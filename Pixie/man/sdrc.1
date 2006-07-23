@@ -1,0 +1,51 @@
+.TH SDRC 1
+.SH NAME
+sdrc \- compile an sl shader.
+.SH SYNOPSIS
+\fBsdrc\fR [ options... ] [ name.sl ...  ]
+.SH DESCRIPTION
+.I  Sdrc
+Compiles renderman SL shaders to Pixie sdr code for use with
+.I rndr.
+.P
+The main documentation is maintained in html form
+and should be included with your distribution in the html or doc directories.
+.SH OPTIONS
+.TP
+.B \-I<PATH>
+Add <PATH> to the list of directories to search for the preprocessor (for includes).
+.TP
+.B \-D<SYMBOL>
+Define <SYMBOL> for the preprocessor.  The name PIXIE is defined by default.
+.TP
+.B \-o <OUTNAME>
+Output to <OUTNAME> regardless of shader names / input file name.
+.TP
+.B \-nw
+Suppress warnings.
+.TP
+.B \-ne
+Suppress errors.
+.TP
+.B \-ri
+Display resolution info for names and functions.
+.TP
+.B \-v
+Display version.
+.TP
+.B \--help
+Display help.
+.SH ENVIRONMENT
+.TP
+.B PATH
+Searched for includes
+.TP
+.B INCLUDE
+Also searched for includes
+.TP
+.B PIXIEHOME
+Used to locate dsos.
+.SH "SEE ALSO"
+rndr(1), texmake(1), show(1), sdrinfo(1)
+.SH BUGS
+See the sourceforge forums / tracker at http://pixie.sourceforge.net

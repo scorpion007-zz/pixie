@@ -1,0 +1,96 @@
+.TH TEXMAKE 1
+.SH NAME
+texmake \- Prepare a texture for use with Pixie. 
+.SH SYNOPSIS
+\fBtexmake\fR [ options... ] inname.tif [ iname2.tif ... ] outname.tex
+.SH DESCRIPTION
+.I  Texmake
+Prepares textures for efficient use in a render with 
+.I rndr
+.P
+The main documentation is maintained in html form
+and should be included with your distribution in the html or doc directories.
+.P
+The command allows for preparation of envionment maps with latitude-logitude
+mapping, cube maps and also shadow maps.
+.I Texmake
+will output a prepared texture in the same format as the input.  Supported modes
+are: 8bit per channel, 16bit per channel and float values per channel.
+.SH OPTIONS
+.TP
+.B -<MODE>
+Is one of:
+.RS
+.TP
+.B <none>
+The default.  Prepare a standard texture.
+.TP
+.B \-shadow
+Prepare a shadow map
+.TP
+.B \-envlatl
+Prepare a latitude-longitude environment map
+.TP
+.B \-envcube
+Prepare a cube environment map.  There are expected to be 6 input textures
+specified before the output filename representing the faces. These are specified
+in the following order: +x -x +y -y +z -z.
+.RE
+.TP
+.B \-tilesize
+Set the tile size for the output, defaults to 32.
+.TP
+.B \-smode <MODE>
+Set the s mode.  This may be one of 
+.RS
+.TP
+.B periodic
+.TP
+.B nonperiodic
+.TP
+.B nowrap
+.TP
+.B clamp
+.TP
+.B black
+.RE
+.TP
+.B \-tmode <MODE>
+Set the t mode, see -smode.
+.TP
+.B \-filter <FILTER>
+Set the filtering mode to <FILTER>.  Valid modes are:
+.RS
+.TP
+.B box
+.TP
+.B triangle
+.TP
+.B gaussian
+.TP
+.B catmull-rom
+.TP
+.B sinc
+.RE
+.TP
+.B \-filterwidth <WIDTH>
+Set the swidth and twidth of the filter used to prepare the mip levels.
+.TP
+.B \-sfilterwidth <WIDTH>
+Set the swidth of the filter.
+.TP
+.B \-tfilterwidth <WIDTH>
+Set the twidth of the filter.
+.TP
+.B \-fov <FOV>
+Set the field of view.
+.TP
+.B \-input <PATH>
+Set the input file path to PATH.
+.TP
+.B \-output <PATH>
+Set the output file path the PATH.
+.SH "SEE ALSO"
+rndr(1), sdrc(1), show(1), sdrinfo(1)
+.SH BUGS
+See the sourceforge forums / tracker at http://pixie.sourceforge.net

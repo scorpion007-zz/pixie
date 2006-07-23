@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="Tutorials/Global Illumination,EfficientlyCachingIrradiance" />
+<link rel="shortcut icon" href="favicon.ico" />
+		<title>Tutorials/Global Illumination - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
+		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="ns-0 ltr">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="top" id="contentTop"></a>
+				<h1 class="firstHeading">Tutorials/Global Illumination</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Tutorials.html" title="Tutorials">Tutorials</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+</p>
+<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class='toclevel-1'><a href="#Overview"><span class="tocnumber">1</span> <span class="toctext">Overview</span></a></li>
+<li class='toclevel-1'><a href="#Photons"><span class="tocnumber">2</span> <span class="toctext">Photons</span></a></li>
+<li class='toclevel-1'><a href="#Irradiance_Caches_.28RIB.29"><span class="tocnumber">3</span> <span class="toctext">Irradiance Caches (RIB)</span></a></li>
+<li class='toclevel-1'><a href="#Irradiance_Caches_.28SL.29"><span class="tocnumber">4</span> <span class="toctext">Irradiance Caches (SL)</span></a></li>
+<li class='toclevel-1'><a href="#Multi-Pass_approaches"><span class="tocnumber">5</span> <span class="toctext">Multi-Pass approaches</span></a></li>
+<li class='toclevel-1'><a href="#Controlling_the_cache_Density"><span class="tocnumber">6</span> <span class="toctext">Controlling the cache Density</span></a></li>
+<li class='toclevel-1'><a href="#Global_Illumination_parameters"><span class="tocnumber">7</span> <span class="toctext">Global Illumination parameters</span></a>
+<ul>
+<li class='toclevel-2'><a href="#Radiance_Caches"><span class="tocnumber">7.1</span> <span class="toctext">Radiance Caches</span></a></li>
+<li class='toclevel-2'><a href="#Occlusion"><span class="tocnumber">7.2</span> <span class="toctext">Occlusion</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Overview">edit</a>]</div><a name="Overview"></a><h1> Overview </h1>
+<p>This page describes a liitle about how to get the best from Pixie's Global Illumination support.
+</p><p>First off, it's probably worth explaining a bit about how Pixie calculates global illumination:  It's actually a pretty broad term and refers to 'global' solutions to the lightin (considering all surface interactions).  It also encompasses a number of techniques.  I'll talk first about color bleeding.  Occlusion (soft ambient shadowing is covered next).  Both technqiues share acceleration via the irradiance cache, so I'll talk at the end about tweaks to keep things fast and other hints.
+</p><p>Eventually, I'll add proper examples for all of the cases.  For now, Per Christensen's paper "Global Illumination and All That" has a very good explanation <a href="http://www.seanet.com/~myandper/abstract/sig03c09.htm" class='external autonumber' title="http://www.seanet.com/~myandper/abstract/sig03c09.htm" rel="nofollow">[1]</a>.
+</p><p><br />
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Photons">edit</a>]</div><a name="Photons"></a><h1> Photons </h1>
+<p>Firstly, if you want colour bleeding between diffuse surfaces, you'll need a photon map.  If you don't want colour bleeding, you don't need a photon map pass.  Photon maps record the irradiance on a surface as light bounces from surface to surface.  Photon maps are baked using the photon hider (use this snippet):
+</p>
+<pre>Hider "photon" "emit" 300000
+...
+Attribute "photon" "globalmap" "photonmap.gpm"
+Attribute "photon" "estimator" 100
+</pre>
+<p><b>The more photons that are emitted, the bigger, but more accurate the photon cache will be</b>.
+</p><p>Each object can have a photon map attached via an attribute which controls where the photons are stored.  The estimator parameter defines how many photons are used to estimate irradiance.  
+</p><p><b>Bigger estimator values are smoother, but less accurate.  Smaller values may be noisy</b>.
+</p><p>Emit as many photons as you can, and use as small a photon estimator as makes sense for your scene.
+</p><p><b>Photons are emitted by lights - so if there's no lights, you'll get no photons</b>.
+</p><p>You can use the <tt>show</tt> program to view the contents of a photon map on disk, to check the density of photons.
+</p>
+<div class="thumb tright"><div style="width:182px;"><a href="images/GSHPhotonMapVis.png" class="internal" title="Photon map displayed with show"><img src="../thumbs/c/c7/GSHPhotonMapVis.png/180px-GSHPhotonMapVis.png" alt="Photon map displayed with show" width="180" height="127" longdesc="images/GSHPhotonMapVis.png" /></a>  <div class="thumbcaption" ><div class="magnify" style="float:right"><a href="images/GSHPhotonMapVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="Enlarge" /></a></div>Photon map displayed with <tt>show</tt></div></div></div>
+<p>Having gotten a photon map from your first pass, you can now calculate the indirect lighting.  This works by sampling a hemisphere at various points in your scene to evalute the incoming light.  These sampled hemispheres are costly to evaluate.  Therefore, a cache (the irradiancecache) is used to speed up the evaluation.  This interpolates between samples from nearby places to work out the lighting in between sample points.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Irradiance Caches (RIB)">edit</a>]</div><a name="Irradiance_Caches_.28RIB.29"></a><h1> Irradiance Caches (RIB) </h1>
+<p>The cache to use is specified using an attribute:
+</p>
+<pre> Attribute "irradiance" "handle" "irr.icf"
+</pre>
+<p>The mode with which to operate on the cache is specified using an attribute also:
+</p>
+<pre> Attribute "irradiance" "filemode" "w"
+</pre>
+<p>The valid modes for Pixie are:
+</p>
+<dl><dt> ""&nbsp;</dt><dd> One-shot cache created on the fly (default)
+</dd><dt> "r"&nbsp;</dt><dd> Read from the cache specified, add samples to it on the fly (but don't save them back out)
+</dd><dt> "R"&nbsp;</dt><dd> Read from the cache specified, use only samples already in the cache
+</dd><dt> "w"&nbsp;</dt><dd> Add samples to the cache then write it out
+</dd><dt> "rw"&nbsp;</dt><dd> Read a cache, add samples to it, then write it back out
+</dd></dl>
+<p>But... Simply adding these attributes to your scene will not have any effect.  You need to have a shader attached which uses either the <tt>occlusion</tt> or <tt>indirectdiffuse</tt> shadeops.  Both of these can store / retrieve results from an irradiancecache (see below for the differences in what's stored).
+</p><p>To get color bleeding, you'll need to specify a photonmap which is used to esitmate the irradiance when writing the irradiancecache.
+</p>
+<pre>Attribute "photon" "globalmap" "cornell.gpm"
+Attribute "photon" "estimator" [500]
+</pre>
+<p><b>Both irradiance caches and photonmaps are specified by attributes - you can use different one or different settings for each primitive if you want</b>.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Irradiance Caches (SL)">edit</a>]</div><a name="Irradiance_Caches_.28SL.29"></a><h1> Irradiance Caches (SL) </h1>
+<p>When baking out irradiance, your shader should have a call to indirectdiffuse
+</p>
+<pre>...
+normal Nn = normalize(N);
+color indirect = indirectdiffuse(P, Nn, samples);
+...
+</pre>
+<p>Where samples is the number of samples to use when estimating the lighting hemisphere.  Note that the indirectdiffuse shadeop only has to resort to sampling the hemisphere when the data in the cache cannot provide a sufficiently error-free interpolated answer.  In which case it samples the irradiance hemisphere and inserts the sample into the cache.  Sampling is done by raytracing - so make sure ray tracing is turned on.
+</p><p><b>Use as many samples for indirectdiffuse as as possible (512, 1024 are good values).</b>
+</p><p><b>Make sure ray-tracing is enabled for your primatives - it's needed to add samples to the cache</b>
+</p><p>The <tt>indirectdiffuse</tt> shadeop takes some optional arguments.  I'll explain these a bit later, in the tweaks section.
+</p><p>The resulting color 'indirect' can then be used along with direct lighting contributions to shade the surface color.  The other effect of this shadeop running, is that the cache will be filled up.  Depending on the values for maxError (and some of the other parameters), many samples will end up in the cache, or only a few.  Either way, some samples may be interpolated from those already in the cache, and maxError controls 'how often' this happens.
+</p><p>Of course you can use these results straight away (you don't even have to explictly save out or name a cache).  But it's often more powerful and more flexible to use this first step to save out a cache, then to reuse it later.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Multi-Pass approaches">edit</a>]</div><a name="Multi-Pass_approaches"></a><h1> Multi-Pass approaches </h1>
+<p>Broadly speaking, multi-pass approaches consist of saving out a cache using the 'w' mode above.  The cache is then read back using either 'r','rw' or 'R' modes.  Once again, the indirectdiffuse shadeop will interact with the cache.  The idea is that the cache has been properly constructed in the first pass, so reading it back is fast, and results will be estimated from samples in the cache.
+</p><p>If the mode is 'r' or 'rw' then additional samples may be added to the cache where needed, this is exactly like the cache construction in the previous pass. 
+</p><p><b>For the r or rw modes in a multi-pass approach, remember to add the globalmap and photon estimator attributes so that illumination can be estimated for the new samples</b>
+</p><p>So why use a multi-pass approach?  There are a number of reasons.  First, the cache is saved out an estimating irradiance using values in the cache is fast.  This means you can bake once and reuse the bake for many viewpoints.  You can also control the interpolation of the prestored results to blur the results stored in the cache.
+</p><p>If you intend to use a cache from a number of viewpoints, there's some things to bear in mind. Essentially, it is the execution of the indirectdiffuse shadeop that causes samples to appear in the cache - during the cache-bake pass.  Pieces of geometry which do not get shaded dont insert samples.
+</p><p>So when reusing the cache in a second pass, if these surfaces become exposed, there are no stored values in the cache.
+</p><p><b>Make sure all the scene you want baked is in view for the bake pass</b>
+</p><p><b>For cache reuse, setting several attributes can help the cache to be sufficiently densely populated</b>
+</p><p><code>
+</p>
+<pre>Attribute "dice" "rasterorient" 0 # view independent dicing
+Attribute "cull" "backfacing" 0   # don't cull backfaces before shading
+Attribute "cull" "hidden" 0         # shade hidden faces too
+</pre>
+<p></code>
+</p><p>Turning off raster oriented dicing means that a non screen-space metric is used when dicing.  This ensures geometry far from the screen still gets diced finely.   Otherwise, it may be coarsly diced and the samples inserted into the cache might be far appart.
+</p><p>Turning off backface culling allows 1-sided grids which are pointing away from the camera in the bake scene to be shaded.  Their sidedness will still be used to determine final visibility.
+</p><p>Turning off hidden surface culling allows hidden surfaces to be shaded.  They'll still be hidden in the final image, but the shader will execute, saving irradiance points so that from a different viewpoint, the cache still has data.
+</p><p>Don't use these for normal renders, they'll all cause more grids to be shaded and more shading points to be created.  This will slow things down.  However, they are a good idea for any sort of baking, irradiancecache included.
+</p><p>Notice the area behind the sphere which isn't covered by samples in this example.  This is fixed by turning off culling of hidden surfaces.  There are also issues due to the fact that non-raster-oriented dicing was off when the cache used in this image was baked.
+</p>
+<div class="center"><div class="floatnone"><span><a href="images/GSHGICullError.jpg" class="image" title="errors from reusing the bake"><img src="../images/GSHGICullError.jpg" alt="errors from reusing the bake" width="400" height="400" longdesc="images/GSHGICullError.jpg" /></a></span></div></div>
+<p><b>When reading back data in the second pass, you may find it useful to set maxError slightly higher than in the bake.</b>
+</p><p>This ensures that the slightly more blurred lookup has data from the cache.  Otherwise, you may find that right in the corners where the irradiance changes quickly, that the samples are too small and some specled holes appear in the irradiance data.  This mainly applies to reusing cache data from different viewpoint.
+</p><p>The bake pass:
+</p>
+<div class="center"><div class="floatnone"><span><a href="images/GSHGiBakePass.jpg" class="image" title="the baked image"><img src="../images/GSHGiBakePass.jpg" alt="the baked image" width="400" height="400" longdesc="images/GSHGiBakePass.jpg" /></a></span></div></div>
+<p>Using the cache with a different viewpoint (see the errors where insufficient data is available in the cache):
+</p>
+<div class="thumb tright"><div style="width:182px;"><a href="images/GSHGIReusedError.png" class="internal" title="errors when reusing a cache"><img src="../thumbs/d/d6/GSHGIReusedError.png/180px-GSHGIReusedError.png" alt="errors when reusing a cache" width="180" height="178" longdesc="images/GSHGIReusedError.png" /></a>  <div class="thumbcaption" ><div class="magnify" style="float:right"><a href="images/GSHGIReusedError.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="Enlarge" /></a></div>errors when reusing a cache</div></div></div>
+<p>Fixed image (either rebake the cache with higher shading rate, or use a slightly higher maxError when reading the cache)
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Controlling the cache Density">edit</a>]</div><a name="Controlling_the_cache_Density"></a><h1> Controlling the cache Density </h1>
+<p>The main parameter you have for cache quality / density is <tt>maxError</tt>.  It is 0.5 by default.  Higher values when baking result in quicker renders, smaller (less dense) caches.  Lower values result in more dense caches.  A value of 0 means never interpolate.
+</p><p><b>Higher values of maxError give more error but are faster.  Lower values are more accurate, and take longer</b>
+</p><p>So basically, you bake with the smallest tollerable maxError, perhaps 0.1.  However, because the cache is filled using the shading execution points, you need to ensure these are sufficiently dense if the cache is to be reused from other viewpoints.  Generally using a higher shading rate (numerically smaller number to ShadingRate) will achieve more shading points and result in a denser cache.  Also a bigger resolution in the bake scene may achieve a similar result.  Note that shading rate is specified in terms of the area of final pixels - more pixelSamples won't do the job.  
+</p><p><b>To get a denser cache increase the resolution or use a higher shading rate</b>
+</p><p>A larger maxError when reading a cache that already has values allows a larger number of samples to be used to estimate the irradiance.  In other words, it blurs the results in the cache slightly.  In combination with the above technique for producing a relatively dense cache in the first place, this can be used to smooth out areas where the samples are too sparse after moving the view.
+</p><p>The <tt>show</tt> program can be used to view a cache and to see it's sample density.
+</p>
+<div class="thumb tright"><div style="width:182px;"><a href="images/GSHICacheVis.png" class="internal" title="cache density as visualized with show"><img src="../thumbs/8/8c/GSHICacheVis.png/180px-GSHICacheVis.png" alt="cache density as visualized with show" width="180" height="131" longdesc="images/GSHICacheVis.png" /></a>  <div class="thumbcaption" ><div class="magnify" style="float:right"><a href="images/GSHICacheVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="Enlarge" /></a></div>cache density as visualized with <tt>show</tt></div></div></div>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Global Illumination parameters">edit</a>]</div><a name="Global_Illumination_parameters"></a><h1> Global Illumination parameters </h1>
+<p><b>maxError</b>
+</p><p>As discussed, maxError controls two things.  Firstly when it's OK to use samples already in the cache (and hence the blurriness of using such samples.  Secondly it controls when to add samples to the cache (because none are available in the cache).  It's an attribute set in the RIB.
+</p><p><b>minR and maxR</b>
+</p><p>The parameters "<tt>minR</tt>" and "<tt>maxR</tt>" are optional parameters passed to the indirectdiffuse shadeop. 
+They control only newly added samples and therefore are useful for baking.
+They represent the minimum and maximum radius that a sample can occupy.
+</p><p>Normally you would not alter these parameters, but doing so may helpprevent interpolation artifacts or otherwise help control the number of samples.
+</p><p>The <tt>maxR</tt> parameter puts an upper limit on the radius of validity for a sample.
+The <tt>minR</tt> parameter on the other hand can prevent the radius of validity becoming too small.
+</p><p>Setting a small <tt>maxR</tt> paramter will probably increase your cache size (but will make it contain more accurate data).  Increasing <tt>minR</tt> sets an upper bound on the size the cache can grow to.  Note you must set <tt>minR</tt> and <tt>maxR</tt> such that <tt>minR &lt; maxR</tt>.
+</p><p><b>maxdist</b>
+</p><p>The "<tt>maxdist</tt>" parameter to indirectdiffuse controls the maximum intersection distance for rays when sampling the irradiance hemisphere.  You may wish to limit the influence of far off objects by setting this.  By default it's infinity.
+</p><p><b>trace bias</b>
+</p><p>Trace Bias ( <tt>Attribute "trace" "float bias" [0.01]</tt> ) isn't a GI attribute per-se but because irradiancecaches use raytracing to sample the irradiance hemisphere, you need to make sure the bias is appropriate for your scene.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Radiance Caches">edit</a>]</div><a name="Radiance_Caches"></a><h2> Radiance Caches </h2>
+<p><i>TODO</i>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Occlusion">edit</a>]</div><a name="Occlusion"></a><h2> Occlusion </h2>
+<p><i>TODO</i>
+</p><p><b>See also</b>
+</p><p><a href="../NotIncludedStatic.html" title="EfficientlyCachingIrradiance">EfficientlyCachingIrradiance</a>
+</p>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!0!!en!2 and timestamp 20060714201752 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tutorials/Global_Illumination">http://www.george-graphics.co.uk/pixiewiki/index.php/Tutorials/Global_Illumination</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Tutorials.html" title="Category:Tutorials">Tutorials</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<ul>
+				 <li id="ca-nstab-main" class="selected"><a href="../Tutorials/Global_Illumination.html">Article</a></li>
+				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
+				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
+				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
+		</ul>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
+				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Tutorials/Global_Illumination&amp;oldid=2162">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 20:32, 7 July 2006.</li>
+				<li id="f-viewcount">This page has been accessed 1,177 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.16 secs. -->
+</body></html>
