@@ -1,2 +1,0 @@
-1.0.5
-	Global variables that have been erronuously defined as "vertex" are changed back to "varying"
