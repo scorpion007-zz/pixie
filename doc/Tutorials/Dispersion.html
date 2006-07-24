@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="Tutorials/Dispersion" />
+<link rel="shortcut icon" href="favicon.ico" />
+		<title>Tutorials/Dispersion - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
+		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="ns-0 ltr">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="top" id="contentTop"></a>
+				<h1 class="firstHeading">Tutorials/Dispersion</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Tutorials.html" title="Tutorials">Tutorials</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+</p>
+<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class='toclevel-1'><a href="#Outline"><span class="tocnumber">1</span> <span class="toctext">Outline</span></a></li>
+<li class='toclevel-1'><a href="#Rendering_a_Photon_Pass"><span class="tocnumber">2</span> <span class="toctext">Rendering a Photon Pass</span></a></li>
+<li class='toclevel-1'><a href="#Rendering_the_Beauty_pass"><span class="tocnumber">3</span> <span class="toctext">Rendering the Beauty pass</span></a></li>
+<li class='toclevel-1'><a href="#Example"><span class="tocnumber">4</span> <span class="toctext">Example</span></a></li>
+</ul>
+</td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Outline">edit</a>]</div><a name="Outline"></a><h1> Outline </h1>
+<p>Pixie is capable of modelling the dispersion of light through refractive objects.  To do this, you must use the photon hider to generate refracted caustics (which will exhibit dispersion).  These are then used in a beauty pass.
+</p><p>There's basically two things you need to enable this:
+</p><p>1. Enable dispersion / spectral sampling:
+</p>
+<pre>Hider "photon" "emit" [1000000] "samplespectrum" [1]
+</pre>
+<p>2. Use the <tt>dielectric</tt> photon shading model.  This model allows you to specify the index of refraction range (<tt>iorrange</tt>) for objects in the scene:
+</p>
+<pre>Attribute "photon" "shadingmodel" "dielectric"
+Attribute "photon" "iorrange" [1.5 1.4]
+</pre>
+<p>3. Render the beauty pass, reading the photon map using the <tt>photonmap()</tt> shadeop.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Rendering a Photon Pass">edit</a>]</div><a name="Rendering_a_Photon_Pass"></a><h1> Rendering a Photon Pass </h1>
+<p>You will need:
+</p><p>1. To use the photon hider with <tt>samplespectrum</tt> enabled, use:
+</p>
+<pre>Hider "photon" "emit" 3000000 "samplespectrum" 1
+</pre>
+<p>Pixie will sample the spectrum - picking a wavelength to sample, and the color associated with the wavelength.  This is filtered by the desired color of the light, and any colored objects in the scene.  Because the surfaces can respond differently (in terms of index of refraction) to the different wavelengths, dispersion can occur.
+</p><p>2. You will need at least one light source - photons are emitted from lights
+</p><p>3. A causticmap attached to objects your scene, use something like:
+</p>
+<pre>Attribute "photon" "causticmap" "caustic.cpm"
+</pre>
+<p>This is where the photons are stored.  As they scatter, refract and disperse, the photons eventually hit an object which recieves them (has the "<tt>matte</tt>" shading model).  This attribute needs to be attached to anything you wish to <u>recieve</u> caustics.
+</p><p>4. You will need an object with the <tt>"matte"</tt> photon shading model, most others models just refract or reflect the photons.
+</p><p>5. You will need to set the photon model to the dispersion-supporting <tt>dielectric</tt> model, for objects you wish to disperse light
+</p>
+<pre>Attribute "photon" "shadingmodel" "dielectric"		# glass parts scatter them
+Attribute "photon" "float[2] iorrange" [1.4 1.2]	# Set ior(red)=1.4, ior(blue)=1.2
+</pre>
+<p>This describes the index of refraction each end of the spectrum gets, controlling how much it is 'bent', and thus causing the dispersion of different wavelength light to occur.
+</p><p>You can check the results using the <tt>show</tt> program.  The photon map will appear to contain many more colors on close inspection than one rendered without <tt>samplespectrum</tt> turned on.
+</p>
+<div class="center"><div class="floatnone"><span><a href="images/DispersionPhotons.png" class="image" title=""><img src="../thumbs/1/16/DispersionPhotons.png/400px-DispersionPhotons.png" alt="" width="400" height="297" longdesc="images/DispersionPhotons.png" /></a></span></div></div>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Rendering the Beauty pass">edit</a>]</div><a name="Rendering_the_Beauty_pass"></a><h1> Rendering the Beauty pass </h1>
+<p>The idea is to take the precomputed caustics and render them.  The <tt>photonmap()</tt> shadeop is the way to do this.  It can be called from any shader type.  Here we use it in a lightsource, to allow it to be easily combined with any scene
+</p>
+<pre>light causticlight()
+{
+	normal Ns = faceforward (normalize(N),I);
+	
+	illuminate (P + Ns) {  /* force execution independent of light location */
+		Cl = filter * photonmap("caustic.cpm", Ps, Ns, "estimator", 100);
+	}
+}
+</pre>
+<p>This could be parameterized to work with any photon map.
+</p><p>This is the only thing you have to do, though probably you will want to set some raytracing attributes, and assign some smarter shaders than in the photon pass (which igores all surface shaders).
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Example">edit</a>]</div><a name="Example"></a><h1> Example </h1>
+<p><a href="images/CausticsPrismSphere.png" class="image" title="Image:CausticsPrismSphere.png"><img src="../images/CausticsPrismSphere.png" alt="Image:CausticsPrismSphere.png" width="640" height="480" longdesc="images/CausticsPrismSphere.png" /></a>
+</p><p>This image uses the two passes described above, though they could of course be described in one RIB file.
+</p><p>You can get the example <a href="../images/DispersionTutorial.zip" class='internal' title="DispersionTutorial.zip"> here</a>
+</p><p>Thanks to Mario F for the idea.
+</p>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1634-0!1!0!0!!en!2 and timestamp 20060714215409 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tutorials/Dispersion">http://www.george-graphics.co.uk/pixiewiki/index.php/Tutorials/Dispersion</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Tutorials.html" title="Category:Tutorials">Tutorials</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<ul>
+				 <li id="ca-nstab-main" class="selected"><a href="../Tutorials/Dispersion.html">Article</a></li>
+				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
+				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
+				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
+		</ul>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
+				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Tutorials/Dispersion&amp;oldid=2178">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 23:13, 7 July 2006.</li>
+				<li id="f-viewcount">This page has been accessed 86 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.21 secs. -->
+</body></html>
