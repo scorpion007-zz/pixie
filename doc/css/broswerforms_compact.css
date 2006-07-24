@@ -1,0 +1,67 @@
+/*
+-----------------------------------------------------
+FraternityManuals.org form tags rules CSS file for screen media
+FileName:   browserforms_compact.css
+Version:    2005.04.06
+Author:		jasonpearce.com
+-----------------------------------------------------
+*/
+
+@namespace url(http://www.w3.org/1999/xhtml); /* set default namespace to HTML */
+
+form {display:block;margin:0 0 1em 0;}
+
+/* miscellaneous form elements */
+fieldset {border:2px groove ThreeDFace;display:block;margin-left:2px;margin-right:2px;padding:0.35em 0.625em 0.75em;}
+label {cursor:default;}
+legend {border:none;padding-left:2px;padding-right:2px;}
+
+/* default inputs, text inputs, and selects */
+input {border:2px inset ThreeDFace;cursor:text;letter-spacing:normal;line-height:normal !important;padding:1px 0 1px 0;text-align:start;text-indent:0;text-transform:none;word-spacing:normal;}
+textarea {border:2px inset ThreeDFace;cursor:text;letter-spacing:normal;line-height:normal !important;margin:1px 0 1px 0;text-align:start;text-indent:0;text-transform:none;vertical-align:text-bottom;word-spacing:normal;}
+textarea > scrollbar {cursor:default;}
+select {border-color:ThreeDFace;border-style:inset !important;border-width:2px !important;cursor:default;line-height:normal !important;margin:0;text-align:start;text-indent:0;white-space:nowrap !important;}
+select[size],select[multiple],select[size][multiple] {padding:1px 0 1px 0;vertical-align:text-bottom;}
+select[size="0"],select[size="1"] {padding:0;vertical-align:baseline;}
+select > input[type="button"] {background-image:url("arrow.gif") !important;background-position:center !important;background-repeat:no-repeat !important;height:12px;position:static !important;white-space:nowrap;width:12px;}
+select > input[type="button"]:active {background-image:url("arrowd.gif") !important;}
+option {display:block;line-height:normal !important;min-height:1em;text-indent:0;}
+select > option {padding:0 5px 0 3px;}
+option:checked {background-color:Highlight !important;color:HighlightText !important;}
+optgroup {display:block;font-style:italic;font-weight:bold;line-height:normal !important;text-indent:0;}
+optgroup > option {font-style:normal;font-weight:normal;padding-left:20px;}
+optgroup:before {content:attr(label);display:block;}
+input[disabled],textarea[disabled],option[disabled],optgroup[disabled],select[disabled] {background-color:ThreeDFace;color:GrayText;cursor:default;}
+option[disabled],optgroup[disabled] {background-color:transparent;}
+
+/* hidden inputs */
+input[type="hidden"] {border:0;cursor:auto;display:none;padding:0;}
+
+/* image buttons */
+input[type="image"] {background-color:transparent;border:none;cursor:pointer;font-family:sans-serif;font-size:small;padding:0;}
+input[type="image"][disabled] {cursor:default;}
+
+/* file selector */
+input[type="file"] {border-style:none !important;cursor:default;padding:0 !important;white-space:nowrap;}
+input[type="file"] > input[type="text"] {background-color:inherit;border-color:inherit;color:inherit;font-size:inherit;height:inherit;}
+
+/* button part of file selector */
+input[type="file"] > input[type="button"] {font-size:inherit;height:inherit;}
+
+/* radio buttons */
+input[type="radio"] {cursor:default;height:13px;margin:3px 3px 0px 5px;padding:0 !important;width:13px;}
+
+/* check boxes */
+input[type="checkbox"] {cursor:default;height:13px;margin:3px 3px 3px 4px;padding:0 !important;vertical-align:text-bottom;width:13px;}
+
+/* common features of radio buttons and check boxes */
+input[type="checkbox"]:focus,input[type="radio"]:focus {border-style:groove !important;}
+input[type="checkbox"]:hover:active,input[type="radio"]:hover:active {background-color:ThreeDFace !important;border-style:inset !important;}
+input[type="radio"],input[type="checkbox"] {border:2px inset ThreeDFace !important;}
+input[type="radio"][disabled],input[type="radio"][disabled]:active,input[type="radio"][disabled]:hover,input[type="radio"][disabled]:hover:active,input[type="checkbox"][disabled],input[type="checkbox"][disabled]:active,input[type="checkbox"][disabled]:hover,input[type="checkbox"][disabled]:hover:active {background-color:ThreeDFace !important;border:1px inset ThreeDShadow !important;color:GrayText !important;padding:1px;}
+
+/* buttons */
+button {text-indent:0;white-space:normal;}
+button,input[type="reset"],input[type="button"],input[type="submit"] {background-color:ButtonFace;border:2px outset ButtonFace;color:ButtonText;cursor:default;line-height:normal !important;padding:0px 6px 0px 6px;white-space:pre;}
+button:active:hover,input[type="reset"]:active:hover,input[type="button"]:active:hover,input[type="submit"]:active:hover {border-style:inset;padding:0px 5px 0px 7px;}
+button[disabled]:active,button[disabled],input[type="reset"][disabled]:active,input[type="reset"][disabled],input[type="button"][disabled]:active,input[type="button"][disabled],select[disabled] > input[type="button"],select[disabled] > input[type="button"]:active,input[type="submit"][disabled]:active,input[type="submit"][disabled] {border:1px outset ButtonShadow;color:GrayText;padding:1px 7px 1px 7px;}

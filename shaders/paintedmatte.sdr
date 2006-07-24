@@ -1,0 +1,43 @@
+#!version 1.7.2
+surface
+#!parameters:
+uniform	float	Ka	=	1
+uniform	float	Kd	=	1
+uniform	string	texname	=	""
+#!variables:
+varying	vector	Nf
+varying	vector	temporary_0
+varying	boolean	temporary_1
+uniform	boolean	temporary_2
+varying	vector	temporary_3
+varying	vector	temporary_4
+uniform	vector	temporary_5
+varying	vector	temporary_6
+varying	vector	temporary_7
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  temporary_0  N 
+	faceforward	("v=vv")  Nf  temporary_0  I 
+	movevv            	Ci Cs
+	sneql             	temporary_2 texname ""
+	vuboolean          temporary_1 temporary_2
+	if                	temporary_1 #!Label3
+	texture	("c=SFff")  temporary_0  texname  0  s  t 
+	mulvv             	Ci Ci temporary_0
+#!Label3:
+	endif             
+	vfromf            	temporary_5 Ka
+	vuvector           temporary_4 temporary_5
+	ambient	("c=")  temporary_6 
+	mulvv             	temporary_3 temporary_4 temporary_6
+	vfromf            	temporary_5 Kd
+	vuvector           temporary_6 temporary_5
+	diffuse	("c=n")  temporary_7  Nf 
+	mulvv             	temporary_4 temporary_6 temporary_7
+	addvv             	temporary_0 temporary_3 temporary_4
+	mulvv             	Ci Ci temporary_0
+	movevv            	Oi Os
+	mulvv             	Ci Ci Oi
+	return            
+

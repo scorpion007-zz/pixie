@@ -1,0 +1,52 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	 [ 1 1 1 ]
+uniform	vector	direction	=	 [ 0 0 1 ]
+uniform	string	shadowname	=	""
+uniform	color	shadowcolor	=	 [ 0 0 0 ]
+uniform	float	decayRate	=	0
+#!variables:
+varying	boolean	temporary_0
+uniform	boolean	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+uniform	vector	temporary_4
+uniform	vector	temporary_5
+varying	vector	temporary_6
+varying	vector	temporary_7
+varying	float	temporary_8
+#!Init:
+	return            
+#!Code:
+	seql              	temporary_1 shadowname ""
+	vuboolean          temporary_0 temporary_1
+	if                	temporary_0 #!Label6
+	vuvector           temporary_2 direction
+	vfromf            	temporary_4 0
+	vuvector           temporary_3 temporary_4
+	solar             	 temporary_2  temporary_3  #!Label7
+	vfromf            	temporary_5 intensity
+	mulvv             	temporary_4 temporary_5 lightcolor
+	vuvector           Cl temporary_4
+#!Label7:
+	endsolar          
+#!Label6:
+	else              	#!Label5
+	vuvector           temporary_2 direction
+	vfromf            	temporary_4 0
+	vuvector           temporary_3 temporary_4
+	solar             	 temporary_2  temporary_3  #!Label8
+	vuvector           temporary_6 shadowcolor
+	vfromf            	temporary_5 intensity
+	mulvv             	temporary_4 temporary_5 lightcolor
+	vuvector           temporary_7 temporary_4
+	shadow	("f=SFp")  temporary_8  shadowname  0  Ps 
+	mix	("v=vvf")  Cl  temporary_6  temporary_7  temporary_8 
+#!Label8:
+	endsolar          
+#!Label5:
+	endif             
+	return            
+

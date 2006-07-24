@@ -1,0 +1,21 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	numSamples	=	16
+uniform	float	intensity	=	0.2
+#!variables:
+varying	vector	Nf
+varying	vector	temporary_0
+varying	float	temporary_1
+uniform	vector	temporary_2
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  temporary_0  N 
+	faceforward	("v=vv")  Nf  temporary_0  I 
+	vufloat            temporary_1 numSamples
+	indirectdiffuse	("c=pnf")  Cl  P  Nf  temporary_1 
+	vfromf            	temporary_2 0
+	vuvector           L temporary_2
+	return            
+

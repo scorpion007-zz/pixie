@@ -1,0 +1,50 @@
+#!version 1.7.2
+surface
+#!parameters:
+uniform	float	Ka	=	1
+uniform	float	Ks	=	1
+uniform	float	Kr	=	1
+uniform	float	roughness	=	.1
+uniform	float	samples	=	1
+uniform	float	blur	=	0
+uniform	string	texname	=	"raytrace"
+#!variables:
+varying	vector	Nf
+varying	vector	temporary_0
+varying	vector	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+varying	vector	temporary_4
+uniform	vector	temporary_5
+varying	vector	temporary_6
+varying	vector	temporary_7
+varying	vector	temporary_8
+varying	float	temporary_9
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  N  N 
+	normalize	("v=v")  I  I 
+	faceforward	("v=vv")  Nf  N  I 
+	movevv            	Oi Os
+	vfromf            	temporary_5 Ka
+	vuvector           temporary_4 temporary_5
+	ambient	("c=")  temporary_6 
+	mulvv             	temporary_3 temporary_4 temporary_6
+	vfromf            	temporary_5 Ks
+	vuvector           temporary_6 temporary_5
+	negv              	temporary_8 I
+	vufloat            temporary_9 roughness
+	specular	("c=nvf")  temporary_7  Nf  temporary_8  temporary_9 
+	mulvv             	temporary_4 temporary_6 temporary_7
+	addvv             	temporary_2 temporary_3 temporary_4
+	mulvv             	temporary_1 Cs temporary_2
+	vfromf            	temporary_5 Kr
+	vuvector           temporary_3 temporary_5
+	reflect	("v=vv")  temporary_6  I  Nf 
+	environment	("c=SFvSfSf")  temporary_4  texname  0  temporary_6  "samples"  samples  "blur"  blur 
+	mulvv             	temporary_2 temporary_3 temporary_4
+	addvv             	temporary_0 temporary_1 temporary_2
+	mulvv             	Ci Os temporary_0
+	return            
+

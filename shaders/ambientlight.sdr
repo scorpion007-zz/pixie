@@ -1,0 +1,18 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	1
+#!variables:
+uniform	vector	temporary_0
+uniform	vector	temporary_1
+#!Init:
+	return            
+#!Code:
+	vfromf            	temporary_1 intensity
+	mulvv             	temporary_0 temporary_1 lightcolor
+	vuvector           Cl temporary_0
+	vfromf            	temporary_0 0
+	vuvector           L temporary_0
+	return            
+

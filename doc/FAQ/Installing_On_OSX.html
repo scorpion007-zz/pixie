@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="FAQ/Installing On OSX,FAQ/Why Wont Pixie Run" />
+<link rel="shortcut icon" href="favicon.ico" />
+		<title>FAQ/Installing On OSX - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
+		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="ns-0 ltr">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="top" id="contentTop"></a>
+				<h1 class="firstHeading">FAQ/Installing On OSX</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../FAQ.html" title="FAQ">FAQ</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Requirements">edit</a>]</div><a name="Requirements"></a><h1> Requirements </h1>
+<p>currently Pixie is compiled against libtiff from fink.  Under OSX 10.2 or earlier, it will also require you to use fink's dlcompat and dlcompat-shlibs libraries.
+</p><p>Please install fink ( <a href="http://fink.sourceforge.net" class='external free' title="http://fink.sourceforge.net" rel="nofollow">http://fink.sourceforge.net</a> ) to get a hold of the required libraries.  I can recommend fink commander ( <a href="http://finkcommander.sourceforge.net" class='external free' title="http://finkcommander.sourceforge.net" rel="nofollow">http://finkcommander.sourceforge.net</a> ) to help ease installation of fink projects, but you'll still need to install fink.  Follow the instructions over at fink for how to set it up.
+</p><p>Install libtiff from fink.  Also, especially for 10.2 or earlier, ensure you installl up to date dlcompat and dlcompat-shlib packages.
+</p><p>Get the binary distribution of Pixie and unpack it at <tt>/Applications/Graphics</tt>.  There should be now a folder in <tt>/Applications/Graphics</tt> called <tt>Pixie</tt>.  You may have issues unpacking with some of the gui apps.  Ensure you've got the latest stuffit, or use the command line:
+</p>
+<pre>
+(Assuming package is on your desktop)
+cd /Applications/Graphics/
+gunzip ~/Desktop/Pixie-osx-1.3.xx.tgz
+tar -xvf ~/Desktop/Pixie-osx-1.3.xx.tar
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: OSX 10.2 Stuff">edit</a>]</div><a name="OSX_10.2_Stuff"></a><h1> OSX 10.2 Stuff </h1>
+<p>Now, for the last part, which is required for 10.2 ONLY.  <b>DO NOT PERFORM THE NEXT STEP ON PANTHER (10.3) or TIGER (10.4)</b>
+</p><p>Pixie requires dlcompat.  When installed via fink, these are in <tt>/sw/lib/libdl.0.dylib</tt>.  Pixie binaries are compiled against Panther which had <tt>/usr/lib/libdl.dylib</tt>.  The solution is to create a symbolic link from where the library is expected to be, to where it is.  One final warning.  Don't do this on Panther or Tiger - you've been warned.
+</p>
+<pre>
+sudo ln -s /sw/lib/libdl.0.dylib /usr/lib/libdl.dylib
+</pre>
+<p>If you don't want to do this, or can't, there's a work arround, which is to set
+</p><p>for tcsh
+</p>
+<pre>setenv DYLD_INSERT_LIBARARIES /sw/lib/libdl.0.dylib
+</pre>
+<p>for bash
+</p>
+<pre>export DYLD_INSERT_LIBARARIES=/sw/lib/libdl.0.dylib
+</pre>
+<p>before running pixie.  Please see the notes at the end of this page...
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: For all OSX Versions">edit</a>]</div><a name="For_all_OSX_Versions"></a><h1> For all OSX Versions </h1>
+<p>You should be ready to roll with renders now.  Remember to set up the environment variable <tt>PIXIEHOME</tt>:
+</p><p>for tcsh
+</p>
+<pre>setenv PIXIEHOME /Applications/Graphics/Pixie
+</pre>
+<p>for bash
+</p>
+<pre>export PIXIEHOME=/Applications/Graphics/Pixie
+</pre>
+<p>Finally, you'll probably want to put pixie binaries in your path, which you do with
+</p><p>for tcsh
+</p>
+<pre>set path=($path /Applications/Graphics/Pixie/bin)
+</pre>
+<p>for bash
+</p>
+<pre>export PATH=$PATH:/Applications/Graphics/Pixie/bin
+</pre>
+<p>That's about it.  I've put these commands in my login files.  There are quite a few different oppinions/preferences on how to do this.  
+</p><p>See also <a href="../FAQ/Why_Wont_Pixie_Run.html" title="FAQ/Why Wont Pixie Run">FAQ/Why Wont Pixie Run</a> for more tips on diagnosing a problem.
+</p>
+<hr />
+<p><b>Notes:</b>
+</p><p>I believe there to be an issue running Pixie under 10.2.x with the fink dlcompat library.  From Beque's email, here's what he did to get things to compile under 10.2.x.  I'm hopfully going to fix up the binary distribution so the method above works correctly.  It might not right now (Pixie 1.4.1).
+</p>
+<pre>export CFLAGS="$CFLAGS -Ddlsym=dlsym_prepend_underscore"
+export CXXFLAGS=$CFLAGS
+export CPPFLAGS=$CFLAGS
+</pre>
+<p>Then I reconfigured, cleaned, rebuilt and installed Pixie:
+</p>
+<pre>./configure --prefix=/Applications/Graphics/Pixie
+make clean
+make
+make install
+</pre>
+<p>Then it worked!
+</p><p>To summarize how I got Pixie to work under OSX 10.2.8:
+</p>
+<ul><li> Download and unpack the source tarball
+</li><li> Make sure fink is installed with libtiff and dlcompat
+</li><li> export environment variables to point to fink's include and library
+</li></ul>
+<p>directories
+</p>
+<ul><li> Define _BSD_SOCKLEN_T_ before including sys/socket.h in src/common/os.h
+</li><li> export c and c++ flags to define dlsym=dlsym_prepend_underscore
+</li><li> configure and make as normal
+</li></ul>
+<p>I am sure some of the c and c++ flags I defined were redundant, but better safe
+than sorry. I'm just glad I got it to work and hope that this might help someone
+else.
+</p><div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/FAQ/Installing_On_OSX">http://www.george-graphics.co.uk/pixiewiki/index.php/FAQ/Installing_On_OSX</a>"</div>
+						<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<ul>
+				 <li id="ca-nstab-main" class="selected"><a href="../FAQ/Installing_On_OSX.html">Article</a></li>
+				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
+				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
+				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
+		</ul>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
+				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=FAQ/Installing_On_OSX&amp;oldid=1837">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 14:44, 23 April 2006.</li>
+				<li id="f-viewcount">This page has been accessed 188 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.19 secs. -->
+</body></html>

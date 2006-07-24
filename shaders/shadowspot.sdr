@@ -1,0 +1,76 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	1
+uniform	point	from	=	"shader"  [ 0 0 0 ]
+uniform	point	to	=	"shader"  [ 0 0 1 ]
+uniform	string	shadowname	=	""
+uniform	float	coneangle
+uniform	float	conedeltaangle
+uniform	float	beamdistribution	=	2
+#!variables:
+uniform	vector	temporary_0
+uniform	vector	axis
+varying	vector	temporary_1
+varying	vector	temporary_2
+varying	float	temporary_3
+varying	float	cosangle
+varying	float	atten
+varying	float	temporary_4
+varying	vector	temporary_5
+varying	float	temporary_6
+uniform	float	temporary_7
+varying	float	temporary_8
+uniform	float	temporary_9
+varying	boolean	temporary_10
+uniform	boolean	temporary_11
+varying	vector	temporary_12
+#!Init:
+	vfromf            	temporary_0 0 0 0
+	pfrom             	from "shader" temporary_0
+	vfromf            	temporary_0 0 0 1
+	pfrom             	to "shader" temporary_0
+	radians	("f=f")  coneangle  30 
+	radians	("f=f")  conedeltaangle  5 
+	return            
+#!Code:
+	subvv             	temporary_0 to from
+	normalize	("v=v")  axis  temporary_0 
+	vuvector           temporary_1 from
+	vuvector           temporary_2 axis
+	vufloat            temporary_3 coneangle
+	illuminate        	 temporary_1  temporary_2  temporary_3  #!Label4
+	vuvector           temporary_5 axis
+	dot               	temporary_4 L temporary_5
+	length	("f=v")  temporary_6  L 
+	divff             	cosangle temporary_4 temporary_6
+	vufloat            temporary_6 beamdistribution
+	pow	("f=ff")  temporary_4  cosangle  temporary_6 
+	dot               	temporary_6 L L
+	divff             	atten temporary_4 temporary_6
+	cos	("f=f")  temporary_7  coneangle 
+	vufloat            temporary_6 temporary_7
+	subff             	temporary_9 coneangle conedeltaangle
+	cos	("f=f")  temporary_7  temporary_9 
+	vufloat            temporary_8 temporary_7
+	smoothstep	("f=fff")  temporary_4  temporary_6  temporary_8  cosangle 
+	mulff             	atten atten temporary_4
+	sneql             	temporary_11 shadowname ""
+	vuboolean          temporary_10 temporary_11
+	if                	temporary_10 #!Label5
+	vufloat            temporary_6 1
+	shadow	("f=SFp")  temporary_8  shadowname  0  Ps 
+	subff             	temporary_4 temporary_6 temporary_8
+	mulff             	atten atten temporary_4
+#!Label5:
+	endif             
+	vufloat            temporary_6 intensity
+	mulff             	temporary_4 atten temporary_6
+	vfromf            	temporary_5 temporary_4
+	vuvector           temporary_12 lightcolor
+	mulvv             	Cl temporary_5 temporary_12
+#!Label4:
+	endilluminate     
+	return            
+

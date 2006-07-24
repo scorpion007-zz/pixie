@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="Documentation/Hiders" />
+<link rel="shortcut icon" href="favicon.ico" />
+		<title>Documentation/Hiders - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
+		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="ns-0 ltr">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="top" id="contentTop"></a>
+				<h1 class="firstHeading">Documentation/Hiders</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Documentation.html" title="Documentation">Documentation</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+Pixie can generate images using raytracing or scan line rendering. As it is often the case, scan line rendering is much faster than raytracing. However, such methods may not support accurate reflections/shadows. Since Pixie supports both types of algorithms, you can combine the best of the two worlds: speed of scan-line rendering and the accuracy of raytracing. A hider is the section of the renderer that is responsible for creating the final image. Essentially, every hider implements a different rendering algorithm. You can switch between defined hiders using  Hider command. Pixie defines the following hiders:
+</p>
+<table class="wikitable">
+
+<tr>
+<td> <b>raytrace</b> </td><td> As the name implies, this hider creates the final image using raytracing. This involves shooting bunch of rays for every pixel (defined by  PixelSamples) and then filtering and summing the color of every ray (defined by <tt>PixelFilter</tt>).
+</td></tr>
+<tr>
+<td> <b>stochastic (hidden)</b> </td><td> (Default) This hider creates the final image using scan-line techniques very similar to Pixar's Reyes architecture. Every specified primitive is split into smaller primitives and deferred until needed. If the projected size of a subdivided primitive is small enough, a regular grid is sampled on the patch and the polygons in this grid are rendered using scan-line methods. Notice that a raytracer may need to keep the entire scene geometry in the memory in case a future ray can intersect them. On the other hand, the deferred and render-and-forget feature of this rendering algorithm allows it to keep a very small memory footprint
+</td></tr>
+<tr>
+<td> <b>zbuffer</b> </td><td> This hider is a stripped down version of Stochastic. It does not support motion blur, depth of field or transparency. If your scene does not involve these effects, this hider can generate an equal quality output with the Stochastic.
+</td></tr>
+<tr>
+<td> <b>opengl</b> </td><td> This is exactly the same with Zbuffer. However, the final stage of the rendering is implemented with OpenGl. The potential hardware acceleration makes this hider much faster than any other hider. If your computer does not have a hardware implemented opengl driver, Zbuffer is faster. OpenGL hider is only available on Windows systems for the time being.
+</td></tr>
+<tr>
+<td> <b>photon</b> </td><td> This hider is used to compute photonmaps in a preprocessing step. This hider does not create an image. The renderer simply goes through the light sources defined in a scene and shoots photons.
+<p><b>New in 1.7.2</b> The photon hider supports dispersion of light.
+</p>
+</td></tr></table>
+<p>If you notice,  OpenGL hider is implemented as a module. That means if you want to use it,  <tt>opengl.dll/so</tt> must be in your procedural path (check <tt>Option "searchpath" "procedural" </tt>).
+</p><p>The following table summarizes the capabilities of each hider:
+</p>
+<table class="wikitable">
+<tr>
+<th style="width:40px">
+</th><th style="width:30px"> TSM
+</th><th style="width:30px"> J
+</th><th style="width:30px"> T
+</th><th style="width:30px"> OC
+</th><th style="width:30px"> AOS
+</th><th style="width:30px"> SS
+</th><th style="width:30px"> MB
+</th><th style="width:30px"> DOF
+</th><th style="width:30px"> LOD
+</th></tr>
+<tr>
+<td>stochastic </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X
+</td></tr>
+<tr>
+<td>raytrace    </td><td>      </td><td>  X	  </td><td>  X  </td><td>      </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X  </td><td>  X
+</td></tr>
+<tr>
+<td>zbuffer     </td><td>      </td><td>      </td><td>      </td><td>  X  </td><td>      </td><td>  X  </td><td>      </td><td>      </td><td>
+</td></tr>
+<tr>
+<td>opengl     </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>  X  </td><td>      </td><td>      </td><td>
+</td></tr>
+<tr>
+<td>photon     </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>
+</td></tr></table>
+<p>Where:
+</p>
+<table>
+<tr>
+<td> TSM </td><td> Transparency Shadow Map
+</td></tr>
+<tr>
+<td> J </td><td> Jittering
+</td></tr>
+<tr>
+<td> T </td><td> Transparency
+</td></tr>
+<tr>
+<td> OC </td><td> Occlusion Culling
+</td></tr>
+<tr>
+<td> AOS </td><td> Arbitrary Output Samples
+</td></tr>
+<tr>
+<td> SS </td><td> Super Sampling
+</td></tr>
+<tr>
+<td> MB </td><td> Motion Blur
+</td></tr>
+<tr>
+<td> DOF </td><td> Depth Of Field
+</td></tr>
+<tr>
+<td> LOD </td><td> Level Of Detail
+</td></tr></table>
+
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1483-0!1!0!0!!en!2 and timestamp 20060714202217 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Hiders">http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Hiders</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<ul>
+				 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Hiders.html">Article</a></li>
+				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
+				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
+				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
+		</ul>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
+				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Hiders&amp;oldid=2133">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 19:47, 7 July 2006.</li>
+				<li id="f-viewcount">This page has been accessed 222 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.29 secs. -->
+</body></html>

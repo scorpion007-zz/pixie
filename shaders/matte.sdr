@@ -1,0 +1,32 @@
+#!version 1.7.2
+surface
+#!parameters:
+uniform	float	Ka	=	1
+uniform	float	Kd	=	1
+#!variables:
+varying	vector	Nf
+varying	vector	temporary_0
+varying	vector	temporary_1
+varying	vector	temporary_2
+uniform	vector	temporary_3
+varying	vector	temporary_4
+varying	vector	temporary_5
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  temporary_0  N 
+	faceforward	("v=vv")  Nf  temporary_0  I 
+	vfromf            	temporary_3 Ka
+	vuvector           temporary_2 temporary_3
+	ambient	("c=")  temporary_4 
+	mulvv             	temporary_1 temporary_2 temporary_4
+	vfromf            	temporary_3 Kd
+	vuvector           temporary_4 temporary_3
+	diffuse	("c=n")  temporary_5  Nf 
+	mulvv             	temporary_2 temporary_4 temporary_5
+	addvv             	temporary_0 temporary_1 temporary_2
+	mulvv             	Ci Cs temporary_0
+	movevv            	Oi Os
+	mulvv             	Ci Ci Oi
+	return            
+

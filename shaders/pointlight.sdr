@@ -1,0 +1,30 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	1
+uniform	point	from	=	"shader"  [ 0 0 0 ]
+#!variables:
+uniform	vector	temporary_0
+varying	vector	temporary_1
+varying	vector	temporary_2
+uniform	vector	temporary_3
+varying	vector	temporary_4
+varying	float	temporary_5
+#!Init:
+	vfromf            	temporary_0 0 0 0
+	pfrom             	from "shader" temporary_0
+	return            
+#!Code:
+	vuvector           temporary_1 from
+	illuminate        	 temporary_1  #!Label2
+	vfromf            	temporary_3 intensity
+	mulvv             	temporary_0 temporary_3 lightcolor
+	vuvector           temporary_2 temporary_0
+	dot               	temporary_5 L L
+	vfromf            	temporary_4 temporary_5
+	divvv             	Cl temporary_2 temporary_4
+#!Label2:
+	endilluminate     
+	return            
+

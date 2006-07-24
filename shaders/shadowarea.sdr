@@ -1,0 +1,39 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	1
+#!variables:
+varying	float	temporary_0
+uniform	float	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+varying	vector	temporary_4
+varying	float	temporary_5
+varying	float	temporary_6
+varying	float	temporary_7
+varying	vector	temporary_8
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  N  N 
+	divff             	temporary_1 3.141592654 2
+	vufloat            temporary_0 temporary_1
+	illuminate        	 P  N  temporary_0  #!Label2
+	visibility	("f=pp")  temporary_6  Ps  P 
+	vufloat            temporary_7 intensity
+	mulff             	temporary_5 temporary_6 temporary_7
+	vfromf            	temporary_4 temporary_5
+	vuvector           temporary_8 lightcolor
+	mulvv             	temporary_3 temporary_4 temporary_8
+	normalize	("v=v")  temporary_8  L 
+	dot               	temporary_5 N temporary_8
+	vfromf            	temporary_4 temporary_5
+	mulvv             	temporary_2 temporary_3 temporary_4
+	dot               	temporary_5 L L
+	vfromf            	temporary_3 temporary_5
+	divvv             	Cl temporary_2 temporary_3
+#!Label2:
+	endilluminate     
+	return            
+
