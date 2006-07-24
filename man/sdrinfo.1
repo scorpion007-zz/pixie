@@ -1,0 +1,58 @@
+.TH SDRINFO 1
+.SH NAME
+sdrinfo \- display information about compiled shaders
+.SH SYNOPSIS
+\fBsdrinfo\fR [ name.sl ... ]
+.SH DESCRIPTION
+.I  Sdrinfo
+Displays information about the shader type and parameters of compiled shaders.
+.P
+The main documentation is maintained in html form
+and should be included with your distribution in the html or doc directories.
+.P
+The displayed information is of the form
+.P
+.RS
+	type "name"
+.br
+		"param1name"	"param1type"
+.br
+			Default value:	<value>
+.br
+		"param2name"	"param2type"
+.br
+			Default value:	<value>
+.RE
+.SH FORMATTING
+The formatting of the printed values is as follows:
+.TP
+.B Float
+1.0
+.TP
+.B Color
+.B Normal
+.B Vector
+.B Point
+[1.0 2.0 3.0]
+.TP
+.B Matrix
+[0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 0.1 0.2 0.3 0.4 0.5 0.6]
+.TP
+.B String
+"string"
+.SH ENVIRONMENT
+.TP
+.B PIXIEHOME
+The directory $(PIXIEHOME)/shaders is searched for shaders
+.TP
+.B SHADERS
+Also searched for shaders
+.SH "SEE ALSO"
+sdrc(1), texmake(1), show(1), sdrinfo(1)
+.SH BUGS
+Complex default values (those which require a function to be run at shader startup)
+may not display the correct value, but a zero instead.  Functions are not run by
+.I sdrinfo
+and only stored defaults are reported.
+.P
+See the sourceforge forums / tracker at http://pixie.sourceforge.net
