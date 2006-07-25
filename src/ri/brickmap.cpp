@@ -1051,20 +1051,20 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 		CBrickMap	*cMap	=	(CBrickMap *) nodes[i*2+1];
 		CVoxel		*cVoxel,*tVoxel;
 		int			j;
-
-		if (cNode->fileIndex == -1)	{
-			// If this is the first time we're writing, append it to the end
-			fseek(cMap->file,0,SEEK_END);
-			cNode->fileIndex	=	ftell(cMap->file);
-		} else {
-			// Go to the correct position
-			fseek(cMap->file,cNode->fileIndex,SEEK_SET);
-		}
 	
 		// Strategy - if we are modifying, save the contents to backing store
 		// otherwise, just forget the voxel altogether
 		if (cMap->modifying == TRUE) {
 			// Write and free the brick
+			
+			if (cNode->fileIndex == -1)	{
+				// If this is the first time we're writing, append it to the end
+				fseek(cMap->file,0,SEEK_END);
+				cNode->fileIndex	=	ftell(cMap->file);
+			} else {
+				// Go to the correct position
+				fseek(cMap->file,cNode->fileIndex,SEEK_SET);
+			}
 			
 			unsigned long bs[BRICK_PRESENCE_LONGS];
 			
