@@ -607,6 +607,12 @@ void				CBrickMap::finalize() {
 
 	// Write the file header at the beginning
 	fwrite(&headerOffset,1,sizeof(int),file);
+
+	// Mark the map as non-modifying, meaning
+	// we will no longer page out nodes
+	// this provides a big speed increase when
+	// compressing
+	modifying		=	FALSE;
 }
 
 
