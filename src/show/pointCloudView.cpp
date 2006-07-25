@@ -49,7 +49,7 @@ CPointCloudView::CPointCloudView(FILE *in) : CInterface() {
 	float				maxDim;
 
 	int numChannels;
-	int dataSize = 0;
+	int dataSize = 3;
 	fread(&numChannels,1,sizeof(int),in);
 	CTexture3dChannel *channels = new CTexture3dChannel[numChannels];
 	for (i=0;i<numChannels;i++) {
@@ -60,11 +60,11 @@ CPointCloudView::CPointCloudView(FILE *in) : CInterface() {
 	fread(&numPhotons,1,sizeof(int),in);
 	fread(&maxPhotons,1,sizeof(int),in);
 
-	printf("Photons: %d\n",numPhotons);
+	printf("Points: %d\n",numPhotons);
 
 	points	=	new CPointCloudPoint[numPhotons];
 
-	fread(points,numPhotons,sizeof(CPointCloudPoint),in);
+	fread(points,numPhotons+1,sizeof(CPointCloudPoint),in);
 	fread(bmin,3,sizeof(float),in);
 	fread(bmax,3,sizeof(float),in);
 	
