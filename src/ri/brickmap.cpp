@@ -347,6 +347,8 @@ CBrickMap::~CBrickMap() {
 // Comments				:
 // Date last edited		:	7/15/2006
 void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP) {
+	dP	*=	dPscale;
+
 	int			depth	=	(int) ceil(log(side*LEAF_FACTOR/dP));	// This is the depth we want to add
 	CBrick		*cBrick;
 	CBrickNode	*cNode;
@@ -360,8 +362,6 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	subvv(P,bmin);
 	mulmn(N,world->from,cN);
 	normalizev(N);
-	dP	*=	dPscale;
-	
 
 	// Iterate over the bricks we want
 	forEachBrick(depth)
@@ -427,6 +427,8 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 // Comments				:
 // Date last edited		:	7/15/2006
 void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
+	dP	*=	dPscale;
+
 	float	depthf		=	log(side*LEAF_FACTOR/dP);
 	int		depth		=	(int) floor(depthf);
 	float	t			=	depthf - depth;
@@ -441,7 +443,6 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	subvv(P,bmin);
 	mulmn(N,world->from,cN);
 	normalizev(N);
-	dP	*=	dPscale;
 
 	stats.numBrickmapLookups	+=	2;
 	
@@ -481,7 +482,7 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 					// Find the voxel with the closest normal
 					for (;cVoxel!=NULL;cVoxel=cVoxel->next) {
 						const float Ncorrect	=	dotvv(cVoxel->N,cVoxel->N);
-						const float	weight		=	Ncorrect*cWeight*dotvv(cVoxel->N,N) + (1.0f-Ncorrect);
+						const float	weight		=	cWeight*(Ncorrect*dotvv(cVoxel->N,N) + cVoxel->weight*(1.0f-Ncorrect));
 
 						if (weight > 0) {
 							int			j;
