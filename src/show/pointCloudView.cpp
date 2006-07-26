@@ -68,10 +68,6 @@ CPointCloudView::CPointCloudView(FILE *in) : CInterface() {
 	fread(bmin,3,sizeof(float),in);
 	fread(bmax,3,sizeof(float),in);
 	
-	matrix dummy;
-	fread(dummy,1,sizeof(matrix),in);
-	fread(dummy,1,sizeof(matrix),in);
-	
 	float *data = new float[numPhotons*dataSize];
 	fread(data,numPhotons,sizeof(float)*dataSize,in);
 
