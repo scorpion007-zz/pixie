@@ -341,6 +341,14 @@
 			<File
 				RelativePath="..\..\..\..\src\ri\execute.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						OmitFramePointers="false"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\executeMisc.cpp"
