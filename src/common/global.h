@@ -50,7 +50,7 @@
 // The Pixie version
 #define	VERSION_RELEASE	1
 #define	VERSION_BETA	7
-#define	VERSION_ALPHA	3
+#define	VERSION_ALPHA	4
 
 // Some constant definitions
 
