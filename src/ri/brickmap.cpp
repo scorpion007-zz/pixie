@@ -361,7 +361,7 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
 	mulmn(N,world->from,cN);
-	normalizev(N);
+	if (dotvv(N,N) > 0) normalizev(N);
 
 	// Iterate over the bricks we want
 	forEachBrick(depth)
@@ -400,6 +400,7 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 							// Mark the brick as needing new storage
 							// Note: we will need to compact the map afterwards
 							cNode->fileIndex = -1;
+							break;
 						} else {
 							cVoxel			=	cVoxel->next;
 						}
@@ -442,7 +443,7 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
 	mulmn(N,world->from,cN);
-	normalizev(N);
+	if (dotvv(N,N) > 0) normalizev(N);
 
 	stats.numBrickmapLookups	+=	2;
 	
