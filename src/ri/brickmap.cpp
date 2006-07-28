@@ -562,7 +562,7 @@ void				CBrickMap::finalize() {
 						const float	invWeight	=	1 / cVoxel->weight;
 						int			j;
 						
-						normalizev(cVoxel->N);
+						if (dotvv(cVoxel->N,cVoxel->N) > 0) normalizev(cVoxel->N);
 						for (j=0;j<dataSize;j++)	data[j]	*=	invWeight;
 						cVoxel->weight	=	1;
 					}
