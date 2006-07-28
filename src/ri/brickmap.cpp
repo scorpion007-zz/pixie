@@ -362,7 +362,7 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	subvv(P,bmin);
 	mulmn(N,world->from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
-
+	
 	// Iterate over the bricks we want
 	forEachBrick(depth)
 		int		cDepth,cx,cy,cz;
@@ -1208,7 +1208,6 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
 	char			tempName[OS_MAX_PATH_LENGTH];
 	char			fileName[OS_MAX_PATH_LENGTH];
-	vector	N;
 	int i;
 	
 	float maxVariation = 0.002f;
@@ -1239,8 +1238,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			for (i=1;i<cPtCloud->numPhotons;i++) {
 				CPointCloudPoint	*p = cPtCloud->photons + i;
 				float			 	*C = dataPointers[p->entryNumber];
-				normalizev(N,p->N);
-				cBMap->store(C,p->P,N,p->dP);
+				cBMap->store(C,p->P,p->N,p->dP);
 			}
 			
 			cBMap->finalize();
