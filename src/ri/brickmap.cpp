@@ -1206,12 +1206,12 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 // Comments				:
 // Date last edited		:	7/16/2006
 void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
-	char			tempName[OS_MAX_PATH_LENGTH];
-	char			fileName[OS_MAX_PATH_LENGTH];
-	int i;
+	char	tempName[OS_MAX_PATH_LENGTH];
+	char	fileName[OS_MAX_PATH_LENGTH];
+	int		i;
 	
 	float maxVariation = 0.002f;
-	for(int i =0;i<n;i++){
+	for(i =0;i<n;i++){
 		if(!strcmp(tokens[i],"maxerror")){
 			maxVariation = ((float*)params[i])[0];
 		}
