@@ -1071,13 +1071,30 @@ void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int 
 	int	i;
 	int	nvertices	=	0;
 	int	nvaryings	=	0;
-
+	int	wrapadd;
+	
+	if (strcmp(wrap,RI_PERIODIC) == 0) {
+		wrapadd	=	0;
+	} else {
+		wrapadd	=	1;
+	}
+					
 	out("Curves \"%s\" [",degree);
 
-	for (i=0;i<ncurves;i++) {
-		nvertices	+=	nverts[i];
-		nvaryings	+=	nverts[i];
-		out("%d ",nverts[i]);
+	if (strcmp(degree,RI_LINEAR) == 0) {
+		for (i=0;i<ncurves;i++) {
+			nvertices	+=	nverts[i];
+			out("%d ",nverts[i]);
+		}
+
+		nvaryings		=	nvertices;
+	} else if (strcmp(degree,RI_CUBIC) == 0) {
+		for (i=0;i<ncurves;i++) {
+			int j		=	(nverts[i] - 4) / attributes->vStep + 1;
+			nvertices	+=	nverts[i];
+			nvaryings	+=	j + wrapadd;
+			out("%d ",nverts[i]);
+		}
 	}
 
 	out("] \"%s\" ",wrap);
