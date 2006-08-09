@@ -49,7 +49,7 @@ CTexture3d::CTexture3d(const char *n,CXform *w,int nc,CTexture3dChannel *ch) : C
 	numChannels	=	0;
 	world		=	w; 
 	world->attach();
-	dPscale		=	pow(determinantm(world->to),1.0f / 3.0f);
+	dPscale		=	pow(fabs(determinantm(world->to)),1.0f / 3.0f);
 
 	if (nc > 0) {
 		int	i;
