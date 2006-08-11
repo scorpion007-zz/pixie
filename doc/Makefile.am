@@ -4,6 +4,7 @@ nobase_doc_DATA = 		\
 	css/*				\
 	css/images/*		\
 	Documentation/* 	\
+	Tutorials/*		 	\
 	FAQ/* 				\
 	images/* 			\
 	thumbs/*/* 			\
