@@ -1167,6 +1167,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			}
 		}
 
+		if (currentRayDepth == 0)  //HACK to not execute atmosphere for non-camera rays
 		if (atmosphere != NULL) {
 			atmosphere->execute(this);
 		}
