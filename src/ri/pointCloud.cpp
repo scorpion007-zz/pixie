@@ -281,6 +281,7 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	memcpy(data,C,dataSize*sizeof(float));
 	point->entryNumber	=	dataPointers->numItems;
 	point->dP			=	dP;
+	
 	dataPointers->push(data);
 }
 
