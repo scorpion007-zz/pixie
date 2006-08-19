@@ -2057,6 +2057,7 @@ void		CRendererContext::netSetup(char *ribFile,char *riNetString) {
 			netNumServers++;
 			tmp	=	marker+1;
 		}
+		netNumServers++;
 		tmp		=	riNetString+11;
 		
 		// Allocate our arrays
@@ -2070,7 +2071,8 @@ void		CRendererContext::netSetup(char *ribFile,char *riNetString) {
 			
 			tmp	=	marker+1;
 		}
-		sscanf(tmp,"%d",&netServers[netNumServers++]);
+		sscanf(tmp,"%d",&netServers[netNumServers]);
+		netNumServers++;
 	} else {
 		error(CODE_BUG,"Unknown net string %s\n",tmp);
 	}
