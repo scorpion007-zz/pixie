@@ -1167,9 +1167,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			}
 		}
 
-		if (currentRayDepth == 0)  //HACK to not execute atmosphere for non-camera rays
-		if (atmosphere != NULL) {
-			atmosphere->execute(this);
+		if (currentRayDepth == 0) {  // do not execute atmosphere for non-camera rays
+			if (atmosphere != NULL) {
+				atmosphere->execute(this);
+			}
 		}
 
 		if (currentShadingState->postShader != NULL) {
@@ -2096,7 +2097,7 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 				texture3d			=	cloud;
 			
 				// Ensure we unmap the file when done.  Do not delete it
-				// as we mark the file to never be written in the server 
+				// as we mark the file to never be written in the server
 				currentRenderer->registerFrameTemporary(name,FALSE);
 				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
 			} else {
@@ -2112,7 +2113,7 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 					texture3d	=	new CPointCloud(name,world,in);
 				} else {
 					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
-						texture3d	=	new CBrickMap(in,name,world);//GSHTODO - make this work with xform !!
+						texture3d	=	new CBrickMap(in,name,world);
 					}
 				}
 			} else {
