@@ -64,7 +64,7 @@ CPointCloudView::CPointCloudView(FILE *in) : CInterface() {
 
 	points	=	new CPointCloudPoint[numPhotons];
 
-	fread(points,numPhotons+1,sizeof(CPointCloudPoint),in);
+	fread(points,numPhotons,sizeof(CPointCloudPoint),in);
 	fread(bmin,3,sizeof(float),in);
 	fread(bmax,3,sizeof(float),in);
 	
@@ -99,6 +99,7 @@ CPointCloudView::CPointCloudView(FILE *in) : CInterface() {
 	
 	delete [] points;
 	delete [] data;
+	delete [] channels;
 
 	glEnable(GL_DEPTH_TEST);
 
