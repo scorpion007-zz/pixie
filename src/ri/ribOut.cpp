@@ -211,7 +211,7 @@ void		CRibOut::RiCropWindow(float xmin,float xmax,float ymin,float ymax) {
 	out("CropWindow %g %g %g %g\n",xmin,xmax,ymin,ymax);
 }
 
-void		CRibOut::RiProjectionV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiProjectionV(char *name,int n,char *tokens[],void *params[]) {
 	out("Projection \"%s\" ",name);
 	writePL(n,tokens,params);
 }
@@ -260,7 +260,7 @@ void		CRibOut::RiExposure(float gain,float gamma) {
 	out("Exposure %g %g\n",gain,gamma);
 }
 
-void		CRibOut::RiImagerV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiImagerV(char *name,int n,char *tokens[],void *params[]) {
 	out("Imager \"%s\" ",name);
 	writePL(n,tokens,params);
 }
@@ -269,17 +269,17 @@ void		CRibOut::RiQuantize(char * type,int one,int qmin,int qmax,float ampl) {
 	out("Quantize \"%s\" %d %d %d %g\n",type,one,qmin,qmax,ampl);
 }
 
-void		CRibOut::RiDisplayV(char *name,char * type,char * mode,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiDisplayV(char *name,char * type,char * mode,int n,char *tokens[],void *params[]) {
 	out("Display \"%s\" \"%s\" \"%s\" ",name,type,mode);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiDisplayChannelV(char *channel,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiDisplayChannelV(char *channel,int n,char *tokens[],void *params[]) {
 	out("Display \"%s\" ",channel);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiHiderV(char * type,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiHiderV(char * type,int n,char *tokens[],void *params[]) {
 	out("Hider \"%s\" ",type);
 	writePL(n,tokens,params);
 }
@@ -349,7 +349,7 @@ void		CRibOut::RiRelativeDetail(float relativedetail) {
 
 
 
-void		CRibOut::RiOptionV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
 	int	i;
 
 	// Check the searchpath options
@@ -462,14 +462,14 @@ void		CRibOut::RiTextureCoordinates(float s1,float t1,float s2,float t2,float s3
 	out("TextureCoordinates [%g %g %g %g %g %g %g %g]\n",s1,t1,s2,t2,s3,t3,s4,t4);
 }
 
-void		*CRibOut::RiLightSourceV(char *name,int n,char *tokens[],char *params[]) {
+void		*CRibOut::RiLightSourceV(char *name,int n,char *tokens[],void *params[]) {
 	out("LightSource \"%s\" %d ",name,numLightSources);
 	writePL(n,tokens,params);
 
 	return (void *) numLightSources++;
 }
 
-void		*CRibOut::RiAreaLightSourceV(char *name,int n,char *tokens[],char *params[]) {
+void		*CRibOut::RiAreaLightSourceV(char *name,int n,char *tokens[],void *params[]) {
 	out("AreaLightSource \"%s\" %d ",name,numLightSources);
 	writePL(n,tokens,params);
 
@@ -480,22 +480,22 @@ void		CRibOut::RiIlluminate(void *light,int onoff) {
 	out("Illuminate %d %d\n",light,onoff);
 }
 
-void		CRibOut::RiSurfaceV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiSurfaceV(char *name,int n,char *tokens[],void *params[]) {
 	out("Surface \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiAtmosphereV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiAtmosphereV(char *name,int n,char *tokens[],void *params[]) {
 	out("Atmosphere \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiInteriorV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiInteriorV(char *name,int n,char *tokens[],void *params[]) {
 	out("Interior \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiExteriorV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiExteriorV(char *name,int n,char *tokens[],void *params[]) {
 	out("Exterior \"%s\" ",name);
 	writePL(n,tokens,params);
 }
@@ -582,12 +582,12 @@ void		CRibOut::RiSkew(float angle,float dx1,float dy1,float dz1,float dx2,float 
 	out("Skew %g %g %g %g %g %g %g\n",angle,dx1,dy1,dz1,dx2,dy2,dz2);
 }
 
-void		CRibOut::RiDeformationV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiDeformationV(char *name,int n,char *tokens[],void *params[]) {
 	out("Deformation \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiDisplacementV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiDisplacementV(char *name,int n,char *tokens[],void *params[]) {
 	out("Displacement \"%s\" ",name);
 	writePL(n,tokens,params);
 }
@@ -652,7 +652,7 @@ void		CRibOut::RiTransformEnd(void) {
 
 
 
-void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
 	int	i;
 
 	if (strcmp(name,RI_DICE) == 0) {
@@ -735,12 +735,12 @@ void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],char *params[]) {
 #undef	attributeEndCheck
 
 
-void		CRibOut::RiPolygonV(int nvertices,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiPolygonV(int nvertices,int n,char *tokens[],void *params[]) {
 	out("Polygon ");
 	writePL(nvertices,nvertices,nvertices,1,n,tokens,params);
 }
 
-void		CRibOut::RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],void *params[]) {
 	int	i;
 	int	nvertices=0;
 
@@ -754,7 +754,7 @@ void		CRibOut::RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],cha
 	writePL(nvertices,nvertices,nvertices,1,n,tokens,params);
 }
 
-void		CRibOut::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *tokens[],void *params[]) {
 	int	i;
 	int	nvertices		=	0;
 	int	mvertex			=	0;
@@ -778,7 +778,7 @@ void		CRibOut::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *t
 	writePL(mvertex,mvertex,nvertices,npolys,n,tokens,params);
 }
 
-void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,char *tokens[],void *params[]) {
 	int	i,j;
 	int	snverts		=	0;
 	int	sverts		=	0;
@@ -827,7 +827,7 @@ void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) 
 	attributes->vStep	=	vstep;
 }
 
-void		CRibOut::RiPatchV(char * type,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiPatchV(char * type,int n,char *tokens[],void *params[]) {
 	int	uver,vver;
 
 	if (strcmp(type,RI_BILINEAR) == 0)		{	uver	=	2;	vver	=	2;	}
@@ -844,7 +844,7 @@ void		CRibOut::RiPatchV(char * type,int n,char *tokens[],char *params[]) {
 	writePL(uver*vver,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,int n,char *tokens[],void *params[]) {
 	int	uw,vw;
 	int	uver,vver;
 	int	upatches,vpatches;
@@ -918,7 +918,7 @@ void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,i
 	writePL(uver*vver,uver*vver,uver*vver,upatches*vpatches,n,tokens,params);
 }
 
-void		CRibOut::RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,char *tokens[],void *params[]) {
 	int	upatches		=	nu - uorder + 1;
 	int	vpatches		=	nv - vorder + 1;
 	int	i,uk,vk;
@@ -1024,50 +1024,50 @@ void		CRibOut::RiTrimCurve(int nloops,int *ncurves,int *order,float *knot,float 
 	out("]\n");
 }
 
-void		CRibOut::RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Sphere %g %g %g %g ",radius,zmin,zmax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiConeV(float height,float radius,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiConeV(float height,float radius,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Cone %g %g %g ",height,radius,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiCylinderV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiCylinderV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Cylinder %g %g %g %g ",radius,zmin,zmax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiHyperboloidV(float *point1,float *point2,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiHyperboloidV(float *point1,float *point2,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Hyperboloid %g %g %g %g %g %g %g ",point1[0],point1[1],point1[2],point2[0],point2[1],point2[2],thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiParaboloidV(float rmax,float zmin,float zmax,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiParaboloidV(float rmax,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Paraboloid %g %g %g %g ",rmax,zmin,zmax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiDiskV(float height,float radius,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiDiskV(float height,float radius,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Disk %g %g %g ",height,radius,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiTorusV(float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiTorusV(float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,char *tokens[],void *params[]) {
 	out("Torus %g %g %g %g %g",majorrad,minorrad,phimin,phimax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiProcedural(char * data,float *bound,void (*subdivfunc)(char *,float),void (*freefunc)(char *)) {
+void		CRibOut::RiProcedural(void * data,float *bound,void (*subdivfunc)(void *,float),void (*freefunc)(void *)) {
 	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Unable to output procedural geometry\n");
 }
 
-void		CRibOut::RiGeometryV(char * type,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiGeometryV(char * type,int n,char *tokens[],void *params[]) {
 	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Unable to output optional geometry\n");
 }
 
-void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int n,char *tokens[],void *params[]) {
 	int	i;
 	int	nvertices	=	0;
 	int	nvaryings	=	0;
@@ -1102,12 +1102,12 @@ void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int 
 	writePL(nvertices,nvaryings,nvaryings,ncurves,n,tokens,params);
 }
 
-void		CRibOut::RiPointsV(int npts,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiPointsV(int npts,int n,char *tokens[],void *params[]) {
 	out("Points ");
 	writePL(npts,npts,npts,1,n,tokens,params);
 }
 
-void		CRibOut::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int vertices[],int ntags,char * tags[],int nargs[],int intargs[],float floatargs[],int n,char *tokens[],char *params[]) {
+void		CRibOut::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int vertices[],int ntags,char * tags[],int nargs[],int intargs[],float floatargs[],int n,char *tokens[],void *params[]) {
 	int	numVertices;
 	int	i,j;
 	int	numInt,numFloat;
@@ -1160,7 +1160,7 @@ void		CRibOut::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int v
 	writePL(numVertices,numVertices,numFacevaryings,nfaces,n,tokens,params);
 }
 
-void		CRibOut::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],char *params[]) {
+void		CRibOut::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]) {
 	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Blobby primitive is not implemented\n");
 }
 
@@ -1211,32 +1211,32 @@ void		CRibOut::RiMotionEnd(void) {
 	out("MotionEnd\n");
 }
 
-void		CRibOut::RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeTexture \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g %g ",pic,tex,swrap,twrap,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeBump \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g %g ",pic,tex,swrap,twrap,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeBump \"%s\" \"%s\" \"%s\" %g %g",pic,tex,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeCubeFaceEnvironment \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g \"%s\" %g %g ",px,nx,py,ny,pz,nz,tex,fov,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]) {
 	out("MakeShadow \"%s\" \"%s\" ",pic,tex);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],char *params[]) {
+void		CRibOut::RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]) {
 	out("MakeTexture3D \"%s\" \"%s\" ",src,dest);
 	writePL(n,tokens,params);
 }
@@ -1262,7 +1262,7 @@ void		CRibOut::RiArchiveRecord(char * type,char *format,va_list args) {
 	}
 }
 
-void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],char *params[]) {
+void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]) {
 	out("ReadArchive \"%s\"\n",filename);
 }
 
@@ -1275,7 +1275,7 @@ void		CRibOut::RiTrace(int,float [][3],float [][3],float [][3],float []) {
 void		CRibOut::RiVisibility(int,float [][3],float [][3],float [][3]) {
 }
 
-void		CRibOut::writePL(int numParameters,char *tokens[],char *vals[]) {
+void		CRibOut::writePL(int numParameters,char *tokens[],void *vals[]) {
 	int		i,j;
 	float	*f;
 	int		*iv;
@@ -1366,7 +1366,7 @@ retry:;
 	out("\n");
 }
 
-void		CRibOut::writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int numParameters,char *tokens[],char *vals[]) {
+void		CRibOut::writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int numParameters,char *tokens[],void *vals[]) {
 	int		i,j;
 	float	*f;
 	char	**s;

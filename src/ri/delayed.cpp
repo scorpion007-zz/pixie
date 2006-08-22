@@ -44,7 +44,7 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(char *,float),void	(*freeFunction)(char *),char *data,int *drc) : CSurface(a,x) {
+CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *data,int *drc) : CSurface(a,x) {
 	stats.numDelayeds++;
 
 	movvv(this->bmin,bmin);

@@ -63,7 +63,7 @@ public:
 // Date last edited		:	8/10/2001
 class	CDelayedObject : public CSurface , public CTracable {
 public:
-							CDelayedObject(CAttributes *,CXform *,const float *,const float *,void	(*subdivisionFunction)(char *,float),void	(*freeFunction)(char *),char *,int *drc=NULL);
+							CDelayedObject(CAttributes *,CXform *,const float *,const float *,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *,int *drc=NULL);
 							~CDelayedObject();
 
 	void					tesselate(CShadingContext *);
@@ -74,9 +74,9 @@ public:
 	int						moving() const													{	return FALSE;		}
 	void					copy(CAttributes *,CXform *,CRendererContext *) const;
 
-	void					(*subdivisionFunction)(char *,float);
-	void					(*freeFunction)(char *);
-	char					*data;
+	void					(*subdivisionFunction)(void *,float);
+	void					(*freeFunction)(void *);
+	void					*data;
 	int						*dataRefCount;
 
 	vector					bmin,bmax;					// Bound in the object space

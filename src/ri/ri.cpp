@@ -461,7 +461,7 @@ static	inline	void	getArgs(va_list args) {
 		nTokens++;
 		if (nTokens == mTokens) {
 			RtToken		*ttokens	=	new RtToken[mTokens + 50];
-			RtPointer	*tvalues	=	new RtToken[mTokens + 50];
+			RtPointer	*tvalues	=	new RtPointer[mTokens + 50];
 			int			i;
 
 			for (i=0;i<nTokens;i++) {

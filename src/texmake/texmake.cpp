@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 	char			*outPath		=	".";
 	float			fov				=	90;
 	RtFilterFunc	filter			=	RiCatmullRomFilter;
-	float			maxerror		=	0.002;
+	float			maxerror		=	0.002f;
 	int				i;
 	char			*textureMode	=	"texture";
 	int				processed;

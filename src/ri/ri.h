@@ -67,7 +67,7 @@ typedef RtFloat RtBasis[4][4];
 typedef RtFloat RtBound[6];
 typedef char   *RtString;
 
-typedef char   *RtPointer;
+typedef void   *RtPointer;
 #define RtVoid void
 typedef RtFloat (*RtFilterFunc)(RtFloat, RtFloat, RtFloat, RtFloat);
 typedef RtVoid  (*RtErrorHandler)(RtInt code, RtInt severity, char *msg);
