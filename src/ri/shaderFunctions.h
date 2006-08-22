@@ -2223,7 +2223,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								} else {																		\
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
-										*r++ = radiiscale;														\
+										*r++ = radiiscale*lookup->radius;														\
 									}																			\
 								}																				\
 																												\
@@ -2323,7 +2323,7 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								} else {																		\
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
-										*r++ = radiiscale;														\
+										*r++ = radiiscale*lookup->radius;														\
 									}																			\
 								}																				\
 																												\
