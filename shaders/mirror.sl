@@ -12,9 +12,14 @@ surface mirror(float Ka=1,Ks=1,Kr=1,roughness=.1,samples=1,blur=0; string texnam
 
     Nf = faceforward(N,I);
 
+	// raytrace will convert to worldspace, but non-raytrace
+	// environments should be looked up in world space
+	vector R = reflect(I,Nf);
+	if( texname != "raytrace" ) R = ntransform("world",R);
+	
     Oi = Os;
     Ci = Os * (Cs * ( Ka*ambient() + Ks*specular(Nf,-I,roughness) ) +
-              Kr*environment(texname,reflect(I,Nf),"samples",samples,"blur",blur));
+              Kr*environment(texname,R,"samples",samples,"blur",blur));
 }
 
 
