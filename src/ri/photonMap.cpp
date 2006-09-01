@@ -73,7 +73,7 @@ float				sinphi[256];
 // Date last edited		:	3/11/2003
 CPhotonMap::CPhotonMap(const char *n,const CXform *world,FILE *in) : CMap<CPhoton>() , CFileResource(n) {
 	root			=	NULL;
-	maxDepth		=	0;
+	maxDepth		=	1;
 	refCount		=	0;
 	modifying		=	FALSE;
 	maxPower		=	0;
