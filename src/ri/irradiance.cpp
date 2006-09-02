@@ -697,7 +697,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 						tex->lookup(color,D0,D1,D2,D3,texLookup);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
-						addvv(irradiance,color);
 					} else{
 						initv(hemisphere->irradiance,0);
 					}
