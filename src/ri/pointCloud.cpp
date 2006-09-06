@@ -196,6 +196,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	mulvf(l.N,-1);				// Photonmaps have N reversed, we must reverse
 								// N when looking up it it
 
+	const float NdotN = dotvv(l.N,l.N);
+	
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
 	l.distances			=	distances;
@@ -217,7 +219,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		// Note that we do the opposite to photonmaps
 		// only entries coherent with N contribute
 		// but l.N is reversed...
-		if (dotvv(p->N,l.N) < 0) {
+		if ((dotvv(p->N,l.N) < 0) || (NdotN <= 0)) {
 			weight	=	1.0f/(distances[i]+C_EPSILON);
 			dest	=	Cl;
 			src		=	dataPointers->array[p->entryNumber];
