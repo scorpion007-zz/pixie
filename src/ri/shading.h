@@ -269,7 +269,7 @@ protected:
 		CPhotonMap				*getPhotonMap(const char *);							// Load a photon map
 		CCache					*getCache(const char *,const char *);					// Load a photon map
 		CTextureInfoBase		*getTextureInfo(const char *);							// Load a textureinfo
-		CTexture3d				*getTexture3d(const char*,int,const char*);				// Load a point cloud or brickmap
+		CTexture3d				*getTexture3d(const char*,int,const char*,const char*);	// Load a point cloud or brickmap
 
 		CDictionary<const char *,CFileResource *>			*loadedFiles;				// This holds the files loaded so far
 

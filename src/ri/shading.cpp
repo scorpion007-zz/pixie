@@ -2082,18 +2082,31 @@ CTextureInfoBase	*CShadingContext::getTextureInfo(const char *name) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	02/22/2006
-CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const char* channels) {
+CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const char* channels,const char *coordsys) {
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
 
 	if (loadedFiles->find(name,texture3d) == FALSE){
 	
+		CXform *xform = world;
+		if (coordsys != NULL) {
+			ECoordinateSystem	esys;
+			matrix				*from,*to;
+			
+			// non worldspace texture
+			xform = new CXform();
+			findCoordinateSystem(coordsys,from,to,esys);
+	
+			movmm(xform->from,to[0]);	// construct the transform to put us in the desired system
+			movmm(xform->to,from[0]);
+		}
+		
 		// If we are writing, it must be a point cloud
 		if (write == TRUE) {
 			
 			if (netClient != INVALID_SOCKET) {
-				CPointCloud	*cloud	=	new CPointCloud(name,world,channels,FALSE);
+				CPointCloud	*cloud	=	new CPointCloud(name,xform,channels,FALSE);
 				texture3d			=	cloud;
 			
 				// Ensure we unmap the file when done.  Do not delete it
@@ -2102,7 +2115,8 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
 			} else {
 				// alloate a point cloud which will be written to disk
-				texture3d	=	new CPointCloud(name,world,channels,TRUE);
+				CXform *dummy = new CXform;
+				texture3d	=	new CPointCloud(name,xform,channels,TRUE);
 			}
 			
 		} else {
@@ -2110,10 +2124,11 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 			if (currentRenderer->locateFile(fileName,name,texturePath)) {
 				// Try to open the file
 				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-					texture3d	=	new CPointCloud(name,world,in);
+					CXform *dummy = new CXform;
+					texture3d	=	new CPointCloud(name,xform,in);
 				} else {
 					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
-						texture3d	=	new CBrickMap(in,name,world);
+						texture3d	=	new CBrickMap(in,name,xform);
 					}
 				}
 			} else {
@@ -2123,11 +2138,14 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 			if (in == NULL) {
 				// allocate a dummy blank-channel point cloud
 				error(CODE_BADTOKEN,"Cannot find or open Texture3d file \"%s\"\n",name);
-				texture3d	=	new CPointCloud(name,world,NULL,FALSE);
+				texture3d	=	new CPointCloud(name,xform,NULL,FALSE);
 				// remove the dummy mapping once the frame ends
 				currentRenderer->registerFrameTemporary(name,FALSE);
 			}
 		}
+		
+		// tidy up in case something went wrong
+		xform->check();
 		
 		loadedFiles->insert(texture3d->name,texture3d);
 	}

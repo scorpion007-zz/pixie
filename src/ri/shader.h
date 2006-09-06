@@ -218,12 +218,17 @@ public:
 // Date last edited		:	7/7/2001
 class	CTexture3dLookup : public CShaderLookup	{
 public:
-							~CTexture3dLookup() { delete[] bindings; delete[] valueSpace; }
+							~CTexture3dLookup()	{
+								delete[] bindings;
+								delete[] valueSpace;
+								if (coordsys != NULL) free(coordsys);
+							}
 		float				radius;					// The sample radius
 		float				radiusScale;			// Blur amount
 		char				**channels;				// The channels this bake3d provides
 		int					numChannels;			// The number of channels bake3d provides
 		int					dataStart;				// The argument at which data starts
+		char				*coordsys;				// The coordinate system to bake to
 		
 		int					sampleSize;				// The cloud's native sample size
 		CTexture3dChannel	**bindings;				// Points to the environment being looked up
