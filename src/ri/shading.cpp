@@ -2098,8 +2098,8 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 			xform = new CXform();
 			findCoordinateSystem(coordsys,from,to,esys);
 	
-			movmm(xform->from,to[0]);	// construct the transform to put us in the desired system
-			movmm(xform->to,from[0]);
+			movmm(xform->from,from[0]);	// construct the transform to put us in the desired system
+			movmm(xform->to,to[0]);
 		}
 		
 		// If we are writing, it must be a point cloud
