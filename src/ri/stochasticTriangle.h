@@ -165,8 +165,7 @@ ybound		=	cPrimitive->ybound;
 		depthFilterIf();																		\
 		pixel->z				=	z;															\
 		touchNode(pixel->node,z);																\
-	}																							\
-	depthFilterElse();
+	} depthFilterElse();
 
 #endif
 
@@ -228,8 +227,7 @@ ybound		=	cPrimitive->ybound;
 		depthFilterIf();																	\
 		pixel->z				=	z;														\
 		touchNode(pixel->node,z);															\
-	}																						\
-	depthFilterElse();
+	} depthFilterElse();
 
 #endif
 #endif
@@ -250,18 +248,21 @@ ybound		=	cPrimitive->ybound;
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
 #else
 #define drawPixelCheck()															\
 	if (z < pixel->z) {																\
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
+
+
+
 #endif // undercull
 #else
-#define drawPixelCheck()																	\
-	CFragment *nSample;																		\
+#define drawPixelCheck()															\
+	CFragment *nSample;																\
 	drawPixel();
 #endif
 
@@ -298,13 +299,6 @@ ymax	=	min(ymax,yres);
 // Compute the area of the triangle
 a		=	area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
 
-#ifdef STOCHASTIC_TRANSPARENT
-	#define t	0
-#else
-	const float t		=	a * -0.01f;
-#endif
-
-
 if (a > 0) {
 
 	// Back face culling
@@ -328,10 +322,10 @@ if (a > 0) {
 			dv2		=	v2;
 
 			u	=	area(xcent,ycent,dv0[COMP_X],dv0[COMP_Y],dv1[COMP_X],dv1[COMP_Y]);
-			if (u < t)	continue;
+			if (u < 0)	continue;
 
 			v	=	area(xcent,ycent,dv1[COMP_X],dv1[COMP_Y],dv2[COMP_X],dv2[COMP_Y]);
-			if (v < t)	continue;
+			if (v < 0)	continue;
 
 			if ((u+v) > a) continue;
 			
@@ -367,10 +361,10 @@ if (a > 0) {
 			dv2		=	v2;
 
 			u	=	area(xcent,ycent,dv0[COMP_X],dv0[COMP_Y],dv1[COMP_X],dv1[COMP_Y]);
-			if (u > t)	continue;
+			if (u > 0)	continue;
 
 			v	=	area(xcent,ycent,dv1[COMP_X],dv1[COMP_Y],dv2[COMP_X],dv2[COMP_Y]);
-			if (v > t)	continue;
+			if (v > 0)	continue;
 
 			if ((u+v) < a) continue;
 
@@ -388,7 +382,6 @@ if (a > 0) {
 
 
 #else	// SLOW_RENDER
-#define	t	0
 
 	a	=	0;
 
@@ -470,10 +463,10 @@ if (a > 0) {
 #endif
 
 			u	=	area(xcent,ycent,dv0[COMP_X],dv0[COMP_Y],dv1[COMP_X],dv1[COMP_Y]);
-			if (u < t)	continue;
+			if (u < 0)	continue;
 
 			v	=	area(xcent,ycent,dv1[COMP_X],dv1[COMP_Y],dv2[COMP_X],dv2[COMP_Y]);
-			if (v < t)	continue;
+			if (v < 0)	continue;
 
 			if ((u+v) > a) continue;
 

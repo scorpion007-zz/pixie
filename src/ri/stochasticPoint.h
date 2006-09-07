@@ -151,8 +151,7 @@
 		depthFilterIf();															\
 		pixel->z						=	z;										\
 		touchNode(pixel->node,z);													\
-	}																				\
-	depthFilterElse();
+	} depthFilterElse();
 
 
 #else
@@ -165,8 +164,7 @@
 		depthFilterIf();															\
 		pixel->z						=	z;										\
 		touchNode(pixel->node,z);													\
-	}																				\
-	depthFilterElse();
+	} depthFilterElse();
 
 #endif
 
@@ -208,14 +206,14 @@
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
 #else
 #define drawPixelCheck()															\
 	if (z < pixel->z) {																\
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
 #endif // undercull
 #else
 #define drawPixelCheck()															\

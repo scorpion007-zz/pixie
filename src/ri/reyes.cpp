@@ -358,6 +358,7 @@ void	CReyes::render() {
 
 	// Initialize the opaque depths
 	maxDepth			=	C_INFINITY;
+	culledDepth			=	C_INFINITY;
 
 	// Init the rasterizer
 	rasterBegin(	bucketPixelWidth,
@@ -413,7 +414,8 @@ void	CReyes::render() {
 
 			// Defer the rest of the objects
 			for (;i>0;i--) {
-				cObject	=	*allObjects++;
+				cObject			=	*allObjects++;
+				culledDepth		=	min(culledDepth,cObject->zmin);
 				objectDefer(cObject);
 			}
 

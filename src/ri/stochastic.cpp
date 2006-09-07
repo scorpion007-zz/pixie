@@ -595,11 +595,13 @@ void		CStochastic::rasterEnd(float *fb2) {
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
 				if (cPixel->z == clipMax)	cFb[1]	=	C_INFINITY;
 				else {
-					if (cPixel->zold == clipMax) {
-						cFb[1]		=	cPixel->z;
-					} else {
-						cFb[1]		=	(cPixel->z + cPixel->zold) * 0.5f;
-					}
+
+					assert(cPixel->z < clipMax);
+					assert(cPixel->zold <= clipMax);
+					assert(cPixel->z <= cPixel->zold);
+
+					if (cPixel->zold < culledDepth)	cFb[1]		=	(cPixel->z + cPixel->zold) * 0.5f;
+					else							cFb[1]		=	(cPixel->z + culledDepth) * 0.5f;
 				}
 			}
 		}

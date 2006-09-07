@@ -234,6 +234,7 @@ public:
 
 protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
+	float						culledDepth;									// The depth of the closest culled object
 	int							xSampleOffset,ySampleOffset;					// The amount of offset around each bucket in samples
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
