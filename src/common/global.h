@@ -117,7 +117,7 @@ typedef union {
 } T64;
 
 
-#ifndef __APPLE_C__
+#ifndef __APPLE__
 	// Enable the memory manager
 	#define USE_MEMORY_MANAGER
 	// But under OSX, this seems to cause some issues
