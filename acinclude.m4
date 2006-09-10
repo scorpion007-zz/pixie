@@ -22,17 +22,24 @@ dnl
 AC_ARG_WITH(openexr-prefix,[  --with-openexr-prefix=PFX   Prefix where libopenexr is installed (optional)], openexr_prefix="$withval", openexr_prefix="/usr")
 AC_ARG_ENABLE(openexrtest, [  --disable-openexrtest       Do not try to compile and run a test Openexr program],, enable_openexrtest=yes)
 AC_ARG_ENABLE(static-openexr, [  --enable-static-openexr  Statically link against OpenEXR libs],enable_static_openexr=yes, enable_static_openexr=no)
+AC_ARG_ENABLE(openexr-threads,[  --enable-openexr-threads Include OpenEXR threading],enable_openexr_threads=yes, enable_openexr_threads=no)
 
   if test "x$openexr_prefix" != "xNONE" ; then
     openexr_args="$openexr_args --prefix=$openexr_prefix"
     OPENEXR_INCLUDES="-I$openexr_prefix/include/OpenEXR"
     OPENEXR_LIBS="-L$openexr_prefix/lib"
     openexr_static_libs="$openexr_prefix/lib/libIlmImf.a $openexr_prefix/lib/libImath.a $openexr_prefix/lib/libIex.a $openexr_prefix/lib/libHalf.a -lz"
+    if test "x$enable_openexr_threads" == "xyes" ; then
+    	openexr_static_libs="$openexr_static_libs $openexr_prefix/lib/libIlmThread.a"
+    fi
   elif test "$prefix" != ""; then
     openexr_args="$openexr_args --prefix=$prefix"
     OPENEXR_INCLUDES="-I$prefix/include/OpenEXR"
     OPENEXR_LIBS="-L$prefix/lib"
     openexr_static_libs="$prefix/lib/libIlmImf.a $prefix/lib/libImath.a $prefix/lib/libIex.a $prefix/lib/libHalf.a -lz"
+    if test "x$enable_openexr_threads" == "xyes" ; then
+    	openexr_static_libs="$openexr_static_libs $prefix/lib/libIlmThread.a"
+    fi
   fi
 
   if test "x$enable_static_openexr" == "xyes"; then
