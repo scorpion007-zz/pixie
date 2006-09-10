@@ -148,7 +148,7 @@ public:
 					framebuffer			=	new FrameBuffer;
 
 					// Compute the size of a pixel
-					pixelSize			=	numSamples*sizeof(half) / 8;
+					pixelSize			=	numSamples*sizeof(half);
 					lastSavedLine		=	0;
 					scanlines			=	new half*[height];
 					scanlineUsage		=	new int[height];
