@@ -117,8 +117,11 @@ typedef union {
 } T64;
 
 
-// Enable the memory manager
-#define USE_MEMORY_MANAGER
+#ifndef __APPLE_C__
+	// Enable the memory manager
+	#define USE_MEMORY_MANAGER
+	// But under OSX, this seems to cause some issues
+#endif
 
 // For Windows/debug build, turn off the memory manager so we can check the memory leaks
 #ifdef		WIN32
