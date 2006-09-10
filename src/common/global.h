@@ -117,10 +117,12 @@ typedef union {
 } T64;
 
 
-#ifndef __APPLE__
+#ifndef __APPLE_CC__
 	// Enable the memory manager
 	#define USE_MEMORY_MANAGER
 	// But under OSX, this seems to cause some issues
+	// We use __APPLE_CC_ because fltk insists on __APPLE__
+	// being undefined
 #endif
 
 // For Windows/debug build, turn off the memory manager so we can check the memory leaks
