@@ -45,7 +45,7 @@
 // Description			:	Holds the framebuffer
 // Comments				:
 // Date last edited		:	5/9/2002
-class	CFramebuffer {
+class	CRgbeFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CFramebuffer
@@ -54,7 +54,7 @@ public:
 				// Return Value			:	-
 				// Comments				:
 				// Date last edited		:	5/9/2002
-				CFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
+				CRgbeFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 					char	fileName[256];
 
 					if (strchr(name,'.') == NULL) {
@@ -80,7 +80,7 @@ public:
 				// Return Value			:	-
 				// Comments				:
 				// Date last edited		:	11/28/2001
-				~CFramebuffer() {
+				~CRgbeFramebuffer() {
 					RGBE_WritePixels(image,data,width*height);
 
 					if (image != NULL)	fclose(image);
@@ -126,7 +126,7 @@ public:
 // Comments				:
 // Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
-	return new CFramebuffer(name,width,height,numSamples,samples,findParameter);
+	return new CRgbeFramebuffer(name,width,height,numSamples,samples,findParameter);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Comments				:
 // Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
-	CFramebuffer	*fb	=	(CFramebuffer *) im;
+	CRgbeFramebuffer	*fb	=	(CRgbeFramebuffer *) im;
 	
 	assert(fb != NULL);
 
@@ -152,7 +152,7 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Comments				:
 // Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
-	CFramebuffer	*fb	=	(CFramebuffer *) im;
+	CRgbeFramebuffer	*fb	=	(CRgbeFramebuffer *) im;
 
 	assert(fb != NULL);
 

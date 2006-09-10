@@ -47,7 +47,7 @@
 // Description			:	Holds the framebuffer
 // Comments				:
 // Date last edited		:	5/9/2002
-class	CFramebuffer {
+class	CFileFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CFramebuffer
@@ -56,7 +56,7 @@ public:
 				// Return Value			:	-
 				// Comments				:
 				// Date last edited		:	5/9/2002
-				CFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
+				CFileFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 					int			i;
 					float		*tmp;
 					float		worldToNDC[16];
@@ -206,7 +206,7 @@ public:
 				// Return Value			:	-
 				// Comments				:
 				// Date last edited		:	11/28/2001
-				~CFramebuffer() {
+				~CFileFramebuffer() {
 					int	i;
 
 					if (image != NULL)	TIFFClose(image);
@@ -345,7 +345,7 @@ public:
 // Comments				:
 // Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
-	CFramebuffer	*fb	=	new CFramebuffer(name,width,height,numSamples,samples,findParameter);
+	CFileFramebuffer	*fb	=	new CFileFramebuffer(name,width,height,numSamples,samples,findParameter);
 	
 	if (fb->image == NULL) {	// If we could not open the image, return NULL
 		delete fb;
@@ -362,7 +362,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Comments				:
 // Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
-	CFramebuffer	*fb	=	(CFramebuffer *) im;
+	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
 	
 	assert(fb != NULL);
 
@@ -378,7 +378,7 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Comments				:
 // Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
-	CFramebuffer	*fb	=	(CFramebuffer *) im;
+	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
 
 	assert(fb != NULL);
 

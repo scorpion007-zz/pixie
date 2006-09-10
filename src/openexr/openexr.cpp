@@ -69,7 +69,7 @@ using namespace Imath;
 // Description			:	Holds the framebuffer
 // Comments				:
 // Date last edited		:	5/9/2002
-class	CFramebuffer {
+class	CExrFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CFramebuffer
@@ -78,7 +78,7 @@ public:
 				// Return Value			:	-
 				// Comments				:
 				// Date last edited		:	5/9/2002
-				CFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
+				CExrFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 					int			i;
 					float		*tmp;
 					char		*software;
@@ -148,7 +148,7 @@ public:
 					framebuffer			=	new FrameBuffer;
 
 					// Compute the size of a pixel
-					pixelSize			=	numSamples*sizeof(half);
+					pixelSize			=	numSamples*sizeof(half) / 8;
 					lastSavedLine		=	0;
 					scanlines			=	new half*[height];
 					scanlineUsage		=	new int[height];
@@ -164,18 +164,19 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	~CFramebuffer
+				// Class				:	CExrFramebuffer
+				// Method				:	~CExrFramebuffer
 				// Description			:	Dtor
 				// Return Value			:	-
 				// Comments				:
 				// Date last edited		:	11/28/2001
-				~CFramebuffer() {
+				~CExrFramebuffer() {
 					int	i;
 					
-					if (file != NULL){	
-						delete file;
+					if (file != NULL){
 						delete framebuffer;
+						delete file;
+						file = NULL;
 					} else {
 						return;
 					}
@@ -300,7 +301,7 @@ public:
 // Comments				:
 // Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
-	CFramebuffer	*fb	=	new CFramebuffer(name,width,height,numSamples,samples,findParameter);
+	CExrFramebuffer	*fb	=	new CExrFramebuffer(name,width,height,numSamples,samples,findParameter);
 	
 	if (fb->file == NULL) {	// If we could not open the image, return NULL
 		delete fb;
@@ -317,7 +318,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Comments				:
 // Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
-	CFramebuffer	*fb	=	(CFramebuffer *) im;
+	CExrFramebuffer	*fb	=	(CExrFramebuffer *) im;
 	
 	assert(fb != NULL);
 
@@ -333,7 +334,7 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Comments				:
 // Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
-	CFramebuffer	*fb	=	(CFramebuffer *) im;
+	CExrFramebuffer	*fb	=	(CExrFramebuffer *) im;
 
 	assert(fb != NULL);
 
