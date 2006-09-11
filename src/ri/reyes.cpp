@@ -375,8 +375,10 @@ void	CReyes::render() {
 	// Process the objects and patches
 	while((cObject = objectQueue.get()) != NULL) {
 
+		if(depthFilter != DEPTH_MID) culledDepth = maxDepth;
+
 		// Is the object behind the maximum opaque depth ?
-		if (cObject->zmin < maxDepth) {
+		if (cObject->zmin < culledDepth) {
 
 			// Is this a grid ?
 			if (cObject->grid != NULL) {
