@@ -88,6 +88,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\..\README = ..\..\..\README
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slc", "slc\slc.vcproj", "{64E59423-5805-45F2-92E1-8D26B92E6C32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -179,6 +181,12 @@ Global
 		{9A91A7E3-FB05-4E3F-91DE-FA47F5FDC398}.Release|Win32.Build.0 = Release|Win32
 		{9A91A7E3-FB05-4E3F-91DE-FA47F5FDC398}.test|Win32.ActiveCfg = Release|Win32
 		{9A91A7E3-FB05-4E3F-91DE-FA47F5FDC398}.test|Win32.Build.0 = Release|Win32
+		{64E59423-5805-45F2-92E1-8D26B92E6C32}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64E59423-5805-45F2-92E1-8D26B92E6C32}.Debug|Win32.Build.0 = Debug|Win32
+		{64E59423-5805-45F2-92E1-8D26B92E6C32}.Release|Win32.ActiveCfg = Release|Win32
+		{64E59423-5805-45F2-92E1-8D26B92E6C32}.Release|Win32.Build.0 = Release|Win32
+		{64E59423-5805-45F2-92E1-8D26B92E6C32}.test|Win32.ActiveCfg = Release|Win32
+		{64E59423-5805-45F2-92E1-8D26B92E6C32}.test|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
