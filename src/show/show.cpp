@@ -39,6 +39,7 @@
 #include "interface.h"
 #include "photonView.h"
 #include "pointCloudView.h"
+#include "brickmapView.h"
 #include "cacheView.h"
 #include "radView.h"
 #include "meshView.h"
@@ -64,15 +65,13 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 
 
 
-
-
 int	main(int argc,char *argv[]) {
 
 	// Init the memory manager
 	memInit();
 
 	if (argc == 1) {
-		fprintf(stdout,"Usage: show <file_name>[,mode]\n");
+		fprintf(stdout,"Usage: show <options> <file_name>[,mode]\n");
 	} else {
 		CInterface	*window	=	NULL;
 		FILE		*in;
@@ -83,12 +82,12 @@ int	main(int argc,char *argv[]) {
 		TIFFSetErrorHandler(tiffErrorHandler);
 		TIFFSetWarningHandler(tiffErrorHandler);
 
-		tin		=	TIFFOpen(argv[1],"r");
+		tin		=	TIFFOpen(argv[argc-1],"r");
 
 		if (tin != NULL) {
 			window	=	new CImageView(tin);
 		} else {
-			in		=	fopen(argv[1],"rb");
+			in		=	fopen(argv[argc-1],"rb");
 
 			if (in != NULL)	{
 				unsigned int	magic	=	0;
@@ -101,15 +100,15 @@ int	main(int argc,char *argv[]) {
 					fread(version,3,sizeof(int),in);
 
 					if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
-						printf("File %s is from an incompatible version\n",argv[1]);
-						printf("Attempting to open %s\n",argv[1]);
+						printf("File %s is from an incompatible version\n",argv[argc-1]);
+						printf("Attempting to open %s\n",argv[argc-1]);
 					}
 
 					fread(&i,1,sizeof(int),in);
 					t	=	(char *) alloca((i+1)*sizeof(char));
 					fread(t,i+1,sizeof(char),in);
 
-					printf("File:    %s\n",argv[1]);
+					printf("File:    %s\n",argv[argc-1]);
 					printf("Version: %d.%d.%d\n",version[0],version[1],version[2]);
 					printf("Type:    %s\n",t);
 
@@ -121,19 +120,32 @@ int	main(int argc,char *argv[]) {
 						window	=	new CRadView(in);
 					} else if (strcmp(t,"PointCloud") == 0) {
 						window	=	new CPointCloudView(in);
+					} else if (strcmp(t,"BrickMap") == 0) {
+						int fast = FALSE;
+						int level = -1;
+						
+						for(int i = 1; i < argc-1; i++) {
+							if(!strcmp(argv[i],"-fast")) {
+								fast = true;
+							} else if(!strcmp(argv[i],"-level")) {
+								level = atoi(argv[i+1]);
+							}
+						}
+						
+						window	=	new CBrickMapView(in,fast,level);
 					} else {
 						window	=	NULL;
 					}
 
 				} else {
-					printf("File %s doesn't seem to be a Pixie file\n",argv[1]);
+					printf("File %s doesn't seem to be a Pixie file\n",argv[argc-1]);
 				}
 			}
 		}
 
 
 		if (window == NULL) {
-			in	=	fopen(argv[1],"r");
+			in	=	fopen(argv[argc-1],"r");
 
 			if (in != NULL) {
 				window	=	new CMeshView(in);

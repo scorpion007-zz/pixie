@@ -82,6 +82,7 @@ CInterface::CInterface() : Fl_Gl_Window(640,480,"View") {
 // Comments				:
 // Date last edited		:	1/14/2002
 CInterface::~CInterface() {
+	hide();
 }
 
 ///////////////////////////////////////////////////////////////////////
