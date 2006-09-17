@@ -31,10 +31,75 @@
 #ifndef SDR_H
 #define SDR_H
 
+#include "interpreter.h"
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CVariable
+// Description			:	Holds a variable
+// Comments				:
+// Date last edited		:	9/16/2006
+class	CVariable {
+public:
+				int			type;			// Type of the variable
+				char		name[512];		// Name of the variable
+				CVariable	*next;			// Next variable in the same scope
+				CNode		*node;			// The node corresponding to this variable
+};
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFunction
+// Description			:	Holds a function
+// Comments				:
+// Date last edited		:	9/16/2006
+class	CScope {
+public:
+				CVariable	*variables;		// The list of variables defined in this scope
+				CScope		*parent;		// The parent scope
+				CNode		*nodes;			// List of nodes for this scope (the code)
+};
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFunction
+// Description			:	Holds a function
+// Comments				:
+// Date last edited		:	9/16/2006
+class	CFunction : public CScope {
+public:
+				int			type;			// Type of the function
+				char		name[512];		// Name of the function
+				CVariable	*inputs;		// List of input variables
+};
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Some global functions for the shader compiler
 extern	int		type;
 extern	int		lineNo;
 extern	char	fileName[512];
+extern	CScope	*scope;
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Some functions for the shader compiler
+void		beginFunction(const char *name,int type);
+void		endFunction();
+void		beginScope();
+void		endScope();
+CVariable	*addVariable(const char *name,int type);
+
+
+
+
 
 
 
