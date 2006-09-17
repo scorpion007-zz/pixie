@@ -13,7 +13,7 @@ show_SOURCES = cacheView.cpp \
 				imageView.cpp \
 				show.cpp
 
-show_LDADD = @X_LIBS@ @FLTK_LDFLAGS@ @X_LDFLAGS@ @TIFF_LIBS@ ../common/libcommon.la
+show_LDADD = @X_LIBS@ @FLTK_LDFLAGS@ @X_LDFLAGS@ @TIFF_LIBS@ ../common/libcommon.la ../ri/libri.la
 show_CXXFLAGS = @X_CFLAGS@ @FLTK_CXXFLAGS@
 
 INCLUDES = -I..
