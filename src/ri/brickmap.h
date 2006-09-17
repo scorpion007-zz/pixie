@@ -38,6 +38,10 @@
 #include "stats.h"
 #include "texture3d.h"
 
+// Forward
+
+class CBrickMapView;
+
 // Some hard coded constants to make our life easier
 #define	BRICK_SHIFT				3
 #define	BRICK_SIZE				8
@@ -199,6 +203,8 @@ protected:
 	static	int					maxMemory;						// The maximum amount of memory to allocate
 
 	static	void				brickQuickSort(CBrickNode **nodes,int start,int end);
+	
+	friend class CBrickMapView;
 };
 
 
