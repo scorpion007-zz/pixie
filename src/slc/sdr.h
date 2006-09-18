@@ -83,6 +83,7 @@ extern	int		type;
 extern	int		lineNo;
 extern	char	fileName[512];
 extern	CScope	*scope;
+extern	CShader	*shader;
 
 
 
@@ -91,11 +92,13 @@ extern	CScope	*scope;
 
 ////////////////////////////////////////////////////////////////////////////
 // Some functions for the shader compiler
-void		beginFunction(const char *name,int type);
-void		endFunction();
-void		beginScope();
-void		endScope();
-CVariable	*addVariable(const char *name,int type);
+void		beginFunction(const char *name,int type);		// Begin a function
+void		endFunction();									// End a function
+void		beginScope();									// Begin a scope
+void		endScope();										// End a scope
+CVariable	*addVariable(const char *name,int type,int numItems=1);		// Add a variable to the current scope
+CVariable	*findVariable(const char *name);				// Find a variable
+void		addNode(CNode *node);							// Add a node to the current scope
 
 
 

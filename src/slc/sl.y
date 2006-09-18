@@ -364,25 +364,14 @@ slFunctionHeader:
 		SL_IDENTIFIER_VALUE									// Name of the Function
 		SL_OPEN_PARANTHESIS
 		{
-			CFunction	*thisFunction	=	sdr->newFunction($2);
-			
-			if ($1 & (SLC_OUTPUT | SLC_EXTERN | SLC_RDONLY)) {
-				sdr->error("Invalid return type for function %s\n",$2);
-				$1	&=	~(SLC_OUTPUT | SLC_EXTERN | SLC_RDONLY);
-			}
-
-			thisFunction->returnValue	=	new CParameter($2,$1,1);
-
-			sdr->undesire();
+			beginFunction($2,$1);
 		}
 		|
 		SL_VOID
 		SL_IDENTIFIER_VALUE									// Name of the CFunction
 		SL_OPEN_PARANTHESIS
 		{
-			CFunction	*thisFunction	=	sdr->newFunction($2);
-			
-			thisFunction->returnValue	=	NULL;
+			beginFunction($2,0);
 		}
 		;
 
@@ -392,15 +381,7 @@ slFunction:
 		SL_CLOSE_PARANTHESIS
 		slBlock
 		{
-			CFunction	*cFun		=	sdr->popFunction();
-
-			cFun->initExpression	=	$2;
-			cFun->code				=	$4;
-
-			if (cFun->returnValue != NULL)
-				if (cFun->returnValueGiven == FALSE) 
-					sdr->error("Return value not given for %s\n",cFun->symbolName);
-
+			endFunction();
 		}
 		;
 		
@@ -409,13 +390,7 @@ slFunction:
 		// (Can be empty)
 slFunctionParameterList:
 		slFunctionParameters
-		{
-			$$	=	$1;
-		}
 	|
-		{
-			$$	=	new CNullExpression;
-		}
 		;
 
 		////////////////////////////////////////////////
@@ -425,20 +400,11 @@ slFunctionParameters:
 		slFunctionParameter								// Semi colon seperated
 		SL_SEMI_COLON 
 		slFunctionParameters
-		{
-			$$	=	new CTwoExpressions($1,$3);
-		}
 	|
 		slFunctionParameter
 		SL_SEMI_COLON
-		{
-			$$	=	$1;
-		}
 	|
 		slFunctionParameter
-		{
-			$$	=	$1;
-		}
 		;
 
 		////////////////////////////////////////////////
@@ -446,26 +412,9 @@ slFunctionParameters:
 slFunctionParameter:
 		slTypeDecl
 		{
-			int	type	=	sdr->desired();
-
-			if (type & (SLC_EXTERN)) {
-				sdr->error("Invalid parameter type\n");
-				type	&=	~(SLC_EXTERN);
-			}
-
-			if (type & SLC_OUTPUT) {
-				sdr->undesire();
-				sdr->desire(type);					// Make sure we mark the desired type as READ-ONLY
-			} else {
-				sdr->undesire();
-				sdr->desire(type | SLC_RDONLY);		// Make sure we mark the desired type as READ-ONLY
-			}
+			type	=	$1;
 		} 
 		slFunctionParameterIdentifierList
-		{
-			$$					=	$3;
-			sdr->undesire();						// We're done with the type
-		}
 		;
 
 		////////////////////////////////////////////////
@@ -473,37 +422,29 @@ slFunctionParameter:
 slFunctionParameterIdentifierList:
 		SL_IDENTIFIER_VALUE							// Default Parameter values are not supported yet
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired(),1);	// Add the Parameter to the current CFunction
+			addVariable($2,type);
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList
 		{
-			$$	=	$4;
+			findVariable($2)->node	=	$2;
 		}
 	|
 		SL_IDENTIFIER_VALUE
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired(),1);
-	
-			$$			=	new CNullExpression;
+			addVariable($2,type);
 		}
 	|
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY,-1);
+			addVariable($2,type,-1);
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList
 		{
-			$$	=	$6;
+			findVariable($2)->node	=	$6;
 		}
 	|
 		SL_IDENTIFIER_VALUE
@@ -511,14 +452,7 @@ slFunctionParameterIdentifierList:
 		SL_FLOAT_VALUE
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));
-			
-			if (cParameter->numItems <= 0) {
-				sdr->error("Array size for %s is invalid (%s)\n",$1,$3);
-				cParameter->numItems	=	1;
-			}
+			addVariable($2,type,atoi($3));
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList

@@ -205,6 +205,10 @@
 				RelativePath="..\..\..\..\src\common\os.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\src\common\simd.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
