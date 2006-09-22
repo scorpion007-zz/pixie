@@ -1,0 +1,11 @@
+#!version 1.7.2
+surface
+#!parameters:
+#!variables:
+#!Init:
+	return            
+#!Code:
+	movevv            	Oi Os
+	mulvv             	Ci Oi Cs
+	return            
+

@@ -1,0 +1,26 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	numSamples	=	16
+#!variables:
+varying	vector	Nf
+varying	vector	temporary_0
+varying	float	temporary_1
+varying	float	temporary_2
+varying	float	temporary_3
+varying	float	temporary_4
+uniform	vector	temporary_5
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  temporary_0  N 
+	faceforward	("v=vv")  Nf  temporary_0  I 
+	vufloat            temporary_2 1
+	vufloat            temporary_4 numSamples
+	occlusion	("f=pnf")  temporary_3  P  Nf  temporary_4 
+	subff             	temporary_1 temporary_2 temporary_3
+	vfromf            	Cl temporary_1
+	vfromf            	temporary_5 0
+	vuvector           L temporary_5
+	return            
+

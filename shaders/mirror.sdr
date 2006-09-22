@@ -1,0 +1,58 @@
+#!version 1.7.4
+surface
+#!parameters:
+uniform	float	Ka	=	1
+uniform	float	Ks	=	1
+uniform	float	Kr	=	1
+uniform	float	roughness	=	.1
+uniform	float	samples	=	1
+uniform	float	blur	=	0
+uniform	string	texname	=	"raytrace"
+#!variables:
+varying	vector	Nf
+varying	vector	R
+varying	boolean	temporary_0
+uniform	boolean	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+varying	vector	temporary_4
+varying	vector	temporary_5
+varying	vector	temporary_6
+uniform	vector	temporary_7
+varying	vector	temporary_8
+varying	vector	temporary_9
+varying	vector	temporary_10
+varying	float	temporary_11
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  N  N 
+	normalize	("v=v")  I  I 
+	faceforward	("v=vv")  Nf  N  I 
+	reflect	("v=vv")  R  I  Nf 
+	sneql             	temporary_1 texname "raytrace"
+	vuboolean          temporary_0 temporary_1
+	if                	temporary_0 #!Label3
+	ntransform	("n=Sn")  R  "world"  R 
+#!Label3:
+	endif             
+	movevv            	Oi Os
+	vfromf            	temporary_7 Ka
+	vuvector           temporary_6 temporary_7
+	ambient	("c=")  temporary_8 
+	mulvv             	temporary_5 temporary_6 temporary_8
+	vfromf            	temporary_7 Ks
+	vuvector           temporary_8 temporary_7
+	negv              	temporary_10 I
+	vufloat            temporary_11 roughness
+	specular	("c=nvf")  temporary_9  Nf  temporary_10  temporary_11 
+	mulvv             	temporary_6 temporary_8 temporary_9
+	addvv             	temporary_4 temporary_5 temporary_6
+	mulvv             	temporary_3 Cs temporary_4
+	vfromf            	temporary_7 Kr
+	vuvector           temporary_5 temporary_7
+	environment	("c=SFvSfSf")  temporary_6  texname  0  R  "samples"  samples  "blur"  blur 
+	mulvv             	temporary_4 temporary_5 temporary_6
+	addvv             	temporary_2 temporary_3 temporary_4
+	mulvv             	Ci Os temporary_2
+	return            

@@ -1,0 +1,37 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	1
+uniform	point	from	=	"shader"  [ 0 0 0 ]
+uniform	point	to	=	"shader"  [ 0 0 1 ]
+#!variables:
+uniform	vector	temporary_0
+varying	vector	dir
+varying	vector	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+varying	vector	temporary_4
+#!Init:
+	vfromf            	temporary_0 0 0 0
+	pfrom             	from "shader" temporary_0
+	vfromf            	temporary_0 0 0 1
+	pfrom             	to "shader" temporary_0
+	return            
+#!Code:
+	subvv             	temporary_0 to from
+	vuvector           dir temporary_0
+	vfromf            	temporary_0 0
+	vuvector           temporary_1 temporary_0
+	solar             	 dir  temporary_1  #!Label2
+	subvv             	temporary_4 Ps dir
+	transmission	("c=pp")  temporary_3  Ps  temporary_4 
+	vfromf            	temporary_0 intensity
+	vuvector           temporary_4 temporary_0
+	mulvv             	temporary_2 temporary_3 temporary_4
+	vuvector           temporary_3 lightcolor
+	mulvv             	Cl temporary_2 temporary_3
+#!Label2:
+	endsolar          
+	return            
+

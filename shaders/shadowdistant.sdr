@@ -1,0 +1,53 @@
+#!version 1.7.2
+light
+#!parameters:
+uniform	float	intensity	=	1
+uniform	color	lightcolor	=	1
+uniform	point	from	=	"shader"  [ 0 0 0 ]
+uniform	point	to	=	"shader"  [ 0 0 1 ]
+uniform	string	shadowname	=	""
+#!variables:
+uniform	vector	temporary_0
+varying	vector	dir
+varying	vector	temporary_1
+varying	vector	vis
+varying	boolean	temporary_2
+uniform	boolean	temporary_3
+uniform	vector	temporary_4
+varying	vector	temporary_5
+varying	vector	temporary_6
+#!Init:
+	vfromf            	temporary_0 0 0 0
+	pfrom             	from "shader" temporary_0
+	vfromf            	temporary_0 0 0 1
+	pfrom             	to "shader" temporary_0
+	return            
+#!Code:
+	subvv             	temporary_0 to from
+	vuvector           dir temporary_0
+	vfromf            	temporary_0 0
+	vuvector           temporary_1 temporary_0
+	solar             	 dir  temporary_1  #!Label4
+	seql              	temporary_3 shadowname ""
+	vuboolean          temporary_2 temporary_3
+	if                	temporary_2 #!Label6
+	vfromf            	temporary_4 1 1 1
+	cfrom             	temporary_0 "rgb" temporary_4
+	vuvector           vis temporary_0
+#!Label6:
+	else              	#!Label5
+	vfromf            	temporary_0 1
+	vuvector           temporary_5 temporary_0
+	shadow	("c=SFp")  temporary_6  shadowname  0  Ps 
+	subvv             	vis temporary_5 temporary_6
+#!Label5:
+	endif             
+	vfromf            	temporary_0 intensity
+	vuvector           temporary_6 temporary_0
+	mulvv             	temporary_5 vis temporary_6
+	vuvector           temporary_6 lightcolor
+	mulvv             	Cl temporary_5 temporary_6
+#!Label4:
+	endsolar          
+	return            
+

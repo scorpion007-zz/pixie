@@ -1,0 +1,58 @@
+#!version 1.7.2
+surface
+#!parameters:
+uniform	float	Ka	=	1
+uniform	float	Kd	=	.5
+uniform	float	Ks	=	.5
+uniform	float	roughness	=	.1
+uniform	color	specularcolor	=	1
+uniform	string	texturename	=	""
+#!variables:
+varying	vector	Nf
+varying	boolean	temporary_0
+uniform	boolean	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+varying	vector	temporary_4
+varying	vector	temporary_5
+uniform	vector	temporary_6
+varying	vector	temporary_7
+varying	vector	temporary_8
+uniform	vector	temporary_9
+varying	float	temporary_10
+#!Init:
+	return            
+#!Code:
+	movevv            	Ci Cs
+	sneql             	temporary_1 texturename ""
+	vuboolean          temporary_0 temporary_1
+	if                	temporary_0 #!Label3
+	texture	("c=SFff")  temporary_2  texturename  0  s  t 
+	mulvv             	Ci Ci temporary_2
+#!Label3:
+	endif             
+	normalize	("v=v")  temporary_2  N 
+	faceforward	("v=vv")  Nf  temporary_2  I 
+	vfromf            	temporary_6 Ka
+	vuvector           temporary_5 temporary_6
+	ambient	("c=")  temporary_7 
+	mulvv             	temporary_4 temporary_5 temporary_7
+	vfromf            	temporary_6 Kd
+	vuvector           temporary_7 temporary_6
+	diffuse	("c=n")  temporary_8  Nf 
+	mulvv             	temporary_5 temporary_7 temporary_8
+	addvv             	temporary_3 temporary_4 temporary_5
+	mulvv             	temporary_2 Ci temporary_3
+	vfromf            	temporary_9 Ks
+	mulvv             	temporary_6 specularcolor temporary_9
+	vuvector           temporary_4 temporary_6
+	normalize	("v=v")  temporary_8  I 
+	negv              	temporary_7 temporary_8
+	vufloat            temporary_10 roughness
+	specular	("c=nvf")  temporary_5  Nf  temporary_7  temporary_10 
+	mulvv             	temporary_3 temporary_4 temporary_5
+	addvv             	Ci temporary_2 temporary_3
+	movevv            	Oi Os
+	mulvv             	Ci Ci Oi
+	return            
+

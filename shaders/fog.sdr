@@ -1,0 +1,32 @@
+#!version 1.7.2
+volume
+#!parameters:
+uniform	float	distance	=	1
+uniform	color	background	=	0
+#!variables:
+varying	float	d
+varying	float	temporary_0
+varying	float	temporary_1
+varying	float	temporary_2
+varying	float	temporary_3
+varying	float	temporary_4
+varying	float	temporary_5
+varying	vector	temporary_6
+uniform	vector	temporary_7
+#!Init:
+	return            
+#!Code:
+	vufloat            temporary_0 1
+	length	("f=v")  temporary_4  I 
+	vufloat            temporary_5 distance
+	divff             	temporary_3 temporary_4 temporary_5
+	negf              	temporary_2 temporary_3
+	exp	("f=f")  temporary_1  temporary_2 
+	subff             	d temporary_0 temporary_1
+	vuvector           temporary_6 background
+	mix	("v=vvf")  Ci  Ci  temporary_6  d 
+	vfromf            	temporary_7 1 1 1
+	vuvector           temporary_6 temporary_7
+	mix	("v=vvf")  Oi  Oi  temporary_6  d 
+	return            
+

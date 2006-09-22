@@ -1,0 +1,18 @@
+Development notes:
+
+Possible Optimization:
+	The shaded lights can be kept as an array instead of a linked list.
+
+Possible Optimization:
+	Omit uniform variables from the shading language.
+	Treat all variables as varyings.
+
+
+Todos:
+OpenEXR input for textures
+RiDisplayChannel & support
+additional attributes, options visible from SL
+bake, pointcloud and brickmap support
+RiFilter support
+trace subsets
+patch crack stitching

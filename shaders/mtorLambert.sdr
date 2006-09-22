@@ -1,0 +1,37 @@
+#!version 1.7.2
+surface
+#!parameters:
+uniform	float	refractiveIndex	=	1
+uniform	float	diffuseCoeff	=	1
+uniform	color	ambientColor	=	 [ 0 0 0 ]
+uniform	color	incandescence	=	 [ 0 0 0 ]
+uniform	float	translucenceCoeff	=	0
+uniform	float	glowIntensity	=	0
+#!variables:
+varying	vector	Nf
+varying	vector	temporary_0
+varying	vector	temporary_1
+varying	vector	temporary_2
+varying	vector	temporary_3
+uniform	vector	temporary_4
+varying	vector	temporary_5
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  temporary_0  N 
+	faceforward	("v=vv")  Nf  temporary_0  I 
+	vfromf            	temporary_4 diffuseCoeff
+	vuvector           temporary_3 temporary_4
+	diffuse	("c=n")  temporary_5  Nf 
+	mulvv             	temporary_2 temporary_3 temporary_5
+	mulvv             	temporary_1 Cs temporary_2
+	vuvector           temporary_2 incandescence
+	addvv             	temporary_0 temporary_1 temporary_2
+	vuvector           temporary_2 ambientColor
+	ambient	("c=")  temporary_3 
+	mulvv             	temporary_1 temporary_2 temporary_3
+	addvv             	Ci temporary_0 temporary_1
+	movevv            	Oi Os
+	mulvv             	Ci Ci Oi
+	return            
+

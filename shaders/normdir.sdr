@@ -1,0 +1,26 @@
+#!version 1.7.2
+surface
+#!parameters:
+#!variables:
+varying	boolean	temporary_0
+varying	float	temporary_1
+varying	float	temporary_2
+uniform	vector	temporary_3
+#!Init:
+	return            
+#!Code:
+	dot               	temporary_1 I N
+	vufloat            temporary_2 0
+	flt               	temporary_0 temporary_1 temporary_2
+	if                	temporary_0 #!Label4
+	vfromf            	temporary_3 0 1 0
+	vuvector           Ci temporary_3
+#!Label4:
+	else              	#!Label3
+	vfromf            	temporary_3 1 0 0
+	vuvector           Ci temporary_3
+#!Label3:
+	endif             
+	movevv            	Oi Os
+	return            
+

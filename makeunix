@@ -1,0 +1,20 @@
+#!/bin/csh
+foreach fil  ( `find . -name "*.cpp" -print` `find . -name "*.c" -print` `find . -name "*.h" -print` `find . -name "*.l" -print` `find . -name "*.y" -print` `find . -name "*.in" -print` `find . -name "*.am" -print` `find . -name "*.sdr" -print` `find . -name "*.sl" -print`)
+printf '\n' >> $fil
+perl -p -i -e 's/\r\n$/\n/' $fil
+end
+cd src/ri
+flex -i -Pdso -olex.dso.cpp dso.l
+bison -p dso -o dso.cpp dso.y
+flex -i -Prib -olex.rib.cpp rib.l
+bison -p rib -o rib.cpp rib.y
+flex -Psl -olex.sl.cpp sdr.l
+bison -p sl -o sl.cpp sdr.y
+flex -Pvar -olex.var.cpp variable.l
+bison -p var -o variable.cpp variable.y
+cd ../sdr
+flex -Psdr -olex.sdr.cpp sdr.l
+bison -p sdr -o sdr.cpp sdr.y
+cd ../sdrc
+flex -Psl -olex.sl.cpp sl.l
+bison -p sl -o sl.cpp sl.y

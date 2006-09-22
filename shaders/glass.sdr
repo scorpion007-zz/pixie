@@ -1,0 +1,79 @@
+#!version 1.7.2
+surface
+#!parameters:
+uniform	float	eta	=	1.5
+uniform	float	Ka	=	1
+uniform	float	Kd	=	1
+uniform	float	Ks	=	1
+uniform	float	roughness	=	0.5
+#!variables:
+varying	vector	R
+varying	vector	T
+varying	vector	In
+varying	float	Kr
+varying	float	Kt
+varying	vector	Nf
+varying	vector	temporary_0
+uniform	vector	temporary_1
+varying	float	temporary_2
+varying	boolean	temporary_3
+varying	float	temporary_4
+varying	float	temporary_5
+uniform	float	temporary_6
+varying	vector	temporary_7
+varying	vector	temporary_8
+#!Init:
+	return            
+#!Code:
+	normalize	("v=v")  temporary_0  N 
+	faceforward	("v=vv")  Nf  temporary_0  I 
+	normalize	("v=v")  In  I 
+	vfromf            	temporary_1 0
+	vuvector           Ci temporary_1
+	dot               	temporary_4 In N
+	vufloat            temporary_5 0
+	flt               	temporary_3 temporary_4 temporary_5
+	if                	temporary_3 #!Label9
+	divff             	temporary_6 1 eta
+	vufloat            temporary_2 temporary_6
+#!Label9:
+	else              	#!Label10
+	vufloat            temporary_2 eta
+#!Label10:
+	endif             
+	fresnel	("o=vvfFFVV")  In  Nf  temporary_2  Kr  Kt  R  T 
+	dot               	temporary_2 I N
+	vufloat            temporary_4 0
+	flt               	temporary_3 temporary_2 temporary_4
+	if                	temporary_3 #!Label11
+	vfromf            	temporary_1 Ks
+	vuvector           temporary_0 temporary_1
+	negv              	temporary_8 In
+	vufloat            temporary_2 roughness
+	specular	("c=nvf")  temporary_7  Nf  temporary_8  temporary_2 
+	mulvv             	Ci temporary_0 temporary_7
+#!Label11:
+	endif             
+	vufloat            temporary_2 0.01
+	fgt               	temporary_3 Kr temporary_2
+	if                	temporary_3 #!Label13
+	vfromf            	temporary_7 Kr
+	trace	("c=pv")  temporary_8  P  R 
+	mulvv             	temporary_0 temporary_7 temporary_8
+	addvv             	Ci Ci temporary_0
+#!Label13:
+	endif             
+	vufloat            temporary_2 0.01
+	fgt               	temporary_3 Kt temporary_2
+	if                	temporary_3 #!Label15
+	vfromf            	temporary_8 Kt
+	mulvv             	temporary_7 Cs temporary_8
+	trace	("c=pv")  temporary_8  P  T 
+	mulvv             	temporary_0 temporary_7 temporary_8
+	addvv             	Ci Ci temporary_0
+#!Label15:
+	endif             
+	mulvv             	Ci Ci Os
+	movevv            	Oi Os
+	return            
+
