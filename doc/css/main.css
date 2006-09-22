@@ -1,0 +1,506 @@
+/*
+-----------------------------------------------------
+FraternityManuals.org MediaWiki 'monobook' style sheet for CSS2-capable browsers
+FileName:   main.css
+Version:    2005.04.06
+Author:		jasonpearce.com
+-----------------------------------------------------
+*/
+
+/* Media Imports -----------------------------------------------------*/
+@import url("browserdefaults_compact.css");
+/* @import url("broswerforms_compact.css"); */
+
+
+/* Typography & Colors -----------------------------------------------*/
+body {
+	background-color: #ffffff; /* white */
+	color: #333; /* dark grey */
+	font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;
+	font-size: 72.5%;
+	}
+
+#titleBar {
+	border-top: 2px solid #1860AC; /* Macro 4 Blue */
+	}
+
+#content {
+	font-size: 1.2em;
+	line-height: 1.2em;
+	}
+
+code {
+	font: 1.1em 'Courier New', Courier, Fixed;
+	}
+
+acronym, abbr, span.caps {
+	font-size: 0.9em;
+	letter-spacing: .07em;
+	}
+
+#column-one {
+	font-size: 1.1em;
+	line-height: 1.0em;
+	}
+
+#column-one {
+	color: #444444;
+	}
+
+#toc { /* table of contents */
+	background: #f6f6f6; /* very light grey */
+	border: 1px solid #e0e0e0; /* slightly darker grey */
+	}
+	
+#toctitle {
+	background: #eee; /* slightly darker grey */
+	color: #89a;
+    border: 1px solid #eee; /* slightly darker grey */
+	}
+
+#footer {
+	border-top: 1px solid #666666;
+	color: #999999;
+	}
+
+#jump-to-nav{
+	text-align: right;
+	padding-bottom: 1.5em;
+}	
+
+/* Links -------------------------------------------------------------*/
+a {color: #2153B0;} /* blue */
+a:hover {color: #173A7B;} /* dark blue */
+
+p a:visited {color: #FD9A26;} /* orange */
+#content a.new {color: green;} /* green */
+
+#column-one a:hover {color: #173A7B;} /* dark blue */
+#column-one .selected a {
+	color: #FD9A26; /* orange */
+	font-weight: bolder;
+	}
+
+#toc a {color: #808080;} /* blue */
+#toc a:hover {color: #173A7B;} /* dark blue */
+#toc p a:visited {color: #2153B0;} /* blue */
+
+#footer a {color: #999999;}
+#footer a:hover {color: #173A7B;} /* dark blue */
+
+/* LINK ICONS
+** keep the whitespace in front of the ^=, hides rule from konqueror
+** this is css3, the validator doesn't like it when validating as css2
+*/
+#bodyContent a[href ^="http://"], #bodyContent a[href ^="gopher://"] {
+    background: url(external.png) center right no-repeat;
+    padding-right: 13px;
+	}
+
+#bodyContent a[href ^="https://"], .link-https {
+    background: url("lock_icon.gif") center right no-repeat;
+    padding-right: 16px;
+	}
+
+#bodyContent a[href ^="mailto:"], .link-mailto {
+    background: url("mail_icon.gif") center right no-repeat;
+    padding-right: 18px;
+	}
+
+#bodyContent a[href ^="news://"] {
+    background: url("news_icon.png") center right no-repeat;
+    padding-right: 18px;
+	}
+
+#bodyContent a[href ^="ftp://"], .link-ftp {
+    background: url("file_icon.gif") center right no-repeat;
+    padding-right: 18px;
+	}
+
+#bodyContent a[href ^="irc://"], .link-irc {
+    background: url("discussionitem_icon.gif")  center right no-repeat;
+    padding-right: 18px;
+}
+
+
+
+
+/* Structure & Frame -------------------------------------------------*/
+body {
+	text-align: center;
+	}
+
+#titleBar {
+	height: 100px;
+	text-align: left;
+	width: 100%;
+	}
+
+#globalWrapper {
+	margin: 20px auto;
+	text-align: left;
+	width: 90%;
+	}
+
+#column-content {
+	margin-left: 200px;
+	}
+
+#column-one {
+	position: absolute;
+	top: 125px;
+	width: 185px;
+	}
+
+#footer {
+	clear: both;
+	height: 5em;
+	margin: 3em 0 3em 200px;
+	}
+
+
+/* Headers -----------------------------------------------------------*/
+/*h1, h2, h3, h4 {font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;}*/
+/*h1, h2, h3, h4 {font-family: Verdana, Arial, Sans-Serif;}*/
+h1, h2 {border-bottom: 1px dotted #333333;  line-height: 1.1em; padding-bottom: 0.2em;}
+
+.firstHeading {border-bottom-style: solid; border-bottom-color: #d5d5d5; font-size: 1.8em; color: #1860AC}
+.editsection {margin-top: 1em;}
+
+.portlet h5 { /* blocks within #column-one */
+	border-top: 1px solid #eeeeee;
+	margin-top: 0;
+	padding-top: 0.25em;
+	}
+
+
+/* Images ------------------------------------------------------------*/
+#titleBar {
+	background: #FFF url("pixie-docs.png") repeat-x; /* blue and white background */
+	/* background: #FFF url(pixie-docs.png) repeat-x; retain as comment for static wiki */
+	}
+	
+#titleBar img {
+	margin-left: 2.5%;
+	}
+
+#p-poweredby img {
+	border: 0;
+	clear: both;
+	float: right;
+	margin: 2px 0;
+	}	
+
+
+/* Lists -------------------------------------------------------------*/
+
+ul {
+	margin: 10px;
+	padding-left: 15px;
+	}
+
+html>body li {
+	margin-left: 10px;;
+	}
+	
+.portlet ul {
+	margin-bottom: 2em;
+	}
+
+.portlet li {
+	margin: 0.5em 0;
+	}
+
+/* Special stylized non-IE bullets
+   Does not work in Internet Explorer, which merely default to normal bullets. */
+html>body .portlet ul {
+	list-style: none;
+	margin-left: 0px;
+	padding: 0 0 0 30px;
+	padding-left: 10px;
+	text-indent: -10px;
+	} 
+
+html>body .portlet li {
+	margin-left: 10px;
+	}
+
+html>body .portlet ul li:before {
+	content: "\00BB \0020";
+	}
+
+dl {
+	margin: 10px;
+	padding-left: 15px;
+	}
+
+html>body dt {
+	margin-left: 10px;
+	font-weight: bold;
+	}
+
+html>body dd {
+	margin-left: 40px;;
+	}
+
+/* Form Elements -----------------------------------------------------*/
+.portlet #searchform {
+	margin-left: 10px;
+	margin-bottom: 2em;
+	}
+
+.portlet #searchform input {
+	margin: 0.15em 0;
+	}
+
+/* Various Tags & Classes --------------------------------------------*/
+#siteSub, .urlexpansion, .printfooter {
+	display: none;
+	}
+
+.visualClear {
+	clear: both;
+	}
+
+/* BEGIN user notifications */
+.usermessage {
+    background-color: #ffce7b; /* yellow */
+    border: 1px solid #ffa500; /* orange */
+    color: Black;
+    font-weight: bold;
+    margin: 2em 0em 1em 0em;
+    padding: 0.5em 1em;
+    vertical-align: middle;
+	}
+
+#siteNotice {
+    font-size: 95%;
+    padding: 0 0.9em 0 0.9em;
+    text-align: center;
+	}
+
+#siteNotice p {margin: 0; padding: 0;}
+
+.error {color: red; font-size: larger;}
+
+#catlinks {
+    background-color: #F2F6FF; /* very light blue */
+    border: 1px solid #CBDDFF; /* light blue */
+    clear: both;
+    margin: 1em 0;
+	}
+
+#catlinks p {margin: 0.5em;}
+/* END user notifications */
+
+
+
+/* Content -----------------------------------------------------------*/
+/* BEGIN Table of Contents */
+#toc {
+	float: right;
+	margin: 0 0 1em 1em;
+	}
+#toc td {padding: 0.5em;}
+#toc .tocindent {margin-left: 1em;}
+#toc .tocline {margin-bottom: 0px;}
+#toc p {margin: 0}
+#toc .editsection {margin-top: 0.7em;}
+/* END Table of Contents */
+
+/* BEGIN Page history styling */
+.autocomment {color: gray;}
+#pagehistory span.user {margin-left: 1.4em; margin-right: 0.4em;}
+#pagehistory span.minor {font-weight: bold;}
+#pagehistory input {margin: 0.2em;}
+#pagehistory li {border: 1px solid #ffffff; margin-top: 1px; margin-bottom: 1px;}
+#pagehistory li.selected {
+	background-color: #CBDDFF; /* light blue */
+	border:1px dashed #FDA32F; /* orange */
+	}
+/* END Page history styling */
+
+/* BEGIN Diff rendering */
+table.diff {background: #FEFEFE; border: 1px solid #cccccc; padding: 0.5em}
+table.diff td {vertical-align: top;}
+td.diff-otitle a, td.diff-ntitle a, td.diff-otitle a:visited, td.diff-ntitle a:visited {color: #2153B0;}
+td.diff-otitle a:hover, td.diff-ntitle a:hover {text-decoration: underline;}
+td.diff-otitle {}
+td.diff-ntitle {}
+td.diff-addedline {background:#F2F6FF;}
+td.diff-addedline span.diffchange {
+	background: #CDDEFF;
+	border: 1px dashed #676F80;
+	color: green;
+	font-weight: bold;
+	}
+td.diff-deletedline {background:#FFF9F2;}
+td.diff-deletedline span.diffchange {
+	background: #FFE9CB;
+	border: 1px dashed #B3A38E;
+	color: red;
+	font-weight: bold;
+	text-decoration: line-through;
+	}
+td.diff-context {background:#eeeeee;}
+.newpage {color: green;	font-weight: bolder;}
+/* END Diff rendering */
+
+/* BEGIN forms */
+fieldset {
+	background: #FAFCFF;
+	border: 1px solid #CBDDFF;
+	margin: 1em;
+	padding: 0.5em 1em;
+	}
+
+fieldset div {
+	margin: 0.25em 0;
+	}
+
+fieldset input {
+	margin: 0 0.5em;
+	}
+
+legend {
+	color: #2153B0;
+	font-size: 1.25em;
+	font-weight: bolder;
+	padding: 0.2em 0.5em;
+	}
+/* END forms */
+
+
+
+
+/* Footer ------------------------------------------------------------*/
+#footer ul {
+	list-style: none;
+	margin: 0;
+	}
+
+#footer ul li {
+	margin: 0.1em;
+	margin-right: 1em;
+	}
+
+#f-lastmod {}
+#f-viewcount {display: none;}
+#f-copyright {}
+#f-about {float: left;}
+#f-disclaimer {float: left;}
+#f-developedby {float: left;}
+/* images */
+div.floatright, table.floatright {
+    clear: right;
+    float: right;
+    position: relative;
+    margin: 0 0 0.5em 0.5em;
+    border: 0
+/*
+    border: 0.5em solid White;
+    border-width: 0.5em 0 0.8em 1.4em;
+*/
+}
+div.floatright p { font-style: italic; }
+div.floatleft, table.floatleft {
+    float: left;
+    position: relative;
+    margin: 0 0.5em 0.5em 0;
+    border: 0
+/*
+    margin: 0.3em 0.5em 0.5em 0;
+    border: 0.5em solid White;
+    border-width: 0.5em 1.4em 0.8em 0;
+*/
+}
+div.floatnone, table.floatnone {
+    float: none;
+    position: relative;
+    margin: 0 0 0.5em 0.5em;
+    border: 0
+/*
+    margin: 0.3em 0.5em 0.5em 0;
+    border: 0.5em solid White;
+    border-width: 0.5em 1.4em 0.8em 0;
+*/
+}
+div.floatleft p { font-style: italic; }
+/* thumbnails */
+div.thumb {
+    margin-bottom: 0.5em;
+    border-style: solid; border-color: White;
+    width: auto;
+}
+div.thumb div {
+    border:1px solid #cccccc;
+    padding: 3px !important;
+    background-color:#f9f9f9;
+    font-size: 94%;
+    text-align: center;
+    overflow: hidden;
+}
+div.thumb div a img {
+    /*border:1px solid #cccccc;*/
+}
+div.thumb div div.thumbcaption {
+    border: none;
+    text-align: left;
+    line-height: 1.4em;
+    padding: 0.3em 0 0.1em 0;
+}
+div.magnify {
+    float: right;
+    border: none !important;
+    background: none !important;
+}
+div.magnify a, div.magnify img {
+    display: block;
+    border: none !important;
+    background: none !important;
+}
+div.tright {
+    clear: right;
+    float: right;
+    border-width: 0.5em 0 0.8em 1.4em;
+}
+div.tleft {
+    float: left;
+    margin-right:0.5em;
+    border-width: 0.5em 1.4em 0.8em 0;
+}
+.urlexpansion,
+.hiddenStructure {
+    display: none;
+}
+img.tex { vertical-align: middle; }
+span.texhtml { font-family: serif; }
+
+img {
+	border: 0px solid #333;
+	}
+
+pre {
+        border: 1px dashed #808080;
+        padding: 3px;
+	    margin: 0.8em;
+        background-color: #efefef;
+        color: #0020a0;
+        font-size: 1.0em;
+	word-wrap: break-word;
+	}
+tt {
+	font-size: 1.1em;
+	color: #0020a0;
+	}
+.center {
+    width: 100%;
+    text-align: center;
+}
+*.center * {
+    margin-left: auto;
+    margin-right: auto;
+}
+hr {
+	border-top: 1px solid #d5d5d5;
+}

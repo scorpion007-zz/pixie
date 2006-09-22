@@ -1,0 +1,123 @@
+/*
+-----------------------------------------------------
+FraternityManuals.org basic tags rules CSS file for screen media
+FileName:   browserdefaults_compact.css
+Version:    2005.04.06
+Author:		jasonpearce.com
+-----------------------------------------------------
+*/
+
+@namespace url(http://www.w3.org/1999/xhtml);/* set default namespace to HTML */
+
+/* zero padding and margins  */
+* {margin:0;}
+
+/* set font size */
+body {	font-size: 62.5%; /* Resets 1em to 10px */}
+
+/* blocks */
+address,blockquote,body,center,dd,dir,div,dl,dt,frameset,h1,h2,h3,h4,h5,h6,hr,html,isindex,listing,map,marquee,menu,multicol,ol,p,plaintext,pre,ul,xmp {display:block;}
+blockquote {margin:1em 40px;}
+blockquote[type=cite] {border-color:blue;border-left:solid;border-width:thin;margin:1em 0px;padding-left:1em;}
+listing {font-size:medium;margin:1em 0;white-space:pre;}
+p,dl,multicol {margin:1em 0;}
+plaintext,xmp,pre {margin:1em 0;white-space:pre;}
+
+/* headings */
+h1,h2,h3,h4,h5,h6 {font-weight:bold;}
+h1 {font-size:1.75em;}
+h2 {font-size:1.5em;}
+h3 {font-size:1.33em;}
+h4 {font-size:1.2em;}
+h5 {font-size:1em;}
+h6 {font-size:0.85em;}
+h1,h2,h3,h4,h5,h6 {margin:1.5em 0 0.25em 0;} 
+h1 {margin-top:0;}
+
+/* link pseudo-classes */
+a:link {text-decoration:none;}
+a:visited {text-decoration:none;}
+a:hover {text-decoration:underline;}
+a:active {text-decoration:none;}
+
+/* tables */
+
+/* for XHTML tables without tbody */
+
+/* inlines */
+b,strong {font-weight:bolder;}
+big {font-size:larger;}
+blink {text-decoration:blink;}
+i,address,cite,dfn,em,var {font-style:italic;}
+nobr {white-space:nowrap;}
+q:after {content:close-quote;}
+q:before {content:open-quote;}
+s,strike,del {text-decoration:line-through;}
+small {font-size:smaller;}
+sub {font-size:smaller;line-height:normal;vertical-align:sub;}
+sup {font-size:smaller;line-height:normal;vertical-align:super;}
+u,ins {text-decoration:underline;}
+
+/* titles */
+abbr[title],acronym[title] {border-bottom:dotted 1px;}
+
+/* lists */
+ul,menu,dir {list-style-type:disc;margin:1em 2em;}
+ol {list-style-type:decimal;margin:1em 2em;}
+li {display:list-item;}
+
+/* nested lists have no top/bottom margins */
+ul ul,ul ol,ul dir,ul menu,ul dl,ol ul,ol ol,ol dir,ol menu,ol dl,dir ul, dir ol, dir dir, dir menu, dir dl,menu ul,menu ol,menu dir,menu menu,menu dl,dl ul,dl ol,dl dir,dl menu,dl dl {margin-top:0;margin-bottom:0;}
+
+/* 2 deep unordered lists use a circle */
+ol ul,ul ul,menu ul,dir ul,ol menu,ul menu,menu menu,dir menu,ol dir, ul dir, menu dir, dir dir {list-style-type:circle;}
+
+/* 3 deep (or more) unordered lists use a square */
+ol ol ul,  ol ul ul,  ol menu ul,  ol dir ul,ol ol menu,ol ul menu,ol menu menu,ol dir menu,ol ol dir, ol ul dir, ol menu dir, ol dir dir,ul ol ul,  ul ul ul,  ul menu ul,  ul dir ul,ul ol menu,ul ul menu,ul menu menu,ul dir menu,ul ol dir, ul ul dir, ul menu dir, ul dir dir,menu ol ul,menu ul ul,menu menu ul,menu dir ul,menu ol menu,menu ul menu,menu menu menu,menu dir menu,menu ol dir, menu ul dir, menu menu dir, menu dir dir,dir ol ul, dir ul ul, dir menu ul, dir dir ul,dir ol menu, dir ul menu, dir menu menu, dir dir menu,dir ol dir,dir ul dir,dir menu dir,dir dir dir {list-style-type:square;}
+
+/* leafs */
+hr {border:1px;height:2px;margin:0.5em auto 0.5em auto;}
+img[usemap],object[usemap] {color:blue;cursor:pointer;}
+iframe {border:2px inset;}
+
+/* hidden elements */
+area,base,basefont,head,meta,noembed,noframes,noscript,param,script,style,title { display:none;}
+
+/* bidirectionality elements */
+*[dir="ltr"] {direction:ltr;unicode-bidi:embed;}
+*[dir="rtl"] {direction:rtl;unicode-bidi:embed;}
+address,blockquote,body,dd,div,dl,dt,fieldset,form,frame,frameset,h1,h2,h3,h4,h5,h6,iframe,noscript,noframes,object,ol,p,ul,applet,center,dir,hr,menu,pre,li,table,tr,thead,tbody,tfoot,col,colgroup,td,th,caption {unicode-bidi:embed;}
+bdo[dir="ltr"] {direction:ltr;unicode-bidi:bidi-override;}
+bdo[dir="rtl"] {direction:rtl;unicode-bidi:bidi-override;}
+
+/* print settings */
+@media print {
+  @page {margin:10%;}
+  blockquote,fieldset,pre {page-break-inside:avoid;}
+  h1,h2,h3,h4,h5,h6 {page-break-after:avoid;page-break-inside:avoid;}
+  ul,ol,dl {page-break-before:avoid;}
+}
+
+/* speech settings */
+@media speech {
+  a:active {voice-family:betty,female;pitch-range:80;pitch:x-high;}
+  a:link {voice-family:harry,male;}
+  a:visited {voice-family:betty,female;}
+  b {pitch:medium;pitch-range:60;stress:90;richness:90;}
+  dfn {pitch:high;pitch-range:60;stress:60;}
+  dt {stress:80;}
+  em {pitch:medium;pitch-range:60;stress:60;richness:50;}
+  h1 {pitch:x-low;pitch-range:90;}
+  h1,h2,h3,h4,h5,h6 {voice-family:paul,male;stress:20;richness:90;}
+  h2 {pitch:x-low;pitch-range:80;}
+  h3 {pitch:low;pitch-range:70;}
+  h4 {pitch:medium;pitch-range:60;}
+  h5 {pitch:medium;pitch-range:50;}
+  h6 {pitch:medium;pitch-range:40;}
+  i {pitch:medium;pitch-range:60;stress:60;richness:50;}
+  li,dt,dd {pitch:medium;richness:60;}
+  pre,code,tt {pitch:medium;pitch-range:0;stress:0;richness:80;}
+  s,strike {richness:0;}
+  strong {pitch:medium;pitch-range:60;stress:90;richness:90;}
+  u {richness:0;}
+}
