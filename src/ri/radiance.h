@@ -99,6 +99,9 @@ public:
 		void				cachesample(float *,const float *,const float *,float);
 		void				finalize(const CGlobalIllumLookup *);
 
+							// The functions to visualize the structure (spelling ? ... a little drunk now (Okan) )
+		void				draw();
+		void				bound(float *bmin,float *bmax);
 private:
 							// The private functions for stuff
 		void				prepareTriangles();

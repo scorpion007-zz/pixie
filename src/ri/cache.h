@@ -34,8 +34,10 @@
 #include "common/global.h"
 #include "common/os.h"
 #include "common/algebra.h"
+#include "opengl/opengl.h"
 #include "fileResource.h"
 #include "shader.h"
+
 
 const	unsigned int	CACHE_SAMPLE	=	1;		// Cache needs to be sampled
 const	unsigned int	CACHE_READ		=	2;		// Read the cache
@@ -47,7 +49,7 @@ const	unsigned int	CACHE_RDONLY	=	8;		// ONLY Read the cache
 // Description			:	Encapsulates a renderer cache
 // Comments				:
 // Date last edited		:	10/15/2005
-class	CCache : public CFileResource  {
+class	CCache : public CFileResource, public CView {
 public:
 					CCache(const char *,unsigned int);
 					~CCache();

@@ -296,3 +296,21 @@ void		pglTriangles(int n,const int *indices,const float *P,const float *C) {
 	glEnd();
 }
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	pglTriangles
+// Description			:	Draw triangles with OpenGL
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/21/2006
+void		pglPoints(int n,const float *P,const float *C) {
+	int	i;
+
+	glBegin(GL_POINTS);
+	for (i=n;i>0;i--,P+=3,C+=3) {
+		glColor3fv(C);
+		glVertex3fv(P);
+	}
+	glEnd();
+}

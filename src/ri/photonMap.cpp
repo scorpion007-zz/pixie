@@ -488,26 +488,25 @@ void	CPhotonMap::bound(float *bmin,float *bmax) {
 // Comments				:
 // Date last edited		:	9/18/2002
 void	CPhotonMap::draw() {
-	const int	maxPoints	=	100;
-	float		P[maxPoints*3];
-	float		C[maxPoints*3];
+	float		P[chunkSize*3];
+	float		C[chunkSize*3];
 	int			i,j;
 	float		*cP	=	P;
 	float		*cC	=	C;
 	CPhoton		*cT	=	photons+1;
 
 	// Collect and dispatch the photons
-	for (i=numPhotons-1,j=maxPoints;i>0;i--,cT++,cP+=3,cC+=3,j--) {
+	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cC+=3,j--) {
 		if (j == 0)	{
-			drawPoints(maxPoints,P,C);
+			drawPoints(chunkSize,P,C);
 			cP	=	P;
 			cC	=	C;
-			j	=	maxPoints;
+			j	=	chunkSize;
 		}
 
 		movvv(cP,cT->P);
 		movvv(cC,cT->C);
 	}
 
-	if (j != maxPoints)	drawPoints(maxPoints-j,P,C);
+	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
 }

@@ -403,10 +403,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\opengl.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\options.cpp"
 				>
 			</File>
@@ -496,6 +492,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\shading.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\show.cpp"
 				>
 			</File>
 			<File
@@ -681,10 +681,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\opengl.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\options.h"
 				>
 			</File>
@@ -810,6 +806,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\shading.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\show.h"
 				>
 			</File>
 			<File

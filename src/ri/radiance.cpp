@@ -65,29 +65,6 @@ static	int		plusOnes[6][5]			=	{
 
 
 
-
-
-
-
-// Some misc junk
-static	int		numCalled	=	0;
-static	int		numSummed1	=	0;
-static	int		numSummed2	=	0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTriTon
 // Description			:	This holds a triangle
@@ -603,8 +580,6 @@ void		CRadianceCache::finalize(const CGlobalIllumLookup *l) {
 						vector	D;
 						float	t,n,w;
 						float	nominator;
-
-						numSummed1++;
 
 						subvv(D,cHarmonic->P,cSample->P);
 
@@ -1374,6 +1349,79 @@ int				CRadianceCache::partition(int numRays,CShadingPoint **rays) {
 	} else {
 		return last;
 	}
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRadianceCache
+// Method				:	draw
+// Description			:	Draw the sucker
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/22/2006
+void		CRadianceCache::draw() {
+	CRadianceHarmonic	*cSample;
+	CRadianceNode		*cNode;
+	CRadianceNode		**stackBase		=	(CRadianceNode **)	alloca(maxDepth*sizeof(CRadianceNode *)*8);
+	CRadianceNode		**stack;
+	int					i,j;
+	float				P[chunkSize*3];
+	float				C[chunkSize*3];
+	float				*cP,*cC;
+
+	j			=	chunkSize;
+	cP			=	P;
+	cC			=	C;
+	stack		=	stackBase;
+	*stack++	=	root;
+	while(stack > stackBase) {
+		cNode	=	*(--stack);
+
+		// Sum the values in this level
+		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--) {
+			if (j == 0)	{
+				drawPoints(chunkSize,P,C);
+				cP	=	P;
+				cC	=	C;
+				j	=	chunkSize;
+			}
+
+			// FIXME: Maybe we should draw disks instead of points here
+			movvv(cP,cSample->P);
+			initv(cC,1);	// The radiance samples store spherical harmonics, not color -- so just visualize their positions
+		}
+
+		// Check the children
+		for (i=0;i<8;i++) {
+			CRadianceNode	*tNode;
+
+			if ((tNode = cNode->children[i]) != NULL) {
+				*stack++	=	tNode;
+			}
+		}
+	}
+
+	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRadianceCache
+// Method				:	bound
+// Description			:	Bound the structure
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/22/2006
+void		CRadianceCache::bound(float *bmin,float *bmax) {
+	assert(root != NULL);
+
+	bmin[0]	=	root->center[0] - root->side*0.5f;
+	bmin[1]	=	root->center[1] - root->side*0.5f;
+	bmin[2]	=	root->center[2] - root->side*0.5f;
+
+	bmax[0]	=	root->center[0] + root->side*0.5f;
+	bmax[1]	=	root->center[1] + root->side*0.5f;
+	bmax[2]	=	root->center[2] + root->side*0.5f;
 }
 
 

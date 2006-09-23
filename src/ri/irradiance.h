@@ -98,6 +98,9 @@ public:
 
 		void					lookup(float *,const float *,const float *,const CGlobalIllumLookup *);
 		void					cachesample(float *,const float *,const float *,float);
+
+		void					draw();
+		void					bound(float *bmin,float *bmax);
 private:
 		void					writeNode(FILE *,CCacheNode *);
 		CCacheNode				*readNode(FILE *);

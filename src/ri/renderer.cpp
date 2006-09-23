@@ -73,7 +73,7 @@
 #include "implicitSurface.h"
 #include "dlobject.h"
 #include "brickmap.h"
-#include "opengl.h"
+#include "show.h"
 
 // The default network port
 #define	DEFAULT_PORT	24914

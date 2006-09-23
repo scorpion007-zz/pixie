@@ -32,7 +32,11 @@
 #ifndef OPENGL_H
 #define OPENGL_H
 
+class	CView;
 
+typedef void	(*TGlVisualizeFunction)(CView *view);
+typedef void	(*TGlTrianglesFunction)(int n,const int *indices,const float *P,const float *C);
+typedef void	(*TGlPointsFunction)(int n,const float *P,const float *C);
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -42,16 +46,19 @@
 // Date last edited		:	9/21/2006
 class	CView {
 public:
-						CView()		{	}
-		virtual			~CView()	{	}
+								CView()		{	}
+		virtual					~CView()	{	}
 
-		virtual	void	draw()							=	NULL;		// The draw the data
-		virtual	void	bound(float *bmin,float *bmax)	=	NULL;		// Bound the data
+		virtual	void			draw()							=	NULL;		// The draw the data
+		virtual	void			bound(float *bmin,float *bmax)	=	NULL;		// Bound the data
 
+		
 
-						// The classes can use the following functions for drawing primitives
-		virtual	void	drawTriangles(int n,const int *indices,const float *P,const float *C)	{	}
-		virtual	void	drawPoints(int n,const float *P,const float *C)							{	}
+								// The classes can use the following functions for drawing primitives
+static	TGlTrianglesFunction	drawTriangles;		// The function to draw bunch of triangles
+static	TGlPointsFunction		drawPoints;			// The function to draw bunch of points
+static	void					*handle;			// The handle for the opengl.[dll/so/dylib] (only valid after show hider is constructed)
+static	const int				chunkSize =	512;	// The number of primitives to draw at a time
 };
 
 
@@ -64,13 +71,10 @@ public:
 
 
 
-
-
-
-typedef void	(*TGlVisualizeFunction)(CView *view);
-
 extern "C" {				
 	LIB_EXPORT	void		pglVisualize(CView *view);
+	LIB_EXPORT	void		pglTriangles(int n,const int *indices,const float *P,const float *C);
+	LIB_EXPORT	void		pglPoints(int n,const float *P,const float *C);
 }
 
 

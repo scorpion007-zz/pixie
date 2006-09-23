@@ -917,4 +917,76 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CIrradianceCache
+// Method				:	draw
+// Description			:	Draw the irradiance cache
+// Return Value			:
+// Comments				:
+// Date last edited		:	9/22/2006
+void		CIrradianceCache::draw() {
+	CCacheSample		*cSample;
+	CCacheNode			*cNode;
+	CCacheNode			**stackBase		=	(CCacheNode **)	alloca(maxDepth*sizeof(CCacheNode *)*8);
+	CCacheNode			**stack;
+	int					i,j;
+	float				P[chunkSize*3];
+	float				C[chunkSize*3];
+	float				*cP,*cC;
+
+	j			=	chunkSize;
+	cP			=	P;
+	cC			=	C;
+	stack		=	stackBase;
+	*stack++	=	root;
+	while(stack > stackBase) {
+		cNode	=	*(--stack);
+
+		// Sum the values in this level
+		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--) {
+			if (j == 0)	{
+				drawPoints(chunkSize,P,C);
+				cP	=	P;
+				cC	=	C;
+				j	=	chunkSize;
+			}
+
+			// FIXME: Maybe we should draw disks instead of points here
+			movvv(cP,cSample->P);
+			movvv(cC,cSample->irradiance);
+		}
+
+		// Check the children
+		for (i=0;i<8;i++) {
+			CCacheNode	*tNode;
+
+			if ((tNode = cNode->children[i]) != NULL) {
+				*stack++	=	tNode;
+			}
+		}
+	}
+
+	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CIrradianceCache
+// Method				:	bound
+// Description			:	Bound the irradiance cache
+// Return Value			:
+// Comments				:
+// Date last edited		:	9/22/2006
+void		CIrradianceCache::bound(float *bmin,float *bmax) {
+	assert(root != NULL);
+
+	bmin[0]	=	root->center[0] - root->side*0.5f;
+	bmin[1]	=	root->center[1] - root->side*0.5f;
+	bmin[2]	=	root->center[2] - root->side*0.5f;
+
+	bmax[0]	=	root->center[0] + root->side*0.5f;
+	bmax[1]	=	root->center[1] + root->side*0.5f;
+	bmax[2]	=	root->center[2] + root->side*0.5f;
+}
+
+
 
