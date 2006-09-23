@@ -30,7 +30,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				noise.cpp \
 				object.cpp \
 				occlusion.cpp \
-				opengl.cpp \
 				options.cpp \
 				output.cpp \
 				patches.cpp \
@@ -54,6 +53,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				ribOut.cpp \
 				shader.cpp \
 				shading.cpp \
+                                show.cpp \
 				sl.cpp \
 				stats.cpp \
 				stochastic.cpp \
