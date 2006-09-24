@@ -64,8 +64,11 @@ public:
 
 	void			balance();
 
-	virtual void	store(const float *,const float *,const float *,float);
-	virtual void	lookup(float *,const float *,const float *,float);
+	void			store(const float *,const float *,const float *,float);
+	void			lookup(float *,const float *,const float *,float);
+
+	void			draw() { }
+	void			bound(float *bmin,float *bmax) { }
 
 private:
 	CMemStack		*memory;			// Storage for the data

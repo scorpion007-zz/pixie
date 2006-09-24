@@ -174,6 +174,9 @@ public:
 			void				finalize();
 			void				compact(const char*,float);
 
+			void				draw();
+			void				bound(float *bmin,float *bmax);
+
 			// Some global static functions for the renderer interface
 	static	void				brickMapInit(int maxMemory = 10000000);
 	static	void				brickMapFlush(int all=FALSE);

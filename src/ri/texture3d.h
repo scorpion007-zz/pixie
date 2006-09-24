@@ -34,6 +34,7 @@
 #include "common/global.h"
 #include "fileResource.h"
 #include "xform.h"
+#include "opengl/opengl.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dChannel
@@ -53,7 +54,7 @@ public:
 // Description			:	Base class for 3d textures
 // Comments				:
 // Date last edited		:	4/1/2002
-class	CTexture3d : public CFileResource {
+class	CTexture3d : public CFileResource, public CView {
 public:
 							CTexture3d(const char *,CXform *,int numChannels=0,CTexture3dChannel *channels=NULL);
 	virtual					~CTexture3d();

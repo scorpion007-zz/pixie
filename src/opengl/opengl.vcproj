@@ -18,7 +18,7 @@
 			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\Qt\4.1.2\include\QtCore,C:\Qt\4.1.2\include\QtGui,C:\Qt\4.1.2\include\QtOpenGL,C:\Qt\4.1.2\include,..,C:\Qt\4.1.2\include\ActiveQt,debug,.,C:\Qt\4.1.2\mkspecs\win32-msvc2005"
+				AdditionalIncludeDirectories="E:\Qt\4.1.2\include\QtCore,E:\Qt\4.1.2\include\QtGui,E:\Qt\4.1.2\include\QtOpenGL,E:\Qt\4.1.2\include,..,E:\Qt\4.1.2\include\ActiveQt,debug,.,E:\Qt\4.1.2\mkspecs\win32-msvc2005"
 				AdditionalOptions="-Zm200 -EHsc"
 				AssemblerListingLocation="..\..\tmpd\work\"
 				BufferSecurityCheck="true"
@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="opengl32.lib glu32.lib gdi32.lib user32.lib ..\..\bind\common.lib QtOpenGLd4.lib QtGuid4.lib QtCored4.lib"
-				AdditionalLibraryDirectories="C:\Qt\4.1.2\lib"
+				AdditionalLibraryDirectories="E:\Qt\4.1.2\lib"
 				GenerateDebugInformation="true"
 				IgnoreImportLibrary="true"
 				OutputFile="..\..\bind\opengl.dll"
@@ -70,7 +70,7 @@
 			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\Qt\4.1.2\include\QtCore,C:\Qt\4.1.2\include\QtGui,C:\Qt\4.1.2\include\QtOpenGL,C:\Qt\4.1.2\include,..,C:\Qt\4.1.2\include\ActiveQt,release,.,C:\Qt\4.1.2\mkspecs\win32-msvc2005"
+				AdditionalIncludeDirectories="E:\Qt\4.1.2\include\QtCore,E:\Qt\4.1.2\include\QtGui,E:\Qt\4.1.2\include\QtOpenGL,E:\Qt\4.1.2\include,..,E:\Qt\4.1.2\include\ActiveQt,release,.,E:\Qt\4.1.2\mkspecs\win32-msvc2005"
 				AdditionalOptions="-Zm200 -EHsc"
 				AssemblerListingLocation="..\..\tmpd\work\"
 				BufferSecurityCheck="true"
@@ -90,7 +90,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="opengl32.lib glu32.lib gdi32.lib user32.lib ..\..\bind\common.lib QtOpenGL4.lib QtGui4.lib QtCore4.lib"
-				AdditionalLibraryDirectories="C:\Qt\4.1.2\lib"
+				AdditionalLibraryDirectories="E:\Qt\4.1.2\lib"
 				GenerateDebugInformation="false"
 				IgnoreImportLibrary="true"
 				OutputFile="..\..\bind\opengl.dll"

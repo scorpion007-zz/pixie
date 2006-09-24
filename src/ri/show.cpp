@@ -51,13 +51,19 @@ TGlPointsFunction		CView::drawPoints		=	NULL;
 // Comments				:
 // Date last edited		:	9/21/2006
 CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODISPLAY) {
+	const char	*pixieHome	=	osEnvironment("PIXIEHOME");
+	char		tmp[OS_MAX_PATH_LENGTH];
 
 	// First, try to load the dynamic library
 #ifdef WIN32
-	CView::handle	=	osLoadModule("opengl.dll");
+	if (pixieHome != NULL)	sprintf(tmp,"%s\\opengl.dll",pixieHome);
+	else					strcpy(tmp,"opengl.dll");
 #else
-	CView::handle	=	osLoadModule("opengl.so");
+	if (pixieHome != NULL)	sprintf(tmp,"%s/opengl.so",pixieHome);
+	else					strcpy(tmp,"opengl.so");
 #endif
+
+	CView::handle	=	osLoadModule(tmp);
 
 	if (CView::handle != NULL) {
 

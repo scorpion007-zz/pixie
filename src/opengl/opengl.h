@@ -35,7 +35,8 @@
 class	CView;
 
 typedef void	(*TGlVisualizeFunction)(CView *view);
-typedef void	(*TGlTrianglesFunction)(int n,const int *indices,const float *P,const float *C);
+typedef void	(*TGlTriMeshFunction)(int n,const int *indices,const float *P,const float *C);
+typedef void	(*TGlTrianglesFunction)(int n,const float *P,const float *C);
 typedef void	(*TGlPointsFunction)(int n,const float *P,const float *C);
 
 
@@ -56,9 +57,10 @@ public:
 
 								// The classes can use the following functions for drawing primitives
 static	TGlTrianglesFunction	drawTriangles;		// The function to draw bunch of triangles
+static	TGlTriMeshFunction		drawTriangleMesh;	// The function to draw bunch of triangles (organized into a mesh)
 static	TGlPointsFunction		drawPoints;			// The function to draw bunch of points
 static	void					*handle;			// The handle for the opengl.[dll/so/dylib] (only valid after show hider is constructed)
-static	const int				chunkSize =	512;	// The number of primitives to draw at a time
+static	const int				chunkSize =	128*3;	// The number of primitives to draw at a time (must be a multiple of 3)
 };
 
 
@@ -73,7 +75,8 @@ static	const int				chunkSize =	512;	// The number of primitives to draw at a ti
 
 extern "C" {				
 	LIB_EXPORT	void		pglVisualize(CView *view);
-	LIB_EXPORT	void		pglTriangles(int n,const int *indices,const float *P,const float *C);
+	LIB_EXPORT	void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C);
+	LIB_EXPORT	void		pglTriangles(int n,const float *P,const float *C);
 	LIB_EXPORT	void		pglPoints(int n,const float *P,const float *C);
 }
 

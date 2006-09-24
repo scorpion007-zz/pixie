@@ -986,6 +986,148 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 
 
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CBrickMap
+// Method				:	draw
+// Description			:	Draw the brickmap
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/25/2006
+void				CBrickMap::draw() {
+	float		P[chunkSize*3];
+	float		C[chunkSize*3];
+	int			j;
+	float		*cP				=	P;
+	float		*cC				=	C;
+	int			level			=	2;
+	int			fast			=	FALSE;
+	int			nb				=	1 << level;
+	float		cubePoints[]	=	{	0, 0, 0,
+										1, 0, 0,
+										1, 0, 1,
+										0, 0, 1,
+										
+										0, 1, 0,
+										1, 1, 0,
+										1, 1, 1,
+										0, 1, 1,
+										
+										0, 0, 0,
+										1, 0, 0,
+										1, 1, 0,
+										0, 1, 0,
+										
+										0, 0, 1,
+										1, 0, 1,
+										1, 1, 1,
+										0, 1, 1,
+										
+										0, 0, 0,
+										0, 1, 0,
+										0, 1, 1,
+										0, 0, 1,
+										
+										1, 0, 0,
+										1, 1, 0,
+										1, 1, 1,
+										1, 0, 1
+										};
+
+	// For each brick at this level
+	j	=	chunkSize;
+	for (int xe=0;xe<nb-1;xe++) for (int ye=0;ye<nb-1;ye++) for (int ze=0;ze<nb-1;ze++) {
+		float				sz		= side/(float) nb;
+		int					x =xe,y=ye,z=ze;
+		CBrickMap::CBrick	*bk		= findBrick(x,y,z,level,false,NULL);
+
+		if (bk == NULL) continue;
+		
+		CBrickMap::CVoxel	*vx		= bk->voxels;
+		
+		float *DD = (float*)((char*)vx + sizeof(CBrickMap::CVoxel));
+		
+		// For each voxel
+		for(int zi=0;zi<BRICK_SIZE;zi++) for(int yi=0;yi<BRICK_SIZE;yi++) for(int xi=0;xi<BRICK_SIZE;xi++) {
+			float	*pts = cubePoints;
+			vector	cent;
+
+			initv(cent,x*sz + xi*(sz/(float) BRICK_SIZE),y*sz + yi*(sz/(float) BRICK_SIZE),z*sz + zi*(sz/(float) BRICK_SIZE));
+	
+			float wt = vx->weight;
+			
+			if (wt < C_EPSILON) continue;			
+
+			if (!fast) {
+
+				for(int j =0; j<6; j++) {
+					vector tmp;
+					
+					#define emitPt(i)						\
+						if (j == 0) {						\
+							drawTriangles(chunkSize/3,P,C);	\
+							cP	=	P;						\
+							cC	=	C;						\
+							j	=	chunkSize;				\
+						}									\
+						mulvf(tmp,pts+ i*3,sz/8.0f);		\
+						addvv(tmp,cent);					\
+						movvv(cP,tmp);						\
+						movvv(cC,DD);						\
+						cP	+=	3;							\
+						cC	+=	3;							\
+						j--;
+					
+						emitPt(0);
+						emitPt(1);
+						emitPt(2);
+						emitPt(2);
+						emitPt(3);
+						emitPt(0);
+					
+					pts += 12;
+				}
+			} else {
+				if (j == 0) {
+					drawPoints(chunkSize,P,C);
+					cP	=	P;
+					cC	=	C;
+					j	=	chunkSize;
+				}
+
+				movvv(cP,cent);
+				movvv(cC,DD);
+
+				cP		+=	3;
+				cC		+=	3;
+				j--;
+			}
+
+			// Update
+			vx = (CBrickMap::CVoxel*)((char*)vx + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
+			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));	
+		}
+	}
+
+	if (j != chunkSize) {
+		if (!fast)		drawTriangles((chunkSize-j)/3,P,C);
+		else			drawPoints(chunkSize,P,C);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CBrickMap
+// Method				:	bound
+// Description			:	Bound the brickmap
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/25/2006
+void				CBrickMap::bound(float *bmin,float *bmax) {
+	movvv(bmin,this->bmin);
+	movvv(bmax,this->bmax);
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	brickMapInit
