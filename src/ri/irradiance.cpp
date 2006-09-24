@@ -943,7 +943,7 @@ void		CIrradianceCache::draw() {
 		cNode	=	*(--stack);
 
 		// Sum the values in this level
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--) {
+		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--,cP+=3,cC+=3) {
 			if (j == 0)	{
 				drawPoints(chunkSize,P,C);
 				cP	=	P;
