@@ -96,9 +96,9 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 						t	=	(char *) alloca((i+1)*sizeof(char));
 						fread(t,i+1,sizeof(char),in);
 
-						info(CODE_LOG,"File:    %s\n",fileName);
-						info(CODE_LOG,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
-						info(CODE_LOG,"Type:    %s\n",t);
+						info(CODE_PRINTF,"File:    %s\n",fileName);
+						info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
+						info(CODE_PRINTF,"Type:    %s\n",t);
 						fclose(in);
 
 						if (strcmp(t,filePhotonMap) == 0) {
