@@ -34,6 +34,7 @@
 #include "error.h"
 #include "fileResource.h"
 #include "photonMap.h"
+#include "texture3d.h"
 #include "opengl/opengl.h"
 
 
@@ -109,7 +110,7 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 						} else if (strcmp(t,filePointCloud) == 0) {
 							
 						} else if (strcmp(t,fileBrickMap) == 0) {
-							
+							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
 						}
 
 						// Create / display the window

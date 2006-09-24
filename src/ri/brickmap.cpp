@@ -1000,7 +1000,7 @@ void				CBrickMap::draw() {
 	int			j;
 	float		*cP				=	P;
 	float		*cC				=	C;
-	int			level			=	2;
+	int			level			=	3;
 	int			fast			=	FALSE;
 	int			nb				=	1 << level;
 	float		cubePoints[]	=	{	0, 0, 0,
@@ -1038,7 +1038,7 @@ void				CBrickMap::draw() {
 	j	=	chunkSize;
 	for (int xe=0;xe<nb-1;xe++) for (int ye=0;ye<nb-1;ye++) for (int ze=0;ze<nb-1;ze++) {
 		float				sz		= side/(float) nb;
-		int					x =xe,y=ye,z=ze;
+		int					x=xe,y=ye,z=ze;
 		CBrickMap::CBrick	*bk		= findBrick(x,y,z,level,false,NULL);
 
 		if (bk == NULL) continue;
@@ -1054,13 +1054,19 @@ void				CBrickMap::draw() {
 
 			initv(cent,x*sz + xi*(sz/(float) BRICK_SIZE),y*sz + yi*(sz/(float) BRICK_SIZE),z*sz + zi*(sz/(float) BRICK_SIZE));
 	
+			// Save values before we update
+			float *DDs = DD;
 			float wt = vx->weight;
+			
+			// Update for next iteration, incase we skip
+			vx = (CBrickMap::CVoxel*)((char*)vx + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
+			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));	
 			
 			if (wt < C_EPSILON) continue;			
 
 			if (!fast) {
 
-				for(int j =0; j<6; j++) {
+				for(int k =0; k<6; k++) {
 					vector tmp;
 					
 					#define emitPt(i)						\
@@ -1073,7 +1079,7 @@ void				CBrickMap::draw() {
 						mulvf(tmp,pts+ i*3,sz/8.0f);		\
 						addvv(tmp,cent);					\
 						movvv(cP,tmp);						\
-						movvv(cC,DD);						\
+						movvv(cC,DDs);						\
 						cP	+=	3;							\
 						cC	+=	3;							\
 						j--;
@@ -1102,10 +1108,6 @@ void				CBrickMap::draw() {
 				cC		+=	3;
 				j--;
 			}
-
-			// Update
-			vx = (CBrickMap::CVoxel*)((char*)vx + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
-			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));	
 		}
 	}
 
