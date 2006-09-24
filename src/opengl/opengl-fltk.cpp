@@ -53,6 +53,7 @@ public:
 
 
 						CMainWindow(CView *v) : Fl_Gl_Window(640,480,"View") {
+							vector tmp;
 							
 							size_range(640,480);
 							mode(FL_RGB | FL_DOUBLE | FL_DEPTH);
@@ -72,9 +73,21 @@ public:
 							drawGround			=	TRUE;
 
 							currentButton		=	0;
+							cameraAction		=	TRUE;
+							zoom				=	1;
 
 							// The view we're drawing
 							view				=	v;
+							
+							view->bound(bmin,bmax);
+							
+							addvv(mid,bmin,bmax);
+							mulvf(mid,(float) 0.5);
+							
+							subvv(tmp,bmax,bmin);
+							maxDim	=	max(tmp[0],tmp[1]);
+							maxDim	=	max(tmp[2],maxDim);
+							maxDim	*=	5;
 							
 							end();
 							show();						
@@ -86,6 +99,8 @@ public:
 						}
 
 		virtual	void	draw()	{
+							matrix tmp;
+							
 							glViewport(0,0,w(),h());
 							glMatrixMode(GL_PROJECTION);
 							glLoadIdentity();
@@ -93,14 +108,24 @@ public:
 
 							glMatrixMode(GL_MODELVIEW);
 							glLoadIdentity();
-							glTranslatef(0,0,-5);
-							//glScalef(1,1,-0.1);
-							glPointSize(5);
 							
-							glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],1);
 							
-							glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-							view->draw();							
+							glTranslatef(position[0],position[1],position[2]);
+							
+							qtoR(tmp,orientation);
+							glMultMatrixf(tmp);
+							
+							glPushMatrix();
+							
+								glScalef(zoom/maxDim,zoom/maxDim,zoom/maxDim);
+								glTranslatef(-mid[0],-mid[1],-mid[2]);
+								
+								glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],1);
+								
+								glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+								view->draw();				
+							
+							glPopMatrix();
 						}
 
 protected:
@@ -111,17 +136,24 @@ protected:
 								mousePressEvent(Fl::event_x(),Fl::event_y());
 								break;
 							case FL_RELEASE:
-								currentButton	&=	~(Fl::event_button() & (FL_BUTTON1|FL_BUTTON2|FL_BUTTON3));
+								currentButton	&=	~(Fl::event_button() & (FL_LEFT_MOUSE|FL_RIGHT_MOUSE|FL_MIDDLE_MOUSE));
 								beginCalled		=	FALSE;
 								break;
 							case FL_DRAG:
 								mouseMoveEvent(Fl::event_x(),Fl::event_y());
 								break;
 							case FL_KEYDOWN:
-								if (Fl::event_key() == FL_Alt_L) cameraAction		=	TRUE;
+								//if (Fl::event_key() == FL_Alt_L)
+								//	cameraAction		=	TRUE;
 								break;
 							case FL_KEYUP:
-								if (Fl::event_key() == FL_Alt_L) cameraAction		=	FALSE;
+								//if (Fl::event_key() == FL_Alt_L)
+								//	cameraAction		=	FALSE;
+								break;
+							case FL_MOUSEWHEEL:
+								zoom += Fl::event_dy()/40.0f;
+								zoom = max(zoom,0.0001);
+								redraw();
 								break;
 							default:
 								break;
@@ -136,9 +168,11 @@ protected:
 
 							// Dispatch the event if we hame camera action
 							if (cameraAction) {
+								
+								if (beginCalled == FALSE)	mousePressEvent(x,y);
 
 								switch(currentButton) {
-									case FL_BUTTON1:
+									case FL_LEFT_MOUSE:
 										{	// Rotate
 											vector		to;
 											vector		prod;
@@ -152,7 +186,7 @@ protected:
 											mulqq(orientation,drag,savedOrientation);
 										}
 										break;
-									case FL_BUTTON2:
+									case FL_RIGHT_MOUSE:
 										{	// Pan
 											vector	d;
 
@@ -160,41 +194,41 @@ protected:
 											d[1]		=	(float) -(y - fromT[1]);
 											d[2]		=	0;
 
-											mulmv(d,cameraToWorld,d);
+											//mulmv(d,cameraToWorld,d);
 											mulvf(d,0.005f);
 											addvv(position,savedPosition,d);
 										}
 										break;
-									case FL_BUTTON3:
+									case FL_MIDDLE_MOUSE:
 										{	// Zoom
 											zoom		=	savedZoom - (x-fromZ[0])*0.005f;
 										}
 										break;
 								}
 							}
-							draw();
+							redraw();
 						}
 
 	void				mousePressEvent(int x, int y) {
 
 							// If no selection, do the camera thing
 							if (cameraAction) {
-
+							
 								// Yes, depending on the button, dispatch the event
 								switch(currentButton) {
-									case FL_BUTTON1:
+									case FL_LEFT_MOUSE:
 										// Rotate
 										movqq(savedOrientation,orientation);
 										toSphere(x,y,fromR);
 										break;
-									case FL_BUTTON2:
+									case FL_RIGHT_MOUSE:
 										// Pan
 										movvv(savedPosition,position);
 										fromT[0]	=	(float) x;
 										fromT[1]	=	(float) y;
 										fromT[2]	=	(float) 0;
 										break;
-									case FL_BUTTON3:
+									case FL_MIDDLE_MOUSE:
 										// Zoom
 										savedZoom	=	zoom;
 										fromZ[0]	=	(float) x;
@@ -231,6 +265,8 @@ protected:
 
 	CView				*view;							// The view we're drawing
 	vector				bmin,bmax;						// The bounding box
+	float				maxDim;
+	vector				mid;
 
 	vector				position;						// The position the camera is looking at (in the world)
 	quaternion			orientation;					// The orientation of the camera (in the world)

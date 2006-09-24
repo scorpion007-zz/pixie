@@ -504,8 +504,10 @@ void	CPhotonMap::draw() {
 			j	=	chunkSize;
 		}
 
+		float maxChannel	=	max(max(cT->C[0],cT->C[1]),cT->C[2]);
+		
 		movvv(cP,cT->P);
-		movvv(cC,cT->C);
+		mulvf(cC,cT->C,1 / maxChannel);
 	}
 
 	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);

@@ -11,7 +11,7 @@ endif
 #INCLUDES = -I.. @QT_INCLUDES@
 
 opengl_la_SOURCES = opengl-fltk.cpp
-opengl_la_LIBADD = ../common/libcommon.la @FLTK_LIBS@ @X_LIBS@
+opengl_la_LIBADD = ../common/libcommon.la @X_LIBS@
 opengl_la_CXXFLAGS = $(AM_CXXFLAGS) @X_CFLAGS@ @FLTK_CXXFLAGS@
 opengl_la_LDFLAGS = -module -avoid-version @FLTK_LDFLAGS@ @X_LDFLAGS@
 
