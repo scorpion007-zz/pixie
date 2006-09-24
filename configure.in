@@ -51,6 +51,14 @@ LDFLAGS="$saved_LDFLAGS"
 LIBS="$saved_LIBS"
 
 dnl ---------------------------------------------------
+dnl Find Qt
+dnl
+
+dnl no_qt=false
+dnl AM_PATH_QT
+dnl AM_CONDITIONAL(BUILD_SHOW, test "x$no_qt" = "x" )
+
+dnl ---------------------------------------------------
 dnl Find FLTK
 dnl
 
@@ -215,6 +223,13 @@ echo "--->            X11 not found."
 echo "---> You should an X11 distribution for your OS"
 echo "---> The framebuffer display will not be built."
 fi
+
+dnl if test "x$no_qt" != "x"; then
+dnl echo "------------------------------------------------"
+dnl echo "--->            Qt not found."
+dnl echo "---> You can download it from www.trolltech.com"
+dnl echo "---> show will not be built."
+dnl fi
 
 if test "x$have_fltk" != "xtrue"; then
 echo "------------------------------------------------"

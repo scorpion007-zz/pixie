@@ -55,6 +55,7 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 	char		tmp[OS_MAX_PATH_LENGTH];
 
 	// First, try to load the dynamic library
+//TODO: load from displays directory
 #ifdef WIN32
 	if (pixieHome != NULL)	sprintf(tmp,"%s\\opengl.dll",pixieHome);
 	else					strcpy(tmp,"opengl.dll");

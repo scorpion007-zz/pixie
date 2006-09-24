@@ -50,8 +50,8 @@ public:
 								CView()		{	}
 		virtual					~CView()	{	}
 
-		virtual	void			draw()							=	NULL;		// The draw the data
-		virtual	void			bound(float *bmin,float *bmax)	=	NULL;		// Bound the data
+		virtual	void			draw()							=	0;		// The draw the data
+		virtual	void			bound(float *bmin,float *bmax)	=	0;		// Bound the data
 
 		
 
