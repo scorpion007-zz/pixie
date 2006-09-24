@@ -61,6 +61,10 @@
 #define PIXIE_DISPLAYS "%PIXIE_DISPLAY%"
 #endif
 
+#ifndef PIXIE_MODULES
+#define PIXIE_MODULES "%PIXIE_MODULES%"
+#endif
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	optionsDeleteSearchPath
@@ -293,6 +297,7 @@ COptions::COptions() {
 #else
 	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:" PIXIE_DISPLAYS,NULL);
 #endif
+	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/modules:" PIXIE_MODULES,NULL);
 	temporaryPath			=	strdup("temp");
 
 
@@ -405,6 +410,7 @@ COptions::COptions(const COptions *o) {
 	texturePath				=	optionsCloneSearchPath(o->texturePath);
 	shaderPath				=	optionsCloneSearchPath(o->shaderPath);
 	displayPath				=	optionsCloneSearchPath(o->displayPath);
+	modulePath				=	optionsCloneSearchPath(o->modulePath);
 	temporaryPath			=	strdup(o->temporaryPath);
 
 	{
@@ -556,6 +562,7 @@ COptions::~COptions(){
 	optionsDeleteSearchPath(texturePath);
 	optionsDeleteSearchPath(shaderPath);
 	optionsDeleteSearchPath(displayPath);
+	optionsDeleteSearchPath(modulePath);
 	free(temporaryPath);
 
 	// Ditch the lights allocated in this context

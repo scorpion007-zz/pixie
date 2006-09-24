@@ -1,6 +1,6 @@
 
 if BUILD_SHOW
- displays_LTLIBRARIES = opengl.la
+ modules_LTLIBRARIES = opengl.la
 endif
 
 #opengl_la_SOURCES = opengl.cpp

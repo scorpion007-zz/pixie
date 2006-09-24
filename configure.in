@@ -170,6 +170,12 @@ AC_ARG_WITH(displaysdir,
 	displaysdir="${withval}",
 	displaysdir="${libdir}/Pixie/displays")
 
+AC_ARG_WITH(modulesdir,
+	AS_HELP_STRING([--with-modulesdir=DIR],[directory to store modules (Default: LIBDIR/Pixie/modules)]),
+	modulesdir="${withval}",
+	modulesdir="${libdir}/Pixie/modules")
+
+
 dnl ---------------------------------------------------
 dnl Are we building for self contained distribution
 dnl
@@ -183,6 +189,7 @@ AS_HELP_STRING([--enable-selfcontained],[Build for a selfcontained setup (overri
 		texturedir="${prefix}/textures"
 		displaysdir="${prefix}/displays"
 		proceduraldir="${prefix}/procedurals"
+		modulesdir="${prefix}/modules"
 		;;
 	no) ;;
 	*) AC_MSG_ERROR(bad value ${enableval} for --enable-selfcontained) ;;
@@ -211,6 +218,7 @@ AC_DEFINE_DIR(PIXIE_MODELS,modeldir,[Directory where we store models])
 AC_DEFINE_DIR(PIXIE_TEXTURES,texturedir,[Directory where we store textures])
 AC_DEFINE_DIR(PIXIE_DISPLAYS,displaysdir,[Directory where we store displays])
 AC_DEFINE_DIR(PIXIE_PROCEDURALS,proceduraldir,[Directory where we store procedurals])
+AC_DEFINE_DIR(PIXIE_MODULES,modulesdir,[Directory where we store modules])
 
 dnl ---------------------------------------------------
 dnl Write the output
@@ -261,6 +269,7 @@ echo "        Models: " $modeldir
 echo "      Textures: " $texturedir
 echo "      Displays: " $displaysdir
 echo "   Procedurals: " $proceduraldir
+echo "       Modules: " $modulesdir
 echo "------------------------------------------------"
 echo "To build Pixie:"
 echo ">make"
