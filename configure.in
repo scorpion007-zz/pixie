@@ -223,7 +223,7 @@ AC_DEFINE_DIR(PIXIE_MODULES,modulesdir,[Directory where we store modules])
 dnl ---------------------------------------------------
 dnl Write the output
 dnl
-AC_OUTPUT(Makefile doc/Makefile src/Makefile src/common/Makefile src/file/Makefile src/framebuffer/Makefile src/openexr/Makefile src/opengl/Makefile src/precomp/Makefile src/rgbe/Makefile src/sdr/Makefile src/sdrc/Makefile src/ri/Makefile src/rndr/Makefile src/texmake/Makefile src/sdrinfo/Makefile src/show/Makefile)
+AC_OUTPUT(Makefile doc/Makefile src/Makefile src/common/Makefile src/file/Makefile src/framebuffer/Makefile src/openexr/Makefile src/gui/Makefile src/precomp/Makefile src/rgbe/Makefile src/sdr/Makefile src/sdrc/Makefile src/ri/Makefile src/rndr/Makefile src/texmake/Makefile src/sdrinfo/Makefile src/show/Makefile)
 
 if test "x$have_x11" != "xtrue"; then
 echo "------------------------------------------------"

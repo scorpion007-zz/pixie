@@ -34,7 +34,7 @@
 #include "common/global.h"
 #include "fileResource.h"
 #include "xform.h"
-#include "opengl/opengl.h"
+#include "gui/opengl.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dChannel

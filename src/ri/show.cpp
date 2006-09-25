@@ -35,7 +35,7 @@
 #include "fileResource.h"
 #include "photonMap.h"
 #include "texture3d.h"
-#include "opengl/opengl.h"
+#include "gui/opengl.h"
 
 
 // The static members of the CView class that visualizable classes derive from
@@ -52,12 +52,11 @@ TGlPointsFunction		CView::drawPoints		=	NULL;
 // Comments				:
 // Date last edited		:	9/21/2006
 CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODISPLAY) {
-	const char	*pixieHome	=	osEnvironment("PIXIEHOME");
 	char		moduleFile[OS_MAX_PATH_LENGTH];
 
 	// First, try to load the dynamic library
 	CView::handle	=	NULL;
-	if(currentRenderer->locateFileEx(moduleFile,"opengl",osModuleExtension,modulePath)) {
+	if(currentRenderer->locateFileEx(moduleFile,"gui",osModuleExtension,modulePath)) {
 		CView::handle		=	osLoadModule(moduleFile);
 	}
 

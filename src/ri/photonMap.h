@@ -36,7 +36,7 @@
 #include "ray.h"
 #include "renderer.h"
 #include "output.h"
-#include "opengl/opengl.h"
+#include "gui/opengl.h"
 
 
 // Macros to pack/unpack directions

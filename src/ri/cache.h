@@ -34,7 +34,7 @@
 #include "common/global.h"
 #include "common/os.h"
 #include "common/algebra.h"
-#include "opengl/opengl.h"
+#include "gui/opengl.h"
 #include "fileResource.h"
 #include "shader.h"
 
