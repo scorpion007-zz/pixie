@@ -41,6 +41,9 @@ const int	INTERFACE_MID_BUTTON	=	2;
 const int	INTERFACE_RIGHT_BUTTON	=	4;
 
 const int	INTERFACE_ALT_KEY		=	65513;
+const int	INTERFACE_CTRL_KEY		=	65507;
+const int	INTERFACE_UP_KEY		=	65362;
+const int	INTERFACE_DOWN_KEY		=	65364;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CInterface
@@ -88,8 +91,11 @@ public:
 
 		virtual	void	draw()	{
 						}
-
+		
 protected:
+
+	virtual void		reparse() {
+						}
 
 	void				computeMatrices() {
 							matrix	R,mtmp,T1,T2;
@@ -195,11 +201,19 @@ protected:
 						}
 
 	void				keyPressEvent(int key) {
-							if (key == INTERFACE_ALT_KEY)	cameraAction	=	TRUE;
+							if (key == INTERFACE_ALT_KEY || key == INTERFACE_CTRL_KEY)	cameraAction	=	TRUE;
+							if (key == INTERFACE_UP_KEY) {
+								CView::detailLevel++;
+								reparse();
+							}
+							if (key == INTERFACE_DOWN_KEY) {
+								CView::detailLevel = max(0,CView::detailLevel-1);
+								reparse();
+							}
 						}
 
 	void				keyReleaseEvent(int key) {
-							if (key == INTERFACE_ALT_KEY)	cameraAction	=	FALSE;
+							if (key == INTERFACE_ALT_KEY || key == INTERFACE_CTRL_KEY)	cameraAction	=	FALSE;
 						}
 
 	void				resizeEvent(int w, int h) {

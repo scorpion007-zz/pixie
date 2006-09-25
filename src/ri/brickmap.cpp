@@ -1000,7 +1000,7 @@ void				CBrickMap::draw() {
 	int			j;
 	float		*cP				=	P;
 	float		*cC				=	C;
-	int			level			=	3;
+	int			level			=	min(max(0,detailLevel),maxDepth);
 	int			fast			=	FALSE;
 	int			nb				=	1 << level;
 	float		cubePoints[]	=	{	0, 0, 0,
@@ -1071,7 +1071,7 @@ void				CBrickMap::draw() {
 					
 					#define emitPt(i)						\
 						if (j == 0) {						\
-							drawTriangles(chunkSize/3,P,C);	\
+							drawTriangles(chunkSize,P,C);	\
 							cP	=	P;						\
 							cC	=	C;						\
 							j	=	chunkSize;				\

@@ -61,6 +61,9 @@ static	TGlTriMeshFunction		drawTriangleMesh;	// The function to draw bunch of tr
 static	TGlPointsFunction		drawPoints;			// The function to draw bunch of points
 static	void					*handle;			// The handle for the opengl.[dll/so/dylib] (only valid after show hider is constructed)
 static	const int				chunkSize =	128*3;	// The number of primitives to draw at a time (must be a multiple of 3)
+
+								// Controls over draw
+static	int						detailLevel;
 };
 
 

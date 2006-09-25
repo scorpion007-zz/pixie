@@ -42,7 +42,7 @@
 void					*CView::handle			=	NULL;
 TGlTrianglesFunction	CView::drawTriangles	=	NULL;
 TGlPointsFunction		CView::drawPoints		=	NULL;
-
+int						CView::detailLevel		=	2;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow

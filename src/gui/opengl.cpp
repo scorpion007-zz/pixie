@@ -55,6 +55,8 @@
 void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
 	int	i;
 
+	#ifdef WIN32
+	
 	glBegin(GL_TRIANGLES);
 	for (i=n;i>0;i--) {
 		glColor3fv(C + indices[0]*3);
@@ -65,6 +67,20 @@ void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
 		glVertex3fv(P + indices[2]*3);
 	}
 	glEnd();
+	
+	#else
+	
+	// This should work on Win32 too, but I didn't test it
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(3,GL_FLOAT,0,P);
+	glColorPointer(3,GL_FLOAT,0,C);
+	glDrawElements(GL_TRIANGLES,n,GL_UNSIGNED_INT,indices);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	
+	#endif
 }
 
 
@@ -77,12 +93,28 @@ void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
 void		pglTriangles(int n,const float *P,const float *C) {
 	int	i;
 
+	#ifdef WIN32
+	
 	glBegin(GL_TRIANGLES);
 	for (i=n;i>0;i--) {
 		glColor3fv(C);	C	+=	3;
 		glVertex3fv(P);	P	+=	3;
 	}
 	glEnd();
+	
+	#else
+	
+	// This should work on Win32 too, but I didn't test it
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(3,GL_FLOAT,0,P);
+	glColorPointer(3,GL_FLOAT,0,C);
+	glDrawArrays(GL_TRIANGLES,0,n);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	
+	#endif
 }
 
 
@@ -96,12 +128,28 @@ void		pglTriangles(int n,const float *P,const float *C) {
 void		pglPoints(int n,const float *P,const float *C) {
 	int	i;
 
+	#ifdef WIN32
+	
 	glBegin(GL_POINTS);
 	for (i=n;i>0;i--,P+=3,C+=3) {
 		glColor3fv(C);
 		glVertex3fv(P);
 	}
 	glEnd();
+
+	#else
+	
+	// This should work on Win32 too, but I didn't test it
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(3,GL_FLOAT,0,P);
+	glColorPointer(3,GL_FLOAT,0,C);
+	glDrawArrays(GL_POINTS,0,n);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	
+	#endif
 }
 
 

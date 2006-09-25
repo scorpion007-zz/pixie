@@ -86,24 +86,18 @@ public:
 
 							// Modelview matrix
 							glMatrixMode(GL_MODELVIEW);
+							glDisable(GL_CULL_FACE);
+							glEnable(GL_DEPTH_TEST);
 							glLoadMatrixf(worldToCamera);
 
 							assert(glGetError() == GL_NO_ERROR);
 							
 							// Create a display list if not done already
 							if (displayList == 0) {
-								displayList	=	glGenLists(1);
-								glNewList(displayList,GL_COMPILE);
-								glPushMatrix();
-								glScalef(1/maxDim,1/maxDim,1/maxDim);
-								glTranslatef(-mid[0],-mid[1],-mid[2]);
-								view->draw();				
-								glPopMatrix();
-								glEndList();
+								createDisplayList();
 							}
 
-							// Draw the scene
-							glEnable(GL_DEPTH_TEST);
+							// Draw the scene							
 							glCallList(displayList);
 
 							if (TRUE) {
@@ -122,6 +116,12 @@ public:
 						}
 
 protected:
+	
+	virtual void		reparse() {
+							createDisplayList();
+							redraw();
+	}
+	
 	void				resize(int x,int y,int width,int height) {
 							CInterface::resizeEvent(width,height);
 							redraw();
@@ -167,6 +167,20 @@ protected:
 							}
 						
 							return 0;
+						}
+						
+	void				createDisplayList() {
+							if (displayList != 0) {
+								displayList	=	glGenLists(1);
+							}
+								
+							glNewList(displayList,GL_COMPILE);
+							glPushMatrix();
+							glScalef(1/maxDim,1/maxDim,1/maxDim);
+							glTranslatef(-mid[0],-mid[1],-mid[2]);
+							view->draw();				
+							glPopMatrix();
+							glEndList();
 						}
 
 	unsigned int		displayList;
