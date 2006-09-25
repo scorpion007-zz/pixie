@@ -868,7 +868,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			}
 
 			// Do not write this brick if variation too low
-			if (maxVar < maxVariation) {
+			if (maxVar < maxVariation && cNode->d > 0) {
 				numCulled++;
 				continue;
 			}
