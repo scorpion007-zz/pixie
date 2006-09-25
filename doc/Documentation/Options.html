@@ -86,7 +86,11 @@
 </p>
 <pre>Option "limits" "int texturememory" [20000]
 </pre>
-<p>This controls the maximum texture amount to keep in the memory. This number is specified in kilobytes.
+<p>This controls the maximum texture amount to keep in the memory (through the texture/shadow/environment calls). This number is specified in kilobytes.
+</p>
+<pre>Option "limits" "int brickmemory" [10000]
+</pre>
+<p>This controls the maximum 3D texture data amount to keep in the memory (thru the texture3d call). This number is specified in kilobytes.
 </p>
 <pre>Option "limits" "int shadercache" [1000]
 </pre>
@@ -224,7 +228,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Options&amp;oldid=2157">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Options&amp;oldid=2186">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -232,8 +236,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 20:28, 7 July 2006.</li>
-				<li id="f-viewcount">This page has been accessed 304 times.</li>
+				<li id="f-lastmod"> This page was last modified 17:02, 26 July 2006.</li>
+				<li id="f-viewcount">This page has been accessed 467 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -241,5 +245,5 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		</div>
 	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.22 secs. -->
+<!-- Served by mercury.svr9-speedyservers.com in 0.20 secs. -->
 </body></html>

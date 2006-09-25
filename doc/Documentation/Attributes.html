@@ -73,6 +73,18 @@
 </pre>
 <p>If this value is 1, when sampling a grid on a surface piece, create a power of two edges on the boundaries. This attribute is used to help the patch cracking problem.
 </p>
+<pre>GeometricApproximation "flatness" 0.5
+</pre>
+<p>This controls the minimum screen-space 'flatness' required to stop tesselating a surface for raytracing.  Tesselation is still limited by the <tt>"maxsubdivision"</tt> attribute, but decreasing this value will have Pixie choose a more highly tesselated surface when it is highly curved.
+</p>
+<pre>GeometricApproximation "normaldeviation" 0.98
+</pre>
+<p>This controls the maximum deviation from the normal that is allowed in a surface tesselated for raytracing.  Smaller values will force higher tesselations.
+</p>
+<pre>GeometricApproximation "pointdeviation" &lt;infinite&gt;
+</pre>
+<p>This controls the maximum pointdeviation that is allowed in a surface tesselated for raytracing.  Smaller values will force higher tesselations.
+</p>
 <div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Displacement attributes">edit</a>]</div><a name="Displacement_attributes"></a><h1> Displacement attributes </h1>
 <p>These attributes are used to tell renderer how much a displacement shader actually displaces the surface. This information is vital for accurately tessellating and rendering surfaces displaced surfaces.
 </p>
@@ -162,7 +174,7 @@
 <pre>Attribute "photon" "ior" 1.5
 Attribute "photon" "iorrange" [1.5 1.4]
 </pre>
-<p>Specifies the index of refraction for the dielectric photon model.  The <tt>ior</tt> attribute make the surface respond to all wavelengths of light with the same index of refracion.  The &lt;t&gt;iorrange&lt;/tt&gt; attribute allows for variation in index of refracion based on wavelengh.  The syntax is <tt>[ior_for_red ior_for_blue]</tt>.  See <a href="../Tutorials/Dispersion.html" title="Tutorials/Dispersion">Tutorials/Dispersion</a> for details.
+<p>Specifies the index of refraction for the dielectric photon model.  The <tt>ior</tt> attribute make the surface respond to all wavelengths of light with the same index of refracion.  The <tt>iorrange</tt> attribute allows for variation in index of refracion based on wavelengh.  The syntax is <tt>[ior_for_red ior_for_blue]</tt>.  See <a href="../Tutorials/Dispersion.html" title="Tutorials/Dispersion">Tutorials/Dispersion</a> for details.
 </p>
 <pre>Attribute "photon" "int estimator" "100"
 </pre>
@@ -227,7 +239,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Attributes&amp;oldid=2156">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Attributes&amp;oldid=2231">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -235,8 +247,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 20:28, 7 July 2006.</li>
-				<li id="f-viewcount">This page has been accessed 284 times.</li>
+				<li id="f-lastmod"> This page was last modified 18:27, 21 September 2006.</li>
+				<li id="f-viewcount">This page has been accessed 393 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -244,5 +256,5 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		</div>
 	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.28 secs. -->
+<!-- Served by mercury.svr9-speedyservers.com in 0.21 secs. -->
 </body></html>
