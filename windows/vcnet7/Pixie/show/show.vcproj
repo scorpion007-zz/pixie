@@ -33,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fltk.lib fltkgl.lib opengl32.lib comctl32.lib libtiff.lib ws2_32.lib common.lib"
+				AdditionalDependencies="common.lib ri.lib"
 				OutputFile="$(OutDir)/show.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\bind"
@@ -88,7 +88,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fltk.lib fltkgl.lib opengl32.lib comctl32.lib libtiff.lib ws2_32.lib common.lib"
+				AdditionalDependencies="common.lib ri.lib"
 				OutputFile="$(OutDir)/show.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"
@@ -128,27 +128,6 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\..\src\show\cacheView.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\imageView.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\interface.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\meshView.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\photonView.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\pointCloudView.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\radView.cpp">
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\show\show.cpp">
 			</File>
 		</Filter>
@@ -156,27 +135,6 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath="..\..\..\..\src\show\cacheView.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\imageView.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\interface.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\meshView.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\photonView.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\pointCloudView.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\show\radView.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

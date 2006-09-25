@@ -105,10 +105,10 @@ public:
 								glScalef(0.2f,0.2f,0.2f);
 								glBegin(GL_LINES);
 								for (int i=0;i<=10;i++) {
-									glVertex3f(-5,-1,i-5);
-									glVertex3f(5,-1,i-5);
-									glVertex3f(i-5,-1,-5);
-									glVertex3f(i-5,-1,5);
+									glVertex3f((float) -5,-1,(float)  (i-5));
+									glVertex3f((float) 5,-1,(float)  (i-5));
+									glVertex3f((float) (i-5),-1,(float) -5);
+									glVertex3f((float) (i-5),-1,(float) 5);
 								}
 								glEnd();
 							}
