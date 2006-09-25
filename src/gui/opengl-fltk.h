@@ -118,9 +118,11 @@ public:
 protected:
 	
 	virtual void		reparse() {
+							glDeleteLists(displayList,1);
+							displayList	=	0;
 							createDisplayList();
 							redraw();
-	}
+						}
 	
 	void				resize(int x,int y,int width,int height) {
 							CInterface::resizeEvent(width,height);

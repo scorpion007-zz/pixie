@@ -45,6 +45,7 @@ CBrickMap	*CBrickMap::brickMaps		=	NULL;			// List of brickmaps in memory
 int			CBrickMap::referenceNumber	=	0;				// The last reference number
 int			CBrickMap::currentMemory	=	0;				// The currently used memory abount
 int			CBrickMap::maxMemory		=	0;				// The maximum memory for brickmaps
+int			CBrickMap::detailLevel		=	2;				// The detail level
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1117,6 +1118,28 @@ void				CBrickMap::draw() {
 	}
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CBrickMap
+// Method				:	brickQuickSort
+// Description			:	Quick sort the bricks wrt. to the referenceNumbers
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	7/15/2006
+int			CBrickMap::keyDown(int key) {
+	if ((key == 'M') || (key == 'm')) {
+		detailLevel++;
+		return TRUE;
+	} else if ((key == 'L') || (key == 'l')) {
+		detailLevel--;
+		if (detailLevel < 0)	detailLevel	=	0;
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	bound
@@ -1404,3 +1427,5 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	
 	CBrickMap::brickMapShutdown();
 }
+
+

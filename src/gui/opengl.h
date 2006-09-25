@@ -52,6 +52,8 @@ public:
 
 		virtual	void			draw()							=	0;		// The draw the data
 		virtual	void			bound(float *bmin,float *bmax)	=	0;		// Bound the data
+		virtual	int				keyDown(int key) { return FALSE;	}		// Called when the user presses a key
+																			// return TRUE if the data needs to be updated
 
 		
 
@@ -61,9 +63,6 @@ static	TGlTriMeshFunction		drawTriangleMesh;	// The function to draw bunch of tr
 static	TGlPointsFunction		drawPoints;			// The function to draw bunch of points
 static	void					*handle;			// The handle for the opengl.[dll/so/dylib] (only valid after show hider is constructed)
 static	const int				chunkSize =	128*3;	// The number of primitives to draw at a time (must be a multiple of 3)
-
-								// Controls over draw
-static	int						detailLevel;
 };
 
 

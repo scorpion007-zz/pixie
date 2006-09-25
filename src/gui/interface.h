@@ -42,8 +42,6 @@ const int	INTERFACE_RIGHT_BUTTON	=	4;
 
 const int	INTERFACE_ALT_KEY		=	65513;
 const int	INTERFACE_CTRL_KEY		=	65507;
-const int	INTERFACE_UP_KEY		=	65362;
-const int	INTERFACE_DOWN_KEY		=	65364;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CInterface
@@ -202,13 +200,8 @@ protected:
 
 	void				keyPressEvent(int key) {
 							if (key == INTERFACE_ALT_KEY || key == INTERFACE_CTRL_KEY)	cameraAction	=	TRUE;
-							if (key == INTERFACE_UP_KEY) {
-								CView::detailLevel++;
-								reparse();
-							}
-							if (key == INTERFACE_DOWN_KEY) {
-								CView::detailLevel = max(0,CView::detailLevel-1);
-								reparse();
+							else {
+								if (view->keyDown(key) == TRUE)	reparse();
 							}
 						}
 

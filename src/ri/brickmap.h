@@ -176,6 +176,7 @@ public:
 
 			void				draw();
 			void				bound(float *bmin,float *bmax);
+			int					keyDown(int key);
 
 			// Some global static functions for the renderer interface
 	static	void				brickMapInit(int maxMemory = 10000000);
@@ -204,6 +205,7 @@ protected:
 	static	int					referenceNumber;				// The last access number
 	static	int					currentMemory;					// The amount of used memory
 	static	int					maxMemory;						// The maximum amount of memory to allocate
+	static	int					detailLevel;					// The brickmap detail level for visualization
 
 	static	void				brickQuickSort(CBrickNode **nodes,int start,int end);
 	
