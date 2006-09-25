@@ -289,3 +289,45 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPhotonMap
+// Method				:	draw
+// Description			:	Gui interface
+// Return Value			:
+// Comments				:
+// Date last edited		:	9/18/2002
+void	CPointCloud::draw() {
+	float		P[chunkSize*3];
+	float		C[chunkSize*3];
+	int			i,j;
+	float		*cP	=	P;
+	float		*cC	=	C;
+	CPointCloudPoint	*cT	=	photons+1;
+
+	// Collect and dispatch the photons
+	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cC+=3,j--) {
+		if (j == 0)	{
+			drawPoints(chunkSize,P,C);
+			cP	=	P;
+			cC	=	C;
+			j	=	chunkSize;
+		}
+		
+		movvv(cP,cT->P);
+		movvv(cC,dataPointers->array[cT->entryNumber]);
+	}
+
+	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Class				:	CPhotonMap
+// Method				:	draw
+// Description			:	Gui interface
+// Return Value			:
+// Comments				:
+// Date last edited		:	9/18/2002
+void	CPointCloud::bound(float *bmin,float *bmax) {
+	movvv(bmin,this->bmin);
+	movvv(bmax,this->bmax);
+}

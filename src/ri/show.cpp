@@ -107,7 +107,7 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 						} else if (strcmp(t,fileGatherCache) == 0) {
 							view	=	getCache(fileName,"R");
 						} else if (strcmp(t,filePointCloud) == 0) {
-							
+							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
 						} else if (strcmp(t,fileBrickMap) == 0) {
 							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
 						}

@@ -1049,7 +1049,6 @@ void				CBrickMap::draw() {
 		
 		// For each voxel
 		for(int zi=0;zi<BRICK_SIZE;zi++) for(int yi=0;yi<BRICK_SIZE;yi++) for(int xi=0;xi<BRICK_SIZE;xi++) {
-			float	*pts = cubePoints;
 			vector	cent;
 
 			initv(cent,x*sz + xi*(sz/(float) BRICK_SIZE),y*sz + yi*(sz/(float) BRICK_SIZE),z*sz + zi*(sz/(float) BRICK_SIZE));
@@ -1066,6 +1065,7 @@ void				CBrickMap::draw() {
 
 			if (!fast) {
 
+				float	*pts = cubePoints;
 				for(int k =0; k<6; k++) {
 					vector tmp;
 					

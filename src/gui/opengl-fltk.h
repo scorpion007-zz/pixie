@@ -103,9 +103,11 @@ public:
 							}
 
 							// Draw the scene
+							glEnable(GL_DEPTH_TEST);
 							glCallList(displayList);
 
 							if (TRUE) {
+								glColor3f(0.0f,0.0f,0.0f);
 								glScalef(0.2f,0.2f,0.2f);
 								glBegin(GL_LINES);
 								for (int i=0;i<=10;i++) {
@@ -157,9 +159,8 @@ protected:
 								CInterface::keyReleaseEvent(Fl::event_key());
 								break;
 							case FL_MOUSEWHEEL:
-								//zoom += Fl::event_dy()/40.0f;
-								//zoom = max(zoom,0.0001f);
-								//redraw();
+								zoom += Fl::event_dy()/40.0f;
+								redraw();
 								break;
 							default:
 								break;
