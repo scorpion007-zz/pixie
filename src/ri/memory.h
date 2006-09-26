@@ -102,6 +102,18 @@ inline void *ralloc(int size) {
 	}
 
 
+// Mem save and mem restore does the same thing, but they explicitly store the checkpoint in T64 data[3];
+#define	memSave(__data)															\
+	__data[0].pointer	=	currentMemoryPage->memory;							\
+	__data[1].int		=	currentMemoryPage->availableSize;					\
+	__data[2].pointer	=	currentMemoryPage;
+
+#define memRestore(__data)														\
+	currentMemoryPage					=	(CMemPage *) __data[2].pointer;		\
+	currentMemoryPage->availableSize	=	__data[1].int;						\
+	currentMemoryPage->memory			=	(char *) __data[0].pointer;			\
+	
+
 
 #endif
 
