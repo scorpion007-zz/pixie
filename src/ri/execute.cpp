@@ -293,8 +293,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
 															currentShadingState->currentLightInstance	=	light;					\
-															currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]	=	light->prepare(this,numVertices); \
-															light->illuminate(this);						\
+															currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]	=	light->prepare(varying,numVertices); \
+															light->illuminate(this,currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]);				\
 														}													\
 													}														\
 												}															\
@@ -354,8 +354,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
 															currentShadingState->currentLightInstance	=	light;						\
-															currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE] = light->prepare(this,numVertices);	\
-															light->illuminate(this);						\
+															currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE] = light->prepare(varying,numVertices);	\
+															light->illuminate(this,currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]);				\
 														}													\
 													}														\
 												}															\

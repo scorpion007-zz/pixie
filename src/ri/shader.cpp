@@ -40,6 +40,7 @@
 #include	"shading.h"
 #include	"cache.h"
 #include	"bundles.h"
+#include	"memory.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
@@ -314,7 +315,6 @@ CShader::CShader(const char *name) : CFileResource(name) {
 	constantsArea			=	NULL;
 	constantEntries			=	NULL;
 	varyingSizes			=	NULL;
-	totalVaryingSize		=	0;
 	strings					=	NULL;
 	parameters				=	NULL;
 }
@@ -833,8 +833,8 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/10/2001
-void			CProgrammableShaderInstance::execute(CShadingContext *context,float **varying) {
-	context->execute(this,varying);
+void			CProgrammableShaderInstance::execute(CShadingContext *context,float **locals) {
+	context->execute(this,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -868,9 +868,9 @@ const char		*CProgrammableShaderInstance::getName() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/10/2001
-void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **varying) {
+void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **locals) {
 	// This function should never be called for non-light shaders
-	context->execute(this,varying);
+	context->execute(this,locals);
 }
 
 
@@ -882,44 +882,69 @@ void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/24/2006
-float			**CProgrammableShaderInstance::prepare(CShadingContext *context,int numVertices) {
-	CVariable					*cVariable;
+float			**CProgrammableShaderInstance::prepare(float **varying,int numVertices) {
+	CVariable	*cVariable;
+	TCode		*data;
+	TCode		**locals;
+	int			totalVaryingSize;
+	int			i;
+
+	// Compute the total memory we will need
+	for (totalVaryingSize=0,i=0;i<parent->numVariables;i++) {
+		if (parent->varyingSizes[i] < 0)	totalVaryingSize	+=	-parent->varyingSizes[i];
+		else								totalVaryingSize	+=	parent->varyingSizes[i]*numVertices*3;
+	}
 
 	// Allocate memory for the temporary shader variables
-	code	=	(TCode *) ralloc((currentShader->totalVaryingSize + currentShader->numVariables)*sizeof(TCode));
-	code	+=	currentShader->numVariables;
+	data	=	(TCode *) ralloc((totalVaryingSize + parent->numVariables)*sizeof(TCode));
+	locals	=	(TCode **) data;
+	data	+=	parent->numVariables;
+
+	// Save the memory
+	for (i=0;i<parent->numVariables;i++) {
+		locals[i]	=	data;
+		if (parent->varyingSizes[i] < 0)	data	+=	-parent->varyingSizes[i];
+		else								data	+=	parent->varyingSizes[i]*numVertices*3;
+	}
 
 	// For each parameter, copy over the default value of the parameter
-	for (cVariable=cInstance->parameters;cVariable!=NULL;cVariable=cVariable->next) {
+	for (cVariable=parameters;cVariable!=NULL;cVariable=cVariable->next) {
 		TCode		*dest;
 		const TCode	*src;
 		
 		// Find where we're writing
 		if (cVariable->storage == STORAGE_GLOBAL)	{
-			cVariable->value	=	dest	=	(TCode *) varying[cVariable->entry];
+			cVariable->value		=	varying[cVariable->entry];
+			dest					=	(TCode *) cVariable->value;
 		} else {
-			dest										=	code;
-			stuff[SL_VARYING_OPERAND][cVariable->entry]	=	code;
+			assert(cVariable->entry < parent->numVariables);
+			dest					=	locals[cVariable->entry];
 		}
 
 		// This is the repetition amount
 		if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
-			code			+=	cVariable->numFloats;
+
+			assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
+
 			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
 				int	i;
 				for (i=cVariable->numFloats;i>0;i--)	*dest++	=	*src++;
 			}
 		} else {
-			
-			code			+=	cVariable->numFloats*maxGridSize*3;
+
+			assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
+
 			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
-				int	n;
+				int			n;
+				const int	c	=	cVariable->numFloats;
 				for(n=numVertices*3;n>0;n--) {
 					for (i=0;i<c;i++)	*dest++	=	src[i];
 				}
 			}
 		}
 	}
+
+	return (float **) locals;
 }
 
 

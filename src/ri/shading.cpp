@@ -803,9 +803,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	currentShadingState->numVertices	=	numVertices;
 
 	// Allocate the caches for the shaders being executed
-	if (surface != NULL)							currentShadingState->messageAccessors[ACCESSOR_SURFACE]			=	surface->prepare(this,numVertices);
-	if (displacement != NULL)						currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(this,numVertices);
-	if (atmosphere != NULL)							currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(this,numVertices);
+	if (surface != NULL)							currentShadingState->messageAccessors[ACCESSOR_SURFACE]			=	surface->prepare(varying,numVertices);
+	if (displacement != NULL)						currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(varying,numVertices);
+	if (atmosphere != NULL)							currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(varying,numVertices);
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
 	// If we need derivative information, treat differently
@@ -1124,11 +1124,11 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 		memBegin();
 
 		if (displacement != NULL) {
-			displacement->execute(this);
+			displacement->execute(this,currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]);
 		}
 
 		if (surface != NULL) {
-			surface->execute(this);
+			surface->execute(this,currentShadingState->messageAccessors[ACCESSOR_SURFACE]);
 		} else {
 			float			*color		=	varying[VARIABLE_CI];
 			float			*opacity	=	varying[VARIABLE_OI];
@@ -1151,13 +1151,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 		if (currentRayDepth == 0) {  // do not execute atmosphere for non-camera rays
 			if (atmosphere != NULL) {
-				atmosphere->execute(this);
+				atmosphere->execute(this,currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]);
 			}
 		}
 
 		if (currentShadingState->postShader != NULL) {
-			currentShadingState->messageAccessors[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(this,numVertices);
-			currentShadingState->postShader->execute(this);
+			currentShadingState->messageAccessors[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(varying,numVertices);
+			currentShadingState->postShader->execute(this,currentShadingState->messageAccessors[ACCESSOR_POSTSHADER]);
 		}
 
 		memEnd();
@@ -1255,12 +1255,12 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	currentShadingState->numVertices	=	numVertices;
 
 	// Set the parameters of the displacement shader
-	if (displacement != NULL)						currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(this,numVertices);
+	if (displacement != NULL)						currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(varying,numVertices);
 	
 	if (usedParameters & PARAMETER_MESSAGEPASSING) {
 		// Iff. we require message passing in the displacement shader, set up the caches
-		if (surface != NULL)						currentShadingState->messageAccessors[ACCESSOR_SURFACE]		=	surface->prepare(this,numVertices);
-		if (atmosphere != NULL)						currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(this,numVertices);
+		if (surface != NULL)						currentShadingState->messageAccessors[ACCESSOR_SURFACE]		=	surface->prepare(varying,numVertices);
+		if (atmosphere != NULL)						currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(varying,numVertices);
 		// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	}
 
@@ -1586,7 +1586,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 		memBegin();
 
 		if (displacement != NULL) {
-			displacement->execute(this);
+			displacement->execute(this,currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]);
 		}
 
 		memEnd();

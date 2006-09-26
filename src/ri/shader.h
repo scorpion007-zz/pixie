@@ -389,7 +389,6 @@ public:
 		TCode					**constantEntries;				// The constant entries
 
 		int						*varyingSizes;					// The size of a variable (if negative, it is uniform)
-		int						totalVaryingSize;				// The total size of the varyings
 
 		char					**strings;						// Strings used by the shader
 
@@ -421,13 +420,13 @@ public:
 		void					detach()	{	refCount--; if (refCount == 0) delete this; }
 		void					check()		{	if (refCount == 0)	delete this;			}
 
-		virtual	void			illuminate(CShadingContext *)							=	0;
+		virtual	void			illuminate(CShadingContext *,float **)					=	0;
 		virtual	void			setParameters(int,char **,void **)						=	0;
 		virtual int				getParameter(const char *,void *,CVariable**,int*)		=	0;
 		virtual	void			execute(CShadingContext *,float **)						=	0;
 		virtual	unsigned int	requiredParameters()									=	0;
 		virtual	const char		*getName()												=	0;
-		virtual	float			**prepare(CShadingContext *,int)						=	0;
+		virtual	float			**prepare(float **,int)									=	0;
 		
 		void					createCategories();
 
@@ -459,13 +458,13 @@ public:
 								CProgrammableShaderInstance(CShader *,CAttributes *,CXform *);
 		virtual					~CProgrammableShaderInstance();
 
-		void					illuminate(CShadingContext *);
+		void					illuminate(CShadingContext *,float **);
 		void					setParameters(int,char **,void **);
 		int						getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
 		void					execute(CShadingContext *,float **);				// Execute the shader
 		unsigned int			requiredParameters();
 		const char				*getName();
-		float					**prepare(CShadingContext *,int);
+		float					**prepare(float **,int);
 
 
 		CAllocatedString		*strings;					// The strings we allocated for parameters

@@ -2362,15 +2362,6 @@ CShader	*shaderCreate(const char *shaderName) {
 		}
 		
 		cShader->numGlobals	=	numGlobals;
-		
-		// Compute the memory we want for holding the varyings
-		for (i=0;i<cShader->numVariables;i++) {
-			if (cShader->varyingSizes[i] < 0) {
-				cShader->totalVaryingSize		+=	-cShader->varyingSizes[i];
-			} else {
-				cShader->totalVaryingSize		+=	cShader->varyingSizes[i]*maxGridSize*3;
-			}
-		}
 	}
 	
 	
