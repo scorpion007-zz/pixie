@@ -177,7 +177,7 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/28/2001
-void	CShadingContext::execute(CProgrammableShaderInstance *cInstance) {
+void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **locals) {
 // At this point, the shader sends us the arrays for parameters/constants/variables/uniforms for the shader
 	
 //	The maximum allowed string size that can be handled
@@ -293,7 +293,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance) {
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
 															currentShadingState->currentLightInstance	=	light;					\
-															light->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]); \
+															currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]	=	light->prepare(this,numVertices); \
 															light->illuminate(this);						\
 														}													\
 													}														\
@@ -354,7 +354,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance) {
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
 															currentShadingState->currentLightInstance	=	light;						\
-															light->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]);	\
+															currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE] = light->prepare(this,numVertices);	\
 															light->illuminate(this);						\
 														}													\
 													}														\
@@ -427,8 +427,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance) {
 	CShadedLight				**alights;
 	CShadedLight				**currentLight;
 	CShadedLight				**freeLights;
-	CShaderCache				*cCache;
 	CGatherBundle				*lastGather;		// Pointer to the last gather bundle
+	
 
 	assert((currentShadingState->numActive+currentShadingState->numPassive) == currentShadingState->numVertices);
 
@@ -436,11 +436,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance) {
 	code								=	currentShader->codeArea;
 	IP									=	currentShader->codeEntryPoint;
 	tagStart							=	currentShadingState->tags;
-
-	// Allocate the shader variables
-	assert(currentShader->cache != NULL); // The cache must have been allocated by the prepareCache function before the shader is executed
-	cCache								=	currentShader->cache;
-	currentShader->cache				=	cCache->shaderNext;
 
 	// Save this stuff for fast access
 	numVertices							=	currentShadingState->numVertices;
@@ -452,8 +447,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance) {
 
 	// Set the access arrays
 	stuff[SL_IMMEDIATE_OPERAND]			=	currentShader->constantEntries;				// Immediate operands
-	stuff[SL_GLOBAL_OPERAND]			=	(TCode **) varying;							// Varying globals
-	stuff[SL_VARYING_OPERAND]			=	cCache->varyings;							// Shader varying local variables
+	stuff[SL_GLOBAL_OPERAND]			=	(TCode **) varying;							// Global variables
+	stuff[SL_VARYING_OPERAND]			=	(TCode **) locals;							// Local variables
 
 	numActive							=	currentShadingState->numActive;
 	numPassive							=	currentShadingState->numPassive;
@@ -733,10 +728,6 @@ execStart:
 
 	goto execStart;
 execEnd:
-
-	// Restore the cache for the shader
-	cCache->shaderNext		=	currentShader->cache;
-	currentShader->cache	=	cCache;
 
 	// Make sure we save the ambient contribution if there has been no illuminate/solar executed
 	if (currentShader->type == SL_LIGHTSOURCE) {

@@ -48,7 +48,6 @@ class	CObject;
 class	CPhotonMap;
 class	CAttributes;
 class	CActiveLight;
-class	CShaderCache;
 class	CTexture;
 class	CTexture3d;
 class	CTextureInfoBase;
@@ -390,6 +389,7 @@ public:
 		TCode					**constantEntries;				// The constant entries
 
 		int						*varyingSizes;					// The size of a variable (if negative, it is uniform)
+		int						totalVaryingSize;				// The total size of the varyings
 
 		char					**strings;						// Strings used by the shader
 
@@ -402,9 +402,6 @@ public:
 		int						initEntryPoint;					// Index into code array where the init code starts
 
 		int						usedParameters;
-
-		CShaderCache			*cache;
-		int						dirty;							// TRUE if the shader has been cached in the last frame
 
 		friend	CShader			*parseShader(const char *,const char *);
 };
@@ -427,10 +424,10 @@ public:
 		virtual	void			illuminate(CShadingContext *)							=	0;
 		virtual	void			setParameters(int,char **,void **)						=	0;
 		virtual int				getParameter(const char *,void *,CVariable**,int*)		=	0;
-		virtual	void			execute(CShadingContext *)								=	0;
+		virtual	void			execute(CShadingContext *,float **)						=	0;
 		virtual	unsigned int	requiredParameters()									=	0;
 		virtual	const char		*getName()												=	0;
-		virtual	void			prepareCache(CShadingContext *,int,float***)			=	0;
+		virtual	float			**prepare(CShadingContext *,int)						=	0;
 		
 		void					createCategories();
 
@@ -465,10 +462,10 @@ public:
 		void					illuminate(CShadingContext *);
 		void					setParameters(int,char **,void **);
 		int						getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
-		void					execute(CShadingContext *);							// Execute the shader
+		void					execute(CShadingContext *,float **);				// Execute the shader
 		unsigned int			requiredParameters();
 		const char				*getName();
-		void					prepareCache(CShadingContext *,int,float***);
+		float					**prepare(CShadingContext *,int);
 
 
 		CAllocatedString		*strings;					// The strings we allocated for parameters

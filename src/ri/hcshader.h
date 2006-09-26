@@ -51,7 +51,7 @@ public:
 		unsigned int			requiredParameters();
 		void					registerDefaults(CAttributes *,CActiveLight *) { }
 		const char				*getName();
-		void					prepareCache(CShadingContext *,int,float***) { }
+		float					**prepare(CShadingContext *,int) { return NULL;	}
 private:
 		vector					corners[4];
 		vector					lightColor;		// The color of the light
@@ -78,7 +78,7 @@ public:
 		unsigned int			requiredParameters();
 		void					registerDefaults(CAttributes *,CActiveLight *) { }
 		const char				*getName();
-		void					prepareCache(CShadingContext *,int,float***) { }
+		float					**prepare(CShadingContext *,int) { return NULL;	}
 private:
 		vector					from;			// The location of the light
 		float					radius;			// The radius of the light

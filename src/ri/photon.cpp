@@ -166,7 +166,7 @@ void		CPhotonHider::renderFrame(){
 				// Execute the light source shader
 				memBegin();
 
-				cLight->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]);
+				currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE] = cLight->prepare(this,numVertices);
 				cLight->illuminate(this);
 
 				memEnd();

@@ -2354,7 +2354,7 @@ CShader	*shaderCreate(const char *shaderName) {
 				if (cVar->variable->storage == STORAGE_GLOBAL ||
 					cVar->variable->storage == STORAGE_MUTABLEPARAMETER)
 						numGlobals++;
-			}
+			} 
 			
 			// Delete the variable
 			delete cVar;
@@ -2362,7 +2362,18 @@ CShader	*shaderCreate(const char *shaderName) {
 		}
 		
 		cShader->numGlobals	=	numGlobals;
+		
+		// Compute the memory we want for holding the varyings
+		for (i=0;i<cShader->numVariables;i++) {
+			if (cShader->varyingSizes[i] < 0) {
+				cShader->totalVaryingSize		+=	-cShader->varyingSizes[i];
+			} else {
+				cShader->totalVaryingSize		+=	cShader->varyingSizes[i]*maxGridSize*3;
+			}
+		}
 	}
+	
+	
 
 	currentData.memory					=	NULL;
 	currentData.code					=	NULL;
