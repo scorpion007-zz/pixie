@@ -153,7 +153,7 @@ public:
 		CShaderInstance			*currentShaderInstance;				// The current shader instance that's executing
 		CShaderInstance			*currentLightInstance;				// The current light instance that's executing
 		
-		float					**messageAccessors[NUM_ACCESSORS];	// The message passing accessors
+		float					**locals[NUM_ACCESSORS];			// The local variables for each shader type
 
 		CShadingState			*next;								// The next in free state list
 };
