@@ -51,7 +51,7 @@ public:
 		unsigned int			requiredParameters();
 		void					registerDefaults(CAttributes *,CActiveLight *) { }
 		const char				*getName();
-		float					**prepare(float **,int) { return NULL;	}
+		float					**prepare(CMemPage*&,float **,int) { return NULL;	}
 private:
 		vector					corners[4];
 		vector					lightColor;		// The color of the light
