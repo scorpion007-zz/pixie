@@ -292,9 +292,12 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													for (cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {	\
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
+															T64		shaderVarCheckpoint[3];											\
+															memSave(shaderVarCheckpoint,shaderStateMemory);							\
 															currentShadingState->currentLightInstance	=	light;					\
-															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(varying,numVertices);	\
-															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);						\
+															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(shaderStateMemory,varying,numVertices);	\
+															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);										\
+															memRestore(shaderVarCheckpoint,shaderStateMemory);						\
 														}													\
 													}														\
 												}															\
@@ -353,9 +356,12 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 														CProgrammableShaderInstance	*light	=	cLight->light;							\
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
+															T64		shaderVarCheckpoint[3];												\
+															memSave(shaderVarCheckpoint,shaderStateMemory);								\
 															currentShadingState->currentLightInstance	=	light;						\
-															currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = light->prepare(varying,numVertices);	\
-															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);					\
+															currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = light->prepare(shaderStateMemory,varying,numVertices);	\
+															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);									\
+															memRestore(shaderVarCheckpoint,shaderStateMemory);							\
 														}													\
 													}														\
 												}															\

@@ -58,6 +58,7 @@ class	CVertex;
 class	CMovingVertex;
 class	CTriangle;
 class	CMovingTriangle;
+class	CMemPage;
 class	CHierarchy;
 class	CActiveSample;
 class	COutput;
@@ -264,6 +265,8 @@ protected:
 		CArray<CSurface *>		*raytraced;												// The list of raytraced objects
 		CArray<CTracable *>		*tracables;												// The array of raytracable objects
 private:
+
+		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
 								
 		CArray<CProgrammableShaderInstance *>	*dirtyInstances;						// The list of shader instances that need cleanup
 

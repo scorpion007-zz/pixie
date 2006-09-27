@@ -60,6 +60,7 @@ class	CVisorCache;
 class	CShadingContext;
 class	CPhotonHider;
 class	CGatherRay;
+class	CMemPage;
 
 // Meanings of the accessor field of TReference
 const	unsigned int		SL_IMMEDIATE_OPERAND			=	0;	// Constants
@@ -426,7 +427,7 @@ public:
 		virtual	void			execute(CShadingContext *,float **)						=	0;
 		virtual	unsigned int	requiredParameters()									=	0;
 		virtual	const char		*getName()												=	0;
-		virtual	float			**prepare(float **,int)									=	0;
+		virtual	float			**prepare(CMemPage*&,float **,int)						=	0;
 		
 		void					createCategories();
 
@@ -464,7 +465,7 @@ public:
 		void					execute(CShadingContext *,float **);				// Execute the shader
 		unsigned int			requiredParameters();
 		const char				*getName();
-		float					**prepare(float **,int);
+		float					**prepare(CMemPage*&,float **,int);
 
 
 		CAllocatedString		*strings;					// The strings we allocated for parameters

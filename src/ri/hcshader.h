@@ -78,7 +78,7 @@ public:
 		unsigned int			requiredParameters();
 		void					registerDefaults(CAttributes *,CActiveLight *) { }
 		const char				*getName();
-		float					**prepare(float **,int) { return NULL;	}
+		float					**prepare(CMemPage*&,float **,int) { return NULL;	}
 private:
 		vector					from;			// The location of the light
 		float					radius;			// The radius of the light

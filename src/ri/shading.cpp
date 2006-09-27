@@ -370,6 +370,9 @@ CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf)
 
 	// This is the memory we allocate our junk from
 	frameMemory				=	new CMemStack(1 << 20);
+	
+	// Initialize the shader state memory stack
+	memoryInit(shaderStateMemory);
 
 	// This is the set of raytraced objects
 	raytraced				=	new CArray<CSurface *>;
@@ -505,6 +508,10 @@ CShadingContext::~CShadingContext() {
 	
 	// Ditch the frame memory
 	delete frameMemory;
+	
+	// Ditch the shader state memory stack
+	memoryTini(shaderStateMemory);
+
 
 	// Reset the dirty attributes
 	if (dirtyAttributes != NULL) {
@@ -730,6 +737,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	int					i;
 	int					numVertices;
 	CSurface			*savedObject;
+	T64					shaderVarCheckpoint[3];
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);
@@ -802,10 +810,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	currentShadingState->numVvertices	=	vVertices;
 	currentShadingState->numVertices	=	numVertices;
 
+	// Checkpoint the shader state stack
+	memSave(shaderVarCheckpoint,shaderStateMemory);
+	
 	// Allocate the caches for the shaders being executed
-	if (surface != NULL)							currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(varying,numVertices);
-	if (displacement != NULL)						currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(varying,numVertices);
-	if (atmosphere != NULL)							currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(varying,numVertices);
+	if (surface != NULL)							currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+	if (displacement != NULL)						currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
+	if (atmosphere != NULL)							currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
 	// If we need derivative information, treat differently
@@ -1156,12 +1167,15 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 		}
 
 		if (currentShadingState->postShader != NULL) {
-			currentShadingState->locals[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(varying,numVertices);
+			currentShadingState->locals[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
 			currentShadingState->postShader->execute(this,currentShadingState->locals[ACCESSOR_POSTSHADER]);
 		}
 
 		memEnd();
 	}
+	
+	// Unwind the stack of shader states
+	memRestore(shaderVarCheckpoint,shaderStateMemory);
 
 	currentShadingState->currentObject	=	savedObject;
 }
@@ -1191,6 +1205,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	int					i;
 	int					numVertices;
 	CSurface			*savedObject;
+	T64					shaderVarCheckpoint[3];
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);
@@ -1254,13 +1269,16 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	currentShadingState->numVvertices	=	vVertices;
 	currentShadingState->numVertices	=	numVertices;
 
+	// Checkpoint the shader state stack
+	memSave(shaderVarCheckpoint,shaderStateMemory);
+
 	// Set the parameters of the displacement shader
-	if (displacement != NULL)	currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(varying,numVertices);
+	if (displacement != NULL)	currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
 	
 	if (usedParameters & PARAMETER_MESSAGEPASSING) {
 		// Iff. we require message passing in the displacement shader, set up the caches
-		if (surface != NULL)	currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(varying,numVertices);
-		if (atmosphere != NULL)	currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(varying,numVertices);
+		if (surface != NULL)	currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+		if (atmosphere != NULL)	currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 		// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	}
 
@@ -1591,6 +1609,9 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 
 		memEnd();
 	}
+	
+	// Unwind the stack of shader states
+	memRestore(shaderVarCheckpoint,shaderStateMemory);
 
 	currentShadingState->currentObject	=	savedObject;
 }

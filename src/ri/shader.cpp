@@ -882,7 +882,7 @@ void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/24/2006
-float			**CProgrammableShaderInstance::prepare(float **varying,int numVertices) {
+float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **varying,int numVertices) {
 	CVariable	*cVariable;
 	TCode		*data;
 	TCode		**locals;
@@ -896,7 +896,7 @@ float			**CProgrammableShaderInstance::prepare(float **varying,int numVertices) 
 	}
 
 	// Allocate memory for the temporary shader variables
-	data	=	(TCode *) ralloc((totalVaryingSize + parent->numVariables)*sizeof(TCode));
+	data	=	(TCode *) ralloc((totalVaryingSize + parent->numVariables)*sizeof(TCode),namedMemory);
 	locals	=	(TCode **) data;
 	data	+=	parent->numVariables;
 
