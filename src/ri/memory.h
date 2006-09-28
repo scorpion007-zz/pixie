@@ -56,13 +56,15 @@ extern	CMemPage	*currentMemoryPage;				// The page that we're allocating from
 
 void				memoryInit();					// Init the memory
 void				memoryTini();					// Destroy the allocated memory
+void				memoryInit(CMemPage *&);		// Init named memory stack
+void				memoryTini(CMemPage *&);		// Destroy the named allocated memory
 CMemPage			*memoryNewPage(int);			// Allocate a new memory page
 void				memoryDeletePage(CMemPage *);	// Allocate a new memory page
 
 
 
 
-// This macro allocates memory in the stack
+// This macro allocates memory in the global stack
 inline void *ralloc(int size) {
 	void	*ptr;
 
@@ -85,6 +87,29 @@ inline void *ralloc(int size) {
 	return	ptr;
 }
 
+// This macro allocates memory in the named stack
+inline void *ralloc(int size,CMemPage *&stack) {
+	void	*ptr;
+
+	while(stack->availableSize < size) {
+		if (stack->next == NULL) {
+			CMemPage	*cPage				=	memoryNewPage(size);
+			cPage->prev						=	stack;
+			stack->next						=	cPage;
+		}
+
+		currentMemoryPage					=	currentMemoryPage->next;
+		currentMemoryPage->availableSize	=	currentMemoryPage->totalSize;
+		currentMemoryPage->memory			=	currentMemoryPage->base;
+	}
+
+
+	ptr										=	stack->memory;
+	stack->memory							=	stack->memory+size;
+	stack->availableSize					-=	size;
+	return	ptr;
+}
+
 
 // This macro places a checkpoint
 #define	memBegin()	{														\
@@ -101,6 +126,17 @@ inline void *ralloc(int size) {
 		currentMemoryPage->memory			=	savedMem;					\
 	}
 
+
+// Mem save and mem restore does the same thing, but they explicitly store the checkpoint in T64 data[3];
+#define	memSave(__data,__stack)													\
+	__data[0].pointer		=	__stack->memory;								\
+	__data[1].integer		=	__stack->availableSize;							\
+	__data[2].pointer		=	__stack;
+
+#define memRestore(__data,__stack)												\
+	__stack					=	(CMemPage *) __data[2].pointer;					\
+	__stack->availableSize	=	__data[1].integer;								\
+	__stack->memory			=	(char *) __data[0].pointer;
 
 
 #endif

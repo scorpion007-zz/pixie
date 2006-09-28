@@ -48,7 +48,6 @@ class	CObject;
 class	CPhotonMap;
 class	CAttributes;
 class	CActiveLight;
-class	CShaderCache;
 class	CTexture;
 class	CTexture3d;
 class	CTextureInfoBase;
@@ -61,6 +60,7 @@ class	CVisorCache;
 class	CShadingContext;
 class	CPhotonHider;
 class	CGatherRay;
+class	CMemPage;
 
 // Meanings of the accessor field of TReference
 const	unsigned int		SL_IMMEDIATE_OPERAND			=	0;	// Constants
@@ -403,9 +403,6 @@ public:
 
 		int						usedParameters;
 
-		CShaderCache			*cache;
-		int						dirty;							// TRUE if the shader has been cached in the last frame
-
 		friend	CShader			*parseShader(const char *,const char *);
 };
 
@@ -424,13 +421,13 @@ public:
 		void					detach()	{	refCount--; if (refCount == 0) delete this; }
 		void					check()		{	if (refCount == 0)	delete this;			}
 
-		virtual	void			illuminate(CShadingContext *)							=	0;
+		virtual	void			illuminate(CShadingContext *,float **)					=	0;
 		virtual	void			setParameters(int,char **,void **)						=	0;
 		virtual int				getParameter(const char *,void *,CVariable**,int*)		=	0;
-		virtual	void			execute(CShadingContext *)								=	0;
+		virtual	void			execute(CShadingContext *,float **)						=	0;
 		virtual	unsigned int	requiredParameters()									=	0;
 		virtual	const char		*getName()												=	0;
-		virtual	void			prepareCache(CShadingContext *,int,float***)			=	0;
+		virtual	float			**prepare(CMemPage*&,float **,int)						=	0;
 		
 		void					createCategories();
 
@@ -462,13 +459,13 @@ public:
 								CProgrammableShaderInstance(CShader *,CAttributes *,CXform *);
 		virtual					~CProgrammableShaderInstance();
 
-		void					illuminate(CShadingContext *);
+		void					illuminate(CShadingContext *,float **);
 		void					setParameters(int,char **,void **);
 		int						getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
-		void					execute(CShadingContext *);							// Execute the shader
+		void					execute(CShadingContext *,float **);				// Execute the shader
 		unsigned int			requiredParameters();
 		const char				*getName();
-		void					prepareCache(CShadingContext *,int,float***);
+		float					**prepare(CMemPage*&,float **,int);
 
 
 		CAllocatedString		*strings;					// The strings we allocated for parameters

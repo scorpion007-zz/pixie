@@ -48,8 +48,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Shading language functions ... (implemented in interpreter.cpp)
-CShaderCache					*newCache(CShader *,CShaderCache *c=NULL);										// Allocate a new cache
-
 #define	saveLighting(a)						scripterror("Invalid environment function call during init\n")
 #define clearLighting()						scripterror("Invalid environment function call during init\n")
 #define enterLightingConditional()			scripterror("Invalid environment function call during init\n")
@@ -395,7 +393,6 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	CShadedLight				**lights;
 	CShadedLight				**alights;
 	CShadedLight				**currentLight;
-	CShaderCache				*cCache;
 	CConditional				*conditionals			=	NULL;
 	CConditional				*cConditional;
 	int							i;
@@ -438,7 +435,6 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	lights									=	NULL;
 	alights									=	NULL;
 	currentLight							=	NULL;
-	cCache									=	NULL;
 
 	// Set the access arrays
 	stuff[SL_IMMEDIATE_OPERAND]				=	currentShader->constantEntries;				// Immediate operands

@@ -932,7 +932,7 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 									srcStep					=	0;											\
 									if (cVar != NULL) {														\
 										if (cVar->storage == STORAGE_PARAMETER || cVar->storage == STORAGE_MUTABLEPARAMETER) { 				\
-											src					=	(TCode *) currentShadingState->messageAccessors[accessor][cVar->entry];	\
+											src					=	(TCode *) currentShadingState->locals[accessor][cVar->entry];			\
 										} else {																							\
 											src					=	(TCode *) varying[cVar->entry];											\
 										}																									\

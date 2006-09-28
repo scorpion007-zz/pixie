@@ -58,6 +58,7 @@ class	CVertex;
 class	CMovingVertex;
 class	CTriangle;
 class	CMovingTriangle;
+class	CMemPage;
 class	CHierarchy;
 class	CActiveSample;
 class	COutput;
@@ -89,20 +90,6 @@ extern	char	*rayLabelPrimary;
 extern	char	*rayLabelTrace;
 extern	char	*rayLabelTransmission;
 extern	char	*rayLabelGather;
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShaderCache
-// Description			:	Holds previously allocated variables for a shader
-// Comments				:
-// Date last edited		:	10/13/2001
-class	CShaderCache {
-public:
-		TCode					**varyings;							// The variables in the shader
-		TCode					*memory;							// Points to the memory allocated for this block
-		CShader					*shader;							// The shader owning this cache
-		CShaderCache			*next;								// The next pointer in the shader array
-		CShaderCache			*shaderNext;						// The next pointer in the shader
-};
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -167,7 +154,7 @@ public:
 		CShaderInstance			*currentShaderInstance;				// The current shader instance that's executing
 		CShaderInstance			*currentLightInstance;				// The current light instance that's executing
 		
-		float					**messageAccessors[NUM_ACCESSORS];	// The message passing accessors
+		float					**locals[NUM_ACCESSORS];			// The local variables for each shader type
 
 		CShadingState			*next;								// The next in free state list
 };
@@ -278,12 +265,12 @@ protected:
 		CArray<CSurface *>		*raytraced;												// The list of raytraced objects
 		CArray<CTracable *>		*tracables;												// The array of raytracable objects
 private:
+
+		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
 								
 		CArray<CProgrammableShaderInstance *>	*dirtyInstances;						// The list of shader instances that need cleanup
-		CArray<CShader *>						*dirtyShaders;							// The list of shaders that are dirty
 
 		CConditional			*conditionals;											// Holds nested conditionals
-		CShaderCache			*shaderCache;											// The list of allocated shader caches
 		int						currentRayDepth;										// Current shading depth
 		const char				*currentRayLabel;										// The current ray label
 		CShadingState			*freeStates;											// The list of free states
@@ -303,8 +290,7 @@ private:
 		CDictionary<const char *,CRemoteChannel *>			*declaredRemoteChannels;	// Known remote channel lookup
 		CArray<CRemoteChannel *>							*remoteChannels;			// all known channels
 
-		void					execute(CProgrammableShaderInstance *);					// Execute a shader
-		CShaderCache			*newCache(CShader *);									// Allocate a new shader cache
+		void					execute(CProgrammableShaderInstance *,float **);		// Execute a shader
 
 		void					duFloat(float *,const float *);
 		void					dvFloat(float *,const float *);

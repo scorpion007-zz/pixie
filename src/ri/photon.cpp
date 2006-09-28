@@ -119,6 +119,7 @@ void		CPhotonHider::renderFrame(){
 		int				*tags						=	currentShadingState->tags;
 		int				emit;
 		float			*Clsave;
+		T64				shaderVarCheckpoint[3];
 
 		// Figure out how much we want to emit
 		emit										=	numEmitPhotons;
@@ -165,10 +166,12 @@ void		CPhotonHider::renderFrame(){
 
 				// Execute the light source shader
 				memBegin();
+	            memSave(shaderVarCheckpoint,shaderStateMemory);
+				
+				currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(shaderStateMemory,currentShadingState->varying,numVertices);
+				cLight->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);
 
-				cLight->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_LIGHTSOURCE]);
-				cLight->illuminate(this);
-
+				memRestore(shaderVarCheckpoint,shaderStateMemory);
 				memEnd();
 
 				emit									-=	numVertices;

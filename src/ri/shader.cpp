@@ -40,6 +40,7 @@
 #include	"shading.h"
 #include	"cache.h"
 #include	"bundles.h"
+#include	"memory.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
@@ -316,8 +317,6 @@ CShader::CShader(const char *name) : CFileResource(name) {
 	varyingSizes			=	NULL;
 	strings					=	NULL;
 	parameters				=	NULL;
-	cache					=	NULL;
-	dirty					=	FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -834,8 +833,8 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/10/2001
-void			CProgrammableShaderInstance::execute(CShadingContext *context) {
-	context->execute(this);
+void			CProgrammableShaderInstance::execute(CShadingContext *context,float **locals) {
+	context->execute(this,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -869,59 +868,83 @@ const char		*CProgrammableShaderInstance::getName() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/10/2001
-void			CProgrammableShaderInstance::illuminate(CShadingContext *context) {
+void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **locals) {
 	// This function should never be called for non-light shaders
-	context->execute(this);
+	context->execute(this,locals);
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
-// Method				:	prepareCache
+// Method				:	prepare
 // Description			:	Allocate the cache and set the parameter defaults
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/24/2006
-void			CProgrammableShaderInstance::prepareCache(CShadingContext *context,int numVertices,float ***accessor) {
-	CVariable		*cVariable;
-	const TCode		*src;
-	TCode			*dest;
-	int				i,n,c;
-	CShaderCache	*cache;
-	TCode			**varying	=	(TCode**) context->currentShadingState->varying;
+float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **varying,int numVertices) {
+	CVariable	*cVariable;
+	TCode		*data;
+	TCode		**locals;
+	int			totalVaryingSize;
+	int			i;
 
-	// Make sure the parent has a shader cache
-	if (parent->cache == NULL)	parent->cache	=	context->newCache(parent);
-	cache	=	parent->cache;
+	// Compute the total memory we will need
+	for (totalVaryingSize=0,i=0;i<parent->numVariables;i++) {
+		if (parent->varyingSizes[i] < 0)	totalVaryingSize	+=	-parent->varyingSizes[i];
+		else								totalVaryingSize	+=	parent->varyingSizes[i]*numVertices*3;
+	}
+
+	// Allocate memory for the temporary shader variables
+	data	=	(TCode *) ralloc((totalVaryingSize + parent->numVariables)*sizeof(TCode),namedMemory);
+	locals	=	(TCode **) data;
+	data	+=	parent->numVariables;
+
+	// Save the memory
+	for (i=0;i<parent->numVariables;i++) {
+		locals[i]	=	data;
+		if (parent->varyingSizes[i] < 0)	data	+=	-parent->varyingSizes[i];
+		else								data	+=	parent->varyingSizes[i]*numVertices*3;
+	}
 
 	// For each parameter, copy over the default value of the parameter
 	for (cVariable=parameters;cVariable!=NULL;cVariable=cVariable->next) {
-	
+		TCode		*dest;
+		const TCode	*src;
+		
+		// Find where we're writing
+		if (cVariable->storage == STORAGE_GLOBAL)	{
+			cVariable->value		=	varying[cVariable->entry];
+			dest					=	(TCode *) cVariable->value;
+		} else {
+			assert(cVariable->entry < parent->numVariables);
+			dest					=	locals[cVariable->entry];
+		}
+
 		// This is the repetition amount
 		if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
-			n				=	1;
-		} else {
-			n				=	numVertices*3;
-		}
-		
-		if (cVariable->storage == STORAGE_GLOBAL) {
-			dest			=	varying[cVariable->entry];
-		} else {
-			dest			=	cache->varyings[cVariable->entry];
-		}
-		
-		cVariable->value	=	(float *) dest;
-		src					=	(const TCode *) cVariable->defaultValue;
-		c					=	cVariable->numFloats;
 
-		// Copy the parameters
-		for(;n>0;n--) {
-			for (i=0;i<c;i++)	*dest++	=	src[i];
+			assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
+
+			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
+				int	i;
+				for (i=cVariable->numFloats;i>0;i--)	*dest++	=	*src++;
+			}
+		} else {
+
+			assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
+
+			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
+				int			n;
+				const int	c	=	cVariable->numFloats;
+				for(n=numVertices*3;n>0;n--) {
+					for (i=0;i<c;i++)	*dest++	=	src[i];
+				}
+			}
 		}
 	}
-	// Install the accessor for the message passing
-	*accessor = (float**) cache->varyings;
+
+	return (float **) locals;
 }
 
 

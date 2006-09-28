@@ -370,6 +370,9 @@ CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf)
 
 	// This is the memory we allocate our junk from
 	frameMemory				=	new CMemStack(1 << 20);
+	
+	// Initialize the shader state memory stack
+	memoryInit(shaderStateMemory);
 
 	// This is the set of raytraced objects
 	raytraced				=	new CArray<CSurface *>;
@@ -377,11 +380,9 @@ CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf)
 	// Init the loaded files
 	loadedFiles				=	new CTrie<CFileResource *>;
 	dirtyInstances			=	NULL;
-	dirtyShaders			=	NULL;
 	dirtyAttributes			=	NULL;
 
 	conditionals			=	NULL;
-	shaderCache				=	NULL;
 	currentRayDepth			=	0;
 	currentRayLabel			=	rayLabelPrimary;
 	freeStates				=	NULL;
@@ -457,22 +458,6 @@ CShadingContext::~CShadingContext() {
 		delete dirtyInstances;
 	}
 
-	// Reset the dirty shaders
-	if (dirtyShaders != NULL) {
-		int		numShaders	=	dirtyShaders->numItems;
-		CShader	**shaders	=	dirtyShaders->array;
-
-		for (;numShaders>0;numShaders--) {
-			CShader	*dirtyShader	=	*shaders++;
-
-			// Reset the cache
-			dirtyShader->cache		=	NULL;
-			dirtyShader->dirty		=	FALSE;
-		}
-
-		delete dirtyShaders;
-	}
-
 	// Ditch the remote channels
 	for (int i=0;i<remoteChannels->numItems;i++) {
 		if (remoteChannels->array[i] != NULL) delete remoteChannels->array[i];
@@ -523,6 +508,10 @@ CShadingContext::~CShadingContext() {
 	
 	// Ditch the frame memory
 	delete frameMemory;
+	
+	// Ditch the shader state memory stack
+	memoryTini(shaderStateMemory);
+
 
 	// Reset the dirty attributes
 	if (dirtyAttributes != NULL) {
@@ -748,6 +737,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	int					i;
 	int					numVertices;
 	CSurface			*savedObject;
+	T64					shaderVarCheckpoint[3];
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);
@@ -820,10 +810,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	currentShadingState->numVvertices	=	vVertices;
 	currentShadingState->numVertices	=	numVertices;
 
+	// Checkpoint the shader state stack
+	memSave(shaderVarCheckpoint,shaderStateMemory);
+	
 	// Allocate the caches for the shaders being executed
-	if (surface != NULL)							surface->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_SURFACE]);
-	if (displacement != NULL)						displacement->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]);
-	if (atmosphere != NULL)							atmosphere->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]);
+	if (surface != NULL)							currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+	if (displacement != NULL)						currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
+	if (atmosphere != NULL)							currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
 	// If we need derivative information, treat differently
@@ -1142,11 +1135,11 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 		memBegin();
 
 		if (displacement != NULL) {
-			displacement->execute(this);
+			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
 		}
 
 		if (surface != NULL) {
-			surface->execute(this);
+			surface->execute(this,currentShadingState->locals[ACCESSOR_SURFACE]);
 		} else {
 			float			*color		=	varying[VARIABLE_CI];
 			float			*opacity	=	varying[VARIABLE_OI];
@@ -1169,17 +1162,20 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 		if (currentRayDepth == 0) {  // do not execute atmosphere for non-camera rays
 			if (atmosphere != NULL) {
-				atmosphere->execute(this);
+				atmosphere->execute(this,currentShadingState->locals[ACCESSOR_ATMOSPHERE]);
 			}
 		}
 
 		if (currentShadingState->postShader != NULL) {
-			currentShadingState->postShader->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_POSTSHADER]);
-			currentShadingState->postShader->execute(this);
+			currentShadingState->locals[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
+			currentShadingState->postShader->execute(this,currentShadingState->locals[ACCESSOR_POSTSHADER]);
 		}
 
 		memEnd();
 	}
+	
+	// Unwind the stack of shader states
+	memRestore(shaderVarCheckpoint,shaderStateMemory);
 
 	currentShadingState->currentObject	=	savedObject;
 }
@@ -1209,6 +1205,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	int					i;
 	int					numVertices;
 	CSurface			*savedObject;
+	T64					shaderVarCheckpoint[3];
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);
@@ -1272,13 +1269,16 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	currentShadingState->numVvertices	=	vVertices;
 	currentShadingState->numVertices	=	numVertices;
 
+	// Checkpoint the shader state stack
+	memSave(shaderVarCheckpoint,shaderStateMemory);
+
 	// Set the parameters of the displacement shader
-	if (displacement != NULL)						displacement->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_DISPLACEMENT]);
+	if (displacement != NULL)	currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
 	
 	if (usedParameters & PARAMETER_MESSAGEPASSING) {
 		// Iff. we require message passing in the displacement shader, set up the caches
-		if (surface != NULL)						surface->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_SURFACE]);
-		if (atmosphere != NULL)						atmosphere->prepareCache(this,numVertices,&currentShadingState->messageAccessors[ACCESSOR_ATMOSPHERE]);
+		if (surface != NULL)	currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+		if (atmosphere != NULL)	currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 		// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	}
 
@@ -1604,11 +1604,14 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 		memBegin();
 
 		if (displacement != NULL) {
-			displacement->execute(this);
+			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
 		}
 
 		memEnd();
 	}
+	
+	// Unwind the stack of shader states
+	memRestore(shaderVarCheckpoint,shaderStateMemory);
 
 	currentShadingState->currentObject	=	savedObject;
 }
@@ -1728,62 +1731,6 @@ void			CShadingContext::freeState(CShadingState *cState) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	newCache
-// Description			:	Allocate a cache for a shader
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/25/2002
-CShaderCache	*CShadingContext::newCache(CShader *currentShader) {
-	int				neededMemory	=	currentShader->numVariables;
-	TCode			*memory;
-	TCode			*memoryBase;
-	int				i;
-	CShaderCache	*block;
-
-	// Compute the size that we need
-	for (i=0;i<currentShader->numVariables;i++) {
-		if (currentShader->varyingSizes[i] < 0) {
-			neededMemory			+=	-currentShader->varyingSizes[i];
-		} else {
-			neededMemory			+=	currentShader->varyingSizes[i]*maxGridSize*3;
-		}
-	}
-
-	// FIXME: Can the size of the cache get too large ?
-	block							=	(CShaderCache *) frameMemory->alloc(neededMemory*sizeof(TCode) + sizeof(CShaderCache));
-	memoryBase = memory				=	(TCode *) (block+1);
-	block->memory					=	memory;
-	block->varyings					=	(TCode **)	memory;	memory	+=	currentShader->numVariables;
-	block->shader					=	currentShader;
-	block->next						=	shaderCache;
-	block->shaderNext				=	NULL;
-	shaderCache						=	block;
-
-	for (i=0;i<currentShader->numVariables;i++) {
-		block->varyings[i]			=	memory;
-
-		if (currentShader->varyingSizes[i] < 0) {
-			memory					+=	-currentShader->varyingSizes[i];
-		} else {
-			memory					+=	currentShader->varyingSizes[i]*maxGridSize*3;
-		}
-	}
-
-	assert((memory - memoryBase) == neededMemory);
-
-	// Insert the shader into our list of dirty shaders if applicable
-	if (currentShader->dirty == FALSE) {
-		currentShader->dirty		=	TRUE;
-
-		if (dirtyShaders == NULL)	dirtyShaders	=	new CArray<CShader *>;
-
-		dirtyShaders->push(currentShader);
-	}
-
-	return block;
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext

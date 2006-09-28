@@ -44,14 +44,14 @@ public:
 								CQuadLight(CAttributes *,CXform *);
 		virtual					~CQuadLight();
 
-		void					illuminate(CShadingContext *);
+		void					illuminate(CShadingContext *,float **);
 		void					setParameters(int,char **,void **);
 		int						getParameter(const char *,void *,CVariable**,int*);
-		void					execute(CShadingContext *);
+		void					execute(CShadingContext *,float **);
 		unsigned int			requiredParameters();
 		void					registerDefaults(CAttributes *,CActiveLight *) { }
 		const char				*getName();
-		void					prepareCache(CShadingContext *,int,float***) { }
+		float					**prepare(CMemPage*&,float **,int) { return NULL;	}
 private:
 		vector					corners[4];
 		vector					lightColor;		// The color of the light
@@ -71,14 +71,14 @@ public:
 								CSphereLight(CAttributes *,CXform *);
 		virtual					~CSphereLight();
 
-		void					illuminate(CShadingContext *);
+		void					illuminate(CShadingContext *,float **);
 		void					setParameters(int,char **,void **);
 		int						getParameter(const char *,void *,CVariable**,int*);
-		void					execute(CShadingContext *);
+		void					execute(CShadingContext *,float **);
 		unsigned int			requiredParameters();
 		void					registerDefaults(CAttributes *,CActiveLight *) { }
 		const char				*getName();
-		void					prepareCache(CShadingContext *,int,float***) { }
+		float					**prepare(CMemPage*&,float **,int) { return NULL;	}
 private:
 		vector					from;			// The location of the light
 		float					radius;			// The radius of the light

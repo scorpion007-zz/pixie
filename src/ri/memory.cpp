@@ -80,6 +80,36 @@ void			memoryTini() {
 }
 
 ///////////////////////////////////////////////////////////////////////
+// Function				:	memoryInit
+// Description			:	Initialize a named memory manager
+// Return Value			:
+// Comments				:	Should be called after memInit
+// Date last edited		:	1/14/2002
+void			memoryInit(CMemPage *&stack) {
+	stack	=	memoryNewPage(INIT_ZONE_SIZE);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	memoryTini
+// Description			:	Destroy a named memory manager
+// Return Value			:
+// Comments				:	Should be called before memTini so counts are correct
+// Date last edited		:	1/14/2002
+void			memoryTini(CMemPage *&stack) {
+	CMemPage	*cPage;
+
+	// We must be the first page
+	assert(stack->prev == NULL);
+
+	while(stack != NULL) {
+		cPage				=	stack;
+		stack	=	cPage->next;
+
+		memoryDeletePage(cPage);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
 // Function				:	memoryNewPage
 // Description			:	Allocate a new memory page whose size is at least "size"
 // Return Value			:

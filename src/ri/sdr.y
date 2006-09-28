@@ -2354,7 +2354,7 @@ CShader	*shaderCreate(const char *shaderName) {
 				if (cVar->variable->storage == STORAGE_GLOBAL ||
 					cVar->variable->storage == STORAGE_MUTABLEPARAMETER)
 						numGlobals++;
-			}
+			} 
 			
 			// Delete the variable
 			delete cVar;
@@ -2363,6 +2363,8 @@ CShader	*shaderCreate(const char *shaderName) {
 		
 		cShader->numGlobals	=	numGlobals;
 	}
+	
+	
 
 	currentData.memory					=	NULL;
 	currentData.code					=	NULL;

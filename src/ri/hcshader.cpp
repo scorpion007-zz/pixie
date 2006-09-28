@@ -76,7 +76,7 @@ CSphereLight::~CSphereLight() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/2/2003
-void					CSphereLight::illuminate(CShadingContext *context) {
+void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 	
 	if (context->hiderFlags & HIDER_ILLUMINATIONHOOK) {
@@ -272,7 +272,7 @@ int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*
 // Return Value			:	-
 // Comments				:	Should never be called
 // Date last edited		:	11/2/2003
-void					CSphereLight::execute(CShadingContext *context) {
+void					CSphereLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
 }
@@ -374,7 +374,7 @@ CQuadLight::~CQuadLight() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/2/2003
-void					CQuadLight::illuminate(CShadingContext *context) {
+void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 
 	if (context->hiderFlags & HIDER_ILLUMINATIONHOOK) {
@@ -634,7 +634,7 @@ int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) 
 // Return Value			:	-
 // Comments				:	Should never be called
 // Date last edited		:	11/2/2003
-void					CQuadLight::execute(CShadingContext *context) {
+void					CQuadLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
 }
