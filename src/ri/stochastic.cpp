@@ -217,27 +217,29 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 			pixel->numSplats			=	0;
 			pixel->node					=	getNode(j,i);
 			pixel->node->zmax			=	clipMax;
+			pixel->first				=	newFragment();
+			pixel->last					=	newFragment();
 
 
-			cFragment					=	&pixel->last;
+			cFragment					=	pixel->last;
 			cFragment->z				=	clipMax;
-			initv(cFragment->data1.color,0);
-			initv(cFragment->data2.opacity,0);
+			initv(cFragment->color,0);
+			initv(cFragment->opacity,0);
 			cFragment->next				=	NULL;
-			cFragment->prev				=	&pixel->first;
+			cFragment->prev				=	pixel->first;
 
-			cFragment					=	&pixel->first;
+			cFragment					=	pixel->first;
 			cFragment->z				=	-C_INFINITY;
-			initv(cFragment->data1.color,0);
-			initv(cFragment->data2.opacity,0);
-			cFragment->next				=	&pixel->last;
+			initv(cFragment->color,0);
+			initv(cFragment->opacity,0);
+			cFragment->next				=	pixel->last;
 			cFragment->prev				=	NULL;
 			
 			for (k=0;k<numExtraSamples;k++) {
 				pixel->extraSamples[k]	=	sampleDefaults[k];
 			}
 
-			pixel->update				=	&pixel->first;
+			pixel->update				=	pixel->first;
 		}
 	}
 
@@ -254,6 +256,45 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CStochastic
+// Method				:	rasterDrawFragments
+// Description			:	Insert bunch of fragments into the framebuffer
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	7/31/2002
+void		CStochastic::rasterDrawFragments(CRasterGrid *grid,TFragment *fragments) {
+	TFragment	*cFragment;
+
+
+#define depthFilterIfZMin()
+#define depthFilterElseZMin()
+
+#define depthFilterIfZMax()		pixel->zold		=	max(pixel->zold,z);
+#define depthFilterElseZMax()	else {	pixel->zold	=	max(pixel->zold,z);	}
+
+#define depthFilterIfZAvg()		pixel->zold		+=	z; pixel->numSplats++;
+#define depthFilterElseZAvg()	else {	pixel->zold	+=	z; pixel->numSplats++;	}
+
+#define depthFilterIfZMid()		pixel->zold		=	pixel->z;
+#define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
+
+#define lodExtraVariables()		const float importance = grid->object->attributes->lodImportance;
+
+
+
+
+	// Iterate and insert every fragment into the 
+	while((cFragment = fragments) != NULL) {
+		CPixel	*cPixel;
+
+		// Advance the fragment
+		fragments	=	fragments->next;
+
+		// Insert the fragment into the pixel
+		#include "stochasticFragment.h"
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
@@ -296,12 +337,12 @@ void		CStochastic::rasterEnd(float *fb2) {
 		vector	ropacity;
 
 		for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
-			TFragment	*cSample	=	cPixel->first.next;
+			TFragment	*cSample	=	cPixel->first->next;
 			TFragment	*oSample;
 			float		*C			=	&cFb[2];
 			float		*O			=	&cFb[5];
  
-			assert(cPixel->first.z == -C_INFINITY);
+			assert(cPixel->first->z == -C_INFINITY);
 
 			if (numExtraSamples > 0)
 				memcpy(cFb+8,cPixel->extraSamples,numExtraSamples*sizeof(float));
@@ -310,10 +351,10 @@ void		CStochastic::rasterEnd(float *fb2) {
 			// cPixel->last ise really used, but cPixel->first is not (it's always skipped in the composite),
 			// so this is safe to do
 			
-			if (cPixel->first.data2.opacity[0] >= 0 || cPixel->first.data2.opacity[1] >= 0 || cPixel->first.data2.opacity[2] >= 0) { 		// Pixel has no Matte
+			if (cPixel->first->opacity[0] >= 0 || cPixel->first->opacity[1] >= 0 || cPixel->first->opacity[2] >= 0) { 		// Pixel has no Matte
 				// Get the base color and opacity
-				movvv(C,cSample->data1.color);
-				movvv(O,cSample->data2.opacity);
+				movvv(C,cSample->color);
+				movvv(O,cSample->opacity);
 				ropacity[0]	=	1-O[0];
 				ropacity[1]	=	1-O[1];
 				ropacity[2]	=	1-O[2];
@@ -322,8 +363,8 @@ void		CStochastic::rasterEnd(float *fb2) {
 				cSample		=	cSample->next;
 				for (;cSample!=NULL;) {
 					deleteFragment(oSample);
-					const float	*color		= cSample->data1.color;
-					const float *opacity	= cSample->data2.opacity;
+					const float	*color		= cSample->color;
+					const float *opacity	= cSample->opacity;
 	
 					// Composite
 					C[0]		+=	ropacity[0]*color[0];
@@ -343,18 +384,18 @@ void		CStochastic::rasterEnd(float *fb2) {
 			else {
 				
 				// Get the base color and opacity
-				if (cSample->data2.opacity[0] < 0 || cSample->data2.opacity[1] < 0 || cSample->data2.opacity[2] < 0) {
+				if (cSample->opacity[0] < 0 || cSample->opacity[1] < 0 || cSample->opacity[2] < 0) {
 					// Matte base sample
 					initv(C,0);
 					initv(O,0);
-					ropacity[0]	=	1+cSample->data2.opacity[0];
-					ropacity[1]	=	1+cSample->data2.opacity[1];
-					ropacity[2]	=	1+cSample->data2.opacity[2];
+					ropacity[0]	=	1+cSample->opacity[0];
+					ropacity[1]	=	1+cSample->opacity[1];
+					ropacity[2]	=	1+cSample->opacity[2];
 				}
 				else {
 					// Non-matte base sample
-					movvv(C,cSample->data1.color);
-					movvv(O,cSample->data2.opacity);
+					movvv(C,cSample->color);
+					movvv(O,cSample->opacity);
 					ropacity[0]	=	1-O[0];
 					ropacity[1]	=	1-O[1];
 					ropacity[2]	=	1-O[2];
@@ -365,8 +406,8 @@ void		CStochastic::rasterEnd(float *fb2) {
 				cSample		=	cSample->next;
 				for (;cSample!=NULL;) {
 					deleteFragment(oSample);
-					const float	*color		= cSample->data1.color;
-					const float *opacity	= cSample->data2.opacity;
+					const float	*color		= cSample->color;
+					const float *opacity	= cSample->opacity;
 	
 					if (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0) {
 						// Composite Matte
@@ -695,9 +736,9 @@ void			CStochastic::filterSamples(int numSamples,TFragment **samples,float *weig
 
 		outSample(cZ,opacity);
 
-		newOpacity[0]				=	oldOpacity[1]*(1-cSample->data2.opacity[0]);
-		newOpacity[1]				=	oldOpacity[2]*(1-cSample->data2.opacity[1]);
-		newOpacity[2]				=	oldOpacity[3]*(1-cSample->data2.opacity[2]);
+		newOpacity[0]				=	oldOpacity[1]*(1-cSample->opacity[0]);
+		newOpacity[1]				=	oldOpacity[2]*(1-cSample->opacity[1]);
+		newOpacity[2]				=	oldOpacity[3]*(1-cSample->opacity[2]);
 
 		opacity[0]					+=	(newOpacity[0] - oldOpacity[1])*oldOpacity[0];
 		opacity[1]					+=	(newOpacity[1] - oldOpacity[2])*oldOpacity[0];
@@ -790,7 +831,7 @@ void		CStochastic::deepShadowCompute() {
 	// Collect the samples first
 	for (i=0,y=0;y<sampleHeight;y++) {
 		for (x=0;x<sampleWidth;x++,i++) {
-			samples[i]	=	fb[y][x].first.next;
+			samples[i]	=	fb[y][x].first->next;
 		}
 	}
 

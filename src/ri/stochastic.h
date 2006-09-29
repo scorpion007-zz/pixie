@@ -49,6 +49,7 @@ public:
 				// The functions inherited from the CReyes
 	void		rasterBegin(int,int,int,int);
 	void		rasterDrawPrimitives(CRasterGrid *);
+	void		rasterDrawFragments(CRasterGrid *,TFragment *);
 	void		rasterEnd(float *);
 private:
 
@@ -59,15 +60,11 @@ private:
 	// Date last edited		:	8/29/2004
 	class	CPixel {
 	public:
-		float			jx,jy;					// The sampling jitter
-		float			jt;						// The time jitter
-		float			jdx,jdy;				// The aperture jitter	(Gaussian)
-		float			jimp;					// The relative important // GSHHACK
 		float			z;						// The farthest opaque z value
 		float			zold;					// This is the old Z value (for depth filtering)
 		int				numSplats;				// The number of splats to this pixel (used by the avg. depth filter);
 		float			xcent,ycent;			// The center of the sampling window
-		TFragment		first,last;				// The first and last fragments always exist
+		TFragment		*first,*last;			// The first and last fragments always exist
 		TFragment		*update;				// The last fragment to be saved
 		float			*extraSamples;			// Pointer to the extra samples array if any
 		COcclusionNode	*node;					// The occlusion sample

@@ -821,6 +821,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\stochasticFragment.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\stochasticPoint.h"
 				>
 			</File>

@@ -69,7 +69,21 @@ const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 12;	// Shade the primitive even 
 class	CReyes : public CShadingContext {
 protected:
 
-	
+
+	////////////////////////////////////////////////////////////////////////
+	// This structure holds info about a fragment
+	typedef struct TFragment {
+			int					index;					// The index of the top left vertex in the grid
+			float				u,v;					// The parametric coordinate
+
+			vector				color;					// The color of the fragment
+			vector				opacity;				// The opacity of the fragment
+
+			int					xSample,ySample;		// The coordinates of the fragment in the current bucket
+			float				z;						// Depth of the sample
+			TFragment			*next;					// The next fragment wrt. depth
+			TFragment			*prev;					// The previous fragment wrt. depth
+	};
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRasterGrid
@@ -85,30 +99,13 @@ protected:
 		int						udiv,vdiv;				// The number of division
 		int						numVertices;			// The number of vertices
 		float					*vertices;				// Array of vertices
-		float					*size;					// The point sizes (only for points)
+		float					*size0,*size1;			// The point sizes
 		int						flags;					// The primitive flags
-		int						refCount;				// The reference counter
-
-		void					attach()	{	refCount++;	}
-		void					detach()	{	refCount--;	if (refCount == 0) delete this;	}
 	};
 
 
 
-	typedef struct TFragment {
-			CRasterGrid		*grid;
-			int				flags;
-
-			// Data1 holds the color of the fragment or the indices of the corners of the triangle in the grid
-			union { 	vector	color;		int		indices[3];		}	data1;
-			// Data2 holds the opacity of the fragment or the weights of the corners of the triangle in the grid
-			union {		vector	opacity;	float	weights[3];		}	data2;
-
-			int				xSample,ySample;			// The coordinates of the fragment in the current bucket
-			float			z;							// Depth of the sample
-			TFragment		*next;						// The next fragment wrt. depth
-			TFragment		*prev;						// The previous fragment wrt. depth
-	};
+	
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -234,9 +231,10 @@ public:
 	void						renderFrame();									// Right after world end to force rendering of the entire frame
 
 								// The following functions must be overriden by the child rasterizer
-	virtual	void				rasterBegin(int,int,int,int)				=	0;
-	virtual	void				rasterDrawPrimitives(CRasterGrid *)			=	0;
-	virtual	void				rasterEnd(float *)							=	0;
+	virtual	void				rasterBegin(int,int,int,int)					=	0;
+	virtual	void				rasterDrawPrimitives(CRasterGrid *)				=	0;
+	virtual	void				rasterDrawFragments(CRasterGrid *,TFragment *)	=	0;
+	virtual	void				rasterEnd(float *)								=	0;
 	
 	
 	void						drawObject(CObject *,const float *,const float *);		// Draw an object

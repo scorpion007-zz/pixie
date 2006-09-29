@@ -660,9 +660,9 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 // Date last edited		:	10/27/2002
 int		precomputeStochasticPrimitivesH() {
 	#ifdef _WIN32
-		FILE	*out	=	fopen("..\\src\\ri\\stochasticPrimitives.h","w");
+		FILE	*out	=	fopen("..\\src\\ri\\stochasticFunctions.h","w");
 	#else
-		FILE	*out	=	fopen("../ri/stochasticPrimitives.h","w");
+		FILE	*out	=	fopen("../ri/stochasticFunctions.h","w");
 	#endif
 	int		i;
 
@@ -774,30 +774,6 @@ int		precomputeStochasticPrimitivesH() {
 			fprintf(out,"\n\tdrawGridHeader()\n");
 
 			if (i & RASTER_LOD)			fprintf(out,"\tlodExtraVariables()\n");
-
-			if (i & RASTER_POINT) {
-				fprintf(out,"\tptExtraVariables()\n");
-				if (i & RASTER_FOCALBLUR)	fprintf(out,"\tfocPtExtraVariables()\n");
-				if (i & RASTER_MOVING)		fprintf(out,"\tmovPtExtraVariables()\n");
-				if (i & RASTER_TRANSPARENT)	fprintf(out,"\ttransPtExtraVariables()\n");
-			} else {
-				fprintf(out,"\ttriExtraVariables()\n");
-				if (i & RASTER_FOCALBLUR)	fprintf(out,"\tfocTriExtraVariables()\n");
-				if (i & RASTER_MOVING)		fprintf(out,"\tmovTriExtraVariables()\n");
-				if (i & RASTER_TRANSPARENT)	fprintf(out,"\ttransTriExtraVariables()\n");
-			}
-			
-			fprintf(out,"\tfor(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {\n");
-			fprintf(out,"\t\tif (cPrimitive->xbound[1] < left)\t\tcontinue;\n");
-			fprintf(out,"\t\tif (cPrimitive->ybound[1] < top)\t\tcontinue;\n");
-			fprintf(out,"\t\tif (cPrimitive->xbound[0] >= right)\t\tcontinue;\n");
-			fprintf(out,"\t\tif (cPrimitive->ybound[0] >= bottom)\tcontinue;\n");
-		
-			if (i & RASTER_POINT) {
-				fprintf(out,"\t\t#include \"stochasticPoint.h\"\n");
-			} else {
-				fprintf(out,"\t\t#include \"stochasticTriangle.h\"\n");
-			}
 	
 			fprintf(out,"\t}\n");
 			

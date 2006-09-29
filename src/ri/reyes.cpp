@@ -398,7 +398,9 @@ void	CReyes::render() {
 				stats.numRasterGridsRendered++;
 
 				// Render the grid
-				rasterDrawPrimitives(cObject->grid);
+				dice(cObject->grid);
+
+				// Defer the grid if applicable
 				objectDefer(cObject);
 
 				continue;
@@ -848,7 +850,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			copyPoints(numPoints,varying,grid->vertices,0);
 
 			// Make sure we record the point sizes
-			for (cSize=grid->size,i=numPoints;i>0;i--,cSize+=2) {
+			for (cSize=grid->size0,i=numPoints;i>0;i--,cSize++) {
 				*cSize	=	*sizeArray++;
 			}
 
@@ -918,7 +920,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 				copyPoints(numPoints,varying,grid->vertices,1);
 
 				// Make sure we record the point sizes
-				for (cSize=grid->size+1,i=numPoints;i>0;i--,cSize+=2) {
+				for (cSize=grid->size1,i=numPoints;i>0;i--,cSize++) {
 					*cSize	=	*sizeArray++;
 				}
 			} else {
@@ -1448,8 +1450,8 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	grid->object			=	object;				object->attach();
 	grid->numVertices		=	numVertices;
 	grid->vertices			=	new float[numVertices*numVertexSamples];
-	grid->size				=	NULL;
-	grid->refCount			=	0;
+	grid->size0				=	NULL;
+	grid->size1				=	NULL;
 
 	numGrids++;
 	if (numGrids > stats.numPeakRasterGrids)	stats.numPeakRasterGrids	=	numGrids;
@@ -1468,7 +1470,7 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 void			CReyes::deleteGrid(CRasterGrid *grid) {
 	grid->object->detach();
 	delete [] grid->vertices;
-	if (grid->size != NULL) delete [] grid->size;
+	if (grid->size0 != NULL) delete [] grid->size0;
 	delete grid;
 
 	numGrids--;
@@ -1578,93 +1580,140 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 // Comments				:
 // Date last edited		:	9/17/2004
 void		CReyes::dice(CRasterGrid *grid) {
+
+	// Holds the current bucket info
+	const int	left			=	tbucketLeft;
+	const int	top				=	tbucketTop;
+	const int	right			=	left + bucketPixelWidth*pixelXsamples + 2*xSampleOffset;
+	const int	bottom			=	top + bucketPixelHeight*pixelYsamples + 2*ySampleOffset;
+	TFragment	*fragments		=	NULL;
+	int			numFragments	=	0;
+
 	if (grid->dim == 2) {
-		int				i,j;
+		int				i,j,ii,jj;
 		const int		udiv		=	grid->udiv;
 		const int		vdiv		=	grid->vdiv;
 		const float		*vertices	=	grid->vertices;
-		float			*stack		=	(float *) alloca(1000*sizeof(float));
-		float			*stackBase	=	stack;
 
-		for (j=0;j<=vdiv;j++) {
-			for (i=0;i<=udiv;i++) {
+		for (j=0;j<vdiv;j++) {
+			for (i=0;i<udiv;i++) {
 				const int	index0		=	j*(udiv+1) + i;
 				const int	index1		=	j*(udiv+1) + i + 1;
 				const int	index2		=	(j + 1)*(udiv+1) + i;
 				const int	index3		=	(j + 1)*(udiv+1) + i + 1;
-				const float	*vertex0	=	vertices + index0*vertexSize;
-				const float	*vertex1	=	vertices + index1*vertexSize;
-				const float	*vertex2	=	vertices + index2*vertexSize;
-				const float	*vertex3	=	vertices + index3*vertexSize;
-				int			xSample,ySample;		// The sample coordinates of the fragment
+				const float	*vertex0	=	vertices + index0*numVertexSamples;
+				const float	*vertex1	=	vertices + index1*numVertexSamples;
+				const float	*vertex2	=	vertices + index2*numVertexSamples;
+				const float	*vertex3	=	vertices + index3*numVertexSamples;
 				vector		tmp;
+				int			mudiv,mvdiv,k;	// Micro division amount
 
-				movvv(stack,vertex0);
-				movvv(stack+3,vertex1);
-				movvv(stack+6,vertex2);
-				movvv(stack+9,vertex3);
-				stack	+=	12;
-				while(stack > stackBase) {
-
-					stack	-=	12;
-
-					const float	*v0	=	stack;
-					const float	*v1	=	stack + 3;
-					const float	*v2	=	stack + 6;
-					const float	*v3	=	stack + 9;
-					
-					// Check the area of v0-v1-v2-v3
+				// FIXME: We can check if we can cull the quad for this bucket
 
 
-					// Top
-					subvv(tmp,v0,v1);
-					if (dotvv(tmp,tmp) > 1) {
-					} else {
+				// Compute the micro subdivision amount
+				subvv(tmp,vertex1,vertex0);
+				mudiv	=	(int) ceil(lengthv(tmp));
+				subvv(tmp,vertex3,vertex2);
+				k	=	(int) ceil(lengthv(tmp));
+				if (k > mudiv)	mudiv	=	k;
+				subvv(tmp,vertex2,vertex0);
+				mvdiv	=	(int) ceil(lengthv(tmp));
+				subvv(tmp,vertex3,vertex1);
+				k	=	(int) ceil(lengthv(tmp));
+				if (k > mvdiv)	mvdiv	=	k;
 
-						// Bottom
-						subvv(tmp,v2,v3);
-						if (dotvv(tmp,tmp) > 1) {
+				assert(mudiv >= 1);
+				assert(mvdiv >= 1);
+
+
+				// Compute the microquads
+				const float	du	=	1 / (float) mudiv;
+				const float	dv	=	1 / (float) mvdiv;
+				float		cu,cv;
+				for (cv=0,jj=0;jj<udiv;jj++,cv+=dv) {
+					for (cu=0,ii=0;ii<udiv;ii++,cu+=du) {
+						vector		v0,v1,v2,v3;
+						TFragment	*cFragment;
+
+						// Compute the corners of the microquads
+#define corner(__c,__u,__v)	__c[0]	=	((vertex1[0] - vertex0[0])*(__u) + vertex0[0])*(1 - (__v)) + 	((vertex3[0] - vertex2[0])*(__u) + vertex2[0])*(__v);	\
+							__c[1]	=	((vertex1[1] - vertex0[1])*(__u) + vertex0[1])*(1 - (__v)) + 	((vertex3[1] - vertex2[1])*(__u) + vertex2[1])*(__v);	\
+							__c[2]	=	((vertex1[2] - vertex0[2])*(__u) + vertex0[2])*(1 - (__v)) + 	((vertex3[2] - vertex2[2])*(__u) + vertex2[2])*(__v);
+
+						corner(v0,cu,cv);
+						corner(v1,cu+du,cv);
+						corner(v2,cu,cv+dv);
+						corner(v3,cu+du,cv+dv);
+
+#undef corner
+
+						// FIXME: apply MB / DOF
+
+
+
+						addvv(tmp,v0,v1);
+						addvv(tmp,v2);
+						addvv(tmp,v3);
+						mulvf(tmp,0.25f);
+
+						const int	x	=	(int) tmp[0];
+						const int	y	=	(int) tmp[1];
+
+						if (x < left)		continue;					
+						if (y < top)		continue;
+						if (x >= right)		continue;
+						if (y >= bottom)	continue;
+
+						cFragment				=	newFragment();		// Allocate the fragment
+						cFragment->xSample		=	x - left;			// The coordinate of the fragment in the current bucket
+						cFragment->ySample		=	y - top;
+						cFragment->z			=	tmp[2];				// The depth of the fragment
+
+						
+						// Check if the fragment is inside the quad
+						const float	xSample		=	cFragment->xSample + 0.5f;
+						const float	ySample		=	cFragment->ySample + 0.5f;
+						float		atop,abottom,aleft,aright;
+
+						if (area(v0[0],v0[1],v1[0],v2[1],v3[0],v3[1]) > 0) {
+							
+
+							// FIXME: Check front/back visibility
+
+							if ((atop		= area(xSample,ySample,v0[0],v0[1],v1[0],v1[1])) < 0) continue;
+							if ((aright		= area(xSample,ySample,v1[0],v1[1],v3[0],v3[1])) < 0) continue;
+							if ((abottom	= area(xSample,ySample,v3[0],v3[1],v2[0],v2[1])) < 0) continue;
+							if ((aleft		= area(xSample,ySample,v2[0],v2[1],v0[0],v0[1])) < 0) continue;
+
 						} else {
+							float	atop,abottom,aleft,aright;
 
-							// Left
-							subvv(tmp,v0,v2);
-							if (dotvv(tmp,tmp) > 1) {
-							} else {
+							// FIXME: Check front/back visibility
 
-								// Right
-								subvv(tmp,v1,v3);
-								if (dotvv(tmp,tmp) > 1) {
-								} else {
-									TFragment	*cFragment;
+							if ((atop		= area(xSample,ySample,v0[0],v0[1],v1[0],v1[1])) > 0) continue;
+							if ((aright		= area(xSample,ySample,v1[0],v1[1],v3[0],v3[1])) > 0) continue;
+							if ((abottom	= area(xSample,ySample,v3[0],v3[1],v2[0],v2[1])) > 0) continue;
+							if ((aleft		= area(xSample,ySample,v2[0],v2[1],v0[0],v0[1])) > 0) continue;
 
-									// The quad is smaller than one sample .. This is good enough, sample the center
-									addvv(tmp,v0,v1);
-									addvv(tmp,v2);
-									addvv(tmp,v3);
-									mulvf(tmp,0.25f);
-
-									// Apply motion blur
-
-									// Apply circle of confusion
-
-									// Bin this sucker
-									cFragment			=	newFragment();
-									cFragment->xSample	=	(int) floor(tmp[0]);
-									cFragment->ySample	=	(int) floor(tmp[1]);
-									cFragment->z		=	tmp[2];
-
-									
-									if (grid->flags & RASTER_UNSHADED) {
-									} else {
-										movvv(cFragment->data1.color,vertex
-									}
-								}
-							}
 						}
 
+						// Record the fragment
+						cFragment->index		=	index0;
+						cFragment->u			=	(aright / (aright + aleft))*udiv + cu;
+						cFragment->v			=	(atop / (atop + abottom))*vdiv + cv;
+
+						cFragment->next			=	fragments;
+						fragments				=	cFragment;
+						numFragments++;
+
+						// FIXME: Too many fragments can accumulate here, may want to flush them periodically
 					}
 				}
 			}
 		}
 	}
+
+	// If we have fragments waiting, render them
+	if (fragments != NULL)	rasterDrawFragments(grid,fragments);	
 }
