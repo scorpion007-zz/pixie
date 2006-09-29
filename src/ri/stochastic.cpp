@@ -156,6 +156,9 @@ CStochastic::~CStochastic() {
 	}
 }
 
+// static sampling - no patterning over buckets or frames
+CSobol<2>	apertureGenerator;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	rasterBegin
@@ -167,7 +170,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
 	CFragment	*cFragment;
-	CSobol<2>	apertureGenerator;
+	//CSobol<2>	apertureGenerator;
 
 
 	assert(numFragments == 0);
