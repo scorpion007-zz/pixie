@@ -43,7 +43,6 @@
 #include "texture.h"
 #include "raytracer.h"
 #include "stochastic.h"
-#include "zbuffer.h"
 #include "renderer.h"
 #include "patches.h"
 #include "ri.h"
@@ -2652,8 +2651,6 @@ void	CRendererContext::RiWorldBegin(void) {
 		renderer						=	new CRaytracer(currentOptions,currentXform,netClient);
 	else if (strcmp(currentOptions->hider,"stochastic") == 0)
 		renderer						=	new CStochastic(currentOptions,currentXform,netClient);
-	else if (strcmp(currentOptions->hider,"zbuffer") == 0)
-		renderer						=	new CZbuffer(currentOptions,currentXform,netClient);
 	else if (strncmp(currentOptions->hider,"show:",5) == 0)
 		renderer						=	new CShow(currentOptions,currentXform,netClient);
 	else if (strcmp(currentOptions->hider,"photon") == 0)

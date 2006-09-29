@@ -53,20 +53,6 @@ public:
 private:
 
 	///////////////////////////////////////////////////////////////////////
-	// Class				:	CFragment
-	// Description			:	This class holds a sample
-	// Comments				:
-	// Date last edited		:	8/29/2004
-	class	CFragment {
-	public:
-		vector			color;					// Color of the sample
-		vector			opacity;				// Opacity of the sample
-		float			z;						// Depth of the sample
-		CFragment		*next;					// The next fragment wrt. depth
-		CFragment		*prev;					// The previous fragment wrt. depth
-	};
-
-	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPixel
 	// Description			:	This class holds a pixel
 	// Comments				:
@@ -81,20 +67,19 @@ private:
 		float			zold;					// This is the old Z value (for depth filtering)
 		int				numSplats;				// The number of splats to this pixel (used by the avg. depth filter);
 		float			xcent,ycent;			// The center of the sampling window
-		CFragment		first,last;				// The first and last fragments always exist
-		CFragment		*update;				// The last fragment to be saved
+		TFragment		first,last;				// The first and last fragments always exist
+		TFragment		*update;				// The last fragment to be saved
 		float			*extraSamples;			// Pointer to the extra samples array if any
 		COcclusionNode	*node;					// The occlusion sample
 	};
 
 
-	void		filterSamples(int,CFragment **,float *);
+	void		filterSamples(int,TFragment **,float *);
 	void		deepShadowCompute();
 
 	int			totalWidth,totalHeight;
 	CPixel		**fb;
 
-	CFragment	*freeFragments;
 	float		*extraSampleMemory;
 	float		*pixelFilterWeights;
 	

@@ -69,16 +69,7 @@ const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 12;	// Shade the primitive even 
 class	CReyes : public CShadingContext {
 protected:
 
-	///////////////////////////////////////////////////////////////////////
-	//	The misc data structures used in the scan line rendering
-	///////////////////////////////////////////////////////////////////////
-	typedef struct TRasterPrimitive {
-			int					xbound[2],ybound[2];	// The bound on the screen, in samples
-			float				*v0;					// The first vertex index (used for sorting)
-			T64					data[2];				// The data field - primitive dependent data area
-	} TRasterPrimitive;
-
-
+	
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRasterGrid
@@ -94,11 +85,30 @@ protected:
 		int						udiv,vdiv;				// The number of division
 		int						numVertices;			// The number of vertices
 		float					*vertices;				// Array of vertices
-		int						numPrimitives;			// Number of primitives
-		TRasterPrimitive		*primitives;			// Array of primitives on this grid
+		float					*size;					// The point sizes (only for points)
 		int						flags;					// The primitive flags
+		int						refCount;				// The reference counter
+
+		void					attach()	{	refCount++;	}
+		void					detach()	{	refCount--;	if (refCount == 0) delete this;	}
 	};
 
+
+
+	typedef struct TFragment {
+			CRasterGrid		*grid;
+			int				flags;
+
+			// Data1 holds the color of the fragment or the indices of the corners of the triangle in the grid
+			union { 	vector	color;		int		indices[3];		}	data1;
+			// Data2 holds the opacity of the fragment or the weights of the corners of the triangle in the grid
+			union {		vector	opacity;	float	weights[3];		}	data2;
+
+			int				xSample,ySample;			// The coordinates of the fragment in the current bucket
+			float			z;							// Depth of the sample
+			TFragment		*next;						// The next fragment wrt. depth
+			TFragment		*prev;						// The previous fragment wrt. depth
+	};
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -126,6 +136,8 @@ protected:
 								~CBucket();
 
 			CRasterObject		*objects;				// The list of objects waiting to be rendered
+			TFragment			*fragments;				// The fragments waiting to be inserted
+			int					numFragments;			// The number of fragments waiting to be inserted into the framebuffer
 	};
 
 
@@ -238,19 +250,50 @@ protected:
 	int							xSampleOffset,ySampleOffset;					// The amount of offset around each bucket in samples
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
+
+
+								///////////////////////////////////////////////////////////////////////
+								// Class				:	CReyes
+								// Method				:	newFragment
+								// Description			:	Allocate a new fragment
+								// Return Value			:
+								// Comments				:	(inline for speed)
+								// Date last edited		:	9/28/2006
+	TFragment					*newFragment() {
+									TFragment	*cFragment;
+
+									if ((cFragment = fragments) != NULL)	fragments	=	fragments->next;
+									else									return (TFragment *) new char[fragmentSize];
+
+									return cFragment;
+								}
+
+								///////////////////////////////////////////////////////////////////////
+								// Class				:	CReyes
+								// Method				:	deleteFragment
+								// Description			:	Delete a fragment
+								// Return Value			:
+								// Comments				:	(inline for speed)
+								// Date last edited		:	9/28/2006
+	void						deleteFragment(TFragment *cFragment) {
+									cFragment->next	=	fragments;
+									fragments		=	cFragment;
+								}
 private:
 	void						copyPoints(int,float **,float *,int);			// Data movement
 	void						copySamples(int,float **,float *,int);
 
 	void						makeRibbon(int,float *,float *,const float *,const float *,const float *,int);
 
-	CRasterGrid					*newGrid(CSurface *,int,int);					// Create a new grid
+	CRasterGrid					*newGrid(CSurface *,int);						// Create a new grid
 	void						deleteGrid(CRasterGrid *);						// Delete a grid
 	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket
 
 	void						render();										// Render the current bucket
 	void						skip();											// Skip the current bucket
 	
+	void						dice(CRasterGrid *grid);						// The function that dices
+
 	int							numGrids;										// The number of grids allocated
 	int							numObjects;										// The number of objects allocated
 
@@ -276,6 +319,14 @@ private:
 	int							tbucketTop;										// Right of the current bucket in samples
 	int							tbucketRight;
 	int							tbucketBottom;
+
+	int							fragmentSize;									// The size of a fragment in bytes
+	TFragment					*fragments;										// List of free fragments
+
+
+
+
+
 
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	COutput

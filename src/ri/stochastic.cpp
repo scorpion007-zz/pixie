@@ -35,22 +35,6 @@
 #include "memory.h"
 #include "random.h"
 
-static	int	numFragments	=	0;
-
-// This macro is used to allocate fragments
-#define	newFragment(__a)	if (freeFragments == NULL)	{						\
-								__a					=	new CFragment;			\
-							} else {											\
-								__a					=	freeFragments;			\
-								freeFragments		=	freeFragments->next;	\
-							}													\
-							numFragments++;
-
-// And deallocate macro
-#define	deleteFragment(__a)	__a->next				=	freeFragments;			\
-							freeFragments			=	__a;					\
-							numFragments--;
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
@@ -79,9 +63,6 @@ CStochastic::CStochastic(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,0), COcc
 
 		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=numExtraSamples)	cPixel->extraSamples	=	cExtraSample;
 	}
-
-	// Init the fragment buffer
-	freeFragments	=	NULL;
 
 	// Initialize the occlusion culler
 	initCuller(max(totalWidth,totalHeight), &maxDepth);
@@ -135,7 +116,6 @@ CStochastic::CStochastic(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,0), COcc
 // Date last edited		:	7/31/2002
 CStochastic::~CStochastic() {
 	int			i;
-	CFragment	*cFragment;
 	
 	// Ditch the pixel filter
 	delete[] pixelFilterWeights;
@@ -148,12 +128,6 @@ CStochastic::~CStochastic() {
 		delete [] fb[i];
 	}
 	delete [] fb;
-
-	// Ditch the extra fragments
-	while((cFragment = freeFragments) != NULL) {
-		freeFragments	=	cFragment->next;
-		delete cFragment;
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -166,11 +140,8 @@ CStochastic::~CStochastic() {
 void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
-	CFragment	*cFragment;
+	TFragment	*cFragment;
 	CSobol<2>	apertureGenerator;
-
-
-	assert(numFragments == 0);
 
 
 	switch(depthFilter) {
@@ -250,15 +221,15 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 
 			cFragment					=	&pixel->last;
 			cFragment->z				=	clipMax;
-			initv(cFragment->color,0);
-			initv(cFragment->opacity,0);
+			initv(cFragment->data1.color,0);
+			initv(cFragment->data2.opacity,0);
 			cFragment->next				=	NULL;
 			cFragment->prev				=	&pixel->first;
 
 			cFragment					=	&pixel->first;
 			cFragment->z				=	-C_INFINITY;
-			initv(cFragment->color,0);
-			initv(cFragment->opacity,0);
+			initv(cFragment->data1.color,0);
+			initv(cFragment->data2.opacity,0);
 			cFragment->next				=	&pixel->last;
 			cFragment->prev				=	NULL;
 			
@@ -281,129 +252,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 // Comments				:
 // Date last edited		:	7/31/2002
 void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
-// Instantiate the dispatch switch
-#define DEFINE_STOCHASTIC_SWITCH
-	#include "stochasticPrimitives.h"
-#undef DEFINE_STOCHASTIC_SWITCH
 }
-
-// Instantiate the rasterization functions
-
-
-#define depthFilterIfZMin()
-#define depthFilterElseZMin()
-
-#define depthFilterIfZMax()		pixel->zold		=	max(pixel->zold,z);
-#define depthFilterElseZMax()	else {	pixel->zold	=	max(pixel->zold,z);	}
-
-#define depthFilterIfZAvg()		pixel->zold		+=	z; pixel->numSplats++;
-#define depthFilterElseZAvg()	else {	pixel->zold	+=	z; pixel->numSplats++;	}
-
-#define depthFilterIfZMid()		pixel->zold		=	pixel->z;
-#define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
-
-#define lodExtraVariables()		const float importance = grid->object->attributes->lodImportance;
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//   There are two sets of parameters, for triangles and for points
-//      Within each set, some parameters are only required when there is motion blur, depth of field etc.
-//      The macros below define local variables for each set, so that we do not end up with a huge amount
-//      of unused variables. This not only makes the compiler happy, but also produces leaner code
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-// Triangle drawing local variables
-#define triExtraVariables()			const	int					*xbound;							\
-									const	int					*ybound;							\
-									const	float				*v0,*v0c;							\
-									const	float				*v1,*v1c;							\
-									const	float				*v2,*v2c;							\
-									const	float				*dv0,*dv1,*dv2;						\
-									float						a;
-
-#define movTriExtraVariables()		vector						v0movTmp,v1movTmp,v2movTmp;
-#define focTriExtraVariables()		vector						v0focTmp,v1focTmp,v2focTmp;
-#define transTriExtraVariables()	const float					*v0o,*v1o,*v2o;
-
-// Point drawing local variables
-#define ptExtraVariables()			const	float				*v0,*v0c;							\
-									const	float				*dv0;
-
-#define movPtExtraVariables()		vector						v0movTmp;
-#define focPtExtraVariables()		vector						v0focTmp;
-#define transPtExtraVariables()		const float					*v0o;
-
-// Common local variables
-#define drawGridHeader() 																			\
-	const	int					xres				=	sampleWidth - 1;							\
-	const	int					yres				=	sampleHeight - 1;							\
-	const	TRasterPrimitive	*cPrimitive;														\
-	const	int					sampleDisplacement	=	numExtraSamples + 10;						\
-	int							xmin,xmax,ymin,ymax,x,y;											\
-	int							numPrimitives;
-
-// This macro is used to insert a fragment into the linked list for a pixel
-#define	findSample(__dest,__z) { 																	\
-	CFragment *lSample	=	pixel->update;															\
-	if (__z >= lSample->z)	{																		\
-		CFragment		*cSample;																	\
-		for (cSample=lSample->next;__z >= cSample->z;lSample=cSample,cSample=cSample->next);		\
-		assert(__z >= lSample->z);																	\
-		assert(__z <= cSample->z);																	\
-		newFragment(__dest);																		\
-		__dest->next	=	cSample;																\
-		__dest->prev	=	lSample;																\
-		cSample->prev	=	__dest;																	\
-		lSample->next	=	__dest;																	\
-	} else {																						\
-		CFragment		*cSample;																	\
-		for (cSample=lSample->prev;__z < cSample->z;lSample=cSample,cSample=cSample->prev);			\
-		assert(__z >= cSample->z);																	\
-		assert(__z <= lSample->z);																	\
-		newFragment(__dest);																		\
-		__dest->next	=	lSample;																\
-		__dest->prev	=	cSample;																\
-		cSample->next	=	__dest;																	\
-		lSample->prev	=	__dest;																	\
-	}																								\
-	pixel->update	=	__dest;																		\
-}
-
-
-	// This macro is called when an opaque fragment is inserted
-#define updateOpaque() {																			\
-	CFragment *cSample=pixel->last.prev;															\
-	while(cSample->z > z) {																			\
-		CFragment *nSample				=	cSample->prev;											\
-		nSample->next		=	&pixel->last;														\
-		pixel->last.prev	=	nSample;															\
-		assert(cSample != &pixel->first);															\
-		deleteFragment(cSample);																	\
-		cSample				=	nSample;															\
-	}																								\
-	pixel->update			=	cSample;															\
-}
-
-
-#define DEFINE_STOCHASTIC_FUNCTIONS
-#include "stochasticPrimitives.h"
-#undef DEFINE_STOCHASTIC_FUNCTIONS
-
-#undef depthFilterIfZMin
-#undef depthFilterElseZMin
-#undef depthFilterIfZMax
-#undef depthFilterElseZMax
-#undef depthFilterIfZAvg
-#undef depthFilterElseZAvg
-#undef depthFilterIfZMid
-#undef depthFilterElseZMid
-#undef lodExtraVariables
-#undef drawGridHeader
-#undef findSample
-#undef updateOpaque
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -447,8 +296,8 @@ void		CStochastic::rasterEnd(float *fb2) {
 		vector	ropacity;
 
 		for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
-			CFragment	*cSample	=	cPixel->first.next;
-			CFragment	*oSample;
+			TFragment	*cSample	=	cPixel->first.next;
+			TFragment	*oSample;
 			float		*C			=	&cFb[2];
 			float		*O			=	&cFb[5];
  
@@ -461,10 +310,10 @@ void		CStochastic::rasterEnd(float *fb2) {
 			// cPixel->last ise really used, but cPixel->first is not (it's always skipped in the composite),
 			// so this is safe to do
 			
-			if (cPixel->first.opacity[0] >= 0 || cPixel->first.opacity[1] >= 0 || cPixel->first.opacity[2] >= 0) { 		// Pixel has no Matte
+			if (cPixel->first.data2.opacity[0] >= 0 || cPixel->first.data2.opacity[1] >= 0 || cPixel->first.data2.opacity[2] >= 0) { 		// Pixel has no Matte
 				// Get the base color and opacity
-				movvv(C,cSample->color);
-				movvv(O,cSample->opacity);
+				movvv(C,cSample->data1.color);
+				movvv(O,cSample->data2.opacity);
 				ropacity[0]	=	1-O[0];
 				ropacity[1]	=	1-O[1];
 				ropacity[2]	=	1-O[2];
@@ -473,8 +322,8 @@ void		CStochastic::rasterEnd(float *fb2) {
 				cSample		=	cSample->next;
 				for (;cSample!=NULL;) {
 					deleteFragment(oSample);
-					const float	*color		= cSample->color;
-					const float *opacity	= cSample->opacity;
+					const float	*color		= cSample->data1.color;
+					const float *opacity	= cSample->data2.opacity;
 	
 					// Composite
 					C[0]		+=	ropacity[0]*color[0];
@@ -494,18 +343,18 @@ void		CStochastic::rasterEnd(float *fb2) {
 			else {
 				
 				// Get the base color and opacity
-				if (cSample->opacity[0] < 0 || cSample->opacity[1] < 0 || cSample->opacity[2] < 0) {
+				if (cSample->data2.opacity[0] < 0 || cSample->data2.opacity[1] < 0 || cSample->data2.opacity[2] < 0) {
 					// Matte base sample
 					initv(C,0);
 					initv(O,0);
-					ropacity[0]	=	1+cSample->opacity[0];
-					ropacity[1]	=	1+cSample->opacity[1];
-					ropacity[2]	=	1+cSample->opacity[2];
+					ropacity[0]	=	1+cSample->data2.opacity[0];
+					ropacity[1]	=	1+cSample->data2.opacity[1];
+					ropacity[2]	=	1+cSample->data2.opacity[2];
 				}
 				else {
 					// Non-matte base sample
-					movvv(C,cSample->color);
-					movvv(O,cSample->opacity);
+					movvv(C,cSample->data1.color);
+					movvv(O,cSample->data2.opacity);
 					ropacity[0]	=	1-O[0];
 					ropacity[1]	=	1-O[1];
 					ropacity[2]	=	1-O[2];
@@ -516,8 +365,8 @@ void		CStochastic::rasterEnd(float *fb2) {
 				cSample		=	cSample->next;
 				for (;cSample!=NULL;) {
 					deleteFragment(oSample);
-					const float	*color		= cSample->color;
-					const float *opacity	= cSample->opacity;
+					const float	*color		= cSample->data1.color;
+					const float *opacity	= cSample->data2.opacity;
 	
 					if (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0) {
 						// Composite Matte
@@ -820,7 +669,7 @@ inline	void	finishSample(float cZ,const float *opacity) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/1/2003
-void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weights) {
+void			CStochastic::filterSamples(int numSamples,TFragment **samples,float *weights) {
 	int		minSample		=	0;
 	int		i;
 	vector	opacity;
@@ -839,16 +688,16 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 	// Filter / output pixels incrementally
 	while(TRUE) {
 		int				stop		=	FALSE;							// TRUE when the opacity drops below 0
-		const CFragment	*cSample	=	samples[minSample];
+		const TFragment	*cSample	=	samples[minSample];
 		const float		cZ			=	cSample->z;						// The current Z coordinate
 		float			*oldOpacity	=	weights + (minSample<<2);
 		vector			newOpacity;
 
 		outSample(cZ,opacity);
 
-		newOpacity[0]				=	oldOpacity[1]*(1-cSample->opacity[0]);
-		newOpacity[1]				=	oldOpacity[2]*(1-cSample->opacity[1]);
-		newOpacity[2]				=	oldOpacity[3]*(1-cSample->opacity[2]);
+		newOpacity[0]				=	oldOpacity[1]*(1-cSample->data2.opacity[0]);
+		newOpacity[1]				=	oldOpacity[2]*(1-cSample->data2.opacity[1]);
+		newOpacity[2]				=	oldOpacity[3]*(1-cSample->data2.opacity[2]);
 
 		opacity[0]					+=	(newOpacity[0] - oldOpacity[1])*oldOpacity[0];
 		opacity[1]					+=	(newOpacity[1] - oldOpacity[2])*oldOpacity[0];
@@ -922,8 +771,8 @@ void		CStochastic::deepShadowCompute() {
 	int			prevFilePos;
 	int			numSamples;
 	int			x,y;
-	CFragment	**samples;
-	CFragment	**fSamples;
+	TFragment	**samples;
+	TFragment	**fSamples;
 	float		*fWeights;
 
 	memBegin();
@@ -931,8 +780,8 @@ void		CStochastic::deepShadowCompute() {
 	prevFilePos		=	ftell(deepShadowFile);
 
 	// Allocate the memory for misc junk
-	samples			=	(CFragment **)	ralloc(totalHeight*totalWidth*sizeof(CFragment*));
-	fSamples		=	(CFragment **)	ralloc(filterWidth*filterHeight*sizeof(CFragment*));
+	samples			=	(TFragment **)	ralloc(totalHeight*totalWidth*sizeof(TFragment*));
+	fSamples		=	(TFragment **)	ralloc(filterWidth*filterHeight*sizeof(TFragment*));
 	fWeights		=	(float *)		ralloc(filterWidth*filterHeight*sizeof(float)*4);
 
 	// Init the samples

@@ -550,10 +550,6 @@
 				RelativePath="..\..\..\..\src\ri\xform.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbuffer.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -870,18 +866,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\xform.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbuffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbufferPoint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbufferTriangle.h"
 				>
 			</File>
 		</Filter>
