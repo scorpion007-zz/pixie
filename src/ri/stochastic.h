@@ -34,6 +34,7 @@
 #include "common/global.h"
 #include "reyes.h"
 #include "occlusion.h"
+#include "random.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -101,6 +102,8 @@ private:
 	int			width,height;
 	int			top,left,right,bottom;
 	int			sampleWidth,sampleHeight;
+	
+	CSobol<2>	apertureGenerator;
 	
 	// Define prototypes for the rasterization functions
 	

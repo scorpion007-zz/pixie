@@ -59,7 +59,8 @@ static	int	numFragments	=	0;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-CStochastic::CStochastic(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,0), COcclusionCuller() {
+CStochastic::CStochastic(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,0), COcclusionCuller(),
+	apertureGenerator(frame) {
 	int		i,j,sx,sy;
 	float	*cExtraSample;
 	CPixel	*cPixel;
@@ -155,9 +156,6 @@ CStochastic::~CStochastic() {
 		delete cFragment;
 	}
 }
-
-// static sampling - no patterning over buckets or frames
-CSobol<2>	apertureGenerator;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
