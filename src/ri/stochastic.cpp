@@ -219,18 +219,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CStochastic
-// Method				:	rasterDrawFragments
-// Description			:	Insert bunch of fragments into the framebuffer
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	7/31/2002
-void		CStochastic::rasterDrawFragments(CRasterGrid *grid,TFragment *fragments) {
-	TFragment	*cFragment;
+void		CStochastic::rasterDrawGrid(CRasterGrid *grid) {
 
 
 #define depthFilterIfZMin()
@@ -246,14 +235,29 @@ void		CStochastic::rasterDrawFragments(CRasterGrid *grid,TFragment *fragments) {
 #define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
 
 
+#define		DISPATCH
+#include	"stochasticSwitch.h"
+#undef		DISPATCH
 
 
-#define depthFilterIf()		depthFilterIfZMid()
-#define depthFilterElse()	depthFilterElseZMid()
-#include "stochasticFragment.h"
-#undef depthFilterIf
-#undef depthFilterElse
+#undef depthFilterIfZMin()
+#undef depthFilterElseZMin()
+
+#undef depthFilterIfZMax()		pixel->zold		=	max(pixel->zold,z);
+#undef depthFilterElseZMax()	else {	pixel->zold	=	max(pixel->zold,z);	}
+
+#undef depthFilterIfZAvg()		pixel->zold		+=	z; pixel->numSplats++;
+#undef depthFilterElseZAvg()	else {	pixel->zold	+=	z; pixel->numSplats++;	}
+
+#undef depthFilterIfZMid()		pixel->zold		=	pixel->z;
+#undef depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
 }
+
+
+#define		CODE
+#include "stochasticSwitch.h"
+#undef		CODE
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic

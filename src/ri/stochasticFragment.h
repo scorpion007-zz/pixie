@@ -22,7 +22,144 @@
 //
 ///////////////////////////////////////////////////////////////////////
 
-// This is the portion of Pixie that inserts a fragment into the framebuffer
+// This is the portion of Pixie that rasterizes a grid into the framebuffer
+
+
+
+
+
+// Some necessary local info
+const int	left				=	this->left;
+const int	top					=	this->top;
+const int	right				=	left + width;
+const int	bottom				=	top + height;
+TFragment	*fragments			=	NULL;
+int			numFragments		=	0;
+
+if (grid->dim == 2) {
+	int				i,j,ii,jj;
+	const int		udiv		=	grid->udiv;
+	const int		vdiv		=	grid->vdiv;
+	const float		*vertices	=	grid->vertices;
+
+	for (j=0;j<vdiv;j++) {
+		for (i=0;i<udiv;i++) {
+			const int	index0		=	j*(udiv+1) + i;
+			const int	index1		=	j*(udiv+1) + i + 1;
+			const int	index2		=	(j + 1)*(udiv+1) + i;
+			const int	index3		=	(j + 1)*(udiv+1) + i + 1;
+			const float	*vertex0	=	vertices + index0*numVertexSamples;
+			const float	*vertex1	=	vertices + index1*numVertexSamples;
+			const float	*vertex2	=	vertices + index2*numVertexSamples;
+			const float	*vertex3	=	vertices + index3*numVertexSamples;
+			vector		tmp;
+			int			mudiv,mvdiv,k;	// Micro division amount
+
+			// FIXME: We can check if we can cull the quad for this bucket
+
+
+			// Compute the micro subdivision amount
+			subvv(tmp,vertex1,vertex0);
+			mudiv	=	(int) ceil(lengthv(tmp));
+			subvv(tmp,vertex3,vertex2);
+			k	=	(int) ceil(lengthv(tmp));
+			if (k > mudiv)	mudiv	=	k;
+			subvv(tmp,vertex2,vertex0);
+			mvdiv	=	(int) ceil(lengthv(tmp));
+			subvv(tmp,vertex3,vertex1);
+			k	=	(int) ceil(lengthv(tmp));
+			if (k > mvdiv)	mvdiv	=	k;
+
+			assert(mudiv >= 1);
+			assert(mvdiv >= 1);
+
+
+			// Compute the microquads
+			const float	du	=	1 / (float) mudiv;
+			const float	dv	=	1 / (float) mvdiv;
+			float		cu,cv;
+			for (cv=0,jj=0;jj<udiv;jj++,cv+=dv) {
+				for (cu=0,ii=0;ii<udiv;ii++,cu+=du) {
+					vector		v0,v1,v2,v3;
+					TFragment	*cFragment;
+
+					// Compute the corners of the microquads
+#define corner(__c,__u,__v)	__c[0]	=	((vertex1[0] - vertex0[0])*(__u) + vertex0[0])*(1 - (__v)) + 	((vertex3[0] - vertex2[0])*(__u) + vertex2[0])*(__v);	\
+						__c[1]	=	((vertex1[1] - vertex0[1])*(__u) + vertex0[1])*(1 - (__v)) + 	((vertex3[1] - vertex2[1])*(__u) + vertex2[1])*(__v);	\
+						__c[2]	=	((vertex1[2] - vertex0[2])*(__u) + vertex0[2])*(1 - (__v)) + 	((vertex3[2] - vertex2[2])*(__u) + vertex2[2])*(__v);
+
+					corner(v0,cu,cv);
+					corner(v1,cu+du,cv);
+					corner(v2,cu,cv+dv);
+					corner(v3,cu+du,cv+dv);
+
+#undef corner
+
+					// FIXME: apply MB / DOF
+
+
+
+					addvv(tmp,v0,v1);
+					addvv(tmp,v2);
+					addvv(tmp,v3);
+					mulvf(tmp,0.25f);
+
+					const int	x	=	(int) tmp[0];
+					const int	y	=	(int) tmp[1];
+
+					if (x < left)		continue;					
+					if (y < top)		continue;
+					if (x >= right)		continue;
+					if (y >= bottom)	continue;
+
+					cFragment				=	newFragment();		// Allocate the fragment
+					cFragment->xSample		=	x - left;			// The coordinate of the fragment in the current bucket
+					cFragment->ySample		=	y - top;
+					cFragment->z			=	tmp[2];				// The depth of the fragment
+
+					
+					// Check if the fragment is inside the quad
+					const float	xSample		=	cFragment->xSample + 0.5f;
+					const float	ySample		=	cFragment->ySample + 0.5f;
+					float		atop,abottom,aleft,aright;
+
+					if (area(v0[0],v0[1],v1[0],v2[1],v3[0],v3[1]) > 0) {
+						
+
+						// FIXME: Check front/back visibility
+
+						if ((atop		= area(xSample,ySample,v0[0],v0[1],v1[0],v1[1])) < 0) continue;
+						if ((aright		= area(xSample,ySample,v1[0],v1[1],v3[0],v3[1])) < 0) continue;
+						if ((abottom	= area(xSample,ySample,v3[0],v3[1],v2[0],v2[1])) < 0) continue;
+						if ((aleft		= area(xSample,ySample,v2[0],v2[1],v0[0],v0[1])) < 0) continue;
+
+					} else {
+						float	atop,abottom,aleft,aright;
+
+						// FIXME: Check front/back visibility
+
+						if ((atop		= area(xSample,ySample,v0[0],v0[1],v1[0],v1[1])) > 0) continue;
+						if ((aright		= area(xSample,ySample,v1[0],v1[1],v3[0],v3[1])) > 0) continue;
+						if ((abottom	= area(xSample,ySample,v3[0],v3[1],v2[0],v2[1])) > 0) continue;
+						if ((aleft		= area(xSample,ySample,v2[0],v2[1],v0[0],v0[1])) > 0) continue;
+
+					}
+
+					// Record the fragment
+					cFragment->index		=	index0;
+					cFragment->u			=	(aright / (aright + aleft))*udiv + cu;
+					cFragment->v			=	(atop / (atop + abottom))*vdiv + cv;
+
+					cFragment->next			=	fragments;
+					fragments				=	cFragment;
+					numFragments++;
+
+					// FIXME: Too many fragments can accumulate here, may want to flush them periodically
+				}
+			}
+		}
+	}
+/*
 
 while((cFragment = fragments) != NULL) {
 
@@ -111,14 +248,14 @@ while((cFragment = fragments) != NULL) {
 #define drawPixelCheck()															\
 	if (z < pixel->z || (grid->flags & RASTER_SHADE_HIDDEN)) {						\
 		shadeGrid(grid,FALSE);														\
-		rasterDrawFragments(frid,cFragment);										\
+		rasterDrawGrid(grid);														\
 		return;																		\
 	} depthFilterElse();
 #else
 #define drawPixelCheck()															\
 	if (z < pixel->z) {																\
 		shadeGrid(grid,FALSE);														\
-		rasterDrawFragments(frid,cFragment);										\
+		rasterDrawGrid(grid);														\
 		return;																		\
 	} depthFilterElse();
 #endif // undercull
@@ -147,5 +284,5 @@ while((cFragment = fragments) != NULL) {
 #undef	lodCheck
 #undef	drawPixelCheck
 #undef	drawPixel
-
+*/
 }

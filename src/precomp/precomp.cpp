@@ -615,189 +615,49 @@ int	precomputeExplosionData() {
 }
 
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	ouputStochasticFuntionName
-// Description			:	write out the function name for rasterization functions
-// Return Value			:	
-// Comments				:
-// Date last edited		:	11/06/2005
-void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
-	if (i & RASTER_POINT)
-		fprintf(out,"drawPointGrid");
-	else
-		fprintf(out,"drawTriangleGrid");
-	
-	switch(i >> RASTER_HIGHBITS_SHIFT) {
-	case DEPTH_MIN:
-		fprintf(out,"Zmin");
-		break;
-	case DEPTH_MAX:
-		fprintf(out,"Zmax");
-		break;
-	case DEPTH_AVG:
-		fprintf(out,"Zavg");
-		break;
-	case DEPTH_MID:
-		fprintf(out,"Zmid");
-		break;
-	}
-	
-	if (i & RASTER_UNSHADED)		fprintf(out,"Unshaded");
-	if (i & RASTER_MOVING)			fprintf(out,"Moving");
-	if (i & RASTER_TRANSPARENT)		fprintf(out,"Transparent");
-	if (i & RASTER_FOCALBLUR)		fprintf(out,"DepthBlur");
-	if (i & RASTER_EXTRASAMPLES)	fprintf(out,"ExtraSamples");
-	if (i & RASTER_MATTE)			fprintf(out,"Matte");
-	if (i & RASTER_LOD)				fprintf(out,"LOD");
-	if (i & RASTER_UNDERCULL)		fprintf(out,"Undercull");
-}
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	precomputeStochasticPrimitivesH
-// Description			:	Compute stochastic.h
+// Function				:	main
+// Description			:	Do the thing baby
 // Return Value			:	0 on success, 1 on failure
 // Comments				:
 // Date last edited		:	10/27/2002
-int		precomputeStochasticPrimitivesH() {
-	#ifdef _WIN32
-		FILE	*out	=	fopen("..\\src\\ri\\stochasticFunctions.h","w");
-	#else
-		FILE	*out	=	fopen("../ri/stochasticFunctions.h","w");
-	#endif
-	int		i;
+int		genUnroll(const char *fileName,int numConditions,char **conditions,char **definitions,char **undefinitions,const char *code) {
+	FILE	*out	=	fopen(fileName,"w");
+	int		i,j,k;
 
-	if (out == NULL) return TRUE;
-	
-	fprintf(out,"//Internally generated header file.\n//Do not mess with it\n\n");
+	if (out == NULL)	return FALSE;
 
-	// Instantiate the dispatch switch
-	
-	fprintf(out,"#ifdef DEFINE_STOCHASTIC_SWITCH\n");
-	
-	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | (depthFilter << RASTER_HIGHBITS_SHIFT)) {\n");
-	const int caseEnumeration = RASTER_GLOBAL_MASK | (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT);
-	for (i=0;i<=caseEnumeration;i++) {
-		fprintf(out,"case %d:\n",i);
-		
-		// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
-		// but we leave the case in as it can help the compiler generate a fast switch statement
-		// Shaded grids never have RASTER_UNDERCULL
-		if (i & RASTER_UNSHADED) {
-			if ((i & RASTER_MATTE) || (i & RASTER_TRANSPARENT)  || (i & RASTER_LOD)) {
-				fprintf(out,"\tbreak;\n");
-				continue;
-			}
-		} else {
-			if (i & RASTER_UNDERCULL) {
-				fprintf(out,"\tbreak;\n");
-				continue;
-			}
-		}
-		
-		// output the function name
-		fprintf(out,"\t");
-		ouputStochasticFuntionName(out,i);
-
-		fprintf(out,"(grid);\n");
-
-		fprintf(out,"\tbreak;\n");
-	}
-	fprintf(out,"default:\n");
-	fprintf(out,"\tbreak;\n");
-	fprintf(out,"}\n");
-	
+	fprintf(out,"#ifdef PROTOTYPE\n");
+	for (i=0;i<(1<<numConditions);i++) 	fprintf(out,"void	stochastic%d(CRasterGrid *);\n",i);
 	fprintf(out,"#endif\n");
-	
-	// Instantiate the functions and the function prototypes
-	
-	for (int j = 0; j < 2; j++){
-		if(j)	fprintf(out,"#ifdef DEFINE_STOCHASTIC_FUNPROTOS\n");
-		else	fprintf(out,"#ifdef DEFINE_STOCHASTIC_FUNCTIONS\n");
-		
-		for (i=0;i<=caseEnumeration;i++) {
-			// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
-			// so we don't have to generate functions for those combinations
-			// Unshaded grids are the only ones which can be underculled
-			if (i & RASTER_UNSHADED) {
-				if ((i & RASTER_MATTE) || (i & RASTER_TRANSPARENT)  || (i & RASTER_LOD)) {
-					continue;
-				}
-			} else {
-				if (i & RASTER_UNDERCULL) {
-					continue;
-				}
-			}
-	
-			// output the function name
-			if (j)	fprintf(out,"void ");
-			else	fprintf(out,"void CStochastic::");
-			ouputStochasticFuntionName(out,i);
-			fprintf(out,"(CRasterGrid *grid)");
-			if (j) {
-				fprintf(out,";\n");
-				continue;
-			}
-			
-			// when instantiating the functions, write out the body			
-			fprintf(out,"{\n");
-			
-			if (i & RASTER_MOVING)			fprintf(out,"\t#define STOCHASTIC_MOVING\n");
-			if (i & RASTER_TRANSPARENT)		fprintf(out,"\t#define STOCHASTIC_TRANSPARENT\n");
-			if (i & RASTER_UNSHADED)		fprintf(out,"\t#define STOCHASTIC_UNSHADED\n");
-			if (i & RASTER_FOCALBLUR)		fprintf(out,"\t#define STOCHASTIC_FOCAL_BLUR\n");
-			if (i & RASTER_EXTRASAMPLES)	fprintf(out,"\t#define STOCHASTIC_EXTRA_SAMPLES\n");
-			if (i & RASTER_MATTE)			fprintf(out,"\t#define STOCHASTIC_MATTE\n");
-			if (i & RASTER_LOD)				fprintf(out,"\t#define STOCHASTIC_LOD\n");
-			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#define STOCHASTIC_UNDERCULL\n");
 
-			// Define the depth filter macros
-			switch(i >> RASTER_HIGHBITS_SHIFT) {
-			case DEPTH_MIN:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMin()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMin()\n");
-				break;
-			case DEPTH_MAX:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMax()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMax()\n");
-				break;
-			case DEPTH_AVG:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZAvg()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZAvg()\n");
-				break;
-			case DEPTH_MID:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMid()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMid()\n");
-				break;
-			}
-
-			// Output the functions variables & define the switches for the primitive
-			fprintf(out,"\n\tdrawGridHeader()\n");
-
-			if (i & RASTER_LOD)			fprintf(out,"\tlodExtraVariables()\n");
-	
-			fprintf(out,"\t}\n");
-			
-			fprintf(out,"\t#undef depthFilterIf\n");
-			fprintf(out,"\t#undef depthFilterElse\n");
-			
-		
-			if (i & RASTER_MOVING)			fprintf(out,"\t#undef STOCHASTIC_MOVING\n");
-			if (i & RASTER_TRANSPARENT)		fprintf(out,"\t#undef STOCHASTIC_TRANSPARENT\n");
-			if (i & RASTER_UNSHADED)		fprintf(out,"\t#undef STOCHASTIC_UNSHADED\n");
-			if (i & RASTER_FOCALBLUR)		fprintf(out,"\t#undef STOCHASTIC_FOCAL_BLUR\n");
-			if (i & RASTER_EXTRASAMPLES)	fprintf(out,"\t#undef STOCHASTIC_EXTRA_SAMPLES\n");
-			if (i & RASTER_MATTE)			fprintf(out,"\t#undef STOCHASTIC_MATTE\n");
-			if (i & RASTER_LOD)				fprintf(out,"\t#undef STOCHASTIC_LOD\n");
-			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#undef STOCHASTIC_UNDERCULL\n");
-	
-			fprintf(out,"}\n");
-		}
-		
-		fprintf(out,"#endif\n");
+	fprintf(out,"#ifdef DISPATCH\n");
+	fprintf(out,"\tint	conditionTracker=0;\n");
+	for (i=0;i<numConditions;i++) fprintf(out,"\t%s conditionTracker |= %d;\n",conditions[i],1<<i);
+	fprintf(out,"\tswitch(conditionTracker) {\n");
+	for (j=0;j<(1<<i);j++) {
+		fprintf(out,"\t\tstochastic%d(grid);\n",j);
+		fprintf(out,"\t\tbreak;\n");
 	}
+	fprintf(out,"\t}\n");
+	fprintf(out,"#endif\n");
+
+
+	fprintf(out,"#ifdef CODE\n");
+	for (j=0;j<(1<<i);j++) {
+		fprintf(out,"void CStochastic::stochastic%d(CRasterGrid *grid){\n",j);
+		for (k=0;k<i;k++)	if (j & (1 << k))	fprintf(out,"\t\t%s\n",definitions[k]);
+		fprintf(out,"\n\n\t\t%s\t\n\n\n",code);
+		for (k=0;k<i;k++)	if (j & (1 << k))	fprintf(out,"\t\t%s\n",undefinitions[k]);
+		fprintf(out,"}\n");
+	}
+	fprintf(out,"#endif\n");
+
 
 	fclose(out);
-	return FALSE;
+
+	return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -824,9 +684,54 @@ int	main(int argc,char *argv[]) {
 	}
 	*/
 
-	if (precomputeStochasticPrimitivesH() == TRUE) {
-		return 1;
+	{
+		const	int		numCond	=	13;
+		char	*cond[numCond]	=	{	"if (grid->flags & RASTER_TRANSPARENT)	",
+										"if (grid->flags & RASTER_UNSHADED)		",
+										"if (grid->flags & RASTER_EXTRASAMPLES)	",
+										"if (grid->flags & RASTER_MOVING)		",
+										"if (grid->flags & RASTER_POINT)			",
+										"if (grid->flags & RASTER_FOCALBLUR)		",
+										"if (grid->flags & RASTER_MATTE)			",
+										"if (grid->flags & RASTER_LOD)			",
+										"if (grid->flags & RASTER_UNDERCULL)		",
+										"if (depthFilter == DEPTH_MIN)		",
+										"if (depthFilter == DEPTH_MAX)		",
+										"if (depthFilter == DEPTH_AVG)		",
+										"if (depthFilter == DEPTH_MID)		"	};
+
+		char	*def[numCond]	=	{	"#define	HIDDEN_TRANSPARENT",
+										"#define	HIDDEN_UNSHADED",
+										"#define	HIDDEN_EXTRASAMPLES",
+										"#define	HIDDEN_MOVING",
+										"#define	HIDDEN_POINT",
+										"#define	HIDDEN_FOCALBLUR",
+										"#define	HIDDEN_MATTE",
+										"#define	HIDDEN_LOD",
+										"#define	HIDDEN_UNDERCULL",
+										"#define	depthFilterIf()	depthFilterIfMin()\n\t\t#define	depthFilterElse()	depthFilterElseMin()",	
+										"#define	depthFilterIf()	depthFilterIfMax()\n\t\t#define	depthFilterElse()	depthFilterElseMax()",	
+										"#define	depthFilterIf()	depthFilterIfAvf()\n\t\t#define	depthFilterElse()	depthFilterElseAvg()",	
+										"#define	depthFilterIf()	depthFilterIfMid()\n\t\t#define	depthFilterElse()	depthFilterElseMid()",			
+																		};
+
+		char	*undef[numCond]	=	{	"#undef	HIDDEN_TRANSPARENT",
+										"#undef	HIDDEN_UNSHADED",
+										"#undef	HIDDEN_EXTRASAMPLES",
+										"#undef	HIDDEN_MOVING",
+										"#undef	HIDDEN_POINT",
+										"#undef	HIDDEN_FOCALBLUR",
+										"#undef	HIDDEN_MATTE",
+										"#undef	HIDDEN_LOD",
+										"#undef	HIDDEN_UNDERCULL",
+										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse",
+										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse",
+										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse",
+										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse"	};
+		
+		genUnroll("..\\src\\ri\\stochasticSwitch.h",numCond,cond,def,undef,"#include \"stochasticFragment.h\"");
 	}
+
 
 	memShutdown();
 

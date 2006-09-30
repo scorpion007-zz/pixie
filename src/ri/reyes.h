@@ -232,8 +232,7 @@ public:
 
 								// The following functions must be overriden by the child rasterizer
 	virtual	void				rasterBegin(int,int,int,int)					=	0;
-	virtual	void				rasterDrawPrimitives(CRasterGrid *)				=	0;
-	virtual	void				rasterDrawFragments(CRasterGrid *,TFragment *)	=	0;
+	virtual	void				rasterDrawGrid(CRasterGrid *)					=	0;
 	virtual	void				rasterEnd(float *)								=	0;
 	
 	
@@ -246,6 +245,7 @@ protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 	float						culledDepth;									// The depth of the closest culled object
 	int							xSampleOffset,ySampleOffset;					// The amount of offset around each bucket in samples
+	int							numVertexSamples;								// The number of samples per pixel
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
 
@@ -289,15 +289,11 @@ private:
 
 	void						render();										// Render the current bucket
 	void						skip();											// Skip the current bucket
-	
-	void						dice(CRasterGrid *grid);						// The function that dices
 
 	int							numGrids;										// The number of grids allocated
 	int							numObjects;										// The number of objects allocated
 
 	CBucket						***buckets;										// All buckets
-
-	int							numVertexSamples;								// The number of samples per pixel
 	int							enableMotionBlur;								// TRUE if the motion blur has to be enabled
 	int							extraPrimitiveFlags;							// These are the extra primitive flags
 	int							xBucketsMinusOne;								// xBuckets-1

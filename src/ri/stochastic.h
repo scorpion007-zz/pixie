@@ -48,8 +48,7 @@ public:
 
 				// The functions inherited from the CReyes
 	void		rasterBegin(int,int,int,int);
-	void		rasterDrawPrimitives(CRasterGrid *);
-	void		rasterDrawFragments(CRasterGrid *,TFragment *);
+	void		rasterDrawGrid(CRasterGrid *);
 	void		rasterEnd(float *);
 private:
 
@@ -85,10 +84,9 @@ private:
 	int			sampleWidth,sampleHeight;
 	
 	// Define prototypes for the rasterization functions
-	
-	#define DEFINE_STOCHASTIC_FUNPROTOS
-	#include "stochasticPrimitives.h"
-	#undef DEFINE_STOCHASTIC_FUNPROTOS
+	#define		PROTOTYPE
+	#include	"stochasticSwitch.h"
+	#undef		PROTOTYPE
 };
 
 #endif
