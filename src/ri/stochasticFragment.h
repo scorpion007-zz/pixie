@@ -24,24 +24,18 @@
 
 // This is the portion of Pixie that inserts a fragment into the framebuffer
 
-#ifdef STOCHASTIC_LOD
-	#define lodCheck()																				\
-		if (importance >= 0) {																		\
-			if (pixel->jimp > importance)		continue;											\
-		} else {																					\
-			if ((1-pixel->jimp) >= -importance)	continue;											\
-		}
-#else
-	#define lodCheck()
-#endif
+while((cFragment = fragments) != NULL) {
+
+	// Advance the fragment
+	fragments	=	fragments->next;
 
 
 // This macro does the actual interpolation of the color from the grid
 #define	computeFragment()																			\
-	const float	*v0			=	grid->vertices + cFragment->index*vertexSize;						\
-	const float	*v1			=	v0 + vertexSize;													\
-	const float	*v2			=	v0 + (grid->udiv+1)*vertexSize;										\
-	const float	*v3			=	v2 + vertexSize;													\
+	const float	*v0			=	grid->vertices + cFragment->index*(10+numExtraSamples);				\
+	const float	*v1			=	v0 + (10+numExtraSamples);											\
+	const float	*v2			=	v0 + (grid->udiv+1)*(10+numExtraSamples);							\
+	const float	*v3			=	v2 + (10+numExtraSamples);											\
 	const float	u			=	cFragment->u;														\
 	const float	v			=	cFragment->v;														\
 	cFragment->color[0]		=	((v1[3] - v0[3])*u + v0[3])*(1-v) + ((v3[3] - v2[3])*u + v2[3])*v;	\
@@ -143,9 +137,6 @@
 		CPixel		*pixel	=	fb[cFragment->ySample] + cFragment->xSample;
 		const float	z		=	cFragment->z;
 
-		// Check the LOD first
-		lodCheck();
-
 		// This macro kicks off the code gen
 		drawPixelCheck();
 
@@ -157,3 +148,4 @@
 #undef	drawPixelCheck
 #undef	drawPixel
 
+}

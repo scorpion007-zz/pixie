@@ -138,7 +138,7 @@ CStochastic::~CStochastic() {
 // Comments				:
 // Date last edited		:	7/31/2002
 void		CStochastic::rasterBegin(int w,int h,int l,int t) {
-	int			i,j,k,pxi,pxj;
+	int			i,j,k;
 	float		zoldStart;
 	TFragment	*cFragment;
 	CSobol<2>	apertureGenerator;
@@ -174,43 +174,10 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 
 	// Init the occlusion culler to zero
 	initToZero();
-	for (i=0,pxi=pixelYsamples-ySampleOffset;i<sampleHeight;i++,pxi++) {
+	for (i=0;i<sampleHeight;i++) {
 		CPixel	*pixel	=	fb[i];
 		
-		if (pxi >= pixelYsamples)	pxi = 0;
-		
-		for (j=0,pxj=pixelXsamples-xSampleOffset;j<sampleWidth;j++,pxj++,pixel++) {
-			float	aperture[2];
-
-			// The stratified sample
-			pixel->jx					=	(jitter*(urand()-0.5f) + 0.5001011f);
-			pixel->jy					=	(jitter*(urand()-0.5f) + 0.5001017f);
-
-			// Time of the sample for motion blur
-			if (pxj >= pixelXsamples)	pxj = 0;
-			pixel->jt					=	( pxi*pixelXsamples + pxj + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);
-			
-			// Importance blend / jitter
-			pixel->jimp					=	1.0f - ( pxj*pixelYsamples + pxi + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);	//urand();
-
-			if (flags & OPTIONS_FLAGS_FOCALBLUR) {
-				// Aperture sample for depth of field
-				while (TRUE) {
-					apertureGenerator.get(aperture);
-					aperture[0] 			= 2.0f*aperture[0] - 1.0f;
-					aperture[1] 			= 2.0f*aperture[1] - 1.0f;
-					if ((aperture[0]*aperture[0] + aperture[1]*aperture[1]) < 1.0f) break;
-				}
-				pixel->jdx					=	aperture[0];
-				pixel->jdy					=	aperture[1];
-			} else {
-				pixel->jdx					=	0;
-				pixel->jdy					=	0;
-			}
-			
-			// Center location of the sample
-			pixel->xcent				=	(j+pixel->jx) + left;
-			pixel->ycent				=	(i+pixel->jy) + top;
+		for (j=0;j<sampleWidth;j++,pixel++) {
 
 			pixel->z					=	clipMax;
 			pixel->zold					=	zoldStart;
@@ -219,7 +186,6 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 			pixel->node->zmax			=	clipMax;
 			pixel->first				=	newFragment();
 			pixel->last					=	newFragment();
-
 
 			cFragment					=	pixel->last;
 			cFragment->z				=	clipMax;
@@ -279,21 +245,14 @@ void		CStochastic::rasterDrawFragments(CRasterGrid *grid,TFragment *fragments) {
 #define depthFilterIfZMid()		pixel->zold		=	pixel->z;
 #define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
 
-#define lodExtraVariables()		const float importance = grid->object->attributes->lodImportance;
 
 
 
-
-	// Iterate and insert every fragment into the 
-	while((cFragment = fragments) != NULL) {
-		CPixel	*cPixel;
-
-		// Advance the fragment
-		fragments	=	fragments->next;
-
-		// Insert the fragment into the pixel
-		#include "stochasticFragment.h"
-	}
+#define depthFilterIf()		depthFilterIfZMid()
+#define depthFilterElse()	depthFilterElseZMid()
+#include "stochasticFragment.h"
+#undef depthFilterIf
+#undef depthFilterElse
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -852,8 +811,8 @@ void		CStochastic::deepShadowCompute() {
 						const int		xsample	=	x*pixelXsamples + sx;
 						const int		ysample	=	y*pixelYsamples + sy;
 						const CPixel	*pixels	=	&fb[ysample][xsample];
-						const float		cx		=	(sx + pixels->jx - filterWidth*0.5f*invPixelXsamples);
-						const float		cy		=	(sy + pixels->jy - filterHeight*0.5f*invPixelYsamples);
+						const float		cx		=	(sx + filterWidth*0.5f*invPixelXsamples);
+						const float		cy		=	(sy + filterHeight*0.5f*invPixelYsamples);
 						fSamples[i]				=	samples[ysample*sampleWidth+xsample];
 						fWeights[i<<2]			=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
 						filterSum				+=	fWeights[i<<2];
