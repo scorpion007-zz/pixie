@@ -43,7 +43,7 @@ Source: ..\src\ri\dsply.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\shadeop.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\sdr\sdr.h; DestDir: {app}\include; Components: libraries
 Source: ..\bin\rgbe.dll; DestDir: {app}\displays; Components: main
-Source: ..\bin\opengl.dll; DestDir: {app}\displays; Components: main
+Source: ..\bin\gui.dll; DestDir: {app}\displays; Components: main
 Source: ..\bin\openexr.dll; DestDir: {app}\displays; Components: main
 Source: ..\bin\framebuffer.dll; DestDir: {app}\displays; Components: main
 Source: ..\bin\file.dll; DestDir: {app}\displays; Components: main
