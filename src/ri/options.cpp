@@ -294,7 +294,7 @@ COptions::COptions() {
 	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:" PIXIE_SHADERS,NULL);
 
 #ifdef _DEBUG
-	displayPath				=	optionsGetSearchPath(".:%%DISPLAYS%:%PIXIEHOME%/bind:" PIXIE_DISPLAYS,NULL);
+	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/bind:" PIXIE_DISPLAYS,NULL);
 	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/bind:" PIXIE_MODULES,NULL);
 #else
 	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:" PIXIE_DISPLAYS,NULL);

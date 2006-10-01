@@ -28,37 +28,63 @@
 
 
 
-// Some necessary local info
-const int	left				=	this->left;
-const int	top					=	this->top;
-const int	right				=	left + width;
-const int	bottom				=	top + height;
-TFragment	*fragments			=	NULL;
-int			numFragments		=	0;
 
-if (grid->dim == 2) {
-	int				i,j,ii,jj;
-	const int		udiv		=	grid->udiv;
-	const int		vdiv		=	grid->vdiv;
-	const float		*vertices	=	grid->vertices;
 
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+//
+//		This is where we dice the microquads into nanoquads
+//
+////////////////////////////////////////////////////////////////////////////////////////////
+const int	left				=	this->left;			// Left of the bucket window
+const int	top					=	this->top;			// Top
+const int	right				=	left + width;		// Right
+const int	bottom				=	top + height;		// Bottom
+const int	udiv				=	grid->udiv;			// For fast access
+const int	vdiv				=	grid->vdiv;
+const float	*vertices			=	grid->vertices;
+const int	*bound				=	grid->bound;
+
+
+if (fragments == NULL) if (grid->dim > 0) {
+	////////////////////////////////////////////////////////////////////////////////////////////
+	// Dice quads (either a curve or a surface)
+	////////////////////////////////////////////////////////////////////////////////////////////
+	int				i,j;
+
+	// For each quad
 	for (j=0;j<vdiv;j++) {
-		for (i=0;i<udiv;i++) {
-			const int	index0		=	j*(udiv+1) + i;
-			const int	index1		=	j*(udiv+1) + i + 1;
-			const int	index2		=	(j + 1)*(udiv+1) + i;
-			const int	index3		=	(j + 1)*(udiv+1) + i + 1;
-			const float	*vertex0	=	vertices + index0*numVertexSamples;
-			const float	*vertex1	=	vertices + index1*numVertexSamples;
-			const float	*vertex2	=	vertices + index2*numVertexSamples;
-			const float	*vertex3	=	vertices + index3*numVertexSamples;
+		for (i=0;i<udiv;i++,bound+=4) {
+
+
+			numQuadsConsidered++;
+
+			// Trivial reject
+			if (bound[0] > right)	continue;	// xmin
+			if (bound[1] > bottom)	continue;	// ymin
+			if (bound[2] < left)	continue;	// xmax
+			if (bound[3] < top)		continue;	// ymax
+
+
+			const int	index		=	j*(udiv+1) + i;						// Index is the top left vertex
+			const float	*vertex0	=	vertices + index*numVertexSamples;	// Top left
+			const float	*vertex1	=	vertex0 + numVertexSamples;			// Top right
+			const float	*vertex2	=	vertex1 + udiv*numVertexSamples;	// Bottom left
+			const float	*vertex3	=	vertex2 + numVertexSamples;			// Bottom right
 			vector		tmp;
 			int			mudiv,mvdiv,k;	// Micro division amount
 
-			// FIXME: We can check if we can cull the quad for this bucket
 
+			numQuadsPassed++;
 
-			// Compute the micro subdivision amount
+			/////////////////////////////////////////////////////////////
+			// Compute the micro subdivision amount so that the max edge 
+			// length for a nanoquad is one sample long
+			/////////////////////////////////////////////////////////////
 			subvv(tmp,vertex1,vertex0);
 			mudiv	=	(int) ceil(lengthv(tmp));
 			subvv(tmp,vertex3,vertex2);
@@ -73,20 +99,26 @@ if (grid->dim == 2) {
 			assert(mudiv >= 1);
 			assert(mvdiv >= 1);
 
+			/*
 
-			// Compute the microquads
+			/////////////////////////////////////////////////////////////
+			// Compute the nanoquads
+			/////////////////////////////////////////////////////////////
 			const float	du	=	1 / (float) mudiv;
 			const float	dv	=	1 / (float) mvdiv;
 			float		cu,cv;
+			int			ii,jj;
 			for (cv=0,jj=0;jj<udiv;jj++,cv+=dv) {
 				for (cu=0,ii=0;ii<udiv;ii++,cu+=du) {
 					vector		v0,v1,v2,v3;
 					TFragment	*cFragment;
 
+					numNanoQuadsConsidered++;
+
 					// Compute the corners of the microquads
 #define corner(__c,__u,__v)	__c[0]	=	((vertex1[0] - vertex0[0])*(__u) + vertex0[0])*(1 - (__v)) + 	((vertex3[0] - vertex2[0])*(__u) + vertex2[0])*(__v);	\
-						__c[1]	=	((vertex1[1] - vertex0[1])*(__u) + vertex0[1])*(1 - (__v)) + 	((vertex3[1] - vertex2[1])*(__u) + vertex2[1])*(__v);	\
-						__c[2]	=	((vertex1[2] - vertex0[2])*(__u) + vertex0[2])*(1 - (__v)) + 	((vertex3[2] - vertex2[2])*(__u) + vertex2[2])*(__v);
+							__c[1]	=	((vertex1[1] - vertex0[1])*(__u) + vertex0[1])*(1 - (__v)) + 	((vertex3[1] - vertex2[1])*(__u) + vertex2[1])*(__v);	\
+							__c[2]	=	((vertex1[2] - vertex0[2])*(__u) + vertex0[2])*(1 - (__v)) + 	((vertex3[2] - vertex2[2])*(__u) + vertex2[2])*(__v);
 
 					corner(v0,cu,cv);
 					corner(v1,cu+du,cv);
@@ -95,38 +127,36 @@ if (grid->dim == 2) {
 
 #undef corner
 
-					// FIXME: apply MB / DOF
+					// v0,v1,v2,v3 are the corners of the nanoquad (topleft,topright,bottomleft,bottomright resp.)
 
-
-
+					// Compute the centeroid of the nanoquad
 					addvv(tmp,v0,v1);
 					addvv(tmp,v2);
 					addvv(tmp,v3);
 					mulvf(tmp,0.25f);
 
-					const int	x	=	(int) tmp[0];
-					const int	y	=	(int) tmp[1];
+					// Convert to integer sample coordinates
+					const int	x	=	(int) floor(tmp[0]);
+					const int	y	=	(int) floor(tmp[1]);
 
+					// Is it in the bucket?
 					if (x < left)		continue;					
 					if (y < top)		continue;
 					if (x >= right)		continue;
 					if (y >= bottom)	continue;
-
-					cFragment				=	newFragment();		// Allocate the fragment
-					cFragment->xSample		=	x - left;			// The coordinate of the fragment in the current bucket
-					cFragment->ySample		=	y - top;
-					cFragment->z			=	tmp[2];				// The depth of the fragment
-
 					
+					numNanoQuadsPassed++;
+
 					// Check if the fragment is inside the quad
-					const float	xSample		=	cFragment->xSample + 0.5f;
-					const float	ySample		=	cFragment->ySample + 0.5f;
+					const float	xSample		=	(float) x + 0.5f;
+					const float	ySample		=	(float) y + 0.5f;
 					float		atop,abottom,aleft,aright;
 
 					if (area(v0[0],v0[1],v1[0],v2[1],v3[0],v3[1]) > 0) {
 						
-
-						// FIXME: Check front/back visibility
+						#ifndef STOCHASTIC_DRAWFRONT
+						continue;
+						#endif
 
 						if ((atop		= area(xSample,ySample,v0[0],v0[1],v1[0],v1[1])) < 0) continue;
 						if ((aright		= area(xSample,ySample,v1[0],v1[1],v3[0],v3[1])) < 0) continue;
@@ -134,9 +164,10 @@ if (grid->dim == 2) {
 						if ((aleft		= area(xSample,ySample,v2[0],v2[1],v0[0],v0[1])) < 0) continue;
 
 					} else {
-						float	atop,abottom,aleft,aright;
 
-						// FIXME: Check front/back visibility
+						#ifndef STOCHASTIC_DRAWBACK
+						continue;
+						#endif
 
 						if ((atop		= area(xSample,ySample,v0[0],v0[1],v1[0],v1[1])) > 0) continue;
 						if ((aright		= area(xSample,ySample,v1[0],v1[1],v3[0],v3[1])) > 0) continue;
@@ -146,33 +177,58 @@ if (grid->dim == 2) {
 					}
 
 					// Record the fragment
-					cFragment->index		=	index0;
+					cFragment				=	newFragment();		// Allocate the fragment
+					cFragment->xSample		=	x;					// The coordinate of the fragment in the current bucket
+					cFragment->ySample		=	y;
+					cFragment->z			=	tmp[2];				// The depth of the fragment
+					cFragment->index		=	index;
 					cFragment->u			=	(aright / (aright + aleft))*udiv + cu;
 					cFragment->v			=	(atop / (atop + abottom))*vdiv + cv;
-
 					cFragment->next			=	fragments;
 					fragments				=	cFragment;
-					numFragments++;
 
-					// FIXME: Too many fragments can accumulate here, may want to flush them periodically
+					// FIXME: This fragment can be deferred to the correct bucket now
 				}
 			}
+			*/
 		}
-	}
-/*
 
+		bound	+=	4;
+	}
+
+} else {
+	////////////////////////////////////////////////////////////////////////////////////////////
+	// Dice points
+	////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+TFragment	*cFragment;
 while((cFragment = fragments) != NULL) {
 
 	// Advance the fragment
 	fragments	=	fragments->next;
 
+	deleteFragment(cFragment);
+}
+
+/*
+////////////////////////////////////////////////////////////////////////////////////////////
+//
+//		This is where the fragment insertion happens
+//
+////////////////////////////////////////////////////////////////////////////////////////////
+TFragment	*cFragment;
+while((cFragment = fragments) != NULL) {
+
+	// Advance the fragment
+	fragments	=	fragments->next;
 
 // This macro does the actual interpolation of the color from the grid
 #define	computeFragment()																			\
-	const float	*v0			=	grid->vertices + cFragment->index*(10+numExtraSamples);				\
-	const float	*v1			=	v0 + (10+numExtraSamples);											\
-	const float	*v2			=	v0 + (grid->udiv+1)*(10+numExtraSamples);							\
-	const float	*v3			=	v2 + (10+numExtraSamples);											\
+	const float	*v0			=	vertices + cFragment->index*numVertexSamples;						\
+	const float	*v1			=	v0 + numVertexSamples;												\
+	const float	*v2			=	v1 + udiv*numVertexSamples;											\
+	const float	*v3			=	v2 + numVertexSamples;												\
 	const float	u			=	cFragment->u;														\
 	const float	v			=	cFragment->v;														\
 	cFragment->color[0]		=	((v1[3] - v0[3])*u + v0[3])*(1-v) + ((v3[3] - v2[3])*u + v2[3])*v;	\
@@ -183,29 +239,16 @@ while((cFragment = fragments) != NULL) {
 	cFragment->opacity[2]	=	((v1[8] - v0[8])*u + v0[8])*(1-v) + ((v3[8] - v2[8])*u + v2[8])*v;	\
 
 
-#ifndef STOCHASTIC_TRANSPARENT
-
-// Opaque fragment insertion
-#define	drawPixel() 																				\
-	computeFragment();																				\
-	TFragment *cSample=pixel->last;																	\
-	while(cSample->z > z) {																			\
-		TFragment *nSample	=	cSample->prev;														\
-		assert(cSample != pixel->first);															\
-		deleteFragment(cSample);																	\
-		cSample				=	nSample;															\
-	}																								\
-	cSample->next			=	cFragment;															\
-	cFragment->prev			=	cSample;															\
-	cFragment->next			=	NULL;																\
-	pixel->last				=	cFragment;															\
-	pixel->update			=	cSample;															\
-	depthFilterIf();																				\
-	touchNode(pixel->node,z);																		\
 
 
-#else
 
+
+
+
+
+#ifdef STOCHASTIC_TRANSPARENT
+
+//////////////////////////////////////////////////////////
 // Transparent fragment insertion
 #define	drawPixel() 																				\
 	computeFragment();																				\
@@ -229,8 +272,35 @@ while((cFragment = fragments) != NULL) {
 		cSample->next	=	cFragment;																\
 		lSample->prev	=	cFragment;																\
 	}																								\
-	pixel->update	=	cFragment;																	\
+	pixel->update	=	cFragment;
 
+//
+//////////////////////////////////////////////////////////
+
+
+#else
+
+
+//////////////////////////////////////////////////////////
+// Opaque fragment insertion
+#define	drawPixel() 																				\
+	computeFragment();																				\
+	TFragment *cSample=pixel->last;																	\
+	while(cSample->z > z) {																			\
+		TFragment *nSample	=	cSample->prev;														\
+		assert(cSample != pixel->first);															\
+		deleteFragment(cSample);																	\
+		cSample				=	nSample;															\
+	}																								\
+	cSample->next			=	cFragment;															\
+	cFragment->prev			=	cSample;															\
+	cFragment->next			=	NULL;																\
+	pixel->last				=	cFragment;															\
+	pixel->update			=	cSample;															\
+	depthFilterIf();																				\
+	touchNode(pixel->node,z);
+//
+//////////////////////////////////////////////////////////
 
 #endif
 
@@ -248,14 +318,14 @@ while((cFragment = fragments) != NULL) {
 #define drawPixelCheck()															\
 	if (z < pixel->z || (grid->flags & RASTER_SHADE_HIDDEN)) {						\
 		shadeGrid(grid,FALSE);														\
-		rasterDrawGrid(grid);														\
+		rasterDrawGrid(grid,cFragment);												\
 		return;																		\
 	} depthFilterElse();
 #else
 #define drawPixelCheck()															\
 	if (z < pixel->z) {																\
 		shadeGrid(grid,FALSE);														\
-		rasterDrawGrid(grid);														\
+		rasterDrawGrid(grid,cFragment);												\
 		return;																		\
 	} depthFilterElse();
 #endif // undercull
@@ -284,5 +354,5 @@ while((cFragment = fragments) != NULL) {
 #undef	lodCheck
 #undef	drawPixelCheck
 #undef	drawPixel
-*/
 }
+*/

@@ -51,11 +51,10 @@ const	unsigned int	RASTER_FOCALBLUR		=	1 << 5;			// The primitive has focalblur
 const	unsigned int	RASTER_MATTE			=	1 << 6;			// The primitive is a matte
 const	unsigned int	RASTER_LOD				=	1 << 7;			// The primitive has LOD
 const	unsigned int	RASTER_UNDERCULL		=	1 << 8;			// The primitive requires underculling
-const	unsigned int	RASTER_GLOBAL_MASK		=	(1 << 8) - 1;	// This mask is used to block the lower fields
-
-
 const	unsigned int	RASTER_DRAW_FRONT		=	1 << 9;			// Draw the front of the primitive
 const	unsigned int	RASTER_DRAW_BACK		=	1 << 10;		// Draw the back of the primitive
+const	unsigned int	RASTER_GLOBAL_MASK		=	(1 << 11) - 1;	// This mask is used to block the lower fields
+
 const	unsigned int	RASTER_SHADE_HIDDEN		=	1 << 11;		// Shade the primitive even if occluded
 const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 12;		// Shade the primitive even if backfacing
 
@@ -99,6 +98,7 @@ protected:
 		int						udiv,vdiv;				// The number of division
 		int						numVertices;			// The number of vertices
 		float					*vertices;				// Array of vertices
+		int						*bound;					// For each vertex, the bound of its quad
 		float					*size0,*size1;			// The point sizes
 		int						flags;					// The primitive flags
 	};
@@ -231,9 +231,9 @@ public:
 	void						renderFrame();									// Right after world end to force rendering of the entire frame
 
 								// The following functions must be overriden by the child rasterizer
-	virtual	void				rasterBegin(int,int,int,int)					=	0;
-	virtual	void				rasterDrawGrid(CRasterGrid *)					=	0;
-	virtual	void				rasterEnd(float *)								=	0;
+	virtual	void				rasterBegin(int,int,int,int)								=	0;
+	virtual	void				rasterDrawGrid(CRasterGrid *,TFragment *fragments=NULL)		=	0;
+	virtual	void				rasterEnd(float *)											=	0;
 	
 	
 	void						drawObject(CObject *,const float *,const float *);		// Draw an object
@@ -260,8 +260,13 @@ protected:
 	TFragment					*newFragment() {
 									TFragment	*cFragment;
 
-									if ((cFragment = fragments) != NULL)	fragments	=	fragments->next;
-									else									return (TFragment *) new char[fragmentSize];
+									numUsedFragments++;
+
+									if ((cFragment = fragments) != NULL) {
+										fragments	=	fragments->next;
+									} else {
+										return (TFragment *) new char[fragmentSize];
+									}
 
 									return cFragment;
 								}
@@ -274,6 +279,9 @@ protected:
 								// Comments				:	(inline for speed)
 								// Date last edited		:	9/28/2006
 	void						deleteFragment(TFragment *cFragment) {
+
+									numUsedFragments--;
+
 									cFragment->next	=	fragments;
 									fragments		=	cFragment;
 								}
@@ -316,6 +324,7 @@ private:
 
 	int							fragmentSize;									// The size of a fragment in bytes
 	TFragment					*fragments;										// List of free fragments
+	int							numUsedFragments;								// The number of fragments in use
 
 
 

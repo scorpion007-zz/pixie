@@ -200,11 +200,12 @@ CReyes::CReyes(COptions *o,CXform *x,SOCKET s,unsigned int hf) : CShadingContext
 	if (aperture != 0)			extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
 
 	// Compute misc junk
-	xBucketsMinusOne	=	xBuckets-1;
-	yBucketsMinusOne	=	yBuckets-1;
+	xBucketsMinusOne		=	xBuckets-1;
+	yBucketsMinusOne		=	yBuckets-1;
 
-	fragmentSize		=	sizeof(TFragment) + numExtraSamples*sizeof(float);
-	fragments			=	NULL;
+	fragmentSize			=	sizeof(TFragment) + numExtraSamples*sizeof(float);
+	fragments				=	NULL;
+	numUsedFragments		=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -443,6 +444,9 @@ void	CReyes::render() {
 
 	// Get the framebuffer
 	rasterEnd(pixelBuffer);
+
+	// Make sure we cleared all the fragments we used
+	assert(numUsedFragments == 0);
 
 	// Flush the data to the out devices
 	commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
@@ -1450,6 +1454,7 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	grid->object			=	object;				object->attach();
 	grid->numVertices		=	numVertices;
 	grid->vertices			=	new float[numVertices*numVertexSamples];
+	grid->bound				=	new int[numVertices*4];
 	grid->size0				=	NULL;
 	grid->size1				=	NULL;
 
@@ -1470,6 +1475,7 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 void			CReyes::deleteGrid(CRasterGrid *grid) {
 	grid->object->detach();
 	delete [] grid->vertices;
+	delete [] grid->bound;
 	if (grid->size0 != NULL) delete [] grid->size0;
 	delete grid;
 
@@ -1515,7 +1521,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		const float	*sVertex;
 
 		for (sVertex=grid->vertices,i=grid->numVertices;i>0;i--,sVertex+=numVertexSamples) {
-			const float	*cVertex	=	sVertex + numExtraSamples+10;
+			const float	*cVertex	=	sVertex + numExtraSamples + 10;
 			if (cVertex[0] < xmin)	xmin	=	cVertex[0];
 			if (cVertex[1] < ymin)	ymin	=	cVertex[1];
 			if (cVertex[2] < zmin)	zmin	=	cVertex[2];
@@ -1560,6 +1566,84 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		cObject->zmin				=	-C_INFINITY;
 	else
 		cObject->zmin				=	zmin;
+
+
+	if (grid->dim == 0) {
+		// Bound points
+	} else {
+		// Bound quads
+		int				i,j;
+		const int		udiv		=	grid->udiv;
+		const int		vdiv		=	grid->vdiv;
+		const float		*vertices	=	grid->vertices;
+
+		// Bound every quad
+		for (j=0;j<vdiv;j++) {
+			for (i=0;i<udiv;i++) {
+				const float	*cVertex	=	vertices + (j*(udiv+1) + i)*numVertexSamples;
+				
+				xmin	=	cVertex[COMP_X];
+				ymin	=	cVertex[COMP_Y];
+				zmin	=	cVertex[COMP_Z];
+
+				cVertex	+=	numVertexSamples;
+				if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+				if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+				if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+
+				cVertex	+=	udiv*numVertexSamples;
+				if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+				if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+				if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+
+				cVertex	+=	numVertexSamples;
+				if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+				if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+				if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+
+				// Take the motion blur into account
+				if (grid->flags & RASTER_MOVING) {
+					cVertex	=	grid->vertices + (j*(udiv+1) + i)*numVertexSamples + (numExtraSamples + 10);
+					if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+					if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+					if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+
+					cVertex	+=	numVertexSamples;
+					if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+					if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+					if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+
+					cVertex	+=	udiv*numVertexSamples;
+					if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+					if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+					if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+
+					cVertex	+=	numVertexSamples;
+					if (cVertex[COMP_X] < xmin)	xmin	=	cVertex[COMP_X];
+					if (cVertex[COMP_Y] < ymin)	ymin	=	cVertex[COMP_Y];
+					if (cVertex[COMP_Z] < zmin)	zmin	=	cVertex[COMP_Z];
+				}
+
+				// Expand the bound by the maximum focal blur amount
+				if (aperture != 0) {
+					const	float	coc1	=	absf(cocSamples(zmin));
+					const	float	coc2	=	absf(cocSamples(zmax));
+					const	float	mcoc	=	max(coc1,coc2);
+
+					xmin	-=	mcoc;
+					xmax	+=	mcoc;
+					ymin	-=	mcoc;
+					ymax	+=	mcoc;
+				}
+
+				int	*bound		=	grid->bound + (j*(udiv+1) + i)*4;
+				bound[0]	=	(int) floor(xmin);
+				bound[1]	=	(int) floor(ymin);
+				bound[2]	=	(int) floor(xmax);
+				bound[3]	=	(int) floor(ymax);
+			}
+		}
+	}
 
 	// Insert the object into the bucket its in
 	objectInsert(cObject);

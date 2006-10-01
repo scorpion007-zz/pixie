@@ -48,7 +48,7 @@ public:
 
 				// The functions inherited from the CReyes
 	void		rasterBegin(int,int,int,int);
-	void		rasterDrawGrid(CRasterGrid *);
+	void		rasterDrawGrid(CRasterGrid *,TFragment *fragments=NULL);
 	void		rasterEnd(float *);
 private:
 

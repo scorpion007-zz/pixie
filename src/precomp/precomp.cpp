@@ -615,6 +615,23 @@ int	precomputeExplosionData() {
 }
 
 
+int	valid(int i) {
+	// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
+	// but we leave the case in as it can help the compiler generate a fast switch statement
+	// Shaded grids never have RASTER_UNDERCULL
+	if (i & RASTER_UNSHADED) {
+		if ((i & RASTER_MATTE) || (i & RASTER_TRANSPARENT)  || (i & RASTER_LOD) || (i & RASTER_EXTRASAMPLES)) {
+			return FALSE;
+		}
+	} else {
+		if (i & RASTER_UNDERCULL) {
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
@@ -622,35 +639,125 @@ int	precomputeExplosionData() {
 // Return Value			:	0 on success, 1 on failure
 // Comments				:
 // Date last edited		:	10/27/2002
-int		genUnroll(const char *fileName,int numConditions,char **conditions,char **definitions,char **undefinitions,const char *code) {
-	FILE	*out	=	fopen(fileName,"w");
-	int		i,j,k;
+int		genUnroll(const char *fileName) {
+	FILE		*out	=	fopen(fileName,"w");
+	int			i,numConditions;
+	const char	*code	=	"#include \"stochasticFragment.h\"";
+
+	numConditions		=	11;	// The number of conditions
 
 	if (out == NULL)	return FALSE;
 
+	// Output the prototype
 	fprintf(out,"#ifdef PROTOTYPE\n");
-	for (i=0;i<(1<<numConditions);i++) 	fprintf(out,"void	stochastic%d(CRasterGrid *);\n",i);
+	for (i=0;i<(1<<(numConditions+2));i++) {
+		if (valid(i))	fprintf(out,"void	stochastic%d(CRasterGrid *,TFragment *);\n",i);
+	}
 	fprintf(out,"#endif\n");
 
+	// Generate the dispatch code
 	fprintf(out,"#ifdef DISPATCH\n");
-	fprintf(out,"\tint	conditionTracker=0;\n");
-	for (i=0;i<numConditions;i++) fprintf(out,"\t%s conditionTracker |= %d;\n",conditions[i],1<<i);
+	fprintf(out,"\tint	conditionTracker = (grid->flags & RASTER_GLOBAL_MASK);\n");
+	fprintf(out,"\tswitch(depthFilter) {\n");
+
+	fprintf(out,"\t\tcase DEPTH_MIN:\n");
+	fprintf(out,"\t\t\tconditionTracker |= 0 << %d;\n",numConditions);
+	fprintf(out,"\t\tbreak;\n");
+
+	fprintf(out,"\t\tcase DEPTH_MAX:\n");
+	fprintf(out,"\t\t\tconditionTracker |= 1 << %d;\n",numConditions);
+	fprintf(out,"\t\tbreak;\n");
+
+	fprintf(out,"\t\tcase DEPTH_AVG:\n");
+	fprintf(out,"\t\t\tconditionTracker |= 2 << %d;\n",numConditions);
+	fprintf(out,"\t\tbreak;\n");
+
+	fprintf(out,"\t\tcase DEPTH_MID:\n");
+	fprintf(out,"\t\t\tconditionTracker |= 3 << %d;\n",numConditions);
+	fprintf(out,"\t\tbreak;\n");
+
+	fprintf(out,"\t\tdefault:\n");
+	fprintf(out,"\t\t\terror(CODE_BUG,\"Invalid depth filter\");");
+	fprintf(out,"\t\tbreak;\n");
+
+	fprintf(out,"\t}\n");
+		
 	fprintf(out,"\tswitch(conditionTracker) {\n");
-	for (j=0;j<(1<<i);j++) {
-		fprintf(out,"\t\tstochastic%d(grid);\n",j);
+	for (i=0;i<(1<<(numConditions+2));i++) {
+		fprintf(out,"\tcase %d:\n",i);
+		if (valid(i))	fprintf(out,"\t\tstochastic%d(grid,fragments);\n",i);
 		fprintf(out,"\t\tbreak;\n");
 	}
+	fprintf(out,"\tdefault:\n");
+	fprintf(out,"\t\terror(CODE_BUG,\"Invalid dispatch in stochastic\");\n");
+	fprintf(out,"\t\tbreak;\n");
 	fprintf(out,"\t}\n");
 	fprintf(out,"#endif\n");
 
 
 	fprintf(out,"#ifdef CODE\n");
-	for (j=0;j<(1<<i);j++) {
-		fprintf(out,"void CStochastic::stochastic%d(CRasterGrid *grid){\n",j);
-		for (k=0;k<i;k++)	if (j & (1 << k))	fprintf(out,"\t\t%s\n",definitions[k]);
+	for (i=0;i<(1<<(numConditions+2));i++) {
+
+		if (valid(i) == FALSE)	continue;
+
+
+		fprintf(out,"void CStochastic::stochastic%d(CRasterGrid *grid,TFragment *fragments){\n",i);
+
+		// Print the defines
+		if (i & RASTER_TRANSPARENT)		fprintf(out,"#define	STOCHASTIC_TRANSPARENT\n");
+		if (i & RASTER_UNSHADED)		fprintf(out,"#define	STOCHASTIC_UNSHADED\n");
+		if (i & RASTER_EXTRASAMPLES)	fprintf(out,"#define	STOCHASTIC_EXTRASAMPLES\n");
+		if (i & RASTER_MOVING)			fprintf(out,"#define	STOCHASTIC_MOVING\n");
+		if (i & RASTER_POINT)			fprintf(out,"#define	STOCHASTIC_POINT\n");
+		if (i & RASTER_FOCALBLUR)		fprintf(out,"#define	STOCHASTIC_FOCALBLUR\n");
+		if (i & RASTER_MATTE)			fprintf(out,"#define	STOCHASTIC_MATTE\n");
+		if (i & RASTER_LOD)				fprintf(out,"#define	STOCHASTIC_LOD\n");
+		if (i & RASTER_UNDERCULL)		fprintf(out,"#define	STOCHASTIC_UNDERCULL\n");
+		if (i & RASTER_DRAW_FRONT)		fprintf(out,"#define	STOCHASTIC_DRAWFRONT\n");
+		if (i & RASTER_DRAW_BACK)		fprintf(out,"#define	STOCHASTIC_DRAWBACK\n");
+
+		switch(i >> numConditions) {
+			case 0:
+				fprintf(out,"#define	depthFilterIf()		depthFilterIfZMin()\n");
+				fprintf(out,"#define	depthFilterElse()	depthFilterElseZMin()\n");
+				break;
+			case 1:
+				fprintf(out,"#define	depthFilterIf()		depthFilterIfZMax()\n");
+				fprintf(out,"#define	depthFilterElse()	depthFilterElseZMax()\n");
+				break;
+			case 2:
+				fprintf(out,"#define	depthFilterIf()		depthFilterIfZAvg()\n");
+				fprintf(out,"#define	depthFilterElse()	depthFilterElseZAvg()\n");
+				break;
+			case 3:
+				fprintf(out,"#define	depthFilterIf()		depthFilterIfZMid()\n");
+				fprintf(out,"#define	depthFilterElse()	depthFilterElseZMid()\n");
+				break;
+			default:
+				assert(FALSE);
+				break;
+		}
+		
 		fprintf(out,"\n\n\t\t%s\t\n\n\n",code);
-		for (k=0;k<i;k++)	if (j & (1 << k))	fprintf(out,"\t\t%s\n",undefinitions[k]);
-		fprintf(out,"}\n");
+
+
+		// Print the defines
+		if (i & RASTER_TRANSPARENT)		fprintf(out,"#undef	STOCHASTIC_TRANSPARENT\n");
+		if (i & RASTER_UNSHADED)		fprintf(out,"#undef	STOCHASTIC_UNSHADED\n");
+		if (i & RASTER_EXTRASAMPLES)	fprintf(out,"#undef	STOCHASTIC_EXTRASAMPLES\n");
+		if (i & RASTER_MOVING)			fprintf(out,"#undef	STOCHASTIC_MOVING\n");
+		if (i & RASTER_POINT)			fprintf(out,"#undef	STOCHASTIC_POINT\n");
+		if (i & RASTER_FOCALBLUR)		fprintf(out,"#undef	STOCHASTIC_FOCALBLUR\n");
+		if (i & RASTER_MATTE)			fprintf(out,"#undef	STOCHASTIC_MATTE\n");
+		if (i & RASTER_LOD)				fprintf(out,"#undef	STOCHASTIC_LOD\n");
+		if (i & RASTER_UNDERCULL)		fprintf(out,"#undef	STOCHASTIC_UNDERCULL\n");
+		if (i & RASTER_DRAW_FRONT)		fprintf(out,"#undef	STOCHASTIC_DRAWFRONT\n");
+		if (i & RASTER_DRAW_BACK)		fprintf(out,"#undef	STOCHASTIC_DRAWBACK\n");
+
+		fprintf(out,"#undef	depthFilterIf\n");
+		fprintf(out,"#undef	depthFilterElse\n");
+
+		fprintf(out,"}\n\n");
 	}
 	fprintf(out,"#endif\n");
 
@@ -684,53 +791,7 @@ int	main(int argc,char *argv[]) {
 	}
 	*/
 
-	{
-		const	int		numCond	=	13;
-		char	*cond[numCond]	=	{	"if (grid->flags & RASTER_TRANSPARENT)	",
-										"if (grid->flags & RASTER_UNSHADED)		",
-										"if (grid->flags & RASTER_EXTRASAMPLES)	",
-										"if (grid->flags & RASTER_MOVING)		",
-										"if (grid->flags & RASTER_POINT)			",
-										"if (grid->flags & RASTER_FOCALBLUR)		",
-										"if (grid->flags & RASTER_MATTE)			",
-										"if (grid->flags & RASTER_LOD)			",
-										"if (grid->flags & RASTER_UNDERCULL)		",
-										"if (depthFilter == DEPTH_MIN)		",
-										"if (depthFilter == DEPTH_MAX)		",
-										"if (depthFilter == DEPTH_AVG)		",
-										"if (depthFilter == DEPTH_MID)		"	};
-
-		char	*def[numCond]	=	{	"#define	HIDDEN_TRANSPARENT",
-										"#define	HIDDEN_UNSHADED",
-										"#define	HIDDEN_EXTRASAMPLES",
-										"#define	HIDDEN_MOVING",
-										"#define	HIDDEN_POINT",
-										"#define	HIDDEN_FOCALBLUR",
-										"#define	HIDDEN_MATTE",
-										"#define	HIDDEN_LOD",
-										"#define	HIDDEN_UNDERCULL",
-										"#define	depthFilterIf()	depthFilterIfMin()\n\t\t#define	depthFilterElse()	depthFilterElseMin()",	
-										"#define	depthFilterIf()	depthFilterIfMax()\n\t\t#define	depthFilterElse()	depthFilterElseMax()",	
-										"#define	depthFilterIf()	depthFilterIfAvf()\n\t\t#define	depthFilterElse()	depthFilterElseAvg()",	
-										"#define	depthFilterIf()	depthFilterIfMid()\n\t\t#define	depthFilterElse()	depthFilterElseMid()",			
-																		};
-
-		char	*undef[numCond]	=	{	"#undef	HIDDEN_TRANSPARENT",
-										"#undef	HIDDEN_UNSHADED",
-										"#undef	HIDDEN_EXTRASAMPLES",
-										"#undef	HIDDEN_MOVING",
-										"#undef	HIDDEN_POINT",
-										"#undef	HIDDEN_FOCALBLUR",
-										"#undef	HIDDEN_MATTE",
-										"#undef	HIDDEN_LOD",
-										"#undef	HIDDEN_UNDERCULL",
-										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse",
-										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse",
-										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse",
-										"#undef	depthFilterIf\n\t\t#undef	depthFilterElse"	};
-		
-		genUnroll("..\\src\\ri\\stochasticSwitch.h",numCond,cond,def,undef,"#include \"stochasticFragment.h\"");
-	}
+	genUnroll("..\\src\\ri\\stochasticSwitch.h");
 
 
 	memShutdown();

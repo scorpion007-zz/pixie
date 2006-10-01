@@ -34,7 +34,12 @@
 #include "renderer.h"
 #include "memory.h"
 #include "random.h"
+#include "error.h"
 
+static	int	numNanoQuadsConsidered	=	0;
+static	int	numNanoQuadsPassed		=	0;
+static	int	numQuadsPassed			=	0;
+static	int	numQuadsConsidered		=	0;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
@@ -219,9 +224,18 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-void		CStochastic::rasterDrawGrid(CRasterGrid *grid) {
+void		CStochastic::rasterDrawGrid(CRasterGrid *grid,TFragment *fragments) {
+
+// Figure out the running conditions and call the appropriate functions
+#define		DISPATCH
+#include	"stochasticSwitch.h"
+#undef		DISPATCH
+}
 
 
+
+//////////////////////////////////////////////////////////////////////////////
+// Define misc macros for the code generation
 #define depthFilterIfZMin()
 #define depthFilterElseZMin()
 
@@ -235,28 +249,26 @@ void		CStochastic::rasterDrawGrid(CRasterGrid *grid) {
 #define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
 
 
-#define		DISPATCH
-#include	"stochasticSwitch.h"
-#undef		DISPATCH
-
-
-#undef depthFilterIfZMin()
-#undef depthFilterElseZMin()
-
-#undef depthFilterIfZMax()		pixel->zold		=	max(pixel->zold,z);
-#undef depthFilterElseZMax()	else {	pixel->zold	=	max(pixel->zold,z);	}
-
-#undef depthFilterIfZAvg()		pixel->zold		+=	z; pixel->numSplats++;
-#undef depthFilterElseZAvg()	else {	pixel->zold	+=	z; pixel->numSplats++;	}
-
-#undef depthFilterIfZMid()		pixel->zold		=	pixel->z;
-#undef depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
-}
-
 
 #define		CODE
 #include "stochasticSwitch.h"
 #undef		CODE
+
+
+
+#undef depthFilterIfZMin
+#undef depthFilterElseZMin
+
+#undef depthFilterIfZMax
+#undef depthFilterElseZMax
+
+#undef depthFilterIfZAvg
+#undef depthFilterElseZAvg
+
+#undef depthFilterIfZMid
+#undef depthFilterElseZMid
+// End of code
+//////////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -343,8 +355,7 @@ void		CStochastic::rasterEnd(float *fb2) {
 					oSample		=	cSample;
 					cSample		=	cSample->next;
 				}
-			}
-			else {
+			} else {
 				
 				// Get the base color and opacity
 				if (cSample->opacity[0] < 0 || cSample->opacity[1] < 0 || cSample->opacity[2] < 0) {
@@ -399,6 +410,9 @@ void		CStochastic::rasterEnd(float *fb2) {
 			// Alpha is the average opacity
 			// I know this is wrong but this is more useful
 			cFb[0]			=	((O[0] + O[1] + O[2])*0.333333333f);
+
+			deleteFragment(cPixel->first);
+			deleteFragment(cPixel->last);
 		}
 	}
 
