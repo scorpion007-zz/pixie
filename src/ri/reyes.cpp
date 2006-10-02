@@ -808,8 +808,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (enableMotionBlur && (object->moving()))					grid->flags	|= RASTER_MOVING;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 		grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)	grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)				grid->flags	|= RASTER_MATTE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 				grid->flags	|= RASTER_LOD;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -865,6 +863,10 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 					break;
 				}
 			}
+			
+			// We require matte and LOD flagged grids to have been shaded / displaced
+			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)				grid->flags	|= RASTER_MATTE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 				grid->flags	|= RASTER_LOD;
 		}
 
 		// Do we have motion ?
@@ -950,8 +952,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
 
 			// Do we have motion blur ?
 			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
@@ -1010,6 +1010,10 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 					break;
 				}
 			}
+			
+			// We require matte and LOD flagged grids to have been shaded / displaced
+			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
 		}
 
 
@@ -1126,8 +1130,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN)	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
 
 			// Do we have motion blur ?
 			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
@@ -1164,6 +1166,10 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 					break;
 				}
 			}
+			
+			// We require matte and LOD flagged grids to have been shaded / displaced
+			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
 		}
 
 		// Do we have motion blur ?
