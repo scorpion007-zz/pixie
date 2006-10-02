@@ -140,6 +140,38 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 
 		stats.gprimMemory	+=	vertexSize*4*sizeof(float);
 	}
+
+	// Compute the bounding box of the patch
+	{
+		float	*ver0,*ver1,*ver2,*ver3;
+		int		vertexSize	=	variables->vertexSize;
+
+		ver0				=	vertex;
+		ver1				=	ver0	+	vertexSize;
+		ver2				=	ver1	+	vertexSize;
+		ver3				=	ver2	+	vertexSize;
+
+		movvv(bmin,ver0);
+		movvv(bmax,ver0);
+
+		addBox(bmin,bmax,ver1);
+		addBox(bmin,bmax,ver2);
+		addBox(bmin,bmax,ver3);
+
+		if (variables->moving) {
+			ver0				=	vertex + vertexSize*4;
+			ver1				=	ver0	+	vertexSize;
+			ver2				=	ver1	+	vertexSize;
+			ver3				=	ver2	+	vertexSize;
+
+			addBox(bmin,bmax,ver0);
+			addBox(bmin,bmax,ver1);
+			addBox(bmin,bmax,ver2);
+			addBox(bmin,bmax,ver3);
+		}
+
+		makeBound(bmin,bmax);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -162,6 +194,153 @@ CBilinearPatch::~CBilinearPatch() {
 }
 
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CBilinearPatch
+// Method				:	intersect
+// Description			:	See object.h
+// Return Value			:	-
+// Comments				:	-
+// Date last edited		:	6/21/2001
+int		CBilinearPatch::intersect(const float *bmin,const float *bmax) const {
+	return intersectBox(bmin,bmax,this->bmin,this->bmax);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CBilinearPatch
+// Method				:	intersect
+// Description			:	See object.h
+// Return Value			:	-
+// Comments				:	-
+// Date last edited		:	6/21/2001
+void	CBilinearPatch::intersect(CRay *cRay) {
+
+	if (! (cRay->flags & attributes->flags) )	return;
+
+	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
+		const float importance = attributes->lodImportance;
+		if (cRay->jimp < 0) cRay->jimp = urand();
+		if (importance >= 0) {
+			if (cRay->jimp > importance)			return;
+		} else {
+			if ((1-cRay->jimp) >= -importance)		return;
+		}
+	}
+
+	const int	vertexSize	=	vertexData->vertexSize;
+
+	const float	*P00	=	vertex;
+	const float	*P10	=	P00 + vertexSize;
+	const float	*P01	=	P10 + vertexSize;
+	const float	*P11	=	P01 + vertexSize;
+	vector	t0,t1,t2,t3;
+
+	if (variables->moving) {
+		interpolatev(t0,P00,P00 + vertexSize*4,cRay->time);	P00	=	t0;
+		interpolatev(t1,P10,P10 + vertexSize*4,cRay->time);	P10	=	t1;
+		interpolatev(t2,P01,P01 + vertexSize*4,cRay->time);	P01	=	t2;
+		interpolatev(t3,P11,P11 + vertexSize*4,cRay->time);	P11	=	t3;
+	} 
+
+
+	const float	*r			=	cRay->from;
+	const float	*q			=	cRay->dir;
+	vector		a,b,c,d;
+
+	subvv(a,P11,P10);
+	subvv(a,P01);
+	addvv(a,P00);
+	subvv(b,P10,P00);
+	subvv(c,P01,P00);
+	movvv(d,P00);
+
+	const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
+	const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
+	const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
+	const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
+	const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
+	const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
+	const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
+	const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
+	
+
+#define solve()														\
+	if ((v > 0) && (v < 1)) {										\
+		{															\
+			const double	a	=	v*A2 + B2;						\
+			const double	b	=	v*(A2 - A1) + B2 - B1;			\
+			if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
+			else			u	=	(-v*C2 - D2) / a;				\
+		}															\
+																	\
+		if ((u > 0) && (u < 1)) {									\
+			double	P[3];											\
+																	\
+			P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
+			P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
+			P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
+																	\
+			if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
+				t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+			else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
+				t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+			else													\
+				t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+																	\
+			if ((t > cRay->tmin) && (t < cRay->t)) {				\
+				vector	dPdu,dPdv,N;								\
+				vector	tmp1,tmp2;									\
+				subvv(tmp1,P10,P00);								\
+				subvv(tmp2,P11,P01);								\
+				interpolatev(dPdu,tmp1,tmp2,(float) v);				\
+				subvv(tmp1,P01,P00);								\
+				subvv(tmp2,P11,P10);								\
+				interpolatev(dPdv,tmp1,tmp2,(float) u);				\
+				crossvv(N,dPdu,dPdv);								\
+				if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
+				if (attributes->nSides == 1) {						\
+					if (dotvv(q,N) < 0) {							\
+						cRay->object	=	this;					\
+						cRay->u			=	(float) (u*uMult + uOrg);	\
+						cRay->v			=	(float) (v*vMult + vOrg);	\
+						cRay->t			=	(float) t;				\
+						movvv(cRay->N,N);							\
+					}												\
+				} else {											\
+					cRay->object	=	this;						\
+					cRay->u			=	(float) (u*uMult + uOrg);	\
+					cRay->v			=	(float) (v*vMult + vOrg);	\
+					cRay->t			=	(float) t;					\
+					movvv(cRay->N,N);								\
+				}													\
+			}														\
+		}															\
+	}
+	
+
+
+	double			roots[2];
+	const int		i	=	solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots);
+	double			u,v,t;
+
+	switch (i) {
+		case 0:
+			break;
+		case 1:
+			v	=	roots[0];
+			solve();
+			break;
+		case 2:
+			v	=	roots[0];
+			solve();
+			v	=	roots[1];
+			solve();
+			break;
+	}
+
+
+}
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBilinearPatch
 // Method				:	bound
@@ -170,34 +349,8 @@ CBilinearPatch::~CBilinearPatch() {
 // Comments				:	-
 // Date last edited		:	6/21/2001
 void	CBilinearPatch::bound(float *bmin,float *bmax) const {
-	float	*ver0,*ver1,*ver2,*ver3;
-	int		vertexSize	=	variables->vertexSize;
-
-	ver0				=	vertex;
-	ver1				=	ver0	+	vertexSize;
-	ver2				=	ver1	+	vertexSize;
-	ver3				=	ver2	+	vertexSize;
-
-	movvv(bmin,ver0);
-	movvv(bmax,ver0);
-
-	addBox(bmin,bmax,ver1);
-	addBox(bmin,bmax,ver2);
-	addBox(bmin,bmax,ver3);
-
-	if (variables->moving) {
-		ver0				=	vertex + vertexSize*4;
-		ver1				=	ver0	+	vertexSize;
-		ver2				=	ver1	+	vertexSize;
-		ver3				=	ver2	+	vertexSize;
-
-		addBox(bmin,bmax,ver0);
-		addBox(bmin,bmax,ver1);
-		addBox(bmin,bmax,ver2);
-		addBox(bmin,bmax,ver3);
-	}
-
-	makeBound(bmin,bmax);
+	movvv(bmin,this->bmin);
+	movvv(bmax,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -208,7 +361,9 @@ void	CBilinearPatch::bound(float *bmin,float *bmax) const {
 // Comments				:	-
 // Date last edited		:	6/21/2001
 void	CBilinearPatch::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
+	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
+		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else														context->addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -240,7 +395,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 			vertexDataStep	=	0;
 		} else {
 			float		*interpolate;
-			const float	*time	=	varying[VARIABLE_TIME] + start;
+			const float	*time		=	varying[VARIABLE_TIME] + start;
 			int			j,k;
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*4;

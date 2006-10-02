@@ -115,8 +115,8 @@ void	CStats::reset() {
 	numVsplits						=	0;
 	numUsplits						=	0;
 	numUVsplits						=	0;
-	numTrianglesCreated				=	0;
-	numTrianglesRendered			=	0;
+	numQuadsCreated					=	0;
+	numQuadsRendered				=	0;
 	numTracedRays					=	0;
 	numShadingRays					=	0;
 	numShadowRays					=	0;
@@ -176,8 +176,8 @@ void	CStats::printStats(int level) {
 
 		if (numRasterGridsCreated > 0) {
 			info(CODE_STATS,"      Grid Culling: %.2f     (percent) \n",100*(numRasterGridsCreated-numRasterGridsShaded) / (float) numRasterGridsCreated);
-			info(CODE_STATS,"          Tri/Grid: %.2f (%d/%d)\n",numTrianglesCreated / (float) numRasterGridsCreated,numTrianglesCreated,numRasterGridsCreated);
-			info(CODE_STATS,"          Overdraw: %.2f (times)\n",numTrianglesRendered / (float) numTrianglesCreated);
+			info(CODE_STATS,"          Quad/Grid: %.2f (%d/%d)\n",numQuadsCreated / (float) numRasterGridsCreated,numQuadsCreated,numRasterGridsCreated);
+			info(CODE_STATS,"          Overdraw: %.2f (times)\n",numQuadsRendered / (float) numQuadsCreated);
 		}
 
 		info(CODE_STATS,"           Objects: %d(%.2f) (peak number(avg))\n",numPeakRasterObjects,avgRasterObjects);

@@ -4,16 +4,16 @@
 #ifdef DEFINE_STOCHASTIC_SWITCH
 switch((grid->flags & RASTER_GLOBAL_MASK) | (depthFilter << RASTER_HIGHBITS_SHIFT)) {
 case 0:
-	drawTriangleGridZmin(grid);
+	drawQuadGridZmin(grid);
 	break;
 case 1:
-	drawTriangleGridZminMoving(grid);
+	drawQuadGridZminMoving(grid);
 	break;
 case 2:
-	drawTriangleGridZminTransparent(grid);
+	drawQuadGridZminTransparent(grid);
 	break;
 case 3:
-	drawTriangleGridZminMovingTransparent(grid);
+	drawQuadGridZminMovingTransparent(grid);
 	break;
 case 4:
 	drawPointGridZmin(grid);
@@ -28,10 +28,10 @@ case 7:
 	drawPointGridZminMovingTransparent(grid);
 	break;
 case 8:
-	drawTriangleGridZminUnshaded(grid);
+	drawQuadGridZminUnshaded(grid);
 	break;
 case 9:
-	drawTriangleGridZminUnshadedMoving(grid);
+	drawQuadGridZminUnshadedMoving(grid);
 	break;
 case 10:
 	break;
@@ -48,16 +48,16 @@ case 14:
 case 15:
 	break;
 case 16:
-	drawTriangleGridZminDepthBlur(grid);
+	drawQuadGridZminDepthBlur(grid);
 	break;
 case 17:
-	drawTriangleGridZminMovingDepthBlur(grid);
+	drawQuadGridZminMovingDepthBlur(grid);
 	break;
 case 18:
-	drawTriangleGridZminTransparentDepthBlur(grid);
+	drawQuadGridZminTransparentDepthBlur(grid);
 	break;
 case 19:
-	drawTriangleGridZminMovingTransparentDepthBlur(grid);
+	drawQuadGridZminMovingTransparentDepthBlur(grid);
 	break;
 case 20:
 	drawPointGridZminDepthBlur(grid);
@@ -72,10 +72,10 @@ case 23:
 	drawPointGridZminMovingTransparentDepthBlur(grid);
 	break;
 case 24:
-	drawTriangleGridZminUnshadedDepthBlur(grid);
+	drawQuadGridZminUnshadedDepthBlur(grid);
 	break;
 case 25:
-	drawTriangleGridZminUnshadedMovingDepthBlur(grid);
+	drawQuadGridZminUnshadedMovingDepthBlur(grid);
 	break;
 case 26:
 	break;
@@ -92,16 +92,16 @@ case 30:
 case 31:
 	break;
 case 32:
-	drawTriangleGridZminExtraSamples(grid);
+	drawQuadGridZminExtraSamples(grid);
 	break;
 case 33:
-	drawTriangleGridZminMovingExtraSamples(grid);
+	drawQuadGridZminMovingExtraSamples(grid);
 	break;
 case 34:
-	drawTriangleGridZminTransparentExtraSamples(grid);
+	drawQuadGridZminTransparentExtraSamples(grid);
 	break;
 case 35:
-	drawTriangleGridZminMovingTransparentExtraSamples(grid);
+	drawQuadGridZminMovingTransparentExtraSamples(grid);
 	break;
 case 36:
 	drawPointGridZminExtraSamples(grid);
@@ -116,10 +116,10 @@ case 39:
 	drawPointGridZminMovingTransparentExtraSamples(grid);
 	break;
 case 40:
-	drawTriangleGridZminUnshadedExtraSamples(grid);
+	drawQuadGridZminUnshadedExtraSamples(grid);
 	break;
 case 41:
-	drawTriangleGridZminUnshadedMovingExtraSamples(grid);
+	drawQuadGridZminUnshadedMovingExtraSamples(grid);
 	break;
 case 42:
 	break;
@@ -136,16 +136,16 @@ case 46:
 case 47:
 	break;
 case 48:
-	drawTriangleGridZminDepthBlurExtraSamples(grid);
+	drawQuadGridZminDepthBlurExtraSamples(grid);
 	break;
 case 49:
-	drawTriangleGridZminMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZminMovingDepthBlurExtraSamples(grid);
 	break;
 case 50:
-	drawTriangleGridZminTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZminTransparentDepthBlurExtraSamples(grid);
 	break;
 case 51:
-	drawTriangleGridZminMovingTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZminMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 52:
 	drawPointGridZminDepthBlurExtraSamples(grid);
@@ -160,10 +160,10 @@ case 55:
 	drawPointGridZminMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 56:
-	drawTriangleGridZminUnshadedDepthBlurExtraSamples(grid);
+	drawQuadGridZminUnshadedDepthBlurExtraSamples(grid);
 	break;
 case 57:
-	drawTriangleGridZminUnshadedMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZminUnshadedMovingDepthBlurExtraSamples(grid);
 	break;
 case 58:
 	break;
@@ -180,16 +180,16 @@ case 62:
 case 63:
 	break;
 case 64:
-	drawTriangleGridZminMatte(grid);
+	drawQuadGridZminMatte(grid);
 	break;
 case 65:
-	drawTriangleGridZminMovingMatte(grid);
+	drawQuadGridZminMovingMatte(grid);
 	break;
 case 66:
-	drawTriangleGridZminTransparentMatte(grid);
+	drawQuadGridZminTransparentMatte(grid);
 	break;
 case 67:
-	drawTriangleGridZminMovingTransparentMatte(grid);
+	drawQuadGridZminMovingTransparentMatte(grid);
 	break;
 case 68:
 	drawPointGridZminMatte(grid);
@@ -220,16 +220,16 @@ case 78:
 case 79:
 	break;
 case 80:
-	drawTriangleGridZminDepthBlurMatte(grid);
+	drawQuadGridZminDepthBlurMatte(grid);
 	break;
 case 81:
-	drawTriangleGridZminMovingDepthBlurMatte(grid);
+	drawQuadGridZminMovingDepthBlurMatte(grid);
 	break;
 case 82:
-	drawTriangleGridZminTransparentDepthBlurMatte(grid);
+	drawQuadGridZminTransparentDepthBlurMatte(grid);
 	break;
 case 83:
-	drawTriangleGridZminMovingTransparentDepthBlurMatte(grid);
+	drawQuadGridZminMovingTransparentDepthBlurMatte(grid);
 	break;
 case 84:
 	drawPointGridZminDepthBlurMatte(grid);
@@ -260,16 +260,16 @@ case 94:
 case 95:
 	break;
 case 96:
-	drawTriangleGridZminExtraSamplesMatte(grid);
+	drawQuadGridZminExtraSamplesMatte(grid);
 	break;
 case 97:
-	drawTriangleGridZminMovingExtraSamplesMatte(grid);
+	drawQuadGridZminMovingExtraSamplesMatte(grid);
 	break;
 case 98:
-	drawTriangleGridZminTransparentExtraSamplesMatte(grid);
+	drawQuadGridZminTransparentExtraSamplesMatte(grid);
 	break;
 case 99:
-	drawTriangleGridZminMovingTransparentExtraSamplesMatte(grid);
+	drawQuadGridZminMovingTransparentExtraSamplesMatte(grid);
 	break;
 case 100:
 	drawPointGridZminExtraSamplesMatte(grid);
@@ -300,16 +300,16 @@ case 110:
 case 111:
 	break;
 case 112:
-	drawTriangleGridZminDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZminDepthBlurExtraSamplesMatte(grid);
 	break;
 case 113:
-	drawTriangleGridZminMovingDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZminMovingDepthBlurExtraSamplesMatte(grid);
 	break;
 case 114:
-	drawTriangleGridZminTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZminTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 115:
-	drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZminMovingTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 116:
 	drawPointGridZminDepthBlurExtraSamplesMatte(grid);
@@ -340,16 +340,16 @@ case 126:
 case 127:
 	break;
 case 128:
-	drawTriangleGridZminLOD(grid);
+	drawQuadGridZminLOD(grid);
 	break;
 case 129:
-	drawTriangleGridZminMovingLOD(grid);
+	drawQuadGridZminMovingLOD(grid);
 	break;
 case 130:
-	drawTriangleGridZminTransparentLOD(grid);
+	drawQuadGridZminTransparentLOD(grid);
 	break;
 case 131:
-	drawTriangleGridZminMovingTransparentLOD(grid);
+	drawQuadGridZminMovingTransparentLOD(grid);
 	break;
 case 132:
 	drawPointGridZminLOD(grid);
@@ -380,16 +380,16 @@ case 142:
 case 143:
 	break;
 case 144:
-	drawTriangleGridZminDepthBlurLOD(grid);
+	drawQuadGridZminDepthBlurLOD(grid);
 	break;
 case 145:
-	drawTriangleGridZminMovingDepthBlurLOD(grid);
+	drawQuadGridZminMovingDepthBlurLOD(grid);
 	break;
 case 146:
-	drawTriangleGridZminTransparentDepthBlurLOD(grid);
+	drawQuadGridZminTransparentDepthBlurLOD(grid);
 	break;
 case 147:
-	drawTriangleGridZminMovingTransparentDepthBlurLOD(grid);
+	drawQuadGridZminMovingTransparentDepthBlurLOD(grid);
 	break;
 case 148:
 	drawPointGridZminDepthBlurLOD(grid);
@@ -420,16 +420,16 @@ case 158:
 case 159:
 	break;
 case 160:
-	drawTriangleGridZminExtraSamplesLOD(grid);
+	drawQuadGridZminExtraSamplesLOD(grid);
 	break;
 case 161:
-	drawTriangleGridZminMovingExtraSamplesLOD(grid);
+	drawQuadGridZminMovingExtraSamplesLOD(grid);
 	break;
 case 162:
-	drawTriangleGridZminTransparentExtraSamplesLOD(grid);
+	drawQuadGridZminTransparentExtraSamplesLOD(grid);
 	break;
 case 163:
-	drawTriangleGridZminMovingTransparentExtraSamplesLOD(grid);
+	drawQuadGridZminMovingTransparentExtraSamplesLOD(grid);
 	break;
 case 164:
 	drawPointGridZminExtraSamplesLOD(grid);
@@ -460,16 +460,16 @@ case 174:
 case 175:
 	break;
 case 176:
-	drawTriangleGridZminDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZminDepthBlurExtraSamplesLOD(grid);
 	break;
 case 177:
-	drawTriangleGridZminMovingDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZminMovingDepthBlurExtraSamplesLOD(grid);
 	break;
 case 178:
-	drawTriangleGridZminTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZminTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 179:
-	drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZminMovingTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 180:
 	drawPointGridZminDepthBlurExtraSamplesLOD(grid);
@@ -500,16 +500,16 @@ case 190:
 case 191:
 	break;
 case 192:
-	drawTriangleGridZminMatteLOD(grid);
+	drawQuadGridZminMatteLOD(grid);
 	break;
 case 193:
-	drawTriangleGridZminMovingMatteLOD(grid);
+	drawQuadGridZminMovingMatteLOD(grid);
 	break;
 case 194:
-	drawTriangleGridZminTransparentMatteLOD(grid);
+	drawQuadGridZminTransparentMatteLOD(grid);
 	break;
 case 195:
-	drawTriangleGridZminMovingTransparentMatteLOD(grid);
+	drawQuadGridZminMovingTransparentMatteLOD(grid);
 	break;
 case 196:
 	drawPointGridZminMatteLOD(grid);
@@ -540,16 +540,16 @@ case 206:
 case 207:
 	break;
 case 208:
-	drawTriangleGridZminDepthBlurMatteLOD(grid);
+	drawQuadGridZminDepthBlurMatteLOD(grid);
 	break;
 case 209:
-	drawTriangleGridZminMovingDepthBlurMatteLOD(grid);
+	drawQuadGridZminMovingDepthBlurMatteLOD(grid);
 	break;
 case 210:
-	drawTriangleGridZminTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZminTransparentDepthBlurMatteLOD(grid);
 	break;
 case 211:
-	drawTriangleGridZminMovingTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZminMovingTransparentDepthBlurMatteLOD(grid);
 	break;
 case 212:
 	drawPointGridZminDepthBlurMatteLOD(grid);
@@ -580,16 +580,16 @@ case 222:
 case 223:
 	break;
 case 224:
-	drawTriangleGridZminExtraSamplesMatteLOD(grid);
+	drawQuadGridZminExtraSamplesMatteLOD(grid);
 	break;
 case 225:
-	drawTriangleGridZminMovingExtraSamplesMatteLOD(grid);
+	drawQuadGridZminMovingExtraSamplesMatteLOD(grid);
 	break;
 case 226:
-	drawTriangleGridZminTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZminTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 227:
-	drawTriangleGridZminMovingTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZminMovingTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 228:
 	drawPointGridZminExtraSamplesMatteLOD(grid);
@@ -620,16 +620,16 @@ case 238:
 case 239:
 	break;
 case 240:
-	drawTriangleGridZminDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZminDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 241:
-	drawTriangleGridZminMovingDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZminMovingDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 242:
-	drawTriangleGridZminTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZminTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 243:
-	drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 244:
 	drawPointGridZminDepthBlurExtraSamplesMatteLOD(grid);
@@ -676,10 +676,10 @@ case 262:
 case 263:
 	break;
 case 264:
-	drawTriangleGridZminUnshadedUndercull(grid);
+	drawQuadGridZminUnshadedUndercull(grid);
 	break;
 case 265:
-	drawTriangleGridZminUnshadedMovingUndercull(grid);
+	drawQuadGridZminUnshadedMovingUndercull(grid);
 	break;
 case 266:
 	break;
@@ -712,10 +712,10 @@ case 278:
 case 279:
 	break;
 case 280:
-	drawTriangleGridZminUnshadedDepthBlurUndercull(grid);
+	drawQuadGridZminUnshadedDepthBlurUndercull(grid);
 	break;
 case 281:
-	drawTriangleGridZminUnshadedMovingDepthBlurUndercull(grid);
+	drawQuadGridZminUnshadedMovingDepthBlurUndercull(grid);
 	break;
 case 282:
 	break;
@@ -748,10 +748,10 @@ case 294:
 case 295:
 	break;
 case 296:
-	drawTriangleGridZminUnshadedExtraSamplesUndercull(grid);
+	drawQuadGridZminUnshadedExtraSamplesUndercull(grid);
 	break;
 case 297:
-	drawTriangleGridZminUnshadedMovingExtraSamplesUndercull(grid);
+	drawQuadGridZminUnshadedMovingExtraSamplesUndercull(grid);
 	break;
 case 298:
 	break;
@@ -784,10 +784,10 @@ case 310:
 case 311:
 	break;
 case 312:
-	drawTriangleGridZminUnshadedDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZminUnshadedDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 313:
-	drawTriangleGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 314:
 	break;
@@ -1188,16 +1188,16 @@ case 510:
 case 511:
 	break;
 case 512:
-	drawTriangleGridZmax(grid);
+	drawQuadGridZmax(grid);
 	break;
 case 513:
-	drawTriangleGridZmaxMoving(grid);
+	drawQuadGridZmaxMoving(grid);
 	break;
 case 514:
-	drawTriangleGridZmaxTransparent(grid);
+	drawQuadGridZmaxTransparent(grid);
 	break;
 case 515:
-	drawTriangleGridZmaxMovingTransparent(grid);
+	drawQuadGridZmaxMovingTransparent(grid);
 	break;
 case 516:
 	drawPointGridZmax(grid);
@@ -1212,10 +1212,10 @@ case 519:
 	drawPointGridZmaxMovingTransparent(grid);
 	break;
 case 520:
-	drawTriangleGridZmaxUnshaded(grid);
+	drawQuadGridZmaxUnshaded(grid);
 	break;
 case 521:
-	drawTriangleGridZmaxUnshadedMoving(grid);
+	drawQuadGridZmaxUnshadedMoving(grid);
 	break;
 case 522:
 	break;
@@ -1232,16 +1232,16 @@ case 526:
 case 527:
 	break;
 case 528:
-	drawTriangleGridZmaxDepthBlur(grid);
+	drawQuadGridZmaxDepthBlur(grid);
 	break;
 case 529:
-	drawTriangleGridZmaxMovingDepthBlur(grid);
+	drawQuadGridZmaxMovingDepthBlur(grid);
 	break;
 case 530:
-	drawTriangleGridZmaxTransparentDepthBlur(grid);
+	drawQuadGridZmaxTransparentDepthBlur(grid);
 	break;
 case 531:
-	drawTriangleGridZmaxMovingTransparentDepthBlur(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlur(grid);
 	break;
 case 532:
 	drawPointGridZmaxDepthBlur(grid);
@@ -1256,10 +1256,10 @@ case 535:
 	drawPointGridZmaxMovingTransparentDepthBlur(grid);
 	break;
 case 536:
-	drawTriangleGridZmaxUnshadedDepthBlur(grid);
+	drawQuadGridZmaxUnshadedDepthBlur(grid);
 	break;
 case 537:
-	drawTriangleGridZmaxUnshadedMovingDepthBlur(grid);
+	drawQuadGridZmaxUnshadedMovingDepthBlur(grid);
 	break;
 case 538:
 	break;
@@ -1276,16 +1276,16 @@ case 542:
 case 543:
 	break;
 case 544:
-	drawTriangleGridZmaxExtraSamples(grid);
+	drawQuadGridZmaxExtraSamples(grid);
 	break;
 case 545:
-	drawTriangleGridZmaxMovingExtraSamples(grid);
+	drawQuadGridZmaxMovingExtraSamples(grid);
 	break;
 case 546:
-	drawTriangleGridZmaxTransparentExtraSamples(grid);
+	drawQuadGridZmaxTransparentExtraSamples(grid);
 	break;
 case 547:
-	drawTriangleGridZmaxMovingTransparentExtraSamples(grid);
+	drawQuadGridZmaxMovingTransparentExtraSamples(grid);
 	break;
 case 548:
 	drawPointGridZmaxExtraSamples(grid);
@@ -1300,10 +1300,10 @@ case 551:
 	drawPointGridZmaxMovingTransparentExtraSamples(grid);
 	break;
 case 552:
-	drawTriangleGridZmaxUnshadedExtraSamples(grid);
+	drawQuadGridZmaxUnshadedExtraSamples(grid);
 	break;
 case 553:
-	drawTriangleGridZmaxUnshadedMovingExtraSamples(grid);
+	drawQuadGridZmaxUnshadedMovingExtraSamples(grid);
 	break;
 case 554:
 	break;
@@ -1320,16 +1320,16 @@ case 558:
 case 559:
 	break;
 case 560:
-	drawTriangleGridZmaxDepthBlurExtraSamples(grid);
+	drawQuadGridZmaxDepthBlurExtraSamples(grid);
 	break;
 case 561:
-	drawTriangleGridZmaxMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZmaxMovingDepthBlurExtraSamples(grid);
 	break;
 case 562:
-	drawTriangleGridZmaxTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZmaxTransparentDepthBlurExtraSamples(grid);
 	break;
 case 563:
-	drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 564:
 	drawPointGridZmaxDepthBlurExtraSamples(grid);
@@ -1344,10 +1344,10 @@ case 567:
 	drawPointGridZmaxMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 568:
-	drawTriangleGridZmaxUnshadedDepthBlurExtraSamples(grid);
+	drawQuadGridZmaxUnshadedDepthBlurExtraSamples(grid);
 	break;
 case 569:
-	drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZmaxUnshadedMovingDepthBlurExtraSamples(grid);
 	break;
 case 570:
 	break;
@@ -1364,16 +1364,16 @@ case 574:
 case 575:
 	break;
 case 576:
-	drawTriangleGridZmaxMatte(grid);
+	drawQuadGridZmaxMatte(grid);
 	break;
 case 577:
-	drawTriangleGridZmaxMovingMatte(grid);
+	drawQuadGridZmaxMovingMatte(grid);
 	break;
 case 578:
-	drawTriangleGridZmaxTransparentMatte(grid);
+	drawQuadGridZmaxTransparentMatte(grid);
 	break;
 case 579:
-	drawTriangleGridZmaxMovingTransparentMatte(grid);
+	drawQuadGridZmaxMovingTransparentMatte(grid);
 	break;
 case 580:
 	drawPointGridZmaxMatte(grid);
@@ -1404,16 +1404,16 @@ case 590:
 case 591:
 	break;
 case 592:
-	drawTriangleGridZmaxDepthBlurMatte(grid);
+	drawQuadGridZmaxDepthBlurMatte(grid);
 	break;
 case 593:
-	drawTriangleGridZmaxMovingDepthBlurMatte(grid);
+	drawQuadGridZmaxMovingDepthBlurMatte(grid);
 	break;
 case 594:
-	drawTriangleGridZmaxTransparentDepthBlurMatte(grid);
+	drawQuadGridZmaxTransparentDepthBlurMatte(grid);
 	break;
 case 595:
-	drawTriangleGridZmaxMovingTransparentDepthBlurMatte(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurMatte(grid);
 	break;
 case 596:
 	drawPointGridZmaxDepthBlurMatte(grid);
@@ -1444,16 +1444,16 @@ case 606:
 case 607:
 	break;
 case 608:
-	drawTriangleGridZmaxExtraSamplesMatte(grid);
+	drawQuadGridZmaxExtraSamplesMatte(grid);
 	break;
 case 609:
-	drawTriangleGridZmaxMovingExtraSamplesMatte(grid);
+	drawQuadGridZmaxMovingExtraSamplesMatte(grid);
 	break;
 case 610:
-	drawTriangleGridZmaxTransparentExtraSamplesMatte(grid);
+	drawQuadGridZmaxTransparentExtraSamplesMatte(grid);
 	break;
 case 611:
-	drawTriangleGridZmaxMovingTransparentExtraSamplesMatte(grid);
+	drawQuadGridZmaxMovingTransparentExtraSamplesMatte(grid);
 	break;
 case 612:
 	drawPointGridZmaxExtraSamplesMatte(grid);
@@ -1484,16 +1484,16 @@ case 622:
 case 623:
 	break;
 case 624:
-	drawTriangleGridZmaxDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmaxDepthBlurExtraSamplesMatte(grid);
 	break;
 case 625:
-	drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmaxMovingDepthBlurExtraSamplesMatte(grid);
 	break;
 case 626:
-	drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmaxTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 627:
-	drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 628:
 	drawPointGridZmaxDepthBlurExtraSamplesMatte(grid);
@@ -1524,16 +1524,16 @@ case 638:
 case 639:
 	break;
 case 640:
-	drawTriangleGridZmaxLOD(grid);
+	drawQuadGridZmaxLOD(grid);
 	break;
 case 641:
-	drawTriangleGridZmaxMovingLOD(grid);
+	drawQuadGridZmaxMovingLOD(grid);
 	break;
 case 642:
-	drawTriangleGridZmaxTransparentLOD(grid);
+	drawQuadGridZmaxTransparentLOD(grid);
 	break;
 case 643:
-	drawTriangleGridZmaxMovingTransparentLOD(grid);
+	drawQuadGridZmaxMovingTransparentLOD(grid);
 	break;
 case 644:
 	drawPointGridZmaxLOD(grid);
@@ -1564,16 +1564,16 @@ case 654:
 case 655:
 	break;
 case 656:
-	drawTriangleGridZmaxDepthBlurLOD(grid);
+	drawQuadGridZmaxDepthBlurLOD(grid);
 	break;
 case 657:
-	drawTriangleGridZmaxMovingDepthBlurLOD(grid);
+	drawQuadGridZmaxMovingDepthBlurLOD(grid);
 	break;
 case 658:
-	drawTriangleGridZmaxTransparentDepthBlurLOD(grid);
+	drawQuadGridZmaxTransparentDepthBlurLOD(grid);
 	break;
 case 659:
-	drawTriangleGridZmaxMovingTransparentDepthBlurLOD(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurLOD(grid);
 	break;
 case 660:
 	drawPointGridZmaxDepthBlurLOD(grid);
@@ -1604,16 +1604,16 @@ case 670:
 case 671:
 	break;
 case 672:
-	drawTriangleGridZmaxExtraSamplesLOD(grid);
+	drawQuadGridZmaxExtraSamplesLOD(grid);
 	break;
 case 673:
-	drawTriangleGridZmaxMovingExtraSamplesLOD(grid);
+	drawQuadGridZmaxMovingExtraSamplesLOD(grid);
 	break;
 case 674:
-	drawTriangleGridZmaxTransparentExtraSamplesLOD(grid);
+	drawQuadGridZmaxTransparentExtraSamplesLOD(grid);
 	break;
 case 675:
-	drawTriangleGridZmaxMovingTransparentExtraSamplesLOD(grid);
+	drawQuadGridZmaxMovingTransparentExtraSamplesLOD(grid);
 	break;
 case 676:
 	drawPointGridZmaxExtraSamplesLOD(grid);
@@ -1644,16 +1644,16 @@ case 686:
 case 687:
 	break;
 case 688:
-	drawTriangleGridZmaxDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmaxDepthBlurExtraSamplesLOD(grid);
 	break;
 case 689:
-	drawTriangleGridZmaxMovingDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmaxMovingDepthBlurExtraSamplesLOD(grid);
 	break;
 case 690:
-	drawTriangleGridZmaxTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmaxTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 691:
-	drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 692:
 	drawPointGridZmaxDepthBlurExtraSamplesLOD(grid);
@@ -1684,16 +1684,16 @@ case 702:
 case 703:
 	break;
 case 704:
-	drawTriangleGridZmaxMatteLOD(grid);
+	drawQuadGridZmaxMatteLOD(grid);
 	break;
 case 705:
-	drawTriangleGridZmaxMovingMatteLOD(grid);
+	drawQuadGridZmaxMovingMatteLOD(grid);
 	break;
 case 706:
-	drawTriangleGridZmaxTransparentMatteLOD(grid);
+	drawQuadGridZmaxTransparentMatteLOD(grid);
 	break;
 case 707:
-	drawTriangleGridZmaxMovingTransparentMatteLOD(grid);
+	drawQuadGridZmaxMovingTransparentMatteLOD(grid);
 	break;
 case 708:
 	drawPointGridZmaxMatteLOD(grid);
@@ -1724,16 +1724,16 @@ case 718:
 case 719:
 	break;
 case 720:
-	drawTriangleGridZmaxDepthBlurMatteLOD(grid);
+	drawQuadGridZmaxDepthBlurMatteLOD(grid);
 	break;
 case 721:
-	drawTriangleGridZmaxMovingDepthBlurMatteLOD(grid);
+	drawQuadGridZmaxMovingDepthBlurMatteLOD(grid);
 	break;
 case 722:
-	drawTriangleGridZmaxTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZmaxTransparentDepthBlurMatteLOD(grid);
 	break;
 case 723:
-	drawTriangleGridZmaxMovingTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurMatteLOD(grid);
 	break;
 case 724:
 	drawPointGridZmaxDepthBlurMatteLOD(grid);
@@ -1764,16 +1764,16 @@ case 734:
 case 735:
 	break;
 case 736:
-	drawTriangleGridZmaxExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxExtraSamplesMatteLOD(grid);
 	break;
 case 737:
-	drawTriangleGridZmaxMovingExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxMovingExtraSamplesMatteLOD(grid);
 	break;
 case 738:
-	drawTriangleGridZmaxTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 739:
-	drawTriangleGridZmaxMovingTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxMovingTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 740:
 	drawPointGridZmaxExtraSamplesMatteLOD(grid);
@@ -1804,16 +1804,16 @@ case 750:
 case 751:
 	break;
 case 752:
-	drawTriangleGridZmaxDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 753:
-	drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxMovingDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 754:
-	drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 755:
-	drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 756:
 	drawPointGridZmaxDepthBlurExtraSamplesMatteLOD(grid);
@@ -1860,10 +1860,10 @@ case 774:
 case 775:
 	break;
 case 776:
-	drawTriangleGridZmaxUnshadedUndercull(grid);
+	drawQuadGridZmaxUnshadedUndercull(grid);
 	break;
 case 777:
-	drawTriangleGridZmaxUnshadedMovingUndercull(grid);
+	drawQuadGridZmaxUnshadedMovingUndercull(grid);
 	break;
 case 778:
 	break;
@@ -1896,10 +1896,10 @@ case 790:
 case 791:
 	break;
 case 792:
-	drawTriangleGridZmaxUnshadedDepthBlurUndercull(grid);
+	drawQuadGridZmaxUnshadedDepthBlurUndercull(grid);
 	break;
 case 793:
-	drawTriangleGridZmaxUnshadedMovingDepthBlurUndercull(grid);
+	drawQuadGridZmaxUnshadedMovingDepthBlurUndercull(grid);
 	break;
 case 794:
 	break;
@@ -1932,10 +1932,10 @@ case 806:
 case 807:
 	break;
 case 808:
-	drawTriangleGridZmaxUnshadedExtraSamplesUndercull(grid);
+	drawQuadGridZmaxUnshadedExtraSamplesUndercull(grid);
 	break;
 case 809:
-	drawTriangleGridZmaxUnshadedMovingExtraSamplesUndercull(grid);
+	drawQuadGridZmaxUnshadedMovingExtraSamplesUndercull(grid);
 	break;
 case 810:
 	break;
@@ -1968,10 +1968,10 @@ case 822:
 case 823:
 	break;
 case 824:
-	drawTriangleGridZmaxUnshadedDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZmaxUnshadedDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 825:
-	drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 826:
 	break;
@@ -2372,16 +2372,16 @@ case 1022:
 case 1023:
 	break;
 case 1024:
-	drawTriangleGridZavg(grid);
+	drawQuadGridZavg(grid);
 	break;
 case 1025:
-	drawTriangleGridZavgMoving(grid);
+	drawQuadGridZavgMoving(grid);
 	break;
 case 1026:
-	drawTriangleGridZavgTransparent(grid);
+	drawQuadGridZavgTransparent(grid);
 	break;
 case 1027:
-	drawTriangleGridZavgMovingTransparent(grid);
+	drawQuadGridZavgMovingTransparent(grid);
 	break;
 case 1028:
 	drawPointGridZavg(grid);
@@ -2396,10 +2396,10 @@ case 1031:
 	drawPointGridZavgMovingTransparent(grid);
 	break;
 case 1032:
-	drawTriangleGridZavgUnshaded(grid);
+	drawQuadGridZavgUnshaded(grid);
 	break;
 case 1033:
-	drawTriangleGridZavgUnshadedMoving(grid);
+	drawQuadGridZavgUnshadedMoving(grid);
 	break;
 case 1034:
 	break;
@@ -2416,16 +2416,16 @@ case 1038:
 case 1039:
 	break;
 case 1040:
-	drawTriangleGridZavgDepthBlur(grid);
+	drawQuadGridZavgDepthBlur(grid);
 	break;
 case 1041:
-	drawTriangleGridZavgMovingDepthBlur(grid);
+	drawQuadGridZavgMovingDepthBlur(grid);
 	break;
 case 1042:
-	drawTriangleGridZavgTransparentDepthBlur(grid);
+	drawQuadGridZavgTransparentDepthBlur(grid);
 	break;
 case 1043:
-	drawTriangleGridZavgMovingTransparentDepthBlur(grid);
+	drawQuadGridZavgMovingTransparentDepthBlur(grid);
 	break;
 case 1044:
 	drawPointGridZavgDepthBlur(grid);
@@ -2440,10 +2440,10 @@ case 1047:
 	drawPointGridZavgMovingTransparentDepthBlur(grid);
 	break;
 case 1048:
-	drawTriangleGridZavgUnshadedDepthBlur(grid);
+	drawQuadGridZavgUnshadedDepthBlur(grid);
 	break;
 case 1049:
-	drawTriangleGridZavgUnshadedMovingDepthBlur(grid);
+	drawQuadGridZavgUnshadedMovingDepthBlur(grid);
 	break;
 case 1050:
 	break;
@@ -2460,16 +2460,16 @@ case 1054:
 case 1055:
 	break;
 case 1056:
-	drawTriangleGridZavgExtraSamples(grid);
+	drawQuadGridZavgExtraSamples(grid);
 	break;
 case 1057:
-	drawTriangleGridZavgMovingExtraSamples(grid);
+	drawQuadGridZavgMovingExtraSamples(grid);
 	break;
 case 1058:
-	drawTriangleGridZavgTransparentExtraSamples(grid);
+	drawQuadGridZavgTransparentExtraSamples(grid);
 	break;
 case 1059:
-	drawTriangleGridZavgMovingTransparentExtraSamples(grid);
+	drawQuadGridZavgMovingTransparentExtraSamples(grid);
 	break;
 case 1060:
 	drawPointGridZavgExtraSamples(grid);
@@ -2484,10 +2484,10 @@ case 1063:
 	drawPointGridZavgMovingTransparentExtraSamples(grid);
 	break;
 case 1064:
-	drawTriangleGridZavgUnshadedExtraSamples(grid);
+	drawQuadGridZavgUnshadedExtraSamples(grid);
 	break;
 case 1065:
-	drawTriangleGridZavgUnshadedMovingExtraSamples(grid);
+	drawQuadGridZavgUnshadedMovingExtraSamples(grid);
 	break;
 case 1066:
 	break;
@@ -2504,16 +2504,16 @@ case 1070:
 case 1071:
 	break;
 case 1072:
-	drawTriangleGridZavgDepthBlurExtraSamples(grid);
+	drawQuadGridZavgDepthBlurExtraSamples(grid);
 	break;
 case 1073:
-	drawTriangleGridZavgMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZavgMovingDepthBlurExtraSamples(grid);
 	break;
 case 1074:
-	drawTriangleGridZavgTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZavgTransparentDepthBlurExtraSamples(grid);
 	break;
 case 1075:
-	drawTriangleGridZavgMovingTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 1076:
 	drawPointGridZavgDepthBlurExtraSamples(grid);
@@ -2528,10 +2528,10 @@ case 1079:
 	drawPointGridZavgMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 1080:
-	drawTriangleGridZavgUnshadedDepthBlurExtraSamples(grid);
+	drawQuadGridZavgUnshadedDepthBlurExtraSamples(grid);
 	break;
 case 1081:
-	drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZavgUnshadedMovingDepthBlurExtraSamples(grid);
 	break;
 case 1082:
 	break;
@@ -2548,16 +2548,16 @@ case 1086:
 case 1087:
 	break;
 case 1088:
-	drawTriangleGridZavgMatte(grid);
+	drawQuadGridZavgMatte(grid);
 	break;
 case 1089:
-	drawTriangleGridZavgMovingMatte(grid);
+	drawQuadGridZavgMovingMatte(grid);
 	break;
 case 1090:
-	drawTriangleGridZavgTransparentMatte(grid);
+	drawQuadGridZavgTransparentMatte(grid);
 	break;
 case 1091:
-	drawTriangleGridZavgMovingTransparentMatte(grid);
+	drawQuadGridZavgMovingTransparentMatte(grid);
 	break;
 case 1092:
 	drawPointGridZavgMatte(grid);
@@ -2588,16 +2588,16 @@ case 1102:
 case 1103:
 	break;
 case 1104:
-	drawTriangleGridZavgDepthBlurMatte(grid);
+	drawQuadGridZavgDepthBlurMatte(grid);
 	break;
 case 1105:
-	drawTriangleGridZavgMovingDepthBlurMatte(grid);
+	drawQuadGridZavgMovingDepthBlurMatte(grid);
 	break;
 case 1106:
-	drawTriangleGridZavgTransparentDepthBlurMatte(grid);
+	drawQuadGridZavgTransparentDepthBlurMatte(grid);
 	break;
 case 1107:
-	drawTriangleGridZavgMovingTransparentDepthBlurMatte(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurMatte(grid);
 	break;
 case 1108:
 	drawPointGridZavgDepthBlurMatte(grid);
@@ -2628,16 +2628,16 @@ case 1118:
 case 1119:
 	break;
 case 1120:
-	drawTriangleGridZavgExtraSamplesMatte(grid);
+	drawQuadGridZavgExtraSamplesMatte(grid);
 	break;
 case 1121:
-	drawTriangleGridZavgMovingExtraSamplesMatte(grid);
+	drawQuadGridZavgMovingExtraSamplesMatte(grid);
 	break;
 case 1122:
-	drawTriangleGridZavgTransparentExtraSamplesMatte(grid);
+	drawQuadGridZavgTransparentExtraSamplesMatte(grid);
 	break;
 case 1123:
-	drawTriangleGridZavgMovingTransparentExtraSamplesMatte(grid);
+	drawQuadGridZavgMovingTransparentExtraSamplesMatte(grid);
 	break;
 case 1124:
 	drawPointGridZavgExtraSamplesMatte(grid);
@@ -2668,16 +2668,16 @@ case 1134:
 case 1135:
 	break;
 case 1136:
-	drawTriangleGridZavgDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZavgDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1137:
-	drawTriangleGridZavgMovingDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZavgMovingDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1138:
-	drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZavgTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1139:
-	drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1140:
 	drawPointGridZavgDepthBlurExtraSamplesMatte(grid);
@@ -2708,16 +2708,16 @@ case 1150:
 case 1151:
 	break;
 case 1152:
-	drawTriangleGridZavgLOD(grid);
+	drawQuadGridZavgLOD(grid);
 	break;
 case 1153:
-	drawTriangleGridZavgMovingLOD(grid);
+	drawQuadGridZavgMovingLOD(grid);
 	break;
 case 1154:
-	drawTriangleGridZavgTransparentLOD(grid);
+	drawQuadGridZavgTransparentLOD(grid);
 	break;
 case 1155:
-	drawTriangleGridZavgMovingTransparentLOD(grid);
+	drawQuadGridZavgMovingTransparentLOD(grid);
 	break;
 case 1156:
 	drawPointGridZavgLOD(grid);
@@ -2748,16 +2748,16 @@ case 1166:
 case 1167:
 	break;
 case 1168:
-	drawTriangleGridZavgDepthBlurLOD(grid);
+	drawQuadGridZavgDepthBlurLOD(grid);
 	break;
 case 1169:
-	drawTriangleGridZavgMovingDepthBlurLOD(grid);
+	drawQuadGridZavgMovingDepthBlurLOD(grid);
 	break;
 case 1170:
-	drawTriangleGridZavgTransparentDepthBlurLOD(grid);
+	drawQuadGridZavgTransparentDepthBlurLOD(grid);
 	break;
 case 1171:
-	drawTriangleGridZavgMovingTransparentDepthBlurLOD(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurLOD(grid);
 	break;
 case 1172:
 	drawPointGridZavgDepthBlurLOD(grid);
@@ -2788,16 +2788,16 @@ case 1182:
 case 1183:
 	break;
 case 1184:
-	drawTriangleGridZavgExtraSamplesLOD(grid);
+	drawQuadGridZavgExtraSamplesLOD(grid);
 	break;
 case 1185:
-	drawTriangleGridZavgMovingExtraSamplesLOD(grid);
+	drawQuadGridZavgMovingExtraSamplesLOD(grid);
 	break;
 case 1186:
-	drawTriangleGridZavgTransparentExtraSamplesLOD(grid);
+	drawQuadGridZavgTransparentExtraSamplesLOD(grid);
 	break;
 case 1187:
-	drawTriangleGridZavgMovingTransparentExtraSamplesLOD(grid);
+	drawQuadGridZavgMovingTransparentExtraSamplesLOD(grid);
 	break;
 case 1188:
 	drawPointGridZavgExtraSamplesLOD(grid);
@@ -2828,16 +2828,16 @@ case 1198:
 case 1199:
 	break;
 case 1200:
-	drawTriangleGridZavgDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZavgDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1201:
-	drawTriangleGridZavgMovingDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZavgMovingDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1202:
-	drawTriangleGridZavgTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZavgTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1203:
-	drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1204:
 	drawPointGridZavgDepthBlurExtraSamplesLOD(grid);
@@ -2868,16 +2868,16 @@ case 1214:
 case 1215:
 	break;
 case 1216:
-	drawTriangleGridZavgMatteLOD(grid);
+	drawQuadGridZavgMatteLOD(grid);
 	break;
 case 1217:
-	drawTriangleGridZavgMovingMatteLOD(grid);
+	drawQuadGridZavgMovingMatteLOD(grid);
 	break;
 case 1218:
-	drawTriangleGridZavgTransparentMatteLOD(grid);
+	drawQuadGridZavgTransparentMatteLOD(grid);
 	break;
 case 1219:
-	drawTriangleGridZavgMovingTransparentMatteLOD(grid);
+	drawQuadGridZavgMovingTransparentMatteLOD(grid);
 	break;
 case 1220:
 	drawPointGridZavgMatteLOD(grid);
@@ -2908,16 +2908,16 @@ case 1230:
 case 1231:
 	break;
 case 1232:
-	drawTriangleGridZavgDepthBlurMatteLOD(grid);
+	drawQuadGridZavgDepthBlurMatteLOD(grid);
 	break;
 case 1233:
-	drawTriangleGridZavgMovingDepthBlurMatteLOD(grid);
+	drawQuadGridZavgMovingDepthBlurMatteLOD(grid);
 	break;
 case 1234:
-	drawTriangleGridZavgTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZavgTransparentDepthBlurMatteLOD(grid);
 	break;
 case 1235:
-	drawTriangleGridZavgMovingTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurMatteLOD(grid);
 	break;
 case 1236:
 	drawPointGridZavgDepthBlurMatteLOD(grid);
@@ -2948,16 +2948,16 @@ case 1246:
 case 1247:
 	break;
 case 1248:
-	drawTriangleGridZavgExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgExtraSamplesMatteLOD(grid);
 	break;
 case 1249:
-	drawTriangleGridZavgMovingExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgMovingExtraSamplesMatteLOD(grid);
 	break;
 case 1250:
-	drawTriangleGridZavgTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 1251:
-	drawTriangleGridZavgMovingTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgMovingTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 1252:
 	drawPointGridZavgExtraSamplesMatteLOD(grid);
@@ -2988,16 +2988,16 @@ case 1262:
 case 1263:
 	break;
 case 1264:
-	drawTriangleGridZavgDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1265:
-	drawTriangleGridZavgMovingDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgMovingDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1266:
-	drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1267:
-	drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1268:
 	drawPointGridZavgDepthBlurExtraSamplesMatteLOD(grid);
@@ -3044,10 +3044,10 @@ case 1286:
 case 1287:
 	break;
 case 1288:
-	drawTriangleGridZavgUnshadedUndercull(grid);
+	drawQuadGridZavgUnshadedUndercull(grid);
 	break;
 case 1289:
-	drawTriangleGridZavgUnshadedMovingUndercull(grid);
+	drawQuadGridZavgUnshadedMovingUndercull(grid);
 	break;
 case 1290:
 	break;
@@ -3080,10 +3080,10 @@ case 1302:
 case 1303:
 	break;
 case 1304:
-	drawTriangleGridZavgUnshadedDepthBlurUndercull(grid);
+	drawQuadGridZavgUnshadedDepthBlurUndercull(grid);
 	break;
 case 1305:
-	drawTriangleGridZavgUnshadedMovingDepthBlurUndercull(grid);
+	drawQuadGridZavgUnshadedMovingDepthBlurUndercull(grid);
 	break;
 case 1306:
 	break;
@@ -3116,10 +3116,10 @@ case 1318:
 case 1319:
 	break;
 case 1320:
-	drawTriangleGridZavgUnshadedExtraSamplesUndercull(grid);
+	drawQuadGridZavgUnshadedExtraSamplesUndercull(grid);
 	break;
 case 1321:
-	drawTriangleGridZavgUnshadedMovingExtraSamplesUndercull(grid);
+	drawQuadGridZavgUnshadedMovingExtraSamplesUndercull(grid);
 	break;
 case 1322:
 	break;
@@ -3152,10 +3152,10 @@ case 1334:
 case 1335:
 	break;
 case 1336:
-	drawTriangleGridZavgUnshadedDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZavgUnshadedDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 1337:
-	drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 1338:
 	break;
@@ -3556,16 +3556,16 @@ case 1534:
 case 1535:
 	break;
 case 1536:
-	drawTriangleGridZmid(grid);
+	drawQuadGridZmid(grid);
 	break;
 case 1537:
-	drawTriangleGridZmidMoving(grid);
+	drawQuadGridZmidMoving(grid);
 	break;
 case 1538:
-	drawTriangleGridZmidTransparent(grid);
+	drawQuadGridZmidTransparent(grid);
 	break;
 case 1539:
-	drawTriangleGridZmidMovingTransparent(grid);
+	drawQuadGridZmidMovingTransparent(grid);
 	break;
 case 1540:
 	drawPointGridZmid(grid);
@@ -3580,10 +3580,10 @@ case 1543:
 	drawPointGridZmidMovingTransparent(grid);
 	break;
 case 1544:
-	drawTriangleGridZmidUnshaded(grid);
+	drawQuadGridZmidUnshaded(grid);
 	break;
 case 1545:
-	drawTriangleGridZmidUnshadedMoving(grid);
+	drawQuadGridZmidUnshadedMoving(grid);
 	break;
 case 1546:
 	break;
@@ -3600,16 +3600,16 @@ case 1550:
 case 1551:
 	break;
 case 1552:
-	drawTriangleGridZmidDepthBlur(grid);
+	drawQuadGridZmidDepthBlur(grid);
 	break;
 case 1553:
-	drawTriangleGridZmidMovingDepthBlur(grid);
+	drawQuadGridZmidMovingDepthBlur(grid);
 	break;
 case 1554:
-	drawTriangleGridZmidTransparentDepthBlur(grid);
+	drawQuadGridZmidTransparentDepthBlur(grid);
 	break;
 case 1555:
-	drawTriangleGridZmidMovingTransparentDepthBlur(grid);
+	drawQuadGridZmidMovingTransparentDepthBlur(grid);
 	break;
 case 1556:
 	drawPointGridZmidDepthBlur(grid);
@@ -3624,10 +3624,10 @@ case 1559:
 	drawPointGridZmidMovingTransparentDepthBlur(grid);
 	break;
 case 1560:
-	drawTriangleGridZmidUnshadedDepthBlur(grid);
+	drawQuadGridZmidUnshadedDepthBlur(grid);
 	break;
 case 1561:
-	drawTriangleGridZmidUnshadedMovingDepthBlur(grid);
+	drawQuadGridZmidUnshadedMovingDepthBlur(grid);
 	break;
 case 1562:
 	break;
@@ -3644,16 +3644,16 @@ case 1566:
 case 1567:
 	break;
 case 1568:
-	drawTriangleGridZmidExtraSamples(grid);
+	drawQuadGridZmidExtraSamples(grid);
 	break;
 case 1569:
-	drawTriangleGridZmidMovingExtraSamples(grid);
+	drawQuadGridZmidMovingExtraSamples(grid);
 	break;
 case 1570:
-	drawTriangleGridZmidTransparentExtraSamples(grid);
+	drawQuadGridZmidTransparentExtraSamples(grid);
 	break;
 case 1571:
-	drawTriangleGridZmidMovingTransparentExtraSamples(grid);
+	drawQuadGridZmidMovingTransparentExtraSamples(grid);
 	break;
 case 1572:
 	drawPointGridZmidExtraSamples(grid);
@@ -3668,10 +3668,10 @@ case 1575:
 	drawPointGridZmidMovingTransparentExtraSamples(grid);
 	break;
 case 1576:
-	drawTriangleGridZmidUnshadedExtraSamples(grid);
+	drawQuadGridZmidUnshadedExtraSamples(grid);
 	break;
 case 1577:
-	drawTriangleGridZmidUnshadedMovingExtraSamples(grid);
+	drawQuadGridZmidUnshadedMovingExtraSamples(grid);
 	break;
 case 1578:
 	break;
@@ -3688,16 +3688,16 @@ case 1582:
 case 1583:
 	break;
 case 1584:
-	drawTriangleGridZmidDepthBlurExtraSamples(grid);
+	drawQuadGridZmidDepthBlurExtraSamples(grid);
 	break;
 case 1585:
-	drawTriangleGridZmidMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZmidMovingDepthBlurExtraSamples(grid);
 	break;
 case 1586:
-	drawTriangleGridZmidTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZmidTransparentDepthBlurExtraSamples(grid);
 	break;
 case 1587:
-	drawTriangleGridZmidMovingTransparentDepthBlurExtraSamples(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 1588:
 	drawPointGridZmidDepthBlurExtraSamples(grid);
@@ -3712,10 +3712,10 @@ case 1591:
 	drawPointGridZmidMovingTransparentDepthBlurExtraSamples(grid);
 	break;
 case 1592:
-	drawTriangleGridZmidUnshadedDepthBlurExtraSamples(grid);
+	drawQuadGridZmidUnshadedDepthBlurExtraSamples(grid);
 	break;
 case 1593:
-	drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamples(grid);
+	drawQuadGridZmidUnshadedMovingDepthBlurExtraSamples(grid);
 	break;
 case 1594:
 	break;
@@ -3732,16 +3732,16 @@ case 1598:
 case 1599:
 	break;
 case 1600:
-	drawTriangleGridZmidMatte(grid);
+	drawQuadGridZmidMatte(grid);
 	break;
 case 1601:
-	drawTriangleGridZmidMovingMatte(grid);
+	drawQuadGridZmidMovingMatte(grid);
 	break;
 case 1602:
-	drawTriangleGridZmidTransparentMatte(grid);
+	drawQuadGridZmidTransparentMatte(grid);
 	break;
 case 1603:
-	drawTriangleGridZmidMovingTransparentMatte(grid);
+	drawQuadGridZmidMovingTransparentMatte(grid);
 	break;
 case 1604:
 	drawPointGridZmidMatte(grid);
@@ -3772,16 +3772,16 @@ case 1614:
 case 1615:
 	break;
 case 1616:
-	drawTriangleGridZmidDepthBlurMatte(grid);
+	drawQuadGridZmidDepthBlurMatte(grid);
 	break;
 case 1617:
-	drawTriangleGridZmidMovingDepthBlurMatte(grid);
+	drawQuadGridZmidMovingDepthBlurMatte(grid);
 	break;
 case 1618:
-	drawTriangleGridZmidTransparentDepthBlurMatte(grid);
+	drawQuadGridZmidTransparentDepthBlurMatte(grid);
 	break;
 case 1619:
-	drawTriangleGridZmidMovingTransparentDepthBlurMatte(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurMatte(grid);
 	break;
 case 1620:
 	drawPointGridZmidDepthBlurMatte(grid);
@@ -3812,16 +3812,16 @@ case 1630:
 case 1631:
 	break;
 case 1632:
-	drawTriangleGridZmidExtraSamplesMatte(grid);
+	drawQuadGridZmidExtraSamplesMatte(grid);
 	break;
 case 1633:
-	drawTriangleGridZmidMovingExtraSamplesMatte(grid);
+	drawQuadGridZmidMovingExtraSamplesMatte(grid);
 	break;
 case 1634:
-	drawTriangleGridZmidTransparentExtraSamplesMatte(grid);
+	drawQuadGridZmidTransparentExtraSamplesMatte(grid);
 	break;
 case 1635:
-	drawTriangleGridZmidMovingTransparentExtraSamplesMatte(grid);
+	drawQuadGridZmidMovingTransparentExtraSamplesMatte(grid);
 	break;
 case 1636:
 	drawPointGridZmidExtraSamplesMatte(grid);
@@ -3852,16 +3852,16 @@ case 1646:
 case 1647:
 	break;
 case 1648:
-	drawTriangleGridZmidDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmidDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1649:
-	drawTriangleGridZmidMovingDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmidMovingDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1650:
-	drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmidTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1651:
-	drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatte(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesMatte(grid);
 	break;
 case 1652:
 	drawPointGridZmidDepthBlurExtraSamplesMatte(grid);
@@ -3892,16 +3892,16 @@ case 1662:
 case 1663:
 	break;
 case 1664:
-	drawTriangleGridZmidLOD(grid);
+	drawQuadGridZmidLOD(grid);
 	break;
 case 1665:
-	drawTriangleGridZmidMovingLOD(grid);
+	drawQuadGridZmidMovingLOD(grid);
 	break;
 case 1666:
-	drawTriangleGridZmidTransparentLOD(grid);
+	drawQuadGridZmidTransparentLOD(grid);
 	break;
 case 1667:
-	drawTriangleGridZmidMovingTransparentLOD(grid);
+	drawQuadGridZmidMovingTransparentLOD(grid);
 	break;
 case 1668:
 	drawPointGridZmidLOD(grid);
@@ -3932,16 +3932,16 @@ case 1678:
 case 1679:
 	break;
 case 1680:
-	drawTriangleGridZmidDepthBlurLOD(grid);
+	drawQuadGridZmidDepthBlurLOD(grid);
 	break;
 case 1681:
-	drawTriangleGridZmidMovingDepthBlurLOD(grid);
+	drawQuadGridZmidMovingDepthBlurLOD(grid);
 	break;
 case 1682:
-	drawTriangleGridZmidTransparentDepthBlurLOD(grid);
+	drawQuadGridZmidTransparentDepthBlurLOD(grid);
 	break;
 case 1683:
-	drawTriangleGridZmidMovingTransparentDepthBlurLOD(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurLOD(grid);
 	break;
 case 1684:
 	drawPointGridZmidDepthBlurLOD(grid);
@@ -3972,16 +3972,16 @@ case 1694:
 case 1695:
 	break;
 case 1696:
-	drawTriangleGridZmidExtraSamplesLOD(grid);
+	drawQuadGridZmidExtraSamplesLOD(grid);
 	break;
 case 1697:
-	drawTriangleGridZmidMovingExtraSamplesLOD(grid);
+	drawQuadGridZmidMovingExtraSamplesLOD(grid);
 	break;
 case 1698:
-	drawTriangleGridZmidTransparentExtraSamplesLOD(grid);
+	drawQuadGridZmidTransparentExtraSamplesLOD(grid);
 	break;
 case 1699:
-	drawTriangleGridZmidMovingTransparentExtraSamplesLOD(grid);
+	drawQuadGridZmidMovingTransparentExtraSamplesLOD(grid);
 	break;
 case 1700:
 	drawPointGridZmidExtraSamplesLOD(grid);
@@ -4012,16 +4012,16 @@ case 1710:
 case 1711:
 	break;
 case 1712:
-	drawTriangleGridZmidDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmidDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1713:
-	drawTriangleGridZmidMovingDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmidMovingDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1714:
-	drawTriangleGridZmidTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmidTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1715:
-	drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesLOD(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesLOD(grid);
 	break;
 case 1716:
 	drawPointGridZmidDepthBlurExtraSamplesLOD(grid);
@@ -4052,16 +4052,16 @@ case 1726:
 case 1727:
 	break;
 case 1728:
-	drawTriangleGridZmidMatteLOD(grid);
+	drawQuadGridZmidMatteLOD(grid);
 	break;
 case 1729:
-	drawTriangleGridZmidMovingMatteLOD(grid);
+	drawQuadGridZmidMovingMatteLOD(grid);
 	break;
 case 1730:
-	drawTriangleGridZmidTransparentMatteLOD(grid);
+	drawQuadGridZmidTransparentMatteLOD(grid);
 	break;
 case 1731:
-	drawTriangleGridZmidMovingTransparentMatteLOD(grid);
+	drawQuadGridZmidMovingTransparentMatteLOD(grid);
 	break;
 case 1732:
 	drawPointGridZmidMatteLOD(grid);
@@ -4092,16 +4092,16 @@ case 1742:
 case 1743:
 	break;
 case 1744:
-	drawTriangleGridZmidDepthBlurMatteLOD(grid);
+	drawQuadGridZmidDepthBlurMatteLOD(grid);
 	break;
 case 1745:
-	drawTriangleGridZmidMovingDepthBlurMatteLOD(grid);
+	drawQuadGridZmidMovingDepthBlurMatteLOD(grid);
 	break;
 case 1746:
-	drawTriangleGridZmidTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZmidTransparentDepthBlurMatteLOD(grid);
 	break;
 case 1747:
-	drawTriangleGridZmidMovingTransparentDepthBlurMatteLOD(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurMatteLOD(grid);
 	break;
 case 1748:
 	drawPointGridZmidDepthBlurMatteLOD(grid);
@@ -4132,16 +4132,16 @@ case 1758:
 case 1759:
 	break;
 case 1760:
-	drawTriangleGridZmidExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidExtraSamplesMatteLOD(grid);
 	break;
 case 1761:
-	drawTriangleGridZmidMovingExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidMovingExtraSamplesMatteLOD(grid);
 	break;
 case 1762:
-	drawTriangleGridZmidTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 1763:
-	drawTriangleGridZmidMovingTransparentExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidMovingTransparentExtraSamplesMatteLOD(grid);
 	break;
 case 1764:
 	drawPointGridZmidExtraSamplesMatteLOD(grid);
@@ -4172,16 +4172,16 @@ case 1774:
 case 1775:
 	break;
 case 1776:
-	drawTriangleGridZmidDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1777:
-	drawTriangleGridZmidMovingDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidMovingDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1778:
-	drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1779:
-	drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
+	drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(grid);
 	break;
 case 1780:
 	drawPointGridZmidDepthBlurExtraSamplesMatteLOD(grid);
@@ -4228,10 +4228,10 @@ case 1798:
 case 1799:
 	break;
 case 1800:
-	drawTriangleGridZmidUnshadedUndercull(grid);
+	drawQuadGridZmidUnshadedUndercull(grid);
 	break;
 case 1801:
-	drawTriangleGridZmidUnshadedMovingUndercull(grid);
+	drawQuadGridZmidUnshadedMovingUndercull(grid);
 	break;
 case 1802:
 	break;
@@ -4264,10 +4264,10 @@ case 1814:
 case 1815:
 	break;
 case 1816:
-	drawTriangleGridZmidUnshadedDepthBlurUndercull(grid);
+	drawQuadGridZmidUnshadedDepthBlurUndercull(grid);
 	break;
 case 1817:
-	drawTriangleGridZmidUnshadedMovingDepthBlurUndercull(grid);
+	drawQuadGridZmidUnshadedMovingDepthBlurUndercull(grid);
 	break;
 case 1818:
 	break;
@@ -4300,10 +4300,10 @@ case 1830:
 case 1831:
 	break;
 case 1832:
-	drawTriangleGridZmidUnshadedExtraSamplesUndercull(grid);
+	drawQuadGridZmidUnshadedExtraSamplesUndercull(grid);
 	break;
 case 1833:
-	drawTriangleGridZmidUnshadedMovingExtraSamplesUndercull(grid);
+	drawQuadGridZmidUnshadedMovingExtraSamplesUndercull(grid);
 	break;
 case 1834:
 	break;
@@ -4336,10 +4336,10 @@ case 1846:
 case 1847:
 	break;
 case 1848:
-	drawTriangleGridZmidUnshadedDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZmidUnshadedDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 1849:
-	drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
+	drawQuadGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(grid);
 	break;
 case 1850:
 	break;
@@ -4744,77 +4744,53 @@ default:
 }
 #endif
 #ifdef DEFINE_STOCHASTIC_FUNCTIONS
-void CStochastic::drawTriangleGridZmin(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmin(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
-void CStochastic::drawTriangleGridZminMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 }
-void CStochastic::drawTriangleGridZminTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZminMovingTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -4824,15 +4800,8 @@ void CStochastic::drawPointGridZmin(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
@@ -4841,16 +4810,8 @@ void CStochastic::drawPointGridZminMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -4860,16 +4821,8 @@ void CStochastic::drawPointGridZminTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -4880,56 +4833,36 @@ void CStochastic::drawPointGridZminMovingTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZminUnshaded(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshaded(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZminUnshadedMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -4940,15 +4873,8 @@ void CStochastic::drawPointGridZminUnshaded(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -4959,103 +4885,67 @@ void CStochastic::drawPointGridZminUnshadedMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZminDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5067,16 +4957,8 @@ void CStochastic::drawPointGridZminDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -5087,17 +4969,8 @@ void CStochastic::drawPointGridZminMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5109,17 +4982,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -5132,63 +4996,40 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlur(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZminUnshadedDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5201,16 +5042,8 @@ void CStochastic::drawPointGridZminUnshadedDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -5223,101 +5056,68 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZminExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminMovingTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5329,15 +5129,8 @@ void CStochastic::drawPointGridZminExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -5348,16 +5141,8 @@ void CStochastic::drawPointGridZminMovingExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5369,16 +5154,8 @@ void CStochastic::drawPointGridZminTransparentExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -5391,60 +5168,40 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminUnshadedExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5457,15 +5214,8 @@ void CStochastic::drawPointGridZminUnshadedExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -5478,92 +5228,64 @@ void CStochastic::drawPointGridZminUnshadedMovingExtraSamples(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -5571,18 +5293,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamples(CRa
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5596,16 +5310,8 @@ void CStochastic::drawPointGridZminDepthBlurExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -5618,17 +5324,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurExtraSamples(CRasterGrid *grid
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5642,17 +5339,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurExtraSamples(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -5667,18 +5355,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5686,30 +5364,24 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamples(CRaste
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -5717,17 +5389,10 @@ void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5742,16 +5407,8 @@ void CStochastic::drawPointGridZminUnshadedDepthBlurExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -5766,17 +5423,8 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5784,84 +5432,60 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZminMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5873,15 +5497,8 @@ void CStochastic::drawPointGridZminMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -5892,16 +5509,8 @@ void CStochastic::drawPointGridZminMovingMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -5913,16 +5522,8 @@ void CStochastic::drawPointGridZminTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -5935,93 +5536,64 @@ void CStochastic::drawPointGridZminMovingTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -6029,18 +5601,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6054,16 +5618,8 @@ void CStochastic::drawPointGridZminDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -6076,17 +5632,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6100,17 +5647,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -6125,18 +5663,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurMatte(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6144,73 +5672,56 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurMatte(CRasterGrid *
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -6218,17 +5729,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6242,15 +5746,8 @@ void CStochastic::drawPointGridZminExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -6263,16 +5760,8 @@ void CStochastic::drawPointGridZminMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6286,16 +5775,8 @@ void CStochastic::drawPointGridZminTransparentExtraSamplesMatte(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -6310,17 +5791,8 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamplesMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6328,30 +5800,24 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamplesMatte(CRasterGri
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -6359,17 +5825,10 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6377,7 +5836,7 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -6385,17 +5844,10 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesMatte(CRas
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -6403,7 +5855,7 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesMatte(CRas
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -6412,18 +5864,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6439,16 +5883,8 @@ void CStochastic::drawPointGridZminDepthBlurExtraSamplesMatte(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -6463,17 +5899,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurExtraSamplesMatte(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6489,17 +5916,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -6516,18 +5934,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamplesMatte(C
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6536,88 +5944,60 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamplesMatte(C
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZminLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminLOD(CRasterGrid *grid){
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6629,16 +6009,8 @@ void CStochastic::drawPointGridZminLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
@@ -6649,17 +6021,8 @@ void CStochastic::drawPointGridZminMovingLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6671,17 +6034,8 @@ void CStochastic::drawPointGridZminTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -6694,97 +6048,64 @@ void CStochastic::drawPointGridZminMovingTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -6792,19 +6113,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6818,17 +6130,8 @@ void CStochastic::drawPointGridZminDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -6841,18 +6144,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6866,18 +6159,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -6892,19 +6175,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -6912,76 +6184,56 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -6989,18 +6241,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7014,16 +6258,8 @@ void CStochastic::drawPointGridZminExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -7036,17 +6272,8 @@ void CStochastic::drawPointGridZminMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7060,17 +6287,8 @@ void CStochastic::drawPointGridZminTransparentExtraSamplesLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7085,18 +6303,8 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7104,31 +6312,24 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -7136,18 +6337,10 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7155,7 +6348,7 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -7163,18 +6356,10 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7182,7 +6367,7 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesLOD(CRaste
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -7191,19 +6376,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesLOD(
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7219,17 +6395,8 @@ void CStochastic::drawPointGridZminDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -7244,18 +6411,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid *g
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7271,18 +6428,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7299,19 +6446,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7320,76 +6456,56 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
@@ -7397,18 +6513,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7422,16 +6530,8 @@ void CStochastic::drawPointGridZminMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -7444,17 +6544,8 @@ void CStochastic::drawPointGridZminMovingMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7468,17 +6559,8 @@ void CStochastic::drawPointGridZminTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7493,18 +6575,8 @@ void CStochastic::drawPointGridZminMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7512,31 +6584,24 @@ void CStochastic::drawPointGridZminMovingTransparentMatteLOD(CRasterGrid *grid){
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -7544,18 +6609,10 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7563,7 +6620,7 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -7571,18 +6628,10 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7590,7 +6639,7 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurMatteLOD(CRasterGrid *
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -7599,19 +6648,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7627,17 +6667,8 @@ void CStochastic::drawPointGridZminDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -7652,18 +6683,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7679,18 +6700,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7707,19 +6718,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7728,30 +6728,24 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -7759,17 +6753,10 @@ void CStochastic::drawTriangleGridZminMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7777,7 +6764,7 @@ void CStochastic::drawTriangleGridZminMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -7785,17 +6772,10 @@ void CStochastic::drawTriangleGridZminTransparentExtraSamplesMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7803,7 +6783,7 @@ void CStochastic::drawTriangleGridZminTransparentExtraSamplesMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -7812,18 +6792,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7839,16 +6811,8 @@ void CStochastic::drawPointGridZminExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -7863,17 +6827,8 @@ void CStochastic::drawPointGridZminMovingExtraSamplesMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7889,17 +6844,8 @@ void CStochastic::drawPointGridZminTransparentExtraSamplesMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -7916,18 +6862,8 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamplesMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7936,7 +6872,7 @@ void CStochastic::drawPointGridZminMovingTransparentExtraSamplesMatteLOD(CRaster
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -7944,17 +6880,10 @@ void CStochastic::drawTriangleGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -7962,7 +6891,7 @@ void CStochastic::drawTriangleGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -7971,18 +6900,10 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -7991,7 +6912,7 @@ void CStochastic::drawTriangleGridZminMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -8000,18 +6921,10 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesMatteLOD(C
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -8020,7 +6933,7 @@ void CStochastic::drawTriangleGridZminTransparentDepthBlurExtraSamplesMatteLOD(C
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -8030,19 +6943,10 @@ void CStochastic::drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8060,17 +6964,8 @@ void CStochastic::drawPointGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -8087,18 +6982,8 @@ void CStochastic::drawPointGridZminMovingDepthBlurExtraSamplesMatteLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8116,18 +7001,8 @@ void CStochastic::drawPointGridZminTransparentDepthBlurExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -8146,19 +7021,8 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamplesMatteLO
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8168,43 +7032,32 @@ void CStochastic::drawPointGridZminMovingTransparentDepthBlurExtraSamplesMatteLO
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZminUnshadedUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8217,15 +7070,8 @@ void CStochastic::drawPointGridZminUnshadedUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -8238,46 +7084,32 @@ void CStochastic::drawPointGridZminUnshadedMovingUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -8285,17 +7117,10 @@ void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlurUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8310,16 +7135,8 @@ void CStochastic::drawPointGridZminUnshadedDepthBlurUndercull(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -8334,17 +7151,8 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8352,29 +7160,24 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -8382,16 +7185,10 @@ void CStochastic::drawTriangleGridZminUnshadedMovingExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8406,15 +7203,8 @@ void CStochastic::drawPointGridZminUnshadedExtraSamplesUndercull(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -8429,16 +7219,8 @@ void CStochastic::drawPointGridZminUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8446,7 +7228,7 @@ void CStochastic::drawPointGridZminUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -8454,16 +7236,10 @@ void CStochastic::drawTriangleGridZminUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -8471,7 +7247,7 @@ void CStochastic::drawTriangleGridZminUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -8480,17 +7256,10 @@ void CStochastic::drawTriangleGridZminUnshadedMovingDepthBlurExtraSamplesUndercu
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8507,16 +7276,8 @@ void CStochastic::drawPointGridZminUnshadedDepthBlurExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -8533,17 +7294,8 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#define depthFilterIf()		depthFilterIfZMin()
 	#define depthFilterElse()	depthFilterElseZMin()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8552,77 +7304,53 @@ void CStochastic::drawPointGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmax(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmax(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
-void CStochastic::drawTriangleGridZmaxMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 }
-void CStochastic::drawTriangleGridZmaxTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8632,15 +7360,8 @@ void CStochastic::drawPointGridZmax(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
@@ -8649,16 +7370,8 @@ void CStochastic::drawPointGridZmaxMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8668,16 +7381,8 @@ void CStochastic::drawPointGridZmaxTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -8688,56 +7393,36 @@ void CStochastic::drawPointGridZmaxMovingTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZmaxUnshaded(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshaded(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8748,15 +7433,8 @@ void CStochastic::drawPointGridZmaxUnshaded(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -8767,103 +7445,67 @@ void CStochastic::drawPointGridZmaxUnshadedMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZmaxDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8875,16 +7517,8 @@ void CStochastic::drawPointGridZmaxDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -8895,17 +7529,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -8917,17 +7542,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -8940,63 +7556,40 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlur(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmaxUnshadedDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9009,16 +7602,8 @@ void CStochastic::drawPointGridZmaxUnshadedDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -9031,101 +7616,68 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmaxExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9137,15 +7689,8 @@ void CStochastic::drawPointGridZmaxExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -9156,16 +7701,8 @@ void CStochastic::drawPointGridZmaxMovingExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9177,16 +7714,8 @@ void CStochastic::drawPointGridZmaxTransparentExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -9199,60 +7728,40 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxUnshadedExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9265,15 +7774,8 @@ void CStochastic::drawPointGridZmaxUnshadedExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -9286,92 +7788,64 @@ void CStochastic::drawPointGridZmaxUnshadedMovingExtraSamples(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -9379,18 +7853,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamples(CRa
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9404,16 +7870,8 @@ void CStochastic::drawPointGridZmaxDepthBlurExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -9426,17 +7884,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurExtraSamples(CRasterGrid *grid
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9450,17 +7899,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurExtraSamples(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -9475,18 +7915,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9494,30 +7924,24 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamples(CRaste
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -9525,17 +7949,10 @@ void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9550,16 +7967,8 @@ void CStochastic::drawPointGridZmaxUnshadedDepthBlurExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -9574,17 +7983,8 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9592,84 +7992,60 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmaxMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9681,15 +8057,8 @@ void CStochastic::drawPointGridZmaxMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -9700,16 +8069,8 @@ void CStochastic::drawPointGridZmaxMovingMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9721,16 +8082,8 @@ void CStochastic::drawPointGridZmaxTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -9743,93 +8096,64 @@ void CStochastic::drawPointGridZmaxMovingTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -9837,18 +8161,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9862,16 +8178,8 @@ void CStochastic::drawPointGridZmaxDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -9884,17 +8192,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9908,17 +8207,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -9933,18 +8223,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -9952,73 +8232,56 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -10026,17 +8289,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10050,15 +8306,8 @@ void CStochastic::drawPointGridZmaxExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -10071,16 +8320,8 @@ void CStochastic::drawPointGridZmaxMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10094,16 +8335,8 @@ void CStochastic::drawPointGridZmaxTransparentExtraSamplesMatte(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10118,17 +8351,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamplesMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10136,30 +8360,24 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamplesMatte(CRasterGri
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -10167,17 +8385,10 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10185,7 +8396,7 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -10193,17 +8404,10 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatte(CRas
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10211,7 +8415,7 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatte(CRas
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -10220,18 +8424,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10247,16 +8443,8 @@ void CStochastic::drawPointGridZmaxDepthBlurExtraSamplesMatte(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -10271,17 +8459,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10297,17 +8476,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10324,18 +8494,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(C
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10344,88 +8504,60 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(C
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmaxLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxLOD(CRasterGrid *grid){
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10437,16 +8569,8 @@ void CStochastic::drawPointGridZmaxLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
@@ -10457,17 +8581,8 @@ void CStochastic::drawPointGridZmaxMovingLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10479,17 +8594,8 @@ void CStochastic::drawPointGridZmaxTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10502,97 +8608,64 @@ void CStochastic::drawPointGridZmaxMovingTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -10600,19 +8673,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10626,17 +8690,8 @@ void CStochastic::drawPointGridZmaxDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -10649,18 +8704,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10674,18 +8719,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10700,19 +8735,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10720,76 +8744,56 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -10797,18 +8801,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10822,16 +8818,8 @@ void CStochastic::drawPointGridZmaxExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -10844,17 +8832,8 @@ void CStochastic::drawPointGridZmaxMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10868,17 +8847,8 @@ void CStochastic::drawPointGridZmaxTransparentExtraSamplesLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10893,18 +8863,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10912,31 +8872,24 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -10944,18 +8897,10 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -10963,7 +8908,7 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -10971,18 +8916,10 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -10990,7 +8927,7 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesLOD(CRaste
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -10999,19 +8936,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11027,17 +8955,8 @@ void CStochastic::drawPointGridZmaxDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -11052,18 +8971,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid *g
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11079,18 +8988,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11107,19 +9006,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11128,76 +9016,56 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
@@ -11205,18 +9073,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11230,16 +9090,8 @@ void CStochastic::drawPointGridZmaxMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -11252,17 +9104,8 @@ void CStochastic::drawPointGridZmaxMovingMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11276,17 +9119,8 @@ void CStochastic::drawPointGridZmaxTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11301,18 +9135,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11320,31 +9144,24 @@ void CStochastic::drawPointGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid){
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -11352,18 +9169,10 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11371,7 +9180,7 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -11379,18 +9188,10 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11398,7 +9199,7 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -11407,19 +9208,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11435,17 +9227,8 @@ void CStochastic::drawPointGridZmaxDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -11460,18 +9243,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11487,18 +9260,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11515,19 +9278,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11536,30 +9288,24 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -11567,17 +9313,10 @@ void CStochastic::drawTriangleGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11585,7 +9324,7 @@ void CStochastic::drawTriangleGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -11593,17 +9332,10 @@ void CStochastic::drawTriangleGridZmaxTransparentExtraSamplesMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11611,7 +9343,7 @@ void CStochastic::drawTriangleGridZmaxTransparentExtraSamplesMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -11620,18 +9352,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11647,16 +9371,8 @@ void CStochastic::drawPointGridZmaxExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -11671,17 +9387,8 @@ void CStochastic::drawPointGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11697,17 +9404,8 @@ void CStochastic::drawPointGridZmaxTransparentExtraSamplesMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11724,18 +9422,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamplesMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11744,7 +9432,7 @@ void CStochastic::drawPointGridZmaxMovingTransparentExtraSamplesMatteLOD(CRaster
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -11752,17 +9440,10 @@ void CStochastic::drawTriangleGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -11770,7 +9451,7 @@ void CStochastic::drawTriangleGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -11779,18 +9460,10 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11799,7 +9472,7 @@ void CStochastic::drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -11808,18 +9481,10 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(C
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11828,7 +9493,7 @@ void CStochastic::drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(C
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -11838,19 +9503,10 @@ void CStochastic::drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11868,17 +9524,8 @@ void CStochastic::drawPointGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -11895,18 +9542,8 @@ void CStochastic::drawPointGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11924,18 +9561,8 @@ void CStochastic::drawPointGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -11954,19 +9581,8 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLO
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -11976,43 +9592,32 @@ void CStochastic::drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLO
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmaxUnshadedUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12025,15 +9630,8 @@ void CStochastic::drawPointGridZmaxUnshadedUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12046,46 +9644,32 @@ void CStochastic::drawPointGridZmaxUnshadedMovingUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -12093,17 +9677,10 @@ void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12118,16 +9695,8 @@ void CStochastic::drawPointGridZmaxUnshadedDepthBlurUndercull(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12142,17 +9711,8 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12160,29 +9720,24 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -12190,16 +9745,10 @@ void CStochastic::drawTriangleGridZmaxUnshadedMovingExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12214,15 +9763,8 @@ void CStochastic::drawPointGridZmaxUnshadedExtraSamplesUndercull(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12237,16 +9779,8 @@ void CStochastic::drawPointGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12254,7 +9788,7 @@ void CStochastic::drawPointGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -12262,16 +9796,10 @@ void CStochastic::drawTriangleGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12279,7 +9807,7 @@ void CStochastic::drawTriangleGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -12288,17 +9816,10 @@ void CStochastic::drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercu
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12315,16 +9836,8 @@ void CStochastic::drawPointGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12341,17 +9854,8 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#define depthFilterIf()		depthFilterIfZMax()
 	#define depthFilterElse()	depthFilterElseZMax()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12360,77 +9864,53 @@ void CStochastic::drawPointGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavg(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavg(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
-void CStochastic::drawTriangleGridZavgMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 }
-void CStochastic::drawTriangleGridZavgTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZavgMovingTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12440,15 +9920,8 @@ void CStochastic::drawPointGridZavg(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
@@ -12457,16 +9930,8 @@ void CStochastic::drawPointGridZavgMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12476,16 +9941,8 @@ void CStochastic::drawPointGridZavgTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -12496,56 +9953,36 @@ void CStochastic::drawPointGridZavgMovingTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZavgUnshaded(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshaded(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZavgUnshadedMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12556,15 +9993,8 @@ void CStochastic::drawPointGridZavgUnshaded(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12575,103 +10005,67 @@ void CStochastic::drawPointGridZavgUnshadedMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZavgDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12683,16 +10077,8 @@ void CStochastic::drawPointGridZavgDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -12703,17 +10089,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12725,17 +10102,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -12748,63 +10116,40 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlur(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZavgUnshadedDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12817,16 +10162,8 @@ void CStochastic::drawPointGridZavgUnshadedDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -12839,101 +10176,68 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZavgExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12945,15 +10249,8 @@ void CStochastic::drawPointGridZavgExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -12964,16 +10261,8 @@ void CStochastic::drawPointGridZavgMovingExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -12985,16 +10274,8 @@ void CStochastic::drawPointGridZavgTransparentExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -13007,60 +10288,40 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgUnshadedExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13073,15 +10334,8 @@ void CStochastic::drawPointGridZavgUnshadedExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -13094,92 +10348,64 @@ void CStochastic::drawPointGridZavgUnshadedMovingExtraSamples(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -13187,18 +10413,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamples(CRa
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13212,16 +10430,8 @@ void CStochastic::drawPointGridZavgDepthBlurExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -13234,17 +10444,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurExtraSamples(CRasterGrid *grid
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13258,17 +10459,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurExtraSamples(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -13283,18 +10475,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13302,30 +10484,24 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamples(CRaste
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -13333,17 +10509,10 @@ void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13358,16 +10527,8 @@ void CStochastic::drawPointGridZavgUnshadedDepthBlurExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -13382,17 +10543,8 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13400,84 +10552,60 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZavgMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13489,15 +10617,8 @@ void CStochastic::drawPointGridZavgMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -13508,16 +10629,8 @@ void CStochastic::drawPointGridZavgMovingMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13529,16 +10642,8 @@ void CStochastic::drawPointGridZavgTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -13551,93 +10656,64 @@ void CStochastic::drawPointGridZavgMovingTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -13645,18 +10721,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13670,16 +10738,8 @@ void CStochastic::drawPointGridZavgDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -13692,17 +10752,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13716,17 +10767,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -13741,18 +10783,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13760,73 +10792,56 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -13834,17 +10849,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13858,15 +10866,8 @@ void CStochastic::drawPointGridZavgExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -13879,16 +10880,8 @@ void CStochastic::drawPointGridZavgMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13902,16 +10895,8 @@ void CStochastic::drawPointGridZavgTransparentExtraSamplesMatte(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -13926,17 +10911,8 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamplesMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13944,30 +10920,24 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamplesMatte(CRasterGri
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -13975,17 +10945,10 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -13993,7 +10956,7 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -14001,17 +10964,10 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatte(CRas
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14019,7 +10975,7 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatte(CRas
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -14028,18 +10984,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14055,16 +11003,8 @@ void CStochastic::drawPointGridZavgDepthBlurExtraSamplesMatte(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -14079,17 +11019,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14105,17 +11036,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14132,18 +11054,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamplesMatte(C
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14152,88 +11064,60 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamplesMatte(C
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZavgLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgLOD(CRasterGrid *grid){
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14245,16 +11129,8 @@ void CStochastic::drawPointGridZavgLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
@@ -14265,17 +11141,8 @@ void CStochastic::drawPointGridZavgMovingLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14287,17 +11154,8 @@ void CStochastic::drawPointGridZavgTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14310,97 +11168,64 @@ void CStochastic::drawPointGridZavgMovingTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -14408,19 +11233,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14434,17 +11250,8 @@ void CStochastic::drawPointGridZavgDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -14457,18 +11264,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14482,18 +11279,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14508,19 +11295,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14528,76 +11304,56 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -14605,18 +11361,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14630,16 +11378,8 @@ void CStochastic::drawPointGridZavgExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -14652,17 +11392,8 @@ void CStochastic::drawPointGridZavgMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14676,17 +11407,8 @@ void CStochastic::drawPointGridZavgTransparentExtraSamplesLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14701,18 +11423,8 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14720,31 +11432,24 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -14752,18 +11457,10 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14771,7 +11468,7 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -14779,18 +11476,10 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14798,7 +11487,7 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesLOD(CRaste
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -14807,19 +11496,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesLOD(
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14835,17 +11515,8 @@ void CStochastic::drawPointGridZavgDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -14860,18 +11531,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid *g
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14887,18 +11548,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -14915,19 +11566,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -14936,76 +11576,56 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
@@ -15013,18 +11633,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15038,16 +11650,8 @@ void CStochastic::drawPointGridZavgMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -15060,17 +11664,8 @@ void CStochastic::drawPointGridZavgMovingMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15084,17 +11679,8 @@ void CStochastic::drawPointGridZavgTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15109,18 +11695,8 @@ void CStochastic::drawPointGridZavgMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15128,31 +11704,24 @@ void CStochastic::drawPointGridZavgMovingTransparentMatteLOD(CRasterGrid *grid){
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -15160,18 +11729,10 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15179,7 +11740,7 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -15187,18 +11748,10 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15206,7 +11759,7 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -15215,19 +11768,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15243,17 +11787,8 @@ void CStochastic::drawPointGridZavgDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -15268,18 +11803,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15295,18 +11820,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15323,19 +11838,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15344,30 +11848,24 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -15375,17 +11873,10 @@ void CStochastic::drawTriangleGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15393,7 +11884,7 @@ void CStochastic::drawTriangleGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -15401,17 +11892,10 @@ void CStochastic::drawTriangleGridZavgTransparentExtraSamplesMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15419,7 +11903,7 @@ void CStochastic::drawTriangleGridZavgTransparentExtraSamplesMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -15428,18 +11912,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15455,16 +11931,8 @@ void CStochastic::drawPointGridZavgExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -15479,17 +11947,8 @@ void CStochastic::drawPointGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15505,17 +11964,8 @@ void CStochastic::drawPointGridZavgTransparentExtraSamplesMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15532,18 +11982,8 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamplesMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15552,7 +11992,7 @@ void CStochastic::drawPointGridZavgMovingTransparentExtraSamplesMatteLOD(CRaster
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -15560,17 +12000,10 @@ void CStochastic::drawTriangleGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -15578,7 +12011,7 @@ void CStochastic::drawTriangleGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -15587,18 +12020,10 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15607,7 +12032,7 @@ void CStochastic::drawTriangleGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -15616,18 +12041,10 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatteLOD(C
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15636,7 +12053,7 @@ void CStochastic::drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatteLOD(C
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -15646,19 +12063,10 @@ void CStochastic::drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15676,17 +12084,8 @@ void CStochastic::drawPointGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -15703,18 +12102,8 @@ void CStochastic::drawPointGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15732,18 +12121,8 @@ void CStochastic::drawPointGridZavgTransparentDepthBlurExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -15762,19 +12141,8 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamplesMatteLO
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15784,43 +12152,32 @@ void CStochastic::drawPointGridZavgMovingTransparentDepthBlurExtraSamplesMatteLO
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZavgUnshadedUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15833,15 +12190,8 @@ void CStochastic::drawPointGridZavgUnshadedUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -15854,46 +12204,32 @@ void CStochastic::drawPointGridZavgUnshadedMovingUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -15901,17 +12237,10 @@ void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlurUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15926,16 +12255,8 @@ void CStochastic::drawPointGridZavgUnshadedDepthBlurUndercull(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -15950,17 +12271,8 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -15968,29 +12280,24 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -15998,16 +12305,10 @@ void CStochastic::drawTriangleGridZavgUnshadedMovingExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16022,15 +12323,8 @@ void CStochastic::drawPointGridZavgUnshadedExtraSamplesUndercull(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -16045,16 +12339,8 @@ void CStochastic::drawPointGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16062,7 +12348,7 @@ void CStochastic::drawPointGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -16070,16 +12356,10 @@ void CStochastic::drawTriangleGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -16087,7 +12367,7 @@ void CStochastic::drawTriangleGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -16096,17 +12376,10 @@ void CStochastic::drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamplesUndercu
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16123,16 +12396,8 @@ void CStochastic::drawPointGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -16149,17 +12414,8 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#define depthFilterIf()		depthFilterIfZAvg()
 	#define depthFilterElse()	depthFilterElseZAvg()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16168,77 +12424,53 @@ void CStochastic::drawPointGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmid(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmid(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
-void CStochastic::drawTriangleGridZmidMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 }
-void CStochastic::drawTriangleGridZmidTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZmidMovingTransparent(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparent(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16248,15 +12480,8 @@ void CStochastic::drawPointGridZmid(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 }
@@ -16265,16 +12490,8 @@ void CStochastic::drawPointGridZmidMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16284,16 +12501,8 @@ void CStochastic::drawPointGridZmidTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -16304,56 +12513,36 @@ void CStochastic::drawPointGridZmidMovingTransparent(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 }
-void CStochastic::drawTriangleGridZmidUnshaded(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshaded(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZmidUnshadedMoving(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMoving(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16364,15 +12553,8 @@ void CStochastic::drawPointGridZmidUnshaded(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -16383,103 +12565,67 @@ void CStochastic::drawPointGridZmidUnshadedMoving(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 }
-void CStochastic::drawTriangleGridZmidDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16491,16 +12637,8 @@ void CStochastic::drawPointGridZmidDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -16511,17 +12649,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16533,17 +12662,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -16556,63 +12676,40 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlur(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmidUnshadedDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlur(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16625,16 +12722,8 @@ void CStochastic::drawPointGridZmidUnshadedDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -16647,101 +12736,68 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlur(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 }
-void CStochastic::drawTriangleGridZmidExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16753,15 +12809,8 @@ void CStochastic::drawPointGridZmidExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -16772,16 +12821,8 @@ void CStochastic::drawPointGridZmidMovingExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16793,16 +12834,8 @@ void CStochastic::drawPointGridZmidTransparentExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -16815,60 +12848,40 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidUnshadedExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -16881,15 +12894,8 @@ void CStochastic::drawPointGridZmidUnshadedExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -16902,92 +12908,64 @@ void CStochastic::drawPointGridZmidUnshadedMovingExtraSamples(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -16995,18 +12973,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamples(CRa
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17020,16 +12990,8 @@ void CStochastic::drawPointGridZmidDepthBlurExtraSamples(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -17042,17 +13004,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurExtraSamples(CRasterGrid *grid
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17066,17 +13019,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurExtraSamples(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -17091,18 +13035,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17110,30 +13044,24 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamples(CRaste
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -17141,17 +13069,10 @@ void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamples(CRaste
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17166,16 +13087,8 @@ void CStochastic::drawPointGridZmidUnshadedDepthBlurExtraSamples(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -17190,17 +13103,8 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17208,84 +13112,60 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 }
-void CStochastic::drawTriangleGridZmidMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17297,15 +13177,8 @@ void CStochastic::drawPointGridZmidMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -17316,16 +13189,8 @@ void CStochastic::drawPointGridZmidMovingMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17337,16 +13202,8 @@ void CStochastic::drawPointGridZmidTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -17359,93 +13216,64 @@ void CStochastic::drawPointGridZmidMovingTransparentMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -17453,18 +13281,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17478,16 +13298,8 @@ void CStochastic::drawPointGridZmidDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -17500,17 +13312,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17524,17 +13327,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -17549,18 +13343,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17568,73 +13352,56 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -17642,17 +13409,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17666,15 +13426,8 @@ void CStochastic::drawPointGridZmidExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -17687,16 +13440,8 @@ void CStochastic::drawPointGridZmidMovingExtraSamplesMatte(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17710,16 +13455,8 @@ void CStochastic::drawPointGridZmidTransparentExtraSamplesMatte(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -17734,17 +13471,8 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamplesMatte(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17752,30 +13480,24 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamplesMatte(CRasterGri
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -17783,17 +13505,10 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17801,7 +13516,7 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -17809,17 +13524,10 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatte(CRas
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -17827,7 +13535,7 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatte(CRas
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -17836,18 +13544,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17863,16 +13563,8 @@ void CStochastic::drawPointGridZmidDepthBlurExtraSamplesMatte(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -17887,17 +13579,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17913,17 +13596,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurExtraSamplesMatte(CRaster
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -17940,18 +13614,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamplesMatte(C
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -17960,88 +13624,60 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamplesMatte(C
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 }
-void CStochastic::drawTriangleGridZmidLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidLOD(CRasterGrid *grid){
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18053,16 +13689,8 @@ void CStochastic::drawPointGridZmidLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_LOD
@@ -18073,17 +13701,8 @@ void CStochastic::drawPointGridZmidMovingLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18095,17 +13714,8 @@ void CStochastic::drawPointGridZmidTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -18118,97 +13728,64 @@ void CStochastic::drawPointGridZmidMovingTransparentLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -18216,19 +13793,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18242,17 +13810,8 @@ void CStochastic::drawPointGridZmidDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -18265,18 +13824,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18290,18 +13839,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -18316,19 +13855,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18336,76 +13864,56 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *gr
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -18413,18 +13921,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18438,16 +13938,8 @@ void CStochastic::drawPointGridZmidExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -18460,17 +13952,8 @@ void CStochastic::drawPointGridZmidMovingExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18484,17 +13967,8 @@ void CStochastic::drawPointGridZmidTransparentExtraSamplesLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -18509,18 +13983,8 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18528,31 +13992,24 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid 
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -18560,18 +14017,10 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18579,7 +14028,7 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -18587,18 +14036,10 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -18606,7 +14047,7 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesLOD(CRaste
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -18615,19 +14056,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesLOD(
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18643,17 +14075,8 @@ void CStochastic::drawPointGridZmidDepthBlurExtraSamplesLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -18668,18 +14091,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid *g
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18695,18 +14108,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurExtraSamplesLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -18723,19 +14126,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18744,76 +14136,56 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_MATTE
@@ -18821,18 +14193,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18846,16 +14210,8 @@ void CStochastic::drawPointGridZmidMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MATTE
@@ -18868,17 +14224,8 @@ void CStochastic::drawPointGridZmidMovingMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18892,17 +14239,8 @@ void CStochastic::drawPointGridZmidTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -18917,18 +14255,8 @@ void CStochastic::drawPointGridZmidMovingTransparentMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18936,31 +14264,24 @@ void CStochastic::drawPointGridZmidMovingTransparentMatteLOD(CRasterGrid *grid){
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -18968,18 +14289,10 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -18987,7 +14300,7 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid)
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_MATTE
@@ -18995,18 +14308,10 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -19014,7 +14319,7 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -19023,19 +14328,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19051,17 +14347,8 @@ void CStochastic::drawPointGridZmidDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -19076,18 +14363,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19103,18 +14380,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *gri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -19131,19 +14398,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19152,30 +14408,24 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
 	#define STOCHASTIC_LOD
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -19183,17 +14433,10 @@ void CStochastic::drawTriangleGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19201,7 +14444,7 @@ void CStochastic::drawTriangleGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *gr
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -19209,17 +14452,10 @@ void CStochastic::drawTriangleGridZmidTransparentExtraSamplesMatteLOD(CRasterGri
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -19227,7 +14463,7 @@ void CStochastic::drawTriangleGridZmidTransparentExtraSamplesMatteLOD(CRasterGri
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -19236,18 +14472,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19263,16 +14491,8 @@ void CStochastic::drawPointGridZmidExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_EXTRA_SAMPLES
@@ -19287,17 +14507,8 @@ void CStochastic::drawPointGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19313,17 +14524,8 @@ void CStochastic::drawPointGridZmidTransparentExtraSamplesMatteLOD(CRasterGrid *
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -19340,18 +14542,8 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamplesMatteLOD(CRaster
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19360,7 +14552,7 @@ void CStochastic::drawPointGridZmidMovingTransparentExtraSamplesMatteLOD(CRaster
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_MATTE
@@ -19368,17 +14560,10 @@ void CStochastic::drawTriangleGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -19386,7 +14571,7 @@ void CStochastic::drawTriangleGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid 
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -19395,18 +14580,10 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19415,7 +14592,7 @@ void CStochastic::drawTriangleGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRaste
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -19424,18 +14601,10 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatteLOD(C
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -19444,7 +14613,7 @@ void CStochastic::drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatteLOD(C
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_TRANSPARENT
 	#define STOCHASTIC_FOCAL_BLUR
@@ -19454,19 +14623,10 @@ void CStochastic::drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatt
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	transTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19484,17 +14644,8 @@ void CStochastic::drawPointGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_FOCAL_BLUR
@@ -19511,18 +14662,8 @@ void CStochastic::drawPointGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19540,18 +14681,8 @@ void CStochastic::drawPointGridZmidTransparentDepthBlurExtraSamplesMatteLOD(CRas
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_TRANSPARENT
@@ -19570,19 +14701,8 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamplesMatteLO
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	lodExtraVariables()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	transPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19592,43 +14712,32 @@ void CStochastic::drawPointGridZmidMovingTransparentDepthBlurExtraSamplesMatteLO
 	#undef STOCHASTIC_MATTE
 	#undef STOCHASTIC_LOD
 }
-void CStochastic::drawTriangleGridZmidUnshadedUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19641,15 +14750,8 @@ void CStochastic::drawPointGridZmidUnshadedUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -19662,46 +14764,32 @@ void CStochastic::drawPointGridZmidUnshadedMovingUndercull(CRasterGrid *grid){
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -19709,17 +14797,10 @@ void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlurUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19734,16 +14815,8 @@ void CStochastic::drawPointGridZmidUnshadedDepthBlurUndercull(CRasterGrid *grid)
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -19758,17 +14831,8 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19776,29 +14840,24 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid 
 	#undef STOCHASTIC_FOCAL_BLUR
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
 	#define STOCHASTIC_UNDERCULL
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -19806,16 +14865,10 @@ void CStochastic::drawTriangleGridZmidUnshadedMovingExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19830,15 +14883,8 @@ void CStochastic::drawPointGridZmidUnshadedExtraSamplesUndercull(CRasterGrid *gr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -19853,16 +14899,8 @@ void CStochastic::drawPointGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19870,7 +14908,7 @@ void CStochastic::drawPointGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGr
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
 	#define STOCHASTIC_EXTRA_SAMPLES
@@ -19878,16 +14916,10 @@ void CStochastic::drawTriangleGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -19895,7 +14927,7 @@ void CStochastic::drawTriangleGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRa
 	#undef STOCHASTIC_EXTRA_SAMPLES
 	#undef STOCHASTIC_UNDERCULL
 }
-void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
+void CStochastic::drawQuadGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid){
 	#define STOCHASTIC_MOVING
 	#define STOCHASTIC_UNSHADED
 	#define STOCHASTIC_FOCAL_BLUR
@@ -19904,17 +14936,10 @@ void CStochastic::drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamplesUndercu
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	triExtraVariables()
-	focTriExtraVariables()
-	movTriExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
-		#include "stochasticTriangle.h"
-	}
+
+		#include "stochasticQuad.h"
+
+
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19931,16 +14956,8 @@ void CStochastic::drawPointGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRaste
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_UNSHADED
@@ -19957,17 +14974,8 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(
 	#define depthFilterIf()		depthFilterIfZMid()
 	#define depthFilterElse()	depthFilterElseZMid()
 
-	drawGridHeader()
-	ptExtraVariables()
-	focPtExtraVariables()
-	movPtExtraVariables()
-	for(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-		if (cPrimitive->xbound[1] < left)		continue;
-		if (cPrimitive->ybound[1] < top)		continue;
-		if (cPrimitive->xbound[0] >= right)		continue;
-		if (cPrimitive->ybound[0] >= bottom)	continue;
+
 		#include "stochasticPoint.h"
-	}
 	#undef depthFilterIf
 	#undef depthFilterElse
 	#undef STOCHASTIC_MOVING
@@ -19978,645 +14986,644 @@ void CStochastic::drawPointGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(
 }
 #endif
 #ifdef DEFINE_STOCHASTIC_FUNPROTOS
-void drawTriangleGridZmin(CRasterGrid *grid);
-void drawTriangleGridZminMoving(CRasterGrid *grid);
-void drawTriangleGridZminTransparent(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparent(CRasterGrid *grid);
+void drawQuadGridZmin(CRasterGrid *grid);
+void drawQuadGridZminMoving(CRasterGrid *grid);
+void drawQuadGridZminTransparent(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparent(CRasterGrid *grid);
 void drawPointGridZmin(CRasterGrid *grid);
 void drawPointGridZminMoving(CRasterGrid *grid);
 void drawPointGridZminTransparent(CRasterGrid *grid);
 void drawPointGridZminMovingTransparent(CRasterGrid *grid);
-void drawTriangleGridZminUnshaded(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMoving(CRasterGrid *grid);
+void drawQuadGridZminUnshaded(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMoving(CRasterGrid *grid);
 void drawPointGridZminUnshaded(CRasterGrid *grid);
 void drawPointGridZminUnshadedMoving(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZminDepthBlur(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZminDepthBlur(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZminUnshadedDepthBlur(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZminUnshadedDepthBlur(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZminExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZminExtraSamples(CRasterGrid *grid);
 void drawPointGridZminMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZminTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminUnshadedExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZminUnshadedExtraSamples(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZminDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZminUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZminMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingMatte(CRasterGrid *grid);
-void drawTriangleGridZminTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZminMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingMatte(CRasterGrid *grid);
+void drawQuadGridZminTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentMatte(CRasterGrid *grid);
 void drawPointGridZminMatte(CRasterGrid *grid);
 void drawPointGridZminMovingMatte(CRasterGrid *grid);
 void drawPointGridZminTransparentMatte(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZminDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZminExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminMovingExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZminLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZminLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentLOD(CRasterGrid *grid);
 void drawPointGridZminLOD(CRasterGrid *grid);
 void drawPointGridZminMovingLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZminDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZminExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminMovingExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZminMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingMatteLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZminDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZminMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZminUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmax(CRasterGrid *grid);
-void drawTriangleGridZmaxMoving(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparent(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparent(CRasterGrid *grid);
+void drawQuadGridZmax(CRasterGrid *grid);
+void drawQuadGridZmaxMoving(CRasterGrid *grid);
+void drawQuadGridZmaxTransparent(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparent(CRasterGrid *grid);
 void drawPointGridZmax(CRasterGrid *grid);
 void drawPointGridZmaxMoving(CRasterGrid *grid);
 void drawPointGridZmaxTransparent(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparent(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshaded(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMoving(CRasterGrid *grid);
+void drawQuadGridZmaxUnshaded(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMoving(CRasterGrid *grid);
 void drawPointGridZmaxUnshaded(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMoving(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlur(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedDepthBlur(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmaxExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmaxMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingMatte(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentMatte(CRasterGrid *grid);
 void drawPointGridZmaxMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingMatte(CRasterGrid *grid);
 void drawPointGridZmaxTransparentMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmaxLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZmaxLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentLOD(CRasterGrid *grid);
 void drawPointGridZmaxLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmaxMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmaxUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZavg(CRasterGrid *grid);
-void drawTriangleGridZavgMoving(CRasterGrid *grid);
-void drawTriangleGridZavgTransparent(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparent(CRasterGrid *grid);
+void drawQuadGridZavg(CRasterGrid *grid);
+void drawQuadGridZavgMoving(CRasterGrid *grid);
+void drawQuadGridZavgTransparent(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparent(CRasterGrid *grid);
 void drawPointGridZavg(CRasterGrid *grid);
 void drawPointGridZavgMoving(CRasterGrid *grid);
 void drawPointGridZavgTransparent(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparent(CRasterGrid *grid);
-void drawTriangleGridZavgUnshaded(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMoving(CRasterGrid *grid);
+void drawQuadGridZavgUnshaded(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMoving(CRasterGrid *grid);
 void drawPointGridZavgUnshaded(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMoving(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlur(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZavgDepthBlur(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedDepthBlur(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZavgUnshadedDepthBlur(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZavgExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgUnshadedExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZavgMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingMatte(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZavgMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingMatte(CRasterGrid *grid);
+void drawQuadGridZavgTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentMatte(CRasterGrid *grid);
 void drawPointGridZavgMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingMatte(CRasterGrid *grid);
 void drawPointGridZavgTransparentMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZavgExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZavgLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZavgLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentLOD(CRasterGrid *grid);
 void drawPointGridZavgLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZavgExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZavgMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZavgUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmid(CRasterGrid *grid);
-void drawTriangleGridZmidMoving(CRasterGrid *grid);
-void drawTriangleGridZmidTransparent(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparent(CRasterGrid *grid);
+void drawQuadGridZmid(CRasterGrid *grid);
+void drawQuadGridZmidMoving(CRasterGrid *grid);
+void drawQuadGridZmidTransparent(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparent(CRasterGrid *grid);
 void drawPointGridZmid(CRasterGrid *grid);
 void drawPointGridZmidMoving(CRasterGrid *grid);
 void drawPointGridZmidTransparent(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparent(CRasterGrid *grid);
-void drawTriangleGridZmidUnshaded(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMoving(CRasterGrid *grid);
+void drawQuadGridZmidUnshaded(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMoving(CRasterGrid *grid);
 void drawPointGridZmidUnshaded(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMoving(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZmidDepthBlur(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlur(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedDepthBlur(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingDepthBlur(CRasterGrid *grid);
 void drawPointGridZmidUnshadedDepthBlur(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingDepthBlur(CRasterGrid *grid);
-void drawTriangleGridZmidExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidTransparentExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidTransparentExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidUnshadedExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidUnshadedDepthBlurExtraSamples(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingDepthBlurExtraSamples(CRasterGrid *grid);
-void drawTriangleGridZmidMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingMatte(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZmidMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingMatte(CRasterGrid *grid);
+void drawQuadGridZmidTransparentMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentMatte(CRasterGrid *grid);
 void drawPointGridZmidMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingMatte(CRasterGrid *grid);
 void drawPointGridZmidTransparentMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentMatte(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurMatte(CRasterGrid *grid);
-void drawTriangleGridZmidExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidTransparentExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidTransparentExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurExtraSamplesMatte(CRasterGrid *grid);
-void drawTriangleGridZmidLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZmidLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentLOD(CRasterGrid *grid);
 void drawPointGridZmidLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentLOD(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurLOD(CRasterGrid *grid);
-void drawTriangleGridZmidExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurExtraSamplesLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
+void drawQuadGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
 void drawPointGridZmidMovingTransparentDepthBlurExtraSamplesMatteLOD(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedDepthBlurUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedDepthBlurUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingDepthBlurUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
-void drawTriangleGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
+void drawQuadGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 void drawPointGridZmidUnshadedMovingDepthBlurExtraSamplesUndercull(CRasterGrid *grid);
 #endif
-

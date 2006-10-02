@@ -625,7 +625,7 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 	if (i & RASTER_POINT)
 		fprintf(out,"drawPointGrid");
 	else
-		fprintf(out,"drawTriangleGrid");
+		fprintf(out,"drawQuadGrid");
 	
 	switch(i >> RASTER_HIGHBITS_SHIFT) {
 	case DEPTH_MIN:
@@ -769,37 +769,12 @@ int		precomputeStochasticPrimitivesH() {
 				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMid()\n");
 				break;
 			}
-
-			// Output the functions variables & define the switches for the primitive
-			fprintf(out,"\n\tdrawGridHeader()\n");
-
-			if (i & RASTER_LOD)			fprintf(out,"\tlodExtraVariables()\n");
-
-			if (i & RASTER_POINT) {
-				fprintf(out,"\tptExtraVariables()\n");
-				if (i & RASTER_FOCALBLUR)	fprintf(out,"\tfocPtExtraVariables()\n");
-				if (i & RASTER_MOVING)		fprintf(out,"\tmovPtExtraVariables()\n");
-				if (i & RASTER_TRANSPARENT)	fprintf(out,"\ttransPtExtraVariables()\n");
-			} else {
-				fprintf(out,"\ttriExtraVariables()\n");
-				if (i & RASTER_FOCALBLUR)	fprintf(out,"\tfocTriExtraVariables()\n");
-				if (i & RASTER_MOVING)		fprintf(out,"\tmovTriExtraVariables()\n");
-				if (i & RASTER_TRANSPARENT)	fprintf(out,"\ttransTriExtraVariables()\n");
-			}
-			
-			fprintf(out,"\tfor(numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {\n");
-			fprintf(out,"\t\tif (cPrimitive->xbound[1] < left)\t\tcontinue;\n");
-			fprintf(out,"\t\tif (cPrimitive->ybound[1] < top)\t\tcontinue;\n");
-			fprintf(out,"\t\tif (cPrimitive->xbound[0] >= right)\t\tcontinue;\n");
-			fprintf(out,"\t\tif (cPrimitive->ybound[0] >= bottom)\tcontinue;\n");
 		
 			if (i & RASTER_POINT) {
-				fprintf(out,"\t\t#include \"stochasticPoint.h\"\n");
+				fprintf(out,"\n\n\t\t#include \"stochasticPoint.h\"\n");
 			} else {
-				fprintf(out,"\t\t#include \"stochasticTriangle.h\"\n");
+				fprintf(out,"\n\n\t\t#include \"stochasticQuad.h\"\n\n\n");
 			}
-	
-			fprintf(out,"\t}\n");
 			
 			fprintf(out,"\t#undef depthFilterIf\n");
 			fprintf(out,"\t#undef depthFilterElse\n");

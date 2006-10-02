@@ -384,7 +384,7 @@ void	CReyes::render() {
 			if (cObject->grid != NULL) {
 				// Update the stats
 				stats.numRasterGridsRendered++;
-				stats.numTrianglesRendered	+=	cObject->grid->numPrimitives;
+				stats.numQuadsRendered	+=	cObject->grid->udiv*cObject->grid->vdiv;
 
 				// Render the grid
 				rasterDrawPrimitives(cObject->grid);
@@ -657,16 +657,9 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,float vmin,float vmax) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
-	int					numVertices,numTriangles;
-	int					uVertex,vVertex;
-	TRasterPrimitive	*cPrimitive,*primitives;
 
 	// Initialize the grid
-	numVertices		=	(udiv+1)*(vdiv+1);							// The number of vertices to shade
-	numTriangles	=	udiv*vdiv*2;								// The number of microtriangles to create
-
-																	// Create the grid
-	nGrid			=	newGrid(object,numVertices,numTriangles);	
+	nGrid			=	newGrid(object,(udiv+1)*(vdiv+1));	
 	nGrid->dim		=	2;
 	nGrid->umin		=	umin;
 	nGrid->umax		=	umax;
@@ -678,30 +671,7 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 	// Sample the grid
 	shadeGrid(nGrid,TRUE);									// Just the position
 
-	// Create the triangles
-	primitives			=	nGrid->primitives;
-	for (vVertex=0;vVertex<vdiv;vVertex++) {
-		for (uVertex=0;uVertex<udiv;uVertex++) {
-			int		v0,v1,v2;
-
-			v0							=	vVertex*(udiv+1)+uVertex;
-			v1							=	vVertex*(udiv+1)+uVertex+1;
-			v2							=	(vVertex+1)*(udiv+1)+uVertex+1;
-			cPrimitive					=	primitives;		primitives++;
-			cPrimitive->v0				=	nGrid->vertices + v0*numVertexSamples;
-			cPrimitive->data[0].pointer	=	nGrid->vertices + v1*numVertexSamples;
-			cPrimitive->data[1].pointer	=	nGrid->vertices + v2*numVertexSamples;
-
-			v0							=	vVertex*(udiv+1)+uVertex;
-			v1							=	(vVertex+1)*(udiv+1)+uVertex+1;
-			v2							=	(vVertex+1)*(udiv+1)+uVertex;
-			cPrimitive					=	primitives;		primitives++;
-			cPrimitive->v0				=	nGrid->vertices + v0*numVertexSamples;
-			cPrimitive->data[0].pointer	=	nGrid->vertices + v1*numVertexSamples;
-			cPrimitive->data[1].pointer	=	nGrid->vertices + v2*numVertexSamples;
-		}
-	}
-
+	// Insert the grid into the buckets
 	insertGrid(nGrid,0);
 }
 
@@ -717,20 +687,9 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
-	int					numVertices,numTriangles;
-	TRasterPrimitive	*cTriangle,*primitives;
-	float				*leftVertices,*rightVertices;
-	float				*vl0;
-	float				*vl1;
-	float				*vr0;
-	float				*vr1;
-	int					i;
 
 	// Initialize the grid
-	numVertices		=	(numDiv+1)*2;								// The number of vertices to shade
-	numTriangles	=	numDiv*2;									// The number of microtriangles to create
-																	// Create the grid
-	nGrid			=	newGrid(object,numVertices,numTriangles);	
+	nGrid			=	newGrid(object,(numDiv+1)*2);	
 	nGrid->dim		=	1;
 	nGrid->umin		=	0;
 	nGrid->umax		=	0;
@@ -741,30 +700,6 @@ void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 
 	// Sample the grid
 	shadeGrid(nGrid,TRUE);									// Just the position
-
-	// Create the triangles
-	primitives			=	nGrid->primitives;
-	leftVertices		=	nGrid->vertices;
-	rightVertices		=	leftVertices + (numDiv+1)*numVertexSamples;
-	for (i=numDiv;i>0;i--) {
-		vl0								=	leftVertices;
-		vl1								=	leftVertices + numVertexSamples;
-		vr0								=	rightVertices;
-		vr1								=	rightVertices + numVertexSamples;
-
-		cTriangle						=	primitives;	primitives++;
-		cTriangle->v0					=	vl0;
-		cTriangle->data[0].pointer		=	vl1;
-		cTriangle->data[1].pointer		=	vr1;
-
-		cTriangle						=	primitives; primitives++;
-		cTriangle->v0					=	vl0;
-		cTriangle->data[0].pointer		=	vr1;
-		cTriangle->data[1].pointer		=	vr0;
-
-		leftVertices					=	vl1;
-		rightVertices					=	vr1;
-	}
 
 	// Dispatch the lines to the renderer
 	insertGrid(nGrid,0);
@@ -780,29 +715,18 @@ void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
-	TRasterPrimitive	*cPrimitive,*primitives;
-	int					i;
-	float				*cVertex;
 																// Create the grid
-	nGrid			=	newGrid(object,numPoints,numPoints);
+	nGrid			=	newGrid(object,numPoints);
 	nGrid->dim		=	0;
 	nGrid->umin		=	0;
 	nGrid->umax		=	0;
 	nGrid->vmin		=	0;
 	nGrid->vmax		=	0;
-	nGrid->udiv		=	0;
+	nGrid->udiv		=	1;
 	nGrid->vdiv		=	numPoints;
 
 	// Sample the grid
 	shadeGrid(nGrid,TRUE);									// Just the position
-
-	// Create the triangles
-	primitives			=	nGrid->primitives;
-	cVertex				=	nGrid->vertices;
-	for (i=numPoints;i>0;i--,cVertex+=numVertexSamples) {
-		cPrimitive						=	primitives;	primitives++;
-		cPrimitive->v0					=	cVertex;
-	}
 
 	// Dispatch the lines to the renderer
 	insertGrid(nGrid,RASTER_POINT);
@@ -876,14 +800,16 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		float				*sizeArray;
 		CSurface			*object			=	grid->object;
 		const CAttributes	*attributes		=	object->attributes;
-		TRasterPrimitive	*cPrimitive;
+		float				*sizes;
 
 		if (Ponly) {
 			// Set the flags
 			grid->flags	=	extraPrimitiveFlags | RASTER_POINT | RASTER_UNSHADED;
-			if (enableMotionBlur && (object->moving()))	grid->flags	|=	RASTER_MOVING;
-			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
-			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+			if (enableMotionBlur && (object->moving()))					grid->flags	|= RASTER_MOVING;
+			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 		grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
+			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)	grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)				grid->flags	|= RASTER_MATTE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 				grid->flags	|= RASTER_LOD;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -913,8 +839,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			copyPoints(numPoints,varying,grid->vertices,0);
 
 			// Make sure we record the point sizes
-			for (cPrimitive=grid->primitives,i=numPoints;i>0;i--,cPrimitive++) {
-				cPrimitive->data[0].real	=	*sizeArray++;
+			for (sizes=grid->sizes,i=numPoints;i>0;i--,sizes+=2) {
+				sizes[0]	=	*sizeArray++;
 			}
 
 		} else {
@@ -938,16 +864,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}
-			}
-			
-			// Determine if we're a matte
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE) {
-				grid->flags |= RASTER_MATTE;
-			}
-			
-			// Determine if there's LOD in effect
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
-				grid->flags |= RASTER_LOD;
 			}
 		}
 
@@ -983,8 +899,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 				copyPoints(numPoints,varying,grid->vertices,1);
 
 				// Make sure we record the point sizes
-				for (cPrimitive=grid->primitives,i=numPoints;i>0;i--,cPrimitive++) {
-					cPrimitive->data[1].real	=	*sizeArray++;
+				for (sizes=grid->sizes,i=numPoints;i>0;i--,sizes+=2) {
+					sizes[1]	=	*sizeArray++;
 				}
 			} else {
 				// Shade the points
@@ -1034,9 +950,11 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
 
 			// Do we have motion blur ?
-			if (enableMotionBlur && (object->moving()))	grid->flags	|=	RASTER_MOVING;
+			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -1091,16 +1009,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}
-			}
-			
-			// Determine if we're a matte
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE) {
-				grid->flags |= RASTER_MATTE;
-			}
-			
-			// Determine if there's LOD in effect
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
-				grid->flags |= RASTER_LOD;
 			}
 		}
 
@@ -1218,9 +1126,11 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN)	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
+			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
 
 			// Do we have motion blur ?
-			if (enableMotionBlur && (object->moving()))	grid->flags	|=	RASTER_MOVING;
+			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
 
 			// Displace the sucker
 			displace(object,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
@@ -1253,16 +1163,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}
-			}
-			
-			// Determine if we're a matte
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE) {
-				grid->flags |= RASTER_MATTE;
-			}
-			
-			// Determine if there's LOD in effect
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
-				grid->flags |= RASTER_LOD;
 			}
 		}
 
@@ -1505,14 +1405,14 @@ void		CReyes::makeRibbon(int numVertices,float *leftVertices,float *rightVertice
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/5/2003
-CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices,int numPrimitives) {
+CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	CRasterGrid			*grid	=	new CRasterGrid;
 
 	grid->object			=	object;				object->attach();
 	grid->numVertices		=	numVertices;
-	grid->numPrimitives		=	numPrimitives;
 	grid->vertices			=	new float[numVertices*numVertexSamples];
-	grid->primitives		=	new TRasterPrimitive[numPrimitives];
+	grid->bounds			=	new int[numVertices*4];
+	grid->sizes				=	new float[numVertices*2];
 
 	numGrids++;
 	if (numGrids > stats.numPeakRasterGrids)	stats.numPeakRasterGrids	=	numGrids;
@@ -1530,8 +1430,9 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices,int numPr
 // Date last edited		:	6/5/2003
 void			CReyes::deleteGrid(CRasterGrid *grid) {
 	grid->object->detach();
-	delete [] grid->primitives;
 	delete [] grid->vertices;
+	delete [] grid->bounds;
+	delete [] grid->sizes;
 	delete grid;
 
 	numGrids--;
@@ -1610,14 +1511,17 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 	// Compute the primitive bounds
 	if (flags & RASTER_POINT) {
-		TRasterPrimitive	*cPrimitive;
 		int					i;
 		float				maxmaxSize	=	-C_INFINITY;
+		const float			*sizes		=	grid->sizes;
+		const float			*vertices	=	grid->vertices;
+		int					*bounds		=	grid->bounds;
 
-		for (cPrimitive=grid->primitives,i=grid->numPrimitives;i>0;i--,cPrimitive++) {
-			float	xbound[2];
-			float	ybound[2];
-			float	*P			=	cPrimitive->v0;
+		// Compute the bounds for every point
+		for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,sizes+=2,bounds+=4) {
+			float		xbound[2];
+			float		ybound[2];
+			const float	*P		=	vertices;
 
 			xbound[0]			=	P[0];
 			xbound[1]			=	P[0];
@@ -1625,14 +1529,15 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 			ybound[1]			=	P[1];
 
 			if (grid->flags & RASTER_MOVING) {
-				P				=	cPrimitive->v0 + numExtraSamples+10;
+				P				+=	numExtraSamples + 10;
 
 				xbound[0]		=	min(xbound[0],P[0]);
 				xbound[1]		=	max(xbound[1],P[0]);
 				ybound[0]		=	min(ybound[0],P[1]);
 				ybound[1]		=	max(ybound[1],P[1]);
 
-				const float maxSize	=	max(cPrimitive->data[0].real,cPrimitive->data[1].real);
+				const float maxSize	=	max(sizes[0],sizes[1]);
+
 				xbound[0]		-=	maxSize;
 				ybound[0]		-=	maxSize;
 				xbound[1]		+=	maxSize;
@@ -1640,18 +1545,19 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 				if (maxSize > maxmaxSize)	maxmaxSize	=	maxSize;
 			} else {
-				xbound[0]		-=	cPrimitive->data[0].real;
-				ybound[0]		-=	cPrimitive->data[0].real;
-				xbound[1]		+=	cPrimitive->data[0].real;
-				ybound[1]		+=	cPrimitive->data[0].real;
+				xbound[0]		-=	sizes[0];
+				ybound[0]		-=	sizes[0];
+				xbound[1]		+=	sizes[0];
+				ybound[1]		+=	sizes[0];
 
-				if (cPrimitive->data[0].real > maxmaxSize)	maxmaxSize	=	cPrimitive->data[0].real;
+				if (sizes[0] > maxmaxSize)	maxmaxSize	=	sizes[0];
 			}
 
-			cPrimitive->xbound[0]	=	(int) floor(xbound[0]);
-			cPrimitive->xbound[1]	=	(int) floor(xbound[1]);
-			cPrimitive->ybound[0]	=	(int) floor(ybound[0]);
-			cPrimitive->ybound[1]	=	(int) floor(ybound[1]);
+			
+			bounds[0]	=	(int) floor(xbound[0]);		// xmin
+			bounds[1]	=	(int) floor(xbound[1]);		// xmax
+			bounds[2]	=	(int) floor(ybound[0]);		// ymin
+			bounds[3]	=	(int) floor(ybound[1]);		// ymax
 		}
 
 		xmin	-=	maxmaxSize;
@@ -1659,67 +1565,91 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		xmax	+=	maxmaxSize;
 		ymax	+=	maxmaxSize;
 	} else {
-		TRasterPrimitive	*cTriangle;
-		int					i;
+		int					i,j;
+		const int			udiv		=	grid->udiv;
+		const int			vdiv		=	grid->vdiv;
+		const float			*vertices	=	grid->vertices;
+		int					*bounds		=	grid->bounds;
 
-		for (cTriangle=grid->primitives,i=grid->numPrimitives;i>0;i--,cTriangle++) {
-			// Compute the primitive bounds
-			float			xbound[2];
-			float			ybound[2];
-			float			*v0			=	cTriangle->v0;
-			float			*v1			=	(float *) cTriangle->data[0].pointer;
-			float			*v2			=	(float *) cTriangle->data[1].pointer;
-			const float		*P			=	v0;
+		// Bound every quad
+		for (j=0;j<vdiv;j++) {
+			for (i=0;i<udiv;i++,bounds+=4) {
+				float			xbound[2];
+				float			ybound[2];
+				const float		*cVertex	=	vertices + (j*(udiv+1) + i)*numVertexSamples; // The top left vertex
+				const float		*P;
 
-			xbound[1]	=	xbound[0]	=	P[COMP_X];
-			ybound[1]	=	ybound[0]	=	P[COMP_Y];
+				// Compute the primitive bounds
+				P			=	cVertex;
+				xbound[1]	=	xbound[0]	=	P[COMP_X];
+				ybound[1]	=	ybound[0]	=	P[COMP_Y];
 
-			P	=	v1;
-			if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
-			else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
-			if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
-			else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
-
-			P	=	v2;
-			if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
-			else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
-			if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
-			else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
-
-			if (grid->flags & RASTER_MOVING) {
-				P	=	v0 + numExtraSamples+10;
+				P			+=	numVertexSamples;
 				if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
 				else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
 				if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
 				else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
 
-				P	=	v1 + numExtraSamples+10;
+				P			+=	udiv*numVertexSamples;
 				if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
 				else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
 				if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
 				else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
 
-				P	=	v2 + numExtraSamples+10;
+				P			+=	numVertexSamples;
 				if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
 				else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
 				if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
 				else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
+
+				if (grid->flags & RASTER_MOVING) {
+					P	=	cVertex + numExtraSamples + 10;
+					if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
+					else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
+					if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
+					else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
+
+					P	+=	numVertexSamples;
+					if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
+					else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
+					if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
+					else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
+
+					P	+=	udiv*numVertexSamples;
+					if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
+					else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
+					if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
+					else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
+
+					P	+=	numVertexSamples;
+					if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
+					else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
+					if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
+					else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
+				}
+
+				if (aperture != 0) {
+					// Expand the bound by the maximum focal blur amount
+					const float	c1		=	cVertex[9];
+					const float	c2		=	cVertex[9 + numVertexSamples];
+					const float	c3		=	cVertex[9 + numVertexSamples*(udiv+1)];
+					const float	c4		=	cVertex[9 + numVertexSamples*(udiv+2)];
+					const float	mcoc	=	max(max(max(c1,c2),c3),c4);
+
+					xbound[0]			-=	mcoc;
+					xbound[1]			+=	mcoc;
+					ybound[0]			-=	mcoc;
+					ybound[1]			+=	mcoc;
+				}
+
+
+				bounds[0]	=	(int) floor(xbound[0]);		// xmin
+				bounds[1]	=	(int) floor(xbound[1]);		// xmax
+				bounds[2]	=	(int) floor(ybound[0]);		// ymin
+				bounds[3]	=	(int) floor(ybound[1]);		// ymax
 			}
 
-			if (aperture != 0) {
-				// Expand the bound by the maximum focal blur amount
-				const	float	mcoc	=	max(max(v0[9],v1[9]),v2[9]);
-
-				xbound[0]	-=	mcoc;
-				xbound[1]	+=	mcoc;
-				ybound[0]	-=	mcoc;
-				ybound[1]	+=	mcoc;
-			}
-
-			cTriangle->xbound[0]	=	(int) floor(xbound[0]);
-			cTriangle->xbound[1]	=	(int) floor(xbound[1]);
-			cTriangle->ybound[0]	=	(int) floor(ybound[0]);
-			cTriangle->ybound[1]	=	(int) floor(ybound[1]);
+			bounds+=4;
 		}
 	}
 
@@ -1742,7 +1672,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	objectInsert(cObject);
 
 	// Update stats
-	stats.numTrianglesCreated	+=	grid->numPrimitives;
+	stats.numQuadsCreated	+=	grid->udiv*grid->vdiv;
 	stats.numRasterGridsCreated++;
 }
 

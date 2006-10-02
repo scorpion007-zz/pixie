@@ -121,8 +121,8 @@ public:
 	int				numObjectOccluded;
 	int				numSplits;
 	int				numVsplits,numUsplits,numUVsplits;
-	int				numTrianglesCreated;
-	int				numTrianglesRendered;
+	int				numQuadsCreated;
+	int				numQuadsRendered;
 	int				numTracedRays,numShadingRays,numShadowRays;
 	int				numRayTriangles;
 	int				numHierarchyLeaves,numHierarchyInternals,numHierarchyUncomputeds;

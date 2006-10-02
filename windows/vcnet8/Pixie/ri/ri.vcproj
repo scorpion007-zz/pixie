@@ -833,7 +833,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\stochasticTriangle.h"
+				RelativePath="..\..\..\..\src\ri\stochasticQuad.h"
 				>
 			</File>
 			<File

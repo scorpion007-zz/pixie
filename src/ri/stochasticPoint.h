@@ -24,13 +24,35 @@
 
 // This is the portion of Pixie that draws a point into the stochastic
 
-#ifdef STOCHASTIC_MOVING
-#define	displacement	sampleDisplacement
+
+int			i;
+const int	*bounds		=	grid->bounds;
+const float	*vertices	=	grid->vertices;
+const float	*sizes		=	grid->sizes;
+const	int	xres		=	sampleWidth - 1;
+const	int	yres		=	sampleHeight - 1;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Here're some macros that make the rasterization job easier for us
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+#ifdef STOCHASTIC_EXTRA_SAMPLES
+#define	displacement	(10 + numExtraSamples)
 #else
 #define	displacement	10
 #endif
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//  This macro checks the pixel LOD against the object LOD level
 #ifdef STOCHASTIC_LOD
+	const float importance = grid->object->attributes->lodImportance;
+
 	#define lodCheck()																			\
 		if (importance >= 0) {																	\
 			if (pixel->jimp > importance)		continue;										\
@@ -41,7 +63,11 @@
 	#define lodCheck()
 #endif
 
-// This macro draws a sample to the pixel buffer
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The following macro is used to draw extra samples for each pixels if any
 #ifdef STOCHASTIC_EXTRA_SAMPLES
 
 #ifdef STOCHASTIC_MOVING
@@ -71,6 +97,12 @@
 #define	drawExtraSamples()
 #endif
 
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// This big ass macro is for computing the final color/opacity of a pixel
 #ifndef STOCHASTIC_TRANSPARENT
 // Non transparent
 	#ifndef STOCHASTIC_MOVING
@@ -78,7 +110,7 @@
 		#ifndef STOCHASTIC_MATTE
 			// Non Matte
 			#define colorOpacityUpdate()													\
-				movvv(nSample->color,v0c);													\
+				movvv(nSample->color,v0 + 3);												\
 				initv(nSample->opacity,1);
 		#else
 			// Matte
@@ -92,7 +124,7 @@
 		#ifndef STOCHASTIC_MATTE
 			// Non Matte
 			#define colorOpacityUpdate()													\
-				interpolatev(nSample->color,v0c,v0c+displacement,jt);						\
+				interpolatev(nSample->color,v0+3,v0+3+displacement,jt);						\
 				initv(nSample->opacity,1);
 		#else
 			// Matte
@@ -109,14 +141,14 @@
 		#ifndef STOCHASTIC_MATTE
 			// Non Matte
 			#define colorOpacityUpdate()													\
-				movvv(nSample->color,v0c);													\
-				movvv(nSample->opacity,v0o);
+				movvv(nSample->color,v0+3);													\
+				movvv(nSample->opacity,v0+6);
 		#else
 			// Matte
 			#define colorOpacityUpdate()													\
 				initv(nSample->color,0);													\
 				initv(nSample->opacity,0);													\
-				subvv(nSample->opacity,v0o);												\
+				subvv(nSample->opacity,v0+6);												\
 				movvv(pixel->first.opacity,nSample->opacity);
 		#endif
 	#else
@@ -124,13 +156,13 @@
 		#ifndef STOCHASTIC_MATTE
 			// Non Matte
 			#define colorOpacityUpdate()													\
-				interpolatev(nSample->color,v0c,v0c+displacement,jt);						\
-				interpolatev(nSample->opacity,v0o,v0o+displacement,jt);
+				interpolatev(nSample->color,v0+3,v0+3+displacement,jt);						\
+				interpolatev(nSample->opacity,v0+6,v0+6+displacement,jt);
 		#else
 			// Matte
 			#define colorOpacityUpdate()													\
 				initv(nSample->color,0);													\
-				interpolatev(nSample->opacity,v0o,v0o+displacement,jt);						\
+				interpolatev(nSample->opacity,v0+6,v0+6+displacement,jt);					\
 				nSample->opacity[0] = -nSample->opacity[0];									\
 				nSample->opacity[1] = -nSample->opacity[1];									\
 				nSample->opacity[2] = -nSample->opacity[2];									\
@@ -198,6 +230,8 @@
 #endif
 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// These macros decide whether we should draw a guad or not
 #ifdef STOCHASTIC_UNSHADED
 // We're not shaded yet, so if we pass the depth test, we need to back and shade the grid
 #ifdef STOCHASTIC_UNDERCULL
@@ -221,56 +255,72 @@
 	drawPixel();
 #endif
 
-v0		=	cPrimitive->v0;
-v0c		=	v0+3;
 
-#ifdef STOCHASTIC_TRANSPARENT
-v0o		=	v0c+3;
-#endif
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+//   Here's the code that actually iterates over the quads and draws them
+//
+///////////////////////////////////////////////////////////////////////////////////////////
 
-xmin	=	cPrimitive->xbound[0] - left;
-ymin	=	cPrimitive->ybound[0] - top;
-xmax	=	cPrimitive->xbound[1] - left;
-ymax	=	cPrimitive->ybound[1] - top;
+// Iterate over every quad
+for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) {
 
-xmin	=	max(xmin,0);
-ymin	=	max(ymin,0);
-xmax	=	min(xmax,xres);
-ymax	=	min(ymax,yres);
+	// Trivial rejects
+	if (bounds[1] < left)		continue;
+	if (bounds[3] < top)		continue;
+	if (bounds[0] >= right)		continue;
+	if (bounds[2] >= bottom)	continue;
 
-for (y=ymin;y<=ymax;y++) {
-	for (x=xmin;x<=xmax;x++) {
-		CPixel			*pixel	=	fb[y]+x;
+	int	xmin	=	bounds[0] - left;	// Convert the bound into the current bucket
+	int	ymin	=	bounds[2] - top;
+	int	xmax	=	bounds[1] - left;
+	int	ymax	=	bounds[3] - top;
 
-		lodCheck();
+	xmin		=	max(xmin,0);		// Clamp the bound in the current bucket
+	ymin		=	max(ymin,0);
+	xmax		=	min(xmax,xres);
+	ymax		=	min(ymax,yres);
 
-		const float		xcent	=	pixel->xcent;
-		const float		ycent	=	pixel->ycent;
+	const float	*v0	=	vertices;
+	int			x,y;
+	for (y=ymin;y<=ymax;y++) {
+		for (x=xmin;x<=xmax;x++) {
+			CPixel			*pixel	=	fb[y]+x;
+
+			lodCheck();
+	
+			const float		xcent	=	pixel->xcent;
+			const float		ycent	=	pixel->ycent;
 		
 		
 #ifdef STOCHASTIC_MOVING
-		const	float	jt		=	pixel->jt;
-		interpolatev(v0movTmp,v0,(v0+sampleDisplacement),jt);
-		dv0						=	v0movTmp;
-		const	float	size	=	cPrimitive->data[0].real*(1-jt) + cPrimitive->data[1].real*jt;
+			const	float	jt		=	pixel->jt;
+			vector	v0movTmp;
+			interpolatev(v0movTmp,v0,(v0+displacement),jt);
+			v0						=	v0movTmp;
+			const	float	size	=	sizes[0]*(1-jt) + sizes[1]*jt;
 #else
-		dv0						=	v0;
-		const	float	size	=	cPrimitive->data[0].real;
+			const	float	size	=	sizes[0];
 #endif
 
 #ifdef STOCHASTIC_FOCAL_BLUR
-		v0focTmp[COMP_X]		=	dv0[COMP_X] + pixel->jdx*v0[9];
-		v0focTmp[COMP_Y]		=	dv0[COMP_Y] + pixel->jdy*v0[9];
-		v0focTmp[COMP_Z]		=	dv0[COMP_Z];
-		dv0						=	v0focTmp;
+			vector	v0focTmp;
+			v0focTmp[COMP_X]		=	v0[COMP_X] + pixel->jdx*vertices[9];
+			v0focTmp[COMP_Y]		=	v0[COMP_Y] + pixel->jdy*vertices[9];
+			v0focTmp[COMP_Z]		=	v0[COMP_Z];
+			v0						=	v0focTmp;
 #endif
 
-		const	float	dx		=	xcent - dv0[0];
-		const	float	dy		=	ycent - dv0[1];
+			const	float	dx		=	xcent - v0[0];
+			const	float	dy		=	ycent - v0[1];
 
-		if ((dx*dx + dy*dy) < (size*size)) {
-			const	float	z	=	dv0[2];
-			drawPixelCheck();
+			if ((dx*dx + dy*dy) < (size*size)) {
+				const	float	z	=	v0[2];
+
+				v0	=	vertices;
+
+				drawPixelCheck();
+			}
 		}
 	}
 }
@@ -283,4 +333,3 @@ for (y=ymin;y<=ymax;y++) {
 #undef	drawExtraSamples
 #undef	displacement
 #undef	colorOpacityUpdate
-

@@ -144,6 +144,7 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t) {
 // Comments				:
 // Date last edited		:	7/31/2002
 void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
+	/*
 	const int				xres				=	sampleWidth-1;
 	const int				yres				=	sampleHeight-1;
 	const TRasterPrimitive	*cPrimitive;
@@ -171,6 +172,7 @@ void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 #include "zbufferTriangle.h"
 		}
 	}
+	*/
 }
 
 

@@ -168,7 +168,6 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
 	CFragment	*cFragment;
-	//CSobol<2>	apertureGenerator;
 
 
 	assert(numFragments == 0);
@@ -221,7 +220,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t) {
 			pixel->jt					=	( pxi*pixelXsamples + pxj + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);
 			
 			// Importance blend / jitter
-			pixel->jimp					=	1.0f - ( pxj*pixelYsamples + pxi + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);	//urand();
+			pixel->jimp					=	1.0f - ( pxj*pixelYsamples + pxi + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);
 
 			if (flags & OPTIONS_FLAGS_FOCALBLUR) {
 				// Aperture sample for depth of field
@@ -303,48 +302,16 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 #define depthFilterIfZMid()		pixel->zold		=	pixel->z;
 #define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
 
-#define lodExtraVariables()		const float importance = grid->object->attributes->lodImportance;
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//   There are two sets of parameters, for triangles and for points
+//   There are two sets of parameters, for quads and for points
 //      Within each set, some parameters are only required when there is motion blur, depth of field etc.
 //      The macros below define local variables for each set, so that we do not end up with a huge amount
 //      of unused variables. This not only makes the compiler happy, but also produces leaner code
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-// Triangle drawing local variables
-#define triExtraVariables()			const	int					*xbound;							\
-									const	int					*ybound;							\
-									const	float				*v0,*v0c;							\
-									const	float				*v1,*v1c;							\
-									const	float				*v2,*v2c;							\
-									const	float				*dv0,*dv1,*dv2;						\
-									float						a;
-
-#define movTriExtraVariables()		vector						v0movTmp,v1movTmp,v2movTmp;
-#define focTriExtraVariables()		vector						v0focTmp,v1focTmp,v2focTmp;
-#define transTriExtraVariables()	const float					*v0o,*v1o,*v2o;
-
-// Point drawing local variables
-#define ptExtraVariables()			const	float				*v0,*v0c;							\
-									const	float				*dv0;
-
-#define movPtExtraVariables()		vector						v0movTmp;
-#define focPtExtraVariables()		vector						v0focTmp;
-#define transPtExtraVariables()		const float					*v0o;
-
-// Common local variables
-#define drawGridHeader() 																			\
-	const	int					xres				=	sampleWidth - 1;							\
-	const	int					yres				=	sampleHeight - 1;							\
-	const	TRasterPrimitive	*cPrimitive;														\
-	const	int					sampleDisplacement	=	numExtraSamples + 10;						\
-	int							xmin,xmax,ymin,ymax,x,y;											\
-	int							numPrimitives;
 
 // This macro is used to insert a fragment into the linked list for a pixel
 #define	findSample(__dest,__z) { 																	\
@@ -401,8 +368,6 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 #undef depthFilterElseZAvg
 #undef depthFilterIfZMid
 #undef depthFilterElseZMid
-#undef lodExtraVariables
-#undef drawGridHeader
 #undef findSample
 #undef updateOpaque
 

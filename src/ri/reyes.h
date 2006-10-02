@@ -69,15 +69,6 @@ const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 12;	// Shade the primitive even 
 class	CReyes : public CShadingContext {
 protected:
 
-	///////////////////////////////////////////////////////////////////////
-	//	The misc data structures used in the scan line rendering
-	///////////////////////////////////////////////////////////////////////
-	typedef struct TRasterPrimitive {
-			int					xbound[2],ybound[2];	// The bound on the screen, in samples
-			float				*v0;					// The first vertex index (used for sorting)
-			T64					data[2];				// The data field - primitive dependent data area
-	} TRasterPrimitive;
-
 
 
 	///////////////////////////////////////////////////////////////////////
@@ -94,8 +85,8 @@ protected:
 		int						udiv,vdiv;				// The number of division
 		int						numVertices;			// The number of vertices
 		float					*vertices;				// Array of vertices
-		int						numPrimitives;			// Number of primitives
-		TRasterPrimitive		*primitives;			// Array of primitives on this grid
+		int						*bounds;				// The bound of the primitive (4 numbers per primitive)
+		float					*sizes;					// The size of the primitive (only makes sense for points)
 		int						flags;					// The primitive flags
 	};
 
@@ -236,6 +227,7 @@ protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 	float						culledDepth;									// The depth of the closest culled object
 	int							xSampleOffset,ySampleOffset;					// The amount of offset around each bucket in samples
+	int							numVertexSamples;								// The number of samples per pixel
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
 private:
@@ -244,7 +236,7 @@ private:
 
 	void						makeRibbon(int,float *,float *,const float *,const float *,const float *,int);
 
-	CRasterGrid					*newGrid(CSurface *,int,int);					// Create a new grid
+	CRasterGrid					*newGrid(CSurface *,int);						// Create a new grid
 	void						deleteGrid(CRasterGrid *);						// Delete a grid
 	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket
 
@@ -256,7 +248,6 @@ private:
 
 	CBucket						***buckets;										// All buckets
 
-	int							numVertexSamples;								// The number of samples per pixel
 	int							enableMotionBlur;								// TRUE if the motion blur has to be enabled
 	int							extraPrimitiveFlags;							// These are the extra primitive flags
 	int							xBucketsMinusOne;								// xBuckets-1

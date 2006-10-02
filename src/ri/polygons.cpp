@@ -663,6 +663,38 @@ void		CPolygonMesh::dice(CShadingContext *r) {
 
 
 
+/*
+///////////////////////////////////////////////////////////////////////
+// Function				:	createQuad
+// Description			:	Actually create the quad
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	10/29/2003
+static	void	createQuad(const int *vindices,const int vi0,const int vi1,const int vi2,const int vi3) {
+	CBilinearPatch		*cQuad;
+	const float			*P				=	meshP;
+	CParameter			*parameters		=	NULL;
+	CVertexData			*vertexData		=	meshPl->vertexData();
+	const int			vertexSize		=	vertexData->vertexSize;
+	double				*vertex			=	(double *) alloca(vertexSize*4*sizeof(double));
+	int					i;
+
+	// Copy the vertex data
+	for (i=0;i<vertexSize;i++) {
+		vertex[0			+ i]	=	vs0[i];
+		vertex[vertexSize*1 + i]	=	vs1[i];
+		vertex[vertexSize*2 + i]	=	vs3[i];
+		vertex[vertexSize*3 + i]	=	vs2[i];
+	}
+
+	// Extract the parameters from the PL
+	parameters							=	meshPl->uniform(meshUniformNumber,NULL);
+	parameters							=	meshPl->varying(v0,v1,v3,v2,parameters);
+
+	// Create the quad
+	cQuad								=	new CBilinearPatch(meshAttributes,meshXform,NULL,parameters,0,0,1,1,vertexData);
+}
+*/
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	createTriangle

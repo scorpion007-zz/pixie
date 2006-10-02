@@ -43,11 +43,13 @@
 // Description			:	Encapsulates a bilinear patch
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CBilinearPatch : public CSurface {
+class	CBilinearPatch : public CSurface , public CTracable{
 public:
 						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *);
 						~CBilinearPatch();
 
+		int				intersect(const float *,const float *) const;
+		void			intersect(CRay *);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const												{	return variables->moving;			}
@@ -55,6 +57,7 @@ public:
 		void			interpolate(int,float **) const;
 
 private:
+		vector			bmin,bmax;
 		CVertexData		*variables;
 		CParameter		*parameters;
 		float			*vertex;
