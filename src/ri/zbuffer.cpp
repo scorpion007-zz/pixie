@@ -144,35 +144,13 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t) {
 // Comments				:
 // Date last edited		:	7/31/2002
 void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
-	/*
-	const int				xres				=	sampleWidth-1;
-	const int				yres				=	sampleHeight-1;
-	const TRasterPrimitive	*cPrimitive;
-	int						numPrimitives;
 
 	// Draw the suckers one by one
 	if (grid->flags & RASTER_POINT) {
-		for (numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-			// Trivial rejects for points
-			if (cPrimitive->xbound[1] < left)		continue;
-			if (cPrimitive->ybound[1] < top)		continue;
-			if (cPrimitive->xbound[0] >= right)		continue;
-			if (cPrimitive->ybound[0] >= bottom)	continue;
-
-#include "zbufferPoint.h"
-		}
+		#include "zbufferPoint.h"
 	} else {
-		for (numPrimitives=grid->numPrimitives,cPrimitive=grid->primitives;numPrimitives>0;numPrimitives--,cPrimitive++) {
-			// Trivial rejects for polygons
-			if (cPrimitive->xbound[1] < left)		continue;
-			if (cPrimitive->ybound[1] < top)		continue;
-			if (cPrimitive->xbound[0] >= right)		continue;
-			if (cPrimitive->ybound[0] >= bottom)	continue;
-
-#include "zbufferTriangle.h"
-		}
+		#include "zbufferQuad.h"
 	}
-	*/
 }
 
 

@@ -30,6 +30,7 @@ const	int	xres		=	sampleWidth - 1;
 const	int	yres		=	sampleHeight - 1;
 const	int	udiv		=	grid->udiv;
 const	int	vdiv		=	grid->vdiv;
+const	int	flags		=	grid->flags;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +136,7 @@ const	int	vdiv		=	grid->vdiv;
 		nSample->opacity[1]		=	((v0c[0]*(1-jt) + v0c[displacement+0]*jt)*(1-u) + (v1c[0]*(1-jt) + v1c[displacement+0]*jt)*u)*(1-v) + ((v2c[0]*(1-jt) + v2c[displacement+0]*jt)*(1-u) + (v3c[0]*(1-jt) + v3c[displacement+0]*jt)*u)*v;	\
 		v0c++;	v1c++;	v2c++;	v3c++;															\
 		nSample->opacity[2]		=	((v0c[0]*(1-jt) + v0c[displacement+0]*jt)*(1-u) + (v1c[0]*(1-jt) + v1c[displacement+0]*jt)*u)*(1-v) + ((v2c[0]*(1-jt) + v2c[displacement+0]*jt)*(1-u) + (v3c[0]*(1-jt) + v3c[displacement+0]*jt)*u)*v;
-
+		
 #else
 
 	#define colorOpacityUpdate()																\
@@ -294,11 +295,11 @@ const	int	vdiv		=	grid->vdiv;
 //////////////////////////////////////////////////////////////////////////////////////////
 // These macros decide whether we should draw a guad or not
 #ifdef STOCHASTIC_UNDERCULL
-#define shouldDrawFront()			(grid->flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE))
-#define shouldDrawBack()			(grid->flags & (RASTER_DRAW_BACK  | RASTER_SHADE_BACKFACE))
+#define shouldDrawFront()			(flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE))
+#define shouldDrawBack()			(flags & (RASTER_DRAW_BACK  | RASTER_SHADE_BACKFACE))
 #else
-#define shouldDrawFront()			(grid->flags & RASTER_DRAW_FRONT)
-#define shouldDrawBack()			(grid->flags & RASTER_DRAW_BACK)
+#define shouldDrawFront()			(flags & RASTER_DRAW_FRONT)
+#define shouldDrawBack()			(flags & RASTER_DRAW_BACK)
 #endif
 
 
@@ -310,7 +311,7 @@ const	int	vdiv		=	grid->vdiv;
 // We're not shaded yet, so if we pass the depth test, we need to back and shade the grid
 #ifdef STOCHASTIC_UNDERCULL
 #define drawPixelCheck()															\
-	if (z < pixel->z || (grid->flags & RASTER_SHADE_HIDDEN)) {						\
+	if (z < pixel->z || (flags & RASTER_SHADE_HIDDEN)) {						\
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
@@ -372,17 +373,16 @@ for (j=0;j<vdiv;j++) {
 #define	checkPixel(__op)																					\
 	const float		xcent	=	pixel->xcent;																\
 	const float		ycent	=	pixel->ycent;																\
-	float			u,v,aleft,atop,aright,abottom;															\
+	float			aleft,atop,aright,abottom;																\
 																											\
 	if ((atop		= area(xcent,ycent,v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y])) __op 0)	continue;	\
 	if ((aright		= area(xcent,ycent,v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y])) __op 0)	continue;	\
 	if ((abottom	= area(xcent,ycent,v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y])) __op 0)	continue;	\
 	if ((aleft		= area(xcent,ycent,v2[COMP_X],v2[COMP_Y],v0[COMP_X],v0[COMP_Y])) __op 0)	continue;	\
 																											\
-	u	=	aleft / (aleft + aright);																		\
-	v	=	atop / (atop + abottom);																		\
-																											\
-	const	float	z			=	(v0[COMP_Z]*(1-u) + v1[COMP_Z]*u)*(1-v) + (v2[COMP_Z]*(1-u) + v3[COMP_Z]*u)*v;	\
+	const float u	=	aleft / (aleft + aright);															\
+	const float v	=	atop / (atop + abottom);															\
+	const float	z	=	(v0[COMP_Z]*(1-u) + v1[COMP_Z]*u)*(1-v) + (v2[COMP_Z]*(1-u) + v3[COMP_Z]*u)*v;		\
 	if (z < clipMin)	continue;
 	
 
@@ -459,7 +459,6 @@ if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0)
 		for (x=xmin;x<=xmax;x++) {
 			CPixel			*pixel	=	fb[y] + x;
 
-
 			lodCheck();
 
 			checkPixel(>);
@@ -478,8 +477,13 @@ if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0)
 		for (x=xmin;x<=xmax;x++) {
 			CPixel			*pixel	=	fb[y] + x;
 
-			lodCheck();
-			
+			lodCheck();			
+
+			v0		=	vertices;
+			v1		=	v0 + numVertexSamples;
+			v2		=	v1 + udiv*numVertexSamples;
+			v3		=	v2 + numVertexSamples;
+
 #ifdef STOCHASTIC_MOVING
 			vector	v0movTmp;
 			vector	v1movTmp;
@@ -501,19 +505,25 @@ if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0)
 			vector	v1focTmp;
 			vector	v2focTmp;
 			vector	v3focTmp;
-			v0focTmp[COMP_X]	= v0[COMP_X] + pixel->jdx*v0[9];
-			v1focTmp[COMP_X]	= v1[COMP_X] + pixel->jdx*v1[9];
-			v2focTmp[COMP_X]	= v2[COMP_X] + pixel->jdx*v2[9];
-			v0focTmp[COMP_Y]	= v0[COMP_Y] + pixel->jdy*v0[9];
-			v1focTmp[COMP_Y]	= v1[COMP_Y] + pixel->jdy*v1[9];
-			v2focTmp[COMP_Y]	= v2[COMP_Y] + pixel->jdy*v2[9];
-			v0focTmp[COMP_Z]	= v0[COMP_Z];
-			v1focTmp[COMP_Z]	= v1[COMP_Z];
-			v2focTmp[COMP_Z]	= v2[COMP_Z];
-			v0		=	v0focTmp;
-			v1		=	v1focTmp;
-			v2		=	v2focTmp;
-			v3		=	v3focTmp;
+			v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0[9];
+			v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1[9];
+			v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2[9];
+			v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3[9];
+
+			v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0[9];
+			v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1[9];
+			v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2[9];
+			v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3[9];
+
+			v0focTmp[COMP_Z]	=	v0[COMP_Z];
+			v1focTmp[COMP_Z]	=	v1[COMP_Z];
+			v2focTmp[COMP_Z]	=	v2[COMP_Z];
+			v3focTmp[COMP_Z]	=	v3[COMP_Z];
+
+			v0					=	v0focTmp;
+			v1					=	v1focTmp;
+			v2					=	v2focTmp;
+			v3					=	v3focTmp;
 #endif
 
 			// Check the orientation of the quad
@@ -527,7 +537,7 @@ if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0)
 				checkPixel(<);
 
 				v0	=	vertices;
-				v1	=	vertices + numVertexSamples;
+				v1	=	v0 + numVertexSamples;
 				v2	=	v1 + udiv*numVertexSamples;
 				v3	=	v2 + numVertexSamples;
 
@@ -542,7 +552,7 @@ if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0)
 				checkPixel(>);
 
 				v0	=	vertices;
-				v1	=	vertices + numVertexSamples;
+				v1	=	v0 + numVertexSamples;
 				v2	=	v1 + udiv*numVertexSamples;
 				v3	=	v2 + numVertexSamples;
 

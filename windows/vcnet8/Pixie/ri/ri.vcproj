@@ -881,7 +881,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\zbufferTriangle.h"
+				RelativePath="..\..\..\..\src\ri\zbufferQuad.h"
 				>
 			</File>
 		</Filter>
