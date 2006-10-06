@@ -31,10 +31,12 @@
 #ifndef DLO_H
 #define DLO_H
 
+#ifndef LIB_EXPORT
 #ifdef WIN32
 #define	LIB_EXPORT				__declspec(dllexport)
 #else
 #define	LIB_EXPORT				extern
+#endif
 #endif
 
 

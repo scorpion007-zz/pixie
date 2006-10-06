@@ -67,10 +67,12 @@ static	const int				chunkSize =	128*3;	// The number of primitives to draw at a 
 
 
 
+#ifndef LIB_EXPORT
 #ifdef WIN32
 #define	LIB_EXPORT				__declspec(dllexport)
 #else
 #define	LIB_EXPORT				extern
+#endif
 #endif
 
 
