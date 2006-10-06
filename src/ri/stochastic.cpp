@@ -164,12 +164,14 @@ CStochastic::~CStochastic() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-void		CStochastic::rasterBegin(int w,int h,int l,int t) {
+void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
 	CFragment	*cFragment;
 
-
+	// Early-out if we have no data
+	if (!(flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket) return;
+	
 	assert(numFragments == 0);
 
 
@@ -379,7 +381,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-void		CStochastic::rasterEnd(float *fb2) {
+void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	int				i,y;
 	int				sx,sy;
 	const int		xres					=	width;
@@ -395,6 +397,28 @@ void		CStochastic::rasterEnd(float *fb2) {
 
 	// Deep shadow map computation
 	if (flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)	deepShadowCompute();
+	else if (noObjects) {
+		// early-out if we have no data
+		
+		// initialize the default samples and also the extra samples using "sampleDefaults"
+		for (tmp=fb2,i=xres*yres;i>0;i--) {
+			*tmp++	=	0;					// r
+			*tmp++	=	0;					// g
+			*tmp++	=	0;					// b
+			*tmp++	=	0;					// a
+			*tmp++	=	C_INFINITY;			// z
+			
+			// extra samples
+			if (numExtraSamples > 0) {
+				memcpy(tmp,sampleDefaults,numExtraSamples*sizeof(float));
+			
+				tmp += numExtraSamples;
+			}
+		}
+
+		
+		return;
+	}
 
 	memBegin();
 

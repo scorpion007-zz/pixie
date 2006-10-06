@@ -48,9 +48,9 @@ public:
 				~CStochastic();
 
 				// The functions inherited from the CReyes
-	void		rasterBegin(int,int,int,int);
+	void		rasterBegin(int,int,int,int,int);
 	void		rasterDrawPrimitives(CRasterGrid *);
-	void		rasterEnd(float *);
+	void		rasterEnd(float *,int);
 private:
 
 	///////////////////////////////////////////////////////////////////////

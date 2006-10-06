@@ -349,6 +349,8 @@ void	CReyes::render() {
 	CRasterObject	*cObject;
 	CBucket			*cBucket	=	buckets[currentYBucket][currentXBucket];
 	CPqueue			objectQueue;
+	int				nullBucket	=	(cBucket->objects == NULL);
+	int				noObjects	=	TRUE;
 
 	// Begin a new memory page
 	memBegin();
@@ -364,7 +366,8 @@ void	CReyes::render() {
 	rasterBegin(	bucketPixelWidth,
 					bucketPixelHeight,
 					tbucketLeft,
-					tbucketTop);
+					tbucketTop,
+					nullBucket);
 
 	// Insert the objects into the queue
 	while((cObject=cBucket->objects) != NULL)	{
@@ -390,6 +393,8 @@ void	CReyes::render() {
 				rasterDrawPrimitives(cObject->grid);
 				objectDefer(cObject);
 
+				noObjects	=	FALSE;
+				
 				continue;
 			} else {
 				// Dice the object
@@ -429,7 +434,7 @@ void	CReyes::render() {
 	assert(cBucket->objects == NULL);
 
 	// Get the framebuffer
-	rasterEnd(pixelBuffer);
+	rasterEnd(pixelBuffer,noObjects);
 
 	// Flush the data to the out devices
 	commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
@@ -1507,8 +1512,8 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 	if (aperture != 0) {
 		// Expand the bound by the maximum focal blur amount
-		const	float	coc1	=	absf(cocSamples(zmin));
-		const	float	coc2	=	absf(cocSamples(zmax));
+		const	float	coc1	=	cocSamples(zmin);
+		const	float	coc2	=	cocSamples(zmax);
 		const	float	mcoc	=	max(coc1,coc2);
 
 		xmin	-=	mcoc;

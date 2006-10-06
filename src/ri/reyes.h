@@ -215,9 +215,9 @@ public:
 	void						renderFrame();									// Right after world end to force rendering of the entire frame
 
 								// The following functions must be overriden by the child rasterizer
-	virtual	void				rasterBegin(int,int,int,int)				=	0;
+	virtual	void				rasterBegin(int,int,int,int,int)			=	0;
 	virtual	void				rasterDrawPrimitives(CRasterGrid *)			=	0;
-	virtual	void				rasterEnd(float *)							=	0;
+	virtual	void				rasterEnd(float *,int)						=	0;
 	
 	
 	void						drawObject(CObject *,const float *,const float *);		// Draw an object

@@ -92,7 +92,7 @@ CZbuffer::~CZbuffer() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-void	CZbuffer::rasterBegin(int w,int h,int l,int t) {
+void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	int	i,j;
 
 	// Set the digits
@@ -161,7 +161,7 @@ void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-void	CZbuffer::rasterEnd(float *fb2) {
+void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			sx,sy;
 	int			i,y;
 	const int	xres				=	width;
