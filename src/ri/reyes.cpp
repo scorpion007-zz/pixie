@@ -816,9 +816,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			// Do we have motion blur?
 			if (enableMotionBlur && (object->moving()))					grid->flags	|= RASTER_MOVING;
 
-			// FIXME: Turn the xtreme flag on only for xtreme motion blur/depth of field
-			if ((grid->flags & (RASTER_MOVING | RASTER_FOCALBLUR)) != 0)grid->flags	|=	RASTER_XTREME;
-
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
 			varying[VARIABLE_CONSTANTWIDTH][0]	=	-C_INFINITY;
@@ -965,9 +962,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 			// Do we have motion blur ?
 			if (enableMotionBlur && (object->moving()))						grid->flags		|=	RASTER_MOVING;
-
-			// FIXME: Turn the xtreme flag on only for xtreme motion blur/depth of field
-			if ((grid->flags & (RASTER_MOVING | RASTER_FOCALBLUR)) != 0)	grid->flags		|=	RASTER_XTREME;
 
 
 			// Reset the size variable
@@ -1147,9 +1141,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 			// Do we have motion blur ?
 			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
-
-			// FIXME: Turn the xtreme flag on only for xtreme motion blur/depth of field
-			if ((grid->flags & (RASTER_MOVING | RASTER_FOCALBLUR)) != 0)grid->flags	|=	RASTER_XTREME;
 
 			// Displace the sucker
 			displace(object,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
@@ -1529,15 +1520,6 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		return;
 	}
 
-	xmin							=	max(xmin,0);
-	ymin							=	max(ymin,0);
-
-	// Save the bound of the grid
-	grid->xbound[0]					=	(int) floor(xmin);
-	grid->xbound[1]					=	(int) floor(xmax);
-	grid->ybound[0]					=	(int) floor(ymin);
-	grid->ybound[1]					=	(int) floor(ymax);
-
 	// Compute the primitive bounds
 	if (flags & RASTER_POINT) {
 		int					i;
@@ -1587,11 +1569,6 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 			bounds[1]	=	(int) floor(xbound[1]);		// xmax
 			bounds[2]	=	(int) floor(ybound[0]);		// ymin
 			bounds[3]	=	(int) floor(ybound[1]);		// ymax
-
-			assert(bounds[0] >= grid->xbound[0]);
-			assert(bounds[1] <= grid->xbound[1]);
-			assert(bounds[2] >= grid->ybound[0]);
-			assert(bounds[3] <= grid->ybound[1]);
 		}
 
 		xmin	-=	maxmaxSize;
@@ -1600,10 +1577,12 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		ymax	+=	maxmaxSize;
 	} else {
 		int					i,j;
-		const int			udiv		=	grid->udiv;
-		const int			vdiv		=	grid->vdiv;
-		const float			*vertices	=	grid->vertices;
-		int					*bounds		=	grid->bounds;
+		const int			udiv			=	grid->udiv;
+		const int			vdiv			=	grid->vdiv;
+		const float			*vertices		=	grid->vertices;
+		int					*bounds			=	grid->bounds;
+		float				originalArea	=	0;	// This is the total area of the grid without mb/dof
+		float				expandedArea	=	0;	// This is the total area of the grid with mb/dof
 
 		// Bound every quad
 		for (j=0;j<vdiv;j++) {
@@ -1635,6 +1614,8 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 				else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
 				if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
 				else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
+
+				originalArea	+=	(xbound[1] - xbound[0])*(ybound[1] - ybound[0]);
 
 				if (grid->flags & RASTER_MOVING) {
 					P	=	cVertex + numExtraSamples + 10;
@@ -1676,28 +1657,39 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 					ybound[1]			+=	mcoc;
 				}
 
+				expandedArea	+=	(xbound[1] - xbound[0])*(ybound[1] - ybound[0]);
 
 				bounds[0]	=	(int) floor(xbound[0]);		// xmin
 				bounds[1]	=	(int) floor(xbound[1]);		// xmax
 				bounds[2]	=	(int) floor(ybound[0]);		// ymin
 				bounds[3]	=	(int) floor(ybound[1]);		// ymax
-
-				assert(bounds[0] >= grid->xbound[0]);
-				assert(bounds[1] <= grid->xbound[1]);
-				assert(bounds[2] >= grid->ybound[0]);
-				assert(bounds[3] <= grid->ybound[1]);
 			}
 
 			bounds+=4;
 		}
+
+		// Check if we have xtreme mb/dof
+		if ((expandedArea / originalArea) > 1.0f) {
+			grid->flags	|=	RASTER_XTREME;
+		}
 	}
+
+
+	xmin							=	max(xmin,0);
+	ymin							=	max(ymin,0);
+
+	// Save the bound of the grid
+	grid->xbound[0]					=	(int) floor(xmin);
+	grid->xbound[1]					=	(int) floor(xmax);
+	grid->ybound[0]					=	(int) floor(ymin);
+	grid->ybound[1]					=	(int) floor(ymax);
 
 	// Record the object
 	newRasterObject(cObject);
-	cObject->xbound[0]				=	(int) floor(xmin);	// Save the bound of the object for future reference
-	cObject->xbound[1]				=	(int) floor(xmax);
-	cObject->ybound[0]				=	(int) floor(ymin);
-	cObject->ybound[1]				=	(int) floor(ymax);
+	cObject->xbound[0]				=	grid->xbound[0];	// Save the bound of the object for future reference
+	cObject->xbound[1]				=	grid->xbound[1];
+	cObject->ybound[0]				=	grid->ybound[0];
+	cObject->ybound[1]				=	grid->ybound[1];
 	cObject->object					=	NULL;
 	cObject->grid					=	grid;
 	// disable gross opacity culling for objects which need hidden surfaces shaded
