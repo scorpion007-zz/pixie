@@ -593,7 +593,7 @@ for (j=0;j<vdiv;j++) {
 		for (y=ymin;y<=ymax;y++) {
 			CPixel		*pixel;
 
-			for (pixel=fb[y]+xmin,x=xmin;x<=xmax;x++) {
+			for (pixel=fb[y]+xmin,x=xmin;x<=xmax;x++,pixel++) {
 	
 				lodCheck();
 
