@@ -49,15 +49,16 @@ const	unsigned int	RASTER_EXTRASAMPLES		=	1 << 5;		// The primitive has extra sa
 const	unsigned int	RASTER_MATTE			=	1 << 6;		// The primitive is a matte
 const	unsigned int	RASTER_LOD				=	1 << 7;		// The primitive has LOD
 const	unsigned int	RASTER_UNDERCULL		=	1 << 8;		// The primitive requires underculling
-const	unsigned int	RASTER_GLOBAL_MASK		=	(1 << 9) - 1;// This mask is used to block the lower fields
+const	unsigned int	RASTER_XTREME			=	1 << 9;		// The primitive has extreme motion blur/depth of field
+const	unsigned int	RASTER_GLOBAL_MASK		=	(1 << 10) - 1;// This mask is used to block the lower fields
 
-const	unsigned int	RASTER_HIGHBITS_SHIFT	=	9;			// The shift needed to put bits in the higher fields
+const	unsigned int	RASTER_HIGHBITS_SHIFT	=	10;			// The shift needed to put bits in the higher fields
 const	unsigned int	RASTER_DEPTHFILT_MASK	=	3;			// Mask for the depth filter
 
-const	unsigned int	RASTER_DRAW_FRONT		=	1 << 9;		// Draw the front of the primitive
-const	unsigned int	RASTER_DRAW_BACK		=	1 << 10;	// Draw the back of the primitive
-const	unsigned int	RASTER_SHADE_HIDDEN		=	1 << 11;	// Shade the primitive even if occluded
-const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 12;	// Shade the primitive even if backfacing
+const	unsigned int	RASTER_DRAW_FRONT		=	1 << 10;	// Draw the front of the primitive
+const	unsigned int	RASTER_DRAW_BACK		=	1 << 11;	// Draw the back of the primitive
+const	unsigned int	RASTER_SHADE_HIDDEN		=	1 << 12;	// Shade the primitive even if occluded
+const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 13;	// Shade the primitive even if backfacing
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -79,15 +80,16 @@ protected:
 	// Date last edited		:	9/17/2004
 	class	CRasterGrid {
 	public:
-		CSurface				*object;				// The object responsible for the grid
-		int						dim;					// Dimensionality (0,1 or 2)
-		float					umin,umax,vmin,vmax;	// The parametric range
-		int						udiv,vdiv;				// The number of division
-		int						numVertices;			// The number of vertices
-		float					*vertices;				// Array of vertices
-		int						*bounds;				// The bound of the primitive (4 numbers per primitive)
-		float					*sizes;					// The size of the primitive (only makes sense for points)
-		int						flags;					// The primitive flags
+			CSurface			*object;				// The object responsible for the grid
+			int					dim;					// Dimensionality (0,1 or 2)
+			float				umin,umax,vmin,vmax;	// The parametric range
+			int					udiv,vdiv;				// The number of division
+			int					numVertices;			// The number of vertices
+			float				*vertices;				// Array of vertices
+			int					*bounds;				// The bound of the primitive (4 numbers per primitive)
+			float				*sizes;					// The size of the primitive (only makes sense for points)
+			int					flags;					// The primitive flags
+			int					xbound[2],ybound[2];	// The bound of the grid in samples
 	};
 
 

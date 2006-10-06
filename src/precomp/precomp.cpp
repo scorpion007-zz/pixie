@@ -650,6 +650,7 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 	if (i & RASTER_MATTE)			fprintf(out,"Matte");
 	if (i & RASTER_LOD)				fprintf(out,"LOD");
 	if (i & RASTER_UNDERCULL)		fprintf(out,"Undercull");
+	if (i & RASTER_XTREME)			fprintf(out,"Xtreme");
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -749,6 +750,7 @@ int		precomputeStochasticPrimitivesH() {
 			if (i & RASTER_MATTE)			fprintf(out,"\t#define STOCHASTIC_MATTE\n");
 			if (i & RASTER_LOD)				fprintf(out,"\t#define STOCHASTIC_LOD\n");
 			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#define STOCHASTIC_UNDERCULL\n");
+			if (i & RASTER_XTREME)			fprintf(out,"\t#define STOCHASTIC_XTREME\n");
 
 			// Define the depth filter macros
 			switch(i >> RASTER_HIGHBITS_SHIFT) {
@@ -788,6 +790,7 @@ int		precomputeStochasticPrimitivesH() {
 			if (i & RASTER_MATTE)			fprintf(out,"\t#undef STOCHASTIC_MATTE\n");
 			if (i & RASTER_LOD)				fprintf(out,"\t#undef STOCHASTIC_LOD\n");
 			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#undef STOCHASTIC_UNDERCULL\n");
+			if (i & RASTER_XTREME)			fprintf(out,"\t#undef STOCHASTIC_XTREME\n");
 	
 			fprintf(out,"}\n");
 		}

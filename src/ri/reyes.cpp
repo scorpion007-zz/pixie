@@ -805,9 +805,14 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		if (Ponly) {
 			// Set the flags
 			grid->flags	=	extraPrimitiveFlags | RASTER_POINT | RASTER_UNSHADED;
-			if (enableMotionBlur && (object->moving()))					grid->flags	|= RASTER_MOVING;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 		grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)	grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+
+			// Do we have motion blur?
+			if (enableMotionBlur && (object->moving()))					grid->flags	|= RASTER_MOVING;
+
+			// FIXME: Turn the xtreme flag on only for xtreme motion blur/depth of field
+			if ((grid->flags & (RASTER_MOVING | RASTER_FOCALBLUR)) != 0)grid->flags	|=	RASTER_XTREME;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -954,7 +959,11 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur ?
-			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
+			if (enableMotionBlur && (object->moving()))						grid->flags		|=	RASTER_MOVING;
+
+			// FIXME: Turn the xtreme flag on only for xtreme motion blur/depth of field
+			if ((grid->flags & (RASTER_MOVING | RASTER_FOCALBLUR)) != 0)	grid->flags		|=	RASTER_XTREME;
+
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -1133,6 +1142,9 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 			// Do we have motion blur ?
 			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
+
+			// FIXME: Turn the xtreme flag on only for xtreme motion blur/depth of field
+			if ((grid->flags & (RASTER_MOVING | RASTER_FOCALBLUR)) != 0)grid->flags	|=	RASTER_XTREME;
 
 			// Displace the sucker
 			displace(object,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
@@ -1505,6 +1517,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		ymax	+=	mcoc;
 	}
 
+
 	// Trivial reject
 	if ((xmin > sampleClipRight)	|| (ymin > sampleClipBottom) || (xmax < sampleClipLeft) || (ymax < sampleClipTop)) {
 		deleteGrid(grid);
@@ -1514,6 +1527,11 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	xmin							=	max(xmin,0);
 	ymin							=	max(ymin,0);
 
+	// Save the bound of the grid
+	grid->xbound[0]					=	(int) floor(xmin);
+	grid->xbound[1]					=	(int) floor(xmax);
+	grid->ybound[0]					=	(int) floor(ymin);
+	grid->ybound[1]					=	(int) floor(ymax);
 
 	// Compute the primitive bounds
 	if (flags & RASTER_POINT) {
@@ -1564,6 +1582,11 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 			bounds[1]	=	(int) floor(xbound[1]);		// xmax
 			bounds[2]	=	(int) floor(ybound[0]);		// ymin
 			bounds[3]	=	(int) floor(ybound[1]);		// ymax
+
+			assert(bounds[0] >= grid->xbound[0]);
+			assert(bounds[1] <= grid->xbound[1]);
+			assert(bounds[2] >= grid->ybound[0]);
+			assert(bounds[3] <= grid->ybound[1]);
 		}
 
 		xmin	-=	maxmaxSize;
@@ -1653,6 +1676,11 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 				bounds[1]	=	(int) floor(xbound[1]);		// xmax
 				bounds[2]	=	(int) floor(ybound[0]);		// ymin
 				bounds[3]	=	(int) floor(ybound[1]);		// ymax
+
+				assert(bounds[0] >= grid->xbound[0]);
+				assert(bounds[1] <= grid->xbound[1]);
+				assert(bounds[2] >= grid->ybound[0]);
+				assert(bounds[3] <= grid->ybound[1]);
 			}
 
 			bounds+=4;
