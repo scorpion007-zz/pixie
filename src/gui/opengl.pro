@@ -1,6 +1,6 @@
 CONFIG			+= 	qt warn_on
-HEADERS			= 	opengl.h interface.cpp opengl-qt.h
-SOURCES			= 	opengl.cpp
+HEADERS			= 	opengl.h opengl-qt.h statView.h
+SOURCES			= 	opengl.cpp statView.cpp
 INCLUDEPATH 	+=	..
 TARGET			= 	opengl
 QT				+= 	opengl

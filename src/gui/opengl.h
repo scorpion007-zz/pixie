@@ -33,6 +33,7 @@
 #define OPENGL_H
 
 class	CView;
+class	CStatistics;
 
 typedef void	(*TGlVisualizeFunction)(CView *view);
 typedef void	(*TGlTriMeshFunction)(int n,const int *indices,const float *P,const float *C);
@@ -82,6 +83,8 @@ extern "C" {
 	LIB_EXPORT	void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C);
 	LIB_EXPORT	void		pglTriangles(int n,const float *P,const float *C);
 	LIB_EXPORT	void		pglPoints(int n,const float *P,const float *C);
+
+	LIB_EXPORT	void		pViewStats(CStatistics *statistics);
 }
 
 
