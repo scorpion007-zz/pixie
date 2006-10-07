@@ -1669,7 +1669,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		}
 
 		// Check if we have xtreme mb/dof
-		if ((expandedArea / originalArea) > 1.0f) {
+		if ((expandedArea / originalArea) > 10.0f) {
 			grid->flags	|=	RASTER_XTREME;
 		}
 	}
