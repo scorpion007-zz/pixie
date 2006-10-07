@@ -189,10 +189,6 @@
 				RelativePath="..\..\..\..\src\gui\opengl.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\..\src\gui\statView.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -213,10 +209,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\gui\opengl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\gui\statView.h"
 				>
 			</File>
 		</Filter>
