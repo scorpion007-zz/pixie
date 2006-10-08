@@ -218,19 +218,19 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 //	Retrieve a pointer to an operand and obtain it's size
 #define		operand(i,n)					{																	\
-												const TCode	ref	=	code[IP+i+2];								\
+												const TCode	ref	=	code[i+2];									\
 												n	= stuff[ref.reference.accessor][ref.reference.index];		\
 											}
 
 //	Retrieve an operand's size
 #define		operandSize(i,n,s)				{																	\
-												const TCode	ref	=	code[IP+i+2];								\
+												const TCode	ref	=	code[i+2];									\
 												n	= stuff[ref.reference.accessor][ref.reference.index];		\
 												s	= ref.reference.numItems;									\
 											}
 
 // Retrieve the parameterlist
-#define		parameterlist					cInstance->parameterLists[code[IP+1].arguments.plNumber]
+#define		parameterlist					cInstance->parameterLists[code[1].arguments.plNumber]
 
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
 												cInstance->dirty	=	TRUE;										\
@@ -241,17 +241,17 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											}
 
 //	Retrieve an integer operand (label references are integer)
-#define		argument(i)						code[IP+i+2].integer;
+#define		argument(i)						code[i+2].integer;
 
 //	Retrieve an integer operand (label references are integer)
-#define		argumentCode(i)					code[IP+i+2]
+#define		argumentCode(i)					code[i+2]
 
 //	Retrieve the number of arguments
-#define		argumentcount(n)				n = code[IP+1].arguments.numArguments;
+#define		argumentcount(n)				n = code[1].arguments.numArguments;
 
 //	Control transfer
 #define		jmp(n)							{																\
-												IP				=	n;										\
+												code		=	currentShader->codeArea + n;				\
 												goto execStart;												\
 											}
 
@@ -417,7 +417,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	//	The	shading variables and junk
 	TCode						**stuff[3];			// Where we keep pointers to the variables
-	int							IP;					// Isn't it obvious ?
 	ESlCode						opcode;				// :)
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;			// The number of active points being shaded
@@ -426,7 +425,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 	int							*tagStart;
 	int							currentVertex;		// The current vertex being executed
 	CShader						*currentShader			=	cInstance->parent;
-	TCode						*code;
+	const TCode					*code;
 	int							numVertices;
 	float						**varying;
 	CShadedLight				**lights;
@@ -439,8 +438,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 	assert((currentShadingState->numActive+currentShadingState->numPassive) == currentShadingState->numVertices);
 
 	currentShadingState->currentShaderInstance	=	cInstance;
-	code								=	currentShader->codeArea;
-	IP									=	currentShader->codeEntryPoint;
+	code								=	currentShader->codeArea + currentShader->codeEntryPoint;
 	tagStart							=	currentShadingState->tags;
 
 	// Save this stuff for fast access
@@ -462,18 +460,18 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	// Execute
 execStart:
-	opcode	=	(ESlCode)	code[IP].integer;	// Get the opcode
+	opcode	=	(ESlCode)	code[0].integer;	// Get the opcode
 
 	tags	=	tagStart;						// Set the tags to the start
 
-	if (code[IP+1].arguments.uniform) {			// If the opcode is uniform , execute once
+	if (code[1].arguments.uniform) {			// If the opcode is uniform , execute once
 #define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -483,7 +481,7 @@ execStart:
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -494,7 +492,7 @@ execStart:
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -502,7 +500,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				scripterror("invalid uniform lighting call");										\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -512,7 +510,7 @@ execStart:
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -528,7 +526,7 @@ execStart:
 		}
 
 		// Resume executing instructions
-		IP	+=	code[IP+1].arguments.numCodes;
+		code	+=	code[1].arguments.numCodes;
 		goto execStart;
 
 #undef DEFOPCODE
@@ -551,7 +549,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -567,7 +565,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -583,7 +581,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -598,7 +596,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 			
@@ -613,7 +611,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -629,7 +627,7 @@ execStart:
 				goto execEnd;
 			}
 
-			IP	+=	code[IP+1].arguments.numCodes;
+			code	+=	code[1].arguments.numCodes;
 			goto execStart;
 		} else {
 
@@ -648,7 +646,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -661,7 +659,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -675,7 +673,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -690,7 +688,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -704,7 +702,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				IP	+=	code[IP+1].arguments.numCodes;												\
+				code	+=	code[1].arguments.numCodes;												\
 				goto execStart;																		\
 			}
 
@@ -719,7 +717,7 @@ execStart:
 				goto execEnd;
 			}
 
-			IP	+=	code[IP+1].arguments.numCodes;
+			code	+=	code[1].arguments.numCodes;
 			goto execStart;
 		}
 

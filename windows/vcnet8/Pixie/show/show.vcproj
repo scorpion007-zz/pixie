@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="gui"
-	ProjectGUID="{CC482007-8EFD-4855-8262-B92C89B328ED}"
-	RootNamespace="gui"
+	Name="show"
+	ProjectGUID="{82683AC1-21C8-46E5-95C8-B930A79440F0}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -18,9 +17,10 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\..\..\..\bind"
-			IntermediateDirectory="..\..\..\..\tmpd\gui"
-			ConfigurationType="2"
-			CharacterSet="1"
+			IntermediateDirectory="..\..\..\..\tmpd\show"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -42,15 +42,18 @@
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
+				SmallerTypeCheck="false"
 				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -63,11 +66,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fltkd.lib fltkgld.lib opengl32.lib common.lib wsock32.lib comctl32.lib"
-				LinkIncremental="2"
+				AdditionalDependencies="common.lib ri.lib"
+				OutputFile="$(OutDir)/show.exe"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bind"
+				IgnoreDefaultLibraryNames="libc, libcd"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				ProgramDatabaseFile="$(OutDir)/show.pdb"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -98,10 +104,10 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\gui"
-			ConfigurationType="2"
-			CharacterSet="1"
-			WholeProgramOptimization="1"
+			IntermediateDirectory="..\..\..\..\tmp\show"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -121,16 +127,21 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				OmitFramePointers="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\..\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -143,13 +154,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fltk.lib fltkgl.lib opengl32.lib common.lib wsock32.lib comctl32.lib"
+				AdditionalDependencies="common.lib ri.lib"
+				OutputFile="$(OutDir)/show.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"
-				GenerateDebugInformation="true"
-				SubSystem="2"
+				IgnoreDefaultLibraryNames="libc"
+				GenerateDebugInformation="false"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -183,11 +197,11 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\src\gui\opengl.cpp"
+				RelativePath="..\..\..\..\src\show\show.cpp"
 				>
 			</File>
 		</Filter>
@@ -196,33 +210,13 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\..\src\gui\interface.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\gui\opengl-fltk.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\gui\opengl-qt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\gui\opengl.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath="..\..\..\..\src\gui\opengl.pro"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

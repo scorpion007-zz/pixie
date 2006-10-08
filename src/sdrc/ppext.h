@@ -9,7 +9,7 @@
 /*
  *	pp1.c
  */
-extern	void			main();
+extern	int				main(int,char *[]);
 extern	char			*getnext();
 extern	void			init();
 extern	void			usage();

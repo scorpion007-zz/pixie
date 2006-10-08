@@ -333,13 +333,13 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 //	Retrieve a pointer to an operand and obtain it's size
 #define		operand(i,n)					{																	\
-												const TCode	ref	=	code[IP+i+2];								\
+												const TCode	ref	=	code[i+2];									\
 												n	= stuff[ref.reference.accessor][ref.reference.index];		\
 											}
 
 //	Retrieve an operand's size
 #define		operandSize(i,n,s)				{																	\
-												const TCode	ref	=	code[IP+i+2];								\
+												const TCode	ref	=	code[i+2];									\
 												n	= stuff[ref.reference.accessor][ref.reference.index];		\
 												s	= ref.reference.numItems;									\
 											}
@@ -347,14 +347,14 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 
 //	Retrieve an integer operand (label references are integer)
-#define		argument(i)						code[IP+i+2].integer;
+#define		argument(i)						code[i+2].integer;
 
 //	Retrieve the number of arguments
-#define		argumentcount(n)				n = code[IP+1].arguments.numArguments;
+#define		argumentcount(n)				n = code[1].arguments.numArguments;
 
 //	Control transfer
 #define		jmp(n)							{																	\
-												IP				=	n;											\
+												code	=	currentShader->codeArea + n;						\
 												goto execStart;													\
 											}
 
@@ -378,7 +378,6 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 //	The	shading variables and junk
 	TCode						**stuff[3];			// Where we keep pointers to the variables
-	int							IP;					// Isn't it obvious ?
 	ESlCode						opcode;				// :)
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;
@@ -386,7 +385,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	int							*tags;
 	int							*tagStart;
 	CShader						*currentShader			=	currentShaderInstance->parent;
-	TCode						*code;
+	const TCode					*code;
 	int							tmpTags;
 	int							numVertices;
 	float						**varying;
@@ -398,9 +397,8 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	int							i;
 	CVariable					*cParameter;
 
-	code									=	currentShader->codeArea;
+	code									=	currentShader->codeArea + currentShader->initEntryPoint;
 
-	IP										=	currentShader->initEntryPoint;
 	numVertices								=	1;
 	tagStart								=	&tmpTags;
 	tmpTags									=	0;
@@ -446,7 +444,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 	// Execute
 execStart:
-	opcode	=	(ESlCode)	code[IP].integer;
+	opcode	=	(ESlCode)	code[0].integer;
 
 	tags	=	tagStart;
 
@@ -457,7 +455,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		IP	+=	code[IP+1].arguments.numCodes;												\
+		code	+=	code[1].arguments.numCodes;												\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -468,7 +466,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		IP	+=	code[IP+1].arguments.numCodes;												\
+		code	+=	code[1].arguments.numCodes;												\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -480,7 +478,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		IP	+=	code[IP+1].arguments.numCodes;												\
+		code	+=	code[1].arguments.numCodes;												\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -491,7 +489,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		IP	+=	code[IP+1].arguments.numCodes;												\
+		code	+=	code[1].arguments.numCodes;												\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -503,7 +501,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		IP	+=	code[IP+1].arguments.numCodes;												\
+		code	+=	code[1].arguments.numCodes;												\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -518,7 +516,7 @@ execStart:
 		goto execEnd;
 	}
 
-	IP	+=	code[IP+1].arguments.numCodes;
+	code	+=	code[1].arguments.numCodes;
 	goto execStart;
 #undef	DEFOPCODE
 #undef	DEFFUNC
