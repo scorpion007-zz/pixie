@@ -1,4 +1,4 @@
-#!version 1.7.2
+#!version 1.7.5
 volume
 #!parameters:
 uniform	float	distance	=	1
@@ -29,4 +29,3 @@ uniform	vector	temporary_7
 	vuvector           temporary_6 temporary_7
 	mix	("v=vvf")  Oi  Oi  temporary_6  d 
 	return            
-

@@ -168,12 +168,8 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
 	CFragment	*cFragment;
-
-	// Early-out if we have no data
-	if (!(flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket) return;
 	
 	assert(numFragments == 0);
-
 
 	switch(depthFilter) {
 	case DEPTH_MIN:
@@ -199,6 +195,9 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	sampleHeight		=	height*pixelYsamples + 2*ySampleOffset;
 	right				=	left + sampleWidth;
 	bottom				=	top + sampleHeight;
+
+	// Early-out if we have no data
+	if (!(flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket) return;
 
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);

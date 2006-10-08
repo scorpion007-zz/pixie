@@ -1,4 +1,4 @@
-#!version 1.7.2
+#!version 1.7.5
 surface
 #!parameters:
 uniform	float	Ka	=	1
@@ -40,4 +40,3 @@ varying	vector	temporary_7
 	movevv            	Oi Os
 	mulvv             	Ci Ci Oi
 	return            
-

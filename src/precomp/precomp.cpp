@@ -694,6 +694,13 @@ int		precomputeStochasticPrimitivesH() {
 				continue;
 			}
 		}
+
+		// Points do not have xtreme motion
+		if (i & RASTER_XTREME) {
+			if (i & RASTER_POINT) {
+				continue;
+			}
+		}
 		
 		// output the function name
 		fprintf(out,"\t");
@@ -725,6 +732,13 @@ int		precomputeStochasticPrimitivesH() {
 				}
 			} else {
 				if (i & RASTER_UNDERCULL) {
+					continue;
+				}
+			}
+
+			// Points do not have xtreme motion
+			if (i & RASTER_XTREME) {
+				if (i & RASTER_POINT) {
 					continue;
 				}
 			}

@@ -73,6 +73,7 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/rndr.pdb"
 				SubSystem="1"
+				StackCommitSize="4000000"
 				TargetMachine="1"
 			/>
 			<Tool

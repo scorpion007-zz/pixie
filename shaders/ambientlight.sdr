@@ -1,4 +1,4 @@
-#!version 1.7.2
+#!version 1.7.5
 light
 #!parameters:
 uniform	float	intensity	=	1
@@ -15,4 +15,3 @@ uniform	vector	temporary_1
 	vfromf            	temporary_0 0
 	vuvector           L temporary_0
 	return            
-

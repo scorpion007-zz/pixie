@@ -1,4 +1,4 @@
-#!version 1.7.2
+#!version 1.7.5
 light
 #!parameters:
 uniform	float	numSamples	=	16
@@ -18,4 +18,3 @@ uniform	vector	temporary_2
 	vfromf            	temporary_2 0
 	vuvector           L temporary_2
 	return            
-

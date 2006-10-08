@@ -531,7 +531,7 @@
 				RelativePath="..\..\..\..\src\ri\stochasticPrimitives.h">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\stochasticTriangle.h">
+				RelativePath="..\..\..\..\src\ri\stochasticQuad.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\subdivision.h">
@@ -567,7 +567,7 @@
 				RelativePath="..\..\..\..\src\ri\zbufferPoint.h">
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\zbufferTriangle.h">
+				RelativePath="..\..\..\..\src\ri\zbufferQuad.h">
 			</File>
 		</Filter>
 		<Filter
