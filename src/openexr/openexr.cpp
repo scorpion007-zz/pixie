@@ -35,19 +35,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef WIN32
-// Sadly, OpenEXR source code is very poorly written (Sorry ILM)
-// I suspect a lot of things will change in the future. Rather than linking against the static version,
-// we'll link against the DLL on windows platforms
-// FIXME: Check if the OpenEXR dll's are distributable with Pixie
-
-// Disable the poor exception handling warnings
-#pragma warning (disable: 4290)
-// Disable the poor non standard template usage warnings
-#pragma warning (disable: 4231)
-
-#define OPENEXR_DLL
-#endif
 
 #include <half.h>
 #include <ImfOutputFile.h>
@@ -259,16 +246,8 @@ public:
 										channelName += 2;
 									}
 									file->setFrameBuffer(*framebuffer);
-									try{
-										file->writePixels(1);
-									}catch(...){
-										// deal with errors but shutting down
-										printf("Error writing to openexr file!\n");
-										delete file;
-										delete framebuffer;
-										file			=	NULL;
-										framebuffer		=	NULL;
-									}
+									file->writePixels(1);
+									
 									delete [] scanlines[lastSavedLine];
 									scanlines[lastSavedLine]	=	NULL;
 								}
