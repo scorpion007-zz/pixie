@@ -3,45 +3,155 @@ light
 #!parameters:
 uniform	float	intensity	=	1
 uniform	color	lightcolor	=	1
-uniform	string	shadowname	=	""
+uniform	string	shadowname_px	=	""
+uniform	string	shadowname_nx	=	""
+uniform	string	shadowname_py	=	""
+uniform	string	shadowname_ny	=	""
+uniform	string	shadowname_pz	=	""
+uniform	string	shadowname_nz	=	""
 uniform	point	from	=	"shader"  [ 0 0 0 ]
 #!variables:
 uniform	vector	temporary_0
 varying	float	vis
-varying	vector	temporary_1
-varying	boolean	temporary_2
+varying	float	atten
+varying	float	ax
+varying	float	ay
+varying	float	az
+varying	vector	Lworld
+varying	boolean	temporary_1
+uniform	boolean	temporary_2
 uniform	boolean	temporary_3
-varying	float	temporary_4
-varying	float	temporary_5
-varying	vector	temporary_6
-varying	vector	temporary_7
-varying	vector	temporary_8
+uniform	boolean	temporary_4
+uniform	boolean	temporary_5
+uniform	boolean	temporary_6
+uniform	boolean	temporary_7
+uniform	boolean	temporary_8
+varying	vector	temporary_9
+varying	float	temporary_10
+varying	float	temporary_11
+varying	vector	temporary_12
+varying	vector	temporary_13
+varying	vector	temporary_14
+uniform	vector	temporary_15
+varying	boolean	temporary_16
+varying	boolean	temporary_17
+varying	boolean	temporary_18
+varying	boolean	temporary_19
+varying	boolean	temporary_20
+varying	float	temporary_21
 #!Init:
 	vfromf            	temporary_0 0 0 0
 	pfrom             	from "shader" temporary_0
 	return            
 #!Code:
-	vuvector           temporary_1 from
-	illuminate        	 temporary_1  #!Label4
-	seql              	temporary_3 shadowname ""
-	vuboolean          temporary_2 temporary_3
-	if                	temporary_2 #!Label6
-	vufloat            vis 1
-#!Label6:
-	else              	#!Label5
-	vufloat            temporary_4 1
-	shadow	("f=SFp")  temporary_5  shadowname  0  Ps 
-	subff             	vis temporary_4 temporary_5
-#!Label5:
-	endif             
-	vufloat            temporary_5 intensity
-	mulff             	temporary_4 vis temporary_5
-	vfromf            	temporary_7 temporary_4
-	vuvector           temporary_8 lightcolor
-	mulvv             	temporary_6 temporary_7 temporary_8
-	dot               	temporary_4 L L
-	vfromf            	temporary_7 temporary_4
-	divvv             	Cl temporary_6 temporary_7
-#!Label4:
+	seql              	temporary_7 shadowname_px ""
+	seql              	temporary_8 shadowname_nx ""
+	or                	temporary_6 temporary_7 temporary_8
+	seql              	temporary_7 shadowname_py ""
+	or                	temporary_5 temporary_6 temporary_7
+	seql              	temporary_6 shadowname_ny ""
+	or                	temporary_4 temporary_5 temporary_6
+	seql              	temporary_5 shadowname_pz ""
+	or                	temporary_3 temporary_4 temporary_5
+	seql              	temporary_4 shadowname_nz ""
+	or                	temporary_2 temporary_3 temporary_4
+	vuboolean          temporary_1 temporary_2
+	if                	temporary_1 #!Label18
+	vuvector           temporary_9 from
+	illuminate        	 temporary_9  #!Label19
+	vufloat            temporary_10 1
+	shadow	("f=SFp")  temporary_11  "raytrace"  0  Ps 
+	subff             	vis temporary_10 temporary_11
+	vufloat            temporary_11 intensity
+	mulff             	temporary_10 vis temporary_11
+	vfromf            	temporary_13 temporary_10
+	vuvector           temporary_14 lightcolor
+	mulvv             	temporary_12 temporary_13 temporary_14
+	dot               	temporary_10 L L
+	vfromf            	temporary_13 temporary_10
+	divvv             	Cl temporary_12 temporary_13
+#!Label19:
 	endilluminate     
+#!Label18:
+	else              	#!Label17
+	vuvector           temporary_9 from
+	illuminate        	 temporary_9  #!Label20
+	vfromf            	temporary_15 0 0 0
+	pfrom             	temporary_0 "world" temporary_15
+	vuvector           temporary_13 temporary_0
+	addvv             	temporary_12 L temporary_13
+	transform	("p=Sp")  Lworld  "world"  temporary_12 
+	xcomp	("f=p")  temporary_10  Lworld 
+	abs	("f=f")  ax  temporary_10 
+	ycomp	("f=p")  temporary_10  Lworld 
+	abs	("f=f")  ay  temporary_10 
+	zcomp	("f=p")  temporary_10  Lworld 
+	abs	("f=f")  az  temporary_10 
+	vufloat            atten 0
+	fgt               	temporary_17 ax ay
+	fgt               	temporary_18 ax az
+	and               	temporary_16 temporary_17 temporary_18
+	if                	temporary_16 #!Label22
+	xcomp	("f=p")  temporary_10  Lworld 
+	vufloat            temporary_11 0.0
+	fgt               	temporary_17 temporary_10 temporary_11
+	if                	temporary_17 #!Label24
+	shadow	("f=SFp")  atten  shadowname_px  0  Ps 
+#!Label24:
+	else              	#!Label23
+	shadow	("f=SFp")  atten  shadowname_nx  0  Ps 
+#!Label23:
+	endif             
+#!Label22:
+	else              	#!Label21
+	fgt               	temporary_18 ay ax
+	fgt               	temporary_19 ay az
+	and               	temporary_17 temporary_18 temporary_19
+	if                	temporary_17 #!Label26
+	ycomp	("f=p")  temporary_10  Lworld 
+	vufloat            temporary_11 0.0
+	fgt               	temporary_18 temporary_10 temporary_11
+	if                	temporary_18 #!Label28
+	shadow	("f=SFp")  atten  shadowname_py  0  Ps 
+#!Label28:
+	else              	#!Label27
+	shadow	("f=SFp")  atten  shadowname_nx  0  Ps 
+#!Label27:
+	endif             
+#!Label26:
+	else              	#!Label25
+	fgt               	temporary_19 az ay
+	fgt               	temporary_20 az ax
+	and               	temporary_18 temporary_19 temporary_20
+	if                	temporary_18 #!Label29
+	zcomp	("f=p")  temporary_10  Lworld 
+	vufloat            temporary_11 0.0
+	fgt               	temporary_19 temporary_10 temporary_11
+	if                	temporary_19 #!Label32
+	shadow	("f=SFp")  atten  shadowname_pz  0  Ps 
+#!Label32:
+	else              	#!Label31
+	shadow	("f=SFp")  atten  shadowname_nx  0  Ps 
+#!Label31:
+	endif             
+#!Label29:
+	endif             
+#!Label25:
+	endif             
+#!Label21:
+	endif             
+	vufloat            temporary_21 1.0
+	subff             	temporary_11 temporary_21 atten
+	vufloat            temporary_21 intensity
+	mulff             	temporary_10 temporary_11 temporary_21
+	vfromf            	temporary_13 temporary_10
+	vuvector           temporary_14 lightcolor
+	mulvv             	temporary_12 temporary_13 temporary_14
+	dot               	temporary_10 L L
+	vfromf            	temporary_13 temporary_10
+	divvv             	Cl temporary_12 temporary_13
+#!Label20:
+	endilluminate     
+#!Label17:
+	endif             
 	return            
