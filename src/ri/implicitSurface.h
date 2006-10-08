@@ -32,6 +32,7 @@
 #define IMPLICITSURFACE_H
 
 #include "common/global.h"
+#include "common/os.h"
 #include "implicit.h"
 #include "object.h"
 #include "hierarchy.h"

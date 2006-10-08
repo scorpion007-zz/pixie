@@ -32,6 +32,7 @@
 #define DLOBJECT_H
 
 #include "common/global.h"
+#include "common/os.h"
 #include "dlo.h"
 #include "object.h"
 #include "hierarchy.h"

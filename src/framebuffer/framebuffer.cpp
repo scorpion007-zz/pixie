@@ -32,8 +32,9 @@
 #include <string.h>
 
 #include "common/global.h"
-#include "ri/dsply.h"
 #include "framebuffer.h"
+#include "ri/dsply.h"
+
 
 #define TRUE	1
 #define	FALSE	0

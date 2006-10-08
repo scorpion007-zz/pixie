@@ -698,6 +698,7 @@ for (j=0;j<vdiv;j++) {
 #undef colorOpacityUpdate
 #undef shouldDrawFront
 #undef shouldDrawBack
+#undef checkPixel
 
 
 

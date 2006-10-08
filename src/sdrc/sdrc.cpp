@@ -86,8 +86,6 @@ extern	"C" int	preprocess(char *,FILE *,int,char **);
 static	char	*defineProgramName				=			"PIXIE";
 // The name of the executable
 static	char	*compilerName					=			"sdrc";
-// The extension of the compiled script
-static	char	*shaderExtension				=			"sdr";
 
 
 /////////////////////////////////////////////////////////////////////
@@ -319,7 +317,7 @@ int main(int argc, char* argv[]) {
 		char	*fp;
 
 		// Recreate the argument list
-		sprintf(tmp,"");
+		strcpy(tmp,"");
 		for (i=0;i<argc;i++) {
 			if (argv[i] != NULL) {
 				strcat(tmp,argv[i]);

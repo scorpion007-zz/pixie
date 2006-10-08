@@ -258,6 +258,7 @@ public:
 // Date last edited		:	3/23/2003
 class	CGatherVariable {
 public:
+	virtual			~CGatherVariable() { }
 	virtual	void	record(int,CGatherRay **,float **varying)	=	0;
 
 	CGatherVariable	*next;		// The next item in the linked list
