@@ -110,6 +110,7 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 OBJEXT = @OBJEXT@
 OPENEXR_INCLUDES = @OPENEXR_INCLUDES@
+OPENEXR_LDFLAGS = @OPENEXR_LDFLAGS@
 OPENEXR_LIBS = @OPENEXR_LIBS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -121,6 +122,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 PIXIE_DISPLAYS = @PIXIE_DISPLAYS@
 PIXIE_DOCS = @PIXIE_DOCS@
 PIXIE_MODELS = @PIXIE_MODELS@
+PIXIE_MODULES = @PIXIE_MODULES@
 PIXIE_PROCEDURALS = @PIXIE_PROCEDURALS@
 PIXIE_SHADERS = @PIXIE_SHADERS@
 PIXIE_TEXTURES = @PIXIE_TEXTURES@
@@ -175,6 +177,7 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 modeldir = @modeldir@
+modulesdir = @modulesdir@
 oldincludedir = @oldincludedir@
 prefix = @prefix@
 proceduraldir = @proceduraldir@
@@ -185,8 +188,8 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 texturedir = @texturedir@
-SUBDIRS = common file framebuffer openexr precomp rgbe sdr sdrc ri rndr texmake sdrinfo show
-EXTRA_DIST = dsotest opengl
+SUBDIRS = common file framebuffer openexr precomp gui rgbe sdr sdrc ri rndr texmake sdrinfo show
+EXTRA_DIST = dsotest
 all: all-recursive
 
 .SUFFIXES:
