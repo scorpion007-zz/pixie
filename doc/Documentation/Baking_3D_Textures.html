@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="keywords" content="Documentation/Baking 3D Textures" />
+<link rel="shortcut icon" href="favicon.ico" />
+		<title>Documentation/Baking 3D Textures - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
+		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="ns-0 ltr">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="top" id="contentTop"></a>
+				<h1 class="firstHeading">Documentation/Baking 3D Textures</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Documentation.html" title="Documentation">Documentation</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+</p>
+<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class='toclevel-1'><a href="#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a>
+<ul>
+<li class='toclevel-2'><a href="#Point_Clouds"><span class="tocnumber">1.1</span> <span class="toctext">Point Clouds</span></a></li>
+<li class='toclevel-2'><a href="#3d_Textures"><span class="tocnumber">1.2</span> <span class="toctext">3d Textures</span></a></li>
+</ul>
+</li>
+<li class='toclevel-1'><a href="#3d_Texture_shadops"><span class="tocnumber">2</span> <span class="toctext">3d Texture shadops</span></a>
+<ul>
+<li class='toclevel-2'><a href="#channels"><span class="tocnumber">2.1</span> <span class="toctext">channels</span></a></li>
+<li class='toclevel-2'><a href="#P.2CN"><span class="tocnumber">2.2</span> <span class="toctext">P,N</span></a></li>
+<li class='toclevel-2'><a href="#optional_parameters"><span class="tocnumber">2.3</span> <span class="toctext">optional parameters</span></a></li>
+</ul>
+</li>
+<li class='toclevel-1'><a href="#Using_texmake_to_prepare_textures"><span class="tocnumber">3</span> <span class="toctext">Using texmake to prepare textures</span></a></li>
+<li class='toclevel-1'><a href="#Alternative_for_preparing_a_texture"><span class="tocnumber">4</span> <span class="toctext">Alternative for preparing a texture</span></a></li>
+<li class='toclevel-1'><a href="#Reading_the_3d_texture_back_in"><span class="tocnumber">5</span> <span class="toctext">Reading the 3d texture back in</span></a>
+<ul>
+<li class='toclevel-2'><a href="#P.2CN_2"><span class="tocnumber">5.1</span> <span class="toctext">P,N</span></a></li>
+<li class='toclevel-2'><a href="#optional_parameters_2"><span class="tocnumber">5.2</span> <span class="toctext">optional parameters</span></a></li>
+</ul>
+</li>
+<li class='toclevel-1'><a href="#Reference_Poses"><span class="tocnumber">6</span> <span class="toctext">Reference Poses</span></a></li>
+</ul>
+</td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Introduction">edit</a>]</div><a name="Introduction"></a><h1> Introduction </h1>
+<p>There are times when a shader calculation is expensive, but predictable, and you'd like to be able to cache the result from one execution and reuse it.  You don't just have to cache the whole shader result - you could cache patterning on a surface, and recombine it with lighting later.
+</p><p>Pixie now supports baking arbitrary data to 3d textures.  You don't need to provide a uv texture mapping for this to work - so it's a rather powerful and general data storage mechanism.
+</p><p>The outline operation is:
+</p>
+<ul><li> call <tt>bake3d()</tt> from your shader to save a point cloud of your data
+</li><li> convert the point cloud to a 3d bricked texture using <tt>texmake</tt>
+</li><li> read the texture using <tt>texture3d</tt>
+</li></ul>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Point Clouds">edit</a>]</div><a name="Point_Clouds"></a><h2> Point Clouds </h2>
+<p>A point cloud is a structure which can hold arbitrary attributes / data produced by the <tt>bake3d</tt> shadeop.  It's construction is straightforward, but it's format requires that the whole cloud is held in memory - this means that reading them can be costly, even if only a small fraction of the data is accessed..  Whilst point clouds support 'blurred' lookups of sorts, they do not really support level of detail - efficient lookups which represent all the data when viewed far away.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: 3d Textures">edit</a>]</div><a name="3d_Textures"></a><h2> 3d Textures </h2>
+<p>Pixie supports a 3d Texture format which can be prepared from a point cloud.  Once prepared, the 3d texture supports efficient lookups, which support level-of-detail.  The entire texture does not have to be held in memory, but instead is paged in as needed.  Whilst the preparation of the texture can be a little time consuming, it is usually done offline, and reused for multiple frames.  If the data baked into the texture is expensive to compute, this can represent quite a saving.
+</p><p>Both point clouds and 3d textures can be read by the <tt>texture3d</tt> shadeop.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: 3d Texture shadops">edit</a>]</div><a name="3d_Texture_shadops"></a><h1> 3d Texture shadops </h1>
+<p>Baking 3d data to a 'point cloud' is done via the following shadeop
+</p>
+<pre>bake3d(string filename,string channels,point P,normal N,...,&lt;data&gt;);
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: channels">edit</a>]</div><a name="channels"></a><h3> <tt>channels</tt> </h3>
+<p>You must predeclare each channel to be baked using the following syntax in your RIB
+</p>
+<pre>DisplayChannel "type name";
+</pre>
+<p>eg
+</p>
+<pre>DisplayChannel "color CoutDiff";
+</pre>
+<p>The channels are then passed to <tt>bake3d</tt> in the <tt>channels</tt> parameter, multiple channels are passed as a single string, with commas to separate them:
+</p>
+<pre>"CoutDiff"
+</pre>
+<p>or
+</p>
+<pre>"CoutDiff,CoutSpec"
+</pre>
+<p>for multiple channels.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: P,N">edit</a>]</div><a name="P.2CN"></a><h3> <tt>P,N</tt> </h3>
+<p>The <tt>P</tt> parameter specifies the point at which the data is given.  The <tt>N</tt> parameter allows you to specifiy a normal for surface data, allowing nearby surfaces to be differentiated.  If the data you are baking is volume data (has no valid N), then pass <tt>N=0</tt>.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: optional parameters">edit</a>]</div><a name="optional_parameters"></a><h3> optional parameters </h3>
+<p>The optional parameters are:
+</p>
+<dl><dt><tt>radius</tt></dt><dd>Specifies the validity radius of each sample.  If you do not provide this, Pixie will calculate a value for you using the grid size.
+</dd><dt><tt>radiusscale</tt></dt><dd>Allows a scale to be applied to the calculated (or provided) radius
+</dd></dl>
+<p>Data to be baked is then specified with name-value pairs, eg
+</p>
+<pre> "CoutDiff",Cd
+</pre>
+<p>so the full call might look like:
+</p>
+<pre>color Cd = &lt;something complex&gt;;
+bake3d("cloud.ptc","CoutDiff",P,N,"CoutDiff",Cd);
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Using texmake to prepare textures">edit</a>]</div><a name="Using_texmake_to_prepare_textures"></a><h1> Using <tt>texmake</tt> to prepare textures </h1>
+<p>To prepare these point clouds into a friendly format for reading, use the <tt>texmake</tt> program.  The <tt>-texture3d</tt> option to <tt>texmake</tt> specifies that you wish to prepare a 3d texture.  The syntax is:
+</p>
+<pre>texmake -texture3d [-maxerror n.n] &lt;input point cloud&gt; &lt;output 3d texture&gt;
+</pre>
+<p>The <tt>-maxerror</tt> parameter allows you to tweak how compression of the texture will occur.  The texture is stored in an octree-like format, with each level of the map representing a coarser approximation to previous levels.   For very uniform data, there is no need to store the finest representations as coarser levels will represent the data perfectly well.  The <tt>-maxerror</tt> parameter represents the maximum variation for which data will be considered uniform.
+</p><p>By setting maxerror (default 0.002) you can control the size/space tradeoff for the map.  Setting this number too large will result in 'blocky' lookups, and too small will hurt performance with no gain in quality.
+</p><p>For example, the following command line might be used to prepare the baked cloud to a 3d texture
+</p>
+<pre>texmake -texture3d cloud.ptc surftexture.bm
+</pre>
+<p>of perhaps after some experimentation:
+</p>
+<pre>texmake -texture3d -maxerror 0.004 cloud.ptc surftexture.bm
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Alternative for preparing a texture">edit</a>]</div><a name="Alternative_for_preparing_a_texture"></a><h1> Alternative for preparing a texture </h1>
+<p>You may also put the following fragment in your RIB <u>outside</u> WorldBegin / WorldEnd:
+</p>
+<pre>MakeTexture3D &lt;inputfile&gt; &lt;outputfile&gt;
+</pre>
+<p>or
+</p>
+<pre>MakeTexture3D &lt;inputfile&gt; &lt;outputfile&gt; "maxerror" [float]
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Reading the 3d texture back in">edit</a>]</div><a name="Reading_the_3d_texture_back_in"></a><h1> Reading the 3d texture back in </h1>
+<p>Reading back a 3d texture or point cloud is done via the following shadeop:
+</p>
+<pre>texture3d(string filename,point P,normal N,...,&lt;data&gt;);
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: P,N">edit</a>]</div><a name="P.2CN_2"></a><h3> <tt>P,N</tt> </h3>
+<p>The <tt>P</tt> parameter specifies the point at which data should be looked up.  The <tt>N</tt> parameter allows you to specifiy a normal for surface data, allowing nearby surfaces to be differentiated.  If the data you are lookup up is volume data (has no valid N), then pass <tt>N=0</tt>.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: optional parameters">edit</a>]</div><a name="optional_parameters_2"></a><h3> optional parameters </h3>
+<p>The optional parameters are:
+</p>
+<dl><dt><tt>radius</tt></dt><dd>Specifies the sampling radius of each sample.  If you do not provide this, Pixie will calculate a value for you using the grid size.
+</dd><dt><tt>radiusscale</tt></dt><dd>Allows a scale to be applied to the calculated (or provided) radius - this allows the lookup to be blurred.
+</dd></dl>
+<p>The data stored in the file is read into variables supplied to <tt>texture3d</tt> with name-value pairs, eg
+</p>
+<pre> "CoutDiff",Cd
+</pre>
+<p>Unlike when baking, no channels have to be supplied, and the data's names are checked against those stored in the file.
+</p><p>so the full call might look like:
+</p>
+<pre>color Cd = 0;
+texture3d("cloud.ptc",P,N,"CoutDiff",Cd);
+&lt;use Cd&gt;
+</pre>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Reference Poses">edit</a>]</div><a name="Reference_Poses"></a><h1> Reference Poses </h1>
+<p>If the object you're baking is moving or deforming, you might wish to bake the data onto a reference pose, and look it up using that pose (using a vertex point __Pref to specify the vertices in reference pose).  Future releases may support baking to an arbitrary coordinate system other than 'world'.
+</p><div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Baking_3D_Textures">http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Baking_3D_Textures</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<ul>
+				 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Baking_3D_Textures.html">Article</a></li>
+				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
+				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
+				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
+		</ul>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
+				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Baking_3D_Textures&amp;oldid=2202">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 21:35, 21 August 2006.</li>
+				<li id="f-viewcount">This page has been accessed 344 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.21 secs. -->
+</body></html>

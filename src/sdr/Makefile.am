@@ -1,0 +1,18 @@
+lib_LTLIBRARIES = libsdr.la 
+
+LIBSDR_CURRENT_VERSION=0
+LIBSDR_REVISION_VERSION=0
+LIBSDR_AGE_VERSION=0
+
+libsdr_la_LDFLAGS = -export-dynamic -version-info $(LIBSDR_CURRENT_VERSION):$(LIBSDR_REVISION_VERSION):$(LIBSDR_AGE_VERSION)
+
+libsdr_la_SOURCES = sdr.cpp
+
+libsdr_la_LIBADD = ../common/libcommon.la
+
+INCLUDES = -I..
+
+includedir = $(prefix)/include
+
+include_HEADERS = sdr.h
+
