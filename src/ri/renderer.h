@@ -280,66 +280,37 @@ public:
 	CShaderInstance		*getShader(const char *,int,int,char **,void **);		// Load a shader
 	int					getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
 
-	CTexture			*textureLoad(const char *,TSearchpath *);				// Load a new texture map
-	CEnvironment		*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
-
 																				// Delayed object junk
 	void				processDelayedObject(CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *,CRay *ray = NULL);
 
 	void				addObject(CObject *);									// Add an object into the scene
 	void				addInstance(void *);									// Add an instance into the scene
-
-																				// Coordinate system functions
-
-
-
+																				// Find a coordinate system
 	int					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
-
 																				// The following functions are about texture management and are implemented in texture.cpp
 	void				rendererThread(void *);
 
 private:
-	CDictionary<const char *,CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
-	CDictionary<const char *,CVariable *>				*declaredVariables;			// Declared variables
-	CDictionary<const char *,CFileResource  *>			*loadedFiles;				// Files that have been loaded
-	CDictionary<const char *,CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
-	CDictionary<const char *,CNetFileMapping *>			*netFileMappings;			// This holds name->name mappings of files
-	CArray<const char*>									*frameTemporaryFiles;		// This hold the name of temporary files
-	int													numKnownGlobalIds;
-	CVariable											*variables;					// List of all defined variables
-	int													numGlobalVariables;			// The number of global variables
-	CDictionary<const char *,CDisplayChannel *>			*declaredChannels;			// The declared display channels
-	CArray<CDisplayChannel*>							*displayChannels;			// The list of all desclared display channels
-	CArray<CXform *>									*savedXforms;				// Used to save/restore the graphics state
-	CArray<CAttributes *>								*savedAttributes;
-	CArray<COptions *>									*savedOptions;
-	CArray<CObject *>									*objects;					// The list of all objects recorded so far
-	CArray<CArray<CObject *> *>							*objectsStack;				// The stack of object lists
-	CArray<CArray<CObject *> *>							*allocatedInstances;		// The list of allocated object instances
-	CXform				*currentXform;											// The current graphics state
-	CAttributes			*currentAttributes;
-	COptions			*currentOptions;
-	CDSO				*dsos;													// The list of DSO's that have been loaded
-	SOCKET				netClient;												// The client that we're serving (-1 if client)
-	int					netNumServers;											// The number of servers (0 if server)
-	SOCKET				*netServers;											// The array of servers that are serving us
-	TMutex				commitMutex;											// The mutex that controls job dispatch
-	CShadingContext		*renderer;												// The renderer doing the current world block
-	int					userRaytracing;											// TRUE if we're raytracing for the user
-	int					numNetrenderedBuckets;									// The number of netrendered buckets
-
-																				// Some RenderMan Interface related variables
-	int					numExpectedMotions;										// The number of expected motions in a motion block
-	int					numMotions;												// The number of motions so far
-	float				*keyTimes;												// The key times
-	float				*motionParameters;										// The arrays of motion parameters
-	int					maxMotionParameters;									// The maximum number of motion parameters that can be stored
-	char				*lastCommand;											// The text of the last motion command
+	CArray<CXform *>			*savedXforms;				// Used to save/restore the graphics state
+	CArray<CAttributes *>		*savedAttributes;
+	CArray<COptions *>			*savedOptions;
+	CArray<CObject *>			*objects;					// The list of all objects recorded so far
+	CArray<CArray<CObject *> *>	*objectsStack;				// The stack of object lists
+	CArray<CArray<CObject *> *>	*allocatedInstances;		// The list of allocated object instances
+	CXform						*currentXform;				// The current graphics state
+	CAttributes					*currentAttributes;
+	COptions					*currentOptions;
+															// Some RenderMan Interface related variables
+	int							numExpectedMotions;			// The number of expected motions in a motion block
+	int							numMotions;					// The number of motions so far
+	float						*keyTimes;					// The key times
+	float						*motionParameters;			// The arrays of motion parameters
+	int							maxMotionParameters;		// The maximum number of motion parameters that can be stored
+	char						*lastCommand;				// The text of the last motion command
 
 	
-	void				init(CProgrammableShaderInstance *);					// Execute the init code of a shader
-	int					loadDSO(char *,char *,TSearchpath *,dsoInitFunction *,dsoExecFunction *,dsoCleanupFunction *);	// Find/load a DSO shader
-	int					addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1);
+	void						init(CProgrammableShaderInstance *);		// Execute the init code of a shader
+	int							addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1);
 };
 
 

@@ -42,6 +42,7 @@
 #include "remoteChannel.h"
 #include "brickmap.h"
 #include "pointCloud.h"
+#include "dso.h"
 
 
 
@@ -130,7 +131,7 @@ CTexture	*CFrame::getTexture(const char *name) {
 
 	if (loadedFiles->find(name,tex) == FALSE){
 		// Load the texture
-		tex	=	currentRenderer->textureLoad(name,options.texturePath);
+		tex	=	textureLoad(name,options.texturePath);
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
@@ -156,7 +157,7 @@ CEnvironment	*CFrame::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
 	if (loadedFiles->find(name,tex) == FALSE){
-		tex	=	currentRenderer->environmentLoad(name,options.texturePath,toWorld);
+		tex	=	environmentLoad(name,options.texturePath,toWorld);
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
@@ -318,11 +319,11 @@ CTextureInfoBase	*CFrame::getTextureInfo(const char *name) {
 
 	if (loadedFiles->find(name,tex) == FALSE){
 		// try environments first
-		tex	=	currentRenderer->environmentLoad(name,options.texturePath,toWorld);
+		tex	=	environmentLoad(name,options.texturePath,toWorld);
 
 		if (tex == NULL)	{
 			// else try as textures
-			tex	=	currentRenderer->textureLoad(name,options.texturePath);
+			tex	=	textureLoad(name,options.texturePath);
 		}
 
 		if (tex != NULL) {
@@ -463,5 +464,105 @@ char					*CFrame::getFilter(RtFilterFunc func) {
 }
 
 
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	dsoLoadCallback
+// Description			:	This function will be called for each module
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/30/2002
+static	int	dsoLoadCallback(const char *file,void *ud) {
+	void	*module		=	osLoadModule(file);
+
+	if (module != NULL) {
+		int				i;
+		void			**userData	=	(void **) ud;
+		char			*name		=	(char *) userData[0];
+		char			*prototype	=	(char *) userData[1];
+		SHADEOP_SPEC	*shadeops;
+
+		{
+			char	tmp[OS_MAX_PATH_LENGTH];
+
+			sprintf(tmp,"%s_shadeops",name);
+
+			shadeops	=	(SHADEOP_SPEC *)	osResolve(module,tmp);
+		}
+
+		if (shadeops != NULL) {
+			for (i=0;;i++) {
+				char	*dsoName,*dsoPrototype;
+
+				if (strcmp(shadeops[i].definition,"") == 0)	break;
+
+				if (dsoParse(shadeops[i].definition,dsoName,dsoPrototype) == TRUE) {
+					if (strcmp(dsoPrototype,prototype) == 0) {
+						dsoInitFunction		*init		=	(dsoInitFunction *) userData[2];
+						dsoExecFunction		*exec		=	(dsoExecFunction *) userData[3];
+						dsoCleanupFunction	*cleanup	=	(dsoCleanupFunction *) userData[4];
+
+						// Bingo
+						init[0]		=	(dsoInitFunction)		osResolve(module,shadeops[i].init);
+						exec[0]		=	(dsoExecFunction)		osResolve(module,dsoName);
+						cleanup[0]	=	(dsoCleanupFunction)	osResolve(module,shadeops[i].cleanup);
+
+						if (exec != NULL) {
+							free(dsoName);
+							free(dsoPrototype);
+
+							// We have found the DSO
+							return FALSE;
+						}
+					}
+
+					free(dsoName);
+					free(dsoPrototype);
+				}
+			}
+		}
+
+		osUnloadModule(module);
+	} else {
+		error(CODE_SYSTEM,"Unable to load dso %s (error %s)\n",file,osModuleError());
+	}
+
+	// Continue iterating
+	return TRUE;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFrame
+// Method				:	loadDSO
+// Description			:	Find and load a DSO shader
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	8/25/2002
+int			CFrame::loadDSO(char *name,char *prototype,TSearchpath *inPath,dsoInitFunction *init,dsoExecFunction *exec,dsoCleanupFunction *cleanup) {
+	void	*userData[5];
+	char	searchPath[OS_MAX_PATH_LENGTH];
+
+	*init		=	NULL;
+	*exec		=	NULL;
+	*cleanup	=	NULL;
+
+	userData[0]	=	name;
+	userData[1]	=	prototype;
+	userData[2]	=	init;
+	userData[3]	=	exec;
+	userData[4]	=	cleanup;
+
+	// Go over the directories
+	for (;inPath!=NULL;inPath=inPath->next) {
+		sprintf(searchPath,"%s*.%s",inPath->directory,osModuleExtension);
+		osEnumerate(searchPath,dsoLoadCallback,userData);
+	}
+
+	if (exec[0] == NULL)	return FALSE;
+
+	return TRUE;
+}
 
 

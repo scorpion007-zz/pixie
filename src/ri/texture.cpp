@@ -2288,7 +2288,7 @@ void		CTexture::textureShutdown() {
 // Return Value			:	Pointer to the new texture
 // Comments				:
 // Date last edited		:	7/7/2001
-CTexture		*CRendererContext::textureLoad(const char *name,TSearchpath *path) {
+CTexture		*CFrame::textureLoad(const char *name,TSearchpath *path) {
 	TIFF			*in;
 	CTexture		*cTexture	=	NULL;
 	char			fn[OS_MAX_PATH_LENGTH];
@@ -2334,7 +2334,7 @@ CTexture		*CRendererContext::textureLoad(const char *name,TSearchpath *path) {
 // Return Value			:	Pointer to the new environment
 // Comments				:
 // Date last edited		:	7/7/2001
-CEnvironment		*CRendererContext::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
+CEnvironment		*CFrame::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
 	TIFF			*in;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	CEnvironment	*cTexture	=	NULL;

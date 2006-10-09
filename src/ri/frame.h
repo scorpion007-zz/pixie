@@ -35,6 +35,7 @@
 #include "common/containers.h"
 #include "common/os.h"
 #include "options.h"
+#include "shadeop.h"
 
 // Compute the circle of confusion in the camera system
 #define	cocPixels(z)	absf((1 / z) - invFocaldistance)*cocFactorPixels
@@ -201,14 +202,11 @@ public:
 								////////////////////////////////////////////////////////////////////
 
 
-								// Various hiders can use these functions to commit their buckets
-		static void				commit(int,int,int,int,float *);
-		static int				advanceBucket(int,int &,int &,int &,int &);			// Find the next bucket to render for network rendering
-		static void				clear(int,int,int,int);								// Clear a window
-		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
-		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
+								
 
-								// Frustrum culling
+								////////////////////////////////////////////////////////////////////
+								// Functions that deal with the clipping/projection
+								////////////////////////////////////////////////////////////////////
 		static int				inFrustrum(const float *,const float *);			// Return TRUE if the box is in the frustrum
 		static int				inFrustrum(const float *);							// Return TRUE if the point is in the frustrum
 		static unsigned int		clipCode(const float *);							// Returns the clipping code
@@ -223,6 +221,15 @@ public:
 		static float			minCocPixels(float z1, float z2);
 		static void				advanceBucket();
 
+
+								////////////////////////////////////////////////////////////////////
+								// Functions that deal with the displays (implemented in frameDisplay.cpp)
+								////////////////////////////////////////////////////////////////////
+		static void				commit(int,int,int,int,float *);
+		static int				advanceBucket(int,int &,int &,int &,int &);			// Find the next bucket to render for network rendering
+		static void				clear(int,int,int,int);								// Clear a window
+		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
+		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
 
 
 								////////////////////////////////////////////////////////////////////
@@ -245,6 +252,8 @@ public:
 								////////////////////////////////////////////////////////////////////
 		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
 		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
+		static	CTexture		*textureLoad(const char *,TSearchpath *);				// Load a new texture map
+		static	CEnvironment	*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
 		static	CTexture		*getTexture(const char *);								// Load a texture
 		static	CEnvironment	*getEnvironment(const char *);							// Load an environment
 		static	CPhotonMap		*getPhotonMap(const char *);							// Load a photon map
@@ -253,6 +262,7 @@ public:
 		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *);	// Load a point cloud or brickmap
 		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 		static	char			*getFilter(RtFilterFunc);								// The other way around
+		static	int				loadDSO(char *,char *,TSearchpath *,dsoInitFunction *,dsoExecFunction *,dsoCleanupFunction *);	// Find/load a DSO shader
 
 
 								////////////////////////////////////////////////////////////////////
@@ -266,6 +276,17 @@ public:
 		static	int				getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network
 		static	void			clientRenderFrame();									// Isn't that obvious
 		static	void			processServerRequest(T32,int);							// Process a request from the server
+
+
+								////////////////////////////////////////////////////////////////////
+								// Remote channel stuff (in remoteChannel.cpp)
+								////////////////////////////////////////////////////////////////////
+		static	int				requestRemoteChannel(CRemoteChannel *);					// request a remote channel (server requests from client)
+		static	int				processChannelRequest(int,SOCKET);						// service request for a remote channel in client
+		static	void			sendBucketDataChannels(int x,int y);					// send all per-bucket remote channels
+		static	void			recvBucketDataChannels(SOCKET s,int x,int y);			// receive one per-bucket remote channel
+		static	void			sendFrameDataChannels();								// send all per-frame remote channels
+		static	void			recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
 
 								////////////////////////////////////////////////////////////////////
 								// The memory we use for the frame
@@ -300,16 +321,6 @@ public:
 		static	CArray<CSurface *>		*raytraced;										// The list of raytraced objects
 		static	CArray<CTracable *>		*tracables;										// The array of raytracable objects
 
-
-								////////////////////////////////////////////////////////////////////
-								// Remote channel stuff (in remoteChannel.cpp)
-								////////////////////////////////////////////////////////////////////
-		static	int				requestRemoteChannel(CRemoteChannel *);					// request a remote channel (server requests from client)
-		static	int				processChannelRequest(int,SOCKET);						// service request for a remote channel in client
-		static	void			sendBucketDataChannels(int x,int y);					// send all per-bucket remote channels
-		static	void			recvBucketDataChannels(SOCKET s,int x,int y);			// receive one per-bucket remote channel
-		static	void			sendFrameDataChannels();								// send all per-frame remote channels
-		static	void			recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
 
 								////////////////////////////////////////////////////////////////////
 								// Some interesting precomputed quantities
