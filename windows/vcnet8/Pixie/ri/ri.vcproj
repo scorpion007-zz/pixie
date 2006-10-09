@@ -359,6 +359,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\frame.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\hcshader.cpp"
 				>
 			</File>
@@ -618,6 +622,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\fileResource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\frame.h"
 				>
 			</File>
 			<File
