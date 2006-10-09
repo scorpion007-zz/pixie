@@ -33,7 +33,6 @@
 
 #include "common/global.h"
 #include "memory.h"
-#include "output.h"
 #include "renderer.h"
 #include "shader.h"
 #include "slcode.h"

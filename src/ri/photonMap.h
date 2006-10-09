@@ -35,7 +35,6 @@
 #include "common/algebra.h"
 #include "ray.h"
 #include "renderer.h"
-#include "output.h"
 #include "gui/opengl.h"
 
 

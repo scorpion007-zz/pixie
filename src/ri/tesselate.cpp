@@ -32,7 +32,6 @@
 
 #include "common/os.h"
 #include "object.h"
-#include "output.h"
 #include "renderer.h"
 #include "shading.h"
 #include "stats.h"

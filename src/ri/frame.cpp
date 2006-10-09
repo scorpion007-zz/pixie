@@ -32,13 +32,99 @@
 #include <math.h>
 
 #include "frame.h"
-#include "renderer.h"
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
+#include "object.h"
+#include "brickmap.h"
+#include "photonMap.h"
+#include "pointCloud.h"
+#include "texture3d.h"
+#include "irradiance.h"
+#include "stats.h"
+#include "random.h"
+#include "points.h"
+#include "radiance.h"
+#include "remoteChannel.h"
+#include "shading.h"
+
 
 
 static COptions::CDisplay	*currentDisplay	=	NULL;
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+// Static members of the CFrame
+/////////////////////////////////////////////////////////////////////
+COptions				CFrame::options;
+CVariable				**CFrame::globalVariables;
+int						CFrame::numGlobalVariables;
+int						CFrame::maxGlobalVariables;
+CDictionary<const char *,CFileResource *>	*CFrame::loadedFiles;
+CDictionary<const char *,CRemoteChannel *>	*CFrame::declaredRemoteChannels;
+CArray<CRemoteChannel *>					*CFrame::remoteChannels;
+CArray<CAttributes *>						*CFrame::dirtyAttributes;
+CArray<CProgrammableShaderInstance *>		*CFrame::dirtyInstances;
+unsigned int			CFrame::raytracingFlags;
+CHierarchy				*CFrame::hierarchy;
+CArray<CTriangle *>		*CFrame::triangles;
+CArray<CSurface *>		*CFrame::raytraced;
+CArray<CTracable *>		*CFrame::tracables;
+matrix					CFrame::fromWorld,CFrame::toWorld;
+matrix					CFrame::fromNDC,CFrame::toNDC;
+matrix					CFrame::fromRaster,CFrame::toRaster;
+matrix					CFrame::fromScreen,CFrame::toScreen;
+matrix					CFrame::worldToNDC;
+unsigned int			CFrame::hiderFlags;
+int						CFrame::numSamples;
+int						CFrame::numExtraSamples;
+int						CFrame::xPixels,CFrame::yPixels;
+unsigned int			CFrame::additionalParameters;
+float					CFrame::pixelLeft,CFrame::pixelRight,CFrame::pixelTop,CFrame::pixelBottom;
+float					CFrame::dydPixel,CFrame::dxdPixel;
+float					CFrame::dPixeldx,CFrame::dPixeldy;
+int						CFrame::renderLeft,CFrame::renderRight,CFrame::renderTop,CFrame::renderBottom;
+int						CFrame::xBuckets,CFrame::yBuckets;
+int						CFrame::metaXBuckets,CFrame::metaYBuckets;
+float					CFrame::aperture;
+float					CFrame::imagePlane;
+float					CFrame::invImagePlane;
+float					CFrame::cocFactorPixels;
+float					CFrame::cocFactorSamples;
+float					CFrame::cocFactorScreen;
+float					CFrame::invFocaldistance;
+float					CFrame::lengthA,CFrame::lengthB;
+float					CFrame::marginXcoverage,CFrame::marginYcoverage;
+float					CFrame::marginX,CFrame::marginY;
+float					CFrame::marginalX,CFrame::marginalY;
+float					CFrame::leftX,CFrame::leftZ,CFrame::leftD;
+float					CFrame::rightX,CFrame::rightZ,CFrame::rightD;
+float					CFrame::topY,CFrame::topZ,CFrame::topD;
+float					CFrame::bottomY,CFrame::bottomZ,CFrame::bottomD;
+int						CFrame::numActiveDisplays;
+int						CFrame::currentXBucket;
+int						CFrame::currentYBucket;
+SOCKET					CFrame::netClient;
+int						*CFrame::jobAssignment;
+FILE					*CFrame::deepShadowFile;
+int						*CFrame::deepShadowIndex;
+int						CFrame::deepShadowIndexStart;
+char					*CFrame::deepShadowFileName;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	findParameter
@@ -64,7 +150,7 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	if (strcmp(name,"quantize") == 0) {
 		if ((numItems == 4) && (type == FLOAT_PARAMETER))	{
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CFrame::colorQuantizer;
+				return	CFrame::options.colorQuantizer;
 			} else {
 				return	currentDisplay->quantizer;
 			}
@@ -72,23 +158,23 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	} else if (strcmp(name,"dither") == 0) {
 		if ((numItems == 1) && (type == FLOAT_PARAMETER)) {
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CFrame::currentOutput->colorQuantizer + 4;
+				return	CFrame::options.colorQuantizer + 4;
 			} else {
 				return	currentDisplay->quantizer + 4;
 			}
 		}
 	} else if (strcmp(name,"near") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::currentOutput->clipMin;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.clipMin;
 	} else if (strcmp(name,"far") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::currentOutput->clipMax;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.clipMax;
 	} else if (strcmp(name,"Nl") == 0) {
-		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CFrame::currentOutput->world->from;
+		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CFrame::fromWorld;
 	} else if (strcmp(name,"NP") == 0) {
-		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CFrame::currentOutput->worldToNDC;
+		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CFrame::worldToNDC;
 	} else if (strcmp(name,"gamma") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::currentOutput->gamma;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.gamma;
 	} else if (strcmp(name,"gain") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::currentOutput->gain;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.gain;
 	} else if (strcmp(name,"Software") == 0) {
 		if ((numItems == 1) && (type == STRING_PARAMETER))		return	(void *) "Pixie";
 	}
@@ -97,72 +183,74 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 }
 
 
-/*
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFrame
-// Method				:	CFrame
-// Description			:	Ctor
+// Method				:	beginFrame
+// Description			:	Begin a frame / compute misc data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/4/2001
-CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
-	matrix	mtmp;
+// Date last edited		:	10/9/2006
+void		CFrame::beginFrame(const COptions *o,const CXform *x,SOCKET s,unsigned int hf) {
 
-	currentOutput			=	this;
+	options					=	*o;
+	movmm(fromWorld,x->from);
+	movmm(toWorld,x->to);
 
 	hiderFlags				=	hf;
 	netClient				=	s;
 
-	assert(pixelXsamples > 0);
-	assert(pixelYsamples > 0);
+	assert(options.pixelXsamples > 0);
+	assert(options.pixelYsamples > 0);
 
 	// Compute some stuff
-	if (flags & OPTIONS_FLAGS_CUSTOM_FRAMEAR) {
-		const float	ar	=	xres*pixelAR / (float) yres;
+	if (options.flags & OPTIONS_FLAGS_CUSTOM_FRAMEAR) {
+		const float	ar	=	options.xres*options.pixelAR / (float) options.yres;
 
 		// Update the resolution as necessary
-		if (frameAR > ar) {
-			yres	=	(int) (xres*pixelAR / frameAR);
+		if (options.frameAR > ar) {
+			options.yres	=	(int) (options.xres*options.pixelAR / options.frameAR);
 		} else {
-			xres	=	(int) (frameAR * yres / pixelAR);
+			options.xres	=	(int) (options.frameAR * options.yres / options.pixelAR);
 		}
 	} else {
-		frameAR = xres*pixelAR / (float) yres;
+		options.frameAR = options.xres*options.pixelAR / (float) options.yres;
 	}
 
-	if (flags & OPTIONS_FLAGS_CUSTOM_SCREENWINDOW) {
+
+	if (options.flags & OPTIONS_FLAGS_CUSTOM_SCREENWINDOW) {
 		// The user explicitly entered the screen window, so we don't have to make sure it matches the frame aspect ratio
 	} else {
-		if (frameAR > (float) 1.0) {
-			screenTop			=	(float) 1.0;
-			screenBottom		=	(float) -1.0;
-			screenLeft			=	-frameAR;
-			screenRight			=	frameAR;
+		if (options.frameAR > (float) 1.0) {
+			options.screenTop			=	(float) 1.0;
+			options.screenBottom		=	(float) -1.0;
+			options.screenLeft			=	-options.frameAR;
+			options.screenRight			=	options.frameAR;
 		} else {
-			screenTop			=	1/frameAR;
-			screenBottom		=	-1/frameAR;
-			screenLeft			=	(float) -1.0;
-			screenRight			=	(float) 1.0;
+			options.screenTop			=	1/options.frameAR;
+			options.screenBottom		=	-1/options.frameAR;
+			options.screenLeft			=	(float) -1.0;
+			options.screenRight			=	(float) 1.0;
 		}
 	}
 
 	imagePlane		=	1;
-	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		imagePlane	=	(float) (1/tan(radians(fov/(float) 2)));
+	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		imagePlane	=	(float) (1/tan(radians(options.fov/(float) 2)));
 	} else {
 		imagePlane	=	1;
 	}
 
 	invImagePlane	=	1/imagePlane;
 
-	assert(cropLeft < cropRight);
-	assert(cropTop < cropBottom);
+	assert(options.cropLeft < options.cropRight);
+	assert(options.cropTop < options.cropBottom);
 
 	// Rendering window in pixels
-	renderLeft			=	(int) ceil(xres*cropLeft);
-	renderRight			=	(int) ceil(xres*cropRight);
-	renderTop			=	(int) ceil(yres*cropTop);
-	renderBottom		=	(int) ceil(yres*cropBottom);
+	renderLeft			=	(int) ceil(options.xres*options.cropLeft);
+	renderRight			=	(int) ceil(options.xres*options.cropRight);
+	renderTop			=	(int) ceil(options.yres*options.cropTop);
+	renderBottom		=	(int) ceil(options.yres*options.cropBottom);
 
 	assert(renderRight > renderLeft);
 	assert(renderBottom > renderTop);
@@ -174,38 +262,38 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 	assert(xPixels >= 0);
 	assert(yPixels >= 0);
 
-	dxdPixel			=	(screenRight	- screenLeft) / (float) (xres);
-	dydPixel			=	(screenBottom	- screenTop) / (float) (yres);
+	dxdPixel			=	(options.screenRight	- options.screenLeft) / (float) (options.xres);
+	dydPixel			=	(options.screenBottom	- options.screenTop) / (float) (options.yres);
 	dPixeldx			=	1	/	dxdPixel;
 	dPixeldy			=	1	/	dydPixel;
-	pixelLeft			=	(float) (screenLeft	+ renderLeft*dxdPixel);
-	pixelTop			=	(float) (screenTop	+ renderTop*dydPixel);
+	pixelLeft			=	(float) (options.screenLeft	+ renderLeft*dxdPixel);
+	pixelTop			=	(float) (options.screenTop	+ renderTop*dydPixel);
 	pixelRight			=	pixelLeft	+ dxdPixel*xPixels;
 	pixelBottom			=	pixelTop	+ dydPixel*yPixels;
 
-	xBuckets			=	(int) ceil(xPixels / (float) bucketWidth);
-	yBuckets			=	(int) ceil(yPixels / (float) bucketHeight);
+	xBuckets			=	(int) ceil(xPixels / (float) options.bucketWidth);
+	yBuckets			=	(int) ceil(yPixels / (float) options.bucketHeight);
 
-	metaXBuckets		=	(int) ceil(xBuckets / (float) netXBuckets);
-	metaYBuckets		=	(int) ceil(yBuckets / (float) netYBuckets);
+	metaXBuckets		=	(int) ceil(xBuckets / (float) options.netXBuckets);
+	metaYBuckets		=	(int) ceil(yBuckets / (float) options.netYBuckets);
 
 	jobAssignment		=	NULL;
 
-	aperture			=	focallength / (2*fstop);
-	if ((aperture <= C_EPSILON) || (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC)) {
+	aperture			=	options.focallength / (2*options.fstop);
+	if ((aperture <= C_EPSILON) || (options.projection == OPTIONS_PROJECTION_ORTHOGRAPHIC)) {
 		aperture			=	0;
 		cocFactorScreen		=	0;
 		cocFactorSamples	=	0;
 		cocFactorPixels		=	0;
 		invFocaldistance	=	0;
 	} else {
-		cocFactorScreen		=	(float) (imagePlane*aperture*focaldistance /  (focaldistance + aperture));
-		cocFactorSamples	=	cocFactorScreen*sqrtf(dPixeldx*dPixeldx*pixelXsamples*pixelXsamples + dPixeldy*dPixeldy*pixelYsamples*pixelYsamples);
+		cocFactorScreen		=	(float) (imagePlane*aperture*options.focaldistance /  (options.focaldistance + aperture));
+		cocFactorSamples	=	cocFactorScreen*sqrtf(dPixeldx*dPixeldx*options.pixelXsamples*options.pixelXsamples + dPixeldy*dPixeldy*options.pixelYsamples*options.pixelYsamples);
 		cocFactorPixels		=	cocFactorScreen*sqrtf(dPixeldx*dPixeldx + dPixeldy*dPixeldy);
-		invFocaldistance	=	1 / focaldistance;
+		invFocaldistance	=	1 / options.focaldistance;
 	}
 
-	if (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC) {
+	if (options.projection == OPTIONS_PROJECTION_ORTHOGRAPHIC) {
 		lengthA			=	0;
 		lengthB			=	sqrtf(dxdPixel*dxdPixel + dydPixel*dydPixel);
 	} else {
@@ -213,23 +301,19 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 		lengthB			=	0;
 	}
 
-	if (aperture		!= 0)			flags	|=	OPTIONS_FLAGS_FOCALBLUR;
-	if (shutterClose	!= shutterOpen)	flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
-
-	// Init the world matrix
-	world				=	x;
-	world->attach();
+	if (aperture				!= 0)					options.flags	|=	OPTIONS_FLAGS_FOCALBLUR;
+	if (options.shutterClose	!= options.shutterOpen)	options.flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
 
 	// Compute the matrices related to the camera transformation
-	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		toNDC[element(0,0)]		=	imagePlane / (screenRight - screenLeft);
+	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		toNDC[element(0,0)]		=	imagePlane / (options.screenRight - options.screenLeft);
 		toNDC[element(0,1)]		=	0;
-		toNDC[element(0,2)]		=	-screenLeft / (screenRight - screenLeft);
+		toNDC[element(0,2)]		=	-options.screenLeft / (options.screenRight - options.screenLeft);
 		toNDC[element(0,3)]		=	0;
 
 		toNDC[element(1,0)]		=	0;
-		toNDC[element(1,1)]		=	imagePlane / (screenBottom - screenTop);
-		toNDC[element(1,2)]		=	-screenTop / (screenBottom - screenTop);
+		toNDC[element(1,1)]		=	imagePlane / (options.screenBottom - options.screenTop);
+		toNDC[element(1,2)]		=	-options.screenTop / (options.screenBottom - options.screenTop);
 		toNDC[element(1,3)]		=	0;
 
 		toNDC[element(2,0)]		=	0;
@@ -242,15 +326,15 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 		toNDC[element(3,2)]		=	1;
 		toNDC[element(3,3)]		=	0;
 	} else {
-		toNDC[element(0,0)]		=	1 / (screenRight - screenLeft);
+		toNDC[element(0,0)]		=	1 / (options.screenRight - options.screenLeft);
 		toNDC[element(0,1)]		=	0;
 		toNDC[element(0,2)]		=	0;
-		toNDC[element(0,3)]		=	-screenLeft / (screenRight - screenLeft);
+		toNDC[element(0,3)]		=	-options.screenLeft / (options.screenRight - options.screenLeft);
 
 		toNDC[element(1,0)]		=	0;
-		toNDC[element(1,1)]		=	1 / (screenBottom - screenTop);
+		toNDC[element(1,1)]		=	1 / (options.screenBottom - options.screenTop);
 		toNDC[element(1,2)]		=	0;
-		toNDC[element(1,3)]		=	-screenTop / (screenBottom - screenTop);
+		toNDC[element(1,3)]		=	-options.screenTop / (options.screenBottom - options.screenTop);
 
 		toNDC[element(2,0)]		=	0;
 		toNDC[element(2,1)]		=	0;
@@ -264,15 +348,15 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 	}
 
 	// The inverse fromNDC is the same for both perspective and orthographic projections
-	fromNDC[element(0,0)]	=	(screenRight - screenLeft);
+	fromNDC[element(0,0)]	=	(options.screenRight - options.screenLeft);
 	fromNDC[element(0,1)]	=	0;
 	fromNDC[element(0,2)]	=	0;
-	fromNDC[element(0,3)]	=	screenLeft;
+	fromNDC[element(0,3)]	=	options.screenLeft;
 
 	fromNDC[element(1,0)]	=	0;
-	fromNDC[element(1,1)]	=	(screenBottom - screenTop);
+	fromNDC[element(1,1)]	=	(options.screenBottom - options.screenTop);
 	fromNDC[element(1,2)]	=	0;
-	fromNDC[element(1,3)]	=	screenTop;
+	fromNDC[element(1,3)]	=	options.screenTop;
 
 	fromNDC[element(1,0)]	=	0;
 	fromNDC[element(1,1)]	=	0;
@@ -286,18 +370,20 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 
 
 	// Compute the fromRaster / toRaster
+	matrix	mtmp;
+
 	identitym(mtmp);
-	mtmp[element(0,0)]		=	(float) xres;
-	mtmp[element(1,1)]		=	(float) yres;
+	mtmp[element(0,0)]		=	(float) options.xres;
+	mtmp[element(1,1)]		=	(float) options.yres;
 	mulmm(toRaster,mtmp,toNDC);
 
 	identitym(mtmp);
-	mtmp[element(0,0)]		=	1 / (float) xres;
-	mtmp[element(1,1)]		=	1 / (float) yres;
+	mtmp[element(0,0)]		=	1 / (float) options.xres;
+	mtmp[element(1,1)]		=	1 / (float) options.yres;
 	mulmm(fromRaster,fromNDC,mtmp);
 
 	// Compute the world to NDC transform required by the shadow maps
-	mulmm(worldToNDC,toNDC,world->from);
+	mulmm(worldToNDC,toNDC,fromWorld);
 
 	const float	minX		=	min(pixelLeft,pixelRight);	// The extend of the rendering window on the image
 	const float	maxX		=	max(pixelLeft,pixelRight);	// plane
@@ -312,7 +398,7 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 	// Py*bottomY	+ Pz*bottomZ	+ bottomD	>=	0	&&
 	// Pz >= clipMin									&&
 	// Pz <= clipMax
-	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		leftX			=	imagePlane;
 		leftZ			=	-minX;
 		leftD			=	0;
@@ -341,16 +427,16 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 		bottomD			=	-minY;
 	}
 
-	if (displays == NULL) {
-		displays				=	new CDisplay;
-		displays->next			=	NULL;
-		displays->outDevice		=	strdup(RI_FILE);
-		displays->outName		=	strdup("ri.tif");
-		displays->outSamples	=	strdup(RI_RGBA);
+	if (options.displays == NULL) {
+		options.displays				=	new CDisplay;
+		options.displays->next			=	NULL;
+		options.displays->outDevice		=	strdup(RI_FILE);
+		options.displays->outName		=	strdup("ri.tif");
+		options.displays->outSamples	=	strdup(RI_RGBA);
 	}
 
-	marginalX			=	pixelFilterWidth / 2;
-	marginalY			=	pixelFilterHeight / 2;
+	marginalX			=	options.pixelFilterWidth / 2;
+	marginalY			=	options.pixelFilterHeight / 2;
 	marginX				=	(float) floor(marginalX);
 	marginY				=	(float) floor(marginalY);
 	marginXcoverage		=	max(marginalX - marginX,0);
@@ -384,19 +470,16 @@ CFrame::CFrame(COptions *options,CXform *x,SOCKET s,unsigned int hf) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFrame
-// Method				:	~CFrame
-// Description			:	Dtor
+// Method				:	endFrame
+// Description			:	Finish the frame
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/4/2001
-CFrame::~CFrame() {
+// Date last edited		:	10/9/2006
+void		CFrame::endFrame() {
 	int			i;
 
 	// Delete the job queue
 	if (jobAssignment	!= NULL)	delete [] jobAssignment;
-
-	// Detach from the world transform
-	world->detach();
 
 	// Finish the out images
 	for (i=0;i<numDisplays;i++) {
@@ -425,6 +508,10 @@ CFrame::~CFrame() {
 		free(deepShadowFileName);
 	}
 }
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFrame
@@ -475,10 +562,10 @@ int				CFrame::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 
 		// Has the bucket been assigned before ?
 		if (bucket(x,y) == -1) {
-			int	left	=	(x / netXBuckets)*netXBuckets;
-			int	right	=	min((left + netXBuckets),xBuckets);
-			int	top		=	(y / netYBuckets)*netYBuckets;
-			int	bottom	=	min((top + netYBuckets),yBuckets);
+			int	left	=	(x / options.netXBuckets)*options.netXBuckets;
+			int	right	=	min((left + options.netXBuckets),xBuckets);
+			int	top		=	(y / options.netYBuckets)*options.netYBuckets;
+			int	bottom	=	min((top + options.netYBuckets),yBuckets);
 			int	i,j;
 
 			// The bucket is not assigned ...
@@ -608,7 +695,7 @@ void	CFrame::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	}
 
 	if ((top == 0) && (left == 0)) {
-		if (renderTop > 0)		clear(0,0,xres,renderTop);
+		if (renderTop > 0)		clear(0,0,options.xres,renderTop);
 	}
 
 	if (left == 0) {
@@ -616,11 +703,11 @@ void	CFrame::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	}
 
 	if ((left+xpixels) == xPixels) {
-		if (renderRight < xres)	clear(renderRight,top+renderTop,xres-renderRight,ypixels);
+		if (renderRight < options.xres)	clear(renderRight,top+renderTop,options.xres-renderRight,ypixels);
 	}
 
 	if (((top+ypixels) == yPixels) && ((left+xpixels) == xPixels)) {
-		if (renderBottom < yres)	clear(0,renderBottom,xres,yres-renderBottom);
+		if (renderBottom < options.yres)	clear(0,renderBottom,options.xres,options.yres-renderBottom);
 	}
 
 
@@ -630,13 +717,13 @@ void	CFrame::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	COutput
+// Class				:	CFrame
 // Method				:	getDisplayName
 // Description			:	Create the display name
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/4/2001
-void	COutput::getDisplayName(char *out,const char *in,const char *displayType) {
+void	CFrame::getDisplayName(char *out,const char *in,const char *displayType) {
 	char		*cOut	=	out;
 	const char	*cIn	=	in;
 
@@ -661,7 +748,7 @@ void	COutput::getDisplayName(char *out,const char *in,const char *displayType) {
 
 			switch(*cIn++) {
 			case 'f':
-				sprintf(cOut,widthString,(int) frame);
+				sprintf(cOut,widthString,(int) options.frame);
 				while(*cOut != '\0')	cOut++;
 				break;
 			case 's':
@@ -709,328 +796,6 @@ void	COutput::getDisplayName(char *out,const char *in,const char *displayType) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
-// Method				:	computeDisplayData
-// Description			:	Compute the display data
-// Return Value			:
-// Comments				:
-// Date last edited		:	7/4/2001
-void	CFrame::computeDisplayData() {
-	CDisplay		*cDisplay;
-	CDisplayChannel *oChannel;
-	char			displayName[OS_MAX_PATH_LENGTH];
-	char			deviceFile[OS_MAX_PATH_LENGTH];
-	char			*sampleDefinition,*sampleName,*nextComma,*tmp;
-	int				i,j,k,s,t,isNewChannel;
-
-	// mark all channels as unallocated
-	currentRenderer->resetDisplayChannelUsage();
-	
-	for (i=0,cDisplay=displays;cDisplay!=NULL;i++,cDisplay=cDisplay->next);
-
-	datas					=	new CDisplayData[i];
-	j						=	0;
-	numSamples				=	5;	// rgbaz
-	numExtraSamples			=	0;
-	numDisplays				=	0;
-	numExtraChannels		=	0;
-	additionalParameters	=	0;
-	numActiveDisplays		=	0;
-	deepShadowFile			=	NULL;
-	deepShadowIndex			=	NULL;
-
-	for (cDisplay=displays;cDisplay!=NULL;cDisplay=cDisplay->next) {
-		datas[numDisplays].display		=	cDisplay;
-		datas[numDisplays].displayName	=	NULL;
-		datas[numDisplays].numChannels	=	0;
-		datas[numDisplays].channels		=	NULL;
-		datas[numDisplays].numSamples	=	0;
-		
-		int dspError					=	FALSE;
-		int dspNumExtraChannels			=	0;
-		int dspNumSamples				=	0;
-		int dspNumExtraSamples			=	0;
-		
-		// work out how many channels to expect (at least one)
-		int dspNumChannels = 1;
-		sampleDefinition = cDisplay->outSamples;
-		while ((sampleDefinition = strchr(sampleDefinition,',')) != NULL) {
-			sampleDefinition++;
-			dspNumChannels++;
-		}
-		datas[numDisplays].channels = new CDisplayChannel[dspNumChannels];
-		
-		// parse the channels / sample types
-		sampleDefinition = strdup(cDisplay->outSamples); // duplicate to tokenize
-		nextComma = sampleName = sampleDefinition;
-		dspNumChannels = 0;
-		do {
-			// parse to next comma, remove spaces
-			nextComma = strchr(sampleName,',');
-			if (nextComma != NULL) {
-				for (tmp=nextComma-1;isspace(*tmp)&&(tmp>sampleName);tmp--) *tmp = '\0';
-				*nextComma++ = '\0';
-				while (isspace(*nextComma)) nextComma++;
-			}
-			while (isspace(*sampleName)) sampleName++;
-			
-			// is the sample name a channel we know about?
-			oChannel = currentRenderer->retrieveDisplayChannel(sampleName);
-			if (oChannel != NULL) {
-				// it's a predefined / already seen channel
-			
-				if (oChannel->variable != NULL) {
-					// variable is NULL only for RGBAZ channels
-					if (hiderFlags & HIDER_RGBAZ_ONLY) {
-						error(CODE_BADTOKEN,"Hider %s can not handle display channels\n",hider);
-						dspError = TRUE;
-						break;
-					}	
-					
-					// Make sure the variable is global
-					if (oChannel->outType == -1) {
-						currentRenderer->makeGlobalVariable(oChannel->variable);
-						oChannel->outType = oChannel->variable->entry;
-					}
-				}
-			} else {
-				// it's an old-style AOV
-				
-				if (hiderFlags & HIDER_RGBAZ_ONLY) {
-					error(CODE_BADTOKEN,"Hider %s can not handle arbitrary output variables\n",hider);
-					dspError = TRUE;
-					break;
-				} else {				
-					CVariable	*cVar		=	currentRenderer->retrieveVariable(sampleName);
-					
-					// if it's an inline declaration but it's not defined yet, declare it
-					if (cVar == NULL) {
-						cVar = currentRenderer->declareVariable(NULL,sampleName);
-					}
-	
-					if (cVar != NULL) {
-						// Make sure the variable is global
-						if (cVar->storage != STORAGE_GLOBAL) {
-							currentRenderer->makeGlobalVariable(cVar);
-						} else if (cVar->storage == STORAGE_PARAMETER || cVar->storage == STORAGE_MUTABLEPARAMETER) {
-							error(CODE_BADTOKEN,"Unable to find output variable or display channel \"%s\" (seems to be a parameter?)\n",sampleName);
-							dspError = TRUE;
-							break;
-						}
-					} else {
-						error(CODE_BADTOKEN,"Unable to find output variable or display channel \"%s\"\n",sampleName);
-						dspError = TRUE;
-						break;
-					}
-										
-					// now create a channel for the variable
-					oChannel = currentRenderer->declareDisplayChannel(cVar);
-					
-					if (oChannel == NULL) {
-						error(CODE_BADTOKEN,"variable \"%s\" clashes with a display channel\n",cVar->name);
-						dspError = TRUE;
-						break;
-					}
-				}
-			}
-			
-			// record channel if it's new
-			isNewChannel = FALSE;
-			if (oChannel->sampleStart == -1) {
-				// sampleStart is -1 only for channels not yet allocated
-				oChannel->sampleStart		=	numSamples + dspNumSamples;
-				dspNumSamples				+=	oChannel->numSamples;
-				dspNumExtraSamples			+=	oChannel->numSamples;
-				additionalParameters		|=	oChannel->variable->usageMarker;
-				dspNumExtraChannels++;
-				isNewChannel = TRUE;
-			}
-			memcpy(datas[numDisplays].channels + dspNumChannels,oChannel,sizeof(CDisplayChannel));
-			if (oChannel->fill) {
-				// ensure a deep copy
-				datas[numDisplays].channels[dspNumChannels].fill = (float*) malloc(sizeof(float)*oChannel->numSamples);
-				for(s=0;s<datas[numDisplays].channels[dspNumChannels].numSamples;s++)
-					datas[numDisplays].channels[dspNumChannels].fill[s] = oChannel->fill[s];
-			}
-			if (isNewChannel == FALSE) {
-				// mark this channel as a duplicate
-				datas[numDisplays].channels[dspNumChannels].variable = NULL;
-			}
-			
-			datas[numDisplays].numSamples		+= oChannel->numSamples;
-			dspNumChannels++;
-			
-			sampleName = nextComma;
-		} while((sampleName != NULL) && (*sampleName != '\0'));
-		
-		free(sampleDefinition);
-		
-		if (dspError) {
-			error(CODE_BADTOKEN,"display \"%s\" disabled\n",cDisplay->outName);
-			delete [] datas[numDisplays].channels;
-			continue;
-		}
-		
-		// Sum up if we successfully allocated display
-		datas[numDisplays].numChannels	=	dspNumChannels;
-		numSamples						+=	dspNumSamples;
-		numExtraSamples					+=	dspNumExtraSamples;
-		numExtraChannels				+=	dspNumExtraChannels;
-
-		// finally deal with the display initialization
-		getDisplayName(displayName,cDisplay->outName,cDisplay->outSamples);
-		
-		// save the computed display name
-		datas[numDisplays].displayName = strdup(displayName);
-		
-		char * outDevice = cDisplay->outDevice;
-		if (strcmp(outDevice,"shadow") == 0)	outDevice	= 	RI_FILE;
-		if (strcmp(outDevice,"zfile") == 0)		outDevice	=	RI_FILE;
-		if (strcmp(outDevice,"tiff") == 0)		outDevice	=	RI_FILE;
-			
-		if (strcmp(outDevice,"tsm") == 0) {
-			int					j;
-			CDeepShadowHeader	header;
-
-			// The TSM is hardcoded
-			datas[numDisplays].module	=	NULL;
-			datas[numDisplays].handle	=	NULL;
-
-			// Set up the file header
-			header.xres		=	xres;
-			header.yres		=	yres;
-			header.xTiles	=	xBuckets;
-			header.yTiles	=	yBuckets;
-			header.tileSize	=	bucketWidth;
-			for (header.tileShift=1;(1 << header.tileShift) < bucketWidth;header.tileShift++);
-			movmm(header.toNDC,worldToNDC);
-
-			// The sanity check
-			if ((1 << header.tileShift) != bucketWidth) {
-				error(CODE_LIMIT,"Bucket width must be a power of 2 for tsm (%d).\n",bucketWidth);
-			} else {
-				if (bucketWidth != bucketHeight) {
-					error(CODE_LIMIT,"Bucket width and height must be same for tsm (%d,%d).\n",bucketWidth,bucketHeight);
-				} else {
-					if (strcmp(hider,"stochastic") != 0) {
-						error(CODE_LIMIT,"Hider must be stochastic / hidden for tsm.\n");
-					} else {
-						if (deepShadowFile != NULL) {
-							error(CODE_LIMIT,"There can only be one tsm output.\n");
-						} else {
-							if (netClient != INVALID_SOCKET) {
-								char tempTsmName[OS_MAX_PATH_LENGTH];
-								
-								if (!osFileExists(temporaryPath)) {
-									osCreateDir(temporaryPath);
-								}
-								
-								// need read and write
-								osTempname(temporaryPath,"rndr",tempTsmName);
-								deepShadowFile		=	ropen(tempTsmName,"w+b",fileTransparencyShadow);
-								
-								// register temporary for deletion
-								currentRenderer->registerFrameTemporary(tempTsmName,TRUE);
-							} else {
-								deepShadowFile		=	ropen(displayName,"wb",fileTransparencyShadow);
-							}
-	
-							if (deepShadowFile != NULL) {
-								numActiveDisplays++;
-								flags						|=	OPTIONS_FLAGS_DEEP_SHADOW_RENDERING;
-	
-								deepShadowIndex				=	new int[xBuckets*yBuckets*2];
-								deepShadowFileName			=	strdup(displayName);
-								
-								// Write the header
-								fwrite(&header,sizeof(CDeepShadowHeader),1,deepShadowFile);
-	
-								// Save the index start
-								deepShadowIndexStart	=	ftell(deepShadowFile);
-	
-								// Write the dummy index
-								fwrite(deepShadowIndex,sizeof(int),xBuckets*yBuckets*2,deepShadowFile);
-	
-								// Parse the tsm parameters
-								for (j=0;j<cDisplay->numParameters;j++) {
-									if (strcmp(cDisplay->parameters[j].name,"threshold") == 0) {
-										float	*val	=	(float *) cDisplay->parameters[j].data;
-	
-										tsmThreshold	=	val[0];
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		} else if (netClient == INVALID_SOCKET) {
-			if (currentRenderer->locateFileEx(deviceFile,outDevice,osModuleExtension,displayPath)) {
-				datas[numDisplays].module		=	osLoadModule(deviceFile);
-				if (datas[numDisplays].module != NULL) {
-					datas[numDisplays].start		=	(TDisplayStartFunction)		osResolve(datas[numDisplays].module,"displayStart");
-					datas[numDisplays].data			=	(TDisplayDataFunction)		osResolve(datas[numDisplays].module,"displayData");
-					datas[numDisplays].rawData		=	(TDisplayRawDataFunction)	osResolve(datas[numDisplays].module,"displayRawData");
-					datas[numDisplays].finish		=	(TDisplayFinishFunction)	osResolve(datas[numDisplays].module,"displayFinish");
-
-					if ((datas[numDisplays].start == NULL) || (datas[numDisplays].data == NULL) || (datas[numDisplays].finish == NULL)) {
-						error(CODE_SYSTEM,"The module %s has missing implementation\n",deviceFile);
-						osUnloadModule(datas[numDisplays].module);
-						datas[numDisplays].module	=	NULL;
-					} else {
-						currentDisplay				=	cDisplay;
-						datas[numDisplays].handle	=	datas[numDisplays].start(displayName,xres,yres,datas[numDisplays].numSamples,cDisplay->outSamples,findParameter);
-							//GSHTODO: above sample names are now quite incorrect
-						if (datas[numDisplays].handle != NULL) {
-							numActiveDisplays++;
-						} else {
-							osUnloadModule(datas[numDisplays].module);
-							datas[numDisplays].module	=	NULL;
-						}
-					}
-				} else {
-					datas[numDisplays].module		=	NULL;
-					error(CODE_SYSTEM,"Unable to open out device \"%s\" (error: %s)\n",cDisplay->outDevice,osModuleError());
-				}
-			} else {
-				datas[numDisplays].module		=	NULL;
-				error(CODE_SYSTEM,"Unable to find out device \"%s\"\n",cDisplay->outDevice);
-			}
-		} else {
-			datas[numDisplays].module	=	NULL;
-			datas[numDisplays].handle	=	NULL;
-		}
-
-		numDisplays++;
-	}
-	
-	// copy the sample and sampled defaults order for fast access
-	sampleOrder		=	new int[numExtraChannels*2];
-	sampleDefaults	=	new float[numExtraSamples];
-	for (i=0,k=0,t=0;i<numDisplays;i++) {
-		for (j=0;j<datas[i].numChannels;j++) {
-			// skip standard channels
-			if (datas[i].channels[j].outType == -1) continue;
-			// skip duplicate channels
-			if (datas[i].channels[j].variable == NULL) continue;
-			
-			if (datas[i].channels[j].fill) {
-				for(s=0;s<datas[i].channels[j].numSamples;s++)
-					sampleDefaults[t+s] = datas[i].channels[j].fill[s];
-			} else {
-				for(s=0;s<datas[i].channels[j].numSamples;s++) sampleDefaults[t+s] = 0;
-			}
-			t += datas[i].channels[j].numSamples;
-			
-			sampleOrder[k++] = datas[i].channels[j].outType;
-			sampleOrder[k++] = datas[i].channels[j].numSamples;
-		}
-	}
-	assert(k == 2*numExtraChannels);
-
-	if (numActiveDisplays == 0) hiderFlags	|=	HIDER_BREAK;
-}
 
 
 
@@ -1163,9 +928,9 @@ unsigned int			CFrame::clipCode(const float *P) {
 		code	|=	CLIP_BOTTOM;
 	}
 
-	if (P[COMP_Z] < clipMin)	code	|=	CLIP_NEAR;
+	if (P[COMP_Z] < options.clipMin)	code	|=	CLIP_NEAR;
 
-	if (P[COMP_Z] > clipMax)	code	|=	CLIP_FAR;
+	if (P[COMP_Z] > options.clipMax)	code	|=	CLIP_FAR;
 
 	return	code;
 }
@@ -1177,5 +942,389 @@ unsigned int			CFrame::clipCode(const float *P) {
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFrame
+// Method				:	render
+// Description			:	Add an object into the scene
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/9/2006
+void			CFrame::render(CShadingContext *context,CObject *cObject,const float *bmin,const float *bmax) {
+	CAttributes	*cAttributes	=	cObject->attributes;
 
-*/
+	// Assign the photon map is necessary
+	if (cAttributes->globalMapName != NULL) {
+		cAttributes->globalMap	=	getPhotonMap(cAttributes->globalMapName);
+		cAttributes->globalMap->attach();
+	}
+
+	if (cAttributes->causticMapName != NULL) {
+		cAttributes->causticMap	=	getPhotonMap(cAttributes->causticMapName);
+		cAttributes->causticMap->attach();
+	}
+
+	if ((cAttributes->globalMap != NULL) || (cAttributes->causticMap != NULL)) {
+		if (dirtyAttributes == NULL) dirtyAttributes	=	new CArray<CAttributes *>;
+
+		cAttributes->attach();
+		dirtyAttributes->push(cAttributes);
+	}
+
+	// Update the world bounding box
+	addBox(worldBmin,worldBmax,bmin);
+	addBox(worldBmin,worldBmax,bmax);
+
+	// Tesselate the object if applicable
+	if (cObject->attributes->flags & raytracingFlags) {
+		cObject->tesselate(context);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFrame
+// Method				:	remove
+// Description			:	Remove a delayed object
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/9/2006
+void			CFrame::remove(CTracable *cObject) {
+	if (hierarchy != NULL) {
+		vector	bmin,bmax;
+
+		// Bound the object
+		cObject->bound(bmin,bmax);
+
+		hierarchy->remove(cObject,bmin,bmax);
+	}
+}
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFrame
+// Method				:	computeDisplayData
+// Description			:	Compute the display data
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+void	CFrame::computeDisplayData() {
+	CDisplay		*cDisplay;
+	CDisplayChannel *oChannel;
+	char			displayName[OS_MAX_PATH_LENGTH];
+	char			deviceFile[OS_MAX_PATH_LENGTH];
+	char			*sampleDefinition,*sampleName,*nextComma,*tmp;
+	int				i,j,k,s,t,isNewChannel;
+
+	// mark all channels as unallocated
+	currentRenderer->resetDisplayChannelUsage();
+	
+	for (i=0,cDisplay=options.displays;cDisplay!=NULL;i++,cDisplay=cDisplay->next);
+
+	datas					=	new CDisplayData[i];
+	j						=	0;
+	numSamples				=	5;	// rgbaz
+	numExtraSamples			=	0;
+	numDisplays				=	0;
+	numExtraChannels		=	0;
+	additionalParameters	=	0;
+	numActiveDisplays		=	0;
+	deepShadowFile			=	NULL;
+	deepShadowIndex			=	NULL;
+
+	for (cDisplay=options.displays;cDisplay!=NULL;cDisplay=cDisplay->next) {
+		datas[numDisplays].display		=	cDisplay;
+		datas[numDisplays].displayName	=	NULL;
+		datas[numDisplays].numChannels	=	0;
+		datas[numDisplays].channels		=	NULL;
+		datas[numDisplays].numSamples	=	0;
+		
+		int dspError					=	FALSE;
+		int dspNumExtraChannels			=	0;
+		int dspNumSamples				=	0;
+		int dspNumExtraSamples			=	0;
+		
+		// work out how many channels to expect (at least one)
+		int dspNumChannels = 1;
+		sampleDefinition = cDisplay->outSamples;
+		while ((sampleDefinition = strchr(sampleDefinition,',')) != NULL) {
+			sampleDefinition++;
+			dspNumChannels++;
+		}
+		datas[numDisplays].channels = new CDisplayChannel[dspNumChannels];
+		
+		// parse the channels / sample types
+		sampleDefinition = strdup(cDisplay->outSamples); // duplicate to tokenize
+		nextComma = sampleName = sampleDefinition;
+		dspNumChannels = 0;
+		do {
+			// parse to next comma, remove spaces
+			nextComma = strchr(sampleName,',');
+			if (nextComma != NULL) {
+				for (tmp=nextComma-1;isspace(*tmp)&&(tmp>sampleName);tmp--) *tmp = '\0';
+				*nextComma++ = '\0';
+				while (isspace(*nextComma)) nextComma++;
+			}
+			while (isspace(*sampleName)) sampleName++;
+			
+			// is the sample name a channel we know about?
+			oChannel = currentRenderer->retrieveDisplayChannel(sampleName);
+			if (oChannel != NULL) {
+				// it's a predefined / already seen channel
+			
+				if (oChannel->variable != NULL) {
+					// variable is NULL only for RGBAZ channels
+					if (hiderFlags & HIDER_RGBAZ_ONLY) {
+						error(CODE_BADTOKEN,"Hider %s can not handle display channels\n",options.hider);
+						dspError = TRUE;
+						break;
+					}	
+					
+					// Make sure the variable is global
+					if (oChannel->outType == -1) {
+						currentRenderer->makeGlobalVariable(oChannel->variable);
+						oChannel->outType = oChannel->variable->entry;
+					}
+				}
+			} else {
+				// it's an old-style AOV
+				
+				if (hiderFlags & HIDER_RGBAZ_ONLY) {
+					error(CODE_BADTOKEN,"Hider %s can not handle arbitrary output variables\n",options.hider);
+					dspError = TRUE;
+					break;
+				} else {				
+					CVariable	*cVar		=	currentRenderer->retrieveVariable(sampleName);
+					
+					// if it's an inline declaration but it's not defined yet, declare it
+					if (cVar == NULL) {
+						cVar = currentRenderer->declareVariable(NULL,sampleName);
+					}
+	
+					if (cVar != NULL) {
+						// Make sure the variable is global
+						if (cVar->storage != STORAGE_GLOBAL) {
+							currentRenderer->makeGlobalVariable(cVar);
+						} else if (cVar->storage == STORAGE_PARAMETER || cVar->storage == STORAGE_MUTABLEPARAMETER) {
+							error(CODE_BADTOKEN,"Unable to find output variable or display channel \"%s\" (seems to be a parameter?)\n",sampleName);
+							dspError = TRUE;
+							break;
+						}
+					} else {
+						error(CODE_BADTOKEN,"Unable to find output variable or display channel \"%s\"\n",sampleName);
+						dspError = TRUE;
+						break;
+					}
+										
+					// now create a channel for the variable
+					oChannel = currentRenderer->declareDisplayChannel(cVar);
+					
+					if (oChannel == NULL) {
+						error(CODE_BADTOKEN,"variable \"%s\" clashes with a display channel\n",cVar->name);
+						dspError = TRUE;
+						break;
+					}
+				}
+			}
+			
+			// record channel if it's new
+			isNewChannel = FALSE;
+			if (oChannel->sampleStart == -1) {
+				// sampleStart is -1 only for channels not yet allocated
+				oChannel->sampleStart		=	numSamples + dspNumSamples;
+				dspNumSamples				+=	oChannel->numSamples;
+				dspNumExtraSamples			+=	oChannel->numSamples;
+				additionalParameters		|=	oChannel->variable->usageMarker;
+				dspNumExtraChannels++;
+				isNewChannel = TRUE;
+			}
+			memcpy(datas[numDisplays].channels + dspNumChannels,oChannel,sizeof(CDisplayChannel));
+			if (oChannel->fill) {
+				// ensure a deep copy
+				datas[numDisplays].channels[dspNumChannels].fill = (float*) malloc(sizeof(float)*oChannel->numSamples);
+				for(s=0;s<datas[numDisplays].channels[dspNumChannels].numSamples;s++)
+					datas[numDisplays].channels[dspNumChannels].fill[s] = oChannel->fill[s];
+			}
+			if (isNewChannel == FALSE) {
+				// mark this channel as a duplicate
+				datas[numDisplays].channels[dspNumChannels].variable = NULL;
+			}
+			
+			datas[numDisplays].numSamples		+= oChannel->numSamples;
+			dspNumChannels++;
+			
+			sampleName = nextComma;
+		} while((sampleName != NULL) && (*sampleName != '\0'));
+		
+		free(sampleDefinition);
+		
+		if (dspError) {
+			error(CODE_BADTOKEN,"display \"%s\" disabled\n",cDisplay->outName);
+			delete [] datas[numDisplays].channels;
+			continue;
+		}
+		
+		// Sum up if we successfully allocated display
+		datas[numDisplays].numChannels	=	dspNumChannels;
+		numSamples						+=	dspNumSamples;
+		numExtraSamples					+=	dspNumExtraSamples;
+		numExtraChannels				+=	dspNumExtraChannels;
+
+		// finally deal with the display initialization
+		getDisplayName(displayName,cDisplay->outName,cDisplay->outSamples);
+		
+		// save the computed display name
+		datas[numDisplays].displayName = strdup(displayName);
+		
+		char * outDevice = cDisplay->outDevice;
+		if (strcmp(outDevice,"shadow") == 0)	outDevice	= 	RI_FILE;
+		if (strcmp(outDevice,"zfile") == 0)		outDevice	=	RI_FILE;
+		if (strcmp(outDevice,"tiff") == 0)		outDevice	=	RI_FILE;
+			
+		if (strcmp(outDevice,"tsm") == 0) {
+			int					j;
+			CDeepShadowHeader	header;
+
+			// The TSM is hardcoded
+			datas[numDisplays].module	=	NULL;
+			datas[numDisplays].handle	=	NULL;
+
+			// Set up the file header
+			header.xres		=	options.xres;
+			header.yres		=	options.yres;
+			header.xTiles	=	xBuckets;
+			header.yTiles	=	yBuckets;
+			header.tileSize	=	options.bucketWidth;
+			for (header.tileShift=1;(1 << header.tileShift) < options.bucketWidth;header.tileShift++);
+			movmm(header.toNDC,worldToNDC);
+
+			// The sanity check
+			if ((1 << header.tileShift) != options.bucketWidth) {
+				error(CODE_LIMIT,"Bucket width must be a power of 2 for tsm (%d).\n",options.bucketWidth);
+			} else {
+				if (options.bucketWidth != options.bucketHeight) {
+					error(CODE_LIMIT,"Bucket width and height must be same for tsm (%d,%d).\n",options.bucketWidth,options.bucketHeight);
+				} else {
+					if (strcmp(options.hider,"stochastic") != 0) {
+						error(CODE_LIMIT,"Hider must be stochastic / hidden for tsm.\n");
+					} else {
+						if (deepShadowFile != NULL) {
+							error(CODE_LIMIT,"There can only be one tsm output.\n");
+						} else {
+							if (netClient != INVALID_SOCKET) {
+								char tempTsmName[OS_MAX_PATH_LENGTH];
+								
+								if (!osFileExists(options.temporaryPath)) {
+									osCreateDir(options.temporaryPath);
+								}
+								
+								// need read and write
+								osTempname(options.temporaryPath,"rndr",tempTsmName);
+								deepShadowFile		=	ropen(tempTsmName,"w+b",fileTransparencyShadow);
+								
+								// register temporary for deletion
+								currentRenderer->registerFrameTemporary(tempTsmName,TRUE);
+							} else {
+								deepShadowFile		=	ropen(displayName,"wb",fileTransparencyShadow);
+							}
+	
+							if (deepShadowFile != NULL) {
+								numActiveDisplays++;
+								options.flags						|=	OPTIONS_FLAGS_DEEP_SHADOW_RENDERING;
+	
+								deepShadowIndex				=	new int[xBuckets*yBuckets*2];
+								deepShadowFileName			=	strdup(displayName);
+								
+								// Write the header
+								fwrite(&header,sizeof(CDeepShadowHeader),1,deepShadowFile);
+	
+								// Save the index start
+								deepShadowIndexStart	=	ftell(deepShadowFile);
+	
+								// Write the dummy index
+								fwrite(deepShadowIndex,sizeof(int),xBuckets*yBuckets*2,deepShadowFile);
+	
+								// Parse the tsm parameters
+								for (j=0;j<cDisplay->numParameters;j++) {
+									if (strcmp(cDisplay->parameters[j].name,"threshold") == 0) {
+										float	*val	=	(float *) cDisplay->parameters[j].data;
+	
+										options.tsmThreshold	=	val[0];
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if (netClient == INVALID_SOCKET) {
+			if (currentRenderer->locateFileEx(deviceFile,outDevice,osModuleExtension,options.displayPath)) {
+				datas[numDisplays].module		=	osLoadModule(deviceFile);
+				if (datas[numDisplays].module != NULL) {
+					datas[numDisplays].start		=	(TDisplayStartFunction)		osResolve(datas[numDisplays].module,"displayStart");
+					datas[numDisplays].data			=	(TDisplayDataFunction)		osResolve(datas[numDisplays].module,"displayData");
+					datas[numDisplays].rawData		=	(TDisplayRawDataFunction)	osResolve(datas[numDisplays].module,"displayRawData");
+					datas[numDisplays].finish		=	(TDisplayFinishFunction)	osResolve(datas[numDisplays].module,"displayFinish");
+
+					if ((datas[numDisplays].start == NULL) || (datas[numDisplays].data == NULL) || (datas[numDisplays].finish == NULL)) {
+						error(CODE_SYSTEM,"The module %s has missing implementation\n",deviceFile);
+						osUnloadModule(datas[numDisplays].module);
+						datas[numDisplays].module	=	NULL;
+					} else {
+						currentDisplay				=	cDisplay;
+						datas[numDisplays].handle	=	datas[numDisplays].start(displayName,options.xres,options.yres,datas[numDisplays].numSamples,cDisplay->outSamples,findParameter);
+							//GSHTODO: above sample names are now quite incorrect
+						if (datas[numDisplays].handle != NULL) {
+							numActiveDisplays++;
+						} else {
+							osUnloadModule(datas[numDisplays].module);
+							datas[numDisplays].module	=	NULL;
+						}
+					}
+				} else {
+					datas[numDisplays].module		=	NULL;
+					error(CODE_SYSTEM,"Unable to open out device \"%s\" (error: %s)\n",cDisplay->outDevice,osModuleError());
+				}
+			} else {
+				datas[numDisplays].module		=	NULL;
+				error(CODE_SYSTEM,"Unable to find out device \"%s\"\n",cDisplay->outDevice);
+			}
+		} else {
+			datas[numDisplays].module	=	NULL;
+			datas[numDisplays].handle	=	NULL;
+		}
+
+		numDisplays++;
+	}
+	
+	// copy the sample and sampled defaults order for fast access
+	sampleOrder		=	new int[numExtraChannels*2];
+	sampleDefaults	=	new float[numExtraSamples];
+	for (i=0,k=0,t=0;i<numDisplays;i++) {
+		for (j=0;j<datas[i].numChannels;j++) {
+			// skip standard channels
+			if (datas[i].channels[j].outType == -1) continue;
+			// skip duplicate channels
+			if (datas[i].channels[j].variable == NULL) continue;
+			
+			if (datas[i].channels[j].fill) {
+				for(s=0;s<datas[i].channels[j].numSamples;s++)
+					sampleDefaults[t+s] = datas[i].channels[j].fill[s];
+			} else {
+				for(s=0;s<datas[i].channels[j].numSamples;s++) sampleDefaults[t+s] = 0;
+			}
+			t += datas[i].channels[j].numSamples;
+			
+			sampleOrder[k++] = datas[i].channels[j].outType;
+			sampleOrder[k++] = datas[i].channels[j].numSamples;
+		}
+	}
+	assert(k == 2*numExtraChannels);
+
+	if (numActiveDisplays == 0) hiderFlags	|=	HIDER_BREAK;
+}

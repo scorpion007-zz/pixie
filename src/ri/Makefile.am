@@ -19,6 +19,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				execute.cpp \
 				executeMisc.cpp \
 				fileResource.cpp \
+				frame.cpp \
 				hcshader.cpp \
 				hierarchy.cpp \
 				implicitSurface.cpp \
@@ -31,7 +32,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				object.cpp \
 				occlusion.cpp \
 				options.cpp \
-				output.cpp \
 				patches.cpp \
 				patchgrid.cpp \
 				photon.cpp \

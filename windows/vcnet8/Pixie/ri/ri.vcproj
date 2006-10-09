@@ -411,10 +411,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\output.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\patches.cpp"
 				>
 			</File>
@@ -690,10 +686,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\options.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\output.h"
 				>
 			</File>
 			<File

@@ -32,7 +32,6 @@
 #define REYES_H
 
 #include "common/global.h"
-#include "output.h"
 #include "shading.h"
 #include "object.h"
 
@@ -271,7 +270,7 @@ private:
 	int							tbucketBottom;
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	COutput
+				// Class				:	CReyes
 				// Method				:	distance2samples
 				// Description			:	Project distances into the sample space
 				// Return Value			:
@@ -290,7 +289,7 @@ private:
 								}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	COutput
+				// Class				:	CReyes
 				// Method				:	camera2samples
 				// Description			:	Project from camera space into the sample space
 				// Return Value			:
@@ -311,7 +310,7 @@ private:
 								}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	COutput
+				// Class				:	CReyes
 				// Method				:	camera2samples
 				// Description			:	Project from camera space into the sample space
 				// Return Value			:

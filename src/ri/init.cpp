@@ -37,7 +37,6 @@
 #include "shading.h"
 #include "stats.h"
 #include "memory.h"
-#include "output.h"
 #include "error.h"
 
 

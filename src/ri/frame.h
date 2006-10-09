@@ -34,8 +34,6 @@
 #include "common/global.h"
 #include "common/containers.h"
 #include "options.h"
-#include "ray.h"
-#include "dsply.h"
 
 // Forward definitions
 class CDisplayChannel;
@@ -63,6 +61,17 @@ const	unsigned	int	CLIP_NEAR					=	16;
 const	unsigned	int	CLIP_FAR					=	32;
 
 
+class	CHierarchy;
+class	CObject;
+class	CTracable;
+class	CRemoteChannel;
+class	CAttributes;
+class	CTriangle;
+class	CTexture;
+class	CEnvironment;
+class	CSurface;
+class	CPhotonMap;
+class	CCache;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFrame
@@ -72,13 +81,20 @@ const	unsigned	int	CLIP_FAR					=	32;
 class CFrame : public COptions {
 public:
 								// Frame functions
-		void					beginFrame(const COptions *options,const CXform *xform,SOCKET client);
-		void					endFrame();
-		void					commit(int,int,int,int,float *);
-		int						advanceBucket(int,int &,int &,int &,int &);		// Find the next bucket to render for network rendering
-		int						inFrustrum(const float *,const float *);		// Return TRUE if the box is in the frustrum
-		int						inFrustrum(const float *);						// Return TRUE if the point is in the frustrum
-		unsigned int			clipCode(const float *);						// Returns the clipping code
+		static	void			beginFrame(const COptions *options,const CXform *xform,SOCKET client,unsigned int hiderFlags);
+		static	void			endFrame();
+
+								// Bucket/output management
+		static void				commit(int,int,int,int,float *);
+		static int				advanceBucket(int,int &,int &,int &,int &);			// Find the next bucket to render for network rendering
+		static void				clear(int,int,int,int);								// Clear a window
+		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
+		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
+
+								// Frustrum culling
+		static int				inFrustrum(const float *,const float *);			// Return TRUE if the box is in the frustrum
+		static int				inFrustrum(const float *);							// Return TRUE if the point is in the frustrum
+		static unsigned int		clipCode(const float *);							// Returns the clipping code
 
 								// Some inline functions defined below
 		void					camera2pixels(float *P);
@@ -90,8 +106,73 @@ public:
 		float					minCocPixels(float z1, float z2);
 		void					advanceBucket();
 
-		static	CXform			*world;											// The world transform
-		static	matrix			fromNDC,toNDC;									// Some misc matrices
+								// Functions to add/remove objects from the frame
+		static	void			render(CShadingContext *context,CObject *object,const float *bmin,const float *bmax);	// Called to insert an object into the scene
+		static	void			remove(CTracable *);											// Called to remove a delayed object from the scene
+
+								////////////////////////////////////////////////////////////////////
+								// The options
+								////////////////////////////////////////////////////////////////////
+		static	COptions		options;		
+
+								////////////////////////////////////////////////////////////////////
+								// Variable managements
+								////////////////////////////////////////////////////////////////////
+		static	CVariable		**globalVariables;										// The array of global variables
+		static	int				numGlobalVariables;										// The current number of global variables
+		static	int				maxGlobalVariables;										// Maximum number of variables allocated
+
+								////////////////////////////////////////////////////////////////////
+								// Remote channels
+								////////////////////////////////////////////////////////////////////
+		static	CDictionary<const char *,CRemoteChannel *>		*declaredRemoteChannels;	// Known remote channel lookup
+		static	CArray<CRemoteChannel *>						*remoteChannels;			// all known channels
+
+								////////////////////////////////////////////////////////////////////
+								// Misc stuff that we touched while rendering that needs cleaning
+								////////////////////////////////////////////////////////////////////
+		static	CArray<CAttributes *>							*dirtyAttributes;		// The list of attributes that need to be cleaned after the rendering
+		static	CArray<CProgrammableShaderInstance *>			*dirtyInstances;		// The list of shader instances that need cleanup
+
+								////////////////////////////////////////////////////////////////////
+								// Misc functions for resource management
+								////////////////////////////////////////////////////////////////////
+		static	CDictionary<const char *,CFileResource *>		*loadedFiles;			// This holds the files loaded so far
+
+		static	CTexture		*getTexture(const char *);								// Load a texture
+		static	CEnvironment	*getEnvironment(const char *);							// Load an environment
+		static	CPhotonMap		*getPhotonMap(const char *);							// Load a photon map
+		static	CCache			*getCache(const char *,const char *);					// Load a photon map
+		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
+		static	CTexture3d		*getTexture3d(const char*,int,const char*,const char*);	// Load a point cloud or brickmap
+
+		
+								////////////////////////////////////////////////////////////////////
+								// Raytracing related functions
+								////////////////////////////////////////////////////////////////////
+		static	unsigned int			raytracingFlags;								// The raytracing flags that hold the combination that needs to be raytraced
+		static	CHierarchy				*hierarchy;										// The raytracing hierarchy
+		static	CArray<CTriangle *>		*triangles;										// The array of triangles
+		static	CArray<CSurface *>		*raytraced;										// The list of raytraced objects
+		static	CArray<CTracable *>		*tracables;										// The array of raytracable objects
+
+
+								////////////////////////////////////////////////////////////////////
+								// Remote channel stuff (in remoteChannel.cpp)
+								////////////////////////////////////////////////////////////////////
+		static	int				requestRemoteChannel(CRemoteChannel *);					// request a remote channel (server requests from client)
+		static	int				processChannelRequest(int,SOCKET);						// service request for a remote channel in client
+		static	void			sendBucketDataChannels(int x,int y);					// send all per-bucket remote channels
+		static	void			recvBucketDataChannels(SOCKET s,int x,int y);			// receive one per-bucket remote channel
+		static	void			sendFrameDataChannels();								// send all per-frame remote channels
+		static	void			recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
+
+								////////////////////////////////////////////////////////////////////
+								// Some interesting precomputed quantities
+								////////////////////////////////////////////////////////////////////
+		static	vector			worldBmin,worldBmax;							// The bounding box of the world
+		static	matrix			fromWorld,toWorld;								// Some misc matrices
+		static	matrix			fromNDC,toNDC;
 		static	matrix			fromRaster,toRaster;
 		static	matrix			fromScreen,toScreen;
 		static	matrix			worldToNDC;										// World to NDC matrix
@@ -139,9 +220,7 @@ public:
 		static	int				deepShadowIndexStart;							// The offset in the file for the indices
 		static	char			*deepShadowFileName;
 
-		static	void			clear(int,int,int,int);								// Clear a window
-		static	void			dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
-		static	void			getDisplayName(char *,const char *,const char *);	// Retrieve the display name
+
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CDisplayData
@@ -170,6 +249,8 @@ public:
 		static	float			*sampleDefaults;	// default values for each channel
 		static	int				numExtraChannels;	
 
+
+protected:
 		static	void			computeDisplayData();
 };
 

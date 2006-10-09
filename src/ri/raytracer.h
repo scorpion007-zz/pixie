@@ -35,7 +35,6 @@
 #include "common/global.h"
 #include "object.h"
 #include "options.h"
-#include "output.h"
 #include "hierarchy.h"
 #include "shading.h"
 

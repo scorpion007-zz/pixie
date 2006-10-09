@@ -34,7 +34,6 @@
 #include "common/global.h"
 #include "common/algebra.h"
 #include "common/containers.h"
-#include "output.h"
 #include "shader.h"
 #include "random.h"
 
@@ -61,7 +60,6 @@ class	CMovingTriangle;
 class	CMemPage;
 class	CHierarchy;
 class	CActiveSample;
-class	COutput;
 class	CPoints;
 class	CPointCloud;
 class	CVolume;
@@ -185,20 +183,17 @@ public:
 // Description			:	Holds thread specific stuff
 // Comments				:
 // Date last edited		:	10/13/2001
-class	CShadingContext : public COutput {
+class	CShadingContext {
 public:
 								CShadingContext(COptions *,CXform *,SOCKET,unsigned int);
 								~CShadingContext();
-
-								// The following functions must be overidden by the derived classes
-		void					render(CObject *);										// Called to insert an object into the scene
-		void					remove(CTracable *);									// Called to remove a delayed object from the scene
 
 								// A block that is used by the renderer
 		void					beginWorld();											// We're starting to specify geometry
 		void					endWorld();												// We're done specifying geometry
 
-		virtual	void			renderFrame()					=	0;					// Right after world end to force rendering of the entire frame
+		// Right after world end to force rendering of the entire frame
+		virtual	void			renderFrame()											=	0;
 
 		// Delayed rendering functions
 		virtual	void			drawObject(CObject *,const float *,const float *)		=	0;
@@ -213,7 +208,6 @@ public:
 		void					shade(CSurface *,int,int,int,unsigned int);				// Shade points on a surface
 		void					displace(CSurface *,int,int,int,unsigned int);			// Sample points on a surface
 
-								// The raytracing functions that can be called after prepareFrame
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
 		void					traceEx(CRayBundle *);									// Trace and maybe shade a bundle of rays. This version increments the shading depth
 		void					retraceRay(CRay *);										// Trace a ray again
@@ -232,66 +226,35 @@ public:
 		void					freeState(CShadingState *);								// Destroy a shading state
 		void					deleteState(CShadingState *);							// Delete a shading state
 
-		CMemStack				*frameMemory;											// The memory area for the frame
-		
-		// remote channels (remoteChannel.cpp)
-		int						requestRemoteChannel(CRemoteChannel *);					// request a remote channel (server requests from client)
-		int						processChannelRequest(int,SOCKET);						// service request for a remote channel in client
-		
-		void					sendBucketDataChannels(int x,int y);					// send all per-bucket remote channels
-		void					recvBucketDataChannels(SOCKET s,int x,int y);			// receive one per-bucket remote channel
-		void					sendFrameDataChannels();								// send all per-frame remote channels
-		void					recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
+		CMemStack				*frameMemory;											// The memory area for the frame		
 	
 protected:
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }
 		virtual	void			illuminateEnd() { }
-		vector					worldBmin,worldBmax;									// The bounding box of the entire scene
-		CHierarchy				*hierarchy;												// The raytracing hierarchy
 
-		CTexture				*getTexture(const char *);								// Load a texture
-		CEnvironment			*getEnvironment(const char *);							// Load an environment
-		CPhotonMap				*getPhotonMap(const char *);							// Load a photon map
-		CCache					*getCache(const char *,const char *);					// Load a photon map
-		CTextureInfoBase		*getTextureInfo(const char *);							// Load a textureinfo
-		CTexture3d				*getTexture3d(const char*,int,const char*,const char*);	// Load a point cloud or brickmap
-
-		CDictionary<const char *,CFileResource *>			*loadedFiles;				// This holds the files loaded so far
-
-		CArray<CAttributes *>	*dirtyAttributes;										// The list of attributes that need to be cleaned after the rendering
-		CArray<CTriangle *>		*triangles;												// The array of triangles
-		CArray<CSurface *>		*raytraced;												// The list of raytraced objects
-		CArray<CTracable *>		*tracables;												// The array of raytracable objects
 private:
 
 		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
-								
-		CArray<CProgrammableShaderInstance *>	*dirtyInstances;						// The list of shader instances that need cleanup
 
 		CConditional			*conditionals;											// Holds nested conditionals
 		int						currentRayDepth;										// Current shading depth
 		const char				*currentRayLabel;										// The current ray label
 		CShadingState			*freeStates;											// The list of free states
 		int						inShadow;												// TRUE if we're in a shadow
-		unsigned int			raytracingFlags;										// The raytracing flags that hold the combination that needs to be raytraced
 
-		CVariable				**globalVariables;										// The array of global variables
-		int						numGlobalVariables;										// The current number of global variables
-		int						maxGlobalVariables;										// Maximum number of variables allocated
 
 		CSobol<4>				traceGenerator;											// Random number generator for "trace"
 		CSobol<4>				transmissionGenerator;									// Random number generator for "transmission"
 		CSobol<4>				gatherGenerator;										// Random number generator for "gather"
 
 		TObjectHash				*traceObjectHash;										// An object hash array for raytraced objects
-		
-		CDictionary<const char *,CRemoteChannel *>			*declaredRemoteChannels;	// Known remote channel lookup
-		CArray<CRemoteChannel *>							*remoteChannels;			// all known channels
+	
 
 		void					execute(CProgrammableShaderInstance *,float **);		// Execute a shader
 
+		// The following functions are used in the shaders
 		void					duFloat(float *,const float *);
 		void					dvFloat(float *,const float *);
 		void					duVector(float *,const float *);
@@ -305,7 +268,7 @@ private:
 		void					indirectSample(CGlobalIllumLookup *,const float *,const float *);
 		void					occlusionSample(CGlobalIllumLookup *,const float *,const float *);
 
-																						// The following functions are used in the shaders
+		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);
 		int						displacementParameter(void *dest,const char *name,CVariable**,int*);
 		int						atmosphereParameter(void *dest,const char *name,CVariable**,int*);

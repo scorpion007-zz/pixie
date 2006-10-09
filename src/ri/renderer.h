@@ -124,7 +124,6 @@ public:
 	float				*fill;			// The sample defaults
 };
 
-class	COutput;
 class	CShadingContext;
 class	CIrradianceCache;
 class	CPhotonMap;

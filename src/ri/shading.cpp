@@ -577,7 +577,7 @@ void	CShadingContext::render(CObject *cObject) {
 
 	// Tesselate the object if applicable
 	if (cObject->attributes->flags & raytracingFlags) {
-		cObject->tesselate(this);
+		cObject->tesselate();
 	}
 
 	if (cObject->attributes->flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) {

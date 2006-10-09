@@ -35,10 +35,10 @@
 #include	"common/global.h"
 #include	"common/containers.h"
 
+#include	"frame.h"
 #include	"remoteChannel.h"
 #include	"error.h"
 #include	"renderer.h"
-#include	"shading.h"
 #include	"irradiance.h"
 #include	"pointCloud.h"
 
@@ -46,14 +46,14 @@
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CFrame
 // Method				:	requestRemoteChannel
 // Description			:	Ask client to set up remote channel like the
 //							one passed as an argument
 // Return Value			:
 // Comments				:	The channel will either be deleted or managed
 // Date last edited		:	03/24/2006
-int		CShadingContext::requestRemoteChannel(CRemoteChannel *serverChannel){
+int		CFrame::requestRemoteChannel(CRemoteChannel *serverChannel){
 	int nameLength			= strlen(serverChannel->name)+1;
 	int clientInitialized	= FALSE;	
 	T32 buffer[3];
@@ -120,14 +120,14 @@ int		CShadingContext::requestRemoteChannel(CRemoteChannel *serverChannel){
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CFrame
 // Method				:	processChannelRequest
 // Description			:	Service request for channel, adding the
 //							newly created channel to the list if successful
 // Return Value			:
 // Comments				:	called from CRendererContext:processServerRequest
 // Date last edited		:	03/24/2006
-int		CShadingContext::processChannelRequest(int index,SOCKET s){
+int		CFrame::processChannelRequest(int index,SOCKET s){
 	int				channelNameLength	= 0;
 	int				channelType			= 0;
 	CRemoteChannel	*rChannel			= NULL;
@@ -241,13 +241,13 @@ int		CShadingContext::processChannelRequest(int index,SOCKET s){
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CFrame
 // Method				:	sendBucketDataChannels
 // Description			:	Send all bucket-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
 // Date last edited		:	03/24/2006
-void CShadingContext::sendBucketDataChannels(int x,int y) {
+void CFrame::sendBucketDataChannels(int x,int y) {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
@@ -289,14 +289,14 @@ void CShadingContext::sendBucketDataChannels(int x,int y) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CFrame
 // Method				:	recvBucketDataChannels
 // Description			:	Recieve all bucket-data channels
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
 // Date last edited		:	03/24/2006
-void CShadingContext::recvBucketDataChannels(SOCKET s,int x,int y) {
+void CFrame::recvBucketDataChannels(SOCKET s,int x,int y) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
@@ -336,13 +336,13 @@ void CShadingContext::recvBucketDataChannels(SOCKET s,int x,int y) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CFrame
 // Method				:	sendFrameDataChannels
 // Description			:	Send all frame-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
 // Date last edited		:	03/24/2006
-void CShadingContext::sendFrameDataChannels() {
+void CFrame::sendFrameDataChannels() {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
@@ -383,14 +383,14 @@ void CShadingContext::sendFrameDataChannels() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CFrame
 // Method				:	recvFrameDataChannels
 // Description			:	Recieve all frame-data channels
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
 // Date last edited		:	03/24/2006
-void CShadingContext::recvFrameDataChannels(SOCKET s) {
+void CFrame::recvFrameDataChannels(SOCKET s) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
