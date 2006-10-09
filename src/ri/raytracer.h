@@ -87,7 +87,7 @@ public:
 // Date last edited		:	8/26/2001
 class	CRaytracer : public CShadingContext {
 public:
-									CRaytracer(COptions *,CXform *,SOCKET);
+									CRaytracer();
 			virtual					~CRaytracer();
 
 			// The main hider interface

@@ -37,6 +37,7 @@
 #include "attributes.h"
 #include "hierarchy.h"
 #include "object.h"
+#include "frame.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -79,7 +80,7 @@ CSphereLight::~CSphereLight() {
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 	
-	if (context->hiderFlags & HIDER_ILLUMINATIONHOOK) {
+	if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {
 		const int	numVertices	=	currentShadingState->numVertices;
 		float		*Pf			=	(float *) alloca(numVertices*3*sizeof(float));
 		float		*Nf			=	(float *) alloca(numVertices*3*sizeof(float));
@@ -120,7 +121,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		CShadedLight	**lights				=	&currentShadingState->lights;
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
-		CHierarchy		*hierarchy				=	context->hierarchy;
+		CHierarchy		*hierarchy				=	CFrame::hierarchy;
 		int				j;
 		CRay			ray;
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
@@ -377,7 +378,7 @@ CQuadLight::~CQuadLight() {
 void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 
-	if (context->hiderFlags & HIDER_ILLUMINATIONHOOK) {
+	if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {
 		const int	numVertices	=	currentShadingState->numVertices;
 		float		*Pf			=	(float *) alloca(numVertices*3*sizeof(float));
 		float		*Nf			=	(float *) alloca(numVertices*3*sizeof(float));
@@ -427,7 +428,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
 		CRay			ray;
-		CHierarchy		*hierarchy				=	context->hierarchy;
+		CHierarchy		*hierarchy				=	CFrame::hierarchy;
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
 		vector			D;
 		int				j;

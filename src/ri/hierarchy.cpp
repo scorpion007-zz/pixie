@@ -34,6 +34,7 @@
 #include "renderer.h"
 #include "memory.h"
 #include "stats.h"
+#include "frame.h"
 
 
 
@@ -814,7 +815,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 	void	*nNode;
 
 	// Should I be an internal node ?
-	if ((cUncomputed->depth < maxDepth) && (cUncomputed->numItems > maxObjects)) {
+	if ((cUncomputed->depth < CFrame::options.maxHierarchyDepth) && (cUncomputed->numItems > CFrame::options.maxHierarchyLeafObjects)) {
 		vector				d;
 		int					i,j,last,k;
 		int					numItems		=	cUncomputed->numItems;
@@ -1513,7 +1514,7 @@ void		CHierarchy::remove(void *node,const CTracable *item,float *bmin,float *bma
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	12/23/2001
-CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const float *tmax,COptions *options,CMemStack *mem) {
+CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const float *tmax,CMemStack *mem) {
 	int						i;
 	CTracable				**hitems	=	new CTracable*[numItems];
 	CHUncomputed			*hroot		=	new CHUncomputed;
@@ -1539,12 +1540,8 @@ CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const fl
 
 	root				=	(void *) getToken(hroot,HIERARCHY_UNCOMPUTED_NODE);
 	
-	// Set the default values
-	maxDepth			=	options->maxHierarchyDepth;
-	maxObjects			=	options->maxHierarchyLeafObjects;
-
 	// Allocate the traversal stack
-	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*maxDepth*2);
+	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*CFrame::options.maxHierarchyDepth*2);
 	currentRayID		=	0;
 }
 

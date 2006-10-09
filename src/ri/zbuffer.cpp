@@ -49,7 +49,7 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-CZbuffer::CZbuffer(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,HIDER_RGBAZ_ONLY) , COcclusionCuller() {
+CZbuffer::CZbuffer() : CReyes(HIDER_RGBAZ_ONLY) , COcclusionCuller() {
 	int	i;
 
 	totalWidth		=	bucketWidth*pixelXsamples + 2*xSampleOffset;

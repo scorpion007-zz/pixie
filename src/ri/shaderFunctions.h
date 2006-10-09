@@ -600,7 +600,7 @@ DEFFUNC(NTransform4		,"ntransform"			,"n=Smn"	,NTRANSFORM4EXPR_PRE,NTRANSFORM4EX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // depth "f=p"
-#define DEPTHEXPR		res->real	=	(op[2].real - clipMin) / (clipMax - clipMin);
+#define DEPTHEXPR		res->real	=	(op[2].real - CFrame::options.clipMin) / (CFrame::options.clipMax - CFrame::options.clipMin);
 
 DEFFUNC(Depth		,"depth"			,"f=p"	,FUN2EXPR_PRE,DEPTHEXPR,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 
@@ -1138,7 +1138,7 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 									lookup					=	new CTextureInfoLookup;				\
 									parameterlist			=	lookup;								\
 									dirty();														\
-									lookup->textureInfo		=	getTextureInfo(op1->string);		\
+									lookup->textureInfo		=	CFrame::getTextureInfo(op1->string);\
 								}																	\
 																									\
 								textureInfo = lookup->textureInfo;									\
@@ -1291,7 +1291,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 										operand(i*2+start+1,val);												\
 																												\
 										if (strcmp(param->string,"filter") == 0) {								\
-											lookup->filter	=	currentRenderer->getFilter(val->string);		\
+											lookup->filter	=	CFrame::getFilter(val->string);					\
 										} else if (strcmp(param->string,"blur") == 0) {							\
 											lookup->blur		=	val->real;									\
 											lookup->coneAngle	=	(float) (C_PI*val->real);					\
@@ -1329,7 +1329,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CFrame::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	TRUE;										\
 								}																				\
@@ -1406,7 +1406,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CFrame::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	FALSE;										\
 								}																				\
@@ -1496,7 +1496,7 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CFrame::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	TRUE;										\
 								}																				\
@@ -1564,7 +1564,7 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CFrame::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	FALSE;										\
 								}																				\
@@ -1651,7 +1651,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"reflection") == 0)) {		\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CFrame::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
 								if (lookup->environment == NULL) {													\
@@ -1743,7 +1743,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"shadow") == 0)) {\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CFrame::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
 								if (lookup->environment == NULL) {													\
@@ -1836,7 +1836,7 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"reflection") == 0)) {		\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CFrame::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
 								if (lookup->environment == NULL) {													\
@@ -1918,7 +1918,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"shadow") == 0)) {		\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CFrame::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
 								if (lookup->environment == NULL) {													\
@@ -2005,7 +2005,7 @@ DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWCEXPR_PRE,NULL_EXPR,NULL_EX
 										operand(i*2+start+1,val);												\
 																												\
 										if (strcmp(param->string,"filter") == 0) {								\
-											lookup->filter		=	currentRenderer->getFilter(val->string);	\
+											lookup->filter		=	CFrame::getFilter(val->string);				\
 										} else if (strcmp(param->string,"width") == 0) {						\
 											lookup->width		=	val->real;									\
 										}																		\
@@ -2169,11 +2169,14 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								argumentcount(numArguments);													\
 								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*));	\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									TCode		*op1,*op2;														\
+									TCode				*op1,*op2;												\
+									matrix				*from,*to;												\
+									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(5,(numArguments-5) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture		=	getTexture3d(op1->string,TRUE,op2->string,lookup->coordsys);							\
+									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
+									lookup->texture		=	CFrame::getTexture3d(op1->string,TRUE,op2->string,*from,*to);							\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
 									lookup->valueSpace	=	new float[lookup->sampleSize];						\
 								}																				\
@@ -2270,10 +2273,13 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								argumentcount(numArguments);													\
 								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*));	\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									TCode		*op1;															\
+									TCode				*op1;													\
+									matrix				*from,*to;												\
+									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1);																\
-									lookup->texture		=	getTexture3d(op1->string,FALSE,NULL,lookup->coordsys);									\
+									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
+									lookup->texture		=	CFrame::getTexture3d(op1->string,FALSE,NULL,*from,*to);									\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
 									lookup->valueSpace	=	new float[lookup->sampleSize];						\
 								}																				\

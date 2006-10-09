@@ -35,6 +35,8 @@
 #include "shading.h"
 #include "ray.h"
 #include "random.h"
+#include "attributes.h"
+#include "options.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonHider
@@ -48,7 +50,7 @@ class	CPhotonHider : public CShadingContext {
 	} EPhotonStage;
 
 public:
-									CPhotonHider(COptions *,CXform *,SOCKET,CAttributes *);
+									CPhotonHider(CAttributes *);
 			virtual					~CPhotonHider();
 
 			// The main hider interface

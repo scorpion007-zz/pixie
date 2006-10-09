@@ -35,6 +35,7 @@
 #include "memory.h"
 #include "stats.h"
 #include "renderer.h"
+#include "frame.h"
 
 
 
@@ -205,7 +206,7 @@ void	CPoints::bound(float *bmin,float *bmax) const {
 void	CPoints::dice(CShadingContext *rasterizer)	{
 	if (pl != NULL)	prep();
 
-	if (numPoints < rasterizer->maxGridSize) {
+	if (numPoints < CFrame::options.maxGridSize) {
 		// We're small enough to render directly
 		rasterizer->drawPoints(this,numPoints);
 	} else {

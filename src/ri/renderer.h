@@ -278,8 +278,6 @@ public:
 	CAttributes			*getAttributes(int);									// Get the active Attributes
 	COptions			*getOptions();											// Get the active Options
 	CShaderInstance		*getShader(const char *,int,int,char **,void **);		// Load a shader
-	RtFilterFunc		getFilter(const char *);								// Get a filter
-	char				*getFilter(RtFilterFunc);								// The other way around
 	int					getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
 
 	CTexture			*textureLoad(const char *,TSearchpath *);				// Load a new texture map
@@ -292,25 +290,10 @@ public:
 	void				addInstance(void *);									// Add an instance into the scene
 
 																				// Coordinate system functions
-	void				defineCoordinateSystem(const char *,matrix &,matrix &,ECoordinateSystem type = COORDINATE_CUSTOM);
+
+
+
 	int					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
-																				// Variable management
-	CVariable			*declareVariable(const char *,const char *,int um = 0);
-	void				makeGlobalVariable(CVariable *);
-	CVariable			*retrieveVariable(const char *);
-	
-	CDisplayChannel		*declareDisplayChannel(const char *);					// Display channel management
-	CDisplayChannel		*declareDisplayChannel(CVariable *);
-	CDisplayChannel		*retrieveDisplayChannel(const char *);
-	void				resetDisplayChannelUsage();
-	
-	void				registerFrameTemporary(const char *,int);				// Register file for end-of-frame deletion
-
-	int					getGlobalID(const char *);								// Global ID management
-
-																				// Locate (download) a file
-	int					locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
-	int					locateFile(char *,const char *,TSearchpath *search=NULL);
 
 																				// The following functions are about texture management and are implemented in texture.cpp
 	void				rendererThread(void *);
@@ -353,12 +336,7 @@ private:
 	int					maxMotionParameters;									// The maximum number of motion parameters that can be stored
 	char				*lastCommand;											// The text of the last motion command
 
-	void				netSetup(char *,char *);								// Setup the network for rendering
-	void				sendFile(int,char *,int,int);							// Send a particular file
-	int					getFile(char *,const char *);							// Get a particular file from network
-	int					getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network
-	void				clientRenderFrame();									// Isn't that obvious
-	void				processServerRequest(T32,int);							// Process a request from the server
+	
 	void				init(CProgrammableShaderInstance *);					// Execute the init code of a shader
 	int					loadDSO(char *,char *,TSearchpath *,dsoInitFunction *,dsoExecFunction *,dsoCleanupFunction *);	// Find/load a DSO shader
 	int					addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1);
@@ -371,10 +349,6 @@ private:
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern	CRendererContext	*currentRenderer;
-
-// Some global functions
-void	rcSend(SOCKET,char *,int,int net = TRUE);								// Send data
-void	rcRecv(SOCKET,char *,int,int net = TRUE);								// Recv data
 
 
 #endif

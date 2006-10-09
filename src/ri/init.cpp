@@ -35,6 +35,7 @@
 #include "slcode.h"
 #include "noise.h"
 #include "shading.h"
+#include "frame.h"
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
@@ -55,8 +56,6 @@
 #define exitFastLightingConditional()		scripterror("Invalid environment function call during init\n")
 #define	rendererInfo(a,b)					scripterror("Invalid environment function call during init\n")
 #define	emission(a,b)						scripterror("Invalid environment function call during init\n")
-#define	clipMin								0
-#define	clipMax								1
 #define debugFunction(a)
 #define	illuminateBegin(a,b,c,d,e,f)
 
@@ -421,7 +420,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 		// Relink the entry point to the global, we already verified the match
 		if (cParameter->storage == STORAGE_GLOBAL) {
-			CVariable	*cVar	=	retrieveVariable(cParameter->name);
+			CVariable	*cVar	=	CFrame::retrieveVariable(cParameter->name);
 			cParameter->entry	=	cVar->entry;
 		}
 		cParameter->value		=	NULL;

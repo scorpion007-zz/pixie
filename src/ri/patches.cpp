@@ -39,6 +39,7 @@
 #include "shading.h"
 #include "error.h"
 #include "patchUtils.h"
+#include "frame.h"
 
 
 
@@ -362,8 +363,8 @@ void	CBilinearPatch::bound(float *bmin,float *bmax) const {
 // Date last edited		:	6/21/2001
 void	CBilinearPatch::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
+		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CFrame::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////

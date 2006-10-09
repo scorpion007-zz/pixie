@@ -34,6 +34,7 @@
 #include "common/global.h"
 #include "shading.h"
 #include "object.h"
+#include "frame.h"
 
 // Note:
 // The low bits are spliced with the zfilter mode and used to dispatch in stochastic hider
@@ -207,7 +208,7 @@ protected:
 
 public:
 
-								CReyes(COptions *,CXform *,SOCKET,unsigned int);
+								CReyes(unsigned int);
 								~CReyes();
 
 								// The main hider interface
@@ -277,9 +278,9 @@ private:
 				// Comments				:	(inline for speed)
 				// Date last edited		:	7/4/2001
 				inline void		distance2samples(int n,float *dist,float *P) {
-									if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+									if(CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										for (;n>0;n--,P+=3) {
-											*dist++		=	dSampledx*imagePlane*dist[0]/P[COMP_Z];
+											*dist++		=	dSampledx*CFrame::imagePlane*dist[0]/P[COMP_Z];
 										}
 									} else {
 										for (;n>0;n--,P+=3) {
@@ -296,15 +297,15 @@ private:
 				// Comments				:	(inline for speed)
 				// Date last edited		:	7/4/2001
 				inline void		camera2samples(int n,float *P) {
-									if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+									if(CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										for (;n>0;n--,P+=3) {
-											P[COMP_X]	=	(imagePlane*P[COMP_X]/P[COMP_Z] - pixelLeft)*dSampledx;
-											P[COMP_Y]	=	(imagePlane*P[COMP_Y]/P[COMP_Z] - pixelTop)*dSampledy;
+											P[COMP_X]	=	(CFrame::imagePlane*P[COMP_X]/P[COMP_Z] - CFrame::pixelLeft)*dSampledx;
+											P[COMP_Y]	=	(CFrame::imagePlane*P[COMP_Y]/P[COMP_Z] - CFrame::pixelTop)*dSampledy;
 										}
 									} else {
 										for (;n>0;n--,P+=3) {
-											P[COMP_X]	=	(P[COMP_X] - pixelLeft)*dSampledx;
-											P[COMP_Y]	=	(P[COMP_Y] - pixelTop)*dSampledy;
+											P[COMP_X]	=	(P[COMP_X] - CFrame::pixelLeft)*dSampledx;
+											P[COMP_Y]	=	(P[COMP_Y] - CFrame::pixelTop)*dSampledy;
 										}
 									}
 								}
@@ -317,13 +318,13 @@ private:
 				// Comments				:	(inline for speed)
 				// Date last edited		:	7/4/2001
 				inline void		camera2samples(float *P) {
-									if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-										P[COMP_X]	=	imagePlane*P[COMP_X]/P[COMP_Z];
-										P[COMP_Y]	=	imagePlane*P[COMP_Y]/P[COMP_Z];
+									if(CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+										P[COMP_X]	=	CFrame::imagePlane*P[COMP_X]/P[COMP_Z];
+										P[COMP_Y]	=	CFrame::imagePlane*P[COMP_Y]/P[COMP_Z];
 									}
 
-									P[COMP_X]	=	(P[COMP_X] - pixelLeft)*dSampledx;
-									P[COMP_Y]	=	(P[COMP_Y] - pixelTop)*dSampledy;
+									P[COMP_X]	=	(P[COMP_X] - CFrame::pixelLeft)*dSampledx;
+									P[COMP_Y]	=	(P[COMP_Y] - CFrame::pixelTop)*dSampledy;
 								}
 };
 

@@ -44,6 +44,7 @@
 #include "irradiance.h"
 #include "bundles.h"
 #include "error.h"
+#include "frame.h"
 #include "executeMisc.h"
 
 // This function is defined in shader.cpp for debugging purposes
@@ -200,7 +201,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 //	Begin a conditional block execution
 #define		beginConditional()				if (conditionals == NULL) {											\
-												conditionals		=	(CConditional *) frameMemory->alloc(sizeof(CConditional));						\
+												conditionals		=	(CConditional *) CFrame::frameMemory->alloc(sizeof(CConditional));						\
 												conditionals->next	=	NULL;									\
 												conditionals->prev	=	NULL;									\
 											}																	\
@@ -233,10 +234,10 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
 												cInstance->dirty	=	TRUE;										\
-												if (dirtyInstances == NULL)											\
-													dirtyInstances	=	new CArray<CProgrammableShaderInstance *>;	\
+												if (CFrame::dirtyInstances == NULL)									\
+													CFrame::dirtyInstances	=	new CArray<CProgrammableShaderInstance *>;	\
 												cInstance->attach();												\
-												dirtyInstances->push(cInstance);									\
+												CFrame::dirtyInstances->push(cInstance);							\
 											}
 
 //	Retrieve an integer operand (label references are integer)
@@ -374,10 +375,10 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											int	invertCatMatch = FALSE;										\
 											if (*(lC->string) != '\0') {									\
 												if (*(lC->string) == '-') {									\
-													saveCat = -(runCat = currentRenderer->getGlobalID(lC->string+1));	\
+													saveCat = -(runCat = CFrame::getGlobalID(lC->string+1));	\
 													invertCatMatch = TRUE;									\
 												} else {													\
-													saveCat = runCat = currentRenderer->getGlobalID(lC->string);		\
+													saveCat = runCat = CFrame::getGlobalID(lC->string);		\
 												}															\
 											}
 

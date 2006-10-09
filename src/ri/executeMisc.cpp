@@ -36,6 +36,7 @@
 #include "executeMisc.h"
 #include "memory.h"
 #include "attributes.h"
+#include "frame.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -569,7 +570,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 	CTransmissionRay	*cRay,**cRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
-	const int			shootStep		=	min(this->shootStep,numVertices*numSamples);
+	const int			shootStep		=	min(CFrame::options.shootStep,numVertices*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	const float			maxDist			=	lookup->maxDist;
 	int					numRemaining	=	shootStep;
@@ -652,7 +653,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 	CTraceRay			*cRay,**cRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
-	const int			shootStep		=	min(this->shootStep,numVertices*numSamples);
+	const int			shootStep		=	min(CFrame::options.shootStep,numVertices*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	int					numRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) lookup->numSamples;
@@ -729,7 +730,7 @@ void	CShadingContext::traceTransmission(int numVertices,CRaySample *samples,CTex
 	CTransmissionRay	*cRay,**cRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
-	const int			shootStep		=	min(this->shootStep,numVertices*numSamples);
+	const int			shootStep		=	min(CFrame::options.shootStep,numVertices*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	const float			maxDist			=	lookup->maxDist;
 	int					numRemaining	=	shootStep;
@@ -814,7 +815,7 @@ void	CShadingContext::traceReflection(int numVertices,CRaySample *samples,CTextu
 	CTraceRay			*cRay,**cRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
-	const int			shootStep		=	min(this->shootStep,numVertices*numSamples);
+	const int			shootStep		=	min(CFrame::options.shootStep,numVertices*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	int					numRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) lookup->numSamples;

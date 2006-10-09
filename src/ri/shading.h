@@ -185,12 +185,8 @@ public:
 // Date last edited		:	10/13/2001
 class	CShadingContext {
 public:
-								CShadingContext(COptions *,CXform *,SOCKET,unsigned int);
+								CShadingContext(unsigned int);
 								~CShadingContext();
-
-								// A block that is used by the renderer
-		void					beginWorld();											// We're starting to specify geometry
-		void					endWorld();												// We're done specifying geometry
 
 		// Right after world end to force rendering of the entire frame
 		virtual	void			renderFrame()											=	0;
@@ -214,19 +210,13 @@ public:
 
 								// Surface tesselation
 		void					tesselate2D(CSurface *);								// Tesselate a surface
-		virtual void			addTracable(CTracable *,CSurface *);					// Add a raytracable object into the scene
-		virtual void			addTracable(CTriangle *,CSurface *);
-		virtual void			addTracable(CMovingTriangle *,CSurface *);
 
 								// Variable management functions
-		void					initState(CVariable *,int);								// Initialize the shading state
-		void					updateState(CVariable *);								// Add a variable into the shading state
+		void					updateState();											// Add a variable into the shading state
 
 		CShadingState			*newState();											// Allocate a new shading state
 		void					freeState(CShadingState *);								// Destroy a shading state
 		void					deleteState(CShadingState *);							// Delete a shading state
-
-		CMemStack				*frameMemory;											// The memory area for the frame		
 	
 protected:
 		virtual	void			solarBegin(const float *,const float *) { }

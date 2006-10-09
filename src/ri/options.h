@@ -141,6 +141,9 @@ public:
 								// The following method is used to convert from a custom color space to RGB if- entered
 	void						convertColor(vector &c,const float *f)	const;
 
+								// Guess where to search by looking into the extension
+	TSearchpath					*pickSearchpath(const char *name);
+
 
 
 
@@ -204,9 +207,7 @@ public:
 
 	float						shutterOpen,shutterClose;						// Motion blur stuff
 
-	unsigned int				flags;											// Flags
-
-	CArray<CShaderInstance *>	*allLights;										// An array of all allocated lights in the options context
+	unsigned int				flags;											// Flags	
 
 								////////////////////////////////////////////////////////////////////
 								// Pixie dependent options
@@ -214,6 +215,8 @@ public:
 
 	int							endofframe;										// The end of frame statstics number
 	char						*filelog;										// The name of the log file
+
+	int							numThreads;										// The number of threads working
 
 	int							maxTextureSize;									// Maximum amount of texture data to keep in memory (in bytes)
 

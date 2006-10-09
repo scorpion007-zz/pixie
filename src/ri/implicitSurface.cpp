@@ -34,6 +34,7 @@
 #include "error.h"
 #include "stats.h"
 #include "shading.h"
+#include "frame.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
@@ -260,7 +261,7 @@ void					CImplicit::interpolate(int,float **)	const {
 // Comments				:
 // Date last edited		:	11/7/2003
 void					CImplicit::tesselate(CShadingContext *context) {
-	context->addTracable(this,this);
+	CFrame::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////

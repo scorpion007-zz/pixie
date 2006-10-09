@@ -329,8 +329,6 @@ COptions::COptions() {
 
 	flags					=	0;
 
-	allLights				=	new CArray<CShaderInstance *>;
-
 	displays				=	NULL;
 
 	clipPlanes				=	NULL;
@@ -353,6 +351,8 @@ COptions::COptions() {
 
 	endofframe				=	0;
 	filelog					=	NULL;
+
+	numThreads				=	1;
 
 	maxTextureSize			=	20000000;
 	maxBrickSize			=	10000000;
@@ -416,21 +416,6 @@ COptions::COptions(const COptions *o) {
 	displayPath				=	optionsCloneSearchPath(o->displayPath);
 	modulePath				=	optionsCloneSearchPath(o->modulePath);
 	temporaryPath			=	strdup(o->temporaryPath);
-
-	{
-		CShaderInstance	**array	=	o->allLights->array;
-		int				size	=	o->allLights->numItems;
-		int				i;
-
-		allLights				=	new CArray<CShaderInstance *>;
-		for (i=0;i<size;i++) {
-			CShaderInstance	*cInstance	=	array[i];
-
-			cInstance->attach();
-
-			allLights->push(cInstance);
-		}
-	}
 
 	if (o->displays != NULL) {
 		CDisplay	*cDisplay,*nDisplay;
@@ -569,19 +554,6 @@ COptions::~COptions(){
 	optionsDeleteSearchPath(modulePath);
 	free(temporaryPath);
 
-	// Ditch the lights allocated in this context
-	{
-		CShaderInstance	**array	=	allLights->array;
-		int				size	=	allLights->numItems;
-		int				i;
-
-		for (i=0;i<size;i++) {
-			array[i]->detach();
-		}
-
-		delete allLights;
-	}
-
 	if (causticIn				!= NULL)	free(causticIn);
 	if (causticOut				!= NULL)	free(causticOut);
 	if (globalIn				!= NULL)	free(globalIn);
@@ -611,6 +583,47 @@ void	COptions::convertColor(vector &c,const float *f)	const	{
 				c[i] += f[j]*toRGB[i*nColorComps+j];
 		}
 	}
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	COptions
+// Method				:	pickSearchpath
+// Description			:	Pick a searchpath from name
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/3/2001
+TSearchpath		*COptions::pickSearchpath(const char *name) {
+
+	if (strstr(name,"rib") != NULL) {
+		return archivePath;
+
+	} else if (strstr(name,"tif") != NULL) {
+		return texturePath;
+
+	} else if (strstr(name,"tiff") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"tex") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"tx") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"ptc") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"bm") != NULL) {
+		return texturePath;
+		
+	} else if (strstr(name,"sdr") != NULL) {
+		return shaderPath;
+
+	} else if (strstr(name,osModuleExtension) != NULL) {
+		return proceduralPath;
+	}
+
+	return NULL;
 }
 
 

@@ -34,6 +34,7 @@
 #include "renderer.h"
 #include "memory.h"
 #include "stats.h"
+#include "frame.h"
 
 // The inverse of the Bezier basis
 static	matrix	invBezier	=	{	0,	0,				0,				1,
@@ -189,9 +190,9 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 
 	shouldSplit		=	FALSE;
 	if (bmin[COMP_Z] < C_EPSILON) {
-		if (bmax[COMP_Z] < rasterizer->clipMin) {
+		if (bmax[COMP_Z] < CFrame::options.clipMin) {
 			numPoints		=	-1;
-		} else if (rasterizer->inFrustrum(bmin,bmax) == FALSE) {
+		} else if (CFrame::inFrustrum(bmin,bmax) == FALSE) {
 			// The curve is out of the viewing frustrum
 			numPoints		=	-1;
 		} else {
@@ -204,13 +205,13 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		int		j;
 
 		// we can do the perspective division
-		rasterizer->camera2pixels(3,P);
+		CFrame::camera2pixels(3,P);
 
 		dx				=	P[6+0] - P[0];
 		dy				=	P[6+1] - P[1];
 		j				=	(int) ceil(C_EPSILON + sqrt(dx*dx + dy*dy) / attributes->shadingRate);
 
-		if ((j + 1) < rasterizer->maxGridSize) {
+		if ((j + 1) < CFrame::options.maxGridSize) {
 			// We can shade this curve
 			numPoints	=	j;
 		} else {

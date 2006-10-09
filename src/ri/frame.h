@@ -33,10 +33,8 @@
 
 #include "common/global.h"
 #include "common/containers.h"
+#include "common/os.h"
 #include "options.h"
-
-// Forward definitions
-class CDisplayChannel;
 
 // Compute the circle of confusion in the camera system
 #define	cocPixels(z)	absf((1 / z) - invFocaldistance)*cocFactorPixels
@@ -60,31 +58,150 @@ const	unsigned	int	CLIP_BOTTOM					=	8;
 const	unsigned	int	CLIP_NEAR					=	16;
 const	unsigned	int	CLIP_FAR					=	32;
 
-
+// Forward definitions
+class	CDisplayChannel;
 class	CHierarchy;
 class	CObject;
 class	CTracable;
 class	CRemoteChannel;
 class	CAttributes;
 class	CTriangle;
+class	CMovingTriangle;
 class	CTexture;
 class	CEnvironment;
 class	CSurface;
 class	CPhotonMap;
 class	CCache;
+class	CNamedCoordinateSystem;
+class	CGlobalIdentifier;
+class	CXform;
+class	CDSO;
+
+
+///////////////////////////////////////////////////////////////////////
+//
+//     The implementation for this class is split into several files:
+//
+//		frame.cpp			- Init / shutdown code
+//		frameDeclerations	- The portion that deals with declerations such as variables/coordinate systems etc.
+//		frameDisplay		- The portion that handles the output
+//		frameFiles			- The portion that manages files and loads stuff
+//
+///////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFrame
-// Description			:	This class handles the output
-// Comments				:	It is just an extended COptions class
-// Date last edited		:	7/4/2001
+// Description			:	This class holds data about the current frame being rendered
+// Comments				:	This class is invalid outside beginFrame / endFrame
+// Date last edited		:	10/10/2006
 class CFrame : public COptions {
-public:
-								// Frame functions
-		static	void			beginFrame(const COptions *options,const CXform *xform,SOCKET client,unsigned int hiderFlags);
-		static	void			endFrame();
 
-								// Bucket/output management
+		///////////////////////////////////////////////////////////////////////
+		// Class				:	CNetFileMapping
+		// Description			:	maps files to alternate pats
+		// Return Value			:
+		// Comments				:
+		// Date last edited		:	02/25/2006
+		class CNetFileMapping{
+		public:
+			CNetFileMapping(const char *from,const char *to) {
+				this->from	= strdup(from);
+				this->to	= strdup(to);
+			}
+			~CNetFileMapping() {
+				free(from);
+				free(to);
+			}
+			
+			char *from,*to;
+		};
+
+public:
+		
+
+
+
+		////////////////////////////////////////////////////////////////////
+		//
+		//   Globally active data / functions
+		//
+		////////////////////////////////////////////////////////////////////
+		static void				beginRenderer(char *ribFile,char *riNetString);
+		static void				endRenderer();
+
+								
+								////////////////////////////////////////////////////////////////////
+								// Some global data structures
+								////////////////////////////////////////////////////////////////////
+		static	CArray<CShaderInstance *>							*allLights;					// An array of all allocated lights in the options context
+		static	CDictionary<const char *,CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
+		static	CDictionary<const char *,CVariable *>				*declaredVariables;			// Declared variables
+		static	CDictionary<const char *,CFileResource  *>			*loadedFiles;				// Files that have been loaded
+		static	CDictionary<const char *,CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
+		static	CDictionary<const char *,CNetFileMapping *>			*netFileMappings;			// This holds name->name mappings of files
+		static	CArray<const char*>									*frameTemporaryFiles;		// This hold the name of temporary files
+		static	int													numKnownGlobalIds;
+		static	CVariable											*variables;					// List of all defined variables
+		static	CArray<CVariable *>									*globalVariables;			// Array of global variables only
+		static	int													numGlobalVariables;			// The number of global variables
+		static	CDictionary<const char *,CDisplayChannel *>			*declaredChannels;			// The declared display channels
+		static	CArray<CDisplayChannel*>							*displayChannels;			// The list of all desclared display channels
+		static	CArray<CArray<CObject *> *>							*allocatedInstances;		// The list of allocated object instances
+		static	CDSO												*dsos;						// The list of DSO's that have been loaded
+		static	SOCKET												netClient;					// The client that we're serving (-1 if client)
+		static	int													netNumServers;				// The number of servers (0 if server)
+		static	SOCKET												*netServers;				// The array of servers that are serving us
+		static	TMutex												commitMutex;				// The mutex that controls job dispatch
+		static	int													userRaytracing;				// TRUE if we're raytracing for the user
+		static	int													numNetrenderedBuckets;		// The number of netrendered buckets
+
+
+
+
+
+
+		////////////////////////////////////////////////////////////////////
+		//
+		//   The following data / functions is only valid when rendering a frame
+		//
+		////////////////////////////////////////////////////////////////////
+		static	void			beginFrame(const COptions *options,CXform *xform,SOCKET client,unsigned int hiderFlags);	// Called in WorldBegin
+		static	void			render(CShadingContext *context,CObject *object,const float *bmin,const float *bmax);	// Called to insert an object into the scene
+		static	void			removeTracable(CTracable *);																	// Called to remove a delayed object from the scene
+		static	void			addTracable(CTracable *,CSurface *);				// Add a raytracable object into the scene
+		static	void			addTracable(CTriangle *,CSurface *);
+		static	void			addTracable(CMovingTriangle *,CSurface *);
+		static	void			prepareFrame();																				// Called in WorldEnd
+		static	int				getJob(int &xBucket,int &yBucket,int thread);
+		static	void			endFrame();																					// Called in WorldEnd
+
+								////////////////////////////////////////////////////////////////////
+								//
+								// Here's how the rendering loop works:
+								//
+								//		beginFrame is called in WorldBegin
+								//		endFrame is called in WorldEnd and renders the frame
+								//
+								// Between these functions, objects can be added to the scene using
+								//		render
+								//
+								// If raytracing is on, objects may need to be tesselated. In this case
+								//		tesselate
+								// function of CObject will be called in
+								//		render
+								// which may subsequently call
+								//		addTracable or removeTracable
+								// When the tesselation is done,
+								//		prepareFrame
+								// must be called to incorporate tesselated objects into the raytracing hierarchy
+								//
+								// During rendering (initiated in endFrame), hiders can ask for a job using
+								//		getJob
+								//
+								////////////////////////////////////////////////////////////////////
+
+
+								// Various hiders can use these functions to commit their buckets
 		static void				commit(int,int,int,int,float *);
 		static int				advanceBucket(int,int &,int &,int &,int &);			// Find the next bucket to render for network rendering
 		static void				clear(int,int,int,int);								// Clear a window
@@ -97,30 +214,68 @@ public:
 		static unsigned int		clipCode(const float *);							// Returns the clipping code
 
 								// Some inline functions defined below
-		void					camera2pixels(float *P);
-		void					camera2pixels(float *x,float *y,const float *P);
-		void					camera2pixels(int n,float *P);
-		void					camera2screen(int n,float *P);
-		void					distance2pixels(int n,float *dist,float *P);
-		void					pixels2camera(float *P,float x,float y,float z);
-		float					minCocPixels(float z1, float z2);
-		void					advanceBucket();
+		static void				camera2pixels(float *P);
+		static void				camera2pixels(float *x,float *y,const float *P);
+		static void				camera2pixels(int n,float *P);
+		static void				camera2screen(int n,float *P);
+		static void				distance2pixels(int n,float *dist,float *P);
+		static void				pixels2camera(float *P,float x,float y,float z);
+		static float			minCocPixels(float z1, float z2);
+		static void				advanceBucket();
 
-								// Functions to add/remove objects from the frame
-		static	void			render(CShadingContext *context,CObject *object,const float *bmin,const float *bmax);	// Called to insert an object into the scene
-		static	void			remove(CTracable *);											// Called to remove a delayed object from the scene
+
+
+								////////////////////////////////////////////////////////////////////
+								// Functions that deal with declerations (implemented in frameDeclerations.cpp)
+								////////////////////////////////////////////////////////////////////
+		static	void			defineCoordinateSystem(const char *,matrix &,matrix &,ECoordinateSystem type = COORDINATE_CUSTOM);
+		static	CVariable		*declareVariable(const char *,const char *,int um = 0);
+		static	void			makeGlobalVariable(CVariable *);
+		static	CVariable		*retrieveVariable(const char *);
+		static	CDisplayChannel	*declareDisplayChannel(const char *);					// Display channel management
+		static	CDisplayChannel	*declareDisplayChannel(CVariable *);
+		static	CDisplayChannel	*retrieveDisplayChannel(const char *);
+		static	void			resetDisplayChannelUsage();
+		static	void			registerFrameTemporary(const char *,int);				// Register file for end-of-frame deletion
+		static	int				getGlobalID(const char *);								// Global ID management
+
+								
+								////////////////////////////////////////////////////////////////////
+								// Functions that deal with files (implemented in frameFiles.cpp)
+								////////////////////////////////////////////////////////////////////
+		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
+		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
+		static	CTexture		*getTexture(const char *);								// Load a texture
+		static	CEnvironment	*getEnvironment(const char *);							// Load an environment
+		static	CPhotonMap		*getPhotonMap(const char *);							// Load a photon map
+		static	CCache			*getCache(const char *,const char *);					// Load a photon map
+		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
+		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *);	// Load a point cloud or brickmap
+		static	RtFilterFunc	getFilter(const char *);								// Get a filter
+		static	char			*getFilter(RtFilterFunc);								// The other way around
+
+
+								////////////////////////////////////////////////////////////////////
+								// Functions that deal with network (implemented in frameNetwork.cpp)
+								////////////////////////////////////////////////////////////////////
+		static	void			rcSend(SOCKET,char *,int,int net = TRUE);				// Send data
+		static	void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
+		static	void			netSetup(char *,char *);								// Setup the network for rendering
+		static	void			sendFile(int,char *,int,int);							// Send a particular file
+		static	int				getFile(char *,const char *);							// Get a particular file from network
+		static	int				getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network
+		static	void			clientRenderFrame();									// Isn't that obvious
+		static	void			processServerRequest(T32,int);							// Process a request from the server
+
+								////////////////////////////////////////////////////////////////////
+								// The memory we use for the frame
+								////////////////////////////////////////////////////////////////////
+		static CMemStack		*frameMemory;
 
 								////////////////////////////////////////////////////////////////////
 								// The options
 								////////////////////////////////////////////////////////////////////
 		static	COptions		options;		
-
-								////////////////////////////////////////////////////////////////////
-								// Variable managements
-								////////////////////////////////////////////////////////////////////
-		static	CVariable		**globalVariables;										// The array of global variables
-		static	int				numGlobalVariables;										// The current number of global variables
-		static	int				maxGlobalVariables;										// Maximum number of variables allocated
 
 								////////////////////////////////////////////////////////////////////
 								// Remote channels
@@ -134,17 +289,6 @@ public:
 		static	CArray<CAttributes *>							*dirtyAttributes;		// The list of attributes that need to be cleaned after the rendering
 		static	CArray<CProgrammableShaderInstance *>			*dirtyInstances;		// The list of shader instances that need cleanup
 
-								////////////////////////////////////////////////////////////////////
-								// Misc functions for resource management
-								////////////////////////////////////////////////////////////////////
-		static	CDictionary<const char *,CFileResource *>		*loadedFiles;			// This holds the files loaded so far
-
-		static	CTexture		*getTexture(const char *);								// Load a texture
-		static	CEnvironment	*getEnvironment(const char *);							// Load an environment
-		static	CPhotonMap		*getPhotonMap(const char *);							// Load a photon map
-		static	CCache			*getCache(const char *,const char *);					// Load a photon map
-		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
-		static	CTexture3d		*getTexture3d(const char*,int,const char*,const char*);	// Load a point cloud or brickmap
 
 		
 								////////////////////////////////////////////////////////////////////
@@ -171,6 +315,7 @@ public:
 								// Some interesting precomputed quantities
 								////////////////////////////////////////////////////////////////////
 		static	vector			worldBmin,worldBmax;							// The bounding box of the world
+		static	CXform			*world;											// The world xform
 		static	matrix			fromWorld,toWorld;								// Some misc matrices
 		static	matrix			fromNDC,toNDC;
 		static	matrix			fromRaster,toRaster;
@@ -210,8 +355,6 @@ public:
 
 		static	int				currentXBucket;									// The bucket counters
 		static	int				currentYBucket;
-
-		static	SOCKET			netClient;										// The client socket if any
 
 		static	int				*jobAssignment;									// The job assignment for the buckets
 

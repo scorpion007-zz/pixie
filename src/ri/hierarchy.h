@@ -39,7 +39,6 @@
 #include "common/algebra.h"
 #include "common/os.h"
 #include "attributes.h"
-#include "options.h"
 #include "ray.h"
 
 ///////////////////////////////////////////////////////////////////////
@@ -313,7 +312,7 @@ class	CHierarchy {
 	};
 
 public:
-						CHierarchy(int,CTracable **,const float *,const float *,COptions *,CMemStack *mem);
+						CHierarchy(int,CTracable **,const float *,const float *,CMemStack *mem);
 						~CHierarchy();
 
 	void				remove(const CTracable *,float *,float *);

@@ -44,7 +44,7 @@
 // Date last edited		:	7/31/2002
 class	CStochastic : public CReyes, public COcclusionCuller {
 public:
-				CStochastic(COptions *,CXform *,SOCKET);
+				CStochastic();
 				~CStochastic();
 
 				// The functions inherited from the CReyes

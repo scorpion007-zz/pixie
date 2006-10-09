@@ -33,6 +33,7 @@
 #include "dlobject.h"
 #include "error.h"
 #include "stats.h"
+#include "frame.h"
 #include "shading.h"
 
 
@@ -193,7 +194,7 @@ void					CDLObject::interpolate(int,float **)	const {
 // Comments				:
 // Date last edited		:	11/7/2003
 void					CDLObject::tesselate(CShadingContext *context) {
-	context->addTracable(this,this);
+	CFrame::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////

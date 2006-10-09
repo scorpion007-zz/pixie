@@ -48,6 +48,7 @@
 #include	"radiance.h"
 #include	"error.h"
 #include	"remoteChannel.h"
+#include	"frame.h"
 
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
@@ -359,61 +360,22 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/25/2002
-CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf) : COutput(o,x,s,hf) {
-
-	// Initialize the extend of the world
-	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
+CShadingContext::CShadingContext(unsigned int hf) {
 
 	// Initialize the shading state
 	currentShadingState		=	NULL;
-
-	// This is the memory we allocate our junk from
-	frameMemory				=	new CMemStack(1 << 20);
 	
 	// Initialize the shader state memory stack
 	memoryInit(shaderStateMemory);
 
-	// This is the set of raytraced objects
-	raytraced				=	new CArray<CSurface *>;
-
-	// Init the loaded files
-	loadedFiles				=	new CTrie<CFileResource *>;
-	dirtyInstances			=	NULL;
-	dirtyAttributes			=	NULL;
-
+	// Init the conditionals
 	conditionals			=	NULL;
 	currentRayDepth			=	0;
 	currentRayLabel			=	rayLabelPrimary;
 	freeStates				=	NULL;
 	inShadow				=	FALSE;
 	
-	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE			|
-								ATTRIBUTES_FLAGS_TRACE_VISIBLE			|
-								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
-
-	if (hiderFlags & HIDER_NEEDS_RAYTRACING) {
-		raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-	}
-
-	globalVariables			=	NULL;
-	numGlobalVariables		=	0;
-	maxGlobalVariables		=	0;
-
 	traceObjectHash			=	NULL;
-
-	hierarchy				=	NULL;
-	tracables				=	NULL;
-	triangles				=	NULL;
-
-	// Initialize remote channels
-	remoteChannels			=	new CArray<CRemoteChannel*>;
-	declaredRemoteChannels	=	new CTrie<CRemoteChannel*>;
-	
-	// Initialize the texturing
-	CTexture::textureInit(maxTextureSize);	// Make sure we convert the size to bytes (from KB)
-	CBrickMap::brickMapInit(maxBrickSize);
-	randomInit();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -426,49 +388,6 @@ CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf)
 CShadingContext::~CShadingContext() {
 	CShadingState	*cState;
 	
-	// Print the stats (before we discard the memory)
-	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;
-
-	// Display the stats if applicable
-	if (endofframe > 0) {
-		stats.printStats(endofframe);
-	}
-
-	// Reset the dirty shader instances
-	if (dirtyInstances != NULL) {
-		int							numShaderInstances	=	dirtyInstances->numItems;
-		CProgrammableShaderInstance	**instances			=	dirtyInstances->array;
-
-		for (;numShaderInstances>0;numShaderInstances--) {
-			CProgrammableShaderInstance	*dirtyInstance	=	*instances++;
-			int							i;
-
-			for (i=0;i<dirtyInstance->parent->numPLs;i++) {
-				if (dirtyInstance->parameterLists[i] != NULL)	{
-					delete dirtyInstance->parameterLists[i];
-					dirtyInstance->parameterLists[i]	=	NULL;
-				}
-			}
-
-			// The shader is no longer dirty
-			dirtyInstance->dirty	=	FALSE;
-			dirtyInstance->detach();
-		}
-
-		delete dirtyInstances;
-	}
-
-	// Ditch the remote channels
-	for (int i=0;i<remoteChannels->numItems;i++) {
-		if (remoteChannels->array[i] != NULL) delete remoteChannels->array[i];
-	}
-	delete remoteChannels;
-	delete declaredRemoteChannels;
-
-	// Ditch the loaded files
-	assert(loadedFiles != NULL);
-	loadedFiles->destroy();
-
 	// Ditch the shading states that have been allocated
 	assert(currentShadingState != NULL);
 	freeState(currentShadingState);
@@ -478,177 +397,13 @@ CShadingContext::~CShadingContext() {
 		freeState(cState);
 	}
 	currentShadingState	=	NULL;
-
-	// Ditch the raytraced objects
-	if (raytraced != NULL) {
-		int			i;
-		CSurface	**surfaces	=	raytraced->array;
-
-		for (i=raytraced->numItems;i>0;i--) {
-			(*surfaces++)->detach();
-		}
-
-		delete raytraced;
-	}
-
-	assert(tracables == NULL);
-
-	// Ditch the triangle list if it's still around
-	if (triangles != NULL) delete triangles;
-
-	// Ditch the global variables
-	if (globalVariables != NULL) {
-		delete [] globalVariables;
-	}
-
-	// Ditch the raytracing hierarchy
-	if (hierarchy != NULL) {
-		delete hierarchy;
-	}
-	
-	// Ditch the frame memory
-	delete frameMemory;
 	
 	// Ditch the shader state memory stack
 	memoryTini(shaderStateMemory);
 
-
-	// Reset the dirty attributes
-	if (dirtyAttributes != NULL) {
-		int			numAttributes	=	dirtyAttributes->numItems;
-		CAttributes	**dirty			=	dirtyAttributes->array;
-		CAttributes	*cAttribute;
-
-		for (;numAttributes>0;numAttributes--) {
-			cAttribute				=	*dirty++;
-			cAttribute->globalMap	=	NULL;
-			cAttribute->causticMap	=	NULL;
-			cAttribute->detach();
-		}
-
-		delete dirtyAttributes;
-	}
-
-	// Close the texturing system
-	CBrickMap::brickMapShutdown();
-	CTexture::textureShutdown();
-	randomShutdown();
 }
 
 
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	render
-// Description			:	Add an object into the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::render(CObject *cObject) {
-	vector		bmin,bmax;
-	CAttributes	*cAttributes	=	cObject->attributes;
-
-	// Assign the photon map is necessary
-	if (cAttributes->globalMapName != NULL) {
-		cAttributes->globalMap	=	getPhotonMap(cAttributes->globalMapName);
-		cAttributes->globalMap->attach();
-	}
-
-	if (cAttributes->causticMapName != NULL) {
-		cAttributes->causticMap	=	getPhotonMap(cAttributes->causticMapName);
-		cAttributes->causticMap->attach();
-	}
-
-	if ((cAttributes->globalMap != NULL) || (cAttributes->causticMap != NULL)) {
-		if (dirtyAttributes == NULL) dirtyAttributes	=	new CArray<CAttributes *>;
-
-		cAttributes->attach();
-		dirtyAttributes->push(cAttributes);
-	}
-
-	// Bound the object
-	cObject->bound(bmin,bmax);
-
-	// Update the world bounding box
-	addBox(worldBmin,worldBmax,bmin);
-	addBox(worldBmin,worldBmax,bmax);
-
-	// Tesselate the object if applicable
-	if (cObject->attributes->flags & raytracingFlags) {
-		cObject->tesselate();
-	}
-
-	if (cObject->attributes->flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) {
-		// Dispatch the object to the hider
-		drawObject(cObject,bmin,bmax);
-	}
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::addTracable(CTracable *tracable,CSurface *object) {
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::addTracable(CTriangle *tracable,CSurface *object) {
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-
-	if (triangles != NULL) triangles->push(tracable);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::addTracable(CMovingTriangle *tracable,CSurface *object) {
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::remove(CTracable *cObject) {
-	if (hierarchy != NULL) {
-		vector	bmin,bmax;
-
-		// Bound the object
-		cObject->bound(bmin,bmax);
-
-		hierarchy->remove(cObject,bmin,bmax);
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -670,49 +425,10 @@ void	CShadingContext::drawObject(CObject *cObject,const float *,const float *) {
 // Comments				:
 // Date last edited		:	11/9/2002
 void	CShadingContext::retraceRay(CRay *cRay) {
-	hierarchy->intersect(cRay);
+	CFrame::hierarchy->intersect(cRay);
 }
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	beginWorld
-// Description			:	Start a world block
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/9/2002
-void	CShadingContext::beginWorld() {
-	assert(tracables == NULL);
-	tracables	=	new CArray<CTracable *>;
-
-	if (flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
-		triangles	=	new CArray<CTriangle *>;
-	}
-	
-	// Start a TSM channel if needed
-	if ((netClient != INVALID_SOCKET) && (flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)) {
-		requestRemoteChannel(new CRemoteTSMChannel(deepShadowFileName,deepShadowFile,deepShadowIndex,xBuckets,yBuckets));
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	endWorld
-// Description			:	End a world block
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/9/2002
-void	CShadingContext::endWorld() {
-	if (hierarchy == NULL) {
-		// Init the hierarchy
-		hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax,this,frameMemory);
-	} else {
-		hierarchy->add(tracables->numItems,tracables->array);
-	}
-
-	delete tracables;
-	tracables	=	NULL;
-}
 
 
 
@@ -747,7 +463,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	stats.numSampled++;
 	stats.numShaded							+=	numVertices;
 
-	assert(numVertices <= maxGridSize);
+	assert(numVertices <= CFrame::options.maxGridSize);
 
 	// Are we a shadow ray ?
 	if (inShadow == TRUE) {
@@ -798,7 +514,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 	if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
 
-	usedParameters						|=	currentAttributes->usedParameters | additionalParameters;
+	usedParameters						|=	currentAttributes->usedParameters | CFrame::additionalParameters;
 
 	// Prepare the shading state
 	varying								=	currentShadingState->varying;
@@ -856,8 +572,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			I				=	varying[VARIABLE_I];
 
 			// Compute the derivative evaluation u/v
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				const float	d	=	dxdPixel / imagePlane;
+			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+				const float	d	=	CFrame::dxdPixel / CFrame::imagePlane;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -890,7 +606,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 					j++;
 				}
 			} else {
-				const float	d	=	dxdPixel;
+				const float	d	=	CFrame::dxdPixel;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -961,12 +677,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * imagePlane / P[COMP_Z])*dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * imagePlane / P[COMP_Z])*dPixeldy;
+					cXy[0]		=	(P[COMP_X] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldx;
+					cXy[1]		=	(P[COMP_Y] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -974,8 +690,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*dPixeldx;
-					cXy[1]		=	P[COMP_Y]*dPixeldy;
+					cXy[0]		=	P[COMP_X]*CFrame::dPixeldx;
+					cXy[1]		=	P[COMP_Y]*CFrame::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -1083,7 +799,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	if (currentRayDepth == 0) {
 		float			*I				=	varying[VARIABLE_I];
 
-		if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 			memcpy(I,varying[VARIABLE_P],numVertices*3*sizeof(float));
 		} else {
 			for (i=numVertices;i>0;i--) {
@@ -1215,7 +931,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	stats.numSampled++;
 	stats.numShaded							+=	numVertices;
 
-	assert(numVertices <= maxGridSize);
+	assert(numVertices <= CFrame::options.maxGridSize);
 
 	// Yes, is there a displacement shader on the surface ?
 	if (	(currentAttributes->displacement == NULL) || 
@@ -1257,7 +973,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 
 	if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
 
-	usedParameters						|=	currentAttributes->usedParameters | additionalParameters;
+	usedParameters						|=	currentAttributes->usedParameters | CFrame::additionalParameters;
 
 	// Prepare the shading state
 	varying								=	currentShadingState->varying;
@@ -1319,8 +1035,8 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			I				=	varying[VARIABLE_I];
 
 			// Compute the derivative evaluation u/v
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				const float	d	=	dxdPixel / imagePlane;
+			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+				const float	d	=	CFrame::dxdPixel / CFrame::imagePlane;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -1353,7 +1069,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 					j++;
 				}
 			} else {
-				const float	d	=	dxdPixel;
+				const float	d	=	CFrame::dxdPixel;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -1426,12 +1142,12 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * imagePlane / P[COMP_Z])*dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * imagePlane / P[COMP_Z])*dPixeldy;
+					cXy[0]		=	(P[COMP_X] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldx;
+					cXy[1]		=	(P[COMP_Y] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -1439,8 +1155,8 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*dPixeldx;
-					cXy[1]		=	P[COMP_Y]*dPixeldy;
+					cXy[0]		=	P[COMP_X]*CFrame::dPixeldx;
+					cXy[1]		=	P[COMP_Y]*CFrame::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -1565,7 +1281,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	if (currentRayDepth == 0) {
 		float			*I				=	varying[VARIABLE_I];
 
-		if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 			memcpy(I,varying[VARIABLE_P],numVertices*3*sizeof(float));
 		} else {
 			for (i=numVertices;i>0;i--) {
@@ -1636,21 +1352,21 @@ CShadingState	*CShadingContext::newState() {
 		int				j;
 		float			*E;
 
-		newState->varying				=	new float*[maxGlobalVariables];				stats.vertexMemory	+=	maxGlobalVariables*sizeof(float *);
-		newState->tags					=	new int[maxGridSize*3];						stats.vertexMemory	+=	maxGridSize*3*sizeof(int);
-		newState->lightingTags			=	new int[maxGridSize*3];						stats.vertexMemory	+=	maxGridSize*3*sizeof(int);
-		newState->Ns					=	new float[maxGridSize*9];					stats.vertexMemory	+=	maxGridSize*3*sizeof(float);
+		newState->varying				=	new float*[CFrame::maxGlobalVariables];				stats.vertexMemory	+=	CFrame::maxGlobalVariables*sizeof(float *);
+		newState->tags					=	new int[CFrame::options.maxGridSize*3];				stats.vertexMemory	+=	CFrame::options.maxGridSize*3*sizeof(int);
+		newState->lightingTags			=	new int[CFrame::options.maxGridSize*3];				stats.vertexMemory	+=	CFrame::options.maxGridSize*3*sizeof(int);
+		newState->Ns					=	new float[CFrame::options.maxGridSize*9];			stats.vertexMemory	+=	CFrame::options.maxGridSize*3*sizeof(float);
 		newState->alights				=	NULL;
 		newState->freeLights			=	NULL;
 		newState->postShader			=	NULL;
 		newState->currentObject			=	NULL;
 
-		for (j=0;j<maxGlobalVariables;j++) {
+		for (j=0;j<CFrame::maxGlobalVariables;j++) {
 			newState->varying[j]	=	NULL;
 		}
 
-		for (j=0;j<numGlobalVariables;j++) {
-			const	CVariable	*var	=	globalVariables[j];
+		for (j=0;j<CFrame::numGlobalVariables;j++) {
+			const	CVariable	*var	=	CFrame::globalVariables[j];
 
 			assert(var != NULL);
 
@@ -1658,14 +1374,14 @@ CShadingState	*CShadingContext::newState() {
 				newState->varying[j]	=	new float[var->numFloats];
 				stats.vertexMemory		+=	var->numFloats*sizeof(float);
 			} else {
-				newState->varying[j]	=	new float[var->numFloats*maxGridSize*3];
-				stats.vertexMemory		+=	var->numFloats*maxGridSize*3*sizeof(float);
+				newState->varying[j]	=	new float[var->numFloats*CFrame::options.maxGridSize*3];
+				stats.vertexMemory		+=	var->numFloats*CFrame::options.maxGridSize*3*sizeof(float);
 			}
 		}
 
 		// E is always (0,0,0)
 		E	=	newState->varying[VARIABLE_E];
-		for (j=maxGridSize*3;j>0;j--) {
+		for (j=CFrame::options.maxGridSize*3;j>0;j--) {
 			initv(E,0,0,0);
 			E	+=	3;
 		}
@@ -1705,24 +1421,24 @@ void				CShadingContext::deleteState(CShadingState *cState) {
 void			CShadingContext::freeState(CShadingState *cState) {
 	int	j;
 
-	for (j=0;j<numGlobalVariables;j++) {
-		if (globalVariables[j] != NULL) {
-			const CVariable	*var	=	globalVariables[j];
+	for (j=0;j<CFrame::numGlobalVariables;j++) {
+		if (CFrame::globalVariables[j] != NULL) {
+			const CVariable	*var	=	CFrame::globalVariables[j];
 
 			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
 				delete [] cState->varying[j];
 				stats.vertexMemory		-=	var->numFloats*sizeof(float);
 			} else {
 				delete [] cState->varying[j];
-				stats.vertexMemory		-=	var->numFloats*maxGridSize*3*sizeof(float);
+				stats.vertexMemory		-=	var->numFloats*CFrame::options.maxGridSize*3*sizeof(float);
 			}
 		}
 	}
 
-	delete [] cState->varying;					stats.vertexMemory	-=	maxGlobalVariables*sizeof(float *);
-	delete [] cState->tags;						stats.vertexMemory	-=	maxGridSize*3*sizeof(int);
-	delete [] cState->lightingTags;				stats.vertexMemory	-=	maxGridSize*3*sizeof(int);
-	delete [] cState->Ns;						stats.vertexMemory	-=	maxGridSize*9*sizeof(float);
+	delete [] cState->varying;					stats.vertexMemory	-=	CFrame::maxGlobalVariables*sizeof(float *);
+	delete [] cState->tags;						stats.vertexMemory	-=	CFrame::options.maxGridSize*3*sizeof(int);
+	delete [] cState->lightingTags;				stats.vertexMemory	-=	CFrame::options.maxGridSize*3*sizeof(int);
+	delete [] cState->Ns;						stats.vertexMemory	-=	CFrame::options.maxGridSize*9*sizeof(float);
 	
 	delete cState;
 }
@@ -1732,31 +1448,6 @@ void			CShadingContext::freeState(CShadingState *cState) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	variableUpdate
-// Description			:	This function is called to signal that there has been
-//							a modification on the set of active variables
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/25/2002
-void		CShadingContext::initState(CVariable *var,int numGlobal) {
-	numGlobalVariables	=	numGlobal;
-	maxGlobalVariables	=	numGlobal + 50;
-	globalVariables		=	new CVariable*[maxGlobalVariables];
-
-	for (;var!=NULL;var=var->next) {
-		if (var->storage == STORAGE_GLOBAL) {
-			assert(var->entry <= numGlobal);
-			globalVariables[var->entry]		=	var;
-		}
-	}
-
-	assert(freeStates == NULL);
-	assert(currentShadingState == NULL);
-
-	currentShadingState	=	newState();
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -1766,11 +1457,8 @@ void		CShadingContext::initState(CVariable *var,int numGlobal) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CShadingContext::updateState(CVariable *var) {
+void		CShadingContext::updateState() {
 	CShadingState	*cState;
-
-	assert(var->storage == STORAGE_GLOBAL);
-	assert(var->entry == numGlobalVariables);
 
 	// Ditch the shading states that have been allocated
 	while ((cState=freeStates) != NULL) {
@@ -1778,327 +1466,12 @@ void		CShadingContext::updateState(CVariable *var) {
 		freeState(cState);
 	}
 
-	if (numGlobalVariables == maxGlobalVariables) {
-		CVariable	**nvariables;
-
-		freeState(currentShadingState);
-		currentShadingState	=	NULL;
-
-		nvariables			=	new CVariable*[maxGlobalVariables + 50];
-		memcpy(nvariables,globalVariables,numGlobalVariables*sizeof(CVariable *));
-		delete [] globalVariables;
-		globalVariables		=	nvariables;
-		maxGlobalVariables	+=	50;
-	}
-
-	globalVariables[numGlobalVariables++]	=	var;
-
-	if (currentShadingState == NULL)	currentShadingState	=	newState();
-	else {
-		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-			currentShadingState->varying[var->entry]	=	new float[var->numFloats];
-			stats.vertexMemory							+=	var->numFloats*sizeof(float);
-		} else {
-			currentShadingState->varying[var->entry]	=	new float[var->numFloats*maxGridSize*3];
-			stats.vertexMemory							+=	var->numFloats*maxGridSize*3*sizeof(float);
-		}
-	}
+	// Recreate
+	freeState(currentShadingState);
+	currentShadingState	=	NULL;
+	currentShadingState	=	newState();
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getTexture
-// Description			:	Load a texture from file
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-CTexture	*CShadingContext::getTexture(const char *name) {
-	CFileResource	*tex;
-
-	if (loadedFiles->find(name,tex) == FALSE){
-		// Load the texture
-		tex	=	currentRenderer->textureLoad(name,texturePath);
-
-		if (tex == NULL)	{
-			// Not found, substitude with a dummy one
-			error(CODE_NOFILE,"Unable open texture \"%s\"\n",name);
-			tex					=	new CTexture(name,128,128,TEXTURE_PERIODIC,TEXTURE_PERIODIC);
-		}
-
-		loadedFiles->insert(tex->name,tex);
-	}
-
-	return (CTexture *) tex;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getEnvironment
-// Description			:	Load an environment map (which can also be a shadow map)
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-CEnvironment	*CShadingContext::getEnvironment(const char *name) {
-	CFileResource	*tex;
-
-	if (loadedFiles->find(name,tex) == FALSE){
-		tex	=	currentRenderer->environmentLoad(name,texturePath,world->to);
-
-		if (tex == NULL)	{
-			// Not found, substitude with a dummy one
-			error(CODE_NOFILE,"Unable open environment \"%s\"\n",name);
-			tex					=	new CEnvironment(name);
-		}
-
-		loadedFiles->insert(tex->name,tex);
-	}
-
-	return (CEnvironment *) tex;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getPhotonMap
-// Description			:	Load a photon map
-// Return Value			:
-// Comments				:
-// Date last edited		:	3/11/2003
-CPhotonMap		*CShadingContext::getPhotonMap(const char *name) {
-	CFileResource	*map;
-	char			fileName[OS_MAX_PATH_LENGTH];
-	FILE			*in;
-
-	// Check the cache to see if the file is in the memory
-	if (loadedFiles->find(name,map) == FALSE){
-
-		// Locate the file
-		if (currentRenderer->locateFile(fileName,name,texturePath)) {
-			// Try to open the file
-			in		=	ropen(fileName,"rb",filePhotonMap,TRUE);
-		} else {
-			in		=	NULL;
-		}
-
-		// Read it
-		map		=	new CPhotonMap(name,world,in);
-		loadedFiles->insert(map->name,map);
-	}
-
-	return (CPhotonMap *) map;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getCache
-// Description			:	Load a cache
-// Return Value			:
-// Comments				:
-// Date last edited		:	3/11/2003
-CCache		*CShadingContext::getCache(const char *name,const char *mode) {
-	CFileResource	*cache;
-	
-	// Check the memory first
-	if (loadedFiles->find(name,cache) == FALSE){
-		char				fileName[OS_MAX_PATH_LENGTH];
-		int					flags;
-		char				type[128];
-		int					createChannel = FALSE;
-		CIrradianceCache	*icache = NULL;
-		CRadianceCache		*rcache = NULL;
-
-		// Process the file mode
-		if (strcmp(mode,"r") == 0) {
-			flags	=	CACHE_READ| CACHE_SAMPLE;
-		} else if (strcmp(mode,"w") == 0) {
-			flags	=	CACHE_WRITE | CACHE_SAMPLE;
-		} else if (strcmp(mode,"R") == 0) {
-			flags	=	CACHE_READ | CACHE_RDONLY;
-		} else if (strcmp(mode,"rw") == 0) {
-			flags	=	CACHE_READ | CACHE_WRITE | CACHE_SAMPLE;
-		} else {
-			flags	=	CACHE_SAMPLE;
-		}
-		
-		// Try to read the file
-		cache		=	NULL;
-		if (flags & CACHE_READ) {
-
-			// Locate the file
-			if (currentRenderer->locateFile(fileName,name,texturePath)) {
-				FILE	*in	=	ropen(fileName,type);
-
-				if (in != NULL) {
-					// If we're netrendering and writing, treat specially
-					if ((netClient != INVALID_SOCKET) && (flags & CACHE_WRITE)) {
-						flags			&=	~CACHE_WRITE;		// don't flush cache to disk
-						createChannel	=	TRUE;
-						if (strncmp(fileName,temporaryPath,strlen(temporaryPath)) == 0) {
-							// it's a temp file, delete it after we're done
-							currentRenderer->registerFrameTemporary(fileName,TRUE);
-						}
-						// always remove the file mapping when writing
-						currentRenderer->registerFrameTemporary(name,FALSE);
-					}
-					
-					// Create the cache
-					if (strcmp(type,fileIrradianceCache) == 0) {
-						cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,in);
-					} else if (strcmp(type,fileGatherCache) == 0) {
-						cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,in,triangles);
-					} else {
-						error(CODE_BUG,"This seems to be a Pixie file of unrecognised type (%s)\n",name);
-						fclose(in);
-					}
-				}
-			}
-		}
-
-		// If there is no cache, create it
-		if (cache == NULL) {
-			// If we're netrendering and writing, treat specially
-			if ((netClient != INVALID_SOCKET) && (flags & CACHE_WRITE)) {
-				flags			&=	~CACHE_WRITE;		// don't flush cache to 
-				createChannel	=	TRUE;
-				// always remove the file mapping when writing
-				currentRenderer->registerFrameTemporary(name,FALSE);
-			}
-			
-			// go ahead and create the cache
-			if (this->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
-				cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
-			} else {
-				cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,NULL);
-			}
-		}
-		
-		// Create channels if possible
-		if (createChannel == TRUE) {
-			if (icache != NULL) {
-				requestRemoteChannel(new CRemoteICacheChannel(icache));
-			} else if (rcache != NULL) {
-				error(CODE_LIMIT,"Radiancecache file \"%s\" cannot be written to in paralell / network renders\n",name);
-
-				// Prevent crashes caused by unwritable empty cache
-				delete cache;
-				flags |= CACHE_WRITE;
-				osTempname(temporaryPath,"rndr",fileName);
-				cache = new CRadianceCache(fileName,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
-			}
-		}
-
-		loadedFiles->insert(cache->name,cache);
-	}
-
-	return (CCache *) cache;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getTextureInfo
-// Description			:	Load a texture from file
-// Return Value			:
-// Comments				:
-// Date last edited		:	02/22/2006
-CTextureInfoBase	*CShadingContext::getTextureInfo(const char *name) {
-	CFileResource	*tex;
-
-	if (loadedFiles->find(name,tex) == FALSE){
-		// try environments first
-		tex	=	currentRenderer->environmentLoad(name,texturePath,world->to);
-
-		if (tex == NULL)	{
-			// else try as textures
-			tex	=	currentRenderer->textureLoad(name,texturePath);
-		}
-
-		if (tex != NULL) {
-			// only store the result if found
-			loadedFiles->insert(tex->name,tex);
-		}
-	}
-
-	return (CTextureInfoBase *) tex;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getTexture3d
-// Description			:	Get a point cloud or brickmap
-// Return Value			:
-// Comments				:
-// Date last edited		:	02/22/2006
-CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const char* channels,const char *coordsys) {
-	CFileResource	*texture3d;
-	char			fileName[OS_MAX_PATH_LENGTH];
-	FILE			*in;
-
-	if (loadedFiles->find(name,texture3d) == FALSE){
-	
-		CXform *xform = world;
-		if (coordsys != NULL) {
-			ECoordinateSystem	esys;
-			matrix				*from,*to;
-			
-			// non worldspace texture
-			xform = new CXform();
-			findCoordinateSystem(coordsys,from,to,esys);
-	
-			movmm(xform->from,from[0]);	// construct the transform to put us in the desired system
-			movmm(xform->to,to[0]);
-		}
-		
-		// If we are writing, it must be a point cloud
-		if (write == TRUE) {
-			
-			if (netClient != INVALID_SOCKET) {
-				CPointCloud	*cloud	=	new CPointCloud(name,xform,channels,FALSE);
-				texture3d			=	cloud;
-			
-				// Ensure we unmap the file when done.  Do not delete it
-				// as we mark the file to never be written in the server
-				currentRenderer->registerFrameTemporary(name,FALSE);
-				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
-			} else {
-				// alloate a point cloud which will be written to disk
-				CXform *dummy = new CXform;
-				texture3d	=	new CPointCloud(name,xform,channels,TRUE);
-			}
-			
-		} else {
-			// Locate the file
-			if (currentRenderer->locateFile(fileName,name,texturePath)) {
-				// Try to open the file
-				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-					CXform *dummy = new CXform;
-					texture3d	=	new CPointCloud(name,xform,in);
-				} else {
-					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
-						texture3d	=	new CBrickMap(in,name,xform);
-					}
-				}
-			} else {
-				in		=	NULL;
-			}
-			
-			if (in == NULL) {
-				// allocate a dummy blank-channel point cloud
-				error(CODE_BADTOKEN,"Cannot find or open Texture3d file \"%s\"\n",name);
-				texture3d	=	new CPointCloud(name,xform,NULL,FALSE);
-				// remove the dummy mapping once the frame ends
-				currentRenderer->registerFrameTemporary(name,FALSE);
-			}
-		}
-		
-		// tidy up in case something went wrong
-		xform->check();
-		
-		loadedFiles->insert(texture3d->name,texture3d);
-	}
-
-	return (CPointCloud *) texture3d;
-}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -2187,88 +1560,88 @@ int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **
 int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 	if (strcmp(name,optionsFormat) == 0) {
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) xres;
-		d[1]		=	(float) yres;
+		d[0]		=	(float) CFrame::options.xres;
+		d[1]		=	(float) CFrame::options.yres;
 		d[2]		=	(float) 1;
 		return TRUE;
 	} else if (strcmp(name,optionsDeviceFrame) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) frame;
+		d[0]		=	(float) CFrame::options.frame;
 		return TRUE;
 	} else if (strcmp(name,optionsDeviceResolution) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) xres;
-		d[1]		=	(float) yres;
+		d[0]		=	(float) CFrame::options.xres;
+		d[1]		=	(float) CFrame::options.yres;
 		d[2]		=	(float) 1;
 		return TRUE;
 	} else if (strcmp(name,optionsFrameAspectRatio) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) frameAR;
+		d[0]		=	(float) CFrame::options.frameAR;
 		return TRUE;
 	} else if (strcmp(name,optionsCropWindow) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) cropLeft;
-		d[1]		=	(float) cropTop;
-		d[2]		=	(float) cropRight;
-		d[3]		=	(float) cropBottom;
+		d[0]		=	(float) CFrame::options.cropLeft;
+		d[1]		=	(float) CFrame::options.cropTop;
+		d[2]		=	(float) CFrame::options.cropRight;
+		d[3]		=	(float) CFrame::options.cropBottom;
 		return TRUE;
 	} else if (strcmp(name,optionsDepthOfField) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) fstop;
-		d[1]		=	(float) focallength;
-		d[2]		=	(float) focaldistance;
+		d[0]		=	(float) CFrame::options.fstop;
+		d[1]		=	(float) CFrame::options.focallength;
+		d[2]		=	(float) CFrame::options.focaldistance;
 		return TRUE;
 	} else if (strcmp(name,optionsShutter) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) shutterOpen;
-		d[1]		=	(float) shutterClose;
+		d[0]		=	(float) CFrame::options.shutterOpen;
+		d[1]		=	(float) CFrame::options.shutterClose;
 		return TRUE;
 	} else if (strcmp(name,optionsClipping) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) clipMin;
-		d[1]		=	(float) clipMax;
+		d[0]		=	(float) CFrame::options.clipMin;
+		d[1]		=	(float) CFrame::options.clipMax;
 		return TRUE;
 	} else if (strcmp(name,optionsBucketSize) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) bucketWidth;
-		d[1]		=	(float) bucketHeight;
+		d[0]		=	(float) CFrame::options.bucketWidth;
+		d[1]		=	(float) CFrame::options.bucketHeight;
 		return TRUE;
 	} else if (strcmp(name,optionsColorQuantizer) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) colorQuantizer[0];
-		d[1]		=	(float) colorQuantizer[1];
-		d[2]		=	(float) colorQuantizer[2];
-		d[3]		=	(float) colorQuantizer[3];
+		d[0]		=	(float) CFrame::options.colorQuantizer[0];
+		d[1]		=	(float) CFrame::options.colorQuantizer[1];
+		d[2]		=	(float) CFrame::options.colorQuantizer[2];
+		d[3]		=	(float) CFrame::options.colorQuantizer[3];
 		return TRUE;
 	} else if (strcmp(name,optionsDepthQuantizer) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) depthQuantizer[0];
-		d[1]		=	(float) depthQuantizer[1];
-		d[2]		=	(float) depthQuantizer[2];
-		d[3]		=	(float) depthQuantizer[3];
+		d[0]		=	(float) CFrame::options.depthQuantizer[0];
+		d[1]		=	(float) CFrame::options.depthQuantizer[1];
+		d[2]		=	(float) CFrame::options.depthQuantizer[2];
+		d[3]		=	(float) CFrame::options.depthQuantizer[3];
 		return TRUE;
 	} else if (strcmp(name,optionsPixelFilter) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) pixelFilterWidth;
-		d[1]		=	(float) pixelFilterHeight;
+		d[0]		=	(float) CFrame::options.pixelFilterWidth;
+		d[1]		=	(float) CFrame::options.pixelFilterHeight;
 		return TRUE;
 	} else if (strcmp(name,optionsGamma) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) gamma;
-		d[1]		=	(float) gain;
+		d[0]		=	(float) CFrame::options.gamma;
+		d[1]		=	(float) CFrame::options.gain;
 		return TRUE;
 	} else if (strcmp(name,optionsMaxRayDepth) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) maxRayDepth;
+		d[0]		=	(float) CFrame::options.maxRayDepth;
 		return TRUE;
 	} else if (strcmp(name,optionsRelativeDetail) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) relativeDetail;
+		d[0]		=	(float) CFrame::options.relativeDetail;
 		return TRUE;
 	} else if (strcmp(name,optionsPixelSamples) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) pixelXsamples;
-		d[1]		=	(float) pixelYsamples;
+		d[0]		=	(float) CFrame::options.pixelXsamples;
+		d[1]		=	(float) CFrame::options.pixelYsamples;
 		return TRUE;
 	}
 	return FALSE;
@@ -2431,8 +1804,8 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 			to			=	&identity;
 			break;
 		case COORDINATE_WORLD:
-			from		=	&world->from;
-			to			=	&world->to;
+			from		=	&CFrame::fromWorld;
+			to			=	&CFrame::toWorld;
 			break;
 		case COORDINATE_SHADER:
 			assert(currentShadingState->currentShaderInstance != NULL);
@@ -2447,16 +1820,16 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 			to			=	&(currentShadingState->currentLightInstance->xform->to);
 			break;
 		case COORDINATE_NDC:
-			from		=	&fromNDC;
-			to			=	&toNDC;
+			from		=	&CFrame::fromNDC;
+			to			=	&CFrame::toNDC;
 			break;
 		case COORDINATE_RASTER:
-			from		=	&fromRaster;
-			to			=	&toRaster;
+			from		=	&CFrame::fromRaster;
+			to			=	&CFrame::toRaster;
 			break;
 		case COORDINATE_SCREEN:
-			from		=	&fromScreen;
-			to			=	&toScreen;
+			from		=	&CFrame::fromScreen;
+			to			=	&CFrame::toScreen;
 			break;
 		case COORDINATE_CURRENT:
 			from		=	&identity;

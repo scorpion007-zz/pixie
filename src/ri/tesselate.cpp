@@ -38,6 +38,7 @@
 #include "memory.h"
 #include "pl.h"
 #include "polygons.h"
+#include "frame.h"
 
 //#define TESSELATION_PRINT
 
@@ -131,9 +132,9 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 
 	// Allocate the memory we'll use for tesselation
 	vertexHash					=	(CQuadVertex **)	ralloc(HASH_SIZE*sizeof(CQuadVertex *));
-	shadingListBase				=	(CQuadVertex **)	ralloc(maxGridSize*sizeof(CQuadVertex *));
+	shadingListBase				=	(CQuadVertex **)	ralloc(CFrame::options.maxGridSize*sizeof(CQuadVertex *));
 	shadingList					=	shadingListBase;
-	numRemainingShadingPoints	=	maxGridSize;
+	numRemainingShadingPoints	=	CFrame::options.maxGridSize;
 
 	// Init the hash table
 	for (i=0;i<HASH_SIZE;i++) {
@@ -195,11 +196,11 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 						// We have exhausted the available shading list, flush it
 
 						// Compute the vertices
-						displace(object,maxGridSize,shadingListBase);
+						displace(object,CFrame::options.maxGridSize,shadingListBase);
 
 						// Reset the list
 						shadingList					=	shadingListBase;
-						numRemainingShadingPoints	=	maxGridSize;
+						numRemainingShadingPoints	=	CFrame::options.maxGridSize;
 					}
 nextPoint:;
 				}
@@ -208,14 +209,14 @@ nextPoint:;
 
 
 		// If there are vertices waiting to be computed in our list, flush them out
-		if (numRemainingShadingPoints < maxGridSize) {
+		if (numRemainingShadingPoints < CFrame::options.maxGridSize) {
 
 			// Compute the vertices
-			displace(object,maxGridSize - numRemainingShadingPoints,shadingListBase);
+			displace(object,CFrame::options.maxGridSize - numRemainingShadingPoints,shadingListBase);
 
 			// Reset the list
 			shadingList					=	shadingListBase;
-			numRemainingShadingPoints	=	maxGridSize;
+			numRemainingShadingPoints	=	CFrame::options.maxGridSize;
 		}
 
 		// Refine the quads if necessary
@@ -282,11 +283,15 @@ nextPoint:;
 		front	=	newFront;
 	}
 
+	// Make sure the memory is allocated
+	if (CFrame::raytraced == NULL)	CFrame::raytraced	=	new CArray<CSurface *>;
+	if (CFrame::tracables  == NULL)	CFrame::tracables	=	new CArray<CTracable *>;
+
 	// Save the object
 	object->attach();
-	raytraced->push(object);
+	CFrame::raytraced->push(object);
 
-	if ((flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+	if ((CFrame::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 		moving	=	TRUE;
 	} else {
 		moving	=	FALSE;
@@ -346,7 +351,7 @@ nextPoint:;
 
 #define createVertex(__dest,__src)															\
 				if ((__dest = __src->vertex) == NULL) {										\
-					CMovingVertex	*t0	=	(CMovingVertex *) frameMemory->alloc(sizeof(CMovingVertex));	\
+					CMovingVertex	*t0	=	(CMovingVertex *) CFrame::frameMemory->alloc(sizeof(CMovingVertex));	\
 					CQuadVertex		*s0	=	__src;											\
 																							\
 					movvv(t0->P[0],s0->P0);													\
@@ -367,7 +372,7 @@ nextPoint:;
 #undef createVertex
 
 				// Create the first triangle
-				t				=	(CMovingTriangle *)	frameMemory->alloc(sizeof(CMovingTriangle)*2);
+				t				=	(CMovingTriangle *)	CFrame::frameMemory->alloc(sizeof(CMovingTriangle)*2);
 				t->v[0]			=	(CVertex *) v0;
 				t->v[1]			=	(CVertex *) v2;
 				t->v[2]			=	(CVertex *) v1;
@@ -379,7 +384,7 @@ nextPoint:;
 				t				=	new (t) CMovingTriangle();
 #endif
 				if ((dotvv(t->N[0],t->N[0]) > 0) && (dotvv(t->N[1],t->N[1]) > 0))
-					tracables->push(t);
+					CFrame::tracables->push(t);
 
 				t++;
 
@@ -394,7 +399,7 @@ nextPoint:;
 				t				=	new (t) CMovingTriangle();
 #endif
 				if ((dotvv(t->N[0],t->N[0]) > 0) && (dotvv(t->N[1],t->N[1]) > 0))
-					tracables->push(t);
+					CFrame::tracables->push(t);
 
 				stats.numRayTriangles	+=	2;
 			} else {
@@ -402,7 +407,7 @@ nextPoint:;
 
 #define createVertex(__dest,__src)															\
 				if ((__dest = __src->vertex) == NULL) {										\
-					CVertex		*t0	=	(CVertex *) frameMemory->alloc(sizeof(CVertex));	\
+					CVertex		*t0	=	(CVertex *) CFrame::frameMemory->alloc(sizeof(CVertex));	\
 					CQuadVertex	*s0	=	__src;												\
 																							\
 					movvv(t0->P,s0->P0);													\
@@ -422,7 +427,7 @@ nextPoint:;
 
 
 				// Create the first triangle
-				t				=	(CTriangle *)	frameMemory->alloc(sizeof(CTriangle)*2);
+				t				=	(CTriangle *)	CFrame::frameMemory->alloc(sizeof(CTriangle)*2);
 				t->v[0]			=	(CVertex *) v0;
 				t->v[1]			=	(CVertex *) v2;
 				t->v[2]			=	(CVertex *) v1;
@@ -434,8 +439,8 @@ nextPoint:;
 				t				=	new (t) CTriangle();
 #endif
 				if (dotvv(t->N,t->N) > 0){
-					tracables->push(t);
-					if (triangles != NULL) triangles->push(t);
+					CFrame::tracables->push(t);
+					if (CFrame::triangles != NULL) CFrame::triangles->push(t);
 				}
 				
 				t++;
@@ -451,8 +456,8 @@ nextPoint:;
 				t				=	new (t) CTriangle();
 #endif
 				if (dotvv(t->N,t->N) > 0){
-					tracables->push(t);
-					if (triangles != NULL) triangles->push(t);
+					CFrame::tracables->push(t);
+					if (CFrame::triangles != NULL) CFrame::triangles->push(t);
 				}
 
 				stats.numRayTriangles	+=	2;
@@ -551,7 +556,7 @@ int			CShadingContext::refine2D(const CAttributes *attributes,CQuad *cQuad) {
 
 		// Screen space flatness
 		if (clipCode == 0) {
-			if (disp > (lengthA*midVertex->P0[COMP_Z] + lengthB)*attributes->flatness)	return TRUE;
+			if (disp > (CFrame::lengthA*midVertex->P0[COMP_Z] + CFrame::lengthB)*attributes->flatness)	return TRUE;
 		}
 
 		// Normal deviation
@@ -589,7 +594,7 @@ int		CShadingContext::refine1D(const CAttributes *attributes,const CQuadVertex *
 	// Only when visible
 	if ((v0->clipCode & v1->clipCode & v2->clipCode) == 0) {
 		// Screen space flatness
-		if (dist > (lengthA*v1->P0[COMP_Z] + lengthB)*attributes->flatness)	return TRUE;
+		if (dist > (CFrame::lengthA*v1->P0[COMP_Z] + CFrame::lengthB)*attributes->flatness)	return TRUE;
 	}
 
 	// Normal deviation
@@ -635,11 +640,11 @@ void		CShadingContext::displace(CSurface *object,int numPoints,CQuadVertex **ver
 
 		normalizev(cVertex->N0,N);
 		movvv(cVertex->P0,P);
-		cVertex->clipCode	=	clipCode(cVertex->P0);
+		cVertex->clipCode	=	CFrame::clipCode(cVertex->P0);
 	}
 
 	// Do we have movement ?
-	if ( (flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+	if ( (CFrame::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 		u			=	varying[VARIABLE_U];
 		v			=	varying[VARIABLE_V];
 		time		=	varying[VARIABLE_TIME];

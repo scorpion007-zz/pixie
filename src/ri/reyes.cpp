@@ -149,7 +149,7 @@ CReyes::CBucket::~CBucket() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	2/1/2002
-CReyes::CReyes(COptions *o,CXform *x,SOCKET s,unsigned int hf) : CShadingContext(o,x,s,hf) {
+CReyes::CReyes(unsigned int hf) : CShadingContext(hf) {
 	int			cx,cy;
 
 	// Allocate the buckets

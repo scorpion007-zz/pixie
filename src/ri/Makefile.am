@@ -20,6 +20,10 @@ libri_la_SOURCES = 		attributes.cpp \
 				executeMisc.cpp \
 				fileResource.cpp \
 				frame.cpp \
+				frameDeclerations.cpp \
+				frameDisplay.cpp \
+				frameFiles.cpp \
+				frameNetwork.cpp \
 				hcshader.cpp \
 				hierarchy.cpp \
 				implicitSurface.cpp \

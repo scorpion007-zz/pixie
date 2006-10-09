@@ -36,6 +36,7 @@
 #include "error.h"
 #include "pointCloud.h"
 #include "memory.h"
+#include "frame.h"
 
 
 
@@ -1390,7 +1391,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	// the shading context is gone
 	CBrickMap::brickMapInit(100000000);
 	
-	if (currentRenderer->locateFile(fileName,src,searchPath)) {
+	if (CFrame::locateFile(fileName,src,searchPath)) {
 		FILE *in;
 		if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
 			// create backing store in a temp file

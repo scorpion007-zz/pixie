@@ -44,7 +44,7 @@
 // Date last edited		:	7/31/2002
 class	CZbuffer : public CReyes , public COcclusionCuller {
 public:
-				CZbuffer(COptions *,CXform *,SOCKET);
+				CZbuffer();
 				~CZbuffer();
 
 				// The functions inherited from the CReyes
