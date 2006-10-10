@@ -154,16 +154,8 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 // Date last edited		:	8/25/2002
 CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
-	CFrame::beginRenderer(fibFile,riNetString);
-
-	
-	numExpectedMotions				=	1;
-	numMotions						=	0;
-	keyTimes						=	NULL;
-	motionParameters				=	NULL;
-	maxMotionParameters				=	0;
-	lastCommand						=	NULL;
-
+	// Initiate the frame
+	CFrame::beginRenderer(ribFile,riNetString);
 
 	// Init the graphics state
 	savedXforms						=	new CArray<CXform *>;
@@ -184,6 +176,14 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 	currentXform->attach();
 	currentAttributes->attach();
 
+	// Some misc data used in the RI interface
+	numExpectedMotions				=	1;
+	numMotions						=	0;
+	keyTimes						=	NULL;
+	motionParameters				=	NULL;
+	maxMotionParameters				=	0;
+	lastCommand						=	NULL;
+
 	
 	// Netfile dictionary if we're a netrender daemon
 	if (CFrame::netClient != INVALID_SOCKET) {
@@ -193,28 +193,18 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 		char	*newTemporaryPath = (char*) malloc(OS_MAX_PATH_LENGTH);
 		char	hostName[1024];
 		gethostname(hostName,1024);
-		#ifdef WIN32
+#ifdef WIN32
 		sprintf(newTemporaryPath,"%s-%s-%d",currentOptions->temporaryPath,hostName,GetCurrentProcessId());
-		#else
+#else
 		sprintf(newTemporaryPath,"%s-%s-%d",currentOptions->temporaryPath,hostName,getpid());
-		#endif
+#endif
 		osFixSlashes(newTemporaryPath);
 		free(currentOptions->temporaryPath);
 		currentOptions->temporaryPath = newTemporaryPath;
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	sfClearTemp
-// Description			:	This callback function is used to remove the temporary files
-// Return Value			:
-// Comments				:
-// Date last edited		:	7/4/2001
-static int	rcClearTemp(const char *fileName,void *userData) {
-	osDeleteFile(fileName);
 
-	return TRUE;
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
@@ -225,67 +215,13 @@ static int	rcClearTemp(const char *fileName,void *userData) {
 // Date last edited		:	8/25/2002
 CRendererContext::~CRendererContext() {
 
-	assert(renderer		== NULL);
-
-	// In the case of an abnormal termination, clear the memory
-	if (renderer != NULL) {
-		delete renderer;
-	}	
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			I N T E R F A C E			S H U T D O W N
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
+	// Destroy the misc stuff
 	if (keyTimes != NULL)			delete [] keyTimes;
 	if (motionParameters != NULL)	delete [] motionParameters;
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			S T A T S			S H U T D O W N
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	stats.rendererTime	=	osCPUTime()	-	stats.rendererStartTime;
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			G R A P H I C S		S T A T E		S H U T D O W N
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-
-	// Ditch the defined objects
-	CArray<CObject *>	*CArray;
-	CDSO				*cDso;
-
-	// Ditch the DSO shaders that have been loaded
-	for (cDso=dsos;cDso!=NULL;) {
-		CDSO	*nDso	=	cDso->next;
-		// Call DSO's cleanup
-		if(cDso->cleanup != NULL) cDso->cleanup(cDso->handle);
-		free(cDso->name);
-		free(cDso->prototype);
-		delete cDso;
-		cDso	=	nDso;
-	}
-
-	// Ditch the temporary files created
-	if (osFileExists(currentOptions->temporaryPath)) {
-		char	tmp[OS_MAX_PATH_LENGTH];
-
-		sprintf(tmp,"%s\\*",currentOptions->temporaryPath);
-		osFixSlashes(tmp);
-		osEnumerate(tmp,rcClearTemp,NULL);
-		osDeleteDir(currentOptions->temporaryPath);
-	}
+		
 
 	// Ditch the instance objects created
+	CArray<CObject *>	*CArray;
 	for (CArray=allocatedInstances->pop();CArray!=NULL;CArray=allocatedInstances->pop()) {
 		CObject	*cObject;
 
@@ -329,57 +265,6 @@ CRendererContext::~CRendererContext() {
 	savedXforms->destroy();
 	savedAttributes->destroy();
 	savedOptions->destroy();
-
-	assert(loadedFiles != NULL);
-	loadedFiles->destroy();
-
-	assert(declaredVariables != NULL);
-	declaredVariables->destroy();
-	
-	// Delete the display channels
-	assert(declaredChannels != NULL);
-	assert(displayChannels != NULL);
-	declaredChannels->destroy();
-	delete displayChannels;
-
-	assert(definedCoordinateSystems	!=	NULL);
-	definedCoordinateSystems->destroy();
-	
-	assert(globalIdHash != NULL);
-	globalIdHash->destroy();
-	
-	// Ditch temporary file and net file mappings
-	
-	if (frameTemporaryFiles != NULL) {
-		frameTemporaryFiles->destroy();
-	}
-	
-	if (netFileMappings != NULL) {
-		netFileMappings->destroy();
-	}
-
-	// Cleanup the parser
-	parserCleanup();
-
-	// Network shutdown
-	if (netClient != INVALID_SOCKET) {
-		closesocket(netClient);
-	}
-
-	if (netNumServers != 0) {
-		int	i;
-
-		for (i=0;i<netNumServers;i++) {
-			closesocket(netServers[i]);
-		}
-
-		delete [] netServers;
-	}
-
-	memoryTini();
-
-	// Check the stats for memory leaks
-	stats.check();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -460,18 +345,18 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 	// Check if we already loaded this shader before ...
 	cShader		=	NULL;
 	cInstance	=	NULL;
-	if (loadedFiles->find(name,file)) {
+	if (CFrame::loadedFiles->find(name,file)) {
 		cShader		=	(CShader *) file;
 	}
 
 	// If not found, search scripts
 	if (cShader == NULL) {
 		char	shaderLocation[OS_MAX_PATH_LENGTH];
-		if (locateFileEx(shaderLocation,name,"sdr",currentOptions->shaderPath) == TRUE) {
+		if (CFrame::locateFileEx(shaderLocation,name,"sdr",currentOptions->shaderPath) == TRUE) {
 			cShader	=	parseShader(name,shaderLocation);
 
 			if (cShader != NULL) {
-				loadedFiles->insert(cShader->name,cShader);
+				CFrame::loadedFiles->insert(cShader->name,cShader);
 			}
 		}
 	}
@@ -545,7 +430,7 @@ int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoEx
 	CDSO				*cDso;
 
 	// Check if the DSO had been loaded before
-	for (cDso=dsos;cDso!=NULL;cDso=cDso->next) {
+	for (cDso=CFrame::dsos;cDso!=NULL;cDso=cDso->next) {
 		if (strcmp(cDso->name,name) == 0) {
 			if (strcmp(cDso->prototype,prototype) == 0) {
 				handle	=	cDso->handle;
@@ -556,7 +441,7 @@ int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoEx
 	}
 
 	// Load a DSO shader
-	if (loadDSO(name,prototype,currentOptions->proceduralPath,&init,&exec,&cleanup) == TRUE) {
+	if (CFrame::loadDSO(name,prototype,currentOptions->proceduralPath,&init,&exec,&cleanup) == TRUE) {
 		// OK, we found the shader
 		if (init !=	NULL)	handle	=	init(0,NULL);
 		else				handle	=	NULL;
@@ -569,8 +454,8 @@ int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoEx
 		cDso->handle	=	handle;
 		cDso->name		=	strdup(name);
 		cDso->prototype	=	strdup(prototype);
-		cDso->next		=	dsos;
-		dsos			=	cDso;
+		cDso->next		=	CFrame::dsos;
+		CFrame::dsos	=	cDso;
 
 		return TRUE;
 	}
@@ -644,9 +529,6 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	CXform		*savedXform;
 	float		area;
 
-	assert(renderer		!=	NULL);
-
-
 	// Restore the graphics state to the one at the delayed object instanciation
 	savedAttributes		=	currentAttributes;
 	savedXform			=	currentXform;
@@ -655,11 +537,8 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	currentAttributes->attach();
 	currentXform->attach();
 
-	// Re-start the world
-	renderer->beginWorld();
-
 	// Execute the subdivision
-	area				=	screenArea(renderer,cDelayed->xform,bmin,bmax);
+	area				=	screenArea(cDelayed->xform,bmin,bmax);
 	subdivisionFunction(data,area);
 
 	// Restore the graphics state back
@@ -672,11 +551,11 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	CFrame::removeTracable(cDelayed);
 
 	// Update the raytracer
-	renderer->endWorld();
+	CFrame::prepareFrame();
 
 	// If we're raytracing, check the ray against the children objects
 	if (cRay != NULL) {
-		renderer->retraceRay(cRay);
+		CFrame::hierarchy->intersect(cRay);
 	}
 }
 
@@ -759,7 +638,7 @@ void	CRendererContext::addInstance(void *d) {
 int		CRendererContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;
 
-	assert(definedCoordinateSystems	!=	NULL);
+	assert(CFrame::definedCoordinateSystems	!=	NULL);
 
 	if(definedCoordinateSystems->find(name,currentSystem)) {
 		from		=	&currentSystem->from;
@@ -2240,7 +2119,7 @@ void	CRendererContext::RiDetail(float *bound) {
 	
 	// project the bound to screen space and calculate size	
 	
-	attributes->lodSize = screenArea(renderer,xform,bmin,bmax);
+	attributes->lodSize = screenArea(xform,bmin,bmax);
 }
 
 void	CRendererContext::RiDetailRange(float minvis,float lowtran,float uptran,float maxvis) {

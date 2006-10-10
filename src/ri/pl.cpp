@@ -36,6 +36,7 @@
 #include "stats.h"
 #include "error.h"
 #include "memory.h"
+#include "frame.h"
 
 
 
@@ -1162,7 +1163,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		int				declaredParam = FALSE;
 
 		// Fetch the parameter
-		cVar	=	currentRenderer->retrieveVariable(params[i]);
+		cVar	=	CFrame::retrieveVariable(params[i]);
 		if (cVar == NULL) {
 
 			// This may be an inline decl., try to parse it into a temp var
@@ -1172,7 +1173,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				container		=	tmp.container;
 				declaredParam	=	TRUE;
 
-				cVar			=	currentRenderer->retrieveVariable(tmp.name);
+				cVar			=	CFrame::retrieveVariable(tmp.name);
 				if (cVar == NULL) {
 					// No match, query the shaders
 					sVar		=	&tmp;

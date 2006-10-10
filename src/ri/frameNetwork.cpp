@@ -51,7 +51,7 @@
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/4/2001
-void		CFrame::rcSend(SOCKET s,char *data,int n,int toNetwork) {
+void		rcSend(SOCKET s,char *data,int n,int toNetwork) {
 	int	i,j;
 
 	if (toNetwork) {
@@ -92,7 +92,7 @@ void		CFrame::rcSend(SOCKET s,char *data,int n,int toNetwork) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/4/2001
-void		CFrame::rcRecv(SOCKET s,char *data,int n,int toNetwork) {
+void		rcRecv(SOCKET s,char *data,int n,int toNetwork) {
 	int	i,j;
 	T32	*buf = (T32 *) data;
 

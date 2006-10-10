@@ -95,14 +95,11 @@ CDictionary<const char *,CVariable *>				*CFrame::declaredVariables			=	NULL;
 CDictionary<const char *,CFileResource  *>			*CFrame::loadedFiles				=	NULL;
 CDictionary<const char *,CGlobalIdentifier *>		*CFrame::globalIdHash				=	NULL;
 CDictionary<const char *,CFrame::CNetFileMapping *>	*CFrame::netFileMappings			=	NULL;
-CArray<const char*>									*CFrame::frameTemporaryFiles		=	NULL;
 int													CFrame::numKnownGlobalIds			=	0;
 CVariable											*CFrame::variables					=	NULL;
 CArray<CVariable *>									*CFrame::globalVariables			=	NULL;
-int													CFrame::numGlobalVariables			=	0;
 CDictionary<const char *,CDisplayChannel *>			*CFrame::declaredChannels			=	NULL;
 CArray<CDisplayChannel*>							*CFrame::displayChannels			=	NULL;
-CArray<CArray<CObject *> *>							*CFrame::allocatedInstances			=	NULL;
 CDSO												*CFrame::dsos						=	NULL;
 SOCKET												CFrame::netClient					=	INVALID_SOCKET;
 int													CFrame::netNumServers				=	0;
@@ -118,6 +115,7 @@ int													CFrame::numNetrenderedBuckets		=	0;
 
 // Local members
 CMemStack									*CFrame::frameMemory				=	NULL;
+CArray<const char*>							*CFrame::frameTemporaryFiles		=	NULL;
 COptions									CFrame::options;
 CDictionary<const char *,CRemoteChannel *>	*CFrame::declaredRemoteChannels		=	NULL;
 CArray<CRemoteChannel *>					*CFrame::remoteChannels				=	NULL;
@@ -211,6 +209,8 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	stats.reset();
 
+
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	//
@@ -218,12 +218,6 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 	//
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////
-	definedCoordinateSystems		=	NULL;
-	declaredVariables				=	NULL;
-	variables						=	NULL;
-	numGlobalVariables				=	0;
-	allocatedInstances				=	NULL;
-	dsos							=	NULL;
 	netClient						=	INVALID_SOCKET;
 	netNumServers					=	0;
 	netServers						=	NULL;
@@ -245,6 +239,10 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 	definedCoordinateSystems			=	new CTrie<CNamedCoordinateSystem *>;
 	// Init the declared variables
 	declaredVariables					=	new CTrie<CVariable *>;
+	// Allocate the global variables array
+	globalVariables						=	new CArray<CVariable *>;
+	// This is the list of all variables
+	variables							=	NULL;
 	// The loaded shaders
 	loadedFiles							=	new CTrie<CFileResource *>;
 	// Global Ids
@@ -254,14 +252,11 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 	// net file mappings
 	netFileMappings						=	NULL;
 	frameTemporaryFiles					=	NULL;
-
-	// Make sure there are no defined variables
-	numGlobalVariables					=	0;
-	variables							=	NULL;
-
 	// DSO init
 	dsos								=	NULL;
-
+	// Define the default display channels
+	declaredChannels					=	new CTrie<CDisplayChannel*>;
+	displayChannels						=	new	CArray<CDisplayChannel*>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -404,10 +399,6 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 	//
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////
-	// Define the default display channels
-	declaredChannels				=	new CTrie<CDisplayChannel*>;
-	displayChannels					=	new	CArray<CDisplayChannel*>;
-		
 	CDisplayChannel	*tmp2;
 
 	tmp2 = new CDisplayChannel("rgb",NULL,3,0);
@@ -484,6 +475,18 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 
 
 ///////////////////////////////////////////////////////////////////////
+// Function				:	sfClearTemp
+// Description			:	This callback function is used to remove the temporary files
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+static int	rcClearTemp(const char *fileName,void *userData) {
+	osDeleteFile(fileName);
+
+	return TRUE;
+}
+
+///////////////////////////////////////////////////////////////////////
 // Class				:	CFrame
 // Method				:	endRenderer
 // Description			:	End the renderer
@@ -491,16 +494,119 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 // Comments				:
 // Date last edited		:	10/9/2006
 void		CFrame::endRenderer() {
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//			N E T W O R K      S H U T D O W N
+	//
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////
+	if (netClient != INVALID_SOCKET) {
+
+		assert(netFileMappings != NULL);
+
+		netFileMappings->destroy();
+		closesocket(netClient);
+	}
+
+	if (netNumServers != 0) {
+		int	i;
+
+		for (i=0;i<netNumServers;i++) {
+			closesocket(netServers[i]);
+		}
+
+		delete [] netServers;
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	//
+	//			D I T C H     T H E    M I S C   D A T A
+	//
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	
+	// Ditch the display channels
+	assert(declaredChannels != NULL);
+	assert(displayChannels != NULL);
+	declaredChannels->destroy();
+	delete displayChannels;
+
+
+	// Ditch the DSO shaders that have been loaded
+	CDSO	*cDso;
+	for (cDso=dsos;cDso!=NULL;) {
+		CDSO	*nDso	=	cDso->next;
+		// Call DSO's cleanup
+		if(cDso->cleanup != NULL) cDso->cleanup(cDso->handle);
+		free(cDso->name);
+		free(cDso->prototype);
+		delete cDso;
+		cDso	=	nDso;
+	}
+
+	// Ditch the global IDs
+	assert(globalIdHash != NULL);
+	globalIdHash->destroy();
+
+	// Ditch the loaded files
+	assert(loadedFiles != NULL);
+	loadedFiles->destroy();
+
+	// First the variables
+	assert(declaredVariables != NULL);
+	declaredVariables->destroy();
+	delete globalVariables;
+
+	// Ditch the coordinate stsrems
+	assert(definedCoordinateSystems	!=	NULL);
+	definedCoordinateSystems->destroy();
+
+	// Ditch the allocated lights lights
 	CShaderInstance	**array	=	allLights->array;
 	int				size	=	allLights->numItems;
 	int				i;
 
-	for (i=0;i<size;i++) {
-		array[i]->detach();
+	for (i=0;i<size;i++)	array[i]->detach();
+	delete allLights;
+
+
+	// Ditch the temporary files created
+	if (osFileExists(options.temporaryPath)) {
+		char	tmp[OS_MAX_PATH_LENGTH];
+
+		sprintf(tmp,"%s\\*",options.temporaryPath);
+		osFixSlashes(tmp);
+		osEnumerate(tmp,rcClearTemp,NULL);
+		osDeleteDir(options.temporaryPath);
 	}
 
-	delete allLights;
+	// Cleanup the parser
+	parserCleanup();
+
+	// Turn off the memory manager
+	memoryTini();
+
+	// Check the stats for memory leaks
+	stats.check();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1103,6 +1209,11 @@ void		CFrame::endFrame() {
 
 	// Ditch the frame memory
 	delete frameMemory;
+
+	// Ditch temporary file and net file mappings
+	if (frameTemporaryFiles != NULL) {
+		frameTemporaryFiles->destroy();
+	}
 }
 
 

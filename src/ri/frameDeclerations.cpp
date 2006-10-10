@@ -147,7 +147,7 @@ CVariable		*CFrame::declareVariable(const char *name,const char *type,int marker
 // Date last edited		:	8/25/2002
 void	CFrame::makeGlobalVariable(CVariable *var) {
 	// Did we already start rendering ?
-	var->entry		=	numGlobalVariables++;
+	var->entry		=	globalVariables->numItems;
 	var->storage	=	STORAGE_GLOBAL;
 	globalVariables->push(var);
 

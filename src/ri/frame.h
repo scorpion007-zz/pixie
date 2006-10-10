@@ -140,11 +140,9 @@ public:
 		static	CDictionary<const char *,CFileResource  *>			*loadedFiles;				// Files that have been loaded
 		static	CDictionary<const char *,CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
 		static	CDictionary<const char *,CNetFileMapping *>			*netFileMappings;			// This holds name->name mappings of files
-		static	CArray<const char*>									*frameTemporaryFiles;		// This hold the name of temporary files
 		static	int													numKnownGlobalIds;
 		static	CVariable											*variables;					// List of all defined variables
 		static	CArray<CVariable *>									*globalVariables;			// Array of global variables only
-		static	int													numGlobalVariables;			// The number of global variables
 		static	CDictionary<const char *,CDisplayChannel *>			*declaredChannels;			// The declared display channels
 		static	CArray<CDisplayChannel*>							*displayChannels;			// The list of all desclared display channels
 		static	CArray<CArray<CObject *> *>							*allocatedInstances;		// The list of allocated object instances
@@ -268,8 +266,6 @@ public:
 								////////////////////////////////////////////////////////////////////
 								// Functions that deal with network (implemented in frameNetwork.cpp)
 								////////////////////////////////////////////////////////////////////
-		static	void			rcSend(SOCKET,char *,int,int net = TRUE);				// Send data
-		static	void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
 		static	void			netSetup(char *,char *);								// Setup the network for rendering
 		static	void			sendFile(int,char *,int,int);							// Send a particular file
 		static	int				getFile(char *,const char *);							// Get a particular file from network
@@ -292,6 +288,7 @@ public:
 								// The memory we use for the frame
 								////////////////////////////////////////////////////////////////////
 		static CMemStack		*frameMemory;
+		static	CArray<const char*>	*frameTemporaryFiles;		// This hold the name of temporary files
 
 								////////////////////////////////////////////////////////////////////
 								// The options
@@ -409,7 +406,9 @@ protected:
 };
 
 
-
+// These two are defined in frameNetwork.cpp
+void			rcSend(SOCKET,char *,int,int net = TRUE);				// Send data
+void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
 
 
 
