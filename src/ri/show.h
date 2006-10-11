@@ -34,6 +34,7 @@
 
 #include "common/global.h"
 #include "shading.h"
+#include "xform.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow

@@ -37,10 +37,10 @@
 #include "common/containers.h"
 #include "common/os.h"
 #include "ri.h"
-#include "renderer.h"
 #include "delayed.h"
 #include "stats.h"
 #include "rib.h"
+#include "rendererContext.h"
 #include "error.h"
 
 #include <math.h>
@@ -221,7 +221,7 @@ static	int		parameterListCheck() {
 	// For each parameter encountered
 	for (i=0;i<numParameters;i++) {
 		TParameter		*par	=	parameters+i;
-		CVariable		*var	=	currentRenderer->retrieveVariable(par->name);
+		CVariable		*var	=	CRenderer::retrieveVariable(par->name);
 		EVariableClass	container;
 
 		// Get the variable container to check the number of items

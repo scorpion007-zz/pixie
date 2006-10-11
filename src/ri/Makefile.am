@@ -19,11 +19,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				execute.cpp \
 				executeMisc.cpp \
 				fileResource.cpp \
-				frame.cpp \
-				frameDeclerations.cpp \
-				frameDisplay.cpp \
-				frameFiles.cpp \
-				frameNetwork.cpp \
 				hcshader.cpp \
 				hierarchy.cpp \
 				implicitSurface.cpp \
@@ -50,6 +45,11 @@ libri_la_SOURCES = 		attributes.cpp \
 				raytracer.cpp \
 				remoteChannel.cpp \
 				renderer.cpp \
+				rendererContext.cpp \
+				rendererDeclerations.cpp \
+				rendererDisplay.cpp \
+				rendererFiles.cpp \
+				rendererNetwork.cpp \
 				reyes.cpp \
 				ri.cpp \
 				rib.cpp \

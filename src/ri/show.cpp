@@ -30,7 +30,6 @@
 ////////////////////////////////////////////////////////////////////////
 #include "show.h"
 #include "cache.h"
-#include "renderer.h"
 #include "error.h"
 #include "fileResource.h"
 #include "photonMap.h"

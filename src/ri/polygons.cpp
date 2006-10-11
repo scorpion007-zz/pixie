@@ -31,15 +31,14 @@
 #include <math.h>
 
 #include "polygons.h"
-#include "renderer.h"
 #include "object.h"
 #include "stats.h"
 #include "memory.h"
 #include "shading.h"
 #include "error.h"
 #include "surface.h"
-#include "frame.h"
-
+#include "renderer.h"
+#include "rendererContext.h"
 
 #if !defined(WIN32)
 #if defined(__GNUC__) && (__GNUC__ < 4)
@@ -743,7 +742,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 			meshContext->tesselate2D(cTriangle);
 		} else {
 			// No, create raytracing triangles
-			CMemStack	*memory	=	CFrame::frameMemory;
+			CMemStack	*memory	=	CRenderer::frameMemory;
 
 			if (meshPl->data1 == NULL) {
 				CVertex		*v0	=	(CVertex *)		memory->alloc(3*sizeof(CVertex) + sizeof(CPtriangle));
@@ -791,7 +790,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 
 
 				// Insert the triangle into the list
-				CFrame::addTracable(t,cTriangle);
+				CRenderer::addTracable(t,cTriangle);
 				stats.numRayTriangles++;
 			} else {
 				CMovingVertex		*v0		=	(CMovingVertex *)		memory->alloc(3*sizeof(CMovingVertex) + sizeof(CPmovingTriangle));
@@ -852,7 +851,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 				}
 
 				// Insert the triangle into the list
-				CFrame::addTracable(t,cTriangle);
+				CRenderer::addTracable(t,cTriangle);
 				stats.numRayTriangles++;
 			}
 		}

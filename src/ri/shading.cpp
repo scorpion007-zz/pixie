@@ -32,7 +32,6 @@
 #include	<math.h>
 #include	<string.h>
 
-#include	"renderer.h"
 #include	"shading.h"
 #include	"object.h"
 #include	"raytracer.h"
@@ -48,7 +47,7 @@
 #include	"radiance.h"
 #include	"error.h"
 #include	"remoteChannel.h"
-#include	"frame.h"
+#include	"renderer.h"
 
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
@@ -425,7 +424,7 @@ void	CShadingContext::drawObject(CObject *cObject,const float *,const float *) {
 // Comments				:
 // Date last edited		:	11/9/2002
 void	CShadingContext::retraceRay(CRay *cRay) {
-	CFrame::hierarchy->intersect(cRay);
+	CRenderer::hierarchy->intersect(cRay);
 }
 
 
@@ -463,7 +462,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	stats.numSampled++;
 	stats.numShaded							+=	numVertices;
 
-	assert(numVertices <= CFrame::options.maxGridSize);
+	assert(numVertices <= CRenderer::options.maxGridSize);
 
 	// Are we a shadow ray ?
 	if (inShadow == TRUE) {
@@ -514,7 +513,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 	if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
 
-	usedParameters						|=	currentAttributes->usedParameters | CFrame::additionalParameters;
+	usedParameters						|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
 
 	// Prepare the shading state
 	varying								=	currentShadingState->varying;
@@ -572,8 +571,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			I				=	varying[VARIABLE_I];
 
 			// Compute the derivative evaluation u/v
-			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				const float	d	=	CFrame::dxdPixel / CFrame::imagePlane;
+			if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+				const float	d	=	CRenderer::dxdPixel / CRenderer::imagePlane;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -606,7 +605,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 					j++;
 				}
 			} else {
-				const float	d	=	CFrame::dxdPixel;
+				const float	d	=	CRenderer::dxdPixel;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -677,12 +676,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
-			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+			if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldy;
+					cXy[0]		=	(P[COMP_X] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldx;
+					cXy[1]		=	(P[COMP_Y] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -690,8 +689,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*CFrame::dPixeldx;
-					cXy[1]		=	P[COMP_Y]*CFrame::dPixeldy;
+					cXy[0]		=	P[COMP_X]*CRenderer::dPixeldx;
+					cXy[1]		=	P[COMP_Y]*CRenderer::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -799,7 +798,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	if (currentRayDepth == 0) {
 		float			*I				=	varying[VARIABLE_I];
 
-		if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 			memcpy(I,varying[VARIABLE_P],numVertices*3*sizeof(float));
 		} else {
 			for (i=numVertices;i>0;i--) {
@@ -931,7 +930,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	stats.numSampled++;
 	stats.numShaded							+=	numVertices;
 
-	assert(numVertices <= CFrame::options.maxGridSize);
+	assert(numVertices <= CRenderer::options.maxGridSize);
 
 	// Yes, is there a displacement shader on the surface ?
 	if (	(currentAttributes->displacement == NULL) || 
@@ -973,7 +972,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 
 	if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
 
-	usedParameters						|=	currentAttributes->usedParameters | CFrame::additionalParameters;
+	usedParameters						|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
 
 	// Prepare the shading state
 	varying								=	currentShadingState->varying;
@@ -1035,8 +1034,8 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			I				=	varying[VARIABLE_I];
 
 			// Compute the derivative evaluation u/v
-			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				const float	d	=	CFrame::dxdPixel / CFrame::imagePlane;
+			if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+				const float	d	=	CRenderer::dxdPixel / CRenderer::imagePlane;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -1069,7 +1068,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 					j++;
 				}
 			} else {
-				const float	d	=	CFrame::dxdPixel;
+				const float	d	=	CRenderer::dxdPixel;
 
 				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
 					float		ku,kv;
@@ -1142,12 +1141,12 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
-			if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+			if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * CFrame::imagePlane / P[COMP_Z])*CFrame::dPixeldy;
+					cXy[0]		=	(P[COMP_X] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldx;
+					cXy[1]		=	(P[COMP_Y] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -1155,8 +1154,8 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*CFrame::dPixeldx;
-					cXy[1]		=	P[COMP_Y]*CFrame::dPixeldy;
+					cXy[0]		=	P[COMP_X]*CRenderer::dPixeldx;
+					cXy[1]		=	P[COMP_Y]*CRenderer::dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -1281,7 +1280,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 	if (currentRayDepth == 0) {
 		float			*I				=	varying[VARIABLE_I];
 
-		if (CFrame::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 			memcpy(I,varying[VARIABLE_P],numVertices*3*sizeof(float));
 		} else {
 			for (i=numVertices;i>0;i--) {
@@ -1352,21 +1351,21 @@ CShadingState	*CShadingContext::newState() {
 		int				j;
 		float			*E;
 
-		newState->varying				=	new float*[CFrame::maxGlobalVariables];				stats.vertexMemory	+=	CFrame::maxGlobalVariables*sizeof(float *);
-		newState->tags					=	new int[CFrame::options.maxGridSize*3];				stats.vertexMemory	+=	CFrame::options.maxGridSize*3*sizeof(int);
-		newState->lightingTags			=	new int[CFrame::options.maxGridSize*3];				stats.vertexMemory	+=	CFrame::options.maxGridSize*3*sizeof(int);
-		newState->Ns					=	new float[CFrame::options.maxGridSize*9];			stats.vertexMemory	+=	CFrame::options.maxGridSize*3*sizeof(float);
+		newState->varying				=	new float*[CRenderer::maxGlobalVariables];				stats.vertexMemory	+=	CRenderer::maxGlobalVariables*sizeof(float *);
+		newState->tags					=	new int[CRenderer::options.maxGridSize*3];				stats.vertexMemory	+=	CRenderer::options.maxGridSize*3*sizeof(int);
+		newState->lightingTags			=	new int[CRenderer::options.maxGridSize*3];				stats.vertexMemory	+=	CRenderer::options.maxGridSize*3*sizeof(int);
+		newState->Ns					=	new float[CRenderer::options.maxGridSize*9];			stats.vertexMemory	+=	CRenderer::options.maxGridSize*3*sizeof(float);
 		newState->alights				=	NULL;
 		newState->freeLights			=	NULL;
 		newState->postShader			=	NULL;
 		newState->currentObject			=	NULL;
 
-		for (j=0;j<CFrame::maxGlobalVariables;j++) {
+		for (j=0;j<CRenderer::maxGlobalVariables;j++) {
 			newState->varying[j]	=	NULL;
 		}
 
-		for (j=0;j<CFrame::numGlobalVariables;j++) {
-			const	CVariable	*var	=	CFrame::globalVariables[j];
+		for (j=0;j<CRenderer::numGlobalVariables;j++) {
+			const	CVariable	*var	=	CRenderer::globalVariables[j];
 
 			assert(var != NULL);
 
@@ -1374,14 +1373,14 @@ CShadingState	*CShadingContext::newState() {
 				newState->varying[j]	=	new float[var->numFloats];
 				stats.vertexMemory		+=	var->numFloats*sizeof(float);
 			} else {
-				newState->varying[j]	=	new float[var->numFloats*CFrame::options.maxGridSize*3];
-				stats.vertexMemory		+=	var->numFloats*CFrame::options.maxGridSize*3*sizeof(float);
+				newState->varying[j]	=	new float[var->numFloats*CRenderer::options.maxGridSize*3];
+				stats.vertexMemory		+=	var->numFloats*CRenderer::options.maxGridSize*3*sizeof(float);
 			}
 		}
 
 		// E is always (0,0,0)
 		E	=	newState->varying[VARIABLE_E];
-		for (j=CFrame::options.maxGridSize*3;j>0;j--) {
+		for (j=CRenderer::options.maxGridSize*3;j>0;j--) {
 			initv(E,0,0,0);
 			E	+=	3;
 		}
@@ -1421,24 +1420,24 @@ void				CShadingContext::deleteState(CShadingState *cState) {
 void			CShadingContext::freeState(CShadingState *cState) {
 	int	j;
 
-	for (j=0;j<CFrame::numGlobalVariables;j++) {
-		if (CFrame::globalVariables[j] != NULL) {
-			const CVariable	*var	=	CFrame::globalVariables[j];
+	for (j=0;j<CRenderer::numGlobalVariables;j++) {
+		if (CRenderer::globalVariables[j] != NULL) {
+			const CVariable	*var	=	CRenderer::globalVariables[j];
 
 			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
 				delete [] cState->varying[j];
 				stats.vertexMemory		-=	var->numFloats*sizeof(float);
 			} else {
 				delete [] cState->varying[j];
-				stats.vertexMemory		-=	var->numFloats*CFrame::options.maxGridSize*3*sizeof(float);
+				stats.vertexMemory		-=	var->numFloats*CRenderer::options.maxGridSize*3*sizeof(float);
 			}
 		}
 	}
 
-	delete [] cState->varying;					stats.vertexMemory	-=	CFrame::maxGlobalVariables*sizeof(float *);
-	delete [] cState->tags;						stats.vertexMemory	-=	CFrame::options.maxGridSize*3*sizeof(int);
-	delete [] cState->lightingTags;				stats.vertexMemory	-=	CFrame::options.maxGridSize*3*sizeof(int);
-	delete [] cState->Ns;						stats.vertexMemory	-=	CFrame::options.maxGridSize*9*sizeof(float);
+	delete [] cState->varying;					stats.vertexMemory	-=	CRenderer::maxGlobalVariables*sizeof(float *);
+	delete [] cState->tags;						stats.vertexMemory	-=	CRenderer::options.maxGridSize*3*sizeof(int);
+	delete [] cState->lightingTags;				stats.vertexMemory	-=	CRenderer::options.maxGridSize*3*sizeof(int);
+	delete [] cState->Ns;						stats.vertexMemory	-=	CRenderer::options.maxGridSize*9*sizeof(float);
 	
 	delete cState;
 }
@@ -1560,88 +1559,88 @@ int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **
 int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 	if (strcmp(name,optionsFormat) == 0) {
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.xres;
-		d[1]		=	(float) CFrame::options.yres;
+		d[0]		=	(float) CRenderer::options.xres;
+		d[1]		=	(float) CRenderer::options.yres;
 		d[2]		=	(float) 1;
 		return TRUE;
 	} else if (strcmp(name,optionsDeviceFrame) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.frame;
+		d[0]		=	(float) CRenderer::options.frame;
 		return TRUE;
 	} else if (strcmp(name,optionsDeviceResolution) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.xres;
-		d[1]		=	(float) CFrame::options.yres;
+		d[0]		=	(float) CRenderer::options.xres;
+		d[1]		=	(float) CRenderer::options.yres;
 		d[2]		=	(float) 1;
 		return TRUE;
 	} else if (strcmp(name,optionsFrameAspectRatio) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.frameAR;
+		d[0]		=	(float) CRenderer::options.frameAR;
 		return TRUE;
 	} else if (strcmp(name,optionsCropWindow) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.cropLeft;
-		d[1]		=	(float) CFrame::options.cropTop;
-		d[2]		=	(float) CFrame::options.cropRight;
-		d[3]		=	(float) CFrame::options.cropBottom;
+		d[0]		=	(float) CRenderer::options.cropLeft;
+		d[1]		=	(float) CRenderer::options.cropTop;
+		d[2]		=	(float) CRenderer::options.cropRight;
+		d[3]		=	(float) CRenderer::options.cropBottom;
 		return TRUE;
 	} else if (strcmp(name,optionsDepthOfField) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.fstop;
-		d[1]		=	(float) CFrame::options.focallength;
-		d[2]		=	(float) CFrame::options.focaldistance;
+		d[0]		=	(float) CRenderer::options.fstop;
+		d[1]		=	(float) CRenderer::options.focallength;
+		d[2]		=	(float) CRenderer::options.focaldistance;
 		return TRUE;
 	} else if (strcmp(name,optionsShutter) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.shutterOpen;
-		d[1]		=	(float) CFrame::options.shutterClose;
+		d[0]		=	(float) CRenderer::options.shutterOpen;
+		d[1]		=	(float) CRenderer::options.shutterClose;
 		return TRUE;
 	} else if (strcmp(name,optionsClipping) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.clipMin;
-		d[1]		=	(float) CFrame::options.clipMax;
+		d[0]		=	(float) CRenderer::options.clipMin;
+		d[1]		=	(float) CRenderer::options.clipMax;
 		return TRUE;
 	} else if (strcmp(name,optionsBucketSize) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.bucketWidth;
-		d[1]		=	(float) CFrame::options.bucketHeight;
+		d[0]		=	(float) CRenderer::options.bucketWidth;
+		d[1]		=	(float) CRenderer::options.bucketHeight;
 		return TRUE;
 	} else if (strcmp(name,optionsColorQuantizer) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.colorQuantizer[0];
-		d[1]		=	(float) CFrame::options.colorQuantizer[1];
-		d[2]		=	(float) CFrame::options.colorQuantizer[2];
-		d[3]		=	(float) CFrame::options.colorQuantizer[3];
+		d[0]		=	(float) CRenderer::options.colorQuantizer[0];
+		d[1]		=	(float) CRenderer::options.colorQuantizer[1];
+		d[2]		=	(float) CRenderer::options.colorQuantizer[2];
+		d[3]		=	(float) CRenderer::options.colorQuantizer[3];
 		return TRUE;
 	} else if (strcmp(name,optionsDepthQuantizer) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.depthQuantizer[0];
-		d[1]		=	(float) CFrame::options.depthQuantizer[1];
-		d[2]		=	(float) CFrame::options.depthQuantizer[2];
-		d[3]		=	(float) CFrame::options.depthQuantizer[3];
+		d[0]		=	(float) CRenderer::options.depthQuantizer[0];
+		d[1]		=	(float) CRenderer::options.depthQuantizer[1];
+		d[2]		=	(float) CRenderer::options.depthQuantizer[2];
+		d[3]		=	(float) CRenderer::options.depthQuantizer[3];
 		return TRUE;
 	} else if (strcmp(name,optionsPixelFilter) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.pixelFilterWidth;
-		d[1]		=	(float) CFrame::options.pixelFilterHeight;
+		d[0]		=	(float) CRenderer::options.pixelFilterWidth;
+		d[1]		=	(float) CRenderer::options.pixelFilterHeight;
 		return TRUE;
 	} else if (strcmp(name,optionsGamma) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.gamma;
-		d[1]		=	(float) CFrame::options.gain;
+		d[0]		=	(float) CRenderer::options.gamma;
+		d[1]		=	(float) CRenderer::options.gain;
 		return TRUE;
 	} else if (strcmp(name,optionsMaxRayDepth) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.maxRayDepth;
+		d[0]		=	(float) CRenderer::options.maxRayDepth;
 		return TRUE;
 	} else if (strcmp(name,optionsRelativeDetail) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.relativeDetail;
+		d[0]		=	(float) CRenderer::options.relativeDetail;
 		return TRUE;
 	} else if (strcmp(name,optionsPixelSamples) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) CFrame::options.pixelXsamples;
-		d[1]		=	(float) CFrame::options.pixelYsamples;
+		d[0]		=	(float) CRenderer::options.pixelXsamples;
+		d[1]		=	(float) CRenderer::options.pixelYsamples;
 		return TRUE;
 	}
 	return FALSE;
@@ -1804,8 +1803,8 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 			to			=	&identity;
 			break;
 		case COORDINATE_WORLD:
-			from		=	&CFrame::fromWorld;
-			to			=	&CFrame::toWorld;
+			from		=	&CRenderer::fromWorld;
+			to			=	&CRenderer::toWorld;
 			break;
 		case COORDINATE_SHADER:
 			assert(currentShadingState->currentShaderInstance != NULL);
@@ -1820,16 +1819,16 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 			to			=	&(currentShadingState->currentLightInstance->xform->to);
 			break;
 		case COORDINATE_NDC:
-			from		=	&CFrame::fromNDC;
-			to			=	&CFrame::toNDC;
+			from		=	&CRenderer::fromNDC;
+			to			=	&CRenderer::toNDC;
 			break;
 		case COORDINATE_RASTER:
-			from		=	&CFrame::fromRaster;
-			to			=	&CFrame::toRaster;
+			from		=	&CRenderer::fromRaster;
+			to			=	&CRenderer::toRaster;
 			break;
 		case COORDINATE_SCREEN:
-			from		=	&CFrame::fromScreen;
-			to			=	&CFrame::toScreen;
+			from		=	&CRenderer::fromScreen;
+			to			=	&CRenderer::toScreen;
 			break;
 		case COORDINATE_CURRENT:
 			from		=	&identity;

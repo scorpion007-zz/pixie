@@ -36,7 +36,6 @@
 #include "object.h"
 #include "shader.h"
 #include "hierarchy.h"
-#include "renderer.h"
 #include "pl.h"
 
 

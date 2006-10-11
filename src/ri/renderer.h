@@ -23,8 +23,8 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	frame.h
-//  Classes				:	CFrame
+//  File				:	renderer.h
+//  Classes				:	CRenderer
 //  Description			:	This class holds global info about a frame
 //
 ////////////////////////////////////////////////////////////////////////
@@ -91,11 +91,11 @@ class	CDSO;
 ///////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Description			:	This class holds data about the current frame being rendered
 // Comments				:	This class is invalid outside beginFrame / endFrame
 // Date last edited		:	10/10/2006
-class CFrame : public COptions {
+class CRenderer : public COptions {
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CNetFileMapping
@@ -127,8 +127,8 @@ public:
 		//   Globally active data / functions
 		//
 		////////////////////////////////////////////////////////////////////
-		static void				beginRenderer(char *ribFile,char *riNetString);
-		static void				endRenderer();
+		static void													beginRenderer(char *ribFile,char *riNetString);
+		static void													endRenderer();
 
 								
 								////////////////////////////////////////////////////////////////////
@@ -233,6 +233,7 @@ public:
 								////////////////////////////////////////////////////////////////////
 								// Functions that deal with declerations (implemented in frameDeclerations.cpp)
 								////////////////////////////////////////////////////////////////////
+		static	void			initDeclerations();
 		static	void			defineCoordinateSystem(const char *,matrix &,matrix &,ECoordinateSystem type = COORDINATE_CUSTOM);
 		static	CVariable		*declareVariable(const char *,const char *,int um = 0);
 		static	void			makeGlobalVariable(CVariable *);
@@ -243,11 +244,13 @@ public:
 		static	void			resetDisplayChannelUsage();
 		static	void			registerFrameTemporary(const char *,int);				// Register file for end-of-frame deletion
 		static	int				getGlobalID(const char *);								// Global ID management
+		static	void			shutdownDeclerations();
 
 								
 								////////////////////////////////////////////////////////////////////
 								// Functions that deal with files (implemented in frameFiles.cpp)
 								////////////////////////////////////////////////////////////////////
+		static	void			initFiles();
 		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
 		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
 		static	CTexture		*textureLoad(const char *,TSearchpath *);				// Load a new texture map
@@ -261,17 +264,20 @@ public:
 		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 		static	char			*getFilter(RtFilterFunc);								// The other way around
 		static	int				loadDSO(char *,char *,TSearchpath *,dsoInitFunction *,dsoExecFunction *,dsoCleanupFunction *);	// Find/load a DSO shader
+		static	void			shutdownFiles();
 
 
 								////////////////////////////////////////////////////////////////////
 								// Functions that deal with network (implemented in frameNetwork.cpp)
 								////////////////////////////////////////////////////////////////////
+		static	void			initNetwork(char *ribFile,char *riNetString);
 		static	void			netSetup(char *,char *);								// Setup the network for rendering
 		static	void			sendFile(int,char *,int,int);							// Send a particular file
 		static	int				getFile(char *,const char *);							// Get a particular file from network
 		static	int				getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network
 		static	void			clientRenderFrame();									// Isn't that obvious
 		static	void			processServerRequest(T32,int);							// Process a request from the server
+		static	void			shutdownNetwork();
 
 
 								////////////////////////////////////////////////////////////////////
@@ -416,13 +422,13 @@ void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	camera2pixels
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CFrame::camera2pixels(float *P) {
+inline void		CRenderer::camera2pixels(float *P) {
 	if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		P[COMP_X]	=	imagePlane*P[COMP_X]/P[COMP_Z];
 		P[COMP_Y]	=	imagePlane*P[COMP_Y]/P[COMP_Z];
@@ -433,13 +439,13 @@ inline void		CFrame::camera2pixels(float *P) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	camera2pixels
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CFrame::camera2pixels(float *x,float *y,const float *P) {
+inline void		CRenderer::camera2pixels(float *x,float *y,const float *P) {
 	if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		x[0]	=	imagePlane*P[COMP_X]/P[COMP_Z];
 		y[0]	=	imagePlane*P[COMP_Y]/P[COMP_Z];
@@ -453,13 +459,13 @@ inline void		CFrame::camera2pixels(float *x,float *y,const float *P) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	camera2pixels
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CFrame::camera2pixels(int n,float *P) {
+inline void		CRenderer::camera2pixels(int n,float *P) {
 	if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
 			P[COMP_X]	=	(imagePlane*P[COMP_X]/P[COMP_Z] - pixelLeft)*dPixeldx;
@@ -474,13 +480,13 @@ inline void		CFrame::camera2pixels(int n,float *P) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	camera2screen
 // Description			:	Project from camera space into the screen space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CFrame::camera2screen(int n,float *P) {
+inline void		CRenderer::camera2screen(int n,float *P) {
 	if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
 			P[COMP_X]	=	(imagePlane*P[COMP_X]/P[COMP_Z] - pixelLeft);
@@ -495,13 +501,13 @@ inline void		CFrame::camera2screen(int n,float *P) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	distance2pixels
 // Description			:	Project a distance in camera space into a distance in the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CFrame::distance2pixels(int n,float *dist,float *P) {
+inline void		CRenderer::distance2pixels(int n,float *dist,float *P) {
 	if(projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
 			*dist++		=	dPixeldx*imagePlane*dist[0]/P[COMP_Z];
@@ -515,25 +521,25 @@ inline void		CFrame::distance2pixels(int n,float *dist,float *P) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	pixels2distance
 // Description			:	Convert from pixel distance to camera space distance
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/4/2001
-void			CFrame::pixels2distance(float &a,float &b,float d) {
+void			CRenderer::pixels2distance(float &a,float &b,float d) {
 	a	=	lengthA*d;
 	b	=	lengthB*d;
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	samples2camera
 // Description			:	Back project from sample space into the camera space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CFrame::pixels2camera(float *P,float x,float y,float z) {
+inline void		CRenderer::pixels2camera(float *P,float x,float y,float z) {
 	x	=	x*dxdPixel + pixelLeft;
 	y	=	y*dydPixel + pixelTop;
 
@@ -549,25 +555,25 @@ inline void		CFrame::pixels2camera(float *P,float x,float y,float z) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	minCocPixels
 // Description			:	return the minimum circle of confusion
 // Return Value			:
 // Comments				:	(inline for speed, needed for CSurface::dice() )
 // Date last edited		:	4/7/2006
-inline float	CFrame::minCocPixels(float z1, float z2) {
+inline float	CRenderer::minCocPixels(float z1, float z2) {
 	return min(cocPixels(z1),cocPixels(z2));
 }
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	advanceBucket
 // Description			:	Advance the bucket
 // Return Value			:	TRUE if we're still rendering, FALSE otherwise
 // Comments				:
 // Date last edited		:	7/4/2001
-void			CFrame::advanceBucket() {
+void			CRenderer::advanceBucket() {
 	currentXBucket++;
 	if (currentXBucket == xBuckets) {		
 		currentXBucket	=	0;

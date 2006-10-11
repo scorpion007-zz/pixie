@@ -40,6 +40,7 @@
 #include "photonMap.h"
 #include "memory.h"
 #include "linsys.h"
+#include "texture.h"
 
 #define	SINTABLE_SIZE		1000		// The size of the alpha / sin(alpha) table
 #define	LOCAL_LOOKUP		10			// The number of nearby local samples to look at

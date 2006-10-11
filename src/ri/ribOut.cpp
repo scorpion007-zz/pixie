@@ -35,8 +35,8 @@
 #include "ribOut.h"
 #include "common/os.h"
 #include "ri.h"
-#include "renderer.h"
 #include "error.h"
+#include "variable.h"
 
 // This is the size of the temporary buffer we use before going to the file
 const	int	ribOutScratchSize	=	1000;

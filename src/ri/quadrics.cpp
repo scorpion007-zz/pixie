@@ -35,14 +35,13 @@
 #include <math.h>
 
 #include "quadrics.h"
-#include "renderer.h"
 #include "common/os.h"
 #include "object.h"
 #include "stats.h"
 #include "memory.h"
 #include "shading.h"
-#include "frame.h"
-
+#include "renderer.h"
+#include "rendererContext.h"
 
 
 
@@ -260,8 +259,8 @@ CSphere::~CSphere() {
 // Date last edited		:	3/17/2001
 void				CSphere::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -728,8 +727,8 @@ CDisk::~CDisk() {
 // Date last edited		:	3/17/2001
 void			CDisk::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 
@@ -1107,8 +1106,8 @@ CCone::~CCone() {
 // Date last edited		:	3/17/2001
 void				CCone::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 
@@ -1562,8 +1561,8 @@ CParaboloid::~CParaboloid() {
 // Date last edited		:	3/17/2001
 void			CParaboloid::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else														CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2000,8 +1999,8 @@ CCylinder::~CCylinder() {
 // Date last edited		:	3/17/2001
 void			CCylinder::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 
@@ -2431,8 +2430,8 @@ CHyperboloid::~CHyperboloid() {
 // Date last edited		:	3/17/2001
 void			CHyperboloid::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2965,8 +2964,8 @@ void			CToroid::tesselate(CShadingContext *context) {
 
 
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 

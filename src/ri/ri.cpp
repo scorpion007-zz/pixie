@@ -46,8 +46,8 @@
 #include "ri.h"
 #include "riInterface.h"
 #include "ribOut.h"
-#include "renderer.h"
 #include "delayed.h"
+#include "rendererContext.h"
 
 //////////////////////////////////////////////////////////////////
 // String definitions

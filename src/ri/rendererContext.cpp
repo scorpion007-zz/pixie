@@ -44,7 +44,7 @@
 #include "raytracer.h"
 #include "stochastic.h"
 #include "zbuffer.h"
-#include "renderer.h"
+#include "rendererContext.h"
 #include "patches.h"
 #include "ri.h"
 #include "rib.h"
@@ -155,7 +155,7 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
 	// Initiate the frame
-	CFrame::beginRenderer(ribFile,riNetString);
+	CRenderer::beginRenderer(ribFile,riNetString);
 
 	// Init the graphics state
 	savedXforms						=	new CArray<CXform *>;
@@ -186,7 +186,7 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
 	
 	// Netfile dictionary if we're a netrender daemon
-	if (CFrame::netClient != INVALID_SOCKET) {
+	if (CRenderer::netClient != INVALID_SOCKET) {
 		
 		// make the temporary directory pid-unique in case we have more than
 		// one on a given host
@@ -345,18 +345,18 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 	// Check if we already loaded this shader before ...
 	cShader		=	NULL;
 	cInstance	=	NULL;
-	if (CFrame::loadedFiles->find(name,file)) {
+	if (CRenderer::loadedFiles->find(name,file)) {
 		cShader		=	(CShader *) file;
 	}
 
 	// If not found, search scripts
 	if (cShader == NULL) {
 		char	shaderLocation[OS_MAX_PATH_LENGTH];
-		if (CFrame::locateFileEx(shaderLocation,name,"sdr",currentOptions->shaderPath) == TRUE) {
+		if (CRenderer::locateFileEx(shaderLocation,name,"sdr",currentOptions->shaderPath) == TRUE) {
 			cShader	=	parseShader(name,shaderLocation);
 
 			if (cShader != NULL) {
-				CFrame::loadedFiles->insert(cShader->name,cShader);
+				CRenderer::loadedFiles->insert(cShader->name,cShader);
 			}
 		}
 	}
@@ -376,7 +376,7 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 			instance->createCategories();
 			
 			// Add the new light into the active lights list for the frame
-			CFrame::allLights->push(instance);
+			CRenderer::allLights->push(instance);
 		}
 
 		assert(instance != NULL);
@@ -395,12 +395,12 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 			cInstance	=	new CSphereLight(currentAttributes,currentXform);
 
 			// Add the new light into the active lights list for the frame
-			CFrame::allLights->push(cInstance);
+			CRenderer::allLights->push(cInstance);
 		} else if (strcmp(name,"quadlight") == 0) {
 			cInstance	=	new CQuadLight(currentAttributes,currentXform);
 
 			// Add the new light into the active lights list for the frame
-			CFrame::allLights->push(cInstance);
+			CRenderer::allLights->push(cInstance);
 		}
 	}
 
@@ -430,7 +430,7 @@ int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoEx
 	CDSO				*cDso;
 
 	// Check if the DSO had been loaded before
-	for (cDso=CFrame::dsos;cDso!=NULL;cDso=cDso->next) {
+	for (cDso=CRenderer::dsos;cDso!=NULL;cDso=cDso->next) {
 		if (strcmp(cDso->name,name) == 0) {
 			if (strcmp(cDso->prototype,prototype) == 0) {
 				handle	=	cDso->handle;
@@ -441,7 +441,7 @@ int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoEx
 	}
 
 	// Load a DSO shader
-	if (CFrame::loadDSO(name,prototype,currentOptions->proceduralPath,&init,&exec,&cleanup) == TRUE) {
+	if (CRenderer::loadDSO(name,prototype,currentOptions->proceduralPath,&init,&exec,&cleanup) == TRUE) {
 		// OK, we found the shader
 		if (init !=	NULL)	handle	=	init(0,NULL);
 		else				handle	=	NULL;
@@ -454,8 +454,8 @@ int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoEx
 		cDso->handle	=	handle;
 		cDso->name		=	strdup(name);
 		cDso->prototype	=	strdup(prototype);
-		cDso->next		=	CFrame::dsos;
-		CFrame::dsos	=	cDso;
+		cDso->next		=	CRenderer::dsos;
+		CRenderer::dsos	=	cDso;
 
 		return TRUE;
 	}
@@ -486,8 +486,8 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 	initv(P	+	7*3,bmax[0],bmin[1],bmax[2]);	mulmp(P + 7*3,x->from,P + 7*3);
 	
 	// Do the projection
-	//CFrame::camera2screen(8,P);
-	CFrame::camera2pixels(8,P);
+	//CRenderer::camera2screen(8,P);
+	CRenderer::camera2pixels(8,P);
 	
 	a		=	0;
 
@@ -548,14 +548,14 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	currentXform		=	savedXform;
 
 	// Remove the delayed primitive from the scene
-	CFrame::removeTracable(cDelayed);
+	CRenderer::removeTracable(cDelayed);
 
 	// Update the raytracer
-	CFrame::prepareFrame();
+	CRenderer::prepareFrame();
 
 	// If we're raytracing, check the ray against the children objects
 	if (cRay != NULL) {
-		CFrame::hierarchy->intersect(cRay);
+		CRenderer::hierarchy->intersect(cRay);
 	}
 }
 
@@ -638,7 +638,7 @@ void	CRendererContext::addInstance(void *d) {
 int		CRendererContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;
 
-	assert(CFrame::definedCoordinateSystems	!=	NULL);
+	assert(CRenderer::definedCoordinateSystems	!=	NULL);
 
 	if(definedCoordinateSystems->find(name,currentSystem)) {
 		from		=	&currentSystem->from;
@@ -653,8 +653,8 @@ int		CRendererContext::findCoordinateSystem(const char *name,matrix *&from,matri
 				to		=	&identity;
 				break;
 			case COORDINATE_WORLD:
-				from	=	&CFrame::fromWorld;
-				to		=	&CFrame::toWorld;
+				from	=	&CRenderer::fromWorld;
+				to		=	&CRenderer::toWorld;
 				break;
 			case COORDINATE_SHADER:
 				from	=	&currentXform->from;

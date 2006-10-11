@@ -24,14 +24,13 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	frameNetwork.cpp
-//  Classes				:	CFrame
+//  Classes				:	CRenderer
 //  Description			:
 //
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
 #include <math.h>
 
-#include "frame.h"
 #include "renderer.h"
 #include "error.h"
 #include "stats.h"
@@ -43,6 +42,55 @@
 // The default zone size
 #define	BUFFER_LENGTH	1 << 12				// The size of the buffer to be used during the network file transfers
 
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	rcRecv
+// Description			:	Receive data from network
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+void			CRenderer::initNetwork(char *ribFile,char *riNetString) {
+
+	// Clear some data
+	netClient						=	INVALID_SOCKET;
+	netNumServers					=	0;
+	netServers						=	NULL;
+	netFileMappings					=	NULL;
+	numNetrenderedBuckets			=	0;
+
+	// Network init
+	netSetup(ribFile,riNetString);
+	
+	if (netClient != INVALID_SOCKET) {
+		netFileMappings = new CTrie<CNetFileMapping*>;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	rcRecv
+// Description			:	Receive data from network
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+void			CRenderer::shutdownNetwork() {
+	if (netClient != INVALID_SOCKET) {
+
+		assert(netFileMappings != NULL);
+
+		netFileMappings->destroy();
+		closesocket(netClient);
+	}
+
+	if (netNumServers != 0) {
+		int	i;
+
+		for (i=0;i<netNumServers;i++) {
+			closesocket(netServers[i]);
+		}
+
+		delete [] netServers;
+	}
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -85,6 +133,8 @@ void		rcSend(SOCKET s,char *data,int n,int toNetwork) {
 
 	stats.totalNetSend	+=	n;
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcRecv
@@ -275,13 +325,13 @@ static	int		netName(sockaddr_in *address,char *name) {
 #endif
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	sendFile
 // Description			:	Send a file over the network to the server
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void				CFrame::sendFile(int index,char *fileToSend,int start,int size) {
+void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 	FILE	*in	=	fopen(fileToSend,"rb");
 
 	if (in != NULL) {
@@ -330,7 +380,7 @@ void				CFrame::sendFile(int index,char *fileToSend,int start,int size) {
 // Return Value			:	The size received
 // Comments				:
 // Date last edited		:	7/4/2001
-int			CFrame::getFile(FILE *file,const char *inName,int start,int size) {
+int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	T32		*buffer;
 	int		i			=	strlen(inName);
 	int		r;
@@ -381,13 +431,13 @@ int			CFrame::getFile(FILE *file,const char *inName,int start,int size) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getFile
 // Description			:	Receive a file over the network from the client
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-int			CFrame::getFile(char *outName,const char *inName) {
+int			CRenderer::getFile(char *outName,const char *inName) {
 	FILE	*out;
 	int		result	=	FALSE;
 
@@ -417,13 +467,13 @@ int			CFrame::getFile(char *outName,const char *inName) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	netSetup
 // Description			:	Setup the network connections
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CFrame::netSetup(char *ribFile,char *riNetString) {
+void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 	char		*tmp		=	riNetString;
 	sockaddr_in	me;
 	SOCKET		control;

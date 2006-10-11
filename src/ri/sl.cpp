@@ -90,7 +90,6 @@
 #include "common/containers.h"
 #include "shader.h"
 #include "slcode.h"
-#include "renderer.h"
 #include "error.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -709,7 +708,7 @@ static	TSlFunction		functions[]	=	{
 		TSlLabel					*newLabelRef(char *,int);
 		void						processEscapes(char *);
 
-#line 659 "../../../../src/ri/sdr.y"
+#line 658 "../../../../src/ri/sdr.y"
 typedef union slval {
 	float	real;
 	char	string[64];
@@ -850,20 +849,20 @@ static const short yyrhs[] = {    42,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   711,   720,   721,   726,   734,   747,   755,   767,   775,   783,
-   789,   795,   801,   807,   815,   822,   826,   829,   836,   843,
-   851,   859,   866,   875,   881,   883,   885,   887,   889,   891,
-   893,   898,   910,   920,   942,   942,   961,   972,   986,   990,
-  1009,  1030,  1061,  1061,  1078,  1089,  1104,  1108,  1115,  1127,
-  1142,  1142,  1153,  1160,  1172,  1189,  1189,  1200,  1207,  1219,
-  1236,  1236,  1247,  1254,  1266,  1283,  1283,  1294,  1301,  1313,
-  1320,  1334,  1345,  1364,  1368,  1412,  1439,  1464,  1485,  1485,
-  1504,  1515,  1563,  1594,  1598,  1605,  1609,  1612,  1615,  1618,
-  1621,  1624,  1627,  1630,  1633,  1638,  1644,  1656,  1662,  1673,
-  1679,  1690,  1696,  1707,  1713,  1724,  1730,  1741,  1747,  1758,
-  1764,  1775,  1782,  1784,  1791,  1793,  1797,  1801,  1805,  1809,
-  1829,  1865,  1884,  1903,  1924,  1929,  1934,  1942,  1950,  1957,
-  1962,  1967,  1972,  1989,  2045
+   710,   719,   720,   725,   733,   746,   754,   766,   774,   782,
+   788,   794,   800,   806,   814,   821,   825,   828,   835,   842,
+   850,   858,   865,   874,   880,   882,   884,   886,   888,   890,
+   892,   897,   909,   919,   941,   941,   960,   971,   985,   989,
+  1008,  1029,  1060,  1060,  1077,  1088,  1103,  1107,  1114,  1126,
+  1141,  1141,  1152,  1159,  1171,  1188,  1188,  1199,  1206,  1218,
+  1235,  1235,  1246,  1253,  1265,  1282,  1282,  1293,  1300,  1312,
+  1319,  1333,  1344,  1363,  1367,  1411,  1438,  1463,  1484,  1484,
+  1503,  1514,  1562,  1593,  1597,  1604,  1608,  1611,  1614,  1617,
+  1620,  1623,  1626,  1629,  1632,  1637,  1643,  1655,  1661,  1672,
+  1678,  1689,  1695,  1706,  1712,  1723,  1729,  1740,  1746,  1757,
+  1763,  1774,  1781,  1783,  1790,  1792,  1796,  1800,  1804,  1808,
+  1828,  1864,  1883,  1902,  1923,  1928,  1933,  1941,  1949,  1956,
+  1961,  1966,  1971,  1988,  2044
 };
 #endif
 
@@ -1576,7 +1575,7 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 729 "../../../../src/ri/sdr.y"
+#line 728 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1584,7 +1583,7 @@ case 4:
 				;
     break;}
 case 5:
-#line 742 "../../../../src/ri/sdr.y"
+#line 741 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1592,7 +1591,7 @@ case 5:
 				;
     break;}
 case 6:
-#line 750 "../../../../src/ri/sdr.y"
+#line 749 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1600,7 +1599,7 @@ case 6:
 				;
     break;}
 case 7:
-#line 762 "../../../../src/ri/sdr.y"
+#line 761 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1608,7 +1607,7 @@ case 7:
 				;
     break;}
 case 8:
-#line 768 "../../../../src/ri/sdr.y"
+#line 767 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	0;
 					yyval.v[1]	=	0;
@@ -1616,7 +1615,7 @@ case 8:
 				;
     break;}
 case 9:
-#line 776 "../../../../src/ri/sdr.y"
+#line 775 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].v[0];
 					yyval.v[1]	=	yyvsp[0].v[1];
@@ -1624,37 +1623,37 @@ case 9:
 				;
     break;}
 case 10:
-#line 786 "../../../../src/ri/sdr.y"
+#line 785 "../../../../src/ri/sdr.y"
 {
 					currentData.shaderType	=	SL_SURFACE;
 				;
     break;}
 case 11:
-#line 792 "../../../../src/ri/sdr.y"
+#line 791 "../../../../src/ri/sdr.y"
 {
 					currentData.shaderType	=	SL_DISPLACEMENT;
 				;
     break;}
 case 12:
-#line 798 "../../../../src/ri/sdr.y"
+#line 797 "../../../../src/ri/sdr.y"
 {
 					currentData.shaderType	=	SL_LIGHTSOURCE;
 				;
     break;}
 case 13:
-#line 804 "../../../../src/ri/sdr.y"
+#line 803 "../../../../src/ri/sdr.y"
 {
 					currentData.shaderType	=	SL_ATMOSPHERE;
 				;
     break;}
 case 14:
-#line 810 "../../../../src/ri/sdr.y"
+#line 809 "../../../../src/ri/sdr.y"
 {
 					currentData.shaderType	=	SL_IMAGER;
 				;
     break;}
 case 18:
-#line 831 "../../../../src/ri/sdr.y"
+#line 830 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1662,7 +1661,7 @@ case 18:
 				;
     break;}
 case 19:
-#line 838 "../../../../src/ri/sdr.y"
+#line 837 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1670,7 +1669,7 @@ case 19:
 				;
     break;}
 case 20:
-#line 846 "../../../../src/ri/sdr.y"
+#line 845 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1678,7 +1677,7 @@ case 20:
 				;
     break;}
 case 21:
-#line 854 "../../../../src/ri/sdr.y"
+#line 853 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1686,7 +1685,7 @@ case 21:
 				;
     break;}
 case 22:
-#line 861 "../../../../src/ri/sdr.y"
+#line 860 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1694,7 +1693,7 @@ case 22:
 				;
     break;}
 case 23:
-#line 867 "../../../../src/ri/sdr.y"
+#line 866 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1702,7 +1701,7 @@ case 23:
 				;
     break;}
 case 32:
-#line 903 "../../../../src/ri/sdr.y"
+#line 902 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_FLOAT,1,TRUE);
 
@@ -1712,7 +1711,7 @@ case 32:
 				;
     break;}
 case 33:
-#line 913 "../../../../src/ri/sdr.y"
+#line 912 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_FLOAT,1,TRUE);
 
@@ -1722,7 +1721,7 @@ case 33:
 				;
     break;}
 case 34:
-#line 927 "../../../../src/ri/sdr.y"
+#line 926 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_FLOAT,(int) yyvsp[-2].real,TRUE);
 					
@@ -1739,7 +1738,7 @@ case 34:
 				;
     break;}
 case 36:
-#line 948 "../../../../src/ri/sdr.y"
+#line 947 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,TRUE);
 
@@ -1752,7 +1751,7 @@ case 36:
 				;
     break;}
 case 37:
-#line 965 "../../../../src/ri/sdr.y"
+#line 964 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1760,7 +1759,7 @@ case 37:
 				;
     break;}
 case 38:
-#line 975 "../../../../src/ri/sdr.y"
+#line 974 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -1774,7 +1773,7 @@ case 38:
 				;
     break;}
 case 40:
-#line 993 "../../../../src/ri/sdr.y"
+#line 992 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_STRING,1,TRUE);
 
@@ -1793,7 +1792,7 @@ case 40:
 				;
     break;}
 case 41:
-#line 1014 "../../../../src/ri/sdr.y"
+#line 1013 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_STRING,1,TRUE);
 
@@ -1812,7 +1811,7 @@ case 41:
 				;
     break;}
 case 42:
-#line 1037 "../../../../src/ri/sdr.y"
+#line 1036 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_STRING,(int) yyvsp[-2].real,TRUE);
 					
@@ -1838,7 +1837,7 @@ case 42:
 				;
     break;}
 case 44:
-#line 1067 "../../../../src/ri/sdr.y"
+#line 1066 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,TRUE);
 
@@ -1851,7 +1850,7 @@ case 44:
 				;
     break;}
 case 45:
-#line 1082 "../../../../src/ri/sdr.y"
+#line 1081 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1859,7 +1858,7 @@ case 45:
 				;
     break;}
 case 46:
-#line 1092 "../../../../src/ri/sdr.y"
+#line 1091 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -1874,13 +1873,13 @@ case 46:
 				;
     break;}
 case 48:
-#line 1111 "../../../../src/ri/sdr.y"
+#line 1110 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_COLOR;
 				;
     break;}
 case 49:
-#line 1115 "../../../../src/ri/sdr.y"
+#line 1114 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1895,7 +1894,7 @@ case 49:
 				;
     break;}
 case 50:
-#line 1134 "../../../../src/ri/sdr.y"
+#line 1133 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_COLOR,(int) yyvsp[-2].real,TRUE);
 					
@@ -1905,19 +1904,19 @@ case 50:
 				;
     break;}
 case 52:
-#line 1148 "../../../../src/ri/sdr.y"
+#line 1147 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 53:
-#line 1156 "../../../../src/ri/sdr.y"
+#line 1155 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_VECTOR;
 				;
     break;}
 case 54:
-#line 1160 "../../../../src/ri/sdr.y"
+#line 1159 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1932,7 +1931,7 @@ case 54:
 				;
     break;}
 case 55:
-#line 1179 "../../../../src/ri/sdr.y"
+#line 1178 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_VECTOR,(int) yyvsp[-2].real,TRUE);
 					
@@ -1944,19 +1943,19 @@ case 55:
 				;
     break;}
 case 57:
-#line 1195 "../../../../src/ri/sdr.y"
+#line 1194 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 58:
-#line 1203 "../../../../src/ri/sdr.y"
+#line 1202 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_NORMAL;
 				;
     break;}
 case 59:
-#line 1207 "../../../../src/ri/sdr.y"
+#line 1206 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1971,7 +1970,7 @@ case 59:
 				;
     break;}
 case 60:
-#line 1226 "../../../../src/ri/sdr.y"
+#line 1225 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_NORMAL,(int) yyvsp[-2].real,TRUE);
 					
@@ -1983,19 +1982,19 @@ case 60:
 				;
     break;}
 case 62:
-#line 1242 "../../../../src/ri/sdr.y"
+#line 1241 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 63:
-#line 1250 "../../../../src/ri/sdr.y"
+#line 1249 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_POINT;
 				;
     break;}
 case 64:
-#line 1254 "../../../../src/ri/sdr.y"
+#line 1253 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -2010,7 +2009,7 @@ case 64:
 				;
     break;}
 case 65:
-#line 1273 "../../../../src/ri/sdr.y"
+#line 1272 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_POINT,(int) yyvsp[-2].real,TRUE);
 					
@@ -2022,13 +2021,13 @@ case 65:
 				;
     break;}
 case 67:
-#line 1289 "../../../../src/ri/sdr.y"
+#line 1288 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 68:
-#line 1296 "../../../../src/ri/sdr.y"
+#line 1295 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2036,7 +2035,7 @@ case 68:
 				;
     break;}
 case 69:
-#line 1308 "../../../../src/ri/sdr.y"
+#line 1307 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2044,7 +2043,7 @@ case 69:
 				;
     break;}
 case 70:
-#line 1315 "../../../../src/ri/sdr.y"
+#line 1314 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2052,7 +2051,7 @@ case 70:
 				;
     break;}
 case 71:
-#line 1326 "../../../../src/ri/sdr.y"
+#line 1325 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2060,7 +2059,7 @@ case 71:
 				;
     break;}
 case 72:
-#line 1338 "../../../../src/ri/sdr.y"
+#line 1337 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -2068,7 +2067,7 @@ case 72:
 				;
     break;}
 case 73:
-#line 1348 "../../../../src/ri/sdr.y"
+#line 1347 "../../../../src/ri/sdr.y"
 {
 					float *v;
 					
@@ -2087,7 +2086,7 @@ case 73:
 				;
     break;}
 case 75:
-#line 1390 "../../../../src/ri/sdr.y"
+#line 1389 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-19].string,TYPE_MATRIX,1,TRUE);
 
@@ -2112,7 +2111,7 @@ case 75:
 				;
     break;}
 case 76:
-#line 1417 "../../../../src/ri/sdr.y"
+#line 1416 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_MATRIX,1,TRUE);
 
@@ -2137,7 +2136,7 @@ case 76:
 				;
     break;}
 case 77:
-#line 1442 "../../../../src/ri/sdr.y"
+#line 1441 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_MATRIX,1,TRUE);
 
@@ -2162,7 +2161,7 @@ case 77:
 				;
     break;}
 case 78:
-#line 1471 "../../../../src/ri/sdr.y"
+#line 1470 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_MATRIX,(int) yyvsp[-2].real,TRUE);
 					
@@ -2178,7 +2177,7 @@ case 78:
 				;
     break;}
 case 80:
-#line 1491 "../../../../src/ri/sdr.y"
+#line 1490 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,TRUE);
 
@@ -2191,7 +2190,7 @@ case 80:
 				;
     break;}
 case 81:
-#line 1508 "../../../../src/ri/sdr.y"
+#line 1507 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("wrong number of items in array initializer\n");
@@ -2199,7 +2198,7 @@ case 81:
 				;
     break;}
 case 82:
-#line 1535 "../../../../src/ri/sdr.y"
+#line 1534 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -2230,7 +2229,7 @@ case 82:
 				;
     break;}
 case 83:
-#line 1566 "../../../../src/ri/sdr.y"
+#line 1565 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -2261,117 +2260,117 @@ case 83:
 				;
     break;}
 case 96:
-#line 1641 "../../../../src/ri/sdr.y"
+#line 1640 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_BOOLEAN,1,FALSE);
 				;
     break;}
 case 97:
-#line 1650 "../../../../src/ri/sdr.y"
+#line 1649 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_BOOLEAN,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 98:
-#line 1659 "../../../../src/ri/sdr.y"
+#line 1658 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_FLOAT,1,FALSE);
 				;
     break;}
 case 99:
-#line 1668 "../../../../src/ri/sdr.y"
+#line 1667 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 100:
-#line 1676 "../../../../src/ri/sdr.y"
+#line 1675 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_STRING,1,FALSE);
 				;
     break;}
 case 101:
-#line 1685 "../../../../src/ri/sdr.y"
+#line 1684 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 102:
-#line 1693 "../../../../src/ri/sdr.y"
+#line 1692 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_VECTOR,1,FALSE);
 				;
     break;}
 case 103:
-#line 1702 "../../../../src/ri/sdr.y"
+#line 1701 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 104:
-#line 1710 "../../../../src/ri/sdr.y"
+#line 1709 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_COLOR,1,FALSE);
 				;
     break;}
 case 105:
-#line 1719 "../../../../src/ri/sdr.y"
+#line 1718 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 106:
-#line 1727 "../../../../src/ri/sdr.y"
+#line 1726 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_NORMAL,1,FALSE);
 				;
     break;}
 case 107:
-#line 1736 "../../../../src/ri/sdr.y"
+#line 1735 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 108:
-#line 1744 "../../../../src/ri/sdr.y"
+#line 1743 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_POINT,1,FALSE);
 				;
     break;}
 case 109:
-#line 1753 "../../../../src/ri/sdr.y"
+#line 1752 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 110:
-#line 1761 "../../../../src/ri/sdr.y"
+#line 1760 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_MATRIX,1,FALSE);
 				;
     break;}
 case 111:
-#line 1770 "../../../../src/ri/sdr.y"
+#line 1769 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 112:
-#line 1777 "../../../../src/ri/sdr.y"
+#line 1776 "../../../../src/ri/sdr.y"
 {
 					currentData.parsingInit	=	TRUE;
 					newLabel(initLabel,FALSE);
 				;
     break;}
 case 114:
-#line 1786 "../../../../src/ri/sdr.y"
+#line 1785 "../../../../src/ri/sdr.y"
 {
 					currentData.parsingInit	=	FALSE;
 					newLabel(codeLabel,FALSE);
 				;
     break;}
 case 120:
-#line 1811 "../../../../src/ri/sdr.y"
+#line 1810 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2391,7 +2390,7 @@ case 120:
 				;
     break;}
 case 121:
-#line 1832 "../../../../src/ri/sdr.y"
+#line 1831 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2425,7 +2424,7 @@ case 121:
 				;
     break;}
 case 122:
-#line 1867 "../../../../src/ri/sdr.y"
+#line 1866 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2445,7 +2444,7 @@ case 122:
 				;
     break;}
 case 123:
-#line 1886 "../../../../src/ri/sdr.y"
+#line 1885 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2465,7 +2464,7 @@ case 123:
 				;
     break;}
 case 124:
-#line 1905 "../../../../src/ri/sdr.y"
+#line 1904 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2485,29 +2484,29 @@ case 124:
 				;
     break;}
 case 125:
-#line 1927 "../../../../src/ri/sdr.y"
+#line 1926 "../../../../src/ri/sdr.y"
 {
 				;
     break;}
 case 126:
-#line 1930 "../../../../src/ri/sdr.y"
+#line 1929 "../../../../src/ri/sdr.y"
 {
 				;
     break;}
 case 127:
-#line 1937 "../../../../src/ri/sdr.y"
+#line 1936 "../../../../src/ri/sdr.y"
 {
 					setOpcode();
 				;
     break;}
 case 128:
-#line 1945 "../../../../src/ri/sdr.y"
+#line 1944 "../../../../src/ri/sdr.y"
 {
 					newLabel(yyvsp[-1].string,FALSE);
 				;
     break;}
 case 129:
-#line 1952 "../../../../src/ri/sdr.y"
+#line 1951 "../../../../src/ri/sdr.y"
 {
 					char	*str	=	yyvsp[0].string;
 
@@ -2515,25 +2514,25 @@ case 129:
 				;
     break;}
 case 130:
-#line 1959 "../../../../src/ri/sdr.y"
+#line 1958 "../../../../src/ri/sdr.y"
 {
 					newLabel(yyvsp[0].string,TRUE);
 				;
     break;}
 case 131:
-#line 1964 "../../../../src/ri/sdr.y"
+#line 1963 "../../../../src/ri/sdr.y"
 {
 					addVariableReference(yyvsp[0].string);
 				;
     break;}
 case 132:
-#line 1969 "../../../../src/ri/sdr.y"
+#line 1968 "../../../../src/ri/sdr.y"
 {
 					addFloatReference(&yyvsp[0].real,1);
 				;
     break;}
 case 133:
-#line 1980 "../../../../src/ri/sdr.y"
+#line 1979 "../../../../src/ri/sdr.y"
 {
 					vector	tmp;
 
@@ -2545,7 +2544,7 @@ case 133:
 				;
     break;}
 case 134:
-#line 2023 "../../../../src/ri/sdr.y"
+#line 2022 "../../../../src/ri/sdr.y"
 {
 					matrix	tmp;
 
@@ -2570,7 +2569,7 @@ case 134:
 				;
     break;}
 case 135:
-#line 2049 "../../../../src/ri/sdr.y"
+#line 2048 "../../../../src/ri/sdr.y"
 {
 					strcpy(currentData.currentPrototype,yyvsp[-1].string);
 				;
@@ -2772,7 +2771,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 2054 "../../../../src/ri/sdr.y"
+#line 2053 "../../../../src/ri/sdr.y"
 
 #include "lex.sl.cpp"
 

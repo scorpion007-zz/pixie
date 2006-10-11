@@ -32,7 +32,7 @@
 #define POINTCLOUD_H
 
 #include "common/global.h"
-#include "renderer.h"
+#include "common/containers.h"
 #include "photonMap.h"
 #include "texture3d.h"
 

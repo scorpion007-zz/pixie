@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "stochastic.h"
-#include "renderer.h"
 #include "memory.h"
 #include "random.h"
 
@@ -60,18 +59,18 @@ static	int	numFragments	=	0;
 // Comments				:
 // Date last edited		:	7/31/2002
 CStochastic::CStochastic() : CReyes(0), COcclusionCuller(),
-	apertureGenerator(frame) {
+	apertureGenerator(CRenderer::frame) {
 	int		i,j,sx,sy;
 	float	*cExtraSample;
 	CPixel	*cPixel;
 
 	// The maximum width/height we should handle
-	totalWidth		=	pixelXsamples*bucketWidth + 2*xSampleOffset;
-	totalHeight		=	pixelYsamples*bucketHeight + 2*ySampleOffset;
+	totalWidth		=	CRenderer::options.pixelXsamples*CRenderer::options.bucketWidth + 2*CRenderer::xSampleOffset;
+	totalHeight		=	CRenderer::options.pixelYsamples*CRenderer::options.bucketHeight + 2*CRenderer::ySampleOffset;
 
 	// Allocate the framebuffer
-	if (numExtraSamples > 0)	extraSampleMemory	=	new float[totalWidth*totalHeight*numExtraSamples];
-	else						extraSampleMemory	=	NULL;
+	if (CRenderer::numExtraSamples > 0)	extraSampleMemory	=	new float[totalWidth*totalHeight*CRenderer::numExtraSamples];
+	else								extraSampleMemory	=	NULL;
 
 	cExtraSample	=	extraSampleMemory;
 	fb				=	new CPixel*[totalHeight];
@@ -107,7 +106,7 @@ CStochastic::CStochastic() : CReyes(0), COcclusionCuller(),
 			for (sx=0;sx<filterWidth;sx++) {
 				const float	cx								=	(sx - halfFilterWidth + 0.5f)*invPixelXsamples;
 				const float	cy								=	(sy - halfFilterHeight + 0.5f)*invPixelYsamples;
-				float		filterResponse					=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
+				float		filterResponse					=	pixelFilter(cx,cy,CRenderer::options.pixelFilterWidth,CRenderer::options.pixelFilterHeight);
 
 				// Account for the partial area out of the bounds
 				//if (fabs(cx) > marginX)	filterResponse		*=	marginXcoverage;

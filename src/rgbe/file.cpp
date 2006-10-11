@@ -41,15 +41,15 @@
 #include "rgbe.h"
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFramebuffer
+// Class				:	CRendererbuffer
 // Description			:	Holds the framebuffer
 // Comments				:
 // Date last edited		:	5/9/2002
 class	CRgbeFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	CRendererbuffer
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
@@ -74,8 +74,8 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	~CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	~CRendererbuffer
 				// Description			:	Dtor
 				// Return Value			:	-
 				// Comments				:
@@ -89,7 +89,7 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
+				// Class				:	CRendererbuffer
 				// Method				:	write
 				// Description			:	Swrite some data to the out file
 				// Return Value			:	-

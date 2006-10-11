@@ -30,15 +30,15 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
-#include "renderer.h"
 #include "shader.h"
 #include "slcode.h"
 #include "noise.h"
 #include "shading.h"
-#include "frame.h"
+#include "renderer.h"
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
+#include "rendererContext.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -420,7 +420,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 		// Relink the entry point to the global, we already verified the match
 		if (cParameter->storage == STORAGE_GLOBAL) {
-			CVariable	*cVar	=	CFrame::retrieveVariable(cParameter->name);
+			CVariable	*cVar	=	CRenderer::retrieveVariable(cParameter->name);
 			cParameter->entry	=	cVar->entry;
 		}
 		cParameter->value		=	NULL;

@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "bundles.h"
-#include "renderer.h"
 #include "error.h"
 #include "stats.h"
 

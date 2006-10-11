@@ -56,8 +56,8 @@
 								lookup->gatherGlobal		=	1;																\
 								lookup->gatherLocal			=	1;																\
 								lookup->localThreshold		=	1;																\
-								lookup->lengthA				=	CFrame::lengthA;												\
-								lookup->lengthB				=	CFrame::lengthB;												\
+								lookup->lengthA				=	CRenderer::lengthA;												\
+								lookup->lengthB				=	CRenderer::lengthB;												\
 								lookup->handle				=	(attributes->irradianceHandle		== NULL ? "temp.irr"	: attributes->irradianceHandle);			\
 								lookup->filemode			=	(attributes->irradianceHandleMode	== NULL ? ""			: attributes->irradianceHandleMode);		\
 								initv(lookup->backgroundColor,0);																\
@@ -102,7 +102,7 @@
 										} else if (strcmp(param->string,"filemode") == 0) {										\
 											lookup->filemode		=	(const char *) val->string;								\
 										} else if (strcmp(param->string,"environmentmap") == 0) {								\
-											lookup->environment		=	CFrame::getEnvironment(val->string);					\
+											lookup->environment		=	CRenderer::getEnvironment(val->string);					\
 										} else if (strcmp(param->string,"irradiance") == 0) {									\
 											lookup->irradianceIndex	=	i*2+start+1;											\
 										} else if (strcmp(param->string,"occlusion") == 0) {									\
@@ -190,7 +190,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 								ray.lastXform			=	NULL;																\
 								ray.object				=	NULL;																\
 																																\
-								CFrame::hierarchy->intersect(&ray);																\
+								CRenderer::hierarchy->intersect(&ray);																\
 																																\
 								res->real				=	ray.t
 
@@ -345,7 +345,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								ray.lastXform			=	NULL;																\
 								ray.object				=	NULL;																\
 																																\
-								CFrame::hierarchy->intersect(&ray);																\
+								CRenderer::hierarchy->intersect(&ray);																\
 																																\
 								if (ray.object != NULL)	res[0].real	=	0;														\
 								else					res[0].real	=	1;
@@ -375,7 +375,7 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CFrame::getCache(lookup->handle,lookup->filemode);						\
+									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);						\
 									lookup->numSamples	=	(int) op3->real;														\
 									lookup->occlusion	=	FALSE;																	\
 								}																									\
@@ -427,7 +427,7 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CFrame::getCache(lookup->handle,lookup->filemode);						\
+									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);						\
 									lookup->numSamples	=	(int) op3->real;														\
 									lookup->occlusion	=	TRUE;																	\
 									if (lookup->irradianceIndex != -1) lookup->occlusion = FALSE;									\
@@ -474,14 +474,14 @@ DEFSHORTFUNC(occlusion	,"occlusion"	,"f=pnf!"	,OCCLUSIONEXPR_PRE,OCCLUSIONEXPR,O
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CFrame::getCache(lookup->handle,lookup->filemode);						\
+									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);						\
 									lookup->numSamples	=	(int) op3->real;														\
 									lookup->occlusion	=	FALSE;																	\
 								}																									\
 								cache	=	lookup->cache;
 
 
-#define	CACSAMPLEEXPR			cache->cachesample(&res->real,&op1->real,&op2->real,(CFrame::lengthA*op1[COMP_Z].real + CFrame::lengthB)*op3->real);
+#define	CACSAMPLEEXPR			cache->cachesample(&res->real,&op1->real,&op2->real,(CRenderer::lengthA*op1[COMP_Z].real + CRenderer::lengthB)*op3->real);
 
 #else
 #define	CACSAMPLEEXPR_PRE
@@ -511,7 +511,7 @@ DEFSHORTFUNC(Cachesample	,"cachesample"	,"f=pnf!"	,CACSAMPLEEXPR_PRE,CACSAMPLEEX
 									argumentcount(numArguments);												\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);									\
 									operand(1,op1);																\
-									lookup->map			=	CFrame::getPhotonMap(op1->string);					\
+									lookup->map			=	CRenderer::getPhotonMap(op1->string);					\
 								}																				\
 								operand(0,res);																	\
 								operand(2,op2);																	\
@@ -557,7 +557,7 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 									argumentcount(numArguments);												\
 									GLOBPARAMETERS(3,(numArguments-3) >> 1);									\
 									operand(1,op1);																\
-									lookup->map			=	CFrame::getPhotonMap(op1->string);					\
+									lookup->map			=	CRenderer::getPhotonMap(op1->string);					\
 								}																				\
 								operand(0,res);																	\
 								operand(2,op2);																	\
@@ -603,7 +603,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lookup->bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
 								lookup->coneAngle		=	(float) (C_PI/2.0);										\
 								lookup->maxDist			=	C_INFINITY;												\
-								lookup->maxRayDepth		=	CFrame::options.maxRayDepth;							\
+								lookup->maxRayDepth		=	CRenderer::options.maxRayDepth;							\
 								lookup->label			=	rayLabelGather;											\
 								lookup->uniformDist		=	FALSE;													\
 								{																					\
@@ -662,12 +662,12 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								for (var=lookup->outputs;var!=NULL;var=var->next) {									\
 									*(var->cDepth++)	=	var->dest;												\
 									operand(var->destIndex,var->dest);												\
-									assert((var->cDepth-var->destForEachLevel) <= (CFrame::options.maxRayDepth+1));	\
+									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::options.maxRayDepth+1));	\
 								}																					\
 								for (var=lookup->nonShadeOutputs;var!=NULL;var=var->next) {							\
 									*(var->cDepth++)	=	var->dest;												\
 									operand(var->destIndex,var->dest);												\
-									assert((var->cDepth-var->destForEachLevel) <= (CFrame::options.maxRayDepth+1));	\
+									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::options.maxRayDepth+1));	\
 								}																					\
 																													\
 								lastGather							=	new CGatherBundle;							\

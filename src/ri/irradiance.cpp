@@ -36,7 +36,9 @@
 #include "shading.h"
 #include "bundles.h"
 #include "photonMap.h"
+#include "surface.h"
 #include "stats.h"
+#include "texture.h"
 
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));

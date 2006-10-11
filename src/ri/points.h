@@ -35,6 +35,7 @@
 #include "photonMap.h"
 #include "ray.h"
 #include "shading.h"
+#include "surface.h"
 #include "pl.h"
 
 ///////////////////////////////////////////////////////////////////////

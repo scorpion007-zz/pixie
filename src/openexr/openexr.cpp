@@ -52,15 +52,15 @@ using namespace Imf;
 using namespace Imath;
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFramebuffer
+// Class				:	CRendererbuffer
 // Description			:	Holds the framebuffer
 // Comments				:
 // Date last edited		:	5/9/2002
 class	CExrFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	CRendererbuffer
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
@@ -178,7 +178,7 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
+				// Class				:	CRendererbuffer
 				// Method				:	write
 				// Description			:	Swrite some data to the out file
 				// Return Value			:	-

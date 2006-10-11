@@ -220,7 +220,7 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 									operand(0,P);														\
 									Pl	=	(float *) P;												\
 																										\
-									if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
 										illuminateBegin(Pl,NULL,NULL);									\
 									} else {															\
 										float		*Ps			=	varying[VARIABLE_PS];				\
@@ -278,7 +278,7 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 									Nf		=	&N->real;												\
 									thetaf	=	&theta->real;											\
 																										\
-									if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
 										illuminateBegin(Pf,Nf,thetaf);									\
 									} else {															\
 										float		*Ps		=	varying[VARIABLE_PS];					\
@@ -327,7 +327,7 @@ DEFOPCODE(Illuminate3	,"illuminate"	,4, ILLUMINATE3EXPR_PRE, NULL_EXPR, NULL_EXP
 #ifdef INIT_SHADING
 #define	ILLUMINATEEND_PRE
 #else
-#define	ILLUMINATEEND_PRE			if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
+#define	ILLUMINATEEND_PRE			if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
 										illuminateEnd();										\
 									} else {													\
 										const float		*L;										\
@@ -389,7 +389,7 @@ DEFOPCODE(EndIlluminate	,"endilluminate"	,0, ILLUMINATEEND_PRE, NULL_EXPR, NULL_
 #else
 #define	SOLAR1EXPR_PRE				int		i;													\
 																								\
-									if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
 										solarBegin(NULL,NULL);									\
 									} else {													\
 										float	*Ps		=	varying[VARIABLE_PS];				\
@@ -429,7 +429,7 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 									Nf		=	&N->real;										\
 									thetaf	=	&theta->real;									\
 																								\
-									if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
 										solarBegin(Nf,thetaf);									\
 									} else {													\
 										vector		R;											\
@@ -438,7 +438,7 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 										const float	*Ns			=	currentShadingState->Ns;	\
 										const float	*costheta	=	currentShadingState->costheta;		\
 																								\
-										subvv(R,CFrame::worldBmax,CFrame::worldBmin);			\
+										subvv(R,CRenderer::worldBmax,CRenderer::worldBmin);			\
 										worldRadius	=	dotvv(R,R);								\
 																								\
 										for (i=numVertices;i>0;i--,tags++) {					\
@@ -475,7 +475,7 @@ DEFOPCODE(Solar2	,"solar"	,3, SOLAR2EXPR_PRE, NULL_EXPR, NULL_EXPR, SOLAR2EXPR_P
 #ifdef INIT_SHADING
 #define SOLAREND_PRE
 #else
-#define	SOLAREND_PRE				if (CFrame::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
+#define	SOLAREND_PRE				if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
 										solarEnd();											\
 									} else {												\
 										const float		*L;									\

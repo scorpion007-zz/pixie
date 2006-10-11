@@ -33,13 +33,13 @@
 #include <math.h>
 
 #include "patches.h"
-#include "renderer.h"
 #include "stats.h"
 #include "memory.h"
 #include "shading.h"
 #include "error.h"
 #include "patchUtils.h"
-#include "frame.h"
+#include "renderer.h"
+#include "rendererContext.h"
 
 
 
@@ -363,8 +363,8 @@ void	CBilinearPatch::bound(float *bmin,float *bmax) const {
 // Date last edited		:	6/21/2001
 void	CBilinearPatch::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CFrame::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CFrame::addTracable(this,this);
+		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else															CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////

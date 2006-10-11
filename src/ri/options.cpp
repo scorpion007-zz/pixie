@@ -34,7 +34,6 @@
 
 #include "options.h"
 #include "texture.h"
-#include "renderer.h"
 #include "stats.h"
 
 #ifdef HAVE_CONFIG_H

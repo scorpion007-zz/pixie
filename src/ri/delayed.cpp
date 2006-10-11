@@ -31,10 +31,10 @@
 #include <math.h>
 
 #include "delayed.h"
-#include "renderer.h"
 #include "hierarchy.h"
 #include "stats.h"
-#include "frame.h"
+#include "renderer.h"
+#include "rendererContext.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -134,7 +134,7 @@ void	CDelayedObject::bound(float *bmin,float *bmax) const {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedObject::tesselate(CShadingContext *context) {
-	CFrame::addTracable(this,this);
+	CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////

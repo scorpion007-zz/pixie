@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "instance.h"
-#include "renderer.h"
 #include "shading.h"
 #include "stats.h"
 

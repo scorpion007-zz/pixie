@@ -33,9 +33,10 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
-#include "ray.h"
-#include "renderer.h"
 #include "gui/opengl.h"
+#include "fileResource.h"
+#include "ray.h"
+#include "xform.h"
 
 
 // Macros to pack/unpack directions

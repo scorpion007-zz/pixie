@@ -35,10 +35,9 @@
 #include	"common/global.h"
 #include	"common/containers.h"
 
-#include	"frame.h"
+#include	"renderer.h"
 #include	"remoteChannel.h"
 #include	"error.h"
-#include	"renderer.h"
 #include	"irradiance.h"
 #include	"pointCloud.h"
 
@@ -46,14 +45,14 @@
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	requestRemoteChannel
 // Description			:	Ask client to set up remote channel like the
 //							one passed as an argument
 // Return Value			:
 // Comments				:	The channel will either be deleted or managed
 // Date last edited		:	03/24/2006
-int		CFrame::requestRemoteChannel(CRemoteChannel *serverChannel){
+int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 	int nameLength			= strlen(serverChannel->name)+1;
 	int clientInitialized	= FALSE;	
 	T32 buffer[3];
@@ -120,14 +119,14 @@ int		CFrame::requestRemoteChannel(CRemoteChannel *serverChannel){
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	processChannelRequest
 // Description			:	Service request for channel, adding the
 //							newly created channel to the list if successful
 // Return Value			:
 // Comments				:	called from CRendererContext:processServerRequest
 // Date last edited		:	03/24/2006
-int		CFrame::processChannelRequest(int index,SOCKET s){
+int		CRenderer::processChannelRequest(int index,SOCKET s){
 	int				channelNameLength	= 0;
 	int				channelType			= 0;
 	CRemoteChannel	*rChannel			= NULL;
@@ -188,7 +187,7 @@ int		CFrame::processChannelRequest(int index,SOCKET s){
 			{
 			// create an pointcloud channel.
 			// Note: the channel definitions are duff
-			CPointCloud *cloud = (CPointCloud*)  getTexture3d(channelName,TRUE,NULL,CFrame::fromWorld,CFrame::toWorld);			
+			CPointCloud *cloud = (CPointCloud*)  getTexture3d(channelName,TRUE,NULL,CRenderer::fromWorld,CRenderer::toWorld);			
 			rChannel = new CRemotePtCloudChannel(cloud);
 			rChannel->remoteId = remoteChannels->numItems;
 			buffer[0].integer	=	rChannel->remoteId;
@@ -241,13 +240,13 @@ int		CFrame::processChannelRequest(int index,SOCKET s){
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	sendBucketDataChannels
 // Description			:	Send all bucket-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
 // Date last edited		:	03/24/2006
-void CFrame::sendBucketDataChannels(int x,int y) {
+void CRenderer::sendBucketDataChannels(int x,int y) {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
@@ -289,14 +288,14 @@ void CFrame::sendBucketDataChannels(int x,int y) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	recvBucketDataChannels
 // Description			:	Recieve all bucket-data channels
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
 // Date last edited		:	03/24/2006
-void CFrame::recvBucketDataChannels(SOCKET s,int x,int y) {
+void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
@@ -336,13 +335,13 @@ void CFrame::recvBucketDataChannels(SOCKET s,int x,int y) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	sendFrameDataChannels
 // Description			:	Send all frame-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
 // Date last edited		:	03/24/2006
-void CFrame::sendFrameDataChannels() {
+void CRenderer::sendFrameDataChannels() {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
@@ -383,14 +382,14 @@ void CFrame::sendFrameDataChannels() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	recvFrameDataChannels
 // Description			:	Recieve all frame-data channels
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
 // Date last edited		:	03/24/2006
-void CFrame::recvFrameDataChannels(SOCKET s) {
+void CRenderer::recvFrameDataChannels(SOCKET s) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];

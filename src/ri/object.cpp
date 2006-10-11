@@ -32,13 +32,12 @@
 
 #include "object.h"
 #include "error.h"
-#include "renderer.h"
 #include "ri.h"
 #include "shading.h"
 #include "stats.h"
 #include "memory.h"
 #include "surface.h"
-
+#include "rendererContext.h"
 
 
 

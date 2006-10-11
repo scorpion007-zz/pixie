@@ -32,7 +32,6 @@
 #define TEXMAKE_H
 
 #include "common/global.h"
-#include "renderer.h"
 #include "ri.h"
 
 void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);

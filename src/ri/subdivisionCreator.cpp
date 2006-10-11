@@ -37,7 +37,6 @@
 #include "subdivisionCreator.h"
 #include "memory.h"
 #include "patches.h"
-#include "renderer.h"
 #include "stats.h"
 #include "patchgrid.h"
 #include "bsplinePatchgrid.h"

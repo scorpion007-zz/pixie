@@ -24,14 +24,14 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	frame.cpp
-//  Classes				:	CFrame
+//  Classes				:	CRenderer
 //  Description			:
 //
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
 #include <math.h>
 
-#include "frame.h"
+#include "renderer.h"
 #include "ray.h"
 #include "object.h"
 #include "xform.h"
@@ -40,11 +40,9 @@
 #include "raytracer.h"
 #include "stochastic.h"
 #include "zbuffer.h"
-#include "renderer.h"
 #include "patches.h"
 #include "ri.h"
 #include "rib.h"
-#include "shadeop.h"
 #include "noise.h"
 #include "stats.h"
 #include "memory.h"
@@ -71,42 +69,38 @@
 #include "brickmap.h"
 #include "show.h"
 #include "remoteChannel.h"
+#include "rendererContext.h"
 
 
 
-// Identity matrix for unknown transformations
-static		matrix	identity	=	{	1,	0,	0,	0,
-										0,	1,	0,	0,
-										0,	0,	1,	0,
-										0,	0,	0,	1	};
 
 
 
 
 /////////////////////////////////////////////////////////////////////
-// Static members of the CFrame
+// Static members of the CRenderer
 /////////////////////////////////////////////////////////////////////
 
 
 // Global members first
-CArray<CShaderInstance *>							*CFrame::allLights					=	NULL;
-CDictionary<const char *,CNamedCoordinateSystem *>	*CFrame::definedCoordinateSystems	=	NULL;
-CDictionary<const char *,CVariable *>				*CFrame::declaredVariables			=	NULL;
-CDictionary<const char *,CFileResource  *>			*CFrame::loadedFiles				=	NULL;
-CDictionary<const char *,CGlobalIdentifier *>		*CFrame::globalIdHash				=	NULL;
-CDictionary<const char *,CFrame::CNetFileMapping *>	*CFrame::netFileMappings			=	NULL;
-int													CFrame::numKnownGlobalIds			=	0;
-CVariable											*CFrame::variables					=	NULL;
-CArray<CVariable *>									*CFrame::globalVariables			=	NULL;
-CDictionary<const char *,CDisplayChannel *>			*CFrame::declaredChannels			=	NULL;
-CArray<CDisplayChannel*>							*CFrame::displayChannels			=	NULL;
-CDSO												*CFrame::dsos						=	NULL;
-SOCKET												CFrame::netClient					=	INVALID_SOCKET;
-int													CFrame::netNumServers				=	0;
-SOCKET												*CFrame::netServers					=	NULL;
-TMutex												CFrame::commitMutex;
-int													CFrame::userRaytracing				=	FALSE;
-int													CFrame::numNetrenderedBuckets		=	0;
+CArray<CShaderInstance *>							*CRenderer::allLights					=	NULL;
+CDictionary<const char *,CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;
+CDictionary<const char *,CVariable *>				*CRenderer::declaredVariables			=	NULL;
+CDictionary<const char *,CFileResource  *>			*CRenderer::loadedFiles				=	NULL;
+CDictionary<const char *,CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;
+CDictionary<const char *,CRenderer::CNetFileMapping *>	*CRenderer::netFileMappings			=	NULL;
+int													CRenderer::numKnownGlobalIds			=	0;
+CVariable											*CRenderer::variables					=	NULL;
+CArray<CVariable *>									*CRenderer::globalVariables			=	NULL;
+CDictionary<const char *,CDisplayChannel *>			*CRenderer::declaredChannels			=	NULL;
+CArray<CDisplayChannel*>							*CRenderer::displayChannels			=	NULL;
+CDSO												*CRenderer::dsos						=	NULL;
+SOCKET												CRenderer::netClient					=	INVALID_SOCKET;
+int													CRenderer::netNumServers				=	0;
+SOCKET												*CRenderer::netServers					=	NULL;
+TMutex												CRenderer::commitMutex;
+int													CRenderer::userRaytracing				=	FALSE;
+int													CRenderer::numNetrenderedBuckets		=	0;
 
 
 
@@ -114,58 +108,58 @@ int													CFrame::numNetrenderedBuckets		=	0;
 
 
 // Local members
-CMemStack									*CFrame::frameMemory				=	NULL;
-CArray<const char*>							*CFrame::frameTemporaryFiles		=	NULL;
-COptions									CFrame::options;
-CDictionary<const char *,CRemoteChannel *>	*CFrame::declaredRemoteChannels		=	NULL;
-CArray<CRemoteChannel *>					*CFrame::remoteChannels				=	NULL;
-CArray<CAttributes *>						*CFrame::dirtyAttributes			=	NULL;
-CArray<CProgrammableShaderInstance *>		*CFrame::dirtyInstances				=	NULL;
-unsigned int			CFrame::raytracingFlags;
-CHierarchy				*CFrame::hierarchy;
-CArray<CTriangle *>		*CFrame::triangles;
-CArray<CSurface *>		*CFrame::raytraced;
-CArray<CTracable *>		*CFrame::tracables;
-matrix					CFrame::fromWorld,CFrame::toWorld;
-CXform					*CFrame::world;
-matrix					CFrame::fromNDC,CFrame::toNDC;
-matrix					CFrame::fromRaster,CFrame::toRaster;
-matrix					CFrame::fromScreen,CFrame::toScreen;
-matrix					CFrame::worldToNDC;
-unsigned int			CFrame::hiderFlags;
-int						CFrame::numSamples;
-int						CFrame::numExtraSamples;
-int						CFrame::xPixels,CFrame::yPixels;
-unsigned int			CFrame::additionalParameters;
-float					CFrame::pixelLeft,CFrame::pixelRight,CFrame::pixelTop,CFrame::pixelBottom;
-float					CFrame::dydPixel,CFrame::dxdPixel;
-float					CFrame::dPixeldx,CFrame::dPixeldy;
-int						CFrame::renderLeft,CFrame::renderRight,CFrame::renderTop,CFrame::renderBottom;
-int						CFrame::xBuckets,CFrame::yBuckets;
-int						CFrame::metaXBuckets,CFrame::metaYBuckets;
-float					CFrame::aperture;
-float					CFrame::imagePlane;
-float					CFrame::invImagePlane;
-float					CFrame::cocFactorPixels;
-float					CFrame::cocFactorSamples;
-float					CFrame::cocFactorScreen;
-float					CFrame::invFocaldistance;
-float					CFrame::lengthA,CFrame::lengthB;
-float					CFrame::marginXcoverage,CFrame::marginYcoverage;
-float					CFrame::marginX,CFrame::marginY;
-float					CFrame::marginalX,CFrame::marginalY;
-float					CFrame::leftX,CFrame::leftZ,CFrame::leftD;
-float					CFrame::rightX,CFrame::rightZ,CFrame::rightD;
-float					CFrame::topY,CFrame::topZ,CFrame::topD;
-float					CFrame::bottomY,CFrame::bottomZ,CFrame::bottomD;
-int						CFrame::numActiveDisplays;
-int						CFrame::currentXBucket;
-int						CFrame::currentYBucket;
-int						*CFrame::jobAssignment;
-FILE					*CFrame::deepShadowFile;
-int						*CFrame::deepShadowIndex;
-int						CFrame::deepShadowIndexStart;
-char					*CFrame::deepShadowFileName;
+CMemStack									*CRenderer::frameMemory				=	NULL;
+CArray<const char*>							*CRenderer::frameTemporaryFiles		=	NULL;
+COptions									CRenderer::options;
+CDictionary<const char *,CRemoteChannel *>	*CRenderer::declaredRemoteChannels		=	NULL;
+CArray<CRemoteChannel *>					*CRenderer::remoteChannels				=	NULL;
+CArray<CAttributes *>						*CRenderer::dirtyAttributes			=	NULL;
+CArray<CProgrammableShaderInstance *>		*CRenderer::dirtyInstances				=	NULL;
+unsigned int			CRenderer::raytracingFlags;
+CHierarchy				*CRenderer::hierarchy;
+CArray<CTriangle *>		*CRenderer::triangles;
+CArray<CSurface *>		*CRenderer::raytraced;
+CArray<CTracable *>		*CRenderer::tracables;
+matrix					CRenderer::fromWorld,CRenderer::toWorld;
+CXform					*CRenderer::world;
+matrix					CRenderer::fromNDC,CRenderer::toNDC;
+matrix					CRenderer::fromRaster,CRenderer::toRaster;
+matrix					CRenderer::fromScreen,CRenderer::toScreen;
+matrix					CRenderer::worldToNDC;
+unsigned int			CRenderer::hiderFlags;
+int						CRenderer::numSamples;
+int						CRenderer::numExtraSamples;
+int						CRenderer::xPixels,CRenderer::yPixels;
+unsigned int			CRenderer::additionalParameters;
+float					CRenderer::pixelLeft,CRenderer::pixelRight,CRenderer::pixelTop,CRenderer::pixelBottom;
+float					CRenderer::dydPixel,CRenderer::dxdPixel;
+float					CRenderer::dPixeldx,CRenderer::dPixeldy;
+int						CRenderer::renderLeft,CRenderer::renderRight,CRenderer::renderTop,CRenderer::renderBottom;
+int						CRenderer::xBuckets,CRenderer::yBuckets;
+int						CRenderer::metaXBuckets,CRenderer::metaYBuckets;
+float					CRenderer::aperture;
+float					CRenderer::imagePlane;
+float					CRenderer::invImagePlane;
+float					CRenderer::cocFactorPixels;
+float					CRenderer::cocFactorSamples;
+float					CRenderer::cocFactorScreen;
+float					CRenderer::invFocaldistance;
+float					CRenderer::lengthA,CRenderer::lengthB;
+float					CRenderer::marginXcoverage,CRenderer::marginYcoverage;
+float					CRenderer::marginX,CRenderer::marginY;
+float					CRenderer::marginalX,CRenderer::marginalY;
+float					CRenderer::leftX,CRenderer::leftZ,CRenderer::leftD;
+float					CRenderer::rightX,CRenderer::rightZ,CRenderer::rightD;
+float					CRenderer::topY,CRenderer::topZ,CRenderer::topD;
+float					CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;
+int						CRenderer::numActiveDisplays;
+int						CRenderer::currentXBucket;
+int						CRenderer::currentYBucket;
+int						*CRenderer::jobAssignment;
+FILE					*CRenderer::deepShadowFile;
+int						*CRenderer::deepShadowIndex;
+int						CRenderer::deepShadowIndexStart;
+char					*CRenderer::deepShadowFileName;
 
 
 
@@ -182,289 +176,36 @@ char					*CFrame::deepShadowFileName;
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	beginRenderer
 // Description			:	Begin the renderer
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
+void		CRenderer::beginRenderer(char *ribFile,char *riNetString) {
 	float			startTime	=	osCPUTime();
 
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			M E M O R Y			I N I T
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	memoryInit();
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			S T A T S			I N I T
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
+	// Reset the stats
 	stats.reset();
 
+	// Init the memory
+	memoryInit();
 
+	// Init the files
+	initFiles();
 
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			R E N D E R E R 		I N I T
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	netClient						=	INVALID_SOCKET;
-	netNumServers					=	0;
-	netServers						=	NULL;
+	// Init the declerations
+	initDeclerations();
+
+	// Init the network
+	initNetwork(ribFile,riNetString);
+
+	// We're not user raytracing	
 	userRaytracing					=	FALSE;
-	numNetrenderedBuckets			=	0;
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			G R A P H I C S		S T A T E		I N I T
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	// Init the light sources we use
-	allLights							=	new CArray<CShaderInstance *>;
-	// Init the coordinate systems
-	definedCoordinateSystems			=	new CTrie<CNamedCoordinateSystem *>;
-	// Init the declared variables
-	declaredVariables					=	new CTrie<CVariable *>;
-	// Allocate the global variables array
-	globalVariables						=	new CArray<CVariable *>;
-	// This is the list of all variables
-	variables							=	NULL;
-	// The loaded shaders
-	loadedFiles							=	new CTrie<CFileResource *>;
-	// Global Ids
-	globalIdHash						=	new CTrie<CGlobalIdentifier *>;
-	// Zero is reserved as an invalid value
-	numKnownGlobalIds					=	1;
-	// net file mappings
-	netFileMappings						=	NULL;
-	frameTemporaryFiles					=	NULL;
-	// DSO init
-	dsos								=	NULL;
-	// Define the default display channels
-	declaredChannels					=	new CTrie<CDisplayChannel*>;
-	displayChannels						=	new	CArray<CDisplayChannel*>;
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			R E G I S T E R    O P T I O N S / A T T R I B U T E S
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-
-	// Define the options
-	declareVariable(RI_ARCHIVE,				"string");
-	declareVariable(RI_PROCEDURAL,			"string");
-	declareVariable(RI_TEXTURE,				"string");
-	declareVariable(RI_SHADER,				"string");
-	declareVariable(RI_DISPLAY,				"string");
-	declareVariable(RI_RESOURCE,			"string");
-
-	declareVariable(RI_BUCKETSIZE,			"int[2]");
-	declareVariable(RI_METABUCKETS,			"int[2]");
-	declareVariable(RI_INHERITATTRIBUTES,	"int");
-	declareVariable(RI_GRIDSIZE,			"int");
-	declareVariable(RI_HIERARCHYDEPTH,		"int");
-	declareVariable(RI_HIERARCHYOBJECTS,	"int");
-	declareVariable(RI_EYESPLITS,			"int");
-	declareVariable(RI_TEXTUREMEMORY,		"int");
-	declareVariable(RI_BRICKMEMORY,			"int");
-	declareVariable(RI_SHADERCACHE,			"int");
-
-	declareVariable(RI_RADIANCECACHE,		"int");
-	declareVariable(RI_JITTER,				"float");
-	declareVariable(RI_FALSECOLOR,			"int");
-	declareVariable(RI_EMIT,				"int");
-	declareVariable(RI_SAMPLESPECTRUM,		"int");
-	declareVariable(RI_DEPTHFILTER,			"string");
-
-	declareVariable(RI_MAXDEPTH,			"int");
-
-	declareVariable(RI_ENDOFFRAME,			"int");
-	declareVariable(RI_FILELOG,				"string");
-	declareVariable(RI_PROGRESS,			"int");
-
-	// File display variables
+	allLights						=	new CArray<CShaderInstance *>;
 	
-	declareVariable("quantize",				"float[4]");
-	declareVariable("dither",				"float");
-	declareVariable("gamma",				"float");
-	declareVariable("gain",					"float");
-	declareVariable("near",					"float");
-	declareVariable("far",					"float");
-	declareVariable("Software",				"string");
-	declareVariable("compression",			"string");
-	declareVariable("NP",					"float[16]");
-	declareVariable("Nl",					"float[16]");
-
-	// Define the attributes
-	declareVariable(RI_NUMPROBES,			"int[2]");
-	declareVariable(RI_MINSUBDIVISION,		"int");
-	declareVariable(RI_MAXSUBDIVISION,		"int");
-	declareVariable(RI_MINSPLITS,			"int");
-	declareVariable(RI_BOUNDEXPAND,			"float");
-	declareVariable(RI_BINARY,				"int");
-	declareVariable(RI_RASTERORIENT,		"int");
-
-	declareVariable(RI_SPHERE,				"float");
-	declareVariable(RI_COORDINATESYSYTEM,	"string");
-
-	declareVariable(RI_DISPLACEMENTS,		"int");
-	declareVariable(RI_BIAS,				"float");
-	declareVariable(RI_MAXDIFFUSEDEPTH,		"int");
-	declareVariable(RI_MAXSPECULARDEPTH,	"int");
-
-	declareVariable(RI_HANDLE,				"string");
-	declareVariable(RI_FILEMODE,			"string");
-	declareVariable(RI_MAXERROR,			"float");
-
-	declareVariable(RI_GLOBALMAP,			"string");
-	declareVariable(RI_CAUSTICMAP,			"string");
-	declareVariable(RI_SHADINGMODEL,		"string");
-	declareVariable(RI_ESTIMATOR,			"int");
-	declareVariable(RI_ILLUMINATEFRONT,		"int");
-
-	declareVariable(RI_TRANSMISSION,		"string");
-	declareVariable(RI_CAMERA,				"int");
-	declareVariable(RI_TRACE,				"int");
-	declareVariable(RI_PHOTON,				"int");
-
-	declareVariable(RI_NAME,				"string");
-
-	declareVariable(RI_HIDDEN,				"int");
-	declareVariable(RI_BACKFACING,			"int");
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			R E G I S T E R    D E F A U L T    V A R I A B L E S
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	CVariable		*tmp;
-	tmp	=	declareVariable("P",	"global vertex point",PARAMETER_P);			assert(tmp->entry	==	VARIABLE_P);
-	tmp	=	declareVariable("Ps",	"global vertex point",PARAMETER_PS);		assert(tmp->entry	==	VARIABLE_PS);
-	tmp	=	declareVariable("N",	"global varying normal",PARAMETER_N);		assert(tmp->entry	==	VARIABLE_N);
-	tmp	=	declareVariable("Ng",	"global varying normal",PARAMETER_NG);		assert(tmp->entry	==	VARIABLE_NG);
-	tmp	=	declareVariable("dPdu",	"global vertex vector",PARAMETER_DPDU);		assert(tmp->entry	==	VARIABLE_DPDU);
-	tmp	=	declareVariable("dPdv",	"global vertex vector",PARAMETER_DPDV);		assert(tmp->entry	==	VARIABLE_DPDV);
-	tmp	=	declareVariable("L",	"global varying vector",PARAMETER_L);		assert(tmp->entry	==	VARIABLE_L);
-	tmp	=	declareVariable("Cs",	"global varying color",PARAMETER_CS);		assert(tmp->entry	==	VARIABLE_CS);
-	tmp	=	declareVariable("Os",	"global varying color",PARAMETER_OS);		assert(tmp->entry	==	VARIABLE_OS);
-	tmp	=	declareVariable("Cl",	"global varying color",PARAMETER_CL);		assert(tmp->entry	==	VARIABLE_CL);
-	tmp	=	declareVariable("Ol",	"global varying color",PARAMETER_OL);		assert(tmp->entry	==	VARIABLE_OL);
-	tmp	=	declareVariable("Ci",	"global varying color",PARAMETER_CI);		assert(tmp->entry	==	VARIABLE_CI);
-	tmp	=	declareVariable("Oi",	"global varying color",PARAMETER_OI);		assert(tmp->entry	==	VARIABLE_OI);
-	tmp	=	declareVariable("s",	"global varying float",PARAMETER_S);		assert(tmp->entry	==	VARIABLE_S);
-	tmp	=	declareVariable("t",	"global varying float",PARAMETER_T);		assert(tmp->entry	==	VARIABLE_T);
-	tmp	=	declareVariable("st",	"varying float[2]",PARAMETER_S | PARAMETER_T);
-	tmp	=	declareVariable("du",	"global varying float",PARAMETER_DU | PARAMETER_DERIVATIVE);	assert(tmp->entry	==	VARIABLE_DU);
-	tmp	=	declareVariable("dv",	"global varying float",PARAMETER_DV | PARAMETER_DERIVATIVE);	assert(tmp->entry	==	VARIABLE_DV);
-	tmp	=	declareVariable("u",	"global varying float",PARAMETER_U);		assert(tmp->entry	==	VARIABLE_U);
-	tmp	=	declareVariable("v",	"global varying float",PARAMETER_V);		assert(tmp->entry	==	VARIABLE_V);
-	tmp	=	declareVariable("I",	"global varying vector",PARAMETER_I);		assert(tmp->entry	==	VARIABLE_I);
-	tmp	=	declareVariable("E",	"global varying point",PARAMETER_E);		assert(tmp->entry	==	VARIABLE_E);
-	tmp	=	declareVariable("alpha","global varying float",PARAMETER_ALPHA);	assert(tmp->entry	==	VARIABLE_ALPHA);
-	tmp	=	declareVariable("time",	"global varying float",PARAMETER_TIME);		assert(tmp->entry	==	VARIABLE_TIME);
-	tmp	=	declareVariable("Pw",	"global vertex htpoint",PARAMETER_P);		tmp->entry			=	VARIABLE_PW;
-	tmp	=	declareVariable("__sru","global varying float",0);					assert(tmp->entry	==	VARIABLE_SRU);
-	tmp	=	declareVariable("__srv","global varying float",0);					assert(tmp->entry	==	VARIABLE_SRV);
-	tmp	=	declareVariable("Pz",	"vertex float",PARAMETER_P);				tmp->entry			=	VARIABLE_P;
-	tmp	=	declareVariable("ncomps","global uniform float",PARAMETER_NCOMPS);	assert(tmp->entry	==	VARIABLE_NCOMPS);
-	tmp	=	declareVariable("dtime","global uniform float",PARAMETER_DTIME);	assert(tmp->entry	==	VARIABLE_DTIME);
-
-	tmp	=	declareVariable("width","global varying float",0);					assert(tmp->entry	==	VARIABLE_WIDTH);
-	tmp	=	declareVariable("constantwidth","global constant float",0);			assert(tmp->entry	==	VARIABLE_CONSTANTWIDTH);
-	tmp	=	declareVariable("Np","uniform normal",PARAMETER_NG);
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			R E G I S T E R    D E F A U L T   D I S P L A Y    C H A N N E L S
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	CDisplayChannel	*tmp2;
-
-	tmp2 = new CDisplayChannel("rgb",NULL,3,0);
-	displayChannels->push(tmp2);
-	declaredChannels->insert(tmp2->name,tmp2);
-	
-	tmp2 = new CDisplayChannel("rgba",NULL,4,0);
-	displayChannels->push(tmp2);
-	declaredChannels->insert(tmp2->name,tmp2);
-	
-	tmp2 = new CDisplayChannel("a",NULL,1,3);
-	displayChannels->push(tmp2);
-	declaredChannels->insert(tmp2->name,tmp2);
-	
-	tmp2 = new CDisplayChannel("z",NULL,1,4);
-	displayChannels->push(tmp2);
-	declaredChannels->insert(tmp2->name,tmp2);
-	
-	tmp2 = new CDisplayChannel("rgbaz",NULL,5,0);
-	displayChannels->push(tmp2);
-	declaredChannels->insert(tmp2->name,tmp2);
-	
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			R E G I S T E R    D E F A U L T   C O O R D I N A T E    S Y S T E M S
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	defineCoordinateSystem(coordinateCameraSystem,identity,identity,COORDINATE_CAMERA);
-	defineCoordinateSystem(coordinateWorldSystem,identity,identity,COORDINATE_WORLD);
-	defineCoordinateSystem(coordinateObjectSystem,identity,identity,COORDINATE_OBJECT);
-	defineCoordinateSystem(coordinateShaderSystem,identity,identity,COORDINATE_SHADER);
-	defineCoordinateSystem(coordinateLightSystem,identity,identity,COORDINATE_LIGHT);
-	defineCoordinateSystem(coordinateNDCSystem,identity,identity,COORDINATE_NDC);
-	defineCoordinateSystem(coordinateRasterSystem,identity,identity,COORDINATE_RASTER);
-	defineCoordinateSystem(coordinateScreenSystem,identity,identity,COORDINATE_SCREEN);
-	defineCoordinateSystem(coordinateCurrentSystem,identity,identity,COORDINATE_CURRENT);
-
-	// Define the default color systems
-	defineCoordinateSystem(colorRgbSystem,identity,identity,COLOR_RGB);
-	defineCoordinateSystem(colorHslSystem,identity,identity,COLOR_HSL);
-	defineCoordinateSystem(colorHsvSystem,identity,identity,COLOR_HSV);
-	defineCoordinateSystem(colorXyzSystem,identity,identity,COLOR_XYZ);
-	defineCoordinateSystem(colorCieSystem,identity,identity,COLOR_CIE);
-	defineCoordinateSystem(colorYiqSystem,identity,identity,COLOR_YIQ);
-	defineCoordinateSystem(colorXyySystem,identity,identity,COLOR_XYY);
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			N E T W O R K      I N I T
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-
-	// Network init
-	netSetup(ribFile,riNetString);
-	
-	if (netClient != INVALID_SOCKET) {
-		netFileMappings = new CTrie<CNetFileMapping*>;
-	}
-
-
 	// Record the start overhead
 	stats.rendererStartOverhead		=	osCPUTime() - startTime;
 
@@ -473,100 +214,15 @@ void		CFrame::beginRenderer(char *ribFile,char *riNetString) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////
-// Function				:	sfClearTemp
-// Description			:	This callback function is used to remove the temporary files
-// Return Value			:
-// Comments				:
-// Date last edited		:	7/4/2001
-static int	rcClearTemp(const char *fileName,void *userData) {
-	osDeleteFile(fileName);
-
-	return TRUE;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	endRenderer
 // Description			:	End the renderer
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::endRenderer() {
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			N E T W O R K      S H U T D O W N
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-	if (netClient != INVALID_SOCKET) {
-
-		assert(netFileMappings != NULL);
-
-		netFileMappings->destroy();
-		closesocket(netClient);
-	}
-
-	if (netNumServers != 0) {
-		int	i;
-
-		for (i=0;i<netNumServers;i++) {
-			closesocket(netServers[i]);
-		}
-
-		delete [] netServers;
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//
-	//			D I T C H     T H E    M I S C   D A T A
-	//
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////
-
-	
-	// Ditch the display channels
-	assert(declaredChannels != NULL);
-	assert(displayChannels != NULL);
-	declaredChannels->destroy();
-	delete displayChannels;
-
-
-	// Ditch the DSO shaders that have been loaded
-	CDSO	*cDso;
-	for (cDso=dsos;cDso!=NULL;) {
-		CDSO	*nDso	=	cDso->next;
-		// Call DSO's cleanup
-		if(cDso->cleanup != NULL) cDso->cleanup(cDso->handle);
-		free(cDso->name);
-		free(cDso->prototype);
-		delete cDso;
-		cDso	=	nDso;
-	}
-
-	// Ditch the global IDs
-	assert(globalIdHash != NULL);
-	globalIdHash->destroy();
-
-	// Ditch the loaded files
-	assert(loadedFiles != NULL);
-	loadedFiles->destroy();
-
-	// First the variables
-	assert(declaredVariables != NULL);
-	declaredVariables->destroy();
-	delete globalVariables;
-
-	// Ditch the coordinate stsrems
-	assert(definedCoordinateSystems	!=	NULL);
-	definedCoordinateSystems->destroy();
-
-	// Ditch the allocated lights lights
+void		CRenderer::endRenderer() {
+	// Ditch the allocated lights
 	CShaderInstance	**array	=	allLights->array;
 	int				size	=	allLights->numItems;
 	int				i;
@@ -574,16 +230,14 @@ void		CFrame::endRenderer() {
 	for (i=0;i<size;i++)	array[i]->detach();
 	delete allLights;
 
+	// Init the network
+	shutdownNetwork();
 
-	// Ditch the temporary files created
-	if (osFileExists(options.temporaryPath)) {
-		char	tmp[OS_MAX_PATH_LENGTH];
+	// Init the declerations
+	shutdownDeclerations();
 
-		sprintf(tmp,"%s\\*",options.temporaryPath);
-		osFixSlashes(tmp);
-		osEnumerate(tmp,rcClearTemp,NULL);
-		osDeleteDir(options.temporaryPath);
-	}
+	// Init the files
+	shutdownFiles();
 
 	// Cleanup the parser
 	parserCleanup();
@@ -612,13 +266,13 @@ void		CFrame::endRenderer() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	beginFrame
 // Description			:	Begin a frame / compute misc data
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf) {
+void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf) {
 
 	// This is the memory we allocate our junk from
 	frameMemory				=	new CMemStack(1 << 20);
@@ -947,13 +601,13 @@ void		CFrame::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	render
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/9/2006
-void			CFrame::render(CShadingContext *context,CObject *cObject,const float *bmin,const float *bmax) {
+void			CRenderer::render(CShadingContext *context,CObject *cObject,const float *bmin,const float *bmax) {
 	CAttributes	*cAttributes	=	cObject->attributes;
 
 	// Assign the photon map is necessary
@@ -985,13 +639,13 @@ void			CFrame::render(CShadingContext *context,CObject *cObject,const float *bmi
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	removeTracable
 // Description			:	Remove a delayed object
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/9/2006
-void			CFrame::removeTracable(CTracable *cObject) {
+void			CRenderer::removeTracable(CTracable *cObject) {
 	if (hierarchy != NULL) {
 		vector	bmin,bmax;
 
@@ -1006,13 +660,13 @@ void			CFrame::removeTracable(CTracable *cObject) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	addTracable
 // Description			:	Add a raytracable object into the frame
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::addTracable(CTracable *tracable,CSurface *object) {
+void		CRenderer::addTracable(CTracable *tracable,CSurface *object) {
 
 	if (tracables == NULL)	tracables	=	new CArray<CTracable *>;
 	if (raytraced == NULL)	raytraced	=	new CArray<CSurface *>;
@@ -1024,13 +678,13 @@ void		CFrame::addTracable(CTracable *tracable,CSurface *object) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	addTracable
 // Description			:	Add a raytracable object into the frame
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::addTracable(CTriangle *tracable,CSurface *object) {
+void		CRenderer::addTracable(CTriangle *tracable,CSurface *object) {
 	if (tracables == NULL)	tracables	=	new CArray<CTracable *>;
 	if (raytraced == NULL)	raytraced	=	new CArray<CSurface *>;
 
@@ -1043,13 +697,13 @@ void		CFrame::addTracable(CTriangle *tracable,CSurface *object) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	addTracable
 // Description			:	Add a raytracable object into the frame
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::addTracable(CMovingTriangle *tracable,CSurface *object) {
+void		CRenderer::addTracable(CMovingTriangle *tracable,CSurface *object) {
 	if (tracables == NULL)	tracables	=	new CArray<CTracable *>;
 	if (raytraced == NULL)	raytraced	=	new CArray<CSurface *>;
 
@@ -1061,13 +715,13 @@ void		CFrame::addTracable(CMovingTriangle *tracable,CSurface *object) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	prepareFrame
 // Description			:	Prepare to render a frame
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::prepareFrame() {
+void		CRenderer::prepareFrame() {
 
 	if (hierarchy == NULL) {
 		// Init the hierarchy
@@ -1081,13 +735,13 @@ void		CFrame::prepareFrame() {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	endFrame
 // Description			:	Finish the frame
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CFrame::endFrame() {
+void		CRenderer::endFrame() {
 	int			i;
 
 	
@@ -1221,13 +875,13 @@ void		CFrame::endFrame() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	advanceBucket
 // Description			:	Advance the bucket for network parallel rendering
 // Return Value			:	TRUE if we're still rendering, FALSE otherwise
 // Comments				:
 // Date last edited		:	7/4/2001
-int				CFrame::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
+int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 
 	nx = xBuckets;
 	ny = yBuckets;
@@ -1312,13 +966,13 @@ int				CFrame::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	inFrustrum
 // Description			:	Check if the given box is inside the viewing frustrum
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/10/2002
-int			CFrame::inFrustrum(const float *bmin,const float *bmax) {
+int			CRenderer::inFrustrum(const float *bmin,const float *bmax) {
 	vector	corners[8];
 	int		i;
 
@@ -1382,13 +1036,13 @@ int			CFrame::inFrustrum(const float *bmin,const float *bmax) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	inFrustrum
 // Description			:	Check if the given box is inside the viewing frustrum
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/10/2002
-int			CFrame::inFrustrum(const float *P) {
+int			CRenderer::inFrustrum(const float *P) {
 
 	if ((P[COMP_X]*leftX + P[COMP_Z]*leftZ + leftD) < 0) {
 		return FALSE;
@@ -1413,13 +1067,13 @@ int			CFrame::inFrustrum(const float *P) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	clipCode
 // Description			:	Compute the clipping codes for a point
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/10/2002
-unsigned int			CFrame::clipCode(const float *P) {
+unsigned int			CRenderer::clipCode(const float *P) {
 	unsigned int	code	=	0;
 
 	if ((P[COMP_X]*leftX + P[COMP_Z]*leftZ + leftD) < 0) {

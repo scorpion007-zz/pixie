@@ -31,10 +31,11 @@
 #include <math.h>
 
 #include "hierarchy.h"
-#include "renderer.h"
 #include "memory.h"
 #include "stats.h"
-#include "frame.h"
+#include "renderer.h"
+#include "surface.h"
+#include "random.h"
 
 
 
@@ -815,7 +816,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 	void	*nNode;
 
 	// Should I be an internal node ?
-	if ((cUncomputed->depth < CFrame::options.maxHierarchyDepth) && (cUncomputed->numItems > CFrame::options.maxHierarchyLeafObjects)) {
+	if ((cUncomputed->depth < CRenderer::options.maxHierarchyDepth) && (cUncomputed->numItems > CRenderer::options.maxHierarchyLeafObjects)) {
 		vector				d;
 		int					i,j,last,k;
 		int					numItems		=	cUncomputed->numItems;
@@ -1541,7 +1542,7 @@ CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const fl
 	root				=	(void *) getToken(hroot,HIERARCHY_UNCOMPUTED_NODE);
 	
 	// Allocate the traversal stack
-	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*CFrame::options.maxHierarchyDepth*2);
+	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*CRenderer::options.maxHierarchyDepth*2);
 	currentRayID		=	0;
 }
 

@@ -35,7 +35,6 @@
 
 #include "texture.h"
 #include "shading.h"
-#include "renderer.h"
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
@@ -2288,7 +2287,7 @@ void		CTexture::textureShutdown() {
 // Return Value			:	Pointer to the new texture
 // Comments				:
 // Date last edited		:	7/7/2001
-CTexture		*CFrame::textureLoad(const char *name,TSearchpath *path) {
+CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 	TIFF			*in;
 	CTexture		*cTexture	=	NULL;
 	char			fn[OS_MAX_PATH_LENGTH];
@@ -2334,7 +2333,7 @@ CTexture		*CFrame::textureLoad(const char *name,TSearchpath *path) {
 // Return Value			:	Pointer to the new environment
 // Comments				:
 // Date last edited		:	7/7/2001
-CEnvironment		*CFrame::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
+CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
 	TIFF			*in;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	CEnvironment	*cTexture	=	NULL;

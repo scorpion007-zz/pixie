@@ -37,7 +37,7 @@
 #include "photonMap.h"
 #include "stats.h"
 #include "error.h"
-#include "frame.h"
+#include "renderer.h"
 
 
 static vector spectrumSpline[] = {		{ 0, 0, 0},
@@ -61,7 +61,7 @@ static vector spectrumSpline[] = {		{ 0, 0, 0},
 // Date last edited		:	3/7/2003
 CPhotonHider::CPhotonHider(CAttributes *a) : CShadingContext(HIDER_NEEDS_RAYTRACING | HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE) {
 	bias		=	a->shadowBias;
-	phony		=	new CSurface(a,CFrame::world);
+	phony		=	new CSurface(a,CRenderer::world);
 	phony->attach();
 }
 
@@ -78,7 +78,7 @@ CPhotonHider::~CPhotonHider() {
 	// Balance the maps that have been modified
 	while((cMap = balanceList.pop()) != NULL) {
 		cMap->modifying	=	FALSE;
-		cMap->write(CFrame::world);
+		cMap->write(CRenderer::world);
 	}
 
 	phony->detach();
@@ -95,8 +95,8 @@ CPhotonHider::~CPhotonHider() {
 void		CPhotonHider::renderFrame(){  
 	memBegin();
 
-	const int		numLights	=	CFrame::allLights->numItems;
-	CShaderInstance	**lights	=	CFrame::allLights->array;
+	const int		numLights	=	CRenderer::allLights->numItems;
+	CShaderInstance	**lights	=	CRenderer::allLights->array;
 	int				i,j;
 	vector			tmp;
 	const	char	*previousActivity	=	stats.activity;
@@ -104,9 +104,9 @@ void		CPhotonHider::renderFrame(){
 	stats.activity	=	"Photonmap construction";
 
 	// Compute the world bounding sphere
-	addvv(worldCenter,CFrame::worldBmin,CFrame::worldBmax);
+	addvv(worldCenter,CRenderer::worldBmin,CRenderer::worldBmax);
 	mulvf(worldCenter,1 / (float) 2);
-	subvv(tmp,CFrame::worldBmax,worldCenter);
+	subvv(tmp,CRenderer::worldBmax,worldCenter);
 	worldRadius	=	lengthv(tmp);
 
 	// The actual photon tracing stage
@@ -123,13 +123,13 @@ void		CPhotonHider::renderFrame(){
 		T64				shaderVarCheckpoint[3];
 
 		// Figure out how much we want to emit
-		emit										=	CFrame::options.numEmitPhotons;
+		emit										=	CRenderer::options.numEmitPhotons;
 
 		if (emit > 0) {
 			photonPower								=	1 / (float) emit;
 
 			while(emit > 0) {
-				const int	numVertices					=	min(CFrame::options.maxGridSize,emit);
+				const int	numVertices					=	min(CRenderer::options.maxGridSize,emit);
 
 				currentShadingState->numVertices		=	numVertices;
 				currentShadingState->numRealVertices	=	numVertices;
@@ -264,7 +264,7 @@ void		CPhotonHider::solarEnd() {
 		float	*Cl	=	varying[VARIABLE_CL];
 		int		i;
 
-		if (CFrame::options.flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
+		if (CRenderer::options.flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 			vector		T;
 			vector		Ce,Cc;
 			float*		ubasis			=	(float*) RiBSplineBasis;
@@ -413,7 +413,7 @@ void		CPhotonHider::illuminateEnd() {
 			ray.lastXform			=	NULL;
 			ray.object				=	NULL;
 
-			CFrame::hierarchy->intersect(&ray);
+			CRenderer::hierarchy->intersect(&ray);
 
 			if (ray.object != NULL) {
 				const float power = (Cl[0] + Cl[1] + Cl[2]) / (3*ray.t*ray.t);
@@ -430,7 +430,7 @@ void		CPhotonHider::illuminateEnd() {
 		float	*Cl	=	varying[VARIABLE_CL];
 		int		i;
 
-		if (CFrame::options.flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
+		if (CRenderer::options.flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 			vector		Ce,Cc;
 			float*		ubasis			=	(float*) RiBSplineBasis;
 			const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
@@ -533,7 +533,7 @@ processBounce:;
 	ray.object				=	NULL;
 
 	// Trace the ray in the scene
-	CFrame::hierarchy->intersect(&ray);
+	CRenderer::hierarchy->intersect(&ray);
 
 	// Do we have an intersection ?
 	if (ray.object != NULL) {
@@ -687,7 +687,7 @@ processBounce:;
 					ray.object				=	NULL;
 				
 					// Trace the ray in the scene
-					CFrame::hierarchy->intersect(&ray);
+					CRenderer::hierarchy->intersect(&ray);
 					
 					// Bail if we hit nothing
 					if (ray.object == NULL) {

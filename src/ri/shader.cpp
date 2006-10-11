@@ -33,7 +33,6 @@
 #include	<stdio.h>
 #include	<string.h>
 
-#include	"renderer.h"
 #include	"error.h"
 #include	"shader.h"
 #include	"stats.h"

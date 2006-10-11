@@ -33,7 +33,6 @@
 #include <math.h>
 
 #include "texmake.h"
-#include "renderer.h"
 #include "ri.h"
 #include "stats.h"
 #include "memory.h"

@@ -37,7 +37,6 @@
 #include "common/containers.h"
 #include "shader.h"
 #include "slcode.h"
-#include "renderer.h"
 #include "error.h"
 
 /////////////////////////////////////////////////////////////////////////////////////

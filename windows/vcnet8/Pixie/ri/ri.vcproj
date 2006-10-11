@@ -359,26 +359,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\frame.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\frameDeclerations.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\frameDisplay.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\frameFiles.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\frameNetwork.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\hcshader.cpp"
 				>
 			</File>
@@ -480,6 +460,26 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\renderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererContext.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererDeclerations.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererDisplay.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererFiles.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererNetwork.cpp"
 				>
 			</File>
 			<File
@@ -637,10 +637,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\frame.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\giFunctions.h"
 				>
 			</File>
@@ -774,6 +770,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\rendererc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererContext.h"
 				>
 			</File>
 			<File

@@ -24,14 +24,13 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	frameFiles.cpp
-//  Classes				:	CFrame
+//  Classes				:	CRenderer
 //  Description			:
 //
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
 #include <math.h>
 
-#include "frame.h"
 #include "renderer.h"
 #include "error.h"
 #include "texture.h"
@@ -43,18 +42,88 @@
 #include "brickmap.h"
 #include "pointCloud.h"
 #include "dso.h"
-
+#include "rendererContext.h"
+#include "shadeop.h"
 
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
+// Method				:	initFiles
+// Description			:	Init the files
+// Return Value			:
+// Comments				:
+// Date last edited		:	8/25/2002
+void		CRenderer::initFiles() {
+
+	// The loaded shaders
+	loadedFiles							=	new CTrie<CFileResource *>;
+
+	// Temporary files we store per frame
+	frameTemporaryFiles					=	NULL;
+
+	// DSO init
+	dsos								=	NULL;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	sfClearTemp
+// Description			:	This callback function is used to remove the temporary files
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+static int	rcClearTemp(const char *fileName,void *userData) {
+	osDeleteFile(fileName);
+
+	return TRUE;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	shutdownFiles
+// Description			:	Shutdown the files
+// Return Value			:
+// Comments				:
+// Date last edited		:	8/25/2002
+void		CRenderer::shutdownFiles() {
+
+	// Ditch the DSO shaders that have been loaded
+	CDSO	*cDso;
+	for (cDso=dsos;cDso!=NULL;) {
+		CDSO	*nDso	=	cDso->next;
+		// Call DSO's cleanup
+		if(cDso->cleanup != NULL) cDso->cleanup(cDso->handle);
+		free(cDso->name);
+		free(cDso->prototype);
+		delete cDso;
+		cDso	=	nDso;
+	}
+
+
+	// Ditch the temporary files created
+	if (osFileExists(options.temporaryPath)) {
+		char	tmp[OS_MAX_PATH_LENGTH];
+
+		sprintf(tmp,"%s\\*",options.temporaryPath);
+		osFixSlashes(tmp);
+		osEnumerate(tmp,rcClearTemp,NULL);
+		osDeleteDir(options.temporaryPath);
+	}
+
+	// Ditch the loaded files
+	assert(loadedFiles != NULL);
+	loadedFiles->destroy();
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
 // Method				:	locateFileEx
 // Description			:	Locate a file on disk
 // Return Value			:	TRUE if found
 // Comments				:
 // Date last edited		:	8/25/2002
-int	CFrame::locateFileEx(char *result,const char *name,const char *extension,TSearchpath *searchpath) {
+int			CRenderer::locateFileEx(char *result,const char *name,const char *extension,TSearchpath *searchpath) {
 	if (strchr(name,'.') == NULL) {
 		char	tmp[OS_MAX_PATH_LENGTH];
 
@@ -67,13 +136,13 @@ int	CFrame::locateFileEx(char *result,const char *name,const char *extension,TSe
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	locateFile
 // Description			:	Locate a file on disk
 // Return Value			:	TRUE if found
 // Comments				:
 // Date last edited		:	8/25/2002
-int	CFrame::locateFile(char *result,const char *name,TSearchpath *searchpath) {
+int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath) {
 
 	if (netClient != INVALID_SOCKET) {
 		// check netfile mappings
@@ -120,13 +189,13 @@ int	CFrame::locateFile(char *result,const char *name,TSearchpath *searchpath) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getTexture
 // Description			:	Load a texture from file
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-CTexture	*CFrame::getTexture(const char *name) {
+CTexture	*CRenderer::getTexture(const char *name) {
 	CFileResource	*tex;
 
 	if (loadedFiles->find(name,tex) == FALSE){
@@ -147,13 +216,13 @@ CTexture	*CFrame::getTexture(const char *name) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getEnvironment
 // Description			:	Load an environment map (which can also be a shadow map)
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-CEnvironment	*CFrame::getEnvironment(const char *name) {
+CEnvironment	*CRenderer::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
 	if (loadedFiles->find(name,tex) == FALSE){
@@ -172,13 +241,13 @@ CEnvironment	*CFrame::getEnvironment(const char *name) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getPhotonMap
 // Description			:	Load a photon map
 // Return Value			:
 // Comments				:
 // Date last edited		:	3/11/2003
-CPhotonMap		*CFrame::getPhotonMap(const char *name) {
+CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	CFileResource	*map;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
@@ -203,13 +272,13 @@ CPhotonMap		*CFrame::getPhotonMap(const char *name) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getCache
 // Description			:	Load a cache
 // Return Value			:
 // Comments				:
 // Date last edited		:	3/11/2003
-CCache		*CFrame::getCache(const char *name,const char *mode) {
+CCache		*CRenderer::getCache(const char *name,const char *mode) {
 	CFileResource	*cache;
 	
 	// Check the memory first
@@ -308,13 +377,13 @@ CCache		*CFrame::getCache(const char *name,const char *mode) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getTextureInfo
 // Description			:	Load a texture from file
 // Return Value			:
 // Comments				:
 // Date last edited		:	02/22/2006
-CTextureInfoBase	*CFrame::getTextureInfo(const char *name) {
+CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 	CFileResource	*tex;
 
 	if (loadedFiles->find(name,tex) == FALSE){
@@ -337,13 +406,13 @@ CTextureInfoBase	*CFrame::getTextureInfo(const char *name) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getTexture3d
 // Description			:	Get a point cloud or brickmap
 // Return Value			:
 // Comments				:
 // Date last edited		:	02/22/2006
-CTexture3d			*CFrame::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to) {
+CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to) {
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
@@ -418,13 +487,13 @@ CTexture3d			*CFrame::getTexture3d(const char *name,int write,const char* channe
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getFilter
 // Description			:	Return the filter matching the name
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-RtFilterFunc			CFrame::getFilter(const char *name) {
+RtFilterFunc			CRenderer::getFilter(const char *name) {
 	if (strcmp(name,RI_GAUSSIANFILTER) == 0) {
 		return	RiGaussianFilter;
 	} else if (strcmp(name,RI_BOXFILTER) == 0) {
@@ -441,13 +510,13 @@ RtFilterFunc			CFrame::getFilter(const char *name) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getFilter
 // Description			:	Return the name matching the filter
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-char					*CFrame::getFilter(RtFilterFunc func) {
+char					*CRenderer::getFilter(RtFilterFunc func) {
 	if (func == RiGaussianFilter) {
 		return	RI_GAUSSIANFILTER;
 	} else if (func == RiBoxFilter) {
@@ -534,13 +603,13 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	loadDSO
 // Description			:	Find and load a DSO shader
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/25/2002
-int			CFrame::loadDSO(char *name,char *prototype,TSearchpath *inPath,dsoInitFunction *init,dsoExecFunction *exec,dsoCleanupFunction *cleanup) {
+int			CRenderer::loadDSO(char *name,char *prototype,TSearchpath *inPath,dsoInitFunction *init,dsoExecFunction *exec,dsoCleanupFunction *cleanup) {
 	void	*userData[5];
 	char	searchPath[OS_MAX_PATH_LENGTH];
 

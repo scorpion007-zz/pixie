@@ -30,7 +30,6 @@
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
 
-#include "renderer.h"
 #include "error.h"
 #include "texture3d.h"
 

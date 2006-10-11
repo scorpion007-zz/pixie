@@ -24,15 +24,15 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	frameDisplay.cpp
-//  Classes				:	CFrame
+//  Classes				:	CRenderer
 //  Description			:
 //
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
 #include <math.h>
 
-#include "frame.h"
 #include "renderer.h"
+#include "rendererContext.h"
 #include "error.h"
 #include "memory.h"
 #include "stats.h"
@@ -67,7 +67,7 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	if (strcmp(name,"quantize") == 0) {
 		if ((numItems == 4) && (type == FLOAT_PARAMETER))	{
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CFrame::options.colorQuantizer;
+				return	CRenderer::options.colorQuantizer;
 			} else {
 				return	currentDisplay->quantizer;
 			}
@@ -75,23 +75,23 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	} else if (strcmp(name,"dither") == 0) {
 		if ((numItems == 1) && (type == FLOAT_PARAMETER)) {
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CFrame::options.colorQuantizer + 4;
+				return	CRenderer::options.colorQuantizer + 4;
 			} else {
 				return	currentDisplay->quantizer + 4;
 			}
 		}
 	} else if (strcmp(name,"near") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.clipMin;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.clipMin;
 	} else if (strcmp(name,"far") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.clipMax;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.clipMax;
 	} else if (strcmp(name,"Nl") == 0) {
-		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CFrame::fromWorld;
+		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::fromWorld;
 	} else if (strcmp(name,"NP") == 0) {
-		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CFrame::worldToNDC;
+		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::worldToNDC;
 	} else if (strcmp(name,"gamma") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.gamma;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.gamma;
 	} else if (strcmp(name,"gain") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CFrame::options.gain;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.gain;
 	} else if (strcmp(name,"Software") == 0) {
 		if ((numItems == 1) && (type == STRING_PARAMETER))		return	(void *) "Pixie";
 	}
@@ -103,13 +103,13 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	dispatch
 // Description			:	Dispatch a rendered window to the out devices
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/26/2001
-void	CFrame::dispatch(int left,int top,int width,int height,float *pixels) {
+void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 	float	*dest,*dispatch;
 	int		i,j,k,l;
 	int		srcStep,dstStep,disp;
@@ -155,13 +155,13 @@ void	CFrame::dispatch(int left,int top,int width,int height,float *pixels) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	clear
 // Description			:	Send a clear window to the out devices
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/26/2001
-void	CFrame::clear(int left,int top,int width,int height) {
+void	CRenderer::clear(int left,int top,int width,int height) {
 	memBegin();
 
 	float	* pixels	=	(float *) ralloc(width*height*numSamples*sizeof(float));
@@ -179,13 +179,13 @@ void	CFrame::clear(int left,int top,int width,int height) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	commit
 // Description			:	Send a window of samples
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/26/2001
-void	CFrame::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
+void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	if (netClient != INVALID_SOCKET) {
 		// We are rendering for a client, so just send the result to the waiting client
 		T32	header[5];
@@ -229,13 +229,13 @@ void	CFrame::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	getDisplayName
 // Description			:	Create the display name
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/4/2001
-void	CFrame::getDisplayName(char *out,const char *in,const char *displayType) {
+void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType) {
 	char		*cOut	=	out;
 	const char	*cIn	=	in;
 
@@ -309,13 +309,13 @@ void	CFrame::getDisplayName(char *out,const char *in,const char *displayType) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFrame
+// Class				:	CRenderer
 // Method				:	computeDisplayData
 // Description			:	Compute the display data
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/4/2001
-void	CFrame::computeDisplayData() {
+void	CRenderer::computeDisplayData() {
 	CDisplay		*cDisplay;
 	CDisplayChannel *oChannel;
 	char			displayName[OS_MAX_PATH_LENGTH];

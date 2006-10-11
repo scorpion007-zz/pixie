@@ -33,7 +33,6 @@
 
 #include "attributes.h"
 #include "ri.h"
-#include "renderer.h"
 #include "stats.h"
 #include "photonMap.h"
 #include "irradiance.h"
