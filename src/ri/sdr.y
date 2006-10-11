@@ -38,6 +38,8 @@
 #include "shader.h"
 #include "slcode.h"
 #include "error.h"
+#include "renderer.h"
+#include "dso.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   First some temporary data structures used during the script parsing
@@ -290,7 +292,7 @@ static	TSlFunction		functions[]	=	{
 													cVariable->variable			=	newVariable;
 													
 													// Is this a global variable ?
-													gVariable					=	currentRenderer->retrieveVariable(name);
+													gVariable					=	CRenderer::retrieveVariable(name);
 													if (gVariable != NULL)	{
 														if (gVariable->storage == STORAGE_GLOBAL) {
 															// If the variable is actually defined
@@ -439,7 +441,7 @@ static	TSlFunction		functions[]	=	{
 													}
 												}
 
-												var	=	currentRenderer->retrieveVariable(name);
+												var	=	CRenderer::retrieveVariable(name);
 
 												if (var != NULL) {
 													currentData.usedParameters										|=	var->usageMarker;
@@ -586,7 +588,7 @@ static	TSlFunction		functions[]	=	{
 														void			*handle;
 														dsoExecFunction	exec;
 
-														if (currentRenderer->getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
+														if (CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
 															// We have the DSO
 														} else {
 															slerror("Unknown function");
@@ -1837,7 +1839,7 @@ slDSO:			SCRL_DSO
 						void			*handle;
 						dsoExecFunction	exec;
 
-						if (currentRenderer->getDSO($2,$5,handle,exec) == TRUE) {
+						if (CRenderer::getDSO($2,$5,handle,exec) == TRUE) {
 							if ($5[0] == 'o')
 								currentData.currentOpcodePlace[0].integer	=	FUNCTION_DSO_VOID;
 							else

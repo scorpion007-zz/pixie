@@ -40,6 +40,7 @@
 #include	"cache.h"
 #include	"bundles.h"
 #include	"memory.h"
+#include	"renderer.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
@@ -221,7 +222,7 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 	CGatherVariable	*nVar	=	NULL;
 
 	if (strncmp(output,"surface:",8) == 0) {
-		CVariable				*var	=	currentRenderer->retrieveVariable(output+8);
+		CVariable				*var	=	CRenderer::retrieveVariable(output+8);
 		if (var == NULL)							error(CODE_BADTOKEN,"Variable %s not found\n",output);
 		else if (var->storage != STORAGE_GLOBAL)	error(CODE_BADTOKEN,"Variable %s not found\n",output);
 		else {
@@ -468,7 +469,7 @@ void CShaderInstance::createCategories() {
 		i=0;
 		do {
 			cCat = token(&tmp,",\t ");
-			if (*cCat != '\0') categories[i++] = currentRenderer->getGlobalID(cCat);
+			if (*cCat != '\0') categories[i++] = CRenderer::getGlobalID(cCat);
 		} while (tmp != NULL);
 		categories[i++] = 0;	// terminate the list
 		

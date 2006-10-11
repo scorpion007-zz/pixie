@@ -211,8 +211,8 @@ public:
 								CReyes(unsigned int);
 								~CReyes();
 
-								// The main hider interface
-	void						renderFrame();									// Right after world end to force rendering of the entire frame
+								// This function is called to to render
+	void						renderingLoop();
 
 								// The following functions must be overriden by the child rasterizer
 	virtual	void				rasterBegin(int,int,int,int,int)			=	0;
@@ -230,6 +230,7 @@ protected:
 	float						culledDepth;									// The depth of the closest culled object
 	int							xSampleOffset,ySampleOffset;					// The amount of offset around each bucket in samples
 	int							numVertexSamples;								// The number of samples per pixel
+	int							currentXBucket,currentYBucket;					// The current bucket we're processing in this thread
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
 private:

@@ -102,6 +102,84 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 
 
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	beginDisplays
+// Description			:	Initiate the displays
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	8/26/2001
+void	CRenderer::beginDisplays() {
+
+	// Clear the data first
+	numDisplays			=	0;
+	numActiveDisplays	=	0;
+	datas				=	NULL;
+
+	deepShadowFile		=	NULL;
+	deepShadowIndex		=	NULL;
+	deepShadowIndexStart=	0;
+	
+	sampleOrder			=	NULL;
+	sampleDefaults		=	NULL;
+
+	// Initiate the displays
+	if (!(hiderFlags & HIDER_NODISPLAY))
+		computeDisplayData();
+	else {
+		numSamples			=	0;
+		numExtraSamples		=	0;
+	}
+
+	// If we have a client, do not create a display
+	if (netClient != INVALID_SOCKET) {
+		numActiveDisplays	=	1;
+	}
+
+	// Start a TSM channel if needed
+	if ((netClient != INVALID_SOCKET) && (options.flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)) {
+		requestRemoteChannel(new CRemoteTSMChannel(deepShadowFileName,deepShadowFile,deepShadowIndex,xBuckets,yBuckets));
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	endDisplays
+// Description			:	Terminate the displays
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	8/26/2001
+void	CRenderer::endDisplays() {
+	// Finish the out images
+	for (i=0;i<numDisplays;i++) {
+		if (datas[i].module != NULL) {
+			datas[i].finish(datas[i].handle);
+			if (strcmp(datas[i].display->outDevice,RI_SHADOW) == 0) {
+				currentRenderer->RiMakeShadowV(datas[i].displayName,datas[i].displayName,0,NULL,NULL);
+			}
+		}
+		if (datas[i].displayName != NULL) free(datas[i].displayName);
+		delete[] datas[i].channels;
+	}
+
+	if (datas != NULL)			delete[] datas;
+	if (sampleOrder != NULL)	delete[] sampleOrder;
+	if (sampleDefaults != NULL)	delete[] sampleDefaults;
+	
+	if (deepShadowFile != NULL) {
+		fseek(deepShadowFile,deepShadowIndexStart,SEEK_SET);
+		fwrite(deepShadowIndex,sizeof(int),xBuckets*yBuckets*2,deepShadowFile);	// Override the deep shadow map index
+		fclose(deepShadowFile);
+	}
+
+	if (deepShadowIndex != NULL) {
+		delete [] deepShadowIndex;
+		free(deepShadowFileName);
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	dispatch

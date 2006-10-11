@@ -45,10 +45,12 @@ libri_la_SOURCES = 		attributes.cpp \
 				raytracer.cpp \
 				remoteChannel.cpp \
 				renderer.cpp \
+				rendererClipping.cpp \
 				rendererContext.cpp \
 				rendererDeclerations.cpp \
 				rendererDisplay.cpp \
 				rendererFiles.cpp \
+				rendererJobs.cpp \
 				rendererNetwork.cpp \
 				reyes.cpp \
 				ri.cpp \

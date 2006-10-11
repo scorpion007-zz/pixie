@@ -246,10 +246,10 @@ void			CRenderer::initDeclerations() {
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////
 	// Identity matrix for unknown transformations
-	static		matrix	identity	=	{	1,	0,	0,	0,
-											0,	1,	0,	0,
-											0,	0,	1,	0,
-											0,	0,	0,	1	};
+	matrix	identity	=	{	1,	0,	0,	0,
+								0,	1,	0,	0,
+								0,	0,	1,	0,
+								0,	0,	0,	1	};
 
 
 	defineCoordinateSystem(coordinateCameraSystem,identity,identity,COORDINATE_CAMERA);

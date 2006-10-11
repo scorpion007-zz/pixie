@@ -331,86 +331,52 @@ CRaytracer::~CRaytracer() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	9/25/2001
-void	CRaytracer::renderFrame() {
+void	CRaytracer::renderingLoop() {
 	int				left;
 	int				top;
 	int				width;
 	int				height;
-	int				numRenderedBuckets	=	0;
-	const	char	*previousActivity	=	stats.activity;
-
-	stats.activity	=	"Raytracer - rendering";
+	CRenderer::CJob	job;
 
 	memBegin();
 
-	if (CRenderer::netClient != INVALID_SOCKET) {
-		// Let the client know that we're starting to render
-		T32		netBuffer;
-
-		// Let the server know that we're ready
-		netBuffer.integer	=	NET_READY;
-		rcSend(CRenderer::netClient,(char *) &netBuffer,1*sizeof(T32));
-	}
-
-	// Do the job
+	// While not done
 	while(TRUE) {
-		if (CRenderer::netClient != INVALID_SOCKET) {
-			T32	netBuffer[3];
 
-			// Receive the bucket to render from the client
-			rcRecv(CRenderer::netClient,(char *) netBuffer,3*sizeof(T32));
+		// Get the job from the renderer
+		CRenderer::dispatchJob(job);
 
-			if (netBuffer[0].integer == NET_RENDER_BUCKET) {
-				CRenderer::currentXBucket	=	netBuffer[1].integer;
-				CRenderer::currentYBucket	=	netBuffer[2].integer;
-			} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
-				// We have finished the frame, so terminate
-				netBuffer[0].integer	=	NET_ACK;
-				rcSend(CRenderer::netClient,(char *) netBuffer,1*sizeof(T32));
-				
-				// send end of frame channel data
-				CRenderer::sendFrameDataChannels();
-				
-				break;
-			} else {
-				error(CODE_BUG,"Unrecognised network request\n");
-				break;
-			}
+		// Process the job
+		if (job.type == CRenderer::CJob::TERMINATE) {
+
+			// End the context
+			break;
+		} else if (job.type == CRenderer::CJob::BUCKET) {
+			const int	x	=	job.xBucket;
+			const int	y	=	job.yBucket;
+
+			assert(x < CRenderer::xBuckets);
+			assert(y < CRenderer::yBuckets);
+
+			left	=	x*CRenderer::options.bucketWidth;
+			top		=	y*CRenderer::options.bucketHeight;
+			width	=	min(CRenderer::options.bucketWidth,CRenderer::xPixels-left);
+			height	=	min(CRenderer::options.bucketHeight,CRenderer::yPixels-top);
+
+			// Sample the framebuffer
+			sample(left,top,width,height);
+
+			// Flush the data to the out devices
+			CRenderer::commit(left,top,width,height,fbPixels);
 		} else {
-			if (CRenderer::hiderFlags & HIDER_BREAK)	break;
+			error(CODE_BUG,"Invalid job for the hider.\n");
 		}
-
-		left	=	CRenderer::currentXBucket*CRenderer::options.bucketWidth;
-		top		=	CRenderer::currentYBucket*CRenderer::options.bucketHeight;
-		width	=	min(CRenderer::options.bucketWidth,CRenderer::xPixels-left);
-		height	=	min(CRenderer::options.bucketHeight,CRenderer::yPixels-top);
-
-									// Sample the framebuffer
-		sample(left,top,width,height);
-
-									// Flush the data to the out devices
-		CRenderer::commit(left,top,width,height,fbPixels);
-		
-		// Advance the current bucket
-		if (CRenderer::netClient != INVALID_SOCKET) {
-			// send end of bucket channel data
-			CRenderer::sendBucketDataChannels(CRenderer::currentXBucket,CRenderer::currentYBucket);
-		} else {
-			// advance bucket after sending channel data
-			numRenderedBuckets++;
-
-			CRenderer::advanceBucket();
-		}
-
-		stats.progress	=	(numRenderedBuckets*100) / (float) (CRenderer::xBuckets*CRenderer::yBuckets);
-		if (CRenderer::options.flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 	}
 
 	memEnd();
 
-	stats.progress	=	100;
-	if (CRenderer::options.flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
-	stats.activity	=	previousActivity;
+	// Ditch everything
+	delete this;
 }
 
 

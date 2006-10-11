@@ -1643,7 +1643,7 @@ YY_RULE_SETUP
 
 														options		=	currentRenderer->getOptions();
 
-														if (currentRenderer->locateFile(location,fileName,options->archivePath) == TRUE) {
+														if (CRenderer::locateFile(location,fileName,options->archivePath) == TRUE) {
 															FILE	*in;
 
 															info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",fileName,location);

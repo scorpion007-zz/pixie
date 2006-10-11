@@ -32,6 +32,7 @@
 #define VARIABLE_H
 
 #include "common/global.h"		// The global header file
+#include "rendererc.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVariable

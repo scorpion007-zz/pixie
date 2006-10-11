@@ -35,6 +35,7 @@
 #include "photonMap.h"
 #include "texture3d.h"
 #include "gui/opengl.h"
+#include "renderer.h"
 
 
 // The static members of the CView class that visualizable classes derive from
@@ -49,12 +50,12 @@ TGlPointsFunction		CView::drawPoints		=	NULL;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	9/21/2006
-CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODISPLAY) {
+CShow::CShow() : CShadingContext(HIDER_NODISPLAY) {
 	char		moduleFile[OS_MAX_PATH_LENGTH];
 
 	// First, try to load the dynamic library
 	CView::handle	=	NULL;
-	if(currentRenderer->locateFileEx(moduleFile,"gui",osModuleExtension,modulePath)) {
+	if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::options.modulePath)) {
 		CView::handle		=	osLoadModule(moduleFile);
 	}
 
@@ -67,7 +68,7 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 		if (visualize != NULL) {
 
 			// Try to load the file
-			const char	*fileName	=	hider + 5;
+			const char	*fileName	=	CRenderer::options.hider + 5;
 			FILE		*in			=	fopen(fileName,"rb");
 
 			CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
@@ -99,15 +100,15 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 						fclose(in);
 
 						if (strcmp(t,filePhotonMap) == 0) {
-							view	=	getPhotonMap(fileName);
+							view	=	CRenderer::getPhotonMap(fileName);
 						} else if (strcmp(t,fileIrradianceCache) == 0) {
-							view	=	getCache(fileName,"R");
+							view	=	CRenderer::getCache(fileName,"R");
 						} else if (strcmp(t,fileGatherCache) == 0) {
-							view	=	getCache(fileName,"R");
+							view	=	CRenderer::getCache(fileName,"R");
 						} else if (strcmp(t,filePointCloud) == 0) {
-							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
+							view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
 						} else if (strcmp(t,fileBrickMap) == 0) {
-							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
+							view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
 						}
 
 						// Create / display the window

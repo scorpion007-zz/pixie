@@ -41,6 +41,7 @@
 #include "stats.h"
 #include "rib.h"
 #include "rendererContext.h"
+#include "renderer.h"
 #include "error.h"
 
 #include <math.h>

@@ -92,7 +92,7 @@ public:
 
 			// The main hider interface
 			// The following functions are commented out for we want the CShadingContext to handle those
-			void					renderFrame();									// Right after world end to force rendering of the entire frame
+			void					renderingLoop();
 
 			// Since we're not doing any rasterization, the following functions are simple stubs
 

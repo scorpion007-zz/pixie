@@ -34,6 +34,7 @@
 #include "memory.h"
 #include "stats.h"
 #include "shading.h"
+#include "renderer.h"
 #include "error.h"
 
 
@@ -180,7 +181,7 @@ void	CPatch::dice(CShadingContext *r) {
 		initv(bmax,-C_INFINITY);
 
 		// Take care of the motion first
-		if ((r->flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+		if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 			// Compute the sample positions and corresponding normal vectors
 			for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
 				for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
@@ -189,9 +190,9 @@ void	CPatch::dice(CShadingContext *r) {
 					timev[k]	=	1;
 				}
 			}
-			assert(k <= (int) r->maxGridSize);
+			assert(k <= (int) CRenderer::options.maxGridSize);
 			r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
-			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull,r->projection);
+			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull,CRenderer::options.projection);
 			
 			movvv(Pmov,varying[VARIABLE_P]);
 			movvv(Pmov+3,varying[VARIABLE_P]+(numUprobes-1)*3);
@@ -207,9 +208,9 @@ void	CPatch::dice(CShadingContext *r) {
 				timev[k]	=	0;
 			}
 		}
-		assert(k <= (int) r->maxGridSize);
+		assert(k <= (int) CRenderer::options.maxGridSize);
 		r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull,r->projection);
+		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull,CRenderer::options.projection);
 
 		// Are we culled
 		if (cullFlags)	return;
@@ -232,7 +233,7 @@ void	CPatch::dice(CShadingContext *r) {
 		addvf(bmax,attributes->maxDisplacement);
 
 		// Frustrum culling
-		if (r->inFrustrum(bmin,bmax) == FALSE)	return;
+		if (CRenderer::inFrustrum(bmin,bmax) == FALSE)	return;
 
 		// Can we make the perspective divide ?
 		if ((bmin[COMP_Z] > C_EPSILON) && (depth >= minDepth)) {
@@ -251,18 +252,18 @@ void	CPatch::dice(CShadingContext *r) {
 			i3				*=	3;
 			i4				*=	3;
 			P				=	varying[VARIABLE_P];
-			r->camera2pixels(numUprobes*numVprobes,P);
+			CRenderer::camera2pixels(numUprobes*numVprobes,P);
 			
 			// Correct shading rate with dof factor
-			if (r->flags & OPTIONS_FLAGS_FOCALBLUR) {
-				float coc = r->minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
+			if (CRenderer::options.flags & OPTIONS_FLAGS_FOCALBLUR) {
+				float coc = CRenderer::minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
 				shadingRate *= max(1,0.5f*coc);
 			}
 			
 			// Optionally correct shading rate with motionfactor
-			if ((r->flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+			if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 
-				r->camera2pixels(4,(float*)Pmov);
+				CRenderer::camera2pixels(4,(float*)Pmov);
 
 				subvv(Pmov,P + i1);		Pmov[2] = 0;
 				subvv(Pmov+3,P + i2);	Pmov[5] = 0;
@@ -321,7 +322,7 @@ void	CPatch::dice(CShadingContext *r) {
 
 		} else {
 			// Are we making too many splits ?
-			if (depth >= r->maxEyeSplits) {
+			if (depth >= CRenderer::options.maxEyeSplits) {
 				warning(CODE_SYSTEM,"Too many eye splits for primitive \"%s\"\n",attributes->name);
 				return;
 			}

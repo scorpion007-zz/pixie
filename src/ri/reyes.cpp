@@ -71,7 +71,7 @@
 		}																								\
 																										\
 																										\
-		if ((by >= yBuckets) || (bx >= xBuckets)) {														\
+		if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {								\
 			deleteRasterObject(__o);																	\
 		} else {																						\
 			cBucket				=	buckets[by][bx];													\
@@ -100,7 +100,7 @@
 	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < yBucketsMinusOne)) {							\
 		int	xb	=	xbucket(__cObject->xbound[0]);																			\
 		if (xb < 0)	xb = 0;																									\
-		assert(xb < (int) xBuckets);																						\
+		assert(xb < (int) CRenderer::xBuckets);																				\
 		assert(buckets[currentYBucket+1][xb] != NULL);																		\
 		stats.numObjectDeferBottom++;																						\
 																															\
@@ -153,53 +153,57 @@ CReyes::CReyes(unsigned int hf) : CShadingContext(hf) {
 	int			cx,cy;
 
 	// Allocate the buckets
-	buckets	=	new CBucket**[yBuckets];
-	for (cy=0;cy<yBuckets;cy++) {
-		buckets[cy]	=	new CBucket*[xBuckets];
+	buckets	=	new CBucket**[CRenderer::yBuckets];
+	for (cy=0;cy<CRenderer::yBuckets;cy++) {
+		buckets[cy]	=	new CBucket*[CRenderer::xBuckets];
 
-		for (cx=0;cx<xBuckets;cx++) {
+		for (cx=0;cx<CRenderer::xBuckets;cx++) {
 			buckets[cy][cx]						=	new CBucket;
 		}
 	}
 
 	// The sample offsets
-	xSampleOffset		=	(int) ceil(max(	(pixelFilterWidth-1)*pixelXsamples  / 2.0 , 0));
-	ySampleOffset		=	(int) ceil(max(	(pixelFilterHeight-1)*pixelYsamples / 2.0 , 0));
+	xSampleOffset		=	(int) ceil(max(	(CRenderer::options.pixelFilterWidth-1)*CRenderer::options.pixelXsamples  / 2.0 , 0));
+	ySampleOffset		=	(int) ceil(max(	(CRenderer::options.pixelFilterHeight-1)*CRenderer::options.pixelYsamples / 2.0 , 0));
 
 	// Compute the inv bucket width and height in samples
-	invBucketSampleWidth	=	1 / (float) (bucketWidth*pixelXsamples);
-	invBucketSampleHeight	=	1 / (float) (bucketHeight*pixelYsamples);
+	invBucketSampleWidth	=	1 / (float) (CRenderer::options.bucketWidth*CRenderer::options.pixelXsamples);
+	invBucketSampleHeight	=	1 / (float) (CRenderer::options.bucketHeight*CRenderer::options.pixelYsamples);
 
 	// dSample / dx,dy
-	dSampledx			=	dPixeldx*pixelXsamples;
-	dSampledy			=	dPixeldy*pixelYsamples;
+	dSampledx			=	CRenderer::dPixeldx*CRenderer::options.pixelXsamples;
+	dSampledy			=	CRenderer::dPixeldy*CRenderer::options.pixelYsamples;
 
 	// The clipping region we have
-	sampleClipLeft		=	(float) (							-	xSampleOffset);
-	sampleClipRight		=	(float) (xPixels*pixelXsamples		+	xSampleOffset);
-	sampleClipTop		=	(float) (0							-	ySampleOffset);
-	sampleClipBottom	=	(float) (yPixels*pixelYsamples		+	ySampleOffset);
+	sampleClipLeft		=	(float) (															-	xSampleOffset);
+	sampleClipRight		=	(float) (CRenderer::xPixels*CRenderer::options.pixelXsamples		+	xSampleOffset);
+	sampleClipTop		=	(float) (0															-	ySampleOffset);
+	sampleClipBottom	=	(float) (CRenderer::yPixels*CRenderer::options.pixelYsamples		+	ySampleOffset);
 
 	// Init the stats
 	numGrids			=	0;
 	numObjects			=	0;
 
 	// The length of a raster vertex
-	if (flags & OPTIONS_FLAGS_MOTIONBLUR) {
-		numVertexSamples	=	(numExtraSamples + 10)*2;
+	if (CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) {
+		numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
 		enableMotionBlur	=	TRUE;
 	} else {
-		numVertexSamples	=	(numExtraSamples + 10);
+		numVertexSamples	=	(CRenderer::numExtraSamples + 10);
 		enableMotionBlur	=	FALSE;
 	}
 
 	extraPrimitiveFlags	=	0;
-	if (numExtraSamples > 0)	extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
-	if (aperture != 0)			extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
+	if (CRenderer::numExtraSamples > 0)	extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
+	if (CRenderer::aperture != 0)		extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
 
 	// Compute misc junk
-	xBucketsMinusOne	=	xBuckets-1;
-	yBucketsMinusOne	=	yBuckets-1;
+	xBucketsMinusOne	=	CRenderer::xBuckets-1;
+	yBucketsMinusOne	=	CRenderer::yBuckets-1;
+
+	// Init the current bucket
+	currentXBucket		=	0;
+	currentYBucket		=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -214,8 +218,8 @@ CReyes::~CReyes() {
 	CBucket	*cBucket;
 
 	// Ditch the buckets
-	for (y=0;y<yBuckets;y++) {
-		for (x=0;x<xBuckets;x++) {
+	for (y=0;y<CRenderer::yBuckets;y++) {
+		for (x=0;x<CRenderer::xBuckets;x++) {
 			if ((cBucket = buckets[y][x]) != NULL)	{
 				CRasterObject		*cObject;
 
@@ -239,100 +243,63 @@ CReyes::~CReyes() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
-// Method				:	renderFrame
-// Description			:	Render the entire frame
+// Method				:	renderingLoop
+// Description			:	This is the rendering loop for the thread
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	2/1/2002
-void		CReyes::renderFrame() {
-	int				numRenderedBuckets	=	0;
-	const	char	*previousActivity	=	stats.activity;
-	int				x,y;
-	
-	stats.activity	=	"Rasterizer - rendering";
+void		CReyes::renderingLoop() {
+	CRenderer::CJob	job;
 
-	if (netClient != INVALID_SOCKET) {
-		// Let the client know that we're ready to render
-		T32		netBuffer;
+#define computeExtends																\
+	bucketPixelLeft		=	currentXBucket*CRenderer::options.bucketWidth;			\
+	bucketPixelTop		=	currentYBucket*CRenderer::options.bucketHeight;			\
+	bucketPixelWidth	=	min(CRenderer::options.bucketWidth,		CRenderer::xPixels-bucketPixelLeft);	\
+	bucketPixelHeight	=	min(CRenderer::options.bucketHeight,	CRenderer::yPixels-bucketPixelTop);		\
+	tbucketLeft			=	bucketPixelLeft*CRenderer::options.pixelXsamples - xSampleOffset;				\
+	tbucketTop			=	bucketPixelTop*CRenderer::options.pixelYsamples - ySampleOffset;				\
+	tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*CRenderer::options.pixelXsamples - xSampleOffset;	\
+	tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*CRenderer::options.pixelYsamples - ySampleOffset;
 
-		netBuffer.integer	=	NET_READY;
-		rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
-	}
-
-
-	// While not done
+	// This is da loop
 	while(TRUE) {
 
-		// If we have a client, ask for a bucket
-		if (netClient != INVALID_SOCKET) {
-			T32	netBuffer[3];
+		// Get the job from the renderer
+		CRenderer::dispatchJob(job);
 
-			// Receive the bucket to render from the client
-			rcRecv(netClient,(char *) netBuffer,3*sizeof(T32));
+		// Process the job
+		if (job.type == CRenderer::CJob::TERMINATE) {
 
-			// Process the render order
-			if (netBuffer[0].integer == NET_RENDER_BUCKET) {
-				x	=	netBuffer[1].integer;
-				y	=	netBuffer[2].integer;
-			} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
-				// We have finished the frame, so terminate
-				netBuffer[0].integer	=	NET_ACK;
-				rcSend(netClient,(char *) netBuffer,1*sizeof(T32));
-				
-				// send end of frame channel data
-				sendFrameDataChannels();
-				
-				break;
-			} else {
-				error(CODE_BUG,"Unrecognised network request\n");
-			}
+			// End the context
+			break;
+		} else if (job.type == CRenderer::CJob::BUCKET) {
+			const int	x	=	job.xBucket;
+			const int	y	=	job.yBucket;
 
-			assert(x < xBuckets);
-			assert(y < yBuckets);
+			assert(x < CRenderer::xBuckets);
+			assert(y < CRenderer::yBuckets);
 
+			// Skip the buckets reach the bucket we want
 			while((currentXBucket != x) || (currentYBucket != y)) {
-				// Compute the extend of the bucket
-				bucketPixelLeft		=	currentXBucket*bucketWidth;
-				bucketPixelTop		=	currentYBucket*bucketHeight;
-				bucketPixelWidth	=	min(bucketWidth,xPixels-bucketPixelLeft);
-				bucketPixelHeight	=	min(bucketHeight,yPixels-bucketPixelTop);
-				tbucketLeft			=	bucketPixelLeft*pixelXsamples - xSampleOffset;
-				tbucketTop			=	bucketPixelTop*pixelYsamples - ySampleOffset;
-				tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*pixelXsamples - xSampleOffset;
-				tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*pixelYsamples - ySampleOffset;
 
-				numRenderedBuckets++;
+				computeExtends;
 				skip();
 			}
+
+
+			// Render the bucket
+
+			computeExtends;
+			render();
 		} else {
-			if (hiderFlags & HIDER_BREAK)	break;
+			error(CODE_BUG,"Invalid job for the hider.\n");
 		}
-
-		// Compute the extend of the bucket
-		bucketPixelLeft		=	currentXBucket*bucketWidth;
-		bucketPixelTop		=	currentYBucket*bucketHeight;
-		bucketPixelWidth	=	min(bucketWidth,xPixels-bucketPixelLeft);
-		bucketPixelHeight	=	min(bucketHeight,yPixels-bucketPixelTop);
-		tbucketLeft			=	bucketPixelLeft*pixelXsamples - xSampleOffset;
-		tbucketTop			=	bucketPixelTop*pixelYsamples - ySampleOffset;
-		tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*pixelXsamples - xSampleOffset;
-		tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*pixelYsamples - ySampleOffset;
-
-		render();
-		numRenderedBuckets++;
-		
-		if (netClient != INVALID_SOCKET) {
-			// send end of bucket channel data
-			sendBucketDataChannels(x,y);
-		}
-
-		stats.progress		=	(numRenderedBuckets*100) / (float) (xBuckets*yBuckets);
-		if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 	}
 
-	stats.progress	=	100;
-	if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
-	stats.activity	=	previousActivity;
+#undef computeExtends
+
+	// Delete the context
+	delete this;
 }
 
 
@@ -356,7 +323,7 @@ void	CReyes::render() {
 	memBegin();
 
 	// Allocate the framebuffer area
-	pixelBuffer			=	(float *) ralloc(bucketWidth*bucketHeight*numSamples*sizeof(float));
+	pixelBuffer			=	(float *) ralloc(CRenderer::options.bucketWidth*CRenderer::options.bucketHeight*CRenderer::numSamples*sizeof(float));
 
 	// Initialize the opaque depths
 	maxDepth			=	C_INFINITY;
@@ -378,7 +345,7 @@ void	CReyes::render() {
 	// Process the objects and patches
 	while((cObject = objectQueue.get()) != NULL) {
 
-		if(depthFilter != DEPTH_MID) culledDepth = maxDepth;
+		if(CRenderer::options.depthFilter != DEPTH_MID) culledDepth = maxDepth;
 
 		// Is the object behind the maximum opaque depth ?
 		if (cObject->zmin < culledDepth) {
@@ -437,14 +404,14 @@ void	CReyes::render() {
 	rasterEnd(pixelBuffer,noObjects);
 
 	// Flush the data to the out devices
-	commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
+	CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
 
 	// Just have rendered this bucket, so deallocate it
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
 
 	// Update the statistics
-	const int	cnBucket			=	currentYBucket*xBuckets+currentXBucket;
+	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
 	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
 	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 
@@ -452,7 +419,11 @@ void	CReyes::render() {
 	memEnd();
 
 	// Advance the bucket
-	advanceBucket();
+	currentXBucket++;
+	if (currentXBucket == CRenderer::xBuckets) {		
+		currentXBucket	=	0;
+		currentYBucket++;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -478,12 +449,16 @@ void	CReyes::skip() {
 	buckets[currentYBucket][currentXBucket]	=	NULL;
 
 	// Update the statistics
-	const int	cnBucket			=	currentYBucket*xBuckets+currentXBucket;
+	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
 	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
 	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 
 	// Advance the bucket
-	advanceBucket();
+	currentXBucket++;
+	if (currentXBucket == CRenderer::xBuckets) {		
+		currentXBucket	=	0;
+		currentYBucket++;
+	}
 }
 
 
@@ -523,19 +498,19 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	float				zmin,zmax;
 
 	// Trivial reject
-	if (bmax[COMP_Z] < clipMin)	{	return;	}
-	if (bmin[COMP_Z] > clipMax)	{	return;	}
+	if (bmax[COMP_Z] < CRenderer::options.clipMin)	{	return;	}
+	if (bmin[COMP_Z] > CRenderer::options.clipMax)	{	return;	}
 
 	// Clamp da bounding box
-	zmin	=	max(bmin[COMP_Z],clipMin);
-	zmax	=	min(bmax[COMP_Z],clipMax);
+	zmin	=	max(bmin[COMP_Z],CRenderer::options.clipMin);
+	zmax	=	min(bmax[COMP_Z],CRenderer::options.clipMax);
 
 	// Compute the projected extend of the bound in the pixel space
-	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		if (zmin < C_EPSILON)	{			// Spanning the eye plane ?
-			if (inFrustrum(bmin,bmax)) {	// Are we in the frustrum ?
-											// If we can not make the perspective divide
-											// Go ahead and process the object now
+	if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (zmin < C_EPSILON)	{					// Spanning the eye plane ?
+			if (CRenderer::inFrustrum(bmin,bmax)) {	// Are we in the frustrum ?
+													// If we can not make the perspective divide
+													// Go ahead and process the object now
 				object->dice(this);
 			}
 
@@ -543,8 +518,8 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 		}
 
 		// Do the perspective divide and figure put the extend on the screen
-		const double	invMin	=	imagePlane	/	(double) zmin;
-		const double	invMax	=	imagePlane	/	(double) zmax;
+		const double	invMin	=	CRenderer::imagePlane	/	(double) zmin;
+		const double	invMax	=	CRenderer::imagePlane	/	(double) zmax;
 
 		x[0]	=	(float) (bmin[COMP_X]*invMin);
 		x[1]	=	(float) (bmin[COMP_X]*invMax);
@@ -571,13 +546,13 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 		ymax	=	bmax[COMP_Y];
 	}
 
-	xmin		-=	pixelLeft;
-	xmax		-=	pixelLeft;
-	ymin		-=	pixelTop;
-	ymax		-=	pixelTop;
+	xmin		-=	CRenderer::pixelLeft;
+	xmax		-=	CRenderer::pixelLeft;
+	ymin		-=	CRenderer::pixelTop;
+	ymax		-=	CRenderer::pixelTop;
 
 	// Account for the depth of field
-	if (aperture != 0) {
+	if (CRenderer::aperture != 0) {
 		const	float	mcoc	=	max(cocScreen(zmin),cocScreen(zmax));
 		xmin					=	xmin-mcoc;
 		xmax					=	xmax+mcoc;
@@ -1109,7 +1084,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		vstart		=	grid->vmin;
 		vstep		=	(grid->vmax - vstart) / (float) vdiv;
 
-		assert(numVertices <= (int) maxGridSize);
+		assert(numVertices <= (int) CRenderer::options.maxGridSize);
 
 		// Shade the points in the patch
 		u			=	varying[VARIABLE_U];
@@ -1229,7 +1204,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 // Date last edited		:	6/5/2003
 void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int stage) {
 	const	float	*P			=	varying[VARIABLE_P];
-	const	int		disp		=	(numExtraSamples + 10)*stage;
+	const	int		disp		=	(CRenderer::numExtraSamples + 10)*stage;
 	int				i;
 
 	// Copy the samples
@@ -1238,7 +1213,7 @@ void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int st
 	}
 
 	// If we have depth of field, compute that
-	if ((aperture != 0) && (stage == 0)) {
+	if ((CRenderer::aperture != 0) && (stage == 0)) {
 		vertices	-=	numVertices*numVertexSamples;
 
 		// Compute the circle of confusion amount
@@ -1262,8 +1237,8 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 	const	float	*C		=	varying[VARIABLE_CI];
 	const	float	*O		=	varying[VARIABLE_OI];
 	int				i,j,k,l;
-	const	int		disp	=	(numExtraSamples + 10)*stage;
-	const	int		*cOrder	=	sampleOrder;
+	const	int		disp	=	(CRenderer::numExtraSamples + 10)*stage;
+	const	int		*cOrder	=	CRenderer::sampleOrder;
 	const	float	*s;
 	float			*d;
 
@@ -1278,7 +1253,7 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 
 	// Do the extra samples
 	k	=	disp + 10;
-	for (i=0;i<numExtraChannels;i++) {
+	for (i=0;i<CRenderer::numExtraChannels;i++) {
 		const int outType			= *cOrder++;
 		const int channelSamples	= *cOrder++;
 
@@ -1383,7 +1358,7 @@ void		CReyes::makeRibbon(int numVertices,float *leftVertices,float *rightVertice
 	float				*pr;
 	vector				tmp;
 
-	disp		*=	(numExtraSamples+10);
+	disp		*=	(CRenderer::numExtraSamples+10);
 
 	for (i=numVertices;i>0;i--) {
 		pl		=	leftVertices	+ disp;	leftVertices	+=	numVertexSamples;
@@ -1491,7 +1466,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		const float	*sVertex;
 
 		for (sVertex=grid->vertices,i=grid->numVertices;i>0;i--,sVertex+=numVertexSamples) {
-			const float	*cVertex	=	sVertex + numExtraSamples+10;
+			const float	*cVertex	=	sVertex + CRenderer::numExtraSamples+10;
 			if (cVertex[0] < xmin)	xmin	=	cVertex[0];
 			if (cVertex[1] < ymin)	ymin	=	cVertex[1];
 			if (cVertex[2] < zmin)	zmin	=	cVertex[2];
@@ -1501,7 +1476,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		}
 	}
 
-	if (aperture != 0) {
+	if (CRenderer::aperture != 0) {
 		// Expand the bound by the maximum focal blur amount
 		const	float	coc1	=	cocSamples(zmin);
 		const	float	coc2	=	cocSamples(zmax);
@@ -1540,7 +1515,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 			ybound[1]			=	P[1];
 
 			if (grid->flags & RASTER_MOVING) {
-				P				+=	numExtraSamples + 10;
+				P				+=	CRenderer::numExtraSamples + 10;
 
 				xbound[0]		=	min(xbound[0],P[0]);
 				xbound[1]		=	max(xbound[1],P[0]);
@@ -1618,7 +1593,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 				originalArea	+=	(xbound[1] - xbound[0])*(ybound[1] - ybound[0]);
 
 				if (grid->flags & RASTER_MOVING) {
-					P	=	cVertex + numExtraSamples + 10;
+					P	=	cVertex + CRenderer::numExtraSamples + 10;
 					if		(P[COMP_X] < xbound[0])	xbound[0]	=	P[COMP_X];
 					else if	(P[COMP_X] > xbound[1])	xbound[1]	=	P[COMP_X];
 					if		(P[COMP_Y] < ybound[0])	ybound[0]	=	P[COMP_Y];
@@ -1643,7 +1618,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 					else if	(P[COMP_Y] > ybound[1])	ybound[1]	=	P[COMP_Y];
 				}
 
-				if (aperture != 0) {
+				if (CRenderer::aperture != 0) {
 					// Expand the bound by the maximum focal blur amount
 					const float	c1		=	cVertex[9];
 					const float	c2		=	cVertex[9 + numVertexSamples];

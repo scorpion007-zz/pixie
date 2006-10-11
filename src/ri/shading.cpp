@@ -1347,11 +1347,13 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 // Date last edited		:	8/25/2002
 CShadingState	*CShadingContext::newState() {
 	if (freeStates == NULL) {
-		CShadingState	*newState		=	new CShadingState;
+		CShadingState	*newState			=	new CShadingState;
 		int				j;
 		float			*E;
+		const int		numGlobalVariables	=	CRenderer::globalVariables->numItems;
+		CVariable		**globalVariables	=	CRenderer::globalVariables->array;
 
-		newState->varying				=	new float*[CRenderer::maxGlobalVariables];				stats.vertexMemory	+=	CRenderer::maxGlobalVariables*sizeof(float *);
+		newState->varying				=	new float*[numGlobalVariables];							stats.vertexMemory	+=	numGlobalVariables*sizeof(float *);
 		newState->tags					=	new int[CRenderer::options.maxGridSize*3];				stats.vertexMemory	+=	CRenderer::options.maxGridSize*3*sizeof(int);
 		newState->lightingTags			=	new int[CRenderer::options.maxGridSize*3];				stats.vertexMemory	+=	CRenderer::options.maxGridSize*3*sizeof(int);
 		newState->Ns					=	new float[CRenderer::options.maxGridSize*9];			stats.vertexMemory	+=	CRenderer::options.maxGridSize*3*sizeof(float);
@@ -1360,12 +1362,8 @@ CShadingState	*CShadingContext::newState() {
 		newState->postShader			=	NULL;
 		newState->currentObject			=	NULL;
 
-		for (j=0;j<CRenderer::maxGlobalVariables;j++) {
-			newState->varying[j]	=	NULL;
-		}
-
-		for (j=0;j<CRenderer::numGlobalVariables;j++) {
-			const	CVariable	*var	=	CRenderer::globalVariables[j];
+		for (j=0;j<numGlobalVariables;j++) {
+			const	CVariable	*var	=	globalVariables[j];
 
 			assert(var != NULL);
 
@@ -1380,10 +1378,7 @@ CShadingState	*CShadingContext::newState() {
 
 		// E is always (0,0,0)
 		E	=	newState->varying[VARIABLE_E];
-		for (j=CRenderer::options.maxGridSize*3;j>0;j--) {
-			initv(E,0,0,0);
-			E	+=	3;
-		}
+		for (j=CRenderer::options.maxGridSize*3;j>0;j--,E+=3)	initv(E,0,0,0);
 
 		if (stats.vertexMemory > stats.peakVertexMemory)	stats.peakVertexMemory=	stats.vertexMemory;
 
@@ -1418,23 +1413,23 @@ void				CShadingContext::deleteState(CShadingState *cState) {
 // Comments				:
 // Date last edited		:	8/25/2002
 void			CShadingContext::freeState(CShadingState *cState) {
-	int	j;
+	int			j;
+	const int	numGlobalVariables	=	CRenderer::globalVariables->numItems;
+	CVariable	**globalVariables	=	CRenderer::globalVariables->array;
 
-	for (j=0;j<CRenderer::numGlobalVariables;j++) {
-		if (CRenderer::globalVariables[j] != NULL) {
-			const CVariable	*var	=	CRenderer::globalVariables[j];
+	for (j=0;j<numGlobalVariables;j++) {
+		const CVariable	*var	=	globalVariables[j];
 
-			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-				delete [] cState->varying[j];
-				stats.vertexMemory		-=	var->numFloats*sizeof(float);
-			} else {
-				delete [] cState->varying[j];
-				stats.vertexMemory		-=	var->numFloats*CRenderer::options.maxGridSize*3*sizeof(float);
-			}
+		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
+			delete [] cState->varying[j];
+			stats.vertexMemory		-=	var->numFloats*sizeof(float);
+		} else {
+			delete [] cState->varying[j];
+			stats.vertexMemory		-=	var->numFloats*CRenderer::options.maxGridSize*3*sizeof(float);
 		}
 	}
 
-	delete [] cState->varying;					stats.vertexMemory	-=	CRenderer::maxGlobalVariables*sizeof(float *);
+	delete [] cState->varying;					stats.vertexMemory	-=	numGlobalVariables*sizeof(float *);
 	delete [] cState->tags;						stats.vertexMemory	-=	CRenderer::options.maxGridSize*3*sizeof(int);
 	delete [] cState->lightingTags;				stats.vertexMemory	-=	CRenderer::options.maxGridSize*3*sizeof(int);
 	delete [] cState->Ns;						stats.vertexMemory	-=	CRenderer::options.maxGridSize*9*sizeof(float);
@@ -1783,11 +1778,14 @@ const char	*CShadingContext::shaderName(const char *type) {
 // Comments				:
 // Date last edited		:	8/25/2002
 void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
-	if (currentRenderer->findCoordinateSystem(name,from,to,cSystem)) {
-		// The coordinate systems that don't have ant implementation will be pushed into the
-		// CDictionary as a custom coordinate system for they are constant accross a frame
-		
-		switch(cSystem) {
+	CNamedCoordinateSystem	*currentSystem;
+
+	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
+		from		=	&currentSystem->from;
+		to			=	&currentSystem->to;
+		cSystem		=	currentSystem->systemType;
+
+		switch(currentSystem->systemType) {
 		case COORDINATE_OBJECT:
 			if (currentShadingState->currentObject == NULL) {
 				error(CODE_SYSTEM,"Object system reference without an object\n");
@@ -1841,13 +1839,18 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 		case COLOR_CIE:
 		case COLOR_YIQ:
 		case COLOR_XYY:
+			// Don't handle color, the custom must have been handled
+			break;
 		case COORDINATE_CUSTOM:
 			// Don't handle color, the custom must have been handled
+			from		=	&currentSystem->from;
+			to			=	&currentSystem->to;
 			break;
 		default:
 			warning(CODE_BUG,"Unknown coordinate system: %s\n",name);
-			from	=	&identity;
-			to		=	&identity;
+			from		=	&identity;
+			to			=	&identity;
+			break;
 		}	
 	} else {
 		warning(CODE_BUG,"Unknown coordinate system: %s\n",name);

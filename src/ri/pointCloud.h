@@ -35,6 +35,7 @@
 #include "common/containers.h"
 #include "photonMap.h"
 #include "texture3d.h"
+#include "options.h"
 
 
 ///////////////////////////////////////////////////////////////////////

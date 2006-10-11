@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	frame.cpp
+//  File				:	renderer.cpp
 //  Classes				:	CRenderer
 //  Description			:
 //
@@ -82,46 +82,49 @@
 /////////////////////////////////////////////////////////////////////
 
 
-// Global members first
+
+
+// Global members (active between RiBegin() - RiEnd())
+CRendererContext									*CRenderer::context						=	NULL;
 CArray<CShaderInstance *>							*CRenderer::allLights					=	NULL;
 CDictionary<const char *,CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;
 CDictionary<const char *,CVariable *>				*CRenderer::declaredVariables			=	NULL;
-CDictionary<const char *,CFileResource  *>			*CRenderer::loadedFiles				=	NULL;
+CDictionary<const char *,CFileResource  *>			*CRenderer::loadedFiles					=	NULL;
 CDictionary<const char *,CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;
 CDictionary<const char *,CRenderer::CNetFileMapping *>	*CRenderer::netFileMappings			=	NULL;
 int													CRenderer::numKnownGlobalIds			=	0;
 CVariable											*CRenderer::variables					=	NULL;
-CArray<CVariable *>									*CRenderer::globalVariables			=	NULL;
+CArray<CVariable *>									*CRenderer::globalVariables				=	NULL;
 CDictionary<const char *,CDisplayChannel *>			*CRenderer::declaredChannels			=	NULL;
-CArray<CDisplayChannel*>							*CRenderer::displayChannels			=	NULL;
+CArray<CDisplayChannel*>							*CRenderer::displayChannels				=	NULL;
 CDSO												*CRenderer::dsos						=	NULL;
 SOCKET												CRenderer::netClient					=	INVALID_SOCKET;
 int													CRenderer::netNumServers				=	0;
 SOCKET												*CRenderer::netServers					=	NULL;
 TMutex												CRenderer::commitMutex;
-int													CRenderer::userRaytracing				=	FALSE;
 int													CRenderer::numNetrenderedBuckets		=	0;
 
 
 
 
 
-
-// Local members
-CMemStack									*CRenderer::frameMemory				=	NULL;
-CArray<const char*>							*CRenderer::frameTemporaryFiles		=	NULL;
-COptions									CRenderer::options;
-CDictionary<const char *,CRemoteChannel *>	*CRenderer::declaredRemoteChannels		=	NULL;
-CArray<CRemoteChannel *>					*CRenderer::remoteChannels				=	NULL;
-CArray<CAttributes *>						*CRenderer::dirtyAttributes			=	NULL;
-CArray<CProgrammableShaderInstance *>		*CRenderer::dirtyInstances				=	NULL;
-unsigned int			CRenderer::raytracingFlags;
-CHierarchy				*CRenderer::hierarchy;
-CArray<CTriangle *>		*CRenderer::triangles;
-CArray<CSurface *>		*CRenderer::raytraced;
-CArray<CTracable *>		*CRenderer::tracables;
+// Local members (active between RiWorldBegin() - RiWorldEnd())
+CMemStack											*CRenderer::frameMemory				=	NULL;
+CArray<const char*>									*CRenderer::frameTemporaryFiles		=	NULL;
+CShadingContext										**CRenderer::contexts				=	NULL;
+COptions											CRenderer::options;
+CDictionary<const char *,CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;
+CArray<CRemoteChannel *>							*CRenderer::remoteChannels			=	NULL;
+CArray<CAttributes *>								*CRenderer::dirtyAttributes			=	NULL;
+CArray<CProgrammableShaderInstance *>				*CRenderer::dirtyInstances			=	NULL;
+unsigned int			CRenderer::raytracingFlags					=	0;
+CHierarchy				*CRenderer::hierarchy						=	NULL;
+CArray<CTriangle *>		*CRenderer::triangles						=	NULL;
+CArray<CSurface *>		*CRenderer::raytraced						=	NULL;
+CArray<CTracable *>		*CRenderer::tracables						=	NULL;
+CObject					*CRenderer::offendingObject					=	NULL;
 matrix					CRenderer::fromWorld,CRenderer::toWorld;
-CXform					*CRenderer::world;
+CXform					*CRenderer::world							=	NULL;
 matrix					CRenderer::fromNDC,CRenderer::toNDC;
 matrix					CRenderer::fromRaster,CRenderer::toRaster;
 matrix					CRenderer::fromScreen,CRenderer::toScreen;
@@ -156,10 +159,10 @@ int						CRenderer::numActiveDisplays;
 int						CRenderer::currentXBucket;
 int						CRenderer::currentYBucket;
 int						*CRenderer::jobAssignment;
-FILE					*CRenderer::deepShadowFile;
-int						*CRenderer::deepShadowIndex;
+FILE					*CRenderer::deepShadowFile			=	NULL;
+int						*CRenderer::deepShadowIndex			=	NULL;
 int						CRenderer::deepShadowIndexStart;
-char					*CRenderer::deepShadowFileName;
+char					*CRenderer::deepShadowFileName		=	NULL;
 
 
 
@@ -182,8 +185,11 @@ char					*CRenderer::deepShadowFileName;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CRenderer::beginRenderer(char *ribFile,char *riNetString) {
+void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetString) {
 	float			startTime	=	osCPUTime();
+
+	// Save the context
+	context		=	c;
 
 	// Reset the stats
 	stats.reset();
@@ -199,16 +205,12 @@ void		CRenderer::beginRenderer(char *ribFile,char *riNetString) {
 
 	// Init the network
 	initNetwork(ribFile,riNetString);
-
-	// We're not user raytracing	
-	userRaytracing					=	FALSE;
 	
 	// Init the light sources we use
 	allLights						=	new CArray<CShaderInstance *>;
 	
 	// Record the start overhead
 	stats.rendererStartOverhead		=	osCPUTime() - startTime;
-
 
 	// Good to rock and roll
 }
@@ -272,9 +274,12 @@ void		CRenderer::endRenderer() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf) {
+void		CRenderer::beginFrame(CRendererContext *c,const COptions *o,CXform *x) {
 
-	// This is the memory we allocate our junk from
+	// Record the frame start time
+	stats.frameStartTime	=	osCPUTime();
+
+	// This is the memory we allocate our junk from (only permenant stuff for the entire frame)
 	frameMemory				=	new CMemStack(1 << 20);
 
 	// Save the options
@@ -288,7 +293,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf
 
 	// Save / precompute some interesting stuff
 	hiderFlags				=	hf;
-	netClient				=	s;
 
 	assert(options.pixelXsamples > 0);
 	assert(options.pixelYsamples > 0);
@@ -475,47 +479,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf
 	// Compute the world to NDC transform required by the shadow maps
 	mulmm(worldToNDC,toNDC,fromWorld);
 
-	const float	minX		=	min(pixelLeft,pixelRight);	// The extend of the rendering window on the image
-	const float	maxX		=	max(pixelLeft,pixelRight);	// plane
-	const float	minY		=	min(pixelTop,pixelBottom);
-	const float	maxY		=	max(pixelTop,pixelBottom);
-
-	// Compute the equations of the clipping planes
-	// The visible points are:
-	// Px*leftX		+ Pz*leftZ		+ leftD		>=	0	&&
-	// Px*rightX	+ Pz*rightZ		+ rightD	>=	0	&&
-	// Py*topY		+ Pz*topZ		+ topD		>=	0	&&
-	// Py*bottomY	+ Pz*bottomZ	+ bottomD	>=	0	&&
-	// Pz >= clipMin									&&
-	// Pz <= clipMax
-	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		leftX			=	imagePlane;
-		leftZ			=	-minX;
-		leftD			=	0;
-		rightX			=	-imagePlane;
-		rightZ			=	maxX;
-		rightD			=	0;
-		topY			=	imagePlane;
-		topZ			=	-minY;
-		topD			=	0;
-		bottomY			=	-imagePlane;
-		bottomZ			=	maxY;
-		bottomD			=	0;
-	} else {
-		leftX			=	1;
-		leftZ			=	0;
-		leftD			=	-minX;
-		rightX			=	-1;
-		rightZ			=	0;
-		rightD			=	maxX;
-
-		topY			=	-1;
-		topZ			=	0;
-		topD			=	maxY;
-		bottomY			=	1;
-		bottomZ			=	0;
-		bottomD			=	-minY;
-	}
 
 	if (options.displays == NULL) {
 		options.displays				=	new CDisplay;
@@ -535,30 +498,9 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf
 	currentXBucket		=	0;
 	currentYBucket		=	0;
 
-	numDisplays			=	0;
-	numActiveDisplays	=	0;
-	datas				=	NULL;
 
-	deepShadowFile		=	NULL;
-	deepShadowIndex		=	NULL;
-	deepShadowIndexStart=	0;
+
 	
-	sampleOrder			=	NULL;
-	sampleDefaults		=	NULL;
-
-	if (netClient != INVALID_SOCKET) {
-		numActiveDisplays		=	1;
-	}
-
-	// Initiate the displays
-	if (!(hiderFlags & HIDER_NODISPLAY))
-		computeDisplayData();
-	else {
-		numSamples		=	0;
-		numExtraSamples	=	0;
-	}
-
-
 	// Initialize the extend of the world
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
@@ -586,17 +528,229 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
 	declaredRemoteChannels	=	new CTrie<CRemoteChannel*>;
-	
-	// Start a TSM channel if needed
-	if ((netClient != INVALID_SOCKET) && (options.flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)) {
-		requestRemoteChannel(new CRemoteTSMChannel(deepShadowFileName,deepShadowFile,deepShadowIndex,xBuckets,yBuckets));
-	}
+
+
+	// Compute the clipping data
+	beginClipping();
+
+	// Start the displays
+	beginDisplays();
 
 	// Initialize the texturing
 	CTexture::textureInit(options.maxTextureSize);
+
+	// Initialize the brickmaps
 	CBrickMap::brickMapInit(options.maxBrickSize);
+
+	// Initialize the random number generator for the frame
 	randomInit();
+
+	// Start the contexts
+	int	i;
+	contexts		=	new CShadingContext*[options.numThreads];
+	for (i=0;i<options.numThreads;i++) {
+
+		// Start the hiders here
+		contexts[i]	=	NULL;
+
+		if (strcmp(options.hider,"raytrace") == 0) {
+			contexts[i]						=	new CRaytracer();
+			dispatchJob						=	singleThreadedReyes;
+		} else if (strcmp(options.hider,"stochastic") == 0) {
+			contexts[i]						=	new CStochastic();
+			dispatchJob						=	singleThreadedReyes;
+		} else if (strcmp(options.hider,"zbuffer") == 0) {
+			contexts[i]						=	new CZbuffer();
+			dispatchJob						=	singleThreadedReyes;
+		} else if (strncmp(options.hider,"show:",5) == 0) {
+			contexts[i]						=	new CShow();
+			dispatchJob						=	singleThreadedReyes;
+		} else if (strcmp(options.hider,"photon") == 0) {
+			if ((netClient != INVALID_SOCKET) || (netNumServers > 0)) {
+				error(CODE_LIMIT,"Hider \"%s\" does not support paralell / network rendering\n",options.hider);
+				contexts[i]					=	new CStochastic();
+				dispatchJob					=	singleThreadedReyes;
+			} else {
+				contexts[i]					=	new CPhotonHider(context->getAttributes(TRUE));
+				dispatchJob					=	singleThreadedPhoton;
+			}
+		} else {
+			error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",options.hider);
+			contexts[i]						=	new CStochastic();
+			dispatchJob						=	singleThreadedReyes;
+		}
+
+		assert(contexts[i] != NULL);
+
+		contexts[i]->updateState();
+	}
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	endFrame
+// Description			:	Finish the frame
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	10/9/2006
+void		CRenderer::endFrame() {
+	
+	// Shutdown the texturing system
+	CBrickMap::brickMapShutdown();
+
+	// Shutdown the brickmaps
+	CTexture::textureShutdown();
+
+	// Shutdown the random number generator
+	randomShutdown();
+
+	// Terminate the displays
+	endDisplays();
+
+	// Delete the job queue
+	if (jobAssignment	!= NULL) {
+		delete [] jobAssignment;
+		jobAssignment	=	NULL;
+	}
+
+	// Reset the dirty shader instances
+	if (dirtyInstances != NULL) {
+		int							numShaderInstances	=	dirtyInstances->numItems;
+		CProgrammableShaderInstance	**instances			=	dirtyInstances->array;
+
+		for (;numShaderInstances>0;numShaderInstances--) {
+			CProgrammableShaderInstance	*dirtyInstance	=	*instances++;
+			int							i;
+
+			for (i=0;i<dirtyInstance->parent->numPLs;i++) {
+				if (dirtyInstance->parameterLists[i] != NULL)	{
+					delete dirtyInstance->parameterLists[i];
+					dirtyInstance->parameterLists[i]	=	NULL;
+				}
+			}
+
+			// The shader is no longer dirty
+			dirtyInstance->dirty	=	FALSE;
+			dirtyInstance->detach();
+		}
+
+		delete dirtyInstances;
+		dirtyInstances	=	NULL;
+	}
+
+	// Reset the dirty attributes
+	if (dirtyAttributes != NULL) {
+		int			numAttributes	=	dirtyAttributes->numItems;
+		CAttributes	**dirty			=	dirtyAttributes->array;
+		CAttributes	*cAttribute;
+
+		for (;numAttributes>0;numAttributes--) {
+			cAttribute				=	*dirty++;
+			cAttribute->globalMap	=	NULL;
+			cAttribute->causticMap	=	NULL;
+			cAttribute->detach();
+		}
+
+		delete dirtyAttributes;
+	}
+
+	// Ditch the remote channels
+	for (int i=0;i<remoteChannels->numItems;i++) {
+		if (remoteChannels->array[i] != NULL) delete remoteChannels->array[i];
+	}
+	delete remoteChannels;
+	delete declaredRemoteChannels;
+	remoteChannels			=	NULL;
+	declaredRemoteChannels	=	NULL;
+
+
+	// Detach from the raytraced objects
+	if (raytraced != NULL) {
+		int			i;
+		CSurface	**surfaces	=	raytraced->array;
+
+		for (i=raytraced->numItems;i>0;i--)	(*surfaces++)->detach();
+
+		delete raytraced;
+		raytraced	=	NULL;
+	}
+
+	// We should not have any dangling raytraced objects
+	assert(tracables == NULL);
+
+	// Ditch the triangle list if it's still around
+	if (triangles != NULL) {
+		delete triangles;
+		triangles	=	NULL;
+	}
+
+	// Ditch the raytracing hierarchy
+	if (hierarchy != NULL) {
+		delete hierarchy;
+		hierarchy	=	NULL;
+	}
+
+	// Release the world
+	world->detach();
+	world		=	NULL;
+
+	// Ditch the frame memory
+	delete frameMemory;
+	frameMemory	=	NULL;
+
+	// Remove end-of-frame temporary files
+	if (frameTemporaryFiles != NULL) {
+		int			i,numTemps	=	frameTemporaryFiles->numItems;
+		const char	**tempFiles	=	frameTemporaryFiles->array;
+		for (i=0;i<numTemps;i++) {
+			int			removeFile	= (*tempFiles)[0];
+			const char	*fileName 	= &(*tempFiles)[1];
+			
+			// Remove file if needed
+			if (removeFile) {
+				if (osFileExists(fileName) == TRUE) {
+					osDeleteFile(fileName);
+				}
+			}
+			
+			// Remove temp file mapping if it exists
+			if (netFileMappings != NULL) {
+				CNetFileMapping* mapping;
+				if (netFileMappings->erase(fileName,mapping) == TRUE) {
+					delete mapping;
+				}
+			}
+			
+			tempFiles++;
+		}
+		frameTemporaryFiles->destroy();
+		frameTemporaryFiles = NULL;
+	}
+
+	// Receive an end of frame confirmation to the server
+	if (netClient != INVALID_SOCKET) {
+		T32		netBuffer;
+
+		// Expect the ready message
+		rcRecv(netClient,(char *) &netBuffer,1*sizeof(T32));
+
+		if (netBuffer.integer == NET_READY) {
+			// We're proceeding to the next frame
+		} else {
+			fatal(CODE_BADTOKEN,"Invalid net command\n");
+		}
+	}
+
+	// Print the stats (before we discard the memory)
+	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;
+
+	// Display the stats if applicable
+	if (options.endofframe > 0)	stats.printStats(options.endofframe);
+}
+
+
+
 
 
 
@@ -607,7 +761,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x,SOCKET s,unsigned int hf
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/9/2006
-void			CRenderer::render(CShadingContext *context,CObject *cObject,const float *bmin,const float *bmax) {
+void			CRenderer::render(CObject *cObject,const float *bmin,const float *bmax) {
 	CAttributes	*cAttributes	=	cObject->attributes;
 
 	// Assign the photon map is necessary
@@ -634,7 +788,9 @@ void			CRenderer::render(CShadingContext *context,CObject *cObject,const float *
 
 	// Tesselate the object if applicable
 	if (cObject->attributes->flags & raytracingFlags) {
-		cObject->tesselate(context);
+
+		// Tesselate the object
+		cObject->tesselate(contexts[0]);
 	}
 }
 
@@ -734,222 +890,40 @@ void		CRenderer::prepareFrame() {
 	tracables	=	NULL;
 }
 
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
-// Method				:	endFrame
-// Description			:	Finish the frame
+// Method				:	renderFrame
+// Description			:	Render the frame
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CRenderer::endFrame() {
-	int			i;
+void		CRenderer::renderFrame() {
+	// Render the frame
+	if (netNumServers != 0) {
 
-	
-	// Print the stats (before we discard the memory)
-	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;
+		// Dispatch the rendering job to the servers
+		clientRenderFrame();
 
-	// Display the stats if applicable
-	if (options.endofframe > 0)	stats.printStats(options.endofframe);
-
-	// Reset the dirty shader instances
-	if (dirtyInstances != NULL) {
-		int							numShaderInstances	=	dirtyInstances->numItems;
-		CProgrammableShaderInstance	**instances			=	dirtyInstances->array;
-
-		for (;numShaderInstances>0;numShaderInstances--) {
-			CProgrammableShaderInstance	*dirtyInstance	=	*instances++;
-			int							i;
-
-			for (i=0;i<dirtyInstance->parent->numPLs;i++) {
-				if (dirtyInstance->parameterLists[i] != NULL)	{
-					delete dirtyInstance->parameterLists[i];
-					dirtyInstance->parameterLists[i]	=	NULL;
-				}
-			}
-
-			// The shader is no longer dirty
-			dirtyInstance->dirty	=	FALSE;
-			dirtyInstance->detach();
-		}
-
-		delete dirtyInstances;
-	}
-
-	// Ditch the remote channels
-	for (int i=0;i<remoteChannels->numItems;i++) {
-		if (remoteChannels->array[i] != NULL) delete remoteChannels->array[i];
-	}
-	delete remoteChannels;
-	delete declaredRemoteChannels;
-
-	// Ditch the loaded files
-	assert(loadedFiles != NULL);
-	loadedFiles->destroy();
-
-	// Ditch the raytraced objects
-	if (raytraced != NULL) {
-		int			i;
-		CSurface	**surfaces	=	raytraced->array;
-
-		for (i=raytraced->numItems;i>0;i--)	(*surfaces++)->detach();
-
-		delete raytraced;
-	}
-
-	assert(tracables == NULL);
-
-	// Ditch the triangle list if it's still around
-	if (triangles != NULL) delete triangles;
-
-	// Ditch the raytracing hierarchy
-	if (hierarchy != NULL) {
-		delete hierarchy;
-	}
-	
-	// Reset the dirty attributes
-	if (dirtyAttributes != NULL) {
-		int			numAttributes	=	dirtyAttributes->numItems;
-		CAttributes	**dirty			=	dirtyAttributes->array;
-		CAttributes	*cAttribute;
-
-		for (;numAttributes>0;numAttributes--) {
-			cAttribute				=	*dirty++;
-			cAttribute->globalMap	=	NULL;
-			cAttribute->causticMap	=	NULL;
-			cAttribute->detach();
-		}
-
-		delete dirtyAttributes;
-	}
-
-	// Close the texturing system
-	CBrickMap::brickMapShutdown();
-	CTexture::textureShutdown();
-	randomShutdown();
-
-
-	// Delete the job queue
-	if (jobAssignment	!= NULL)	delete [] jobAssignment;
-
-	// Finish the out images
-	for (i=0;i<numDisplays;i++) {
-		if (datas[i].module != NULL) {
-			datas[i].finish(datas[i].handle);
-			if (strcmp(datas[i].display->outDevice,RI_SHADOW) == 0) {
-				currentRenderer->RiMakeShadowV(datas[i].displayName,datas[i].displayName,0,NULL,NULL);
-			}
-		}
-		if (datas[i].displayName != NULL) free(datas[i].displayName);
-		delete[] datas[i].channels;
-	}
-
-	if (datas != NULL)			delete[] datas;
-	if (sampleOrder != NULL)	delete[] sampleOrder;
-	if (sampleDefaults != NULL)	delete[] sampleDefaults;
-	
-	if (deepShadowFile != NULL) {
-		fseek(deepShadowFile,deepShadowIndexStart,SEEK_SET);
-		fwrite(deepShadowIndex,sizeof(int),xBuckets*yBuckets*2,deepShadowFile);	// Override the deep shadow map index
-		fclose(deepShadowFile);
-	}
-
-	if (deepShadowIndex != NULL) {
-		delete [] deepShadowIndex;
-		free(deepShadowFileName);
-	}
-
-	// Release the world
-	world->detach();
-
-	// Ditch the frame memory
-	delete frameMemory;
-
-	// Ditch temporary file and net file mappings
-	if (frameTemporaryFiles != NULL) {
-		frameTemporaryFiles->destroy();
-	}
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	advanceBucket
-// Description			:	Advance the bucket for network parallel rendering
-// Return Value			:	TRUE if we're still rendering, FALSE otherwise
-// Comments				:
-// Date last edited		:	7/4/2001
-int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
-
-	nx = xBuckets;
-	ny = yBuckets;
-	
-// Advance bucket indices
-#define	advance(__x,__y)									\
-		__x++;												\
-		if (__x == xBuckets) {								\
-			__x	=	0;										\
-			__y++;											\
-			if (__y == yBuckets)	{						\
-				return FALSE;								\
-			}												\
-		}
-
-// Find the server index assigned to this job
-#define	bucket(__x,__y)		jobAssignment[__y*xBuckets + __x]
-
-	if (jobAssignment == FALSE) {
-		int	i;
-
-		jobAssignment	=	new int[xBuckets*yBuckets];
-
-		// Create the job assignment
-		for (i=0;i<xBuckets*yBuckets;i++)	jobAssignment[i]	=	-1;
-
-	}
-
-	// Are we just starting ?
-	if ((x == -1) || (y == -1)) {
-		x	=	0;			// Begin from the start
-		y	=	0;
 	} else {
-		advance(x,y);		// Advance the bucket by one
-	}
+		const	char	*previousActivity	=	stats.activity;
 	
-	// Scan forward from (cx,cy) to find the first bucket to render
-	while(TRUE) {
+		stats.activity	=	"Rendering";
 
-		// Has the bucket been assigned before ?
-		if (bucket(x,y) == -1) {
-			int	left	=	(x / options.netXBuckets)*options.netXBuckets;
-			int	right	=	min((left + options.netXBuckets),xBuckets);
-			int	top		=	(y / options.netYBuckets)*options.netYBuckets;
-			int	bottom	=	min((top + options.netYBuckets),yBuckets);
-			int	i,j;
+		// Let the client know that we're ready to render
+		if (netClient != INVALID_SOCKET) {
+			T32		netBuffer;
 
-			// The bucket is not assigned ...
-			// Assign the meta block to this processor
-			for (i=left;i<right;i++) {
-				for (j=top;j<bottom;j++) {
-					bucket(i,j)	=	index;
-				}
-			}
-
-			assert(bucket(x,y) == index);
-
-			// We found the job !!!
-			return TRUE;
-		} else if (bucket(x,y) != index) {
-
-			// This bucket has been pre-allocated to another server, skip over
-			advance(x,y);
-		} else {
-
-			// This bucket has been pre-allocated to us, proceed
-			return TRUE;
+			netBuffer.integer	=	NET_READY;
+			rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
 		}
+
+		// Enter the rendering loop
+		contexts[0]->renderingLoop();
+
+		stats.activity	=	previousActivity;
 	}
 }
 
@@ -963,141 +937,6 @@ int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 
 
 
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	inFrustrum
-// Description			:	Check if the given box is inside the viewing frustrum
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/10/2002
-int			CRenderer::inFrustrum(const float *bmin,const float *bmax) {
-	vector	corners[8];
-	int		i;
-
-	initv(corners[0],bmin[COMP_X],bmin[COMP_Y],bmin[COMP_Z]);
-	initv(corners[1],bmin[COMP_X],bmax[COMP_Y],bmin[COMP_Z]);
-	initv(corners[2],bmin[COMP_X],bmax[COMP_Y],bmax[COMP_Z]);
-	initv(corners[3],bmin[COMP_X],bmin[COMP_Y],bmax[COMP_Z]);
-	initv(corners[4],bmax[COMP_X],bmin[COMP_Y],bmin[COMP_Z]);
-	initv(corners[5],bmax[COMP_X],bmax[COMP_Y],bmin[COMP_Z]);
-	initv(corners[6],bmax[COMP_X],bmax[COMP_Y],bmax[COMP_Z]);
-	initv(corners[7],bmax[COMP_X],bmin[COMP_Y],bmax[COMP_Z]);
-
-	// Check against the left bounding plane
-	for (i=0;i<8;i++) {
-		const float	*corner	=	corners[i];
-
-		if ((corner[COMP_X]*leftX + corner[COMP_Z]*leftZ + leftD) > 0) {
-			break;
-		}
-	}
-
-	if (i == 8)	return FALSE;
-
-
-	// Check against the right bounding plane
-	for (i=0;i<8;i++) {
-		const float	*corner	=	corners[i];
-
-		if ((corner[COMP_X]*rightX + corner[COMP_Z]*rightZ + rightD) > 0) {
-			break;
-		}
-	}
-
-	if (i == 8)	return	FALSE;
-
-	// Check against the top bounding plane
-	for (i=0;i<8;i++) {
-		const float	*corner	=	corners[i];
-
-		if ((corner[COMP_Y]*topY + corner[COMP_Z]*topZ + topD) > 0) {
-			break;
-		}
-	}
-
-	if (i == 8)	return	FALSE;
-
-
-	// Check against the bottom bounding plane
-	for (i=0;i<8;i++) {
-		const float	*corner	=	corners[i];
-
-		if ((corner[COMP_Y]*bottomY + corner[COMP_Z]*bottomZ + bottomD) > 0) {
-			break;
-		}
-	}
-
-	if (i == 8)	return	FALSE;
-
-	return	TRUE;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	inFrustrum
-// Description			:	Check if the given box is inside the viewing frustrum
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/10/2002
-int			CRenderer::inFrustrum(const float *P) {
-
-	if ((P[COMP_X]*leftX + P[COMP_Z]*leftZ + leftD) < 0) {
-		return FALSE;
-	}
-
-	if ((P[COMP_X]*rightX + P[COMP_Z]*rightZ + rightD) < 0) {
-		return FALSE;
-	}
-
-	if ((P[COMP_Y]*topY + P[COMP_Z]*topZ + topD) < 0) {
-		return FALSE;
-	}
-
-	if ((P[COMP_Y]*bottomY + P[COMP_Z]*bottomZ + bottomD) < 0) {
-		return FALSE;
-	}
-
-	return	TRUE;
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	clipCode
-// Description			:	Compute the clipping codes for a point
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/10/2002
-unsigned int			CRenderer::clipCode(const float *P) {
-	unsigned int	code	=	0;
-
-	if ((P[COMP_X]*leftX + P[COMP_Z]*leftZ + leftD) < 0) {
-		code	|=	CLIP_LEFT;
-	}
-
-	if ((P[COMP_X]*rightX + P[COMP_Z]*rightZ + rightD) < 0) {
-		code	|=	CLIP_RIGHT;
-	}
-
-	if ((P[COMP_Y]*topY + P[COMP_Z]*topZ + topD) < 0) {
-		code	|=	CLIP_TOP;
-	}
-
-	if ((P[COMP_Y]*bottomY + P[COMP_Z]*bottomZ + bottomD) < 0) {
-		code	|=	CLIP_BOTTOM;
-	}
-
-	if (P[COMP_Z] < options.clipMin)	code	|=	CLIP_NEAR;
-
-	if (P[COMP_Z] > options.clipMax)	code	|=	CLIP_FAR;
-
-	return	code;
-}
 
 
 

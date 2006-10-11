@@ -41,7 +41,7 @@ const	int	yres		=	sampleHeight - 1;
 
 
 #ifdef STOCHASTIC_EXTRA_SAMPLES
-#define	displacement	(10 + numExtraSamples)
+#define	displacement	(10 + CRenderer::numExtraSamples)
 #else
 #define	displacement	10
 #endif
@@ -76,7 +76,7 @@ const	int	yres		=	sampleHeight - 1;
 	const	float	*s0	=	v0+10;													\
 	float			*dest;															\
 																					\
-	for (dest=pixel->extraSamples,currentSample=numExtraSamples;currentSample>0;currentSample--,s0++) {		\
+	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
 		*dest++		=	(s0[0]*(1-jt)+s0[displacement]*jt);							\
 	}																				\
 }
@@ -87,7 +87,7 @@ const	int	yres		=	sampleHeight - 1;
 	const	float	*s0	=	v0+10;													\
 	float			*dest;															\
 																					\
-	for (dest=pixel->extraSamples,currentSample=numExtraSamples;currentSample>0;currentSample--,s0++) {		\
+	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
 		*dest++		=	s0[currentSample];											\
 	}																				\
 }

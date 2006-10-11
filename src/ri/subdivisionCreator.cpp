@@ -42,6 +42,7 @@
 #include "bsplinePatchgrid.h"
 #include "shading.h"
 #include "error.h"
+#include "rendererContext.h"
 #include "pl.h"
 
 

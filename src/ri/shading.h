@@ -188,8 +188,8 @@ public:
 								CShadingContext(unsigned int);
 								~CShadingContext();
 
-		// Right after world end to force rendering of the entire frame
-		virtual	void			renderFrame()											=	0;
+		// This function is called to to render
+		virtual	void			renderingLoop()											=	0;
 
 		// Delayed rendering functions
 		virtual	void			drawObject(CObject *,const float *,const float *)		=	0;

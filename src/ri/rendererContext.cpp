@@ -73,7 +73,7 @@
 #include "implicitSurface.h"
 #include "dlobject.h"
 #include "show.h"
-
+#include "brickmap.h"
 
 
 // Textual definitions of predefined coordinate systems
@@ -155,7 +155,7 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
 	// Initiate the frame
-	CRenderer::beginRenderer(ribFile,riNetString);
+	CRenderer::beginRenderer(this,ribFile,riNetString);
 
 	// Init the graphics state
 	savedXforms						=	new CArray<CXform *>;
@@ -578,11 +578,15 @@ void	CRendererContext::addObject(CObject *o) {
 	// Make sure we don't delete the object
 	o->attach();
 
-	if (renderer != NULL) {
-		// Try to render the object
-		assert(renderer != NULL);
+	// Are we in the world block ?
+	if (CRenderer::world != NULL) {
+		vector	bmin,bmax;
 
-		renderer->render(o);
+		// Bound the object
+		o->bound(bmin,bmax);
+
+		// Render the object
+		CRenderer::render(o,bmin,bmax);
 	}
 
 	// Processing is done
@@ -628,6 +632,13 @@ void	CRendererContext::addInstance(void *d) {
 
 
 
+
+
+static	matrix	identity	=	{	1,	0,	0,	0,
+								0,	1,	0,	0,
+								0,	0,	1,	0,
+								0,	0,	0,	1	};
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	findCoordinateSystem
@@ -640,7 +651,7 @@ int		CRendererContext::findCoordinateSystem(const char *name,matrix *&from,matri
 
 	assert(CRenderer::definedCoordinateSystems	!=	NULL);
 
-	if(definedCoordinateSystems->find(name,currentSystem)) {
+	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
 		from		=	&currentSystem->from;
 		to			=	&currentSystem->to;
 		cSystem		=	currentSystem->systemType;
@@ -682,223 +693,6 @@ int		CRendererContext::findCoordinateSystem(const char *name,matrix *&from,matri
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	dispatcherThread
-// Description			:	This thread is responsible for dispatching needed buckets
-//							the servers
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/28/2001
-static	void		*dispatcherThread(void *w) {
-	currentRenderer->rendererThread(w);
-
-	return NULL;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	rendererThread
-// Description			:	This function actually manages the servers
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-void		CRendererContext::rendererThread(void *w) {
-	int		index			=	(int) w;	// This is the server index, 1 thread for every server
-	int		done			=	FALSE;
-	T32		netBuffer[3];
-	int		x,y,nx,ny;
-
-	// Make sure the server needs all the files it needs
-	while(TRUE) {
-
-		// Expect the ready message
-		rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));
-
-		if (netBuffer[0].integer == NET_READY)	break;
-
-		// Server needs something, process the request
-		processServerRequest(netBuffer[0],index);
-	}
-
-	// At this point, the server should be ready to render...
-
-	// Dispatch buckets
-	x	=	-1;
-	y	=	-1;
-	while(done==FALSE){
-		T32		header[5];
-		float	*buffer;
-
-		// Find the needed bucket
-		osDownMutex(commitMutex);
-
-		// Get the current bucket and advance the bucket
-		if (renderer->advanceBucket(index,x,y,nx,ny) == FALSE) {
-			done	=	TRUE;
-		}
-
-		// Release the bucket
-		osUpMutex(commitMutex);
-
-		if (done == FALSE) {
-
-			// Dispatch the job
-			netBuffer[0].integer	=	NET_RENDER_BUCKET;
-			netBuffer[1].integer	=	x;
-			netBuffer[2].integer	=	y;
-			rcSend(netServers[index],(char *) netBuffer,3*sizeof(T32));
-
-			while(TRUE) {
-				// Expect the ready message
-				rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));
-
-				if (netBuffer[0].integer == NET_READY)	break;
-
-				// Server needs something, process the request
-				processServerRequest(netBuffer[0],index);
-			}
-
-			// Receive the result
-			rcRecv(netServers[index],(char *) &header,5*sizeof(T32));		// Receive the response header
-			rcSend(netServers[index],(char *) &netBuffer,1*sizeof(T32));	// Echo the message back
-
-			buffer					=	new float[header[4].integer];
-																			// Receive the framebuffer
-			rcRecv(netServers[index],(char *) buffer,header[4].integer*sizeof(T32));
-
-			// Commit the bucket
-			osDownMutex(commitMutex);
-			
-			renderer->commit(header[0].integer,header[1].integer,header[2].integer,header[3].integer,buffer);
-			renderer->recvBucketDataChannels(netServers[index],x,y);
-	
-			numNetrenderedBuckets++;
-			stats.progress		=	(numNetrenderedBuckets*100) / (float) (nx*ny);
-			if (renderer->flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
-			
-			osUpMutex(commitMutex);
-
-			delete[] buffer;
-		}
-
-		if(done == TRUE){
-			// We finished rendering this frame
-			// Advance the server to the next frame
-			netBuffer[0].integer	=	NET_FINISH_FRAME;
-			netBuffer[1].integer	=	0;
-			netBuffer[2].integer	=	0;
-			rcSend(netServers[index],(char *) netBuffer,3*sizeof(T32));
-			rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));	// Expect ACK
-			
-			osDownMutex(commitMutex);
-			
-			renderer->recvFrameDataChannels(netServers[index]);
-	
-			stats.progress	=	100;
-			if (renderer->flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
-
-			osUpMutex(commitMutex);
-		}
-	}
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	clientRenderFrame
-// Description			:	We're a client, so spawn a thread to guide each server
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-void		CRendererContext::clientRenderFrame() {
-	int			i;
-	TThread		*threads;
-
-	// Create the mutexes
-	osCreateMutex(commitMutex);
-
-	threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
-
-	// Spawn the threads
-	for (i=0;i<netNumServers;i++) {
-		threads[i]	=	osCreateThread(dispatcherThread,(void *) i);
-	}
-
-	// Go to sleep until we're done
-	for (i=0;i<netNumServers;i++) {
-		osWaitThread(threads[i]);
-	}
-
-	// Ditch the mutexes
-	osDeleteMutex(commitMutex);
-
-	// If restart if necessary
-	numNetrenderedBuckets = 0;
-	for (i=0;i<netNumServers;i++) {
-		T32	netBuffer;
-		netBuffer.integer	=	NET_READY;
-		rcSend(netServers[i],(char *) &netBuffer,sizeof(T32));
-	}
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	processServerRequest
-// Description			:	Process a server request
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/25/2002
-void			CRendererContext::processServerRequest(T32 req,int index) {
-	if (req.integer == NET_SEND_FILE) {
-		// The server is missing a file, so send it over
-		char		*fileName;
-		char		fileLocation[OS_MAX_PATH_LENGTH];
-		int			start,size;
-		int			nameLength;
-		T32			buffer[3];
-		TSearchpath	*search;
-
-		// Receive the length of the fileName
-		rcRecv(netServers[index],(char *) buffer,3*sizeof(T32));
-		start		=	buffer[0].integer;
-		size		=	buffer[1].integer;
-		nameLength	=	buffer[2].integer;
-
-		fileName	=	(char *) alloca(nameLength);
-		rcRecv(netServers[index],(char *) fileName,nameLength,FALSE);
-		
-		// Figure out what type of file it is
-		if (strstr(fileName,".sdr") != NULL)		search	=	currentOptions->shaderPath;
-		else if (strstr(fileName,".dll") != NULL)	search	=	currentOptions->proceduralPath;
-		else if (strstr(fileName,".so") != NULL)	search	=	currentOptions->proceduralPath;
-		else if (strstr(fileName,".rib") != NULL)	search	=	currentOptions->archivePath;
-		else if (strstr(fileName,".tif") != NULL)	search	=	currentOptions->texturePath;
-		else if (strstr(fileName,".tiff") != NULL)	search	=	currentOptions->texturePath;
-		else if (strstr(fileName,".tex") != NULL)	search	=	currentOptions->texturePath;
-		else if (strstr(fileName,".tx") != NULL)	search	=	currentOptions->texturePath;
-		else if (strstr(fileName,".ptc") != NULL)	search	=	currentOptions->texturePath;
-		else if (strstr(fileName,".bm") != NULL)	search	=	currentOptions->texturePath;
-		else										search	=	NULL;
-
-		if (locateFile(fileLocation,fileName,search)) {
-			sendFile(index,fileLocation,start,size);
-		} else {
-			// Unable to find file
-			T32	response;
-
-			response.integer	=	NET_NACK;
-			rcSend(netServers[index],(char *) &response,sizeof(T32));
-		}
-	} else if (req.integer == NET_CREATE_CHANNEL) {
-		// This must be atomic
-		osDownMutex(commitMutex);
-		renderer->processChannelRequest(index,netServers[index]);
-		osUpMutex(commitMutex);
-	} else {
-		error(CODE_BUG,"Unknown server request\n");
-	}
-}
 
 
 
@@ -1033,7 +827,7 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,char *name,
 //	Renderer Interface
 ////////////////////////////////////////////////////////////////////////////////
 void	CRendererContext::RiDeclare(char *name,char *declaration) {
-	declareVariable(name,declaration);
+	CRenderer::declareVariable(name,declaration);
 }
    
 // FrameBegin - End stuff
@@ -1068,38 +862,15 @@ void	CRendererContext::RiWorldBegin(void) {
 	assert(currentOptions	!=	NULL);
 
 	// Init the stats
-	stats.frameStartTime				=	osCPUTime();
 	stats.progress						=	0;
 
-	defineCoordinateSystem(coordinateWorldSystem,currentXform->from,currentXform->to,COORDINATE_WORLD);
+	// Define the world coordinate system
+	CRenderer::defineCoordinateSystem(coordinateWorldSystem,currentXform->from,currentXform->to,COORDINATE_WORLD);
 
-	// Create the renderer
-	if (strcmp(currentOptions->hider,"raytrace") == 0)
-		renderer						=	new CRaytracer(currentOptions,currentXform,netClient);
-	else if (strcmp(currentOptions->hider,"stochastic") == 0)
-		renderer						=	new CStochastic(currentOptions,currentXform,netClient);
-	else if (strcmp(currentOptions->hider,"zbuffer") == 0)
-		renderer						=	new CZbuffer(currentOptions,currentXform,netClient);
-	else if (strncmp(currentOptions->hider,"show:",5) == 0)
-		renderer						=	new CShow(currentOptions,currentXform,netClient);
-	else if (strcmp(currentOptions->hider,"photon") == 0)
-		if ((netClient != INVALID_SOCKET) || (netNumServers > 0)) {
-			error(CODE_LIMIT,"Hider \"%s\" does not support paralell / network rendering\n",currentOptions->hider);
-			renderer					=	new CStochastic(currentOptions,currentXform,netClient);
-		} else {
-			renderer					=	new CPhotonHider(currentOptions,currentXform,netClient,currentAttributes);
-		}
-	else {
-		error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",currentOptions->hider);
-		renderer						=	new CStochastic(currentOptions,currentXform,netClient);
-	}
+	// Start the renderer
+	CRenderer::beginFrame(currentOptions,currentXform);
 
-	renderer->initState(variables,numGlobalVariables);
-	renderer->beginWorld();
-
-	userRaytracing						=	FALSE;
-
-
+	// Update the sequence number
 	stats.runningSequenceNumber++;
 }
 
@@ -1121,66 +892,17 @@ void	CRendererContext::RiWorldEnd(void) {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Do the thing baby
 
-	// If the user is raytracing, then do not render the scene
-	if (userRaytracing == FALSE) {
-		// Prepare the raytracer
-		renderer->endWorld();
 
-		// Render the frame
-		if (netNumServers != 0) {
-			// Dispatch the rendering job to the servers
-			clientRenderFrame();
-		} else {
-			// Just render
-			renderer->renderFrame();
-		}
-	}
+	// Prepare the frame in case we're raytracing
+	CRenderer::prepareFrame();
 
-	delete renderer;
-	renderer		=	NULL;
+	// Render the frame
+	CRenderer::renderFrame();
+
+	// Cleanup the frame
+	CRenderer::endFrame();
 	
-	// remove end-of-frame temporary files
-	if (frameTemporaryFiles != NULL) {
-		int			i,numTemps	=	frameTemporaryFiles->numItems;
-		const char	**tempFiles	=	frameTemporaryFiles->array;
-		for (i=0;i<numTemps;i++) {
-			int			removeFile	= (*tempFiles)[0];
-			const char	*fileName 	= &(*tempFiles)[1];
-			
-			// Remove file if needed
-			if (removeFile) {
-				if (osFileExists(fileName) == TRUE) {
-					osDeleteFile(fileName);
-				}
-			}
-			
-			// Remove temp file mapping if it exists
-			if (netFileMappings != NULL) {
-				CNetFileMapping* mapping;
-				if (netFileMappings->erase(fileName,mapping) == TRUE) {
-					delete mapping;
-				}
-			}
-			
-			tempFiles++;
-		}
-		frameTemporaryFiles->destroy();
-		frameTemporaryFiles = NULL;
-	}
-
-	if (netClient != INVALID_SOCKET) {	// End of frame confirmation
-		T32		netBuffer;
-
-		// Expect the ready message
-		rcRecv(netClient,(char *) &netBuffer,1*sizeof(T32));
-
-		if (netBuffer.integer == NET_READY) {
-			// We're proceeding to the next frame
-		} else {
-			fatal(CODE_BADTOKEN,"Invalid net command\n");
-		}
-	}
-
+	// Restore the graphics state
 	xformEnd();
 	attributeEnd();
 	optionEnd();
@@ -1503,7 +1225,7 @@ void	CRendererContext::RiDisplayV(char *name,char *type,char *mode,int n,char *t
 			CVariable	*cVar;
 			CVariable	tVar;
 
-			cVar						=	retrieveVariable(tokens[i]);
+			cVar						=	CRenderer::retrieveVariable(tokens[i]);
 			if (cVar == NULL)
 				if (parseVariable(&tVar,NULL,tokens[i]) == TRUE) {
 					cVar	=	&tVar;
@@ -1565,14 +1287,14 @@ void	CRendererContext::RiDisplayV(char *name,char *type,char *mode,int n,char *t
 void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void *params[]) {
 	int i,j;
 	
-	CDisplayChannel *nChannel = declareDisplayChannel(channel);
+	CDisplayChannel *nChannel = CRenderer::declareDisplayChannel(channel);
 	
 	if (nChannel != NULL) {
 		for (j=0,i=0;i<n;i++) {
 			CVariable	*cVar;
 			CVariable	tVar;
 
-			cVar						=	retrieveVariable(tokens[i]);
+			cVar						=	CRenderer::retrieveVariable(tokens[i]);
 			if (cVar == NULL)
 				if (parseVariable(&tVar,NULL,tokens[i]) == TRUE) {
 					cVar	=	&tVar;
@@ -1813,7 +1535,7 @@ void	CRendererContext::RiColor(float * Cs) {
 	vector			color;
 	float			*p0,*p1;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	options		=	getOptions(TRUE);
@@ -1843,7 +1565,7 @@ void	CRendererContext::RiOpacity (float * Cs) {
 	vector			color;
 	float			*p0,*p1;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	options		=	getOptions(TRUE);
@@ -1872,7 +1594,7 @@ void	CRendererContext::RiTextureCoordinates(float s1,float t1,float s2,float t2,
 	float		*p0,*p1;
 	float		data[8];
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 
@@ -1944,7 +1666,7 @@ void	*CRendererContext::RiLightSourceV(char *name,int n,char *tokens[],void *par
 	CAttributes			*attributes;
 	CShaderInstance		*cShader;
 
-	if (netNumServers > 0)	return NULL;
+	if (CRenderer::netNumServers > 0)	return NULL;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_LIGHTSOURCE,n,tokens,(void **) params);
@@ -1962,7 +1684,7 @@ void	*CRendererContext::RiAreaLightSourceV(char *name,int n,char *tokens[],void 
 	CAttributes			*attributes;
 	CShaderInstance		*cShader;
 
-	if (netNumServers > 0)	return NULL;
+	if (CRenderer::netNumServers > 0)	return NULL;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_LIGHTSOURCE,n,tokens,(void **) params);
@@ -1981,7 +1703,7 @@ void	CRendererContext::RiIlluminate (void *light,int onoff) {
 	CShaderInstance	*cInstance	=	(CShaderInstance *) light;
 	CAttributes		*attributes;
 
-	if (netNumServers > 0)				return;
+	if (CRenderer::netNumServers > 0)				return;
 	if (cInstance == NULL)	return;
 
 	attributes	=	getAttributes(TRUE);
@@ -1995,7 +1717,7 @@ void	CRendererContext::RiSurfaceV(char *name,int n,char *tokens[],void *params[]
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_SURFACE,n,tokens,(void **) params);
@@ -2010,7 +1732,7 @@ void	CRendererContext::RiAtmosphereV(char *name,int n,char *tokens[],void *param
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,(void **) params);
@@ -2025,7 +1747,7 @@ void	CRendererContext::RiInteriorV(char *name,int n,char *tokens[],void *params[
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,(void **) params);
@@ -2040,7 +1762,7 @@ void	CRendererContext::RiExteriorV (char *name,int n,char *tokens[],void *params
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,(void **) params);
@@ -2054,7 +1776,7 @@ void	CRendererContext::RiExteriorV (char *name,int n,char *tokens[],void *params
 void	CRendererContext::RiShadingRate(float size) {
 	CAttributes			*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	if (size < C_EPSILON) {
 		error(CODE_RANGE,"Invalid shading rate (%f)\n",size);
@@ -2071,7 +1793,7 @@ void	CRendererContext::RiShadingInterpolation(char *type) {
 void	CRendererContext::RiMatte(int onoff) {
 	CAttributes	*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	if (onoff) 
@@ -2086,7 +1808,7 @@ void	CRendererContext::RiBound(float *bound) {
 	CAttributes	*attributes;
 	CXform		*xform;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform							=	getXform(FALSE);
 	attributes						=	getAttributes(TRUE);
@@ -2105,7 +1827,7 @@ void	CRendererContext::RiDetail(float *bound) {
 	CXform		*xform;
 	vector		bmin,bmax;
 	
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform				=	getXform(FALSE);
 	attributes			=	getAttributes(TRUE);
@@ -2125,7 +1847,7 @@ void	CRendererContext::RiDetail(float *bound) {
 void	CRendererContext::RiDetailRange(float minvis,float lowtran,float uptran,float maxvis) {
 	CAttributes	*attributes;
 	
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes				=	getAttributes(TRUE);
 	
@@ -2160,7 +1882,7 @@ void	CRendererContext::RiDetailRange(float minvis,float lowtran,float uptran,flo
 void	CRendererContext::RiGeometricApproximation(char *type,float value) {
 	CAttributes	*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 
@@ -2178,7 +1900,7 @@ void	CRendererContext::RiGeometricApproximation(char *type,float value) {
 }
 
 void	CRendererContext::RiGeometricRepresentation(char *type) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_INCAPABLE,"Arbitrary geometric representation is not implemented (yet).\n");
 
@@ -2188,7 +1910,7 @@ void	CRendererContext::RiGeometricRepresentation(char *type) {
 void	CRendererContext::RiOrientation(char *orientation) {
 	CAttributes	*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 
@@ -2203,7 +1925,7 @@ void	CRendererContext::RiOrientation(char *orientation) {
 void	CRendererContext::RiReverseOrientation(void) {
 	CAttributes	*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes			=	getAttributes(TRUE);
 	attributes->flags	^= ATTRIBUTES_FLAGS_INSIDE;
@@ -2212,7 +1934,7 @@ void	CRendererContext::RiReverseOrientation(void) {
 void	CRendererContext::RiSides(int nsides) {
 	CAttributes	*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	if (!((nsides == 1) || (nsides == 2)))
 		error(CODE_RANGE,"Invalid number of sides (%d).\n",nsides);
@@ -2235,7 +1957,8 @@ void	CRendererContext::RiIdentity(void) {
 	case 1:
 		xform	=	getXform(TRUE);
 
-		if (renderer == NULL) {
+		if (CRenderer::world == NULL) {
+
 			xform->identity();
 
 			if (xform->next != NULL)	{
@@ -2243,12 +1966,11 @@ void	CRendererContext::RiIdentity(void) {
 				xform->next	=	NULL;
 			}
 		} else {
-			CXform	*world	=	renderer->world;
 
-			movmm(xform->from,renderer->world->from);
-			movmm(xform->to,renderer->world->to);
+			movmm(xform->from,CRenderer::world->from);
+			movmm(xform->to,CRenderer::world->to);
 
-			if (world->next == NULL) {
+			if (CRenderer::world->next == NULL) {
 				if (xform->next != NULL)	{
 					delete xform->next;
 					xform->next	=	NULL;
@@ -2257,8 +1979,8 @@ void	CRendererContext::RiIdentity(void) {
 				if (xform->next == NULL)
 					xform->next	=	new CXform(xform);
 
-				movmm(xform->next->from,world->next->from);
-				movmm(xform->next->to,world->next->to);
+				movmm(xform->next->from,CRenderer::world->next->from);
+				movmm(xform->next->to,CRenderer::world->next->to);
 			}
 		}
 
@@ -2278,21 +2000,20 @@ void	CRendererContext::RiIdentity(void) {
 	case 2:
 		xform	=	getXform(TRUE);
 
-		if (renderer == NULL) {
+		if (CRenderer::world == NULL) {
 			xform->identity();
 			if (xform->next != NULL)	{
 				delete xform->next;
 				xform->next	=	NULL;
 			}
 		} else {
-			CXform	*world	=	renderer->world;
 
-			movmm(xform->from,world->from);
-			movmm(xform->to,world->to);
+			movmm(xform->from,CRenderer::world->from);
+			movmm(xform->to,CRenderer::world->to);
 
-			if (world->next == NULL) {
-				movmm(xform->next->from,world->from);
-				movmm(xform->next->to,world->to);
+			if (CRenderer::world->next == NULL) {
+				movmm(xform->next->from,CRenderer::world->from);
+				movmm(xform->next->to,CRenderer::world->to);
 
 				if (xform->next != NULL)	{
 					delete xform->next;
@@ -2301,8 +2022,8 @@ void	CRendererContext::RiIdentity(void) {
 			} else {
 				if (xform->next == NULL)
 					xform->next	=	new CXform(xform);
-				movmm(xform->next->from,world->next->from);
-				movmm(xform->next->to,world->next->to);
+				movmm(xform->next->from,CRenderer::world->next->from);
+				movmm(xform->next->to,CRenderer::world->next->to);
 			}
 		}
 
@@ -2355,7 +2076,7 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 		} else {
 			xform			=	getXform(TRUE);
 
-			if (renderer == NULL) {
+			if (CRenderer::world == NULL) {
 				movmm(xform->from,p0);
 				movmm(xform->to,to0);
 
@@ -2364,10 +2085,10 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 					xform->next	=	NULL;
 				}
 			} else {
-				CXform	*world	=	renderer->world;
+				CXform	*world	=	CRenderer::world;
 
-				mulmm(xform->from,renderer->world->from,p0);
-				mulmm(xform->to,to0,renderer->world->to);
+				mulmm(xform->from,world->from,p0);
+				mulmm(xform->to,to0,world->to);
 
 				if (world->next == NULL) {
 					if (xform->next != NULL)	{
@@ -2403,7 +2124,7 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 		} else {
 			xform			=	getXform(TRUE);
 
-			if (renderer == NULL) {
+			if (CRenderer::world == NULL) {
 				movmm(xform->from,p0);
 				movmm(xform->to,to0);
 				if (xform->next == NULL)	{
@@ -2412,10 +2133,10 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 				movmm(xform->next->from,p1);
 				movmm(xform->next->to,to1);
 			} else {
-				CXform	*world	=	renderer->world;
+				CXform	*world	=	CRenderer::world;
 
-				mulmm(xform->from,renderer->world->from,p0);
-				mulmm(xform->to,to0,renderer->world->to);
+				mulmm(xform->from,CRenderer::world->from,p0);
+				mulmm(xform->to,to0,CRenderer::world->to);
 				if (xform->next == NULL)	{
 					xform->next	=	new CXform(xform);
 				}
@@ -2859,7 +2580,7 @@ void	CRendererContext::RiSkew(float angle,float dx1,float dy1,float dz1,float dx
 }
 
 void	CRendererContext::RiDeformationV(char *name,int n,char *tokens[],void *params[]) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_INCAPABLE,"Atbitrary deformations are not implemented (yet).\n");
 
@@ -2871,7 +2592,7 @@ void	CRendererContext::RiDisplacementV(char *name,int n,char *tokens[],void *par
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 	cShader		=	getShader(name,SL_DISPLACEMENT,n,tokens,(void **) params);
@@ -2887,7 +2608,7 @@ void	CRendererContext::RiCoordinateSystem(char *space) {
 
 	xform	=	getXform(FALSE);
 
-	defineCoordinateSystem(space,xform->from,xform->to);
+	CRenderer::defineCoordinateSystem(space,xform->from,xform->to);
 }
 
 void	CRendererContext::RiCoordSysTransform(char *space) {
@@ -2973,7 +2694,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 	int			i;
 	CAttributes	*attributes;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
 
@@ -3128,7 +2849,7 @@ void	CRendererContext::RiPolygonV(int nvertices,int n,char *tokens[],void *param
 	float			*p0,*p1;
 	CPl				*pl;
 	
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
@@ -3176,7 +2897,7 @@ void	CRendererContext::RiGeneralPolygonV(int nloops,int *nverts,int n,char *toke
 	CPl				*pl;
 	int				i,nvertices;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
@@ -3225,7 +2946,7 @@ void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n
 	CPl				*pl;
 	int				i,nvertices,mvertex;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
@@ -3295,7 +3016,7 @@ void	CRendererContext::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nver
 	int				sverts;				// The size of the verts array
 	int				numVertices;		// The number of vertices
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
@@ -3486,7 +3207,7 @@ void	CRendererContext::RiPatchV (char * type,int n,char *tokens[],void *params[]
 	int				degree;
 	CPl				*pl;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
@@ -3552,7 +3273,7 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 	int				numVertex,numVarying,numUniform;
 	int				degree;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -3675,7 +3396,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 	int				upatches,vpatches;
 	CPl				*pl;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
@@ -3721,7 +3442,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 }
 
 void	CRendererContext::RiTrimCurve (int nloops,int *ncurves,int *order,float *knot,float *amin,float *amax,int *n,float *u,float *v,float *w) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_INCAPABLE,"Trim curves are not implemented yet (yet).\n");
 }
@@ -3735,7 +3456,7 @@ void	CRendererContext::RiCurvesV(char *d,int ncurves,int nverts[], char *w,int n
 	int			degree,wrap;
 	CPl			*pl;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -3839,7 +3560,7 @@ void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetam
 	unsigned int	parametersF;
 	float			tmp;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	xform			=	getXform(FALSE);
@@ -3927,7 +3648,7 @@ void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,c
 	CParameter		*parameters;
 	unsigned int	parametersF;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -3996,7 +3717,7 @@ void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float the
 	CParameter		*parameters;
 	unsigned int	parametersF;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -4066,7 +3787,7 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 	CParameter		*parameters;
 	unsigned int	parametersF;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -4139,7 +3860,7 @@ void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float th
 	CParameter		*parameters;
 	unsigned int	parametersF;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -4211,7 +3932,7 @@ void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,c
 	CParameter		*parameters;
 	unsigned int	parametersF;
 
-	if (netNumServers > 0)			return;
+	if (CRenderer::netNumServers > 0)			return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -4281,7 +4002,7 @@ void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,floa
 	CParameter		*parameters;
 	unsigned int	parametersF;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -4349,7 +4070,7 @@ void	CRendererContext::RiProcedural(void *data,float *bound,void (*subdivfunc) (
 	CAttributes		*attributes;
 	vector			bmin,bmax;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform		=	getXform(FALSE);
 	attributes	=	getAttributes(FALSE);
@@ -4372,7 +4093,7 @@ void	CRendererContext::RiProcedural(void *data,float *bound,void (*subdivfunc) (
 
 
 void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[]) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 		
 	if (strcmp(type,"implicit") == 0) {
 		int				i;
@@ -4410,7 +4131,7 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 		} else {
 			char	location[OS_MAX_PATH_LENGTH];
 
-			if (locateFileEx(location,name,osModuleExtension,currentOptions->proceduralPath)) {
+			if (CRenderer::locateFileEx(location,name,osModuleExtension,currentOptions->proceduralPath)) {
 				CObject	*cObject	=	new CImplicit(getAttributes(FALSE),getXform(FALSE),frame,location,stepSize,scaleFactor);
 
 				addObject(cObject);
@@ -4446,7 +4167,7 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 		} else {
 			char	location[OS_MAX_PATH_LENGTH];
 
-			if (locateFileEx(location,name,osModuleExtension,currentOptions->proceduralPath)) {
+			if (CRenderer::locateFileEx(location,name,osModuleExtension,currentOptions->proceduralPath)) {
 				void	*handle,*data;
 				vector	bmin,bmax;
 
@@ -4495,7 +4216,7 @@ void	CRendererContext::RiPointsV(int npts,int n,char *tokens[],void *params[]) {
 	float		*p0,*p1;
 	CPl			*pl;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
 	
@@ -4540,7 +4261,7 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 	CXform		*xform;
 	float		*p0,*p1;
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	xform		=	getXform(FALSE);
 	attributes	=	getAttributes(FALSE);
@@ -4602,26 +4323,26 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 
 void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]) {
 
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_INCAPABLE,"Blobby primitive is not implemented yet (yet).\n");
 }
 
 
 void	CRendererContext::RiSolidBegin(char *type) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_OPTIONAL,"CSG is not implemented.\n");
 }
 
 void	CRendererContext::RiSolidEnd(void) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 }
 
 void	*CRendererContext::RiObjectBegin (void) {
 	CXform	*xForm;
 
-	if (netNumServers > 0)	return NULL;
+	if (CRenderer::netNumServers > 0)	return NULL;
 
 	// Reset the xform so that all the objects defined relative to the beginning of the block
 	xformBegin();
@@ -4638,7 +4359,7 @@ void	*CRendererContext::RiObjectBegin (void) {
 
 
 void	CRendererContext::RiObjectEnd(void) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	CObject	*cObject;
 
@@ -4654,7 +4375,7 @@ void	CRendererContext::RiObjectEnd(void) {
 
 
 void	CRendererContext::RiObjectInstance(void *handle) {
-	if (netNumServers > 0)	return;
+	if (CRenderer::netNumServers > 0)	return;
 
 	addInstance(handle);
 }
@@ -4679,7 +4400,7 @@ void	CRendererContext::RiMotionEnd(void) {
 void	CRendererContext::RiMakeTextureV(char *pic,char *tex,char *swrap,char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
-	if (netClient != INVALID_SOCKET)	return;
+	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
 	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,(void **) params);
@@ -4688,7 +4409,7 @@ void	CRendererContext::RiMakeTextureV(char *pic,char *tex,char *swrap,char *twra
 void	CRendererContext::RiMakeBumpV(char *pic,char *tex,char *swrap,char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
-	if (netClient != INVALID_SOCKET)	return;
+	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
 	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,(void **) params);
@@ -4697,7 +4418,7 @@ void	CRendererContext::RiMakeBumpV(char *pic,char *tex,char *swrap,char *twrap,f
 void	CRendererContext::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
-	if (netClient != INVALID_SOCKET)	return;
+	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
 	makeCylindericalEnvironment(pic,tex,options->texturePath,RI_PERIODIC,RI_CLAMP,filterfunc,swidth,twidth,n,tokens,(void **) params);
@@ -4706,7 +4427,7 @@ void	CRendererContext::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*fil
 void	CRendererContext::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny, char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
-	if (netClient != INVALID_SOCKET)	return;
+	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
 	makeCubicEnvironment(px,py,pz,nx,ny,nz,tex,RI_CLAMP,RI_CLAMP,options->texturePath,filterfunc,swidth,twidth,n,tokens,(void **) params,FALSE);
@@ -4716,7 +4437,7 @@ void	CRendererContext::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,cha
 void	CRendererContext::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
-	if (netClient != INVALID_SOCKET)	return;
+	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
 	makeSideEnvironment(pic,tex,options->texturePath,RI_CLAMP,RI_CLAMP,RiBoxFilter,1,1,n,tokens,(void **) params,TRUE);
@@ -4725,7 +4446,7 @@ void	CRendererContext::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],vo
 void	CRendererContext::RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
-	if (netClient != INVALID_SOCKET)	return;
+	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
 	makeTexture3D(src,dest,options->texturePath,n,tokens,(void **) params);
@@ -4742,7 +4463,7 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 		COptions	*options	=	getOptions(FALSE);
 
 		// Try locating the file
-		if (locateFile(tmp,filename,options->archivePath)) {
+		if (CRenderer::locateFile(tmp,filename,options->archivePath)) {
 
 			// Success, parse the file
 			ribParse(tmp,callback);
@@ -4752,142 +4473,13 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 	}
 }
 
-void	CRendererContext::RiTrace(int n,float from[][3],float to[][3],float Ci[][3]) {
-	memBegin();
-
-	if (userRaytracing == FALSE) {
-		// Prepare the rendering environment
-		renderer->endWorld();
-
-		// Make sure we mark ourself as raytracing so that sfEnd will not render
-		userRaytracing					=	TRUE;
-	}
-
-	CTraceBundle	bundle;
-	CTraceRay		*rays			=	(CTraceRay *) ralloc(n*sizeof(CTraceRay));
-	CTraceRay		**allRays		=	(CTraceRay **) ralloc(n*sizeof(CTraceRay *));
-	int				i;
-	const float		bias			=	currentAttributes->shadowBias;
-
-	for (i=0;i<n;i++) {
-		CTraceRay	*cRay	=	allRays[i]	=	&rays[i];
-		movvv(cRay->from,from[i]);
-		subvv(cRay->dir,to[i],from[i]);
-		normalizev(cRay->dir);
-		cRay->time			=	urand();
-		cRay->dest			=	Ci[i];
-		cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
-		cRay->tmin			=	bias;
-		cRay->t				=	C_INFINITY;
-		cRay->multiplier	=	1;
-	}
-
-	bundle.rays			=	(CRay **) allRays;
-	bundle.numRays		=	n;
-	bundle.postShader	=	NULL;
-	bundle.last			=	0;
-	bundle.depth		=	0;
-	renderer->trace(&bundle);
-
-	memEnd();
-
-}
-
-void	CRendererContext::RiTrace(int n,float from[][3],float to[][3],float Ci[][3],float t[]) {
-	memBegin();
-
-	if (userRaytracing == FALSE) {
-		// Prepare the rendering environment
-		renderer->endWorld();
-
-		// Make sure we mark ourself as raytracing so that sfEnd will not render
-		userRaytracing					=	TRUE;
-	}
-
-	CTraceExBundle	bundle;
-	CTraceExRay		*rays			=	(CTraceExRay *) ralloc(n*sizeof(CTraceExRay));
-	CTraceExRay		**allRays		=	(CTraceExRay **) ralloc(n*sizeof(CTraceExRay *));
-	int				i;
-	const float		bias			=	currentAttributes->shadowBias;
-
-	for (i=0;i<n;i++) {
-		CTraceExRay	*cRay	=	allRays[i]	=	&rays[i];
-		movvv(cRay->from,from[i]);
-		subvv(cRay->dir,to[i],from[i]);
-		normalizev(cRay->dir);
-		cRay->time			=	urand();
-		cRay->dest			=	Ci[i];
-		cRay->destT			=	&t[i];
-		cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
-		cRay->tmin			=	bias;
-		cRay->t				=	C_INFINITY;
-		cRay->multiplier	=	1;
-	}
-
-	bundle.rays			=	(CRay **) allRays;
-	bundle.numRays		=	n;
-	bundle.postShader	=	NULL;
-	bundle.last			=	0;
-	bundle.depth		=	0;
-	renderer->trace(&bundle);
-
-
-	memEnd();
-
-}
-
-
-void	CRendererContext::RiVisibility(int n,float from[][3],float to[][3],float Oi[][3]) {
-	memBegin();
-
-	if (userRaytracing == FALSE) {
-		// Prepare the rendering environment
-		renderer->endWorld();
-
-		// Make sure we mark ourself as raytracing so that sfEnd will not render
-		userRaytracing					=	TRUE;
-	}
-
-	CTransmissionBundle	bundle;
-	CTransmissionRay	*rays			=	(CTransmissionRay *) ralloc(n*sizeof(CTransmissionRay));
-	CTransmissionRay	**allRays		=	(CTransmissionRay **) ralloc(n*sizeof(CTransmissionRay *));
-	int					i;
-	const float			bias			=	currentAttributes->shadowBias;
-
-	for (i=0;i<n;i++) {
-		CTransmissionRay	*cRay	=	allRays[i]	=	&rays[i];
-		movvv(cRay->from,from[i]);
-		subvv(cRay->dir,to[i],from[i]);
-		cRay->t				=	lengthv(cRay->dir);
-		mulvf(cRay->dir,1/cRay->t);
-		cRay->time			=	urand();
-		cRay->dest			=	Oi[i];
-		cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
-		cRay->tmin			=	bias;
-		cRay->multiplier	=	1;
-	}
-
-	bundle.rays			=	(CRay **) allRays;
-	bundle.numRays		=	n;
-	bundle.postShader	=	NULL;
-	bundle.last			=	0;
-	bundle.depth		=	0;
-	renderer->trace(&bundle);
-
-
-	memEnd();
-}
 
 void	CRendererContext::RiError(int code,int severity,char *mes) {
 	char		tmp[OS_MAX_PATH_LENGTH];
 	CAttributes	*attributes	=	NULL;
 
-	if (renderer != NULL) {
-		if (renderer->currentShadingState != NULL) {
-			if (renderer->currentShadingState->currentObject != NULL) {
-				attributes	=	renderer->currentShadingState->currentObject->attributes;
-			}
-		}
+	if (CRenderer::offendingObject != NULL) {
+		attributes	=	CRenderer::offendingObject->attributes;
 	}
 
 	if (attributes == NULL)	attributes	=	currentAttributes;

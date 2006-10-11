@@ -35,6 +35,7 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
+#include "ri/renderer.h"
 #include "ri/reyes.h"
 
 typedef struct {
@@ -675,7 +676,7 @@ int		precomputeStochasticPrimitivesH() {
 	
 	fprintf(out,"#ifdef DEFINE_STOCHASTIC_SWITCH\n");
 	
-	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | (depthFilter << RASTER_HIGHBITS_SHIFT)) {\n");
+	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | (CRenderer::options.depthFilter << RASTER_HIGHBITS_SHIFT)) {\n");
 	const int caseEnumeration = RASTER_GLOBAL_MASK | (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT);
 	for (i=0;i<=caseEnumeration;i++) {
 		fprintf(out,"case %d:\n",i);
