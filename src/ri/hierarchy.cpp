@@ -816,7 +816,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 	void	*nNode;
 
 	// Should I be an internal node ?
-	if ((cUncomputed->depth < CRenderer::options.maxHierarchyDepth) && (cUncomputed->numItems > CRenderer::options.maxHierarchyLeafObjects)) {
+	if ((cUncomputed->depth < CRenderer::maxHierarchyDepth) && (cUncomputed->numItems > CRenderer::maxHierarchyLeafObjects)) {
 		vector				d;
 		int					i,j,last,k;
 		int					numItems		=	cUncomputed->numItems;
@@ -1542,7 +1542,7 @@ CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const fl
 	root				=	(void *) getToken(hroot,HIERARCHY_UNCOMPUTED_NODE);
 	
 	// Allocate the traversal stack
-	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*CRenderer::options.maxHierarchyDepth*2);
+	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
 	currentRayID		=	0;
 }
 

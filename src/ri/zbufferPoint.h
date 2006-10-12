@@ -63,16 +63,16 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 				float		*sample		=	&fb[y][x*SAMPLES_PER_PIXEL];
 				const float	z			=	vertices[2];
 
-				if (z < sample[0] || (CRenderer::options.flags & RASTER_SHADE_HIDDEN)) {
-					if (z > CRenderer::options.clipMin) {
-						if (CRenderer::options.flags & RASTER_UNSHADED) {
+				if (z < sample[0] || (CRenderer::flags & RASTER_SHADE_HIDDEN)) {
+					if (z > CRenderer::clipMin) {
+						if (CRenderer::flags & RASTER_UNSHADED) {
 							shadeGrid(grid,FALSE);
 							rasterDrawPrimitives(grid);
 							return;
 						}
 
 						sample[0]	=	z;
-						if (CRenderer::options.flags & RASTER_MATTE ) {
+						if (CRenderer::flags & RASTER_MATTE ) {
 							initv(sample,0);
 						} else {
 							sample[1]	=	vertices[3];

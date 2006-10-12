@@ -190,7 +190,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 
 	shouldSplit		=	FALSE;
 	if (bmin[COMP_Z] < C_EPSILON) {
-		if (bmax[COMP_Z] < CRenderer::options.clipMin) {
+		if (bmax[COMP_Z] < CRenderer::clipMin) {
 			numPoints		=	-1;
 		} else if (CRenderer::inFrustrum(bmin,bmax) == FALSE) {
 			// The curve is out of the viewing frustrum
@@ -211,7 +211,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		dy				=	P[6+1] - P[1];
 		j				=	(int) ceil(C_EPSILON + sqrt(dx*dx + dy*dy) / attributes->shadingRate);
 
-		if ((j + 1) < CRenderer::options.maxGridSize) {
+		if ((j + 1) < CRenderer::maxGridSize) {
 			// We can shade this curve
 			numPoints	=	j;
 		} else {

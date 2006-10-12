@@ -91,7 +91,7 @@ CDictionary<const char *,CNamedCoordinateSystem *>	*CRenderer::definedCoordinate
 CDictionary<const char *,CVariable *>				*CRenderer::declaredVariables			=	NULL;
 CDictionary<const char *,CFileResource  *>			*CRenderer::loadedFiles					=	NULL;
 CDictionary<const char *,CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;
-CDictionary<const char *,CRenderer::CNetFileMapping *>	*CRenderer::netFileMappings			=	NULL;
+CDictionary<const char *,CNetFileMapping *>			*CRenderer::netFileMappings				=	NULL;
 int													CRenderer::numKnownGlobalIds			=	0;
 CVariable											*CRenderer::variables					=	NULL;
 CArray<CVariable *>									*CRenderer::globalVariables				=	NULL;
@@ -109,10 +109,72 @@ int													CRenderer::numNetrenderedBuckets		=	0;
 
 
 // Local members (active between RiWorldBegin() - RiWorldEnd())
+
+////////////////////////////////////////////////////////////////////
+// Frame options
+////////////////////////////////////////////////////////////////////
+int				CRenderer::xres,CRenderer::yres;
+int				CRenderer::frame;
+float			CRenderer::pixelAR;
+float			CRenderer::frameAR;
+float			CRenderer::cropLeft,CRenderer::cropRight,CRenderer::cropTop,CRenderer::cropBottom;
+float			CRenderer::screenLeft,CRenderer::screenRight,CRenderer::screenTop,CRenderer::screenBottom;
+float			CRenderer::clipMin,CRenderer::clipMax;
+float			CRenderer::pixelVariance;
+float			CRenderer::jitter;
+char			*CRenderer::hider;
+TSearchpath		*CRenderer::archivePath;
+TSearchpath		*CRenderer::proceduralPath;
+TSearchpath		*CRenderer::texturePath;
+TSearchpath		*CRenderer::shaderPath;
+TSearchpath		*CRenderer::displayPath;
+TSearchpath		*CRenderer::modulePath;
+char			*CRenderer::temporaryPath;
+int				CRenderer::pixelXsamples,CRenderer::pixelYsamples;
+float			CRenderer::gamma,CRenderer::gain;
+float			CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight;
+RtFilterFunc	CRenderer::pixelFilter;
+float			CRenderer::colorQuantizer[5];
+float			CRenderer::depthQuantizer[5];
+COptions::CDisplay		*CRenderer::displays;
+COptions::CClipPlane	*CRenderer::clipPlanes;
+float			CRenderer::relativeDetail;
+EProjectionType	CRenderer::projection;
+float			CRenderer::fov;
+int				CRenderer::nColorComps;
+float			*CRenderer::fromRGB,*CRenderer::toRGB;
+float			CRenderer::fstop,CRenderer::focallength,CRenderer::focaldistance;
+float			CRenderer::shutterOpen,CRenderer::shutterClose;
+unsigned int	CRenderer::flags;
+
+////////////////////////////////////////////////////////////////////
+// Pixie dependent options
+////////////////////////////////////////////////////////////////////
+int				CRenderer::endofframe;
+char			*CRenderer::filelog;
+int				CRenderer::numThreads;
+int				CRenderer::maxTextureSize;
+int				CRenderer::maxBrickSize;
+int				CRenderer::maxShaderCache;
+int				CRenderer::maxGridSize;
+int				CRenderer::maxRayDepth;
+int				CRenderer::maxPhotonDepth;
+int				CRenderer::bucketWidth,CRenderer::bucketHeight;
+int				CRenderer::netXBuckets,CRenderer::netYBuckets;
+int				CRenderer::maxEyeSplits;
+int				CRenderer::maxHierarchyDepth;
+int				CRenderer::maxHierarchyLeafObjects;
+float			CRenderer::tsmThreshold;
+char			*CRenderer::causticIn,*CRenderer::causticOut;
+char			*CRenderer::globalIn,*CRenderer::globalOut;
+char			*CRenderer::volumeIn,*CRenderer::volumeOut;
+int				CRenderer::numEmitPhotons;
+int				CRenderer::shootStep;
+EDepthFilter	CRenderer::depthFilter;
+
 CMemStack											*CRenderer::frameMemory				=	NULL;
 CArray<const char*>									*CRenderer::frameTemporaryFiles		=	NULL;
 CShadingContext										**CRenderer::contexts				=	NULL;
-COptions											CRenderer::options;
 CDictionary<const char *,CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;
 CArray<CRemoteChannel *>							*CRenderer::remoteChannels			=	NULL;
 CArray<CAttributes *>								*CRenderer::dirtyAttributes			=	NULL;
@@ -271,7 +333,89 @@ void		CRenderer::endRenderer() {
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	copyOptions
+// Description			:	Begin a frame / compute misc data
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	10/9/2006
+static void	copyOptions(const COptions *o) {
+	CRenderer::xres					=	o->xres;
+	CRenderer::yres					=	o->yres;
+	CRenderer::frame				=	o->frame;
+	CRenderer::pixelAR				=	o->pixelAR;
+	CRenderer::frameAR				=	o->frameAR;
+	CRenderer::cropLeft				=	o->cropLeft;
+	CRenderer::cropRight			=	o->cropRight;
+	CRenderer::cropTop				=	o->cropTop;
+	CRenderer::cropBottom			=	o->cropBottom;
+	CRenderer::screenLeft			=	o->screenLeft;
+	CRenderer::screenRight			=	o->screenRight;
+	CRenderer::screenTop			=	o->screenTop;
+	CRenderer::screenBottom			=	o->screenBottom;
+	CRenderer::clipMin				=	o->clipMin;
+	CRenderer::clipMax				=	o->clipMax;
+	CRenderer::pixelVariance		=	o->pixelVariance;
+	CRenderer::jitter				=	o->jitter;
+	CRenderer::hider				=	o->hider;
+	CRenderer::archivePath			=	o->archivePath;
+	CRenderer::proceduralPath		=	o->proceduralPath;
+	CRenderer::texturePath			=	o->texturePath;
+	CRenderer::shaderPath			=	o->shaderPath;
+	CRenderer::displayPath			=	o->displayPath;
+	CRenderer::modulePath			=	o->modulePath;
+	CRenderer::temporaryPath		=	o->temporaryPath;
+	CRenderer::pixelXsamples		=	o->pixelXsamples;
+	CRenderer::pixelYsamples		=	o->pixelYsamples;
+	CRenderer::gamma				=	o->gamma;
+	CRenderer::gain					=	o->gain;
+	CRenderer::pixelFilterWidth		=	o->pixelFilterWidth;
+	CRenderer::pixelFilterHeight	=	o->pixelFilterHeight;
+	CRenderer::pixelFilter			=	o->pixelFilter;
+	memcpy(CRenderer::colorQuantizer,o->colorQuantizer,5*sizeof(float));
+	memcpy(CRenderer::depthQuantizer,o->depthQuantizer,5*sizeof(float));
+	CRenderer::displays				=	o->displays;
+	CRenderer::clipPlanes			=	o->clipPlanes;
+	CRenderer::relativeDetail		=	o->relativeDetail;
+	CRenderer::projection			=	o->projection;
+	CRenderer::fov					=	o->fov;
+	CRenderer::nColorComps			=	o->nColorComps;
+	CRenderer::fromRGB				=	o->fromRGB;
+	CRenderer::toRGB				=	o->toRGB;
+	CRenderer::fstop				=	o->fstop;
+	CRenderer::focallength			=	o->focallength;
+	CRenderer::focaldistance		=	o->focaldistance;
+	CRenderer::shutterOpen			=	o->shutterOpen;
+	CRenderer::shutterClose			=	o->shutterClose;
+	CRenderer::flags				=	o->flags;
 
+	CRenderer::endofframe			=	o->endofframe;
+	CRenderer::filelog				=	o->filelog;
+	CRenderer::numThreads			=	o->numThreads;
+	CRenderer::maxTextureSize		=	o->maxTextureSize;
+	CRenderer::maxBrickSize			=	o->maxBrickSize;
+	CRenderer::maxShaderCache		=	o->maxShaderCache;
+	CRenderer::maxGridSize			=	o->maxGridSize;
+	CRenderer::maxRayDepth			=	o->maxRayDepth;
+	CRenderer::maxPhotonDepth		=	o->maxPhotonDepth;
+	CRenderer::bucketWidth			=	o->bucketWidth;
+	CRenderer::bucketHeight			=	o->bucketHeight;
+	CRenderer::netXBuckets			=	o->netXBuckets;
+	CRenderer::netYBuckets			=	o->netYBuckets;
+	CRenderer::maxEyeSplits			=	o->maxEyeSplits;
+	CRenderer::maxHierarchyDepth	=	o->maxHierarchyDepth;
+	CRenderer::maxHierarchyLeafObjects		=	o->maxHierarchyLeafObjects;
+	CRenderer::tsmThreshold			=	o->tsmThreshold;
+	CRenderer::causticIn			=	o->causticIn;
+	CRenderer::causticOut			=	o->causticOut;
+	CRenderer::globalIn				=	o->globalIn;
+	CRenderer::globalOut			=	o->globalOut;
+	CRenderer::volumeIn				=	o->volumeIn;
+	CRenderer::volumeOut			=	o->volumeOut;
+	CRenderer::numEmitPhotons		=	o->numEmitPhotons;
+	CRenderer::shootStep			=	o->shootStep;
+	CRenderer::depthFilter			=	o->depthFilter;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
@@ -285,11 +429,11 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	// Record the frame start time
 	stats.frameStartTime	=	osCPUTime();
 
+	// Make a local copy of the options
+	copyOptions(o);
+
 	// This is the memory we allocate our junk from (only permenant stuff for the entire frame)
 	frameMemory				=	new CMemStack(1 << 20);
-
-	// Save the options
-	options					=	*o;
 
 	// Save the world xform
 	world					=	x;
@@ -297,57 +441,57 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	movmm(fromWorld,x->from);
 	movmm(toWorld,x->to);
 
-	assert(options.pixelXsamples > 0);
-	assert(options.pixelYsamples > 0);
+	assert(pixelXsamples > 0);
+	assert(pixelYsamples > 0);
 
 	// Compute some stuff
-	if (options.flags & OPTIONS_FLAGS_CUSTOM_FRAMEAR) {
-		const float	ar	=	options.xres*options.pixelAR / (float) options.yres;
+	if (flags & OPTIONS_FLAGS_CUSTOM_FRAMEAR) {
+		const float	ar	=	xres*pixelAR / (float) yres;
 
 		// Update the resolution as necessary
-		if (options.frameAR > ar) {
-			options.yres	=	(int) (options.xres*options.pixelAR / options.frameAR);
+		if (frameAR > ar) {
+			yres	=	(int) (xres*pixelAR / frameAR);
 		} else {
-			options.xres	=	(int) (options.frameAR * options.yres / options.pixelAR);
+			xres	=	(int) (frameAR * yres / pixelAR);
 		}
 	} else {
-		options.frameAR = options.xres*options.pixelAR / (float) options.yres;
+		frameAR = xres*pixelAR / (float) yres;
 	}
 
 
-	if (options.flags & OPTIONS_FLAGS_CUSTOM_SCREENWINDOW) {
+	if (flags & OPTIONS_FLAGS_CUSTOM_SCREENWINDOW) {
 		// The user explicitly entered the screen window, so we don't have to make sure it matches the frame aspect ratio
 	} else {
-		if (options.frameAR > (float) 1.0) {
-			options.screenTop			=	(float) 1.0;
-			options.screenBottom		=	(float) -1.0;
-			options.screenLeft			=	-options.frameAR;
-			options.screenRight			=	options.frameAR;
+		if (frameAR > (float) 1.0) {
+			screenTop			=	(float) 1.0;
+			screenBottom		=	(float) -1.0;
+			screenLeft			=	-frameAR;
+			screenRight			=	frameAR;
 		} else {
-			options.screenTop			=	1/options.frameAR;
-			options.screenBottom		=	-1/options.frameAR;
-			options.screenLeft			=	(float) -1.0;
-			options.screenRight			=	(float) 1.0;
+			screenTop			=	1/frameAR;
+			screenBottom		=	-1/frameAR;
+			screenLeft			=	(float) -1.0;
+			screenRight			=	(float) 1.0;
 		}
 	}
 
 	imagePlane		=	1;
-	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		imagePlane	=	(float) (1/tan(radians(options.fov/(float) 2)));
+	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		imagePlane	=	(float) (1/tan(radians(fov/(float) 2)));
 	} else {
 		imagePlane	=	1;
 	}
 
 	invImagePlane	=	1/imagePlane;
 
-	assert(options.cropLeft < options.cropRight);
-	assert(options.cropTop < options.cropBottom);
+	assert(cropLeft < cropRight);
+	assert(cropTop < cropBottom);
 
 	// Rendering window in pixels
-	renderLeft			=	(int) ceil(options.xres*options.cropLeft);
-	renderRight			=	(int) ceil(options.xres*options.cropRight);
-	renderTop			=	(int) ceil(options.yres*options.cropTop);
-	renderBottom		=	(int) ceil(options.yres*options.cropBottom);
+	renderLeft			=	(int) ceil(xres*cropLeft);
+	renderRight			=	(int) ceil(xres*cropRight);
+	renderTop			=	(int) ceil(yres*cropTop);
+	renderBottom		=	(int) ceil(yres*cropBottom);
 
 	assert(renderRight > renderLeft);
 	assert(renderBottom > renderTop);
@@ -359,38 +503,38 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	assert(xPixels >= 0);
 	assert(yPixels >= 0);
 
-	dxdPixel			=	(options.screenRight	- options.screenLeft) / (float) (options.xres);
-	dydPixel			=	(options.screenBottom	- options.screenTop) / (float) (options.yres);
+	dxdPixel			=	(screenRight	- screenLeft) / (float) (xres);
+	dydPixel			=	(screenBottom	- screenTop) / (float) (yres);
 	dPixeldx			=	1	/	dxdPixel;
 	dPixeldy			=	1	/	dydPixel;
-	pixelLeft			=	(float) (options.screenLeft	+ renderLeft*dxdPixel);
-	pixelTop			=	(float) (options.screenTop	+ renderTop*dydPixel);
+	pixelLeft			=	(float) (screenLeft	+ renderLeft*dxdPixel);
+	pixelTop			=	(float) (screenTop	+ renderTop*dydPixel);
 	pixelRight			=	pixelLeft	+ dxdPixel*xPixels;
 	pixelBottom			=	pixelTop	+ dydPixel*yPixels;
 
-	xBuckets			=	(int) ceil(xPixels / (float) options.bucketWidth);
-	yBuckets			=	(int) ceil(yPixels / (float) options.bucketHeight);
+	xBuckets			=	(int) ceil(xPixels / (float) bucketWidth);
+	yBuckets			=	(int) ceil(yPixels / (float) bucketHeight);
 
-	metaXBuckets		=	(int) ceil(xBuckets / (float) options.netXBuckets);
-	metaYBuckets		=	(int) ceil(yBuckets / (float) options.netYBuckets);
+	metaXBuckets		=	(int) ceil(xBuckets / (float) netXBuckets);
+	metaYBuckets		=	(int) ceil(yBuckets / (float) netYBuckets);
 
 	jobAssignment		=	NULL;
 
-	aperture			=	options.focallength / (2*options.fstop);
-	if ((aperture <= C_EPSILON) || (options.projection == OPTIONS_PROJECTION_ORTHOGRAPHIC)) {
+	aperture			=	focallength / (2*fstop);
+	if ((aperture <= C_EPSILON) || (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC)) {
 		aperture			=	0;
 		cocFactorScreen		=	0;
 		cocFactorSamples	=	0;
 		cocFactorPixels		=	0;
 		invFocaldistance	=	0;
 	} else {
-		cocFactorScreen		=	(float) (imagePlane*aperture*options.focaldistance /  (options.focaldistance + aperture));
-		cocFactorSamples	=	cocFactorScreen*sqrtf(dPixeldx*dPixeldx*options.pixelXsamples*options.pixelXsamples + dPixeldy*dPixeldy*options.pixelYsamples*options.pixelYsamples);
+		cocFactorScreen		=	(float) (imagePlane*aperture*focaldistance /  (focaldistance + aperture));
+		cocFactorSamples	=	cocFactorScreen*sqrtf(dPixeldx*dPixeldx*pixelXsamples*pixelXsamples + dPixeldy*dPixeldy*pixelYsamples*pixelYsamples);
 		cocFactorPixels		=	cocFactorScreen*sqrtf(dPixeldx*dPixeldx + dPixeldy*dPixeldy);
-		invFocaldistance	=	1 / options.focaldistance;
+		invFocaldistance	=	1 / focaldistance;
 	}
 
-	if (options.projection == OPTIONS_PROJECTION_ORTHOGRAPHIC) {
+	if (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC) {
 		lengthA			=	0;
 		lengthB			=	sqrtf(dxdPixel*dxdPixel + dydPixel*dydPixel);
 	} else {
@@ -398,19 +542,19 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		lengthB			=	0;
 	}
 
-	if (aperture				!= 0)					options.flags	|=	OPTIONS_FLAGS_FOCALBLUR;
-	if (options.shutterClose	!= options.shutterOpen)	options.flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
+	if (aperture				!= 0)					flags	|=	OPTIONS_FLAGS_FOCALBLUR;
+	if (shutterClose	!= shutterOpen)	flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
 
 	// Compute the matrices related to the camera transformation
-	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		toNDC[element(0,0)]		=	imagePlane / (options.screenRight - options.screenLeft);
+	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		toNDC[element(0,0)]		=	imagePlane / (screenRight - screenLeft);
 		toNDC[element(0,1)]		=	0;
-		toNDC[element(0,2)]		=	-options.screenLeft / (options.screenRight - options.screenLeft);
+		toNDC[element(0,2)]		=	-screenLeft / (screenRight - screenLeft);
 		toNDC[element(0,3)]		=	0;
 
 		toNDC[element(1,0)]		=	0;
-		toNDC[element(1,1)]		=	imagePlane / (options.screenBottom - options.screenTop);
-		toNDC[element(1,2)]		=	-options.screenTop / (options.screenBottom - options.screenTop);
+		toNDC[element(1,1)]		=	imagePlane / (screenBottom - screenTop);
+		toNDC[element(1,2)]		=	-screenTop / (screenBottom - screenTop);
 		toNDC[element(1,3)]		=	0;
 
 		toNDC[element(2,0)]		=	0;
@@ -423,15 +567,15 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		toNDC[element(3,2)]		=	1;
 		toNDC[element(3,3)]		=	0;
 	} else {
-		toNDC[element(0,0)]		=	1 / (options.screenRight - options.screenLeft);
+		toNDC[element(0,0)]		=	1 / (screenRight - screenLeft);
 		toNDC[element(0,1)]		=	0;
 		toNDC[element(0,2)]		=	0;
-		toNDC[element(0,3)]		=	-options.screenLeft / (options.screenRight - options.screenLeft);
+		toNDC[element(0,3)]		=	-screenLeft / (screenRight - screenLeft);
 
 		toNDC[element(1,0)]		=	0;
-		toNDC[element(1,1)]		=	1 / (options.screenBottom - options.screenTop);
+		toNDC[element(1,1)]		=	1 / (screenBottom - screenTop);
 		toNDC[element(1,2)]		=	0;
-		toNDC[element(1,3)]		=	-options.screenTop / (options.screenBottom - options.screenTop);
+		toNDC[element(1,3)]		=	-screenTop / (screenBottom - screenTop);
 
 		toNDC[element(2,0)]		=	0;
 		toNDC[element(2,1)]		=	0;
@@ -445,15 +589,15 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	}
 
 	// The inverse fromNDC is the same for both perspective and orthographic projections
-	fromNDC[element(0,0)]	=	(options.screenRight - options.screenLeft);
+	fromNDC[element(0,0)]	=	(screenRight - screenLeft);
 	fromNDC[element(0,1)]	=	0;
 	fromNDC[element(0,2)]	=	0;
-	fromNDC[element(0,3)]	=	options.screenLeft;
+	fromNDC[element(0,3)]	=	screenLeft;
 
 	fromNDC[element(1,0)]	=	0;
-	fromNDC[element(1,1)]	=	(options.screenBottom - options.screenTop);
+	fromNDC[element(1,1)]	=	(screenBottom - screenTop);
 	fromNDC[element(1,2)]	=	0;
-	fromNDC[element(1,3)]	=	options.screenTop;
+	fromNDC[element(1,3)]	=	screenTop;
 
 	fromNDC[element(1,0)]	=	0;
 	fromNDC[element(1,1)]	=	0;
@@ -470,29 +614,29 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	matrix	mtmp;
 
 	identitym(mtmp);
-	mtmp[element(0,0)]		=	(float) options.xres;
-	mtmp[element(1,1)]		=	(float) options.yres;
+	mtmp[element(0,0)]		=	(float) xres;
+	mtmp[element(1,1)]		=	(float) yres;
 	mulmm(toRaster,mtmp,toNDC);
 
 	identitym(mtmp);
-	mtmp[element(0,0)]		=	1 / (float) options.xres;
-	mtmp[element(1,1)]		=	1 / (float) options.yres;
+	mtmp[element(0,0)]		=	1 / (float) xres;
+	mtmp[element(1,1)]		=	1 / (float) yres;
 	mulmm(fromRaster,fromNDC,mtmp);
 
 	// Compute the world to NDC transform required by the shadow maps
 	mulmm(worldToNDC,toNDC,fromWorld);
 
 
-	if (options.displays == NULL) {
-		options.displays				=	new COptions::CDisplay;
-		options.displays->next			=	NULL;
-		options.displays->outDevice		=	strdup(RI_FILE);
-		options.displays->outName		=	strdup("ri.tif");
-		options.displays->outSamples	=	strdup(RI_RGBA);
+	if (displays == NULL) {
+		displays				=	new COptions::CDisplay;
+		displays->next			=	NULL;
+		displays->outDevice		=	strdup(RI_FILE);
+		displays->outName		=	strdup("ri.tif");
+		displays->outSamples	=	strdup(RI_RGBA);
 	}
 
-	marginalX			=	options.pixelFilterWidth / 2;
-	marginalY			=	options.pixelFilterHeight / 2;
+	marginalX			=	pixelFilterWidth / 2;
+	marginalY			=	pixelFilterHeight / 2;
 	marginX				=	(float) floor(marginalX);
 	marginY				=	(float) floor(marginalY);
 	marginXcoverage		=	max(marginalX - marginX,0);
@@ -532,7 +676,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	remoteChannels			=	new CArray<CRemoteChannel*>;
 	declaredRemoteChannels	=	new CTrie<CRemoteChannel*>;
 
-
 	// Compute the clipping data
 	beginClipping();
 
@@ -540,45 +683,39 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	beginDisplays();
 
 	// Initialize the texturing
-	CTexture::textureInit(options.maxTextureSize);
+	CTexture::textureInit(maxTextureSize);
 
 	// Initialize the brickmaps
-	CBrickMap::brickMapInit(options.maxBrickSize);
+	CBrickMap::brickMapInit(maxBrickSize);
 
 	// Initialize the random number generator for the frame
 	randomInit();
 
 	// Start the contexts
 	int	i;
-	contexts		=	new CShadingContext*[options.numThreads];
-	for (i=0;i<options.numThreads;i++) {
+	contexts		=	new CShadingContext*[numThreads];
+	for (i=0;i<numThreads;i++) {
 
 		// Start the hiders here
 		contexts[i]	=	NULL;
 
-		if (strcmp(options.hider,"raytrace") == 0) {
+		if (strcmp(hider,"raytrace") == 0) {
 			contexts[i]						=	new CRaytracer();
 			dispatchJob						=	dispatchReyes;
-		} else if (strcmp(options.hider,"stochastic") == 0) {
+		} else if (strcmp(hider,"stochastic") == 0) {
 			contexts[i]						=	new CStochastic();
 			dispatchJob						=	dispatchReyes;
-		} else if (strcmp(options.hider,"zbuffer") == 0) {
+		} else if (strcmp(hider,"zbuffer") == 0) {
 			contexts[i]						=	new CZbuffer();
 			dispatchJob						=	dispatchReyes;
-		} else if (strncmp(options.hider,"show:",5) == 0) {
+		} else if (strncmp(hider,"show:",5) == 0) {
 			contexts[i]						=	new CShow();
 			dispatchJob						=	dispatchReyes;
-		} else if (strcmp(options.hider,"photon") == 0) {
-			if ((netClient != INVALID_SOCKET) || (netNumServers > 0)) {
-				error(CODE_LIMIT,"Hider \"%s\" does not support paralell / network rendering\n",options.hider);
-				contexts[i]					=	new CStochastic();
-				dispatchJob					=	dispatchReyes;
-			} else {
-				contexts[i]					=	new CPhotonHider(context->getAttributes(TRUE));
-				dispatchJob					=	dispatchPhoton;
-			}
+		} else if (strcmp(hider,"photon") == 0) {
+			contexts[i]						=	new CPhotonHider(context->getAttributes(TRUE));
+			dispatchJob						=	dispatchPhoton;
 		} else {
-			error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",options.hider);
+			error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",hider);
 			contexts[i]						=	new CStochastic();
 			dispatchJob						=	dispatchReyes;
 		}
@@ -591,6 +728,18 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 
 
 ///////////////////////////////////////////////////////////////////////
+// Function				:	sfClearTemp
+// Description			:	This callback function is used to remove the temporary files
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+static int	rcClearTemp(const char *fileName,void *userData) {
+	osDeleteFile(fileName);
+
+	return TRUE;
+}
+
+///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	endFrame
 // Description			:	Finish the frame
@@ -598,7 +747,12 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 // Comments				:
 // Date last edited		:	10/9/2006
 void		CRenderer::endFrame() {
-	
+	int	i;
+
+	// Delete the contexts
+	for (i=0;i<numThreads;i++)	delete contexts[i];
+	delete [] contexts;
+
 	// Shutdown the texturing system
 	CBrickMap::brickMapShutdown();
 
@@ -702,6 +856,18 @@ void		CRenderer::endFrame() {
 	delete frameMemory;
 	frameMemory	=	NULL;
 
+	// Ditch the temporary files created
+	if (temporaryPath != NULL) {
+		if (osFileExists(temporaryPath)) {
+			char	tmp[OS_MAX_PATH_LENGTH];
+
+			sprintf(tmp,"%s\\*",temporaryPath);
+			osFixSlashes(tmp);
+			osEnumerate(tmp,rcClearTemp,NULL);
+			osDeleteDir(temporaryPath);
+		}
+	}
+
 	// Remove end-of-frame temporary files
 	if (frameTemporaryFiles != NULL) {
 		int			i,numTemps	=	frameTemporaryFiles->numItems;
@@ -749,7 +915,7 @@ void		CRenderer::endFrame() {
 	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;
 
 	// Display the stats if applicable
-	if (options.endofframe > 0)	stats.printStats(options.endofframe);
+	if (endofframe > 0)	stats.printStats(endofframe);
 }
 
 
@@ -882,15 +1048,17 @@ void		CRenderer::addTracable(CMovingTriangle *tracable,CSurface *object) {
 // Date last edited		:	10/9/2006
 void		CRenderer::prepareFrame() {
 
-	if (hierarchy == NULL) {
-		// Init the hierarchy
-		hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax,frameMemory);
-	} else {
-		hierarchy->add(tracables->numItems,tracables->array);
-	}
+	if (tracables != NULL) {
+		if (hierarchy == NULL) {
+			// Init the hierarchy
+			hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax,frameMemory);
+		} else {
+			hierarchy->add(tracables->numItems,tracables->array);
+		}
 
-	delete tracables;
-	tracables	=	NULL;
+		delete tracables;
+		tracables	=	NULL;
+	}
 }
 
 
@@ -904,12 +1072,18 @@ void		CRenderer::prepareFrame() {
 // Comments				:
 // Date last edited		:	10/9/2006
 void		CRenderer::renderFrame() {
+	return;
+
 	// Render the frame
 	if (netNumServers != 0) {
+		const	char	*previousActivity	=	stats.activity;
+	
+		stats.activity	=	"Dispatching";
 
 		// Dispatch the rendering job to the servers
 		clientRenderFrame();
 
+		stats.activity	=	previousActivity;
 	} else {
 		const	char	*previousActivity	=	stats.activity;
 	

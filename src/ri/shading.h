@@ -179,14 +179,14 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CThreadContext
+// Class				:	CShadingContext
 // Description			:	Holds thread specific stuff
 // Comments				:
 // Date last edited		:	10/13/2001
 class	CShadingContext {
 public:
 								CShadingContext(unsigned int);
-								~CShadingContext();
+		virtual					~CShadingContext();
 
 		// This function is called to to render
 		virtual	void			renderingLoop()											=	0;

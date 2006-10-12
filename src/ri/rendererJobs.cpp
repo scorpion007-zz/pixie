@@ -47,7 +47,7 @@ void			(*CRenderer::dispatchJob)(CJob &job)	=	NULL;
 void			CRenderer::beginRendering() {
 	int	i;
 
-	for (i=0;i<options.numThreads;i++) {
+	for (i=0;i<numThreads;i++) {
 		contexts[i]->renderingLoop();
 	}
 }
@@ -179,10 +179,10 @@ int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 
 		// Has the bucket been assigned before ?
 		if (bucket(x,y) == -1) {
-			int	left	=	(x / options.netXBuckets)*options.netXBuckets;
-			int	right	=	min((left + options.netXBuckets),xBuckets);
-			int	top		=	(y / options.netYBuckets)*options.netYBuckets;
-			int	bottom	=	min((top + options.netYBuckets),yBuckets);
+			int	left	=	(x / netXBuckets)*netXBuckets;
+			int	right	=	min((left + netXBuckets),xBuckets);
+			int	top		=	(y / netYBuckets)*netYBuckets;
+			int	bottom	=	min((top + netYBuckets),yBuckets);
 			int	i,j;
 
 			// The bucket is not assigned ...
@@ -304,7 +304,7 @@ void		CRenderer::rendererThread(void *w) {
 	
 			numNetrenderedBuckets++;
 			stats.progress		=	(numNetrenderedBuckets*100) / (float) (nx*ny);
-			if (options.flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
+			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 			
 			osUpMutex(commitMutex);
 
@@ -325,7 +325,7 @@ void		CRenderer::rendererThread(void *w) {
 			recvFrameDataChannels(netServers[index]);
 	
 			stats.progress	=	100;
-			if (options.flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
+			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
 
 			osUpMutex(commitMutex);
 		}
@@ -399,16 +399,16 @@ void			CRenderer::processServerRequest(T32 req,int index) {
 		rcRecv(netServers[index],(char *) fileName,nameLength,FALSE);
 		
 		// Figure out what type of file it is
-		if (strstr(fileName,".sdr") != NULL)		search	=	options.shaderPath;
-		else if (strstr(fileName,".dll") != NULL)	search	=	options.proceduralPath;
-		else if (strstr(fileName,".so") != NULL)	search	=	options.proceduralPath;
-		else if (strstr(fileName,".rib") != NULL)	search	=	options.archivePath;
-		else if (strstr(fileName,".tif") != NULL)	search	=	options.texturePath;
-		else if (strstr(fileName,".tiff") != NULL)	search	=	options.texturePath;
-		else if (strstr(fileName,".tex") != NULL)	search	=	options.texturePath;
-		else if (strstr(fileName,".tx") != NULL)	search	=	options.texturePath;
-		else if (strstr(fileName,".ptc") != NULL)	search	=	options.texturePath;
-		else if (strstr(fileName,".bm") != NULL)	search	=	options.texturePath;
+		if (strstr(fileName,".sdr") != NULL)		search	=	shaderPath;
+		else if (strstr(fileName,".dll") != NULL)	search	=	proceduralPath;
+		else if (strstr(fileName,".so") != NULL)	search	=	proceduralPath;
+		else if (strstr(fileName,".rib") != NULL)	search	=	archivePath;
+		else if (strstr(fileName,".tif") != NULL)	search	=	texturePath;
+		else if (strstr(fileName,".tiff") != NULL)	search	=	texturePath;
+		else if (strstr(fileName,".tex") != NULL)	search	=	texturePath;
+		else if (strstr(fileName,".tx") != NULL)	search	=	texturePath;
+		else if (strstr(fileName,".ptc") != NULL)	search	=	texturePath;
+		else if (strstr(fileName,".bm") != NULL)	search	=	texturePath;
 		else										search	=	NULL;
 
 		if (locateFile(fileLocation,fileName,search)) {

@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	frameFiles.cpp
+//  File				:	rendererFiles.cpp
 //  Classes				:	CRenderer
 //  Description			:
 //
@@ -67,17 +67,6 @@ void		CRenderer::initFiles() {
 	dsos								=	NULL;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	sfClearTemp
-// Description			:	This callback function is used to remove the temporary files
-// Return Value			:
-// Comments				:
-// Date last edited		:	7/4/2001
-static int	rcClearTemp(const char *fileName,void *userData) {
-	osDeleteFile(fileName);
-
-	return TRUE;
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
@@ -98,18 +87,7 @@ void		CRenderer::shutdownFiles() {
 		free(cDso->prototype);
 		delete cDso;
 		cDso	=	nDso;
-	}
-
-
-	// Ditch the temporary files created
-	if (osFileExists(options.temporaryPath)) {
-		char	tmp[OS_MAX_PATH_LENGTH];
-
-		sprintf(tmp,"%s\\*",options.temporaryPath);
-		osFixSlashes(tmp);
-		osEnumerate(tmp,rcClearTemp,NULL);
-		osDeleteDir(options.temporaryPath);
-	}
+	}	
 
 	// Ditch the loaded files
 	assert(loadedFiles != NULL);
@@ -201,7 +179,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 	if (loadedFiles->find(name,tex) == FALSE){
 		// Load the texture
-		tex	=	textureLoad(name,options.texturePath);
+		tex	=	textureLoad(name,texturePath);
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
@@ -227,7 +205,7 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
 	if (loadedFiles->find(name,tex) == FALSE){
-		tex	=	environmentLoad(name,options.texturePath,toWorld);
+		tex	=	environmentLoad(name,texturePath,toWorld);
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
@@ -257,7 +235,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	if (loadedFiles->find(name,map) == FALSE){
 
 		// Locate the file
-		if (locateFile(fileName,name,options.texturePath)) {
+		if (locateFile(fileName,name,texturePath)) {
 			// Try to open the file
 			in		=	ropen(fileName,"rb",filePhotonMap,TRUE);
 		} else {
@@ -309,7 +287,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 		if (flags & CACHE_READ) {
 
 			// Locate the file
-			if (locateFile(fileName,name,options.texturePath)) {
+			if (locateFile(fileName,name,texturePath)) {
 				FILE	*in	=	ropen(fileName,type);
 
 				if (in != NULL) {
@@ -317,7 +295,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 					if ((netClient != INVALID_SOCKET) && (flags & CACHE_WRITE)) {
 						flags			&=	~CACHE_WRITE;		// don't flush cache to disk
 						createChannel	=	TRUE;
-						if (strncmp(fileName,options.temporaryPath,strlen(options.temporaryPath)) == 0) {
+						if (strncmp(fileName,temporaryPath,strlen(temporaryPath)) == 0) {
 							// it's a temp file, delete it after we're done
 							registerFrameTemporary(fileName,TRUE);
 						}
@@ -349,7 +327,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 			}
 			
 			// go ahead and create the cache
-			if (options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
+			if (flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
 				cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
 			} else {
 				cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,NULL);
@@ -366,7 +344,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 				// Prevent crashes caused by unwritable empty cache
 				delete cache;
 				flags |= CACHE_WRITE;
-				osTempname(options.temporaryPath,"rndr",fileName);
+				osTempname(temporaryPath,"rndr",fileName);
 				cache = new CRadianceCache(fileName,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
 			}
 		}
@@ -389,11 +367,11 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 
 	if (loadedFiles->find(name,tex) == FALSE){
 		// try environments first
-		tex	=	environmentLoad(name,options.texturePath,toWorld);
+		tex	=	environmentLoad(name,texturePath,toWorld);
 
 		if (tex == NULL)	{
 			// else try as textures
-			tex	=	textureLoad(name,options.texturePath);
+			tex	=	textureLoad(name,texturePath);
 		}
 
 		if (tex != NULL) {
@@ -454,7 +432,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			
 		} else {
 			// Locate the file
-			if (locateFile(fileName,name,options.texturePath)) {
+			if (locateFile(fileName,name,texturePath)) {
 				// Try to open the file
 				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
 					CXform *dummy = new CXform;
@@ -642,7 +620,7 @@ int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunct
 	userData[4]	=	&cleanup;
 
 	// Go over the directories
-	TSearchpath			*inPath	=	options.proceduralPath;
+	TSearchpath			*inPath	=	proceduralPath;
 	char				searchPath[OS_MAX_PATH_LENGTH];
 	for (;inPath!=NULL;inPath=inPath->next) {
 		sprintf(searchPath,"%s*.%s",inPath->directory,osModuleExtension);

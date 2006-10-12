@@ -115,7 +115,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		addvv(ray->to,ray->from,ray->dir);
 		
 		// Check the ray against the clipping planes
-		for (cPlane=CRenderer::options.clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
+		for (cPlane=CRenderer::clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
 			tt	=	-(dotvv(cPlane->normal,ray->from)+cPlane->d) / dotvv(cPlane->normal,ray->dir);
 
 			if ((tt > 0) && (tt < t))	t	=	tt;
@@ -241,7 +241,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				int	numShading;
 
 				while((numShading = shadingGroups->numRays) > 0) {
-					if (numShading > CRenderer::options.maxGridSize)	numShading	=	CRenderer::options.maxGridSize;
+					if (numShading > CRenderer::maxGridSize)	numShading	=	CRenderer::maxGridSize;
 					
 					// Restore the object pointers in the rays for the bundle code
 					for (i=0;i<numShading;i++) {
@@ -302,7 +302,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 // Comments				:
 // Date last edited		:	8/30/2002
 void	CShadingContext::traceEx(CRayBundle *bundle) {
-	if (currentRayDepth < CRenderer::options.maxRayDepth) {
+	if (currentRayDepth < CRenderer::maxRayDepth) {
 		CShadingState	*savedState		=	currentShadingState;
 		const char		*savedLabel		=	currentRayLabel;
 

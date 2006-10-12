@@ -163,29 +163,29 @@ CReyes::CReyes(unsigned int hf) : CShadingContext(hf) {
 	}
 
 	// The sample offsets
-	xSampleOffset		=	(int) ceil(max(	(CRenderer::options.pixelFilterWidth-1)*CRenderer::options.pixelXsamples  / 2.0 , 0));
-	ySampleOffset		=	(int) ceil(max(	(CRenderer::options.pixelFilterHeight-1)*CRenderer::options.pixelYsamples / 2.0 , 0));
+	xSampleOffset		=	(int) ceil(max(	(CRenderer::pixelFilterWidth-1)*CRenderer::pixelXsamples  / 2.0 , 0));
+	ySampleOffset		=	(int) ceil(max(	(CRenderer::pixelFilterHeight-1)*CRenderer::pixelYsamples / 2.0 , 0));
 
 	// Compute the inv bucket width and height in samples
-	invBucketSampleWidth	=	1 / (float) (CRenderer::options.bucketWidth*CRenderer::options.pixelXsamples);
-	invBucketSampleHeight	=	1 / (float) (CRenderer::options.bucketHeight*CRenderer::options.pixelYsamples);
+	invBucketSampleWidth	=	1 / (float) (CRenderer::bucketWidth*CRenderer::pixelXsamples);
+	invBucketSampleHeight	=	1 / (float) (CRenderer::bucketHeight*CRenderer::pixelYsamples);
 
 	// dSample / dx,dy
-	dSampledx			=	CRenderer::dPixeldx*CRenderer::options.pixelXsamples;
-	dSampledy			=	CRenderer::dPixeldy*CRenderer::options.pixelYsamples;
+	dSampledx			=	CRenderer::dPixeldx*CRenderer::pixelXsamples;
+	dSampledy			=	CRenderer::dPixeldy*CRenderer::pixelYsamples;
 
 	// The clipping region we have
 	sampleClipLeft		=	(float) (															-	xSampleOffset);
-	sampleClipRight		=	(float) (CRenderer::xPixels*CRenderer::options.pixelXsamples		+	xSampleOffset);
+	sampleClipRight		=	(float) (CRenderer::xPixels*CRenderer::pixelXsamples		+	xSampleOffset);
 	sampleClipTop		=	(float) (0															-	ySampleOffset);
-	sampleClipBottom	=	(float) (CRenderer::yPixels*CRenderer::options.pixelYsamples		+	ySampleOffset);
+	sampleClipBottom	=	(float) (CRenderer::yPixels*CRenderer::pixelYsamples		+	ySampleOffset);
 
 	// Init the stats
 	numGrids			=	0;
 	numObjects			=	0;
 
 	// The length of a raster vertex
-	if (CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) {
+	if (CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) {
 		numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
 		enableMotionBlur	=	TRUE;
 	} else {
@@ -252,14 +252,14 @@ void		CReyes::renderingLoop() {
 	CRenderer::CJob	job;
 
 #define computeExtends																\
-	bucketPixelLeft		=	currentXBucket*CRenderer::options.bucketWidth;			\
-	bucketPixelTop		=	currentYBucket*CRenderer::options.bucketHeight;			\
-	bucketPixelWidth	=	min(CRenderer::options.bucketWidth,		CRenderer::xPixels-bucketPixelLeft);	\
-	bucketPixelHeight	=	min(CRenderer::options.bucketHeight,	CRenderer::yPixels-bucketPixelTop);		\
-	tbucketLeft			=	bucketPixelLeft*CRenderer::options.pixelXsamples - xSampleOffset;				\
-	tbucketTop			=	bucketPixelTop*CRenderer::options.pixelYsamples - ySampleOffset;				\
-	tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*CRenderer::options.pixelXsamples - xSampleOffset;	\
-	tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*CRenderer::options.pixelYsamples - ySampleOffset;
+	bucketPixelLeft		=	currentXBucket*CRenderer::bucketWidth;			\
+	bucketPixelTop		=	currentYBucket*CRenderer::bucketHeight;			\
+	bucketPixelWidth	=	min(CRenderer::bucketWidth,		CRenderer::xPixels-bucketPixelLeft);	\
+	bucketPixelHeight	=	min(CRenderer::bucketHeight,	CRenderer::yPixels-bucketPixelTop);		\
+	tbucketLeft			=	bucketPixelLeft*CRenderer::pixelXsamples - xSampleOffset;				\
+	tbucketTop			=	bucketPixelTop*CRenderer::pixelYsamples - ySampleOffset;				\
+	tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*CRenderer::pixelXsamples - xSampleOffset;	\
+	tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*CRenderer::pixelYsamples - ySampleOffset;
 
 	// This is da loop
 	while(TRUE) {
@@ -323,7 +323,7 @@ void	CReyes::render() {
 	memBegin();
 
 	// Allocate the framebuffer area
-	pixelBuffer			=	(float *) ralloc(CRenderer::options.bucketWidth*CRenderer::options.bucketHeight*CRenderer::numSamples*sizeof(float));
+	pixelBuffer			=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float));
 
 	// Initialize the opaque depths
 	maxDepth			=	C_INFINITY;
@@ -345,7 +345,7 @@ void	CReyes::render() {
 	// Process the objects and patches
 	while((cObject = objectQueue.get()) != NULL) {
 
-		if(CRenderer::options.depthFilter != DEPTH_MID) culledDepth = maxDepth;
+		if(CRenderer::depthFilter != DEPTH_MID) culledDepth = maxDepth;
 
 		// Is the object behind the maximum opaque depth ?
 		if (cObject->zmin < culledDepth) {
@@ -498,15 +498,15 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	float				zmin,zmax;
 
 	// Trivial reject
-	if (bmax[COMP_Z] < CRenderer::options.clipMin)	{	return;	}
-	if (bmin[COMP_Z] > CRenderer::options.clipMax)	{	return;	}
+	if (bmax[COMP_Z] < CRenderer::clipMin)	{	return;	}
+	if (bmin[COMP_Z] > CRenderer::clipMax)	{	return;	}
 
 	// Clamp da bounding box
-	zmin	=	max(bmin[COMP_Z],CRenderer::options.clipMin);
-	zmax	=	min(bmax[COMP_Z],CRenderer::options.clipMax);
+	zmin	=	max(bmin[COMP_Z],CRenderer::clipMin);
+	zmax	=	min(bmax[COMP_Z],CRenderer::clipMax);
 
 	// Compute the projected extend of the bound in the pixel space
-	if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		if (zmin < C_EPSILON)	{					// Spanning the eye plane ?
 			if (CRenderer::inFrustrum(bmin,bmax)) {	// Are we in the frustrum ?
 													// If we can not make the perspective divide
@@ -1084,7 +1084,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		vstart		=	grid->vmin;
 		vstep		=	(grid->vmax - vstart) / (float) vdiv;
 
-		assert(numVertices <= (int) CRenderer::options.maxGridSize);
+		assert(numVertices <= (int) CRenderer::maxGridSize);
 
 		// Shade the points in the patch
 		u			=	varying[VARIABLE_U];

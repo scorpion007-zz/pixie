@@ -600,7 +600,7 @@ DEFFUNC(NTransform4		,"ntransform"			,"n=Smn"	,NTRANSFORM4EXPR_PRE,NTRANSFORM4EX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // depth "f=p"
-#define DEPTHEXPR		res->real	=	(op[2].real - CRenderer::options.clipMin) / (CRenderer::options.clipMax - CRenderer::options.clipMin);
+#define DEPTHEXPR		res->real	=	(op[2].real - CRenderer::clipMin) / (CRenderer::clipMax - CRenderer::clipMin);
 
 DEFFUNC(Depth		,"depth"			,"f=p"	,FUN2EXPR_PRE,DEPTHEXPR,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 

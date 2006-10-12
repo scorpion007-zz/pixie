@@ -603,7 +603,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lookup->bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
 								lookup->coneAngle		=	(float) (C_PI/2.0);										\
 								lookup->maxDist			=	C_INFINITY;												\
-								lookup->maxRayDepth		=	CRenderer::options.maxRayDepth;							\
+								lookup->maxRayDepth		=	CRenderer::maxRayDepth;									\
 								lookup->label			=	rayLabelGather;											\
 								lookup->uniformDist		=	FALSE;													\
 								{																					\
@@ -662,12 +662,12 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								for (var=lookup->outputs;var!=NULL;var=var->next) {									\
 									*(var->cDepth++)	=	var->dest;												\
 									operand(var->destIndex,var->dest);												\
-									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::options.maxRayDepth+1));	\
+									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::maxRayDepth+1));		\
 								}																					\
 								for (var=lookup->nonShadeOutputs;var!=NULL;var=var->next) {							\
 									*(var->cDepth++)	=	var->dest;												\
 									operand(var->destIndex,var->dest);												\
-									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::options.maxRayDepth+1));	\
+									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::maxRayDepth+1));		\
 								}																					\
 																													\
 								lastGather							=	new CGatherBundle;							\

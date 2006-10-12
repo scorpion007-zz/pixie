@@ -249,6 +249,7 @@ COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
 	d		=	other->d;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	COptions
@@ -551,7 +552,7 @@ COptions::~COptions(){
 	optionsDeleteSearchPath(shaderPath);
 	optionsDeleteSearchPath(displayPath);
 	optionsDeleteSearchPath(modulePath);
-	free(temporaryPath);
+	if (temporaryPath != NULL)	free(temporaryPath);
 
 	if (causticIn				!= NULL)	free(causticIn);
 	if (causticOut				!= NULL)	free(causticOut);

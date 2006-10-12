@@ -29,7 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include "occlusion.h"
-
+#include "renderer.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
@@ -49,8 +49,6 @@ COcclusionCuller::COcclusionCuller() {
 // Comments				:
 // Date last edited		:	8/25/2002
 COcclusionCuller::~COcclusionCuller() {
-	deleteNode(root);
-	delete [] nodes;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -63,7 +61,7 @@ COcclusionCuller::~COcclusionCuller() {
 void	COcclusionCuller::initCuller(int w,float *ma) {
 	for (depth=0,width=1;width < w;depth++,width=width<<1);
 
-	nodes			=	new COcclusionNode*[width*width];
+	nodes			=	(COcclusionNode **) CRenderer::frameMemory->alloc(width*width*sizeof(COcclusionNode *));
 	root			=	newNode(NULL,width,0,0);
 	maxOpaqueDepth	=	ma;
 }
@@ -125,7 +123,7 @@ void	COcclusionCuller::initToZero() {
 // Comments				:
 // Date last edited		:	8/25/2002
 COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int x,int y) {
-	COcclusionNode	*cNode	=	new COcclusionNode;
+	COcclusionNode	*cNode	=	(COcclusionNode *) CRenderer::frameMemory->alloc(sizeof(COcclusionNode));
 
 	cNode->parent		=	p;
 	cNode->width		=	w;
@@ -145,23 +143,5 @@ COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,in
 	}
 
 	return cNode;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	COcclusionCuller::COcclusionNode
-// Method				:	~COcclusionNode
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/25/2002
-void	COcclusionCuller::deleteNode(COcclusionNode *cNode) {
-	if (cNode->width > 1) {
-		deleteNode(cNode->children[0]);
-		deleteNode(cNode->children[1]);
-		deleteNode(cNode->children[2]);
-		deleteNode(cNode->children[3]);
-	}
-
-	delete cNode;
 }
 

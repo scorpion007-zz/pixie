@@ -55,7 +55,7 @@ void		CRenderer::beginClipping() {
 	// Py*bottomY	+ Pz*bottomZ	+ bottomD	>=	0	&&
 	// Pz >= clipMin									&&
 	// Pz <= clipMax
-	if (options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		leftX			=	imagePlane;
 		leftZ			=	-minX;
 		leftD			=	0;
@@ -212,9 +212,9 @@ unsigned int			CRenderer::clipCode(const float *P) {
 		code	|=	CLIP_BOTTOM;
 	}
 
-	if (P[COMP_Z] < options.clipMin)	code	|=	CLIP_NEAR;
+	if (P[COMP_Z] < clipMin)	code	|=	CLIP_NEAR;
 
-	if (P[COMP_Z] > options.clipMax)	code	|=	CLIP_FAR;
+	if (P[COMP_Z] > clipMax)	code	|=	CLIP_FAR;
 
 	return	code;
 }

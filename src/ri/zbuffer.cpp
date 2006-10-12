@@ -52,8 +52,8 @@
 CZbuffer::CZbuffer() : CReyes(HIDER_RGBAZ_ONLY) , COcclusionCuller() {
 	int	i;
 
-	totalWidth		=	CRenderer::options.bucketWidth*CRenderer::options.pixelXsamples + 2*xSampleOffset;
-	totalHeight		=	CRenderer::options.bucketHeight*CRenderer::options.pixelYsamples + 2*ySampleOffset;
+	totalWidth		=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*xSampleOffset;
+	totalHeight		=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*ySampleOffset;
 	
 
 	// Allocate the framebuffer
@@ -100,8 +100,8 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	height				=	h;
 	left				=	l;
 	top					=	t;
-	sampleWidth			=	width*CRenderer::options.pixelXsamples + 2*xSampleOffset;
-	sampleHeight		=	height*CRenderer::options.pixelYsamples + 2*ySampleOffset;
+	sampleWidth			=	width*CRenderer::pixelXsamples + 2*xSampleOffset;
+	sampleHeight		=	height*CRenderer::pixelYsamples + 2*ySampleOffset;
 	right				=	left + sampleWidth;
 	bottom				=	top + sampleHeight;
 
@@ -109,8 +109,8 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	assert(sampleHeight <= totalHeight);
 
 
-	assert(width <= CRenderer::options.bucketWidth);
-	assert(height <= CRenderer::options.bucketHeight);
+	assert(width <= CRenderer::bucketWidth);
+	assert(height <= CRenderer::bucketHeight);
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);
 
@@ -122,7 +122,7 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 		for (j=0;j<sampleWidth;j++) {
 			COcclusionNode	*cNode;
 
-			cLine[0]	=	CRenderer::options.clipMax;	// z
+			cLine[0]	=	CRenderer::clipMax;	// z
 			cLine[1]	=	0;							// r
 			cLine[2]	=	0;							// g
 			cLine[3]	=	0;							// b
@@ -130,7 +130,7 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 
 			// Set the occlusion cache entry
 			cNode		=	getNode(j,i);
-			cNode->zmax	=	CRenderer::options.clipMax;
+			cNode->zmax	=	CRenderer::clipMax;
 		}
 	}
 	resetHierarchy();
@@ -166,10 +166,10 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			i,y;
 	const int	xres				=	width;
 	const int	yres				=	height;
-	const int	filterWidth			=	CRenderer::options.pixelXsamples + 2*xSampleOffset;
-	const int	filterHeight		=	CRenderer::options.pixelYsamples + 2*ySampleOffset;
-	const float	invPixelXsamples	=	1 / (float) CRenderer::options.pixelXsamples;
-	const float	invPixelYsamples	=	1 / (float) CRenderer::options.pixelYsamples;
+	const int	filterWidth			=	CRenderer::pixelXsamples + 2*xSampleOffset;
+	const int	filterHeight		=	CRenderer::pixelYsamples + 2*ySampleOffset;
+	const float	invPixelXsamples	=	1 / (float) CRenderer::pixelXsamples;
+	const float	invPixelYsamples	=	1 / (float) CRenderer::pixelYsamples;
 	float		*tmp;
 	float		*pixelFilterWeights;
 
@@ -200,7 +200,7 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 			for (sx=0;sx<filterWidth;sx++) {
 				const float	cx								=	(sx - halfFilterWidth + 0.5f)*invPixelXsamples;
 				const float	cy								=	(sy - halfFilterHeight + 0.5f)*invPixelYsamples;
-				float		filterResponse					=	CRenderer::options.pixelFilter(cx,cy,CRenderer::options.pixelFilterWidth,CRenderer::options.pixelFilterHeight);
+				float		filterResponse					=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
 
 				// Account for the partial area out of the bounds
 				//if (fabs(cx) > marginX)	filterResponse		*=	marginXcoverage;
@@ -222,7 +222,7 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	for (y=0;y<yres;y++) {
 		for (sy=0;sy<filterHeight;sy++) {
 			for (sx=0;sx<filterWidth;sx++) {
-				const float	*sampleLine		=	&fb[y*CRenderer::options.pixelYsamples+sy][sx*SAMPLES_PER_PIXEL];
+				const float	*sampleLine		=	&fb[y*CRenderer::pixelYsamples+sy][sx*SAMPLES_PER_PIXEL];
 				float		*pixelLine		=	&fb2[y*xres*5];
 				const float	filterResponse	=	pixelFilterWeights[sy*filterWidth + sx];
 
@@ -230,10 +230,10 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 					pixelLine[0]			+=	filterResponse*sampleLine[1];
 					pixelLine[1]			+=	filterResponse*sampleLine[2];
 					pixelLine[2]			+=	filterResponse*sampleLine[3];
-					pixelLine[3]			+=  filterResponse*((sampleLine[0] != CRenderer::options.clipMax) ? 1.0f : 0.0f);
+					pixelLine[3]			+=  filterResponse*((sampleLine[0] != CRenderer::clipMax) ? 1.0f : 0.0f);
 					pixelLine[4]			+=  filterResponse*sampleLine[0];
 					pixelLine				+=	5;
-					sampleLine				+=	CRenderer::options.pixelXsamples*SAMPLES_PER_PIXEL;
+					sampleLine				+=	CRenderer::pixelXsamples*SAMPLES_PER_PIXEL;
 				}
 			}
 		}

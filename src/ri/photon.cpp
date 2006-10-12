@@ -138,7 +138,7 @@ void		CPhotonHider::renderingLoop(){
 					photonPower								=	1 / (float) emit;
 
 					while(emit > 0) {
-						const int	numVertices					=	min(CRenderer::options.maxGridSize,emit);
+						const int	numVertices					=	min(CRenderer::maxGridSize,emit);
 
 						currentShadingState->numVertices		=	numVertices;
 						currentShadingState->numRealVertices	=	numVertices;
@@ -275,7 +275,7 @@ void		CPhotonHider::solarEnd() {
 		float	*Cl	=	varying[VARIABLE_CL];
 		int		i;
 
-		if (CRenderer::options.flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
+		if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 			vector		T;
 			vector		Ce,Cc;
 			float*		ubasis			=	(float*) RiBSplineBasis;
@@ -441,7 +441,7 @@ void		CPhotonHider::illuminateEnd() {
 		float	*Cl	=	varying[VARIABLE_CL];
 		int		i;
 
-		if (CRenderer::options.flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
+		if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 			vector		Ce,Cc;
 			float*		ubasis			=	(float*) RiBSplineBasis;
 			const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);

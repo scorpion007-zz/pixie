@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	frameDeclerations.cpp
+//  File				:	rendererDeclerations.cpp
 //  Classes				:	CRenderer
 //  Description			:
 //
@@ -34,6 +34,7 @@
 #include "renderer.h"
 #include "rendererContext.h"
 #include "error.h"
+#include "shading.h"
 
 
 
@@ -407,12 +408,20 @@ CVariable		*CRenderer::declareVariable(const char *name,const char *type,int mar
 // Comments				:
 // Date last edited		:	8/25/2002
 void	CRenderer::makeGlobalVariable(CVariable *var) {
+
 	// Did we already start rendering ?
 	var->entry		=	globalVariables->numItems;
 	var->storage	=	STORAGE_GLOBAL;
 	globalVariables->push(var);
 
-	// FIXME: Flush the states for the shading contexts
+	// Flush the states for the shading contexts
+	if (contexts != NULL) {
+		int	i;
+
+		for (i=0;i<numThreads;i++) {
+			contexts[i]->updateState();
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////

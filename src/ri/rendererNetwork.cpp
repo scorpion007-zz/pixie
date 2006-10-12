@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	frameNetwork.cpp
+//  File				:	rendererNetwork.cpp
 //  Classes				:	CRenderer
 //  Description			:
 //
@@ -441,11 +441,11 @@ int			CRenderer::getFile(char *outName,const char *inName) {
 	FILE	*out;
 	int		result	=	FALSE;
 
-	if (!osFileExists(options.temporaryPath)) {
-		osCreateDir(options.temporaryPath);
+	if (!osFileExists(temporaryPath)) {
+		osCreateDir(temporaryPath);
 	}
 
-	osTempname(options.temporaryPath,"rndr",outName);
+	osTempname(temporaryPath,"rndr",outName);
 	CNetFileMapping *mapping = new CNetFileMapping(inName,outName);
 	netFileMappings->insert(mapping->from,mapping);
 

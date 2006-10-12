@@ -233,6 +233,7 @@ void	CStats::printStats(int level) {
 // Comments				:
 // Date last edited		:	8/30/2002
 void	CStats::check() {
+
 	// Sanity check
 	// Make sure we deallocated everything that we allocated
 	assert(numAttributes			==	0);

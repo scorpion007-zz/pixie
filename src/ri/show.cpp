@@ -55,7 +55,7 @@ CShow::CShow() : CShadingContext(HIDER_NODISPLAY) {
 
 	// First, try to load the dynamic library
 	CView::handle	=	NULL;
-	if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::options.modulePath)) {
+	if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::modulePath)) {
 		CView::handle		=	osLoadModule(moduleFile);
 	}
 
@@ -68,7 +68,7 @@ CShow::CShow() : CShadingContext(HIDER_NODISPLAY) {
 		if (visualize != NULL) {
 
 			// Try to load the file
-			const char	*fileName	=	CRenderer::options.hider + 5;
+			const char	*fileName	=	CRenderer::hider + 5;
 			FILE		*in			=	fopen(fileName,"rb");
 
 			CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");

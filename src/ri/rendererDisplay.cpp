@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	frameDisplay.cpp
+//  File				:	rendererDisplay.cpp
 //  Classes				:	CRenderer
 //  Description			:
 //
@@ -68,7 +68,7 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	if (strcmp(name,"quantize") == 0) {
 		if ((numItems == 4) && (type == FLOAT_PARAMETER))	{
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CRenderer::options.colorQuantizer;
+				return	CRenderer::colorQuantizer;
 			} else {
 				return	currentDisplay->quantizer;
 			}
@@ -76,23 +76,23 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	} else if (strcmp(name,"dither") == 0) {
 		if ((numItems == 1) && (type == FLOAT_PARAMETER)) {
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CRenderer::options.colorQuantizer + 4;
+				return	CRenderer::colorQuantizer + 4;
 			} else {
 				return	currentDisplay->quantizer + 4;
 			}
 		}
 	} else if (strcmp(name,"near") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.clipMin;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::clipMin;
 	} else if (strcmp(name,"far") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.clipMax;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::clipMax;
 	} else if (strcmp(name,"Nl") == 0) {
 		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::fromWorld;
 	} else if (strcmp(name,"NP") == 0) {
 		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::worldToNDC;
 	} else if (strcmp(name,"gamma") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.gamma;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::gamma;
 	} else if (strcmp(name,"gain") == 0) {
-		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::options.gain;
+		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::gain;
 	} else if (strcmp(name,"Software") == 0) {
 		if ((numItems == 1) && (type == STRING_PARAMETER))		return	(void *) "Pixie";
 	}
@@ -140,7 +140,7 @@ void	CRenderer::beginDisplays() {
 	}
 
 	// Start a TSM channel if needed
-	if ((netClient != INVALID_SOCKET) && (options.flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)) {
+	if ((netClient != INVALID_SOCKET) && (flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)) {
 		requestRemoteChannel(new CRemoteTSMChannel(deepShadowFileName,deepShadowFile,deepShadowIndex,xBuckets,yBuckets));
 	}
 }
@@ -288,7 +288,7 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	}
 
 	if ((top == 0) && (left == 0)) {
-		if (renderTop > 0)		clear(0,0,options.xres,renderTop);
+		if (renderTop > 0)		clear(0,0,xres,renderTop);
 	}
 
 	if (left == 0) {
@@ -296,11 +296,11 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	}
 
 	if ((left+xpixels) == xPixels) {
-		if (renderRight < options.xres)	clear(renderRight,top+renderTop,options.xres-renderRight,ypixels);
+		if (renderRight < xres)	clear(renderRight,top+renderTop,xres-renderRight,ypixels);
 	}
 
 	if (((top+ypixels) == yPixels) && ((left+xpixels) == xPixels)) {
-		if (renderBottom < options.yres)	clear(0,renderBottom,options.xres,options.yres-renderBottom);
+		if (renderBottom < yres)	clear(0,renderBottom,xres,yres-renderBottom);
 	}
 
 
@@ -341,7 +341,7 @@ void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType)
 
 			switch(*cIn++) {
 			case 'f':
-				sprintf(cOut,widthString,(int) options.frame);
+				sprintf(cOut,widthString,(int) frame);
 				while(*cOut != '\0')	cOut++;
 				break;
 			case 's':
@@ -407,7 +407,7 @@ void	CRenderer::computeDisplayData() {
 	// mark all channels as unallocated
 	resetDisplayChannelUsage();
 	
-	for (i=0,cDisplay=options.displays;cDisplay!=NULL;i++,cDisplay=cDisplay->next);
+	for (i=0,cDisplay=displays;cDisplay!=NULL;i++,cDisplay=cDisplay->next);
 
 	datas					=	new CDisplayData[i];
 	j						=	0;
@@ -420,7 +420,7 @@ void	CRenderer::computeDisplayData() {
 	deepShadowFile			=	NULL;
 	deepShadowIndex			=	NULL;
 
-	for (cDisplay=options.displays;cDisplay!=NULL;cDisplay=cDisplay->next) {
+	for (cDisplay=displays;cDisplay!=NULL;cDisplay=cDisplay->next) {
 		datas[numDisplays].display		=	cDisplay;
 		datas[numDisplays].displayName	=	NULL;
 		datas[numDisplays].numChannels	=	0;
@@ -463,7 +463,7 @@ void	CRenderer::computeDisplayData() {
 				if (oChannel->variable != NULL) {
 					// variable is NULL only for RGBAZ channels
 					if (hiderFlags & HIDER_RGBAZ_ONLY) {
-						error(CODE_BADTOKEN,"Hider %s can not handle display channels\n",options.hider);
+						error(CODE_BADTOKEN,"Hider %s can not handle display channels\n",hider);
 						dspError = TRUE;
 						break;
 					}	
@@ -478,7 +478,7 @@ void	CRenderer::computeDisplayData() {
 				// it's an old-style AOV
 				
 				if (hiderFlags & HIDER_RGBAZ_ONLY) {
-					error(CODE_BADTOKEN,"Hider %s can not handle arbitrary output variables\n",options.hider);
+					error(CODE_BADTOKEN,"Hider %s can not handle arbitrary output variables\n",hider);
 					dspError = TRUE;
 					break;
 				} else {				
@@ -578,22 +578,22 @@ void	CRenderer::computeDisplayData() {
 			datas[numDisplays].handle	=	NULL;
 
 			// Set up the file header
-			header.xres		=	options.xres;
-			header.yres		=	options.yres;
+			header.xres		=	xres;
+			header.yres		=	yres;
 			header.xTiles	=	xBuckets;
 			header.yTiles	=	yBuckets;
-			header.tileSize	=	options.bucketWidth;
-			for (header.tileShift=1;(1 << header.tileShift) < options.bucketWidth;header.tileShift++);
+			header.tileSize	=	bucketWidth;
+			for (header.tileShift=1;(1 << header.tileShift) < bucketWidth;header.tileShift++);
 			movmm(header.toNDC,worldToNDC);
 
 			// The sanity check
-			if ((1 << header.tileShift) != options.bucketWidth) {
-				error(CODE_LIMIT,"Bucket width must be a power of 2 for tsm (%d).\n",options.bucketWidth);
+			if ((1 << header.tileShift) != bucketWidth) {
+				error(CODE_LIMIT,"Bucket width must be a power of 2 for tsm (%d).\n",bucketWidth);
 			} else {
-				if (options.bucketWidth != options.bucketHeight) {
-					error(CODE_LIMIT,"Bucket width and height must be same for tsm (%d,%d).\n",options.bucketWidth,options.bucketHeight);
+				if (bucketWidth != bucketHeight) {
+					error(CODE_LIMIT,"Bucket width and height must be same for tsm (%d,%d).\n",bucketWidth,bucketHeight);
 				} else {
-					if (strcmp(options.hider,"stochastic") != 0) {
+					if (strcmp(hider,"stochastic") != 0) {
 						error(CODE_LIMIT,"Hider must be stochastic / hidden for tsm.\n");
 					} else {
 						if (deepShadowFile != NULL) {
@@ -602,12 +602,12 @@ void	CRenderer::computeDisplayData() {
 							if (netClient != INVALID_SOCKET) {
 								char tempTsmName[OS_MAX_PATH_LENGTH];
 								
-								if (!osFileExists(options.temporaryPath)) {
-									osCreateDir(options.temporaryPath);
+								if (!osFileExists(temporaryPath)) {
+									osCreateDir(temporaryPath);
 								}
 								
 								// need read and write
-								osTempname(options.temporaryPath,"rndr",tempTsmName);
+								osTempname(temporaryPath,"rndr",tempTsmName);
 								deepShadowFile		=	ropen(tempTsmName,"w+b",fileTransparencyShadow);
 								
 								// register temporary for deletion
@@ -618,7 +618,7 @@ void	CRenderer::computeDisplayData() {
 	
 							if (deepShadowFile != NULL) {
 								numActiveDisplays++;
-								options.flags						|=	OPTIONS_FLAGS_DEEP_SHADOW_RENDERING;
+								flags						|=	OPTIONS_FLAGS_DEEP_SHADOW_RENDERING;
 	
 								deepShadowIndex				=	new int[xBuckets*yBuckets*2];
 								deepShadowFileName			=	strdup(displayName);
@@ -637,7 +637,7 @@ void	CRenderer::computeDisplayData() {
 									if (strcmp(cDisplay->parameters[j].name,"threshold") == 0) {
 										float	*val	=	(float *) cDisplay->parameters[j].data;
 	
-										options.tsmThreshold	=	val[0];
+										tsmThreshold	=	val[0];
 									}
 								}
 							}
@@ -646,7 +646,7 @@ void	CRenderer::computeDisplayData() {
 				}
 			}
 		} else if (netClient == INVALID_SOCKET) {
-			if (locateFileEx(deviceFile,outDevice,osModuleExtension,options.displayPath)) {
+			if (locateFileEx(deviceFile,outDevice,osModuleExtension,displayPath)) {
 				datas[numDisplays].module		=	osLoadModule(deviceFile);
 				if (datas[numDisplays].module != NULL) {
 					datas[numDisplays].start		=	(TDisplayStartFunction)		osResolve(datas[numDisplays].module,"displayStart");
@@ -660,7 +660,7 @@ void	CRenderer::computeDisplayData() {
 						datas[numDisplays].module	=	NULL;
 					} else {
 						currentDisplay				=	cDisplay;
-						datas[numDisplays].handle	=	datas[numDisplays].start(displayName,options.xres,options.yres,datas[numDisplays].numSamples,cDisplay->outSamples,findParameter);
+						datas[numDisplays].handle	=	datas[numDisplays].start(displayName,xres,yres,datas[numDisplays].numSamples,cDisplay->outSamples,findParameter);
 							//GSHTODO: above sample names are now quite incorrect
 						if (datas[numDisplays].handle != NULL) {
 							numActiveDisplays++;

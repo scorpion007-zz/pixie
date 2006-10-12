@@ -300,12 +300,12 @@ void	CPrimaryBundle::post() {
 // Comments				:
 // Date last edited		:	8/26/2001
 CRaytracer::CRaytracer()	: CShadingContext(HIDER_NEEDS_RAYTRACING),
-	primaryBundle(CRenderer::options.shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
+	primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
 	
-	const int		xoffset				=	(int) ceil((CRenderer::options.pixelFilterWidth	- 1) / (float) 2);
-	const int		yoffset				=	(int) ceil((CRenderer::options.pixelFilterHeight	- 1) / (float) 2);
-	const int		xpixels				=	CRenderer::options.bucketWidth + 2*xoffset;
-	const int		ypixels				=	CRenderer::options.bucketHeight + 2*yoffset;
+	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	- 1) / (float) 2);
+	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight	- 1) / (float) 2);
+	const int		xpixels				=	CRenderer::bucketWidth + 2*xoffset;
+	const int		ypixels				=	CRenderer::bucketHeight + 2*yoffset;
 	
 	fbContribution						=	new float[xpixels*ypixels];
 	fbPixels							=	new float[xpixels*ypixels*CRenderer::numSamples];
@@ -358,10 +358,10 @@ void	CRaytracer::renderingLoop() {
 			assert(x < CRenderer::xBuckets);
 			assert(y < CRenderer::yBuckets);
 
-			left	=	x*CRenderer::options.bucketWidth;
-			top		=	y*CRenderer::options.bucketHeight;
-			width	=	min(CRenderer::options.bucketWidth,CRenderer::xPixels-left);
-			height	=	min(CRenderer::options.bucketHeight,CRenderer::yPixels-top);
+			left	=	x*CRenderer::bucketWidth;
+			top		=	y*CRenderer::bucketHeight;
+			width	=	min(CRenderer::bucketWidth,CRenderer::xPixels-left);
+			height	=	min(CRenderer::bucketHeight,CRenderer::yPixels-top);
 
 			// Sample the framebuffer
 			sample(left,top,width,height);
@@ -393,15 +393,15 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	int				maxShading			=	primaryBundle.maxPrimaryRays;
 	int				i,j;
 	int				k;
-	const int		xoffset				=	(int) ceil((CRenderer::options.pixelFilterWidth	- 1)*CRenderer::options.pixelXsamples / (float) 2);
-	const int		yoffset				=	(int) ceil((CRenderer::options.pixelFilterHeight	- 1)*CRenderer::options.pixelYsamples / (float) 2);
-	const int		xsamples			=	xpixels*CRenderer::options.pixelXsamples + 2*xoffset;
-	const int		ysamples			=	ypixels*CRenderer::options.pixelYsamples + 2*yoffset;
+	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	- 1)*CRenderer::pixelXsamples / (float) 2);
+	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight	- 1)*CRenderer::pixelYsamples / (float) 2);
+	const int		xsamples			=	xpixels*CRenderer::pixelXsamples + 2*xoffset;
+	const int		ysamples			=	ypixels*CRenderer::pixelYsamples + 2*yoffset;
 	CPrimaryRay		*rays				=	primaryBundle.rayBase;
 	CRay			**rayPointers		=	primaryBundle.rays;
 	CPrimaryRay		*cRay;
-	const float		invXsamples			=	1 / (float) CRenderer::options.pixelXsamples;
-	const float		invYsamples			=	1 / (float) CRenderer::options.pixelYsamples;
+	const float		invXsamples			=	1 / (float) CRenderer::pixelXsamples;
+	const float		invYsamples			=	1 / (float) CRenderer::pixelYsamples;
 
 	// Clear the framebuffer
 	for (i=0;i<(xpixels*ypixels);i++) {
@@ -425,8 +425,8 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 
 				for (y=0;y<my;y++) {
 					for (x=0;x<mx;x++) {
-						cRay->x						=	(float) left + (float) (i+x-xoffset+CRenderer::options.jitter*(urand()-(float) 0.5) + (float) 0.5)*invXsamples;	// Center the sample location in the pixel
-						cRay->y						=	(float) top  + (float) (j+y-yoffset+CRenderer::options.jitter*(urand()-(float) 0.5) + (float) 0.5)*invYsamples;
+						cRay->x						=	(float) left + (float) (i+x-xoffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invXsamples;	// Center the sample location in the pixel
+						cRay->y						=	(float) top  + (float) (j+y-yoffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invYsamples;
 
 						rayPointers[numShading++]	=	cRay;
 						cRay++;
@@ -509,7 +509,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			y					=	cRay->y;
 
 			pixels2camera(from,x,y,0);
-			pixels2camera(to,x,y,CRenderer::options.focaldistance);
+			pixels2camera(to,x,y,CRenderer::focaldistance);
 
 			from[COMP_X]	+=	cosf(theta) * r;
 			from[COMP_Y]	+=	sinf(theta) * r;
@@ -544,8 +544,8 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 // Date last edited		:	9/25/2001
 void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int top,int xpixels,int ypixels) {
 	int				i,j;
-	const int		pw			=	(int) ceil((CRenderer::options.pixelFilterWidth-1) / (float) 2);
-	const int		ph			=	(int) ceil((CRenderer::options.pixelFilterHeight-1) / (float) 2);
+	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1) / (float) 2);
+	const int		ph			=	(int) ceil((CRenderer::pixelFilterHeight-1) / (float) 2);
 
 	for (i=0;i<numShading;i++,samples++) {
 		const float	x			=	samples->x;
@@ -567,7 +567,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 
 		for (cy=pt + (float) 0.5 - y,pixelY=pt;pixelY<=pb;pixelY++,cy++) {
 			for (cx=pl + (float) 0.5 - x,pixelX=pl;pixelX<=pr;pixelX++,cx++) {
-				float	contribution					=	CRenderer::options.pixelFilter(cx,cy,CRenderer::options.pixelFilterWidth,CRenderer::options.pixelFilterHeight);
+				float	contribution					=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
 
 				if (fabs(cx) > CRenderer::marginX)	contribution	*=	CRenderer::marginXcoverage;
 				if (fabs(cy) > CRenderer::marginY)	contribution	*=	CRenderer::marginYcoverage;

@@ -111,7 +111,6 @@ private:
 
 
 	COcclusionNode	*newNode(COcclusionNode *,int,int,int);
-	void			deleteNode(COcclusionNode *);
 };
 
 

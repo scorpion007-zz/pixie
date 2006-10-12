@@ -363,7 +363,7 @@ void	CBilinearPatch::bound(float *bmin,float *bmax) const {
 // Date last edited		:	6/21/2001
 void	CBilinearPatch::tesselate(CShadingContext *context) {
 	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::options.flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
 	else															CRenderer::addTracable(this,this);
 }
 

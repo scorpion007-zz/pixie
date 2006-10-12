@@ -113,7 +113,7 @@ static	int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int 
 	if (nsides == 1  && !disable) {
 		P	-=	k*3;
 
-		if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 			for (i=k;i>0;i--) {
 				if (dotvv(P,N) < 0)	break;
 				N	+=	3;
@@ -190,7 +190,7 @@ void	CPatch::dice(CShadingContext *r) {
 		initv(bmax,-C_INFINITY);
 
 		// Take care of the motion first
-		if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+		if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 			// Compute the sample positions and corresponding normal vectors
 			for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
 				for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
@@ -199,7 +199,7 @@ void	CPatch::dice(CShadingContext *r) {
 					timev[k]	=	1;
 				}
 			}
-			assert(k <= (int) CRenderer::options.maxGridSize);
+			assert(k <= (int) CRenderer::maxGridSize);
 			r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 			
@@ -217,7 +217,7 @@ void	CPatch::dice(CShadingContext *r) {
 				timev[k]	=	0;
 			}
 		}
-		assert(k <= (int) CRenderer::options.maxGridSize);
+		assert(k <= (int) CRenderer::maxGridSize);
 		r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 
@@ -264,13 +264,13 @@ void	CPatch::dice(CShadingContext *r) {
 			camera2pixels(numUprobes*numVprobes,P);
 			
 			// Correct shading rate with dof factor
-			if (CRenderer::options.flags & OPTIONS_FLAGS_FOCALBLUR) {
+			if (CRenderer::flags & OPTIONS_FLAGS_FOCALBLUR) {
 				float coc = minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
 				shadingRate *= max(1,0.5f*coc);
 			}
 			
 			// Optionally correct shading rate with motionfactor
-			if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 
 				camera2pixels(4,(float*)Pmov);
 
@@ -331,7 +331,7 @@ void	CPatch::dice(CShadingContext *r) {
 
 		} else {
 			// Are we making too many splits ?
-			if (depth >= CRenderer::options.maxEyeSplits) {
+			if (depth >= CRenderer::maxEyeSplits) {
 				warning(CODE_SYSTEM,"Too many eye splits for primitive \"%s\"\n",attributes->name);
 				return;
 			}
@@ -346,7 +346,7 @@ void	CPatch::dice(CShadingContext *r) {
 		if (udiv == 0) {
 			// We're spanning the eye plane
 			splitToChildren(r,2);
-		} else if (((udiv+1)*(vdiv+1)) > CRenderer::options.maxGridSize) {
+		} else if (((udiv+1)*(vdiv+1)) > CRenderer::maxGridSize) {
 			// We're too big, split the surface further
 			if (udiv == vdiv) {
 				splitToChildren(r,2);
@@ -460,7 +460,7 @@ void		CPatch::diceNew(CShadingContext *r) {
 		initv(bmax,-C_INFINITY);
 
 		// Take care of the motion
-		if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+		if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 			// Compute the sample positions and corresponding normal vectors
 			uv			=	varying[VARIABLE_U];
 			vv			=	varying[VARIABLE_V];
@@ -579,7 +579,7 @@ int		CPatch::diceStats(CShadingContext *r,float *P,float *N,int udiv,int vdiv,in
 	nvdiv	=	(int) (vAvg*vdiv / (attributes->shadingRate*numV));
 
 	// Are we too big ?
-	if ((nudiv+1)*(nvdiv+1) > CRenderer::options.maxGridSize) {
+	if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize) {
 		// We're too big, decide on the split
 		if (nudiv > nvdiv)	return SPLIT_U;
 		else				return SPLIT_V;

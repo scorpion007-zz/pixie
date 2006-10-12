@@ -25,7 +25,7 @@
 //
 //  File				:	renderer.h
 //  Classes				:	CRenderer
-//  Description			:	This class holds global info about a frame
+//  Description			:	This class holds global info about the renderer
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef FRAME_H
@@ -37,11 +37,12 @@
 #include "options.h"
 #include "shadeop.h"
 
-// Compute the circle of confusion in the camera system
+// Compute the circle of confusion as a function of the depth
 #define	cocPixels(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorPixels
 #define	cocSamples(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorSamples
 #define	cocScreen(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorScreen
 
+// The following bits can be used by the hiders
 const	unsigned	int	HIDER_RGBAZ_ONLY			=	1;	// The hider can only produce RGBAZ channels
 const	unsigned	int	HIDER_NEEDS_RAYTRACING		=	2;	// The hider requires raytracing
 const	unsigned	int	HIDER_BREAK					=	4;	// The hider should stop rendering
@@ -78,16 +79,20 @@ class	CGlobalIdentifier;
 class	CXform;
 class	CDSO;
 class	CRendererContext;
+class	CNetFileMapping;
 
 
 ///////////////////////////////////////////////////////////////////////
 //
 //     The implementation for this class is split into several files:
 //
-//		frame.cpp			- Init / shutdown code
-//		frameDeclerations	- The portion that deals with declerations such as variables/coordinate systems etc.
-//		frameDisplay		- The portion that handles the output
-//		frameFiles			- The portion that manages files and loads stuff
+//		renderer.cpp			- Init / shutdown code
+//		rendererDeclerations	- The portion that deals with declerations such as variables/coordinate systems etc.
+//		rendererDisplay			- The portion that handles the output
+//		rendererFiles			- The portion that manages files and loads stuff
+//		rendererNetwork			- The portion that manages the network
+//		rendererClipping		- The portion that handles the clipping
+//		rendererJob				- The portion that dispatches the rendering jobs to threads
 //
 ///////////////////////////////////////////////////////////////////////
 
@@ -97,32 +102,7 @@ class	CRendererContext;
 // Comments				:	This class is invalid outside beginFrame / endFrame
 // Date last edited		:	10/10/2006
 class CRenderer {
-
-		///////////////////////////////////////////////////////////////////////
-		// Class				:	CNetFileMapping
-		// Description			:	Maps files to alternate paths
-		// Comments				:
-		// Date last edited		:	02/25/2006
-		class CNetFileMapping{
-		public:
-
-			CNetFileMapping(const char *from,const char *to) {
-				this->from	= strdup(from);
-				this->to	= strdup(to);
-			}
-
-			~CNetFileMapping() {
-				free(from);
-				free(to);
-			}
-			
-			char *from,*to;
-		};
-
 public:
-		
-
-
 
 		////////////////////////////////////////////////////////////////////
 		//
@@ -138,11 +118,11 @@ public:
 								
 		////////////////////////////////////////////////////////////////////
 		//
-		// Some global data structures that hand around between beginRenderer and endRenderer
+		// Some global data structures that hang around between beginRenderer and endRenderer
 		//
 		////////////////////////////////////////////////////////////////////
 		static	CRendererContext									*context;					// The renderer context (RenderMan Interface)
-		static	CArray<CShaderInstance *>							*allLights;					// An array of all allocated lights in the options context
+		static	CArray<CShaderInstance *>							*allLights;					// An array of all allocated lights
 		static	CDictionary<const char *,CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
 		static	CDictionary<const char *,CVariable *>				*declaredVariables;			// Declared variables
 		static	CDictionary<const char *,CFileResource  *>			*loadedFiles;				// Files that have been loaded
@@ -161,6 +141,7 @@ public:
 		static	TMutex												commitMutex;				// The mutex that controls job dispatch
 		static	int													userRaytracing;				// TRUE if we're raytracing for the user
 		static	int													numNetrenderedBuckets;		// The number of netrendered buckets
+
 
 
 
@@ -325,10 +306,71 @@ public:
 		////////////////////////////////////////////////////////////////////
 		// The memory we use for the frame
 		////////////////////////////////////////////////////////////////////
+		static	int				xres,yres;										// Output resolution
+		static	int				frame;											// The frame number given by frameBegin
+		static	float			pixelAR;										// Pixel aspect ratio
+		static	float			frameAR;										// Frame aspect ratio
+		static	float			cropLeft,cropRight,cropTop,cropBottom;			// The crop window
+		static	float			screenLeft,screenRight,screenTop,screenBottom;	// The screen window
+		static	float			clipMin,clipMax;								// Clipping bounds
+		static	float			pixelVariance;									// The maximum tolerable pixel color variation
+		static	float			jitter;											// Amount of jitter in samples
+		static	char			*hider;											// Hider name
+		static	TSearchpath		*archivePath;									// RIB search path
+		static	TSearchpath		*proceduralPath;								// Procedural primitive search path
+		static	TSearchpath		*texturePath;									// Texture search path
+		static	TSearchpath		*shaderPath;									// Shader search path
+		static	TSearchpath		*displayPath;									// Display search path
+		static	TSearchpath		*modulePath;									// Search path for Pixie modules
+		static	char			*temporaryPath;									// Where tmp files are stored
+		static	int				pixelXsamples,pixelYsamples;					// Number of samples to take in X and Y
+		static	float			gamma,gain;										// Gamma correction stuff
+		static	float			pixelFilterWidth,pixelFilterHeight;				// Pixel filter data
+		static	RtFilterFunc	pixelFilter;
+		static	float			colorQuantizer[5];								// The quantization data
+		static	float			depthQuantizer[5];
+		static	COptions::CDisplay		*displays;										// List of displays to send the output
+		static	COptions::CClipPlane	*clipPlanes;									// List of used defined clipping planes
+		static	float			relativeDetail;									// The relative detail multiplier
+		static	EProjectionType	projection;										// Projection type
+		static	float			fov;											// Field of view for perspective projection
+		static	int				nColorComps;									// Custom color space stuff
+		static	float			*fromRGB,*toRGB;
+		static	float			fstop,focallength,focaldistance;				// Depth of field stuff
+		static	float			shutterOpen,shutterClose;						// Motion blur stuff
+		static	unsigned int	flags;											// Flags	
+
+		////////////////////////////////////////////////////////////////////
+		// Pixie dependent options
+		////////////////////////////////////////////////////////////////////
+		static	int				endofframe;										// The end of frame statstics number
+		static	char			*filelog;										// The name of the log file
+		static	int				numThreads;										// The number of threads working
+		static	int				maxTextureSize;									// Maximum amount of texture data to keep in memory (in bytes)
+		static	int				maxBrickSize;									// Maximum amount of brick data to keep in memory (in bytes)
+		static	int				maxShaderCache;									// The maximum shader cache amount
+		static	int				maxGridSize;									// Maximum number of points to shade at a time
+		static	int				maxRayDepth;									// Maximum raytracing recursion depth
+		static	int				maxPhotonDepth;									// The maximum number of photon bounces
+		static	int				bucketWidth,bucketHeight;						// Bucket dimentions in samples
+		static	int				netXBuckets,netYBuckets;						// The meta bucket size
+		static	int				maxEyeSplits;									// Maximum number of eye splits
+																				// The number of times the bucket will be rendered
+		static	int				maxHierarchyDepth;								// The maximum depth of the hierarchy
+		static	int				maxHierarchyLeafObjects;						// The maximum number of objects for a leaf
+		static	float			tsmThreshold;									// Transparency shadow map threshold
+		static	char			*causticIn,*causticOut;							// The caustics in/out file name
+		static	char			*globalIn,*globalOut;							// The global photon map 
+		static	char			*volumeIn,*volumeOut;							// The volume photon map 
+		static	int				numEmitPhotons;									// The number of photons to emit for the scene
+		static	int				shootStep;										// The number of rays to shoot at a time
+		static	EDepthFilter	depthFilter;									// Holds the depth filter type
+
+
+
 		static	CMemStack					*frameMemory;
 		static	CArray<const char*>			*frameTemporaryFiles;	// This hold the name of temporary files
 		static	CShadingContext				**contexts;				// The array of shading contexts
-		static	COptions					options;				// The options
 		static	CDictionary<const char *,CRemoteChannel *>		*declaredRemoteChannels;	// Known remote channel lookup
 		static	CArray<CRemoteChannel *>	*remoteChannels;		// all known channels
 		static	CArray<CAttributes *>		*dirtyAttributes;		// The list of attributes that need to be cleaned after the rendering
@@ -439,7 +481,7 @@ void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
 inline void		camera2pixels(float *P) {
-	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		P[COMP_X]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
 		P[COMP_Y]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
 	}
@@ -455,7 +497,7 @@ inline void		camera2pixels(float *P) {
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
 inline void		camera2pixels(float *x,float *y,const float *P) {
-	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		x[0]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
 		y[0]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
 	} else {
@@ -474,7 +516,7 @@ inline void		camera2pixels(float *x,float *y,const float *P) {
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
 inline void		camera2pixels(int n,float *P) {
-	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
 			P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
 			P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop)*CRenderer::dPixeldy;
@@ -494,7 +536,7 @@ inline void		camera2pixels(int n,float *P) {
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
 inline void		camera2screen(int n,float *P) {
-	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
 			P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft);
 			P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop);
@@ -514,7 +556,7 @@ inline void		camera2screen(int n,float *P) {
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
 inline void		distance2pixels(int n,float *dist,float *P) {
-	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
 			*dist++		=	CRenderer::dPixeldx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
 		}
@@ -547,7 +589,7 @@ inline void		pixels2camera(float *P,float x,float y,float z) {
 	x	=	x*CRenderer::dxdPixel + CRenderer::pixelLeft;
 	y	=	y*CRenderer::dydPixel + CRenderer::pixelTop;
 
-	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		P[COMP_X]	=	x*z*CRenderer::invImagePlane;
 		P[COMP_Y]	=	y*z*CRenderer::invImagePlane;
 		P[COMP_Z]	=	z;
@@ -626,7 +668,26 @@ public:
 };
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CNetFileMapping
+// Description			:	Maps files to alternate paths
+// Comments				:
+// Date last edited		:	02/25/2006
+class CNetFileMapping{
+public:
 
+	CNetFileMapping(const char *from,const char *to) {
+		this->from	= strdup(from);
+		this->to	= strdup(to);
+	}
+
+	~CNetFileMapping() {
+		free(from);
+		free(to);
+	}
+	
+	char *from,*to;
+};
 
 #endif
 

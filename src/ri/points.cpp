@@ -205,7 +205,7 @@ void	CPoints::bound(float *bmin,float *bmax) const {
 void	CPoints::dice(CShadingContext *rasterizer)	{
 	if (pl != NULL)	prep();
 
-	if (numPoints < CRenderer::options.maxGridSize) {
+	if (numPoints < CRenderer::maxGridSize) {
 		// We're small enough to render directly
 		rasterizer->drawPoints(this,numPoints);
 	} else {

@@ -131,9 +131,9 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 
 	// Allocate the memory we'll use for tesselation
 	vertexHash					=	(CQuadVertex **)	ralloc(HASH_SIZE*sizeof(CQuadVertex *));
-	shadingListBase				=	(CQuadVertex **)	ralloc(CRenderer::options.maxGridSize*sizeof(CQuadVertex *));
+	shadingListBase				=	(CQuadVertex **)	ralloc(CRenderer::maxGridSize*sizeof(CQuadVertex *));
 	shadingList					=	shadingListBase;
-	numRemainingShadingPoints	=	CRenderer::options.maxGridSize;
+	numRemainingShadingPoints	=	CRenderer::maxGridSize;
 
 	// Init the hash table
 	for (i=0;i<HASH_SIZE;i++) {
@@ -195,11 +195,11 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 						// We have exhausted the available shading list, flush it
 
 						// Compute the vertices
-						displace(object,CRenderer::options.maxGridSize,shadingListBase);
+						displace(object,CRenderer::maxGridSize,shadingListBase);
 
 						// Reset the list
 						shadingList					=	shadingListBase;
-						numRemainingShadingPoints	=	CRenderer::options.maxGridSize;
+						numRemainingShadingPoints	=	CRenderer::maxGridSize;
 					}
 nextPoint:;
 				}
@@ -208,14 +208,14 @@ nextPoint:;
 
 
 		// If there are vertices waiting to be computed in our list, flush them out
-		if (numRemainingShadingPoints < CRenderer::options.maxGridSize) {
+		if (numRemainingShadingPoints < CRenderer::maxGridSize) {
 
 			// Compute the vertices
-			displace(object,CRenderer::options.maxGridSize - numRemainingShadingPoints,shadingListBase);
+			displace(object,CRenderer::maxGridSize - numRemainingShadingPoints,shadingListBase);
 
 			// Reset the list
 			shadingList					=	shadingListBase;
-			numRemainingShadingPoints	=	CRenderer::options.maxGridSize;
+			numRemainingShadingPoints	=	CRenderer::maxGridSize;
 		}
 
 		// Refine the quads if necessary
@@ -290,7 +290,7 @@ nextPoint:;
 	object->attach();
 	CRenderer::raytraced->push(object);
 
-	if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+	if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 		moving	=	TRUE;
 	} else {
 		moving	=	FALSE;
@@ -643,7 +643,7 @@ void		CShadingContext::displace(CSurface *object,int numPoints,CQuadVertex **ver
 	}
 
 	// Do we have movement ?
-	if ( (CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+	if ( (CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 		u			=	varying[VARIABLE_U];
 		v			=	varying[VARIABLE_V];
 		time		=	varying[VARIABLE_TIME];

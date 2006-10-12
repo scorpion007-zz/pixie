@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	renderer.cpp
+//  File				:	rendererContext.cpp
 //  Classes				:	-
 //  Description			:	Renderer implementation
 //
@@ -154,7 +154,7 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 // Date last edited		:	8/25/2002
 CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
-	// Initiate the frame
+	// Initiate the renderer
 	CRenderer::beginRenderer(this,ribFile,riNetString);
 
 	// Init the graphics state
@@ -265,6 +265,9 @@ CRendererContext::~CRendererContext() {
 	savedXforms->destroy();
 	savedAttributes->destroy();
 	savedOptions->destroy();
+
+	// Terminate the renderer
+	CRenderer::endRenderer();
 }
 
 ///////////////////////////////////////////////////////////////////////

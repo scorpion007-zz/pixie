@@ -78,7 +78,7 @@ for (j=0;j<vdiv;j++) {
 #define	recordPixel()														\
 		float	*sample		=	&fb[y][x*SAMPLES_PER_PIXEL];				\
 		if (z < sample[0] || (flags & RASTER_SHADE_HIDDEN)) {				\
-			if (z > CRenderer::options.clipMin) {							\
+			if (z > CRenderer::clipMin) {							\
 				if (flags & RASTER_UNSHADED) {								\
 					shadeGrid(grid,FALSE);									\
 					rasterDrawPrimitives(grid);								\

@@ -341,7 +341,7 @@
 	const float u	=	aleft / (aleft + aright);															\
 	const float v	=	atop / (atop + abottom);															\
 	const float	z	=	(v0[COMP_Z]*(1-u) + v1[COMP_Z]*u)*(1-v) + (v2[COMP_Z]*(1-u) + v3[COMP_Z]*u)*v;		\
-	if (z < CRenderer::options.clipMin)	continue;
+	if (z < CRenderer::clipMin)	continue;
 
 
 
