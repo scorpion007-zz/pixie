@@ -37,6 +37,7 @@
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
+#include "renderer.h"
 
 ///////////////////////////////////////////////////////////////////////
 // function				:	tiffErrorHandler
@@ -485,7 +486,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 	TIFFSetErrorHandler(tiffErrorHandler);
 	TIFFSetWarningHandler(tiffErrorHandler);
 
-	if (currentRenderer->locateFile(inputFileName,input,path) == FALSE) {
+	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
 		return;
 	}
@@ -553,7 +554,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 	TIFFSetErrorHandler(tiffErrorHandler);
 	TIFFSetWarningHandler(tiffErrorHandler);
 
-	if (currentRenderer->locateFile(inputFileName,input,path) == FALSE) {
+	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
 		return;
 	}
@@ -654,7 +655,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 	TIFFSetErrorHandler(tiffErrorHandler);
 	TIFFSetWarningHandler(tiffErrorHandler);
 
-	if (currentRenderer->locateFile(inputFileName,names[0],path) == FALSE) {
+	if (CRenderer::locateFile(inputFileName,names[0],path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",names[0]);
 		return;
 	}
@@ -677,7 +678,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 		for (i=0;i<6;i++) {
 			char		spec[1024];
 
-			if (currentRenderer->locateFile(inputFileName,names[i],path) == FALSE) {
+			if (CRenderer::locateFile(inputFileName,names[i],path) == FALSE) {
 				error(CODE_NOFILE,"Unable to find \"%s\"\n",names[i]);
 				TIFFClose(outHandle);
 				return;
@@ -750,7 +751,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 	TIFFSetErrorHandler(tiffErrorHandler);
 	TIFFSetWarningHandler(tiffErrorHandler);
 
-	if (currentRenderer->locateFile(inputFileName,input,path) == FALSE) {
+	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
 		return;
 	}
@@ -820,7 +821,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 	TIFFSetErrorHandler(tiffErrorHandler);
 	TIFFSetWarningHandler(tiffErrorHandler);
 
-	if (currentRenderer->locateFile(inputFileName,input,path) == FALSE) {
+	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
 		return;
 	}

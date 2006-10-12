@@ -205,7 +205,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		int		j;
 
 		// we can do the perspective division
-		CRenderer::camera2pixels(3,P);
+		camera2pixels(3,P);
 
 		dx				=	P[6+0] - P[0];
 		dy				=	P[6+1] - P[1];

@@ -32,6 +32,7 @@
 
 #include "error.h"
 #include "texture3d.h"
+#include "renderer.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -116,7 +117,7 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 		while (isspace(*sampleName)) sampleName++;
 		
 		// is the sample name a channel we know about?
-		oChannel = currentRenderer->retrieveDisplayChannel(sampleName);
+		oChannel = CRenderer::retrieveDisplayChannel(sampleName);
 		if (oChannel != NULL) {
 			// it's a predefined / already seen channel
 			strcpy(channels[numChannels].name,oChannel->name);

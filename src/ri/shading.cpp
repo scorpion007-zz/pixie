@@ -361,6 +361,9 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Date last edited		:	8/25/2002
 CShadingContext::CShadingContext(unsigned int hf) {
 
+	// Save the hider flags
+	CRenderer::hiderFlags	=	hf;
+
 	// Initialize the shading state
 	currentShadingState		=	NULL;
 	

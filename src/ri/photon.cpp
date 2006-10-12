@@ -92,16 +92,15 @@ CPhotonHider::~CPhotonHider() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2003
-void		CPhotonHider::renderFrame(){  
+void		CPhotonHider::renderingLoop(){  
+	CRenderer::CJob	job;
+
 	memBegin();
 
-	const int		numLights	=	CRenderer::allLights->numItems;
-	CShaderInstance	**lights	=	CRenderer::allLights->array;
+	const int		numLights			=	CRenderer::allLights->numItems;
+	CShaderInstance	**lights			=	CRenderer::allLights->array;
 	int				i,j;
 	vector			tmp;
-	const	char	*previousActivity	=	stats.activity;
-
-	stats.activity	=	"Photonmap construction";
 
 	// Compute the world bounding sphere
 	addvv(worldCenter,CRenderer::worldBmin,CRenderer::worldBmax);
@@ -109,78 +108,90 @@ void		CPhotonHider::renderFrame(){
 	subvv(tmp,CRenderer::worldBmax,worldCenter);
 	worldRadius	=	lengthv(tmp);
 
-	// The actual photon tracing stage
-	stage						=	PHOTON_TRACE;
-	for (i=0;i<numLights;i++) {
-		CShaderInstance	*cLight						=	lights[i];
-		CShadedLight	**lights					=	&currentShadingState->lights;
-		CShadedLight	**alights					=	&currentShadingState->alights;
-		CShadedLight	**currentLight				=	&currentShadingState->currentLight;
-		CShadedLight	**freeLights				=	&currentShadingState->freeLights;
-		int				*tags						=	currentShadingState->tags;
-		int				emit;
-		float			*Clsave;
-		T64				shaderVarCheckpoint[3];
+	// This is da loop
+	while(TRUE) {
 
-		// Figure out how much we want to emit
-		emit										=	CRenderer::options.numEmitPhotons;
+		// Get the job from the renderer
+		CRenderer::dispatchJob(job);
 
-		if (emit > 0) {
-			photonPower								=	1 / (float) emit;
+		if (job.type == CRenderer::CJob::TERMINATE) {
+			break;
+		} else if (job.type == CRenderer::CJob::PHOTON_BUNDLE) {
 
-			while(emit > 0) {
-				const int	numVertices					=	min(CRenderer::options.maxGridSize,emit);
+			// The actual photon tracing stage
+			stage						=	PHOTON_TRACE;
+			for (i=0;i<numLights;i++) {
+				CShaderInstance	*cLight						=	lights[i];
+				CShadedLight	**lights					=	&currentShadingState->lights;
+				CShadedLight	**alights					=	&currentShadingState->alights;
+				CShadedLight	**currentLight				=	&currentShadingState->currentLight;
+				CShadedLight	**freeLights				=	&currentShadingState->freeLights;
+				int				*tags						=	currentShadingState->tags;
+				int				emit;
+				float			*Clsave;
+				T64				shaderVarCheckpoint[3];
 
-				currentShadingState->numVertices		=	numVertices;
-				currentShadingState->numRealVertices	=	numVertices;
-				currentShadingState->numUvertices		=	-1;
-				currentShadingState->numVvertices		=	-1;
-				currentShadingState->numActive			=	numVertices;
-				currentShadingState->numPassive			=	0;
-				currentShadingState->shadingDim			=	SHADING_0D;
-				currentShadingState->currentObject		=	phony;
-				currentShadingState->lightCategory		=	0;
-				
-				// Ensure there's space for the ambient lights
-				
-				*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight));
-				(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight));
-				(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices);
-				(*alights)->savedState[0]	=		NULL;			/* ambient lights do not use tags or save L */
-				(*alights)->lightTags		=		NULL;
-				(*alights)->instance		=		NULL;
-				(*alights)->next			=		NULL;
-				
-				// Reset the state
-				
-				*lights						=	NULL;			// Lights			:	Cool
-				*currentLight				=	NULL;			// Light iterator	:	Cool
-				*freeLights					=	NULL;			// Free light lits	:	Cool
-				
-				Clsave						= (*alights)->savedState[1];
-				
-				for (j=0;j<numVertices;j++) {
-					initv(Clsave,0,0,0);						// Ambient lights	:	Cool
-					tags[j]		=	0;							// Exec tags		:	Cool
-					Clsave	+=	3;
+				// Figure out how much we want to emit
+				emit										=	job.numPhotons;
+
+				if (emit > 0) {
+					photonPower								=	1 / (float) emit;
+
+					while(emit > 0) {
+						const int	numVertices					=	min(CRenderer::options.maxGridSize,emit);
+
+						currentShadingState->numVertices		=	numVertices;
+						currentShadingState->numRealVertices	=	numVertices;
+						currentShadingState->numUvertices		=	-1;
+						currentShadingState->numVvertices		=	-1;
+						currentShadingState->numActive			=	numVertices;
+						currentShadingState->numPassive			=	0;
+						currentShadingState->shadingDim			=	SHADING_0D;
+						currentShadingState->currentObject		=	phony;
+						currentShadingState->lightCategory		=	0;
+						
+						// Ensure there's space for the ambient lights
+						
+						*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight));
+						(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight));
+						(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices);
+						(*alights)->savedState[0]	=		NULL;			/* ambient lights do not use tags or save L */
+						(*alights)->lightTags		=		NULL;
+						(*alights)->instance		=		NULL;
+						(*alights)->next			=		NULL;
+						
+						// Reset the state
+						
+						*lights						=	NULL;			// Lights			:	Cool
+						*currentLight				=	NULL;			// Light iterator	:	Cool
+						*freeLights					=	NULL;			// Free light lits	:	Cool
+						
+						Clsave						= (*alights)->savedState[1];
+						
+						for (j=0;j<numVertices;j++) {
+							initv(Clsave,0,0,0);						// Ambient lights	:	Cool
+							tags[j]		=	0;							// Exec tags		:	Cool
+							Clsave	+=	3;
+						}
+
+						// Execute the light source shader
+						memBegin();
+						memSave(shaderVarCheckpoint,shaderStateMemory);
+						
+						currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(shaderStateMemory,currentShadingState->varying,numVertices);
+						cLight->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);
+
+						memRestore(shaderVarCheckpoint,shaderStateMemory);
+						memEnd();
+
+						emit									-=	numVertices;
+					}
 				}
-
-				// Execute the light source shader
-				memBegin();
-	            memSave(shaderVarCheckpoint,shaderStateMemory);
-				
-				currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(shaderStateMemory,currentShadingState->varying,numVertices);
-				cLight->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);
-
-				memRestore(shaderVarCheckpoint,shaderStateMemory);
-				memEnd();
-
-				emit									-=	numVertices;
 			}
+		} else {
+			error(CODE_BUG,"Unexpected job type in photon hider.\n");
 		}
 	}
-
-	stats.activity	=	previousActivity;
 
 	memEnd();
 }

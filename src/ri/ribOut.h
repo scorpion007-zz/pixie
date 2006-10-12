@@ -199,10 +199,6 @@ public:
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
 
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3]);
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3],float []);
-	virtual	void		RiVisibility(int,float [][3],float [][3],float [][3]);
-
 private:
 	void				writePL(int,char *[],void *[]);
 	void				writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int,char *[],void *[]);

@@ -36,7 +36,8 @@
 #include "error.h"
 #include "memory.h"
 #include "stats.h"
-
+#include "options.h"
+#include "remoteChannel.h"
 
 
 
@@ -152,6 +153,8 @@ void	CRenderer::beginDisplays() {
 // Comments				:
 // Date last edited		:	8/26/2001
 void	CRenderer::endDisplays() {
+	int	i;
+
 	// Finish the out images
 	for (i=0;i<numDisplays;i++) {
 		if (datas[i].module != NULL) {
@@ -394,12 +397,12 @@ void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType)
 // Comments				:
 // Date last edited		:	7/4/2001
 void	CRenderer::computeDisplayData() {
-	CDisplay		*cDisplay;
-	CDisplayChannel *oChannel;
-	char			displayName[OS_MAX_PATH_LENGTH];
-	char			deviceFile[OS_MAX_PATH_LENGTH];
-	char			*sampleDefinition,*sampleName,*nextComma,*tmp;
-	int				i,j,k,s,t,isNewChannel;
+	COptions::CDisplay	*cDisplay;
+	CDisplayChannel		*oChannel;
+	char				displayName[OS_MAX_PATH_LENGTH];
+	char				deviceFile[OS_MAX_PATH_LENGTH];
+	char				*sampleDefinition,*sampleName,*nextComma,*tmp;
+	int					i,j,k,s,t,isNewChannel;
 
 	// mark all channels as unallocated
 	resetDisplayChannelUsage();

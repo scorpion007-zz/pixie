@@ -38,6 +38,7 @@
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
+#include "renderer.h"
 
 
 
@@ -2293,7 +2294,7 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 	char			fn[OS_MAX_PATH_LENGTH];
 	int				directory	=	0;
 
-	if (currentRenderer->locateFile(fn,name,path) == FALSE) {
+	if (CRenderer::locateFile(fn,name,path) == FALSE) {
 		return NULL;
 	}
 
@@ -2340,7 +2341,7 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 	matrix			trans;
 	FILE			*tmpin;
 
-	if (currentRenderer->locateFile(fileName,name,path) == FALSE) {
+	if (CRenderer::locateFile(fileName,name,path) == FALSE) {
 		return NULL;
 	}
 

@@ -35,6 +35,8 @@
 
 void			(*CRenderer::dispatchJob)(CJob &job)	=	NULL;
 
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	beginRendering
@@ -102,31 +104,19 @@ void			CRenderer::dispatchReyes(CJob &job) {
 		job.xBucket	=	currentXBucket;
 		job.yBucket	=	currentYBucket;
 
-		advanceBucket();
+		// Advance the bucket
+		CRenderer::currentXBucket++;
+		if (CRenderer::currentXBucket == CRenderer::xBuckets) {		
+			CRenderer::currentXBucket	=	0;
+			CRenderer::currentYBucket++;
+		}
+
+		if ((CRenderer::currentXBucket == 0) && (CRenderer::currentYBucket == CRenderer::yBuckets)) {
+			CRenderer::hiderFlags |=	HIDER_DONE | HIDER_BREAK;
+		}
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	dispatchNetworkReyes
-// Description			:	Dispatch buckets from network
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void			CRenderer::dispatchNetworkReyes(CJob &job) {
-
-	// If we're done, tell the hider to terminate
-	if (hiderFlags & (HIDER_DONE | HIDER_BREAK)) {
-		job.type	=	CJob::TERMINATE;
-	} else {
-		// Otherwise, dispatch a bucket
-		job.type	=	CJob::BUCKET;
-		job.xBucket	=	currentXBucket;
-		job.yBucket	=	currentYBucket;
-
-		advanceBucket();
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////

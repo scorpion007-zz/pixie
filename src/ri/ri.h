@@ -555,15 +555,6 @@ EXTERN(RtVoid)
 
 			
 
-EXTERN(RtVoid)
-	RiTrace(RtInt,RtPoint *,RtPoint *,RtPoint *);
-
-EXTERN(RtVoid)
-	RiTraceEx(RtInt,RtPoint *,RtPoint *,RtPoint *,RtFloat *);
-
-EXTERN(RtVoid)
-	RiVisibility(RtInt,RtPoint *,RtPoint *,RtPoint *);
-
 
 /*
     Error codes

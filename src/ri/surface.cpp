@@ -46,6 +46,15 @@ const	int		SPLIT_UV	=	3;
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	minCocPixels
+// Description			:	return the minimum circle of confusion
+// Return Value			:
+// Comments				:	(inline for speed, needed for CSurface::dice() )
+// Date last edited		:	4/7/2006
+static inline float	minCocPixels(float z1, float z2) {
+	return min(cocPixels(z1),cocPixels(z2));
+}
 
 
 
@@ -91,7 +100,7 @@ CPatch::~CPatch() {
 }
 
 
-static	int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int nsides,int disable,EProjectionType projection) {
+static	int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int nsides,int disable) {
 	int	i;
 
 	// Update the bounding box
@@ -104,7 +113,7 @@ static	int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int 
 	if (nsides == 1  && !disable) {
 		P	-=	k*3;
 
-		if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		if (CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 			for (i=k;i>0;i--) {
 				if (dotvv(P,N) < 0)	break;
 				N	+=	3;
@@ -192,7 +201,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			assert(k <= (int) CRenderer::options.maxGridSize);
 			r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
-			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull,CRenderer::options.projection);
+			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 			
 			movvv(Pmov,varying[VARIABLE_P]);
 			movvv(Pmov+3,varying[VARIABLE_P]+(numUprobes-1)*3);
@@ -210,7 +219,7 @@ void	CPatch::dice(CShadingContext *r) {
 		}
 		assert(k <= (int) CRenderer::options.maxGridSize);
 		r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull,CRenderer::options.projection);
+		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 
 		// Are we culled
 		if (cullFlags)	return;
@@ -252,18 +261,18 @@ void	CPatch::dice(CShadingContext *r) {
 			i3				*=	3;
 			i4				*=	3;
 			P				=	varying[VARIABLE_P];
-			CRenderer::camera2pixels(numUprobes*numVprobes,P);
+			camera2pixels(numUprobes*numVprobes,P);
 			
 			// Correct shading rate with dof factor
 			if (CRenderer::options.flags & OPTIONS_FLAGS_FOCALBLUR) {
-				float coc = CRenderer::minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
+				float coc = minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
 				shadingRate *= max(1,0.5f*coc);
 			}
 			
 			// Optionally correct shading rate with motionfactor
 			if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 
-				CRenderer::camera2pixels(4,(float*)Pmov);
+				camera2pixels(4,(float*)Pmov);
 
 				subvv(Pmov,P + i1);		Pmov[2] = 0;
 				subvv(Pmov+3,P + i2);	Pmov[5] = 0;
@@ -337,7 +346,7 @@ void	CPatch::dice(CShadingContext *r) {
 		if (udiv == 0) {
 			// We're spanning the eye plane
 			splitToChildren(r,2);
-		} else if (((udiv+1)*(vdiv+1)) > r->maxGridSize) {
+		} else if (((udiv+1)*(vdiv+1)) > CRenderer::options.maxGridSize) {
 			// We're too big, split the surface further
 			if (udiv == vdiv) {
 				splitToChildren(r,2);
@@ -451,7 +460,7 @@ void		CPatch::diceNew(CShadingContext *r) {
 		initv(bmax,-C_INFINITY);
 
 		// Take care of the motion
-		if ((r->flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+		if ((CRenderer::options.flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 			// Compute the sample positions and corresponding normal vectors
 			uv			=	varying[VARIABLE_U];
 			vv			=	varying[VARIABLE_V];
@@ -465,7 +474,7 @@ void		CPatch::diceNew(CShadingContext *r) {
 			}
 
 			r->displace(object,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
-			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull,r->projection);
+			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull);
 		}
 
 
@@ -481,7 +490,7 @@ void		CPatch::diceNew(CShadingContext *r) {
 			}
 		}
 		r->displace(object,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull,r->projection);
+		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull);
 
 		// Are we culled ?
 		if (cullFlags)	return;
@@ -489,7 +498,7 @@ void		CPatch::diceNew(CShadingContext *r) {
 		// Can we make the perspective divide ?
 		if (bmin[COMP_Z] > C_EPSILON) {
 			// Do the projection
-			r->camera2pixels((udiv+1)*(vdiv+1),varying[VARIABLE_P]);
+			camera2pixels((udiv+1)*(vdiv+1),varying[VARIABLE_P]);
 
 			// Decide on the split
 			splitDecision	=	diceStats(r,varying[VARIABLE_P],varying[VARIABLE_N],udiv,vdiv,nudiv,nvdiv);
@@ -570,7 +579,7 @@ int		CPatch::diceStats(CShadingContext *r,float *P,float *N,int udiv,int vdiv,in
 	nvdiv	=	(int) (vAvg*vdiv / (attributes->shadingRate*numV));
 
 	// Are we too big ?
-	if ((nudiv+1)*(nvdiv+1) > r->maxGridSize) {
+	if ((nudiv+1)*(nvdiv+1) > CRenderer::options.maxGridSize) {
 		// We're too big, decide on the split
 		if (nudiv > nvdiv)	return SPLIT_U;
 		else				return SPLIT_V;

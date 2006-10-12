@@ -33,6 +33,7 @@
 
 #include "common/global.h"
 #include "ri.h"
+#include "options.h"
 
 void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
 void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int);

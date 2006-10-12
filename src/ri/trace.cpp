@@ -35,7 +35,8 @@
 #include "stats.h"
 #include "memory.h"
 #include "points.h"
-
+#include "options.h"
+#include "renderer.h"
 
 
 
@@ -114,7 +115,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		addvv(ray->to,ray->from,ray->dir);
 		
 		// Check the ray against the clipping planes
-		for (cPlane=clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
+		for (cPlane=CRenderer::options.clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
 			tt	=	-(dotvv(cPlane->normal,ray->from)+cPlane->d) / dotvv(cPlane->normal,ray->dir);
 
 			if ((tt > 0) && (tt < t))	t	=	tt;
@@ -127,7 +128,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		ray->jimp				=	-1.0f;
 		ray->lastXform			=	NULL;
 		ray->object				=	NULL;
-		hierarchy->intersect(ray);
+		CRenderer::hierarchy->intersect(ray);
 	}
 
 	// Increment the traced ray counter
@@ -154,7 +155,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 			// Check we have the hash table allocated
 			if (traceObjectHash == NULL) {
-				traceObjectHash	=	(TObjectHash *) frameMemory->alloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE);
+				traceObjectHash	=	(TObjectHash *) CRenderer::frameMemory->alloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE);
 
 				// Fill the object pointers with impossible data
 				for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
@@ -193,7 +194,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 					// Did we find it ?
 					if (cHash == NULL) {
-						cHash				=	(TObjectHash *) frameMemory->alloc(sizeof(TObjectHash));//GSHHACK //ralloc(sizeof(TObjectHash));
+						cHash				=	(TObjectHash *) CRenderer::frameMemory->alloc(sizeof(TObjectHash));//GSHHACK //ralloc(sizeof(TObjectHash));
 						cHash->object		=	cRay->object;
 						cHash->numRays		=	0;
 						cHash->rays			=	NULL;
@@ -240,7 +241,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				int	numShading;
 
 				while((numShading = shadingGroups->numRays) > 0) {
-					if (numShading > maxGridSize)	numShading	=	maxGridSize;
+					if (numShading > CRenderer::options.maxGridSize)	numShading	=	CRenderer::options.maxGridSize;
 					
 					// Restore the object pointers in the rays for the bundle code
 					for (i=0;i<numShading;i++) {
@@ -276,7 +277,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				cRay->tmin		=	cRay->t + C_EPSILON;
 				cRay->object	=	NULL;
 				cRay->t			=	C_INFINITY;
-				hierarchy->intersect(cRay);
+				CRenderer::hierarchy->intersect(cRay);
 			}
 
 			// Increment the traced ray counter
@@ -301,7 +302,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 // Comments				:
 // Date last edited		:	8/30/2002
 void	CShadingContext::traceEx(CRayBundle *bundle) {
-	if (currentRayDepth < maxRayDepth) {
+	if (currentRayDepth < CRenderer::options.maxRayDepth) {
 		CShadingState	*savedState		=	currentShadingState;
 		const char		*savedLabel		=	currentRayLabel;
 

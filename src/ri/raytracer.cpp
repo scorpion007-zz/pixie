@@ -484,8 +484,8 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			x					=	cRay->x;
 			y					=	cRay->y;
 
-			CRenderer::pixels2camera(from,x,y,0);
-			CRenderer::pixels2camera(to,x,y,CRenderer::imagePlane);
+			pixels2camera(from,x,y,0);
+			pixels2camera(to,x,y,CRenderer::imagePlane);
 
 			movvv(cRay->from,from);
 			subvv(cRay->dir,to,from);
@@ -508,8 +508,8 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			x					=	cRay->x;
 			y					=	cRay->y;
 
-			CRenderer::pixels2camera(from,x,y,0);
-			CRenderer::pixels2camera(to,x,y,CRenderer::options.focaldistance);
+			pixels2camera(from,x,y,0);
+			pixels2camera(to,x,y,CRenderer::options.focaldistance);
 
 			from[COMP_X]	+=	cosf(theta) * r;
 			from[COMP_Y]	+=	sinf(theta) * r;

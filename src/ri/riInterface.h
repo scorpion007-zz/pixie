@@ -174,10 +174,6 @@ public:
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
 
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3]);
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3],float []);
-	virtual	void		RiVisibility(int,float [][3],float [][3],float [][3]);
-
 	virtual	void		RiError(int,int,char *);
 
 protected:

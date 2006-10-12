@@ -417,51 +417,6 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 }
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	getDSO
-// Description			:	Load a DSO matching the prototyoe
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-int						CRendererContext::getDSO(char *name,char *prototype,void *&handle,dsoExecFunction &exec) {
-	dsoInitFunction		init;
-	dsoCleanupFunction	cleanup;
-	CDSO				*cDso;
-
-	// Check if the DSO had been loaded before
-	for (cDso=CRenderer::dsos;cDso!=NULL;cDso=cDso->next) {
-		if (strcmp(cDso->name,name) == 0) {
-			if (strcmp(cDso->prototype,prototype) == 0) {
-				handle	=	cDso->handle;
-				exec	=	cDso->exec;
-				return	TRUE;
-			}
-		}
-	}
-
-	// Load a DSO shader
-	if (CRenderer::loadDSO(name,prototype,currentOptions->proceduralPath,&init,&exec,&cleanup) == TRUE) {
-		// OK, we found the shader
-		if (init !=	NULL)	handle	=	init(0,NULL);
-		else				handle	=	NULL;
-
-		// Save the DSO
-		cDso			=	new CDSO;
-		cDso->init		=	init;
-		cDso->exec		=	exec;
-		cDso->cleanup	=	cleanup;
-		cDso->handle	=	handle;
-		cDso->name		=	strdup(name);
-		cDso->prototype	=	strdup(prototype);
-		cDso->next		=	CRenderer::dsos;
-		CRenderer::dsos	=	cDso;
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
 
 
 
@@ -486,8 +441,8 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 	initv(P	+	7*3,bmax[0],bmin[1],bmax[2]);	mulmp(P + 7*3,x->from,P + 7*3);
 	
 	// Do the projection
-	//CRenderer::camera2screen(8,P);
-	CRenderer::camera2pixels(8,P);
+	//camera2screen(8,P);
+	camera2pixels(8,P);
 	
 	a		=	0;
 

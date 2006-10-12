@@ -367,15 +367,6 @@ void		CRiInterface::RiArchiveRecord(char * type,char *format,va_list args) {
 void		CRiInterface::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiTrace(int,float [][3],float [][3],float [][3]) {
-}
-
-void		CRiInterface::RiTrace(int,float [][3],float [][3],float [][3],float []) {
-}
-
-void		CRiInterface::RiVisibility(int,float [][3],float [][3],float [][3]) {
-}
-
 void		CRiInterface::RiError(int c,int s,char *m) {
 	if (errorHandler != NULL) {
 		errorHandler(c,s,m);

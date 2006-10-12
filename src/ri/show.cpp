@@ -106,9 +106,9 @@ CShow::CShow() : CShadingContext(HIDER_NODISPLAY) {
 						} else if (strcmp(t,fileGatherCache) == 0) {
 							view	=	CRenderer::getCache(fileName,"R");
 						} else if (strcmp(t,filePointCloud) == 0) {
-							view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+							//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
 						} else if (strcmp(t,fileBrickMap) == 0) {
-							view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+							//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
 						}
 
 						// Create / display the window

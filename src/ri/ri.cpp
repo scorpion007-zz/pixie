@@ -2200,35 +2200,3 @@ EXTERN(RtVoid)
 
 	renderMan->RiReadArchiveV(filename,callback,n,tokens,params);
 }
-
-EXTERN(RtVoid)
-RiTrace(RtInt n,RtPoint *from,RtPoint *to,RtPoint *Ci) {
-	if (!(currentBlock & RENDERMAN_WORLD_BLOCK)) {
-		error(CODE_NESTING,"RiTrace was not expected outside world\n");
-		return;
-	}
-
-	renderMan->RiTrace(n,from,to,Ci);
-}
-
-
-EXTERN(RtVoid)
-RiTraceEx(RtInt n,RtPoint *from,RtPoint *to,RtPoint *Ci,RtFloat *t) {
-	if (!(currentBlock & RENDERMAN_WORLD_BLOCK)) {
-		error(CODE_NESTING,"RiTrace was not expected outside world\n");
-		return;
-	}
-
-	renderMan->RiTrace(n,from,to,Ci,t);
-}
-
-
-EXTERN(RtVoid)
-RiVisibility(RtInt n,RtPoint *from,RtPoint *to,RtPoint *Oi) {
-	if (!(currentBlock & RENDERMAN_WORLD_BLOCK)) {
-		error(CODE_NESTING,"RiTrace was not expected outside world\n");
-		return;
-	}
-
-	renderMan->RiVisibility(n,from,to,Oi);
-}

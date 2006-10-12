@@ -206,10 +206,6 @@ public:
 	void				RiArchiveRecord(char * type,char *format,va_list args);
 	void				RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
 
-	void				RiTrace(int,float [][3],float [][3],float [][3]);
-	void				RiTrace(int,float [][3],float [][3],float [][3],float []);
-	void				RiVisibility(int,float [][3],float [][3],float [][3]);
-
 	void				RiError(int,int,char *);
 
 
@@ -218,7 +214,6 @@ public:
 	CAttributes			*getAttributes(int);									// Get the active Attributes
 	COptions			*getOptions();											// Get the active Options
 	CShaderInstance		*getShader(const char *,int,int,char **,void **);		// Load a shader
-	int					getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
 
 																				// Delayed object junk
 	void				processDelayedObject(CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *,CRay *ray = NULL);

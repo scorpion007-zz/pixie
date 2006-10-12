@@ -44,6 +44,7 @@
 #include "dso.h"
 #include "rendererContext.h"
 #include "shadeop.h"
+#include "options.h"
 
 
 
@@ -602,36 +603,72 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 }
 
 
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
-// Method				:	loadDSO
-// Description			:	Find and load a DSO shader
-// Return Value			:	-
+// Method				:	getDSO
+// Description			:	Load a DSO matching the prototyoe
+// Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-int			CRenderer::loadDSO(char *name,char *prototype,TSearchpath *inPath,dsoInitFunction *init,dsoExecFunction *exec,dsoCleanupFunction *cleanup) {
-	void	*userData[5];
-	char	searchPath[OS_MAX_PATH_LENGTH];
+int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunction &exec) {
+	CDSO				*cDso;
 
-	*init		=	NULL;
-	*exec		=	NULL;
-	*cleanup	=	NULL;
+	// Check if the DSO had been loaded before
+	for (cDso=dsos;cDso!=NULL;cDso=cDso->next) {
+		if (strcmp(cDso->name,name) == 0) {
+			if (strcmp(cDso->prototype,prototype) == 0) {
+				handle	=	cDso->handle;
+				exec	=	cDso->exec;
+				return	TRUE;
+			}
+		}
+	}
 
+	
+	
+	dsoInitFunction		init;
+	dsoCleanupFunction	cleanup;
+	init		=	NULL;
+	exec		=	NULL;
+	cleanup		=	NULL;
+
+	void				*userData[5];
 	userData[0]	=	name;
 	userData[1]	=	prototype;
-	userData[2]	=	init;
-	userData[3]	=	exec;
-	userData[4]	=	cleanup;
+	userData[2]	=	&init;
+	userData[3]	=	&exec;
+	userData[4]	=	&cleanup;
 
 	// Go over the directories
+	TSearchpath			*inPath	=	options.proceduralPath;
+	char				searchPath[OS_MAX_PATH_LENGTH];
 	for (;inPath!=NULL;inPath=inPath->next) {
 		sprintf(searchPath,"%s*.%s",inPath->directory,osModuleExtension);
 		osEnumerate(searchPath,dsoLoadCallback,userData);
 	}
 
-	if (exec[0] == NULL)	return FALSE;
+	if (exec != NULL) {
+		// OK, we found the shader
+		if (init !=	NULL)	handle	=	init(0,NULL);
+		else				handle	=	NULL;
 
-	return TRUE;
+		// Save the DSO
+		cDso			=	new CDSO;
+		cDso->init		=	init;
+		cDso->exec		=	exec;
+		cDso->cleanup	=	cleanup;
+		cDso->handle	=	handle;
+		cDso->name		=	strdup(name);
+		cDso->prototype	=	strdup(prototype);
+		cDso->next		=	CRenderer::dsos;
+		CRenderer::dsos	=	cDso;
+
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 

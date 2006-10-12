@@ -124,6 +124,7 @@ CArray<CSurface *>		*CRenderer::raytraced						=	NULL;
 CArray<CTracable *>		*CRenderer::tracables						=	NULL;
 CObject					*CRenderer::offendingObject					=	NULL;
 matrix					CRenderer::fromWorld,CRenderer::toWorld;
+vector					CRenderer::worldBmin,CRenderer::worldBmax;
 CXform					*CRenderer::world							=	NULL;
 matrix					CRenderer::fromNDC,CRenderer::toNDC;
 matrix					CRenderer::fromRaster,CRenderer::toRaster;
@@ -164,6 +165,11 @@ int						*CRenderer::deepShadowIndex			=	NULL;
 int						CRenderer::deepShadowIndexStart;
 char					*CRenderer::deepShadowFileName		=	NULL;
 
+int						CRenderer::numDisplays;
+CRenderer::CDisplayData	*CRenderer::datas;
+int						*CRenderer::sampleOrder;
+float					*CRenderer::sampleDefaults;
+int						CRenderer::numExtraChannels;	
 
 
 
@@ -274,7 +280,7 @@ void		CRenderer::endRenderer() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CRenderer::beginFrame(CRendererContext *c,const COptions *o,CXform *x) {
+void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 
 	// Record the frame start time
 	stats.frameStartTime	=	osCPUTime();
@@ -290,9 +296,6 @@ void		CRenderer::beginFrame(CRendererContext *c,const COptions *o,CXform *x) {
 	world->attach();
 	movmm(fromWorld,x->from);
 	movmm(toWorld,x->to);
-
-	// Save / precompute some interesting stuff
-	hiderFlags				=	hf;
 
 	assert(options.pixelXsamples > 0);
 	assert(options.pixelYsamples > 0);
@@ -481,7 +484,7 @@ void		CRenderer::beginFrame(CRendererContext *c,const COptions *o,CXform *x) {
 
 
 	if (options.displays == NULL) {
-		options.displays				=	new CDisplay;
+		options.displays				=	new COptions::CDisplay;
 		options.displays->next			=	NULL;
 		options.displays->outDevice		=	strdup(RI_FILE);
 		options.displays->outName		=	strdup("ri.tif");
@@ -555,29 +558,29 @@ void		CRenderer::beginFrame(CRendererContext *c,const COptions *o,CXform *x) {
 
 		if (strcmp(options.hider,"raytrace") == 0) {
 			contexts[i]						=	new CRaytracer();
-			dispatchJob						=	singleThreadedReyes;
+			dispatchJob						=	dispatchReyes;
 		} else if (strcmp(options.hider,"stochastic") == 0) {
 			contexts[i]						=	new CStochastic();
-			dispatchJob						=	singleThreadedReyes;
+			dispatchJob						=	dispatchReyes;
 		} else if (strcmp(options.hider,"zbuffer") == 0) {
 			contexts[i]						=	new CZbuffer();
-			dispatchJob						=	singleThreadedReyes;
+			dispatchJob						=	dispatchReyes;
 		} else if (strncmp(options.hider,"show:",5) == 0) {
 			contexts[i]						=	new CShow();
-			dispatchJob						=	singleThreadedReyes;
+			dispatchJob						=	dispatchReyes;
 		} else if (strcmp(options.hider,"photon") == 0) {
 			if ((netClient != INVALID_SOCKET) || (netNumServers > 0)) {
 				error(CODE_LIMIT,"Hider \"%s\" does not support paralell / network rendering\n",options.hider);
 				contexts[i]					=	new CStochastic();
-				dispatchJob					=	singleThreadedReyes;
+				dispatchJob					=	dispatchReyes;
 			} else {
 				contexts[i]					=	new CPhotonHider(context->getAttributes(TRUE));
-				dispatchJob					=	singleThreadedPhoton;
+				dispatchJob					=	dispatchPhoton;
 			}
 		} else {
 			error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",options.hider);
 			contexts[i]						=	new CStochastic();
-			dispatchJob						=	singleThreadedReyes;
+			dispatchJob						=	dispatchReyes;
 		}
 
 		assert(contexts[i] != NULL);

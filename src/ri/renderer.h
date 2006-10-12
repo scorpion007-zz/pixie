@@ -96,7 +96,7 @@ class	CRendererContext;
 // Description			:	This class holds data about the current frame being rendered
 // Comments				:	This class is invalid outside beginFrame / endFrame
 // Date last edited		:	10/10/2006
-class CRenderer : public COptions {
+class CRenderer {
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CNetFileMapping
@@ -105,10 +105,12 @@ class CRenderer : public COptions {
 		// Date last edited		:	02/25/2006
 		class CNetFileMapping{
 		public:
+
 			CNetFileMapping(const char *from,const char *to) {
 				this->from	= strdup(from);
 				this->to	= strdup(to);
 			}
+
 			~CNetFileMapping() {
 				free(from);
 				free(to);
@@ -210,19 +212,6 @@ public:
 
 
 		////////////////////////////////////////////////////////////////////
-		// Some inline functions defined below for efficiency
-		////////////////////////////////////////////////////////////////////
-		static void				camera2pixels(float *P);							// Project to pixels
-		static void				camera2pixels(float *x,float *y,const float *P);	// Project to pixels
-		static void				camera2pixels(int n,float *P);						// Project to pixels (array)
-		static void				camera2screen(int n,float *P);						// Project to screen (array)
-		static void				pixels2distance(float &a,float &b,float d);			// Project to distance
-		static void				distance2pixels(int n,float *dist,float *P);		// Project to pixels
-		static void				pixels2camera(float *P,float x,float y,float z);	// Compute the camera space coordinates from pixel coordinates
-		static float			minCocPixels(float z1, float z2);
-
-
-		////////////////////////////////////////////////////////////////////
 		// Functions that deal with rendering (defined in rendererJobs.cpp)
 		////////////////////////////////////////////////////////////////////
 
@@ -241,6 +230,7 @@ public:
 										}	type;
 
 									int			xBucket,yBucket;	// For a bucket job, the bucket to render
+									int			numPhotons;			// The number of photons to emit
 									CJob		*next;				// The next job to perform
 								};
 
@@ -250,10 +240,7 @@ public:
 		static void				processServerRequest(T32 req,int index);	// This function is used to serve the client requests
 		static void				(*dispatchJob)(CJob &job);			// This function is used to ask for a job
 		static void				dispatchReyes(CJob &job);			// This function dispatches single threaded buckets
-		static void				dispatchNetworkReyes(CJob &job);	// This function dispatches single threaded buckets
 		static void				dispatchPhoton(CJob &job);			// This function dispatches single threaded photon bundles
-		static void				dispatchNetworkPhoton(CJob &job);	// This function dispatches single threaded photon bundles
-		static void				advanceBucket();
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with the clipping/projection (defined in rendererClipping.cpp)
@@ -285,12 +272,12 @@ public:
 		static	CVariable		*declareVariable(const char *,const char *,int um = 0);
 		static	void			makeGlobalVariable(CVariable *);
 		static	CVariable		*retrieveVariable(const char *);
-		static	CDisplayChannel	*declareDisplayChannel(const char *);					// Display channel management
+		static	CDisplayChannel	*declareDisplayChannel(const char *);				// Display channel management
 		static	CDisplayChannel	*declareDisplayChannel(CVariable *);
 		static	CDisplayChannel	*retrieveDisplayChannel(const char *);
 		static	void			resetDisplayChannelUsage();
-		static	void			registerFrameTemporary(const char *,int);				// Register file for end-of-frame deletion
-		static	int				getGlobalID(const char *);								// Global ID management
+		static	void			registerFrameTemporary(const char *,int);			// Register file for end-of-frame deletion
+		static	int				getGlobalID(const char *);							// Global ID management
 		static	void			shutdownDeclerations();
 
 								
@@ -310,7 +297,7 @@ public:
 		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *);	// Load a point cloud or brickmap
 		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 		static	char			*getFilter(RtFilterFunc);								// The other way around
-		static	int				loadDSO(char *,char *,TSearchpath *,dsoInitFunction *,dsoExecFunction *,dsoCleanupFunction *);	// Find/load a DSO shader
+		static	int				getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
 		static	void			shutdownFiles();
 
 
@@ -418,7 +405,7 @@ public:
 				TDisplayDataFunction		data;							// The data function
 				TDisplayRawDataFunction		rawData;						// The raw data function
 				TDisplayFinishFunction		finish;							// The finish function
-				CDisplay					*display;
+				COptions::CDisplay			*display;
 		};
 
 		static	int				numDisplays;
@@ -439,131 +426,130 @@ void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
 
 
 
+
+////////////////////////////////////////////////////////////////////
+// Some inline functions defined below for efficiency
+////////////////////////////////////////////////////////////////////
+
+
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	camera2pixels
+// Function				:	camera2pixels
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CRenderer::camera2pixels(float *P) {
-	if(options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		P[COMP_X]	=	imagePlane*P[COMP_X]/P[COMP_Z];
-		P[COMP_Y]	=	imagePlane*P[COMP_Y]/P[COMP_Z];
+inline void		camera2pixels(float *P) {
+	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		P[COMP_X]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
+		P[COMP_Y]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
 	}
 
-	P[COMP_X]	=	(P[COMP_X] - pixelLeft)*dPixeldx;
-	P[COMP_Y]	=	(P[COMP_Y] - pixelTop)*dPixeldy;
+	P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+	P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*CRenderer::dPixeldy;
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	camera2pixels
+// Function				:	camera2pixels
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CRenderer::camera2pixels(float *x,float *y,const float *P) {
-	if(options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		x[0]	=	imagePlane*P[COMP_X]/P[COMP_Z];
-		y[0]	=	imagePlane*P[COMP_Y]/P[COMP_Z];
+inline void		camera2pixels(float *x,float *y,const float *P) {
+	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		x[0]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
+		y[0]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
 	} else {
 		x[0]	=	P[COMP_X];
 		y[0]	=	P[COMP_Y];
 	}
 
-	x[0]	=	(x[0] - pixelLeft)*dPixeldx;
-	y[0]	=	(y[0] - pixelTop)*dPixeldy;
+	x[0]	=	(x[0] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+	y[0]	=	(y[0] - CRenderer::pixelTop)*CRenderer::dPixeldy;
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	camera2pixels
+// Function				:	camera2pixels
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CRenderer::camera2pixels(int n,float *P) {
-	if(options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+inline void		camera2pixels(int n,float *P) {
+	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
-			P[COMP_X]	=	(imagePlane*P[COMP_X]/P[COMP_Z] - pixelLeft)*dPixeldx;
-			P[COMP_Y]	=	(imagePlane*P[COMP_Y]/P[COMP_Z] - pixelTop)*dPixeldy;
+			P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+			P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop)*CRenderer::dPixeldy;
 		}
 	} else {
 		for (;n>0;n--,P+=3) {
-			P[COMP_X]	=	(P[COMP_X] - pixelLeft)*dPixeldx;
-			P[COMP_Y]	=	(P[COMP_Y] - pixelTop)*dPixeldy;
+			P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+			P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*CRenderer::dPixeldy;
 		}
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	camera2screen
+// Function				:	camera2screen
 // Description			:	Project from camera space into the screen space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CRenderer::camera2screen(int n,float *P) {
-	if(options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+inline void		camera2screen(int n,float *P) {
+	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
-			P[COMP_X]	=	(imagePlane*P[COMP_X]/P[COMP_Z] - pixelLeft);
-			P[COMP_Y]	=	(imagePlane*P[COMP_Y]/P[COMP_Z] - pixelTop);
+			P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft);
+			P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop);
 		}
 	} else {
 		for (;n>0;n--,P+=3) {
-			P[COMP_X]	=	(P[COMP_X] - pixelLeft);
-			P[COMP_Y]	=	(P[COMP_Y] - pixelTop);
+			P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft);
+			P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop);
 		}
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	distance2pixels
+// Function				:	distance2pixels
 // Description			:	Project a distance in camera space into a distance in the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CRenderer::distance2pixels(int n,float *dist,float *P) {
-	if(options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+inline void		distance2pixels(int n,float *dist,float *P) {
+	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
-			*dist++		=	dPixeldx*imagePlane*dist[0]/P[COMP_Z];
+			*dist++		=	CRenderer::dPixeldx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
 		}
 	} else {
 		for (;n>0;n--,P+=3) {
-			*dist++		=	dPixeldx*dist[0];
+			*dist++		=	CRenderer::dPixeldx*dist[0];
 		}
 	}
 }
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	pixels2distance
+// Function				:	pixels2distance
 // Description			:	Convert from pixel distance to camera space distance
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/4/2001
-void			CRenderer::pixels2distance(float &a,float &b,float d) {
-	a	=	lengthA*d;
-	b	=	lengthB*d;
+inline void			pixels2distance(float &a,float &b,float d) {
+	a	=	CRenderer::lengthA*d;
+	b	=	CRenderer::lengthB*d;
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	samples2camera
+// Function				:	samples2camera
 // Description			:	Back project from sample space into the camera space
 // Return Value			:
 // Comments				:	(inline for speed)
 // Date last edited		:	7/4/2001
-inline void		CRenderer::pixels2camera(float *P,float x,float y,float z) {
-	x	=	x*dxdPixel + pixelLeft;
-	y	=	y*dydPixel + pixelTop;
+inline void		pixels2camera(float *P,float x,float y,float z) {
+	x	=	x*CRenderer::dxdPixel + CRenderer::pixelLeft;
+	y	=	y*CRenderer::dydPixel + CRenderer::pixelTop;
 
-	if(options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		P[COMP_X]	=	x*z*invImagePlane;
-		P[COMP_Y]	=	y*z*invImagePlane;
+	if(CRenderer::options.projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		P[COMP_X]	=	x*z*CRenderer::invImagePlane;
+		P[COMP_Y]	=	y*z*CRenderer::invImagePlane;
 		P[COMP_Z]	=	z;
 	} else {
 		P[COMP_X]	=	x;
@@ -572,36 +558,7 @@ inline void		CRenderer::pixels2camera(float *P,float x,float y,float z) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	minCocPixels
-// Description			:	return the minimum circle of confusion
-// Return Value			:
-// Comments				:	(inline for speed, needed for CSurface::dice() )
-// Date last edited		:	4/7/2006
-inline float	CRenderer::minCocPixels(float z1, float z2) {
-	return min(cocPixels(z1),cocPixels(z2));
-}
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	advanceBucket
-// Description			:	Advance the bucket
-// Return Value			:	TRUE if we're still rendering, FALSE otherwise
-// Comments				:
-// Date last edited		:	7/4/2001
-void			CRenderer::advanceBucket() {
-	currentXBucket++;
-	if (currentXBucket == xBuckets) {		
-		currentXBucket	=	0;
-		currentYBucket++;
-	}
-
-	if ((currentXBucket == 0) && (currentYBucket == yBuckets)) {
-		hiderFlags |=	HIDER_DONE | HIDER_BREAK;
-	}
-}
 
 
 

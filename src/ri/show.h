@@ -47,7 +47,7 @@ public:
 			virtual			~CShow();
 
 			// Right after world end to force rendering of the entire frame
-			void			renderFrame() { }
+			void			renderingLoop() { }
 
 			// Delayed rendering functions
 			void			drawObject(CObject *,const float *,const float *) { }

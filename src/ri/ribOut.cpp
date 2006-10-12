@@ -1266,15 +1266,6 @@ void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *),int 
 	out("ReadArchive \"%s\"\n",filename);
 }
 
-void		CRibOut::RiTrace(int,float [][3],float [][3],float [][3]) {
-}
-
-void		CRibOut::RiTrace(int,float [][3],float [][3],float [][3],float []) {
-}
-
-void		CRibOut::RiVisibility(int,float [][3],float [][3],float [][3]) {
-}
-
 void		CRibOut::writePL(int numParameters,char *tokens[],void *vals[]) {
 	int		i,j;
 	float	*f;
