@@ -398,6 +398,13 @@ for (y=ymin;y<=ymax;y++) for (x=xmin;x<=xmax;x++) {
 			const float	*v2	=	v1 + udiv*numVertexSamples;
 			const float	*v3	=	v2 + numVertexSamples;
 
+#ifdef STOCHASTIC_FOCAL_BLUR
+				const float v0d =	v0[9];
+				const float v1d =	v1[9];
+				const float v2d =	v2[9];
+				const float v3d =	v3[9];
+#endif
+
 #ifdef STOCHASTIC_MOVING
 			vector	v0movTmp;
 			vector	v1movTmp;
@@ -419,15 +426,15 @@ for (y=ymin;y<=ymax;y++) for (x=xmin;x<=xmax;x++) {
 			vector	v1focTmp;
 			vector	v2focTmp;
 			vector	v3focTmp;
-			v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0[9];
-			v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1[9];
-			v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2[9];
-			v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3[9];
+			v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
+			v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
+			v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
+			v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
 
-			v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0[9];
-			v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1[9];
-			v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2[9];
-			v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3[9];
+			v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
+			v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
+			v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
+			v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
 
 			v0focTmp[COMP_Z]	=	v0[COMP_Z];
 			v1focTmp[COMP_Z]	=	v1[COMP_Z];
@@ -602,6 +609,13 @@ for (j=0;j<vdiv;j++) {
 				const float	*v2	=	v1 + udiv*numVertexSamples;
 				const float	*v3	=	v2 + numVertexSamples;
 
+#ifdef STOCHASTIC_FOCAL_BLUR
+				const float v0d =	v0[9];
+				const float v1d =	v1[9];
+				const float v2d =	v2[9];
+				const float v3d =	v3[9];
+#endif
+
 #ifdef STOCHASTIC_MOVING
 				vector	v0movTmp;
 				vector	v1movTmp;
@@ -623,15 +637,15 @@ for (j=0;j<vdiv;j++) {
 				vector	v1focTmp;
 				vector	v2focTmp;
 				vector	v3focTmp;
-				v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0[9];
-				v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1[9];
-				v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2[9];
-				v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3[9];
+				v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
+				v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
+				v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
+				v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
 
-				v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0[9];
-				v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1[9];
-				v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2[9];
-				v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3[9];
+				v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
+				v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
+				v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
+				v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
 
 				v0focTmp[COMP_Z]	=	v0[COMP_Z];
 				v1focTmp[COMP_Z]	=	v1[COMP_Z];
