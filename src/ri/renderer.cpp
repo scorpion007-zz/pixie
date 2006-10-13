@@ -113,65 +113,68 @@ int													CRenderer::numNetrenderedBuckets		=	0;
 ////////////////////////////////////////////////////////////////////
 // Frame options
 ////////////////////////////////////////////////////////////////////
-int				CRenderer::xres,CRenderer::yres;
-int				CRenderer::frame;
-float			CRenderer::pixelAR;
-float			CRenderer::frameAR;
-float			CRenderer::cropLeft,CRenderer::cropRight,CRenderer::cropTop,CRenderer::cropBottom;
-float			CRenderer::screenLeft,CRenderer::screenRight,CRenderer::screenTop,CRenderer::screenBottom;
-float			CRenderer::clipMin,CRenderer::clipMax;
-float			CRenderer::pixelVariance;
-float			CRenderer::jitter;
-char			*CRenderer::hider;
-TSearchpath		*CRenderer::archivePath;
-TSearchpath		*CRenderer::proceduralPath;
-TSearchpath		*CRenderer::texturePath;
-TSearchpath		*CRenderer::shaderPath;
-TSearchpath		*CRenderer::displayPath;
-TSearchpath		*CRenderer::modulePath;
-char			*CRenderer::temporaryPath;
-int				CRenderer::pixelXsamples,CRenderer::pixelYsamples;
-float			CRenderer::gamma,CRenderer::gain;
-float			CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight;
-RtFilterFunc	CRenderer::pixelFilter;
-float			CRenderer::colorQuantizer[5];
-float			CRenderer::depthQuantizer[5];
+int						CRenderer::xres,CRenderer::yres;
+int						CRenderer::frame;
+float					CRenderer::pixelAR;
+float					CRenderer::frameAR;
+float					CRenderer::cropLeft,CRenderer::cropRight,CRenderer::cropTop,CRenderer::cropBottom;
+float					CRenderer::screenLeft,CRenderer::screenRight,CRenderer::screenTop,CRenderer::screenBottom;
+float					CRenderer::clipMin,CRenderer::clipMax;
+float					CRenderer::pixelVariance;
+float					CRenderer::jitter;
+char					*CRenderer::hider;
+TSearchpath				*CRenderer::archivePath;
+TSearchpath				*CRenderer::proceduralPath;
+TSearchpath				*CRenderer::texturePath;
+TSearchpath				*CRenderer::shaderPath;
+TSearchpath				*CRenderer::displayPath;
+TSearchpath				*CRenderer::modulePath;
+char					*CRenderer::temporaryPath;
+int						CRenderer::pixelXsamples,CRenderer::pixelYsamples;
+float					CRenderer::gamma,CRenderer::gain;
+float					CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight;
+RtFilterFunc			CRenderer::pixelFilter;
+float					CRenderer::colorQuantizer[5];
+float					CRenderer::depthQuantizer[5];
 COptions::CDisplay		*CRenderer::displays;
 COptions::CClipPlane	*CRenderer::clipPlanes;
-float			CRenderer::relativeDetail;
-EProjectionType	CRenderer::projection;
-float			CRenderer::fov;
-int				CRenderer::nColorComps;
-float			*CRenderer::fromRGB,*CRenderer::toRGB;
-float			CRenderer::fstop,CRenderer::focallength,CRenderer::focaldistance;
-float			CRenderer::shutterOpen,CRenderer::shutterClose;
-unsigned int	CRenderer::flags;
+float					CRenderer::relativeDetail;
+EProjectionType			CRenderer::projection;
+float					CRenderer::fov;
+int						CRenderer::nColorComps;
+float					*CRenderer::fromRGB,*CRenderer::toRGB;
+float					CRenderer::fstop,CRenderer::focallength,CRenderer::focaldistance;
+float					CRenderer::shutterOpen,CRenderer::shutterClose;
+unsigned int			CRenderer::flags;
 
 ////////////////////////////////////////////////////////////////////
 // Pixie dependent options
 ////////////////////////////////////////////////////////////////////
-int				CRenderer::endofframe;
-char			*CRenderer::filelog;
-int				CRenderer::numThreads;
-int				CRenderer::maxTextureSize;
-int				CRenderer::maxBrickSize;
-int				CRenderer::maxShaderCache;
-int				CRenderer::maxGridSize;
-int				CRenderer::maxRayDepth;
-int				CRenderer::maxPhotonDepth;
-int				CRenderer::bucketWidth,CRenderer::bucketHeight;
-int				CRenderer::netXBuckets,CRenderer::netYBuckets;
-int				CRenderer::maxEyeSplits;
-int				CRenderer::maxHierarchyDepth;
-int				CRenderer::maxHierarchyLeafObjects;
-float			CRenderer::tsmThreshold;
-char			*CRenderer::causticIn,*CRenderer::causticOut;
-char			*CRenderer::globalIn,*CRenderer::globalOut;
-char			*CRenderer::volumeIn,*CRenderer::volumeOut;
-int				CRenderer::numEmitPhotons;
-int				CRenderer::shootStep;
-EDepthFilter	CRenderer::depthFilter;
+int						CRenderer::endofframe;
+char					*CRenderer::filelog;
+int						CRenderer::numThreads;
+int						CRenderer::maxTextureSize;
+int						CRenderer::maxBrickSize;
+int						CRenderer::maxShaderCache;
+int						CRenderer::maxGridSize;
+int						CRenderer::maxRayDepth;
+int						CRenderer::maxPhotonDepth;
+int						CRenderer::bucketWidth,CRenderer::bucketHeight;
+int						CRenderer::netXBuckets,CRenderer::netYBuckets;
+int						CRenderer::maxEyeSplits;
+int						CRenderer::maxHierarchyDepth;
+int						CRenderer::maxHierarchyLeafObjects;
+float					CRenderer::tsmThreshold;
+char					*CRenderer::causticIn,*CRenderer::causticOut;
+char					*CRenderer::globalIn,*CRenderer::globalOut;
+char					*CRenderer::volumeIn,*CRenderer::volumeOut;
+int						CRenderer::numEmitPhotons;
+int						CRenderer::shootStep;
+EDepthFilter			CRenderer::depthFilter;
 
+////////////////////////////////////////////////////////////////////
+// Frame data
+////////////////////////////////////////////////////////////////////
 CMemStack											*CRenderer::frameMemory				=	NULL;
 CArray<const char*>									*CRenderer::frameTemporaryFiles		=	NULL;
 CShadingContext										**CRenderer::contexts				=	NULL;
@@ -226,7 +229,6 @@ FILE					*CRenderer::deepShadowFile			=	NULL;
 int						*CRenderer::deepShadowIndex			=	NULL;
 int						CRenderer::deepShadowIndexStart;
 char					*CRenderer::deepShadowFileName		=	NULL;
-
 int						CRenderer::numDisplays;
 CRenderer::CDisplayData	*CRenderer::datas;
 int						*CRenderer::sampleOrder;
@@ -340,81 +342,81 @@ void		CRenderer::endRenderer() {
 // Comments				:
 // Date last edited		:	10/9/2006
 static void	copyOptions(const COptions *o) {
-	CRenderer::xres					=	o->xres;
-	CRenderer::yres					=	o->yres;
-	CRenderer::frame				=	o->frame;
-	CRenderer::pixelAR				=	o->pixelAR;
-	CRenderer::frameAR				=	o->frameAR;
-	CRenderer::cropLeft				=	o->cropLeft;
-	CRenderer::cropRight			=	o->cropRight;
-	CRenderer::cropTop				=	o->cropTop;
-	CRenderer::cropBottom			=	o->cropBottom;
-	CRenderer::screenLeft			=	o->screenLeft;
-	CRenderer::screenRight			=	o->screenRight;
-	CRenderer::screenTop			=	o->screenTop;
-	CRenderer::screenBottom			=	o->screenBottom;
-	CRenderer::clipMin				=	o->clipMin;
-	CRenderer::clipMax				=	o->clipMax;
-	CRenderer::pixelVariance		=	o->pixelVariance;
-	CRenderer::jitter				=	o->jitter;
-	CRenderer::hider				=	o->hider;
-	CRenderer::archivePath			=	o->archivePath;
-	CRenderer::proceduralPath		=	o->proceduralPath;
-	CRenderer::texturePath			=	o->texturePath;
-	CRenderer::shaderPath			=	o->shaderPath;
-	CRenderer::displayPath			=	o->displayPath;
-	CRenderer::modulePath			=	o->modulePath;
-	CRenderer::temporaryPath		=	o->temporaryPath;
-	CRenderer::pixelXsamples		=	o->pixelXsamples;
-	CRenderer::pixelYsamples		=	o->pixelYsamples;
-	CRenderer::gamma				=	o->gamma;
-	CRenderer::gain					=	o->gain;
-	CRenderer::pixelFilterWidth		=	o->pixelFilterWidth;
-	CRenderer::pixelFilterHeight	=	o->pixelFilterHeight;
-	CRenderer::pixelFilter			=	o->pixelFilter;
+	CRenderer::xres						=	o->xres;
+	CRenderer::yres						=	o->yres;
+	CRenderer::frame					=	o->frame;
+	CRenderer::pixelAR					=	o->pixelAR;
+	CRenderer::frameAR					=	o->frameAR;
+	CRenderer::cropLeft					=	o->cropLeft;
+	CRenderer::cropRight				=	o->cropRight;
+	CRenderer::cropTop					=	o->cropTop;
+	CRenderer::cropBottom				=	o->cropBottom;
+	CRenderer::screenLeft				=	o->screenLeft;
+	CRenderer::screenRight				=	o->screenRight;
+	CRenderer::screenTop				=	o->screenTop;
+	CRenderer::screenBottom				=	o->screenBottom;
+	CRenderer::clipMin					=	o->clipMin;
+	CRenderer::clipMax					=	o->clipMax;
+	CRenderer::pixelVariance			=	o->pixelVariance;
+	CRenderer::jitter					=	o->jitter;
+	CRenderer::hider					=	o->hider;
+	CRenderer::archivePath				=	o->archivePath;
+	CRenderer::proceduralPath			=	o->proceduralPath;
+	CRenderer::texturePath				=	o->texturePath;
+	CRenderer::shaderPath				=	o->shaderPath;
+	CRenderer::displayPath				=	o->displayPath;
+	CRenderer::modulePath				=	o->modulePath;
+	CRenderer::temporaryPath			=	o->temporaryPath;
+	CRenderer::pixelXsamples			=	o->pixelXsamples;
+	CRenderer::pixelYsamples			=	o->pixelYsamples;
+	CRenderer::gamma					=	o->gamma;
+	CRenderer::gain						=	o->gain;
+	CRenderer::pixelFilterWidth			=	o->pixelFilterWidth;
+	CRenderer::pixelFilterHeight		=	o->pixelFilterHeight;
+	CRenderer::pixelFilter				=	o->pixelFilter;
 	memcpy(CRenderer::colorQuantizer,o->colorQuantizer,5*sizeof(float));
 	memcpy(CRenderer::depthQuantizer,o->depthQuantizer,5*sizeof(float));
-	CRenderer::displays				=	o->displays;
-	CRenderer::clipPlanes			=	o->clipPlanes;
-	CRenderer::relativeDetail		=	o->relativeDetail;
-	CRenderer::projection			=	o->projection;
-	CRenderer::fov					=	o->fov;
-	CRenderer::nColorComps			=	o->nColorComps;
-	CRenderer::fromRGB				=	o->fromRGB;
-	CRenderer::toRGB				=	o->toRGB;
-	CRenderer::fstop				=	o->fstop;
-	CRenderer::focallength			=	o->focallength;
-	CRenderer::focaldistance		=	o->focaldistance;
-	CRenderer::shutterOpen			=	o->shutterOpen;
-	CRenderer::shutterClose			=	o->shutterClose;
-	CRenderer::flags				=	o->flags;
+	CRenderer::displays					=	o->displays;
+	CRenderer::clipPlanes				=	o->clipPlanes;
+	CRenderer::relativeDetail			=	o->relativeDetail;
+	CRenderer::projection				=	o->projection;
+	CRenderer::fov						=	o->fov;
+	CRenderer::nColorComps				=	o->nColorComps;
+	CRenderer::fromRGB					=	o->fromRGB;
+	CRenderer::toRGB					=	o->toRGB;
+	CRenderer::fstop					=	o->fstop;
+	CRenderer::focallength				=	o->focallength;
+	CRenderer::focaldistance			=	o->focaldistance;
+	CRenderer::shutterOpen				=	o->shutterOpen;
+	CRenderer::shutterClose				=	o->shutterClose;
+	CRenderer::flags					=	o->flags;
 
-	CRenderer::endofframe			=	o->endofframe;
-	CRenderer::filelog				=	o->filelog;
-	CRenderer::numThreads			=	o->numThreads;
-	CRenderer::maxTextureSize		=	o->maxTextureSize;
-	CRenderer::maxBrickSize			=	o->maxBrickSize;
-	CRenderer::maxShaderCache		=	o->maxShaderCache;
-	CRenderer::maxGridSize			=	o->maxGridSize;
-	CRenderer::maxRayDepth			=	o->maxRayDepth;
-	CRenderer::maxPhotonDepth		=	o->maxPhotonDepth;
-	CRenderer::bucketWidth			=	o->bucketWidth;
-	CRenderer::bucketHeight			=	o->bucketHeight;
-	CRenderer::netXBuckets			=	o->netXBuckets;
-	CRenderer::netYBuckets			=	o->netYBuckets;
-	CRenderer::maxEyeSplits			=	o->maxEyeSplits;
-	CRenderer::maxHierarchyDepth	=	o->maxHierarchyDepth;
-	CRenderer::maxHierarchyLeafObjects		=	o->maxHierarchyLeafObjects;
-	CRenderer::tsmThreshold			=	o->tsmThreshold;
-	CRenderer::causticIn			=	o->causticIn;
-	CRenderer::causticOut			=	o->causticOut;
-	CRenderer::globalIn				=	o->globalIn;
-	CRenderer::globalOut			=	o->globalOut;
-	CRenderer::volumeIn				=	o->volumeIn;
-	CRenderer::volumeOut			=	o->volumeOut;
-	CRenderer::numEmitPhotons		=	o->numEmitPhotons;
-	CRenderer::shootStep			=	o->shootStep;
-	CRenderer::depthFilter			=	o->depthFilter;
+	CRenderer::endofframe				=	o->endofframe;
+	CRenderer::filelog					=	o->filelog;
+	CRenderer::numThreads				=	o->numThreads;
+	CRenderer::maxTextureSize			=	o->maxTextureSize;
+	CRenderer::maxBrickSize				=	o->maxBrickSize;
+	CRenderer::maxShaderCache			=	o->maxShaderCache;
+	CRenderer::maxGridSize				=	o->maxGridSize;
+	CRenderer::maxRayDepth				=	o->maxRayDepth;
+	CRenderer::maxPhotonDepth			=	o->maxPhotonDepth;
+	CRenderer::bucketWidth				=	o->bucketWidth;
+	CRenderer::bucketHeight				=	o->bucketHeight;
+	CRenderer::netXBuckets				=	o->netXBuckets;
+	CRenderer::netYBuckets				=	o->netYBuckets;
+	CRenderer::maxEyeSplits				=	o->maxEyeSplits;
+	CRenderer::maxHierarchyDepth		=	o->maxHierarchyDepth;
+	CRenderer::maxHierarchyLeafObjects	=	o->maxHierarchyLeafObjects;
+	CRenderer::tsmThreshold				=	o->tsmThreshold;
+	CRenderer::causticIn				=	o->causticIn;
+	CRenderer::causticOut				=	o->causticOut;
+	CRenderer::globalIn					=	o->globalIn;
+	CRenderer::globalOut				=	o->globalOut;
+	CRenderer::volumeIn					=	o->volumeIn;
+	CRenderer::volumeOut				=	o->volumeOut;
+	CRenderer::numEmitPhotons			=	o->numEmitPhotons;
+	CRenderer::shootStep				=	o->shootStep;
+	CRenderer::depthFilter				=	o->depthFilter;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -542,7 +544,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		lengthB			=	0;
 	}
 
-	if (aperture				!= 0)					flags	|=	OPTIONS_FLAGS_FOCALBLUR;
+	if (aperture		!= 0)			flags	|=	OPTIONS_FLAGS_FOCALBLUR;
 	if (shutterClose	!= shutterOpen)	flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
 
 	// Compute the matrices related to the camera transformation
@@ -626,13 +628,13 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	// Compute the world to NDC transform required by the shadow maps
 	mulmm(worldToNDC,toNDC,fromWorld);
 
-
+	// Create a default display if not there
 	if (displays == NULL) {
-		displays				=	new COptions::CDisplay;
+		displays				=	(COptions::CDisplay *) frameMemory->alloc(sizeof(COptions::CDisplay));
 		displays->next			=	NULL;
-		displays->outDevice		=	strdup(RI_FILE);
-		displays->outName		=	strdup("ri.tif");
-		displays->outSamples	=	strdup(RI_RGBA);
+		displays->outDevice		=	RI_FILE;
+		displays->outName		=	"ri.tif";
+		displays->outSamples	=	RI_RGBA;
 	}
 
 	marginalX			=	pixelFilterWidth / 2;
@@ -642,16 +644,13 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	marginXcoverage		=	max(marginalX - marginX,0);
 	marginYcoverage		=	max(marginalY -	marginY,0);
 
+	// The bucket we're rendering
 	currentXBucket		=	0;
 	currentYBucket		=	0;
-
-
-
 	
 	// Initialize the extend of the world
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
 
 	// This is the set of raytraced objects
 	raytraced				=	NULL;
@@ -664,13 +663,10 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	dirtyInstances			=	NULL;
 	dirtyAttributes			=	NULL;
 	
+	// These are the flags that objects need to have to be visible to raytracer
 	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE			|
 								ATTRIBUTES_FLAGS_TRACE_VISIBLE			|
 								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
-
-	if (hiderFlags & HIDER_NEEDS_RAYTRACING) {
-		raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-	}
 
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
@@ -1021,23 +1017,6 @@ void		CRenderer::addTracable(CTriangle *tracable,CSurface *object) {
 	if (triangles != NULL) triangles->push(tracable);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	addTracable
-// Description			:	Add a raytracable object into the frame
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/9/2006
-void		CRenderer::addTracable(CMovingTriangle *tracable,CSurface *object) {
-	if (tracables == NULL)	tracables	=	new CArray<CTracable *>;
-	if (raytraced == NULL)	raytraced	=	new CArray<CSurface *>;
-
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
@@ -1062,6 +1041,18 @@ void		CRenderer::prepareFrame() {
 }
 
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	dispatcherThread
+// Description			:	This thread is responsible for dispatching needed buckets
+//							the servers
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+static	void		*dispatcherThread(void *w) {
+	CRenderer::rendererThread(w);
+
+	return NULL;
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -1072,16 +1063,40 @@ void		CRenderer::prepareFrame() {
 // Comments				:
 // Date last edited		:	10/9/2006
 void		CRenderer::renderFrame() {
-	return;
 
 	// Render the frame
 	if (netNumServers != 0) {
 		const	char	*previousActivity	=	stats.activity;
-	
+		int				i;
+		TThread			*threads;
+
 		stats.activity	=	"Dispatching";
 
-		// Dispatch the rendering job to the servers
-		clientRenderFrame();
+		// Create the mutexes
+		osCreateMutex(commitMutex);
+
+		threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
+
+		// Spawn the threads
+		for (i=0;i<netNumServers;i++) {
+			threads[i]	=	osCreateThread(dispatcherThread,(void *) i);
+		}
+
+		// Go to sleep until we're done
+		for (i=0;i<netNumServers;i++) {
+			osWaitThread(threads[i]);
+		}
+
+		// Ditch the mutexes
+		osDeleteMutex(commitMutex);
+
+		// Send the ready to the servers to prepare them for the next frame
+		numNetrenderedBuckets = 0;
+		for (i=0;i<netNumServers;i++) {
+			T32	netBuffer;
+			netBuffer.integer	=	NET_READY;
+			rcSend(netServers[i],(char *) &netBuffer,sizeof(T32));
+		}
 
 		stats.activity	=	previousActivity;
 	} else {

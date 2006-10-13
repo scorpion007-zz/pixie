@@ -49,11 +49,12 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-CZbuffer::CZbuffer() : CReyes(HIDER_RGBAZ_ONLY) , COcclusionCuller() {
+CZbuffer::CZbuffer() : CReyes() , COcclusionCuller() {
 	int	i;
 
-	totalWidth		=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*xSampleOffset;
-	totalHeight		=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*ySampleOffset;
+	CRenderer::hiderFlags	|=	HIDER_RGBAZ_ONLY;
+	totalWidth				=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*xSampleOffset;
+	totalHeight				=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*ySampleOffset;
 	
 
 	// Allocate the framebuffer

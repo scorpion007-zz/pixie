@@ -221,7 +221,7 @@ public:
 	void				addObject(CObject *);									// Add an object into the scene
 	void				addInstance(void *);									// Add an instance into the scene
 																				// Find a coordinate system
-	int					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
+
 																				// The following functions are about texture management and are implemented in texture.cpp
 	void				rendererThread(void *);
 

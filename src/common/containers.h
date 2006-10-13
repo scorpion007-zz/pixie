@@ -305,7 +305,7 @@ public:
 
 						// Dtor
 						~CTrie() {
-							if (root ~= NULL) deleteNode(root);
+							if (root != NULL) deleteNode(root);
 						}
 
 						// Insert an object into the trie

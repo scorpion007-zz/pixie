@@ -59,9 +59,11 @@ static vector spectrumSpline[] = {		{ 0, 0, 0},
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2003
-CPhotonHider::CPhotonHider(CAttributes *a) : CShadingContext(HIDER_NEEDS_RAYTRACING | HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE) {
-	bias		=	a->shadowBias;
-	phony		=	new CSurface(a,CRenderer::world);
+CPhotonHider::CPhotonHider(CAttributes *a) {
+	CRenderer::raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
+	CRenderer::hiderFlags			|=	HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE;
+	bias							=	a->shadowBias;
+	phony							=	new CSurface(a,CRenderer::world);
 	phony->attach();
 }
 

@@ -149,7 +149,7 @@ CReyes::CBucket::~CBucket() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	2/1/2002
-CReyes::CReyes(unsigned int hf) : CShadingContext(hf) {
+CReyes::CReyes() {
 	int			cx,cy;
 
 	// Allocate the buckets

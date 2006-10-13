@@ -37,6 +37,10 @@
 #include "shading.h"
 
 
+static	matrix	identity	=	{	1,	0,	0,	0,
+									0,	1,	0,	0,
+									0,	0,	1,	0,
+									0,	0,	0,	1	};
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -330,6 +334,63 @@ void			CRenderer::defineCoordinateSystem(const char *name,matrix &from,matrix &t
 		definedCoordinateSystems->insert(newEntry->name,newEntry);
 	}
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRendererContext
+// Method				:	findCoordinateSystem
+// Description			:	Find a coordinate system
+// Return Value			:	TRUE on success
+// Comments				:
+// Date last edited		:	8/25/2002
+int			CRenderer::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
+	CNamedCoordinateSystem	*currentSystem;
+
+	assert(CRenderer::definedCoordinateSystems	!=	NULL);
+
+	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
+		from		=	&currentSystem->from;
+		to			=	&currentSystem->to;
+		cSystem		=	currentSystem->systemType;
+
+		switch(cSystem) {
+			case COORDINATE_OBJECT:
+				break;
+			case COORDINATE_CAMERA:
+				from	=	&identity;
+				to		=	&identity;
+				break;
+			case COORDINATE_WORLD:
+				from	=	&CRenderer::fromWorld;
+				to		=	&CRenderer::toWorld;
+				break;
+			case COORDINATE_SHADER:
+				{
+					CXform	*currentXform	=	context->getXform(FALSE);
+					from	=	&currentXform->from;
+					to		=	&currentXform->to;
+					break;
+				}
+			case COORDINATE_LIGHT:
+			case COORDINATE_NDC:
+			case COORDINATE_RASTER:
+			case COORDINATE_SCREEN:
+				break;
+			case COORDINATE_CURRENT:
+				{
+					CXform	*currentXform	=	context->getXform(FALSE);
+					from	=	&currentXform->from;
+					to		=	&currentXform->to;
+					break;
+				}
+		}
+
+		return	TRUE;
+	}
+
+	return	FALSE;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////

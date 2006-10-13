@@ -38,6 +38,7 @@
 #include "memory.h"
 #include "surface.h"
 #include "rendererContext.h"
+#include "renderer.h"
 
 
 
@@ -178,7 +179,7 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 		matrix				*to;
 		ECoordinateSystem	sys;
 
-		if (currentRenderer->findCoordinateSystem(attributes->maxDisplacementSpace,from,to,sys)) {
+		if (CRenderer::findCoordinateSystem(attributes->maxDisplacementSpace,from,to,sys)) {
 			maxDisp	=	attributes->maxDisplacement	* getDisp(*from,attributes->maxDisplacement);
 		}
 

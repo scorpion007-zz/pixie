@@ -185,7 +185,7 @@ public:
 // Date last edited		:	10/13/2001
 class	CShadingContext {
 public:
-								CShadingContext(unsigned int);
+								CShadingContext();
 		virtual					~CShadingContext();
 
 		// This function is called to to render

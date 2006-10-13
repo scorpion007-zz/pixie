@@ -58,6 +58,7 @@
 #define	emission(a,b)						scripterror("Invalid environment function call during init\n")
 #define debugFunction(a)
 #define	illuminateBegin(a,b,c,d,e,f)
+#define findCoordinateSystem				CRenderer::findCoordinateSystem
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext

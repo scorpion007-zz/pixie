@@ -299,16 +299,16 @@ void	CPrimaryBundle::post() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/26/2001
-CRaytracer::CRaytracer()	: CShadingContext(HIDER_NEEDS_RAYTRACING),
-	primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
+CRaytracer::CRaytracer() : primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
+	CRenderer::raytracingFlags	|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
+
+	const int		xoffset		=	(int) ceil((CRenderer::pixelFilterWidth	- 1) / (float) 2);
+	const int		yoffset		=	(int) ceil((CRenderer::pixelFilterHeight	- 1) / (float) 2);
+	const int		xpixels		=	CRenderer::bucketWidth + 2*xoffset;
+	const int		ypixels		=	CRenderer::bucketHeight + 2*yoffset;
 	
-	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	- 1) / (float) 2);
-	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight	- 1) / (float) 2);
-	const int		xpixels				=	CRenderer::bucketWidth + 2*xoffset;
-	const int		ypixels				=	CRenderer::bucketHeight + 2*yoffset;
-	
-	fbContribution						=	new float[xpixels*ypixels];
-	fbPixels							=	new float[xpixels*ypixels*CRenderer::numSamples];
+	fbContribution				=	new float[xpixels*ypixels];
+	fbPixels					=	new float[xpixels*ypixels*CRenderer::numSamples];
 }
 
 ///////////////////////////////////////////////////////////////////////

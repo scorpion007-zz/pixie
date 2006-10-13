@@ -209,22 +209,6 @@ int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 	}
 }
 
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	dispatcherThread
-// Description			:	This thread is responsible for dispatching needed buckets
-//							the servers
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/28/2001
-static	void		*dispatcherThread(void *w) {
-	CRenderer::rendererThread(w);
-
-	return NULL;
-}
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	rendererThread
@@ -332,44 +316,6 @@ void		CRenderer::rendererThread(void *w) {
 	}
 }
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	clientRenderFrame
-// Description			:	We're a client, so spawn a thread to guide each server
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-void		CRenderer::clientRenderFrame() {
-	int			i;
-	TThread		*threads;
-
-	// Create the mutexes
-	osCreateMutex(commitMutex);
-
-	threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
-
-	// Spawn the threads
-	for (i=0;i<netNumServers;i++) {
-		threads[i]	=	osCreateThread(dispatcherThread,(void *) i);
-	}
-
-	// Go to sleep until we're done
-	for (i=0;i<netNumServers;i++) {
-		osWaitThread(threads[i]);
-	}
-
-	// Ditch the mutexes
-	osDeleteMutex(commitMutex);
-
-	// Send the ready to the servers to prepare them for the next frame
-	numNetrenderedBuckets = 0;
-	for (i=0;i<netNumServers;i++) {
-		T32	netBuffer;
-		netBuffer.integer	=	NET_READY;
-		rcSend(netServers[i],(char *) &netBuffer,sizeof(T32));
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////

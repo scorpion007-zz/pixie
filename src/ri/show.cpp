@@ -50,8 +50,10 @@ TGlPointsFunction		CView::drawPoints		=	NULL;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	9/21/2006
-CShow::CShow() : CShadingContext(HIDER_NODISPLAY) {
+CShow::CShow() : CShadingContext() {
 	char		moduleFile[OS_MAX_PATH_LENGTH];
+
+	CRenderer::hiderFlags	|=	HIDER_NODISPLAY;
 
 	// First, try to load the dynamic library
 	CView::handle	=	NULL;

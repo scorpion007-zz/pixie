@@ -208,7 +208,7 @@ protected:
 
 public:
 
-								CReyes(unsigned int);
+								CReyes();
 								~CReyes();
 
 								// This function is called to to render

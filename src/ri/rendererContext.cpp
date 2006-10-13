@@ -592,59 +592,6 @@ void	CRendererContext::addInstance(void *d) {
 
 
 
-static	matrix	identity	=	{	1,	0,	0,	0,
-								0,	1,	0,	0,
-								0,	0,	1,	0,
-								0,	0,	0,	1	};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	findCoordinateSystem
-// Description			:	Find a coordinate system
-// Return Value			:	TRUE on success
-// Comments				:
-// Date last edited		:	8/25/2002
-int		CRendererContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
-	CNamedCoordinateSystem	*currentSystem;
-
-	assert(CRenderer::definedCoordinateSystems	!=	NULL);
-
-	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
-		from		=	&currentSystem->from;
-		to			=	&currentSystem->to;
-		cSystem		=	currentSystem->systemType;
-
-		switch(cSystem) {
-			case COORDINATE_OBJECT:
-				break;
-			case COORDINATE_CAMERA:
-				from	=	&identity;
-				to		=	&identity;
-				break;
-			case COORDINATE_WORLD:
-				from	=	&CRenderer::fromWorld;
-				to		=	&CRenderer::toWorld;
-				break;
-			case COORDINATE_SHADER:
-				from	=	&currentXform->from;
-				to		=	&currentXform->to;
-				break;
-			case COORDINATE_LIGHT:
-			case COORDINATE_NDC:
-			case COORDINATE_RASTER:
-			case COORDINATE_SCREEN:
-				break;
-			case COORDINATE_CURRENT:
-				from	=	&currentXform->from;
-				to		=	&currentXform->to;
-				break;
-		}
-
-		return	TRUE;
-	}
-
-	return	FALSE;
-}
 
 
 
@@ -2577,7 +2524,7 @@ void	CRendererContext::RiCoordSysTransform(char *space) {
 	xform	=	getXform(FALSE);
 
 	if (xform != NULL) {
-		findCoordinateSystem(space,from,to,cSystem);
+		CRenderer::findCoordinateSystem(space,from,to,cSystem);
 
 		movmm(xform->from,from[0]);
 		movmm(xform->to,to[0]);
@@ -2591,8 +2538,8 @@ void	CRendererContext::RiTransformPoints(char *fromspace,char *tospace,int npoin
 	int					i;
 	vector				tmp;
 
-	findCoordinateSystem(fromspace,from1,to1,cSystem1);
-	findCoordinateSystem(tospace,from2,to2,cSystem2);
+	CRenderer::findCoordinateSystem(fromspace,from1,to1,cSystem1);
+	CRenderer::findCoordinateSystem(tospace,from2,to2,cSystem2);
 
 	for (i=0;i<npoints;i++) {
 		mulmp(tmp,from1[0],points[i]);
