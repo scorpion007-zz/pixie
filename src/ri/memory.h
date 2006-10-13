@@ -98,9 +98,9 @@ inline void *ralloc(int size,CMemPage *&stack) {
 			stack->next						=	cPage;
 		}
 
-		currentMemoryPage					=	currentMemoryPage->next;
-		currentMemoryPage->availableSize	=	currentMemoryPage->totalSize;
-		currentMemoryPage->memory			=	currentMemoryPage->base;
+		stack								=	stack->next;
+		stack->availableSize				=	stack->totalSize;
+		stack->memory						=	stack->base;
 	}
 
 
