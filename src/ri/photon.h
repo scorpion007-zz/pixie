@@ -50,7 +50,7 @@ class	CPhotonHider : public CShadingContext {
 	} EPhotonStage;
 
 public:
-									CPhotonHider(CAttributes *);
+									CPhotonHider(int thread,CAttributes *);
 			virtual					~CPhotonHider();
 
 			// The main hider interface

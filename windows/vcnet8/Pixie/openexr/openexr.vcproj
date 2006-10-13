@@ -66,11 +66,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="IlmImf.lib Iex.lib Imath.lib Half.lib zlib.lib"
+				AdditionalDependencies="IlmImf_d.lib Iex_d.lib Imath_d.lib Half_d.lib IlmThread_d.lib zlibd.lib"
 				OutputFile="$(OutDir)/openexr.dll"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames="libcmtd"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/openexr.pdb"
 				SubSystem="2"

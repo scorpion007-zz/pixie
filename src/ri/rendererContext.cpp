@@ -98,7 +98,6 @@ const char	*colorCieSystem				=	"cie";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // The global variables are defined here
-CRendererContext	*currentRenderer		=	NULL;
 extern	int			ribCommandLineno;					// These two are defined in rib.y
 extern	const char	*ribFile;
 

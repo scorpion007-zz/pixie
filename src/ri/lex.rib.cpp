@@ -1641,7 +1641,7 @@ YY_RULE_SETUP
 
 														fileName[strlen(fileName)-1]	=	'\0';
 
-														options		=	currentRenderer->getOptions();
+														options		=	CRenderer::context->getOptions();
 
 														if (CRenderer::locateFile(location,fileName,options->archivePath) == TRUE) {
 															FILE	*in;

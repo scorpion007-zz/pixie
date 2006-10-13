@@ -35,7 +35,6 @@
 #define HIERARCHY_H
 
 #include "common/global.h"
-#include "common/containers.h"
 #include "common/algebra.h"
 #include "common/os.h"
 #include "attributes.h"
@@ -312,7 +311,7 @@ class	CHierarchy {
 	};
 
 public:
-						CHierarchy(int,CTracable **,const float *,const float *,CMemStack *mem);
+						CHierarchy(int,CTracable **,const float *,const float *);
 						~CHierarchy();
 
 	void				remove(const CTracable *,float *,float *);
@@ -327,7 +326,6 @@ private:
 	void				add(void *node,CHInternal *parent,int depth,int numItems,CTracable **items,float *bmin,float *bmax);
 	void				remove(void *node,const CTracable *item,float *bmin,float *bmax,float *ibmin,float *ibmax);
 
-	CMemStack			*memory;					// The memory area we allocate the hierarchy from
 	void				*root;						// Root node of the hierarchy
 	vector				bmin,bmax;					// The bound of all the objects in the tree
 	int					maxObjects;					// Maximum number of objects per leaf

@@ -58,7 +58,7 @@ static	int	numFragments	=	0;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-CStochastic::CStochastic() : CReyes(), COcclusionCuller(),
+CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 	apertureGenerator(CRenderer::frame) {
 	int		i,j,sx,sy;
 	float	*cExtraSample;

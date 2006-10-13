@@ -49,7 +49,7 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/31/2002
-CZbuffer::CZbuffer() : CReyes() , COcclusionCuller() {
+CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	int	i;
 
 	CRenderer::hiderFlags	|=	HIDER_RGBAZ_ONLY;

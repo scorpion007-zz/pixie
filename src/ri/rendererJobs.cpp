@@ -33,7 +33,7 @@
 #include "stats.h"
 #include "error.h"
 
-void			(*CRenderer::dispatchJob)(CJob &job)	=	NULL;
+void			(*CRenderer::dispatchJob)(int thread,CJob &job)	=	NULL;
 
 
 
@@ -63,7 +63,7 @@ void			CRenderer::beginRendering() {
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-void			CRenderer::dispatchReyes(CJob &job) {
+void			CRenderer::dispatchReyes(int thread,CJob &job) {
 
 	// If we have a client, ask for a bucket
 	if (netClient != INVALID_SOCKET) {
@@ -126,7 +126,7 @@ void			CRenderer::dispatchReyes(CJob &job) {
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-void			CRenderer::dispatchPhoton(CJob &job) {
+void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 }
 
 

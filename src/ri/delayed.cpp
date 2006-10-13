@@ -109,7 +109,7 @@ void	CDelayedObject::intersect(CRay *cRay) {
 	float	tmax	=	cRay->t;
 
 	if (hierarchyIntersectBox(this->cbmin,this->cbmax,cRay->from,cRay->to,tmin,tmax)) {
-		currentRenderer->processDelayedObject(this,subdivisionFunction,data,bmin,bmax,cRay);
+		CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax,cRay);
 	}
 }
 
@@ -145,7 +145,7 @@ void	CDelayedObject::tesselate(CShadingContext *context) {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedObject::dice(CShadingContext *r) {
-	currentRenderer->processDelayedObject(this,subdivisionFunction,data,bmin,bmax);
+	CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////

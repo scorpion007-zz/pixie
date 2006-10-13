@@ -160,7 +160,7 @@ void	CRenderer::endDisplays() {
 		if (datas[i].module != NULL) {
 			datas[i].finish(datas[i].handle);
 			if (strcmp(datas[i].display->outDevice,RI_SHADOW) == 0) {
-				currentRenderer->RiMakeShadowV(datas[i].displayName,datas[i].displayName,0,NULL,NULL);
+				CRenderer::context->RiMakeShadowV(datas[i].displayName,datas[i].displayName,0,NULL,NULL);
 			}
 		}
 		if (datas[i].displayName != NULL) free(datas[i].displayName);

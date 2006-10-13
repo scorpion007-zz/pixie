@@ -149,7 +149,7 @@ CReyes::CBucket::~CBucket() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	2/1/2002
-CReyes::CReyes() {
+CReyes::CReyes(int thread) : CShadingContext(thread) {
 	int			cx,cy;
 
 	// Allocate the buckets
@@ -251,9 +251,9 @@ CReyes::~CReyes() {
 void		CReyes::renderingLoop() {
 	CRenderer::CJob	job;
 
-#define computeExtends																\
-	bucketPixelLeft		=	currentXBucket*CRenderer::bucketWidth;			\
-	bucketPixelTop		=	currentYBucket*CRenderer::bucketHeight;			\
+#define computeExtends																				\
+	bucketPixelLeft		=	currentXBucket*CRenderer::bucketWidth;									\
+	bucketPixelTop		=	currentYBucket*CRenderer::bucketHeight;									\
 	bucketPixelWidth	=	min(CRenderer::bucketWidth,		CRenderer::xPixels-bucketPixelLeft);	\
 	bucketPixelHeight	=	min(CRenderer::bucketHeight,	CRenderer::yPixels-bucketPixelTop);		\
 	tbucketLeft			=	bucketPixelLeft*CRenderer::pixelXsamples - xSampleOffset;				\
@@ -265,7 +265,7 @@ void		CReyes::renderingLoop() {
 	while(TRUE) {
 
 		// Get the job from the renderer
-		CRenderer::dispatchJob(job);
+		CRenderer::dispatchJob(thread,job);
 
 		// Process the job
 		if (job.type == CRenderer::CJob::TERMINATE) {
@@ -298,8 +298,6 @@ void		CReyes::renderingLoop() {
 
 #undef computeExtends
 
-	// Delete the context
-	delete this;
 }
 
 

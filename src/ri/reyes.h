@@ -208,7 +208,7 @@ protected:
 
 public:
 
-								CReyes();
+								CReyes(int thread);
 								~CReyes();
 
 								// This function is called to to render

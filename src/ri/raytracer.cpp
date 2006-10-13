@@ -299,7 +299,7 @@ void	CPrimaryBundle::post() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/26/2001
-CRaytracer::CRaytracer() : primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
+CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
 	CRenderer::raytracingFlags	|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 
 	const int		xoffset		=	(int) ceil((CRenderer::pixelFilterWidth	- 1) / (float) 2);
@@ -344,7 +344,7 @@ void	CRaytracer::renderingLoop() {
 	while(TRUE) {
 
 		// Get the job from the renderer
-		CRenderer::dispatchJob(job);
+		CRenderer::dispatchJob(thread,job);
 
 		// Process the job
 		if (job.type == CRenderer::CJob::TERMINATE) {

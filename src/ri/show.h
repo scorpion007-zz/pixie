@@ -43,7 +43,7 @@
 // Date last edited		:	8/26/2001
 class	CShow : public CShadingContext {
 public:
-							CShow();
+							CShow(int thread);
 			virtual			~CShow();
 
 			// Right after world end to force rendering of the entire frame

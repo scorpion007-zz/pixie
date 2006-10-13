@@ -59,7 +59,7 @@ static vector spectrumSpline[] = {		{ 0, 0, 0},
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2003
-CPhotonHider::CPhotonHider(CAttributes *a) {
+CPhotonHider::CPhotonHider(int thread,CAttributes *a) : CShadingContext(thread) {
 	CRenderer::raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 	CRenderer::hiderFlags			|=	HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE;
 	bias							=	a->shadowBias;
@@ -114,7 +114,7 @@ void		CPhotonHider::renderingLoop(){
 	while(TRUE) {
 
 		// Get the job from the renderer
-		CRenderer::dispatchJob(job);
+		CRenderer::dispatchJob(thread,job);
 
 		if (job.type == CRenderer::CJob::TERMINATE) {
 			break;

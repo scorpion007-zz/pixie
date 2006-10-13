@@ -234,7 +234,7 @@ static	int		parameterListCheck() {
 			} else {
 				if (FALSE) { 	// If we want to go through the shader parameters (performance hit)
 					// Not global, not inline, check the shaders
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					var						=	attributes->findParameter(par->name);
 					
 					if (var != NULL) {
@@ -1945,7 +1945,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					int	numuPatches,numvPatches;
 					int	nu	=	(int) $3;
 					int	nv	=	(int) $5;
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int	uw,vw;
 					int	numVaryings;
 
@@ -2306,7 +2306,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				{
 					int			*argi1		=	(int *) get(0);
 					int			numVertices,numUniforms;
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int			wrap;
 					int			numVaryings,i;
 

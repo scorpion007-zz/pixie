@@ -361,7 +361,7 @@ static	int		parameterListCheck() {
 			} else {
 				if (FALSE) { 	// If we want to go through the shader parameters (performance hit)
 					// Not global, not inline, check the shaders
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					var						=	attributes->findParameter(par->name);
 					
 					if (var != NULL) {
@@ -2730,7 +2730,7 @@ case 116:
 					int	numuPatches,numvPatches;
 					int	nu	=	(int) yyvsp[-4].real;
 					int	nv	=	(int) yyvsp[-2].real;
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int	uw,vw;
 					int	numVaryings;
 
@@ -2996,7 +2996,7 @@ case 133:
 {
 					int			*argi1		=	(int *) get(0);
 					int			numVertices,numUniforms;
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int			wrap;
 					int			numVaryings,i;
 

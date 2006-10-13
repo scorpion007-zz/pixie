@@ -637,16 +637,16 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		displays->outSamples	=	RI_RGBA;
 	}
 
-	marginalX			=	pixelFilterWidth / 2;
-	marginalY			=	pixelFilterHeight / 2;
-	marginX				=	(float) floor(marginalX);
-	marginY				=	(float) floor(marginalY);
-	marginXcoverage		=	max(marginalX - marginX,0);
-	marginYcoverage		=	max(marginalY -	marginY,0);
+	marginalX				=	pixelFilterWidth / 2;
+	marginalY				=	pixelFilterHeight / 2;
+	marginX					=	(float) floor(marginalX);
+	marginY					=	(float) floor(marginalY);
+	marginXcoverage			=	max(marginalX - marginX,0);
+	marginYcoverage			=	max(marginalY -	marginY,0);
 
 	// The bucket we're rendering
-	currentXBucket		=	0;
-	currentYBucket		=	0;
+	currentXBucket			=	0;
+	currentYBucket			=	0;
 	
 	// Initialize the extend of the world
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
@@ -696,23 +696,23 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		contexts[i]	=	NULL;
 
 		if (strcmp(hider,"raytrace") == 0) {
-			contexts[i]						=	new CRaytracer();
+			contexts[i]						=	new CRaytracer(i);
 			dispatchJob						=	dispatchReyes;
 		} else if (strcmp(hider,"stochastic") == 0) {
-			contexts[i]						=	new CStochastic();
+			contexts[i]						=	new CStochastic(i);
 			dispatchJob						=	dispatchReyes;
 		} else if (strcmp(hider,"zbuffer") == 0) {
-			contexts[i]						=	new CZbuffer();
+			contexts[i]						=	new CZbuffer(i);
 			dispatchJob						=	dispatchReyes;
 		} else if (strncmp(hider,"show:",5) == 0) {
-			contexts[i]						=	new CShow();
+			contexts[i]						=	new CShow(i);
 			dispatchJob						=	dispatchReyes;
 		} else if (strcmp(hider,"photon") == 0) {
-			contexts[i]						=	new CPhotonHider(context->getAttributes(TRUE));
+			contexts[i]						=	new CPhotonHider(i,context->getAttributes(TRUE));
 			dispatchJob						=	dispatchPhoton;
 		} else {
 			error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",hider);
-			contexts[i]						=	new CStochastic();
+			contexts[i]						=	new CStochastic(i);
 			dispatchJob						=	dispatchReyes;
 		}
 
@@ -957,6 +957,12 @@ void			CRenderer::render(CObject *cObject,const float *bmin,const float *bmax) {
 		// Tesselate the object
 		cObject->tesselate(contexts[0]);
 	}
+
+	// Add the object to the context
+	int i;
+	for (i=0;i<numThreads;i++) {
+		contexts[i]->drawObject(cObject,bmin,bmax);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1030,13 +1036,16 @@ void		CRenderer::prepareFrame() {
 	if (tracables != NULL) {
 		if (hierarchy == NULL) {
 			// Init the hierarchy
-			hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax,frameMemory);
+			hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax);
 		} else {
 			hierarchy->add(tracables->numItems,tracables->array);
 		}
 
 		delete tracables;
 		tracables	=	NULL;
+	} else {
+		// Create a dummy hierarchy
+		hierarchy	=	new CHierarchy(0,NULL,worldBmin,worldBmax);
 	}
 }
 

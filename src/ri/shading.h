@@ -185,7 +185,7 @@ public:
 // Date last edited		:	10/13/2001
 class	CShadingContext {
 public:
-								CShadingContext();
+								CShadingContext(int thread);
 		virtual					~CShadingContext();
 
 		// This function is called to to render
@@ -224,8 +224,8 @@ protected:
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }
 		virtual	void			illuminateEnd() { }
 
+		int						thread;													// The thread number for this context
 private:
-
 		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
 
 		CConditional			*conditionals;											// Holds nested conditionals

@@ -927,10 +927,10 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			CHLeaf				*newNode;
 
 			// We do not have a good split, create a leaf node
-			newNode						=	(CHLeaf *) memory->alloc(sizeof(CHLeaf));
+			newNode						=	(CHLeaf *) CRenderer::frameMemory->alloc(sizeof(CHLeaf));
 			stats.numHierarchyLeaves++;
 			newNode->numItems			=	numItems;
-			newNode->items				=	(CTracable **)	memory->alloc(sizeof(CTracable *)*numItems);
+			newNode->items				=	(CTracable **)	CRenderer::frameMemory->alloc(sizeof(CTracable *)*numItems);
 			memcpy(newNode->items,items,sizeof(CTracable *)*numItems);
 
 			// We don't need this node anymore
@@ -945,7 +945,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			CHUncomputed		*front,*back;
 
 			// We have a good split, create an internal node
-			newNode						=	(CHInternal *) memory->alloc(sizeof(CHInternal));
+			newNode						=	(CHInternal *) CRenderer::frameMemory->alloc(sizeof(CHInternal));
 			stats.numHierarchyInternals++;
 			newNode->splitAxis			=	splitAxis;
 			newNode->splitCoordinate	=	splitCoordinate;
@@ -1003,9 +1003,9 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 		stats.numHierarchyLeaves++;
 		stats.numLeafItems	+=	cUncomputed->numItems;
 
-		newNode				=	(CHLeaf *)		memory->alloc(sizeof(CHLeaf));
+		newNode				=	(CHLeaf *)		CRenderer::frameMemory->alloc(sizeof(CHLeaf));
 		newNode->numItems	=	cUncomputed->numItems;
-		newNode->items		=	(CTracable **)	memory->alloc(sizeof(CTracable *)*newNode->numItems);
+		newNode->items		=	(CTracable **)	CRenderer::frameMemory->alloc(sizeof(CTracable *)*newNode->numItems);
 		memcpy(newNode->items,cUncomputed->items,sizeof(CTracable *)*newNode->numItems);
 
 		nNode				=	(void *) getToken(newNode,HIERARCHY_LEAF_NODE);
@@ -1515,12 +1515,10 @@ void		CHierarchy::remove(void *node,const CTracable *item,float *bmin,float *bma
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	12/23/2001
-CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const float *tmax,CMemStack *mem) {
+CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const float *tmax) {
 	int						i;
 	CTracable				**hitems	=	new CTracable*[numItems];
 	CHUncomputed			*hroot		=	new CHUncomputed;
-
-	memory				=	mem;
 
 	for (i=0;i<numItems;i++) {
 		items[i]->ID	=	-1;
@@ -1542,7 +1540,7 @@ CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const fl
 	root				=	(void *) getToken(hroot,HIERARCHY_UNCOMPUTED_NODE);
 	
 	// Allocate the traversal stack
-	singleStack			=	(CHStack *) memory->alloc(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
+	singleStack			=	(CHStack *) CRenderer::frameMemory->alloc(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
 	currentRayID		=	0;
 }
 
