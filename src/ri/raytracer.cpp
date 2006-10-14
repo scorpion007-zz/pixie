@@ -547,6 +547,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1) / (float) 2);
 	const int		ph			=	(int) ceil((CRenderer::pixelFilterHeight-1) / (float) 2);
 
+	/*
 	for (i=0;i<numShading;i++,samples++) {
 		const float	x			=	samples->x;
 		const float	y			=	samples->y;
@@ -567,6 +568,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 
 		for (cy=pt + (float) 0.5 - y,pixelY=pt;pixelY<=pb;pixelY++,cy++) {
 			for (cx=pl + (float) 0.5 - x,pixelX=pl;pixelX<=pr;pixelX++,cx++) {
+
 				float	contribution					=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
 
 				if (fabs(cx) > CRenderer::marginX)	contribution	*=	CRenderer::marginXcoverage;
@@ -587,5 +589,6 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 			}
 		}
 	}
+	*/
 }
 

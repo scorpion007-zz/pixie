@@ -378,7 +378,6 @@ void		CRibOut::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
 			optionCheckInt(RI_EYESPLITS,1)
 			optionCheckInt(RI_TEXTUREMEMORY,1)
 			optionCheckInt(RI_BRICKMEMORY,1)
-			optionCheckInt(RI_SHADERCACHE,1)
 			optionEndCheck
 		}
 	// Check the hider options
@@ -1513,7 +1512,6 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable(RI_EYESPLITS,			"int");
 	declareVariable(RI_TEXTUREMEMORY,		"int");
 	declareVariable(RI_BRICKMEMORY,			"int");
-	declareVariable(RI_SHADERCACHE,			"int");
 
 	declareVariable(RI_RADIANCECACHE,		"int");
 	declareVariable(RI_JITTER,				"float");

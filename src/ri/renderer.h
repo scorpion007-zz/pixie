@@ -136,15 +136,21 @@ public:
 		static	CDSO												*dsos;						// The list of DSO's that have been loaded
 		static	SOCKET												netClient;					// The client that we're serving (-1 if client)
 		static	int													netNumServers;				// The number of servers (0 if server)
-		static	SOCKET												*netServers;				// The array of servers that are serving us
-		static	TMutex												commitMutex;				// The mutex that controls job dispatch
+		static	SOCKET												*netServers;				// The array of servers that are serving us		
 		static	int													userRaytracing;				// TRUE if we're raytracing for the user
 		static	int													numNetrenderedBuckets;		// The number of netrendered buckets
 
 
-
-
-
+		////////////////////////////////////////////////////////////////////
+		//
+		// Synchronization objects ...
+		//
+		//    Even though some of them are inly used between WorldBegin - WorldEnd, 
+		//    we're defining them as global
+		//
+		////////////////////////////////////////////////////////////////////
+		static	TMutex												commitMutex;				// The mutex that controls job dispatch
+		static	TMutex												networkMutex;				// To serialize the network communication
 
 
 		////////////////////////////////////////////////////////////////////
@@ -204,8 +210,7 @@ public:
 
 		static void				(*dispatchJob)(int thread,CJob &job);			// This function is used by the hiders to ask for a job
 
-		static void				beginRendering();
-		static void				rendererThread(void *w);						// Each client has one thread running this function on the client side to dispatch jobs
+		static void				serverThread(void *w);							// Each client has one thread running this function on the client side to dispatch jobs to servers
 		static void				processServerRequest(T32 req,int index);		// This function is used to serve the client requests
 		static void				dispatchReyes(int thread,CJob &job);			// This function dispatches single threaded buckets
 		static void				dispatchPhoton(int thread,CJob &job);			// This function dispatches single threaded photon bundles
@@ -223,7 +228,7 @@ public:
 		////////////////////////////////////////////////////////////////////
 		static void				beginDisplays();									// Init the displays
 		static void				commit(int,int,int,int,float *);					// Send a chunk of computed framebuffer to the display drivers
-		static int				advanceBucket(int,int &,int &,int &,int &);			// Find the next bucket to render for network rendering
+		static int				advanceBucket(int,int &,int &);						// Find the next bucket to render for network rendering
 		static void				clear(int,int,int,int);								// Clear a window
 		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
 		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
@@ -337,7 +342,6 @@ public:
 		static	int						numThreads;										// The number of threads working
 		static	int						maxTextureSize;									// Maximum amount of texture data to keep in memory (in bytes)
 		static	int						maxBrickSize;									// Maximum amount of brick data to keep in memory (in bytes)
-		static	int						maxShaderCache;									// The maximum shader cache amount
 		static	int						maxGridSize;									// Maximum number of points to shade at a time
 		static	int						maxRayDepth;									// Maximum raytracing recursion depth
 		static	int						maxPhotonDepth;									// The maximum number of photon bounces
@@ -361,7 +365,6 @@ public:
 		static	CShadingContext								**contexts;				// The array of shading contexts
 		static	CDictionary<const char *,CRemoteChannel *>	*declaredRemoteChannels;// Known remote channel lookup
 		static	CArray<CRemoteChannel *>					*remoteChannels;		// all known channels
-		static	CArray<CAttributes *>						*dirtyAttributes;		// The list of attributes that need to be cleaned after the rendering
 		static	CArray<CProgrammableShaderInstance *>		*dirtyInstances;
 		static	unsigned int			raytracingFlags;			// The raytracing flags that hold the combination that needs to be raytraced
 		static	CHierarchy				*hierarchy;					// The raytracing hierarchy
@@ -383,9 +386,13 @@ public:
 		static	unsigned int			additionalParameters;		// Any user specified parameters to be computed
 		static	float					pixelLeft,pixelRight,pixelTop,pixelBottom;		// The rendering window on the screen plane
 		static	float					dydPixel,dxdPixel;			// Stuff
-		static	float					dPixeldx,dPixeldy;
-		static	int						renderLeft,renderRight,renderTop,renderBottom;	// The actual rendering window in pixels
+		static	float					dPixeldx,dPixeldy;			// dPixel / dx, dPixel / dy
+		static	float					dSampledx,dSampledy;		// dSample / dx, dSample / dy
+		static	int						renderLeft,renderRight,renderTop,renderBottom;					// The actual rendering window in pixels
 		static	int						xBuckets,yBuckets;			// The number of buckets
+		static	int						xBucketsMinusOne;			// Obvious ?
+		static	int						yBucketsMinusOne;
+		static	float					invBucketSampleWidth,invBucketSampleHeight;		// The 1 / sample
 		static	int						metaXBuckets,metaYBuckets;						// The number of meta buckets in X and Y
 		static	float					aperture;					// Aperture radius
 		static	float					imagePlane;					// The z coordinate of the image plane
@@ -395,9 +402,11 @@ public:
 		static	float					cocFactorScreen;			// The circle of concusion factor for the screen
 		static	float					invFocaldistance;			// 1 / focalDistance
 		static	float					lengthA,lengthB;			// The depth to length conversion
-		static	float					marginXcoverage,marginYcoverage;				// Coverage ratios for the pixel filter
-		static	float					marginX,marginY;
-		static	float					marginalX,marginalY;
+
+		static	int						xSampleOffset,ySampleOffset;// The amount of offset around each bucket in samples
+		static	float					sampleClipRight,sampleClipLeft,sampleClipTop,sampleClipBottom;	// The actual rendering window in samples
+		static	float					*pixelFilterKernel;			// The precomputed pixel filter kernel
+
 		static	float					leftX,leftZ,leftD;			// The clipping plane equations
 		static	float					rightX,rightZ,rightD;
 		static	float					topY,topZ,topD;

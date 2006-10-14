@@ -102,7 +102,7 @@ protected:
 	public:
 			CObject				*object;				// The object
 			CRasterGrid			*grid;					// The grid
-			CRasterObject		**next;					// The next object
+			CRasterObject		**next;					// The next object (one for each thread)
 			int					refCount;				// The number of threads working on this object
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
@@ -163,10 +163,10 @@ protected:
 									if (numItems <= 1) {
 										cItem	=	NULL;
 									} else {
-										cItem		=	allItems[1];
+										cItem	=	allItems[1];
 									
 										numItems--;
-										lItem		=	allItems[numItems];
+										lItem	=	allItems[numItems];
 
 										while (i <= numItems / 2) {
 											j = 2 * i;
@@ -226,7 +226,7 @@ public:
 	virtual	void				rasterDrawPrimitives(CRasterGrid *)			=	0;
 	virtual	void				rasterEnd(float *,int)						=	0;
 	
-	
+								// The following can be called from the "dice" function to insert an object into the scene
 	void						drawObject(CObject *,const float *,const float *);		// Draw an object
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
 	void						drawRibbon(CSurface *,int,float,float);					// Draw a ribbon (RiCurves)
@@ -235,39 +235,34 @@ public:
 protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 	float						culledDepth;									// The depth of the closest culled object
-	int							xSampleOffset,ySampleOffset;					// The amount of offset around each bucket in samples
-	int							numVertexSamples;								// The number of samples per pixel
+
+	static	int					extraPrimitiveFlags;							// These are the extra primitive flags
+	static	int					numVertexSamples;								// The number of samples per pixel
+	
 	int							currentXBucket,currentYBucket;					// The current bucket we're processing in this thread
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
 private:
-	void						copyPoints(int,float **,float *,int);			// Data movement
-	void						copySamples(int,float **,float *,int);
+	void						copyPoints(int,float **,float *,int);			// Data movement (copy P only)
+	void						copySamples(int,float **,float *,int);			// Data movement (copy the color + opacity + extra samples)
 
 	void						makeRibbon(int,float *,float *,const float *,const float *,const float *,int);
 
+	void						insertObject(CRasterObject *object);			// Add an object into the system
+	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket
 	CRasterGrid					*newGrid(CSurface *,int);						// Create a new grid
 	void						deleteGrid(CRasterGrid *);						// Delete a grid
-	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket
 
 	void						render();										// Render the current bucket
 	void						skip();											// Skip the current bucket
 	
-	int							numGrids;										// The number of grids allocated
-	int							numObjects;										// The number of objects allocated
+	static	int					numGrids;										// The number of grids allocated
+	static	int					numObjects;										// The number of objects allocated
+
+	CRasterObject				*currentObject;									// The current raster object we're drawing
 	CBucket						***buckets;										// All buckets
 	TMutex						bucketMutex;									// Controls the accesses to the buckets
 
-	int							enableMotionBlur;								// TRUE if the motion blur has to be enabled
-	int							extraPrimitiveFlags;							// These are the extra primitive flags
-	int							xBucketsMinusOne;								// xBuckets-1
-	int							yBucketsMinusOne;								// yBuckets-1
-
-	float						dSampledx,dSampledy;							// dSample / dx, dSample / dy
-																				// The clipping region in samples
-	float						sampleClipRight,sampleClipLeft,sampleClipTop,sampleClipBottom;
-
-	float						invBucketSampleWidth,invBucketSampleHeight;		// The 1 / sample
 
 	int							bucketPixelLeft;								// Left of the current bucket in pixels
 	int							bucketPixelTop;									// Top of the current bucket in pixels
@@ -288,11 +283,11 @@ private:
 				inline void		distance2samples(int n,float *dist,float *P) {
 									if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										for (;n>0;n--,P+=3) {
-											*dist++		=	dSampledx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
+											*dist++		=	CRenderer::dSampledx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
 										}
 									} else {
 										for (;n>0;n--,P+=3) {
-											*dist++		=	dSampledx*dist[0];
+											*dist++		=	CRenderer::dSampledx*dist[0];
 										}
 									}
 								}
@@ -307,13 +302,13 @@ private:
 				inline void		camera2samples(int n,float *P) {
 									if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										for (;n>0;n--,P+=3) {
-											P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft)*dSampledx;
-											P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop)*dSampledy;
+											P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft)*CRenderer::dSampledx;
+											P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop)*CRenderer::dSampledy;
 										}
 									} else {
 										for (;n>0;n--,P+=3) {
-											P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*dSampledx;
-											P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*dSampledy;
+											P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*CRenderer::dSampledx;
+											P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*CRenderer::dSampledy;
 										}
 									}
 								}
@@ -331,65 +326,9 @@ private:
 										P[COMP_Y]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
 									}
 
-									P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*dSampledx;
-									P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*dSampledy;
+									P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*CRenderer::dSampledx;
+									P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*CRenderer::dSampledy;
 								}
-
-				///////////////////////////////////////////////////////////////////////
-				// Class				:	CReyes
-				// Method				:	insertObject
-				// Description			:	Insert an object into all hiders
-				// Return Value			:
-				// Comments				:	(inline for speed)
-				// Date last edited		:	7/4/2001
-				inline	void	insertObject(CRasterObject *object) {
-					int			i;
-
-					// First, make sure we're the only one accessing this object (this must always fallthrough)
-					osDownMutex(object->mutex);
-
-					// For every thread
-					const int	sx = (int) floor((object->xbound[0] - xSampleOffset) * invBucketSampleWidth);
-					const int	sy = (int) floor((object->ybound[0] - ySampleOffset) * invBucketSampleHeight);
-					for (i=0;i<CRenderer::numThreads;i++) {
-						CReyes		*hider	=	(CReyes *) CRenderer::contexts[i];
-						int			bx		=	sx;
-						int			by		=	sy;
-						CBucket		*cBucket;
-
-						// Secure the area
-						osDownMutex(hider->bucketMutex);
-
-						// Determine the bucket
-						if (by <= hider->currentYBucket) {
-							by	=	hider->currentYBucket;
-							if (bx < hider->currentXBucket)	bx	=	hider->currentXBucket;
-						} else {
-							if (bx < 0)	bx	=	0;
-						}
-
-						if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {
-							// Out of bounds
-						} else {
-							// Insert the object	
-							object->refCount++;
-							cBucket					=	buckets[by][bx];
-							object->next[thread]	=	cBucket->objects;
-							cBucket->objects		=	object;
-						}
-
-						// Release the mutex
-						osUpMutex(hider->bucketMutex);
-					}
-
-					// Did we kill the object ?
-					if (object->refCount == 0) {
-						osUpMutex(object->mutex);
-						deleteRasterObject(object);
-					} else {
-						osUpMutex(object->mutex);
-					}
-				}
 
 };
 

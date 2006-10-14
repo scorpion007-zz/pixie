@@ -1372,8 +1372,6 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 				options->maxTextureSize	*=	1000;								// Convert into bytes
 			optionCheck(RI_BRICKMEMORY,			options->maxBrickSize,				0,100000,int)
 				options->maxBrickSize	*=	1000;								// Convert into bytes
-			optionCheck(RI_SHADERCACHE,			options->maxShaderCache,			0,100000,int)
-				options->maxShaderCache	*=	1000;								// Convert into bytes
 			optionEndCheck
 		}
 	// Check the hider options

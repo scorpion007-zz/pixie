@@ -78,13 +78,16 @@
 
 
 /////////////////////////////////////////////////////////////////////
+//
 // Static members of the CRenderer
+//
 /////////////////////////////////////////////////////////////////////
 
 
 
-
+////////////////////////////////////////////////////////////////////
 // Global members (active between RiBegin() - RiEnd())
+////////////////////////////////////////////////////////////////////
 CRendererContext									*CRenderer::context						=	NULL;
 CArray<CShaderInstance *>							*CRenderer::allLights					=	NULL;
 CDictionary<const char *,CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;
@@ -101,139 +104,137 @@ CDSO												*CRenderer::dsos						=	NULL;
 SOCKET												CRenderer::netClient					=	INVALID_SOCKET;
 int													CRenderer::netNumServers				=	0;
 SOCKET												*CRenderer::netServers					=	NULL;
-TMutex												CRenderer::commitMutex;
 int													CRenderer::numNetrenderedBuckets		=	0;
 
+// Global synchronization objects
+TMutex												CRenderer::commitMutex;
+TMutex												CRenderer::networkMutex;
 
-
-
-
+////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
-
 ////////////////////////////////////////////////////////////////////
 // Frame options
-////////////////////////////////////////////////////////////////////
-int						CRenderer::xres,CRenderer::yres;
-int						CRenderer::frame;
-float					CRenderer::pixelAR;
-float					CRenderer::frameAR;
-float					CRenderer::cropLeft,CRenderer::cropRight,CRenderer::cropTop,CRenderer::cropBottom;
-float					CRenderer::screenLeft,CRenderer::screenRight,CRenderer::screenTop,CRenderer::screenBottom;
-float					CRenderer::clipMin,CRenderer::clipMax;
-float					CRenderer::pixelVariance;
-float					CRenderer::jitter;
-char					*CRenderer::hider;
-TSearchpath				*CRenderer::archivePath;
-TSearchpath				*CRenderer::proceduralPath;
-TSearchpath				*CRenderer::texturePath;
-TSearchpath				*CRenderer::shaderPath;
-TSearchpath				*CRenderer::displayPath;
-TSearchpath				*CRenderer::modulePath;
-char					*CRenderer::temporaryPath;
-int						CRenderer::pixelXsamples,CRenderer::pixelYsamples;
-float					CRenderer::gamma,CRenderer::gain;
-float					CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight;
-RtFilterFunc			CRenderer::pixelFilter;
-float					CRenderer::colorQuantizer[5];
-float					CRenderer::depthQuantizer[5];
-COptions::CDisplay		*CRenderer::displays;
-COptions::CClipPlane	*CRenderer::clipPlanes;
-float					CRenderer::relativeDetail;
-EProjectionType			CRenderer::projection;
-float					CRenderer::fov;
-int						CRenderer::nColorComps;
-float					*CRenderer::fromRGB,*CRenderer::toRGB;
-float					CRenderer::fstop,CRenderer::focallength,CRenderer::focaldistance;
-float					CRenderer::shutterOpen,CRenderer::shutterClose;
-unsigned int			CRenderer::flags;
+int											CRenderer::xres,CRenderer::yres;
+int											CRenderer::frame;
+float										CRenderer::pixelAR;
+float										CRenderer::frameAR;
+float										CRenderer::cropLeft,CRenderer::cropRight,CRenderer::cropTop,CRenderer::cropBottom;
+float										CRenderer::screenLeft,CRenderer::screenRight,CRenderer::screenTop,CRenderer::screenBottom;
+float										CRenderer::clipMin,CRenderer::clipMax;
+float										CRenderer::pixelVariance;
+float										CRenderer::jitter;
+char										*CRenderer::hider;
+TSearchpath									*CRenderer::archivePath;
+TSearchpath									*CRenderer::proceduralPath;
+TSearchpath									*CRenderer::texturePath;
+TSearchpath									*CRenderer::shaderPath;
+TSearchpath									*CRenderer::displayPath;
+TSearchpath									*CRenderer::modulePath;
+char										*CRenderer::temporaryPath;
+int											CRenderer::pixelXsamples,CRenderer::pixelYsamples;
+float										CRenderer::gamma,CRenderer::gain;
+float										CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight;
+RtFilterFunc								CRenderer::pixelFilter;
+float										CRenderer::colorQuantizer[5];
+float										CRenderer::depthQuantizer[5];
+COptions::CDisplay							*CRenderer::displays;
+COptions::CClipPlane						*CRenderer::clipPlanes;
+float										CRenderer::relativeDetail;
+EProjectionType								CRenderer::projection;
+float										CRenderer::fov;
+int											CRenderer::nColorComps;
+float										*CRenderer::fromRGB,*CRenderer::toRGB;
+float										CRenderer::fstop,CRenderer::focallength,CRenderer::focaldistance;
+float										CRenderer::shutterOpen,CRenderer::shutterClose;
+unsigned int								CRenderer::flags;
 
-////////////////////////////////////////////////////////////////////
 // Pixie dependent options
-////////////////////////////////////////////////////////////////////
-int						CRenderer::endofframe;
-char					*CRenderer::filelog;
-int						CRenderer::numThreads;
-int						CRenderer::maxTextureSize;
-int						CRenderer::maxBrickSize;
-int						CRenderer::maxShaderCache;
-int						CRenderer::maxGridSize;
-int						CRenderer::maxRayDepth;
-int						CRenderer::maxPhotonDepth;
-int						CRenderer::bucketWidth,CRenderer::bucketHeight;
-int						CRenderer::netXBuckets,CRenderer::netYBuckets;
-int						CRenderer::maxEyeSplits;
-int						CRenderer::maxHierarchyDepth;
-int						CRenderer::maxHierarchyLeafObjects;
-float					CRenderer::tsmThreshold;
-char					*CRenderer::causticIn,*CRenderer::causticOut;
-char					*CRenderer::globalIn,*CRenderer::globalOut;
-char					*CRenderer::volumeIn,*CRenderer::volumeOut;
-int						CRenderer::numEmitPhotons;
-int						CRenderer::shootStep;
-EDepthFilter			CRenderer::depthFilter;
+int											CRenderer::endofframe;
+char										*CRenderer::filelog;
+int											CRenderer::numThreads;
+int											CRenderer::maxTextureSize;
+int											CRenderer::maxBrickSize;
+int											CRenderer::maxGridSize;
+int											CRenderer::maxRayDepth;
+int											CRenderer::maxPhotonDepth;
+int											CRenderer::bucketWidth,CRenderer::bucketHeight;
+int											CRenderer::netXBuckets,CRenderer::netYBuckets;
+int											CRenderer::maxEyeSplits;
+int											CRenderer::maxHierarchyDepth;
+int											CRenderer::maxHierarchyLeafObjects;
+float										CRenderer::tsmThreshold;
+char										*CRenderer::causticIn,*CRenderer::causticOut;
+char										*CRenderer::globalIn,*CRenderer::globalOut;
+char										*CRenderer::volumeIn,*CRenderer::volumeOut;
+int											CRenderer::numEmitPhotons;
+int											CRenderer::shootStep;
+EDepthFilter								CRenderer::depthFilter;
 
-////////////////////////////////////////////////////////////////////
 // Frame data
-////////////////////////////////////////////////////////////////////
-CMemStack											*CRenderer::frameMemory				=	NULL;
-CArray<const char*>									*CRenderer::frameTemporaryFiles		=	NULL;
-CShadingContext										**CRenderer::contexts				=	NULL;
-CDictionary<const char *,CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;
-CArray<CRemoteChannel *>							*CRenderer::remoteChannels			=	NULL;
-CArray<CAttributes *>								*CRenderer::dirtyAttributes			=	NULL;
-CArray<CProgrammableShaderInstance *>				*CRenderer::dirtyInstances			=	NULL;
-unsigned int			CRenderer::raytracingFlags					=	0;
-CHierarchy				*CRenderer::hierarchy						=	NULL;
-CArray<CTriangle *>		*CRenderer::triangles						=	NULL;
-CArray<CSurface *>		*CRenderer::raytraced						=	NULL;
-CArray<CTracable *>		*CRenderer::tracables						=	NULL;
-CObject					*CRenderer::offendingObject					=	NULL;
-matrix					CRenderer::fromWorld,CRenderer::toWorld;
-vector					CRenderer::worldBmin,CRenderer::worldBmax;
-CXform					*CRenderer::world							=	NULL;
-matrix					CRenderer::fromNDC,CRenderer::toNDC;
-matrix					CRenderer::fromRaster,CRenderer::toRaster;
-matrix					CRenderer::fromScreen,CRenderer::toScreen;
-matrix					CRenderer::worldToNDC;
-unsigned int			CRenderer::hiderFlags;
-int						CRenderer::numSamples;
-int						CRenderer::numExtraSamples;
-int						CRenderer::xPixels,CRenderer::yPixels;
-unsigned int			CRenderer::additionalParameters;
-float					CRenderer::pixelLeft,CRenderer::pixelRight,CRenderer::pixelTop,CRenderer::pixelBottom;
-float					CRenderer::dydPixel,CRenderer::dxdPixel;
-float					CRenderer::dPixeldx,CRenderer::dPixeldy;
-int						CRenderer::renderLeft,CRenderer::renderRight,CRenderer::renderTop,CRenderer::renderBottom;
-int						CRenderer::xBuckets,CRenderer::yBuckets;
-int						CRenderer::metaXBuckets,CRenderer::metaYBuckets;
-float					CRenderer::aperture;
-float					CRenderer::imagePlane;
-float					CRenderer::invImagePlane;
-float					CRenderer::cocFactorPixels;
-float					CRenderer::cocFactorSamples;
-float					CRenderer::cocFactorScreen;
-float					CRenderer::invFocaldistance;
-float					CRenderer::lengthA,CRenderer::lengthB;
-float					CRenderer::marginXcoverage,CRenderer::marginYcoverage;
-float					CRenderer::marginX,CRenderer::marginY;
-float					CRenderer::marginalX,CRenderer::marginalY;
-float					CRenderer::leftX,CRenderer::leftZ,CRenderer::leftD;
-float					CRenderer::rightX,CRenderer::rightZ,CRenderer::rightD;
-float					CRenderer::topY,CRenderer::topZ,CRenderer::topD;
-float					CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;
-int						CRenderer::numActiveDisplays;
-int						CRenderer::currentXBucket;
-int						CRenderer::currentYBucket;
-int						*CRenderer::jobAssignment;
-FILE					*CRenderer::deepShadowFile			=	NULL;
-int						*CRenderer::deepShadowIndex			=	NULL;
-int						CRenderer::deepShadowIndexStart;
-char					*CRenderer::deepShadowFileName		=	NULL;
-int						CRenderer::numDisplays;
-CRenderer::CDisplayData	*CRenderer::datas;
-int						*CRenderer::sampleOrder;
-float					*CRenderer::sampleDefaults;
-int						CRenderer::numExtraChannels;	
+CMemStack									*CRenderer::frameMemory				=	NULL;
+CArray<const char*>							*CRenderer::frameTemporaryFiles		=	NULL;
+CShadingContext								**CRenderer::contexts				=	NULL;
+CDictionary<const char *,CRemoteChannel *>	*CRenderer::declaredRemoteChannels	=	NULL;
+CArray<CRemoteChannel *>					*CRenderer::remoteChannels			=	NULL;
+CArray<CProgrammableShaderInstance*>		*CRenderer::dirtyInstances			=	NULL;
+unsigned int								CRenderer::raytracingFlags			=	0;
+CHierarchy									*CRenderer::hierarchy				=	NULL;
+CArray<CTriangle *>							*CRenderer::triangles				=	NULL;
+CArray<CSurface *>							*CRenderer::raytraced				=	NULL;
+CArray<CTracable *>							*CRenderer::tracables				=	NULL;
+CObject										*CRenderer::offendingObject			=	NULL;
+matrix										CRenderer::fromWorld,CRenderer::toWorld;
+vector										CRenderer::worldBmin,CRenderer::worldBmax;
+CXform										*CRenderer::world					=	NULL;
+matrix										CRenderer::fromNDC,CRenderer::toNDC;
+matrix										CRenderer::fromRaster,CRenderer::toRaster;
+matrix										CRenderer::fromScreen,CRenderer::toScreen;
+matrix										CRenderer::worldToNDC;
+unsigned int								CRenderer::hiderFlags;
+int											CRenderer::numSamples;
+int											CRenderer::numExtraSamples;
+int											CRenderer::xPixels,CRenderer::yPixels;
+unsigned int								CRenderer::additionalParameters;
+float										CRenderer::pixelLeft,CRenderer::pixelRight,CRenderer::pixelTop,CRenderer::pixelBottom;
+float										CRenderer::dydPixel,CRenderer::dxdPixel;
+float										CRenderer::dPixeldx,CRenderer::dPixeldy;
+float										CRenderer::dSampledx,CRenderer::dSampledy;
+int											CRenderer::renderLeft,CRenderer::renderRight,CRenderer::renderTop,CRenderer::renderBottom;
+int											CRenderer::xBuckets,CRenderer::yBuckets;
+int											CRenderer::xBucketsMinusOne;
+int											CRenderer::yBucketsMinusOne;
+float										CRenderer::invBucketSampleWidth,CRenderer::invBucketSampleHeight;
+int											CRenderer::metaXBuckets,CRenderer::metaYBuckets;
+float										CRenderer::aperture;
+float										CRenderer::imagePlane;
+float										CRenderer::invImagePlane;
+float										CRenderer::cocFactorPixels;
+float										CRenderer::cocFactorSamples;
+float										CRenderer::cocFactorScreen;
+float										CRenderer::invFocaldistance;
+float										CRenderer::lengthA,CRenderer::lengthB;
+
+int											CRenderer::xSampleOffset,CRenderer::ySampleOffset;
+float										CRenderer::sampleClipRight,CRenderer::sampleClipLeft,CRenderer::sampleClipTop,CRenderer::sampleClipBottom;
+float										*CRenderer::pixelFilterKernel;
+
+float										CRenderer::leftX,CRenderer::leftZ,CRenderer::leftD;
+float										CRenderer::rightX,CRenderer::rightZ,CRenderer::rightD;
+float										CRenderer::topY,CRenderer::topZ,CRenderer::topD;
+float										CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;
+int											CRenderer::numActiveDisplays;
+int											CRenderer::currentXBucket;
+int											CRenderer::currentYBucket;
+int											*CRenderer::jobAssignment;
+FILE										*CRenderer::deepShadowFile			=	NULL;
+int											*CRenderer::deepShadowIndex			=	NULL;
+int											CRenderer::deepShadowIndexStart;
+char										*CRenderer::deepShadowFileName		=	NULL;
+int											CRenderer::numDisplays;
+CRenderer::CDisplayData						*CRenderer::datas;
+int											*CRenderer::sampleOrder;
+float										*CRenderer::sampleDefaults;
+int											CRenderer::numExtraChannels;	
 
 
 
@@ -264,6 +265,10 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Reset the stats
 	stats.reset();
 
+	// Create the commit mutex (globally active)
+	osCreateMutex(commitMutex);
+	osCreateMutex(networkMutex);
+
 	// Init the memory
 	memoryInit();
 
@@ -278,7 +283,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	
 	// Init the light sources we use
 	allLights						=	new CArray<CShaderInstance *>;
-	
+
 	// Record the start overhead
 	stats.rendererStartOverhead		=	osCPUTime() - startTime;
 
@@ -314,6 +319,10 @@ void		CRenderer::endRenderer() {
 	// Cleanup the parser
 	parserCleanup();
 
+	// Delete the commit mutex (globally active)
+	osDeleteMutex(commitMutex);
+	osDeleteMutex(networkMutex);
+
 	// Turn off the memory manager
 	memoryTini();
 
@@ -337,7 +346,7 @@ void		CRenderer::endRenderer() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	copyOptions
-// Description			:	Begin a frame / compute misc data
+// Description			:	Make a local copy of the options
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
@@ -396,7 +405,6 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::numThreads				=	o->numThreads;
 	CRenderer::maxTextureSize			=	o->maxTextureSize;
 	CRenderer::maxBrickSize				=	o->maxBrickSize;
-	CRenderer::maxShaderCache			=	o->maxShaderCache;
 	CRenderer::maxGridSize				=	o->maxGridSize;
 	CRenderer::maxRayDepth				=	o->maxRayDepth;
 	CRenderer::maxPhotonDepth			=	o->maxPhotonDepth;
@@ -477,13 +485,13 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		}
 	}
 
+	// Compute the image plane depth
 	imagePlane		=	1;
 	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		imagePlane	=	(float) (1/tan(radians(fov/(float) 2)));
 	} else {
 		imagePlane	=	1;
 	}
-
 	invImagePlane	=	1/imagePlane;
 
 	assert(cropLeft < cropRight);
@@ -505,23 +513,36 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	assert(xPixels >= 0);
 	assert(yPixels >= 0);
 
+	// Compute various quantities about the rendering window
 	dxdPixel			=	(screenRight	- screenLeft) / (float) (xres);
 	dydPixel			=	(screenBottom	- screenTop) / (float) (yres);
 	dPixeldx			=	1	/	dxdPixel;
 	dPixeldy			=	1	/	dydPixel;
+	dSampledx			=	dPixeldx*pixelXsamples;
+	dSampledy			=	dPixeldy*pixelYsamples;
 	pixelLeft			=	(float) (screenLeft	+ renderLeft*dxdPixel);
 	pixelTop			=	(float) (screenTop	+ renderTop*dydPixel);
 	pixelRight			=	pixelLeft	+ dxdPixel*xPixels;
 	pixelBottom			=	pixelTop	+ dydPixel*yPixels;
 
+	// Compute the inv bucket width and height in samples
+	invBucketSampleWidth	=	1 / (float) (bucketWidth*pixelXsamples);
+	invBucketSampleHeight	=	1 / (float) (bucketHeight*pixelYsamples);
+
+	// Number of buckets to render
 	xBuckets			=	(int) ceil(xPixels / (float) bucketWidth);
 	yBuckets			=	(int) ceil(yPixels / (float) bucketHeight);
+	xBucketsMinusOne	=	xBuckets-1;
+	yBucketsMinusOne	=	yBuckets-1;
 
+	// Number of meta buckets for net rendering
 	metaXBuckets		=	(int) ceil(xBuckets / (float) netXBuckets);
 	metaYBuckets		=	(int) ceil(yBuckets / (float) netYBuckets);
 
+	// If we have servers, this array will hold the server assignment for each bucket
 	jobAssignment		=	NULL;
 
+	// Compute depth of field related stuff
 	aperture			=	focallength / (2*fstop);
 	if ((aperture <= C_EPSILON) || (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC)) {
 		aperture			=	0;
@@ -536,16 +557,18 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		invFocaldistance	=	1 / focaldistance;
 	}
 
+	// Update the flags if we have depth of field / motion blur
+	if (aperture		!= 0)			flags	|=	OPTIONS_FLAGS_FOCALBLUR;
+	if (shutterClose	!= shutterOpen)	flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
+
+	// lengthA * z + lengthB gives the screen space radius of a unit sphere at depth = z
 	if (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC) {
 		lengthA			=	0;
 		lengthB			=	sqrtf(dxdPixel*dxdPixel + dydPixel*dydPixel);
 	} else {
 		lengthA			=	sqrtf(dxdPixel*dxdPixel + dydPixel*dydPixel) / imagePlane;
 		lengthB			=	0;
-	}
-
-	if (aperture		!= 0)			flags	|=	OPTIONS_FLAGS_FOCALBLUR;
-	if (shutterClose	!= shutterOpen)	flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
+	}	
 
 	// Compute the matrices related to the camera transformation
 	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
@@ -637,12 +660,51 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		displays->outSamples	=	RI_RGBA;
 	}
 
-	marginalX				=	pixelFilterWidth / 2;
-	marginalY				=	pixelFilterHeight / 2;
-	marginX					=	(float) floor(marginalX);
-	marginY					=	(float) floor(marginalY);
-	marginXcoverage			=	max(marginalX - marginX,0);
-	marginYcoverage			=	max(marginalY -	marginY,0);
+	// The sample offsets
+	xSampleOffset		=	(int) ceil(max(	(CRenderer::pixelFilterWidth-1)*CRenderer::pixelXsamples  / 2.0 , 0));
+	ySampleOffset		=	(int) ceil(max(	(CRenderer::pixelFilterHeight-1)*CRenderer::pixelYsamples / 2.0 , 0));
+
+	// The clipping region we have
+	sampleClipLeft		=	(float) (						-	xSampleOffset);
+	sampleClipRight		=	(float) (xPixels*pixelXsamples	+	xSampleOffset);
+	sampleClipTop		=	(float) (						-	ySampleOffset);
+	sampleClipBottom	=	(float) (yPixels*pixelYsamples	+	ySampleOffset);
+
+	// Set up the pixel filter kernel
+	{
+		const int		filterWidth				=	pixelXsamples + 2*xSampleOffset;
+		const int		filterHeight			=	pixelYsamples + 2*ySampleOffset;
+		const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
+		const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
+
+		// Allocate the pixel filter
+		pixelFilterKernel = (float *) frameMemory->alloc(filterWidth*filterHeight*sizeof(float));
+	
+		// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
+		float	totalWeight	=	0;
+		double	invWeight;
+		int		sx,sy;
+
+		// Evaluate the filter
+		for (sy=0;sy<filterHeight;sy++) {
+			for (sx=0;sx<filterWidth;sx++) {
+				const float	cx				=	(sx - halfFilterWidth + 0.5f) / (float) pixelXsamples;
+				const float	cy				=	(sy - halfFilterHeight + 0.5f) / (float) pixelYsamples;
+				const float	filterResponse	=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
+
+				// Record
+				pixelFilterKernel[sy*filterWidth + sx]		=	filterResponse;
+				totalWeight									+=	filterResponse;
+			}
+		}
+
+		// Normalize the filter kernel
+		int	i;
+		invWeight	=	1 / (double) totalWeight;
+		for (i=0;i<filterWidth*filterHeight;i++) {
+			pixelFilterKernel[i]			=	(float) (pixelFilterKernel[i] * invWeight);
+		}
+	}
 
 	// The bucket we're rendering
 	currentXBucket			=	0;
@@ -658,10 +720,8 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	tracables				=	NULL;
 	triangles				=	NULL;
 
-	// Init the loaded files
-	loadedFiles				=	new CTrie<CFileResource *>;
+	// No dirty shader instances yet
 	dirtyInstances			=	NULL;
-	dirtyAttributes			=	NULL;
 	
 	// These are the flags that objects need to have to be visible to raytracer
 	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE			|
@@ -761,12 +821,6 @@ void		CRenderer::endFrame() {
 	// Terminate the displays
 	endDisplays();
 
-	// Delete the job queue
-	if (jobAssignment	!= NULL) {
-		delete [] jobAssignment;
-		jobAssignment	=	NULL;
-	}
-
 	// Reset the dirty shader instances
 	if (dirtyInstances != NULL) {
 		int							numShaderInstances	=	dirtyInstances->numItems;
@@ -790,22 +844,6 @@ void		CRenderer::endFrame() {
 
 		delete dirtyInstances;
 		dirtyInstances	=	NULL;
-	}
-
-	// Reset the dirty attributes
-	if (dirtyAttributes != NULL) {
-		int			numAttributes	=	dirtyAttributes->numItems;
-		CAttributes	**dirty			=	dirtyAttributes->array;
-		CAttributes	*cAttribute;
-
-		for (;numAttributes>0;numAttributes--) {
-			cAttribute				=	*dirty++;
-			cAttribute->globalMap	=	NULL;
-			cAttribute->causticMap	=	NULL;
-			cAttribute->detach();
-		}
-
-		delete dirtyAttributes;
 	}
 
 	// Ditch the remote channels
@@ -940,13 +978,6 @@ void			CRenderer::render(CObject *cObject,const float *bmin,const float *bmax) {
 		cAttributes->causticMap->attach();
 	}
 
-	if ((cAttributes->globalMap != NULL) || (cAttributes->causticMap != NULL)) {
-		if (dirtyAttributes == NULL) dirtyAttributes	=	new CArray<CAttributes *>;
-
-		cAttributes->attach();
-		dirtyAttributes->push(cAttributes);
-	}
-
 	// Update the world bounding box
 	addBox(worldBmin,worldBmax,bmin);
 	addBox(worldBmin,worldBmax,bmax);
@@ -958,11 +989,8 @@ void			CRenderer::render(CObject *cObject,const float *bmin,const float *bmax) {
 		cObject->tesselate(contexts[0]);
 	}
 
-	// Add the object to the context
-	int i;
-	for (i=0;i<numThreads;i++) {
-		contexts[i]->drawObject(cObject,bmin,bmax);
-	}
+	// Only add to this first context, it will do the culling and add it to the rest of the threads
+	contexts[0]->drawObject(cObject,bmin,bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1050,6 +1078,17 @@ void		CRenderer::prepareFrame() {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Function				:	dispatcherThread
 // Description			:	This thread is responsible for dispatching needed buckets
@@ -1057,8 +1096,20 @@ void		CRenderer::prepareFrame() {
 // Return Value			:
 // Comments				:
 // Date last edited		:	11/28/2001
-static	void		*dispatcherThread(void *w) {
-	CRenderer::rendererThread(w);
+static	void		*serverDispatchThread(void *w) {
+	CRenderer::serverThread(w);
+
+	return NULL;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	rendererThread
+// Description			:	This thread is responsible for rendering
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+static	void		*rendererDispatchThread(void *w) {
+	CRenderer::contexts[(int) w]->renderingLoop();
 
 	return NULL;
 }
@@ -1081,23 +1132,16 @@ void		CRenderer::renderFrame() {
 
 		stats.activity	=	"Dispatching";
 
-		// Create the mutexes
-		osCreateMutex(commitMutex);
-
-		threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
-
 		// Spawn the threads
+		threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
 		for (i=0;i<netNumServers;i++) {
-			threads[i]	=	osCreateThread(dispatcherThread,(void *) i);
+			threads[i]	=	osCreateThread(serverDispatchThread,(void *) i);
 		}
 
 		// Go to sleep until we're done
 		for (i=0;i<netNumServers;i++) {
 			osWaitThread(threads[i]);
 		}
-
-		// Ditch the mutexes
-		osDeleteMutex(commitMutex);
 
 		// Send the ready to the servers to prepare them for the next frame
 		numNetrenderedBuckets = 0;
@@ -1110,6 +1154,8 @@ void		CRenderer::renderFrame() {
 		stats.activity	=	previousActivity;
 	} else {
 		const	char	*previousActivity	=	stats.activity;
+		int				i;
+		TThread			*threads;
 	
 		stats.activity	=	"Rendering";
 
@@ -1121,8 +1167,16 @@ void		CRenderer::renderFrame() {
 			rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
 		}
 
-		// Enter the rendering loop
-		contexts[0]->renderingLoop();
+		// Spawn the threads
+		threads	=	(TThread *) alloca(numThreads*sizeof(TThread));
+		for (i=0;i<numThreads;i++) {
+			threads[i]	=	osCreateThread(rendererDispatchThread,(void *) i);
+		}
+
+		// Go to sleep until we're done
+		for (i=0;i<numThreads;i++) {
+			osWaitThread(threads[i]);
+		}
 
 		stats.activity	=	previousActivity;
 	}

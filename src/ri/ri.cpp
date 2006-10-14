@@ -285,7 +285,6 @@ RtToken		RI_TEXTUREMEMORY		=	"texturememory";
 RtToken		RI_BRICKMEMORY			=	"brickmemory";
 RtToken		RI_HIERARCHYDEPTH		=	"hierarchydepth";
 RtToken		RI_HIERARCHYOBJECTS		=	"hierarchyleafobjects";
-RtToken		RI_SHADERCACHE			=	"shadercache";
 RtToken		RI_EYESPLITS			=	"eyesplits";
 
 // Trace options

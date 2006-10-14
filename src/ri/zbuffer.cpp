@@ -53,8 +53,8 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	int	i;
 
 	CRenderer::hiderFlags	|=	HIDER_RGBAZ_ONLY;
-	totalWidth				=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*xSampleOffset;
-	totalHeight				=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*ySampleOffset;
+	totalWidth				=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	totalHeight				=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	
 
 	// Allocate the framebuffer
@@ -101,8 +101,8 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	height				=	h;
 	left				=	l;
 	top					=	t;
-	sampleWidth			=	width*CRenderer::pixelXsamples + 2*xSampleOffset;
-	sampleHeight		=	height*CRenderer::pixelYsamples + 2*ySampleOffset;
+	sampleWidth			=	width*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	sampleHeight		=	height*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	right				=	left + sampleWidth;
 	bottom				=	top + sampleHeight;
 
@@ -167,12 +167,11 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			i,y;
 	const int	xres				=	width;
 	const int	yres				=	height;
-	const int	filterWidth			=	CRenderer::pixelXsamples + 2*xSampleOffset;
-	const int	filterHeight		=	CRenderer::pixelYsamples + 2*ySampleOffset;
+	const int	filterWidth			=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int	filterHeight		=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	const float	invPixelXsamples	=	1 / (float) CRenderer::pixelXsamples;
 	const float	invPixelYsamples	=	1 / (float) CRenderer::pixelYsamples;
 	float		*tmp;
-	float		*pixelFilterWeights;
 
 	memBegin();
 
@@ -186,46 +185,13 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 		*tmp++	=	0;
 	}
 
-	// Allocate the memory for the pixel filter
-	pixelFilterWeights	=	(float *) alloca(filterHeight*filterHeight*sizeof(float));
-
-	// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
-	{
-		float		totalWeight			=	0;
-		double		invWeight;
-		const float	halfFilterWidth		=	filterWidth / 2.0f;
-		const float	halfFilterHeight	=	filterHeight / 2.0f;
-
-
-		for (sy=0;sy<filterHeight;sy++) {
-			for (sx=0;sx<filterWidth;sx++) {
-				const float	cx								=	(sx - halfFilterWidth + 0.5f)*invPixelXsamples;
-				const float	cy								=	(sy - halfFilterHeight + 0.5f)*invPixelYsamples;
-				float		filterResponse					=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
-
-				// Account for the partial area out of the bounds
-				//if (fabs(cx) > marginX)	filterResponse		*=	marginXcoverage;
-				//if (fabs(cy) > marginY)	filterResponse		*=	marginYcoverage;
-
-				// Record
-				pixelFilterWeights[sy*filterWidth + sx]		=	filterResponse;
-				totalWeight									+=	filterResponse;
-			}
-		}
-
-		// Normalize the filter kernel
-		invWeight	=	1 / (double) totalWeight;
-		for (i=0;i<filterWidth*filterHeight;i++) {
-			pixelFilterWeights[i]							=	(float) (pixelFilterWeights[i] * invWeight);
-		}
-	}
 
 	for (y=0;y<yres;y++) {
 		for (sy=0;sy<filterHeight;sy++) {
 			for (sx=0;sx<filterWidth;sx++) {
 				const float	*sampleLine		=	&fb[y*CRenderer::pixelYsamples+sy][sx*SAMPLES_PER_PIXEL];
 				float		*pixelLine		=	&fb2[y*xres*5];
-				const float	filterResponse	=	pixelFilterWeights[sy*filterWidth + sx];
+				const float	filterResponse	=	CRenderer::pixelFilterKernel[sy*filterWidth + sx];
 
 				for (i=0;i<xres;i++) {
 					pixelLine[0]			+=	filterResponse*sampleLine[1];

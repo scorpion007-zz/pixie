@@ -97,7 +97,6 @@ private:
 
 	CFragment	*freeFragments;
 	float		*extraSampleMemory;
-	float		*pixelFilterWeights;
 	
 	int			width,height;
 	int			top,left,right,bottom;

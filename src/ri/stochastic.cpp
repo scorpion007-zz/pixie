@@ -60,13 +60,13 @@ static	int	numFragments	=	0;
 // Date last edited		:	7/31/2002
 CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 	apertureGenerator(CRenderer::frame) {
-	int		i,j,sx,sy;
+	int		i,j;
 	float	*cExtraSample;
 	CPixel	*cPixel;
 
 	// The maximum width/height we should handle
-	totalWidth		=	CRenderer::pixelXsamples*CRenderer::bucketWidth + 2*xSampleOffset;
-	totalHeight		=	CRenderer::pixelYsamples*CRenderer::bucketHeight + 2*ySampleOffset;
+	totalWidth		=	CRenderer::pixelXsamples*CRenderer::bucketWidth + 2*CRenderer::xSampleOffset;
+	totalHeight		=	CRenderer::pixelYsamples*CRenderer::bucketHeight + 2*CRenderer::ySampleOffset;
 
 	// Allocate the framebuffer
 	if (CRenderer::numExtraSamples > 0)	extraSampleMemory	=	new float[totalWidth*totalHeight*CRenderer::numExtraSamples];
@@ -85,45 +85,6 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 
 	// Initialize the occlusion culler
 	initCuller(max(totalWidth,totalHeight), &maxDepth);
-	
-	// Set up the pixel filter
-	const int		filterWidth				=	CRenderer::pixelXsamples + 2*xSampleOffset;
-	const int		filterHeight			=	CRenderer::pixelYsamples + 2*ySampleOffset;
-	const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
-	const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
-	const float		invPixelXsamples		=	1 / (float) CRenderer::pixelXsamples;
-	const float		invPixelYsamples		=	1 / (float) CRenderer::pixelYsamples;
-
-	
-	pixelFilterWeights	=	new float[filterWidth*filterHeight];
-	
-	// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
-	{
-		float	totalWeight	=	0;
-		double	invWeight;
-
-		for (sy=0;sy<filterHeight;sy++) {
-			for (sx=0;sx<filterWidth;sx++) {
-				const float	cx								=	(sx - halfFilterWidth + 0.5f)*invPixelXsamples;
-				const float	cy								=	(sy - halfFilterHeight + 0.5f)*invPixelYsamples;
-				float		filterResponse					=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
-
-				// Account for the partial area out of the bounds
-				//if (fabs(cx) > marginX)	filterResponse		*=	marginXcoverage;
-				//if (fabs(cy) > marginY)	filterResponse		*=	marginYcoverage;
-
-				// Record
-				pixelFilterWeights[sy*filterWidth + sx]		=	filterResponse;
-				totalWeight									+=	filterResponse;
-			}
-		}
-
-		// Normalize the filter kernel
-		invWeight	=	1 / (double) totalWeight;
-		for (i=0;i<filterWidth*filterHeight;i++) {
-			pixelFilterWeights[i]							=	(float) (pixelFilterWeights[i] * invWeight);
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -137,9 +98,6 @@ CStochastic::~CStochastic() {
 	int			i;
 	CFragment	*cFragment;
 	
-	// Ditch the pixel filter
-	delete[] pixelFilterWeights;
-
 	// Ditch the memory we allocated for extra samples
 	if (extraSampleMemory != NULL) delete [] extraSampleMemory;
 
@@ -190,8 +148,8 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	height				=	h;
 	left				=	l;
 	top					=	t;
-	sampleWidth			=	width*CRenderer::pixelXsamples + 2*xSampleOffset;
-	sampleHeight		=	height*CRenderer::pixelYsamples + 2*ySampleOffset;
+	sampleWidth			=	width*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	sampleHeight		=	height*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	right				=	left + sampleWidth;
 	bottom				=	top + sampleHeight;
 
@@ -203,12 +161,12 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 
 	// Init the occlusion culler to zero
 	initToZero();
-	for (i=0,pxi=CRenderer::pixelYsamples-ySampleOffset;i<sampleHeight;i++,pxi++) {
+	for (i=0,pxi=CRenderer::pixelYsamples-CRenderer::ySampleOffset;i<sampleHeight;i++,pxi++) {
 		CPixel	*pixel	=	fb[i];
 		
 		if (pxi >= CRenderer::pixelYsamples)	pxi = 0;
 		
-		for (j=0,pxj=CRenderer::pixelXsamples-xSampleOffset;j<sampleWidth;j++,pxj++,pixel++) {
+		for (j=0,pxj=CRenderer::pixelXsamples-CRenderer::xSampleOffset;j<sampleWidth;j++,pxj++,pixel++) {
 			float	aperture[2];
 
 			// The stratified sample
@@ -384,8 +342,8 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	int				sx,sy;
 	const int		xres					=	width;
 	const int		yres					=	height;
-	const int		filterWidth				=	CRenderer::pixelXsamples + 2*xSampleOffset;
-	const int		filterHeight			=	CRenderer::pixelYsamples + 2*ySampleOffset;
+	const int		filterWidth				=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int		filterHeight			=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
 	const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
 	float			*fbs;
@@ -609,7 +567,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				const float		*sampleLine		=	&fbs[((y*CRenderer::pixelYsamples+sy)*totalWidth + sx)*pixelSize];
 				const float		xOffset			=	sx - halfFilterWidth;
 				const float		yOffset			=	sy - halfFilterHeight;
-				const float		filterResponse	=	pixelFilterWeights[sy*filterWidth + sx];
+				const float		filterResponse	=	CRenderer::pixelFilterKernel[sy*filterWidth + sx];
 
 				for (i=0;i<xres;i++) {
 					int			es;
@@ -903,8 +861,8 @@ void		CStochastic::deepShadowCompute() {
 	int			i;
 	const int	xres				=	width;
 	const int	yres				=	height;
-	const int	filterWidth			=	CRenderer::pixelXsamples + 2*xSampleOffset;
-	const int	filterHeight		=	CRenderer::pixelYsamples + 2*ySampleOffset;
+	const int	filterWidth			=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int	filterHeight		=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	const float	invPixelXsamples	=	1 / (float) CRenderer::pixelXsamples;
 	const float	invPixelYsamples	=	1 / (float) CRenderer::pixelYsamples;
 	int			prevFilePos;

@@ -126,6 +126,22 @@ inline void *ralloc(int size,CMemPage *&stack) {
 		currentMemoryPage->memory			=	savedMem;					\
 	}
 
+// This macro places a checkpoint
+#define	memEnter(__page)	{									\
+	char		*savedMem		=	__page->memory;				\
+	int			savedAvailable	=	__page->availableSize;		\
+	CMemPage	*savedPage		=	__page;
+
+// This macro restores the memory to the last checkpoint
+// It is important that the scope between the matching begin-end
+// pairs mist not be exitted
+#define	memLeave(__page)										\
+		__page					=	savedPage;					\
+		__page->availableSize	=	savedAvailable;				\
+		__page->memory			=	savedMem;					\
+	}
+
+
 
 // Mem save and mem restore does the same thing, but they explicitly store the checkpoint in T64 data[3];
 #define	memSave(__data,__stack)													\

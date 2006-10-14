@@ -352,12 +352,10 @@ COptions::COptions() {
 	endofframe				=	0;
 	filelog					=	NULL;
 
-	numThreads				=	1;
+	numThreads				=	2;
 
 	maxTextureSize			=	20000000;
 	maxBrickSize			=	10000000;
-
-	maxShaderCache			=	1000000;
 
 	maxGridSize				=	16*16;
 

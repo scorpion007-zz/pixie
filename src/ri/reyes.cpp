@@ -38,8 +38,13 @@
 #include "points.h"
 #include "reyes.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// Some misc macros
+/////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+// This macro allocates a new raster object
 #define newRasterObject(__a)		__a				=	new CRasterObject;								\
 									__a->next		=	new CRasterObject*[CRenderer::numThreads];		\
 									__a->refCount	=	0;												\
@@ -47,7 +52,8 @@
 									numObjects++;														\
 									if (numObjects > stats.numPeakRasterObjects)						\
 										stats.numPeakRasterObjects = numObjects;
-									
+	
+// This macro deletes a raster object (the object must be locked)
 #define	deleteRasterObject(__a)		if (__a->grid != NULL)	deleteGrid(__a->grid);						\
 									else					__a->object->detach();						\
 									osDeleteMutex(__a->mutex);											\
@@ -57,55 +63,28 @@
 
 
 // Returns the bucket numbers
-#define	xbucket(__x)	(int) floor((__x - xSampleOffset) * invBucketSampleWidth);
-#define	ybucket(__y)	(int) floor((__y - ySampleOffset) * invBucketSampleHeight);
+#define	xbucket(__x)	(int) floor((__x - CRenderer::xSampleOffset) * CRenderer::invBucketSampleWidth);
+#define	ybucket(__y)	(int) floor((__y - CRenderer::ySampleOffset) * CRenderer::invBucketSampleHeight);
 
 
-// Insert an object into a bucket
-#define	objectInsert(__o) {																				\
-		int			bx			=	xbucket(__o->xbound[0]);											\
-		int			by			=	ybucket(__o->ybound[0]);											\
-		CBucket		*cBucket;																			\
-																										\
-		if (by <= currentYBucket) {																		\
-			by	=	currentYBucket;																		\
-			if (bx < currentXBucket)	bx	=	currentXBucket;											\
-		} else {																						\
-			if (bx < 0)			bx	=	0;																\
-		}																								\
-																										\
-																										\
-		if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {								\
-			deleteRasterObject(__o);																	\
-		} else {																						\
-			osDownMutex(bucketMutex);																	\
-			cBucket				=	buckets[by][bx];													\
-			__o->next[thread]	=	cBucket->objects;													\
-			cBucket->objects	=	__o;																\
-			osUpMutex(bucketMutex);																		\
-		}																								\
-	}
-
-// Insert an object into a bucket
+// Insert an object into a bucket (buckets must be locked)
 #define	objectExplicitInsert(__o,__bx,__by) {															\
 		CBucket					*cBucket;																\
 																										\
-		osDownMutex(bucketMutex);																		\
 		cBucket				=	buckets[__by][__bx];													\
 		__o->next[thread]	=	cBucket->objects;														\
 		cBucket->objects	=	__o;																	\
-		osUpMutex(bucketMutex);																			\
 	}
 
 
-// Defer the object to the next bucket that'll need it
+// Defer the object to the next bucket that'll need it (buckets must be locked, object must not be locked)
 #define	objectDefer(__cObject)																								\
-	if (		(__cObject->xbound[1] >= tbucketRight)	&&	(currentXBucket < xBucketsMinusOne)) {							\
+	if (		(__cObject->xbound[1] >= tbucketRight)	&&	(currentXBucket < CRenderer::xBucketsMinusOne)) {				\
 		assert(buckets[currentYBucket][currentXBucket+1] != NULL);															\
 		stats.numObjectDeferRight++;																						\
 																															\
 		objectExplicitInsert(__cObject,currentXBucket+1,currentYBucket);													\
-	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < yBucketsMinusOne)) {							\
+	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < CRenderer::yBucketsMinusOne)) {				\
 		int	xb	=	xbucket(__cObject->xbound[0]);																			\
 		if (xb < 0)	xb = 0;																									\
 		assert(xb < (int) CRenderer::xBuckets);																				\
@@ -114,12 +93,25 @@
 																															\
 		objectExplicitInsert(__cObject,xb,currentYBucket+1);																\
 	} else {																												\
-		deleteRasterObject(__cObject);																						\
+		osDownMutex(__cObject->mutex);																						\
+		__cObject->refCount--;																								\
+		if (__cObject->refCount == 0) {																						\
+			deleteRasterObject(__cObject);																					\
+		} else {																											\
+			osUpMutex(__cObject->mutex);																					\
+		}																													\
 	}
 
 
 
 
+
+//////////////////////////////////////////////////////////////
+// Some static variables for the CReyes class
+int		CReyes::extraPrimitiveFlags;
+int		CReyes::numVertexSamples;
+int		CReyes::numGrids;
+int		CReyes::numObjects;
 
 
 
@@ -170,44 +162,18 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 		}
 	}
 
-	// The sample offsets
-	xSampleOffset		=	(int) ceil(max(	(CRenderer::pixelFilterWidth-1)*CRenderer::pixelXsamples  / 2.0 , 0));
-	ySampleOffset		=	(int) ceil(max(	(CRenderer::pixelFilterHeight-1)*CRenderer::pixelYsamples / 2.0 , 0));
+	// The length of a raster vertex
+	if (CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR)	numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
+	else												numVertexSamples	=	(CRenderer::numExtraSamples + 10);
 
-	// Compute the inv bucket width and height in samples
-	invBucketSampleWidth	=	1 / (float) (CRenderer::bucketWidth*CRenderer::pixelXsamples);
-	invBucketSampleHeight	=	1 / (float) (CRenderer::bucketHeight*CRenderer::pixelYsamples);
+	extraPrimitiveFlags	=	0;
+	if (CRenderer::numExtraSamples > 0)					extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
+	if (CRenderer::aperture != 0)						extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
 
-	// dSample / dx,dy
-	dSampledx			=	CRenderer::dPixeldx*CRenderer::pixelXsamples;
-	dSampledy			=	CRenderer::dPixeldy*CRenderer::pixelYsamples;
-
-	// The clipping region we have
-	sampleClipLeft		=	(float) (															-	xSampleOffset);
-	sampleClipRight		=	(float) (CRenderer::xPixels*CRenderer::pixelXsamples		+	xSampleOffset);
-	sampleClipTop		=	(float) (0															-	ySampleOffset);
-	sampleClipBottom	=	(float) (CRenderer::yPixels*CRenderer::pixelYsamples		+	ySampleOffset);
 
 	// Init the stats
 	numGrids			=	0;
 	numObjects			=	0;
-
-	// The length of a raster vertex
-	if (CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) {
-		numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
-		enableMotionBlur	=	TRUE;
-	} else {
-		numVertexSamples	=	(CRenderer::numExtraSamples + 10);
-		enableMotionBlur	=	FALSE;
-	}
-
-	extraPrimitiveFlags	=	0;
-	if (CRenderer::numExtraSamples > 0)	extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
-	if (CRenderer::aperture != 0)		extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
-
-	// Compute misc junk
-	xBucketsMinusOne	=	CRenderer::xBuckets-1;
-	yBucketsMinusOne	=	CRenderer::yBuckets-1;
 
 	// Init the current bucket
 	currentXBucket		=	0;
@@ -267,10 +233,10 @@ void		CReyes::renderingLoop() {
 	bucketPixelTop		=	currentYBucket*CRenderer::bucketHeight;									\
 	bucketPixelWidth	=	min(CRenderer::bucketWidth,		CRenderer::xPixels-bucketPixelLeft);	\
 	bucketPixelHeight	=	min(CRenderer::bucketHeight,	CRenderer::yPixels-bucketPixelTop);		\
-	tbucketLeft			=	bucketPixelLeft*CRenderer::pixelXsamples - xSampleOffset;				\
-	tbucketTop			=	bucketPixelTop*CRenderer::pixelYsamples - ySampleOffset;				\
-	tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*CRenderer::pixelXsamples - xSampleOffset;	\
-	tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*CRenderer::pixelYsamples - ySampleOffset;
+	tbucketLeft			=	bucketPixelLeft*CRenderer::pixelXsamples - CRenderer::xSampleOffset;	\
+	tbucketTop			=	bucketPixelTop*CRenderer::pixelYsamples - CRenderer::ySampleOffset;		\
+	tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*CRenderer::pixelXsamples - CRenderer::xSampleOffset;	\
+	tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*CRenderer::pixelYsamples - CRenderer::ySampleOffset;
 
 	// This is da loop
 	while(TRUE) {
@@ -299,11 +265,11 @@ void		CReyes::renderingLoop() {
 
 
 			// Render the bucket
-
 			computeExtends;
 			render();
 		} else {
 			error(CODE_BUG,"Invalid job for the hider.\n");
+			break;
 		}
 	}
 
@@ -323,20 +289,29 @@ void		CReyes::renderingLoop() {
 void	CReyes::render() {
 	float			*pixelBuffer;
 	CRasterObject	*cObject;
-	CBucket			*cBucket	=	buckets[currentYBucket][currentXBucket];
 	CPqueue			objectQueue;
-	int				nullBucket	=	(cBucket->objects == NULL);
-	int				noObjects	=	TRUE;
 
 	// Begin a new memory page
-	memBegin();
+	memEnter(threadMemory);
 
-	// Allocate the framebuffer area
-	pixelBuffer			=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float));
+	// Allocate the framebuffer area (from the thread memory)
+	pixelBuffer			=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float),threadMemory);
 
 	// Initialize the opaque depths
 	maxDepth			=	C_INFINITY;
 	culledDepth			=	C_INFINITY;
+
+	// Insert the objects into the queue
+	osDownMutex(bucketMutex);
+	CBucket			*cBucket	=	buckets[currentYBucket][currentXBucket];
+	int				nullBucket	=	(cBucket->objects == NULL);
+	int				noObjects	=	TRUE;
+	cBucket->queue				=	&objectQueue;
+	while((cObject=cBucket->objects) != NULL)	{
+		cBucket->objects		=	cObject->next[thread];
+		objectQueue.insert(cObject);
+	}
+	osUpMutex(bucketMutex);
 
 	// Init the rasterizer
 	rasterBegin(	bucketPixelWidth,
@@ -344,15 +319,6 @@ void	CReyes::render() {
 					tbucketLeft,
 					tbucketTop,
 					nullBucket);
-
-	// Insert the objects into the queue
-	osDownMutex(bucketMutex);
-	cBucket->queue	=	&objectQueue;
-	while((cObject=cBucket->objects) != NULL)	{
-		cBucket->objects	=	cObject->next[thread];
-		objectQueue.insert(cObject);
-	}
-	osUpMutex(bucketMutex);
 
 	// Process the objects and patches
 	while((cObject = objectQueue.get(bucketMutex)) != NULL) {
@@ -364,27 +330,43 @@ void	CReyes::render() {
 
 			// Is this a grid ?
 			if (cObject->grid != NULL) {
+
 				// Update the stats
 				stats.numRasterGridsRendered++;
 				stats.numQuadsRendered	+=	cObject->grid->udiv*cObject->grid->vdiv;
 
 				// Render the grid
+				currentObject			=	cObject;
 				rasterDrawPrimitives(cObject->grid);
+
+				// Defer the object
+				osDownMutex(bucketMutex);
 				objectDefer(cObject);
+				osUpMutex(bucketMutex);
 
 				noObjects	=	FALSE;
 				
 				continue;
 			} else {
 				// Dice the object
+				osDownMutex(cObject->mutex);
 				cObject->object->dice(this);
-				deleteRasterObject(cObject);
+				cObject->refCount--;
+				if (cObject->refCount == 0) {
+					// Get rid of the object
+					deleteRasterObject(cObject);
+				} else {
+					// Unlock the object
+					osUpMutex(cObject->mutex);
+				}
 
 				// Insert the objects into the queue
+				osDownMutex(bucketMutex);
 				while((cObject=cBucket->objects) != NULL)	{
 					cBucket->objects	=	cObject->next[thread];
 					objectQueue.insert(cObject);
 				}
+				osUpMutex(bucketMutex);
 
 				// Keep going
 				continue;
@@ -396,6 +378,7 @@ void	CReyes::render() {
 			int				i				=	objectQueue.numItems - 1;
 
 			// Defer the current object
+			osDownMutex(bucketMutex);
 			objectDefer(cObject);
 
 			// Defer the rest of the objects
@@ -404,6 +387,7 @@ void	CReyes::render() {
 				culledDepth		=	min(culledDepth,cObject->zmin);
 				objectDefer(cObject);
 			}
+			osUpMutex(bucketMutex);
 
 			break;
 		}
@@ -415,13 +399,28 @@ void	CReyes::render() {
 	// Get the framebuffer
 	rasterEnd(pixelBuffer,noObjects);
 
+	if (thread == 1) {
+		pixelBuffer[1]	=	1;
+	}
+
 	// Flush the data to the out devices
 	CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
 
-	// Just have rendered this bucket, so deallocate it
+	// Lock the bucket one more time
 	osDownMutex(bucketMutex);
+
+	// Just have rendered this bucket, so deallocate it
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
+
+	// Advance the bucket
+	currentXBucket++;
+	if (currentXBucket == CRenderer::xBuckets) {		
+		currentXBucket	=	0;
+		currentYBucket++;
+	}
+
+	// Unlock the bucket
 	osUpMutex(bucketMutex);
 
 	// Update the statistics
@@ -430,14 +429,7 @@ void	CReyes::render() {
 	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 
 	// Restore the memory
-	memEnd();
-
-	// Advance the bucket
-	currentXBucket++;
-	if (currentXBucket == CRenderer::xBuckets) {		
-		currentXBucket	=	0;
-		currentYBucket++;
-	}
+	memLeave(threadMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -462,12 +454,6 @@ void	CReyes::skip() {
 	// Just have rendered this bucket, so deallocate it
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
-	osUpMutex(bucketMutex);
-
-	// Update the statistics
-	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
-	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
-	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 
 	// Advance the bucket
 	currentXBucket++;
@@ -475,6 +461,13 @@ void	CReyes::skip() {
 		currentXBucket	=	0;
 		currentYBucket++;
 	}
+
+	osUpMutex(bucketMutex);
+
+	// Update the statistics
+	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
+	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
+	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 }
 
 
@@ -504,7 +497,7 @@ void	CReyes::skip() {
 // Method				:	drawObject
 // Description			:	Draw an object
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	float				xmin,xmax,ymin,ymax;
@@ -577,10 +570,10 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	}
 
 	// Convert to samples
-	xmin	*=	dSampledx;
-	ymin	*=	dSampledy;
-	xmax	*=	dSampledx;
-	ymax	*=	dSampledy;
+	xmin	*=	CRenderer::dSampledx;
+	ymin	*=	CRenderer::dSampledy;
+	xmax	*=	CRenderer::dSampledx;
+	ymax	*=	CRenderer::dSampledy;
 
 	if (xmax < xmin) {
 		const float	t	=	xmax;
@@ -595,10 +588,10 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	}
 
 	// Trivial reject
-	if (xmin > sampleClipRight)		return;
-	if (ymin > sampleClipBottom)	return;
-	if (xmax < sampleClipLeft)		return;
-	if (ymax < sampleClipTop)		return;
+	if (xmin > CRenderer::sampleClipRight)		return;
+	if (ymin > CRenderer::sampleClipBottom)		return;
+	if (xmax < CRenderer::sampleClipLeft)		return;
+	if (ymax < CRenderer::sampleClipTop)		return;
 
 	xmin							=	max(xmin,0);
 	ymin							=	max(ymin,0);
@@ -611,6 +604,7 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	cObject->ybound[1]				=	(int) floor(ymax);
 	cObject->object					=	object;
 	cObject->grid					=	NULL;
+
 	// disable gross opacity culling for objects which need hidden surfaces shaded
 	// this is only OK because cObject->zmin is not used to update the max opaque depth
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN)
@@ -620,7 +614,7 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	object->attach();
 
 	// Insert the object into the bucket its in
-	objectInsert(cObject);
+	insertObject(cObject);
 }
 
 
@@ -648,7 +642,7 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 // Method				:	drawGrid
 // Description			:	Draw a grid
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,float vmin,float vmax) {
 	// Create a grid on the surface
@@ -678,7 +672,7 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 // Method				:	drawRibbon
 // Description			:	Draw a ribbon
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 	// Create a grid on the surface
@@ -706,7 +700,7 @@ void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 // Method				:	drawPoints
 // Description			:	Draw bunch of points
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Create a grid on the surface
@@ -788,6 +782,16 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 // Comments				:
 // Date last edited		:	6/5/2003
 void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
+
+	if (Ponly == FALSE) {
+		osDownMutex(currentObject->mutex);
+
+		if (!(grid->flags & RASTER_UNSHADED)) {
+			osUpMutex(currentObject->mutex);
+			return;
+		}
+	}
+
 	if (grid->dim == 0) {
 		// This is a 0 dimensional point cloud
 		int					i;
@@ -805,7 +809,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)	grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur?
-			if (enableMotionBlur && (object->moving()))					grid->flags	|= RASTER_MOVING;
+			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) grid->flags	|= RASTER_MOVING;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -952,7 +956,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur ?
-			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
+			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving()))	grid->flags		|=	RASTER_MOVING;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -1130,7 +1134,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur ?
-			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
+			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) grid->flags		|=	RASTER_MOVING;
 
 			// Displace the sucker
 			displace(object,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
@@ -1206,6 +1210,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 		}
 	}
+
+	if (Ponly == FALSE)	osUpMutex(currentObject->mutex);
 }
 
 
@@ -1246,7 +1252,7 @@ void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int st
 // Method				:	copySamples
 // Description			:	Copy the shading data over
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int stage) {
 	const	float	*C		=	varying[VARIABLE_CI];
@@ -1365,7 +1371,7 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 // Method				:	makeRibbon
 // Description			:	Displace the left and right vertices from each other
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 void		CReyes::makeRibbon(int numVertices,float *leftVertices,float *rightVertices,const float *size,const float *N,const float *dPdv,int disp) {
 	int					i;
@@ -1407,7 +1413,7 @@ void		CReyes::makeRibbon(int numVertices,float *leftVertices,float *rightVertice
 // Method				:	newGrid
 // Description			:	Initialize a grid by copying the points
 // Return Value			:	-
-// Comments				:
+// Comments				:	attach() is not thread safe
 // Date last edited		:	6/5/2003
 CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	CRasterGrid			*grid	=	new CRasterGrid;
@@ -1430,7 +1436,7 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Method				:	deleteGrid
 // Description			:	Delete the grid
 // Return Value			:	-
-// Comments				:
+// Comments				:	detach() is not thread safe
 // Date last edited		:	6/5/2003
 void			CReyes::deleteGrid(CRasterGrid *grid) {
 	grid->object->detach();
@@ -1450,7 +1456,7 @@ void			CReyes::deleteGrid(CRasterGrid *grid) {
 // Method				:	insertGrid
 // Description			:	Compute the grid bound and insert the grid into the correct bucket
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	9/17/2004
 void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	// Compute the grid bound and insert it
@@ -1505,7 +1511,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 
 	// Trivial reject
-	if ((xmin > sampleClipRight)	|| (ymin > sampleClipBottom) || (xmax < sampleClipLeft) || (ymax < sampleClipTop)) {
+	if ((xmin > CRenderer::sampleClipRight)	|| (ymin > CRenderer::sampleClipBottom) || (xmax < CRenderer::sampleClipLeft) || (ymax < CRenderer::sampleClipTop)) {
 		deleteGrid(grid);
 		return;
 	}
@@ -1690,10 +1696,71 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 		cObject->zmin				=	zmin;
 
 	// Insert the object into the bucket its in
-	objectInsert(cObject);
+	insertObject(cObject);
 
 	// Update stats
 	stats.numQuadsCreated	+=	grid->udiv*grid->vdiv;
 	stats.numRasterGridsCreated++;
 }
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CReyes
+// Method				:	insertObject
+// Description			:	Insert an object into all hiders
+// Return Value			:
+// Comments				:	(inline for speed)
+// Date last edited		:	7/4/2001
+void	CReyes::insertObject(CRasterObject *object) {
+	int			i;
+
+	// First, make sure we're the only one accessing this object (this must always fallthrough)
+	osDownMutex(object->mutex);
+
+	// For every thread
+	const int	sx = xbucket(object->xbound[0]);
+	const int	sy = ybucket(object->ybound[0]);
+	for (i=0;i<CRenderer::numThreads;i++) {
+		CReyes		*hider	=	(CReyes *) CRenderer::contexts[i];
+		int			bx		=	sx;
+		int			by		=	sy;
+		CBucket		*cBucket;
+
+		// Secure the area
+		osDownMutex(hider->bucketMutex);
+
+		// Determine the bucket
+		if (by <= hider->currentYBucket) {
+			by	=	hider->currentYBucket;
+			if (bx < hider->currentXBucket)	bx	=	hider->currentXBucket;
+		} else {
+			if (bx < 0)	bx	=	0;
+		}
+
+		if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {
+			// Out of bounds
+		} else {
+			// Insert the object	
+			object->refCount++;
+			cBucket					=	buckets[by][bx];
+			if (cBucket->queue == NULL) {
+				object->next[thread]	=	cBucket->objects;
+				cBucket->objects		=	object;
+			} else {
+				cBucket->queue->insert(object);
+			}
+		}
+
+		// Release the mutex
+		osUpMutex(hider->bucketMutex);
+	}
+
+	// Did we kill the object ?
+	if (object->refCount == 0) {
+		osUpMutex(object->mutex);
+		deleteRasterObject(object);
+	} else {
+		osUpMutex(object->mutex);
+	}
+}

@@ -188,21 +188,18 @@ void	CRenderer::endDisplays() {
 // Method				:	dispatch
 // Description			:	Dispatch a rendered window to the out devices
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe, FIXME: The dispatch size can get too big (CRASH)
 // Date last edited		:	8/26/2001
 void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
-	float	*dest,*dispatch;
+	float	*dest;
 	int		i,j,k,l;
 	int		srcStep,dstStep,disp;
 
 	// Send the pixels to the output servers
 	for (i=0;i<numDisplays;i++) {
 		if (datas[i].module != NULL) {
-			int				imageSamples	=	datas[i].numSamples;
-			
-			memBegin();
-	
-			dispatch	= (float *) ralloc(width*height*imageSamples*sizeof(float));
+			int		imageSamples	=	datas[i].numSamples;
+			float	*dispatch		=	(float *) alloca(width*height*imageSamples*sizeof(float));
 			
 			for (j=0,disp=0;j<datas[i].numChannels;j++){
 				const float		*tmp			=	&pixels[datas[i].channels[j].sampleStart];
@@ -215,7 +212,7 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 	
 				for (k=width*height;k>0;k--) {
 					for (l=channelSamples;l>0;l--) {
-						*dest++	=	*tmp++;				// GSHTODO: quantize here, not in driver
+						*dest++	=	*tmp++;
 					}
 					tmp		+=	srcStep;
 					dest	+=	dstStep;
@@ -223,14 +220,13 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 			}
 
 			if (datas[i].data(datas[i].handle,left,top,width,height,dispatch) == FALSE) {
+				// FIXME: Must lock this piece of code
 				datas[i].handle	=	NULL;
 				numActiveDisplays--;
 				if (numActiveDisplays == 0)	hiderFlags	|=	HIDER_BREAK;
 				osUnloadModule(datas[i].module);
 				datas[i].module	=	NULL;
 			}
-
-			memEnd();
 		}
 	}
 }
@@ -240,21 +236,15 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 // Method				:	clear
 // Description			:	Send a clear window to the out devices
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe, FIXME: The clear size can get too big (CRASH)
 // Date last edited		:	8/26/2001
 void	CRenderer::clear(int left,int top,int width,int height) {
-	memBegin();
-
-	float	* pixels	=	(float *) ralloc(width*height*numSamples*sizeof(float));
+	float	*pixels	=	(float *) alloca(width*height*numSamples*sizeof(float));
 	int		i;
 
-	for (i=0;i<width*height*numSamples;i++) {
-		pixels[i]	=	0;
-	}
+	for (i=0;i<width*height*numSamples;i++)	pixels[i]	=	0;
 
 	dispatch(left,top,width,height,pixels);
-
-	memEnd();
 }
 
 
@@ -264,13 +254,16 @@ void	CRenderer::clear(int left,int top,int width,int height) {
 // Method				:	commit
 // Description			:	Send a window of samples
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	8/26/2001
 void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	if (netClient != INVALID_SOCKET) {
 		// We are rendering for a client, so just send the result to the waiting client
 		T32	header[5];
 		T32	a;
+
+		// Lock network
+		osDownMutex(networkMutex);
 
 		header[0].integer	=	NET_READY;
 		rcSend(netClient,(char *) header,	1*sizeof(T32));
@@ -284,19 +277,23 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 		rcSend(netClient,(char *) header,	5*sizeof(T32));
 		rcRecv(netClient,(char *) &a,		1*sizeof(T32));
 		rcSend(netClient,(char *) pixels,xpixels*ypixels*numSamples*sizeof(T32));
+
+		// Unlock network
+		osUpMutex(networkMutex);
+
 		return;
 	}
 
 	if ((top == 0) && (left == 0)) {
-		if (renderTop > 0)		clear(0,0,xres,renderTop);
+		if (renderTop > 0)			clear(0,0,xres,renderTop);
 	}
 
 	if (left == 0) {
-		if (renderLeft > 0)		clear(0,top+renderTop,renderLeft,ypixels);
+		if (renderLeft > 0)			clear(0,top+renderTop,renderLeft,ypixels);
 	}
 
 	if ((left+xpixels) == xPixels) {
-		if (renderRight < xres)	clear(renderRight,top+renderTop,xres-renderRight,ypixels);
+		if (renderRight < xres)		clear(renderRight,top+renderTop,xres-renderRight,ypixels);
 	}
 
 	if (((top+ypixels) == yPixels) && ((left+xpixels) == xPixels)) {

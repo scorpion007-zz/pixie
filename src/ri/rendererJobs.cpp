@@ -37,21 +37,6 @@ void			(*CRenderer::dispatchJob)(int thread,CJob &job)	=	NULL;
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	beginRendering
-// Description			:	Begin the rendering
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void			CRenderer::beginRendering() {
-	int	i;
-
-	for (i=0;i<numThreads;i++) {
-		contexts[i]->renderingLoop();
-	}
-}
-
 
 
 
@@ -90,15 +75,24 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			return;
 		} else {
 			error(CODE_BUG,"Unrecognised network request\n");
+			job.type				=	CJob::TERMINATE;
+			return;
 		}
 	}
 
-	// We do not have a client, if we're not done, dispatch the first bucket
+	// We do not have a client
+
+
+
+
+	// Lock the bucket info
+	osDownMutex(commitMutex);
 
 	// If we're done, tell the hider to terminate
 	if (hiderFlags & (HIDER_DONE | HIDER_BREAK)) {
 		job.type	=	CJob::TERMINATE;
 	} else {
+
 		// Otherwise, dispatch a bucket
 		job.type	=	CJob::BUCKET;
 		job.xBucket	=	currentXBucket;
@@ -115,6 +109,9 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			CRenderer::hiderFlags |=	HIDER_DONE | HIDER_BREAK;
 		}
 	}
+
+	// Release the bucket info
+	osUpMutex(commitMutex);
 }
 
 
@@ -127,7 +124,13 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 // Comments				:	-
 // Date last edited		:	6/21/2001
 void			CRenderer::dispatchPhoton(int thread,CJob &job) {
+	// FIXME: Implement
 }
+
+
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -137,11 +140,9 @@ void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 // Return Value			:	TRUE if we're still rendering, FALSE otherwise
 // Comments				:
 // Date last edited		:	7/4/2001
-int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
+int				CRenderer::advanceBucket(int index,int &x,int &y) {
 
-	nx = xBuckets;
-	ny = yBuckets;
-	
+
 // Advance bucket indices
 #define	advance(__x,__y)									\
 		__x++;												\
@@ -159,7 +160,7 @@ int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 	if (jobAssignment == FALSE) {
 		int	i;
 
-		jobAssignment	=	new int[xBuckets*yBuckets];
+		jobAssignment	=	(int *) frameMemory->alloc(xBuckets*yBuckets*sizeof(int));
 
 		// Create the job assignment
 		for (i=0;i<xBuckets*yBuckets;i++)	jobAssignment[i]	=	-1;
@@ -211,16 +212,16 @@ int				CRenderer::advanceBucket(int index,int &x,int &y,int &nx,int &ny) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
-// Method				:	rendererThread
+// Method				:	serverThread
 // Description			:	This function actually manages the servers
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CRenderer::rendererThread(void *w) {
+void		CRenderer::serverThread(void *w) {
 	int		index			=	(int) w;	// This is the server index, 1 thread for every server
 	int		done			=	FALSE;
 	T32		netBuffer[3];
-	int		x,y,nx,ny;
+	int		x,y;
 
 	// Make sure the server needs all the files it needs
 	while(TRUE) {
@@ -247,7 +248,7 @@ void		CRenderer::rendererThread(void *w) {
 		osDownMutex(commitMutex);
 
 		// Get the current bucket and advance the bucket
-		if (advanceBucket(index,x,y,nx,ny) == FALSE) {
+		if (advanceBucket(index,x,y) == FALSE) {
 			done	=	TRUE;
 		}
 
@@ -287,7 +288,7 @@ void		CRenderer::rendererThread(void *w) {
 			recvBucketDataChannels(netServers[index],x,y);
 	
 			numNetrenderedBuckets++;
-			stats.progress		=	(numNetrenderedBuckets*100) / (float) (nx*ny);
+			stats.progress		=	(numNetrenderedBuckets*100) / (float) (xBuckets * yBuckets);
 			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 			
 			osUpMutex(commitMutex);

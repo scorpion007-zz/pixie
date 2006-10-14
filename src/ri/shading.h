@@ -225,6 +225,7 @@ protected:
 		virtual	void			illuminateEnd() { }
 
 		int						thread;													// The thread number for this context
+		CMemPage				*threadMemory;											// Memory from which we allocate the temp thread stuff
 private:
 		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
 

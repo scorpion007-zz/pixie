@@ -222,8 +222,6 @@ public:
 
 	int							maxBrickSize;									// Maximum amount of brick data to keep in memory (in bytes)
 
-	int							maxShaderCache;									// The maximum shader cache amount
-
 	int							maxGridSize;									// Maximum number of points to shade at a time
 
 	int							maxRayDepth;									// Maximum raytracing recursion depth

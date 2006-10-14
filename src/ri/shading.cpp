@@ -370,6 +370,9 @@ CShadingContext::CShadingContext(int t) {
 	// Initialize the shader state memory stack
 	memoryInit(shaderStateMemory);
 
+	// Initialize the thread memory stack
+	memoryInit(threadMemory);
+
 	// Init the conditionals
 	conditionals			=	NULL;
 	currentRayDepth			=	0;
@@ -399,6 +402,9 @@ CShadingContext::~CShadingContext() {
 	}
 	currentShadingState	=	NULL;
 	
+	// Ditch the thread memory stack
+	memoryTini(threadMemory);
+
 	// Ditch the shader state memory stack
 	memoryTini(shaderStateMemory);
 
