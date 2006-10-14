@@ -380,7 +380,6 @@ CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf)
 	// Init the loaded files
 	loadedFiles				=	new CTrie<CFileResource *>;
 	dirtyInstances			=	NULL;
-	dirtyAttributes			=	NULL;
 
 	conditionals			=	NULL;
 	currentRayDepth			=	0;
