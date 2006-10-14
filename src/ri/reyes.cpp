@@ -47,6 +47,7 @@
 // This macro allocates a new raster object
 #define newRasterObject(__a)		__a				=	new CRasterObject;								\
 									__a->next		=	new CRasterObject*[CRenderer::numThreads];		\
+									__a->diced		=	FALSE;											\
 									__a->refCount	=	0;												\
 									osCreateMutex(__a->mutex);											\
 									numObjects++;														\
@@ -199,7 +200,12 @@ CReyes::~CReyes() {
 
 				while((cObject=cBucket->objects) != NULL) {
 					cBucket->objects	=	cObject->next[thread];
-					deleteRasterObject(cObject);
+
+					// No need to guard since this code is not executed by multiple threads
+					cObject->refCount--;
+					if (cObject->refCount == 0) {
+						deleteRasterObject(cObject);
+					}
 				}
 
 				delete buckets[y][x];
@@ -291,15 +297,9 @@ void	CReyes::render() {
 	CRasterObject	*cObject;
 	CPqueue			objectQueue;
 
-	// Begin a new memory page
-	memEnter(threadMemory);
-
-	// Allocate the framebuffer area (from the thread memory)
-	pixelBuffer			=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float),threadMemory);
-
 	// Initialize the opaque depths
-	maxDepth			=	C_INFINITY;
-	culledDepth			=	C_INFINITY;
+	maxDepth					=	C_INFINITY;
+	culledDepth					=	C_INFINITY;
 
 	// Insert the objects into the queue
 	osDownMutex(bucketMutex);
@@ -344,13 +344,20 @@ void	CReyes::render() {
 				objectDefer(cObject);
 				osUpMutex(bucketMutex);
 
+				// We rendered objects
 				noObjects	=	FALSE;
 				
 				continue;
 			} else {
 				// Dice the object
 				osDownMutex(cObject->mutex);
-				cObject->object->dice(this);
+
+				// Did we dice this object before ?
+				if (cObject->diced == FALSE) {
+					cObject->object->dice(this);
+					cObject->diced	=	TRUE;
+				}
+
 				cObject->refCount--;
 				if (cObject->refCount == 0) {
 					// Get rid of the object
@@ -396,15 +403,25 @@ void	CReyes::render() {
 	// All objects must be deferred
 	assert(cBucket->objects == NULL);
 
-	// Get the framebuffer
-	rasterEnd(pixelBuffer,noObjects);
+	// Begin a new memory page
+	memEnter(threadMemory);
 
-	if (thread == 1) {
-		pixelBuffer[1]	=	1;
-	}
+		// Allocate the framebuffer area (from the thread memory)
+		pixelBuffer		=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float),threadMemory);
 
-	// Flush the data to the out devices
-	CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
+		// Get the framebuffer
+		rasterEnd(pixelBuffer,noObjects);
+
+		// Mark the first thread
+		if (thread == 1) {
+			pixelBuffer[5]	=	1;
+		}
+
+		// Flush the data to the out devices
+		CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
+
+	// Restore the memory
+	memLeave(threadMemory);
 
 	// Lock the bucket one more time
 	osDownMutex(bucketMutex);
@@ -427,9 +444,6 @@ void	CReyes::render() {
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
 	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
 	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
-
-	// Restore the memory
-	memLeave(threadMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1743,10 +1757,10 @@ void	CReyes::insertObject(CRasterObject *object) {
 		} else {
 			// Insert the object	
 			object->refCount++;
-			cBucket					=	buckets[by][bx];
+			cBucket					=	hider->buckets[by][bx];
 			if (cBucket->queue == NULL) {
-				object->next[thread]	=	cBucket->objects;
-				cBucket->objects		=	object;
+				object->next[i]		=	cBucket->objects;
+				cBucket->objects	=	object;
 			} else {
 				cBucket->queue->insert(object);
 			}

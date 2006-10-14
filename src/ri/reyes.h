@@ -104,6 +104,7 @@ protected:
 			CRasterGrid			*grid;					// The grid
 			CRasterObject		**next;					// The next object (one for each thread)
 			int					refCount;				// The number of threads working on this object
+			int					diced;					// TRUE if this object has already been diced
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
 			TMutex				mutex;					// To secure the object

@@ -151,6 +151,7 @@ public:
 		////////////////////////////////////////////////////////////////////
 		static	TMutex												commitMutex;				// The mutex that controls job dispatch
 		static	TMutex												networkMutex;				// To serialize the network communication
+		static	TMutex												hierarchyMutex;				// To serialize the raytracing hierarchy
 
 
 		////////////////////////////////////////////////////////////////////

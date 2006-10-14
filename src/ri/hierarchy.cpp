@@ -1582,6 +1582,7 @@ CHierarchy::~CHierarchy() {
 // Comments				:
 // Date last edited		:	12/23/2001
 void	CHierarchy::intersect(CRay *ray) {
+
 	float			tnear	=	ray->tmin;
 	float			tfar	=	ray->t;
 	float			t1,t2;
@@ -1609,6 +1610,9 @@ void	CHierarchy::intersect(CRay *ray) {
 		}
 	}
 
+	// FIXME: This is just a temporary solution ... Make the intersect function thread safe
+	osDownMutex(CRenderer::hierarchyMutex);
 	ray->ID		=	currentRayID++;
 	intersect(root,ray,tnear,tfar);
+	osUpMutex(CRenderer::hierarchyMutex);
 }

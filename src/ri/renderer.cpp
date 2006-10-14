@@ -109,6 +109,7 @@ int													CRenderer::numNetrenderedBuckets		=	0;
 // Global synchronization objects
 TMutex												CRenderer::commitMutex;
 TMutex												CRenderer::networkMutex;
+TMutex												CRenderer::hierarchyMutex;
 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
@@ -268,6 +269,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Create the commit mutex (globally active)
 	osCreateMutex(commitMutex);
 	osCreateMutex(networkMutex);
+	osCreateMutex(hierarchyMutex);
 
 	// Init the memory
 	memoryInit();
@@ -322,6 +324,7 @@ void		CRenderer::endRenderer() {
 	// Delete the commit mutex (globally active)
 	osDeleteMutex(commitMutex);
 	osDeleteMutex(networkMutex);
+	osDeleteMutex(hierarchyMutex);
 
 	// Turn off the memory manager
 	memoryTini();

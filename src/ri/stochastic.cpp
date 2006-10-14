@@ -376,10 +376,10 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		return;
 	}
 
-	memBegin();
+	memEnter(threadMemory);
 
 	// Allocate the framebuffer
-	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float));
+	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
 
 	// Collapse the samples (transparency composite)
 
@@ -592,7 +592,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		}
 	}
 
-	memEnd();
+	memLeave(threadMemory);
 }
 
 
@@ -872,14 +872,14 @@ void		CStochastic::deepShadowCompute() {
 	CFragment	**fSamples;
 	float		*fWeights;
 
-	memBegin();
+	memEnter(threadMemory);
 	
 	prevFilePos		=	ftell(deepShadowFile);
 
 	// Allocate the memory for misc junk
-	samples			=	(CFragment **)	ralloc(totalHeight*totalWidth*sizeof(CFragment*));
-	fSamples		=	(CFragment **)	ralloc(filterWidth*filterHeight*sizeof(CFragment*));
-	fWeights		=	(float *)		ralloc(filterWidth*filterHeight*sizeof(float)*4);
+	samples			=	(CFragment **)	ralloc(totalHeight*totalWidth*sizeof(CFragment*),threadMemory);
+	fSamples		=	(CFragment **)	ralloc(filterWidth*filterHeight*sizeof(CFragment*),threadMemory);
+	fWeights		=	(float *)		ralloc(filterWidth*filterHeight*sizeof(float)*4,threadMemory);
 
 	// Init the samples
 	for (i=0;i<totalWidth*totalHeight;i++)	samples[i]	=	NULL;
@@ -954,5 +954,5 @@ void		CStochastic::deepShadowCompute() {
 	CRenderer::deepShadowIndex[tileIndex]											=	prevFilePos;
 	CRenderer::deepShadowIndex[tileIndex + CRenderer::xBuckets*CRenderer::yBuckets]	=	ftell(CRenderer::deepShadowFile) - prevFilePos;
 
-	memEnd();
+	memLeave(threadMemory);
 }

@@ -106,7 +106,7 @@ static	char	*rendererinfoVersionStr		=	"versionstring";
 // Function				:	complete
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	4/18/2002
 inline void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes1,const CAttributes *attributes2) {
 	int		i;
@@ -247,7 +247,7 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Function				:	complete
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	4/18/2002
 inline	void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes) {
 	int		i;
@@ -424,16 +424,6 @@ void	CShadingContext::drawObject(CObject *cObject,const float *,const float *) {
 	// This function must be overriden
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	retraceRay
-// Description			:	Retrace a ray
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/9/2002
-void	CShadingContext::retraceRay(CRay *cRay) {
-	CRenderer::hierarchy->intersect(cRay);
-}
 
 
 
@@ -444,7 +434,7 @@ void	CShadingContext::retraceRay(CRay *cRay) {
 // Method				:	shade2D
 // Description			:	Sample/Shade bunch of points
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	8/30/2002
 //
 //
@@ -465,7 +455,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	assert(uVertices > 0);
 	assert(vVertices > 0);
 
-	numVertices	=	uVertices*vVertices;
+	numVertices								=	uVertices*vVertices;
 
 	stats.numSampled++;
 	stats.numShaded							+=	numVertices;
@@ -670,9 +660,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			object->sample(0,numVertices,varying,usedParameters);
 
 			// We're rasterizing, so the derivative information is already available
-			memBegin();
+			memEnter(threadMemory);
 
-			xy					=	(float *) ralloc(numVertices*2*sizeof(float));
+			xy					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
 
 			P					=	varying[VARIABLE_P];
 			du					=	varying[VARIABLE_DU];
@@ -788,7 +778,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			}
 
 			// Done and done
-			memEnd();
+			memLeave(threadMemory);
 		}
 	} else {
 		// No derivative information is needed
@@ -855,7 +845,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			complete(numVertices,varying,usedParameters,currentAttributes);
 		}
 
-		memBegin();
+		memEnter(threadMemory);
 
 		if (displacement != NULL) {
 			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
@@ -894,7 +884,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			currentShadingState->postShader->execute(this,currentShadingState->locals[ACCESSOR_POSTSHADER]);
 		}
 
-		memEnd();
+		memLeave(threadMemory);
 	}
 	
 	// Unwind the stack of shader states
@@ -1135,9 +1125,9 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			object->sample(0,numVertices,varying,usedParameters);
 
 			// We're rasterizing, so the derivative information is already available
-			memBegin();
+			memEnter(threadMemory);
 
-			xy					=	(float *) ralloc(numVertices*2*sizeof(float));
+			xy					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
 
 			P					=	varying[VARIABLE_P];
 			du					=	varying[VARIABLE_DU];
@@ -1271,7 +1261,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			}
 
 			// Done and done
-			memEnd();
+			memLeave(threadMemory);
 		}
 	} else {
 		// No derivative information is needed
@@ -1324,13 +1314,13 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			complete(numVertices,varying,usedParameters,currentAttributes);
 		}
 
-		memBegin();
+		memEnter(threadMemory);
 
 		if (displacement != NULL) {
 			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
 		}
 
-		memEnd();
+		memLeave(threadMemory);
 	}
 	
 	// Unwind the stack of shader states

@@ -201,12 +201,12 @@ public:
 
 		// Some shading functions
 		CShadingState			*currentShadingState;									// The current shading state
+
 		void					shade(CSurface *,int,int,int,unsigned int);				// Shade points on a surface
 		void					displace(CSurface *,int,int,int,unsigned int);			// Sample points on a surface
 
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
 		void					traceEx(CRayBundle *);									// Trace and maybe shade a bundle of rays. This version increments the shading depth
-		void					retraceRay(CRay *);										// Trace a ray again
 
 								// Surface tesselation
 		void					tesselate2D(CSurface *);								// Tesselate a surface

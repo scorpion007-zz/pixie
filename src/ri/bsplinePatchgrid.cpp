@@ -209,7 +209,6 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 	const int 	upatches	=	uVertices - 3;
 	const int 	vpatches	=	vVertices - 3;
 	
-	memBegin();
 
 	if (variables->moving == FALSE) {
 		vertexData			=	vertex;								// No need for interpolation
@@ -230,7 +229,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 			double			*interpolate;
 			const float		*time	=	varying[VARIABLE_TIME] + start;
 
-			vertexData				=	(double *) ralloc(numVertices*vertexSize*16*sizeof(double));
+			vertexData				=	(double *) alloca(numVertices*vertexSize*16*sizeof(double));
 			vertexDataStep			=	vertexSize*16;
 			vertexSampleStride		=	0;
 
@@ -251,7 +250,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 	}
 	
 	{	// Do the vertices
-		float	*intr		=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+		float	*intr		=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv		=	varying[VARIABLE_DPDV] + start*3;
 		float	*N			=	varying[VARIABLE_NG] + start*3;
@@ -313,8 +312,6 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 	normalFix();
 	
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////

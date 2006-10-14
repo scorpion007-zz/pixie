@@ -58,9 +58,9 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	
 
 	// Allocate the framebuffer
-	fb					=	new float*[totalHeight];
+	fb					=	(float **) CRenderer::frameMemory->alloc(totalHeight*sizeof(float *));
 	for (i=0;i<totalHeight;i++) {
-		fb[i]			=	new float[totalWidth*SAMPLES_PER_PIXEL];
+		fb[i]			=	(float *) CRenderer::frameMemory->alloc(totalWidth*SAMPLES_PER_PIXEL*sizeof(float));
 	}
 
 	// Initialize the occlusion culler
@@ -76,13 +76,8 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 // Comments				:
 // Date last edited		:	7/31/2002
 CZbuffer::~CZbuffer() {
-	int	i;
-
-	for (i=0;i<totalHeight;i++) {
-		delete [] fb[i];
-	}
-
-	delete [] fb;
+	
+	// Framebuffer is allocated from the frame memory
 }
 
 
@@ -91,7 +86,7 @@ CZbuffer::~CZbuffer() {
 // Method				:	rasterBegin
 // Description			:	Init the framebuffer
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	7/31/2002
 void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	int	i,j;
@@ -108,7 +103,6 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);
-
 
 	assert(width <= CRenderer::bucketWidth);
 	assert(height <= CRenderer::bucketHeight);
@@ -142,7 +136,7 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 // Method				:	rasterDrawTriangles
 // Description			:	Draw rectangles
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	7/31/2002
 void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 
@@ -160,7 +154,7 @@ void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 // Method				:	rasterEnd
 // Description			:	Retrieve the image
 // Return Value			:	-
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	7/31/2002
 void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			sx,sy;
@@ -172,8 +166,6 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	const float	invPixelXsamples	=	1 / (float) CRenderer::pixelXsamples;
 	const float	invPixelYsamples	=	1 / (float) CRenderer::pixelYsamples;
 	float		*tmp;
-
-	memBegin();
 
 	assert(CRenderer::numSamples == 5);
 
@@ -205,8 +197,6 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 			}
 		}
 	}
-
-	memEnd();
 }
 
 
