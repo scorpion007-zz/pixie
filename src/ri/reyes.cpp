@@ -43,12 +43,14 @@
 #define newRasterObject(__a)		__a				=	new CRasterObject;								\
 									__a->next		=	new CRasterObject*[CRenderer::numThreads];		\
 									__a->refCount	=	0;												\
+									osCreateMutex(__a->mutex);											\
 									numObjects++;														\
 									if (numObjects > stats.numPeakRasterObjects)						\
 										stats.numPeakRasterObjects = numObjects;
 									
 #define	deleteRasterObject(__a)		if (__a->grid != NULL)	deleteGrid(__a->grid);						\
 									else					__a->object->detach();						\
+									osDeleteMutex(__a->mutex);											\
 									delete [] __a->next;												\
 									delete __a;															\
 									numObjects--;
@@ -56,7 +58,6 @@
 
 // Returns the bucket numbers
 #define	xbucket(__x)	(int) floor((__x - xSampleOffset) * invBucketSampleWidth);
-
 #define	ybucket(__y)	(int) floor((__y - ySampleOffset) * invBucketSampleHeight);
 
 
@@ -77,9 +78,11 @@
 		if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {								\
 			deleteRasterObject(__o);																	\
 		} else {																						\
+			osDownMutex(bucketMutex);																	\
 			cBucket				=	buckets[by][bx];													\
 			__o->next[thread]	=	cBucket->objects;													\
 			cBucket->objects	=	__o;																\
+			osUpMutex(bucketMutex);																		\
 		}																								\
 	}
 
@@ -87,9 +90,11 @@
 #define	objectExplicitInsert(__o,__bx,__by) {															\
 		CBucket					*cBucket;																\
 																										\
+		osDownMutex(bucketMutex);																		\
 		cBucket				=	buckets[__by][__bx];													\
 		__o->next[thread]	=	cBucket->objects;														\
 		cBucket->objects	=	__o;																	\
+		osUpMutex(bucketMutex);																			\
 	}
 
 
@@ -122,8 +127,6 @@
 
 
 
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes::CBucket
 // Method				:	CBucket
@@ -133,6 +136,7 @@
 // Date last edited		:	10/14/2002
 CReyes::CBucket::CBucket() {
 	objects			=	NULL;
+	queue			=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -156,6 +160,7 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	int			cx,cy;
 
 	// Allocate the buckets
+	osCreateMutex(bucketMutex);
 	buckets	=	new CBucket**[CRenderer::yBuckets];
 	for (cy=0;cy<CRenderer::yBuckets;cy++) {
 		buckets[cy]	=	new CBucket*[CRenderer::xBuckets];
@@ -237,6 +242,9 @@ CReyes::~CReyes() {
 		delete [] buckets[y];
 	}
 	delete [] buckets;
+
+	// Get rid of the bucket mutex
+	osDeleteMutex(bucketMutex);
 
 	// Sanity check
 	assert(numObjects			==	0);
@@ -338,14 +346,17 @@ void	CReyes::render() {
 					nullBucket);
 
 	// Insert the objects into the queue
+	osDownMutex(bucketMutex);
+	cBucket->queue	=	&objectQueue;
 	while((cObject=cBucket->objects) != NULL)	{
 		cBucket->objects	=	cObject->next[thread];
 		objectQueue.insert(cObject);
 	}
+	osUpMutex(bucketMutex);
 
 	// Process the objects and patches
-	while((cObject = objectQueue.get()) != NULL) {
-
+	while((cObject = objectQueue.get(bucketMutex)) != NULL) {
+		
 		if(CRenderer::depthFilter != DEPTH_MID) culledDepth = maxDepth;
 
 		// Is the object behind the maximum opaque depth ?
@@ -408,8 +419,10 @@ void	CReyes::render() {
 	CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
 
 	// Just have rendered this bucket, so deallocate it
+	osDownMutex(bucketMutex);
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
+	osUpMutex(bucketMutex);
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
@@ -439,6 +452,7 @@ void	CReyes::skip() {
 	CBucket				*cBucket			=	buckets[currentYBucket][currentXBucket];
 
 	// Defer the objects
+	osDownMutex(bucketMutex);
 	while((cObject	=	cBucket->objects) != NULL) {
 		cBucket->objects	=	cObject->next[thread];
 
@@ -448,6 +462,7 @@ void	CReyes::skip() {
 	// Just have rendered this bucket, so deallocate it
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
+	osUpMutex(bucketMutex);
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;

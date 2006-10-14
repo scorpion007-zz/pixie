@@ -202,13 +202,13 @@ public:
 			CJob		*next;				// The next job to perform
 		};
 
-		static void				(*dispatchJob)(int thread,CJob &job);		// This function is used by the hiders to ask for a job
+		static void				(*dispatchJob)(int thread,CJob &job);			// This function is used by the hiders to ask for a job
 
 		static void				beginRendering();
-		static void				rendererThread(void *w);					// Each client has one thread running this function on the client side to dispatch jobs
-		static void				processServerRequest(T32 req,int index);	// This function is used to serve the client requests
-		static void				dispatchReyes(int thread,CJob &job);		// This function dispatches single threaded buckets
-		static void				dispatchPhoton(int thread,CJob &job);		// This function dispatches single threaded photon bundles
+		static void				rendererThread(void *w);						// Each client has one thread running this function on the client side to dispatch jobs
+		static void				processServerRequest(T32 req,int index);		// This function is used to serve the client requests
+		static void				dispatchReyes(int thread,CJob &job);			// This function dispatches single threaded buckets
+		static void				dispatchPhoton(int thread,CJob &job);			// This function dispatches single threaded photon bundles
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with the clipping/projection (defined in rendererClipping.cpp)

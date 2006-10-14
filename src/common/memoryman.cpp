@@ -43,12 +43,13 @@ typedef union TMemoryHeader {
 
 #define	MEMORY_PAGE_SIZE	1 << 18
 
-TMemoryHeader			*memoryChunks[NUM_CHUNKS];
-unsigned char			*memoryPage					=	NULL;
-unsigned int			memoryAvailable				=	0;
-unsigned int			memoryUsage					=	0;
-TMemoryHeader			*memoryAllPages				=	NULL;
-static	int				memoryManagerInited			=	0;
+static	TMemoryHeader			*memoryChunks[NUM_CHUNKS];
+static	unsigned char			*memoryPage					=	NULL;
+static	unsigned int			memoryAvailable				=	0;
+static	unsigned int			memoryUsage					=	0;
+static	TMemoryHeader			*memoryAllPages				=	NULL;
+static	int						memoryManagerInited			=	0;
+static	TMutex					memoryMutex;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -63,6 +64,9 @@ inline	void	*allocMem(size_t size) {
 
 	// Round up
 	if (size & 7) index++;
+
+	// Secure the area
+	osDownMutex(memoryMutex);
 
 	// Is the requested size too large ?
 	if (index >= NUM_CHUNKS) {
@@ -88,9 +92,12 @@ inline	void	*allocMem(size_t size) {
 		}
 	}
 
-	ptri->index	=	index;
-
 	memoryUsage	+=	index;
+
+	// Release the area
+	osUpMutex(memoryMutex);
+
+	ptri->index	=	index;
 
 	return ptri+1;
 }
@@ -105,6 +112,9 @@ inline	void	delMem(void *ptr) {
 	if (ptr != 0) {
 		TMemoryHeader	*ptri	=	(TMemoryHeader *) ptr;
 
+		// Secure the area
+		osDownMutex(memoryMutex);
+
 		ptri--;
 		memoryUsage	-=	ptri->index;
 
@@ -114,8 +124,10 @@ inline	void	delMem(void *ptr) {
 			unsigned int	index	=	ptri->index;
 			ptri->next				=	memoryChunks[index];
 			memoryChunks[index]		=	ptri;
-
 		}
+
+		// Release the area
+		osUpMutex(memoryMutex);
 	}
 }
 
@@ -179,6 +191,7 @@ void	memInit() {
 		memoryUsage			=	0;
 		memoryPage			=	0;
 		memoryAllPages		=	0;
+		osCreateMutex(memoryMutex);
 	}
 
 	memoryManagerInited++;
@@ -197,6 +210,8 @@ void	memShutdown() {
 		TMemoryHeader	*cPage;
 
 		assert(memoryManagerInited == TRUE);
+
+		osDeleteMutex(memoryMutex);
 
 		while((cPage=memoryAllPages) != NULL) {
 			memoryAllPages	=	cPage->next;

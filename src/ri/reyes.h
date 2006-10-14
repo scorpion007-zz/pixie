@@ -71,7 +71,6 @@ class	CReyes : public CShadingContext {
 protected:
 
 
-
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRasterGrid
 	// Description			:	This class encapsulates a shading grid
@@ -107,21 +106,8 @@ protected:
 			int					refCount;				// The number of threads working on this object
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
+			TMutex				mutex;					// To secure the object
 	};	
-
-	///////////////////////////////////////////////////////////////////////
-	// Class				:	CBucket
-	// Description			:	Holds a bucket
-	// Comments				:
-	// Date last edited		:	1/30/2002
-	class	CBucket {
-	public:
-								CBucket();
-								~CBucket();
-
-			CRasterObject		*objects;				// The list of objects waiting to be rendered
-	};
-
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPqueue
@@ -168,31 +154,38 @@ protected:
 									allItems[i]		=	cObject;
 								}
 					
-				CRasterObject	*get() {
+				CRasterObject	*get(TMutex &mutex) {
 									int				i = 1, j;
 									CRasterObject	*lItem,*cItem;
-
-									if (numItems <= 1) return NULL;
 								
-									cItem		=	allItems[1];
-								
-									numItems--;
-									lItem		=	allItems[numItems];
+									osDownMutex(mutex);
 
-									while (i <= numItems / 2) {
-										j = 2 * i;
-										if (j >= numItems) break;
+									if (numItems <= 1) {
+										cItem	=	NULL;
+									} else {
+										cItem		=	allItems[1];
+									
+										numItems--;
+										lItem		=	allItems[numItems];
 
-										if ((j < (numItems-1)) && (allItems[j]->zmin > allItems[j+1]->zmin))
-											j++;
+										while (i <= numItems / 2) {
+											j = 2 * i;
+											if (j >= numItems) break;
 
-										if (allItems[j]->zmin > lItem->zmin)
-											break;
+											if ((j < (numItems-1)) && (allItems[j]->zmin > allItems[j+1]->zmin))
+												j++;
 
-										allItems[i]	=	allItems[j];
-										i			=	j;
+											if (allItems[j]->zmin > lItem->zmin)
+												break;
+
+											allItems[i]	=	allItems[j];
+											i			=	j;
+										}
+										allItems[i]				=	lItem;
 									}
-									allItems[i]				=	lItem;
+
+									osUpMutex(mutex);
+
 									return cItem;
 								}
 
@@ -203,8 +196,21 @@ protected:
 
 
 
+	
 
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CBucket
+	// Description			:	Holds a bucket
+	// Comments				:
+	// Date last edited		:	1/30/2002
+	class	CBucket {
+	public:
+								CBucket();
+								~CBucket();
 
+			CRasterObject		*objects;				// The list of objects waiting to be rendered
+			CPqueue				*queue;					// If this is not null, we're currently rendering this bucket
+	};
 
 
 public:
@@ -249,8 +255,8 @@ private:
 	
 	int							numGrids;										// The number of grids allocated
 	int							numObjects;										// The number of objects allocated
-
 	CBucket						***buckets;										// All buckets
+	TMutex						bucketMutex;									// Controls the accesses to the buckets
 
 	int							enableMotionBlur;								// TRUE if the motion blur has to be enabled
 	int							extraPrimitiveFlags;							// These are the extra primitive flags
@@ -328,6 +334,63 @@ private:
 									P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*dSampledx;
 									P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*dSampledy;
 								}
+
+				///////////////////////////////////////////////////////////////////////
+				// Class				:	CReyes
+				// Method				:	insertObject
+				// Description			:	Insert an object into all hiders
+				// Return Value			:
+				// Comments				:	(inline for speed)
+				// Date last edited		:	7/4/2001
+				inline	void	insertObject(CRasterObject *object) {
+					int			i;
+
+					// First, make sure we're the only one accessing this object (this must always fallthrough)
+					osDownMutex(object->mutex);
+
+					// For every thread
+					const int	sx = (int) floor((object->xbound[0] - xSampleOffset) * invBucketSampleWidth);
+					const int	sy = (int) floor((object->ybound[0] - ySampleOffset) * invBucketSampleHeight);
+					for (i=0;i<CRenderer::numThreads;i++) {
+						CReyes		*hider	=	(CReyes *) CRenderer::contexts[i];
+						int			bx		=	sx;
+						int			by		=	sy;
+						CBucket		*cBucket;
+
+						// Secure the area
+						osDownMutex(hider->bucketMutex);
+
+						// Determine the bucket
+						if (by <= hider->currentYBucket) {
+							by	=	hider->currentYBucket;
+							if (bx < hider->currentXBucket)	bx	=	hider->currentXBucket;
+						} else {
+							if (bx < 0)	bx	=	0;
+						}
+
+						if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {
+							// Out of bounds
+						} else {
+							// Insert the object	
+							object->refCount++;
+							cBucket					=	buckets[by][bx];
+							object->next[thread]	=	cBucket->objects;
+							cBucket->objects		=	object;
+						}
+
+						// Release the mutex
+						osUpMutex(hider->bucketMutex);
+					}
+
+					// Did we kill the object ?
+					if (object->refCount == 0) {
+						osUpMutex(object->mutex);
+						deleteRasterObject(object);
+					} else {
+						osUpMutex(object->mutex);
+					}
+				}
+
 };
 
 #endif
