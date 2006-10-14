@@ -4,7 +4,7 @@ dnl    Pixie configure.in file
 dnl
 dnl
 AC_INIT(src/common/global.h)
-AM_INIT_AUTOMAKE(Pixie,1.7.5)
+AM_INIT_AUTOMAKE(Pixie,1.7.6)
 AM_CONFIG_HEADER(config.h)
 AC_PREFIX_DEFAULT(/opt/pixie)
 

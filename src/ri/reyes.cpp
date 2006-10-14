@@ -700,11 +700,11 @@ void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 	nGrid->umax		=	0;
 	nGrid->vmin		=	vmin;
 	nGrid->vmax		=	vmax;
-	nGrid->udiv		=	1;
-	nGrid->vdiv		=	numDiv;
+	nGrid->udiv		=	numDiv;		// Hack: We're fooling the rasterizer here
+	nGrid->vdiv		=	1;			// The ribbon is actually subdivided along v, not u
 
 	// Sample the grid
-	shadeGrid(nGrid,TRUE);									// Just the position
+	shadeGrid(nGrid,TRUE);			// Just the position
 
 	// Dispatch the lines to the renderer
 	insertGrid(nGrid,0);
@@ -921,7 +921,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 	} else if (grid->dim == 1) {
 		// This is a 1 dimensional ribbon
-		const int			numVertices		=	grid->vdiv + 1;
+		const int			numVertices		=	grid->udiv + 1;
 		int					j;
 		float				*size;
 		int					i;
