@@ -673,8 +673,8 @@ void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
 	nGrid->umax		=	0;
 	nGrid->vmin		=	vmin;
 	nGrid->vmax		=	vmax;
-	nGrid->udiv		=	1;
-	nGrid->vdiv		=	numDiv;
+	nGrid->udiv		=	numDiv;
+	nGrid->vdiv		=	1;
 
 	// Sample the grid
 	shadeGrid(nGrid,TRUE);									// Just the position
@@ -894,7 +894,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 	} else if (grid->dim == 1) {
 		// This is a 1 dimensional ribbon
-		const int			numVertices		=	grid->vdiv + 1;
+		const int			numVertices		=	grid->udiv + 1;
 		int					j;
 		float				*size;
 		int					i;
@@ -934,8 +934,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur ?
-			if (enableMotionBlur && (object->moving()))						grid->flags		|=	RASTER_MOVING;
-
+			if (enableMotionBlur && (object->moving()))				grid->flags		|=	RASTER_MOVING;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
