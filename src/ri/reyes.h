@@ -103,7 +103,8 @@ protected:
 	public:
 			CObject				*object;				// The object
 			CRasterGrid			*grid;					// The grid
-			CRasterObject		*next;					// The next object
+			CRasterObject		**next;					// The next object
+			int					refCount;				// The number of threads working on this object
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
 	};	

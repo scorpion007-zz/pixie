@@ -46,7 +46,7 @@
 #define	popen			_popen
 #define	pclose			_pclose
 #define	TThread			HANDLE
-#define	TMutex			LPCRITICAL_SECTION 
+#define	TMutex			CRITICAL_SECTION 
 typedef void			*(*TFun)(void *);
 
 #else				// >>>>>>>>>>>>>>>>>>>   Unix

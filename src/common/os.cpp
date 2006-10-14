@@ -577,11 +577,7 @@ int		osWaitThread(TThread	thread) {
 // Date last edited		:	11/28/2001
 void	osCreateMutex(TMutex &mutex) {
 #ifdef WIN32
-	CRITICAL_SECTION	*section	=	new CRITICAL_SECTION;
-
-	InitializeCriticalSection(section);
-
-	mutex	=	section;
+	InitializeCriticalSection(&mutex);
 #else
 	pthread_mutex_init(&mutex,NULL);
 #endif
@@ -595,7 +591,7 @@ void	osCreateMutex(TMutex &mutex) {
 // Date last edited		:	11/28/2001
 void	osDownMutex(TMutex &mutex) {
 #ifdef WIN32
-	EnterCriticalSection(mutex);
+	EnterCriticalSection(&mutex);
 #else
 	pthread_mutex_lock(&mutex);
 #endif
@@ -609,7 +605,7 @@ void	osDownMutex(TMutex &mutex) {
 // Date last edited		:	11/28/2001
 void	osUpMutex(TMutex &mutex) {
 #ifdef WIN32
-	LeaveCriticalSection(mutex);
+	LeaveCriticalSection(&mutex);
 #else
 	pthread_mutex_unlock(&mutex);
 #endif
@@ -623,9 +619,7 @@ void	osUpMutex(TMutex &mutex) {
 // Date last edited		:	11/28/2001
 void	osDeleteMutex(TMutex &mutex) {
 #ifdef WIN32
-	DeleteCriticalSection(mutex);
-
-	delete mutex;
+	DeleteCriticalSection(&mutex);
 #else
 	pthread_mutex_destroy(&mutex);
 #endif

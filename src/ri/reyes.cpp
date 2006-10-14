@@ -40,13 +40,16 @@
 
 
 
-#define newRasterObject(__a)		__a = new CRasterObject;											\
+#define newRasterObject(__a)		__a				=	new CRasterObject;								\
+									__a->next		=	new CRasterObject*[CRenderer::numThreads];		\
+									__a->refCount	=	0;												\
 									numObjects++;														\
 									if (numObjects > stats.numPeakRasterObjects)						\
 										stats.numPeakRasterObjects = numObjects;
 									
 #define	deleteRasterObject(__a)		if (__a->grid != NULL)	deleteGrid(__a->grid);						\
 									else					__a->object->detach();						\
+									delete [] __a->next;												\
 									delete __a;															\
 									numObjects--;
 
@@ -75,7 +78,7 @@
 			deleteRasterObject(__o);																	\
 		} else {																						\
 			cBucket				=	buckets[by][bx];													\
-			__o->next			=	cBucket->objects;													\
+			__o->next[thread]	=	cBucket->objects;													\
 			cBucket->objects	=	__o;																\
 		}																								\
 	}
@@ -85,7 +88,7 @@
 		CBucket					*cBucket;																\
 																										\
 		cBucket				=	buckets[__by][__bx];													\
-		__o->next			=	cBucket->objects;														\
+		__o->next[thread]	=	cBucket->objects;														\
 		cBucket->objects	=	__o;																	\
 	}
 
@@ -224,7 +227,7 @@ CReyes::~CReyes() {
 				CRasterObject		*cObject;
 
 				while((cObject=cBucket->objects) != NULL) {
-					cBucket->objects	=	cObject->next;
+					cBucket->objects	=	cObject->next[thread];
 					deleteRasterObject(cObject);
 				}
 
@@ -336,7 +339,7 @@ void	CReyes::render() {
 
 	// Insert the objects into the queue
 	while((cObject=cBucket->objects) != NULL)	{
-		cBucket->objects	=	cObject->next;
+		cBucket->objects	=	cObject->next[thread];
 		objectQueue.insert(cObject);
 	}
 
@@ -368,7 +371,7 @@ void	CReyes::render() {
 
 				// Insert the objects into the queue
 				while((cObject=cBucket->objects) != NULL)	{
-					cBucket->objects	=	cObject->next;
+					cBucket->objects	=	cObject->next[thread];
 					objectQueue.insert(cObject);
 				}
 
@@ -437,7 +440,7 @@ void	CReyes::skip() {
 
 	// Defer the objects
 	while((cObject	=	cBucket->objects) != NULL) {
-		cBucket->objects	=	cObject->next;
+		cBucket->objects	=	cObject->next[thread];
 
 		objectDefer(cObject);
 	}
