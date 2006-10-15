@@ -42,42 +42,7 @@ static	int					allocatedPages			=	0;
 static	int					freedPages				=	0;
 static	int					memoryPageSize			=	1000000;
 static	float				lastPagingTime			=	0;
-		CMemPage			*currentMemoryPage		=	NULL;
 
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	memoryInit
-// Description			:	Initialize the memory manager
-// Return Value			:
-// Comments				:
-// Date last edited		:	1/14/2002
-void			memoryInit() {
-	currentMemoryPage	=	memoryNewPage(INIT_ZONE_SIZE);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	memoryTini
-// Description			:	Destroy memory manager
-// Return Value			:
-// Comments				:
-// Date last edited		:	1/14/2002
-void			memoryTini() {
-	CMemPage	*cPage;
-
-	// We must be the first page
-	assert(currentMemoryPage->prev == NULL);
-
-	while(currentMemoryPage != NULL) {
-		cPage				=	currentMemoryPage;
-		currentMemoryPage	=	cPage->next;
-
-		memoryDeletePage(cPage);
-	}
-
-	assert(allocatedZoneMemory	==	freedZoneMemory);
-	assert(allocatedPages		==	freedPages);
-	assert(stats.zoneMemory		==	0);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	memoryInit
@@ -102,7 +67,7 @@ void			memoryTini(CMemPage *&stack) {
 	assert(stack->prev == NULL);
 
 	while(stack != NULL) {
-		cPage				=	stack;
+		cPage	=	stack;
 		stack	=	cPage->next;
 
 		memoryDeletePage(cPage);

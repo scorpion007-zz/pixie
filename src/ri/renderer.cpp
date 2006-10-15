@@ -88,6 +88,7 @@
 ////////////////////////////////////////////////////////////////////
 // Global members (active between RiBegin() - RiEnd())
 ////////////////////////////////////////////////////////////////////
+CMemPage											*CRenderer::globalMemory				=	NULL;
 CRendererContext									*CRenderer::context						=	NULL;
 CArray<CShaderInstance *>							*CRenderer::allLights					=	NULL;
 CDictionary<const char *,CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;
@@ -272,7 +273,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(hierarchyMutex);
 
 	// Init the memory
-	memoryInit();
+	memoryInit(globalMemory);
 
 	// Init the files
 	initFiles();
@@ -327,7 +328,7 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(hierarchyMutex);
 
 	// Turn off the memory manager
-	memoryTini();
+	memoryTini(globalMemory);
 
 	// Check the stats for memory leaks
 	stats.check();

@@ -97,7 +97,7 @@ CPhotonHider::~CPhotonHider() {
 void		CPhotonHider::renderingLoop(){  
 	CRenderer::CJob	job;
 
-	memBegin();
+	memBegin(threadMemory);
 
 	const int		numLights			=	CRenderer::allLights->numItems;
 	CShaderInstance	**lights			=	CRenderer::allLights->array;
@@ -154,9 +154,9 @@ void		CPhotonHider::renderingLoop(){
 						
 						// Ensure there's space for the ambient lights
 						
-						*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight));
-						(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight));
-						(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices);
+						*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight),threadMemory);
+						(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight),threadMemory);
+						(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices,threadMemory);
 						(*alights)->savedState[0]	=		NULL;			/* ambient lights do not use tags or save L */
 						(*alights)->lightTags		=		NULL;
 						(*alights)->instance		=		NULL;
@@ -177,14 +177,14 @@ void		CPhotonHider::renderingLoop(){
 						}
 
 						// Execute the light source shader
-						memBegin();
+						memBegin(threadMemory);
 						memSave(shaderVarCheckpoint,shaderStateMemory);
 						
 						currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(shaderStateMemory,currentShadingState->varying,numVertices);
 						cLight->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);
 
 						memRestore(shaderVarCheckpoint,shaderStateMemory);
-						memEnd();
+						memEnd(threadMemory);
 
 						emit									-=	numVertices;
 					}
@@ -195,7 +195,7 @@ void		CPhotonHider::renderingLoop(){
 		}
 	}
 
-	memEnd();
+	memEnd(threadMemory);
 }
 
 

@@ -120,6 +120,7 @@ public:
 		// Some global data structures that hang around between beginRenderer and endRenderer
 		//
 		////////////////////////////////////////////////////////////////////
+		static	CMemPage											*globalMemory;				// The global memory stack
 		static	CRendererContext									*context;					// The renderer context (RenderMan Interface)
 		static	CArray<CShaderInstance *>							*allLights;					// An array of all allocated lights
 		static	CDictionary<const char *,CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context

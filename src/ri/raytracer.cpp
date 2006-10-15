@@ -338,7 +338,7 @@ void	CRaytracer::renderingLoop() {
 	int				height;
 	CRenderer::CJob	job;
 
-	memBegin();
+	memBegin(threadMemory);
 
 	// While not done
 	while(TRUE) {
@@ -373,7 +373,7 @@ void	CRaytracer::renderingLoop() {
 		}
 	}
 
-	memEnd();
+	memEnd(threadMemory);
 
 	// Ditch everything
 	delete this;

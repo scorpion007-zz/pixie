@@ -199,7 +199,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			rays				+=	numRays;
 			while((cHash=objects) != NULL) {
 				CRay			*cRay;
-				TShadingGroup	*cGroup	=	(TShadingGroup *) ralloc(sizeof(TShadingGroup));
+				TShadingGroup	*cGroup	=	(TShadingGroup *) ralloc(sizeof(TShadingGroup),threadMemory);
 
 				// Put the rays in this bin into an array
 				for (cRay=cHash->rays;cRay!=NULL;cRay = (CRay *) (cRay->object)) {

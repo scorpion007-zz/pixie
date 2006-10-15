@@ -360,6 +360,7 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Comments				:
 // Date last edited		:	8/25/2002
 CShadingContext::CShadingContext(int t) {
+	int	i;
 
 	// This is our thread number
 	thread					=	t;
@@ -663,7 +664,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			object->sample(0,numVertices,varying,usedParameters);
 
 			// We're rasterizing, so the derivative information is already available
-			memEnter(threadMemory);
+			memBegin(threadMemory);
 
 			xy					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
 
@@ -781,7 +782,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			}
 
 			// Done and done
-			memLeave(threadMemory);
+			memEnd(threadMemory);
 		}
 	} else {
 		// No derivative information is needed
@@ -848,7 +849,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			complete(numVertices,varying,usedParameters,currentAttributes);
 		}
 
-		memEnter(threadMemory);
+		memBegin(threadMemory);
 
 		if (displacement != NULL) {
 			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
@@ -887,7 +888,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			currentShadingState->postShader->execute(this,currentShadingState->locals[ACCESSOR_POSTSHADER]);
 		}
 
-		memLeave(threadMemory);
+		memEnd(threadMemory);
 	}
 	
 	// Unwind the stack of shader states
@@ -1128,7 +1129,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			object->sample(0,numVertices,varying,usedParameters);
 
 			// We're rasterizing, so the derivative information is already available
-			memEnter(threadMemory);
+			memBegin(threadMemory);
 
 			xy					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
 
@@ -1264,7 +1265,7 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			}
 
 			// Done and done
-			memLeave(threadMemory);
+			memEnd(threadMemory);
 		}
 	} else {
 		// No derivative information is needed
@@ -1317,13 +1318,13 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 			complete(numVertices,varying,usedParameters,currentAttributes);
 		}
 
-		memEnter(threadMemory);
+		memBegin(threadMemory);
 
 		if (displacement != NULL) {
 			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
 		}
 
-		memLeave(threadMemory);
+		memEnd(threadMemory);
 	}
 	
 	// Unwind the stack of shader states

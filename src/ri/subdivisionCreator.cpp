@@ -44,6 +44,7 @@
 #include "error.h"
 #include "rendererContext.h"
 #include "pl.h"
+#include "renderer.h"
 
 
 
@@ -160,7 +161,7 @@ public:
 	float			sharpness;
 
 	void			*operator new(size_t s) {
-						return ralloc((int) s);
+						return ralloc((int) s,CRenderer::globalMemory);
 					}
 
 					///////////////////////////////////////////////////////////////////////
@@ -187,7 +188,7 @@ public:
 					// Comments				:
 					// Date last edited		:	5/28/2003
 	void			addFace(CSFace *face) {
-						CVertexFace	*cFace	=	(CVertexFace *) ralloc(sizeof(CVertexFace));
+						CVertexFace	*cFace	=	(CVertexFace *) ralloc(sizeof(CVertexFace),CRenderer::globalMemory);
 
 						cFace->face	=	face;
 						cFace->next	=	faces;
@@ -205,7 +206,7 @@ public:
 					// Comments				:
 					// Date last edited		:	5/28/2003
 	void			addEdge(CSEdge *edge) {
-						CVertexEdge	*cEdge	=	(CVertexEdge *) ralloc(sizeof(CVertexEdge));
+						CVertexEdge	*cEdge	=	(CVertexEdge *) ralloc(sizeof(CVertexEdge),CRenderer::globalMemory);
 
 						cEdge->edge	=	edge;
 						cEdge->next	=	edges;
@@ -259,7 +260,7 @@ public:
 	CSEdge			*children[2];					// The child edges
 
 	void			*operator new(size_t s) {
-						return ralloc(s);
+						return ralloc(s,CRenderer::globalMemory);
 					}
 
 					///////////////////////////////////////////////////////////////////////
@@ -352,7 +353,7 @@ public:
 	CSVertex		*childVertex;
 
 	void			*operator new(size_t s) {
-						return ralloc(s);
+						return ralloc(s,CRenderer::globalMemory);
 					}
 
 					///////////////////////////////////////////////////////////////////////
@@ -367,7 +368,7 @@ public:
 							int			i;
 							CSEdge		**newEdges	=	(CSEdge **) alloca(numEdges*sizeof(CSEdge *));
 
-							children				=	(CSFace **) ralloc(numEdges*sizeof(CSFace *));
+							children				=	(CSFace **) ralloc(numEdges*sizeof(CSFace *),CRenderer::globalMemory);
 							childVertex				=	new CSVertex;
 							childVertex->parentf	=	this;
 
@@ -383,8 +384,8 @@ public:
 
 								cFace->uniformIndex	=	uniformIndex;
 								cFace->numEdges		=	4;
-								cFace->edges		=	(CSEdge **)		ralloc(4*sizeof(CSEdge *));
-								cFace->vertices		=	(CSVertex **)	ralloc(4*sizeof(CSVertex *));
+								cFace->edges		=	(CSEdge **)		ralloc(4*sizeof(CSEdge *),CRenderer::globalMemory);
+								cFace->vertices		=	(CSVertex **)	ralloc(4*sizeof(CSVertex *),CRenderer::globalMemory);
 
 								cEdge->vertices[0]	=	edges[i]->childVertex;
 								cEdge->vertices[1]	=	childVertex;
@@ -1133,7 +1134,7 @@ int		CSFace::findCornerVertex(int eOrg,int vOrg,CSVertex *&v) {
 void	CSVertex::compute() {
 	assert(vertex == NULL);
 
-	vertex	=	(double *) ralloc(vertexSize*sizeof(double));
+	vertex	=	(double *) ralloc(vertexSize*sizeof(double),CRenderer::globalMemory);
 
 	if (parentv != NULL)		parentv->compute(vertex);
 	else if (parente != NULL)	parente->compute(vertex);
@@ -1529,7 +1530,7 @@ static void	gatherData(int numVertex,CSVertex **vertices,CSVertex **varyings,int
 
 	assert(vertexSize > 0);
 
-	vertex		=	(double *) ralloc(vertexSize*numVertex*sizeof(double));
+	vertex		=	(double *) ralloc(vertexSize*numVertex*sizeof(double),CRenderer::globalMemory);
 
 	for (i=0;i<numVertex;i++) {
 		if (vertices[i]->vertex == NULL)	vertices[i]->compute();
@@ -1785,15 +1786,15 @@ void		CSubdivMesh::create() {
 	currentXform		=	this->xform;
 	parameterList		=	this->pl;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// Collect the misc data
 	vertexData			=	NULL;	pl->collect(vertexSize,vertexData,CONTAINER_VERTEX);
 	varyingData			=	NULL;	pl->collect(varyingSize,varyingData,CONTAINER_VARYING);
 	facevaryingData		=	NULL;	pl->collect(facevaryingSize,facevaryingData,CONTAINER_FACEVARYING);
 
-	faces				=	(CSFace **)		ralloc(numFaces*sizeof(CSFace *));
-	vertices			=	(CSVertex **)	ralloc(numVertices*sizeof(CSVertex *));
+	faces				=	(CSFace **)		ralloc(numFaces*sizeof(CSFace *),CRenderer::globalMemory);
+	vertices			=	(CSVertex **)	ralloc(numVertices*sizeof(CSVertex *),CRenderer::globalMemory);
 
 	// Create the vertices and copy the vertex / varying data over
 	for (i=0;i<numVertices;i++)	{
@@ -1802,7 +1803,7 @@ void		CSubdivMesh::create() {
 		int			k;
 
 		vertices[i]					=	new CSVertex;
-		dest = vertices[i]->vertex	=	(double *) ralloc(vertexSize*sizeof(double));
+		dest = vertices[i]->vertex	=	(double *) ralloc(vertexSize*sizeof(double),CRenderer::globalMemory);
 
 		for (k=0;k<vertexSize;k++)	*dest++	=	*src++;
 	}
@@ -1823,8 +1824,8 @@ void		CSubdivMesh::create() {
 		CSFace	*cFace			=	faces[i];
 		int		numEdges		=	numVerticesPerFace[i];
 		cFace->numEdges			=	numEdges;
-		cFace->vertices			=	(CSVertex **)	ralloc(numEdges*sizeof(CSVertex *));
-		cFace->edges			=	(CSEdge **)		ralloc(numEdges*sizeof(CSEdge *));
+		cFace->vertices			=	(CSVertex **)	ralloc(numEdges*sizeof(CSVertex *),CRenderer::globalMemory);
+		cFace->edges			=	(CSEdge **)		ralloc(numEdges*sizeof(CSEdge *),CRenderer::globalMemory);
 
 		// Set the vertices belonging to a face
 		for (j=0;j<numEdges;j++) {
@@ -1932,7 +1933,7 @@ void		CSubdivMesh::create() {
 	}
 
 	// Re-claim the memory
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 
 	// Attach to the objects so they don't get destroyed before us
 	for (i=0;i<objects->numItems;i++) {

@@ -584,8 +584,8 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 	else						bundle.label	=	lookup->label;
 
 	// Allocate the memory for the transmission rays
-	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay));
-	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*));
+	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
+	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*),threadMemory);
 
 	inShadow		=	TRUE;					// We're in shadow
 
@@ -665,8 +665,8 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 	if (lookup->label == NULL)	bundle.label	=	rayLabelTransmission;
 	else						bundle.label	=	lookup->label;
 
-	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay));
-	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*));
+	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
+	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
 
 	for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {
 		if (*tags == 0) {
@@ -745,8 +745,8 @@ void	CShadingContext::traceTransmission(int numVertices,CRaySample *samples,CTex
 	else						bundle.label	=	lookup->label;
 
 	// Allocate the memory for the transmission rays
-	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay));
-	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*));
+	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
+	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*),threadMemory);
 
 	// We're in shadow
 	inShadow				=	TRUE;
@@ -829,8 +829,8 @@ void	CShadingContext::traceReflection(int numVertices,CRaySample *samples,CTextu
 	else						bundle.label	=	lookup->label;
 
 	// Allocate the memory
-	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay));
-	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*));
+	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
+	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
 
 	// Shoot the rays
 	for (i=numVertices;i>0;i--,samples++) {

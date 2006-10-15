@@ -376,7 +376,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		return;
 	}
 
-	memEnter(threadMemory);
+	memBegin(threadMemory);
 
 	// Allocate the framebuffer
 	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
@@ -592,7 +592,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		}
 	}
 
-	memLeave(threadMemory);
+	memEnd(threadMemory);
 }
 
 
@@ -872,7 +872,7 @@ void		CStochastic::deepShadowCompute() {
 	CFragment	**fSamples;
 	float		*fWeights;
 
-	memEnter(threadMemory);
+	memBegin(threadMemory);
 	
 	prevFilePos		=	ftell(deepShadowFile);
 
@@ -954,5 +954,5 @@ void		CStochastic::deepShadowCompute() {
 	CRenderer::deepShadowIndex[tileIndex]											=	prevFilePos;
 	CRenderer::deepShadowIndex[tileIndex + CRenderer::xBuckets*CRenderer::yBuckets]	=	ftell(CRenderer::deepShadowFile) - prevFilePos;
 
-	memLeave(threadMemory);
+	memEnd(threadMemory);
 }

@@ -35,6 +35,7 @@
 #include "shading.h"
 #include "memory.h"
 #include "stats.h"
+#include "renderer.h"
 
 // Note:
 //	The patgrid is instantiated with a grid of (nu+2)*(nv+2) vertices which
@@ -248,7 +249,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 	float				*vertexData;
 	int					vertexDataStep;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;									// No need for interpolation
@@ -268,7 +269,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*(nu+2)*(nv+2);
 
-			vertexData				=	(float *) ralloc(numVertices*(nu+2)*(nv+2)*vertexSize*sizeof(float));
+			vertexData				=	(float *) ralloc(numVertices*(nu+2)*(nv+2)*vertexSize*sizeof(float),CRenderer::globalMemory);
 			vertexDataStep			=	(nu+2)*(nv+2)*vertexSize;
 
 			interpolate				=	vertexData;
@@ -284,7 +285,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 	}
 
 	{	// Do the vertices
-		float	*intr		=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+		float	*intr		=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv		=	varying[VARIABLE_DPDV] + start*3;
 		float	*intrStart	=	intr;
@@ -351,7 +352,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////

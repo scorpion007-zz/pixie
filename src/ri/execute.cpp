@@ -62,16 +62,16 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 		if (*freeLights != NULL) {															\
 			cLight					= *freeLights;											\
 			*freeLights				= (*freeLights)->next;									\
-			float**		savedState	= (float**) ralloc((2+numGlobals)*sizeof(float*));		\
+			float**		savedState	= (float**) ralloc((2+numGlobals)*sizeof(float*),threadMemory);		\
 			savedState[0]			= cLight->savedState[0];								\
 			savedState[1]			= cLight->savedState[1];								\
 			cLight->savedState		= savedState;											\
 		} else {																			\
-			cLight					= (CShadedLight*) ralloc(sizeof(CShadedLight));			\
-			cLight->lightTags		= (int*)	ralloc(sizeof(int)*numVertices);			\
-			cLight->savedState		= (float**) ralloc((2+numGlobals)*sizeof(float*));		\
-			cLight->savedState[0]	= (float*)	ralloc(3*sizeof(float)*numVertices);		\
-			cLight->savedState[1]	= (float*)	ralloc(3*sizeof(float)*numVertices);		\
+			cLight					= (CShadedLight*) ralloc(sizeof(CShadedLight),threadMemory);		\
+			cLight->lightTags		= (int*)	ralloc(sizeof(int)*numVertices,threadMemory);			\
+			cLight->savedState		= (float**) ralloc((2+numGlobals)*sizeof(float*),threadMemory);		\
+			cLight->savedState[0]	= (float*)	ralloc(3*sizeof(float)*numVertices,threadMemory);		\
+			cLight->savedState[1]	= (float*)	ralloc(3*sizeof(float)*numVertices,threadMemory);		\
 			cLight->instance		= cInstance;											\
 		}																					\
 		cLight->next			= *lights;													\
@@ -88,20 +88,20 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 				if (cVariable->storage == STORAGE_GLOBAL) {									\
 					/* globals come from the global varyings */								\
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {					\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats);						\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats,threadMemory);			\
 						memcpy(cLight->savedState[2+globNum],varying[cVariable->entry],sizeof(float)*cVariable->numFloats);				\
 					} else {																											\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices);			\
-						memcpy(cLight->savedState[2+globNum],varying[cVariable->entry],sizeof(float)*cVariable->numFloats*numVertices);	\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices,threadMemory);	\
+						memcpy(cLight->savedState[2+globNum],varying[cVariable->entry],sizeof(float)*cVariable->numFloats*numVertices);		\
 					}																		\
 					globNum++;																\
 				} else if (cVariable->storage == STORAGE_MUTABLEPARAMETER) {				\
 					/* mutable parameters come from the shader varyings */					\
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {										\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats);											\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats,threadMemory);								\
 						memcpy(cLight->savedState[2+globNum],stuff[SL_VARYING_OPERAND][cVariable->entry],sizeof(float)*cVariable->numFloats);				\
 					} else {																																\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices);								\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices,threadMemory);					\
 						memcpy(cLight->savedState[2+globNum],stuff[SL_VARYING_OPERAND][cVariable->entry],sizeof(float)*cVariable->numFloats*numVertices);	\
 					}																		\
 					globNum++;																\
@@ -195,7 +195,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 #define		savestring(r,n)					{																	\
 												int		strLen	=	strlen(n) + 1;								\
 												int		strSize	=	(strLen & ~3) + 4;							\
-												char	*strmem	=	(char *) ralloc(strSize);					\
+												char	*strmem	=	(char *) ralloc(strSize,threadMemory);		\
 												strcpy(strmem,n);												\
 												r				=	strmem;										\
 											}
@@ -272,9 +272,9 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												currentShadingState->ambientLightsExecuted	=	TRUE;		\
 																											\
 												if (*alights == NULL) {										\
-													*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight));							\
-													(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight));							\
-													(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices);					\
+													*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight),threadMemory);				\
+													(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight),threadMemory);			\
+													(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices,threadMemory);		\
 													(*alights)->savedState[0]	=		NULL;			/* ambient lights do not use tags or save L */			\
 													(*alights)->lightTags		=		NULL;				\
 													(*alights)->instance		=		NULL;				\

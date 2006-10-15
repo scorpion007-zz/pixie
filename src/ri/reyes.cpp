@@ -408,7 +408,7 @@ void	CReyes::render() {
 	assert(cBucket->objects == NULL);
 
 	// Begin a new memory page
-	memEnter(threadMemory);
+	memBegin(threadMemory);
 
 		// Allocate the framebuffer area (from the thread memory)
 		pixelBuffer		=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float),threadMemory);
@@ -425,7 +425,7 @@ void	CReyes::render() {
 		CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
 
 	// Restore the memory
-	memLeave(threadMemory);
+	memEnd(threadMemory);
 
 	// Lock the bucket one more time
 	osDownMutex(bucketMutex);

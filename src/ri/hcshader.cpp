@@ -132,11 +132,11 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		if (currentShadingState->numActive == 0)
 			return;
 		
-		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight));
-		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices);
-		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*));
-		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
-		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
+		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight),CRenderer::globalMemory);
+		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices,CRenderer::globalMemory);
+		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*),CRenderer::globalMemory);
+		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices,CRenderer::globalMemory);
+		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices,CRenderer::globalMemory);
 		cLight->instance			=	this;
 		cLight->next				=	*lights;
 		*lights						=	cLight;
@@ -442,11 +442,11 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		if (currentShadingState->numActive == 0)
 			return;
 		
-		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight));
-		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices);
-		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*));
-		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
-		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
+		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight),CRenderer::globalMemory);
+		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices,CRenderer::globalMemory);
+		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*),CRenderer::globalMemory);
+		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices,CRenderer::globalMemory);
+		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices,CRenderer::globalMemory);
 		cLight->instance			=	this;
 		memcpy(cLight->lightTags,tags,sizeof(int)*numVertices);
 		L							=	cLight->savedState[0];

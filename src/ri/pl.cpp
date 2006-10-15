@@ -824,7 +824,7 @@ void	CPl::collect(int &size,float *&data,EVariableClass container) {
 
 	assert(numItems > 0);
 
-	if (data == NULL)	data	=	(float *) ralloc(size*numItems*sizeof(float));
+	if (data == NULL)	data	=	(float *) ralloc(size*numItems*sizeof(float),CRenderer::globalMemory);
 
 	oData	=	data;
 
@@ -1291,15 +1291,15 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		if (strcmp(cVar->name,"st") == 0) {
 			CPl		*npl;
 
-			memBegin();
+			memBegin(CRenderer::globalMemory);
 
-			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *));
-			void	**nvals		=	(void **) ralloc((numParams+1)*sizeof(void *));
+			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *),CRenderer::globalMemory);
+			void	**nvals		=	(void **) ralloc((numParams+1)*sizeof(void *),CRenderer::globalMemory);
 			int		j;
 			float	*sval,*tval,*src;
 
-			sval				=	(float *) ralloc(numItems*sizeof(float));
-			tval				=	(float *) ralloc(numItems*sizeof(float));
+			sval				=	(float *) ralloc(numItems*sizeof(float),CRenderer::globalMemory);
+			tval				=	(float *) ralloc(numItems*sizeof(float),CRenderer::globalMemory);
 			src					=	(float *) vals[i];
 
 			// Separate s and t
@@ -1342,8 +1342,8 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 						decl	=	"uniform float";
 						break;
 				}
-				sDecl = (char*) ralloc(strlen(decl) + strlen(RI_S) + 2);
-				tDecl = (char*) ralloc(strlen(decl) + strlen(RI_T) + 2);
+				sDecl = (char*) ralloc(strlen(decl) + strlen(RI_S) + 2,CRenderer::globalMemory);
+				tDecl = (char*) ralloc(strlen(decl) + strlen(RI_T) + 2,CRenderer::globalMemory);
 				sprintf(sDecl,"%s %s",decl,RI_S);
 				sprintf(tDecl,"%s %s",decl,RI_T);
 			}
@@ -1363,7 +1363,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 			npl	=	parseParameterList(numUniform,numVertex,numVarying,numFaceVarying,j,ntokens,nvals,required,flags,attributes);
 
-			memEnd();
+			memEnd(CRenderer::globalMemory);
 
 			return npl;
 		}

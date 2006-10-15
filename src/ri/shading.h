@@ -229,14 +229,15 @@ public:
 		void					freeState(CShadingState *);								// Destroy a shading state
 		void					deleteState(CShadingState *);							// Delete a shading state
 	
+		CMemPage				*threadMemory;											// Memory from which we allocate the temp thread stuff
+
 protected:
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }
 		virtual	void			illuminateEnd() { }
 
-		int						thread;													// The thread number for this context
-		CMemPage				*threadMemory;											// Memory from which we allocate the temp thread stuff
+		int						thread;													// The thread number for this context		
 private:
 		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
 

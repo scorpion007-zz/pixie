@@ -59,6 +59,7 @@
 #define debugFunction(a)
 #define	illuminateBegin(a,b,c,d,e,f)
 #define findCoordinateSystem				CRenderer::findCoordinateSystem
+#define threadMemory						CRenderer::globalMemory
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -308,7 +309,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 #define		savestring(r,n)					{																	\
 												int		strLen	=	strlen(n) + 1;								\
 												int		strSize	=	(strLen & ~3) + 4;							\
-												char	*strmem	=	(char *) ralloc(strSize);					\
+												char	*strmem	=	(char *) ralloc(strSize,threadMemory);		\
 												strcpy(strmem,n);												\
 												r				=	strmem;										\
 											}
@@ -403,13 +404,13 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	tmpTags									=	0;
 
 	// Setup local variables
-	stuff[SL_VARYING_OPERAND]				=	(TCode **) ralloc(currentShader->numVariables*sizeof(TCode*));	// Shader varying variables
+	stuff[SL_VARYING_OPERAND]				=	(TCode **) ralloc(currentShader->numVariables*sizeof(TCode*),threadMemory);	// Shader varying variables
 	for (i=0;i<currentShader->numVariables;i++) {											// Allocate memory for every varying variable
 		int	size							=	currentShader->varyingSizes[i];
 
 		if (size != 0) {
 			if (size < 0)	size				=	-size;
-			stuff[SL_VARYING_OPERAND][i]		=	(TCode *) ralloc(size*sizeof(TCode));
+			stuff[SL_VARYING_OPERAND][i]		=	(TCode *) ralloc(size*sizeof(TCode),threadMemory);
 		}
 	}
 

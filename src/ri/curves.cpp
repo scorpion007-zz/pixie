@@ -154,7 +154,7 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CCurve::dice(CShadingContext *rasterizer) {
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// We can sample the object, so do so
 	float	**varying		=	rasterizer->currentShadingState->varying;
@@ -229,7 +229,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		}
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -301,9 +301,9 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	float			*N;
 
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
-	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
 
 	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
 		v0		=	base->vertex;
@@ -378,7 +378,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -497,9 +497,9 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	const	float	*v1;
 	float			*N;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
-	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
 
 	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
 		v0					=	base->vertex;
@@ -541,7 +541,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -822,7 +822,7 @@ void	CCurveMesh::create() {
 	// Allocate the variables
 	variables		=	pl->vertexData();
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// Instanciate
 	if (degree == 3) {
@@ -913,7 +913,7 @@ void	CCurveMesh::create() {
 		}
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 

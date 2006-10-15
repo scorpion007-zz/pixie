@@ -211,7 +211,7 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 	} else {
 
 		// We're too many, split us
-		memBegin();
+		memBegin(rasterizer->threadMemory);
 
 		vector		D;
 		int			numFront,numBack;
@@ -223,9 +223,9 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 		CPoints		*child;
 		vector		bmin,bmax;
 
-		front		=	(const float **)	ralloc(numPoints*sizeof(float *));
-		back		=	(const float **)	ralloc(numPoints*sizeof(float *));
-		membership	=	(int *)				ralloc(numPoints*sizeof(int));
+		front		=	(const float **)	ralloc(numPoints*sizeof(float *),CRenderer::globalMemory);
+		back		=	(const float **)	ralloc(numPoints*sizeof(float *),CRenderer::globalMemory);
+		membership	=	(int *)				ralloc(numPoints*sizeof(int),CRenderer::globalMemory);
 
 		for (i=0;i<numPoints;i++)	membership[i]	=	-1;
 
@@ -310,7 +310,7 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 		child->detach();
 
 
-		memEnd();
+		memEnd(rasterizer->threadMemory);
 	}
 }
 
@@ -323,10 +323,10 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 // Comments				:
 // Date last edited		:	10/15/2002
 void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &usedParameters) const {
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 	CVertexData		*variables	=	base->variables;
 	const int		vertexSize	=	variables->vertexSize;
-	float			*vertexData	=	(float *) ralloc(numPoints*vertexSize*sizeof(float));
+	float			*vertexData	=	(float *) ralloc(numPoints*vertexSize*sizeof(float),CRenderer::globalMemory);
 	int				i;
 	float			*vertexBase	=	vertexData;
 
@@ -359,7 +359,7 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 
 	usedParameters	&=	~(PARAMETER_N | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 

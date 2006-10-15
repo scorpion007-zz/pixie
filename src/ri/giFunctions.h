@@ -119,7 +119,7 @@
 #ifndef INIT_SHADING
 #define	TRANSMISSIONEXPR_PRE	TCode			*res,*op1,*op2;																	\
 								CTextureLookup	*lookup;																		\
-								CRaySample		*samples	=	(CRaySample *) ralloc(numVertices*sizeof(CRaySample));			\
+								CRaySample		*samples	=	(CRaySample *) ralloc(numVertices*sizeof(CRaySample),threadMemory);			\
 								CRaySample		*cSample	=	samples;														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {										\
 									int			numArguments;																	\
@@ -252,9 +252,9 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,FUN3EXPR_UPDA
 									argumentcount(numArguments);																\
 									TRACEPARAMETERS(3,(numArguments-3) >> 1);													\
 								}																								\
-								rays			=	(CTraceRay *) ralloc(numVertices*sizeof(CTraceRay));						\
-								interiorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *));						\
-								exteriorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *));						\
+								rays			=	(CTraceRay *) ralloc(numVertices*sizeof(CTraceRay),threadMemory);			\
+								interiorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
+								exteriorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
 								N				=	varying[VARIABLE_N];														\
 								operand(0,res);																					\
 								operand(1,op1);																					\
@@ -678,9 +678,9 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								operand(1,P);																		\
 								operand(2,N);																		\
 																													\
-								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *));		\
+								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
 								lastGather->raysStorage				=	lastGather->rays;							\
-								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay));
+								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);
 								
 
 

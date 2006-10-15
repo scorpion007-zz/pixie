@@ -163,7 +163,7 @@ DEFFUNC(Dvv			,"Dv"		,"v=v"	,DVVEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 // deriv "f=ff"
 #ifndef INIT_SHADING
 #define	DERIVFEXPR_PRE			FUN3EXPR_PRE																\
-								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*4);		\
+								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*4,threadMemory);		\
 								float	*duBottom	=	duTop + numVertices;								\
 								float	*dvTop		=	duBottom + numVertices;								\
 								float	*dvBottom	=	dvTop + numVertices;								\
@@ -208,7 +208,7 @@ DEFFUNC(Derivf		,"Deriv"			,"f=ff"	,DERIVFEXPR_PRE,DERIVFEXPR,DERIVFEXPR_UPDATE,
 // deriv "v=vf"
 #ifndef INIT_SHADING
 #define	DERIVVEXPR_PRE			FUN3EXPR_PRE																\
-								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*8);		\
+								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*8,threadMemory);		\
 								float	*duBottom	=	duTop + numVertices*3;								\
 								float	*dvTop		=	duBottom + numVertices;								\
 								float	*dvBottom	=	dvTop + numVertices*3;								\
@@ -261,7 +261,7 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 #define	AREAEXPR_PRE			FUN2EXPR_PRE																\
 								float	*du		=	varying[VARIABLE_DU];									\
 								float	*dv		=	varying[VARIABLE_DV];									\
-								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float));			\
+								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
 								float	*dPdv	=	dPdu + numVertices*3;									\
 								vector	tmp;																\
 								duVector(dPdu,(float *) op);												\
@@ -296,7 +296,7 @@ DEFFUNC(Area		,"area"			,"f=p"	,AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 #ifndef INIT_SHADING
 
 #define	CALCULATENORMALEXPR_PRE		FUN2EXPR_PRE																\
-									float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float));			\
+									float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
 									float	*dPdv	=	dPdu + numVertices*3;									\
 									float	mult	=	((currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ? (float) -1 : (float) 1);	\
 									duVector(dPdu,(float *) op);												\
@@ -629,7 +629,7 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 // diffuse	"c=n"
 #define	DIFFUSEEXPR_PRE		const float		*P,*N,*Cl,*L;										\
 							float			*R;													\
-							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
+							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 							const TCode		*op;												\
 							TCode			*res;												\
 							int				i;													\
@@ -683,7 +683,7 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 // diffuse	"c=pnf"
 #define	DIFFUSE2EXPR_PRE	const float		*P,*N,*Cl,*L;										\
 							float			*R;													\
-							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)); \
+							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory); \
 							const float		*cosangle;											\
 							const TCode		*op1,*op2,*op3;										\
 							TCode			*res;												\
@@ -746,8 +746,8 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 // specular	"c=nvf"
 #define	SPECULAREXPR_PRE		const float		*P,*N,*Cl,*L,*V;									\
 								float			*R,*power;											\
-								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
-								float			*powers		=	(float *) ralloc(numVertices*sizeof(float));	\
+								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
+								float			*powers		=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								const TCode		*op1,*op2,*op3;										\
 								TCode			*res;												\
 								int				i;													\
@@ -816,8 +816,8 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 // phong	"c=nvf"
 #define	PHONGEXPR_PRE			const float		*P,*N,*Cl,*L,*V,*size;								\
 								float			*refDir,*R;											\
-								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
-								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float));	\
+								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
+								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float),threadMemory);	\
 								const TCode		*op1,*op2,*op3;										\
 								TCode			*res;												\
 								float			coefficient;										\
@@ -1337,7 +1337,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float));	\
+								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
@@ -1414,7 +1414,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float));	\
+								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
@@ -1661,7 +1661,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									operand(0,res);																	\
 									operand(3,op3);																	\
 																													\
-									color						=	(float *) ralloc(numRealVertices*3*sizeof(float));	\
+									color						=	(float *) ralloc(numRealVertices*3*sizeof(float),threadMemory);	\
 									traceReflection(color,varying[VARIABLE_P],(float *) op3,numRealVertices,tags,lookup);	\
 																													\
 									for (i=numRealVertices;i>0;i--,tags++,res++,color+=3) {							\
@@ -1673,7 +1673,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									const float		*D;																\
 									vector			color;															\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1753,7 +1753,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 									operand(0,res);																	\
 									operand(3,op3);																	\
 																													\
-									color						=	(float *) ralloc(numRealVertices*3*sizeof(float));	\
+									color						=	(float *) ralloc(numRealVertices*3*sizeof(float),threadMemory);	\
 																													\
 									traceTransmission(color,(float *) op3,varying[VARIABLE_L],numRealVertices,tags,lookup);	\
 																													\
@@ -1766,7 +1766,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 									const float		*D;																\
 									vector			color;															\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1849,7 +1849,7 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 								} else {																			\
 									const float		*D;																\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1937,7 +1937,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 								} else {																			\
 									const float		*D;																\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -2029,7 +2029,7 @@ DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWCEXPR_PRE,NULL_EXPR,NULL_EX
 								lookup->compute();																\
 							}																					\
 							const	float			width	=	lookup->width;									\
-							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float));	\
+							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
 							float	*dsdv					=	dsdu + numVertices;								\
 							float	*fwidth					=	dsdu;											\
 							const float		*du				=	varying[VARIABLE_DU];							\
@@ -2126,7 +2126,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 // This macro is used to decode the bake3d parameter list
 #define	TEXTURE3DPARAMETERS(start,num)																			\
 								lookup						=	new CTexture3dLookup;							\
-								const char **channelNames	=	(const char **) ralloc(num*sizeof(char*));		\
+								const char **channelNames	=	(const char **) ralloc(num*sizeof(char*),threadMemory);		\
 								parameterlist				=	lookup;											\
 								dirty();																		\
 								lookup->radius			=	-1.0f;												\
@@ -2167,7 +2167,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								CTexture3dLookup*lookup;														\
 								int				numArguments;													\
 								argumentcount(numArguments);													\
-								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*));	\
+								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*),threadMemory);	\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1,*op2;												\
 									matrix				*from,*to;												\
@@ -2184,7 +2184,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float));	\
+								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float),threadMemory);	\
 								float			*dPdv		=	dPdu + numVertices*3;							\
 								float			*radius		=	dPdv + numVertices*3;							\
 								const	float	radiiscale	=	lookup->radiusScale;							\
@@ -2271,7 +2271,7 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								CTexture3dLookup	*lookup;													\
 								int				numArguments;													\
 								argumentcount(numArguments);													\
-								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*));	\
+								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*),threadMemory);	\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1;													\
 									matrix				*from,*to;												\
@@ -2287,7 +2287,7 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								operand(2,op2);																	\
 								operand(3,op3);																	\
 								int				i;																\
-								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float));	\
+								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float),threadMemory);	\
 								float			*dPdv		=	dPdu + numVertices*3;							\
 								float			*radius		=	dPdv + numVertices*3;							\
 								const	float	radiiscale	=	lookup->radiusScale;							\

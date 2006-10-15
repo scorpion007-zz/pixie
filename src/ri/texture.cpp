@@ -387,7 +387,7 @@ static void		textureMemFlush(CTextureBlock *entry) {
 	CTextureBlock	*cBlock;
 	CTextureBlock	**activeBlocks;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// Do we have stuff to free ?
 	if (usedBlocks == NULL)	return;
@@ -400,7 +400,7 @@ static void		textureMemFlush(CTextureBlock *entry) {
 	}
 	
 	// Collect those blocks into an array
-	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *));
+	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),CRenderer::globalMemory);
 	for (cBlock=usedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
 		if (cBlock->data != NULL) {
 			if (cBlock != entry) {
@@ -423,7 +423,7 @@ static void		textureMemFlush(CTextureBlock *entry) {
 		cBlock->data		=	NULL;
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -504,9 +504,9 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 				// No, read the required portion
 				unsigned char	*tdata;
 
-				memBegin();
+				memBegin(CRenderer::globalMemory);
 				
-				tdata		=	(unsigned char *) ralloc(width*height*pixelSize);
+				tdata		=	(unsigned char *) ralloc(width*height*pixelSize,CRenderer::globalMemory);
 
 				// Read the entire image
 				assert((int) (pixelSize*width) == TIFFScanlineSize(in));
@@ -519,7 +519,7 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 					memcpy(&((unsigned char *) data)[i*pixelSize*w],&tdata[((y+i)*width + x)*pixelSize],w*pixelSize);
 				}
 
-				memEnd();
+				memEnd(CRenderer::globalMemory);
 			} else {
 				uint32	tileWidth,tileHeight;
 

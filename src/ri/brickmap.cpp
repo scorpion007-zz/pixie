@@ -773,11 +773,11 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	FILE		*outfile 	=	ropen(outFileName,"wb+",fileBrickMap);
 		
 	
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 	
-	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float));
-	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*));
-	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float));
+	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float),CRenderer::globalMemory);
+	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*),CRenderer::globalMemory);
+	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float),CRenderer::globalMemory);
 	float 		*dataVar	=	dataMean + dataSize;
 	
 	// Initialize the hash
@@ -875,7 +875,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			}
 			
 			
-			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode));
+			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode),CRenderer::globalMemory);
 			
 			// Initialize temporary node data over
 			*tNode				=	*cNode;
@@ -982,7 +982,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	
 	fclose(outfile);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -1185,7 +1185,7 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 	CBrickMap	*cMap;
 	int			i;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// Collect the loaded bricks into an array
 	numNodes	=	0;
@@ -1196,7 +1196,7 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 			}
 		}
 	}
-	nodes		=	(CBrickNode **) ralloc(numNodes*2*sizeof(CBrickNode *));
+	nodes		=	(CBrickNode **) ralloc(numNodes*2*sizeof(CBrickNode *),CRenderer::globalMemory);
 	numNodes	=	0;
 	for (cMap=brickMaps;cMap!=NULL;cMap=cMap->nextMap) {
 		for (i=0;i<BRICK_HASHSIZE;i++) {
@@ -1295,7 +1295,7 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 		}
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 

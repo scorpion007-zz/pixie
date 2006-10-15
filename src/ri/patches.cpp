@@ -73,7 +73,7 @@ static	inline	void	gatherData(int u,int v,int nu,int nv,int uv,int vv,int un,dou
 
 	assert(vertexSize > 0);
 
-	dest	=	vertex	=	(double *) ralloc(vertexSize*nu*nv*sizeof(double));
+	dest	=	vertex	=	(double *) ralloc(vertexSize*nu*nv*sizeof(double),CRenderer::globalMemory);
 
 	// Copy the vertex variables over
 	for (j=0;j<nv;j++) {
@@ -382,7 +382,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 	float			*vertexData;
 	int				vertexDataStep;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;							// No need for interpolation
@@ -401,7 +401,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*4;
 
-			vertexData		=	(float *) ralloc(numVertices*vertexSize*4*sizeof(float));
+			vertexData		=	(float *) ralloc(numVertices*vertexSize*4*sizeof(float),CRenderer::globalMemory);
 			vertexDataStep	=	vertexSize*4;
 			interpolate		=	vertexData;
 			k				=	vertexSize*4;
@@ -417,7 +417,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 
 	{	// Do the vertices
 		// Interpolate the vertices
-		float		*intr	=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+		float		*intr	=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
 		const float	*v0		=	vertexData;
 		const float	*v1		=	v0 + vertexSize;
 		const float	*v2		=	v1 + vertexSize;
@@ -498,7 +498,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -708,7 +708,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 	double				*vertexData;
 	int					vertexDataStep;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;
@@ -727,7 +727,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 			const double	*vertex0	=	vertex;
 			const double	*vertex1	=	vertex + vertexSize*16;
 
-			vertexData		=	(double *) ralloc(numVertices*vertexSize*16*sizeof(double));
+			vertexData		=	(double *) ralloc(numVertices*vertexSize*16*sizeof(double),CRenderer::globalMemory);
 			vertexDataStep	=	vertexSize*16;
 			interpolate		=	vertexData;
 
@@ -742,7 +742,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 	}
 
 	{	// Do the vertices
-		float	*intr		=	(float *) ralloc(vertexSize*numVertices*sizeof(float));
+		float	*intr		=	(float *) ralloc(vertexSize*numVertices*sizeof(float),CRenderer::globalMemory);
 		double	*data;
 		float	*intrStart	=	intr;
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
@@ -801,7 +801,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -869,10 +869,10 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	uMult				=	umax	-	uOrg;
 	vMult				=	vmax	-	vOrg;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
-	uCoefficients		=	(double *) ralloc(uOrder*uOrder*sizeof(double));
-	vCoefficients		=	(double *) ralloc(vOrder*vOrder*sizeof(double));
+	uCoefficients		=	(double *) ralloc(uOrder*uOrder*sizeof(double),CRenderer::globalMemory);
+	vCoefficients		=	(double *) ralloc(vOrder*vOrder*sizeof(double),CRenderer::globalMemory);
 
 	// For each basis function
 	// Compute the coefficients
@@ -902,7 +902,7 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*sizeof(double);
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 
 	makeBound(bmin,bmax);
 }
@@ -1011,7 +1011,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 	double				*vertexData;
 	int					vertexDataStep;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;
@@ -1030,7 +1030,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 			const double	*vertex0	=	vertex;
 			const double	*vertex1	=	vertex + vertexSize*uOrder*vOrder;
 
-			vertexData		=	(double *) ralloc(numVertices*vertexSize*uOrder*vOrder*sizeof(double));
+			vertexData		=	(double *) ralloc(numVertices*vertexSize*uOrder*vOrder*sizeof(double),CRenderer::globalMemory);
 			vertexDataStep	=	vertexSize*uOrder*vOrder;
 			interpolate		=	vertexData;
 
@@ -1044,7 +1044,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 	}
 
 	{	// Do the vertices
-		float	*intr			=	(float *) ralloc(vertexSize*numVertices*sizeof(float));
+		float	*intr			=	(float *) ralloc(vertexSize*numVertices*sizeof(float),CRenderer::globalMemory);
 		float	*intrStart		=	intr;
 		float	*dPdu			=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv			=	varying[VARIABLE_DPDV] + start*3;
@@ -1054,7 +1054,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 		double	pdv[4];
 
 #define computeNURBS(UORDER,VORDER) {																\
-		double	*memBase		=	(double *) ralloc((UORDER*3 + VORDER*3)*sizeof(double));		\
+		double	*memBase		=	(double *) ralloc((UORDER*3 + VORDER*3)*sizeof(double),CRenderer::globalMemory);		\
 		double	*uPowers		=	memBase;														\
 		double	*vPowers		=	uPowers + UORDER;												\
 		double	*duPowers		=	vPowers + VORDER;												\
@@ -1281,7 +1281,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1332,10 +1332,10 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 			coefficients[0]	=	0;
 	} else {
 
-		memBegin();
+		memBegin(CRenderer::globalMemory);
 
-		double	*lowerCoefficients1	=	(double *) ralloc((order-1)*sizeof(double));
-		double	*lowerCoefficients2	=	(double *) ralloc((order-1)*sizeof(double));
+		double	*lowerCoefficients1	=	(double *) ralloc((order-1)*sizeof(double),CRenderer::globalMemory);
+		double	*lowerCoefficients2	=	(double *) ralloc((order-1)*sizeof(double),CRenderer::globalMemory);
 		unsigned int		i;
 
 		precompBasisCoefficients(lowerCoefficients1,order-1,start,interval,knots);
@@ -1359,7 +1359,7 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 				coefficients[i]		+=	 lowerCoefficients2[i]*(knots[start+order]/(knots[start+order]-knots[start+1]));
 		}
 
-		memEnd();
+		memEnd(CRenderer::globalMemory);
 	}
 }
 
@@ -1601,7 +1601,7 @@ void	CPatchMesh::create() {
 
 	children			=	new CArray<CObject *>;
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	uvertices			=	uVertices;
 	vvertices			=	vVertices;
@@ -1690,7 +1690,7 @@ void	CPatchMesh::create() {
 
 	vertexData->detach();
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -1892,7 +1892,7 @@ void	CNURBSPatchMesh::create() {
 	vertexData		=	pl->vertexData();
 	vertexData->attach();
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// Create the NURBS patches
 	for (k=0,j=0;j<vPatches;j++) {
@@ -1920,7 +1920,7 @@ void	CNURBSPatchMesh::create() {
 		}
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 
 	vertexData->detach();
 }

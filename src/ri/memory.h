@@ -49,13 +49,6 @@ public:
 		CMemPage		*prev;						// points to the previous valid memory block
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	Renderer memory stack management
-extern	CMemPage	*currentMemoryPage;				// The page that we're allocating from
-
-
-void				memoryInit();					// Init the memory
-void				memoryTini();					// Destroy the allocated memory
 void				memoryInit(CMemPage *&);		// Init named memory stack
 void				memoryTini(CMemPage *&);		// Destroy the named allocated memory
 CMemPage			*memoryNewPage(int);			// Allocate a new memory page
@@ -64,28 +57,6 @@ void				memoryDeletePage(CMemPage *);	// Allocate a new memory page
 
 
 
-// This macro allocates memory in the global stack
-inline void *ralloc(int size) {
-	void	*ptr;
-
-	while(currentMemoryPage->availableSize < size) {
-		if (currentMemoryPage->next == NULL) {
-			CMemPage	*cPage				=	memoryNewPage(size);
-			cPage->prev						=	currentMemoryPage;
-			currentMemoryPage->next			=	cPage;
-		}
-
-		currentMemoryPage					=	currentMemoryPage->next;
-		currentMemoryPage->availableSize	=	currentMemoryPage->totalSize;
-		currentMemoryPage->memory			=	currentMemoryPage->base;
-	}
-
-
-	ptr									=	currentMemoryPage->memory;
-	currentMemoryPage->memory			=	currentMemoryPage->memory+size;
-	currentMemoryPage->availableSize	-=	size;
-	return	ptr;
-}
 
 // This macro allocates memory in the named stack
 inline void *ralloc(int size,CMemPage *&stack) {
@@ -112,22 +83,7 @@ inline void *ralloc(int size,CMemPage *&stack) {
 
 
 // This macro places a checkpoint
-#define	memBegin()	{														\
-	char		*savedMem		=	currentMemoryPage->memory;				\
-	int			savedAvailable	=	currentMemoryPage->availableSize;		\
-	CMemPage	*savedPage		=	currentMemoryPage;
-
-// This macro restores the memory to the last checkpoint
-// It is important that the scope between the matching begin-end
-// pairs mist not be exitted
-#define	memEnd()															\
-		currentMemoryPage					=	savedPage;					\
-		currentMemoryPage->availableSize	=	savedAvailable;				\
-		currentMemoryPage->memory			=	savedMem;					\
-	}
-
-// This macro places a checkpoint
-#define	memEnter(__page)	{									\
+#define	memBegin(__page)	{									\
 	char		*savedMem		=	__page->memory;				\
 	int			savedAvailable	=	__page->availableSize;		\
 	CMemPage	*savedPage		=	__page;
@@ -135,7 +91,7 @@ inline void *ralloc(int size,CMemPage *&stack) {
 // This macro restores the memory to the last checkpoint
 // It is important that the scope between the matching begin-end
 // pairs mist not be exitted
-#define	memLeave(__page)										\
+#define	memEnd(__page)											\
 		__page					=	savedPage;					\
 		__page->availableSize	=	savedAvailable;				\
 		__page->memory			=	savedMem;					\

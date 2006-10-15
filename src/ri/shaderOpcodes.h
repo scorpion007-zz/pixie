@@ -44,7 +44,7 @@
 									TCode			*operand;												\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
-									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)*4);	\
+									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)*4,threadMemory);	\
 									float			*Ntmp		=	costheta + numVertices;					\
 									int				i;														\
 									lightCatPreExpr;														\
@@ -106,7 +106,7 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 									int				i;														\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
-									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
+									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 									lightCatPreExpr;														\
 									beginIndex		=	argument(3);										\
 									endIndex		=	argument(4);										\

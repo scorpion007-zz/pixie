@@ -127,11 +127,11 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 #endif
 
 	// Begin a memory page
-	memBegin();
+	memBegin(threadMemory);
 
 	// Allocate the memory we'll use for tesselation
-	vertexHash					=	(CQuadVertex **)	ralloc(HASH_SIZE*sizeof(CQuadVertex *));
-	shadingListBase				=	(CQuadVertex **)	ralloc(CRenderer::maxGridSize*sizeof(CQuadVertex *));
+	vertexHash					=	(CQuadVertex **)	ralloc(HASH_SIZE*sizeof(CQuadVertex *),threadMemory);
+	shadingListBase				=	(CQuadVertex **)	ralloc(CRenderer::maxGridSize*sizeof(CQuadVertex *),threadMemory);
 	shadingList					=	shadingListBase;
 	numRemainingShadingPoints	=	CRenderer::maxGridSize;
 
@@ -141,7 +141,7 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 	}
 
 	// Create the top level patch
-	cQuad						=	root	=	(CQuad *) ralloc(sizeof(CQuad));
+	cQuad						=	root	=	(CQuad *) ralloc(sizeof(CQuad),threadMemory);
 	cQuad->umin					=	0;
 	cQuad->vmin					=	0;
 	cQuad->umax					=	1;
@@ -182,7 +182,7 @@ void	CShadingContext::tesselate2D(CSurface *object) {
 						}
 					}
 
-					cVertex				=	(CQuadVertex *) ralloc(sizeof(CQuadVertex));
+					cVertex				=	(CQuadVertex *) ralloc(sizeof(CQuadVertex),threadMemory);
 					cVertex->u			=	cu;
 					cVertex->v			=	cv;
 					cVertex->vertex		=	NULL;
@@ -228,7 +228,7 @@ nextPoint:;
 				// Yes, split the quad into 4 and add the children into the new front
 				const float	umid		=	(cQuad->umin + cQuad->umax)*(float) 0.5;
 				const float	vmid		=	(cQuad->vmin + cQuad->vmax)*(float) 0.5;
-				CQuad		*c0			=	cQuad->children[0]	=	(CQuad *) ralloc(sizeof(CQuad)*4);
+				CQuad		*c0			=	cQuad->children[0]	=	(CQuad *) ralloc(sizeof(CQuad)*4,threadMemory);
 				CQuad		*c1			=	cQuad->children[1]	=	c0 + 1;
 				CQuad		*c2			=	cQuad->children[2]	=	c1 + 1;
 				CQuad		*c3			=	cQuad->children[3]	=	c2 + 1;
@@ -482,7 +482,7 @@ nextPoint:;
 	}
 
 	// End a memory page
-	memEnd();
+	memEnd(threadMemory);
 
 #ifdef TESSELATION_PRINT
 	fclose(out);

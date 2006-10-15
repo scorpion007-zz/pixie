@@ -92,7 +92,7 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 		pixelSize	=	numSamples*sizeof(float);
 	}
 
-	tileData		=	(unsigned char *) ralloc(pixelSize*tileSize*tileSize);
+	tileData		=	(unsigned char *) ralloc(pixelSize*tileSize*tileSize,CRenderer::globalMemory);
 
 	assert(TIFFTileSize(out) == (tileSize*tileSize*pixelSize));
 
@@ -134,7 +134,7 @@ template <class T> static	void	appendPyramid(TIFF *out,int dstart,int numSamples
 	currentHeight	=	height;
 	currentLevel	=	data;
 
-	fnextLevel		=	(float *)	ralloc(width*height*numSamples*sizeof(float));
+	fnextLevel		=	(float *)	ralloc(width*height*numSamples*sizeof(float),CRenderer::globalMemory);
 
 	for (i=1;i<pyramidSize;i++) {
 		int			x,y,yo;
@@ -221,7 +221,7 @@ void	*readLayer(TIFF *in,int *width,int *height,int *bitsperpixel,int *numSample
 		pixelSize	=	0;
 	}
 
-	data		=	(unsigned char *) ralloc(pixelSize*w*h);
+	data		=	(unsigned char *) ralloc(pixelSize*w*h,CRenderer::globalMemory);
 
 	for (i=0;i<(int) h;i++) {
 		TIFFReadScanline(in,&data[i*pixelSize*w],i,0);
@@ -282,7 +282,7 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int numSample
 	if (!((width[0] == newWidth) && (height[0] == newHeight))) {
 		T *newData;
 
-		newData	=	(T *) ralloc(newWidth*newHeight*numSamples*sizeof(T));
+		newData	=	(T *) ralloc(newWidth*newHeight*numSamples*sizeof(T),CRenderer::globalMemory);
 		memset(newData,0,newWidth*newHeight*numSamples*sizeof(T));
 
 		copyData<T>(data[0],width[0],height[0],0,0,width[0],height[0],newData,newWidth,newHeight,0,0,numSamples);
@@ -324,10 +324,10 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int numSample
 // Comments				:
 // Date last edited		:	7/6/2001
 template <class T> void	filterImage(int width,int height,int numSamples,int bitspersample,float filterWidth,float filterHeight,RtFilterFunc filter,T *data) {
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
-	float	*filteredData	=	(float *) ralloc(width*height*numSamples*sizeof(float));
-	float	*normalizer		=	(float *) ralloc(width*height*sizeof(float));
+	float	*filteredData	=	(float *) ralloc(width*height*numSamples*sizeof(float),CRenderer::globalMemory);
+	float	*normalizer		=	(float *) ralloc(width*height*sizeof(float),CRenderer::globalMemory);
 	int		x,y,i;
 	int		fw				=	(int) ceil((filterWidth-1)/2);
 	int		fh				=	(int) ceil((filterHeight-1)/2);
@@ -395,7 +395,7 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 		norm++;
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -497,7 +497,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 		return;
 	}
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	pyramidSize	=	0;
 	getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
@@ -521,7 +521,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 		TIFFClose(outHandle);
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -565,7 +565,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 		return;
 	}
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	// Read off the from world transformation from the image if possible
 	{
@@ -617,7 +617,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 		error(CODE_SYSTEM,"Unable to create %s for writing\n",tmp);
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -707,14 +707,14 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 		for (i=0;i<6;i++) {
 			int			dstart	=	0;
 
-			memBegin();
+			memBegin(CRenderer::globalMemory);
 
 			data			=	readLayer(inHandles[i],&width,&height,&bitspersample,&numSamples);
 			TIFFClose(inHandles[i]);
 
 			appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,pyramidSize,data,smode,tmode,(i == 5 ? TRUE : FALSE));
 
-			memEnd();
+			memEnd(CRenderer::globalMemory);
 		}
 
 		TIFFClose(outHandle);
@@ -762,7 +762,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 		return;
 	}
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	pyramidSize	=	0;
 	getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
@@ -788,7 +788,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 		TIFFClose(outHandle);
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -832,7 +832,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 		return;
 	}
 
-	memBegin();
+	memBegin(CRenderer::globalMemory);
 
 	pyramidSize	=	0;
 	getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
@@ -858,6 +858,6 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 		TIFFClose(outHandle);
 	}
 
-	memEnd();
+	memEnd(CRenderer::globalMemory);
 }
 
