@@ -154,8 +154,6 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CCurve::dice(CShadingContext *rasterizer) {
-	memBegin(CRenderer::globalMemory);
-
 	// We can sample the object, so do so
 	float	**varying		=	rasterizer->currentShadingState->varying;
 	float	*u				=	varying[VARIABLE_U];
@@ -228,8 +226,6 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 			rasterizer->drawRibbon(this,numPoints,vmin,vmax);
 		}
 	}
-
-	memEnd(CRenderer::globalMemory);
 }
 
 
@@ -301,9 +297,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	float			*N;
 
 
-	memBegin(CRenderer::globalMemory);
-
-	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
+	intr	=	intrStart	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 
 	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
 		v0		=	base->vertex;
@@ -377,8 +371,6 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	variables->dispatch(intrStart,0,numVertices,varying);
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -497,9 +489,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	const	float	*v1;
 	float			*N;
 
-	memBegin(CRenderer::globalMemory);
-
-	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
+	intr	=	intrStart	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 
 	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
 		v0					=	base->vertex;
@@ -540,8 +530,6 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	variables->dispatch(intrStart,0,numSavedVertices,varying);
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -789,7 +777,7 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 	int		i;
 	CObject	**c;
 
-	if (children == NULL)	create();
+	if (children == NULL)	create(rasterizer);
 
 	c	=	children->array;
 	i	=	children->numItems;
@@ -807,7 +795,7 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void	CCurveMesh::create() {
+void	CCurveMesh::create(CShadingContext *context) {
 	int					i;
 	CVertexData			*variables;
 	int					vertexSize;
@@ -821,8 +809,6 @@ void	CCurveMesh::create() {
 
 	// Allocate the variables
 	variables		=	pl->vertexData();
-
-	memBegin(CRenderer::globalMemory);
 
 	// Instanciate
 	if (degree == 3) {
@@ -912,8 +898,6 @@ void	CCurveMesh::create() {
 			t						+=	nvars;
 		}
 	}
-
-	memEnd(CRenderer::globalMemory);
 }
 
 

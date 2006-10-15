@@ -142,7 +142,7 @@ public:
 		void				dice(CShadingContext *rasterizer);
 
 private:
-		void				create();
+		void				create(CShadingContext *context);
 
 		CPl					*pl;
 		int					numVertices;

@@ -223,9 +223,9 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 		CPoints		*child;
 		vector		bmin,bmax;
 
-		front		=	(const float **)	ralloc(numPoints*sizeof(float *),CRenderer::globalMemory);
-		back		=	(const float **)	ralloc(numPoints*sizeof(float *),CRenderer::globalMemory);
-		membership	=	(int *)				ralloc(numPoints*sizeof(int),CRenderer::globalMemory);
+		front		=	(const float **)	ralloc(numPoints*sizeof(float *),rasterizer->threadMemory);
+		back		=	(const float **)	ralloc(numPoints*sizeof(float *),rasterizer->threadMemory);
+		membership	=	(int *)				ralloc(numPoints*sizeof(int),rasterizer->threadMemory);
 
 		for (i=0;i<numPoints;i++)	membership[i]	=	-1;
 
@@ -323,10 +323,9 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 // Comments				:
 // Date last edited		:	10/15/2002
 void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &usedParameters) const {
-	memBegin(CRenderer::globalMemory);
 	CVertexData		*variables	=	base->variables;
 	const int		vertexSize	=	variables->vertexSize;
-	float			*vertexData	=	(float *) ralloc(numPoints*vertexSize*sizeof(float),CRenderer::globalMemory);
+	float			*vertexData	=	(float *) alloca(numPoints*vertexSize*sizeof(float));
 	int				i;
 	float			*vertexBase	=	vertexData;
 
@@ -358,8 +357,6 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 	variables->dispatch(vertexBase,0,numPoints,varying);
 
 	usedParameters	&=	~(PARAMETER_N | variables->parameters);
-
-	memEnd(CRenderer::globalMemory);
 }
 
 

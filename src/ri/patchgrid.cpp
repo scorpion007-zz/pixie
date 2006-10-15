@@ -249,8 +249,6 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 	float				*vertexData;
 	int					vertexDataStep;
 
-	memBegin(CRenderer::globalMemory);
-
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;									// No need for interpolation
 		vertexDataStep	=	0;
@@ -269,7 +267,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*(nu+2)*(nv+2);
 
-			vertexData				=	(float *) ralloc(numVertices*(nu+2)*(nv+2)*vertexSize*sizeof(float),CRenderer::globalMemory);
+			vertexData				=	(float *) alloca(numVertices*(nu+2)*(nv+2)*vertexSize*sizeof(float));
 			vertexDataStep			=	(nu+2)*(nv+2)*vertexSize;
 
 			interpolate				=	vertexData;
@@ -285,7 +283,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 	}
 
 	{	// Do the vertices
-		float	*intr		=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
+		float	*intr		=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv		=	varying[VARIABLE_DPDV] + start*3;
 		float	*intrStart	=	intr;
@@ -351,8 +349,6 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////

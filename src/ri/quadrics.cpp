@@ -405,9 +405,7 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 	float			*cosv;
 	float			*memBase;
 
-	memBegin(CRenderer::globalMemory);
-
-	memBase			=	(float *)	ralloc(numVertices*4*sizeof(float),CRenderer::globalMemory);
+	memBase			=	(float *)	alloca(numVertices*4*sizeof(float));
 	sinu			=	memBase;
 	cosu			=	sinu + numVertices;
 	sinv			=	cosu + numVertices;
@@ -417,7 +415,7 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 		const float	*time	=	&varying[VARIABLE_TIME][start];
 		float		*r,*umax,*vmax,*vmin;
 
-		memBase			=	(float *)	ralloc(numVertices*4*sizeof(float),CRenderer::globalMemory);
+		memBase			=	(float *)	alloca(numVertices*4*sizeof(float));
 		r				=	memBase;
 		umax			=	r + numVertices;
 		vmax			=	umax + numVertices;
@@ -550,8 +548,6 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -842,10 +838,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 	float			*dest;
 	float			*memBase;
 
-	memBegin(CRenderer::globalMemory);
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	memBase	=	(float *)	ralloc(numVertices*2*sizeof(float),CRenderer::globalMemory);
+	memBase	=	(float *)	alloca(numVertices*2*sizeof(float));
 	sinu	=	memBase;
 	cosu	=	sinu + numVertices;
 
@@ -855,7 +849,7 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 		float		*z;
 		float		*umax;
 
-		memBase				=	(float *)	ralloc(numVertices*3*sizeof(float),CRenderer::globalMemory);
+		memBase				=	(float *)	alloca(numVertices*3*sizeof(float));
 		r					=	memBase;
 		z					=	r + numVertices;
 		umax				=	z + numVertices;
@@ -947,8 +941,6 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1261,10 +1253,8 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 	float		*dest;
 	float		*memBase;
 
-	memBegin(CRenderer::globalMemory);
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	memBase	=	(float *)	ralloc(numVertices*2*sizeof(float),CRenderer::globalMemory);
+	memBase	=	(float *)	alloca(numVertices*2*sizeof(float));
 	sinu	=	memBase;
 	cosu	=	sinu + numVertices;
 
@@ -1281,7 +1271,7 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 		float		*height;
 		float		*umax;
 
-		memBase			=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+		memBase			=	(float *)	alloca(numVertices*sizeof(float));
 		r				=	memBase;
 		height			=	r + numVertices;
 		umax			=	height + numVertices;
@@ -1390,8 +1380,6 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1706,19 +1694,17 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 	float	*v		=	&varying[VARIABLE_V][start];
 	float	*dest;
 
-	memBegin(CRenderer::globalMemory);
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	sqrtz	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
+	sqrtz	=	(float *)	alloca(numVertices*sizeof(float));
 
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*r		=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*zmax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*zmin	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+		float	*r		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmin	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*time	=	&varying[VARIABLE_TIME][start];
 
 		// Precompute the sin/cos for u points
@@ -1840,8 +1826,6 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2139,17 +2123,15 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 	float	*v		=	varying[VARIABLE_V];
 	float	*dest;
 
-	memBegin(CRenderer::globalMemory);
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*r		=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*zmax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*zmin	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+		float	*r		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmin	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*time	=	&varying[VARIABLE_TIME][start];
 
 		// Precompute the sin/cos for u points
@@ -2271,8 +2253,6 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2628,18 +2608,16 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 	float	*v		=	&varying[VARIABLE_V][start];
 	float	*dest;
 
-	memBegin(CRenderer::globalMemory);
-
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*p1		=	(float *)	ralloc(numVertices*sizeof(float)*3,CRenderer::globalMemory);
-		float	*p2		=	(float *)	ralloc(numVertices*sizeof(float)*3,CRenderer::globalMemory);
-		float	*dx		=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*dy		=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*dz		=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*p1		=	(float *)	alloca(numVertices*sizeof(float)*3);
+		float	*p2		=	(float *)	alloca(numVertices*sizeof(float)*3);
+		float	*dx		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*dy		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*dz		=	(float *)	alloca(numVertices*sizeof(float));
 		const	float	*tp1	=	this->p1;
 		float	*np1	=	&nextData[0];
 		const	float	*tp2	=	this->p2;
@@ -2784,8 +2762,6 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -3158,20 +3134,18 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 	float	*v		=	&varying[VARIABLE_V][start];
 	float	*dest;
 
-	memBegin(CRenderer::globalMemory);
-
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	sinv	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-	cosv	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
+	sinv	=	(float *)	alloca(numVertices*sizeof(float));
+	cosv	=	(float *)	alloca(numVertices*sizeof(float));
 
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*rmin	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*rmax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*vmin	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*vmax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float),CRenderer::globalMemory);
+		float	*rmin	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*rmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*vmin	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*vmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*time	=	&varying[VARIABLE_TIME][start];
 
 		// Precompute the sin/cos for u points
@@ -3289,8 +3263,6 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 	normalFix();
 
 	up	&=	~parametersF;
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////

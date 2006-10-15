@@ -38,6 +38,7 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
+#include "common/os.h"
 #include "ri/dsply.h"							// The display driver interface
 
 
@@ -197,6 +198,8 @@ public:
 					this->width			=	width;
 					this->height		=	height;
 					this->numSamples	=	numSamples;
+
+					osCreateMutex(fileMutex);
 				}
 
 				///////////////////////////////////////////////////////////////////////
@@ -208,6 +211,8 @@ public:
 				// Date last edited		:	11/28/2001
 				~CFileFramebuffer() {
 					int	i;
+
+					osDeleteMutex(fileMutex);
 
 					if (image != NULL)	TIFFClose(image);
 					else	return;
@@ -253,6 +258,9 @@ public:
 							else if (data[i] > qmax)	data[i]	=	qmax;
 						}
 					}
+
+					// Lock the file
+					osDownMutex(fileMutex);
 
 					// Record the data
 					for (i=0;i<h;i++) {
@@ -323,6 +331,9 @@ public:
 							}
 						}
 					}
+
+					// Release the file
+					osUpMutex(fileMutex);
 				}
 
 	unsigned char	**scanlines;
@@ -332,6 +343,7 @@ public:
 	int				pixelSize;
 	int				numSamples;
 	int				lastSavedLine;
+	TMutex			fileMutex;
 
 	float			qmin,qmax,qone,qzero,qamp;
 	float			gamma,gain;

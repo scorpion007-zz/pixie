@@ -231,8 +231,6 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 	float				*vertexData;
 	int					vertexDataStep;
 
-	memBegin(CRenderer::globalMemory);
-
 	if (this->vertexData->moving == 0) {
 		vertexData		=	vertex;			// No need for interpolation
 		vertexDataStep	=	0;
@@ -250,7 +248,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 			const float		*vertex0	=	vertex;
 			const float		*vertex1	=	vertex + vertexSize*K;
 
-			vertexData				=	(float *) ralloc(numVertices*K*vertexSize*sizeof(float),CRenderer::globalMemory);
+			vertexData				=	(float *) alloca(numVertices*K*vertexSize*sizeof(float));
 			vertexDataStep			=	K*vertexSize;
 
 			interpolate				=	vertexData;
@@ -272,7 +270,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 
 
 	{	// Do the vertices
-		float	*intr	=	(float *) ralloc(numVertices*vertexSize*sizeof(float),CRenderer::globalMemory);
+		float	*intr	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 		float	*tmp	=	intr;
 		//float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
 		//float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
@@ -394,8 +392,6 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 	//normalFix();
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | this->vertexData->parameters);
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////

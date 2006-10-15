@@ -148,7 +148,7 @@ public:
 		void				dice(CShadingContext *rasterizer);
 
 private:
-		void				create();
+		void				create(CShadingContext *context);
 
 		CPl					*pl;
 		int					degree;
@@ -175,7 +175,7 @@ public:
 		void				dice(CShadingContext *rasterizer);
 
 private:
-		void				create();
+		void				create(CShadingContext *context);
 
 		CPl					*pl;
 		int					uVertices,vVertices,uOrder,vOrder;

@@ -179,8 +179,6 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 	const float	*v				=	varying[VARIABLE_V] + start;
 	const CPl	*pl				=	mesh->pl;
 
-	memBegin(CRenderer::globalMemory);
-
 
 	if ((pl->data1 != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
 		const float		*v00;
@@ -369,8 +367,6 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | mesh->parameters);
-
-	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
