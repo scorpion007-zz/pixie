@@ -73,7 +73,6 @@ struct	TObjectHash;
 
 const int	SHADING_OBJECT_CACHE_SIZE	=	512;
 
-
 typedef enum {
 	SHADING_0D,				// Shading points
 	SHADING_1D_GRID,		// Shading lines (grid)
@@ -177,6 +176,18 @@ public:
 		virtual	void			post()							=	0;		// The function that's called after each pass
 };
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	TObjectHash
+// Description			:	Holds an object hash root
+// Comments				:
+// Date last edited		:	8/16/2004
+typedef struct TObjectHash {
+		CSurface				*object;
+		CRay					*rays;
+		int						numRays;
+		TObjectHash				*next;
+		TObjectHash				*shadeNext;
+} TObjectHash;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -235,14 +246,12 @@ private:
 		CShadingState			*freeStates;											// The list of free states
 		int						inShadow;												// TRUE if we're in a shadow
 
-
 		CSobol<4>				traceGenerator;											// Random number generator for "trace"
 		CSobol<4>				transmissionGenerator;									// Random number generator for "transmission"
 		CSobol<4>				gatherGenerator;										// Random number generator for "gather"
 
 		TObjectHash				*traceObjectHash;										// An object hash array for raytraced objects
 	
-
 		void					execute(CProgrammableShaderInstance *,float **);		// Execute a shader
 
 		// The following functions are used in the shaders

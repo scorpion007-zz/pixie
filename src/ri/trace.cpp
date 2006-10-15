@@ -48,18 +48,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	TObjectHash
-// Description			:	Holds an object hash root
-// Comments				:
-// Date last edited		:	8/16/2004
-typedef struct TObjectHash {
-	CSurface		*object;
-	CRay			*rays;
-	int				numRays;
-	TObjectHash		*next;
-	TObjectHash		*shadeNext;
-} TObjectHash;
+
 
 
 
@@ -154,12 +143,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			TShadingGroup	*shadingGroups	=	NULL;	// Holds a list of shading groups
 
 			// Check we have the hash table allocated
-			if (traceObjectHash == NULL) {
-				traceObjectHash	=	(TObjectHash *) CRenderer::frameMemory->alloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE);
-
-				// Fill the object pointers with impossible data
-				for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
-			}
+			assert(traceObjectHash != NULL);
 
 			// Hash the rays into the table
 			for (i=0;i<numRays;i++) {

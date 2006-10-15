@@ -379,7 +379,10 @@ CShadingContext::CShadingContext(int t) {
 	currentRayLabel			=	rayLabelPrimary;
 	freeStates				=	NULL;
 	inShadow				=	FALSE;
-	traceObjectHash			=	NULL;
+	traceObjectHash			=	(TObjectHash *) CRenderer::frameMemory->alloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE);
+
+	// Fill the object pointers with impossible data
+	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
 }
 
 ///////////////////////////////////////////////////////////////////////

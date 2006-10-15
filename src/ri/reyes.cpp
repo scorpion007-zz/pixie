@@ -301,6 +301,10 @@ void	CReyes::render() {
 	maxDepth					=	C_INFINITY;
 	culledDepth					=	C_INFINITY;
 
+	if (thread == 1) {
+		int i = 1;
+	}
+
 	// Insert the objects into the queue
 	osDownMutex(bucketMutex);
 	CBucket			*cBucket	=	buckets[currentYBucket][currentXBucket];
