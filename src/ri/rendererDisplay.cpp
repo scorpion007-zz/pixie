@@ -263,7 +263,7 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 		T32	a;
 
 		// Lock network
-		osDownMutex(networkMutex);
+		osLock(networkMutex);
 
 		header[0].integer	=	NET_READY;
 		rcSend(netClient,(char *) header,	1*sizeof(T32));
@@ -279,7 +279,7 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 		rcSend(netClient,(char *) pixels,xpixels*ypixels*numSamples*sizeof(T32));
 
 		// Unlock network
-		osUpMutex(networkMutex);
+		osUnlock(networkMutex);
 
 		return;
 	}

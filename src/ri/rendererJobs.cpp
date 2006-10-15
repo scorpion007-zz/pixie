@@ -86,7 +86,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 
 
 	// Lock the bucket info
-	osDownMutex(commitMutex);
+	osLock(commitMutex);
 
 	// If we're done, tell the hider to terminate
 	if (hiderFlags & (HIDER_DONE | HIDER_BREAK)) {
@@ -111,7 +111,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 	}
 
 	// Release the bucket info
-	osUpMutex(commitMutex);
+	osUnlock(commitMutex);
 }
 
 
@@ -245,7 +245,7 @@ void		CRenderer::serverThread(void *w) {
 		float	*buffer;
 
 		// Find the needed bucket
-		osDownMutex(commitMutex);
+		osLock(commitMutex);
 
 		// Get the current bucket and advance the bucket
 		if (advanceBucket(index,x,y) == FALSE) {
@@ -253,7 +253,7 @@ void		CRenderer::serverThread(void *w) {
 		}
 
 		// Release the bucket
-		osUpMutex(commitMutex);
+		osUnlock(commitMutex);
 
 		if (done == FALSE) {
 
@@ -282,7 +282,7 @@ void		CRenderer::serverThread(void *w) {
 			rcRecv(netServers[index],(char *) buffer,header[4].integer*sizeof(T32));
 
 			// Commit the bucket
-			osDownMutex(commitMutex);
+			osLock(commitMutex);
 			
 			commit(header[0].integer,header[1].integer,header[2].integer,header[3].integer,buffer);
 			recvBucketDataChannels(netServers[index],x,y);
@@ -291,7 +291,7 @@ void		CRenderer::serverThread(void *w) {
 			stats.progress		=	(numNetrenderedBuckets*100) / (float) (xBuckets * yBuckets);
 			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 			
-			osUpMutex(commitMutex);
+			osUnlock(commitMutex);
 
 			delete[] buffer;
 		}
@@ -305,14 +305,14 @@ void		CRenderer::serverThread(void *w) {
 			rcSend(netServers[index],(char *) netBuffer,3*sizeof(T32));
 			rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));	// Expect ACK
 			
-			osDownMutex(commitMutex);
+			osLock(commitMutex);
 			
 			recvFrameDataChannels(netServers[index]);
 	
 			stats.progress	=	100;
 			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
 
-			osUpMutex(commitMutex);
+			osUnlock(commitMutex);
 		}
 	}
 }
@@ -369,9 +369,9 @@ void			CRenderer::processServerRequest(T32 req,int index) {
 		}
 	} else if (req.integer == NET_CREATE_CHANNEL) {
 		// This must be atomic
-		osDownMutex(commitMutex);
+		osLock(commitMutex);
 		processChannelRequest(index,netServers[index]);
-		osUpMutex(commitMutex);
+		osUnlock(commitMutex);
 	} else {
 		error(CODE_BUG,"Unknown server request\n");
 	}

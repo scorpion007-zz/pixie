@@ -159,7 +159,7 @@ protected:
 									int				i = 1, j;
 									CRasterObject	*lItem,*cItem;
 								
-									osDownMutex(mutex);
+									osLock(mutex);
 
 									if (numItems <= 1) {
 										cItem	=	NULL;
@@ -185,7 +185,7 @@ protected:
 										allItems[i]				=	lItem;
 									}
 
-									osUpMutex(mutex);
+									osUnlock(mutex);
 
 									return cItem;
 								}

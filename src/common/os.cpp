@@ -584,34 +584,6 @@ void	osCreateMutex(TMutex &mutex) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	osDownMutex
-// Description			:	Lock a mutex
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/28/2001
-void	osDownMutex(TMutex &mutex) {
-#ifdef WIN32
-	EnterCriticalSection(&mutex);
-#else
-	pthread_mutex_lock(&mutex);
-#endif
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	osUpMutex
-// Description			:	Unlock a mutex
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/28/2001
-void	osUpMutex(TMutex &mutex) {
-#ifdef WIN32
-	LeaveCriticalSection(&mutex);
-#else
-	pthread_mutex_unlock(&mutex);
-#endif
-}
-
-///////////////////////////////////////////////////////////////////////
 // Function				:	osDeleteMutex
 // Description			:	Delete a mutex
 // Return Value			:

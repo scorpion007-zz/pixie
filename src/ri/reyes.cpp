@@ -94,12 +94,12 @@
 																															\
 		objectExplicitInsert(__cObject,xb,currentYBucket+1);																\
 	} else {																												\
-		osDownMutex(__cObject->mutex);																						\
+		osLock(__cObject->mutex);																						\
 		__cObject->refCount--;																								\
 		if (__cObject->refCount == 0) {																						\
 			deleteRasterObject(__cObject);																					\
 		} else {																											\
-			osUpMutex(__cObject->mutex);																					\
+			osUnlock(__cObject->mutex);																					\
 		}																													\
 	}
 
@@ -306,7 +306,7 @@ void	CReyes::render() {
 	}
 
 	// Insert the objects into the queue
-	osDownMutex(bucketMutex);
+	osLock(bucketMutex);
 	CBucket			*cBucket	=	buckets[currentYBucket][currentXBucket];
 	int				nullBucket	=	(cBucket->objects == NULL);
 	int				noObjects	=	TRUE;
@@ -315,7 +315,7 @@ void	CReyes::render() {
 		cBucket->objects		=	cObject->next[thread];
 		objectQueue.insert(cObject);
 	}
-	osUpMutex(bucketMutex);
+	osUnlock(bucketMutex);
 
 	// Init the rasterizer
 	rasterBegin(	bucketPixelWidth,
@@ -344,9 +344,9 @@ void	CReyes::render() {
 				rasterDrawPrimitives(cObject->grid);
 
 				// Defer the object
-				osDownMutex(bucketMutex);
+				osLock(bucketMutex);
 				objectDefer(cObject);
-				osUpMutex(bucketMutex);
+				osUnlock(bucketMutex);
 
 				// We rendered objects
 				noObjects	=	FALSE;
@@ -354,7 +354,7 @@ void	CReyes::render() {
 				continue;
 			} else {
 				// Dice the object
-				osDownMutex(cObject->mutex);
+				osLock(cObject->mutex);
 
 				// Did we dice this object before ?
 				if (cObject->diced == FALSE) {
@@ -368,16 +368,16 @@ void	CReyes::render() {
 					deleteRasterObject(cObject);
 				} else {
 					// Unlock the object
-					osUpMutex(cObject->mutex);
+					osUnlock(cObject->mutex);
 				}
 
 				// Insert the objects into the queue
-				osDownMutex(bucketMutex);
+				osLock(bucketMutex);
 				while((cObject=cBucket->objects) != NULL)	{
 					cBucket->objects	=	cObject->next[thread];
 					objectQueue.insert(cObject);
 				}
-				osUpMutex(bucketMutex);
+				osUnlock(bucketMutex);
 
 				// Keep going
 				continue;
@@ -389,7 +389,7 @@ void	CReyes::render() {
 			int				i				=	objectQueue.numItems - 1;
 
 			// Defer the current object
-			osDownMutex(bucketMutex);
+			osLock(bucketMutex);
 			objectDefer(cObject);
 
 			// Defer the rest of the objects
@@ -398,7 +398,7 @@ void	CReyes::render() {
 				culledDepth		=	min(culledDepth,cObject->zmin);
 				objectDefer(cObject);
 			}
-			osUpMutex(bucketMutex);
+			osUnlock(bucketMutex);
 
 			break;
 		}
@@ -428,7 +428,7 @@ void	CReyes::render() {
 	memEnd(threadMemory);
 
 	// Lock the bucket one more time
-	osDownMutex(bucketMutex);
+	osLock(bucketMutex);
 
 	// Just have rendered this bucket, so deallocate it
 	delete cBucket;
@@ -442,7 +442,7 @@ void	CReyes::render() {
 	}
 
 	// Unlock the bucket
-	osUpMutex(bucketMutex);
+	osUnlock(bucketMutex);
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
@@ -462,7 +462,7 @@ void	CReyes::skip() {
 	CBucket				*cBucket			=	buckets[currentYBucket][currentXBucket];
 
 	// Defer the objects
-	osDownMutex(bucketMutex);
+	osLock(bucketMutex);
 	while((cObject	=	cBucket->objects) != NULL) {
 		cBucket->objects	=	cObject->next[thread];
 
@@ -480,7 +480,7 @@ void	CReyes::skip() {
 		currentYBucket++;
 	}
 
-	osUpMutex(bucketMutex);
+	osUnlock(bucketMutex);
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
@@ -802,10 +802,10 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 	if (Ponly == FALSE) {
-		osDownMutex(currentObject->mutex);
+		osLock(currentObject->mutex);
 
 		if (!(grid->flags & RASTER_UNSHADED)) {
-			osUpMutex(currentObject->mutex);
+			osUnlock(currentObject->mutex);
 			return;
 		}
 	}
@@ -1229,7 +1229,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 	}
 
-	if (Ponly == FALSE)	osUpMutex(currentObject->mutex);
+	if (Ponly == FALSE)	osUnlock(currentObject->mutex);
 }
 
 
@@ -1734,7 +1734,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 	int			i;
 
 	// First, make sure we're the only one accessing this object (this must always fallthrough)
-	osDownMutex(object->mutex);
+	osLock(object->mutex);
 
 	// For every thread
 	const int	sx = xbucket(object->xbound[0]);
@@ -1746,7 +1746,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 		CBucket		*cBucket;
 
 		// Secure the area
-		osDownMutex(hider->bucketMutex);
+		osLock(hider->bucketMutex);
 
 		// Determine the bucket
 		if (by <= hider->currentYBucket) {
@@ -1771,14 +1771,14 @@ void	CReyes::insertObject(CRasterObject *object) {
 		}
 
 		// Release the mutex
-		osUpMutex(hider->bucketMutex);
+		osUnlock(hider->bucketMutex);
 	}
 
 	// Did we kill the object ?
 	if (object->refCount == 0) {
-		osUpMutex(object->mutex);
+		osUnlock(object->mutex);
 		deleteRasterObject(object);
 	} else {
-		osUpMutex(object->mutex);
+		osUnlock(object->mutex);
 	}
 }

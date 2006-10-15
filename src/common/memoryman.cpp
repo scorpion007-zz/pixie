@@ -66,7 +66,7 @@ inline	void	*allocMem(size_t size) {
 	if (size & 7) index++;
 
 	// Secure the area
-	osDownMutex(memoryMutex);
+	osLock(memoryMutex);
 
 	// Is the requested size too large ?
 	if (index >= NUM_CHUNKS) {
@@ -95,7 +95,7 @@ inline	void	*allocMem(size_t size) {
 	memoryUsage	+=	index;
 
 	// Release the area
-	osUpMutex(memoryMutex);
+	osUnlock(memoryMutex);
 
 	ptri->index	=	index;
 
@@ -113,7 +113,7 @@ inline	void	delMem(void *ptr) {
 		TMemoryHeader	*ptri	=	(TMemoryHeader *) ptr;
 
 		// Secure the area
-		osDownMutex(memoryMutex);
+		osLock(memoryMutex);
 
 		ptri--;
 		memoryUsage	-=	ptri->index;
@@ -127,7 +127,7 @@ inline	void	delMem(void *ptr) {
 		}
 
 		// Release the area
-		osUpMutex(memoryMutex);
+		osUnlock(memoryMutex);
 	}
 }
 

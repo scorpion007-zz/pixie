@@ -1611,8 +1611,8 @@ void	CHierarchy::intersect(CRay *ray) {
 	}
 
 	// FIXME: This is just a temporary solution ... Make the intersect function thread safe
-	osDownMutex(CRenderer::hierarchyMutex);
+	osLock(CRenderer::hierarchyMutex);
 	ray->ID		=	currentRayID++;
 	intersect(root,ray,tnear,tfar);
-	osUpMutex(CRenderer::hierarchyMutex);
+	osUnlock(CRenderer::hierarchyMutex);
 }

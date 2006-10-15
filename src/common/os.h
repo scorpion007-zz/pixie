@@ -143,8 +143,35 @@ TThread			osCreateThread(TFun,void *);
 int				osWaitThread(TThread);
 void			osCreateMutex(TMutex &);
 void			osDeleteMutex(TMutex &);
-void			osDownMutex(TMutex &);
-void			osUpMutex(TMutex &);
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osLock
+// Description			:	Lock a mutex
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+inline	void	osLock(TMutex &mutex) {
+#ifdef WIN32
+	EnterCriticalSection(&mutex);
+#else
+	pthread_mutex_lock(&mutex);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osUnlock
+// Description			:	Unlock a mutex
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+inline	void	osUnlock(TMutex &mutex) {
+#ifdef WIN32
+	LeaveCriticalSection(&mutex);
+#else
+	pthread_mutex_unlock(&mutex);
+#endif
+}
+
 
 
 // Misc. file extensions

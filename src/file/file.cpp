@@ -260,7 +260,7 @@ public:
 					}
 
 					// Lock the file
-					osDownMutex(fileMutex);
+					osLock(fileMutex);
 
 					// Record the data
 					for (i=0;i<h;i++) {
@@ -333,7 +333,7 @@ public:
 					}
 
 					// Release the file
-					osUpMutex(fileMutex);
+					osUnlock(fileMutex);
 				}
 
 	unsigned char	**scanlines;
