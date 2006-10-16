@@ -448,7 +448,9 @@ for (y=ymin;y<=ymax;y++) for (x=xmin;x<=xmax;x++) {
 #endif
 
 			// Check the orientation of the quad
-			if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0) {
+			float a	= area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+			if (fabsf(a) < C_EPSILON)  a = area(v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+			if (a > 0) {
 
 				// Back face culling
 				if (!shouldDrawBack()) {
@@ -549,7 +551,9 @@ for (j=0;j<vdiv;j++) {
 		// Do the fast rasterization
 
 		// Check the orientation of the quad
-		if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0) {
+		float a	= area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+		if (fabsf(a) < C_EPSILON)  a = area(v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+		if (a > 0) {
 
 			// Back face culling
 			if (!shouldDrawBack()) {
@@ -659,7 +663,10 @@ for (j=0;j<vdiv;j++) {
 #endif
 
 				// Check the orientation of the quad
-				if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0) {
+				float a	= area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+				if (fabsf(a) < C_EPSILON)  a = area(v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+				if (a > 0) {
+
 
 					// Back face culling
 					if (!shouldDrawBack()) {

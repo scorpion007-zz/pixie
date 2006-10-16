@@ -102,8 +102,9 @@ for (j=0;j<vdiv;j++) {
 
 
 
-
-		if (area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]) > 0) {
+		float a	= area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+		if (fabsf(a) < C_EPSILON)  a = area(v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+		if (a > 0) {
 
 			if (flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE)) {
 
