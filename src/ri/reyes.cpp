@@ -387,6 +387,11 @@ void	CReyes::render() {
 
 		// Get the framebuffer
 		rasterEnd(pixelBuffer,noObjects);
+	
+		// Send bucket data if we're a netrender
+		if (CRenderer::netClient != INVALID_SOCKET) {
+			CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
+		}
 
 		// Mark the first thread
 		if (thread == 1) {

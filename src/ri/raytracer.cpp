@@ -368,6 +368,12 @@ void	CRaytracer::renderingLoop() {
 
 			// Flush the data to the out devices
 			CRenderer::commit(left,top,width,height,fbPixels);
+			
+			// Send bucket data if we're a netrender
+			if (CRenderer::netClient != INVALID_SOCKET) {
+				CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
+			}
+
 		} else {
 			error(CODE_BUG,"Invalid job for the hider.\n");
 		}
