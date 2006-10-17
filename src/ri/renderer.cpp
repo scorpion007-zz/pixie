@@ -111,6 +111,7 @@ int													CRenderer::numNetrenderedBuckets		=	0;
 TMutex												CRenderer::commitMutex;
 TMutex												CRenderer::networkMutex;
 TMutex												CRenderer::hierarchyMutex;
+TMutex												CRenderer::refCountMutex;
 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
@@ -271,6 +272,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(commitMutex);
 	osCreateMutex(networkMutex);
 	osCreateMutex(hierarchyMutex);
+	osCreateMutex(refCountMutex);
 
 	// Init the memory
 	memoryInit(globalMemory);
@@ -326,6 +328,7 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(commitMutex);
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(hierarchyMutex);
+	osDeleteMutex(refCountMutex);
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);

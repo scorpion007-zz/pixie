@@ -42,27 +42,6 @@
 // Some misc macros
 /////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-// This macro allocates a new raster object
-#define newRasterObject(__a)		__a				=	new CRasterObject;								\
-									__a->next		=	new CRasterObject*[CRenderer::numThreads];		\
-									__a->diced		=	FALSE;											\
-									__a->refCount	=	0;												\
-									osCreateMutex(__a->mutex);											\
-									numObjects++;														\
-									if (numObjects > stats.numPeakRasterObjects)						\
-										stats.numPeakRasterObjects = numObjects;
-	
-// This macro deletes a raster object (the object must be locked)
-#define	deleteRasterObject(__a)		if (__a->grid != NULL)	deleteGrid(__a->grid);						\
-									else					__a->object->detach();						\
-									osDeleteMutex(__a->mutex);											\
-									delete [] __a->next;												\
-									delete __a;															\
-									numObjects--;
-
-
 // Returns the bucket numbers
 #define	xbucket(__x)	(int) floor((__x - CRenderer::xSampleOffset) * CRenderer::invBucketSampleWidth);
 #define	ybucket(__y)	(int) floor((__y - CRenderer::ySampleOffset) * CRenderer::invBucketSampleHeight);
@@ -106,7 +85,7 @@
 			osLock(cObject->mutex);																				\
 			cObject->refCount--;																				\
 			if (cObject->refCount == 0) {																		\
-				deleteRasterObject(cObject);																	\
+				deleteObject(cObject);																			\
 			} else {																							\
 				osUnlock(cObject->mutex);																		\
 			}																									\
@@ -202,17 +181,9 @@ CReyes::~CReyes() {
 	for (y=0;y<CRenderer::yBuckets;y++) {
 		for (x=0;x<CRenderer::xBuckets;x++) {
 			if ((cBucket = buckets[y][x]) != NULL)	{
-				CRasterObject		*cObject;
+				CRasterObject		*allObjects	=	cBucket->objects;
 
-				while((cObject=cBucket->objects) != NULL) {
-					cBucket->objects	=	cObject->next[thread];
-
-					// No need to guard since this code is not executed by multiple threads
-					cObject->refCount--;
-					if (cObject->refCount == 0) {
-						deleteRasterObject(cObject);
-					}
-				}
+				flushObjects(allObjects);
 
 				delete buckets[y][x];
 			}
@@ -334,16 +305,16 @@ void	CReyes::render() {
 		if (cObject->zmin < culledDepth) {
 
 			// Is this a grid ?
-			if (cObject->grid != NULL) {
+			if (cObject->grid) {
 				CRasterObject		*objectsToDelete	=	NULL;
+				CRasterGrid			*grid				=	(CRasterGrid *) cObject;
 
 				// Update the stats
 				stats.numRasterGridsRendered++;
-				stats.numQuadsRendered	+=	cObject->grid->udiv*cObject->grid->vdiv;
+				stats.numQuadsRendered	+=	grid->udiv*grid->vdiv;
 
 				// Render the grid
-				currentObject			=	cObject;
-				rasterDrawPrimitives(cObject->grid);
+				rasterDrawPrimitives(grid);
 
 				// Defer the object
 				osLock(bucketMutex);
@@ -370,22 +341,11 @@ void	CReyes::render() {
 				cObject->refCount--;
 				if (cObject->refCount == 0) {
 					// Get rid of the object
-					deleteRasterObject(cObject);
+					deleteObject(cObject);
 				} else {
 					// Unlock the object
 					osUnlock(cObject->mutex);
 				}
-
-				// ---> The following piece of code should never be executed
-				// Insert the objects into the queue
-				osLock(bucketMutex);
-				while((cObject=cBucket->objects) != NULL)	{
-					assert(FALSE);
-					cBucket->objects	=	cObject->next[thread];
-					objectQueue.insert(cObject);
-				}
-				osUnlock(bucketMutex);
-				// ---<
 
 				// Keep going
 				continue;
@@ -630,13 +590,11 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 	ymin							=	max(ymin,0);
 
 	// Record the object
-	newRasterObject(cObject);
+	cObject							=	newObject(object);
 	cObject->xbound[0]				=	(int) floor(xmin);	// Save the bound of the object for future reference
 	cObject->xbound[1]				=	(int) floor(xmax);
 	cObject->ybound[0]				=	(int) floor(ymin);
 	cObject->ybound[1]				=	(int) floor(ymax);
-	cObject->object					=	object;
-	cObject->grid					=	NULL;
 
 	// disable gross opacity culling for objects which need hidden surfaces shaded
 	// this is only OK because cObject->zmin is not used to update the max opaque depth
@@ -644,11 +602,14 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 		cObject->zmin				=	-C_INFINITY;
 	else
 		cObject->zmin				=	zmin;
-	object->attach();
 
 	// Insert the object into the bucket its in
 	insertObject(cObject);
 }
+
+
+
+
 
 
 
@@ -817,10 +778,10 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 	if (Ponly == FALSE) {
-		osLock(currentObject->mutex);
+		osLock(grid->mutex);
 
 		if (!(grid->flags & RASTER_UNSHADED)) {
-			osUnlock(currentObject->mutex);
+			osUnlock(grid->mutex);
 			return;
 		}
 	}
@@ -831,7 +792,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		float				**varying		=	currentShadingState->varying;
 		int					numPoints		=	grid->vdiv;
 		float				*sizeArray;
-		CSurface			*object			=	grid->object;
+		CSurface			*object			=	(CSurface *) (grid->object);
 		const CAttributes	*attributes		=	object->attributes;
 		float				*sizes;
 
@@ -956,7 +917,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		float				*v;
 		float				*time;
 		float				*leftVertices,*rightVertices;
-		CSurface			*object			=	grid->object;
+		CSurface			*object			=	(CSurface *) (grid->object);
 		const CAttributes	*attributes		=	object->attributes;
 
 		varying		=	currentShadingState->varying;
@@ -1115,7 +1076,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		int					numVertices;
 		float				**varying	=	currentShadingState->varying;
 		T32					one;
-		CSurface			*object		=	grid->object;
+		CSurface			*object		=	(CSurface *) (grid->object);
 		const CAttributes	*attributes	=	object->attributes;
 		const int			udiv		=	grid->udiv;
 		const int			vdiv		=	grid->vdiv;
@@ -1242,7 +1203,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		assert(grid->flags & RASTER_UNSHADED);
 		grid->flags		&=	~(RASTER_UNSHADED | RASTER_SHADE_HIDDEN | RASTER_SHADE_BACKFACE | RASTER_UNDERCULL);
 
-		osUnlock(currentObject->mutex);
+		osUnlock(grid->mutex);
 	}
 }
 
@@ -1440,21 +1401,64 @@ void		CReyes::makeRibbon(int numVertices,float *leftVertices,float *rightVertice
 
 
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CReyes
+// Method				:	newObject
+// Description			:	Allocate a new raster object
+// Return Value			:	-
+// Comments				:	Thread safe
+// Date last edited		:	6/5/2003
+CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
+	CRasterObject	*nObject;
+
+	nObject				=	new CRasterObject;
+	nObject->next		=	new CRasterObject*[CRenderer::numThreads];
+	nObject->object		=	cObject;	
+	nObject->diced		=	FALSE;	// FIXME: Can combine diced and grid into one integer
+	nObject->grid		=	FALSE;
+	nObject->refCount	=	0;
+	osCreateMutex(nObject->mutex);
+
+	osLock(CRenderer::refCountMutex);
+	cObject->attach();
+	osUnlock(CRenderer::refCountMutex);
+
+	numObjects++;
+	if (numObjects > stats.numPeakRasterObjects)	stats.numPeakRasterObjects = numObjects;
+
+	return nObject;
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	newGrid
 // Description			:	Initialize a grid by copying the points
 // Return Value			:	-
-// Comments				:	attach() is not thread safe
+// Comments				:	Thread safe
 // Date last edited		:	6/5/2003
 CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
-	CRasterGrid			*grid	=	new CRasterGrid;
+	CRasterGrid		*grid;
 
-	grid->object			=	object;				object->attach();
-	grid->numVertices		=	numVertices;
-	grid->vertices			=	new float[numVertices*numVertexSamples];
-	grid->bounds			=	new int[numVertices*4];
-	grid->sizes				=	new float[numVertices*2];
+	grid				=	new CRasterGrid;
+	grid->next			=	new CRasterObject*[CRenderer::numThreads];
+	grid->object		=	object;
+	grid->diced			=	TRUE;
+	grid->grid			=	TRUE;
+	grid->refCount		=	0;
+	osCreateMutex(grid->mutex);
+
+	// Allocate grid specific fields
+	grid->numVertices	=	numVertices;
+	grid->vertices		=	new float[numVertices*numVertexSamples];
+	grid->bounds		=	new int[numVertices*4];
+	grid->sizes			=	new float[numVertices*2];
+
+	osLock(CRenderer::refCountMutex);
+	object->attach();
+	osUnlock(CRenderer::refCountMutex);
 
 	numGrids++;
 	if (numGrids > stats.numPeakRasterGrids)	stats.numPeakRasterGrids	=	numGrids;
@@ -1463,23 +1467,48 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	return grid;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
-// Method				:	deleteGrid
-// Description			:	Delete the grid
+// Method				:	deleteObject
+// Description			:	Delete a raster object
 // Return Value			:	-
-// Comments				:	detach() is not thread safe
+// Comments				:	detach is not thread safe
 // Date last edited		:	6/5/2003
-void			CReyes::deleteGrid(CRasterGrid *grid) {
-	grid->object->detach();
-	delete [] grid->vertices;
-	delete [] grid->bounds;
-	delete [] grid->sizes;
-	delete grid;
+void				CReyes::deleteObject(CRasterObject *dObject) {
 
-	numGrids--;
-	assert(numGrids >= 0);
+	assert(dObject->refCount == 0);
+
+	// Detach from the object
+	osLock(CRenderer::refCountMutex);
+	dObject->object->detach();
+	osUnlock(CRenderer::refCountMutex);
+
+	osDeleteMutex(dObject->mutex);
+	delete [] dObject->next;
+
+	if (dObject->grid)	{
+		CRasterGrid *grid	=	(CRasterGrid *) dObject;
+
+		delete [] grid->vertices;
+		delete [] grid->bounds;
+		delete [] grid->sizes;
+		delete grid;
+
+		numGrids--;
+		assert(numGrids >= 0);
+	} else {
+		delete dObject;
+
+		numObjects--;
+		assert(numObjects >= 0);
+	}
 }
+
+
+
+
+
 
 
 
@@ -1494,7 +1523,6 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	// Compute the grid bound and insert it
 	float				xmin,xmax,ymin,ymax;
 	int					i;
-	CRasterObject		*cObject;
 	float				zmin,zmax;
 	const float			*cVertex;
 
@@ -1544,7 +1572,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 	// Trivial reject
 	if ((xmin > CRenderer::sampleClipRight)	|| (ymin > CRenderer::sampleClipBottom) || (xmax < CRenderer::sampleClipLeft) || (ymax < CRenderer::sampleClipTop)) {
-		deleteGrid(grid);
+		deleteObject(grid);
 		return;
 	}
 
@@ -1712,23 +1740,15 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	grid->ybound[0]					=	(int) floor(ymin);
 	grid->ybound[1]					=	(int) floor(ymax);
 
-	// Record the object
-	newRasterObject(cObject);
-	cObject->xbound[0]				=	grid->xbound[0];	// Save the bound of the object for future reference
-	cObject->xbound[1]				=	grid->xbound[1];
-	cObject->ybound[0]				=	grid->ybound[0];
-	cObject->ybound[1]				=	grid->ybound[1];
-	cObject->object					=	NULL;
-	cObject->grid					=	grid;
 	// disable gross opacity culling for objects which need hidden surfaces shaded
 	// this is only OK because cObject->zmin is not used to update the max opaque depth
 	if (grid->flags & RASTER_SHADE_HIDDEN)
-		cObject->zmin				=	-C_INFINITY;
+		grid->zmin					=	-C_INFINITY;
 	else
-		cObject->zmin				=	zmin;
+		grid->zmin					=	zmin;
 
 	// Insert the object into the bucket its in
-	insertObject(cObject);
+	insertObject(grid);
 
 	// Update stats
 	stats.numQuadsCreated	+=	grid->udiv*grid->vdiv;
@@ -1796,10 +1816,12 @@ void	CReyes::insertObject(CRasterObject *object) {
 
 	// Compute the reference count
 	refCount	=	refCount + object->refCount - (CRenderer::numThreads + 1);
+	assert(refCount >= 0);
+	assert(refCount <= CRenderer::numThreads);
 
 	// Did we kill the object ?
 	if (refCount == 0) {
-		deleteRasterObject(object);
+		deleteObject(object);
 	} else {
 		object->refCount	=	refCount;
 		osUnlock(object->mutex);

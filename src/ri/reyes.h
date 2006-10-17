@@ -70,29 +70,6 @@ const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 13;	// Shade the primitive even 
 class	CReyes : public CShadingContext {
 protected:
 
-
-	///////////////////////////////////////////////////////////////////////
-	// Class				:	CRasterGrid
-	// Description			:	This class encapsulates a shading grid
-	//							line renderer
-	// Comments				:
-	// Date last edited		:	9/17/2004
-	class	CRasterGrid {
-	public:
-			CSurface			*object;				// The object responsible for the grid
-			int					dim;					// Dimensionality (0,1 or 2)
-			float				umin,umax,vmin,vmax;	// The parametric range
-			int					udiv,vdiv;				// The number of division
-			int					numVertices;			// The number of vertices
-			float				*vertices;				// Array of vertices
-			int					*bounds;				// The bound of the primitive (4 numbers per primitive)
-			float				*sizes;					// The size of the primitive (only makes sense for points)
-			int					flags;					// The primitive flags
-			int					xbound[2],ybound[2];	// The bound of the grid in samples
-	};
-
-
-
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRasterPatch
 	// Description			:	Holds an object
@@ -101,14 +78,34 @@ protected:
 	class	CRasterObject {
 	public:
 			CObject				*object;				// The object
-			CRasterGrid			*grid;					// The grid
 			CRasterObject		**next;					// The next object (one for each thread)
 			int					refCount;				// The number of threads working on this object
 			int					diced;					// TRUE if this object has already been diced
+			int					grid;					// TRUE if this is a grid
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
 			TMutex				mutex;					// To secure the object
+			
 	};	
+
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CRasterGrid
+	// Description			:	This class encapsulates a shading grid
+	//							line renderer
+	// Comments				:
+	// Date last edited		:	9/17/2004
+	class	CRasterGrid : public CRasterObject {
+	public:
+			int					dim;					// Dimensionality (0,1 or 2)
+			float				umin,umax,vmin,vmax;	// The parametric range
+			int					udiv,vdiv;				// The number of division
+			int					numVertices;			// The number of vertices
+			float				*vertices;				// Array of vertices
+			int					*bounds;				// The bound of the primitive (4 numbers per primitive)
+			float				*sizes;					// The size of the primitive (only makes sense for points)
+			int					flags;					// The primitive flags
+	};
+
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPqueue
@@ -190,9 +187,9 @@ protected:
 									return cItem;
 								}
 
-					CRasterObject	**allItems;					// Array of the heap
-					int				numItems,maxItems,stepSize;	// Misc junk
-				};
+		CRasterObject			**allItems;					// Array of the heap
+		int						numItems,maxItems,stepSize;	// Misc junk
+	};
 
 
 
@@ -250,19 +247,19 @@ private:
 
 	void						insertObject(CRasterObject *object);			// Add an object into the system
 	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket
-	CRasterGrid					*newGrid(CSurface *,int);						// Create a new grid
-	void						deleteGrid(CRasterGrid *);						// Delete a grid
 
+	CRasterObject				*newObject(CObject *);							// Create a new object
+	CRasterGrid					*newGrid(CSurface *,int);						// Create a new grid
+	void						deleteObject(CRasterObject *);					// Delete an object (the object can also be a grid)
+	
 	void						render();										// Render the current bucket
 	void						skip();											// Skip the current bucket
 	
-	static	int					numGrids;										// The number of grids allocated
-	static	int					numObjects;										// The number of objects allocated
+	static	int					numGrids;										// The number of grids allocated (for housekeeping)
+	static	int					numObjects;										// The number of objects allocated (for housekeeping)
 
-	CRasterObject				*currentObject;									// The current raster object we're drawing
 	CBucket						***buckets;										// All buckets
 	TMutex						bucketMutex;									// Controls the accesses to the buckets
-
 
 	int							bucketPixelLeft;								// Left of the current bucket in pixels
 	int							bucketPixelTop;									// Top of the current bucket in pixels
