@@ -52,6 +52,10 @@ static	FILE	*out;					// Debugging output
 #endif
 
 
+// FIXME: rand() is not thread safe
+#define	urand()	(rand() / (float) RAND_MAX)
+#define	irand()	rand()
+
 
 // These two arrays are used to hold plusOne[i] = (i+1) % 3 and minusOne[i] = (i-1) % 3
 static	int		plusOne[3]				=	{1,2,0};

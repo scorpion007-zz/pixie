@@ -232,7 +232,6 @@ public:
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
 	void						drawRibbon(CSurface *,int,float,float);					// Draw a ribbon (RiCurves)
 	void						drawPoints(CSurface *,int);								// Draw points (RiPoints)
-
 protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 	float						culledDepth;									// The depth of the closest culled object

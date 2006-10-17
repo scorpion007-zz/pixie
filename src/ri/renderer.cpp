@@ -748,9 +748,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
 
-	// Initialize the random number generator for the frame
-	randomInit();
-
 	// Start the contexts
 	int	i;
 	contexts		=	new CShadingContext*[numThreads];
@@ -818,9 +815,6 @@ void		CRenderer::endFrame() {
 
 	// Shutdown the brickmaps
 	CTexture::textureShutdown();
-
-	// Shutdown the random number generator
-	randomShutdown();
 
 	// Terminate the displays
 	endDisplays();

@@ -60,6 +60,7 @@
 #define	illuminateBegin(a,b,c,d,e,f)
 #define findCoordinateSystem				CRenderer::findCoordinateSystem
 #define threadMemory						CRenderer::globalMemory
+#define urand()								(rand() / (float) RAND_MAX)
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext

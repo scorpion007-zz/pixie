@@ -231,6 +231,40 @@ public:
 	
 		CMemPage				*threadMemory;											// Memory from which we allocate the temp thread stuff
 
+		// Thread safe random number generator for integers
+		inline	unsigned long	irand() {
+									register unsigned long y;
+
+									if(state == next)	next_state();
+
+									y = *( --next);
+
+									// Tempering
+									y ^= (y >> 11);
+									y ^= (y << 7) & 0x9d2c5680UL;
+									y ^= (y << 15) & 0xefc60000UL;
+									y ^= (y >> 18);
+
+									return y;
+								}
+      
+		// Thread safe random number generator for floats
+		inline	float			urand() {
+									register unsigned long y;
+
+									if(state == next)	next_state();
+
+									y = *( --next);
+
+									// Tempering
+									y ^= (y >> 11);
+									y ^= (y << 7) & 0x9d2c5680UL;
+									y ^= (y << 15) & 0xefc60000UL;
+									y ^= (y >> 18);
+
+									y &= 0x3FFFFFFF;
+									return float(y) * (float(1.0)/float(0x3FFFFFFF));
+								}
 protected:
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }
@@ -288,6 +322,30 @@ private:
 
 		// Some misc shading functions
 		void					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
+
+		// Some data structures for urand()
+		//
+		// implementation of  Takuji Nishimura and Makoto Matsumoto's
+		// MT19937 (Mersenne Twister pseudorandom number generator)
+		// with optimizations by Shawn Cokus, Matthe Bellew.
+		// This generator is not cryptoraphically secure. 
+		//
+		// M. Matsumoto and T. Nishimura,
+		// "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform  
+		// Pseudo-Random Number Generator",
+		// ACM Transactions on Modeling and Computer Simulation,
+		// Vol. 8, No. 1, January 1998, pp 3--30.
+		//
+		// C++ interface and further optimization by Mayur Patel
+		//
+
+		unsigned long			state[624];
+		unsigned long			*next;
+
+		void					next_state();
+		void					randomInit(unsigned long u = 5489UL);
+		void					randomShutdown();
+
 
 		friend	class			CPhotonHider;
 		friend	class			CProgrammableShaderInstance;

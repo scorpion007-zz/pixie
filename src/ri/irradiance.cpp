@@ -43,6 +43,8 @@
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 
+// FIXME: rand() is not thread safe
+#define	urand()	(rand() / (float) RAND_MAX)
 
 
 ///////////////////////////////////////////////////////////////////////

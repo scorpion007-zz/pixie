@@ -114,7 +114,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		ray->invDir[COMP_Y]		=	1/ray->dir[COMP_Y];
 		ray->invDir[COMP_Z]		=	1/ray->dir[COMP_Z];
 		ray->t					=	t;
-		ray->jimp				=	-1.0f;
+		ray->jimp				=	urand();
 		ray->lastXform			=	NULL;
 		ray->object				=	NULL;
 		CRenderer::hierarchy->intersect(ray);

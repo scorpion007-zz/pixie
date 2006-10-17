@@ -336,7 +336,6 @@ void	CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test
 
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
-		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
 			if (cRay->jimp > importance)			return;
 		} else {
@@ -412,7 +411,6 @@ void	CPtriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection tes
 	
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
-		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
 			if (cRay->jimp > importance)			return;
 		} else {
@@ -621,7 +619,6 @@ void	CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersectio
 
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
-		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
 			if (cRay->jimp > importance)			return;
 		} else {
@@ -704,7 +701,6 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
-		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
 			if (cRay->jimp > importance)			return;
 		} else {

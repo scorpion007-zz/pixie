@@ -94,8 +94,7 @@ void					CDLObject::intersect(CRay *ray) {
 	if (! (ray->flags & attributes->flags) )	return;
 	
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
-		float importance = attributes->lodImportance;
-		if (ray->jimp < 0) ray->jimp = urand();
+		const float importance = attributes->lodImportance;
 		if (importance >= 0) {
 			if (ray->jimp > importance)			return;
 		} else {

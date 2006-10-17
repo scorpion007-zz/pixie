@@ -220,7 +220,6 @@ void	CBilinearPatch::intersect(CRay *cRay) {
 
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		const float importance = attributes->lodImportance;
-		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
 			if (cRay->jimp > importance)			return;
 		} else {

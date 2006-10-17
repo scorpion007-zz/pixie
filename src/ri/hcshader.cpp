@@ -80,6 +80,16 @@ CSphereLight::~CSphereLight() {
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 	
+#define sampleSphere(cP)								\
+	while(TRUE) {										\
+		cP[COMP_X]	=	2*context->urand()-1;			\
+		cP[COMP_Y]	=	2*context->urand()-1;			\
+		cP[COMP_Z]	=	2*context->urand()-1;			\
+														\
+		if (dotvv(cP,cP) < 1)	break;					\
+	}
+
+
 	if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {
 		const int	numVertices	=	currentShadingState->numVertices;
 		float		*Pf			=	(float *) alloca(numVertices*3*sizeof(float));
@@ -191,6 +201,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 			Cl	+=	3;
 		}
 	}
+#undef sampleSphere
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -393,8 +404,8 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		// Generate points on the surface
 		for (i=numVertices;i>0;i--,cP+=3,cN+=3) {
 			vector			P0,P1;
-			const float		u	=	urand();
-			const float		v	=	urand();
+			const float		u	=	context->urand();
+			const float		v	=	context->urand();
 
 			interpolatev(P0,corners[0],corners[1],u);
 			interpolatev(P1,corners[2],corners[3],u);
@@ -468,8 +479,8 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 					float			visibility	=	0;
 
 					for (j=numSamples;j>0;j--) {
-						const float	u	=	urand();
-						const float	v	=	urand();
+						const float	u	=	context->urand();
+						const float	v	=	context->urand();
 
 						interpolatev(P0,corners[0],corners[1],u);
 						interpolatev(P1,corners[2],corners[3],u);

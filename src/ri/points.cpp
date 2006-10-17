@@ -271,10 +271,10 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 			if (moved == FALSE)	break;
 
 			if (num0 > 0)	mulvf(P0,nP0,1 / (float) num0);
-			else			movvv(P0,points[irand() % numPoints]);
+			else			movvv(P0,points[rasterizer->irand() % numPoints]);
 
 			if (num1 > 0)	mulvf(P1,nP1,1 / (float) num1);
-			else			movvv(P1,points[irand() % numPoints]);
+			else			movvv(P1,points[rasterizer->irand() % numPoints]);
 		}
 
 

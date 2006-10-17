@@ -384,6 +384,9 @@ CShadingContext::CShadingContext(int t) {
 
 	// Fill the object pointers with impossible data
 	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
+
+	// Init the random number generator
+	randomInit();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -396,6 +399,9 @@ CShadingContext::CShadingContext(int t) {
 CShadingContext::~CShadingContext() {
 	CShadingState	*cState;
 	
+	// Shutdown the random number generator
+	randomShutdown();
+
 	// Ditch the shading states that have been allocated
 	assert(currentShadingState != NULL);
 	freeState(currentShadingState);
@@ -1860,4 +1866,106 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 		from	=	&identity;
 		to		=	&identity;
 	}
+}
+
+
+
+
+
+
+
+
+
+
+//Period parameters
+#define N 624
+#define M 397
+#define MATRIX_A 0x9908b0dfUL	//constant vector a
+#define UMASK 0x80000000UL		//most significant w-r bits
+#define LMASK 0x7fffffffUL		//least significant r bits
+#define MIXBITS(u,v) ( ((u) & UMASK) | ((v) & LMASK) )
+#define TWIST(u,v) ((MIXBITS(u,v) >> 1) ^ (_uTable[v & 1UL] ))
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	randomInit
+// Description			:	Init the random number generator
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	8/25/2002
+void			CShadingContext::randomInit(unsigned long s) {
+    int j;
+    state[0]= s & 0xffffffffUL;
+    for (j=1; j<N; j++) {
+        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j); 
+        state[j] &= 0xffffffffUL;  /* for >32 bit machines */
+    }
+    next = state;
+    return;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	randomShutdown
+// Description			:	Shutdown the random number generator
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	8/25/2002
+void			CShadingContext::randomShutdown() {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	next_state
+// Description			:	Get the next stage for the random number generator
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	8/25/2002
+void			CShadingContext::next_state() {
+    static const unsigned long _uTable[2] = { 0UL, MATRIX_A };
+    register signed int j;
+    
+    register unsigned long *p0;
+    register unsigned long *p1;
+
+    j = ( N-M ) >> 1;
+    p0 = state;
+    p1 = p0 + 1;
+    while(j) {
+       --j;
+        *p0 = TWIST( *p0, *p1 );
+		*p0 ^= p0[M];
+		++p1;
+		++p0;
+
+		*p0 = TWIST( *p0, *p1 );
+		*p0 ^= p0[M];
+		++p1; 
+		++p0;
+    }
+
+    *p0 = TWIST( *p0, *p1);
+    *p0 ^= p0[M];
+    ++p1; 
+    ++p0;
+
+    j = (M-1) >> 1;
+    while( j ) {
+       --j;
+       *p0 = TWIST( *p0, *p1 );
+       *p0 ^= p0[M-N];
+       ++p1;
+       ++p0;
+
+       *p0 = TWIST( *p0, *p1 );
+       *p0 ^= p0[M-N];
+       ++p1;
+       ++p0;
+    }
+    *p0 = TWIST( *p0, *state );
+    *p0 ^= p0[M-N];
+
+    next = state + N;
+    return;
 }

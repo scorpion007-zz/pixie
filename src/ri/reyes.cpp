@@ -79,32 +79,39 @@
 
 
 // Defer the object to the next bucket that'll need it (buckets must be locked, object must not be locked)
-#define	objectDefer(__cObject)																								\
-	if (		(__cObject->xbound[1] >= tbucketRight)	&&	(currentXBucket < CRenderer::xBucketsMinusOne)) {				\
-		assert(buckets[currentYBucket][currentXBucket+1] != NULL);															\
-		stats.numObjectDeferRight++;																						\
-																															\
-		objectExplicitInsert(__cObject,currentXBucket+1,currentYBucket);													\
-	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < CRenderer::yBucketsMinusOne)) {				\
-		int	xb	=	xbucket(__cObject->xbound[0]);																			\
-		if (xb < 0)	xb = 0;																									\
-		assert(xb < (int) CRenderer::xBuckets);																				\
-		assert(buckets[currentYBucket+1][xb] != NULL);																		\
-		stats.numObjectDeferBottom++;																						\
-																															\
-		objectExplicitInsert(__cObject,xb,currentYBucket+1);																\
-	} else {																												\
-		osLock(__cObject->mutex);																						\
-		__cObject->refCount--;																								\
-		if (__cObject->refCount == 0) {																						\
-			deleteRasterObject(__cObject);																					\
-		} else {																											\
-			osUnlock(__cObject->mutex);																					\
-		}																													\
+#define	objectDefer(__cObject)																					\
+	if (		(__cObject->xbound[1] >= tbucketRight)	&&	(currentXBucket < CRenderer::xBucketsMinusOne)) {	\
+		assert(buckets[currentYBucket][currentXBucket+1] != NULL);												\
+		stats.numObjectDeferRight++;																			\
+																												\
+		objectExplicitInsert(__cObject,currentXBucket+1,currentYBucket);										\
+	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < CRenderer::yBucketsMinusOne)) {	\
+		int	xb	=	xbucket(__cObject->xbound[0]);																\
+		if (xb < 0)	xb = 0;																						\
+		assert(xb < (int) CRenderer::xBuckets);																	\
+		assert(buckets[currentYBucket+1][xb] != NULL);															\
+		stats.numObjectDeferBottom++;																			\
+																												\
+		objectExplicitInsert(__cObject,xb,currentYBucket+1);													\
+	} else {																									\
+		__cObject->next[thread]	=	objectsToDelete;															\
+		objectsToDelete			=	__cObject;																	\
 	}
 
 
-
+#define	flushObjects(__objects)	{																				\
+		CRasterObject	*cObject;																				\
+		while((cObject = __objects) != NULL) {																	\
+			__objects	=	__objects->next[thread];															\
+			osLock(cObject->mutex);																				\
+			cObject->refCount--;																				\
+			if (cObject->refCount == 0) {																		\
+				deleteRasterObject(cObject);																	\
+			} else {																							\
+				osUnlock(cObject->mutex);																		\
+			}																									\
+		}																										\
+	}
 
 
 //////////////////////////////////////////////////////////////
@@ -170,7 +177,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	extraPrimitiveFlags	=	0;
 	if (CRenderer::numExtraSamples > 0)					extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
 	if (CRenderer::aperture != 0)						extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
-
 
 	// Init the stats
 	numGrids			=	0;
@@ -293,17 +299,12 @@ void		CReyes::renderingLoop() {
 // Comments				:
 // Date last edited		:	2/1/2002
 void	CReyes::render() {
-	float			*pixelBuffer;
 	CRasterObject	*cObject;
 	CPqueue			objectQueue;
 
 	// Initialize the opaque depths
 	maxDepth					=	C_INFINITY;
 	culledDepth					=	C_INFINITY;
-
-	if (thread == 1) {
-		int i = 1;
-	}
 
 	// Insert the objects into the queue
 	osLock(bucketMutex);
@@ -334,6 +335,7 @@ void	CReyes::render() {
 
 			// Is this a grid ?
 			if (cObject->grid != NULL) {
+				CRasterObject		*objectsToDelete	=	NULL;
 
 				// Update the stats
 				stats.numRasterGridsRendered++;
@@ -347,6 +349,9 @@ void	CReyes::render() {
 				osLock(bucketMutex);
 				objectDefer(cObject);
 				osUnlock(bucketMutex);
+
+				// Delete the objects we do not need
+				flushObjects(objectsToDelete);
 
 				// We rendered objects
 				noObjects	=	FALSE;
@@ -371,13 +376,16 @@ void	CReyes::render() {
 					osUnlock(cObject->mutex);
 				}
 
+				// ---> The following piece of code should never be executed
 				// Insert the objects into the queue
 				osLock(bucketMutex);
 				while((cObject=cBucket->objects) != NULL)	{
+					assert(FALSE);
 					cBucket->objects	=	cObject->next[thread];
 					objectQueue.insert(cObject);
 				}
 				osUnlock(bucketMutex);
+				// ---<
 
 				// Keep going
 				continue;
@@ -385,8 +393,9 @@ void	CReyes::render() {
 
 			
 		} else {
-			CRasterObject	**allObjects	=	objectQueue.allItems + 1;
-			int				i				=	objectQueue.numItems - 1;
+			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
+			int				i					=	objectQueue.numItems - 1;
+			CRasterObject	*objectsToDelete	=	NULL;
 
 			// Defer the current object
 			osLock(bucketMutex);
@@ -400,6 +409,9 @@ void	CReyes::render() {
 			}
 			osUnlock(bucketMutex);
 
+			// Delete the objects we do not need
+			flushObjects(objectsToDelete);
+
 			break;
 		}
 	}
@@ -411,7 +423,7 @@ void	CReyes::render() {
 	memBegin(threadMemory);
 
 		// Allocate the framebuffer area (from the thread memory)
-		pixelBuffer		=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float),threadMemory);
+		float			*pixelBuffer		=	(float *) ralloc(CRenderer::bucketWidth*CRenderer::bucketHeight*CRenderer::numSamples*sizeof(float),threadMemory);
 
 		// Get the framebuffer
 		rasterEnd(pixelBuffer,noObjects);
@@ -460,12 +472,12 @@ void	CReyes::render() {
 void	CReyes::skip() {
 	CRasterObject		*cObject;
 	CBucket				*cBucket			=	buckets[currentYBucket][currentXBucket];
+	CRasterObject		*objectsToDelete	=	NULL;
 
 	// Defer the objects
 	osLock(bucketMutex);
-	while((cObject	=	cBucket->objects) != NULL) {
+	while((cObject = cBucket->objects) != NULL) {
 		cBucket->objects	=	cObject->next[thread];
-
 		objectDefer(cObject);
 	}
 
@@ -481,6 +493,9 @@ void	CReyes::skip() {
 	}
 
 	osUnlock(bucketMutex);
+
+	// Delete the objects we do not need
+	flushObjects(objectsToDelete);
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
@@ -866,8 +881,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			T32				one;
 
 			// Sanity check
-			assert(grid->flags & RASTER_UNSHADED);
-			grid->flags		&=	~(RASTER_UNSHADED | RASTER_SHADE_HIDDEN | RASTER_SHADE_BACKFACE | RASTER_UNDERCULL);
 			stats.numRasterGridsShaded++;
 
 			// Shade the points
@@ -1010,8 +1023,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			T32					*Oi;
 
 			// Sanity check
-			assert(grid->flags & RASTER_UNSHADED);
-			grid->flags		&=	~(RASTER_UNSHADED | RASTER_SHADE_HIDDEN | RASTER_SHADE_BACKFACE | RASTER_UNDERCULL);
 			stats.numRasterGridsShaded++;
 
 			// Shade the points on the curve
@@ -1164,8 +1175,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			copyPoints(numVertices,varying,grid->vertices,0);
 		} else {
 			// Sanity check
-			assert(grid->flags & RASTER_UNSHADED);
-			grid->flags		&=	~(RASTER_UNSHADED | RASTER_SHADE_HIDDEN | RASTER_SHADE_BACKFACE | RASTER_UNDERCULL);
 			stats.numRasterGridsShaded++;
 
 			// Shade the sucker
@@ -1229,7 +1238,12 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 	}
 
-	if (Ponly == FALSE)	osUnlock(currentObject->mutex);
+	if (Ponly == FALSE)	{
+		assert(grid->flags & RASTER_UNSHADED);
+		grid->flags		&=	~(RASTER_UNSHADED | RASTER_SHADE_HIDDEN | RASTER_SHADE_BACKFACE | RASTER_UNDERCULL);
+
+		osUnlock(currentObject->mutex);
+	}
 }
 
 
@@ -1732,9 +1746,10 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 // Date last edited		:	7/4/2001
 void	CReyes::insertObject(CRasterObject *object) {
 	int			i;
+	int			refCount	=	0;
 
-	// First, make sure we're the only one accessing this object (this must always fallthrough)
-	osLock(object->mutex);
+	// A fake refcount to prevent other threads from deallocating this object
+	object->refCount	=	CRenderer::numThreads+1;
 
 	// For every thread
 	const int	sx = xbucket(object->xbound[0]);
@@ -1760,12 +1775,14 @@ void	CReyes::insertObject(CRasterObject *object) {
 			// Out of bounds
 		} else {
 			// Insert the object	
-			object->refCount++;
+			refCount++;
 			cBucket					=	hider->buckets[by][bx];
 			if (cBucket->queue == NULL) {
+				// The thread has not processed this bucket yet
 				object->next[i]		=	cBucket->objects;
 				cBucket->objects	=	object;
 			} else {
+				// The thread is processinf this bucket
 				cBucket->queue->insert(object);
 			}
 		}
@@ -1774,11 +1791,17 @@ void	CReyes::insertObject(CRasterObject *object) {
 		osUnlock(hider->bucketMutex);
 	}
 
+	// Check if we need to delete this object
+	osLock(object->mutex);
+
+	// Compute the reference count
+	refCount	=	refCount + object->refCount - (CRenderer::numThreads + 1);
+
 	// Did we kill the object ?
-	if (object->refCount == 0) {
-		osUnlock(object->mutex);
+	if (refCount == 0) {
 		deleteRasterObject(object);
 	} else {
+		object->refCount	=	refCount;
 		osUnlock(object->mutex);
 	}
 }

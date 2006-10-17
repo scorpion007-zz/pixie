@@ -492,7 +492,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			normalizev(cRay->dir);
 
 			cRay->time			=	jtime;
-			cRay->jimp			=	-1.0f;
+			cRay->jimp			=	urand();
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;
@@ -519,7 +519,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			normalizev(cRay->dir);
 
 			cRay->time			=	jtime;
-			cRay->jimp			=	-1.0f;
+			cRay->jimp			=	urand();
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;

@@ -51,7 +51,6 @@
 																\
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {				\
 		const float importance = attributes->lodImportance;		\
-		if (rv->jimp < 0) rv->jimp = urand();					\
 		if (importance >= 0) {									\
 			if (rv->jimp > importance)			return;			\
 		} else {												\

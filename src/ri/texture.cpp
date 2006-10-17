@@ -44,6 +44,8 @@
 
 
 
+// FIXME: rand() is not thread safe
+#define	urand()	(rand() / (float) RAND_MAX)
 
 
 

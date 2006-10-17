@@ -133,6 +133,8 @@ static	float	getDisp(float *mat,float disp) {
 	int		i;
 	float	alpha;
 
+#define urand()	rand() / (float) RAND_MAX
+
 	tmp[0]	=	urand();
 	tmp[1]	=	urand();
 	tmp[2]	=	urand();
@@ -152,6 +154,8 @@ static	float	getDisp(float *mat,float disp) {
 	}
 	
 	return	alpha;
+
+#undef urand
 }
 
 
