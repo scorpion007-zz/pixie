@@ -597,6 +597,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 
 // The origin, the last depth sample we output
+// FIXME: TSM generation is not thread safe
 static	float	origin[4];
 static	float	lastZ;
 static	float	rSlopeMin;
