@@ -112,6 +112,8 @@ public:
 	int				numRasterGridsCreated;
 	int				numRasterGridsShaded;
 	int				numRasterGridsRendered;
+	int				numRasterGrids;
+	int				numRasterObjects;
 	int				numPeakRasterGrids;
 	int				numPeakRasterObjects;
 	float			avgRasterGrids;

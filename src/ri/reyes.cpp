@@ -97,9 +97,6 @@
 // Some static variables for the CReyes class
 int		CReyes::extraPrimitiveFlags;
 int		CReyes::numVertexSamples;
-int		CReyes::numGrids;
-int		CReyes::numObjects;
-
 
 
 
@@ -196,9 +193,9 @@ CReyes::~CReyes() {
 	// Get rid of the bucket mutex
 	osDeleteMutex(bucketMutex);	// destroy the _locked_ mutex
 
-	// Sanity check
-	assert(numObjects			==	0);
-	assert(numGrids				==	0);
+	// Update the global stats
+	stats.numRasterObjects	+=	numObjects;
+	stats.numRasterGrids	+=	numGrids;
 }
 
 
@@ -1487,8 +1484,6 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Date last edited		:	6/5/2003
 void				CReyes::deleteObject(CRasterObject *dObject) {
 
-	return;
-
 	assert(dObject->refCount == 0);
 
 	// Detach from the object
@@ -1508,12 +1503,10 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		delete grid;
 
 		numGrids--;
-		assert(numGrids >= 0);
 	} else {
 		delete dObject;
 
 		numObjects--;
-		assert(numObjects >= 0);
 	}
 }
 

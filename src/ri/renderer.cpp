@@ -810,8 +810,13 @@ void		CRenderer::endFrame() {
 	int	i;
 
 	// Delete the contexts
-	for (i=0;i<numThreads;i++)	delete contexts[i];
+	for (i=0;i<numThreads;i++)	{
+		delete contexts[i];
+	}
 	delete [] contexts;
+
+	assert(stats.numRasterGrids		== 0);
+	assert(stats.numRasterObjects	== 0);
 
 	// Shutdown the texturing system
 	CBrickMap::brickMapShutdown();

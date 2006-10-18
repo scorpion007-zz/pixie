@@ -229,6 +229,9 @@ public:
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
 	void						drawRibbon(CSurface *,int,float,float);					// Draw a ribbon (RiCurves)
 	void						drawPoints(CSurface *,int);								// Draw points (RiPoints)
+
+	int							numGrids;										// The number of grids allocated (for housekeeping)
+	int							numObjects;										// The number of objects allocated (for housekeeping)
 protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 	float						culledDepth;									// The depth of the closest culled object
@@ -254,9 +257,6 @@ private:
 	
 	void						render();										// Render the current bucket
 	void						skip();											// Skip the current bucket
-	
-	static	int					numGrids;										// The number of grids allocated (for housekeeping)
-	static	int					numObjects;										// The number of objects allocated (for housekeeping)
 
 	CBucket						***buckets;										// All buckets
 	TMutex						bucketMutex;									// Controls the accesses to the buckets

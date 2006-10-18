@@ -104,6 +104,8 @@ void	CStats::reset() {
 	numRasterGridsCreated			=	0;
 	numRasterGridsShaded			=	0;
 	numRasterGridsRendered			=	0;
+	numRasterGrids					=	0;
+	numRasterObjects				=	0;
 	numPeakRasterGrids				=	0;
 	numPeakRasterObjects			=	0;
 	avgRasterGrids					=	0;
