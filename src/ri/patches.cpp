@@ -703,6 +703,8 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 	double				*vertexData;
 	int					vertexDataStep;
 
+	assert(vertexSize > 0);
+
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;
 		vertexDataStep	=	0;
@@ -798,8 +800,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
 // Method				:	interpolate
-// Description			:	See object.h
-// Return Value			:	-
+// Description			:	See object.h// Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
 void	CBicubicPatch::interpolate(int numVertices,float **varying) const {

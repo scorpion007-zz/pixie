@@ -48,16 +48,16 @@
 
 
 // Insert an object into a bucket (buckets must be locked)
-#define	objectExplicitInsert(__o,__bx,__by) {															\
-		CBucket					*cBucket;																\
-																										\
-		cBucket				=	buckets[__by][__bx];													\
-		__o->next[thread]	=	cBucket->objects;														\
-		cBucket->objects	=	__o;																	\
+#define	objectExplicitInsert(__o,__bx,__by) {			\
+		CBucket					*cBucket;				\
+														\
+		cBucket				=	buckets[__by][__bx];	\
+		__o->next[thread]	=	cBucket->objects;		\
+		cBucket->objects	=	__o;					\
 	}
 
 
-// Defer the object to the next bucket that'll need it (buckets must be locked, object must not be locked)
+// Defer the object to the next bucket that'll need it (buckets must be locked)
 #define	objectDefer(__cObject)																					\
 	if (		(__cObject->xbound[1] >= tbucketRight)	&&	(currentXBucket < CRenderer::xBucketsMinusOne)) {	\
 		assert(buckets[currentYBucket][currentXBucket+1] != NULL);												\
@@ -78,18 +78,18 @@
 	}
 
 
-#define	flushObjects(__objects)	{																				\
-		CRasterObject	*cObject;																				\
-		while((cObject = __objects) != NULL) {																	\
-			__objects	=	__objects->next[thread];															\
-			osLock(cObject->mutex);																				\
-			cObject->refCount--;																				\
-			if (cObject->refCount == 0) {																		\
-				deleteObject(cObject);																			\
-			} else {																							\
-				osUnlock(cObject->mutex);																		\
-			}																									\
-		}																										\
+#define	flushObjects(__objects)	{						\
+		CRasterObject	*cObject;						\
+		while((cObject = __objects) != NULL) {			\
+			__objects	=	__objects->next[thread];	\
+			osLock(cObject->mutex);						\
+			cObject->refCount--;						\
+			if (cObject->refCount == 0) {				\
+				deleteObject(cObject);					\
+			} else {									\
+				osUnlock(cObject->mutex);				\
+			}											\
+		}												\
 	}
 
 
@@ -154,8 +154,8 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	else												numVertexSamples	=	(CRenderer::numExtraSamples + 10);
 
 	extraPrimitiveFlags	=	0;
-	if (CRenderer::numExtraSamples > 0)					extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
-	if (CRenderer::aperture != 0)						extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
+	if (CRenderer::numExtraSamples > 0)	extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
+	if (CRenderer::aperture != 0)		extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
 
 	// Init the stats
 	numGrids			=	0;
@@ -311,7 +311,7 @@ void	CReyes::render() {
 
 				// Update the stats
 				stats.numRasterGridsRendered++;
-				stats.numQuadsRendered	+=	grid->udiv*grid->vdiv;
+				stats.numQuadsRendered					+=	grid->udiv*grid->vdiv;
 
 				// Render the grid
 				rasterDrawPrimitives(grid);
@@ -408,6 +408,7 @@ void	CReyes::render() {
 	osLock(bucketMutex);
 
 	// Just have rendered this bucket, so deallocate it
+	assert(cBucket->objects == NULL);
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
 
@@ -456,7 +457,6 @@ void	CReyes::skip() {
 		currentXBucket	=	0;
 		currentYBucket++;
 	}
-
 	osUnlock(bucketMutex);
 
 	// Delete the objects we do not need
@@ -782,6 +782,7 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 // Date last edited		:	6/5/2003
 void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
+	// Make sure we shade a grid only once
 	if (Ponly == FALSE) {
 		osLock(grid->mutex);
 
@@ -1481,6 +1482,8 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Comments				:	detach is not thread safe
 // Date last edited		:	6/5/2003
 void				CReyes::deleteObject(CRasterObject *dObject) {
+
+	return;
 
 	assert(dObject->refCount == 0);
 
