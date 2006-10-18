@@ -390,11 +390,6 @@ void	CReyes::render() {
 		// Get the framebuffer
 		rasterEnd(pixelBuffer,noObjects);
 	
-		// Send bucket data if we're a netrender
-		if (CRenderer::netClient != INVALID_SOCKET) {
-			CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
-		}
-
 		// Mark the first thread
 		if (thread == 1) {
 			pixelBuffer[5]	=	1;
@@ -402,8 +397,17 @@ void	CReyes::render() {
 			pixelBuffer[6]	=	1;
 		}
 
+		osLock(CRenderer::commitMutex);
+		
 		// Flush the data to the out devices
 		CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
+		
+		// Send bucket data if we're a netrender
+		if (CRenderer::netClient != INVALID_SOCKET) {
+			CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
+		}
+		
+		osUnlock(CRenderer::commitMutex);
 
 	// Restore the memory
 	memEnd(threadMemory);
@@ -1775,7 +1779,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 // Method				:	insertObject
 // Description			:	Insert an object into all hiders
 // Return Value			:
-// Comments				:	(inline for speed)
+// Comments				:	* Called from parse thread *
 // Date last edited		:	7/4/2001
 void	CReyes::insertObject(CRasterObject *object) {
 	int			i;
