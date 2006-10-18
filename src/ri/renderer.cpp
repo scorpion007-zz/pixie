@@ -334,7 +334,7 @@ void		CRenderer::endRenderer() {
 	memoryTini(globalMemory);
 
 	// Check the stats for memory leaks
-	stats.check();
+	//stats.check();
 }
 
 

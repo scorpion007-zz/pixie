@@ -358,10 +358,13 @@ void	CRaytracer::renderingLoop() {
 			assert(x < CRenderer::xBuckets);
 			assert(y < CRenderer::yBuckets);
 
-			left	=	x*CRenderer::bucketWidth;
-			top		=	y*CRenderer::bucketHeight;
-			width	=	min(CRenderer::bucketWidth,CRenderer::xPixels-left);
-			height	=	min(CRenderer::bucketHeight,CRenderer::yPixels-top);
+			currentXBucket	=	x;
+			currentYBucket	=	y;
+
+			left			=	x*CRenderer::bucketWidth;
+			top				=	y*CRenderer::bucketHeight;
+			width			=	min(CRenderer::bucketWidth,CRenderer::xPixels-left);
+			height			=	min(CRenderer::bucketHeight,CRenderer::yPixels-top);
 
 			// Sample the framebuffer
 			sample(left,top,width,height);
