@@ -271,6 +271,10 @@ void	CReyes::render() {
 	CRasterObject	*cObject;
 	CPqueue			objectQueue;
 
+	if ((currentYBucket == 0) && (currentXBucket == 1)) {
+		int i = 1;
+	}
+
 	// Initialize the opaque depths
 	maxDepth					=	C_INFINITY;
 	culledDepth					=	C_INFINITY;
@@ -594,6 +598,8 @@ void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
 
 	xmin							=	max(xmin,0);
 	ymin							=	max(ymin,0);
+	xmax							=	min(xmax,CRenderer::sampleClipRight);
+	ymax							=	min(ymax,CRenderer::sampleClipBottom);
 
 	// Record the object
 	cObject							=	newObject(object);
@@ -1483,6 +1489,8 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Comments				:	detach is not thread safe. dObject->mutex must be locked
 // Date last edited		:	6/5/2003
 void				CReyes::deleteObject(CRasterObject *dObject) {
+
+	return;
 
 	assert(dObject->refCount == 0);
 
