@@ -178,6 +178,7 @@ CReyes::~CReyes() {
 	CBucket	*cBucket;
 
 	// Ditch the buckets
+	osLock(bucketMutex);
 	for (y=0;y<CRenderer::yBuckets;y++) {
 		for (x=0;x<CRenderer::xBuckets;x++) {
 			if ((cBucket = buckets[y][x]) != NULL)	{
@@ -193,7 +194,7 @@ CReyes::~CReyes() {
 	delete [] buckets;
 
 	// Get rid of the bucket mutex
-	osDeleteMutex(bucketMutex);
+	osDeleteMutex(bucketMutex);	// destroy the _locked_ mutex
 
 	// Sanity check
 	assert(numObjects			==	0);
@@ -396,6 +397,8 @@ void	CReyes::render() {
 		// Mark the first thread
 		if (thread == 1) {
 			pixelBuffer[5]	=	1;
+		} else if (thread == 0) {
+			pixelBuffer[6]	=	1;
 		}
 
 		// Flush the data to the out devices
@@ -437,11 +440,12 @@ void	CReyes::render() {
 // Date last edited		:	2/1/2002
 void	CReyes::skip() {
 	CRasterObject		*cObject;
-	CBucket				*cBucket			=	buckets[currentYBucket][currentXBucket];
+	CBucket				*cBucket;
 	CRasterObject		*objectsToDelete	=	NULL;
 
 	// Defer the objects
 	osLock(bucketMutex);
+	cBucket	= buckets[currentYBucket][currentXBucket];
 	while((cObject = cBucket->objects) != NULL) {
 		cBucket->objects	=	cObject->next[thread];
 		objectDefer(cObject);
@@ -1479,7 +1483,7 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Method				:	deleteObject
 // Description			:	Delete a raster object
 // Return Value			:	-
-// Comments				:	detach is not thread safe
+// Comments				:	detach is not thread safe. dObject->mutex must be locked
 // Date last edited		:	6/5/2003
 void				CReyes::deleteObject(CRasterObject *dObject) {
 
@@ -1492,7 +1496,7 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 	dObject->object->detach();
 	osUnlock(CRenderer::refCountMutex);
 
-	osDeleteMutex(dObject->mutex);
+	osDeleteMutex(dObject->mutex);	// destroy the _locked_ mutex
 	delete [] dObject->next;
 
 	if (dObject->grid)	{
