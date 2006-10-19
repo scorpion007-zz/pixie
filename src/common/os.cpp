@@ -547,7 +547,12 @@ TThread	osCreateThread(TFun entry,void *d) {
 
 	cThread				=	CreateThread(NULL,0,dispatcherThread,data,0,&id);
 #else
-	pthread_create(&cThread,NULL,entry,d);
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setstacksize(&attr,1024*1024*8);//8MB stack
+	pthread_create(&cThread,&attr,entry,d);
+	pthread_attr_destroy(&attr);
+	//pthread_create(&cThread,NULL,entry,d);
 #endif
 
 	return	cThread;
@@ -579,7 +584,14 @@ void	osCreateMutex(TMutex &mutex) {
 #ifdef WIN32
 	InitializeCriticalSection(&mutex);
 #else
+//	pthread_mutexattr_t attr;				// we wish attrs to be reentrant?
+//	pthread_mutexattr_init(&attr);
+//	pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
+//	pthread_mutex_init(&mutex,/*NULL*/&attr);
+//	pthread_mutexattr_destroy(&attr);
+	
 	pthread_mutex_init(&mutex,NULL);
+
 #endif
 }
 

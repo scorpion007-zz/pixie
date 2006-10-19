@@ -364,13 +364,15 @@ void	CReyes::render() {
 			// Defer the rest of the objects
 			for (;i>0;i--) {
 				cObject			=	*allObjects++;
+							objectQueue.numItems--;	///<- decrement to record no objects
 				culledDepth		=	min(culledDepth,cObject->zmin);
 				objectDefer(cObject);
 			}
-			osUnlock(bucketMutex);
+			assert(cBucket->queue->numItems == 1);
+			osUnlock(bucketMutex);			///<- problem.  objects can go to the queue in between here and bucket dealloc
 
 			// Delete the objects we do not need
-			flushObjects(objectsToDelete);
+			//flushObjects(objectsToDelete);
 
 			break;
 		}
@@ -408,6 +410,30 @@ void	CReyes::render() {
 
 	// Lock the bucket one more time
 	osLock(bucketMutex);
+
+	{	// PROOF OF CONECPT ONLY
+		CRasterObject	**allObjects		=	objectQueue.allItems + 1;
+		int				i					=	objectQueue.numItems - 1;
+		CRasterObject	*objectsToDelete	=	NULL;
+
+		for (;i>0;i--) {
+			cObject			=	*allObjects++;
+										objectQueue.numItems--;	///<- decrement to record no objects
+			CRasterObject *deleteables = objectsToDelete;
+			CRasterObject *dObj = deleteables;
+			int gotOne = dObj ? false : true;
+			while(dObj != NULL) {
+				if (cObject->object == dObj->object) {
+					gotOne = true;
+					break;
+				}
+				dObj = dObj->next[thread];
+			}
+			assert(gotOne);
+		}
+		flushObjects(objectsToDelete);
+	}
+
 
 	// Just have rendered this bucket, so deallocate it
 	assert(cBucket->objects == NULL);
