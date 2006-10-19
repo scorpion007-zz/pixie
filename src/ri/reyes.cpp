@@ -271,10 +271,6 @@ void	CReyes::render() {
 	CRasterObject	*cObject;
 	CPqueue			objectQueue;
 
-	if ((currentYBucket == 0) && (currentXBucket == 1)) {
-		int i = 1;
-	}
-
 	// Initialize the opaque depths
 	maxDepth					=	C_INFINITY;
 	culledDepth					=	C_INFINITY;
@@ -297,6 +293,7 @@ void	CReyes::render() {
 					tbucketLeft,
 					tbucketTop,
 					nullBucket);
+
 
 	// Process the objects and patches
 	while((cObject = objectQueue.get(bucketMutex)) != NULL) {
@@ -331,6 +328,7 @@ void	CReyes::render() {
 				
 				continue;
 			} else {
+
 				// Dice the object
 				osLock(cObject->mutex);
 
@@ -396,8 +394,6 @@ void	CReyes::render() {
 		} else if (thread == 0) {
 			pixelBuffer[6]	=	1;
 		}
-
-		osLock(CRenderer::commitMutex);
 		
 		// Flush the data to the out devices
 		CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
@@ -406,8 +402,6 @@ void	CReyes::render() {
 		if (CRenderer::netClient != INVALID_SOCKET) {
 			CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
 		}
-		
-		osUnlock(CRenderer::commitMutex);
 
 	// Restore the memory
 	memEnd(threadMemory);
@@ -417,6 +411,7 @@ void	CReyes::render() {
 
 	// Just have rendered this bucket, so deallocate it
 	assert(cBucket->objects == NULL);
+	assert(cBucket->queue->numItems == 1);
 	delete cBucket;
 	buckets[currentYBucket][currentXBucket]	=	NULL;
 
@@ -1493,8 +1488,6 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Comments				:	detach is not thread safe. dObject->mutex must be locked
 // Date last edited		:	6/5/2003
 void				CReyes::deleteObject(CRasterObject *dObject) {
-
-	return;
 
 	assert(dObject->refCount == 0);
 
