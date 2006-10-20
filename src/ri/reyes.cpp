@@ -295,6 +295,7 @@ void	CReyes::render() {
 					tbucketTop,
 					nullBucket);
 
+int exitViaCull = FALSE;//HACK
 
 	// Process the objects and patches
 	while((cObject = objectQueue.get(bucketMutex)) != NULL) {
@@ -303,12 +304,12 @@ void	CReyes::render() {
 
 		// Is the object behind the maximum opaque depth ?
 		if (cObject->zmin < culledDepth) {
-
+			
 			// Is this a grid ?
 			if (cObject->grid) {
 				CRasterObject		*objectsToDelete	=	NULL;
 				CRasterGrid			*grid				=	(CRasterGrid *) cObject;
-
+				
 				// Update the stats
 				stats.numRasterGridsRendered++;
 				stats.numQuadsRendered					+=	grid->udiv*grid->vdiv;
@@ -331,7 +332,7 @@ void	CReyes::render() {
 			} else {
 
 				// Dice the object
-				osLock(cObject->mutex);
+				//osLock(cObject->mutex);	// already locked
 
 				// Did we dice this object before ?
 				if (cObject->diced == FALSE) {
@@ -379,10 +380,18 @@ void	CReyes::render() {
 
 			// Delete the objects we do not need
 			flushObjects(objectsToDelete);
+			exitViaCull = TRUE;							//HACK
 
 			break;
 		}
 	}
+	
+	// we left the mutex locked
+	
+	buckets[currentYBucket][currentXBucket]	=	NULL;//this would prevent stuff coming back, but is wrong
+													// are the objects we get back real?
+	osUnlock(bucketMutex);
+
 
 	// All objects must be deferred
 	assert(cBucket->objects == NULL);
@@ -418,26 +427,25 @@ void	CReyes::render() {
 	osLock(bucketMutex);
 
 	{	// PROOF OF CONECPT ONLY
-		CRasterObject	**allObjects		=	objectQueue.allItems + 1;
-		int				i					=	objectQueue.numItems - 1;
-		CRasterObject	*objectsToDelete	=	NULL;
+		// At the cull point we should have killed all objects and grids
+		// Some of those objects might have tried to return grids to us from other threads
+		// which we guard against
+		
+		// Q: why do we still get occasional grids coming back to us?
+		// They must be inserted between the while loop exiting and getting
+		// here!
+		if(objectQueue.numItems != 1) {
+			fprintf(stderr,"%d : %d , %d\n",thread,objectQueue.numItems - 1,exitViaCull);
+			
+			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
+			int				i					=	objectQueue.numItems - 1;
 
-		for (;i>0;i--) {
-			cObject			=	*allObjects++;
-										objectQueue.numItems--;	///<- decrement to record no objects
-			CRasterObject *deleteables = objectsToDelete;
-			CRasterObject *dObj = deleteables;
-			int gotOne = dObj ? false : true;
-			while(dObj != NULL) {
-				if (cObject->object == dObj->object) {
-					gotOne = true;
-					break;
-				}
-				dObj = dObj->next[thread];
+			for (;i>0;i--) {
+				CRasterObject *rob = *allObjects++;
+				fprintf(stderr,"  %d : %x %x\n",i,rob->grid,rob->object);
 			}
-			assert(gotOne);
 		}
-		flushObjects(objectsToDelete);
+		objectQueue.numItems = 1;// allow us to continue, but any time this happens it's a bug
 	}
 
 
