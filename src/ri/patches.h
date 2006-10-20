@@ -43,7 +43,7 @@
 // Description			:	Encapsulates a bilinear patch
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CBilinearPatch : public CSurface , public CTracable{
+class	CBilinearPatch : public CSurface , public CTracable {
 public:
 						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *);
 						~CBilinearPatch();

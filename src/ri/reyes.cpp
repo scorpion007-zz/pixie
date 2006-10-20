@@ -120,7 +120,7 @@ CReyes::CBucket::CBucket() {
 // Method				:	~CBucket
 // Description			:	Dtor
 // Return Value			:	-
-// Comments				:
+// Comments				:6
 // Date last edited		:	10/14/2002
 CReyes::CBucket::~CBucket() {
 }
@@ -174,8 +174,9 @@ CReyes::~CReyes() {
 	int		x,y;
 	CBucket	*cBucket;
 
-	// Ditch the buckets
 	osLock(bucketMutex);
+
+	// Ditch the buckets
 	for (y=0;y<CRenderer::yBuckets;y++) {
 		for (x=0;x<CRenderer::xBuckets;x++) {
 			if ((cBucket = buckets[y][x]) != NULL)	{
@@ -357,22 +358,27 @@ void	CReyes::render() {
 			int				i					=	objectQueue.numItems - 1;
 			CRasterObject	*objectsToDelete	=	NULL;
 
-			// Defer the current object
+			
 			osLock(bucketMutex);
+
+			// We killed this bucket
+			buckets[currentYBucket][currentXBucket]	=	NULL;
+
+			// Defer the current object
 			objectDefer(cObject);
 
 			// Defer the rest of the objects
 			for (;i>0;i--) {
 				cObject			=	*allObjects++;
-							objectQueue.numItems--;	///<- decrement to record no objects
 				culledDepth		=	min(culledDepth,cObject->zmin);
 				objectDefer(cObject);
 			}
-			assert(cBucket->queue->numItems == 1);
-			osUnlock(bucketMutex);			///<- problem.  objects can go to the queue in between here and bucket dealloc
+
+			objectQueue.numItems	=	1;
+			osUnlock(bucketMutex);
 
 			// Delete the objects we do not need
-			//flushObjects(objectsToDelete);
+			flushObjects(objectsToDelete);
 
 			break;
 		}
@@ -1830,16 +1836,35 @@ void	CReyes::insertObject(CRasterObject *object) {
 		if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {
 			// Out of bounds
 		} else {
-			// Insert the object	
-			refCount++;
-			cBucket					=	hider->buckets[by][bx];
-			if (cBucket->queue == NULL) {
-				// The thread has not processed this bucket yet
-				object->next[i]		=	cBucket->objects;
-				cBucket->objects	=	object;
-			} else {
-				// The thread is processinf this bucket
-				cBucket->queue->insert(object);
+			// Get the bucket
+			cBucket	=	hider->buckets[by][bx];
+
+			// Is the bucket dead ?
+			while((cBucket = hider->buckets[by][bx]) == NULL) {
+				bx++;
+				if (bx == CRenderer::xBuckets) {
+					bx	=	0;
+					by++;
+					if (by == CRenderer::yBuckets) {
+						break;
+					}
+				}
+
+				cBucket	=	hider->buckets[by][bx];
+			}
+
+			if (cBucket != NULL) {
+				// Insert the object	
+				refCount++;
+				
+				if (cBucket->queue == NULL) {
+					// The thread has not processed this bucket yet
+					object->next[i]		=	cBucket->objects;
+					cBucket->objects	=	object;
+				} else {
+					// The thread is processinf this bucket
+					cBucket->queue->insert(object);
+				}
 			}
 		}
 

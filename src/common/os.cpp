@@ -545,7 +545,7 @@ TThread	osCreateThread(TFun entry,void *d) {
 	data->thread		=	entry;
 	data->userData		=	d;
 
-	cThread				=	CreateThread(NULL,0,dispatcherThread,data,0,&id);
+	cThread				=	CreateThread(NULL,80000000,dispatcherThread,data,0,&id);
 #else
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);

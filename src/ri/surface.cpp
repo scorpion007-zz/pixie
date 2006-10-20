@@ -100,7 +100,7 @@ CPatch::~CPatch() {
 }
 
 
-static	int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int nsides,int disable) {
+static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int nsides,int disable) {
 	int	i;
 
 	// Update the bounding box
@@ -191,6 +191,7 @@ void	CPatch::dice(CShadingContext *r) {
 
 		// Take care of the motion first
 		if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+
 			// Compute the sample positions and corresponding normal vectors
 			for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
 				for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
@@ -265,7 +266,7 @@ void	CPatch::dice(CShadingContext *r) {
 			
 			// Correct shading rate with dof factor
 			if (CRenderer::flags & OPTIONS_FLAGS_FOCALBLUR) {
-				float coc = minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
+				const float coc = minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
 				shadingRate *= max(1,0.5f*coc);
 			}
 			

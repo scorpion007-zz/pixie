@@ -43,53 +43,39 @@
 
 
 
-////////////////////////////////////////////////////////////////////////
-//
-//	Some static variables used while creating primitives
-//
-////////////////////////////////////////////////////////////////////////
-static	int				uvaryings,vvaryings;
-static	int				uvertices,vvertices;
-static	CPl				*parameterList;
-static	CVertexData		*vertexData;
-static	float			*vertices;
-static	int				vertexSize;
-
 ///////////////////////////////////////////////////////////////////////
-// Function				:	gatherData
-// Description			:	Get the data
+// Macro				:	gatherData
+// Description			:	Get the data to create the primitive
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-static	inline	void	gatherData(CShadingContext *context,int u,int v,int nu,int nv,int uv,int vv,int un,double *&vertex,CParameter *&parameters) {
-	int			i,j,k;
-	double		*dest;
-	const int	v0		=	vv*uvaryings+uv;
-	const int	v1		=	vv*uvaryings+((uv+1) % uvaryings);
-	const int	v2		=	((vv+1) % vvaryings)*uvaryings+uv;
-	const int	v3		=	((vv+1) % vvaryings)*uvaryings+((uv+1) % uvaryings);
-
-	vertex		=	NULL;
-
-	assert(vertexSize > 0);
-
-	dest	=	vertex	=	(double *) ralloc(vertexSize*nu*nv*sizeof(double),context->threadMemory);
-
-	// Copy the vertex variables over
-	for (j=0;j<nv;j++) {
-		const int		vVertex	=	(v + j) % vvertices;
-		for (i=0;i<nu;i++) {
-			const int		uVertex	=	(u + i) % uvertices;
-		
-			const int		index	=	vVertex * uvertices + uVertex;
-			const float		*src	=	vertices + index*vertexSize;
-
-			for (k=vertexSize;k>0;k--)	*dest++	=	*src++;
-		}
-	}
-
-	parameters	=	parameterList->uniform(un,NULL);
-	parameters	=	parameterList->varying(v0,v1,v2,v3,parameters);
+#define	gatherData(__context,__u,__v,__nu,__nv,__uv,__vv,__un,__vertex,__parameters) {	\
+	int			__i,__j;																\
+	double		*__dest;																\
+																						\
+	assert(vertexSize > 0);																\
+																						\
+	__dest = __vertex = (double *) ralloc(vertexSize*(__nu)*(__nv)*sizeof(double),__context->threadMemory);	\
+																						\
+	for (__j=0;__j<(__nv);__j++) {														\
+		const int __vVertex	=	((__v) + __j) % vvertices;								\
+		for (__i=0;__i<(__nu);__i++) {													\
+			const int		__uVertex	=	((__u) + __i) % uvertices;					\
+			const int		__index		=	__vVertex * uvertices + __uVertex;			\
+			const float		*__src		=	vertices + __index*vertexSize;				\
+			int				__k;														\
+																						\
+			for (__k=vertexSize;__k>0;__k--)	*__dest++	=	*__src++;				\
+		}																				\
+	}																					\
+																						\
+	__parameters	=	parameterList->uniform(__un,NULL);								\
+																						\
+	const int	__v0 =	(__vv)*uvaryings+(__uv);										\
+	const int	__v1 =	(__vv)*uvaryings+(((__uv)+1) % uvaryings);						\
+	const int	__v2 =	(((__vv)+1) % vvaryings)*uvaryings+(__uv);						\
+	const int	__v3 =	(((__vv)+1) % vvaryings)*uvaryings+(((__uv)+1) % uvaryings);	\
+	__parameters	=	parameterList->varying(__v0,__v1,__v2,__v3,__parameters);		\
 }
 
 
@@ -227,7 +213,7 @@ void	CBilinearPatch::intersect(CRay *cRay) {
 		}
 	}
 
-	const int	vertexSize	=	vertexData->vertexSize;
+	const int	vertexSize	=	variables->vertexSize;
 
 	const float	*P00	=	vertex;
 	const float	*P10	=	P00 + vertexSize;
@@ -1578,6 +1564,13 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 // Date last edited		:	5/28/2003
 void	CPatchMesh::create(CShadingContext *context) {
 	int				i,j,k;
+	int				uvaryings,vvaryings;
+	int				uvertices,vvertices;
+	CPl				*parameterList;
+	CVertexData		*vertexData;
+	float			*vertices;
+	int				vertexSize;
+
 
 	children			=	new CArray<CObject *>;
 
@@ -1854,6 +1847,13 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	double			*vertex;
 	int				upatches,vpatches;
 	CParameter		*parameters;
+	int				uvaryings,vvaryings;
+	int				uvertices,vvertices;
+	CPl				*parameterList;
+	CVertexData		*vertexData;
+	float			*vertices;
+	int				vertexSize;
+
 
 	children		=	new CArray<CObject *>;
 
