@@ -332,7 +332,7 @@ int exitViaCull = FALSE;//HACK
 			} else {
 
 				// Dice the object
-				//osLock(cObject->mutex);	// already locked
+				osLock(cObject->mutex);	// already locked
 
 				// Did we dice this object before ?
 				if (cObject->diced == FALSE) {
@@ -388,7 +388,7 @@ int exitViaCull = FALSE;//HACK
 	
 	// we left the mutex locked
 	
-	buckets[currentYBucket][currentXBucket]	=	NULL;//this would prevent stuff coming back, but is wrong
+//	buckets[currentYBucket][currentXBucket]	=	NULL;//this would prevent stuff coming back, but is wrong
 													// are the objects we get back real?
 	osUnlock(bucketMutex);
 
@@ -435,7 +435,7 @@ int exitViaCull = FALSE;//HACK
 		// They must be inserted between the while loop exiting and getting
 		// here!
 		if(objectQueue.numItems != 1) {
-			fprintf(stderr,"%d : %d , %d\n",thread,objectQueue.numItems - 1,exitViaCull);
+			fprintf(stderr,"%d : %d , %d (%d,%d)\n",thread,objectQueue.numItems - 1,exitViaCull,currentXBucket,currentYBucket);
 			
 			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
 			int				i					=	objectQueue.numItems - 1;
