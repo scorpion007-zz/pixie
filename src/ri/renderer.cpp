@@ -442,6 +442,7 @@ static void	copyOptions(const COptions *o) {
 // Comments				:
 // Date last edited		:	10/9/2006
 void		CRenderer::beginFrame(const COptions *o,CXform *x) {
+	int		i;
 
 	// Record the frame start time
 	stats.frameStartTime	=	osCPUTime();
@@ -547,7 +548,10 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	metaYBuckets		=	(int) ceil(yBuckets / (float) netYBuckets);
 
 	// If we have servers, this array will hold the server assignment for each bucket
-	jobAssignment		=	NULL;
+	jobAssignment		=	(int *) frameMemory->alloc(xBuckets*yBuckets*sizeof(int));
+
+	// Create the job assignment
+	for (i=0;i<xBuckets*yBuckets;i++)	jobAssignment[i]	=	-1;
 
 	// Compute depth of field related stuff
 	aperture			=	focallength / (2*fstop);
@@ -706,7 +710,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		}
 
 		// Normalize the filter kernel
-		int	i;
 		invWeight	=	1 / (double) totalWeight;
 		for (i=0;i<filterWidth*filterHeight;i++) {
 			pixelFilterKernel[i]			=	(float) (pixelFilterKernel[i] * invWeight);
@@ -752,7 +755,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	CBrickMap::brickMapInit(maxBrickSize);
 
 	// Start the contexts
-	int	i;
 	contexts		=	new CShadingContext*[numThreads];
 	for (i=0;i<numThreads;i++) {
 

@@ -34,8 +34,6 @@
 #include "memory.h"
 #include "random.h"
 
-static	int	numFragments	=	0;
-
 // This macro is used to allocate fragments
 #define	newFragment(__a)	if (freeFragments == NULL)	{						\
 								__a					=	new CFragment;			\
@@ -82,6 +80,7 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 
 	// Init the fragment buffer
 	freeFragments	=	NULL;
+	numFragments	=	0;
 
 	// Initialize the occlusion culler
 	initCuller(max(totalWidth,totalHeight), &maxDepth);
@@ -596,18 +595,20 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 }
 
 
-// The origin, the last depth sample we output
-// FIXME: TSM generation is not thread safe
-static	float	origin[4];
-static	float	lastZ;
-static	float	rSlopeMin;
-static	float	gSlopeMin;
-static	float	bSlopeMin;
-static	float	rSlopeMax;
-static	float	gSlopeMax;
-static	float	bSlopeMax;
-static	FILE	*deepShadowFile;
-static	float	tsmThreshold;
+// A transient data structure to hold TSM data
+class	CTSMData {
+public:
+	float	origin[4];
+	float	lastZ;
+	float	rSlopeMin;
+	float	gSlopeMin;
+	float	bSlopeMin;
+	float	rSlopeMax;
+	float	gSlopeMax;
+	float	bSlopeMax;
+	FILE	*deepShadowFile;
+	float	tsmThreshold;
+};
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	outSample
@@ -615,24 +616,24 @@ static	float	tsmThreshold;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	12/26/2003
-inline	void	startSample(FILE *outFile,float threshold) {
-	deepShadowFile	=	outFile;
-	tsmThreshold	=	threshold;
+inline	void	startSample(FILE *outFile,float threshold,CTSMData &data) {
+	data.deepShadowFile		=	outFile;
+	data.tsmThreshold		=	threshold;
 
-	rSlopeMax		=	C_INFINITY;
-	gSlopeMax		=	C_INFINITY;
-	bSlopeMax		=	C_INFINITY;
-	rSlopeMin		=	-C_INFINITY;
-	gSlopeMin		=	-C_INFINITY;
-	bSlopeMin		=	-C_INFINITY;
+	data.rSlopeMax		=	C_INFINITY;
+	data.gSlopeMax		=	C_INFINITY;
+	data.bSlopeMax		=	C_INFINITY;
+	data.rSlopeMin		=	-C_INFINITY;
+	data.gSlopeMin		=	-C_INFINITY;
+	data.bSlopeMin		=	-C_INFINITY;
 
 	// Output the first sample (at z=-C_INFINITY)
-	origin[0]		=	-C_INFINITY;
-	origin[1]		=	1;
-	origin[2]		=	1;
-	origin[3]		=	1;
-	fwrite(origin,sizeof(float),4,deepShadowFile);
-	lastZ			=	-C_INFINITY;
+	data.origin[0]		=	-C_INFINITY;
+	data.origin[1]		=	1;
+	data.origin[2]		=	1;
+	data.origin[3]		=	1;
+	fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
+	data.lastZ			=	-C_INFINITY;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -641,98 +642,98 @@ inline	void	startSample(FILE *outFile,float threshold) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	12/26/2003
-inline	void	outSample(float cZ,const float *opacity) {
+inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 	// Always output the closest sample
-	if (origin[0] == -C_INFINITY) {
-		origin[0]	=	cZ;
-		origin[1]	=	opacity[0];
-		origin[2]	=	opacity[1];
-		origin[3]	=	opacity[2];
+	if (data.origin[0] == -C_INFINITY) {
+		data.origin[0]	=	cZ;
+		data.origin[1]	=	opacity[0];
+		data.origin[2]	=	opacity[1];
+		data.origin[3]	=	opacity[2];
 
-		fwrite(origin,sizeof(float),4,deepShadowFile);
-	} else if (cZ == origin[0]) {	// Do we have a step ?
-		const float	dr	=	absf(origin[1] - opacity[0]);							
-		const float	dg	=	absf(origin[2] - opacity[1]);
-		const float	db	=	absf(origin[3] - opacity[2]);
+		fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
+	} else if (cZ == data.origin[0]) {	// Do we have a step ?
+		const float	dr	=	absf(data.origin[1] - opacity[0]);							
+		const float	dg	=	absf(data.origin[2] - opacity[1]);
+		const float	db	=	absf(data.origin[3] - opacity[2]);
 
 		// Is the step small enough ?
-		if ((dr >= tsmThreshold) || (dg >= tsmThreshold) || (db >= tsmThreshold)) {
+		if ((dr >= data.tsmThreshold) || (dg >= data.tsmThreshold) || (db >= data.tsmThreshold)) {
 
 			// No, output the step
-			origin[1]	=	opacity[0];
-			origin[2]	=	opacity[1];
-			origin[3]	=	opacity[2];
-			fwrite(origin,sizeof(float),4,deepShadowFile);
+			data.origin[1]	=	opacity[0];
+			data.origin[2]	=	opacity[1];
+			data.origin[3]	=	opacity[2];
+			fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 		}
 	} else {
 		// Check for the window of validity
-		const float	denom		=	1 / (cZ - origin[0]);
-		float		crSlopeMax	=	(opacity[0] - origin[1] + tsmThreshold) * denom;
-		float		cgSlopeMax	=	(opacity[1] - origin[2] + tsmThreshold) * denom;
-		float		cbSlopeMax	=	(opacity[2] - origin[3] + tsmThreshold) * denom;
-		float		crSlopeMin	=	(opacity[0] - origin[1] - tsmThreshold) * denom;
-		float		cgSlopeMin	=	(opacity[1] - origin[2] - tsmThreshold) * denom;
-		float		cbSlopeMin	=	(opacity[2] - origin[3] - tsmThreshold) * denom;
+		const float	denom		=	1 / (cZ - data.origin[0]);
+		float		crSlopeMax	=	(opacity[0] - data.origin[1] + data.tsmThreshold) * denom;
+		float		cgSlopeMax	=	(opacity[1] - data.origin[2] + data.tsmThreshold) * denom;
+		float		cbSlopeMax	=	(opacity[2] - data.origin[3] + data.tsmThreshold) * denom;
+		float		crSlopeMin	=	(opacity[0] - data.origin[1] - data.tsmThreshold) * denom;
+		float		cgSlopeMin	=	(opacity[1] - data.origin[2] - data.tsmThreshold) * denom;
+		float		cbSlopeMin	=	(opacity[2] - data.origin[3] - data.tsmThreshold) * denom;
 
-		crSlopeMax				=	min(crSlopeMax,rSlopeMax);
-		cgSlopeMax				=	min(cgSlopeMax,gSlopeMax);
-		cbSlopeMax				=	min(cbSlopeMax,bSlopeMax);
+		crSlopeMax				=	min(crSlopeMax,data.rSlopeMax);
+		cgSlopeMax				=	min(cgSlopeMax,data.gSlopeMax);
+		cbSlopeMax				=	min(cbSlopeMax,data.bSlopeMax);
 
-		crSlopeMin				=	max(crSlopeMin,rSlopeMin);
-		cgSlopeMin				=	max(cgSlopeMin,gSlopeMin);
-		cbSlopeMin				=	max(cbSlopeMin,bSlopeMin);
+		crSlopeMin				=	max(crSlopeMin,data.rSlopeMin);
+		cgSlopeMin				=	max(cgSlopeMin,data.gSlopeMin);
+		cbSlopeMin				=	max(cbSlopeMin,data.bSlopeMin);
 
 		if ((crSlopeMin < crSlopeMax) && (cgSlopeMin < cgSlopeMax) && (cbSlopeMin < cbSlopeMax)) {			
 			// We're in range
-			rSlopeMax		=	crSlopeMax;
-			gSlopeMax		=	cgSlopeMax;
-			bSlopeMax		=	cbSlopeMax;
+			data.rSlopeMax		=	crSlopeMax;
+			data.gSlopeMax		=	cgSlopeMax;
+			data.bSlopeMax		=	cbSlopeMax;
 
-			rSlopeMin		=	crSlopeMin;
-			gSlopeMin		=	cgSlopeMin;
-			bSlopeMin		=	cbSlopeMin;
+			data.rSlopeMin		=	crSlopeMin;
+			data.gSlopeMin		=	cgSlopeMin;
+			data.bSlopeMin		=	cbSlopeMin;
 		} else {
-			origin[1]		+=	(rSlopeMin + rSlopeMax)*(lastZ - origin[0])*0.5f;
-			origin[2]		+=	(gSlopeMin + gSlopeMax)*(lastZ - origin[0])*0.5f;
-			origin[3]		+=	(bSlopeMin + bSlopeMax)*(lastZ - origin[0])*0.5f;
-			origin[0]		=	lastZ;
-			fwrite(origin,sizeof(float),4,deepShadowFile);
+			data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+			data.origin[2]		+=	(data.gSlopeMin + data.gSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+			data.origin[3]		+=	(data.bSlopeMin + data.bSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+			data.origin[0]		=	data.lastZ;
+			fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 
-			rSlopeMax		=	C_INFINITY;
-			gSlopeMax		=	C_INFINITY;
-			bSlopeMax		=	C_INFINITY;
-			rSlopeMin		=	-C_INFINITY;
-			gSlopeMin		=	-C_INFINITY;
-			bSlopeMin		=	-C_INFINITY;
+			data.rSlopeMax		=	C_INFINITY;
+			data.gSlopeMax		=	C_INFINITY;
+			data.bSlopeMax		=	C_INFINITY;
+			data.rSlopeMin		=	-C_INFINITY;
+			data.gSlopeMin		=	-C_INFINITY;
+			data.bSlopeMin		=	-C_INFINITY;
 
 			// Do we have a step ?
-			if (cZ == origin[0]) {
-				const float	dr	=	absf(origin[1] - opacity[0]);							
-				const float	dg	=	absf(origin[2] - opacity[1]);
-				const float	db	=	absf(origin[3] - opacity[2]);
+			if (cZ == data.origin[0]) {
+				const float	dr	=	absf(data.origin[1] - opacity[0]);							
+				const float	dg	=	absf(data.origin[2] - opacity[1]);
+				const float	db	=	absf(data.origin[3] - opacity[2]);
 
 				// Is the step small enough ?
-				if ((dr >= tsmThreshold) || (dg >= tsmThreshold) || (db >= tsmThreshold)) {
+				if ((dr >= data.tsmThreshold) || (dg >= data.tsmThreshold) || (db >= data.tsmThreshold)) {
 
 					// No, output the step
-					origin[1]	=	opacity[0];
-					origin[2]	=	opacity[1];
-					origin[3]	=	opacity[2];
-					fwrite(origin,sizeof(float),4,deepShadowFile);
+					data.origin[1]	=	opacity[0];
+					data.origin[2]	=	opacity[1];
+					data.origin[3]	=	opacity[2];
+					fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 				}
 			} else {
-				const float	denom		=	1 / (cZ - origin[0]);
-				rSlopeMax	=	(opacity[0] - origin[1] + tsmThreshold) * denom;
-				gSlopeMax	=	(opacity[1] - origin[2] + tsmThreshold) * denom;
-				bSlopeMax	=	(opacity[2] - origin[3] + tsmThreshold) * denom;
-				rSlopeMin	=	(opacity[0] - origin[1] - tsmThreshold) * denom;
-				gSlopeMin	=	(opacity[1] - origin[2] - tsmThreshold) * denom;
-				bSlopeMin	=	(opacity[2] - origin[3] - tsmThreshold) * denom;
+				const float	denom		=	1 / (cZ - data.origin[0]);
+				data.rSlopeMax	=	(opacity[0] - data.origin[1] + data.tsmThreshold) * denom;
+				data.gSlopeMax	=	(opacity[1] - data.origin[2] + data.tsmThreshold) * denom;
+				data.bSlopeMax	=	(opacity[2] - data.origin[3] + data.tsmThreshold) * denom;
+				data.rSlopeMin	=	(opacity[0] - data.origin[1] - data.tsmThreshold) * denom;
+				data.gSlopeMin	=	(opacity[1] - data.origin[2] - data.tsmThreshold) * denom;
+				data.bSlopeMin	=	(opacity[2] - data.origin[3] - data.tsmThreshold) * denom;
 			}
 		}
 	}
 
-	lastZ	=	cZ;
+	data.lastZ	=	cZ;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -741,23 +742,23 @@ inline	void	outSample(float cZ,const float *opacity) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	12/26/2003
-inline	void	finishSample(float cZ,const float *opacity) {
-	if (origin[0] < cZ) {
-		origin[1]		+=	(rSlopeMin + rSlopeMax)*(lastZ - origin[0])*0.5f;	
-		origin[2]		+=	(gSlopeMin + gSlopeMax)*(lastZ - origin[0])*0.5f;
-		origin[3]		+=	(bSlopeMin + bSlopeMax)*(lastZ - origin[0])*0.5f;
-		origin[0]		=	lastZ;
-		fwrite(origin,sizeof(float),4,deepShadowFile);
+inline	void	finishSample(float cZ,const float *opacity,CTSMData &data) {
+	if (data.origin[0] < cZ) {
+		data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;	
+		data.origin[2]		+=	(data.gSlopeMin + data.gSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+		data.origin[3]		+=	(data.bSlopeMin + data.bSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+		data.origin[0]		=	data.lastZ;
+		fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 	}
 
-	origin[0]		=	cZ;
-	origin[1]		=	opacity[0];
-	origin[2]		=	opacity[1];
-	origin[3]		=	opacity[2];
-	fwrite(origin,sizeof(float),4,deepShadowFile);
+	data.origin[0]		=	cZ;
+	data.origin[1]		=	opacity[0];
+	data.origin[2]		=	opacity[1];
+	data.origin[3]		=	opacity[2];
+	fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 
-	origin[0]		=	C_INFINITY;
-	fwrite(origin,sizeof(float),4,deepShadowFile);
+	data.origin[0]		=	C_INFINITY;
+	fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -768,13 +769,14 @@ inline	void	finishSample(float cZ,const float *opacity) {
 // Comments				:
 // Date last edited		:	3/1/2003
 void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weights) {
-	int		minSample		=	0;
-	int		i;
-	vector	opacity;
+	int			minSample		=	0;
+	int			i;
+	vector		opacity;
+	CTSMData	data;
 
 	initv(opacity,1,1,1);		// The current opacity
 
-	startSample(deepShadowFile,tsmThreshold);				// The beginning of a pixel
+	startSample(CRenderer::deepShadowFile,CRenderer::tsmThreshold,data);				// The beginning of a pixel
 
 	// Find the closest sample
 	for (i=1;i<numSamples;i++) {
@@ -791,7 +793,7 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 		float			*oldOpacity	=	weights + (minSample<<2);
 		vector			newOpacity;
 
-		outSample(cZ,opacity);
+		outSample(cZ,opacity,data);
 
 		newOpacity[0]				=	oldOpacity[1]*(1-cSample->opacity[0]);
 		newOpacity[1]				=	oldOpacity[2]*(1-cSample->opacity[1]);
@@ -837,10 +839,10 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 
 		// Decide whether we should stop or keep going
 		if (stop == 3) {
-			finishSample(cZ,opacity);
+			finishSample(cZ,opacity,data);
 			break;
 		} else {
-			outSample(cZ,opacity);
+			outSample(cZ,opacity,data);
 		}
 
 		for (minSample=0,i=1;i<numSamples;i++) {
@@ -875,7 +877,7 @@ void		CStochastic::deepShadowCompute() {
 
 	memBegin(threadMemory);
 	
-	prevFilePos		=	ftell(deepShadowFile);
+	prevFilePos		=	ftell(CRenderer::deepShadowFile);
 
 	// Allocate the memory for misc junk
 	samples			=	(CFragment **)	ralloc(totalHeight*totalWidth*sizeof(CFragment*),threadMemory);
@@ -937,13 +939,13 @@ void		CStochastic::deepShadowCompute() {
 				dummy[1]	=	1;
 				dummy[2]	=	1;
 				dummy[3]	=	1;
-				fwrite(dummy,sizeof(float),4,deepShadowFile);
+				fwrite(dummy,sizeof(float),4,CRenderer::deepShadowFile);
 
 				dummy[0]	=	C_INFINITY;
 				dummy[1]	=	1;
 				dummy[2]	=	1;
 				dummy[3]	=	1;
-				fwrite(dummy,sizeof(float),4,deepShadowFile);
+				fwrite(dummy,sizeof(float),4,CRenderer::deepShadowFile);
 			}
 		}
 	}

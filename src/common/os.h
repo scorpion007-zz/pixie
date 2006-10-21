@@ -47,6 +47,7 @@
 #define	pclose			_pclose
 #define	TThread			HANDLE
 #define	TMutex			CRITICAL_SECTION 
+#define	TSemaphore		HANDLE
 typedef void			*(*TFun)(void *);
 
 #else				// >>>>>>>>>>>>>>>>>>>   Unix
@@ -69,8 +70,8 @@ typedef void			*(*TFun)(void *);
 #define	INVALID_SOCKET	-1
 #define	TThread			pthread_t
 #define	TMutex			pthread_mutex_t
+#define TSemaphore		sem_t
 typedef void			*(*TFun)(void *);
-
 #endif
 
 // Some common headers
@@ -143,6 +144,8 @@ TThread			osCreateThread(TFun,void *);
 int				osWaitThread(TThread);
 void			osCreateMutex(TMutex &);
 void			osDeleteMutex(TMutex &);
+void			osCreateSemaphore(TMutex &,int);
+void			osDeleteSemaphore(TMutex &);
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osLock
@@ -172,6 +175,34 @@ inline	void	osUnlock(TMutex &mutex) {
 #endif
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osUp
+// Description			:	Increment a semaphore
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+inline	void	osUp(TSemaphore &sem) {
+#ifdef WIN32
+	ReleaseSemaphore(sem,1,NULL);
+#else
+	sem_post(&sem);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osDown
+// Description			:	Decrement a semaphore
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+inline	void	osDown(TSemaphore &sem) {
+#ifdef WIN32
+	WaitForSingleObject(sem,INFINITE);
+#else
+	sem_wait(&sem);
+#endif
+}
 
 
 // Misc. file extensions

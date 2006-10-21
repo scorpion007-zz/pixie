@@ -81,7 +81,10 @@ CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float 
 	this->minDepth	=	minDepth;
 	this->udiv		=	-1;
 	this->vdiv		=	-1;
+
+	osLock(CRenderer::refCountMutex);
 	this->object->attach();
+	osUnlock(CRenderer::refCountMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -96,7 +99,9 @@ CPatch::~CPatch() {
 	stats.gprimMemory	-=	sizeof(CPatch);
 	stats.numSurfaces--;
 
+	osLock(CRenderer::refCountMutex);
 	object->detach();
+	osUnlock(CRenderer::refCountMutex);
 }
 
 
@@ -375,6 +380,8 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 
 	stats.numSplits++;
 
+	osLock(CRenderer::refCountMutex);
+
 	switch(dir) {
 	case 0:
 		if (umax <= umin)	break;
@@ -416,6 +423,8 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		stats.numUVsplits++;
 		break;
 	}
+
+	osUnlock(CRenderer::refCountMutex);
 }
 
 
@@ -724,7 +733,9 @@ CSurfaceGrid::CSurfaceGrid(CAttributes *a,CXform *x,CSurface *s,float umin,float
 	this->vmax		=	vmax;
 	this->object	=	s;
 
+	osLock(CRenderer::refCountMutex);
 	object->attach();
+	osUnlock(CRenderer::refCountMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -735,7 +746,10 @@ CSurfaceGrid::CSurfaceGrid(CAttributes *a,CXform *x,CSurface *s,float umin,float
 // Comments				:
 // Date last edited		:	2/9/2005
 CSurfaceGrid::~CSurfaceGrid() {
+
+	osLock(CRenderer::refCountMutex);
 	object->detach();
+	osUnlock(CRenderer::refCountMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////

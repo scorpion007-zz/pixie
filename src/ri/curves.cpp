@@ -42,9 +42,6 @@ static	matrix	invBezier	=	{	0,	0,				0,				1,
 									0,	1/(float) 3,	2/(float) 3,	1,
 									1,	1,				1,				1};
 
-// Temp variable
-static	matrix	geometryMatrix;
-
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeCubicBound
@@ -52,7 +49,7 @@ static	matrix	geometryMatrix;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/25/2004
-static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3) {
+static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3,const float *geometryMatrix) {
 	htpoint	tmp,tmp2;
 	vector	vtmp0,vtmp1,vtmp2,vtmp3;
 
@@ -389,13 +386,14 @@ void			CCubicCurve::bound(float *bmin,float *bmax) const {
 	const float			*v1			=	v0 + vs;
 	const float			*v2			=	v1 + vs;
 	const float			*v3			=	v2 + vs;
+	matrix				geometryMatrix;
 
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	mulmm(geometryMatrix,attributes->vBasis,invBezier);
 
-	makeCubicBound(bmin,bmax,v0,v1,v2,v3);
+	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
 	
 	if (variables->moving) {
 		v0	+=	vertexSize;
@@ -403,7 +401,7 @@ void			CCubicCurve::bound(float *bmin,float *bmax) const {
 		v2	+=	vertexSize;
 		v3	+=	vertexSize;
 
-		makeCubicBound(bmin,bmax,v0,v1,v2,v3);
+		makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
 	}
 
 	subvf(bmin,base->maxSize);
@@ -668,6 +666,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 	} else {
 		int				k			=	0;
 		int				cVertex		=	0;
+		matrix			geometryMatrix;
 
 		mulmm(geometryMatrix,attributes->vBasis,invBezier);
 
@@ -681,7 +680,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 				float	*v2		=	pl->data0 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 				float	*v3		=	pl->data0 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-				makeCubicBound(bmin,bmax,v0,v1,v2,v3);
+				makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
 
 				if (pl->data1 != NULL) {
 					v0			=	pl->data1 + (cVertex+(j*attributes->vStep + 0) % nverts[i])*3;
@@ -689,7 +688,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 					v2			=	pl->data1 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 					v3			=	pl->data1 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-					makeCubicBound(bmin,bmax,v0,v1,v2,v3);
+					makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
 				}
 			}
 

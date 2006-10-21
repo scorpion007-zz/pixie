@@ -36,7 +36,6 @@
 #include "occlusion.h"
 #include "random.h"
 
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Description			:	This is the stochastic hider (a scanline renderer)
@@ -88,7 +87,6 @@ private:
 		COcclusionNode	*node;					// The occlusion sample
 	};
 
-
 	void		filterSamples(int,CFragment **,float *);
 	void		deepShadowCompute();
 
@@ -96,6 +94,7 @@ private:
 	CPixel		**fb;
 
 	CFragment	*freeFragments;
+	int			numFragments;
 	float		*extraSampleMemory;
 	
 	int			width,height;

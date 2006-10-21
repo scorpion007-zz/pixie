@@ -70,19 +70,27 @@ public:
 
 
 
-static	CAttributes			*meshAttributes;		// Mesh attributes
-static	CXform				*meshXform;				// Mesh xform
-static	CPl					*meshPl;				// Parameter list
-static	CArray<CObject *>	*meshChildren;			// List of children
-static	const float			*meshP;					// The vertex positions
-static	CPlParameter		*meshNormal;			// The normal parameter
-static	const float			*meshNormalData0;		// The normal data
-static	const float			*meshNormalData1;
-static	int					meshTriangleType;		// The triangle type
-static	int					meshUniformNumber;		// The current uniform number
-static	int					meshFacevaryingNumber;	// The current facevarying number
-static	CPolygonMesh		*mesh;					// The mesh we're allocating the triangle for
-static	CShadingContext		*meshContext;			// The shading context
+///////////////////////////////////////////////////////////////////////
+// Class				:	CMeshData
+// Description			:	This class holds transient data about the polygon mesh used during triangulation
+// Comments				:
+// Date last edited		:	1/20/2002
+class	CMeshData {
+public:
+	CAttributes			*meshAttributes;		// Mesh attributes
+	CXform				*meshXform;				// Mesh xform
+	CPl					*meshPl;				// Parameter list
+	CArray<CObject *>	*meshChildren;			// List of children
+	const float			*meshP;					// The vertex positions
+	CPlParameter		*meshNormal;			// The normal parameter
+	const float			*meshNormalData0;		// The normal data at shutter open
+	const float			*meshNormalData1;		// The normal data at shutter close
+	int					meshTriangleType;		// The triangle type
+	int					meshUniformNumber;		// The current uniform number
+	int					meshFacevaryingNumber;	// The current facevarying number
+	CPolygonMesh		*mesh;					// The mesh we're allocating the triangle for
+	CShadingContext		*meshContext;			// The shading context
+};
 
 
 
@@ -698,9 +706,9 @@ static	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/29/2003
-inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const int vi2) {
+inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const int vi2,CMeshData &data) {
 	CPolygonTriangle	*cTriangle;
-	const float			*P				=	meshP;
+	const float			*P				=	data.meshP;
 	const float			*vs0			=	P+vindices[vi0]*3;
 	const float			*vs1			=	P+vindices[vi1]*3;
 	const float			*vs2			=	P+vindices[vi2]*3;
@@ -715,32 +723,32 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 	}
 
 	// Create the triangle
-	cTriangle				=	new CPolygonTriangle(meshAttributes,meshXform,mesh);
+	cTriangle				=	new CPolygonTriangle(data.meshAttributes,data.meshXform,data.mesh);
 
 	// Set the variables
 	cTriangle->v0			=	vindices[vi0];
 	cTriangle->v1			=	vindices[vi1];
 	cTriangle->v2			=	vindices[vi2];
-	cTriangle->fv0			=	meshFacevaryingNumber+vi0;
-	cTriangle->fv1			=	meshFacevaryingNumber+vi1;
-	cTriangle->fv2			=	meshFacevaryingNumber+vi2;
-	cTriangle->uniform		=	meshUniformNumber;
+	cTriangle->fv0			=	data.meshFacevaryingNumber+vi0;
+	cTriangle->fv1			=	data.meshFacevaryingNumber+vi1;
+	cTriangle->fv2			=	data.meshFacevaryingNumber+vi2;
+	cTriangle->uniform		=	data.meshUniformNumber;
 
 	// Add the children into the pool
-	meshChildren->push(cTriangle);
+	data.meshChildren->push(cTriangle);
 
 	// Do we need to create a tracable object for this triangle ?
-	if (meshContext != NULL) {
+	if (data.meshContext != NULL) {
 
 		// Do we have displacements ?
-		if ((meshAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) && (meshAttributes->displacement != NULL)) {
+		if ((data.meshAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) && (data.meshAttributes->displacement != NULL)) {
 			// Yes, tesselate the triangle
-			meshContext->tesselate2D(cTriangle);
+			data.meshContext->tesselate2D(cTriangle);
 		} else {
 			// No, create raytracing triangles
 			CMemStack	*memory	=	CRenderer::frameMemory;
 
-			if (meshPl->data1 == NULL) {
+			if (data.meshPl->data1 == NULL) {
 				CVertex		*v0	=	(CVertex *)		memory->alloc(3*sizeof(CVertex) + sizeof(CPtriangle));
 				CVertex		*v1	=	v0+1;
 				CVertex		*v2	=	v1+1;
@@ -763,7 +771,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 
 
 				// Create the vertices
-				switch(meshTriangleType) {
+				switch(data.meshTriangleType) {
 				case 0:
 					// Flat triangle
 					movvv(v0->N,t->N);
@@ -772,15 +780,15 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 					break;
 				case 1:
 					// Smooth triangle
-					movvv(v0->N,meshNormalData0+vindices[vi0]*3);
-					movvv(v1->N,meshNormalData0+vindices[vi1]*3);
-					movvv(v2->N,meshNormalData0+vindices[vi2]*3);
+					movvv(v0->N,data.meshNormalData0+vindices[vi0]*3);
+					movvv(v1->N,data.meshNormalData0+vindices[vi1]*3);
+					movvv(v2->N,data.meshNormalData0+vindices[vi2]*3);
 					break;
 				case 2:
 					// Smooth facevarying triangle
-					movvv(v0->N,meshNormalData0+(meshFacevaryingNumber+vi0)*3);
-					movvv(v1->N,meshNormalData0+(meshFacevaryingNumber+vi1)*3);
-					movvv(v2->N,meshNormalData0+(meshFacevaryingNumber+vi2)*3);
+					movvv(v0->N,data.meshNormalData0+(data.meshFacevaryingNumber+vi0)*3);
+					movvv(v1->N,data.meshNormalData0+(data.meshFacevaryingNumber+vi1)*3);
+					movvv(v2->N,data.meshNormalData0+(data.meshFacevaryingNumber+vi2)*3);
 					break;
 				}
 
@@ -793,7 +801,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 				CMovingVertex		*v1		=	v0+1;
 				CMovingVertex		*v2		=	v1+1;
 				CPmovingTriangle	*t		=	(CPmovingTriangle *)	(v2 + 1);
-				const float			*P1		=	meshPl->data1;
+				const float			*P1		=	data.meshPl->data1;
 				const float			*ve0	=	P1+vindices[vi0]*3;
 				const float			*ve1	=	P1+vindices[vi1]*3;
 				const float			*ve2	=	P1+vindices[vi2]*3;
@@ -816,7 +824,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 
 
 				// Create the vertices
-				switch(meshTriangleType) {
+				switch(data.meshTriangleType) {
 				case 0:
 					// Flat triangle
 					movvv(v0->N[0],t->N[0]);
@@ -828,21 +836,21 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 					break;
 				case 1:
 					// Smooth triangle
-					movvv(v0->N[0],meshNormalData0+vindices[vi0]*3);
-					movvv(v1->N[0],meshNormalData0+vindices[vi1]*3);
-					movvv(v2->N[0],meshNormalData0+vindices[vi2]*3);
-					movvv(v0->N[1],meshNormalData1+vindices[vi0]*3);
-					movvv(v1->N[1],meshNormalData1+vindices[vi1]*3);
-					movvv(v2->N[1],meshNormalData1+vindices[vi2]*3);
+					movvv(v0->N[0],data.meshNormalData0+vindices[vi0]*3);
+					movvv(v1->N[0],data.meshNormalData0+vindices[vi1]*3);
+					movvv(v2->N[0],data.meshNormalData0+vindices[vi2]*3);
+					movvv(v0->N[1],data.meshNormalData1+vindices[vi0]*3);
+					movvv(v1->N[1],data.meshNormalData1+vindices[vi1]*3);
+					movvv(v2->N[1],data.meshNormalData1+vindices[vi2]*3);
 					break;
 				case 2:
 					// Smooth facevarying triangle
-					movvv(v0->N[0],meshNormalData0+(meshFacevaryingNumber+vi0)*3);
-					movvv(v1->N[0],meshNormalData0+(meshFacevaryingNumber+vi1)*3);
-					movvv(v2->N[0],meshNormalData0+(meshFacevaryingNumber+vi2)*3);
-					movvv(v0->N[1],meshNormalData1+(meshFacevaryingNumber+vi0)*3);
-					movvv(v1->N[1],meshNormalData1+(meshFacevaryingNumber+vi1)*3);
-					movvv(v2->N[1],meshNormalData1+(meshFacevaryingNumber+vi2)*3);
+					movvv(v0->N[0],data.meshNormalData0+(data.meshFacevaryingNumber+vi0)*3);
+					movvv(v1->N[0],data.meshNormalData0+(data.meshFacevaryingNumber+vi1)*3);
+					movvv(v2->N[0],data.meshNormalData0+(data.meshFacevaryingNumber+vi2)*3);
+					movvv(v0->N[1],data.meshNormalData1+(data.meshFacevaryingNumber+vi0)*3);
+					movvv(v1->N[1],data.meshNormalData1+(data.meshFacevaryingNumber+vi1)*3);
+					movvv(v2->N[1],data.meshNormalData1+(data.meshFacevaryingNumber+vi2)*3);
 					break;
 				}
 
@@ -954,7 +962,7 @@ static	inline	int			orientationCheck(CTriVertex *loop,int cw) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/29/2003
-inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices) {
+inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &data) {
 	int			i,j,k;
 	int			numVertices;
 	CTriVertex	**loops;
@@ -985,7 +993,7 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices) {
 	for (numVertices=0,i=0;i<nloops;numVertices+=nverts[i],i++);
 
 	// Compute the polygon normal
-	for (P=meshP,i=0;i<nverts[0];i++) {
+	for (P=data.meshP,i=0;i<nverts[0];i++) {
 		const int	vi0		=	vindices[i];
 		const int	vi1		=	vindices[(i+1) % nverts[0]];
 		const int	vi2		=	vindices[(i+2) % nverts[0]];
@@ -1025,8 +1033,8 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices) {
 
 	// Check if we have a degenerate polygon
 	if (i == nverts[0]) {
-		meshUniformNumber++;
-		meshFacevaryingNumber	+=	numVertices;
+		data.meshUniformNumber++;
+		data.meshFacevaryingNumber	+=	numVertices;
 
 		return;
 	}
@@ -1077,12 +1085,12 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices) {
 		const int	vi2	=	(pVertex->xy - xy) >> 1;
 
 		if (reverse == FALSE) {
-			createTriangle(vindices,vi0,vi1,vi2);
+			createTriangle(vindices,vi0,vi1,vi2,data);
 		} else {
-			createTriangle(vindices,vi0,vi2,vi1);
+			createTriangle(vindices,vi0,vi2,vi1,data);
 		}
-		meshUniformNumber++;
-		meshFacevaryingNumber	+=	3;
+		data.meshUniformNumber++;
+		data.meshFacevaryingNumber	+=	3;
 
 		return;
 	}
@@ -1181,9 +1189,9 @@ nextLoop:;
 						const int	vi2	=	(pVertex->xy - xy) >> 1;
 
 						if (reverse == FALSE) {
-							createTriangle(vindices,vi0,vi1,vi2);
+							createTriangle(vindices,vi0,vi1,vi2,data);
 						} else {
-							createTriangle(vindices,vi0,vi2,vi1);
+							createTriangle(vindices,vi0,vi2,vi1,data);
 						}
 
 						if (sVertex == cVertex)	sVertex	=	nVertex;
@@ -1207,8 +1215,8 @@ nextLoop:;
 	}
 
 	// Update the data
-	meshUniformNumber++;
-	meshFacevaryingNumber	+=	numVertices;
+	data.meshUniformNumber++;
+	data.meshFacevaryingNumber	+=	numVertices;
 }
 
 
@@ -1281,24 +1289,25 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 	parameters				=	pl->parameterUsage();
 
 	// Fill in the data structure
-	meshAttributes			=	attributes;
-	meshXform				=	xform;
-	meshPl					=	pl;
-	meshChildren			=	children;
-	meshP					=	pl->data0;
-	meshNormal				=	normal;
-	meshNormalData0			=	normalData0;
-	meshNormalData1			=	normalData1;
-	meshTriangleType		=	triangleType;
-	meshUniformNumber		=	0;
-	meshFacevaryingNumber	=	0;
-	mesh					=	this;
-	meshContext				=	context;
+	CMeshData	data;
+	data.meshAttributes			=	attributes;
+	data.meshXform				=	xform;
+	data.meshPl					=	pl;
+	data.meshChildren			=	children;
+	data.meshP					=	pl->data0;
+	data.meshNormal				=	normal;
+	data.meshNormalData0		=	normalData0;
+	data.meshNormalData1		=	normalData1;
+	data.meshTriangleType		=	triangleType;
+	data.meshUniformNumber		=	0;
+	data.meshFacevaryingNumber	=	0;
+	data.mesh					=	this;
+	data.meshContext			=	context;
 
 	// Triangulate the individual polygons
 	for (cnholes=nholes,cvertices=vertices,cnvertices=nvertices,i=0;i<npoly;i++) {
 		// Triangulate the current polygon
-		triangulatePolygon(cnholes[0],cnvertices,cvertices);
+		triangulatePolygon(cnholes[0],cnvertices,cvertices,data);
 
 		// Advance the holes
 		for (j=0;j<cnholes[0];j++) {

@@ -39,8 +39,6 @@ void			(*CRenderer::dispatchJob)(int thread,CJob &job)	=	NULL;
 
 
 
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	dispatchReyes
@@ -156,16 +154,6 @@ int				CRenderer::advanceBucket(int index,int &x,int &y) {
 
 // Find the server index assigned to this job
 #define	bucket(__x,__y)		jobAssignment[__y*xBuckets + __x]
-
-	if (jobAssignment == FALSE) {
-		int	i;
-
-		jobAssignment	=	(int *) frameMemory->alloc(xBuckets*yBuckets*sizeof(int));
-
-		// Create the job assignment
-		for (i=0;i<xBuckets*yBuckets;i++)	jobAssignment[i]	=	-1;
-
-	}
 
 	// Are we just starting ?
 	if ((x == -1) || (y == -1)) {

@@ -584,14 +584,7 @@ void	osCreateMutex(TMutex &mutex) {
 #ifdef WIN32
 	InitializeCriticalSection(&mutex);
 #else
-//	pthread_mutexattr_t attr;				// we wish attrs to be reentrant?
-//	pthread_mutexattr_init(&attr);
-//	pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
-//	pthread_mutex_init(&mutex,/*NULL*/&attr);
-//	pthread_mutexattr_destroy(&attr);
-	
 	pthread_mutex_init(&mutex,NULL);
-
 #endif
 }
 
@@ -608,5 +601,34 @@ void	osDeleteMutex(TMutex &mutex) {
 	pthread_mutex_destroy(&mutex);
 #endif
 }
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osCreateSemaphore
+// Description			:	Create a semaphere
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+void	osCreateSemaphore(TSemaphore &sem,int count) {
+#ifdef WIN32
+	sem	=	CreateSemaphore(NULL,0,count,NULL);
+#else
+	sem_init(&sem,PTHREAD_PROCESS_PRIVATE,count);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osDeleteMutex
+// Description			:	Delete a mutex
+// Return Value			:
+// Comments				:
+// Date last edited		:	11/28/2001
+void	osDeleteSemaphore(TSemaphore &sem) {
+#ifdef WIN32
+	CloseHandle(sem);
+#else
+	sem_destroy(&sem);
+#endif
+}
+
 
 

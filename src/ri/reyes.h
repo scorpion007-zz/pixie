@@ -182,7 +182,7 @@ protected:
 										allItems[i]				=	lItem;
 									}
 
-									if (cItem != NULL) osUnlock(mutex); // leave mutex locked on exit
+									if (cItem != NULL) osUnlock(mutex);
 
 									return cItem;
 								}

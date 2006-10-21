@@ -596,12 +596,17 @@ CBicubicPatch::~CBicubicPatch() {
 // Date last edited		:	6/21/2001
 void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,int disp) {
 	int					k,l;
-	const float			*vb			=	attributes->uBasis;
-	const float			*ub			=	attributes->vBasis;
 	const int			vertexSize	=	variables->vertexSize;
 	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
-	double				data[16];
-	matrix				ut;
+	dmatrix				data;
+	dmatrix				ut;
+	dmatrix				ub,vb;
+
+	// Promote the basis matrices to double
+	for (k=0;k<16;k++) {
+		ub[k]	=	attributes->uBasis[k];
+		vb[k]	=	attributes->vBasis[k];
+	}
 
 	transposem(ut,ub);
 
@@ -614,8 +619,8 @@ void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,in
 			for (x=0;x<4;x++)
 				data[element(y,x)]	=	vertexData[(y*4+x)*vs+k+disp];
 
-		mulmmd(tmp2,ut,data);
-		mulmmd(tmp,tmp2,vb);
+		mulmm(tmp2,ut,data);
+		mulmm(tmp,tmp2,vb);
 
 		for (l=0;l<16;l++)
 			vertex[16*k+l]	=	tmp[l];
@@ -626,24 +631,24 @@ void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,in
 		double	tmp1[16],tmp2[16];
 		double	*cVertex	=	vertex;
 
-		mulmmd(tmp1,invBezier,cVertex);
-		mulmmd(tmp2,tmp1,invBezier);
+		mulmm(tmp1,invBezier,cVertex);
+		mulmm(tmp2,tmp1,invBezier);
 		for (k=0;k<16;k++) {
 			if (tmp2[k] < bmin[COMP_X])	bmin[COMP_X]	=	(float) tmp2[k];
 			if (tmp2[k] > bmax[COMP_X])	bmax[COMP_X]	=	(float) tmp2[k];
 		}
 
 		cVertex	+=	16;
-		mulmmd(tmp1,invBezier,cVertex);
-		mulmmd(tmp2,tmp1,invBezier);
+		mulmm(tmp1,invBezier,cVertex);
+		mulmm(tmp2,tmp1,invBezier);
 		for (k=0;k<16;k++) {
 			if (tmp2[k] < bmin[COMP_Y])	bmin[COMP_Y]	=	(float) tmp2[k];
 			if (tmp2[k] > bmax[COMP_Y])	bmax[COMP_Y]	=	(float) tmp2[k];
 		}
 
 		cVertex	+=	16;
-		mulmmd(tmp1,invBezier,cVertex);
-		mulmmd(tmp2,tmp1,invBezier);
+		mulmm(tmp1,invBezier,cVertex);
+		mulmm(tmp2,tmp1,invBezier);
 		for (k=0;k<16;k++) {
 			if (tmp2[k] < bmin[COMP_Z])	bmin[COMP_Z]	=	(float) tmp2[k];
 			if (tmp2[k] > bmax[COMP_Z])	bmax[COMP_Z]	=	(float) tmp2[k];
@@ -1394,7 +1399,9 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		const int		us		=	attributes->uStep;
 		const int		vs		=	attributes->vStep;
 		double			xg[16],yg[16],zg[16];
-		matrix			ut;
+		matrix			ub;
+		dmatrix			ut,vb;
+		dmatrix			geometryU,geometryV;
 
 		assert(degree == 3);
 
@@ -1408,9 +1415,16 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		vMult					=	1 / (float) vpatches;
 
 		// Note that u basis and v basis are swapped to take the transpose into account done during the precomputation
-		transposem(ut,attributes->uBasis);
-		mulmmd(geometryV,invBezier,ut);
-		mulmmd(geometryU,attributes->vBasis,invBezier);
+		transposem(ub,attributes->uBasis);
+
+		// Promote the precision
+		for (i=0;i<16;i++)	{
+			ut[i]	=	ub[i];
+			vb[i]	=	attributes->vBasis[i];
+		}
+
+		mulmm(geometryV,invBezier,ut);
+		mulmm(geometryU,vb,invBezier);
 
 		for (i=0;i<vpatches;i++) {
 			for (j=0;j<upatches;j++) {
