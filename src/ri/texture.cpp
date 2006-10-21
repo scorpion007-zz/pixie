@@ -458,6 +458,12 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 	void			*data	=	NULL;
 	TIFF			*in;
 
+	osLock(CRenderer::textureMutex);
+	if (entry->data != NULL) {
+		osUnlock(CRenderer::textureMutex);
+		return;
+	}
+
 	// Update the state
 	stats.numTextureMisses++;
 
@@ -565,6 +571,8 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 	}
 
 	entry->data	=	data;
+
+	osUnlock(CRenderer::textureMutex);
 }
 
 //////////////////////////////////////////////////////////////////////

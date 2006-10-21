@@ -60,6 +60,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			job.type				=	CJob::BUCKET;
 			job.xBucket				=	netBuffer[1].integer;
 			job.yBucket				=	netBuffer[2].integer;
+
 			return;
 		} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
 			// We have finished the frame, so terminate
@@ -90,20 +91,52 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 	if (hiderFlags & (HIDER_DONE | HIDER_BREAK)) {
 		job.type	=	CJob::TERMINATE;
 	} else {
+		int	x,y;
 
-		// Otherwise, dispatch a bucket
-		job.type	=	CJob::BUCKET;
-		job.xBucket	=	currentXBucket;
-		job.yBucket	=	currentYBucket;
+		// Find the bucket for this thread to render
+		x	=	contexts[thread]->currentXBucket;
+		y	=	contexts[thread]->currentYBucket;
+		while(TRUE) {
 
-		// Advance the bucket
-		CRenderer::currentXBucket++;
-		if (CRenderer::currentXBucket == CRenderer::xBuckets) {		
-			CRenderer::currentXBucket	=	0;
-			CRenderer::currentYBucket++;
+			// Has this bucket been assigned to soneone ?
+			if (jobAssignment[y*xBuckets+x]	== -1) {
+				int	i;
+
+				// Nop, allocate the next stride of buckets to this thread
+				for (i=0;i<threadStride;i++) {
+					if ((y*xBuckets+x+i) < (xBuckets*yBuckets))	jobAssignment[y*xBuckets+x+i] = thread;
+				}
+
+				break;
+
+			// Has it been assigned to me?
+			} else if (jobAssignment[y*xBuckets+x]	== thread) {
+				break;
+
+			// OK, it has been assigned to someone else ... Skip this bucket
+			} else {
+				x++;
+				if (x == xBuckets) {
+					x = 0;
+					y++;
+					if (y == yBuckets) break;
+				}
+			}
 		}
 
-		if ((CRenderer::currentXBucket == 0) && (CRenderer::currentYBucket == CRenderer::yBuckets)) {
+
+		// Did we find the bucket ?
+		if (y < yBuckets) {
+			job.type	=	CJob::BUCKET;
+			job.xBucket	=	x;
+			job.yBucket	=	y;
+		} else {
+			job.type	=	CJob::TERMINATE;
+			numActiveThreads--;
+		}
+
+		// Did we finish the scene ?
+		if (numActiveThreads == 0) {
 			CRenderer::hiderFlags |=	HIDER_DONE | HIDER_BREAK;
 		}
 	}

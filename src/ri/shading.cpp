@@ -374,6 +374,10 @@ CShadingContext::CShadingContext(int t) {
 	// Initialize the thread memory stack
 	memoryInit(threadMemory);
 
+	// Init the bucket we're rendering
+	currentXBucket			=	0;
+	currentYBucket			=	0;
+
 	// Init the conditionals
 	conditionals			=	NULL;
 	currentRayDepth			=	0;

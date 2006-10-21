@@ -153,6 +153,8 @@ public:
 		static	TMutex												commitMutex;				// The mutex that controls job dispatch
 		static	TMutex												networkMutex;				// To serialize the network communication
 		static	TMutex												hierarchyMutex;				// To serialize the raytracing hierarchy
+		static	TMutex												textureMutex;				// To serialize texture fetches
+		static	TMutex												fileMutex;					// To serialize file loading
 		static	TMutex												refCountMutex;				// To serialize the object attach()/detach()
 
 
@@ -350,6 +352,7 @@ public:
 		static	int						maxPhotonDepth;									// The maximum number of photon bounces
 		static	int						bucketWidth,bucketHeight;						// Bucket dimentions in samples
 		static	int						netXBuckets,netYBuckets;						// The meta bucket size
+		static	int						threadStride;									// The number of buckets per thread at a time
 		static	int						maxEyeSplits;									// Maximum number of eye splits
 		static	int						maxHierarchyDepth;								// The maximum depth of the hierarchy
 		static	int						maxHierarchyLeafObjects;						// The maximum number of objects for a leaf
@@ -366,6 +369,7 @@ public:
 		static	CMemStack									*frameMemory;			// Where the frame memory is allocated from
 		static	CArray<const char*>							*frameTemporaryFiles;	// This hold the name of temporary files
 		static	CShadingContext								**contexts;				// The array of shading contexts
+		static	int											numActiveThreads;		// The number of threads currently active
 		static	CDictionary<const char *,CRemoteChannel *>	*declaredRemoteChannels;// Known remote channel lookup
 		static	CArray<CRemoteChannel *>					*remoteChannels;		// all known channels
 		static	CArray<CProgrammableShaderInstance *>		*dirtyInstances;

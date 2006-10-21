@@ -231,6 +231,8 @@ public:
 	
 		CMemPage				*threadMemory;											// Memory from which we allocate the temp thread stuff
 
+		int						currentXBucket,currentYBucket;							// The current bucket we're processing in this thread
+
 		// Thread safe random number generator for integers
 		inline	unsigned long	irand() {
 									register unsigned long y;

@@ -299,16 +299,6 @@ class	CHierarchy {
 	};
 
 
-	///////////////////////////////////////////////////////////////////////
-	// Class				:	CHSingleStack
-	// Description			:	Stack entry
-	// Comments				:
-	// Date last edited		:	12/23/2001
-	class	CHStack {
-	public:
-		void					*node;
-		float					tmin,tmax;
-	};
 
 public:
 						CHierarchy(int,CTracable **,const float *,const float *);
@@ -330,7 +320,6 @@ private:
 	vector				bmin,bmax;					// The bound of all the objects in the tree
 	int					maxObjects;					// Maximum number of objects per leaf
 	int					maxDepth;					// Maximum leaf depth
-	CHStack				*singleStack;				// Traversal stack
 	int					currentRayID;				// The global ray counter used for mailboxing
 };
 

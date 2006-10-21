@@ -758,6 +758,37 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CHStack
+// Description			:	Stack entry
+// Comments				:	A misc class to hold in the stack
+// Date last edited		:	12/23/2001
+class	CHStack {
+public:
+	void					*node;
+	float					tmin,tmax;
+};
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Function				:	hierarchyDelete
 // Description			:	Delete a hierarchy node and all children
@@ -767,7 +798,7 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 void		CHierarchy::deleteNode(void *cNode) {
 	CHInternal			*cInternal;
 	CHUncomputed		*cUncomputed;
-	CHStack				*hierarchyStack		=	singleStack;
+	CHStack				*hierarchyStack		=	(CHStack *) alloca(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
 	CHStack				*hierarchyStackTop	=	hierarchyStack;
 
 	hierarchyStackTop->node	=	cNode;
@@ -1017,7 +1048,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 // Function				:	hierarchyIntersect
 // Description			:	Intersection computation
 // Return Value			:
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	12/23/2001
 void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 	int							i;
@@ -1032,7 +1063,7 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 	const float					*from				=	ray->from;
 	const float					*to					=	ray->to;
 	const float					*invDir				=	ray->invDir;
-	CHStack						*hierarchyStack		=	singleStack;
+	CHStack						*hierarchyStack		=	(CHStack *) alloca(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
 	CHStack						*hierarchyStackTop	=	hierarchyStack;
 
 	hierarchyStackTop->node		=	r;
@@ -1055,7 +1086,6 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 				}
 
 				items[i]->ID = ray->ID;
-
 				items[i]->intersect(ray);
 			}
 
@@ -1167,18 +1197,36 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			}
 			break;
 		case HIERARCHY_UNCOMPUTED_NODE:
+
+			// We hit an uncomputed node
 			cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
 			cInternal		=	cUncomputed->parent;
-			nNode			=	compute(cUncomputed);
 
-			if (cInternal == NULL) {
-				root	=	nNode;
+			// Make sure this action is atomic
+			osLock(CRenderer::hierarchyMutex);
+
+			// Is this the first time we're locking ?
+			if ((cInternal == NULL) || (cInternal->front == hierarchyStackTop->node) || (cInternal->back == hierarchyStackTop->node)) {
+				nNode			=	compute(cUncomputed);
+
+				if (cInternal == NULL) {
+					root	=	nNode;
+				} else {
+					if (cInternal->front == hierarchyStackTop->node)
+						cInternal->front	=	nNode;
+					if (cInternal->back == hierarchyStackTop->node)
+						cInternal->back		=	nNode;
+				}
 			} else {
-				if (cInternal->front == hierarchyStackTop->node)
-					cInternal->front	=	nNode;
-				if (cInternal->back == hierarchyStackTop->node)
-					cInternal->back		=	nNode;
+				// A parallel thread took care of it ... re-trace the ray
+				intersect(r,ray,tmin,tmax);
+
+				// Don't forget to unlock before we return
+				osUnlock(CRenderer::hierarchyMutex);
+				return;
 			}
+
+			osUnlock(CRenderer::hierarchyMutex);
 
 			hierarchyStackTop->node	=	nNode;
 			hierarchyStackTop++;
@@ -1197,7 +1245,7 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 // Function				:	collect
 // Description			:	Find the items near a point
 // Return Value			:
-// Comments				:
+// Comments				:	Thread safe
 // Date last edited		:	12/23/2001
 int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 	int							i;
@@ -1208,7 +1256,7 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 	void						*nNode;
 	unsigned int				splitAxis;
 	float						splitCoordinate;
-	CHStack						*hierarchyStack		=	singleStack;
+	CHStack						*hierarchyStack		=	(CHStack *) alloca(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);;
 	CHStack						*hierarchyStackTop	=	hierarchyStack;
 	int							numCollected		=	0;
 
@@ -1231,7 +1279,7 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 					continue;
 				}
 
-				items[i]->ID	= currentRayID;
+				items[i]->ID	=	currentRayID;
 				*n++			=	items[i];
 				numCollected++;
 
@@ -1299,11 +1347,11 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 // Comments				:
 // Date last edited		:	12/23/2001
 void		CHierarchy::add(void *node,CHInternal *parent,int depth,int numItems,CTracable **items,float *bmin,float *bmax) {
-	int							i,j;
-	CHLeaf						*cLeaf;
-	CHInternal					*cInternal;
-	CHUncomputed				*cUncomputed;
-	void						*newNode;
+	int				i,j;
+	CHLeaf			*cLeaf;
+	CHInternal		*cInternal;
+	CHUncomputed	*cUncomputed;
+	void			*newNode;
 
 	switch(getData(node)) {
 	case HIERARCHY_LEAF_NODE:
@@ -1536,7 +1584,6 @@ CHierarchy::CHierarchy(int numItems,CTracable **items,const float *tmin,const fl
 	root				=	(void *) getToken(hroot,HIERARCHY_UNCOMPUTED_NODE);
 	
 	// Allocate the traversal stack
-	singleStack			=	(CHStack *) CRenderer::frameMemory->alloc(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
 	currentRayID		=	0;
 }
 
@@ -1606,9 +1653,6 @@ void	CHierarchy::intersect(CRay *ray) {
 		}
 	}
 
-	// FIXME: This is just a temporary solution ... Make the intersect function thread safe
-	osLock(CRenderer::hierarchyMutex);
-	ray->ID		=	currentRayID++;
+	ray->ID		=	currentRayID++;	// I don't think we need to lock for this
 	intersect(root,ray,tnear,tfar);
-	osUnlock(CRenderer::hierarchyMutex);
 }

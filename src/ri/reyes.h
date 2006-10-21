@@ -237,9 +237,7 @@ protected:
 	float						culledDepth;									// The depth of the closest culled object
 
 	static	int					extraPrimitiveFlags;							// These are the extra primitive flags
-	static	int					numVertexSamples;								// The number of samples per pixel
-	
-	int							currentXBucket,currentYBucket;					// The current bucket we're processing in this thread
+	static	int					numVertexSamples;								// The number of samples per pixel	
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
 private:

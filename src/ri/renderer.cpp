@@ -111,6 +111,8 @@ int													CRenderer::numNetrenderedBuckets		=	0;
 TMutex												CRenderer::commitMutex;
 TMutex												CRenderer::networkMutex;
 TMutex												CRenderer::hierarchyMutex;
+TMutex												CRenderer::textureMutex;
+TMutex												CRenderer::fileMutex;
 TMutex												CRenderer::refCountMutex;
 
 ////////////////////////////////////////////////////////////////////
@@ -162,6 +164,7 @@ int											CRenderer::maxRayDepth;
 int											CRenderer::maxPhotonDepth;
 int											CRenderer::bucketWidth,CRenderer::bucketHeight;
 int											CRenderer::netXBuckets,CRenderer::netYBuckets;
+int											CRenderer::threadStride;
 int											CRenderer::maxEyeSplits;
 int											CRenderer::maxHierarchyDepth;
 int											CRenderer::maxHierarchyLeafObjects;
@@ -177,6 +180,7 @@ EDepthFilter								CRenderer::depthFilter;
 CMemStack									*CRenderer::frameMemory				=	NULL;
 CArray<const char*>							*CRenderer::frameTemporaryFiles		=	NULL;
 CShadingContext								**CRenderer::contexts				=	NULL;
+int											CRenderer::numActiveThreads			=	0;
 CDictionary<const char *,CRemoteChannel *>	*CRenderer::declaredRemoteChannels	=	NULL;
 CArray<CRemoteChannel *>					*CRenderer::remoteChannels			=	NULL;
 CArray<CProgrammableShaderInstance*>		*CRenderer::dirtyInstances			=	NULL;
@@ -272,6 +276,8 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(commitMutex);
 	osCreateMutex(networkMutex);
 	osCreateMutex(hierarchyMutex);
+	osCreateMutex(textureMutex);
+	osCreateMutex(fileMutex);
 	osCreateMutex(refCountMutex);
 
 	// Init the memory
@@ -328,13 +334,15 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(commitMutex);
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(hierarchyMutex);
+	osDeleteMutex(textureMutex);
+	osDeleteMutex(fileMutex);
 	osDeleteMutex(refCountMutex);
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);
 
 	// Check the stats for memory leaks
-	//stats.check();
+	stats.check();
 }
 
 
@@ -419,6 +427,7 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::bucketHeight				=	o->bucketHeight;
 	CRenderer::netXBuckets				=	o->netXBuckets;
 	CRenderer::netYBuckets				=	o->netYBuckets;
+	CRenderer::threadStride				=	3;
 	CRenderer::maxEyeSplits				=	o->maxEyeSplits;
 	CRenderer::maxHierarchyDepth		=	o->maxHierarchyDepth;
 	CRenderer::maxHierarchyLeafObjects	=	o->maxHierarchyLeafObjects;
@@ -755,7 +764,8 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	CBrickMap::brickMapInit(maxBrickSize);
 
 	// Start the contexts
-	contexts		=	new CShadingContext*[numThreads];
+	numActiveThreads	=	2;
+	contexts			=	new CShadingContext*[numThreads];
 	for (i=0;i<numThreads;i++) {
 
 		// Start the hiders here

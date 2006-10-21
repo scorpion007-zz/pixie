@@ -39,6 +39,7 @@
 #include "surface.h"
 #include "stats.h"
 #include "texture.h"
+#include "renderer.h"
 
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
@@ -850,6 +851,9 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 	if (lookup->maxError != 0) {
 		float	gP[7*3],gR[7*3];
 
+		// We're modifying, lock the thing
+		osLock(CRenderer::fileMutex);
+
 		// Compute the radius of validity
 		rMean					=	rMeanMin / 2;
 		rMean					=	max(rMean, lookup->lengthA*lookup->minFGRadius + lookup->lengthB);
@@ -915,6 +919,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 		cSample->next	=	cNode->samples;
 		cNode->samples	=	cSample;
 		maxDepth		=	max(depth,maxDepth);
+
+		osUnlock(CRenderer::fileMutex);
 	}
 }
 
