@@ -157,10 +157,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	// Init the stats
 	numGrids			=	0;
 	numObjects			=	0;
-
-	// Init the current bucket
-	currentXBucket		=	0;
-	currentYBucket		=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -305,7 +301,6 @@ void	CReyes::render() {
 			
 			// Is this a grid ?
 			if (cObject->grid) {
-				CRasterObject		*objectsToDelete	=	NULL;
 				CRasterGrid			*grid				=	(CRasterGrid *) cObject;
 				
 				// Update the stats
@@ -316,6 +311,7 @@ void	CReyes::render() {
 				rasterDrawPrimitives(grid);
 
 				// Defer the object
+				CRasterObject		*objectsToDelete	=	NULL;
 				osLock(bucketMutex);
 				objectDefer(cObject);
 				osUnlock(bucketMutex);
