@@ -295,11 +295,9 @@ void	CReyes::render() {
 					tbucketTop,
 					nullBucket);
 
-int exitViaCull = FALSE;//HACK
-
 	// Process the objects and patches
 	while((cObject = objectQueue.get(bucketMutex)) != NULL) {
-		
+
 		if(CRenderer::depthFilter != DEPTH_MID) culledDepth = maxDepth;
 
 		// Is the object behind the maximum opaque depth ?
@@ -332,7 +330,7 @@ int exitViaCull = FALSE;//HACK
 			} else {
 
 				// Dice the object
-				osLock(cObject->mutex);	// already locked
+				osLock(cObject->mutex);
 
 				// Did we dice this object before ?
 				if (cObject->diced == FALSE) {
@@ -375,26 +373,26 @@ int exitViaCull = FALSE;//HACK
 				objectDefer(cObject);
 			}
 
-			objectQueue.numItems	=	1;
+			objectQueue.numItems					=	1;
+			buckets[currentYBucket][currentXBucket]	=	NULL;
+
 			osUnlock(bucketMutex);
 
 			// Delete the objects we do not need
 			flushObjects(objectsToDelete);
-			exitViaCull = TRUE;							//HACK
+
+			osLock(bucketMutex);
 
 			break;
 		}
 	}
-	
-	// we left the mutex locked
-	
-//	buckets[currentYBucket][currentXBucket]	=	NULL;//this would prevent stuff coming back, but is wrong
-													// are the objects we get back real?
-	osUnlock(bucketMutex);
 
-
-	// All objects must be deferred
+	// All objects must be processed
+	buckets[currentYBucket][currentXBucket]	=	NULL;
 	assert(cBucket->objects == NULL);
+	assert(cBucket->queue->numItems == 1);
+
+	osUnlock(bucketMutex);
 
 	// Begin a new memory page
 	memBegin(threadMemory);
@@ -426,34 +424,10 @@ int exitViaCull = FALSE;//HACK
 	// Lock the bucket one more time
 	osLock(bucketMutex);
 
-	{	// PROOF OF CONECPT ONLY
-		// At the cull point we should have killed all objects and grids
-		// Some of those objects might have tried to return grids to us from other threads
-		// which we guard against
-		
-		// Q: why do we still get occasional grids coming back to us?
-		// They must be inserted between the while loop exiting and getting
-		// here!
-		if(objectQueue.numItems != 1) {
-			fprintf(stderr,"%d : %d , %d (%d,%d)\n",thread,objectQueue.numItems - 1,exitViaCull,currentXBucket,currentYBucket);
-			
-			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
-			int				i					=	objectQueue.numItems - 1;
-
-			for (;i>0;i--) {
-				CRasterObject *rob = *allObjects++;
-				fprintf(stderr,"  %d : %x %x\n",i,rob->grid,rob->object);
-			}
-		}
-		objectQueue.numItems = 1;// allow us to continue, but any time this happens it's a bug
-	}
-
-
 	// Just have rendered this bucket, so deallocate it
 	assert(cBucket->objects == NULL);
-	assert(cBucket->queue->numItems == 1);
+	//assert(cBucket->queue->numItems == 1);
 	delete cBucket;
-	buckets[currentYBucket][currentXBucket]	=	NULL;
 
 	// Advance the bucket
 	currentXBucket++;
