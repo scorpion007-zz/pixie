@@ -427,7 +427,7 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::bucketHeight				=	o->bucketHeight;
 	CRenderer::netXBuckets				=	o->netXBuckets;
 	CRenderer::netYBuckets				=	o->netYBuckets;
-	CRenderer::threadStride				=	3;
+	CRenderer::threadStride				=	o->threadStride;
 	CRenderer::maxEyeSplits				=	o->maxEyeSplits;
 	CRenderer::maxHierarchyDepth		=	o->maxHierarchyDepth;
 	CRenderer::maxHierarchyLeafObjects	=	o->maxHierarchyLeafObjects;

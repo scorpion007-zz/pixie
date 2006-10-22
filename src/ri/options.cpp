@@ -368,6 +368,8 @@ COptions::COptions() {
 	netXBuckets				=	5;
 	netYBuckets				=	5;
 
+	threadStride			=	3;
+
 	maxEyeSplits			=	10;
 
 	maxHierarchyDepth		=	40;

@@ -232,6 +232,8 @@ public:
 
 	int							netXBuckets,netYBuckets;						// The meta bucket size
 
+	int							threadStride;									// The number of buckets to distribute to threads at a time
+
 	int							maxEyeSplits;									// Maximum number of eye splits
 																				// The number of times the bucket will be rendered
 	int							maxHierarchyDepth;								// The maximum depth of the hierarchy

@@ -380,30 +380,44 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 
 	stats.numSplits++;
 
-	osLock(CRenderer::refCountMutex);
-
 	switch(dir) {
 	case 0:
 		if (umax <= umin)	break;
 
 		// Split along one direction
 		umid			=	(umin + umax) / (float) 2;
-		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);	p1->dice(r);
-		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);	p2->dice(r);
+		osLock(CRenderer::refCountMutex);
+		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
+		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
+		osUnlock(CRenderer::refCountMutex);
+
+		p1->dice(r);
+		p2->dice(r);
+
+		osLock(CRenderer::refCountMutex);
 		p1->check();
 		p2->check();
 		stats.numUsplits++;
+		osUnlock(CRenderer::refCountMutex);
 		break;
 	case 1:
 		if (vmax <= vmin)	break;
 
 		// Split along one direction
 		vmid			=	(vmin + vmax) / (float) 2;
-		p1				=	new CPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);	p1->dice(r);
-		p2				=	new CPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);	p2->dice(r);
+		osLock(CRenderer::refCountMutex);
+		p1				=	new CPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);	
+		p2				=	new CPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);	
+		osUnlock(CRenderer::refCountMutex);
+
+		p1->dice(r);
+		p2->dice(r);
+
+		osLock(CRenderer::refCountMutex);
 		p1->check();
 		p2->check();
 		stats.numVsplits++;
+		osUnlock(CRenderer::refCountMutex);
 		break;
 	case 2:
 		if (vmax <= vmin)	break;
@@ -412,19 +426,28 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		// Split along one direction
 		vmid			=	(vmin + vmax) / (float) 2;
 		umid			=	(umin + umax) / (float) 2;
-		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);	p1->dice(r);
-		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);	p2->dice(r);
-		p3				=	new CPatch(attributes,xform,object,umin,umid,vmid,vmax,depth+1,minDepth);	p3->dice(r);
-		p4				=	new CPatch(attributes,xform,object,umid,umax,vmid,vmax,depth+1,minDepth);	p4->dice(r);
+		osLock(CRenderer::refCountMutex);
+		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);
+		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);
+		p3				=	new CPatch(attributes,xform,object,umin,umid,vmid,vmax,depth+1,minDepth);
+		p4				=	new CPatch(attributes,xform,object,umid,umax,vmid,vmax,depth+1,minDepth);
+		osUnlock(CRenderer::refCountMutex);
+
+		p1->dice(r);
+		p2->dice(r);
+		p3->dice(r);
+		p4->dice(r);
+
+		osLock(CRenderer::refCountMutex);
 		p1->check();
 		p2->check();
 		p3->check();
 		p4->check();
 		stats.numUVsplits++;
+		osUnlock(CRenderer::refCountMutex);
+
 		break;
 	}
-
-	osUnlock(CRenderer::refCountMutex);
 }
 
 
