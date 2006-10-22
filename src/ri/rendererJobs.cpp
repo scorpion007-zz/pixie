@@ -53,14 +53,16 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 		T32	netBuffer[3];
 
 		// Receive the bucket to render from the client
+		osLock(networkMutex);
 		rcRecv(netClient,(char *) netBuffer,3*sizeof(T32));
-
+		
 		// Process the render order
 		if (netBuffer[0].integer == NET_RENDER_BUCKET) {
 			job.type				=	CJob::BUCKET;
 			job.xBucket				=	netBuffer[1].integer;
 			job.yBucket				=	netBuffer[2].integer;
 
+			osUnlock(networkMutex);
 			return;
 		} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
 			// We have finished the frame, so terminate
@@ -71,10 +73,13 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			sendFrameDataChannels();
 			
 			job.type				=	CJob::TERMINATE;
+			
+			osUnlock(networkMutex);
 			return;
 		} else {
 			error(CODE_BUG,"Unrecognised network request\n");
 			job.type				=	CJob::TERMINATE;
+			osUnlock(networkMutex);
 			return;
 		}
 	}

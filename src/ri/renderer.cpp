@@ -1183,8 +1183,12 @@ void		CRenderer::renderFrame() {
 
 			netBuffer.integer	=	NET_READY;
 			rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
+			
+			// for now to keep things working, one thread only in each server
+			// FIXME: remove this once the client server networking is threadable
+			numThreads = 1;
 		}
-
+		
 		// Spawn the threads
 		threads	=	(TThread *) alloca(numThreads*sizeof(TThread));
 		for (i=0;i<numThreads;i++) {
