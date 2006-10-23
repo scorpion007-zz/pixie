@@ -67,6 +67,10 @@ typedef void			*(*TFun)(void *);
 #include <signal.h>
 #include <errno.h>
 
+#ifdef __APPLE__
+#include <semaphore.h>
+#endif
+
 
 #define	LIB_EXPORT		extern
 #define LIB_IMPORT		extern
