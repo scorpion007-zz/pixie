@@ -2788,9 +2788,9 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 #endif
 		}
 
-		if (lights != NULL)		delete lights;
-		if (lightNames != NULL)	delete lightNames;
-		if (ribObjects != NULL)	delete ribObjects;
+		if (lights		!= NULL)	delete lights;
+		if (lightNames	!= NULL)	delete lightNames;
+		if (ribObjects	!= NULL)	delete ribObjects;
 		delete allocatedStrings;
 		delete [] args;
 		delete [] parameters;

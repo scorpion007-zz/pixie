@@ -113,8 +113,6 @@ protected:
 
 			float					*fbContribution;
 			float					*fbPixels;
-
-			int						currentXBucket,currentYBucket;
 };
 
 #endif

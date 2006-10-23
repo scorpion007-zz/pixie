@@ -178,7 +178,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 					// Did we find it ?
 					if (cHash == NULL) {
-						cHash				=	(TObjectHash *) CRenderer::frameMemory->alloc(sizeof(TObjectHash));//GSHHACK //ralloc(sizeof(TObjectHash));
+						cHash				=	(TObjectHash *) ralloc(sizeof(TObjectHash),threadMemory);
 						cHash->object		=	cRay->object;
 						cHash->numRays		=	0;
 						cHash->rays			=	NULL;

@@ -42,7 +42,7 @@
 #include "shading.h"
 #include "renderer.h"
 #include "rendererContext.h"
-
+#include "common/polynomial.h"
 
 
 

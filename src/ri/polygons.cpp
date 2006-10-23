@@ -39,6 +39,7 @@
 #include "surface.h"
 #include "renderer.h"
 #include "rendererContext.h"
+#include "common/polynomial.h"
 
 #if !defined(WIN32)
 #if defined(__GNUC__) && (__GNUC__ < 4)
@@ -548,29 +549,22 @@ void			CPolygonQuad::bound(float *bmin,float *bmax) const {
 	const CPl	*pl			=	mesh->pl;
 	const float	*vertices	=	pl->data0;
 	const float	*v0			=	vertices + this->v0*3;
-	const float	*v1			=	vertices + this->v1*3;
-	const float	*v2			=	vertices + this->v2*3;
-	const float	*v3			=	vertices + this->v3*3;
 
 	// Bound the primitive in the camera space
 	movvv(bmin,v0);
 	movvv(bmax,v0);
 
-	addBox(bmin,bmax,v1);
-	addBox(bmin,bmax,v2);
-	addBox(bmin,bmax,v3);
+	addBox(bmin,bmax,vertices + this->v1*3);
+	addBox(bmin,bmax,vertices + this->v2*3);
+	addBox(bmin,bmax,vertices + this->v3*3);
 
 	if ((vertices=pl->data1) != NULL) {
 		vertices	=	pl->data1;
-		v0			=	vertices + this->v0*3;
-		v1			=	vertices + this->v1*3;
-		v2			=	vertices + this->v2*3;
-		v3			=	vertices + this->v3*3;
 
-		addBox(bmin,bmax,v0);
-		addBox(bmin,bmax,v1);
-		addBox(bmin,bmax,v2);
-		addBox(bmin,bmax,v3);
+		addBox(bmin,bmax,vertices + this->v0*3);
+		addBox(bmin,bmax,vertices + this->v1*3);
+		addBox(bmin,bmax,vertices + this->v2*3);
+		addBox(bmin,bmax,vertices + this->v3*3);
 	}
 
 	makeBound(bmin,bmax);
@@ -721,7 +715,6 @@ void		CPolygonQuad::intersect(CRay *cRay) {
 			solve();
 			break;
 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1671,15 +1664,16 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		const int	vi3	=	(nnVertex->xy - xy) >> 1;
 
 		if (reverse == FALSE) {
-			createQuad(vindices,vi0,vi1,vi2,vi3,data);
-		} else {
 			createQuad(vindices,vi3,vi2,vi1,vi0,data);
+		} else {
+			createQuad(vindices,vi0,vi1,vi2,vi3,data);
 		}
 		data.meshUniformNumber++;
 		data.meshFacevaryingNumber	+=	4;
 
 		return;
 	}
+
 #endif
 
 	// Eliminate holes by connecting them to the outher hull

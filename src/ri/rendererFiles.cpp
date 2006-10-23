@@ -177,6 +177,8 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 CTexture	*CRenderer::getTexture(const char *name) {
 	CFileResource	*tex;
 
+	if (*name == '\0')	return NULL;
+
 	if (loadedFiles->find(name,tex) == FALSE){
 		// Load the texture
 		tex	=	textureLoad(name,texturePath);
@@ -204,6 +206,8 @@ CTexture	*CRenderer::getTexture(const char *name) {
 CEnvironment	*CRenderer::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
+	if (*name == '\0')	return NULL;
+
 	if (loadedFiles->find(name,tex) == FALSE){
 		tex	=	environmentLoad(name,texturePath,toWorld);
 
@@ -230,6 +234,8 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	CFileResource	*map;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
+
+	if (*name == '\0')	return NULL;
 
 	// Check the cache to see if the file is in the memory
 	if (loadedFiles->find(name,map) == FALSE){
@@ -259,6 +265,8 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 // Date last edited		:	3/11/2003
 CCache		*CRenderer::getCache(const char *name,const char *mode) {
 	CFileResource	*cache;
+
+	if (*name == '\0')	return NULL;
 
 	// Check the memory first
 	if (loadedFiles->find(name,cache) == FALSE){
@@ -365,6 +373,8 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 	CFileResource	*tex;
 
+	if (*name == '\0')	return NULL;
+
 	if (loadedFiles->find(name,tex) == FALSE){
 		// try environments first
 		tex	=	environmentLoad(name,texturePath,toWorld);
@@ -395,6 +405,8 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
+
+	if (*name == '\0')	return NULL;
 
 	if (loadedFiles->find(name,texture3d) == FALSE){
 	

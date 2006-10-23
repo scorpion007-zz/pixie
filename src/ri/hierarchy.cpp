@@ -784,8 +784,8 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 // Date last edited		:	12/23/2001
 class	CHStack {
 public:
-	void					*node;
-	float					tmin,tmax;
+	void				*node;
+	float				tmin,tmax;
 };
 
 
@@ -1044,6 +1044,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 	return nNode;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
 // Function				:	hierarchyIntersect
 // Description			:	Intersection computation
@@ -1205,7 +1206,6 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 				// We hit an uncomputed node
 				cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
 				cInternal		=	cUncomputed->parent;
-
 				nNode			=	compute(cUncomputed);
 
 				if (cInternal == NULL) {

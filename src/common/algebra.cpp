@@ -63,18 +63,3 @@ static	inline double det3x3(const double  a1,const double  a2,const double  a3,c
 #undef SCALAR_TYPE
 #undef VECTOR_TYPE
 #undef MATRIX_TYPE
-
-
-
-
-
-/////////////////////////////////////////////////////////////
-// Initialize the math
-void	mathInit() {
-}
-
-/////////////////////////////////////////////////////////////
-// Shutdown the math
-void	mathShutdown() {
-}
-

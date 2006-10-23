@@ -305,7 +305,7 @@ public:
 
 						// Dtor
 						~CTrie() {
-							if (root != NULL) deleteNode(root);
+							if (root != NULL) delete root;
 						}
 
 						// Insert an object into the trie
@@ -401,25 +401,6 @@ public:
 		CTrieNode		*root;
 
 private:
-		void			deleteNode(CTrieNode *cNode) {
-
-							if (isLeaf(cNode)) {
-								CTrieLeaf	*cLeaf	=	getLeaf(cNode);
-								delete cLeaf;
-							} else {
-								int	i;
-
-								for (i=0;i<256;i++) {
-									if (cNode->pointers[i] != NULL) {
-										deleteNode(cNode->pointers[i]);
-									}
-								}
-
-								delete cNode;
-							}
-
-							
-						}
 
 		void			destroyNode(CTrieNode *cNode) {
 
