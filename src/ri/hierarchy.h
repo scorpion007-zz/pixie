@@ -318,8 +318,6 @@ private:
 
 	void				*root;						// Root node of the hierarchy
 	vector				bmin,bmax;					// The bound of all the objects in the tree
-	int					maxObjects;					// Maximum number of objects per leaf
-	int					maxDepth;					// Maximum leaf depth
 	int					currentRayID;				// The global ray counter used for mailboxing
 };
 

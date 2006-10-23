@@ -28,17 +28,18 @@
 //  Description			:	Implementation !!!
 //
 ////////////////////////////////////////////////////////////////////////
-#include <stddef.h>		// Ensure NULL is defined before libtiff
-#include <math.h>
-#include <string.h>
-#include <tiffio.h>
-
 #include "texture.h"
 #include "shading.h"
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
 #include "renderer.h"
+
+#include <stddef.h>		// Ensure NULL is defined before libtiff
+#include <math.h>
+#include <string.h>
+#include <tiffio.h>
+
 
 
 

@@ -112,8 +112,8 @@ TMutex												CRenderer::commitMutex;
 TMutex												CRenderer::networkMutex;
 TMutex												CRenderer::hierarchyMutex;
 TMutex												CRenderer::textureMutex;
-TMutex												CRenderer::fileMutex;
 TMutex												CRenderer::refCountMutex;
+TMutex												CRenderer::shaderMutex;
 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
@@ -232,6 +232,7 @@ float										CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;
 int											CRenderer::numActiveDisplays;
 int											CRenderer::currentXBucket;
 int											CRenderer::currentYBucket;
+int											CRenderer::currentPhoton;
 int											*CRenderer::jobAssignment;
 FILE										*CRenderer::deepShadowFile			=	NULL;
 int											*CRenderer::deepShadowIndex			=	NULL;
@@ -277,8 +278,8 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(networkMutex);
 	osCreateMutex(hierarchyMutex);
 	osCreateMutex(textureMutex);
-	osCreateMutex(fileMutex);
 	osCreateMutex(refCountMutex);
+	osCreateMutex(shaderMutex);
 
 	// Init the memory
 	memoryInit(globalMemory);
@@ -335,8 +336,8 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(hierarchyMutex);
 	osDeleteMutex(textureMutex);
-	osDeleteMutex(fileMutex);
 	osDeleteMutex(refCountMutex);
+	osDeleteMutex(shaderMutex);
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);
@@ -728,6 +729,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	// The bucket we're rendering
 	currentXBucket			=	0;
 	currentYBucket			=	0;
+	currentPhoton			=	0;
 	
 	// Initialize the extend of the world
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);

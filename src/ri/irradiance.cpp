@@ -39,7 +39,6 @@
 #include "surface.h"
 #include "stats.h"
 #include "texture.h"
-#include "renderer.h"
 
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
@@ -71,6 +70,7 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *
 	root				=	NULL;
 	maxDepth			=	1;
 	hierarchy			=	h;
+	osCreateMutex(mutex);
 
 	// Are we reading from file ?
 	if (flags & CACHE_READ) {
@@ -121,6 +121,9 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *
 // Comments				:
 // Date last edited		:	10/15/2003
 CIrradianceCache::~CIrradianceCache() {
+
+	osDeleteMutex(mutex);
+
 	// Are we writing the file out ?
 	if (flags & CACHE_WRITE) {
 		FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
@@ -231,6 +234,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 	initv(irradiance,0);
 	initv(envdir,0);
 
+	osLock(mutex);
 	stack		=	stackBase;
 	*stack++	=	root;
 	while(stack > stackBase) {
@@ -296,6 +300,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 			}
 		}
 	}
+	osUnlock(mutex);
 
 	if (totalWeight > C_EPSILON) {
 		double	normalizer	=	1 / totalWeight;
@@ -852,7 +857,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 		float	gP[7*3],gR[7*3];
 
 		// We're modifying, lock the thing
-		osLock(CRenderer::fileMutex);
+		osLock(mutex);
 
 		// Compute the radius of validity
 		rMean					=	rMeanMin / 2;
@@ -920,7 +925,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 		cNode->samples	=	cSample;
 		maxDepth		=	max(depth,maxDepth);
 
-		osUnlock(CRenderer::fileMutex);
+		osUnlock(mutex);
 	}
 }
 

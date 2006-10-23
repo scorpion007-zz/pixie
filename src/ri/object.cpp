@@ -233,11 +233,16 @@ CSurface::~CSurface() {
 // Comments				:
 // Date last edited		:	10/16/2001
 void				CSurface::dice(CShadingContext *rasterizer) {
+
+	osLock(CRenderer::refCountMutex);
 	CPatch	*cSurface	=	new CPatch(attributes,xform,this,0,1,0,1,0,attributes->minSplits);
+	osUnlock(CRenderer::refCountMutex);
 
 	cSurface->dice(rasterizer);
 
+	osLock(CRenderer::refCountMutex);
 	cSurface->check();
+	osUnlock(CRenderer::refCountMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////

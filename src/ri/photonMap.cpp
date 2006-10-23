@@ -77,6 +77,7 @@ CPhotonMap::CPhotonMap(const char *n,const CXform *world,FILE *in) : CMap<CPhoto
 	refCount		=	0;
 	modifying		=	FALSE;
 	maxPower		=	0;
+	osCreateMutex(mutex);
 
 	// Try to read the photonmap
 	if (in != NULL) {
@@ -118,6 +119,8 @@ CPhotonMap::CPhotonMap(const char *n,const CXform *world,FILE *in) : CMap<CPhoto
 // Comments				:
 // Date last edited		:	3/11/2003
 CPhotonMap::~CPhotonMap() {
+	osDeleteMutex(mutex);
+
 	if (root != NULL) {
 		CPhotonNode		**stackBase	=	(CPhotonNode **)	alloca(maxDepth*sizeof(CPhotonNode *)*8);
 		CPhotonNode		**stack;
@@ -347,7 +350,11 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 	l.indices			=	indices;
 	l.distances			=	distances;
 
+	// Probe the previous lookups first
+	osLock(mutex);
 	if (!probe(Cl,l.P,l.N)) {
+		osUnlock(mutex);
+
 		CMap<CPhoton>::lookupWithN(&l,1);
 
 		initv(Cl,0,0,0);
@@ -373,8 +380,10 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
 
 		// Insert it into the probe 
+		osLock(mutex);
 		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
 	}
+	osUnlock(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -403,7 +412,11 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 	l.indices			=	indices;
 	l.distances			=	distances;
 
+	// Probe the previous lookups first
+	osLock(mutex);
 	if (!probe(Cl,l.P,l.N)) {
+		osUnlock(mutex);
+
 		CMap<CPhoton>::lookup(&l,1);
 
 		initv(Cl,0,0,0);
@@ -424,8 +437,10 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
 
 		// Record it so we can probe it later
+		osLock(mutex);
 		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
 	}
+	osUnlock(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -457,10 +472,13 @@ void	CPhotonMap::balance() {
 // Comments				:
 // Date last edited		:	9/18/2002
 void	CPhotonMap::store(const float *P,const float *N,const float *I,const float *C) {
+
+	osLock(mutex);
 	CPhoton	*ton	=	CMap<CPhoton>::store(P,N);
 	dirToPhoton(ton->theta,ton->phi,I);
 	movvv(ton->C,C);
 	maxPower	=	max(maxPower,dotvv(C,C));
+	osUnlock(mutex);
 }
 
 

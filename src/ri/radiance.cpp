@@ -350,6 +350,7 @@ CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *b
 	hierarchy			=	h;
 	tris				=	t;
 	triangleHash		=	NULL;
+	osCreateMutex(mutex);
 
 	// Figure out whether we're in read / write mode
 	if (in == NULL) {
@@ -379,6 +380,8 @@ CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *b
 // Comments				:
 // Date last edited		:	7/06/2004
 CRadianceCache::~CRadianceCache() {
+	osDeleteMutex(mutex);
+
 	// Are we writing into a file ?
 	if (flags & CACHE_WRITE) {
 		FILE	*out	=	ropen(name,"wb",fileGatherCache);
@@ -417,6 +420,8 @@ CRadianceCache::~CRadianceCache() {
 void		CRadianceCache::lookup(float *C,const float *P,const float *N,const CGlobalIllumLookup *lookup) {
 	// Are we writing ?
 	if (flags & CACHE_WRITE) {
+		osLock(mutex);
+
 		CShadingPoint		*cPoint			=	(CShadingPoint *) memory->alloc(sizeof(CShadingPoint));
 		CDepositorySample	*cSample;
 		float				Cl[5];
@@ -454,6 +459,8 @@ void		CRadianceCache::lookup(float *C,const float *P,const float *N,const CGloba
 		C[1]				=	Cl[1];
 		C[2]				=	Cl[2];
 		C[3]				=	Cl[3];
+
+		osUnlock(mutex);
 	} else {
 		// Just lookup the hash
 		hash->lookup(C,P,N);

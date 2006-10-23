@@ -122,6 +122,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,CXform *world) : CTexture3d(name,
 	normalThreshold	=	0.7f;
 	file			=	in;
 	modifying		=	FALSE;
+	osCreateMutex(mutex);
 
 	// Read the header offset
 	fseek(file,-4,SEEK_END);
@@ -182,6 +183,7 @@ CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,CXform *
 	normalThreshold	=	0.7f;
 	file			=	NULL;
 	modifying		=	TRUE;
+	osCreateMutex(mutex);
 
 
 	// Compute the bounding cube
@@ -238,6 +240,8 @@ CBrickMap::~CBrickMap() {
 
 	// Close the file if not already have done so
 	if (file != NULL)	fclose(file);
+
+	osDeleteMutex(mutex);
 }
 
 
@@ -364,6 +368,9 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	mulmn(N,world->from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
 	
+	// Lock the structure
+	osLock(mutex);
+
 	// Iterate over the bricks we want
 	forEachBrick(depth)
 		int		cDepth,cx,cy,cz;
@@ -417,6 +424,9 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 			}
 		}
 	}
+
+	// Release the structure
+	osUnlock(mutex);
 }
 
 
@@ -445,11 +455,14 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	subvv(P,bmin);
 	mulmn(N,world->from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
-
-	stats.numBrickmapLookups	+=	2;
 	
+	// Perform the lookup
+	osLock(mutex);
+	stats.numBrickmapLookups	+=	2;
 	lookup(P,N,dP,data0,depth);
 	lookup(P,N,dP,data1,depth+1);
+	osUnlock(mutex);
+
 	for (i=0;i<dataSize;i++)	data[i]	=	data0[i]*(1-t) + data1[i]*t;
 }
 

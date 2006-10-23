@@ -197,6 +197,7 @@ protected:
 			int					maxDepth;						// The maximum depth of the structure
 			CBrickMap			*nextMap;						// Maintain a linked list of brickmaps
 			int					modifying;
+			TMutex				mutex;
 
 
 																// Some static variables

@@ -121,11 +121,13 @@
 								CTextureLookup	*lookup;																		\
 								CRaySample		*samples	=	(CRaySample *) ralloc(numVertices*sizeof(CRaySample),threadMemory);			\
 								CRaySample		*cSample	=	samples;														\
+								osLock(CRenderer::shaderMutex);																	\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {										\
 									int			numArguments;																	\
 									argumentcount(numArguments);																\
 									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);													\
 								}																								\
+								osUnlock(CRenderer::shaderMutex);																\
 								operand(0,res);																					\
 								operand(1,op1);																					\
 								operand(2,op2);
@@ -247,11 +249,13 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,FUN3EXPR_UPDA
 								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;			\
 								float				*N;																			\
 								CTraceLookup		*lookup;																	\
+								osLock(CRenderer::shaderMutex);																	\
 								if ((lookup = (CTraceLookup *) parameterlist) == NULL) {										\
 									int			numArguments;																	\
 									argumentcount(numArguments);																\
 									TRACEPARAMETERS(3,(numArguments-3) >> 1);													\
 								}																								\
+								osUnlock(CRenderer::shaderMutex);																\
 								rays			=	(CTraceRay *) ralloc(numVertices*sizeof(CTraceRay),threadMemory);			\
 								interiorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
 								exteriorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
@@ -370,15 +374,17 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 								TCode				*envdir;																		\
 								TCode				*coverage;																		\
 								FUN4EXPR_PRE;																						\
+								osLock(CRenderer::shaderMutex);																		\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;						\
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);						\
+									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
 									lookup->numSamples	=	(int) op3->real;														\
 									lookup->occlusion	=	FALSE;																	\
 								}																									\
+								osUnlock(CRenderer::shaderMutex);																	\
 								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir);	}				\
 								else envdir = (TCode *) varying[VARIABLE_PW];														\
 								if (lookup->coverageIndex != -1)	{	operand(lookup->coverageIndex,coverage);	}				\
@@ -422,16 +428,18 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 								TCode				*envdir;																		\
 								TCode				*irradiance;																	\
 								FUN4EXPR_PRE;																						\
+								osLock(CRenderer::shaderMutex);																		\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;						\
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);						\
+									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
 									lookup->numSamples	=	(int) op3->real;														\
 									lookup->occlusion	=	TRUE;																	\
 									if (lookup->irradianceIndex != -1) lookup->occlusion = FALSE;									\
 								}																									\
+								osUnlock(CRenderer::shaderMutex);																	\
 								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir);	}				\
 								else envdir = (TCode *) varying[VARIABLE_PW];														\
 								if (lookup->irradianceIndex != -1)	{	operand(lookup->irradianceIndex,irradiance);	}			\
@@ -469,15 +477,17 @@ DEFSHORTFUNC(occlusion	,"occlusion"	,"f=pnf!"	,OCCLUSIONEXPR_PRE,OCCLUSIONEXPR,O
 #define	CACSAMPLEEXPR_PRE		CGlobalIllumLookup	*lookup;																		\
 								CCache				*cache;																			\
 								FUN4EXPR_PRE;																						\
+								osLock(CRenderer::shaderMutex);																		\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;						\
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);						\
+									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
 									lookup->numSamples	=	(int) op3->real;														\
 									lookup->occlusion	=	FALSE;																	\
 								}																									\
+								osUnlock(CRenderer::shaderMutex);																	\
 								cache	=	lookup->cache;
 
 
@@ -504,6 +514,7 @@ DEFSHORTFUNC(Cachesample	,"cachesample"	,"f=pnf!"	,CACSAMPLEEXPR_PRE,CACSAMPLEEX
 								CPhotonMap			*map;														\
 								TCode				*res;														\
 								const TCode			*op2,*op3;													\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {					\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;	\
 									int			numArguments;													\
@@ -511,8 +522,9 @@ DEFSHORTFUNC(Cachesample	,"cachesample"	,"f=pnf!"	,CACSAMPLEEXPR_PRE,CACSAMPLEEX
 									argumentcount(numArguments);												\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);									\
 									operand(1,op1);																\
-									lookup->map			=	CRenderer::getPhotonMap(op1->string);					\
+									lookup->map			=	CRenderer::getPhotonMap(op1->string);				\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
 								operand(2,op2);																	\
 								operand(3,op3);																	\
@@ -550,6 +562,7 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 								CPhotonMap			*map;														\
 								TCode				*res;														\
 								const TCode			*op2;														\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {					\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;	\
 									int			numArguments;													\
@@ -557,8 +570,9 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 									argumentcount(numArguments);												\
 									GLOBPARAMETERS(3,(numArguments-3) >> 1);									\
 									operand(1,op1);																\
-									lookup->map			=	CRenderer::getPhotonMap(op1->string);					\
+									lookup->map			=	CRenderer::getPhotonMap(op1->string);				\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
 								operand(2,op2);																	\
 								map						=	lookup->map;
@@ -646,6 +660,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								CGatherRay		*rays;																\
 								TCode			*P,*N;																\
 								CGatherVariable	*var;																\
+								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CGatherLookup *) parameterlist) == NULL) {							\
 									TCode			*samples,*sampleCone;											\
 									int				numArguments;													\
@@ -658,6 +673,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 									lookup->numSamples				=	(int) samples->real;						\
 									lookup->coneAngle				=	sampleCone->real;							\
 								}																					\
+								osUnlock(CRenderer::shaderMutex);													\
 																													\
 								for (var=lookup->outputs;var!=NULL;var=var->next) {									\
 									*(var->cDepth++)	=	var->dest;												\

@@ -29,17 +29,17 @@
 //							that sends the image into a file
 //
 ////////////////////////////////////////////////////////////////////////
+#include "common/global.h"
+#include "common/algebra.h"
+#include "common/os.h"
+#include "ri/dsply.h"							// The display driver interface
+
 #include <stdlib.h>								// Ensure we have NULL defined before libtiff
 #include <tiffio.h>								// Libtiff is required
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-#include "common/global.h"
-#include "common/algebra.h"
-#include "common/os.h"
-#include "ri/dsply.h"							// The display driver interface
 
 
 

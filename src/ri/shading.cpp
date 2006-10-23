@@ -390,7 +390,7 @@ CShadingContext::CShadingContext(int t) {
 	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
 
 	// Init the random number generator
-	randomInit();
+	randomInit(5489*(thread+1));
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -402,6 +402,13 @@ CShadingContext::CShadingContext(int t) {
 // Date last edited		:	8/25/2002
 CShadingContext::~CShadingContext() {
 	CShadingState	*cState;
+	CConditional	*cConditional;
+
+	// Delete the conditionals we allocated
+	while((cConditional = conditionals) != NULL) {
+		conditionals	=	conditionals->next;
+		delete cConditional;
+	}
 	
 	// Shutdown the random number generator
 	randomShutdown();

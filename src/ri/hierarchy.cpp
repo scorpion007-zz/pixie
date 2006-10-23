@@ -36,6 +36,7 @@
 #include "renderer.h"
 #include "surface.h"
 #include "random.h"
+#include "error.h"
 
 
 
@@ -954,7 +955,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			CHLeaf				*newNode;
 
 			// We do not have a good split, create a leaf node
-			newNode						=	(CHLeaf *) CRenderer::frameMemory->alloc(sizeof(CHLeaf));
+			newNode						=	(CHLeaf *)		CRenderer::frameMemory->alloc(sizeof(CHLeaf));
 			stats.numHierarchyLeaves++;
 			newNode->numItems			=	numItems;
 			newNode->items				=	(CTracable **)	CRenderer::frameMemory->alloc(sizeof(CTracable *)*numItems);
@@ -1034,7 +1035,6 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 		newNode->numItems	=	cUncomputed->numItems;
 		newNode->items		=	(CTracable **)	CRenderer::frameMemory->alloc(sizeof(CTracable *)*newNode->numItems);
 		memcpy(newNode->items,cUncomputed->items,sizeof(CTracable *)*newNode->numItems);
-
 		nNode				=	(void *) getToken(newNode,HIERARCHY_LEAF_NODE);
 
 		delete [] cUncomputed->items;
@@ -1198,38 +1198,43 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			break;
 		case HIERARCHY_UNCOMPUTED_NODE:
 
-			// We hit an uncomputed node
-			cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
-			cInternal		=	cUncomputed->parent;
 
 			// Make sure this action is atomic
-			osLock(CRenderer::hierarchyMutex);
+			if (osTrylock(CRenderer::hierarchyMutex)) {
 
-			// Is this the first time we're locking ?
-			if ((cInternal == NULL) || (cInternal->front == hierarchyStackTop->node) || (cInternal->back == hierarchyStackTop->node)) {
+				// We hit an uncomputed node
+				cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
+				cInternal		=	cUncomputed->parent;
+
 				nNode			=	compute(cUncomputed);
 
 				if (cInternal == NULL) {
-					root	=	nNode;
+					root		=	nNode;
 				} else {
 					if (cInternal->front == hierarchyStackTop->node)
 						cInternal->front	=	nNode;
-					if (cInternal->back == hierarchyStackTop->node)
+					else if (cInternal->back == hierarchyStackTop->node)
 						cInternal->back		=	nNode;
+					else {
+						error(CODE_BUG,"Lost hierarchy node\n");
+					}
 				}
-			} else {
-				// A parallel thread took care of it ... re-trace the ray
-				intersect(r,ray,tmin,tmax);
 
-				// Don't forget to unlock before we return
+				hierarchyStackTop->node	=	nNode;
+				hierarchyStackTop++;
+
 				osUnlock(CRenderer::hierarchyMutex);
+			} else {
+
+				// Wait until the other thread finishes processing
+				osLock(CRenderer::hierarchyMutex);
+				osUnlock(CRenderer::hierarchyMutex);
+
+				// A parallel thread took care of it ... re-trace the ray
+				intersect(ray);
+				
 				return;
 			}
-
-			osUnlock(CRenderer::hierarchyMutex);
-
-			hierarchyStackTop->node	=	nNode;
-			hierarchyStackTop++;
 
 			break;
 		case HIERARCHY_EMPTY_NODE:

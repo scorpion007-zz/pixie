@@ -154,8 +154,8 @@ public:
 		static	TMutex												networkMutex;				// To serialize the network communication
 		static	TMutex												hierarchyMutex;				// To serialize the raytracing hierarchy
 		static	TMutex												textureMutex;				// To serialize texture fetches
-		static	TMutex												fileMutex;					// To serialize file loading
 		static	TMutex												refCountMutex;				// To serialize the object attach()/detach()
+		static	TMutex												shaderMutex;				// To serialize shader parameter list access
 
 
 		////////////////////////////////////////////////////////////////////
@@ -421,6 +421,7 @@ public:
 		static	int						numActiveDisplays;			// The number of active displays
 		static	int						currentXBucket;				// The bucket counters
 		static	int						currentYBucket;
+		static	int						currentPhoton;				// The current photon counter for the photon mapping
 		static	int						*jobAssignment;				// The job assignment for the buckets
 		static	FILE					*deepShadowFile;			// Deep shadow map stuff
 		static	int						*deepShadowIndex;

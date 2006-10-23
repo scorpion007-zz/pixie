@@ -131,6 +131,8 @@ private:
 		int					numRaysPerCluster;		// The number of rays to shoot per cluster
 		float				bias;					// The raytracing bias
 		vector				backgroundColor;		// The color of the background
+
+		TMutex				mutex;
 };
 
 

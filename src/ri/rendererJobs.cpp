@@ -160,7 +160,24 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 // Comments				:	-
 // Date last edited		:	6/21/2001
 void			CRenderer::dispatchPhoton(int thread,CJob &job) {
-	// FIXME: Implement
+
+	// Lock
+	osLock(commitMutex);
+
+	if (currentPhoton < numEmitPhotons) {
+
+		// There are still photons to trace
+		job.type		=	CJob::PHOTON_BUNDLE;
+		job.numPhotons	=	min(1000,numEmitPhotons-currentPhoton);	// Shoot 1000 photons at a time
+		currentPhoton	+=	job.numPhotons;
+	} else {
+
+		// We're finished, terminate
+		job.type		=	CJob::TERMINATE;
+	}
+
+	// Unlock
+	osUnlock(commitMutex);
 }
 
 

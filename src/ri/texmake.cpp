@@ -28,16 +28,17 @@
 //  Description			:	This file comtains texture file making routines
 //
 ////////////////////////////////////////////////////////////////////////
-#include <stddef.h>		// ensure we have NULL defined before libtiff
-#include <tiffio.h>
-#include <math.h>
-
 #include "texmake.h"
 #include "ri.h"
 #include "stats.h"
 #include "memory.h"
 #include "error.h"
 #include "renderer.h"
+
+#include <stddef.h>		// ensure we have NULL defined before libtiff
+#include <tiffio.h>
+#include <math.h>
+
 
 ///////////////////////////////////////////////////////////////////////
 // function				:	tiffErrorHandler

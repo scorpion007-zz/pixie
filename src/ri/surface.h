@@ -60,24 +60,6 @@ private:
 };
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurfaceGrid
-// Description			:	Holds a piece of surface to be rendered
-// Comments				:
-// Date last edited		:	6/4/2003
-class	CSurfaceGrid : public CObject {
-public:
-							CSurfaceGrid(CAttributes *,CXform *,CSurface *,float,float,float,float,int,int);
-							~CSurfaceGrid();
-
-	void					dice(CShadingContext *);		// Split or render this object
-
-private:
-	CSurface				*object;						// The object the surface belongs to
-	float					umin,umax,vmin,vmax;			// The parametric extend of the surface
-	int						udiv,vdiv;						// The split amounts
-};
-
 #endif
 
 

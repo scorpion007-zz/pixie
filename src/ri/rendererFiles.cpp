@@ -177,8 +177,6 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 CTexture	*CRenderer::getTexture(const char *name) {
 	CFileResource	*tex;
 
-	osLock(fileMutex);
-
 	if (loadedFiles->find(name,tex) == FALSE){
 		// Load the texture
 		tex	=	textureLoad(name,texturePath);
@@ -191,8 +189,6 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 		loadedFiles->insert(tex->name,tex);
 	}
-
-	osUnlock(fileMutex);
 
 	return (CTexture *) tex;
 }
@@ -208,8 +204,6 @@ CTexture	*CRenderer::getTexture(const char *name) {
 CEnvironment	*CRenderer::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
-	osLock(fileMutex);
-
 	if (loadedFiles->find(name,tex) == FALSE){
 		tex	=	environmentLoad(name,texturePath,toWorld);
 
@@ -221,8 +215,6 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 
 		loadedFiles->insert(tex->name,tex);
 	}
-
-	osUnlock(fileMutex);
 
 	return (CEnvironment *) tex;
 }
@@ -238,8 +230,6 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	CFileResource	*map;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
-
-	osLock(fileMutex);
 
 	// Check the cache to see if the file is in the memory
 	if (loadedFiles->find(name,map) == FALSE){
@@ -257,8 +247,6 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 		loadedFiles->insert(map->name,map);
 	}
 
-	osUnlock(fileMutex);
-
 	return (CPhotonMap *) map;
 }
 
@@ -271,8 +259,6 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 // Date last edited		:	3/11/2003
 CCache		*CRenderer::getCache(const char *name,const char *mode) {
 	CFileResource	*cache;
-	
-	osLock(fileMutex);
 
 	// Check the memory first
 	if (loadedFiles->find(name,cache) == FALSE){
@@ -366,8 +352,6 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 		loadedFiles->insert(cache->name,cache);
 	}
 
-	osUnlock(fileMutex);
-
 	return (CCache *) cache;
 }
 
@@ -380,8 +364,6 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 // Date last edited		:	02/22/2006
 CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 	CFileResource	*tex;
-
-	osLock(fileMutex);
 
 	if (loadedFiles->find(name,tex) == FALSE){
 		// try environments first
@@ -398,8 +380,6 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 		}
 	}
 
-	osUnlock(fileMutex);
-
 	return (CTextureInfoBase *) tex;
 }
 
@@ -415,8 +395,6 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
-
-	osLock(fileMutex);
 
 	if (loadedFiles->find(name,texture3d) == FALSE){
 	
@@ -482,8 +460,6 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 		
 		loadedFiles->insert(texture3d->name,texture3d);
 	}
-
-	osUnlock(fileMutex);
 
 	return (CPointCloud *) texture3d;
 }

@@ -33,6 +33,7 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
+#include "common/os.h"
 #include "gui/opengl.h"
 #include "fileResource.h"
 #include "ray.h"
@@ -711,6 +712,7 @@ public:
 	matrix		toCamera,fromCamera;
 	float		maxPower;			// The maximum photon power
 	float		searchRadius;
+	TMutex		mutex;				// For synchronization
 };
 
 

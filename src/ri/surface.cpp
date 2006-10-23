@@ -81,10 +81,7 @@ CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float 
 	this->minDepth	=	minDepth;
 	this->udiv		=	-1;
 	this->vdiv		=	-1;
-
-	osLock(CRenderer::refCountMutex);
-	this->object->attach();
-	osUnlock(CRenderer::refCountMutex);
+	this->object->attach();	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -99,9 +96,7 @@ CPatch::~CPatch() {
 	stats.gprimMemory	-=	sizeof(CPatch);
 	stats.numSurfaces--;
 
-	osLock(CRenderer::refCountMutex);
 	object->detach();
-	osUnlock(CRenderer::refCountMutex);
 }
 
 
@@ -742,48 +737,6 @@ int		CPatch::diceStats(CShadingContext *r,float *P,float *N,int udiv,int vdiv) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurfaceGrid
-// Method				:	CSurfaceGrid
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/9/2005
-CSurfaceGrid::CSurfaceGrid(CAttributes *a,CXform *x,CSurface *s,float umin,float umax,float vmin,float vmax,int depth,int minDepth) : CObject(a,x) {
-	this->umin		=	umin;
-	this->umax		=	umax;
-	this->vmin		=	vmin;
-	this->vmax		=	vmax;
-	this->object	=	s;
-
-	osLock(CRenderer::refCountMutex);
-	object->attach();
-	osUnlock(CRenderer::refCountMutex);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurfaceGrid
-// Method				:	~CSurfaceGrid
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/9/2005
-CSurfaceGrid::~CSurfaceGrid() {
-
-	osLock(CRenderer::refCountMutex);
-	object->detach();
-	osUnlock(CRenderer::refCountMutex);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurfaceGrid
-// Method				:	dice
-// Description			:	Dispatch the grid
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/9/2005
-void			CSurfaceGrid::dice(CShadingContext *context) {
-}
 
 
 

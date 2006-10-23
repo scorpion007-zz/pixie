@@ -202,7 +202,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 //	Begin a conditional block execution
 #define		beginConditional()				if (conditionals == NULL) {											\
-												conditionals		=	(CConditional *) CRenderer::frameMemory->alloc(sizeof(CConditional));						\
+												conditionals		=	new CConditional;						\
 												conditionals->next	=	NULL;									\
 												conditionals->prev	=	NULL;									\
 											}																	\
@@ -235,7 +235,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
 												cInstance->dirty	=	TRUE;										\
-												if (CRenderer::dirtyInstances == NULL)									\
+												if (CRenderer::dirtyInstances == NULL)								\
 													CRenderer::dirtyInstances	=	new CArray<CProgrammableShaderInstance *>;	\
 												cInstance->attach();												\
 												CRenderer::dirtyInstances->push(cInstance);							\

@@ -117,6 +117,8 @@ private:
 		matrix					fromWorld,toWorld;
 		matrix					from,to;
 		
+		TMutex					mutex;
+
 		friend class			CRemoteICacheChannel;
 };
 
