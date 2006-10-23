@@ -77,6 +77,8 @@ private:
 	int				flush;				// Should this be written to disk?
 	float			searchRadius;
 	
+	TMutex			mutex;
+	
 	friend			void	makeTexture3D(const char *,const char *,TSearchpath *,int,char **,void **);
 	
 	friend class CRemotePtCloudChannel;

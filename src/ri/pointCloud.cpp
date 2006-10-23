@@ -55,6 +55,8 @@ CPointCloud::CPointCloud(const char *n,CXform *world,const char *channelDefs,int
 	dataPointers		= new CArray<float*>;
 	flush				= write;
 
+	osCreateMutex(mutex);
+
 	// Assign the channels
 	defineChannels(channelDefs);
 
@@ -77,6 +79,9 @@ CPointCloud::CPointCloud(const char *n,CXform *world,FILE *in) : CMap<CPointClou
 	memory				= new CMemStack;
 	dataPointers		= new CArray<float*>;
 	flush				= FALSE;
+	
+	osCreateMutex(mutex);
+
 	
 	// Try to read the point cloud
 
@@ -110,6 +115,8 @@ CPointCloud::CPointCloud(const char *n,CXform *world,FILE *in) : CMap<CPointClou
 // Comments				:
 // Date last edited		:	3/11/2003
 CPointCloud::~CPointCloud() {
+	osDeleteMutex(mutex);
+
 	if (flush) write();
 	
 	delete dataPointers;
@@ -125,7 +132,9 @@ CPointCloud::~CPointCloud() {
 // Comments				:
 // Date last edited		:	3/11/2003
 void	CPointCloud::reset() {
+	osLock(mutex);
 	CMap<CPointCloudPoint>::reset();
+	osUnlock(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -202,6 +211,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	l.indices			=	indices;
 	l.distances			=	distances;
 
+	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
+		
 	CMap<CPointCloudPoint>::lookupWithN(&l,1);
 
 	for (i=0;i<dataSize;i++) Cl[i] = 0.0f;	//GSHTODO: channel fill values
@@ -229,6 +240,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 			totalWeight += weight;
 		}
 	}
+	osUnlock(mutex);
+	
 	// Divide the contribution
 	weight	= 1.0f/totalWeight;
 	for (i=0;i<dataSize;i++) Cl[i]	*=	weight;
@@ -276,7 +289,8 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	mulmp(P,world->to,cP);
 	mulmn(N,world->from,cN);
 	dP			*=	dPscale;
-
+	
+	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
 	point		=	CMap<CPointCloudPoint>::store(P,N);
 	
 	float *data = (float*) memory->alloc(dataSize*sizeof(float));
@@ -285,6 +299,7 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	point->dP			=	dP;
 	
 	dataPointers->push(data);
+	osUnlock(mutex);
 }
 
 

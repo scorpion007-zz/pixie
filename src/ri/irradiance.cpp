@@ -234,7 +234,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 	initv(irradiance,0);
 	initv(envdir,0);
 
-	osLock(mutex);
+	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
 	stack		=	stackBase;
 	*stack++	=	root;
 	while(stack > stackBase) {

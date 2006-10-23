@@ -765,6 +765,12 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
 
+	if (netClient != INVALID_SOCKET) {
+		// for now to keep things working, one thread only in each server
+		// FIXME: remove this once the client server networking is threadable
+		numThreads = 1;
+	}
+			
 	// Start the contexts
 	numActiveThreads	=	2;
 	contexts			=	new CShadingContext*[numThreads];
@@ -1185,10 +1191,6 @@ void		CRenderer::renderFrame() {
 
 			netBuffer.integer	=	NET_READY;
 			rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
-			
-			// for now to keep things working, one thread only in each server
-			// FIXME: remove this once the client server networking is threadable
-			numThreads = 1;
 		}
 		
 		// Spawn the threads
