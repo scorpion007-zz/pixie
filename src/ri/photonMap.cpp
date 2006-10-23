@@ -324,6 +324,9 @@ void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 	maxDepth		=	max(maxDepth,depth);
 }
 
+static	int	numCached	=	0;
+static	int	numComputed	=	0;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	lookup
@@ -333,22 +336,77 @@ void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 //							Il	must be normalized
 // Date last edited		:	4/1/2002
 void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) {
-	int				numFound	=	0;
+	int				numFound;
 	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *)); 
 	float			*distances	=	(float	*)			alloca((maxFound+1)*sizeof(float)); 
 	CLookup			l;
 
 	searchRadius		=	(sqrtf(maxFound*maxPower / 0.05f) / (float) C_PI)*0.5f;
 
+	// First, find the closests photon
 	distances[0]		=	searchRadius*searchRadius;
-
-	l.maxFound			=	maxFound;
+	l.maxFound			=	1;
 	l.numFound			=	0;
 	mulmp(l.P,toCamera,Pl);
 	mulmn(l.N,fromCamera,Nl);
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
 	l.distances			=	distances;
+	initv(Cl,0);
+
+	CMap<CPhoton>::lookupWithN(&l,1);
+
+	if (l.numFound == 0)	return;
+
+	CPhoton	*nearestPhoton	=	(CPhoton *) indices[1];
+
+	// Did we compute this before ?
+	if (nearestPhoton->irradiance[0] == -1) {
+		numComputed++;
+
+		// Lookup the photonmap at the location of the photon
+		distances[0]		=	searchRadius*searchRadius;
+		l.maxFound			=	maxFound;
+		l.numFound			=	0;
+		movvv(l.P,nearestPhoton->P);
+		movvv(l.N,nearestPhoton->N);
+		l.gotHeap			=	FALSE;
+
+		CMap<CPhoton>::lookupWithN(&l,1);
+
+		if ((numFound = l.numFound) < 2)	return;
+
+		// Accumulate the irradiance
+		for (int i=1;i<=numFound;i++) {
+			const	CPhoton	*p	=	indices[i];
+			vector	I;
+
+			assert(distances[i] <= distances[0]);
+
+			photonToDir(I,p->theta,p->phi);
+
+			if (dotvv(I,l.N) < 0) {
+				addvv(Cl,p->C);
+			}
+		}
+
+		// Normalize the result
+		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
+
+		// Record the irradiance in the photon
+		// NOTE: This is not entirely thread safe, 
+		// but it is better to let the other thread 
+		// recompute this data than blocking) ...
+		// Notice that photon maps tend to get queried at distant locations
+		movvv(nearestPhoton->irradiance,Cl);
+	} else {
+		numCached++;
+
+		movvv(Cl,nearestPhoton->irradiance);
+	}
+
+
+	/*
 
 	// Probe the previous lookups first
 	osLock(mutex);
@@ -384,6 +442,7 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
 	}
 	osUnlock(mutex);
+	*/
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -477,6 +536,7 @@ void	CPhotonMap::store(const float *P,const float *N,const float *I,const float 
 	CPhoton	*ton	=	CMap<CPhoton>::store(P,N);
 	dirToPhoton(ton->theta,ton->phi,I);
 	movvv(ton->C,C);
+	initv(ton->irradiance,-1);
 	maxPower	=	max(maxPower,dotvv(C,C));
 	osUnlock(mutex);
 }

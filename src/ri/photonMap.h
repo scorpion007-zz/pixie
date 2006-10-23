@@ -644,6 +644,7 @@ public:
 // Date last edited		:	4/1/2002
 class	CPhoton : public CTon {
 public:
+	vector			irradiance;		// The precomputed irradiance amount (-1 if not precomputed)
 	vector			C;				// The intensity
 	unsigned char	theta,phi;		// Photon direction
 };
