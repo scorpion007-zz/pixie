@@ -217,7 +217,10 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 
 	for (i=0;i<dataSize;i++) Cl[i] = 0.0f;	//GSHTODO: channel fill values
 
-	if (l.numFound < 2)	return;
+	if (l.numFound < 2)	{
+		osUnlock(mutex);
+		return;
+	}
 
 	numFound		=	l.numFound;
 	totalWeight		=	0;
