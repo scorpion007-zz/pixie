@@ -247,9 +247,9 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 				const float	cv		=	v[i];
 				const float	ctime	=	time[i];
 
-				dest[0]			=	(v01[0]*cv + v02[0]*(1-cv) - v00[0])*(1-ctime) + (v01[0]*cv + v02[0]*(1-cv) - v00[0])*ctime;
-				dest[1]			=	(v01[1]*cv + v02[1]*(1-cv) - v00[1])*(1-ctime) + (v01[1]*cv + v02[1]*(1-cv) - v00[1])*ctime;
-				dest[2]			=	(v01[2]*cv + v02[2]*(1-cv) - v00[2])*(1-ctime) + (v01[2]*cv + v02[2]*(1-cv) - v00[2])*ctime;
+				dest[0]			=	(v01[0]*cv + v02[0]*(1-cv) - v00[0])*(1-ctime) + (v11[0]*cv + v12[0]*(1-cv) - v10[0])*ctime;
+				dest[1]			=	(v01[1]*cv + v02[1]*(1-cv) - v00[1])*(1-ctime) + (v11[1]*cv + v12[1]*(1-cv) - v10[1])*ctime;
+				dest[2]			=	(v01[2]*cv + v02[2]*(1-cv) - v00[2])*(1-ctime) + (v11[2]*cv + v12[2]*(1-cv) - v10[2])*ctime;
 				dest			+=	3;
 			}
 		}
@@ -493,6 +493,557 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying) const {
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	CPolygonQuad
+// Description			:	Ctor
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh) : CSurface(a,x) {
+	stats.numGprims++;
+
+	// Save the parameters
+	this->mesh			=	mesh;
+	mesh->attach();
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	~CPolygonQuad
+// Description			:	Dtor
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+CPolygonQuad::~CPolygonQuad() {
+	stats.numGprims--;
+	mesh->detach();
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	tesselate
+// Description			:	See object.h
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/17/2001
+void			CPolygonQuad::tesselate(CShadingContext *context) {
+	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
+		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
+	else														CRenderer::addTracable(this,this);
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	bound
+// Description			:	Compute the bounding box of the polygon
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+void			CPolygonQuad::bound(float *bmin,float *bmax) const {
+	const CPl	*pl			=	mesh->pl;
+	const float	*vertices	=	pl->data0;
+	const float	*v0			=	vertices + this->v0*3;
+	const float	*v1			=	vertices + this->v1*3;
+	const float	*v2			=	vertices + this->v2*3;
+	const float	*v3			=	vertices + this->v3*3;
+
+	// Bound the primitive in the camera space
+	movvv(bmin,v0);
+	movvv(bmax,v0);
+
+	addBox(bmin,bmax,v1);
+	addBox(bmin,bmax,v2);
+	addBox(bmin,bmax,v3);
+
+	if ((vertices=pl->data1) != NULL) {
+		vertices	=	pl->data1;
+		v0			=	vertices + this->v0*3;
+		v1			=	vertices + this->v1*3;
+		v2			=	vertices + this->v2*3;
+		v3			=	vertices + this->v3*3;
+
+		addBox(bmin,bmax,v0);
+		addBox(bmin,bmax,v1);
+		addBox(bmin,bmax,v2);
+		addBox(bmin,bmax,v3);
+	}
+
+	makeBound(bmin,bmax);
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	intersect
+// Description			:	Intersect the quad qith a box
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+int			CPolygonQuad::intersect(const float *bmin,const float *bmax) const {
+	vector	bmi,bma;
+
+	bound(bmi,bma);
+	return intersectBox(bmin,bmax,bmi,bma);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	intersect
+// Description			:	Intersect the quad with a ray
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+void		CPolygonQuad::intersect(CRay *cRay) {
+
+	if (! (cRay->flags & attributes->flags) )	return;
+
+	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
+		const float importance = attributes->lodImportance;
+		if (importance >= 0) {
+			if (cRay->jimp > importance)			return;
+		} else {
+			if ((1-cRay->jimp) >= -importance)		return;
+		}
+	}
+
+	const CPl	*pl			=	mesh->pl;
+	const float	*vertices	=	pl->data0;
+	const float	*P00		=	vertices + this->v0*3;
+	const float	*P10		=	vertices + this->v1*3;
+	const float	*P01		=	vertices + this->v2*3;
+	const float	*P11		=	vertices + this->v3*3;
+	vector	t0,t1,t2,t3;
+
+	if ((vertices = pl->data1) != NULL) {
+		interpolatev(t0,P00,vertices + this->v0*3,cRay->time);	P00	=	t0;
+		interpolatev(t1,P10,vertices + this->v1*3,cRay->time);	P10	=	t1;
+		interpolatev(t2,P01,vertices + this->v2*3,cRay->time);	P01	=	t2;
+		interpolatev(t3,P11,vertices + this->v3*3,cRay->time);	P11	=	t3;
+	} 
+
+
+	const float	*r			=	cRay->from;
+	const float	*q			=	cRay->dir;
+	vector		a,b,c,d;
+
+	subvv(a,P11,P10);
+	subvv(a,P01);
+	addvv(a,P00);
+	subvv(b,P10,P00);
+	subvv(c,P01,P00);
+	movvv(d,P00);
+
+	const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
+	const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
+	const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
+	const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
+	const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
+	const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
+	const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
+	const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
+	
+
+#define solve()														\
+	if ((v > 0) && (v < 1)) {										\
+		{															\
+			const double	a	=	v*A2 + B2;						\
+			const double	b	=	v*(A2 - A1) + B2 - B1;			\
+			if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
+			else			u	=	(-v*C2 - D2) / a;				\
+		}															\
+																	\
+		if ((u > 0) && (u < 1)) {									\
+			double	P[3];											\
+																	\
+			P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
+			P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
+			P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
+																	\
+			if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
+				t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+			else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
+				t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+			else													\
+				t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+																	\
+			if ((t > cRay->tmin) && (t < cRay->t)) {				\
+				vector	dPdu,dPdv,N;								\
+				vector	tmp1,tmp2;									\
+				subvv(tmp1,P10,P00);								\
+				subvv(tmp2,P11,P01);								\
+				interpolatev(dPdu,tmp1,tmp2,(float) v);				\
+				subvv(tmp1,P01,P00);								\
+				subvv(tmp2,P11,P10);								\
+				interpolatev(dPdv,tmp1,tmp2,(float) u);				\
+				crossvv(N,dPdu,dPdv);								\
+				if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
+				if (attributes->nSides == 1) {						\
+					if (dotvv(q,N) < 0) {							\
+						cRay->object	=	this;					\
+						cRay->u			=	(float) u;				\
+						cRay->v			=	(float) v;				\
+						cRay->t			=	(float) t;				\
+						movvv(cRay->N,N);							\
+					}												\
+				} else {											\
+					cRay->object	=	this;						\
+					cRay->u			=	(float) u;					\
+					cRay->v			=	(float) v;					\
+					cRay->t			=	(float) t;					\
+					movvv(cRay->N,N);								\
+				}													\
+			}														\
+		}															\
+	}
+	
+
+
+	double			roots[2];
+	const int		i	=	solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots);
+	double			u,v,t;
+
+	switch (i) {
+		case 0:
+			break;
+		case 1:
+			v	=	roots[0];
+			solve();
+			break;
+		case 2:
+			v	=	roots[0];
+			solve();
+			v	=	roots[1];
+			solve();
+			break;
+	}
+
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	sample
+// Description			:	Sample bunch of points on the quad
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+	int			i,j,k;
+	const float	*u				=	varying[VARIABLE_U] + start;
+	const float	*v				=	varying[VARIABLE_V] + start;
+	const CPl	*pl				=	mesh->pl;
+
+
+	if ((pl->data1 != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
+		const float		*v00;
+		const float		*v01;
+		const float		*v02;
+		const float		*v03;
+		const float		*v10;
+		const float		*v11;
+		const float		*v12;
+		const float		*v13;
+		const float		*data0	=	pl->data0;
+		const float		*data1	=	pl->data1;
+		const float		*time	=	varying[VARIABLE_TIME] + start*3;
+
+		// Interpolate the vertex variables accross the triangle
+		for (j=0;j<pl->numParameters;j++) {
+			const CVariable	*variable	=	pl->parameters[j].variable;
+			const int		numFloats	=	variable->numFloats;
+
+			if (pl->parameters[j].container == CONTAINER_VERTEX) {
+				float		*dest	=	pl->parameters[j].resolve(varying) + start*numFloats;
+
+				if (dest != NULL) {
+					const float	*sv00	=	data0 + this->v0*variable->numFloats;
+					const float	*sv01	=	data0 + this->v1*variable->numFloats;
+					const float	*sv02	=	data0 + this->v2*variable->numFloats;
+					const float	*sv03	=	data0 + this->v3*variable->numFloats;
+					const float	*sv10	=	data1 + this->v0*variable->numFloats;
+					const float	*sv11	=	data1 + this->v1*variable->numFloats;
+					const float	*sv12	=	data1 + this->v2*variable->numFloats;
+					const float	*sv13	=	data1 + this->v3*variable->numFloats;
+
+					for (i=0;i<numVertices;i++) {
+						const	float	cu		=	u[i];
+						const	float	cv		=	v[i];
+						const	float	ctime	=	time[i];
+
+						for (k=0;k<numFloats;k++) {
+							*dest++	=	((sv00[k]*(1-cu) + sv01[k]*cu)*(1-cv) + (sv02[k]*cu + sv03[k]*(1-cu))*cv)*(1-ctime) + 
+										((sv10[k]*(1-cu) + sv11[k]*cu)*(1-cv) + (sv12[k]*cu + sv13[k]*(1-cu))*cv)*ctime;
+						}
+					}
+				}
+			}
+
+			data0	+=	numFloats*pl->parameters[j].numItems;
+			data1	+=	numFloats*pl->parameters[j].numItems;
+		}
+
+		v00	=	data0 + this->v0*3;
+		v01	=	data0 + this->v1*3;
+		v02	=	data0 + this->v2*3;
+		v03	=	data0 + this->v3*3;
+		v10	=	data1 + this->v0*3;
+		v11	=	data1 + this->v1*3;
+		v12	=	data1 + this->v2*3;
+		v13	=	data1 + this->v3*3;
+
+		// Compute surface derivatives and normal if required
+		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
+			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
+
+			for (i=0;i<numVertices;i++) {
+				const float	cv		=	v[i];
+				const float	ctime	=	time[i];
+
+				dest[0]			=	((-v00[0] + v01[0])*(1-cv) + (-v02[0] + v03[0])*cv)*(1-ctime) + ((-v10[0] + v11[0])*(1-cv) + (-v12[0] + v13[0])*cv)*ctime;
+				dest[1]			=	((-v00[1] + v01[1])*(1-cv) + (-v02[1] + v03[1])*cv)*(1-ctime) + ((-v10[1] + v11[1])*(1-cv) + (-v12[1] + v13[1])*cv)*ctime;
+				dest[2]			=	((-v00[2] + v01[2])*(1-cv) + (-v02[2] + v03[2])*cv)*(1-ctime) + ((-v10[2] + v11[2])*(1-cv) + (-v12[2] + v13[2])*cv)*ctime;
+				dest			+=	3;
+			}
+		}
+
+		if (up & (PARAMETER_DPDV | PARAMETER_NG)) {
+			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
+
+			for (i=0;i<numVertices;i++) {
+				const float	cu		=	u[i];
+				const float	ctime	=	time[i];
+
+				dest[0]			=	(-(v00[0]*(1-cu) + (v01[0]*cu)) + (v02[0]*(1-cu) + (v03[0]*cu)))*(1-ctime) + (-(v10[0]*(1-cu) + (v11[0]*cu)) + (v12[0]*(1-cu) + (v13[0]*cu)))*ctime;
+				dest[1]			=	(-(v00[1]*(1-cu) + (v01[1]*cu)) + (v02[1]*(1-cu) + (v03[1]*cu)))*(1-ctime) + (-(v10[1]*(1-cu) + (v11[1]*cu)) + (v12[1]*(1-cu) + (v13[1]*cu)))*ctime;
+				dest[2]			=	(-(v00[2]*(1-cu) + (v01[2]*cu)) + (v02[2]*(1-cu) + (v03[2]*cu)))*(1-ctime) + (-(v10[2]*(1-cu) + (v11[2]*cu)) + (v12[2]*(1-cu) + (v13[2]*cu)))*ctime;
+				dest			+=	3;
+			}
+		}
+
+		if (up & PARAMETER_NG) {
+			float	*dest	=	&varying[VARIABLE_NG][start*3];
+			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
+			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+
+			for (i=0;i<numVertices;i++) {
+				crossvv(dest,dPdu,dPdv);
+
+				dest			+=	3;
+				dPdu			+=	3;
+				dPdv			+=	3;
+			}
+		}
+	} else {
+		const float		*v0;
+		const float		*v1;
+		const float		*v2;
+		const float		*v3;
+		const float		*data;
+
+		if (up & PARAMETER_END_SAMPLE) {
+			data		=	pl->data1;
+		} else {
+			data		=	pl->data0;
+		}
+
+		v0	=	data + this->v0*3;
+		v1	=	data + this->v1*3;
+		v2	=	data + this->v2*3;
+		v3	=	data + this->v3*3;
+
+		// Interpolate the vertex variables accross the triangle
+		for (j=0;j<pl->numParameters;j++) {
+			const CVariable	*variable	=	pl->parameters[j].variable;
+			const int		numFloats	=	variable->numFloats;
+
+			if (pl->parameters[j].container == CONTAINER_VERTEX) {
+				float		*dest	=	pl->parameters[j].resolve(varying) + start*numFloats;
+
+				if (dest != NULL) {
+					const float	*sv0	=	data + this->v0*variable->numFloats;
+					const float	*sv1	=	data + this->v1*variable->numFloats;
+					const float	*sv2	=	data + this->v2*variable->numFloats;
+					const float	*sv3	=	data + this->v3*variable->numFloats;
+
+					for (i=0;i<numVertices;i++) {
+						const	float	cu	=	u[i];
+						const	float	cv	=	v[i];
+
+						for (k=0;k<numFloats;k++) {
+							*dest++	=	(sv0[k]*(1-cu) + sv1[k]*cu)*(1-cv) + (sv2[k]*(1-cu) + sv3[k]*cu)*cv;
+						}
+					}
+				}
+			}
+
+			data	+=	numFloats*pl->parameters[j].numItems;
+		}
+
+		// Compute surface derivatives and normal if required
+		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
+			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
+
+			for (i=0;i<numVertices;i++) {
+				const float	cv	=	v[i];
+
+				dest[0]			=	(v1[0] - v0[0])*(1-cv) + (v3[0] - v2[0])*cv;
+				dest[1]			=	(v1[1] - v0[1])*(1-cv) + (v3[1] - v2[1])*cv;
+				dest[2]			=	(v1[2] - v0[2])*(1-cv) + (v3[2] - v2[2])*cv;
+				dest			+=	3;
+			}
+		}
+
+		if (up & (PARAMETER_DPDV | PARAMETER_NG)) {
+			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
+
+			for (i=0;i<numVertices;i++) {
+				const float	cu	=	u[i];
+
+				dest[0]			=	(v2[0]*(1-cu) + v3[0]*cu) - (v0[0]*(1-cu) + v1[0]*cu);
+				dest[1]			=	(v2[1]*(1-cu) + v3[1]*cu) - (v0[1]*(1-cu) + v1[1]*cu);
+				dest[2]			=	(v2[2]*(1-cu) + v3[2]*cu) - (v0[2]*(1-cu) + v1[2]*cu);
+				dest			+=	3;
+			}
+		}
+
+		if (up & PARAMETER_NG) {
+			float	*dest	=	&varying[VARIABLE_NG][start*3];
+			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
+			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+
+			for (i=0;i<numVertices;i++) {
+				crossvv(dest,dPdu,dPdv);
+
+				dest			+=	3;
+				dPdu			+=	3;
+				dPdv			+=	3;
+			}
+		}
+	}
+
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | mesh->parameters);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Method				:	interpolate
+// Description			:	Core interpolation
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+void			CPolygonQuad::interpolate(int numVertices,float **varying) const {
+	int			i,j,k;
+	const float	*u				=	varying[VARIABLE_U];
+	const float	*v				=	varying[VARIABLE_V];
+	const CPl	*pl				=	mesh->pl;
+	const float	*data			=	pl->data0;
+
+	for (i=0;i<pl->numParameters;i++) {
+		const CPlParameter	*cParameter	=	pl->parameters+i;
+		const CVariable		*cVariable	=	cParameter->variable;
+		const int			numFloats	=	cVariable->numFloats;
+		float				*dest		=	cParameter->resolve(varying);
+		const float			*src;
+		const float			*v0,*v1,*v2,*v3;
+
+		if (dest != NULL) {
+			switch(cParameter->container) {
+			case CONTAINER_UNIFORM:
+				if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+					src	=	data + this->uniform*numFloats;
+					for (j=numFloats;j>0;j--) {
+						*dest++	=	*src++;
+					}
+				} else {
+					// premote
+					for(j=0;j<numVertices;j++) {
+						src	=	data + this->uniform*numFloats;
+						for (k=numFloats;k>0;k--) {
+							*dest++	=	*src++;
+						}
+					}
+				}
+				break;
+			case CONTAINER_VERTEX:
+				// Ignore
+				break;
+			case CONTAINER_VARYING:
+				v0	=	data + this->v0*numFloats;
+				v1	=	data + this->v1*numFloats;
+				v2	=	data + this->v2*numFloats;
+				v3	=	data + this->v3*numFloats;
+				for (j=0;j<numVertices;j++) {
+					const	float	cu	=	u[j];
+					const	float	cv	=	v[j];
+
+					for (k=0;k<numFloats;k++) {
+						*dest++	=	(v0[k]*(1-cu) + v1[k]*cu)*(1-cv) + (v2[k]*(1-cu) + v3[k]*cu)*cv;
+					}
+				}
+
+				break;
+			case CONTAINER_FACEVARYING:
+				v0	=	data + this->fv0*numFloats;
+				v1	=	data + this->fv1*numFloats;
+				v2	=	data + this->fv2*numFloats;
+				v3	=	data + this->fv3*numFloats;
+				for (j=0;j<numVertices;j++) {
+					const	float	cu	=	u[j];
+					const	float	cv	=	v[j];
+
+					for (k=0;k<numFloats;k++) {
+						*dest++	=	(v0[k]*(1-cu) + v1[k]*cu)*(1-cv) + (v2[k]*(1-cu) + v3[k]*cu)*cv;
+					}
+				}
+				break;
+			case CONTAINER_CONSTANT:
+				if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+					src	=	data;
+					for (j=numFloats;j>0;j--) {
+						*dest++	=	*src++;
+					}
+				} else {
+					// premote
+					for(j=0;j<numVertices;j++) {
+						src	=	data;
+						for (k=numFloats;k>0;k--) {
+							*dest++	=	*src++;
+						}
+					}
+				}
+				break;
+			}
+		}
+
+		data	+=	cParameter->numItems*numFloats;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -667,38 +1218,44 @@ void		CPolygonMesh::dice(CShadingContext *r) {
 
 
 
-/*
+
+
 ///////////////////////////////////////////////////////////////////////
-// Function				:	createQuad
-// Description			:	Actually create the quad
+// Function				:	createTriangle
+// Description			:	Actually create the triangle
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/29/2003
-static	void	createQuad(const int *vindices,const int vi0,const int vi1,const int vi2,const int vi3) {
-	CBilinearPatch		*cQuad;
-	const float			*P				=	meshP;
-	CParameter			*parameters		=	NULL;
-	CVertexData			*vertexData		=	meshPl->vertexData();
-	const int			vertexSize		=	vertexData->vertexSize;
-	double				*vertex			=	(double *) alloca(vertexSize*4*sizeof(double));
-	int					i;
+inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int vi2,const int vi3,CMeshData &data) {
+	CPolygonQuad		*cQuad;
+	const float			*P				=	data.meshP;
+	const float			*vs0			=	P+vindices[vi0]*3;
+	const float			*vs1			=	P+vindices[vi1]*3;
+	const float			*vs2			=	P+vindices[vi2]*3;
+	const float			*vs3			=	P+vindices[vi3]*3;
 
-	// Copy the vertex data
-	for (i=0;i<vertexSize;i++) {
-		vertex[0			+ i]	=	vs0[i];
-		vertex[vertexSize*1 + i]	=	vs1[i];
-		vertex[vertexSize*2 + i]	=	vs3[i];
-		vertex[vertexSize*3 + i]	=	vs2[i];
+	// Create the triangle
+	cQuad				=	new CPolygonQuad(data.meshAttributes,data.meshXform,data.mesh);
+
+	// Set the variables
+	cQuad->v0			=	vindices[vi0];
+	cQuad->v1			=	vindices[vi1];
+	cQuad->v3			=	vindices[vi2];
+	cQuad->v2			=	vindices[vi3];
+	cQuad->fv0			=	data.meshFacevaryingNumber+vi0;
+	cQuad->fv1			=	data.meshFacevaryingNumber+vi1;
+	cQuad->fv3			=	data.meshFacevaryingNumber+vi2;
+	cQuad->fv2			=	data.meshFacevaryingNumber+vi3;
+	cQuad->uniform		=	data.meshUniformNumber;
+
+	// Add the children into the pool
+	data.meshChildren->push(cQuad);
+
+	if (data.meshContext != NULL) {
+		cQuad->tesselate(data.meshContext);
 	}
 
-	// Extract the parameters from the PL
-	parameters							=	meshPl->uniform(meshUniformNumber,NULL);
-	parameters							=	meshPl->varying(v0,v1,v3,v2,parameters);
-
-	// Create the quad
-	cQuad								=	new CBilinearPatch(meshAttributes,meshXform,NULL,parameters,0,0,1,1,vertexData);
 }
-*/
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	createTriangle
@@ -986,6 +1543,15 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		meshFacevaryingNumber	+=	3;
 
 		return;
+	} else if ((nloops == 1) && (nverts[0] == 4)) {
+
+		// Create the quad
+		createQuad(vindices,0,1,2,3);
+
+		meshUniformNumber++;
+		meshFacevaryingNumber	+=	4;
+
+		return;
 	}
 #endif
 
@@ -1091,6 +1657,26 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		}
 		data.meshUniformNumber++;
 		data.meshFacevaryingNumber	+=	3;
+
+		return;
+	} else if ((nloops == 1) && (nverts[0] == 4)) {
+		CTriVertex	*nnVertex;
+		cVertex		= loops[0];
+		pVertex		= cVertex->prev;
+		nnVertex	= pVertex->prev;
+		nVertex		= cVertex->next;
+		const int	vi0	=	(nVertex->xy - xy) >> 1;
+		const int	vi1	=	(cVertex->xy - xy) >> 1;
+		const int	vi2	=	(pVertex->xy - xy) >> 1;
+		const int	vi3	=	(nnVertex->xy - xy) >> 1;
+
+		if (reverse == FALSE) {
+			createQuad(vindices,vi0,vi1,vi2,vi3,data);
+		} else {
+			createQuad(vindices,vi3,vi2,vi1,vi0,data);
+		}
+		data.meshUniformNumber++;
+		data.meshFacevaryingNumber	+=	4;
 
 		return;
 	}
@@ -1286,7 +1872,7 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 	}
 	numVertices++;
 
-	parameters				=	pl->parameterUsage();
+	parameters					=	pl->parameterUsage();
 
 	// Fill in the data structure
 	CMeshData	data;

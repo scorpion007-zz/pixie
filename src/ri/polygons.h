@@ -66,12 +66,13 @@ private:
 		unsigned int		parameters;
 
 		friend	class		CPolygonTriangle;
+		friend	class		CPolygonQuad;
 };
 
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CTriangle
+// Class				:	CPolygonTriangle
 // Description			:	This class is used during the tesselation
 //							Every polygon is first triangulated to obtain a 
 //							meaningful parameter space. Then individual triangles
@@ -96,7 +97,30 @@ public:
 		int					uniform;		// The uniform index
 };
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonQuad
+// Description			:	Holds a bilinear polygon
+// Comments				:
+// Date last edited		:	6/28/2001
+class	CPolygonQuad : public CSurface , public CTracable {
+public:
+							CPolygonQuad(CAttributes *,CXform *,CPolygonMesh *);
+							~CPolygonQuad();
 
+		int					intersect(const float *,const float *) const;
+		void				intersect(CRay *);
+		void				bound(float *,float *) const;
+		void				tesselate(CShadingContext *);
+		int					moving() const												{	return mesh->pl->data1 != NULL;		}
+		void				sample(int,int,float **,unsigned int &) const;
+		void				interpolate(int,float **) const;
+
+
+		CPolygonMesh		*mesh;
+		int					v0,v1,v2,v3;		// The vertex indices
+		int					fv0,fv1,fv2,fv3;	// The facevarying indices
+		int					uniform;			// The uniform index
+};
 #endif
 
 
