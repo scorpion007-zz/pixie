@@ -113,7 +113,7 @@ static	inline	float	intersect(const float *P,float dP,float x,float y,float z,fl
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/15/2006
-CBrickMap::CBrickMap(FILE *in,const char *name,CXform *world) : CTexture3d(name,world) {
+CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to) : CTexture3d(name,from,to) {
 	int		offset,i;
 
 	// Init the data
@@ -174,7 +174,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,CXform *world) : CTexture3d(name,
 // Return Value			:	-
 // Comments				:	Use this contructor to compute from sctratch
 // Date last edited		:	7/15/2006
-CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,CXform *world,CTexture3dChannel *ch,int nc) : CTexture3d(name,world,nc,ch) {
+CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,CTexture3dChannel *ch,int nc) : CTexture3d(name,from,to,nc,ch) {
 	int	i;
 	
 	// Init the data
@@ -362,10 +362,10 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	if (depth > maxDepth)	depth	=	maxDepth;
 
 	// First, transform the point to world coordinate system
-	mulmp(P,world->to,cP);
+	mulmp(P,to,cP);
 	assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
-	mulmn(N,world->from,cN);
+	mulmn(N,from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
 	
 	// Lock the structure
@@ -450,10 +450,10 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	int		i;
 
 	// First, transform the point to world coordinate system
-	mulmp(P,world->to,cP);
+	mulmp(P,to,cP);
 	assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
-	mulmn(N,world->from,cN);
+	mulmn(N,from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
 	
 	// Perform the lookup
@@ -1406,13 +1406,16 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	if (CRenderer::locateFile(fileName,src,searchPath)) {
 		FILE *in;
 		if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
+			matrix	identity;
+
 			// create backing store in a temp file
 			// FIXME: make osTempname not always prefix dir
 			sprintf(tempName,"%s.tmp",dest);
 		
-			CXform		*dummyXform	=	new CXform;	dummyXform->attach();
-			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,dummyXform,in);
-			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,dummyXform,cPtCloud->channels,cPtCloud->numChannels);
+			identitym(identity);
+
+			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identity,identity,in);
+			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identity,identity,cPtCloud->channels,cPtCloud->numChannels);
 			
 			float **dataPointers =	cPtCloud->dataPointers->array;
 			for (i=1;i<cPtCloud->numPhotons;i++) {
@@ -1428,7 +1431,6 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			
 			delete cBMap;
 			delete cPtCloud;
-			dummyXform->detach();
 			// clean up
 			osDeleteFile(tempName);
 		} else {

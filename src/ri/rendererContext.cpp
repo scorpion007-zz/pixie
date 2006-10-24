@@ -76,26 +76,6 @@
 #include "brickmap.h"
 
 
-// Textual definitions of predefined coordinate systems
-const char	*coordinateCameraSystem		=	"camera";
-const char	*coordinateWorldSystem		=	"world";
-const char	*coordinateObjectSystem		=	"object";
-const char	*coordinateShaderSystem		=	"shader";
-const char	*coordinateLightSystem		=	"light";
-const char	*coordinateNDCSystem		=	"NDC";
-const char	*coordinateRasterSystem		=	"raster";
-const char	*coordinateScreenSystem		=	"screen";
-const char	*coordinateCurrentSystem	=	"current";
-
-// Textual definitions of the predefined color systems
-const char	*colorRgbSystem				=	"rgb";
-const char	*colorHslSystem				=	"hsl";
-const char	*colorHsvSystem				=	"hsv";
-const char	*colorXyzSystem				=	"xyz";
-const char	*colorYiqSystem				=	"yiq";
-const char	*colorXyySystem				=	"xyy";
-const char	*colorCieSystem				=	"cie";
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // The global variables are defined here
 extern	int			ribCommandLineno;					// These two are defined in rib.y

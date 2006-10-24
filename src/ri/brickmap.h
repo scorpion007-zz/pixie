@@ -101,8 +101,8 @@ class	CBrickMap : public CTexture3d {
 	};
 
 public:
-								CBrickMap(FILE *in,const char *name,CXform *world);
-								CBrickMap(const char *name,const float *bmin,const float *bmax,CXform *world,CTexture3dChannel*,int);
+								CBrickMap(FILE *in,const char *name,const float *from,const float *to);
+								CBrickMap(const char *name,const float *bmin,const float *bmax,const float *from,const float *to,CTexture3dChannel*,int);
 			virtual				~CBrickMap();
 			
 								///////////////////////////////////////////////////////////////////////

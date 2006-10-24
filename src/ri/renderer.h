@@ -59,6 +59,26 @@ const	unsigned	int	CLIP_BOTTOM					=	8;
 const	unsigned	int	CLIP_NEAR					=	16;
 const	unsigned	int	CLIP_FAR					=	32;
 
+// Textual definitions of predefined coordinate systems
+extern	const char	*coordinateCameraSystem;
+extern	const char	*coordinateWorldSystem;
+extern	const char	*coordinateObjectSystem;
+extern	const char	*coordinateShaderSystem;
+extern	const char	*coordinateLightSystem;
+extern	const char	*coordinateNDCSystem;
+extern	const char	*coordinateRasterSystem;
+extern	const char	*coordinateScreenSystem;
+extern	const char	*coordinateCurrentSystem;
+
+// Textual definitions of the predefined color systems
+extern	const char	*colorRgbSystem;
+extern	const char	*colorHslSystem;
+extern	const char	*colorHsvSystem;
+extern	const char	*colorXyzSystem;
+extern	const char	*colorYiqSystem;
+extern	const char	*colorXyySystem;
+extern	const char	*colorCieSystem;
+
 // Forward definitions
 class	CDisplayChannel;
 class	CHierarchy;

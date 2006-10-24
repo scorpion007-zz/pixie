@@ -42,14 +42,14 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/23/2006
-CTexture3d::CTexture3d(const char *n,CXform *w,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
+CTexture3d::CTexture3d(const char *n,const float *f,const float *t,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
 	refCount	=	0;
 	dataSize	=	0;
 	channels	=	NULL;
 	numChannels	=	0;
-	world		=	w; 
-	world->attach();
-	dPscale		=	pow(fabs(determinantm(world->to)),1.0f / 3.0f);
+	movmm(from,f);
+	movmm(to,t);
+	dPscale		=	pow(fabs(determinantm(to)),1.0f / 3.0f);
 
 	if (nc > 0) {
 		int	i;
@@ -70,8 +70,6 @@ CTexture3d::CTexture3d(const char *n,CXform *w,int nc,CTexture3dChannel *ch) : C
 // Comments				:
 // Date last edited		:	7/23/2006
 CTexture3d::~CTexture3d() { 
-	world->detach();
-
 	if (channels != NULL) delete [] channels;
 }
 	

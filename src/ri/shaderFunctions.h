@@ -2153,7 +2153,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								dirty();																		\
 								lookup->radius			=	-1.0f;												\
 								lookup->radiusScale		=	1.0f;												\
-								lookup->coordsys		=	NULL;												\
+								lookup->coordsys		=	coordinateWorldSystem;								\
 								lookup->numChannels		=	0;													\
 								lookup->dataStart		=	start;												\
 								{																				\
@@ -2172,7 +2172,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											lookup->radius		=	val->real;									\
 											lookup->dataStart += 2;												\
 										} else if (strcmp(param->string,"coordsystem") == 0) {					\
-											lookup->coordsys	=	strdup(val->string);								\
+											lookup->coordsys	=	val->string;								\
 											lookup->dataStart += 2;												\
 										} else {																\
 											channelNames[lookup->numChannels++]	= param->string;				\
@@ -2199,7 +2199,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									operand(1,op1);																\
 									operand(2,op2);																\
 									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,*from,*to);							\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,*from,*to);						\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
 									lookup->valueSpace	=	new float[lookup->sampleSize];						\
 								}																				\
@@ -2304,7 +2304,7 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1);																\
 									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,*from,*to);									\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,*from,*to);								\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
 									lookup->valueSpace	=	new float[lookup->sampleSize];						\
 								}																				\

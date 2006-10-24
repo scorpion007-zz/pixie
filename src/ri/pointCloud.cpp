@@ -49,7 +49,7 @@
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
 // Date last edited		:	06/27/2006
-CPointCloud::CPointCloud(const char *n,CXform *world,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,world) {
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	// Create our data areas
 	memory				= new CMemStack;
 	dataPointers		= new CArray<float*>;
@@ -72,7 +72,7 @@ CPointCloud::CPointCloud(const char *n,CXform *world,const char *channelDefs,int
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
 // Date last edited		:	06/27/2006
-CPointCloud::CPointCloud(const char *n,CXform *world,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,world) {
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	int		i;
 
 	// Create our data areas
@@ -200,8 +200,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	l.numFound			=	0;
 
 	// Perform lookup in the world coordinate system
-	mulmp(l.P,world->to,Pl);
-	mulmn(l.N,world->from,Nl);
+	mulmp(l.P,to,Pl);
+	mulmn(l.N,from,Nl);
 	mulvf(l.N,-1);				// Photonmaps have N reversed, we must reverse
 								// N when looking up it it
 
@@ -289,8 +289,8 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	CPointCloudPoint	*point;
 
 	// Store in the world coordinate system
-	mulmp(P,world->to,cP);
-	mulmn(N,world->from,cN);
+	mulmp(P,to,cP);
+	mulmn(N,from,cN);
 	dP			*=	dPscale;
 	
 	osLock(mutex);	// FIXME: use rwlock to allow multiple readers

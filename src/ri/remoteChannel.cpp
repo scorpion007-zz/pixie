@@ -764,14 +764,8 @@ int	CRemotePtCloudChannel::setup(SOCKET s) {
 	rcRecv(s,channelDef,1024,FALSE);
 	cloud->defineChannels(channelDef);
 	
-	// detach the transform
-	cloud->world->detach();
-	
-	CXform *dummy = new CXform();	// points have already been transformed into worldspace
-									// by the client -> this must be done only for netrender servers
-	
-	dummy->attach();
-	cloud->world = dummy;
+	identitym(cloud->to);
+	identitym(cloud->from);
 	
 	// set the scale to 1
 	

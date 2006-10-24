@@ -56,8 +56,8 @@ public:
 // Date last edited		:	3/11/2003
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
-					CPointCloud(const char *,CXform *,const char*,int);
-					CPointCloud(const char *,CXform *,FILE *);
+					CPointCloud(const char *,const float *from,const float *to,const char*,int);
+					CPointCloud(const char *,const float *from,const float *to,FILE *);
 					~CPointCloud();
 
 	void			reset();
