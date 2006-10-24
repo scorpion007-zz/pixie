@@ -35,11 +35,6 @@
 
 #ifdef WIN32		// >>>>>>>>>>>>>>>>>>>   Win32
 #define	WIN32_LEAN_AND_MEAN 
-
-#ifndef _WIN32_WINNT
-# define _WIN32_WINNT 0x400
-#endif
-
 #include <windows.h>
 #include <winsock.h>
 #include <malloc.h>
@@ -167,20 +162,6 @@ inline	void	osLock(TMutex &mutex) {
 	EnterCriticalSection(&mutex);
 #else
 	pthread_mutex_lock(&mutex);
-#endif
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	osTrylock
-// Description			:	Try to lock a mutex
-// Return Value			:	TRUE if we own the mutex/FALSE otherwise
-// Comments				:
-// Date last edited		:	11/28/2001
-inline	int		osTrylock(TMutex &mutex) {
-#ifdef WIN32
-	return	TryEnterCriticalSection(&mutex) != 0;
-#else
-	return	pthread_mutex_trylock(&mutex) == 0;
 #endif
 }
 

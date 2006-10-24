@@ -1067,6 +1067,7 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 	CHStack						*hierarchyStack		=	(CHStack *) alloca(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
 	CHStack						*hierarchyStackTop	=	hierarchyStack;
 
+	cInternal					=	NULL;
 	hierarchyStackTop->node		=	r;
 	hierarchyStackTop->tmin		=	tmin;
 	hierarchyStackTop->tmax		=	tmax;
@@ -1201,40 +1202,48 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 
 
 			// Make sure this action is atomic
-			if (osTrylock(CRenderer::hierarchyMutex)) {
+			osLock(CRenderer::hierarchyMutex);
 
-				// We hit an uncomputed node
-				cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
-				cInternal		=	cUncomputed->parent;
-				nNode			=	compute(cUncomputed);
+			// Check if this node has been taken care of
+			if (cInternal == NULL) {
+				if (root != hierarchyStackTop->node) {
 
-				if (cInternal == NULL) {
-					root		=	nNode;
-				} else {
-					if (cInternal->front == hierarchyStackTop->node)
-						cInternal->front	=	nNode;
-					else if (cInternal->back == hierarchyStackTop->node)
-						cInternal->back		=	nNode;
-					else {
-						error(CODE_BUG,"Lost hierarchy node\n");
-					}
+					// A parallel thread took care of it ... re-trace the ray
+					osUnlock(CRenderer::hierarchyMutex);
+					intersect(ray);
+					return;
 				}
-
-				hierarchyStackTop->node	=	nNode;
-				hierarchyStackTop++;
-
-				osUnlock(CRenderer::hierarchyMutex);
 			} else {
+				if (	(cInternal->front != hierarchyStackTop->node) && (cInternal->back != hierarchyStackTop->node)	) {
 
-				// Wait until the other thread finishes processing
-				osLock(CRenderer::hierarchyMutex);
-				osUnlock(CRenderer::hierarchyMutex);
-
-				// A parallel thread took care of it ... re-trace the ray
-				intersect(ray);
-				
-				return;
+					// A parallel thread took care of it ... re-trace the ray
+					osUnlock(CRenderer::hierarchyMutex);
+					intersect(ray);
+					return;
+				}
 			}
+
+			// We hit an uncomputed node
+			cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
+			assert(cInternal ==	cUncomputed->parent);
+			nNode			=	compute(cUncomputed);
+
+			if (cInternal == NULL) {
+				root		=	nNode;
+			} else {
+				if (cInternal->front == hierarchyStackTop->node)
+					cInternal->front	=	nNode;
+				else if (cInternal->back == hierarchyStackTop->node)
+					cInternal->back		=	nNode;
+				else {
+					error(CODE_BUG,"Lost hierarchy node\n");
+				}
+			}
+
+			hierarchyStackTop->node	=	nNode;
+			hierarchyStackTop++;
+
+			osUnlock(CRenderer::hierarchyMutex);
 
 			break;
 		case HIERARCHY_EMPTY_NODE:
@@ -1630,14 +1639,13 @@ CHierarchy::~CHierarchy() {
 // Comments				:
 // Date last edited		:	12/23/2001
 void	CHierarchy::intersect(CRay *ray) {
-
 	float			tnear	=	ray->tmin;
 	float			tfar	=	ray->t;
 	float			t1,t2;
 	unsigned int	i;
-	float			*F		=	ray->from;
-	float			*T		=	ray->to;
-	float			*D		=	ray->invDir;
+	const float		*F		=	ray->from;
+	const float		*T		=	ray->to;
+	const float		*D		=	ray->invDir;
 
 	for (i=0;i<3;i++) {
 		if (F[i] == T[i]) {
