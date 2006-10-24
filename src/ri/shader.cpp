@@ -924,7 +924,7 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 		// This is the repetition amount
 		if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 
-			assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
+			//assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
 
 			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
 				int	i;
@@ -932,7 +932,7 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 			}
 		} else {
 
-			assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
+			//assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
 
 			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
 				int			n;
