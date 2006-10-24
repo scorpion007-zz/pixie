@@ -2193,15 +2193,18 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1,*op2;												\
+									matrix				*from,*to;												\
+									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(5,(numArguments-5) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,lookup->coordsys);					\
+									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,*from,*to);						\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
-									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
 									lookup->nv			=	CRenderer::numThreads;								\
+									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
 									for (int t = 0; t<CRenderer::numThreads; t++)								\
-										lookup->valueSpace[t] = new float[lookup->sampleSize];							\
+										lookup->valueSpace[t] = new float[lookup->sampleSize];					\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
@@ -2299,14 +2302,17 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1;													\
+									matrix				*from,*to;												\
+									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1);																\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,lookup->coordsys);						\
+									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,*from,*to);								\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
-									lookup->valueSpace	=	new float*[CRenderer::numThreads];														\
 									lookup->nv			=	CRenderer::numThreads;								\
+									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
 									for (int t = 0; t<CRenderer::numThreads; t++)								\
-										lookup->valueSpace[t] = new float[lookup->sampleSize];							\
+										lookup->valueSpace[t] = new float[lookup->sampleSize];					\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
