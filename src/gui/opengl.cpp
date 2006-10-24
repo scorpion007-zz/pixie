@@ -99,5 +99,36 @@ void		pglPoints(int n,const float *P,const float *C) {
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	pglDisks
+// Description			:	Draw disks with OpenGL
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/21/2006
+void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *C) {
+	
+	for (;n>0;n--,P+=3,dP++,N+=3,C+=3) {
+		vector	X,Y,x,y;
+		int		i;
+
+		crossvv(X,P,N);
+		crossvv(Y,X,N);
+		normalizevf(X);
+		normalizevf(Y);
+
+		glColor3fv(C);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3fv(P);
+		for (i=0;i<=10;i++) {
+			const float	theta	=	(float) (i * C_PI * 2.0f / 10.0f);
+			mulvf(x,X,cosf(theta)*dP[0]);
+			mulvf(y,Y,sinf(theta)*dP[0]);
+			addvv(x,P);
+			addvv(x,y);
+			glVertex3fv(x);
+		}
+		glEnd();
+	}
+}
 
 

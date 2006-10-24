@@ -947,27 +947,34 @@ void		CIrradianceCache::draw() {
 	int					i,j;
 	float				P[chunkSize*3];
 	float				C[chunkSize*3];
-	float				*cP,*cC;
+	float				N[chunkSize*3];
+	float				dP[chunkSize];
+	float				*cP,*cC,*cN,*cdP;
 
 	j			=	chunkSize;
 	cP			=	P;
 	cC			=	C;
+	cN			=	N;
+	cdP			=	dP;
 	stack		=	stackBase;
 	*stack++	=	root;
 	while(stack > stackBase) {
 		cNode	=	*(--stack);
 
 		// Sum the values in this level
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--,cP+=3,cC+=3) {
+		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--,cP+=3,cN+=3,cdP++,cC+=3) {
 			if (j == 0)	{
-				drawPoints(chunkSize,P,C);
+				drawDisks(chunkSize,P,dP,N,C);
 				cP	=	P;
 				cC	=	C;
+				cN	=	N;
+				cdP	=	dP;
 				j	=	chunkSize;
 			}
 
-			// FIXME: Maybe we should draw disks instead of points here
 			movvv(cP,cSample->P);
+			movvv(cN,cSample->N);
+			*dP		=	cSample->dP;
 			movvv(cC,cSample->irradiance);
 		}
 
@@ -981,7 +988,7 @@ void		CIrradianceCache::draw() {
 		}
 	}
 
-	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+	if (j != chunkSize)	drawDisks(chunkSize-j,P,dP,N,C);
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -42,6 +42,7 @@
 void					*CView::handle			=	NULL;
 TGlTrianglesFunction	CView::drawTriangles	=	NULL;
 TGlPointsFunction		CView::drawPoints		=	NULL;
+TGlDisksFunction		CView::drawDisks		=	NULL;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
@@ -77,6 +78,7 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 
 				CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
 				CView::drawPoints		=	(TGlPointsFunction)		osResolve(CView::handle,"pglPoints");
+				CView::drawDisks		=	(TGlDisksFunction)		osResolve(CView::handle,"pglDisks");
 
 				assert(CView::drawTriangles != NULL);
 				assert(CView::drawPoints != NULL);
@@ -110,9 +112,9 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 							} else if (strcmp(t,fileGatherCache) == 0) {
 								view	=	CRenderer::getCache(fileName,"R");
 							} else if (strcmp(t,filePointCloud) == 0) {
-								//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
 							} else if (strcmp(t,fileBrickMap) == 0) {
-								//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
 							}
 
 							// Create / display the window

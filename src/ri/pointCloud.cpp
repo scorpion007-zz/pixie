@@ -317,25 +317,33 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 void	CPointCloud::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
+	float		N[chunkSize*3];
+	float		dP[chunkSize*3];
 	int			i,j;
-	float		*cP	=	P;
-	float		*cC	=	C;
+	float		*cP		=	P;
+	float		*cC		=	C;
+	float		*cN		=	N;
+	float		*cdP	=	dP;
 	CPointCloudPoint	*cT	=	photons+1;
 
 	// Collect and dispatch the photons
-	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cC+=3,j--) {
+	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
 		if (j == 0)	{
-			drawPoints(chunkSize,P,C);
+			drawDisks(chunkSize,P,dP,N,C);
 			cP	=	P;
 			cC	=	C;
+			cN	=	N;
+			cdP	=	dP;
 			j	=	chunkSize;
 		}
 		
 		movvv(cP,cT->P);
+		movvv(cN,cT->N);
+		*dP	=	cT->dP;
 		movvv(cC,dataPointers->array[cT->entryNumber]);
 	}
 
-	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+	if (j != chunkSize)	drawDisks(chunkSize-j,P,dP,N,C);
 }
 
 //////////////////////////////////////////////////////////////////////
