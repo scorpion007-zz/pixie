@@ -67,6 +67,17 @@ void		CRenderer::initFiles() {
 	dsos								=	NULL;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	sfClearTemp
+// Description			:	This callback function is used to remove the temporary files
+// Return Value			:
+// Comments				:
+// Date last edited		:	7/4/2001
+static int	rcClearTemp(const char *fileName,void *userData) {
+	osDeleteFile(fileName);
+
+	return TRUE;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
@@ -77,6 +88,18 @@ void		CRenderer::initFiles() {
 // Date last edited		:	8/25/2002
 void		CRenderer::shutdownFiles() {
 
+	// Ditch the temporary files created
+	if (temporaryPath != NULL) {
+		if (osFileExists(temporaryPath)) {
+			char	tmp[OS_MAX_PATH_LENGTH];
+
+			sprintf(tmp,"%s\\*",temporaryPath);
+			osFixSlashes(tmp);
+			osEnumerate(tmp,rcClearTemp,NULL);
+			osDeleteDir(temporaryPath);
+		}
+	}
+	
 	// Ditch the DSO shaders that have been loaded
 	CDSO	*cDso;
 	for (cDso=dsos;cDso!=NULL;) {
@@ -401,18 +424,25 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	02/22/2006
-CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to) {
+CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const char *coordsys) {
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
 
 	if (*name == '\0')	return NULL;
 
-	if (loadedFiles->find(name,texture3d) == FALSE){
-
-		if (from == NULL) {
-			from	=	world->from;
-			to		=	world->to;
+	if (loadedFiles->find(name,texture3d) == FALSE){	
+		CXform *xform = world;
+		if (coordsys != NULL) {
+			ECoordinateSystem	esys;
+			matrix				*from,*to;
+			
+			// non worldspace texture
+			xform = new CXform();
+			findCoordinateSystem(coordsys,from,to,esys);
+	
+			movmm(xform->from,from[0]);	// construct the transform to put us in the desired system
+			movmm(xform->to,to[0]);
 		}
 		
 		// If we are writing, it must be a point cloud
@@ -428,7 +458,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
 			} else {
 				// alloate a point cloud which will be written to disk
-				texture3d	=	new CPointCloud(name,from,to,channels,TRUE);
+				texture3d	=	new CPointCloud(name,xform,channels,TRUE);
 			}
 			
 		} else {
@@ -436,7 +466,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			if (locateFile(fileName,name,texturePath)) {
 				// Try to open the file
 				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-					texture3d	=	new CPointCloud(name,from,to,in);
+					texture3d	=	new CPointCloud(name,xform,in);
 				} else {
 					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
 						texture3d	=	new CBrickMap(in,name,from,to);

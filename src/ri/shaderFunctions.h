@@ -2193,15 +2193,15 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1,*op2;												\
-									matrix				*from,*to;												\
-									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(5,(numArguments-5) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,*from,*to);						\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,lookup->coordsys);					\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
-									lookup->valueSpace	=	new float[lookup->sampleSize];						\
+									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
+									lookup->nv			=	CRenderer::numThreads;								\
+									for (int t = 0; t<CRenderer::numThreads; t++)								\
+										lookup->valueSpace[t] = new float[lookup->sampleSize];							\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
@@ -2262,8 +2262,8 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									operand(lookup->dataStart+i*2+1,channelValues[i]);							\
 								} 
 
-#define	BAKE3DEXPR				tex->prepareSample(lookup->valueSpace,(float**)channelValues,lookup->bindings);	\
-								tex->store(lookup->valueSpace,&op3->real,&op4->real,*radius);					\
+#define	BAKE3DEXPR				tex->prepareSample(lookup->valueSpace[thread],(float**)channelValues,lookup->bindings);	\
+								tex->store(lookup->valueSpace[thread],&op3->real,&op4->real,*radius);					\
 								res->real		=	1;
 
 #define	BAKE3DEXPR_UPDATE		res++;																			\
@@ -2299,14 +2299,14 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1;													\
-									matrix				*from,*to;												\
-									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1);																\
-									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,*from,*to);								\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,lookup->coordsys);						\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
-									lookup->valueSpace	=	new float[lookup->sampleSize];						\
+									lookup->valueSpace	=	new float*[CRenderer::numThreads];														\
+									lookup->nv			=	CRenderer::numThreads;								\
+									for (int t = 0; t<CRenderer::numThreads; t++)								\
+										lookup->valueSpace[t] = new float[lookup->sampleSize];							\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
@@ -2367,8 +2367,8 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 									operand(lookup->dataStart+i*2+1,channelValues[i]);							\
 								}
 
-#define	TEXTURE3DEXPR			tex->lookup(lookup->valueSpace,&op2->real,&op3->real,*radius);							\
-								tex->unpackSample(lookup->valueSpace,(float**)channelValues,lookup->bindings);			\
+#define	TEXTURE3DEXPR			tex->lookup(lookup->valueSpace[thread],&op2->real,&op3->real,*radius);							\
+								tex->unpackSample(lookup->valueSpace[thread],(float**)channelValues,lookup->bindings);			\
 								res->real		=	1;
 
 #define	TEXTURE3DEXPR_UPDATE	res++;																			\

@@ -187,7 +187,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 			{
 			// create an pointcloud channel.
 			// Note: the channel definitions are duff
-			CPointCloud *cloud = (CPointCloud*)  getTexture3d(channelName,TRUE,NULL,CRenderer::fromWorld,CRenderer::toWorld);			
+			CPointCloud *cloud = (CPointCloud*)  getTexture3d(channelName,TRUE,NULL,NULL);			
 			rChannel = new CRemotePtCloudChannel(cloud);
 			rChannel->remoteId = remoteChannels->numItems;
 			buffer[0].integer	=	rChannel->remoteId;

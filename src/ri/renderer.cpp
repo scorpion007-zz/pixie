@@ -827,19 +827,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	}
 }
 
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	sfClearTemp
-// Description			:	This callback function is used to remove the temporary files
-// Return Value			:
-// Comments				:
-// Date last edited		:	7/4/2001
-static int	rcClearTemp(const char *fileName,void *userData) {
-	osDeleteFile(fileName);
-
-	return TRUE;
-}
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	endFrame
@@ -936,18 +923,6 @@ void		CRenderer::endFrame() {
 	// Ditch the frame memory
 	delete frameMemory;
 	frameMemory	=	NULL;
-
-	// Ditch the temporary files created
-	if (temporaryPath != NULL) {
-		if (osFileExists(temporaryPath)) {
-			char	tmp[OS_MAX_PATH_LENGTH];
-
-			sprintf(tmp,"%s\\*",temporaryPath);
-			osFixSlashes(tmp);
-			osEnumerate(tmp,rcClearTemp,NULL);
-			osDeleteDir(temporaryPath);
-		}
-	}
 
 	// Remove end-of-frame temporary files
 	if (frameTemporaryFiles != NULL) {

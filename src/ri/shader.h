@@ -220,6 +220,8 @@ class	CTexture3dLookup : public CShaderLookup	{
 public:
 							~CTexture3dLookup()	{
 								delete[] bindings;
+								for (int t = 0; t<nv; t++)
+									delete[] valueSpace[t];
 								delete[] valueSpace;
 							}
 		float				radius;					// The sample radius
@@ -231,7 +233,8 @@ public:
 		
 		int					sampleSize;				// The cloud's native sample size
 		CTexture3dChannel	**bindings;				// Points to the environment being looked up
-		float				*valueSpace;			// Space for one sample
+		int					nv;
+		float				**valueSpace;			// Space for one sample
 		
 		CTexture3d			*texture;
 };
