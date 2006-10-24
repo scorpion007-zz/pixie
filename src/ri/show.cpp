@@ -51,78 +51,81 @@ TGlPointsFunction		CView::drawPoints		=	NULL;
 // Comments				:
 // Date last edited		:	9/21/2006
 CShow::CShow(int thread) : CShadingContext(thread) {
-	char		moduleFile[OS_MAX_PATH_LENGTH];
 
-	CRenderer::hiderFlags	|=	HIDER_NODISPLAY;
+	if (thread == 0) {
+		char		moduleFile[OS_MAX_PATH_LENGTH];
 
-	// First, try to load the dynamic library
-	CView::handle	=	NULL;
-	if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::modulePath)) {
-		CView::handle		=	osLoadModule(moduleFile);
-	}
+		CRenderer::hiderFlags	|=	HIDER_NODISPLAY;
 
-	if (CView::handle != NULL) {
+		// First, try to load the dynamic library
+		CView::handle	=	NULL;
+		if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::modulePath)) {
+			CView::handle		=	osLoadModule(moduleFile);
+		}
 
-		// Is this the library we were expecting ?
-		TGlVisualizeFunction	visualize	=	(TGlVisualizeFunction) osResolve(CView::handle,"pglVisualize");
-		CView					*view		=	NULL;
+		if (CView::handle != NULL) {
 
-		if (visualize != NULL) {
+			// Is this the library we were expecting ?
+			TGlVisualizeFunction	visualize	=	(TGlVisualizeFunction) osResolve(CView::handle,"pglVisualize");
+			CView					*view		=	NULL;
 
-			// Try to load the file
-			const char	*fileName	=	CRenderer::hider + 5;
-			FILE		*in			=	fopen(fileName,"rb");
+			if (visualize != NULL) {
 
-			CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
-			CView::drawPoints		=	(TGlPointsFunction)		osResolve(CView::handle,"pglPoints");
+				// Try to load the file
+				const char	*fileName	=	CRenderer::hider + 5;
+				FILE		*in			=	fopen(fileName,"rb");
 
-			assert(CView::drawTriangles != NULL);
-			assert(CView::drawPoints != NULL);
+				CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
+				CView::drawPoints		=	(TGlPointsFunction)		osResolve(CView::handle,"pglPoints");
 
-			if (in != NULL)	{
-				unsigned int	magic	=	0;
-				int				version[3],i;
-				char			*t;
+				assert(CView::drawTriangles != NULL);
+				assert(CView::drawPoints != NULL);
 
-				fread(&magic,1,sizeof(int),in);
+				if (in != NULL)	{
+					unsigned int	magic	=	0;
+					int				version[3],i;
+					char			*t;
 
-				if (magic == magicNumber) {
-					fread(version,3,sizeof(int),in);
+					fread(&magic,1,sizeof(int),in);
 
-					if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
-						error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
-					} else {
-						fread(&i,1,sizeof(int),in);
-						t	=	(char *) alloca((i+1)*sizeof(char));
-						fread(t,i+1,sizeof(char),in);
+					if (magic == magicNumber) {
+						fread(version,3,sizeof(int),in);
 
-						info(CODE_PRINTF,"File:    %s\n",fileName);
-						info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
-						info(CODE_PRINTF,"Type:    %s\n",t);
-						fclose(in);
+						if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
+							error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
+						} else {
+							fread(&i,1,sizeof(int),in);
+							t	=	(char *) alloca((i+1)*sizeof(char));
+							fread(t,i+1,sizeof(char),in);
 
-						if (strcmp(t,filePhotonMap) == 0) {
-							view	=	CRenderer::getPhotonMap(fileName);
-						} else if (strcmp(t,fileIrradianceCache) == 0) {
-							view	=	CRenderer::getCache(fileName,"R");
-						} else if (strcmp(t,fileGatherCache) == 0) {
-							view	=	CRenderer::getCache(fileName,"R");
-						} else if (strcmp(t,filePointCloud) == 0) {
-							//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
-						} else if (strcmp(t,fileBrickMap) == 0) {
-							//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+							info(CODE_PRINTF,"File:    %s\n",fileName);
+							info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
+							info(CODE_PRINTF,"Type:    %s\n",t);
+							fclose(in);
+
+							if (strcmp(t,filePhotonMap) == 0) {
+								view	=	CRenderer::getPhotonMap(fileName);
+							} else if (strcmp(t,fileIrradianceCache) == 0) {
+								view	=	CRenderer::getCache(fileName,"R");
+							} else if (strcmp(t,fileGatherCache) == 0) {
+								view	=	CRenderer::getCache(fileName,"R");
+							} else if (strcmp(t,filePointCloud) == 0) {
+								//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+							} else if (strcmp(t,fileBrickMap) == 0) {
+								//view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL);
+							}
+
+							// Create / display the window
+							if (view != NULL)	visualize(view);
 						}
-
-						// Create / display the window
-						if (view != NULL)	visualize(view);
+					} else {
+						error(CODE_BADFILE,"File %s doesn't seem to be a Pixie file\n",fileName);
 					}
-				} else {
-					error(CODE_BADFILE,"File %s doesn't seem to be a Pixie file\n",fileName);
 				}
 			}
+		} else {
+			error(CODE_SYSTEM,"Opengl wrapper not found...");
 		}
-	} else {
-		error(CODE_SYSTEM,"Opengl wrapper not found...");
 	}
 }
 

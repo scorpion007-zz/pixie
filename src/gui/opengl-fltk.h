@@ -172,7 +172,7 @@ protected:
 						}
 						
 	void				createDisplayList() {
-							if (displayList != 0) {
+							if (displayList == 0) {
 								displayList	=	glGenLists(1);
 							}
 								
