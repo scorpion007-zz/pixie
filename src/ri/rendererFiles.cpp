@@ -424,32 +424,25 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	02/22/2006
-CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const char *coordsys) {
+CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to) {
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
 
 	if (*name == '\0')	return NULL;
 
-	if (loadedFiles->find(name,texture3d) == FALSE){	
-		CXform *xform = world;
-		if (coordsys != NULL) {
-			ECoordinateSystem	esys;
-			matrix				*from,*to;
-			
-			// non worldspace texture
-			xform = new CXform();
-			findCoordinateSystem(coordsys,from,to,esys);
-	
-			movmm(xform->from,from[0]);	// construct the transform to put us in the desired system
-			movmm(xform->to,to[0]);
+	if (loadedFiles->find(name,texture3d) == FALSE){
+
+		if (from == NULL) {
+			from	=	world->from;
+			to		=	world->to;
 		}
 		
 		// If we are writing, it must be a point cloud
 		if (write == TRUE) {
 			
 			if (netClient != INVALID_SOCKET) {
-				CPointCloud	*cloud	=	new CPointCloud(name,from,to,channels,FALSE);
+				CPointCloud	*cloud	=	new CPointCloud(name,world->from,world->to,channels,FALSE);
 				texture3d			=	cloud;
 			
 				// Ensure we unmap the file when done.  Do not delete it
@@ -458,7 +451,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
 			} else {
 				// alloate a point cloud which will be written to disk
-				texture3d	=	new CPointCloud(name,xform,channels,TRUE);
+				texture3d	=	new CPointCloud(name,from,to,channels,TRUE);
 			}
 			
 		} else {
@@ -466,7 +459,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			if (locateFile(fileName,name,texturePath)) {
 				// Try to open the file
 				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-					texture3d	=	new CPointCloud(name,xform,in);
+					texture3d	=	new CPointCloud(name,from,to,in);
 				} else {
 					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
 						texture3d	=	new CBrickMap(in,name,from,to);
@@ -479,7 +472,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			if (in == NULL) {
 				// allocate a dummy blank-channel point cloud
 				error(CODE_BADTOKEN,"Cannot find or open Texture3d file \"%s\"\n",name);
-				texture3d	=	new CPointCloud(name,from,to,NULL,FALSE);
+				texture3d	=	new CPointCloud(name,world->from,world->to,NULL,FALSE);
 				// remove the dummy mapping once the frame ends
 				registerFrameTemporary(name,FALSE);
 			}
