@@ -324,12 +324,10 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 
 		
 	// Make the temporary directory pid-unique in case we have more than one on a given host
-	char	hostName[1024];
-	gethostname(hostName,1024);
 #ifdef WIN32
-	sprintf(temporaryPath,"PixieTemp_%s_%d",hostName,GetCurrentProcessId());
+	sprintf(temporaryPath,"PixieTemp_%d",GetCurrentProcessId());
 #else
-	sprintf(temporaryPath,"PixieTemp-%s-%d",hostName,getpid());
+	sprintf(temporaryPath,"PixieTemp-%d",getpid());
 #endif
 	osFixSlashes(temporaryPath);
 
