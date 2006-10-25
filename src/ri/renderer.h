@@ -140,27 +140,27 @@ public:
 		// Some global data structures that hang around between beginRenderer and endRenderer
 		//
 		////////////////////////////////////////////////////////////////////
-		static	CMemPage											*globalMemory;				// The global memory stack
-		static	CRendererContext									*context;					// The renderer context (RenderMan Interface)
-		static	CArray<CShaderInstance *>							*allLights;					// An array of all allocated lights
-		static	CDictionary<const char *,CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
-		static	CDictionary<const char *,CVariable *>				*declaredVariables;			// Declared variables
-		static	CDictionary<const char *,CFileResource  *>			*loadedFiles;				// Files that have been loaded
-		static	CDictionary<const char *,CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
-		static	CDictionary<const char *,CNetFileMapping *>			*netFileMappings;			// This holds name->name mappings of files
-		static	int													numKnownGlobalIds;			// The current free global ID
-		static	CVariable											*variables;					// List of all defined variables
-		static	CArray<CVariable *>									*globalVariables;			// Array of global variables only
-		static	CDictionary<const char *,CDisplayChannel *>			*declaredChannels;			// The declared display channels
-		static	CArray<CDisplayChannel*>							*displayChannels;			// The list of all desclared display channels
-		static	CArray<CArray<CObject *> *>							*allocatedInstances;		// The list of allocated object instances
-		static	CDSO												*dsos;						// The list of DSO's that have been loaded
-		static	SOCKET												netClient;					// The client that we're serving (-1 if client)
-		static	int													netNumServers;				// The number of servers (0 if server)
-		static	SOCKET												*netServers;				// The array of servers that are serving us		
-		static	int													userRaytracing;				// TRUE if we're raytracing for the user
-		static	int													numNetrenderedBuckets;		// The number of netrendered buckets
-		static	char												temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
+		static	CMemPage						*globalMemory;				// The global memory stack
+		static	CRendererContext				*context;					// The renderer context (RenderMan Interface)
+		static	CArray<CShaderInstance *>		*allLights;					// An array of all allocated lights
+		static	CTrie<CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
+		static	CTrie<CVariable *>				*declaredVariables;			// Declared variables
+		static	CTrie<CFileResource  *>			*globalFiles;				// Files that have been loaded (they stick around for the entire rendering)
+		static	CTrie<CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
+		static	CTrie<CNetFileMapping *>		*netFileMappings;			// This holds name->name mappings of files
+		static	int								numKnownGlobalIds;			// The current free global ID
+		static	CVariable						*variables;					// List of all defined variables
+		static	CArray<CVariable *>				*globalVariables;			// Array of global variables only
+		static	CTrie<CDisplayChannel *>		*declaredChannels;			// The declared display channels
+		static	CArray<CDisplayChannel*>		*displayChannels;			// The list of all desclared display channels
+		static	CArray<CArray<CObject *> *>		*allocatedInstances;		// The list of allocated object instances
+		static	CDSO							*dsos;						// The list of DSO's that have been loaded
+		static	SOCKET							netClient;					// The client that we're serving (-1 if client)
+		static	int								netNumServers;				// The number of servers (0 if server)
+		static	SOCKET							*netServers;				// The array of servers that are serving us		
+		static	int								userRaytracing;				// TRUE if we're raytracing for the user
+		static	int								numNetrenderedBuckets;		// The number of netrendered buckets
+		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
 
 
 		////////////////////////////////////////////////////////////////////
@@ -291,6 +291,7 @@ public:
 		static	CCache			*getCache(const char *,const char *);					// Load a photon map
 		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
 		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *);	// Load a point cloud or brickmap
+		static	CShader			*getShader(const char *,TSearchpath *search=NULL);		// Load a shader
 		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 		static	char			*getFilter(RtFilterFunc);								// The other way around
 		static	int				getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
@@ -386,11 +387,12 @@ public:
 
 
 		// Second, some other data structures
-		static	CMemStack									*frameMemory;			// Where the frame memory is allocated from
-		static	CArray<const char*>							*frameTemporaryFiles;	// This hold the name of temporary files
-		static	CShadingContext								**contexts;				// The array of shading contexts
-		static	int											numActiveThreads;		// The number of threads currently active
-		static	CDictionary<const char *,CRemoteChannel *>	*declaredRemoteChannels;// Known remote channel lookup
+		static	CMemStack				*frameMemory;			// Where the frame memory is allocated from
+		static	CTrie<CFileResource  *>	*frameFiles;			// Files that have been loaded (they stick around only during the frame)
+		static	CArray<const char*>		*frameTemporaryFiles;	// This hold the name of temporary files
+		static	CShadingContext			**contexts;				// The array of shading contexts
+		static	int						numActiveThreads;		// The number of threads currently active
+		static	CTrie<CRemoteChannel *>	*declaredRemoteChannels;// Known remote channel lookup
 		static	CArray<CRemoteChannel *>					*remoteChannels;		// all known channels
 		static	CArray<CProgrammableShaderInstance *>		*dirtyInstances;
 		static	unsigned int			raytracingFlags;			// The raytracing flags that hold the combination that needs to be raytraced

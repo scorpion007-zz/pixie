@@ -297,32 +297,8 @@ COptions	*CRendererContext::getOptions() {
 // Comments				:
 // Date last edited		:	8/25/2002
 CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,char **params,void **vals) {
-	CShader			*cShader;
-	CShaderInstance	*cInstance;
-	CFileResource	*file;
-
-	if (strcmp(name,"null") == 0)				return	NULL;
-
-	if (strcmp(name,RI_DEFAULTSURFACE) == 0)	name	=	RI_MATTE;
-
-	// Check if we already loaded this shader before ...
-	cShader		=	NULL;
-	cInstance	=	NULL;
-	if (CRenderer::loadedFiles->find(name,file)) {
-		cShader		=	(CShader *) file;
-	}
-
-	// If not found, search scripts
-	if (cShader == NULL) {
-		char	shaderLocation[OS_MAX_PATH_LENGTH];
-		if (CRenderer::locateFileEx(shaderLocation,name,"sdr",currentOptions->shaderPath) == TRUE) {
-			cShader	=	parseShader(name,shaderLocation);
-
-			if (cShader != NULL) {
-				CRenderer::loadedFiles->insert(cShader->name,cShader);
-			}
-		}
-	}
+	CShaderInstance	*cInstance	=	NULL;
+	CShader			*cShader	=	CRenderer::getShader(name,currentOptions->shaderPath);
 
 	if (cShader != NULL) {
 		CProgrammableShaderInstance	*instance;

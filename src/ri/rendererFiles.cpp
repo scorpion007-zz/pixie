@@ -58,7 +58,7 @@
 void		CRenderer::initFiles() {
 
 	// The loaded shaders
-	loadedFiles							=	new CTrie<CFileResource *>;
+	globalFiles							=	new CTrie<CFileResource *>;
 
 	// Temporary files we store per frame
 	frameTemporaryFiles					=	NULL;
@@ -113,8 +113,8 @@ void		CRenderer::shutdownFiles() {
 	}	
 
 	// Ditch the loaded files
-	assert(loadedFiles != NULL);
-	loadedFiles->destroy();
+	assert(globalFiles != NULL);
+	globalFiles->destroy();
 }
 
 
@@ -202,7 +202,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 	if (*name == '\0')	return NULL;
 
-	if (loadedFiles->find(name,tex) == FALSE){
+	if (frameFiles->find(name,tex) == FALSE){
 		// Load the texture
 		tex	=	textureLoad(name,texturePath);
 
@@ -212,7 +212,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 			tex					=	new CTexture(name,128,128,TEXTURE_PERIODIC,TEXTURE_PERIODIC);
 		}
 
-		loadedFiles->insert(tex->name,tex);
+		frameFiles->insert(tex->name,tex);
 	}
 
 	return (CTexture *) tex;
@@ -231,7 +231,7 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 
 	if (*name == '\0')	return NULL;
 
-	if (loadedFiles->find(name,tex) == FALSE){
+	if (frameFiles->find(name,tex) == FALSE){
 		tex	=	environmentLoad(name,texturePath,toWorld);
 
 		if (tex == NULL)	{
@@ -240,7 +240,7 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 			tex					=	new CEnvironment(name);
 		}
 
-		loadedFiles->insert(tex->name,tex);
+		frameFiles->insert(tex->name,tex);
 	}
 
 	return (CEnvironment *) tex;
@@ -261,7 +261,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	if (*name == '\0')	return NULL;
 
 	// Check the cache to see if the file is in the memory
-	if (loadedFiles->find(name,map) == FALSE){
+	if (frameFiles->find(name,map) == FALSE){
 
 		// Locate the file
 		if (locateFile(fileName,name,texturePath)) {
@@ -273,7 +273,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 
 		// Read it
 		map		=	new CPhotonMap(name,world,in);
-		loadedFiles->insert(map->name,map);
+		frameFiles->insert(map->name,map);
 	}
 
 	return (CPhotonMap *) map;
@@ -292,7 +292,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 	if (*name == '\0')	return NULL;
 
 	// Check the memory first
-	if (loadedFiles->find(name,cache) == FALSE){
+	if (frameFiles->find(name,cache) == FALSE){
 		char				fileName[OS_MAX_PATH_LENGTH];
 		int					flags;
 		char				type[128];
@@ -380,7 +380,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 			}
 		}
 
-		loadedFiles->insert(cache->name,cache);
+		frameFiles->insert(cache->name,cache);
 	}
 
 	return (CCache *) cache;
@@ -398,7 +398,7 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 
 	if (*name == '\0')	return NULL;
 
-	if (loadedFiles->find(name,tex) == FALSE){
+	if (frameFiles->find(name,tex) == FALSE){
 		// try environments first
 		tex	=	environmentLoad(name,texturePath,toWorld);
 
@@ -409,7 +409,7 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 
 		if (tex != NULL) {
 			// only store the result if found
-			loadedFiles->insert(tex->name,tex);
+			frameFiles->insert(tex->name,tex);
 		}
 	}
 
@@ -431,7 +431,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 
 	if (*name == '\0')	return NULL;
 
-	if (loadedFiles->find(name,texture3d) == FALSE){
+	if (frameFiles->find(name,texture3d) == FALSE){
 
 		if (from == NULL) {
 			from	=	world->from;
@@ -478,10 +478,44 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			}
 		}
 				
-		loadedFiles->insert(texture3d->name,texture3d);
+		frameFiles->insert(texture3d->name,texture3d);
 	}
 
 	return (CPointCloud *) texture3d;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRendererContext
+// Method				:	getShader
+// Description			:	Create an instance of a shader
+// Return Value			:
+// Comments				:
+// Date last edited		:	8/25/2002
+CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
+	CShader			*cShader;
+	CFileResource	*file;
+
+	if (strcmp(name,"null") == 0)				return	NULL;
+
+	if (strcmp(name,RI_DEFAULTSURFACE) == 0)	name	=	RI_MATTE;
+
+	// Check if we already loaded this shader before ...
+	cShader		=	NULL;
+	if (globalFiles->find(name,file)) {
+		cShader		=	(CShader *) file;
+	} else {
+		char	shaderLocation[OS_MAX_PATH_LENGTH];
+
+		if (CRenderer::locateFileEx(shaderLocation,name,"sdr",path) == TRUE) {
+			cShader	=	parseShader(name,shaderLocation);
+
+			if (cShader != NULL) {
+				globalFiles->insert(cShader->name,cShader);
+			}
+		}
+	}
+
+	return cShader;
 }
 
 
