@@ -301,10 +301,6 @@ COptions::COptions() {
 	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/modules:" PIXIE_MODULES,NULL);
 #endif
 
-	
-	temporaryPath			=	strdup("temp");
-
-
 	// Override the official defaults for testing
 	pixelXsamples			=	2;
 	pixelYsamples			=	2;
@@ -415,7 +411,6 @@ COptions::COptions(const COptions *o) {
 	shaderPath				=	optionsCloneSearchPath(o->shaderPath);
 	displayPath				=	optionsCloneSearchPath(o->displayPath);
 	modulePath				=	optionsCloneSearchPath(o->modulePath);
-	temporaryPath			=	strdup(o->temporaryPath);
 
 	if (o->displays != NULL) {
 		CDisplay	*cDisplay,*nDisplay;
@@ -552,7 +547,6 @@ COptions::~COptions(){
 	optionsDeleteSearchPath(shaderPath);
 	optionsDeleteSearchPath(displayPath);
 	optionsDeleteSearchPath(modulePath);
-	if (temporaryPath != NULL)	free(temporaryPath);
 
 	if (causticIn				!= NULL)	free(causticIn);
 	if (causticOut				!= NULL)	free(causticOut);

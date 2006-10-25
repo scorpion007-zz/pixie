@@ -179,7 +179,6 @@ public:
 	TSearchpath					*shaderPath;									// Shader search path
 	TSearchpath					*displayPath;									// Display search path
 	TSearchpath					*modulePath;									// Search path for Pixie modules
-	char						*temporaryPath;									// Where tmp files are stored
 
 	int							pixelXsamples,pixelYsamples;					// Number of samples to take in X and Y
 

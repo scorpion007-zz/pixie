@@ -52,7 +52,7 @@ public:
 	void					copy(CAttributes *a,CXform *x,CRendererContext *c) const;
 
 private:
-	void					create();
+	void					create(CShadingContext *context);
 
 	CPl						*pl;
 	int						numFaces;

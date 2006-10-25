@@ -725,6 +725,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 				float	dx,dy,d;
 
 				P				=	varying[VARIABLE_P]		+	tmp*3;
+				d				=	0;
 				for (j=uVertices-1;j>0;j--) {
 					dx		=	cXy[2] - cXy[0];
 					dy		=	cXy[3] - cXy[1];
@@ -766,6 +767,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 				float	dx,dy,d;
 
 				P				=	varying[VARIABLE_P]		+	i*3;
+				d				=	0;
 				for (j=0;j<vVertices-1;j++) {
 					dx		=	cXy[uVertices*2]	- cXy[0];
 					dy		=	cXy[uVertices*2+1]	- cXy[1];

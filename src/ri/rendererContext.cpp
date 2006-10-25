@@ -162,25 +162,6 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 	motionParameters				=	NULL;
 	maxMotionParameters				=	0;
 	lastCommand						=	NULL;
-
-	
-	// Netfile dictionary if we're a netrender daemon
-	if (CRenderer::netClient != INVALID_SOCKET) {
-		
-		// make the temporary directory pid-unique in case we have more than
-		// one on a given host
-		char	*newTemporaryPath = (char*) malloc(OS_MAX_PATH_LENGTH);
-		char	hostName[1024];
-		gethostname(hostName,1024);
-#ifdef WIN32
-		sprintf(newTemporaryPath,"%s-%s-%d",currentOptions->temporaryPath,hostName,GetCurrentProcessId());
-#else
-		sprintf(newTemporaryPath,"%s-%s-%d",currentOptions->temporaryPath,hostName,getpid());
-#endif
-		osFixSlashes(newTemporaryPath);
-		free(currentOptions->temporaryPath);
-		currentOptions->temporaryPath = newTemporaryPath;
-	}
 }
 
 

@@ -160,6 +160,7 @@ public:
 		static	SOCKET												*netServers;				// The array of servers that are serving us		
 		static	int													userRaytracing;				// TRUE if we're raytracing for the user
 		static	int													numNetrenderedBuckets;		// The number of netrendered buckets
+		static	char												temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
 
 
 		////////////////////////////////////////////////////////////////////
@@ -345,7 +346,6 @@ public:
 		static	TSearchpath				*shaderPath;									// Shader search path
 		static	TSearchpath				*displayPath;									// Display search path
 		static	TSearchpath				*modulePath;									// Search path for Pixie modules
-		static	char					*temporaryPath;									// Where tmp files are stored
 		static	int						pixelXsamples,pixelYsamples;					// Number of samples to take in X and Y
 		static	float					gamma,gain;										// Gamma correction stuff
 		static	float					pixelFilterWidth,pixelFilterHeight;				// Pixel filter data

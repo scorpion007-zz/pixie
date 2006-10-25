@@ -127,6 +127,7 @@ SOCKET												CRenderer::netClient					=	INVALID_SOCKET;
 int													CRenderer::netNumServers				=	0;
 SOCKET												*CRenderer::netServers					=	NULL;
 int													CRenderer::numNetrenderedBuckets		=	0;
+char												CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];
 
 // Global synchronization objects
 TMutex												CRenderer::commitMutex;
@@ -156,7 +157,6 @@ TSearchpath									*CRenderer::texturePath;
 TSearchpath									*CRenderer::shaderPath;
 TSearchpath									*CRenderer::displayPath;
 TSearchpath									*CRenderer::modulePath;
-char										*CRenderer::temporaryPath;
 int											CRenderer::pixelXsamples,CRenderer::pixelYsamples;
 float										CRenderer::gamma,CRenderer::gain;
 float										CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight;
@@ -320,6 +320,19 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Record the start overhead
 	stats.rendererStartOverhead		=	osCPUTime() - startTime;
 
+	// Create a temporary directory for the lifetime of the renderer
+
+		
+	// Make the temporary directory pid-unique in case we have more than one on a given host
+	char	hostName[1024];
+	gethostname(hostName,1024);
+#ifdef WIN32
+	sprintf(temporaryPath,"PixieTemp_%s_%d",hostName,GetCurrentProcessId());
+#else
+	sprintf(temporaryPath,"PixieTemp-%s-%d",hostName,getpid());
+#endif
+	osFixSlashes(temporaryPath);
+
 	// Good to rock and roll
 }
 
@@ -412,7 +425,6 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::shaderPath				=	o->shaderPath;
 	CRenderer::displayPath				=	o->displayPath;
 	CRenderer::modulePath				=	o->modulePath;
-	CRenderer::temporaryPath			=	o->temporaryPath;
 	CRenderer::pixelXsamples			=	o->pixelXsamples;
 	CRenderer::pixelYsamples			=	o->pixelYsamples;
 	CRenderer::gamma					=	o->gamma;
