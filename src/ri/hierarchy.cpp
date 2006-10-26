@@ -1027,10 +1027,6 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			stats.numHierarchyUncomputeds--;
 
 			nNode						=	(void *) getToken(newNode,HIERARCHY_INTERNAL_NODE);
-
-			if (nNode == (void *) 0x01c7f0f1) {
-				int	i	=	1;
-			}
 		}
 
 		memEnd(CRenderer::globalMemory);
@@ -1050,10 +1046,6 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 
 		delete [] cUncomputed->items;
 		delete cUncomputed;
-
-		if (nNode == (void *) 0x01c7f0f1) {
-			int	i	=	1;
-		}
 	}
 
 	return nNode;
@@ -1119,7 +1111,7 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			tmin			=	hierarchyStackTop->tmin;
 			tmax			=	hierarchyStackTop->tmax;
 
-			splitAxis		=	cInternal->splitAxis & 3;
+			splitAxis		=	cInternal->splitAxis;
 			splitCoordinate	=	cInternal->splitCoordinate;
 
 			assert(splitAxis < 3);
@@ -1269,11 +1261,9 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			} else {
 				if (cInternal->front == hierarchyStackTop->node) {
 					cInternal->front	=	nNode;
-					cInternal->splitAxis |= 4;
 				}
 				else if (cInternal->back == hierarchyStackTop->node) {
 					cInternal->back		=	nNode;
-					cInternal->splitAxis |= 8;
 				}
 				else {
 					error(CODE_BUG,"Lost hierarchy node\n");
@@ -1344,7 +1334,7 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 		case HIERARCHY_INTERNAL_NODE:
 			cInternal		=	(CHInternal *)	getPointer(hierarchyStackTop->node);
 
-			splitAxis		=	cInternal->splitAxis & 3;
+			splitAxis		=	cInternal->splitAxis;
 			splitCoordinate	=	cInternal->splitCoordinate;
 
 			if (P[splitAxis] > splitCoordinate) {
@@ -1453,7 +1443,7 @@ void		CHierarchy::add(void *node,CHInternal *parent,int depth,int numItems,CTrac
 		movvv(bmi,bmin);
 		movvv(bma,bmax);
 
-		bmi[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis]	=	cInternal->splitCoordinate;
 
 		for (i=0,last=0;i<numItems;i++) {
 			if (items[i]->intersect(bmi,bma)) {
@@ -1466,8 +1456,8 @@ void		CHierarchy::add(void *node,CHInternal *parent,int depth,int numItems,CTrac
 		add(cInternal->front,cInternal,depth+1,last,items,bmi,bma);
 
 
-		bmi[cInternal->splitAxis & 3]	=	bmin[cInternal->splitAxis & 3];
-		bma[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis]	=	bmin[cInternal->splitAxis];
+		bma[cInternal->splitAxis]	=	cInternal->splitCoordinate;
 
 		for (j=last,i=0,last=0;i<j;i++) {
 			if (!items[i]->intersect(bmi,bma)) {
@@ -1559,13 +1549,13 @@ void		CHierarchy::remove(void *node,const CTracable *item,float *bmin,float *bma
 
 		movvv(bmi,bmin);
 		movvv(bma,bmax);
-		bmi[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis]	=	cInternal->splitCoordinate;
 		if (intersectBox(bmi,bma,ibmin,ibmax)) {
 			remove(cInternal->front,item,bmi,bma,ibmin,ibmax);
 		}
 
-		bmi[cInternal->splitAxis & 3]	=	bmin[cInternal->splitAxis & 3];
-		bma[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis]	=	bmin[cInternal->splitAxis];
+		bma[cInternal->splitAxis]	=	cInternal->splitCoordinate;
 		if (intersectBox(bmi,bma,ibmin,ibmax)) {
 			remove(cInternal->back,item,bmi,bma,ibmin,ibmax);
 		}
