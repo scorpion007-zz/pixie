@@ -784,8 +784,9 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 // Date last edited		:	12/23/2001
 class	CHStack {
 public:
-	void				*node;
-	float				tmin,tmax;
+	void		*node;		// The node to process
+	void		*parent;	// Its parent node
+	float		tmin,tmax;	// The parametric range
 };
 
 
@@ -797,6 +798,7 @@ public:
 // Comments				:
 // Date last edited		:	12/23/2001
 void		CHierarchy::deleteNode(void *cNode) {
+	CHLeaf				*cLeaf;
 	CHInternal			*cInternal;
 	CHUncomputed		*cUncomputed;
 	CHStack				*hierarchyStack		=	(CHStack *) alloca(sizeof(CHStack)*CRenderer::maxHierarchyDepth*2);
@@ -811,6 +813,9 @@ void		CHierarchy::deleteNode(void *cNode) {
 
 		switch(getData(hierarchyStackTop->node)) {
 		case HIERARCHY_LEAF_NODE:
+			cLeaf			=	(CHLeaf *) getPointer(hierarchyStackTop->node);
+			if (cLeaf->items != NULL)	delete [] cLeaf->items;
+			delete cLeaf;
 			stats.numHierarchyLeaves--;
 			break;
 		case HIERARCHY_INTERNAL_NODE:
@@ -818,6 +823,7 @@ void		CHierarchy::deleteNode(void *cNode) {
 			hierarchyStackTop->node	=	cInternal->front;	hierarchyStackTop++;
 			hierarchyStackTop->node	=	cInternal->back;	hierarchyStackTop++;
 			stats.numHierarchyInternals--;
+			delete cInternal;
 			break;
 		case HIERARCHY_UNCOMPUTED_NODE:
 			cUncomputed		=	(CHUncomputed *) getPointer(hierarchyStackTop->node);
@@ -955,10 +961,10 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			CHLeaf				*newNode;
 
 			// We do not have a good split, create a leaf node
-			newNode						=	(CHLeaf *)		CRenderer::frameMemory->alloc(sizeof(CHLeaf));
+			newNode						=	new CHLeaf;
 			stats.numHierarchyLeaves++;
 			newNode->numItems			=	numItems;
-			newNode->items				=	(CTracable **)	CRenderer::frameMemory->alloc(sizeof(CTracable *)*numItems);
+			newNode->items				=	new CTracable*[numItems];
 			memcpy(newNode->items,items,sizeof(CTracable *)*numItems);
 
 			// We don't need this node anymore
@@ -973,11 +979,12 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			CHUncomputed		*front,*back;
 
 			// We have a good split, create an internal node
-			newNode						=	(CHInternal *) CRenderer::frameMemory->alloc(sizeof(CHInternal));
+			newNode						=	new CHInternal;
 			stats.numHierarchyInternals++;
 			newNode->splitAxis			=	splitAxis;
 			newNode->splitCoordinate	=	splitCoordinate;
 
+			assert(splitAxis < 3);
 
 			if (numFront > 0) {
 				front					=	new CHUncomputed;
@@ -1020,6 +1027,10 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			stats.numHierarchyUncomputeds--;
 
 			nNode						=	(void *) getToken(newNode,HIERARCHY_INTERNAL_NODE);
+
+			if (nNode == (void *) 0x01c7f0f1) {
+				int	i	=	1;
+			}
 		}
 
 		memEnd(CRenderer::globalMemory);
@@ -1031,14 +1042,18 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 		stats.numHierarchyLeaves++;
 		stats.numLeafItems	+=	cUncomputed->numItems;
 
-		newNode				=	(CHLeaf *)		CRenderer::frameMemory->alloc(sizeof(CHLeaf));
+		newNode				=	new CHLeaf;
 		newNode->numItems	=	cUncomputed->numItems;
-		newNode->items		=	(CTracable **)	CRenderer::frameMemory->alloc(sizeof(CTracable *)*newNode->numItems);
+		newNode->items		=	new CTracable*[newNode->numItems];
 		memcpy(newNode->items,cUncomputed->items,sizeof(CTracable *)*newNode->numItems);
 		nNode				=	(void *) getToken(newNode,HIERARCHY_LEAF_NODE);
 
 		delete [] cUncomputed->items;
 		delete cUncomputed;
+
+		if (nNode == (void *) 0x01c7f0f1) {
+			int	i	=	1;
+		}
 	}
 
 	return nNode;
@@ -1069,6 +1084,7 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 
 	cInternal					=	NULL;
 	hierarchyStackTop->node		=	r;
+	hierarchyStackTop->parent	=	NULL;
 	hierarchyStackTop->tmin		=	tmin;
 	hierarchyStackTop->tmax		=	tmax;
 	hierarchyStackTop++;
@@ -1103,19 +1119,23 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			tmin			=	hierarchyStackTop->tmin;
 			tmax			=	hierarchyStackTop->tmax;
 
-			splitAxis		=	cInternal->splitAxis;
+			splitAxis		=	cInternal->splitAxis & 3;
 			splitCoordinate	=	cInternal->splitCoordinate;
+
+			assert(splitAxis < 3);
 
 			if (to[splitAxis] == from[splitAxis]) {
 				if (from[splitAxis] > splitCoordinate) {
-					hierarchyStackTop->node	=	cInternal->front;
-					hierarchyStackTop->tmin	=	tmin;
-					hierarchyStackTop->tmax	=	tmax;
+					hierarchyStackTop->node		=	cInternal->front;
+					hierarchyStackTop->parent	=	cInternal;
+					hierarchyStackTop->tmin		=	tmin;
+					hierarchyStackTop->tmax		=	tmax;
 					hierarchyStackTop++;
 				} else {
-					hierarchyStackTop->node	=	cInternal->back;
-					hierarchyStackTop->tmin	=	tmin;
-					hierarchyStackTop->tmax	=	tmax;
+					hierarchyStackTop->node		=	cInternal->back;
+					hierarchyStackTop->parent	=	cInternal;
+					hierarchyStackTop->tmin		=	tmin;
+					hierarchyStackTop->tmax		=	tmax;
 					hierarchyStackTop++;
 				}
 			} else {
@@ -1124,75 +1144,87 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 				if (from[splitAxis] > splitCoordinate) {
 					if (t > tmin) {
 						if (t > tmax) {
-							hierarchyStackTop->node	=	cInternal->front;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->front;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 						} else {
-							hierarchyStackTop->node	=	cInternal->back;
-							hierarchyStackTop->tmin	=	t;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->back;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	t;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 
-							hierarchyStackTop->node	=	cInternal->front;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	t;
+							hierarchyStackTop->node		=	cInternal->front;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	t;
 							hierarchyStackTop++;
 						}
 					} else {
 						if (t > 0) {
-							hierarchyStackTop->node	=	cInternal->back;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->back;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 						} else {
-							hierarchyStackTop->node	=	cInternal->front;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->front;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 						}
 					}
 				} else if (from[splitAxis] < splitCoordinate) {
 					if (t > tmin) {
 						if (t > tmax) {
-							hierarchyStackTop->node	=	cInternal->back;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->back;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 						} else {
-							hierarchyStackTop->node	=	cInternal->front;
-							hierarchyStackTop->tmin	=	t;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->front;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	t;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 
-							hierarchyStackTop->node	=	cInternal->back;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	t;
+							hierarchyStackTop->node		=	cInternal->back;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	t;
 							hierarchyStackTop++;
 						}
 					} else {
 						if (t > 0) {
-							hierarchyStackTop->node	=	cInternal->front;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->front;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 						} else {
-							hierarchyStackTop->node	=	cInternal->back;
-							hierarchyStackTop->tmin	=	tmin;
-							hierarchyStackTop->tmax	=	tmax;
+							hierarchyStackTop->node		=	cInternal->back;
+							hierarchyStackTop->parent	=	cInternal;
+							hierarchyStackTop->tmin		=	tmin;
+							hierarchyStackTop->tmax		=	tmax;
 							hierarchyStackTop++;
 						}
 					}
 				} else {
 					if (invDir[splitAxis] > 0) {
-						hierarchyStackTop->node	=	cInternal->front;
-						hierarchyStackTop->tmin	=	tmin;
-						hierarchyStackTop->tmax	=	tmax;
+						hierarchyStackTop->node		=	cInternal->front;
+						hierarchyStackTop->parent	=	cInternal;
+						hierarchyStackTop->tmin		=	tmin;
+						hierarchyStackTop->tmax		=	tmax;
 						hierarchyStackTop++;
 					} else {
-						hierarchyStackTop->node	=	cInternal->back;
-						hierarchyStackTop->tmin	=	tmin;
-						hierarchyStackTop->tmax	=	tmax;
+						hierarchyStackTop->node		=	cInternal->back;
+						hierarchyStackTop->parent	=	cInternal;
+						hierarchyStackTop->tmin		=	tmin;
+						hierarchyStackTop->tmax		=	tmax;
 						hierarchyStackTop++;
 					}
 				}
@@ -1205,23 +1237,27 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			osLock(CRenderer::hierarchyMutex);
 
 			// Check if this node has been taken care of
+			cInternal	=	(CHInternal *) hierarchyStackTop->parent;
 			if (cInternal == NULL) {
-				if (root != hierarchyStackTop->node) {
+				if (root != hierarchyStackTop->node) {// other thread doesn't alter our stack!!
 
 					// A parallel thread took care of it ... re-trace the ray
 					osUnlock(CRenderer::hierarchyMutex);
+
+					
 					intersect(ray);
 					return;
 				}
 			} else {
 				if (	(cInternal->front != hierarchyStackTop->node) && (cInternal->back != hierarchyStackTop->node)	) {
-
 					// A parallel thread took care of it ... re-trace the ray
 					osUnlock(CRenderer::hierarchyMutex);
+					
 					intersect(ray);
 					return;
 				}
 			}
+
 
 			// We hit an uncomputed node
 			cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
@@ -1231,18 +1267,23 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 			if (cInternal == NULL) {
 				root		=	nNode;
 			} else {
-				if (cInternal->front == hierarchyStackTop->node)
+				if (cInternal->front == hierarchyStackTop->node) {
 					cInternal->front	=	nNode;
-				else if (cInternal->back == hierarchyStackTop->node)
+					cInternal->splitAxis |= 4;
+				}
+				else if (cInternal->back == hierarchyStackTop->node) {
 					cInternal->back		=	nNode;
+					cInternal->splitAxis |= 8;
+				}
 				else {
 					error(CODE_BUG,"Lost hierarchy node\n");
 				}
 			}
 
+
 			hierarchyStackTop->node	=	nNode;
 			hierarchyStackTop++;
-
+			
 			osUnlock(CRenderer::hierarchyMutex);
 
 			break;
@@ -1303,7 +1344,7 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 		case HIERARCHY_INTERNAL_NODE:
 			cInternal		=	(CHInternal *)	getPointer(hierarchyStackTop->node);
 
-			splitAxis		=	cInternal->splitAxis;
+			splitAxis		=	cInternal->splitAxis & 3;
 			splitCoordinate	=	cInternal->splitCoordinate;
 
 			if (P[splitAxis] > splitCoordinate) {
@@ -1325,6 +1366,8 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 			}
 			break;
 		case HIERARCHY_UNCOMPUTED_NODE:
+			osLock(CRenderer::hierarchyMutex);
+			
 			cUncomputed		=	(CHUncomputed *)	getPointer(hierarchyStackTop->node);
 			cInternal		=	cUncomputed->parent;
 			nNode			=	compute(cUncomputed);
@@ -1340,6 +1383,8 @@ int			CHierarchy::collect(CTracable **n,const float *P,float dP) {
 
 			hierarchyStackTop->node	=	nNode;
 			hierarchyStackTop++;
+			
+			osUnlock(CRenderer::hierarchyMutex);
 
 			break;
 		case HIERARCHY_EMPTY_NODE:
@@ -1408,7 +1453,7 @@ void		CHierarchy::add(void *node,CHInternal *parent,int depth,int numItems,CTrac
 		movvv(bmi,bmin);
 		movvv(bma,bmax);
 
-		bmi[cInternal->splitAxis]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
 
 		for (i=0,last=0;i<numItems;i++) {
 			if (items[i]->intersect(bmi,bma)) {
@@ -1421,8 +1466,8 @@ void		CHierarchy::add(void *node,CHInternal *parent,int depth,int numItems,CTrac
 		add(cInternal->front,cInternal,depth+1,last,items,bmi,bma);
 
 
-		bmi[cInternal->splitAxis]	=	bmin[cInternal->splitAxis];
-		bma[cInternal->splitAxis]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis & 3]	=	bmin[cInternal->splitAxis & 3];
+		bma[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
 
 		for (j=last,i=0,last=0;i<j;i++) {
 			if (!items[i]->intersect(bmi,bma)) {
@@ -1514,13 +1559,13 @@ void		CHierarchy::remove(void *node,const CTracable *item,float *bmin,float *bma
 
 		movvv(bmi,bmin);
 		movvv(bma,bmax);
-		bmi[cInternal->splitAxis]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
 		if (intersectBox(bmi,bma,ibmin,ibmax)) {
 			remove(cInternal->front,item,bmi,bma,ibmin,ibmax);
 		}
 
-		bmi[cInternal->splitAxis]	=	bmin[cInternal->splitAxis];
-		bma[cInternal->splitAxis]	=	cInternal->splitCoordinate;
+		bmi[cInternal->splitAxis & 3]	=	bmin[cInternal->splitAxis & 3];
+		bma[cInternal->splitAxis & 3]	=	cInternal->splitCoordinate;
 		if (intersectBox(bmi,bma,ibmin,ibmax)) {
 			remove(cInternal->back,item,bmi,bma,ibmin,ibmax);
 		}

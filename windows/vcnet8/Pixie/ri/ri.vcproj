@@ -981,6 +981,10 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath=".\VTune\ri.vpj"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\..\src\ri\rib.l"
 			>
 			<FileConfiguration
