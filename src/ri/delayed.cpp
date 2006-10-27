@@ -55,6 +55,8 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 	this->freeFunction			=	freeFunction;
 	this->data					=	data;
 
+	processed					=	FALSE;
+
 	if (drc == NULL) {
 		dataRefCount			=	new int;
 		dataRefCount[0]			=	0;
@@ -109,7 +111,14 @@ void	CDelayedObject::intersect(CRay *cRay) {
 	float	tmax	=	cRay->t;
 
 	if (hierarchyIntersectBox(this->cbmin,this->cbmax,cRay->from,cRay->to,tmin,tmax)) {
-		CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax,cRay);
+		osLock(CRenderer::delayedMutex);
+
+		if (processed == FALSE) {
+			CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax,cRay);
+			processed	=	TRUE;
+		}
+
+		osUnlock(CRenderer::delayedMutex);
 	}
 }
 
@@ -145,7 +154,12 @@ void	CDelayedObject::tesselate(CShadingContext *context) {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedObject::dice(CShadingContext *r) {
-	CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax);
+	osLock(CRenderer::delayedMutex);
+	if (processed == FALSE) {
+		CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax);
+		processed	=	TRUE;
+	}
+	osUnlock(CRenderer::delayedMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////

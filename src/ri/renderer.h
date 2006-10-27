@@ -177,6 +177,7 @@ public:
 		static	TMutex												textureMutex;				// To serialize texture fetches
 		static	TMutex												refCountMutex;				// To serialize the object attach()/detach()
 		static	TMutex												shaderMutex;				// To serialize shader parameter list access
+		static	TMutex												delayedMutex;				// To serialize rib parsing/delayed objects
 
 
 		////////////////////////////////////////////////////////////////////
@@ -387,7 +388,7 @@ public:
 
 
 		// Second, some other data structures
-		static	CMemStack				*frameMemory;			// Where the frame memory is allocated from
+		static	T64						frameCheckpoint[3];		// The checkpoint for the global memory in the frame
 		static	CTrie<CFileResource  *>	*frameFiles;			// Files that have been loaded (they stick around only during the frame)
 		static	CArray<const char*>		*frameTemporaryFiles;	// This hold the name of temporary files
 		static	CShadingContext			**contexts;				// The array of shading contexts

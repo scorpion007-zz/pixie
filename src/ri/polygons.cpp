@@ -1296,10 +1296,8 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 			data.meshContext->tesselate2D(cTriangle);
 		} else {
 			// No, create raytracing triangles
-			CMemStack	*memory	=	CRenderer::frameMemory;
-
 			if (data.meshPl->data1 == NULL) {
-				CVertex		*v0	=	(CVertex *)		memory->alloc(3*sizeof(CVertex) + sizeof(CPtriangle));
+				CVertex		*v0	=	(CVertex *)		ralloc(3*sizeof(CVertex) + sizeof(CPtriangle),CRenderer::globalMemory);
 				CVertex		*v1	=	v0+1;
 				CVertex		*v2	=	v1+1;
 				CPtriangle	*t	=	(CPtriangle *)	(v2 + 1);
@@ -1347,7 +1345,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 				CRenderer::addTracable(t,cTriangle);
 				stats.numRayTriangles++;
 			} else {
-				CMovingVertex		*v0		=	(CMovingVertex *)		memory->alloc(3*sizeof(CMovingVertex) + sizeof(CPmovingTriangle));
+				CMovingVertex		*v0		=	(CMovingVertex *)		ralloc(3*sizeof(CMovingVertex) + sizeof(CPmovingTriangle),CRenderer::globalMemory);
 				CMovingVertex		*v1		=	v0+1;
 				CMovingVertex		*v2		=	v1+1;
 				CPmovingTriangle	*t		=	(CPmovingTriangle *)	(v2 + 1);

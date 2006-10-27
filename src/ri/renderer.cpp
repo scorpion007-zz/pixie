@@ -136,6 +136,7 @@ TMutex							CRenderer::hierarchyMutex;
 TMutex							CRenderer::textureMutex;
 TMutex							CRenderer::refCountMutex;
 TMutex							CRenderer::shaderMutex;
+TMutex							CRenderer::delayedMutex;
 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
@@ -198,7 +199,7 @@ int								CRenderer::shootStep;
 EDepthFilter					CRenderer::depthFilter;
 
 // Frame data
-CMemStack						*CRenderer::frameMemory				=	NULL;
+T64								CRenderer::frameCheckpoint[3];
 CTrie<CFileResource  *>			*CRenderer::frameFiles				=	NULL;
 CArray<const char*>				*CRenderer::frameTemporaryFiles		=	NULL;
 CShadingContext					**CRenderer::contexts				=	NULL;
@@ -302,6 +303,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(textureMutex);
 	osCreateMutex(refCountMutex);
 	osCreateMutex(shaderMutex);
+	osCreateMutex(delayedMutex);
 
 	// Init the memory
 	memoryInit(globalMemory);
@@ -371,6 +373,7 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(textureMutex);
 	osDeleteMutex(refCountMutex);
 	osDeleteMutex(shaderMutex);
+	osDeleteMutex(delayedMutex);
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);
@@ -489,11 +492,13 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	// Record the frame start time
 	stats.frameStartTime	=	osCPUTime();
 
+	// Save the checkpoint for the global memory
+	memSave(frameCheckpoint,globalMemory);
+
 	// Make a local copy of the options
 	copyOptions(o);
 
 	// This is the memory we allocate our junk from (only permenant stuff for the entire frame)
-	frameMemory				=	new CMemStack(1 << 20);
 	frameFiles				=	new CTrie<CFileResource  *>;
 
 	// Save the world xform
@@ -591,7 +596,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	metaYBuckets		=	(int) ceil(yBuckets / (float) netYBuckets);
 
 	// If we have servers, this array will hold the server assignment for each bucket
-	jobAssignment		=	(int *) frameMemory->alloc(xBuckets*yBuckets*sizeof(int));
+	jobAssignment		=	(int *) ralloc(xBuckets*yBuckets*sizeof(int),globalMemory);
 
 	// Create the job assignment
 	for (i=0;i<xBuckets*yBuckets;i++)	jobAssignment[i]	=	-1;
@@ -707,7 +712,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 
 	// Create a default display if not there
 	if (displays == NULL) {
-		displays				=	(COptions::CDisplay *) frameMemory->alloc(sizeof(COptions::CDisplay));
+		displays				=	(COptions::CDisplay *) ralloc(sizeof(COptions::CDisplay),globalMemory);
 		displays->next			=	NULL;
 		displays->outDevice		=	RI_FILE;
 		displays->outName		=	"ri.tif";
@@ -732,7 +737,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 		const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
 
 		// Allocate the pixel filter
-		pixelFilterKernel = (float *) frameMemory->alloc(filterWidth*filterHeight*sizeof(float));
+		pixelFilterKernel = (float *) ralloc(filterWidth*filterHeight*sizeof(float),globalMemory);
 	
 		// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
 		float	totalWeight	=	0;
@@ -935,10 +940,6 @@ void		CRenderer::endFrame() {
 	world->detach();
 	world		=	NULL;
 
-	// Ditch the frame memory
-	delete frameMemory;
-	frameMemory	=	NULL;
-
 	// Remove end-of-frame temporary files
 	if (frameTemporaryFiles != NULL) {
 		int			i,numTemps	=	frameTemporaryFiles->numItems;
@@ -981,6 +982,9 @@ void		CRenderer::endFrame() {
 			fatal(CODE_BADTOKEN,"Invalid net command\n");
 		}
 	}
+
+	// Restore the frame memory
+	memRestore(frameCheckpoint,globalMemory);
 
 	// Print the stats (before we discard the memory)
 	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;

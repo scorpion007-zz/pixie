@@ -58,9 +58,9 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	
 
 	// Allocate the framebuffer
-	fb					=	(float **) CRenderer::frameMemory->alloc(totalHeight*sizeof(float *));
+	fb					=	(float **) ralloc(totalHeight*sizeof(float *),CRenderer::globalMemory);
 	for (i=0;i<totalHeight;i++) {
-		fb[i]			=	(float *) CRenderer::frameMemory->alloc(totalWidth*SAMPLES_PER_PIXEL*sizeof(float));
+		fb[i]			=	(float *) ralloc(totalWidth*SAMPLES_PER_PIXEL*sizeof(float),CRenderer::globalMemory);
 	}
 
 	// Initialize the occlusion culler

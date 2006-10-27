@@ -350,7 +350,7 @@ nextPoint:;
 
 #define createVertex(__dest,__src)															\
 				if ((__dest = __src->vertex) == NULL) {										\
-					CMovingVertex	*t0	=	(CMovingVertex *) CRenderer::frameMemory->alloc(sizeof(CMovingVertex));	\
+					CMovingVertex	*t0	=	(CMovingVertex *) ralloc(sizeof(CMovingVertex),CRenderer::globalMemory);	\
 					CQuadVertex		*s0	=	__src;											\
 																							\
 					movvv(t0->P[0],s0->P0);													\
@@ -371,7 +371,7 @@ nextPoint:;
 #undef createVertex
 
 				// Create the first triangle
-				t				=	(CMovingTriangle *)	CRenderer::frameMemory->alloc(sizeof(CMovingTriangle)*2);
+				t				=	(CMovingTriangle *)	ralloc(sizeof(CMovingTriangle)*2,CRenderer::globalMemory);
 				t->v[0]			=	(CVertex *) v0;
 				t->v[1]			=	(CVertex *) v2;
 				t->v[2]			=	(CVertex *) v1;
@@ -406,7 +406,7 @@ nextPoint:;
 
 #define createVertex(__dest,__src)															\
 				if ((__dest = __src->vertex) == NULL) {										\
-					CVertex		*t0	=	(CVertex *) CRenderer::frameMemory->alloc(sizeof(CVertex));	\
+					CVertex		*t0	=	(CVertex *) ralloc(sizeof(CVertex),CRenderer::globalMemory);	\
 					CQuadVertex	*s0	=	__src;												\
 																							\
 					movvv(t0->P,s0->P0);													\
@@ -426,7 +426,7 @@ nextPoint:;
 
 
 				// Create the first triangle
-				t				=	(CTriangle *)	CRenderer::frameMemory->alloc(sizeof(CTriangle)*2);
+				t				=	(CTriangle *)	ralloc(sizeof(CTriangle)*2,CRenderer::globalMemory);
 				t->v[0]			=	(CVertex *) v0;
 				t->v[1]			=	(CVertex *) v2;
 				t->v[2]			=	(CVertex *) v1;

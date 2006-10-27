@@ -79,6 +79,8 @@ public:
 	void					*data;
 	int						*dataRefCount;
 
+	int						processed;
+
 	vector					bmin,bmax;					// Bound in the object space
 	vector					cbmin,cbmax;				// Bound in the camera space
 
