@@ -1,11 +1,8 @@
 
-/*  A Bison parser, made from ../../../../src/sdrc/sl.y
- by  GNU Bison version 1.25
-  */
+/*  A Bison parser, made from sl.y
+    by GNU Bison version 1.28  */
 
 #define YYBISON 1  /* Identify Bison output.  */
-
-#define alloca
 
 #define yyparse slparse
 #define yylex sllex
@@ -14,77 +11,77 @@
 #define yychar slchar
 #define yydebug sldebug
 #define yynerrs slnerrs
-#define	SL_SURFACE	258
-#define	SL_DISPLACEMENT	259
-#define	SL_LIGHT	260
-#define	SL_VOLUME	261
-#define	SL_TRANSFORMATION	262
-#define	SL_IMAGER	263
-#define	SL_FOR	264
-#define	SL_WHILE	265
-#define	SL_IF	266
-#define	SL_GATHER	267
-#define	SL_ELSE	268
-#define	SL_BREAK	269
-#define	SL_CONTINUE	270
-#define	SL_ILLUMINANCE	271
-#define	SL_ILLUMINATE	272
-#define	SL_SOLAR	273
-#define	SL_RETURN	274
-#define	SL_VOID	275
-#define	SL_FCN_PI	276
-#define	SL_IDENTIFIER_VALUE	277
-#define	SL_FLOAT_VALUE	278
-#define	SL_COMMA	279
-#define	SL_SEMI_COLON	280
-#define	SL_OPEN_PARANTHESIS	281
-#define	SL_CLOSE_PARANTHESIS	282
-#define	SL_OPEN_CRL_PARANTHESIS	283
-#define	SL_CLOSE_CRL_PARANTHESIS	284
-#define	SL_OPEN_SQR_PARANTHESIS	285
-#define	SL_CLOSE_SQR_PARANTHESIS	286
-#define	SL_TEXTURE	287
-#define	SL_SHADOW	288
-#define	SL_ENVIRONMENT	289
-#define	SL_BUMP	290
-#define	SL_TEXT_VALUE	291
-#define	SL_QUESTION	292
-#define	SL_COLON	293
-#define	SL_FLOAT	294
-#define	SL_COLOR	295
-#define	SL_POINT	296
-#define	SL_VECTOR	297
-#define	SL_NORMAL	298
-#define	SL_MATRIX	299
-#define	SL_STRING	300
-#define	SL_COMP_EQUAL	301
-#define	SL_COMP_DIFFERENT	302
-#define	SL_COMP_GREATER	303
-#define	SL_COMP_GREATER_EQUAL	304
-#define	SL_COMP_LESS	305
-#define	SL_COMP_LESS_EQUAL	306
-#define	SL_EQUAL	307
-#define	SL_INCREMENT	308
-#define	SL_DECREMENT	309
-#define	SL_INCREMENT_BY	310
-#define	SL_DECREMENT_BY	311
-#define	SL_MULTIPLY_BY	312
-#define	SL_DIVIDE_BY	313
-#define	SL_PLUS	314
-#define	SL_MINUS	315
-#define	SL_CROSS	316
-#define	SL_DIVIDE	317
-#define	SL_MULTIPLY	318
-#define	SL_DOT	319
-#define	SL_OR	320
-#define	SL_AND	321
-#define	SL_NOT	322
-#define	SL_OUTPUT	323
-#define	SL_EXTERN	324
-#define	SL_UNIFORM	325
-#define	SL_VARIABLE	326
+#define	SL_SURFACE	257
+#define	SL_DISPLACEMENT	258
+#define	SL_LIGHT	259
+#define	SL_VOLUME	260
+#define	SL_TRANSFORMATION	261
+#define	SL_IMAGER	262
+#define	SL_FOR	263
+#define	SL_WHILE	264
+#define	SL_IF	265
+#define	SL_GATHER	266
+#define	SL_ELSE	267
+#define	SL_BREAK	268
+#define	SL_CONTINUE	269
+#define	SL_ILLUMINANCE	270
+#define	SL_ILLUMINATE	271
+#define	SL_SOLAR	272
+#define	SL_RETURN	273
+#define	SL_VOID	274
+#define	SL_FCN_PI	275
+#define	SL_IDENTIFIER_VALUE	276
+#define	SL_FLOAT_VALUE	277
+#define	SL_COMMA	278
+#define	SL_SEMI_COLON	279
+#define	SL_OPEN_PARANTHESIS	280
+#define	SL_CLOSE_PARANTHESIS	281
+#define	SL_OPEN_CRL_PARANTHESIS	282
+#define	SL_CLOSE_CRL_PARANTHESIS	283
+#define	SL_OPEN_SQR_PARANTHESIS	284
+#define	SL_CLOSE_SQR_PARANTHESIS	285
+#define	SL_TEXTURE	286
+#define	SL_SHADOW	287
+#define	SL_ENVIRONMENT	288
+#define	SL_BUMP	289
+#define	SL_TEXT_VALUE	290
+#define	SL_QUESTION	291
+#define	SL_COLON	292
+#define	SL_FLOAT	293
+#define	SL_COLOR	294
+#define	SL_POINT	295
+#define	SL_VECTOR	296
+#define	SL_NORMAL	297
+#define	SL_MATRIX	298
+#define	SL_STRING	299
+#define	SL_COMP_EQUAL	300
+#define	SL_COMP_DIFFERENT	301
+#define	SL_COMP_GREATER	302
+#define	SL_COMP_GREATER_EQUAL	303
+#define	SL_COMP_LESS	304
+#define	SL_COMP_LESS_EQUAL	305
+#define	SL_EQUAL	306
+#define	SL_INCREMENT	307
+#define	SL_DECREMENT	308
+#define	SL_INCREMENT_BY	309
+#define	SL_DECREMENT_BY	310
+#define	SL_MULTIPLY_BY	311
+#define	SL_DIVIDE_BY	312
+#define	SL_PLUS	313
+#define	SL_MINUS	314
+#define	SL_CROSS	315
+#define	SL_DIVIDE	316
+#define	SL_MULTIPLY	317
+#define	SL_DOT	318
+#define	SL_OR	319
+#define	SL_AND	320
+#define	SL_NOT	321
+#define	SL_OUTPUT	322
+#define	SL_EXTERN	323
+#define	SL_UNIFORM	324
+#define	SL_VARIABLE	325
 
-#line 60 "../../../../src/sdrc/sl.y"
+#line 60 "sl.y"
 
 //////////////////////////////////////////////////////////////////////////
 // Misc C definitions
@@ -110,7 +107,7 @@
 
 
 
-#line 85 "../../../../src/sdrc/sl.y"
+#line 85 "sl.y"
 typedef union {
   char					*string;
   CExpression			*code;
@@ -130,10 +127,10 @@ typedef union {
 
 
 #define	YYFINAL		443
-#define	YYFLAG		32768
+#define	YYFLAG		-32768
 #define	YYNTBASE	72
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 326 ? yytranslate[x] : 176)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 325 ? yytranslate[x] : 176)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -161,14 +158,14 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
-     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
-    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-    26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-    36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
-    46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
-    56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
-    66,    67,    68,    69,    70,    71
+     2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
+     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+    27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+    37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
+    47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
+    57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
+    67,    68,    69,    70,    71
 };
 
 #if YYDEBUG != 0
@@ -851,6 +848,8 @@ static const short yycheck[] = {     1,
     63,    64
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
+#line 3 "/usr/share/bison.simple"
+/* This file comes from bison-1.28.  */
 
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Free Software Foundation, Inc.
@@ -867,46 +866,66 @@ static const short yycheck[] = {     1,
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, when this file is copied by Bison into a
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef alloca
-#ifdef __GNUC__
-#define alloca __builtin_alloca
-#else /* not GNU C.  */
-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi)
-#include <alloca.h>
-#else /* not sparc */
-#if defined (MSDOS) && !defined (__TURBOC__)
-#include <malloc.h>
-#else /* not MSDOS, or __TURBOC__ */
-#if defined(_AIX)
-#include <malloc.h>
- #pragma alloca
-#else /* not MSDOS, __TURBOC__, or _AIX */
-#ifdef __hpux
-#ifdef __cplusplus
-extern "C" {
-void *alloca (unsigned int);
-};
-#else /* not __cplusplus */
-void *alloca ();
-#endif /* not __cplusplus */
-#endif /* __hpux */
-#endif /* not _AIX */
-#endif /* not MSDOS, or __TURBOC__ */
-#endif /* not sparc.  */
-#endif /* not GNU C.  */
-#endif /* alloca not defined.  */
-
 /* This is the parser code that is written into each bison parser
   when the %semantic_parser declaration is not specified in the grammar.
   It was written by Richard Stallman by simplifying the hairy parser
   used when %semantic_parser is specified.  */
+
+#ifndef YYSTACK_USE_ALLOCA
+#ifdef alloca
+#define YYSTACK_USE_ALLOCA
+#else /* alloca not defined */
+#ifdef __GNUC__
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#else /* not GNU C.  */
+#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi) || (defined (__sun) && defined (__i386))
+#define YYSTACK_USE_ALLOCA
+#include <alloca.h>
+#else /* not sparc */
+/* We think this test detects Watcom and Microsoft C.  */
+/* This used to test MSDOS, but that is a bad idea
+   since that symbol is in the user namespace.  */
+#if (defined (_MSDOS) || defined (_MSDOS_)) && !defined (__TURBOC__)
+#if 0 /* No need for malloc.h, which pollutes the namespace;
+	 instead, just don't use alloca.  */
+#include <malloc.h>
+#endif
+#else /* not MSDOS, or __TURBOC__ */
+#if defined(_AIX)
+/* I don't know what this was needed for, but it pollutes the namespace.
+   So I turned it off.   rms, 2 May 1997.  */
+/* #include <malloc.h>  */
+ #pragma alloca
+#define YYSTACK_USE_ALLOCA
+#else /* not MSDOS, or __TURBOC__, or _AIX */
+#if 0
+#ifdef __hpux /* haible@ilog.fr says this works for HPUX 9.05 and up,
+		 and on HPUX 10.  Eventually we can turn this on.  */
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#endif /* __hpux */
+#endif
+#endif /* not _AIX */
+#endif /* not MSDOS, or __TURBOC__ */
+#endif /* not sparc */
+#endif /* not GNU C */
+#endif /* alloca not defined */
+#endif /* YYSTACK_USE_ALLOCA not defined */
+
+#ifdef YYSTACK_USE_ALLOCA
+#define YYSTACK_ALLOC alloca
+#else
+#define YYSTACK_ALLOC malloc
+#endif
 
 /* Note: there must be only one dollar sign in this file.
    It is replaced by the list of actions, each action
@@ -916,8 +935,8 @@ void *alloca ();
 #define yyclearin	(yychar = YYEMPTY)
 #define YYEMPTY		-2
 #define YYEOF		0
-#define YYACCEPT	return(0)
-#define YYABORT 	return(1)
+#define YYACCEPT	goto yyacceptlab
+#define YYABORT 	goto yyabortlab
 #define YYERROR		goto yyerrlab1
 /* Like YYERROR except do call yyerror.
    This remains here temporarily to ease the
@@ -998,12 +1017,12 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #ifndef YYMAXDEPTH
 #define YYMAXDEPTH 10000
 #endif
-
-/* Prevent warning if -Wstrict-prototypes.  */
-#ifdef __GNUC__
-int yyparse (void);
-#endif
 
+/* Define __yy_memcpy.  Note that the size argument
+   should be passed with type unsigned int, because that is what the non-GCC
+   definitions require.  With GCC, __builtin_memcpy takes an arg
+   of type size_t, but it can handle unsigned int.  */
+
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
 #define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
 #else				/* not GNU C or C++ */
@@ -1015,7 +1034,7 @@ static void
 __yy_memcpy (to, from, count)
      char *to;
      char *from;
-     int count;
+     unsigned int count;
 {
   register char *f = from;
   register char *t = to;
@@ -1030,10 +1049,10 @@ __yy_memcpy (to, from, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (char *to, char *from, int count)
+__yy_memcpy (char *to, char *from, unsigned int count)
 {
-  register char *f = from;
   register char *t = to;
+  register char *f = from;
   register int i = count;
 
   while (i-- > 0)
@@ -1043,6 +1062,7 @@ __yy_memcpy (char *to, char *from, int count)
 #endif
 #endif
 
+#line 217 "/usr/share/bison.simple"
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
    into yyparse.  The argument should have type void *.
@@ -1062,6 +1082,15 @@ __yy_memcpy (char *to, char *from, int count)
 #define YYPARSE_PARAM_ARG
 #define YYPARSE_PARAM_DECL
 #endif /* not YYPARSE_PARAM */
+
+/* Prevent warning if -Wstrict-prototypes.  */
+#ifdef __GNUC__
+#ifdef YYPARSE_PARAM
+int yyparse (void *);
+#else
+int yyparse (void);
+#endif
+#endif
 
 int
 yyparse(YYPARSE_PARAM_ARG)
@@ -1091,6 +1120,7 @@ yyparse(YYPARSE_PARAM_ARG)
 #endif
 
   int yystacksize = YYINITDEPTH;
+  int yyfree_stacks = 0;
 
 #ifdef YYPURE
   int yychar;
@@ -1175,18 +1205,32 @@ yynewstate:
       if (yystacksize >= YYMAXDEPTH)
 	{
 	  yyerror("parser stack overflow");
+	  if (yyfree_stacks)
+	    {
+	      free (yyss);
+	      free (yyvs);
+#ifdef YYLSP_NEEDED
+	      free (yyls);
+#endif
+	    }
 	  return 2;
 	}
       yystacksize *= 2;
       if (yystacksize > YYMAXDEPTH)
 	yystacksize = YYMAXDEPTH;
-      yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
-      __yy_memcpy ((char *)yyss, (char *)yyss1, size * sizeof (*yyssp));
-      yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
-      __yy_memcpy ((char *)yyvs, (char *)yyvs1, size * sizeof (*yyvsp));
+#ifndef YYSTACK_USE_ALLOCA
+      yyfree_stacks = 1;
+#endif
+      yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
+      __yy_memcpy ((char *)yyss, (char *)yyss1,
+		   size * (unsigned int) sizeof (*yyssp));
+      yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
+      __yy_memcpy ((char *)yyvs, (char *)yyvs1,
+		   size * (unsigned int) sizeof (*yyvsp));
 #ifdef YYLSP_NEEDED
-      yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
-      __yy_memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
+      yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
+      __yy_memcpy ((char *)yyls, (char *)yyls1,
+		   size * (unsigned int) sizeof (*yylsp));
 #endif
 #endif /* no yyoverflow */
 
@@ -1347,118 +1391,118 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 247 "../../../../src/sdrc/sl.y"
+#line 247 "sl.y"
 {
 			;
     break;}
 case 2:
-#line 250 "../../../../src/sdrc/sl.y"
+#line 250 "sl.y"
 {
 			;
     break;}
 case 3:
-#line 256 "../../../../src/sdrc/sl.y"
+#line 256 "sl.y"
 {
 				yyval.integer	=	SLC_UNIFORM;
 			;
     break;}
 case 4:
-#line 261 "../../../../src/sdrc/sl.y"
+#line 261 "sl.y"
 {
 				yyval.integer	=	SLC_VARYING;
 			;
     break;}
 case 5:
-#line 265 "../../../../src/sdrc/sl.y"
+#line 265 "sl.y"
 {
 				yyval.integer	=	0;
 			;
     break;}
 case 6:
-#line 273 "../../../../src/sdrc/sl.y"
+#line 273 "sl.y"
 {
 				yyval.integer	=	SLC_EXTERN;
 			;
     break;}
 case 7:
-#line 277 "../../../../src/sdrc/sl.y"
+#line 277 "sl.y"
 {
 				yyval.integer	=	0;
 			;
     break;}
 case 8:
-#line 284 "../../../../src/sdrc/sl.y"
+#line 284 "sl.y"
 {
 				yyval.integer	=	SLC_OUTPUT;
 			;
     break;}
 case 9:
-#line 288 "../../../../src/sdrc/sl.y"
+#line 288 "sl.y"
 {
 				yyval.integer	=	0;
 			;
     break;}
 case 10:
-#line 295 "../../../../src/sdrc/sl.y"
+#line 295 "sl.y"
 {
 				yyval.integer	=	SLC_FLOAT;
 			;
     break;}
 case 11:
-#line 300 "../../../../src/sdrc/sl.y"
+#line 300 "sl.y"
 {
 				yyval.integer	=	SLC_VECTOR | SLC_VCOLOR;
 			;
     break;}
 case 12:
-#line 305 "../../../../src/sdrc/sl.y"
+#line 305 "sl.y"
 {
 				yyval.integer	=	SLC_VECTOR | SLC_VVECTOR;
 			;
     break;}
 case 13:
-#line 310 "../../../../src/sdrc/sl.y"
+#line 310 "sl.y"
 {
 				yyval.integer	=	SLC_VECTOR | SLC_VNORMAL;
 			;
     break;}
 case 14:
-#line 315 "../../../../src/sdrc/sl.y"
+#line 315 "sl.y"
 {
 				yyval.integer	=	SLC_VECTOR | SLC_VPOINT;
 			;
     break;}
 case 15:
-#line 320 "../../../../src/sdrc/sl.y"
+#line 320 "sl.y"
 {
 				yyval.integer	=	SLC_MATRIX;
 			;
     break;}
 case 16:
-#line 325 "../../../../src/sdrc/sl.y"
+#line 325 "sl.y"
 {
 				yyval.integer	=	SLC_STRING | SLC_UNIFORM;
 			;
     break;}
 case 17:
-#line 335 "../../../../src/sdrc/sl.y"
+#line 335 "sl.y"
 {
 				yyval.integer	=	yyvsp[-3].integer | yyvsp[-2].integer | yyvsp[-1].integer | yyvsp[0].integer;
 				sdr->desire(yyval.integer);
 			;
     break;}
 case 18:
-#line 353 "../../../../src/sdrc/sl.y"
+#line 353 "sl.y"
 {
 		;
     break;}
 case 19:
-#line 357 "../../../../src/sdrc/sl.y"
+#line 357 "sl.y"
 {
 		;
     break;}
 case 20:
-#line 374 "../../../../src/sdrc/sl.y"
+#line 374 "sl.y"
 {
 			CFunction	*thisFunction	=	sdr->newFunction(yyvsp[-1].string);
 			
@@ -1473,7 +1517,7 @@ case 20:
 		;
     break;}
 case 21:
-#line 390 "../../../../src/sdrc/sl.y"
+#line 390 "sl.y"
 {
 			CFunction	*thisFunction	=	sdr->newFunction(yyvsp[-1].string);
 			
@@ -1481,7 +1525,7 @@ case 21:
 		;
     break;}
 case 22:
-#line 402 "../../../../src/sdrc/sl.y"
+#line 402 "sl.y"
 {
 			CFunction	*cFun		=	sdr->popFunction();
 
@@ -1495,37 +1539,37 @@ case 22:
 		;
     break;}
 case 23:
-#line 420 "../../../../src/sdrc/sl.y"
+#line 420 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 24:
-#line 424 "../../../../src/sdrc/sl.y"
+#line 424 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 25:
-#line 436 "../../../../src/sdrc/sl.y"
+#line 436 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-2].code,yyvsp[0].code);
 		;
     break;}
 case 26:
-#line 442 "../../../../src/sdrc/sl.y"
+#line 442 "sl.y"
 {
 			yyval.code	=	yyvsp[-1].code;
 		;
     break;}
 case 27:
-#line 447 "../../../../src/sdrc/sl.y"
+#line 447 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 28:
-#line 456 "../../../../src/sdrc/sl.y"
+#line 456 "sl.y"
 {
 			int	type	=	sdr->desired();
 
@@ -1544,14 +1588,14 @@ case 28:
 		;
     break;}
 case 29:
-#line 473 "../../../../src/sdrc/sl.y"
+#line 473 "sl.y"
 {
 			yyval.code					=	yyvsp[0].code;
 			sdr->undesire();						// We're done with the type
 		;
     break;}
 case 30:
-#line 483 "../../../../src/sdrc/sl.y"
+#line 483 "sl.y"
 {
 			CParameter	*cParameter;
 			
@@ -1559,13 +1603,13 @@ case 30:
 		;
     break;}
 case 31:
-#line 490 "../../../../src/sdrc/sl.y"
+#line 490 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 32:
-#line 495 "../../../../src/sdrc/sl.y"
+#line 495 "sl.y"
 {
 			CParameter	*cParameter;
 			
@@ -1575,7 +1619,7 @@ case 32:
 		;
     break;}
 case 33:
-#line 506 "../../../../src/sdrc/sl.y"
+#line 506 "sl.y"
 {
 			CParameter	*cParameter;
 			
@@ -1583,13 +1627,13 @@ case 33:
 		;
     break;}
 case 34:
-#line 513 "../../../../src/sdrc/sl.y"
+#line 513 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 35:
-#line 521 "../../../../src/sdrc/sl.y"
+#line 521 "sl.y"
 {
 			CParameter	*cParameter;
 			
@@ -1602,13 +1646,13 @@ case 35:
 		;
     break;}
 case 36:
-#line 533 "../../../../src/sdrc/sl.y"
+#line 533 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 37:
-#line 540 "../../../../src/sdrc/sl.y"
+#line 540 "sl.y"
 {
 			CParameter	*cParameter;
 			
@@ -1618,7 +1662,7 @@ case 37:
 		;
     break;}
 case 38:
-#line 552 "../../../../src/sdrc/sl.y"
+#line 552 "sl.y"
 {
 			CParameter	*cParameter;
 			
@@ -1633,7 +1677,7 @@ case 38:
 		;
     break;}
 case 39:
-#line 573 "../../../../src/sdrc/sl.y"
+#line 573 "sl.y"
 {
 			CFunction		*mainFunction	=	sdr->newFunction(constantShaderMain);
 
@@ -1645,13 +1689,13 @@ case 39:
 		;
     break;}
 case 40:
-#line 584 "../../../../src/sdrc/sl.y"
+#line 584 "sl.y"
 {
 			sdr->restoreParameters();
 		;
     break;}
 case 41:
-#line 588 "../../../../src/sdrc/sl.y"
+#line 588 "sl.y"
 {
 			CFunction	*cFun			=	sdr->popFunction();
 			CParameter	*cParameter;
@@ -1667,73 +1711,73 @@ case 41:
 		;
     break;}
 case 42:
-#line 606 "../../../../src/sdrc/sl.y"
+#line 606 "sl.y"
 {
 			yyval.integer	=	SLC_SURFACE;
 		;
     break;}
 case 43:
-#line 611 "../../../../src/sdrc/sl.y"
+#line 611 "sl.y"
 {
 			yyval.integer	=	SLC_DISPLACEMENT;
 		;
     break;}
 case 44:
-#line 616 "../../../../src/sdrc/sl.y"
+#line 616 "sl.y"
 {
 			yyval.integer	=	SLC_LIGHT;
 		;
     break;}
 case 45:
-#line 621 "../../../../src/sdrc/sl.y"
+#line 621 "sl.y"
 {
 			yyval.integer	=	SLC_VOLUME;
 		;
     break;}
 case 46:
-#line 626 "../../../../src/sdrc/sl.y"
+#line 626 "sl.y"
 {
 			yyval.integer	=	SLC_TRANSFORMATION;
 		;
     break;}
 case 47:
-#line 631 "../../../../src/sdrc/sl.y"
+#line 631 "sl.y"
 {
 			yyval.integer	=	SLC_IMAGER;
 		;
     break;}
 case 48:
-#line 640 "../../../../src/sdrc/sl.y"
+#line 640 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 49:
-#line 644 "../../../../src/sdrc/sl.y"
+#line 644 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 50:
-#line 655 "../../../../src/sdrc/sl.y"
+#line 655 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-2].code,yyvsp[0].code);
 		;
     break;}
 case 51:
-#line 661 "../../../../src/sdrc/sl.y"
+#line 661 "sl.y"
 {
 			yyval.code	=	yyvsp[-1].code;
 		;
     break;}
 case 52:
-#line 666 "../../../../src/sdrc/sl.y"
+#line 666 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 53:
-#line 675 "../../../../src/sdrc/sl.y"
+#line 675 "sl.y"
 {
 			int	type	=	yyvsp[0].integer;
 
@@ -1747,7 +1791,7 @@ case 53:
 		;
     break;}
 case 54:
-#line 687 "../../../../src/sdrc/sl.y"
+#line 687 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		
@@ -1759,19 +1803,19 @@ case 54:
 		;
     break;}
 case 55:
-#line 703 "../../../../src/sdrc/sl.y"
+#line 703 "sl.y"
 {
 			yyval.code	=	getAssignment(sdr->variableList,yyvsp[0].expression);
 		;
     break;}
 case 56:
-#line 709 "../../../../src/sdrc/sl.y"
+#line 709 "sl.y"
 {
 			yyval.code	=	getAssignment(sdr->variableList,yyvsp[0].array);
 		;
     break;}
 case 57:
-#line 718 "../../../../src/sdrc/sl.y"
+#line 718 "sl.y"
 {
 			CParameter	*cParameter	=	sdr->newParameter(yyvsp[-1].string,sdr->desired() | SLC_PARAMETER,1);
 
@@ -1779,13 +1823,13 @@ case 57:
 		;
     break;}
 case 58:
-#line 724 "../../../../src/sdrc/sl.y"
+#line 724 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 59:
-#line 729 "../../../../src/sdrc/sl.y"
+#line 729 "sl.y"
 {
 			CParameter	*cParameter	=	sdr->newParameter(yyvsp[0].string,sdr->desired() | SLC_PARAMETER,1);
 
@@ -1793,13 +1837,13 @@ case 59:
 		;
     break;}
 case 60:
-#line 735 "../../../../src/sdrc/sl.y"
+#line 735 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 61:
-#line 744 "../../../../src/sdrc/sl.y"
+#line 744 "sl.y"
 {
 			CParameter	*cParameter	=	sdr->newParameter(yyvsp[-4].string,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,atoi(yyvsp[-2].string));
 
@@ -1812,13 +1856,13 @@ case 61:
 		;
     break;}
 case 62:
-#line 755 "../../../../src/sdrc/sl.y"
+#line 755 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 63:
-#line 763 "../../../../src/sdrc/sl.y"
+#line 763 "sl.y"
 {
 			CParameter	*cParameter	=	sdr->newParameter(yyvsp[-3].string,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,atoi(yyvsp[-1].string));
 
@@ -1832,37 +1876,37 @@ case 63:
 		;
     break;}
 case 64:
-#line 775 "../../../../src/sdrc/sl.y"
+#line 775 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 65:
-#line 780 "../../../../src/sdrc/sl.y"
+#line 780 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 66:
-#line 788 "../../../../src/sdrc/sl.y"
+#line 788 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 67:
-#line 795 "../../../../src/sdrc/sl.y"
+#line 795 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-2].code,yyvsp[0].code);
 		;
     break;}
 case 68:
-#line 805 "../../../../src/sdrc/sl.y"
+#line 805 "sl.y"
 {
 			CFunction	*cFun	=	sdr->newFunction(constantBlockName);
 		;
     break;}
 case 69:
-#line 810 "../../../../src/sdrc/sl.y"
+#line 810 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -1872,7 +1916,7 @@ case 69:
 		;
     break;}
 case 70:
-#line 826 "../../../../src/sdrc/sl.y"
+#line 826 "sl.y"
 {
 			CVariable	*cVar;
 
@@ -1889,19 +1933,19 @@ case 70:
 		;
     break;}
 case 71:
-#line 847 "../../../../src/sdrc/sl.y"
+#line 847 "sl.y"
 {
 			yyval.code	=	getAssignment(sdr->variableList,yyvsp[0].expression);
 		;
     break;}
 case 72:
-#line 853 "../../../../src/sdrc/sl.y"
+#line 853 "sl.y"
 {
 			yyval.code	=	getAssignment(sdr->variableList,yyvsp[0].array);
 		;
     break;}
 case 73:
-#line 860 "../../../../src/sdrc/sl.y"
+#line 860 "sl.y"
 {
 			CVariable	*cVar;
 
@@ -1911,13 +1955,13 @@ case 73:
 		;
     break;}
 case 74:
-#line 868 "../../../../src/sdrc/sl.y"
+#line 868 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 75:
-#line 873 "../../../../src/sdrc/sl.y"
+#line 873 "sl.y"
 {
 			CVariable	*cVar;
 
@@ -1927,13 +1971,13 @@ case 75:
 		;
     break;}
 case 76:
-#line 882 "../../../../src/sdrc/sl.y"
+#line 882 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-1].code,yyvsp[0].code);
 		;
     break;}
 case 77:
-#line 891 "../../../../src/sdrc/sl.y"
+#line 891 "sl.y"
 {
 			CVariable	*cVar;
 
@@ -1948,13 +1992,13 @@ case 77:
 		;
     break;}
 case 78:
-#line 904 "../../../../src/sdrc/sl.y"
+#line 904 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 79:
-#line 912 "../../../../src/sdrc/sl.y"
+#line 912 "sl.y"
 {
 			CVariable	*cVar;
 
@@ -1970,25 +2014,25 @@ case 79:
 		;
     break;}
 case 80:
-#line 928 "../../../../src/sdrc/sl.y"
+#line 928 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-1].code,yyvsp[0].code);
 		;
     break;}
 case 81:
-#line 936 "../../../../src/sdrc/sl.y"
+#line 936 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 82:
-#line 941 "../../../../src/sdrc/sl.y"
+#line 941 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 83:
-#line 951 "../../../../src/sdrc/sl.y"
+#line 951 "sl.y"
 {
 
 			yyval.code	=	yyvsp[0].code;
@@ -1996,14 +2040,14 @@ case 83:
 		;
     break;}
 case 84:
-#line 958 "../../../../src/sdrc/sl.y"
+#line 958 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 			assert(sdr->desired() & SLC_NONE);
 		;
     break;}
 case 85:
-#line 964 "../../../../src/sdrc/sl.y"
+#line 964 "sl.y"
 {
 			// Recoverable error happened
 			yyval.code	=	new CNullExpression;
@@ -2011,163 +2055,163 @@ case 85:
 		;
     break;}
 case 86:
-#line 975 "../../../../src/sdrc/sl.y"
+#line 975 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-1].code,yyvsp[0].code);
 		;
     break;}
 case 87:
-#line 979 "../../../../src/sdrc/sl.y"
+#line 979 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 88:
-#line 989 "../../../../src/sdrc/sl.y"
+#line 989 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 89:
-#line 994 "../../../../src/sdrc/sl.y"
+#line 994 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 90:
-#line 999 "../../../../src/sdrc/sl.y"
+#line 999 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 91:
-#line 1004 "../../../../src/sdrc/sl.y"
+#line 1004 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 92:
-#line 1009 "../../../../src/sdrc/sl.y"
+#line 1009 "sl.y"
 {
 			yyval.code	=	yyvsp[-1].expression;
 		;
     break;}
 case 93:
-#line 1014 "../../../../src/sdrc/sl.y"
+#line 1014 "sl.y"
 {
 			yyval.code	=	yyvsp[-1].expression;
 		;
     break;}
 case 94:
-#line 1019 "../../../../src/sdrc/sl.y"
+#line 1019 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 95:
-#line 1024 "../../../../src/sdrc/sl.y"
+#line 1024 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 96:
-#line 1029 "../../../../src/sdrc/sl.y"
+#line 1029 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 97:
-#line 1034 "../../../../src/sdrc/sl.y"
+#line 1034 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 98:
-#line 1039 "../../../../src/sdrc/sl.y"
+#line 1039 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 99:
-#line 1044 "../../../../src/sdrc/sl.y"
+#line 1044 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 100:
-#line 1049 "../../../../src/sdrc/sl.y"
+#line 1049 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 101:
-#line 1054 "../../../../src/sdrc/sl.y"
+#line 1054 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 102:
-#line 1059 "../../../../src/sdrc/sl.y"
+#line 1059 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 103:
-#line 1064 "../../../../src/sdrc/sl.y"
+#line 1064 "sl.y"
 {
 			yyval.code	=	yyvsp[-1].expression;
 		;
     break;}
 case 104:
-#line 1069 "../../../../src/sdrc/sl.y"
+#line 1069 "sl.y"
 {
 			yyval.code					=	new CNullExpression;
 		;
     break;}
 case 105:
-#line 1078 "../../../../src/sdrc/sl.y"
+#line 1078 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 106:
-#line 1083 "../../../../src/sdrc/sl.y"
+#line 1083 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 107:
-#line 1088 "../../../../src/sdrc/sl.y"
+#line 1088 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 108:
-#line 1093 "../../../../src/sdrc/sl.y"
+#line 1093 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 109:
-#line 1098 "../../../../src/sdrc/sl.y"
+#line 1098 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 110:
-#line 1103 "../../../../src/sdrc/sl.y"
+#line 1103 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 111:
-#line 1108 "../../../../src/sdrc/sl.y"
+#line 1108 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 112:
-#line 1117 "../../../../src/sdrc/sl.y"
+#line 1117 "sl.y"
 {
 			CFunction	*cFunction;
 			int			bc;
@@ -2195,7 +2239,7 @@ case 112:
 		;
     break;}
 case 113:
-#line 1144 "../../../../src/sdrc/sl.y"
+#line 1144 "sl.y"
 {
 			CFunction	*cFunction;
 			char		tmp[256];
@@ -2221,7 +2265,7 @@ case 113:
 		;
     break;}
 case 114:
-#line 1173 "../../../../src/sdrc/sl.y"
+#line 1173 "sl.y"
 {
 			CFunction	*cFunction;
 			char		tmp[256];
@@ -2249,7 +2293,7 @@ case 114:
 		;
     break;}
 case 115:
-#line 1200 "../../../../src/sdrc/sl.y"
+#line 1200 "sl.y"
 {
 			CFunction	*cFunction;
 			char		tmp[256];
@@ -2273,7 +2317,7 @@ case 115:
 		;
     break;}
 case 116:
-#line 1227 "../../../../src/sdrc/sl.y"
+#line 1227 "sl.y"
 {
 			CFunction	*cFun	=	sdr->lastFunction;
 			CExpression	*c;
@@ -2303,7 +2347,7 @@ case 116:
 		;
     break;}
 case 117:
-#line 1256 "../../../../src/sdrc/sl.y"
+#line 1256 "sl.y"
 {
 			CFunction	*cFun	=	sdr->lastFunction;
 
@@ -2323,7 +2367,7 @@ case 117:
 		;
     break;}
 case 118:
-#line 1283 "../../../../src/sdrc/sl.y"
+#line 1283 "sl.y"
 {
 			CFunction	*cFun	=	sdr->newFunction(constantLoopName);
 			
@@ -2331,7 +2375,7 @@ case 118:
 		;
     break;}
 case 119:
-#line 1294 "../../../../src/sdrc/sl.y"
+#line 1294 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2339,7 +2383,7 @@ case 119:
 		;
     break;}
 case 120:
-#line 1304 "../../../../src/sdrc/sl.y"
+#line 1304 "sl.y"
 {
 
 			CFunction	*cFun	=	sdr->popFunction();
@@ -2348,7 +2392,7 @@ case 120:
 		;
     break;}
 case 121:
-#line 1317 "../../../../src/sdrc/sl.y"
+#line 1317 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2357,7 +2401,7 @@ case 121:
 		;
     break;}
 case 122:
-#line 1324 "../../../../src/sdrc/sl.y"
+#line 1324 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-3].string);
 
@@ -2370,7 +2414,7 @@ case 122:
 		;
     break;}
 case 123:
-#line 1340 "../../../../src/sdrc/sl.y"
+#line 1340 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2379,7 +2423,7 @@ case 123:
 		;
     break;}
 case 124:
-#line 1347 "../../../../src/sdrc/sl.y"
+#line 1347 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-6].string);
 
@@ -2392,7 +2436,7 @@ case 124:
 		;
     break;}
 case 125:
-#line 1364 "../../../../src/sdrc/sl.y"
+#line 1364 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2401,7 +2445,7 @@ case 125:
 		;
     break;}
 case 126:
-#line 1371 "../../../../src/sdrc/sl.y"
+#line 1371 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-3].string);
 
@@ -2414,7 +2458,7 @@ case 126:
 		;
     break;}
 case 127:
-#line 1384 "../../../../src/sdrc/sl.y"
+#line 1384 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2423,7 +2467,7 @@ case 127:
 		;
     break;}
 case 128:
-#line 1391 "../../../../src/sdrc/sl.y"
+#line 1391 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-3].string);
 
@@ -2436,7 +2480,7 @@ case 128:
 		;
     break;}
 case 129:
-#line 1404 "../../../../src/sdrc/sl.y"
+#line 1404 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2447,7 +2491,7 @@ case 129:
 		;
     break;}
 case 130:
-#line 1415 "../../../../src/sdrc/sl.y"
+#line 1415 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2458,7 +2502,7 @@ case 130:
 		;
     break;}
 case 131:
-#line 1426 "../../../../src/sdrc/sl.y"
+#line 1426 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2467,7 +2511,7 @@ case 131:
 		;
     break;}
 case 132:
-#line 1433 "../../../../src/sdrc/sl.y"
+#line 1433 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-3].string);
 
@@ -2480,7 +2524,7 @@ case 132:
 		;
     break;}
 case 133:
-#line 1446 "../../../../src/sdrc/sl.y"
+#line 1446 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-1].string);
 
@@ -2489,7 +2533,7 @@ case 133:
 		;
     break;}
 case 134:
-#line 1453 "../../../../src/sdrc/sl.y"
+#line 1453 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-3].string);
 
@@ -2502,7 +2546,7 @@ case 134:
 		;
     break;}
 case 135:
-#line 1469 "../../../../src/sdrc/sl.y"
+#line 1469 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2511,7 +2555,7 @@ case 135:
 		;
     break;}
 case 136:
-#line 1476 "../../../../src/sdrc/sl.y"
+#line 1476 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-6].string);
 			
@@ -2524,7 +2568,7 @@ case 136:
 		;
     break;}
 case 137:
-#line 1492 "../../../../src/sdrc/sl.y"
+#line 1492 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2533,7 +2577,7 @@ case 137:
 		;
     break;}
 case 138:
-#line 1499 "../../../../src/sdrc/sl.y"
+#line 1499 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-6].string);
 
@@ -2546,7 +2590,7 @@ case 138:
 		;
     break;}
 case 139:
-#line 1515 "../../../../src/sdrc/sl.y"
+#line 1515 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2557,7 +2601,7 @@ case 139:
 		;
     break;}
 case 140:
-#line 1529 "../../../../src/sdrc/sl.y"
+#line 1529 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2568,7 +2612,7 @@ case 140:
 		;
     break;}
 case 141:
-#line 1543 "../../../../src/sdrc/sl.y"
+#line 1543 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2577,7 +2621,7 @@ case 141:
 		;
     break;}
 case 142:
-#line 1550 "../../../../src/sdrc/sl.y"
+#line 1550 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-6].string);
 
@@ -2590,7 +2634,7 @@ case 142:
 		;
     break;}
 case 143:
-#line 1566 "../../../../src/sdrc/sl.y"
+#line 1566 "sl.y"
 {
 			CVariable	*cVar				=	sdr->getVariable(yyvsp[-4].string);
 
@@ -2599,7 +2643,7 @@ case 143:
 		;
     break;}
 case 144:
-#line 1573 "../../../../src/sdrc/sl.y"
+#line 1573 "sl.y"
 {
 			CVariable			*cVar		=	sdr->getVariable(yyvsp[-6].string);
 
@@ -2612,13 +2656,13 @@ case 144:
 		;
     break;}
 case 145:
-#line 1589 "../../../../src/sdrc/sl.y"
+#line 1589 "sl.y"
 {
 			CFunction	*cFun	=	sdr->newFunction(constantLoopName);
 		;
     break;}
 case 146:
-#line 1603 "../../../../src/sdrc/sl.y"
+#line 1603 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2626,7 +2670,7 @@ case 146:
 		;
     break;}
 case 147:
-#line 1620 "../../../../src/sdrc/sl.y"
+#line 1620 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2634,144 +2678,144 @@ case 147:
 		;
     break;}
 case 148:
-#line 1631 "../../../../src/sdrc/sl.y"
+#line 1631 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 149:
-#line 1635 "../../../../src/sdrc/sl.y"
+#line 1635 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 150:
-#line 1646 "../../../../src/sdrc/sl.y"
+#line 1646 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-2].expression,yyvsp[0].code);
 		;
     break;}
 case 151:
-#line 1651 "../../../../src/sdrc/sl.y"
+#line 1651 "sl.y"
 {
 			yyval.code	=	yyvsp[0].expression;
 		;
     break;}
 case 152:
-#line 1660 "../../../../src/sdrc/sl.y"
+#line 1660 "sl.y"
 {
 			yyval.expression	=	getConversion(SLC_BOOLEAN,yyvsp[0].expression);
 		;
     break;}
 case 153:
-#line 1664 "../../../../src/sdrc/sl.y"
+#line 1664 "sl.y"
 {
 			yyval.expression	=	new CConstantTerminalExpression(SLC_BOOLEAN | SLC_UNIFORM,strdup("true"));
 		;
     break;}
 case 154:
-#line 1673 "../../../../src/sdrc/sl.y"
+#line 1673 "sl.y"
 {
 			yyval.code	=	yyvsp[0].code;
 		;
     break;}
 case 155:
-#line 1677 "../../../../src/sdrc/sl.y"
+#line 1677 "sl.y"
 {
 			yyval.code	=	new CNullExpression;
 		;
     break;}
 case 156:
-#line 1688 "../../../../src/sdrc/sl.y"
+#line 1688 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-2].expression,yyvsp[0].code);
 		;
     break;}
 case 157:
-#line 1693 "../../../../src/sdrc/sl.y"
+#line 1693 "sl.y"
 {
 			yyval.code	=	yyvsp[0].expression;
 		;
     break;}
 case 158:
-#line 1700 "../../../../src/sdrc/sl.y"
+#line 1700 "sl.y"
 {
 			yyval.code	=	new CTwoExpressions(yyvsp[-2].expression,yyvsp[0].code);
 		;
     break;}
 case 159:
-#line 1705 "../../../../src/sdrc/sl.y"
+#line 1705 "sl.y"
 {
 			yyval.code	=	yyvsp[0].expression;
 		;
     break;}
 case 160:
-#line 1720 "../../../../src/sdrc/sl.y"
+#line 1720 "sl.y"
 {
 			yyval.code	=	new CIfThenElse(yyvsp[-4].expression,yyvsp[-2].code,yyvsp[0].code);
 		;
     break;}
 case 161:
-#line 1733 "../../../../src/sdrc/sl.y"
+#line 1733 "sl.y"
 {
 			yyval.code	=	new CIfThenElse(yyvsp[-2].expression,yyvsp[0].code,NULL);
 		;
     break;}
 case 162:
-#line 1744 "../../../../src/sdrc/sl.y"
+#line 1744 "sl.y"
 {
 			yyval.code	=	new CIfThenElse(yyvsp[-4].expression,yyvsp[-2].code,yyvsp[0].code);
 		;
     break;}
 case 163:
-#line 1757 "../../../../src/sdrc/sl.y"
+#line 1757 "sl.y"
 {
 			yyval.array->push(yyvsp[0].expression);
 		;
     break;}
 case 164:
-#line 1762 "../../../../src/sdrc/sl.y"
+#line 1762 "sl.y"
 {
 			sdr->actualParameters->push(yyvsp[0].expression);
 			yyval.array	=	sdr->actualParameters;
 		;
     break;}
 case 165:
-#line 1771 "../../../../src/sdrc/sl.y"
+#line 1771 "sl.y"
 {
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			sdr->actualParameters	=	new CArray<CExpression *>;
 		;
     break;}
 case 166:
-#line 1777 "../../../../src/sdrc/sl.y"
+#line 1777 "sl.y"
 {
 			yyval.array	=	yyvsp[-1].array;
 		;
     break;}
 case 167:
-#line 1789 "../../../../src/sdrc/sl.y"
+#line 1789 "sl.y"
 {
 			yyval.code	=	new CGatherThenElse(yyvsp[-3].array,yyvsp[-2].code,yyvsp[0].code);
 			sdr->actualParameters	=	sdr->actualParameterStack->pop();
 		;
     break;}
 case 168:
-#line 1800 "../../../../src/sdrc/sl.y"
+#line 1800 "sl.y"
 {
 			yyval.code	=	new CGatherThenElse(yyvsp[-1].array,yyvsp[0].code,NULL);
 			sdr->actualParameters	=	sdr->actualParameterStack->pop();
 		;
     break;}
 case 169:
-#line 1809 "../../../../src/sdrc/sl.y"
+#line 1809 "sl.y"
 {
 			yyval.code	=	new CGatherThenElse(yyvsp[-3].array,yyvsp[-2].code,yyvsp[0].code);
 			sdr->actualParameters	=	sdr->actualParameterStack->pop();
 		;
     break;}
 case 170:
-#line 1819 "../../../../src/sdrc/sl.y"
+#line 1819 "sl.y"
 {
 			CFunction	*cCFunction	=	sdr->newFunction(constantLoopName);
 
@@ -2779,7 +2823,7 @@ case 170:
 		;
     break;}
 case 171:
-#line 1831 "../../../../src/sdrc/sl.y"
+#line 1831 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2787,7 +2831,7 @@ case 171:
 		;
     break;}
 case 172:
-#line 1844 "../../../../src/sdrc/sl.y"
+#line 1844 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2795,7 +2839,7 @@ case 172:
 		;
     break;}
 case 173:
-#line 1859 "../../../../src/sdrc/sl.y"
+#line 1859 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2803,7 +2847,7 @@ case 173:
 		;
     break;}
 case 174:
-#line 1876 "../../../../src/sdrc/sl.y"
+#line 1876 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2811,7 +2855,7 @@ case 174:
 		;
     break;}
 case 175:
-#line 1889 "../../../../src/sdrc/sl.y"
+#line 1889 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2819,7 +2863,7 @@ case 175:
 		;
     break;}
 case 176:
-#line 1902 "../../../../src/sdrc/sl.y"
+#line 1902 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2827,7 +2871,7 @@ case 176:
 		;
     break;}
 case 177:
-#line 1917 "../../../../src/sdrc/sl.y"
+#line 1917 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2835,7 +2879,7 @@ case 177:
 		;
     break;}
 case 178:
-#line 1934 "../../../../src/sdrc/sl.y"
+#line 1934 "sl.y"
 {
 			CFunction	*cFun	=	sdr->popFunction();
 
@@ -2843,7 +2887,7 @@ case 178:
 		;
     break;}
 case 179:
-#line 1949 "../../../../src/sdrc/sl.y"
+#line 1949 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2851,7 +2895,7 @@ case 179:
 		;
     break;}
 case 180:
-#line 1964 "../../../../src/sdrc/sl.y"
+#line 1964 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2859,7 +2903,7 @@ case 180:
 		;
     break;}
 case 181:
-#line 1977 "../../../../src/sdrc/sl.y"
+#line 1977 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2867,7 +2911,7 @@ case 181:
 		;
     break;}
 case 182:
-#line 1992 "../../../../src/sdrc/sl.y"
+#line 1992 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2875,7 +2919,7 @@ case 182:
 		;
     break;}
 case 183:
-#line 2006 "../../../../src/sdrc/sl.y"
+#line 2006 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2883,7 +2927,7 @@ case 183:
 		;
     break;}
 case 184:
-#line 2019 "../../../../src/sdrc/sl.y"
+#line 2019 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2891,7 +2935,7 @@ case 184:
 		;
     break;}
 case 185:
-#line 2031 "../../../../src/sdrc/sl.y"
+#line 2031 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2899,7 +2943,7 @@ case 185:
 		;
     break;}
 case 186:
-#line 2044 "../../../../src/sdrc/sl.y"
+#line 2044 "sl.y"
 {
 			sdr->requiredShaderContext	|=	SLC_LIGHT;
 
@@ -2907,25 +2951,25 @@ case 186:
 		;
     break;}
 case 187:
-#line 2055 "../../../../src/sdrc/sl.y"
+#line 2055 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;
 		;
     break;}
 case 188:
-#line 2062 "../../../../src/sdrc/sl.y"
+#line 2062 "sl.y"
 {
 			yyval.expression	=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix,NULL,NULL);
 		;
     break;}
 case 189:
-#line 2069 "../../../../src/sdrc/sl.y"
+#line 2069 "sl.y"
 {
 			yyval.expression	=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeSubFloatFloat,opcodeSubVectorVector,opcodeSubMatrixMatrix,NULL,NULL);
 		;
     break;}
 case 190:
-#line 2076 "../../../../src/sdrc/sl.y"
+#line 2076 "sl.y"
 {
 			yyval.expression	=	NULL;
 
@@ -2957,44 +3001,44 @@ case 190:
 		;
     break;}
 case 191:
-#line 2109 "../../../../src/sdrc/sl.y"
+#line 2109 "sl.y"
 {
 			yyval.expression	=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeDivFloatFloat,opcodeDivVectorVector,opcodeDivMatrixMatrix,NULL,NULL);
 		;
     break;}
 case 192:
-#line 2115 "../../../../src/sdrc/sl.y"
+#line 2115 "sl.y"
 {
 			sdr->desire(SLC_VECTOR | SLC_VVECTOR);
 		;
     break;}
 case 193:
-#line 2119 "../../../../src/sdrc/sl.y"
+#line 2119 "sl.y"
 {
 			sdr->undesire();
 			yyval.expression	=	new CBinaryExpression(SLC_FLOAT,opcodeDotProduct,getConversion(SLC_VECTOR,yyvsp[-3].expression),getConversion(SLC_VECTOR,yyvsp[0].expression));
 		;
     break;}
 case 194:
-#line 2127 "../../../../src/sdrc/sl.y"
+#line 2127 "sl.y"
 {
 			yyval.expression	=	new CBinaryExpression(SLC_VECTOR,opcodeCrossProduct,getConversion(SLC_VECTOR,yyvsp[-2].expression),getConversion(SLC_VECTOR,yyvsp[0].expression));
 		;
     break;}
 case 195:
-#line 2133 "../../../../src/sdrc/sl.y"
+#line 2133 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;	
 		;
     break;}
 case 196:
-#line 2139 "../../../../src/sdrc/sl.y"
+#line 2139 "sl.y"
 {
 			yyval.expression	=	getOperation(yyvsp[0].expression,opcodeNegFloat,opcodeNegVector,opcodeNegMatrix,NULL,NULL);
 		;
     break;}
 case 197:
-#line 2148 "../../../../src/sdrc/sl.y"
+#line 2148 "sl.y"
 {
 			int	ft	=	yyvsp[-2].expression->type;
 			int	st	=	yyvsp[0].expression->type;
@@ -3007,57 +3051,57 @@ case 197:
 		;
     break;}
 case 198:
-#line 2164 "../../../../src/sdrc/sl.y"
+#line 2164 "sl.y"
 {
 			yyval.array	=	yyvsp[-1].array;
 		;
     break;}
 case 199:
-#line 2173 "../../../../src/sdrc/sl.y"
+#line 2173 "sl.y"
 {
 			yyval.array	=	yyvsp[0].array;
 			yyval.array->push(yyvsp[-2].expression);
 		;
     break;}
 case 200:
-#line 2179 "../../../../src/sdrc/sl.y"
+#line 2179 "sl.y"
 {
 			yyval.array	=	new CArray<CExpression *>;
 			yyval.array->push(yyvsp[0].expression);
 		;
     break;}
 case 201:
-#line 2187 "../../../../src/sdrc/sl.y"
+#line 2187 "sl.y"
 {
 			yyval.expression	=	new CConstantTerminalExpression(SLC_FLOAT | SLC_UNIFORM,strdup("3.141592654"));
 		;
     break;}
 case 202:
-#line 2192 "../../../../src/sdrc/sl.y"
+#line 2192 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;
 		;
     break;}
 case 203:
-#line 2197 "../../../../src/sdrc/sl.y"
+#line 2197 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;
 		;
     break;}
 case 204:
-#line 2202 "../../../../src/sdrc/sl.y"
+#line 2202 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;
 		;
     break;}
 case 205:
-#line 2207 "../../../../src/sdrc/sl.y"
+#line 2207 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;
 		;
     break;}
 case 206:
-#line 2212 "../../../../src/sdrc/sl.y"
+#line 2212 "sl.y"
 {
 	
 			CVariable	*cVar	=	sdr->getVariable(yyvsp[0].string);
@@ -3071,7 +3115,7 @@ case 206:
 		;
     break;}
 case 207:
-#line 2228 "../../../../src/sdrc/sl.y"
+#line 2228 "sl.y"
 {
 			CVariable *cVar	=	sdr->getVariable(yyvsp[-3].string);
 
@@ -3084,25 +3128,25 @@ case 207:
 		;
     break;}
 case 208:
-#line 2240 "../../../../src/sdrc/sl.y"
+#line 2240 "sl.y"
 {
 			yyval.expression	=	new CConstantTerminalExpression(SLC_FLOAT,strdup(yyvsp[0].string));
 		;
     break;}
 case 209:
-#line 2245 "../../../../src/sdrc/sl.y"
+#line 2245 "sl.y"
 {
 			yyval.expression	=	new CConstantTerminalExpression(SLC_STRING,strdup(yyvsp[0].string));
 		;
     break;}
 case 210:
-#line 2256 "../../../../src/sdrc/sl.y"
+#line 2256 "sl.y"
 {
 			yyval.expression	=	new CVectorExpression(yyvsp[-5].expression,yyvsp[-3].expression,yyvsp[-1].expression);
 		;
     break;}
 case 211:
-#line 2293 "../../../../src/sdrc/sl.y"
+#line 2293 "sl.y"
 {
 			CExpression	*elements[16];
 
@@ -3127,13 +3171,13 @@ case 211:
 		;
     break;}
 case 212:
-#line 2319 "../../../../src/sdrc/sl.y"
+#line 2319 "sl.y"
 {	
 			yyval.expression	=	yyvsp[-1].expression;
 		;
     break;}
 case 213:
-#line 2328 "../../../../src/sdrc/sl.y"
+#line 2328 "sl.y"
 {
 			yyval.expression	=	getConversion(yyvsp[-1].integer,yyvsp[0].expression);
 
@@ -3141,7 +3185,7 @@ case 213:
 		;
     break;}
 case 214:
-#line 2337 "../../../../src/sdrc/sl.y"
+#line 2337 "sl.y"
 {
 			yyval.expression	=	getConversion(yyvsp[-2].integer,yyvsp[-1].string,yyvsp[0].expression);
 
@@ -3149,87 +3193,87 @@ case 214:
 		;
     break;}
 case 215:
-#line 2348 "../../../../src/sdrc/sl.y"
+#line 2348 "sl.y"
 {
 			yyval.expression	=	yyvsp[-1].expression;
 		;
     break;}
 case 216:
-#line 2355 "../../../../src/sdrc/sl.y"
+#line 2355 "sl.y"
 {
 			yyval.expression	=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,NULL,NULL,NULL,NULL,opcodeAnd);
 		;
     break;}
 case 217:
-#line 2362 "../../../../src/sdrc/sl.y"
+#line 2362 "sl.y"
 {
 			yyval.expression	=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,NULL,NULL,NULL,NULL,opcodeOr);
 		;
     break;}
 case 218:
-#line 2369 "../../../../src/sdrc/sl.y"
+#line 2369 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeFloatGreater,opcodeVectorGreater,NULL,NULL,NULL);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 219:
-#line 2377 "../../../../src/sdrc/sl.y"
+#line 2377 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeFloatLess,opcodeVectorLess,NULL,NULL,NULL);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 220:
-#line 2385 "../../../../src/sdrc/sl.y"
+#line 2385 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeFloatEGreater,opcodeVectorEGreater,NULL,NULL,NULL);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 221:
-#line 2393 "../../../../src/sdrc/sl.y"
+#line 2393 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeFloatELess,opcodeVectorELess,NULL,NULL,NULL);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 222:
-#line 2401 "../../../../src/sdrc/sl.y"
+#line 2401 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeFloatEqual,opcodeVectorEqual,NULL,opcodeStringEqual,NULL);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 223:
-#line 2409 "../../../../src/sdrc/sl.y"
+#line 2409 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,opcodeFloatNotEqual,opcodeVectorNotEqual,NULL,opcodeStringNotEqual,NULL);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 224:
-#line 2417 "../../../../src/sdrc/sl.y"
+#line 2417 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,NULL,NULL,NULL,NULL,opcodeAnd);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 225:
-#line 2425 "../../../../src/sdrc/sl.y"
+#line 2425 "sl.y"
 {
 			yyval.expression			=	getOperation(yyvsp[-2].expression,yyvsp[0].expression,NULL,NULL,NULL,NULL,opcodeXor);
 			yyval.expression->type	=	SLC_BOOLEAN | (yyvsp[-2].expression->type & yyvsp[0].expression->type & SLC_UNIFORM);
 		;
     break;}
 case 226:
-#line 2432 "../../../../src/sdrc/sl.y"
+#line 2432 "sl.y"
 {
 			yyval.expression			=	new CUnaryExpression(SLC_BOOLEAN,opcodeNot,getConversion(SLC_BOOLEAN,yyvsp[0].expression));
 		;
     break;}
 case 227:
-#line 2442 "../../../../src/sdrc/sl.y"
+#line 2442 "sl.y"
 {
 			CFunctionPrototype		*cFun;
 			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
@@ -3270,13 +3314,13 @@ case 227:
 		;
     break;}
 case 228:
-#line 2482 "../../../../src/sdrc/sl.y"
+#line 2482 "sl.y"
 {
 			yyval.expression	=	yyvsp[0].expression;
 		;
     break;}
 case 229:
-#line 2492 "../../../../src/sdrc/sl.y"
+#line 2492 "sl.y"
 {
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
@@ -3291,7 +3335,7 @@ case 229:
 		;
     break;}
 case 230:
-#line 2507 "../../../../src/sdrc/sl.y"
+#line 2507 "sl.y"
 {
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
@@ -3306,7 +3350,7 @@ case 230:
 		;
     break;}
 case 231:
-#line 2522 "../../../../src/sdrc/sl.y"
+#line 2522 "sl.y"
 {
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
@@ -3321,7 +3365,7 @@ case 231:
 		;
     break;}
 case 232:
-#line 2540 "../../../../src/sdrc/sl.y"
+#line 2540 "sl.y"
 {
 			CFunction				*cFun;
 			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
@@ -3395,13 +3439,13 @@ case 232:
 		;
     break;}
 case 233:
-#line 2617 "../../../../src/sdrc/sl.y"
+#line 2617 "sl.y"
 {
 			yyval.code	=	new CConstantTerminalExpression(SLC_STRING | SLC_UNIFORM,strdup(yyvsp[0].string));
 		;
     break;}
 case 234:
-#line 2622 "../../../../src/sdrc/sl.y"
+#line 2622 "sl.y"
 {
 			CVariable	*cVar	=	sdr->getVariable(yyvsp[0].string);
 
@@ -3410,19 +3454,19 @@ case 234:
 		;
     break;}
 case 235:
-#line 2635 "../../../../src/sdrc/sl.y"
+#line 2635 "sl.y"
 {
 			yyval.code	=	getConversion(SLC_FLOAT | (yyvsp[-1].expression->type & SLC_UNIFORM),yyvsp[-1].expression);
 		;
     break;}
 case 236:
-#line 2639 "../../../../src/sdrc/sl.y"
+#line 2639 "sl.y"
 {
 			yyval.code	=	new CConstantTerminalExpression(SLC_FLOAT | SLC_UNIFORM,strdup("0"));
 		;
     break;}
 case 237:
-#line 2657 "../../../../src/sdrc/sl.y"
+#line 2657 "sl.y"
 {
 			// Fake the parameters
 			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
@@ -3441,7 +3485,7 @@ case 237:
 		;
     break;}
 case 238:
-#line 2679 "../../../../src/sdrc/sl.y"
+#line 2679 "sl.y"
 {
 			// Fake the parameters
 			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
@@ -3460,7 +3504,7 @@ case 238:
 		;
     break;}
 case 239:
-#line 2699 "../../../../src/sdrc/sl.y"
+#line 2699 "sl.y"
 {
 			yyval.string	=	"texture";
 
@@ -3474,7 +3518,7 @@ case 239:
 		;
     break;}
 case 240:
-#line 2712 "../../../../src/sdrc/sl.y"
+#line 2712 "sl.y"
 {
 			yyval.string	=	"shadow";
 
@@ -3488,7 +3532,7 @@ case 240:
 		;
     break;}
 case 241:
-#line 2725 "../../../../src/sdrc/sl.y"
+#line 2725 "sl.y"
 {
 			yyval.string	=	"environment";
 
@@ -3502,7 +3546,7 @@ case 241:
 		;
     break;}
 case 242:
-#line 2738 "../../../../src/sdrc/sl.y"
+#line 2738 "sl.y"
 {
 			yyval.string	=	"bump";
 
@@ -3516,34 +3560,35 @@ case 242:
 		;
     break;}
 case 243:
-#line 2755 "../../../../src/sdrc/sl.y"
+#line 2755 "sl.y"
 {
 		;
     break;}
 case 244:
-#line 2758 "../../../../src/sdrc/sl.y"
+#line 2758 "sl.y"
 {
 		;
     break;}
 case 245:
-#line 2765 "../../../../src/sdrc/sl.y"
+#line 2765 "sl.y"
 {
 			sdr->actualParameters->push(yyvsp[-1].expression);
 		;
     break;}
 case 246:
-#line 2769 "../../../../src/sdrc/sl.y"
+#line 2769 "sl.y"
 {
 		;
     break;}
 case 247:
-#line 2773 "../../../../src/sdrc/sl.y"
+#line 2773 "sl.y"
 {
 			sdr->actualParameters->push(yyvsp[0].expression);
 		;
     break;}
 }
    /* the action file gets copied in in place of this dollarsign */
+#line 543 "/usr/share/bison.simple"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -3738,8 +3783,32 @@ yyerrhandle:
 
   yystate = yyn;
   goto yynewstate;
+
+ yyacceptlab:
+  /* YYACCEPT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 0;
+
+ yyabortlab:
+  /* YYABORT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 1;
 }
-#line 2778 "../../../../src/sdrc/sl.y"
+#line 2778 "sl.y"
 
 
 

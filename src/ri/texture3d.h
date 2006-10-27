@@ -32,6 +32,7 @@
 #define TEXTURE3D_H
 
 #include "common/global.h"
+#include "common/os.h"
 #include "fileResource.h"
 #include "xform.h"
 #include "gui/opengl.h"
