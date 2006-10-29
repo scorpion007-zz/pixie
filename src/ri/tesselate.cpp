@@ -437,6 +437,7 @@ nextPoint:;
 #else
 				t				=	new (t) CTriangle();
 #endif
+
 				if (dotvv(t->N,t->N) > 0){
 					CRenderer::tracables->push(t);
 					if (CRenderer::triangles != NULL) CRenderer::triangles->push(t);
@@ -454,6 +455,7 @@ nextPoint:;
 #else
 				t				=	new (t) CTriangle();
 #endif
+
 				if (dotvv(t->N,t->N) > 0){
 					CRenderer::tracables->push(t);
 					if (CRenderer::triangles != NULL) CRenderer::triangles->push(t);

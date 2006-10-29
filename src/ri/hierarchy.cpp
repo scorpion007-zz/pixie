@@ -862,10 +862,9 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 		int					numFront,numBack;
 		vector				fbmin,fbmax,bbmin,bbmax;
 
-		memBegin(CRenderer::globalMemory);
 
 		// Allocate a temporary memory to hold the items we partitioned
-		frontItems				=	(CTracable **) ralloc(numItems*2*sizeof(CTracable *),CRenderer::globalMemory);
+		frontItems				=	new CTracable*[numItems*2];	// FIXME: Allocate this from the thread memory
 		backItems				=	frontItems + numItems;
 
 		// Sort the coordinates
@@ -1029,7 +1028,7 @@ void		*CHierarchy::compute(CHUncomputed *cUncomputed) {
 			nNode						=	(void *) getToken(newNode,HIERARCHY_INTERNAL_NODE);
 		}
 
-		memEnd(CRenderer::globalMemory);
+		delete [] frontItems;
 	} else {
 		// We should be a leaf ...
 		CHLeaf	*newNode;
