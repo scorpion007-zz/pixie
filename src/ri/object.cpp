@@ -122,7 +122,7 @@ void				CObject::dice(CShadingContext *rasterizer) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-void				CObject::copy(CAttributes *,CXform *,CRendererContext *) const {
+void				CObject::instantiate(CAttributes *,CXform *,CRendererContext *) const {
 	error(CODE_BUG,"An object is missing the \"copy\" function\n");
 	assert(FALSE);
 }

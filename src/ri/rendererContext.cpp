@@ -453,6 +453,38 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	}
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRendererContext
+// Method				:	processDelayedObject
+// Description			:	Process a delayed primitive
+//							i.e. : Raytrace it or add it to the graphics state
+// Return Value			:
+// Comments				:
+// Date last edited		:	8/25/2002
+void		CRendererContext::processDelayedInstance(CDelayedInstance *cDelayed,CRay *cRay) {
+
+	// Instantiate the objects
+	CObject		**objects	=	cDelayed->instance->array;
+	int			numObjects	=	cDelayed->instance->numItems;
+	int			i;
+	for (i=0;i<numObjects;i++) {
+		objects[i]->instantiate(cDelayed->attributes,cDelayed->xform,this);
+	}
+
+	// Remove the delayed primitive from the scene
+	CRenderer::removeTracable(cDelayed);
+
+	// Update the raytracer
+	CRenderer::prepareFrame();
+
+	// If we're raytracing, check the ray against the children objects
+	if (cRay != NULL) {
+		CRenderer::hierarchy->intersect(cRay);
+	}
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	addObject
@@ -510,7 +542,7 @@ void	CRendererContext::addInstance(void *d) {
 	// Instanciate the instance
 	if (objects == NULL) {
 		for (i=0;i<numObjects;i++) {
-			all[i]->copy(cAttributes,cXform,this);
+			all[i]->instantiate(cAttributes,cXform,this);
 		}
 	} else {
 		CArray<CObject *>	*nInstance		=	new CArray<CObject *>;

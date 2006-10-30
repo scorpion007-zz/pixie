@@ -49,6 +49,7 @@ class	CIrradianceCache;
 class	CPhotonMap;
 class	CParticipatingMedium;
 class	CDelayedObject;
+class	CDelayedInstance;
 class	CNetFileMapping;
 
 ///////////////////////////////////////////////////////////////////////
@@ -197,6 +198,7 @@ public:
 
 																				// Delayed object junk
 	void				processDelayedObject(CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *,CRay *ray = NULL);
+	void				processDelayedInstance(CDelayedInstance *instance,CRay *ray = NULL);
 
 	void				addObject(CObject *);									// Add an object into the scene
 	void				addInstance(void *);									// Add an instance into the scene

@@ -90,12 +90,12 @@ void			CObjectInstance::bound(float *bmin,float *bmax) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObjectInstance
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/30/2002
-void			CObjectInstance::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void			CObjectInstance::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CObject	**all		=	objects->array;
 	int		numObjects	=	objects->numItems;
 	int		i;
@@ -104,7 +104,7 @@ void			CObjectInstance::copy(CAttributes *a,CXform *x,CRendererContext *c) const
 	nx->concat(xform);
 
 	for (i=0;i<numObjects;i++) {
-		all[i]->copy(a,nx,c);
+		all[i]->instantiate(a,nx,c);
 	}
 
 	nx->check();

@@ -800,7 +800,7 @@ CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/19/2003
-void	CPl::collect(int &size,float *&data,EVariableClass container) {
+void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page) {
 	int			i,j,k;
 	const float	*cData		=	data0;
 	float		*oData;
@@ -824,7 +824,11 @@ void	CPl::collect(int &size,float *&data,EVariableClass container) {
 
 	assert(numItems > 0);
 
-	if (data == NULL)	data	=	(float *) ralloc(size*numItems*sizeof(float),CRenderer::globalMemory);
+	// Allocate the memory to keep things around
+	if (data == NULL)	{
+		assert(page != NULL);
+		data	=	(float *) ralloc(size*numItems*sizeof(float),page);
+	}
 
 	oData	=	data;
 
@@ -1291,6 +1295,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		if (strcmp(cVar->name,"st") == 0) {
 			CPl		*npl;
 
+			osLock(CRenderer::memoryMutex);
 			memBegin(CRenderer::globalMemory);
 
 			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *),CRenderer::globalMemory);
@@ -1364,6 +1369,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 			npl	=	parseParameterList(numUniform,numVertex,numVarying,numFaceVarying,j,ntokens,nvals,required,flags,attributes);
 
 			memEnd(CRenderer::globalMemory);
+			osUnlock(CRenderer::memoryMutex);
 
 			return npl;
 		}

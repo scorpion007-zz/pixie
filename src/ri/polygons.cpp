@@ -1136,12 +1136,12 @@ void		CPolygonMesh::bound(float *bmi,float *bma) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	Instanciate the mesh
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void		CPolygonMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx		=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform

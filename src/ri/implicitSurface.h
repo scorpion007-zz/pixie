@@ -57,7 +57,7 @@ public:
 	void						interpolate(int,float **)	const;										// Interpolate the variables
 	void						tesselate(CShadingContext *);											// Create a raytraceable object for this
 	void						dice(CShadingContext *);												// Split or render this object
-	void						copy(CAttributes *,CXform *,CRendererContext *) const;					// Instanciate this object
+	void						instantiate(CAttributes *,CXform *,CRendererContext *) const;			// Instanciate this object
 	void						shade(CShadingContext *,int,CRay **);									// Shade the object
 
 

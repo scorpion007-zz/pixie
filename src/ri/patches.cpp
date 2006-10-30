@@ -1508,11 +1508,11 @@ void	CPatchMesh::bound(float *bmi,float *bma) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CPatchMesh
-// Description			:	copy
+// Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
 // Date last edited		:	6/10/2003
-void	CPatchMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1595,7 +1595,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 	vertices			=	NULL;
 	pl->transform(xform);
-	pl->collect(vertexSize,vertices,CONTAINER_VERTEX);
+	pl->collect(vertexSize,vertices,CONTAINER_VERTEX,context->threadMemory);
 	parameterList		=	pl;
 	vertexData			=	pl->vertexData();
 	vertexData->attach();
@@ -1787,11 +1787,11 @@ void	CNURBSPatchMesh::bound(float *bmi,float *bma) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CNURBSPatchMesh
-// Description			:	clone
+// Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
 // Date last edited		:	6/10/2003
-void	CNURBSPatchMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1881,7 +1881,7 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	// Transform the core into the camera coordinate system
 	vertices		=	NULL;
 	pl->transform(xform);
-	pl->collect(vertexSize,vertices,CONTAINER_VERTEX);
+	pl->collect(vertexSize,vertices,CONTAINER_VERTEX,context->threadMemory);
 	parameterList	=	pl;
 	vertexData		=	pl->vertexData();
 	vertexData->attach();

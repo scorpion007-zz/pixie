@@ -137,7 +137,7 @@ public:
 							~CCurveMesh();
 
 		void				bound(float *,float *) const;
-		void				copy(CAttributes *,CXform *,CRendererContext *) const;
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		void				tesselate(CShadingContext *context);
 		void				dice(CShadingContext *rasterizer);
 

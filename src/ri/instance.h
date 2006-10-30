@@ -46,7 +46,7 @@ public:
 							~CObjectInstance();
 
 	virtual	void			bound(float *,float *) const;
-	virtual	void			copy(CAttributes *,CXform *,CRendererContext *) const;
+	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 	CArray<CObject *>		*objects;
 };

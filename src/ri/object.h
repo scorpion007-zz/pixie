@@ -259,7 +259,7 @@ public:
 	virtual	void			bound(float *,float *) const;											// Compute the bounding box
 	virtual	void			tesselate(CShadingContext *);											// Create a raytraceable object for this
 	virtual	void			dice(CShadingContext *);												// Split or render this object
-	virtual	void			copy(CAttributes *,CXform *,CRendererContext *) const;					// Instanciate this object
+	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const;			// Instanciate this object
 
 	CAttributes				*attributes;	// Holds the object attributes
 	CXform					*xform;			// Holds the object xform to the object space

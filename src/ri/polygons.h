@@ -51,7 +51,7 @@ public:
 							~CPolygonMesh();
 
 		void				bound(float *,float *) const;
-		void				copy(CAttributes *,CXform *,CRendererContext *) const;
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		void				tesselate(CShadingContext *);
 		void				dice(CShadingContext *);
 

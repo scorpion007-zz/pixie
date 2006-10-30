@@ -44,8 +44,6 @@
 #include "pl.h"
 #include "renderer.h"
 
-
-
 #undef new
 
 const	unsigned	int	FACE_MOVING				=	2;			// Set if the face is moving
@@ -468,9 +466,9 @@ public:
 					// Comments				:
 					// Date last edited		:	5/28/2003
 	void			create(CArray<CObject *> *objects) {
-						int	split		=	FALSE;
-						int	funny		=	FALSE;
-						int funnyBorder	=	FALSE;
+						int	split				=	FALSE;
+						int	funny				=	FALSE;
+						int funnyBorder			=	FALSE;
 						int	i,j;
 						int	numExtraordinary	=	0;
 						int	extraordinary		=	0;
@@ -625,7 +623,6 @@ public:
 								}
 							} else {
 								// Damn, we're a funny patch, deal with it
-
 								int			nv		=	(1 << data.irregularDepth) + 1;
 								double		*vertex;
 								CSVertex	*va[4];
@@ -1749,12 +1746,12 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 							
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
-// Method				:	clone
+// Method				:	instantiate
 // Description			:	Clone the primitive
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void		CSubdivMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void		CSubdivMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx		=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1784,7 +1781,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	const char	*savedActivity	=	stats.activity;
 	CSubdivData	data;
 
-	stats.activity				=	"Subdivision Surface Instantiation";
+	stats.activity			=	"Subdivision Surface Instantiation";
 
 	// Transform the core
 	pl->transform(xform);
@@ -1816,18 +1813,16 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	memBegin(context->threadMemory);
 
 	// Collect the misc data
-	data.vertexData			=	NULL;	pl->collect(data.vertexSize,data.vertexData,CONTAINER_VERTEX);
-	data.varyingData		=	NULL;	pl->collect(data.varyingSize,data.varyingData,CONTAINER_VARYING);
-	data.facevaryingData	=	NULL;	pl->collect(data.facevaryingSize,data.facevaryingData,CONTAINER_FACEVARYING);
+	data.vertexData			=	NULL;			pl->collect(data.vertexSize,data.vertexData,CONTAINER_VERTEX,context->threadMemory);
+	data.varyingData		=	NULL;			pl->collect(data.varyingSize,data.varyingData,CONTAINER_VARYING,context->threadMemory);
+	data.facevaryingData	=	NULL;			pl->collect(data.facevaryingSize,data.facevaryingData,CONTAINER_FACEVARYING,context->threadMemory);
 
-	
-
-	faces				=	(CSFace **)		ralloc(numFaces*sizeof(CSFace *),data.context->threadMemory);
-	vertices			=	(CSVertex **)	ralloc(numVertices*sizeof(CSVertex *),data.context->threadMemory);
+	faces					=	(CSFace **)		ralloc(numFaces*sizeof(CSFace *),data.context->threadMemory);
+	vertices				=	(CSVertex **)	ralloc(numVertices*sizeof(CSVertex *),data.context->threadMemory);
 
 	// Create the vertices and copy the vertex / varying data over
 	for (i=0;i<numVertices;i++)	{
-		const float	*src		=	data.vertexData + i*data.vertexSize;
+		const float	*src			=	data.vertexData + i*data.vertexSize;
 		double		*dest;
 		int			k;
 

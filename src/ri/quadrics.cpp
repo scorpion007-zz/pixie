@@ -562,12 +562,12 @@ void			CSphere::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void	CSphere::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void	CSphere::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -955,12 +955,12 @@ void			CDisk::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void			CDisk::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void			CDisk::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1394,12 +1394,12 @@ void			CCone::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void			CCone::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void			CCone::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1840,12 +1840,12 @@ void			CParaboloid::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void		CParaboloid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void		CParaboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -2267,12 +2267,12 @@ void			CCylinder::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void	CCylinder::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void	CCylinder::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -2776,12 +2776,12 @@ void			CHyperboloid::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void			CHyperboloid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void			CHyperboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -3277,12 +3277,12 @@ void			CToroid::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void	CToroid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void	CToroid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform

@@ -49,7 +49,7 @@ public:
 	void					tesselate(CShadingContext *context);
 	void					dice(CShadingContext *rasterizer);
 	int						moving() const {	return pl->data1 != NULL;	}
-	void					copy(CAttributes *a,CXform *x,CRendererContext *c) const;
+	void					instantiate(CAttributes *a,CXform *x,CRendererContext *c) const;
 
 private:
 	void					create(CShadingContext *context);

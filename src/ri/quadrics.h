@@ -57,7 +57,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;
@@ -88,7 +88,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;
@@ -119,7 +119,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;
@@ -150,7 +150,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;
@@ -181,7 +181,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;
@@ -211,7 +211,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;
@@ -243,7 +243,7 @@ public:
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		CParameter		*parameters;

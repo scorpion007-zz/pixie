@@ -75,7 +75,7 @@ public:
 		void			sample(int,int,float **,unsigned int &) const;
 		int				moving() const { return (pl != NULL ? (pl->data1 !=NULL) : base->variables->moving);	}
 		void			interpolate(int,float **) const;
-		void			copy(CAttributes *,CXform *,CRendererContext *) const;
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		void			prep();

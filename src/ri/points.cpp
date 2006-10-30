@@ -376,12 +376,12 @@ void	CPoints::interpolate(int numVertices,float **varying) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	Clone the points
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
-void	CPoints::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 }
 
 
@@ -405,7 +405,7 @@ void	CPoints::prep() {
 	pl->transform(xform);
 
 	base->vertex				=	new float[vertexSize*numPoints];
-	pl->collect(i,base->vertex,CONTAINER_VERTEX);
+	pl->collect(i,base->vertex,CONTAINER_VERTEX,NULL);
 	assert(i == vertexSize);
 
 	delete pl;

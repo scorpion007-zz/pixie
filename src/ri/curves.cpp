@@ -740,11 +740,11 @@ void	CCurveMesh::bound(float *bmi,float *bma) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CCurveMesh
-// Description			:	clone
+// Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
 // Date last edited		:	6/10/2003
-void	CCurveMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -802,9 +802,11 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 	children			=	new CArray<CObject *>;
 
+	memBegin(context->threadMemory);
+
 	vertex	=	NULL;
-	pl->transform(xform);								// Transform the core
-	pl->collect(vertexSize,vertex,CONTAINER_VERTEX);	// Obtain the vertex data
+	pl->transform(xform);													// Transform the core
+	pl->collect(vertexSize,vertex,CONTAINER_VERTEX,context->threadMemory);	// Obtain the vertex data
 
 	// Allocate the variables
 	variables		=	pl->vertexData();
@@ -897,6 +899,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 			t						+=	nvars;
 		}
 	}
+
+	memEnd(context->threadMemory);
 }
 
 

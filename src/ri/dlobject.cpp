@@ -209,12 +209,12 @@ void					CDLObject::dice(CShadingContext *) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	Create a copy
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/7/2003
-void					CDLObject::copy(CAttributes *a,CXform *x,CRendererContext *context) const {
+void					CDLObject::instantiate(CAttributes *a,CXform *x,CRendererContext *context) const {
 }
 
 
