@@ -297,6 +297,7 @@ nextPoint:;
 	}
 
 	// Create the triangles
+	osLock(CRenderer::memoryMutex);
 	front		=	root;
 	while((cQuad=front)!=NULL) {
 		front	=	cQuad->next;
@@ -350,7 +351,7 @@ nextPoint:;
 
 #define createVertex(__dest,__src)															\
 				if ((__dest = __src->vertex) == NULL) {										\
-					CMovingVertex	*t0	=	(CMovingVertex *) ralloc(sizeof(CMovingVertex),CRenderer::globalMemory);	\
+					CMovingVertex	*t0	=	(CMovingVertex *) CRenderer::frameMemory->alloc(sizeof(CMovingVertex));	\
 					CQuadVertex		*s0	=	__src;											\
 																							\
 					movvv(t0->P[0],s0->P0);													\
@@ -371,7 +372,7 @@ nextPoint:;
 #undef createVertex
 
 				// Create the first triangle
-				t				=	(CMovingTriangle *)	ralloc(sizeof(CMovingTriangle)*2,CRenderer::globalMemory);
+				t				=	(CMovingTriangle *)	CRenderer::frameMemory->alloc(sizeof(CMovingTriangle)*2);
 				t->v[0]			=	(CVertex *) v0;
 				t->v[1]			=	(CVertex *) v2;
 				t->v[2]			=	(CVertex *) v1;
@@ -406,7 +407,7 @@ nextPoint:;
 
 #define createVertex(__dest,__src)															\
 				if ((__dest = __src->vertex) == NULL) {										\
-					CVertex		*t0	=	(CVertex *) ralloc(sizeof(CVertex),CRenderer::globalMemory);	\
+					CVertex		*t0	=	(CVertex *) CRenderer::frameMemory->alloc(sizeof(CVertex));	\
 					CQuadVertex	*s0	=	__src;												\
 																							\
 					movvv(t0->P,s0->P0);													\
@@ -426,7 +427,7 @@ nextPoint:;
 
 
 				// Create the first triangle
-				t				=	(CTriangle *)	ralloc(sizeof(CTriangle)*2,CRenderer::globalMemory);
+				t				=	(CTriangle *)	CRenderer::frameMemory->alloc(sizeof(CTriangle)*2);
 				t->v[0]			=	(CVertex *) v0;
 				t->v[1]			=	(CVertex *) v2;
 				t->v[2]			=	(CVertex *) v1;
@@ -482,6 +483,7 @@ nextPoint:;
 		}
 
 	}
+	osUnlock(CRenderer::memoryMutex);
 
 	// End a memory page
 	memEnd(threadMemory);

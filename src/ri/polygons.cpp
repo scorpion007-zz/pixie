@@ -1297,7 +1297,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 		} else {
 			// No, create raytracing triangles
 			if (data.meshPl->data1 == NULL) {
-				CVertex		*v0	=	(CVertex *)		ralloc(3*sizeof(CVertex) + sizeof(CPtriangle),CRenderer::globalMemory);
+				CVertex		*v0	=	(CVertex *)		CRenderer::frameMemory->alloc(3*sizeof(CVertex) + sizeof(CPtriangle));
 				CVertex		*v1	=	v0+1;
 				CVertex		*v2	=	v1+1;
 				CPtriangle	*t	=	(CPtriangle *)	(v2 + 1);
@@ -1345,7 +1345,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 				CRenderer::addTracable(t,cTriangle);
 				stats.numRayTriangles++;
 			} else {
-				CMovingVertex		*v0		=	(CMovingVertex *)		ralloc(3*sizeof(CMovingVertex) + sizeof(CPmovingTriangle),CRenderer::globalMemory);
+				CMovingVertex		*v0		=	(CMovingVertex *)		CRenderer::frameMemory->alloc(3*sizeof(CMovingVertex) + sizeof(CPmovingTriangle));
 				CMovingVertex		*v1		=	v0+1;
 				CMovingVertex		*v2		=	v1+1;
 				CPmovingTriangle	*t		=	(CPmovingTriangle *)	(v2 + 1);
@@ -1882,6 +1882,8 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 	data.mesh					=	this;
 	data.meshContext			=	context;
 
+	osLock(CRenderer::memoryMutex);
+
 	// Triangulate the individual polygons
 	for (cnholes=nholes,cvertices=vertices,cnvertices=nvertices,i=0;i<npoly;i++) {
 		// Triangulate the current polygon
@@ -1894,6 +1896,8 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 		cnvertices	+=	cnholes[0];
 		cnholes++;
 	}
+
+	osUnlock(CRenderer::memoryMutex);
 }
 
 

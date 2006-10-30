@@ -389,6 +389,7 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	i					=	(i / sizeof(T32))+2;
 
 	// Allocate tmp space
+	osLock(memoryMutex);
 	memBegin(globalMemory);
 
 	buffer				=	(T32 *) ralloc((i+4)*sizeof(T32),globalMemory);
@@ -425,6 +426,7 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	}
 
 	memEnd(globalMemory);
+	osUnlock(memoryMutex);
 
 	return r;
 }

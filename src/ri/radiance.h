@@ -113,7 +113,7 @@ private:
 
 		CDepository			*hash;					// This is where we keep our computed data
 
-		CMemStack<50000>	*memory;				// The global memory area
+		CMemStack			*memory;				// The global memory area
 		CShadingPoint		*shadingPoints;			// List of shading points
 		int					numShadingPoints;		// The number of shading points
 

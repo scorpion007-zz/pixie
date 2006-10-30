@@ -107,7 +107,7 @@ private:
 
 		void					sample(float *,const float *,const float *,const CGlobalIllumLookup *);
 
-		CMemStack<50000>		*memory;
+		CMemStack				*memory;
 
 		CHierarchy				*hierarchy;
 

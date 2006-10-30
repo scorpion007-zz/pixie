@@ -72,7 +72,7 @@ public:
 	void					bound(float *bmin,float *bmax);
 
 private:
-	CMemStack<50000>		*memory;			// Storage for the data
+	CMemStack				*memory;			// Storage for the data
 	CArray<float*>			*dataPointers;		// data pointers for each sample	
 	int						flush;				// Should this be written to disk?
 	float					searchRadius;

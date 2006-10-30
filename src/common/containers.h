@@ -665,7 +665,7 @@ public:
 // Description			:	A stack based memory manager
 // Comments				:
 // Date last edited		:	8/2/2001
-template <int pageSize=500000> class CMemStack {
+class CMemStack {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CMemPage
@@ -683,7 +683,8 @@ template <int pageSize=500000> class CMemStack {
 	};
 
 public:
-						CMemStack() {
+						CMemStack(int bs = 1 << 12) {
+							pageSize	=	bs;
 							firstPage	=	stack	=	memoryNewPage(pageSize);
 						}
 
@@ -732,7 +733,7 @@ public:
 		CMemPage		*stack;
 private:
 		CMemPage		*firstPage;
-
+		int				pageSize;
 
 		CMemPage		*memoryNewPage(int size) {
 							CMemPage	*newPage	=	new CMemPage;

@@ -121,10 +121,10 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			// OK, it has been assigned to someone else ... Skip this bucket
 			} else {
 				x++;
-				if (x == xBuckets) {
+				if (x >= xBuckets) {
 					x = 0;
 					y++;
-					if (y == yBuckets) break;
+					if (y >= yBuckets) break;
 				}
 			}
 		}

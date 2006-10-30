@@ -1058,7 +1058,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.sdr.cpp"
+					Outputs="../../../../src/ri/lex.sl.cpp"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -1067,7 +1067,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.sdr.cpp"
+					Outputs="../../../../src/ri/lex.sl.cpp"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -1076,7 +1076,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.sdr.cpp"
+					Outputs="../../../../src/ri/lex.sl.cpp"
 				/>
 			</FileConfiguration>
 		</File>

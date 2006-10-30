@@ -342,7 +342,7 @@ CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *b
 #endif
 
 	hash				=	new CDepository;
-	memory				=	new CMemStack<50000>;
+	memory				=	new CMemStack;
 	shadingPoints		=	NULL;
 	numShadingPoints	=	0;
 	root				=	NULL;

@@ -389,7 +389,7 @@ public:
 
 
 		// Second, some other data structures
-		static	T64						frameCheckpoint[3];		// The checkpoint for the global memory in the frame
+		static	CMemStack				*frameMemory;			// Where we allocate permanent frame data
 		static	CTrie<CFileResource  *>	*frameFiles;			// Files that have been loaded (they stick around only during the frame)
 		static	CArray<const char*>		*frameTemporaryFiles;	// This hold the name of temporary files
 		static	CShadingContext			**contexts;				// The array of shading contexts
