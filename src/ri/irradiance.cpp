@@ -66,7 +66,7 @@ const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *bmin,const float *bmax,CXform *w,CHierarchy *h,FILE *in) : CCache(name,f) {
 	int	i;
 
-	memory				=	new CMemStack;		// Where we allocate our memory from
+	memory				=	new CMemStack<50000>;		// Where we allocate our memory from
 	root				=	NULL;
 	maxDepth			=	1;
 	hierarchy			=	h;

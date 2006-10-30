@@ -56,28 +56,28 @@ public:
 // Date last edited		:	3/11/2003
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
-					CPointCloud(const char *,const float *from,const float *to,const char*,int);
-					CPointCloud(const char *,const float *from,const float *to,FILE *);
-					~CPointCloud();
+							CPointCloud(const char *,const float *from,const float *to,const char*,int);
+							CPointCloud(const char *,const float *from,const float *to,FILE *);
+							~CPointCloud();
 
-	void			reset();
-	void			write();
+	void					reset();
+	void					write();
 
-	void			balance();
+	void					balance();
 
-	void			store(const float *,const float *,const float *,float);
-	void			lookup(float *,const float *,const float *,float);
+	void					store(const float *,const float *,const float *,float);
+	void					lookup(float *,const float *,const float *,float);
 
-	void			draw();
-	void			bound(float *bmin,float *bmax);
+	void					draw();
+	void					bound(float *bmin,float *bmax);
 
 private:
-	CMemStack		*memory;			// Storage for the data
-	CArray<float*>	*dataPointers;		// data pointers for each sample	
-	int				flush;				// Should this be written to disk?
-	float			searchRadius;
+	CMemStack<50000>		*memory;			// Storage for the data
+	CArray<float*>			*dataPointers;		// data pointers for each sample	
+	int						flush;				// Should this be written to disk?
+	float					searchRadius;
 	
-	TMutex			mutex;
+	TMutex					mutex;
 	
 	friend			void	makeTexture3D(const char *,const char *,TSearchpath *,int,char **,void **);
 	

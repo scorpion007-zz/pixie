@@ -51,7 +51,7 @@
 // Date last edited		:	06/27/2006
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	// Create our data areas
-	memory				= new CMemStack;
+	memory				= new CMemStack<50000>;
 	dataPointers		= new CArray<float*>;
 	flush				= write;
 
@@ -76,7 +76,7 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	int		i;
 
 	// Create our data areas
-	memory				= new CMemStack;
+	memory				= new CMemStack<50000>;
 	dataPointers		= new CArray<float*>;
 	flush				= FALSE;
 	

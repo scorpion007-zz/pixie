@@ -785,7 +785,6 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 
 	FILE		*outfile 	=	ropen(outFileName,"wb+",fileBrickMap);
 		
-	
 	memBegin(CRenderer::globalMemory);
 	
 	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float),CRenderer::globalMemory);
@@ -1198,6 +1197,7 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 	CBrickMap	*cMap;
 	int			i;
 
+	osLock(CRenderer::memoryMutex);
 	memBegin(CRenderer::globalMemory);
 
 	// Collect the loaded bricks into an array
@@ -1309,6 +1309,7 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 	}
 
 	memEnd(CRenderer::globalMemory);
+	osUnlock(CRenderer::memoryMutex);
 }
 
 
@@ -1396,6 +1397,9 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			maxVariation = ((float*)params[i])[0];
 		}
 	}
+
+	// Lock the main memory
+	osLock(CRenderer::memoryMutex);
 	
 	// If not initialized already, init the brick memory manager
 	// Use a large memory limit when creating brickmaps
@@ -1441,6 +1445,9 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	}
 	
 	CBrickMap::brickMapShutdown();
+
+	// Release the main memory
+	osUnlock(CRenderer::memoryMutex);
 }
 
 

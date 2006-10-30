@@ -131,6 +131,7 @@ char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];
 
 // Global synchronization objects
 TMutex							CRenderer::commitMutex;
+TMutex							CRenderer::memoryMutex;
 TMutex							CRenderer::networkMutex;
 TMutex							CRenderer::hierarchyMutex;
 TMutex							CRenderer::textureMutex;
@@ -298,6 +299,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 
 	// Create the commit mutex (globally active)
 	osCreateMutex(commitMutex);
+	osCreateMutex(memoryMutex);
 	osCreateMutex(networkMutex);
 	osCreateMutex(hierarchyMutex);
 	osCreateMutex(textureMutex);
@@ -368,6 +370,7 @@ void		CRenderer::endRenderer() {
 
 	// Delete the commit mutex (globally active)
 	osDeleteMutex(commitMutex);
+	osDeleteMutex(memoryMutex);
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(hierarchyMutex);
 	osDeleteMutex(textureMutex);

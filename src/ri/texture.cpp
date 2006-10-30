@@ -390,6 +390,7 @@ static void		textureMemFlush(CTextureBlock *entry) {
 	CTextureBlock	*cBlock;
 	CTextureBlock	**activeBlocks;
 
+	osLock(CRenderer::memoryMutex);
 	memBegin(CRenderer::globalMemory);
 
 	// Do we have stuff to free ?
@@ -427,6 +428,7 @@ static void		textureMemFlush(CTextureBlock *entry) {
 	}
 
 	memEnd(CRenderer::globalMemory);
+	osUnlock(CRenderer::memoryMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -513,6 +515,7 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 				// No, read the required portion
 				unsigned char	*tdata;
 
+				osLock(CRenderer::memoryMutex);
 				memBegin(CRenderer::globalMemory);
 				
 				tdata		=	(unsigned char *) ralloc(width*height*pixelSize,CRenderer::globalMemory);
@@ -529,6 +532,7 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 				}
 
 				memEnd(CRenderer::globalMemory);
+				osUnlock(CRenderer::memoryMutex);
 			} else {
 				uint32	tileWidth,tileHeight;
 
