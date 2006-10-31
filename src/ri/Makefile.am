@@ -23,7 +23,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				hierarchy.cpp \
 				implicitSurface.cpp \
 				init.cpp \
-				instance.cpp \
 				irradiance.cpp \
 				linsys.cpp \
 				memory.cpp \

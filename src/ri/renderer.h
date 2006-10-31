@@ -153,7 +153,6 @@ public:
 		static	CArray<CVariable *>				*globalVariables;			// Array of global variables only
 		static	CTrie<CDisplayChannel *>		*declaredChannels;			// The declared display channels
 		static	CArray<CDisplayChannel*>		*displayChannels;			// The list of all desclared display channels
-		static	CArray<CArray<CObject *> *>		*allocatedInstances;		// The list of allocated object instances
 		static	CDSO							*dsos;						// The list of DSO's that have been loaded
 		static	SOCKET							netClient;					// The client that we're serving (-1 if client)
 		static	int								netNumServers;				// The number of servers (0 if server)

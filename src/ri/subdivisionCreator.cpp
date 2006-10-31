@@ -43,11 +43,18 @@
 #include "rendererContext.h"
 #include "pl.h"
 #include "renderer.h"
+#include "ri.h"
 
 #undef new
 
 const	unsigned	int	FACE_MOVING				=	2;			// Set if the face is moving
 const	unsigned	int	FACE_INTEPOLATEBOUNDARY	=	4;			// Set if we're interpolating the boundary
+
+const	float			bsplineBasis[16]		=	 {
+	(float) (-1.0/6.0),	(float) (3.0/6.0),	(float) (-3.0/6.0),	(float)  (1.0/6.0),
+	(float) (3.0/6.0),	(float) -(6.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0),
+	(float) (-3.0/6.0),	(float) (0.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0),
+	(float) (1.0/6.0),	(float) (4.0/6.0),	(float) (1.0/6.0),	(float)  (0.0/6.0)};
 
 class	CSVertex;
 class	CSEdge;
@@ -619,7 +626,7 @@ public:
 									gatherData(data,16,v,va,uniformIndex,vertex,parameters);
 
 									// Create the primitive
-									objects->push(new CBicubicPatch(data.currentAttributes,data.currentXform,data.vd,parameters,0,0,1,1,vertex));
+									objects->push(new CBicubicPatch(data.currentAttributes,data.currentXform,data.vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis));
 								}
 							} else {
 								// Damn, we're a funny patch, deal with it

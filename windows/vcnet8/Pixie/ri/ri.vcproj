@@ -375,10 +375,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\instance.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\irradiance.cpp"
 				>
 			</File>
@@ -670,10 +666,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\implicitSurface.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\instance.h"
 				>
 			</File>
 			<File

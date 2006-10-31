@@ -205,6 +205,18 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CArray<CObject *> *i
 	instance		=	in;
 	processed		=	FALSE;
 
+	initv(cbmin,C_INFINITY);
+	initv(cbmax,-C_INFINITY);
+
+	CObject	**objects	=	in->array;
+	int		i;
+	for (i=0;i<in->numItems;i++) {
+		vector	bmin,bmax;
+		objects[i]->bound(bmin,bmax);
+		addBox(cbmin,cbmax,bmin);
+		addBox(cbmin,cbmax,bmax);
+	}
+
 	xform->transformBound(this->cbmin,this->cbmax);
 	makeBound(this->cbmin,this->cbmax);
 }

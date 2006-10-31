@@ -531,29 +531,13 @@ void	CRendererContext::addInstance(void *d) {
 	CArray<CObject *>	*cInstance		=	(CArray<CObject *> *) d;
 	CXform				*cXform			=	getXform(FALSE);
 	CAttributes			*cAttributes	=	getAttributes(FALSE);
-	int					i;
-	int					numObjects		=	cInstance->numItems;
-	CObject				**all			=	cInstance->array;
 
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
 		cAttributes	=	NULL;
 	}
 
 	// Instanciate the instance
-	if (objects == NULL) {
-		for (i=0;i<numObjects;i++) {
-			all[i]->instantiate(cAttributes,cXform,this);
-		}
-	} else {
-		CArray<CObject *>	*nInstance		=	new CArray<CObject *>;
-
-		for (i=0;i<numObjects;i++) {
-			all[i]->attach();
-			nInstance->push(all[i]);
-		}
-
-		objects->push(new CObjectInstance(cAttributes,cXform,nInstance));
-	}
+	addObject(new CDelayedInstance(cAttributes,cXform,cInstance));
 }
 
 
@@ -4144,13 +4128,7 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 		error(CODE_INCAPABLE,"Unknown subdivision scheme (%s).\n",scheme);
 		return;
 	}
-	
-	// save previous attributes so we don't mess with the basis for other primitives
-	attributeBegin();
-	attributes	=	getAttributes(FALSE);
-	
-	RiBasis(RiBSplineBasis,1,RiBSplineBasis,1);
-		
+			
 	// Count the number of faces / vertices
 	for (i=0,j=0;i<nfaces;j+=nvertices[i],i++);
 
@@ -4187,9 +4165,6 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 
 	// Create the object
 	addObject(new CSubdivMesh(attributes,xform,pl,nfaces,nvertices,vertices,ntags,tags,nargs,intargs,floatargs));
-	
-	// Restore those attributes
-	attributeEnd();
 }
 
 void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]) {
