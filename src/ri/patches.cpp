@@ -587,6 +587,7 @@ CBicubicPatch::~CBicubicPatch() {
 }
 
 
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
 // Method				:	computeVertexData

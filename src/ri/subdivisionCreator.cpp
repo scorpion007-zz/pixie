@@ -1783,6 +1783,8 @@ void		CSubdivMesh::create(CShadingContext *context) {
 
 	stats.activity			=	"Subdivision Surface Instantiation";
 
+	memBegin(context->threadMemory);
+
 	// Transform the core
 	pl->transform(xform);
 
@@ -1809,8 +1811,6 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	data.currentAttributes	=	this->attributes;
 	data.currentXform		=	this->xform;
 	data.parameterList		=	this->pl;
-
-	memBegin(context->threadMemory);
 
 	// Collect the misc data
 	data.vertexData			=	NULL;			pl->collect(data.vertexSize,data.vertexData,CONTAINER_VERTEX,context->threadMemory);

@@ -260,16 +260,22 @@ DEFFUNC(Stepf		,"step"		,"f=ff",FUN3EXPR_PRE,STEPEXP,FUN3EXPR_UPDATE(1,1,1),NULL
 DEFFUNC(SmoothStepf		,"smoothstep"		,"f=fff",FUN4EXPR_PRE,SMOOTHSTEPEXP,FUN4EXPR_UPDATE(1,1,1,1),NULL_EXPR,0)
 
 #define	RANDOMFEXP		res->real	=	urand();
-DEFFUNC(Randomf		,"random"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 
 #define	RANDOMVEXP		res[0].real	=	urand();	\
 						res[1].real	=	urand();	\
 						res[2].real	=	urand();
 
+DEFFUNC(Randomf			,"random"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 DEFLINKFUNC(Random1		,"random"		,"c=", 0)
 DEFLINKFUNC(Random2		,"random"		,"p=", 0)
 DEFLINKFUNC(Random3		,"random"		,"n=", 0)
 DEFFUNC(Randomv			,"random"		,"v=",FUN1EXPR_PRE,RANDOMVEXP,FUN1EXPR_UPDATE(3),NULL_EXPR,0)
+
+DEFFUNC(URandomf		,"urandom"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
+DEFLINKFUNC(URandom1	,"urandom"		,"c=", 0)
+DEFLINKFUNC(URandom2	,"urandom"		,"p=", 0)
+DEFLINKFUNC(URandom3	,"urandom"		,"n=", 0)
+DEFFUNC(URandomv		,"urandom"		,"v=",FUN1EXPR_PRE,RANDOMVEXP,FUN1EXPR_UPDATE(3),NULL_EXPR,0)
 
 #define	XCOMPEXP		res->real	=	op[0].real;
 DEFLINKFUNC(Xcomp1		,"xcomp"		,"f=p", 0)
