@@ -56,7 +56,6 @@
 #include "random.h"
 #include "points.h"
 #include "curves.h"
-#include "instance.h"
 #include "delayed.h"
 #include "dso.h"
 #include "bundles.h"
