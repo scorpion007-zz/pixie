@@ -50,7 +50,7 @@
 class	CTracable {
 public:
 	virtual	void	bound(float *,float *) const					=	0;
-	virtual	void	intersect(CRay *)								=	0;
+	virtual	int		intersect(CRay *)								=	0;
 	virtual	int		intersect(const float *,const float *) const	=	0;
 
 	int				ID;
@@ -90,7 +90,7 @@ public:
 					CTriangle();
 
 	void			bound(float *,float *) const;
-	void			intersect(CRay *);
+	int				intersect(CRay *);
 	int				intersect(const float *,const float *) const;
 
 	void			*v[3];		// Pointers to the vertices (v[0] contains the major axis, v[1] contains the face status, v[2] contains the front back)
@@ -109,7 +109,7 @@ class	CPtriangle : public CTriangle {
 public:
 					CPtriangle() : CTriangle() {}
 
-	void			intersect(CRay *);
+	int				intersect(CRay *);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ public:
 					CMovingTriangle();
 
 	void			bound(float *,float *) const;
-	void			intersect(CRay *);
+	int				intersect(CRay *);
 	int				intersect(const float *,const float *) const;
 
 	void			*v[3];		// Pointers to the vertices (v[0] contains the majot axis, v[1] contains the face status)
@@ -140,7 +140,7 @@ class	CPmovingTriangle : public CMovingTriangle {
 public:
 					CPmovingTriangle() : CMovingTriangle() {}
 
-	void			intersect(CRay *);
+	int				intersect(CRay *);
 };
 
 const	int		HIERARCHY_LEAF_NODE			=	0;		// The node is leaf

@@ -213,17 +213,17 @@ int		CBilinearPatch::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-void	CBilinearPatch::intersect(CRay *cRay) {
+int		CBilinearPatch::intersect(CRay *cRay) {
 
-	if (! (cRay->flags & attributes->flags) )	return;
+	if (! (cRay->flags & attributes->flags) )	return FALSE;
 
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		const float importance = attributes->lodImportance;
 		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
-			if (cRay->jimp > importance)			return;
+			if (cRay->jimp > importance)			return FALSE;
 		} else {
-			if ((1-cRay->jimp) >= -importance)		return;
+			if ((1-cRay->jimp) >= -importance)		return FALSE;
 		}
 	}
 
@@ -337,8 +337,7 @@ void	CBilinearPatch::intersect(CRay *cRay) {
 			solve();
 			break;
 	}
-
-
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////

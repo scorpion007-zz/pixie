@@ -322,7 +322,7 @@ int		CTriangle::intersect(const float *bmin,const float *bmax) const {
 // Comments				:	
 // Date last edited		:	3/11/2001
 // FIXME: Optimize
-void	CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
+int		CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
 	CVertex			*ver0,*ver1,*ver2;
 	vector			intersection;
 	float			t;
@@ -330,28 +330,28 @@ void	CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test
 	float			a,uc,vc;
 	unsigned int	major,minor;
 
-	if (! (cRay->flags & object->attributes->flags) )	return;
+	if (! (cRay->flags & object->attributes->flags) )	return FALSE;
 
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
 		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
-			if (cRay->jimp > importance)			return;
+			if (cRay->jimp > importance)			return FALSE;
 		} else {
-			if ((1-cRay->jimp) >= -importance)		return;
+			if ((1-cRay->jimp) >= -importance)		return FALSE;
 		}
 	}
 							// Operate on the camera space coordinates
-	if ((t = dotvv(cRay->dir,N)) == 0)	return;
+	if ((t = dotvv(cRay->dir,N)) == 0)	return FALSE;
 
 	if (getData(v[1]) == 0) {
-		if (t > 0)	return;
+		if (t > 0)	return FALSE;
 	}
 
 	t	=	(- d - dotvv(cRay->from,N)) / t;
 
-	if (t <= cRay->tmin)	return;
-	if (t >= cRay->t)	return;
+	if (t <= cRay->tmin)	return FALSE;
+	if (t >= cRay->t)	return FALSE;
 
 	mulvf(intersection,cRay->dir,t);
 	addvv(intersection,cRay->from);
@@ -368,13 +368,13 @@ void	CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test
 	minor	=	getData(v[2]);
 
 	if ((a = area(v0[major],v0[minor],v1[major],v1[minor],v2[major],v2[minor])) > 0) {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((uc + vc) > a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((uc + vc) > a)	return FALSE;
 	} else {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((uc + vc) < a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((uc + vc) < a)	return FALSE;
 	}
 
 	uc				/=	a;
@@ -387,6 +387,7 @@ void	CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test
 	cRay->N[0]		=	ver0->N[0]*vc + ver1->N[0]*(1-uc-vc) + ver2->N[0]*uc;
 	cRay->N[1]		=	ver0->N[1]*vc + ver1->N[1]*(1-uc-vc) + ver2->N[1]*uc;
 	cRay->N[2]		=	ver0->N[2]*vc + ver1->N[2]*(1-uc-vc) + ver2->N[2]*uc;
+	return FALSE;
 }
 
 
@@ -398,7 +399,7 @@ void	CTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test
 // Comments				:	
 // Date last edited		:	3/11/2001
 // FIXME: Optimize
-void	CPtriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
+int		CPtriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
 	CVertex			*ver0,*ver1,*ver2;
 	vector			intersection;
 	float			t;
@@ -406,29 +407,29 @@ void	CPtriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection tes
 	double			a,uc,vc;
 	unsigned int	major,minor;
 
-	if (! (cRay->flags & object->attributes->flags) )	return;
+	if (! (cRay->flags & object->attributes->flags) )	return FALSE;
 	
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
 		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
-			if (cRay->jimp > importance)			return;
+			if (cRay->jimp > importance)			return FALSE;
 		} else {
-			if ((1-cRay->jimp) >= -importance)		return;
+			if ((1-cRay->jimp) >= -importance)		return FALSE;
 		}
 	}
 	
 							// Operate on the camera space coordinates
-	if ((t = dotvv(cRay->dir,N)) == 0)	return;
+	if ((t = dotvv(cRay->dir,N)) == 0)	return FALSE;
 
 	if (getData(v[1]) == 0) {
-		if (t > 0)	return;
+		if (t > 0)	return FALSE;
 	}
 
 	t	=	(- d - dotvv(cRay->from,N)) / t;
 
-	if (t <= cRay->tmin)	return;
-	if (t >= cRay->t)		return;
+	if (t <= cRay->tmin)	return FALSE;
+	if (t >= cRay->t)		return FALSE;
 
 	mulvf(intersection,cRay->dir,t);
 	addvv(intersection,cRay->from);
@@ -445,13 +446,13 @@ void	CPtriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection tes
 	minor	=	getData(v[2]);
 
 	if ((a = area(v0[major],v0[minor],v1[major],v1[minor],v2[major],v2[minor])) > 0) {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((uc + vc) > a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((uc + vc) > a)	return FALSE;
 	} else {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((uc + vc) < a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((uc + vc) < a)	return FALSE;
 	}
 
 
@@ -462,6 +463,7 @@ void	CPtriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection tes
 	cRay->N[0]		=	ver0->N[0]*(1-cRay->u) + ver1->N[0]*cRay->u*cRay->v + ver2->N[0]*cRay->u*(1-cRay->v);
 	cRay->N[1]		=	ver0->N[1]*(1-cRay->u) + ver1->N[1]*cRay->u*cRay->v + ver2->N[1]*cRay->u*(1-cRay->v);
 	cRay->N[2]		=	ver0->N[2]*(1-cRay->u) + ver1->N[2]*cRay->u*cRay->v + ver2->N[2]*cRay->u*(1-cRay->v);
+	return FALSE;
 }
 
 
@@ -603,7 +605,7 @@ int		CMovingTriangle::intersect(const float *bmin,const float *bmax)	const {
 // Comments				:	
 // Date last edited		:	3/11/2001
 // FIXME: Optimize
-void	CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
+int		CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
 	CMovingVertex	*ver0,*ver1,*ver2;
 	vector			intersection;
 	float			t;
@@ -615,32 +617,32 @@ void	CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersectio
 	vector			normal;
 	float			d;
 
-	if (! (cRay->flags & object->attributes->flags) )	return;
+	if (! (cRay->flags & object->attributes->flags) )	return FALSE;
 
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
 		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
-			if (cRay->jimp > importance)			return;
+			if (cRay->jimp > importance)			return FALSE;
 		} else {
-			if ((1-cRay->jimp) >= -importance)		return;
+			if ((1-cRay->jimp) >= -importance)		return FALSE;
 		}
 	}
 	
 	interpolatev(normal,this->N[0],this->N[1],cRay->time);
 
-	if ((t = dotvv(cRay->dir,normal)) == 0)	return;
+	if ((t = dotvv(cRay->dir,normal)) == 0)	return FALSE;
 
 	if(getData(v[1]) == 0) {
-		if (t > 0)	return;
+		if (t > 0)	return FALSE;
 	}
 
 	d	=	this->d[0]*(1-cRay->time) + this->d[1]*cRay->time;
 
 	t	=	-(d + dotvv(cRay->from,normal)) / dotvv(cRay->dir,normal);
 
-	if (t <= cRay->tmin)	return;
-	if (t >= cRay->t)	return;
+	if (t <= cRay->tmin)	return FALSE;
+	if (t >= cRay->t)	return FALSE;
 
 	mulvf(intersection,cRay->dir,t);
 	addvv(intersection,cRay->from);
@@ -657,13 +659,13 @@ void	CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersectio
 	minor		=	getData(v[2]);
 
 	if ((a = area(v0[major],v0[minor],v1[major],v1[minor],v2[major],v2[minor])) > 0) {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((uc + vc) > a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((uc + vc) > a)	return FALSE;
 	} else {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((uc + vc) < a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((uc + vc) < a)	return FALSE;
 	}
 
 	uc				/=	a;
@@ -676,6 +678,7 @@ void	CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersectio
 	cRay->N[0]		=	(float) (ver0->N[0][0]*vc + ver1->N[0][0]*(1-uc-vc) + ver2->N[0][0]*uc);
 	cRay->N[1]		=	(float) (ver0->N[0][1]*vc + ver1->N[0][1]*(1-uc-vc) + ver2->N[0][1]*uc);
 	cRay->N[2]		=	(float) (ver0->N[0][2]*vc + ver1->N[0][2]*(1-uc-vc) + ver2->N[0][2]*uc);
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -686,7 +689,7 @@ void	CMovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersectio
 // Comments				:	
 // Date last edited		:	3/11/2001
 // FIXME: Optimize
-void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
+int		CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersection test here
 	CMovingVertex	*ver0,*ver1,*ver2;
 	vector			intersection;
 	float			t;
@@ -698,32 +701,32 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 	vector			normal;
 	float			d;
 
-	if (! (cRay->flags & object->attributes->flags) )	return;
+	if (! (cRay->flags & object->attributes->flags) )	return FALSE;
 
 	if (object->attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = object->attributes->lodImportance;
 		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
-			if (cRay->jimp > importance)			return;
+			if (cRay->jimp > importance)			return FALSE;
 		} else {
-			if ((1-cRay->jimp) >= -importance)		return;
+			if ((1-cRay->jimp) >= -importance)		return FALSE;
 		}
 	}
 	
 	interpolatev(normal,this->N[0],this->N[1],cRay->time);
 
-	if ((t = dotvv(cRay->dir,normal)) == 0)	return;
+	if ((t = dotvv(cRay->dir,normal)) == 0)	return FALSE;
 
 	if(getData(v[1]) == 0) {
-		if (t > 0)	return;
+		if (t > 0)	return FALSE;
 	}
 
 	d	=	this->d[0]*(1-cRay->time) + this->d[1]*cRay->time;
 
 	t	=	-(d + dotvv(cRay->from,normal)) / dotvv(cRay->dir,normal);
 
-	if (t <= cRay->tmin)	return;
-	if (t >= cRay->t)	return;
+	if (t <= cRay->tmin)	return FALSE;
+	if (t >= cRay->t)	return FALSE;
 
 	mulvf(intersection,cRay->dir,t);
 	addvv(intersection,cRay->from);
@@ -740,13 +743,13 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 	minor		=	getData(v[2]);
 
 	if ((a = area(v0[major],v0[minor],v1[major],v1[minor],v2[major],v2[minor])) > 0) {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return;
-		if ((uc + vc) > a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) < 0)	return FALSE;
+		if ((uc + vc) > a)	return FALSE;
 	} else {
-		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return;
-		if ((uc + vc) < a)	return;
+		if ((uc = area(v0[major],v0[minor],v1[major],v1[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((vc = area(v1[major],v1[minor],v2[major],v2[minor],intersection[major],intersection[minor])) > 0)	return FALSE;
+		if ((uc + vc) < a)	return FALSE;
 	}
 	
 	cRay->t			=	t;
@@ -756,6 +759,7 @@ void	CPmovingTriangle::intersect(CRay *cRay)	{	// Do the triangle/ray intersecti
 	cRay->N[0]		=	ver0->N[0][0]*(1-cRay->u) + ver1->N[0][0]*cRay->u*cRay->v + ver2->N[0][0]*cRay->u*(1-cRay->v);
 	cRay->N[1]		=	ver0->N[0][1]*(1-cRay->u) + ver1->N[0][1]*cRay->u*cRay->v + ver2->N[0][1]*cRay->u*(1-cRay->v);
 	cRay->N[2]		=	ver0->N[0][2]*(1-cRay->u) + ver1->N[0][2]*cRay->u*cRay->v + ver2->N[0][2]*cRay->u*(1-cRay->v);
+	return FALSE;
 }
 
 
@@ -1031,6 +1035,9 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 	void						*nNode;
 	unsigned int				splitAxis;
 	float						splitCoordinate;
+
+retrace:
+
 	const float					*from				=	ray->from;
 	const float					*to					=	ray->to;
 	const float					*invDir				=	ray->invDir;
@@ -1058,7 +1065,9 @@ void		CHierarchy::intersect(void *r,CRay *ray,float tmin,float tmax) {
 
 				items[i]->ID = ray->ID;
 
-				items[i]->intersect(ray);
+				if (items[i]->intersect(ray) == TRUE) {
+					 goto retrace;
+				}
 			}
 
 			if (ray->t < hierarchyStackTop->tmax) {

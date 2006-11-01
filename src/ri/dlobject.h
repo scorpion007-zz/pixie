@@ -48,7 +48,7 @@ public:
 								~CDLObject();
 
 								// Raytracing functionality
-	void						intersect(CRay *);
+	int							intersect(CRay *);
 	int							intersect(const float *,const float *) const;
 
 								// Object functionality

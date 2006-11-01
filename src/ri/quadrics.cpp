@@ -47,15 +47,15 @@
 
 
 #define	checkRay(rv)											\
-	if (! (rv->flags & attributes->flags) )	return;				\
+	if (! (rv->flags & attributes->flags) )	return FALSE;		\
 																\
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {				\
 		const float importance = attributes->lodImportance;		\
 		if (rv->jimp < 0) rv->jimp = urand();					\
 		if (importance >= 0) {									\
-			if (rv->jimp > importance)			return;			\
+			if (rv->jimp > importance)			return FALSE;	\
 		} else {												\
-			if ((1-rv->jimp) >= -importance)	return;			\
+			if ((1-rv->jimp) >= -importance)	return FALSE;	\
 		}														\
 	}															\
 																\
@@ -282,7 +282,7 @@ int				CSphere::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CSphere::intersect(CRay *rv) {
+int		CSphere::intersect(CRay *rv) {
 	unsigned int	ns,i;
 	double			s[2];
 	double			r,umax,vmin,vmax;
@@ -306,7 +306,7 @@ void	CSphere::intersect(CRay *rv) {
 	const double b	=	2*dotvv(rv->oDir,rv->oFrom);
 	const double c	=	dotvv(rv->oFrom,rv->oFrom) - r*r;
 
-	if ((ns		=	solveQuadric<double>(a,b,c,s)) == 0) return;
+	if ((ns		=	solveQuadric<double>(a,b,c,s)) == 0) return FALSE;
 
 	for (i=0;i<ns;i++) {
 		double	P[3];
@@ -317,7 +317,7 @@ void	CSphere::intersect(CRay *rv) {
 		t		=	(float) s[i];
 
 		if (t	<=	rv->tmin)		continue;
-		if (t	>=	rv->t)			return;
+		if (t	>=	rv->t)			return FALSE;
 
 		P[0]	=	rv->oDir[0]*t + rv->oFrom[0];
 		P[1]	=	rv->oDir[1]*t + rv->oFrom[1];
@@ -371,8 +371,9 @@ void	CSphere::intersect(CRay *rv) {
 		rv->v			=	(float) v;
 		rv->t			=	(float) t;
 		mulmn(rv->N,xform->to,tmp);
-		return;
+		return FALSE;
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -751,7 +752,7 @@ int				CDisk::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CDisk::intersect(CRay *rv) {
+int		CDisk::intersect(CRay *rv) {
 	float	t;
 	double	u;
 	double	x,y;
@@ -773,11 +774,11 @@ void	CDisk::intersect(CRay *rv) {
 
 	t	=	(float) (z - rv->oFrom[COMP_Z])/rv->oDir[COMP_Z];
 
-	if ((t <= rv->tmin) || (t >= rv->t)) return;
+	if ((t <= rv->tmin) || (t >= rv->t)) return FALSE;
 
 	x	=	rv->oFrom[COMP_X] + rv->oDir[COMP_X]*t;
 	y	=	rv->oFrom[COMP_Y] + rv->oDir[COMP_Y]*t;
-	if ((x*x+y*y) > r*r) return;
+	if ((x*x+y*y) > r*r) return FALSE;
 
 	if (r < 0)	u	=	atan2(-y,-x);
 	else		u	=	atan2(y,x);
@@ -786,9 +787,9 @@ void	CDisk::intersect(CRay *rv) {
 
 	if (umax < 0) {
 		u	=	u - 2*C_PI;
-		if (u < umax) return;
+		if (u < umax) return FALSE;
 	} else {
-		if (u > umax) return;
+		if (u > umax) return FALSE;
 	}
 
 	initv(Nt,0,0,(float) umax);
@@ -799,7 +800,7 @@ void	CDisk::intersect(CRay *rv) {
 
 	if (attributes->nSides == 1) {
 		if (dotvv(rv->oDir,Nt) > 0) {
-			return;
+			return FALSE;
 		}
 	}
 
@@ -812,6 +813,7 @@ void	CDisk::intersect(CRay *rv) {
 	}
 	rv->t		=	(float) t;
 	mulmn(rv->N,xform->to,Nt);
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1131,7 +1133,7 @@ int				CCone::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CCone::intersect(CRay *rv) {
+int		CCone::intersect(CRay *rv) {
 	float			*from;
 	float			*dir;
 	double			s[2];
@@ -1164,7 +1166,7 @@ void	CCone::intersect(CRay *rv) {
 		const double	b		=	height*height*2*(from[COMP_X]*dir[COMP_X] + from[COMP_Y]*dir[COMP_Y]) - r*r*2*(from[COMP_Z]-height)*dir[COMP_Z];
 		const double	c		=	height*height*(from[COMP_X]*from[COMP_X] + from[COMP_Y]*from[COMP_Y]) - r*r*(from[COMP_Z]-height)*(from[COMP_Z]-height);
 
-		if ((ns	= solveQuadric<double>(a,b,c,s)) == 0) return;
+		if ((ns	= solveQuadric<double>(a,b,c,s)) == 0) return FALSE;
 	}
 
 
@@ -1174,7 +1176,7 @@ void	CCone::intersect(CRay *rv) {
 		double	P[3];
 
 		if (t <= rv->tmin)	continue;
-		if (t >= rv->t)		return;
+		if (t >= rv->t)		return FALSE;
 
 		P[COMP_Z]	=	rv->oDir[COMP_Z]*t + rv->oFrom[COMP_Z];
 
@@ -1229,8 +1231,9 @@ void	CCone::intersect(CRay *rv) {
 		rv->v		=	(float) v;
 		rv->t		=	(float) t;
 		mulmn(rv->N,xform->to,Nt);
-		return;
+		return FALSE;
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1584,7 +1587,7 @@ int				CParaboloid::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CParaboloid::intersect(CRay *rv) {
+int		CParaboloid::intersect(CRay *rv) {
 	vector	Nt;
 
 	checkRay(rv);
@@ -1614,11 +1617,11 @@ void	CParaboloid::intersect(CRay *rv) {
 	c		=	from[COMP_X]*from[COMP_X] + from[COMP_Y]*from[COMP_Y] - r*r*from[COMP_Z]/zmax;
 
 	if (a < C_EPSILON) {
-		if (b == 0) return;
+		if (b == 0) return FALSE;
 		s[0]	=	-c/b;
 		ns		=	1;
 	} else {
-		if ((ns = solveQuadric<double>(a,b,c,s)) == 0) return;
+		if ((ns = solveQuadric<double>(a,b,c,s)) == 0) return FALSE;
 	}
 
 	if (zmin < zmax)	{
@@ -1635,7 +1638,7 @@ void	CParaboloid::intersect(CRay *rv) {
 		double	P[3];
 
 		if (t <= rv->tmin)	continue;
-		if (t >= rv->t)		return;
+		if (t >= rv->t)		return FALSE;
 
 		P[0]	=	from[0] + dir[0]*t;
 		P[1]	=	from[1] + dir[1]*t;
@@ -1674,8 +1677,9 @@ void	CParaboloid::intersect(CRay *rv) {
 		rv->v		=	(float) ((P[COMP_Z]	-	zmin) / (zmax - zmin));
 		rv->t		=	(float) t;
 		mulmn(rv->N,xform->to,Nt);
-		return;
+		return FALSE;
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2023,7 +2027,7 @@ int				CCylinder::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CCylinder::intersect(CRay *rv) {
+int		CCylinder::intersect(CRay *rv) {
 	vector	Nt;
 
 	checkRay(rv);
@@ -2051,12 +2055,12 @@ void	CCylinder::intersect(CRay *rv) {
 	c		=	from[COMP_X]*from[COMP_X] + from[COMP_Y]*from[COMP_Y] - r*r;
 
 	if (a == 0) {
-		if (b == 0)	return;
+		if (b == 0)	return FALSE;
 
 		s[0]	=	-c/b;
 		ns		=	1;
 	} else {
-		if ((ns = solveQuadric<double>(a,b,c,s)) == 0) return;
+		if ((ns = solveQuadric<double>(a,b,c,s)) == 0) return FALSE;
 	}
 
 	for (i=0;i<ns;i++) {
@@ -2065,7 +2069,7 @@ void	CCylinder::intersect(CRay *rv) {
 		double	P[3];
 
 		if (t	<=	rv->tmin)	continue;
-		if (t	>=	rv->t)		return;
+		if (t	>=	rv->t)		return FALSE;
 
 		P[0]	=	from[0] + dir[0]*t;
 		P[1]	=	from[1] + dir[1]*t;
@@ -2107,9 +2111,9 @@ void	CCylinder::intersect(CRay *rv) {
 		rv->v		=	(float) (P[COMP_Z] - zmin) / (zmax - zmin);
 		rv->t		=	(float) t;
 		mulmn(rv->N,xform->to,Nt);
-		return;
+		return FALSE;
 	}
-
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2453,7 +2457,7 @@ int				CHyperboloid::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CHyperboloid::intersect(CRay *rv) {
+int		CHyperboloid::intersect(CRay *rv) {
 
 	checkRay(rv);
 
@@ -2514,12 +2518,12 @@ void	CHyperboloid::intersect(CRay *rv) {
 		c		=	from[COMP_X]*from[COMP_X] + from[COMP_Y]*from[COMP_Y] - dmin*dmin - (from[COMP_Z]-zmin)*(from[COMP_Z]-zmin)*d*d;
 
 		if (a == 0) {
-			if (b == 0)	return;
+			if (b == 0)	return FALSE;
 
 			ns		=	1;
 			ts[0]	=	-c / b;
 		} else {
-			if ((ns	=	solveQuadric<double>(a,b,c,ts)) == 0) return;
+			if ((ns	=	solveQuadric<double>(a,b,c,ts)) == 0) return FALSE;
 		}
 	}
 
@@ -2529,7 +2533,7 @@ void	CHyperboloid::intersect(CRay *rv) {
 		double	ustart;
 		double	u,v;
 
-		if (t >= rv->t)		return;
+		if (t >= rv->t)		return FALSE;
 		if (t <= rv->tmin)	continue;
 
 		P[0]	=	from[0] + dir[0]*t;
@@ -2597,8 +2601,9 @@ void	CHyperboloid::intersect(CRay *rv) {
 		rv->t		=	(float) t;
 		mulmn(rv->N,xform->to,Nt);
 
-		return;
+		return FALSE;
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2988,7 +2993,7 @@ int				CToroid::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CToroid::intersect(CRay *rv) {
+int		CToroid::intersect(CRay *rv) {
 
 	checkRay(rv);
 
@@ -3123,9 +3128,10 @@ void	CToroid::intersect(CRay *rv) {
 			mulmn(rv->N,xform->to,Nt);
 
 
-			return;
+			return FALSE;
 		}
 	}
+	return FALSE;
 
 }
 

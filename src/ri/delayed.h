@@ -69,7 +69,7 @@ public:
 	void					tesselate(CShadingContext *);
 	void					dice(CShadingContext *);
 	int						intersect(const float *,const float *) const;
-	void					intersect(CRay *);
+	int						intersect(CRay *);
 	void					bound(float *,float *) const;
 	int						moving() const													{	return FALSE;		}
 	void					copy(CAttributes *,CXform *,CRendererContext *) const;

@@ -104,13 +104,15 @@ int		CDelayedObject::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-void	CDelayedObject::intersect(CRay *cRay) {
+int	CDelayedObject::intersect(CRay *cRay) {
 	float	tmin	=	cRay->tmin;
 	float	tmax	=	cRay->t;
 
 	if (hierarchyIntersectBox(this->cbmin,this->cbmax,cRay->from,cRay->to,tmin,tmax)) {
 		currentRenderer->processDelayedObject(this,subdivisionFunction,data,bmin,bmax,cRay);
+		return TRUE;
 	}
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////

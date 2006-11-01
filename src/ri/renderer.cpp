@@ -1005,9 +1005,9 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	renderer->endWorld();
 
 	// If we're raytracing, check the ray against the children objects
-	if (cRay != NULL) {
-		renderer->retraceRay(cRay);
-	}
+//	if (cRay != NULL) {
+//		renderer->retraceRay(cRay);
+//	}
 }
 
 ///////////////////////////////////////////////////////////////////////

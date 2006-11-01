@@ -49,7 +49,7 @@ public:
 						~CBilinearPatch();
 
 		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
+		int				intersect(CRay *);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const												{	return variables->moving;			}
