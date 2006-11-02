@@ -34,6 +34,7 @@
 #include "memory.h"
 #include "error.h"
 #include "renderer.h"
+#include "tiff.h"
 
 #include <stddef.h>		// ensure we have NULL defined before libtiff
 #include <tiffio.h>
@@ -61,7 +62,7 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/6/2001
-static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,void *data,int last) {
+static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,void *data) {
 	int				x,y;
 	unsigned char	*tileData;
 	int				pixelSize;
@@ -93,6 +94,8 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 		pixelSize	=	numSamples*sizeof(float);
 	}
 
+	memBegin(CRenderer::globalMemory);
+
 	tileData		=	(unsigned char *) ralloc(pixelSize*tileSize*tileSize,CRenderer::globalMemory);
 
 	assert(TIFFTileSize(out) == (tileSize*tileSize*pixelSize));
@@ -109,9 +112,9 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 		}
 	}
 
-	if (last == FALSE) {
-		TIFFWriteDirectory(out);
-	}
+	TIFFWriteDirectory(out);
+
+	memEnd(CRenderer::globalMemory);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -121,14 +124,13 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/6/2001
-template <class T> static	void	appendPyramid(TIFF *out,int dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,T *data,int pyramidSize,int last) {
+template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,T *data) {
 	T		*currentLevel;
-	int		i;
 	int		currentWidth,currentHeight,nextWidth,nextHeight;
 	float	*fnextLevel;
 
 	// Append the base layer
-	appendLayer(out,dstart,numSamples,bitsperpixel,tileSize,width,height,data,last & (pyramidSize == 1));
+	appendLayer(out,dstart,numSamples,bitsperpixel,tileSize,width,height,data);
 
 	// Append the remaining layers
 	currentWidth	=	width;
@@ -137,7 +139,7 @@ template <class T> static	void	appendPyramid(TIFF *out,int dstart,int numSamples
 
 	fnextLevel		=	(float *)	ralloc(width*height*numSamples*sizeof(float),CRenderer::globalMemory);
 
-	for (i=1;i<pyramidSize;i++) {
+	while((currentWidth > 2) && (currentHeight > 2)) {
 		int			x,y,yo;
 		int			s;
 
@@ -184,7 +186,7 @@ template <class T> static	void	appendPyramid(TIFF *out,int dstart,int numSamples
 		currentWidth	=	nextWidth;
 		currentHeight	=	nextHeight;
 
-		appendLayer(out,dstart+i,numSamples,bitsperpixel,tileSize,currentWidth,currentHeight,currentLevel,last & (i == (pyramidSize-1)));
+		appendLayer(out,dstart++,numSamples,bitsperpixel,tileSize,currentWidth,currentHeight,currentLevel);
 	}
 }
 
@@ -402,62 +404,34 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	getTextureSpec
-// Description			:	Generate the texture spec string for a given texture
-// Return Value			:
-// Comments				:
-// Date last edited		:	7/6/2001
-void	getTextureSpec(TIFF *in,char *spec,char *smode,char *tmode,int tileSize,int &pyramidSize) {
-	uint32			w,h;
-	uint32			nw,nh;
-
-	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&w);
-	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&h);
-
-	// Expand the size to power of two
-	for (nw=1;nw<w;nw=nw<<1);
-	for (nh=1;nh<h;nh=nh<<1);
-
-	// Compute the number of pyramid levels
-	if (pyramidSize != 1) {
-		assert(pyramidSize == 0);
-		for (;(nw > 2) && (nh > 2);nw=nw>>1,nh=nh>>1,pyramidSize++);
-	}
-
-	sprintf(spec,"#texture (%dx%d): smode: %s tmode: %s levels: %d",w,h,smode,tmode,pyramidSize);
-}
-
-///////////////////////////////////////////////////////////////////////
 // Function				:	appendTexture
 // Description			:	Make and append a texture to the end of the TIFF file
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/6/2001
-void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int bitspersample,RtFilterFunc filter,float filterWidth,float filterHeight,int tileSize,int pyramidSize,void *data,char *smode,char *tmode,int last) {
+void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int bitspersample,RtFilterFunc filter,float filterWidth,float filterHeight,int tileSize,void *data,char *smode,char *tmode) {
 	if (bitspersample == 8) {
 		if ((filterWidth > 1) || (filterHeight > 1))
 			filterImage<unsigned char>(width,height,numSamples,bitspersample,filterWidth,filterHeight,filter,(unsigned char *) data);
 
 		adjustSize<unsigned char>((unsigned char **) &data,&width,&height,numSamples,smode,tmode);
 
-		appendPyramid<unsigned char>(out,0,numSamples,bitspersample,tileSize,width,height,(unsigned char *) data,pyramidSize,last);
+		appendPyramid<unsigned char>(out,dstart,numSamples,bitspersample,tileSize,width,height,(unsigned char *) data);
 	} else if (bitspersample == 16) {
 		if ((filterWidth > 1) || (filterHeight > 1))
 			filterImage<unsigned short>(width,height,numSamples,bitspersample,filterWidth,filterHeight,filter,(unsigned short *) data);
 
 		adjustSize<unsigned short>((unsigned short **) &data,&width,&height,numSamples,smode,tmode);
 
-		appendPyramid<unsigned short>(out,0,numSamples,bitspersample,tileSize,width,height,(unsigned short *) data,pyramidSize,last);
+		appendPyramid<unsigned short>(out,dstart,numSamples,bitspersample,tileSize,width,height,(unsigned short *) data);
 	} else if (bitspersample == 32) {
 		if ((filterWidth > 1) || (filterHeight > 1))
 			filterImage<float>(width,height,numSamples,bitspersample,filterWidth,filterHeight,filter,(float *) data);
 
 		adjustSize<float>((float **) &data,&width,&height,numSamples,smode,tmode);
 
-		appendPyramid<float>(out,0,numSamples,bitspersample,tileSize,width,height,(float *) data,pyramidSize,last);
+		appendPyramid<float>(out,dstart,numSamples,bitspersample,tileSize,width,height,(float *) data);
 	}
-
-	dstart	+=	pyramidSize;
 }
 
 
@@ -491,21 +465,28 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
-			int				pyramidSize;
-			char			spec[1024];
+			char			modes[128];
 
 			memBegin(CRenderer::globalMemory);
 
-			pyramidSize	=	0;
-			getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
+			// Read the texture
 			data		=	readLayer(inHandle,&width,&height,&bitspersample,&numSamples);
 			TIFFClose(inHandle);
 
+			// Write the made texture
 			TIFF	*outHandle	=	TIFFOpen(output,"w");
 			if (output != NULL) {
 				int	dstart	=	0;
-				TIFFSetField(outHandle, TIFFTAG_IMAGEDESCRIPTION,	spec);
-				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,pyramidSize,data,smode,tmode,TRUE);
+
+				sprintf(modes,"%s %s",smode,tmode);
+
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_TEXTURE);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	width);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	height);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_WRAPMODES,		modes);
+
+				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode);
+
 				TIFFClose(outHandle);
 			}
 
@@ -547,31 +528,21 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
-			int				pyramidSize;
-			char			spec[1024];
-			char			allSpec[1024];
+			matrix			worldToCamera,worldToScreen;
 
 			memBegin(CRenderer::globalMemory);
 
 			// Read off the from world transformation from the image if possible
-			char	*desc;
-
-			TIFFGetFieldDefaulted(inHandle,	TIFFTAG_IMAGEDESCRIPTION,	&desc);
-
-			if (strncmp(desc,"WorldToNDC=",11) == 0) {
-				strcpy(spec,desc+11);
-			} else {
-				sprintf(spec,"[1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1] ");
+			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	worldToCamera) == FALSE) {
+				error(CODE_BUG,"Unable to read the world to camera matrix.\n");
+				identitym(worldToCamera);
 			}
 
-			// Set the spec
-			sprintf(allSpec,"#shadow ");
-			strcat(allSpec,spec);
-				
-			strcat(allSpec," ");
-			pyramidSize	=	(shadow ? 1 : 0);
-			getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
-			strcat(allSpec,spec);
+			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	worldToScreen) == FALSE) {
+				error(CODE_BUG,"Unable to read the world to screen matrix.\n");
+				identitym(worldToScreen);
+			}
+
 
 			// Read the data
 			data		=	readLayer(inHandle,&width,&height,&bitspersample,&numSamples);
@@ -583,9 +554,14 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 			if (output != NULL) {
 				int			dstart	=	0;
 
-				TIFFSetField(outHandle, TIFFTAG_IMAGEDESCRIPTION,	allSpec);
+				// Write the texture data
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,		TIFF_SHADOW);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLWIDTH,		width);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLLENGTH,		height);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	worldToCamera);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	worldToScreen);
 
-				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,1,data,smode,tmode,TRUE);
+				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode);
 
 				TIFFClose(outHandle);
 			} else {
@@ -628,61 +604,43 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 
 		TIFF	*outHandle = TIFFOpen(output,"w");
 		if (output != NULL) {
-			TIFF			*inHandles[6];
 			void			*data;
 			int				numSamples;
 			int				bitspersample;
 			int				i;
-			int				width,height;
 			int				tileSize		=	32;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
-			int				pyramidSize;
-			char			allSpec[1024];
-
-			sprintf(allSpec,"#cenvironment ");
-			
-			// Make one pass to create the env spec
-			for (i=0;i<6;i++) {
-				char		spec[1024];
-
-				if (CRenderer::locateFile(inputFileName,names[i],path) == FALSE) {
-					error(CODE_NOFILE,"Unable to find \"%s\"\n",names[i]);
-					TIFFClose(outHandle);
-					outHandle = NULL;
-				} else {
-					inHandles[i]	=	TIFFOpen(inputFileName,"r");
-					if (inHandles[i] == NULL) {
-						int	j;
-
-						error(CODE_NOFILE,"Unable to open \"%s\" \n",inputFileName);
-
-						for (j=0;j<i;j++)	TIFFClose(inHandles[j]);
-						TIFFClose(outHandle);
-						outHandle	=	NULL;
-					} else {
-						pyramidSize	=	(shadow ? 1 : 0);
-						getTextureSpec(inHandles[i],spec,smode,tmode,tileSize,pyramidSize);
-
-						strcat(allSpec,spec);
-						strcat(allSpec," ");
-					}
-				}
-			}
 
 			if (outHandle != NULL) {
-				TIFFSetField(outHandle, TIFFTAG_IMAGEDESCRIPTION,	allSpec);
+				int			dstart	=	0;
 
-				for (i=0;i<6;i++) {
-					int			dstart	=	0;
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,		TIFF_CUBIC_ENVIRONMENT);
+
+				for (i=0;i<6;i++) {	
+					int		width,height;
+					TIFF	*inHandle;
+
+					// Open the file
+					if (CRenderer::locateFile(inputFileName,names[i],path) == FALSE) {
+						error(CODE_NOFILE,"Unable to find \"%s\"\n",names[i]);
+						break;
+					} else {
+						inHandle	=	TIFFOpen(inputFileName,"r");
+						if (inHandle == NULL)	break;
+					}
 
 					memBegin(CRenderer::globalMemory);
 
-					data			=	readLayer(inHandles[i],&width,&height,&bitspersample,&numSamples);
-					TIFFClose(inHandles[i]);
+					// Read the data
+					data			=	readLayer(inHandle,&width,&height,&bitspersample,&numSamples);
+					TIFFClose(inHandle);
 
-					appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,pyramidSize,data,smode,tmode,(i == 5 ? TRUE : FALSE));
+					// Write the data
+					TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLWIDTH,		width);
+					TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLLENGTH,		height);
+					appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode);
 
 					memEnd(CRenderer::globalMemory);
 				}
@@ -728,24 +686,21 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
-			int				pyramidSize;
-			char			spec[1024];
-			char			allSpec[1024];
 
 			memBegin(CRenderer::globalMemory);
 
-			pyramidSize	=	0;
-			getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
-			sprintf(allSpec,"#senvironment %s",spec);
-
+			// Read the texture
 			data		=	readLayer(inHandle,&width,&height,&bitspersample,&numSamples);
 			TIFFClose(inHandle);
 
 			TIFF	*outHandle	=	TIFFOpen(output,"w");
 			if (output != NULL) {
 				int	dstart	=	0;
-				TIFFSetField(outHandle, TIFFTAG_IMAGEDESCRIPTION,	allSpec);
-				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,pyramidSize,data,smode,tmode,TRUE);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_SPHERICAL_ENVIRONMENT);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	width);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	height);
+
+				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode);
 				TIFFClose(outHandle);
 			}
 
@@ -789,15 +744,8 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
-			int				pyramidSize;
-			char			spec[1024];
-			char			allSpec[1024];
 
 			memBegin(CRenderer::globalMemory);
-
-			pyramidSize	=	0;
-			getTextureSpec(inHandle,spec,smode,tmode,tileSize,pyramidSize);
-			sprintf(allSpec,"#lenvironment %s",spec);
 
 			data		=	readLayer(inHandle,&width,&height,&bitspersample,&numSamples);
 			TIFFClose(inHandle);
@@ -806,8 +754,11 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			TIFF	*outHandle	=	TIFFOpen(output,"w");
 			if (output != NULL) {
 				int	dstart	=	0;
-				TIFFSetField(outHandle, TIFFTAG_IMAGEDESCRIPTION,	allSpec);
-				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,pyramidSize,data,smode,tmode,TRUE);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_CYLINDER_ENVIRONMENT);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	width);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	height);
+
+				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode);
 				TIFFClose(outHandle);
 			}
 
