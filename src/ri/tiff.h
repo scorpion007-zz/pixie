@@ -32,15 +32,24 @@
 #define TIFF_H
 
 // Textureformat
-const char	*TIFF_TEXTURE					=	"Pixie Texture";
-const char	*TIFF_CYLINDER_ENVIRONMENT		=	"Pixie Environment (cylinder)";
-const char	*TIFF_CUBIC_ENVIRONMENT			=	"Pixie Environment (cubic)";
-const char	*TIFF_SPHERICAL_ENVIRONMENT		=	"Pixie Environment (spherical)";
-const char	*TIFF_SHADOW					=	"Pixie shadow";
+extern const char	*TIFF_TEXTURE;
+extern const char	*TIFF_CYLINDER_ENVIRONMENT;
+extern const char	*TIFF_CUBIC_ENVIRONMENT;
+extern const char	*TIFF_SPHERICAL_ENVIRONMENT;
+extern const char	*TIFF_SHADOW;
 
 // Texture wrap mode
 const int	TIFF_PERIODIC		=	0;		// Periodic texture
 const int	TIFF_CLAMP			=	1;		// Clamp
 const int	TIFF_BLACK			=	2;		// To black
+
+// This function computes the number of levels for a particular image
+inline int	tiffNumLevels(int w,int h) {
+	int	i;
+
+	for (i=0;(w > 2) && (h > 2);i++,w=w>>1,h=h>>1);
+
+	return i+1;
+}
 
 #endif

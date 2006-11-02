@@ -34,6 +34,7 @@
 #include "memory.h"
 #include "error.h"
 #include "renderer.h"
+#include "tiff.h"
 
 #include <stddef.h>		// Ensure NULL is defined before libtiff
 #include <math.h>
@@ -2090,7 +2091,7 @@ void			CCylindericalEnvironment::lookup(float *result,const float *D0,const floa
 // Return Value			:	TRUE on success
 // Comments				:
 // Date last edited		:	7/7/2001
-template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int dstart,int width,int height,char *smode,char *tmode,int pyramidSize,T enforcer) {
+template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int dstart,int width,int height,char *smode,char *tmode,T enforcer) {
 	CMadeTexture			*cTexture;
 	int						i,j;
 	uint32					fileWidth,fileHeight;
@@ -2124,7 +2125,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 		sMode	=	TEXTURE_BLACK;
 	} else {
 		error(CODE_BADTOKEN,"Unknown texture wrap mode (\"%s\")\n",smode);
-		sMode	=	TEXTURE_PERIODIC;
+		sMode	=	TEXTURE_BLACK;
 	}
 
 	if (strcmp(tmode,RI_PERIODIC) == 0) {
@@ -2135,7 +2136,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 		tMode	=	TEXTURE_BLACK;
 	} else {
 		error(CODE_BADTOKEN,"Unknown texture wrap mode (\"%s\")\n",tmode);
-		tMode	=	TEXTURE_PERIODIC;
+		tMode	=	TEXTURE_BLACK;
 	}
 
 	cTexture	=	new CMadeTexture(aname,width,height,sMode,tMode);
@@ -2151,21 +2152,23 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 		M		=	inv255;
 	}
 
+	// This is the number of levels we have for the texture
+	int	pyramidSize		=	tiffNumLevels(fileWidth,fileHeight);
+
 	cTexture->numLayers	=	pyramidSize;
 	cTexture->layers	=	new CTextureLayer*[pyramidSize];
 
 	cwidth				=	width;
 	cheight				=	height;
 	for (i=0;i<pyramidSize;i++) {
+		TIFFSetDirectory(in,dstart);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&fileWidth);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&fileHeight);
-		cTexture->layers[i]	=	new CTiledTexture<T>(name,dstart+i,cwidth,cheight,numSamples,fileWidth,fileHeight,tileSize,tileSizeShift,M);
-		if (i != (pyramidSize-1)) {
-			TIFFSetDirectory(in,dstart+i+1);
-		}
+		cTexture->layers[i]	=	new CTiledTexture<T>(name,dstart,cwidth,cheight,numSamples,fileWidth,fileHeight,tileSize,tileSizeShift,M);
+		dstart++;
 
-		cwidth	=	cwidth >> 1;
-		cheight	=	cheight >> 1;
+		cwidth				=	cwidth >> 1;
+		cheight				=	cheight >> 1;
 	}
 
 	return cTexture;
@@ -2177,12 +2180,13 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 // Return Value			:	The texture
 // Comments				:
 // Date last edited		:	8/10/2001
-template <class T> static CTexture	*readTexture(const char *name,const char *aname,TIFF *in,int dstart,T enforcer) {
+template <class T> static CTexture	*readTexture(const char *name,const char *aname,TIFF *in,int &dstart,T enforcer) {
 	uint32				width,height;
 	uint16				numSamples;
 	CRegularTexture		*cTexture;
 	double				M;
 
+	TIFFSetDirectory(in,dstart);
 	width				=	0;
 	height				=	0;
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&width);
@@ -2197,10 +2201,11 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 		M		=	inv255;
 	}
 
-	cTexture			=	new CRegularTexture(aname,width,height,TEXTURE_PERIODIC,TEXTURE_PERIODIC);
+	cTexture			=	new CRegularTexture(aname,width,height,TEXTURE_BLACK,TEXTURE_BLACK);
 	cTexture->width		=	width;
 	cTexture->height	=	height;
 	cTexture->layer		=	new CBasicTexture<T>(name,dstart,width,height,numSamples,width,height,M);
+	dstart++;
 
 	return cTexture;
 }
@@ -2211,38 +2216,48 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 // Return Value			:	Pointer to the new texture
 // Comments				:
 // Date last edited		:	7/7/2001
-static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart,char *textureSpec) {
-	int				pyramidSize;
-	CTexture		*cTexture	=	NULL;
-	char			smode[32],tmode[32];
-	int				width,height;
+static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart,int unMade = FALSE) {
+	CTexture		*cTexture = NULL;
 	uint16			bitspersample;
 
+	// Get the bits per sample from the file
 	TIFFSetDirectory(in,dstart);
 	TIFFGetFieldDefaulted(in,TIFFTAG_BITSPERSAMPLE              ,&bitspersample);
-	
-	cTexture	=	NULL;
 
-	strcpy(smode,RI_PERIODIC);
-	strcpy(tmode,RI_PERIODIC);
+	// Is this a made texture file ?
+	if (unMade == FALSE) {
+		char			*smode,*tmode,*mode,tmp[128];
+		uint32			width,height;
 
-	if (textureSpec == NULL) {		// Not a made texture
-		pyramidSize	=	1;
-	} else {
-		if (sscanf(textureSpec,"#texture (%dx%d): smode: %s tmode: %s levels: %d ",&width,&height,smode,tmode,&pyramidSize) == 5) {
-			if (bitspersample == 8) {
-				cTexture	=	readMadeTexture<unsigned char>(name,aname,in,dstart,width,height,smode,tmode,pyramidSize,1);
-			} else if (bitspersample == 16) {
-				cTexture	=	readMadeTexture<unsigned short>(name,aname,in,dstart,width,height,smode,tmode,pyramidSize,1);
+		width	=	0;
+		height	=	0;
+		mode	=	NULL;
+		if (	(TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH       ,&width)	== 1) &&
+				(TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH      ,&height)	== 1)) {
+
+			if (TIFFGetField(in,TIFFTAG_PIXAR_WRAPMODES ,&mode)		== 1) {
+				strcpy(tmp,mode);
+				smode	=	tmp;
+				tmode	=	strchr(smode,',');
+				assert(tmode != NULL);
+				*tmode++	=	'\0';
 			} else {
-				cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,pyramidSize,1);
+				smode	=	RI_BLACK;
+				tmode	=	RI_BLACK;
 			}
-		} else {
-			pyramidSize	=	1;
-		}
-	}
 
-	if (cTexture == NULL) {
+
+			if (bitspersample == 8) {
+				cTexture	=	readMadeTexture<unsigned char>(name,aname,in,dstart,width,height,smode,tmode,1);
+			} else if (bitspersample == 16) {
+				cTexture	=	readMadeTexture<unsigned short>(name,aname,in,dstart,width,height,smode,tmode,1);
+			} else {
+				cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,1);
+			}
+		
+		}
+	} else {
+
 		if (bitspersample == 8) {
 			cTexture	=	readTexture<unsigned char>(name,aname,in,dstart,1);
 		} else if (bitspersample == 16) {
@@ -2252,7 +2267,8 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 		}
 	}
 
-	dstart	+=	pyramidSize;
+
+	assert(cTexture != NULL);
 
 	return cTexture;
 }
@@ -2321,19 +2337,19 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 	in			=	TIFFOpen(fn,"r");
 
 	if (in != NULL) {
-		char	*textureSpec = NULL;
-		char	tmp[1024];
+		char	*textureFormat = NULL;
 
-		if (TIFFGetField(in,TIFFTAG_IMAGEDESCRIPTION              ,&textureSpec) == 1) {
-			strcpy(tmp,textureSpec);
-			textureSpec	=	tmp;
-
-			if (strncmp(textureSpec,"#texture",8) == 0)
-				cTexture	=	texLoad(fn,name,in,directory,textureSpec);
+		if (TIFFGetField(in,TIFFTAG_PIXAR_TEXTUREFORMAT,&textureFormat) == 1) {
+			
+			if (strcmp(textureFormat,TIFF_TEXTURE) == 0)
+				// This seems like a made texture
+				cTexture	=	texLoad(fn,name,in,directory);
 			else
-				cTexture	=	texLoad(fn,name,in,directory,NULL);
+				// This seems like a texture made by another software
+				cTexture	=	texLoad(fn,name,in,directory);
 		} else {
-			cTexture		=	texLoad(fn,name,in,directory,NULL);
+			// This seems like an unmade texture
+			cTexture		=	texLoad(fn,name,in,directory);
 		}
 
 		TIFFClose(in);
@@ -2353,7 +2369,6 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 	TIFF			*in;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	CEnvironment	*cTexture	=	NULL;
-	matrix			trans;
 	FILE			*tmpin;
 
 	if (CRenderer::locateFile(fileName,name,path) == FALSE) {
@@ -2374,95 +2389,50 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 	in			=	TIFFOpen(fileName,"r");
 
 	if (in != NULL) {
-		char				tmp[1024];
-		char				*textureSpec = NULL;
-		matrix				envMat;
+		char				*textureFormat = NULL;
 
-		if (TIFFGetField(in,TIFFTAG_IMAGEDESCRIPTION              ,&textureSpec) == 1) {
-			strcpy(tmp,textureSpec);
-			textureSpec	=	tmp;
+		if (TIFFGetField(in,TIFFTAG_PIXAR_TEXTUREFORMAT ,&textureFormat) == 1) {
 
-			if (strncmp(textureSpec,"#cenvironment",13) == 0) {
+			if (strcmp(textureFormat,TIFF_CUBIC_ENVIRONMENT) == 0) {
 				// We're loading a cubic environment 
 				int			directory	=	0;
-				char		*cSpec;
 				int			i;
 				CTexture	*sides[6];
 
-				cSpec	=	strstr(textureSpec,"#texture");
+				for (i=0;i<6;i++)	sides[i]	=	texLoad(fileName,name,in,directory);
 
-				if (cSpec == NULL) {
-					error(CODE_BADFILE,"Missing side in %s\n",fileName);
-				} else {
-					for (i=0;i<6;i++) {
-						if (cSpec == NULL) {
-							// This shound't have happened
-							int	j;
-
-							error(CODE_BADFILE,"Missing side in %s\n",fileName);
-
-							for (j=0;j<i;j++)	delete sides[j];
-
-							break;
-						} else {
-							sides[i]	=	texLoad(fileName,name,in,directory,cSpec);
-
-							cSpec		+=	8;
-
-							cSpec		=	strstr(cSpec,"#texture");
-						}
-					}
-
-					if (i == 6) {
-						cTexture	=	new CCubicEnvironment(name,sides);
-					}
-				}
-			} else if (strncmp(textureSpec,"#senvironment",13) == 0) {
+				cTexture	=	new CCubicEnvironment(name,sides);
+			} else if (strcmp(textureFormat,TIFF_SPHERICAL_ENVIRONMENT) == 0) {
 				int			directory	=	0;
-				char		*cSpec;
 				CTexture	*side;
 
-				cSpec	=	strstr(textureSpec,"#texture");
+				side		=	texLoad(fileName,name,in,directory);
 
-				if (cSpec == NULL) {
-					error(CODE_BADFILE,"Missing texture in %s\n",fileName);
-				} else {
-					side	=	texLoad(fileName,name,in,directory,cSpec);
-
-					cTexture	=	new CSphericalEnvironment(name,side);
-				}
-			} else if (strncmp(textureSpec,"#lenvironment",13) == 0) {
+				cTexture	=	new CSphericalEnvironment(name,side);
+			} else if (strcmp(textureFormat,TIFF_CYLINDER_ENVIRONMENT) == 0) {
 				int			directory	=	0;
-				char		*cSpec;
 				CTexture	*side;
 
-				cSpec	=	strstr(textureSpec,"#texture");
+				side		=	texLoad(fileName,name,in,directory);
 
-				if (cSpec == NULL) {
-					error(CODE_BADFILE,"Missing texture in %s\n",fileName);
-				} else {
-					side	=	texLoad(fileName,name,in,directory,cSpec);
+				cTexture	=	new CCylindericalEnvironment(name,side);
+			} else if (strcmp(textureFormat,TIFF_SHADOW) == 0)	{
+				CTexture	*side;
+				int			directory	=	0;
+				matrix		worldToCamera,worldToScreen,trans;
+				float		*tmp;
 
-					cTexture	=	new CCylindericalEnvironment(name,side);
-				}
-			} else if (sscanf(textureSpec,"#shadow [ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]",
-					&envMat[0],		&envMat[1],		&envMat[2],		&envMat[3],
-					&envMat[4],		&envMat[5],		&envMat[6],		&envMat[7],
-					&envMat[8],		&envMat[9],		&envMat[10],	&envMat[11],
-					&envMat[12],	&envMat[13],	&envMat[14],	&envMat[15]) == 16)	{
-				CTexture			*side;
-				int					directory	=	0;
+				TIFFGetField(in,TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	&tmp);	movmm(worldToCamera,tmp);
+				TIFFGetField(in,TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	&tmp);	movmm(worldToScreen,tmp);
 
-				side		=	texLoad(fileName,name,in,directory,strstr(textureSpec,"#texture"));
+				side		=	texLoad(fileName,name,in,directory);
 
 				// Compute the transformation matrix to the light space
-				mulmm(trans,envMat,toWorld);
+				mulmm(trans,worldToScreen,toWorld);
 
 				cTexture	=	new CShadow(name,trans,side);
 			}
-		}
-
-		TIFFClose(in);
+		} 
 	}
 
 	return cTexture;

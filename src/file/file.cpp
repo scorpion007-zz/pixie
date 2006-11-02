@@ -63,7 +63,6 @@ public:
 					float		worldToNDC[16];
 					float		worldToCamera[16];
 					char		*software;
-					char		desc[1024];
 					const char	*compression	=	NULL;
 
 					// Open the image file
@@ -139,12 +138,6 @@ public:
 						sampleformat	=	SAMPLEFORMAT_UINT;
 					}
 
-					sprintf(desc,"WorldToNDC=[%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]"
-						,worldToNDC[0],worldToNDC[1],worldToNDC[2],worldToNDC[3]
-						,worldToNDC[4],worldToNDC[5],worldToNDC[6],worldToNDC[7]
-						,worldToNDC[8],worldToNDC[9],worldToNDC[10],worldToNDC[11]
-						,worldToNDC[12],worldToNDC[13],worldToNDC[14],worldToNDC[15]);
-
 					// Set the tiff fields
 					TIFFSetField(image, TIFFTAG_IMAGEWIDTH,			(unsigned long) width);
 					TIFFSetField(image, TIFFTAG_IMAGELENGTH,		(unsigned long) height);
@@ -183,7 +176,6 @@ public:
 						TIFFSetField(image, TIFFTAG_EXTRASAMPLES, 1, &sampleinfo);
 					}
 
-					TIFFSetField(image, TIFFTAG_IMAGEDESCRIPTION,		desc);
 					if (software != NULL)	TIFFSetField(image, TIFFTAG_SOFTWARE,		software);
 
 					lastSavedLine	=	0;

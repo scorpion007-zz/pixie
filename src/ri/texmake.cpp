@@ -40,6 +40,13 @@
 #include <tiffio.h>
 #include <math.h>
 
+const char	*TIFF_TEXTURE					=	"Pixie Texture";
+const char	*TIFF_CYLINDER_ENVIRONMENT		=	"Pixie Environment (cylinder)";
+const char	*TIFF_CUBIC_ENVIRONMENT			=	"Pixie Environment (cubic)";
+const char	*TIFF_SPHERICAL_ENVIRONMENT		=	"Pixie Environment (spherical)";
+const char	*TIFF_SHADOW					=	"Pixie shadow";
+const int	defaultTileSize					=	32;
+
 
 ///////////////////////////////////////////////////////////////////////
 // function				:	tiffErrorHandler
@@ -75,18 +82,27 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 	TIFFSetField(out, TIFFTAG_XRESOLUTION,			1.0f);
 	TIFFSetField(out, TIFFTAG_YRESOLUTION,			1.0f);
 	TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_LZW);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_ADOBE_DEFLATE);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_JPEG);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_PACKBITS);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_THUNDERSCAN);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_PIXARFILM);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_PIXARLOG);
+	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_DEFLATE);
+
+	
 	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL,		(unsigned long) numSamples);
 	TIFFSetField(out, TIFFTAG_TILEWIDTH,			(unsigned long) tileSize);
 	TIFFSetField(out, TIFFTAG_TILELENGTH,			(unsigned long) tileSize);
 
 	if (bitsperpixel == 8) {
 		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT,		SAMPLEFORMAT_UINT);
-		TIFFSetField(out, TIFFTAG_BITSPERSAMPLE,		(unsigned long) (sizeof(unsigned char)*8));
+		TIFFSetField(out, TIFFTAG_BITSPERSAMPLE,	(unsigned long) (sizeof(unsigned char)*8));
 		pixelSize	=	numSamples*sizeof(unsigned char);
 	} else if (bitsperpixel == 16) {
 		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT,		SAMPLEFORMAT_UINT);
-		TIFFSetField(out, TIFFTAG_BITSPERSAMPLE,		(unsigned long) (sizeof(unsigned short)*8));
-		TIFFSetField(out, TIFFTAG_PHOTOMETRIC,			PHOTOMETRIC_MINISBLACK);
+		TIFFSetField(out, TIFFTAG_BITSPERSAMPLE,	(unsigned long) (sizeof(unsigned short)*8));
+		TIFFSetField(out, TIFFTAG_PHOTOMETRIC,		PHOTOMETRIC_MINISBLACK);
 		pixelSize	=	numSamples*sizeof(unsigned short);
 	} else {
 		TIFFSetField(out, TIFFTAG_SAMPLEFORMAT,		SAMPLEFORMAT_IEEEFP);
@@ -130,7 +146,7 @@ template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSample
 	float	*fnextLevel;
 
 	// Append the base layer
-	appendLayer(out,dstart,numSamples,bitsperpixel,tileSize,width,height,data);
+	appendLayer(out,dstart++,numSamples,bitsperpixel,tileSize,width,height,data);
 
 	// Append the remaining layers
 	currentWidth	=	width;
@@ -139,7 +155,10 @@ template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSample
 
 	fnextLevel		=	(float *)	ralloc(width*height*numSamples*sizeof(float),CRenderer::globalMemory);
 
-	while((currentWidth > 2) && (currentHeight > 2)) {
+	int numLevels	=	tiffNumLevels(width,height);
+	int	i;
+
+	for (i=1;i<numLevels;i++) {
 		int			x,y,yo;
 		int			s;
 
@@ -224,7 +243,7 @@ void	*readLayer(TIFF *in,int *width,int *height,int *bitsperpixel,int *numSample
 		pixelSize	=	0;
 	}
 
-	data		=	(unsigned char *) ralloc(pixelSize*w*h,CRenderer::globalMemory);
+	data =	(unsigned char *) ralloc(pixelSize*w*h,CRenderer::globalMemory);
 
 	for (i=0;i<(int) h;i++) {
 		TIFFReadScanline(in,&data[i*pixelSize*w],i,0);
@@ -461,7 +480,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	32;
+			int				tileSize		=	defaultTileSize;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -478,7 +497,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 			if (output != NULL) {
 				int	dstart	=	0;
 
-				sprintf(modes,"%s %s",smode,tmode);
+				sprintf(modes,"%s,%s",smode,tmode);
 
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_TEXTURE);
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	width);
@@ -524,23 +543,28 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	32;
+			int				tileSize		=	defaultTileSize;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
 			matrix			worldToCamera,worldToScreen;
+			float			*tmp;
 
 			memBegin(CRenderer::globalMemory);
 
 			// Read off the from world transformation from the image if possible
-			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	worldToCamera) == FALSE) {
+			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	&tmp) == FALSE) {
 				error(CODE_BUG,"Unable to read the world to camera matrix.\n");
 				identitym(worldToCamera);
+			} else {
+				movmm(worldToCamera,tmp);
 			}
 
-			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	worldToScreen) == FALSE) {
+			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	&tmp) == FALSE) {
 				error(CODE_BUG,"Unable to read the world to screen matrix.\n");
 				identitym(worldToScreen);
+			} else {
+				movmm(worldToScreen,tmp);
 			}
 
 
@@ -608,7 +632,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 			int				numSamples;
 			int				bitspersample;
 			int				i;
-			int				tileSize		=	32;
+			int				tileSize		=	defaultTileSize;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -682,7 +706,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	32;
+			int				tileSize		=	defaultTileSize;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -740,7 +764,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	32;
+			int				tileSize		=	defaultTileSize;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;

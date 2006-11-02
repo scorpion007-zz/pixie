@@ -297,6 +297,9 @@ COptions	*CRendererContext::getOptions() {
 // Date last edited		:	8/25/2002
 CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,char **params,void **vals) {
 	CShaderInstance	*cInstance	=	NULL;
+
+	if (strcmp(name,"null") == 0)	return	NULL;
+
 	CShader			*cShader	=	CRenderer::getShader(name,currentOptions->shaderPath);
 
 	if (cShader != NULL) {

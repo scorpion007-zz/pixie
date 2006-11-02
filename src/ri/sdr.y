@@ -2097,7 +2097,9 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 	slparse();
 
 	if (currentData.numErrors != 0) {
+		sl_delete_buffer( YY_CURRENT_BUFFER );
 		fclose(fin);
+		sl_switch_to_buffer( oldState );
 		return NULL;
 	}
 

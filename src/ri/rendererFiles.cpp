@@ -495,8 +495,6 @@ CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 	CShader			*cShader;
 	CFileResource	*file;
 
-	if (strcmp(name,"null") == 0)				return	NULL;
-
 	if (strcmp(name,RI_DEFAULTSURFACE) == 0)	name	=	RI_MATTE;
 
 	// Check if we already loaded this shader before ...
