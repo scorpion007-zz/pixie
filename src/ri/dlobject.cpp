@@ -85,20 +85,20 @@ CDLObject::~CDLObject() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/7/2003
-int						CDLObject::intersect(CRay *ray) {
+void					CDLObject::intersect(CRay *ray,int &) {
 	vector	oN;
 	float	t;
 
 	// Should we intersect ?
-	if (! (ray->flags & attributes->flags) )	return FALSE;
+	if (! (ray->flags & attributes->flags) )	return;
 	
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = attributes->lodImportance;
 		if (ray->jimp < 0) ray->jimp = urand();
 		if (importance >= 0) {
-			if (ray->jimp > importance)			return FALSE;
+			if (ray->jimp > importance)			return;
 		} else {
-			if ((1-ray->jimp) >= -importance)	return FALSE;
+			if ((1-ray->jimp) >= -importance)	return;
 		}
 	}
 	
@@ -139,8 +139,6 @@ int						CDLObject::intersect(CRay *ray) {
 		ray->u		=	0;
 		ray->v		=	0;
 	}
-	
-	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////

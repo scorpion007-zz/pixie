@@ -69,7 +69,7 @@ public:
 	void					tesselate(CShadingContext *);
 	void					dice(CShadingContext *);
 	int						intersect(const float *,const float *) const;
-	int						intersect(CRay *);
+	void					intersect(CRay *,int &);
 	void					bound(float *,float *) const;
 	int						moving() const													{	return FALSE;		}
 	void					copy(CAttributes *,CXform *,CRendererContext *) const;
@@ -79,11 +79,38 @@ public:
 	void					*data;
 	int						*dataRefCount;
 
+	int						processed;
+
 	vector					bmin,bmax;					// Bound in the object space
 	vector					cbmin,cbmax;				// Bound in the camera space
 
 };
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDelayedInstance
+// Description			:	Contains an instance object
+// Comments				:
+// Date last edited		:	8/10/2001
+class	CDelayedInstance : public CSurface , public CTracable {
+public:
+							CDelayedInstance(CAttributes *,CXform *,CArray<CObject *> *);
+							~CDelayedInstance();
+
+	void					tesselate(CShadingContext *);
+	void					dice(CShadingContext *);
+	int						intersect(const float *,const float *) const;
+	void					intersect(CRay *,int &);
+	void					bound(float *,float *) const;
+	int						moving() const													{	return FALSE;		}
+	void					copy(CAttributes *,CXform *,CRendererContext *) const;
+
+	CArray<CObject *>		*instance;
+	int						processed;
+
+	vector					bmin,bmax;					// Bound in the object space
+	vector					cbmin,cbmax;				// Bound in the camera space
+
+};
 #endif
 
 

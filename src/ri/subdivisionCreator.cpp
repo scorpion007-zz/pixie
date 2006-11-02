@@ -45,6 +45,11 @@
 #include "error.h"
 #include "pl.h"
 
+const	float			bsplineBasis[16]		=	 {
+	(float) (-1.0/6.0),	(float) (3.0/6.0),	(float) (-3.0/6.0),	(float)  (1.0/6.0),
+	(float) (3.0/6.0),	(float) -(6.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0),
+	(float) (-3.0/6.0),	(float) (0.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0),
+	(float) (1.0/6.0),	(float) (4.0/6.0),	(float) (1.0/6.0),	(float)  (0.0/6.0)};
 
 
 #undef new
@@ -612,7 +617,7 @@ public:
 									gatherData(16,v,va,uniformIndex,vertex,parameters);
 
 									// Create the primitive
-									objects->push(new CBicubicPatch(currentAttributes,currentXform,vd,parameters,0,0,1,1,vertex));
+									objects->push(new CBicubicPatch(currentAttributes,currentXform,vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis));
 								}
 							} else {
 								// Damn, we're a funny patch, deal with it

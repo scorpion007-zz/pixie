@@ -661,17 +661,6 @@ void	CShadingContext::drawObject(CObject *cObject,const float *,const float *) {
 	// This function must be overriden
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	retraceRay
-// Description			:	Retrace a ray
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/9/2002
-void	CShadingContext::retraceRay(CRay *cRay) {
-	hierarchy->intersect(cRay);
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext

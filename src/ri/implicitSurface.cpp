@@ -108,7 +108,7 @@ CImplicit::~CImplicit() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/7/2003
-int					CImplicit::intersect(CRay *ray) {
+void				CImplicit::intersect(CRay *ray,int &) {
 	float	tmin,tmax;
 	vector	lastP,P;
 	float	lastF,F;
@@ -117,21 +117,21 @@ int					CImplicit::intersect(CRay *ray) {
 	double	lastT,t,dt;
 
 	// Do the freaking ray martching
-	if (! (ray->flags & attributes->flags) )	return FALSE;
+	if (! (ray->flags & attributes->flags) )	return;
 	
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		float importance = attributes->lodImportance;
 		if (ray->jimp < 0) ray->jimp = urand();
 		if (importance >= 0) {
-			if (ray->jimp > importance)			return FALSE;
+			if (ray->jimp > importance)			return;
 		} else {
-			if ((1-ray->jimp) >= -importance)	return FALSE;
+			if ((1-ray->jimp) >= -importance)	return;
 		}
 	}
 
-	if (handle == NULL)	return FALSE;
+	if (handle == NULL)	return;
 
-	if (dotvv(ray->dir,ray->dir) < 0)	return FALSE;
+	if (dotvv(ray->dir,ray->dir) < 0)	return;
 
 	// Transform to object space
 	if (ray->lastXform != xform) {
@@ -176,7 +176,7 @@ int					CImplicit::intersect(CRay *ray) {
 
 martchLoop:;
 		t			=	lastT + dt;
-		if (t > tmax)	return FALSE;
+		if (t > tmax)	return;
 
 		P[0]		=	(float) (ray->oFrom[0] + ray->oDir[0]*t);
 		P[1]		=	(float) (ray->oFrom[1] + ray->oDir[1]*t);
@@ -203,10 +203,9 @@ martchLoop:;
 			if (evalNormalFunction != NULL) evalNormalFunction(dF,data,P,ray->time);
 			mulmn(ray->N,xform->to,dF);
 			ray->t	=	(float) t;
-			return FALSE;
+			return;
 		}
 	}
-	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -216,7 +216,6 @@ public:
 								// The raytracing functions that can be called after prepareFrame
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
 		void					traceEx(CRayBundle *);									// Trace and maybe shade a bundle of rays. This version increments the shading depth
-		void					retraceRay(CRay *);										// Trace a ray again
 
 								// Surface tesselation
 		void					tesselate2D(CSurface *);								// Tesselate a surface

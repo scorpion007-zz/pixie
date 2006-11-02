@@ -49,7 +49,7 @@ public:
 						~CBilinearPatch();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const												{	return variables->moving;			}
@@ -72,7 +72,7 @@ private:
 // Date last edited		:	6/28/2001
 class	CBicubicPatch : public CSurface {
 public:
-						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *);
+						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *,const float *uBasis=NULL,const float *vBasis=NULL);
 						~CBicubicPatch();
 
 		void			bound(float *,float *) const;
@@ -82,7 +82,7 @@ public:
 		void			interpolate(int,float **) const;
 
 private:
-		void			computeVertexData(double *,const double *,int);
+		void			computeVertexData(double *,const double *,int,const float *,const float *);
 
 		CVertexData		*variables;
 		CParameter		*parameters;

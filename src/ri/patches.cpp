@@ -213,17 +213,17 @@ int		CBilinearPatch::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-int		CBilinearPatch::intersect(CRay *cRay) {
+void		CBilinearPatch::intersect(CRay *cRay,int &) {
 
-	if (! (cRay->flags & attributes->flags) )	return FALSE;
+	if (! (cRay->flags & attributes->flags) )	return;
 
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		const float importance = attributes->lodImportance;
 		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
-			if (cRay->jimp > importance)			return FALSE;
+			if (cRay->jimp > importance)			return;
 		} else {
-			if ((1-cRay->jimp) >= -importance)		return FALSE;
+			if ((1-cRay->jimp) >= -importance)		return;
 		}
 	}
 
@@ -337,7 +337,6 @@ int		CBilinearPatch::intersect(CRay *cRay) {
 			solve();
 			break;
 	}
-	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -546,7 +545,7 @@ void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,double *vertexData) : CSurface(a,x) {
+CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,double *vertexData,const float *uBasis,const float *vBasis) : CSurface(a,x) {
 	const unsigned int vertexSize	=	v->vertexSize;
 
 	stats.numGprims++;
@@ -561,20 +560,23 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 	this->uMult	=	uMult;
 	this->vMult	=	vMult;
 
+	if (uBasis == NULL)	uBasis	=	attributes->uBasis;
+	if (vBasis == NULL)	vBasis	=	attributes->vBasis;
+
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	if (variables->moving) {
 		vertex	=	new double[vertexSize*32];
 
-		computeVertexData(vertex					,vertexData,0);
-		computeVertexData(vertex + vertexSize*16	,vertexData,vertexSize);
+		computeVertexData(vertex					,vertexData,0,uBasis,vBasis);
+		computeVertexData(vertex + vertexSize*16	,vertexData,vertexSize,uBasis,vBasis);
 
 		stats.gprimMemory	+=	vertexSize*32*sizeof(double);
 	} else {
 		vertex	=	new double[vertexSize*16];
 
-		computeVertexData(vertex,vertexData,0);
+		computeVertexData(vertex,vertexData,0,uBasis,vBasis);
 
 		stats.gprimMemory	+=	vertexSize*16*sizeof(double);
 	}
@@ -611,15 +613,20 @@ CBicubicPatch::~CBicubicPatch() {
 // Return Value			:	The new vertex data
 // Comments				:	-
 // Date last edited		:	6/21/2001
-void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,int disp) {
+void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,int disp,const float *uBasis,const float *vBasis) {
 	int					k,l;
-	const float			*vb			=	attributes->uBasis;
-	const float			*ub			=	attributes->vBasis;
 	const int			vertexSize	=	variables->vertexSize;
 	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
 	double				data[16];
-	matrix				ut;
+	double				ut[16];
+	double				ub[16],vb[16];
 
+	// Promote the basis matrices to double
+	for (k=0;k<16;k++) {
+		ub[k]	=	uBasis[k];
+		vb[k]	=	vBasis[k];
+	}
+	
 	transposem(ut,ub);
 
 	// Compute the premultiplied geometry matrix

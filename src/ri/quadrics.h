@@ -52,7 +52,7 @@ public:
 						~CSphere();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
@@ -83,7 +83,7 @@ public:
 						~CDisk();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
@@ -114,7 +114,7 @@ public:
 						~CCone();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
@@ -145,7 +145,7 @@ public:
 						~CParaboloid();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
@@ -176,7 +176,7 @@ public:
 						~CCylinder();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
@@ -206,7 +206,7 @@ public:
 						~CHyperboloid();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
@@ -238,7 +238,7 @@ public:
 						~CToroid();
 
 		int				intersect(const float *,const float *) const;
-		int				intersect(CRay *);
+		void			intersect(CRay *,int &);
 		void			bound(float *,float *) const;
 		void			tesselate(CShadingContext *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}

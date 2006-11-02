@@ -39,6 +39,7 @@
 #include "options.h"
 #include "shader.h"
 #include "object.h"
+#include "delayed.h"
 #include "shadeop.h"
 #include "riInterface.h"
 #include "variable.h"
@@ -288,6 +289,7 @@ public:
 
 																				// Delayed object junk
 	void				processDelayedObject(CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *,CRay *ray = NULL);
+	void				processDelayedInstance(CDelayedInstance *,CRay *ray = NULL);
 
 	void				addObject(CObject *);									// Add an object into the scene
 	void				addInstance(void *);									// Add an instance into the scene

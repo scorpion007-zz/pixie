@@ -1003,12 +1003,33 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 
 	// Update the raytracer
 	renderer->endWorld();
-
-	// If we're raytracing, check the ray against the children objects
-//	if (cRay != NULL) {
-//		renderer->retraceRay(cRay);
-//	}
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRendererContext
+// Method				:	processDelayedObject
+// Description			:	Process a delayed primitive
+//							i.e. : Raytrace it or add it to the graphics state
+// Return Value			:
+// Comments				:
+// Date last edited		:	8/25/2002
+void		CRendererContext::processDelayedInstance(CDelayedInstance *cDelayed,CRay *cRay) {
+
+	// Instantiate the objects
+	CObject		**objects	=	cDelayed->instance->array;
+	int			numObjects	=	cDelayed->instance->numItems;
+	int			i;
+	for (i=0;i<numObjects;i++) {
+		objects[i]->copy(cDelayed->attributes,cDelayed->xform,this);
+	}
+
+	// Remove the delayed primitive from the scene
+	renderer->remove(cDelayed);
+
+	// Update the raytracer
+	renderer->endWorld();
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
@@ -1052,29 +1073,13 @@ void	CRendererContext::addInstance(void *d) {
 	CArray<CObject *>	*cInstance		=	(CArray<CObject *> *) d;
 	CXform				*cXform			=	getXform(FALSE);
 	CAttributes			*cAttributes	=	getAttributes(FALSE);
-	int					i;
-	int					numObjects		=	cInstance->numItems;
-	CObject				**all			=	cInstance->array;
 
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
 		cAttributes	=	NULL;
 	}
 
 	// Instanciate the instance
-	if (objects == NULL) {
-		for (i=0;i<numObjects;i++) {
-			all[i]->copy(cAttributes,cXform,this);
-		}
-	} else {
-		CArray<CObject *>	*nInstance		=	new CArray<CObject *>;
-
-		for (i=0;i<numObjects;i++) {
-			all[i]->attach();
-			nInstance->push(all[i]);
-		}
-
-		objects->push(new CObjectInstance(cAttributes,cXform,nInstance));
-	}
+	addObject(new CDelayedInstance(cAttributes,cXform,cInstance));
 }
 
 
@@ -6126,12 +6131,6 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 		error(CODE_INCAPABLE,"Unknown subdivision scheme (%s).\n",scheme);
 		return;
 	}
-	
-	// save previous attributes so we don't mess with the basis for other primitives
-	attributeBegin();
-	attributes	=	getAttributes(FALSE);
-	
-	RiBasis(RiBSplineBasis,1,RiBSplineBasis,1);
 		
 	// Count the number of faces / vertices
 	for (i=0,j=0;i<nfaces;j+=nvertices[i],i++);
@@ -6169,9 +6168,6 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 
 	// Create the object
 	addObject(new CSubdivMesh(attributes,xform,pl,nfaces,nvertices,vertices,ntags,tags,nargs,intargs,floatargs));
-	
-	// Restore those attributes
-	attributeEnd();
 }
 
 void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]) {
