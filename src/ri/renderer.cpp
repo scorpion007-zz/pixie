@@ -1015,6 +1015,9 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 // Date last edited		:	8/25/2002
 void		CRendererContext::processDelayedInstance(CDelayedInstance *cDelayed,CRay *cRay) {
 
+	// Re-start the world
+	renderer->beginWorld();
+	
 	// Instantiate the objects
 	CObject		**objects	=	cDelayed->instance->array;
 	int			numObjects	=	cDelayed->instance->numItems;
