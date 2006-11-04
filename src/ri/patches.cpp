@@ -650,24 +650,24 @@ void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,in
 		double	tmp1[16],tmp2[16];
 		double	*cVertex	=	vertex;
 
-		mulmmd(tmp1,invBezier,cVertex);
-		mulmmd(tmp2,tmp1,invBezier);
+		mulmm(tmp1,invBezier,cVertex);
+		mulmm(tmp2,tmp1,invBezier);
 		for (k=0;k<16;k++) {
 			if (tmp2[k] < bmin[COMP_X])	bmin[COMP_X]	=	(float) tmp2[k];
 			if (tmp2[k] > bmax[COMP_X])	bmax[COMP_X]	=	(float) tmp2[k];
 		}
 
 		cVertex	+=	16;
-		mulmmd(tmp1,invBezier,cVertex);
-		mulmmd(tmp2,tmp1,invBezier);
+		mulmm(tmp1,invBezier,cVertex);
+		mulmm(tmp2,tmp1,invBezier);
 		for (k=0;k<16;k++) {
 			if (tmp2[k] < bmin[COMP_Y])	bmin[COMP_Y]	=	(float) tmp2[k];
 			if (tmp2[k] > bmax[COMP_Y])	bmax[COMP_Y]	=	(float) tmp2[k];
 		}
 
 		cVertex	+=	16;
-		mulmmd(tmp1,invBezier,cVertex);
-		mulmmd(tmp2,tmp1,invBezier);
+		mulmm(tmp1,invBezier,cVertex);
+		mulmm(tmp2,tmp1,invBezier);
 		for (k=0;k<16;k++) {
 			if (tmp2[k] < bmin[COMP_Z])	bmin[COMP_Z]	=	(float) tmp2[k];
 			if (tmp2[k] > bmax[COMP_Z])	bmax[COMP_Z]	=	(float) tmp2[k];

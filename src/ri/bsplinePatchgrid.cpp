@@ -47,6 +47,8 @@
 CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,float uOrg,float vOrg,float uMult,float vMult,double *ve) : CSurface(a,x) {
 	int				numVertices;
 	const int		vertexSize	=	var->vertexSize;
+	double			geometryU[16],geometryV[16];
+
 
 	stats.numGprims++;
 	stats.gprimMemory	+=	sizeof(CBSplinePatchGrid);
@@ -66,7 +68,7 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 	numVertices	=	(nu*nv);
 	
 	int				i,j,k;
-	matrix			ut,bsplinebasis;
+	double			ut[16],bsplinebasis[16];
 	double			tmp[16];
 
 	const int 		upatches	=	uVertices - 3;
@@ -81,8 +83,8 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 		for (j=0;j<4;j++)
 			bsplinebasis[element(i,j)]	=	RiBSplineBasis[j][i];
 	transposem(ut,bsplinebasis);
-	mulmmd(geometryV,invBezier,ut);
-	mulmmd(geometryU,bsplinebasis,invBezier);
+	mulmm(geometryV,invBezier,ut);
+	mulmm(geometryU,bsplinebasis,invBezier);
 	
 	// alloc off upatches*vpatches*16*vertexSize worth of data
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
@@ -112,8 +114,8 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 			
 			// precompute B*G*B' and stash it
 			for	(k=0;k<vertexSize;k++) {
-				mulmmd(tmp,ut,patchData);
-				mulmmd(patchData,tmp,bsplinebasis);
+				mulmm(tmp,ut,patchData);
+				mulmm(patchData,tmp,bsplinebasis);
 				patchData += 16;
 			}
 
@@ -138,8 +140,8 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 
 				// precompute B*G*B' and stash it
 				for	(k=0;k<vertexSize;k++) {
-					mulmmd(tmp,ut,patchData);
-					mulmmd(patchData,tmp,bsplinebasis);
+					mulmm(tmp,ut,patchData);
+					mulmm(patchData,tmp,bsplinebasis);
 					patchData += 16;
 				}
 			}

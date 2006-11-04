@@ -61,44 +61,49 @@ class	CSVertex;
 class	CSEdge;
 class	CSFace;
 
-// Some static variables that are set in the split function of CSFace
-static	int				vertexSize			=	0;					// The size of a vertex variable
-static	int				varyingSize			=	0;					// The size of a varying variable
-static	int				facevaryingSize		=	0;					// The size of a facevarying variable
-static	float			*vertexData			=	NULL;				// The array of vertices
-static	float			*varyingData		=	NULL;				// The array of varyings
-static	float			*facevaryingData	=	NULL;				// The array of facevaryings
+// This class some transient data we use during the tesselation of the subdivision surface
+class CSubdivData {
+public:
+	int				vertexSize;					// The size of a vertex variable
+	int				varyingSize;				// The size of a varying variable
+	int				facevaryingSize;			// The size of a facevarying variable
+	float			*vertexData;				// The array of vertices
+	float			*varyingData;				// The array of varyings
+	float			*facevaryingData;			// The array of facevaryings
 
-static	int				irregularDepth		=	5;					// The depth of subdivision in the case of the creases / etc.
-static	CSVertex		**irregularVertices	=	NULL;				// The array of irregular vertices
-static	CSVertex		**irregularRing		=	NULL;				// The ring of irregular vertices about the extraordinary vert
-static	CVertexData		*vd					=	0;
-static	CAttributes		*currentAttributes	=	NULL;
-static	CXform			*currentXform		=	NULL;
-static	int				currentFlags		=	0;
-static	CPl				*parameterList		=	NULL;
+	int				irregularDepth;				// The depth of subdivision in the case of the creases / etc.
+	CSVertex		**irregularVertices;		// The array of irregular vertices
+	CSVertex		**irregularRing;			// The ring of irregular vertices about the extraordinary vert
+	CVertexData		*vd;
+	CAttributes		*currentAttributes;
+	CXform			*currentXform;
+	int				currentFlags;
+	CPl				*parameterList;
+};
+
+
 
 
 // Some misc functions for computing the vertex / varying coordinates
-void	accumVertex(double *dest,const double *src,double mul = 1) {
-	for (int i=0;i<vertexSize;i++) {
+inline void	accumVertex(CSubdivData &data,double *dest,const double *src,double mul = 1) {
+	for (int i=0;i<data.vertexSize;i++) {
 		dest[i]	+=	src[i]*mul;
 	}
 }
 
-void	scaleVertex(double *dest,double mul = 1) {
-	for (int i=0;i<vertexSize;i++) {
+inline void	scaleVertex(CSubdivData &data,double *dest,double mul = 1) {
+	for (int i=0;i<data.vertexSize;i++) {
 		dest[i]	*=	mul;
 	}
 }
 
-void	initVertex(double *dest) {
-	for (int i=0;i<vertexSize;i++) {
+inline void	initVertex(CSubdivData &data,double *dest) {
+	for (int i=0;i<data.vertexSize;i++) {
 		dest[i]	=	0;
 	}
 }
 
-static void	gatherData(int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,double *&vertex,CParameter *&parameters);
+static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,double *&vertex,CParameter *&parameters);
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -137,7 +142,7 @@ public:
 					// Return Value			:	-
 					// Comments				:
 					// Date last edited		:	5/28/2003
-					CSVertex() {
+					CSVertex(CSubdivData &d) : data(d) {
 						faces			=	NULL;
 						edges			=	NULL;
 						valence			=	0;
@@ -152,6 +157,7 @@ public:
 						sharpness		=	0;
 					}
 
+	CSubdivData		&data;
 	CVertexFace		*faces;							// Incident faces
 	CVertexEdge		*edges;							// Incident edges
 	int				valence;						// Edge valence
@@ -177,7 +183,7 @@ public:
 					// Date last edited		:	10/12/2002
 	void			split() {
 						if (childVertex == NULL) {
-							childVertex					=	new CSVertex;
+							childVertex					=	new CSVertex(data);
 							childVertex->parentv		=	this;
 							childVertex->sharpness		=	max(sharpness-1,0);
 						}
@@ -245,7 +251,7 @@ public:
 					// Return Value			:	-
 					// Comments				:
 					// Date last edited		:	5/28/2003
-					CSEdge() {
+					CSEdge(CSubdivData &d) : data(d) {
 						vertices[0]	=	NULL;
 						vertices[1]	=	NULL;
 						faces[0]	=	NULL;
@@ -257,6 +263,7 @@ public:
 					}
 
 
+	CSubdivData		&data;
 	CSVertex		*vertices[2];					// Incident vertices
 	CSFace			*faces[2];						// Incident faces
 	float			sharpness;						// Edge sharpness
@@ -279,9 +286,9 @@ public:
 							vertices[0]->split();
 							vertices[1]->split();
 
-							children[0]					=	new CSEdge;
-							children[1]					=	new CSEdge;
-							childVertex					=	new CSVertex;
+							children[0]					=	new CSEdge(data);
+							children[1]					=	new CSEdge(data);
+							childVertex					=	new CSVertex(data);
 							
 							childVertex->parente		=	this;
 
@@ -338,7 +345,7 @@ public:
 					// Return Value			:	-
 					// Comments				:
 					// Date last edited		:	5/28/2003
-					CSFace() {
+					CSFace(CSubdivData &d) : data(d) {
 						numEdges		=	0;
 						edges			=	NULL;
 						vertices		=	NULL;
@@ -348,6 +355,7 @@ public:
 						hole			=	FALSE;
 					}
 
+	CSubdivData		&data;
 	int				numEdges;
 	CSEdge			**edges;
 	CSVertex		**vertices;
@@ -373,7 +381,7 @@ public:
 							CSEdge		**newEdges	=	(CSEdge **) alloca(numEdges*sizeof(CSEdge *));
 
 							children				=	(CSFace **) ralloc(numEdges*sizeof(CSFace *));
-							childVertex				=	new CSVertex;
+							childVertex				=	new CSVertex(data);
 							childVertex->parentf	=	this;
 
 							// Make sure the incident edges are split
@@ -383,8 +391,8 @@ public:
 
 							// Create the edges connected to the center
 							for (i=0;i<numEdges;i++) {
-								CSFace	*cFace		=	new CSFace;
-								CSEdge	*cEdge		=	new CSEdge;
+								CSFace	*cFace		=	new CSFace(data);
+								CSEdge	*cEdge		=	new CSEdge(data);
 
 								cFace->uniformIndex	=	uniformIndex;
 								cFace->numEdges		=	4;
@@ -464,9 +472,9 @@ public:
 					// Comments				:
 					// Date last edited		:	5/28/2003
 	void			create(CArray<CObject *> *objects) {
-						int	split		=	FALSE;
-						int	funny		=	FALSE;
-						int funnyBorder	=	FALSE;
+						int	split				=	FALSE;
+						int	funny				=	FALSE;
+						int funnyBorder			=	FALSE;
 						int	i,j;
 						int	numExtraordinary	=	0;
 						int	extraordinary		=	0;
@@ -488,7 +496,7 @@ public:
 								}
 	
 								if (vertices[i]->valence != vertices[i]->fvalence) {
-									if (!(currentFlags & FACE_INTEPOLATEBOUNDARY)) {
+									if (!(data.currentFlags & FACE_INTEPOLATEBOUNDARY)) {
 										// We're a face adjacent to a boundary and the interpolate boundary flag is not set
 										return;
 									} else {
@@ -534,12 +542,12 @@ public:
 									CSVertex	**v,*va[4];
 									int			N		=	vertices[extraordinary]->valence;
 									int			K		=	2*N + 8;
-									CSVertex	**ring	=	(CSVertex **) alloca(2*N*sizeof(CSVertex *));	// Holds the ring around the extraordinary vertex
+									CSVertex	**ring	=	(CSVertex **) alloca(2*N*sizeof(CSVertex *));	// Holds the ring around the extraordinary vertex (transient)
 									CSVertex	*ringt[8];
 									double		*vertex;
 									CParameter	*parameters;
 
-									v		=	(CSVertex **) alloca((K+1)*sizeof(CSVertex *));				// Holds the vertices that effect the current patch
+									v		=	(CSVertex **) alloca((K+1)*sizeof(CSVertex *));				// Holds the vertices that effect the current patch (transient)
 
 									// First, deal with the vertices around the extraordinary vertex
 									vertices[(extraordinary + 0) & 3]->sort(ring,edges[(extraordinary + 0) & 3],this,2*N);
@@ -571,10 +579,10 @@ public:
 									va[3]		=	v[5];
 
 									// Gather the data
-									gatherData(K,v+1,va,uniformIndex,vertex,parameters);
+									gatherData(data,K,v+1,va,uniformIndex,vertex,parameters);
 
 									// Create the primitive
-									objects->push(new CSubdivision(currentAttributes,currentXform,vd,parameters,N,0.0f,0.0f,1.0f,1.0f,vertex));
+									objects->push(new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,1.0f,1.0f,vertex));
 								} else {
 									// This is an ordinary patch
 									CSVertex	*v[16],*va[4];
@@ -614,30 +622,29 @@ public:
 									va[3]		=	v[2*4+2];
 
 									// Gather the data
-									gatherData(16,v,va,uniformIndex,vertex,parameters);
+									gatherData(data,16,v,va,uniformIndex,vertex,parameters);
 
 									// Create the primitive
-									objects->push(new CBicubicPatch(currentAttributes,currentXform,vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis));
+									objects->push(new CBicubicPatch(data.currentAttributes,data.currentXform,data.vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis));
 								}
 							} else {
 								// Damn, we're a funny patch, deal with it
-
-								int			nv		=	(1 << irregularDepth) + 1;
+								int			nv		=	(1 << data.irregularDepth) + 1;
 								double		*vertex;
 								CSVertex	*va[4];
 								CParameter	*parameters;
 
-								irregularVertices	=	(CSVertex **) alloca(sizeof(CSVertex *)*(nv+2)*(nv+2));
+								data.irregularVertices	=	(CSVertex **) alloca(sizeof(CSVertex *)*(nv+2)*(nv+2));
 								for (i=0;i<(nv+2)*(nv+2);i++) {
-									irregularVertices[i] = NULL;
+									data.irregularVertices[i] = NULL;
 								}
 								
 								if ( (numExtraordinary > 0) && (vertices[(extraordinary+0)&3]->valence >= 3)) {
-									irregularRing	=	(CSVertex **) alloca(sizeof(CSVertex *)*(vertices[(extraordinary+0)&3]->valence*2));
+									data.irregularRing	=	(CSVertex **) alloca(sizeof(CSVertex *)*(vertices[(extraordinary+0)&3]->valence*2));
 								}
 								
 								// Create irregular patch
-								unconditionalSplit(irregularDepth,0,0,vertices[extraordinary]);
+								unconditionalSplit(data.irregularDepth,0,0,vertices[extraordinary]);
 								
 								va[0]	=	vertices[(extraordinary+0)&3];
 								va[1]	=	vertices[(extraordinary+1)&3];
@@ -652,10 +659,10 @@ public:
 									// if only the corner is at the border.  Set these to the nearest point to ensure
 									// gather will succeed (we don't use these points anyway)
 									
-									if (irregularVertices[0*(nv+2)+0] == NULL)				irregularVertices[0*(nv+2)+0]			= irregularVertices[1*(nv+2)+1];
-									if (irregularVertices[0*(nv+2)+(nv+1)] == NULL)			irregularVertices[0*(nv+2)+(nv+1)]		= irregularVertices[1*(nv+2)+(nv)];
-									if (irregularVertices[(nv+1)*(nv+2)+(nv+1)] == NULL)	irregularVertices[(nv+1)*(nv+2)+(nv+1)] = irregularVertices[(nv)*(nv+2)+(nv)];
-									if (irregularVertices[(nv+1)*(nv+2)+0] == NULL)			irregularVertices[(nv+1)*(nv+2)+0]		= irregularVertices[(nv)*(nv+2)+1];
+									if (data.irregularVertices[0*(nv+2)+0] == NULL)				data.irregularVertices[0*(nv+2)+0]				= data.irregularVertices[1*(nv+2)+1];
+									if (data.irregularVertices[0*(nv+2)+(nv+1)] == NULL)		data.irregularVertices[0*(nv+2)+(nv+1)]			= data.irregularVertices[1*(nv+2)+(nv)];
+									if (data.irregularVertices[(nv+1)*(nv+2)+(nv+1)] == NULL)	data.irregularVertices[(nv+1)*(nv+2)+(nv+1)]	= data.irregularVertices[(nv)*(nv+2)+(nv)];
+									if (data.irregularVertices[(nv+1)*(nv+2)+0] == NULL)		data.irregularVertices[(nv+1)*(nv+2)+0]			= data.irregularVertices[(nv)*(nv+2)+1];
 																		
 									// now we gather the grid from neighbors on patches where it exists
 									// pass all available data to the patch grid and flags to indicate which
@@ -665,10 +672,10 @@ public:
 									int bBot = (edges[(extraordinary+2)&3]->faces[0] == NULL) || (edges[(extraordinary+2)&3]->faces[1] == NULL);
 									int bLft = (edges[(extraordinary+3)&3]->faces[0] == NULL) || (edges[(extraordinary+3)&3]->faces[1] == NULL);
 									
-									gatherData((nv+2)*(nv+2),irregularVertices,va,uniformIndex,vertex,parameters);
+									gatherData(data,(nv+2)*(nv+2),data.irregularVertices,va,uniformIndex,vertex,parameters);
 										
 									// Create the primitive
-									objects->push(new CPatchGrid(currentAttributes,currentXform,vd,parameters,nv,nv,bTop,bRgt,bBot,bLft,vertex));
+									objects->push(new CPatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv,nv,bTop,bRgt,bBot,bLft,vertex));
 								} else {
 									if ( (numExtraordinary > 0) && (vertices[(extraordinary+0)&3]->valence >= 3)) {
 										// We're have an extraordinary patch
@@ -684,62 +691,62 @@ public:
 										const float mult			=	1.0f/(nv-1);
 										
 										for (i=0;i<(nv+1);i++) {
-											strip1Vertices[4*i+0] = irregularVertices[(i+1)*(nv+2)+0];
-											strip1Vertices[4*i+1] = irregularVertices[(i+1)*(nv+2)+1];
-											strip1Vertices[4*i+2] = irregularVertices[(i+1)*(nv+2)+2];
-											strip1Vertices[4*i+3] = irregularVertices[(i+1)*(nv+2)+3];
+											strip1Vertices[4*i+0] = data.irregularVertices[(i+1)*(nv+2)+0];
+											strip1Vertices[4*i+1] = data.irregularVertices[(i+1)*(nv+2)+1];
+											strip1Vertices[4*i+2] = data.irregularVertices[(i+1)*(nv+2)+2];
+											strip1Vertices[4*i+3] = data.irregularVertices[(i+1)*(nv+2)+3];
 																						
-											strip2Vertices[0*(nv+1)+i] = irregularVertices[0*(nv+2)+1+i];
-											strip2Vertices[1*(nv+1)+i] = irregularVertices[1*(nv+2)+1+i];
-											strip2Vertices[2*(nv+1)+i] = irregularVertices[2*(nv+2)+1+i];
-											strip2Vertices[3*(nv+1)+i] = irregularVertices[3*(nv+2)+1+i];
+											strip2Vertices[0*(nv+1)+i] = data.irregularVertices[0*(nv+2)+1+i];
+											strip2Vertices[1*(nv+1)+i] = data.irregularVertices[1*(nv+2)+1+i];
+											strip2Vertices[2*(nv+1)+i] = data.irregularVertices[2*(nv+2)+1+i];
+											strip2Vertices[3*(nv+1)+i] = data.irregularVertices[3*(nv+2)+1+i];
 											
 											for (j=0;j<(nv+1);j++) {
-												patchVertices[i*(nv+1)+j] = irregularVertices[(i+1)*(nv+2)+j+1];
+												patchVertices[i*(nv+1)+j] = data.irregularVertices[(i+1)*(nv+2)+j+1];
 											}
 										}
 										
 										// 'left' strip
-										gatherData((nv+1)*(4),strip1Vertices,va,uniformIndex,vertex,parameters);
-										objects->push(new CBSplinePatchGrid(currentAttributes,currentXform,vd,parameters,4,nv+1,0.0f,mult,mult,(nv-2)*mult,vertex));
+										gatherData(data,(nv+1)*(4),strip1Vertices,va,uniformIndex,vertex,parameters);
+										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,4,nv+1,0.0f,mult,mult,(nv-2)*mult,vertex));
 										
 										// 'top' strip
-										gatherData((4)*(nv+1),strip2Vertices,va,uniformIndex,vertex,parameters);
-										objects->push(new CBSplinePatchGrid(currentAttributes,currentXform,vd,parameters,nv+1,4,mult,0.0f,(nv-2)*mult,mult,vertex));
+										gatherData(data,(4)*(nv+1),strip2Vertices,va,uniformIndex,vertex,parameters);
+										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,4,mult,0.0f,(nv-2)*mult,mult,vertex));
 										
 										// main grid
-										gatherData((nv+1)*(nv+1),patchVertices,va,uniformIndex,vertex,parameters);
-										objects->push(new CBSplinePatchGrid(currentAttributes,currentXform,vd,parameters,nv+1,nv+1,mult,mult,(nv-2)*mult,(nv-2)*mult,vertex));
+										gatherData(data,(nv+1)*(nv+1),patchVertices,va,uniformIndex,vertex,parameters);
+										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,nv+1,mult,mult,(nv-2)*mult,(nv-2)*mult,vertex));
 										
 										// extraordinary patch
 										for (i=0;i<(2*N);i++) {
-											v[i + 2]	=	irregularRing[(i + 2*N - 2) % (2*N)];
+											v[i + 2]	=	data.irregularRing[(i + 2*N - 2) % (2*N)];
 										}
 										
-										v[1]		= irregularVertices[1*(nv+2)+1];
+										v[1]		= data.irregularVertices[1*(nv+2)+1];
 										
-										v[2*N+6]	= irregularVertices[2*(nv+2)+3];
-										v[2*N+7]	= irregularVertices[1*(nv+2)+3];
-										v[2*N+8]	= irregularVertices[0*(nv+2)+3];
+										v[2*N+6]	= data.irregularVertices[2*(nv+2)+3];
+										v[2*N+7]	= data.irregularVertices[1*(nv+2)+3];
+										v[2*N+8]	= data.irregularVertices[0*(nv+2)+3];
 										
-										v[2*N+5]	= irregularVertices[3*(nv+2)+0];
-										v[2*N+4]	= irregularVertices[3*(nv+2)+1];
-										v[2*N+3]	= irregularVertices[3*(nv+2)+2];
-										v[2*N+2]	= irregularVertices[3*(nv+2)+3];
+										v[2*N+5]	= data.irregularVertices[3*(nv+2)+0];
+										v[2*N+4]	= data.irregularVertices[3*(nv+2)+1];
+										v[2*N+3]	= data.irregularVertices[3*(nv+2)+2];
+										v[2*N+2]	= data.irregularVertices[3*(nv+2)+3];
 																				
 										// Gather the data
-										gatherData(K,v+1,va,uniformIndex,vertex,parameters);
+										gatherData(data,K,v+1,va,uniformIndex,vertex,parameters);
 																		
 										// Create the primitive
-										objects->push(new CSubdivision(currentAttributes,currentXform,vd,parameters,N,0.0f,0.0f,mult,mult,vertex));
+										objects->push(new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,mult,mult,vertex));
 									} else {
 										// No extraordinary patch, use the a bicubic b-spline patch
 										
 										// Gather the data
-										gatherData((nv+2)*(nv+2),irregularVertices,va,uniformIndex,vertex,parameters);
+										gatherData(data,(nv+2)*(nv+2),data.irregularVertices,va,uniformIndex,vertex,parameters);
 										
 										// Create the primitive
-										objects->push(new CBSplinePatchGrid(currentAttributes,currentXform,vd,parameters,nv+2,nv+2,0.0f,0.0f,1.0f,1.0f,vertex));
+										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+2,nv+2,0.0f,0.0f,1.0f,1.0f,vertex));
 									}
 								}
 							}
@@ -786,15 +793,15 @@ public:
 							for (i=0;i<4;i++) {
 								if (vertices[i] == org) {
 									char l = (x==0);
-									char r = (x==(1 << irregularDepth)-1);
+									char r = (x==(1 << data.irregularDepth)-1);
 									char t = (y==0);
-									char b = (y==(1 << irregularDepth)-1);
+									char b = (y==(1 << data.irregularDepth)-1);
 									char ml=0,mr=0,mt=0,mb=0;
 									
-									irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 1]		=	vertices[(i + 0) & 3];
-									irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 2]		=	vertices[(i + 1) & 3];
-									irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 2]		=	vertices[(i + 2) & 3];
-									irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 1]		=	vertices[(i + 3) & 3];
+									data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 1]		=	vertices[(i + 0) & 3];
+									data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 2]		=	vertices[(i + 1) & 3];
+									data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 2]		=	vertices[(i + 2) & 3];
+									data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 1]		=	vertices[(i + 3) & 3];
 									
 									// If we're not at an edge, the rest is not relevant
 									if (!(l||r||t||b)) break;
@@ -802,32 +809,32 @@ public:
 									// Deal with the edges
 									//  either we fetch vertices from a neighboring face or duplicate the edge
 									if (l) {
-										CSVertex *v1	=	irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 1];
-										CSVertex *v2	= 	irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 1];
+										CSVertex *v1	=	data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 1];
+										CSVertex *v2	= 	data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 1];
 										ml = findEdgeVertices((i+3)&3,(i+3)&3,v1,v2);
-										irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x] = v1;
-										irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x] = v2;
+										data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x] = v1;
+										data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x] = v2;
 									}
 									if (r) {
-										CSVertex *v1	=	irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 2];
-										CSVertex *v2	=	irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 2];
+										CSVertex *v1	=	data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 2];
+										CSVertex *v2	=	data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 2];
 										mr = findEdgeVertices((i+1)&3,(i+2)&3,v1,v2);
-										irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 3] = v1;
-										irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 3] = v2;
+										data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 3] = v1;
+										data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 3] = v2;
 									}
 									if (t) {
-										CSVertex *v1	=	irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 1];
-										CSVertex *v2	=	irregularVertices[(y+1) * ((1 << irregularDepth) + 3) + x + 2];
+										CSVertex *v1	=	data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 1];
+										CSVertex *v2	=	data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 2];
 										mt = findEdgeVertices((i+0)&3,(i+1)&3,v1,v2);
-										irregularVertices[(y) * ((1 << irregularDepth) + 3) + x + 1] = v1;
-										irregularVertices[(y) * ((1 << irregularDepth) + 3) + x + 2] = v2;
+										data.irregularVertices[(y) * ((1 << data.irregularDepth) + 3) + x + 1] = v1;
+										data.irregularVertices[(y) * ((1 << data.irregularDepth) + 3) + x + 2] = v2;
 									}
 									if (b) {
-										CSVertex *v1	=	irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 1];
-										CSVertex *v2	=	irregularVertices[(y+2) * ((1 << irregularDepth) + 3) + x + 2];
+										CSVertex *v1	=	data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 1];
+										CSVertex *v2	=	data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 2];
 										mb = findEdgeVertices((i+2)&3,(i+2)&3,v1,v2);
-										irregularVertices[(y+3) * ((1 << irregularDepth) + 3) + x + 1] = v1;
-										irregularVertices[(y+3) * ((1 << irregularDepth) + 3) + x + 2] = v2;
+										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x + 1] = v1;
+										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x + 2] = v2;
 									}
 									
 									// Deal with the corners
@@ -839,31 +846,31 @@ public:
 									if (l&&t) {
 										if (((vertices[(i+0)&3]->valence != 4) && (vertices[(i+0)&3]->valence >= 3) && (vertices[(i+0)&3]->valence==vertices[(i+0)&3]->fvalence))) {
 											// We're an extraordinary point and not at the border
-											vertices[(i+0)&3]->sort(irregularRing,edges[(i+0)&3],this,2*vertices[(i+0)&3]->valence);
+											vertices[(i+0)&3]->sort(data.irregularRing,edges[(i+0)&3],this,2*vertices[(i+0)&3]->valence);
 										} else {
-											CSVertex *v = irregularVertices[(y+mt) * ((1 << irregularDepth) + 3) + x + ml];
+											CSVertex *v = data.irregularVertices[(y+mt) * ((1 << data.irregularDepth) + 3) + x + ml];
 											if(!findCornerVertex((i+0)&3,(i+0)&3,v))
 												findCornerVertex((i+3)&3,(i+0)&3,v);
-											irregularVertices[(y) * ((1 << irregularDepth) + 3) + x] = v;
+											data.irregularVertices[(y) * ((1 << data.irregularDepth) + 3) + x] = v;
 										}
 									}
 									if (r&&t) {
-										CSVertex *v = irregularVertices[(y+mt) * ((1 << irregularDepth) + 3) + x + 3 - mr];
+										CSVertex *v = data.irregularVertices[(y+mt) * ((1 << data.irregularDepth) + 3) + x + 3 - mr];
 										if(!findCornerVertex((i+1)&3,(i+1)&3,v))
 											findCornerVertex((i+0)&3,(i+1)&3,v);
-										irregularVertices[(y) * ((1 << irregularDepth) + 3) + x + 3] = v;
+										data.irregularVertices[(y) * ((1 << data.irregularDepth) + 3) + x + 3] = v;
 									}
 									if (r&&b) {
-										CSVertex *v = irregularVertices[(y+3-mb) * ((1 << irregularDepth) + 3) + x + 3 - mr];
+										CSVertex *v = data.irregularVertices[(y+3-mb) * ((1 << data.irregularDepth) + 3) + x + 3 - mr];
 										if(!findCornerVertex((i+2)&3,(i+2)&3,v))
 											findCornerVertex((i+1)&3,(i+2)&3,v);
-										irregularVertices[(y+3) * ((1 << irregularDepth) + 3) + x + 3] = v;
+										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x + 3] = v;
 									}
 									if (l&&b) {
-										CSVertex *v = irregularVertices[(y+3-mb) * ((1 << irregularDepth) + 3) + x + ml];
+										CSVertex *v = data.irregularVertices[(y+3-mb) * ((1 << data.irregularDepth) + 3) + x + ml];
 										if(!findCornerVertex((i+3)&3,(i+3)&3,v))
 											findCornerVertex((i+2)&3,(i+3)&3,v);
-										irregularVertices[(y+3) * ((1 << irregularDepth) + 3) + x] = v;
+										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x] = v;
 									}
 									
 									break;
@@ -983,7 +990,7 @@ int		CSVertex::funny() {
 	CVertexEdge	*cEdge;
 
 	if (fvalence != valence) {
-		assert(currentFlags & FACE_INTEPOLATEBOUNDARY);
+		assert(data.currentFlags & FACE_INTEPOLATEBOUNDARY);
 		return TRUE;
 	}
 
@@ -1138,7 +1145,7 @@ int		CSFace::findCornerVertex(int eOrg,int vOrg,CSVertex *&v) {
 void	CSVertex::compute() {
 	assert(vertex == NULL);
 
-	vertex	=	(double *) ralloc(vertexSize*sizeof(double));
+	vertex	=	(double *) ralloc(data.vertexSize*sizeof(double));
 
 	if (parentv != NULL)		parentv->compute(vertex);
 	else if (parente != NULL)	parente->compute(vertex);
@@ -1164,7 +1171,7 @@ void	CSVertex::compute(double *vertex) {
 
 	if (this->vertex == NULL)	compute();
 
-	tvertex			=	(double *) alloca(vertexSize*sizeof(double));
+	tvertex			=	(double *) alloca(data.vertexSize*sizeof(double));
 	
 	for (numSharp=0,sharpness=0,cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 		if (cEdge->edge->sharpness > 0) {
@@ -1174,16 +1181,16 @@ void	CSVertex::compute(double *vertex) {
 	}
 	
 	if ((numSharp > 2) || (valence == 2)) {	// We're a corner vertex
-		memcpy(vertex,this->vertex,vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
 	} else {											// We're not a corner vertex
-		double	*sharpVertex	=	(double *) alloca(vertexSize*sizeof(double));
-		double	*smoothVertex	=	(double *) alloca(vertexSize*sizeof(double));
+		double	*sharpVertex	=	(double *) alloca(data.vertexSize*sizeof(double));
+		double	*smoothVertex	=	(double *) alloca(data.vertexSize*sizeof(double));
 
 		sharpness	/=	(double) numSharp;
 
 		// Compute the smooth rule
-		initVertex(smoothVertex);
-		initVertex(sharpVertex);
+		initVertex(data,smoothVertex);
+		initVertex(data,sharpVertex);
 
 		for (cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 			CSVertex	*oVertex;
@@ -1196,47 +1203,47 @@ void	CSVertex::compute(double *vertex) {
 
 			if (oVertex->vertex == NULL)	oVertex->compute();
 
-			accumVertex(smoothVertex,oVertex->vertex);
+			accumVertex(data,smoothVertex,oVertex->vertex);
 
 			if (cEdge->edge->sharpness > 0) {
-				accumVertex(sharpVertex,oVertex->vertex);
+				accumVertex(data,sharpVertex,oVertex->vertex);
 			}
 		}
 
 		for (cFace=faces;cFace!=NULL;cFace=cFace->next) {
 			cFace->face->compute(tvertex);
-			accumVertex(smoothVertex,tvertex);
+			accumVertex(data,smoothVertex,tvertex);
 		}
 
-		scaleVertex(smoothVertex, 1 / (double) (valence*valence));
-		accumVertex(smoothVertex,this->vertex,(valence - 2) / (double) valence);
+		scaleVertex(data,smoothVertex, 1 / (double) (valence*valence));
+		accumVertex(data,smoothVertex,this->vertex,(valence - 2) / (double) valence);
 
-		scaleVertex(sharpVertex, 1.0 / 8.0);
-		accumVertex(sharpVertex,this->vertex,6.0 / 8.0);
+		scaleVertex(data,sharpVertex, 1.0 / 8.0);
+		accumVertex(data,sharpVertex,this->vertex,6.0 / 8.0);
 
 		if (numSharp == 2) {
 			// We're a crease vertex
 			if (sharpness >= 1) {
-				memcpy(vertex,sharpVertex,vertexSize*sizeof(double));
+				memcpy(vertex,sharpVertex,data.vertexSize*sizeof(double));
 			} else if (sharpness <= 0) {
-				memcpy(vertex,smoothVertex,vertexSize*sizeof(double));
+				memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
 			} else {
-				initVertex(vertex);
-				accumVertex(vertex,smoothVertex,1-sharpness);
-				accumVertex(vertex,sharpVertex,sharpness);
+				initVertex(data,vertex);
+				accumVertex(data,vertex,smoothVertex,1-sharpness);
+				accumVertex(data,vertex,sharpVertex,sharpness);
 			}
 		} else {
 			// We're a dart or a non-crease vertex
-			memcpy(vertex,smoothVertex,vertexSize*sizeof(double));
+			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
 		}
 	}
 	
 	if (this->sharpness >= 1) {			// sharp corner rule
-		memcpy(vertex,this->vertex,vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
 	}
 	else if (this->sharpness > 0) {		// smooth corner rule
-		scaleVertex(vertex,1 - this->sharpness);
-		accumVertex(vertex,this->vertex,this->sharpness);
+		scaleVertex(data,vertex,1 - this->sharpness);
+		accumVertex(data,vertex,this->vertex,this->sharpness);
 	}
 }
 
@@ -1254,11 +1261,11 @@ void	CSVertex::computeVarying(float *varying,float *facevarying) {
 	else if (parentf != NULL)	parentf->computeVarying(varying,facevarying);
 	else {
 		if (this->varying != NULL) {
-			memcpy(varying,this->varying,sizeof(float)*varyingSize);
+			memcpy(varying,this->varying,sizeof(float)*data.varyingSize);
 		}
 
 		if (this->facevarying != NULL) {
-			memcpy(facevarying,this->facevarying,sizeof(float)*facevaryingSize);
+			memcpy(facevarying,this->facevarying,sizeof(float)*data.facevaryingSize);
 		}
 	}
 }
@@ -1279,7 +1286,7 @@ void	CSVertex::computeLimit(double *vertex) {
 
 	if (this->vertex == NULL)	compute();
 
-	tvertex			=	(double *) alloca(vertexSize*sizeof(double));
+	tvertex			=	(double *) alloca(data.vertexSize*sizeof(double));
 
 	for (numSharp=0,sharpness=0,cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 		if (cEdge->edge->sharpness > 0) {
@@ -1289,58 +1296,58 @@ void	CSVertex::computeLimit(double *vertex) {
 	}
 
 	if ((numSharp > 2) || (valence == 2)) {	// We're a corner vertex
-		memcpy(vertex,this->vertex,vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
 	} else {											// We're not a corner vertex
-		double	*sharpVertex	=	(double *) alloca(vertexSize*sizeof(double));
-		double	*smoothVertex	=	(double *) alloca(vertexSize*sizeof(double));
+		double	*sharpVertex	=	(double *) alloca(data.vertexSize*sizeof(double));
+		double	*smoothVertex	=	(double *) alloca(data.vertexSize*sizeof(double));
 
 		sharpness	/=	(double) numSharp;
 
 		// Compute the smooth rule
-		initVertex(smoothVertex);
-		initVertex(sharpVertex);
+		initVertex(data,smoothVertex);
+		initVertex(data,sharpVertex);
 
 		for (cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
-			accumVertex(smoothVertex,tvertex,4);
+			accumVertex(data,smoothVertex,tvertex,4);
 
 			if (cEdge->edge->sharpness > 0) {
-				accumVertex(sharpVertex,tvertex);
+				accumVertex(data,sharpVertex,tvertex);
 			}
 		}
 
 		for (cFace=faces;cFace!=NULL;cFace=cFace->next) {
-			accumVertex(smoothVertex,tvertex);
+			accumVertex(data,smoothVertex,tvertex);
 		}
 
-		accumVertex(smoothVertex,this->vertex,(double) (valence*valence));
-		scaleVertex(smoothVertex, 1 / (double) (valence*(valence+5)));
+		accumVertex(data,smoothVertex,this->vertex,(double) (valence*valence));
+		scaleVertex(data,smoothVertex, 1 / (double) (valence*(valence+5)));
 
-		scaleVertex(sharpVertex, 1.0 / 4.0);
-		accumVertex(sharpVertex,this->vertex,1.0 / 2.0);
+		scaleVertex(data,sharpVertex, 1.0 / 4.0);
+		accumVertex(data,sharpVertex,this->vertex,1.0 / 2.0);
 
 		if (numSharp == 2) {
 			// We're a crease vertex
 			if (sharpness >= 1) {
-				memcpy(vertex,sharpVertex,vertexSize*sizeof(double));
+				memcpy(vertex,sharpVertex,data.vertexSize*sizeof(double));
 			} else if (sharpness <= 0) {
-				memcpy(vertex,smoothVertex,vertexSize*sizeof(double));
+				memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
 			} else {
-				initVertex(vertex);
-				accumVertex(vertex,smoothVertex,1-sharpness);
-				accumVertex(vertex,sharpVertex,sharpness);
+				initVertex(data,vertex);
+				accumVertex(data,vertex,smoothVertex,1-sharpness);
+				accumVertex(data,vertex,sharpVertex,sharpness);
 			}
 		} else {
 			// We're a dart or a non-crease vertex
-			memcpy(vertex,smoothVertex,vertexSize*sizeof(double));
+			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
 		}
 	}
 	
 	if (this->sharpness >= 1) {			// sharp corner rule
-		memcpy(vertex,this->vertex,vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
 	}
 	else if (this->sharpness > 0) {		// smooth corner rule
-		scaleVertex(vertex,1 - this->sharpness);
-		accumVertex(vertex,this->vertex,this->sharpness);
+		scaleVertex(data,vertex,1 - this->sharpness);
+		accumVertex(data,vertex,this->vertex,this->sharpness);
 	}
 }
 
@@ -1355,35 +1362,35 @@ void	CSEdge::compute(double *vertex) {
 	double	*tvertex;
 	double	*smoothVertex,*sharpVertex;
 
-	smoothVertex	=	(double *) alloca(vertexSize*sizeof(double));
-	sharpVertex		=	(double *) alloca(vertexSize*sizeof(double));
-	tvertex			=	(double *) alloca(vertexSize*sizeof(double));
+	smoothVertex	=	(double *) alloca(data.vertexSize*sizeof(double));
+	sharpVertex		=	(double *) alloca(data.vertexSize*sizeof(double));
+	tvertex			=	(double *) alloca(data.vertexSize*sizeof(double));
 
 	if (vertices[0]->vertex == NULL)	vertices[0]->compute();
 	if (vertices[1]->vertex == NULL)	vertices[1]->compute();
 
 	if ((sharpness > 0) || (faces[1] == NULL)) {	// Have to compute the sharp vertex
-		initVertex(sharpVertex);
-		accumVertex(sharpVertex,vertices[0]->vertex);
-		accumVertex(sharpVertex,vertices[1]->vertex);
-		scaleVertex(sharpVertex,1 / (double) 2);
+		initVertex(data,sharpVertex);
+		accumVertex(data,sharpVertex,vertices[0]->vertex);
+		accumVertex(data,sharpVertex,vertices[1]->vertex);
+		scaleVertex(data,sharpVertex,1 / (double) 2);
 	}
 
 	if ((sharpness < 1) && (faces[1] != NULL)) {	// Have to compute the smooth vertex
 		faces[0]->compute(smoothVertex);
 		faces[1]->compute(tvertex);
-		accumVertex(smoothVertex,tvertex);
-		accumVertex(smoothVertex,vertices[0]->vertex);
-		accumVertex(smoothVertex,vertices[1]->vertex);
-		scaleVertex(smoothVertex,1 / (double) 4);
+		accumVertex(data,smoothVertex,tvertex);
+		accumVertex(data,smoothVertex,vertices[0]->vertex);
+		accumVertex(data,smoothVertex,vertices[1]->vertex);
+		scaleVertex(data,smoothVertex,1 / (double) 4);
 	}
 
-	if ((sharpness >= 1) || (faces[1] == NULL))			memcpy(vertex,sharpVertex,vertexSize*sizeof(double));
-	else if (sharpness <= 0)							memcpy(vertex,smoothVertex,vertexSize*sizeof(double));
+	if ((sharpness >= 1) || (faces[1] == NULL))			memcpy(vertex,sharpVertex,data.vertexSize*sizeof(double));
+	else if (sharpness <= 0)							memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
 	else {
-		initVertex(vertex);
-		accumVertex(vertex,smoothVertex,(1-sharpness));
-		accumVertex(vertex,sharpVertex,sharpness);
+		initVertex(data,vertex);
+		accumVertex(data,vertex,smoothVertex,(1-sharpness));
+		accumVertex(data,vertex,sharpVertex,sharpness);
 	}
 }
 
@@ -1398,17 +1405,17 @@ void	CSEdge::computeVarying(float *varying,float *facevarying) {
 	float	*varying1,*facevarying1;
 	int		i;
 
-	varying1		=	(float *) alloca(sizeof(float)*varyingSize);
-	facevarying1	=	(float *) alloca(sizeof(float)*facevaryingSize);
+	varying1		=	(float *) alloca(sizeof(float)*data.varyingSize);
+	facevarying1	=	(float *) alloca(sizeof(float)*data.facevaryingSize);
 
 	vertices[0]->computeVarying(varying,facevarying);
 	vertices[1]->computeVarying(varying1,facevarying1);
 
-	for (i=0;i<varyingSize;i++) {
+	for (i=0;i<data.varyingSize;i++) {
 		varying[i]	=	(varying[i] + varying1[i]) / (float) 2;
 	}
 
-	for (i=0;i<facevaryingSize;i++) {
+	for (i=0;i<data.facevaryingSize;i++) {
 		facevarying[i]	=	(facevarying[i] + facevarying1[i]) / (float) 2;
 	}
 }
@@ -1423,15 +1430,15 @@ void	CSEdge::computeVarying(float *varying,float *facevarying) {
 void	CSFace::compute(double *vertex) {
 	int	i;
 
-	initVertex(vertex);
+	initVertex(data,vertex);
 
 	for (i=0;i<numEdges;i++) {
 		if (vertices[i]->vertex == NULL)	vertices[i]->compute();
 
-		accumVertex(vertex,vertices[i]->vertex);
+		accumVertex(data,vertex,vertices[i]->vertex);
 	}
 
-	scaleVertex(vertex,1 / (double) numEdges);
+	scaleVertex(data,vertex,1 / (double) numEdges);
 }
 
 
@@ -1448,34 +1455,34 @@ void	CSFace::computeVarying(float *varying,float *facevarying) {
 	int			i,j;
 	const float	scale	=	1 / (float) numEdges;
 
-	varying1		=	(float *) alloca(sizeof(float)*varyingSize);
-	facevarying1	=	(float *) alloca(sizeof(float)*facevaryingSize);
+	varying1		=	(float *) alloca(sizeof(float)*data.varyingSize);
+	facevarying1	=	(float *) alloca(sizeof(float)*data.facevaryingSize);
 
-	for (i=0;i<varyingSize;i++) {
+	for (i=0;i<data.varyingSize;i++) {
 		varying[i]	=	0;
 	}
 
-	for (i=0;i<facevaryingSize;i++) {
+	for (i=0;i<data.facevaryingSize;i++) {
 		facevarying[i]	=	0;
 	}
 
 	for (j=0;j<numEdges;j++) {
 		vertices[j]->computeVarying(varying1,facevarying1);
 
-		for (i=0;i<varyingSize;i++) {
+		for (i=0;i<data.varyingSize;i++) {
 			varying[i]	+=	varying1[i];
 		}
 
-		for (i=0;i<facevaryingSize;i++) {
+		for (i=0;i<data.facevaryingSize;i++) {
 			facevarying[i]	+=	facevarying1[i];
 		}
 	}
 
-	for (i=0;i<varyingSize;i++) {
+	for (i=0;i<data.varyingSize;i++) {
 		varying[i]	*=	scale;
 	}
 
-	for (i=0;i<facevaryingSize;i++) {
+	for (i=0;i<data.facevaryingSize;i++) {
 		facevarying[i]	*=	scale;
 	}
 }
@@ -1528,37 +1535,37 @@ void	CSFace::computeVarying(float *varying,float *facevarying) {
 
 
 
-static void	gatherData(int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,double *&vertex,CParameter *&parameters) {
+static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,double *&vertex,CParameter *&parameters) {
 	int			i;
 	float		*varyingsT,*facevaryingsT;
 
-	assert(vertexSize > 0);
+	assert(data.vertexSize > 0);
 
-	vertex		=	(double *) ralloc(vertexSize*numVertex*sizeof(double));
+	vertex		=	(double *) ralloc(data.vertexSize*numVertex*sizeof(double));
 
 	for (i=0;i<numVertex;i++) {
 		if (vertices[i]->vertex == NULL)	vertices[i]->compute();
 		
-		memcpy(vertex+i*vertexSize,vertices[i]->vertex,sizeof(double)*vertexSize);
+		memcpy(vertex+i*data.vertexSize,vertices[i]->vertex,sizeof(double)*data.vertexSize);
 	}
 
 
-	varyingsT		=	(float *) alloca(varyingSize*4*sizeof(float));
-	facevaryingsT	=	(float *) alloca(facevaryingSize*4*sizeof(float));
+	varyingsT		=	(float *) alloca(data.varyingSize*4*sizeof(float));
+	facevaryingsT	=	(float *) alloca(data.facevaryingSize*4*sizeof(float));
 
 	for (i=0;i<4;i++) {
-		varyings[i]->computeVarying(varyingsT + i*varyingSize,facevaryingsT + i*facevaryingSize);
+		varyings[i]->computeVarying(varyingsT + i*data.varyingSize,facevaryingsT + i*data.facevaryingSize);
 	}
 
-	parameters		=	parameterList->uniform(uniformNumber,NULL);
-	parameters		=	parameterList->varying(	varyingsT+0*varyingSize,
-												varyingsT+1*varyingSize,
-												varyingsT+2*varyingSize,
-												varyingsT+3*varyingSize,parameters);
-	parameters		=	parameterList->facevarying(	facevaryingsT+0*facevaryingSize,
-													facevaryingsT+1*facevaryingSize,
-													facevaryingsT+2*facevaryingSize,
-													facevaryingsT+3*facevaryingSize,parameters);
+	parameters		=	data.parameterList->uniform(uniformNumber,NULL);
+	parameters		=	data.parameterList->varying(	varyingsT+0*data.varyingSize,
+														varyingsT+1*data.varyingSize,
+														varyingsT+2*data.varyingSize,
+														varyingsT+3*data.varyingSize,parameters);
+	parameters		=	data.parameterList->facevarying(	facevaryingsT+0*data.facevaryingSize,
+															facevaryingsT+1*data.facevaryingSize,
+															facevaryingsT+2*data.facevaryingSize,
+															facevaryingsT+3*data.facevaryingSize,parameters);
 }
 
 
@@ -1778,49 +1785,66 @@ void		CSubdivMesh::create() {
 	float		*cfloatargs;
 	int			*cvertexIndex;
 	const char	*savedActivity	=	stats.activity;
+	CSubdivData	data;
 
-	stats.activity				=	"Subdivision Surface Instantiation";
+	stats.activity			=	"Subdivision Surface Instantiation";
+
+	memBegin();
 
 	// Transform the core
 	pl->transform(xform);
 
-	vd					=	pl->vertexData();
-	currentFlags		=	0;
-	currentAttributes	=	this->attributes;
-	currentXform		=	this->xform;
-	parameterList		=	this->pl;
+	data.vertexSize			=	0;
+	data.varyingSize		=	0;
+	data.facevaryingSize	=	0;
+	data.vertexData			=	NULL;
+	data.varyingData		=	NULL;
+	data.facevaryingData	=	NULL;
 
-	memBegin();
+	data.irregularDepth		=	5;
+	data.irregularVertices	=	NULL;
+	data.irregularRing		=	NULL;
+	data.vd					=	NULL;
+	data.currentAttributes	=	NULL;
+	data.currentXform		=	NULL;
+	data.currentFlags		=	0;
+	data.parameterList		=	NULL;
+
+	data.vd					=	pl->vertexData();
+	data.currentFlags		=	0;
+	data.currentAttributes	=	this->attributes;
+	data.currentXform		=	this->xform;
+	data.parameterList		=	this->pl;
 
 	// Collect the misc data
-	vertexData			=	NULL;	pl->collect(vertexSize,vertexData,CONTAINER_VERTEX);
-	varyingData			=	NULL;	pl->collect(varyingSize,varyingData,CONTAINER_VARYING);
-	facevaryingData		=	NULL;	pl->collect(facevaryingSize,facevaryingData,CONTAINER_FACEVARYING);
+	data.vertexData			=	NULL;			pl->collect(data.vertexSize,data.vertexData,CONTAINER_VERTEX);
+	data.varyingData		=	NULL;			pl->collect(data.varyingSize,data.varyingData,CONTAINER_VARYING);
+	data.facevaryingData	=	NULL;			pl->collect(data.facevaryingSize,data.facevaryingData,CONTAINER_FACEVARYING);
 
-	faces				=	(CSFace **)		ralloc(numFaces*sizeof(CSFace *));
-	vertices			=	(CSVertex **)	ralloc(numVertices*sizeof(CSVertex *));
+	faces					=	(CSFace **)		ralloc(numFaces*sizeof(CSFace *));
+	vertices				=	(CSVertex **)	ralloc(numVertices*sizeof(CSVertex *));
 
 	// Create the vertices and copy the vertex / varying data over
 	for (i=0;i<numVertices;i++)	{
-		const float	*src		=	vertexData + i*vertexSize;
+		const float	*src			=	data.vertexData + i*data.vertexSize;
 		double		*dest;
 		int			k;
 
-		vertices[i]					=	new CSVertex;
-		dest = vertices[i]->vertex	=	(double *) ralloc(vertexSize*sizeof(double));
+		vertices[i]					=	new CSVertex(data);
+		dest = vertices[i]->vertex	=	(double *) ralloc(data.vertexSize*sizeof(double));
 
-		for (k=0;k<vertexSize;k++)	*dest++	=	*src++;
+		for (k=0;k<data.vertexSize;k++)	*dest++	=	*src++;
 	}
 
-	if (varyingData != NULL) {
+	if (data.varyingData != NULL) {
 		for (i=0;i<numVertices;i++) {
-			vertices[i]->varying	=	varyingData + i*varyingSize;
+			vertices[i]->varying	=	data.varyingData + i*data.varyingSize;
 		}
 	}
 
 	// Create the faces
 	for (i=0;i<numFaces;i++) {
-		faces[i]				=	new CSFace;
+		faces[i]				=	new CSFace(data);
 	}
 	
 	// Manage the connectivity
@@ -1841,7 +1865,7 @@ void		CSubdivMesh::create() {
 			CSEdge	*cEdge;
 
 			if ((cEdge = cFace->vertices[j]->edgeExists(cFace->vertices[(j+1) % numEdges])) == NULL) {
-				cEdge				=	new CSEdge;
+				cEdge				=	new CSEdge(data);
 				cEdge->vertices[0]	=	cFace->vertices[j];
 				cEdge->vertices[1]	=	cFace->vertices[(j+1) % numEdges];
 				cEdge->vertices[0]->addEdge(cEdge);
@@ -1878,7 +1902,7 @@ void		CSubdivMesh::create() {
 				}
 			}
 		} else if (strcmp(tags[i],RI_INTERPOLATEBOUNDARY) == 0) {
-			currentFlags	|=	FACE_INTEPOLATEBOUNDARY;
+			data.currentFlags	|=	FACE_INTEPOLATEBOUNDARY;
 		} else if (strcmp(tags[i],RI_CORNER) == 0) {
 			for (j=0;j<cnargs[0];j++) {
 				vertices[cintargs[j]]->sharpness = cfloatargs[j];
@@ -1895,7 +1919,7 @@ void		CSubdivMesh::create() {
 	// Add sharp creases when we've got an interpolateboundary tag
 	// Note: corner in the literature refers to v.valence == 2,
 	// whereas the spec overloads corners as tags to mean sharp vertices
-	if (currentFlags & FACE_INTEPOLATEBOUNDARY) {
+	if (data.currentFlags & FACE_INTEPOLATEBOUNDARY) {
 		for (i=0;i<numFaces;i++) {
 			CSFace	*cFace			=	faces[i];
 			int		numEdges		=	numVerticesPerFace[i];
@@ -1917,7 +1941,7 @@ void		CSubdivMesh::create() {
 
 		// Set the facevarying parameters
 		for (j=0;j<faces[i]->numEdges;j++) {
-			faces[i]->vertices[j]->facevarying	=	facevaryingData + (k+j)*facevaryingSize;
+			faces[i]->vertices[j]->facevarying	=	data.facevaryingData + (k+j)*data.facevaryingSize;
 			
 			// Check for degenerate faces
 			int val = faces[i]->vertices[j]->valence;
