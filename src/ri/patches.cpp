@@ -189,18 +189,7 @@ CBilinearPatch::~CBilinearPatch() {
 // Return Value			:	-
 // Comments				:	-
 // Date last edited		:	6/21/2001
-int		CBilinearPatch::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBilinearPatch
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::intersect(CRay *cRay) {
+void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (! (cRay->flags & attributes->flags) )	return;
 
@@ -325,31 +314,6 @@ void	CBilinearPatch::intersect(CRay *cRay) {
 	}
 
 
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBilinearPatch
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBilinearPatch
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -662,29 +626,6 @@ void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,in
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBicubicPatch
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBicubicPatch
 // Method				:	sample
 // Description			:	See object.h
 // Return Value			:	-
@@ -954,29 +895,6 @@ void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficient
 
 		addBox(bmin,bmax,P);
 	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CNURBSPatch
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CNURBSPatch::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CNURBSPatch
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CNURBSPatch::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1471,6 +1389,9 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		}
 	}
 
+	xform->transformBound(bmin,bmax);
+	makeBound(bmin,bmax);
+
 	children	=	NULL;
 }
 
@@ -1485,30 +1406,8 @@ CPatchMesh::~CPatchMesh() {
 	stats.gprimMemory	-=	sizeof(CPatchMesh);
 
 	delete pl;
-
-	if (children != NULL) {
-		CObject	**objects	=	children->array;
-		int		numObjects	=	children->numItems;
-		int		i;
-
-		for (i=0;i<numObjects;i++)	objects[i]->detach();
-
-		delete children;
-	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	CPatchMesh
-// Description			:	bound
-// Return Value			:	Bound the mesh
-// Comments				:	-
-// Date last edited		:	6/10/2003
-void	CPatchMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CPatchMesh
@@ -1528,48 +1427,18 @@ void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/28/2003
-void	CPatchMesh::tesselate(CShadingContext *context)	{
-	int		i;
-	int		numChildren;
-	CObject	**c;
-
-	if (children == NULL)	create(context);
-
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		c[i]->tesselate(context);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPatchMesh
 // Method				:	dice
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
 void	CPatchMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	int		numChildren;
-	CObject	**c;
 
 	if (children == NULL)	create(rasterizer);
 
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		vector	bmin,bmax;
-
-		c[i]->bound(bmin,bmax);
-		rasterizer->drawObject(c[i],bmin,bmax);
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		rasterizer->drawObject(cObject);
 	}
 }
 
@@ -1589,8 +1458,6 @@ void	CPatchMesh::create(CShadingContext *context) {
 	float			*vertices;
 	int				vertexSize;
 
-
-	children			=	new CArray<CObject *>;
 
 	memBegin(context->threadMemory);
 
@@ -1634,8 +1501,8 @@ void	CPatchMesh::create(CShadingContext *context) {
 				nObject	=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
 
 				nObject->attach();
-
-				children->push(nObject);
+				nObject->sibling	=	children;
+				children			=	nObject;
 			}
 		}
 	} else {
@@ -1673,8 +1540,8 @@ void	CPatchMesh::create(CShadingContext *context) {
 				nObject	=	new CBicubicPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
 
 				nObject->attach();
-
-				children->push(nObject);
+				nObject->sibling	=	children;
+				children			=	nObject;
 			}
 		}
 	}
@@ -1748,6 +1615,9 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 		}
 	}
 
+	xform->transformBound(bmin,bmax);
+	makeBound(bmin,bmax);
+
 	children	=	NULL;
 }
 
@@ -1764,30 +1634,8 @@ CNURBSPatchMesh::~CNURBSPatchMesh() {
 	delete [] uKnots;
 	delete [] vKnots;
 	delete pl;
-
-	if (children != NULL) {
-		CObject	**objects	=	children->array;
-		int		numObjects	=	children->numItems;
-		int		i;
-
-		for (i=0;i<numObjects;i++)	objects[i]->detach();
-
-		delete children;
-	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	CNURBSPatchMesh
-// Description			:	bound
-// Return Value			:	Bound the mesh
-// Comments				:	-
-// Date last edited		:	6/10/2003
-void	CNURBSPatchMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CNURBSPatchMesh
@@ -1807,48 +1655,18 @@ void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatchMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/28/2003
-void	CNURBSPatchMesh::tesselate(CShadingContext *context)	{
-	int		i;
-	int		numChildren;
-	CObject	**c;
-
-	if (children == NULL)	create(context);
-
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		c[i]->tesselate(context);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CNURBSPatchMesh
 // Method				:	dice
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
 void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	int		numChildren;
-	CObject	**c;
 
 	if (children == NULL)	create(rasterizer);
 
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		vector	bmin,bmax;
-
-		c[i]->bound(bmin,bmax);
-		rasterizer->drawObject(c[i],bmin,bmax);
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		rasterizer->drawObject(cObject);
 	}
 }
 
@@ -1872,8 +1690,6 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	float			*vertices;
 	int				vertexSize;
 
-
-	children		=	new CArray<CObject *>;
 
 	uvertices		=	uVertices;
 	vvertices		=	vVertices;
@@ -1912,8 +1728,8 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 				nObject	=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
 
 				nObject->attach();
-
-				children->push(nObject);
+				nObject->sibling	=	children;
+				children			=	nObject;
 			}
 		}
 	}

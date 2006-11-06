@@ -37,7 +37,6 @@
 #include "options.h"
 #include "shader.h"
 #include "cache.h"
-#include "hierarchy.h"
 #include "random.h"
 #include "depository.h"
 
@@ -93,7 +92,7 @@ public:
 
 public:
 
-								CIrradianceCache(const char *,unsigned int,const float *,const float *,CXform *,CHierarchy *,FILE *);
+								CIrradianceCache(const char *,unsigned int,const float *,const float *,CXform *,FILE *);
 								~CIrradianceCache();
 
 		void					lookup(float *,const float *,const float *,const CGlobalIllumLookup *);
@@ -108,8 +107,6 @@ private:
 		void					sample(float *,const float *,const float *,const CGlobalIllumLookup *);
 
 		CMemStack				*memory;
-
-		CHierarchy				*hierarchy;
 
 		CCacheNode				*root;
 		int						maxDepth;

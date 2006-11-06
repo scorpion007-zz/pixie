@@ -46,8 +46,8 @@ public:
 					CSubdivision(CAttributes *,CXform *,CVertexData *,CParameter *,int,float,float,float,float,double *);
 					~CSubdivision();
 
-	void			bound(float *,float *) const;
-	void			tesselate(CShadingContext *);
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
 	int				moving() const												{	return vertexData->moving;			}
 	void			sample(int,int,float **,unsigned int &) const;
 	void			interpolate(int,float **) const;
@@ -57,7 +57,6 @@ public:
 	int				N;				// The valence
 	float			*vertex;		// The vertex data
 	float			uOrg,vOrg,uMult,vMult;
-	vector			bmin,bmax;
 
 private:
 	void			projectVertices(float *,double *,int);

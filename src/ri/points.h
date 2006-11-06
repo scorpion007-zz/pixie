@@ -69,20 +69,22 @@ public:
 						CPoints(CAttributes *,CXform *,CPointBase *,int,const float **);
 						~CPoints();
 
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *)	{	}
+						// Object interface
+		void			intersect(CShadingContext *,CRay *)	{	}
 		void			dice(CShadingContext *);
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+
+						// Surface interface
 		void			sample(int,int,float **,unsigned int &) const;
 		int				moving() const { return (pl != NULL ? (pl->data1 !=NULL) : base->variables->moving);	}
 		void			interpolate(int,float **) const;
-		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
 
 private:
 		void			prep();
 
 		int				numPoints;				// The number of points
 		CPl				*pl;					// The parameter list
-		vector			bmin,bmax;				// The bounding box
 
 												// The variables below will only be ready after prep() is called
 

@@ -342,7 +342,7 @@ void	CPatch::dice(CShadingContext *r) {
 		}
 
 		// Finally record the surface with the rasterizer
-		r->drawObject(this,bmin,bmax);
+		r->drawObject(this);
 	} else {
 		if (udiv == 0) {
 			// We're spanning the eye plane

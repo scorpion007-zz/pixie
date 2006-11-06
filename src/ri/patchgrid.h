@@ -46,8 +46,6 @@ public:
 					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,double *);
 					~CPatchGrid();
 
-	void			bound(float *,float *) const;
-	void			tesselate(CShadingContext *);
 	int				moving() const												{	return variables->moving;			}
 	void			sample(int,int,float **,unsigned int &) const;
 	void			interpolate(int,float **) const;
@@ -57,7 +55,6 @@ public:
 
 	float			*vertex;
 	float			*Pu,*Pv;
-	vector			bmin,bmax;
 	int				nu,nv;			// The number of samples in u and v
 };
 

@@ -62,9 +62,7 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 			data			=	initFunction(frame,bmin,bmax);
 
 			if (data != NULL) {
-				movvv(cameraBmin,bmin);
-				movvv(cameraBmax,bmax);
-				xform->transformBound(cameraBmin,cameraBmax);
+				xform->transformBound(bmin,bmax);
 				stepSize			=	ss;
 			} else {
 				error(CODE_BADFILE,"Implicit %s failed to initialise\n",name);
@@ -109,7 +107,7 @@ CImplicit::~CImplicit() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/7/2003
-void					CImplicit::intersect(CRay *ray) {
+void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
 	float	tmin,tmax;
 	vector	lastP,P;
 	float	lastF,F;
@@ -146,16 +144,16 @@ void					CImplicit::intersect(CRay *ray) {
 			mulmp(tmp[2],xform->next->to,ray->from);
 			mulmp(tmp[3],xform->next->to,to);
 
-			interpolatev(ray->oFrom,tmp[0],tmp[2],ray->time);
-			interpolatev(ray->oTo,tmp[1],tmp[3],ray->time);
-			subvv(ray->oDir,ray->oTo,ray->oFrom);
+			interpolatev(ray->from,tmp[0],tmp[2],ray->time);
+			interpolatev(ray->to,tmp[1],tmp[3],ray->time);
+			subvv(ray->dir,ray->to,ray->from);
 		} else {
 			vector	to;
 			addvv(to,ray->from,ray->dir);
 
-			mulmp(ray->oFrom,xform->to,ray->from);
-			mulmp(ray->oTo,xform->to,to);
-			subvv(ray->oDir,ray->oTo,ray->oFrom);
+			mulmp(ray->from,xform->to,ray->from);
+			mulmp(ray->to,xform->to,to);
+			subvv(ray->dir,ray->to,ray->from);
 		}
 
 		ray->lastXform	=	xform;
@@ -165,11 +163,11 @@ void					CImplicit::intersect(CRay *ray) {
 	tmax	=	ray->t;
 
 	// Find an intersection if any
-	if (hierarchyIntersectBox(bmin,bmax,ray->oFrom,ray->oTo,tmin,tmax)) {
+	if (intersectBox(bmin,bmax,ray->from,ray->to,tmin,tmax)) {
 		lastT		=	tmin;
-		lastP[0]	=	(float) (ray->oFrom[0] + ray->oDir[0]*lastT);
-		lastP[1]	=	(float) (ray->oFrom[1] + ray->oDir[1]*lastT);
-		lastP[2]	=	(float) (ray->oFrom[2] + ray->oDir[2]*lastT);
+		lastP[0]	=	(float) (ray->from[0] + ray->dir[0]*lastT);
+		lastP[1]	=	(float) (ray->from[1] + ray->dir[1]*lastT);
+		lastP[2]	=	(float) (ray->from[2] + ray->dir[2]*lastT);
 		lastF		=	evalFunction(lastdF,data,lastP,ray->time);		
 
 		dt			=	(float) fabs(lastF)*scaleFactor;
@@ -178,9 +176,9 @@ martchLoop:;
 		t			=	lastT + dt;
 		if (t > tmax)	return;
 
-		P[0]		=	(float) (ray->oFrom[0] + ray->oDir[0]*t);
-		P[1]		=	(float) (ray->oFrom[1] + ray->oDir[1]*t);
-		P[2]		=	(float) (ray->oFrom[2] + ray->oDir[2]*t);
+		P[0]		=	(float) (ray->from[0] + ray->dir[0]*t);
+		P[1]		=	(float) (ray->from[1] + ray->dir[1]*t);
+		P[2]		=	(float) (ray->from[2] + ray->dir[2]*t);
 		assert(dotvv(P,P) >= 0);
 		F			=	evalFunction(dF,data,P,ray->time);
 
@@ -208,28 +206,6 @@ martchLoop:;
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CImplicit
-// Method				:	intersect
-// Description			:	Intersect the object with a box
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-int						CImplicit::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,cameraBmin,cameraBmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CImplicit
-// Method				:	bound
-// Description			:	Bound the surface
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-void					CImplicit::bound(float *bmin,float *bmax) const {
-	movvv(bmin,cameraBmin);
-	movvv(bmax,cameraBmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
@@ -254,17 +230,6 @@ void					CImplicit::interpolate(int,float **)	const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
-// Method				:	tesselate
-// Description			:	Tesselate the surface
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-void					CImplicit::tesselate(CShadingContext *context) {
-	CRenderer::addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CImplicit
 // Method				:	dice
 // Description			:	Dice the surface for scan-line rendering
 // Return Value			:	-
@@ -272,7 +237,6 @@ void					CImplicit::tesselate(CShadingContext *context) {
 // Date last edited		:	11/7/2003
 void					CImplicit::dice(CShadingContext *) {
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit

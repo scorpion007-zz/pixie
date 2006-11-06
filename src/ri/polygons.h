@@ -34,7 +34,6 @@
 #include "common/global.h"
 #include "object.h"
 #include "patches.h"
-#include "hierarchy.h"
 #include "pl.h"
 
 // Some forward declerations
@@ -50,10 +49,9 @@ public:
 							CPolygonMesh(CAttributes *,CXform *,CPl *,int,int *,int *,int *);
 							~CPolygonMesh();
 
-		void				bound(float *,float *) const;
-		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *);
+		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		void				triangulate(CShadingContext *);
@@ -61,8 +59,7 @@ private:
 		CPl					*pl;
 		int					npoly,nloops,nverts;
 		int					*nholes,*nvertices,*vertices;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
-		CArray<CObject *>	*children;
+
 		unsigned int		parameters;
 
 		friend	class		CPolygonTriangle;
@@ -84,8 +81,10 @@ public:
 							CPolygonTriangle(CAttributes *,CXform *,CPolygonMesh *);
 							~CPolygonTriangle();
 
-		void				bound(float *,float *) const;
-		void				tesselate(CShadingContext *);
+		void				intersect(CShadingContext *,CRay *);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+	
+
 		int					moving() const												{	return mesh->pl->data1 != NULL;		}
 		void				sample(int,int,float **,unsigned int &) const;
 		void				interpolate(int,float **) const;
@@ -102,15 +101,14 @@ public:
 // Description			:	Holds a bilinear polygon
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CPolygonQuad : public CSurface , public CTracable {
+class	CPolygonQuad : public CSurface {
 public:
 							CPolygonQuad(CAttributes *,CXform *,CPolygonMesh *);
 							~CPolygonQuad();
 
-		int					intersect(const float *,const float *) const;
-		void				intersect(CRay *);
-		void				bound(float *,float *) const;
-		void				tesselate(CShadingContext *);
+		void				intersect(CShadingContext *,CRay *);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
 		int					moving() const												{	return mesh->pl->data1 != NULL;		}
 		void				sample(int,int,float **,unsigned int &) const;
 		void				interpolate(int,float **) const;

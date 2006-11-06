@@ -35,7 +35,6 @@
 #include "common/algebra.h"
 #include "object.h"
 #include "shader.h"
-#include "hierarchy.h"
 #include "pl.h"
 
 
@@ -44,16 +43,13 @@
 // Description			:	Encapsulates a sphere
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CSphere : public CSurface , public CTracable {
+class	CSphere : public CSurface {
 public:
 						CSphere(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float);
 						CSphere(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float,float,float,float);
 						~CSphere();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -64,7 +60,6 @@ private:
 		unsigned int	parametersF;
 		float			r,umax,vmin,vmax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float,float,float,float);
 };
@@ -75,16 +70,13 @@ private:
 // Description			:	Encapsulates a disk
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CDisk : public CSurface , public CTracable {
+class	CDisk : public CSurface {
 public:
 						CDisk(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float);
 						CDisk(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float,float);
 						~CDisk();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -95,7 +87,6 @@ private:
 		unsigned int	parametersF;
 		float			r,z,umax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float,float,float);
 };
@@ -106,16 +97,13 @@ private:
 // Description			:	Encapsulates a cone
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CCone : public CSurface , public CTracable {
+class	CCone : public CSurface {
 public:
 						CCone(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float);
 						CCone(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float,float);
 						~CCone();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -126,7 +114,6 @@ private:
 		unsigned int	parametersF;
 		float			r,height,umax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float,float,float);
 };
@@ -137,16 +124,13 @@ private:
 // Description			:	Encapsulates a paraboloid
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CParaboloid : public CSurface , public CTracable {
+class	CParaboloid : public CSurface {
 public:
 						CParaboloid(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float);
 						CParaboloid(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float,float,float,float);
 						~CParaboloid();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -157,7 +141,6 @@ private:
 		unsigned int	parametersF;
 		float			r,zmin,zmax,umax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float,float,float,float);
 };
@@ -168,16 +151,13 @@ private:
 // Description			:	Encapsulates a cylinder
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CCylinder : public CSurface , public CTracable {
+class	CCylinder : public CSurface {
 public:
 						CCylinder(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float);
 						CCylinder(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float,float,float,float);
 						~CCylinder();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -188,7 +168,6 @@ private:
 		unsigned int	parametersF;
 		float			r,zmin,zmax,umax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float,float,float,float);
 };
@@ -198,16 +177,13 @@ private:
 // Description			:	Encapsulates a hyperboloid
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CHyperboloid : public CSurface , public CTracable {
+class	CHyperboloid : public CSurface {
 public:
 						CHyperboloid(CAttributes *,CXform *,CParameter *,unsigned int,const float *,const float *,float);
 						CHyperboloid(CAttributes *,CXform *,CParameter *,unsigned int,const float *,const float *,float,const float *,const float *,float);
 						~CHyperboloid();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -219,7 +195,6 @@ private:
 		vector			p1,p2;
 		float			umax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float *,float *,float);
 };
@@ -230,16 +205,13 @@ private:
 // Description			:	Encapsulates a torus
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CToroid : public CSurface , public CTracable {
+class	CToroid : public CSurface {
 public:
 						CToroid(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float);
 						CToroid(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float,float,float,float,float,float);
 						~CToroid();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
 		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -250,7 +222,6 @@ private:
 		unsigned int	parametersF;
 		float			rmin,rmax,vmin,vmax,umax;
 		float			*nextData;
-		vector			bmin,bmax;
 
 		void			computeObjectBound(float *,float *,float,float,float,float,float);
 };

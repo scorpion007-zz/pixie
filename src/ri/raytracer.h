@@ -35,7 +35,6 @@
 #include "common/global.h"
 #include "object.h"
 #include "options.h"
-#include "hierarchy.h"
 #include "shading.h"
 
 
@@ -97,7 +96,7 @@ public:
 			// Since we're not doing any rasterization, the following functions are simple stubs
 
 			// Delayed rendering functions
-			void					drawObject(CObject *,const float *,const float *) { }
+			void					drawObject(CObject *) { }
 
 			// Primitive creation functions
 			void					drawGrid(CSurface *,int,int,float,float,float,float) { }

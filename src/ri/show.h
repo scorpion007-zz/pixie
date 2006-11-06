@@ -50,7 +50,7 @@ public:
 			void			renderingLoop() { }
 
 			// Delayed rendering functions
-			void			drawObject(CObject *,const float *,const float *) { }
+			void			drawObject(CObject *) { }
 
 			// Primitive creation functions
 			void			drawGrid(CSurface *,int,int,float,float,float,float) { }

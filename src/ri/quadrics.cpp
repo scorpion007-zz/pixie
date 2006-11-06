@@ -42,6 +42,7 @@
 #include "shading.h"
 #include "renderer.h"
 #include "rendererContext.h"
+#include "objectMisc.h"
 #include "common/polynomial.h"
 
 
@@ -251,37 +252,12 @@ CSphere::~CSphere() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void				CSphere::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphere
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CSphere::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphere
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CSphere::intersect(CRay *rv) {
+void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 	unsigned int	ns,i;
 	double			s[2];
 	double			r,umax,vmin,vmax;
@@ -374,17 +350,6 @@ void	CSphere::intersect(CRay *rv) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphere
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CSphere::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
@@ -715,38 +680,12 @@ CDisk::~CDisk() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CDisk::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisk
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CDisk::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisk
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CDisk::intersect(CRay *rv) {
+void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 	float	t;
 	double	u;
 	double	x,y;
@@ -807,18 +746,6 @@ void	CDisk::intersect(CRay *rv) {
 	}
 	rv->t		=	(float) t;
 	mulmn(rv->N,xform->to,Nt);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisk
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CDisk::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1088,32 +1015,6 @@ CCone::~CCone() {
 	if (nextData	!= NULL)	delete [] nextData;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCone
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void				CCone::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCone
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CCone::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
@@ -1122,7 +1023,7 @@ int				CCone::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CCone::intersect(CRay *rv) {
+void	CCone::intersect(CShadingContext *context,CRay *rv) {
 	float			*from;
 	float			*dir;
 	double			s[2];
@@ -1224,17 +1125,6 @@ void	CCone::intersect(CRay *rv) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCone
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CCone::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
@@ -1539,30 +1429,6 @@ CParaboloid::~CParaboloid() {
 	if (nextData	!= NULL)	delete [] nextData;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CParaboloid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CParaboloid::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														CRenderer::addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CParaboloid
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CParaboloid::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
@@ -1571,7 +1437,7 @@ int				CParaboloid::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CParaboloid::intersect(CRay *rv) {
+void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 	vector	Nt;
 
 	checkRay(rv);
@@ -1663,18 +1529,6 @@ void	CParaboloid::intersect(CRay *rv) {
 		mulmn(rv->N,xform->to,Nt);
 		return;
 	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CParaboloid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CParaboloid::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1973,31 +1827,6 @@ CCylinder::~CCylinder() {
 	if (nextData	!= NULL)	delete [] nextData;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylinder
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CCylinder::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylinder
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CCylinder::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
@@ -2006,7 +1835,7 @@ int				CCylinder::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CCylinder::intersect(CRay *rv) {
+void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 	vector	Nt;
 
 	checkRay(rv);
@@ -2095,17 +1924,6 @@ void	CCylinder::intersect(CRay *rv) {
 
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylinder
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CCylinder::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
@@ -2402,37 +2220,12 @@ CHyperboloid::~CHyperboloid() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CHyperboloid::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CHyperboloid
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CHyperboloid::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CHyperboloid
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CHyperboloid::intersect(CRay *rv) {
+void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
@@ -2578,18 +2371,6 @@ void	CHyperboloid::intersect(CRay *rv) {
 
 		return;
 	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CHyperboloid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CHyperboloid::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2926,44 +2707,12 @@ CToroid::~CToroid() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CToroid::tesselate(CShadingContext *context) {
-
-	// FIXME: Do the correct ray torus intersection
-	context->tesselate2D(this);
-	return;
-
-
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else															CRenderer::addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CToroid
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CToroid::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CToroid
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 // Date last edited		:	3/17/2001
-void	CToroid::intersect(CRay *rv) {
+void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
@@ -3102,18 +2851,6 @@ void	CToroid::intersect(CRay *rv) {
 		}
 	}
 
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CToroid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CToroid::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////

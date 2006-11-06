@@ -260,6 +260,36 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 // Comments				:	
 // Date last edited		:	6/2/2003
 CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
+
+	// Compute the bounding box
+	const CVertexData	*variables	=	base->variables;
+	const int			vertexSize	=	variables->vertexSize;
+	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
+	const float			*vertex		=	base->vertex;
+	const float			*v0			=	vertex;
+	const float			*v1			=	v0 + vs;
+	const float			*v2			=	v1 + vs;
+	const float			*v3			=	v2 + vs;
+	matrix				geometryMatrix;
+
+	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
+	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
+
+	mulmm(geometryMatrix,attributes->vBasis,invBezier);
+
+	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
+	
+	if (variables->moving) {
+		v0	+=	vertexSize;
+		v1	+=	vertexSize;
+		v2	+=	vertexSize;
+		v3	+=	vertexSize;
+
+		makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
+	}
+
+	subvf(bmin,base->maxSize);
+	addvf(bmax,base->maxSize);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -370,43 +400,6 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCubicCurve
-// Method				:	dice
-// Description			:	Dice the curve group into smaller ones
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/2/2003
-void			CCubicCurve::bound(float *bmin,float *bmax) const {
-	const CVertexData	*variables	=	base->variables;
-	const int			vertexSize	=	variables->vertexSize;
-	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
-	const float			*vertex		=	base->vertex;
-	const float			*v0			=	vertex;
-	const float			*v1			=	v0 + vs;
-	const float			*v2			=	v1 + vs;
-	const float			*v3			=	v2 + vs;
-	matrix				geometryMatrix;
-
-	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
-	mulmm(geometryMatrix,attributes->vBasis,invBezier);
-
-	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
-	
-	if (variables->moving) {
-		v0	+=	vertexSize;
-		v1	+=	vertexSize;
-		v2	+=	vertexSize;
-		v3	+=	vertexSize;
-
-		makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
-	}
-
-	subvf(bmin,base->maxSize);
-	addvf(bmax,base->maxSize);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
@@ -416,19 +409,13 @@ void			CCubicCurve::bound(float *bmin,float *bmax) const {
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
-	CCubicCurve		*cGroup;
 	float			vmid		=	(vmin + vmax) * 0.5f;
-	vector			bmin,bmax;
 
 	// Create vmin - vmid group
-	cGroup	=	new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	rasterizer->drawObject(new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax));
 
 	// Create vmid - vmax group
-	cGroup	=	new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	rasterizer->drawObject(new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax));
 }
 
 
@@ -456,6 +443,23 @@ void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 // Comments				:	
 // Date last edited		:	6/2/2003
 CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
+
+	// Compute the bounding box
+	const CVertexData	*variables	=	base->variables;
+	const int			vertexSize	=	variables->vertexSize;
+	const float			*vertex		=	base->vertex;
+	int					i;
+
+	if (variables->moving)	i	=	4;
+	else					i	=	2;
+
+	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
+	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
+
+	for (;i>0;i--,vertex+=vertexSize)	addBox(bmin,bmax,vertex);
+
+	subvf(bmin,base->maxSize);
+	addvf(bmax,base->maxSize);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -530,30 +534,6 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CLinearCurve
-// Method				:	dice
-// Description			:	Dice the curve group into smaller ones
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/2/2003
-void			CLinearCurve::bound(float *bmin,float *bmax) const {
-	const CVertexData	*variables	=	base->variables;
-	const int			vertexSize	=	variables->vertexSize;
-	const float			*vertex		=	base->vertex;
-	int					i;
-
-	if (variables->moving)	i	=	4;
-	else					i	=	2;
-
-	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
-	for (;i>0;i--,vertex+=vertexSize)	addBox(bmin,bmax,vertex);
-
-	subvf(bmin,base->maxSize);
-	addvf(bmax,base->maxSize);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurve
@@ -563,19 +543,13 @@ void			CLinearCurve::bound(float *bmin,float *bmax) const {
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
-	CLinearCurve	*cGroup;
 	const float		vmid				=	(vmin + vmax) * 0.5f;
-	vector			bmin,bmax;
 
 	// Create vmin - vmid group
-	cGroup	=	new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	rasterizer->drawObject(new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax));
 
 	// Create vmid - vmax group
-	cGroup	=	new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	rasterizer->drawObject(new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax));
 }
 
 
@@ -699,7 +673,8 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 	addvf(bmax,maxSize);
 	subvf(bmin,maxSize);
 
-	children	=	NULL;
+	xform->transformBound(bmin,bmax);
+	makeBound(bmin,bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -714,29 +689,8 @@ CCurveMesh::~CCurveMesh() {
 
 	delete pl;
 	delete [] nverts;
-
-	if (children != NULL) {
-		CObject	**c	=	children->array;
-		int		i	=	children->numItems;
-
-		for (;i>0;i--)	(*c++)->detach();
-
-		delete children;
-	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	CCurveMesh
-// Description			:	bound
-// Return Value			:	Bound the mesh
-// Comments				:	-
-// Date last edited		:	6/10/2003
-void	CCurveMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CCurveMesh
@@ -756,33 +710,18 @@ void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurveMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/28/2003
-void	CCurveMesh::tesselate(CShadingContext *context)	{
-	// We can not be raytraced
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCurveMesh
 // Method				:	dice
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
 void	CCurveMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	CObject	**c;
 
 	if (children == NULL)	create(rasterizer);
 
-	c	=	children->array;
-	i	=	children->numItems;
-
-	for (;i>0;i--) {
-		(*c++)->dice(rasterizer);
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		rasterizer->drawObject(cObject);
 	}
 }
 
@@ -799,8 +738,6 @@ void	CCurveMesh::create(CShadingContext *context) {
 	CVertexData			*variables;
 	int					vertexSize;
 	float				*vertex;
-
-	children			=	new CArray<CObject *>;
 
 	memBegin(context->threadMemory);
 
@@ -850,7 +787,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 				cCurve				=	new CCubicCurve(attributes,xform,base,0,1,vmin,vmax);
 				cCurve->attach();
-				children->push(cCurve);
+				cCurve->sibling		=	children;
+				children			=	cCurve;
 				
 			}
 
@@ -892,7 +830,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 				cCurve				=	new CLinearCurve(attributes,xform,base,0,1,vmin,vmax);
 				cCurve->attach();
-				children->push(cCurve);
+				cCurve->sibling		=	children;
+				children			=	cCurve;
 			}
 
 			cVertex					+=	nverts[i];

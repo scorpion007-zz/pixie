@@ -81,7 +81,7 @@ public:
 	CAttributes			*meshAttributes;		// Mesh attributes
 	CXform				*meshXform;				// Mesh xform
 	CPl					*meshPl;				// Parameter list
-	CArray<CObject *>	*meshChildren;			// List of children
+	CObject				*meshChildren;			// List of children
 	const float			*meshP;					// The vertex positions
 	CPlParameter		*meshNormal;			// The normal parameter
 	const float			*meshNormalData0;		// The normal data at shutter open
@@ -109,45 +109,9 @@ CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh) 
 	stats.numGprims++;
 
 	// Save the parameters
-	this->mesh			=	mesh;
+	this->mesh				=	mesh;
 	mesh->attach();
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonTriangle
-// Method				:	~CPolygonTriangle
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/7/2002
-CPolygonTriangle::~CPolygonTriangle() {
-	stats.numGprims--;
-	mesh->detach();
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonTriangle
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CPolygonTriangle::tesselate(CShadingContext *context) {
-	assert(FALSE);	// Should never be called
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonTriangle
-// Method				:	bound
-// Description			:	Compute the bounding box of the polygon
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/7/2002
-void			CPolygonTriangle::bound(float *bmin,float *bmax) const {
 	const CPl	*pl			=	mesh->pl;
 	const float	*vertices	=	pl->data0;
 	const float	*v0			=	vertices + this->v0*3;
@@ -174,6 +138,23 @@ void			CPolygonTriangle::bound(float *bmin,float *bmax) const {
 
 	makeBound(bmin,bmax);
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonTriangle
+// Method				:	~CPolygonTriangle
+// Description			:	Dtor
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+CPolygonTriangle::~CPolygonTriangle() {
+	stats.numGprims--;
+	mesh->detach();
+}
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
@@ -505,47 +486,9 @@ CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh) : CSurfa
 	stats.numGprims++;
 
 	// Save the parameters
-	this->mesh			=	mesh;
+	this->mesh				=	mesh;
 	mesh->attach();
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonQuad
-// Method				:	~CPolygonQuad
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/7/2002
-CPolygonQuad::~CPolygonQuad() {
-	stats.numGprims--;
-	mesh->detach();
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonQuad
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CPolygonQuad::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(CRenderer::flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														CRenderer::addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonQuad
-// Method				:	bound
-// Description			:	Compute the bounding box of the polygon
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/7/2002
-void			CPolygonQuad::bound(float *bmin,float *bmax) const {
 	const CPl	*pl			=	mesh->pl;
 	const float	*vertices	=	pl->data0;
 	const float	*v0			=	vertices + this->v0*3;
@@ -570,20 +513,21 @@ void			CPolygonQuad::bound(float *bmin,float *bmax) const {
 	makeBound(bmin,bmax);
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
-// Method				:	intersect
-// Description			:	Intersect the quad qith a box
+// Method				:	~CPolygonQuad
+// Description			:	Dtor
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2002
-int			CPolygonQuad::intersect(const float *bmin,const float *bmax) const {
-	vector	bmi,bma;
-
-	bound(bmi,bma);
-	return intersectBox(bmin,bmax,bmi,bma);
+CPolygonQuad::~CPolygonQuad() {
+	stats.numGprims--;
+	mesh->detach();
 }
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
@@ -592,7 +536,7 @@ int			CPolygonQuad::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2002
-void		CPolygonQuad::intersect(CRay *cRay) {
+void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (! (cRay->flags & attributes->flags) )	return;
 
@@ -1097,6 +1041,9 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 		}
 	}
 
+	xform->transformBound(bmin,bmax);
+	makeBound(bmin,bmax);
+
 	children			=	NULL;
 }
 
@@ -1120,19 +1067,6 @@ CPolygonMesh::~CPolygonMesh() {
 	if (children != NULL)	delete children;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonMesh
-// Method				:	bound
-// Description			:	Compute the bounding box
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/11/2003
-void		CPolygonMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
@@ -1153,36 +1087,18 @@ void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) co
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
-// Method				:	tesselate
-// Description			:	Tesselate the mesh
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/11/2003
-void		CPolygonMesh::tesselate(CShadingContext *c) {
-	if (children == NULL) {
-		triangulate(c);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonMesh
 // Method				:	dice
 // Description			:	Split the mesh
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/11/2003
 void		CPolygonMesh::dice(CShadingContext *r) {
-	int		i;
-	CObject	**objects;
 
-	if (children == NULL) {
-		triangulate(NULL);
-	}
+	if (children == NULL)	triangulate(NULL);
 
-	objects	=	children->array;
-
-	for (i=children->numItems;i>0;i--,objects++) {
-		(*objects)->dice(r);
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		r->drawObject(cObject);
 	}
 }
 
@@ -1242,12 +1158,8 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 	cQuad->uniform		=	data.meshUniformNumber;
 
 	// Add the children into the pool
-	data.meshChildren->push(cQuad);
-
-	if (data.meshContext != NULL) {
-		cQuad->tesselate(data.meshContext);
-	}
-
+	cQuad->sibling		=	data.meshChildren;
+	data.meshChildren	=	cQuad;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1285,129 +1197,8 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 	cTriangle->uniform		=	data.meshUniformNumber;
 
 	// Add the children into the pool
-	data.meshChildren->push(cTriangle);
-
-	// Do we need to create a tracable object for this triangle ?
-	if (data.meshContext != NULL) {
-
-		// Do we have displacements ?
-		if ((data.meshAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) && (data.meshAttributes->displacement != NULL)) {
-			// Yes, tesselate the triangle
-			data.meshContext->tesselate2D(cTriangle);
-		} else {
-			// No, create raytracing triangles
-			if (data.meshPl->data1 == NULL) {
-				CVertex		*v0	=	(CVertex *)		CRenderer::frameMemory->alloc(3*sizeof(CVertex) + sizeof(CPtriangle));
-				CVertex		*v1	=	v0+1;
-				CVertex		*v2	=	v1+1;
-				CPtriangle	*t	=	(CPtriangle *)	(v2 + 1);
-
-				movvv(v0->P,vs0);	v0->u = 0;	v0->v = 1;
-				movvv(v1->P,vs1);	v1->u = 1;	v1->v = 1;
-				movvv(v2->P,vs2);	v2->u = 1;	v2->v = 0;
-
-				t->v[0]		=	v0;
-				t->v[1]		=	v1;
-				t->v[2]		=	v2;
-				t->object	=	cTriangle;
-
-#ifdef WIN32
-				t->CPtriangle::CPtriangle();
-#else
-				t	=	new (t) CPtriangle;
-#endif
-
-
-				// Create the vertices
-				switch(data.meshTriangleType) {
-				case 0:
-					// Flat triangle
-					movvv(v0->N,t->N);
-					movvv(v1->N,t->N);
-					movvv(v2->N,t->N);
-					break;
-				case 1:
-					// Smooth triangle
-					movvv(v0->N,data.meshNormalData0+vindices[vi0]*3);
-					movvv(v1->N,data.meshNormalData0+vindices[vi1]*3);
-					movvv(v2->N,data.meshNormalData0+vindices[vi2]*3);
-					break;
-				case 2:
-					// Smooth facevarying triangle
-					movvv(v0->N,data.meshNormalData0+(data.meshFacevaryingNumber+vi0)*3);
-					movvv(v1->N,data.meshNormalData0+(data.meshFacevaryingNumber+vi1)*3);
-					movvv(v2->N,data.meshNormalData0+(data.meshFacevaryingNumber+vi2)*3);
-					break;
-				}
-
-
-				// Insert the triangle into the list
-				CRenderer::addTracable(t,cTriangle);
-				stats.numRayTriangles++;
-			} else {
-				CMovingVertex		*v0		=	(CMovingVertex *)		CRenderer::frameMemory->alloc(3*sizeof(CMovingVertex) + sizeof(CPmovingTriangle));
-				CMovingVertex		*v1		=	v0+1;
-				CMovingVertex		*v2		=	v1+1;
-				CPmovingTriangle	*t		=	(CPmovingTriangle *)	(v2 + 1);
-				const float			*P1		=	data.meshPl->data1;
-				const float			*ve0	=	P1+vindices[vi0]*3;
-				const float			*ve1	=	P1+vindices[vi1]*3;
-				const float			*ve2	=	P1+vindices[vi2]*3;
-
-
-				movvv(v0->P[0],vs0);	movvv(v0->P[1],ve0);	v0->u = 0;	v0->v = 1;
-				movvv(v1->P[0],vs1);	movvv(v1->P[1],ve1);	v1->u = 1;	v1->v = 1;
-				movvv(v2->P[0],vs2);	movvv(v2->P[1],ve2);	v2->u = 1;	v2->v = 0;
-
-				t->v[0]		=	v0;
-				t->v[1]		=	v1;
-				t->v[2]		=	v2;
-				t->object	=	cTriangle;
-
-#ifdef WIN32
-				t->CPmovingTriangle::CPmovingTriangle();
-#else
-				t	=	new (t) CPmovingTriangle;
-#endif
-
-
-				// Create the vertices
-				switch(data.meshTriangleType) {
-				case 0:
-					// Flat triangle
-					movvv(v0->N[0],t->N[0]);
-					movvv(v1->N[0],t->N[0]);
-					movvv(v2->N[0],t->N[0]);
-					movvv(v0->N[1],t->N[1]);
-					movvv(v1->N[1],t->N[1]);
-					movvv(v2->N[1],t->N[1]);
-					break;
-				case 1:
-					// Smooth triangle
-					movvv(v0->N[0],data.meshNormalData0+vindices[vi0]*3);
-					movvv(v1->N[0],data.meshNormalData0+vindices[vi1]*3);
-					movvv(v2->N[0],data.meshNormalData0+vindices[vi2]*3);
-					movvv(v0->N[1],data.meshNormalData1+vindices[vi0]*3);
-					movvv(v1->N[1],data.meshNormalData1+vindices[vi1]*3);
-					movvv(v2->N[1],data.meshNormalData1+vindices[vi2]*3);
-					break;
-				case 2:
-					// Smooth facevarying triangle
-					movvv(v0->N[0],data.meshNormalData0+(data.meshFacevaryingNumber+vi0)*3);
-					movvv(v1->N[0],data.meshNormalData0+(data.meshFacevaryingNumber+vi1)*3);
-					movvv(v2->N[0],data.meshNormalData0+(data.meshFacevaryingNumber+vi2)*3);
-					movvv(v0->N[1],data.meshNormalData1+(data.meshFacevaryingNumber+vi0)*3);
-					movvv(v1->N[1],data.meshNormalData1+(data.meshFacevaryingNumber+vi1)*3);
-					movvv(v2->N[1],data.meshNormalData1+(data.meshFacevaryingNumber+vi2)*3);
-					break;
-				}
-
-				// Insert the triangle into the list
-				CRenderer::addTracable(t,cTriangle);
-				stats.numRayTriangles++;
-			}
-		}
-	}
+	cTriangle->sibling		=	data.meshChildren;
+	data.meshChildren		=	cTriangle;
 }
 
 
@@ -1852,8 +1643,6 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 		}
 	}
 
-	// Allocate the space for the children triangles
-	children	=	new CArray<CObject *>;
 
 	// Count the number of vertices there is in the mesh
 	for (j=0,i=0;i<npoly;i++)	j+=nholes[i];
@@ -1896,6 +1685,8 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 		cnvertices	+=	cnholes[0];
 		cnholes++;
 	}
+
+	children					=	data.meshChildren;
 
 	osUnlock(CRenderer::memoryMutex);
 }

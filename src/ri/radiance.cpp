@@ -334,7 +334,7 @@ private:
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	7/06/2004
-CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *bmin,const float *bmax,CHierarchy *h,FILE *in,CArray<CTriangle *> *t) : CCache(name,mode) {
+CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *bmin,const float *bmax,FILE *in,CArray<CTriangle *> *t) : CCache(name,mode) {
 	int			i;
 
 #ifdef DEBUG_PRINT
@@ -1087,7 +1087,7 @@ void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLoo
 			ray.object				=	NULL;
 
 			// Trace the ray
-			hierarchy->intersect(&ray);
+			CRenderer::trace(&ray,NULL);
 			stats.numIndirectDiffuseRays++;
 
 			// Do we have an intersection that's too close ?

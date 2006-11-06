@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "delayed.h"
-#include "hierarchy.h"
 #include "stats.h"
 #include "renderer.h"
 #include "rendererContext.h"
@@ -49,8 +48,6 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 
 	movvv(this->bmin,bmin);
 	movvv(this->bmax,bmax);
-	movvv(this->cbmin,bmin);
-	movvv(this->cbmax,bmax);
 	this->subdivisionFunction	=	subdivisionFunction;
 	this->freeFunction			=	freeFunction;
 	this->data					=	data;
@@ -66,8 +63,8 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 
 	dataRefCount[0]++;
 
-	xform->transformBound(this->cbmin,this->cbmax);
-	makeBound(this->cbmin,this->cbmax);
+	xform->transformBound(this->bmin,this->bmax);
+	makeBound(this->bmin,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -95,26 +92,15 @@ CDelayedObject::~CDelayedObject() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-int		CDelayedObject::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,this->cbmin,this->cbmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDelayedObject
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/10/2001
-void	CDelayedObject::intersect(CRay *cRay) {
+void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 	float	tmin	=	cRay->tmin;
 	float	tmax	=	cRay->t;
 
-	if (hierarchyIntersectBox(this->cbmin,this->cbmax,cRay->from,cRay->to,tmin,tmax)) {
+	if (intersectBox(bmin,bmax,cRay->from,cRay->to,tmin,tmax)) {
 		osLock(CRenderer::delayedMutex);
 
 		if (processed == FALSE) {
-			CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax,cRay);
+			CRenderer::context->processDelayedObject(context,this,subdivisionFunction,data,bmin,bmax,cRay);
 			processed	=	TRUE;
 		}
 
@@ -122,29 +108,7 @@ void	CDelayedObject::intersect(CRay *cRay) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDelayedObject
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/10/2001
-void	CDelayedObject::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->cbmin);
-	movvv(bmax,this->cbmax);
-}
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDelayedObject
-// Method				:	split
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/10/2001
-void	CDelayedObject::tesselate(CShadingContext *context) {
-	CRenderer::addTracable(this,this);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedObject
@@ -157,7 +121,7 @@ void	CDelayedObject::dice(CShadingContext *r) {
 	osLock(CRenderer::delayedMutex);
 
 	if (processed == FALSE) {
-		CRenderer::context->processDelayedObject(this,subdivisionFunction,data,bmin,bmax);
+		CRenderer::context->processDelayedObject(r,this,subdivisionFunction,data,bmin,bmax);
 		processed	=	TRUE;
 	}
 
@@ -205,20 +169,15 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CArray<CObject *> *i
 	instance		=	in;
 	processed		=	FALSE;
 
-	initv(cbmin,C_INFINITY);
-	initv(cbmax,-C_INFINITY);
+	initv(bmin,C_INFINITY);
+	initv(bmax,-C_INFINITY);
 
 	CObject	**objects	=	in->array;
 	int		i;
 	for (i=0;i<in->numItems;i++) {
-		vector	bmin,bmax;
-		objects[i]->bound(bmin,bmax);
-		addBox(cbmin,cbmax,bmin);
-		addBox(cbmin,cbmax,bmax);
+		addBox(bmin,bmax,objects[i]->bmin);
+		addBox(bmin,bmax,objects[i]->bmax);
 	}
-
-	xform->transformBound(this->cbmin,this->cbmax);
-	makeBound(this->cbmin,this->cbmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -232,16 +191,6 @@ CDelayedInstance::~CDelayedInstance() {
 	stats.numDelayeds--;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDelayedInstance
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/10/2001
-int		CDelayedInstance::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,this->cbmin,this->cbmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedInstance
@@ -250,15 +199,15 @@ int		CDelayedInstance::intersect(const float *bmin,const float *bmax) const {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-void	CDelayedInstance::intersect(CRay *cRay) {
+void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 	float	tmin	=	cRay->tmin;
 	float	tmax	=	cRay->t;
 
-	if (hierarchyIntersectBox(this->cbmin,this->cbmax,cRay->from,cRay->to,tmin,tmax)) {
+	if (intersectBox(bmin,bmax,cRay->from,cRay->to,tmin,tmax)) {
 		osLock(CRenderer::delayedMutex);
 
 		if (processed == FALSE) {
-			CRenderer::context->processDelayedInstance(this,cRay);
+			CRenderer::context->processDelayedInstance(context,this,cRay);
 			processed	=	TRUE;
 		}
 
@@ -266,29 +215,6 @@ void	CDelayedInstance::intersect(CRay *cRay) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDelayedInstance
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/10/2001
-void	CDelayedInstance::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->cbmin);
-	movvv(bmax,this->cbmax);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDelayedInstance
-// Method				:	split
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/10/2001
-void	CDelayedInstance::tesselate(CShadingContext *context) {
-	CRenderer::addTracable(this,this);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedInstance
@@ -301,7 +227,7 @@ void	CDelayedInstance::dice(CShadingContext *r) {
 	osLock(CRenderer::delayedMutex);
 
 	if (processed == FALSE) {
-		CRenderer::context->processDelayedInstance(this);
+		CRenderer::context->processDelayedInstance(r,this);
 		processed	=	TRUE;
 	}
 

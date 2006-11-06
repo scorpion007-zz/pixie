@@ -190,29 +190,6 @@ void	CSubdivision::projectVertices(float *fvertex,double *vertexData,int disp) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSubdivision
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/12/2002
-void		CSubdivision::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSubdivision
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void		CSubdivision::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivision

@@ -35,7 +35,6 @@
 #include "shading.h"
 #include "memory.h"
 #include "attributes.h"
-#include "hierarchy.h"
 #include "object.h"
 #include "renderer.h"
 
@@ -131,7 +130,6 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		CShadedLight	**lights				=	&currentShadingState->lights;
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
-		CHierarchy		*hierarchy				=	CRenderer::hierarchy;
 		int				j;
 		CRay			ray;
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
@@ -183,7 +181,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 					ray.lastXform			=	NULL;
 					ray.object				=	NULL;
 
-					hierarchy->intersect(&ray);
+					CRenderer::trace(&ray,context->threadMemory);
 
 					if (ray.object == NULL) {
 						subvv(P,Ps);
@@ -439,7 +437,6 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
 		CRay			ray;
-		CHierarchy		*hierarchy				=	CRenderer::hierarchy;
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
 		vector			D;
 		int				j;
@@ -504,7 +501,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 						ray.lastXform			=	NULL;
 						ray.object				=	NULL;
 
-						hierarchy->intersect(&ray);
+						CRenderer::trace(&ray,context->threadMemory);
 
 						if (ray.object == NULL) {
 							visibility++;

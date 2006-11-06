@@ -43,21 +43,19 @@
 // Description			:	Encapsulates a bilinear patch
 // Comments				:
 // Date last edited		:	6/28/2001
-class	CBilinearPatch : public CSurface , public CTracable {
+class	CBilinearPatch : public CSurface {
 public:
 						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *);
 						~CBilinearPatch();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			intersect(CShadingContext *,CRay *);
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
+
 		int				moving() const												{	return variables->moving;			}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
 
 private:
-		vector			bmin,bmax;
 		CVertexData		*variables;
 		CParameter		*parameters;
 		float			*vertex;
@@ -75,8 +73,8 @@ public:
 						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *,const float *uBasis=NULL,const float *vBasis=NULL);
 						~CBicubicPatch();
 
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
+
 		int				moving() const												{	return variables->moving;			}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -87,7 +85,6 @@ private:
 		CVertexData		*variables;
 		CParameter		*parameters;
 		double			*vertex;
-		vector			bmin,bmax;							// The original bounding box
 		float			uOrg,vOrg,uMult,vMult;				// The parametric range of the patch
 };
 
@@ -101,8 +98,8 @@ public:
 						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,double *);
 						~CNURBSPatch();
 
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
 		int				moving() const												{	return variables->moving;			}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
@@ -114,7 +111,6 @@ private:
 		CVertexData		*variables;
 		CParameter		*parameters;
 		double			*vertex;							// These are double precision to reduce roundoff errors
-		vector			bmin,bmax;
 		int				uOrder,vOrder;
 		float			uOrg,vOrg,uMult,vMult;
 };
@@ -142,10 +138,9 @@ public:
 							CPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,int);
 							~CPatchMesh();
 
-		void				bound(float *,float *) const;
-		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *context);
+		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		void				create(CShadingContext *context);
@@ -153,8 +148,6 @@ private:
 		CPl					*pl;
 		int					degree;
 		int					uVertices,vVertices,uWrap,vWrap;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
-		CArray<CObject *>	*children;
 };
 
 
@@ -169,10 +162,9 @@ public:
 							CNURBSPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,float *,float *);
 							~CNURBSPatchMesh();
 
-		void				bound(float *,float *) const;
-		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *context);
+		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
 		void				create(CShadingContext *context);
@@ -180,8 +172,6 @@ private:
 		CPl					*pl;
 		int					uVertices,vVertices,uOrder,vOrder;
 		float				*uKnots,*vKnots;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
-		CArray<CObject *>	*children;
 };
 
 #endif

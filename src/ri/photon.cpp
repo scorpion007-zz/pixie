@@ -426,7 +426,7 @@ void		CPhotonHider::illuminateEnd() {
 			ray.lastXform			=	NULL;
 			ray.object				=	NULL;
 
-			CRenderer::hierarchy->intersect(&ray);
+			CRenderer::trace(&ray,threadMemory);
 
 			if (ray.object != NULL) {
 				const float power = (Cl[0] + Cl[1] + Cl[2]) / (3*ray.t*ray.t);
@@ -546,7 +546,7 @@ processBounce:;
 	ray.object				=	NULL;
 
 	// Trace the ray in the scene
-	CRenderer::hierarchy->intersect(&ray);
+	CRenderer::trace(&ray,threadMemory);
 
 	// Do we have an intersection ?
 	if (ray.object != NULL) {
@@ -700,7 +700,7 @@ processBounce:;
 					ray.object				=	NULL;
 				
 					// Trace the ray in the scene
-					CRenderer::hierarchy->intersect(&ray);
+					CRenderer::trace(&ray,threadMemory);
 					
 					// Bail if we hit nothing
 					if (ray.object == NULL) {

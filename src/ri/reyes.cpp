@@ -511,12 +511,14 @@ void	CReyes::skip() {
 // Return Value			:	-
 // Comments				:	Thread safe
 // Date last edited		:	6/5/2003
-void		CReyes::drawObject(CObject *object,const float *bmin,const float *bmax) {
+void		CReyes::drawObject(CObject *object) {
 	float				xmin,xmax,ymin,ymax;
 	float				x[4],y[4];
 	int					i;
 	CRasterObject		*cObject;
 	float				zmin,zmax;
+	const float			*bmin	=	object->bmin;
+	const float			*bmax	=	object->bmax;
 
 	// Trivial reject
 	if (bmax[COMP_Z] < CRenderer::clipMin)	{	return;	}

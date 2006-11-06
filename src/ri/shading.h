@@ -58,7 +58,6 @@ class	CMovingVertex;
 class	CTriangle;
 class	CMovingTriangle;
 class	CMemPage;
-class	CHierarchy;
 class	CActiveSample;
 class	CPoints;
 class	CPointCloud;
@@ -203,7 +202,7 @@ public:
 		virtual	void			renderingLoop()											=	0;
 
 		// Delayed rendering functions
-		virtual	void			drawObject(CObject *,const float *,const float *)		=	0;
+		virtual	void			drawObject(CObject *)									=	0;
 
 		// Primitive creation functions
 		virtual	void			drawGrid(CSurface *,int,int,float,float,float,float)	=	0;

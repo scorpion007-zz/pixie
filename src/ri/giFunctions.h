@@ -192,7 +192,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 								ray.lastXform			=	NULL;																\
 								ray.object				=	NULL;																\
 																																\
-								CRenderer::hierarchy->intersect(&ray);																\
+								CRenderer::trace(&ray,threadMemory);															\
 																																\
 								res->real				=	ray.t
 
@@ -349,7 +349,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								ray.lastXform			=	NULL;																\
 								ray.object				=	NULL;																\
 																																\
-								CRenderer::hierarchy->intersect(&ray);																\
+								CRenderer::trace(&ray,threadMemory);															\
 																																\
 								if (ray.object != NULL)	res[0].real	=	0;														\
 								else					res[0].real	=	1;

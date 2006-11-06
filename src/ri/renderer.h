@@ -81,7 +81,6 @@ extern	const char	*colorCieSystem;
 
 // Forward definitions
 class	CDisplayChannel;
-class	CHierarchy;
 class	CObject;
 class	CTracable;
 class	CRemoteChannel;
@@ -99,6 +98,7 @@ class	CXform;
 class	CDSO;
 class	CRendererContext;
 class	CNetFileMapping;
+class	CRay;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -185,7 +185,6 @@ public:
 		// Here's how the rendering loop works:
 		//
 		//		beginFrame is called in WorldBegin
-		//		prepareFrame is called in WorldEnd to prepare the raytracing
 		//		renderFrame is called in WorldEnd to do the rendering
 		//		endFrame is called in WorldEnd
 		//
@@ -205,12 +204,9 @@ public:
 		////////////////////////////////////////////////////////////////////
 		static	void			beginFrame(const COptions *options,CXform *xform);				// Called in WorldBegin
 		static	void			endFrame();														// Called in WorldEnd
-		static	void			prepareFrame();													// Called in WorldEnd
 		static	void			renderFrame();													// Called in WorldEnd
-		static	void			render(CObject *object,const float *bmin,const float *bmax);	// Called to insert an object into the scene
-		static	void			removeTracable(CTracable *);									// Called to remove a delayed object from the scene
-		static	void			addTracable(CTracable *,CSurface *);							// Add a raytracable object into the scene
-		static	void			addTracable(CTriangle *,CSurface *);
+		static	void			render(CObject *object);										// Called to insert an object into the scene
+		static	void			trace(CRay *ray,CMemPage *memory);								// Trace a ray
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with rendering (defined in rendererJobs.cpp)
@@ -388,19 +384,16 @@ public:
 
 
 		// Second, some other data structures
-		static	CMemStack				*frameMemory;			// Where we allocate permanent frame data
-		static	CTrie<CFileResource  *>	*frameFiles;			// Files that have been loaded (they stick around only during the frame)
-		static	CArray<const char*>		*frameTemporaryFiles;	// This hold the name of temporary files
-		static	CShadingContext			**contexts;				// The array of shading contexts
-		static	int						numActiveThreads;		// The number of threads currently active
-		static	CTrie<CRemoteChannel *>	*declaredRemoteChannels;// Known remote channel lookup
+		static	CMemStack				*frameMemory;				// Where we allocate permanent frame data
+		static	CTrie<CFileResource  *>	*frameFiles;				// Files that have been loaded (they stick around only during the frame)
+		static	CArray<const char*>		*frameTemporaryFiles;		// This hold the name of temporary files
+		static	CShadingContext			**contexts;					// The array of shading contexts
+		static	int						numActiveThreads;			// The number of threads currently active
+		static	CTrie<CRemoteChannel *>	*declaredRemoteChannels;	// Known remote channel lookup
 		static	CArray<CRemoteChannel *>					*remoteChannels;		// all known channels
 		static	CArray<CProgrammableShaderInstance *>		*dirtyInstances;
 		static	unsigned int			raytracingFlags;			// The raytracing flags that hold the combination that needs to be raytraced
-		static	CHierarchy				*hierarchy;					// The raytracing hierarchy
-		static	CArray<CTriangle *>		*triangles;					// The array of triangles
-		static	CArray<CSurface *>		*raytraced;					// The list of raytraced objects
-		static	CArray<CTracable *>		*tracables;					// The array of raytracable objects
+		static	CObject					*root;						// The root bounding volume object
 		static	CObject					*offendingObject;			// This points to the object creating an error
 		static	vector					worldBmin,worldBmax;		// The bounding box of the world
 		static	CXform					*world;						// The world xform

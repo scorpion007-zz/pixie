@@ -472,7 +472,7 @@ public:
 					// Return Value			:	-
 					// Comments				:
 					// Date last edited		:	5/28/2003
-	void			create(CArray<CObject *> *objects) {
+	void			create(CObject *&children) {
 						int	split				=	FALSE;
 						int	funny				=	FALSE;
 						int funnyBorder			=	FALSE;
@@ -583,7 +583,10 @@ public:
 									gatherData(data,K,v+1,va,uniformIndex,vertex,parameters);
 
 									// Create the primitive
-									objects->push(new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,1.0f,1.0f,vertex));
+									CObject	*nObject	=	new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,1.0f,1.0f,vertex);
+									nObject->attach();
+									nObject->sibling	=	children;
+									children			=	nObject;
 								} else {
 									// This is an ordinary patch
 									CSVertex	*v[16],*va[4];
@@ -626,7 +629,10 @@ public:
 									gatherData(data,16,v,va,uniformIndex,vertex,parameters);
 
 									// Create the primitive
-									objects->push(new CBicubicPatch(data.currentAttributes,data.currentXform,data.vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis));
+									CObject	*nObject	=	new CBicubicPatch(data.currentAttributes,data.currentXform,data.vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis);
+									nObject->attach();
+									nObject->sibling	=	children;
+									children			=	nObject;
 								}
 							} else {
 								// Damn, we're a funny patch, deal with it
@@ -676,7 +682,10 @@ public:
 									gatherData(data,(nv+2)*(nv+2),data.irregularVertices,va,uniformIndex,vertex,parameters);
 										
 									// Create the primitive
-									objects->push(new CPatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv,nv,bTop,bRgt,bBot,bLft,vertex));
+									CObject	*nObject	=	new CPatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv,nv,bTop,bRgt,bBot,bLft,vertex);
+									nObject->attach();
+									nObject->sibling	=	children;
+									children			=	nObject;
 								} else {
 									if ( (numExtraordinary > 0) && (vertices[(extraordinary+0)&3]->valence >= 3)) {
 										// We're have an extraordinary patch
@@ -707,17 +716,28 @@ public:
 											}
 										}
 										
+										CObject	*nObject;
+
 										// 'left' strip
 										gatherData(data,(nv+1)*(4),strip1Vertices,va,uniformIndex,vertex,parameters);
-										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,4,nv+1,0.0f,mult,mult,(nv-2)*mult,vertex));
+										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,4,nv+1,0.0f,mult,mult,(nv-2)*mult,vertex);
+										nObject->attach();
+										nObject->sibling	=	children;
+										children			=	nObject;
 										
 										// 'top' strip
 										gatherData(data,(4)*(nv+1),strip2Vertices,va,uniformIndex,vertex,parameters);
-										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,4,mult,0.0f,(nv-2)*mult,mult,vertex));
+										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,4,mult,0.0f,(nv-2)*mult,mult,vertex);
+										nObject->attach();
+										nObject->sibling	=	children;
+										children			=	nObject;
 										
 										// main grid
 										gatherData(data,(nv+1)*(nv+1),patchVertices,va,uniformIndex,vertex,parameters);
-										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,nv+1,mult,mult,(nv-2)*mult,(nv-2)*mult,vertex));
+										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,nv+1,mult,mult,(nv-2)*mult,(nv-2)*mult,vertex);
+										nObject->attach();
+										nObject->sibling	=	children;
+										children			=	nObject;
 										
 										// extraordinary patch
 										for (i=0;i<(2*N);i++) {
@@ -739,7 +759,10 @@ public:
 										gatherData(data,K,v+1,va,uniformIndex,vertex,parameters);
 																		
 										// Create the primitive
-										objects->push(new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,mult,mult,vertex));
+										nObject				=	new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,mult,mult,vertex);
+										nObject->attach();
+										nObject->sibling	=	children;
+										children			=	nObject;
 									} else {
 										// No extraordinary patch, use the a bicubic b-spline patch
 										
@@ -747,7 +770,10 @@ public:
 										gatherData(data,(nv+2)*(nv+2),data.irregularVertices,va,uniformIndex,vertex,parameters);
 										
 										// Create the primitive
-										objects->push(new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+2,nv+2,0.0f,0.0f,1.0f,1.0f,vertex));
+										CObject	*nObject	=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+2,nv+2,0.0f,0.0f,1.0f,1.0f,vertex);
+										nObject->attach();
+										nObject->sibling	=	children;
+										children			=	nObject;
 									}
 								}
 							}
@@ -757,7 +783,7 @@ public:
 							}
 
 							for (i=0;i<numEdges;i++) {
-								children[i]->create(objects);
+								this->children[i]->create(children);
 							}
 						}
 					}
@@ -1647,8 +1673,6 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 
 	xform->transformBound(bmin,bmax);
 	makeBound(bmin,bmax);
-
-	objects						=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1677,54 +1701,23 @@ CSubdivMesh::~CSubdivMesh() {
 		if (intargs != NULL)	delete [] intargs;
 		if (floatargs != NULL)	delete [] floatargs;
 	}
-
-	// Ditch the children if available
-	if (objects != NULL) {
-		int		numItems	=	objects->numItems;
-		CObject	**o			=	objects->array;
-		int		i;
-
-		for (i=0;i<numItems;i++) {
-			o[i]->detach();
-		}
-
-		delete objects;
-	}
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
-// Method				:	bound
-// Description			:	Bound the primitive
+// Method				:	intersect
+// Description			:	Intersect the thing
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void		CSubdivMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
+void		CSubdivMesh::intersect(CShadingContext *rasterizer,CRay *cRay) {
+
+	if (children == NULL)	create(rasterizer);
+
+	CObject::intersect(rasterizer,cRay);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSubdivMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/28/2003
-void		CSubdivMesh::tesselate(CShadingContext *context)	{
-	int		i;
-	int		numChildren;
-	CObject	**c;
-
-	if (objects == NULL)	create(context);
-
-	numChildren	=	objects->numItems;
-	c			=	objects->array;
-
-	for (i=0;i<numChildren;i++) {
-		c[i]->tesselate(context);
-	}
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
@@ -1734,20 +1727,12 @@ void		CSubdivMesh::tesselate(CShadingContext *context)	{
 // Comments				:
 // Date last edited		:	5/28/2003
 void		CSubdivMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	int		numChildren;
-	CObject	**c;
 
-	if (objects == NULL)	create(rasterizer);
+	if (children == NULL)	create(rasterizer);
 
-	numChildren	=	objects->numItems;
-	c			=	objects->array;
-
-	for (i=0;i<numChildren;i++) {
-		vector	bmin,bmax;
-
-		c[i]->bound(bmin,bmax);
-		rasterizer->drawObject(c[i],bmin,bmax);
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		rasterizer->drawObject(cObject);
 	}
 }
 							
@@ -1939,7 +1924,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	}
 		
 	// Finalize the faces
-	objects			=	new CArray<CObject *>;
+	children			=	NULL;
 	for (k=0,i=0;i<numFaces;i++) {
 
 		// Set the facevarying parameters
@@ -1957,7 +1942,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 		k	+=	j;
 
 		// Finally, create the face
-		faces[i]->create(objects);
+		faces[i]->create(children);
 		
 		skipFace:
 			;		// intentionally empty
@@ -1965,11 +1950,6 @@ void		CSubdivMesh::create(CShadingContext *context) {
 
 	// Re-claim the memory
 	memEnd(context->threadMemory);
-
-	// Attach to the objects so they don't get destroyed before us
-	for (i=0;i<objects->numItems;i++) {
-		objects->array[i]->attach();
-	}
 	
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
 

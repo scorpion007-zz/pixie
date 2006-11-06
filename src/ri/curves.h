@@ -77,10 +77,14 @@ public:
 					CCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCurve();
 
-	void			tesselate(CShadingContext *)	{	}
-	int				moving() const												{	return base->variables->moving;	}
+					// Surface interface
+	int				moving() const													{	return base->variables->moving;	}
 	void			interpolate(int,float **) const;
+
+					// Object interface
+	void			intersect(CShadingContext *,CRay *)								{	assert(FALSE);	}
 	void			dice(CShadingContext *);
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 
 protected:
 	virtual	void	splitToChildren(CShadingContext *)	=	0;
@@ -100,9 +104,11 @@ public:
 					CCubicCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCubicCurve();
 
+					// Surface interface
 	void			sample(int,int,float **,unsigned int &) const;
-	void			bound(float *,float *) const;
 
+					// Intersect a ray (ray/curve intersections not supported)
+	void			intersect(CShadingContext *,CRay *)		{	}
 protected:
 	void			splitToChildren(CShadingContext *);
 };
@@ -117,9 +123,11 @@ public:
 					CLinearCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CLinearCurve();
 
+					// Surface interface
 	void			sample(int,int,float **,unsigned int &) const;
-	void			bound(float *,float *) const;
 
+					// Intersect a ray (ray/curve intersections not supported)
+	void			intersect(CShadingContext *,CRay *)		{	}
 protected:
 	void			splitToChildren(CShadingContext *);
 };
@@ -136,10 +144,11 @@ public:
 							CCurveMesh(CAttributes *,CXform *,CPl *,int,int,int,int *,int);
 							~CCurveMesh();
 
-		void				bound(float *,float *) const;
-		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *context);
+							// Object interface
+		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
 
 private:
 		void				create(CShadingContext *context);
@@ -149,12 +158,9 @@ private:
 		int					numCurves;
 		int					*nverts;
 		int					degree,wrap;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
 
 		const CVariable		*sizeVariable;
 		float				maxSize;
-
-		CArray<CObject *>	*children;
 };
 
 

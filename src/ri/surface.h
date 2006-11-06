@@ -44,7 +44,10 @@ public:
 							CPatch(CAttributes *,CXform *,CSurface *,float,float,float,float,int,int);
 							~CPatch();
 
+
+	void					intersect(CShadingContext *,CRay *)	{	assert(FALSE);	}
 	void					dice(CShadingContext *);		// Split or render this object
+	void					instantiate(CAttributes *,CXform *,CRendererContext *) const { assert(FALSE);	}
 
 private:
 	void					splitToChildren(CShadingContext *,int);

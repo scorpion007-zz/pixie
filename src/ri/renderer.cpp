@@ -208,10 +208,7 @@ CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;
 CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;
 CArray<CProgrammableShaderInstance*>		*CRenderer::dirtyInstances			=	NULL;
 unsigned int					CRenderer::raytracingFlags			=	0;
-CHierarchy						*CRenderer::hierarchy				=	NULL;
-CArray<CTriangle *>				*CRenderer::triangles				=	NULL;
-CArray<CSurface *>				*CRenderer::raytraced				=	NULL;
-CArray<CTracable *>				*CRenderer::tracables				=	NULL;
+CObject							*CRenderer::root					=	NULL;
 CObject							*CRenderer::offendingObject			=	NULL;
 matrix							CRenderer::fromWorld,CRenderer::toWorld;
 vector							CRenderer::worldBmin,CRenderer::worldBmax;
@@ -775,12 +772,6 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
-	// This is the set of raytraced objects
-	raytraced				=	NULL;
-	hierarchy				=	NULL;
-	tracables				=	NULL;
-	triangles				=	NULL;
-
 	// No dirty shader instances yet
 	dirtyInstances			=	NULL;
 	
@@ -788,6 +779,9 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE			|
 								ATTRIBUTES_FLAGS_TRACE_VISIBLE			|
 								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
+
+	// Set the root object
+	root					=	NULL;
 
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
@@ -911,32 +905,6 @@ void		CRenderer::endFrame() {
 	// Shutdown the brickmaps
 	CTexture::textureShutdown();
 
-	// Detach from the raytraced objects
-	if (raytraced != NULL) {
-		int			i;
-		CSurface	**surfaces	=	raytraced->array;
-
-		for (i=raytraced->numItems;i>0;i--)	(*surfaces++)->detach();
-
-		delete raytraced;
-		raytraced	=	NULL;
-	}
-
-	// We should not have any dangling raytraced objects
-	assert(tracables == NULL);
-
-	// Ditch the triangle list if it's still around
-	if (triangles != NULL) {
-		delete triangles;
-		triangles	=	NULL;
-	}
-
-	// Ditch the raytracing hierarchy
-	if (hierarchy != NULL) {
-		delete hierarchy;
-		hierarchy	=	NULL;
-	}
-
 	// Release the world
 	world->detach();
 	world		=	NULL;
@@ -1007,7 +975,7 @@ void		CRenderer::endFrame() {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/9/2006
-void			CRenderer::render(CObject *cObject,const float *bmin,const float *bmax) {
+void			CRenderer::render(CObject *cObject) {
 	CAttributes	*cAttributes	=	cObject->attributes;
 
 	// Assign the photon map is necessary
@@ -1022,103 +990,25 @@ void			CRenderer::render(CObject *cObject,const float *bmin,const float *bmax) {
 	}
 
 	// Update the world bounding box
-	addBox(worldBmin,worldBmax,bmin);
-	addBox(worldBmin,worldBmax,bmax);
+	addBox(worldBmin,worldBmax,cObject->bmin);
+	addBox(worldBmin,worldBmax,cObject->bmax);
 
 	// Tesselate the object if applicable
 	if (cObject->attributes->flags & raytracingFlags) {
 
-		// Tesselate the object
-		cObject->tesselate(contexts[0]);
+		if (root == NULL)	root	=	new CDummyObject(NULL,NULL);
+
+		cObject->sibling	=	root->children;
+		root->children		=	cObject->sibling;
 	}
 
 	// Only add to this first context, it will do the culling and add it to the rest of the threads
-	contexts[0]->drawObject(cObject,bmin,bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	removeTracable
-// Description			:	Remove a delayed object
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/9/2006
-void			CRenderer::removeTracable(CTracable *cObject) {
-	if (hierarchy != NULL) {
-		vector	bmin,bmax;
-
-		// Bound the object
-		cObject->bound(bmin,bmax);
-
-		hierarchy->remove(cObject,bmin,bmax);
-	}
+	contexts[0]->drawObject(cObject);
 }
 
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	addTracable
-// Description			:	Add a raytracable object into the frame
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/9/2006
-void		CRenderer::addTracable(CTracable *tracable,CSurface *object) {
-
-	if (tracables == NULL)	tracables	=	new CArray<CTracable *>;
-	if (raytraced == NULL)	raytraced	=	new CArray<CSurface *>;
-
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	addTracable
-// Description			:	Add a raytracable object into the frame
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/9/2006
-void		CRenderer::addTracable(CTriangle *tracable,CSurface *object) {
-	if (tracables == NULL)	tracables	=	new CArray<CTracable *>;
-	if (raytraced == NULL)	raytraced	=	new CArray<CSurface *>;
-
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-
-	if (triangles != NULL) triangles->push(tracable);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRenderer
-// Method				:	prepareFrame
-// Description			:	Prepare to render a frame
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/9/2006
-void		CRenderer::prepareFrame() {
-
-	if (tracables != NULL) {
-		if (hierarchy == NULL) {
-			// Init the hierarchy
-			hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax);
-		} else {
-			hierarchy->add(tracables->numItems,tracables->array);
-		}
-
-		delete tracables;
-		tracables	=	NULL;
-	} else {
-		// Create a dummy hierarchy
-		hierarchy	=	new CHierarchy(0,NULL,worldBmin,worldBmax);
-	}
-}
 
 
 

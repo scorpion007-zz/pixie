@@ -45,11 +45,11 @@ public:
 							CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,char **tags,int *nargs,int *intargs,float *floatargs);
 							~CSubdivMesh();
 
-	void					bound(float *bmi,float *bma) const;
-	void					tesselate(CShadingContext *context);
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *rasterizer);
-	int						moving() const {	return pl->data1 != NULL;	}
 	void					instantiate(CAttributes *a,CXform *x,CRendererContext *c) const;
+
+	int						moving() const {	return pl->data1 != NULL;	}
 
 private:
 	void					create(CShadingContext *context);
@@ -64,8 +64,6 @@ private:
 	int						*nargs;
 	int						*intargs;
 	float					*floatargs;
-	vector					bmin,bmax;
-	CArray<CObject *>		*objects;
 };
 
 #endif

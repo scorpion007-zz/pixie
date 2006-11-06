@@ -297,8 +297,6 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 		int					flags;
 		char				type[128];
 		int					createChannel = FALSE;
-		CIrradianceCache	*icache = NULL;
-		CRadianceCache		*rcache = NULL;
 
 		// Process the file mode
 		if (strcmp(mode,"r") == 0) {
@@ -336,9 +334,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 					
 					// Create the cache
 					if (strcmp(type,fileIrradianceCache) == 0) {
-						cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,in);
-					} else if (strcmp(type,fileGatherCache) == 0) {
-						cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,in,triangles);
+						cache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,in);
 					} else {
 						error(CODE_BUG,"This seems to be a Pixie file of unrecognised type (%s)\n",name);
 						fclose(in);
@@ -358,25 +354,13 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 			}
 			
 			// go ahead and create the cache
-			if (flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
-				cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
-			} else {
-				cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,NULL);
-			}
+			cache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,NULL);
 		}
 		
 		// Create channels if possible
 		if (createChannel == TRUE) {
-			if (icache != NULL) {
-				requestRemoteChannel(new CRemoteICacheChannel(icache));
-			} else if (rcache != NULL) {
-				error(CODE_LIMIT,"Radiancecache file \"%s\" cannot be written to in paralell / network renders\n",name);
-
-				// Prevent crashes caused by unwritable empty cache
-				delete cache;
-				flags |= CACHE_WRITE;
-				osTempname(temporaryPath,"rndr",fileName);
-				cache = new CRadianceCache(fileName,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
+			if (cache != NULL) {
+				requestRemoteChannel(new CRemoteICacheChannel((CIrradianceCache *) cache));
 			}
 		}
 

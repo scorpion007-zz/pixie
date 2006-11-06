@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "points.h"
-#include "hierarchy.h"
 #include "memory.h"
 #include "stats.h"
 #include "renderer.h"
@@ -185,18 +184,6 @@ CPoints::~CPoints() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/15/2002
-void	CPoints::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPoints
 // Method				:	dice
 // Description			:	See object.h
 // Return Value			:	-
@@ -221,7 +208,6 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 		vector		P0,P1,nP0,nP1;
 		int			num0,num1,moved;
 		CPoints		*child;
-		vector		bmin,bmax;
 
 		front		=	(const float **)	ralloc(numPoints*sizeof(float *),rasterizer->threadMemory);
 		back		=	(const float **)	ralloc(numPoints*sizeof(float *),rasterizer->threadMemory);
@@ -299,14 +285,12 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 
 		child	=	new CPoints(attributes,xform,base,numFront,front);
 		child->attach();
-		child->bound(bmin,bmax);
-		rasterizer->drawObject(child,bmin,bmax);
+		rasterizer->drawObject(child);
 		child->detach();
 
 		child	=	new CPoints(attributes,xform,base,numBack,back);
 		child->attach();
-		child->bound(bmin,bmax);
-		rasterizer->drawObject(child,bmin,bmax);
+		rasterizer->drawObject(child);
 		child->detach();
 
 

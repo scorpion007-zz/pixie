@@ -56,9 +56,7 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 	movvv(this->bmin,bmi);
 	movvv(this->bmax,bma);
 
-	movvv(cameraBmin,bmin);
-	movvv(cameraBmax,bmax);
-	xform->transformBound(cameraBmin,cameraBmax);
+	xform->transformBound(bmin,bmax);
 }
 
 
@@ -86,7 +84,7 @@ CDLObject::~CDLObject() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	11/7/2003
-void					CDLObject::intersect(CRay *ray) {
+void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 	vector	oN;
 	float	t;
 
@@ -141,28 +139,6 @@ void					CDLObject::intersect(CRay *ray) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDLObject
-// Method				:	intersect
-// Description			:	Intersect the object with a box
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-int						CDLObject::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,cameraBmin,cameraBmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDLObject
-// Method				:	bound
-// Description			:	Bound the surface
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::bound(float *bmin,float *bmax) const {
-	movvv(bmin,cameraBmin);
-	movvv(bmax,cameraBmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
@@ -183,17 +159,6 @@ void					CDLObject::sample(int,int,float **,unsigned int &up) const {
 // Comments				:
 // Date last edited		:	11/7/2003
 void					CDLObject::interpolate(int,float **)	const {
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDLObject
-// Method				:	tesselate
-// Description			:	Tesselate the surface
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::tesselate(CShadingContext *context) {
-	CRenderer::addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -315,19 +315,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\curves.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\delayed.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\depository.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\dlobject.cpp"
 				>
 			</File>
 			<File
@@ -363,14 +351,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\hierarchy.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\implicitSurface.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\init.cpp"
 				>
 			</File>
@@ -391,23 +371,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\object.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\occlusion.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\options.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\patches.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\patchgrid.cpp"
 				>
 			</File>
 			<File
@@ -424,22 +392,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\pointCloud.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\points.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\polygons.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\quadrics.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\radiance.cpp"
 				>
 			</File>
 			<File
@@ -531,22 +483,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\subdivision.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\subdivisionCreator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\surface.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\tesselate.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\texmake.cpp"
 				>
 			</File>
@@ -601,23 +537,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\curves.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\delayed.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\depository.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\dlo.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\dlobject.h"
 				>
 			</File>
 			<File
@@ -657,15 +581,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\hierarchy.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\implicit.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\implicitSurface.h"
 				>
 			</File>
 			<File
@@ -689,23 +605,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\object.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\occlusion.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\options.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\patches.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\patchgrid.h"
 				>
 			</File>
 			<File
@@ -729,23 +633,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\points.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\polygons.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\primvars.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\quadrics.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\radiance.h"
 				>
 			</File>
 			<File
@@ -853,22 +741,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\subdivision.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\subdivisionCreator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\subdivisionData.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\surface.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\texmake.h"
 				>
 			</File>
@@ -910,6 +782,122 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="Primitives"
+			>
+			<File
+				RelativePath="..\..\..\..\src\ri\curves.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\curves.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\delayed.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\delayed.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dlobject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dlobject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\implicitSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\implicitSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\object.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\object.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\objectMisc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\patches.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\patches.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\patchgrid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\patchgrid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\points.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\points.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\polygons.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\polygons.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\quadrics.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\quadrics.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\subdivision.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\subdivision.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\subdivisionCreator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\subdivisionCreator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\subdivisionData.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\surface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\surface.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\..\..\..\src\ri\dso.l"

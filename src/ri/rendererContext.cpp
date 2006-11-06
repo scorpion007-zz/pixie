@@ -420,7 +420,7 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*subdivisionFunction)(void *,float),void *data,const float *bmin,const float *bmax,CRay *cRay) {
+void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedObject *cDelayed,void	(*subdivisionFunction)(void *,float),void *data,const float *bmin,const float *bmax,CRay *cRay) {
 	CAttributes	*savedAttributes;
 	CXform		*savedXform;
 	float		area;
@@ -443,15 +443,9 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 	currentAttributes	=	savedAttributes;
 	currentXform		=	savedXform;
 
-	// Remove the delayed primitive from the scene
-	CRenderer::removeTracable(cDelayed);
-
-	// Update the raytracer
-	CRenderer::prepareFrame();
-
 	// If we're raytracing, check the ray against the children objects
 	if (cRay != NULL) {
-		CRenderer::hierarchy->intersect(cRay);
+		CRenderer::trace(cRay,context->threadMemory);
 	}
 }
 
@@ -464,7 +458,7 @@ void		CRendererContext::processDelayedObject(CDelayedObject *cDelayed,void	(*sub
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CRendererContext::processDelayedInstance(CDelayedInstance *cDelayed,CRay *cRay) {
+void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed,CRay *cRay) {
 
 	// Instantiate the objects
 	CObject		**objects	=	cDelayed->instance->array;
@@ -474,15 +468,9 @@ void		CRendererContext::processDelayedInstance(CDelayedInstance *cDelayed,CRay *
 		objects[i]->instantiate(cDelayed->attributes,cDelayed->xform,this);
 	}
 
-	// Remove the delayed primitive from the scene
-	CRenderer::removeTracable(cDelayed);
-
-	// Update the raytracer
-	CRenderer::prepareFrame();
-
 	// If we're raytracing, check the ray against the children objects
 	if (cRay != NULL) {
-		CRenderer::hierarchy->intersect(cRay);
+		CRenderer::trace(cRay,context->threadMemory);
 	}
 }
 
@@ -508,13 +496,9 @@ void	CRendererContext::addObject(CObject *o) {
 
 	// Are we in the world block ?
 	if (CRenderer::world != NULL) {
-		vector	bmin,bmax;
-
-		// Bound the object
-		o->bound(bmin,bmax);
 
 		// Render the object
-		CRenderer::render(o,bmin,bmax);
+		CRenderer::render(o);
 	}
 
 	// Processing is done
@@ -751,9 +735,6 @@ void	CRendererContext::RiWorldEnd(void) {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Do the thing baby
 
-
-	// Prepare the frame in case we're raytracing
-	CRenderer::prepareFrame();
 
 	// Render the frame
 	CRenderer::renderFrame();

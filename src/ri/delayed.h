@@ -61,18 +61,19 @@ public:
 // Description			:	Contains a delayed object
 // Comments				:
 // Date last edited		:	8/10/2001
-class	CDelayedObject : public CSurface , public CTracable {
+class	CDelayedObject : public CSurface {
 public:
 							CDelayedObject(CAttributes *,CXform *,const float *,const float *,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *,int *drc=NULL);
 							~CDelayedObject();
 
-	void					tesselate(CShadingContext *);
+							// Object interface
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *);
-	int						intersect(const float *,const float *) const;
-	void					intersect(CRay *);
-	void					bound(float *,float *) const;
-	int						moving() const													{	return FALSE;		}
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
+	
+							// Surface interface
+	int						moving() const				{	return FALSE;		}
+	
 
 	void					(*subdivisionFunction)(void *,float);
 	void					(*freeFunction)(void *);
@@ -80,9 +81,6 @@ public:
 	int						*dataRefCount;
 
 	int						processed;
-
-	vector					bmin,bmax;					// Bound in the object space
-	vector					cbmin,cbmax;				// Bound in the camera space
 };
 
 
@@ -91,25 +89,21 @@ public:
 // Description			:	Contains an instance object
 // Comments				:
 // Date last edited		:	8/10/2001
-class	CDelayedInstance : public CSurface , public CTracable {
+class	CDelayedInstance : public CSurface {
 public:
 							CDelayedInstance(CAttributes *,CXform *,CArray<CObject *> *);
 							~CDelayedInstance();
 
-	void					tesselate(CShadingContext *);
+							// Object interface
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *);
-	int						intersect(const float *,const float *) const;
-	void					intersect(CRay *);
-	void					bound(float *,float *) const;
-	int						moving() const													{	return FALSE;		}
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
+	
+							// Surface interface
+	int						moving() const													{	return FALSE;		}
 
 	CArray<CObject *>		*instance;
 	int						processed;
-
-	vector					bmin,bmax;					// Bound in the object space
-	vector					cbmin,cbmax;				// Bound in the camera space
-
 };
 
 

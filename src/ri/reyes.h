@@ -225,7 +225,7 @@ public:
 	virtual	void				rasterEnd(float *,int)						=	0;
 	
 								// The following can be called from the "dice" function to insert an object into the scene
-	void						drawObject(CObject *,const float *,const float *);		// Draw an object
+	void						drawObject(CObject *);									// Draw an object
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
 	void						drawRibbon(CSurface *,int,float,float);					// Draw a ribbon (RiCurves)
 	void						drawPoints(CSurface *,int);								// Draw points (RiPoints)

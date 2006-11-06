@@ -36,7 +36,6 @@
 #include "attributes.h"
 #include "fileResource.h"
 #include "cache.h"
-#include "hierarchy.h"
 #include "random.h"
 #include "depository.h"
 
@@ -91,7 +90,7 @@ public:
 
 public:
 
-							CRadianceCache(const char *,unsigned int,const float *,const float *,CHierarchy *,FILE *,CArray<CTriangle *> *);
+							CRadianceCache(const char *,unsigned int,const float *,const float *,FILE *,CArray<CTriangle *> *);
 							~CRadianceCache();
 
 							// Overloaded cache functionality
@@ -122,7 +121,6 @@ private:
 
 		CSobol<4>			generator;				// Random number generator for the ray-casting
 
-		CHierarchy			*hierarchy;				// The raytracing hierarchy (read only)
 		CArray<CTriangle *> *tris;					// The triangles in the scene
 
 		CTriangleHash		*triangleHash;			// The hash for the triangles

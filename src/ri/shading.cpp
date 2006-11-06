@@ -441,7 +441,7 @@ CShadingContext::~CShadingContext() {
 // Return Value			:
 // Comments				:
 // Date last edited		:	2/15/2003
-void	CShadingContext::drawObject(CObject *cObject,const float *,const float *) {
+void	CShadingContext::drawObject(CObject *cObject) {
 	// This function must be overriden
 }
 

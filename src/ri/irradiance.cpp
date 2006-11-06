@@ -39,6 +39,7 @@
 #include "surface.h"
 #include "stats.h"
 #include "texture.h"
+#include "renderer.h"
 
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
@@ -63,13 +64,12 @@ const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/15/2003
-CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *bmin,const float *bmax,CXform *w,CHierarchy *h,FILE *in) : CCache(name,f) {
+CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *bmin,const float *bmax,CXform *w,FILE *in) : CCache(name,f) {
 	int	i;
 
 	memory				=	new CMemStack;		// Where we allocate our memory from
 	root				=	NULL;
 	maxDepth			=	1;
-	hierarchy			=	h;
 	osCreateMutex(mutex);
 
 	// Are we reading from file ?
@@ -673,7 +673,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 				ray.lastXform			=	NULL;
 				ray.object				=	NULL;
 
-				hierarchy->intersect(&ray);
+				CRenderer::trace(&ray,NULL);
 
 				// Do we have an intersection ?
 				if (ray.object != NULL) {
@@ -760,7 +760,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 				ray.lastXform			=	NULL;
 				ray.object				=	NULL;
 
-				hierarchy->intersect(&ray);
+				CRenderer::trace(&ray,NULL);
 
 				// Do we have an intersection ?
 				if (ray.object != NULL) {

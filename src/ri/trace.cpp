@@ -30,7 +30,6 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
-#include "hierarchy.h"
 #include "shading.h"
 #include "stats.h"
 #include "memory.h"
@@ -117,7 +116,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		ray->jimp				=	urand();
 		ray->lastXform			=	NULL;
 		ray->object				=	NULL;
-		CRenderer::hierarchy->intersect(ray);
+		CRenderer::trace(ray,threadMemory);
 	}
 
 	// Increment the traced ray counter
@@ -261,7 +260,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				cRay->tmin		=	cRay->t + C_EPSILON;
 				cRay->object	=	NULL;
 				cRay->t			=	C_INFINITY;
-				CRenderer::hierarchy->intersect(cRay);
+				CRenderer::trace(cRay,threadMemory);
 			}
 
 			// Increment the traced ray counter

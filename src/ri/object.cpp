@@ -30,6 +30,7 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
+#include "common/polynomial.h"
 #include "object.h"
 #include "error.h"
 #include "ri.h"
@@ -39,6 +40,8 @@
 #include "surface.h"
 #include "rendererContext.h"
 #include "renderer.h"
+
+
 
 
 
@@ -82,50 +85,7 @@ CObject::~CObject() {
 	xform->detach();
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CObject
-// Method				:	bound
-// Description			:	Compute the bounding box of the object
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-void				CObject::bound(float *bmin,float *bmax) const {
-	error(CODE_BUG,"An object is missing the \"bound\" function\n");
-	assert(FALSE);
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CObject
-// Method				:	tesselate
-// Description			:	Tesselate the object into raytracable primitives
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-void				CObject::tesselate(CShadingContext *context) {
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CObject
-// Method				:	dice
-// Description			:	Dice the object into smaller ones
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-void				CObject::dice(CShadingContext *rasterizer) {
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CObject
-// Method				:	copy
-// Description			:	Create a clone object
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-void				CObject::instantiate(CAttributes *,CXform *,CRendererContext *) const {
-	error(CODE_BUG,"An object is missing the \"copy\" function\n");
-	assert(FALSE);
-}
 
 
 static	float	getDisp(float *mat,float disp) {
@@ -158,6 +118,26 @@ static	float	getDisp(float *mat,float disp) {
 #undef urand
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CObject
+// Method				:	cluster
+// Description			:	Cluster the objects
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void		CObject::cluster() {
+	int		numChildren;
+	CObject	*cObject;
+
+	// Cound the number of children
+	for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++);
+
+	// If we have too few children, continue
+	if (numChildren <= 2)	return;
+
+	// Cluster the rest
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
@@ -206,6 +186,53 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 
 
 ///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyObject
+// Method				:	CDummyObject
+// Description			:	Ctor
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyObject
+// Method				:	~CDummyObject
+// Description			:	Dtor
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+CDummyObject::~CDummyObject() {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyObject
+// Method				:	intersect
+// Description			:	Intersect a ray
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void			CDummyObject::intersect(CShadingContext *,CRay *) {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyObject
+// Method				:	dice
+// Description			:	Dice the object
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void			CDummyObject::dice(CShadingContext *) {
+}
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	CSurface
 // Description			:	Ctor
@@ -213,6 +240,7 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
+	P	=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -223,6 +251,168 @@ CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::~CSurface() {
+	if (P != NULL)	delete [] P;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	intersect
+// Description			:	Intersect the surface
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
+	const int	udiv	=	4;
+	const int	vdiv	=	4;
+
+	// Do we have a grid ?
+	if (P == NULL) {
+		const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
+		const float			ustep		=	1 / (float) udiv;
+		const float			vstep		=	1 / (float) vdiv;
+		float				**varying	=	context->currentShadingState->varying;
+		float				*u;
+		float				*v;
+		float				*time;
+		float				cu,cv;
+		int					i,j;
+
+		assert(numVertices <= (int) CRenderer::maxGridSize);
+
+		// Shade the points in the patch
+		u			=	varying[VARIABLE_U];
+		v			=	varying[VARIABLE_V];
+		time		=	varying[VARIABLE_TIME];
+
+		// Shade the minimum grid
+		for (j=vdiv,cv=0;j>=0;j--,cv+=vstep) {
+			for (i=udiv,cu=0;i>=0;i--,cu+=ustep) {
+				*u++		=	cu;
+				*v++		=	cv;
+				*time++		=	0;
+			}
+		}
+
+		// Displace the sucker
+		context->displace(this,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+
+		// Allocate the memory
+		P						=	new float[numVertices*3];
+		memcpy(P,varying[VARIABLE_P],numVertices*3*sizeof(float));
+	}
+
+	// Intersect the ray
+	{
+		int			i,j;
+		const float	*cP	=	P;
+		const float	*r	=	cRay->from;
+		const float	*q	=	cRay->dir;
+
+		for (j=vdiv;j>0;j--) {
+			for (i=udiv;i>0;i--,cP += 3) {
+				const float	*P00		=	cP;
+				const float	*P10		=	cP + 3;
+				const float	*P01		=	cP + (udiv+1)*3;
+				const float	*P11		=	cP + (udiv+1)*3 + 3;
+				
+				vector		a,b,c,d;
+
+				subvv(a,P11,P10);
+				subvv(a,P01);
+				addvv(a,P00);
+				subvv(b,P10,P00);
+				subvv(c,P01,P00);
+				movvv(d,P00);
+
+				const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
+				const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
+				const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
+				const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
+				const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
+				const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
+				const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
+				const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
+				
+
+			#define solve()														\
+				if ((v > 0) && (v < 1)) {										\
+					{															\
+						const double	a	=	v*A2 + B2;						\
+						const double	b	=	v*(A2 - A1) + B2 - B1;			\
+						if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
+						else			u	=	(-v*C2 - D2) / a;				\
+					}															\
+																				\
+					if ((u > 0) && (u < 1)) {									\
+						double	P[3];											\
+																				\
+						P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
+						P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
+						P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
+																				\
+						if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
+							t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+						else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
+							t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+						else													\
+							t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+																				\
+						if ((t > cRay->tmin) && (t < cRay->t)) {				\
+							vector	dPdu,dPdv,N;								\
+							vector	tmp1,tmp2;									\
+							subvv(tmp1,P10,P00);								\
+							subvv(tmp2,P11,P01);								\
+							interpolatev(dPdu,tmp1,tmp2,(float) v);				\
+							subvv(tmp1,P01,P00);								\
+							subvv(tmp2,P11,P10);								\
+							interpolatev(dPdv,tmp1,tmp2,(float) u);				\
+							crossvv(N,dPdu,dPdv);								\
+							if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
+							if (attributes->nSides == 1) {						\
+								if (dotvv(q,N) < 0) {							\
+									cRay->object	=	this;					\
+									cRay->u			=	(float) u;				\
+									cRay->v			=	(float) v;				\
+									cRay->t			=	(float) t;				\
+									movvv(cRay->N,N);							\
+								}												\
+							} else {											\
+								cRay->object	=	this;						\
+								cRay->u			=	(float) u;					\
+								cRay->v			=	(float) v;					\
+								cRay->t			=	(float) t;					\
+								movvv(cRay->N,N);								\
+							}													\
+						}														\
+					}															\
+				}
+				
+
+
+				double			roots[2];
+				const int		i	=	solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots);
+				double			u,v,t;
+
+				switch (i) {
+					case 0:
+						break;
+					case 1:
+						v	=	roots[0];
+						solve();
+						break;
+					case 2:
+						v	=	roots[0];
+						solve();
+						v	=	roots[1];
+						solve();
+						break;
+				}
+
+			}
+
+			cP += 3;
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
