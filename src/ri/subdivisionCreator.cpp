@@ -1714,8 +1714,6 @@ CSubdivMesh::~CSubdivMesh() {
 void		CSubdivMesh::intersect(CShadingContext *rasterizer,CRay *cRay) {
 
 	if (children == NULL)	create(rasterizer);
-
-	CObject::intersect(rasterizer,cRay);
 }
 
 

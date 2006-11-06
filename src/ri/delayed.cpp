@@ -43,7 +43,7 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *data,int *drc) : CSurface(a,x) {
+CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *data,int *drc) : CObject(a,x) {
 	stats.numDelayeds++;
 
 	movvv(this->bmin,bmin);
@@ -163,7 +163,7 @@ void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) c
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CArray<CObject *> *in) : CSurface(a,x) {
+CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CArray<CObject *> *in) : CObject(a,x) {
 	stats.numDelayeds++;
 
 	instance		=	in;

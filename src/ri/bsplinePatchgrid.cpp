@@ -169,28 +169,7 @@ CBSplinePatchGrid::~CBSplinePatchGrid() {
 	stats.gprimMemory	-=	sizeof(CBSplinePatchGrid);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBSplinePatchGrid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	01/23/2006
-void		CBSplinePatchGrid::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBSplinePatchGrid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBSplinePatchGrid::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBSplinePatchGrid

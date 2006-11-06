@@ -46,9 +46,11 @@ public:
 					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,double *);
 					~CBSplinePatchGrid();
 
-	void			bound(float *,float *) const;
-	void			tesselate(CShadingContext *);
-	int				moving() const												{	return variables->moving;			}
+					// Object interface
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+					// Surface interface
+	int				moving() const													{	return variables->moving;			}
 	void			sample(int,int,float **,unsigned int &) const;
 	void			interpolate(int,float **) const;
 
@@ -56,7 +58,6 @@ public:
 	CParameter		*parameters;				// The parameters
 
 	double			*vertex;					// The vertex data (premultiplied Bu*G*Bu')
-	vector			bmin,bmax;					// The bounds
 	float			uOrg,vOrg,uMult,vMult;		// The u,v ranges
 	int				uVertices,vVertices;		// The number of samples in u and v
 };

@@ -217,9 +217,8 @@ public:
 
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
 		void					traceEx(CRayBundle *);									// Trace and maybe shade a bundle of rays. This version increments the shading depth
-
-								// Surface tesselation
-		void					tesselate2D(CSurface *);								// Tesselate a surface
+		void					trace(CRay *);											// Trace a ray (no shading)
+		void					traceAny(CRay *);										// Trace any ray (no shading)
 
 								// Variable management functions
 		void					updateState();											// Add a variable into the shading state

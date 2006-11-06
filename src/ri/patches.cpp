@@ -1427,6 +1427,18 @@ void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
+// Method				:	intersect
+// Description			:	Intersect a ray with this pritimive
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	5/28/2003
+void	CPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
+
+	if (children == NULL)	create(rasterizer);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPatchMesh
 // Method				:	dice
 // Description			:	Dice the primitive
 // Return Value			:	-
@@ -1450,6 +1462,13 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 // Comments				:
 // Date last edited		:	5/28/2003
 void	CPatchMesh::create(CShadingContext *context) {
+
+	osLock(CRenderer::hierarchyMutex);
+	if (children != NULL) {
+		osUnlock(CRenderer::hierarchyMutex);
+		return;
+	}
+
 	int				i,j,k;
 	int				uvaryings,vvaryings;
 	int				uvertices,vvertices;
@@ -1549,6 +1568,8 @@ void	CPatchMesh::create(CShadingContext *context) {
 	vertexData->detach();
 
 	memEnd(context->threadMemory);
+
+	osUnlock(CRenderer::hierarchyMutex);
 }
 
 
@@ -1660,6 +1681,18 @@ void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) 
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
+void	CNURBSPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
+
+	if (children == NULL)	create(rasterizer);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CNURBSPatchMesh
+// Method				:	dice
+// Description			:	Dice the primitive
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	5/28/2003
 void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1677,6 +1710,13 @@ void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 // Comments				:	-
 // Date last edited		:	6/10/2003
 void	CNURBSPatchMesh::create(CShadingContext *context) {
+
+	osLock(CRenderer::hierarchyMutex);
+	if (children != NULL) {
+		osUnlock(CRenderer::hierarchyMutex);
+		return;
+	}
+
 	int				uPatches	=	uVertices - uOrder+1;
 	int				vPatches	=	vVertices - vOrder+1;
 	int				i,j,k;
@@ -1737,5 +1777,7 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	memEnd(context->threadMemory);
 
 	vertexData->detach();
+
+	osUnlock(CRenderer::hierarchyMutex);
 }
 

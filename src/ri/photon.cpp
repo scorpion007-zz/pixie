@@ -52,6 +52,17 @@ static vector spectrumSpline[] = {		{ 0, 0, 0},
 										};
 
 
+// A phony surface class
+class	CPhonySurface : public CSurface {
+public:
+							CPhonySurface(CAttributes *a,CXform *x) : CSurface(a,x) { }
+							~CPhonySurface()	{	}
+
+			void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
+
+};
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonHider
 // Method				:	CPhotonHider
@@ -63,7 +74,7 @@ CPhotonHider::CPhotonHider(int thread,CAttributes *a) : CShadingContext(thread) 
 	CRenderer::raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 	CRenderer::hiderFlags			|=	HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE;
 	bias							=	a->shadowBias;
-	phony							=	new CSurface(a,CRenderer::world);
+	phony							=	new CPhonySurface(a,CRenderer::world);
 	phony->attach();
 }
 
@@ -426,7 +437,7 @@ void		CPhotonHider::illuminateEnd() {
 			ray.lastXform			=	NULL;
 			ray.object				=	NULL;
 
-			CRenderer::trace(&ray,threadMemory);
+			trace(&ray);
 
 			if (ray.object != NULL) {
 				const float power = (Cl[0] + Cl[1] + Cl[2]) / (3*ray.t*ray.t);
@@ -546,7 +557,7 @@ processBounce:;
 	ray.object				=	NULL;
 
 	// Trace the ray in the scene
-	CRenderer::trace(&ray,threadMemory);
+	trace(&ray);
 
 	// Do we have an intersection ?
 	if (ray.object != NULL) {
@@ -700,7 +711,7 @@ processBounce:;
 					ray.object				=	NULL;
 				
 					// Trace the ray in the scene
-					CRenderer::trace(&ray,threadMemory);
+					trace(&ray);
 					
 					// Bail if we hit nothing
 					if (ray.object == NULL) {

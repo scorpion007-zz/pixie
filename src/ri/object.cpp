@@ -64,8 +64,11 @@ CObject::CObject(CAttributes *a,CXform *x) {
 	attributes	=	a;
 	xform		=	x;
 
-	attributes->attach();
-	xform->attach();
+	if (attributes != NULL)	attributes->attach();
+	if (xform != NULL)		xform->attach();
+
+	children	=	NULL;
+	sibling		=	NULL;
 
 	refCount	=	0;
 }
@@ -81,8 +84,8 @@ CObject::CObject(CAttributes *a,CXform *x) {
 CObject::~CObject() {
 	stats.numObjects--;
 
-	attributes->detach();
-	xform->detach();
+	if (attributes != NULL)	attributes->detach();
+	if (xform != NULL)		xform->detach();
 }
 
 
@@ -126,7 +129,7 @@ static	float	getDisp(float *mat,float disp) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-void		CObject::cluster() {
+void		CObject::cluster(CShadingContext *context) {
 	int		numChildren;
 	CObject	*cObject;
 
@@ -137,6 +140,43 @@ void		CObject::cluster() {
 	if (numChildren <= 2)	return;
 
 	// Cluster the rest
+	vector	D;
+	subvv(D,bmax,bmin);
+
+	int	splitAxis;
+	if (D[0] > D[1]) {
+		if (D[2] > D[0])				splitAxis	=	2;
+		else							splitAxis	=	0;
+	} else {
+		if (D[2] > D[1])				splitAxis	=	2;
+		else							splitAxis	=	1;
+	}
+
+	const float	splitCoordinate	=	(bmax[splitAxis] + bmin[splitAxis])*0.5f;
+
+	// Cluster the rest of the objects
+	CObject	*front	=	new CDummyObject(attributes,xform);
+	CObject	*back	=	new CDummyObject(attributes,xform);
+
+	for (cObject=children;cObject!=NULL;) {
+		CObject	*nObject	=	cObject->sibling;
+
+		const float	d	=	(cObject->bmin[splitAxis] + cObject->bmax[splitAxis])*0.5f;
+		if (d > splitCoordinate) {
+			cObject->sibling	=	front->children;
+			front->children		=	cObject;
+		} else {
+			cObject->sibling	=	back->children;
+			back->children		=	cObject;
+		}
+
+		cObject	=	nObject;
+	}
+
+	// Update the hierarchy
+	children		=	front;
+	front->sibling	=	back;
+	back->sibling	=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////

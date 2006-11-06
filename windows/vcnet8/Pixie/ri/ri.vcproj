@@ -290,20 +290,16 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Sources"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath="..\..\..\..\src\ri\attributes.cpp"
-				>
-			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\brickmap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\bsplinePatchgrid.cpp"
+				RelativePath="..\..\..\..\src\ri\brickmap.h"
 				>
 			</File>
 			<File
@@ -311,7 +307,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\bundles.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\cache.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\cache.h"
 				>
 			</File>
 			<File
@@ -319,7 +323,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\dso.cpp"
+				RelativePath="..\..\..\..\src\ri\depository.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dlo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dso.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dsply.h"
 				>
 			</File>
 			<File
@@ -327,19 +343,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\execute.cpp"
+				RelativePath="..\..\..\..\src\ri\error.h"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						OmitFramePointers="false"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\executeMisc.cpp"
+				RelativePath="..\..\..\..\src\ri\executeMisc.h"
 				>
 			</File>
 			<File
@@ -347,11 +355,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\hcshader.cpp"
+				RelativePath="..\..\..\..\src\ri\fileResource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\init.cpp"
+				RelativePath="..\..\..\..\src\ri\harmonics.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\hcshader.cpp"
 				>
 			</File>
 			<File
@@ -359,7 +371,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\irradiance.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\linsys.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\linsys.h"
 				>
 			</File>
 			<File
@@ -367,7 +387,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\memory.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\noise.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\noise.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\noiseTables.h"
 				>
 			</File>
 			<File
@@ -375,11 +407,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\options.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\photon.cpp"
+				RelativePath="..\..\..\..\src\ri\occlusion.h"
 				>
 			</File>
 			<File
@@ -387,7 +415,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\photonMap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\pl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\pl.h"
 				>
 			</File>
 			<File
@@ -395,11 +431,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\pointCloud.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\primvars.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\random.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\raytracer.cpp"
+				RelativePath="..\..\..\..\src\ri\random.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ray.h"
 				>
 			</File>
 			<File
@@ -407,7 +455,87 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\remoteChannel.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ri.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ri.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ribOut.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ribOut.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\riInterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\riInterface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shadeop.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stats.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stats.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texmake.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texmake.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture3d.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture3d.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\tiff.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Renderer"
+			>
+			<File
 				RelativePath="..\..\..\..\src\ri\renderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\renderer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererc.h"
 				>
 			</File>
 			<File
@@ -416,6 +544,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\rendererContext.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rendererContext.h"
 				>
 			</File>
 			<File
@@ -438,354 +570,18 @@
 				RelativePath="..\..\..\..\src\ri\rendererNetwork.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\reyes.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\ri.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\rib.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\ribOut.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\riInterface.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shading.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\show.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\sl.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stats.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stochastic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texmake.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture3d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\trace.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\variable.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\xform.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbuffer.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="Primitives"
 			>
 			<File
-				RelativePath="..\..\..\..\src\ri\attributes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\brickmap.h"
+				RelativePath="..\..\..\..\src\ri\bsplinePatchgrid.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\bsplinePatchgrid.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\bundles.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\cache.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\depository.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\dlo.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\dso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\dsply.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\error.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\executeMisc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\fileResource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\giFunctions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\giOpcodes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\harmonics.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\hcshader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\implicit.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\irradiance.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\linsys.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\noise.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\noiseTables.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\occlusion.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\options.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\patchUtils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\photon.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\photonMap.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\pl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\pointCloud.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\primvars.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\random.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\ray.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\raytracer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\remoteChannel.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\renderer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\rendererc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\rendererContext.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\reyes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\ri.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\rib.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\ribOut.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\riInterface.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\scriptFunctions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\scriptOpcodes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shadeop.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shaderFunctions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shaderOpcodes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\shading.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\show.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\slcode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stats.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stochastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stochasticPoint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stochasticPrimitives.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\stochasticQuad.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texmake.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\tiff.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\variable.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\xform.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbuffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbufferPoint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\zbufferQuad.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-		</Filter>
-		<Filter
-			Name="Primitives"
-			>
 			<File
 				RelativePath="..\..\..\..\src\ri\curves.cpp"
 				>
@@ -808,6 +604,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\dlobject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\implicit.h"
 				>
 			</File>
 			<File
@@ -844,6 +644,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\patchgrid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\patchUtils.h"
 				>
 			</File>
 			<File
@@ -899,270 +703,470 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\..\..\..\src\ri\dso.l"
+		<Filter
+			Name="Hiders"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			<File
+				RelativePath="..\..\..\..\src\ri\photon.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.dso.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\photon.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.dso.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\raytracer.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.dso.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\dso.y"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\raytracer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\reyes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\reyes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\show.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\show.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stochastic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stochastic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stochasticPoint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stochasticPrimitives.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\stochasticQuad.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\zbuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\zbuffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\zbufferPoint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\zbufferQuad.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="State"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			<File
+				RelativePath="..\..\..\..\src\ri\attributes.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.dso.cpp"
-					Outputs="../../../../src/ri/dso.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\attributes.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.dso.cpp"
-					Outputs="../../../../src/ri/dso.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\options.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.dso.cpp"
-					Outputs="../../../../src/ri/dso.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\VTune\ri.vpj"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\options.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\variable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\xform.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\xform.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Parsers"
 			>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\rib.l"
+			<File
+				RelativePath="..\..\..\..\src\ri\dso.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dso.l"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.dso.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.dso.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.dso.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\dso.y"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.dso.cpp"
+						Outputs="../../../../src/ri/dso.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.dso.cpp"
+						Outputs="../../../../src/ri/dso.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.dso.cpp"
+						Outputs="../../../../src/ri/dso.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rib.l"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.rib.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.rib.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.rib.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\rib.y"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.rib.cpp"
+						Outputs="../../../../src/ri/rib.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.rib.cpp"
+						Outputs="../../../../src/ri/rib.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.rib.cpp"
+						Outputs="../../../../src/ri/rib.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\sdr.l"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.sl.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.sl.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.sl.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\sdr.y"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.sl.cpp"
+						Outputs="../../../../src/ri/sl.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.sl.cpp"
+						Outputs="../../../../src/ri/sl.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.sl.cpp"
+						Outputs="../../../../src/ri/sl.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\sl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\variable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\variable.l"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.var.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.var.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l&#x0D;&#x0A;"
+						Outputs="../../../../src/ri/lex.var.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\variable.y"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.var.cpp"
+						Outputs="../../../../src/ri/variable.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.var.cpp"
+						Outputs="../../../../src/ri/variable.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="test|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose&#x0D;&#x0A;"
+						AdditionalDependencies="../../../../src/ri/lex.var.cpp"
+						Outputs="../../../../src/ri/variable.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Shading"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			<File
+				RelativePath="..\..\..\..\src\ri\execute.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.rib.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						OmitFramePointers="false"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\executeMisc.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.rib.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\giFunctions.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.rib.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\rib.y"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\giOpcodes.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.rib.cpp"
-					Outputs="../../../../src/ri/rib.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\hcshader.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.rib.cpp"
-					Outputs="../../../../src/ri/rib.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\init.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.rib.cpp"
-					Outputs="../../../../src/ri/rib.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\sdr.l"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\scriptFunctions.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.sl.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\scriptOpcodes.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.sl.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shader.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.sl.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\sdr.y"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shader.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.sl.cpp"
-					Outputs="../../../../src/ri/sl.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shaderFunctions.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.sl.cpp"
-					Outputs="../../../../src/ri/sl.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shaderOpcodes.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.sl.cpp"
-					Outputs="../../../../src/ri/sl.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\variable.l"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shading.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.var.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\shading.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.var.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\slcode.h"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l&#x0D;&#x0A;"
-					Outputs="../../../../src/ri/lex.var.cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\src\ri\variable.y"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\trace.cpp"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.var.cpp"
-					Outputs="../../../../src/ri/variable.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.var.cpp"
-					Outputs="../../../../src/ri/variable.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="test|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose&#x0D;&#x0A;"
-					AdditionalDependencies="../../../../src/ri/lex.var.cpp"
-					Outputs="../../../../src/ri/variable.cpp"
-				/>
-			</FileConfiguration>
-		</File>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

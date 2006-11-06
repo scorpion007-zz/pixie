@@ -46,6 +46,10 @@ public:
 					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,double *);
 					~CPatchGrid();
 
+					// Object interface
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+					// Surface interface
 	int				moving() const												{	return variables->moving;			}
 	void			sample(int,int,float **,unsigned int &) const;
 	void			interpolate(int,float **) const;

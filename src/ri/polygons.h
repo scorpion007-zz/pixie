@@ -54,7 +54,7 @@ public:
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
-		void				triangulate(CShadingContext *);
+		void				triangulate();
 
 		CPl					*pl;
 		int					npoly,nloops,nverts;

@@ -739,6 +739,12 @@ void	CCurveMesh::create(CShadingContext *context) {
 	int					vertexSize;
 	float				*vertex;
 
+	osLock(CRenderer::hierarchyMutex);
+	if (children != NULL) {
+		osUnlock(CRenderer::hierarchyMutex);
+		return;
+	}
+
 	memBegin(context->threadMemory);
 
 	vertex	=	NULL;
@@ -840,6 +846,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 	}
 
 	memEnd(context->threadMemory);
+
+	osUnlock(CRenderer::hierarchyMutex);
 }
 
 

@@ -212,7 +212,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/15/2003
-void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGlobalIllumLookup *lookup) {
+void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingContext *context,const CGlobalIllumLookup *lookup) {
 	vector				P,N;
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
@@ -316,7 +316,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 		C[6]			=	envdir[2];
 	} else {
 		if (flags & CACHE_SAMPLE) {
-			sample(C,cP,cN,lookup);
+			sample(C,cP,cN,context,lookup);
 		} else {
 			C[0]	=	0;
 			C[1]	=	0;
@@ -580,7 +580,7 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/15/2003
-void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlobalIllumLookup *lookup) {
+void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingContext *context,const CGlobalIllumLookup *lookup) {
 	CCacheSample		*cSample;
 	int					i,j;
 	int					numSamples		=	lookup->numSamples;
@@ -673,7 +673,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 				ray.lastXform			=	NULL;
 				ray.object				=	NULL;
 
-				CRenderer::trace(&ray,NULL);
+				context->trace(&ray);
 
 				// Do we have an intersection ?
 				if (ray.object != NULL) {
@@ -760,7 +760,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 				ray.lastXform			=	NULL;
 				ray.object				=	NULL;
 
-				CRenderer::trace(&ray,NULL);
+				context->trace(&ray);
 
 				// Do we have an intersection ?
 				if (ray.object != NULL) {

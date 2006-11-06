@@ -181,7 +181,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 					ray.lastXform			=	NULL;
 					ray.object				=	NULL;
 
-					CRenderer::trace(&ray,context->threadMemory);
+					context->trace(&ray);
 
 					if (ray.object == NULL) {
 						subvv(P,Ps);
@@ -501,7 +501,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 						ray.lastXform			=	NULL;
 						ray.object				=	NULL;
 
-						CRenderer::trace(&ray,context->threadMemory);
+						context->trace(&ray);
 
 						if (ray.object == NULL) {
 							visibility++;

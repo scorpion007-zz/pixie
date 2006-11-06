@@ -445,7 +445,7 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 
 	// If we're raytracing, check the ray against the children objects
 	if (cRay != NULL) {
-		CRenderer::trace(cRay,context->threadMemory);
+		context->trace(cRay);
 	}
 }
 
@@ -470,7 +470,7 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 
 	// If we're raytracing, check the ray against the children objects
 	if (cRay != NULL) {
-		CRenderer::trace(cRay,context->threadMemory);
+		context->trace(cRay);
 	}
 }
 

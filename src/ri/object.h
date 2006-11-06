@@ -61,11 +61,7 @@ public:
 
 							// Instance management
 	inline	void			attach()	{	refCount++;		}
-
-							// Instance management
 	inline	void			detach()	{	refCount--;	if (refCount == 0)	delete this;	}
-
-							// Instance management						
 	inline	void			check()		{	if (refCount == 0)	delete this;				}
 
 
@@ -81,7 +77,7 @@ public:
 	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	NULL;
 
 							// This function is used to create a bounding volume hierarchy from the children
-			void			cluster();
+			void			cluster(CShadingContext *);
 
 	CAttributes				*attributes;			// Holds the object attributes
 	CXform					*xform;					// Holds the object xform to the object space
@@ -122,7 +118,6 @@ public:
 							// CObject interface
 	virtual	void			intersect(CShadingContext *,CRay *);									// Intersect a ray with the surface
 	virtual	void			dice(CShadingContext *);												// Split or render this object
-	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 	
 							// CSurface interface
 	virtual	int				moving() const;															// TRUE if we're moving

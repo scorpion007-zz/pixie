@@ -781,7 +781,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 
 	// Set the root object
-	root					=	NULL;
+	root					=	new CDummyObject(NULL,NULL);
 
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
@@ -858,6 +858,9 @@ void		CRenderer::endFrame() {
 
 	assert(stats.numRasterGrids		== 0);
 	assert(stats.numRasterObjects	== 0);
+
+	// Delete the root object and it's children
+	delete root;
 
 	// Terminate the displays
 	endDisplays();
@@ -995,9 +998,6 @@ void			CRenderer::render(CObject *cObject) {
 
 	// Tesselate the object if applicable
 	if (cObject->attributes->flags & raytracingFlags) {
-
-		if (root == NULL)	root	=	new CDummyObject(NULL,NULL);
-
 		cObject->sibling	=	root->children;
 		root->children		=	cObject->sibling;
 	}
@@ -1005,7 +1005,6 @@ void			CRenderer::render(CObject *cObject) {
 	// Only add to this first context, it will do the culling and add it to the rest of the threads
 	contexts[0]->drawObject(cObject);
 }
-
 
 
 
@@ -1056,6 +1055,9 @@ static	void		*rendererDispatchThread(void *w) {
 // Comments				:
 // Date last edited		:	10/9/2006
 void		CRenderer::renderFrame() {
+
+	// Make sure we have a bounding hierarchy
+	root->cluster(contexts[0]);
 
 	// Render the frame
 	if (netNumServers != 0) {

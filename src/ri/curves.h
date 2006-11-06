@@ -45,46 +45,47 @@
 class	CCurve : public CSurface {
 public:
 
-	///////////////////////////////////////////////////////////////////////
-	// Class				:	CBase
-	// Description			:	This class holds the data about a single curve
-	// Comments				:
-	// Date last edited		:	10/8/2002
-	class	CBase {
-	public:
-						CBase() {
-							refCount	=	0;
-						}
+					///////////////////////////////////////////////////////////////////////
+					// Class				:	CBase
+					// Description			:	This class holds the data about a single curve
+					// Comments				:
+					// Date last edited		:	10/8/2002
+					class	CBase {
+					public:
+										CBase() {
+											refCount	=	0;
+										}
 
-						~CBase() {
-							delete [] vertex;
-							variables->detach();
-							if (parameters != NULL)	delete parameters;
-						}
+										~CBase() {
+											delete [] vertex;
+											variables->detach();
+											if (parameters != NULL)	delete parameters;
+										}
 
-		void			attach()	{	refCount++;	}
+						void			attach()	{	refCount++;	}
 
-		void			detach()	{	if ((--refCount) == 0) delete this;	}
+						void			detach()	{	if ((--refCount) == 0) delete this;	}
 
-		const CVariable	*sizeVariable;	// The size variable
-		float			maxSize;		// The maximum size of the curve
-		CVertexData		*variables;		// The variables for the curve
-		CParameter		*parameters;	// Da parameters
-		float			*vertex;		// Da vertex data
-		int				refCount;		// Da ref count
-	};
+						const CVariable	*sizeVariable;	// The size variable
+						float			maxSize;		// The maximum size of the curve
+						CVertexData		*variables;		// The variables for the curve
+						CParameter		*parameters;	// Da parameters
+						float			*vertex;		// Da vertex data
+						int				refCount;		// Da ref count
+					};
+
 public:
 					CCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCurve();
-
-					// Surface interface
-	int				moving() const													{	return base->variables->moving;	}
-	void			interpolate(int,float **) const;
 
 					// Object interface
 	void			intersect(CShadingContext *,CRay *)								{	assert(FALSE);	}
 	void			dice(CShadingContext *);
 	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+					// Surface interface
+	int				moving() const													{	return base->variables->moving;	}
+	void			interpolate(int,float **) const;
 
 protected:
 	virtual	void	splitToChildren(CShadingContext *)	=	0;
@@ -145,7 +146,7 @@ public:
 							~CCurveMesh();
 
 							// Object interface
-		void				intersect(CShadingContext *,CRay *);
+		void				intersect(CShadingContext *,CRay *)	{	}
 		void				dice(CShadingContext *rasterizer);
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		

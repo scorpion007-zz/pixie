@@ -206,7 +206,6 @@ public:
 		static	void			endFrame();														// Called in WorldEnd
 		static	void			renderFrame();													// Called in WorldEnd
 		static	void			render(CObject *object);										// Called to insert an object into the scene
-		static	void			trace(CRay *ray,CMemPage *memory);								// Trace a ray
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with rendering (defined in rendererJobs.cpp)

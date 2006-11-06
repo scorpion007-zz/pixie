@@ -61,7 +61,7 @@ public:
 // Description			:	Contains a delayed object
 // Comments				:
 // Date last edited		:	8/10/2001
-class	CDelayedObject : public CSurface {
+class	CDelayedObject : public CObject {
 public:
 							CDelayedObject(CAttributes *,CXform *,const float *,const float *,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *,int *drc=NULL);
 							~CDelayedObject();
@@ -71,10 +71,6 @@ public:
 	void					dice(CShadingContext *);
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
 	
-							// Surface interface
-	int						moving() const				{	return FALSE;		}
-	
-
 	void					(*subdivisionFunction)(void *,float);
 	void					(*freeFunction)(void *);
 	void					*data;
@@ -89,7 +85,7 @@ public:
 // Description			:	Contains an instance object
 // Comments				:
 // Date last edited		:	8/10/2001
-class	CDelayedInstance : public CSurface {
+class	CDelayedInstance : public CObject {
 public:
 							CDelayedInstance(CAttributes *,CXform *,CArray<CObject *> *);
 							~CDelayedInstance();
@@ -99,9 +95,6 @@ public:
 	void					dice(CShadingContext *);
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
 	
-							// Surface interface
-	int						moving() const													{	return FALSE;		}
-
 	CArray<CObject *>		*instance;
 	int						processed;
 };

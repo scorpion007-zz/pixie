@@ -153,7 +153,16 @@ CPolygonTriangle::~CPolygonTriangle() {
 
 
 
-
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonTriangle
+// Method				:	intersect
+// Description			:	Intersect the polygon with the ray
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/7/2002
+void		CPolygonTriangle::intersect(CShadingContext *context,CRay *ray) {
+	// FIXME: Fill me in
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -1070,6 +1079,37 @@ CPolygonMesh::~CPolygonMesh() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
+// Method				:	intersect
+// Description			:	Intersect with a ray
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	6/11/2003
+void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
+
+	if (children == NULL)	triangulate();
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonMesh
+// Method				:	dice
+// Description			:	Split the mesh
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	6/11/2003
+void		CPolygonMesh::dice(CShadingContext *r) {
+
+	if (children == NULL)	triangulate();
+
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		r->drawObject(cObject);
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPolygonMesh
 // Method				:	instantiate
 // Description			:	Instanciate the mesh
 // Return Value			:	-
@@ -1085,22 +1125,6 @@ void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) co
 	c->addObject(new CPolygonMesh(a,nx,pl->clone(a),npoly,nholes,nvertices,vertices));
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPolygonMesh
-// Method				:	dice
-// Description			:	Split the mesh
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/11/2003
-void		CPolygonMesh::dice(CShadingContext *r) {
-
-	if (children == NULL)	triangulate(NULL);
-
-	CObject	*cObject;
-	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
-		r->drawObject(cObject);
-	}
-}
 
 
 
@@ -1598,7 +1622,7 @@ nextLoop:;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void				CPolygonMesh::triangulate(CShadingContext *context) {
+void				CPolygonMesh::triangulate() {
 	int					i,j,k,numVertices;
 	int					*cnholes,*cvertices,*cnvertices;
 	CPlParameter		*normal;
@@ -1669,7 +1693,6 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 	data.meshUniformNumber		=	0;
 	data.meshFacevaryingNumber	=	0;
 	data.mesh					=	this;
-	data.meshContext			=	context;
 
 	osLock(CRenderer::memoryMutex);
 

@@ -192,7 +192,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 								ray.lastXform			=	NULL;																\
 								ray.object				=	NULL;																\
 																																\
-								CRenderer::trace(&ray,threadMemory);															\
+								trace(&ray);																					\
 																																\
 								res->real				=	ray.t
 
@@ -349,7 +349,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								ray.lastXform			=	NULL;																\
 								ray.object				=	NULL;																\
 																																\
-								CRenderer::trace(&ray,threadMemory);															\
+								trace(&ray);																					\
 																																\
 								if (ray.object != NULL)	res[0].real	=	0;														\
 								else					res[0].real	=	1;
@@ -392,7 +392,7 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 								cache	=	lookup->cache;
 
 
-#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,lookup);														\
+#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,this,lookup);														\
 								movvv(&res->real,C);																				\
 								movvv(&envdir->real,C+4);																			\
 								coverage->real = C[3];
@@ -446,7 +446,7 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 								else irradiance = (TCode *) varying[VARIABLE_PW];													\
 								cache	=	lookup->cache;
 
-#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,lookup);														\
+#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,this,lookup);														\
 								res->real	=	C[3];																				\
 								movvv(&irradiance->real,C);																			\
 								movvv(&envdir->real,C+4);

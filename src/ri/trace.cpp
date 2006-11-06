@@ -116,7 +116,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		ray->jimp				=	urand();
 		ray->lastXform			=	NULL;
 		ray->object				=	NULL;
-		CRenderer::trace(ray,threadMemory);
+		trace(ray);
 	}
 
 	// Increment the traced ray counter
@@ -260,7 +260,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				cRay->tmin		=	cRay->t + C_EPSILON;
 				cRay->object	=	NULL;
 				cRay->t			=	C_INFINITY;
-				CRenderer::trace(cRay,threadMemory);
+				trace(cRay);
 			}
 
 			// Increment the traced ray counter
@@ -314,5 +314,80 @@ void	CShadingContext::traceEx(CRayBundle *bundle) {
 }
 
 
+// This is a temp class to hold the heap
+class	CTraceObject {
+public:
+		float		tmin;
+		CObject		*object;
+};
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	trace
+// Description			:	Trace a single ray
+// Return Value			:	-
+// Comments				:	Assume the following fields of CRay have been set:
+//							1. from
+//							2. dir (must be unit length)
+//							3. t
+//							4. tmin
+//							5. flags
+// Date last edited		:	8/30/2002
+void	CShadingContext::trace(CRay *ray) {
+
+	
+	CTraceObject		heapBase[100];
+	CTraceObject		*heap		=	heapBase;
+	int					numObjects	=	1;
+	int					maxObjects	=	100;
+
+	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->to,ray->tmin,ray->t);
+	heap[1].object		=	CRenderer::root;
+
+	// While we have objects in the heap, pop the object and process it
+	while(heap[1].tmin < ray->t) {
+		CObject	*object	=	heap[1].object;
+
+		// Remove the topmost item from da heap
+		heap[1]			=	heap[numObjects];
+		int	parent		=	1;
+		int	child		=	2;
+		while(child < numObjects) {
+			if (((child+1) <= numObjects) && (heap[child].tmin > heap[child+1].tmin))	child++;
+
+			heap[parent]	=	heap[child];
+			parent			=	child;
+			child			=	child+child;
+		}
+		numObjects--;
+
+		object->intersect(this,ray);
+
+		CObject	*cChild;
+		for (cChild=object->children;cChild!=NULL;cChild=cChild->sibling) {
+
+			// Expand the heap as needed
+			if (numObjects == maxObjects) {
+				assert(FALSE);
+			}
+
+			// Insert the child into the heap
+			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->to,ray->tmin,ray->t);
+			
+			// Maintain the heap
+			int	child	=	++numObjects;
+			int	parent	=	child >> 1;
+			while ((child > 1) && (tmin < heap[parent].tmin)) {
+				heap[child]			=	heap[parent];
+				child				=	parent;
+				parent				=	parent >> 1;
+			}
+			heap[child].tmin	=	tmin;
+			heap[child].object	=	cChild;
+		}
+	}
+}
 
 
