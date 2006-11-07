@@ -64,13 +64,21 @@ CObject::CObject(CAttributes *a,CXform *x) {
 	attributes	=	a;
 	xform		=	x;
 
-	if (attributes != NULL)	attributes->attach();
+	refCount	=	0;
+
+	if (attributes != NULL)	{
+
+		// Do not let be destroyed
+		attributes->attach();
+		if (attributes->flags & CRenderer::raytracingFlags)	attach();
+	}
+
 	if (xform != NULL)		xform->attach();
 
 	children	=	NULL;
 	sibling		=	NULL;
 
-	refCount	=	0;
+	
 }
 
 
@@ -82,6 +90,7 @@ CObject::CObject(CAttributes *a,CXform *x) {
 // Comments				:	
 // Date last edited		:	3/11/2001
 CObject::~CObject() {
+
 	stats.numObjects--;
 
 	if (attributes != NULL)	attributes->detach();
@@ -133,50 +142,130 @@ void		CObject::cluster(CShadingContext *context) {
 	int		numChildren;
 	CObject	*cObject;
 
-	// Cound the number of children
+	// Count the number of children
 	for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++);
 
 	// If we have too few children, continue
 	if (numChildren <= 2)	return;
 
-	// Cluster the rest
-	vector	D;
-	subvv(D,bmax,bmin);
+	CObject	*front;
+	CObject	*back;
 
-	int	splitAxis;
-	if (D[0] > D[1]) {
-		if (D[2] > D[0])				splitAxis	=	2;
-		else							splitAxis	=	0;
-	} else {
-		if (D[2] > D[1])				splitAxis	=	2;
-		else							splitAxis	=	1;
+	// Begin a memory page
+	memBegin(context->threadMemory);
+
+	// Cluster the midpoints of the objects
+	float	*P			=	(float *)	ralloc(numChildren*3*sizeof(float),context->threadMemory);
+	int		*indices	=	(int *)		ralloc(numChildren*sizeof(int),context->threadMemory);
+
+
+	// For 5 iterations
+	int	iteration;
+	for (iteration=0;iteration<5;iteration++) {
+
+		// Compute a slightly jittered center position for the object
+		for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++) {
+			initv(P + numChildren*3	,	(cObject->bmax[0] - cObject->bmin[0])*(context->urand()*0.2f + 0.4f) +  cObject->bmin[0]
+									,	(cObject->bmax[1] - cObject->bmin[1])*(context->urand()*0.2f + 0.4f) +  cObject->bmin[1]
+									,	(cObject->bmax[2] - cObject->bmin[2])*(context->urand()*0.2f + 0.4f) +  cObject->bmin[2]);
+			indices[numChildren]	=	-1;
+		}
+
+		// The random cluster centers
+		vector	P1,P2;
+		initv(P1,	(bmax[0] - bmin[0])*context->urand() + bmin[0]
+				,	(bmax[1] - bmin[1])*context->urand() + bmin[1]
+				,	(bmax[2] - bmin[2])*context->urand() + bmin[2]);
+		initv(P2,	(bmax[0] - bmin[0])*context->urand() + bmin[0]
+				,	(bmax[1] - bmin[1])*context->urand() + bmin[1]
+				,	(bmax[2] - bmin[2])*context->urand() + bmin[2]);
+
+		// The main clustering loop
+		int	done;
+		for (done=FALSE;done==FALSE;) {
+			int		i;
+			vector	nP1,nP2;
+			int		num1,num2;
+
+			done	=	TRUE;
+
+			initv(nP1,0);
+			initv(nP2,0);
+			num1	=	0;
+			num2	=	0;
+			for (i=0;i<numChildren;i++) {
+				vector	D1,D2;
+
+				subvv(D1,P + i*3,P1);
+				subvv(D2,P + i*3,P2);
+				if (dotvv(D1,D1) < dotvv(D2,D2)) {
+					if (indices[i] != 0) {
+						done		=	FALSE;
+						indices[i]	=	0;
+					}
+
+					addvv(nP1,P+i*3);
+					num1++;
+				} else {
+					if (indices[i] != 1) {
+						done		=	FALSE;
+						indices[i]	=	1;
+					}
+
+					addvv(nP2,P+i*3);
+					num2++;
+				}
+			}
+
+			if ((num1 == 0) || (num2 == 0))	break;
+
+			mulvf(P1,nP1,1/(float) num1);
+			mulvf(P2,nP2,1/(float) num2);
+		}
+
+		if (done == TRUE)	break;
 	}
 
-	const float	splitCoordinate	=	(bmax[splitAxis] + bmin[splitAxis])*0.5f;
+
+
+
+
 
 	// Cluster the rest of the objects
-	CObject	*front	=	new CDummyObject(attributes,xform);
-	CObject	*back	=	new CDummyObject(attributes,xform);
+	front	=	new CDummyObject(attributes,xform);
+	back	=	new CDummyObject(attributes,xform);
+	initv(front->bmin,C_INFINITY);
+	initv(front->bmax,-C_INFINITY);
+	initv(back->bmin,C_INFINITY);
+	initv(back->bmax,-C_INFINITY);
 
-	for (cObject=children;cObject!=NULL;) {
+	// Create the clusters
+	for (numChildren=0,cObject=children;cObject!=NULL;numChildren++) {
 		CObject	*nObject	=	cObject->sibling;
 
-		const float	d	=	(cObject->bmin[splitAxis] + cObject->bmax[splitAxis])*0.5f;
-		if (d > splitCoordinate) {
+		if (indices[numChildren] == 0) {
 			cObject->sibling	=	front->children;
 			front->children		=	cObject;
+			addBox(front->bmin,front->bmax,cObject->bmin);
+			addBox(front->bmin,front->bmax,cObject->bmax);
 		} else {
 			cObject->sibling	=	back->children;
 			back->children		=	cObject;
+			addBox(back->bmin,back->bmax,cObject->bmin);
+			addBox(back->bmin,back->bmax,cObject->bmax);
 		}
 
 		cObject	=	nObject;
 	}
-
-	// Update the hierarchy
 	children		=	front;
 	front->sibling	=	back;
 	back->sibling	=	NULL;
+
+	memEnd(context->threadMemory);
+
+	// Recurse
+	front->cluster(context);
+	back->cluster(context);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -411,15 +500,15 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 							if (attributes->nSides == 1) {						\
 								if (dotvv(q,N) < 0) {							\
 									cRay->object	=	this;					\
-									cRay->u			=	(float) u;				\
-									cRay->v			=	(float) v;				\
+									cRay->u			=	(float) (u + (udiv-i))/(float) udiv;	\
+									cRay->v			=	(float) (v + (vdiv-j))/(float) vdiv;	\
 									cRay->t			=	(float) t;				\
 									movvv(cRay->N,N);							\
 								}												\
 							} else {											\
 								cRay->object	=	this;						\
-								cRay->u			=	(float) u;					\
-								cRay->v			=	(float) v;					\
+								cRay->u			=	(float) (u + (udiv-i)) / (float) udiv;		\
+								cRay->v			=	(float) (v + (vdiv-j)) / (float) vdiv;		\
 								cRay->t			=	(float) t;					\
 								movvv(cRay->N,N);								\
 							}													\

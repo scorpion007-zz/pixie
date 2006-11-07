@@ -338,7 +338,7 @@ public:
 void	CShadingContext::trace(CRay *ray) {
 
 	
-	CTraceObject		heapBase[100];
+	CTraceObject		heapBase[101];
 	CTraceObject		*heap		=	heapBase;
 	int					numObjects	=	1;
 	int					maxObjects	=	100;
@@ -347,45 +347,55 @@ void	CShadingContext::trace(CRay *ray) {
 	heap[1].object		=	CRenderer::root;
 
 	// While we have objects in the heap, pop the object and process it
-	while(heap[1].tmin < ray->t) {
+	while((numObjects >= 1) && (heap[1].tmin < ray->t)) {
 		CObject	*object	=	heap[1].object;
 
 		// Remove the topmost item from da heap
-		heap[1]			=	heap[numObjects];
-		int	parent		=	1;
-		int	child		=	2;
+		int			parent	=	1;
+		int			child	=	2;
+		const float	tmin	=	heap[numObjects].tmin;
 		while(child < numObjects) {
-			if (((child+1) <= numObjects) && (heap[child].tmin > heap[child+1].tmin))	child++;
+			if (((child+1) < numObjects) && (heap[child].tmin > heap[child+1].tmin))	child++;
+
+			if (tmin < heap[child].tmin)	break;
 
 			heap[parent]	=	heap[child];
 			parent			=	child;
 			child			=	child+child;
 		}
+		heap[parent]	=	heap[numObjects];
 		numObjects--;
 
-		object->intersect(this,ray);
+		// If this is a real object, intersect it with the ray
+		if (object->attributes != NULL)	object->intersect(this,ray);
 
+		// Insert the children objects into the queue
 		CObject	*cChild;
 		for (cChild=object->children;cChild!=NULL;cChild=cChild->sibling) {
 
-			// Expand the heap as needed
+			// Allocate more heap space if we need it (very unlikely)
 			if (numObjects == maxObjects) {
-				assert(FALSE);
+				maxObjects					*=	2;
+				CTraceObject	*newHeap	=	(CTraceObject *) ralloc((maxObjects+1)*sizeof(CTraceObject),threadMemory);
+				memcpy(newHeap,heap,(numObjects+1)*sizeof(CTraceObject));
+				heap						=	newHeap;
 			}
 
 			// Insert the child into the heap
 			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->to,ray->tmin,ray->t);
 			
-			// Maintain the heap
-			int	child	=	++numObjects;
-			int	parent	=	child >> 1;
-			while ((child > 1) && (tmin < heap[parent].tmin)) {
-				heap[child]			=	heap[parent];
-				child				=	parent;
-				parent				=	parent >> 1;
+			if (tmin < ray->t) {
+				// Maintain the heap
+				int	child	=	++numObjects;
+				int	parent	=	child >> 1;
+				while ((child > 1) && (tmin < heap[parent].tmin)) {
+					heap[child]			=	heap[parent];
+					child				=	parent;
+					parent				=	parent >> 1;
+				}
+				heap[child].tmin	=	tmin;
+				heap[child].object	=	cChild;
 			}
-			heap[child].tmin	=	tmin;
-			heap[child].object	=	cChild;
 		}
 	}
 }

@@ -82,6 +82,8 @@ CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float 
 	this->udiv		=	-1;
 	this->vdiv		=	-1;
 	this->object->attach();	
+	movvv(this->bmin,o->bmin);
+	movvv(this->bmax,o->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////

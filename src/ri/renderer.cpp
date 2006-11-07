@@ -999,7 +999,7 @@ void			CRenderer::render(CObject *cObject) {
 	// Tesselate the object if applicable
 	if (cObject->attributes->flags & raytracingFlags) {
 		cObject->sibling	=	root->children;
-		root->children		=	cObject->sibling;
+		root->children		=	cObject;
 	}
 
 	// Only add to this first context, it will do the culling and add it to the rest of the threads
@@ -1057,6 +1057,8 @@ static	void		*rendererDispatchThread(void *w) {
 void		CRenderer::renderFrame() {
 
 	// Make sure we have a bounding hierarchy
+	movvv(root->bmin,worldBmin);
+	movvv(root->bmax,worldBmax);
 	root->cluster(contexts[0]);
 
 	// Render the frame

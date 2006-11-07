@@ -1405,7 +1405,7 @@ CPatchMesh::~CPatchMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CPatchMesh);
 
-	delete pl;
+	if (pl != NULL)	delete pl;
 }
 
 
@@ -1421,6 +1421,8 @@ void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 	nx->concat(xform);	// Concetenate the local xform
 
 	if (a == NULL)	a	=	attributes;
+
+	assert(pl != NULL);
 
 	c->addObject(new CPatchMesh(a,nx,pl->clone(a),degree,uVertices,vVertices,uWrap,vWrap));
 }
@@ -1450,7 +1452,9 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 
 	CObject	*cObject;
 	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		cObject->attach();
 		rasterizer->drawObject(cObject);
+		cObject->detach();
 	}
 }
 
@@ -1519,7 +1523,6 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 				nObject	=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
 
-				nObject->attach();
 				nObject->sibling	=	children;
 				children			=	nObject;
 			}
@@ -1558,7 +1561,6 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 				nObject	=	new CBicubicPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
 
-				nObject->attach();
 				nObject->sibling	=	children;
 				children			=	nObject;
 			}
@@ -1569,6 +1571,11 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 	memEnd(context->threadMemory);
 
+	// We're done with the parameter list
+	delete pl;
+	pl	=	NULL;
+
+	// Release the lock
 	osUnlock(CRenderer::hierarchyMutex);
 }
 
@@ -1699,7 +1706,9 @@ void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 
 	CObject	*cObject;
 	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+		cObject->attach();
 		rasterizer->drawObject(cObject);
+		cObject->detach();
 	}
 }
 
@@ -1765,9 +1774,8 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 
 				gatherData(context,i,j,uOrder,vOrder,i,j,k,vertex,parameters);
 
-				nObject	=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
+				nObject				=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
 
-				nObject->attach();
 				nObject->sibling	=	children;
 				children			=	nObject;
 			}
