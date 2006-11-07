@@ -87,7 +87,7 @@ public:
 // Date last edited		:	8/10/2001
 class	CDelayedInstance : public CObject {
 public:
-							CDelayedInstance(CAttributes *,CXform *,CArray<CObject *> *);
+							CDelayedInstance(CAttributes *,CXform *,CObject *);
 							~CDelayedInstance();
 
 							// Object interface
@@ -95,7 +95,7 @@ public:
 	void					dice(CShadingContext *);
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
 	
-	CArray<CObject *>		*instance;
+	CObject					*instance;
 	int						processed;
 };
 

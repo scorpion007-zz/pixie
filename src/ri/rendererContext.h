@@ -197,8 +197,8 @@ public:
 	CShaderInstance		*getShader(const char *,int,int,char **,void **);		// Load a shader
 
 																				// Delayed object junk
-	void				processDelayedObject(CShadingContext *context,CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *,CRay *ray = NULL);
-	void				processDelayedInstance(CShadingContext *context,CDelayedInstance *instance,CRay *ray = NULL);
+	void				processDelayedObject(CShadingContext *context,CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *);
+	void				processDelayedInstance(CShadingContext *context,CDelayedInstance *instance);
 
 	void				addObject(CObject *);									// Add an object into the scene
 	void				addInstance(void *);									// Add an instance into the scene
@@ -208,12 +208,18 @@ public:
 	void				rendererThread(void *);
 
 private:
+
+	class	CInstance {
+	public:
+			CObject		*objects;
+	};
+
 	CArray<CXform *>			*savedXforms;				// Used to save/restore the graphics state
 	CArray<CAttributes *>		*savedAttributes;
 	CArray<COptions *>			*savedOptions;
-	CArray<CObject *>			*objects;					// The list of all objects recorded so far
-	CArray<CArray<CObject *> *>	*objectsStack;				// The stack of object lists
-	CArray<CArray<CObject *> *>	*allocatedInstances;		// The list of allocated object instances
+	CInstance					*instance;					// The list of all objects recorded so far
+	CArray<CInstance *>			*instanceStack;				// The stack of object lists
+	CArray<CInstance *>			*allocatedInstances;		// The list of allocated object instances
 	CXform						*currentXform;				// The current graphics state
 	CAttributes					*currentAttributes;
 	COptions					*currentOptions;

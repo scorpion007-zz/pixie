@@ -133,6 +133,7 @@ TMutex							CRenderer::commitMutex;
 TMutex							CRenderer::memoryMutex;
 TMutex							CRenderer::networkMutex;
 TMutex							CRenderer::hierarchyMutex;
+TMutex							CRenderer::tesselateMutex;
 TMutex							CRenderer::textureMutex;
 TMutex							CRenderer::refCountMutex;
 TMutex							CRenderer::shaderMutex;
@@ -298,6 +299,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(memoryMutex);
 	osCreateMutex(networkMutex);
 	osCreateMutex(hierarchyMutex);
+	osCreateMutex(tesselateMutex);
 	osCreateMutex(textureMutex);
 	osCreateMutex(refCountMutex);
 	osCreateMutex(shaderMutex);
@@ -369,6 +371,7 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(memoryMutex);
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(hierarchyMutex);
+	osDeleteMutex(tesselateMutex);
 	osDeleteMutex(textureMutex);
 	osDeleteMutex(refCountMutex);
 	osDeleteMutex(shaderMutex);

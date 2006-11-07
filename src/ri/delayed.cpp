@@ -93,17 +93,14 @@ CDelayedObject::~CDelayedObject() {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
-	float	tmin	=	cRay->tmin;
-	float	tmax	=	cRay->t;
+		
 
-	if (intersectBox(bmin,bmax,cRay->from,cRay->to,tmin,tmax)) {
+	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
-
 		if (processed == FALSE) {
-			CRenderer::context->processDelayedObject(context,this,subdivisionFunction,data,bmin,bmax,cRay);
+			CRenderer::context->processDelayedObject(context,this,subdivisionFunction,data,bmin,bmax);
 			processed	=	TRUE;
 		}
-
 		osUnlock(CRenderer::delayedMutex);
 	}
 }
@@ -118,14 +115,16 @@ void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedObject::dice(CShadingContext *r) {
-	osLock(CRenderer::delayedMutex);
+	
 
 	if (processed == FALSE) {
-		CRenderer::context->processDelayedObject(r,this,subdivisionFunction,data,bmin,bmax);
-		processed	=	TRUE;
+		osLock(CRenderer::delayedMutex);
+		if (processed == FALSE) {
+			CRenderer::context->processDelayedObject(r,this,subdivisionFunction,data,bmin,bmax);
+			processed	=	TRUE;
+		}
+		osUnlock(CRenderer::delayedMutex);
 	}
-
-	osUnlock(CRenderer::delayedMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -163,7 +162,7 @@ void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) c
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	8/10/2001
-CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CArray<CObject *> *in) : CObject(a,x) {
+CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObject(a,x) {
 	stats.numDelayeds++;
 
 	instance		=	in;
@@ -172,11 +171,10 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CArray<CObject *> *i
 	initv(bmin,C_INFINITY);
 	initv(bmax,-C_INFINITY);
 
-	CObject	**objects	=	in->array;
-	int		i;
-	for (i=0;i<in->numItems;i++) {
-		addBox(bmin,bmax,objects[i]->bmin);
-		addBox(bmin,bmax,objects[i]->bmax);
+	CObject	*cObject;
+	for (cObject=instance;cObject!=NULL;cObject=cObject->sibling) {
+		addBox(bmin,bmax,cObject->bmin);
+		addBox(bmin,bmax,cObject->bmax);
 	}
 }
 
@@ -200,17 +198,13 @@ CDelayedInstance::~CDelayedInstance() {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
-	float	tmin	=	cRay->tmin;
-	float	tmax	=	cRay->t;
-
-	if (intersectBox(bmin,bmax,cRay->from,cRay->to,tmin,tmax)) {
+	
+	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
-
 		if (processed == FALSE) {
-			CRenderer::context->processDelayedInstance(context,this,cRay);
+			CRenderer::context->processDelayedInstance(context,this);
 			processed	=	TRUE;
 		}
-
 		osUnlock(CRenderer::delayedMutex);
 	}
 }
@@ -224,14 +218,16 @@ void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 // Comments				:
 // Date last edited		:	8/10/2001
 void	CDelayedInstance::dice(CShadingContext *r) {
-	osLock(CRenderer::delayedMutex);
+	
 
 	if (processed == FALSE) {
-		CRenderer::context->processDelayedInstance(r,this);
-		processed	=	TRUE;
+		osLock(CRenderer::delayedMutex);
+		if (processed == FALSE) {
+			CRenderer::context->processDelayedInstance(r,this);
+			processed	=	TRUE;
+		}
+		osUnlock(CRenderer::delayedMutex);
 	}
-
-	osUnlock(CRenderer::delayedMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////

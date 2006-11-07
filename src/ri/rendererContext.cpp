@@ -141,11 +141,11 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 	savedOptions					=	new CArray<COptions *>;
 
 	// Init the object stack
-	objects							=	NULL;
-	objectsStack					=	new CArray<CArray<CObject *> *>;
+	instance						=	NULL;
+	instanceStack					=	new CArray<CInstance *>;
 
 	// Init the object instance junk
-	allocatedInstances				=	new CArray<CArray<CObject *> *>;
+	allocatedInstances				=	new CArray<CInstance *>;
 
 	// Allocate the initial graphics state
 	currentOptions					=	new COptions;
@@ -180,32 +180,21 @@ CRendererContext::~CRendererContext() {
 		
 
 	// Ditch the instance objects created
-	CArray<CObject *>	*CArray;
-	for (CArray=allocatedInstances->pop();CArray!=NULL;CArray=allocatedInstances->pop()) {
+	CInstance	*cInstance;
+	for (cInstance=allocatedInstances->pop();cInstance!=NULL;cInstance=allocatedInstances->pop()) {
 		CObject	*cObject;
 
-		for (cObject=CArray->first();cObject!=NULL;cObject=CArray->next()) {
+		while((cObject = cInstance->objects) != NULL) {
+			cInstance->objects	=	cObject->sibling;
 			cObject->detach();
 		}
-
-		delete CArray;
 	}
 	delete allocatedInstances;
 
 	// Delete the object stack
-	assert(objectsStack				!=	NULL);
-	assert(objectsStack->numItems	==	0);
-	for (CArray=objectsStack->pop();CArray!= NULL;CArray=objectsStack->pop()) {
-		CObject	*cObject;
-
-		// Abnormal termination, force explicit object delete
-		for (cObject=CArray->first();cObject!=NULL;cObject=CArray->next()) {
-			delete cObject;
-		}
-
-		delete CArray;
-	}
-	delete objectsStack;
+	assert(instanceStack !=	NULL);
+	assert(instanceStack->numItems	==	0);
+	delete instanceStack;
 	
 	// Ditch the current graphics state
 	assert(currentOptions				!=	NULL);
@@ -420,33 +409,32 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedObject *cDelayed,void	(*subdivisionFunction)(void *,float),void *data,const float *bmin,const float *bmax,CRay *cRay) {
-	CAttributes	*savedAttributes;
-	CXform		*savedXform;
-	float		area;
+void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedObject *cDelayed,void	(*subdivisionFunction)(void *,float),void *data,const float *bmin,const float *bmax) {
 
-	// Restore the graphics state to the one at the delayed object instanciation
-	savedAttributes		=	currentAttributes;
-	savedXform			=	currentXform;
+	// Save the current graphics state
+	CObject		*savedRoot			=	CRenderer::root;
+	CAttributes	*savedAttributes	=	currentAttributes;
+	CXform		*savedXform			=	currentXform;
+
+	// Overwrite the current graphics state
+	CRenderer::root		=	cDelayed;
 	currentAttributes	=	new CAttributes(cDelayed->attributes);	// Duplicate the graphics state of the delayed object
 	currentXform		=	new CXform(cDelayed->xform);
 	currentAttributes->attach();
 	currentXform->attach();
 
 	// Execute the subdivision
-	area				=	screenArea(cDelayed->xform,bmin,bmax);
-	subdivisionFunction(data,area);
+	subdivisionFunction(data,screenArea(cDelayed->xform,bmin,bmax));
 
 	// Restore the graphics state back
 	currentAttributes->detach();									// Restore the graphics state of the delayed object
 	currentXform->detach();
 	currentAttributes	=	savedAttributes;
 	currentXform		=	savedXform;
+	CRenderer::root		=	savedRoot;
 
-	// If we're raytracing, check the ray against the children objects
-	if (cRay != NULL) {
-		context->trace(cRay);
-	}
+	// Create the hierarchy
+	cDelayed->cluster(context);
 }
 
 
@@ -458,20 +446,22 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 // Return Value			:
 // Comments				:
 // Date last edited		:	8/25/2002
-void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed,CRay *cRay) {
+void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed) {
+
+	// Save the root object
+	CObject		*savedRoot	=	CRenderer::root;
+	CRenderer::root			=	cDelayed;
 
 	// Instantiate the objects
-	CObject		**objects	=	cDelayed->instance->array;
-	int			numObjects	=	cDelayed->instance->numItems;
-	int			i;
-	for (i=0;i<numObjects;i++) {
-		objects[i]->instantiate(cDelayed->attributes,cDelayed->xform,this);
-	}
+	CObject	*cObject;
+	for (cObject=cDelayed->instance;cObject!=NULL;cObject=cObject->sibling)	cObject->instantiate(cDelayed->attributes,cDelayed->xform,this);
 
-	// If we're raytracing, check the ray against the children objects
-	if (cRay != NULL) {
-		context->trace(cRay);
-	}
+
+	// Restore the root object
+	CRenderer::root			=	savedRoot;
+
+	// Create the hierarchy
+	cDelayed->cluster(context);
 }
 
 
@@ -486,8 +476,10 @@ void	CRendererContext::addObject(CObject *o) {
 	assert(currentAttributes	!= NULL);
 	assert(o					!= NULL);
 
-	if (objects != NULL) {
-		objects->push(o);
+	// Are we inside objectBegin/objectEnd ?
+	if (instance != NULL) {
+		o->sibling			=	instance->objects;
+		instance->objects	=	o;
 		return;
 	}
 
@@ -514,16 +506,16 @@ void	CRendererContext::addObject(CObject *o) {
 // Comments				:
 // Date last edited		:	8/25/2002
 void	CRendererContext::addInstance(void *d) {
-	CArray<CObject *>	*cInstance		=	(CArray<CObject *> *) d;
-	CXform				*cXform			=	getXform(FALSE);
-	CAttributes			*cAttributes	=	getAttributes(FALSE);
+	CInstance		*cInstance		=	(CInstance *) d;
+	CXform			*cXform			=	getXform(FALSE);
+	CAttributes		*cAttributes	=	getAttributes(FALSE);
 
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
 		cAttributes	=	NULL;
 	}
 
 	// Instanciate the instance
-	addObject(new CDelayedInstance(cAttributes,cXform,cInstance));
+	addObject(new CDelayedInstance(cAttributes,cXform,cInstance->objects));
 }
 
 
@@ -4181,9 +4173,10 @@ void	*CRendererContext::RiObjectBegin (void) {
 	if (xForm->next != NULL)	xForm->next->identity();
 
 	// Create a new object
-	objectsStack->push(objects);
-	objects			=	new CArray<CObject *>;
-	return	objects;
+	instanceStack->push(instance);
+	instance			=	new CInstance;
+	instance->objects	=	NULL;
+	return	instance;
 }
 
 
@@ -4193,12 +4186,10 @@ void	CRendererContext::RiObjectEnd(void) {
 	CObject	*cObject;
 
 	// Attach to the instanciated objects so that we don't loose them later
-	for (cObject=objects->first();cObject!=NULL;cObject=objects->next()) {
-		cObject->attach();
-	}
+	for (cObject=instance->objects;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
 
-	allocatedInstances->push(objects);
-	objects			=	objectsStack->pop();
+	allocatedInstances->push(instance);
+	instance	=	instanceStack->pop();
 	xformEnd();
 }
 

@@ -396,38 +396,45 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 	// Do we have a grid ?
 	if (P == NULL) {
-		const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
-		const float			ustep		=	1 / (float) udiv;
-		const float			vstep		=	1 / (float) vdiv;
-		float				**varying	=	context->currentShadingState->varying;
-		float				*u;
-		float				*v;
-		float				*time;
-		float				cu,cv;
-		int					i,j;
+		osLock(CRenderer::tesselateMutex);
 
-		assert(numVertices <= (int) CRenderer::maxGridSize);
+		if (P == NULL) {
+			const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
+			const float			ustep		=	1 / (float) udiv;
+			const float			vstep		=	1 / (float) vdiv;
+			float				**varying	=	context->currentShadingState->varying;
+			float				*u;
+			float				*v;
+			float				*time;
+			float				cu,cv;
+			int					i,j;
 
-		// Shade the points in the patch
-		u			=	varying[VARIABLE_U];
-		v			=	varying[VARIABLE_V];
-		time		=	varying[VARIABLE_TIME];
+			assert(numVertices <= (int) CRenderer::maxGridSize);
 
-		// Shade the minimum grid
-		for (j=vdiv,cv=0;j>=0;j--,cv+=vstep) {
-			for (i=udiv,cu=0;i>=0;i--,cu+=ustep) {
-				*u++		=	cu;
-				*v++		=	cv;
-				*time++		=	0;
+			// Shade the points in the patch
+			u			=	varying[VARIABLE_U];
+			v			=	varying[VARIABLE_V];
+			time		=	varying[VARIABLE_TIME];
+
+			// Shade the minimum grid
+			for (j=vdiv,cv=0;j>=0;j--,cv+=vstep) {
+				for (i=udiv,cu=0;i>=0;i--,cu+=ustep) {
+					*u++		=	cu;
+					*v++		=	cv;
+					*time++		=	0;
+				}
 			}
+
+			// Displace the sucker
+			context->displace(this,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+
+			// Allocate the memory
+			float	*cP						=	new float[numVertices*3];
+			memcpy(cP,varying[VARIABLE_P],numVertices*3*sizeof(float));
+			P								=	cP;
 		}
 
-		// Displace the sucker
-		context->displace(this,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
-
-		// Allocate the memory
-		P						=	new float[numVertices*3];
-		memcpy(P,varying[VARIABLE_P],numVertices*3*sizeof(float));
+		osUnlock(CRenderer::tesselateMutex);
 	}
 
 	// Intersect the ray
@@ -437,12 +444,12 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 		const float	*r	=	cRay->from;
 		const float	*q	=	cRay->dir;
 
-		for (j=vdiv;j>0;j--) {
-			for (i=udiv;i>0;i--,cP += 3) {
-				const float	*P00		=	cP;
-				const float	*P10		=	cP + 3;
-				const float	*P01		=	cP + (udiv+1)*3;
-				const float	*P11		=	cP + (udiv+1)*3 + 3;
+		for (j=0;j<vdiv;j++) {
+			for (i=0;i<udiv;i++,cP += 3) {
+				const float	*P00	=	cP;
+				const float	*P10	=	cP + 3;
+				const float	*P01	=	cP + (udiv+1)*3;
+				const float	*P11	=	P01 + 3;
 				
 				vector		a,b,c,d;
 
@@ -500,15 +507,15 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 							if (attributes->nSides == 1) {						\
 								if (dotvv(q,N) < 0) {							\
 									cRay->object	=	this;					\
-									cRay->u			=	(float) (u + (udiv-i))/(float) udiv;	\
-									cRay->v			=	(float) (v + (vdiv-j))/(float) vdiv;	\
+									cRay->u			=	(float) (u + i)/(float) udiv;	\
+									cRay->v			=	(float) (v + j)/(float) vdiv;	\
 									cRay->t			=	(float) t;				\
 									movvv(cRay->N,N);							\
 								}												\
 							} else {											\
 								cRay->object	=	this;						\
-								cRay->u			=	(float) (u + (udiv-i)) / (float) udiv;		\
-								cRay->v			=	(float) (v + (vdiv-j)) / (float) vdiv;		\
+								cRay->u			=	(float) (u + i) / (float) udiv;		\
+								cRay->v			=	(float) (v + j) / (float) vdiv;		\
 								cRay->t			=	(float) t;					\
 								movvv(cRay->N,N);								\
 							}													\
@@ -519,10 +526,9 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 
 				double			roots[2];
-				const int		i	=	solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots);
 				double			u,v,t;
 
-				switch (i) {
+				switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {
 					case 0:
 						break;
 					case 1:
