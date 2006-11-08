@@ -3536,7 +3536,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		CArray<RtPointer>	*savedObjects					=	ribObjects;
 		CArray<char *>		*savedAllocatedStrings			=	allocatedStrings;
 		int					savedRibLineno					=	ribLineno;
-		const char			*savedActivity					=	stats.activity;
 		void				(*savedCallback)(const char *)	=	callback;
 		ERIBValue			*savedArgs						=	args;
 		int					savedNumArguments				=	numArguments;
@@ -3583,7 +3582,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		lightNames			=	NULL;
 		ribObjects			=	NULL;
 		allocatedStrings	=	new CArray<char *>;
-		stats.activity		=	"Rib parsing";
 		callback			=	c;
 		maxArgument			=	1000;
 		argumentStepSize	=	100000;
@@ -3648,7 +3646,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		ribObjects			=	savedObjects;
 		ribLineno			=	savedRibLineno;
 		allocatedStrings	=	savedAllocatedStrings;
-		stats.activity		=	savedActivity;
 		callback			=	savedCallback;
 		
 		if ((ribDepth = savedRibDepth) == 0) {

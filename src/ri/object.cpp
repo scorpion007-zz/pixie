@@ -346,6 +346,7 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Comments				:
 // Date last edited		:	10/16/2001
 CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
+	refCount	=	-1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -356,6 +357,7 @@ CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CDummyObject::~CDummyObject() {
+	assert(refCount == -1);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -366,6 +368,8 @@ CDummyObject::~CDummyObject() {
 // Comments				:
 // Date last edited		:	10/16/2001
 void			CDummyObject::intersect(CShadingContext *,CRay *) {
+	// Should never reach this point
+	assert(FALSE);
 }
 
 

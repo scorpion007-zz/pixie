@@ -1066,11 +1066,9 @@ void		CRenderer::renderFrame() {
 
 	// Render the frame
 	if (netNumServers != 0) {
-		const	char	*previousActivity	=	stats.activity;
 		int				i;
 		TThread			*threads;
 
-		stats.activity	=	"Dispatching";
 
 		// Spawn the threads
 		threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
@@ -1091,13 +1089,9 @@ void		CRenderer::renderFrame() {
 			rcSend(netServers[i],(char *) &netBuffer,sizeof(T32));
 		}
 
-		stats.activity	=	previousActivity;
 	} else {
-		const	char	*previousActivity	=	stats.activity;
 		int				i;
 		TThread			*threads;
-	
-		stats.activity	=	"Rendering";
 
 		// Let the client know that we're ready to render
 		if (netClient != INVALID_SOCKET) {
@@ -1117,8 +1111,6 @@ void		CRenderer::renderFrame() {
 		for (i=0;i<numThreads;i++) {
 			osWaitThread(threads[i]);
 		}
-
-		stats.activity	=	previousActivity;
 	}
 }
 

@@ -1763,10 +1763,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	int			*cintargs;
 	float		*cfloatargs;
 	int			*cvertexIndex;
-	const char	*savedActivity	=	stats.activity;
 	CSubdivData	data;
-
-	stats.activity			=	"Subdivision Surface Instantiation";
 
 	memBegin(context->threadMemory);
 
@@ -1945,6 +1942,4 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	memEnd(context->threadMemory);
 	
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
-
-	stats.activity	=	savedActivity;
 }

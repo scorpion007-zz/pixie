@@ -95,7 +95,6 @@ void	CStats::reset() {
 	frameStartOverhead				=	0;
 	frameEndOverhead				=	0;
 	frameRaytracerOverhead			=	0;
-	activity						=	"idle";
 	progress						=	0;
 	sprintf(frameName,"");
 	frameNumber						=	0;

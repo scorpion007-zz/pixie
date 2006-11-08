@@ -168,8 +168,94 @@ CPolygonTriangle::~CPolygonTriangle() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2002
-void		CPolygonTriangle::intersect(CShadingContext *context,CRay *ray) {
-	// FIXME: Fill me in
+void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
+	if (! (cRay->flags & attributes->flags) )	return;
+
+	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
+		const float importance = attributes->lodImportance;
+		if (importance >= 0) {
+			if (cRay->jimp > importance)			return;
+		} else {
+			if ((1-cRay->jimp) >= -importance)		return;
+		}
+	}
+
+	// Get the polygon corners
+	const CPl	*pl			=	mesh->pl;
+	const float	*vertices	=	pl->data0;
+	const float	*vert0		=	vertices + this->v0*3;
+	const float	*vert1		=	vertices + this->v1*3;
+	const float	*vert2		=	vertices + this->v2*3;
+	vector		t0,t1,t2;
+
+	if ((vertices = pl->data1) != NULL) {
+		interpolatev(t0,vert0,vertices + this->v0*3,cRay->time);	vert0	=	t0;
+		interpolatev(t1,vert1,vertices + this->v1*3,cRay->time);	vert1	=	t1;
+		interpolatev(t2,vert2,vertices + this->v2*3,cRay->time);	vert2	=	t2;
+	} 
+
+	// The ray triangle intersection code
+	// Hacked away from the article titled "Fast, Minimum Storage Ray-Triangle Intersection"
+	//	http://jgt.akpeters.com/papers/MollerTrumbore97/
+
+	vector	edge1,edge2,tvec,pvec,qvec;
+
+	subvv(edge1,vert1,vert0);
+	subvv(edge2,vert2,vert0);
+	crossvv(pvec,cRay->dir,edge2);
+
+	const float det = dotvv(edge1, pvec);
+
+	if (attributes->nSides == 1) {
+
+		if (xform->flip) {
+			if (det < C_EPSILON)	return;
+		} else {
+			if (det > -C_EPSILON)	return;
+		}
+
+		subvv(tvec, cRay->from, vert0);
+
+		const float	u = dotvv(tvec, pvec);
+		if (u < 0.0 || u > det)	return;
+
+		crossvv(qvec, tvec, edge1);
+
+		const float	v = dotvv(cRay->dir, qvec);
+		if (v < 0.0 || u + v > det)	return;
+
+		const float t = dotvv(edge2, qvec);
+		const float	inv_det = 1.0f / det;
+		if ((t > cRay->tmin) && (t < cRay->t)) {
+			cRay->object	=	this;
+			cRay->t			=	t*inv_det;
+			cRay->u			=	(u + v)*inv_det;
+			cRay->v			=	u / (u + v);
+		}
+	} else {
+		if ((det > -C_EPSILON) && (det < C_EPSILON))	return;
+
+		const float	inv_det = 1.0f / det;
+
+		subvv(tvec, cRay->from, vert0);
+
+		const float	u = dotvv(tvec, pvec) * inv_det;
+		if (u < 0.0 || u > 1.0)	return;
+
+		crossvv(qvec, tvec, edge1);
+
+		const float	v = dotvv(cRay->dir, qvec) * inv_det;
+		if (v < 0.0 || u + v > 1.0)	return;
+
+		const float t = dotvv(edge2, qvec) * inv_det;
+
+		if ((t > cRay->tmin) && (t < cRay->t)) {
+			cRay->object	=	this;
+			cRay->t			=	t;
+			cRay->u			=	u + v;
+			cRay->v			=	u / (u + v);
+		}
+	}
 }
 
 

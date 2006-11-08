@@ -103,7 +103,6 @@ public:
 	float			frameStartOverhead;				// The start overhead
 	float			frameEndOverhead;				// The end overhead
 	float			frameRaytracerOverhead;			// The start overhead used by the raytracer
-	const	char	*activity;						// Holds the current activity being performed
 	float			progress;						// The progress in the current frame
 	char			frameName[64];					// The name of the current frame
 	int				frameNumber;					// The number of the current frame
