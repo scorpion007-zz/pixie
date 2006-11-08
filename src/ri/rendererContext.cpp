@@ -447,13 +447,18 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 // Comments				:
 // Date last edited		:	8/25/2002
 void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed) {
-
+	
 	// Set the delayed object
 	delayed	=	cDelayed;
+	
+	CAttributes		*cAttributes	=	cDelayed->attributes;
+	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
+		cAttributes		=	getAttributes(FALSE);;
+	}
 
 	// Instantiate the objects
 	CObject	*cObject;
-	for (cObject=cDelayed->instance;cObject!=NULL;cObject=cObject->sibling)	cObject->instantiate(cDelayed->attributes,cDelayed->xform,this);
+	for (cObject=cDelayed->instance;cObject!=NULL;cObject=cObject->sibling)	cObject->instantiate(cAttributes,cDelayed->xform,this);
 
 	// We're not processing a delayed object anymore
 	delayed	=	NULL;
@@ -514,10 +519,6 @@ void	CRendererContext::addInstance(void *d) {
 	CInstance		*cInstance		=	(CInstance *) d;
 	CXform			*cXform			=	getXform(FALSE);
 	CAttributes		*cAttributes	=	getAttributes(FALSE);
-
-	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
-		cAttributes	=	NULL;
-	}
 
 	// Instanciate the instance
 	addObject(new CDelayedInstance(cAttributes,cXform,cInstance->objects));
