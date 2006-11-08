@@ -86,25 +86,25 @@ public:
 
 
 // Some misc functions for computing the vertex / varying coordinates
-inline void	accumVertex(CSubdivData &data,double *dest,const double *src,double mul = 1) {
+inline void	accumVertex(CSubdivData &data,float *dest,const float *src,float mul = 1) {
 	for (int i=0;i<data.vertexSize;i++) {
 		dest[i]	+=	src[i]*mul;
 	}
 }
 
-inline void	scaleVertex(CSubdivData &data,double *dest,double mul = 1) {
+inline void	scaleVertex(CSubdivData &data,float *dest,float mul = 1) {
 	for (int i=0;i<data.vertexSize;i++) {
 		dest[i]	*=	mul;
 	}
 }
 
-inline void	initVertex(CSubdivData &data,double *dest) {
+inline void	initVertex(CSubdivData &data,float *dest) {
 	for (int i=0;i<data.vertexSize;i++) {
 		dest[i]	=	0;
 	}
 }
 
-static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,double *&vertex,CParameter *&parameters);
+static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,float *&vertex,CParameter *&parameters);
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ public:
 	CVertexEdge		*edges;							// Incident edges
 	int				valence;						// Edge valence
 	int				fvalence;						// Face valence i.e., the number of faces incident on the vertex
-	double			*vertex;						// The vertex coordinates
+	float			*vertex;						// The vertex coordinates
 	float			*varying,*facevarying;			// The varying coordinates
 	CSVertex		*parentv;						// The parent simplex
 	CSEdge			*parente;
@@ -229,8 +229,8 @@ public:
 	CSEdge			*edgeExists(CSVertex *v);
 	void			splitIncidentFaces();
 	void			sort(CSVertex **,CSEdge *,CSFace *,int);
-	void			compute(double *);
-	void			computeLimit(double *);
+	void			compute(float *);
+	void			computeLimit(float *);
 	void			computeVarying(float *,float *);
 	void			compute();
 	int				funny();
@@ -324,7 +324,7 @@ public:
 						}
 					}
 
-	void			compute(double *);
+	void			compute(float *);
 	void			computeVarying(float *,float *);
 };
 
@@ -545,7 +545,7 @@ public:
 									int			K		=	2*N + 8;
 									CSVertex	**ring	=	(CSVertex **) alloca(2*N*sizeof(CSVertex *));	// Holds the ring around the extraordinary vertex (transient)
 									CSVertex	*ringt[8];
-									double		*vertex;
+									float		*vertex;
 									CParameter	*parameters;
 
 									v		=	(CSVertex **) alloca((K+1)*sizeof(CSVertex *));				// Holds the vertices that effect the current patch (transient)
@@ -584,14 +584,13 @@ public:
 
 									// Create the primitive
 									CObject	*nObject	=	new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,1.0f,1.0f,vertex);
-									nObject->attach();
 									nObject->sibling	=	children;
 									children			=	nObject;
 								} else {
 									// This is an ordinary patch
 									CSVertex	*v[16],*va[4];
 									CSVertex	*ring[8];
-									double		*vertex;
+									float		*vertex;
 									CParameter	*parameters;
 
 									// Gather the regular neighborhood
@@ -630,14 +629,13 @@ public:
 
 									// Create the primitive
 									CObject	*nObject	=	new CBicubicPatch(data.currentAttributes,data.currentXform,data.vd,parameters,0,0,1,1,vertex,bsplineBasis,bsplineBasis);
-									nObject->attach();
 									nObject->sibling	=	children;
 									children			=	nObject;
 								}
 							} else {
 								// Damn, we're a funny patch, deal with it
 								int			nv		=	(1 << data.irregularDepth) + 1;
-								double		*vertex;
+								float		*vertex;
 								CSVertex	*va[4];
 								CParameter	*parameters;
 
@@ -683,7 +681,6 @@ public:
 										
 									// Create the primitive
 									CObject	*nObject	=	new CPatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv,nv,bTop,bRgt,bBot,bLft,vertex);
-									nObject->attach();
 									nObject->sibling	=	children;
 									children			=	nObject;
 								} else {
@@ -721,21 +718,18 @@ public:
 										// 'left' strip
 										gatherData(data,(nv+1)*(4),strip1Vertices,va,uniformIndex,vertex,parameters);
 										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,4,nv+1,0.0f,mult,mult,(nv-2)*mult,vertex);
-										nObject->attach();
 										nObject->sibling	=	children;
 										children			=	nObject;
 										
 										// 'top' strip
 										gatherData(data,(4)*(nv+1),strip2Vertices,va,uniformIndex,vertex,parameters);
 										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,4,mult,0.0f,(nv-2)*mult,mult,vertex);
-										nObject->attach();
 										nObject->sibling	=	children;
 										children			=	nObject;
 										
 										// main grid
 										gatherData(data,(nv+1)*(nv+1),patchVertices,va,uniformIndex,vertex,parameters);
 										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,nv+1,mult,mult,(nv-2)*mult,(nv-2)*mult,vertex);
-										nObject->attach();
 										nObject->sibling	=	children;
 										children			=	nObject;
 										
@@ -760,7 +754,6 @@ public:
 																		
 										// Create the primitive
 										nObject				=	new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,mult,mult,vertex);
-										nObject->attach();
 										nObject->sibling	=	children;
 										children			=	nObject;
 									} else {
@@ -771,7 +764,6 @@ public:
 										
 										// Create the primitive
 										CObject	*nObject	=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+2,nv+2,0.0f,0.0f,1.0f,1.0f,vertex);
-										nObject->attach();
 										nObject->sibling	=	children;
 										children			=	nObject;
 									}
@@ -908,7 +900,7 @@ public:
 						}
 					}
 
-	void			compute(double *);
+	void			compute(float *);
 	void			computeVarying(float *,float *);
 	char			findEdgeVertices(int,int,CSVertex*&,CSVertex*&);
 	int				findCornerVertex(int,int,CSVertex*&);
@@ -1172,7 +1164,7 @@ int		CSFace::findCornerVertex(int eOrg,int vOrg,CSVertex *&v) {
 void	CSVertex::compute() {
 	assert(vertex == NULL);
 
-	vertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+	vertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 
 	if (parentv != NULL)		parentv->compute(vertex);
 	else if (parente != NULL)	parente->compute(vertex);
@@ -1189,16 +1181,16 @@ void	CSVertex::compute() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void	CSVertex::compute(double *vertex) {
+void	CSVertex::compute(float *vertex) {
 	CVertexEdge	*cEdge;
 	CVertexFace	*cFace;
-	double		*tvertex;
-	double		sharpness;
+	float		*tvertex;
+	float		sharpness;
 	int			numSharp;
 
 	if (this->vertex == NULL)	compute();
 
-	tvertex			=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+	tvertex			=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 	
 	for (numSharp=0,sharpness=0,cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 		if (cEdge->edge->sharpness > 0) {
@@ -1208,12 +1200,12 @@ void	CSVertex::compute(double *vertex) {
 	}
 	
 	if ((numSharp > 2) || (valence == 2)) {	// We're a corner vertex
-		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	} else {											// We're not a corner vertex
-		double	*sharpVertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
-		double	*smoothVertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+		float	*sharpVertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
+		float	*smoothVertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 
-		sharpness	/=	(double) numSharp;
+		sharpness	/=	(float) numSharp;
 
 		// Compute the smooth rule
 		initVertex(data,smoothVertex);
@@ -1242,8 +1234,8 @@ void	CSVertex::compute(double *vertex) {
 			accumVertex(data,smoothVertex,tvertex);
 		}
 
-		scaleVertex(data,smoothVertex, 1 / (double) (valence*valence));
-		accumVertex(data,smoothVertex,this->vertex,(valence - 2) / (double) valence);
+		scaleVertex(data,smoothVertex, 1 / (float) (valence*valence));
+		accumVertex(data,smoothVertex,this->vertex,(valence - 2) / (float) valence);
 
 		scaleVertex(data,sharpVertex, 1.0 / 8.0);
 		accumVertex(data,sharpVertex,this->vertex,6.0 / 8.0);
@@ -1251,9 +1243,9 @@ void	CSVertex::compute(double *vertex) {
 		if (numSharp == 2) {
 			// We're a crease vertex
 			if (sharpness >= 1) {
-				memcpy(vertex,sharpVertex,data.vertexSize*sizeof(double));
+				memcpy(vertex,sharpVertex,data.vertexSize*sizeof(float));
 			} else if (sharpness <= 0) {
-				memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
+				memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 			} else {
 				initVertex(data,vertex);
 				accumVertex(data,vertex,smoothVertex,1-sharpness);
@@ -1261,12 +1253,12 @@ void	CSVertex::compute(double *vertex) {
 			}
 		} else {
 			// We're a dart or a non-crease vertex
-			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
+			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 		}
 	}
 	
 	if (this->sharpness >= 1) {			// sharp corner rule
-		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	}
 	else if (this->sharpness > 0) {		// smooth corner rule
 		scaleVertex(data,vertex,1 - this->sharpness);
@@ -1304,16 +1296,16 @@ void	CSVertex::computeVarying(float *varying,float *facevarying) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void	CSVertex::computeLimit(double *vertex) {
+void	CSVertex::computeLimit(float *vertex) {
 	CVertexEdge	*cEdge;
 	CVertexFace	*cFace;
-	double		*tvertex;
-	double		sharpness;
+	float		*tvertex;
+	float		sharpness;
 	int			numSharp;
 
 	if (this->vertex == NULL)	compute();
 
-	tvertex			=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+	tvertex			=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 
 	for (numSharp=0,sharpness=0,cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 		if (cEdge->edge->sharpness > 0) {
@@ -1323,12 +1315,12 @@ void	CSVertex::computeLimit(double *vertex) {
 	}
 
 	if ((numSharp > 2) || (valence == 2)) {	// We're a corner vertex
-		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	} else {											// We're not a corner vertex
-		double	*sharpVertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
-		double	*smoothVertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+		float	*sharpVertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
+		float	*smoothVertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 
-		sharpness	/=	(double) numSharp;
+		sharpness	/=	(float) numSharp;
 
 		// Compute the smooth rule
 		initVertex(data,smoothVertex);
@@ -1346,8 +1338,8 @@ void	CSVertex::computeLimit(double *vertex) {
 			accumVertex(data,smoothVertex,tvertex);
 		}
 
-		accumVertex(data,smoothVertex,this->vertex,(double) (valence*valence));
-		scaleVertex(data,smoothVertex, 1 / (double) (valence*(valence+5)));
+		accumVertex(data,smoothVertex,this->vertex,(float) (valence*valence));
+		scaleVertex(data,smoothVertex, 1 / (float) (valence*(valence+5)));
 
 		scaleVertex(data,sharpVertex, 1.0 / 4.0);
 		accumVertex(data,sharpVertex,this->vertex,1.0 / 2.0);
@@ -1355,9 +1347,9 @@ void	CSVertex::computeLimit(double *vertex) {
 		if (numSharp == 2) {
 			// We're a crease vertex
 			if (sharpness >= 1) {
-				memcpy(vertex,sharpVertex,data.vertexSize*sizeof(double));
+				memcpy(vertex,sharpVertex,data.vertexSize*sizeof(float));
 			} else if (sharpness <= 0) {
-				memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
+				memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 			} else {
 				initVertex(data,vertex);
 				accumVertex(data,vertex,smoothVertex,1-sharpness);
@@ -1365,12 +1357,12 @@ void	CSVertex::computeLimit(double *vertex) {
 			}
 		} else {
 			// We're a dart or a non-crease vertex
-			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
+			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 		}
 	}
 	
 	if (this->sharpness >= 1) {			// sharp corner rule
-		memcpy(vertex,this->vertex,data.vertexSize*sizeof(double));
+		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	}
 	else if (this->sharpness > 0) {		// smooth corner rule
 		scaleVertex(data,vertex,1 - this->sharpness);
@@ -1385,13 +1377,13 @@ void	CSVertex::computeLimit(double *vertex) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void	CSEdge::compute(double *vertex) {
-	double	*tvertex;
-	double	*smoothVertex,*sharpVertex;
+void	CSEdge::compute(float *vertex) {
+	float	*tvertex;
+	float	*smoothVertex,*sharpVertex;
 
-	smoothVertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
-	sharpVertex		=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
-	tvertex			=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+	smoothVertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
+	sharpVertex		=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
+	tvertex			=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 
 	if (vertices[0]->vertex == NULL)	vertices[0]->compute();
 	if (vertices[1]->vertex == NULL)	vertices[1]->compute();
@@ -1400,7 +1392,7 @@ void	CSEdge::compute(double *vertex) {
 		initVertex(data,sharpVertex);
 		accumVertex(data,sharpVertex,vertices[0]->vertex);
 		accumVertex(data,sharpVertex,vertices[1]->vertex);
-		scaleVertex(data,sharpVertex,1 / (double) 2);
+		scaleVertex(data,sharpVertex,1 / (float) 2);
 	}
 
 	if ((sharpness < 1) && (faces[1] != NULL)) {	// Have to compute the smooth vertex
@@ -1409,11 +1401,11 @@ void	CSEdge::compute(double *vertex) {
 		accumVertex(data,smoothVertex,tvertex);
 		accumVertex(data,smoothVertex,vertices[0]->vertex);
 		accumVertex(data,smoothVertex,vertices[1]->vertex);
-		scaleVertex(data,smoothVertex,1 / (double) 4);
+		scaleVertex(data,smoothVertex,1 / (float) 4);
 	}
 
-	if ((sharpness >= 1) || (faces[1] == NULL))			memcpy(vertex,sharpVertex,data.vertexSize*sizeof(double));
-	else if (sharpness <= 0)							memcpy(vertex,smoothVertex,data.vertexSize*sizeof(double));
+	if ((sharpness >= 1) || (faces[1] == NULL))			memcpy(vertex,sharpVertex,data.vertexSize*sizeof(float));
+	else if (sharpness <= 0)							memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 	else {
 		initVertex(data,vertex);
 		accumVertex(data,vertex,smoothVertex,(1-sharpness));
@@ -1454,7 +1446,7 @@ void	CSEdge::computeVarying(float *varying,float *facevarying) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void	CSFace::compute(double *vertex) {
+void	CSFace::compute(float *vertex) {
 	int	i;
 
 	initVertex(data,vertex);
@@ -1465,7 +1457,7 @@ void	CSFace::compute(double *vertex) {
 		accumVertex(data,vertex,vertices[i]->vertex);
 	}
 
-	scaleVertex(data,vertex,1 / (double) numEdges);
+	scaleVertex(data,vertex,1 / (float) numEdges);
 }
 
 
@@ -1562,18 +1554,18 @@ void	CSFace::computeVarying(float *varying,float *facevarying) {
 
 
 
-static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,double *&vertex,CParameter *&parameters) {
+static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVertex **varyings,int uniformNumber,float *&vertex,CParameter *&parameters) {
 	int			i;
 	float		*varyingsT,*facevaryingsT;
 
 	assert(data.vertexSize > 0);
 
-	vertex		=	(double *) ralloc(data.vertexSize*numVertex*sizeof(double),data.context->threadMemory);
+	vertex		=	(float *) ralloc(data.vertexSize*numVertex*sizeof(float),data.context->threadMemory);
 
 	for (i=0;i<numVertex;i++) {
 		if (vertices[i]->vertex == NULL)	vertices[i]->compute();
 		
-		memcpy(vertex+i*data.vertexSize,vertices[i]->vertex,sizeof(double)*data.vertexSize);
+		memcpy(vertex+i*data.vertexSize,vertices[i]->vertex,sizeof(float)*data.vertexSize);
 	}
 
 
@@ -1728,9 +1720,12 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
 
-	CObject	*cObject;
-	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
+	CObject	*cObject,*nObject;
+	for (cObject=children;cObject!=NULL;cObject=nObject) {
+		nObject	=	cObject->sibling;
+		cObject->attach();
 		rasterizer->drawObject(cObject);
+		cObject->detach();
 	}
 }
 							
@@ -1813,11 +1808,11 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	// Create the vertices and copy the vertex / varying data over
 	for (i=0;i<numVertices;i++)	{
 		const float	*src			=	data.vertexData + i*data.vertexSize;
-		double		*dest;
+		float		*dest;
 		int			k;
 
 		vertices[i]					=	new (data.context) CSVertex(data);
-		dest = vertices[i]->vertex	=	(double *) ralloc(data.vertexSize*sizeof(double),data.context->threadMemory);
+		dest = vertices[i]->vertex	=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
 
 		for (k=0;k<data.vertexSize;k++)	*dest++	=	*src++;
 	}

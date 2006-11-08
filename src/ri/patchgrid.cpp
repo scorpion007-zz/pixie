@@ -52,7 +52,7 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/12/2002
-CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,int bTop,int bRgt,int bBot,int bLft,double *ve) : CSurface(a,x) {
+CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,int bTop,int bRgt,int bBot,int bLft,float *ve) : CSurface(a,x) {
 	int				numVertices,realNumVertices;
 	int				i;
 	float			*dest;
@@ -73,7 +73,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 	realNumVertices	=	(nu*nv);
 
 	if (variables->moving) {
-		const double	*src;
+		const float	*src;
 
 		dest		=	vertex		=	new float[numVertices*vertexSize*2];
 		stats.gprimMemory			+=	sizeof(float)*numVertices*vertexSize*2;
@@ -82,7 +82,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 			int	j;
 
 			for (j=vertexSize;j>0;j--) {
-				*dest++ = (float) *src++;
+				*dest++ = *src++;
 			}
 
 			src	+=	vertexSize;
@@ -92,7 +92,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 			int	j;
 
 			for (j=vertexSize;j>0;j--) {
-				*dest++ = (float) *src++;
+				*dest++ = *src++;
 			}
 
 			src	+=	vertexSize;
@@ -101,7 +101,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 		dest		=	vertex		=	new float[numVertices*vertexSize];
 		stats.gprimMemory			+=	sizeof(float)*numVertices*vertexSize;
 
-		for (i=numVertices*vertexSize;i>0;i--) *dest++ = (float) *ve++;
+		for (i=numVertices*vertexSize;i>0;i--) *dest++ = *ve++;
 	}
 
 	

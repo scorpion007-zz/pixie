@@ -217,7 +217,8 @@ private:
 	CArray<CXform *>			*savedXforms;				// Used to save/restore the graphics state
 	CArray<CAttributes *>		*savedAttributes;
 	CArray<COptions *>			*savedOptions;
-	CInstance					*instance;					// The list of all objects recorded so far
+	CInstance					*instance;					// The current instance object
+	CObject						*delayed;					// The current delayed object
 	CArray<CInstance *>			*instanceStack;				// The stack of object lists
 	CArray<CInstance *>			*allocatedInstances;		// The list of allocated object instances
 	CXform						*currentXform;				// The current graphics state

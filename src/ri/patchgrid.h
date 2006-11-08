@@ -43,7 +43,7 @@
 // Date last edited		:	5/30/2003
 class	CPatchGrid : public CSurface {
 public:
-					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,double *);
+					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,float *);
 					~CPatchGrid();
 
 					// Object interface

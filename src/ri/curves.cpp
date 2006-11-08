@@ -49,7 +49,7 @@ static	matrix	invBezier	=	{	0,	0,				0,				1,
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/25/2004
-static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3,const float *geometryMatrix) {
+static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3,const float *geometryMatrix,const CXform *xform) {
 	htpoint	tmp,tmp2;
 	vector	vtmp0,vtmp1,vtmp2,vtmp3;
 
@@ -82,6 +82,13 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 	vtmp1[COMP_Z]	=	tmp2[1];
 	vtmp2[COMP_Z]	=	tmp2[2];
 	vtmp3[COMP_Z]	=	tmp2[3];
+
+	if (xform != NULL) {
+		mulmp(vtmp0,xform->from,vtmp0);
+		mulmp(vtmp1,xform->from,vtmp1);
+		mulmp(vtmp2,xform->from,vtmp2);
+		mulmp(vtmp3,xform->from,vtmp3);
+	}
 
 	addBox(bmin,bmax,vtmp0);
 	addBox(bmin,bmax,vtmp1);
@@ -277,7 +284,7 @@ CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,f
 
 	mulmm(geometryMatrix,attributes->vBasis,invBezier);
 
-	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
+	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,NULL);
 	
 	if (variables->moving) {
 		v0	+=	vertexSize;
@@ -285,7 +292,7 @@ CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,f
 		v2	+=	vertexSize;
 		v3	+=	vertexSize;
 
-		makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
+		makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,NULL);
 	}
 
 	subvf(bmin,base->maxSize);
@@ -574,41 +581,42 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *nve,int w) : CObject(a,x) {
 	int			i;
 	const float	*P;
-	const float	expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
 	float		*vertex;
 
 	stats.numGprims++;
 	stats.gprimMemory		+=	sizeof(CCurveMesh) + sizeof(int)*nc;
 
+	// Attach to the PL
 	pl			=	c;
 
+	// Save the data
 	numVertices	=	nv;
 	numCurves	=	nc;
 	degree		=	d;
 	nverts		=	new int[numCurves];				memcpy(nverts,nve,sizeof(int)*numCurves);
 	wrap		=	w;
 
-	// Extract the size parameter
+	// Extract the maximum width without touching the PL
 	sizeVariable				=	NULL;
 	maxSize						=	0;
 	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
 
-		if ((strcmp(cVar->name,"width") == 0) || (strcmp(cVar->name,"constantwidth") == 0)) {
+		if ((cVar->entry == VARIABLE_WIDTH) || (cVar->entry == VARIABLE_CONSTANTWIDTH)) {
 			const	int	np	=	pl->parameters[i].numItems;
+
+			assert(cVar->numFloats == 1);
 
 			sizeVariable		=	cVar;
 
 			for (i=0;i<np;i++) {
-				vertex[i]		*=	expansion;
 				maxSize			=	max(maxSize,vertex[i]);
 			}
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0) - np;
+				vertex	=	pl->data1 + (vertex - pl->data0);
 
 				for (i=0;i<np;i++) {
-					vertex[i]		*=	expansion;
 					maxSize			=	max(maxSize,vertex[i]);
 				}
 			}
@@ -616,25 +624,25 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 			break;
 		}
 
-		vertex	+=	pl->parameters[i].numItems*cVar->numFloats;
+		vertex +=	pl->parameters[i].numItems*cVar->numFloats;
 	}
 
-	if (sizeVariable == NULL)	maxSize	=	1;
-	maxSize		*=	0.5f;
-
 	// Compute the bound
-
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	if (degree == 1) {
+		vector	tmp;
+
 		for (P=pl->data0,i=numVertices;i>0;i--,P+=3) {
-			addBox(bmin,bmax,P);
+			mulmp(tmp,xform->from,P);
+			addBox(bmin,bmax,tmp);
 		}
 
 		if (pl->data1 != NULL) {
 			for (P=pl->data1,i=numVertices;i>0;i--,P+=3) {
-				addBox(bmin,bmax,P);
+				mulmp(tmp,xform->from,P);
+				addBox(bmin,bmax,tmp);
 			}
 		}
 	} else {
@@ -642,6 +650,10 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 		int				cVertex		=	0;
 		matrix			geometryMatrix;
 
+		assert(degree == 3);
+
+		// Convert to Bezier Matrix
+		// FIXME: The order of the multiplication may be wrong !!!
 		mulmm(geometryMatrix,attributes->vBasis,invBezier);
 
 		for (i=0;i<numCurves;i++) {
@@ -654,7 +666,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 				float	*v2		=	pl->data0 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 				float	*v3		=	pl->data0 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-				makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
+				makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform);
 
 				if (pl->data1 != NULL) {
 					v0			=	pl->data1 + (cVertex+(j*attributes->vStep + 0) % nverts[i])*3;
@@ -662,7 +674,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 					v2			=	pl->data1 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 					v3			=	pl->data1 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-					makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix);
+					makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform);
 				}
 			}
 
@@ -670,10 +682,13 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 		}
 	}
 
+	// Expand the bounding box by the width of the curves
+	if (sizeVariable == NULL)	maxSize	=	1;
+	maxSize		*=	0.5f*powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
 	addvf(bmax,maxSize);
 	subvf(bmin,maxSize);
 
-	xform->transformBound(bmin,bmax);
+	// Make it a bound
 	makeBound(bmin,bmax);
 }
 
@@ -719,10 +734,7 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
 
-	CObject	*cObject;
-	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
-		rasterizer->drawObject(cObject);
-	}
+	CObject::dice(rasterizer);
 }
 
 
@@ -734,10 +746,6 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 // Comments				:
 // Date last edited		:	5/28/2003
 void	CCurveMesh::create(CShadingContext *context) {
-	int					i;
-	CVertexData			*variables;
-	int					vertexSize;
-	float				*vertex;
 
 	osLock(CRenderer::hierarchyMutex);
 	if (children != NULL) {
@@ -745,14 +753,44 @@ void	CCurveMesh::create(CShadingContext *context) {
 		return;
 	}
 
+	int					i;
+	CVertexData			*variables;
+	int					vertexSize;
+	float				*vertex;
+	CObject				*allChildren;
+
 	memBegin(context->threadMemory);
 
+	// Extract the vertices
 	vertex	=	NULL;
 	pl->transform(xform);													// Transform the core
 	pl->collect(vertexSize,vertex,CONTAINER_VERTEX,context->threadMemory);	// Obtain the vertex data
 
+	// Multiply the curve width by the expansion in the coordinate system
+	const float expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
+	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+		const CVariable	*cVar	=	pl->parameters[i].variable;
+
+		if (cVar == sizeVariable) {
+			const	int	np	=	pl->parameters[i].numItems;
+
+			for (i=0;i<np;i++) vertex[i] *=	expansion;
+
+			if (pl->data1 != NULL) {
+				vertex	=	pl->data1 + (vertex - pl->data0);
+
+				for (i=0;i<np;i++)	vertex[i] *= expansion;
+			}
+
+			break;
+		}
+
+		vertex+=pl->parameters[i].numItems*cVar->numFloats;
+	}
+
 	// Allocate the variables
 	variables		=	pl->vertexData();
+	allChildren		=	NULL;
 
 	// Instanciate
 	if (degree == 3) {
@@ -792,10 +830,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 				memcpy(base->vertex + 3*vertexSize,v3,vertexSize*sizeof(float));
 
 				cCurve				=	new CCubicCurve(attributes,xform,base,0,1,vmin,vmax);
-				cCurve->attach();
-				cCurve->sibling		=	children;
-				children			=	cCurve;
-				
+				cCurve->sibling		=	allChildren;
+				allChildren			=	cCurve;	
 			}
 
 			cVertex					+=	nverts[i];
@@ -835,9 +871,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 				memcpy(base->vertex + 1*vertexSize,v1,vertexSize*sizeof(float));
 
 				cCurve				=	new CLinearCurve(attributes,xform,base,0,1,vmin,vmax);
-				cCurve->attach();
-				cCurve->sibling		=	children;
-				children			=	cCurve;
+				cCurve->sibling		=	allChildren;
+				allChildren			=	cCurve;
 			}
 
 			cVertex					+=	nverts[i];
@@ -847,6 +882,8 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 	memEnd(context->threadMemory);
 
+	children	=	allChildren;
+	cluster(context);
 	osUnlock(CRenderer::hierarchyMutex);
 }
 

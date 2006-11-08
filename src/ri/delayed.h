@@ -76,6 +76,8 @@ public:
 	void					*data;
 	int						*dataRefCount;
 
+	vector					objectBmin,objectBmax;
+
 	int						processed;
 };
 

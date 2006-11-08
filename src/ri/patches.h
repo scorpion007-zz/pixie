@@ -45,7 +45,7 @@
 // Date last edited		:	6/28/2001
 class	CBilinearPatch : public CSurface {
 public:
-						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *);
+						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *);
 						~CBilinearPatch();
 
 		void			intersect(CShadingContext *,CRay *);
@@ -70,7 +70,7 @@ private:
 // Date last edited		:	6/28/2001
 class	CBicubicPatch : public CSurface {
 public:
-						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *,const float *uBasis=NULL,const float *vBasis=NULL);
+						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *,const float *uBasis=NULL,const float *vBasis=NULL);
 						~CBicubicPatch();
 
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
@@ -80,11 +80,11 @@ public:
 		void			interpolate(int,float **) const;
 
 private:
-		void			computeVertexData(double *,const double *,int,const float *,const float *);
+		void			computeVertexData(float *,const float *,int,const float *,const float *);
 
 		CVertexData		*variables;
 		CParameter		*parameters;
-		double			*vertex;
+		float			*vertex;
 		float			uOrg,vOrg,uMult,vMult;				// The parametric range of the patch
 };
 
@@ -95,7 +95,7 @@ private:
 // Date last edited		:	6/28/2001
 class	CNURBSPatch : public CSurface {
 public:
-						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,double *);
+						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,float *);
 						~CNURBSPatch();
 
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
@@ -105,12 +105,12 @@ public:
 		void			interpolate(int,float **) const;
 
 private:
-		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);
-		void			precomputeVertexData(double *,const double *,const double *,double *,int);
+		void			precompBasisCoefficients(float *,unsigned int,unsigned int,unsigned int,const float *);
+		void			precomputeVertexData(float *,const float *,const float *,float *,int);
 
 		CVertexData		*variables;
 		CParameter		*parameters;
-		double			*vertex;							// These are double precision to reduce roundoff errors
+		float			*vertex;
 		int				uOrder,vOrder;
 		float			uOrg,vOrg,uMult,vMult;
 };

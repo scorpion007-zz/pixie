@@ -66,19 +66,14 @@ CObject::CObject(CAttributes *a,CXform *x) {
 
 	refCount	=	0;
 
-	if (attributes != NULL)	{
+	attributes->attach();
+	xform->attach();
 
-		// Do not let be destroyed
-		attributes->attach();
-		if (attributes->flags & CRenderer::raytracingFlags)	attach();
-	}
-
-	if (xform != NULL)		xform->attach();
+	// If we're raytracing, don't let be destroyed
+	if (attributes->flags & CRenderer::raytracingFlags)	attach();
 
 	children	=	NULL;
 	sibling		=	NULL;
-
-	
 }
 
 
@@ -90,14 +85,29 @@ CObject::CObject(CAttributes *a,CXform *x) {
 // Comments				:	
 // Date last edited		:	3/11/2001
 CObject::~CObject() {
-
 	stats.numObjects--;
 
-	if (attributes != NULL)	attributes->detach();
-	if (xform != NULL)		xform->detach();
+	attributes->detach();
+	xform->detach();
 }
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CObject
+// Method				:	dice
+// Description			:	Dice the children objects
+// Return Value			:	-
+// Comments				:	
+// Date last edited		:	3/11/2001
+void			CObject::dice(CShadingContext *rasterizer) {
+	CObject	*cObject,*nObject;
+	for (cObject=children;cObject!=NULL;cObject=nObject) {
+		nObject	=	cObject->sibling;
+		cObject->attach();
+		rasterizer->drawObject(cObject);
+		cObject->detach();
+	}
+}
 
 
 static	float	getDisp(float *mat,float disp) {
@@ -270,6 +280,20 @@ void		CObject::cluster(CShadingContext *context) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
+// Method				:	destroy
+// Description			:	Destroy the entire tree
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void		CObject::destroy() {
+	if (sibling != NULL)	sibling->destroy();
+	if (children != NULL)	children->destroy();
+
+	delete this;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CObject
 // Method				:	makeBound
 // Description			:	Make sure we do not have empty bounding box
 // Return Value			:
@@ -342,16 +366,6 @@ CDummyObject::~CDummyObject() {
 // Comments				:
 // Date last edited		:	10/16/2001
 void			CDummyObject::intersect(CShadingContext *,CRay *) {
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDummyObject
-// Method				:	dice
-// Description			:	Dice the object
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-void			CDummyObject::dice(CShadingContext *) {
 }
 
 

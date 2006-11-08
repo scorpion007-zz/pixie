@@ -203,7 +203,7 @@ public:
 		//		getJob
 		//
 		////////////////////////////////////////////////////////////////////
-		static	void			beginFrame(const COptions *options,CXform *xform);				// Called in WorldBegin
+		static	void			beginFrame(const COptions *options,CAttributes *attributes,CXform *xform);		// Called in WorldBegin
 		static	void			endFrame();														// Called in WorldEnd
 		static	void			renderFrame();													// Called in WorldEnd
 		static	void			render(CObject *object);										// Called to insert an object into the scene

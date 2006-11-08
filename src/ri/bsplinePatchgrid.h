@@ -43,7 +43,7 @@
 // Date last edited		:	5/30/2003
 class	CBSplinePatchGrid : public CSurface {
 public:
-					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,double *);
+					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,float *);
 					~CBSplinePatchGrid();
 
 					// Object interface
@@ -57,7 +57,7 @@ public:
 	CVertexData		*variables;					// The variables
 	CParameter		*parameters;				// The parameters
 
-	double			*vertex;					// The vertex data (premultiplied Bu*G*Bu')
+	float			*vertex;					// The vertex data (premultiplied Bu*G*Bu')
 	float			uOrg,vOrg,uMult,vMult;		// The u,v ranges
 	int				uVertices,vVertices;		// The number of samples in u and v
 };

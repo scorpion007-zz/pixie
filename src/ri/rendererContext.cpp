@@ -142,6 +142,7 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
 	// Init the object stack
 	instance						=	NULL;
+	delayed							=	NULL;
 	instanceStack					=	new CArray<CInstance *>;
 
 	// Init the object instance junk
@@ -412,12 +413,11 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedObject *cDelayed,void	(*subdivisionFunction)(void *,float),void *data,const float *bmin,const float *bmax) {
 
 	// Save the current graphics state
-	CObject		*savedRoot			=	CRenderer::root;
 	CAttributes	*savedAttributes	=	currentAttributes;
 	CXform		*savedXform			=	currentXform;
 
 	// Overwrite the current graphics state
-	CRenderer::root		=	cDelayed;
+	delayed				=	cDelayed;
 	currentAttributes	=	new CAttributes(cDelayed->attributes);	// Duplicate the graphics state of the delayed object
 	currentXform		=	new CXform(cDelayed->xform);
 	currentAttributes->attach();
@@ -431,7 +431,7 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 	currentXform->detach();
 	currentAttributes	=	savedAttributes;
 	currentXform		=	savedXform;
-	CRenderer::root		=	savedRoot;
+	delayed				=	NULL;
 
 	// Create the hierarchy
 	cDelayed->cluster(context);
@@ -448,17 +448,15 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 // Date last edited		:	8/25/2002
 void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed) {
 
-	// Save the root object
-	CObject		*savedRoot	=	CRenderer::root;
-	CRenderer::root			=	cDelayed;
+	// Set the delayed object
+	delayed	=	cDelayed;
 
 	// Instantiate the objects
 	CObject	*cObject;
 	for (cObject=cDelayed->instance;cObject!=NULL;cObject=cObject->sibling)	cObject->instantiate(cDelayed->attributes,cDelayed->xform,this);
 
-
-	// Restore the root object
-	CRenderer::root			=	savedRoot;
+	// We're not processing a delayed object anymore
+	delayed	=	NULL;
 
 	// Create the hierarchy
 	cDelayed->cluster(context);
@@ -480,6 +478,13 @@ void	CRendererContext::addObject(CObject *o) {
 	if (instance != NULL) {
 		o->sibling			=	instance->objects;
 		instance->objects	=	o;
+		return;
+	}
+
+	// Are we processing a delayed object ?
+	if (delayed != NULL) {
+		o->sibling			=	delayed->children;
+		delayed->children	=	o;
 		return;
 	}
 
@@ -703,7 +708,7 @@ void	CRendererContext::RiWorldBegin(void) {
 	CRenderer::defineCoordinateSystem(coordinateWorldSystem,currentXform->from,currentXform->to,COORDINATE_WORLD);
 
 	// Start the renderer
-	CRenderer::beginFrame(currentOptions,currentXform);
+	CRenderer::beginFrame(currentOptions,currentAttributes,currentXform);
 
 	// Update the sequence number
 	stats.runningSequenceNumber++;

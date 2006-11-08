@@ -57,13 +57,10 @@ public:
 							CObject(CAttributes *,CXform *);
 	virtual					~CObject();
 
-
-
 							// Instance management
 	inline	void			attach()	{	refCount++;		}
 	inline	void			detach()	{	refCount--;	if (refCount == 0)	delete this;	}
 	inline	void			check()		{	if (refCount == 0)	delete this;				}
-
 
 							///////////////////////////////////////////////////////////////
 							//
@@ -73,11 +70,11 @@ public:
 							//
 							//	
 	virtual	void			intersect(CShadingContext *,CRay *)								=	NULL;
-	virtual	void			dice(CShadingContext *)											=	NULL;
+	virtual	void			dice(CShadingContext *);
 	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	NULL;
 
-							// This function is used to create a bounding volume hierarchy from the children
-			void			cluster(CShadingContext *);
+			void			cluster(CShadingContext *);	// Take the children and create a bounding volume hierarchy
+			void			destroy();					// Delete the children/siblings
 
 	CAttributes				*attributes;			// Holds the object attributes
 	CXform					*xform;					// Holds the object xform to the object space
@@ -100,14 +97,13 @@ public:
 	virtual					~CDummyObject();
 
 	virtual	void			intersect(CShadingContext *,CRay *);
-	virtual	void			dice(CShadingContext *);
 	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 };
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
-// Description			:	This class encapsulates a general object
+// Description			:	This class encapsulates a 2D surface
 // Comments				:
 // Date last edited		:	3/11/2001
 class	CSurface : public CObject {

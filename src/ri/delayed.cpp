@@ -54,6 +54,10 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 
 	processed					=	FALSE;
 
+	// Save the object space bounding box
+	movvv(objectBmin,bmin);
+	movvv(objectBmax,bmax);
+
 	if (drc == NULL) {
 		dataRefCount			=	new int;
 		dataRefCount[0]			=	0;
@@ -94,7 +98,7 @@ CDelayedObject::~CDelayedObject() {
 // Date last edited		:	8/10/2001
 void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 		
-
+	// Process the object
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
 		if (processed == FALSE) {
@@ -116,7 +120,7 @@ void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 // Date last edited		:	8/10/2001
 void	CDelayedObject::dice(CShadingContext *r) {
 	
-
+	// Process the object
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
 		if (processed == FALSE) {
@@ -125,6 +129,9 @@ void	CDelayedObject::dice(CShadingContext *r) {
 		}
 		osUnlock(CRenderer::delayedMutex);
 	}
+
+	// Let the parent dice it
+	CObject::dice(r);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -141,7 +148,7 @@ void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) c
 
 	if (a == NULL)	a	=	attributes;
 
-	c->addObject(new CDelayedObject(a,nx,bmin,bmax,subdivisionFunction,freeFunction,data,dataRefCount));
+	c->addObject(new CDelayedObject(a,nx,objectBmin,objectBmax,subdivisionFunction,freeFunction,data,dataRefCount));
 }
 
 
@@ -176,6 +183,9 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObje
 		addBox(bmin,bmax,cObject->bmin);
 		addBox(bmin,bmax,cObject->bmax);
 	}
+
+	xform->transformBound(this->bmin,this->bmax);
+	makeBound(this->bmin,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -199,6 +209,7 @@ CDelayedInstance::~CDelayedInstance() {
 // Date last edited		:	8/10/2001
 void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 	
+	// Process the instance
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
 		if (processed == FALSE) {
@@ -219,7 +230,7 @@ void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 // Date last edited		:	8/10/2001
 void	CDelayedInstance::dice(CShadingContext *r) {
 	
-
+	// Process the instance
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
 		if (processed == FALSE) {
@@ -228,6 +239,9 @@ void	CDelayedInstance::dice(CShadingContext *r) {
 		}
 		osUnlock(CRenderer::delayedMutex);
 	}
+
+	// Let the parent take care of the instance
+	CObject::dice(r);
 }
 
 ///////////////////////////////////////////////////////////////////////

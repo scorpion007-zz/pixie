@@ -57,6 +57,7 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 	movvv(this->bmax,bma);
 
 	xform->transformBound(bmin,bmax);
+	makeBound(bmin,bmax);
 }
 
 

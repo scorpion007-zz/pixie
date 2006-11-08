@@ -54,7 +54,7 @@ public:
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
-		void				triangulate();
+		void				triangulate(CShadingContext *);
 
 		CPl					*pl;
 		int					npoly,nloops,nverts;
@@ -78,7 +78,7 @@ private:
 // Date last edited		:	6/28/2001
 class	CPolygonTriangle : public CSurface {
 public:
-							CPolygonTriangle(CAttributes *,CXform *,CPolygonMesh *);
+							CPolygonTriangle(CAttributes *,CXform *,CPolygonMesh *,int v0,int v1,int v2,int fv0,int fv1,int fv2,int uniform);
 							~CPolygonTriangle();
 
 		void				intersect(CShadingContext *,CRay *);
@@ -90,10 +90,10 @@ public:
 		void				interpolate(int,float **) const;
 
 
-		CPolygonMesh		*mesh;
-		int					v0,v1,v2;		// The vertex indices
-		int					fv0,fv1,fv2;	// The facevarying indices
-		int					uniform;		// The uniform index
+		CPolygonMesh		*mesh;				// The mesh data
+		int					v0,v1,v2;			// The vertex indices
+		int					fv0,fv1,fv2;		// The facevarying indices
+		int					uniform;			// The uniform index
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ public:
 // Date last edited		:	6/28/2001
 class	CPolygonQuad : public CSurface {
 public:
-							CPolygonQuad(CAttributes *,CXform *,CPolygonMesh *);
+							CPolygonQuad(CAttributes *,CXform *,CPolygonMesh *,int v0,int v1,int v2,int v3,int fv0,int fv1,int fv2,int fv3,int uniform);
 							~CPolygonQuad();
 
 		void				intersect(CShadingContext *,CRay *);
@@ -114,7 +114,7 @@ public:
 		void				interpolate(int,float **) const;
 
 
-		CPolygonMesh		*mesh;
+		CPolygonMesh		*mesh;				// The mesh data
 		int					v0,v1,v2,v3;		// The vertex indices
 		int					fv0,fv1,fv2,fv3;	// The facevarying indices
 		int					uniform;			// The uniform index

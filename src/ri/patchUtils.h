@@ -30,10 +30,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 // The inverse of the Bezier basis
-static	double	invBezier[16]	=	{	0,		0,			0,			1.0,
-										0,		0,			1.0/3.0,	1.0,
-										0,		1.0/3.0,	2.0/3.0,	1.0,
-										1.0,	1.0,		1.0,		1.0};
+static	float	invBezier[16]	=	{	0,		0,			0,			1.0f,
+										0,		0,			1.0f/3.0f,	1.0f,
+										0,		1.0f/3.0f,	2.0f/3.0f,	1.0f,
+										1.0f,	1.0f,		1.0f,		1.0f};
 
 
 
@@ -80,8 +80,8 @@ static	double	invBezier[16]	=	{	0,		0,			0,			1.0,
 // Comments				:
 // Date last edited		:	5/25/2004
 #define	makeCubicBound(__bmin,__bmax,__gx,__gy,__gz) {							\
-	double	tmp1[16];															\
-	double	tmp2[16];															\
+	matrix	tmp1;																\
+	matrix	tmp2;																\
 	int		i;																	\
 																				\
 	mulmm(tmp1,geometryV,__gx);													\
@@ -106,5 +106,37 @@ static	double	invBezier[16]	=	{	0,		0,			0,			1.0,
 	for (i=0;i<16;i++) {														\
 		if (tmp2[i] < __bmin[COMP_Z])	__bmin[COMP_Z]	=	(float) tmp2[i];	\
 		if (tmp2[i] > __bmax[COMP_Z])	__bmax[COMP_Z]	=	(float) tmp2[i];	\
+	}																			\
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	makeCubicBound
+// Description			:	Converts the control vertices to Bezier control vertices
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	5/25/2004
+#define	makeCubicBoundX(__bmin,__bmax,__gx,__gy,__gz,__xform) {					\
+	matrix	tmp1;																\
+	matrix	tmpX;																\
+	matrix	tmpY;																\
+	matrix	tmpZ;																\
+	int		i;																	\
+																				\
+	mulmm(tmp1,geometryV,__gx);													\
+	mulmm(tmpX,tmp1,geometryU);													\
+																				\
+	mulmm(tmp1,geometryV,__gy);													\
+	mulmm(tmpY,tmp1,geometryU);													\
+																				\
+	mulmm(tmp1,geometryV,__gz);													\
+	mulmm(tmpZ,tmp1,geometryU);													\
+																				\
+	for (i=0;i<16;i++) {														\
+		vector	D,Dw;															\
+		initv(D,(float) tmpX[i],(float) tmpY[i],(float) tmpZ[i]);				\
+		mulmp(Dw,__xform->from,D);												\
+		addBox(__bmin,__bmax,Dw);												\
 	}																			\
 }

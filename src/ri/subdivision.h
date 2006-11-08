@@ -43,7 +43,7 @@
 // Date last edited		:	10/12/2002
 class	CSubdivision : public CSurface {
 public:
-					CSubdivision(CAttributes *,CXform *,CVertexData *,CParameter *,int,float,float,float,float,double *);
+					CSubdivision(CAttributes *,CXform *,CVertexData *,CParameter *,int,float,float,float,float,float *);
 					~CSubdivision();
 
 	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
@@ -59,7 +59,7 @@ public:
 	float			uOrg,vOrg,uMult,vMult;
 
 private:
-	void			projectVertices(float *,double *,int);
+	void			projectVertices(float *,float *,int);
 };
 
 #endif

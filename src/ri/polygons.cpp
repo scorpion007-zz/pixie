@@ -105,12 +105,20 @@ public:
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2002
-CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh) : CSurface(a,x) {
+CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int ifv0,int ifv1,int ifv2,int iuniform) : CSurface(a,x) {
 	stats.numGprims++;
 
 	// Save the parameters
 	this->mesh				=	mesh;
 	mesh->attach();
+
+	this->v0				=	iv0;
+	this->v1				=	iv1;
+	this->v2				=	iv2;
+	this->fv0				=	ifv0;
+	this->fv1				=	ifv1;
+	this->fv2				=	ifv2;
+	this->uniform			=	iuniform;
 
 	const CPl	*pl			=	mesh->pl;
 	const float	*vertices	=	pl->data0;
@@ -491,12 +499,22 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying) const {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/7/2002
-CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh) : CSurface(a,x) {
+CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int iv3,int ifv0,int ifv1,int ifv2,int ifv3,int iuniform) : CSurface(a,x) {
 	stats.numGprims++;
 
 	// Save the parameters
 	this->mesh				=	mesh;
 	mesh->attach();
+
+	this->v0				=	iv0;
+	this->v1				=	iv1;
+	this->v2				=	iv2;
+	this->v3				=	iv3;
+	this->fv0				=	ifv0;
+	this->fv1				=	ifv1;
+	this->fv2				=	ifv2;
+	this->fv3				=	ifv3;
+	this->uniform			=	iuniform;
 
 	const CPl	*pl			=	mesh->pl;
 	const float	*vertices	=	pl->data0;
@@ -1072,8 +1090,6 @@ CPolygonMesh::~CPolygonMesh() {
 	delete [] nholes;
 	delete [] nvertices;
 	delete [] vertices;
-
-	if (children != NULL)	delete children;
 }
 
 
@@ -1086,7 +1102,7 @@ CPolygonMesh::~CPolygonMesh() {
 // Date last edited		:	6/11/2003
 void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 
-	if (children == NULL)	triangulate();
+	if (children == NULL)	triangulate(r);
 }
 
 
@@ -1099,12 +1115,9 @@ void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 // Date last edited		:	6/11/2003
 void		CPolygonMesh::dice(CShadingContext *r) {
 
-	if (children == NULL)	triangulate();
+	if (children == NULL)	triangulate(r);
 
-	CObject	*cObject;
-	for (cObject=children;cObject!=NULL;cObject=cObject->sibling) {
-		r->drawObject(cObject);
-	}
+	CObject::dice(r);
 }
 
 
@@ -1168,18 +1181,17 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 	const float			*vs3			=	P+vindices[vi3]*3;
 
 	// Create the triangle
-	cQuad				=	new CPolygonQuad(data.meshAttributes,data.meshXform,data.mesh);
+	cQuad				=	new CPolygonQuad(data.meshAttributes,data.meshXform,data.mesh
+		,vindices[vi0]
+		,vindices[vi1]
+		,vindices[vi3]
+		,vindices[vi2]
+		,data.meshFacevaryingNumber+vi0
+		,data.meshFacevaryingNumber+vi1
+		,data.meshFacevaryingNumber+vi3
+		,data.meshFacevaryingNumber+vi2
+		,data.meshUniformNumber);
 
-	// Set the variables
-	cQuad->v0			=	vindices[vi0];
-	cQuad->v1			=	vindices[vi1];
-	cQuad->v3			=	vindices[vi2];
-	cQuad->v2			=	vindices[vi3];
-	cQuad->fv0			=	data.meshFacevaryingNumber+vi0;
-	cQuad->fv1			=	data.meshFacevaryingNumber+vi1;
-	cQuad->fv3			=	data.meshFacevaryingNumber+vi2;
-	cQuad->fv2			=	data.meshFacevaryingNumber+vi3;
-	cQuad->uniform		=	data.meshUniformNumber;
 
 	// Add the children into the pool
 	cQuad->sibling		=	data.meshChildren;
@@ -1209,16 +1221,15 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 	}
 
 	// Create the triangle
-	cTriangle				=	new CPolygonTriangle(data.meshAttributes,data.meshXform,data.mesh);
+	cTriangle				=	new CPolygonTriangle(data.meshAttributes,data.meshXform,data.mesh
+		,vindices[vi0]
+		,vindices[vi1]
+		,vindices[vi2]
+		,data.meshFacevaryingNumber+vi0
+		,data.meshFacevaryingNumber+vi1
+		,data.meshFacevaryingNumber+vi2
+		,data.meshUniformNumber);
 
-	// Set the variables
-	cTriangle->v0			=	vindices[vi0];
-	cTriangle->v1			=	vindices[vi1];
-	cTriangle->v2			=	vindices[vi2];
-	cTriangle->fv0			=	data.meshFacevaryingNumber+vi0;
-	cTriangle->fv1			=	data.meshFacevaryingNumber+vi1;
-	cTriangle->fv2			=	data.meshFacevaryingNumber+vi2;
-	cTriangle->uniform		=	data.meshUniformNumber;
 
 	// Add the children into the pool
 	cTriangle->sibling		=	data.meshChildren;
@@ -1622,7 +1633,13 @@ nextLoop:;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void				CPolygonMesh::triangulate() {
+void				CPolygonMesh::triangulate(CShadingContext *context) {
+	osLock(CRenderer::hierarchyMutex);
+	if (children != NULL) {
+		osUnlock(CRenderer::hierarchyMutex);
+		return;
+	}
+
 	int					i,j,k,numVertices;
 	int					*cnholes,*cvertices,*cnvertices;
 	CPlParameter		*normal;
@@ -1694,8 +1711,6 @@ void				CPolygonMesh::triangulate() {
 	data.meshFacevaryingNumber	=	0;
 	data.mesh					=	this;
 
-	osLock(CRenderer::memoryMutex);
-
 	// Triangulate the individual polygons
 	for (cnholes=nholes,cvertices=vertices,cnvertices=nvertices,i=0;i<npoly;i++) {
 		// Triangulate the current polygon
@@ -1710,8 +1725,9 @@ void				CPolygonMesh::triangulate() {
 	}
 
 	children					=	data.meshChildren;
+	cluster(context);
 
-	osUnlock(CRenderer::memoryMutex);
+	osUnlock(CRenderer::hierarchyMutex);
 }
 
 

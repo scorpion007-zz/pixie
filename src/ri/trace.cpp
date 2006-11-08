@@ -366,15 +366,6 @@ void	CShadingContext::trace(CRay *ray) {
 		heap[parent]	=	heap[numObjects];
 		numObjects--;
 
-		{
-			int	i;
-
-			for (i=1;i<numObjects;i++) {
-				if ((i+i) < numObjects)		assert(heap[i+i].tmin >= heap[i].tmin);
-				if ((i+i+1) < numObjects)	assert(heap[i+i+1].tmin >= heap[i].tmin);
-			}
-		}
-
 		// If this is a real object, intersect it with the ray
 		if (object->attributes != NULL)	{
 			object->intersect(this,ray);

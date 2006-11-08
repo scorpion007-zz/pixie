@@ -63,7 +63,6 @@ public:
 										}
 
 						void			attach()	{	refCount++;	}
-
 						void			detach()	{	if ((--refCount) == 0) delete this;	}
 
 						const CVariable	*sizeVariable;	// The size variable
@@ -105,11 +104,12 @@ public:
 					CCubicCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCubicCurve();
 
+					// Intersect a ray (ray/curve intersections not supported)
+	void			intersect(CShadingContext *,CRay *)		{	}
+
 					// Surface interface
 	void			sample(int,int,float **,unsigned int &) const;
 
-					// Intersect a ray (ray/curve intersections not supported)
-	void			intersect(CShadingContext *,CRay *)		{	}
 protected:
 	void			splitToChildren(CShadingContext *);
 };
@@ -124,11 +124,12 @@ public:
 					CLinearCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CLinearCurve();
 
+					// Intersect a ray (ray/curve intersections not supported)
+	void			intersect(CShadingContext *,CRay *)		{	}
+
 					// Surface interface
 	void			sample(int,int,float **,unsigned int &) const;
 
-					// Intersect a ray (ray/curve intersections not supported)
-	void			intersect(CShadingContext *,CRay *)		{	}
 protected:
 	void			splitToChildren(CShadingContext *);
 };

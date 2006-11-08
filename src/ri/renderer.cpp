@@ -488,7 +488,7 @@ static void	copyOptions(const COptions *o) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	10/9/2006
-void		CRenderer::beginFrame(const COptions *o,CXform *x) {
+void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	int		i;
 
 	// Record the frame start time
@@ -784,7 +784,7 @@ void		CRenderer::beginFrame(const COptions *o,CXform *x) {
 								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 
 	// Set the root object
-	root					=	new CDummyObject(NULL,NULL);
+	root					=	new CDummyObject(a,x);
 
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
@@ -863,7 +863,7 @@ void		CRenderer::endFrame() {
 	assert(stats.numRasterObjects	== 0);
 
 	// Delete the root object and it's children
-	delete root;
+	root->destroy();
 
 	// Terminate the displays
 	endDisplays();

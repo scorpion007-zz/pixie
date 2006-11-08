@@ -44,11 +44,7 @@
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	01/23/2006
-CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,float uOrg,float vOrg,float uMult,float vMult,double *ve) : CSurface(a,x) {
-	int				numVertices;
-	const int		vertexSize	=	var->vertexSize;
-	double			geometryU[16],geometryV[16];
-
+CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,float uOrg,float vOrg,float uMult,float vMult,float *ve) : CSurface(a,x) {
 	stats.numGprims++;
 	stats.gprimMemory	+=	sizeof(CBSplinePatchGrid);
 
@@ -57,22 +53,21 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 
 	parameters			=	p;
 
-	uVertices	=	nu;
-	vVertices	=	nv;
-	this->uOrg	=	uOrg;
-	this->vOrg	=	vOrg;
-	this->uMult	=	uMult;
-	this->vMult	=	vMult;
+	uVertices			=	nu;
+	vVertices			=	nv;
+	this->uOrg			=	uOrg;
+	this->vOrg			=	vOrg;
+	this->uMult			=	uMult;
+	this->vMult			=	vMult;
 
-	numVertices	=	(nu*nv);
-	
+	const int		numVertices		=	(nu*nv);
 	int				i,j,k;
-	dmatrix			ut;
-	dmatrix			bsplinebasis;
-	double			tmp[16];
-
-	const int 		upatches	=	uVertices - 3;
-	const int	 	vpatches	=	vVertices - 3;
+	matrix			ut;
+	matrix			bsplinebasis;
+	matrix			geometryU,geometryV;
+	matrix			tmp;
+	const int 		upatches		=	uVertices - 3;
+	const int	 	vpatches		=	vVertices - 3;
 
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
@@ -87,21 +82,22 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 	mulmm(geometryU,bsplinebasis,invBezier);
 	
 	// alloc off upatches*vpatches*16*vertexSize worth of data
+	const int	vertexSize	=	var->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
-	vertex					=	new double[vs*16*upatches*vpatches];
-	stats.gprimMemory		+=	vs*16*upatches*vpatches*sizeof(double);
+	vertex					=	new float[vs*16*upatches*vpatches];
+	stats.gprimMemory		+=	vs*16*upatches*vpatches*sizeof(float);
 	
 	for (i=0;i<vpatches;i++) {
 		for (j=0;j<upatches;j++) {
-			int			r,c;
-			double *patchData = vertex + (i*upatches + j)*16*vertexSize;
+			int		r,c;
+			float	*patchData = vertex + (i*upatches + j)*16*vertexSize;
 
 			// Fill in the geometry matrices
 			for (r=0;r<4;r++) {
 				int					y	=	(r + i) % vVertices;
 				for (c=0;c<4;c++) {
-					int				x	=	(c + j) % uVertices;
-					const double	*d	=	ve + (y*uVertices+x)*vs;
+					int			x	=	(c + j) % uVertices;
+					const float	*d	=	ve + (y*uVertices+x)*vs;
 
 					for	(k=0;k<vertexSize;k++) {
 						patchData[16*k + element(r,c)]		=	*d++;
@@ -126,8 +122,8 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 				for (r=0;r<4;r++) {
 					int					y	=	(r + i) % vVertices;
 					for (c=0;c<4;c++) {
-						int				x	=	(c + j) % uVertices;
-						const double	*d	=	ve + vertexSize + (y*uVertices+x)*vs;
+						int			x	=	(c + j) % uVertices;
+						const float	*d	=	ve + vertexSize + (y*uVertices+x)*vs;
 						
 						for	(k=0;k<vertexSize;k++) {
 							patchData[16*k + element(r,c)]		=	*d++;
@@ -159,7 +155,7 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 // Comments				:
 // Date last edited		:	01/23/2006
 CBSplinePatchGrid::~CBSplinePatchGrid() {
-	delete [] vertex;	stats.gprimMemory	-=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize)*(uVertices-3)*(vVertices-3)*sizeof(double)*16;
+	delete [] vertex;	stats.gprimMemory	-=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize)*(uVertices-3)*(vVertices-3)*sizeof(float)*16;
 
 	variables->detach();
 
@@ -183,7 +179,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
 	const int			vertexSize				=	variables->vertexSize;
-	double				*vertexData;
+	float				*vertexData;
 	int					vertexDataStep;
 	int					vertexSampleStride;
 	
@@ -207,10 +203,10 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 		} else {
 														// Interpolate the vertex data in advance
 														// Note: this is potentially hugely expensive
-			double			*interpolate;
+			float			*interpolate;
 			const float		*time	=	varying[VARIABLE_TIME] + start;
 
-			vertexData				=	(double *) alloca(numVertices*vertexSize*16*sizeof(double));
+			vertexData				=	(float *) alloca(numVertices*vertexSize*16*sizeof(float));
 			vertexDataStep			=	vertexSize*16;
 			vertexSampleStride		=	0;
 
@@ -219,8 +215,8 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 			for (i=0;i<numVertices;i++) {
 				const	int		x			=	(int) floor(min(u[i]*upatches,(uVertices-4)));
 				const	int		y			=	(int) floor(min(v[i]*vpatches,(vVertices-4)));
-				const 	double	*vertex0	=	vertex + (y*upatches + x)*vertexSize*16;
-				const 	double	*vertex1	=	vertex0 + vertexSize*16*upatches*vpatches;
+				const 	float	*vertex0	=	vertex + (y*upatches + x)*vertexSize*16;
+				const 	float	*vertex1	=	vertex0 + vertexSize*16*upatches*vpatches;
 				const	float	ctime		=	*time++;
 
 				for (j=0;j<vertexDataStep;j++) {
@@ -244,15 +240,15 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 			double			tmp1[4],tmp2[4];
 			const	int		x			=	(int) floor(min(u[i]*upatches,(uVertices-4)));
 			const	int		y			=	(int) floor(min(v[i]*vpatches,(vVertices-4)));
-			const	double	cu			=	(u[i]*upatches - x);
-			const	double	cv			=	(v[i]*vpatches - y);
+			const	float	cu			=	(u[i]*upatches - x);
+			const	float	cv			=	(v[i]*vpatches - y);
 
-			const	double	*data		=	vertexData + (y*upatches + x)*vertexSampleStride;
+			const	float	*data		=	vertexData + (y*upatches + x)*vertexSampleStride;
 			const	double	usquared	=	cu*cu;
 			const	double	ucubed		=	cu*usquared;
 			const	double	vsquared	=	cv*cv;
 			const	double	vcubed		=	cv*vsquared;
-			int		j;
+			int				j;
 
 			for (j=0;j<3;j++) {
 				for (int t=0;t<4;t++) {
