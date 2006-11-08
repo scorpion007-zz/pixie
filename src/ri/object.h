@@ -69,9 +69,9 @@ public:
 							// All objects must override the following functions
 							//
 							//	
-	virtual	void			intersect(CShadingContext *,CRay *)								=	NULL;
+	virtual	void			intersect(CShadingContext *,CRay *)								=	0;
 	virtual	void			dice(CShadingContext *);
-	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	NULL;
+	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	0;
 
 			void			cluster(CShadingContext *);	// Take the children and create a bounding volume hierarchy
 			void			destroy();					// Delete the children/siblings
