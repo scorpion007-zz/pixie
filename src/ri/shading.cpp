@@ -1374,7 +1374,7 @@ CShadingState	*CShadingContext::newState() {
 		const int		numGlobalVariables	=	CRenderer::globalVariables->numItems;
 		CVariable		**globalVariables	=	CRenderer::globalVariables->array;
 
-		newState->varying				=	new float*[numGlobalVariables];							stats.vertexMemory	+=	numGlobalVariables*sizeof(float *);
+		newState->varying				=	new float*[numGlobalVariables];					stats.vertexMemory	+=	numGlobalVariables*sizeof(float *);
 		newState->tags					=	new int[CRenderer::maxGridSize*3];				stats.vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
 		newState->lightingTags			=	new int[CRenderer::maxGridSize*3];				stats.vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
 		newState->Ns					=	new float[CRenderer::maxGridSize*9];			stats.vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(float);

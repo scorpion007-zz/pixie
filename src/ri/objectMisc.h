@@ -184,6 +184,38 @@ inline	void	interpolate3(int num,float *src0,const float *src1,const float *time
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	transform
+// Description			:	Transform a ray
+// Return Value			:
+// Comments				:
+// Date last edited		:	3/11/2002
+inline	void	transform(float *oFrom,float *oDir,const CXform *xform,CRay *ray) {
+	if (xform->next != NULL) {
+		vector	tmp[5];
+		vector	to;
+
+		addvv(to,ray->from,ray->dir);
+
+		mulmp(tmp[0],xform->to,ray->from);
+		mulmp(tmp[1],xform->to,to);
+
+		mulmp(tmp[2],xform->next->to,ray->from);
+		mulmp(tmp[3],xform->next->to,to);
+
+		interpolatev(oFrom,tmp[0],tmp[2],ray->time);
+		interpolatev(tmp[5],tmp[1],tmp[3],ray->time);
+		subvv(oDir,tmp[5],oFrom);
+	} else {
+		vector	to,tmp;
+		addvv(to,ray->from,ray->dir);
+
+		mulmp(oFrom,xform->to,ray->from);
+		mulmp(tmp,xform->to,to);
+		subvv(oDir,tmp,oFrom);
+	}
+}
+
 #endif
 
 

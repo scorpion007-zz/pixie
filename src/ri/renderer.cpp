@@ -189,8 +189,6 @@ int								CRenderer::bucketWidth,CRenderer::bucketHeight;
 int								CRenderer::netXBuckets,CRenderer::netYBuckets;
 int								CRenderer::threadStride;
 int								CRenderer::maxEyeSplits;
-int								CRenderer::maxHierarchyDepth;
-int								CRenderer::maxHierarchyLeafObjects;
 float							CRenderer::tsmThreshold;
 char							*CRenderer::causticIn,*CRenderer::causticOut;
 char							*CRenderer::globalIn,*CRenderer::globalOut;
@@ -467,8 +465,6 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::netYBuckets				=	o->netYBuckets;
 	CRenderer::threadStride				=	o->threadStride;
 	CRenderer::maxEyeSplits				=	o->maxEyeSplits;
-	CRenderer::maxHierarchyDepth		=	o->maxHierarchyDepth;
-	CRenderer::maxHierarchyLeafObjects	=	o->maxHierarchyLeafObjects;
 	CRenderer::tsmThreshold				=	o->tsmThreshold;
 	CRenderer::causticIn				=	o->causticIn;
 	CRenderer::causticOut				=	o->causticOut;

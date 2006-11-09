@@ -424,18 +424,11 @@ void		CPhotonHider::illuminateEnd() {
 		for (;numVertices>0;numVertices--,Cl+=3,L+=3,Ps+=3) {
 			movvv(ray.dir,L);
 			subvv(ray.from,Ps,L);
-			movvv(ray.to,Ps);
 
 			ray.flags				=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			ray.tmin				=	bias;
-			ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-			ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-			ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 			ray.t					=	C_INFINITY;
 			ray.time				=	0;
-			ray.jimp				=	urand();
-			ray.lastXform			=	NULL;
-			ray.object				=	NULL;
 
 			trace(&ray);
 
@@ -533,7 +526,6 @@ void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
 
 	movvv(ray.from,P);
 	movvv(ray.dir,L);
-	addvv(ray.to,P,L);
 
 	movvv(Cl,C);
 
@@ -548,13 +540,8 @@ void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
 processBounce:;
 
 	// Set misc variables
-	ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-	ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-	ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 	ray.t					=	C_INFINITY;
 	ray.time				=	0;
-	ray.lastXform			=	NULL;
-	ray.object				=	NULL;
 
 	// Trace the ray in the scene
 	trace(&ray);
@@ -626,7 +613,6 @@ processBounce:;
 
 				// Process the current hit
 				movvv(ray.from,Pl);
-				addvv(ray.to,ray.from,ray.dir);
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	FALSE;
 
@@ -700,15 +686,9 @@ processBounce:;
 				{
 					// Set misc variables
 					movvv(ray.from,Pl);
-					addvv(ray.to,ray.from,ray.dir);
 			
-					ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-					ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-					ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 					ray.t					=	C_INFINITY;
 					ray.time				=	0;
-					ray.lastXform			=	NULL;
-					ray.object				=	NULL;
 				
 					// Trace the ray in the scene
 					trace(&ray);
@@ -802,7 +782,6 @@ processBounce:;
 				
 				// go trace this as normal ray
 				movvv(ray.from,Pl);
-				addvv(ray.to,ray.from,ray.dir);
 				
 			//	lastBounceSpecular = TRUE;
 				
@@ -833,7 +812,6 @@ processBounce:;
 				
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				addvv(ray.to,ray.from,ray.dir);
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 
@@ -876,7 +854,6 @@ processBounce:;
 
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				addvv(ray.to,ray.from,ray.dir);
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 
@@ -919,7 +896,6 @@ processBounce:;
 
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				addvv(ray.to,ray.from,ray.dir);
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 
@@ -968,7 +944,6 @@ processBounce:;
 
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				addvv(ray.to,ray.from,ray.dir);
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 

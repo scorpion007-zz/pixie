@@ -165,21 +165,14 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 
 					// Evaluate visibility between P and Ps
 					movvv(ray.from,Ps);
-					movvv(ray.to,P);
 					subvv(ray.dir,P,Ps);
 					const float	len	=	lengthv(ray.dir);
 					mulvf(ray.dir,1 / len);
 
 					ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 					ray.tmin				=	bias;
-					ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-					ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-					ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 					ray.t					=	len - bias;
 					ray.time				=	0;
-					ray.jimp				=	-1.0f;
-					ray.lastXform			=	NULL;
-					ray.object				=	NULL;
 
 					context->trace(&ray);
 
@@ -485,21 +478,14 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 						
 						// Evaluate visibility between P and Ps
 						movvv(ray.from,Ps);
-						movvv(ray.to,P);
 						subvv(ray.dir,P,Ps);
 						const float	len	=	lengthv(ray.dir);
 						mulvf(ray.dir,1 / len);
 
 						ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 						ray.tmin				=	bias;
-						ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-						ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-						ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 						ray.t					=	len - bias;
 						ray.time				=	0;
-						ray.jimp				=	-1.0f;
-						ray.lastXform			=	NULL;
-						ray.object				=	NULL;
 
 						context->trace(&ray);
 

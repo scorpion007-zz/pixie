@@ -368,9 +368,6 @@ COptions::COptions() {
 
 	maxEyeSplits			=	10;
 
-	maxHierarchyDepth		=	40;
-	maxHierarchyLeafObjects	=	5;
-
 	tsmThreshold			=	(float ) 0.1;
 
 	causticIn				=	NULL;

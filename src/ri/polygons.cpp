@@ -208,7 +208,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (attributes->nSides == 1) {
 
-		if (xform->flip) {
+		if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) {
 			if (det < C_EPSILON)	return;
 		} else {
 			if (det > -C_EPSILON)	return;
@@ -231,6 +231,8 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 			cRay->t			=	t*inv_det;
 			cRay->u			=	(u + v)*inv_det;
 			cRay->v			=	u / (u + v);
+			if	((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip)	crossvv(cRay->N,edge2,edge1);
+			else																crossvv(cRay->N,edge1,edge2);
 		}
 	} else {
 		if ((det > -C_EPSILON) && (det < C_EPSILON))	return;
@@ -254,6 +256,8 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 			cRay->t			=	t;
 			cRay->u			=	u + v;
 			cRay->v			=	u / (u + v);
+			if	((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip)	crossvv(cRay->N,edge2,edge1);
+			else																crossvv(cRay->N,edge1,edge2);
 		}
 	}
 }

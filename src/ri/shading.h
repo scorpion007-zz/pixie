@@ -265,6 +265,7 @@ public:
 									y &= 0x3FFFFFFF;
 									return float(y) * (float(1.0)/float(0x3FFFFFFF));
 								}
+
 protected:
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }

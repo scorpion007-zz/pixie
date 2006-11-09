@@ -372,8 +372,6 @@ public:
 		static	int						netXBuckets,netYBuckets;						// The meta bucket size
 		static	int						threadStride;									// The number of buckets per thread at a time
 		static	int						maxEyeSplits;									// Maximum number of eye splits
-		static	int						maxHierarchyDepth;								// The maximum depth of the hierarchy
-		static	int						maxHierarchyLeafObjects;						// The maximum number of objects for a leaf
 		static	float					tsmThreshold;									// Transparency shadow map threshold
 		static	char					*causticIn,*causticOut;							// The caustics in/out file name
 		static	char					*globalIn,*globalOut;							// The global photon map 

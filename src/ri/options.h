@@ -235,8 +235,6 @@ public:
 
 	int							maxEyeSplits;									// Maximum number of eye splits
 																				// The number of times the bucket will be rendered
-	int							maxHierarchyDepth;								// The maximum depth of the hierarchy
-	int							maxHierarchyLeafObjects;						// The maximum number of objects for a leaf
 
 	float						tsmThreshold;									// Transparency shadow map threshold
 

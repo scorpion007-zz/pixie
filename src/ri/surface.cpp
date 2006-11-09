@@ -146,6 +146,7 @@ static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int
 // Comments				:
 // Date last edited		:	6/4/2003
 void	CPatch::dice(CShadingContext *r) {
+
 	// Have we checked size of this piece before ?
 	if ((udiv == -1) && (vdiv == -1)) {
 		// No, probe the surface and find the bounding box

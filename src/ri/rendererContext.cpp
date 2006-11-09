@@ -32,7 +32,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-
 #include "common/algebra.h"
 #include "common/containers.h"
 #include "common/os.h"
@@ -1299,8 +1298,6 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 				}
 			optionCheckFlag(RI_INHERITATTRIBUTES,options->flags,					OPTIONS_FLAGS_INHERIT_ATTRIBUTES)
 			optionCheck(RI_GRIDSIZE,			options->maxGridSize,				0,100000,int)
-			optionCheck(RI_HIERARCHYDEPTH,		options->maxHierarchyDepth,			1,100000,int)
-			optionCheck(RI_HIERARCHYOBJECTS,	options->maxHierarchyLeafObjects,	1,100000,int)
 			optionCheck(RI_EYESPLITS,			options->maxEyeSplits,				1,100000,int)
 			optionCheck(RI_TEXTUREMEMORY,		options->maxTextureSize,			0,100000,int)
 				options->maxTextureSize	*=	1000;								// Convert into bytes

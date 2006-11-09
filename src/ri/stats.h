@@ -117,8 +117,6 @@ public:
 	int				numPeakRasterObjects;
 	float			avgRasterGrids;
 	float			avgRasterObjects;
-	int				numObjectDeferRight;
-	int				numObjectDeferBottom;
 	int				numObjectOccluded;
 	int				numSplits;
 	int				numVsplits,numUsplits,numUVsplits;
@@ -126,7 +124,6 @@ public:
 	int				numQuadsRendered;
 	int				numTracedRays,numShadingRays,numShadowRays;
 	int				numRayTriangles;
-	int				numHierarchyLeaves,numHierarchyInternals,numHierarchyUncomputeds;
 	int				numLeafItems;
 	int				numTextureMisses;				// The number of texture misses
 	int				transferredTextureData;			// The amount the texture data transmitted

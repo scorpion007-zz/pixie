@@ -99,8 +99,6 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		CRay	*ray	=	rays[i];
 		
 		t				=	ray->t;
-
-		addvv(ray->to,ray->from,ray->dir);
 		
 		// Check the ray against the clipping planes
 		for (cPlane=CRenderer::clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
@@ -109,13 +107,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			if ((tt > 0) && (tt < t))	t	=	tt;
 		}
 
-		ray->invDir[COMP_X]		=	1/ray->dir[COMP_X];
-		ray->invDir[COMP_Y]		=	1/ray->dir[COMP_Y];
-		ray->invDir[COMP_Z]		=	1/ray->dir[COMP_Z];
 		ray->t					=	t;
-		ray->jimp				=	urand();
-		ray->lastXform			=	NULL;
-		ray->object				=	NULL;
 		trace(ray);
 	}
 
@@ -258,7 +250,6 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				CRay	*cRay	=	*rays++;
 
 				cRay->tmin		=	cRay->t + C_EPSILON;
-				cRay->object	=	NULL;
 				cRay->t			=	C_INFINITY;
 				trace(cRay);
 			}
@@ -343,8 +334,10 @@ void	CShadingContext::trace(CRay *ray) {
 	int					numObjects	=	1;
 	int					maxObjects	=	100;
 
-	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->to,ray->tmin,ray->t);
+	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->dir,ray->tmin,ray->t);
 	heap[1].object		=	CRenderer::root;
+	ray->jimp			=	urand();
+	ray->object			=	NULL;
 
 	// While we have objects in the heap, pop the object and process it
 	while((numObjects > 0) && (heap[1].tmin < ray->t)) {
@@ -385,7 +378,7 @@ void	CShadingContext::trace(CRay *ray) {
 			}
 
 			// Insert the child into the heap
-			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->to,ray->tmin,ray->t);
+			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->dir,ray->tmin,ray->t);
 			
 			if (tmin < ray->t) {
 				// Maintain the heap

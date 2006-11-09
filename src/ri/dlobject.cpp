@@ -35,6 +35,7 @@
 #include "stats.h"
 #include "renderer.h"
 #include "shading.h"
+#include "objectMisc.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -101,37 +102,13 @@ void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 		}
 	}
 	
-
-	// Convert the ray into the right coordinate system
-	if (ray->lastXform != xform) {
-		if (xform->next != NULL) {
-			vector	tmp[4];
-			vector	to;
-			addvv(to,ray->from,ray->dir);
-
-			mulmp(tmp[0],xform->to,ray->from);
-			mulmp(tmp[1],xform->to,to);
-
-			mulmp(tmp[2],xform->next->to,ray->from);
-			mulmp(tmp[3],xform->next->to,to);
-
-			interpolatev(ray->oFrom,tmp[0],tmp[2],ray->time);
-			interpolatev(ray->oTo,tmp[1],tmp[3],ray->time);
-			subvv(ray->oDir,ray->oTo,ray->oFrom);
-		} else {
-			vector	to;
-			addvv(to,ray->from,ray->dir);
-
-			mulmp(ray->oFrom,xform->to,ray->from);
-			mulmp(ray->oTo,xform->to,to);
-			subvv(ray->oDir,ray->oTo,ray->oFrom);
-		}
-
-		ray->lastXform	=	xform;
-	}
+	
+	// Transform the ray
+	vector	oFrom,oDir;
+	transform(oFrom,oDir,xform,ray);
 
 	// Perform the actual intersection
-	if (intersectFunction(data,ray->oFrom,ray->oDir,&t,oN)) {
+	if (intersectFunction(data,oFrom,oDir,&t,oN)) {
 		mulmn(ray->N,xform->to,oN);
 		ray->t		=	t;
 		ray->object	=	this;

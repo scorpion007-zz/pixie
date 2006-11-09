@@ -109,8 +109,6 @@ void	CStats::reset() {
 	numPeakRasterObjects			=	0;
 	avgRasterGrids					=	0;
 	avgRasterObjects				=	0;
-	numObjectDeferRight				=	0;
-	numObjectDeferBottom			=	0;
 	numObjectOccluded				=	0;
 	numSplits						=	0;
 	numVsplits						=	0;
@@ -122,9 +120,6 @@ void	CStats::reset() {
 	numShadingRays					=	0;
 	numShadowRays					=	0;
 	numRayTriangles					=	0;
-	numHierarchyLeaves				=	0;
-	numHierarchyInternals			=	0;
-	numHierarchyUncomputeds			=	0;
 	numLeafItems					=	0;
 	numTextureMisses				=	0;
 	transferredTextureData			=	0;
@@ -192,7 +187,6 @@ void	CStats::printStats(int level) {
 
 		info(CODE_STATS,"->Raytracer\n");
 		info(CODE_STATS,"            Traced: %d (%d shading, %d shadow)\n",numTracedRays,numShadingRays,numShadowRays);
-		info(CODE_STATS,"         Hierarchy: %d leaf, %d intermediate, %d uncomputed\n",numHierarchyLeaves,numHierarchyInternals,numHierarchyUncomputeds);
 		info(CODE_STATS,"       Tesselation: %d triangles\n",numRayTriangles);
 		info(CODE_STATS,"        Leaf items: %d\n",numLeafItems);
 	}
@@ -257,10 +251,6 @@ void	CStats::check() {
 	assert(numInstances				==	0);
 	assert(numTextures				==	0);
 	assert(numEnvironments			==	0);
-
-	assert(numHierarchyInternals	==	0);
-	assert(numHierarchyLeaves		==	0);
-	assert(numHierarchyUncomputeds	==	0);
 
 	assert(attributesMemory			==	0);
 	assert(xformMemory				==	0);

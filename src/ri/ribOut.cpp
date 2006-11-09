@@ -373,8 +373,6 @@ void		CRibOut::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
 			optionCheckInt(RI_METABUCKETS,2)
 			optionCheckInt(RI_INHERITATTRIBUTES,1)
 			optionCheckInt(RI_GRIDSIZE,1)
-			optionCheckInt(RI_HIERARCHYDEPTH,1)
-			optionCheckInt(RI_HIERARCHYOBJECTS,1)
 			optionCheckInt(RI_EYESPLITS,1)
 			optionCheckInt(RI_TEXTUREMEMORY,1)
 			optionCheckInt(RI_BRICKMEMORY,1)
@@ -1507,8 +1505,6 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable(RI_METABUCKETS,			"int[2]");
 	declareVariable(RI_INHERITATTRIBUTES,	"int");
 	declareVariable(RI_GRIDSIZE,			"int");
-	declareVariable(RI_HIERARCHYDEPTH,		"int");
-	declareVariable(RI_HIERARCHYOBJECTS,	"int");
 	declareVariable(RI_EYESPLITS,			"int");
 	declareVariable(RI_TEXTUREMEMORY,		"int");
 	declareVariable(RI_BRICKMEMORY,			"int");

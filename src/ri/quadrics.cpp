@@ -59,32 +59,8 @@
 		}														\
 	}															\
 																\
-	if (rv->lastXform != xform) {								\
-		if (xform->next != NULL) {								\
-			vector	tmp[4];										\
-			vector	to;											\
-			addvv(to,rv->from,rv->dir);							\
-																\
-			mulmp(tmp[0],xform->to,rv->from);					\
-			mulmp(tmp[1],xform->to,to);							\
-																\
-			mulmp(tmp[2],xform->next->to,rv->from);				\
-			mulmp(tmp[3],xform->next->to,to);					\
-																\
-			interpolatev(rv->oFrom,tmp[0],tmp[2],rv->time);		\
-			interpolatev(rv->oTo,tmp[1],tmp[3],rv->time);		\
-			subvv(rv->oDir,rv->oTo,rv->oFrom);					\
-		} else {												\
-			vector	to;											\
-			addvv(to,rv->from,rv->dir);							\
-																\
-			mulmp(rv->oFrom,xform->to,rv->from);				\
-			mulmp(rv->oTo,xform->to,to);						\
-			subvv(rv->oDir,rv->oTo,rv->oFrom);					\
-		}														\
-																\
-		rv->lastXform	=	xform;								\
-	}
+	vector	oFrom,oDir;											\
+	transform(oFrom,oDir,xform,rv);
 
 
 
@@ -277,9 +253,9 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 	}
 	
 
-	const double a	=	dotvv(rv->oDir,rv->oDir);
-	const double b	=	2*dotvv(rv->oDir,rv->oFrom);
-	const double c	=	dotvv(rv->oFrom,rv->oFrom) - r*r;
+	const double a	=	dotvv(oDir,oDir);
+	const double b	=	2*dotvv(oDir,oFrom);
+	const double c	=	dotvv(oFrom,oFrom) - r*r;
 
 	if ((ns		=	solveQuadric<double>(a,b,c,s)) == 0) return;
 
@@ -294,9 +270,9 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 		if (t	<=	rv->tmin)		continue;
 		if (t	>=	rv->t)			return;
 
-		P[0]	=	rv->oDir[0]*t + rv->oFrom[0];
-		P[1]	=	rv->oDir[1]*t + rv->oFrom[1];
-		P[2]	=	rv->oDir[2]*t + rv->oFrom[2];
+		P[0]	=	oDir[0]*t + oFrom[0];
+		P[1]	=	oDir[1]*t + oFrom[1];
+		P[2]	=	oDir[2]*t + oFrom[2];
 
 		if (r > 0) {
 			u									=	atan2(P[COMP_Y],P[COMP_X]);
@@ -334,7 +310,7 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 		}
 
 		if (attributes->nSides == 1) {
-			if ((rv->oDir[0]*P[0] + rv->oDir[1]*P[1] + rv->oDir[2]*P[2]) > 0) continue;
+			if ((oDir[0]*P[0] + oDir[1]*P[1] + oDir[2]*P[2]) > 0) continue;
 		}
 
 		tmp[0]			=	(float) P[0];
@@ -705,12 +681,12 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 		umax	=	this->umax;
 	}
 
-	t	=	(float) (z - rv->oFrom[COMP_Z])/rv->oDir[COMP_Z];
+	t	=	(float) (z - oFrom[COMP_Z])/oDir[COMP_Z];
 
 	if ((t <= rv->tmin) || (t >= rv->t)) return;
 
-	x	=	rv->oFrom[COMP_X] + rv->oDir[COMP_X]*t;
-	y	=	rv->oFrom[COMP_Y] + rv->oDir[COMP_Y]*t;
+	x	=	oFrom[COMP_X] + oDir[COMP_X]*t;
+	y	=	oFrom[COMP_Y] + oDir[COMP_Y]*t;
 	if ((x*x+y*y) > r*r) return;
 
 	if (r < 0)	u	=	atan2(-y,-x);
@@ -732,7 +708,7 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 	}
 
 	if (attributes->nSides == 1) {
-		if (dotvv(rv->oDir,Nt) > 0) {
+		if (dotvv(oDir,Nt) > 0) {
 			return;
 		}
 	}
@@ -1033,8 +1009,8 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
-	from	=	rv->oFrom;
-	dir		=	rv->oDir;
+	from	=	oFrom;
+	dir		=	oDir;
 
 	if (nextData != NULL) {
 		r		=	this->r *		(1-rv->time) + nextData[0] * rv->time;
@@ -1068,7 +1044,7 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 		if (t <= rv->tmin)	continue;
 		if (t >= rv->t)		return;
 
-		P[COMP_Z]	=	rv->oDir[COMP_Z]*t + rv->oFrom[COMP_Z];
+		P[COMP_Z]	=	oDir[COMP_Z]*t + oFrom[COMP_Z];
 
 		if (height < 0) {
 			if (P[COMP_Z] < height) continue;
@@ -1078,8 +1054,8 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 			if (P[COMP_Z] < 0) 		continue;
 		}
 
-		P[COMP_X]					=	rv->oDir[COMP_X]*t + rv->oFrom[COMP_X];
-		P[COMP_Y]					=	rv->oDir[COMP_Y]*t + rv->oFrom[COMP_Y];
+		P[COMP_X]					=	oDir[COMP_X]*t + oFrom[COMP_X];
+		P[COMP_Y]					=	oDir[COMP_Y]*t + oFrom[COMP_Y];
 
 		if (r > 0) 	u				=	atan2(P[COMP_Y],P[COMP_X]);
 		else 		u				=	atan2(-P[COMP_Y],-P[COMP_X]);
@@ -1111,7 +1087,7 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 		}
 
 		if (attributes->nSides == 1) {
-			if (dotvv(rv->oDir,Nt) > 0) {
+			if (dotvv(oDir,Nt) > 0) {
 				continue;
 			}
 		}
@@ -1442,8 +1418,8 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
-	float	*from	=	rv->oFrom;
-	float	*dir	=	rv->oDir;
+	float	*from	=	oFrom;
+	float	*dir	=	oDir;
 	double	a,b,c,s[2];
 	unsigned int		ns,i;
 	float	zmi,zma;
@@ -1519,7 +1495,7 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 		}
 
 		if (attributes->nSides == 1) {
-			if (dotvv(rv->oDir,Nt) > 0) continue;
+			if (dotvv(oDir,Nt) > 0) continue;
 		}
 
 		rv->object	=	this;
@@ -1840,8 +1816,8 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
-	float	*from	=	rv->oFrom;
-	float	*dir	=	rv->oDir;
+	float	*from	=	oFrom;
+	float	*dir	=	oDir;
 	double	a,b,c,s[2];
 	unsigned int		ns,i;
 	float	r,zmin,zmax,umax;
@@ -1911,7 +1887,7 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 		}
 
 		if (attributes->nSides == 1) {
-			if (dotvv(rv->oDir,Nt) > 0) continue;
+			if (dotvv(oDir,Nt) > 0) continue;
 		}
 
 		rv->object	=	this;
@@ -2229,8 +2205,8 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
-	float	*from	=	rv->oFrom;
-	float	*dir	=	rv->oDir;
+	float	*from	=	oFrom;
+	float	*dir	=	oDir;
 	unsigned int		ns,i;
 	double	ts[2];
 	double	P[3];
@@ -2359,7 +2335,7 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 			}
 
 			if (attributes->nSides == 1) {
-				if (dotvv(rv->oDir,Nt) > 0) continue;
+				if (dotvv(oDir,Nt) > 0) continue;
 			}
 		}
 
@@ -2738,8 +2714,8 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 		double		s[5];
 		double		c[5];
 		int			i;
-		const float	*from	=	rv->oFrom;
-		const float	*dir	=	rv->oDir;
+		const float	*from	=	oFrom;
+		const float	*dir	=	oDir;
 
 		double		R2		=	rmax*rmax;
 		double		r2		=	rmin*rmin;
@@ -2834,7 +2810,7 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 			}
 
 			if (attributes->nSides == 1) {
-				//if (dotvv(rv->oDir,Nt) > 0) continue;
+				//if (dotvv(oDir,Nt) > 0) continue;
 			}
 
 			u						=	u / umax;

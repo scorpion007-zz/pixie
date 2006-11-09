@@ -35,6 +35,7 @@
 #include "stats.h"
 #include "shading.h"
 #include "renderer.h"
+#include "objectMisc.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
@@ -131,39 +132,11 @@ void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
 
 	if (dotvv(ray->dir,ray->dir) < 0)	return;
 
-	// Transform to object space
-	if (ray->lastXform != xform) {
-		if (xform->next != NULL) {
-			vector	tmp[4];
-			vector	to;
-			addvv(to,ray->from,ray->dir);
-
-			mulmp(tmp[0],xform->to,ray->from);
-			mulmp(tmp[1],xform->to,to);
-
-			mulmp(tmp[2],xform->next->to,ray->from);
-			mulmp(tmp[3],xform->next->to,to);
-
-			interpolatev(ray->from,tmp[0],tmp[2],ray->time);
-			interpolatev(ray->to,tmp[1],tmp[3],ray->time);
-			subvv(ray->dir,ray->to,ray->from);
-		} else {
-			vector	to;
-			addvv(to,ray->from,ray->dir);
-
-			mulmp(ray->from,xform->to,ray->from);
-			mulmp(ray->to,xform->to,to);
-			subvv(ray->dir,ray->to,ray->from);
-		}
-
-		ray->lastXform	=	xform;
-	}
-
 	tmin	=	ray->tmin;
 	tmax	=	ray->t;
 
 	// Find an intersection if any
-	if (intersectBox(bmin,bmax,ray->from,ray->to,tmin,tmax)) {
+	if (intersectBox(bmin,bmax,ray->from,ray->dir,tmin,tmax)) {
 		lastT		=	tmin;
 		lastP[0]	=	(float) (ray->from[0] + ray->dir[0]*lastT);
 		lastP[1]	=	(float) (ray->from[1] + ray->dir[1]*lastT);

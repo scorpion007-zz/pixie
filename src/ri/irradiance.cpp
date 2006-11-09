@@ -660,18 +660,10 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				ray.from[COMP_Y]		=	P[COMP_Y] + X[COMP_Y]*dx + Y[COMP_Y]*dy;
 				ray.from[COMP_Z]		=	P[COMP_Z] + X[COMP_Z]*dx + Y[COMP_Z]*dy;
 
-				addvv(ray.to,ray.from,ray.dir);
-
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
-				ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-				ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-				ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
-				ray.jimp				=	-1.0f;
-				ray.lastXform			=	NULL;
-				ray.object				=	NULL;
 
 				context->trace(&ray);
 
@@ -747,18 +739,10 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				ray.from[COMP_Y]		=	P[COMP_Y] + X[COMP_Y]*dx + Y[COMP_Y]*dy;
 				ray.from[COMP_Z]		=	P[COMP_Z] + X[COMP_Z]*dx + Y[COMP_Z]*dy;
 
-				addvv(ray.to,ray.from,ray.dir);
-
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
-				ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-				ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-				ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
-				ray.jimp				=	-1.0f;
-				ray.lastXform			=	NULL;
-				ray.object				=	NULL;
 
 				context->trace(&ray);
 

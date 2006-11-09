@@ -61,7 +61,6 @@
 #define	objectDefer(__cObject)																					\
 	if (		(__cObject->xbound[1] >= tbucketRight)	&&	(currentXBucket < CRenderer::xBucketsMinusOne)) {	\
 		assert(buckets[currentYBucket][currentXBucket+1] != NULL);												\
-		stats.numObjectDeferRight++;																			\
 																												\
 		objectExplicitInsert(__cObject,currentXBucket+1,currentYBucket);										\
 	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < CRenderer::yBucketsMinusOne)) {	\
@@ -69,7 +68,6 @@
 		if (xb < 0)	xb = 0;																						\
 		assert(xb < (int) CRenderer::xBuckets);																	\
 		assert(buckets[currentYBucket+1][xb] != NULL);															\
-		stats.numObjectDeferBottom++;																			\
 																												\
 		objectExplicitInsert(__cObject,xb,currentYBucket+1);													\
 	} else {																									\

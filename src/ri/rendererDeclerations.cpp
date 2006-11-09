@@ -99,8 +99,6 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_METABUCKETS,			"int[2]");
 	declareVariable(RI_INHERITATTRIBUTES,	"int");
 	declareVariable(RI_GRIDSIZE,			"int");
-	declareVariable(RI_HIERARCHYDEPTH,		"int");
-	declareVariable(RI_HIERARCHYOBJECTS,	"int");
 	declareVariable(RI_EYESPLITS,			"int");
 	declareVariable(RI_TEXTUREMEMORY,		"int");
 	declareVariable(RI_BRICKMEMORY,			"int");

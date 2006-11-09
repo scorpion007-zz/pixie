@@ -180,17 +180,10 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 								ray.t					=	lengthv(D);															\
 								mulvf(ray.dir,D,1/ray.t);																		\
 								movvv(ray.from,&op1->real);																		\
-								addvv(ray.to,D,&op1->real);																		\
 								ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;										\
 								ray.time				=	urand();															\
-								ray.jimp				=	-1.0f;																\
 								ray.tmin				=	bias;																\
 								ray.t					-=	bias;																\
-								ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];													\
-								ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];													\
-								ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];													\
-								ray.lastXform			=	NULL;																\
-								ray.object				=	NULL;																\
 																																\
 								trace(&ray);																					\
 																																\
@@ -337,17 +330,10 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								ray.t					=	lengthv(D);															\
 								mulvf(ray.dir,D,1/ray.t);																		\
 								movvv(ray.from,&op1->real);																		\
-								addvv(ray.to,D,&op1->real);																		\
 								ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;								\
 								ray.time				=	urand();															\
-								ray.jimp				=	-1.0f;																\
 								ray.tmin				=	bias;																\
 								ray.t					-=	bias;																\
-								ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];													\
-								ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];													\
-								ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];													\
-								ray.lastXform			=	NULL;																\
-								ray.object				=	NULL;																\
 																																\
 								trace(&ray);																					\
 																																\
