@@ -902,11 +902,16 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 
 	switch(currentShadingState->shadingDim) {
 
+
+
+
+
 		// Dv executing on Points
 		case SHADING_0D:
 		{
 			assert(FALSE);
 
+			// Set anyway
 			for (int i=numVertices;i>0;i--) {
 				*ab++	=	0;
 				*ab++	=	0;
@@ -915,6 +920,10 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 			return	ab - numVertices*2;
 		}
 		break;
+
+
+
+
 
 		// Dv executing on Curves
 		case SHADING_1D_GRID:
@@ -945,6 +954,11 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 			return	ab - numVertices*2;
 		}
 		break;
+
+
+
+
+
 
 
 		// Dv executing on Curves
@@ -980,6 +994,11 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 		break;
 
 
+
+
+
+
+
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
@@ -990,13 +1009,14 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 			for (j=0;j<vVertices;j++) {
 				for (i=0;i<uVertices;i++) {
 					
-					const int	ii		=	min(i,uVertices-1);
-					const int	jj		=	min(j,vVertices-1);
+					const int	ii		=	min(i,uVertices-2);
+					const int	jj		=	min(j,vVertices-2);
 
+					// The 4 corners of the current quad
 					const float	*cFrom0	=	from + jj*uVertices*3 + ii*3;
-					const float	*cFrom1	=	from + jj*uVertices*3 + (ii+1)*3;
-					const float	*cFrom2	=	from + (jj+1)*uVertices*3 + ii*3;
-					const float	*cFrom3	=	from + (jj+1)*uVertices*3 + (ii+1)*3;
+					const float	*cFrom1	=	cFrom0 + 3;
+					const float	*cFrom2	=	cFrom0 + uVertices*3;
+					const float	*cFrom3	=	cFrom2 + 3;
 
 					ab[0]				=	0;
 					ab[1]				=	0;
@@ -1011,17 +1031,21 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 					subvv(tmp,cFrom2,cFrom3);
 					ab[1]				+=	lengthv(tmp);
 
+					// The directions at 4 corners of the quad
 					const float	*cDir0	=	dir + jj*uVertices*3 + ii*3;
-					const float	*cDir1	=	dir + jj*uVertices*3 + (ii+1)*3;
-					const float	*cDir2	=	dir + (jj+1)*uVertices*3 + ii*3;
-					const float	*cDir3	=	dir + (jj+1)*uVertices*3 + (ii+1)*3;
+					const float	*cDir1	=	cDir0 + 3;
+					const float	*cDir2	=	cDir0 + uVertices*3;
+					const float	*cDir3	=	cDir2 + 3;
 
 					float a				=	dotvv(cDir1,cDir0);
 					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir1,cDir1)))));
+
 					a					=	dotvv(cDir2,cDir0);
 					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir2,cDir2)))));
+
 					a					=	dotvv(cDir3,cDir1);
 					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir3,cDir3)*dotvv(cDir1,cDir1)))));
+
 					a					=	dotvv(cDir2,cDir3);
 					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir2,cDir2)*dotvv(cDir3,cDir3)))));
 
@@ -1032,6 +1056,12 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 			return ab - uVertices*vVertices*2;
 		}
 		break;
+
+
+
+
+
+
 
 		// Dv executing on a 2D raytraced surface
 		case SHADING_2D:

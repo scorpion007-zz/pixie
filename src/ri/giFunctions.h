@@ -321,35 +321,42 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // visibility	"f=pp"
 #ifndef INIT_SHADING
-#define	VISIBILITYEXPR_PRE		FUN3EXPR_PRE																						\
-								const float			bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
-								vector				D;																				\
+#define	VISIBILITYEXPR_PRE		FUN3EXPR_PRE																				\
+								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;	\
+								const float			*ab		=	rayDiff((float *) op1,NULL,(float *) op2);					\
+								vector				D;																		\
 								CRay				ray;
 
-#define	VISIBILITYEXPR			subvv(D,(float *) op2,(float *) op1);															\
-								ray.t					=	lengthv(D);															\
-								mulvf(ray.dir,D,1/ray.t);																		\
-								movvv(ray.from,&op1->real);																		\
-								ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;								\
-								ray.time				=	urand();															\
-								ray.tmin				=	bias;																\
-								ray.t					-=	bias;																\
-																																\
-								trace(&ray);																					\
-																																\
-								if (ray.object != NULL)	res[0].real	=	0;														\
+#define	VISIBILITYEXPR			subvv(D,(float *) op2,(float *) op1);														\
+								ray.t					=	lengthv(D);														\
+								mulvf(ray.dir,D,1/ray.t);																	\
+								movvv(ray.from,&op1->real);																	\
+								ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;							\
+								ray.time				=	urand();														\
+								ray.tmin				=	bias;															\
+								ray.t					-=	bias;															\
+								ray.da					=	ab[0];															\
+								ray.db					=	ab[1];															\
+																															\
+								trace(&ray);																				\
+																															\
+								if (ray.object != NULL)	res[0].real	=	0;													\
 								else					res[0].real	=	1;
 
+#define	VISIBILITYEXPR_UPDATE	FUN3EXPR_UPDATE(1,3,3)																		\
+								ab	+=	2;
 
 #else
 #define	VISIBILITYEXPR_PRE
 #define	VISIBILITYEXPR
+#define	VISIBILITYEXPR_UPDATE
 #endif
 
-DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILITYEXPR,FUN3EXPR_UPDATE(1,3,3),NULL_EXPR,PARAMETER_RAYTRACE)
+DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILITYEXPR,VISIBILITYEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE)
 
 #undef	VISIBILITYEXPR_PRE
 #undef	VISIBILITYEXPR
+#undef	VISIBILITYEXPR_UPDATE
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // indirectdiffuse	"c=pnf!"
