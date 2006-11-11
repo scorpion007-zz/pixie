@@ -536,6 +536,25 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 		}
 	}
 
+	// Setup the ray differentials
+	if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		const float	a	=	1 / (CRenderer::imagePlane*CRenderer::dPixeldx);
+
+		cRay	=	rays;
+		for (i=numShading;i>0;i--,cRay++) {
+			cRay->db			=	0;
+			cRay->da			=	a;
+		}
+	} else{
+		const float	a	=	1 / CRenderer::dPixeldx;
+
+		cRay	=	rays;
+		for (i=numShading;i>0;i--,cRay++) {
+			cRay->db			=	a;
+			cRay->da			=	0;
+		}
+	}
+
 	// Actually raytrace
 	primaryBundle.numRays	=	numShading;
 	primaryBundle.last		=	0;

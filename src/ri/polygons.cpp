@@ -1192,7 +1192,7 @@ CPolygonMesh::~CPolygonMesh() {
 // Date last edited		:	6/11/2003
 void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 
-	if (children == NULL)	triangulate(r);
+	if (children == NULL)	create(r);
 }
 
 
@@ -1205,7 +1205,7 @@ void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 // Date last edited		:	6/11/2003
 void		CPolygonMesh::dice(CShadingContext *r) {
 
-	if (children == NULL)	triangulate(r);
+	if (children == NULL)	create(r);
 
 	CObject::dice(r);
 }
@@ -1723,7 +1723,7 @@ nextLoop:;
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/28/2003
-void				CPolygonMesh::triangulate(CShadingContext *context) {
+void				CPolygonMesh::create(CShadingContext *context) {
 	osLock(CRenderer::hierarchyMutex);
 	if (children != NULL) {
 		osUnlock(CRenderer::hierarchyMutex);
@@ -1815,7 +1815,13 @@ void				CPolygonMesh::triangulate(CShadingContext *context) {
 	}
 
 	children					=	data.meshChildren;
-	cluster(context);
+
+	// If raytraced, attach to the children
+	if (raytraced()) {
+		CObject	*cObject;
+		for (cObject=children;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
+		cluster(context);
+	}
 
 	osUnlock(CRenderer::hierarchyMutex);
 }

@@ -69,9 +69,6 @@ CObject::CObject(CAttributes *a,CXform *x) {
 	attributes->attach();
 	xform->attach();
 
-	// If we're raytracing, don't let be destroyed
-	if (attributes->flags & CRenderer::raytracingFlags)	attach();
-
 	children	=	NULL;
 	sibling		=	NULL;
 }
@@ -407,6 +404,19 @@ CSurface::~CSurface() {
 // Comments				:
 // Date last edited		:	10/16/2001
 void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
+
+	if (! (cRay->flags & attributes->flags) )	return;
+
+	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
+		const float importance = attributes->lodImportance;
+		if (importance >= 0) {
+			if (cRay->jimp > importance)			return;
+		} else {
+			if ((1-cRay->jimp) >= -importance)		return;
+		}
+	}
+
+
 	const int	udiv	=	4;
 	const int	vdiv	=	4;
 
@@ -634,16 +644,19 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 	float	*u			=	varying[VARIABLE_U];
 	float	*v			=	varying[VARIABLE_V];
 	float	*time		=	varying[VARIABLE_TIME];
-	float	*from		=	varying[VARIABLE_I];
+	float	*I			=	varying[VARIABLE_I];
+	float	*du			=	varying[VARIABLE_DU];
 	int		i;
 
 	for (i=numRays;i>0;i--) {
 		const CRay	*cRay	=	*rays++;
 
-		*u++	=	cRay->u;
-		*v++	=	cRay->v;
-		*time++	=	cRay->time;
-		movvv(from,cRay->from);	from	+=	3;
+		*u++	=	cRay->u;						// The intersection u
+		*v++	=	cRay->v;						// The intersection v
+		*time++	=	cRay->time;						// The intersection time
+		*du++	=	cRay->da*cRay->t + cRay->db;	// The ray differential
+		mulvf(I,cRay->dir,cRay->t);					// Compute the I vector
+		I		+=	3;
 	}
 
 	context->shade(this,numRays,1,-1,0);

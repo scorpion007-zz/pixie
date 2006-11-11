@@ -74,8 +74,8 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 		// Du executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			int			uVertices	=	currentShadingState->numUvertices;
-			int			vVertices	=	currentShadingState->numVvertices;
+			const int	uVertices	=	currentShadingState->numUvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
 			int			i,j;
 			const float	*u			=	currentShadingState->varying[VARIABLE_U];
 
@@ -99,7 +99,7 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 		// Du executing on a 2D raytraced surface
 		case SHADING_2D:
 		{
-			int			numRealVertices	=	currentShadingState->numRealVertices;
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices;
 			float		*ddest			=	dest + numRealVertices;
 			const float	*du				=	currentShadingState->varying[VARIABLE_DU];
@@ -148,7 +148,7 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		// Dv executing on Curves
 		case SHADING_1D_GRID:
 		{
-			int			vVertices	=	currentShadingState->numVvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
 			int			i;
 			const float	*v			=	currentShadingState->varying[VARIABLE_V];
 
@@ -168,8 +168,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		// Dv executing on Curves
 		case SHADING_1D:
 		{
-			int			numVertices		=	currentShadingState->numVertices;
-			int			numRealVertices	=	currentShadingState->numRealVertices;
+			const int	numVertices		=	currentShadingState->numVertices;
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices;
 			float		*ddest			=	dest + numRealVertices;
 			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
@@ -196,8 +196,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			int			uVertices	=	currentShadingState->numUvertices;
-			int			vVertices	=	currentShadingState->numVvertices;
+			const int	uVertices	=	currentShadingState->numUvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
 			int			i,j;
 			const float	*v			=	currentShadingState->varying[VARIABLE_V];
 
@@ -225,8 +225,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		// Dv executing on a 2D raytraced surface
 		case SHADING_2D:
 		{
-			int			numVertices		=	currentShadingState->numVertices;
-			int			numRealVertices	=	currentShadingState->numRealVertices;
+			const int	numVertices		=	currentShadingState->numVertices;
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices;
 			float		*ddest			=	dest + numRealVertices;
 			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
@@ -311,8 +311,8 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 		// Du executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			int			uVertices	=	currentShadingState->numUvertices;
-			int			vVertices	=	currentShadingState->numVvertices;
+			const int	uVertices	=	currentShadingState->numUvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
 			int			i,j;
 			const float	*u			=	currentShadingState->varying[VARIABLE_U];
 
@@ -346,7 +346,7 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 		// Du executing on a 2D raytraced surface
 		case SHADING_2D:
 		{
-			int			numRealVertices	=	currentShadingState->numRealVertices;
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
 			const float	*du				=	currentShadingState->varying[VARIABLE_DU];
@@ -406,7 +406,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		// Dv executing on Curves
 		case SHADING_1D_GRID:
 		{
-			int			vVertices	=	currentShadingState->numVvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
 			int			i;
 			const float	*v			=	currentShadingState->varying[VARIABLE_V];
 			float		invDv;
@@ -441,8 +441,8 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		// Dv executing on Curves
 		case SHADING_1D:
 		{
-			int			numVertices		=	currentShadingState->numVertices;
-			int			numRealVertices	=	currentShadingState->numRealVertices;
+			const int	numVertices		=	currentShadingState->numVertices;
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
 			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
@@ -478,8 +478,8 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			int			uVertices	=	currentShadingState->numUvertices;
-			int			vVertices	=	currentShadingState->numVvertices;
+			const int	uVertices	=	currentShadingState->numUvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
 			int			i,j;
 			const float	*v			=	currentShadingState->varying[VARIABLE_V];
 
@@ -520,8 +520,8 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		// Dv executing on a 2D raytraced surface
 		case SHADING_2D:
 		{
-			int			numVertices		=	currentShadingState->numVertices;
-			int			numRealVertices	=	currentShadingState->numRealVertices;
+			const int	numVertices		=	currentShadingState->numVertices;
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
 			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
@@ -553,7 +553,6 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		}
 		break;
 	}
-
 }
 
 
@@ -875,3 +874,207 @@ void	CShadingContext::traceReflection(int numVertices,CRaySample *samples,CTextu
 }
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	rayDiff
+// Description			:	Compute the ray differentials
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/23/2003
+float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
+
+	// Allocate the return value
+	const int	numVertices	=	currentShadingState->numVertices;
+	float		*ab			=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
+
+	// Compute the direction vector if not already computed
+	if (dir == NULL) {
+		int	i;
+
+		dir		=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);
+		for (i=numVertices;i>0;i--,dir+=3,from+=3,to+=3)	subvv(dir,to,from);
+
+		dir		-=	numVertices*3;
+		from	-=	numVertices*3;
+		to		-=	numVertices*3;
+	}
+
+
+	switch(currentShadingState->shadingDim) {
+
+		// Dv executing on Points
+		case SHADING_0D:
+		{
+			assert(FALSE);
+
+			for (int i=numVertices;i>0;i--) {
+				*ab++	=	0;
+				*ab++	=	0;
+			}
+
+			return	ab - numVertices*2;
+		}
+		break;
+
+		// Dv executing on Curves
+		case SHADING_1D_GRID:
+		{
+			const int	vVertices	=	currentShadingState->numVvertices;
+			int			i;
+			vector		tmp;
+			float		a;
+
+			assert(currentShadingState->numUvertices == 1);
+			assert(vVertices > 0);
+
+			for (i=vVertices-1;i>0;i--) {
+				subvv(tmp,from+3,from);
+				ab[1]	=	lengthv(tmp);
+				a		=	dotvv(dir,dir+3);
+				ab[0]	=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(dir+3,dir+3)))));
+
+				from	+=	3;
+				dir		+=	3;
+				ab		+=	2;
+			}
+
+			ab[0]	=	ab[-2];
+			ab[1]	=	ab[-1];
+			ab		+=	2;
+
+			return	ab - numVertices*2;
+		}
+		break;
+
+
+		// Dv executing on Curves
+		case SHADING_1D:
+			assert(FALSE);
+
+			{
+				int			numRealVertices	=	currentShadingState->numRealVertices;
+				const float	*dfrom			=	from + numRealVertices*3;
+				const float	*ddir			=	dir + numRealVertices*3;
+				int			i;
+
+				assert(numVertices == numRealVertices*3);
+
+				for (i=numRealVertices;i>0;i--) {
+					vector	tmp;
+
+					subvv(tmp,dfrom,from);
+					ab[1]				=	lengthv(tmp);
+
+					const float	a		=	dotvv(dir,ddir);
+					ab[0]				=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir,ddir)))));
+
+					ab					+=	2;
+					from				+=	3;
+					dir					+=	3;
+					dfrom				+=	3;
+					ddir				+=	3;
+				}
+
+				return ab - numRealVertices*2;
+			}
+		break;
+
+
+		// Dv executing on a 2D grid
+		case SHADING_2D_GRID:
+		{
+			const int	uVertices	=	currentShadingState->numUvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
+			int			i,j;
+
+			for (j=0;j<vVertices;j++) {
+				for (i=0;i<uVertices;i++) {
+					
+					const int	ii		=	min(i,uVertices-1);
+					const int	jj		=	min(j,vVertices-1);
+
+					const float	*cFrom0	=	from + jj*uVertices*3 + ii*3;
+					const float	*cFrom1	=	from + jj*uVertices*3 + (ii+1)*3;
+					const float	*cFrom2	=	from + (jj+1)*uVertices*3 + ii*3;
+					const float	*cFrom3	=	from + (jj+1)*uVertices*3 + (ii+1)*3;
+
+					ab[0]				=	0;
+					ab[1]				=	0;
+
+					vector		tmp;
+					subvv(tmp,cFrom1,cFrom0);
+					ab[1]				+=	lengthv(tmp);
+					subvv(tmp,cFrom2,cFrom0);
+					ab[1]				+=	lengthv(tmp);
+					subvv(tmp,cFrom1,cFrom3);
+					ab[1]				+=	lengthv(tmp);
+					subvv(tmp,cFrom2,cFrom3);
+					ab[1]				+=	lengthv(tmp);
+
+					const float	*cDir0	=	dir + jj*uVertices*3 + ii*3;
+					const float	*cDir1	=	dir + jj*uVertices*3 + (ii+1)*3;
+					const float	*cDir2	=	dir + (jj+1)*uVertices*3 + ii*3;
+					const float	*cDir3	=	dir + (jj+1)*uVertices*3 + (ii+1)*3;
+
+					float a				=	dotvv(cDir1,cDir0);
+					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir1,cDir1)))));
+					a					=	dotvv(cDir2,cDir0);
+					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir2,cDir2)))));
+					a					=	dotvv(cDir3,cDir1);
+					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir3,cDir3)*dotvv(cDir1,cDir1)))));
+					a					=	dotvv(cDir2,cDir3);
+					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir2,cDir2)*dotvv(cDir3,cDir3)))));
+
+					ab					+=	2;
+				}
+			}
+			
+			return ab - uVertices*vVertices*2;
+		}
+		break;
+
+		// Dv executing on a 2D raytraced surface
+		case SHADING_2D:
+		{
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
+			const float	*dfrom			=	from + numRealVertices*3;
+			const float	*ddir			=	dir + numRealVertices*3;
+			int			i;
+
+			assert(numVertices == numRealVertices*3);
+
+			for (i=numRealVertices;i>0;i--) {
+				vector	tmp;
+
+				ab[0]				=	0;
+				ab[1]				=	0;
+
+				subvv(tmp,dfrom,from);
+				ab[1]				+=	lengthv(tmp);
+				subvv(tmp,dfrom + 3,from);
+				ab[1]				+=	lengthv(tmp);
+
+				float a;
+				a					=	dotvv(dir,ddir);
+				ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir,ddir)))));
+				a					=	dotvv(dir,ddir+3);
+				ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir+3,ddir+3)))));
+
+				ab[0]				*=	0.5f;
+				ab[1]				*=	0.5f;
+
+				ab					+=	2;
+				from				+=	3;
+				dir					+=	3;
+				dfrom				+=	6;
+				ddir				+=	6;
+			}
+
+			return ab - numRealVertices*2;
+		}
+		break;
+	}
+
+	assert(FALSE);
+	return NULL;
+}

@@ -233,7 +233,7 @@ void					CImplicit::shade(CShadingContext *context,int numRays,CRay **rays) {
 	float	**varying	=	context->currentShadingState->varying;
 	float	*P			=	varying[VARIABLE_P];
 	float	*N			=	varying[VARIABLE_NG];
-	float	*from		=	varying[VARIABLE_I];
+	float	*I			=	varying[VARIABLE_I];
 	int		i;
 
 	for (i=numRays;i>0;i--) {
@@ -243,11 +243,11 @@ void					CImplicit::shade(CShadingContext *context,int numRays,CRay **rays) {
 		P[1]			=	cRay->from[1] + cRay->dir[1]*cRay->t;
 		P[2]			=	cRay->from[2] + cRay->dir[2]*cRay->t;
 		movvv(N,cRay->N);
-		movvv(from,cRay->from);
+		subvv(I,P,cRay->from);
 
 		P				+=	3;
 		N				+=	3;
-		from			+=	3;
+		I				+=	3;
 	}
 
 	if (xform->flip) {

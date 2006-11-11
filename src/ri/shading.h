@@ -212,7 +212,7 @@ public:
 		// Some shading functions
 		CShadingState			*currentShadingState;									// The current shading state
 
-		void					shade(CSurface *,int,int,int,unsigned int);				// Shade points on a surface
+		void					shade(CSurface *,int,int,int,unsigned int,int displaceOnly=FALSE);	// Shade points on a surface
 		void					displace(CSurface *,int,int,int,unsigned int);			// Sample points on a surface
 
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
@@ -295,6 +295,7 @@ private:
 		void					dvFloat(float *,const float *);
 		void					duVector(float *,const float *);
 		void					dvVector(float *,const float *);
+		float					*rayDiff(const float *from,float *dir,const float *to);
 
 		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
 		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);

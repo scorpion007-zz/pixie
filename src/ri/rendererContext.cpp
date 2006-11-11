@@ -487,8 +487,14 @@ void	CRendererContext::addObject(CObject *o) {
 
 	// Are we processing a delayed object ?
 	if (delayed != NULL) {
+
+		// Maintain the object if it is raytraced
+		if (o->raytraced())	o->attach();
+
+		// Add the object to the hirarchy
 		o->sibling			=	delayed->children;
 		delayed->children	=	o;
+
 		return;
 	}
 

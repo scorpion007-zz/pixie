@@ -995,8 +995,9 @@ void			CRenderer::render(CObject *cObject) {
 	addBox(worldBmin,worldBmax,cObject->bmin);
 	addBox(worldBmin,worldBmax,cObject->bmax);
 
-	// Tesselate the object if applicable
-	if (cObject->attributes->flags & raytracingFlags) {
+	// If the object is raytraced, add it into our hierarchy
+	if (cObject->raytraced()) {
+		cObject->attach();
 		cObject->sibling	=	root->children;
 		root->children		=	cObject;
 	}

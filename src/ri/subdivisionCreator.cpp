@@ -1941,5 +1941,12 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	// Re-claim the memory
 	memEnd(context->threadMemory);
 	
+	// If raytraced, attach to the children
+	if (raytraced()) {
+		CObject	*cObject;
+		for (cObject=children;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
+		cluster(context);
+	}
+
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
 }
