@@ -429,20 +429,27 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 		osLock(CRenderer::tesselateMutex);
 
 		if (tesselationCache == NULL) {
-			tesselationCache	=	tesselate(context,0.01f);
+			tesselationCache	=	tesselate(context,0,0.0f,1.0f,0.0f,1.0f,0.01f);
 		}
 
 		osUnlock(CRenderer::tesselateMutex);
 	}
 
 	// Intersect the ray
-	{
+	CSurface::CSurfaceTesselation *cTesselation = tesselationCache;
+	
+	while (cTesselation != NULL) {
 		int			i,j;
-		const float	*cP		=	tesselationCache->P;
+		const float	*cP		=	cTesselation->P;
 		const float	*r		=	cRay->from;
 		const float	*q		=	cRay->dir;
-		const int	udiv	=	tesselationCache->udiv;
-		const int	vdiv	=	tesselationCache->udiv;
+		const int	udiv	=	cTesselation->udiv;
+		const int	vdiv	=	cTesselation->vdiv;
+		
+		const float umin = cTesselation->umin;
+		const float vmin = cTesselation->vmin;
+		const float urg = (cTesselation->umax-cTesselation->umin);
+		const float vrg = (cTesselation->vmax-cTesselation->vmin);
 
 		for (j=0;j<vdiv;j++) {
 			for (i=0;i<udiv;i++,cP += 3) {
@@ -507,15 +514,15 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 							if (attributes->nSides == 1) {						\
 								if (dotvv(q,N) < 0) {							\
 									cRay->object	=	this;					\
-									cRay->u			=	(float) (u + i)/(float) udiv;	\
-									cRay->v			=	(float) (v + j)/(float) vdiv;	\
+									cRay->u			=	(float) umin + (u + i)*urg / (float) udiv;	\
+									cRay->v			=	(float) vmin + (v + j)*vrg / (float) vdiv;	\
 									cRay->t			=	(float) t;				\
 									movvv(cRay->N,N);							\
 								}												\
 							} else {											\
 								cRay->object	=	this;						\
-								cRay->u			=	(float) (u + i) / (float) udiv;		\
-								cRay->v			=	(float) (v + j) / (float) vdiv;		\
+								cRay->u			=	(float) umin + (u + i)*urg / (float) udiv;		\
+								cRay->v			=	(float) vmin + (v + j)*vrg / (float) vdiv;		\
 								cRay->t			=	(float) t;					\
 								movvv(cRay->N,N);								\
 							}													\
@@ -547,6 +554,8 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 			cP += 3;
 		}
+		
+		cTesselation = cTesselation->otherTesselations;
 	}
 }
 
@@ -674,18 +683,20 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,float r) {
-
+CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,int depth,float umin,float umax,float vmin,float vmax,float r) {
 	// Get some misc variables for fast access
 	float	**varying	=	context->currentShadingState->varying;
 
 	// Start with a 3x3 sampling grid
 	int		udiv		=	2;
 	int		vdiv		=	2;
+	
+	int		maxTesselationReached	=	(depth >= attributes->maxSubdivision);
+
 	while(TRUE) {
 		// Sample points on the patch
-		float	ustep		=	1.0f / (float) (udiv);
-		float	vstep		=	1.0f / (float) (vdiv);
+		float	ustep		=	(umax-umin) / (float) (udiv);
+		float	vstep		=	(vmax-vmin) / (float) (vdiv);
 
 		// Compute the sample positions and corresponding normal vectors
 		float	*uv			=	varying[VARIABLE_U];
@@ -693,8 +704,8 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 		float	*timev		=	varying[VARIABLE_TIME];
 		int		up,vp;
 		float	u,v;
-		for (vp=vdiv+1,v=0;vp>0;vp--,v+=vstep) {
-			for (up=udiv+1,u=0;up>0;up--,u+=ustep) {
+		for (vp=vdiv+1,v=vmin;vp>0;vp--,v+=vstep) {
+			for (up=udiv+1,u=umin;up>0;up--,u+=ustep) {
 				*uv++		=	u;
 				*vv++		=	v;
 				*timev++	=	0;
@@ -702,6 +713,8 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 		}
 		context->displace(this,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 
+		if (maxTesselationReached) break;
+		
 		// Evaluate the quality of this tesselation in u and v separately
 		int		i;
 		float	vMax	=	0;
@@ -730,14 +743,65 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 
 		// Scale back if we exceeded the max shading size
 		if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize) {
+			#if 0
 			float	aspect	=	uAvg / vAvg;
-
-			nvdiv	=	(int) floor(sqrtf(CRenderer::maxGridSize / aspect));
-			nudiv	=	(int) floor(nvdiv*aspect);
+			nvdiv	=	(int) floor(sqrtf(CRenderer::maxGridSize / aspect))-1;
+			nudiv	=	(int) floor(nvdiv*aspect)-1;
+						
+			assert ((nudiv+1)*(nvdiv+1) <= CRenderer::maxGridSize);
+			maxTesselationReached = TRUE;
 			
+			#else
 			// TODO: allow multiple shades in multiple patches, and reconstruct.
 			// TODO: begin-end time samples
-			break;
+			//break;
+			if (nvdiv == nudiv) {
+				float 		umid			=	(umin + umax) / (float) 2;
+				float 		vmid			=	(vmin + vmax) / (float) 2;
+				
+				CSurface::CSurfaceTesselation *a = tesselate(context,depth+1,umin,umid,vmin,vmid,r);
+				CSurface::CSurfaceTesselation *b = tesselate(context,depth+1,umid,umax,vmin,vmid,r);
+				CSurface::CSurfaceTesselation *c = tesselate(context,depth+1,umid,umax,vmid,vmax,r);
+				CSurface::CSurfaceTesselation *d = tesselate(context,depth+1,umin,umid,vmid,vmax,r);
+				
+				CSurface::CSurfaceTesselation *ct = a;
+				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
+				ct->otherTesselations = b;
+				
+				ct = b;
+				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
+				ct->otherTesselations = c;
+				
+				ct = c;
+				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
+				ct->otherTesselations = d;
+				
+				return a;
+				
+			} else if (nudiv > nvdiv) {
+				float 		umid			=	(umin + umax) / (float) 2;
+				
+				CSurface::CSurfaceTesselation *a = tesselate(context,depth+1,umin,umid,vmin,vmax,r);
+				CSurface::CSurfaceTesselation *b = tesselate(context,depth+1,umid,umax,vmin,vmax,r);
+				
+				CSurface::CSurfaceTesselation *ct = a;
+				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
+				ct->otherTesselations = b;
+								
+				return a;
+			} else {
+				float 		vmid			=	(vmin + vmax) / (float) 2;
+				
+				CSurface::CSurfaceTesselation *a = tesselate(context,depth+1,umin,umax,vmin,vmid,r);
+				CSurface::CSurfaceTesselation *b = tesselate(context,depth+1,umin,umax,vmid,vmax,r);
+				
+				CSurface::CSurfaceTesselation *ct = a;
+				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
+				ct->otherTesselations = b;
+								
+				return a;
+			}
+			#endif
 		}
 
 		// Do another iteration
@@ -749,10 +813,18 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 	CSurfaceTesselation	*newTesselationCache	=	new CSurfaceTesselation;
 	newTesselationCache->udiv					=	udiv;
 	newTesselationCache->vdiv					=	vdiv;
+	
+	newTesselationCache->umin					=	umin;
+	newTesselationCache->umax					=	umax;
+	newTesselationCache->vmin					=	vmin;
+	newTesselationCache->vmax					=	vmax;
+	
 	newTesselationCache->lastRefNumber			=	-1;
-	newTesselationCache->P						=	new float[(udiv+1)*(udiv+1)*3];
-	newTesselationCache->size					=	(udiv+1)*(udiv+1)*3*sizeof(float);
-	memcpy(newTesselationCache->P,varying[VARIABLE_P],(udiv+1)*(udiv+1)*3*sizeof(float));
+	newTesselationCache->P						=	new float[(udiv+1)*(vdiv+1)*3];
+	newTesselationCache->size					=	(udiv+1)*(vdiv+1)*3*sizeof(float);
+	newTesselationCache->otherTesselations		=	NULL;
+	
+	memcpy(newTesselationCache->P,varying[VARIABLE_P],(udiv+1)*(vdiv+1)*3*sizeof(float));
 
 	return newTesselationCache;
 }
