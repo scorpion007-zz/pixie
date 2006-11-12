@@ -141,6 +141,10 @@ protected:
 
 			};
 
+			// The following two functions can be used to estimate the shading rate and the dicing amount
+			float					estimateShadingRate(const float *P0,const float *P1);
+			void					estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
+
 			// Find the best tesselation for this object
 			CSurfaceTesselation		*tesselate(CShadingContext *context,int depth,float umin,float umax,float vmin,float vmax,float r);
 

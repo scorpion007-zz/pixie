@@ -162,72 +162,66 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	float	**varying		=	rasterizer->currentShadingState->varying;
 	float	*u				=	varying[VARIABLE_U];
 	float	*v				=	varying[VARIABLE_V];
-	float	*time			=	varying[VARIABLE_TIME];
 	float	*P;
-	int		shouldSplit;
-	int		numPoints;
 	vector	bmin,bmax;
+	int		udiv,vdiv;
 
-	// Sample 3 points on the curve
-	*v++			=	vmin;
-	*v++			=	(vmin + vmax) * 0.5f;
-	*v++			=	vmax;
-	*u++			=	0;
-	*u++			=	0;
-	*u++			=	0;
-	*time++			=	0;
-	*time++			=	0;
-	*time++			=	0;
+	// Sample 6 points on the curve
+
+	// Top
+	*v++	=	vmin;
+	*u++	=	0;
+	*v++	=	vmin;
+	*u++	=	1;
+
+	// Middle
+	*v++	=	(vmin + vmax) * 0.5f;
+	*u++	=	0;
+	*v++	=	(vmin + vmax) * 0.5f;
+	*u++	=	1;
+
+	// Bottom
+	*v++	=	vmax;
+	*u++	=	0;
+	*v++	=	vmax;
+	*u++	=	1;
 
 	// Sample the curves
-	rasterizer->displace(this,1,3,1,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
+	rasterizer->displace(this,2,3,2,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
 
 	// Compute the curve bounding box
-	P				=	varying[VARIABLE_P];
+	P		=	varying[VARIABLE_P];
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-	addBox(bmin,bmax,P);
-	addBox(bmin,bmax,P+3);
-	addBox(bmin,bmax,P+6);
+	int	i;
+	for (i=0;i<6;i++)	addBox(bmin,bmax,P + i*3);
 
-	shouldSplit		=	FALSE;
 	if (bmin[COMP_Z] < C_EPSILON) {
 		if (bmax[COMP_Z] < CRenderer::clipMin) {
-			numPoints		=	-1;
+			// The curve is behind the screen
+
 		} else if (CRenderer::inFrustrum(bmin,bmax) == FALSE) {
 			// The curve is out of the viewing frustrum
-			numPoints		=	-1;
+			
 		} else {
 			// Split the curve into two pieces
-			numPoints		=	0;
-			shouldSplit		=	TRUE;
+			splitToChildren(rasterizer);
 		}
 	} else {
-		float	dx,dy;
-		int		j;
+		// We can do the perspective division
+		camera2pixels(6,P);
 
-		// we can do the perspective division
-		camera2pixels(3,P);
+		// Estimate the dicing amount
+		estimateDicing(P,1,2,udiv,vdiv,attributes->shadingRate);
 
-		dx				=	P[6+0] - P[0];
-		dy				=	P[6+1] - P[1];
-		j				=	(int) ceil(C_EPSILON + sqrt(dx*dx + dy*dy) / attributes->shadingRate);
+		// Make sure we don't split along u
+		if (vdiv == 1)	udiv	=	(CRenderer::maxGridSize >> 1) - 1;
 
-		if ((j + 1) < CRenderer::maxGridSize) {
-			// We can shade this curve
-			numPoints	=	j;
+		// Can we render this sucker ?
+		if ((udiv+1)*(vdiv+1) > CRenderer::maxGridSize) {
+			splitToChildren(rasterizer);
 		} else {
-			// We can not shade this curve - so split into two
-			numPoints	=	0;
-			shouldSplit	=	TRUE;
-		}
-	}
-
-	if (shouldSplit) {
-		splitToChildren(rasterizer);
-	} else {
-		if (numPoints > 0) {
-			rasterizer->drawRibbon(this,numPoints,vmin,vmax);
+			rasterizer->drawGrid(this,udiv,vdiv,0,1,vmin,vmax);
 		}
 	}
 }
@@ -371,6 +365,9 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		}
 	}
 
+	// Dispatch the variables
+	variables->dispatch(intrStart,0,numVertices,varying);
+
 	if (up & (PARAMETER_DPDU | PARAMETER_DPDV)) {
 		float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 		float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
@@ -401,8 +398,6 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 			*dPdu++	=	0;
 		}
 	}
-
-	variables->dispatch(intrStart,0,numVertices,varying);
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
 }
@@ -496,7 +491,6 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	const	int		numSavedVertices	=	numVertices;
 	const	float	*v0;
 	const	float	*v1;
-	float			*N;
 
 	intr	=	intrStart	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 
@@ -508,35 +502,50 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 		v1					=	v0 + vs;
 	}
 
-	N						=	varying[VARIABLE_NG] + start*3;
-
 	for (j=numVertices;j>0;j--) {
 		const	float	cv	=	*v++;
 
-		*intr++	=	*N++	=	v0[0]*(1-cv) + v1[0]*cv;
-		*intr++	=	*N++	=	v0[1]*(1-cv) + v1[1]*cv;
-		*intr++	=	*N++	=	v0[2]*(1-cv) + v1[2]*cv;
+		*intr++	=	v0[0]*(1-cv) + v1[0]*cv;
+		*intr++	=	v0[1]*(1-cv) + v1[1]*cv;
+		*intr++	=	v0[2]*(1-cv) + v1[2]*cv;
 
 		for (k=3;k<vertexSize;k++) {
 			*intr++			=	v0[k]*(1-cv) + v1[k]*cv;
 		}
 	}
 
-	if (up & (PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_N)) {
-		float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-		float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+	// Dispatch the variables
+	variables->dispatch(intrStart,0,numSavedVertices,varying);
 
-		for (j=numVertices;j>0;j--) {
-			*dPdv++	=	v1[0] - v0[0];
-			*dPdv++	=	v1[1] - v0[1];
-			*dPdv++	=	v1[2] - v0[2];
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-		}
+	// Compute the normal and derivatives
+	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;
+	float		*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+	float		*P		=	varying[VARIABLE_P] + start*3;
+	float		*N		=	varying[VARIABLE_NG] + start*3;
+	const float	*u		=	varying[VARIABLE_U] + start*3;
+	const float	*size;
+	int			sizeStep;
+
+	if (base->sizeVariable->entry == VARIABLE_WIDTH) {
+		size		=	varying[VARIABLE_WIDTH] + start;
+		sizeStep	=	1;
+	} else {
+		assert(base->sizeVariable->entry == VARIABLE_CONSTANTWIDTH);
+		size		=	varying[VARIABLE_CONSTANTWIDTH] + start;
+		sizeStep	=	0;
 	}
 
-	variables->dispatch(intrStart,0,numSavedVertices,varying);
+	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3,size+=sizeStep) {
+		vector	tmp;
+
+		subvv(dPdv,v1,v0);
+		crossvv(dPdu,dPdv,P);
+		crossvv(N,dPdu,dPdv);
+
+		normalizevf(dPdu);
+		mulvf(tmp,dPdu,(*u++ - 0.5f)*size[0]);
+		addvv(P,tmp);
+	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
 }

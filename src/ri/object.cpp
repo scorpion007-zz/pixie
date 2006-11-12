@@ -518,15 +518,15 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 							if (attributes->nSides == 1) {						\
 								if (dotvv(q,N) < 0) {							\
 									cRay->object	=	this;					\
-									cRay->u			=	(float) umin + (u + i)*urg / (float) udiv;	\
-									cRay->v			=	(float) vmin + (v + j)*vrg / (float) vdiv;	\
+									cRay->u			=	(float) umin + ((float) u + i)*urg / (float) udiv;	\
+									cRay->v			=	(float) vmin + ((float) v + j)*vrg / (float) vdiv;	\
 									cRay->t			=	(float) t;				\
 									movvv(cRay->N,N);							\
 								}												\
 							} else {											\
 								cRay->object	=	this;						\
-								cRay->u			=	(float) umin + (u + i)*urg / (float) udiv;		\
-								cRay->v			=	(float) vmin + (v + j)*vrg / (float) vdiv;		\
+								cRay->u			=	(float) umin + ((float) u + i)*urg / (float) udiv;		\
+								cRay->v			=	(float) vmin + ((float) v + j)*vrg / (float) vdiv;		\
 								cRay->t			=	(float) t;					\
 								movvv(cRay->N,N);								\
 							}													\
@@ -650,8 +650,72 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 }
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	estimateShadingRate
+// Description			:	Estimate the shading rate
+// Return Value			:
+// Comments				:	P must be in pixels
+// Date last edited		:	10/16/2001
+float				CSurface::estimateShadingRate(const float *P0,const float *P1) {
+	return attributes->shadingRate;
+}
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	estimateDicing
+// Description			:	Estimate the dicing size on the screen
+// Return Value			:
+// Comments				:	P must be in pixels
+// Date last edited		:	10/16/2001
+void				CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float motionFactor) {
+	float		uAvg,vAvg;	// The average edge length
+	float		uMin,vMin;	// The minimum edge length
+	float		uMax,vMax;	// The maximum edge length
+	int			numU,numV;
+	int			i,j;
+	const float	*cP,*nP,*tP;
+	float		l;
+	float		dx,dy;
 
+	uAvg	=	vAvg	=	0;
+	uMax	=	vMax	=	0;
+	uMin	=	vMin	=	C_INFINITY;
+	numU	=	numV	=	0;
+
+	// U stats
+	cP	=	P;
+	for (j=(vdiv+1);j>0;j--) {
+		for (i=udiv;i>0;i--,cP+=3) {
+			dx		=	cP[3 + COMP_X] - cP[COMP_X];
+			dy		=	cP[3 + COMP_Y] - cP[COMP_Y];
+			l		=	sqrtf(dx*dx + dy*dy);
+			uAvg	+=	l;	numU++;
+			if (l < uMin)	uMin	=	l;
+			if (l > uMax)	uMax	=	l;
+		}
+		cP	+=	3;
+	}
+
+	// V stats
+	cP	=	P;
+	for (i=(udiv+1);i>0;i--,cP+=3) {
+		nP	=	cP;
+		tP	=	nP	+	(udiv+1)*3;
+		for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+			dx		=	tP[COMP_X] - nP[COMP_X];
+			dy		=	tP[COMP_Y] - nP[COMP_Y];
+			l		=	sqrtf(dx*dx + dy*dy);
+			vAvg	+=	l;	numV++;
+			if (l < vMin)	vMin	=	l;
+			if (l > vMax)	vMax	=	l;
+		}
+	}
+
+	// Compute the new grid size
+	nudiv	=	(int) (uAvg*udiv / (attributes->shadingRate*numU));
+	nvdiv	=	(int) (vAvg*vdiv / (attributes->shadingRate*numV));
+}
 
 
 
