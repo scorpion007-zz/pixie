@@ -388,7 +388,7 @@ void			CDummyObject::intersect(CShadingContext *,CRay *) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
-	P	=	NULL;
+	tesselationCache	=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -399,7 +399,7 @@ CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::~CSurface() {
-	if (P != NULL)	delete P;
+	if (tesselationCache != NULL)	delete tesselationCache;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -425,11 +425,11 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 
 	// Do we have a grid ?
-	if (P == NULL) {
+	if (tesselationCache == NULL) {
 		osLock(CRenderer::tesselateMutex);
 
-		if (P == NULL) {
-			P	=	tesselate(context,0.01f);
+		if (tesselationCache == NULL) {
+			tesselationCache	=	tesselate(context,0.01f);
 		}
 
 		osUnlock(CRenderer::tesselateMutex);
@@ -438,11 +438,11 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 	// Intersect the ray
 	{
 		int			i,j;
-		const float	*cP		=	P->P;
+		const float	*cP		=	tesselationCache->P;
 		const float	*r		=	cRay->from;
 		const float	*q		=	cRay->dir;
-		const int	udiv	=	P->udiv;
-		const int	vdiv	=	P->udiv;
+		const int	udiv	=	tesselationCache->udiv;
+		const int	vdiv	=	tesselationCache->udiv;
 
 		for (j=0;j<vdiv;j++) {
 			for (i=0;i<udiv;i++,cP += 3) {
@@ -734,6 +734,10 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 
 			nvdiv	=	(int) floor(sqrtf(CRenderer::maxGridSize / aspect));
 			nudiv	=	(int) floor(nvdiv*aspect);
+			
+			// TODO: allow multiple shades in multiple patches, and reconstruct.
+			// TODO: begin-end time samples
+			break;
 		}
 
 		// Do another iteration
@@ -742,13 +746,13 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 	}
 
 	// At this point, I should have the tesselation. So create the grid and return it
-	CSurfaceTesselation	*P	=	new CSurfaceTesselation;
-	P->udiv				=	udiv;
-	P->vdiv				=	vdiv;
-	P->lastRefNumber	=	-1;
-	P->P				=	new float[(udiv+1)*(udiv+1)*3];
-	P->size				=	(udiv+1)*(udiv+1)*3*sizeof(float);
-	memcpy(P->P,varying[VARIABLE_P],(udiv+1)*(udiv+1)*3*sizeof(float));
+	CSurfaceTesselation	*newTesselationCache	=	new CSurfaceTesselation;
+	newTesselationCache->udiv					=	udiv;
+	newTesselationCache->vdiv					=	vdiv;
+	newTesselationCache->lastRefNumber			=	-1;
+	newTesselationCache->P						=	new float[(udiv+1)*(udiv+1)*3];
+	newTesselationCache->size					=	(udiv+1)*(udiv+1)*3*sizeof(float);
+	memcpy(newTesselationCache->P,varying[VARIABLE_P],(udiv+1)*(udiv+1)*3*sizeof(float));
 
-	return P;
+	return newTesselationCache;
 }

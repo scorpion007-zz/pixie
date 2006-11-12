@@ -143,7 +143,7 @@ protected:
 			CSurfaceTesselation		*tesselate(CShadingContext *context,float r);
 
 			// The grid if sampled for raytracing
-			CSurfaceTesselation		*P;
+			CSurfaceTesselation		*tesselationCache;
 };
 
 #endif
