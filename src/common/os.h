@@ -62,7 +62,7 @@ typedef void			*(*TFun)(void *);
 #include <signal.h>
 #include <errno.h>
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
 #include <semaphore.h>
 #endif
 

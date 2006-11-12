@@ -39,7 +39,7 @@
 #include <sys/timeb.h>
 
 // Needed for OSX 10.2.x fix
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
 #include <stdio.h>
 #endif
 
@@ -205,7 +205,7 @@ void	*osResolve(void *cModule,const char *name) {
 		result	=	dlsym((void *) cModule,name);
 		
 // OSX 10.2.x fix
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
 		if(result == NULL){
 			char new_name[strlen(name)+2];
 			sprintf(new_name,"_%s",name);
