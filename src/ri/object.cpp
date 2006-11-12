@@ -736,8 +736,8 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,in
 		uAvg	/=	(float) (vdiv+1);
 		vAvg	/=	(float) (udiv+1);
 
-		int	nudiv	=	(int) (uAvg / r);
-		int	nvdiv	=	(int) (vAvg / r);
+		int	nudiv	=	max((int) (uAvg / r),2);
+		int	nvdiv	=	max((int) (vAvg / r),2);
 
 		if ((nudiv == udiv) && (nvdiv == vdiv))	break;
 
