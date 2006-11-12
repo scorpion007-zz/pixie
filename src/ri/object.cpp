@@ -399,10 +399,10 @@ CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::~CSurface() {
-	CSurface::CSurfaceTesselation *cTesselation = tesselationCache;
-	while (cTesselation != NULL) {
-		cTesselation = tesselationCache;
-		delete tesselationCache;
+	while (tesselationCache != NULL) {
+		CSurface::CSurfaceTesselation *cTesselation = tesselationCache;
+		tesselationCache = tesselationCache->otherTesselations;
+		delete cTesselation;
 	}
 }
 
