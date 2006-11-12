@@ -61,6 +61,7 @@
 CObject::CObject(CAttributes *a,CXform *x) {
 	stats.numObjects++;
 
+	flags		=	0;
 	attributes	=	a;
 	xform		=	x;
 
@@ -343,6 +344,7 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Comments				:
 // Date last edited		:	10/16/2001
 CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
+	flags	|=	OBJECT_DUMMY;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -423,7 +425,7 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 		osLock(CRenderer::tesselateMutex);
 
 		if (P == NULL) {
-			P	=	tesselate(context);
+			P	=	tesselate(context,0.01f);
 		}
 
 		osUnlock(CRenderer::tesselateMutex);
@@ -642,23 +644,20 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-inline	float	checkAngle(const float *P,int step,int num) {
-	float	maxAngle	=	1;
+static	inline	float	measureLength(const float *P,int step,int num) {
+	float	length	=	0;
 
 	for (;num>0;num--) {
 		const float	*Pn		=	P + step;
-		const float	*Pnn	=	Pn + step;
-		vector	D1,D2;
+		vector		D;
 
-		subvv(D1,Pn,P);
-		subvv(D2,Pnn,Pn);
+		subvv(D,Pn,P);
+		length	+=	lengthv(D);
 
-		const float	a		=	dotvv(D1,D2) * isqrtf(dotvv(D1,D1) * (dotvv(D2,D2)));
-		maxAngle			=	min(maxAngle,a);
 		P					=	Pn;
 	}
 
-	return maxAngle;
+	return length;
 }
 
 
@@ -671,7 +670,8 @@ inline	float	checkAngle(const float *P,int step,int num) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context) {
+CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,float r) {
+
 	// Get some misc variables for fast access
 	float	**varying	=	context->currentShadingState->varying;
 
@@ -684,11 +684,11 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context) {
 		float	vstep		=	1.0f / (float) (vdiv);
 
 		// Compute the sample positions and corresponding normal vectors
-		float		*uv			=	varying[VARIABLE_U];
-		float		*vv			=	varying[VARIABLE_V];
-		float		*timev		=	varying[VARIABLE_TIME];
-		int			up,vp;
-		float		u,v;
+		float	*uv			=	varying[VARIABLE_U];
+		float	*vv			=	varying[VARIABLE_V];
+		float	*timev		=	varying[VARIABLE_TIME];
+		int		up,vp;
+		float	u,v;
 		for (vp=vdiv+1,v=0;vp>0;vp--,v+=vstep) {
 			for (up=udiv+1,u=0;up>0;up--,u+=ustep) {
 				*uv++		=	u;
@@ -699,30 +699,40 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context) {
 		context->displace(this,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 
 		// Evaluate the quality of this tesselation in u and v separately
-		float	minUangle	=	1;
-		float	minVangle	=	1;
 		int		i;
+		float	vMax	=	0;
+		float	vAvg	=	0;
 		for (i=0;i<=udiv;i++) {
-			minVangle		=	min(minVangle,	checkAngle(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv-1));
+			const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv-1));
+			vMax			=	max(vMax,l);
+			vAvg			+=	l;
 		}
 
+		float	uMax	=	0;
+		float	uAvg	=	0;
 		for (i=0;i<=vdiv;i++) {
-			minUangle		=	min(minUangle,	checkAngle(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv-1));
+			const float	l	=	measureLength(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv-1));
+			uMax			=	max(uMax,l);
+			uAvg			+=	l;
 		}
 
-		const float	threshold	=	cosf(radians(10));
-		int			nudiv,nvdiv;
+		uAvg	/=	(float) (vdiv+1);
+		vAvg	/=	(float) (udiv+1);
 
-		if (minUangle < threshold)	nudiv	=	udiv*2;
-		else						nudiv	=	udiv;
-
-		if (minVangle < threshold)	nvdiv	=	vdiv*2;
-		else						nvdiv	=	vdiv;
-
-		if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize)	break;
+		int	nudiv	=	(int) (uAvg / r);
+		int	nvdiv	=	(int) (vAvg / r);
 
 		if ((nudiv == udiv) && (nvdiv == vdiv))	break;
 
+		// Scale back if we exceeded the max shading size
+		if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize) {
+			float	aspect	=	uAvg / vAvg;
+
+			nvdiv	=	(int) floor(sqrtf(CRenderer::maxGridSize / aspect));
+			nudiv	=	(int) floor(nvdiv*aspect);
+		}
+
+		// Do another iteration
 		udiv	=	nudiv;
 		vdiv	=	nvdiv;
 	}
@@ -735,12 +745,6 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context) {
 	P->P				=	new float[(udiv+1)*(udiv+1)*3];
 	P->size				=	(udiv+1)*(udiv+1)*3*sizeof(float);
 	memcpy(P->P,varying[VARIABLE_P],(udiv+1)*(udiv+1)*3*sizeof(float));
-
-	CDebugView	d("C:\\temp\\o.dat",TRUE);
-	int	i;
-	for (i=0;i<(udiv+1)*(udiv+1);i++) {
-		d.point(P->P + i*3);
-	}
 
 	return P;
 }

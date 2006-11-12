@@ -360,8 +360,7 @@ void	CShadingContext::trace(CRay *ray) {
 		numObjects--;
 
 		// If this is a real object, intersect it with the ray
-		// (Dummy objects have -1 as the refCount)
-		if (object->refCount != -1)	{
+		if ((object->flags & OBJECT_DUMMY) == 0) {
 			object->intersect(this,ray);
 		}
 

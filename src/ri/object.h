@@ -47,6 +47,8 @@ class	CShadingContext;
 class	CVolume;
 class	CRendererContext;
 
+// Various object flags
+const unsigned int	OBJECT_DUMMY			=	1;	// Set if the object is a dummy object
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
@@ -78,11 +80,12 @@ public:
 			void			cluster(CShadingContext *);	// Take the children and create a bounding volume hierarchy
 			void			destroy();					// Delete the children/siblings
 
-	CAttributes				*attributes;			// Holds the object attributes
-	CXform					*xform;					// Holds the object xform to the object space
-	int						refCount;				// The reference counter
-	CObject					*children,*sibling;		// The hierarchy
-	vector					bmin,bmax;				// The bounding box
+	int						flags;						// Holds object flags
+	CAttributes				*attributes;				// Holds the object attributes
+	CXform					*xform;						// Holds the object xform to the object space
+	int						refCount;					// The reference counter
+	CObject					*children,*sibling;			// The hierarchy
+	vector					bmin,bmax;					// The bounding box
 protected:
 	void					makeBound(float *,float *) const;
 };
@@ -114,29 +117,30 @@ public:
 							~CSurface();
 
 							// CObject interface
-	virtual	void			intersect(CShadingContext *,CRay *);									// Intersect a ray with the surface
-	virtual	void			dice(CShadingContext *);												// Split or render this object
+	virtual	void			intersect(CShadingContext *,CRay *);				// Intersect a ray with the surface
+	virtual	void			dice(CShadingContext *);							// Split or render this object
 	
 							// CSurface interface
-	virtual	int				moving() const;															// TRUE if we're moving
-	virtual	void			sample(int,int,float **,unsigned int &) const;							// Sample the surface of the object
-	virtual	void			interpolate(int,float **)	const;										// Interpolate the variables
-	virtual	void			shade(CShadingContext *,int,CRay **);									// Shade the object
+	virtual	int				moving() const;										// TRUE if we're moving
+	virtual	void			sample(int,int,float **,unsigned int &) const;		// Sample the surface of the object
+	virtual	void			interpolate(int,float **)	const;					// Interpolate the variables
+	virtual	void			shade(CShadingContext *,int,CRay **);				// Shade the object
 
 protected:
 
 			class	CSurfaceTesselation {
 			public:
-					int					udiv,vdiv;
-					float				*P;
-					int					lastRefNumber;
-					int					size;
-					CSurfaceTesselation	*next,*prev;
+					int					udiv,vdiv;				// The grid size
+					float				*P;						// The P
+					int					lastRefNumber;			// Last time we accessed this grid
+					int					size;					// The size (in bytes) of the grid
+					float				r;						// The average size of the quads
+					CSurfaceTesselation	*next,*prev;			// To maintain the linked list
 
 			};
 
 			// Find the best tesselation for this object
-			CSurfaceTesselation		*tesselate(CShadingContext *context);
+			CSurfaceTesselation		*tesselate(CShadingContext *context,float r);
 
 			// The grid if sampled for raytracing
 			CSurfaceTesselation		*P;
