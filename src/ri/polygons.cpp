@@ -41,6 +41,7 @@
 #include "rendererContext.h"
 #include "common/polynomial.h"
 
+#if 0
 #if !defined(WIN32)
 #if defined(__GNUC__) && (__GNUC__ < 4)
 // Stupid gcc doesn't allow explicit constructor invocation
@@ -54,6 +55,7 @@ void	*operator new(size_t size,CPtriangle *buf) {
 void	*operator new(size_t size,CMovingTriangle *buf) {
 	return	buf;
 }
+#endif
 #endif
 #endif
 
@@ -641,8 +643,6 @@ CPolygonQuad::~CPolygonQuad() {
 	stats.numGprims--;
 	mesh->detach();
 }
-
-
 
 
 
@@ -1365,7 +1365,7 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/26/2004
-static	inline	int			orientationCheck(CTriVertex *loop,int cw) {
+static	inline	int			orientationCheck(CTriVertex *loop,int cw,CMeshData &data) {
 	CTriVertex	*minVertex;
 	CTriVertex	*cVertex,*pVertex,*nVertex;
 	int			reverse;
@@ -1395,7 +1395,7 @@ static	inline	int			orientationCheck(CTriVertex *loop,int cw) {
 
 	// Do we need to reverse the loop
 	if (reverse == TRUE) {
-		CTriVertex	**vertices	=	(CTriVertex **) alloca(numVertices*sizeof(CTriVertex *));
+		CTriVertex	**vertices	=	(CTriVertex **) ralloc(numVertices*sizeof(CTriVertex *),data.meshContext->threadMemory);
 		int			i;
 
 		vertices[0]	=	loop;
@@ -1513,9 +1513,9 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 	}
 
 	// Allocate the intial memory
-	xy			=	(float *)			alloca(numVertices*2*sizeof(float));
-	loops		=	(CTriVertex **)		alloca(nloops*sizeof(CTriVertex *));
-	vertices	=	(CTriVertex *)		alloca(numVertices*sizeof(CTriVertex));
+	xy			=	(float *)			ralloc(numVertices*2*sizeof(float),data.meshContext->threadMemory);
+	loops		=	(CTriVertex **)		ralloc(nloops*sizeof(CTriVertex *),data.meshContext->threadMemory);
+	vertices	=	(CTriVertex *)		ralloc(numVertices*sizeof(CTriVertex),data.meshContext->threadMemory);
 
 	// Collect the vertex data
 	for (i=0;i<numVertices;i++) {
@@ -1542,9 +1542,9 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 	
 
 	// Correct the orientation
-	reverse	=	orientationCheck(loops[0],TRUE);
+	reverse	=	orientationCheck(loops[0],TRUE,data);
 	for (i=1;i<nloops;i++) {
-		orientationCheck(loops[i],FALSE);
+		orientationCheck(loops[i],FALSE,data);
 	}
 
 #ifndef OLDSTYLE
@@ -1615,7 +1615,7 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 
 					if (k) {
 						// Connect these two vertices
-						CTriVertex	*snVertex	=	(CTriVertex *) alloca(2*sizeof(CTriVertex));
+						CTriVertex	*snVertex	=	(CTriVertex *) ralloc(2*sizeof(CTriVertex),data.meshContext->threadMemory);
 						CTriVertex	*dnVertex	=	snVertex+1;
 
 						snVertex->xy			=	sVertex->xy;
@@ -1800,7 +1800,10 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	data.meshUniformNumber		=	0;
 	data.meshFacevaryingNumber	=	0;
 	data.mesh					=	this;
+	data.meshContext			=	context;
 
+	memBegin(context->threadMemory);
+	
 	// Triangulate the individual polygons
 	for (cnholes=nholes,cvertices=vertices,cnvertices=nvertices,i=0;i<npoly;i++) {
 		// Triangulate the current polygon
@@ -1813,6 +1816,8 @@ void				CPolygonMesh::create(CShadingContext *context) {
 		cnvertices	+=	cnholes[0];
 		cnholes++;
 	}
+	
+	memEnd(context->threadMemory);
 
 	children					=	data.meshChildren;
 
