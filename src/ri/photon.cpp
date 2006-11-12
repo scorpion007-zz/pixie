@@ -38,9 +38,10 @@
 #include "stats.h"
 #include "error.h"
 #include "renderer.h"
+#include "defaults.h"
 
 
-static vector spectrumSpline[] = {		{ 0, 0, 0},
+static vector spectrumSpline[] = {			{ 0, 0, 0},
 											{ 0, 0, 0},
 											{ 1, 0, 0},
 											{ 1, 0.72f, 0},
@@ -108,19 +109,6 @@ CPhotonHider::~CPhotonHider() {
 void		CPhotonHider::renderingLoop(){  
 	CRenderer::CJob	job;
 
-	memBegin(threadMemory);
-
-	const int		numLights			=	CRenderer::allLights->numItems;
-	CShaderInstance	**lights			=	CRenderer::allLights->array;
-	int				i,j;
-	vector			tmp;
-
-	// Compute the world bounding sphere
-	addvv(worldCenter,CRenderer::worldBmin,CRenderer::worldBmax);
-	mulvf(worldCenter,1 / (float) 2);
-	subvv(tmp,CRenderer::worldBmax,worldCenter);
-	worldRadius	=	lengthv(tmp);
-
 	// This is da loop
 	while(TRUE) {
 
@@ -131,18 +119,22 @@ void		CPhotonHider::renderingLoop(){
 			break;
 		} else if (job.type == CRenderer::CJob::PHOTON_BUNDLE) {
 
+			// Compute the world bounding sphere
+			vector			tmp;
+			addvv(worldCenter,CRenderer::worldBmin,CRenderer::worldBmax);
+			mulvf(worldCenter,1 / (float) 2);
+			subvv(tmp,CRenderer::worldBmax,worldCenter);
+			worldRadius	=	lengthv(tmp);
+
 			// The actual photon tracing stage
-			stage						=	PHOTON_TRACE;
+			const int		numLights	=	CRenderer::allLights->numItems;
+			CShaderInstance	**lights	=	CRenderer::allLights->array;
+			int				i,j;
 			for (i=0;i<numLights;i++) {
-				CShaderInstance	*cLight						=	lights[i];
-				CShadedLight	**lights					=	&currentShadingState->lights;
-				CShadedLight	**alights					=	&currentShadingState->alights;
-				CShadedLight	**currentLight				=	&currentShadingState->currentLight;
-				CShadedLight	**freeLights				=	&currentShadingState->freeLights;
-				int				*tags						=	currentShadingState->tags;
+				CShaderInstance	*cLight		=	lights[i];
+				CShadedLight	**alights	=	&currentShadingState->alights;
 				int				emit;
 				float			*Clsave;
-				T64				shaderVarCheckpoint[3];
 
 				// Figure out how much we want to emit
 				emit										=	job.numPhotons;
@@ -164,39 +156,39 @@ void		CPhotonHider::renderingLoop(){
 						currentShadingState->lightCategory		=	0;
 						
 						// Ensure there's space for the ambient lights
-						
+						memBegin(threadMemory);
 						*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight),threadMemory);
-						(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight),threadMemory);
+						(*alights)->savedState		=		(float**)		ralloc(2*sizeof(float *),threadMemory);
 						(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices,threadMemory);
 						(*alights)->savedState[0]	=		NULL;			/* ambient lights do not use tags or save L */
 						(*alights)->lightTags		=		NULL;
 						(*alights)->instance		=		NULL;
 						(*alights)->next			=		NULL;
 						
-						// Reset the state
-						
-						*lights						=	NULL;			// Lights			:	Cool
-						*currentLight				=	NULL;			// Light iterator	:	Cool
-						*freeLights					=	NULL;			// Free light lits	:	Cool
+						// Reset the state	
+						currentShadingState->lights			=	NULL;			// Lights			:	Cool
+						currentShadingState->currentLight	=	NULL;			// Light iterator	:	Cool
+						currentShadingState->freeLights		=	NULL;			// Free light list	:	Cool
 						
 						Clsave						= (*alights)->savedState[1];
 						
+						int *tags					=	currentShadingState->tags;
 						for (j=0;j<numVertices;j++) {
 							initv(Clsave,0,0,0);						// Ambient lights	:	Cool
 							tags[j]		=	0;							// Exec tags		:	Cool
-							Clsave	+=	3;
+							Clsave		+=	3;
 						}
+						
+						// Prepare the lightsource parameters
+						currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(threadMemory,currentShadingState->varying,numVertices);
 
 						// Execute the light source shader
-						memBegin(threadMemory);
-						memSave(shaderVarCheckpoint,shaderStateMemory);
-						
-						currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(shaderStateMemory,currentShadingState->varying,numVertices);
 						cLight->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);
 
-						memRestore(shaderVarCheckpoint,shaderStateMemory);
+						// Restore the thread memory
 						memEnd(threadMemory);
 
+						// We emitted this many photons
 						emit									-=	numVertices;
 					}
 				}
@@ -205,8 +197,6 @@ void		CPhotonHider::renderingLoop(){
 			error(CODE_BUG,"Unexpected job type in photon hider.\n");
 		}
 	}
-
-	memEnd(threadMemory);
 }
 
 
@@ -265,85 +255,70 @@ void		CPhotonHider::solarBegin(const float *L,const float *theta) {
 // Comments				:
 // Date last edited		:	3/7/2003
 void		CPhotonHider::solarEnd() {
-	int			numVertices	=	currentShadingState->numVertices;
-	float		**varying	=	currentShadingState->varying;
+	int		numVertices	=	currentShadingState->numVertices;
+	float	**varying	=	currentShadingState->varying;
 
-	if (stage == PHOTON_ESTIMATE) {
-		// Estimation
-		const float	*Cl			=	varying[VARIABLE_CL];
+	// Photon casting
+	float	*Ps	=	varying[VARIABLE_PS];
+	float	*L	=	varying[VARIABLE_L];
+	float	*Cl	=	varying[VARIABLE_CL];
+	int		i;
 
-		// Solar lights are easy, just do the averaging
-		for (;numVertices>0;numVertices--,Cl+=3) {
-			const float power	=	(Cl[0] + Cl[1] + Cl[2]) / (float) 3;
+	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
+		vector		T;
+		vector		Ce,Cc;
+		float*		ubasis			=	(float*) RiBSplineBasis;
+		const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
+		const int	step			=	1;
+		const int	n				=	(numPoints-4)/step+1;
+		
+		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {	
+			
+			float		wavelen			=	urand();
+			int			piece			=	(int) floor(wavelen * n);
+			int			pieceid			=	piece*step;
+			float		u				=	wavelen*n - piece;
+			
+			float		tmp[4];
+			float		ub[4];
+			
+			ub[3] = 1;
+			ub[2] =	u;
+			ub[1] =	u*u;
+			ub[0] =	u*ub[2];
+			
+			tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];
+			tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];
+			tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];
+			tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];
+			
+			Ce[0]		=	tmp[0]*spectrumSpline[pieceid+0][0] +
+							tmp[1]*spectrumSpline[pieceid+1][0] +
+							tmp[2]*spectrumSpline[pieceid+2][0] +
+							tmp[3]*spectrumSpline[pieceid+3][0];
+			Ce[1]		=	tmp[0]*spectrumSpline[pieceid+0][1] +
+							tmp[1]*spectrumSpline[pieceid+1][1] +
+							tmp[2]*spectrumSpline[pieceid+2][1] +
+							tmp[3]*spectrumSpline[pieceid+3][1];
+			Ce[2]		=	tmp[0]*spectrumSpline[pieceid+0][2] +
+							tmp[1]*spectrumSpline[pieceid+1][2] +
+							tmp[2]*spectrumSpline[pieceid+2][2] +
+							tmp[3]*spectrumSpline[pieceid+3][2];
+			mulvv(Cc,Cl,Ce);
 
-			minPower	=	min(minPower,power);
-			maxPower	=	max(maxPower,power);
-			avgPower	+=	power;
-			numPower++;
+			mulvf(T,L,worldRadius);
+			subvv(Ps,T);
+			mulvf(Cc,powerScale*photonPower);
+			tracePhoton(Ps,L,Cc,wavelen,0,0);
 		}
 	} else {
-		// Photon casting
-		float	*Ps	=	varying[VARIABLE_PS];
-		float	*L	=	varying[VARIABLE_L];
-		float	*Cl	=	varying[VARIABLE_CL];
-		int		i;
+		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
+			vector	T;
 
-		if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
-			vector		T;
-			vector		Ce,Cc;
-			float*		ubasis			=	(float*) RiBSplineBasis;
-			const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
-			const int	step			=	1;
-			const int	n				=	(numPoints-4)/step+1;
-			
-			for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {	
-				
-				float		wavelen			=	urand();
-				int			piece			=	(int) floor(wavelen * n);
-				int			pieceid			=	piece*step;
-				float		u				=	wavelen*n - piece;
-				
-				float		tmp[4];
-				float		ub[4];
-				
-				ub[3] = 1;
-				ub[2] =	u;
-				ub[1] =	u*u;
-				ub[0] =	u*ub[2];
-				
-				tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];
-				tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];
-				tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];
-				tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];
-				
-				Ce[0]		=	tmp[0]*spectrumSpline[pieceid+0][0] +
-								tmp[1]*spectrumSpline[pieceid+1][0] +
-								tmp[2]*spectrumSpline[pieceid+2][0] +
-								tmp[3]*spectrumSpline[pieceid+3][0];
-				Ce[1]		=	tmp[0]*spectrumSpline[pieceid+0][1] +
-								tmp[1]*spectrumSpline[pieceid+1][1] +
-								tmp[2]*spectrumSpline[pieceid+2][1] +
-								tmp[3]*spectrumSpline[pieceid+3][1];
-				Ce[2]		=	tmp[0]*spectrumSpline[pieceid+0][2] +
-								tmp[1]*spectrumSpline[pieceid+1][2] +
-								tmp[2]*spectrumSpline[pieceid+2][2] +
-								tmp[3]*spectrumSpline[pieceid+3][2];
-				mulvv(Cc,Cl,Ce);
-	
-				mulvf(T,L,worldRadius);
-				subvv(Ps,T);
-				mulvf(Cc,powerScale*photonPower);
-				tracePhoton(Ps,L,Cc,wavelen);
-			}
-		} else {
-			for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
-				vector	T;
-	
-				mulvf(T,L,worldRadius);
-				subvv(Ps,T);
-				mulvf(Cl,powerScale*photonPower);
-				tracePhoton(Ps,L,Cl,0.5);
-			}
+			mulvf(T,L,worldRadius);
+			subvv(Ps,T);
+			mulvf(Cl,powerScale*photonPower);
+			tracePhoton(Ps,L,Cl,0.5,0,0);
 		}
 	}
 }
@@ -386,18 +361,17 @@ void		CPhotonHider::illuminateBegin(const float *P,const float *N,const float *t
 
 		assert(N != NULL);
 
-		if (theta == NULL) {
-			// FIXME: Don't know how to handle this
-		} else {
+		// Save the tangent of the angle for the ray differential
+		varying[VARIABLE_PW][0]			=	tanf(theta[0]);
 
-			for (;numVertices>0;numVertices--,shaderPs+=3,shaderL+=3) {
-				// Sample a direction in the unit sphere
-				sampleHemisphere(shaderL,N,theta[0],gen4);
+		for (;numVertices>0;numVertices--,shaderPs+=3,shaderL+=3) {
 
-				// Compute the point being shaded	
-				normalizev(shaderL);
-				addvv(shaderPs,P,shaderL);
-			}
+			// Sample a direction in the unit sphere
+			sampleHemisphere(shaderL,N,theta[0],gen4);
+
+			// Compute the point being shaded	
+			normalizev(shaderL);
+			addvv(shaderPs,P,shaderL);
 		}
 	}
 }
@@ -413,92 +387,63 @@ void		CPhotonHider::illuminateBegin(const float *P,const float *N,const float *t
 void		CPhotonHider::illuminateEnd() {
 	int			numVertices	=	currentShadingState->numVertices;
 	float		**varying	=	currentShadingState->varying;
+	float		*Ps	=	varying[VARIABLE_PS];
+	float		*L	=	varying[VARIABLE_L];
+	float		*Cl	=	varying[VARIABLE_CL];
+	int			i;
+	const float	da	=	varying[VARIABLE_PW][0];
 
-	if (stage == PHOTON_ESTIMATE) {
-		// Estimation
-		const float	*Cl			=	varying[VARIABLE_CL];
-		const float	*Ps			=	varying[VARIABLE_PS];
-		const float	*L			=	varying[VARIABLE_L];
-		CRay		ray;
-
-		for (;numVertices>0;numVertices--,Cl+=3,L+=3,Ps+=3) {
-			movvv(ray.dir,L);
-			subvv(ray.from,Ps,L);
-
-			ray.flags				=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-			ray.tmin				=	bias;
-			ray.t					=	C_INFINITY;
-			ray.time				=	0;
-
-			trace(&ray);
-
-			if (ray.object != NULL) {
-				const float power = (Cl[0] + Cl[1] + Cl[2]) / (3*ray.t*ray.t);
-
-				minPower	=	min(minPower,power);
-				maxPower	=	max(maxPower,power);
-				avgPower	+=	power;
-				numPower++;
-			}
+	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
+		vector		Ce,Cc;
+		float*		ubasis			=	(float*) RiBSplineBasis;
+		const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
+		const int	step			=	1;
+		const int	n				=	(numPoints-4)/step+1;
+		
+		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {				
+			float		wavelen			=	urand();
+			int			piece			=	(int) floor(wavelen * n);
+			int			pieceid			=	piece*step;
+			float		u				=	wavelen*n - piece;
+			
+			float		tmp[4];
+			float		ub[4];
+			
+			ub[3] = 1;
+			ub[2] =	u;
+			ub[1] =	u*u;
+			ub[0] =	u*ub[2];
+			
+			tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];
+			tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];
+			tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];
+			tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];
+			
+			Ce[0]		=	tmp[0]*spectrumSpline[pieceid+0][0] +
+							tmp[1]*spectrumSpline[pieceid+1][0] +
+							tmp[2]*spectrumSpline[pieceid+2][0] +
+							tmp[3]*spectrumSpline[pieceid+3][0];
+			Ce[1]		=	tmp[0]*spectrumSpline[pieceid+0][1] +
+							tmp[1]*spectrumSpline[pieceid+1][1] +
+							tmp[2]*spectrumSpline[pieceid+2][1] +
+							tmp[3]*spectrumSpline[pieceid+3][1];
+			Ce[2]		=	tmp[0]*spectrumSpline[pieceid+0][2] +
+							tmp[1]*spectrumSpline[pieceid+1][2] +
+							tmp[2]*spectrumSpline[pieceid+2][2] +
+							tmp[3]*spectrumSpline[pieceid+3][2];
+			mulvv(Cc,Cl,Ce);
+			
+			subvv(Ps,L);
+			mulvf(Cc,powerScale*photonPower);
+			tracePhoton(Ps,L,Cc,wavelen,da,0);
 		}
 	} else {
-		float	*Ps	=	varying[VARIABLE_PS];
-		float	*L	=	varying[VARIABLE_L];
-		float	*Cl	=	varying[VARIABLE_CL];
-		int		i;
-
-		if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
-			vector		Ce,Cc;
-			float*		ubasis			=	(float*) RiBSplineBasis;
-			const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
-			const int	step			=	1;
-			const int	n				=	(numPoints-4)/step+1;
-			
-			for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {				
-				float		wavelen			=	urand();
-				int			piece			=	(int) floor(wavelen * n);
-				int			pieceid			=	piece*step;
-				float		u				=	wavelen*n - piece;
-				
-				float		tmp[4];
-				float		ub[4];
-				
-				ub[3] = 1;
-				ub[2] =	u;
-				ub[1] =	u*u;
-				ub[0] =	u*ub[2];
-				
-				tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];
-				tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];
-				tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];
-				tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];
-				
-				Ce[0]		=	tmp[0]*spectrumSpline[pieceid+0][0] +
-								tmp[1]*spectrumSpline[pieceid+1][0] +
-								tmp[2]*spectrumSpline[pieceid+2][0] +
-								tmp[3]*spectrumSpline[pieceid+3][0];
-				Ce[1]		=	tmp[0]*spectrumSpline[pieceid+0][1] +
-								tmp[1]*spectrumSpline[pieceid+1][1] +
-								tmp[2]*spectrumSpline[pieceid+2][1] +
-								tmp[3]*spectrumSpline[pieceid+3][1];
-				Ce[2]		=	tmp[0]*spectrumSpline[pieceid+0][2] +
-								tmp[1]*spectrumSpline[pieceid+1][2] +
-								tmp[2]*spectrumSpline[pieceid+2][2] +
-								tmp[3]*spectrumSpline[pieceid+3][2];
-				mulvv(Cc,Cl,Ce);
-				
-				subvv(Ps,L);
-				mulvf(Cc,powerScale*photonPower);
-				tracePhoton(Ps,L,Cc,wavelen);
-			}
-		} else {
-			for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
-				subvv(Ps,L);
-				mulvf(Cl,powerScale*photonPower);
-				tracePhoton(Ps,L,Cl,0.5);
-			}
-
+		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
+			subvv(Ps,L);
+			mulvf(Cl,powerScale*photonPower);
+			tracePhoton(Ps,L,Cl,0.5,da,0);
 		}
+
 	}
 }
 
@@ -510,7 +455,7 @@ void		CPhotonHider::illuminateEnd() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/11/2003
-void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
+void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength,float da,float db) {
 	CRay				ray;
 	vector				Cl,Pl,Nl;
 	CAttributes			*attributes;
@@ -522,11 +467,8 @@ void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
 	// The L must be unit vector
 	assert((dotvv(L,L) - 1)*(dotvv(L,L) - 1) < 0.00001);
 
-	//if (dotvv(C,C) < EPSILON)	return;
-
 	movvv(ray.from,P);
 	movvv(ray.dir,L);
-
 	movvv(Cl,C);
 
 	// The maximum number of diffuse and specular bounces
@@ -536,6 +478,8 @@ void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
 
 	// The intersection bias
 	ray.tmin				=	bias;
+	ray.da					=	min(da,DEFAULT_RAY_DA);
+	ray.db					=	max(db,DEFAULT_RAY_DB);
 
 processBounce:;
 
@@ -614,12 +558,17 @@ processBounce:;
 				// Process the current hit
 				movvv(ray.from,Pl);
 				ray.tmin				=	attributes->shadowBias;
+				ray.da					=	DEFAULT_RAY_DA;
+				ray.db					=	DEFAULT_RAY_DB;
 				lastBounceSpecular		=	FALSE;
+
+				// We just hit a diffuse surface, so set the ray differential to something big
 
 				goto processBounce;
 			}
 
 			break;
+
 		case SM_TRANSLUCENT:
 			//HACKBEGIN
 			//
@@ -815,9 +764,11 @@ processBounce:;
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 
+				// No change in the ray differentials
 				goto processBounce;
 			}
 			break;
+
 		case SM_GLASS:
 			{
 				float	eta;
@@ -857,9 +808,13 @@ processBounce:;
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 
+				// No change in the ray differential
+
 				goto processBounce;
 			}
 			break;
+
+
 		case SM_WATER:
 			{
 				float	eta;
@@ -902,6 +857,8 @@ processBounce:;
 				goto processBounce;
 			}
 			break;
+
+
 		case SM_DIELECTRIC:
 			{
 				float	eta;
@@ -947,6 +904,7 @@ processBounce:;
 				ray.tmin				=	attributes->shadowBias;
 				lastBounceSpecular		=	TRUE;
 
+				// No change in the ray differential
 				goto processBounce;
 			}
 			break;
@@ -960,6 +918,8 @@ processBounce:;
 				Cl[0]	*=	(1-attributes->surfaceOpacity[0]);
 				Cl[1]	*=	(1-attributes->surfaceOpacity[1]);
 				Cl[2]	*=	(1-attributes->surfaceOpacity[2]);
+
+				// No change in the ray differential
 			}
 			break;
 		}

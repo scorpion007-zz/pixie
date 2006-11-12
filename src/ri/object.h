@@ -124,7 +124,22 @@ public:
 	virtual	void			shade(CShadingContext *,int,CRay **);									// Shade the object
 
 protected:
-			float			*P;		// The grid if sampled
+
+			class	CSurfaceTesselation {
+			public:
+					int					udiv,vdiv;
+					float				*P;
+					int					lastRefNumber;
+					int					size;
+					CSurfaceTesselation	*next,*prev;
+
+			};
+
+			// Find the best tesselation for this object
+			CSurfaceTesselation		*tesselate(CShadingContext *context);
+
+			// The grid if sampled for raytracing
+			CSurfaceTesselation		*P;
 };
 
 #endif

@@ -912,25 +912,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	displace
-// Description			:	Sample/Shade bunch of points
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/30/2002
-//
-//
-//
-//	Preconditions:
-//	!!!	->	u,v,time,I		fields of varying must be set
-void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int dim,unsigned int usedParameters) {
-
-	// Shade the surface
-	shade(object,uVertices,vVertices,dim,usedParameters,TRUE);
-}
-
-
 
 
 

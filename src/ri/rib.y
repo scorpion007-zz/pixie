@@ -2717,9 +2717,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		TRibFile			*savedRibStack					=	ribStack;
 		const char			*savedRibFile					=	ribFile;
 		FILE				*savedRibIn						=	ribin;
-
 		
-
 		// Init the environment
 		if (fileName[0] == '-') {
 			// Read from stdin
@@ -2774,6 +2772,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 			ribStack		=	NULL;	// prevent falling out of current ReadArchive
 		}
 		
+		ribFile				=	fileName;
 		ribLineno			=	1;
 
 		ribparse();

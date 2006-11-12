@@ -44,11 +44,6 @@
 // Comments				:
 // Date last edited		:	3/8/2003
 class	CPhotonHider : public CShadingContext {
-	typedef enum {
-		PHOTON_ESTIMATE,		// Estimate the energy per unit area
-		PHOTON_TRACE			// Create/trace photons from the light source
-	} EPhotonStage;
-
 public:
 									CPhotonHider(int thread,CAttributes *);
 			virtual					~CPhotonHider();
@@ -72,14 +67,13 @@ protected:
 			void					illuminateBegin(const float *,const float *,const float *);
 			void					illuminateEnd();
 private:
-			void					tracePhoton(float *,float *,float *,float);
-
-			EPhotonStage			stage;					// The current stage
+			void					tracePhoton(float *,float *,float *,float,float,float);
+	
 			float					bias;					// The initial intersection bias
 
 			float					powerScale;				// The scaling factor for individual photon powers
 			float					minPower;				// The variables to find the range of the illumination
-			float					maxPower;				//     for the current light
+			float					maxPower;				// for the current light
 			float					avgPower;
 			float					numPower;
 

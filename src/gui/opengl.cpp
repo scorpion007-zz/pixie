@@ -38,6 +38,7 @@
 #endif
 
 #include "common/global.h"
+#include "common/os.h"
 #include "opengl.h"
 #include "interface.h"
 
@@ -79,6 +80,22 @@ void		pglTriangles(int n,const float *P,const float *C) {
 	glDisableClientState(GL_COLOR_ARRAY);
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	pglLines
+// Description			:	Draw triangles with OpenGL
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/21/2006
+void		pglLines(int n,const float *P,const float *C) {
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(3,GL_FLOAT,0,P);
+	glColorPointer(3,GL_FLOAT,0,C);
+	glDrawArrays(GL_LINES,0,n);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -132,3 +149,75 @@ void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *
 }
 
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	pglFile
+// Description			:	Read the primitives from a file
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	9/21/2006
+void		pglFile(const char *fileName) {
+	FILE	*file	=	fopen(fileName,"rb");
+	vector	bmin,bmax;
+
+	fread(bmin,3,sizeof(float),file);
+	fread(bmax,3,sizeof(float),file);
+
+	int	lastType	=	-1;
+
+	while(!feof(file)) {
+		int		i;
+		vector	P1,P2,P3;
+
+		fread(&i,1,sizeof(int),file);
+		switch(i) {
+			case 0:
+
+				if (lastType != i) {
+					if (lastType != -1) glEnd();
+					lastType	=	i;
+					glBegin(GL_POINTS);
+				}
+
+				// Point
+				fread(P1,3,sizeof(float),file);
+				glVertex3fv(P1);
+				break;
+			case 1:
+
+				if (lastType != i) {
+					if (lastType != -1) glEnd();
+					lastType	=	i;
+					glBegin(GL_LINES);
+				}
+
+				// Line
+				fread(P1,3,sizeof(float),file);
+				fread(P2,3,sizeof(float),file);
+				glVertex3fv(P1);
+				glVertex3fv(P2);
+				break;
+			case 2:
+
+				if (lastType != i) {
+					if (lastType != -1) glEnd();
+					lastType	=	i;
+					glBegin(GL_TRIANGLES);
+				}
+
+				// Triangle
+				fread(P1,3,sizeof(float),file);
+				fread(P2,3,sizeof(float),file);
+				fread(P3,3,sizeof(float),file);
+				glVertex3fv(P1);
+				glVertex3fv(P2);
+				glVertex3fv(P3);
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (lastType != -1) glEnd();
+
+	fclose(file);
+}

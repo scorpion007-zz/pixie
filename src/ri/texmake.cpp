@@ -35,6 +35,7 @@
 #include "error.h"
 #include "renderer.h"
 #include "tiff.h"
+#include "defaults.h"
 
 #include <stddef.h>		// ensure we have NULL defined before libtiff
 #include <tiffio.h>
@@ -45,7 +46,6 @@ const char	*TIFF_CYLINDER_ENVIRONMENT		=	"Pixie Environment (cylinder)";
 const char	*TIFF_CUBIC_ENVIRONMENT			=	"Pixie Environment (cubic)";
 const char	*TIFF_SPHERICAL_ENVIRONMENT		=	"Pixie Environment (spherical)";
 const char	*TIFF_SHADOW					=	"Pixie shadow";
-const int	defaultTileSize					=	32;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -480,7 +480,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	defaultTileSize;
+			int				tileSize		=	DEFAULT_TILE_SIZE;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -543,7 +543,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	defaultTileSize;
+			int				tileSize		=	DEFAULT_TILE_SIZE;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -632,7 +632,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 			int				numSamples;
 			int				bitspersample;
 			int				i;
-			int				tileSize		=	defaultTileSize;
+			int				tileSize		=	DEFAULT_TILE_SIZE;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -706,7 +706,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	defaultTileSize;
+			int				tileSize		=	DEFAULT_TILE_SIZE;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
@@ -764,7 +764,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			int				numSamples;
 			int				bitspersample;
 			int				width,height;
-			int				tileSize		=	defaultTileSize;
+			int				tileSize		=	DEFAULT_TILE_SIZE;
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;

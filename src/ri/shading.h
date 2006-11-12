@@ -209,27 +209,30 @@ public:
 		virtual	void			drawRibbon(CSurface *,int,float,float)					=	0;
 		virtual	void			drawPoints(CSurface *,int)								=	0;
 
-		// Some shading functions
-		CShadingState			*currentShadingState;									// The current shading state
+		// The current shading state
+		CShadingState			*currentShadingState;
 
-		void					shade(CSurface *,int,int,int,unsigned int,int displaceOnly=FALSE);	// Shade points on a surface
-		void					displace(CSurface *,int,int,int,unsigned int);			// Sample points on a surface
+		// Shade points on a surface
+		void					shade(CSurface *,int,int,int,unsigned int,int displaceOnly=FALSE);
+		inline	void			displace(CSurface *surface,int u,int v,int n,unsigned int up)	{	shade(surface,u,v,n,up,TRUE);	}
 
+		// Raytracing functions
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
 		void					traceEx(CRayBundle *);									// Trace and maybe shade a bundle of rays. This version increments the shading depth
 		void					trace(CRay *);											// Trace a ray (no shading)
 		void					traceAny(CRay *);										// Trace any ray (no shading)
 
-								// Variable management functions
+		// Shading state management functions
 		void					updateState();											// Add a variable into the shading state
-
 		CShadingState			*newState();											// Allocate a new shading state
 		void					freeState(CShadingState *);								// Destroy a shading state
 		void					deleteState(CShadingState *);							// Delete a shading state
 	
-		CMemPage				*threadMemory;											// Memory from which we allocate the temp thread stuff
+		// Memory from which we allocate the temp thread stuff
+		CMemPage				*threadMemory;
 
-		int						currentXBucket,currentYBucket;							// The current bucket we're processing in this thread
+		// The current bucket we're processing in this thread
+		int						currentXBucket,currentYBucket;
 
 		// Thread safe random number generator for integers
 		inline	unsigned long	irand() {
@@ -267,6 +270,7 @@ public:
 								}
 
 protected:
+		// Hiders can hook into the following functions
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }

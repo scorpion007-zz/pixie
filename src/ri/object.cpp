@@ -417,47 +417,13 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 	}
 
 
-	const int	udiv	=	4;
-	const int	vdiv	=	4;
 
 	// Do we have a grid ?
 	if (P == NULL) {
 		osLock(CRenderer::tesselateMutex);
 
 		if (P == NULL) {
-			const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
-			const float			ustep		=	1 / (float) udiv;
-			const float			vstep		=	1 / (float) vdiv;
-			float				**varying	=	context->currentShadingState->varying;
-			float				*u;
-			float				*v;
-			float				*time;
-			float				cu,cv;
-			int					i,j;
-
-			assert(numVertices <= (int) CRenderer::maxGridSize);
-
-			// Shade the points in the patch
-			u			=	varying[VARIABLE_U];
-			v			=	varying[VARIABLE_V];
-			time		=	varying[VARIABLE_TIME];
-
-			// Shade the minimum grid
-			for (j=vdiv,cv=0;j>=0;j--,cv+=vstep) {
-				for (i=udiv,cu=0;i>=0;i--,cu+=ustep) {
-					*u++		=	cu;
-					*v++		=	cv;
-					*time++		=	0;
-				}
-			}
-
-			// Displace the sucker
-			context->displace(this,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
-
-			// Allocate the memory
-			float	*cP						=	new float[numVertices*3];
-			memcpy(cP,varying[VARIABLE_P],numVertices*3*sizeof(float));
-			P								=	cP;
+			P	=	tesselate(context);
 		}
 
 		osUnlock(CRenderer::tesselateMutex);
@@ -466,9 +432,11 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 	// Intersect the ray
 	{
 		int			i,j;
-		const float	*cP	=	P;
-		const float	*r	=	cRay->from;
-		const float	*q	=	cRay->dir;
+		const float	*cP		=	P->P;
+		const float	*r		=	cRay->from;
+		const float	*q		=	cRay->dir;
+		const int	udiv	=	P->udiv;
+		const int	vdiv	=	P->udiv;
 
 		for (j=0;j<vdiv;j++) {
 			for (i=0;i<udiv;i++,cP += 3) {
@@ -666,3 +634,113 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 
 
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	checkAngle
+// Description			:	This function takes P and returns the cosine of the minimum angle deviation
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+inline	float	checkAngle(const float *P,int step,int num) {
+	float	maxAngle	=	1;
+
+	for (;num>0;num--) {
+		const float	*Pn		=	P + step;
+		const float	*Pnn	=	Pn + step;
+		vector	D1,D2;
+
+		subvv(D1,Pn,P);
+		subvv(D2,Pnn,Pn);
+
+		const float	a		=	dotvv(D1,D2) * isqrtf(dotvv(D1,D1) * (dotvv(D2,D2)));
+		maxAngle			=	min(maxAngle,a);
+		P					=	Pn;
+	}
+
+	return maxAngle;
+}
+
+
+#include "debug.h"
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	tesselate
+// Description			:	Find the best tesselation for this object
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context) {
+	// Get some misc variables for fast access
+	float	**varying	=	context->currentShadingState->varying;
+
+	// Start with a 3x3 sampling grid
+	int		udiv		=	2;
+	int		vdiv		=	2;
+	while(TRUE) {
+		// Sample points on the patch
+		float	ustep		=	1.0f / (float) (udiv);
+		float	vstep		=	1.0f / (float) (vdiv);
+
+		// Compute the sample positions and corresponding normal vectors
+		float		*uv			=	varying[VARIABLE_U];
+		float		*vv			=	varying[VARIABLE_V];
+		float		*timev		=	varying[VARIABLE_TIME];
+		int			up,vp;
+		float		u,v;
+		for (vp=vdiv+1,v=0;vp>0;vp--,v+=vstep) {
+			for (up=udiv+1,u=0;up>0;up--,u+=ustep) {
+				*uv++		=	u;
+				*vv++		=	v;
+				*timev++	=	0;
+			}
+		}
+		context->displace(this,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+
+		// Evaluate the quality of this tesselation in u and v separately
+		float	minUangle	=	1;
+		float	minVangle	=	1;
+		int		i;
+		for (i=0;i<=udiv;i++) {
+			minVangle		=	min(minVangle,	checkAngle(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv-1));
+		}
+
+		for (i=0;i<=vdiv;i++) {
+			minUangle		=	min(minUangle,	checkAngle(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv-1));
+		}
+
+		const float	threshold	=	cosf(radians(10));
+		int			nudiv,nvdiv;
+
+		if (minUangle < threshold)	nudiv	=	udiv*2;
+		else						nudiv	=	udiv;
+
+		if (minVangle < threshold)	nvdiv	=	vdiv*2;
+		else						nvdiv	=	vdiv;
+
+		if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize)	break;
+
+		if ((nudiv == udiv) && (nvdiv == vdiv))	break;
+
+		udiv	=	nudiv;
+		vdiv	=	nvdiv;
+	}
+
+	// At this point, I should have the tesselation. So create the grid and return it
+	CSurfaceTesselation	*P	=	new CSurfaceTesselation;
+	P->udiv				=	udiv;
+	P->vdiv				=	vdiv;
+	P->lastRefNumber	=	-1;
+	P->P				=	new float[(udiv+1)*(udiv+1)*3];
+	P->size				=	(udiv+1)*(udiv+1)*3*sizeof(float);
+	memcpy(P->P,varying[VARIABLE_P],(udiv+1)*(udiv+1)*3*sizeof(float));
+
+	CDebugView	d("C:\\temp\\o.dat",TRUE);
+	int	i;
+	for (i=0;i<(udiv+1)*(udiv+1);i++) {
+		d.point(P->P + i*3);
+	}
+
+	return P;
+}

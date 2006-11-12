@@ -36,13 +36,16 @@
 #include "texture3d.h"
 #include "gui/opengl.h"
 #include "renderer.h"
+#include "debug.h"
 
 
 // The static members of the CView class that visualizable classes derive from
 void					*CView::handle			=	NULL;
 TGlTrianglesFunction	CView::drawTriangles	=	NULL;
+TGlLinesFunction		CView::drawLines		=	NULL;
 TGlPointsFunction		CView::drawPoints		=	NULL;
 TGlDisksFunction		CView::drawDisks		=	NULL;
+TGlFileFunction			CView::drawFile			=	NULL;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
@@ -77,8 +80,10 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 				FILE		*in			=	fopen(fileName,"rb");
 
 				CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
+				CView::drawLines		=	(TGlLinesFunction)		osResolve(CView::handle,"pglLines");
 				CView::drawPoints		=	(TGlPointsFunction)		osResolve(CView::handle,"pglPoints");
 				CView::drawDisks		=	(TGlDisksFunction)		osResolve(CView::handle,"pglDisks");
+				CView::drawFile			=	(TGlFileFunction)		osResolve(CView::handle,"pglFile");
 
 				assert(CView::drawTriangles != NULL);
 				assert(CView::drawPoints != NULL);
@@ -121,7 +126,13 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 							if (view != NULL)	visualize(view);
 						}
 					} else {
-						error(CODE_BADFILE,"File %s doesn't seem to be a Pixie file\n",fileName);
+
+						fseek(in,0,SEEK_SET);
+						view	=	new CDebugView(in,fileName);
+
+						visualize(view);
+
+						delete view;
 					}
 				}
 			}

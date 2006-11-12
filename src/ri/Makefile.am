@@ -11,6 +11,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				cache.cpp \
 				curves.cpp \
 				bsplinePatchgrid.cpp \
+				debug.cpp \
 				delayed.cpp \
 				depository.cpp \
 				dlobject.cpp \

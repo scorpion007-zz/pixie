@@ -319,6 +319,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\debug.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\debug.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\depository.cpp"
 				>
 			</File>
@@ -1167,6 +1175,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\..\..\src\ri\defaults.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

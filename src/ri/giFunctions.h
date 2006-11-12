@@ -171,9 +171,10 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // trace	"f=pv"
 #ifndef INIT_SHADING
-#define	TRACEEXPR_PRE			FUN3EXPR_PRE																						\
-								const float			bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
-								vector				D;																				\
+#define	TRACEEXPR_PRE			FUN3EXPR_PRE																					\
+								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;		\
+								const float			*ab		=	rayDiff((float *) op1,(float *) op2,NULL);						\
+								vector				D;																			\
 								CRay				ray;
 
 #define	TRACEEXPR				subvv(D,(float *) op2,(float *) op1);															\
@@ -184,18 +185,24 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 								ray.time				=	urand();															\
 								ray.tmin				=	bias;																\
 								ray.t					-=	bias;																\
+								ray.da					=	ab[0];																\
+								ray.db					=	ab[1];																\
 																																\
 								trace(&ray);																					\
 																																\
 								res->real				=	ray.t
 
 
+#define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(1,3,3)																			\
+								ab	+=	2;
+
 #else
 #define	TRACEEXPR_PRE
 #define	TRACEEXPR
+#define	TRACEEXPR_UPDATE
 #endif
 
-DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,FUN3EXPR_UPDATE(1,3,3),NULL_EXPR,PARAMETER_RAYTRACE)
+DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE)
 
 #undef	TRACEEXPR_PRE
 #undef	TRACEEXPR

@@ -39,7 +39,9 @@ typedef void	(*TGlVisualizeFunction)(CView *view);
 typedef void	(*TGlTriMeshFunction)(int n,const int *indices,const float *P,const float *C);
 typedef void	(*TGlTrianglesFunction)(int n,const float *P,const float *C);
 typedef void	(*TGlPointsFunction)(int n,const float *P,const float *C);
+typedef void	(*TGlLinesFunction)(int n,const float *P,const float *C);
 typedef void	(*TGlDisksFunction)(int n,const float *P,const float *dP,const float *N,const float *C);
+typedef void	(*TGlFileFunction)(const char *fileName);
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -62,8 +64,10 @@ public:
 								// The classes can use the following functions for drawing primitives
 static	TGlTrianglesFunction	drawTriangles;		// The function to draw bunch of triangles
 static	TGlTriMeshFunction		drawTriangleMesh;	// The function to draw bunch of triangles (organized into a mesh)
+static	TGlLinesFunction		drawLines;			// The function to draw bunch of points
 static	TGlPointsFunction		drawPoints;			// The function to draw bunch of points
 static	TGlDisksFunction		drawDisks;			// The function to draw bunch of disks
+static	TGlFileFunction			drawFile;			// The function to draw primitives from a binary file
 static	void					*handle;			// The handle for the opengl.[dll/so/dylib] (only valid after show hider is constructed)
 static	const int				chunkSize =	128*3;	// The number of primitives to draw at a time (must be a multiple of 3)
 };
@@ -84,8 +88,10 @@ extern "C" {
 	LIB_EXPORT	void		pglVisualize(CView *view);
 	LIB_EXPORT	void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C);
 	LIB_EXPORT	void		pglTriangles(int n,const float *P,const float *C);
-	LIB_EXPORT	void		pglPoints(int n,const float *P,const float *C);
+	LIB_EXPORT	void		pglLines(int n,const float *P,const float *C);
+	LIB_EXPORT	void		pglPoints(int n,const float *P,const float *C);	
 	LIB_EXPORT	void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *C);
+	LIB_EXPORT	void		pglFile(const char *fileName);
 
 	LIB_EXPORT	void		pViewStats(CStatistics *statistics);
 }
