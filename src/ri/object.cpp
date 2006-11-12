@@ -30,6 +30,7 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
+#include "common/global.h"
 #include "common/polynomial.h"
 #include "object.h"
 #include "error.h"
@@ -274,6 +275,9 @@ void		CObject::cluster(CShadingContext *context) {
 	// Recurse
 	front->cluster(context);
 	back->cluster(context);
+	
+	front->attach();
+	back->attach();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -395,7 +399,7 @@ CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::~CSurface() {
-	if (P != NULL)	delete [] P;
+	if (P != NULL)	delete P;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -661,7 +665,7 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 }
 
 
-#include "debug.h"
+//#include "debug.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
@@ -703,7 +707,7 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 		float	vMax	=	0;
 		float	vAvg	=	0;
 		for (i=0;i<=udiv;i++) {
-			const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv-1));
+			const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv-1);
 			vMax			=	max(vMax,l);
 			vAvg			+=	l;
 		}
@@ -711,7 +715,7 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,fl
 		float	uMax	=	0;
 		float	uAvg	=	0;
 		for (i=0;i<=vdiv;i++) {
-			const float	l	=	measureLength(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv-1));
+			const float	l	=	measureLength(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv-1);
 			uMax			=	max(uMax,l);
 			uAvg			+=	l;
 		}
