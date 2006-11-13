@@ -54,7 +54,6 @@ public:
 
 			// Primitive creation functions
 			void			drawGrid(CSurface *,int,int,float,float,float,float) { }
-			void			drawRibbon(CSurface *,int,float,float) { }
 			void			drawPoints(CSurface *,int) { }
 
 };

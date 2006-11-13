@@ -147,6 +147,33 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 	for (i=numVertices;i>0;i--) {
 		*v++	=	(gvmax - gvmin)*v[0] + gvmin;
 	}
+
+	// Make the ribbon here
+	
+
+	// Get the width
+	const float	*size;
+	int			sizeStep;
+
+	if (base->sizeVariable->entry == VARIABLE_WIDTH) {
+		size		=	varying[VARIABLE_WIDTH];
+		sizeStep	=	1;
+	} else {
+		assert(base->sizeVariable->entry == VARIABLE_CONSTANTWIDTH);
+		size		=	varying[VARIABLE_CONSTANTWIDTH];
+		sizeStep	=	0;
+	}
+
+	const float	*dPdu	=	varying[VARIABLE_DPDU];
+	float		*P		=	varying[VARIABLE_P];
+	const float	*u		=	varying[VARIABLE_U];
+	int			j;
+	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,size+=sizeStep) {
+		vector	tmp;
+
+		mulvf(tmp,dPdu,(*u++ - 0.5f)*size[0]);
+		addvv(P,tmp);
+	}
 }
 
 
@@ -187,7 +214,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	*u++	=	1;
 
 	// Sample the curves
-	rasterizer->displace(this,2,3,2,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
+	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
 
 	// Compute the curve bounding box
 	P		=	varying[VARIABLE_P];
@@ -322,8 +349,6 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	const	float	*v1;
 	const	float	*v2;
 	const	float	*v3;
-	float			*N;
-
 
 	intr	=	intrStart	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 
@@ -338,8 +363,6 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		v2		=	v1 + vs;
 		v3		=	v2 + vs;
 	}
-
-	N		=	varying[VARIABLE_NG] + start*3;
 
 	for (i=0;i<numVertices;i++) {
 		const	float	cv				=	*v++;
@@ -356,9 +379,9 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)] + vb[3]*vBasis[element(2,3)];
 		tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)] + vb[3]*vBasis[element(3,3)];
 
-		*intr++	=	*N++	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
-		*intr++	=	*N++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
-		*intr++	=	*N++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+		*intr++	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
+		*intr++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
+		*intr++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
 		for (k=3;k<vertexSize;k++) {
 			*intr++	=	tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k];
@@ -368,35 +391,35 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	// Dispatch the variables
 	variables->dispatch(intrStart,0,numVertices,varying);
 
-	if (up & (PARAMETER_DPDU | PARAMETER_DPDV)) {
-		float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-		float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;
+	float		*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+	const float	*P		=	varying[VARIABLE_P] + start*3;
+	float		*N		=	varying[VARIABLE_NG] + start*3;
 
-		v	=	varying[VARIABLE_V] + start*3;
+	v	=	varying[VARIABLE_V] + start*3;
 
-		for (i=0;i<numVertices;i++) {
-			const	float	cv				=	*v++;
-			float			vb[4];
-			float			tmp[4];
+	for (i=numVertices;i>0;i--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
+		const	float	cv				=	*v++;
+		float			vb[4];
+		float			tmp[4];
 
-			vb[3]	=	0;
-			vb[2]	=	1;
-			vb[1]	=	2*cv;
-			vb[0]	=	3*cv*cv;
+		vb[3]	=	0;
+		vb[2]	=	1;
+		vb[1]	=	2*cv;
+		vb[0]	=	3*cv*cv;
 
-			tmp[0]	=	vb[0]*vBasis[element(0,0)] + vb[1]*vBasis[element(0,1)] + vb[2]*vBasis[element(0,2)];
-			tmp[1]	=	vb[0]*vBasis[element(1,0)] + vb[1]*vBasis[element(1,1)] + vb[2]*vBasis[element(1,2)];
-			tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)];
-			tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)];
+		tmp[0]	=	vb[0]*vBasis[element(0,0)] + vb[1]*vBasis[element(0,1)] + vb[2]*vBasis[element(0,2)];
+		tmp[1]	=	vb[0]*vBasis[element(1,0)] + vb[1]*vBasis[element(1,1)] + vb[2]*vBasis[element(1,2)];
+		tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)];
+		tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)];
 
-			*dPdv++	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
-			*dPdv++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
-			*dPdv++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+		dPdv[0]	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
+		dPdv[1]	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
+		dPdv[2]	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-		}
+		crossvv(dPdu,dPdv,P);
+		crossvv(N,dPdu,dPdv);
+		normalizevf(dPdu);
 	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
@@ -520,31 +543,14 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	// Compute the normal and derivatives
 	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 	float		*dPdu	=	varying[VARIABLE_DPDU] + start*3;
-	float		*P		=	varying[VARIABLE_P] + start*3;
+	const float	*P		=	varying[VARIABLE_P] + start*3;
 	float		*N		=	varying[VARIABLE_NG] + start*3;
-	const float	*u		=	varying[VARIABLE_U] + start*3;
-	const float	*size;
-	int			sizeStep;
 
-	if (base->sizeVariable->entry == VARIABLE_WIDTH) {
-		size		=	varying[VARIABLE_WIDTH] + start;
-		sizeStep	=	1;
-	} else {
-		assert(base->sizeVariable->entry == VARIABLE_CONSTANTWIDTH);
-		size		=	varying[VARIABLE_CONSTANTWIDTH] + start;
-		sizeStep	=	0;
-	}
-
-	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3,size+=sizeStep) {
-		vector	tmp;
-
+	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
 		subvv(dPdv,v1,v0);
 		crossvv(dPdu,dPdv,P);
 		crossvv(N,dPdu,dPdv);
-
 		normalizevf(dPdu);
-		mulvf(tmp,dPdu,(*u++ - 0.5f)*size[0]);
-		addvv(P,tmp);
 	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
@@ -776,25 +782,28 @@ void	CCurveMesh::create(CShadingContext *context) {
 	pl->collect(vertexSize,vertex,CONTAINER_VERTEX,context->threadMemory);	// Obtain the vertex data
 
 	// Multiply the curve width by the expansion in the coordinate system
-	const float expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
-	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
-		const CVariable	*cVar	=	pl->parameters[i].variable;
+	{
+		const float expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
+		float		*vertex;
+		for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+			const CVariable	*cVar	=	pl->parameters[i].variable;
 
-		if (cVar == sizeVariable) {
-			const	int	np	=	pl->parameters[i].numItems;
+			if (cVar == sizeVariable) {
+				const	int	np	=	pl->parameters[i].numItems;
 
-			for (i=0;i<np;i++) vertex[i] *=	expansion;
+				for (i=0;i<np;i++) vertex[i] *=	expansion;
 
-			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0);
+				if (pl->data1 != NULL) {
+					vertex	=	pl->data1 + (vertex - pl->data0);
 
-				for (i=0;i<np;i++)	vertex[i] *= expansion;
+					for (i=0;i<np;i++)	vertex[i] *= expansion;
+				}
+
+				break;
 			}
 
-			break;
+			vertex+=pl->parameters[i].numItems*cVar->numFloats;
 		}
-
-		vertex+=pl->parameters[i].numItems*cVar->numFloats;
 	}
 
 	// Allocate the variables

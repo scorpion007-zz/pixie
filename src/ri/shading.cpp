@@ -462,7 +462,7 @@ void	CShadingContext::drawObject(CObject *cObject) {
 //
 //	Preconditions:
 //	!!!	->	u,v,time,I		fields of varying must be set
-void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim,unsigned int usedParameters,int displaceOnly) {
+void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadingDim dim,unsigned int usedParameters,int displaceOnly) {
 	CAttributes			*currentAttributes	=	object->attributes;
 	float				**varying			=	currentShadingState->varying;
 	CShaderInstance		*displacement;
@@ -592,8 +592,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 
 
 	// If we need derivative information, treat differently
-	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != 0)) {	// Notice: we can not differentiate a 0 dimentional point set
-		if (dim == -1) {											// We're raytracing, so the derivative computation is different
+	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
+		if (dim == SHADING_2D) {											// We're raytracing, so the derivative computation is different
 			int					numRealVertices;
 			unsigned int		shadingParameters;
 
@@ -668,8 +668,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			const float		shadingRate				=	currentAttributes->shadingRate;
 			float			*sru,*srv;
 
+			assert(dim == SHADING_2D_GRID);
+
 			currentShadingState->numRealVertices	=	numVertices;
-			currentShadingState->shadingDim			=	(dim == 2 ? SHADING_2D_GRID : SHADING_1D_GRID);
+			currentShadingState->shadingDim			=	SHADING_2D_GRID;
 			currentShadingState->numActive			=	numVertices;
 			currentShadingState->numPassive			=	0;
 

@@ -204,7 +204,7 @@ void	CPatch::dice(CShadingContext *r) {
 				}
 			}
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
+			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 			
 			movvv(Pmov,varying[VARIABLE_P]);
@@ -222,7 +222,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 		}
 		assert(k <= (int) CRenderer::maxGridSize);
-		r->displace(object,numUprobes,numVprobes,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+		r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 
 		// Are we culled
@@ -504,7 +504,7 @@ void		CPatch::diceNew(CShadingContext *r) {
 				}
 			}
 
-			r->displace(object,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
+			r->displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull);
 		}
 
@@ -514,13 +514,13 @@ void		CPatch::diceNew(CShadingContext *r) {
 		vv			=	varying[VARIABLE_V];
 		timev		=	varying[VARIABLE_TIME];
 		for (vp=vdiv+1,v=vstart;vp>0;vp--,v+=vstep) {
-				for (up=udiv+1,u=ustart;up>0;up--,u+=ustep) {
+			for (up=udiv+1,u=ustart;up>0;up--,u+=ustep) {
 				*uv++		=	u;
 				*vv++		=	v;
 				*timev++	=	0;
 			}
 		}
-		r->displace(object,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+		r->displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull);
 
 		// Are we culled ?

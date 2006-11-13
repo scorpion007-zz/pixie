@@ -665,7 +665,7 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 
 	// Initialize the grid
 	nGrid			=	newGrid(object,(udiv+1)*(vdiv+1));	
-	nGrid->dim		=	2;
+	nGrid->dim		=	SHADING_2D_GRID;
 	nGrid->umin		=	umin;
 	nGrid->umax		=	umax;
 	nGrid->vmin		=	vmin;
@@ -681,35 +681,6 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 }
 
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CReyes
-// Method				:	drawRibbon
-// Description			:	Draw a ribbon
-// Return Value			:	-
-// Comments				:	Thread safe
-// Date last edited		:	6/5/2003
-void		CReyes::drawRibbon(CSurface *object,int numDiv,float vmin,float vmax) {
-	// Create a grid on the surface
-	CRasterGrid			*nGrid;
-
-	// Initialize the grid
-	nGrid			=	newGrid(object,(numDiv+1)*2);	
-	nGrid->dim		=	1;
-	nGrid->umin		=	0;
-	nGrid->umax		=	0;
-	nGrid->vmin		=	vmin;
-	nGrid->vmax		=	vmax;
-	nGrid->udiv		=	numDiv;
-	nGrid->vdiv		=	1;
-
-	// Sample the grid
-	shadeGrid(nGrid,TRUE);									// Just the position
-
-	// Dispatch the lines to the renderer
-	insertGrid(nGrid,0);
-}
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	drawPoints
@@ -722,7 +693,7 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	CRasterGrid			*nGrid;
 																// Create the grid
 	nGrid			=	newGrid(object,numPoints);
-	nGrid->dim		=	0;
+	nGrid->dim		=	SHADING_0D;
 	nGrid->umin		=	0;
 	nGrid->umax		=	0;
 	nGrid->vmin		=	0;
@@ -808,7 +779,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 	}
 
-	if (grid->dim == 0) {
+	if (grid->dim == SHADING_0D) {
 		// This is a 0 dimensional point cloud
 		int					i;
 		float				**varying		=	currentShadingState->varying;
@@ -832,7 +803,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			varying[VARIABLE_CONSTANTWIDTH][0]	=	-C_INFINITY;
 
 			// Shade the points
-			displace(object,numPoints,1,0,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+			displace(object,numPoints,1,SHADING_0D,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
 
 			// Figure out the size of the ribbon
 			sizeArray	=	varying[VARIABLE_WIDTH];
@@ -867,7 +838,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			stats.numRasterGridsShaded++;
 
 			// Shade the points
-			shade(object,numPoints,1,0,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+			shade(object,numPoints,1,SHADING_0D,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
 
 			// Copy the point samples
 			copySamples(numPoints,varying,grid->vertices,0);
@@ -894,7 +865,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 				varying[VARIABLE_CONSTANTWIDTH][0]	=	-C_INFINITY;
 
 				// Shade the points
-				displace(object,numPoints,1,0,PARAMETER_END_SAMPLE | PARAMETER_P);
+				displace(object,numPoints,1,SHADING_0D,PARAMETER_END_SAMPLE | PARAMETER_P);
 
 				// Figure out the size of the ribbon
 				sizeArray	=	varying[VARIABLE_WIDTH];
@@ -922,172 +893,15 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 				}
 			} else {
 				// Shade the points
-				shade(object,numPoints,1,0,PARAMETER_END_SAMPLE | PARAMETER_P);
+				shade(object,numPoints,1,SHADING_0D,PARAMETER_END_SAMPLE | PARAMETER_P);
 
 				// Copy the point samples
 				copySamples(numPoints,varying,grid->vertices,1);
 			}
 		}
-	} else if (grid->dim == 1) {
-		// This is a 1 dimensional ribbon
-		const int			numVertices		=	grid->udiv + 1;
-		int					j;
-		float				*size;
-		int					i;
-		float				**varying;
-		float				*u;
-		float				*v;
-		float				*time;
-		float				*leftVertices,*rightVertices;
-		CSurface			*object			=	(CSurface *) (grid->object);
-		const CAttributes	*attributes		=	object->attributes;
-
-		varying		=	currentShadingState->varying;
-		u			=	varying[VARIABLE_U];
-		v			=	varying[VARIABLE_V];
-		time		=	varying[VARIABLE_TIME];
-
-		// Put the sampling coordinates
-		for (j=0;j<numVertices;j++) {
-			const float t	=	(float) j / (float) (numVertices - 1);
-			*u++	=	0;
-			*v++	=	grid->vmin*(1-t) + grid->vmax*t;
-			*time++	=	0;
-		}
-
-		if (Ponly) {
-			// Set the flags
-			if (attributes->nSides == 2) {
-				grid->flags	=	RASTER_DRAW_FRONT | RASTER_DRAW_BACK | RASTER_UNSHADED | extraPrimitiveFlags;
-			} else {
-				if (attributes->flags & ATTRIBUTES_FLAGS_INSIDE) {	// Flip
-					grid->flags	=	RASTER_DRAW_FRONT | RASTER_UNSHADED | extraPrimitiveFlags;
-				} else {
-					grid->flags	=	RASTER_DRAW_BACK | RASTER_UNSHADED | extraPrimitiveFlags;
-				}
-			}
-			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
-			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
-
-			// Do we have motion blur ?
-			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving()))	grid->flags		|=	RASTER_MOVING;
-
-			// Reset the size variable
-			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
-			varying[VARIABLE_CONSTANTWIDTH][0]	=	-C_INFINITY;
-
-			// Shade the points on the curve
-			displace(object,1,numVertices,1,PARAMETER_BEGIN_SAMPLE | PARAMETER_N | PARAMETER_DPDV | PARAMETER_P);
-
-			// Figure out the size of the ribbon
-			size	=	varying[VARIABLE_WIDTH];
-			if (varying[VARIABLE_WIDTH][0] == -C_INFINITY) {
-				if (varying[VARIABLE_CONSTANTWIDTH][0] == -C_INFINITY) {
-					// No width is set
-					for (i=0;i<numVertices;i++)	size[i]	=	1;
-				} else {
-					const float	tmp	=	varying[VARIABLE_CONSTANTWIDTH][0];
-
-					for (i=0;i<numVertices;i++)	size[i]	=	tmp;
-				}
-			}
-
-			// Copy the vertex samples
-			leftVertices	=	grid->vertices;
-			rightVertices	=	leftVertices + numVertices*numVertexSamples;
-			copyPoints(numVertices,varying,leftVertices,0);
-			copyPoints(numVertices,varying,rightVertices,0);
-
-			// Create the ribbon
-			makeRibbon(numVertices,leftVertices,rightVertices,size,varying[VARIABLE_N],varying[VARIABLE_DPDV],0);
-		} else {
-			T32					one;
-			int					opaque;
-			T32					*Oi;
-
-			// Sanity check
-			stats.numRasterGridsShaded++;
-
-			// Shade the points on the curve
-			shade(object,1,numVertices,1,PARAMETER_BEGIN_SAMPLE | PARAMETER_N | PARAMETER_DPDV | PARAMETER_P);
-
-			// Copy the vertex samples
-			leftVertices	=	grid->vertices;
-			rightVertices	=	leftVertices + numVertices*numVertexSamples;
-			copySamples(numVertices,varying,leftVertices,0);
-			copySamples(numVertices,varying,rightVertices,0);
-
-			// Check if we're opaque
-			for (one.real=1,opaque=0,Oi=(T32 *) varying[VARIABLE_OI],i=numVertices;i>0;i--,Oi+=3) {
-				if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
-					grid->flags	|=	RASTER_TRANSPARENT;
-					break;
-				}
-			}
-			
-			// We require matte and LOD flagged grids to have been shaded / displaced
-			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
-			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
-		}
-
-
-		// Take care of the motion
-		if (grid->flags & RASTER_MOVING) {
-			// Sample points along the curve
-			u				=	varying[VARIABLE_U];
-			v				=	varying[VARIABLE_V];
-			time			=	varying[VARIABLE_TIME];
-
-			// Put the sampling coordinates
-			for (j=0;j<numVertices;j++) {
-				const float t	=	(float) j / (float) (numVertices - 1);
-				*u++	=	0;
-				*v++	=	grid->vmin*(1-t) + grid->vmax*t;
-				*time++	=	1;
-			}
-
-			if (Ponly) {
-				// Reset the size variable
-				varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
-				varying[VARIABLE_CONSTANTWIDTH][0]	=	-C_INFINITY;
-
-				// Shade the points on the curve
-				displace(object,1,numVertices,1,PARAMETER_END_SAMPLE | PARAMETER_N | PARAMETER_DPDV | PARAMETER_P);
-
-				// Figure out the size of the ribbon
-				size	=	varying[VARIABLE_WIDTH];
-				if (varying[VARIABLE_WIDTH][0] == -C_INFINITY) {
-					if (varying[VARIABLE_CONSTANTWIDTH][0] == -C_INFINITY) {
-						// No width is set
-						for (i=0;i<numVertices;i++)	size[i]	=	1;
-					} else {
-						const float	tmp	=	varying[VARIABLE_CONSTANTWIDTH][0];
-
-						for (i=0;i<numVertices;i++)	size[i]	=	tmp;
-					}
-				}
-
-				// Copy the vertex samples
-				leftVertices	=	grid->vertices;
-				rightVertices	=	leftVertices + numVertices*numVertexSamples;
-				copyPoints(numVertices,varying,leftVertices,1);
-				copyPoints(numVertices,varying,rightVertices,1);
-
-				// Create the ribbon
-				makeRibbon(numVertices,leftVertices,rightVertices,size,varying[VARIABLE_N],varying[VARIABLE_DPDV],1);
-			} else {
-				// Shade the points on the curve
-				shade(object,1,numVertices,1,PARAMETER_END_SAMPLE | PARAMETER_N | PARAMETER_DPDV | PARAMETER_P);
-
-				// Copy the vertex samples
-				leftVertices	=	grid->vertices;
-				rightVertices	=	leftVertices + numVertices*numVertexSamples;
-				copySamples(numVertices,varying,leftVertices,1);
-				copySamples(numVertices,varying,rightVertices,1);
-			}
-		}
 	} else {
-		assert(grid->dim == 2);
+		assert(grid->dim == SHADING_2D_GRID);
+
 		// This is a 2 dimensional surface
 		int					i,j;
 		float				ustart;
@@ -1149,7 +963,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) grid->flags		|=	RASTER_MOVING;
 
 			// Displace the sucker
-			displace(object,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+			displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
 
 			// Project the P into samples
 			camera2samples(numVertices,varying[VARIABLE_P]);
@@ -1161,7 +975,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			stats.numRasterGridsShaded++;
 
 			// Shade the sucker
-			shade(object,udiv+1,vdiv+1,2,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+			shade(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
 
 			// Project the P into samples
 			camera2samples(numVertices,varying[VARIABLE_P]);
@@ -1201,7 +1015,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 			if (Ponly) {
 				// Shade the sucker
-				displace(object,udiv+1,vdiv+1,2,PARAMETER_END_SAMPLE | PARAMETER_P);
+				displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_END_SAMPLE | PARAMETER_P);
 
 				// Project the P into samples
 				camera2samples(numVertices,varying[VARIABLE_P]);
@@ -1210,7 +1024,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 				copyPoints(numVertices,varying,grid->vertices,1);
 			} else {
 				// Shade the sucker
-				shade(object,udiv+1,vdiv+1,2,PARAMETER_END_SAMPLE | PARAMETER_P);
+				shade(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_END_SAMPLE | PARAMETER_P);
 
 				// Project the P into samples
 				camera2samples(numVertices,varying[VARIABLE_P]);
@@ -1381,41 +1195,6 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CReyes
-// Method				:	makeRibbon
-// Description			:	Displace the left and right vertices from each other
-// Return Value			:	-
-// Comments				:	Thread safe
-// Date last edited		:	6/5/2003
-void		CReyes::makeRibbon(int numVertices,float *leftVertices,float *rightVertices,const float *size,const float *N,const float *dPdv,int disp) {
-	int					i;
-	float				*pl;
-	float				*pr;
-	vector				tmp;
-
-	disp		*=	(CRenderer::numExtraSamples+10);
-
-	for (i=numVertices;i>0;i--) {
-		pl		=	leftVertices	+ disp;	leftVertices	+=	numVertexSamples;
-		pr		=	rightVertices	+ disp;	rightVertices	+=	numVertexSamples;
-	
-		crossvv(tmp,N,dPdv);		// This is the extrude direction
-
-		normalizevf(tmp);			// Use the fast normalization as it doesn't create catastrophic error
-
-		mulvf(tmp,(*size++) * 0.5f);
-
-		addvv(pl,tmp);
-		subvv(pr,tmp);
-
-		camera2samples(pl);
-		camera2samples(pr);
-
-		N		+=	3;
-		dPdv	+=	3;
-	}
-}
 
 
 

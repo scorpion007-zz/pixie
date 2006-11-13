@@ -59,15 +59,6 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
-		case SHADING_1D_GRID:
-		case SHADING_1D:
-		{
-			int		i;
-			
-			for (i=currentShadingState->numVertices;i>0;i--) {
-				*dest++	=	0;
-			}
-		}
 		break;
 
 
@@ -141,53 +132,6 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		{
 			for (int i=currentShadingState->numVertices;i>0;i--) {
 				*dest++	=	0;
-			}
-		}
-		break;
-
-		// Dv executing on Curves
-		case SHADING_1D_GRID:
-		{
-			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i;
-			const float	*v			=	currentShadingState->varying[VARIABLE_V];
-
-			*dest++	=	(src[1] - src[0]) / (v[1] - v[0]);
-			src++;
-			v++;
-			for (i=vVertices-2;i>0;i--) {
-				*dest++	=	(src[1] - src[-1]) / (v[1] - v[-1]);
-				src++;
-				v++;
-			}
-			*dest	=	(src[0] - src[-1]) / (v[0] - v[-1]);
-		}
-		break;
-
-
-		// Dv executing on Curves
-		case SHADING_1D:
-		{
-			const int	numVertices		=	currentShadingState->numVertices;
-			const int	numRealVertices	=	currentShadingState->numRealVertices;
-			const float	*dsrc			=	src + numRealVertices;
-			float		*ddest			=	dest + numRealVertices;
-			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
-			int			i;
-
-			assert(numVertices == numRealVertices*3);
-
-			for (i=numRealVertices;i>0;i--) {
-				const float	val	=	(dsrc[0] - src[0]) / (*dv++);
-
-				ddest[0]		=	val;
-				ddest[1]		=	val;
-				dest[0]			=	val;
-
-				dest++;
-				src++;
-				ddest			+=	2;
-				dsrc			+=	2;
 			}
 		}
 		break;
@@ -296,15 +240,6 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
-		case SHADING_1D_GRID:
-		case SHADING_1D:
-		{
-			int		i;
-			
-			for (i=currentShadingState->numVertices;i>0;i--) {
-				*dest++	=	0;
-			}
-		}
 		break;
 
 
@@ -402,79 +337,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			}
 		}
 		break;
-
-		// Dv executing on Curves
-		case SHADING_1D_GRID:
-		{
-			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i;
-			const float	*v			=	currentShadingState->varying[VARIABLE_V];
-			float		invDv;
-
-			assert(currentShadingState->numUvertices == 1);
-			assert(vVertices > 0);
-
-			invDv	=	1 / (v[1] - v[0]);
-			*dest++	=	(src[3] - src[0]) * invDv;
-			*dest++	=	(src[4] - src[1]) * invDv;
-			*dest++	=	(src[5] - src[2]) * invDv;
-			src		+=	3;
-			v++;
-
-			for (i=vVertices-2;i>0;i--) {
-				invDv	=	1 / (v[1] - v[-1]);
-				*dest++	=	(src[3] - src[-3]) * invDv;
-				*dest++	=	(src[4] - src[-2]) * invDv;
-				*dest++	=	(src[5] - src[-1]) * invDv;
-				src		+=	3;
-				v++;
-			}
-
-			invDv	=	1 / (v[0] - v[-1]);
-			*dest++	=	(src[0] - src[-3]) * invDv;
-			*dest++	=	(src[1] - src[-2]) * invDv;
-			*dest++	=	(src[2] - src[-1]) * invDv;
-		}
-		break;
-
-
-		// Dv executing on Curves
-		case SHADING_1D:
-		{
-			const int	numVertices		=	currentShadingState->numVertices;
-			const int	numRealVertices	=	currentShadingState->numRealVertices;
-			const float	*dsrc			=	src + numRealVertices*3;
-			float		*ddest			=	dest + numRealVertices*3;
-			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
-			int			i;
-
-			assert(numVertices == numRealVertices*3);
-
-			for (i=numRealVertices;i>0;i--) {
-				const float	invDv	=	1 / (*dv++);
-				const float	val0	=	(dsrc[3] - src[0]) * invDv;
-				const float	val1	=	(dsrc[4] - src[1]) * invDv;
-				const float	val2	=	(dsrc[5] - src[2]) * invDv;
-
-				ddest[0]		=	val0;
-				ddest[1]		=	val1;
-				ddest[2]		=	val2;
-				ddest[3]		=	val0;
-				ddest[4]		=	val1;
-				ddest[5]		=	val2;
-				dest[0]			=	val0;
-				dest[1]			=	val1;
-				dest[2]			=	val2;
-
-				dest			+=	3;
-				src				+=	3;
-				ddest			+=	6;
-				dsrc			+=	6;
-			}
-		}
-		break;
-
-
+		
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
@@ -921,77 +784,6 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 		}
 		break;
 
-
-
-
-
-		// Dv executing on Curves
-		case SHADING_1D_GRID:
-		{
-			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i;
-			vector		tmp;
-			float		a;
-
-			assert(currentShadingState->numUvertices == 1);
-			assert(vVertices > 0);
-
-			for (i=vVertices-1;i>0;i--) {
-				subvv(tmp,from+3,from);
-				ab[1]	=	lengthv(tmp);
-				a		=	dotvv(dir,dir+3);
-				ab[0]	=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(dir+3,dir+3)))));
-
-				from	+=	3;
-				dir		+=	3;
-				ab		+=	2;
-			}
-
-			ab[0]	=	ab[-2];
-			ab[1]	=	ab[-1];
-			ab		+=	2;
-
-			return	ab - numVertices*2;
-		}
-		break;
-
-
-
-
-
-
-
-		// Dv executing on Curves
-		case SHADING_1D:
-			assert(FALSE);
-
-			{
-				int			numRealVertices	=	currentShadingState->numRealVertices;
-				const float	*dfrom			=	from + numRealVertices*3;
-				const float	*ddir			=	dir + numRealVertices*3;
-				int			i;
-
-				assert(numVertices == numRealVertices*3);
-
-				for (i=numRealVertices;i>0;i--) {
-					vector	tmp;
-
-					subvv(tmp,dfrom,from);
-					ab[1]				=	lengthv(tmp);
-
-					const float	a		=	dotvv(dir,ddir);
-					ab[0]				=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir,ddir)))));
-
-					ab					+=	2;
-					from				+=	3;
-					dir					+=	3;
-					dfrom				+=	3;
-					ddir				+=	3;
-				}
-
-				return ab - numRealVertices*2;
-			}
-		break;
 
 
 

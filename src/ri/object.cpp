@@ -646,7 +646,7 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 		I		+=	3;
 	}
 
-	context->shade(this,numRays,1,-1,0);
+	context->shade(this,numRays,1,SHADING_2D,0);
 }
 
 
@@ -779,7 +779,7 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,in
 				*timev++	=	0;
 			}
 		}
-		context->displace(this,udiv+1,vdiv+1,2,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+		context->displace(this,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 
 		if (maxTesselationReached) break;
 		

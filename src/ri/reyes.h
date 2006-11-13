@@ -96,7 +96,7 @@ protected:
 	// Date last edited		:	9/17/2004
 	class	CRasterGrid : public CRasterObject {
 	public:
-			int					dim;					// Dimensionality (0,1 or 2)
+			EShadingDim			dim;					// Dimensionality (0,1 or 2)
 			float				umin,umax,vmin,vmax;	// The parametric range
 			int					udiv,vdiv;				// The number of division
 			int					numVertices;			// The number of vertices
@@ -227,7 +227,6 @@ public:
 								// The following can be called from the "dice" function to insert an object into the scene
 	void						drawObject(CObject *);									// Draw an object
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
-	void						drawRibbon(CSurface *,int,float,float);					// Draw a ribbon (RiCurves)
 	void						drawPoints(CSurface *,int);								// Draw points (RiPoints)
 
 	int							numGrids;										// The number of grids allocated (for housekeeping)
@@ -243,8 +242,6 @@ protected:
 private:
 	void						copyPoints(int,float **,float *,int);			// Data movement (copy P only)
 	void						copySamples(int,float **,float *,int);			// Data movement (copy the color + opacity + extra samples)
-
-	void						makeRibbon(int,float *,float *,const float *,const float *,const float *,int);
 
 	void						insertObject(CRasterObject *object);			// Add an object into the system
 	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket

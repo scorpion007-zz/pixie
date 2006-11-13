@@ -74,11 +74,8 @@ const int	SHADING_OBJECT_CACHE_SIZE	=	512;
 
 typedef enum {
 	SHADING_0D,				// Shading points
-	SHADING_1D_GRID,		// Shading lines (grid)
-	SHADING_1D,				// Shading lines
 	SHADING_2D_GRID,		// Shading a 2D grid
-	SHADING_2D,				// Shading a 2D surface that has been arbitraryly sampled
-	SHADING_NODIM			// Shading arbitraryly sampled points without any neighborhood info
+	SHADING_2D				// Shading a 2D surface that has been arbitraryly sampled
 } EShadingDim;
 
 // Predefined ray labels used during raytracing
@@ -206,15 +203,14 @@ public:
 
 		// Primitive creation functions
 		virtual	void			drawGrid(CSurface *,int,int,float,float,float,float)	=	0;
-		virtual	void			drawRibbon(CSurface *,int,float,float)					=	0;
 		virtual	void			drawPoints(CSurface *,int)								=	0;
 
 		// The current shading state
 		CShadingState			*currentShadingState;
 
 		// Shade points on a surface
-		void					shade(CSurface *,int,int,int,unsigned int,int displaceOnly=FALSE);
-		inline	void			displace(CSurface *surface,int u,int v,int n,unsigned int up)	{	shade(surface,u,v,n,up,TRUE);	}
+		void					shade(CSurface *,int,int,EShadingDim,unsigned int,int displaceOnly=FALSE);
+		inline	void			displace(CSurface *surface,int u,int v,EShadingDim dim,unsigned int up)	{	shade(surface,u,v,dim,up,TRUE);	}
 
 		// Raytracing functions
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
