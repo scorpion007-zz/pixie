@@ -494,7 +494,7 @@ processBounce:;
 
 	// Set misc variables
 	ray.t					=	C_INFINITY;
-	ray.time				=	0;
+	ray.time				=	urand();
 
 	// Trace the ray in the scene
 	trace(&ray);
@@ -510,6 +510,9 @@ processBounce:;
 
 		mulvf(Pl,ray.dir,ray.t);
 		addvv(Pl,ray.from);
+
+		// Update the ray differential
+		ray.db	+=	ray.da*ray.t;
 
 		// Process this hit
 		switch(attributes->shadingModel) {
@@ -568,7 +571,6 @@ processBounce:;
 				movvv(ray.from,Pl);
 				ray.tmin				=	attributes->shadowBias;
 				ray.da					=	DEFAULT_RAY_DA;
-				ray.db					=	DEFAULT_RAY_DB;
 				lastBounceSpecular		=	FALSE;
 
 				// We just hit a diffuse surface, so set the ray differential to something big

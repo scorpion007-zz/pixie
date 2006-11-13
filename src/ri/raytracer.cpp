@@ -490,12 +490,10 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 
 		for (i=numShading;i>0;i--,cRay++) {
 			// First two numbers in the samples list are the x/y coordinates in pixels of the sample location
-			const float	jtime		=	urand();
-			vector		from,to;
-
 			x					=	cRay->x;
 			y					=	cRay->y;
 
+			vector		from,to;
 			pixels2camera(from,x,y,0);
 			pixels2camera(to,x,y,CRenderer::imagePlane);
 
@@ -503,7 +501,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			subvv(cRay->dir,to,from);
 			normalizev(cRay->dir);
 
-			cRay->time			=	jtime;
+			cRay->time			=	urand();
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;
@@ -511,25 +509,23 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 	} else {
 		for (i=numShading;i>0;i--,cRay++) {
 			// First two numbers in the samples list are the x/y coordinates in pixels of the sample location
-			const float	jtime			=	urand();
-			vector		from,to;
-			const float	theta			=	(float) (urand()*2*C_PI);
-			const float	r				=	urand()*CRenderer::aperture;
-
 			x					=	cRay->x;
 			y					=	cRay->y;
 
+			vector		from,to;
 			pixels2camera(from,x,y,0);
 			pixels2camera(to,x,y,CRenderer::focaldistance);
 
-			from[COMP_X]	+=	cosf(theta) * r;
-			from[COMP_Y]	+=	sinf(theta) * r;
+			const float	theta	=	(float) (urand()*2*C_PI);
+			const float	r		=	urand()*CRenderer::aperture;
+			from[COMP_X]		+=	cosf(theta) * r;
+			from[COMP_Y]		+=	sinf(theta) * r;
 
 			movvv(cRay->from,from);
 			subvv(cRay->dir,to,from);
 			normalizev(cRay->dir);
 
-			cRay->time			=	jtime;
+			cRay->time			=	urand();
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;

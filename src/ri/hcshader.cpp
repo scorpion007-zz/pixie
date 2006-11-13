@@ -37,6 +37,7 @@
 #include "attributes.h"
 #include "object.h"
 #include "renderer.h"
+#include "defaults.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -135,7 +136,6 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
 		int				numVertices				=	currentShadingState->numRealVertices;
 		CShadedLight	*cLight;
-		float			*L,*Cl;
 		
 		if (currentShadingState->numActive == 0)
 			return;
@@ -149,10 +149,11 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		cLight->next				=	*lights;
 		*lights						=	cLight;
 		memcpy(cLight->lightTags,tags,sizeof(int)*numVertices);
-		L							=	cLight->savedState[0];
-		Cl							=	cLight->savedState[1];
+		float		*L				=	cLight->savedState[0];
+		float		*Cl				=	cLight->savedState[1];
+		const float	*time			=	currentShadingState->varying[VARIABLE_TIME];
 
-		for (int i=numVertices;i>0;i--,Ps+=3){
+		for (int i=numVertices;i>0;i--,Ps+=3,time++){
 			if (*tags++ == 0) {
 				vector			P;
 				float			visibility	=	0;
@@ -172,13 +173,20 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 					ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 					ray.tmin				=	bias;
 					ray.t					=	len - bias;
-					ray.time				=	0;
+					ray.time				=	*time;
+
+					// Figure out the ray differential
+					const float	sina		=	radius / len;
+					const float	cosa		=	sqrtf(1 - sina*sina);
+					const float	da			=	sina / (cosa + C_EPSILON);
+					ray.da					=	min(DEFAULT_RAY_DA,da);
+					ray.db					=	DEFAULT_RAY_DB;
 
 					context->trace(&ray);
 
 					if (ray.object == NULL) {
 						subvv(P,Ps);
-						visibility	+=	intensity / dotvv(P,P);
+						visibility			+=	intensity / dotvv(P,P);
 					}
 				}
 
@@ -357,6 +365,24 @@ CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	normalizev(N);
 
 	if (reverse)	mulvf(N,-1);
+
+	// Find the center point of the light
+	addvv(center,corners[0],corners[1]);
+	addvv(center,corners[2]);
+	addvv(center,corners[3]);
+	mulvf(center,1 / (float) 4);
+
+	// Find the radius of the light
+	vector	tmp;
+	subvv(tmp,corners[0],center);
+	r	=	lengthv(tmp);
+	subvv(tmp,corners[1],center);
+	r	+=	lengthv(tmp);
+	subvv(tmp,corners[2],center);
+	r	+=	lengthv(tmp);
+	subvv(tmp,corners[3],center);
+	r	+=	lengthv(tmp);
+	r	*=	0.25f;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -433,12 +459,10 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
 		vector			D;
 		int				j;
-		vector			center;
 		int				numVertices				=	currentShadingState->numRealVertices;
 		int				numLitPoints			=	0;
 		CShadedLight	*cLight;
 		int				*lightTags;
-		float			*L,*Cl;
 		
 		if (currentShadingState->numActive == 0)
 			return;
@@ -450,18 +474,17 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices,context->threadMemory);
 		cLight->instance			=	this;
 		memcpy(cLight->lightTags,tags,sizeof(int)*numVertices);
-		L							=	cLight->savedState[0];
-		Cl							=	cLight->savedState[1];
+		float		*L					=	cLight->savedState[0];
+		float		*Cl					=	cLight->savedState[1];
+		const float	*time				=	currentShadingState->varying[VARIABLE_TIME];
 		
 		// GSHTODO: do something to check Ps vs N angle before allocating light
 		
-		addvv(center,corners[0],corners[1]);
-		addvv(center,corners[2]);
-		addvv(center,corners[3]);
-		mulvf(center,1 / (float) 4);
+		
+
 		
 		lightTags = cLight->lightTags;
-		for (int i=currentShadingState->numRealVertices;i>0;i--,Ps+=3) {
+		for (int i=currentShadingState->numRealVertices;i>0;i--,Ps+=3,time++) {
 			if (*lightTags == 0) {
 				subvv(D,Ps,center);
 				if (dotvv(D,N) > 0) {
@@ -470,11 +493,10 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 
 					for (j=numSamples;j>0;j--) {
 						const float	u	=	context->urand();
-						const float	v	=	context->urand();
 
 						interpolatev(P0,corners[0],corners[1],u);
 						interpolatev(P1,corners[2],corners[3],u);
-						interpolatev(P,P0,P1,v);
+						interpolatev(P,P0,P1,context->urand());
 						
 						// Evaluate visibility between P and Ps
 						movvv(ray.from,Ps);
@@ -485,7 +507,14 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 						ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 						ray.tmin				=	bias;
 						ray.t					=	len - bias;
-						ray.time				=	0;
+						ray.time				=	*time;
+
+						// Figure out the ray differential
+						const float	sina		=	r / len;
+						const float	cosa		=	sqrtf(1 - sina*sina);
+						const float	da			=	sina / (cosa + C_EPSILON);
+						ray.da					=	min(DEFAULT_RAY_DA,da);
+						ray.db					=	DEFAULT_RAY_DB;
 
 						context->trace(&ray);
 

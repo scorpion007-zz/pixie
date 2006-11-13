@@ -40,12 +40,10 @@
 #include "stats.h"
 #include "texture.h"
 #include "renderer.h"
+#include "defaults.h"
 
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
-
-// FIXME: rand() is not thread safe
-#define	urand()	(rand() / (float) RAND_MAX)
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -643,12 +641,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
-				float		tmp			=	sqrtf((i+urand()) / (float) nt);
-				const float	phi			=	(float) (2*C_PI*(j+urand()) / (float) np);
+				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
+				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
 				const float	sinPhi		=	(sinf(phi)*tmp);
-				const float	dx			=	(2*urand()-1)*footprint;
-				const float	dy			=	(2*urand()-1)*footprint;
+				const float	dx			=	(2*context->urand()-1)*footprint;
+				const float	dy			=	(2*context->urand()-1)*footprint;
 
 				tmp						=	sqrtf(1 - tmp*tmp);
 
@@ -664,6 +662,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				ray.tmin				=	lookup->bias;
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
+				ray.da					=	DEFAULT_RAY_DA;
+				ray.db					=	DEFAULT_RAY_DB;
 
 				context->trace(&ray);
 
@@ -722,12 +722,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
-				float		tmp			=	sqrtf((i+urand()) / (float) nt);
-				const float	phi			=	(float) (2*C_PI*(j+urand()) / (float) np);
+				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
+				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
 				const float	sinPhi		=	(sinf(phi)*tmp);
-				const float	dx			=	(2*urand()-1)*footprint;
-				const float	dy			=	(2*urand()-1)*footprint;
+				const float	dx			=	(2*context->urand()-1)*footprint;
+				const float	dy			=	(2*context->urand()-1)*footprint;
 
 				tmp						=	sqrtf(1 - tmp*tmp);
 
@@ -743,6 +743,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				ray.tmin				=	lookup->bias;
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
+				ray.da					=	DEFAULT_RAY_DA;
+				ray.db					=	DEFAULT_RAY_DB;
 
 				context->trace(&ray);
 

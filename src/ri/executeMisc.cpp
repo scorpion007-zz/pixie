@@ -475,8 +475,12 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 
 	inShadow		=	TRUE;					// We're in shadow
 
+	// Compute the ray differential
+	const float	*ab			=	rayDiff(from,L,NULL);
+	const float	*time		=	currentShadingState->varying[VARIABLE_TIME];
+
 	// Create the rays
-	for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {
+	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2,time++) {
 		if (*tags == 0) {
 			const	float	d	=	lengthv(L);
 			mulvf(dir,L,-1/d);
@@ -490,10 +494,12 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 				movvv(cRay->from,from);
 				cRay->t				=	min(maxDist,d) - bias;
 				cRay->tmin			=	bias;
-				cRay->time			=	urand();
+				cRay->time			=	*time;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 				cRay->dest			=	dest;
 				cRay->multiplier	=	multiplier;
+				cRay->da			=	ab[0];		// The ray differential
+				cRay->db			=	ab[1];
 				*cRays++			=	cRay++;
 				if (--numRemaining == 0) {
 					bundle.numRays	=	shootStep;
@@ -554,7 +560,11 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
 	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
 
-	for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {
+	// Compute the ray differential
+	const float	*ab			=	rayDiff(from,dir,NULL);
+	const float	*time		=	currentShadingState->varying[VARIABLE_TIME];
+
+	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2,time++) {
 		if (*tags == 0) {
 			normalizev(D,dir);
 
@@ -562,12 +572,14 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
 				sampleHemisphere(cRay->dir,D,coneAngle,traceGenerator);
 				movvv(cRay->from,from);
-				cRay->time			=	urand();
+				cRay->time			=	*time;
 				cRay->t				=	C_INFINITY;
 				cRay->tmin			=	bias;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				cRay->dest			=	dest;
 				cRay->multiplier	=	multiplier;
+				cRay->da			=	ab[0];		// The ray differential
+				cRay->db			=	ab[1];
 				*cRays++			=	cRay++;
 				if (--numRemaining == 0) {
 					bundle.numRays		=	shootStep;
@@ -603,163 +615,6 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	traceTransmission
-// Description			:	Trace transmission rays
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/23/2003
-void	CShadingContext::traceTransmission(int numVertices,CRaySample *samples,CTextureLookup *lookup) {
-	CTransmissionRay	*rayBase;
-	CTransmissionRay	**raysBase;
-	CTransmissionRay	*cRay,**cRays;
-	const int			numSamples		=	lookup->numSamples;
-	const float			bias			=	lookup->shadowBias;
-	const int			shootStep		=	min(CRenderer::shootStep,numVertices*numSamples);
-	const float			coneAngle		=	lookup->coneAngle;
-	const float			maxDist			=	lookup->maxDist;
-	int					numRemaining	=	shootStep;
-	const float			multiplier		=	1 / (float) lookup->numSamples;
-	int					currentSample;
-	int					i;
-	CTransmissionBundle	bundle;
-	vector				L,D;
-
-	// Set the label
-	if (lookup->label == NULL)	bundle.label	=	rayLabelTransmission;
-	else						bundle.label	=	lookup->label;
-
-	// Allocate the memory for the transmission rays
-	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
-	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*),threadMemory);
-
-	// We're in shadow
-	inShadow				=	TRUE;
-
-	// Create the rays
-	for (i=numVertices;i>0;i--,samples++) {
-		subvv(L,samples->to,samples->from);
-		const	float	d	=	lengthv(L);
-		mulvf(D,L,1/d);
-
-		// Clear the transmission
-		initv(samples->res,0,0,0);
-
-		// Create the samples
-		for (currentSample=numSamples;currentSample>0;currentSample--) {
-			// Sample a point in the cone
-			sampleCosineHemisphere(cRay->dir,D,coneAngle,transmissionGenerator);
-			movvv(cRay->from,samples->from);
-			cRay->t				=	min(maxDist,d) - bias;
-			cRay->tmin			=	bias;
-			cRay->time			=	urand();
-			cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
-			cRay->dest			=	samples->res;
-			cRay->multiplier	=	multiplier;
-			*cRays++			=	cRay++;
-			if (--numRemaining == 0) {
-				bundle.numRays		=	shootStep;
-				bundle.rays			=	(CRay **) raysBase;
-				bundle.depth		=	0;
-				bundle.last			=	0;
-				bundle.postShader	=	NULL;
-				traceEx(&bundle);
-				cRay				=	rayBase;
-				cRays				=	raysBase;
-				numRemaining		=	shootStep;
-			}
-		}
-	}
-
-	// Shoot the remaining rays
-	if (numRemaining != shootStep) {
-		bundle.numRays		=	shootStep-numRemaining;
-		bundle.rays			=	(CRay **) raysBase;
-		bundle.depth		=	0;
-		bundle.last			=	0;
-		bundle.postShader	=	NULL;
-		traceEx(&bundle);
-	}
-
-	// We're not in shadow anymore
-	inShadow		=	FALSE;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	traceReflection
-// Description			:	Trace reflection rays
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/23/2003
-void	CShadingContext::traceReflection(int numVertices,CRaySample *samples,CTextureLookup *lookup) {
-	CTraceRay			*rayBase;
-	CTraceRay			**raysBase;
-	CTraceRay			*cRay,**cRays;
-	const int			numSamples		=	lookup->numSamples;
-	const float			bias			=	lookup->shadowBias;
-	const int			shootStep		=	min(CRenderer::shootStep,numVertices*numSamples);
-	const float			coneAngle		=	lookup->coneAngle;
-	int					numRemaining	=	shootStep;
-	const float			multiplier		=	1 / (float) lookup->numSamples;
-	int					currentSample;
-	int					i;
-	CTraceBundle		bundle;
-	vector				D;
-
-	// Set the label
-	if (lookup->label == NULL)	bundle.label	=	rayLabelTransmission;
-	else						bundle.label	=	lookup->label;
-
-	// Allocate the memory
-	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
-	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
-
-	// Shoot the rays
-	for (i=numVertices;i>0;i--,samples++) {
-		subvv(D,samples->to,samples->from);
-		normalizev(D);
-		initv(samples->res,0);
-
-		for (currentSample=numSamples;currentSample>0;currentSample--) {
-			sampleCosineHemisphere(cRay->dir,D,coneAngle,traceGenerator);
-			movvv(cRay->from,samples->from);
-			cRay->time			=	urand();
-			cRay->t				=	C_INFINITY;
-			cRay->tmin			=	bias;
-			cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
-			cRay->dest			=	samples->res;
-			cRay->multiplier	=	multiplier;
-			*cRays++			=	cRay++;
-			if (--numRemaining == 0) {
-				bundle.numRays		=	shootStep;
-				bundle.rays			=	(CRay **) raysBase;
-				bundle.depth		=	0;
-				bundle.last			=	0;
-				bundle.postShader	=	NULL;
-				traceEx(&bundle);
-				cRay				=	rayBase;
-				cRays				=	raysBase;
-				numRemaining		=	shootStep;
-			}
-		}
-	}
-
-	// Shoot any remaining rays
-	if (numRemaining != shootStep) {
-		bundle.numRays		=	shootStep-numRemaining;
-		bundle.rays			=	(CRay **) raysBase;
-		bundle.depth		=	0;
-		bundle.last			=	0;
-		bundle.postShader	=	NULL;
-		traceEx(&bundle);
-	}
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -768,7 +623,7 @@ void	CShadingContext::traceReflection(int numVertices,CRaySample *samples,CTextu
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/23/2003
-float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
+float		*CShadingContext::rayDiff(const float *from,const float *dir,const float *to) {
 
 	// Allocate the return value
 	const int	numVertices	=	currentShadingState->numVertices;
@@ -776,14 +631,15 @@ float		*CShadingContext::rayDiff(const float *from,float *dir,const float *to) {
 
 	// Compute the direction vector if not already computed
 	if (dir == NULL) {
-		int	i;
+		int		i;
 
-		dir		=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);
-		for (i=numVertices;i>0;i--,dir+=3,from+=3,to+=3)	subvv(dir,to,from);
+		float	*D		=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);
+		for (i=numVertices;i>0;i--,D+=3,from+=3,to+=3)	subvv(D,to,from);
 
-		dir		-=	numVertices*3;
+		D		-=	numVertices*3;
 		from	-=	numVertices*3;
 		to		-=	numVertices*3;
+		dir		=	D;
 	}
 
 

@@ -375,6 +375,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\hcshader.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\irradiance.cpp"
 				>
 			</File>
@@ -1124,10 +1128,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\giOpcodes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\hcshader.h"
 				>
 			</File>
 			<File

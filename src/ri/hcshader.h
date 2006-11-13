@@ -53,7 +53,9 @@ public:
 		const char				*getName();
 		float					**prepare(CMemPage*&,float **,int) { return NULL;	}
 private:
-		vector					corners[4];
+		vector					corners[4];		// 4 corners of the light
+		vector					center;			// Center of the light
+		float					r;				// Radius of the light
 		vector					lightColor;		// The color of the light
 		float					intensity;		// The intensity of the light
 		int						numSamples;		// The number of samples to take

@@ -36,17 +36,6 @@
 #include "shader.h"
 #include "shading.h"
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRaySample
-// Description			:	Holds info about a ray sample
-// Comments				:	-
-// Date last edited		:	6/13/2004
-class	CRaySample {
-public:
-		float		*res;	// Where the result will be stored
-		vector		from;	// Origin
-		vector		to;		// Destination point
-};
 
 #endif
 

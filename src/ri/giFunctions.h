@@ -119,8 +119,6 @@
 #ifndef INIT_SHADING
 #define	TRANSMISSIONEXPR_PRE	TCode			*res,*op1,*op2;																	\
 								CTextureLookup	*lookup;																		\
-								CRaySample		*samples	=	(CRaySample *) ralloc(numVertices*sizeof(CRaySample),threadMemory);			\
-								CRaySample		*cSample	=	samples;														\
 								osLock(CRenderer::shaderMutex);																	\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {										\
 									int			numArguments;																	\
@@ -130,41 +128,24 @@
 								osUnlock(CRenderer::shaderMutex);																\
 								operand(0,res);																					\
 								operand(1,op1);																					\
-								operand(2,op2);
+								operand(2,op2);																					\
+								float	*L	=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);						\
+								int		t;																						\
+								for (t=0;t<numVertices;t++)	subvv(L + t*3,(float *) op1 + t*3,(float *) op2 + t*3);				\
+								traceTransmission((float *) res,(float *) op1,L,currentShadingState->numRealVertices,tags,lookup);
 
-#define	TRANSMISSIONEXPR		cSample->res	=	&res->real;																	\
-								movvv(cSample->from,&op1->real);																\
-								movvv(cSample->to,&op2->real);																	\
-								cSample++;
-
-
-#define	TRANSMISSIONEXPR_UPDATE	res	+=	3;																						\
-								op1	+=	3;																						\
-								op2	+=	3;
-
-#define	TRANSMISSIONEXPR_POST	traceTransmission(cSample-samples,samples,lookup);
 
 #else
 
 #define	TRANSMISSIONEXPR_PRE
 
-#define	TRANSMISSIONEXPR
-
-#define	TRANSMISSIONEXPR_UPDATE
-
-#define	TRANSMISSIONEXPR_POST
 
 #endif
 
-DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE,TRANSMISSIONEXPR_POST,PARAMETER_RAYTRACE)
+DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_RAYTRACE)
 
 #undef	TRANSMISSIONEXPR_PRE
 
-#undef	TRANSMISSIONEXPR
-
-#undef	TRANSMISSIONEXPR_UPDATE
-
-#undef	TRANSMISSIONEXPR_POST
 
 
 
@@ -174,6 +155,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 #define	TRACEEXPR_PRE			FUN3EXPR_PRE																					\
 								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;		\
 								const float			*ab		=	rayDiff((float *) op1,(float *) op2,NULL);						\
+								const float			*time	=	varying[VARIABLE_TIME];											\
 								vector				D;																			\
 								CRay				ray;
 
@@ -182,7 +164,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 								mulvf(ray.dir,D,1/ray.t);																		\
 								movvv(ray.from,&op1->real);																		\
 								ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;										\
-								ray.time				=	urand();															\
+								ray.time				=	*time;																\
 								ray.tmin				=	bias;																\
 								ray.t					-=	bias;																\
 								ray.da					=	ab[0];																\
@@ -194,6 +176,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMI
 
 
 #define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(1,3,3)																			\
+								time++;																							\
 								ab	+=	2;
 
 #else
@@ -331,6 +314,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 #define	VISIBILITYEXPR_PRE		FUN3EXPR_PRE																				\
 								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;	\
 								const float			*ab		=	rayDiff((float *) op1,NULL,(float *) op2);					\
+								const float			*time	=	varying[VARIABLE_TIME];										\
 								vector				D;																		\
 								CRay				ray;
 
@@ -339,7 +323,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								mulvf(ray.dir,D,1/ray.t);																	\
 								movvv(ray.from,&op1->real);																	\
 								ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;							\
-								ray.time				=	urand();														\
+								ray.time				=	*time;															\
 								ray.tmin				=	bias;															\
 								ray.t					-=	bias;															\
 								ray.da					=	ab[0];															\
@@ -351,6 +335,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								else					res[0].real	=	1;
 
 #define	VISIBILITYEXPR_UPDATE	FUN3EXPR_UPDATE(1,3,3)																		\
+								time++;																						\
 								ab	+=	2;
 
 #else

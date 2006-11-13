@@ -67,7 +67,6 @@ class	CCache;
 class	CVisorCache;
 class	CPl;
 class	CSphereLight;
-class	CRaySample;
 struct	TObjectHash;
 
 const int	SHADING_OBJECT_CACHE_SIZE	=	512;
@@ -295,12 +294,10 @@ private:
 		void					dvFloat(float *,const float *);
 		void					duVector(float *,const float *);
 		void					dvVector(float *,const float *);
-		float					*rayDiff(const float *from,float *dir,const float *to);
+		float					*rayDiff(const float *from,const float *dir,const float *to);
 
 		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
 		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);
-		void					traceTransmission(int,CRaySample *,CTextureLookup *);
-		void					traceReflection(int,CRaySample *,CTextureLookup *);
 
 		void					indirectSample(CGlobalIllumLookup *,const float *,const float *);
 		void					occlusionSample(CGlobalIllumLookup *,const float *,const float *);
