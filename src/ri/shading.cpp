@@ -657,6 +657,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 			// Sample the object again, this time at the extra shading points
 			object->sample(numRealVertices,2*numRealVertices,varying,usedParameters);
+
+			// Interpolate the various variables defined on the object
+			object->interpolate(numVertices,varying);
+
 		} else {
 			// We're shading a regular grid, so take the shortcut while computing the surface derivatives
 			float			*P;
@@ -680,6 +684,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 			// Sample the object
 			object->sample(0,numVertices,varying,usedParameters);
+
+			// Interpolate the various variables defined on the object
+			object->interpolate(numVertices,varying);
 
 			// We're rasterizing, so the derivative information is already available
 			memBegin(threadMemory);
@@ -823,6 +830,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// Sample the object
 		object->sample(0,numVertices,varying,usedParameters);
 
+		// Interpolate the various variables defined on the object
+		object->interpolate(numVertices,varying);
+
 		// Compute the I
 		if (currentRayDepth == 0) {
 			if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
@@ -838,9 +848,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 	// Clear the tags for shader execution
 	memset(currentShadingState->tags,0,numVertices*sizeof(int));
-
-	// Interpolate the various variables defined on the object
-	object->interpolate(numVertices,varying);
 
 	// Fill in the uninitialized variables from the attributes
 	if (currentAttributes->next != NULL) {
