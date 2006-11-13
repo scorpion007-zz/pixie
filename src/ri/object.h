@@ -131,12 +131,10 @@ protected:
 			class	CSurfaceTesselation {
 			public:
 					int					udiv,vdiv;				// The grid size
-					float				umin,umax,vmin,vmax;	// The range
 					float				*P;						// The P
 					int					lastRefNumber;			// Last time we accessed this grid
 					int					size;					// The size (in bytes) of the grid
 					float				r;						// The average size of the quads
-					CSurfaceTesselation	*otherTesselations;		// next tesselation for subdivided tesselations
 					CSurfaceTesselation	*next,*prev;			// To maintain the linked list
 
 			};
@@ -146,7 +144,7 @@ protected:
 			void					estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
 
 			// Find the best tesselation for this object
-			CSurfaceTesselation		*tesselate(CShadingContext *context,int depth,float umin,float umax,float vmin,float vmax,float r);
+			CSurfaceTesselation		*tesselate(CShadingContext *context,float r);
 
 			// The grid if sampled for raytracing
 			CSurfaceTesselation		*tesselationCache;

@@ -139,17 +139,14 @@ CCurve::~CCurve() {
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CCurve::interpolate(int numVertices,float **varying) const {
-	float	*v	=	varying[VARIABLE_V];
-	int		i;
 
+	// Dispatch the parameters
 	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying);
 
-	for (i=numVertices;i>0;i--) {
-		*v++	=	(gvmax - gvmin)*v[0] + gvmin;
-	}
-
-	// Make the ribbon here
-	
+	// Normalize the v parameter
+	float	*v	=	varying[VARIABLE_V];
+	int		i;
+	for (i=numVertices;i>0;i--)	*v++	=	(gvmax - gvmin)*v[0] + gvmin;
 
 	// Get the width
 	const float	*size;
@@ -164,14 +161,14 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 		sizeStep	=	0;
 	}
 
-	const float	*dPdu	=	varying[VARIABLE_DPDU];
+	float		*dPdu	=	varying[VARIABLE_DPDU];
 	float		*P		=	varying[VARIABLE_P];
 	const float	*u		=	varying[VARIABLE_U];
 	int			j;
+	vector		tmp;
 	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,size+=sizeStep) {
-		vector	tmp;
-
 		mulvf(tmp,dPdu,(*u++ - 0.5f)*size[0]);
+		mulvf(dPdu,size[0]);
 		addvv(P,tmp);
 	}
 }
@@ -189,9 +186,6 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	float	**varying		=	rasterizer->currentShadingState->varying;
 	float	*u				=	varying[VARIABLE_U];
 	float	*v				=	varying[VARIABLE_V];
-	float	*P;
-	vector	bmin,bmax;
-	int		udiv,vdiv;
 
 	// Sample 6 points on the curve
 
@@ -217,10 +211,11 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
 
 	// Compute the curve bounding box
-	P		=	varying[VARIABLE_P];
+	float	*P		=	varying[VARIABLE_P];
+	vector	bmin,bmax;
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-	int	i;
+	int		i;
 	for (i=0;i<6;i++)	addBox(bmin,bmax,P + i*3);
 
 	if (bmin[COMP_Z] < C_EPSILON) {
@@ -239,10 +234,11 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		camera2pixels(6,P);
 
 		// Estimate the dicing amount
+		int		udiv,vdiv;
 		estimateDicing(P,1,2,udiv,vdiv,attributes->shadingRate);
 
 		// Make sure we don't split along u
-		if (vdiv == 1)	udiv	=	(CRenderer::maxGridSize >> 1) - 1;
+		if (vdiv == 1)	udiv	=	min(udiv,(CRenderer::maxGridSize >> 1) - 1);
 
 		// Can we render this sucker ?
 		if ((udiv+1)*(vdiv+1) > CRenderer::maxGridSize) {
@@ -340,7 +336,6 @@ CCubicCurve::~CCubicCurve() {
 void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				i,k;
 	float			*intr,*intrStart;
-	const	float	*v					=	varying[VARIABLE_V] + start;
 	const	float	*vBasis				=	attributes->vBasis;
 	CVertexData		*variables			=	base->variables;
 	const	int		vertexSize			=	variables->vertexSize;
@@ -364,7 +359,8 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		v3		=	v2 + vs;
 	}
 
-	for (i=0;i<numVertices;i++) {
+	const	float	*v					=	varying[VARIABLE_V] + start;
+	for (i=numVertices;i>0;i--) {
 		const	float	cv				=	*v++;
 		float			vb[4];
 		float			tmp[4];
@@ -391,15 +387,15 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	// Dispatch the variables
 	variables->dispatch(intrStart,0,numVertices,varying);
 
-	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-	float		*dPdu	=	varying[VARIABLE_DPDU] + start*3;
-	const float	*P		=	varying[VARIABLE_P] + start*3;
-	float		*N		=	varying[VARIABLE_NG] + start*3;
+	float		*dPdv	=	varying[VARIABLE_DPDV]	+ start*3;
+	float		*dPdu	=	varying[VARIABLE_DPDU]	+ start*3;
+	const float	*P		=	varying[VARIABLE_P]		+ start*3;
+	float		*N		=	varying[VARIABLE_NG]	+ start*3;
 
 	v	=	varying[VARIABLE_V] + start*3;
 
 	for (i=numVertices;i>0;i--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
-		const	float	cv				=	*v++;
+		const	float	cv	= *v++;
 		float			vb[4];
 		float			tmp[4];
 
@@ -434,7 +430,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
-	float			vmid		=	(vmin + vmax) * 0.5f;
+	const float vmid = (vmin + vmax) * 0.5f;
 
 	// Create vmin - vmid group
 	rasterizer->drawObject(new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax));
@@ -507,7 +503,6 @@ CLinearCurve::~CLinearCurve() {
 void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				j,k;
 	float			*intr,*intrStart;
-	const	float	*v					=	varying[VARIABLE_V];
 	CVertexData		*variables			=	base->variables;
 	const	int		vertexSize			=	variables->vertexSize;
 	const	int		vs					=	(variables->moving ? vertexSize*2 : vertexSize);
@@ -525,6 +520,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 		v1					=	v0 + vs;
 	}
 
+	const	float	*v = varying[VARIABLE_V];
 	for (j=numVertices;j>0;j--) {
 		const	float	cv	=	*v++;
 
@@ -565,7 +561,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 // Comments				:
 // Date last edited		:	6/2/2003
 void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
-	const float		vmid				=	(vmin + vmax) * 0.5f;
+	const float		vmid = (vmin + vmax) * 0.5f;
 
 	// Create vmin - vmid group
 	rasterizer->drawObject(new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax));
@@ -602,18 +598,18 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 	stats.gprimMemory		+=	sizeof(CCurveMesh) + sizeof(int)*nc;
 
 	// Attach to the PL
-	pl			=	c;
+	pl				=	c;
 
 	// Save the data
-	numVertices	=	nv;
-	numCurves	=	nc;
-	degree		=	d;
-	nverts		=	new int[numCurves];				memcpy(nverts,nve,sizeof(int)*numCurves);
-	wrap		=	w;
+	numVertices		=	nv;
+	numCurves		=	nc;
+	degree			=	d;
+	nverts			=	new int[numCurves]; memcpy(nverts,nve,sizeof(int)*numCurves);
+	wrap			=	w;
 
 	// Extract the maximum width without touching the PL
-	sizeVariable				=	NULL;
-	maxSize						=	0;
+	sizeVariable	=	NULL;
+	maxSize			=	0;
 	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
 

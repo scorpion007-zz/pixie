@@ -78,7 +78,6 @@ public:
 					~CCurve();
 
 					// Object interface
-	void			intersect(CShadingContext *,CRay *)								{	assert(FALSE);	}
 	void			dice(CShadingContext *);
 	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 
@@ -104,9 +103,6 @@ public:
 					CCubicCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCubicCurve();
 
-					// Intersect a ray (ray/curve intersections not supported)
-	void			intersect(CShadingContext *,CRay *)		{	}
-
 					// Surface interface
 	void			sample(int,int,float **,unsigned int &) const;
 
@@ -123,9 +119,6 @@ class	CLinearCurve : public CCurve {
 public:
 					CLinearCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CLinearCurve();
-
-					// Intersect a ray (ray/curve intersections not supported)
-	void			intersect(CShadingContext *,CRay *)		{	}
 
 					// Surface interface
 	void			sample(int,int,float **,unsigned int &) const;

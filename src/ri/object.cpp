@@ -399,10 +399,9 @@ CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::~CSurface() {
-	while (tesselationCache != NULL) {
-		CSurface::CSurfaceTesselation *cTesselation = tesselationCache;
-		tesselationCache = tesselationCache->otherTesselations;
-		delete cTesselation;
+	if (tesselationCache != NULL)	{
+		delete [] tesselationCache->P;
+		delete tesselationCache;
 	}
 }
 
@@ -433,133 +432,122 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 		osLock(CRenderer::tesselateMutex);
 
 		if (tesselationCache == NULL) {
-			tesselationCache	=	tesselate(context,0,0.0f,1.0f,0.0f,1.0f,0.01f);
+			tesselationCache	=	tesselate(context,0);
 		}
 
 		osUnlock(CRenderer::tesselateMutex);
 	}
 
 	// Intersect the ray
-	CSurface::CSurfaceTesselation *cTesselation = tesselationCache;
-	
-	while (cTesselation != NULL) {
-		int			i,j;
-		const float	*cP		=	cTesselation->P;
-		const float	*r		=	cRay->from;
-		const float	*q		=	cRay->dir;
-		const int	udiv	=	cTesselation->udiv;
-		const int	vdiv	=	cTesselation->vdiv;
-		
-		const float umin = cTesselation->umin;
-		const float vmin = cTesselation->vmin;
-		const float urg = (cTesselation->umax-cTesselation->umin);
-		const float vrg = (cTesselation->vmax-cTesselation->vmin);
+	int			i,j;
+	const float	*cP		=	tesselationCache->P;
+	const float	*r		=	cRay->from;
+	const float	*q		=	cRay->dir;
+	const int	udiv	=	tesselationCache->udiv;
+	const int	vdiv	=	tesselationCache->vdiv;
 
-		for (j=0;j<vdiv;j++) {
-			for (i=0;i<udiv;i++,cP += 3) {
-				const float	*P00	=	cP;
-				const float	*P10	=	cP + 3;
-				const float	*P01	=	cP + (udiv+1)*3;
-				const float	*P11	=	P01 + 3;
-				
-				vector		a,b,c,d;
+	for (j=0;j<vdiv;j++) {
+		for (i=0;i<udiv;i++,cP += 3) {
+			const float	*P00	=	cP;
+			const float	*P10	=	cP + 3;
+			const float	*P01	=	cP + (udiv+1)*3;
+			const float	*P11	=	P01 + 3;
+			
+			vector		a,b,c,d;
 
-				subvv(a,P11,P10);
-				subvv(a,P01);
-				addvv(a,P00);
-				subvv(b,P10,P00);
-				subvv(c,P01,P00);
-				movvv(d,P00);
+			subvv(a,P11,P10);
+			subvv(a,P01);
+			addvv(a,P00);
+			subvv(b,P10,P00);
+			subvv(c,P01,P00);
+			movvv(d,P00);
 
-				const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
-				const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
-				const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
-				const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
-				const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
-				const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
-				const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
-				const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
-				
+			const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
+			const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
+			const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
+			const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
+			const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
+			const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
+			const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
+			const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
+			
 
-			#define solve()														\
-				if ((v > 0) && (v < 1)) {										\
-					{															\
-						const double	a	=	v*A2 + B2;						\
-						const double	b	=	v*(A2 - A1) + B2 - B1;			\
-						if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
-						else			u	=	(-v*C2 - D2) / a;				\
-					}															\
-																				\
-					if ((u > 0) && (u < 1)) {									\
-						double	P[3];											\
-																				\
-						P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
-						P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
-						P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
-																				\
-						if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
-							t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
-						else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
-							t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
-						else													\
-							t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
-																				\
-						if ((t > cRay->tmin) && (t < cRay->t)) {				\
-							vector	dPdu,dPdv,N;								\
-							vector	tmp1,tmp2;									\
-							subvv(tmp1,P10,P00);								\
-							subvv(tmp2,P11,P01);								\
-							interpolatev(dPdu,tmp1,tmp2,(float) v);				\
-							subvv(tmp1,P01,P00);								\
-							subvv(tmp2,P11,P10);								\
-							interpolatev(dPdv,tmp1,tmp2,(float) u);				\
-							crossvv(N,dPdu,dPdv);								\
-							if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
-							if (attributes->nSides == 1) {						\
-								if (dotvv(q,N) < 0) {							\
-									cRay->object	=	this;					\
-									cRay->u			=	(float) umin + ((float) u + i)*urg / (float) udiv;	\
-									cRay->v			=	(float) vmin + ((float) v + j)*vrg / (float) vdiv;	\
-									cRay->t			=	(float) t;				\
-									movvv(cRay->N,N);							\
-								}												\
-							} else {											\
-								cRay->object	=	this;						\
-								cRay->u			=	(float) umin + ((float) u + i)*urg / (float) udiv;		\
-								cRay->v			=	(float) vmin + ((float) v + j)*vrg / (float) vdiv;		\
-								cRay->t			=	(float) t;					\
-								movvv(cRay->N,N);								\
-							}													\
-						}														\
-					}															\
-				}
-				
+		#define solve()														\
+			if ((v > 0) && (v < 1)) {										\
+				{															\
+					const double	a	=	v*A2 + B2;						\
+					const double	b	=	v*(A2 - A1) + B2 - B1;			\
+					if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
+					else			u	=	(-v*C2 - D2) / a;				\
+				}															\
+																			\
+				if ((u > 0) && (u < 1)) {									\
+					double	P[3];											\
+																			\
+					P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
+					P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
+					P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
+																			\
+					if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
+						t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+					else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
+						t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+					else													\
+						t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+																			\
+					if ((t > cRay->tmin) && (t < cRay->t)) {				\
+						vector	dPdu,dPdv,N;								\
+						vector	tmp1,tmp2;									\
+						subvv(tmp1,P10,P00);								\
+						subvv(tmp2,P11,P01);								\
+						interpolatev(dPdu,tmp1,tmp2,(float) v);				\
+						subvv(tmp1,P01,P00);								\
+						subvv(tmp2,P11,P10);								\
+						interpolatev(dPdv,tmp1,tmp2,(float) u);				\
+						crossvv(N,dPdu,dPdv);								\
+						if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
+						if (attributes->nSides == 1) {						\
+							if (dotvv(q,N) < 0) {							\
+								cRay->object	=	this;					\
+								cRay->u			=	((float) u + i) / (float) udiv;	\
+								cRay->v			=	((float) v + j) / (float) vdiv;	\
+								cRay->t			=	(float) t;				\
+								movvv(cRay->N,N);							\
+							}												\
+						} else {											\
+							cRay->object	=	this;						\
+							cRay->u			=	((float) u + i) / (float) udiv;		\
+							cRay->v			=	((float) v + j) / (float) vdiv;		\
+							cRay->t			=	(float) t;					\
+							movvv(cRay->N,N);								\
+						}													\
+					}														\
+				}															\
+			}
+			
 
 
-				double			roots[2];
-				double			u,v,t;
+			double			roots[2];
+			double			u,v,t;
 
-				switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {
-					case 0:
-						break;
-					case 1:
-						v	=	roots[0];
-						solve();
-						break;
-					case 2:
-						v	=	roots[0];
-						solve();
-						v	=	roots[1];
-						solve();
-						break;
-				}
-
+			switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {
+				case 0:
+					break;
+				case 1:
+					v	=	roots[0];
+					solve();
+					break;
+				case 2:
+					v	=	roots[0];
+					solve();
+					v	=	roots[1];
+					solve();
+					break;
 			}
 
-			cP += 3;
 		}
-		
-		cTesselation = cTesselation->otherTesselations;
+
+		cP += 3;
 	}
 }
 
@@ -751,7 +739,7 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,int depth,float umin,float umax,float vmin,float vmax,float r) {
+CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,float r) {
 	// Get some misc variables for fast access
 	float	**varying	=	context->currentShadingState->varying;
 
@@ -759,12 +747,10 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,in
 	int		udiv		=	2;
 	int		vdiv		=	2;
 	
-	int		maxTesselationReached	=	(depth >= attributes->maxSubdivision);
-
 	while(TRUE) {
 		// Sample points on the patch
-		float	ustep		=	(umax-umin) / (float) (udiv);
-		float	vstep		=	(vmax-vmin) / (float) (vdiv);
+		const float	ustep	=	1.0f / (float) (udiv);
+		const float	vstep	=	1.0f / (float) (vdiv);
 
 		// Compute the sample positions and corresponding normal vectors
 		float	*uv			=	varying[VARIABLE_U];
@@ -772,17 +758,18 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,in
 		float	*timev		=	varying[VARIABLE_TIME];
 		int		up,vp;
 		float	u,v;
-		for (vp=vdiv+1,v=vmin;vp>0;vp--,v+=vstep) {
-			for (up=udiv+1,u=umin;up>0;up--,u+=ustep) {
+		for (vp=vdiv+1,v=0;vp>0;vp--,v+=vstep) {
+			for (up=udiv+1,u=0;up>0;up--,u+=ustep) {
 				*uv++		=	u;
 				*vv++		=	v;
 				*timev++	=	0;
 			}
 		}
 		context->displace(this,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-
-		if (maxTesselationReached) break;
 		
+		// FIXME: Remove
+		break;
+
 		// Evaluate the quality of this tesselation in u and v separately
 		int		i;
 		float	vMax	=	0;
@@ -811,65 +798,12 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,in
 
 		// Scale back if we exceeded the max shading size
 		if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize) {
-			#if 0
-			float	aspect	=	uAvg / vAvg;
+			const float	aspect	=	uAvg / vAvg;
 			nvdiv	=	(int) floor(sqrtf(CRenderer::maxGridSize / aspect))-1;
 			nudiv	=	(int) floor(nvdiv*aspect)-1;
 						
 			assert ((nudiv+1)*(nvdiv+1) <= CRenderer::maxGridSize);
-			maxTesselationReached = TRUE;
-			
-			#else
-			// TODO: allow multiple shades in multiple patches, and reconstruct.
-			// TODO: begin-end time samples
-			//break;
-			if (nvdiv == nudiv) {
-				float 		umid			=	(umin + umax) / (float) 2;
-				float 		vmid			=	(vmin + vmax) / (float) 2;
-				
-				CSurface::CSurfaceTesselation *a = tesselate(context,depth+1,umin,umid,vmin,vmid,r);
-				CSurface::CSurfaceTesselation *b = tesselate(context,depth+1,umid,umax,vmin,vmid,r);
-				CSurface::CSurfaceTesselation *c = tesselate(context,depth+1,umid,umax,vmid,vmax,r);
-				CSurface::CSurfaceTesselation *d = tesselate(context,depth+1,umin,umid,vmid,vmax,r);
-				
-				CSurface::CSurfaceTesselation *ct = a;
-				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
-				ct->otherTesselations = b;
-				
-				ct = b;
-				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
-				ct->otherTesselations = c;
-				
-				ct = c;
-				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
-				ct->otherTesselations = d;
-				
-				return a;
-				
-			} else if (nudiv > nvdiv) {
-				float 		umid			=	(umin + umax) / (float) 2;
-				
-				CSurface::CSurfaceTesselation *a = tesselate(context,depth+1,umin,umid,vmin,vmax,r);
-				CSurface::CSurfaceTesselation *b = tesselate(context,depth+1,umid,umax,vmin,vmax,r);
-				
-				CSurface::CSurfaceTesselation *ct = a;
-				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
-				ct->otherTesselations = b;
-								
-				return a;
-			} else {
-				float 		vmid			=	(vmin + vmax) / (float) 2;
-				
-				CSurface::CSurfaceTesselation *a = tesselate(context,depth+1,umin,umax,vmin,vmid,r);
-				CSurface::CSurfaceTesselation *b = tesselate(context,depth+1,umin,umax,vmid,vmax,r);
-				
-				CSurface::CSurfaceTesselation *ct = a;
-				while(ct->otherTesselations != NULL) ct = ct->otherTesselations;
-				ct->otherTesselations = b;
-								
-				return a;
-			}
-			#endif
+			break;
 		}
 
 		// Do another iteration
@@ -880,17 +814,10 @@ CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,in
 	// At this point, I should have the tesselation. So create the grid and return it
 	CSurfaceTesselation	*newTesselationCache	=	new CSurfaceTesselation;
 	newTesselationCache->udiv					=	udiv;
-	newTesselationCache->vdiv					=	vdiv;
-	
-	newTesselationCache->umin					=	umin;
-	newTesselationCache->umax					=	umax;
-	newTesselationCache->vmin					=	vmin;
-	newTesselationCache->vmax					=	vmax;
-	
+	newTesselationCache->vdiv					=	vdiv;		
 	newTesselationCache->lastRefNumber			=	-1;
 	newTesselationCache->P						=	new float[(udiv+1)*(vdiv+1)*3];
 	newTesselationCache->size					=	(udiv+1)*(vdiv+1)*3*sizeof(float);
-	newTesselationCache->otherTesselations		=	NULL;
 	
 	memcpy(newTesselationCache->P,varying[VARIABLE_P],(udiv+1)*(vdiv+1)*3*sizeof(float));
 

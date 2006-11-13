@@ -70,16 +70,19 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 			int			i,j;
 			const float	*u			=	currentShadingState->varying[VARIABLE_U];
 
+			assert(uVertices >= 2);
+			assert(vVertices >= 2);
+
 			for (j=vVertices;j>0;j--) {
-				*dest++	=	(src[1] - src[0]) / (u[1] - u[0]);
+				*dest++	=	(src[1] - src[0]) / (u[1] - u[0]);			assert(u[1] > u[0]);
 				src++;
 				u++;
 				for (i=uVertices-2;i>0;i--) {
-					*dest++	=	(src[1] - src[-1]) / (u[1] - u[-1]);
+					*dest++	=	(src[1] - src[-1]) / (u[1] - u[-1]);	assert(u[1] > u[-1]);
 					src++;
 					u++;
 				}
-				*dest++	=	(src[0] - src[-1]) / (u[0] - u[-1]);
+				*dest++	=	(src[0] - src[-1]) / (u[0] - u[-1]);		assert(u[0] > u[-1]);
 				src++;
 				u++;
 			}
@@ -97,6 +100,9 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 			int			i;
 
 			for (i=numRealVertices;i>0;i--) {
+
+				assert(*du != 0);
+
 				const float	val	=	(dsrc[0] - src[0]) / (*du++);
 
 				ddest[0]		=	val;
@@ -145,23 +151,26 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 			int			i,j;
 			const float	*v			=	currentShadingState->varying[VARIABLE_V];
 
+			assert(uVertices >= 2);
+			assert(vVertices >= 2);
+
 			for (j=0;j<uVertices;j++) {
 				float		*cRes	=	dest + j;
 				const float	*cOp	=	src + j;
 				const float	*cv		=	v + j;
-				cRes[0]				=	(cOp[uVertices] - cOp[0]) / (cv[uVertices] - cv[0]);
+				cRes[0]				=	(cOp[uVertices] - cOp[0]) / (cv[uVertices] - cv[0]);	assert(cv[uVertices] > cv[0]);
 				cRes				+=	uVertices;
 				cOp					+=	uVertices;
 				cv					+=	uVertices;
 
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]		=	(cOp[uVertices] - cOp[-uVertices]) / (cv[uVertices] - cv[-uVertices]);
+					cRes[0]		=	(cOp[uVertices] - cOp[-uVertices]) / (cv[uVertices] - cv[-uVertices]);	assert(cv[uVertices] > cv[-uVertices]);
 					cRes		+=	uVertices;
 					cOp			+=	uVertices;
 					cv			+=	uVertices;
 				}
 
-				cRes[0]			=	(cOp[0] - cOp[-uVertices]) / (cv[0] - cv[-uVertices]);
+				cRes[0]			=	(cOp[0] - cOp[-uVertices]) / (cv[0] - cv[-uVertices]);	assert(cv[0] > cv[-uVertices]);
 			}
 		}
 		break;
@@ -178,6 +187,9 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 			assert(numVertices == numRealVertices*3);
 
 			for (int i=numRealVertices;i>0;i--) {
+
+				assert(*dv != 0);
+
 				const float	val	=	(dsrc[1] - src[0]) / (*dv++);
 
 				ddest[0]		=	val;
@@ -251,15 +263,18 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 			int			i,j;
 			const float	*u			=	currentShadingState->varying[VARIABLE_U];
 
+			assert(uVertices >= 2);
+			assert(vVertices >= 2);
+
 			for (j=vVertices;j>0;j--) {
-				float	invDu	=	1 / (u[1] - u[0]);
+				float	invDu	=	1 / (u[1] - u[0]);	assert(u[1] > u[0]);
 				*dest++	=	(src[3] - src[0]) * invDu;
 				*dest++	=	(src[4] - src[1]) * invDu;
 				*dest++	=	(src[5] - src[2]) * invDu;
 				src		+=	3;
 				u++;
 				for (i=uVertices-2;i>0;i--) {
-					invDu	=	1 / (u[1] - u[-1]);
+					invDu	=	1 / (u[1] - u[-1]);		assert(u[1] > u[-1]);
 					*dest++	=	(src[3] - src[-3]) * invDu;
 					*dest++	=	(src[4] - src[-2]) * invDu;
 					*dest++	=	(src[5] - src[-1]) * invDu;
@@ -267,7 +282,7 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 					u++;
 				}
 
-				invDu	=	1 / (u[0] - u[-1]);
+				invDu	=	1 / (u[0] - u[-1]);			assert(u[0] > u[-1]);
 				*dest++	=	(src[0] - src[-3]) * invDu;
 				*dest++	=	(src[1] - src[-2]) * invDu;
 				*dest++	=	(src[2] - src[-1]) * invDu;
@@ -288,6 +303,9 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 			int			i;
 
 			for (i=numRealVertices;i>0;i--) {
+
+				assert(*du != 0);
+
 				const float	invDu	=	1 / (*du++);
 				const float	val0	=	(dsrc[0] - src[0]) * invDu;
 				const float	val1	=	(dsrc[1] - src[1]) * invDu;
@@ -346,13 +364,16 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			int			i,j;
 			const float	*v			=	currentShadingState->varying[VARIABLE_V];
 
+			assert(uVertices >= 2);
+			assert(vVertices >= 2);
+
 			for (j=0;j<uVertices;j++) {
 				float		invDv;
 				float		*cRes	=	dest + j*3;
 				const float	*cOp	=	src + j*3;
 				const float	*cv		=	v + j;
 
-				invDv				=	1 / (cv[uVertices] - cv[0]);
+				invDv				=	1 / (cv[uVertices] - cv[0]);	assert(cv[uVertices] > cv[0]);
 
 				cRes[0]				=	(cOp[uVertices*3+0] - cOp[0]) * invDv;
 				cRes[1]				=	(cOp[uVertices*3+1] - cOp[1]) * invDv;
@@ -362,7 +383,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 				cv					+=	uVertices;
 
 				for (i=vVertices-2;i>0;i--) {
-					invDv			=	1 / (cv[uVertices] - cv[-uVertices]);
+					invDv			=	1 / (cv[uVertices] - cv[-uVertices]);	assert(cv[uVertices] > cv[-uVertices]);
 
 					cRes[0]			=	(cOp[uVertices*3+0] - cOp[-uVertices*3+0]) * invDv;
 					cRes[1]			=	(cOp[uVertices*3+1] - cOp[-uVertices*3+1]) * invDv;
@@ -372,7 +393,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 					cv				+=	uVertices;
 				}
 
-				invDv				=	1 / (cv[0] - cv[-uVertices]);
+				invDv				=	1 / (cv[0] - cv[-uVertices]);			assert(cv[0] > cv[-uVertices]);
 				cRes[0]				=	(cOp[0] - cOp[-uVertices*3+0]) * invDv;
 				cRes[1]				=	(cOp[1] - cOp[-uVertices*3+1]) * invDv;
 				cRes[2]				=	(cOp[2] - cOp[-uVertices*3+2]) * invDv;
@@ -393,6 +414,9 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			assert(numVertices == numRealVertices*3);
 
 			for (i=numRealVertices;i>0;i--) {
+
+				assert(*dv > 0);
+
 				const float	invDv	=	1 / (*dv++);
 				const float	val0	=	(dsrc[3] - src[0]) * invDv;
 				const float	val1	=	(dsrc[4] - src[1]) * invDv;

@@ -255,14 +255,18 @@ void		CPhotonHider::solarBegin(const float *L,const float *theta) {
 // Comments				:
 // Date last edited		:	3/7/2003
 void		CPhotonHider::solarEnd() {
-	int		numVertices	=	currentShadingState->numVertices;
-	float	**varying	=	currentShadingState->varying;
+	int			numVertices	=	currentShadingState->numVertices;
+	float		**varying	=	currentShadingState->varying;
 
 	// Photon casting
-	float	*Ps	=	varying[VARIABLE_PS];
-	float	*L	=	varying[VARIABLE_L];
-	float	*Cl	=	varying[VARIABLE_CL];
-	int		i;
+	float		*Ps	=	varying[VARIABLE_PS];
+	float		*L	=	varying[VARIABLE_L];
+	float		*Cl	=	varying[VARIABLE_CL];
+	int			i;
+
+	// Compute the ray differential
+	// da = 0 because all the photons are parallel
+	const float	db	=	sqrt((worldRadius * worldRadius) / (float) CRenderer::numEmitPhotons);
 
 	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 		vector		T;
@@ -309,7 +313,7 @@ void		CPhotonHider::solarEnd() {
 			mulvf(T,L,worldRadius);
 			subvv(Ps,T);
 			mulvf(Cc,powerScale*photonPower);
-			tracePhoton(Ps,L,Cc,wavelen,0,0);
+			tracePhoton(Ps,L,Cc,wavelen,0,db);
 		}
 	} else {
 		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
@@ -318,7 +322,7 @@ void		CPhotonHider::solarEnd() {
 			mulvf(T,L,worldRadius);
 			subvv(Ps,T);
 			mulvf(Cl,powerScale*photonPower);
-			tracePhoton(Ps,L,Cl,0.5,0,0);
+			tracePhoton(Ps,L,Cl,0.5,0,db);
 		}
 	}
 }
@@ -341,6 +345,9 @@ void		CPhotonHider::illuminateBegin(const float *P,const float *N,const float *t
 		// We must be a point light source
 		powerScale		=	(float) (4*C_PI);
 
+		// Save the tangent of the angle for the ray differential
+		varying[VARIABLE_PW][0]			=	DEFAULT_RAY_DA;
+
 		for (;numVertices>0;numVertices--,shaderPs+=3,shaderL+=3) {
 			// Sample a direction in the unit sphere
 			do {
@@ -362,7 +369,7 @@ void		CPhotonHider::illuminateBegin(const float *P,const float *N,const float *t
 		assert(N != NULL);
 
 		// Save the tangent of the angle for the ray differential
-		varying[VARIABLE_PW][0]			=	tanf(theta[0]);
+		varying[VARIABLE_PW][0]			=	min(DEFAULT_RAY_DA,tanf(theta[0]));
 
 		for (;numVertices>0;numVertices--,shaderPs+=3,shaderL+=3) {
 
@@ -478,8 +485,10 @@ void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength,floa
 
 	// The intersection bias
 	ray.tmin				=	bias;
-	ray.da					=	min(da,DEFAULT_RAY_DA);
-	ray.db					=	max(db,DEFAULT_RAY_DB);
+	ray.da					=	da;
+	ray.db					=	db;
+
+	assert(da <= DEFAULT_RAY_DA);
 
 processBounce:;
 

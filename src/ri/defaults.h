@@ -35,7 +35,7 @@
 #define	DEFAULT_TILE_SIZE	32
 
 // The default ray differential for photon/irradiance cache
-#define DEFAULT_RAY_DA		0.01f
+#define DEFAULT_RAY_DA		0.5f
 #define	DEFAULT_RAY_DB		0
 
 #endif
