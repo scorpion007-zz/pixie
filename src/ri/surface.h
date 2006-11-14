@@ -41,7 +41,7 @@
 // Date last edited		:	6/4/2003
 class	CPatch : public CObject {
 public:
-							CPatch(CAttributes *,CXform *,CSurface *,float,float,float,float,int,int);
+							CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth);
 							~CPatch();
 
 
@@ -51,9 +51,6 @@ public:
 
 private:
 	void					splitToChildren(CShadingContext *,int);
-	void					diceNew(CShadingContext *);
-	int						diceStats(CShadingContext *,float *,float *,int,int,int &,int &);
-	int						diceStats(CShadingContext *,float *,float *,int,int);
 
 	int						depth;							// Depth of the patch
 	int						minDepth;						// The minimum depth of the patch
@@ -62,6 +59,45 @@ private:
 	int						udiv,vdiv;						// The split amounts
 };
 
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTesselationPatch
+// Description			:	Encapsulates a piece of 2D surface
+// Comments				:
+// Date last edited		:	11/13/2006
+class	CTesselationPatch : public CObject {
+public:
+							CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth);
+							~CTesselationPatch();
+
+
+	void					intersect(CShadingContext *,CRay *) { assert(FALSE); }
+	void					dice(CShadingContext *) { assert(FALSE) };
+	void					instantiate(CAttributes *,CXform *,CRendererContext *) const { assert(FALSE);	}
+
+	
+	void					intersect(CShadingContext *,CRay *,float requiredR);
+	// FIXME: should be private??
+	void	tesselate(CShadingContext *context,int saveP);
+private:
+
+	int						depth;							// Depth of the patch
+	int						minDepth;						// The minimum depth of the patch
+	CSurface				*object;						// The object the surface belongs to
+	float					umin,umax,vmin,vmax;			// The parametric extend of the surface
+	int						udiv,vdiv;						// The split amounts
+	
+	float					*P;						// The P
+	CTesselationPatch		*subTesselations[4];
+	int						numTesselations;
+	int						lastRefNumber;			// Last time we accessed this grid
+	int						size;					// The size (in bytes) of the grid
+	float					ru,rv,r;				// The average size of the quads in u and v
+	CTesselationPatch		*next,*prev;			// To maintain the linked list
+
+};
 
 #endif
 

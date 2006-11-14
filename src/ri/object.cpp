@@ -30,8 +30,6 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
-#include "common/global.h"
-#include "common/polynomial.h"
 #include "object.h"
 #include "error.h"
 #include "ri.h"
@@ -388,7 +386,7 @@ void			CDummyObject::intersect(CShadingContext *,CRay *) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
-	tesselationCache	=	NULL;
+	tesselationTree		=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -399,10 +397,7 @@ CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
 // Comments				:
 // Date last edited		:	10/16/2001
 CSurface::~CSurface() {
-	if (tesselationCache != NULL)	{
-		delete [] tesselationCache->P;
-		delete tesselationCache;
-	}
+	if (tesselationTree != NULL) delete tesselationTree;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -425,130 +420,27 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 		}
 	}
 
-
-
 	// Do we have a grid ?
-	if (tesselationCache == NULL) {
+	if (tesselationTree == NULL) {
 		osLock(CRenderer::tesselateMutex);
 
-		if (tesselationCache == NULL) {
-			tesselationCache	=	tesselate(context,0);
+		if (tesselationTree == NULL) {
+			tesselationTree		=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0);
+			tesselationTree->tesselate(context,FALSE);
+			// FIXME: we tesselate (but do not save) the coarsest level to get an accurate
+			// r estimate for the grid to start things off.  
+			// Q: Can we do this without firing the tesselation off?
+			// A: perhaps, but we definitely need r accurate as subdivision will use this to
+			// guess their r without tesselation
 		}
 
 		osUnlock(CRenderer::tesselateMutex);
 	}
 
-	// Intersect the ray
-	int			i,j;
-	const float	*cP		=	tesselationCache->P;
-	const float	*r		=	cRay->from;
-	const float	*q		=	cRay->dir;
-	const int	udiv	=	tesselationCache->udiv;
-	const int	vdiv	=	tesselationCache->vdiv;
-
-	for (j=0;j<vdiv;j++) {
-		for (i=0;i<udiv;i++,cP += 3) {
-			const float	*P00	=	cP;
-			const float	*P10	=	cP + 3;
-			const float	*P01	=	cP + (udiv+1)*3;
-			const float	*P11	=	P01 + 3;
-			
-			vector		a,b,c,d;
-
-			subvv(a,P11,P10);
-			subvv(a,P01);
-			addvv(a,P00);
-			subvv(b,P10,P00);
-			subvv(c,P01,P00);
-			movvv(d,P00);
-
-			const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
-			const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
-			const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
-			const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
-			const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
-			const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
-			const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
-			const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
-			
-
-		#define solve()														\
-			if ((v > 0) && (v < 1)) {										\
-				{															\
-					const double	a	=	v*A2 + B2;						\
-					const double	b	=	v*(A2 - A1) + B2 - B1;			\
-					if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
-					else			u	=	(-v*C2 - D2) / a;				\
-				}															\
-																			\
-				if ((u > 0) && (u < 1)) {									\
-					double	P[3];											\
-																			\
-					P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
-					P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
-					P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
-																			\
-					if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
-						t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
-					else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
-						t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
-					else													\
-						t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
-																			\
-					if ((t > cRay->tmin) && (t < cRay->t)) {				\
-						vector	dPdu,dPdv,N;								\
-						vector	tmp1,tmp2;									\
-						subvv(tmp1,P10,P00);								\
-						subvv(tmp2,P11,P01);								\
-						interpolatev(dPdu,tmp1,tmp2,(float) v);				\
-						subvv(tmp1,P01,P00);								\
-						subvv(tmp2,P11,P10);								\
-						interpolatev(dPdv,tmp1,tmp2,(float) u);				\
-						crossvv(N,dPdu,dPdv);								\
-						if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
-						if (attributes->nSides == 1) {						\
-							if (dotvv(q,N) < 0) {							\
-								cRay->object	=	this;					\
-								cRay->u			=	((float) u + i) / (float) udiv;	\
-								cRay->v			=	((float) v + j) / (float) vdiv;	\
-								cRay->t			=	(float) t;				\
-								movvv(cRay->N,N);							\
-							}												\
-						} else {											\
-							cRay->object	=	this;						\
-							cRay->u			=	((float) u + i) / (float) udiv;		\
-							cRay->v			=	((float) v + j) / (float) vdiv;		\
-							cRay->t			=	(float) t;					\
-							movvv(cRay->N,N);								\
-						}													\
-					}														\
-				}															\
-			}
-			
-
-
-			double			roots[2];
-			double			u,v,t;
-
-			switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {
-				case 0:
-					break;
-				case 1:
-					v	=	roots[0];
-					solve();
-					break;
-				case 2:
-					v	=	roots[0];
-					solve();
-					v	=	roots[1];
-					solve();
-					break;
-			}
-
-		}
-
-		cP += 3;
-	}
+	float t = nearestBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t);
+	float r = cRay->da * t + cRay->db;
+	
+	tesselationTree->intersect(context,cRay,r);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -637,189 +529,70 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 	context->shade(this,numRays,1,SHADING_2D,0);
 }
 
-
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CSurface
-// Method				:	estimateShadingRate
-// Description			:	Estimate the shading rate
-// Return Value			:
-// Comments				:	P must be in pixels
-// Date last edited		:	10/16/2001
-float				CSurface::estimateShadingRate(const float *P0,const float *P1) {
-	return attributes->shadingRate;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurface
-// Method				:	estimateDicing
-// Description			:	Estimate the dicing size on the screen
-// Return Value			:
-// Comments				:	P must be in pixels
-// Date last edited		:	10/16/2001
-void				CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float motionFactor) {
-	float		uAvg,vAvg;	// The average edge length
-	float		uMin,vMin;	// The minimum edge length
-	float		uMax,vMax;	// The maximum edge length
-	int			numU,numV;
-	int			i,j;
-	const float	*cP,*nP,*tP;
-	float		l;
-	float		dx,dy;
-
-	uAvg	=	vAvg	=	0;
-	uMax	=	vMax	=	0;
-	uMin	=	vMin	=	C_INFINITY;
-	numU	=	numV	=	0;
-
-	// U stats
-	cP	=	P;
-	for (j=(vdiv+1);j>0;j--) {
-		for (i=udiv;i>0;i--,cP+=3) {
-			dx		=	cP[3 + COMP_X] - cP[COMP_X];
-			dy		=	cP[3 + COMP_Y] - cP[COMP_Y];
-			l		=	sqrtf(dx*dx + dy*dy);
-			uAvg	+=	l;	numU++;
-			if (l < uMin)	uMin	=	l;
-			if (l > uMax)	uMax	=	l;
-		}
-		cP	+=	3;
-	}
-
-	// V stats
-	cP	=	P;
-	for (i=(udiv+1);i>0;i--,cP+=3) {
-		nP	=	cP;
-		tP	=	nP	+	(udiv+1)*3;
-		for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
-			dx		=	tP[COMP_X] - nP[COMP_X];
-			dy		=	tP[COMP_Y] - nP[COMP_Y];
-			l		=	sqrtf(dx*dx + dy*dy);
-			vAvg	+=	l;	numV++;
-			if (l < vMin)	vMin	=	l;
-			if (l > vMax)	vMax	=	l;
-		}
-	}
-
-	// Compute the new grid size
-	nudiv	=	(int) (uAvg*udiv / (attributes->shadingRate*numU));
-	nvdiv	=	(int) (vAvg*vdiv / (attributes->shadingRate*numV));
+// Class			   :   CSurface
+// Method			   :   estimateShadingRate
+// Description		   :   Estimate the shading rate
+// Return Value			   :
+// Comments				   :   P must be in pixels
+// Date last edited		   :   10/16/2001
+float			   CSurface::estimateShadingRate(const float *P0,const float *P1) {
+   return attributes->shadingRate;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////
-// Function				:	checkAngle
-// Description			:	This function takes P and returns the cosine of the minimum angle deviation
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-static	inline	float	measureLength(const float *P,int step,int num) {
-	float	length	=	0;
+// Class			   :   CSurface
+// Method			   :   estimateDicing
+// Description		   :   Estimate the dicing size on the screen
+// Return Value			   :
+// Comments				   :   P must be in pixels
+// Date last edited		   :   10/16/2001
+void			   CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float motionFactor) {
+   float	   uAvg,vAvg;  // The average edge length
+   float	   uMin,vMin;  // The minimum edge length
+   float	   uMax,vMax;  // The maximum edge length
+   int		   numU,numV;
+   int		   i,j;
+   const float *cP,*nP,*tP;
+   float	   l;
+   float	   dx,dy;
 
-	for (;num>0;num--) {
-		const float	*Pn		=	P + step;
-		vector		D;
+   uAvg	   =   vAvg	   =   0;
+   uMax	   =   vMax	   =   0;
+   uMin	   =   vMin	   =   C_INFINITY;
+   numU	   =   numV	   =   0;
 
-		subvv(D,Pn,P);
-		length	+=	lengthv(D);
+   // U stats
+   cP  =   P;
+   for (j=(vdiv+1);j>0;j--) {
+	   for (i=udiv;i>0;i--,cP+=3) {
+		   dx	   =   cP[3 + COMP_X] - cP[COMP_X];
+		   dy	   =   cP[3 + COMP_Y] - cP[COMP_Y];
+		   l	   =   sqrtf(dx*dx + dy*dy);
+	uAvg	+=	l;	numU++;
+		   if (l < uMin)   uMin	   =   l;
+		   if (l > uMax)   uMax	   =   l;
+	   }
+	   cP  +=  3;
+   }
 
-		P					=	Pn;
-	}
+   // V stats
+   cP  =   P;
+   for (i=(udiv+1);i>0;i--,cP+=3) {
+	   nP  =   cP;
+	   tP  =   nP  +   (udiv+1)*3;
+	   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+		   dx	   =   tP[COMP_X] - nP[COMP_X];
+		   dy	   =   tP[COMP_Y] - nP[COMP_Y];
+		   l	   =   sqrtf(dx*dx + dy*dy);
+		   vAvg	   +=  l;  numV++;
+		   if (l < vMin)   vMin	   =   l;
+		   if (l > vMax)   vMax	   =   l;
+	   }
+   }
 
-	return length;
-}
-
-
-//#include "debug.h"
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurface
-// Method				:	tesselate
-// Description			:	Find the best tesselation for this object
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-CSurface::CSurfaceTesselation			*CSurface::tesselate(CShadingContext *context,float r) {
-	// Get some misc variables for fast access
-	float	**varying	=	context->currentShadingState->varying;
-
-	// Start with a 3x3 sampling grid
-	int		udiv		=	2;
-	int		vdiv		=	2;
-	
-	while(TRUE) {
-		// Sample points on the patch
-		const float	ustep	=	1.0f / (float) (udiv);
-		const float	vstep	=	1.0f / (float) (vdiv);
-
-		// Compute the sample positions and corresponding normal vectors
-		float	*uv			=	varying[VARIABLE_U];
-		float	*vv			=	varying[VARIABLE_V];
-		float	*timev		=	varying[VARIABLE_TIME];
-		int		up,vp;
-		float	u,v;
-		for (vp=vdiv+1,v=0;vp>0;vp--,v+=vstep) {
-			for (up=udiv+1,u=0;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
-				*timev++	=	0;
-			}
-		}
-		context->displace(this,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-		
-		// FIXME: Remove
-		break;
-
-		// Evaluate the quality of this tesselation in u and v separately
-		int		i;
-		float	vMax	=	0;
-		float	vAvg	=	0;
-		for (i=0;i<=udiv;i++) {
-			const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv-1);
-			vMax			=	max(vMax,l);
-			vAvg			+=	l;
-		}
-
-		float	uMax	=	0;
-		float	uAvg	=	0;
-		for (i=0;i<=vdiv;i++) {
-			const float	l	=	measureLength(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv-1);
-			uMax			=	max(uMax,l);
-			uAvg			+=	l;
-		}
-
-		uAvg	/=	(float) (vdiv+1);
-		vAvg	/=	(float) (udiv+1);
-
-		int	nudiv	=	max((int) (uAvg / r),2);
-		int	nvdiv	=	max((int) (vAvg / r),2);
-
-		if ((nudiv == udiv) && (nvdiv == vdiv))	break;
-
-		// Scale back if we exceeded the max shading size
-		if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize) {
-			const float	aspect	=	uAvg / vAvg;
-			nvdiv	=	(int) floor(sqrtf(CRenderer::maxGridSize / aspect))-1;
-			nudiv	=	(int) floor(nvdiv*aspect)-1;
-						
-			assert ((nudiv+1)*(nvdiv+1) <= CRenderer::maxGridSize);
-			break;
-		}
-
-		// Do another iteration
-		udiv	=	nudiv;
-		vdiv	=	nvdiv;
-	}
-
-	// At this point, I should have the tesselation. So create the grid and return it
-	CSurfaceTesselation	*newTesselationCache	=	new CSurfaceTesselation;
-	newTesselationCache->udiv					=	udiv;
-	newTesselationCache->vdiv					=	vdiv;		
-	newTesselationCache->lastRefNumber			=	-1;
-	newTesselationCache->P						=	new float[(udiv+1)*(vdiv+1)*3];
-	newTesselationCache->size					=	(udiv+1)*(vdiv+1)*3*sizeof(float);
-	
-	memcpy(newTesselationCache->P,varying[VARIABLE_P],(udiv+1)*(vdiv+1)*3*sizeof(float));
-
-	return newTesselationCache;
+   // Compute the new grid size
+   nudiv   =   (int) (uAvg*udiv / (attributes->shadingRate*numU));
+   nvdiv   =   (int) (vAvg*vdiv / (attributes->shadingRate*numV));
 }

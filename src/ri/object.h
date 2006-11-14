@@ -46,9 +46,11 @@ class	CVariable;
 class	CShadingContext;
 class	CVolume;
 class	CRendererContext;
+class	CTesselationPatch;
 
 // Various object flags
 const unsigned int	OBJECT_DUMMY			=	1;	// Set if the object is a dummy object
+const unsigned int	OBJECT_TESSELATION		=	2;	// Set if the object is an intermediate tesselation
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
@@ -128,26 +130,12 @@ public:
 
 protected:
 
-			class	CSurfaceTesselation {
-			public:
-					int					udiv,vdiv;				// The grid size
-					float				*P;						// The P
-					int					lastRefNumber;			// Last time we accessed this grid
-					int					size;					// The size (in bytes) of the grid
-					float				r;						// The average size of the quads
-					CSurfaceTesselation	*next,*prev;			// To maintain the linked list
-
-			};
 
 			// The following two functions can be used to estimate the shading rate and the dicing amount
 			float					estimateShadingRate(const float *P0,const float *P1);
 			void					estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
 
-			// Find the best tesselation for this object
-			CSurfaceTesselation		*tesselate(CShadingContext *context,float r);
-
-			// The grid if sampled for raytracing
-			CSurfaceTesselation		*tesselationCache;
+			CTesselationPatch		*tesselationTree;
 };
 
 #endif

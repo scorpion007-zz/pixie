@@ -30,11 +30,14 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
+#include "common/global.h"
+#include "common/polynomial.h"
 #include "surface.h"
 #include "memory.h"
 #include "stats.h"
 #include "shading.h"
 #include "renderer.h"
+#include "rendererContext.h"
 #include "error.h"
 
 
@@ -451,300 +454,427 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 
 
 
+
+
+
+
+
+//FIXMES:
+/*
+make r,ru,rv guesses constructor params
+remove minDepth stuff
+remove udiv,vdiv
+support untesselation
+	mutex per patch?
+
+*/
+
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
-// Method				:	diceNew
-// Description			:	The new version of dice
+// Method				:	CPatch
+// Description			:	Ctor
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/4/2003
-void		CPatch::diceNew(CShadingContext *r) {
-	vector					bmin,bmax;
-	int						up,vp;
-	float					u,v;
-	float					ustep,vstep;
-	float					ustart,vstart;
-	float					**varying;
-	float					*uv;
-	float					*vv;
-	float					*timev;
-	int						cullFlags;
-	int						disableCull;
-	int						nudiv,nvdiv,splitDecision;
+CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth) : CObject(a,x) {
+	// Record the stuff
+	this->object	=	o;
+	this->umin		=	umin;
+	this->umax		=	umax;
+	this->vmin		=	vmin;
+	this->vmax		=	vmax;
+	this->depth		=	depth;
+	this->minDepth	=	minDepth;
+	this->udiv		=	-1;
+	this->vdiv		=	-1;
+	movvv(this->bmin,o->bmin);
+	movvv(this->bmax,o->bmax);
+	
+	this->ru		=
+		this->rv	=
+		this->r 	=	C_INFINITY;
+	
+	this->P = NULL;
+	this->subTesselations[0]	= 
+		this->subTesselations[1] = 
+		this->subTesselations[2] = 
+		this->subTesselations[3] = NULL;
+	numTesselations = 0;
+}
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPatch
+// Method				:	~CPatch
+// Description			:	Dtor
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	6/4/2003
+CTesselationPatch::~CTesselationPatch() {
+	// clean up tesselations
+	delete[] P;
+	for (int i=0;i<numTesselations;i++)	{
+		delete subTesselations[i]; 
+	}
+}
+
+
+void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay,float requiredR) {
+	
+	// trivially reject using bounds	
+	if(P != NULL && depth > 1) {	// FIXME: convert P!=NULL to check if we've been tesselated ever
+		// Only do so for tesselations > 2 deep, others will be too coarse
+		// FIXME: we should do better here
+		if (!intersectBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t)) return;
+	}
+	
+	// recurse if r is insufficient
+	if (r > 2*requiredR && depth < 5) {	// FIXME: make this a user controllable parameter
+		// Make subtesselations if they don't exist
+		
+		if (numTesselations == 0) {
+			osLock(CRenderer::tesselateMutex);
+
+			if (numTesselations == 0) {
+				if (ru > 2*rv) {
+					// dice u 1st
+					float umid				=	(umin + umax) / (float) 2;
+					subTesselations[0]		=	new CTesselationPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
+					subTesselations[1]		=	new CTesselationPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
+					subTesselations[0]->ru	=	ru/2.0f;	// we'll calculate this again on tesselation
+					subTesselations[0]->rv	=	rv;
+					subTesselations[0]->r	=	r/2.0f;
+					subTesselations[1]->ru	=	ru/2.0f;
+					subTesselations[1]->rv	=	rv;
+					subTesselations[1]->r	=	r/2.0f;
+					numTesselations			=	2;
+					//fprintf(stderr," US %f %f %f\n",ru/2.0f,rv,r/2.0f);
+				} else if (rv > 2*ru) {
+					// dice v 1st
+					float vmid				=	(vmin + vmax) / (float) 2;
+					subTesselations[0]		=	new CTesselationPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);
+					subTesselations[1]		=	new CTesselationPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);
+					subTesselations[0]->ru	=	ru;			// we'll calculate this again on tesselation
+					subTesselations[0]->rv	=	rv/2.0f;
+					subTesselations[0]->r	=	r/2.0f;
+					subTesselations[1]->ru	=	ru;
+					subTesselations[1]->rv	=	rv/2.0f;
+					subTesselations[1]->r	=	r/2.0f;
+					numTesselations			=	2;
+					//fprintf(stderr," VS %f %f %f\n",ru,rv/2.0f,r/2.0f);
+				} else {
+					// dice both
+					float umid				=	(umin + umax) / (float) 2;
+					float vmid				=	(vmin + vmax) / (float) 2;
+					subTesselations[0]		=	new CTesselationPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);
+					subTesselations[1]		=	new CTesselationPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);
+					subTesselations[2]		=	new CTesselationPatch(attributes,xform,object,umid,umax,vmid,vmax,depth+1,minDepth);
+					subTesselations[3]		=	new CTesselationPatch(attributes,xform,object,umin,umid,vmid,vmax,depth+1,minDepth);
+					subTesselations[0]->ru	=	ru/2.0f;		// we'll calculate this again on tesselation
+					subTesselations[0]->rv	=	rv/2.0f;
+					subTesselations[0]->r	=	r/2.0f;
+					subTesselations[1]->ru	=	ru/2.0f;
+					subTesselations[1]->rv	=	rv/2.0f;
+					subTesselations[1]->r	=	r/2.0f;
+					subTesselations[2]->ru	=	ru/2.0f;
+					subTesselations[2]->rv	=	rv/2.0f;
+					subTesselations[2]->r	=	r/2.0f;
+					subTesselations[3]->ru	=	ru/2.0f;
+					subTesselations[3]->rv	=	rv/2.0f;
+					subTesselations[3]->r	=	r/2.0f;
+					numTesselations			=	4;
+					//fprintf(stderr," BS %f %f %f\n",ru/2.0f,rv/2.0f,r/2.0f);
+				}
+			}
+			
+			osUnlock(CRenderer::tesselateMutex);
+		}
+		
+		// test the subtesselations
+		
+		for(int i=0;i<numTesselations;i++) {
+			subTesselations[i]->intersect(context,cRay,r);
+		}
+		return;
+	}
+	
+	// Our r is sufficient. verify we have P
+	
+	osLock(CRenderer::tesselateMutex);
+	if (P == NULL) {
+	//	osLock(CRenderer::tesselateMutex);
+		
+		if (P == NULL) {
+			tesselate(context,TRUE);
+		}
+		
+	//	osUnlock(CRenderer::tesselateMutex);
+	}
+	
+	// Intersect the ray
+	
+	int			i,j;
+	const float	*cP		=	P;
+	const float	*r		=	cRay->from;
+	const float	*q		=	cRay->dir;
+	
+	float urg = (umax - umin) / (float) udiv;
+	float vrg = (vmax - vmin) / (float) vdiv;
+
+	// FIXME: pull udiv and vdiv out to constants so we can really get this unrolled
+	for (j=0;j<vdiv;j++) {
+		for (i=0;i<udiv;i++,cP += 3) {
+			const float	*P00	=	cP;
+			const float	*P10	=	cP + 3;
+			const float	*P01	=	cP + (udiv+1)*3;
+			const float	*P11	=	P01 + 3;
+			
+			vector		a,b,c,d;
+
+			subvv(a,P11,P10);
+			subvv(a,P01);
+			addvv(a,P00);
+			subvv(b,P10,P00);
+			subvv(c,P01,P00);
+			movvv(d,P00);
+
+			const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
+			const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
+			const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
+			const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
+			const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
+			const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
+			const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
+			const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
+			
+
+
+		#define solve()														\
+			if ((v > 0) && (v < 1)) {										\
+				{															\
+					const double	a	=	v*A2 + B2;						\
+					const double	b	=	v*(A2 - A1) + B2 - B1;			\
+					if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
+					else			u	=	(-v*C2 - D2) / a;				\
+				}															\
+																			\
+				if ((u > 0) && (u < 1)) {									\
+					double	P[3];											\
+																			\
+					P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
+					P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
+					P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
+																			\
+					if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
+						t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+					else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
+						t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+					else													\
+						t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+																			\
+					if ((t > cRay->tmin) && (t < cRay->t)) {				\
+						vector	dPdu,dPdv,N;								\
+						vector	tmp1,tmp2;									\
+						subvv(tmp1,P10,P00);								\
+						subvv(tmp2,P11,P01);								\
+						interpolatev(dPdu,tmp1,tmp2,(float) v);				\
+						subvv(tmp1,P01,P00);								\
+						subvv(tmp2,P11,P10);								\
+						interpolatev(dPdv,tmp1,tmp2,(float) u);				\
+						crossvv(N,dPdu,dPdv);								\
+						if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
+						if (attributes->nSides == 1) {						\
+							if (dotvv(q,N) < 0) {							\
+								cRay->object	=	object;					\
+								cRay->u			=	umin + ((float) u + i)*urg;	\
+								cRay->v			=	vmin + ((float) v + j)*vrg;	\
+								cRay->t			=	(float) t;				\
+								movvv(cRay->N,N);							\
+							}												\
+						} else {											\
+							cRay->object	=	object;						\
+							cRay->u			=	umin + ((float) u + i)*urg;	\
+							cRay->v			=	vmin + ((float) v + j)*vrg;	\
+							cRay->t			=	(float) t;					\
+							movvv(cRay->N,N);								\
+						}													\
+					}														\
+				}															\
+			}
+			
+
+
+			double			roots[2];
+			double			u,v,t;
+			switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {
+				case 0:
+					break;
+				case 1:
+					v	=	roots[0];
+					solve();
+					break;
+				case 2:
+					v	=	roots[0];
+					solve();
+					v	=	roots[1];
+					solve();
+					break;
+			}
+
+		}
+
+		cP += 3;
+	}
+		osUnlock(CRenderer::tesselateMutex);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	checkAngle
+// Description			:	This function takes P and returns the cosine of the minimum angle deviation
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+static	inline	float	measureLength(const float *P,int step,int num) {
+	float	length	=	0;
+
+	for (;num>0;num--) {
+		const float	*Pn		=	P + step;
+		vector		D;
+
+		subvv(D,Pn,P);
+		length	+=	lengthv(D);
+
+		P					=	Pn;
+	}
+
+	return length;
+}
+
+
+#include "debug.h"
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	tesselate
+// Description			:	Find the best tesselation for this object
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void			CTesselationPatch::tesselate(CShadingContext *context,int saveP) {
 	// Get some misc variables for fast access
-	disableCull			=	attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE;
-	varying				=	r->currentShadingState->varying;
+	float	**varying	=	context->currentShadingState->varying;
 
 	// Start with a 3x3 sampling grid
-	udiv				=	2;
-	vdiv				=	2;
-	while(TRUE) {
-		cullFlags		=	TRUE;
+	udiv		=	4;
+	vdiv		=	4;
 
-		// Sample points on the patch
-		ustart			=	umin;
-		vstart			=	vmin;
-		ustep			=	(umax - ustart) / (float) (udiv);
-		vstep			=	(vmax - vstart) / (float) (vdiv);
+	// Sample points on the patch
+	const float	ustep	=	(umax-umin) / (float) (udiv);
+	const float	vstep	=	(vmax-vmin) / (float) (vdiv);
 
-		initv(bmin,C_INFINITY);
-		initv(bmax,-C_INFINITY);
-
-		// Take care of the motion
-		if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
-			// Compute the sample positions and corresponding normal vectors
-			uv			=	varying[VARIABLE_U];
-			vv			=	varying[VARIABLE_V];
-			timev		=	varying[VARIABLE_TIME];
-			for (vp=vdiv+1,v=vstart;vp>0;vp--,v+=vstep) {
-				for (up=udiv+1,u=ustart;up>0;up--,u+=ustep) {
-					*uv++		=	u;
-					*vv++		=	v;
-					*timev++	=	1;
-				}
-			}
-
-			r->displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
-			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull);
-		}
-
-
-		// Compute the sample positions and corresponding normal vectors
-		uv			=	varying[VARIABLE_U];
-		vv			=	varying[VARIABLE_V];
-		timev		=	varying[VARIABLE_TIME];
-		for (vp=vdiv+1,v=vstart;vp>0;vp--,v+=vstep) {
-			for (up=udiv+1,u=ustart;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
-				*timev++	=	0;
-			}
-		}
-		r->displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],(udiv+1)*(vdiv+1),attributes->nSides,disableCull);
-
-		// Are we culled ?
-		if (cullFlags)	return;
-
-		// Can we make the perspective divide ?
-		if (bmin[COMP_Z] > C_EPSILON) {
-			// Do the projection
-			camera2pixels((udiv+1)*(vdiv+1),varying[VARIABLE_P]);
-
-			// Decide on the split
-			splitDecision	=	diceStats(r,varying[VARIABLE_P],varying[VARIABLE_N],udiv,vdiv,nudiv,nvdiv);
-			if (splitDecision == SPLIT_NONE) {
-
-				// Do we have a good enough estimate ?
-				//if ((udiv == nudiv) && (vdiv == nvdiv))	return splitDecision;
-
-				// Keep going
-				udiv	=	nudiv;
-				vdiv	=	nvdiv;
-			} else {
-				return;
-			}
-		} else {
-			// Decide on the split
-			//return	diceStats(r,varying[VARIABLE_P],varying[VARIABLE_N],udiv,vdiv);
+	// Compute the sample positions and corresponding normal vectors
+	float	*uv			=	varying[VARIABLE_U];
+	float	*vv			=	varying[VARIABLE_V];
+	float	*timev		=	varying[VARIABLE_TIME];
+	int		up,vp;
+	float	u,v;
+	for (vp=vdiv+1,v=vmin;vp>0;vp--,v+=vstep) {
+		for (up=udiv+1,u=umin;up>0;up--,u+=ustep) {
+			*uv++		=	u;
+			*vv++		=	v;
+			*timev++	=	0;
 		}
 	}
-
-	assert(FALSE);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPatch
-// Method				:	diceStats
-// Description			:	Estimate the dicing stats
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/4/2003
-int		CPatch::diceStats(CShadingContext *r,float *P,float *N,int udiv,int vdiv,int &nudiv,int &nvdiv) {
-	float		uAvg,vAvg;	// The average edge length
-	float		uMin,vMin;	// The minimum edge length
-	float		uMax,vMax;	// The maximum edge length
-	int			numU,numV;
-	int			i,j;
-	float		*cP,*nP,*tP;
-	float		l;
-	float		dx,dy;
-
-	uAvg	=	vAvg	=	0;
-	uMax	=	vMax	=	0;
-	uMin	=	vMin	=	C_INFINITY;
-	numU	=	numV	=	0;
-
-	// U stats
-	cP	=	P;
-	for (j=(vdiv+1);j>0;j--) {
-		for (i=udiv;i>0;i--,cP+=3) {
-			dx		=	cP[3 + COMP_X] - cP[COMP_X];
-			dy		=	cP[3 + COMP_Y] - cP[COMP_Y];
-			l		=	sqrtf(dx*dx + dy*dy);
-			uAvg	+=	l;	numU++;
-			if (l < uMin)	uMin	=	l;
-			if (l > uMax)	uMax	=	l;
-		}
-		cP	+=	3;
+	context->displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+	
+	// Evaluate the quality of this tesselation in u and v separately
+	int		i;
+	float	vMax	=	0;
+	float	vAvg	=	0;
+	for (i=0;i<=udiv;i++) {
+		const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv);
+		vMax			=	max(vMax,l);
+		vAvg			+=	l;
 	}
 
-	// V stats
-	cP	=	P;
-	for (i=(udiv+1);i>0;i--,cP+=3) {
-		nP	=	cP;
-		tP	=	nP	+	(udiv+1)*3;
-		for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
-			dx		=	tP[COMP_X] - nP[COMP_X];
-			dy		=	tP[COMP_Y] - nP[COMP_Y];
-			l		=	sqrtf(dx*dx + dy*dy);
-			vAvg	+=	l;	numV++;
-			if (l < vMin)	vMin	=	l;
-			if (l > vMax)	vMax	=	l;
-		}
+	float	uMax	=	0;
+	float	uAvg	=	0;
+	for (i=0;i<=vdiv;i++) {
+		const float	l	=	measureLength(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv);
+		uMax			=	max(uMax,l);
+		uAvg			+=	l;
 	}
 
-	// Compute the new grid size
-	nudiv	=	(int) (uAvg*udiv / (attributes->shadingRate*numU));
-	nvdiv	=	(int) (vAvg*vdiv / (attributes->shadingRate*numV));
+	uAvg	/=	(float) (udiv+1)*vdiv;
+	vAvg	/=	(float) (vdiv+1)*udiv;
+		
+	// At this point, I should have the tesselation. So create the grid and return it
+	
+	//if((uAvg+vAvg)/2.0 > 2*this->r && depth > 0) fprintf(stderr,"tesselationm underreduction %f %f %d\n",(uAvg+vAvg)/2.0f,this->r,depth);
+	
+	lastRefNumber			=	-1;
+	this->ru				=	uAvg;
+	this->rv				=	vAvg;
+	this->r					=	(ru+rv)/2;
+	//fprintf(stderr,"%f %f %f\n",ru,rv,r);
+	
+	#if 0
+	{
+		CDebugView	d("/tmp/tesselate.dat",TRUE);
+	
+		float *Pcur = varying[VARIABLE_P];
+		for (int i =0;i<vdiv;i++) {
+			d.line(Pcur,Pcur+3);
+			d.line(Pcur+(udiv+1)*3,Pcur+(udiv+1)*3+3);
+			Pcur +=3;
+		}
+		Pcur = varying[VARIABLE_P];
+		for (int i =0;i<udiv;i++) {
+			d.line(Pcur,Pcur+(vdiv+1)*3);
+			d.line(Pcur+udiv*3,Pcur+udiv*3+(vdiv+1)*3);
+			Pcur += (vdiv+1)*3;
+		}
+		Pcur = varying[VARIABLE_P];
+		for (int i =(vdiv+1)*(udiv+1);i>0;i--) {
+			d.point(Pcur);
+		}
+	}
+	#endif
+	
+	// save a tighter bound
+	initv(bmin,C_INFINITY);
+	initv(bmax,-C_INFINITY);
 
-	// Are we too big ?
-	if ((nudiv+1)*(nvdiv+1) > CRenderer::maxGridSize) {
-		// We're too big, decide on the split
-		if (nudiv > nvdiv)	return SPLIT_U;
-		else				return SPLIT_V;
+	float *Pcur = varying[VARIABLE_P];
+	for (int i =(vdiv+1)*(udiv+1);i>0;i--) {
+		addBox(bmin,bmax,Pcur);
+		Pcur			+=	3;
+	}
+	
+	float maxBound	=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
+	maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
+	maxBound		*=	attributes->rasterExpand;
+
+	bmin[COMP_X]	-=	maxBound;
+	bmin[COMP_Y]	-=	maxBound;
+	bmin[COMP_Z]	-=	maxBound;
+	bmax[COMP_X]	+=	maxBound;
+	bmax[COMP_Y]	+=	maxBound;
+	bmax[COMP_Z]	+=	maxBound;
+
+	// create P if it is so required
+	if (saveP) {
+		P						=	new float[(udiv+1)*(vdiv+1)*3];
+		size					=	(udiv+1)*(vdiv+1)*3*sizeof(float);
+		
+		memcpy(P,varying[VARIABLE_P],(udiv+1)*(vdiv+1)*3*sizeof(float));
 	} else {
-
-		// Is there a big stretch ?
-		if (uMax > attributes->shadingRate) {
-			if (vMax > attributes->shadingRate) {
-				if (uMax > vMax) {
-					return SPLIT_U;
-				} else {
-					return SPLIT_V;
-				}
-			} else {
-				return SPLIT_U;
-			}
-		} else if (vMax > attributes->shadingRate) {
-			return SPLIT_V;
-		} else {
-			// We're good to go
-			return	SPLIT_NONE;
-		}
+		P						=	NULL;
+		size					=	0;
 	}
 }
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPatch
-// Method				:	diceStats
-// Description			:	Figure out the maximum parametric direction
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/4/2003
-int		CPatch::diceStats(CShadingContext *r,float *P,float *N,int udiv,int vdiv) {
-	float		uMax,vMax;	// The maximum side length
-	int			i,j;
-	float		*cP,*nP,*tP;
-	float		l;
-	vector		D;
-
-	uMax	=	vMax	=	0;
-
-	// U stats
-	cP	=	P;
-	for (j=(vdiv+1);j>0;j--) {
-		l	=	0;
-
-		for (i=udiv;i>0;i--,cP+=3) {
-			subvv(D,cP+3,cP);
-			l		+=	sqrtf(dotvv(D,D));
-		}
-		cP	+=	3;
-
-		if (l > uMax)	uMax	=	l;
-	}
-
-	// V stats
-	cP	=	P;
-	for (i=(udiv+1);i>0;i--,cP+=3) {
-		l	=	0;
-		nP	=	cP;
-		tP	=	nP	+	(udiv+1)*3;
-		for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
-			subvv(nP,tP);
-			l		+=	sqrtf(dotvv(D,D));
-		}
-
-		if (l > vMax)	vMax	=	l;
-	}
-
-	// Split along the longest direction
-	if (uMax > vMax)	return SPLIT_U;
-	else				return SPLIT_V;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
