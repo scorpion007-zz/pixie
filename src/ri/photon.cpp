@@ -77,6 +77,8 @@ CPhotonHider::CPhotonHider(int thread,CAttributes *a) : CShadingContext(thread) 
 	bias							=	a->shadowBias;
 	phony							=	new CPhonySurface(a,CRenderer::world);
 	phony->attach();
+
+	numTracedPhotons				=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -96,6 +98,9 @@ CPhotonHider::~CPhotonHider() {
 	}
 
 	phony->detach();
+
+	// Update the stats
+	stats.numPhotonRays		+=		numTracedPhotons;
 }
 
 
@@ -497,6 +502,7 @@ processBounce:;
 	ray.time				=	urand();
 
 	// Trace the ray in the scene
+	numTracedPhotons++;
 	trace(&ray);
 
 	// Do we have an intersection ?
@@ -651,6 +657,7 @@ processBounce:;
 					ray.time				=	0;
 				
 					// Trace the ray in the scene
+					numTracedPhotons++;
 					trace(&ray);
 					
 					// Bail if we hit nothing

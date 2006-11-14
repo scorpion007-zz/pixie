@@ -37,7 +37,6 @@
 #include "slcode.h"
 #include "shading.h"
 #include "noise.h"
-#include "stats.h"
 #include "photonMap.h"
 #include "texture3d.h"
 #include "irradiance.h"

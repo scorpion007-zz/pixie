@@ -35,7 +35,6 @@
 #include "noise.h"
 #include "shading.h"
 #include "renderer.h"
-#include "stats.h"
 #include "memory.h"
 #include "error.h"
 #include "rendererContext.h"

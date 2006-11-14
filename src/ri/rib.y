@@ -38,7 +38,6 @@
 #include "common/os.h"
 #include "ri.h"
 #include "delayed.h"
-#include "stats.h"
 #include "rib.h"
 #include "rendererContext.h"
 #include "renderer.h"

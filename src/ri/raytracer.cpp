@@ -32,7 +32,6 @@
 
 #include "raytracer.h"
 #include "shading.h"
-#include "stats.h"
 #include "random.h"
 #include "memory.h"
 #include "error.h"
@@ -557,7 +556,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 	primaryBundle.depth		=	0;
 	trace(&primaryBundle);
 
-	stats.numShadingRays	+=	numShading;
+	numRaytraceRays	+=	numShading;
 }
 
 ///////////////////////////////////////////////////////////////////////

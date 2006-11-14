@@ -170,6 +170,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 								ray.da					=	ab[0];																\
 								ray.db					=	ab[1];																\
 																																\
+								numReflectionRays++;																			\
 								trace(&ray);																					\
 																																\
 								res->real				=	ray.t
@@ -245,7 +246,8 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 								N				=	varying[VARIABLE_N];														\
 								operand(0,res);																					\
 								operand(1,op1);																					\
-								operand(2,op2);
+								operand(2,op2);																					\
+								const float *ab	=	rayDiff((const float *) op1,(const float *) op2,NULL);
 
 #define	TRACEEXPR				if (dotvv((float *) op2,(float *) op2) > 0) {													\
 									movvv(rays->from,(float *) op1);															\
@@ -256,7 +258,9 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 									rays->t				=	C_INFINITY;															\
 									rays->time			=	urand();															\
 									rays->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;										\
-									rays->tmin			=	lookup->bias;																\
+									rays->tmin			=	lookup->bias;														\
+									rays->da			=	ab[0];																\
+									rays->db			=	ab[1];																\
 									if (dotvv(&op2->real,N) > 0) {																\
 										exteriorRays[cExterior++]	=	rays++;													\
 									} else {																					\
@@ -269,9 +273,11 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 
 
 #define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(3,3,3);																			\
+								ab					+=	2;																		\
 								N					+=	3;
 
 #define	TREACEEXPR_POST			if (inShadow == FALSE) {																		\
+									numReflectionRays	+=	cInterior + cExterior;												\
 									if (cInterior > 0) {																		\
 										interiorBundle.postShader	=	cAttributes->interior;									\
 										interiorBundle.numRays		=	cInterior;												\
@@ -329,6 +335,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								ray.da					=	ab[0];															\
 								ray.db					=	ab[1];															\
 																															\
+								numTransmissionRays++;																		\
 								trace(&ray);																				\
 																															\
 								if (ray.object != NULL)	res[0].real	=	0;													\

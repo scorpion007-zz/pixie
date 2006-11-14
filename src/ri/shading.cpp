@@ -391,6 +391,13 @@ CShadingContext::CShadingContext(int t) {
 
 	// Init the random number generator
 	randomInit(5489*(thread+1));
+
+	// Init the stats
+	numShade				=	0;
+	numSampled				=	0;
+	numShaded				=	0;
+	vertexMemory			=	0;
+	peakVertexMemory		=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -429,6 +436,16 @@ CShadingContext::~CShadingContext() {
 	// Ditch the shader state memory stack
 	memoryTini(shaderStateMemory);
 
+	// The frame assertions
+	assert(vertexMemory == 0);
+
+	stats.numShade				+=		numShade;
+	stats.numSampled			+=		numSampled;
+	stats.numShaded				+=		numShaded;
+	stats.numTracedRays			+=		numTracedRays;
+	stats.numReflectionRays		+=		numReflectionRays;
+	stats.numTransmissionRays	+=		numTransmissionRays;
+	stats.numGatherRays			+=		numGatherRays;
 }
 
 
@@ -480,8 +497,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	assert(numVertices <= CRenderer::maxGridSize);
 
 	// Update the stats
-	stats.numSampled++;
-	stats.numShaded					+=	numVertices;
+	numShade++;
+	numSampled					+=	numVertices;
 
 	
 	// Are we just displacing the surface ?
@@ -875,6 +892,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		currentShadingState->freeLights				=	NULL;
 
 		if (surface != NULL) {
+			numShaded					+=	numVertices;
 			surface->execute(this,currentShadingState->locals[ACCESSOR_SURFACE]);
 		} else {
 			float			*color		=	varying[VARIABLE_CI];
@@ -942,10 +960,10 @@ CShadingState	*CShadingContext::newState() {
 		const int		numGlobalVariables	=	CRenderer::globalVariables->numItems;
 		CVariable		**globalVariables	=	CRenderer::globalVariables->array;
 
-		newState->varying				=	new float*[numGlobalVariables];					stats.vertexMemory	+=	numGlobalVariables*sizeof(float *);
-		newState->tags					=	new int[CRenderer::maxGridSize*3];				stats.vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
-		newState->lightingTags			=	new int[CRenderer::maxGridSize*3];				stats.vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
-		newState->Ns					=	new float[CRenderer::maxGridSize*9];			stats.vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(float);
+		newState->varying				=	new float*[numGlobalVariables];					vertexMemory	+=	numGlobalVariables*sizeof(float *);
+		newState->tags					=	new int[CRenderer::maxGridSize*3];				vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
+		newState->lightingTags			=	new int[CRenderer::maxGridSize*3];				vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
+		newState->Ns					=	new float[CRenderer::maxGridSize*9];			vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(float);
 		newState->alights				=	NULL;
 		newState->freeLights			=	NULL;
 		newState->postShader			=	NULL;
@@ -958,10 +976,10 @@ CShadingState	*CShadingContext::newState() {
 
 			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
 				newState->varying[j]	=	new float[var->numFloats];
-				stats.vertexMemory		+=	var->numFloats*sizeof(float);
+				vertexMemory		+=	var->numFloats*sizeof(float);
 			} else {
 				newState->varying[j]	=	new float[var->numFloats*CRenderer::maxGridSize*3];
-				stats.vertexMemory		+=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
+				vertexMemory		+=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 			}
 		}
 
@@ -969,7 +987,7 @@ CShadingState	*CShadingContext::newState() {
 		E	=	newState->varying[VARIABLE_E];
 		for (j=CRenderer::maxGridSize*3;j>0;j--,E+=3)	initv(E,0,0,0);
 
-		if (stats.vertexMemory > stats.peakVertexMemory)	stats.peakVertexMemory=	stats.vertexMemory;
+		if (vertexMemory > peakVertexMemory)	peakVertexMemory=	vertexMemory;
 
 		newState->next				=	NULL;
 		return	newState;
@@ -1011,17 +1029,17 @@ void			CShadingContext::freeState(CShadingState *cState) {
 
 		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
 			delete [] cState->varying[j];
-			stats.vertexMemory		-=	var->numFloats*sizeof(float);
+			vertexMemory		-=	var->numFloats*sizeof(float);
 		} else {
 			delete [] cState->varying[j];
-			stats.vertexMemory		-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
+			vertexMemory		-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 		}
 	}
 
-	delete [] cState->varying;					stats.vertexMemory	-=	numGlobalVariables*sizeof(float *);
-	delete [] cState->tags;						stats.vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
-	delete [] cState->lightingTags;				stats.vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
-	delete [] cState->Ns;						stats.vertexMemory	-=	CRenderer::maxGridSize*9*sizeof(float);
+	delete [] cState->varying;					vertexMemory	-=	numGlobalVariables*sizeof(float *);
+	delete [] cState->tags;						vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
+	delete [] cState->lightingTags;				vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
+	delete [] cState->Ns;						vertexMemory	-=	CRenderer::maxGridSize*9*sizeof(float);
 	
 	delete cState;
 }

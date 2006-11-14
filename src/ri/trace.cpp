@@ -111,9 +111,6 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		trace(ray);
 	}
 
-	// Increment the traced ray counter
-	stats.numTracedRays	+=	numRays;
-
 	// The transparency pass loop
 	while(TRUE) {
 
@@ -255,7 +252,6 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			}
 
 			// Increment the traced ray counter
-			stats.numTracedRays	+=	numRays;
 			rays				=	bundle->rays;
 		}
 	}
@@ -338,6 +334,8 @@ void	CShadingContext::trace(CRay *ray) {
 	heap[1].object		=	CRenderer::root;
 	ray->jimp			=	urand();
 	ray->object			=	NULL;
+
+	numTracedRays++;
 
 	// While we have objects in the heap, pop the object and process it
 	while((numObjects > 0) && (heap[1].tmin < ray->t)) {

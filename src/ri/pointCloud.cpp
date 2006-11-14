@@ -33,7 +33,6 @@
 #include "pointCloud.h"
 #include "object.h"
 #include "raytracer.h"
-#include "stats.h"
 #include "memory.h"
 #include "random.h"
 #include "error.h"

@@ -272,6 +272,16 @@ protected:
 		virtual	void			illuminateEnd() { }
 
 		int						thread;													// The thread number for this context		
+
+		int						numShade;												// Number of times shade is called
+		int						numSampled;												// Number of points sampled
+		int						numShaded;												// Number of points shaded
+		int						vertexMemory;											// The amount of vertex memory allocated by this context
+		int						peakVertexMemory;										// The maximum peak vertex memory
+		int						numTracedRays;											// The number of rays traced
+		int						numReflectionRays;
+		int						numTransmissionRays;
+		int						numGatherRays;
 private:
 		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
 

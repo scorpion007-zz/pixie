@@ -374,9 +374,7 @@ void	CPatch::dice(CShadingContext *r) {
 // Date last edited		:	6/4/2003
 void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 	CPatch	*p1,*p2,*p3,*p4;
-	float		umid,vmid;
-
-	stats.numSplits++;
+	float	umid,vmid;
 
 	switch(dir) {
 	case 0:
@@ -395,6 +393,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		osLock(CRenderer::refCountMutex);
 		p1->check();
 		p2->check();
+		stats.numSplits++;
 		stats.numUsplits++;
 		osUnlock(CRenderer::refCountMutex);
 		break;
@@ -414,6 +413,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		osLock(CRenderer::refCountMutex);
 		p1->check();
 		p2->check();
+		stats.numSplits++;
 		stats.numVsplits++;
 		osUnlock(CRenderer::refCountMutex);
 		break;
@@ -441,6 +441,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		p2->check();
 		p3->check();
 		p4->check();
+		stats.numSplits++;
 		stats.numUVsplits++;
 		osUnlock(CRenderer::refCountMutex);
 

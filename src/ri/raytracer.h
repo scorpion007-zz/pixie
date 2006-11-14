@@ -111,6 +111,9 @@ protected:
 
 			float					*fbContribution;
 			float					*fbPixels;
+
+			// Some stats
+			int						numRaytraceRays;
 };
 
 #endif

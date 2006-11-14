@@ -106,7 +106,7 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 // Date last edited		:	6/2/2003
 CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CSurface(a,x) {
 	stats.numGprims++;
-	stats.gprimCoreMemory	+=	sizeof(CCurve);
+	stats.gprimMemory	+=	sizeof(CCurve);
 
 	vmin				=	vmi;
 	vmax				=	vma;
@@ -125,7 +125,7 @@ CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,
 // Date last edited		:	6/2/2003
 CCurve::~CCurve() {
 	stats.numGprims--;
-	stats.gprimCoreMemory	-=	sizeof(CCurve);
+	stats.gprimMemory	-=	sizeof(CCurve);
 
 	base->detach();
 }

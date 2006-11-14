@@ -155,6 +155,11 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	// Init the stats
 	numGrids			=	0;
 	numObjects			=	0;
+	numGridsRendered	=	0;
+	numQuadsRendered	=	0;
+	numGridsShaded		=	0;
+	numGridsCreated		=	0;
+	numVerticesCreated	=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -189,8 +194,13 @@ CReyes::~CReyes() {
 	osDeleteMutex(bucketMutex);	// destroy the _locked_ mutex
 
 	// Update the global stats
-	stats.numRasterObjects	+=	numObjects;
-	stats.numRasterGrids	+=	numGrids;
+	stats.numRasterObjects			+=	numObjects;
+	stats.numRasterGrids			+=	numGrids;
+	stats.numRasterGridsCreated		+=	numGridsCreated;
+	stats.numRasterVerticesCreated	+=	numVerticesCreated;
+	stats.numRasterGridsShaded		+=	numGridsShaded;
+	stats.numRasterGridsRendered	+=	numGridsRendered;
+	stats.numRasterQuadsRendered	+=	numQuadsRendered;
 }
 
 
@@ -302,8 +312,8 @@ void	CReyes::render() {
 				CRasterGrid			*grid				=	(CRasterGrid *) cObject;
 				
 				// Update the stats
-				stats.numRasterGridsRendered++;
-				stats.numQuadsRendered					+=	grid->udiv*grid->vdiv;
+				numGridsRendered++;
+				numQuadsRendered					+=	grid->udiv*grid->vdiv;
 
 				// Render the grid
 				rasterDrawPrimitives(grid);
@@ -435,8 +445,6 @@ void	CReyes::render() {
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
-	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
-	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -476,8 +484,6 @@ void	CReyes::skip() {
 
 	// Update the statistics
 	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
-	stats.avgRasterObjects			=	(stats.avgRasterObjects*cnBucket	+ numObjects) / (float) (cnBucket+1);
-	stats.avgRasterGrids			=	(stats.avgRasterGrids*cnBucket		+ numGrids) / (float) (cnBucket+1);
 }
 
 
@@ -835,7 +841,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			T32				one;
 
 			// Sanity check
-			stats.numRasterGridsShaded++;
+			numGridsShaded++;
 
 			// Shade the points
 			shade(object,numPoints,1,SHADING_0D,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
@@ -972,7 +978,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			copyPoints(numVertices,varying,grid->vertices,0);
 		} else {
 			// Sanity check
-			stats.numRasterGridsShaded++;
+			numGridsShaded++;
 
 			// Shade the sucker
 			shade(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
@@ -1227,7 +1233,6 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	osUnlock(CRenderer::refCountMutex);
 
 	numObjects++;
-	if (numObjects > stats.numPeakRasterObjects)	stats.numPeakRasterObjects = numObjects;
 
 	return nObject;
 }
@@ -1262,8 +1267,8 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	osUnlock(CRenderer::refCountMutex);
 
 	numGrids++;
-	if (numGrids > stats.numPeakRasterGrids)	stats.numPeakRasterGrids	=	numGrids;
-	stats.numRasterGridsCreated++;
+	numGridsCreated++;
+	numVerticesCreated	+=	numVertices;
 
 	return grid;
 }
@@ -1550,8 +1555,7 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	insertObject(grid);
 
 	// Update stats
-	stats.numQuadsCreated	+=	grid->udiv*grid->vdiv;
-	stats.numRasterGridsCreated++;
+	
 }
 
 

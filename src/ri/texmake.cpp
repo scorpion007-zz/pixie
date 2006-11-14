@@ -30,7 +30,6 @@
 ////////////////////////////////////////////////////////////////////////
 #include "texmake.h"
 #include "ri.h"
-#include "stats.h"
 #include "memory.h"
 #include "error.h"
 #include "renderer.h"

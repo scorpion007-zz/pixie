@@ -37,7 +37,7 @@
 #include "memory.h"
 #include "attributes.h"
 #include "renderer.h"
-
+#include "stats.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -502,15 +502,16 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 				cRay->db			=	ab[1];
 				*cRays++			=	cRay++;
 				if (--numRemaining == 0) {
-					bundle.numRays	=	shootStep;
-					bundle.rays		=	(CRay **) raysBase;
-					bundle.depth	=	0;
-					bundle.last		=	0;
+					numTransmissionRays	+=	shootStep;
+					bundle.numRays		=	shootStep;
+					bundle.rays			=	(CRay **) raysBase;
+					bundle.depth		=	0;
+					bundle.last			=	0;
 					bundle.postShader	=	NULL;
 					traceEx(&bundle);
-					cRay			=	rayBase;
-					cRays			=	raysBase;
-					numRemaining	=	shootStep;
+					cRay				=	rayBase;
+					cRays				=	raysBase;
+					numRemaining		=	shootStep;
 				}
 			}
 		}
@@ -520,10 +521,11 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 	}
 
 	if (numRemaining != shootStep) {
-		bundle.numRays	=	shootStep-numRemaining;
-		bundle.rays		=	(CRay **) raysBase;
-		bundle.depth	=	0;
-		bundle.last		=	0;
+		numTransmissionRays	+=	shootStep-numRemaining;
+		bundle.numRays		=	shootStep-numRemaining;
+		bundle.rays			=	(CRay **) raysBase;
+		bundle.depth		=	0;
+		bundle.last			=	0;
 		bundle.postShader	=	NULL;
 		traceEx(&bundle);
 	}
@@ -582,6 +584,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 				cRay->db			=	ab[1];
 				*cRays++			=	cRay++;
 				if (--numRemaining == 0) {
+					numReflectionRays	+=	shootStep;
 					bundle.numRays		=	shootStep;
 					bundle.rays			=	(CRay **) raysBase;
 					bundle.depth		=	0;
@@ -600,6 +603,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 	}
 
 	if (numRemaining != shootStep) {
+		numReflectionRays	+=	shootStep-numRemaining;
 		bundle.numRays		=	shootStep-numRemaining;
 		bundle.rays			=	(CRay **) raysBase;
 		bundle.depth		=	0;

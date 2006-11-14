@@ -229,8 +229,14 @@ public:
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
 	void						drawPoints(CSurface *,int);								// Draw points (RiPoints)
 
+								// Some stats
 	int							numGrids;										// The number of grids allocated (for housekeeping)
 	int							numObjects;										// The number of objects allocated (for housekeeping)
+	int							numGridsRendered;
+	int							numQuadsRendered;
+	int							numGridsShaded;
+	int							numGridsCreated;
+	int							numVerticesCreated;
 protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 	float						culledDepth;									// The depth of the closest culled object

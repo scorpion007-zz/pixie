@@ -64,8 +64,6 @@ void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
 	T32		one;
 	T32		*opacity;
 
-	stats.numShadingRays	+=	nr;
-
 	one.real	=	1.0f;
 
 	if (depth == 0) {
@@ -130,7 +128,6 @@ void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
 // Comments				:
 // Date last edited		:	3/21/2003
 void	CTraceBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
 
 	if (depth > 0) {
 		int	i;
@@ -193,8 +190,6 @@ void	CTraceExBundle::postShade(int nr,CRay **r,float **varying) {
 	int		i;
 	T32		one;
 	T32		*opacity;
-
-	stats.numShadingRays	+=	nr;
 
 	one.real	=	1.0f;
 
@@ -262,7 +257,6 @@ void	CTraceExBundle::postShade(int nr,CRay **r,float **varying) {
 // Comments				:
 // Date last edited		:	3/21/2003
 void	CTraceExBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
 
 	if (depth > 0) {
 		int	i;
@@ -338,8 +332,6 @@ void	CIrradianceBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	int		i;
 
-	stats.numShadingRays	+=	nr;
-
 	for (i=nr;i>0;i--,Ci+=3) {
 		CIrradianceRay	*cRay	=	(CIrradianceRay *) (*r++);
 
@@ -355,7 +347,6 @@ void	CIrradianceBundle::postShade(int nr,CRay **r,float **varying) {
 // Comments				:
 // Date last edited		:	3/21/2003
 void	CIrradianceBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -395,8 +386,6 @@ void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
 	int		i;
 	T32		one;
 	T32		*opacity;
-
-	stats.numShadowRays	+=	nr;
 
 	one.real	=	1.0f;
 
@@ -445,8 +434,6 @@ void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
 // Date last edited		:	3/21/2003
 void	CTransmissionBundle::postShade(int nr,CRay **r) {
 	int	i;
-
-	stats.numShadowRays	+=	nr;
 
 	if (depth == 0) {
 		for (i=nr;i>0;i--) {
@@ -548,8 +535,6 @@ int		CGatherBundle::postTraceAction() {
 void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 	CGatherVariable	*cVariable;
 
-	stats.numShadingRays	+=	nr;
-
 	for (cVariable=lookup->outputs;cVariable!=NULL;cVariable=cVariable->next) {
 		cVariable->record(nr,(CGatherRay **) r,varying);
 	}
@@ -563,7 +548,6 @@ void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 // Comments				:
 // Date last edited		:	3/23/2003
 void	CGatherBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
 }
 
 ///////////////////////////////////////////////////////////////////////

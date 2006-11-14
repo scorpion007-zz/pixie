@@ -65,6 +65,8 @@ protected:
 			void					solarEnd();
 			void					illuminateBegin(const float *,const float *,const float *);
 			void					illuminateEnd();
+
+			int						numTracedPhotons;
 private:
 			void					tracePhoton(float *,float *,float *,float,float,float);
 	
