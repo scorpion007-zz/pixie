@@ -1222,6 +1222,7 @@ void		CMadeTexture::lookup4(float *result,const float *u,const float *v,const CT
 											// Find the layer that we want to probe
 	l			=	(logf(diag)*0.5f*(1/logf(2.0f)));
 	l			=	max(l,0);
+
 	i			=	(int) floor(l);
 	if (i >= (numLayers-1)) i =	numLayers-2;
 
@@ -1243,6 +1244,7 @@ void		CMadeTexture::lookup4(float *result,const float *u,const float *v,const CT
 								(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
 		t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
 								(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
+
 		contribution		=	lookup->filter(r[0]-0.5f,r[1]-0.5f,1,1);
 		totalContribution	+=	contribution;
 

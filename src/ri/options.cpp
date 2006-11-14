@@ -35,6 +35,7 @@
 #include "options.h"
 #include "texture.h"
 #include "stats.h"
+#include "defaults.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -348,27 +349,27 @@ COptions::COptions() {
 	endofframe				=	0;
 	filelog					=	NULL;
 
-	numThreads				=	2;
+	numThreads				=	DEFAULT_NUM_THREADS;
 
-	maxTextureSize			=	20000000;
-	maxBrickSize			=	10000000;
+	maxTextureSize			=	DEFAULT_MAX_TEXTURESIZE;
+	maxBrickSize			=	DEFAULT_MAX_BRICKSIZE;
 
-	maxGridSize				=	16*16;
+	maxGridSize				=	DEFAULT_MAX_GRIDSIZE;
 
 	maxRayDepth				=	5;
 	maxPhotonDepth			=	10;
 
-	bucketWidth				=	32;
-	bucketHeight			=	32;
+	bucketWidth				=	DEFAULT_TILE_WIDTH;
+	bucketHeight			=	DEFAULT_TILE_HEIGHT;
 
-	netXBuckets				=	5;
-	netYBuckets				=	5;
+	netXBuckets				=	DEFAULT_NET_XBUCKETS;
+	netYBuckets				=	DEFAULT_NET_YBUCKETS;
 
-	threadStride			=	3;
+	threadStride			=	DEFAULT_THREAD_STRIDE;
 
 	maxEyeSplits			=	10;
 
-	tsmThreshold			=	(float ) 0.1;
+	tsmThreshold			=	DEFAULT_TSM_THRESHOLD;
 
 	causticIn				=	NULL;
 	causticOut				=	NULL;

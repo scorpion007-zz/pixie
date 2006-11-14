@@ -32,11 +32,24 @@
 #define DEFAULTS_H
 
 // The default tile size for textures
-#define	DEFAULT_TILE_SIZE	32
+#define	DEFAULT_TILE_SIZE		32
 
 // The default ray differential for photon/irradiance cache
-#define DEFAULT_RAY_DA		0.5f
-#define	DEFAULT_RAY_DB		0
+#define DEFAULT_RAY_DA			0.5f
+#define	DEFAULT_RAY_DB			0
+
+// Some default options
+#define	DEFAULT_TILE_WIDTH		32
+#define	DEFAULT_TILE_HEIGHT		32
+#define	DEFAULT_NET_XBUCKETS	5
+#define	DEFAULT_NET_YBUCKETS	5
+#define	DEFAULT_TSM_THRESHOLD	(float ) 0.1
+#define	DEFAULT_MAX_GRIDSIZE	16*16
+#define DEFAULT_NUM_THREADS		2
+#define DEFAULT_MAX_TEXTURESIZE	20000000
+#define DEFAULT_MAX_BRICKSIZE	10000000
+#define DEFAULT_THREAD_STRIDE	3
+
 
 #endif
 
