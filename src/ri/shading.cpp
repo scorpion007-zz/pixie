@@ -963,7 +963,7 @@ CShadingState	*CShadingContext::newState() {
 		newState->varying				=	new float*[numGlobalVariables];					vertexMemory	+=	numGlobalVariables*sizeof(float *);
 		newState->tags					=	new int[CRenderer::maxGridSize*3];				vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
 		newState->lightingTags			=	new int[CRenderer::maxGridSize*3];				vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
-		newState->Ns					=	new float[CRenderer::maxGridSize*9];			vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(float);
+		newState->Ns					=	new float[CRenderer::maxGridSize*9];			vertexMemory	+=	CRenderer::maxGridSize*9*sizeof(float);
 		newState->alights				=	NULL;
 		newState->freeLights			=	NULL;
 		newState->postShader			=	NULL;

@@ -886,7 +886,7 @@ RiTriangleFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 
 EXTERN(RtFloat)
 RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
-   double r2 = (x*x + y*y)*0.5;
+   double r2 = (x*x + y*y);
    double r = sqrt(r2);
 
    if (r < 1.0) {

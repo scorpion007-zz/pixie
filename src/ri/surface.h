@@ -74,7 +74,7 @@ public:
 
 
 	void					intersect(CShadingContext *,CRay *) { assert(FALSE); }
-	void					dice(CShadingContext *) { assert(FALSE) };
+	void					dice(CShadingContext *) { assert(FALSE); }
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const { assert(FALSE);	}
 
 	
