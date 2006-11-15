@@ -258,11 +258,11 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 			// Directional weight
 			e2		=	1 - dotvv(N,cSample->N);
 			if (e2 < 0)	e2	=	0;
-			e2		=	sqrtf(e2 * weightNormalDenominator);
+			e2		=	sqrtf(e2);
 
 			// Are we writing ?
-			w		=	1 - maxError * max(e1,e2);
-			if (w > 0) {
+			w		=	1 / (e1 + e2 + C_EPSILON);
+			if (w*maxError > 1) {
 				vector	ntmp;
 
 				crossvv(ntmp,N,cSample->N);
@@ -325,6 +325,8 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 			C[6]	=	0;
 		}
 	}
+
+	assert(dotvv(C,C) >= 0);
 }
 
 
@@ -586,7 +588,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 	vector				irradiance;
 	vector				envdir;
 	float				rMean;
-	float				rMeanMin;
 	CRay				ray;
 	int					nt,np;
 	vector				X,Y;
@@ -631,7 +632,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 	initv(irradiance,0);
 	initv(envdir,0);
 	rMean							=	0;
-	rMeanMin						=	C_INFINITY;
 
 	if (lookup->occlusion == TRUE) {
 
@@ -705,7 +705,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				}
 
 				rMean						+=	1 / ray.t;
-				rMeanMin					=	min(rMeanMin,ray.t);
 
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
@@ -810,7 +809,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				}
 
 				rMean						+=	1 / ray.t;
-				rMeanMin					=	min(rMeanMin,ray.t);
 
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
@@ -846,10 +844,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 		osLock(mutex);
 
 		// Compute the radius of validity
-		rMean					=	rMeanMin / 2;
-		rMean					=	max(rMean, lookup->lengthA*lookup->minFGRadius + lookup->lengthB);
-		rMean					=	min(rMean, lookup->lengthA*lookup->maxFGRadius + lookup->lengthB);
-
+		rMean					=	1 / rMean;
+		
 		// Create the sample
 		cSample					=	(CCacheSample *) memory->alloc(sizeof(CCacheSample));
 
@@ -865,6 +861,18 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 			cSample->gR[i*3 + COMP_Y]	=	X[COMP_Y]*gR[i*3 + COMP_X] + Y[COMP_Y]*gR[i*3 + COMP_Y];
 			cSample->gR[i*3 + COMP_Z]	=	X[COMP_Z]*gR[i*3 + COMP_X] + Y[COMP_Z]*gR[i*3 + COMP_Y];
 		}
+
+		// Compute the magnitude of the translational gradient
+		float	magGrad	=	0;
+		for (i=0;i<21;i++)	magGrad	+=	cSample->gP[i]*cSample->gP[i];
+		magGrad	=	sqrtf(magGrad / dotvv(irradiance,irradiance));
+		if (magGrad > 1 / rMean) {
+			rMean	=	1 / magGrad;
+		}
+
+		// Clamp the R
+		rMean					=	max(rMean, lookup->lengthA*lookup->minFGRadius + lookup->lengthB);
+		rMean					=	min(rMean, lookup->lengthA*lookup->maxFGRadius + lookup->lengthB);
 
 		// Record the data
 		movvv(cSample->P,P);
