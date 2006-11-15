@@ -90,6 +90,7 @@ private:
 	int						udiv,vdiv;						// The split amounts
 	
 	float					*P;						// The P
+	float					*bounds;				// The quad bounds
 	CTesselationPatch		*subTesselations[4];
 	int						numTesselations;
 	int						lastRefNumber;			// Last time we accessed this grid

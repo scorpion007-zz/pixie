@@ -520,18 +520,21 @@ CTesselationPatch::~CTesselationPatch() {
 	}
 }
 
-
 void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay,float requiredR) {
-	
+
+#if 0		
 	// trivially reject using bounds	
 	if(P != NULL && depth > 1) {	// FIXME: convert P!=NULL to check if we've been tesselated ever
 		// Only do so for tesselations > 2 deep, others will be too coarse
 		// FIXME: we should do better here
-		if (!intersectBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t)) return;
+		float tmin = cRay->tmin;
+		float tmax = cRay->t;
+		if (!intersectBox(bmin,bmax,cRay->from,cRay->dir,tmin,tmax)) return;
 	}
-	
+#endif
+
 	// recurse if r is insufficient
-	if (r > 2*requiredR && depth < 5) {	// FIXME: make this a user controllable parameter
+	if (r > 2*requiredR && depth < 10) {	// FIXME: make this a user controllable parameter
 		// Make subtesselations if they don't exist
 		
 		if (numTesselations == 0) {
@@ -602,21 +605,23 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay,float requ
 	
 	// Our r is sufficient. verify we have P
 	
-	osLock(CRenderer::tesselateMutex);
+	//osLock(CRenderer::tesselateMutex);
+	
 	if (P == NULL) {
-	//	osLock(CRenderer::tesselateMutex);
+		osLock(CRenderer::tesselateMutex);
 		
 		if (P == NULL) {
 			tesselate(context,TRUE);
 		}
 		
-	//	osUnlock(CRenderer::tesselateMutex);
+		osUnlock(CRenderer::tesselateMutex);
 	}
 	
 	// Intersect the ray
 	
 	int			i,j;
 	const float	*cP		=	P;
+	const float *cB		=	bounds;
 	const float	*r		=	cRay->from;
 	const float	*q		=	cRay->dir;
 	
@@ -625,7 +630,15 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay,float requ
 
 	// FIXME: pull udiv and vdiv out to constants so we can really get this unrolled
 	for (j=0;j<vdiv;j++) {
-		for (i=0;i<udiv;i++,cP += 3) {
+		for (i=0;i<udiv;i++,cP += 3,cB += 6) {
+		
+			// quick-reject bounds
+			float tmin = cRay->tmin;
+			float tmax = cRay->t;
+			if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {
+				continue;
+			}
+
 			const float	*P00	=	cP;
 			const float	*P10	=	cP + 3;
 			const float	*P01	=	cP + (udiv+1)*3;
@@ -727,7 +740,8 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay,float requ
 
 		cP += 3;
 	}
-		osUnlock(CRenderer::tesselateMutex);
+	
+	//osUnlock(CRenderer::tesselateMutex);
 }
 
 
@@ -772,6 +786,8 @@ void			CTesselationPatch::tesselate(CShadingContext *context,int saveP) {
 	// Start with a 3x3 sampling grid
 	udiv		=	4;
 	vdiv		=	4;
+	
+if(depth>1) fprintf(stderr,"%d\n",depth);
 
 	// Sample points on the patch
 	const float	ustep	=	(umax-umin) / (float) (udiv);
@@ -810,8 +826,8 @@ void			CTesselationPatch::tesselate(CShadingContext *context,int saveP) {
 		uAvg			+=	l;
 	}
 
-	uAvg	/=	(float) (udiv+1)*vdiv;
-	vAvg	/=	(float) (vdiv+1)*udiv;
+	vAvg	/=	(float) (udiv+1)*vdiv;
+	uAvg	/=	(float) (vdiv+1)*udiv;
 		
 	// At this point, I should have the tesselation. So create the grid and return it
 	
@@ -869,10 +885,42 @@ void			CTesselationPatch::tesselate(CShadingContext *context,int saveP) {
 
 	// create P if it is so required
 	if (saveP) {
-		P						=	new float[(udiv+1)*(vdiv+1)*3];
-		size					=	(udiv+1)*(vdiv+1)*3*sizeof(float);
+		P						=	new float[(udiv+1)*(vdiv+1)*3 + udiv*vdiv*6];
+		bounds					=	P + (udiv+1)*(vdiv+1)*3;
+		size					=	(udiv+1)*(vdiv+1)*3*sizeof(float) + udiv*vdiv*6*sizeof(float);
 		
 		memcpy(P,varying[VARIABLE_P],(udiv+1)*(vdiv+1)*3*sizeof(float));
+		
+		float *Pcur = P;
+		float *bnds = bounds;
+		
+		for (i=0;i<vdiv;i++) {
+			for (int j=0;j<udiv;j++) {
+				initv(bnds,C_INFINITY);
+				initv(bnds+3,-C_INFINITY);
+				
+				addBox(bnds,bnds+3,Pcur);
+				addBox(bnds,bnds+3,Pcur+3);
+				addBox(bnds,bnds+3,Pcur+(udiv+1)*3);
+				addBox(bnds,bnds+3,Pcur+(udiv+1)*3+3);
+				
+				maxBound		=	max(bnds[3+COMP_X]-bnds[COMP_X],bnds[3+COMP_Y]-bnds[COMP_Y]);
+				maxBound		=	max(bnds[3+COMP_Z]-bnds[COMP_Z],maxBound);
+				maxBound		*=	attributes->rasterExpand;
+
+				bnds[COMP_X]	-=	maxBound;
+				bnds[COMP_Y]	-=	maxBound;
+				bnds[COMP_Z]	-=	maxBound;
+				bnds[3+COMP_X]	+=	maxBound;
+				bnds[3+COMP_Y]	+=	maxBound;
+				bnds[3+COMP_Z]	+=	maxBound;
+				
+				bnds += 6;
+				Pcur += 3;
+			}
+			Pcur += 3;
+		}
+		
 	} else {
 		P						=	NULL;
 		size					=	0;
