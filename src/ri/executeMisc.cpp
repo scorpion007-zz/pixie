@@ -38,6 +38,7 @@
 #include "attributes.h"
 #include "renderer.h"
 #include "stats.h"
+#include "defaults.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -714,16 +715,25 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 					const float	*cDir3	=	cDir2 + 3;
 
 					float a				=	dotvv(cDir1,cDir0);
-					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir1,cDir1)))));
+					ab[0]				+=	acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir1,cDir1) + C_EPSILON)));
 
 					a					=	dotvv(cDir2,cDir0);
-					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir2,cDir2)))));
+					ab[0]				+=	acosf(sqrtf(a*a / (dotvv(cDir0,cDir0)*dotvv(cDir2,cDir2) + C_EPSILON)));
 
 					a					=	dotvv(cDir3,cDir1);
-					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir3,cDir3)*dotvv(cDir1,cDir1)))));
+					ab[0]				+=	acosf(sqrtf(a*a / (dotvv(cDir3,cDir3)*dotvv(cDir1,cDir1) + C_EPSILON)));
 
 					a					=	dotvv(cDir2,cDir3);
-					ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(cDir2,cDir2)*dotvv(cDir3,cDir3)))));
+					ab[0]				+=	acosf(sqrtf(a*a / (dotvv(cDir2,cDir2)*dotvv(cDir3,cDir3) + C_EPSILON)));
+
+					ab[0]				*=	0.25f;
+					ab[1]				*=	0.25f;
+
+					ab[0]				=	tanf(min(ab[0],C_PI*0.5f - C_EPSILON));
+					ab[0]				=	min(ab[0],DEFAULT_RAY_DA);
+
+					assert(ab[0] >= 0);
+					assert(ab[1] >= 0);
 
 					ab					+=	2;
 				}
@@ -762,12 +772,17 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 
 				float a;
 				a					=	dotvv(dir,ddir);
-				ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir,ddir)))));
+				ab[0]				+=	acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir,ddir) + C_EPSILON)));
 				a					=	dotvv(dir,ddir+3);
-				ab[0]				+=	tanf(acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir+3,ddir+3)))));
+				ab[0]				+=	acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir+3,ddir+3) + C_EPSILON)));
 
 				ab[0]				*=	0.5f;
 				ab[1]				*=	0.5f;
+				ab[0]				=	tanf(min(ab[0],C_PI*0.5f - C_EPSILON));
+				ab[0]				=	min(ab[0],DEFAULT_RAY_DA);
+
+				assert(ab[0] >= 0);
+				assert(ab[1] >= 0);
 
 				ab					+=	2;
 				from				+=	3;
