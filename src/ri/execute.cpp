@@ -46,6 +46,7 @@
 #include "surface.h"
 #include "texture.h"
 #include "executeMisc.h"
+#include "defaults.h"
 
 // This function is defined in shader.cpp for debugging purposes
 void							debugFunction(float *);

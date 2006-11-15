@@ -261,14 +261,11 @@ public:
 class	CGatherVariable {
 public:
 	virtual			~CGatherVariable() { }
-	virtual	void	record(int,CGatherRay **,float **varying)	=	0;
+	virtual	void	record(TCode *,int,CGatherRay **,float **varying)	=	0;
 
 	CGatherVariable	*next;		// The next item in the linked list
 	int				shade;		// TRUE if this variable requires shading
 	int				destIndex;	// The destination index
-	TCode			*dest;		// The destination to save
-	TCode			**destForEachLevel;	// As the name says
-	TCode			**cDepth;	// The dest pointer for the current depth
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -279,7 +276,7 @@ public:
 class	CShaderVectorVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -292,7 +289,7 @@ public:
 class	CShaderFloatVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -305,7 +302,7 @@ public:
 class	CRayOriginVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -316,7 +313,7 @@ public:
 class	CRayDirVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -327,7 +324,7 @@ public:
 class	CRayLengthVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 };
 
 
@@ -345,11 +342,14 @@ public:
 	void					addOutput(const char *,int);
 
 	CGatherVariable			*outputs;				// These are the outputs that require shading
+	int						numOutputs;				// The number of outputs
 	CGatherVariable			*nonShadeOutputs;		// These are the outputs that do not require shading
+	int						numNonShadeOutputs;		// The number of outputs that don't need shading
 
 	const char				*category;				// The gather category
 	const char				*label;					// The ray label
 	float					coneAngle;				// The distribution angle
+	float					da;						// The ray differential
 	int						numSamples;				// The number of samples to gather
 	float					bias;					// The shadow bias
 	float					maxDist;				// The maximum intersection distance
@@ -357,19 +357,6 @@ public:
 	int						uniformDist;			// TRUE if we should sample uniformly
 };
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CExplosionLookup
-// Description			:	Explosion related variables
-// Comments				:
-// Date last edited		:	2/13/2003
-class	CExplosionLookup : public CShaderLookup {
-public:
-		float				scatteringCoefficient;	// The scattering coefficient
-		CVolume				*volume;				// The volume lookup
-		CColorMap			*colormap;				// The colormap lookup
-		const char			*explosionSpace;		// The space of the explosion
-};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShader

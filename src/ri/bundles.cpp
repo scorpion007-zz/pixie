@@ -509,8 +509,9 @@ int		CGatherBundle::postTraceAction() {
 
 	// Dispatch the outputs that don't need shading
 	for (cVariable=lookup->nonShadeOutputs;cVariable!=NULL;cVariable=cVariable->next) {
-		cVariable->record(numRays,(CGatherRay **) rays,NULL);
+		cVariable->record(*nonShadeOutputs++,numRays,(CGatherRay **) rays,NULL);
 	}
+	nonShadeOutputs	-=	lookup->numNonShadeOutputs;
 
 	// Adjust the tags
 	for (i=0;i<numRays;i++) {
@@ -536,8 +537,9 @@ void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 	CGatherVariable	*cVariable;
 
 	for (cVariable=lookup->outputs;cVariable!=NULL;cVariable=cVariable->next) {
-		cVariable->record(nr,(CGatherRay **) r,varying);
+		cVariable->record(*outputs++,nr,(CGatherRay **) r,varying);
 	}
+	outputs	-=	lookup->numOutputs;
 }
 
 ///////////////////////////////////////////////////////////////////////

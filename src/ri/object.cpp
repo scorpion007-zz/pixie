@@ -425,8 +425,9 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 		osLock(CRenderer::tesselateMutex);
 
 		if (tesselationTree == NULL) {
-			tesselationTree		=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0);
-			tesselationTree->tesselate(context,FALSE);
+			CTesselationPatch	*tree	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0);
+			tree->tesselate(context,FALSE);
+			tesselationTree				=	tree;
 			// FIXME: we tesselate (but do not save) the coarsest level to get an accurate
 			// r estimate for the grid to start things off.  
 			// Q: Can we do this without firing the tesselation off?
@@ -440,6 +441,8 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 	float t = nearestBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t);
 	float r = cRay->da * t + cRay->db;
 	
+	assert(r >= 0);
+
 	tesselationTree->intersect(context,cRay,r);
 }
 

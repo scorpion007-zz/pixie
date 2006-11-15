@@ -91,7 +91,7 @@ void	CFilterLookup::compute() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/23/2003
-void	CShaderVectorVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CShaderVectorVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
 
@@ -109,7 +109,7 @@ void	CShaderVectorVariable::record(int nr,CGatherRay **r,float **varying) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/23/2003
-void	CShaderFloatVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CShaderFloatVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
 
@@ -128,7 +128,7 @@ void	CShaderFloatVariable::record(int nr,CGatherRay **r,float **varying) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/23/2003
-void	CRayOriginVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CRayOriginVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
@@ -146,7 +146,7 @@ void	CRayOriginVariable::record(int nr,CGatherRay **r,float **varying) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/23/2003
-void	CRayDirVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CRayDirVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
@@ -164,7 +164,7 @@ void	CRayDirVariable::record(int nr,CGatherRay **r,float **varying) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/23/2003
-void	CRayLengthVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CRayLengthVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
@@ -183,8 +183,10 @@ void	CRayLengthVariable::record(int nr,CGatherRay **r,float **varying) {
 // Comments				:
 // Date last edited		:	3/23/2003
 CGatherLookup::CGatherLookup() {
-	outputs			=	NULL;
-	nonShadeOutputs	=	NULL;
+	outputs				=	NULL;
+	numOutputs			=	0;
+	nonShadeOutputs		=	NULL;
+	numNonShadeOutputs	=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -199,13 +201,11 @@ CGatherLookup::~CGatherLookup() {
 
 	while((cVar=outputs) != NULL) {
 		outputs	=	cVar->next;
-		if (cVar->destForEachLevel != NULL) delete [] cVar->destForEachLevel;
 		delete cVar;
 	}
 
 	while((cVar=nonShadeOutputs) != NULL) {
 		nonShadeOutputs	=	cVar->next;
-		if (cVar->destForEachLevel != NULL) delete [] cVar->destForEachLevel;
 		delete cVar;
 	}
 }
@@ -236,6 +236,7 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 				outVar->destIndex	=	destIndex;
 				outVar->next		=	outputs;
 				outputs				=	outVar;
+				numOutputs++;
 				nVar				=	outVar;
 			} else if (var->type == TYPE_FLOAT) {
 				CShaderFloatVariable	*outVar	=	new CShaderFloatVariable;
@@ -244,6 +245,7 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 				outVar->destIndex	=	destIndex;
 				outVar->next		=	outputs;
 				outputs				=	outVar;
+				numOutputs++;
 				nVar				=	outVar;
 			} else {
 				error(CODE_BADTOKEN,"Unknown output variable type for gather\n");
@@ -254,26 +256,24 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 		outVar->destIndex	=	destIndex;
 		outVar->next		=	nonShadeOutputs;
 		nonShadeOutputs		=	outVar;
+		numNonShadeOutputs++;
 		nVar				=	outVar;
 	} else if (strcmp(output,"ray:direction") == 0) {
 		CRayDirVariable	*outVar	=	new CRayDirVariable;
 		outVar->destIndex	=	destIndex;
 		outVar->next		=	nonShadeOutputs;
 		nonShadeOutputs		=	outVar;
+		numNonShadeOutputs++;
 		nVar				=	outVar;
 	} else if (strcmp(output,"ray:length") == 0) {
 		CRayLengthVariable	*outVar	=	new CRayLengthVariable;
 		outVar->destIndex	=	destIndex;
 		outVar->next		=	nonShadeOutputs;
 		nonShadeOutputs		=	outVar;
+		numNonShadeOutputs++;
 		nVar				=	outVar;
 	} else {
 		error(CODE_BADTOKEN,"Unknown output variable for gather\n");
-	}
-
-	if (nVar != NULL) {
-		nVar->destForEachLevel	=	new TCode*[maxRayDepth+1];
-		nVar->cDepth			=	nVar->destForEachLevel;
 	}
 }
 

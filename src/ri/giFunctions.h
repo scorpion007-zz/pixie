@@ -142,7 +142,7 @@
 
 #endif
 
-DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_RAYTRACE)
+DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
 
 #undef	TRANSMISSIONEXPR_PRE
 
@@ -186,7 +186,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 #define	TRACEEXPR_UPDATE
 #endif
 
-DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE)
+DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE)
 
 #undef	TRACEEXPR_PRE
 #undef	TRACEEXPR
@@ -305,7 +305,7 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 #define	TREACEEXPR_POST
 #endif
 
-DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,TREACEEXPR_POST,PARAMETER_N | PARAMETER_RAYTRACE)
+DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,TREACEEXPR_POST,PARAMETER_N | PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE)
 
 #undef	TRACEEXPR_PRE
 #undef	TRACEEXPR
@@ -351,7 +351,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 #define	VISIBILITYEXPR_UPDATE
 #endif
 
-DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILITYEXPR,VISIBILITYEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE)
+DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILITYEXPR,VISIBILITYEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE)
 
 #undef	VISIBILITYEXPR_PRE
 #undef	VISIBILITYEXPR
@@ -608,6 +608,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lookup->numSamples		=	1;														\
 								lookup->bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
 								lookup->coneAngle		=	(float) (C_PI/2.0);										\
+								lookup->da				=	min(tanf(lookup->coneAngle),DEFAULT_RAY_DA);			\
 								lookup->maxDist			=	C_INFINITY;												\
 								lookup->maxRayDepth		=	CRenderer::maxRayDepth;									\
 								lookup->label			=	rayLabelGather;											\
@@ -628,6 +629,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 											lookup->maxDist		=	val->real;										\
 										} else if (strcmp(param->string,"samplecone") == 0) {						\
 											lookup->coneAngle	=	val->real;										\
+											lookup->da			=	min(tanf(lookup->coneAngle),DEFAULT_RAY_DA);	\
 										} else if (strcmp(param->string,"label") == 0) {							\
 											lookup->label		=	val->string;									\
 										} else if (strcmp(param->string,"distribution") == 0) {						\
@@ -649,9 +651,6 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 // gather	"o=spnff!"
 #ifndef INIT_SHADING
 #define	GATHERHEADEREXPR_PRE	CGatherLookup	*lookup;															\
-								CGatherRay		*rays;																\
-								TCode			*P,*N;																\
-								CGatherVariable	*var;																\
 								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CGatherLookup *) parameterlist) == NULL) {							\
 									TCode			*samples,*sampleCone;											\
@@ -667,25 +666,32 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
 																													\
-								for (var=lookup->outputs;var!=NULL;var=var->next) {									\
-									*(var->cDepth++)	=	var->dest;												\
-									operand(var->destIndex,var->dest);												\
-									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::maxRayDepth+1));		\
-								}																					\
-								for (var=lookup->nonShadeOutputs;var!=NULL;var=var->next) {							\
-									*(var->cDepth++)	=	var->dest;												\
-									operand(var->destIndex,var->dest);												\
-									assert((var->cDepth-var->destForEachLevel) <= (CRenderer::maxRayDepth+1));		\
-								}																					\
 																													\
 								lastGather							=	new CGatherBundle;							\
+								lastGather->outputs					=	(TCode **) ralloc((lookup->numOutputs + lookup->numNonShadeOutputs)*sizeof(TCode *),threadMemory);	\
+								lastGather->nonShadeOutputs			=	lastGather->outputs + lookup->numOutputs;	\
 								lastGather->lookup					=	lookup;										\
 								lastGather->remainingSamples		=	lookup->numSamples;							\
 								lastGather->numMisses				=	0;											\
 								lastGather->label					=	lookup->label;								\
+																													\
+								CGatherVariable	*var;																\
+								int				cOutput;															\
+								for (cOutput=0,var=lookup->outputs;var!=NULL;var=var->next,cOutput++) {				\
+									operand(var->destIndex,lastGather->outputs[cOutput]);							\
+								}																					\
+								assert(cOutput == lookup->numOutputs);												\
+																													\
+								for (cOutput=0,var=lookup->nonShadeOutputs;var!=NULL;var=var->next,cOutput++) {		\
+									operand(var->destIndex,lastGather->nonShadeOutputs[cOutput]);					\
+								}																					\
+																													\
+								TCode	*P,*N;																		\
 								operand(1,P);																		\
 								operand(2,N);																		\
 																													\
+								CGatherRay		*rays;																\
+								lastGather->ab						=	rayDiff((float *) P,(float *) N,NULL);		\
 								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
 								lastGather->raysStorage				=	lastGather->rays;							\
 								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);
@@ -705,7 +711,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 #define GATHERHEADEREXPR_UPDATE
 #endif
 
-DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GATHERHEADEREXPR,GATHERHEADEREXPR_UPDATE,NULL_EXPR,0)
+DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GATHERHEADEREXPR,GATHERHEADEREXPR_UPDATE,NULL_EXPR,PARAMETER_DERIVATIVE)
 
 #undef	GATHERHEADEREXPR_PRE
 #undef	GATHERHEADEREXPR
@@ -807,32 +813,6 @@ DEFSHORTFUNC(RayDepth		,"raydepth"	,"f="	,FUN1EXPR_PRE,RAYDEPTHEXPR,FUN1EXPR_UPD
 
 
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This macro is used to decode the explosion parameter list
-#define	EXPPARAMETERS(start,num)																					\
-								lookup							=	new CExplosionLookup;							\
-								parameterlist					=	lookup;											\
-								dirty();																			\
-								lookup->scatteringCoefficient	=	0;												\
-								lookup->explosionSpace			=	"explosion";									\
-								{																					\
-									int		i;																		\
-									TCode	*param,*val;															\
-																													\
-									for (i=0;i<num;i++) {															\
-										operand(i*2+start,param);													\
-										operand(i*2+start+1,val);													\
-																													\
-										if (strcmp(param->string,"scatter") == 0) {									\
-											lookup->scatteringCoefficient	=	val->real;							\
-										} else if (strcmp(param->string,"space") == 0) {							\
-											lookup->explosionSpace			=	val->string;						\
-										}																			\
-																													\
-									}																				\
-								}
 
 
 
