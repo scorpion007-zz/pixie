@@ -221,7 +221,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 	float				coverage;
 	vector				irradiance,envdir;
 	const float			maxError		=	lookup->maxError;
-	int					numSummed		=	0;
 	
 	// Convert the query point into the right coordinate system
 	mulmp(P,from,cP);
@@ -241,8 +240,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 		// Sum the values in this level
 		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
 			vector	D;
-			float	e1,e2;
-			float	w;
 
 			// D = vector from sample to query point
 			subvv(D,P,cSample->P);
@@ -253,17 +250,22 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 			// The blending weight computation
 
 			// Positional weight
-			e1		=	lengthv(D) / cSample->dP;
+			float	e1 = dotvv(D,D);
+			if (e1 > (maxError*maxError*cSample->dP*cSample->dP))	continue;
+			e1 = sqrtf(e1) / cSample->dP;
 
 			// Directional weight
-			e2		=	1 - dotvv(N,cSample->N);
+			float	e2 =	1 - dotvv(N,cSample->N);
 			if (e2 < 0)	e2	=	0;
 			e2		=	sqrtf(e2);
 
 			// Are we writing ?
-			w		=	1 / (e1 + e2 + C_EPSILON);
-			if (w*maxError > 1) {
+			float	w		=	e1 + e2;
+			if (w < maxError*(0.9f + 0.2f*context->urand())) {
 				vector	ntmp;
+
+				// This is the final weight
+				w				=	1 / (w + C_EPSILON);
 
 				crossvv(ntmp,N,cSample->N);
 
@@ -275,8 +277,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 				envdir[0]		+=	w*(cSample->envdir[0]		+ dotvv(cSample->gP+4*3,D) + dotvv(cSample->gR+4*3,ntmp));
 				envdir[1]		+=	w*(cSample->envdir[1]		+ dotvv(cSample->gP+5*3,D) + dotvv(cSample->gR+5*3,ntmp));
 				envdir[2]		+=	w*(cSample->envdir[2]		+ dotvv(cSample->gP+6*3,D) + dotvv(cSample->gR+6*3,ntmp));
-
-				numSummed++;
 			}
 		}
 
@@ -968,7 +968,7 @@ void		CIrradianceCache::draw() {
 
 			movvv(cP,cSample->P);
 			movvv(cN,cSample->N);
-			*dP		=	cSample->dP;
+			*cdP		=	cSample->dP;
 			movvv(cC,cSample->irradiance);
 		}
 
