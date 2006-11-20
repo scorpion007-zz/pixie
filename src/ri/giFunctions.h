@@ -46,8 +46,8 @@
 								lookup->numSamples			=	200;															\
 								lookup->maxError			=	attributes->irradianceMaxError;									\
 								lookup->maxBrightness		=	1;																\
-								lookup->maxFGRadius			=	128;															\
-								lookup->minFGRadius			=	2;																\
+								lookup->maxFGRadius			=	C_INFINITY;														\
+								lookup->minFGRadius			=	C_EPSILON;														\
 								lookup->irradianceIndex		=	-1;																\
 								lookup->coverageIndex		=	-1;																\
 								lookup->environmentIndex	=	-1;																\
@@ -78,7 +78,6 @@
 											lookup->maxDistance	=	val->real;													\
 										} else if (strcmp(param->string,"maxerror") == 0) {										\
 											lookup->maxError	=	val->real;													\
-											if (lookup->maxError > 0)	lookup->maxError = 0.5f/lookup->maxError;				\
 										} else if (strcmp(param->string,"samples") == 0) {										\
 											lookup->numSamples	=	(int) val->real;											\
 										} else if (strcmp(param->string,"bias") == 0) {											\

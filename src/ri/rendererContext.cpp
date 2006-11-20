@@ -2587,9 +2587,6 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 				attributeCheckString(RI_HANDLE,			attributes->irradianceHandle)
 				attributeCheckString(RI_FILEMODE,		attributes->irradianceHandleMode)
 				attributeCheck(RI_MAXERROR,				attributes->irradianceMaxError,		0,C_INFINITY,float)
-
-				if (attributes->irradianceMaxError > 0)	attributes->irradianceMaxError = 0.5f/attributes->irradianceMaxError;
-
 				attributeEndCheck
 			}
 		} else if (strcmp(name,RI_PHOTON) == 0) {

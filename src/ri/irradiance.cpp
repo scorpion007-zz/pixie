@@ -41,7 +41,7 @@
 #include "texture.h"
 #include "renderer.h"
 #include "defaults.h"
-
+#include "debug.h"
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 
@@ -267,7 +267,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,CShadingC
 				// This is the final weight
 				w				=	1 / (w + C_EPSILON);
 
-				crossvv(ntmp,N,cSample->N);
+				crossvv(ntmp,cSample->N,N);
 
 				totalWeight		+=	w;
 				coverage		+=	w*(cSample->coverage		+ dotvv(cSample->gP+0*3,D) + dotvv(cSample->gR+0*3,ntmp));
@@ -425,7 +425,7 @@ public:
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/15/2004
-inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
+inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
 	int					i,j,k;
 	double				nextsine, lastsine, d;
 	double				mag0[7], mag1[7];
@@ -451,13 +451,13 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 				if (dp[0].invDepth > d) d = dp[0].invDepth;
 
 				d		*= lastsine * (1.0 - (double)i/(double) nt);
-				mag0[0]	+= d*(dp->coverage - dp[-np].coverage);
+				mag0[0]	+= d*(dp->coverage		- dp[-np].coverage);
 				mag0[1]	+= d*(dp->irradiance[0] - dp[-np].irradiance[0]);
 				mag0[2]	+= d*(dp->irradiance[1] - dp[-np].irradiance[1]);
 				mag0[3]	+= d*(dp->irradiance[2] - dp[-np].irradiance[2]);
-				mag0[4]	+= d*(dp->envdir[0] - dp[-np].envdir[0]);
-				mag0[5]	+= d*(dp->envdir[1] - dp[-np].envdir[1]);
-				mag0[6]	+= d*(dp->envdir[2] - dp[-np].envdir[2]);
+				mag0[4]	+= d*(dp->envdir[0]		- dp[-np].envdir[0]);
+				mag0[5]	+= d*(dp->envdir[1]		- dp[-np].envdir[1]);
+				mag0[6]	+= d*(dp->envdir[2]		- dp[-np].envdir[2]);
 			}
 
 			nextsine = sqrt((double)(i+1)/(double) nt);
@@ -470,13 +470,13 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 
 				d		*=	(nextsine - lastsine);
 
-				mag1[0]	+= d*(dp->coverage - dp[-1].coverage);
+				mag1[0]	+= d*(dp->coverage		- dp[-1].coverage);
 				mag1[1]	+= d*(dp->irradiance[0] - dp[-1].irradiance[0]);
 				mag1[2]	+= d*(dp->irradiance[1] - dp[-1].irradiance[1]);
 				mag1[3]	+= d*(dp->irradiance[2] - dp[-1].irradiance[2]);
-				mag1[4]	+= d*(dp->envdir[0] - dp[-1].envdir[0]);
-				mag1[5]	+= d*(dp->envdir[1] - dp[-1].envdir[1]);
-				mag1[6]	+= d*(dp->envdir[2] - dp[-1].envdir[2]);
+				mag1[4]	+= d*(dp->envdir[0]		- dp[-1].envdir[0]);
+				mag1[5]	+= d*(dp->envdir[1]		- dp[-1].envdir[1]);
+				mag1[6]	+= d*(dp->envdir[2]		- dp[-1].envdir[2]);
 
 			} else {
 				assert((dp+np-1) < h+np*nt);
@@ -486,13 +486,13 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 
 				d		*=	(nextsine - lastsine);
 
-				mag1[0]	+= d*(dp->coverage - dp[np-1].coverage);
+				mag1[0]	+= d*(dp->coverage		- dp[np-1].coverage);
 				mag1[1]	+= d*(dp->irradiance[0] - dp[np-1].irradiance[0]);
 				mag1[2]	+= d*(dp->irradiance[1] - dp[np-1].irradiance[1]);
 				mag1[3]	+= d*(dp->irradiance[2] - dp[np-1].irradiance[2]);
-				mag1[4]	+= d*(dp->envdir[0] - dp[np-1].envdir[0]);
-				mag1[5]	+= d*(dp->envdir[1] - dp[np-1].envdir[1]);
-				mag1[6]	+= d*(dp->envdir[2] - dp[np-1].envdir[2]);
+				mag1[4]	+= d*(dp->envdir[0]		- dp[np-1].envdir[0]);
+				mag1[5]	+= d*(dp->envdir[1]		- dp[np-1].envdir[1]);
+				mag1[6]	+= d*(dp->envdir[2]		- dp[np-1].envdir[2]);
 
 			}
 
@@ -512,12 +512,12 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 		}
 	}
 
-	d			=	1 / C_PI;
+	d			=	np*nt / C_PI;
 
-	for (k=0;k<7;k++) {
-		dP[k*3 + COMP_X]	=	(float) (yd[k]*d);
-		dP[k*3 + COMP_Y]	=	(float) (xd[k]*d);
-		dP[k*3 + COMP_Z]	=	0;
+	for (i=0;i<7;i++) {
+		dP[i*3 + COMP_X]	=	(float) ((xd[i]*X[COMP_X] + yd[i]*Y[COMP_X])*d);
+		dP[i*3 + COMP_Y]	=	(float) ((xd[i]*X[COMP_Y] + yd[i]*Y[COMP_Y])*d);
+		dP[i*3 + COMP_Z]	=	(float) ((xd[i]*X[COMP_Z] + yd[i]*Y[COMP_Z])*d);
 	}
 }
 
@@ -527,10 +527,10 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	5/15/2004
-inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
+inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
 	int					i,j,k;
 	double				mag[7];
-	double				phi, xd[7], yd[7],cosphi,sinphi;
+	double				xd[7], yd[7];
 	CHemisphereSample	*dp;
 
 	for (i=0;i<7;i++)	{	xd[i] = yd[i] = 0.0;	}
@@ -551,9 +551,10 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 			mag[6]	+= dp->envdir[2]*tmp;
 			dp		+= np;
 		}
-		phi		=	2.0*C_PI * (j+.5)/np + C_PI/2.0;
-		cosphi	=	cos(phi);
-		sinphi	=	sin(phi);
+
+		const double	phi		=	2.0*C_PI * (j+.5)/np + C_PI/2.0;
+		const double	cosphi	=	cos(phi);
+		const double	sinphi	=	sin(phi);
 
 		for (k=0;k<7;k++) {
 			xd[k]	+=	mag[k] * cosphi;
@@ -561,12 +562,10 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 		}
 	}
 
-	cosphi		=	1 / (double) (nt*np);
-
 	for (i=0;i<7;i++) {
-		dP[i*3 + COMP_X]	=	(float) (yd[i]*cosphi);
-		dP[i*3 + COMP_Y]	=	(float) (xd[i]*cosphi);
-		dP[i*3 + COMP_Z]	=	0;
+		dP[i*3 + COMP_X]	=	(float) (xd[i]*X[COMP_X] + yd[i]*Y[COMP_X]);
+		dP[i*3 + COMP_Y]	=	(float) (xd[i]*X[COMP_Y] + yd[i]*Y[COMP_Y]);
+		dP[i*3 + COMP_Z]	=	(float) (xd[i]*X[COMP_Z] + yd[i]*Y[COMP_Z]);
 	}
 }
 
@@ -594,9 +593,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 	CHemisphereSample	*hemisphere;
 	CCacheNode			*cNode;
 	int					depth;
-	float				tmp;
 	CTextureLookup		*texLookup;
-	const float			footprint	=	P[COMP_Z]*lookup->lengthA + lookup->lengthB;
 
 	// Allocate memory
 	nt								=	(int) (sqrtf(numSamples / C_PI) + 0.5);
@@ -605,7 +602,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 	hemisphere						=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
 
 	if(lookup->environment != NULL){
-		texLookup = (CTextureLookup*) alloca(sizeof(CTextureLookup));
+		texLookup				= (CTextureLookup*) alloca(sizeof(CTextureLookup));
 		texLookup->filter		= RiGaussianFilter;
 		texLookup->blur			= 0;
 		texLookup->swidth		= 1;
@@ -625,7 +622,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 	// Create an orthanormal coordinate system
 	crossvv(X,N,P);
 	normalizevf(X);
-	crossvv(Y,N,X);
+	crossvv(Y,X,N);
 
 	// Sample the hemisphere
 	coverage						=	0;
@@ -639,14 +636,14 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 		stats.numOcclusionRays			+=	numSamples;
 		stats.numOcclusionSamples++;
 
+		CDebugView	f("c:\\temp\\o.dat",TRUE);
+
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
 				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
 				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
 				const float	sinPhi		=	(sinf(phi)*tmp);
-				const float	dx			=	(2*context->urand()-1)*footprint;
-				const float	dy			=	(2*context->urand()-1)*footprint;
 
 				tmp						=	sqrtf(1 - tmp*tmp);
 
@@ -654,9 +651,14 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				ray.dir[1]				=	X[1]*sinPhi + Y[1]*cosPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*sinPhi + Y[2]*cosPhi + N[2]*tmp;
 
-				ray.from[COMP_X]		=	P[COMP_X] + X[COMP_X]*dx + Y[COMP_X]*dy;
-				ray.from[COMP_Y]		=	P[COMP_Y] + X[COMP_Y]*dx + Y[COMP_Y]*dy;
-				ray.from[COMP_Z]		=	P[COMP_Z] + X[COMP_Z]*dx + Y[COMP_Z]*dy;
+				ray.from[COMP_X]		=	P[COMP_X];
+				ray.from[COMP_Y]		=	P[COMP_Y];
+				ray.from[COMP_Z]		=	P[COMP_Z];
+
+				vector	T;
+				mulvf(T,ray.dir,0.2f);
+				addvv(T,ray.from);
+				f.line(ray.from,T);
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
@@ -725,8 +727,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
 				const float	sinPhi		=	(sinf(phi)*tmp);
-				const float	dx			=	(2*context->urand()-1)*footprint;
-				const float	dy			=	(2*context->urand()-1)*footprint;
 
 				tmp						=	sqrtf(1 - tmp*tmp);
 
@@ -734,9 +734,9 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 				ray.dir[1]				=	X[1]*sinPhi + Y[1]*cosPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*sinPhi + Y[2]*cosPhi + N[2]*tmp;
 
-				ray.from[COMP_X]		=	P[COMP_X] + X[COMP_X]*dx + Y[COMP_X]*dy;
-				ray.from[COMP_Y]		=	P[COMP_Y] + X[COMP_Y]*dx + Y[COMP_Y]*dy;
-				ray.from[COMP_Z]		=	P[COMP_Z] + X[COMP_Z]*dx + Y[COMP_Z]*dy;
+				ray.from[COMP_X]		=	P[COMP_X];
+				ray.from[COMP_Y]		=	P[COMP_Y];
+				ray.from[COMP_Z]		=	P[COMP_Z];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
@@ -821,10 +821,9 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 	hemisphere				-=	np*nt;
 
 	// Normalize
-	tmp						=	1 / (float) numSamples;
+	const float	tmp			=	1 / (float) numSamples;
 	coverage				*=	tmp;
 	mulvf(irradiance,tmp);
-	mulvf(envdir,tmp);
 	normalizevf(envdir);
 
 	// Record the value
@@ -838,7 +837,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 
 	// Should we save it ?
 	if (lookup->maxError != 0) {
-		float	gP[7*3],gR[7*3];
 
 		// We're modifying, lock the thing
 		osLock(mutex);
@@ -849,30 +847,26 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 		// Create the sample
 		cSample					=	(CCacheSample *) memory->alloc(sizeof(CCacheSample));
 
-		// Compute the gradients
-		posGradient(gP,np,nt,hemisphere);
-		rotGradient(gR,np,nt,hemisphere);
-		for (i=0;i<7;i++) {
-			cSample->gP[i*3 + COMP_X]	=	X[COMP_X]*gP[i*3 + COMP_X] + Y[COMP_X]*gP[i*3 + COMP_Y];
-			cSample->gP[i*3 + COMP_Y]	=	X[COMP_Y]*gP[i*3 + COMP_X] + Y[COMP_Y]*gP[i*3 + COMP_Y];
-			cSample->gP[i*3 + COMP_Z]	=	X[COMP_Z]*gP[i*3 + COMP_X] + Y[COMP_Z]*gP[i*3 + COMP_Y];
+		// Compute the gradients of the illumination
+		posGradient(cSample->gP,np,nt,hemisphere,X,Y);
+		rotGradient(cSample->gR,np,nt,hemisphere,X,Y);
 
-			cSample->gR[i*3 + COMP_X]	=	X[COMP_X]*gR[i*3 + COMP_X] + Y[COMP_X]*gR[i*3 + COMP_Y];
-			cSample->gR[i*3 + COMP_Y]	=	X[COMP_Y]*gR[i*3 + COMP_X] + Y[COMP_Y]*gR[i*3 + COMP_Y];
-			cSample->gR[i*3 + COMP_Z]	=	X[COMP_Z]*gR[i*3 + COMP_X] + Y[COMP_Z]*gR[i*3 + COMP_Y];
-		}
+		for (i=0;i<21;i++)	cSample->gR[i]	=	0;
+		for (i=0;i<21;i++)	cSample->gP[i]	=	0;
 
 		// Compute the magnitude of the translational gradient
-		float	magGrad	=	0;
-		for (i=0;i<21;i++)	magGrad	+=	cSample->gP[i]*cSample->gP[i];
-		magGrad	=	sqrtf(magGrad / dotvv(irradiance,irradiance));
-		if (magGrad > 1 / rMean) {
-			rMean	=	1 / magGrad;
-		}
+		//const float	magGrad	=	dotvv(cSample->gP,cSample->gP) / (coverage*coverage);
+		//if (magGrad*rMean*rMean > 1) {
+		//	rMean	=	isqrtf(magGrad);
+		//}
 
 		// Clamp the R
-		rMean					=	max(rMean, lookup->lengthA*lookup->minFGRadius + lookup->lengthB);
-		rMean					=	min(rMean, lookup->lengthA*lookup->maxFGRadius + lookup->lengthB);
+		rMean					=	max(rMean, lookup->minFGRadius);
+		rMean					=	min(rMean, lookup->maxFGRadius);
+
+		rMean					=	max(rMean, 0.1);
+		rMean					=	min(rMean, 3);
+
 
 		// Record the data
 		movvv(cSample->P,P);
