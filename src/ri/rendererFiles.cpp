@@ -189,6 +189,36 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyTexture
+// Description			:	Encapsulates a texture we use if we could not load it
+// Comments				:
+// Date last edited		:	9/24/2002
+class	CDummyTexture : public CTexture {
+public:
+						CDummyTexture(const char *name) : CTexture(name) {}
+						~CDummyTexture() {}
+
+	float				lookupz(float u,float v,float z,const CTextureLookup *lookup)					{ return 0;	}
+	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup)				{ initv(dest,lookup->fill);	}
+	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup) { initv(dest,lookup->fill);	}
+	};
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyEnvironment
+// Description			:	A dummy environment map we create if we can not instantiate
+// Comments				:
+// Date last edited		:	9/24/2002
+class	CDummyEnvironment : public CEnvironment {
+public:
+						CDummyEnvironment(const char *name) : CEnvironment(name) {}
+						~CDummyEnvironment() {}
+						
+	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) { initv(dest,lookup->fill);	}
+};
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
@@ -209,7 +239,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
 			error(CODE_NOFILE,"Unable open texture \"%s\"\n",name);
-			tex					=	new CTexture(name,128,128,TEXTURE_PERIODIC,TEXTURE_PERIODIC);
+			tex					=	new CDummyTexture(name);
 		}
 
 		frameFiles->insert(tex->name,tex);
@@ -237,7 +267,7 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
 			error(CODE_NOFILE,"Unable open environment \"%s\"\n",name);
-			tex					=	new CEnvironment(name);
+			tex					=	new CDummyEnvironment(name);
 		}
 
 		frameFiles->insert(tex->name,tex);

@@ -127,6 +127,10 @@ int								CRenderer::netNumServers				=	0;
 SOCKET							*CRenderer::netServers					=	NULL;
 int								CRenderer::numNetrenderedBuckets		=	0;
 char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];
+int								CRenderer::textureRefNumber				=	0;
+CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;
+int								CRenderer::textureUsedMemory			=	0;
+int								CRenderer::textureMaxMemory				=	0;
 
 // Global synchronization objects
 TMutex							CRenderer::commitMutex;
@@ -793,7 +797,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	beginDisplays();
 
 	// Initialize the texturing
-	CTexture::textureInit(maxTextureSize);
+	textureSetMaxMemory(maxTextureSize);
 
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
@@ -903,9 +907,6 @@ void		CRenderer::endFrame() {
 
 	// Shutdown the texturing system
 	CBrickMap::brickMapShutdown();
-
-	// Shutdown the brickmaps
-	CTexture::textureShutdown();
 
 	// Release the world
 	world->detach();

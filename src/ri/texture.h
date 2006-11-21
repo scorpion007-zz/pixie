@@ -36,14 +36,7 @@
 #include "common/containers.h"
 #include "attributes.h"
 #include "fileResource.h"
-#include "random.h"
-
-// Texture wrapping mode
-typedef enum {
-	TEXTURE_PERIODIC,
-	TEXTURE_BLACK,
-	TEXTURE_CLAMP
-} TTextureMode;
+#include "stats.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -53,14 +46,14 @@ typedef enum {
 // Date last edited		:	02/22/2006
 class	CTextureInfoBase : public CFileResource {
 public:
-						CTextureInfoBase(const char *n) : CFileResource(n) { }
+						CTextureInfoBase(const char *name) : CFileResource(name) { }
 	virtual				~CTextureInfoBase() { }
 	
-	virtual void		getResolution(float*)		= 0;
-	virtual char* 		getTextureType()			= 0;
-	virtual int 		getNumChannels()			= 0;
-	virtual int 		getViewMatrix(float*)		= 0;
-	virtual int 		getProjectionMatrix(float*)	= 0;
+	virtual void		getResolution(float *dest)			= 0;
+	virtual char* 		getTextureType()					= 0;
+	virtual int 		getNumChannels()					= 0;
+	virtual int 		getViewMatrix(float *dest)			= 0;
+	virtual int 		getProjectionMatrix(float *dest)	= 0;
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -70,26 +63,25 @@ public:
 // Date last edited		:	9/24/2002
 class	CTexture : public CTextureInfoBase {
 public:
+						CTexture(const char *name) : CTextureInfoBase(name) {
+							stats.numTextures++;
+							if (stats.numTextures > stats.numPeakTextures)	stats.numPeakTextures	=	stats.numTextures;
+						}
 
-						CTexture(const char *,int,int,TTextureMode,TTextureMode);
-	virtual				~CTexture();
+	virtual				~CTexture() {
+							stats.numTextures--;
+						}
 
-	virtual float		lookupz(float,float,float,const CTextureLookup *);						// Depth access
-	virtual	void		lookup(float *,float,float,const CTextureLookup *);						// Point access
-	virtual	void		lookup4(float *,const float *,const	float *,const CTextureLookup *);	// Area access
+	virtual float		lookupz(float u,float v,float z,const CTextureLookup *lookup)					=	0;
+	virtual	void		lookup(float *dest,float u,float v,const CTextureLookup *lookup)				=	0;
+	virtual	void		lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup)	=	0;
 	
 	// textureinfo support
-	void				getResolution(float *r) 	{ r[0] = (float) width; r[1] = (float) height; }
+	void				getResolution(float *r)		{ r[0] = 0; r[1] = 0; }
 	char* 				getTextureType()			{ return "texture"; }
 	int 				getNumChannels()			{ return 0; }
 	int 				getViewMatrix(float*)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
-
-	int					width,height;											// The dimensions of the texture (just ised to figure out the blur amount)
-	TTextureMode		sMode,tMode;											// The texture wrapping mode
-
-	static void			textureInit(int);										// This function MUST be called before any texture is loaded
-	static void			textureShutdown();										// This function MUST be called before termination
 };
 
 
@@ -101,11 +93,16 @@ public:
 // Date last edited		:	9/24/2002
 class	CEnvironment : public CTextureInfoBase {
 public:
+						CEnvironment(const char *name) : CTextureInfoBase(name) {
+							stats.numEnvironments++;
+							if (stats.numEnvironments > stats.numPeakEnvironments)	stats.numPeakEnvironments	=	stats.numEnvironments;
+						}
 
-						CEnvironment(const char *);
-	virtual				~CEnvironment();
+	virtual				~CEnvironment() {
+							stats.numEnvironments--;
+						}
 
-	virtual	void		lookup(float *,const float *,const float *,const float *,const float *,const CTextureLookup *);
+	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup)	=	0;
 	
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = 0; r[1] = 0; }
@@ -118,7 +115,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDeepShadowHeader
-// Description			:	The deep shadow map header
+// Description			:	The deep shadow map header (used internally)
 // Comments				:
 // Date last edited		:	2/28/2002
 class	CDeepShadowHeader {
@@ -127,8 +124,9 @@ public:
 	int					xTiles,yTiles;			// The number of tiles
 	int					tileSize;				// The tile dimensions
 	int					tileShift;				// The tile shift
-	matrix				toNDC;
+	matrix				toNDC;					// Xform to the normalized device coordinates
 };
+
 
 
 #endif

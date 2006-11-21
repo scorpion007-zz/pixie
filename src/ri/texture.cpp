@@ -41,22 +41,8 @@
 #include <string.h>
 #include <tiffio.h>
 
-
-
-
-
-
 // FIXME: rand() is not thread safe
 #define	urand()	(rand() / (float) RAND_MAX)
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-//
-//		Class declerations
-//
-///////////////////////////////////////////////////////////////////////
 
 
 
@@ -69,264 +55,12 @@
 // Date last edited		:	7/7/2001
 class	CTextureBlock	{
 public:
-	void				*data;					// Where the block data is stored (NULL if the block has been paged out)
-	int					size;					// Size of the block in bytes
-	int					lastRefNumber;			// Last time this block was referenced
-	CTextureBlock		*next;					// Pointer to the next used / empty block
-	CTextureBlock		*prev;					// Pointer to the previous used / empty block
+	void				*data;				// Where the block data is stored (NULL if the block has been paged out)
+	int					size;				// Size of the block in bytes
+	int					lastRefNumber;		// Last time this block was referenced
+	CTextureBlock		*next;				// Pointer to the next used / empty block
+	CTextureBlock		*prev;				// Pointer to the previous used / empty block
 };
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLayer
-// Description			:	This class encapsulates a single 2D texture layer in a file
-// Comments				:
-// Date last edited		:	9/24/2002
-class	CTextureLayer  {
-public:
-						CTextureLayer(const char *,int,int,int,int,int,int);
-	virtual				~CTextureLayer();
-
-	void				lookup(float *,float,float,int,int,const CTextureLookup *);		// Color lookup
-	float				lookupz(float,float,float,int,int,const CTextureLookup *);		// Depth lookup
-
-
-	char				*name;															// The filename of the texture
-	int					directory;														// The directory index in the tiff file
-	int					width,height,numSamples;										// The image info
-	int					fileWidth,fileHeight;											// The physical size in the file
-protected:
-	// This function must be overriden by the child class
-	virtual	void		lookupPixel(float *,int,int,int,int,const CTextureLookup *)		=	0;		// Lookup 4 pixel values
-};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CMadeTexture
-// Description			:	A previously made texture
-// Comments				:
-// Date last edited		:	9/24/2002
-class	CMadeTexture : public CTexture {
-public:
-						CMadeTexture(const char *,int,int,TTextureMode,TTextureMode);
-	virtual				~CMadeTexture();
-
-	float				lookupz(float,float,float,const CTextureLookup *);
-	void				lookup(float *,float,float,const CTextureLookup *);
-	void				lookup4(float *,const float *,const float *,const CTextureLookup *);
-	
-	// textureinfo support
-	int 				getNumChannels()			{ return layers[0]->numSamples; }
-
-	int					numLayers;												// The number of layers
-	CTextureLayer		**layers;												// The actual layers
-	CSobol<2>			generator;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRegularTexture
-// Description			:	A regular texture
-// Comments				:
-// Date last edited		:	9/24/2002
-class	CRegularTexture : public CTexture {
-public:
-						CRegularTexture(const char *,int,int,TTextureMode,TTextureMode);
-	virtual				~CRegularTexture();
-
-	float				lookupz(float,float,float,const CTextureLookup *);
-	void				lookup(float *,float,float,const CTextureLookup *);
-	void				lookup4(float *,const float *,const float *,const CTextureLookup *lookup);
-	
-	// textureinfo support
-	int 				getNumChannels()			{ return layer->numSamples; }
-	
-	CTextureLayer		*layer;													// There's only one layer
-	CSobol<2>			generator;
-};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadow
-// Description			:	A single sided shadow map
-// Comments				:
-// Date last edited		:	9/24/2002
-class	CShadow : public CEnvironment{
-public:
-
-						CShadow(const char *,float *,CTexture *s);
-	virtual				~CShadow();
-
-	void				lookup(float *,const float *,const float *,const float *,const float *,const CTextureLookup *);
-	
-	// textureinfo support
-	void				getResolution(float *r) 	{ side->getResolution(r); }
-	char* 				getTextureType()			{ return "shadow"; }
-	int 				getNumChannels()			{ return side->getNumChannels(); }
-	int 				getViewMatrix(float *m)		{ movmm(m,toNDC); return TRUE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
-
-private:
-	CTexture			*side;
-	matrix				toNDC;
-	CSobol<4>			generator;
-};
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDeepShadow
-// Description			:	A deep shadow map
-// Comments				:
-// Date last edited		:	2/28/2002
-class	CDeepShadow : public CEnvironment{
-	class	CDeepTile {
-	public:
-		float			**data;
-		float			**lastData;
-		CTextureBlock	*block;
-	};
-
-public:
-
-						CDeepShadow(const char *,const char *,const float *,FILE *);
-	virtual				~CDeepShadow();
-
-	void				lookup(float *,const float *,const float *,const float *,const float *,const CTextureLookup *);
-	
-	// textureinfo support
-	void				getResolution(float *r) 	{ r[0] = (float) header.xres; r[1] = (float) header.yres; }
-	char* 				getTextureType()			{ return "shadow"; }
-	int 				getNumChannels()			{ return 4; }
-	int 				getViewMatrix(float *m)		{ movmm(m,header.toNDC); return TRUE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
-private:
-	void				loadTile(int,int);
-
-	char				*fileName;				// The name of the file
-	CDeepTile			**tiles;				// Array of tiles
-	int					*tileIndices;			// The tile offset index in the file
-	CDeepShadowHeader	header;					// The header
-	int					fileStart;				// The offset in the file
-};
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCubicEnvironment
-// Description			:	A Cubic environment map
-// Comments				:
-// Date last edited		:	9/24/2002
-class	CCubicEnvironment : public CEnvironment{
-public:
-
-						CCubicEnvironment(const char *,CTexture **s);
-	virtual				~CCubicEnvironment();
-
-	void				lookup(float *,const float *,const float *,const float *,const float *,const CTextureLookup *);
-
-	// textureinfo support
-	void				getResolution(float *r) 	{ sides[0]->getResolution(r); }
-	char* 				getTextureType()			{ return "environment"; }
-	int 				getNumChannels()			{ return sides[0]->getNumChannels(); }
-	int 				getViewMatrix(float *m)		{ return FALSE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
-	CTexture			*sides[6];
-	CSobol<2>			generator;
-};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphericalEnvironment
-// Description			:	A Spherical environment map
-// Comments				:	RenderMan does not support cylinderical env. maps yet so this class is not used
-// Date last edited		:	9/24/2002
-class	CSphericalEnvironment : public CEnvironment{
-public:
-
-						CSphericalEnvironment(const char *,CTexture *s);
-	virtual				~CSphericalEnvironment();
-
-	void				lookup(float *,const float *,const float *,const float *,const float *,const CTextureLookup *);
-
-	// textureinfo support
-	void				getResolution(float *r) 	{ side->getResolution(r); }
-	char* 				getTextureType()			{ return "environment"; }
-	int 				getNumChannels()			{ return side->getNumChannels(); }
-	int 				getViewMatrix(float *m)		{ return FALSE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
-	CTexture			*side;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylindericalEnvironment
-// Description			:	A Cylinderical environment map
-// Comments				:
-// Date last edited		:	9/24/2002
-class	CCylindericalEnvironment : public CEnvironment{
-public:
-
-						CCylindericalEnvironment(const char *,CTexture *s);
-	virtual				~CCylindericalEnvironment();
-
-	void				lookup(float *,const float *,const float *,const float *,const float *,const CTextureLookup *);
-
-	// textureinfo support
-	void				getResolution(float *r) 	{ side->getResolution(r); }
-	char* 				getTextureType()			{ return "environment"; }
-	int 				getNumChannels()			{ return side->getNumChannels(); }
-	int 				getViewMatrix(float *m)		{ return FALSE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
-	CTexture			*side;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-//
-//		Static data structures
-//
-///////////////////////////////////////////////////////////////////////
-static	int						refNumber				=	0;				// The last reference number
-static	CTextureBlock			*usedBlocks				=	NULL;			// All blocks currently in use
-static	CTextureBlock			*freeBlocks				=	NULL;			// Free blocks
-static	int						numUsedBlocks			=	0;				// Number of used blocks
-static	int						usedTextureMemory		=	0;				// The amount of texture memory in use
-static	int						maxTextureMemory		=	0;				// The maximum texture memory
-const	double					inv255					=	1 / 255.0;		// A useful number
-
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -386,19 +120,19 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	7/7/2001
-static void		textureMemFlush(CTextureBlock *entry) {
-	int				i,j;
-	CTextureBlock	*cBlock;
-	CTextureBlock	**activeBlocks;
+static inline void	textureMemFlush(CTextureBlock *entry,int all) {
+	
+	// Do we have stuff to free ?
+	if (CRenderer::textureUsedBlocks == NULL)	return;
 
 	osLock(CRenderer::memoryMutex);
 	memBegin(CRenderer::globalMemory);
 
-	// Do we have stuff to free ?
-	if (usedBlocks == NULL)	return;
-
 	// Figure out how many blocks we have in memory
-	for (cBlock=usedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
+	int				i,j;
+	CTextureBlock	**activeBlocks;
+	CTextureBlock	*cBlock;
+	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
 		if (cBlock->data != NULL) {
 			i++;
 		}
@@ -406,7 +140,7 @@ static void		textureMemFlush(CTextureBlock *entry) {
 	
 	// Collect those blocks into an array
 	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),CRenderer::globalMemory);
-	for (cBlock=usedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
+	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
 		if (cBlock->data != NULL) {
 			if (cBlock != entry) {
 				activeBlocks[i++]	=	cBlock;
@@ -418,38 +152,43 @@ static void		textureMemFlush(CTextureBlock *entry) {
 	if (i > 1)	textureQuickSort(activeBlocks,0,i-1);
 
 	// Free the memory
-	for (j=0;(j<i) && (usedTextureMemory > (maxTextureMemory/2));j++) {
-		cBlock	=	activeBlocks[j];
+	if (all)	CRenderer::textureMaxMemory	=	0;
+	for (j=0;(j<i) && (CRenderer::textureUsedMemory > (CRenderer::textureMaxMemory/2));j++) {
+		cBlock							=	activeBlocks[j];
 
-		stats.textureSize	-=	cBlock->size;
-		stats.textureMemory	-=	cBlock->size;
-		usedTextureMemory	-=	cBlock->size;
+		stats.textureSize				-=	cBlock->size;
+		stats.textureMemory				-=	cBlock->size;
+		CRenderer::textureUsedMemory	-=	cBlock->size;
 		delete [] (unsigned char *) cBlock->data;
-		cBlock->data		=	NULL;
+		cBlock->data					=	NULL;
 	}
 
 	memEnd(CRenderer::globalMemory);
 	osUnlock(CRenderer::memoryMutex);
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureLoadBlock
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
 // Date last edited		:	7/7/2001
-static void			textureAllocateBlock(CTextureBlock *entry) {
+static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry) {
 	stats.textureSize				+=	entry->size;
 	stats.peakTextureSize			=	max(stats.textureSize,stats.peakTextureSize);
 	stats.textureMemory				+=	entry->size;
 	stats.transferredTextureData	+=	entry->size;
-	usedTextureMemory				+=	entry->size;
+	CRenderer::textureUsedMemory	+=	entry->size;
 
-	entry->data						=	new unsigned char[entry->size];
+	unsigned char *data				=	new unsigned char[entry->size];
 
 	// If we exceeded the maximum texture memory, phase out the last texture
-	if (usedTextureMemory > maxTextureMemory)
-		textureMemFlush(entry);
+	if (CRenderer::textureUsedMemory > CRenderer::textureMaxMemory)
+		textureMemFlush(entry,FALSE);
+
+	return data;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -458,7 +197,7 @@ static void			textureAllocateBlock(CTextureBlock *entry) {
 // Return Value			:	Pointer to the new texture
 // Comments				:
 // Date last edited		:	7/7/2001
-static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir) {
+static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir) {
 	void			*data	=	NULL;
 	TIFF			*in;
 
@@ -475,6 +214,7 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 	TIFFSetErrorHandler(tiffErrorHandler);
 	TIFFSetWarningHandler(tiffErrorHandler);
 
+	// Open the file
 	in		=	TIFFOpen(name,"r");
 
 	if (in != NULL) {		// Error, we opened this file before
@@ -501,13 +241,13 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 		} else if(bitspersample == 16){
 			pixelSize	=	numSamples*sizeof(unsigned short);
 		} else {
+			assert(bitspersample == 32);
 			pixelSize	=	numSamples*sizeof(float);
 		}
 
 		// Allocate space for the texture
 		assert(entry->data == NULL);
-		textureAllocateBlock(entry);		
-		data		=	(unsigned char *) entry->data;
+		data		=	textureAllocateBlock(entry);		
 
 		// Do we need to read the entire texture ?
 		if ((x != 0) || (y != 0) || (w != (int) width) || (h != (int) height)) {
@@ -582,65 +322,42 @@ static void			textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w
 }
 
 //////////////////////////////////////////////////////////////////////
-// Function				:	textureNewBlock
-// Description			:	Create a new texture block
+// Function				:	texturRegisterBlock
+// Description			:	Add a block into the list of used blocks
 // Return Value			:	Pointer to the new block
 // Comments				:
 // Date last edited		:	7/7/2001
-static CTextureBlock	*textureNewBlock(int size) {
-	CTextureBlock	*cEntry	=	NULL;
+static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 	
-	if (freeBlocks != NULL)	{
-		cEntry		=	freeBlocks;
-		freeBlocks	=	cEntry->next;
-	}
+	cEntry->prev						=	NULL;
+	cEntry->next						=	CRenderer::textureUsedBlocks;
+	if (CRenderer::textureUsedBlocks != NULL)
+		CRenderer::textureUsedBlocks->prev	=	cEntry;
+	CRenderer::textureUsedBlocks		=	cEntry;
 
-	if (cEntry == NULL) {
-		cEntry		=	new CTextureBlock;
-	}
-
-	cEntry->prev			=	NULL;
-	cEntry->next			=	usedBlocks;
-	if (usedBlocks != NULL)
-		usedBlocks->prev		=	cEntry;
-	usedBlocks				=	cEntry;
-
-	cEntry->data			=	NULL;
-	cEntry->lastRefNumber	=	refNumber;
-	cEntry->size			=	size;
-
-	return cEntry;
+	cEntry->data						=	NULL;
+	cEntry->lastRefNumber				=	CRenderer::textureRefNumber;
+	cEntry->size						=	size;
 }
 
 //////////////////////////////////////////////////////////////////////
-// Function				:	textureDeleteBlock
-// Description			:	Delete a texture block
+// Function				:	texturUnregisterBlock
+// Description			:	Remove the block
 // Return Value			:	Pointer to the new block
 // Comments				:
 // Date last edited		:	7/7/2001
-static void		textureDeleteBlock(CTextureBlock *cEntry) {
-
-	// Remove the block from a doubly linked list
-	if (cEntry->prev == NULL) {
-		assert(cEntry == usedBlocks);
-		usedBlocks			=	cEntry->next;
-		if (usedBlocks != NULL)
-			usedBlocks->prev	=	NULL;
-	} else {
-		cEntry->prev->next	=	cEntry->next;
-		if (cEntry->next != NULL)
-			cEntry->next->prev	=	cEntry->prev;
-	}
+static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
+	
+	if (cEntry->next != NULL)	cEntry->next->prev						=	cEntry->prev;
+	if (cEntry->prev != NULL)	cEntry->prev->next						=	cEntry->next;
+	else						CRenderer::textureUsedBlocks			=	cEntry->next;
 
 	if (cEntry->data != NULL) {
 		stats.textureSize	-=	cEntry->size;
 		stats.textureMemory	-=	cEntry->size;
-		usedTextureMemory	-=	cEntry->size;
+		CRenderer::textureUsedMemory	-=	cEntry->size;
 		delete [] (unsigned char *) cEntry->data;
 	}
-	
-	cEntry->next		=	freeBlocks;
-	freeBlocks			=	cEntry;
 }
 
 
@@ -655,6 +372,135 @@ static void		textureDeleteBlock(CTextureBlock *cEntry) {
 
 
 
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+//
+//		Class declerations
+//
+///////////////////////////////////////////////////////////////////////
+
+// Texture wrapping modes
+typedef enum {
+	TEXTURE_PERIODIC	=	0,
+	TEXTURE_BLACK,
+	TEXTURE_CLAMP
+} TTextureMode;
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTextureLayer
+// Description			:	This class encapsulates a single 2D texture layer in a file
+// Comments				:
+// Date last edited		:	9/24/2002
+class	CTextureLayer  {
+public:
+						CTextureLayer(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode) {
+							this->directory		=	directory;
+							this->width			=	width;
+							this->height		=	height;
+							this->numSamples	=	numSamples;
+							this->fileWidth		=	fileWidth;
+							this->fileHeight	=	fileHeight;
+							this->name			=	strdup(name);
+							this->sMode			=	sMode;
+							this->tMode			=	tMode;
+						}
+
+	virtual				~CTextureLayer() {
+							free(name);
+						}
+
+	void				lookup(float *r,float s,float t,const CTextureLookup *lookup) { 
+							s		*=	width;					// To the pixel space
+							t		*=	height;
+							int		si	=	(int) floor(s);		// The integer pixel coordinates
+							int		ti	=	(int) floor(t);
+							float	ds	=	s - si;
+							float	dt	=	t - ti;
+
+							if (si >= width)	si	=  (sMode == TEXTURE_PERIODIC) ? (si - width)  : (width-1);
+							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
+
+							float	res[4*3];
+							lookupPixel(res,si,ti,lookup);
+
+							float	tmp;
+
+							tmp		=	(1-ds)*(1-dt);				// Bilinear interpolation
+							r[0]	=	res[0]*tmp;
+							r[1]	=	res[1]*tmp;
+							r[2]	=	res[2]*tmp;
+
+							tmp		=	ds*(1-dt);
+							r[0]	+=	res[3]*tmp;
+							r[1]	+=	res[4]*tmp;
+							r[2]	+=	res[5]*tmp;
+
+							tmp		=	(1-ds)*dt;
+							r[0]	+=	res[6]*tmp;
+							r[1]	+=	res[7]*tmp;
+							r[2]	+=	res[8]*tmp;
+
+							tmp		=	ds*dt;
+							r[0]	+=	res[9]*tmp;
+							r[1]	+=	res[10]*tmp;
+							r[2]	+=	res[11]*tmp;
+						}
+
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
+							s		*=	width;						// To the pixel space
+							t		*=	height;
+							int		si		=	(int) floor(s);				// The integer pixel coordinates
+							int		ti		=	(int) floor(t);
+							float	ds		=	s - si;
+							float	dt		=	t - ti;
+
+							if (si >= width)	si	=  (sMode == TEXTURE_PERIODIC) ? (si - width)  : (width-1);
+							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
+
+							float	res[4*3];
+							lookupPixel(res,si,ti,lookup);
+
+							float	r		=	0;
+
+							if (z > res[0]) {
+								r		+=	(1-ds)*(1-dt);
+							}
+
+							if (z > res[3]) {
+								r		+=	ds*(1-dt);
+							}
+
+							if (z > res[6]) {
+								r		+=	(1-ds)*dt;
+							}
+
+							if (z > res[9]) {
+								r		+=	ds*dt;
+							}
+
+							return r;
+						}
+
+	char				*name;															// The filename of the texture
+	short				directory;														// The directory index in the tiff file
+	short				numSamples;														// The number of samples in the texture
+	int					width,height;													// The image info
+	int					fileWidth,fileHeight;											// The physical size in the file
+	TTextureMode		sMode,tMode;													// The wrap modes
+protected:
+	// This function must be overriden by the child class
+	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *)		=	0;		// Lookup 4 pixel values
+};
 
 
 
@@ -672,10 +518,9 @@ public:
 					// Return Value			:	-
 					// Comments				:
 					// Date last edited		:	2/28/2002
-					CBasicTexture(const char *name,int directory,int width,int height,int numSamples,int fileWidth,int fileHeight,double Mult) :
-					CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight)	{
-						this->dataBlock		=	textureNewBlock(width*height*numSamples*sizeof(T));
-						this->M				=	Mult;
+					CBasicTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
+						textureRegisterBlock(&dataBlock,width*height*numSamples*sizeof(T));
+						M				=	Mult;
 					}
 
 					///////////////////////////////////////////////////////////////////////
@@ -686,36 +531,41 @@ public:
 					// Comments				:
 					// Date last edited		:	2/28/2002
 					~CBasicTexture() {
-						textureDeleteBlock(dataBlock);
+						textureUnregisterBlock(&dataBlock);
 					}
 
 protected:
 					// The pixel lookup
-			void	lookupPixel(float *res,int x,int y,int smode,int tmode,const CTextureLookup *l) {
-						const T		*data;
-						int			xi,yi;
+			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l) {
 
-						if (dataBlock->data == NULL) {
+						if (dataBlock.data == NULL) {
 							// The data is cached out
-							textureLoadBlock(dataBlock,name,0,0,fileWidth,fileHeight,directory);
+							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory);
 						}
 
 						// Texture cache management
-						refNumber++;
-						dataBlock->lastRefNumber	=	refNumber;
+						CRenderer::textureRefNumber++;
+						dataBlock.lastRefNumber	=	CRenderer::textureRefNumber;
 
-						xi		=	x+1;
-						yi		=	y+1;
+						int	xi		=	x+1;
+						int	yi		=	y+1;
 						
+						assert(x >= 0);
+						assert(y >= 0);
+						assert(x < width);
+						assert(y < height);
+
 						// these must be after the xi,yi calculation
-						if (x < 0)			x  = (smode == TEXTURE_PERIODIC) ? (x + width)   : 0;
-						if (y < 0)			y  = (tmode == TEXTURE_PERIODIC) ? (y + height)  : 0;
-						if (xi >= width)	xi = (smode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
-						if (yi >= height)	yi = (tmode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
+						//if (x < 0)			x  = (smode == TEXTURE_PERIODIC) ? (x + width)   : 0;
+						//f (y < 0)			y  = (tmode == TEXTURE_PERIODIC) ? (y + height)  : 0;
+						if (xi >= width)	xi = (sMode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
+						if (yi >= height)	yi = (tMode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
+
+						const T		*data;
 
 						if (l->lookupFloat) {
 #define access(__x,__y)											\
-							data	=	&((T *) dataBlock->data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
+							data	=	&((T *) dataBlock.data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);	\
 							res[1]	=	l->fill;				\
 							res[2]	=	l->fill;				\
@@ -729,7 +579,7 @@ protected:
 
 						} else {
 #define access(__x,__y)											\
-							data	=	&((T *) dataBlock->data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
+							data	=	&((T *) dataBlock.data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);	\
 							res[1]	=	(float) (data[1]*M);	\
 							res[2]	=	(float) (data[2]*M);	\
@@ -744,7 +594,7 @@ protected:
 					}
 
 private:
-	CTextureBlock	*dataBlock;
+	CTextureBlock	dataBlock;
 	double			M;
 };
 
@@ -755,91 +605,92 @@ private:
 // Date last edited		:	9/24/2002
 template <class T> class CTiledTexture : public CTextureLayer {
 public:
-			///////////////////////////////////////////////////////////////////////
-			// Class				:	CTiledTexture
-			// Method				:	CTiledTexture
-			// Description			:	Ctor
-			// Return Value			:	-
-			// Comments				:
-			// Date last edited		:	2/28/2002
-			CTiledTexture(const char *name,int directory,int width,int height,int numSamples,int fileWidth,int fileHeight,int tileSize,int tileSizeShift,double Mult) :
-			CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight)	{
-					int	i,j;
-					int	tileLength;
-
+				///////////////////////////////////////////////////////////////////////
+				// Class				:	CTiledTexture
+				// Method				:	CTiledTexture
+				// Description			:	Ctor
+				// Return Value			:	-
+				// Comments				:
+				// Date last edited		:	2/28/2002
+				CTiledTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,int tileSize,int tileSizeShift,double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
 					this->tileSize		=	tileSize;
 					this->tileSizeShift	=	tileSizeShift;
-					tileLength			=	tileSize*tileSize*numSamples*sizeof(T);
 
 					xTiles				=	(int) ceil((float) width / (float) tileSize);
 					yTiles				=	(int) ceil((float) height / (float) tileSize);
 
-					dataBlocks			=	new CTextureBlock**[yTiles];
+					const int	tileLength	=	tileSize*tileSize*numSamples*sizeof(T);
+					int			i,j;
+
+					dataBlocks			=	new CTextureBlock*[yTiles];
 					for (i=0;i<yTiles;i++) {
-						dataBlocks[i]	=	new CTextureBlock*[xTiles];
+						dataBlocks[i]	=	new CTextureBlock[xTiles];
 
 						for (j=0;j<xTiles;j++) {
-							dataBlocks[i][j]	=	textureNewBlock(tileLength);
+							textureRegisterBlock(dataBlocks[i] + j,tileLength);
 						}
 					}
 
 					M					=	Mult;
 				}
 
-			///////////////////////////////////////////////////////////////////////
-			// Class				:	CTiledTexture
-			// Method				:	~CTiledTexture
-			// Description			:	Dtor
-			// Return Value			:	-
-			// Comments				:
-			// Date last edited		:	2/28/2002
-			~CTiledTexture() {
-				int i,j;
+				///////////////////////////////////////////////////////////////////////
+				// Class				:	CTiledTexture
+				// Method				:	~CTiledTexture
+				// Description			:	Dtor
+				// Return Value			:	-
+				// Comments				:
+				// Date last edited		:	2/28/2002
+				~CTiledTexture() {
+					int i,j;
 
-				for (i=0;i<yTiles;i++) {
-					for (j=0;j<xTiles;j++) {
-						textureDeleteBlock(dataBlocks[i][j]);
+					for (i=0;i<yTiles;i++) {
+						for (j=0;j<xTiles;j++) {
+							textureUnregisterBlock(&dataBlocks[i][j]);
+						}
+
+						delete [] dataBlocks[i];
 					}
 
-					delete [] dataBlocks[i];
+					delete [] dataBlocks;
 				}
-
-				delete [] dataBlocks;
-			}
 
 protected:
 
 					// Pixel lookup
-	void			lookupPixel(float *res,int x,int y,int smode,int tmode,const CTextureLookup *l) {
+	void			lookupPixel(float *res,int x,int y,const CTextureLookup *l) {
 						int					xTile;
 						int					yTile;
 						CTextureBlock		*block;
 						const T				*data;
-						int					xi,yi;
 						const int			t		=	tileSize - 1;
 
-						xi		=	x+1;
-						yi		=	y+1;
+						int	xi		=	x+1;
+						int	yi		=	y+1;
 						
 						// these must be after the xi,yi calculation
-						if (x < 0)			x  = (smode == TEXTURE_PERIODIC) ? (x + width)   : 0;
-						if (y < 0)			y  = (tmode == TEXTURE_PERIODIC) ? (y + height)  : 0;
-						if (xi >= width)	xi = (smode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
-						if (yi >= height)	yi = (tmode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
+						assert(x >= 0);
+						assert(y >= 0);
+						assert(x < width);
+						assert(y < height);
+
+						//if (x < 0)			x  = (smode == TEXTURE_PERIODIC) ? (x + width)   : 0;
+						//if (y < 0)			y  = (tmode == TEXTURE_PERIODIC) ? (y + height)  : 0;
+						if (xi >= width)	xi = (sMode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
+						if (yi >= height)	yi = (tMode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
 
 						if (l->lookupFloat) {
-
 #define	access(__x,__y)																\
 							xTile	=	__x >> tileSizeShift;						\
 							yTile	=	__y >> tileSizeShift;						\
-							block	=	dataBlocks[yTile][xTile];					\
+							block	=	dataBlocks[yTile] + xTile;					\
 																					\
 							if (block->data == NULL) {								\
 								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory);		\
 							}														\
 																					\
-							refNumber++;											\
-							block->lastRefNumber	=	refNumber;					\
+							CRenderer::textureRefNumber++;							\
+							block->lastRefNumber	=	CRenderer::textureRefNumber;	\
 																					\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);						\
@@ -858,14 +709,14 @@ protected:
 #define	access(__x,__y)																\
 							xTile	=	__x >> tileSizeShift;						\
 							yTile	=	__y >> tileSizeShift;						\
-							block	=	dataBlocks[yTile][xTile];					\
+							block	=	dataBlocks[yTile] + xTile;					\
 																					\
 							if (block->data == NULL) {								\
 								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory);		\
 							}														\
 																					\
-							refNumber++;											\
-							block->lastRefNumber	=	refNumber;					\
+							CRenderer::textureRefNumber++;							\
+							block->lastRefNumber	=	CRenderer::textureRefNumber;	\
 																					\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);						\
@@ -884,7 +735,7 @@ protected:
 
 						
 
-	CTextureBlock	***dataBlocks;
+	CTextureBlock	**dataBlocks;
 	int				xTiles,yTiles;
 	int				tileSize,tileSizeShift;
 	double			M;
@@ -893,1197 +744,990 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLayer
-// Method				:	CTextureLayer
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CTextureLayer::CTextureLayer(const char *n,int dir,int w,int h,int ns,int fw,int fh) {
-	directory	=	dir;
-	width		=	w;
-	height		=	h;
-	numSamples	=	ns;
-	fileWidth	=	fw;
-	fileHeight	=	fh;
-	name		=	strdup(n);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLayer
-// Method				:	CTextureLayer
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CTextureLayer::~CTextureLayer() {
-	free(name);
-}
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLayer
-// Method				:	lookup
-// Description			:	Lookup a pixel in the texture (bilinear lookup)
-// Return Value			:	Color in r
-// Comments				:	0 <= (x,y) <= 1
-// Date last edited		:	2/28/2002
-void		CTextureLayer::lookup(float *r,float x,float y,int smode,int tmode,const CTextureLookup *l) {
-	int		xi;
-	int		yi;
-	float	dx;
-	float	dy;
-	float	res[4*3];
-	float	tmp;
-
-	x		*=	width;						// To the pixel space
-	y		*=	height;
-	x		-=	0.5;						// Pixel centers
-	y		-=	0.5;
-	xi		=	(int) floor(x);				// The integer pixel coordinates
-	yi		=	(int) floor(y);
-	dx		=	x - xi;
-	dy		=	y - yi;
-
-	if (xi >= width)	xi	=  (smode == TEXTURE_PERIODIC) ? (xi - width)  : (width-1);
-	if (yi >= height)	yi	=  (tmode == TEXTURE_PERIODIC) ? (yi - height) : (height-1);
 
 
-	lookupPixel(res,xi,yi,smode,tmode,l);
-
-	tmp		=	(1-dx)*(1-dy);				// Bilinear interpolation
-	r[0]	=	res[0]*tmp;
-	r[1]	=	res[1]*tmp;
-	r[2]	=	res[2]*tmp;
-
-	tmp		=	dx*(1-dy);
-	r[0]	+=	res[3]*tmp;
-	r[1]	+=	res[4]*tmp;
-	r[2]	+=	res[5]*tmp;
-
-	tmp		=	(1-dx)*dy;
-	r[0]	+=	res[6]*tmp;
-	r[1]	+=	res[7]*tmp;
-	r[2]	+=	res[8]*tmp;
-
-	tmp		=	dx*dy;
-	r[0]	+=	res[9]*tmp;
-	r[1]	+=	res[10]*tmp;
-	r[2]	+=	res[11]*tmp;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLayer
-// Method				:	lookupz
-// Description			:	Lookup a pixel in the texture (bilinear lookup)
-// Return Value			:	Color in r
-// Comments				:	0 <= (x,y) <= 1
-// Date last edited		:	2/28/2002
-float		CTextureLayer::lookupz(float x,float y,float z,int smode,int tmode,const CTextureLookup *l) {
-	int		xi;
-	int		yi;
-	float	res[4*3];
-	float	dx,dy;
-	float	r;
-
-	x		*=	width;						// To the pixel space
-	y		*=	height;
-	x		-=	0.5;						// Pixel centers
-	y		-=	0.5;
-	xi		=	(int) floor(x);				// The integer pixel coordinates
-	yi		=	(int) floor(y);
-	dx		=	x - xi;
-	dy		=	y - yi;
-
-	if (xi >= width)	xi	=  (smode == TEXTURE_PERIODIC) ? (xi - width)  : (width-1);
-	if (yi >= height)	yi	=  (tmode == TEXTURE_PERIODIC) ? (yi - height) : (height-1);
-
-	lookupPixel(res,xi,yi,smode,tmode,l);
-
-	r		=	0;
-
-	if (z > res[0]) {
-		r		+=	(1-dx)*(1-dy);
-	}
-
-	if (z > res[3]) {
-		r		+=	dx*(1-dy);
-	}
-
-	if (z > res[6]) {
-		r		+=	(1-dx)*dy;
-	}
-
-	if (z > res[9]) {
-		r		+=	dx*dy;
-	}
-
-	return r;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture
-// Method				:	CTexture
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CTexture::CTexture(const char *name,int w,int h,TTextureMode s,TTextureMode t) : CTextureInfoBase(name) {
-	stats.numTextures++;
-	if (stats.numTextures > stats.numPeakTextures)
-		stats.numPeakTextures	=	stats.numTextures;
-
-	this->width			=	w;
-	this->height		=	h;
-	this->sMode			=	s;
-	this->tMode			=	t;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture
-// Method				:	~CTexture
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CTexture::~CTexture() {
-	stats.numTextures--;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture
-// Method				:	lookupz
-// Description			:	Depth lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-float		CTexture::lookupz(float u,float v,float z,const CTextureLookup *l) {
-	return 0;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture
-// Method				:	lookup
-// Description			:	Point lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void		CTexture::lookup(float *s,float u,float v,const CTextureLookup *l) {
-	initv(s,l->fill,l->fill,l->fill);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture
-// Method				:	lookup
-// Description			:	Area lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void		CTexture::lookup4(float *s,const float *,const float *,const CTextureLookup *l) {
-	initv(s,l->fill,l->fill,l->fill);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CMadeTexture
-// Method				:	CMadeTexture
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CMadeTexture::CMadeTexture(const char *name,int w,int h,TTextureMode s,TTextureMode t) : CTexture(name,w,h,s,t) {
-	numLayers	=	0;
-	layers		=	NULL;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CMadeTexture
-// Method				:	~CMadeTexture
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CMadeTexture::~CMadeTexture() {
-	int	i;
-
-	if (layers != NULL) {
-		for (i=0;i<numLayers;i++)
-			delete layers[i];
-		delete [] layers;
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CMadeTexture
-// Method				:	lookupz
-// Description			:	Depth lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-float		CMadeTexture::lookupz(float s,float t,float z,const CTextureLookup *l) {
-	assert(numLayers > 0);
-	return layers[0]->lookupz(s,t,z,sMode,tMode,l);
-}
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMadeTexture
-// Method				:	lookup
-// Description			:	Point lookup
-// Return Value			:	-
+// Description			:	A previously made texture
 // Comments				:
-// Date last edited		:	2/28/2002
-void		CMadeTexture::lookup(float *result,float s,float t,const CTextureLookup *l) {
-	// Do the s mode
-	switch(sMode) {
-	case TEXTURE_PERIODIC:
-		s	=	fmodf(s,1);
-		if (s < 0)	s	+=	1;
-		break;
-	case TEXTURE_BLACK:
-		if ((s < 0) || (s > 1)) {
-			initv(result,l->fill,l->fill,l->fill);
-			return;
-		}
-		break;
-	case TEXTURE_CLAMP:
-		if (s < 0)		s	=	0;
-		if (s > 1)		s	=	1;
-		break;
-	}
+// Date last edited		:	9/24/2002
+class	CMadeTexture : public CTexture {
+public:
+						CMadeTexture(const char *name) : CTexture(name) {
+							numLayers	=	0;
+							layers		=	NULL;
+						}
 
-	// Do the t mode
-	switch(tMode) {
-	case TEXTURE_PERIODIC:
-		t	=	fmodf(t,1);
-		if (t < 0)	t	+=	1;
-		break;
-	case TEXTURE_BLACK:
-		if ((t < 0) || (t > 1)) {
-			initv(result,l->fill,l->fill,l->fill);
-			return;
-		}
-		break;
-	case TEXTURE_CLAMP:
-		if (t < 0)		t	=	0;
-		if (t > 1)		t	=	1;
-		break;
-	}
+	virtual				~CMadeTexture() {
+							if (layers != NULL) {
+								int	i;
 
-	layers[0]->lookup(result,s,t,sMode,tMode,l);
-}
+								for (i=0;i<numLayers;i++)
+									delete layers[i];
+								delete [] layers;
+							}
+						}
 
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
+							assert(numLayers > 0);
+							return layers[0]->lookupz(s,t,z,lookup);
+						}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CMadeTexture
-// Method				:	lookup4
-// Description			:	Area lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void		CMadeTexture::lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup) {
-	int				i;
-	float			totalContribution	=	0;
-	CTextureLayer	*layer0,*layer1;
-	float			offset;
-	float			l;
-	float			diag;
-	const float		cs	=	((u[0] + u[1] + u[2] + u[3]) * 0.25f);
-	const float		ct	=	((v[0] + v[1] + v[2] + v[3]) * 0.25f);
-	float			ds,dt,d;
+	void				lookup(float *result,float s,float t,const CTextureLookup *l) {
 
-	// Compute the tri-linear level
-	ds			=	(u[0] - cs)*width;
-	dt			=	(v[0] - ct)*height;
-	diag		=	ds*ds + dt*dt;
+							// Do the s mode
+							switch(layers[0]->sMode) {
+							case TEXTURE_PERIODIC:
+								s	=	fmodf(s,1);
+								if (s < 0)	s	+=	1;
+								break;
+							case TEXTURE_BLACK:
+								if ((s < 0) || (s > 1)) {
+									initv(result,l->fill,l->fill,l->fill);
+									return;
+								}
+								break;
+							case TEXTURE_CLAMP:
+								if (s < 0)		s	=	0;
+								if (s > 1)		s	=	1;
+								break;
+							}
 
-	ds			=	(u[1] - cs)*width;
-	dt			=	(v[1] - ct)*height;
-	d			=	ds*ds + dt*dt;
-	diag		=	min(d,diag);
+							// Do the t mode
+							switch(layers[0]->tMode) {
+							case TEXTURE_PERIODIC:
+								t	=	fmodf(t,1);
+								if (t < 0)	t	+=	1;
+								break;
+							case TEXTURE_BLACK:
+								if ((t < 0) || (t > 1)) {
+									initv(result,l->fill,l->fill,l->fill);
+									return;
+								}
+								break;
+							case TEXTURE_CLAMP:
+								if (t < 0)		t	=	0;
+								if (t > 1)		t	=	1;
+								break;
+							}
 
-	ds			=	(u[2] - cs)*width;
-	dt			=	(v[2] - ct)*height;
-	d			=	ds*ds + dt*dt;
-	diag		=	min(d,diag);
+							layers[0]->lookup(result,s,t,l);
+						}
 
-	ds			=	(u[3] - cs)*width;
-	dt			=	(v[3] - ct)*height;
-	d			=	ds*ds + dt*dt;
-	diag		=	min(d,diag);
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup) {
+							int				i;
+							float			totalContribution	=	0;
+							CTextureLayer	*layer0,*layer1;
+							float			offset;
+							float			l;
+							float			diag;
+							const float		cs	=	((u[0] + u[1] + u[2] + u[3]) * 0.25f);
+							const float		ct	=	((v[0] + v[1] + v[2] + v[3]) * 0.25f);
+							float			ds,dt,d;
 
-	diag		+=	lookup->blur*lookup->blur*width*height;
+							const int		width	=	layers[0]->width;
+							const int		height	=	layers[0]->height;
 
-											// Find the layer that we want to probe
-	l			=	(logf(diag)*0.5f*(1/logf(2.0f)));
-	l			=	max(l,0);
+							// Compute the tri-linear level
+							ds			=	(u[0] - cs)*width;
+							dt			=	(v[0] - ct)*height;
+							diag		=	ds*ds + dt*dt;
 
-	i			=	(int) floor(l);
-	if (i >= (numLayers-1)) i =	numLayers-2;
+							ds			=	(u[1] - cs)*width;
+							dt			=	(v[1] - ct)*height;
+							d			=	ds*ds + dt*dt;
+							diag		=	min(d,diag);
 
-	layer0		=	layers[i];
-	layer1		=	layers[i+1];	
-	offset		=	l - i;
-	offset		=	min(offset,1);
+							ds			=	(u[2] - cs)*width;
+							dt			=	(v[2] - ct)*height;
+							d			=	ds*ds + dt*dt;
+							diag		=	min(d,diag);
 
-	initv(result,0,0,0);					// Result is black
-	for (i=lookup->numSamples;i>0;i--) {
-		float			r[2];
-		float			s,t;
-		vector			C,CC0,CC1;
-		float			contribution;
+							ds			=	(u[3] - cs)*width;
+							dt			=	(v[3] - ct)*height;
+							d			=	ds*ds + dt*dt;
+							diag		=	min(d,diag);
 
-		generator.get(r);
+							diag		+=	lookup->blur*lookup->blur*width*height;
 
-		s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
-								(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
-		t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
-								(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
+																	// Find the layer that we want to probe
+							l			=	(logf(diag)*0.5f*(1/logf(2.0f)));
+							l			=	max(l,0);
 
-		contribution		=	lookup->filter(r[0]-0.5f,r[1]-0.5f,1,1);
-		totalContribution	+=	contribution;
+							i			=	(int) floor(l);
+							if (i >= (numLayers-1)) i =	numLayers-2;
 
-		// Do the s mode
-		switch(sMode) {
-		case TEXTURE_PERIODIC:
-			s	=	fmodf(s,1);
-			if (s < 0)	s	+=	1;
-			break;
-		case TEXTURE_BLACK:
-			if ((s < 0) || (s > 1)) {
-				continue;
-			}
-			break;
-		case TEXTURE_CLAMP:
-			if (s < 0)		s	=	0;
-			if (s > 1)		s	=	1;
-			break;
-		}
+							layer0		=	layers[i];
+							layer1		=	layers[i+1];	
+							offset		=	l - i;
+							offset		=	min(offset,1);
 
-		// Do the t mode
-		switch(tMode) {
-		case TEXTURE_PERIODIC:
-			t	=	fmodf(t,1);
-			if (t < 0)	t	+=	1;
-			break;
-		case TEXTURE_BLACK:
-			if ((t < 0) || (t > 1)) {
-				continue;
-			}
-			break;
-		case TEXTURE_CLAMP:
-			if (t < 0)		t	=	0;
-			if (t > 1)		t	=	1;
-			break;
-		}
+							initv(result,0,0,0);					// Result is black
+							for (i=lookup->numSamples;i>0;i--) {
+								float			r[2];
+								float			s,t;
+								vector			C,CC0,CC1;
+								float			contribution;
 
-						// lookup (s,t) and add it to the result
-		layer0->lookup(CC0,s,t,sMode,tMode,lookup);
-		layer1->lookup(CC1,s,t,sMode,tMode,lookup);
-		interpolatev(C,CC0,CC1,offset);
+								generator.get(r);
 
-		result[0]		+=	C[0]*contribution;
-		result[1]		+=	C[1]*contribution;
-		result[2]		+=	C[2]*contribution;
-	}
+								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
+														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
+								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
+														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
 
-	const	float	tmp	=	1 / totalContribution;
-	mulvf(result,tmp);
-}
+								contribution		=	lookup->filter(r[0]-0.5f,r[1]-0.5f,1,1);
+								totalContribution	+=	contribution;
 
+								// Do the s mode
+								switch(layers[0]->sMode) {
+								case TEXTURE_PERIODIC:
+									s	=	fmodf(s,1);
+									if (s < 0)	s	+=	1;
+									break;
+								case TEXTURE_BLACK:
+									if ((s < 0) || (s > 1)) {
+										continue;
+									}
+									break;
+								case TEXTURE_CLAMP:
+									if (s < 0)		s	=	0;
+									if (s > 1)		s	=	1;
+									break;
+								}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRegularTexture
-// Method				:	CRegularTexture
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CRegularTexture::CRegularTexture(const char *name,int w,int h,TTextureMode s,TTextureMode t) : CTexture(name,w,h,s,t) {
-	layer	=	NULL;
-}
+								// Do the t mode
+								switch(layers[0]->tMode) {
+								case TEXTURE_PERIODIC:
+									t	=	fmodf(t,1);
+									if (t < 0)	t	+=	1;
+									break;
+								case TEXTURE_BLACK:
+									if ((t < 0) || (t > 1)) {
+										continue;
+									}
+									break;
+								case TEXTURE_CLAMP:
+									if (t < 0)		t	=	0;
+									if (t > 1)		t	=	1;
+									break;
+								}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRegularTexture
-// Method				:	~CRegularTexture
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CRegularTexture::~CRegularTexture() {
-	if (layer != NULL) delete layer;
-}
+												// lookup (s,t) and add it to the result
+								layer0->lookup(CC0,s,t,lookup);
+								layer1->lookup(CC1,s,t,lookup);
+								interpolatev(C,CC0,CC1,offset);
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRegularTexture
-// Method				:	rootLayer
-// Description			:	Return the root layer
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-float				CRegularTexture::lookupz(float s,float t,float z,const CTextureLookup *l) {
-	assert(layer != NULL);
-	return layer->lookupz(s,t,z,sMode,tMode,l);
-}
+								result[0]		+=	C[0]*contribution;
+								result[1]		+=	C[1]*contribution;
+								result[2]		+=	C[2]*contribution;
+							}
+
+							const	float	tmp	=	1 / totalContribution;
+							mulvf(result,tmp);
+						}
+
+	
+	// textureinfo support
+	void				getResolution(float *r) 	{ r[0] = (float) layers[0]->width; r[1] = (float) layers[0]->height; }
+	int 				getNumChannels()			{ return layers[0]->numSamples; }
+
+	short				numLayers;					// The number of layers
+	CTextureLayer		**layers;					// The actual layers
+	CSobol<2>			generator;
+};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRegularTexture
-// Method				:	lookup
-// Description			:	Point lookup
-// Return Value			:	-
+// Description			:	A regular texture
 // Comments				:
-// Date last edited		:	2/28/2002
-void				CRegularTexture::lookup(float *result,float s,float t,const CTextureLookup *l) {
-	// Do the s mode
-	switch(sMode) {
-	case TEXTURE_PERIODIC:
-		s	=	fmodf(s,1);
-		if (s < 0)	s	+=	1;
-		break;
-	case TEXTURE_BLACK:
-		if ((s < 0) || (s > 1)) {
-			initv(result,l->fill,l->fill,l->fill);
-			return;
-		}
-		break;
-	case TEXTURE_CLAMP:
-		if (s < 0)		s	=	0;
-		if (s > 1)		s	=	1;
-		break;
-	}
+// Date last edited		:	9/24/2002
+class	CRegularTexture : public CTexture {
+public:
+						CRegularTexture(const char *name) : CTexture(name) {
+							layer	=	NULL;
+						}
 
-	// Do the t mode
-	switch(tMode) {
-	case TEXTURE_PERIODIC:
-		t	=	fmodf(t,1);
-		if (t < 0)	t	+=	1;
-		break;
-	case TEXTURE_BLACK:
-		if ((t < 0) || (t > 1)) {
-			initv(result,l->fill,l->fill,l->fill);
-			return;
-		}
-		break;
-	case TEXTURE_CLAMP:
-		if (t < 0)		t	=	0;
-		if (t > 1)		t	=	1;
-		break;
-	}
+	virtual				~CRegularTexture() {
+							if (layer != NULL) delete  layer;
+						}
 
-	layer->lookup(result,s,t,sMode,tMode,l);
-}
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
+							assert(layer != NULL);
+							return layer->lookupz(s,t,z,lookup);
+						}
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRegularTexture
-// Method				:	lookup
-// Description			:	Area lookup
-// Return Value			:	-
-// Comments				:	Default to point lookup
-// Date last edited		:	2/28/2002
-void				CRegularTexture::lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup) {
-	int			i;
-	float		totalContribution	=	0;
+	void				lookup(float *result,float s,float t,const CTextureLookup *l) {
+							// Do the s mode
+							switch(layer->sMode) {
+							case TEXTURE_PERIODIC:
+								s	=	fmodf(s,1);
+								if (s < 0)	s	+=	1;
+								break;
+							case TEXTURE_BLACK:
+								if ((s < 0) || (s > 1)) {
+									initv(result,l->fill,l->fill,l->fill);
+									return;
+								}
+								break;
+							case TEXTURE_CLAMP:
+								if (s < 0)		s	=	0;
+								if (s > 1)		s	=	1;
+								break;
+							}
 
-	initv(result,0,0,0);		// Result is black
-	for (i=lookup->numSamples;i>0;i--) {
-		float			s,t;
-		vector			C;
-		float			contribution;
-		float			r[2];
+							// Do the t mode
+							switch(layer->tMode) {
+							case TEXTURE_PERIODIC:
+								t	=	fmodf(t,1);
+								if (t < 0)	t	+=	1;
+								break;
+							case TEXTURE_BLACK:
+								if ((t < 0) || (t > 1)) {
+									initv(result,l->fill,l->fill,l->fill);
+									return;
+								}
+								break;
+							case TEXTURE_CLAMP:
+								if (t < 0)		t	=	0;
+								if (t > 1)		t	=	1;
+								break;
+							}
 
-		generator.get(r);
+							layer->lookup(result,s,t,l);
+						}
 
-		s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
-								(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
-		t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
-								(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
-		contribution		=	lookup->filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
-		totalContribution	+=	contribution;
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup) {
+							int			i;
+							float		totalContribution	=	0;
 
-		if (lookup->blur > 0) {
-			generator.get(r);
-			s				+=	lookup->blur*(r[0] - 0.5f);
-			t				+=	lookup->blur*(r[1] - 0.5f);
-		}
+							initv(result,0,0,0);		// Result is black
+							for (i=lookup->numSamples;i>0;i--) {
+								float			s,t;
+								vector			C;
+								float			contribution;
+								float			r[2];
 
-		// Do the s mode
-		switch(sMode) {
-		case TEXTURE_PERIODIC:
-			s	=	fmodf(s,1);
-			if (s < 0)	s	+=	1;
-			break;
-		case TEXTURE_BLACK:
-			if ((s < 0) || (s > 1)) {
-				continue;
-			}
-			break;
-		case TEXTURE_CLAMP:
-			if (s < 0)		s	=	0;
-			if (s > 1)		s	=	1;
-			break;
-		}
+								generator.get(r);
 
-		// Do the t mode
-		switch(tMode) {
-		case TEXTURE_PERIODIC:
-			t	=	fmodf(t,1);
-			if (t < 0)	t	+=	1;
-			break;
-		case TEXTURE_BLACK:
-			if ((t < 0) || (t > 1)) {
-				continue;
-			}
-			break;
-		case TEXTURE_CLAMP:
-			if (t < 0)		t	=	0;
-			if (t > 1)		t	=	1;
-			break;
-		}
-						// lookup (s,t) and add it to the result
-		layer->lookup(C,s,t,sMode,tMode,lookup);
+								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
+														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
+								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
+														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
+								contribution		=	lookup->filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
+								totalContribution	+=	contribution;
 
-		result[0]		+=	C[0]*contribution;
-		result[1]		+=	C[1]*contribution;
-		result[2]		+=	C[2]*contribution;
-	}
+								if (lookup->blur > 0) {
+									generator.get(r);
+									s				+=	lookup->blur*(r[0] - 0.5f);
+									t				+=	lookup->blur*(r[1] - 0.5f);
+								}
 
-	const float	tmp	=	1 / totalContribution;
-	mulvf(result,tmp);
-}
+								// Do the s mode
+								switch(layer->sMode) {
+								case TEXTURE_PERIODIC:
+									s	=	fmodf(s,1);
+									if (s < 0)	s	+=	1;
+									break;
+								case TEXTURE_BLACK:
+									if ((s < 0) || (s > 1)) {
+										continue;
+									}
+									break;
+								case TEXTURE_CLAMP:
+									if (s < 0)		s	=	0;
+									if (s > 1)		s	=	1;
+									break;
+								}
 
+								// Do the t mode
+								switch(layer->tMode) {
+								case TEXTURE_PERIODIC:
+									t	=	fmodf(t,1);
+									if (t < 0)	t	+=	1;
+									break;
+								case TEXTURE_BLACK:
+									if ((t < 0) || (t > 1)) {
+										continue;
+									}
+									break;
+								case TEXTURE_CLAMP:
+									if (t < 0)		t	=	0;
+									if (t > 1)		t	=	1;
+									break;
+								}
+												// lookup (s,t) and add it to the result
+								layer->lookup(C,s,t,lookup);
 
+								result[0]		+=	C[0]*contribution;
+								result[1]		+=	C[1]*contribution;
+								result[2]		+=	C[2]*contribution;
+							}
 
-
-// For side access
-
-typedef enum {
-	PX,
-	NX,
-	PY,
-	NY,
-	PZ,
-	NZ,
-} ESide;
-
-
-typedef enum {
-	XYZ,
-	XZY,
-	YXZ,
-	YZX,
-	ZXY,
-	ZYX
-} EOrder;
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CEnvironment
-// Method				:	CEnvironment
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CEnvironment::CEnvironment(const char *n) : CTextureInfoBase(n) {
-	stats.numEnvironments++;
-	if (stats.numEnvironments > stats.numPeakEnvironments)
-		stats.numPeakEnvironments	=	stats.numEnvironments;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CEnvironment
-// Method				:	~CEnvironment
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CEnvironment::~CEnvironment() {
-	stats.numEnvironments--;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CEnvironment
-// Method				:	Lookup
-// Description			:	Environment lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void			CEnvironment::lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
-	result[0]	=	1-lookup->fill;
-	result[1]	=	1-lookup->fill;
-	result[2]	=	1-lookup->fill;
-}
+							const float	tmp	=	1 / totalContribution;
+							mulvf(result,tmp);
+						}
+	
+	// textureinfo support
+	void				getResolution(float *r) 	{ r[0] = (float) layer->width; r[1] = (float) layer->height; }
+	int 				getNumChannels()			{ return layer->numSamples; }
+	
+	CTextureLayer		*layer;						// There's only one layer
+	CSobol<2>			generator;
+};
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadow
-// Method				:	CShadow
-// Description			:	Ctor
-// Return Value			:	-
+// Description			:	A single sided shadow map
 // Comments				:
-// Date last edited		:	2/28/2002
-CShadow::CShadow(const char *n,float *em,CTexture *s) : CEnvironment(n) {
-	movmm(toNDC,em);
-	side			=	s;
+// Date last edited		:	9/24/2002
+class	CShadow : public CEnvironment{
+public:
+
+						CShadow(const char *name,float *toNDC,CTexture *side) : CEnvironment(name) {
+							movmm(this->toNDC,toNDC);
+							this->side	=	side;
+						}
+
+	virtual				~CShadow() {
+							if (side != NULL)	delete side;
+						}
+
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+							int			i;
+							float		totalContribution	=	0;
+							float		r[4];
+
+							result[0]	=	0;
+							for (i=lookup->numSamples;i>0;i--) {
+								float	x,y;
+								float	s,t;
+								float	C;
+								float	contribution;
+								float	tmp[4],cP[4];
+
+								generator.get(r);
+
+								x					=	r[0];	// Assume x,y are gaussian samples
+								y					=	r[1];
+								contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
+								totalContribution	+=	contribution;
+
+								cP[COMP_X]			=	(D0[COMP_X]*(1-x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1-x) + D3[COMP_X]*x)*y;
+								cP[COMP_Y]			=	(D0[COMP_Y]*(1-x) + D1[COMP_Y]*x)*(1-y) + (D2[COMP_Y]*(1-x) + D3[COMP_Y]*x)*y;
+								cP[COMP_Z]			=	(D0[COMP_Z]*(1-x) + D1[COMP_Z]*x)*(1-y) + (D2[COMP_Z]*(1-x) + D3[COMP_Z]*x)*y;
+								cP[3]				=	1;
+
+								mulmp4(tmp,toNDC,cP);
+								s					=	tmp[0] / tmp[3];
+								t					=	tmp[1] / tmp[3];
+
+								// Blur the result
+								s					+=	2*(r[2]-0.5f)*lookup->blur;
+								t					+=	2*(r[3]-0.5f)*lookup->blur;
+
+
+								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
+									continue;
+								}
+
+								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup);
+
+								result[0]			+=	C*contribution;
+							}
+
+							result[0]	/=	totalContribution;
+							result[1]	=	result[0];
+							result[2]	=	result[0];
+						}
 	
-	// shadows may be non-texmade textures, periodic never valid
-	side->sMode		=	TEXTURE_CLAMP;
-	side->tMode		=	TEXTURE_CLAMP;
-}
+	// textureinfo support
+	void				getResolution(float *r) 	{ side->getResolution(r); }
+	char* 				getTextureType()			{ return "shadow"; }
+	int 				getNumChannels()			{ return side->getNumChannels(); }
+	int 				getViewMatrix(float *m)		{ movmm(m,toNDC); return TRUE; }
+	int 				getProjectionMatrix(float*)	{ return FALSE; }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadow
-// Method				:	~CShadow
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CShadow::~CShadow() {
-	if (side != NULL)	delete side;
-}
+private:
+	CTexture			*side;
+	matrix				toNDC;
+	CSobol<4>			generator;
+};
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadow
-// Method				:	Lookup
-// Description			:	Environment lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void			CShadow::lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
-	int			i;
-	float		totalContribution	=	0;
-	float		r[4];
-
-	result[0]	=	0;
-	for (i=lookup->numSamples;i>0;i--) {
-		float	x,y;
-		float	s,t;
-		float	C;
-		float	contribution;
-		float	tmp[4],cP[4];
-
-		generator.get(r);
-
-		x					=	r[0];	// Assume x,y are gaussian samples
-		y					=	r[1];
-		contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
-		totalContribution	+=	contribution;
-
-		cP[COMP_X]			=	(D0[COMP_X]*(1-x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1-x) + D3[COMP_X]*x)*y;
-		cP[COMP_Y]			=	(D0[COMP_Y]*(1-x) + D1[COMP_Y]*x)*(1-y) + (D2[COMP_Y]*(1-x) + D3[COMP_Y]*x)*y;
-		cP[COMP_Z]			=	(D0[COMP_Z]*(1-x) + D1[COMP_Z]*x)*(1-y) + (D2[COMP_Z]*(1-x) + D3[COMP_Z]*x)*y;
-		cP[3]				=	1;
-
-		mulmp4(tmp,toNDC,cP);
-		s					=	tmp[0] / tmp[3];
-		t					=	tmp[1] / tmp[3];
-
-		// Blur the result
-		s					+=	2*(r[2]-0.5f)*lookup->blur;
-		t					+=	2*(r[3]-0.5f)*lookup->blur;
-
-
-		if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
-			continue;
-		}
-
-		C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup);
-
-		result[0]			+=	C*contribution;
-	}
-
-	result[0]	/=	totalContribution;
-	result[1]	=	result[0];
-	result[2]	=	result[0];
-}
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDeepShadow
-// Method				:	CDeepShadow
-// Description			:	Ctor
-// Return Value			:	-
+// Description			:	A deep shadow map
 // Comments				:
 // Date last edited		:	2/28/2002
-CDeepShadow::CDeepShadow(const char *n,const char *fn,const float *toWorld,FILE *in) : CEnvironment(n) {
-	int		i,k;
-	matrix	mtmp;
-	int		*tileSizes;
+class	CDeepShadow : public CEnvironment{
 
-	fileName	=	strdup(fn);
+	// Holds a deep tile
+	class	CDeepTile {
+	public:
+		float			**data;
+		float			**lastData;
+		CTextureBlock	block;
+	};
 
-	// Read the header
-	fread(&header,sizeof(CDeepShadowHeader),1,in);
-	mulmm(mtmp,header.toNDC,toWorld);
-	movmm(header.toNDC,mtmp);
+public:
 
-	// Read the tile end indices
-	tileIndices		=	new int[header.xTiles*header.yTiles];
-	fread(tileIndices,sizeof(int),header.xTiles*header.yTiles,in);
+						CDeepShadow(const char *name,const char *fn,const float *toWorld,FILE *in) : CEnvironment(name) {
+							int		i,k;
+							matrix	mtmp;
+							int		*tileSizes;
 
-	// new-style tsm file
-	tileSizes	=	new int[header.xTiles*header.yTiles];
-	fread(tileSizes,sizeof(int),header.xTiles*header.yTiles,in);
+							fileName	=	strdup(fn);
+
+							// Read the header
+							fread(&header,sizeof(CDeepShadowHeader),1,in);
+							mulmm(mtmp,header.toNDC,toWorld);
+							movmm(header.toNDC,mtmp);
+
+							// Read the tile end indices
+							tileIndices		=	new int[header.xTiles*header.yTiles];
+							fread(tileIndices,sizeof(int),header.xTiles*header.yTiles,in);
+
+							// new-style tsm file
+							tileSizes	=	new int[header.xTiles*header.yTiles];
+							fread(tileSizes,sizeof(int),header.xTiles*header.yTiles,in);
+							
+							// Save the index start
+							fileStart		=	ftell(in);
+							
+							// Init the tiles
+							tiles	=	new CDeepTile*[header.yTiles];
+							for (k=0,i=0;i<header.yTiles;i++) {
+								int	j;
+
+								tiles[i]	=	new CDeepTile[header.xTiles];
+
+								for (j=0;j<header.xTiles;j++,k++) {
+									CDeepTile	*cTile	=	tiles[i]+j;
+									int			size;
+
+									size				=	tileSizes[k];
+
+									textureRegisterBlock(&(cTile->block),size);
+									cTile->data			=	new float*[header.tileSize*header.tileSize];
+									cTile->lastData		=	new float*[header.tileSize*header.tileSize];
+								}
+							}
+
+							delete[] tileSizes;
+								
+							fclose(in);
+						}
+
+	virtual				~CDeepShadow() {
+							int	i,j;
+
+							for (j=0;j<header.yTiles;j++) {
+								for (i=0;i<header.xTiles;i++) {
+									textureUnregisterBlock(&(tiles[j][i].block));
+									delete [] tiles[j][i].lastData;
+									delete [] tiles[j][i].data;
+								}
+								delete [] tiles[j];
+							}
+							delete [] tiles;
+
+							delete [] tileIndices;
+
+							free(fileName);
+						}
+
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+							int			i;
+							float		totalContribution	=	0;
+
+							result[0]	=	0;
+							result[1]	=	0;
+							result[2]	=	0;
+							for (i=lookup->numSamples;i>0;i--) {
+								float		x,y;		// Assume x,y are gaussian samples
+								float		s,t,w;
+								float		contribution;
+								float		tmp[4],cP[4];
+								int			px,py;
+								int			bx,by;
+								CDeepTile	*cTile;
+								float		*cPixel;
+
+								x					=	urand();
+								y					=	urand();
+								contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
+								totalContribution	+=	contribution;
+
+								cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
+								cP[COMP_Y]			=	(D0[COMP_Y]*(1 - x) + D1[COMP_Y]*x)*(1-y) + (D2[COMP_Y]*(1 - x) + D3[COMP_Y]*x)*y;
+								cP[COMP_Z]			=	(D0[COMP_Z]*(1 - x) + D1[COMP_Z]*x)*(1-y) + (D2[COMP_Z]*(1 - x) + D3[COMP_Z]*x)*y;
+								cP[3]				=	1;
+
+								mulmp4(tmp,header.toNDC,cP);
+								s					=	tmp[0] / tmp[3];
+								t					=	tmp[1] / tmp[3];
+								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
+									continue;
+								}
+
+								s					*=	header.xres;
+								t					*=	header.yres;
+								w					=	tmp[2] - lookup->shadowBias;
+
+								px					=	(int) floor(s);
+								py					=	(int) floor(t);
+								bx					=	px >> header.tileShift;
+								by					=	py >> header.tileShift;
+								px					=	px & ((1 << header.tileShift) - 1);
+								py					=	py & ((1 << header.tileShift) - 1);
+
+								cTile				=	tiles[by]+bx;
+
+								if (cTile->block.data == NULL)	loadTile(bx,by);
+
+								cPixel				=	cTile->lastData[py*header.tileSize+px];
+
+								while(TRUE) {
+									if (cPixel[0] > w)		cPixel	-=	4;
+									else if (cPixel[4] < w)	cPixel	+=	4;
+									else {
+										const float	alpha	=	(w - cPixel[0]) / (cPixel[4] - cPixel[0]);
+
+										result[0]			+=	(1-((1-alpha)*cPixel[1] + alpha*cPixel[5]))*contribution;
+										result[1]			+=	(1-((1-alpha)*cPixel[2] + alpha*cPixel[6]))*contribution;
+										result[2]			+=	(1-((1-alpha)*cPixel[3] + alpha*cPixel[7]))*contribution;
+
+										cTile->lastData[py*header.tileSize+px]	=	cPixel;
+
+										break;
+									}
+								}
+
+								//	0	-	z
+								//	1	-	r
+								//	2	-	g
+								//	3	-	b
+
+								//	4	-	z
+								//	5	-	r
+								//	6	-	g
+								//	7	-	b
+							}
+
+							result[0]	/=	totalContribution;
+							result[1]	/=	totalContribution;
+							result[2]	/=	totalContribution;
+						}
 	
-	// Save the index start
-	fileStart		=	ftell(in);
+	// textureinfo support
+	void				getResolution(float *r) 	{ r[0] = (float) header.xres; r[1] = (float) header.yres; }
+	char* 				getTextureType()			{ return "shadow"; }
+	int 				getNumChannels()			{ return 4; }
+	int 				getViewMatrix(float *m)		{ movmm(m,header.toNDC); return TRUE; }
+	int 				getProjectionMatrix(float*)	{ return FALSE; }
 	
-	// Init the tiles
-	tiles	=	new CDeepTile*[header.yTiles];
-	for (k=0,i=0;i<header.yTiles;i++) {
-		int	j;
+private:
+	void				loadTile(int x,int y) {
 
-		tiles[i]	=	new CDeepTile[header.xTiles];
+							CDeepTile	*cTile	=	tiles[y]+x;
 
-		for (j=0;j<header.xTiles;j++,k++) {
-			CDeepTile	*cTile	=	tiles[i]+j;
-			int			size;
+							osLock(CRenderer::textureMutex);
+							if (cTile->block.data != NULL) {
+								osUnlock(CRenderer::textureMutex);
+								return;
+							}
 
-			size				=	tileSizes[k];
+							int			index	=	y*header.xTiles+x;
+							FILE		*in		=	fopen(fileName,"rb");
+							float		**cData;
+							float		**cLastData;
+							float		*data,*dataStart;
+							int			i;
+							int			startIndex;
 
-			cTile->block		=	textureNewBlock(size);
-			cTile->data			=	new float*[header.tileSize*header.tileSize];
-			cTile->lastData		=	new float*[header.tileSize*header.tileSize];
-		}
-	}
+							assert(in != NULL);
 
-	delete[] tileSizes;
-		
-	fclose(in);
-}
+							startIndex	=	tileIndices[index];
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDeepShadow
-// Method				:	~CDeepShadow
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CDeepShadow::~CDeepShadow() {
-	int	i,j;
+							dataStart	=	data	=	(float *) textureAllocateBlock(&(cTile->block));
+							fseek(in,startIndex,SEEK_SET);
+							fread(data,sizeof(unsigned char),cTile->block.size,in);
+							fclose(in);
 
-	for (j=0;j<header.yTiles;j++) {
-		for (i=0;i<header.xTiles;i++) {
-			textureDeleteBlock(tiles[j][i].block);
-			delete [] tiles[j][i].lastData;
-			delete [] tiles[j][i].data;
-		}
-		delete [] tiles[j];
-	}
-	delete [] tiles;
+							cLastData		=	cTile->lastData;
+							cData			=	cTile->data;
+							for (i=header.tileSize*header.tileSize;i>0;i--) {
+								cData[0]		=	data;
+								cLastData[0]	=	data;
+								cData++;
+								cLastData++;
 
-	delete [] tileIndices;
+								if (i != 1) {
+									data		+=	4;
+									while(*data != -C_INFINITY)	data	+=	4;
+								}
+							}
 
-	free(fileName);
-}
+							cTile->block.data	=	dataStart;
+							osUnlock(CRenderer::textureMutex);
+						}
+
+	char				*fileName;				// The name of the file
+	CDeepTile			**tiles;				// Array of tiles
+	int					*tileIndices;			// The tile offset index in the file
+	CDeepShadowHeader	header;					// The header
+	int					fileStart;				// The offset in the file
+};
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDeepShadow
-// Method				:	loadTile
-// Description			:	Cache in a tile
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void	CDeepShadow::loadTile(int x,int y) {
-	int			index	=	y*header.xTiles+x;
-	CDeepTile	*cTile	=	tiles[y]+x;
-	FILE		*in		=	fopen(fileName,"rb");
-	float		**cData;
-	float		**cLastData;
-	float		*data;
-	int			i;
-	int			startIndex;
-
-	assert(in != NULL);
-
-	startIndex	=	tileIndices[index];
-
-	textureAllocateBlock(cTile->block);
-	fseek(in,startIndex,SEEK_SET);
-	fread(cTile->block->data,sizeof(unsigned char),cTile->block->size,in);
-	fclose(in);
-
-	data			=	(float *) cTile->block->data;
-	cLastData		=	cTile->lastData;
-	cData			=	cTile->data;
-	for (i=header.tileSize*header.tileSize;i>0;i--) {
-		cData[0]		=	data;
-		cLastData[0]	=	data;
-		cData++;
-		cLastData++;
-
-		if (i != 1) {
-			data		+=	4;
-			while(*data != -C_INFINITY)	data	+=	4;
-		}
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDeepShadow
-// Method				:	lookup
-// Description			:	shadow lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void	CDeepShadow::lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
-	int			i;
-	float		totalContribution	=	0;
-
-	result[0]	=	0;
-	result[1]	=	0;
-	result[2]	=	0;
-	for (i=lookup->numSamples;i>0;i--) {
-		float		x,y;		// Assume x,y are gaussian samples
-		float		s,t,w;
-		float		contribution;
-		float		tmp[4],cP[4];
-		int			px,py;
-		int			bx,by;
-		CDeepTile	*cTile;
-		float		*cPixel;
-
-		x					=	urand();
-		y					=	urand();
-		contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
-		totalContribution	+=	contribution;
-
-		cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
-		cP[COMP_Y]			=	(D0[COMP_Y]*(1 - x) + D1[COMP_Y]*x)*(1-y) + (D2[COMP_Y]*(1 - x) + D3[COMP_Y]*x)*y;
-		cP[COMP_Z]			=	(D0[COMP_Z]*(1 - x) + D1[COMP_Z]*x)*(1-y) + (D2[COMP_Z]*(1 - x) + D3[COMP_Z]*x)*y;
-		cP[3]				=	1;
-
-		mulmp4(tmp,header.toNDC,cP);
-		s					=	tmp[0] / tmp[3];
-		t					=	tmp[1] / tmp[3];
-		if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
-			continue;
-		}
-
-		s					*=	header.xres;
-		t					*=	header.yres;
-		w					=	tmp[2] - lookup->shadowBias;
-
-		px					=	(int) floor(s);
-		py					=	(int) floor(t);
-		bx					=	px >> header.tileShift;
-		by					=	py >> header.tileShift;
-		px					=	px & ((1 << header.tileShift) - 1);
-		py					=	py & ((1 << header.tileShift) - 1);
-
-		cTile				=	tiles[by]+bx;
-
-		if (cTile->block->data == NULL)	loadTile(bx,by);
-
-		cPixel				=	cTile->lastData[py*header.tileSize+px];
-
-		while(TRUE) {
-			if (cPixel[0] > w)		cPixel	-=	4;
-			else if (cPixel[4] < w)	cPixel	+=	4;
-			else {
-				const float	alpha	=	(w - cPixel[0]) / (cPixel[4] - cPixel[0]);
-
-				result[0]			+=	(1-((1-alpha)*cPixel[1] + alpha*cPixel[5]))*contribution;
-				result[1]			+=	(1-((1-alpha)*cPixel[2] + alpha*cPixel[6]))*contribution;
-				result[2]			+=	(1-((1-alpha)*cPixel[3] + alpha*cPixel[7]))*contribution;
-
-				cTile->lastData[py*header.tileSize+px]	=	cPixel;
-
-				break;
-			}
-		}
-
-		//	0	-	z
-		//	1	-	r
-		//	2	-	g
-		//	3	-	b
-
-		//	4	-	z
-		//	5	-	r
-		//	6	-	g
-		//	7	-	b
-	}
-
-	result[0]	/=	totalContribution;
-	result[1]	/=	totalContribution;
-	result[2]	/=	totalContribution;
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicEnvironment
-// Method				:	CCubicEnvironment
-// Description			:	Ctor
-// Return Value			:	-
+// Description			:	A Cubic environment map
 // Comments				:
-// Date last edited		:	2/28/2002
-CCubicEnvironment::CCubicEnvironment(const char *n,CTexture **s) : CEnvironment(n) {
-	sides[0]		=	s[0];
-	sides[1]		=	s[1];
-	sides[2]		=	s[2];
-	sides[3]		=	s[3];
-	sides[4]		=	s[4];
-	sides[5]		=	s[5];
-}
+// Date last edited		:	9/24/2002
+class	CCubicEnvironment : public CEnvironment{
+public:
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCubicEnvironment
-// Method				:	~CCubicEnvironment
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CCubicEnvironment::~CCubicEnvironment() {
-	if (sides[0] != NULL)		delete sides[0];
-	if (sides[1] != NULL)		delete sides[1];
-	if (sides[2] != NULL)		delete sides[2];
-	if (sides[3] != NULL)		delete sides[3];
-	if (sides[4] != NULL)		delete sides[4];
-	if (sides[5] != NULL)		delete sides[5];
-}
+						CCubicEnvironment(const char *name,CTexture **s) : CEnvironment(name) {
+							sides[0]		=	s[0];
+							sides[1]		=	s[1];
+							sides[2]		=	s[2];
+							sides[3]		=	s[3];
+							sides[4]		=	s[4];
+							sides[5]		=	s[5];
+						}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCubicEnvironment
-// Method				:	Lookup
-// Description			:	Environment lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void			CCubicEnvironment::lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
-	EOrder		order;
-	CTexture	*side;
-	float		u,v;
-	vector		D;
-	int			i;
-	float		totalContribution	=	0;
-	float		r[2];
-	vector		C;
+	virtual				~CCubicEnvironment() {
+							if (sides[0] != NULL)		delete sides[0];
+							if (sides[1] != NULL)		delete sides[1];
+							if (sides[2] != NULL)		delete sides[2];
+							if (sides[3] != NULL)		delete sides[3];
+							if (sides[4] != NULL)		delete sides[4];
+							if (sides[5] != NULL)		delete sides[5];
+						}
 
-	result[0]	=	0;
-	result[1]	=	0;
-	result[2]	=	0;
+						typedef enum {
+							PX		=	0,
+							NX,
+							PY,
+							NY,
+							PZ,
+							NZ,
+						} ESide;
 
-	if (dotvv(D0,D0) == 0)	return;
-
-	for (i=lookup->numSamples;i>0;i--) {
-		float	x,y;
-		float	t;
-		float	contribution;
-
-		generator.get(r);
-
-		x					=	r[0];	// Assume x,y are gaussian samples
-		y					=	r[1];
-		contribution		=	lookup->filter(x - (float) 0.5,y - (float) 0.5,1,1);
-		totalContribution	+=	contribution;
-
-		D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
-		D[1]				=	(D0[1]*(1-x) + D1[1]*x)*(1-y) + (D2[1]*(1-x) + D3[1]*x)*y;
-		D[2]				=	(D0[2]*(1-x) + D1[2]*x)*(1-y) + (D2[2]*(1-x) + D3[2]*x)*y;
-
-		// Find the side of the cube that we're looking at
-		if (fabs(D[COMP_Y]) > fabs(D[COMP_X])) {
-			if (fabs(D[COMP_Z]) > fabs(D[COMP_Y])) {
-				order	=	ZYX;
-			} else {
-				if (fabs(D[COMP_Z]) > fabs(D[COMP_X]))
-					order	=	YZX;
-				else
-					order	=	YXZ;
-			}
-		} else if (fabs(D[COMP_Z]) > fabs(D[COMP_Y])) {
-			if (fabs(D[COMP_Z]) > fabs(D[COMP_X]))
-				order	=	ZXY;
-			else
-				order	=	XZY;
-		} else {
-			order		=	XYZ;
-		}
-
-		switch(order) {
-		case XYZ:
-		case XZY:
-			if (D[COMP_X] > 0)	{	
-				side	=	sides[PX];	
-				t		=	1 / D[COMP_X];
-				u		=	(-D[COMP_Z]*t+1)*0.5f;
-				v		=	(-D[COMP_Y]*t+1)*0.5f;
-			} else {
-				side	=	sides[NX];
-				t		=	-1 / D[COMP_X];
-				u		=	(D[COMP_Z]*t+1)*0.5f;
-				v		=	(-D[COMP_Y]*t+1)*0.5f;
-			}
-			break;
-		case YXZ:
-		case YZX:
-			if (D[COMP_Y] > 0) {
-				side	=	sides[PY];	
-				t		=	1 / D[COMP_Y];
-				u		=	(D[COMP_X]*t+1)*0.5f;
-				v		=	(D[COMP_Z]*t+1)*0.5f;
-			} else	{
-				side	=	sides[NY];	
-				t		=	-1 / D[COMP_Y];
-				u		=	(D[COMP_X]*t+1)*0.5f;
-				v		=	(-D[COMP_Z]*t+1)*0.5f;
-			}
-			break;
-		case ZXY:
-		case ZYX:
-			if (D[COMP_Z] > 0) {
-				side	=	sides[PZ];
-				t		=	1 / D[COMP_Z];
-				u		=	(D[COMP_X]*t+1)*0.5f;
-				v		=	(-D[COMP_Y]*t+1)*0.5f;
-			} else {
-				side	=	sides[NZ];
-				t		=	-1 / D[COMP_Z];
-				u		=	(-D[COMP_X]*t+1)*0.5f;
-				v		=	(-D[COMP_Y]*t+1)*0.5f;
-			}
-
-			break;
-		}
+	
+						typedef enum {
+							XYZ		=	0,
+							XZY,
+							YXZ,
+							YZX,
+							ZXY,
+							ZYX
+						} EOrder;
 
 
-		side->lookup(C,u,v,lookup);
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+							EOrder		order;
+							CTexture	*side;
+							float		u,v;
+							vector		D;
+							int			i;
+							float		totalContribution	=	0;
+							float		r[2];
+							vector		C;
 
-		result[0]	+=	C[0]*contribution;
-		result[1]	+=	C[1]*contribution;
-		result[2]	+=	C[2]*contribution;
-	}
+							result[0]	=	0;
+							result[1]	=	0;
+							result[2]	=	0;
 
-	mulvf(result,1 / totalContribution);
+							if (dotvv(D0,D0) == 0)	return;
 
-}
+							for (i=lookup->numSamples;i>0;i--) {
+								float	x,y;
+								float	t;
+								float	contribution;
+
+								generator.get(r);
+
+								x					=	r[0];	// Assume x,y are gaussian samples
+								y					=	r[1];
+								contribution		=	lookup->filter(x - (float) 0.5,y - (float) 0.5,1,1);
+								totalContribution	+=	contribution;
+
+								D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
+								D[1]				=	(D0[1]*(1-x) + D1[1]*x)*(1-y) + (D2[1]*(1-x) + D3[1]*x)*y;
+								D[2]				=	(D0[2]*(1-x) + D1[2]*x)*(1-y) + (D2[2]*(1-x) + D3[2]*x)*y;
+
+								// Find the side of the cube that we're looking at
+								if (fabs(D[COMP_Y]) > fabs(D[COMP_X])) {
+									if (fabs(D[COMP_Z]) > fabs(D[COMP_Y])) {
+										order	=	ZYX;
+									} else {
+										if (fabs(D[COMP_Z]) > fabs(D[COMP_X]))
+											order	=	YZX;
+										else
+											order	=	YXZ;
+									}
+								} else if (fabs(D[COMP_Z]) > fabs(D[COMP_Y])) {
+									if (fabs(D[COMP_Z]) > fabs(D[COMP_X]))
+										order	=	ZXY;
+									else
+										order	=	XZY;
+								} else {
+									order		=	XYZ;
+								}
+
+								switch(order) {
+								case XYZ:
+								case XZY:
+									if (D[COMP_X] > 0)	{	
+										side	=	sides[PX];	
+										t		=	1 / D[COMP_X];
+										u		=	(-D[COMP_Z]*t+1)*0.5f;
+										v		=	(-D[COMP_Y]*t+1)*0.5f;
+									} else {
+										side	=	sides[NX];
+										t		=	-1 / D[COMP_X];
+										u		=	(D[COMP_Z]*t+1)*0.5f;
+										v		=	(-D[COMP_Y]*t+1)*0.5f;
+									}
+									break;
+								case YXZ:
+								case YZX:
+									if (D[COMP_Y] > 0) {
+										side	=	sides[PY];	
+										t		=	1 / D[COMP_Y];
+										u		=	(D[COMP_X]*t+1)*0.5f;
+										v		=	(D[COMP_Z]*t+1)*0.5f;
+									} else	{
+										side	=	sides[NY];	
+										t		=	-1 / D[COMP_Y];
+										u		=	(D[COMP_X]*t+1)*0.5f;
+										v		=	(-D[COMP_Z]*t+1)*0.5f;
+									}
+									break;
+								case ZXY:
+								case ZYX:
+									if (D[COMP_Z] > 0) {
+										side	=	sides[PZ];
+										t		=	1 / D[COMP_Z];
+										u		=	(D[COMP_X]*t+1)*0.5f;
+										v		=	(-D[COMP_Y]*t+1)*0.5f;
+									} else {
+										side	=	sides[NZ];
+										t		=	-1 / D[COMP_Z];
+										u		=	(-D[COMP_X]*t+1)*0.5f;
+										v		=	(-D[COMP_Y]*t+1)*0.5f;
+									}
+
+									break;
+								}
+
+
+								side->lookup(C,u,v,lookup);
+
+								result[0]	+=	C[0]*contribution;
+								result[1]	+=	C[1]*contribution;
+								result[2]	+=	C[2]*contribution;
+							}
+
+							mulvf(result,1 / totalContribution);
+						}
+
+	// textureinfo support
+	void				getResolution(float *r) 	{ sides[0]->getResolution(r); }
+	char* 				getTextureType()			{ return "environment"; }
+	int 				getNumChannels()			{ return sides[0]->getNumChannels(); }
+	int 				getViewMatrix(float *m)		{ return FALSE; }
+	int 				getProjectionMatrix(float*)	{ return FALSE; }
+	
+	CTexture			*sides[6];
+	CSobol<2>			generator;
+};
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphericalEnvironment
-// Method				:	CSphericalEnvironment
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CSphericalEnvironment::CSphericalEnvironment(const char *n,CTexture *s) : CEnvironment(n) {
-	side		=	s;
-}
+// Description			:	A Spherical environment map
+// Comments				:	RenderMan does not support cylinderical env. maps yet so this class is not used
+// Date last edited		:	9/24/2002
+class	CSphericalEnvironment : public CEnvironment{
+public:
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphericalEnvironment
-// Method				:	~CSphericalEnvironment
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CSphericalEnvironment::~CSphericalEnvironment() {
-	if (side != NULL)		delete side;
-}
+						CSphericalEnvironment(const char *name,CTexture *s) : CEnvironment(name) {
+							side	=	s;
+						}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphericalEnvironment
-// Method				:	Lookup
-// Description			:	Environment lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void			CSphericalEnvironment::lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
-	float		u[4],v[4];
-	float		m;
+	virtual				~CSphericalEnvironment() {
+							delete side;
+						}
 
-	m					=	2*sqrtf(D0[COMP_X]*D0[COMP_X] + D0[COMP_Y]*D0[COMP_Y] + (D0[COMP_Z]+1)*(D0[COMP_Z]+1));
-	u[0]				=	D0[COMP_X] / m + 0.5f;
-	v[0]				=	D0[COMP_Y] / m + 0.5f;
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+							float		u[4],v[4];
+							float		m;
 
-	m					=	2*sqrtf(D1[COMP_X]*D1[COMP_X] + D1[COMP_Y]*D1[COMP_Y] + (D1[COMP_Z]+1)*(D1[COMP_Z]+1));
-	u[1]				=	D1[COMP_X] / m + 0.5f;
-	v[1]				=	D1[COMP_Y] / m + 0.5f;
+							m					=	2*sqrtf(D0[COMP_X]*D0[COMP_X] + D0[COMP_Y]*D0[COMP_Y] + (D0[COMP_Z]+1)*(D0[COMP_Z]+1));
+							u[0]				=	D0[COMP_X] / m + 0.5f;
+							v[0]				=	D0[COMP_Y] / m + 0.5f;
 
-	m					=	2*sqrtf(D2[COMP_X]*D2[COMP_X] + D2[COMP_Y]*D2[COMP_Y] + (D2[COMP_Z]+1)*(D2[COMP_Z]+1));
-	u[2]				=	D2[COMP_X] / m + 0.5f;
-	v[2]				=	D2[COMP_Y] / m + 0.5f;
+							m					=	2*sqrtf(D1[COMP_X]*D1[COMP_X] + D1[COMP_Y]*D1[COMP_Y] + (D1[COMP_Z]+1)*(D1[COMP_Z]+1));
+							u[1]				=	D1[COMP_X] / m + 0.5f;
+							v[1]				=	D1[COMP_Y] / m + 0.5f;
 
-	m					=	2*sqrtf(D3[COMP_X]*D3[COMP_X] + D3[COMP_Y]*D3[COMP_Y] + (D3[COMP_Z]+1)*(D3[COMP_Z]+1));
-	u[3]				=	D3[COMP_X] / m + 0.5f;
-	v[3]				=	D3[COMP_Y] / m + 0.5f;
+							m					=	2*sqrtf(D2[COMP_X]*D2[COMP_X] + D2[COMP_Y]*D2[COMP_Y] + (D2[COMP_Z]+1)*(D2[COMP_Z]+1));
+							u[2]				=	D2[COMP_X] / m + 0.5f;
+							v[2]				=	D2[COMP_Y] / m + 0.5f;
 
-	side->lookup4(result,u,v,lookup);
-}
+							m					=	2*sqrtf(D3[COMP_X]*D3[COMP_X] + D3[COMP_Y]*D3[COMP_Y] + (D3[COMP_Z]+1)*(D3[COMP_Z]+1));
+							u[3]				=	D3[COMP_X] / m + 0.5f;
+							v[3]				=	D3[COMP_Y] / m + 0.5f;
 
+							side->lookup4(result,u,v,lookup);
+						}
 
-
+	// textureinfo support
+	void				getResolution(float *r) 	{ side->getResolution(r); }
+	char* 				getTextureType()			{ return "environment"; }
+	int 				getNumChannels()			{ return side->getNumChannels(); }
+	int 				getViewMatrix(float *m)		{ return FALSE; }
+	int 				getProjectionMatrix(float*)	{ return FALSE; }
+	
+	CTexture			*side;
+};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylindericalEnvironment
-// Method				:	CCylindericalEnvironment
-// Description			:	Ctor
-// Return Value			:	-
+// Description			:	A Cylinderical environment map
 // Comments				:
-// Date last edited		:	2/28/2002
-CCylindericalEnvironment::CCylindericalEnvironment(const char *n,CTexture *s) : CEnvironment(n) {
-	side			=	s;
-}
+// Date last edited		:	9/24/2002
+class	CCylindericalEnvironment : public CEnvironment{
+public:
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphericalEnvironment
-// Method				:	~CSphericalEnvironment
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-CCylindericalEnvironment::~CCylindericalEnvironment() {
-	if (side != NULL)		delete side;
-}
+						CCylindericalEnvironment(const char *name,CTexture *s) : CEnvironment(name) {
+							side	=	s;
+						}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylindericalEnvironment
-// Method				:	Lookup
-// Description			:	Environment lookup
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	2/28/2002
-void			CCylindericalEnvironment::lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
-	float		u[4],v[4];
-	double		a,b,c;
-	vector		D,Dsamp;
+	virtual				~CCylindericalEnvironment() {
+							delete side;
+						}
 
-	if (dotvv(D0,D0) > 0) {
-		normalizev(D,D0);
-		movvv(Dsamp,D);
-		u[0]				=	(atan2f(D[COMP_Z],D[COMP_X]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
-		v[0]				=	acosf(D[COMP_Y]) * (1.0f / (float) C_PI);
-		
-		c = (D[COMP_X]*D[COMP_X]+D[COMP_Z]*D[COMP_Z])*2.0*C_PI;
-		a = -D[COMP_Z]/c;
-		b = D[COMP_X]/c;
-		c = -1.0f/(C_PI*sqrt(1.0f-D[COMP_Y]*D[COMP_Y] + C_EPSILON));
-				
-		normalizev(D,D1);
-		subvv(D,Dsamp);
-		u[1]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-		v[1]				=	v[0] + (float) (c*D[COMP_Y]);
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+							float		u[4],v[4];
+							double		a,b,c;
+							vector		D,Dsamp;
 
-		normalizev(D,D2);
-		subvv(D,Dsamp);
-		u[2]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-		v[2]				=	v[0] + (float) (c*D[COMP_Y]);
-		
-		normalizev(D,D3);
-		subvv(D,Dsamp);
-		u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-		v[3]				=	v[0] + (float) (c*D[COMP_Y]);
-		
-		side->lookup4(result,u,v,lookup);
-	} else {
-		initv(result,0,0,0);
-	}
-}
+							if (dotvv(D0,D0) > 0) {
+								normalizev(D,D0);
+								movvv(Dsamp,D);
+								u[0]				=	(atan2f(D[COMP_Z],D[COMP_X]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
+								v[0]				=	acosf(D[COMP_Y]) * (1.0f / (float) C_PI);
+								
+								c = (D[COMP_X]*D[COMP_X]+D[COMP_Z]*D[COMP_Z])*2.0*C_PI;
+								a = -D[COMP_Z]/c;
+								b = D[COMP_X]/c;
+								c = -1.0f/(C_PI*sqrt(1.0f-D[COMP_Y]*D[COMP_Y] + C_EPSILON));
+										
+								normalizev(D,D1);
+								subvv(D,Dsamp);
+								u[1]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
+								v[1]				=	v[0] + (float) (c*D[COMP_Y]);
+
+								normalizev(D,D2);
+								subvv(D,Dsamp);
+								u[2]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
+								v[2]				=	v[0] + (float) (c*D[COMP_Y]);
+								
+								normalizev(D,D3);
+								subvv(D,Dsamp);
+								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
+								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
+								
+								side->lookup4(result,u,v,lookup);
+							} else {
+								initv(result,0,0,0);
+							}
+						}
+
+	// textureinfo support
+	void				getResolution(float *r) 	{ side->getResolution(r); }
+	char* 				getTextureType()			{ return "environment"; }
+	int 				getNumChannels()			{ return side->getNumChannels(); }
+	int 				getViewMatrix(float *m)		{ return FALSE; }
+	int 				getProjectionMatrix(float*)	{ return FALSE; }
+	
+	CTexture			*side;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2141,7 +1785,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 		tMode	=	TEXTURE_BLACK;
 	}
 
-	cTexture	=	new CMadeTexture(aname,width,height,sMode,tMode);
+	cTexture	=	new CMadeTexture(aname);
 
 	for (i=1,j=0;i != tileSize;i = i << 1,j++);
 	tileSizeShift		=	j;
@@ -2151,7 +1795,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 	} else if(sizeof(T) == sizeof(unsigned short)) {
 		M		= 	1.0/65535.0;
 	} else {
-		M		=	inv255;
+		M		=	1.0/255.0;
 	}
 
 	// This is the number of levels we have for the texture
@@ -2166,7 +1810,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 		TIFFSetDirectory(in,dstart);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&fileWidth);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&fileHeight);
-		cTexture->layers[i]	=	new CTiledTexture<T>(name,dstart,cwidth,cheight,numSamples,fileWidth,fileHeight,tileSize,tileSizeShift,M);
+		cTexture->layers[i]	=	new CTiledTexture<T>(name,dstart,cwidth,cheight,numSamples,fileWidth,fileHeight,sMode,tMode,tileSize,tileSizeShift,M);
 		dstart++;
 
 		cwidth				=	cwidth >> 1;
@@ -2200,13 +1844,11 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 	} else if(sizeof(T) == sizeof(unsigned short)) {
 		M		= 	1.0/65535.0;
 	} else {
-		M		=	inv255;
+		M		=	1.0/255.0;
 	}
 
-	cTexture			=	new CRegularTexture(aname,width,height,TEXTURE_BLACK,TEXTURE_BLACK);
-	cTexture->width		=	width;
-	cTexture->height	=	height;
-	cTexture->layer		=	new CBasicTexture<T>(name,dstart,width,height,numSamples,width,height,M);
+	cTexture			=	new CRegularTexture(aname);
+	cTexture->layer		=	new CBasicTexture<T>(name,dstart,width,height,numSamples,width,height,TEXTURE_BLACK,TEXTURE_BLACK,M);
 	dstart++;
 
 	return cTexture;
@@ -2276,43 +1918,6 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 }
 
 
-////////////////////////////////////////////////////////////////////////
-// TextureBase methods
-
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	textureInit
-// Description			:	This function is called before any texturemapping stuff to init
-// Return Value			:	TRUE on success
-// Comments				:
-// Date last edited		:	7/7/2001
-void		CTexture::textureInit(int maxMemory) {
-	refNumber				=	0;			// Last texture fererence number
-	usedBlocks				=	NULL;
-	freeBlocks				=	NULL;
-	numUsedBlocks			=	0;
-	usedTextureMemory		=	0;
-	maxTextureMemory		=	maxMemory;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	textureShutdown
-// Description			:	Delete everything about textures
-// Return Value			:	TRUE on success
-// Comments				:
-// Date last edited		:	7/7/2001
-void		CTexture::textureShutdown() {
-	CTextureBlock	*cBlock,*nBlock;
-
-	while(usedBlocks != NULL)
-		textureDeleteBlock(usedBlocks);
-
-	for (cBlock=freeBlocks;cBlock!=NULL;) {
-		nBlock	=	cBlock->next;
-		delete cBlock;
-		cBlock	=	nBlock;
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -2440,3 +2045,18 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 	return cTexture;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	textureSetMaxMemory
+// Description			:	Set the maximum texture memory
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	7/7/2001
+void			CRenderer::textureSetMaxMemory(int mm) {
+
+	// Flush all the memory
+	textureMemFlush(NULL,TRUE);
+	assert(CRenderer::textureUsedMemory == 0);
+
+	// Reset the texture memory
+	CRenderer::textureMaxMemory	=	mm;
+}

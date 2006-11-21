@@ -864,7 +864,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,CShadingCo
 		rMean					=	max(rMean, lookup->minFGRadius);
 		rMean					=	min(rMean, lookup->maxFGRadius);
 
-		rMean					=	max(rMean, 0.1);
+		rMean					=	max(rMean, 0.1f);
 		rMean					=	min(rMean, 3);
 
 

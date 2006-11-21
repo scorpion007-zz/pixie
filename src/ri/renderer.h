@@ -99,6 +99,7 @@ class	CDSO;
 class	CRendererContext;
 class	CNetFileMapping;
 class	CRay;
+class	CTextureBlock;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -160,6 +161,10 @@ public:
 		static	int								userRaytracing;				// TRUE if we're raytracing for the user
 		static	int								numNetrenderedBuckets;		// The number of netrendered buckets
 		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
+		static	int								textureRefNumber;			// The last reference number for textures
+		static	CTextureBlock					*textureUsedBlocks;			// All texture blocks currently in use
+		static	int								textureUsedMemory;			// The amount of texture memory in use
+		static	int								textureMaxMemory;			// The maximum texture memory
 
 
 		////////////////////////////////////////////////////////////////////
@@ -231,12 +236,12 @@ public:
 			CJob		*next;				// The next job to perform
 		};
 
-		static void				(*dispatchJob)(int thread,CJob &job);			// This function is used by the hiders to ask for a job
+		static void				(*dispatchJob)(int thread,CJob &job);				// This function is used by the hiders to ask for a job
 
-		static void				serverThread(void *w);							// Each client has one thread running this function on the client side to dispatch jobs to servers
-		static void				processServerRequest(T32 req,int index);		// This function is used to serve the client requests
-		static void				dispatchReyes(int thread,CJob &job);			// This function dispatches single threaded buckets
-		static void				dispatchPhoton(int thread,CJob &job);			// This function dispatches single threaded photon bundles
+		static void				serverThread(void *w);								// Each client has one thread running this function on the client side to dispatch jobs to servers
+		static void				processServerRequest(T32 req,int index);			// This function is used to serve the client requests
+		static void				dispatchReyes(int thread,CJob &job);				// This function dispatches single threaded buckets
+		static void				dispatchPhoton(int thread,CJob &job);				// This function dispatches single threaded photon bundles
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with the clipping/projection (defined in rendererClipping.cpp)
@@ -280,6 +285,7 @@ public:
 		static	void			initFiles();
 		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
 		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
+		static	void			textureSetMaxMemory(int);								// Set the maximum texture memory
 		static	CTexture		*textureLoad(const char *,TSearchpath *);				// Load a new texture map
 		static	CEnvironment	*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
 		static	CTexture		*getTexture(const char *);								// Load a texture
