@@ -1303,7 +1303,7 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 					options->netYBuckets	=	val[1];
 				}
 			optionCheckFlag(RI_INHERITATTRIBUTES,options->flags,					OPTIONS_FLAGS_INHERIT_ATTRIBUTES)
-			optionCheck(RI_GRIDSIZE,			options->maxGridSize,				0,100000,int)
+			optionCheck(RI_GRIDSIZE,			options->maxGridSize,				128,100000,int)
 			optionCheck(RI_EYESPLITS,			options->maxEyeSplits,				1,100000,int)
 			optionCheck(RI_TEXTUREMEMORY,		options->maxTextureSize,			0,100000,int)
 				options->maxTextureSize	*=	1000;								// Convert into bytes
