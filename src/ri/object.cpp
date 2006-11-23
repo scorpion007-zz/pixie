@@ -378,27 +378,6 @@ void			CDummyObject::intersect(CShadingContext *,CRay *) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurface
-// Method				:	CSurface
-// Description			:	Ctor
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-CSurface::CSurface(CAttributes *a,CXform *x) : CObject(a,x) {
-	tesselationTree		=	NULL;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSurface
-// Method				:	~CSurface
-// Description			:	Dtor
-// Return Value			:
-// Comments				:
-// Date last edited		:	10/16/2001
-CSurface::~CSurface() {
-	if (tesselationTree != NULL) delete tesselationTree;
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
@@ -421,29 +400,23 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 	}
 
 	// Do we have a grid ?
-	if (tesselationTree == NULL) {
-		osLock(CRenderer::tesselateMutex);
+	if (children == NULL) {
+		osLock(CRenderer::hierarchyMutex);
 
-		if (tesselationTree == NULL) {
-			CTesselationPatch	*tree	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0);
-			tree->tesselate(context,FALSE);
-			tesselationTree				=	tree;
-			// FIXME: we tesselate (but do not save) the coarsest level to get an accurate
+		if (children == NULL) {
+			CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
+			tesselation->tesselate(context,16,TRUE);
+			tesselation->attach();
+			children				=	tesselation;
+			// FIXME: we tesselate (but do not save) the finest level to get an accurate
 			// r estimate for the grid to start things off.  
 			// Q: Can we do this without firing the tesselation off?
 			// A: perhaps, but we definitely need r accurate as subdivision will use this to
 			// guess their r without tesselation
 		}
 
-		osUnlock(CRenderer::tesselateMutex);
+		osUnlock(CRenderer::hierarchyMutex);
 	}
-
-	float t = nearestBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t);
-	float r = cRay->da * t + cRay->db;
-	
-	assert(r >= 0);
-
-	tesselationTree->intersect(context,cRay,r);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -464,6 +437,8 @@ void				CSurface::dice(CShadingContext *rasterizer) {
 	osLock(CRenderer::refCountMutex);
 	cSurface->check();
 	osUnlock(CRenderer::refCountMutex);
+	
+	// Note we tesselate for raytracing on demand - so we do not automatically emit a CTesselationPatch here
 }
 
 ///////////////////////////////////////////////////////////////////////

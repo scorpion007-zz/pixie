@@ -68,36 +68,40 @@ private:
 // Comments				:
 // Date last edited		:	11/13/2006
 class	CTesselationPatch : public CObject {
+
+	struct CSubTesselation {
+		float					*P;						// The P
+		int						size;					// The size (in bytes) of the grid
+		int						lastRefNumber;			// Last time we accessed this grid
+		CSubTesselation			*next,*prev;			// To maintain the linked list	
+	};
+	
+	
 public:
-							CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth);
+							CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,char depth,char minDepth,float r);
 							~CTesselationPatch();
 
 
-	void					intersect(CShadingContext *,CRay *) { assert(FALSE); }
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *) { assert(FALSE); }
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const { assert(FALSE);	}
 
-	
-	void					intersect(CShadingContext *,CRay *,float requiredR);
-	// FIXME: should be private??
-	void	tesselate(CShadingContext *context,int saveP);
+	CSubTesselation*	tesselate(CShadingContext *context,char div,int estimateOnly);//FIXME
 private:
+	
+	//CSubTesselation*	tesselate(CShadingContext *context,char div,int estimateOnly);
+	void				splitToChildren(CShadingContext *context);	
 
-	int						depth;							// Depth of the patch
-	int						minDepth;						// The minimum depth of the patch
+	
+	
+	char					depth;							// Depth of the patch
+	char					minDepth;						// The minimum depth of the patch
 	CSurface				*object;						// The object the surface belongs to
 	float					umin,umax,vmin,vmax;			// The parametric extend of the surface
-	int						udiv,vdiv;						// The split amounts
 	
-	float					*P;						// The P
-	float					*bounds;				// The quad bounds
-	CTesselationPatch		*subTesselations[4];
-	int						numTesselations;
-	int						lastRefNumber;			// Last time we accessed this grid
-	int						size;					// The size (in bytes) of the grid
-	float					ru,rv,r;				// The average size of the quads in u and v
-	CTesselationPatch		*next,*prev;			// To maintain the linked list
-
+	float					rmax;
+	
+	CSubTesselation			*tesselations[3];
 };
 
 #endif

@@ -479,7 +479,7 @@ support untesselation
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	6/4/2003
-CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth) : CObject(a,x) {
+CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,char depth,char minDepth,float r) : CObject(a,x) {
 	// Record the stuff
 	this->object	=	o;
 	this->umin		=	umin;
@@ -488,22 +488,16 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 	this->vmax		=	vmax;
 	this->depth		=	depth;
 	this->minDepth	=	minDepth;
-	this->udiv		=	-1;
-	this->vdiv		=	-1;
 	movvv(this->bmin,o->bmin);
 	movvv(this->bmax,o->bmax);
 	
-	this->ru		=
-		this->rv	=
-		this->r 	=	C_INFINITY;
+	tesselations[0] =
+	tesselations[1]	=
+	tesselations[2]	=	NULL;
 	
-	this->P = NULL;
-	this->subTesselations[0]	= 
-		this->subTesselations[1] = 
-		this->subTesselations[2] = 
-		this->subTesselations[3] = NULL;
-	numTesselations = 0;
+	this->rmax		=	r;
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
@@ -514,234 +508,361 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 // Date last edited		:	6/4/2003
 CTesselationPatch::~CTesselationPatch() {
 	// clean up tesselations
-	delete[] P;
-	for (int i=0;i<numTesselations;i++)	{
-		delete subTesselations[i]; 
+	for(int i=0;i<3;i++) {
+		if (tesselations[i] == NULL) delete tesselations[i];
 	}
 }
 
-void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay,float requiredR) {
+void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 
-#if 0		
-	// trivially reject using bounds	
-	if(P != NULL && depth > 1) {	// FIXME: convert P!=NULL to check if we've been tesselated ever
-		// Only do so for tesselations > 2 deep, others will be too coarse
-		// FIXME: we should do better here
-		float tmin = cRay->tmin;
-		float tmax = cRay->t;
-		if (!intersectBox(bmin,bmax,cRay->from,cRay->dir,tmin,tmax)) return;
+	// check the ray conditions before proceeding
+	
+	if (! (cRay->flags & attributes->flags) )	return;
+
+	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
+		const float importance = attributes->lodImportance;
+		if (importance >= 0) {
+			if (cRay->jimp > importance)			return;
+		} else {
+			if ((1-cRay->jimp) >= -importance)		return;
+		}
 	}
-#endif
+	
+	// intersect with our bounding box
+	float t = nearestBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t);
+	
+	// bail out if the hit point is already further than the ray got
+	if (!(t < cRay->t)) return;
+	
+	float requiredR = cRay->da * t + cRay->db;
+	//requiredR*=8;
 
-	// recurse if r is insufficient
-	if (r > 2*requiredR && depth < 10) {	// FIXME: make this a user controllable parameter
-		// Make subtesselations if they don't exist
+	// bail very early if this ray should have been handled by a coarser (parent)
+	// CTesselationPatch
+	
+	if (rmax*2.0f < requiredR && depth > 0) {
+		// something else should have dealt with this
+		return;
+	}
 		
-		if (numTesselations == 0) {
+	// find a tesselation level
+	float	rCur	=	rmax;
+	int		div		=	1;
+	int		level	=	0;
+	for (level=0;level<3;level++) {
+		if (rCur < requiredR) {
+			break;
+		}
+		rCur	*=	0.25;
+		div		=	div<<2;
+	}
+	
+	#if 0
+		// HACK - dissallow recursive splitting
+		if (level == 3)	{
+			level = 2;
+			rCur = rmax/16.0f;
+			div = 16;
+		}
+	#endif
+	
+	#if 0
+		//HACK for testing
+		level = 2;
+		rCur = rmax/16.2;
+		div = 16;
+	#endif
+		
+	// did we find one?
+	if (level < 3) {
+		// r for level is sufficient. verify we have a tesselation
+		
+	//	fprintf(stderr,"got level %d %f\n",level,rCur);
+		
+		//osLock(CRenderer::tesselateMutex);
+		
+		if (tesselations[level] == NULL) {
 			osLock(CRenderer::tesselateMutex);
-
-			if (numTesselations == 0) {
-				if (ru > 2*rv) {
-					// dice u 1st
-					float umid				=	(umin + umax) / (float) 2;
-					subTesselations[0]		=	new CTesselationPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
-					subTesselations[1]		=	new CTesselationPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
-					subTesselations[0]->ru	=	ru/2.0f;	// we'll calculate this again on tesselation
-					subTesselations[0]->rv	=	rv;
-					subTesselations[0]->r	=	r/2.0f;
-					subTesselations[1]->ru	=	ru/2.0f;
-					subTesselations[1]->rv	=	rv;
-					subTesselations[1]->r	=	r/2.0f;
-					numTesselations			=	2;
-					//fprintf(stderr," US %f %f %f\n",ru/2.0f,rv,r/2.0f);
-				} else if (rv > 2*ru) {
-					// dice v 1st
-					float vmid				=	(vmin + vmax) / (float) 2;
-					subTesselations[0]		=	new CTesselationPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);
-					subTesselations[1]		=	new CTesselationPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);
-					subTesselations[0]->ru	=	ru;			// we'll calculate this again on tesselation
-					subTesselations[0]->rv	=	rv/2.0f;
-					subTesselations[0]->r	=	r/2.0f;
-					subTesselations[1]->ru	=	ru;
-					subTesselations[1]->rv	=	rv/2.0f;
-					subTesselations[1]->r	=	r/2.0f;
-					numTesselations			=	2;
-					//fprintf(stderr," VS %f %f %f\n",ru,rv/2.0f,r/2.0f);
-				} else {
-					// dice both
-					float umid				=	(umin + umax) / (float) 2;
-					float vmid				=	(vmin + vmax) / (float) 2;
-					subTesselations[0]		=	new CTesselationPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);
-					subTesselations[1]		=	new CTesselationPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);
-					subTesselations[2]		=	new CTesselationPatch(attributes,xform,object,umid,umax,vmid,vmax,depth+1,minDepth);
-					subTesselations[3]		=	new CTesselationPatch(attributes,xform,object,umin,umid,vmid,vmax,depth+1,minDepth);
-					subTesselations[0]->ru	=	ru/2.0f;		// we'll calculate this again on tesselation
-					subTesselations[0]->rv	=	rv/2.0f;
-					subTesselations[0]->r	=	r/2.0f;
-					subTesselations[1]->ru	=	ru/2.0f;
-					subTesselations[1]->rv	=	rv/2.0f;
-					subTesselations[1]->r	=	r/2.0f;
-					subTesselations[2]->ru	=	ru/2.0f;
-					subTesselations[2]->rv	=	rv/2.0f;
-					subTesselations[2]->r	=	r/2.0f;
-					subTesselations[3]->ru	=	ru/2.0f;
-					subTesselations[3]->rv	=	rv/2.0f;
-					subTesselations[3]->r	=	r/2.0f;
-					numTesselations			=	4;
-					//fprintf(stderr," BS %f %f %f\n",ru/2.0f,rv/2.0f,r/2.0f);
-				}
+			
+			if (tesselations[level] == NULL) {
+				tesselations[level] = tesselate(context,div,FALSE);
 			}
 			
 			osUnlock(CRenderer::tesselateMutex);
 		}
 		
-		// test the subtesselations
-		
-		for(int i=0;i<numTesselations;i++) {
-			subTesselations[i]->intersect(context,cRay,r);
-		}
-		return;
-	}
+		// Intersect the ray
 	
-	// Our r is sufficient. verify we have P
-	
-	//osLock(CRenderer::tesselateMutex);
-	
-	if (P == NULL) {
-		osLock(CRenderer::tesselateMutex);
-		
-		if (P == NULL) {
-			tesselate(context,TRUE);
-		}
-		
-		osUnlock(CRenderer::tesselateMutex);
-	}
-	
-	// Intersect the ray
-	
-	int			i,j;
-	const float	*cP		=	P;
-	const float *cB		=	bounds;
-	const float	*r		=	cRay->from;
-	const float	*q		=	cRay->dir;
-	
-	float urg = (umax - umin) / (float) udiv;
-	float vrg = (vmax - vmin) / (float) vdiv;
-
-	// FIXME: pull udiv and vdiv out to constants so we can really get this unrolled
-	for (j=0;j<vdiv;j++) {
-		for (i=0;i<udiv;i++,cP += 3,cB += 6) {
-		
-			// quick-reject bounds
-			float tmin = cRay->tmin;
-			float tmax = cRay->t;
-			if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {
-				continue;
-			}
-
-			const float	*P00	=	cP;
-			const float	*P10	=	cP + 3;
-			const float	*P01	=	cP + (udiv+1)*3;
-			const float	*P11	=	P01 + 3;
-			
-			vector		a,b,c,d;
-
-			subvv(a,P11,P10);
-			subvv(a,P01);
-			addvv(a,P00);
-			subvv(b,P10,P00);
-			subvv(c,P01,P00);
-			movvv(d,P00);
-
-			const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];
-			const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];
-			const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];
-			const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];
-			const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];
-			const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
-			const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
-			const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
-			
-
-
-		#define solve()														\
-			if ((v > 0) && (v < 1)) {										\
-				{															\
-					const double	a	=	v*A2 + B2;						\
-					const double	b	=	v*(A2 - A1) + B2 - B1;			\
-					if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
-					else			u	=	(-v*C2 - D2) / a;				\
-				}															\
-																			\
-				if ((u > 0) && (u < 1)) {									\
-					double	P[3];											\
-																			\
-					P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
-					P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
-					P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
-																			\
-					if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
-						t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
-					else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
-						t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
-					else													\
-						t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
-																			\
-					if ((t > cRay->tmin) && (t < cRay->t)) {				\
-						vector	dPdu,dPdv,N;								\
-						vector	tmp1,tmp2;									\
-						subvv(tmp1,P10,P00);								\
-						subvv(tmp2,P11,P01);								\
-						interpolatev(dPdu,tmp1,tmp2,(float) v);				\
-						subvv(tmp1,P01,P00);								\
-						subvv(tmp2,P11,P10);								\
-						interpolatev(dPdv,tmp1,tmp2,(float) u);				\
-						crossvv(N,dPdu,dPdv);								\
-						if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
-						if (attributes->nSides == 1) {						\
-							if (dotvv(q,N) < 0) {							\
-								cRay->object	=	object;					\
+		#define solve()															\
+				if ((v > 0) && (v < 1)) {										\
+					{															\
+						const double	a	=	v*A2 + B2;						\
+						const double	b	=	v*(A2 - A1) + B2 - B1;			\
+						if (b*b >= a*a)	u	=	(v*(C1 - C2) + D1 - D2) / b;	\
+						else			u	=	(-v*C2 - D2) / a;				\
+					}															\
+																				\
+					if ((u > 0) && (u < 1)) {									\
+						double	P[3];											\
+																				\
+						P[0]	=	a[0]*u*v + b[0]*u + c[0]*v + d[0];			\
+						P[1]	=	a[1]*u*v + b[1]*u + c[1]*v + d[1];			\
+						P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
+																				\
+						if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
+							t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+						else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
+							t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+						else													\
+							t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+																				\
+						if ((t > cRay->tmin) && (t < cRay->t)) {				\
+							vector	dPdu,dPdv,N;								\
+							vector	tmp1,tmp2;									\
+							subvv(tmp1,P10,P00);								\
+							subvv(tmp2,P11,P01);								\
+							interpolatev(dPdu,tmp1,tmp2,(float) v);				\
+							subvv(tmp1,P01,P00);								\
+							subvv(tmp2,P11,P10);								\
+							interpolatev(dPdv,tmp1,tmp2,(float) u);				\
+							crossvv(N,dPdu,dPdv);								\
+							if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
+							if (attributes->nSides == 1) {						\
+								if (dotvv(q,N) < 0) {							\
+									cRay->object	=	object;					\
+									cRay->u			=	umin + ((float) u + i)*urg;	\
+									cRay->v			=	vmin + ((float) v + j)*vrg;	\
+									cRay->t			=	(float) t;				\
+									movvv(cRay->N,N);							\
+								}												\
+							} else {											\
+								cRay->object	=	object;						\
 								cRay->u			=	umin + ((float) u + i)*urg;	\
 								cRay->v			=	vmin + ((float) v + j)*vrg;	\
-								cRay->t			=	(float) t;				\
-								movvv(cRay->N,N);							\
-							}												\
-						} else {											\
-							cRay->object	=	object;						\
-							cRay->u			=	umin + ((float) u + i)*urg;	\
-							cRay->v			=	vmin + ((float) v + j)*vrg;	\
-							cRay->t			=	(float) t;					\
-							movvv(cRay->N,N);								\
-						}													\
-					}														\
-				}															\
-			}
+								cRay->t			=	(float) t;					\
+								movvv(cRay->N,N);								\
+							}													\
+						}														\
+					}															\
+				}
+	
+				
+		#define intersectQuads()												\
+																				\
+				vector		a,b,c,d;											\
+																				\
+				subvv(a,P11,P10);												\
+				subvv(a,P01);													\
+				addvv(a,P00);													\
+				subvv(b,P10,P00);												\
+				subvv(c,P01,P00);												\
+				movvv(d,P00);													\
+																				\
+				const double	A1	=	a[COMP_X]*q[COMP_Z] - a[COMP_Z]*q[COMP_X];											\
+				const double	B1	=	b[COMP_X]*q[COMP_Z] - b[COMP_Z]*q[COMP_X];											\
+				const double	C1	=	c[COMP_X]*q[COMP_Z] - c[COMP_Z]*q[COMP_X];											\
+				const double	D1	=	(d[COMP_X] - r[COMP_X])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_X];				\
+				const double	A2	=	a[COMP_Y]*q[COMP_Z] - a[COMP_Z]*q[COMP_Y];											\
+				const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];											\
+				const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];											\
+				const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];				\
+																															\
+				double			roots[2];																					\
+				double			u,v,t;																						\
+				switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {			\
+					case 0:														\
+						break;													\
+					case 1:														\
+						v	=	roots[0];										\
+						solve();												\
+						break;													\
+					case 2:														\
+						v	=	roots[0];										\
+						solve();												\
+						v	=	roots[1];										\
+						solve();												\
+						break;													\
+				}
+		
+		
+		if (div == 1) {
+			const float	*r		=	cRay->from;
+			const float	*q		=	cRay->dir;
+		
+			const float	*P00	=	tesselations[level]->P;
+			const float	*P10	=	P00+3;
+			const float	*P01	=	P00+6;
+			const float	*P11	=	P00+9;
 			
-
-
-			double			roots[2];
-			double			u,v,t;
-			switch (solveQuadric<double>(A2*C1 - A1*C2,A2*D1 - A1*D2 + B2*C1 - B1*C2,B2*D1 - B1*D2,roots)) {
-				case 0:
-					break;
-				case 1:
-					v	=	roots[0];
-					solve();
-					break;
-				case 2:
-					v	=	roots[0];
-					solve();
-					v	=	roots[1];
-					solve();
-					break;
+			const float urg		=	(umax - umin);
+			const float vrg		=	(vmax - vmin);
+		
+			const int i = 0;
+			const int j = 0;
+			
+			intersectQuads();
+			return;
+			
+		} else if (div <= 4) {
+			if (rCur*0.5 < requiredR) {
+				// downsample 4x4 to 2x2 (not the same as above because we divided
+				// in the parametric space here we quads intersect directly
+				
+				const float	*r		=	cRay->from;
+				const float	*q		=	cRay->dir;
+				
+				const float urg		=	2.0f*(umax - umin) / (float) div;
+				const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+				
+				const float	*cP		=	tesselations[level]->P;
+				
+				const int nb = div>>1;
+				
+				for (int j=0;j<nb;j++) {
+					for (int i=0;i<nb;i++,cP += 6) {
+						const float	*P00	=	cP;
+						const float	*P10	=	cP+6;
+						const float	*P01	=	cP+(div+1)*6;
+						const float	*P11	=	cP+(div+1)*6+6;
+		
+						intersectQuads();
+					}
+					cP += (div+1)*3 +3;
+				}
+			} else {
+				// 2x2 or 4x4 quads intersect directly
+				
+				const float	*r		=	cRay->from;
+				const float	*q		=	cRay->dir;
+				
+				const float urg		=	(umax - umin) / (float) div;
+				const float vrg		=	(vmax - vmin) / (float) div;
+				
+				const float	*cP		=	tesselations[level]->P;
+		
+				for (int j=0;j<div;j++) {
+					for (int i=0;i<div;i++,cP += 3) {
+						const float	*P00	=	cP;
+						const float	*P10	=	cP+3;
+						const float	*P01	=	cP+(div+1)*3;
+						const float	*P11	=	cP+(div+1)*3+3;
+		
+						intersectQuads();
+					}
+					cP += 3;
+				}
 			}
-
+			return;
+		} else {
+			if (rCur*0.5 < requiredR) {
+				// downsample 8x8 to 4x4 or 16x16 to 8x8
+				// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
+				// we bound-intersect each 2x2 subgrid before intersecting quads
+				
+				//fprintf(stderr,"%f %f %f (%d %d)\n",r,requiredR,r/requiredR,udiv,vdiv);
+				
+				const float	*r		=	cRay->from;
+				const float	*q		=	cRay->dir;
+				
+				const float urg		=	2.0f*(umax - umin) / (float) div;
+				const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+		
+				const float	*P		=	tesselations[level]->P;
+				const float	*cB		=	P+(div+1)*(div+1)*3;
+		
+				int nb				=	div>>2;
+				
+				for (int y=0;y<nb;y++) {
+					for (int x=0;x<nb;x++,cB += 6) {
+						
+						float tmin = cRay->tmin;
+						float tmax = cRay->t;
+						if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// pull out ray t etc to shadows
+							continue;
+						}
+						
+						const float	*cP	=	P + (x*4 + y*4*(div+1))*3;
+		
+						for (int cj=0;cj<2;cj++) {
+							for (int ci=0;ci<2;ci++,cP += 6) {
+								const float	*P00	=	cP;
+								const float	*P10	=	cP+6;
+								const float	*P01	=	cP+(div+1)*6;
+								const float	*P11	=	cP+(div+1)*6 + 6;
+				
+								const int i = x*2+ci;
+								const int j	= y*2+cj;
+								
+								intersectQuads();
+							}
+							cP += (div+1)*3 + (div-4+1)*3;
+						}
+					}
+				}
+			} else {
+				// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
+				// we bound-intersect each 4x4 subgrid before intersecting quads
+				
+				const float	*r		=	cRay->from;
+				const float	*q		=	cRay->dir;
+				
+				const float urg		=	(umax - umin) / (float) div;
+				const float vrg		=	(vmax - vmin) / (float) div;
+		
+				const float	*P		=	tesselations[level]->P;
+				const float	*cB		=	P+(div+1)*(div+1)*3;
+		
+				int nb				=	div>>2;
+				
+				for (int y=0;y<nb;y++) {
+					for (int x=0;x<nb;x++,cB += 6) {
+						
+						float tmin = cRay->tmin;
+						float tmax = cRay->t;
+						if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// pull out ray t etc to shadows
+							continue;
+						}
+						
+						const float	*cP	=	P + (x*4 + y*4*(div+1))*3;
+		
+						for (int cj=0;cj<4;cj++) {
+							for (int ci=0;ci<4;ci++,cP += 3) {
+								const float	*P00	=	cP;
+								const float	*P10	=	cP+3;
+								const float	*P01	=	cP+(div+1)*3;
+								const float	*P11	=	cP+(div+1)*3 + 3;
+				
+								const int i = x*4+ci;
+								const int j	= y*4+cj;
+								
+								intersectQuads();
+							}
+							cP += (div-4+1)*3;
+						}
+					}
+				}
+	
+			}
 		}
+	} else {
+		if (children == NULL) {
+			osLock(CRenderer::hierarchyMutex);
+			
+			if (children != NULL) {
+				osUnlock(CRenderer::hierarchyMutex);
+				return;
+			}
+	
+			// we have no sufficient level, split to children.  Let them deal with it
+			splitToChildren(context);
 
-		cP += 3;
+			osUnlock(CRenderer::hierarchyMutex);
+		}
 	}
+
 	
 	//osUnlock(CRenderer::tesselateMutex);
+	
 }
 
 
@@ -779,19 +900,25 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-void			CTesselationPatch::tesselate(CShadingContext *context,int saveP) {
+CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContext *context,char rdiv,int estimateOnly) {
 	// Get some misc variables for fast access
 	float	**varying	=	context->currentShadingState->varying;
 
-	// Start with a 3x3 sampling grid
-	udiv		=	4;
-	vdiv		=	4;
+	int div = rdiv;
+	if (div == 1) div = 2;
+
+
+//	This should now be guaranteed	
+//	if((udiv+1)*(vdiv+1) > CRenderer::maxGridSize) {
+//		udiv	=	udiv>>1;
+//		vdiv	=	vdiv>>1;
+//	}
 	
-if(depth>1) fprintf(stderr,"%d\n",depth);
+//	if(!estimateOnly) fprintf(stderr,"tesselate %d - %d\n",depth,rdiv);
 
 	// Sample points on the patch
-	const float	ustep	=	(umax-umin) / (float) (udiv);
-	const float	vstep	=	(vmax-vmin) / (float) (vdiv);
+	const float	ustep	=	(umax-umin) / (float) div;
+	const float	vstep	=	(vmax-vmin) / (float) div;
 
 	// Compute the sample positions and corresponding normal vectors
 	float	*uv			=	varying[VARIABLE_U];
@@ -799,115 +926,153 @@ if(depth>1) fprintf(stderr,"%d\n",depth);
 	float	*timev		=	varying[VARIABLE_TIME];
 	int		up,vp;
 	float	u,v;
-	for (vp=vdiv+1,v=vmin;vp>0;vp--,v+=vstep) {
-		for (up=udiv+1,u=umin;up>0;up--,u+=ustep) {
+	for (vp=div+1,v=vmin;vp>0;vp--,v+=vstep) {
+		for (up=div+1,u=umin;up>0;up--,u+=ustep) {
 			*uv++		=	u;
 			*vv++		=	v;
 			*timev++	=	0;
 		}
 	}
-	context->displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+	context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 	
 	// Evaluate the quality of this tesselation in u and v separately
 	int		i;
 	float	vMax	=	0;
 	float	vAvg	=	0;
-	for (i=0;i<=udiv;i++) {
-		const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(udiv+1)*3,vdiv);
+	for (i=0;i<=div;i++) {
+		const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(div+1)*3,div);
 		vMax			=	max(vMax,l);
 		vAvg			+=	l;
 	}
 
 	float	uMax	=	0;
 	float	uAvg	=	0;
-	for (i=0;i<=vdiv;i++) {
-		const float	l	=	measureLength(varying[VARIABLE_P] + i*(udiv+1)*3,3,udiv);
+	for (i=0;i<=div;i++) {
+		const float	l	=	measureLength(varying[VARIABLE_P] + i*(div+1)*3,3,div);
 		uMax			=	max(uMax,l);
 		uAvg			+=	l;
 	}
 
-	vAvg	/=	(float) (udiv+1)*vdiv;
-	uAvg	/=	(float) (vdiv+1)*udiv;
+	vAvg	/=	(float) (div+1)*div;
+	uAvg	/=	(float) (div+1)*div;
 		
 	// At this point, I should have the tesselation. So create the grid and return it
 	
-	//if((uAvg+vAvg)/2.0 > 2*this->r && depth > 0) fprintf(stderr,"tesselationm underreduction %f %f %d\n",(uAvg+vAvg)/2.0f,this->r,depth);
-	
-	lastRefNumber			=	-1;
-	this->ru				=	uAvg;
-	this->rv				=	vAvg;
-	this->r					=	(ru+rv)/2;
-	//fprintf(stderr,"%f %f %f\n",ru,rv,r);
 	
 	#if 0
 	{
 		CDebugView	d("/tmp/tesselate.dat",TRUE);
 	
 		float *Pcur = varying[VARIABLE_P];
-		for (int i =0;i<vdiv;i++) {
+		for (int i =0;i<div;i++) {
 			d.line(Pcur,Pcur+3);
-			d.line(Pcur+(udiv+1)*3,Pcur+(udiv+1)*3+3);
+			d.line(Pcur+(div+1)*3,Pcur+(div+1)*3+3);
 			Pcur +=3;
 		}
 		Pcur = varying[VARIABLE_P];
-		for (int i =0;i<udiv;i++) {
-			d.line(Pcur,Pcur+(vdiv+1)*3);
-			d.line(Pcur+udiv*3,Pcur+udiv*3+(vdiv+1)*3);
-			Pcur += (vdiv+1)*3;
+		for (int i =0;i<div;i++) {
+			d.line(Pcur,Pcur+(div+1)*3);
+			d.line(Pcur+div*3,Pcur+div*3+(div+1)*3);
+			Pcur += (div+1)*3;
 		}
 		Pcur = varying[VARIABLE_P];
-		for (int i =(vdiv+1)*(udiv+1);i>0;i--) {
+		for (int i =(div+1)*(div+1);i>0;i--) {
 			d.point(Pcur);
 		}
 	}
 	#endif
 	
-	// save a tighter bound
-	initv(bmin,C_INFINITY);
-	initv(bmax,-C_INFINITY);
-
-	float *Pcur = varying[VARIABLE_P];
-	for (int i =(vdiv+1)*(udiv+1);i>0;i--) {
-		addBox(bmin,bmax,Pcur);
-		Pcur			+=	3;
-	}
 	
-	float maxBound	=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
-	maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
-	maxBound		*=	attributes->rasterExpand;
-
-	bmin[COMP_X]	-=	maxBound;
-	bmin[COMP_Y]	-=	maxBound;
-	bmin[COMP_Z]	-=	maxBound;
-	bmax[COMP_X]	+=	maxBound;
-	bmax[COMP_Y]	+=	maxBound;
-	bmax[COMP_Z]	+=	maxBound;
+	// This controls how much we overestimate bounds of both the grid, and
+	// sub-parts of the grid.  Setting this high hurts performance
+	//const float boundExpander = attributes->rasterExpand;
+	const float boundExpander = 0.1f;
 
 	// create P if it is so required
-	if (saveP) {
-		P						=	new float[(udiv+1)*(vdiv+1)*3 + udiv*vdiv*6];
-		bounds					=	P + (udiv+1)*(vdiv+1)*3;
-		size					=	(udiv+1)*(vdiv+1)*3*sizeof(float) + udiv*vdiv*6*sizeof(float);
+	if (!estimateOnly) {
 		
-		memcpy(P,varying[VARIABLE_P],(udiv+1)*(vdiv+1)*3*sizeof(float));
-		
-		float *Pcur = P;
-		float *bnds = bounds;
-		
-		for (i=0;i<vdiv;i++) {
-			for (int j=0;j<udiv;j++) {
+		if (rdiv == 1) {
+			// subsampling our 2x2 to 1x1, no bounds
+			
+			void			*mem			=	malloc(sizeof(CSubTesselation) + 2*2*3*sizeof(float));
+			CSubTesselation	*cTesselation	=	(CSubTesselation*) mem;
+			
+			cTesselation->P					=	(float*) ((char*) mem + sizeof(CSubTesselation));
+			cTesselation->size				=	2*2*3*sizeof(float);			
+			cTesselation->lastRefNumber		=	-1;
+			//rmax							=	max(rmax,(uAvg+vAvg)/4.0f);	// we're subsampling
+	
+			movvv(cTesselation->P,		varying[VARIABLE_P]);
+			movvv(cTesselation->P+3,	varying[VARIABLE_P]+6);
+			movvv(cTesselation->P+6,	varying[VARIABLE_P]+18);
+			movvv(cTesselation->P+9,	varying[VARIABLE_P]+24);
+			
+			// install tesselation last so other threads don't use bounds/P before they're ready
+			return cTesselation;
+			
+		} else if (rdiv <= 4) {
+			// not saving bounds here
+			void				*mem			= malloc(sizeof(CSubTesselation) + (div+1)*(div+1)*3*sizeof(float));
+			CSubTesselation		*cTesselation	= (CSubTesselation*) mem;
+
+			cTesselation->P						=	(float*) ((char*) mem + sizeof(CSubTesselation));
+			cTesselation->size					=	(div+1)*(div+1)*3*sizeof(float);
+			cTesselation->lastRefNumber			=	-1;
+			//rmax								=	max(rmax,div*(uAvg+vAvg)/2.0f);
+			
+			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+			
+			// install tesselation last so other threads don't use bounds/P before they're ready
+			return cTesselation;
+		} else {
+			// create bounds, but only if it saves us work later
+						
+			int nb = div>>2;		// number of bounds in each direction
+			
+			// save off the data
+			
+			void				*mem			= malloc(sizeof(CSubTesselation) + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
+			CSubTesselation		*cTesselation	= (CSubTesselation*) mem;
+
+			cTesselation->P						=	(float*) ((char*) mem + sizeof(CSubTesselation));
+			cTesselation->size					=	((div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
+			cTesselation->lastRefNumber			=	-1;
+			//rmax								=	max(rmax,div*(uAvg+vAvg)/2.0f);
+			
+			float *bounds						=	cTesselation->P + (div+1)*(div+1)*3;
+			
+			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+			
+			
+			// clear them
+			float *bnds = bounds;
+			for (i=0;i<nb*nb;i++,bnds+=6) {
 				initv(bnds,C_INFINITY);
 				initv(bnds+3,-C_INFINITY);
+			}
+			
+			// sum them
+			bnds = bounds;
+			for (int y=0;y<nb;y++) {
+				for (int x=0; x<nb;x++,bnds+=6) {
+					const float *cP		=	cTesselation->P + (x*4 + y*4*(div+1))*3;
 				
-				addBox(bnds,bnds+3,Pcur);
-				addBox(bnds,bnds+3,Pcur+3);
-				addBox(bnds,bnds+3,Pcur+(udiv+1)*3);
-				addBox(bnds,bnds+3,Pcur+(udiv+1)*3+3);
-				
-				maxBound		=	max(bnds[3+COMP_X]-bnds[COMP_X],bnds[3+COMP_Y]-bnds[COMP_Y]);
+					for (i=0;i<5;i++) {
+						for (int j=0;j<5;j++,cP+=3) {
+							addBox(bnds,bnds+3,cP);
+						}
+						cP += ((div+1)-5)*3;
+					}
+				}
+			}
+			
+			// expand them
+			bnds = bounds;
+			for(i=0;i<nb*nb;i++){
+				float maxBound	=	max(bnds[3+COMP_X]-bnds[COMP_X],bnds[3+COMP_Y]-bnds[COMP_Y]);
 				maxBound		=	max(bnds[3+COMP_Z]-bnds[COMP_Z],maxBound);
-				maxBound		*=	attributes->rasterExpand;
-
+				maxBound		*=	boundExpander;
+	
 				bnds[COMP_X]	-=	maxBound;
 				bnds[COMP_Y]	-=	maxBound;
 				bnds[COMP_Z]	-=	maxBound;
@@ -915,14 +1080,104 @@ if(depth>1) fprintf(stderr,"%d\n",depth);
 				bnds[3+COMP_Y]	+=	maxBound;
 				bnds[3+COMP_Z]	+=	maxBound;
 				
-				bnds += 6;
-				Pcur += 3;
+				bnds+=6;
 			}
-			Pcur += 3;
+			
+			// install tesselation last so other threads don't use bounds/P before they're ready
+			return cTesselation;
 		}
-		
-	} else {
-		P						=	NULL;
-		size					=	0;
 	}
+	
+	// simply save the coarse r estimate
+	if (rdiv == 1) {
+		rmax							=	max(rmax,(uAvg+vAvg)/4.0f);	// we're subsampling
+	} else {
+		rmax							=	max(rmax,div*(uAvg+vAvg)/2.0f);
+	}
+	
+	// save a tighter bound
+	initv(bmin,C_INFINITY);
+	initv(bmax,-C_INFINITY);
+
+	float *Pcur = varying[VARIABLE_P];
+	for (int i =(div+1)*(div+1);i>0;i--) {
+		addBox(bmin,bmax,Pcur);
+		Pcur			+=	3;
+	}
+	
+	float maxBound	=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
+	maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
+	maxBound		*=	boundExpander;
+
+	bmin[COMP_X]	-=	maxBound;
+	bmin[COMP_Y]	-=	maxBound;
+	bmin[COMP_Z]	-=	maxBound;
+	bmax[COMP_X]	+=	maxBound;
+	bmax[COMP_Y]	+=	maxBound;
+	bmax[COMP_Z]	+=	maxBound;
+	
+	return NULL;
+}
+
+void		CTesselationPatch::splitToChildren(CShadingContext *context) {	
+	const int udiv = 16;
+	const int vdiv = 16;
+	
+	float	**varying	=	context->currentShadingState->varying;
+
+	const float	ustep	=	(umax-umin) / (float) udiv;
+	const float	vstep	=	(vmax-vmin) / (float) vdiv;
+
+	// sanity check before dividing
+	if(umin>= umax || vmin>= vmax) {
+		return;
+	}
+
+	// Compute the new patch parameteric splits
+	
+	int		cu,cv;
+	float	u,v;
+
+	float *us = (float*) alloca(sizeof(float)*((udiv+1) + (vdiv+1)));	// don't use varyings as tesselate will smash them
+	float *vs = us + (udiv+1);
+	
+	
+	float	*vv			=	vs;
+	for (cv=0,v=vmin;cv<vdiv+1;cv++,v+=vstep) {
+		*vv++		=	v;
+	}
+	float	*uv			=	us;
+	for (cu=0,u=umin;cu<udiv+1;cu++,u+=ustep) {
+		*uv++		=	u;
+	}
+	
+	// ensure the ends are at the ends
+	us[udiv] = umax;	
+	vs[vdiv] = vmax;
+	
+	// generate subpatches
+	CTesselationPatch *subPatches = NULL;
+	
+	for (cv=0,vv=vs;cv<vdiv;cv++,vv++) {
+		for (cu=0,uv=us;cu<udiv;cu++,uv++) {
+		
+			// sanity check before emitting the subpatch
+			if(uv[0] >= uv[1] || vv[0] >= vv[1]) {
+				continue;
+			}
+			
+			// emit the new subpatch
+			CTesselationPatch *cPatch = new CTesselationPatch(attributes,xform,object,uv[0],uv[1],vv[0],vv[1],depth+1,minDepth,-1);
+			cPatch->tesselate(context,16,TRUE);
+			cPatch->sibling = subPatches;
+			subPatches = cPatch;
+		}
+	}
+	
+	// attach them
+	children = subPatches;
+	
+	CObject	*cObject;
+	for (cObject=children;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
+	cluster(context);		
 }
