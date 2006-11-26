@@ -136,8 +136,8 @@ void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *
 		glColor3fv(C);
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3fv(P);
-		for (i=0;i<=10;i++) {
-			const float	theta	=	(float) (i * C_PI * 2.0f / 10.0f);
+		for (i=0;i<=20;i++) {
+			const float	theta	=	(float) (i * C_PI * 2.0f / 20.0f);
 			mulvf(x,X,cosf(theta)*dP[0]);
 			mulvf(y,Y,sinf(theta)*dP[0]);
 			addvv(x,P);

@@ -839,7 +839,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		}
 	} else {
 		// No derivative information is needed
-		currentShadingState->shadingDim			=	SHADING_0D;
+		currentShadingState->shadingDim			=	dim;
 		currentShadingState->numRealVertices	=	numVertices;
 		currentShadingState->numActive			=	numVertices;
 		currentShadingState->numPassive			=	0;

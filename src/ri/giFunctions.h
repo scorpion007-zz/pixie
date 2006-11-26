@@ -380,16 +380,18 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 								else envdir = (TCode *) varying[VARIABLE_PW];														\
 								if (lookup->coverageIndex != -1)	{	operand(lookup->coverageIndex,coverage);	}				\
 								else coverage = (TCode *) varying[VARIABLE_PW];														\
+								const float	*b	=	rayDiff(&op1->real);															\
 								cache	=	lookup->cache;
 
 
-#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,this,lookup);														\
+#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,*b,this,lookup);												\
 								movvv(&res->real,C);																				\
 								movvv(&envdir->real,C+4);																			\
 								coverage->real = C[3];
 
 
 #define	IDEXPR_UPDATE			FUN4EXPR_UPDATE(3,3,3,0)																			\
+								b++;																								\
 								envdir	+=	3;																						\
 								coverage++;
 
@@ -435,15 +437,17 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 								else envdir = (TCode *) varying[VARIABLE_PW];														\
 								if (lookup->irradianceIndex != -1)	{	operand(lookup->irradianceIndex,irradiance);	}			\
 								else irradiance = (TCode *) varying[VARIABLE_PW];													\
+								const float	*b	=	rayDiff(&op1->real);															\
 								cache	=	lookup->cache;
 
-#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,this,lookup);														\
+#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,*b,this,lookup);												\
 								res->real	=	C[3];																				\
 								movvv(&irradiance->real,C);																			\
 								movvv(&envdir->real,C+4);
 
 
 #define	OCCLUSIONEXPR_UPDATE	FUN4EXPR_UPDATE(1,3,3,0)																			\
+								b++;																								\
 								irradiance	+=	3;																					\
 								envdir		+=	3;
 

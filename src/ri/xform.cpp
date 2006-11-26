@@ -398,3 +398,48 @@ void	CXform::invTransformBound(float *bmin,float *bmax) const {
 	movvv(bmax,lbmax);
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CXform
+// Method				:	transformBound
+// Description			:	This function is used to transform a bounding box
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/3/2001
+void	transformBound(float *lbmin,float *lbmax,const float *to,const float *bmin,const float *bmax) {
+	vector		corners[8];
+	int			i;
+	vector		vtmp;
+
+	// Compute & transfer the corners to the dest space
+	initv(vtmp,bmin[COMP_X],bmin[COMP_Y],bmin[COMP_Z]);
+	mulmp(corners[0],to,vtmp);
+
+	initv(vtmp,bmin[COMP_X],bmin[COMP_Y],bmax[COMP_Z]);
+	mulmp(corners[1],to,vtmp);
+
+	initv(vtmp,bmin[COMP_X],bmax[COMP_Y],bmax[COMP_Z]);
+	mulmp(corners[2],to,vtmp);
+
+	initv(vtmp,bmin[COMP_X],bmax[COMP_Y],bmin[COMP_Z]);
+	mulmp(corners[3],to,vtmp);
+
+	initv(vtmp,bmax[COMP_X],bmin[COMP_Y],bmin[COMP_Z]);
+	mulmp(corners[4],to,vtmp);
+
+	initv(vtmp,bmax[COMP_X],bmin[COMP_Y],bmax[COMP_Z]);
+	mulmp(corners[5],to,vtmp);
+
+	initv(vtmp,bmax[COMP_X],bmax[COMP_Y],bmax[COMP_Z]);
+	mulmp(corners[6],to,vtmp);
+
+	initv(vtmp,bmax[COMP_X],bmax[COMP_Y],bmin[COMP_Z]);
+	mulmp(corners[7],to,vtmp);
+
+	movvv(lbmin,corners[0]);
+	movvv(lbmax,corners[0]);
+
+	for (i=1;i<8;i++) {
+		addBox(lbmin,lbmax,corners[i]);
+	}
+}

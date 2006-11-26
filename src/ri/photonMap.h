@@ -644,7 +644,6 @@ public:
 // Date last edited		:	4/1/2002
 class	CPhoton : public CTon {
 public:
-	vector			irradiance;		// The precomputed irradiance amount (-1 if not precomputed)
 	vector			C;				// The intensity
 	unsigned char	theta,phi;		// Photon direction
 };
@@ -667,24 +666,8 @@ public:
 // Comments				:
 // Date last edited		:	3/11/2003
 class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView {
-
-	class	CPhotonSample {
-	public:
-		vector			C,P,N;
-		float			dP;
-		CPhotonSample	*next;
-	};
-
-	class	CPhotonNode {
-	public:
-		vector			center;
-		float			side;
-		CPhotonSample	*samples;
-		CPhotonNode		*children[8];
-	};
-
 public:
-				CPhotonMap(const char *,const CXform *,FILE *);
+				CPhotonMap(const char *,FILE *);
 				~CPhotonMap();
 
 	void		attach()	{	refCount++;	}
@@ -693,9 +676,6 @@ public:
 
 	void		reset();
 	void		write(const CXform *);
-
-	int			probe(float *,const float *,const float *);
-	void		insert(const float *,const float *,const float *,float);
 
 	void		lookup(float *,const float *,int);
 	void		lookup(float *,const float *,const float *,int);
@@ -706,14 +686,12 @@ public:
 	void		draw();
 	void		bound(float *bmin,float *bmax);
 
-	CPhotonNode	*root;
-	int			maxDepth;			// The maximum depth of the hierarchy
 	int			refCount;
 	int			modifying;
-	matrix		toCamera,fromCamera;
+	matrix		from,to;
 	float		maxPower;			// The maximum photon power
 	float		searchRadius;
-	TMutex		mutex;				// For synchronization
+	TMutex		mutex;				// For synchronization during writing
 };
 
 

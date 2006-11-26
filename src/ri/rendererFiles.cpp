@@ -302,7 +302,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 		}
 
 		// Read it
-		map		=	new CPhotonMap(name,world,in);
+		map		=	new CPhotonMap(name,in);
 		frameFiles->insert(map->name,map);
 	}
 
@@ -364,7 +364,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 					
 					// Create the cache
 					if (strcmp(type,fileIrradianceCache) == 0) {
-						cache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,in);
+						cache	=	new CIrradianceCache(name,flags,in);
 					} else {
 						error(CODE_BUG,"This seems to be a Pixie file of unrecognised type (%s)\n",name);
 						fclose(in);
@@ -384,7 +384,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 			}
 			
 			// go ahead and create the cache
-			cache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,NULL);
+			cache	=	new CIrradianceCache(name,flags,NULL);
 		}
 		
 		// Create channels if possible

@@ -78,5 +78,6 @@ public:
 	int			flip;								// TRUE if the determinant is < 0
 };
 
+void	transformBound(float *bmax,float *bmin,const float *to,const float *obmin,const float *obmax);
 #endif
 

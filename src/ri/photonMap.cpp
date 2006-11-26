@@ -71,41 +71,30 @@ float				sinphi[256];
 // Return Value			:
 // Comments				:
 // Date last edited		:	3/11/2003
-CPhotonMap::CPhotonMap(const char *n,const CXform *world,FILE *in) : CMap<CPhoton>() , CFileResource(n) {
-	root			=	NULL;
-	maxDepth		=	1;
+CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource(n) {
 	refCount		=	0;
 	modifying		=	FALSE;
 	maxPower		=	0;
 	osCreateMutex(mutex);
 
+	identitym(from);
+	identitym(to);
+
 	// Try to read the photonmap
 	if (in != NULL) {
-		matrix	tmp;
-		int		i;
+		matrix	fromWorld,toWorld;
 
 		CMap<CPhoton>::read(in);
 
 		// Read the transformation matrices
-		fread(tmp,1,sizeof(matrix),in);
-		mulmm(toCamera,tmp,world->to);
-		fread(tmp,1,sizeof(matrix),in);
-		mulmm(fromCamera,world->from,tmp);
+		fread(fromWorld,1,sizeof(matrix),in);
+		fread(toWorld,1,sizeof(matrix),in);
 		fread(&maxPower,1,sizeof(float),in);
 
-		root			=	new CPhotonNode;
-		addvv(root->center,bmin,bmax);
-		mulvf(root->center,1 / (float) 2);
-		root->side		=	max(max(bmax[0]-bmin[0],bmax[1] - bmin[1]),bmax[2] - bmin[2]);
-		root->samples	=	NULL;
-		for (i=0;i<8;i++) root->children[i]	=	NULL;
-
-		fclose(in);
+		mulmm(to,fromWorld,CRenderer::toWorld);
+		mulmm(from,CRenderer::fromWorld,toWorld);
 	} else {
-		// Reset the transformation matrices
-		movmm(toCamera,world->from);
-		movmm(fromCamera,world->to);
-
+	
 		// Make sure we have a root
 		balance();
 	}
@@ -120,31 +109,6 @@ CPhotonMap::CPhotonMap(const char *n,const CXform *world,FILE *in) : CMap<CPhoto
 // Date last edited		:	3/11/2003
 CPhotonMap::~CPhotonMap() {
 	osDeleteMutex(mutex);
-
-	if (root != NULL) {
-		CPhotonNode		**stackBase	=	(CPhotonNode **)	alloca(maxDepth*sizeof(CPhotonNode *)*8);
-		CPhotonNode		**stack;
-		CPhotonNode		*cNode;
-		CPhotonSample	*cSample;
-		int			i;
-
-		stack		=	stackBase;
-		*stack++	=	root;
-		while(stack > stackBase) {
-			cNode	=	*(--stack);
-
-			while((cSample=cNode->samples) != NULL) {
-				cNode->samples	=	cSample->next;
-				delete cSample;
-			}
-
-			for (i=0;i<8;i++) {
-				if (cNode->children[i] != NULL) *stack++	=	cNode->children[i];
-			}
-
-			delete cNode;
-		}
-	}
 }
 
 
@@ -179,8 +143,8 @@ void	CPhotonMap::write(const CXform *world) {
 		CMap<CPhoton>::write(out);
 
 		// Write the matrices
-		fwrite(world->from,1,sizeof(matrix),out);
-		fwrite(world->to,1,sizeof(matrix),out);
+		fwrite(CRenderer::fromWorld,1,sizeof(matrix),out);
+		fwrite(CRenderer::toWorld,1,sizeof(matrix),out);
 		maxPower	=	sqrtf(maxPower);
 		fwrite(&maxPower,1,sizeof(float),out);
 
@@ -193,139 +157,9 @@ void	CPhotonMap::write(const CXform *world) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
-// Method				:	lookup
-// Description			:	Locate the nearest maxFoundPhoton photons
-// Return Value			:
-// Comments				:	
-int		CPhotonMap::probe(float *C,const float *P,const float *N) {
-	CPhotonNode			*cNode;
-	CPhotonNode			**stackBase	=	(CPhotonNode **)	alloca(maxDepth*sizeof(CPhotonNode *)*8);
-	CPhotonNode			**stack;
-	CPhotonSample		*cSample;
-	float				totalWeight	=	0;
-	int					i;
-
-	if (root == NULL) return FALSE;
-
-	stack			=	stackBase;
-	*stack++		=	root;
-	initv(C,0,0,0);
-	while(stack > stackBase) {
-		cNode	=	*(--stack);
-
-		// Iterate over the samples
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
-			vector	D;
-			float	d;
-			
-			subvv(D,cSample->P,P);
-
-			d	=	dotvv(D,D);
-
-			if (d < (cSample->dP*cSample->dP)) {
-				d	=	sqrtf(d);
-				d	+=	absf(dotvv(D,cSample->N))*16;
-
-				if (dotvv(cSample->N,N) < 0) {
-					// if N=0, this should not operate anything out.  verify
-					d = C_INFINITY;
-				}
-			
-				if (d < cSample->dP) {
-					float	weight	=	1 - d / cSample->dP;
-
-					totalWeight		+=	weight;
-					C[0]			+=	cSample->C[0]*weight;
-					C[1]			+=	cSample->C[1]*weight;
-					C[2]			+=	cSample->C[2]*weight;
-				}
-			}
-		}
-
-		// Check the children
-		for (i=0;i<8;i++) {
-			CPhotonNode	*tNode	=	cNode->children[i];
-
-			if (tNode != NULL) {
-				const	float	tSide	=	tNode->side;
-
-				if (	((tNode->center[0] + tSide) > P[0])	&&
-						((tNode->center[1] + tSide) > P[1])	&&
-						((tNode->center[2] + tSide) > P[2])	&&
-						((tNode->center[0] - tSide) < P[0])	&&
-						((tNode->center[1] - tSide) < P[1])	&&
-						((tNode->center[2] - tSide) < P[2])) {
-					*stack++	=	tNode;
-				}
-			}
-		}
-	}
-
-	if (totalWeight > 0) {
-		mulvf(C,1 / totalWeight);
-		return TRUE;
-	}
-
-	return FALSE;
-}
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
-// Method				:	insert
-// Description			:	Insert a sample
-// Return Value			:
-// Comments				:	
-void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
-	CPhotonSample	*cSample	=	new CPhotonSample;
-	CPhotonNode		*cNode		=	root;
-	int				depth		=	0;
-	int				i,j;
-
-	movvv(cSample->C,C);
-	movvv(cSample->P,P);
-	movvv(cSample->N,N);
-	cSample->dP	=	dP;
-
-	while(cNode->side > (2*dP)) {
-		depth++;
-
-		for (j=0,i=0;i<3;i++) {
-			if (P[i] > cNode->center[i]) {
-				j			|=	1 << i;
-			}
-		}
-
-		if (cNode->children[j] == NULL)	{
-			CPhotonNode	*nNode	=	(CPhotonNode *) new CPhotonNode;
-
-			for (i=0;i<3;i++) {
-				if (P[i] > cNode->center[i]) {
-					nNode->center[i]	=	cNode->center[i] + cNode->side / (float) 4;
-				} else {
-					nNode->center[i]	=	cNode->center[i] - cNode->side / (float) 4;
-				}
-			}
-
-			cNode->children[j]	=	nNode;
-			nNode->side			=	cNode->side / (float) 2;
-			nNode->samples		=	NULL;
-			for (i=0;i<8;i++)	nNode->children[i]	=	NULL;
-		}
-
-		cNode			=	cNode->children[j];
-	}
-
-	cSample->next	=	cNode->samples;
-	cNode->samples	=	cSample;
-	maxDepth		=	max(maxDepth,depth);
-}
-
-static	int	numCached	=	0;
-static	int	numComputed	=	0;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
@@ -343,106 +177,39 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 
 	searchRadius		=	(sqrtf(maxFound*maxPower / 0.05f) / (float) C_PI)*0.5f;
 
-	// First, find the closests photon
+	// Lookup the photonmap at the location of the photon
 	distances[0]		=	searchRadius*searchRadius;
-	l.maxFound			=	1;
+	l.maxFound			=	maxFound;
 	l.numFound			=	0;
-	mulmp(l.P,toCamera,Pl);
-	mulmn(l.N,fromCamera,Nl);
+	mulmp(l.P,to,Pl);
+	mulmn(l.N,from,Nl);
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
 	l.distances			=	distances;
-	initv(Cl,0);
+
 
 	CMap<CPhoton>::lookupWithN(&l,1);
 
-	if (l.numFound == 0)	return;
+	initv(Cl,0);
 
-	CPhoton	*nearestPhoton	=	(CPhoton *) indices[1];
+	if ((numFound = l.numFound) < 2)	return;
 
-	// Did we compute this before ?
-	if (nearestPhoton->irradiance[0] == -1) {
-		numComputed++;
+	// Accumulate the irradiance
+	for (int i=1;i<=numFound;i++) {
+		const	CPhoton	*p	=	indices[i];
+		vector	I;
 
-		// Lookup the photonmap at the location of the photon
-		distances[0]		=	searchRadius*searchRadius;
-		l.maxFound			=	maxFound;
-		l.numFound			=	0;
-		movvv(l.P,nearestPhoton->P);
-		movvv(l.N,nearestPhoton->N);
-		l.gotHeap			=	FALSE;
+		assert(distances[i] <= distances[0]);
 
-		CMap<CPhoton>::lookupWithN(&l,1);
+		photonToDir(I,p->theta,p->phi);
 
-		if ((numFound = l.numFound) < 2)	return;
-
-		// Accumulate the irradiance
-		for (int i=1;i<=numFound;i++) {
-			const	CPhoton	*p	=	indices[i];
-			vector	I;
-
-			assert(distances[i] <= distances[0]);
-
-			photonToDir(I,p->theta,p->phi);
-
-			if (dotvv(I,l.N) < 0) {
-				addvv(Cl,p->C);
-			}
+		if (dotvv(I,l.N) < 0) {
+			addvv(Cl,p->C);
 		}
-
-		// Normalize the result
-		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
-
-		// Record the irradiance in the photon
-		// NOTE: This is not entirely thread safe, 
-		// but it is better to let the other thread 
-		// recompute this data than blocking) ...
-		// Notice that photon maps tend to get queried at distant locations
-		movvv(nearestPhoton->irradiance,Cl);
-	} else {
-		numCached++;
-
-		movvv(Cl,nearestPhoton->irradiance);
 	}
 
-
-	/*
-
-	// Probe the previous lookups first
-	osLock(mutex);
-	if (!probe(Cl,l.P,l.N)) {
-		osUnlock(mutex);
-
-		CMap<CPhoton>::lookupWithN(&l,1);
-
-		initv(Cl,0,0,0);
-
-		if (l.numFound < 2)	return;
-
-		numFound	=	l.numFound;
-
-		for (int i=1;i<=numFound;i++) {
-			const	CPhoton	*p	=	indices[i];
-			vector	I;
-
-			assert(distances[i] <= distances[0]);
-
-			photonToDir(I,p->theta,p->phi);
-
-			if (dotvv(I,l.N) < 0) {
-				addvv(Cl,p->C);
-			}
-		}
-
-		// Normalize the result
-		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
-
-		// Insert it into the probe 
-		osLock(mutex);
-		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
-	}
-	osUnlock(mutex);
-	*/
+	// Normalize the result
+	mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -465,41 +232,30 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 
 	l.maxFound			=	maxFound;
 	l.numFound			=	0;
-	mulmp(l.P,toCamera,Pl);
+	mulmp(l.P,to,Pl);
 	initv(l.N,0,0,0);
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
 	l.distances			=	distances;
 
-	// Probe the previous lookups first
-	osLock(mutex);
-	if (!probe(Cl,l.P,l.N)) {
-		osUnlock(mutex);
+	CMap<CPhoton>::lookup(&l,1);
 
-		CMap<CPhoton>::lookup(&l,1);
+	initv(Cl,0,0,0);
 
-		initv(Cl,0,0,0);
+	if (l.numFound < 2)	return;
 
-		if (l.numFound < 2)	return;
+	numFound	=	l.numFound;
 
-		numFound	=	l.numFound;
+	for (int i=1;i<=numFound;i++) {
+		const	CPhoton	*p	=	indices[i];
 
-		for (int i=1;i<=numFound;i++) {
-			const	CPhoton	*p	=	indices[i];
+		assert(distances[i] <= distances[0]);
 
-			assert(distances[i] <= distances[0]);
-
-			addvv(Cl,p->C);
-		}
-		
-		// Normalize the result
-		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
-
-		// Record it so we can probe it later
-		osLock(mutex);
-		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
+		addvv(Cl,p->C);
 	}
-	osUnlock(mutex);
+	
+	// Normalize the result
+	mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -536,7 +292,6 @@ void	CPhotonMap::store(const float *P,const float *N,const float *I,const float 
 	CPhoton	*ton	=	CMap<CPhoton>::store(P,N);
 	dirToPhoton(ton->theta,ton->phi,I);
 	movvv(ton->C,C);
-	initv(ton->irradiance,-1);
 	maxPower	=	max(maxPower,dotvv(C,C));
 	osUnlock(mutex);
 }

@@ -355,10 +355,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\executeMisc.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\fileResource.cpp"
 				>
 			</File>
@@ -1120,6 +1116,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\executeMisc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\executeMisc.h"
 				>
 			</File>
 			<File

@@ -305,6 +305,7 @@ private:
 		void					duVector(float *,const float *);
 		void					dvVector(float *,const float *);
 		float					*rayDiff(const float *from,const float *dir,const float *to);
+		float					*rayDiff(const float *from);
 
 		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
 		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);

@@ -92,10 +92,10 @@ public:
 
 public:
 
-								CIrradianceCache(const char *,unsigned int,const float *,const float *,CXform *,FILE *);
+								CIrradianceCache(const char *,unsigned int,FILE *);
 								~CIrradianceCache();
 
-		void					lookup(float *,const float *,const float *,CShadingContext *,const CGlobalIllumLookup *);
+		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
 		void					cachesample(float *,const float *,const float *,float);
 
 		void					draw();
@@ -104,16 +104,16 @@ private:
 		void					writeNode(FILE *,CCacheNode *);
 		CCacheNode				*readNode(FILE *);
 
-		void					sample(float *,const float *,const float *,CShadingContext *,const CGlobalIllumLookup *);
+		void					sample(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
+		void					clamp(CCacheSample *);
 
 		CMemStack				*memory;
 
 		CCacheNode				*root;
 		int						maxDepth;
-
-		matrix					fromWorld,toWorld;
-		matrix					from,to;
 		
+		matrix					from,to;
+
 		TMutex					mutex;
 
 		friend class			CRemoteICacheChannel;

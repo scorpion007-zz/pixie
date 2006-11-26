@@ -657,12 +657,11 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 		// Dv executing on Points
 		case SHADING_0D:
 		{
-			assert(FALSE);
 
 			// Set anyway
 			for (int i=numVertices;i>0;i--) {
-				*ab++	=	0;
-				*ab++	=	0;
+				*ab++	=	DEFAULT_RAY_DA;
+				*ab++	=	DEFAULT_RAY_DB;
 			}
 
 			return	ab - numVertices*2;
@@ -800,6 +799,127 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 			}
 
 			return ab - numRealVertices*2;
+		}
+		break;
+	}
+
+	assert(FALSE);
+	return NULL;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	rayDiff
+// Description			:	Compute the ray differentials
+// Return Value			:	-
+// Comments				:
+// Date last edited		:	3/23/2003
+float		*CShadingContext::rayDiff(const float *from) {
+
+	// Allocate the return value
+	const int	numVertices	=	currentShadingState->numVertices;
+	float		*b			=	(float *) ralloc(numVertices*sizeof(float),threadMemory);
+
+
+	switch(currentShadingState->shadingDim) {
+
+
+
+
+
+		// Dv executing on Points
+		case SHADING_0D:
+		{
+			// Set anyway
+			for (int i=numVertices;i>0;i--) {
+				*b++	=	DEFAULT_RAY_DB;
+			}
+
+			return	b - numVertices;
+		}
+		break;
+
+
+
+
+
+
+
+
+		// Dv executing on a 2D grid
+		case SHADING_2D_GRID:
+		{
+			const int	uVertices	=	currentShadingState->numUvertices;
+			const int	vVertices	=	currentShadingState->numVvertices;
+			int			i,j;
+
+			for (j=0;j<vVertices;j++) {
+				for (i=0;i<uVertices;i++) {
+					
+					const int	ii		=	min(i,uVertices-2);
+					const int	jj		=	min(j,vVertices-2);
+
+					// The 4 corners of the current quad
+					const float	*cFrom0	=	from + jj*uVertices*3 + ii*3;
+					const float	*cFrom1	=	cFrom0 + 3;
+					const float	*cFrom2	=	cFrom0 + uVertices*3;
+					const float	*cFrom3	=	cFrom2 + 3;
+
+					b[0]				=	0;
+
+					vector		tmp;
+					subvv(tmp,cFrom1,cFrom0);
+					b[0]				+=	lengthv(tmp);
+					subvv(tmp,cFrom2,cFrom0);
+					b[0]				+=	lengthv(tmp);
+					subvv(tmp,cFrom1,cFrom3);
+					b[0]				+=	lengthv(tmp);
+					subvv(tmp,cFrom2,cFrom3);
+					b[0]				+=	lengthv(tmp);
+
+					b[0]				*=	0.25f;
+					b++;
+				}
+			}
+			
+			return b - uVertices*vVertices;
+		}
+		break;
+
+
+
+
+
+
+
+		// Dv executing on a 2D raytraced surface
+		case SHADING_2D:
+		{
+			const int	numRealVertices	=	currentShadingState->numRealVertices;
+			const float	*dfrom			=	from + numRealVertices*3;
+			int			i;
+
+			assert(numVertices == numRealVertices*3);
+
+			for (i=numRealVertices;i>0;i--) {
+				vector	tmp;
+
+				b[0]				=	0;
+
+				subvv(tmp,dfrom,from);
+				b[0]				+=	lengthv(tmp);
+				subvv(tmp,dfrom + 3,from);
+				b[0]				+=	lengthv(tmp);
+				b[0]				*=	0.5f;
+
+				b++;
+				from				+=	3;
+				dfrom				+=	6;
+			}
+
+			return b - numRealVertices;
 		}
 		break;
 	}
