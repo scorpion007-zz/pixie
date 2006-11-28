@@ -68,7 +68,7 @@ protected:
 
 			int						numTracedPhotons;
 private:
-			void					tracePhoton(float *,float *,float *,float,float,float);
+			void					tracePhoton(float *,float *,float *,float);
 	
 			float					bias;					// The initial intersection bias
 

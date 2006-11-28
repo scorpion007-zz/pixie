@@ -269,10 +269,6 @@ void		CPhotonHider::solarEnd() {
 	float		*Cl	=	varying[VARIABLE_CL];
 	int			i;
 
-	// Compute the ray differential
-	// da = 0 because all the photons are parallel
-	const float	db	=	sqrt((worldRadius * worldRadius) / (float) CRenderer::numEmitPhotons);
-
 	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 		vector		T;
 		vector		Ce,Cc;
@@ -318,7 +314,7 @@ void		CPhotonHider::solarEnd() {
 			mulvf(T,L,worldRadius);
 			subvv(Ps,T);
 			mulvf(Cc,powerScale*photonPower);
-			tracePhoton(Ps,L,Cc,wavelen,0,db);
+			tracePhoton(Ps,L,Cc,wavelen);
 		}
 	} else {
 		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
@@ -327,7 +323,7 @@ void		CPhotonHider::solarEnd() {
 			mulvf(T,L,worldRadius);
 			subvv(Ps,T);
 			mulvf(Cl,powerScale*photonPower);
-			tracePhoton(Ps,L,Cl,0.5,0,db);
+			tracePhoton(Ps,L,Cl,0.5);
 		}
 	}
 }
@@ -403,7 +399,6 @@ void		CPhotonHider::illuminateEnd() {
 	float		*L	=	varying[VARIABLE_L];
 	float		*Cl	=	varying[VARIABLE_CL];
 	int			i;
-	const float	da	=	varying[VARIABLE_PW][0];
 
 	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
 		vector		Ce,Cc;
@@ -447,13 +442,13 @@ void		CPhotonHider::illuminateEnd() {
 			
 			subvv(Ps,L);
 			mulvf(Cc,powerScale*photonPower);
-			tracePhoton(Ps,L,Cc,wavelen,da,0);
+			tracePhoton(Ps,L,Cc,wavelen);
 		}
 	} else {
 		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
 			subvv(Ps,L);
 			mulvf(Cl,powerScale*photonPower);
-			tracePhoton(Ps,L,Cl,0.5,da,0);
+			tracePhoton(Ps,L,Cl,0.5);
 		}
 
 	}
@@ -467,7 +462,7 @@ void		CPhotonHider::illuminateEnd() {
 // Return Value			:	-
 // Comments				:
 // Date last edited		:	3/11/2003
-void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength,float da,float db) {
+void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
 	CRay				ray;
 	vector				Cl,Pl,Nl;
 	CAttributes			*attributes;
@@ -490,10 +485,8 @@ void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength,floa
 
 	// The intersection bias
 	ray.tmin				=	bias;
-	ray.da					=	da;
-	ray.db					=	db;
-
-	assert(da <= DEFAULT_RAY_DA);
+	ray.da					=	0;
+	ray.db					=	C_INFINITY;
 
 processBounce:;
 
@@ -516,9 +509,6 @@ processBounce:;
 
 		mulvf(Pl,ray.dir,ray.t);
 		addvv(Pl,ray.from);
-
-		// Update the ray differential
-		ray.db	+=	ray.da*ray.t;
 
 		// Process this hit
 		switch(attributes->shadingModel) {
@@ -576,7 +566,6 @@ processBounce:;
 				// Process the current hit
 				movvv(ray.from,Pl);
 				ray.tmin				=	attributes->shadowBias;
-				ray.da					=	DEFAULT_RAY_DA;
 				lastBounceSpecular		=	FALSE;
 
 				// We just hit a diffuse surface, so set the ray differential to something big
