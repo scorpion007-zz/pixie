@@ -1,15 +1,21 @@
+Open Issues:
+- Purging tessellations for raytracing
+- Moving raytraced surface
+- Efficient subdivision surface creases
+- Subdivision highly creased surface issues
+- Children pointer mess-up in cluster()
+- Bug: Terminating the framebuffer during rendering.
+- Irradiance accuracy issues
+
 Development notes:
 
-
-
 Possible Optimization:
-	The shaded lights can be kept as an array instead of a linked list.
 
 Todos:
-OpenEXR input for textures
-RiDisplayChannel & support
-additional attributes, options visible from SL
-bake, pointcloud and brickmap support
-RiFilter support
-trace subsets
-patch crack stitching
+- OpenEXR input for textures
+- RiDisplayChannel & support
+- additional attributes, options visible from SL
+- bake, pointcloud and brickmap support (done)
+- RiFilter support
+- trace subsets
+- patch crack stitching
