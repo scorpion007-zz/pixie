@@ -134,6 +134,7 @@ int								CRenderer::textureMaxMemory				=	0;
 
 // Global synchronization objects
 TMutex							CRenderer::commitMutex;
+TMutex							CRenderer::dispatchMutex;
 TMutex							CRenderer::memoryMutex;
 TMutex							CRenderer::networkMutex;
 TMutex							CRenderer::hierarchyMutex;
@@ -298,6 +299,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 
 	// Create the commit mutex (globally active)
 	osCreateMutex(commitMutex);
+	osCreateMutex(dispatchMutex);
 	osCreateMutex(memoryMutex);
 	osCreateMutex(networkMutex);
 	osCreateMutex(hierarchyMutex);
@@ -370,6 +372,7 @@ void		CRenderer::endRenderer() {
 
 	// Delete the commit mutex (globally active)
 	osDeleteMutex(commitMutex);
+	osDeleteMutex(dispatchMutex);
 	osDeleteMutex(memoryMutex);
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(hierarchyMutex);
@@ -1060,7 +1063,7 @@ void		CRenderer::renderFrame() {
 	// Make sure we have a bounding hierarchy
 	movvv(root->bmin,worldBmin);
 	movvv(root->bmax,worldBmax);
-	root->cluster(contexts[0]);
+	root->setChildren(contexts[0],root->children);
 
 	// Render the frame
 	if (netNumServers != 0) {

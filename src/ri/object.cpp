@@ -145,7 +145,7 @@ static	float	getDisp(float *mat,float disp) {
 // Return Value			:
 // Comments				:
 // Date last edited		:	10/16/2001
-void		CObject::cluster(CShadingContext *context) {
+CObject		*CObject::cluster(CShadingContext *context,CObject *children) {
 	int		numChildren;
 	CObject	*cObject;
 
@@ -153,10 +153,11 @@ void		CObject::cluster(CShadingContext *context) {
 	for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++);
 
 	// If we have too few children, continue
-	if (numChildren <= 2)	return;
+	if (numChildren <= 2)	return children;
 
-	CObject	*front;
-	CObject	*back;
+	// These are the two children
+	CObject	*front,*frontChildren;
+	CObject	*back,*backChildren;
 
 	// Begin a memory page
 	memBegin(context->threadMemory);
@@ -246,36 +247,61 @@ void		CObject::cluster(CShadingContext *context) {
 	initv(back->bmin,C_INFINITY);
 	initv(back->bmax,-C_INFINITY);
 
+	frontChildren	=	NULL;
+	backChildren	=	NULL;
+
 	// Create the clusters
 	for (numChildren=0,cObject=children;cObject!=NULL;numChildren++) {
 		CObject	*nObject	=	cObject->sibling;
 
 		if (indices[numChildren] == 0) {
-			cObject->sibling	=	front->children;
-			front->children		=	cObject;
+			cObject->sibling	=	frontChildren;
+			frontChildren		=	cObject;
 			addBox(front->bmin,front->bmax,cObject->bmin);
 			addBox(front->bmin,front->bmax,cObject->bmax);
 		} else {
-			cObject->sibling	=	back->children;
-			back->children		=	cObject;
+			cObject->sibling	=	backChildren;
+			backChildren		=	cObject;
 			addBox(back->bmin,back->bmax,cObject->bmin);
 			addBox(back->bmin,back->bmax,cObject->bmax);
 		}
 
 		cObject	=	nObject;
 	}
-	children		=	front;
-	front->sibling	=	back;
-	back->sibling	=	NULL;
 
 	memEnd(context->threadMemory);
 
 	// Recurse
-	front->cluster(context);
-	back->cluster(context);
+	front->children	=	front->cluster(context,frontChildren);
+	back->children	=	back->cluster(context,backChildren);
 	
 	front->attach();
 	back->attach();
+
+	front->sibling	=	back;
+	back->sibling	=	NULL;
+
+	return front;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CObject
+// Method				:	setChildren
+// Description			:	Set the children objects
+// Return Value			:
+// Comments				:
+// Date last edited		:	10/16/2001
+void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
+
+	// If raytraced, attach to the children
+	if (raytraced()) {
+		CObject	*cObject;
+		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
+		children	=	cluster(context,allChildren);
+	} else {
+		children	=	allChildren;
+	}
+
 }
 
 ///////////////////////////////////////////////////////////////////////

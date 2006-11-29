@@ -1566,15 +1566,9 @@ void	CPatchMesh::create(CShadingContext *context) {
 	delete pl;
 	pl	=	NULL;
 
-	children		=	allChildren;
-
-	// If raytraced, attach to the children
-	if (raytraced()) {
-		CObject	*cObject;
-		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-		cluster(context);
-	}
-
+	// Set the children pointer
+	setChildren(context,allChildren);
+	
 	// Release the lock
 	osUnlock(CRenderer::hierarchyMutex);
 }
@@ -1772,14 +1766,8 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 
 	vertexData->detach();
 
-	children	=	allChildren;
-
-	// If raytraced, attach to the children
-	if (raytraced()) {
-		CObject	*cObject;
-		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-		cluster(context);
-	}
+	// Set the children 
+	setChildren(context,allChildren);
 
 	osUnlock(CRenderer::hierarchyMutex);
 }

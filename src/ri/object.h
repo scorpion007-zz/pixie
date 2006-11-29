@@ -79,7 +79,12 @@ public:
 	virtual	void			dice(CShadingContext *);
 	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	0;
 
-			void			cluster(CShadingContext *);	// Take the children and create a bounding volume hierarchy
+														// Take a list of objects and cluster them
+			CObject			*cluster(CShadingContext *,CObject *);	
+
+														// Set the children objects
+			void			setChildren(CShadingContext *,CObject *);
+
 			void			destroy();					// Delete the children/siblings
 
 	int						flags;						// Holds object flags

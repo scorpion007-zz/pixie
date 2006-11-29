@@ -896,15 +896,9 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 	memEnd(context->threadMemory);
 
-	children	=	allChildren;
-
-	// If raytraced, attach to the children
-	if (raytraced()) {
-		CObject	*cObject;
-		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-		cluster(context);
-	}
-
+	// Set the child objects
+	setChildren(context,allChildren);
+	
 	osUnlock(CRenderer::hierarchyMutex);
 }
 

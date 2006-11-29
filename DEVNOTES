@@ -3,7 +3,6 @@ Open Issues:
 - Moving raytraced surface
 - Efficient subdivision surface creases
 - Subdivision highly creased surface issues
-- Children pointer mess-up in cluster()
 - Bug: Terminating the framebuffer during rendering.
 - Irradiance accuracy issues
 

@@ -1819,15 +1819,9 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	
 	memEnd(context->threadMemory);
 
-	children					=	data.meshChildren;
-
-	// If raytraced, attach to the children
-	if (raytraced()) {
-		CObject	*cObject;
-		for (cObject=children;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-		cluster(context);
-	}
-
+	// Set the children
+	setChildren(context,data.meshChildren);
+	
 	osUnlock(CRenderer::hierarchyMutex);
 }
 

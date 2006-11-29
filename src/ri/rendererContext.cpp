@@ -433,7 +433,7 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 	delayed				=	NULL;
 
 	// Create the hierarchy
-	cDelayed->cluster(context);
+	cDelayed->setChildren(context,cDelayed->children);
 }
 
 
@@ -452,7 +452,7 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 	
 	CAttributes		*cAttributes	=	cDelayed->attributes;
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
-		cAttributes		=	getAttributes(FALSE);;
+		cAttributes		=	getAttributes(FALSE);
 	}
 
 	// Instantiate the objects
@@ -463,7 +463,7 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 	delayed	=	NULL;
 
 	// Create the hierarchy
-	cDelayed->cluster(context);
+	cDelayed->setChildren(context,cDelayed->children);
 }
 
 

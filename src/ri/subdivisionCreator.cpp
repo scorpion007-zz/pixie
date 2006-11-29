@@ -1764,6 +1764,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	float		*cfloatargs;
 	int			*cvertexIndex;
 	CSubdivData	data;
+	CObject		*allChildren;
 
 	memBegin(context->threadMemory);
 
@@ -1914,7 +1915,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	}
 		
 	// Finalize the faces
-	children			=	NULL;
+	allChildren	=	NULL;
 	for (k=0,i=0;i<numFaces;i++) {
 
 		// Set the facevarying parameters
@@ -1932,7 +1933,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 		k	+=	j;
 
 		// Finally, create the face
-		faces[i]->create(children);
+		faces[i]->create(allChildren);
 		
 		skipFace:
 			;		// intentionally empty
@@ -1940,13 +1941,9 @@ void		CSubdivMesh::create(CShadingContext *context) {
 
 	// Re-claim the memory
 	memEnd(context->threadMemory);
-	
-	// If raytraced, attach to the children
-	if (raytraced()) {
-		CObject	*cObject;
-		for (cObject=children;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-		cluster(context);
-	}
+
+	// Set the children objects
+	setChildren(context,allChildren);
 
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
 }

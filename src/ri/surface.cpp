@@ -1175,9 +1175,5 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 	}
 	
 	// attach them
-	children = subPatches;
-	
-	CObject	*cObject;
-	for (cObject=children;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-	cluster(context);		
+	setChildren(context,subPatches);
 }
