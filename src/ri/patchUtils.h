@@ -78,7 +78,6 @@ static	float	invBezier[16]	=	{	0,		0,			0,			1.0f,
 // Description			:	Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/25/2004
 #define	makeCubicBound(__bmin,__bmax,__gx,__gy,__gz) {							\
 	matrix	tmp1;																\
 	matrix	tmp2;																\
@@ -116,7 +115,6 @@ static	float	invBezier[16]	=	{	0,		0,			0,			1.0f,
 // Description			:	Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/25/2004
 #define	makeCubicBoundX(__bmin,__bmax,__gx,__gy,__gz,__xform) {					\
 	matrix	tmp1;																\
 	matrix	tmpX;																\

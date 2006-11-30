@@ -48,7 +48,6 @@ static	matrix	invBezier	=	{	0,	0,				0,				1,
 // Description			:	Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/25/2004
 static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3,const float *geometryMatrix,const CXform *xform) {
 	htpoint	tmp,tmp2;
 	vector	vtmp0,vtmp1,vtmp2,vtmp3;
@@ -103,7 +102,6 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	6/2/2003
 CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CSurface(a,x) {
 	stats.numGprims++;
 	stats.gprimMemory	+=	sizeof(CCurve);
@@ -122,7 +120,6 @@ CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 CCurve::~CCurve() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CCurve);
@@ -137,7 +134,6 @@ CCurve::~CCurve() {
 // Description			:	Interpolate the junk
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CCurve::interpolate(int numVertices,float **varying) const {
 
 	// Dispatch the parameters
@@ -180,7 +176,6 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 // Description			:	Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CCurve::dice(CShadingContext *rasterizer) {
 	// We can sample the object, so do so
 	float	**varying		=	rasterizer->currentShadingState->varying;
@@ -282,7 +277,6 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	6/2/2003
 CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
 
 	// Compute the bounding box
@@ -322,7 +316,6 @@ CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,f
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 CCubicCurve::~CCubicCurve() {
 }
 
@@ -332,7 +325,6 @@ CCubicCurve::~CCubicCurve() {
 // Description			:	Sample the curves
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				i,k;
 	float			*intr,*intrStart;
@@ -428,7 +420,6 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 	const float vmid = (vmin + vmax) * 0.5f;
 
@@ -462,7 +453,6 @@ void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	6/2/2003
 CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
 
 	// Compute the bounding box
@@ -489,7 +479,6 @@ CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 CLinearCurve::~CLinearCurve() {
 }
 
@@ -499,7 +488,6 @@ CLinearCurve::~CLinearCurve() {
 // Description			:	Sample the curves
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				j,k;
 	float			*intr,*intrStart;
@@ -559,7 +547,6 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 	const float		vmid = (vmin + vmax) * 0.5f;
 
@@ -588,7 +575,6 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 // Description			:	CCurveMesh
 // Return Value			:	Ctor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *nve,int w) : CObject(a,x) {
 	int			i;
 	const float	*P;
@@ -708,7 +694,6 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 // Description			:	~CCurveMesh
 // Return Value			:	Dtor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CCurveMesh::~CCurveMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CCurveMesh) + sizeof(int)*numCurves;
@@ -723,7 +708,6 @@ CCurveMesh::~CCurveMesh() {
 // Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
-// Date last edited		:	6/10/2003
 void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
@@ -740,7 +724,6 @@ void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CCurveMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
@@ -755,7 +738,6 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CCurveMesh::create(CShadingContext *context) {
 
 	osLock(CRenderer::hierarchyMutex);

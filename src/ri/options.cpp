@@ -71,7 +71,6 @@
 // Description			:	Delete the searchpath
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 static	void		optionsDeleteSearchPath(TSearchpath *cPath) {
 	TSearchpath	*nPath;
 
@@ -89,7 +88,6 @@ static	void		optionsDeleteSearchPath(TSearchpath *cPath) {
 // Description			:	Clone a search path
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 static	TSearchpath	*optionsCloneSearchPath(TSearchpath *cPath) {
 	TSearchpath	*nPath	=	NULL;
 	TSearchpath	*lPath	=	NULL;
@@ -119,7 +117,6 @@ static	TSearchpath	*optionsCloneSearchPath(TSearchpath *cPath) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CDisplay::CDisplay() {
 	outDevice		=	NULL;
 	outName			=	NULL;
@@ -138,7 +135,6 @@ COptions::CDisplay::CDisplay() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CDisplay::CDisplay(const CDisplay *other) {
 
 	outDevice		=	strdup(other->outDevice);
@@ -199,7 +195,6 @@ COptions::CDisplay::CDisplay(const CDisplay *other) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CDisplay::~CDisplay() {
 	if (outDevice	!= NULL)	free(outDevice);
 	if (outName		!= NULL)	free(outName);
@@ -233,7 +228,6 @@ COptions::CDisplay::~CDisplay() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CClipPlane::CClipPlane() {
 }
 
@@ -244,7 +238,6 @@ COptions::CClipPlane::CClipPlane() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
 	movvv(normal,other->normal);
 	d		=	other->d;
@@ -257,7 +250,6 @@ COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
 // Description			:	All the default frame specific settings are defined here
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::COptions() {
 	stats.numOptions++;
 	stats.optionsMemory		+=	sizeof(COptions);
@@ -394,7 +386,6 @@ COptions::COptions() {
 // Description			:	Create an exact copy of another options block
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::COptions(const COptions *o) {
 	stats.numOptions++;
 	stats.optionsMemory		+=	sizeof(COptions);
@@ -503,7 +494,6 @@ COptions::COptions(const COptions *o) {
 // Description			:	Destructor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::~COptions(){
 	stats.numOptions--;
 	stats.optionsMemory		-=	sizeof(COptions);
@@ -561,7 +551,6 @@ COptions::~COptions(){
 // Description			:	Convert color to RGB space from whatever space entered
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	COptions::convertColor(vector &c,const float *f)	const	{
 	int	i,j;
 	if (toRGB == NULL) {
@@ -584,7 +573,6 @@ void	COptions::convertColor(vector &c,const float *f)	const	{
 // Description			:	Pick a searchpath from name
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 TSearchpath		*COptions::pickSearchpath(const char *name) {
 
 	if (strstr(name,"rib") != NULL) {
@@ -624,7 +612,6 @@ TSearchpath		*COptions::pickSearchpath(const char *name) {
 // Description			:	Get the searchpath
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 	TSearchpath		*newPath	=	NULL;
 	TSearchpath		*lastPath	=	NULL;

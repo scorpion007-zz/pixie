@@ -156,7 +156,6 @@ void			osDeleteSemaphore(TMutex &);
 // Description			:	Lock a mutex
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 inline	void	osLock(TMutex &mutex) {
 #ifdef WIN32
 	EnterCriticalSection(&mutex);
@@ -170,7 +169,6 @@ inline	void	osLock(TMutex &mutex) {
 // Description			:	Unlock a mutex
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 inline	void	osUnlock(TMutex &mutex) {
 #ifdef WIN32
 	LeaveCriticalSection(&mutex);
@@ -185,7 +183,6 @@ inline	void	osUnlock(TMutex &mutex) {
 // Description			:	Increment a semaphore
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 inline	void	osUp(TSemaphore &sem) {
 #ifdef WIN32
 	ReleaseSemaphore(sem,1,NULL);
@@ -199,7 +196,6 @@ inline	void	osUp(TSemaphore &sem) {
 // Description			:	Decrement a semaphore
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 inline	void	osDown(TSemaphore &sem) {
 #ifdef WIN32
 	WaitForSingleObject(sem,INFINITE);

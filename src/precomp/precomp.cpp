@@ -146,7 +146,6 @@ static	double fColorMatch[][3]={
 // Description			:	Evaluate black bolor for a temperature
 // Return Value			:	The XYZ color in xyz
 // Comments				:
-// Date last edited		:	10/15/2002
 static	inline	void	blackBody(float *xyz,double temperature) {
     double	XX=0.0,YY=0.0,ZZ=0.0;
     double	dis,wavelength,weight;
@@ -192,7 +191,6 @@ static	inline	void	blackBody(float *xyz,double temperature) {
 // Description			:	Convert a color from XYZ to RGB
 // Return Value			:	The rgb in rgb
 // Comments				:	-
-// Date last edited		:	10/7/2002
 static	inline	void	xyzTorgb(float *rgb,const float *xyz) {
 	if (FALSE) {
 		rgb[COMP_R]		=	(float)	(3.24079*xyz[0]		-	1.537150*xyz[1]	-	0.498535*xyz[2]);
@@ -212,7 +210,6 @@ static	inline	void	xyzTorgb(float *rgb,const float *xyz) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 static void	noiseNormalize2(float v[2]) {
 	float s;
 
@@ -226,7 +223,6 @@ static void	noiseNormalize2(float v[2]) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 static	void noiseNormalize3(float v[3]) {
 	float s;
 
@@ -241,7 +237,6 @@ static	void noiseNormalize3(float v[3]) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 static void noiseNormalize4(float v[4]) {
 	float s;
 
@@ -258,7 +253,6 @@ static void noiseNormalize4(float v[4]) {
 // Description			:	create noiseTables.h header file for the ri
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	10/27/2002
 int	precomputeNoiseData() {
 	int		p[NOISESIZE + NOISESIZE + 2];
 	int		p2[NOISESIZE + NOISESIZE + 2];
@@ -409,7 +403,6 @@ int	precomputeNoiseData() {
 // Description			:	create subdivisionData.h header file for the ri
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	10/27/2002
 int	precomputeSubdivisionData() {
 	FILE			*out;
 	TEvalStruct		**ev;
@@ -570,7 +563,6 @@ int	precomputeSubdivisionData() {
 // Description			:	create subdivisionData.h header file for the ri
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	10/27/2002
 int	precomputeExplosionData() {
 	#ifdef _WIN32
 		FILE	*out	=	fopen("..\\src\\ri\\experimental\\explosionData.h","w");
@@ -621,7 +613,6 @@ int	precomputeExplosionData() {
 // Description			:	write out the function name for rasterization functions
 // Return Value			:	
 // Comments				:
-// Date last edited		:	11/06/2005
 void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 	if (i & RASTER_POINT)
 		fprintf(out,"drawPointGrid");
@@ -659,7 +650,6 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 // Description			:	Compute stochastic.h
 // Return Value			:	0 on success, 1 on failure
 // Comments				:
-// Date last edited		:	10/27/2002
 int		precomputeStochasticPrimitivesH() {
 	#ifdef _WIN32
 		FILE	*out	=	fopen("..\\src\\ri\\stochasticPrimitives.h","w");
@@ -822,7 +812,6 @@ int		precomputeStochasticPrimitivesH() {
 // Description			:	Do the thing baby
 // Return Value			:	0 on success, 1 on failure
 // Comments				:
-// Date last edited		:	10/27/2002
 int	main(int argc,char *argv[]) {
 
 	memInit();

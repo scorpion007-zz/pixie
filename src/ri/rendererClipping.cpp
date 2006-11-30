@@ -39,7 +39,6 @@
 // Description			:	Compute various quantities that have to do with clipping
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/10/2002
 void		CRenderer::beginClipping() {
 
 	const float	minX		=	min(pixelLeft,pixelRight);	// The extend of the rendering window on the image
@@ -91,7 +90,6 @@ void		CRenderer::beginClipping() {
 // Description			:	Check if the given box is inside the viewing frustrum
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/10/2002
 int			CRenderer::inFrustrum(const float *bmin,const float *bmax) {
 	vector	corners[8];
 	int		i;
@@ -161,7 +159,6 @@ int			CRenderer::inFrustrum(const float *bmin,const float *bmax) {
 // Description			:	Check if the given box is inside the viewing frustrum
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/10/2002
 int			CRenderer::inFrustrum(const float *P) {
 
 	if ((P[COMP_X]*leftX + P[COMP_Z]*leftZ + leftD) < 0) {
@@ -192,7 +189,6 @@ int			CRenderer::inFrustrum(const float *P) {
 // Description			:	Compute the clipping codes for a point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/10/2002
 unsigned int			CRenderer::clipCode(const float *P) {
 	unsigned int	code	=	0;
 

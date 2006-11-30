@@ -56,7 +56,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	3/11/2001
 CObject::CObject(CAttributes *a,CXform *x) {
 	stats.numObjects++;
 
@@ -80,7 +79,6 @@ CObject::CObject(CAttributes *a,CXform *x) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	3/11/2001
 CObject::~CObject() {
 	stats.numObjects--;
 
@@ -95,7 +93,6 @@ CObject::~CObject() {
 // Description			:	Dice the children objects
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	3/11/2001
 void			CObject::dice(CShadingContext *rasterizer) {
 	CObject	*cObject,*nObject;
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
@@ -144,7 +141,6 @@ static	float	getDisp(float *mat,float disp) {
 // Description			:	Cluster the objects
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 CObject		*CObject::cluster(CShadingContext *context,CObject *children) {
 	int		numChildren;
 	CObject	*cObject;
@@ -290,7 +286,6 @@ CObject		*CObject::cluster(CShadingContext *context,CObject *children) {
 // Description			:	Set the children objects
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 
 	// If raytraced, attach to the children
@@ -310,7 +305,6 @@ void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 // Description			:	Destroy the entire tree
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void		CObject::destroy() {
 	if (sibling != NULL)	sibling->destroy();
 	if (children != NULL)	children->destroy();
@@ -324,7 +318,6 @@ void		CObject::destroy() {
 // Description			:	Make sure we do not have empty bounding box
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void		CObject::makeBound(float *bmin,float *bmax) const {
 	vector	D;
 	float	maxD;
@@ -370,7 +363,6 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
 	flags	|=	OBJECT_DUMMY;
 }
@@ -381,7 +373,6 @@ CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 CDummyObject::~CDummyObject() {
 }
 
@@ -391,7 +382,6 @@ CDummyObject::~CDummyObject() {
 // Description			:	Intersect a ray
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void			CDummyObject::intersect(CShadingContext *,CRay *) {
 	// Should never reach this point
 	//assert(FALSE);
@@ -411,7 +401,6 @@ void			CDummyObject::intersect(CShadingContext *,CRay *) {
 // Description			:	Intersect the surface
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (! (cRay->flags & attributes->flags) )	return;
@@ -451,7 +440,6 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	Dice the object into smaller ones
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void				CSurface::dice(CShadingContext *rasterizer) {
 
 	osLock(CRenderer::refCountMutex);
@@ -473,7 +461,6 @@ void				CSurface::dice(CShadingContext *rasterizer) {
 // Description			:	TRUE if the object is moving
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 int					CSurface::moving() const {
 	return FALSE;
 }
@@ -484,7 +471,6 @@ int					CSurface::moving() const {
 // Description			:	Sample a bunch of points on the surface
 // Return Value			:	TRUE if the sampling was done and shaders need to be executed
 // Comments				:
-// Date last edited		:	10/16/2001
 void				CSurface::sample(int,int,float **,unsigned int &) const {
 	error(CODE_BUG,"An object is missing the \"sample\" function\n");
 	assert(FALSE);
@@ -496,7 +482,6 @@ void				CSurface::sample(int,int,float **,unsigned int &) const {
 // Description			:	Interpolate the varying data and set the uniform data
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void				CSurface::interpolate(int,float **)	const {
 	error(CODE_BUG,"An object is missing the \"interpolate\" function\n");
 	assert(FALSE);
@@ -509,7 +494,6 @@ void				CSurface::interpolate(int,float **)	const {
 // Description			:	Split an object
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 	float	**varying	=	context->currentShadingState->varying;
 	float	*u			=	varying[VARIABLE_U];
@@ -539,7 +523,6 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 // Description		   :   Estimate the shading rate
 // Return Value			   :
 // Comments				   :   P must be in pixels
-// Date last edited		   :   10/16/2001
 float			   CSurface::estimateShadingRate(const float *P0,const float *P1) {
    return attributes->shadingRate;
 }
@@ -551,7 +534,6 @@ float			   CSurface::estimateShadingRate(const float *P0,const float *P1) {
 // Description		   :   Estimate the dicing size on the screen
 // Return Value			   :
 // Comments				   :   P must be in pixels
-// Date last edited		   :   10/16/2001
 void			   CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float motionFactor) {
    float	   uAvg,vAvg;  // The average edge length
    float	   uMin,vMin;  // The minimum edge length

@@ -49,7 +49,6 @@ extern "C" {
 // Description			:	Reset the renderer statistics
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/30/2002
 void	CStats::reset() {
 	zoneMemory							=	0;
 	peakZoneMemory						=	0;
@@ -126,7 +125,6 @@ void	CStats::reset() {
 // Description			:	Prints the statistics
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/30/2002
 void	CStats::printStats(int level) {
 	info(CODE_STATS,"---> Renderer current:\n");
 
@@ -208,7 +206,6 @@ void	CStats::printStats(int level) {
 // Description			:	Make sure everything is deallocated
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/30/2002
 void	CStats::check() {
 
 	// Sanity check

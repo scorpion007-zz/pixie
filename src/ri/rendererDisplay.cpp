@@ -49,7 +49,6 @@ static COptions::CDisplay	*currentDisplay	=	NULL;
 // Description			:	This function can be used by the display server to probe for parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/4/2001
 void	*findParameter(const char *name,ParameterType type,int numItems) {
 	if (currentDisplay != NULL) {
 		int	i;
@@ -111,7 +110,6 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 // Description			:	Initiate the displays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 void	CRenderer::beginDisplays() {
 
 	// Clear the data first
@@ -151,7 +149,6 @@ void	CRenderer::beginDisplays() {
 // Description			:	Terminate the displays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 void	CRenderer::endDisplays() {
 	int	i;
 
@@ -189,7 +186,6 @@ void	CRenderer::endDisplays() {
 // Description			:	Dispatch a rendered window to the out devices
 // Return Value			:	-
 // Comments				:	Thread safe, FIXME: The dispatch size can get too big (CRASH)
-// Date last edited		:	8/26/2001
 void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 	float	*dest;
 	int		i,j,k,l;
@@ -239,7 +235,6 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 // Description			:	Send a clear window to the out devices
 // Return Value			:	-
 // Comments				:	Thread safe, FIXME: The clear size can get too big (CRASH)
-// Date last edited		:	8/26/2001
 void	CRenderer::clear(int left,int top,int width,int height) {
 	float	*pixels	=	(float *) alloca(width*height*numSamples*sizeof(float));
 	int		i;
@@ -257,7 +252,6 @@ void	CRenderer::clear(int left,int top,int width,int height) {
 // Description			:	Send a window of samples
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	8/26/2001
 void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	if (netClient != INVALID_SOCKET) {
 		// We are rendering for a client, so just send the result to the waiting client
@@ -314,7 +308,6 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 // Description			:	Create the display name
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType) {
 	char		*cOut	=	out;
 	const char	*cIn	=	in;
@@ -394,7 +387,6 @@ void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType)
 // Description			:	Compute the display data
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 void	CRenderer::computeDisplayData() {
 	COptions::CDisplay	*cDisplay;
 	CDisplayChannel		*oChannel;

@@ -52,7 +52,6 @@ const char	*TIFF_SHADOW					=	"Pixie shadow";
 // Description			:	Handle errors coming from the libtiff
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 	char tmp[1024];
 
@@ -67,7 +66,6 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 // Description			:	Append a layer of image into an image file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/6/2001
 static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,void *data) {
 	int				x,y;
 	unsigned char	*tileData;
@@ -138,7 +136,6 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 //							the reduction gives the amount of reduction in the image size at each step
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,T *data) {
 	T		*currentLevel;
 	int		currentWidth,currentHeight,nextWidth,nextHeight;
@@ -213,7 +210,6 @@ template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSample
 // Description			:	Read a layer of the image into memory
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	*readLayer(TIFF *in,int *width,int *height,int *bitsperpixel,int *numSamples) {
 	unsigned char	*data;
 	int				i;
@@ -256,7 +252,6 @@ void	*readLayer(TIFF *in,int *width,int *height,int *bitsperpixel,int *numSample
 // Description			:	Copy a rectangular portion between images
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 template <class T> void copyData(T *from,int fw,int fh,int x,int y,int w,int h,
 								 T *to,int tw,int th,int tx,int ty,int numSamples) {
 	int	i,j;
@@ -277,7 +272,6 @@ template <class T> void copyData(T *from,int fw,int fh,int x,int y,int w,int h,
 // Description			:	Paint
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 template <class T> void	initData(T *to,int width,int height,int x,int y,int w,int h,int numSamples,T n) {
 	int	i,j,s;
 
@@ -293,7 +287,6 @@ template <class T> void	initData(T *to,int width,int height,int x,int y,int w,in
 // Description			:	Adjust the size of an image so that it's size is a power of two
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 template <class T> void	adjustSize(T **data,int *width,int *height,int numSamples,char *smode,char *tmode) {
 	int	newWidth,newHeight;
 
@@ -343,7 +336,6 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int numSample
 // Description			:	Apply a filter to the image
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 template <class T> void	filterImage(int width,int height,int numSamples,int bitspersample,float filterWidth,float filterHeight,RtFilterFunc filter,T *data) {
 
 	memBegin(CRenderer::globalMemory);
@@ -426,7 +418,6 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 // Description			:	Make and append a texture to the end of the TIFF file
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int bitspersample,RtFilterFunc filter,float filterWidth,float filterHeight,int tileSize,void *data,char *smode,char *tmode) {
 	if (bitspersample == 8) {
 		if ((filterWidth > 1) || (filterHeight > 1))
@@ -458,7 +449,6 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 // Description			:	Create an image pyramid from input
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
@@ -521,7 +511,6 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 // Description			:	Create a single sided environment map
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
@@ -603,7 +592,6 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 // Description			:	Create an environment map where each side is a pyramid
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,char *output,char *smode,char *tmode,TSearchpath *path,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 	char	*names[6];
@@ -683,7 +671,6 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 // Description			:	Create an image pyramid from input
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
@@ -741,7 +728,6 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 // Description			:	Create an image pyramid from input
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/6/2001
 void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 

@@ -78,7 +78,6 @@ extern const int v_init[8][SOBOL_MAX_DIMENSION];
 // Class				:	CSobol
 // Description			:	Sobol quasi random generator
 // Comments				:
-// Date last edited		:	9/12/2002
 template <int dimension> class CSobol {
 public:
 					CSobol(int seq = 1) {

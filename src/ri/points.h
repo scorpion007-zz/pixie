@@ -42,14 +42,12 @@
 // Class				:	CPoints
 // Description			:	Implements a points primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CPoints : public CSurface {
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CPointBase
 		// Description			:	This class holds the memory for the points
 		// Comments				:
-		// Date last edited		:	10/8/2002
 		class CPointBase {
 		public:
 							CPointBase()	{	refCount	=	0;							}

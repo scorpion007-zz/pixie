@@ -48,7 +48,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	int	i;
 
@@ -74,7 +73,6 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 CZbuffer::~CZbuffer() {
 	
 	// Framebuffer is allocated from the frame memory
@@ -87,7 +85,6 @@ CZbuffer::~CZbuffer() {
 // Description			:	Init the framebuffer
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	7/31/2002
 void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	int	i,j;
 
@@ -137,7 +134,6 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 // Description			:	Draw rectangles
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	7/31/2002
 void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 
 	// Draw the suckers one by one
@@ -155,7 +151,6 @@ void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 // Description			:	Retrieve the image
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	7/31/2002
 void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			sx,sy;
 	int			i,y;

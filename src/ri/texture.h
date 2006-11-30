@@ -43,7 +43,6 @@
 // Class				:	CTextureInfoBase
 // Description			:	This class allows textureinfo to get data
 // Comments				:
-// Date last edited		:	02/22/2006
 class	CTextureInfoBase : public CFileResource {
 public:
 						CTextureInfoBase(const char *name) : CFileResource(name) { }
@@ -60,7 +59,6 @@ public:
 // Class				:	CTexture
 // Description			:	This class the the base of all texture types
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CTexture : public CTextureInfoBase {
 public:
 						CTexture(const char *name) : CTextureInfoBase(name) {
@@ -90,7 +88,6 @@ public:
 // Class				:	CEnvironment
 // Description			:	An environment map (also encapsulates shadow maps)
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CEnvironment : public CTextureInfoBase {
 public:
 						CEnvironment(const char *name) : CTextureInfoBase(name) {
@@ -117,7 +114,6 @@ public:
 // Class				:	CDeepShadowHeader
 // Description			:	The deep shadow map header (used internally)
 // Comments				:
-// Date last edited		:	2/28/2002
 class	CDeepShadowHeader {
 public:
 	int					xres,yres;				// The resolution of the file

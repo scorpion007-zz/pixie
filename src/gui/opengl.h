@@ -48,7 +48,6 @@ typedef void	(*TGlFileFunction)(const char *fileName);
 // Class				:	CView
 // Description			:	Encapsulates a data view
 // Comments				:	The classes that "show" can visualize must be derived
-// Date last edited		:	9/21/2006
 class	CView {
 public:
 								CView()		{	}

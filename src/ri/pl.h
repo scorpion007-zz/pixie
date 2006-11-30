@@ -44,7 +44,6 @@ const	unsigned int	PL_VERTEX_TO_VARYING	=	2;	// Force vertex variables to be var
 // Class				:	CVertexData
 // Description			:	Holds vertex data
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVertexData {
 public:
 							CVertexData();
@@ -68,7 +67,6 @@ public:
 // Class				:	CParameter
 // Description			:	Encapsulates a parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CParameter {
 public:
 							CParameter(CVariable *);
@@ -87,7 +85,6 @@ public:
 // Class				:	CPlParameter
 // Description			:	Encapsulates a parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class CPlParameter {
 public:
 	CVariable				*variable;			// The variable
@@ -100,7 +97,6 @@ public:
 							// Class				:	CPlParameter
 							// Description			:	This function is used to obtain the variable to write to
 							// Comments				:
-							// Date last edited		:	5/28/2006
 	float					*resolve(float **varying) const {
 								if (variable->storage == STORAGE_GLOBAL)	return varying[variable->entry];
 								else {
@@ -115,7 +111,6 @@ public:
 // Class				:	CPl
 // Description			:	Holds a parameter list
 // Comments				:
-// Date last edited		:	5/28/2006
 class	CPl {
 public:
 							CPl(int,int,CPlParameter *,float *,float *d1 = NULL);

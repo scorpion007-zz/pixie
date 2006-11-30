@@ -45,7 +45,6 @@
 //							attributes are given here
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/11/2003
 CAttributes::CAttributes() {
 	next					=	NULL;
 	refCount				=	0;
@@ -156,7 +155,6 @@ CAttributes::CAttributes() {
 //							another attribute set
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/13/2003
 CAttributes::CAttributes(const CAttributes *a) {
 	CActiveLight	*cLight,*nLight;
 
@@ -204,7 +202,6 @@ CAttributes::CAttributes(const CAttributes *a) {
 // Description			:	Deallocate everything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 CAttributes::~CAttributes(){
 	CActiveLight	*cLight;
 
@@ -242,7 +239,6 @@ CAttributes::~CAttributes(){
 // Description			:	Obvious !
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CAttributes::addLight(CShaderInstance *cLight) {
 	CActiveLight	*nLight,*pLight;
 
@@ -270,7 +266,6 @@ void	CAttributes::addLight(CShaderInstance *cLight) {
 //							source from the active light source list
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CAttributes::removeLight(CShaderInstance *light) {
 	CActiveLight	*cLight,*pLight;
 
@@ -292,7 +287,6 @@ void	CAttributes::removeLight(CShaderInstance *light) {
 // Description			:	Check the light parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CAttributes::checkParameters() {
 	CActiveLight	*cLight;
 
@@ -317,7 +311,6 @@ void	CAttributes::checkParameters() {
 // Description			:	Find a particular parameter
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2006
 CVariable	*CAttributes::findParameter(const char *name) {
 	CVariable	*cParameter;
 

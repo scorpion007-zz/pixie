@@ -153,7 +153,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float vmina,float vmaxa,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CSphere);
 	stats.numGprims++;
@@ -179,7 +178,6 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float vmin0,float vmax0,float angle0,float r1,float vmin1,float vmax1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -215,7 +213,6 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CSphere::~CSphere() {
 	stats.gprimMemory	-=	sizeof(CSphere);
 	stats.gprimMemory	-=	(nextData != NULL ? 4*sizeof(float) : 0);
@@ -232,7 +229,6 @@ CSphere::~CSphere() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 	unsigned int	ns,i;
 	double			s[2];
@@ -333,7 +329,6 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				currentVertex;
 	float			*dest;
@@ -496,7 +491,6 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CSphere::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -507,7 +501,6 @@ void			CSphere::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void	CSphere::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -527,7 +520,6 @@ void	CSphere::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CSphere::computeObjectBound(float *bmin,float *bmax,float r,float vmin,float vmax,float umax) {
 	float	maxRadius;
 	float	vmi		=	min(vmin,vmax);
@@ -584,7 +576,6 @@ void			CSphere::computeObjectBound(float *bmin,float *bmax,float r,float vmin,fl
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float za,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CDisk);
 	stats.numGprims++;
@@ -609,7 +600,6 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float z0,float angle0,float r1,float z1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -643,7 +633,6 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CDisk::~CDisk() {
 	stats.gprimMemory	-=	sizeof(CDisk);
 	stats.gprimMemory	-=	(nextData != NULL ? 3*sizeof(float) : 0);
@@ -660,7 +649,6 @@ CDisk::~CDisk() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 	float	t;
 	double	u;
@@ -730,7 +718,6 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	float			*sinu;
 	float			*cosu;
@@ -851,7 +838,6 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CDisk::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -862,7 +848,6 @@ void			CDisk::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void			CDisk::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -882,7 +867,6 @@ void			CDisk::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CDisk::computeObjectBound(float *bmin,float *bmax,float r,float z,float umax) {
 	r	=	absf(r);
 
@@ -922,7 +906,6 @@ void			CDisk::computeObjectBound(float *bmin,float *bmax,float r,float z,float u
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float heighta,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CCone);
 	stats.numGprims++;
@@ -947,7 +930,6 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float height0,float angle0,float r1,float height1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -981,7 +963,6 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCone::~CCone() {
 	stats.gprimMemory	-=	sizeof(CCone);
 	stats.gprimMemory	-=	(nextData != NULL ? 3*sizeof(float) : 0);
@@ -998,7 +979,6 @@ CCone::~CCone() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CCone::intersect(CShadingContext *context,CRay *rv) {
 	float			*from;
 	float			*dir;
@@ -1108,7 +1088,6 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	float		*cosu;
 	float		*sinu;
@@ -1253,7 +1232,6 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCone::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -1264,7 +1242,6 @@ void			CCone::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void			CCone::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -1285,7 +1262,6 @@ void			CCone::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCone::computeObjectBound(float *bmin,float *bmax,float r,float height,float umax) {
 
 	r	=	absf(r);
@@ -1332,7 +1308,6 @@ void			CCone::computeObjectBound(float *bmin,float *bmax,float r,float height,fl
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float zmina,float zmaxa,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CParaboloid);
 	stats.numGprims++;
@@ -1358,7 +1333,6 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float zmin0,float zmax0,float angle0,float r1,float zmin1,float zmax1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -1395,7 +1369,6 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CParaboloid::~CParaboloid() {
 	stats.gprimMemory	-=	sizeof(CParaboloid);
 	stats.gprimMemory	-=	(nextData != NULL ? 4*sizeof(float) : 0);
@@ -1412,7 +1385,6 @@ CParaboloid::~CParaboloid() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 	vector	Nt;
 
@@ -1513,7 +1485,6 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
@@ -1663,7 +1634,6 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CParaboloid::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -1674,7 +1644,6 @@ void			CParaboloid::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void		CParaboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -1694,7 +1663,6 @@ void		CParaboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) co
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CParaboloid::computeObjectBound(float *bmin,float *bmax,float r,float zmin,float zmax,float umax) {
 	r	=	absf(r);
 
@@ -1730,7 +1698,6 @@ void			CParaboloid::computeObjectBound(float *bmin,float *bmax,float r,float zmi
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float zmina,float zmaxa,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CCylinder);
 	stats.numGprims++;
@@ -1757,7 +1724,6 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float zmin0,float zmax0,float angle0,float r1,float zmin1,float zmax1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -1793,7 +1759,6 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCylinder::~CCylinder() {
 	stats.gprimMemory	-=	sizeof(CCylinder);
 	stats.gprimMemory	-=	(nextData != NULL ? 4*sizeof(float) : 0);
@@ -1810,7 +1775,6 @@ CCylinder::~CCylinder() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 	vector	Nt;
 
@@ -1907,7 +1871,6 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
@@ -2054,7 +2017,6 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCylinder::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -2065,7 +2027,6 @@ void			CCylinder::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void	CCylinder::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -2085,7 +2046,6 @@ void	CCylinder::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCylinder::computeObjectBound(float *bmin,float *bmax,float r,float zmin,float zmax,float umax) {
 	r	=	absf(r);
 
@@ -2122,7 +2082,6 @@ void			CCylinder::computeObjectBound(float *bmin,float *bmax,float r,float zmin,
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,const float *p1a,const float *p2a,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CHyperboloid);
 	stats.numGprims++;
@@ -2148,7 +2107,6 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,const float *p10,const float *p20,float angle0,const float *p11,const float *p21,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -2183,7 +2141,6 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CHyperboloid::~CHyperboloid() {
 	stats.gprimMemory	-=	sizeof(CHyperboloid);
 	stats.gprimMemory	-=	(nextData != NULL ? 7*sizeof(float) : 0);
@@ -2200,7 +2157,6 @@ CHyperboloid::~CHyperboloid() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
@@ -2355,7 +2311,6 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
@@ -2526,7 +2481,6 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CHyperboloid::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -2537,7 +2491,6 @@ void			CHyperboloid::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void			CHyperboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -2557,7 +2510,6 @@ void			CHyperboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) 
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CHyperboloid::computeObjectBound(float *bmin,float *bmax,float *p1,float *p2,float umax) {
 	float	d	=	p1[COMP_X] * p1[COMP_X] + p1[COMP_Y] * p1[COMP_Y];
 	float	d2	=	p2[COMP_X] * p2[COMP_X] + p2[COMP_Y] * p2[COMP_Y];
@@ -2604,7 +2556,6 @@ void			CHyperboloid::computeObjectBound(float *bmin,float *bmax,float *p1,float 
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rmina,float rmaxa,float vmina,float vmaxa,float umaxa) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CToroid);
 	stats.numGprims++;
@@ -2631,7 +2582,6 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rmin0,float rmax0,float vmin0,float vmax0,float umax0,float rmin1,float rmax1,float vmin1,float vmax1,float umax1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -2670,7 +2620,6 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CToroid::~CToroid() {
 	stats.gprimMemory	-=	sizeof(CToroid);
 	stats.gprimMemory	-=	(nextData != NULL ? 5*sizeof(float) : 0);
@@ -2687,7 +2636,6 @@ CToroid::~CToroid() {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
 void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
@@ -2835,7 +2783,6 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
@@ -2983,7 +2930,6 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CToroid::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }
@@ -2994,7 +2940,6 @@ void			CToroid::interpolate(int numVertices,float **varying) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void	CToroid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
@@ -3014,7 +2959,6 @@ void	CToroid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CToroid::computeObjectBound(float *bmin,float *bmax,float rmin,float rmax,float vmin,float vmax,float umax) {
 	float	r	=	absf(rmin) + absf(rmax);
 

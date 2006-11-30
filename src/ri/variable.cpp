@@ -1081,7 +1081,6 @@ void	varerror(char *str) {
 // Description			:	Parse a variable but do not commit it into the global variables
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/19/2001
 int	parseVariable(CVariable *var,const char *name,const char *decl) {
 	CVariable		*savedVariable;
 	const char		*savedName;

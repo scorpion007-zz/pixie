@@ -86,7 +86,6 @@ extern	const char	*ribFile;
 // Description			:	display channel info ctor
 // Return Value			:
 // Comments				:	var can be NULL
-// Date last edited		:	02/25/2006
 CDisplayChannel::CDisplayChannel() {
 	strcpy(this->name,"*INVALID*");
 	variable		=	NULL;
@@ -101,7 +100,6 @@ CDisplayChannel::CDisplayChannel() {
 // Description			:	display channel info dtor
 // Return Value			:
 // Comments				:	var can be NULL
-// Date last edited		:	02/25/2006
 CDisplayChannel::~CDisplayChannel() {
 	if (fill) free(fill);
 }
@@ -111,7 +109,6 @@ CDisplayChannel::~CDisplayChannel() {
 // Description			:	display channel info ctor
 // Return Value			:
 // Comments				:	var can be NULL
-// Date last edited		:	02/25/2006
 CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int start,int entry) {
 	strcpy(this->name,name);
 	variable	=	var;
@@ -128,7 +125,6 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 
 	// Initiate the renderer
@@ -171,7 +167,6 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CRendererContext::~CRendererContext() {
 
 	// Destroy the misc stuff
@@ -224,7 +219,6 @@ CRendererContext::~CRendererContext() {
 // Description			:	Return the active Xform
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CXform		*CRendererContext::getXform(int modify) {
 	assert(currentXform	!=	NULL);
 
@@ -246,7 +240,6 @@ CXform		*CRendererContext::getXform(int modify) {
 // Description			:	Return the active attributes
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CAttributes	*CRendererContext::getAttributes(int modify) {
 	assert(currentAttributes	!=	NULL);
 
@@ -269,7 +262,6 @@ CAttributes	*CRendererContext::getAttributes(int modify) {
 // Description			:	Return the active options
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 COptions	*CRendererContext::getOptions() {
 	assert(currentOptions	!=	NULL);
 
@@ -283,7 +275,6 @@ COptions	*CRendererContext::getOptions() {
 // Description			:	Create an instance of a shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,char **params,void **vals) {
 	CShaderInstance	*cInstance	=	NULL;
 
@@ -355,7 +346,6 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 // Description			:	Compute the screen space area of a box
 // Return Value			:	The area
 // Comments				:
-// Date last edited		:	10/11/2004
 static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 	float	P[8*3];
 	float	t,a;
@@ -408,7 +398,6 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 //							i.e. : Raytrace it or add it to the graphics state
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedObject *cDelayed,void	(*subdivisionFunction)(void *,float),void *data,const float *bmin,const float *bmax) {
 
 	// Save the current graphics state
@@ -444,7 +433,6 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 //							i.e. : Raytrace it or add it to the graphics state
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed) {
 	
 	// Set the delayed object
@@ -473,7 +461,6 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void	CRendererContext::addObject(CObject *o) {
 	assert(currentAttributes	!= NULL);
 	assert(o					!= NULL);
@@ -519,7 +506,6 @@ void	CRendererContext::addObject(CObject *o) {
 // Description			:	Add an instance of a compound object
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void	CRendererContext::addInstance(void *d) {
 	CInstance		*cInstance		=	(CInstance *) d;
 	CXform			*cXform			=	getXform(FALSE);
@@ -560,7 +546,6 @@ void	CRendererContext::addInstance(void *d) {
 // Description			:	Make sure the command is good to go
 // Return Value			:	The processing type (see below)
 // Comments				:
-// Date last edited		:	8/7/2001
 //	0	-	skip
 //	1	-	process single
 //	2	-	process double

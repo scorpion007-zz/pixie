@@ -38,7 +38,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 COcclusionCuller::COcclusionCuller() {
 }
 
@@ -48,7 +47,6 @@ COcclusionCuller::COcclusionCuller() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 COcclusionCuller::~COcclusionCuller() {
 }
 
@@ -58,7 +56,6 @@ COcclusionCuller::~COcclusionCuller() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void	COcclusionCuller::initCuller(int w,float *ma) {
 	for (depth=0,width=1;width < w;depth++,width=width<<1);
 
@@ -74,7 +71,6 @@ void	COcclusionCuller::initCuller(int w,float *ma) {
 // Description			:	Reset the occlusion hierarchy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void	COcclusionCuller::resetHierarchy(COcclusionNode *cNode) {
 	if (cNode==NULL)	cNode	=	root;
 
@@ -95,7 +91,6 @@ void	COcclusionCuller::resetHierarchy(COcclusionNode *cNode) {
 // Description			:	Reset the occlusion hierarchy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void	COcclusionCuller::initToZero() {
 	int				i;
 	COcclusionNode	*cNode;
@@ -122,7 +117,6 @@ void	COcclusionCuller::initToZero() {
 // Description			:	Allocate a new occlusion node
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int x,int y) {
 	COcclusionNode	*cNode	=	(COcclusionNode *) CRenderer::frameMemory->alloc(sizeof(COcclusionNode));
 

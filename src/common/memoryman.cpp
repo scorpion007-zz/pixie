@@ -57,7 +57,6 @@ static	TMutex					memoryMutex;
 // Description			:	Allocate memory from the manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 inline	void	*allocMem(size_t size) {
 	unsigned int	 index	=	size >> 3;	// Align at 8 byte boundary
 	TMemoryHeader	*ptri;
@@ -107,7 +106,6 @@ inline	void	*allocMem(size_t size) {
 // Description			:	Delete memory from manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 inline	void	delMem(void *ptr) {
 	if (ptr != 0) {
 		TMemoryHeader	*ptri	=	(TMemoryHeader *) ptr;
@@ -137,7 +135,6 @@ inline	void	delMem(void *ptr) {
 // Description			:	Overloaded new
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	*operator new(size_t size) {
 	return allocMem(size);
 }
@@ -148,7 +145,6 @@ void	*operator new(size_t size) {
 // Description			:	Overloaded new
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	*operator new[](size_t size) {
 	return allocMem(size);
 }
@@ -158,7 +154,6 @@ void	*operator new[](size_t size) {
 // Description			:	Overloaded delete
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	operator delete(void *ptr) {
 	delMem(ptr);
 }
@@ -168,7 +163,6 @@ void	operator delete(void *ptr) {
 // Description			:	Overloaded delete
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	operator delete[](void *ptr) {
 	delMem(ptr);
 }
@@ -179,7 +173,6 @@ void	operator delete[](void *ptr) {
 // Description			:	Init the memory manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	memInit() {
 
 	if (memoryManagerInited == 0) {
@@ -202,7 +195,6 @@ void	memInit() {
 // Description			:	Shutdown the memory manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	memShutdown() {
 	memoryManagerInited--;
 
@@ -226,7 +218,6 @@ void	memShutdown() {
 // Description			:	Allocate a new page of memory
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	memNewPage(unsigned int size) {
 
 	assert(memoryManagerInited > 0);

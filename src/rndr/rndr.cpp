@@ -77,7 +77,6 @@ extern "C" {
 //							we're running a server, it can spawn another one
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 void	exitFunction() {
 	if (deamon == TRUE) {
 		// Close socket before respawning
@@ -118,7 +117,6 @@ void	exitFunction() {
 // Description			:	Print the stinking usage
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 void	printUsage() {
 	fprintf(stdout,"PIXIE v%d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 
@@ -158,7 +156,6 @@ void	printUsage() {
 // Description			:	The main rendering thread
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	riThread(void *w) {
 	T32		*buffer	=	(T32 *) w;
 	char	managerString[1024];
@@ -191,7 +188,6 @@ void	riThread(void *w) {
 // Description			:	run as a local server and connect to client
 // Return Value			:	-
 // Comments				:	Servers connect back to client to avoid race
-// Date last edited		:	02/23/2006
 void	rndrc(char *ribFile,int port) {
 	char		managerString[1024];
 	SOCKET		sock;
@@ -259,7 +255,6 @@ void	rndrc(char *ribFile,int port) {
 // Description			:	Run a set of subprocess and pre-accept connects
 // Return Value			:	-
 // Comments				:	the accepted sockets are handed back in managerString
-// Date last edited		:	02/23/2006
 int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	SOCKET		sock;
 	struct		sockaddr_in	me;
@@ -431,7 +426,6 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 // Description			:	Run the network deamon
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 void	rndrd(int port) {
 	SOCKET		sock;
 	struct		sockaddr_in	me;
@@ -539,7 +533,6 @@ void	rndrd(int port) {
 // Description			:	The god
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 int main(int argc, char* argv[]) {
 	int				i;
 	char			managerString[1024];

@@ -23,41 +23,37 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	show.h
+//  File				:	gi.cpp
 //  Classes				:	-
-//  Description			:	The wrapped openGL interface
+//  Description			:	The global illumination stuff
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef SHOW_H
-#define SHOW_H
+#include "gi.h"
 
-
-#include "common/global.h"
-#include "shading.h"
-#include "xform.h"
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShow
-// Description			:	This is just a wrapper to visualize a file
+// Class				:	CGI
+// Method				:	CGI
+// Description			:	Ctor
+// Return Value			:	-
 // Comments				:
-class	CShow : public CShadingContext {
-public:
-							CShow(int thread);
-			virtual			~CShow();
+CGI::CGI() {
+}
 
-			// Right after world end to force rendering of the entire frame
-			void			renderingLoop() { }
+///////////////////////////////////////////////////////////////////////
+// Class				:	CGI
+// Method				:	~CGI
+// Description			:	Dtor
+// Return Value			:	-
+// Comments				:
+CGI::~CGI() {
+}
 
-			// Delayed rendering functions
-			void			drawObject(CObject *) { }
-
-			// Primitive creation functions
-			void			drawGrid(CSurface *,int,int,float,float,float,float) { }
-			void			drawPoints(CSurface *,int) { }
-
-};
-
-#endif
-
-
-
+///////////////////////////////////////////////////////////////////////
+// Class				:	CGI
+// Method				:	cluster
+// Description			:	Cluster the points
+// Return Value			:	-
+// Comments				:
+void			CGI::cluster(CArray<CNode> &nodes,int numPoints,CPoint *points) {
+}

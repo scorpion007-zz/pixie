@@ -78,7 +78,6 @@ extern	float				sinphi[256];
 // Class				:	CTon
 // Description			:	Holds a generic particle
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CTon {
 public:
 	vector			P,N;		// Position and normal
@@ -89,7 +88,6 @@ public:
 // Class				:	CMap
 // Description			:	Holds a generic map
 // Comments				:
-// Date last edited		:	4/1/2002
 template <class T> class	CMap {
 public:
 
@@ -99,7 +97,6 @@ public:
 				// Description			:	Ctor
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 				CMap() {
 					numPhotons	=	0;
 					maxPhotons	=	0;
@@ -129,7 +126,6 @@ public:
 				// Description			:	Dtor
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 		virtual	~CMap() {
 					if (photons != NULL)	delete [] photons;
 				}
@@ -140,7 +136,6 @@ public:
 				// Description			:	Read the photonmap from a file
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	9/10/2002
 		void	read(FILE *in) {
 					fread(&numPhotons,1,sizeof(int),in);
 					fread(&maxPhotons,1,sizeof(int),in);
@@ -158,7 +153,6 @@ public:
 				// Description			:	Append the photon map into a file
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	9/10/2002
 		void	write(FILE *out) {
 					fwrite(&numPhotons,1,sizeof(int),out);
 					fwrite(&maxPhotons,1,sizeof(int),out);
@@ -173,7 +167,6 @@ public:
 				// Description			:	Reset the photonmap
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	9/10/2002
 		void	reset() {
 					if (photons != NULL)	delete photons;
 
@@ -190,7 +183,6 @@ public:
 				// Description			:	Store a photon
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 		T		*store(const float *P,const float *N) {
 					if (numPhotons < maxPhotons) {
 						T	*photon	=	&photons[++numPhotons];
@@ -231,7 +223,6 @@ public:
 				// Description			:	Store a photon
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 		T		*store(const T *item) {
 					if (numPhotons < maxPhotons) {
 						T	*photon	=	&photons[++numPhotons];
@@ -267,7 +258,6 @@ public:
 				// Description			:	Balance the map
 				// Return Value			:	-
 				// Comments				:	Must be called before the map is used
-				// Date last edited		:	4/1/2002
 	virtual	void	balance() {
 				if (numPhotons == 0)	return;
 
@@ -316,7 +306,6 @@ protected:
 			// Description			:	Balance a particular subset
 			// Return Value			:	Internally used by balance
 			// Comments				:
-			// Date last edited		:	4/1/2002
 	void	balance(T **ar1,T **ar2,int index,int start,int end) {
 				int	median	=	1;
 
@@ -415,7 +404,6 @@ public:
 			// Description			:	Locate the nearest maxFoundPhoton photons
 			// Return Value			:	Internally used
 			// Comments				:
-			// Date last edited		:	4/1/2002
 	void	lookupWithN(CLookup *l,int index) {
 				const T		*photon	=	&photons[index];
 				float		d,t;
@@ -513,7 +501,6 @@ public:
 			// Description			:	Locate the nearest maxFoundPhoton photons
 			// Return Value			:	Internally used
 			// Comments				:
-			// Date last edited		:	4/1/2002
 	void	lookup(CLookup *l,int index) {
 				const T		*photon	=	&photons[index];
 				float		d;
@@ -641,7 +628,6 @@ public:
 // Class				:	CPhoton
 // Description			:	A Photon
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CPhoton : public CTon {
 public:
 	vector			C;				// The intensity
@@ -653,7 +639,6 @@ public:
 // Class				:	CPhotonRay
 // Description			:	A Photon
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CPhotonRay : public CRay {
 public:
 	vector			intensity;		// The intensity
@@ -664,7 +649,6 @@ public:
 // Class				:	CPhotonMap
 // Description			:	A Photon map
 // Comments				:
-// Date last edited		:	3/11/2003
 class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView {
 public:
 				CPhotonMap(const char *,FILE *);

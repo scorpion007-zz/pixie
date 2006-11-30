@@ -42,7 +42,6 @@
 // Class				:	CSphere
 // Description			:	Encapsulates a sphere
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CSphere : public CSurface {
 public:
 						CSphere(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float);
@@ -69,7 +68,6 @@ private:
 // Class				:	CDisk
 // Description			:	Encapsulates a disk
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CDisk : public CSurface {
 public:
 						CDisk(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float);
@@ -96,7 +94,6 @@ private:
 // Class				:	CCone
 // Description			:	Encapsulates a cone
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CCone : public CSurface {
 public:
 						CCone(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float);
@@ -123,7 +120,6 @@ private:
 // Class				:	CParaboloid
 // Description			:	Encapsulates a paraboloid
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CParaboloid : public CSurface {
 public:
 						CParaboloid(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float);
@@ -150,7 +146,6 @@ private:
 // Class				:	CCylinder
 // Description			:	Encapsulates a cylinder
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CCylinder : public CSurface {
 public:
 						CCylinder(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float);
@@ -176,7 +171,6 @@ private:
 // Class				:	CHyperboloid
 // Description			:	Encapsulates a hyperboloid
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CHyperboloid : public CSurface {
 public:
 						CHyperboloid(CAttributes *,CXform *,CParameter *,unsigned int,const float *,const float *,float);
@@ -204,7 +198,6 @@ private:
 // Class				:	CToroid
 // Description			:	Encapsulates a torus
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CToroid : public CSurface {
 public:
 						CToroid(CAttributes *,CXform *,CParameter *,unsigned int,float,float,float,float,float);

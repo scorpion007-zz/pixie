@@ -40,7 +40,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 CTexture3d::CTexture3d(const char *n,const float *f,const float *t,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
 	refCount	=	0;
 	dataSize	=	0;
@@ -67,7 +66,6 @@ CTexture3d::CTexture3d(const char *n,const float *f,const float *t,int nc,CTextu
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 CTexture3d::~CTexture3d() { 
 	if (channels != NULL) delete [] channels;
 }
@@ -78,7 +76,6 @@ CTexture3d::~CTexture3d() {
 // Description			:	Define the channels
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::defineChannels(const char *channelDefinitions) {
 	char				*nextComma,*sampleName,*tmp;
 	CDisplayChannel		*oChannel;
@@ -141,7 +138,6 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 // Description			:	Write the channels to file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::writeChannels(FILE *out) {
 	// Write out the header and channels
 	fwrite(&numChannels,1,sizeof(int),out);
@@ -157,7 +153,6 @@ void CTexture3d::writeChannels(FILE *out) {
 // Description			:	Read the channels from file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::readChannels(FILE *in) {
 	if (channels != NULL)	delete [] channels;
 
@@ -177,7 +172,6 @@ void CTexture3d::readChannels(FILE *in) {
 // Description			:	Resolve the channel names
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 int CTexture3d::bindChannelNames(int &n,const char **names,CTexture3dChannel ***bindings) {
 	CTexture3dChannel	**entryPointers		= new CTexture3dChannel*[numChannels];
 	int					numChannelsBound	= 0;
@@ -211,7 +205,6 @@ int CTexture3d::bindChannelNames(int &n,const char **names,CTexture3dChannel ***
 // Description			:	prepareSample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::prepareSample(float *C,float **samples,CTexture3dChannel **bindings) {
 	float *src,*dest;
 
@@ -236,7 +229,6 @@ void CTexture3d::prepareSample(float *C,float **samples,CTexture3dChannel **bind
 // Description			:	unpackSample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::unpackSample(float *C,float **samples,CTexture3dChannel **bindings) {
 	float *src,*dest;
 

@@ -43,7 +43,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	int				i;
 	float			*vertex;
@@ -132,7 +131,6 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi) : CSurface(a,x) {
 	int		i;
 
@@ -165,7 +163,6 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi)
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 CPoints::~CPoints() {
 	stats.numGprims--;
 	stats.gprimMemory		-=	sizeof(CPoints);
@@ -185,7 +182,6 @@ CPoints::~CPoints() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 void	CPoints::dice(CShadingContext *rasterizer)	{
 	if (pl != NULL)	prep();
 
@@ -302,7 +298,6 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 // Description			:	Push all the defined variables into the arrays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &usedParameters) const {
 	CVertexData		*variables	=	base->variables;
 	const int		vertexSize	=	variables->vertexSize;
@@ -348,7 +343,6 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 // Description			:	Interpolate the varying junck and save the uniform stuff
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 void	CPoints::interpolate(int numVertices,float **varying) const {
 	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying);
 }
@@ -361,7 +355,6 @@ void	CPoints::interpolate(int numVertices,float **varying) const {
 // Description			:	Clone the points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
@@ -381,7 +374,6 @@ void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 // Description			:	Prepare the points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void	CPoints::prep() {
 
 	osLock(CRenderer::hierarchyMutex);

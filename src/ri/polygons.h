@@ -43,7 +43,6 @@ class	CPolygonTriangle;
 // Class				:	CPolygonMesh
 // Description			:	Encapsulates a polygon mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CPolygonMesh : public CObject {
 public:
 							CPolygonMesh(CAttributes *,CXform *,CPl *,int,int *,int *,int *);
@@ -75,7 +74,6 @@ private:
 //							meaningful parameter space. Then individual triangles
 //							(this class) is tesselated into microtriangles
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CPolygonTriangle : public CSurface {
 public:
 							CPolygonTriangle(CAttributes *,CXform *,CPolygonMesh *,int v0,int v1,int v2,int fv0,int fv1,int fv2,int uniform);
@@ -100,7 +98,6 @@ public:
 // Class				:	CPolygonQuad
 // Description			:	Holds a bilinear polygon
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CPolygonQuad : public CSurface {
 public:
 							CPolygonQuad(CAttributes *,CXform *,CPolygonMesh *,int v0,int v1,int v2,int v3,int fv0,int fv1,int fv2,int fv3,int uniform);

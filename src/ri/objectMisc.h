@@ -36,7 +36,6 @@
 // Description			:	Transform bunch of points from one space to another
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2002
 inline	void	transform(float *dest,const float *src,int num,const float *from) {
 	int	i;
 
@@ -52,7 +51,6 @@ inline	void	transform(float *dest,const float *src,int num,const float *from) {
 // Description			:	Transform bunch of points from one space to another
 // Return Value			:
 // Comments				:	In place version of the one above
-// Date last edited		:	3/11/2002
 inline	void	transform(float *src,int num,const float *from) {
 	int		i;
 
@@ -67,7 +65,6 @@ inline	void	transform(float *src,int num,const float *from) {
 // Description			:	Transform bunch of points from one space to another
 // Return Value			:
 // Comments				:	This one also interpolates with a time constant
-// Date last edited		:	3/11/2002
 inline	void	transform(float *src,int num,const float *from0,const float *from1,const float *time) {
 	int		i;
 	vector	tmp0,tmp1;
@@ -87,7 +84,6 @@ inline	void	transform(float *src,int num,const float *from0,const float *from1,c
 // Description			:	Transform bunch of vectors from one space to another
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2002
 inline	void	vtransform(float *src,int num,const float *from) {
 	int		i;
 
@@ -102,7 +98,6 @@ inline	void	vtransform(float *src,int num,const float *from) {
 // Description			:	Transform bunch of vectors from one space to another
 // Return Value			:
 // Comments				:	This one also interpolates with a time constant
-// Date last edited		:	3/11/2002
 inline	void	vtransform(float *src,int num,const float *from0,const float *from1,const float *time) {
 	vector	tmp0,tmp1;
 	int		i;
@@ -120,7 +115,6 @@ inline	void	vtransform(float *src,int num,const float *from0,const float *from1,
 // Description			:	Transform bunch of normals from one space to another
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2002
 inline	void	ntransform(float *src,int num,const float *to) {
 	int		i;
 
@@ -135,7 +129,6 @@ inline	void	ntransform(float *src,int num,const float *to) {
 // Description			:	Transform bunch of normals from one space to another
 // Return Value			:
 // Comments				:	This one also interpolates with a time constant
-// Date last edited		:	3/11/2002
 inline	void	ntransform(float *src,int num,const float *to0,const float *to1,const float *time) {
 	vector	tmp0,tmp1;
 	int		i;
@@ -153,7 +146,6 @@ inline	void	ntransform(float *src,int num,const float *to0,const float *to1,cons
 // Description			:	Interpolate bunch of floats
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2002
 inline	void	interpolate(int num,float *src0,const float *src1,const float *time) {
 	int	i;
 
@@ -170,7 +162,6 @@ inline	void	interpolate(int num,float *src0,const float *src1,const float *time)
 // Description			:	Interpolate bunch of points
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2002
 inline	void	interpolate3(int num,float *src0,const float *src1,const float *time) {
 	int	i;
 
@@ -189,7 +180,6 @@ inline	void	interpolate3(int num,float *src0,const float *src1,const float *time
 // Description			:	Transform a ray
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2002
 inline	void	transform(float *oFrom,float *oDir,const CXform *xform,CRay *ray) {
 	if (xform->next != NULL) {
 		vector	tmp[5];

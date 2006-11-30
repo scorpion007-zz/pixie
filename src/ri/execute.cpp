@@ -177,7 +177,6 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 // Description			:	Execute a shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **locals) {
 // At this point, the shader sends us the arrays for parameters/constants/variables/uniforms for the shader
 	

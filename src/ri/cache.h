@@ -48,7 +48,6 @@ const	unsigned int	CACHE_RDONLY	=	8;		// ONLY Read the cache
 // Class				:	CCache
 // Description			:	Encapsulates a renderer cache
 // Comments				:
-// Date last edited		:	10/15/2005
 class	CCache : public CFileResource, public CView {
 public:
 					CCache(const char *,unsigned int);

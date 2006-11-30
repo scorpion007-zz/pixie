@@ -40,7 +40,6 @@
 // Class				:	CBSplinePatchGrid
 // Description			:	Implements a non-regular catmull-clark subdivision patch
 // Comments				:	This is valid for irregular patches away from the border
-// Date last edited		:	5/30/2003
 class	CBSplinePatchGrid : public CSurface {
 public:
 					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,float *);

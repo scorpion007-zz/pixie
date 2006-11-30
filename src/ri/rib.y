@@ -187,7 +187,6 @@ void	test();
 // Description			:	Convert the argument to lowercase
 // Return Value			:	Pointer to the argument
 // Comments				:
-// Date last edited		:	8/10/2001
 static	char			*toLowerCase(char *s) {
 	int	i;
 	int	l	=	strlen(s);
@@ -206,7 +205,6 @@ static	char			*toLowerCase(char *s) {
 // Description			:	Count the number of variables inb the parameter list
 // Return Value			:	TRUE if OK
 // Comments				:	(This version is used by the primitives)
-// Date last edited		:	8/10/2001
 static	int		parameterListCheck() {
 	int			i;
 	CVariable	tmp;
@@ -370,7 +368,6 @@ static	int		parameterListCheck() {
 // Description			:	Get the basis matrix from a given text
 // Return Value			:	TRUE if OK
 // Comments				:
-// Date last edited		:	8/20/2003
 static	int		sizeCheck(int numExpVertex,int numExpVarying,int numExpFaceVarying,int numExpUniform) {
 	if (numExpVarying == 0)		numExpVarying		=	numExpVertex;
 	if (numExpVertex == 0)		numExpVertex		=	numExpVarying;
@@ -419,7 +416,6 @@ static	int		sizeCheck(int numExpVertex,int numExpVarying,int numExpFaceVarying,i
 // Description			:	Get the basis matrix from a given text
 // Return Value			:	TRUE if OK
 // Comments				:
-// Date last edited		:	8/10/2001
 static	int		getBasis(RtBasis **a,char *n) {
 	char	*name	=	toLowerCase(n);
 
@@ -446,7 +442,6 @@ static	int		getBasis(RtBasis **a,char *n) {
 // Description			:	Get the filter from a given text
 // Return Value			:	NULL if failed
 // Comments				:
-// Date last edited		:	8/10/2001
 static	RtFilterFunc	getFilter(char *n) {
 	char			*name	=	toLowerCase(n);
 	RtFilterFunc	f		=	NULL;
@@ -473,7 +468,6 @@ static	RtFilterFunc	getFilter(char *n) {
 // Description			:	Get the error handler from a given text
 // Return Value			:	NULL if failed
 // Comments				:
-// Date last edited		:	8/10/2001
 static	RtErrorHandler	getErrorHandler(char *n) {
 	char			*name	=	toLowerCase(n);
 	RtErrorHandler	f		=	NULL;
@@ -2680,7 +2674,6 @@ static	int		ribStep		=	5*(1<<10);	// Parse 5 KB at a time
 // Description			:	Parser error file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/8/2001
 void	riberror(char *s,...) {
 	warning(CODE_BADFILE,"RIB Parse error\n");
 }
@@ -2690,7 +2683,6 @@ void	riberror(char *s,...) {
 // Description			:	Parse a rib file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/8/2001
 void	ribParse(const char *fileName,void (*c)(const char *)) {
 	if (fileName != NULL) {
 		
@@ -2839,7 +2831,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 // Description			:	Clean the memory allocated by the parser
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/8/2001
 void		parserCleanup() {
 	rib_delete_buffer(YY_CURRENT_BUFFER);
 	yy_init				= 1;

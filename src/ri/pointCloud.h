@@ -42,7 +42,6 @@
 // Class				:	CPointCloudPoint
 // Description			:	A point cloud point
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CPointCloudPoint : public CTon {
 public:
 	float			dP;				// The sample radius
@@ -53,7 +52,6 @@ public:
 // Class				:	CPhotonMap
 // Description			:	A Photon map
 // Comments				:
-// Date last edited		:	3/11/2003
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
 							CPointCloud(const char *,const float *from,const float *to,const char*,int);

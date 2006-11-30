@@ -111,14 +111,12 @@ static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVer
 // Class				:	CSVertex
 // Description			:	Encapsulates a subdivision mesh vertex
 // Comments				:
-// Date last edited		:	5/28/2003
 class	CSVertex {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CVertexFace
 	// Description			:	Encapsulates a face incident on a vertex
 	// Comments				:
-	// Date last edited		:	5/28/2003
 	class	CVertexFace {
 	public:
 		CSFace			*face;
@@ -129,7 +127,6 @@ class	CSVertex {
 	// Class				:	CVertexEdge
 	// Description			:	Encapsulates an edge incident on a vertex
 	// Comments				:
-	// Date last edited		:	5/28/2003
 	class	CVertexEdge {
 	public:
 		CSEdge			*edge;
@@ -142,7 +139,6 @@ public:
 					// Description			:	Ctor
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 					CSVertex(CSubdivData &d) : data(d) {
 						faces			=	NULL;
 						edges			=	NULL;
@@ -181,7 +177,6 @@ public:
 					// Description			:	Split a vertex
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	10/12/2002
 	void			split() {
 						if (childVertex == NULL) {
 							childVertex					=	new (data.context) CSVertex(data);
@@ -197,7 +192,6 @@ public:
 					// Description			:	Add an incident face into the vertex
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 	void			addFace(CSFace *face) {
 						CVertexFace	*cFace	=	(CVertexFace *) ralloc(sizeof(CVertexFace),data.context->threadMemory);
 
@@ -215,7 +209,6 @@ public:
 					// Description			:	Add an incident edge into the vertex
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 	void			addEdge(CSEdge *edge) {
 						CVertexEdge	*cEdge	=	(CVertexEdge *) ralloc(sizeof(CVertexEdge),data.context->threadMemory);
 
@@ -241,7 +234,6 @@ public:
 // Class				:	CSEdge
 // Description			:	Encapsulates an edge
 // Comments				:
-// Date last edited		:	5/28/2003
 class	CSEdge {
 public:
 
@@ -251,7 +243,6 @@ public:
 					// Description			:	Ctor
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 					CSEdge(CSubdivData &d) : data(d) {
 						vertices[0]	=	NULL;
 						vertices[1]	=	NULL;
@@ -281,7 +272,6 @@ public:
 					// Description			:	Split an edge
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	10/12/2002
 	void			split() {
 						if (childVertex == NULL) {
 							vertices[0]->split();
@@ -314,7 +304,6 @@ public:
 					// Description			:	Add a face into an edge
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 	void			addFace(CSFace *face) {
 						if (faces[0] == NULL)	faces[0]	=	face;
 						else {
@@ -336,7 +325,6 @@ public:
 // Class				:	CSFace
 // Description			:	Encapsulates a face
 // Comments				:
-// Date last edited		:	5/28/2003
 class	CSFace {
 public:
 					///////////////////////////////////////////////////////////////////////
@@ -345,7 +333,6 @@ public:
 					// Description			:	Ctor
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 					CSFace(CSubdivData &d) : data(d) {
 						numEdges		=	0;
 						edges			=	NULL;
@@ -375,7 +362,6 @@ public:
 					// Description			:	Split the face
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 	void			split() {
 						if (childVertex == NULL) {
 							int			i;
@@ -471,7 +457,6 @@ public:
 					// Description			:	Split / create children objects
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 	void			create(CObject *&children) {
 						int	split				=	FALSE;
 						int	funny				=	FALSE;
@@ -786,7 +771,6 @@ public:
 					// Description			:	Unconditionally split this quad until a predefined depth for table computation
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	5/28/2003
 	void			unconditionalSplit(int depth,int x,int y,CSVertex *org) {
 						if (depth > 0) {
 							int	i;
@@ -927,7 +911,6 @@ public:
 // Description			:	Split all the incident faces
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void		CSVertex::splitIncidentFaces() {
 	CVertexFace	*cFace;
 
@@ -942,7 +925,6 @@ void		CSVertex::splitIncidentFaces() {
 // Description			:	Figure out if an edge has already been inserted
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 CSEdge		*CSVertex::edgeExists(CSVertex *v) {
 	CVertexEdge	*cEdge;
 	
@@ -961,7 +943,6 @@ CSEdge		*CSVertex::edgeExists(CSVertex *v) {
 // Description			:	Sort 1 ring neighborhood
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void		CSVertex::sort(CSVertex **v,CSEdge *cEdge,CSFace *cFace,int exp) {
 	CSEdge	*estart	=	cEdge;
 	int		i;
@@ -1004,7 +985,6 @@ void		CSVertex::sort(CSVertex **v,CSEdge *cEdge,CSFace *cFace,int exp) {
 // Description			:	Figure out if there's something funny in the neighborhood of the vertex
 // Return Value			:	TRUE if funny
 // Comments				:
-// Date last edited		:	5/28/2003
 int		CSVertex::funny() {
 	CVertexEdge	*cEdge;
 
@@ -1032,7 +1012,6 @@ int		CSVertex::funny() {
 // Description			:	TRUE if there is a non-quad incident face
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/28/2003
 int		CSVertex::shouldSplit() {
 	CVertexFace	*cFace;
 
@@ -1049,7 +1028,6 @@ int		CSVertex::shouldSplit() {
 // Description			:	get the vertex pair bordering an edge
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	01/06/2006
 char	CSFace::findEdgeVertices(int eOrg,int vOrg,CSVertex* &v1,CSVertex* &v2) {
 	CSEdge		*cEdge = edges[eOrg];
 	CSVertex	*cVert = vertices[vOrg];
@@ -1086,7 +1064,6 @@ char	CSFace::findEdgeVertices(int eOrg,int vOrg,CSVertex* &v1,CSVertex* &v2) {
 // Description			:	find the vertex corner-opposite by edge walking
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	01/06/2006
 int		CSFace::findCornerVertex(int eOrg,int vOrg,CSVertex *&v) {
 	CSEdge		*cEdge = edges[eOrg];
 	CSVertex	*cVert = vertices[vOrg];
@@ -1160,7 +1137,6 @@ int		CSFace::findCornerVertex(int eOrg,int vOrg,CSVertex *&v) {
 // Description			:	Compute the vertex / varying
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSVertex::compute() {
 	assert(vertex == NULL);
 
@@ -1180,7 +1156,6 @@ void	CSVertex::compute() {
 // Description			:	Compute the vertex / varying
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSVertex::compute(float *vertex) {
 	CVertexEdge	*cEdge;
 	CVertexFace	*cFace;
@@ -1273,7 +1248,6 @@ void	CSVertex::compute(float *vertex) {
 // Description			:	Compute the vertex / varying
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSVertex::computeVarying(float *varying,float *facevarying) {
 	if		(parentv != NULL)	parentv->computeVarying(varying,facevarying);
 	else if (parente != NULL)	parente->computeVarying(varying,facevarying);
@@ -1295,7 +1269,6 @@ void	CSVertex::computeVarying(float *varying,float *facevarying) {
 // Description			:	Compute the vertex / varying
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSVertex::computeLimit(float *vertex) {
 	CVertexEdge	*cEdge;
 	CVertexFace	*cFace;
@@ -1376,7 +1349,6 @@ void	CSVertex::computeLimit(float *vertex) {
 // Description			:	Edge subdivision rule
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSEdge::compute(float *vertex) {
 	float	*tvertex;
 	float	*smoothVertex,*sharpVertex;
@@ -1419,7 +1391,6 @@ void	CSEdge::compute(float *vertex) {
 // Description			:	Edge subdivision rule
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSEdge::computeVarying(float *varying,float *facevarying) {
 	float	*varying1,*facevarying1;
 	int		i;
@@ -1445,7 +1416,6 @@ void	CSEdge::computeVarying(float *varying,float *facevarying) {
 // Description			:	Face subdivision rule
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSFace::compute(float *vertex) {
 	int	i;
 
@@ -1468,7 +1438,6 @@ void	CSFace::compute(float *vertex) {
 // Description			:	Face subdivision rule
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CSFace::computeVarying(float *varying,float *facevarying) {
 	float		*varying1,*facevarying1;
 	int			i,j;
@@ -1607,7 +1576,6 @@ static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVer
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,char **tags,int *nargs,int *intargs,float *floatargs) : CObject(a,x) {
 	int			i,j,ias,fas;
 	const float	*P;
@@ -1673,7 +1641,6 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 CSubdivMesh::~CSubdivMesh() {
 	int	i;
 
@@ -1702,7 +1669,6 @@ CSubdivMesh::~CSubdivMesh() {
 // Description			:	Intersect the thing
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void		CSubdivMesh::intersect(CShadingContext *rasterizer,CRay *cRay) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1715,7 +1681,6 @@ void		CSubdivMesh::intersect(CShadingContext *rasterizer,CRay *cRay) {
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1735,7 +1700,6 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 // Description			:	Clone the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void		CSubdivMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx		=	new CXform(x);
 
@@ -1753,7 +1717,6 @@ void		CSubdivMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) con
 // Description			:	Split this into smaller primitives
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void		CSubdivMesh::create(CShadingContext *context) {
 	int			i;
 	int			j,k;

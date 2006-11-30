@@ -41,7 +41,6 @@
 // Class				:	CCubicCurves
 // Description			:	Implements a curve primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CCurve : public CSurface {
 public:
 
@@ -49,7 +48,6 @@ public:
 					// Class				:	CBase
 					// Description			:	This class holds the data about a single curve
 					// Comments				:
-					// Date last edited		:	10/8/2002
 					class	CBase {
 					public:
 										CBase() {
@@ -97,7 +95,6 @@ protected:
 // Class				:	CCubicCurves
 // Description			:	Implements a curve primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CCubicCurve : public CCurve {
 public:
 					CCubicCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
@@ -114,7 +111,6 @@ protected:
 // Class				:	CLinearCurves
 // Description			:	Implements a linear primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CLinearCurve : public CCurve {
 public:
 					CLinearCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
@@ -133,7 +129,6 @@ protected:
 // Class				:	CCurvesMesh
 // Description			:	Encapsulates a curves mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CCurveMesh : public CObject {
 public:
 							CCurveMesh(CAttributes *,CXform *,CPl *,int,int,int,int *,int);

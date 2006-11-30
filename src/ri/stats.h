@@ -37,7 +37,6 @@
 // Class				:	CStats
 // Description			:	Holds statistics
 // Comments				:
-// Date last edited		:	1/19/2001
 class CStats {
 public:
 

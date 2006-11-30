@@ -49,7 +49,6 @@ static	matrix	identity	=	{	1,	0,	0,	0,
 // Description			:	Init the declerations
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CRenderer::initDeclerations() {
 
 
@@ -280,7 +279,6 @@ void			CRenderer::initDeclerations() {
 // Description			:	Clear the declerations
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CRenderer::shutdownDeclerations() {
 	// Ditch the global IDs
 	assert(globalIdHash != NULL);
@@ -310,7 +308,6 @@ void			CRenderer::shutdownDeclerations() {
 // Description			:	Define a coordinate system
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CRenderer::defineCoordinateSystem(const char *name,matrix &from,matrix &to,ECoordinateSystem type) {
 	CNamedCoordinateSystem	*newEntry;
 	
@@ -339,7 +336,6 @@ void			CRenderer::defineCoordinateSystem(const char *name,matrix &from,matrix &t
 // Description			:	Find a coordinate system
 // Return Value			:	TRUE on success
 // Comments				:
-// Date last edited		:	8/25/2002
 int			CRenderer::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;
 
@@ -396,7 +392,6 @@ int			CRenderer::findCoordinateSystem(const char *name,matrix *&from,matrix *&to
 // Description			:	Define a new variable
 // Return Value			:	The new variable if successful, NULL otherwise
 // Comments				:
-// Date last edited		:	8/25/2002
 CVariable		*CRenderer::declareVariable(const char *name,const char *type,int marker) {
 	CVariable	cVariable,*nVariable;
 
@@ -464,7 +459,6 @@ CVariable		*CRenderer::declareVariable(const char *name,const char *type,int mar
 // Description			:	Forcefully make a variable global
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void	CRenderer::makeGlobalVariable(CVariable *var) {
 
 	// Did we already start rendering ?
@@ -488,7 +482,6 @@ void	CRenderer::makeGlobalVariable(CVariable *var) {
 // Description			:	Lookup a variable
 // Return Value			:	The variable if found, NULL otherwise
 // Comments				:
-// Date last edited		:	8/25/2002
 CVariable		*CRenderer::retrieveVariable(const char *name) {
 	CVariable					*cVariable;
 
@@ -507,7 +500,6 @@ CVariable		*CRenderer::retrieveVariable(const char *name) {
 // Description			:	Map a string to a number globally
 // Return Value			:	The ID
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CRenderer::getGlobalID(const char *name) {
 	CGlobalIdentifier	*cId;
 
@@ -529,7 +521,6 @@ int		CRenderer::getGlobalID(const char *name) {
 // Description			:	Define a new displayChannel
 // Return Value			:	The new display channel, NULL otherwise
 // Comments				:
-// Date last edited		:	08/02/2006
 CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 	CDisplayChannel *oChannel;
 	CVariable		cVariable,*oVariable;
@@ -572,7 +563,6 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 // Description			:	Define a new displayChannel
 // Return Value			:	The new display channel, NULL otherwise
 // Comments				:
-// Date last edited		:	08/02/2006
 CDisplayChannel		*CRenderer::declareDisplayChannel(CVariable *var) {
 	CDisplayChannel *oChannel;
 	
@@ -601,7 +591,6 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(CVariable *var) {
 // Description			:	Define a new displayChannel
 // Return Value			:	The found display channel, NULL otherwise
 // Comments				:
-// Date last edited		:	08/02/2006
 CDisplayChannel		*CRenderer::retrieveDisplayChannel(const char *name) {
 	CDisplayChannel *oChannel;
 	if (declaredChannels->find(name,oChannel) == TRUE) {
@@ -617,7 +606,6 @@ CDisplayChannel		*CRenderer::retrieveDisplayChannel(const char *name) {
 // Description			:	Mark all AOV channels as unused
 // Return Value			:	
 // Comments				:
-// Date last edited		:	08/02/2006
 void CRenderer::resetDisplayChannelUsage() {
 	int i,n = displayChannels->numItems;
 	CDisplayChannel **dsp = displayChannels->array;
@@ -639,7 +627,6 @@ void CRenderer::resetDisplayChannelUsage() {
 //						:	 client-side file, and must be removed before next frame.
 // Return Value			:	
 // Comments				:	Also removes any netFileMappings for the file
-// Date last edited		:	08/02/2006
 void CRenderer::registerFrameTemporary(const char *name, int deleteFile) {
 	char *tmp = new char[strlen(name)+2];
 	tmp[0] = (deleteFile == TRUE) ? 1 : 0;

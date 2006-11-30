@@ -41,7 +41,6 @@
 //							local system to the global system and "to"
 //							is the transformation from global to local system
 // Comments				:
-// Date last edited		:	3/3/2001
 class CXform {
 public:
 				CXform();

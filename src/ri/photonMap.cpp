@@ -70,7 +70,6 @@ float				sinphi[256];
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource(n) {
 	refCount		=	0;
 	modifying		=	FALSE;
@@ -106,7 +105,6 @@ CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 CPhotonMap::~CPhotonMap() {
 	osDeleteMutex(mutex);
 }
@@ -118,7 +116,6 @@ CPhotonMap::~CPhotonMap() {
 // Description			:	Reset the photonmap
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 void	CPhotonMap::reset() {
 	CMap<CPhoton>::reset();
 }
@@ -129,7 +126,6 @@ void	CPhotonMap::reset() {
 // Description			:	Write the photon map into a file
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 void	CPhotonMap::write(const CXform *world) {
 	// Flush the photonmap
 	FILE		*out		=	ropen(name,"wb",filePhotonMap);
@@ -168,7 +164,6 @@ void	CPhotonMap::write(const CXform *world) {
 // Return Value			:
 // Comments				:	Nl	must be normalized
 //							Il	must be normalized
-// Date last edited		:	4/1/2002
 void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) {
 	int				numFound;
 	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *)); 
@@ -219,7 +214,6 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 // Return Value			:
 // Comments				:	Nl	must be normalized
 //							Il	must be normalized
-// Date last edited		:	4/1/2002
 void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 	int				numFound	=	0;
 	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *)); 
@@ -264,7 +258,6 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 // Description			:	Balance the map
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPhotonMap::balance() {
 	// If we have no photons in the map, add a dummy one to avoid an if statement during the lookup
 	if (numPhotons == 0) {
@@ -285,7 +278,6 @@ void	CPhotonMap::balance() {
 // Description			:	Store a photon
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPhotonMap::store(const float *P,const float *N,const float *I,const float *C) {
 
 	osLock(mutex);
@@ -303,7 +295,6 @@ void	CPhotonMap::store(const float *P,const float *N,const float *I,const float 
 // Description			:	Bound the data
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPhotonMap::bound(float *bmin,float *bmax) {
 	int	i;
 
@@ -319,7 +310,6 @@ void	CPhotonMap::bound(float *bmin,float *bmax) {
 // Description			:	Draw the photonmap
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPhotonMap::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];

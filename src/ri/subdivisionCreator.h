@@ -39,7 +39,6 @@
 // Class				:	CSubdivMesh
 // Description			:	Holds a subdivision surface mesh
 // Comments				:
-// Date last edited		:	5/30/2003
 class	CSubdivMesh : public CObject {
 public:
 							CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,char **tags,int *nargs,int *intargs,float *floatargs);

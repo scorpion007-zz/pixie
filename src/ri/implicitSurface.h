@@ -40,7 +40,6 @@
 // Class				:	CImplicit
 // Description			:	This class encapsulates an implicit surface defined by a signed distance function
 // Comments				:
-// Date last edited		:	3/11/2001
 class	CImplicit : public CSurface {
 public:
 								CImplicit(CAttributes *,CXform *,int,const char *,float,float);

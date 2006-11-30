@@ -404,7 +404,6 @@ static	int					allowedCommands		=	RENDERMAN_BLOCK	|
 // Description			:	Make sure the command is good for a given nesting
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	inline int		check(char *fun,int scope) {
 	if (ignoreFrame)							return TRUE;
 
@@ -424,7 +423,6 @@ static	inline int		check(char *fun,int scope) {
 // Description			:	Extract a parameter from the command string
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	inline int		extract(char *dest,const char *tag,const char *src) {
 	const char	*tmp,*tmpEnd;
 	int			length;
@@ -447,7 +445,6 @@ static	inline int		extract(char *dest,const char *tag,const char *src) {
 // Description			:	Read the parameter list and set nTokens,tokens,values
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	inline	void	getArgs(va_list args) {
 	RtToken		tmp;
 	tmp			= va_arg(args,RtToken);
@@ -483,7 +480,6 @@ static	inline	void	getArgs(va_list args) {
 // Description			:	Init the static variables
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	void RiInit() {
 	nTokens				=	0;
 	mTokens				=	0;
@@ -503,7 +499,6 @@ static	void RiInit() {
 // Description			:	Ditch the allocated static variables
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	void RiTini() {
 	if (tokens != NULL)				delete [] tokens;
 	if (values != NULL)				delete [] values;

@@ -107,7 +107,6 @@ static	char	*rendererinfoVersionStr		=	"versionstring";
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
 // Comments				:	Thread safe
-// Date last edited		:	4/18/2002
 inline void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes1,const CAttributes *attributes2) {
 	int		i;
 
@@ -248,7 +247,6 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
 // Comments				:	Thread safe
-// Date last edited		:	4/18/2002
 inline	void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes) {
 	int		i;
 
@@ -358,7 +356,6 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 CShadingContext::CShadingContext(int t) {
 	int	i;
 
@@ -406,7 +403,6 @@ CShadingContext::CShadingContext(int t) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 CShadingContext::~CShadingContext() {
 	CShadingState	*cState;
 	CConditional	*cConditional;
@@ -457,7 +453,6 @@ CShadingContext::~CShadingContext() {
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
-// Date last edited		:	2/15/2003
 void	CShadingContext::drawObject(CObject *cObject) {
 	// This function must be overriden
 }
@@ -473,7 +468,6 @@ void	CShadingContext::drawObject(CObject *cObject) {
 // Description			:	Sample/Shade bunch of points
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	8/30/2002
 //
 //
 //
@@ -951,7 +945,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 // Description			:	Allocate a new shading state
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 CShadingState	*CShadingContext::newState() {
 	if (freeStates == NULL) {
 		CShadingState	*newState			=	new CShadingState;
@@ -1005,7 +998,6 @@ CShadingState	*CShadingContext::newState() {
 // Description			:	Allocate a new shading state
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void				CShadingContext::deleteState(CShadingState *cState) {
 	cState->next	=	freeStates;
 	freeStates		=	cState;
@@ -1018,7 +1010,6 @@ void				CShadingContext::deleteState(CShadingState *cState) {
 // Description			:	Ditch a shading state
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CShadingContext::freeState(CShadingState *cState) {
 	int			j;
 	const int	numGlobalVariables	=	CRenderer::globalVariables->numItems;
@@ -1057,7 +1048,6 @@ void			CShadingContext::freeState(CShadingState *cState) {
 //							a modification on the set of active variables
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CShadingContext::updateState() {
 	CShadingState	*cState;
 
@@ -1082,7 +1072,6 @@ void		CShadingContext::updateState() {
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1097,7 +1086,6 @@ int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **v
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::displacementParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1113,7 +1101,6 @@ int		CShadingContext::displacementParameter(void *dest,const char *name,CVariabl
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1128,7 +1115,6 @@ int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable 
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1143,7 +1129,6 @@ int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1158,7 +1143,6 @@ int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 	if (strcmp(name,optionsFormat) == 0) {
 		float	*d	=	(float *) dest;
@@ -1255,7 +1239,6 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1313,7 +1296,6 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int *) {
 	
 	if (strcmp(name,rendererinfoRenderer) == 0) {
@@ -1338,7 +1320,6 @@ int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int 
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 const char	*CShadingContext::shaderName() {
 	assert(currentShadingState->currentShaderInstance != NULL);
 
@@ -1351,7 +1332,6 @@ const char	*CShadingContext::shaderName() {
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 const char	*CShadingContext::shaderName(const char *type) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -1384,7 +1364,6 @@ const char	*CShadingContext::shaderName(const char *type) {
 // Description			:	Locate a coordinate system
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;
 
@@ -1492,7 +1471,6 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 // Description			:	Init the random number generator
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CShadingContext::randomInit(unsigned long s) {
     int j;
     state[0]= s & 0xffffffffUL;
@@ -1510,7 +1488,6 @@ void			CShadingContext::randomInit(unsigned long s) {
 // Description			:	Shutdown the random number generator
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CShadingContext::randomShutdown() {
 }
 
@@ -1520,7 +1497,6 @@ void			CShadingContext::randomShutdown() {
 // Description			:	Get the next stage for the random number generator
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CShadingContext::next_state() {
     static const unsigned long _uTable[2] = { 0UL, MATRIX_A };
     register signed int j;

@@ -44,7 +44,6 @@
 // Class				:	CMainWindow
 // Description			:	This class is responsible for drawing a view
 // Comments				:
-// Date last edited		:	9/21/2006
 class	CMainWindow : public QMainWindow, public CInterface {
 public:
 
@@ -184,7 +183,6 @@ protected:
 // Description			:	Visualize some data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglVisualize(CView *view) {
 	int		argc	=	1;
 	char	*argv[]	=	{	"View"	};

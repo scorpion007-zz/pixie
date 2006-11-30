@@ -40,7 +40,6 @@
 // Class				:	CDLObject
 // Description			:	This class defines an object that is dynamically loaded
 // Comments				:
-// Date last edited		:	3/11/2001
 class	CDLObject : public CSurface {
 public:
 								CDLObject(CAttributes *,CXform *,void *,void *,const float *,const float *,dloInitFunction,dloIntersectFunction,dloTiniFunction);

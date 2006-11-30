@@ -363,6 +363,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\gi.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\gi.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\harmonics.h"
 				>
 			</File>

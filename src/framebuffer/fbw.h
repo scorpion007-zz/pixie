@@ -40,7 +40,6 @@
 // Class				:	CWinDisplay
 // Description			:	The windows display class
 // Comments				:
-// Date last edited		:	2/28/2002
 class	CWinDisplay : public CDisplay {
 public:
 					CWinDisplay(const char *,const char *,int,int,int);

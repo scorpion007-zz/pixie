@@ -79,7 +79,6 @@ const	unsigned int		OPTIONS_FLAGS_SAMPLESPECTRUM		=	1<<19;	// Sample the spectru
 // Class				:	COptions
 // Description			:	This class settings that are constant accross a frame
 // Comments				:
-// Date last edited		:	7/4/2001
 class COptions {
 public:
 
@@ -88,14 +87,12 @@ public:
 	// Class				:	CDisplay
 	// Description			:	Holds a display setting
 	// Comments				:
-	// Date last edited		:	7/4/2001
 	class CDisplay {
 	public:
 									///////////////////////////////////////////////////////////////////////
 									// Class				:	TDisplayParameter
 									// Description			:	Holds a display parameter
 									// Comments				:
-									// Date last edited		:	7/4/2001
 									typedef struct {
 										char			*name;
 										ParameterType	type;
@@ -122,7 +119,6 @@ public:
 	// Class				:	CClipPlane
 	// Description			:	Holds a user defined clip plane description
 	// Comments				:
-	// Date last edited		:	7/4/2001
 	class CClipPlane {
 	public:
 									CClipPlane();

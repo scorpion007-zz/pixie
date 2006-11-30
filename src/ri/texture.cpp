@@ -52,7 +52,6 @@
 // Class				:	CTextureBlock
 // Description			:	This class holds information about a particular texture block
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CTextureBlock	{
 public:
 	void				*data;				// Where the block data is stored (NULL if the block has been paged out)
@@ -74,7 +73,6 @@ public:
 // Description			:	Handle errors coming from the libtiff
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 	char tmp[1024];
 
@@ -88,7 +86,6 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 // Description			:	Sort the textures in the order of increasing last ref number
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/7/2001
 static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
 	int				i,last;
 	CTextureBlock	*cBlock;
@@ -119,7 +116,6 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
 // Description			:	Try to deallocate some textures from memory
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/7/2001
 static inline void	textureMemFlush(CTextureBlock *entry,int all) {
 	
 	// Do we have stuff to free ?
@@ -174,7 +170,6 @@ static inline void	textureMemFlush(CTextureBlock *entry,int all) {
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-// Date last edited		:	7/7/2001
 static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry) {
 	stats.textureSize				+=	entry->size;
 	stats.peakTextureSize			=	max(stats.textureSize,stats.peakTextureSize);
@@ -196,7 +191,6 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry) {
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-// Date last edited		:	7/7/2001
 static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir) {
 	void			*data	=	NULL;
 	TIFF			*in;
@@ -326,7 +320,6 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 // Description			:	Add a block into the list of used blocks
 // Return Value			:	Pointer to the new block
 // Comments				:
-// Date last edited		:	7/7/2001
 static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 	
 	cEntry->prev						=	NULL;
@@ -345,7 +338,6 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 // Description			:	Remove the block
 // Return Value			:	Pointer to the new block
 // Comments				:
-// Date last edited		:	7/7/2001
 static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
 	
 	if (cEntry->next != NULL)	cEntry->next->prev						=	cEntry->prev;
@@ -400,7 +392,6 @@ typedef enum {
 // Class				:	CTextureLayer
 // Description			:	This class encapsulates a single 2D texture layer in a file
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CTextureLayer  {
 public:
 						CTextureLayer(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode) {
@@ -508,7 +499,6 @@ protected:
 // Class				:	CBasicTexture
 // Description			:	Thic class holds a basic uncached texture
 // Comments				:
-// Date last edited		:	9/24/2002
 template <class T> class CBasicTexture : public CTextureLayer {
 public:
 					///////////////////////////////////////////////////////////////////////
@@ -517,7 +507,6 @@ public:
 					// Description			:	Ctor
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	2/28/2002
 					CBasicTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
 						textureRegisterBlock(&dataBlock,width*height*numSamples*sizeof(T));
 						M				=	Mult;
@@ -529,7 +518,6 @@ public:
 					// Description			:	Dtor
 					// Return Value			:	-
 					// Comments				:
-					// Date last edited		:	2/28/2002
 					~CBasicTexture() {
 						textureUnregisterBlock(&dataBlock);
 					}
@@ -602,7 +590,6 @@ private:
 // Class				:	CTiledTexture
 // Description			:	Thi class holds info about a tiled texture (tiled textures are cached in tiles)
 // Comments				:
-// Date last edited		:	9/24/2002
 template <class T> class CTiledTexture : public CTextureLayer {
 public:
 				///////////////////////////////////////////////////////////////////////
@@ -611,7 +598,6 @@ public:
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	2/28/2002
 				CTiledTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,int tileSize,int tileSizeShift,double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
 					this->tileSize		=	tileSize;
 					this->tileSizeShift	=	tileSizeShift;
@@ -640,7 +626,6 @@ public:
 				// Description			:	Dtor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	2/28/2002
 				~CTiledTexture() {
 					int i,j;
 
@@ -755,7 +740,6 @@ protected:
 // Class				:	CMadeTexture
 // Description			:	A previously made texture
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CMadeTexture : public CTexture {
 public:
 						CMadeTexture(const char *name) : CTexture(name) {
@@ -946,7 +930,6 @@ public:
 // Class				:	CRegularTexture
 // Description			:	A regular texture
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CRegularTexture : public CTexture {
 public:
 						CRegularTexture(const char *name) : CTexture(name) {
@@ -1087,7 +1070,6 @@ public:
 // Class				:	CShadow
 // Description			:	A single sided shadow map
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CShadow : public CEnvironment{
 public:
 
@@ -1167,7 +1149,6 @@ private:
 // Class				:	CDeepShadow
 // Description			:	A deep shadow map
 // Comments				:
-// Date last edited		:	2/28/2002
 class	CDeepShadow : public CEnvironment{
 
 	// Holds a deep tile
@@ -1394,7 +1375,6 @@ private:
 // Class				:	CCubicEnvironment
 // Description			:	A Cubic environment map
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CCubicEnvironment : public CEnvironment{
 public:
 
@@ -1560,7 +1540,6 @@ public:
 // Class				:	CSphericalEnvironment
 // Description			:	A Spherical environment map
 // Comments				:	RenderMan does not support cylinderical env. maps yet so this class is not used
-// Date last edited		:	9/24/2002
 class	CSphericalEnvironment : public CEnvironment{
 public:
 
@@ -1609,7 +1588,6 @@ public:
 // Class				:	CCylindericalEnvironment
 // Description			:	A Cylinderical environment map
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CCylindericalEnvironment : public CEnvironment{
 public:
 
@@ -1736,7 +1714,6 @@ public:
 // Description			:	Read the pyramid layers
 // Return Value			:	TRUE on success
 // Comments				:
-// Date last edited		:	7/7/2001
 template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int dstart,int width,int height,char *smode,char *tmode,T enforcer) {
 	CMadeTexture			*cTexture;
 	int						i,j;
@@ -1825,7 +1802,6 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 // Description			:	read a regular texture
 // Return Value			:	The texture
 // Comments				:
-// Date last edited		:	8/10/2001
 template <class T> static CTexture	*readTexture(const char *name,const char *aname,TIFF *in,int &dstart,T enforcer) {
 	uint32				width,height;
 	uint16				numSamples;
@@ -1859,7 +1835,6 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 // Description			:	Load a texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-// Date last edited		:	7/7/2001
 static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart,int unMade = FALSE) {
 	CTexture		*cTexture = NULL;
 	uint16			bitspersample;
@@ -1925,7 +1900,6 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 // Description			:	Load a texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-// Date last edited		:	7/7/2001
 CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 	TIFF			*in;
 	CTexture		*cTexture	=	NULL;
@@ -1971,7 +1945,6 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 // Description			:	Load an environment from disk
 // Return Value			:	Pointer to the new environment
 // Comments				:
-// Date last edited		:	7/7/2001
 CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
 	TIFF			*in;
 	char			fileName[OS_MAX_PATH_LENGTH];
@@ -2050,7 +2023,6 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 // Description			:	Set the maximum texture memory
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/7/2001
 void			CRenderer::textureSetMaxMemory(int mm) {
 
 	// Flush all the memory

@@ -42,7 +42,6 @@
 // Class				:	CBilinearPatch
 // Description			:	Encapsulates a bilinear patch
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CBilinearPatch : public CSurface {
 public:
 						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *);
@@ -67,7 +66,6 @@ private:
 // Class				:	CBicubicPatch
 // Description			:	Encapsulates a bicubic patch
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CBicubicPatch : public CSurface {
 public:
 						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *,const float *uBasis=NULL,const float *vBasis=NULL);
@@ -92,7 +90,6 @@ private:
 // Class				:	CNURBSPatch
 // Description			:	Encapsulates a NURBS patch
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CNURBSPatch : public CSurface {
 public:
 						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,float *);
@@ -132,7 +129,6 @@ private:
 // Class				:	CPatchMesh
 // Description			:	Encapsulates a patch mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CPatchMesh : public CObject {
 public:
 							CPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,int);
@@ -156,7 +152,6 @@ private:
 // Class				:	CNURBSPatchMesh
 // Description			:	Encapsulates a NURBS patch mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CNURBSPatchMesh : public CObject {
 public:
 							CNURBSPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,float *,float *);

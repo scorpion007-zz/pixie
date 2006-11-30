@@ -287,7 +287,6 @@ int								CRenderer::numExtraChannels;
 // Description			:	Begin the renderer
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/9/2006
 void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetString) {
 	float			startTime	=	osCPUTime();
 
@@ -348,7 +347,6 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 // Description			:	End the renderer
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/9/2006
 void		CRenderer::endRenderer() {
 	// Ditch the allocated lights
 	CShaderInstance	**array	=	allLights->array;
@@ -408,7 +406,6 @@ void		CRenderer::endRenderer() {
 // Description			:	Make a local copy of the options
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/9/2006
 static void	copyOptions(const COptions *o) {
 	CRenderer::xres						=	o->xres;
 	CRenderer::yres						=	o->yres;
@@ -490,7 +487,6 @@ static void	copyOptions(const COptions *o) {
 // Description			:	Begin a frame / compute misc data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/9/2006
 void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	int		i;
 
@@ -852,7 +848,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 // Description			:	Finish the frame
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/9/2006
 void		CRenderer::endFrame() {
 	int	i;
 
@@ -980,7 +975,6 @@ void		CRenderer::endFrame() {
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/9/2006
 void			CRenderer::render(CObject *cObject) {
 	CAttributes	*cAttributes	=	cObject->attributes;
 
@@ -1031,7 +1025,6 @@ void			CRenderer::render(CObject *cObject) {
 //							the servers
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 static	void		*serverDispatchThread(void *w) {
 	CRenderer::serverThread(w);
 
@@ -1043,7 +1036,6 @@ static	void		*serverDispatchThread(void *w) {
 // Description			:	This thread is responsible for rendering
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 static	void		*rendererDispatchThread(void *w) {
 	CRenderer::contexts[(int) w]->renderingLoop();
 
@@ -1057,7 +1049,6 @@ static	void		*rendererDispatchThread(void *w) {
 // Description			:	Render the frame
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/9/2006
 void		CRenderer::renderFrame() {
 
 	// Make sure we have a bounding hierarchy

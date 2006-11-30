@@ -43,7 +43,6 @@
 // Class				:	CRaytracer
 // Description			:	Encapsulates a primary camera ray
 // Comments				:
-// Date last edited		:	3/20/2003
 class	CPrimaryRay : public CRay {
 public:
 	vector	color;					// Color of the ray
@@ -58,7 +57,6 @@ public:
 // Class				:	CRaytracer
 // Description			:	Defines a raytracer
 // Comments				:
-// Date last edited		:	3/20/2003
 class	CPrimaryBundle : public CRayBundle {
 public:
 				CPrimaryBundle(int,int,int,int*,int,float*);
@@ -83,7 +81,6 @@ public:
 // Class				:	CRaytracer
 // Description			:	Defines a raytracer
 // Comments				:
-// Date last edited		:	8/26/2001
 class	CRaytracer : public CShadingContext {
 public:
 									CRaytracer(int thread);

@@ -88,7 +88,6 @@ extern	char	*rayLabelGather;
 // Class				:	CConditional
 // Description			:	This class is used to hold info about a conditional
 // Comments				:
-// Date last edited		:	10/13/2001
 class	CConditional {
 public:
 		int						forStart;							// The start IP of the conditional
@@ -103,7 +102,6 @@ public:
 // Class				:	CShadedLight
 // Description			:	Hold a shaded light
 // Comments				:	An instance of this class will be created for each execution of "solar" or "illuminate"
-// Date last edited		:	10/13/2001
 class	CShadedLight {
 public:
 		float					**savedState;						// the saved variables for this light
@@ -116,7 +114,6 @@ public:
 // Class				:	CShadingState
 // Description			:	Holds a shading state at a depth
 // Comments				:
-// Date last edited		:	10/13/2001
 class	CShadingState {
 public:
 																	// ---> Input fields
@@ -155,7 +152,6 @@ public:
 // Class				:	CRayBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/20/2003
 class	CRayBundle {
 public:
 		int						numRays;									// The number of rays to trace
@@ -175,7 +171,6 @@ public:
 // Class				:	TObjectHash
 // Description			:	Holds an object hash root
 // Comments				:
-// Date last edited		:	8/16/2004
 typedef struct TObjectHash {
 		CSurface				*object;
 		CRay					*rays;
@@ -188,7 +183,6 @@ typedef struct TObjectHash {
 // Class				:	CShadingContext
 // Description			:	Holds thread specific stuff
 // Comments				:
-// Date last edited		:	10/13/2001
 class	CShadingContext {
 public:
 								CShadingContext(int thread);

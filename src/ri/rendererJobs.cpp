@@ -45,7 +45,6 @@ void			(*CRenderer::dispatchJob)(int thread,CJob &job)	=	NULL;
 // Description			:	Dispatch individual buckets
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void			CRenderer::dispatchReyes(int thread,CJob &job) {
 
 	// If we have a client, ask for a bucket
@@ -158,7 +157,6 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 // Description			:	This function is used by the hiders to request a job
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 
 	// Lock
@@ -192,7 +190,6 @@ void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 // Description			:	Advance the bucket for network parallel rendering
 // Return Value			:	TRUE if we're still rendering, FALSE otherwise
 // Comments				:
-// Date last edited		:	7/4/2001
 int				CRenderer::advanceBucket(int index,int &x,int &y) {
 
 
@@ -259,7 +256,6 @@ int				CRenderer::advanceBucket(int index,int &x,int &y) {
 // Description			:	This function actually manages the servers
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CRenderer::serverThread(void *w) {
 	int		index			=	(int) w;	// This is the server index, 1 thread for every server
 	int		done			=	FALSE;
@@ -368,7 +364,6 @@ void		CRenderer::serverThread(void *w) {
 // Description			:	Process a server request
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CRenderer::processServerRequest(T32 req,int index) {
 	if (req.integer == NET_SEND_FILE) {
 		// The server is missing a file, so send it over

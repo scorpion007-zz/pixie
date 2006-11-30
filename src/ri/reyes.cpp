@@ -107,7 +107,6 @@ int		CReyes::numVertexSamples;
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/14/2002
 CReyes::CBucket::CBucket() {
 	objects			=	NULL;
 	queue			=	NULL;
@@ -119,7 +118,6 @@ CReyes::CBucket::CBucket() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:6
-// Date last edited		:	10/14/2002
 CReyes::CBucket::~CBucket() {
 }
 
@@ -129,7 +127,6 @@ CReyes::CBucket::~CBucket() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/1/2002
 CReyes::CReyes(int thread) : CShadingContext(thread) {
 	int			cx,cy;
 
@@ -168,7 +165,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/1/2002
 CReyes::~CReyes() {
 	int		x,y;
 	CBucket	*cBucket;
@@ -210,7 +206,6 @@ CReyes::~CReyes() {
 // Description			:	This is the rendering loop for the thread
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/1/2002
 void		CReyes::renderingLoop() {
 	CRenderer::CJob	job;
 
@@ -271,7 +266,6 @@ void		CReyes::renderingLoop() {
 // Description			:	Render the current bucket
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/1/2002
 void	CReyes::render() {
 	CRasterObject	*cObject;
 	CPqueue			objectQueue;
@@ -453,7 +447,6 @@ void	CReyes::render() {
 // Description			:	Skip the current bucket
 // Return Value			:
 // Comments				:
-// Date last edited		:	2/1/2002
 void	CReyes::skip() {
 	CRasterObject		*cObject;
 	CBucket				*cBucket;
@@ -514,7 +507,6 @@ void	CReyes::skip() {
 // Description			:	Draw an object
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	6/5/2003
 void		CReyes::drawObject(CObject *object) {
 	float				xmin,xmax,ymin,ymax;
 	float				x[4],y[4];
@@ -664,7 +656,6 @@ void		CReyes::drawObject(CObject *object) {
 // Description			:	Draw a grid
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	6/5/2003
 void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,float vmin,float vmax) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
@@ -693,7 +684,6 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 // Description			:	Draw bunch of points
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	6/5/2003
 void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
@@ -772,7 +762,6 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 // Description			:	Shade a grid
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/5/2003
 void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 	// Make sure we shade a grid only once
@@ -1057,7 +1046,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 // Description			:	Copy the point data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/5/2003
 void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int stage) {
 	const	float	*P			=	varying[VARIABLE_P];
 	const	int		disp		=	(CRenderer::numExtraSamples + 10)*stage;
@@ -1088,7 +1076,6 @@ void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int st
 // Description			:	Copy the shading data over
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	6/5/2003
 void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int stage) {
 	const	float	*C		=	varying[VARIABLE_CI];
 	const	float	*O		=	varying[VARIABLE_OI];
@@ -1216,7 +1203,6 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 // Description			:	Allocate a new raster object
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	6/5/2003
 CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	CRasterObject	*nObject;
 
@@ -1244,7 +1230,6 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 // Description			:	Initialize a grid by copying the points
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	6/5/2003
 CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	CRasterGrid		*grid;
 
@@ -1280,7 +1265,6 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 // Description			:	Delete a raster object
 // Return Value			:	-
 // Comments				:	detach is not thread safe. dObject->mutex must be locked
-// Date last edited		:	6/5/2003
 void				CReyes::deleteObject(CRasterObject *dObject) {
 
 	assert(dObject->refCount == 0);
@@ -1322,7 +1306,6 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 // Description			:	Compute the grid bound and insert the grid into the correct bucket
 // Return Value			:	-
 // Comments				:	Thread safe
-// Date last edited		:	9/17/2004
 void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	// Compute the grid bound and insert it
 	float				xmin,xmax,ymin,ymax;
@@ -1566,7 +1549,6 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 // Description			:	Insert an object into all hiders
 // Return Value			:
 // Comments				:	* Called from parse thread *
-// Date last edited		:	7/4/2001
 void	CReyes::insertObject(CRasterObject *object) {
 	int			i;
 	int			refCount	=	0;

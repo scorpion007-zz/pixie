@@ -51,7 +51,6 @@
 //							one passed as an argument
 // Return Value			:
 // Comments				:	The channel will either be deleted or managed
-// Date last edited		:	03/24/2006
 int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 	int nameLength			= strlen(serverChannel->name)+1;
 	int clientInitialized	= FALSE;	
@@ -125,7 +124,6 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 //							newly created channel to the list if successful
 // Return Value			:
 // Comments				:	called from CRendererContext:processServerRequest
-// Date last edited		:	03/24/2006
 int		CRenderer::processChannelRequest(int index,SOCKET s){
 	int				channelNameLength	= 0;
 	int				channelType			= 0;
@@ -245,7 +243,6 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 // Description			:	Send all bucket-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
-// Date last edited		:	03/24/2006
 void CRenderer::sendBucketDataChannels(int x,int y) {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
@@ -294,7 +291,6 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
-// Date last edited		:	03/24/2006
 void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
@@ -340,7 +336,6 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 // Description			:	Send all frame-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
-// Date last edited		:	03/24/2006
 void CRenderer::sendFrameDataChannels() {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
@@ -388,7 +383,6 @@ void CRenderer::sendFrameDataChannels() {
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
-// Date last edited		:	03/24/2006
 void CRenderer::recvFrameDataChannels(SOCKET s) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
@@ -434,7 +428,6 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 // Method				:	ctor
 // Description			:	-
 // Comments				:	The file is opened elsewhere and closed elsewhere
-// Date last edited		:	03/24/2006
 CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,int yb) : CRemoteChannel(name,REMOTECHANNEL_PERBUCKET,CHANNELTYPE_TSM) {
 	tsmFile = f;
 	index = idx;
@@ -449,7 +442,6 @@ CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,in
 // Description			:	send a buckets worth of tsm data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	// record current position, seek back to tile start
 	long curPos = ftell(tsmFile);
@@ -481,7 +473,6 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 // Description			:	receive a buckets worth of tsm data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	// record where we are
 	long prevPos = ftell(tsmFile);
@@ -513,7 +504,6 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 // Method				:	ctor
 // Description			:	-
 // Comments				:	The cache is opened elsewhere and closed elsewhere
-// Date last edited		:	03/24/2006
 CRemoteICacheChannel::CRemoteICacheChannel(CIrradianceCache *c) : CRemoteChannel(c->name,REMOTECHANNEL_PERFRAME,CHANNELTYPE_ICACHE) {
 	cache = c;
 }
@@ -525,7 +515,6 @@ CRemoteICacheChannel::CRemoteICacheChannel(CIrradianceCache *c) : CRemoteChannel
 // Description			:	send all the cache's data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteICacheChannel::sendRemoteFrame(SOCKET s) {
 	CIrradianceCache::CCacheNode			**stackBase;
 	CIrradianceCache::CCacheNode			**stack;
@@ -575,7 +564,6 @@ int		CRemoteICacheChannel::sendRemoteFrame(SOCKET s) {
 // Description			:	receive all the server's cache data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 	CIrradianceCache::CCacheNode			*cNode;
 	CIrradianceCache::CCacheSample			*cSample;
@@ -666,7 +654,6 @@ int	CRemoteICacheChannel::setup(SOCKET s) {
 // Method				:	ctor
 // Description			:	-
 // Comments				:	The cache is opened elsewhere and closed elsewhere
-// Date last edited		:	03/24/2006
 CRemotePtCloudChannel::CRemotePtCloudChannel(CPointCloud *c) : CRemoteChannel(c->name,REMOTECHANNEL_PERFRAME,CHANNELTYPE_PTCLOUD) {
 	cloud = c;
 }
@@ -678,7 +665,6 @@ CRemotePtCloudChannel::CRemotePtCloudChannel(CPointCloud *c) : CRemoteChannel(c-
 // Description			:	send all the cache's data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
 	int i,numSamples;
 
@@ -704,7 +690,6 @@ int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
 // Description			:	receive all the server's cache data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemotePtCloudChannel::recvRemoteFrame(SOCKET s) {
 	int					i,numSamples;
 	CPointCloudPoint	pt;
@@ -731,7 +716,6 @@ int		CRemotePtCloudChannel::recvRemoteFrame(SOCKET s) {
 // Description			:	sendSetupData
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemotePtCloudChannel::sendSetupData(SOCKET s) {
 	char	channelDef[1024];
 	char	*ptr = channelDef;
@@ -756,7 +740,6 @@ int		CRemotePtCloudChannel::sendSetupData(SOCKET s) {
 // Description			:	setup
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int	CRemotePtCloudChannel::setup(SOCKET s) {
 	char	channelDef[1024];
 	

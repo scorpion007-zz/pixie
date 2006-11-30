@@ -43,7 +43,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOrder,int numExtraSamp,float *sampDefaults) {
 	int		i;
 	float	*src;
@@ -76,7 +75,6 @@ CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOr
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 CPrimaryBundle::~CPrimaryBundle() {
 	delete [] rayBase;
 	delete [] rays;
@@ -89,7 +87,6 @@ CPrimaryBundle::~CPrimaryBundle() {
 // Description			:	Post trace action, force shading
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 int		CPrimaryBundle::postTraceAction() {
 	return TRUE;
 }
@@ -100,7 +97,6 @@ int		CPrimaryBundle::postTraceAction() {
 // Description			:	Record the raytracing results
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 	float		*Ci		=	varying[VARIABLE_CI];
 	float		*Oi		=	varying[VARIABLE_OI];
@@ -244,7 +240,6 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 void	CPrimaryBundle::postShade(int nr,CRay **r) {
 	int			i,j;
 
@@ -283,7 +278,6 @@ void	CPrimaryBundle::postShade(int nr,CRay **r) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 void	CPrimaryBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -297,7 +291,6 @@ void	CPrimaryBundle::post() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
 	CRenderer::raytracingFlags	|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 
@@ -316,7 +309,6 @@ CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRen
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 CRaytracer::~CRaytracer() {
 	delete [] fbContribution;
 	delete [] fbPixels;
@@ -329,7 +321,6 @@ CRaytracer::~CRaytracer() {
 // Description			:	Replace the occurance of a pointer with another
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::renderingLoop() {
 	int				left;
 	int				top;
@@ -399,7 +390,6 @@ void	CRaytracer::renderingLoop() {
 // Description			:	Samples a rectangular array of pixels
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	int				maxShading			=	primaryBundle.maxPrimaryRays;
 	int				i,j;
@@ -478,7 +468,6 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 // Description			:	Raytrace the sample locations
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 	int			i;
 	float		x,y;
@@ -565,7 +554,6 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 // Description			:	Splat the samples on the image
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int top,int xpixels,int ypixels) {
 	int				i,j;
 	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1) / (float) 2);

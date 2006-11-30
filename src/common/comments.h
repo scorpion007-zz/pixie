@@ -40,7 +40,6 @@
 // Class				:
 // Description			:
 // Comments				:
-// Date last edited		:
 
 
 
@@ -51,7 +50,6 @@
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 
 
 
@@ -60,7 +58,6 @@
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 
 
 

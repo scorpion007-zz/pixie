@@ -55,7 +55,6 @@
 // Class				:	CDictionary
 // Description			:	Pure virtual parent class for dictionary
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class keyType,class valType> class CDictionary  {
 public:
 						CDictionary()	{	}
@@ -84,14 +83,12 @@ public:
 // Class				:	CHash
 // Description			:	Hash table
 // Comments				:
-// Date last edited		:	2/8/2003
 template <class keyType,class valType>	class CHash : public CDictionary<keyType,valType> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CHashBucket
 	// Description			:	Hash table
 	// Comments				:
-	// Date last edited		:	2/8/2003
 	class CHashBucket {
 	public:
 		keyType		key;
@@ -248,14 +245,12 @@ const	int		TRIE_NODE_LEAF				=	1;
 // Class				:	CTrie
 // Description			:	Trie class
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class valType> class CTrie : public CDictionary<const char *,valType> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CTrieLeaf
 	// Description			:	Encapsulates a trie leaf
 	// Comments				:
-	// Date last edited		:	11/28/2001
 	class CTrieLeaf {
 	public:
 		CTrieLeaf(const char *k,valType v) {
@@ -271,7 +266,6 @@ template <class valType> class CTrie : public CDictionary<const char *,valType> 
 	// Class				:	CTrieNode
 	// Description			:	Encapsulates a trie internal node
 	// Comments				:
-	// Date last edited		:	11/28/2001
 	class CTrieNode {
 	public:
 		CTrieNode() {
@@ -441,14 +435,12 @@ private:
 // Class				:	CPqueue
 // Description			:	Priority queue
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class ItemType,class PriorityType> class CPqueue  {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPqueueItem
 	// Description			:	Holds a priority queue item
 	// Comments				:
-	// Date last edited		:	11/28/2001
 	class	CPqueueItem	{
 	public:
 		ItemType		item;
@@ -568,7 +560,6 @@ private:
 // Class				:	CMemPool
 // Description			:	Memory pool for a particular class that's allocated frequently
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class T>	class CMemPool {
 public:
 	
@@ -664,14 +655,12 @@ public:
 // Class				:	CMemStack
 // Description			:	A stack based memory manager
 // Comments				:
-// Date last edited		:	8/2/2001
 class CMemStack {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CMemPage
 	// Description			:	This class contains a memory page
 	// Comments				:
-	// Date last edited		:	8/2/2001
 	class CMemPage {
 	public:
 			char			*memory;					// Points to the current free memory
@@ -790,7 +779,6 @@ private:
 // Class				:	CArray
 // Description			:	Array
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class T> class CArray {
 public:
 						CArray(int ss = 100) {

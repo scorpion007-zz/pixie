@@ -108,7 +108,6 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 // Class				:	CShaderLookup
 // Description			:	This class encapsulates a shader lookup
 // Comments				:
-// Date last edited		:	2/13/2003
 class	CShaderLookup {
 public:
 							CShaderLookup();
@@ -122,7 +121,6 @@ public:
 // Class				:	CTextureLookup
 // Description			:	This class holds information about a particular texture lookup
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CFilterLookup : public CShaderLookup	{
 public:
 		float				width;					// The width parameter
@@ -138,7 +136,6 @@ public:
 // Class				:	CTextureInfoLookup
 // Description			:	This class holds the base of a textureinfo lookup
 // Comments				:
-// Date last edited		:	02/24/2006
 class	CTextureInfoLookup : public CShaderLookup	{
 public:
 		CTextureInfoBase	*textureInfo;
@@ -148,7 +145,6 @@ public:
 // Class				:	CTraceLookup
 // Description			:	This class holds the base of a trace lookup
 // Comments				:
-// Date last edited		:	02/24/2006
 class	CTraceLookup : public CShaderLookup	{
 public:
 		float				bias;
@@ -159,7 +155,6 @@ public:
 // Class				:	CTextureLookup
 // Description			:	This class holds information about a particular texture lookup
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CTextureLookup : public CShaderLookup	{
 public:
 		RtFilterFunc		filter;					// Lookup filter
@@ -181,7 +176,6 @@ public:
 // Class				:	CGlobalIllumLookup
 // Description			:	This class encapsulates a global illumination lookup
 // Comments				:
-// Date last edited		:	2/13/2003
 class	CGlobalIllumLookup : public CShaderLookup {
 public:
 							CGlobalIllumLookup();
@@ -215,7 +209,6 @@ public:
 // Class				:	CTexture3dLookup
 // Description			:	This class holds information about a 3d texture bake
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CTexture3dLookup : public CShaderLookup	{
 public:
 							~CTexture3dLookup()	{
@@ -257,7 +250,6 @@ public:
 // Class				:	CGatherVariable
 // Description			:	Encapsulates a variable to be saved
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherVariable {
 public:
 	virtual			~CGatherVariable() { }
@@ -272,7 +264,6 @@ public:
 // Class				:	CShaderVectorVariable
 // Description			:	Encapsulates a shader variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CShaderVectorVariable : public CGatherVariable {
 public:
 
@@ -285,7 +276,6 @@ public:
 // Class				:	CShaderFloatVariable
 // Description			:	Encapsulates a shader variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CShaderFloatVariable : public CGatherVariable {
 public:
 
@@ -298,7 +288,6 @@ public:
 // Class				:	CRayOriginVariable
 // Description			:	Ray origin variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CRayOriginVariable : public CGatherVariable {
 public:
 
@@ -309,7 +298,6 @@ public:
 // Class				:	CRayDirVariable
 // Description			:	Ray direction variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CRayDirVariable : public CGatherVariable {
 public:
 
@@ -320,7 +308,6 @@ public:
 // Class				:	CRayLengthVariable
 // Description			:	Ray direction variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CRayLengthVariable : public CGatherVariable {
 public:
 
@@ -332,7 +319,6 @@ public:
 // Class				:	CGatherLookup
 // Description			:	Lookup parameters for the gather
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherLookup : public CShaderLookup {
 public:
 
@@ -362,7 +348,6 @@ public:
 // Class				:	CShader
 // Description			:	This class encapsulates a shader
 // Comments				:
-// Date last edited		:	3/13/2001
 class	CShader	: public CFileResource {
 public:
 								CShader(const char *);
@@ -401,7 +386,6 @@ public:
 // Class				:	CShaderInstance
 // Description			:	This class encapsulates an instance of a shader
 // Comments				:
-// Date last edited		:	3/10/2001
 class	CShaderInstance {
 public:
 								CShaderInstance(CAttributes *,CXform *);
@@ -432,14 +416,12 @@ public:
 // Class				:	CProgrammableShaderInstance
 // Description			:	This class encapsulates an instance of a programmable shader
 // Comments				:
-// Date last edited		:	3/10/2001
 class	CProgrammableShaderInstance : public CShaderInstance {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CAllocatedString
 	// Description			:	We use this class to keep track of the allocated strings for parameters
 	// Comments				:
-	// Date last edited		:	3/10/2001
 	class	CAllocatedString {
 	public:
 			char				*string;

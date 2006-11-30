@@ -45,7 +45,6 @@
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter::CParameter(CVariable *v) {
 	stats.numParameters++;
 
@@ -61,7 +60,6 @@ CParameter::CParameter(CVariable *v) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter::~CParameter() {
 	stats.numParameters--;
 
@@ -73,7 +71,6 @@ CParameter::~CParameter() {
 // Class				:	CUniformParameter
 // Description			:	Encapsulates a uniform parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CUniformParameter : public CParameter {
 public:
 					CUniformParameter(CVariable *v) : CParameter(v) {
@@ -153,7 +150,6 @@ public:
 // Class				:	CUniformParameter
 // Description			:	Encapsulates a varying parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVaryingParameter : public CParameter {
 public:
 					CVaryingParameter(CVariable *v) : CParameter(v) {
@@ -248,7 +244,6 @@ public:
 // Class				:	CUniformParameter
 // Description			:	Encapsulates a varying parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVarying3Parameter : public CParameter {
 public:
 					CVarying3Parameter(CVariable *v) : CParameter(v) {
@@ -343,7 +338,6 @@ public:
 // Class				:	CVarying2Parameter
 // Description			:	Encapsulates a varying parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVarying2Parameter : public CParameter {
 public:
 					CVarying2Parameter(CVariable *v) : CParameter(v) {
@@ -474,7 +468,6 @@ public:
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CVertexData::CVertexData() {
 	stats.numVertexDatas++;
 	stats.gprimCoreMemory	+=	sizeof(CVertexData);
@@ -488,7 +481,6 @@ CVertexData::CVertexData() {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CVertexData::~CVertexData() {
 	stats.numVertexDatas--;
 	stats.gprimCoreMemory	-=	(sizeof(CVertexData) + numVariables*sizeof(CVariable *));
@@ -503,7 +495,6 @@ CVertexData::~CVertexData() {
 // Description			:	Dispatch vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 void	CVertexData::dispatch(const float *data,int start,int numVertices,float **varying) {
 	int			i;
 	CVariable	**dispatch	=	variables;
@@ -532,7 +523,6 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
 	stats.numPls++;
 	stats.gprimCoreMemory	+=	sizeof(CPl);
@@ -551,7 +541,6 @@ CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl::~CPl() {
 	stats.numPls--;
 	stats.gprimCoreMemory	-=	sizeof(CPl);
@@ -580,7 +569,6 @@ CPl::~CPl() {
 // Description			:	Append another data block for the shutter close
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 void		CPl::append(float *d) {
 	if (data1 == NULL) {
 		data1					=	new float[dataSize];
@@ -596,7 +584,6 @@ void		CPl::append(float *d) {
 // Description			:	Transform the variables into another coordinaye system
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 void		CPl::transform(CXform *x,float *cData) {
 	if (cData == NULL) {
 		if ((x->next != NULL) && (data1 == NULL)) {
@@ -679,7 +666,6 @@ void		CPl::transform(CXform *x,float *cData) {
 // Description			:	Extract the vertex data from the parameter list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CVertexData	*CPl::vertexData() {
 	int			i,j;
 	CVertexData	*vd	=	new CVertexData;
@@ -728,7 +714,6 @@ CVertexData	*CPl::vertexData() {
 // Description			:	Extract the vertex data from the parameter list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl				*CPl::clone(CAttributes *a) {
 	float			*ndata0,*ndata1;
 	CPlParameter	*nParameters;
@@ -776,7 +761,6 @@ CPl				*CPl::clone(CAttributes *a) {
 // Description			:	Find a variable in the parameter list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 	int	i,disp;
 
@@ -799,7 +783,6 @@ CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page) {
 	int			i,j,k;
 	const float	*cData		=	data0;
@@ -879,7 +862,6 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::uniform(int u,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -918,7 +900,6 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -952,7 +933,6 @@ CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -984,7 +964,6 @@ CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p) {
 	int				i;
 	CPlParameter	*cParameter	=	parameters;
@@ -1021,7 +1000,6 @@ CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p)
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -1055,7 +1033,6 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter *p) {
 	int				i;
 	CPlParameter	*cParameter	=	parameters;
@@ -1092,7 +1069,6 @@ CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -1125,7 +1101,6 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 // Description			:	Extracts the parameters set by the list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 unsigned int CPl::parameterUsage() {
 	unsigned int	p;
 	int				i;
@@ -1147,7 +1122,6 @@ unsigned int CPl::parameterUsage() {
 // Description			:	Parse a parameter list
 // Return Value			:	The parsed parameter list
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,char **params,void **vals,char *required,int flags,CAttributes *attributes) {
 	int					i,numDefinedParams = 0;
 	CPlParameter		*parameters,*finalParameters;

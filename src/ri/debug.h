@@ -41,7 +41,6 @@
 // Class				:	CDebugView
 // Description			:	This class is used to draw various things
 // Comments				:
-// Date last edited		:	9/21/2006
 class	CDebugView : public CView {
 public:
 								CDebugView(const char *fileName,int append=FALSE);

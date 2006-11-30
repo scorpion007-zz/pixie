@@ -43,7 +43,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float ss,float sf) : CSurface(a,x) {
 	handle	=	osLoadModule(name);
 
@@ -88,7 +87,6 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 CImplicit::~CImplicit() {
 	stats.numGprims--;
 	stats.gprimMemory		-=	sizeof(CImplicit);
@@ -107,7 +105,6 @@ CImplicit::~CImplicit() {
 // Description			:	Intersect the surface with the ray
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
 	float	tmin,tmax;
 	vector	lastP,P;
@@ -186,7 +183,6 @@ martchLoop:;
 // Description			:	Sample the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CImplicit::sample(int,int,float **,unsigned int &up) const {
 	up	&=	~(PARAMETER_P | PARAMETER_NG);
 }
@@ -197,7 +193,6 @@ void					CImplicit::sample(int,int,float **,unsigned int &up) const {
 // Description			:	Interpolate the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CImplicit::interpolate(int,float **)	const {
 }
 
@@ -207,7 +202,6 @@ void					CImplicit::interpolate(int,float **)	const {
 // Description			:	Dice the surface for scan-line rendering
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CImplicit::dice(CShadingContext *) {
 }
 
@@ -217,7 +211,6 @@ void					CImplicit::dice(CShadingContext *) {
 // Description			:	Create a copy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CImplicit::instantiate(CAttributes *a,CXform *x,CRendererContext *context) const {
 }
 
@@ -228,7 +221,6 @@ void					CImplicit::instantiate(CAttributes *a,CXform *x,CRendererContext *conte
 // Description			:	Shade the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CImplicit::shade(CShadingContext *context,int numRays,CRay **rays) {
 	float	**varying	=	context->currentShadingState->varying;
 	float	*P			=	varying[VARIABLE_P];

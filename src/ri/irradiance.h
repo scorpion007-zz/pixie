@@ -47,7 +47,6 @@ class CRemoteICacheChannel;
 // Class				:	CIrradianceCache
 // Description			:	Encapsulates an irradiance cache
 // Comments				:
-// Date last edited		:	10/15/2005
 class	CIrradianceCache : public CCache {
 public:
 
@@ -55,7 +54,6 @@ public:
 	// Class				:	CIrradiance
 	// Description			:	Holds irradiance information on a surface
 	// Comments				:
-	// Date last edited		:	10/15/2005
 	class	CCacheSample {
 	public:
 		vector				P;					// Point
@@ -75,7 +73,6 @@ public:
 	// Class				:	CIrradianceNode
 	// Description			:	Holds information about incident illumination
 	// Comments				:
-	// Date last edited		:	10/15/2005
 	class	CCacheNode {
 	public:
 							CCacheNode(const float *);

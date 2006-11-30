@@ -55,7 +55,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 	apertureGenerator(CRenderer::frame) {
 	int		i,j;
@@ -92,7 +91,6 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 CStochastic::~CStochastic() {
 	int			i;
 	CFragment	*cFragment;
@@ -119,7 +117,6 @@ CStochastic::~CStochastic() {
 // Description			:	Begin drawing an image
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
@@ -236,7 +233,6 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 // Description			:	Draw bunch of primitives
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // Instantiate the dispatch switch
 #define DEFINE_STOCHASTIC_SWITCH
@@ -335,7 +331,6 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // Description			:	Get the image from the screen
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	int				i,y;
 	int				sx,sy;
@@ -615,7 +610,6 @@ public:
 // Description			:	This function is used to output a depth sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/26/2003
 inline	void	startSample(FILE *outFile,float threshold,CTSMData &data) {
 	data.deepShadowFile		=	outFile;
 	data.tsmThreshold		=	threshold;
@@ -641,7 +635,6 @@ inline	void	startSample(FILE *outFile,float threshold,CTSMData &data) {
 // Description			:	This function is used to output a depth sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/26/2003
 inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 	// Always output the closest sample
 	if (data.origin[0] == -C_INFINITY) {
@@ -741,7 +734,6 @@ inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 // Description			:	This function is used to output the last sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/26/2003
 inline	void	finishSample(float cZ,const float *opacity,CTSMData &data) {
 	if (data.origin[0] < cZ) {
 		data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;	
@@ -767,7 +759,6 @@ inline	void	finishSample(float cZ,const float *opacity,CTSMData &data) {
 // Description			:	Filter / output the pixel
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weights) {
 	int			minSample		=	0;
 	int			i;
@@ -859,7 +850,6 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 // Description			:	Compute/write deep shadow map data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::deepShadowCompute() {
 	int			i;
 	const int	xres				=	width;

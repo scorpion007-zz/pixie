@@ -53,7 +53,6 @@
 // Description			:	Compute the u derivative
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/4/2003
 void	CShadingContext::duFloat(float *dest,const float *src) {
 	switch(currentShadingState->shadingDim) {
 
@@ -129,7 +128,6 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 // Description			:	Compute the v derivative
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/4/2003
 void	CShadingContext::dvFloat(float *dest,const float *src) {
 
 	switch(currentShadingState->shadingDim) {
@@ -246,7 +244,6 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 // Description			:	Compute the u derivative
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/4/2003
 void	CShadingContext::duVector(float *dest,const float *src) {
 	switch(currentShadingState->shadingDim) {
 
@@ -344,7 +341,6 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 // Description			:	Compute the v derivative
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/4/2003
 void	CShadingContext::dvVector(float *dest,const float *src) {
 	switch(currentShadingState->shadingDim) {
 
@@ -450,7 +446,6 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 // Description			:	Trace transmission rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CShadingContext::traceTransmission(float *dest,const float *from,const float *L,int numVertices,int *tags,CTextureLookup *lookup) {
 	CTransmissionRay	*rayBase;
 	CTransmissionRay	**raysBase;
@@ -541,7 +536,6 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 // Description			:	Trace reflection rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CShadingContext::traceReflection(float *dest,const float *from,const float *dir,int numVertices,int *tags,CTextureLookup *lookup) {
 	CTraceRay			*rayBase;
 	CTraceRay			**raysBase;
@@ -627,7 +621,6 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 // Description			:	Compute the ray differentials
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 float		*CShadingContext::rayDiff(const float *from,const float *dir,const float *to) {
 
 	// Allocate the return value
@@ -815,7 +808,6 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 // Description			:	Compute the ray differentials
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 float		*CShadingContext::rayDiff(const float *from) {
 
 	// Allocate the return value

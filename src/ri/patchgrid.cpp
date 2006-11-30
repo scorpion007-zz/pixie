@@ -51,7 +51,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,int bTop,int bRgt,int bBot,int bLft,float *ve) : CSurface(a,x) {
 	int				numVertices,realNumVertices;
 	int				i;
@@ -194,7 +193,6 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 CPatchGrid::~CPatchGrid() {
 	int	numVertices		=	(nu+2)*(nv+2);
 	int realNumVertices	=	(nu*nv);
@@ -217,7 +215,6 @@ CPatchGrid::~CPatchGrid() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int					i,j;
 	const float			*u						=	varying[VARIABLE_U]+start;
@@ -334,7 +331,6 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 void		CPatchGrid::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 }

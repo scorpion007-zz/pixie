@@ -62,7 +62,6 @@ const	float	horizonCutoff			=	(float) cosf(radians(80));
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in) : CCache(name,f) {
 	int	i;
 
@@ -122,7 +121,6 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in) : C
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 CIrradianceCache::~CIrradianceCache() {
 
 	osDeleteMutex(mutex);
@@ -155,7 +153,6 @@ CIrradianceCache::~CIrradianceCache() {
 // Description			:	Write a node into a file
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 void			CIrradianceCache::writeNode(FILE *out,CCacheNode *cNode) {
 	int				numSamples,i;
 	CCacheSample	*cSample;
@@ -183,7 +180,6 @@ void			CIrradianceCache::writeNode(FILE *out,CCacheNode *cNode) {
 // Description			:	Read a node from file
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 	int				numSamples,i;
 	CCacheNode		*cNode	=	(CCacheNode *) memory->alloc(sizeof(CCacheNode));
@@ -215,7 +211,6 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Description			:	Lookup da cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
@@ -353,7 +348,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 // Description			:	Check if there's a nearby sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2003
 void	CIrradianceCache::cachesample(float *C,const float *cP,const float *cN,float dP) {
 	CCacheSample	*cSample;
 	CCacheNode		*cNode;
@@ -422,7 +416,6 @@ void	CIrradianceCache::cachesample(float *C,const float *cP,const float *cN,floa
 // Class				:	CHemisphereSample
 // Description			:	This class is used to hold data about a hemisphere sample
 // Comments				:	-
-// Date last edited		:	5/15/2004
 class	CHemisphereSample {
 public:
 		vector	dir;			// Direction in the camera coordinate system
@@ -442,7 +435,6 @@ public:
 // Description			:	Compute the positional gradient for bunch of data points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/15/2004
 inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
 	int					i,j,k;
 	double				nextsine, lastsine, d;
@@ -544,7 +536,6 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Description			:	Compute the rotational gradient for bunch of data points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/15/2004
 inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
 	int					i,j,k;
 	double				mag[7];
@@ -599,7 +590,6 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Description			:	Sample the occlusion
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
 	CCacheSample		*cSample;
 	int					i,j;
@@ -933,7 +923,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 // Description			:	Clamp the radius
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CIrradianceCache::clamp(CCacheSample *nSample) {
 	CCacheSample	*cSample;
 	CCacheNode		*cNode;
@@ -984,7 +973,6 @@ void		CIrradianceCache::clamp(CCacheSample *nSample) {
 // Description			:	Draw the irradiance cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CIrradianceCache::draw() {
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
@@ -1094,7 +1082,6 @@ void		CIrradianceCache::draw() {
 // Description			:	Bound the irradiance cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CIrradianceCache::bound(float *bmin,float *bmax) {
 	assert(root != NULL);
 

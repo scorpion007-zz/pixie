@@ -56,7 +56,6 @@ class	CNetFileMapping;
 // Class				:	CRendererContext
 // Description			:	Holds the global rendering context
 // Comments				:
-// Date last edited		:	10/13/2001
 class	CRendererContext : public CRiInterface {
 public:
 

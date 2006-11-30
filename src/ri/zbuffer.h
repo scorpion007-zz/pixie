@@ -41,7 +41,6 @@
 // Class				:	CZbuffer
 // Description			:	This is the zbuffer hider (a scanline renderer)
 // Comments				:
-// Date last edited		:	7/31/2002
 class	CZbuffer : public CReyes , public COcclusionCuller {
 public:
 				CZbuffer(int thread);

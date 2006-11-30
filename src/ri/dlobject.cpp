@@ -44,7 +44,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const float *bmi,const float *bma,dloInitFunction initFunction,dloIntersectFunction intersectFunction,dloTiniFunction tiniFunction) : CSurface(a,x) {
 	stats.numGprims++;
 	stats.gprimMemory		+=	sizeof(CDLObject);
@@ -68,7 +67,6 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 CDLObject::~CDLObject() {
 	stats.numGprims--;
 	stats.gprimMemory		-=	sizeof(CDLObject);
@@ -85,7 +83,6 @@ CDLObject::~CDLObject() {
 // Description			:	Intersect the surface with the ray
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 	vector	oN;
 	float	t;
@@ -124,7 +121,6 @@ void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 // Description			:	Sample the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::sample(int,int,float **,unsigned int &up) const {
 	up	&=	~(PARAMETER_P | PARAMETER_NG);
 }
@@ -135,7 +131,6 @@ void					CDLObject::sample(int,int,float **,unsigned int &up) const {
 // Description			:	Interpolate the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::interpolate(int,float **)	const {
 }
 
@@ -145,7 +140,6 @@ void					CDLObject::interpolate(int,float **)	const {
 // Description			:	Dice the surface for scan-line rendering
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::dice(CShadingContext *) {
 }
 
@@ -156,7 +150,6 @@ void					CDLObject::dice(CShadingContext *) {
 // Description			:	Create a copy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::instantiate(CAttributes *a,CXform *x,CRendererContext *context) const {
 }
 
@@ -167,7 +160,6 @@ void					CDLObject::instantiate(CAttributes *a,CXform *x,CRendererContext *conte
 // Description			:	Shade the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::shade(CShadingContext *context,int numRays,CRay **rays) {
 	float	**varying	=	context->currentShadingState->varying;
 	float	*P			=	varying[VARIABLE_P];

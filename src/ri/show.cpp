@@ -53,7 +53,6 @@ TGlFileFunction			CView::drawFile			=	NULL;
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 CShow::CShow(int thread) : CShadingContext(thread) {
 
 	if (thread == 0) {
@@ -149,6 +148,5 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 CShow::~CShow() {
 }

@@ -36,7 +36,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 CDebugView::CDebugView(const char *fileName,int append) {
 	initv(bmin,C_INFINITY);
 	initv(bmax,-C_INFINITY);
@@ -67,7 +66,6 @@ CDebugView::CDebugView(const char *fileName,int append) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 CDebugView::CDebugView(FILE *in,const char *fn) {
 	
 	file		=	in;
@@ -84,7 +82,6 @@ CDebugView::CDebugView(FILE *in,const char *fn) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 CDebugView::~CDebugView() {
 	if (writing == TRUE) {
 		fseek(file,0,SEEK_SET);
@@ -102,7 +99,6 @@ CDebugView::~CDebugView() {
 // Description			:	Draw the stuff in the file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void		CDebugView::draw() {
 
 	drawFile(fileName);
@@ -114,7 +110,6 @@ void		CDebugView::draw() {
 // Description			:	Bound the stuff in the file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void		CDebugView::bound(float *bmin,float *bmax) {
 	movvv(bmin,this->bmin);
 	movvv(bmax,this->bmax);

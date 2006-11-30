@@ -47,7 +47,6 @@ const int	INTERFACE_CTRL_KEY		=	65507;
 // Class				:	CInterface
 // Description			:	Deals with the trackball interface
 // Comments				:	-
-// Date last edited		:	9/21/2006
 class	CInterface {
 public:
 						CInterface(CView *v) {

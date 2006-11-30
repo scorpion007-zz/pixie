@@ -54,7 +54,6 @@ const	int		SPLIT_UV	=	3;
 // Description			:	return the minimum circle of confusion
 // Return Value			:
 // Comments				:	(inline for speed, needed for CSurface::dice() )
-// Date last edited		:	4/7/2006
 static inline float	minCocPixels(float z1, float z2) {
 	return min(cocPixels(z1),cocPixels(z2));
 }
@@ -67,7 +66,6 @@ static inline float	minCocPixels(float z1, float z2) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/4/2003
 CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth) : CObject(a,x) {
 	stats.numGprims++;
 	stats.gprimMemory	+=	sizeof(CPatch);
@@ -95,7 +93,6 @@ CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/4/2003
 CPatch::~CPatch() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CPatch);
@@ -147,7 +144,6 @@ static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int
 // Description			:	Dice the surface into smaller primitives
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/4/2003
 void	CPatch::dice(CShadingContext *r) {
 
 	// Have we checked size of this piece before ?
@@ -374,7 +370,6 @@ void	CPatch::dice(CShadingContext *r) {
 // Description			:	Split the surface into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/4/2003
 void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 	CPatch	*p1,*p2,*p3,*p4;
 	float	umid,vmid;
@@ -478,7 +473,6 @@ support untesselation
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/4/2003
 CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,char depth,char minDepth,float r) : CObject(a,x) {
 	// Record the stuff
 	this->object	=	o;
@@ -505,7 +499,6 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/4/2003
 CTesselationPatch::~CTesselationPatch() {
 	// clean up tesselations
 	for(int i=0;i<3;i++) {
@@ -872,7 +865,6 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	This function takes P and returns the cosine of the minimum angle deviation
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 static	inline	float	measureLength(const float *P,int step,int num) {
 	float	length	=	0;
 
@@ -899,7 +891,6 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 // Description			:	Find the best tesselation for this object
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/16/2001
 CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContext *context,char rdiv,int estimateOnly) {
 	// Get some misc variables for fast access
 	float	**varying	=	context->currentShadingState->varying;

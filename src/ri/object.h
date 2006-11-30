@@ -56,7 +56,6 @@ const unsigned int	OBJECT_TESSELATION		=	2;	// Set if the object is an intermedi
 // Class				:	CObject
 // Description			:	This class encapsulates a general object
 // Comments				:
-// Date last edited		:	3/11/2001
 class	CObject {
 public:
 							CObject(CAttributes *,CXform *);
@@ -102,7 +101,6 @@ protected:
 // Class				:	CDummyObject
 // Description			:	A dummy object
 // Comments				:
-// Date last edited		:	3/11/2001
 class	CDummyObject : public CObject {
 public:
 							CDummyObject(CAttributes *,CXform *);
@@ -117,7 +115,6 @@ public:
 // Class				:	CSurface
 // Description			:	This class encapsulates a 2D surface
 // Comments				:
-// Date last edited		:	3/11/2001
 class	CSurface : public CObject {
 public:
 							CSurface(CAttributes *a,CXform *x) : CObject(a,x) { }

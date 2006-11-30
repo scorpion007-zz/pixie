@@ -47,7 +47,6 @@
 // Description			:	Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
-// Date last edited		:	06/27/2006
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	// Create our data areas
 	memory				= new CMemStack;
@@ -70,7 +69,6 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const c
 // Description			:	Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
-// Date last edited		:	06/27/2006
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	int		i;
 
@@ -112,7 +110,6 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 CPointCloud::~CPointCloud() {
 	osDeleteMutex(mutex);
 
@@ -129,7 +126,6 @@ CPointCloud::~CPointCloud() {
 // Description			:	Reset the photonmap
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 void	CPointCloud::reset() {
 	osLock(mutex);
 	CMap<CPointCloudPoint>::reset();
@@ -142,7 +138,6 @@ void	CPointCloud::reset() {
 // Description			:	Write the photon map into a file
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 void	CPointCloud::write() {
 	// Flush the photonmap
 	FILE		*out		=	ropen(name,"wb",filePointCloud);
@@ -180,7 +175,6 @@ void	CPointCloud::write() {
 // Return Value			:
 // Comments				:	Nl	must be normalized
 //							Il	must be normalized
-// Date last edited		:	4/1/2002
 void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
 	int						numFound	=	0;
 	const int 				maxFound	=	16;
@@ -255,7 +249,6 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 // Description			:	Balance the map
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::balance() {
 	// If we have no points in the map, add a dummy one to avoid an if statement during the lookup
 	if (numPhotons == 0) {
@@ -282,7 +275,6 @@ void	CPointCloud::balance() {
 // Description			:	Store a photon
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP) {
 	vector				P,N;
 	CPointCloudPoint	*point;
@@ -312,7 +304,6 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 // Description			:	Gui interface
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
@@ -351,7 +342,6 @@ void	CPointCloud::draw() {
 // Description			:	Gui interface
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::bound(float *bmin,float *bmax) {
 	movvv(bmin,this->bmin);
 	movvv(bmax,this->bmax);

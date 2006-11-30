@@ -42,7 +42,6 @@
 // Class				:	CPhotonHider
 // Description			:	This class implements the photon hider
 // Comments				:
-// Date last edited		:	3/8/2003
 class	CPhotonHider : public CShadingContext {
 public:
 									CPhotonHider(int thread,CAttributes *);

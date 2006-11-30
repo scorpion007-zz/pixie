@@ -40,7 +40,6 @@
 // Class				:	CPatchGrid
 // Description			:	Implements a non-regular catmull-clark subdivision patch
 // Comments				:	Regular patches are implemented as bi-cubic patches
-// Date last edited		:	5/30/2003
 class	CPatchGrid : public CSurface {
 public:
 					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,float *);

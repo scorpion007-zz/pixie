@@ -48,7 +48,6 @@
 // Description			:	Receive data from network
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 void			CRenderer::initNetwork(char *ribFile,char *riNetString) {
 
 	// Clear some data
@@ -71,7 +70,6 @@ void			CRenderer::initNetwork(char *ribFile,char *riNetString) {
 // Description			:	Receive data from network
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 void			CRenderer::shutdownNetwork() {
 	if (netClient != INVALID_SOCKET) {
 
@@ -98,7 +96,6 @@ void			CRenderer::shutdownNetwork() {
 // Description			:	Send data on the network
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 void		rcSend(SOCKET s,char *data,int n,int toNetwork) {
 	int	i,j;
 
@@ -141,7 +138,6 @@ void		rcSend(SOCKET s,char *data,int n,int toNetwork) {
 // Description			:	Receive data from network
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 void		rcRecv(SOCKET s,char *data,int n,int toNetwork) {
 	int	i,j;
 	T32	*buf = (T32 *) data;
@@ -184,7 +180,6 @@ void		rcRecv(SOCKET s,char *data,int n,int toNetwork) {
 // Description			:	Lookup the name of a socket and return it's address
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	6/24/2002
 static	int		netName(sockaddr_in *address,char *name) {
 	int					port;
 	struct	hostent		*hp			=	NULL;
@@ -330,7 +325,6 @@ static	int		netName(sockaddr_in *address,char *name) {
 // Description			:	Send a file over the network to the server
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 	FILE	*in	=	fopen(fileToSend,"rb");
 
@@ -379,7 +373,6 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 // Description			:	Get a portion of a file
 // Return Value			:	The size received
 // Comments				:
-// Date last edited		:	7/4/2001
 int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	T32		*buffer;
 	int		i			=	strlen(inName);
@@ -438,7 +431,6 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 // Description			:	Receive a file over the network from the client
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 int			CRenderer::getFile(char *outName,const char *inName) {
 	FILE	*out;
 	int		result	=	FALSE;
@@ -474,7 +466,6 @@ int			CRenderer::getFile(char *outName,const char *inName) {
 // Description			:	Setup the network connections
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 	char		*tmp		=	riNetString;
 	sockaddr_in	me;

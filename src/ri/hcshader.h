@@ -38,7 +38,6 @@
 // Class				:	CQuadLight
 // Description			:	This is a quadratic area light source
 // Comments				:
-// Date last edited		:	11/2/2003
 class	CQuadLight : public CShaderInstance {
 public:
 								CQuadLight(CAttributes *,CXform *);
@@ -67,7 +66,6 @@ private:
 // Class				:	CSphereLight
 // Description			:	This is a spherical area light source
 // Comments				:
-// Date last edited		:	11/2/2003
 class	CSphereLight : public CShaderInstance {
 public:
 								CSphereLight(CAttributes *,CXform *);

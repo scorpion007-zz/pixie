@@ -48,7 +48,6 @@
 // Description			:	Get the data to create the primitive
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 #define	gatherData(__context,__u,__v,__nu,__nv,__uv,__vv,__un,__vertex,__parameters) {	\
 	int			__i,__j;																\
 	float		*__dest;																\
@@ -85,7 +84,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertex0) : CSurface(a,x) {
 
 	stats.gprimMemory	+=	sizeof(CBilinearPatch);
@@ -169,7 +167,6 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CBilinearPatch::~CBilinearPatch() {
 	const	int	vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
@@ -190,7 +187,6 @@ CBilinearPatch::~CBilinearPatch() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (! (cRay->flags & attributes->flags) )	return;
@@ -324,7 +320,6 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				i,j;
 	const float		*u						=	varying[VARIABLE_U]+start;
@@ -454,7 +449,6 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 
@@ -494,7 +488,6 @@ void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertexData,const float *uBasis,const float *vBasis) : CSurface(a,x) {
 	const unsigned int vertexSize	=	v->vertexSize;
 
@@ -540,7 +533,6 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CBicubicPatch::~CBicubicPatch() {
 	const int	vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
@@ -563,7 +555,6 @@ CBicubicPatch::~CBicubicPatch() {
 // Description			:	Compute the Bu*G*Bv' matrix as the matrix data so that we don't need to do this multiplication at runtime
 // Return Value			:	The new vertex data
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int disp,const float *uBasis,const float *vBasis) {
 	int					k,l;
 	const int			vertexSize	=	variables->vertexSize;
@@ -625,7 +616,6 @@ void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int					i,k;
 	const float			*u					=	varying[VARIABLE_U]+start;
@@ -733,7 +723,6 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 // Method				:	interpolate
 // Description			:	See object.h// Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 
@@ -770,7 +759,6 @@ void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,int uOrder,int vOrder,float *uKnots,float *vKnots,float *vertex0) : CSurface(a,x) {
 	int			j;
 	float		*uCoefficients,*vCoefficients;
@@ -832,7 +820,6 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CNURBSPatch::~CNURBSPatch() {
 	const int			vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
@@ -852,7 +839,6 @@ CNURBSPatch::~CNURBSPatch() {
 // Description			:	Precompute uBasis*G*vBasis'
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CNURBSPatch::precomputeVertexData(float *vertex,const float *uCoefficients,const float *vCoefficients,float *vertexData,int disp) {
 	const int	vertexSize	=	variables->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
@@ -898,7 +884,6 @@ void	CNURBSPatch::precomputeVertexData(float *vertex,const float *uCoefficients,
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int					i,k;
 	const float			*u					=	varying[VARIABLE_U]+start;
@@ -1182,7 +1167,6 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 
@@ -1215,7 +1199,6 @@ void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Compute the coefficients of a basis
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/22/2001
 void		CNURBSPatch::precompBasisCoefficients(float *coefficients,unsigned int order,unsigned int start,unsigned int interval,const float *knots) {
 	if (order == 1) {
 		if (start == interval)
@@ -1278,7 +1261,6 @@ void		CNURBSPatch::precompBasisCoefficients(float *coefficients,unsigned int ord
 // Description			:	CPatchMesh
 // Return Value			:	Ctor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int uw,int vw) : CObject(a,x) {
 	int			i;
 	const float	*P;
@@ -1396,7 +1378,6 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 // Description			:	~CPatchMesh
 // Return Value			:	Dtor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CPatchMesh::~CPatchMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CPatchMesh);
@@ -1410,7 +1391,6 @@ CPatchMesh::~CPatchMesh() {
 // Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
-// Date last edited		:	6/10/2003
 void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
@@ -1429,7 +1409,6 @@ void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 // Description			:	Intersect a ray with this pritimive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1441,7 +1420,6 @@ void	CPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CPatchMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1455,7 +1433,6 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 // Description			:	Create the children
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CPatchMesh::create(CShadingContext *context) {
 
 	osLock(CRenderer::hierarchyMutex);
@@ -1597,7 +1574,6 @@ void	CPatchMesh::create(CShadingContext *context) {
 // Description			:	CNURBSPatchMesh
 // Return Value			:	Ctor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,int uo,int vo,float *uk,float *vk) : CObject(a,x) {
 	int			i;
 	const float	*P;
@@ -1641,7 +1617,6 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 // Description			:	~CNURBSPatchMesh
 // Return Value			:	Dtor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CNURBSPatchMesh::~CNURBSPatchMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CNURBSPatchMesh) + (uVertices+uOrder)*sizeof(float) + (vVertices+vOrder)*sizeof(float);
@@ -1657,7 +1632,6 @@ CNURBSPatchMesh::~CNURBSPatchMesh() {
 // Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
-// Date last edited		:	6/10/2003
 void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
@@ -1674,7 +1648,6 @@ void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) 
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CNURBSPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1686,7 +1659,6 @@ void	CNURBSPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 
 	if (children == NULL)	create(rasterizer);
@@ -1699,7 +1671,6 @@ void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 // Description			:	split
 // Return Value			:	Split the mesh
 // Comments				:	-
-// Date last edited		:	6/10/2003
 void	CNURBSPatchMesh::create(CShadingContext *context) {
 
 	osLock(CRenderer::hierarchyMutex);

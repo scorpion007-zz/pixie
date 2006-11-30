@@ -38,7 +38,6 @@
 // Class				:	CVariable
 // Description			:	This class holds information about a variable
 // Comments				:	FIXME: Maximum length of a variable's name is 63 characters
-// Date last edited		:	8/2/2001
 class CVariable {
 public:
 	char				name[64];		// Name as it is referenced

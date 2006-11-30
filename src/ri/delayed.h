@@ -38,7 +38,6 @@
 // Class				:	CDelayedData
 // Description			:	This is a simple container used by the rib interface for procedural dynamic objects
 // Comments				:
-// Date last edited		:	8/10/2001
 class	CDelayedData {
 public:
 					CDelayedData() {
@@ -60,7 +59,6 @@ public:
 // Class				:	CDelayedObject
 // Description			:	Contains a delayed object
 // Comments				:
-// Date last edited		:	8/10/2001
 class	CDelayedObject : public CObject {
 public:
 							CDelayedObject(CAttributes *,CXform *,const float *,const float *,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *,int *drc=NULL);
@@ -86,7 +84,6 @@ public:
 // Class				:	CDelayedInstance
 // Description			:	Contains an instance object
 // Comments				:
-// Date last edited		:	8/10/2001
 class	CDelayedInstance : public CObject {
 public:
 							CDelayedInstance(CAttributes *,CXform *,CObject *);

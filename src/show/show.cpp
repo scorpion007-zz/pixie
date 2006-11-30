@@ -42,7 +42,6 @@
 // Description			:	Da main function for show
 // Return Value			:	1 on failure, 0 on success
 // Comments				:
-// Date last edited		:	9/22/2006
 int	main(int argc,char *argv[]) {
 
 	if (argc == 1) {

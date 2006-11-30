@@ -38,7 +38,6 @@
 // Class				:	COcclusionCuller
 // Description			:	The occlusion culler class
 // Comments				:
-// Date last edited		:	12/23/2003
 class	COcclusionCuller {
 public:
 
@@ -46,7 +45,6 @@ public:
 					// Class				:	COcclusionCuller
 					// Description			:	The occlusion culler class
 					// Comments				:
-					// Date last edited		:	12/23/2003
 					class COcclusionNode {
 					public:
 							COcclusionNode	*parent;		// The parent pointer

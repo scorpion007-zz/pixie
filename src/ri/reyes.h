@@ -66,7 +66,6 @@ const	unsigned int	RASTER_SHADE_BACKFACE	=	1 << 13;	// Shade the primitive even 
 // Description			:	This class is implementes a REYES like scan
 //							line renderer
 // Comments				:
-// Date last edited		:	4/25/2004
 class	CReyes : public CShadingContext {
 protected:
 
@@ -74,7 +73,6 @@ protected:
 	// Class				:	CRasterPatch
 	// Description			:	Holds an object
 	// Comments				:
-	// Date last edited		:	1/30/2002
 	class	CRasterObject {
 	public:
 			CObject				*object;				// The object
@@ -93,7 +91,6 @@ protected:
 	// Description			:	This class encapsulates a shading grid
 	//							line renderer
 	// Comments				:
-	// Date last edited		:	9/17/2004
 	class	CRasterGrid : public CRasterObject {
 	public:
 			EShadingDim			dim;					// Dimensionality (0,1 or 2)
@@ -111,7 +108,6 @@ protected:
 	// Class				:	CPqueue
 	// Description			:	Priority queue specifically written for CRasterObject
 	// Comments				:	I could have used the template in containers.h, but this one allows me to defer objects directly
-	// Date last edited		:	9/20/2004
 	class CPqueue  {
 	public:
 								CPqueue(int ss=100)	{
@@ -200,7 +196,6 @@ protected:
 	// Class				:	CBucket
 	// Description			:	Holds a bucket
 	// Comments				:
-	// Date last edited		:	1/30/2002
 	class	CBucket {
 	public:
 								CBucket();
@@ -277,7 +272,6 @@ private:
 				// Description			:	Project distances into the sample space
 				// Return Value			:
 				// Comments				:	(inline for speed)
-				// Date last edited		:	7/4/2001
 				inline void		distance2samples(int n,float *dist,float *P) {
 									if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										for (;n>0;n--,P+=3) {
@@ -296,7 +290,6 @@ private:
 				// Description			:	Project from camera space into the sample space
 				// Return Value			:
 				// Comments				:	(inline for speed)
-				// Date last edited		:	7/4/2001
 				inline void		camera2samples(int n,float *P) {
 									if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										for (;n>0;n--,P+=3) {
@@ -317,7 +310,6 @@ private:
 				// Description			:	Project from camera space into the sample space
 				// Return Value			:
 				// Comments				:	(inline for speed)
-				// Date last edited		:	7/4/2001
 				inline void		camera2samples(float *P) {
 									if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 										P[COMP_X]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];

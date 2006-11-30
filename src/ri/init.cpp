@@ -67,7 +67,6 @@
 // Description			:	Do color conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
 	switch(s) {
 	case COLOR_RGB:
@@ -184,7 +183,6 @@ void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
 // Description			:	Do color conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void		convertColorTo(float *out,const float *in,ECoordinateSystem s) {
 	switch(s) {
 	case COLOR_RGB:
@@ -290,7 +288,6 @@ void		convertColorTo(float *out,const float *in,ECoordinateSystem s) {
 // Description			:	Execute the current shader's init code
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) {
 // At this point, the shader sends us the arrays for parameters/constants/variables/uniforms for the shader
 	

@@ -247,7 +247,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Returns the number of codes that a particular type takes
 									// Return Value			:	Size in codes
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	int					numComponents(EVariableType type) {
 										switch(type) {
 										case TYPE_FLOAT:
@@ -295,7 +294,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a new variable/parameter
 									// Return Value			:	The default area if available
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	TCode				*newVariable(char *name,EVariableType type,int numItems,int parameter) {
 										const int	numComp			=	numComponents(type);
 
@@ -386,7 +384,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a reference to a string
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				addStringReference(char **items,int numItems) {
 										int	i;
 										
@@ -423,7 +420,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a reference to a float
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				addFloatReference(float *items,int numItems) {
 										int	i;
 										switch(currentData.passNumber) {
@@ -457,7 +453,6 @@ static	TSlFunction		functions[]	=	{
 										// Description			:	Add a reference to a variable/parameter
 										// Return Value			:	-
 										// Comments				:
-										// Date last edited		:	8/8/2001
 		static	void					addVariableReference(char *name) {
 											CVariable		*var;
 											TSlVariable		*cVariable;
@@ -525,7 +520,6 @@ static	TSlFunction		functions[]	=	{
 										// Description			:	Find/Set an opcode/function
 										// Return Value			:	-
 										// Comments				:
-										// Date last edited		:	8/8/2001
 		static	void					setOpcode() {
 											switch(currentData.passNumber) {
 											case 1:
@@ -660,7 +654,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Create a new label definition/reference
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				newLabel(char *name,int reference) {
 										switch(currentData.passNumber) {
 										case 1:
@@ -2784,7 +2777,6 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 void	slerror(char *s) {
 	warning(CODE_BADFILE,"Error in shader \"%s\" (%d) (\"%s\") (v%d.%d.%d)\n",currentData.name,slLineno,s,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 	currentData.numErrors++;
@@ -2796,7 +2788,6 @@ void	slerror(char *s) {
 // Description			:	Parse a shader
 // Return Value			:	Parsed shader if successful
 // Comments				:
-// Date last edited		:	8/8/2001
 CShader	*parseShader(const char *shaderName,const char *name) {
 	YY_BUFFER_STATE	oldState;
 
@@ -2853,7 +2844,6 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 // Description			:	Deallocate any previously allocated memory for the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2001
 void	reset() {
 	if (currentData.strings != NULL) {
 		int	i;
@@ -2949,7 +2939,6 @@ void	reset() {
 // Description			:	Allocate required space for the shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 void	alloc() {
 	TCode	*mem;
 
@@ -2998,7 +2987,6 @@ void	alloc() {
 // Description			:	Parse successful, allocate the shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 CShader	*shaderCreate(const char *shaderName) {
 	CShader	*cShader;
 
@@ -3107,7 +3095,6 @@ CShader	*shaderCreate(const char *shaderName) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void	processEscapes(char *str) {
 	int		i,n,j;
 

@@ -46,7 +46,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int N,float uOrg,float vOrg,float uMult,float vMult,float *vertex) : CSurface(a,x) {
 	const int	K		=	2*N+8;
 
@@ -90,7 +89,6 @@ CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 CSubdivision::~CSubdivision() {
 	const int	K	=	2*N+8;
 
@@ -114,7 +112,6 @@ CSubdivision::~CSubdivision() {
 // Description			:	Project a set of vertices into the eigen space of the patch
 // Return Value			:	The projected points
 // Comments				:
-// Date last edited		:	10/12/2002
 void	CSubdivision::projectVertices(float *fvertex,float *vertexData,int disp) {
 	int			i;
 	double		*cVertex;
@@ -164,7 +161,6 @@ void	CSubdivision::projectVertices(float *fvertex,float *vertexData,int disp) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int					i,j,k,t;
 	const float			*u						=	varying[VARIABLE_U]+start;
@@ -344,7 +340,6 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 void		CSubdivision::interpolate(int numVertices,float **varying) const {
 	// Correct the parametric range of the primitive
 	// do it first so we interpolate varyings on larger patch

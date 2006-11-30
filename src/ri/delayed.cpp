@@ -42,7 +42,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *data,int *drc) : CObject(a,x) {
 	stats.numDelayeds++;
 
@@ -77,7 +76,6 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 CDelayedObject::~CDelayedObject() {
 	stats.numDelayeds--;
 
@@ -95,7 +93,6 @@ CDelayedObject::~CDelayedObject() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 		
 	// Process the object
@@ -117,7 +114,6 @@ void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 void	CDelayedObject::dice(CShadingContext *r) {
 	
 	// Process the object
@@ -140,7 +136,6 @@ void	CDelayedObject::dice(CShadingContext *r) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform			*nx					=	new CXform(x);
 
@@ -168,7 +163,6 @@ void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) c
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObject(a,x) {
 	stats.numDelayeds++;
 
@@ -194,7 +188,6 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObje
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 CDelayedInstance::~CDelayedInstance() {
 	stats.numDelayeds--;
 }
@@ -206,7 +199,6 @@ CDelayedInstance::~CDelayedInstance() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 	
 	// Process the instance
@@ -227,7 +219,6 @@ void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 void	CDelayedInstance::dice(CShadingContext *r) {
 	
 	// Process the instance
@@ -250,7 +241,6 @@ void	CDelayedInstance::dice(CShadingContext *r) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/10/2001
 void	CDelayedInstance::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform			*nx					=	new CXform(x);
 

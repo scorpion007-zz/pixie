@@ -39,7 +39,6 @@
 // Class				:	CDisplay
 // Description			:	Holds image data to be passed to the window thread
 // Comments				:
-// Date last edited		:	2/28/2002
 class	CDisplay {
 public:
 					CDisplay(const char *,const char *,int,int,int);

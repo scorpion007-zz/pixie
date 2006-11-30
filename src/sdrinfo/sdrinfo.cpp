@@ -41,7 +41,6 @@
 // Description			:	The god
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 int main(int argc, char* argv[]) {
 	char	tmp[1024];
 

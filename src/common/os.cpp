@@ -109,7 +109,6 @@ static	time_t	osStartTimeMsec;
 // Description			:	Initialize the operating system
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/12/2006
 void	osInit() {
 	timeb	ti;
 
@@ -124,7 +123,6 @@ void	osInit() {
 // Description			:	Shutdown the operating system
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/12/2006
 void	osShutdown() {
 }
 
@@ -134,7 +132,6 @@ void	osShutdown() {
 // Description			:	Load / attach a dll/so file
 // Return Value			:	The module handle
 // Comments				:
-// Date last edited		:	11/28/2001
 void	*osLoadModule(const char *name) {
 	void	*cModule	=	NULL;
 
@@ -165,7 +162,6 @@ void	*osLoadModule(const char *name) {
 // Description			:	Get the latest error
 // Return Value			:	The error string
 // Comments				:
-// Date last edited		:	11/28/2001
 const char *osModuleError() {
 #ifdef WIN32
 	return NULL;
@@ -179,7 +175,6 @@ const char *osModuleError() {
 // Description			:	Unload / detach a dll/so file
 // Return Value			:	The module handle
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osUnloadModule(void *cModule) {
 #ifdef WIN32
 	if (cModule != NULL) FreeLibrary((HMODULE) cModule);
@@ -194,7 +189,6 @@ void	osUnloadModule(void *cModule) {
 // Description			:	Resolve a symbol in a dll/so file
 // Return Value			:	The module handle
 // Comments				:
-// Date last edited		:	11/28/2001
 void	*osResolve(void *cModule,const char *name) {
 	void	*result	=	NULL;
 
@@ -224,7 +218,6 @@ void	*osResolve(void *cModule,const char *name) {
 // Description			:	Get an environment variable
 // Return Value			:	The variable value if found
 // Comments				:
-// Date last edited		:	11/28/2001
 char			*osEnvironment(const char *name) {	
 	return getenv(name);
 }
@@ -234,7 +227,6 @@ char			*osEnvironment(const char *name) {
 // Description			:	Check if a file exists
 // Return Value			:	TRUE if it does
 // Comments				:
-// Date last edited		:	11/28/2001
 int		osFileExists(const char *name) {
 #ifdef WIN32
 	if (_access(name,0) == 0) return TRUE;
@@ -251,7 +243,6 @@ int		osFileExists(const char *name) {
 // Description			:	Make sure the slashes are right
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osFixSlashes(char *st) {
 	for (;*st!='\0';st++) {
 		if ((*st == '\\') || (*st == '/')) *st	=	OS_DIR_SEPERATOR;
@@ -264,7 +255,6 @@ void	osFixSlashes(char *st) {
 // Description			:	Create a temporary file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osTempname(const char *directory,const char *prefix,char *result) {
 	#ifdef WIN32
 		// avoid some windows shortcomings by extending count when we
@@ -289,7 +279,6 @@ void	osTempname(const char *directory,const char *prefix,char *result) {
 // Description			:	Wrapper for fopen
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			*osOpen(const char *name,const char *mode) {
 	return fopen(name,mode);
 }
@@ -299,7 +288,6 @@ void			*osOpen(const char *name,const char *mode) {
 // Description			:	Wrapper for fclose
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			osClose(void *handle) {
 	fclose((FILE *)handle);
 }
@@ -309,7 +297,6 @@ void			osClose(void *handle) {
 // Description			:	Wrapper for fwrite
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			osWrite(void *handle,void *data,int bytes) {
 	fwrite(data,1,bytes,(FILE *) handle);
 }
@@ -319,7 +306,6 @@ void			osWrite(void *handle,void *data,int bytes) {
 // Description			:	Wrapper for fwrite
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			osWriteInt(void *handle,int *data,int number) {
 	fwrite(data,sizeof(int),1,(FILE *) handle);
 }
@@ -329,7 +315,6 @@ void			osWriteInt(void *handle,int *data,int number) {
 // Description			:	Wrapper for fwrite
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			osWriteFloat(void *handle,float *data,int number) {
 	fwrite(data,sizeof(float),1,(FILE *) handle);
 }
@@ -339,7 +324,6 @@ void			osWriteFloat(void *handle,float *data,int number) {
 // Description			:	Wrapper for fwrite
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			osWriteString(void *handle,const char *data) {
 	int	i	=	strlen(data);
 
@@ -352,7 +336,6 @@ void			osWriteString(void *handle,const char *data) {
 // Description			:	Wrapper for fread
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void			osRead(void *handle,void *data,int bytes) {
 	fread(data,1,bytes,(FILE *) handle);
 }
@@ -362,7 +345,6 @@ void			osRead(void *handle,void *data,int bytes) {
 // Description			:	Wrapper for fread
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 int				osReadInt(void *handle,int *data,int number) {
 	if (data == NULL) {
 		int	i;
@@ -379,7 +361,6 @@ int				osReadInt(void *handle,int *data,int number) {
 // Description			:	Wrapper for fread
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 float			osReadFloat(void *handle,float *data,int number) {
 	if (data == NULL) {
 		float	i;
@@ -396,7 +377,6 @@ float			osReadFloat(void *handle,float *data,int number) {
 // Description			:	Wrapper for fread
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 char			*osReadString(void *handle,char **data) {
 	int	length	=	osReadInt(handle);
 
@@ -416,7 +396,6 @@ char			*osReadString(void *handle,char **data) {
 // Description			:	Create a directory
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osCreateDir(const char *n) {
 #ifdef WIN32
 		_mkdir(n);
@@ -430,7 +409,6 @@ void	osCreateDir(const char *n) {
 // Description			:	Remove a directory
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osDeleteDir(const char *n)	{
 #ifdef WIN32
 	_rmdir(n);	
@@ -444,7 +422,6 @@ void	osDeleteDir(const char *n)	{
 // Description			:	Delete a file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osDeleteFile(const char *n)	{
 #ifdef WIN32
 	_unlink(n);	
@@ -459,7 +436,6 @@ void	osDeleteFile(const char *n)	{
 // Description			:	Enumerate the files matching a criteria
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *userData) {
 #ifdef WIN32
 	_finddata_t	c_file;
@@ -510,7 +486,6 @@ void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *use
 // Description			:	Get the time
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 float	osTime() {
 	timeb	ti;
 
@@ -524,7 +499,6 @@ float	osTime() {
 // Description			:	Get the time
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 float	osCPUTime() {
 	return	clock() / (float) CLOCKS_PER_SEC;
 }
@@ -534,7 +508,6 @@ float	osCPUTime() {
 // Description			:	Start a thread
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 TThread	osCreateThread(TFun entry,void *d) {
 	TThread	cThread;
 
@@ -563,7 +536,6 @@ TThread	osCreateThread(TFun entry,void *d) {
 // Description			:	Wait for the termination of a thread
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 int		osWaitThread(TThread	thread) {
 #ifdef WIN32
 	WaitForSingleObject(thread,INFINITE);
@@ -579,7 +551,6 @@ int		osWaitThread(TThread	thread) {
 // Description			:	Create a mutex
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osCreateMutex(TMutex &mutex) {
 #ifdef WIN32
 	InitializeCriticalSection(&mutex);
@@ -593,7 +564,6 @@ void	osCreateMutex(TMutex &mutex) {
 // Description			:	Delete a mutex
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osDeleteMutex(TMutex &mutex) {
 #ifdef WIN32
 	DeleteCriticalSection(&mutex);
@@ -607,7 +577,6 @@ void	osDeleteMutex(TMutex &mutex) {
 // Description			:	Create a semaphere
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osCreateSemaphore(TSemaphore &sem,int count) {
 #ifdef WIN32
 	sem	=	CreateSemaphore(NULL,0,count,NULL);
@@ -621,7 +590,6 @@ void	osCreateSemaphore(TSemaphore &sem,int count) {
 // Description			:	Delete a mutex
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	osDeleteSemaphore(TSemaphore &sem) {
 #ifdef WIN32
 	CloseHandle(sem);

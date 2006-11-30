@@ -38,7 +38,6 @@
 // Class				:	CPatch
 // Description			:	Encapsulates a piece of 2D surface
 // Comments				:
-// Date last edited		:	6/4/2003
 class	CPatch : public CObject {
 public:
 							CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth);
@@ -66,7 +65,6 @@ private:
 // Class				:	CTesselationPatch
 // Description			:	Encapsulates a piece of 2D surface
 // Comments				:
-// Date last edited		:	11/13/2006
 class	CTesselationPatch : public CObject {
 
 	struct CSubTesselation {

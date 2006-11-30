@@ -40,7 +40,6 @@
 // Class				:	CSubdivision
 // Description			:	Implements a non-regular catmull-clark subdivision patch
 // Comments				:	Regular patches are implemented as bi-cubic patches
-// Date last edited		:	10/12/2002
 class	CSubdivision : public CSurface {
 public:
 					CSubdivision(CAttributes *,CXform *,CVertexData *,CParameter *,int,float,float,float,float,float *);

@@ -58,7 +58,6 @@ int			CBrickMap::detailLevel		=	2;				// The detail level
 // Description			:	Compute the volume of the intersection of the cube centered at P with side dP, with the cube centered at x,y,z with side d
 // Return Value			:	the volume of the intersection
 // Comments				:
-// Date last edited		:	7/16/2006
 static	inline	float	intersect(const float *P,float dP,float x,float y,float z,float d) {
 	float	tmin1,tmin2,tmax1,tmax2,tmin,tmax;
 	float	w;
@@ -112,7 +111,6 @@ static	inline	float	intersect(const float *P,float dP,float x,float y,float z,fl
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to) : CTexture3d(name,from,to) {
 	int		offset,i;
 
@@ -173,7 +171,6 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Use this contructor to compute from sctratch
-// Date last edited		:	7/15/2006
 CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,CTexture3dChannel *ch,int nc) : CTexture3d(name,from,to,nc,ch) {
 	int	i;
 	
@@ -211,7 +208,6 @@ CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const fl
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::~CBrickMap() {
 	int			i;
 	CBrickNode	*cNode;
@@ -350,7 +346,6 @@ CBrickMap::~CBrickMap() {
 // Description			:	Add a point into the structure
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP) {
 	dP	*=	dPscale;
 
@@ -437,7 +432,6 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 // Description			:	Lookup data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	dP	*=	dPscale;
 
@@ -474,7 +468,6 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 // Description			:	Lookup a particular depth
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int depth) {
 	CBrick	*cBrick;
 	float	totalWeight	=	0;
@@ -528,7 +521,6 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 // Description			:	Finalize the creation of the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::finalize() {
 	int			*stack		=	(int *) alloca(maxDepth*8*5*sizeof(int));
 	int			*stackBase	=	stack;
@@ -649,7 +641,6 @@ void				CBrickMap::finalize() {
 // Description			:	Create a new brick
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 	CBrick	*cBrick;
 
@@ -689,7 +680,6 @@ CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 // Description			:	Load a brick
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {	
 	CBrick	*cBrick	=	newBrick(FALSE);
 	CVoxel	*cVoxel,*tVoxel;
@@ -775,7 +765,6 @@ CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {
 // Description			:	This function is called to re-claim some of the memory from the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	int			numNodes;
 	CBrickNode	*cNode;
@@ -1006,7 +995,6 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 // Description			:	Draw the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2006
 void				CBrickMap::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
@@ -1137,7 +1125,6 @@ void				CBrickMap::draw() {
 // Description			:	Quick sort the bricks wrt. to the referenceNumbers
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 int			CBrickMap::keyDown(int key) {
 	if ((key == 'M') || (key == 'm')) {
 		detailLevel++;
@@ -1158,7 +1145,6 @@ int			CBrickMap::keyDown(int key) {
 // Description			:	Bound the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2006
 void				CBrickMap::bound(float *bmin,float *bmax) {
 	movvv(bmin,this->bmin);
 	movvv(bmax,this->bmax);
@@ -1171,7 +1157,6 @@ void				CBrickMap::bound(float *bmin,float *bmax) {
 // Description			:	Initialize the brickmaps at the beginning of a frame
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::brickMapInit(int m) {
 	// This function is guaranteed to be called once and only once for each frame
 	brickMaps		=	NULL;
@@ -1189,7 +1174,6 @@ void				CBrickMap::brickMapInit(int m) {
 // Description			:	This function is called to re-claim some of the memory from the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::brickMapFlush(int allBricks) {
 	int			numNodes;
 	CBrickNode	**nodes;
@@ -1319,7 +1303,6 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 // Description			:	Clear the memory used by the brickmaps
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::brickMapShutdown() {
 	// This function is guaranteed to be called once and only once for each frame
 	assert(currentMemory == 0);
@@ -1332,7 +1315,6 @@ void				CBrickMap::brickMapShutdown() {
 // Description			:	Quick sort the bricks wrt. to the referenceNumbers
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 	int			i,last;
 	CBrickNode	*cNode;
@@ -1385,7 +1367,6 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 // Description			:	This function creates the 3D baed texture from point cloud representation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/16/2006
 void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
 	char	tempName[OS_MAX_PATH_LENGTH];
 	char	fileName[OS_MAX_PATH_LENGTH];

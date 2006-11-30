@@ -41,7 +41,6 @@
 // Class				:	CTexture3dChannel
 // Description			:	A point cloud channel
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CTexture3dChannel {
 public:
 	char					name[64];		// Name of the channel
@@ -54,7 +53,6 @@ public:
 // Class				:	CTexture3d
 // Description			:	Base class for 3d textures
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CTexture3d : public CFileResource, public CView {
 public:
 							CTexture3d(const char *,const float *from,const float *to,int numChannels=0,CTexture3dChannel *channels=NULL);

@@ -120,7 +120,6 @@ class	CTextureBlock;
 // Class				:	CRenderer
 // Description			:	This class holds data about the current frame being rendered
 // Comments				:	This class is invalid outside beginFrame / endFrame
-// Date last edited		:	10/10/2006
 class CRenderer {
 public:
 
@@ -222,7 +221,6 @@ public:
 		// Class				:	CJob
 		// Description			:	This class keeps track of a job to perform
 		// Comments				:
-		// Date last edited		:	02/25/2006
 		class	CJob {
 		public:
 			enum {	BUCKET,					// Render a bucket
@@ -453,7 +451,6 @@ public:
 		// Class				:	CDisplayData
 		// Description			:	This class holds data about a display driver
 		// Comments				:
-		// Date last edited		:	7/4/2001
 		class CDisplayData {
 		public:
 				void						*module;						// The module handle for the out device
@@ -497,7 +494,6 @@ void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
-// Date last edited		:	7/4/2001
 inline void		camera2pixels(float *P) {
 	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		P[COMP_X]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
@@ -513,7 +509,6 @@ inline void		camera2pixels(float *P) {
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
-// Date last edited		:	7/4/2001
 inline void		camera2pixels(float *x,float *y,const float *P) {
 	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		x[0]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
@@ -532,7 +527,6 @@ inline void		camera2pixels(float *x,float *y,const float *P) {
 // Description			:	Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
-// Date last edited		:	7/4/2001
 inline void		camera2pixels(int n,float *P) {
 	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
@@ -552,7 +546,6 @@ inline void		camera2pixels(int n,float *P) {
 // Description			:	Project from camera space into the screen space
 // Return Value			:
 // Comments				:	(inline for speed)
-// Date last edited		:	7/4/2001
 inline void		camera2screen(int n,float *P) {
 	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
@@ -572,7 +565,6 @@ inline void		camera2screen(int n,float *P) {
 // Description			:	Project a distance in camera space into a distance in the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
-// Date last edited		:	7/4/2001
 inline void		distance2pixels(int n,float *dist,float *P) {
 	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		for (;n>0;n--,P+=3) {
@@ -590,7 +582,6 @@ inline void		distance2pixels(int n,float *dist,float *P) {
 // Description			:	Convert from pixel distance to camera space distance
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/4/2001
 inline void			pixels2distance(float &a,float &b,float d) {
 	a	=	CRenderer::lengthA*d;
 	b	=	CRenderer::lengthB*d;
@@ -601,7 +592,6 @@ inline void			pixels2distance(float &a,float &b,float d) {
 // Description			:	Back project from sample space into the camera space
 // Return Value			:
 // Comments				:	(inline for speed)
-// Date last edited		:	7/4/2001
 inline void		pixels2camera(float *P,float x,float y,float z) {
 	x	=	x*CRenderer::dxdPixel + CRenderer::pixelLeft;
 	y	=	y*CRenderer::dydPixel + CRenderer::pixelTop;
@@ -630,7 +620,6 @@ inline void		pixels2camera(float *P,float x,float y,float z) {
 // Class				:	CNamedCoordinateSystem
 // Description			:	Holds a coordinate system
 // Comments				:
-// Date last edited		:	10/13/2001
 class  CNamedCoordinateSystem {
 public:
 	char				name[64];		// Name of the coordinate system
@@ -643,7 +632,6 @@ public:
 // Class				:	CDSO
 // Description			:	Holds a DSO shader info
 // Comments				:
-// Date last edited		:	8/05/2002
 class	CDSO {
 public:
 	void				*handle;		// The handle to the module that implements the DSO shader
@@ -659,7 +647,6 @@ public:
 // Class				:	CGlobalIdentifier
 // Description			:	Holds a global identifier
 // Comments				:
-// Date last edited		:	10/13/2001
 class  CGlobalIdentifier {
 public:
 	char				name[64];		// Name of the identifier
@@ -672,7 +659,6 @@ public:
 // Comments				:	if variable is NULL and entry is -1 this is
 //						:	one of the standard rgbaz channels
 //						:	sampleStart is filled at render time
-// Date last edited		:	03/08/2006
 class  CDisplayChannel {
 public:
 	CDisplayChannel();
@@ -692,7 +678,6 @@ public:
 // Class				:	CNetFileMapping
 // Description			:	Maps files to alternate paths
 // Comments				:
-// Date last edited		:	02/25/2006
 class CNetFileMapping{
 public:
 

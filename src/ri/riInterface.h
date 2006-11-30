@@ -38,7 +38,6 @@
 // Class				:	CRiInterface
 // Description			:	This is the virtual class that implements the RenderMan interface
 // Comments				:
-// Date last edited		:	6/1/2004
 class	CRiInterface {
 public:
 						CRiInterface();

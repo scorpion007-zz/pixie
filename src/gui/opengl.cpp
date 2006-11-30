@@ -52,7 +52,6 @@
 // Description			:	Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -69,7 +68,6 @@ void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
 // Description			:	Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglTriangles(int n,const float *P,const float *C) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -86,7 +84,6 @@ void		pglTriangles(int n,const float *P,const float *C) {
 // Description			:	Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglLines(int n,const float *P,const float *C) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -103,7 +100,6 @@ void		pglLines(int n,const float *P,const float *C) {
 // Description			:	Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglPoints(int n,const float *P,const float *C) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -121,7 +117,6 @@ void		pglPoints(int n,const float *P,const float *C) {
 // Description			:	Draw disks with OpenGL
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *C) {
 	
 	for (;n>0;n--,P+=3,dP++,N+=3,C+=3) {
@@ -154,7 +149,6 @@ void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *
 // Description			:	Read the primitives from a file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 void		pglFile(const char *fileName) {
 	FILE	*file	=	fopen(fileName,"rb");
 	vector	bmin,bmax;

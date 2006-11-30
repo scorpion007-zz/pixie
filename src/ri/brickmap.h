@@ -56,7 +56,6 @@ class CBrickMapView;
 // Class				:	CBrickMap
 // Description			:	Implements a 3D texture
 // Comments				:
-// Date last edited		:	7/15/2006
 class	CBrickMap : public CTexture3d {
 
 
@@ -64,7 +63,6 @@ class	CBrickMap : public CTexture3d {
 	// Class				:	CVoxel
 	// Description			:	Holds a voxel data
 	// Comments				:	The data is implicitly stored after the voxel in memory
-	// Date last edited		:	7/15/2006
 	class CVoxel {
 	public:
 		float			weight;				// The weight of the voxel
@@ -77,7 +75,6 @@ class	CBrickMap : public CTexture3d {
 	// Class				:	CBrick
 	// Description			:	Holds a brick
 	// Comments				:
-	// Date last edited		:	7/15/2006
 	class CBrick {
 	public:
 		CVoxel			*voxels;			// The brick data
@@ -90,7 +87,6 @@ class	CBrickMap : public CTexture3d {
 	// Class				:	CBrickNode
 	// Description			:	Holds a hash bucket entry for a bucket
 	// Comments				:	FIXME: We should make this structure 16 bytes (it is currently 20 bytes)
-	// Date last edited		:	7/15/2006
 	class CBrickNode {
 	public:
 		CBrick			*brick;				// The brick (NULL if on disk)
@@ -111,7 +107,6 @@ public:
 								// Description			:	Locate a brick given it's spatial index
 								// Return Value			:	The brick if found
 								// Comments				:
-								// Date last edited		:	7/15/2006
 			inline	CBrick		*findBrick(int x,int y,int z,int d,int forceCreate,CBrickNode **n) {
 									int			key		=	(x + y + z + d) & (BRICK_HASHSIZE-1);	// FIXME: this is a horrible key
 									CBrickNode	*cNode	=	activeBricks[key];

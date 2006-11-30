@@ -120,7 +120,6 @@ const int v_init[8][SOBOL_MAX_DIMENSION] = {
 // Description			:	Sample vectors distributed uniformly in a hemisphere
 // Return Value			:
 // Comments				:	Z must be unit
-// Date last edited		:	9/17/2002
 void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator) {
 	float	P[4];
 	vector	Po;
@@ -159,7 +158,6 @@ void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &gener
 // Description			:	Sample vectors distributed uniformly in a hemisphere
 // Return Value			:
 // Comments				:	Z must be unit
-// Date last edited		:	9/17/2002
 void		sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator) {
 	float			P[4];
 	vector			Po;
@@ -199,7 +197,6 @@ void		sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4>
 // Description			:	Sample a point in a unit sphere
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/17/2002
 void	sampleSphere(float *P,CSobol<3> &generator) {
 	float	r[3];
 

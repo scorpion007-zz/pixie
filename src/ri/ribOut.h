@@ -45,14 +45,12 @@ class	CVariable;
 // Class				:	CRibOut
 // Description			:	This class implements a RIB file output
 // Comments				:
-// Date last edited		:	6/1/2004
 class	CRibOut : public CRiInterface {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRibAttributes
 	// Description			:	The attributes holder for the RIB file output
 	// Comments				:
-	// Date last edited		:	6/1/2004
 	class	CRibAttributes {
 	public:
 							CRibAttributes();
@@ -221,7 +219,6 @@ private:
 											// Description			:	Write a variable argument list
 											// Return Value			:	-
 											// Comments				:
-											// Date last edited		:	6/8/2006
 	void									vout(const char *mes,va_list args) {
 												const int	l	=	vsprintf(scratch,mes,args);
 
@@ -235,7 +232,6 @@ private:
 											// Description			:	Write an argument list
 											// Return Value			:	-
 											// Comments				:
-											// Date last edited		:	6/8/2006
 	void									out(const char *mes,...) {
 												va_list	args;
 

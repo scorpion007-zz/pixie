@@ -43,7 +43,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	01/23/2006
 CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,float uOrg,float vOrg,float uMult,float vMult,float *ve) : CSurface(a,x) {
 	stats.numGprims++;
 	stats.gprimMemory	+=	sizeof(CBSplinePatchGrid);
@@ -153,7 +152,6 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	01/23/2006
 CBSplinePatchGrid::~CBSplinePatchGrid() {
 	delete [] vertex;	stats.gprimMemory	-=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize)*(uVertices-3)*(vVertices-3)*sizeof(float)*16;
 
@@ -173,7 +171,6 @@ CBSplinePatchGrid::~CBSplinePatchGrid() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	01/23/2006
 void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int					i,j,k;
 	const float			*u						=	varying[VARIABLE_U]+start;
@@ -297,7 +294,6 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	01/23/2006
 void		CBSplinePatchGrid::interpolate(int numVertices,float **varying) const {
 	// perform u,v rescale first to interpolate from larger patch
 	if ((uMult != 1) || (vMult != 1)) {

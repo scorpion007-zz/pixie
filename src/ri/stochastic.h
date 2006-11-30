@@ -40,7 +40,6 @@
 // Class				:	CStochastic
 // Description			:	This is the stochastic hider (a scanline renderer)
 // Comments				:
-// Date last edited		:	7/31/2002
 class	CStochastic : public CReyes, public COcclusionCuller {
 public:
 				CStochastic(int thread);
@@ -56,7 +55,6 @@ private:
 	// Class				:	CFragment
 	// Description			:	This class holds a sample
 	// Comments				:
-	// Date last edited		:	8/29/2004
 	class	CFragment {
 	public:
 		vector			color;					// Color of the sample
@@ -70,7 +68,6 @@ private:
 	// Class				:	CPixel
 	// Description			:	This class holds a pixel
 	// Comments				:
-	// Date last edited		:	8/29/2004
 	class	CPixel {
 	public:
 		float			jx,jy;					// The sampling jitter

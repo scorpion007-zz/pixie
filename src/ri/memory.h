@@ -38,7 +38,6 @@
 // Class				:	CMemPage
 // Description			:	This class coltains memory that's allocated on the fly
 // Comments				:
-// Date last edited		:	8/2/2001
 class CMemPage {
 public:
 		char			*memory;					// Points to the current free memory

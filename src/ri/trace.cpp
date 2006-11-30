@@ -79,7 +79,6 @@
 //							3. t
 //							4. tmin
 //							5. flags
-// Date last edited		:	8/30/2002
 void	CShadingContext::trace(CRayBundle *bundle) {
 	int								i;
 	const	COptions::CClipPlane	*cPlane;
@@ -270,7 +269,6 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 // Description			:	Trace/Shade bunch of rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/30/2002
 void	CShadingContext::traceEx(CRayBundle *bundle) {
 	if (currentRayDepth < CRenderer::maxRayDepth) {
 		CShadingState	*savedState		=	currentShadingState;
@@ -321,7 +319,6 @@ public:
 //							3. t
 //							4. tmin
 //							5. flags
-// Date last edited		:	8/30/2002
 void	CShadingContext::trace(CRay *ray) {
 
 	

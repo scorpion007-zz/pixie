@@ -49,7 +49,6 @@ const	unsigned	int	magicNumber	=	123456789;
 // Class				:	CFileResource
 // Description			:	Any class that is read or written to a file must derive from this class
 // Comments				:
-// Date last edited		:	7/4/2001
 class	CFileResource {
 public:
 					CFileResource(const char *);

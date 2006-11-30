@@ -68,7 +68,6 @@ const	float				ATTRIBUTES_MIN_SHADINGRATE					=	C_EPSILON;
 // Class				:	CActiveLight
 // Description			:	Holds an active light source instance
 // Comments				:
-// Date last edited		:	2/9/2003
 class	CActiveLight {
 public:
 	CProgrammableShaderInstance		*light;
@@ -93,7 +92,6 @@ typedef enum {
 //							attributes share a common clone to avoid unnecessary
 //							memory allocation.
 // Comments				:
-// Date last edited		:	2/9/2003
 class CAttributes {
 public: 
 							CAttributes();

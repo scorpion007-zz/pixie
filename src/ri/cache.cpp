@@ -39,7 +39,6 @@
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	4/1/2002
 CCache::CCache(const char *name,unsigned int f) : CFileResource(name) {
 	flags	=	f;
 }
@@ -50,7 +49,6 @@ CCache::CCache(const char *name,unsigned int f) : CFileResource(name) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	4/1/2002
 CCache::~CCache() {
 }
 

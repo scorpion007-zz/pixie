@@ -48,7 +48,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderLookup::CShaderLookup() {
 }
 
@@ -59,7 +58,6 @@ CShaderLookup::CShaderLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderLookup::~CShaderLookup() {
 }
 
@@ -69,7 +67,6 @@ CShaderLookup::~CShaderLookup() {
 // Description			:	Lookup filter values at discrete intelvals
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void	CFilterLookup::compute() {
 	int		i;
 	float	val;
@@ -90,7 +87,6 @@ void	CFilterLookup::compute() {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CShaderVectorVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
@@ -108,7 +104,6 @@ void	CShaderVectorVariable::record(TCode *dest,int nr,CGatherRay **r,float **var
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CShaderFloatVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
@@ -127,7 +122,6 @@ void	CShaderFloatVariable::record(TCode *dest,int nr,CGatherRay **r,float **vary
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CRayOriginVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
@@ -145,7 +139,6 @@ void	CRayOriginVariable::record(TCode *dest,int nr,CGatherRay **r,float **varyin
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CRayDirVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
@@ -163,7 +156,6 @@ void	CRayDirVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) 
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CRayLengthVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
@@ -181,7 +173,6 @@ void	CRayLengthVariable::record(TCode *dest,int nr,CGatherRay **r,float **varyin
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherLookup::CGatherLookup() {
 	outputs				=	NULL;
 	numOutputs			=	0;
@@ -195,7 +186,6 @@ CGatherLookup::CGatherLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherLookup::~CGatherLookup() {
 	CGatherVariable	*cVar;
 
@@ -217,7 +207,6 @@ CGatherLookup::~CGatherLookup() {
 // Description			:	Adds an output
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherLookup::addOutput(const char *output,int destIndex) {
 	CGatherVariable	*nVar	=	NULL;
 
@@ -284,7 +273,6 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CGlobalIllumLookup::CGlobalIllumLookup() {
 }
 
@@ -294,7 +282,6 @@ CGlobalIllumLookup::CGlobalIllumLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CGlobalIllumLookup::~CGlobalIllumLookup() {
 	if (cache != NULL) cache->finalize(this);
 }
@@ -305,7 +292,6 @@ CGlobalIllumLookup::~CGlobalIllumLookup() {
 // Description			:	Constructor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShader::CShader(const char *name) : CFileResource(name) {
 	stats.numShaders++;
 
@@ -325,7 +311,6 @@ CShader::CShader(const char *name) : CFileResource(name) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShader::~CShader() {
 	int			i;
 	CVariable	*cParameter;
@@ -358,7 +343,6 @@ CShader::~CShader() {
 // Description			:	This function must make sure the shader can never execute again
 // Return Value			:
 // Comments				:	
-// Date last edited		:	3/10/2001
 void	CShader::nullify() {
 	codeEntryPoint	=	-1;
 	initEntryPoint	=	-1;
@@ -372,7 +356,6 @@ void	CShader::nullify() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 	stats.numShaderInstances++;
 
@@ -390,7 +373,6 @@ CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderInstance::~CShaderInstance() {
 	stats.numShaderInstances--;
 
@@ -408,7 +390,6 @@ CShaderInstance::~CShaderInstance() {
 // Description			:	This function implements "strsep" which is non portable
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/1/2005
 static char	*token(char **str,char *tok) {
 	char	*cStr	=	*str;
 	char	*oStr	=	cStr;
@@ -449,7 +430,6 @@ static char	*token(char **str,char *tok) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void CShaderInstance::createCategories() {
 	char	*categoryString,*cCat,*tmp;
 	int		i,numCategories;
@@ -492,7 +472,6 @@ void CShaderInstance::createCategories() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	int			i;
 	CVariable	*cVariable;
@@ -532,7 +511,6 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 	CVariable			*cParameter;
 	CAllocatedString	*cString;
@@ -578,7 +556,6 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 // Description			:	Set the values of the parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 	CVariable	*cParameter;
 
@@ -709,7 +686,6 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 // Description			:	Set the values of the parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals) {
 	int	i;
 
@@ -740,7 +716,6 @@ void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals
 //							and char ** if the type of the parameter is string.
 //							iff var or globalIndex is NULL, we skip any parameters
 //							which are mutable
-// Date last edited		:	3/10/2001
 int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVariable **var,int *globalIndex) {
 	int							j,storage,globalNumber = 0;
 	float						*destFloat;
@@ -832,7 +807,6 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 // Description			:	Actually execute the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void			CProgrammableShaderInstance::execute(CShadingContext *context,float **locals) {
 	context->execute(this,locals);
 }
@@ -843,7 +817,6 @@ void			CProgrammableShaderInstance::execute(CShadingContext *context,float **loc
 // Description			:	Return the required parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 unsigned int	CProgrammableShaderInstance::requiredParameters() {
 	return parent->usedParameters;
 }
@@ -856,7 +829,6 @@ unsigned int	CProgrammableShaderInstance::requiredParameters() {
 // Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 const char		*CProgrammableShaderInstance::getName() {
 	return parent->name;
 }
@@ -867,7 +839,6 @@ const char		*CProgrammableShaderInstance::getName() {
 // Description			:	Illuminate the shading state is a lightsource shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **locals) {
 	// This function should never be called for non-light shaders
 	context->execute(this,locals);
@@ -881,7 +852,6 @@ void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **
 // Description			:	Allocate the cache and set the parameter defaults
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/24/2006
 float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **varying,int numVertices) {
 	CVariable	*cVariable;
 	TCode		*data;
@@ -957,7 +927,6 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 // Description			:	This function is used to debugging purposes
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	2/4/2003
 void	debugFunction(float *op) {
 	fprintf(stderr,"Debug\n");
 }

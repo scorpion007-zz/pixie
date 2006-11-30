@@ -45,7 +45,6 @@
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 int		CTraceBundle::postTraceAction() {
 	return TRUE;
 }
@@ -56,7 +55,6 @@ int		CTraceBundle::postTraceAction() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	float	*Oi	=	varying[VARIABLE_OI];
@@ -126,7 +124,6 @@ void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:	Called for the rays that don't hit anything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceBundle::postShade(int nr,CRay **r) {
 
 	if (depth > 0) {
@@ -149,7 +146,6 @@ void	CTraceBundle::postShade(int nr,CRay **r) {
 // Description			:	Called after the first pass
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -172,7 +168,6 @@ void	CTraceBundle::post() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 int		CTraceExBundle::postTraceAction() {
 	return TRUE;
 }
@@ -183,7 +178,6 @@ int		CTraceExBundle::postTraceAction() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceExBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	float	*Oi	=	varying[VARIABLE_OI];
@@ -255,7 +249,6 @@ void	CTraceExBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:	Called for the rays that don't hit anything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceExBundle::postShade(int nr,CRay **r) {
 
 	if (depth > 0) {
@@ -278,7 +271,6 @@ void	CTraceExBundle::postShade(int nr,CRay **r) {
 // Description			:	Called after the first pass
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceExBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -316,7 +308,6 @@ void	CTraceExBundle::post() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 int		CIrradianceBundle::postTraceAction() {
 	return shade;
 }
@@ -327,7 +318,6 @@ int		CIrradianceBundle::postTraceAction() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CIrradianceBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	int		i;
@@ -345,7 +335,6 @@ void	CIrradianceBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:	Called for the rays that don't hit anything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CIrradianceBundle::postShade(int nr,CRay **r) {
 }
 
@@ -355,7 +344,6 @@ void	CIrradianceBundle::postShade(int nr,CRay **r) {
 // Description			:	Called after the first pass
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CIrradianceBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -368,7 +356,6 @@ void	CIrradianceBundle::post() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 int		CTransmissionBundle::postTraceAction() {
 	return TRUE;
 }
@@ -379,7 +366,6 @@ int		CTransmissionBundle::postTraceAction() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	float	*Oi	=	varying[VARIABLE_OI];
@@ -431,7 +417,6 @@ void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:	Called for the rays that don't hit anything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTransmissionBundle::postShade(int nr,CRay **r) {
 	int	i;
 
@@ -463,7 +448,6 @@ void	CTransmissionBundle::postShade(int nr,CRay **r) {
 // Description			:	Called after the first pass
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTransmissionBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -482,7 +466,6 @@ void	CTransmissionBundle::post() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherBundle::CGatherBundle() {
 }
 
@@ -492,7 +475,6 @@ CGatherBundle::CGatherBundle() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherBundle::~CGatherBundle() {
 }
 
@@ -502,7 +484,6 @@ CGatherBundle::~CGatherBundle() {
 // Description			:
 // Return Value			:	TRUE if needs shading
 // Comments				:
-// Date last edited		:	3/23/2003
 int		CGatherBundle::postTraceAction() {
 	CGatherVariable	*cVariable;
 	int				i;
@@ -532,7 +513,6 @@ int		CGatherBundle::postTraceAction() {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 	CGatherVariable	*cVariable;
 
@@ -548,7 +528,6 @@ void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherBundle::postShade(int nr,CRay **r) {
 }
 
@@ -558,7 +537,6 @@ void	CGatherBundle::postShade(int nr,CRay **r) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherBundle::post() {
 	numRays	=	last;
 	numRays	=	0;

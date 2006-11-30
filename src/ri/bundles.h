@@ -39,7 +39,6 @@
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "trace" shading language command
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTraceRay : public CRay {
 public:
 		vector					opacity;
@@ -52,7 +51,6 @@ public:
 // Class				:	CTraceBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTraceBundle : public CRayBundle {
 public:
 				int				postTraceAction();
@@ -69,7 +67,6 @@ public:
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "trace" shading language command
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTraceExRay : public CRay {
 public:
 		vector					opacity;
@@ -83,7 +80,6 @@ public:
 // Class				:	CTraceBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTraceExBundle : public CRayBundle {
 public:
 				int				postTraceAction();
@@ -100,7 +96,6 @@ public:
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "transmission" shading language command
 // Comments				:	Note that we do not have color
-// Date last edited		:	3/21/2003
 class	CTransmissionRay : public CRay {
 public:
 		vector					opacity;
@@ -112,7 +107,6 @@ public:
 // Class				:	CTraceBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTransmissionBundle : public CRayBundle {
 public:
 				int				postTraceAction();
@@ -125,7 +119,6 @@ public:
 // Class				:	CIrradianceRay
 // Description			:	Expands the ray for "transmission" shading language command
 // Comments				:	Note that we do not have color
-// Date last edited		:	3/21/2003
 class	CIrradianceRay : public CRay {
 public:
 		float					*dest;
@@ -137,7 +130,6 @@ public:
 // Class				:	CIrradianceBundle
 // Description			:	Encapsulates an irradiance bundle
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CIrradianceBundle : public CRayBundle {
 public:
 				int				postTraceAction();
@@ -151,7 +143,6 @@ public:
 // Class				:	CGatherRay
 // Description			:	The ray used for gathering
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherRay : public CRay {
 public:
 	int				*tags;		// The tag
@@ -166,7 +157,6 @@ public:
 // Class				:	CGatherBundle
 // Description			:	Bundle of gather rays
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherBundle : public CRayBundle {
 public:
 

@@ -56,7 +56,6 @@
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float noiseFloat(float arg) {
 	int bx0, bx1;
 	float rx0, rx1, sx, t, u, v, vec[1];
@@ -78,7 +77,6 @@ float noiseFloat(float arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float noiseFloat(float uarg,float varg)
 {
 	int bx0, bx1, by0, by1, b00, b10, b01, b11;
@@ -121,7 +119,6 @@ float noiseFloat(float uarg,float varg)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float noiseFloat(const float *vec)
 {
 	int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
@@ -174,7 +171,6 @@ float noiseFloat(const float *vec)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void noiseVector(float *r,float arg)
 {
 	int bx0, bx1;
@@ -207,7 +203,6 @@ void noiseVector(float *r,float arg)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void noiseVector(float *r,float uarg,float varg)
 {
 	int bx0, bx1, by0, by1, b00, b10, b01, b11;
@@ -289,7 +284,6 @@ void noiseVector(float *r,float uarg,float varg)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void noiseVector(float *r,const float *vec)
 {
 	int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
@@ -409,7 +403,6 @@ void noiseVector(float *r,const float *vec)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 float	noiseFloat(const float *argu,float argv) {
 	int bx0, bx1, by0, by1, bz0, bz1, bw0, bw1, b00, b10, b01, b11;
 	float rx0, rx1, ry0, ry1, rz0, rz1, rw0, rw1, *q, sy, sz, sw, a, b, c, d, e, t, u, v, vec[4];
@@ -490,7 +483,6 @@ float	noiseFloat(const float *argu,float argv) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	noiseVector(float *r,const float *argu,float argv) {
 	int bx0, bx1, by0, by1, bz0, bz1, bw0, bw1, b00, b10, b01, b11;
 	float rx0, rx1, ry0, ry1, rz0, rz1, rw0, rw1, *q, sy, sz, sw, a, b, c, d, e, t, u, v, vec[4];
@@ -685,7 +677,6 @@ void	noiseVector(float *r,const float *argu,float argv) {
 // Description			:	I cheaply use the other noise function
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(float u,float uperiod) {
 	return noiseFloat((float) fmod(u,uperiod));
 }
@@ -696,7 +687,6 @@ float	pnoiseFloat(float u,float uperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(float u,float v,float uperiod,float vperiod) {
 	return noiseFloat((float) fmod(u,uperiod),(float) fmod(v,vperiod));
 }
@@ -706,7 +696,6 @@ float	pnoiseFloat(float u,float v,float uperiod,float vperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(const float *arg,const float *periods) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -720,7 +709,6 @@ float	pnoiseFloat(const float *arg,const float *periods) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(const float *arg,float w,const float *periods,float wperiod) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -734,7 +722,6 @@ float	pnoiseFloat(const float *arg,float w,const float *periods,float wperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,float u,float uperiod) {
 	noiseVector(r,(float) fmod(u,uperiod));
 }
@@ -744,7 +731,6 @@ void	pnoiseVector(float *r,float u,float uperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,float u,float v,float uperiod,float vperiod) {
 	noiseVector(r,(float) fmod(u,uperiod),(float) fmod(v,vperiod));
 }
@@ -754,7 +740,6 @@ void	pnoiseVector(float *r,float u,float v,float uperiod,float vperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,const float *arg,const float *periods) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -768,7 +753,6 @@ void	pnoiseVector(float *r,const float *arg,const float *periods) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,const float *arg,float w,const float *periods,float wperiod) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -782,7 +766,6 @@ void	pnoiseVector(float *r,const float *arg,float w,const float *periods,float w
 // Description			:	Fast cell noise implementation
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(float arg) {
 	int		bx0;
 	int		index;
@@ -798,7 +781,6 @@ float	cellNoiseFloat(float arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(float u,float v) {
 	int		bx0, by0;
 	int		index;
@@ -816,7 +798,6 @@ float	cellNoiseFloat(float u,float v) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(const float *arg) {
 	int		bx0, by0, bz0;
 	int		index;
@@ -834,7 +815,6 @@ float	cellNoiseFloat(const float *arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(const float *arg,float w) {
 	int		bx0, by0, bz0, bw0;
 	int		index;
@@ -853,7 +833,6 @@ float	cellNoiseFloat(const float *arg,float w) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,float arg) {
 	int		bx0;
 	int		index;
@@ -871,7 +850,6 @@ void	cellNoiseVector(float *r,float arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,float u,float v) {
 	int		bx0, by0;
 	int		index;
@@ -891,7 +869,6 @@ void	cellNoiseVector(float *r,float u,float v) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,const float *arg) {
 	int		bx0, by0, bz0;
 	int		index;
@@ -911,7 +888,6 @@ void	cellNoiseVector(float *r,const float *arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,const float *arg,float w) {
 	int		bx0, by0, bz0, bw0;
 	int		index;

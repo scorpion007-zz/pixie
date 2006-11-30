@@ -41,7 +41,6 @@
 // Description			:	Constructor
 // Return Value			:	-
 // Comments				:	Identity at the beginning
-// Date last edited		:	3/3/2001
 CXform::CXform() {
 	stats.numXforms++;
 	stats.xformMemory	+=	sizeof(CXform);
@@ -60,7 +59,6 @@ CXform::CXform() {
 // Description			:	Create an exact copy of another xform
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	3/3/2001
 CXform::CXform(CXform *a) {
 	stats.numXforms++;
 	stats.xformMemory	+=	sizeof(CXform);
@@ -83,7 +81,6 @@ CXform::CXform(CXform *a) {
 // Description			:	Destructor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	3/3/2001
 CXform::~CXform() {
 	stats.numXforms--;
 	stats.xformMemory	-=	sizeof(CXform);
@@ -98,7 +95,6 @@ CXform::~CXform() {
 // Description			:	Initialize the transformation to identity
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::identity() {
 	identitym(from);
 	identitym(to);
@@ -111,7 +107,6 @@ void	CXform::identity() {
 //							specified transformation is applied first
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::translate(float dx,float dy,float dz) {
 	matrix	tmp,tmp2;
 
@@ -130,7 +125,6 @@ void	CXform::translate(float dx,float dy,float dz) {
 // Description			:	Append a rotation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::rotate(float angle,float x,float y,float z) {
 	matrix		tmp,tmp2;
 	const float	r	=	(float) radians(angle);
@@ -150,7 +144,6 @@ void	CXform::rotate(float angle,float x,float y,float z) {
 // Description			:	Append a scale
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::scale(float sx,float sy,float sz) {
 	matrix	tmp,tmp2;
 
@@ -172,7 +165,6 @@ void	CXform::scale(float sx,float sy,float sz) {
 // Description			:	Append a skew
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::skew(float angle,float dx1,float dy1,float dz1,float dx2,float dy2,float dz2) {
 	matrix	tmp,tmp2;
 	const	float	r	=	(float) radians(angle);
@@ -194,7 +186,6 @@ void	CXform::skew(float angle,float dx1,float dy1,float dz1,float dx2,float dy2,
 //							transformation will be applied first)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::concat(CXform *x) {
 	matrix	tmp;
 
@@ -217,7 +208,6 @@ void	CXform::concat(CXform *x) {
 // Description			:	Invert the transformation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::invert() {
 	matrix	tmp;
 	movmm(tmp,from);
@@ -233,7 +223,6 @@ void	CXform::invert() {
 // Description			:	Transfer the bounding box from one system to another
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::transformBound(float *bmin,float *bmax) const {
 	vector		corners[8];
 	int			i;
@@ -319,7 +308,6 @@ void	CXform::transformBound(float *bmin,float *bmax) const {
 // Description			:	Transfer the bounding box from one system to another
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CXform::invTransformBound(float *bmin,float *bmax) const {
 	vector		corners[8];
 	int			i;
@@ -405,7 +393,6 @@ void	CXform::invTransformBound(float *bmin,float *bmax) const {
 // Description			:	This function is used to transform a bounding box
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	transformBound(float *lbmin,float *lbmax,const float *to,const float *bmin,const float *bmax) {
 	vector		corners[8];
 	int			i;

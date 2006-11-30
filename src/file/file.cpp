@@ -47,7 +47,6 @@
 // Class				:	CRendererbuffer
 // Description			:	Holds the framebuffer
 // Comments				:
-// Date last edited		:	5/9/2002
 class	CFileFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
@@ -56,7 +55,6 @@ public:
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	5/9/2002
 				CFileFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 					int			i;
 					float		*tmp;
@@ -200,7 +198,6 @@ public:
 				// Description			:	Dtor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	11/28/2001
 				~CFileFramebuffer() {
 					int	i;
 
@@ -224,7 +221,6 @@ public:
 				// Description			:	Swrite some data to the out file
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	11/28/2001
 	void		write(int x,int y,int w,int h,float *data) {
 					int				i,j;
 					int				check		=	FALSE;
@@ -347,7 +343,6 @@ public:
 // Description			:	Begin receiving an image
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 	CFileFramebuffer	*fb	=	new CFileFramebuffer(name,width,height,numSamples,samples,findParameter);
 	
@@ -364,7 +359,6 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Description			:	Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
 	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
 	
@@ -380,7 +374,6 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Description			:	Finish receiving an image
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
 	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
 

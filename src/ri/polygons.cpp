@@ -64,7 +64,6 @@ void	*operator new(size_t size,CMovingTriangle *buf) {
 // Class				:	CTriVertex
 // Description			:	This is a temporary vertex used during the triangulation
 // Comments				:
-// Date last edited		:	1/20/2002
 class	CTriVertex {
 public:
 	const	float		*xy;
@@ -77,7 +76,6 @@ public:
 // Class				:	CMeshData
 // Description			:	This class holds transient data about the polygon mesh used during triangulation
 // Comments				:
-// Date last edited		:	1/20/2002
 class	CMeshData {
 public:
 	CAttributes			*meshAttributes;		// Mesh attributes
@@ -106,7 +104,6 @@ public:
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int ifv0,int ifv1,int ifv2,int iuniform) : CSurface(a,x) {
 	stats.numGprims++;
 
@@ -155,7 +152,6 @@ CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 CPolygonTriangle::~CPolygonTriangle() {
 	stats.numGprims--;
 	mesh->detach();
@@ -169,7 +165,6 @@ CPolygonTriangle::~CPolygonTriangle() {
 // Description			:	Intersect the polygon with the ray
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 	if (! (cRay->flags & attributes->flags) )	return;
 
@@ -271,7 +266,6 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	Sample bunch of points on the triangle
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U] + start;
@@ -474,7 +468,6 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 // Description			:	Core interpolation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 void			CPolygonTriangle::interpolate(int numVertices,float **varying) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U];
@@ -590,7 +583,6 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying) const {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int iv3,int ifv0,int ifv1,int ifv2,int ifv3,int iuniform) : CSurface(a,x) {
 	stats.numGprims++;
 
@@ -638,7 +630,6 @@ CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 CPolygonQuad::~CPolygonQuad() {
 	stats.numGprims--;
 	mesh->detach();
@@ -652,7 +643,6 @@ CPolygonQuad::~CPolygonQuad() {
 // Description			:	Intersect the quad with a ray
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (! (cRay->flags & attributes->flags) )	return;
@@ -784,7 +774,6 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	Sample bunch of points on the quad
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U] + start;
@@ -988,7 +977,6 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	Core interpolation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/7/2002
 void			CPolygonQuad::interpolate(int numVertices,float **varying) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U];
@@ -1113,7 +1101,6 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying) const {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nholes,int *nvertices,int *vertices) : CObject(a,x) {
 	int		i,mVertex;
 	float	*P;
@@ -1170,7 +1157,6 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 CPolygonMesh::~CPolygonMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CPolygonMesh);
@@ -1189,7 +1175,6 @@ CPolygonMesh::~CPolygonMesh() {
 // Description			:	Intersect with a ray
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 
 	if (children == NULL)	create(r);
@@ -1202,7 +1187,6 @@ void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 // Description			:	Split the mesh
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void		CPolygonMesh::dice(CShadingContext *r) {
 
 	if (children == NULL)	create(r);
@@ -1217,7 +1201,6 @@ void		CPolygonMesh::dice(CShadingContext *r) {
 // Description			:	Instanciate the mesh
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx		=	new CXform(x);
 
@@ -1261,7 +1244,6 @@ void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) co
 // Description			:	Actually create the triangle
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/29/2003
 inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int vi2,const int vi3,CMeshData &data) {
 	CPolygonQuad		*cQuad;
 	const float			*P				=	data.meshP;
@@ -1293,7 +1275,6 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 // Description			:	Actually create the triangle
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/29/2003
 inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const int vi2,CMeshData &data) {
 	CPolygonTriangle	*cTriangle;
 	const float			*P				=	data.meshP;
@@ -1335,7 +1316,6 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 // Description			:	Check if the edge between from and to is inside the polygon
 // Return Value			:	TRUE if this is a valid edge
 // Comments				:
-// Date last edited		:	10/29/2003
 static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTriVertex *to) {
 	const CTriVertex	*sVertex	=	loop;
 	const float			*a			=	loop->xy;
@@ -1364,7 +1344,6 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 // Description			:	Check the orientation of a loop to make sure it is CW or CCW
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/26/2004
 static	inline	int			orientationCheck(CTriVertex *loop,int cw,CMeshData &data) {
 	CTriVertex	*minVertex;
 	CTriVertex	*cVertex,*pVertex,*nVertex;
@@ -1425,7 +1404,6 @@ static	inline	int			orientationCheck(CTriVertex *loop,int cw,CMeshData &data) {
 // Description			:	Triangulate a general polygon
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/29/2003
 inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &data) {
 	int			i,j,k;
 	int			numVertices;
@@ -1722,7 +1700,6 @@ nextLoop:;
 // Description			:	Triangulate the mesh
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void				CPolygonMesh::create(CShadingContext *context) {
 	osLock(CRenderer::hierarchyMutex);
 	if (children != NULL) {

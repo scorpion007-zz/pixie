@@ -46,7 +46,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CSphereLight::CSphereLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	vector	P;
 
@@ -65,7 +64,6 @@ CSphereLight::CSphereLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CSphereLight::~CSphereLight() {
 }
 
@@ -76,7 +74,6 @@ CSphereLight::~CSphereLight() {
 // Description			:	Called chen we need to illuminate a point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 	
@@ -209,7 +206,6 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 // Description			:	Set shader parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CSphereLight::setParameters(int n,char **params,void **vals) {
 	int	i;
 
@@ -244,7 +240,6 @@ void					CSphereLight::setParameters(int n,char **params,void **vals) {
 // Description			:	Query a shader parameter
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*) {
 	if (strcmp(param,"from") == 0) {
 		float	*cval	=	(float *) val;
@@ -282,7 +277,6 @@ int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*
 // Description			:	Execute the shader
 // Return Value			:	-
 // Comments				:	Should never be called
-// Date last edited		:	11/2/2003
 void					CSphereLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
@@ -294,7 +288,6 @@ void					CSphereLight::execute(CShadingContext *context,float **locals) {
 // Description			:	Get the required parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 unsigned int			CSphereLight::requiredParameters() {
 	return 0;
 }
@@ -305,7 +298,6 @@ unsigned int			CSphereLight::requiredParameters() {
 // Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 const char				*CSphereLight::getName() {
 	return "spherelight";
 }
@@ -339,7 +331,6 @@ const char				*CSphereLight::getName() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	vector	P;
 	vector	D0,D1;
@@ -391,7 +382,6 @@ CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CQuadLight::~CQuadLight() {
 }
 
@@ -402,7 +392,6 @@ CQuadLight::~CQuadLight() {
 // Description			:	Called chen we need to illuminate a point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 
@@ -557,7 +546,6 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 // Description			:	Set shader parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CQuadLight::setParameters(int n,char **params,void **vals) {
 	int	i;
 
@@ -604,7 +592,6 @@ void					CQuadLight::setParameters(int n,char **params,void **vals) {
 // Description			:	Query a shader parameter
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) {
 	if (strcmp(param,"P0") == 0) {
 		float	*cval	=	(float *) val;
@@ -657,7 +644,6 @@ int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) 
 // Description			:	Execute the shader
 // Return Value			:	-
 // Comments				:	Should never be called
-// Date last edited		:	11/2/2003
 void					CQuadLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
@@ -669,7 +655,6 @@ void					CQuadLight::execute(CShadingContext *context,float **locals) {
 // Description			:	Get the required parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 unsigned int			CQuadLight::requiredParameters() {
 	return 0;
 }
@@ -680,7 +665,6 @@ unsigned int			CQuadLight::requiredParameters() {
 // Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 const char				*CQuadLight::getName() {
 	return "quadlight";
 }

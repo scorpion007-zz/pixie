@@ -54,7 +54,6 @@
 // Description			:	Init the files
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CRenderer::initFiles() {
 
 	// The loaded shaders
@@ -72,7 +71,6 @@ void		CRenderer::initFiles() {
 // Description			:	This callback function is used to remove the temporary files
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/4/2001
 static int	rcClearTemp(const char *fileName,void *userData) {
 	osDeleteFile(fileName);
 
@@ -85,7 +83,6 @@ static int	rcClearTemp(const char *fileName,void *userData) {
 // Description			:	Shutdown the files
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 void		CRenderer::shutdownFiles() {
 
 	// Ditch the temporary files created
@@ -124,7 +121,6 @@ void		CRenderer::shutdownFiles() {
 // Description			:	Locate a file on disk
 // Return Value			:	TRUE if found
 // Comments				:
-// Date last edited		:	8/25/2002
 int			CRenderer::locateFileEx(char *result,const char *name,const char *extension,TSearchpath *searchpath) {
 	if (strchr(name,'.') == NULL) {
 		char	tmp[OS_MAX_PATH_LENGTH];
@@ -143,7 +139,6 @@ int			CRenderer::locateFileEx(char *result,const char *name,const char *extensio
 // Description			:	Locate a file on disk
 // Return Value			:	TRUE if found
 // Comments				:
-// Date last edited		:	8/25/2002
 int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath) {
 
 	if (netClient != INVALID_SOCKET) {
@@ -193,7 +188,6 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 // Class				:	CDummyTexture
 // Description			:	Encapsulates a texture we use if we could not load it
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CDummyTexture : public CTexture {
 public:
 						CDummyTexture(const char *name) : CTexture(name) {}
@@ -209,7 +203,6 @@ public:
 // Class				:	CDummyEnvironment
 // Description			:	A dummy environment map we create if we can not instantiate
 // Comments				:
-// Date last edited		:	9/24/2002
 class	CDummyEnvironment : public CEnvironment {
 public:
 						CDummyEnvironment(const char *name) : CEnvironment(name) {}
@@ -226,7 +219,6 @@ public:
 // Description			:	Load a texture from file
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CTexture	*CRenderer::getTexture(const char *name) {
 	CFileResource	*tex;
 
@@ -255,7 +247,6 @@ CTexture	*CRenderer::getTexture(const char *name) {
 // Description			:	Load an environment map (which can also be a shadow map)
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CEnvironment	*CRenderer::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
@@ -282,7 +273,6 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 // Description			:	Load a photon map
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	CFileResource	*map;
 	char			fileName[OS_MAX_PATH_LENGTH];
@@ -315,7 +305,6 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 // Description			:	Load a cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 CCache		*CRenderer::getCache(const char *name,const char *mode) {
 	CFileResource	*cache;
 
@@ -406,7 +395,6 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 // Description			:	Load a texture from file
 // Return Value			:
 // Comments				:
-// Date last edited		:	02/22/2006
 CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 	CFileResource	*tex;
 
@@ -437,7 +425,6 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 // Description			:	Get a point cloud or brickmap
 // Return Value			:
 // Comments				:
-// Date last edited		:	02/22/2006
 CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to) {
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
@@ -504,7 +491,6 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 // Description			:	Create an instance of a shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 	CShader			*cShader;
 	CFileResource	*file;
@@ -537,7 +523,6 @@ CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 // Description			:	Return the filter matching the name
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 RtFilterFunc			CRenderer::getFilter(const char *name) {
 	if (strcmp(name,RI_GAUSSIANFILTER) == 0) {
 		return	RiGaussianFilter;
@@ -560,7 +545,6 @@ RtFilterFunc			CRenderer::getFilter(const char *name) {
 // Description			:	Return the name matching the filter
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/25/2002
 char					*CRenderer::getFilter(RtFilterFunc func) {
 	if (func == RiGaussianFilter) {
 		return	RI_GAUSSIANFILTER;
@@ -586,7 +570,6 @@ char					*CRenderer::getFilter(RtFilterFunc func) {
 // Description			:	This function will be called for each module
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/30/2002
 static	int	dsoLoadCallback(const char *file,void *ud) {
 	void	*module		=	osLoadModule(file);
 
@@ -655,7 +638,6 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 // Description			:	Load a DSO matching the prototyoe
 // Return Value			:
 // Comments				:	This function does not need to be thread safe
-// Date last edited		:	8/25/2002
 int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunction &exec) {
 	CDSO				*cDso;
 

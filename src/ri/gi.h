@@ -23,41 +23,69 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	show.h
+//  File				:	gi.h
 //  Classes				:	-
-//  Description			:	The wrapped openGL interface
+//  Description			:	The global illumination stuff
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef SHOW_H
-#define SHOW_H
-
+#ifndef GI_H
+#define GI_H
 
 #include "common/global.h"
-#include "shading.h"
-#include "xform.h"
+#include "common/containers.h"
+#include "renderer.h"
+
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShow
-// Description			:	This is just a wrapper to visualize a file
+// Class				:	CGI
+// Description			:	This class is responsible for the global illumination
 // Comments				:
-class	CShow : public CShadingContext {
+class	CGI {
 public:
-							CShow(int thread);
-			virtual			~CShow();
 
-			// Right after world end to force rendering of the entire frame
-			void			renderingLoop() { }
 
-			// Delayed rendering functions
-			void			drawObject(CObject *) { }
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CPoint
+	// Description			:	This holds a light or a gather point
+	// Comments				:
+	class	CPoint {
+	public:
+		vector		P,N,C;			// Position, Normal, Irradiance
+	};
 
-			// Primitive creation functions
-			void			drawGrid(CSurface *,int,int,float,float,float,float) { }
-			void			drawPoints(CSurface *,int) { }
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CNode
+	// Description			:	This holds a light/gather tree node
+	// Comments				:
+	class	CNode {
+	public:
+		int			front,back;
+		int			representative;
+	};
 
+
+
+
+
+
+
+					CGI();
+	virtual			~CGI();
+
+
+	// The light and gather points
+	CArray<CPoint>	lights;
+	CArray<CPoint>	gathers;
+
+	// The light and gather trees (the first entry is the root)
+	CArray<CNode>	lightTree,gatherTree;
+protected:
+	void			cluster(CArray<CNode> &nodes,int numPoints,CPoint *points);
 };
 
+
 #endif
+
 
 
 
