@@ -46,14 +46,12 @@ class	CTriangleHash;
 // Class				:	CRadianceCache
 // Description			:	Radiance cache responsible for estimating stuff
 // Comments				:
-// Date last edited		:	11/5/2003
 class	CRadianceCache : public CCache {
 public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRadianceSample
 	// Description			:	Holds a radiance sample
 	// Comments				:
-	// Date last edited		:	11/5/2003
 	class	CRadianceHarmonic {
 	public:
 		float				Y[27];					// The spherical harmonic coefficients for this cluster
@@ -67,7 +65,6 @@ public:
 	// Class				:	CRadianceNode
 	// Description			:	Defines a radiance node
 	// Comments				:
-	// Date last edited		:	11/5/2003
 	class	CRadianceNode {
 	public:
 		CRadianceNode		*children[8];			// The children nodes
@@ -80,7 +77,6 @@ public:
 	// Class				:	CShadingPoint
 	// Description			:	Holds a shading point
 	// Comments				:
-	// Date last edited		:	11/5/2003
 	class	CShadingPoint {
 	public:
 		vector				P,N;					// The position and normal of the shading point

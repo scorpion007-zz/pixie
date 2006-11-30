@@ -74,7 +74,6 @@ static	int		plusOnes[6][5]			=	{
 // Class				:	CTriTon
 // Description			:	This holds a triangle
 // Comments				:
-// Date last edited		:	11/5/2003
 class	CTriTon : public CTon {
 public:
 	float		corners[3*3];
@@ -96,7 +95,6 @@ public:
 // Class				:	CTriangleHash
 // Description			:	A hash that holds the contribution that comes from faraway geometry
 // Comments				:
-// Date last edited		:	11/5/2003
 class	CTriangleHash : public CMap<CTriTon> {
 public:
 				CTriangleHash(float a) : CMap<CTriTon>() {	
@@ -333,7 +331,6 @@ private:
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/06/2004
 CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *bmin,const float *bmax,FILE *in,CArray<CTriangle *> *t) : CCache(name,mode) {
 	int			i;
 
@@ -378,7 +375,6 @@ CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *b
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/06/2004
 CRadianceCache::~CRadianceCache() {
 	osDeleteMutex(mutex);
 
@@ -416,7 +412,6 @@ CRadianceCache::~CRadianceCache() {
 // Description			:	Lookup da radiance cache
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/06/2004
 void		CRadianceCache::lookup(float *C,const float *P,const float *N,const CGlobalIllumLookup *lookup) {
 	// Are we writing ?
 	if (flags & CACHE_WRITE) {
@@ -474,7 +469,6 @@ void		CRadianceCache::lookup(float *C,const float *P,const float *N,const CGloba
 // Description			:	Check the existance of a sample in the cache
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/06/2004
 void		CRadianceCache::cachesample(float *C,const float *P,const float *N,float dP) {
 	CRadianceNode		*cNode;
 	CRadianceNode		**stack,**stackBase;
@@ -530,7 +524,6 @@ void		CRadianceCache::cachesample(float *C,const float *P,const float *N,float d
 // Description			:	Finalize da cache
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/06/2004
 void		CRadianceCache::finalize(const CGlobalIllumLookup *l) {
 	// Do we have samples waiting to be processed ?
 	if (numShadingPoints > 0) {
@@ -711,7 +704,6 @@ void		CRadianceCache::finalize(const CGlobalIllumLookup *l) {
 // Description			:	Split the triangles as necessary
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2003
 void	CRadianceCache::prepareTriangles() {
 	// Create the triangles
 	int					i;
@@ -769,7 +761,6 @@ void	CRadianceCache::prepareTriangles() {
 // Description			:	Split a triangle
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2003
 void					CRadianceCache::split(const float *corners,const float *N,CAttributes *attributes) {
 	vector			D;
 	float			L0,L1,L2;
@@ -926,7 +917,6 @@ void					CRadianceCache::split(const float *corners,const float *N,CAttributes *
 // Description			:	Write a cache node onto the disk
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2003
 void					CRadianceCache::writeNode(FILE *out,CRadianceNode *node) {
 	int					i;
 	CRadianceHarmonic	*cSample;
@@ -956,7 +946,6 @@ void					CRadianceCache::writeNode(FILE *out,CRadianceNode *node) {
 // Description			:	Read a cache node from disk
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2003
 CRadianceCache::CRadianceNode				*CRadianceCache::readNode(FILE *in) {
 	int					i;
 	CRadianceHarmonic	*cSample;
@@ -997,7 +986,6 @@ CRadianceCache::CRadianceNode				*CRadianceCache::readNode(FILE *in) {
 // Description			:	Compute the harmonic samples
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2003
 void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLookup *texLookup) {
 	vector				P,N;
 	float				dP,dN;
@@ -1250,7 +1238,6 @@ void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLoo
 // Description			:	Partition the shading points into two clusters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2003
 int				CRadianceCache::partition(int numRays,CShadingPoint **rays) {
 	int						moved;
 	CShadingPoint			*s1,*s2;
@@ -1371,7 +1358,6 @@ int				CRadianceCache::partition(int numRays,CShadingPoint **rays) {
 // Description			:	Draw the sucker
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CRadianceCache::draw() {
 	CRadianceHarmonic	*cSample;
 	CRadianceNode		*cNode;
@@ -1423,7 +1409,6 @@ void		CRadianceCache::draw() {
 // Description			:	Bound the structure
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CRadianceCache::bound(float *bmin,float *bmax) {
 	assert(root != NULL);
 

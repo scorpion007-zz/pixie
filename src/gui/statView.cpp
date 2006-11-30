@@ -38,7 +38,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2006
 CStatView::CStatView(CStatistics *s,QWidget *parent) : QDialog(parent) {
 
 	// Create the tab widget
@@ -75,7 +74,6 @@ CStatView::CStatView(CStatistics *s,QWidget *parent) : QDialog(parent) {
 // Description			:	Update the tabs
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2006
 void		CTimeMemory::update(CStatistics *stats) {
 }
 
@@ -86,7 +84,6 @@ void		CTimeMemory::update(CStatistics *stats) {
 // Description			:	Update the tabs
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2006
 void		CNumbers::update(CStatistics *stats) {
 	QGridLayout		*layout	=	new QGridLayout;
 
