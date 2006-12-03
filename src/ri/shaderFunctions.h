@@ -2211,53 +2211,15 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float),threadMemory);	\
-								float			*dPdv		=	dPdu + numVertices*3;							\
-								float			*radius		=	dPdv + numVertices*3;							\
-								const	float	radiiscale	=	lookup->radiusScale;							\
-								float			*r			=	radius;											\
+								float			*radius		=	rayDiff((const float *) op3);					\
 								CTexture3d		*tex		=	lookup->texture;								\
-								const float		*D			=	(const float *) op3;							\
-								const float		*du			=	varying[VARIABLE_DU];							\
-								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								duVector(dPdu,D);																\
-								dvVector(dPdv,D);																\
-																												\
-								if ( lookup->radius < 0 ) {														\
-									/* unless one was specified, calculate the radius */						\
-									for (i=0;i<numVertices;i++) {												\
-										vector	D0,D1,D2,D3;													\
-										vector	l0,l1,l2,l3;													\
-																												\
-										D0[0]	=	D[0];														\
-										D0[1]	=	D[1];														\
-										D0[2]	=	D[2];														\
-										D1[0]	=	D[0] + dPdu[0]*du[0];										\
-										D1[1]	=	D[1] + dPdu[1]*du[0];										\
-										D1[2]	=	D[2] + dPdu[2]*du[0];										\
-										D2[0]	=	D[0] + dPdv[0]*dv[0];										\
-										D2[1]	=	D[1] + dPdv[1]*dv[0];										\
-										D2[2]	=	D[2] + dPdv[2]*dv[0];										\
-										D3[0]	=	D[0] + dPdv[0]*dv[0] + dPdu[0]*du[0];						\
-										D3[1]	=	D[1] + dPdv[1]*dv[0] + dPdu[1]*du[0];						\
-										D3[2]	=	D[2] + dPdv[2]*dv[0] + dPdu[2]*du[0];						\
-																												\
-										subvv(l0,D0,D1);														\
-										subvv(l1,D1,D3);														\
-										subvv(l2,D3,D2);														\
-										subvv(l3,D2,D0);														\
-																												\
-										float rm = max(dotvv(l0,l0),dotvv(l1,l1));								\
-										rm = max(rm,dotvv(l2,l2));												\
-										rm = max(rm,dotvv(l3,l3));												\
-																												\
-										*r++ = radiiscale*0.5f*sqrtf(rm);										\
-									}																			\
-								} else {																		\
+								if ( lookup->radius > 0 ) {														\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
-										*r++ = radiiscale*lookup->radius;														\
+										*r++ = radiiscale*lookup->radius;										\
 									}																			\
 								}																				\
 																												\
@@ -2319,53 +2281,15 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								operand(2,op2);																	\
 								operand(3,op3);																	\
 								int				i;																\
-								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float),threadMemory);	\
-								float			*dPdv		=	dPdu + numVertices*3;							\
-								float			*radius		=	dPdv + numVertices*3;							\
-								const	float	radiiscale	=	lookup->radiusScale;							\
-								float			*r			=	radius;											\
+								float			*radius		=	rayDiff((const float *) op2);					\
 								CTexture3d		*tex		=	lookup->texture;								\
-								const float		*D			=	(const float *) op2;							\
-								const float		*du			=	varying[VARIABLE_DU];							\
-								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								duVector(dPdu,D);																\
-								dvVector(dPdv,D);																\
-																												\
-								if ( lookup->radius < 0 ) {														\
-									/* unless one was specified, calculate the radius */						\
-									for (i=0;i<numVertices;i++) {												\
-										vector	D0,D1,D2,D3;													\
-										vector	l0,l1,l2,l3;													\
-																												\
-										D0[0]	=	D[0];														\
-										D0[1]	=	D[1];														\
-										D0[2]	=	D[2];														\
-										D1[0]	=	D[0] + dPdu[0]*du[0];										\
-										D1[1]	=	D[1] + dPdu[1]*du[0];										\
-										D1[2]	=	D[2] + dPdu[2]*du[0];										\
-										D2[0]	=	D[0] + dPdv[0]*dv[0];										\
-										D2[1]	=	D[1] + dPdv[1]*dv[0];										\
-										D2[2]	=	D[2] + dPdv[2]*dv[0];										\
-										D3[0]	=	D[0] + dPdv[0]*dv[0] + dPdu[0]*du[0];						\
-										D3[1]	=	D[1] + dPdv[1]*dv[0] + dPdu[1]*du[0];						\
-										D3[2]	=	D[2] + dPdv[2]*dv[0] + dPdu[2]*du[0];						\
-																												\
-										subvv(l0,D0,D1);														\
-										subvv(l1,D1,D3);														\
-										subvv(l2,D3,D2);														\
-										subvv(l3,D2,D0);														\
-																												\
-										float rm = max(dotvv(l0,l0),dotvv(l1,l1));								\
-										rm = max(rm,dotvv(l2,l2));												\
-										rm = max(rm,dotvv(l3,l3));												\
-																												\
-										*r++ = radiiscale*0.5f*sqrtf(rm);										\
-									}																			\
-								} else {																		\
+								if ( lookup->radius > 0 ) {														\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
-										*r++ = radiiscale*lookup->radius;														\
+										*r++ = radiiscale*lookup->radius;										\
 									}																			\
 								}																				\
 																												\
