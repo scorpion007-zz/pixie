@@ -295,27 +295,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\src\ri\brickmap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\brickmap.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\bundles.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\bundles.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\cache.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\cache.h"
 				>
 			</File>
 			<File
@@ -355,14 +339,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\fileResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\fileResource.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\gi.cpp"
 				>
 			</File>
@@ -380,14 +356,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\hcshader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\irradiance.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\irradiance.h"
 				>
 			</File>
 			<File
@@ -427,27 +395,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\photonMap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\photonMap.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\pl.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\pl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\pointCloud.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\pointCloud.h"
 				>
 			</File>
 			<File
@@ -508,30 +460,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\stats.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texmake.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texmake.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture3d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\texture3d.h"
 				>
 			</File>
 			<File
@@ -1180,6 +1108,82 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\trace.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Files"
+			>
+			<File
+				RelativePath="..\..\..\..\src\ri\brickmap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\brickmap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\cache.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\cache.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\fileResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\fileResource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\irradiance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\irradiance.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\photonMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\photonMap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\pointCloud.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\pointCloud.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texmake.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texmake.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture3d.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\texture3d.h"
 				>
 			</File>
 		</Filter>
