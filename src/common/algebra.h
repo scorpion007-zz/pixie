@@ -112,7 +112,7 @@ typedef float	matrix[16];									// an array of 16 floats
 
 typedef double	dvector[3];									// an array of 3 doubles
 typedef double	dquaternion[4];								// an array of 4 doubles
-typedef float	dhtpoint[4];								// an array of 4 floats
+typedef double	dhtpoint[4];								// an array of 4 floats
 typedef double	dmatrix[16];								// an array of 16 doubles
 
 // Row major matrix element order (compatible with openGL)

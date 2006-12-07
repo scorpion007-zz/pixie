@@ -30,12 +30,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 // The inverse of the Bezier basis
-static	float	invBezier[16]	=	{	0,		0,			0,			1.0f,
+static	matrix	invBezier		=	{	0,		0,			0,			1.0f,
 										0,		0,			1.0f/3.0f,	1.0f,
 										0,		1.0f/3.0f,	2.0f/3.0f,	1.0f,
 										1.0f,	1.0f,		1.0f,		1.0f};
 
-
+static	dmatrix	dinvBezier		=	{	0,		0,			0,			1.0,
+										0,		0,			1.0/3.0,	1.0,
+										0,		1.0/3.0,	2.0/3.0,	1.0,
+										1.0,	1.0,		1.0,		1.0};
 
 // This macro is used to fix the degenerate normal vectors
 #define	normalFix()	{																				\
@@ -116,10 +119,10 @@ static	float	invBezier[16]	=	{	0,		0,			0,			1.0f,
 // Return Value			:	-
 // Comments				:
 #define	makeCubicBoundX(__bmin,__bmax,__gx,__gy,__gz,__xform) {					\
-	matrix	tmp1;																\
-	matrix	tmpX;																\
-	matrix	tmpY;																\
-	matrix	tmpZ;																\
+	dmatrix	tmp1;																\
+	dmatrix	tmpX;																\
+	dmatrix	tmpY;																\
+	dmatrix	tmpZ;																\
 	int		i;																	\
 																				\
 	mulmm(tmp1,geometryV,__gx);													\

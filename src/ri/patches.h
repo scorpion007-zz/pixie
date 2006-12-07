@@ -47,18 +47,20 @@ public:
 						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *);
 						~CBilinearPatch();
 
+						// CObject interface
 		void			intersect(CShadingContext *,CRay *);
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
 
-		int				moving() const												{	return variables->moving;			}
+						// CSurface interface
+		int				moving() const {	return variables->moving;			}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
 
 private:
-		CVertexData		*variables;
-		CParameter		*parameters;
-		float			*vertex;
-		float			uMult,vMult,uOrg,vOrg;				// The parametric range of the patch
+		CVertexData		*variables;						// The variables for the patch
+		CParameter		*parameters;					// The parameters for the patch
+		float			*vertex;						// The vertex data
+		float			uMult,vMult,uOrg,vOrg;			// The parametric range of the patch
 };
 
 
@@ -71,19 +73,21 @@ public:
 						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *,const float *uBasis=NULL,const float *vBasis=NULL);
 						~CBicubicPatch();
 
+						// CObject interface
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
 
-		int				moving() const												{	return variables->moving;			}
+						// CSurface interface
+		int				moving() const	{	return variables->moving;			}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
 
 private:
 		void			computeVertexData(float *,const float *,int,const float *,const float *);
 
-		CVertexData		*variables;
-		CParameter		*parameters;
-		float			*vertex;
-		float			uOrg,vOrg,uMult,vMult;				// The parametric range of the patch
+		CVertexData		*variables;						// Variables for the patch
+		CParameter		*parameters;					// Parameters for the patch
+		float			*vertex;						// The vertex data
+		float			uOrg,vOrg,uMult,vMult;			// The parametric range of the patch
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -95,9 +99,11 @@ public:
 						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,float *);
 						~CNURBSPatch();
 
+						// CObject interface
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 
-		int				moving() const												{	return variables->moving;			}
+						// CSurface interface
+		int				moving() const	{	return variables->moving;			}
 		void			sample(int,int,float **,unsigned int &) const;
 		void			interpolate(int,float **) const;
 
@@ -105,11 +111,11 @@ private:
 		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);
 		void			precomputeVertexData(float *,const double *,const double *,float *,int);
 
-		CVertexData		*variables;
-		CParameter		*parameters;
-		float			*vertex;
-		int				uOrder,vOrder;
-		float			uOrg,vOrg,uMult,vMult;
+		CVertexData		*variables;						// The variable data
+		CParameter		*parameters;					// The parameters for this patch
+		float			*vertex;						// The vertex data
+		int				uOrder,vOrder;					// The order of the patch
+		float			uOrg,vOrg,uMult,vMult;			// The parametric range of the patch
 };
 
 
@@ -134,6 +140,7 @@ public:
 							CPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,int);
 							~CPatchMesh();
 
+							// CObject interface
 		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
@@ -157,6 +164,7 @@ public:
 							CNURBSPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,float *,float *);
 							~CNURBSPatchMesh();
 
+							// CObject interface
 		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;

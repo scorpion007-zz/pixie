@@ -201,11 +201,10 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 	}
 
 	const int	vertexSize	=	variables->vertexSize;
-
-	const float	*P00	=	vertex;
-	const float	*P10	=	P00 + vertexSize;
-	const float	*P01	=	P10 + vertexSize;
-	const float	*P11	=	P01 + vertexSize;
+	const float	*P00		=	vertex;
+	const float	*P10		=	P00 + vertexSize;
+	const float	*P01		=	P10 + vertexSize;
+	const float	*P11		=	P01 + vertexSize;
 	vector	t0,t1,t2,t3;
 
 	if (variables->moving) {
@@ -322,9 +321,9 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 // Comments				:	-
 void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
 	int				i,j;
-	const float		*u						=	varying[VARIABLE_U]+start;
-	const float		*v						=	varying[VARIABLE_V]+start;
-	const int		vertexSize				=	variables->vertexSize;
+	const float		*u				=	varying[VARIABLE_U]+start;
+	const float		*v				=	varying[VARIABLE_V]+start;
+	const int		vertexSize		=	variables->vertexSize;
 	float			*vertexData;
 	int				vertexDataStep;
 
@@ -450,19 +449,19 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 // Return Value			:	-
 // Comments				:	-
 void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
+
+	// Dispatch the parameters first
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
-		float	*u,*v,*du,*dv,*dPdu,*dPdv;
+		float	*u		=	varying[VARIABLE_U];
+		float	*v		=	varying[VARIABLE_V];
+		float	*du		=	varying[VARIABLE_DU];
+		float	*dv		=	varying[VARIABLE_DV];
+		float	*dPdu	=	varying[VARIABLE_DPDU];
+		float	*dPdv	=	varying[VARIABLE_DPDV];
 		int		i;
-
-		u		=	varying[VARIABLE_U];
-		v		=	varying[VARIABLE_V];
-		du		=	varying[VARIABLE_DU];
-		dv		=	varying[VARIABLE_DV];
-		dPdu	=	varying[VARIABLE_DPDU];
-		dPdv	=	varying[VARIABLE_DPDV];
 
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
@@ -559,14 +558,21 @@ void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int 
 	int					k,l;
 	const int			vertexSize	=	variables->vertexSize;
 	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
-	matrix				data;
-	matrix				ut;
+	dmatrix				data;
+	dmatrix				ut,uB,vB;
 
-	transposem(ut,uBasis);
+	// Promote the basis to double
+	for (k=0;k<16;k++) {
+		uB[k]	=	uBasis[k];
+		vB[k]	=	vBasis[k];
+	}
+
+	// Compute the utranspose
+	transposem(ut,uB);
 
 	// Compute the premultiplied geometry matrix
 	for	(k=0;k<vertexSize;k++) {
-		matrix			tmp,tmp2;
+		dmatrix			tmp,tmp2;
 		unsigned int	x,y;
 
 		for (y=0;y<4;y++)
@@ -574,38 +580,24 @@ void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int 
 				data[element(y,x)]	=	vertexData[(y*4+x)*vs+k+disp];
 
 		mulmm(tmp2,ut,data);
-		mulmm(tmp,tmp2,vBasis);
+		mulmm(tmp,tmp2,vB);
 
-		for (l=0;l<16;l++)
-			vertex[16*k+l]	=	tmp[l];
-	}
+		// Demote to float
+		for (l=0;l<16;l++)	vertex[16*k+l]	=	(float) tmp[l];
 
-	// Compute the bound
-	{
-		matrix	tmp1,tmp2;
-		float	*cVertex	=	vertex;
+		// Update the bounding box
+		if (k < 3) {
 
-		mulmm(tmp1,invBezier,cVertex);
-		mulmm(tmp2,tmp1,invBezier);
-		for (k=0;k<16;k++) {
-			if (tmp2[k] < bmin[COMP_X])	bmin[COMP_X]	=	(float) tmp2[k];
-			if (tmp2[k] > bmax[COMP_X])	bmax[COMP_X]	=	(float) tmp2[k];
-		}
+			// Convert to the bezier control vertices
+			mulmm(tmp2,dinvBezier,tmp);
+			mulmm(tmp,tmp2,dinvBezier);
 
-		cVertex	+=	16;
-		mulmm(tmp1,invBezier,cVertex);
-		mulmm(tmp2,tmp1,invBezier);
-		for (k=0;k<16;k++) {
-			if (tmp2[k] < bmin[COMP_Y])	bmin[COMP_Y]	=	(float) tmp2[k];
-			if (tmp2[k] > bmax[COMP_Y])	bmax[COMP_Y]	=	(float) tmp2[k];
-		}
-
-		cVertex	+=	16;
-		mulmm(tmp1,invBezier,cVertex);
-		mulmm(tmp2,tmp1,invBezier);
-		for (k=0;k<16;k++) {
-			if (tmp2[k] < bmin[COMP_Z])	bmin[COMP_Z]	=	(float) tmp2[k];
-			if (tmp2[k] > bmax[COMP_Z])	bmax[COMP_Z]	=	(float) tmp2[k];
+			// Expand the bound appropriately
+			int	i;
+			for (i=0;i<16;i++) {
+				if (tmp[i] < bmin[k])	bmin[k]	=	(float) tmp[i];
+				if (tmp[i] > bmax[k])	bmax[k]	=	(float) tmp[i];
+			}
 		}
 	}
 }
@@ -620,7 +612,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 	int					i,k;
 	const float			*u					=	varying[VARIABLE_U]+start;
 	const float			*v					=	varying[VARIABLE_V]+start;
-	int					vertexSize			=	variables->vertexSize;
+	const int			vertexSize			=	variables->vertexSize;
 	float				*vertexData;
 	int					vertexDataStep;
 
@@ -638,7 +630,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 			vertexDataStep	=	0;
 		} else {
 			float			*interpolate;
-			const float		*time	=	varying[VARIABLE_TIME] + start;
+			const float		*time		=	varying[VARIABLE_TIME] + start;
 			int				j;
 			const float		*vertex0	=	vertex;
 			const float		*vertex1	=	vertex + vertexSize*16;
@@ -690,7 +682,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 
 			for (;j<vertexSize;j++) {
 				for (int t=0;t<4;t++) {
-					tmp1[t]	=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
+					tmp1[t]		=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
 				}
 
 				intr[k++]		=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
@@ -724,19 +716,19 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	See object.h// Return Value			:	-
 // Comments				:	-
 void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
+
+	// Dispatch the parameters first
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
-		float	*u,*v,*du,*dv,*dPdu,*dPdv;
+		float	*u		=	varying[VARIABLE_U];
+		float	*v		=	varying[VARIABLE_V];
+		float	*du		=	varying[VARIABLE_DU];
+		float	*dv		=	varying[VARIABLE_DV];
+		float	*dPdu	=	varying[VARIABLE_DPDU];
+		float	*dPdv	=	varying[VARIABLE_DPDV];
 		int		i;
-
-		u		=	varying[VARIABLE_U];
-		v		=	varying[VARIABLE_V];
-		du		=	varying[VARIABLE_DU];
-		dv		=	varying[VARIABLE_DV];
-		dPdu	=	varying[VARIABLE_DPDU];
-		dPdv	=	varying[VARIABLE_DPDV];
 
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
@@ -779,7 +771,7 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	uMult				=	umax	-	uOrg;
 	vMult				=	vmax	-	vOrg;
 
-	double		*uCoefficients,*vCoefficients;
+	double	*uCoefficients,*vCoefficients;
 	uCoefficients		=	(double *) alloca(uOrder*uOrder*sizeof(double));
 	vCoefficients		=	(double *) alloca(vOrder*vOrder*sizeof(double));
 
@@ -849,9 +841,7 @@ void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients
 	for (cVertex=vertex,i=0;i<vertexSize;i++,cVertex+=uOrder*vOrder) {
 		int		u,v;
 
-		for (j=0;j<uOrder*vOrder;j++) {
-			tmp[j]	=	0;
-		}
+		for (j=0;j<uOrder*vOrder;j++)	tmp[j]	=	0;
 
 		for (v=0;v<vOrder;v++) {
 			const double *vRow	=	&vCoefficients[v*vOrder];
@@ -867,11 +857,11 @@ void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients
 			}
 		}
 
-		for (j=0;j<uOrder*vOrder;j++) {
-			cVertex[j]	=	(float) tmp[j];
-		}
+		// Demote to float
+		for (j=0;j<uOrder*vOrder;j++)	cVertex[j]	=	(float) tmp[j];
 	}
 
+	// Update the bounding box
 	for (vertexData+=disp,i=0;i<uOrder*vOrder;i++,vertexData+=vs) {
 		vector	P;
 
@@ -934,22 +924,21 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 		float	*dPdv			=	varying[VARIABLE_DPDV] + start*3;
 		float	*N				=	varying[VARIABLE_NG] + start*3;
 		float	*vertexStart;
-		float	pdu[4];
-		float	pdv[4];
+		double	pdu[4];
+		double	pdv[4];
 
 #define computeNURBS(UORDER,VORDER) {																\
-		float	*memBase		=	(float *) alloca((UORDER*3 + VORDER*3)*sizeof(float));			\
-		float	*uPowers		=	memBase;														\
-		float	*vPowers		=	uPowers + UORDER;												\
-		float	*duPowers		=	vPowers + VORDER;												\
-		float	*dvPowers		=	duPowers + UORDER;												\
+		double	*memBase		=	(double *) alloca((UORDER*3 + VORDER*3)*sizeof(double));		\
+		double	*uPowers		=	memBase;														\
+		double	*vPowers		=	uPowers + UORDER;												\
+		double	*duPowers		=	vPowers + VORDER;												\
+		double	*dvPowers		=	duPowers + UORDER;												\
 																									\
 		for (i=0,k=0;i<numVertices;i++) {															\
 			int				j,t,var;																\
-			float			*cVertex;																\
-			float			denominator;															\
-			const float		cu				=	u[i]*uMult + uOrg;									\
-			const float		cv				=	v[i]*vMult + vOrg;									\
+			double			denominator;															\
+			const double	cu				=	u[i]*uMult + uOrg;									\
+			const double	cv				=	v[i]*vMult + vOrg;									\
 																									\
 			uPowers[0]		=	1;																	\
 			duPowers[0]		=	0;																	\
@@ -965,15 +954,15 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 				dvPowers[j]	=	j*vPowers[j-1];														\
 			}																						\
 																									\
-			cVertex			=	vertexData;															\
+			const float *cVertex			=	vertexData;											\
 			vertexStart		=	intr;																\
 			for (var=0;var<4;var++) {																\
 				denominator		=	0;																\
 				pdu[var]		=	0;																\
 				pdv[var]		=	0;																\
 				for (j=0;j<UORDER;j++) {															\
-					float	tmp		=	0;															\
-					float	tmpdv	=	0;															\
+					double	tmp		=	0;															\
+					double	tmpdv	=	0;															\
 																									\
 					for (t=0;t<VORDER;t++,cVertex++) {												\
 						tmp		+=	(*cVertex)*vPowers[t];											\
@@ -988,9 +977,9 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 			}																						\
 																									\
 			for (;var<vertexSize;var++) {															\
-				float	res	=	0;																	\
+				double	res	=	0;																	\
 				for (j=0;j<UORDER;j++) {															\
-					float	tmp	=	0;																\
+					double	tmp	=	0;																\
 																									\
 					for (t=0;t<VORDER;t++) {														\
 						tmp		+=	(*cVertex++)*vPowers[t];										\
@@ -1173,19 +1162,19 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 // Return Value			:	-
 // Comments				:	-
 void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
+
+	// Dispatch the parameters first
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
-		float	*u,*v,*du,*dv,*dPdu,*dPdv;
-		int		i;
-
-		u		=	varying[VARIABLE_U];
-		v		=	varying[VARIABLE_V];
-		du		=	varying[VARIABLE_DU];
-		dv		=	varying[VARIABLE_DV];
-		dPdu	=	varying[VARIABLE_DPDU];
-		dPdv	=	varying[VARIABLE_DPDV];
+		float *u	=	varying[VARIABLE_U];
+		float *v	=	varying[VARIABLE_V];
+		float *du	=	varying[VARIABLE_DU];
+		float *dv	=	varying[VARIABLE_DV];
+		float *dPdu	=	varying[VARIABLE_DPDU];
+		float *dPdv	=	varying[VARIABLE_DPDV];
+		int	  i;
 
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
@@ -1274,14 +1263,13 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 	stats.gprimMemory	+=	sizeof(CPatchMesh);
 
 	pl			=	c;
-
 	degree		=	d;
 	uVertices	=	nu;
 	vVertices	=	nv;
 	uWrap		=	uw;
 	vWrap		=	vw;
 
-	// Compute the bounding box in the local object coordinate system
+	// Compute the bounding box in the camera system
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
@@ -1306,10 +1294,10 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		int				upatches,vpatches;
 		const int		us		=	attributes->uStep;
 		const int		vs		=	attributes->vStep;
-		matrix			xg,yg,zg;
+		dmatrix			xg,yg,zg;
 		matrix			ub;
-		matrix			ut,vb;
-		matrix			geometryU,geometryV;
+		dmatrix			ut,vb;
+		dmatrix			geometryU,geometryV;
 
 		assert(degree == 3);
 
@@ -1331,8 +1319,8 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 			vb[i]	=	attributes->vBasis[i];
 		}
 
-		mulmm(geometryV,invBezier,ut);
-		mulmm(geometryU,vb,invBezier);
+		mulmm(geometryV,dinvBezier,ut);
+		mulmm(geometryU,vb,dinvBezier);
 
 		for (i=0;i<vpatches;i++) {
 			for (j=0;j<upatches;j++) {
@@ -1601,7 +1589,8 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 	for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=4) {
 		htpoint	tmp;
 
-		mulmp(tmp,xform->from,P);
+		mulmp4(tmp,xform->from,P);
+		mulvf(tmp,1/tmp[3]);
 		addBox(bmin,bmax,tmp);
 	}
 
@@ -1609,7 +1598,8 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 		for (P=pl->data1,i=0;i<(uVertices*vVertices);i++,P+=4) {
 			htpoint	tmp;
 
-			mulmp(tmp,xform->from,P);
+			mulmp4(tmp,xform->from,P);
+			mulvf(tmp,1/tmp[3]);
 			addBox(bmin,bmax,tmp);
 		}
 	}
@@ -1745,6 +1735,7 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	// Set the children 
 	setChildren(context,allChildren);
 
+	// Release the lock
 	osUnlock(CRenderer::hierarchyMutex);
 }
 
