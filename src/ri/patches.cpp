@@ -1212,9 +1212,9 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 			coefficients[0]	=	0;
 	} else {
 
-		double	*lowerCoefficients1	=	(double *) alloca((order-1)*sizeof(double));
-		double	*lowerCoefficients2	=	(double *) alloca((order-1)*sizeof(double));
-		unsigned int		i;
+		double			*lowerCoefficients1	=	(double *) alloca((order-1)*sizeof(double));
+		double			*lowerCoefficients2	=	(double *) alloca((order-1)*sizeof(double));
+		unsigned int	i;
 
 		precompBasisCoefficients(lowerCoefficients1,order-1,start,interval,knots);
 		precompBasisCoefficients(lowerCoefficients2,order-1,start+1,interval,knots);
