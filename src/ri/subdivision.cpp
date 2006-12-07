@@ -224,7 +224,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 		}
 
 		// FIXME: This definition of real is temporary. After profiling, remove it
-#define	real	float
+#define	real	double
 
 		for (i=0;i<numVertices;i++) {
 			real	cu	=	v[i];

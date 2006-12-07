@@ -158,9 +158,6 @@ void	CPatch::dice(CShadingContext *r) {
 		int						numUprobes;
 		int						numVprobes;
 		int						up,vp;
-		float					u,v;
-		float					ustep,vstep;
-		float					ustart,vstart;
 		float					**varying;
 		int						k;
 		float					*uv;
@@ -179,10 +176,11 @@ void	CPatch::dice(CShadingContext *r) {
 		varying			=	r->currentShadingState->varying;
 
 		// Sample points on the patch
-		ustart			=	umin;
-		vstart			=	vmin;
-		ustep			=	(umax - ustart) / (float) (numUprobes-1);
-		vstep			=	(vmax - vstart) / (float) (numVprobes-1);
+		double	ustart	=	umin;
+		double	vstart	=	vmin;
+		double	ustep	=	(umax - ustart) / (double) (numUprobes-1);
+		double	vstep	=	(vmax - vstart) / (double) (numVprobes-1);
+		double	u,v;
 
 		uv				=	varying[VARIABLE_U];
 		vv				=	varying[VARIABLE_V];
@@ -197,8 +195,8 @@ void	CPatch::dice(CShadingContext *r) {
 			// Compute the sample positions and corresponding normal vectors
 			for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
 				for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
-					uv[k]		=	u;
-					vv[k]		=	v;
+					uv[k]		=	(float) u;
+					vv[k]		=	(float) v;
 					timev[k]	=	1;
 				}
 			}
@@ -215,8 +213,8 @@ void	CPatch::dice(CShadingContext *r) {
 		// Compute the sample positions and corresponding normal vectors
 		for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
 			for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
-				uv[k]		=	u;
-				vv[k]		=	v;
+				uv[k]		=	(float) u;
+				vv[k]		=	(float) v;
 				timev[k]	=	0;
 			}
 		}

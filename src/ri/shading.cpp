@@ -745,12 +745,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 			// Compute the du
 			for (i=0;i<vVertices;i++) {
-				int		tmp		=	i*uVertices;
-				float	*cDU	=	du	+ tmp;
-				float	*cU		=	u	+ tmp;
-				float	*cSr	=	sru	+ tmp;
-				float	*cXy	=	xy	+ tmp*2;
-				float	dx,dy,d;
+				const int	tmp		=	i*uVertices;
+				float		*cDU	=	du	+ tmp;
+				float		*cU		=	u	+ tmp;
+				float		*cSr	=	sru	+ tmp;
+				float		*cXy	=	xy	+ tmp*2;
+				float		dx,dy,d;
 
 				P				=	varying[VARIABLE_P]		+	tmp*3;
 				d				=	0;
@@ -760,6 +760,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
 					d		=	cSr[0]*(cU[1] - cU[0]);
 					d		=	min(d,1);
+					d		=	max(d,C_EPSILON);
 					assert(d > 0);
 					assert(d <= 1);
 					cDU[0]	=	d;
@@ -801,6 +802,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					dy		=	cXy[uVertices*2+1]	- cXy[1];
 					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
 					d		=	cSr[0]*(cV[uVertices] - cV[0]);
+					d		=	max(d,C_EPSILON);
 					d		=	min(d,1);
 					assert(d > 0);
 					assert(d <= 1);

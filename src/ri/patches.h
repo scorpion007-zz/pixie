@@ -102,8 +102,8 @@ public:
 		void			interpolate(int,float **) const;
 
 private:
-		void			precompBasisCoefficients(float *,unsigned int,unsigned int,unsigned int,const float *);
-		void			precomputeVertexData(float *,const float *,const float *,float *,int);
+		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);
+		void			precomputeVertexData(float *,const double *,const double *,float *,int);
 
 		CVertexData		*variables;
 		CParameter		*parameters;

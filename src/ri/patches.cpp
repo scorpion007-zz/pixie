@@ -580,7 +580,7 @@ void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int 
 			vertex[16*k+l]	=	tmp[l];
 	}
 
-	// Computhe the bound
+	// Compute the bound
 	{
 		matrix	tmp1,tmp2;
 		float	*cVertex	=	vertex;
@@ -761,7 +761,6 @@ void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
 // Comments				:	-
 CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,int uOrder,int vOrder,float *uKnots,float *vKnots,float *vertex0) : CSurface(a,x) {
 	int			j;
-	float		*uCoefficients,*vCoefficients;
 	const int	vertexSize	=	v->vertexSize;
 
 	stats.gprimMemory	+=	sizeof(CNURBSPatch);
@@ -780,8 +779,9 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	uMult				=	umax	-	uOrg;
 	vMult				=	vmax	-	vOrg;
 
-	uCoefficients		=	(float *) alloca(uOrder*uOrder*sizeof(float));
-	vCoefficients		=	(float *) alloca(vOrder*vOrder*sizeof(float));
+	double		*uCoefficients,*vCoefficients;
+	uCoefficients		=	(double *) alloca(uOrder*uOrder*sizeof(double));
+	vCoefficients		=	(double *) alloca(vOrder*vOrder*sizeof(double));
 
 	// For each basis function
 	// Compute the coefficients
@@ -839,31 +839,36 @@ CNURBSPatch::~CNURBSPatch() {
 // Description			:	Precompute uBasis*G*vBasis'
 // Return Value			:	-
 // Comments				:	-
-void	CNURBSPatch::precomputeVertexData(float *vertex,const float *uCoefficients,const float *vCoefficients,float *vertexData,int disp) {
+void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients,const double *vCoefficients,float *vertexData,int disp) {
 	const int	vertexSize	=	variables->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
 	int			i,j,k;
 	float		*cVertex;
+	double		*tmp		=	(double *) alloca(uOrder*vOrder*sizeof(double));
 
 	for (cVertex=vertex,i=0;i<vertexSize;i++,cVertex+=uOrder*vOrder) {
 		int		u,v;
 
 		for (j=0;j<uOrder*vOrder;j++) {
-			cVertex[j]	=	0;
+			tmp[j]	=	0;
 		}
 
 		for (v=0;v<vOrder;v++) {
-			const float *vRow	=	&vCoefficients[v*vOrder];
+			const double *vRow	=	&vCoefficients[v*vOrder];
 			for (u=0;u<uOrder;u++) {
-				float		data	=	vertexData[i+(v*uOrder+u)*vs+disp];
-				const float *uRow	=	&uCoefficients[u*uOrder];
+				double			data	=	vertexData[i+(v*uOrder+u)*vs+disp];
+				const double	*uRow	=	&uCoefficients[u*uOrder];
 
 				for (j=0;j<uOrder;j++) {
 					for (k=0;k<vOrder;k++) {
-						cVertex[j*vOrder+k]	+=	data*uRow[j]*vRow[k];
+						tmp[j*vOrder+k]	+=	data*uRow[j]*vRow[k];
 					}
 				}
 			}
+		}
+
+		for (j=0;j<uOrder*vOrder;j++) {
+			cVertex[j]	=	(float) tmp[j];
 		}
 	}
 
@@ -1199,7 +1204,7 @@ void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Compute the coefficients of a basis
 // Return Value			:	-
 // Comments				:
-void		CNURBSPatch::precompBasisCoefficients(float *coefficients,unsigned int order,unsigned int start,unsigned int interval,const float *knots) {
+void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int order,unsigned int start,unsigned int interval,const float *knots) {
 	if (order == 1) {
 		if (start == interval)
 			coefficients[0]	=	1;
@@ -1207,8 +1212,8 @@ void		CNURBSPatch::precompBasisCoefficients(float *coefficients,unsigned int ord
 			coefficients[0]	=	0;
 	} else {
 
-		float	*lowerCoefficients1	=	(float *) alloca((order-1)*sizeof(float));
-		float	*lowerCoefficients2	=	(float *) alloca((order-1)*sizeof(float));
+		double	*lowerCoefficients1	=	(double *) alloca((order-1)*sizeof(double));
+		double	*lowerCoefficients2	=	(double *) alloca((order-1)*sizeof(double));
 		unsigned int		i;
 
 		precompBasisCoefficients(lowerCoefficients1,order-1,start,interval,knots);

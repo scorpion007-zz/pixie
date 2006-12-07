@@ -1873,9 +1873,10 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 			} else {
 				cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,1);
 			}
-		
 		}
-	} else {
+	} 
+	
+	if (cTexture == NULL) {
 
 		if (bitspersample == 8) {
 			cTexture	=	readTexture<unsigned char>(name,aname,in,dstart,1);
