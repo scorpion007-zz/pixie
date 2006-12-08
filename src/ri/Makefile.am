@@ -21,7 +21,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				executeMisc.cpp \
 				fileResource.cpp \
 				hcshader.cpp \
-				hierarchy.cpp \
 				implicitSurface.cpp \
 				init.cpp \
 				irradiance.cpp \
@@ -66,7 +65,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				subdivision.cpp \
 				subdivisionCreator.cpp \
 				surface.cpp \
-				tesselate.cpp \
 				texmake.cpp \
 				texture.cpp \
 				texture3d.cpp \
@@ -75,7 +73,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				xform.cpp	\
 				zbuffer.cpp
 
-libri_la_LIBADD = ../common/libcommon.la @TIFF_LIBS@ @ZLIB_LIBS@
+libri_la_LIBADD = ../common/libpixiecommon.la @TIFF_LIBS@ @ZLIB_LIBS@
 
 INCLUDES = -I..
 
