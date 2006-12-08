@@ -145,7 +145,8 @@ protected:
 											d[2]		=	0;
 
 											mulmv(d,cameraToWorld,d);
-											mulvf(d,0.005f);
+											//mulvf(d,0.005f);
+											mulvf(d,0.005f*zoom);
 											addvv(position,savedPosition,d);
 										}
 										break;
