@@ -50,6 +50,10 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		183D2A670B2BC6BB001BB8F4 /* libri.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
+		183D2A6C0B2BC732001BB8F4 /* ri.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F820AD6E196003C2D7B /* ri.h */; };
+		183D2A6D0B2BC741001BB8F4 /* dsply.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F080AD6E143003C2D7B /* dsply.h */; };
+		183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9E09B300AD9BCF300A33716 /* sdr.h */; };
 		1862D75C0B2A8F5A00111435 /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1862D7590B2A8F5A00111435 /* debug.cpp */; };
 		1862D75D0B2A8F5A00111435 /* debug.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D75A0B2A8F5A00111435 /* debug.h */; };
 		1862D75E0B2A8F5A00111435 /* defaults.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D75B0B2A8F5A00111435 /* defaults.h */; };
@@ -569,6 +573,40 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		183D2A650B2BC6AD001BB8F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /bin;
+			dstSubfolderSpec = 0;
+			files = (
+				183D2A670B2BC6BB001BB8F4 /* libri.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		183D2A6A0B2BC718001BB8F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = /include;
+			dstSubfolderSpec = 0;
+			files = (
+				183D2A6D0B2BC741001BB8F4 /* dsply.h in CopyFiles */,
+				183D2A6C0B2BC732001BB8F4 /* ri.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		183D2A700B2BC76A001BB8F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /include;
+			dstSubfolderSpec = 0;
+			files = (
+				183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1862D7590B2A8F5A00111435 /* debug.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = debug.cpp; path = ../../src/ri/debug.cpp; sourceTree = SOURCE_ROOT; };
 		1862D75A0B2A8F5A00111435 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = debug.h; path = ../../src/ri/debug.h; sourceTree = SOURCE_ROOT; };
@@ -588,8 +626,8 @@
 		C96A6E3B0AD6D66C003C2D7B /* os.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = os.cpp; path = ../../src/common/os.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E3C0AD6D66C003C2D7B /* os.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = os.h; path = ../../src/common/os.h; sourceTree = SOURCE_ROOT; };
 		C96A6E3D0AD6D66C003C2D7B /* simd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = simd.h; path = ../../src/common/simd.h; sourceTree = SOURCE_ROOT; };
-		C96A6E580AD6D73A003C2D7B /* libfile.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libfile.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		C96A6E5D0AD6D746003C2D7B /* libframebuffer.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libframebuffer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C96A6E580AD6D73A003C2D7B /* file.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = file.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C96A6E5D0AD6D746003C2D7B /* framebuffer.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = framebuffer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E660AD6D778003C2D7B /* file.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file.cpp; path = ../../src/file/file.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E680AD6D791003C2D7B /* fbx.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fbx.cpp; path = ../../src/framebuffer/fbx.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E690AD6D791003C2D7B /* fbx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fbx.h; path = ../../src/framebuffer/fbx.h; sourceTree = SOURCE_ROOT; };
@@ -770,7 +808,7 @@
 		C9E09B170AD9B8E600A33716 /* precomp.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = precomp.cpp; path = ../../src/precomp/precomp.cpp; sourceTree = SOURCE_ROOT; };
 		C9E09B2F0AD9BCF300A33716 /* sdr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = sdr.cpp; path = ../../src/sdr/sdr.cpp; sourceTree = SOURCE_ROOT; };
 		C9E09B300AD9BCF300A33716 /* sdr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sdr.h; path = ../../src/sdr/sdr.h; sourceTree = SOURCE_ROOT; };
-		C9E09B420AD9BEBE00A33716 /* librgbe.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = librgbe.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9E09B420AD9BEBE00A33716 /* rgbe.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = rgbe.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9E09B5B0AD9BF4300A33716 /* rgbe.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rgbe.cpp; path = ../../src/rgbe/rgbe.cpp; sourceTree = SOURCE_ROOT; };
 		C9E09B5C0AD9BF4300A33716 /* rgbe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rgbe.h; path = ../../src/rgbe/rgbe.h; sourceTree = SOURCE_ROOT; };
 		C9E09B5F0AD9BF5600A33716 /* file.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file.cpp; path = ../../src/rgbe/file.cpp; sourceTree = SOURCE_ROOT; };
@@ -901,12 +939,12 @@
 			isa = PBXGroup;
 			children = (
 				C96A6E290AD6D5E5003C2D7B /* libcommon.a */,
-				C96A6E580AD6D73A003C2D7B /* libfile.dylib */,
-				C96A6E5D0AD6D746003C2D7B /* libframebuffer.dylib */,
+				C96A6E580AD6D73A003C2D7B /* file.dylib */,
+				C96A6E5D0AD6D746003C2D7B /* framebuffer.dylib */,
 				C96A6EC20AD6E08A003C2D7B /* libri.dylib */,
 				C96A6EC70AD6E096003C2D7B /* libdsotest.dylib */,
 				C96A6EE20AD6E0F6003C2D7B /* libsdr.dylib */,
-				C9E09B420AD9BEBE00A33716 /* librgbe.dylib */,
+				C9E09B420AD9BEBE00A33716 /* rgbe.dylib */,
 				C983E6C20AF2E8FB00648461 /* rndr */,
 				C983E6D20AF2E9C900648461 /* sdrc */,
 				C983E6ED0AF2E9FE00648461 /* precomp */,
@@ -1392,7 +1430,7 @@
 			);
 			name = file;
 			productName = file;
-			productReference = C96A6E580AD6D73A003C2D7B /* libfile.dylib */;
+			productReference = C96A6E580AD6D73A003C2D7B /* file.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		C96A6E5C0AD6D746003C2D7B /* framebuffer */ = {
@@ -1419,7 +1457,7 @@
 			);
 			name = framebuffer;
 			productName = framebuffer;
-			productReference = C96A6E5D0AD6D746003C2D7B /* libframebuffer.dylib */;
+			productReference = C96A6E5D0AD6D746003C2D7B /* framebuffer.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		C96A6EC10AD6E08A003C2D7B /* ri */ = {
@@ -1429,6 +1467,8 @@
 				C96A6EBE0AD6E08A003C2D7B /* Headers */,
 				C96A6EBF0AD6E08A003C2D7B /* Sources */,
 				C96A6EC00AD6E08A003C2D7B /* Frameworks */,
+				183D2A650B2BC6AD001BB8F4 /* CopyFiles */,
+				183D2A6A0B2BC718001BB8F4 /* CopyFiles */,
 			);
 			buildRules = (
 				C97A3D4A0AD6E99B00889CEB /* PBXBuildRule */,
@@ -1495,6 +1535,7 @@
 				C96A6EDE0AD6E0F6003C2D7B /* Headers */,
 				C96A6EDF0AD6E0F6003C2D7B /* Sources */,
 				C96A6EE00AD6E0F6003C2D7B /* Frameworks */,
+				183D2A700B2BC76A001BB8F4 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1665,7 +1706,7 @@
 			);
 			name = rgbe;
 			productName = rgbe;
-			productReference = C9E09B420AD9BEBE00A33716 /* librgbe.dylib */;
+			productReference = C9E09B420AD9BEBE00A33716 /* rgbe.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -2099,7 +2140,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = common;
 				ZERO_LINK = NO;
@@ -2113,7 +2154,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = common;
 				ZERO_LINK = NO;
@@ -2125,7 +2166,7 @@
 			buildSettings = {
 				BUILD_VARIANTS = normal;
 				COPY_PHASE_STRIP = NO;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -2135,7 +2176,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /displays;
 				LIBRARY_SEARCH_PATHS = (
 					/sw/lib,
 					/usr/lib,
@@ -2156,7 +2197,7 @@
 			buildSettings = {
 				BUILD_VARIANTS = normal;
 				COPY_PHASE_STRIP = YES;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2164,7 +2205,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /displays;
 				LIBRARY_SEARCH_PATHS = (
 					/sw/lib,
 					/usr/lib,
@@ -2184,7 +2225,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -2195,10 +2236,10 @@
 					"~/Pixie/trunk/src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /displays;
 				LIBRARY_SEARCH_PATHS = (
 					/sw/lib,
-					/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/lib,
+					/usr/X11R6/lib,
 				);
 				OTHER_LDFLAGS = (
 					"-lX11",
@@ -2214,7 +2255,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2223,10 +2264,10 @@
 					"~/Pixie/trunk/src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /displays;
 				LIBRARY_SEARCH_PATHS = (
 					/sw/lib,
-					/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/lib,
+					/usr/X11R6/lib,
 				);
 				OTHER_LDFLAGS = (
 					"-lX11",
@@ -2242,6 +2283,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2252,7 +2294,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -2267,6 +2309,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -2275,7 +2318,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -2296,7 +2339,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = dsotest;
 				ZERO_LINK = NO;
@@ -2311,7 +2354,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = dsotest;
 				ZERO_LINK = NO;
@@ -2328,7 +2371,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = "-lcommon";
 				PREBINDING = NO;
 				PRODUCT_NAME = sdr;
@@ -2344,7 +2387,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = "-lcommon";
 				PREBINDING = NO;
 				PRODUCT_NAME = sdr;
@@ -2361,7 +2404,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = rndr;
@@ -2376,7 +2419,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = rndr;
@@ -2393,7 +2436,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrc;
 				ZERO_LINK = NO;
@@ -2407,7 +2450,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrc;
 				ZERO_LINK = NO;
@@ -2423,7 +2466,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = precomp;
 				ZERO_LINK = NO;
@@ -2437,7 +2480,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = precomp;
 				ZERO_LINK = NO;
@@ -2453,7 +2496,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrinfo;
 				ZERO_LINK = NO;
@@ -2467,7 +2510,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrinfo;
 				ZERO_LINK = NO;
@@ -2483,7 +2526,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = texmake;
 				ZERO_LINK = NO;
@@ -2497,7 +2540,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
+				INSTALL_PATH = /bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = texmake;
 				ZERO_LINK = NO;
@@ -2552,13 +2595,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /displays;
 				OTHER_LDFLAGS = "-lcommon";
 				PREBINDING = NO;
 				PRODUCT_NAME = rgbe;
@@ -2570,11 +2613,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
+				INSTALL_PATH = /displays;
 				OTHER_LDFLAGS = "-lcommon";
 				PREBINDING = NO;
 				PRODUCT_NAME = rgbe;

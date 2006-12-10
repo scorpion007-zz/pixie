@@ -209,7 +209,7 @@ inline	void	osDown(TSemaphore &sem) {
 #ifdef WIN32
 const	char	osModuleExtension[]		=	"dll";
 #else		// Win32
-#ifdef OSX
+#ifdef __APPLE_CC__
 const	char	osModuleExtension[]		=	"dylib";
 #else		// OSX
 const	char	osModuleExtension[]		=	"so";
