@@ -577,7 +577,7 @@
 		183D2A650B2BC6AD001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /bin;
+			dstPath = /lib;
 			dstSubfolderSpec = 0;
 			files = (
 				183D2A670B2BC6BB001BB8F4 /* libri.dylib in CopyFiles */,
@@ -2294,7 +2294,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /bin;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -2318,7 +2318,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /bin;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
