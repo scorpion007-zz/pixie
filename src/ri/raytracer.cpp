@@ -294,8 +294,8 @@ void	CPrimaryBundle::post() {
 CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
 	CRenderer::raytracingFlags	|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 
-	const int		xoffset		=	(int) ceil((CRenderer::pixelFilterWidth		- 1) / (float) 2);
-	const int		yoffset		=	(int) ceil((CRenderer::pixelFilterHeight	- 1) / (float) 2);
+	const int		xoffset		=	(int) ceil((CRenderer::pixelFilterWidth		- 1)*0.5f);
+	const int		yoffset		=	(int) ceil((CRenderer::pixelFilterHeight	- 1)*0.5f);
 	const int		xpixels		=	CRenderer::bucketWidth + 2*xoffset;
 	const int		ypixels		=	CRenderer::bucketHeight + 2*yoffset;
 	
@@ -394,8 +394,8 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	int				maxShading			=	primaryBundle.maxPrimaryRays;
 	int				i,j;
 	int				k;
-	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	 - 1)*CRenderer::pixelXsamples / (float) 2);
-	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight - 1)*CRenderer::pixelYsamples / (float) 2);
+	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	 - 1)*CRenderer::pixelXsamples*0.5f);
+	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight - 1)*CRenderer::pixelYsamples*0.5f);
 	const int		xsamples			=	xpixels*CRenderer::pixelXsamples + 2*xoffset;
 	const int		ysamples			=	ypixels*CRenderer::pixelYsamples + 2*yoffset;
 	CPrimaryRay		*rays				=	primaryBundle.rayBase;
@@ -556,8 +556,8 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 // Comments				:
 void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int top,int xpixels,int ypixels) {
 	int				i,j;
-	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1) / (float) 2);
-	const int		ph			=	(int) ceil((CRenderer::pixelFilterHeight-1) / (float) 2);
+	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1)*0.5f);
+	const int		ph			=	(int) ceil((CRenderer::pixelFilterHeight-1)*0.5f);
 
 	for (i=0;i<numShading;i++,samples++) {
 		const float	x			=	samples->x;

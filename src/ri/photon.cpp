@@ -124,7 +124,7 @@ void		CPhotonHider::renderingLoop(){
 			// Compute the world bounding sphere
 			vector			tmp;
 			addvv(worldCenter,CRenderer::worldBmin,CRenderer::worldBmax);
-			mulvf(worldCenter,1 / (float) 2);
+			mulvf(worldCenter,0.5f);
 			subvv(tmp,CRenderer::worldBmax,worldCenter);
 			worldRadius	=	lengthv(tmp);
 

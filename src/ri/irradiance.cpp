@@ -104,7 +104,7 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in) : C
 		root			=	(CCacheNode *) memory->alloc(sizeof(CCacheNode));
 		for (i=0;i<8;i++)	root->children[i]	=	NULL;
 		addvv(center,bmin,bmax);
-		mulvf(center,1 / (float) 2);
+		mulvf(center,0.5f);
 		movvv(root->center,center);
 		subvv(bmax,bmin);
 		root->side		=	max(max(bmax[0],bmax[1]),bmax[2]);

@@ -305,10 +305,10 @@ void	CPatch::dice(CShadingContext *r) {
 				vLength[1]		=	sqrtf(dx*dx + dy*dy);
 			}
 
-			umLength		=	(uLength[0]+uLength[1]) / (float) 2;// The length of the u and v extremal edges
-			vmLength		=	(vLength[0]+vLength[1]) / (float) 2;
+			umLength		=	(uLength[0]+uLength[1]) *0.5f;// The length of the u and v extremal edges
+			vmLength		=	(vLength[0]+vLength[1]) *0.5f;
 
-			umLength		=	min(umLength,1000);					// FIXME: This is really ugly
+			umLength		=	min(umLength,1000);						// FIXME: This is really ugly
 			vmLength		=	min(vmLength,1000);
 
 			// Do some regularization on the shading rate
@@ -377,7 +377,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		if (umax <= umin)	break;
 
 		// Split along one direction
-		umid			=	(umin + umax) / (float) 2;
+		umid			=	(umin + umax)*0.5f;
 		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
@@ -397,7 +397,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		if (vmax <= vmin)	break;
 
 		// Split along one direction
-		vmid			=	(vmin + vmax) / (float) 2;
+		vmid			=	(vmin + vmax)*0.5f;
 		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);	
 		p2				=	new CPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);	
@@ -418,8 +418,8 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		if (umax <= umin)	break;
 
 		// Split along one direction
-		vmid			=	(vmin + vmax) / (float) 2;
-		umid			=	(umin + umax) / (float) 2;
+		vmid			=	(vmin + vmax)*0.5f;
+		umid			=	(umin + umax)*0.5f;
 		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);

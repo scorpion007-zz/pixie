@@ -545,7 +545,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Compute the image plane depth
 	imagePlane		=	1;
 	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		imagePlane	=	(float) (1/tan(radians(fov/(float) 2)));
+		imagePlane	=	(float) (1/tan(radians(fov*0.5f)));
 	} else {
 		imagePlane	=	1;
 	}
@@ -734,8 +734,8 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	{
 		const int		filterWidth				=	pixelXsamples + 2*xSampleOffset;
 		const int		filterHeight			=	pixelYsamples + 2*ySampleOffset;
-		const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
-		const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
+		const float		halfFilterWidth			=	(float) filterWidth*0.5f;
+		const float		halfFilterHeight		=	(float) filterHeight*0.5f;
 
 		// Allocate the pixel filter
 		pixelFilterKernel = (float *) frameMemory->alloc(filterWidth*filterHeight*sizeof(float));

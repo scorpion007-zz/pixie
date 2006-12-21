@@ -610,7 +610,7 @@ int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 					}
 		
 					cNode->children[j]	=	nNode;
-					nNode->side			=	cNode->side / (float) 2;
+					nNode->side			=	cNode->side*0.5f;
 					nNode->samples		=	NULL;
 					for (i=0;i<8;i++)	nNode->children[i]	=	NULL;
 				}

@@ -1364,7 +1364,7 @@ void	CSEdge::compute(float *vertex) {
 		initVertex(data,sharpVertex);
 		accumVertex(data,sharpVertex,vertices[0]->vertex);
 		accumVertex(data,sharpVertex,vertices[1]->vertex);
-		scaleVertex(data,sharpVertex,1 / (float) 2);
+		scaleVertex(data,sharpVertex,0.5f);
 	}
 
 	if ((sharpness < 1) && (faces[1] != NULL)) {	// Have to compute the smooth vertex
@@ -1402,11 +1402,11 @@ void	CSEdge::computeVarying(float *varying,float *facevarying) {
 	vertices[1]->computeVarying(varying1,facevarying1);
 
 	for (i=0;i<data.varyingSize;i++) {
-		varying[i]	=	(varying[i] + varying1[i]) / (float) 2;
+		varying[i]	=	(varying[i] + varying1[i])*0.5f;
 	}
 
 	for (i=0;i<data.facevaryingSize;i++) {
-		facevarying[i]	=	(facevarying[i] + facevarying1[i]) / (float) 2;
+		facevarying[i]	=	(facevarying[i] + facevarying1[i])*0.5f;
 	}
 }
 

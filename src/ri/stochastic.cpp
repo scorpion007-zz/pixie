@@ -338,8 +338,8 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	const int		yres					=	height;
 	const int		filterWidth				=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
 	const int		filterHeight			=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
-	const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
-	const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
+	const float		halfFilterWidth			=	(float) filterWidth*0.5f;
+	const float		halfFilterHeight		=	(float) filterHeight*0.5f;
 	float			*fbs;
 	const int		pixelSize				=	8	+ CRenderer::numExtraSamples;	// alpha + depth + color + opacity + extra samples
 	float			*tmp;
