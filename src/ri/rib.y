@@ -2351,7 +2351,9 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribIntArray
 				ribIntArray
+				RIB_ARRAY_BEGIN
 				ribTexts
+				RIB_ARRAY_END
 				ribIntArray
 				ribIntArray
 				ribFloatArray
@@ -2366,9 +2368,9 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						argi1	=	(int *)		get(0);
 						argi2	=	(int *)		get($3);
 						args1	=	(char **)	get($3+$4);
-						argi3	=	(int *)		get($3+$4+$5);
-						argi4	=	(int *)		get($3+$4+$5+$6);
-						argf1	=	(float *)	get($3+$4+$5+$6+$7);
+						argi3	=	(int *)		get($3+$4+$6);
+						argi4	=	(int *)		get($3+$4+$6+$8);
+						argf1	=	(float *)	get($3+$4+$6+$8+$9);
 
 						// Count the number of faces / vertices
 						for (i=0,j=0;i<$3;j+=argi1[i],i++);
@@ -2380,7 +2382,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 
 						if (sizeCheck(numVertices,numVertices,j,$3)) {
-							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,args1,argi3,argi4,argf1,numParameters,tokens,vals);
+							RiSubdivisionMeshV($2,$3,argi1,argi2,$6,args1,argi3,argi4,argf1,numParameters,tokens,vals);
 						}
 					}
 				}
