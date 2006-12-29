@@ -154,7 +154,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="IlmImf_dll.lib Iex_dll.lib Imath_dll.lib Half_dll.lib zlib.lib"
+				AdditionalDependencies="IlmImf.lib Iex.lib Imath.lib Half.lib IlmThread.lib zlib.lib"
 				OutputFile="$(OutDir)/openexr.dll"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames=""
