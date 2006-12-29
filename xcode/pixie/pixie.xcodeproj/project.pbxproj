@@ -11,7 +11,6 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = C98989160AF1B9A6003DB17A /* Build configuration list for PBXAggregateTarget "all" */;
 			buildPhases = (
-				188383130B2FB26700166E3E /* CopyFiles */,
 				188383500B2FB2D100166E3E /* CopyFiles */,
 				188383560B2FB2ED00166E3E /* CopyFiles */,
 			);
@@ -64,60 +63,6 @@
 		1862D7620B2A8F8100111435 /* gi.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D7600B2A8F8100111435 /* gi.h */; };
 		1862D7640B2A8FB100111435 /* tiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D7630B2A8FB100111435 /* tiff.h */; };
 		1862D7660B2A8FCD00111435 /* objectMisc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D7650B2A8FCD00111435 /* objectMisc.h */; };
-		188383150B2FB27900166E3E /* ambientindirect.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398370B2D2CA60055E484 /* ambientindirect.sdr */; };
-		188383160B2FB27900166E3E /* ambientindirect.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398380B2D2CA60055E484 /* ambientindirect.sl */; };
-		188383170B2FB27900166E3E /* ambientlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398390B2D2CA60055E484 /* ambientlight.sdr */; };
-		188383180B2FB27900166E3E /* ambientlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983A0B2D2CA60055E484 /* ambientlight.sl */; };
-		188383190B2FB27900166E3E /* ambientocclusion.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983B0B2D2CA60055E484 /* ambientocclusion.sdr */; };
-		1883831A0B2FB27900166E3E /* ambientocclusion.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983C0B2D2CA60055E484 /* ambientocclusion.sl */; };
-		1883831B0B2FB27900166E3E /* arealight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983D0B2D2CA60055E484 /* arealight.sdr */; };
-		1883831C0B2FB27900166E3E /* arealight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983E0B2D2CA60055E484 /* arealight.sl */; };
-		1883831D0B2FB27900166E3E /* constant.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983F0B2D2CA60055E484 /* constant.sdr */; };
-		1883831E0B2FB27900166E3E /* constant.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398400B2D2CA60055E484 /* constant.sl */; };
-		1883831F0B2FB27900166E3E /* distantlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398410B2D2CA60055E484 /* distantlight.sdr */; };
-		188383200B2FB27900166E3E /* distantlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398420B2D2CA60055E484 /* distantlight.sl */; };
-		188383210B2FB27900166E3E /* fog.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398430B2D2CA60055E484 /* fog.sdr */; };
-		188383220B2FB27900166E3E /* fog.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398440B2D2CA60055E484 /* fog.sl */; };
-		188383230B2FB27900166E3E /* glass.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398450B2D2CA60055E484 /* glass.sdr */; };
-		188383240B2FB27900166E3E /* glass.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398460B2D2CA60055E484 /* glass.sl */; };
-		188383250B2FB27900166E3E /* matte.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398470B2D2CA60055E484 /* matte.sdr */; };
-		188383260B2FB27900166E3E /* matte.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398480B2D2CA60055E484 /* matte.sl */; };
-		188383270B2FB27900166E3E /* metal.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398490B2D2CA60055E484 /* metal.sdr */; };
-		188383280B2FB27900166E3E /* metal.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984A0B2D2CA60055E484 /* metal.sl */; };
-		188383290B2FB27900166E3E /* mirror.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984B0B2D2CA60055E484 /* mirror.sdr */; };
-		1883832A0B2FB27900166E3E /* mirror.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984C0B2D2CA60055E484 /* mirror.sl */; };
-		1883832B0B2FB27900166E3E /* mtorDirectionalLight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984D0B2D2CA60055E484 /* mtorDirectionalLight.sdr */; };
-		1883832C0B2FB27900166E3E /* mtorDirectionalLight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984E0B2D2CA60055E484 /* mtorDirectionalLight.sl */; };
-		1883832D0B2FB27900166E3E /* mtorLambert.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984F0B2D2CA60055E484 /* mtorLambert.sdr */; };
-		1883832E0B2FB27900166E3E /* mtorLambert.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398500B2D2CA60055E484 /* mtorLambert.sl */; };
-		1883832F0B2FB27900166E3E /* mtorPhong.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398510B2D2CA60055E484 /* mtorPhong.sdr */; };
-		188383300B2FB27900166E3E /* mtorPhong.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398520B2D2CA60055E484 /* mtorPhong.sl */; };
-		188383310B2FB27900166E3E /* normdir.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398530B2D2CA60055E484 /* normdir.sdr */; };
-		188383320B2FB27900166E3E /* normdir.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398540B2D2CA60055E484 /* normdir.sl */; };
-		188383330B2FB27900166E3E /* paintedmatte.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398550B2D2CA60055E484 /* paintedmatte.sdr */; };
-		188383340B2FB27900166E3E /* paintedmatte.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398560B2D2CA60055E484 /* paintedmatte.sl */; };
-		188383350B2FB27900166E3E /* paintedplastic.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398570B2D2CA60055E484 /* paintedplastic.sdr */; };
-		188383360B2FB27900166E3E /* paintedplastic.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398580B2D2CA60055E484 /* paintedplastic.sl */; };
-		188383370B2FB27900166E3E /* plastic.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398590B2D2CA60055E484 /* plastic.sdr */; };
-		188383380B2FB27900166E3E /* plastic.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985A0B2D2CA60055E484 /* plastic.sl */; };
-		188383390B2FB27900166E3E /* pointlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985B0B2D2CA60055E484 /* pointlight.sdr */; };
-		1883833A0B2FB27900166E3E /* pointlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985C0B2D2CA60055E484 /* pointlight.sl */; };
-		1883833B0B2FB27900166E3E /* rayarea.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985D0B2D2CA60055E484 /* rayarea.sdr */; };
-		1883833C0B2FB27900166E3E /* rayarea.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985E0B2D2CA60055E484 /* rayarea.sl */; };
-		1883833D0B2FB27900166E3E /* raydistant.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985F0B2D2CA60055E484 /* raydistant.sdr */; };
-		1883833E0B2FB27900166E3E /* raydistant.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398600B2D2CA60055E484 /* raydistant.sl */; };
-		1883833F0B2FB27900166E3E /* raypoint.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398610B2D2CA60055E484 /* raypoint.sdr */; };
-		188383400B2FB27900166E3E /* raypoint.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398620B2D2CA60055E484 /* raypoint.sl */; };
-		188383410B2FB27900166E3E /* shadowarea.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398630B2D2CA60055E484 /* shadowarea.sdr */; };
-		188383420B2FB27900166E3E /* shadowarea.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398640B2D2CA60055E484 /* shadowarea.sl */; };
-		188383430B2FB27900166E3E /* shadowdistant.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398650B2D2CA60055E484 /* shadowdistant.sdr */; };
-		188383440B2FB27900166E3E /* shadowdistant.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398660B2D2CA60055E484 /* shadowdistant.sl */; };
-		188383450B2FB27900166E3E /* shadowpoint.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398670B2D2CA60055E484 /* shadowpoint.sdr */; };
-		188383460B2FB27900166E3E /* shadowpoint.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398680B2D2CA60055E484 /* shadowpoint.sl */; };
-		188383470B2FB27900166E3E /* shadowspot.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398690B2D2CA60055E484 /* shadowspot.sdr */; };
-		188383480B2FB27900166E3E /* shadowspot.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833986A0B2D2CA60055E484 /* shadowspot.sl */; };
-		188383490B2FB27900166E3E /* spotlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833986B0B2D2CA60055E484 /* spotlight.sdr */; };
-		1883834A0B2FB27900166E3E /* spotlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833986C0B2D2CA60055E484 /* spotlight.sl */; };
 		188383520B2FB2E300166E3E /* rndr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1883834C0B2FB2BB00166E3E /* rndr.1 */; };
 		188383530B2FB2E300166E3E /* sdrc.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1883834D0B2FB2BB00166E3E /* sdrc.1 */; };
 		188383540B2FB2E300166E3E /* sdrinfo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1883834E0B2FB2BB00166E3E /* sdrinfo.1 */; };
@@ -129,6 +74,10 @@
 		188383E70B2FB39D00166E3E /* LICENSE in CopyFiles */ = {isa = PBXBuildFile; fileRef = 188383E00B2FB38F00166E3E /* LICENSE */; };
 		188383E80B2FB39D00166E3E /* NEWS in CopyFiles */ = {isa = PBXBuildFile; fileRef = 188383E10B2FB38F00166E3E /* NEWS */; };
 		188383E90B2FB39D00166E3E /* README in CopyFiles */ = {isa = PBXBuildFile; fileRef = 188383E20B2FB38F00166E3E /* README */; };
+		18A298DB0B44E80E006B9ABE /* libri.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
+		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
+		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
+		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -293,11 +242,8 @@
 		C983E6EF0AF2EA1200648461 /* precomp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9E09B170AD9B8E600A33716 /* precomp.cpp */; };
 		C983E6F80AF2EA4000648461 /* sdrinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9E09B610AD9BF7200A33716 /* sdrinfo.cpp */; };
 		C983E7010AF2EA9300648461 /* texmake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9E09BB20AD9C2E900A33716 /* texmake.cpp */; };
-		C983E7460AF2F2A900648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
-		C983E7470AF2F2AD00648461 /* libri.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
 		C983E7480AF2F2B900648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		C983E7490AF2F2C100648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
-		C983E74A0AF2F2CC00648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		C983E74B0AF2F2D000648461 /* libsdr.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EE20AD6E0F6003C2D7B /* libsdr.dylib */; };
 		C983E74C0AF2F2D800648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		C983E74D0AF2F2DD00648461 /* libri.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
@@ -645,7 +591,7 @@
 		183D2A650B2BC6AD001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /lib;
+			dstPath = /bin;
 			dstSubfolderSpec = 0;
 			files = (
 				183D2A670B2BC6BB001BB8F4 /* libri.dylib in CopyFiles */,
@@ -658,6 +604,9 @@
 			dstPath = /include;
 			dstSubfolderSpec = 0;
 			files = (
+				18A299030B44F040006B9ABE /* dlo.h in CopyFiles */,
+				18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */,
+				18A299010B44F020006B9ABE /* implicit.h in CopyFiles */,
 				183D2A6D0B2BC741001BB8F4 /* dsply.h in CopyFiles */,
 				183D2A6C0B2BC732001BB8F4 /* ri.h in CopyFiles */,
 			);
@@ -670,69 +619,6 @@
 			dstSubfolderSpec = 0;
 			files = (
 				183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		188383130B2FB26700166E3E /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /shaders;
-			dstSubfolderSpec = 0;
-			files = (
-				188383150B2FB27900166E3E /* ambientindirect.sdr in CopyFiles */,
-				188383160B2FB27900166E3E /* ambientindirect.sl in CopyFiles */,
-				188383170B2FB27900166E3E /* ambientlight.sdr in CopyFiles */,
-				188383180B2FB27900166E3E /* ambientlight.sl in CopyFiles */,
-				188383190B2FB27900166E3E /* ambientocclusion.sdr in CopyFiles */,
-				1883831A0B2FB27900166E3E /* ambientocclusion.sl in CopyFiles */,
-				1883831B0B2FB27900166E3E /* arealight.sdr in CopyFiles */,
-				1883831C0B2FB27900166E3E /* arealight.sl in CopyFiles */,
-				1883831D0B2FB27900166E3E /* constant.sdr in CopyFiles */,
-				1883831E0B2FB27900166E3E /* constant.sl in CopyFiles */,
-				1883831F0B2FB27900166E3E /* distantlight.sdr in CopyFiles */,
-				188383200B2FB27900166E3E /* distantlight.sl in CopyFiles */,
-				188383210B2FB27900166E3E /* fog.sdr in CopyFiles */,
-				188383220B2FB27900166E3E /* fog.sl in CopyFiles */,
-				188383230B2FB27900166E3E /* glass.sdr in CopyFiles */,
-				188383240B2FB27900166E3E /* glass.sl in CopyFiles */,
-				188383250B2FB27900166E3E /* matte.sdr in CopyFiles */,
-				188383260B2FB27900166E3E /* matte.sl in CopyFiles */,
-				188383270B2FB27900166E3E /* metal.sdr in CopyFiles */,
-				188383280B2FB27900166E3E /* metal.sl in CopyFiles */,
-				188383290B2FB27900166E3E /* mirror.sdr in CopyFiles */,
-				1883832A0B2FB27900166E3E /* mirror.sl in CopyFiles */,
-				1883832B0B2FB27900166E3E /* mtorDirectionalLight.sdr in CopyFiles */,
-				1883832C0B2FB27900166E3E /* mtorDirectionalLight.sl in CopyFiles */,
-				1883832D0B2FB27900166E3E /* mtorLambert.sdr in CopyFiles */,
-				1883832E0B2FB27900166E3E /* mtorLambert.sl in CopyFiles */,
-				1883832F0B2FB27900166E3E /* mtorPhong.sdr in CopyFiles */,
-				188383300B2FB27900166E3E /* mtorPhong.sl in CopyFiles */,
-				188383310B2FB27900166E3E /* normdir.sdr in CopyFiles */,
-				188383320B2FB27900166E3E /* normdir.sl in CopyFiles */,
-				188383330B2FB27900166E3E /* paintedmatte.sdr in CopyFiles */,
-				188383340B2FB27900166E3E /* paintedmatte.sl in CopyFiles */,
-				188383350B2FB27900166E3E /* paintedplastic.sdr in CopyFiles */,
-				188383360B2FB27900166E3E /* paintedplastic.sl in CopyFiles */,
-				188383370B2FB27900166E3E /* plastic.sdr in CopyFiles */,
-				188383380B2FB27900166E3E /* plastic.sl in CopyFiles */,
-				188383390B2FB27900166E3E /* pointlight.sdr in CopyFiles */,
-				1883833A0B2FB27900166E3E /* pointlight.sl in CopyFiles */,
-				1883833B0B2FB27900166E3E /* rayarea.sdr in CopyFiles */,
-				1883833C0B2FB27900166E3E /* rayarea.sl in CopyFiles */,
-				1883833D0B2FB27900166E3E /* raydistant.sdr in CopyFiles */,
-				1883833E0B2FB27900166E3E /* raydistant.sl in CopyFiles */,
-				1883833F0B2FB27900166E3E /* raypoint.sdr in CopyFiles */,
-				188383400B2FB27900166E3E /* raypoint.sl in CopyFiles */,
-				188383410B2FB27900166E3E /* shadowarea.sdr in CopyFiles */,
-				188383420B2FB27900166E3E /* shadowarea.sl in CopyFiles */,
-				188383430B2FB27900166E3E /* shadowdistant.sdr in CopyFiles */,
-				188383440B2FB27900166E3E /* shadowdistant.sl in CopyFiles */,
-				188383450B2FB27900166E3E /* shadowpoint.sdr in CopyFiles */,
-				188383460B2FB27900166E3E /* shadowpoint.sl in CopyFiles */,
-				188383470B2FB27900166E3E /* shadowspot.sdr in CopyFiles */,
-				188383480B2FB27900166E3E /* shadowspot.sl in CopyFiles */,
-				188383490B2FB27900166E3E /* spotlight.sdr in CopyFiles */,
-				1883834A0B2FB27900166E3E /* spotlight.sl in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1097,7 +983,7 @@
 		C96A6FB80AD6E196003C2D7B /* zbuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbuffer.h; path = ../../src/ri/zbuffer.h; sourceTree = SOURCE_ROOT; };
 		C96A6FB90AD6E196003C2D7B /* zbufferPoint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbufferPoint.h; path = ../../src/ri/zbufferPoint.h; sourceTree = SOURCE_ROOT; };
 		C96A6FBA0AD6E196003C2D7B /* zbufferQuad.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbufferQuad.h; path = ../../src/ri/zbufferQuad.h; sourceTree = SOURCE_ROOT; };
-		C983E6C20AF2E8FB00648461 /* rndr */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = rndr; sourceTree = BUILT_PRODUCTS_DIR; };
+		C983E6C20AF2E8FB00648461 /* rndr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rndr; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6D20AF2E9C900648461 /* sdrc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6ED0AF2E9FE00648461 /* precomp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = precomp; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6F60AF2EA3400648461 /* sdrinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrinfo; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1193,8 +1079,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C983E7460AF2F2A900648461 /* libcommon.a in Frameworks */,
-				C983E7470AF2F2AD00648461 /* libri.dylib in Frameworks */,
+				18A298DB0B44E80E006B9ABE /* libri.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1218,7 +1103,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C983E74A0AF2F2CC00648461 /* libcommon.a in Frameworks */,
 				C983E74B0AF2F2D000648461 /* libsdr.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2851,10 +2735,7 @@
 					../../src,
 				);
 				INSTALL_PATH = /tmp;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					"$(EXECUTABLE_PATH)",
-				);
+				LIBRARY_SEARCH_PATHS = /sw/lib;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				ZERO_LINK = NO;
 			};
@@ -2874,10 +2755,7 @@
 					../../src,
 				);
 				INSTALL_PATH = /tmp;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					"$(EXECUTABLE_PATH)",
-				);
+				LIBRARY_SEARCH_PATHS = /sw/lib;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				ZERO_LINK = NO;
 			};
@@ -2892,7 +2770,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = common;
 				ZERO_LINK = NO;
@@ -2906,7 +2784,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = common;
 				ZERO_LINK = NO;
@@ -2929,15 +2807,9 @@
 					../../src,
 				);
 				INSTALL_PATH = /displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /sw/lib;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
-				OTHER_LDFLAGS = (
-					"-lcommon",
-					"-ltiff",
-				);
+				OTHER_LDFLAGS = "-ltiff";
 				PREBINDING = NO;
 				PRODUCT_NAME = file;
 				ZERO_LINK = NO;
@@ -2958,15 +2830,9 @@
 					../../src,
 				);
 				INSTALL_PATH = /displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /sw/lib;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
-				OTHER_LDFLAGS = (
-					"-lcommon",
-					"-ltiff",
-				);
+				OTHER_LDFLAGS = "-ltiff";
 				PREBINDING = NO;
 				PRODUCT_NAME = file;
 				ZERO_LINK = NO;
@@ -3046,7 +2912,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -3070,7 +2936,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -3346,6 +3212,7 @@
 		C9E09B460AD9BEC200A33716 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -3354,7 +3221,8 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /displays;
-				OTHER_LDFLAGS = "-lcommon";
+				LIBRARY_SEARCH_PATHS = /sw/lib;
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = rgbe;
 				ZERO_LINK = NO;
@@ -3364,13 +3232,15 @@
 		C9E09B470AD9BEC200A33716 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = YES;
 				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /displays;
-				OTHER_LDFLAGS = "-lcommon";
+				LIBRARY_SEARCH_PATHS = /sw/lib;
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = rgbe;
 				ZERO_LINK = NO;
