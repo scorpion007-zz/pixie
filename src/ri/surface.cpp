@@ -149,43 +149,36 @@ void	CPatch::dice(CShadingContext *r) {
 	// Have we checked size of this piece before ?
 	if ((udiv == -1) && (vdiv == -1)) {
 		// No, probe the surface and find the bounding box
-		vector					bmin,bmax,D;
-		float					Pmov[4*3];
-		float					maxBound;
-		float					dx,dy;
-		float					*P;
-		float					rasterExpand;
-		int						numUprobes;
-		int						numVprobes;
-		int						up,vp;
-		float					**varying;
-		int						k;
-		float					*uv;
-		float					*vv;
-		float					*timev;
-		int						disableCull;
-		int						cullFlags	=	TRUE;
+		vector		bmin,bmax,D;
+		float		Pmov[4*3];
+		float		maxBound;
+		float		dx,dy;
+		float		*P;
+		int			up,vp;
+		int			k;
+		int			cullFlags	=	TRUE;
 		
 		// We need to split this patch, so no need to compute udiv / vdiv
 
 		// Get some misc variables for fast access
-		disableCull		=	attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE;
-		rasterExpand	=	attributes->rasterExpand;
-		numUprobes		=	attributes->numUProbes;
-		numVprobes		=	attributes->numVProbes;
-		varying			=	r->currentShadingState->varying;
+		const int	disableCull		=	attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE;
+		const int	numUprobes		=	attributes->numUProbes;
+		const int	numVprobes		=	attributes->numVProbes;
+		float		**varying		=	r->currentShadingState->varying;
 
 		// Sample points on the patch
-		double	ustart	=	umin;
-		double	vstart	=	vmin;
-		double	ustep	=	(umax - ustart) / (double) (numUprobes-1);
-		double	vstep	=	(vmax - vstart) / (double) (numVprobes-1);
-		double	u,v;
+		const double	ustart		=	umin;
+		const double	vstart		=	vmin;
+		const double	ustep		=	(umax - ustart) / (double) (numUprobes-1);
+		const double	vstep		=	(vmax - vstart) / (double) (numVprobes-1);
+		double			u,v;
 
-		uv				=	varying[VARIABLE_U];
-		vv				=	varying[VARIABLE_V];
-		timev			=	varying[VARIABLE_TIME];
+		// The current u/v/time vectors
+		float			*uv			=	varying[VARIABLE_U];
+		float			*vv			=	varying[VARIABLE_V];
+		float			*timev		=	varying[VARIABLE_TIME];
 
+		// Init the bounding box to zero
 		initv(bmin,C_INFINITY);
 		initv(bmax,-C_INFINITY);
 
@@ -200,6 +193,7 @@ void	CPatch::dice(CShadingContext *r) {
 					timev[k]	=	1;
 				}
 			}
+			
 			assert(k <= (int) CRenderer::maxGridSize);
 			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
@@ -218,6 +212,7 @@ void	CPatch::dice(CShadingContext *r) {
 				timev[k]	=	0;
 			}
 		}
+		
 		assert(k <= (int) CRenderer::maxGridSize);
 		r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
@@ -228,7 +223,7 @@ void	CPatch::dice(CShadingContext *r) {
 		// Expand the bound
 		maxBound		=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
 		maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
-		maxBound		*=	rasterExpand;
+		maxBound		*=	attributes->rasterExpand;
 		if (maxBound == 0)	return;
 
 		bmin[COMP_X]	-=	maxBound;
@@ -248,10 +243,10 @@ void	CPatch::dice(CShadingContext *r) {
 		// Can we make the perspective divide ?
 		if ((bmin[COMP_Z] > C_EPSILON) && (depth >= minDepth)) {
 			// Figure out the subdivision we want to make
-			int		i1			=	0;								// Index of the top left
-			int		i2			=	numUprobes-1;					// Index of the top right
-			int		i3			=	numVprobes*numUprobes-1;		// Index of the bottom right
-			int		i4			=	(numVprobes-1)*numUprobes;		// Index of the bottom left
+			int		i1		=	0;								// Index of the top left
+			int		i2		=	numUprobes-1;					// Index of the top right
+			int		i3		=	numVprobes*numUprobes-1;		// Index of the bottom right
+			int		i4		=	(numVprobes-1)*numUprobes;		// Index of the bottom left
 			float	uLength[2],vLength[2];
 			float	umLength,vmLength;
 			float	shadingRate	=	attributes->shadingRate;

@@ -49,7 +49,7 @@ const	unsigned	int	HIDER_NODISPLAY				=	4;	// The hider is not actually generati
 const	unsigned	int	HIDER_DONE					=	8;	// The image has been computed, so stop
 const	unsigned	int	HIDER_ILLUMINATIONHOOK		=	16;	// The hider requires the illumination hooks
 const	unsigned	int	HIDER_PHOTONMAP_OVERWRITE	=	32;	// Overwrite the photon maps
-const	unsigned	int	HIDER_GEOMETRYHOOK			=	64;// The hider requires the geometry hooks
+const	unsigned	int	HIDER_GEOMETRYHOOK			=	64;	// The hider requires the geometry hooks
 
 // The clipping codes used by the clipcode()
 const	unsigned	int	CLIP_LEFT					=	1;
@@ -131,8 +131,8 @@ public:
 		//  They pretty much do what you would expect
 		// 
 		////////////////////////////////////////////////////////////////////
-		static void													beginRenderer(CRendererContext *context,char *ribFile,char *riNetString);
-		static void													endRenderer();
+		static void								beginRenderer(CRendererContext *context,char *ribFile,char *riNetString);
+		static void								endRenderer();
 
 								
 		////////////////////////////////////////////////////////////////////
@@ -170,20 +170,20 @@ public:
 		//
 		// Synchronization objects ...
 		//
-		//    Even though some of them are inly used between WorldBegin - WorldEnd, 
+		//    Even though some of them are mainly used between WorldBegin - WorldEnd, 
 		//    we're defining them as global
 		//
 		////////////////////////////////////////////////////////////////////
-		static	TMutex												commitMutex;				// The mutex that controls job dispatch
-		static	TMutex												dispatchMutex;				// To serialize the bucket dispatch if needed
-		static	TMutex												memoryMutex;				// To serialize accesses to the global memory
-		static	TMutex												networkMutex;				// To serialize the network communication
-		static	TMutex												hierarchyMutex;				// To serialize the raytracing hierarchy
-		static	TMutex												tesselateMutex;				// To serialize the tesselation
-		static	TMutex												textureMutex;				// To serialize texture fetches
-		static	TMutex												refCountMutex;				// To serialize the object attach()/detach()
-		static	TMutex												shaderMutex;				// To serialize shader parameter list access
-		static	TMutex												delayedMutex;				// To serialize rib parsing/delayed objects
+		static	TMutex							commitMutex;				// The mutex that controls job dispatch
+		static	TMutex							dispatchMutex;				// To serialize the bucket dispatch if needed
+		static	TMutex							memoryMutex;				// To serialize accesses to the global memory
+		static	TMutex							networkMutex;				// To serialize the network communication
+		static	TMutex							hierarchyMutex;				// To serialize the raytracing hierarchy
+		static	TMutex							tesselateMutex;				// To serialize the tesselation
+		static	TMutex							textureMutex;				// To serialize texture fetches
+		static	TMutex							refCountMutex;				// To serialize the object attach()/detach()
+		static	TMutex							shaderMutex;				// To serialize shader parameter list access
+		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
 
 
 		////////////////////////////////////////////////////////////////////
@@ -196,13 +196,6 @@ public:
 		//
 		// Between these functions, objects can be added to the scene using
 		//		render
-		//
-		// If raytracing is on, objects may need to be tesselated. In this case
-		//		tesselate
-		// function of CObject will be called in
-		//		render
-		// which may subsequently call
-		//		addTracable or removeTracable
 		//
 		// During rendering (in renderFrame), hiders can ask for a job using
 		//		getJob

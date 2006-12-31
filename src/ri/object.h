@@ -134,8 +134,8 @@ protected:
 
 
 			// The following two functions can be used to estimate the shading rate and the dicing amount
-			float					estimateShadingRate(const float *P0,const float *P1);
-			void					estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
+			float			estimateShadingRate(const float *P0,const float *P1);
+			void			estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
 };
 
 #endif
