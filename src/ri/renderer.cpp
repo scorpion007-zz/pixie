@@ -797,6 +797,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 	// Initialize the texturing
 	textureSetMaxMemory(maxTextureSize);
+	textureUsedBlocks = NULL;//FIXME - is this needed?
 
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
@@ -804,11 +805,13 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	if (netClient != INVALID_SOCKET) {
 		// for now to keep things working, one thread only in each server
 		// FIXME: remove this once the client server networking is threadable
+		// problem relates to having multiple server threads comminicating over socket
+		// need a single thread in charge of that, so we only get one nack
 		numThreads = 1;
 	}
 			
 	// Start the contexts
-	numActiveThreads	=	2;
+	numActiveThreads	=	numThreads;
 	contexts			=	new CShadingContext*[numThreads];
 	for (i=0;i<numThreads;i++) {
 
@@ -856,6 +859,7 @@ void		CRenderer::endFrame() {
 		delete contexts[i];
 	}
 	delete [] contexts;
+	contexts = NULL;
 
 	assert(stats.numRasterGrids		== 0);
 	assert(stats.numRasterObjects	== 0);
