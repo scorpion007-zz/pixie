@@ -158,7 +158,7 @@ public:
 		static	int								netNumServers;				// The number of servers (0 if server)
 		static	SOCKET							*netServers;				// The array of servers that are serving us		
 		static	int								userRaytracing;				// TRUE if we're raytracing for the user
-		static	int								numNetrenderedBuckets;		// The number of netrendered buckets
+		static	int								numRenderedBuckets;			// The number of rendered buckets
 		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
 		static	int								textureRefNumber;			// The last reference number for textures
 		static	CTextureBlock					*textureUsedBlocks;			// All texture blocks currently in use
