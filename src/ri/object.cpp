@@ -556,7 +556,7 @@ void			   CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,i
 		   dx	   =   cP[3 + COMP_X] - cP[COMP_X];
 		   dy	   =   cP[3 + COMP_Y] - cP[COMP_Y];
 		   l	   =   sqrtf(dx*dx + dy*dy);
-	uAvg	+=	l;	numU++;
+		   uAvg	+=	l;	numU++;
 		   if (l < uMin)   uMin	   =   l;
 		   if (l > uMax)   uMax	   =   l;
 	   }
@@ -581,4 +581,7 @@ void			   CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,i
    // Compute the new grid size
    nudiv   =   (int) (uAvg*udiv / (attributes->shadingRate*numU));
    nvdiv   =   (int) (vAvg*vdiv / (attributes->shadingRate*numV));
+   
+   nudiv   =   max(1,nudiv);
+   nvdiv   =   max(1,nvdiv);
 }
