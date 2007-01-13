@@ -39,6 +39,7 @@
 #include "surface.h"
 #include "renderer.h"
 #include "rendererContext.h"
+#include "patches.h"
 #include "common/polynomial.h"
 
 #if 0
@@ -59,6 +60,8 @@ void	*operator new(size_t size,CMovingTriangle *buf) {
 #endif
 #endif
 
+// For debugging only, force all trace calls to go through the tesselation patch
+#define FORCE_TESSELATED_TRACE 0
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTriVertex
@@ -175,6 +178,29 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 		} else {
 			if ((1-cRay->jimp) >= -importance)		return;
 		}
+	}
+
+	// smash to grids if we've got displacement
+	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) || FORCE_TESSELATED_TRACE) {
+		// Do we have a grid ?
+		if (children == NULL) {
+			osLock(CRenderer::hierarchyMutex);
+	
+			if (children == NULL) {
+				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
+				tesselation->tesselate(context,16,TRUE);
+				tesselation->attach();
+				children				=	tesselation;
+				// FIXME: we tesselate (but do not save) the finest level to get an accurate
+				// r estimate for the grid to start things off.  
+				// Q: Can we do this without firing the tesselation off?
+				// A: perhaps, but we definitely need r accurate as subdivision will use this to
+				// guess their r without tesselation
+			}
+	
+			osUnlock(CRenderer::hierarchyMutex);
+		}
+		return;
 	}
 
 	// Get the polygon corners
@@ -654,6 +680,29 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 		} else {
 			if ((1-cRay->jimp) >= -importance)		return;
 		}
+	}
+
+	// smash to grids if we've got displacement
+	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) || FORCE_TESSELATED_TRACE) {
+		// Do we have a grid ?
+		if (children == NULL) {
+			osLock(CRenderer::hierarchyMutex);
+	
+			if (children == NULL) {
+				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
+				tesselation->tesselate(context,16,TRUE);
+				tesselation->attach();
+				children				=	tesselation;
+				// FIXME: we tesselate (but do not save) the finest level to get an accurate
+				// r estimate for the grid to start things off.  
+				// Q: Can we do this without firing the tesselation off?
+				// A: perhaps, but we definitely need r accurate as subdivision will use this to
+				// guess their r without tesselation
+			}
+	
+			osUnlock(CRenderer::hierarchyMutex);
+		}
+		return;
 	}
 
 	const CPl	*pl			=	mesh->pl;

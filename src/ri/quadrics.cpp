@@ -38,13 +38,13 @@
 #include "common/os.h"
 #include "object.h"
 #include "stats.h"
+#include "surface.h"
 #include "memory.h"
 #include "shading.h"
 #include "renderer.h"
 #include "rendererContext.h"
 #include "objectMisc.h"
 #include "common/polynomial.h"
-
 
 
 #define	checkRay(rv)											\
@@ -57,6 +57,22 @@
 		} else {												\
 			if ((1-rv->jimp) >= -importance)	return;			\
 		}														\
+	}															\
+																\
+	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)) {						\
+		/* Do we have a grid ? */								\
+		if (children == NULL) {									\
+			osLock(CRenderer::hierarchyMutex);					\
+																\
+			if (children == NULL) {								\
+				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);	\
+				tesselation->tesselate(context,16,TRUE);		\
+				tesselation->attach();							\
+				children				=	tesselation;		\
+			}													\
+			osUnlock(CRenderer::hierarchyMutex);				\
+		}														\
+		return;													\
 	}															\
 																\
 	vector	oFrom,oDir;											\
