@@ -160,7 +160,7 @@ void		pglFile(const char *fileName) {
 
 	while(!feof(file)) {
 		int		i;
-		vector	P1,P2,P3;
+		vector	P1,P2,P3,P4;
 
 		fread(&i,1,sizeof(int),file);
 		switch(i) {
@@ -205,6 +205,24 @@ void		pglFile(const char *fileName) {
 				glVertex3fv(P1);
 				glVertex3fv(P2);
 				glVertex3fv(P3);
+				break;
+			case 3:
+
+				if (lastType != i) {
+					if (lastType != -1) glEnd();
+					lastType	=	i;
+					glBegin(GL_QUADS);
+				}
+
+				// Quad
+				fread(P1,3,sizeof(float),file);
+				fread(P2,3,sizeof(float),file);
+				fread(P3,3,sizeof(float),file);
+				fread(P4,3,sizeof(float),file);
+				glVertex3fv(P1);
+				glVertex3fv(P2);
+				glVertex3fv(P3);
+				glVertex3fv(P4);
 				break;
 			default:
 				break;
