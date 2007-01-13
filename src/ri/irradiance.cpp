@@ -640,7 +640,13 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	initv(irradiance,0);
 	initv(envdir,0);
 	rMean							=	C_INFINITY;
-
+	
+	// Calculate the ray differentials (use average spread in theta and phi)
+	//const float da					=	DEFAULT_RAY_DA;
+	//const float db					=	DEFAULT_RAY_DB;
+	const float da					=	tanf(C_PI/(2*(nt+np)));
+	const float db					=	dSample;
+	
 	if (lookup->occlusion == TRUE) {
 
 		// We're shading for occlusion
@@ -668,8 +674,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.tmin				=	lookup->bias;
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
-				ray.da					=	DEFAULT_RAY_DA;
-				ray.db					=	DEFAULT_RAY_DB;
+				ray.da					=	da;
+				ray.db					=	db;
 
 				context->trace(&ray);
 
@@ -746,8 +752,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.tmin				=	lookup->bias;
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
-				ray.da					=	DEFAULT_RAY_DA;
-				ray.db					=	DEFAULT_RAY_DB;
+				ray.da					=	da;
+				ray.db					=	db;
 
 				context->trace(&ray);
 
