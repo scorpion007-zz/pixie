@@ -117,7 +117,7 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
 // Return Value			:
 // Comments				:
 static inline void	textureMemFlush(CTextureBlock *entry,int all) {
-	
+
 	// Do we have stuff to free ?
 	if (CRenderer::textureUsedBlocks == NULL)	return;
 
@@ -413,6 +413,8 @@ public:
 	void				lookup(float *r,float s,float t,const CTextureLookup *lookup) { 
 							s		*=	width;					// To the pixel space
 							t		*=	height;
+							s		-=	0.5;						// Pixel centers
+							t		-=	0.5;
 							int		si	=	(int) floor(s);		// The integer pixel coordinates
 							int		ti	=	(int) floor(t);
 							float	ds	=	s - si;
@@ -450,6 +452,8 @@ public:
 	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
 							s		*=	width;						// To the pixel space
 							t		*=	height;
+							s		-=	0.5;						// Pixel centers
+							t		-=	0.5;
 							int		si		=	(int) floor(s);				// The integer pixel coordinates
 							int		ti		=	(int) floor(t);
 							float	ds		=	s - si;
@@ -538,14 +542,9 @@ protected:
 						int	xi		=	x+1;
 						int	yi		=	y+1;
 						
-						assert(x >= 0);
-						assert(y >= 0);
-						assert(x < width);
-						assert(y < height);
-
 						// these must be after the xi,yi calculation
-						//if (x < 0)			x  = (smode == TEXTURE_PERIODIC) ? (x + width)   : 0;
-						//f (y < 0)			y  = (tmode == TEXTURE_PERIODIC) ? (y + height)  : 0;
+						if (x < 0)			x  = (sMode == TEXTURE_PERIODIC) ? (x + width)   : 0;
+						if (y < 0)			y  = (tMode == TEXTURE_PERIODIC) ? (y + height)  : 0;
 						if (xi >= width)	xi = (sMode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
 						if (yi >= height)	yi = (tMode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
 
@@ -654,13 +653,9 @@ protected:
 						int	yi		=	y+1;
 						
 						// these must be after the xi,yi calculation
-						assert(x >= 0);
-						assert(y >= 0);
-						assert(x < width);
-						assert(y < height);
-
-						//if (x < 0)			x  = (smode == TEXTURE_PERIODIC) ? (x + width)   : 0;
-						//if (y < 0)			y  = (tmode == TEXTURE_PERIODIC) ? (y + height)  : 0;
+						
+						if (x < 0)			x  = (sMode == TEXTURE_PERIODIC) ? (x + width)   : 0;
+						if (y < 0)			y  = (tMode == TEXTURE_PERIODIC) ? (y + height)  : 0;
 						if (xi >= width)	xi = (sMode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
 						if (yi >= height)	yi = (tMode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
 
@@ -675,7 +670,7 @@ protected:
 							}														\
 																					\
 							CRenderer::textureRefNumber++;							\
-							block->lastRefNumber	=	CRenderer::textureRefNumber;	\
+							block->lastRefNumber	=	CRenderer::textureRefNumber;\
 																					\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);						\
@@ -701,7 +696,7 @@ protected:
 							}														\
 																					\
 							CRenderer::textureRefNumber++;							\
-							block->lastRefNumber	=	CRenderer::textureRefNumber;	\
+							block->lastRefNumber	=	CRenderer::textureRefNumber;\
 																					\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);						\
@@ -1273,7 +1268,7 @@ public:
 
 								cTile				=	tiles[by]+bx;
 
-								if (cTile->block.data == NULL)	loadTile(bx,by);
+								if (cTile->block.data == NULL) loadTile(bx,by);
 
 								cPixel				=	cTile->lastData[py*header.tileSize+px];
 
