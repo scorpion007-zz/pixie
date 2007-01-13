@@ -284,6 +284,8 @@ RtToken		RI_MAXRECURSION			=	"raydepth";
 RtToken		RI_TEXTUREMEMORY		=	"texturememory";
 RtToken		RI_BRICKMEMORY			=	"brickmemory";
 RtToken		RI_EYESPLITS			=	"eyesplits";
+RtToken		RI_NUMTHREADS			=	"numthreads";
+RtToken		RI_THREADSTRIDE			=	"threadstride";
 
 // Trace options
 RtToken		RI_MAXDEPTH				=	"maxdepth";
@@ -891,6 +893,18 @@ RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
    } else {
 	   return 0;
    }
+/*
+   double r2 = (x*x + y*y);		// RiSpec version
+   double r = sqrt(r2);
+
+   if (r < 1.0) {
+	   return	(float) (3.0*r*r2 - 5.0*r2 + 2.0);
+   } else if (r < 2.0) {
+	   return	(float) (-r*r2 + 5.0*r2 - 8.0*r + 4.0);
+   } else {
+	   return 0;
+   }
+*/
 }
 
 EXTERN(RtFloat)
