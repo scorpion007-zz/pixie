@@ -1066,6 +1066,37 @@ void		CShadingContext::updateState() {
 	currentShadingState	=	newState();
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	saveState
+// Description			:	Save the shading state so a nested tesselation
+//							doesn't trash our variables
+// Return Value			:	an opaque shading state reference
+// Comments				:
+void	*CShadingContext::saveState() {
+	CShadingState	*savedState		=	currentShadingState;
+	if (freeStates == NULL)			freeStates	=	newState();
+
+	currentShadingState				=	freeStates;
+	freeStates						=	currentShadingState->next;
+	
+	return (void*) savedState;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	restoreState
+// Description			:	Restore the shading state from a previous save
+// Return Value			:	-
+// Comments				:
+void	CShadingContext::restoreState(void *state) {
+	CShadingState	*savedState		=	(CShadingState*) state;
+	
+	currentShadingState->next		=	freeStates;
+	freeStates						=	currentShadingState;
+
+	currentShadingState				=	savedState;
+}
 
 
 ///////////////////////////////////////////////////////////////////////
