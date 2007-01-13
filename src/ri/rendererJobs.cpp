@@ -325,10 +325,6 @@ void		CRenderer::serverThread(void *w) {
 			
 			commit(header[0].integer,header[1].integer,header[2].integer,header[3].integer,buffer);
 			recvBucketDataChannels(netServers[index],x,y);
-	
-			numNetrenderedBuckets++;
-			stats.progress		=	(numNetrenderedBuckets*100) / (float) (xBuckets * yBuckets);
-			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 			
 			osUnlock(commitMutex);
 
@@ -347,10 +343,7 @@ void		CRenderer::serverThread(void *w) {
 			osLock(commitMutex);
 			
 			recvFrameDataChannels(netServers[index]);
-	
-			stats.progress	=	100;
-			if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
-
+			
 			osUnlock(commitMutex);
 		}
 	}
