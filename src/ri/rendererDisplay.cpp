@@ -253,6 +253,14 @@ void	CRenderer::clear(int left,int top,int width,int height) {
 // Return Value			:	-
 // Comments				:	Thread safe
 void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
+	// Progress stats
+	if (flags & OPTIONS_FLAGS_PROGRESS)	{
+		numRenderedBuckets++;
+		stats.progress		=	(numRenderedBuckets*100) / (float) (xBuckets * yBuckets);
+		if (numRenderedBuckets == xBuckets*yBuckets)	info(CODE_PROGRESS,"Done                    \r\n");
+		else											info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);		
+	}
+	
 	if (netClient != INVALID_SOCKET) {
 		// We are rendering for a client, so just send the result to the waiting client
 		T32	header[5];
