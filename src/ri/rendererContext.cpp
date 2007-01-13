@@ -1294,6 +1294,8 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 				options->maxTextureSize	*=	1000;								// Convert into bytes
 			optionCheck(RI_BRICKMEMORY,			options->maxBrickSize,				0,100000,int)
 				options->maxBrickSize	*=	1000;								// Convert into bytes
+			optionCheck(RI_NUMTHREADS,			options->numThreads,				1,32,int)
+			optionCheck(RI_THREADSTRIDE,		options->threadStride,				1,32,int)
 			optionEndCheck
 		}
 	// Check the hider options
@@ -4317,7 +4319,7 @@ void	CRendererContext::RiError(int code,int severity,char *mes) {
 
 	// Log the file
 	if (code == RIE_LOG) {
-		if (currentOptions->filelog != NULL) {
+		if ((currentOptions != NULL) && (currentOptions->filelog != NULL)) {
 			FILE	*out	=	fopen(currentOptions->filelog,"a");
 
 			if (out != NULL) {
