@@ -216,6 +216,8 @@ public:
 		CShadingState			*newState();											// Allocate a new shading state
 		void					freeState(CShadingState *);								// Destroy a shading state
 		void					deleteState(CShadingState *);							// Delete a shading state
+		void					*saveState();											// Save the shading state
+		void					restoreState(void *state);								// Restore a saved shading state
 	
 		// Memory from which we allocate the temp thread stuff
 		CMemPage				*threadMemory;
