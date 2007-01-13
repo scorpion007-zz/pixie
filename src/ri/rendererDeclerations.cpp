@@ -101,6 +101,8 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_EYESPLITS,			"int");
 	declareVariable(RI_TEXTUREMEMORY,		"int");
 	declareVariable(RI_BRICKMEMORY,			"int");
+	declareVariable(RI_NUMTHREADS,			"int");
+	declareVariable(RI_THREADSTRIDE,		"int");
 
 	declareVariable(RI_RADIANCECACHE,		"int");
 	declareVariable(RI_JITTER,				"float");
