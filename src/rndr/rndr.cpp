@@ -548,6 +548,7 @@ int main(int argc, char* argv[]) {
 	int				frameBufferOnly	=	FALSE;
 	int				displayStats	=	FALSE;
 	int				displayProgress	=	FALSE;
+	int				numThreads		=	-1;
 	int				localChildren	=	0;
 
 	// Init the memory manager
@@ -627,6 +628,8 @@ int main(int argc, char* argv[]) {
 			}
 		} else if (strcmp(argv[i],"-d") == 0) {
 			frameBufferOnly	=	TRUE;
+		} else if (strncmp(argv[i],"-t:",3) == 0) {
+			numThreads			=	atoi(argv[i]+3);
 		} else if (strcmp(argv[i],"-t") == 0) {
 			displayStats	=	TRUE;
 		} else if (strcmp(argv[i],"-p") == 0) {
@@ -642,6 +645,12 @@ int main(int argc, char* argv[]) {
 			fprintf(stderr,"Invalid combination of client and server options\n");
 			exit(0);
 		}
+	}
+	
+	// FIXME: remove once multithreaded netrenders are working
+	if ((client | server | localserver) && numThreads > 0) {
+		fprintf(stderr,"You cannot specify multithreaded for network / multiprocessor renders\n");
+		exit(0);
 	}
 
 	// Launch into daemon mode if appropriate
@@ -727,6 +736,10 @@ int main(int argc, char* argv[]) {
 		RiOption(RI_STATISTICS,RI_PROGRESS,&progress,RI_NULL);
 	}
 
+	if (numThreads > 0) {
+		RiOption(RI_LIMITS,RI_NUMTHREADS,&numThreads,RI_NULL);
+	}
+	
 	if (!killservers) RiReadArchive(source,NULL,NULL);
 
 	RiEnd();
