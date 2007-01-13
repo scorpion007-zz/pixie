@@ -55,7 +55,6 @@ void			CRenderer::initNetwork(char *ribFile,char *riNetString) {
 	netNumServers					=	0;
 	netServers						=	NULL;
 	netFileMappings					=	NULL;
-	numNetrenderedBuckets			=	0;
 
 	// Network init
 	netSetup(ribFile,riNetString);
