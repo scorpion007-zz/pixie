@@ -125,7 +125,7 @@ CDSO							*CRenderer::dsos						=	NULL;
 SOCKET							CRenderer::netClient					=	INVALID_SOCKET;
 int								CRenderer::netNumServers				=	0;
 SOCKET							*CRenderer::netServers					=	NULL;
-int								CRenderer::numNetrenderedBuckets		=	0;
+int								CRenderer::numRenderedBuckets			=	0;
 char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];
 int								CRenderer::textureRefNumber				=	0;
 CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;
@@ -1059,7 +1059,8 @@ void		CRenderer::renderFrame() {
 	movvv(root->bmin,worldBmin);
 	movvv(root->bmax,worldBmax);
 	root->setChildren(contexts[0],root->children);
-
+	numRenderedBuckets = 0;
+	
 	// Render the frame
 	if (netNumServers != 0) {
 		int				i;
@@ -1078,7 +1079,6 @@ void		CRenderer::renderFrame() {
 		}
 
 		// Send the ready to the servers to prepare them for the next frame
-		numNetrenderedBuckets = 0;
 		for (i=0;i<netNumServers;i++) {
 			T32	netBuffer;
 			netBuffer.integer	=	NET_READY;
