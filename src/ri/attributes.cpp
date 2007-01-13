@@ -94,12 +94,12 @@ CAttributes::CAttributes() {
 	flags						|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 	flags						|=	ATTRIBUTES_FLAGS_SINGULARITYFIX;
 
-	minSubdivision				=	2;
-	maxSubdivision				=	5;
+	minSubdivision				=	2;					//DEADATTR
+	maxSubdivision				=	5;					//DEADATTR
 
-	flatness					=	0.5f;
-	pointDeviation				=	C_INFINITY;
-	normalDeviation				=	cosf(radians(45));
+	flatness					=	0.5f;				//DEADATTR
+	pointDeviation				=	C_INFINITY;			//DEADATTR
+	normalDeviation				=	cosf(radians(45));	//DEADATTR
 
 	maxDisplacement				=	0;
 	maxDisplacementSpace		=	NULL;
