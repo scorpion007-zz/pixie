@@ -73,6 +73,18 @@ public:
 									fwrite(P2,3,sizeof(float),file);
 									fwrite(P3,3,sizeof(float),file);
 								}
+								
+				void			quad(const float *P1,const float *P2,const float *P3,const float *P4) {
+									addBox(bmin,bmax,P1);
+									addBox(bmin,bmax,P2);
+									addBox(bmin,bmax,P3);
+									int	i	=	3;
+									fwrite(&i,1,sizeof(int),file);
+									fwrite(P1,3,sizeof(float),file);
+									fwrite(P2,3,sizeof(float),file);
+									fwrite(P3,3,sizeof(float),file);
+									fwrite(P4,3,sizeof(float),file);
+								}
 
 				// Stuff inherited from CView
 				void			draw();
