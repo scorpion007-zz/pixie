@@ -392,6 +392,17 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 		}
 	}
 
+	float minVal = -C_INFINITY;
+	float maxVal = C_INFINITY;
+	
+	if (bitspersample == 8) {
+		minVal = 0;
+		maxVal = 255;
+	} else if (bitspersample == 16) {
+		minVal = 0;
+		maxVal = 65535;
+	}
+	
 	// Normalize the image
 	float	*pixel	=	filteredData;
 	T		*dest	=	data;
@@ -401,7 +412,11 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 		int	k;
 
 		for (k=0;k<numSamples;k++) {
-			dest[k]	=	(T) (pixel[k] / norm[0]);
+			float t = (pixel[k] / norm[0]);		// avoid precision / quanitze issues
+			t = min(max(minVal,t),maxVal);
+			dest[k]	=	(T) (t);
+			
+			//dest[k]	=	(T) (pixel[k] / norm[0]);
 		}
 
 		dest	+=	numSamples;
@@ -420,21 +435,21 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 // Comments				:
 void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int bitspersample,RtFilterFunc filter,float filterWidth,float filterHeight,int tileSize,void *data,char *smode,char *tmode) {
 	if (bitspersample == 8) {
-		if ((filterWidth > 1) || (filterHeight > 1))
+		if ((filterWidth > 1.0) || (filterHeight > 1.0))
 			filterImage<unsigned char>(width,height,numSamples,bitspersample,filterWidth,filterHeight,filter,(unsigned char *) data);
 
 		adjustSize<unsigned char>((unsigned char **) &data,&width,&height,numSamples,smode,tmode);
 
 		appendPyramid<unsigned char>(out,dstart,numSamples,bitspersample,tileSize,width,height,(unsigned char *) data);
 	} else if (bitspersample == 16) {
-		if ((filterWidth > 1) || (filterHeight > 1))
+		if ((filterWidth > 1.0) || (filterHeight > 1.0))
 			filterImage<unsigned short>(width,height,numSamples,bitspersample,filterWidth,filterHeight,filter,(unsigned short *) data);
 
 		adjustSize<unsigned short>((unsigned short **) &data,&width,&height,numSamples,smode,tmode);
 
 		appendPyramid<unsigned short>(out,dstart,numSamples,bitspersample,tileSize,width,height,(unsigned short *) data);
 	} else if (bitspersample == 32) {
-		if ((filterWidth > 1) || (filterHeight > 1))
+		if ((filterWidth > 1.0) || (filterHeight > 1.0))
 			filterImage<float>(width,height,numSamples,bitspersample,filterWidth,filterHeight,filter,(float *) data);
 
 		adjustSize<float>((float **) &data,&width,&height,numSamples,smode,tmode);
