@@ -73,7 +73,7 @@ public:
 									fwrite(P2,3,sizeof(float),file);
 									fwrite(P3,3,sizeof(float),file);
 								}
-								
+
 				void			quad(const float *P1,const float *P2,const float *P3,const float *P4) {
 									addBox(bmin,bmax,P1);
 									addBox(bmin,bmax,P2);
