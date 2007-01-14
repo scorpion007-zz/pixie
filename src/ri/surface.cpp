@@ -632,7 +632,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 										vector p;									\
 										mulvf(p,cRay->dir,cRay->t);					\
 										addvv(p,cRay->from);						\
-										d.disc(p,requiredR);						\
+										d.point(p);									\
 									}											\
 								}												\
 							} else {											\
@@ -646,7 +646,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 									vector p;									\
 									mulvf(p,cRay->dir,cRay->t);					\
 									addvv(p,cRay->from);						\
-									d.disc(p,requiredR);						\
+									d.point(p);									\
 								}												\
 							}													\
 						}														\
