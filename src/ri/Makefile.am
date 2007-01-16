@@ -39,7 +39,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				pointCloud.cpp \
 				polygons.cpp \
 				quadrics.cpp \
-				radiance.cpp \
 				random.cpp \
 				raytracer.cpp \
 				remoteChannel.cpp \
