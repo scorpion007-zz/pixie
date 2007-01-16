@@ -1377,7 +1377,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4(color,cs,ct,lookup);												\
+								tex->lookup4(color,cs,ct,lookup,thread);										\
 								res[i].real	=	color[0];
 
 #define	TEXTUREFEXPR_UPDATE		i++;
@@ -1455,7 +1455,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4((float *) res,cs,ct,lookup);
+								tex->lookup4((float *) res,cs,ct,lookup,thread);
 
 #define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;
 #else
@@ -1527,7 +1527,7 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 								ct[1]		=	op6->real;														\
 								ct[2]		=	op8->real;														\
 								ct[3]		=	op10->real;														\
-								tex->lookup4(tmp,cs,ct,lookup);													\
+								tex->lookup4(tmp,cs,ct,lookup,thread);											\
 								res->real	=	tmp[0];
 
 #define	TEXTUREFFULLEXPR_UPDATE	res++;																			\
@@ -1597,7 +1597,7 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								ct[1]		=	op6->real;														\
 								ct[2]		=	op8->real;														\
 								ct[3]		=	op10->real;														\
-								tex->lookup4((float *) res,cs,ct,lookup);
+								tex->lookup4((float *) res,cs,ct,lookup,thread);
 
 #define	TEXTURECFULLEXPR_UPDATE	res	+=	3;																		\
 								op3++;																			\
@@ -1714,7 +1714,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(color,D0,D1,D2,D3,lookup);									\
+											tex->lookup(color,D0,D1,D2,D3,lookup,thread);							\
 											res->real	=	color[0];												\
 										}																			\
 										res			++;																\
@@ -1809,7 +1809,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(color,D0,D1,D2,D3,lookup);									\
+											tex->lookup(color,D0,D1,D2,D3,lookup,thread);							\
 											res->real	=	color[0];												\
 										}																			\
 										res			++;																\
@@ -1894,7 +1894,7 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(&res->real,D0,D1,D2,D3,lookup);								\
+											tex->lookup(&res->real,D0,D1,D2,D3,lookup,thread);						\
 										}																			\
 										res			+=	3;															\
 										D			+=	3;															\
@@ -1984,7 +1984,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(&res->real,D0,D1,D2,D3,lookup);								\
+											tex->lookup(&res->real,D0,D1,D2,D3,lookup,thread);						\
 										}																			\
 										res			+=	3;															\
 										D			+=	3;															\
