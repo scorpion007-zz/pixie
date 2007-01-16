@@ -92,7 +92,7 @@ public:
 								CIrradianceCache(const char *,unsigned int,FILE *);
 								~CIrradianceCache();
 
-		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
+		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *,int thread);
 		void					cachesample(float *,const float *,const float *,float);
 
 		void					draw();
@@ -101,7 +101,7 @@ private:
 		void					writeNode(FILE *,CCacheNode *);
 		CCacheNode				*readNode(FILE *);
 
-		void					sample(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
+		void					sample(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *,int thread);
 		void					clamp(CCacheSample *);
 
 		CMemStack				*memory;

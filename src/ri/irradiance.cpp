@@ -211,7 +211,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Description			:	Lookup da cache
 // Return Value			:
 // Comments				:
-void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
+void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup, int thread) {
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
 	float				totalWeight		=	0;
@@ -323,7 +323,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 		if (flags & CACHE_SAMPLE) {
 
 			// Create a new sample
-			sample(C,P,N,dSample,context,lookup);
+			sample(C,P,N,dSample,context,lookup,thread);
 		} else {
 
 			// No joy
@@ -590,7 +590,7 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Description			:	Sample the occlusion
 // Return Value			:
 // Comments				:
-void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
+void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup,int thread) {
 	CCacheSample		*cSample;
 	int					i,j;
 	int					numSamples		=	lookup->numSamples;
@@ -708,7 +708,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,thread);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -809,7 +809,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,thread);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -828,7 +828,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		}
 	}
 	hemisphere				-=	np*nt;
-
+	
 	// Normalize
 	const float	tmp			=	1 / (float) numSamples;
 	coverage				*=	tmp;
