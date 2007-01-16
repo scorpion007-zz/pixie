@@ -40,6 +40,20 @@
 #include <malloc.h>
 #include <process.h>
 
+class CRWLock {
+    HANDLE  readerEvent;
+    HANDLE  mutex;
+    HANDLE  writerMutex;
+	LONG	readCount;
+	
+    friend void osCreateRWLock(CRWLock &);
+    friend void osDeleteRWLock(CRWLock &);
+    friend void osReadLock(CRWLock &);
+    friend void osReadUnlock(CRWLock &);
+    friend void osWriteLock(CRWLock &);
+    friend void osWriteUnlock(CRWLock &);
+};
+
 #define	socklen_t		int
 #define	LIB_EXPORT		__declspec(dllexport)
 #define LIB_IMPORT		__declspec(dllimport)
@@ -48,6 +62,7 @@
 #define	TThread			HANDLE
 #define	TMutex			CRITICAL_SECTION 
 #define	TSemaphore		HANDLE
+#define TRWLock         CRWLock
 typedef void			*(*TFun)(void *);
 
 #else				// >>>>>>>>>>>>>>>>>>>   Unix
@@ -75,7 +90,9 @@ typedef void			*(*TFun)(void *);
 #define	TThread			pthread_t
 #define	TMutex			pthread_mutex_t
 #define TSemaphore		sem_t
+#define TRWLock			pthread_rwlock_t
 typedef void			*(*TFun)(void *);
+
 #endif
 
 // Some common headers
@@ -204,13 +221,117 @@ inline	void	osDown(TSemaphore &sem) {
 #endif
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	osCreateRWLock
+// Description			:	create a read-write lock
+// Return Value			:
+// Comments				:
+inline	void osCreateRWLock(TRWLock &l) {
+#ifdef WIN32
+	l.readerEvent	=	CreateEvent(NULL,TRUE,FALSE,NULL);
+	l.mutex			=	CreateEvent(NULL,FALSE,TRUE,NULL);
+	l.writerMutex	=	CreateMutex(NULL,FALSE,NULL);
+	l.readerCount	=	-1;
+#else
+	pthread_rwlock_init(&l,NULL);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osDeleteRWLock
+// Description			:	destroy a read-write lock
+// Return Value			:
+// Comments				:
+inline	void osDeleteRWLock(TRWLock &l) {
+#ifdef WIN32
+	CloseHandle(l.readerEvent);
+	CloseHandle(l.mutex);
+	CloseHandle(l.writerMutex);
+#else
+	pthread_rwlock_destroy(&l);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osReadLock
+// Description			:	lock for reading
+// Return Value			:
+// Comments				:
+inline	void osReadLock(TRWLock &l) {
+#ifdef WIN32
+	// If we're first reader, claim mutex for all readers
+	if (InterlockedIncrement(&l.readCount) == 0) {
+		WaitForSingleObject(l.mutex, INFINITE);
+	}
+	// Signal that there are readers
+	WaitForSingleObject(l.readerEvent, INFINITE);
+#else	
+	pthread_rwlock_rdlock(&l);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osReadUnlock
+// Description			:	unlock after reading
+// Return Value			:
+// Comments				:
+inline	void osReadUnlock(TRWLock &l) {
+#ifdef WIN32
+	// If we're last reader, signal that there are no more
+	if (InterlockedDecrement(&l.readCount) < 0) {
+		ResetEvent(l.readerEvent);
+		// And release global mutex for a writer
+		ReleaseMutex(l.mutex);
+	}
+#else
+	pthread_rwlock_unlock(&l);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osWriteLock
+// Description			:	lock for writing
+// Return Value			:
+// Comments				:
+inline	void osWriteLock(TRWLock &l) {
+#ifdef WIN32
+	// Ensure we are the only writr
+	WaitForSingleObject(l.writerMutex, INFINITE);
+	// Claim the global mutex
+	WaitForSingleObject(l.mutex, INFINITE);
+#else
+	pthread_rwlock_wrlock(&l);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osWriteUnlock
+// Description			:	unlock after writing
+// Return Value			:
+// Comments				:
+inline	void osWriteUnlock(TRWLock &l) {
+#ifdef WIN32
+	// Signal that that there are no more writers
+	SetEvent(l.mutex);
+	// And release writer mutex for a reader
+	ReleaseMutex(l.writerMutex);
+#else
+	pthread_rwlock_unlock(&l);
+#endif
+}
+
 
 // Misc. file extensions
 #ifdef WIN32
 const	char	osModuleExtension[]		=	"dll";
 #else		// Win32
 #ifdef __APPLE_CC__
-const	char	osModuleExtension[]		=	"dylib";
+//const	char	osModuleExtension[]		=	"dylib";
+
+// loadable libs on darwin are supposed to be .bundle
+// but automake/libtool chooses .so and it can't be 
+// changed.  Xcode can be
+const	char	osModuleExtension[]		=	"so";
 #else		// OSX
 const	char	osModuleExtension[]		=	"so";
 #endif		// OSX
