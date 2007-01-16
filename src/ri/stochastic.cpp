@@ -865,6 +865,8 @@ void		CStochastic::deepShadowCompute() {
 	CFragment	**fSamples;
 	float		*fWeights;
 
+	osLock(CRenderer::deepShadowMutex);
+	
 	memBegin(threadMemory);
 	
 	prevFilePos		=	ftell(CRenderer::deepShadowFile);
@@ -948,4 +950,6 @@ void		CStochastic::deepShadowCompute() {
 	CRenderer::deepShadowIndex[tileIndex + CRenderer::xBuckets*CRenderer::yBuckets]	=	ftell(CRenderer::deepShadowFile) - prevFilePos;
 
 	memEnd(threadMemory);
+	
+	osUnlock(CRenderer::deepShadowMutex);
 }
