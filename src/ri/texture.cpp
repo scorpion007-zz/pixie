@@ -45,8 +45,23 @@
 #define	urand()	(rand() / (float) RAND_MAX)
 
 
+// per block or global locking
+// per block is faster, but requires (fractionally) more memory
+#define PERBLOCK_LOCK
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTexBlockThreadData
+// Description			:	This class holds thread-specific information about a texture block
+// Comments				:
+class	CTexBlockThreadData	{
+public:
+	void	*data;				// Residency for each thread
+	int		lastRefNumber;		// Last time this block was referenced
+};
+// FIXME.
+// NOT CURRENTLY USED.
+// INTENDED AS TAIL-PATCH to CTextureBlock
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureBlock
@@ -55,8 +70,14 @@
 class	CTextureBlock	{
 public:
 	void				*data;				// Where the block data is stored (NULL if the block has been paged out)
+	CTexBlockThreadData	*threadData;
+	
+#ifdef PERBLOCK_LOCK
+	TMutex				mutex;
+#endif
+
+	int					refCount;			// how many threads reference this block
 	int					size;				// Size of the block in bytes
-	int					lastRefNumber;		// Last time this block was referenced
 	CTextureBlock		*next;				// Pointer to the next used / empty block
 	CTextureBlock		*prev;				// Pointer to the previous used / empty block
 };
@@ -86,12 +107,12 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 // Description			:	Sort the textures in the order of increasing last ref number
 // Return Value			:
 // Comments				:
-static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
+static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end,int thread) {
 	int				i,last;
 	CTextureBlock	*cBlock;
 
 	for (last=start,i=start+1;i<=end;i++) {
-		if (activeBlocks[i]->lastRefNumber < activeBlocks[start]->lastRefNumber) {
+		if (activeBlocks[i]->threadData[thread].lastRefNumber < activeBlocks[start]->threadData[thread].lastRefNumber) {
 			last++;
 			cBlock					=	activeBlocks[last];
 			activeBlocks[last]		=	activeBlocks[i];
@@ -105,10 +126,10 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
 
 	// Speed is not an issue since this is not done very frequently, so recursion is OK
 	if ((last-1) > start)
-		textureQuickSort(activeBlocks,start,last-1);
+		textureQuickSort(activeBlocks,start,last-1,thread);
 
 	if (end > (last+1))
-		textureQuickSort(activeBlocks,last+1,end);
+		textureQuickSort(activeBlocks,last+1,end,thread);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -116,11 +137,15 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end) {
 // Description			:	Try to deallocate some textures from memory
 // Return Value			:
 // Comments				:
-static inline void	textureMemFlush(CTextureBlock *entry,int all) {
+static inline void	textureMemFlush(CTextureBlock *entry,int thread,int all) {
 
 	// Do we have stuff to free ?
 	if (CRenderer::textureUsedBlocks == NULL)	return;
 
+	#ifdef PERBLOCK_LOCK
+		osLock(CRenderer::textureMutex);
+	#endif
+	
 	osLock(CRenderer::memoryMutex);
 	memBegin(CRenderer::globalMemory);
 
@@ -129,7 +154,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,int all) {
 	CTextureBlock	**activeBlocks;
 	CTextureBlock	*cBlock;
 	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
-		if (cBlock->data != NULL) {
+		if (cBlock->threadData[thread].data != NULL) {
 			i++;
 		}
 	}
@@ -137,7 +162,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,int all) {
 	// Collect those blocks into an array
 	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),CRenderer::globalMemory);
 	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
-		if (cBlock->data != NULL) {
+		if (cBlock->threadData[thread].data != NULL) {
 			if (cBlock != entry) {
 				activeBlocks[i++]	=	cBlock;
 			}
@@ -145,22 +170,40 @@ static inline void	textureMemFlush(CTextureBlock *entry,int all) {
 	}
 
 	// Sort the blocks from last used to the most recently used
-	if (i > 1)	textureQuickSort(activeBlocks,0,i-1);
+	if (i > 1)	textureQuickSort(activeBlocks,0,i-1,thread);
 
 	// Free the memory
-	if (all)	CRenderer::textureMaxMemory	=	0;
-	for (j=0;(j<i) && (CRenderer::textureUsedMemory > (CRenderer::textureMaxMemory/2));j++) {
+	if (all)	CRenderer::textureMaxMemory[thread]	=	0;
+	for (j=0;(j<i) && (CRenderer::textureUsedMemory[thread] > (CRenderer::textureMaxMemory[thread]/2));j++) {
 		cBlock							=	activeBlocks[j];
 
-		stats.textureSize				-=	cBlock->size;
-		stats.textureMemory				-=	cBlock->size;
-		CRenderer::textureUsedMemory	-=	cBlock->size;
-		delete [] (unsigned char *) cBlock->data;
-		cBlock->data					=	NULL;
+		CRenderer::textureUsedMemory[thread]	-=	cBlock->size;
+		cBlock->threadData[thread].data			=	NULL;
+		
+		#ifdef PERBLOCK_LOCK
+			osLock(cBlock->mutex);
+		#endif
+		
+		if (--cBlock->refCount == 0) {
+			stats.textureSize						-=	cBlock->size;
+			stats.textureMemory						-=	cBlock->size;
+			
+			delete [] (unsigned char *) cBlock->data;
+			cBlock->data					=	NULL;
+		}
+		
+		#ifdef PERBLOCK_LOCK
+			osUnlock(cBlock->mutex);
+		#endif
+
 	}
 
 	memEnd(CRenderer::globalMemory);
 	osUnlock(CRenderer::memoryMutex);
+	
+	#ifdef PERBLOCK_LOCK
+		osUnlock(CRenderer::textureMutex);
+	#endif
 }
 
 
@@ -170,18 +213,18 @@ static inline void	textureMemFlush(CTextureBlock *entry,int all) {
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry) {
-	stats.textureSize				+=	entry->size;
-	stats.peakTextureSize			=	max(stats.textureSize,stats.peakTextureSize);
-	stats.textureMemory				+=	entry->size;
-	stats.transferredTextureData	+=	entry->size;
-	CRenderer::textureUsedMemory	+=	entry->size;
+static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,int thread) {
+	stats.textureSize						+=	entry->size;
+	stats.peakTextureSize					=	max(stats.textureSize,stats.peakTextureSize);
+	stats.textureMemory						+=	entry->size;
+	stats.transferredTextureData			+=	entry->size;
+	CRenderer::textureUsedMemory[thread]	+=	entry->size;
 
 	unsigned char *data				=	new unsigned char[entry->size];
 
 	// If we exceeded the maximum texture memory, phase out the last texture
-	if (CRenderer::textureUsedMemory > CRenderer::textureMaxMemory)
-		textureMemFlush(entry,FALSE);
+	if (CRenderer::textureUsedMemory[thread] > CRenderer::textureMaxMemory[thread])
+		textureMemFlush(entry,thread,FALSE);
 
 	return data;
 }
@@ -191,13 +234,26 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry) {
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir) {
+static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir,int thread) {
 	void			*data	=	NULL;
 	TIFF			*in;
-
-	osLock(CRenderer::textureMutex);
+	
+	#ifndef PERBLOCK_LOCK
+		osLock(CRenderer::textureMutex);
+	#else
+		osLock(entry->mutex);
+	#endif
+	
+	// if we already have the data, use that and increment the reference count
 	if (entry->data != NULL) {
-		osUnlock(CRenderer::textureMutex);
+		entry->threadData[thread].data	=	data;
+		entry->refCount++;
+		
+		#ifndef PERBLOCK_LOCK 
+			osUnlock(CRenderer::textureMutex);
+		#else
+			osUnlock(entry->mutex);
+		#endif
 		return;
 	}
 
@@ -241,7 +297,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 
 		// Allocate space for the texture
 		assert(entry->data == NULL);
-		data		=	textureAllocateBlock(entry);		
+		data		=	textureAllocateBlock(entry,thread);
 
 		// Do we need to read the entire texture ?
 		if ((x != 0) || (y != 0) || (w != (int) width) || (h != (int) height)) {
@@ -310,9 +366,19 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 		// FIXME: Is this an error ?
 	}
 
-	entry->data	=	data;
+	// See note below about out of order architectures.  The functions above take care of this
+	
+	assert(entry->refCount == 0);
+	
+	entry->refCount = 1;
+	entry->data						=	data;
+	entry->threadData[thread].data	=	data;
 
-	osUnlock(CRenderer::textureMutex);
+	#ifndef PERBLOCK_LOCK
+		osUnlock(CRenderer::textureMutex);
+	#else
+		osUnlock(entry->mutex);
+	#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -329,8 +395,18 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 	CRenderer::textureUsedBlocks		=	cEntry;
 
 	cEntry->data						=	NULL;
-	cEntry->lastRefNumber				=	CRenderer::textureRefNumber;
+	cEntry->refCount					=	0;
+	cEntry->threadData					=	new CTexBlockThreadData[CRenderer::numThreads];
 	cEntry->size						=	size;
+	
+	#ifdef PERBLOCK_LOCK
+		osCreateMutex(cEntry->mutex);
+	#endif
+	for (int i=0;i<CRenderer::numThreads;i++) {
+		cEntry->threadData[i].data				=	NULL;
+		cEntry->threadData[i].lastRefNumber		=	0; // FIXME: is this right?
+							// should be CRenderer::textureRefNumber ???
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -344,12 +420,25 @@ static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
 	if (cEntry->prev != NULL)	cEntry->prev->next						=	cEntry->next;
 	else						CRenderer::textureUsedBlocks			=	cEntry->next;
 
+	//assert(cEntry->refCount == 0);//? bad idea?
+	
 	if (cEntry->data != NULL) {
 		stats.textureSize	-=	cEntry->size;
 		stats.textureMemory	-=	cEntry->size;
-		CRenderer::textureUsedMemory	-=	cEntry->size;
+		// how to deal with this??
+		for (int i=0;i<CRenderer::numThreads;i++) {
+			if (cEntry->threadData[i].data != NULL) {
+				CRenderer::textureUsedMemory[i]	-=	cEntry->size;
+			}
+		}
 		delete [] (unsigned char *) cEntry->data;
 	}
+	
+	delete[] cEntry->threadData;
+	
+	#ifdef PERBLOCK_LOCK
+		osDeleteMutex(cEntry->mutex);
+	#endif
 }
 
 
@@ -410,7 +499,7 @@ public:
 							free(name);
 						}
 
-	void				lookup(float *r,float s,float t,const CTextureLookup *lookup) { 
+	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,int thread) { 
 							s		*=	width;					// To the pixel space
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
@@ -424,7 +513,7 @@ public:
 							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
 
 							float	res[4*3];
-							lookupPixel(res,si,ti,lookup);
+							lookupPixel(res,si,ti,lookup,thread);
 
 							float	tmp;
 
@@ -449,7 +538,7 @@ public:
 							r[2]	+=	res[11]*tmp;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,int thread) {
 							s		*=	width;						// To the pixel space
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
@@ -463,7 +552,7 @@ public:
 							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
 
 							float	res[4*3];
-							lookupPixel(res,si,ti,lookup);
+							lookupPixel(res,si,ti,lookup,thread);
 
 							float	r		=	0;
 
@@ -494,7 +583,7 @@ public:
 	TTextureMode		sMode,tMode;													// The wrap modes
 protected:
 	// This function must be overriden by the child class
-	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *)		=	0;		// Lookup 4 pixel values
+	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *,int thread)		=	0;		// Lookup 4 pixel values
 };
 
 
@@ -528,16 +617,17 @@ public:
 
 protected:
 					// The pixel lookup
-			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l) {
-
-						if (dataBlock.data == NULL) {
+			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l,int thread) {
+						
+						if (dataBlock.threadData[thread].data == NULL) {
 							// The data is cached out
-							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory);
+							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory,thread);
 						}
+						
 
 						// Texture cache management
-						CRenderer::textureRefNumber++;
-						dataBlock.lastRefNumber	=	CRenderer::textureRefNumber;
+						CRenderer::textureRefNumber[thread]++;
+						dataBlock.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
 
 						int	xi		=	x+1;
 						int	yi		=	y+1;
@@ -577,7 +667,7 @@ protected:
 							access(x,yi);
 							access(xi,yi);
 #undef access
-						}
+						}						
 					}
 
 private:
@@ -642,13 +732,13 @@ public:
 protected:
 
 					// Pixel lookup
-	void			lookupPixel(float *res,int x,int y,const CTextureLookup *l) {
+	void			lookupPixel(float *res,int x,int y,const CTextureLookup *l,int thread) {
 						int					xTile;
 						int					yTile;
 						CTextureBlock		*block;
 						const T				*data;
 						const int			t		=	tileSize - 1;
-
+						
 						int	xi		=	x+1;
 						int	yi		=	y+1;
 						
@@ -665,13 +755,12 @@ protected:
 							yTile	=	__y >> tileSizeShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
-							if (block->data == NULL) {								\
-								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory);		\
-							}														\
-																					\
-							CRenderer::textureRefNumber++;							\
-							block->lastRefNumber	=	CRenderer::textureRefNumber;\
-																					\
+							if (block->threadData[thread].data == NULL) {			\
+								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,thread);		\
+							}																					\
+							CRenderer::textureRefNumber[thread]++;												\
+							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];	\
+																												\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);						\
 							res[1]	=	l->fill;									\
@@ -691,13 +780,12 @@ protected:
 							yTile	=	__y >> tileSizeShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
-							if (block->data == NULL) {								\
-								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory);		\
-							}														\
-																					\
-							CRenderer::textureRefNumber++;							\
-							block->lastRefNumber	=	CRenderer::textureRefNumber;\
-																					\
+							if (block->threadData[thread].data == NULL) {			\
+								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,thread);		\
+							}																					\
+							CRenderer::textureRefNumber[thread]++;												\
+							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];	\
+																												\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
 							res[0]	=	(float) (data[0]*M);						\
 							res[1]	=	(float) (data[1]*M);						\
@@ -752,12 +840,12 @@ public:
 							}
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,int thread) {
 							assert(numLayers > 0);
-							return layers[0]->lookupz(s,t,z,lookup);
+							return layers[0]->lookupz(s,t,z,lookup,thread);
 						}
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l) {
+	void				lookup(float *result,float s,float t,const CTextureLookup *l,int thread) {
 
 							// Do the s mode
 							switch(layers[0]->sMode) {
@@ -795,10 +883,10 @@ public:
 								break;
 							}
 
-							layers[0]->lookup(result,s,t,l);
+							layers[0]->lookup(result,s,t,l,thread);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup) {
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,int thread) {
 							int				i;
 							float			totalContribution	=	0;
 							CTextureLayer	*layer0,*layer1;
@@ -898,8 +986,8 @@ public:
 								}
 
 												// lookup (s,t) and add it to the result
-								layer0->lookup(CC0,s,t,lookup);
-								layer1->lookup(CC1,s,t,lookup);
+								layer0->lookup(CC0,s,t,lookup,thread);
+								layer1->lookup(CC1,s,t,lookup,thread);
 								interpolatev(C,CC0,CC1,offset);
 
 								result[0]		+=	C[0]*contribution;
@@ -935,13 +1023,13 @@ public:
 							if (layer != NULL) delete  layer;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,int thread) {
 							assert(layer != NULL);
-							return layer->lookupz(s,t,z,lookup);
+							return layer->lookupz(s,t,z,lookup,thread);
 						}
 
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l) {
+	void				lookup(float *result,float s,float t,const CTextureLookup *l,int thread) {
 							// Do the s mode
 							switch(layer->sMode) {
 							case TEXTURE_PERIODIC:
@@ -978,10 +1066,10 @@ public:
 								break;
 							}
 
-							layer->lookup(result,s,t,l);
+							layer->lookup(result,s,t,l,thread);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup) {
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,int thread) {
 							int			i;
 							float		totalContribution	=	0;
 
@@ -1041,7 +1129,7 @@ public:
 									break;
 								}
 												// lookup (s,t) and add it to the result
-								layer->lookup(C,s,t,lookup);
+								layer->lookup(C,s,t,lookup,thread);
 
 								result[0]		+=	C[0]*contribution;
 								result[1]		+=	C[1]*contribution;
@@ -1077,7 +1165,7 @@ public:
 							if (side != NULL)	delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
 							int			i;
 							float		totalContribution	=	0;
 							float		r[4];
@@ -1115,7 +1203,7 @@ public:
 									continue;
 								}
 
-								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup);
+								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup,thread);
 
 								result[0]			+=	C*contribution;
 							}
@@ -1221,7 +1309,7 @@ public:
 							free(fileName);
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
 							int			i;
 							float		totalContribution	=	0;
 
@@ -1268,7 +1356,12 @@ public:
 
 								cTile				=	tiles[by]+bx;
 
-								if (cTile->block.data == NULL) loadTile(bx,by);
+								CRenderer::textureRefNumber[thread]++;
+								cTile->block.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
+								
+								if (cTile->block.threadData[thread].data == NULL) {
+									loadTile(bx,by,thread);
+								}
 
 								cPixel				=	cTile->lastData[py*header.tileSize+px];
 
@@ -1312,13 +1405,23 @@ public:
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
 	
 private:
-	void				loadTile(int x,int y) {
+	void				loadTile(int x,int y,int thread) {
 
 							CDeepTile	*cTile	=	tiles[y]+x;
 
-							osLock(CRenderer::textureMutex);
+							#ifndef PERBLOCK_LOCK
+								osLock(CRenderer::textureMutex);
+							#else
+								osLock(cTile->block.mutex);
+							#endif
 							if (cTile->block.data != NULL) {
-								osUnlock(CRenderer::textureMutex);
+								cTile->block.threadData[thread].data	 = 	cTile->block.data;
+								cTile->block.refCount++;
+								#ifndef PERBLOCK_LOCK
+									osUnlock(CRenderer::textureMutex);
+								#else
+									osUnlock(cTile->block.mutex);
+								#endif
 								return;
 							}
 
@@ -1334,10 +1437,10 @@ private:
 
 							startIndex	=	tileIndices[index];
 
-							dataStart	=	data	=	(float *) textureAllocateBlock(&(cTile->block));
+							dataStart	=	data	=	(float *) textureAllocateBlock(&(cTile->block),thread);
 							fseek(in,startIndex,SEEK_SET);
 							fread(data,sizeof(unsigned char),cTile->block.size,in);
-							fclose(in);
+							//fclose(in);  // moved later, see below
 
 							cLastData		=	cTile->lastData;
 							cData			=	cTile->data;
@@ -1352,9 +1455,26 @@ private:
 									while(*data != -C_INFINITY)	data	+=	4;
 								}
 							}
-
-							cTile->block.data	=	dataStart;
-							osUnlock(CRenderer::textureMutex);
+							
+							// This is a function call, which the compiler thinks could access
+							// any of memory.  Place it here, to ensure the compiler does not 
+							// hoist the store of the data before we finish computing the
+							// data starts and ends on archictectures like PPC which are massively
+							// out of order wrt memory store completion
+							// the osUnlock will take care of the real barrier
+							fclose(in);
+							
+							assert(cTile->block.refCount == 0);
+							
+							cTile->block.refCount					=	1;
+							cTile->block.data						=	dataStart;
+							cTile->block.threadData[thread].data	=	dataStart;
+							
+							#ifndef PERBLOCK_LOCK
+								osUnlock(CRenderer::textureMutex);
+							#else
+								osUnlock(cTile->block.mutex);
+							#endif
 						}
 
 	char				*fileName;				// The name of the file
@@ -1411,7 +1531,7 @@ public:
 						} EOrder;
 
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
 							EOrder		order;
 							CTexture	*side;
 							float		u,v;
@@ -1509,7 +1629,7 @@ public:
 								}
 
 
-								side->lookup(C,u,v,lookup);
+								side->lookup(C,u,v,lookup,thread);
 
 								result[0]	+=	C[0]*contribution;
 								result[1]	+=	C[1]*contribution;
@@ -1546,7 +1666,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
 							float		u[4],v[4];
 							float		m;
 
@@ -1566,7 +1686,7 @@ public:
 							u[3]				=	D3[COMP_X] / m + 0.5f;
 							v[3]				=	D3[COMP_Y] / m + 0.5f;
 
-							side->lookup4(result,u,v,lookup);
+							side->lookup4(result,u,v,lookup,thread);
 						}
 
 	// textureinfo support
@@ -1594,7 +1714,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
 							float		u[4],v[4];
 							double		a,b,c;
 							vector		D,Dsamp;
@@ -1625,7 +1745,7 @@ public:
 								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
 								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
 								
-								side->lookup4(result,u,v,lookup);
+								side->lookup4(result,u,v,lookup,thread);
 							} else {
 								initv(result,0,0,0);
 							}
@@ -2015,16 +2135,49 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	textureSetMaxMemory
-// Description			:	Set the maximum texture memory
+// Function				:	initTextures
+// Description			:	Set the maximum texture memory and init texturing
 // Return Value			:	-
 // Comments				:
-void			CRenderer::textureSetMaxMemory(int mm) {
+void			CRenderer::initTextures(int mm) {
+	// Set up our texturing
+	int maxPerThread = (int) ceil((float)mm/CRenderer::numThreads);
+	
+	CRenderer::textureUsedMemory	=	new int[CRenderer::numThreads];
+	CRenderer::textureMaxMemory		=	new int[CRenderer::numThreads];
+	
+	CRenderer::textureRefNumber		=	new	int[CRenderer::numThreads];
+	
+	for (int i=0;i<CRenderer::numThreads;i++) {
+		CRenderer::textureMaxMemory[i]		=	maxPerThread;
+		CRenderer::textureUsedMemory[i]		=	0;
+		
+		CRenderer::textureRefNumber[i]		=	0;
+	}
+	
+	// Note: all memory should have been cleared by previous shutdown
+}
 
-	// Flush all the memory
-	textureMemFlush(NULL,TRUE);
-	assert(CRenderer::textureUsedMemory == 0);
+///////////////////////////////////////////////////////////////////////
+// Function				:	shutdownTextures
+// Description			:	Set the maximum texture memory and init texturing
+// Return Value			:	-
+// Comments				:
+void			CRenderer::shutdownTextures() {
 
-	// Reset the texture memory
-	CRenderer::textureMaxMemory	=	mm;
+	// Flush all the memory (blocks will be killed by earlier file shutdown)
+	
+	//for (int i=0;i<CRenderer::numThreads;i++) {
+	//	textureMemFlush(NULL,i,TRUE);
+	//	assert(CRenderer::textureUsedMemory[i] == 0);
+	//}
+	
+	assert(CRenderer::textureUsedBlocks == NULL);
+	
+	// free up our texturing counters
+	
+	delete[] CRenderer::textureUsedMemory;
+	delete[] CRenderer::textureMaxMemory;
+	
+	delete[] CRenderer::textureRefNumber;
 }
