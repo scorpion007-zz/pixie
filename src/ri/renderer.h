@@ -160,10 +160,10 @@ public:
 		static	int								userRaytracing;				// TRUE if we're raytracing for the user
 		static	int								numRenderedBuckets;			// The number of rendered buckets
 		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
-		static	int								textureRefNumber;			// The last reference number for textures
+		static	int								*textureRefNumber;			// The last reference number for each thread's textures
 		static	CTextureBlock					*textureUsedBlocks;			// All texture blocks currently in use
-		static	int								textureUsedMemory;			// The amount of texture memory in use
-		static	int								textureMaxMemory;			// The maximum texture memory
+		static	int								*textureUsedMemory;			// The amount of texture memory in use for each thread
+		static	int								*textureMaxMemory;			// The maximum texture memory for each thread
 
 
 		////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ public:
 		static	TMutex							refCountMutex;				// To serialize the object attach()/detach()
 		static	TMutex							shaderMutex;				// To serialize shader parameter list access
 		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
-
+		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_
 
 		////////////////////////////////////////////////////////////////////
 		//
@@ -244,7 +244,7 @@ public:
 		static unsigned int		clipCode(const float *);							// Returns the clipping code
 
 		////////////////////////////////////////////////////////////////////
-		// Functions that deal with the displays (implemented in frameDisplay.cpp)
+		// Functions that deal with the displays (implemented in rendererDisplay.cpp)
 		////////////////////////////////////////////////////////////////////
 		static void				beginDisplays();									// Init the displays
 		static void				commit(int,int,int,int,float *);					// Send a chunk of computed framebuffer to the display drivers
@@ -255,7 +255,7 @@ public:
 		static void				endDisplays();										// Shutdown the displays
 
 		////////////////////////////////////////////////////////////////////
-		// Functions that deal with declerations (implemented in frameDeclerations.cpp)
+		// Functions that deal with declerations (implemented in rendererDeclerations.cpp)
 		////////////////////////////////////////////////////////////////////
 		static	void			initDeclerations();
 		static	void			defineCoordinateSystem(const char *,matrix &,matrix &,ECoordinateSystem type = COORDINATE_CUSTOM);
@@ -272,12 +272,13 @@ public:
 		static	void			shutdownDeclerations();
 								
 		////////////////////////////////////////////////////////////////////
-		// Functions that deal with files (implemented in frameFiles.cpp)
+		// Functions that deal with files (implemented in rendererFiles.cpp)
 		////////////////////////////////////////////////////////////////////
 		static	void			initFiles();
 		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
 		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
-		static	void			textureSetMaxMemory(int);								// Set the maximum texture memory
+		
+		static	void			initTextures(int);										// Set the maximum texture memory and init texturing		
 		static	CTexture		*textureLoad(const char *,TSearchpath *);				// Load a new texture map
 		static	CEnvironment	*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
 		static	CTexture		*getTexture(const char *);								// Load a texture
@@ -291,9 +292,11 @@ public:
 		static	char			*getFilter(RtFilterFunc);								// The other way around
 		static	int				getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
 		static	void			shutdownFiles();
+		static	void			shutdownTextures();										// clean up texturing
+
 
 		////////////////////////////////////////////////////////////////////
-		// Functions that deal with network (implemented in frameNetwork.cpp)
+		// Functions that deal with network (implemented in rendererNetwork.cpp)
 		////////////////////////////////////////////////////////////////////
 		static	void			initNetwork(char *ribFile,char *riNetString);			// Initiate misc network functionality
 		static	void			netSetup(char *,char *);								// Setup the network for rendering

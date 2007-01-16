@@ -127,10 +127,11 @@ int								CRenderer::netNumServers				=	0;
 SOCKET							*CRenderer::netServers					=	NULL;
 int								CRenderer::numRenderedBuckets			=	0;
 char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];
-int								CRenderer::textureRefNumber				=	0;
+int								*CRenderer::textureRefNumber			=	NULL;
 CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;
-int								CRenderer::textureUsedMemory			=	0;
-int								CRenderer::textureMaxMemory				=	0;
+int								*CRenderer::textureUsedMemory			=	NULL;
+int								*CRenderer::textureMaxMemory			=	NULL;
+
 
 // Global synchronization objects
 TMutex							CRenderer::commitMutex;
@@ -143,6 +144,7 @@ TMutex							CRenderer::textureMutex;
 TMutex							CRenderer::refCountMutex;
 TMutex							CRenderer::shaderMutex;
 TMutex							CRenderer::delayedMutex;
+TMutex							CRenderer::deepShadowMutex;
 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
@@ -307,6 +309,8 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(refCountMutex);
 	osCreateMutex(shaderMutex);
 	osCreateMutex(delayedMutex);
+	osCreateMutex(deepShadowMutex);
+	
 
 	// Init the memory
 	memoryInit(globalMemory);
@@ -379,6 +383,7 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(refCountMutex);
 	osDeleteMutex(shaderMutex);
 	osDeleteMutex(delayedMutex);
+	osDeleteMutex(deepShadowMutex);
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);
@@ -795,10 +800,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Start the displays
 	beginDisplays();
 
-	// Initialize the texturing
-	textureSetMaxMemory(maxTextureSize);
-	textureUsedBlocks = NULL;//FIXME - is this needed?
-
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
 
@@ -809,7 +810,12 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		// need a single thread in charge of that, so we only get one nack
 		numThreads = 1;
 	}
-			
+	
+	// Initialize the texturing (after we worked out how many threads)
+	initTextures(maxTextureSize);
+	//	textureUsedBlocks = NULL;//FIXME - is this needed?
+
+
 	// Start the contexts
 	numActiveThreads	=	numThreads;
 	contexts			=	new CShadingContext*[numThreads];
@@ -907,6 +913,9 @@ void		CRenderer::endFrame() {
 	// Unload the files
 	frameFiles->destroy();
 
+	// terminate the texturing  (must be after we kill the files)
+	shutdownTextures();
+		
 	// Shutdown the texturing system
 	CBrickMap::brickMapShutdown();
 
