@@ -402,11 +402,13 @@ void	CReyes::render() {
 		rasterEnd(pixelBuffer,noObjects);
 	
 		// Mark the first thread
+		#if 0
 		if (thread == 1) {
 			pixelBuffer[5]	=	1;
 		} else if (thread == 0) {
 			pixelBuffer[6]	=	1;
 		}
+		#endif
 		
 		// Flush the data to the out devices
 		CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
