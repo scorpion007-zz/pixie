@@ -150,7 +150,7 @@ void	CPatch::dice(CShadingContext *r) {
 	// Have we checked size of this piece before ?
 	if ((udiv == -1) && (vdiv == -1)) {
 		// No, probe the surface and find the bounding box
-		vector		bmin,bmax,D;
+		vector		D;
 		float		Pmov[4*3];
 		float		maxBound;
 		float		dx,dy;
