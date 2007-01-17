@@ -142,7 +142,7 @@ void		CPhotonHider::renderingLoop(){
 				emit										=	job.numPhotons;
 
 				if (emit > 0) {
-					photonPower								=	1 / (float) emit;
+					photonPower								=	1 / (float) CRenderer::numEmitPhotons;
 
 					while(emit > 0) {
 						const int	numVertices					=	min(CRenderer::maxGridSize,emit);
