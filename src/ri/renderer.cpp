@@ -108,30 +108,24 @@ const char	*colorCieSystem				=	"cie";
 ////////////////////////////////////////////////////////////////////
 // Global members (active between RiBegin() - RiEnd())
 ////////////////////////////////////////////////////////////////////
-CMemPage						*CRenderer::globalMemory				=	NULL;
-CRendererContext				*CRenderer::context						=	NULL;
-CArray<CShaderInstance *>		*CRenderer::allLights					=	NULL;
-CTrie<CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;
-CTrie<CVariable *>				*CRenderer::declaredVariables			=	NULL;
-CTrie<CFileResource  *>			*CRenderer::globalFiles					=	NULL;
-CTrie<CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;
-CTrie<CNetFileMapping *>		*CRenderer::netFileMappings				=	NULL;
-int								CRenderer::numKnownGlobalIds			=	0;
-CVariable						*CRenderer::variables					=	NULL;
-CArray<CVariable *>				*CRenderer::globalVariables				=	NULL;
-CTrie<CDisplayChannel *>		*CRenderer::declaredChannels			=	NULL;
-CArray<CDisplayChannel*>		*CRenderer::displayChannels				=	NULL;
-CDSO							*CRenderer::dsos						=	NULL;
-SOCKET							CRenderer::netClient					=	INVALID_SOCKET;
-int								CRenderer::netNumServers				=	0;
-SOCKET							*CRenderer::netServers					=	NULL;
-int								CRenderer::numRenderedBuckets			=	0;
-char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];
-int								*CRenderer::textureRefNumber			=	NULL;
-CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;
-int								*CRenderer::textureUsedMemory			=	NULL;
-int								*CRenderer::textureMaxMemory			=	NULL;
-
+CMemPage						*CRenderer::globalMemory				=	NULL;					// initialized in beginRenderer, destroyed in endRenderer
+CRendererContext				*CRenderer::context						=	NULL;					// initialzied in beginRenderer
+CArray<CShaderInstance *>		*CRenderer::allLights					=	NULL;					// initialized in beginRenderer, destroyed in endRenderer
+CTrie<CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CTrie<CVariable *>				*CRenderer::declaredVariables			=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CTrie<CFileResource  *>			*CRenderer::globalFiles					=	NULL;					// initialized in initFiles, destroyed in shutdownFiles
+CTrie<CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CTrie<CNetFileMapping *>		*CRenderer::netFileMappings				=	NULL;					// initialized in initNetwork, destroyed in shutdownNetwork
+int								CRenderer::numKnownGlobalIds			=	0;						// initialized in initDeclerations
+CVariable						*CRenderer::variables					=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CArray<CVariable *>				*CRenderer::globalVariables				=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CTrie<CDisplayChannel *>		*CRenderer::declaredChannels			=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CArray<CDisplayChannel*>		*CRenderer::displayChannels				=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CDSO							*CRenderer::dsos						=	NULL;					// initialized in initFiles, destroyed in shutdownFiles
+SOCKET							CRenderer::netClient					=	INVALID_SOCKET;			// initialized in initNetwork
+int								CRenderer::netNumServers				=	0;						// initialized in initNetwork
+SOCKET							*CRenderer::netServers					=	NULL;					// initialized in initNetwork, destroyed in shutdownNetwork
+char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];						// initialized in beginRenderer
 
 // Global synchronization objects
 TMutex							CRenderer::commitMutex;
@@ -272,6 +266,12 @@ CRenderer::CDisplayData			*CRenderer::datas;													// initialized in begin
 int								*CRenderer::sampleOrder;											// initialized in beginDisplays / computeDisplayData
 float							*CRenderer::sampleDefaults;											// initialized in beginDisplays / computeDisplayData
 int								CRenderer::numExtraChannels;										// initialized in beginDisplays / computeDisplayData
+int								CRenderer::numRenderedBuckets			=	0;						// initialized in beginFrame
+int								*CRenderer::textureRefNumber			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
+CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
+int								*CRenderer::textureUsedMemory			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
+int								*CRenderer::textureMaxMemory			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
+
 
 
 
@@ -808,7 +808,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	beginClipping();
 
 	// Start the displays
-	beginDisplays();
+	//beginDisplays();			// NODISPLAY etc not yet set
 
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);

@@ -2143,6 +2143,8 @@ void			CRenderer::initTextures(int mm) {
 	// Set up our texturing
 	int maxPerThread = (int) ceil((float)mm/CRenderer::numThreads);
 	
+	CRenderer::textureUsedBlocks	=	NULL;
+	
 	CRenderer::textureUsedMemory	=	new int[CRenderer::numThreads];
 	CRenderer::textureMaxMemory		=	new int[CRenderer::numThreads];
 	
