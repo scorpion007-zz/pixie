@@ -149,7 +149,7 @@ TMutex							CRenderer::deepShadowMutex;
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
 ////////////////////////////////////////////////////////////////////
-// Frame options
+// Frame options - intialized in copyOptions()
 int								CRenderer::xres,CRenderer::yres;
 int								CRenderer::frame;
 float							CRenderer::pixelAR;
@@ -205,70 +205,73 @@ int								CRenderer::shootStep;
 EDepthFilter					CRenderer::depthFilter;
 
 // Frame data
-CMemStack						*CRenderer::frameMemory				=	NULL;
-CTrie<CFileResource  *>			*CRenderer::frameFiles				=	NULL;
-CArray<const char*>				*CRenderer::frameTemporaryFiles		=	NULL;
-CShadingContext					**CRenderer::contexts				=	NULL;
-int								CRenderer::numActiveThreads			=	0;
-CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;
-CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;
-CArray<CProgrammableShaderInstance*>		*CRenderer::dirtyInstances			=	NULL;
-unsigned int					CRenderer::raytracingFlags			=	0;
-CObject							*CRenderer::root					=	NULL;
-CObject							*CRenderer::offendingObject			=	NULL;
-matrix							CRenderer::fromWorld,CRenderer::toWorld;
-vector							CRenderer::worldBmin,CRenderer::worldBmax;
-CXform							*CRenderer::world					=	NULL;
-matrix							CRenderer::fromNDC,CRenderer::toNDC;
-matrix							CRenderer::fromRaster,CRenderer::toRaster;
-matrix							CRenderer::fromScreen,CRenderer::toScreen;
+CMemStack						*CRenderer::frameMemory				=	NULL;						// intialized in beginFrame, destroyed in endFrame
+CTrie<CFileResource  *>			*CRenderer::frameFiles				=	NULL;						// intialized in beginFrame, destroyed in endFrame
+CArray<const char*>				*CRenderer::frameTemporaryFiles		=	NULL;						// intialized in beginFrame, destroyed in endFrame
+CShadingContext					**CRenderer::contexts				=	NULL;						// intialized in beginFrame, destroyed in endFrame
+int								CRenderer::numActiveThreads			=	0;							// intialized in beginFrame
+CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;						// intialized in beginFrame, destroyed in endFrame
+CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;						// intialized in beginFrame, destroyed in endFrame
+CArray<CProgrammableShaderInstance*>		*CRenderer::dirtyInstances			=	NULL;			// intialized in beginFrame, destroyed in endFrame
+unsigned int					CRenderer::raytracingFlags			=	0;							// intialized in beginFrame
+CObject							*CRenderer::root					=	NULL;						// intialized in beginFrame, destroyed in endFrame
+CObject							*CRenderer::offendingObject			=	NULL;						// intialized in beginFrame
+matrix							CRenderer::fromWorld,CRenderer::toWorld;							// intialized in beginFrame
+vector							CRenderer::worldBmin,CRenderer::worldBmax;							// intialized in beginFrame
+CXform							*CRenderer::world					=	NULL;						// intialized in beginFrame, destroyed in endFrame
+matrix							CRenderer::fromNDC,CRenderer::toNDC;								// intialized in beginFrame
+matrix							CRenderer::fromRaster,CRenderer::toRaster;							// intialized in beginFrame
+matrix							CRenderer::fromScreen,CRenderer::toScreen;///!!!!FIXME!!!!
 matrix							CRenderer::worldToNDC;
-unsigned int					CRenderer::hiderFlags;
-int								CRenderer::numSamples;
-int								CRenderer::numExtraSamples;
-int								CRenderer::xPixels,CRenderer::yPixels;
-unsigned int					CRenderer::additionalParameters;
-float							CRenderer::pixelLeft,CRenderer::pixelRight,CRenderer::pixelTop,CRenderer::pixelBottom;
-float							CRenderer::dydPixel,CRenderer::dxdPixel;
-float							CRenderer::dPixeldx,CRenderer::dPixeldy;
-float							CRenderer::dSampledx,CRenderer::dSampledy;
-int								CRenderer::renderLeft,CRenderer::renderRight,CRenderer::renderTop,CRenderer::renderBottom;
-int								CRenderer::xBuckets,CRenderer::yBuckets;
-int								CRenderer::xBucketsMinusOne;
-int								CRenderer::yBucketsMinusOne;
-float							CRenderer::invBucketSampleWidth,CRenderer::invBucketSampleHeight;
-int								CRenderer::metaXBuckets,CRenderer::metaYBuckets;
-float							CRenderer::aperture;
-float							CRenderer::imagePlane;
-float							CRenderer::invImagePlane;
-float							CRenderer::cocFactorPixels;
-float							CRenderer::cocFactorSamples;
-float							CRenderer::cocFactorScreen;
-float							CRenderer::invFocaldistance;
-float							CRenderer::lengthA,CRenderer::lengthB;
+unsigned int					CRenderer::hiderFlags;												// intialized in beginFrame
+int								CRenderer::numSamples;												// initialized in beginDisplays
+int								CRenderer::numExtraSamples;											// initialized in beginDisplays
+int								CRenderer::xPixels,CRenderer::yPixels;								// intialized in beginFrame
+unsigned int					CRenderer::additionalParameters;									// initialized in beginDisplays
+float							CRenderer::pixelLeft,CRenderer::pixelRight;							// intialized in beginFrame
+float							CRenderer::pixelTop,CRenderer::pixelBottom;							// intialized in beginFrame
+float							CRenderer::dydPixel,CRenderer::dxdPixel;							// intialized in beginFrame
+float							CRenderer::dPixeldx,CRenderer::dPixeldy;							// intialized in beginFrame
+float							CRenderer::dSampledx,CRenderer::dSampledy;							// intialized in beginFrame
+int								CRenderer::renderLeft,CRenderer::renderRight;						// intialized in beginFrame
+int								CRenderer::renderTop,CRenderer::renderBottom;						// intialized in beginFrame
+int								CRenderer::xBuckets,CRenderer::yBuckets;							// intialized in beginFrame
+int								CRenderer::xBucketsMinusOne;										// intialized in beginFrame
+int								CRenderer::yBucketsMinusOne;										// intialized in beginFrame
+float							CRenderer::invBucketSampleWidth,CRenderer::invBucketSampleHeight;	// intialized in beginFrame
+int								CRenderer::metaXBuckets,CRenderer::metaYBuckets;					// intialized in beginFrame
+float							CRenderer::aperture;												// intialized in beginFrame
+float							CRenderer::imagePlane;												// intialized in beginFrame
+float							CRenderer::invImagePlane;											// intialized in beginFrame
+float							CRenderer::cocFactorPixels;											// intialized in beginFrame
+float							CRenderer::cocFactorSamples;										// intialized in beginFrame
+float							CRenderer::cocFactorScreen;											// intialized in beginFrame
+float							CRenderer::invFocaldistance;										// intialized in beginFrame
+float							CRenderer::lengthA,CRenderer::lengthB;								// intialized in beginFrame
 
-int								CRenderer::xSampleOffset,CRenderer::ySampleOffset;
-float							CRenderer::sampleClipRight,CRenderer::sampleClipLeft,CRenderer::sampleClipTop,CRenderer::sampleClipBottom;
-float							*CRenderer::pixelFilterKernel;
+int								CRenderer::xSampleOffset,CRenderer::ySampleOffset;					// intialized in beginFrame
+float							CRenderer::sampleClipRight,CRenderer::sampleClipLeft;				// intialized in beginFrame
+float							CRenderer::sampleClipTop,CRenderer::sampleClipBottom;				// intialized in beginFrame
+float							*CRenderer::pixelFilterKernel;										// intialized in beginFrame
 
-float							CRenderer::leftX,CRenderer::leftZ,CRenderer::leftD;
-float							CRenderer::rightX,CRenderer::rightZ,CRenderer::rightD;
-float							CRenderer::topY,CRenderer::topZ,CRenderer::topD;
-float							CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;
-int								CRenderer::numActiveDisplays;
-int								CRenderer::currentXBucket;
-int								CRenderer::currentYBucket;
-int								CRenderer::currentPhoton;
-int								*CRenderer::jobAssignment;
-FILE							*CRenderer::deepShadowFile			=	NULL;
-int								*CRenderer::deepShadowIndex			=	NULL;
-int								CRenderer::deepShadowIndexStart;
-char							*CRenderer::deepShadowFileName		=	NULL;
-int								CRenderer::numDisplays;
-CRenderer::CDisplayData			*CRenderer::datas;
-int								*CRenderer::sampleOrder;
-float							*CRenderer::sampleDefaults;
-int								CRenderer::numExtraChannels;	
+float							CRenderer::leftX,CRenderer::leftZ,CRenderer::leftD;					// initialized in beginClipping
+float							CRenderer::rightX,CRenderer::rightZ,CRenderer::rightD;				// initialized in beginClipping
+float							CRenderer::topY,CRenderer::topZ,CRenderer::topD;					// initialized in beginClipping
+float							CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;			// initialized in beginClipping
+int								CRenderer::numActiveDisplays;										// initialized in beginDisplays
+int								CRenderer::currentXBucket;											// intialized in beginFrame
+int								CRenderer::currentYBucket;											// intialized in beginFrame
+int								CRenderer::currentPhoton;											// intialized in beginFrame
+int								*CRenderer::jobAssignment;											// intialized in beginFrame
+FILE							*CRenderer::deepShadowFile			=	NULL;						// initialized in beginDisplays
+int								*CRenderer::deepShadowIndex			=	NULL;						// initialized in beginDisplays
+int								CRenderer::deepShadowIndexStart;									// initialized in beginDisplays
+char							*CRenderer::deepShadowFileName		=	NULL;						// initialized in beginDisplays / computeDisplayData
+int								CRenderer::numDisplays;												// initialized in beginDisplays
+CRenderer::CDisplayData			*CRenderer::datas;													// initialized in beginDisplays / computeDisplayData
+int								*CRenderer::sampleOrder;											// initialized in beginDisplays / computeDisplayData
+float							*CRenderer::sampleDefaults;											// initialized in beginDisplays / computeDisplayData
+int								CRenderer::numExtraChannels;										// initialized in beginDisplays / computeDisplayData
 
 
 
@@ -506,6 +509,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 	// This is the memory we allocate our junk from (only permenant stuff for the entire frame)
 	frameFiles				=	new CTrie<CFileResource  *>;
+	frameTemporaryFiles		=	NULL;
 
 	// Save the world xform
 	world					=	x;
@@ -790,10 +794,16 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Set the root object
 	root					=	new CDummyObject(a,x);
 
+	// Error handling
+	offendingObject			=	NULL;
+	
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
 	declaredRemoteChannels	=	new CTrie<CRemoteChannel*>;
 
+	// Misc startup
+	hiderFlags	=	0;
+	
 	// Compute the clipping data
 	beginClipping();
 
