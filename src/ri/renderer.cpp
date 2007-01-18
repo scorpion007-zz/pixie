@@ -823,8 +823,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	
 	// Initialize the texturing (after we worked out how many threads)
 	initTextures(maxTextureSize);
-	//	textureUsedBlocks = NULL;//FIXME - is this needed?
-
 
 	// Start the contexts
 	numActiveThreads	=	numThreads;
