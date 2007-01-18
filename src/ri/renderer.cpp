@@ -821,6 +821,11 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Initialize the texturing (after we worked out how many threads)
 	initTextures(maxTextureSize);
 
+	// Set up displays
+	// FIXME: ideally, we'd do this after the hiders have had a chance to alter the hiderFlags
+	// but we need the displays to have determine the extraSampleSize etc....
+	beginDisplays();
+	
 	// Start the contexts
 	numActiveThreads	=	numThreads;
 	contexts			=	new CShadingContext*[numThreads];
@@ -853,11 +858,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		assert(contexts[i] != NULL);
 
 		contexts[i]->updateState();
-	}
-	
-	// Set up displays
-	// Do this after the hiders have had a chance to alter the hiderFlags
-	beginDisplays();			
+	}			
 }
 
 ///////////////////////////////////////////////////////////////////////
