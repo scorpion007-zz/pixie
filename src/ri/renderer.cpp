@@ -808,7 +808,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	beginClipping();
 
 	// Start the displays
-	//beginDisplays();			// NODISPLAY etc not yet set
+	beginDisplays();			// NODISPLAY etc not yet set
 
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
