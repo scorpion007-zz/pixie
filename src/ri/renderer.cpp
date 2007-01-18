@@ -807,9 +807,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Compute the clipping data
 	beginClipping();
 
-	// Start the displays
-	beginDisplays();			// NODISPLAY etc not yet set
-
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
 
@@ -857,6 +854,10 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 		contexts[i]->updateState();
 	}
+	
+	// Set up displays
+	// Do this after the hiders have had a chance to alter the hiderFlags
+	beginDisplays();			
 }
 
 ///////////////////////////////////////////////////////////////////////
