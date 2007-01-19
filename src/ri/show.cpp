@@ -58,8 +58,6 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 	if (thread == 0) {
 		char		moduleFile[OS_MAX_PATH_LENGTH];
 
-		CRenderer::hiderFlags	|=	HIDER_NODISPLAY;
-
 		// First, try to load the dynamic library
 		CView::handle	=	NULL;
 		if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::modulePath)) {
@@ -150,3 +148,14 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 // Comments				:
 CShow::~CShow() {
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class                :   CShow
+// Method               :   preDisplaySetup
+// Description          :   allow the hider to affect display setup
+// Return Value         :   -
+// Comments             :
+void CShow::preDisplaySetup() {
+	CRenderer::hiderFlags	|=	HIDER_NODISPLAY;
+}
+
