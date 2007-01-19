@@ -821,9 +821,23 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Initialize the texturing (after we worked out how many threads)
 	initTextures(maxTextureSize);
 
+	// Allow the hider to control display setup
+	if (strcmp(hider,"raytrace") == 0) {
+		CRaytracer::preDisplaySetup();
+	} else if (strcmp(hider,"stochastic") == 0) {
+		CStochastic::preDisplaySetup();
+	} else if (strcmp(hider,"zbuffer") == 0) {
+		CZbuffer::preDisplaySetup();
+	} else if (strncmp(hider,"show:",5) == 0) {
+		CShow::preDisplaySetup();
+	} else if (strcmp(hider,"photon") == 0) {
+		CPhotonHider::preDisplaySetup();
+	} else {
+		error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",hider);
+		CStochastic::preDisplaySetup();
+	}
+	
 	// Set up displays
-	// FIXME: ideally, we'd do this after the hiders have had a chance to alter the hiderFlags
-	// but we need the displays to have determine the extraSampleSize etc....
 	beginDisplays();
 	
 	// Start the contexts
@@ -850,7 +864,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 			contexts[i]						=	new CPhotonHider(i,context->getAttributes(TRUE));
 			dispatchJob						=	dispatchPhoton;
 		} else {
-			error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",hider);
 			contexts[i]						=	new CStochastic(i);
 			dispatchJob						=	dispatchReyes;
 		}
