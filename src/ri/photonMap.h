@@ -65,7 +65,9 @@
 }
 
 
-#define PDEBUG
+// Debug and build options
+//#define PHOTON_DEBUG
+#define PHOTON_LOOKUP_CACHE
 
 // Some extern variables defined in photon.cpp
 extern	int					inited;
@@ -353,7 +355,7 @@ protected:
 					}
 
 
-#ifdef PDEBUG
+#ifdef PHOTON_DEBUG
 					// FIXME: Remove
 					int	i;
 					for (i=start;i<median;i++) {
@@ -650,6 +652,24 @@ public:
 // Description			:	A Photon map
 // Comments				:
 class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView {
+	
+	#ifdef PHOTON_LOOKUP_CACHE
+		class	CPhotonSample {
+		public:
+			vector			C,P,N;
+			float			dP;
+			CPhotonSample	*next;
+		};
+
+		class	CPhotonNode {
+		public:
+			vector			center;
+			float			side;
+			CPhotonSample	*samples;
+			CPhotonNode		*children[8];
+		};
+	#endif
+	
 public:
 				CPhotonMap(const char *,FILE *);
 				~CPhotonMap();
@@ -669,6 +689,14 @@ public:
 
 	void		draw();
 	void		bound(float *bmin,float *bmax);
+
+	#ifdef PHOTON_LOOKUP_CACHE
+		int			probe(float *,const float *,const float *);
+		void		insert(const float *,const float *,const float *,float);
+
+		CPhotonNode	*root;
+		int			maxDepth;			// The maximum depth of the hierarchy
+	#endif
 
 	int			refCount;
 	int			modifying;
