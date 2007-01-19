@@ -168,6 +168,13 @@ void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 		job.type		=	CJob::PHOTON_BUNDLE;
 		job.numPhotons	=	min(1000,numEmitPhotons-currentPhoton);	// Shoot 1000 photons at a time
 		currentPhoton	+=	job.numPhotons;
+		
+		if (CRenderer::flags & OPTIONS_FLAGS_PROGRESS)	{
+			stats.progress		=	(currentPhoton*100) / (float) (numEmitPhotons);
+			if (currentPhoton == numEmitPhotons)	info(CODE_PROGRESS,"Done %d photons            	            \r\n",numEmitPhotons);
+			else									info(CODE_PROGRESS,"Done %%%3.2f %d photons\r",stats.progress,currentPhoton);
+		}
+
 	} else {
 
 		// We're finished, terminate
