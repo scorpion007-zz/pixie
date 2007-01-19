@@ -46,6 +46,8 @@ public:
 				CZbuffer(int thread);
 				~CZbuffer();
 
+	static void	preDisplaySetup();
+
 				// The functions inherited from the CReyes
 	void		rasterBegin(int,int,int,int,int);
 	void		rasterDrawPrimitives(CRasterGrid *);
