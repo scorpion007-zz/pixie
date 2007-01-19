@@ -72,7 +72,6 @@ public:
 // Comments				:
 CPhotonHider::CPhotonHider(int thread,CAttributes *a) : CShadingContext(thread) {
 	CRenderer::raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-	CRenderer::hiderFlags			|=	HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE;
 	bias							=	a->shadowBias;
 	phony							=	new CPhonySurface(a,CRenderer::world);
 	phony->attach();
@@ -101,6 +100,15 @@ CPhotonHider::~CPhotonHider() {
 	stats.numPhotonRays		+=		numTracedPhotons;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPhotonHider
+// Method				:	preDisplaySetup
+// Description			:	allow the hider to affect display setup
+// Return Value			:	-
+// Comments				:
+void CPhotonHider::preDisplaySetup() {
+	CRenderer::hiderFlags			|=	HIDER_NODISPLAY | HIDER_ILLUMINATIONHOOK | HIDER_PHOTONMAP_OVERWRITE;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonHider
