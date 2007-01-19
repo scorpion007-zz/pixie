@@ -45,6 +45,8 @@ public:
 							CShow(int thread);
 			virtual			~CShow();
 
+			static void		preDisplaySetup();
+
 			// Right after world end to force rendering of the entire frame
 			void			renderingLoop() { }
 
