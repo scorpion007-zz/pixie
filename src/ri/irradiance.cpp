@@ -46,6 +46,8 @@
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 const	float	horizonCutoff			=	(float) cosf(radians(80));
 
+#define HARMONIC_MEAN
+#define GRADIENT_CLAMPING
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -231,14 +233,14 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 	initv(irradiance,0);
 	initv(envdir,0);
 
-	// The weighting algorithm is that described in [Tebellion and Lamorte 2004]
-	// We need to convert the max error as in Wald to Tebellion 
+	// The weighting algorithm is that described in [Tabellion and Lamorlette 2004]
+	// We need to convert the max error as in Wald to Tabellion 
 	// The default value of maxError is 0.4f
 	const float			K		=	0.4f / lookup->maxError;
 
-	// Lock the data for reading
-	osLock(mutex);
-
+	// Note, we do not need to lock the data for reading
+	// if word-writes are atomic
+	
 	// Prepare for the non recursive tree traversal
 	stack		=	stackBase;
 	*stack++	=	root;
@@ -301,9 +303,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 			}
 		}
 	}
-
-	// Release the lock
-	osUnlock(mutex);
 
 	// Do we have anything ?
 	if (totalWeight > C_EPSILON) {
@@ -639,7 +638,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	coverage						=	0;
 	initv(irradiance,0);
 	initv(envdir,0);
-	rMean							=	C_INFINITY;
+	#ifndef HARMONIC_MEAN
+		rMean							=	C_INFINITY;
+	#else
+		rMean							=	0;
+		int nMean						=	0;
+	#endif
 	
 	// Calculate the ray differentials (use average spread in theta and phi)
 	//const float da					=	DEFAULT_RAY_DA;
@@ -719,7 +723,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
 
-				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+				#ifndef HARMONIC_MEAN
+					if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+				#else
+					if (tmp > horizonCutoff)	{ rMean =	1.0f/ray.t;	nMean++; }
+				#endif
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -820,7 +828,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
-				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+				#ifndef HARMONIC_MEAN
+					if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+				#else
+					if (tmp > horizonCutoff)	{ rMean =	1.0f/ray.t;	nMean++; }
+				#endif
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -857,17 +869,39 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		posGradient(cSample->gP,np,nt,hemisphere,X,Y);
 		rotGradient(cSample->gR,np,nt,hemisphere,X,Y);
 
+		#ifdef HARMONIC_MEAN
+		rMean					=	((float) nMean) / rMean;
+		#endif
+		
+		#ifdef GRADIENT_CLAMPING
+		// Do the translational gradient clamp trick
+		{
+			float mag = cSample->gP[1]*cSample->gP[1] +
+						cSample->gP[2]*cSample->gP[2] +
+						cSample->gP[3]*cSample->gP[3];
+			
+			mag = sqrtf(mag);
+			
+			float divis = 
+				cSample->irradiance[0]*cSample->irradiance[0] +
+				cSample->irradiance[1]*cSample->irradiance[1] +
+				cSample->irradiance[2]*cSample->irradiance[2];
+			
+			divis = sqrtf(divis);
+			
+			// If the translational gradient is bigger than the inverse of the radius
+			// use it's inverse as radius instead
+			if (mag/divis > 1.0f/rMean) rMean = divis/mag;
+		}
+		
 		// Compute the radius of validity
 		rMean					*=	0.5f;
 
 		// Clamp the radius of validity
 		rMean					=	max(rMean, lookup->minFGRadius);
 		rMean					=	min(rMean, lookup->maxFGRadius);
-
-		// Clamp the radius of validity
-		rMean					=	max(rMean,dSample);
-		rMean					=	min(rMean,dSample*10);
-
+		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5);
+		
 		// Record the data
 		movvv(cSample->P,P);
 		movvv(cSample->N,N);
@@ -875,7 +909,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		cSample->coverage		=	coverage;
 		movvv(cSample->envdir,envdir);
 		movvv(cSample->irradiance,irradiance);
-
+		
 		// Do the neighbour clamping trick
 		clamp(cSample);
 
