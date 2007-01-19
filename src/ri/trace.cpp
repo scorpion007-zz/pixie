@@ -307,6 +307,80 @@ public:
 };
 
 
+#define SCALAR_TYPE float
+inline	SCALAR_TYPE		nearestBoxFast(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,const SCALAR_TYPE *F,const SCALAR_TYPE *D,const SCALAR_TYPE *iD,SCALAR_TYPE tmin,SCALAR_TYPE tmax) {
+	SCALAR_TYPE		tnear,tfar;
+	SCALAR_TYPE		t1,t2;
+	unsigned int	i;
+
+	vector _D,_F,_iD,_bmin,_bmax;
+	
+	movvv(_iD,iD);
+	movvv(_D,D);
+	movvv(_F,F);
+	movvv(_bmin,bmin);
+	movvv(_bmax,bmax);
+	
+	tnear	=	tmin;
+	tfar	=	tmax;
+
+		if (_D[0] == 0) {
+			if ((_F[0] > _bmax[0]) || (_F[0] < _bmin[0])) return C_INFINITY;
+		} else {
+			t1		=	(_bmin[0] - _F[0]) * _iD[0];
+			t2		=	(_bmax[0] - _F[0]) * _iD[0];
+
+			if (t1 < t2) {
+				if (t1 > tnear)	tnear = t1;
+				if (t2 < tfar)	tfar = t2;
+			} else {
+				if (t2 > tnear)	tnear = t2;
+				if (t1 < tfar)	tfar = t1;
+			}
+
+			if (tnear > tfar) return C_INFINITY;
+		}
+
+		if (_D[1] == 0) {
+			if ((_F[1] > _bmax[1]) || (_F[1] < _bmin[1])) return C_INFINITY;
+		} else {
+			t1		=	(_bmin[1] - _F[1]) * _iD[1];
+			t2		=	(_bmax[1] - _F[1]) * _iD[1];
+
+			if (t1 < t2) {
+				if (t1 > tnear)	tnear = t1;
+				if (t2 < tfar)	tfar = t2;
+			} else {
+				if (t2 > tnear)	tnear = t2;
+				if (t1 < tfar)	tfar = t1;
+			}
+
+			if (tnear > tfar) return C_INFINITY;
+		}
+
+		if (_D[2] == 0) {
+			if ((_F[2] > _bmax[2]) || (_F[2] < _bmin[2])) return C_INFINITY;
+		} else {
+			t1		=	(_bmin[2] - _F[2]) * _iD[2];
+			t2		=	(_bmax[2] - _F[2]) * _iD[2];
+
+			if (t1 < t2) {
+				if (t1 > tnear)	tnear = t1;
+				if (t2 < tfar)	tfar = t2;
+			} else {
+				if (t2 > tnear)	tnear = t2;
+				if (t1 < tfar)	tfar = t1;
+			}
+
+			if (tnear > tfar) return C_INFINITY;
+		}
+
+	return tnear;
+}
+#undef SCALAR_TYPE
+
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -327,7 +401,13 @@ void	CShadingContext::trace(CRay *ray) {
 	int					numObjects	=	1;
 	int					maxObjects	=	100;
 
-	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->dir,ray->tmin,ray->t);
+	vector iD;
+	
+	iD[0] = 1.0f/ray->dir[0];
+	iD[1] = 1.0f/ray->dir[1];
+	iD[2] = 1.0f/ray->dir[2];
+	
+	heap[1].tmin		=	nearestBoxFast(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->dir,iD,ray->tmin,ray->t);
 	heap[1].object		=	CRenderer::root;
 	ray->jimp			=	urand();
 	ray->object			=	NULL;
@@ -372,7 +452,7 @@ void	CShadingContext::trace(CRay *ray) {
 			}
 
 			// Insert the child into the heap
-			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->dir,ray->tmin,ray->t);
+			const float	tmin	=	nearestBoxFast(cChild->bmin,cChild->bmax,ray->from,ray->dir,iD,ray->tmin,ray->t);
 			
 			if (tmin < ray->t) {
 				// Maintain the heap
