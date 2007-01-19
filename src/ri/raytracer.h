@@ -86,6 +86,8 @@ public:
 									CRaytracer(int thread);
 			virtual					~CRaytracer();
 
+			static void				preDisplaySetup() { }
+
 			// The main hider interface
 			// The following functions are commented out for we want the CShadingContext to handle those
 			void					renderingLoop();
