@@ -90,7 +90,9 @@ CPhotonHider::~CPhotonHider() {
 
 	// Balance the maps that have been modified
 	while((cMap = balanceList.pop()) != NULL) {
-		cMap->modifying	=	FALSE;
+		// Note that we are single threaded in the destructor
+		// but we may have items in this list which are already written
+		// write() takes care of this
 		cMap->write(CRenderer::world);
 	}
 
@@ -529,6 +531,9 @@ processBounce:;
 				// Save the photon
 				if ((globalMap=attributes->globalMap) != NULL) {
 					if (globalMap->modifying == FALSE) {
+						// Note: this isn't strictly thread safe, more than one
+						// thread may end up with the map in the balance list
+						// but the write() will take care of it
 						globalMap->modifying	=	TRUE;
 						globalMap->reset();
 						balanceList.push(globalMap);
@@ -540,6 +545,7 @@ processBounce:;
 				if ((causticMap=attributes->causticMap) != NULL) {
 					if (lastBounceSpecular) {
 						if (causticMap->modifying == FALSE) {
+							// Note: this isn't strictly thread safe, see above
 							causticMap->modifying	=	TRUE;
 							causticMap->reset();
 							balanceList.push(causticMap);
@@ -595,6 +601,7 @@ processBounce:;
 				// Save the photon on entry to the material
 				if ((globalMap=attributes->globalMap) != NULL) {
 					if (globalMap->modifying == FALSE) {
+						// Note: this isn't strictly thread safe, see above
 						globalMap->modifying	=	TRUE;
 						globalMap->reset();
 						balanceList.push(globalMap);
@@ -606,6 +613,7 @@ processBounce:;
 				if ((causticMap=attributes->causticMap) != NULL) {
 					if (lastBounceSpecular) {
 						if (causticMap->modifying == FALSE) {
+							// Note: this isn't strictly thread safe, see above
 							causticMap->modifying	=	TRUE;
 							causticMap->reset();
 							balanceList.push(causticMap);
@@ -676,6 +684,7 @@ processBounce:;
 						
 							/*if ((globalMap=attributes->globalMap) != NULL) {
 								if (globalMap->modifying == FALSE) {
+									// Note: this isn't strictly thread safe, see above
 									globalMap->modifying	=	TRUE;
 									globalMap->reset();
 									balanceList.push(globalMap);
@@ -716,6 +725,7 @@ processBounce:;
 						
 						if ((globalMap=attributes->globalMap) != NULL) {
 							if (globalMap->modifying == FALSE) {
+								// Note: this isn't strictly thread safe, see above
 								globalMap->modifying	=	TRUE;
 								globalMap->reset();
 								balanceList.push(globalMap);
