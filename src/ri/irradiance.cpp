@@ -893,6 +893,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 			// use it's inverse as radius instead
 			if (mag/divis > 1.0f/rMean) rMean = divis/mag;
 		}
+		#endif
 		
 		// Compute the radius of validity
 		rMean					*=	0.5f;
