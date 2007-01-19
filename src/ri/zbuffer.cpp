@@ -51,7 +51,6 @@
 CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	int	i;
 
-	CRenderer::hiderFlags	|=	HIDER_RGBAZ_ONLY;
 	totalWidth				=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
 	totalHeight				=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	
@@ -78,6 +77,15 @@ CZbuffer::~CZbuffer() {
 	// Framebuffer is allocated from the frame memory
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class                :   CZBuffer
+// Method               :   preDisplaySetup
+// Description          :   allow the hider to affect display setup
+// Return Value         :   -
+// Comments             :
+void CZbuffer::preDisplaySetup() {
+	CRenderer::hiderFlags	|=	HIDER_RGBAZ_ONLY;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
