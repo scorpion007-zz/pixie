@@ -876,17 +876,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		#ifdef GRADIENT_CLAMPING
 		// Do the translational gradient clamp trick
 		{
-			float mag = cSample->gP[1]*cSample->gP[1] +
-						cSample->gP[2]*cSample->gP[2] +
-						cSample->gP[3]*cSample->gP[3];
-			
+			float mag = dotvv(cSample->gP+1*3,cSample->gP+1*3) +
+						dotvv(cSample->gP+2*3,cSample->gP+2*3) +
+						dotvv(cSample->gP+3*3,cSample->gP+3*3);
 			mag = sqrtf(mag);
 			
-			float divis = 
-				cSample->irradiance[0]*cSample->irradiance[0] +
-				cSample->irradiance[1]*cSample->irradiance[1] +
-				cSample->irradiance[2]*cSample->irradiance[2];
-			
+			float divis = dotvv(cSample->irradiance,cSample->irradiance);
 			divis = sqrtf(divis);
 			
 			// If the translational gradient is bigger than the inverse of the radius
