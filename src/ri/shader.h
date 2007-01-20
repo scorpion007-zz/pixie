@@ -188,6 +188,7 @@ public:
 		float				maxBrightness;			// The maximum brightness amount
 		float				minFGRadius;			// The minimum final gather spacing
 		float				maxFGRadius;			// The maximum final gather spacing
+		float				sampleBase;				// The relative ammount to jitter ray origins
 		int					irradianceIndex;		// The index of the irradiance
 		int					coverageIndex;			// The index of the coverage
 		int					environmentIndex;		// The index of the environment direction

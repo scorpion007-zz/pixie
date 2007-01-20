@@ -48,6 +48,7 @@
 								lookup->maxBrightness		=	1;																\
 								lookup->maxFGRadius			=	C_INFINITY;														\
 								lookup->minFGRadius			=	C_EPSILON;														\
+								lookup->sampleBase			=	1;																\
 								lookup->irradianceIndex		=	-1;																\
 								lookup->coverageIndex		=	-1;																\
 								lookup->environmentIndex	=	-1;																\
@@ -92,6 +93,8 @@
 											lookup->minFGRadius	=	val->real;													\
 										} else if (strcmp(param->string,"maxR") == 0) {											\
 											lookup->maxFGRadius	=	val->real;													\
+										} else if (strcmp(param->string,"samplebase") == 0) {									\
+											lookup->sampleBase	=	val->real;													\
 										} else if (strcmp(param->string,"global") == 0) {										\
 											lookup->gatherGlobal	=	(int) val->real;										\
 										} else if (strcmp(param->string,"local") == 0) {										\
