@@ -173,12 +173,6 @@ void	CPhotonMap::write(const CXform *world) {
 	// we do this so it manages the modifying state properly
 	
 	if (modifying == TRUE) {
-		// Prevent more than one thread writing
-		osLock(mutex);
-		
-		// In case another thread wrote us
-		if (modifying == FALSE) return;
-
 		// Flush the photonmap
 		FILE		*out		=	ropen(name,"wb",filePhotonMap);
 	
@@ -203,9 +197,6 @@ void	CPhotonMap::write(const CXform *world) {
 		
 		// We are no longer modifying this map
 		modifying = FALSE;
-		
-		// Unlock our mutex 
-		osUnlock(mutex);
 	}
 }
 
