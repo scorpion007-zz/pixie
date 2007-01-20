@@ -48,7 +48,7 @@
 								lookup->maxBrightness		=	1;																\
 								lookup->maxFGRadius			=	C_INFINITY;														\
 								lookup->minFGRadius			=	C_EPSILON;														\
-								lookup->sampleBase			=	1;																\
+								lookup->sampleBase			=	0;																\
 								lookup->irradianceIndex		=	-1;																\
 								lookup->coverageIndex		=	-1;																\
 								lookup->environmentIndex	=	-1;																\
