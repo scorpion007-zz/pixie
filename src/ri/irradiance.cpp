@@ -46,8 +46,6 @@
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 const	float	horizonCutoff			=	(float) cosf(radians(80));
 
-//#define HARMONIC_MEAN
-
 ///////////////////////////////////////////////////////////////////////
 //
 //
@@ -637,12 +635,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	coverage						=	0;
 	initv(irradiance,0);
 	initv(envdir,0);
-	#ifndef HARMONIC_MEAN
-		rMean							=	C_INFINITY;
-	#else
-		rMean							=	0;
-		int nMean						=	0;
-	#endif
+	rMean							=	C_INFINITY;
 	
 	// Calculate the ray differentials (use average spread in theta and phi)
 	//const float da					=	DEFAULT_RAY_DA;
@@ -725,11 +718,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
 
-				#ifndef HARMONIC_MEAN
-					if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
-				#else
-					if (tmp > horizonCutoff)	{ rMean =	1.0f/ray.t;	nMean++; }
-				#endif
+				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+				
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -833,11 +823,9 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
-				#ifndef HARMONIC_MEAN
-					if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
-				#else
-					if (tmp > horizonCutoff)	{ rMean =	1.0f/ray.t;	nMean++; }
-				#endif
+
+				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -873,10 +861,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		// Compute the gradients of the illumination
 		posGradient(cSample->gP,np,nt,hemisphere,X,Y);
 		rotGradient(cSample->gR,np,nt,hemisphere,X,Y);
-
-		#ifdef HARMONIC_MEAN
-		rMean					=	((float) nMean) / rMean;
-		#endif
 		
 		// Compute the radius of validity
 		rMean					*=	0.5f;
