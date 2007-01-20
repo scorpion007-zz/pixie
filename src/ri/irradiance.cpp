@@ -46,7 +46,7 @@
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 const	float	horizonCutoff			=	(float) cosf(radians(80));
 
-#define HARMONIC_MEAN
+//#define HARMONIC_MEAN
 
 ///////////////////////////////////////////////////////////////////////
 //
