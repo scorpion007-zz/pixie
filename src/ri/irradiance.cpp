@@ -47,7 +47,6 @@ const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 const	float	horizonCutoff			=	(float) cosf(radians(80));
 
 #define HARMONIC_MEAN
-#define GRADIENT_CLAMPING
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -272,7 +271,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 				vector	ntmp;
 
 				crossvv(ntmp,cSample->N,N);
-
+				
 				// Sum the sample
 				totalWeight		+=	w;
 				coverage		+=	w*(cSample->coverage		+ dotvv(cSample->gP+0*3,D) + dotvv(cSample->gR+0*3,ntmp));
@@ -670,9 +669,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				ray.from[COMP_X]		=	P[COMP_X];
-				ray.from[COMP_Y]		=	P[COMP_Y];
-				ray.from[COMP_Z]		=	P[COMP_Z];
+				const float originJitterX = context->urand()*dSample*0.5f*lookup->sampleBase;
+				const float originJitterY = context->urand()*dSample*0.5f*lookup->sampleBase;
+				
+				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*X[0] + originJitterX*Y[0];
+				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*X[1] + originJitterX*Y[1];
+				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*X[2] + originJitterX*Y[2];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
@@ -752,9 +754,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				ray.from[COMP_X]		=	P[COMP_X];
-				ray.from[COMP_Y]		=	P[COMP_Y];
-				ray.from[COMP_Z]		=	P[COMP_Z];
+				const float originJitterX = context->urand()*dSample*0.5f*lookup->sampleBase;
+				const float originJitterY = context->urand()*dSample*0.5f*lookup->sampleBase;
+				
+				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*X[0] + originJitterX*Y[0];
+				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*X[1] + originJitterX*Y[1];
+				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*X[2] + originJitterX*Y[2];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
@@ -873,23 +878,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		rMean					=	((float) nMean) / rMean;
 		#endif
 		
-		#ifdef GRADIENT_CLAMPING
-		// Do the translational gradient clamp trick
-		{
-			float mag = dotvv(cSample->gP+1*3,cSample->gP+1*3) +
-						dotvv(cSample->gP+2*3,cSample->gP+2*3) +
-						dotvv(cSample->gP+3*3,cSample->gP+3*3);
-			mag = sqrtf(mag);
-			
-			float divis = dotvv(cSample->irradiance,cSample->irradiance);
-			divis = sqrtf(divis);
-			
-			// If the translational gradient is bigger than the inverse of the radius
-			// use it's inverse as radius instead
-			if (mag/divis > 1.0f/rMean) rMean = divis/mag;
-		}
-		#endif
-		
 		// Compute the radius of validity
 		rMean					*=	0.5f;
 
@@ -897,7 +885,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		rMean					=	max(rMean, lookup->minFGRadius);
 		rMean					=	min(rMean, lookup->maxFGRadius);
 		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5);
-		
+				
 		// Record the data
 		movvv(cSample->P,P);
 		movvv(cSample->N,N);
@@ -908,12 +896,13 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		
 		// Do the neighbour clamping trick
 		clamp(cSample);
-
+		rMean	=	cSample->dP;	// copy dP back so we get the right place in the octree
+		
 		// The error multiplier
 		const float		K		=	0.4f / lookup->maxError;
-
-		// Insert the new sample into the cache
 		rMean					/=	K;
+		
+		// Insert the new sample into the cache
 		cNode					=	root;
 		depth					=	0;
 		while(cNode->side > (2*rMean)) {
@@ -975,7 +964,9 @@ void		CIrradianceCache::clamp(CCacheSample *nSample) {
 			vector	D;
 
 			subvv(D,cSample->P,nSample->P);
-			const float	l	=	lengthv(D);
+			//const float	l	=	lengthv(D);
+			// Avoid issues with coincident points
+			const float 	l	= 	(dotvv(D,D) > C_EPSILON) ? lengthv(D) : C_EPSILON;
 
 			nSample->dP		=	min(nSample->dP,cSample->dP + l);
 			cSample->dP		=	min(cSample->dP,nSample->dP + l);
