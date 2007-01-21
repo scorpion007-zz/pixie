@@ -454,6 +454,8 @@ static	RtFilterFunc	getFilter(char *n) {
 		f = RiTriangleFilter;
 	} else if (strcmp(name,RI_CATMULLROMFILTER) == 0) {
 		f = RiCatmullRomFilter;
+	} else if (strcmp(name,RI_BLACKMANHARRISFILTER) == 0) {
+		f = RiBlackmanHarrisFilter;
 	} else if (strcmp(name,RI_SINCFILTER) == 0) {
 		f = RiSincFilter;
 	} else {

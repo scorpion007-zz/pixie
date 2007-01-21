@@ -54,6 +54,8 @@ static	char	*getFilter(float (*function)(float,float,float,float)) {
 		return	RI_TRIANGLEFILTER;
 	} else if (function == RiCatmullRomFilter) {
 		return	RI_CATMULLROMFILTER;
+	} else if (function == RiBlackmanHarrisFilter) {
+		return	RI_BLACKMANHARRISFILTER;
 	} else if (function == RiSincFilter) {
 		return	RI_SINCFILTER;
 	} else {
