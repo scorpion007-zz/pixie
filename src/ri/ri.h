@@ -134,6 +134,7 @@ EXTERN(RtToken)	RI_TRIANGLEFILTER;
 EXTERN(RtToken)	RI_GAUSSIANFILTER;
 EXTERN(RtToken)	RI_SINCFILTER;
 EXTERN(RtToken)	RI_CATMULLROMFILTER;
+EXTERN(RtToken)	RI_BLACKMANHARRISFILTER;
 EXTERN(RtToken)	RI_CUSTOM;
 
 
@@ -332,6 +333,7 @@ EXTERN(RtFloat)
     RiBoxFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiTriangleFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
+    RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth);
 
 EXTERN(RtVoid)

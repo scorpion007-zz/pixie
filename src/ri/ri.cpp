@@ -186,6 +186,7 @@ RtToken		RI_TRIANGLEFILTER			=	"triangle";
 RtToken		RI_GAUSSIANFILTER			=	"gaussian";
 RtToken		RI_SINCFILTER				=	"sinc";
 RtToken		RI_CATMULLROMFILTER			=	"catmull-rom";
+RtToken		RI_BLACKMANHARRISFILTER		=	"blackman-harris";
 RtToken		RI_CUSTOM					=	"custom";
 
 
@@ -893,18 +894,31 @@ RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
    } else {
 	   return 0;
    }
-/*
-   double r2 = (x*x + y*y);		// RiSpec version
-   double r = sqrt(r2);
+}
 
-   if (r < 1.0) {
-	   return	(float) (3.0*r*r2 - 5.0*r2 + 2.0);
-   } else if (r < 2.0) {
-	   return	(float) (-r*r2 + 5.0*r2 - 8.0*r + 4.0);
+EXTERN(RtFloat)
+RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
+	// FIXME: check this is correct
+   double xc = x/xwidth;
+   double yc = y/ywidth;
+
+   double r2 = (xc*xc + yc*yc);
+   double r = sqrt(r2);
+   
+   const float N  = 1;
+   const float a0 = 0.35875f;
+   const float a1 = 0.48829f;
+   const float a2 = 0.14128f;
+   const float a3 = 0.01168f;
+   
+   double X = 0;
+   double Y = 0;
+   
+   if (r <= N/2.0) {
+	   return	(float) (a0 + a1*cos(2*C_PI*r/N) + a2*cos(4*C_PI*r/N) + a3*cos(6*C_PI*r/N));
    } else {
-	   return 0;
+       return	0;
    }
-*/
 }
 
 EXTERN(RtFloat)
