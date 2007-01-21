@@ -420,14 +420,9 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 		if (children == NULL) {
 			CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
-			tesselation->tesselate(context,16,TRUE);
+			tesselation->initTesselation(context);
 			tesselation->attach();
 			children				=	tesselation;
-			// FIXME: we tesselate (but do not save) the finest level to get an accurate
-			// r estimate for the grid to start things off.  
-			// Q: Can we do this without firing the tesselation off?
-			// A: perhaps, but we definitely need r accurate as subdivision will use this to
-			// guess their r without tesselation
 		}
 
 		osUnlock(CRenderer::hierarchyMutex);

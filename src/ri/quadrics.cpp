@@ -66,7 +66,7 @@
 																\
 			if (children == NULL) {								\
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);	\
-				tesselation->tesselate(context,16,TRUE);		\
+				tesselation->initTesselation(context);			\
 				tesselation->attach();							\
 				children				=	tesselation;		\
 			}													\

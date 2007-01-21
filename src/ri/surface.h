@@ -84,10 +84,11 @@ public:
 	void					dice(CShadingContext *) { assert(FALSE); }
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const { assert(FALSE);	}
 
-	CSubTesselation*		tesselate(CShadingContext *context,char div,int estimateOnly);//FIXME
+	void					initTesselation(CShadingContext *context);
+	
 private:
 	
-	//CSubTesselation*	tesselate(CShadingContext *context,char div,int estimateOnly);
+	CSubTesselation*		tesselate(CShadingContext *context,char div,int estimateOnly);
 	void					splitToChildren(CShadingContext *context);	
 	
 	char					depth;							// Depth of the patch

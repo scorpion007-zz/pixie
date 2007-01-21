@@ -448,6 +448,14 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 
 
 
+
+//////////////////////////////////////////////
+///
+///	On-Demand Tesselation Implementation
+///
+/////////////////////////////////////////////
+
+
 //FIXMES:
 /*
 make r,ru,rv guesses constructor params
@@ -458,7 +466,7 @@ support untesselation
 
 */
 
-#define DEBUG_HITS 0
+//#define DEBUG_HITS
 #define DEBUG_TESSELATIONS 0
 
 
@@ -504,6 +512,12 @@ CTesselationPatch::~CTesselationPatch() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPatch
+// Method				:	intersect
+// Description			:	intersect a ray with a tesselation patch
+// Return Value			:	-
+// Comments				:
 void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 	// check the ray conditions before proceeding
@@ -526,7 +540,6 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	if (!(t < cRay->t)) return;
 	
 	float requiredR = cRay->da * t + cRay->db;
-	//requiredR*=8;
 
 	// bail very early if this ray should have been handled by a coarser tesselation
 	if (rmax*2.0f < requiredR && depth > 0) {
@@ -585,6 +598,17 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		}
 		
 		// Intersect the ray
+		
+		#ifdef DEBUG_HITS
+		#define debugHit()															\
+										CDebugView	d("/tmp/tesselate.dat",TRUE);	\
+										vector p;									\
+										mulvf(p,cRay->dir,cRay->t);					\
+										addvv(p,cRay->from);						\
+										d.point(p);
+		#else
+		#define debugHit()
+		#endif
 	
 		#define solve()															\
 				if ((v > 0) && (v < 1)) {										\
@@ -627,13 +651,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 									cRay->v			=	vmin + ((float) v + j)*vrg;	\
 									cRay->t			=	(float) t;					\
 									movvv(cRay->N,N);								\
-									if(DEBUG_HITS){									\
-										CDebugView	d("/tmp/tesselate.dat",TRUE);	\
-										vector p;									\
-										mulvf(p,cRay->dir,cRay->t);					\
-										addvv(p,cRay->from);						\
-										d.point(p);									\
-									}											\
+									debugHit();										\
 								}												\
 							} else {											\
 								cRay->object	=	object;						\
@@ -641,13 +659,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 								cRay->v			=	vmin + ((float) v + j)*vrg;	\
 								cRay->t			=	(float) t;					\
 								movvv(cRay->N,N);								\
-								if(DEBUG_HITS){									\
-									CDebugView	d("/tmp/tesselate.dat",TRUE);	\
-									vector p;									\
-									mulvf(p,cRay->dir,cRay->t);					\
-									addvv(p,cRay->from);						\
-									d.point(p);									\
-								}												\
+								debugHit();										\
 							}													\
 						}														\
 					}															\
@@ -873,8 +885,8 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	checkAngle
-// Description			:	This function takes P and returns the cosine of the minimum angle deviation
+// Function				:	measureLength
+// Description			:	This function takes P and returns the sum of edge lengths
 // Return Value			:
 // Comments				:
 static	inline	float	measureLength(const float *P,int step,int num) {
@@ -893,6 +905,21 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 	return length;
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	initTesselation
+// Description			:	Make an estimate about required tesselation sizes
+// Return Value			:
+// Comments				:
+void CTesselationPatch::initTesselation(CShadingContext *context) {
+	// We tesselate (but do not save) the finest level to get an accurate
+	// r estimate for the grid to start things off.  
+	// Q: Can we do this without firing the tesselation off?
+	// A: perhaps, but we definitely need r accurate as subdivision will use this to
+	// guess their r without tesselation
+	tesselate(context,16,TRUE);
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -1034,7 +1061,7 @@ CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContex
 		} else {
 			// create bounds, but only if it saves us work later
 						
-			int nb = div>>2;		// number of bounds in each direction
+			int nb = div>>2;					// number of bounds in each direction
 			
 			// save off the data
 			
@@ -1130,6 +1157,12 @@ CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContex
 	return NULL;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	splitToChildren
+// Description			:	generate subpatches when current tesselations are insufficient
+// Return Value			:
+// Comments				:
 void		CTesselationPatch::splitToChildren(CShadingContext *context) {	
 	const int udiv = 16;
 	const int vdiv = 16;
