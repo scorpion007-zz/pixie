@@ -898,7 +898,6 @@ RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 
 EXTERN(RtFloat)
 RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
-	// FIXME: check this is correct
    double xc = x/xwidth;
    double yc = y/ywidth;
 
