@@ -1037,7 +1037,9 @@ void			CRenderer::render(CObject *cObject) {
 	}
 
 	// Only add to this first context, it will do the culling and add it to the rest of the threads
-	contexts[0]->drawObject(cObject);
+	if (cObject->attributes->flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) {	// FIXME check this
+		contexts[0]->drawObject(cObject);
+	}
 }
 
 
