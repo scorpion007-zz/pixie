@@ -215,8 +215,8 @@ vector							CRenderer::worldBmin,CRenderer::worldBmax;							// intialized in b
 CXform							*CRenderer::world					=	NULL;						// intialized in beginFrame, destroyed in endFrame
 matrix							CRenderer::fromNDC,CRenderer::toNDC;								// intialized in beginFrame
 matrix							CRenderer::fromRaster,CRenderer::toRaster;							// intialized in beginFrame
-matrix							CRenderer::fromScreen,CRenderer::toScreen;///!!!!FIXME!!!!
-matrix							CRenderer::worldToNDC;
+matrix							CRenderer::fromScreen,CRenderer::toScreen							// intialized in beginFrame
+matrix							CRenderer::worldToNDC;												// intialized in beginFrame
 unsigned int					CRenderer::hiderFlags;												// intialized in beginFrame
 int								CRenderer::numSamples;												// initialized in beginDisplays
 int								CRenderer::numExtraSamples;											// initialized in beginDisplays
@@ -641,6 +641,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 	// Compute the matrices related to the camera transformation
 	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		// NDC
 		toNDC[element(0,0)]		=	imagePlane / (screenRight - screenLeft);
 		toNDC[element(0,1)]		=	0;
 		toNDC[element(0,2)]		=	-screenLeft / (screenRight - screenLeft);
@@ -660,7 +661,29 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		toNDC[element(3,1)]		=	0;
 		toNDC[element(3,2)]		=	1;
 		toNDC[element(3,3)]		=	0;
+		
+		// Screen
+		toScreen[element(0,0)]	=	imagePlane;
+		toScreen[element(0,1)]	=	0;
+		toScreen[element(0,2)]	=	-1;
+		toScreen[element(0,3)]	=	0;
+
+		toScreen[element(1,0)]	=	0;
+		toScreen[element(1,1)]	=	imagePlane;
+		toScreen[element(1,2)]	=	-1;
+		toScreen[element(1,3)]	=	0;
+
+		toScreen[element(2,0)]	=	0;
+		toScreen[element(2,1)]	=	0;
+		toScreen[element(2,2)]	=	1;
+		toScreen[element(2,3)]	=	0;
+
+		toScreen[element(3,0)]	=	0;
+		toScreen[element(3,1)]	=	0;
+		toScreen[element(3,2)]	=	1;
+		toScreen[element(3,3)]	=	0;
 	} else {
+		// NDC
 		toNDC[element(0,0)]		=	1 / (screenRight - screenLeft);
 		toNDC[element(0,1)]		=	0;
 		toNDC[element(0,2)]		=	0;
@@ -680,29 +703,70 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		toNDC[element(3,1)]		=	0;
 		toNDC[element(3,2)]		=	0;
 		toNDC[element(3,3)]		=	1;
+		
+		// Screen
+		toScreen[element(0,0)]	=	1;
+		toScreen[element(0,1)]	=	0;
+		toScreen[element(0,2)]	=	0;
+		toScreen[element(0,3)]	=	-1;
+
+		toScreen[element(1,0)]	=	0;
+		toScreen[element(1,1)]	=	1;
+		toScreen[element(1,2)]	=	0;
+		toScreen[element(1,3)]	=	-1;
+
+		toScreen[element(2,0)]	=	0;
+		toScreen[element(2,1)]	=	0;
+		toScreen[element(2,2)]	=	1;
+		toScreen[element(2,3)]	=	0;
+
+		toScreen[element(3,0)]	=	0;
+		toScreen[element(3,1)]	=	0;
+		toScreen[element(3,2)]	=	0;
+		toScreen[element(3,3)]	=	1;
 	}
 
 	// The inverse fromNDC is the same for both perspective and orthographic projections
-	fromNDC[element(0,0)]	=	(screenRight - screenLeft);
-	fromNDC[element(0,1)]	=	0;
-	fromNDC[element(0,2)]	=	0;
-	fromNDC[element(0,3)]	=	screenLeft;
+	fromNDC[element(0,0)]		=	(screenRight - screenLeft);
+	fromNDC[element(0,1)]		=	0;
+	fromNDC[element(0,2)]		=	0;
+	fromNDC[element(0,3)]		=	screenLeft;
 
-	fromNDC[element(1,0)]	=	0;
-	fromNDC[element(1,1)]	=	(screenBottom - screenTop);
-	fromNDC[element(1,2)]	=	0;
-	fromNDC[element(1,3)]	=	screenTop;
+	fromNDC[element(1,0)]		=	0;
+	fromNDC[element(1,1)]		=	(screenBottom - screenTop);
+	fromNDC[element(1,2)]		=	0;
+	fromNDC[element(1,3)]		=	screenTop;
 
-	fromNDC[element(1,0)]	=	0;
-	fromNDC[element(1,1)]	=	0;
-	fromNDC[element(1,2)]	=	0;
-	fromNDC[element(1,3)]	=	imagePlane;
+	fromNDC[element(1,0)]		=	0;
+	fromNDC[element(1,1)]		=	0;
+	fromNDC[element(1,2)]		=	0;
+	fromNDC[element(1,3)]		=	imagePlane;
 
-	fromNDC[element(3,0)]	=	0;
-	fromNDC[element(3,1)]	=	0;
-	fromNDC[element(3,2)]	=	0;
-	fromNDC[element(3,3)]	=	1;
+	fromNDC[element(3,0)]		=	0;
+	fromNDC[element(3,1)]		=	0;
+	fromNDC[element(3,2)]		=	0;
+	fromNDC[element(3,3)]		=	1;
 
+	// The inverse fromScreen is the same for both perspective and orthographic projections
+	fromScreen[element(0,0)]	=	1;
+	fromScreen[element(0,1)]	=	0;
+	fromScreen[element(0,2)]	=	0;
+	fromScreen[element(0,3)]	=	1;
+
+	fromScreen[element(1,0)]	=	0;
+	fromScreen[element(1,1)]	=	1;
+	fromScreen[element(1,2)]	=	0;
+	fromScreen[element(1,3)]	=	1;
+
+	fromScreen[element(1,0)]	=	0;
+	fromScreen[element(1,1)]	=	0;
+	fromScreen[element(1,2)]	=	0;
+	fromScreen[element(1,3)]	=	1;
+
+	fromScreen[element(3,0)]	=	0;
+	fromScreen[element(3,1)]	=	0;
+	fromScreen[element(3,2)]	=	0;
+	fromScreen[element(3,3)]	=	1;
 
 	// Compute the fromRaster / toRaster
 	matrix	mtmp;
@@ -1011,18 +1075,22 @@ void		CRenderer::endFrame() {
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
-void			CRenderer::render(CObject *cObject) {
+void			CRenderer::render(CObject *cObject) {				// FIXME - this is not thread safe!!!!
 	CAttributes	*cAttributes	=	cObject->attributes;
 
 	// Assign the photon map is necessary
 	if (cAttributes->globalMapName != NULL) {
-		cAttributes->globalMap	=	getPhotonMap(cAttributes->globalMapName);
-		cAttributes->globalMap->attach();
+		if (cAttributes->globalMap == NULL) {
+			cAttributes->globalMap	=	getPhotonMap(cAttributes->globalMapName);
+			cAttributes->globalMap->attach();
+		}
 	}
 
 	if (cAttributes->causticMapName != NULL) {
-		cAttributes->causticMap	=	getPhotonMap(cAttributes->causticMapName);
-		cAttributes->causticMap->attach();
+		if (cAttributes->causticMap == NULL) {
+			cAttributes->causticMap	=	getPhotonMap(cAttributes->causticMapName);
+			cAttributes->causticMap->attach();
+		}
 	}
 
 	// Update the world bounding box
@@ -1037,7 +1105,7 @@ void			CRenderer::render(CObject *cObject) {
 	}
 
 	// Only add to this first context, it will do the culling and add it to the rest of the threads
-	if (cObject->attributes->flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) {	// FIXME check this
+	if (cObject->attributes->flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) {
 		contexts[0]->drawObject(cObject);
 	}
 }
