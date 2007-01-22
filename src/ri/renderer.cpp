@@ -215,7 +215,7 @@ vector							CRenderer::worldBmin,CRenderer::worldBmax;							// intialized in b
 CXform							*CRenderer::world					=	NULL;						// intialized in beginFrame, destroyed in endFrame
 matrix							CRenderer::fromNDC,CRenderer::toNDC;								// intialized in beginFrame
 matrix							CRenderer::fromRaster,CRenderer::toRaster;							// intialized in beginFrame
-matrix							CRenderer::fromScreen,CRenderer::toScreen							// intialized in beginFrame
+matrix							CRenderer::fromScreen,CRenderer::toScreen;							// intialized in beginFrame
 matrix							CRenderer::worldToNDC;												// intialized in beginFrame
 unsigned int					CRenderer::hiderFlags;												// intialized in beginFrame
 int								CRenderer::numSamples;												// initialized in beginDisplays
