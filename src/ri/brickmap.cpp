@@ -774,12 +774,14 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 
 	FILE		*outfile 	=	ropen(outFileName,"wb+",fileBrickMap);
 	
-	osLock(CRenderer::memoryMutex);
-	memBegin(CRenderer::globalMemory);
+	// Use our own temp memory so we don't get mutex-reentrancy locking issues
+	CMemPage	*tempMemory = NULL;
+	memoryInit(tempMemory);
+	memBegin(tempMemory);
 	
-	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float),CRenderer::globalMemory);
-	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*),CRenderer::globalMemory);
-	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float),CRenderer::globalMemory);
+	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float),tempMemory);
+	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*),tempMemory);
+	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float),tempMemory);
 	float 		*dataVar	=	dataMean + dataSize;
 	
 	// Initialize the hash
@@ -877,7 +879,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			}
 			
 			
-			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode),CRenderer::globalMemory);
+			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode),tempMemory);
 			
 			// Initialize temporary node data over
 			*tNode				=	*cNode;
@@ -984,8 +986,8 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	
 	fclose(outfile);
 
-	memEnd(CRenderer::globalMemory);
-	osUnlock(CRenderer::memoryMutex);
+	memEnd(tempMemory);
+	memoryTini(tempMemory);
 }
 
 
