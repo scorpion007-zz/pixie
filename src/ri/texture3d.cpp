@@ -41,7 +41,6 @@
 // Return Value			:	-
 // Comments				:
 CTexture3d::CTexture3d(const char *n,const float *f,const float *t,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
-	refCount	=	0;
 	dataSize	=	0;
 	channels	=	NULL;
 	numChannels	=	0;

@@ -57,11 +57,7 @@ class	CTexture3d : public CFileResource, public CView {
 public:
 							CTexture3d(const char *,const float *from,const float *to,int numChannels=0,CTexture3dChannel *channels=NULL);
 	virtual					~CTexture3d();
-	
-	void					attach()	{	refCount++;	}
-	void					detach()	{	refCount--; if (refCount == 0) delete this; }
-	void					check()		{	if (refCount == 0)	delete this;			}
-	
+
 	virtual	void			lookup(float *,const float *,const float *,float) = 0;
 	virtual	void			store(const float *,const float *,const float *,float) = 0;
 	int						bindChannelNames(int&,const char **,CTexture3dChannel ***);
@@ -73,7 +69,6 @@ protected:
 	void					writeChannels(FILE *);
 	void					readChannels(FILE *);
 	
-	int						refCount;
 	int						dataSize;			// The size of each data sample
 	CTexture3dChannel		*channels;			// List of channels
 	int						numChannels;
