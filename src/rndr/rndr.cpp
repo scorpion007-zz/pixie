@@ -209,6 +209,11 @@ void	rndrc(char *ribFile,int port) {
 	#endif
 #endif
 
+	u_int32_t	attemptAddress	=	INADDR_ANY;
+	
+	// Here we include robustness for Win32 not allowing bind / connect to ANY
+retryBind:
+
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == INVALID_SOCKET) {
 		if (silent == FALSE)	fprintf(stderr,"Socket error\n");
@@ -224,10 +229,16 @@ void	rndrc(char *ribFile,int port) {
 	// connect to server
 	
 	client.sin_family		= AF_INET;
-	client.sin_addr.s_addr	= htonl(INADDR_ANY);
+	client.sin_addr.s_addr	= htonl(attemptAddress);
 	client.sin_port			= htons(port);
 	
 	if (connect(sock, (struct sockaddr *) &client, sizeof(client)) < 0) {
+		// Retry with loopback
+		if (attemptAddress != INADDR_LOOPBACK) {
+			closesocket(sock);
+			attemptAddress = INADDR_LOOPBACK;
+			goto retryBind;
+		}
 		if (silent == FALSE)	fprintf(stderr,"Connection error\n");
 		closesocket(sock);
 		return;
