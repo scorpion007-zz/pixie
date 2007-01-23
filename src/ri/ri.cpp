@@ -902,7 +902,7 @@ RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
    double yc = y/ywidth;
 
    double r2 = (xc*xc + yc*yc);
-   double r = sqrt(r2);
+   double r = 0.5-sqrt(r2);
    
    const float N  = 1;
    const float a0 = 0.35875f;
@@ -910,11 +910,8 @@ RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
    const float a2 = 0.14128f;
    const float a3 = 0.01168f;
    
-   double X = 0;
-   double Y = 0;
-   
    if (r <= N/2.0) {
-	   return	(float) (a0 + a1*cos(2*C_PI*r/N) + a2*cos(4*C_PI*r/N) + a3*cos(6*C_PI*r/N));
+	   return	(float) (a0 - a1*cos(2*C_PI*r/N) + a2*cos(4*C_PI*r/N) - a3*cos(6*C_PI*r/N));
    } else {
        return	0;
    }
@@ -922,6 +919,7 @@ RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 
 EXTERN(RtFloat)
 RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
+	
 	if ( x != 0.0 )	{
 		x *= (float) C_PI;
 		x = cosf( 0.5 * x / xwidth ) * sinf( x ) / x;
