@@ -1123,8 +1123,8 @@ void				CBrickMap::draw() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickQuickSort
-// Description			:	Quick sort the bricks wrt. to the referenceNumbers
+// Method				:	keyDown
+// Description			:	handle interface keys
 // Return Value			:	-
 // Comments				:
 int			CBrickMap::keyDown(int key) {

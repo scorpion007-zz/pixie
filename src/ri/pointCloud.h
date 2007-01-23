@@ -67,6 +67,8 @@ public:
 	void					lookup(float *,const float *,const float *,float);
 
 	void					draw();
+	int						keyDown(int);
+	
 	void					bound(float *bmin,float *bmax);
 
 private:
@@ -76,6 +78,8 @@ private:
 	float					searchRadius;
 	
 	TMutex					mutex;
+	
+	static	int				drawDiscs;					// Which type to draw
 	
 	friend			void	makeTexture3D(const char *,const char *,TSearchpath *,int,char **,void **);
 	

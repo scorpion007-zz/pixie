@@ -38,7 +38,11 @@
 #include "error.h"
 
 
+///////////////////////////////////////////////////////////////////////
+// globals
+///////////////////////////////////////////////////////////////////////
 
+int			CPointCloud::drawDiscs		=	TRUE;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -308,7 +312,7 @@ void	CPointCloud::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
 	float		N[chunkSize*3];
-	float		dP[chunkSize*3];
+	float		dP[chunkSize];
 	int			i,j;
 	float		*cP		=	P;
 	float		*cC		=	C;
@@ -319,7 +323,8 @@ void	CPointCloud::draw() {
 	// Collect and dispatch the photons
 	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
 		if (j == 0)	{
-			drawDisks(chunkSize,P,dP,N,C);
+			if (drawDiscs)		drawDisks(chunkSize,P,dP,N,C);
+			else			 	drawPoints(chunkSize,P,C);
 			cP	=	P;
 			cC	=	C;
 			cN	=	N;
@@ -329,11 +334,32 @@ void	CPointCloud::draw() {
 		
 		movvv(cP,cT->P);
 		movvv(cN,cT->N);
-		*dP	=	cT->dP;
+		*cdP	=	cT->dP/dPscale;
 		movvv(cC,dataPointers->array[cT->entryNumber]);
 	}
 
-	if (j != chunkSize)	drawDisks(chunkSize-j,P,dP,N,C);
+	if (j != chunkSize) {
+		if (drawDiscs)		drawDisks(chunkSize-j,P,dP,N,C);
+		else			 	drawPoints(chunkSize-j,P,C);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPointCloud
+// Method				:	keyDown
+// Description			:	handle keypresses
+// Return Value			:	-
+// Comments				:
+int			CPointCloud::keyDown(int key) {
+	if ((key == 'd') || (key == 'D')) {
+		drawDiscs = TRUE;
+		return TRUE;
+	} else if ((key == 'p') || (key == 'P')) {
+		drawDiscs = FALSE;
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -54,6 +54,7 @@ const	float	horizonCutoff			=	(float) cosf(radians(80));
 //
 ///////////////////////////////////////////////////////////////////////
 
+int			CIrradianceCache::drawDiscs		=	TRUE;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
@@ -1009,7 +1010,8 @@ void		CIrradianceCache::draw() {
 		// Sum the values in this level
 		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--,cP+=3,cN+=3,cdP++,cC+=3) {
 			if (j == 0)	{
-				drawDisks(chunkSize,P,dP,N,C);
+				if (drawDiscs)		drawDisks(chunkSize,P,dP,N,C);
+				else			 	drawPoints(chunkSize,P,C);
 				cP	=	P;
 				cC	=	C;
 				cN	=	N;
@@ -1033,59 +1035,30 @@ void		CIrradianceCache::draw() {
 		}
 	}
 
-	if (j != chunkSize)	drawDisks(chunkSize-j,P,dP,N,C);
+	if (j != chunkSize) {
+		if (drawDiscs)		drawDisks(chunkSize-j,P,dP,N,C);
+		else			 	drawPoints(chunkSize-j,P,C);
+	}
+}
 
-
-
-
-
-
-
-
-
-	/*
-	j			=	chunkSize;
-	cP			=	P;
-	cC			=	C;
-	stack		=	stackBase;
-	*stack++	=	root;
-	while(stack > stackBase) {
-		cNode	=	*(--stack);
-
-		// Sum the values in this level
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j-=2,cP+=6,cC+=6) {
-			if (j == 0)	{
-				drawLines(chunkSize,P,C);
-				cP	=	P;
-				cC	=	C;
-				j	=	chunkSize;
-			}
-
-			vector	T;
-			mulvf(T,cSample->N,0.01f);
-
-			movvv(cP+0,cSample->P);
-			addvv(cP+3,cP+0,cSample->gP);
-			initv(cC,1,0,0);
-			initv(cC+3,1,0,0);
-
-			addvv(cP+0,T);
-			addvv(cP+3,T);
-		}
-
-		// Check the children
-		for (i=0;i<8;i++) {
-			CCacheNode	*tNode;
-
-			if ((tNode = cNode->children[i]) != NULL) {
-				*stack++	=	tNode;
-			}
-		}
+///////////////////////////////////////////////////////////////////////
+// Class				:	CIrradianceCache
+// Method				:	keyDown
+// Description			:	handle keypresses
+// Return Value			:	-
+// Comments				:
+int			CIrradianceCache::keyDown(int key) {
+	if ((key == 'd') || (key == 'D')) {
+		drawDiscs = TRUE;
+		return TRUE;
+	} else if ((key == 'p') || (key == 'P')) {
+		drawDiscs = FALSE;
+		return TRUE;
 	}
 
-	if (j != chunkSize)	drawLines((chunkSize-j),P,C);
-	*/
+	return FALSE;
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache

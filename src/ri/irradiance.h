@@ -96,6 +96,8 @@ public:
 		void					cachesample(float *,const float *,const float *,float);
 
 		void					draw();
+		int						keyDown(int key);
+		
 		void					bound(float *bmin,float *bmax);
 private:
 		void					writeNode(FILE *,CCacheNode *);
@@ -112,6 +114,8 @@ private:
 		matrix					from,to;
 
 		TMutex					mutex;
+		
+		static	int				drawDiscs;					// Which type to draw
 
 		friend class			CRemoteICacheChannel;
 };
