@@ -2221,6 +2221,13 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									for (i=0;i<numVertices;i++) {												\
 										*r++ = radiiscale*lookup->radius;										\
 									}																			\
+								} else {																		\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
+									/* no radius given, scale dP */												\
+									for (i=0;i<numVertices;i++,r++) {											\
+										r[0] = radiiscale*0.5f*r[0];												\
+									}																			\
 								}																				\
 																												\
 								for (i=0;i<lookup->numChannels;i++) {											\
@@ -2290,6 +2297,13 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
 										*r++ = radiiscale*lookup->radius;										\
+									}																			\
+								} else {																		\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
+									/* no radius given, scale dP */												\
+									for (i=0;i<numVertices;i++,r++) {											\
+										r[0] = radiiscale*0.5f*r[0];												\
 									}																			\
 								}																				\
 																												\
