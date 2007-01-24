@@ -176,8 +176,9 @@ const	unsigned	int		VARIABLE_SRU				=	24;
 const	unsigned	int		VARIABLE_SRV				=	25;
 const	unsigned	int		VARIABLE_NCOMPS				=	26;
 const	unsigned	int		VARIABLE_DTIME				=	27;
-const	unsigned	int		VARIABLE_WIDTH				=	28;
-const	unsigned	int		VARIABLE_CONSTANTWIDTH		=	29;
+const	unsigned	int		VARIABLE_DPDTIME			=	28;
+const	unsigned	int		VARIABLE_WIDTH				=	29;
+const	unsigned	int		VARIABLE_CONSTANTWIDTH		=	30;
 
 //	Some shader parameters
 const	unsigned	int		PARAMETER_DERIVATIVE		=	1 << 14;
