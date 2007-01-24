@@ -205,6 +205,7 @@ void			CRenderer::initDeclerations() {
 	tmp	=	declareVariable("Pz",	"vertex float",PARAMETER_P);				tmp->entry			=	VARIABLE_P;
 	tmp	=	declareVariable("ncomps","global uniform float",PARAMETER_NCOMPS);	assert(tmp->entry	==	VARIABLE_NCOMPS);
 	tmp	=	declareVariable("dtime","global uniform float",PARAMETER_DTIME);	assert(tmp->entry	==	VARIABLE_DTIME);
+	tmp	=	declareVariable("dPdtime","global varying vector",PARAMETER_DPDTIME);assert(tmp->entry	==	VARIABLE_DPDTIME);
 
 	tmp	=	declareVariable("width","global varying float",0);					assert(tmp->entry	==	VARIABLE_WIDTH);
 	tmp	=	declareVariable("constantwidth","global constant float",0);			assert(tmp->entry	==	VARIABLE_CONSTANTWIDTH);
