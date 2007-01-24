@@ -201,16 +201,38 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	*u++	=	0;
 	*v++	=	vmax;
 	*u++	=	1;
-
-	// Sample the curves
-	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
-
+	
 	// Compute the curve bounding box
 	float	*P		=	varying[VARIABLE_P];
 	vector	bmin,bmax;
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 	int		i;
+	
+	// Take care of the motion first
+	if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && moving()) {
+
+		// Compute the sample positions and corresponding normal vectors
+		float *timev = varying[VARIABLE_TIME];
+		for (i=0;i<6;i++) {
+			timev[i]    =   1;
+		}
+
+		rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
+		
+		for (i=0;i<6;i++) {
+			addBox(bmin,bmax,P + i*3);
+			// Restore t for the next pass
+			timev[i]	=	0;
+		}
+		
+		// The u,v from the end sample will not have changed
+	}
+	
+	// Sample the curves
+	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
+
+	// Add start sample bounds
 	for (i=0;i<6;i++)	addBox(bmin,bmax,P + i*3);
 
 	if (bmin[COMP_Z] < C_EPSILON) {
