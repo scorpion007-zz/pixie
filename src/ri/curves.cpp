@@ -181,6 +181,52 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	float	**varying		=	rasterizer->currentShadingState->varying;
 	float	*u				=	varying[VARIABLE_U];
 	float	*v				=	varying[VARIABLE_V];
+	float	*timev			=	varying[VARIABLE_TIME];
+
+	// Compute the curve bounding box
+	float	*P		=	varying[VARIABLE_P];
+	vector	bmin,bmax;
+	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
+	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
+	int		i;
+	
+	// Take care of the motion first
+	if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && moving()) {
+		
+		// Sample 6 points on the curve
+
+		// Top
+		*v++	=	vmin;
+		*u++	=	0;
+		*v++	=	vmin;
+		*u++	=	1;
+
+		// Middle
+		*v++	=	(vmin + vmax) * 0.5f;
+		*u++	=	0;
+		*v++	=	(vmin + vmax) * 0.5f;
+		*u++	=	1;
+
+		// Bottom
+		*v++	=	vmax;
+		*u++	=	0;
+		*v++	=	vmax;
+		*u++	=	1;
+
+		// Compute the sample positions and corresponding normal vectors
+		for (i=0;i<6;i++) 	timev[i]    =   1;
+
+		rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
+		
+		for (i=0;i<6;i++) 	addBox(bmin,bmax,P + i*3);
+		
+		// The u,v from the end sample will not have changed
+		
+		u				=	varying[VARIABLE_U];
+		v				=	varying[VARIABLE_V];
+		timev			=	varying[VARIABLE_TIME];
+	}
+	
 
 	// Sample 6 points on the curve
 
@@ -202,32 +248,8 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	*v++	=	vmax;
 	*u++	=	1;
 	
-	// Compute the curve bounding box
-	float	*P		=	varying[VARIABLE_P];
-	vector	bmin,bmax;
-	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-	int		i;
-	
-	// Take care of the motion first
-	if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && moving()) {
-
-		// Compute the sample positions and corresponding normal vectors
-		float *timev = varying[VARIABLE_TIME];
-		for (i=0;i<6;i++) {
-			timev[i]    =   1;
-		}
-
-		rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
-		
-		for (i=0;i<6;i++) {
-			addBox(bmin,bmax,P + i*3);
-			// Restore t for the next pass
-			timev[i]	=	0;
-		}
-		
-		// The u,v from the end sample will not have changed
-	}
+	// Time 0
+	for (i=0;i<6;i++)		timev[i]	=	0;
 	
 	// Sample the curves
 	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
