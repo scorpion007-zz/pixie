@@ -310,6 +310,7 @@ RtToken		RI_EMIT					=	"emit";
 RtToken		RI_SAMPLESPECTRUM		=	"samplespectrum";
 RtToken		RI_DEPTHFILTER			=	"depthfilter";
 RtToken		RI_RADIANCECACHE		=	"radiancecache";
+RtToken		RI_SAMPLEMOTION			=	"samplemotion";
 
 // IO options
 RtToken		RI_MASKRESOLUTION		=	"maskresolution";

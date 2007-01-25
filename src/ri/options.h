@@ -67,12 +67,13 @@ const	unsigned int		OPTIONS_FLAGS_CUSTOM_RESOLUTION		=	1<<2;	// The resolution i
 const	unsigned int		OPTIONS_FLAGS_CUSTOM_CLIPPING		=	1<<3;	// The near/far clipping planes have been set by user
 const	unsigned int		OPTIONS_FLAGS_FALSECOLOR_RAYTRACES	=	1<<4;	// Create a false color image of the effort being spent on the image
 const	unsigned int		OPTIONS_FLAGS_INHERIT_ATTRIBUTES	=	1<<12;	// The object instance inherit attributes from the parent
-const	unsigned int		OPTIONS_FLAGS_MOTIONBLUR			=	1<<13;	// We have motion blur in the scene
+const	unsigned int		OPTIONS_FLAGS_MOTIONBLUR			=	1<<13;	// We have motion blur in the scene (shutter open != shutter close)
 const	unsigned int		OPTIONS_FLAGS_FOCALBLUR				=	1<<14;	// We have depth of field in the scene
 const	unsigned int		OPTIONS_FLAGS_DEEP_SHADOW_RENDERING	=	1<<16;	// We're rendering a deep shadow map
 const	unsigned int		OPTIONS_FLAGS_USE_RADIANCE_CACHE	=	1<<17;	// Use the new radiance cache
 const	unsigned int		OPTIONS_FLAGS_PROGRESS				=	1<<18;	// Display the progress
 const	unsigned int		OPTIONS_FLAGS_SAMPLESPECTRUM		=	1<<19;	// Sample the spectrum in photon hider
+const	unsigned int		OPTIONS_FLAGS_SAMPLEMOTION			=	1<<20;	// We want the hider to sample motion blur (perform motion blur)
 
 
 ///////////////////////////////////////////////////////////////////////

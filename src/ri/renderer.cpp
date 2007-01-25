@@ -627,8 +627,12 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	}
 
 	// Update the flags if we have depth of field / motion blur
-	if (aperture		!= 0)			flags	|=	OPTIONS_FLAGS_FOCALBLUR;
-	if (shutterClose	!= shutterOpen)	flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
+	if (aperture		!= 0)					flags	|=	OPTIONS_FLAGS_FOCALBLUR;
+	if (shutterClose	!= shutterOpen)			flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
+	
+	// Clear samplemotion if we don't have any motionblur
+	// If we do, keep the user option to turn it off
+	if (!(flags & OPTIONS_FLAGS_MOTIONBLUR))	flags	&=	~OPTIONS_FLAGS_SAMPLEMOTION;
 
 	// lengthA * z + lengthB gives the screen space radius of a unit sphere at depth = z
 	if (projection == OPTIONS_PROJECTION_ORTHOGRAPHIC) {
@@ -871,9 +875,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Compute the clipping data
 	beginClipping();
 
-	// Initialize the brickmaps
-	CBrickMap::brickMapInit(maxBrickSize);
-
 	if (netClient != INVALID_SOCKET) {
 		// for now to keep things working, one thread only in each server
 		// FIXME: remove this once the client server networking is threadable
@@ -882,6 +883,9 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		numThreads = 1;
 	}
 	
+	// Initialize the brickmaps
+	CBrickMap::brickMapInit(maxBrickSize);
+
 	// Initialize the texturing (after we worked out how many threads)
 	initTextures(maxTextureSize);
 

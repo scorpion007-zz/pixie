@@ -316,7 +316,9 @@ COptions::COptions() {
 	depthQuantizer[3]		=	0;				// Max
 	depthQuantizer[4]		=	0;
 
-	flags					=	0;
+	// We default to sampling motion, but this can be turned off.
+	// Additionally, if there's no motionblur in the scene, it will be turned off
+	flags					=	OPTIONS_FLAGS_SAMPLE_MOTIONBLUR;
 
 	displays				=	NULL;
 

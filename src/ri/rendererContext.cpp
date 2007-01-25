@@ -1308,6 +1308,7 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 			optionCheckFlag(RI_RADIANCECACHE,	options->flags,						OPTIONS_FLAGS_USE_RADIANCE_CACHE)
 			optionCheck(RI_EMIT,				options->numEmitPhotons,			0,100000000,int)
 			optionCheckFlag(RI_SAMPLESPECTRUM,	options->flags,						OPTIONS_FLAGS_SAMPLESPECTRUM)
+			optionCheckFlag(RI_SAMPLESMOTION,	options->flags,						OPTIONS_FLAGS_SAMPLEMOTION)
 			} else if (strcmp(tokens[i],RI_DEPTHFILTER) == 0) {
 				char	*val	=	((char **) params[i])[0];
 				if		(strcmp(val,"min") == 0)		options->depthFilter	=	DEPTH_MIN;

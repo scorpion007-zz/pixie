@@ -142,7 +142,7 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	}
 
 	// The length of a raster vertex
-	if (CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR)	numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
+	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION)	numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
 	else												numVertexSamples	=	(CRenderer::numExtraSamples + 10);
 
 	extraPrimitiveFlags	=	0;
@@ -793,7 +793,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)	grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur?
-			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) grid->flags	|= RASTER_MOVING;
+			if ((CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION) && (object->moving())) grid->flags	|= RASTER_MOVING;
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -957,7 +957,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur ?
-			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) grid->flags		|=	RASTER_MOVING;
+			if ((CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION) && (object->moving())) grid->flags		|=	RASTER_MOVING;
 
 			// Displace the sucker
 			displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
