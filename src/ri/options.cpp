@@ -318,7 +318,7 @@ COptions::COptions() {
 
 	// We default to sampling motion, but this can be turned off.
 	// Additionally, if there's no motionblur in the scene, it will be turned off
-	flags					=	OPTIONS_FLAGS_SAMPLE_MOTIONBLUR;
+	flags					=	OPTIONS_FLAGS_SAMPLEMOTION;
 
 	displays				=	NULL;
 
