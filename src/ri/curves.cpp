@@ -164,7 +164,7 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 	vector		tmp;
 	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,size+=sizeStep) {
 		mulvf(tmp,dPdu,(*u++ - 0.5f)*size[0]);
-		mulvf(dPdu,size[0]);
+		mulvf(dPdu,-size[0]);
 		addvv(P,tmp);
 	}
 }
@@ -450,7 +450,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		dPdv[2]	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
 		crossvv(dPdu,dPdv,P);
-		crossvv(N,dPdu,dPdv);
+		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
 
@@ -577,7 +577,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
 		subvv(dPdv,v1,v0);
 		crossvv(dPdu,dPdv,P);
-		crossvv(N,dPdu,dPdv);
+		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
 
