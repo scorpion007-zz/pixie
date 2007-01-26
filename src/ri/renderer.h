@@ -360,6 +360,7 @@ public:
 		static	float					*fromRGB,*toRGB;
 		static	float					fstop,focallength,focaldistance;				// Depth of field stuff
 		static	float					shutterOpen,shutterClose;						// Motion blur stuff
+		static	float					shutterTime,invShutterTime;						// More motion stuff
 		static	unsigned int			flags;											// Flags	
 		static	int						endofframe;										// The end of frame statstics number
 		static	char					*filelog;										// The name of the log file

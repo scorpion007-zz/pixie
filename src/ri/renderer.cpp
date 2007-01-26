@@ -175,6 +175,7 @@ int								CRenderer::nColorComps;
 float							*CRenderer::fromRGB,*CRenderer::toRGB;
 float							CRenderer::fstop,CRenderer::focallength,CRenderer::focaldistance;
 float							CRenderer::shutterOpen,CRenderer::shutterClose;
+float							CRenderer::shutterTime,CRenderer::invShutterTime;					// initialized in beginFrame
 unsigned int					CRenderer::flags;
 
 // Pixie dependent options
@@ -629,6 +630,10 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Update the flags if we have depth of field / motion blur
 	if (aperture		!= 0)					flags	|=	OPTIONS_FLAGS_FOCALBLUR;
 	if (shutterClose	!= shutterOpen)			flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
+
+	shutterTime			=	shutterClose - shutterOpen;
+	if (shutterTime <= 0 ) 	invShutterTime	=	1.0f/shutterTime;
+	else					invShutterTime	=	1.0f;
 	
 	// Clear samplemotion if we don't have any motionblur
 	// If we do, keep the user option to turn it off
