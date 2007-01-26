@@ -719,7 +719,7 @@ void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals
 //							which are mutable
 int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVariable **var,int *globalIndex) {
 	int							j,storage;
-	int							globalNumber = parent->numGlobals-1;
+	int							globalNumber = 0;
 	float						*destFloat;
 	float						*srcFloat;
 	const char					**destString;
@@ -731,7 +731,8 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 	// BEWARE!
 	// the instance parameters are stored in the opposite order to the
 	// parent shader parameters.  The counting scheme for globals used here must
-	// match that used when saving lights
+	// match that used when saving lights.  In both cases, we loop the instance
+	// not the parent parameters
 	
 	for (cParameter=parameters;cParameter!=NULL;cParameter=cParameter->next) {
 		// retrieve the storage in which the parameter lives
@@ -800,7 +801,7 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 
 			return	TRUE;
 		} else {
-			if (!(storage == STORAGE_PARAMETER && parent->type == SL_LIGHTSOURCE))	globalNumber--;
+			if (!(storage == STORAGE_PARAMETER && parent->type == SL_LIGHTSOURCE))	globalNumber++;
 		}
 	}
 

@@ -81,10 +81,9 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 		__L						= cLight->savedState[0];									\
 		/*save extra variables if needed*/													\
 		if (numGlobals != 0) {																\
-			CShader						*cShader 	=	cInstance->parent;					\
 			int							globNum		=	0;									\
 			CVariable					*cVariable;											\
-			for (cVariable=cShader->parameters;cVariable!=NULL;cVariable=cVariable->next) {	\
+			for (cVariable=cInstance->parameters;cVariable!=NULL;cVariable=cVariable->next) {	\
 				if (cVariable->storage == STORAGE_GLOBAL) {									\
 					/* globals come from the global varyings */								\
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {					\
