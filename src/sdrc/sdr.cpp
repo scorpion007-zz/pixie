@@ -1046,8 +1046,8 @@ CScriptContext::CScriptContext(int s) {
 	addGlobalVariable("s",		SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("t",		SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("ncomps",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
-	addGlobalVariable("time",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
-	addGlobalVariable("dtime",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
+	addGlobalVariable("time",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);	// FIXME should be uniform
+	addGlobalVariable("dtime",	SLC_FLOAT | SLC_UNIFORM,	SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("dPdtime",	SLC_VECTOR | SLC_VVECTOR,	SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("alpha",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 }
