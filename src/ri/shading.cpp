@@ -240,6 +240,22 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 			time	++;
 		}
 	}
+	
+	// Finally, range-correct time
+	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
+		float	*time		=	varying[VARIABLE_TIME];
+		float	*dtimev		=	varying[VARIABLE_DTIME];
+		const float dtime	= 	1.0f/(CRenderer::shutterClose - CRenderer::shutterOpen);
+		const float t0		=	CRenderer::shutterOpen;
+		
+		*dtimev = CRenderer::shutterClose - CRenderer::shutterOpen;
+		
+		for (i=num;i>0;i--) {
+			time[0] = (time[0]*dtime + t0);
+			time++;
+		}
+	}
+	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -344,6 +360,21 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 		for (i=num;i>0;i--) {
 			movvv(dest,src);
 			dest	+=	3;
+		}
+	}
+	
+	// Finally, range-correct time
+	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
+		float	*time		=	varying[VARIABLE_TIME];
+		float	*dtimev		=	varying[VARIABLE_DTIME];
+		const float dtime	= 	1.0f/(CRenderer::shutterClose - CRenderer::shutterOpen);
+		const float t0		=	CRenderer::shutterOpen;
+		
+		*dtimev = CRenderer::shutterClose - CRenderer::shutterOpen;
+		
+		for (i=num;i>0;i--) {
+			time[0] = (time[0]*dtime + t0);
+			time++;
 		}
 	}
 }
@@ -921,12 +952,16 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// available inside displacement shaders
 		
 		if (usedParameters & PARAMETER_DPDTIME) {
+			const	float	dtime		=	(CRenderer::shutterClose - CRenderer::shutterOpen) > 0 ?
+											1.0f/(CRenderer::shutterClose - CRenderer::shutterOpen) : 1.0f;
+
 			if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
 				float			*dPdtime	=	varying[VARIABLE_DPDTIME];
 				const	float	*P			=	varying[VARIABLE_P];
 
 				for (i=numVertices;i>0;i--) {
 					subvv(dPdtime,P);
+					mulvf(dPdtime,dtime);
 					dPdtime	+=	3;
 					P		+=	3;
 				}
@@ -936,7 +971,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 				for (i=numVertices;i>0;i--) {
 					subvv(dPdtime,P);
-					mulvf(dPdtime,-1);
+					mulvf(dPdtime,-dtime);
 					dPdtime	+=	3;
 					P		+=	3;
 				}
