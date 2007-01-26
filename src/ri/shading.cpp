@@ -245,13 +245,13 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
 		float	*time		=	varying[VARIABLE_TIME];
 		float	*dtimev		=	varying[VARIABLE_DTIME];
-		const float dtime	= 	1.0f/(CRenderer::shutterClose - CRenderer::shutterOpen);
+		const float idtime	= 	CRenderer::invShutterTime;
 		const float t0		=	CRenderer::shutterOpen;
 		
 		*dtimev = CRenderer::shutterClose - CRenderer::shutterOpen;
 		
 		for (i=num;i>0;i--) {
-			time[0] = (time[0]*dtime + t0);
+			time[0] = (time[0]*idtime + t0);
 			time++;
 		}
 	}
@@ -367,13 +367,13 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
 		float	*time		=	varying[VARIABLE_TIME];
 		float	*dtimev		=	varying[VARIABLE_DTIME];
-		const float dtime	= 	1.0f/(CRenderer::shutterClose - CRenderer::shutterOpen);
+		const float idtime	= 	CRenderer::invShutterTime;
 		const float t0		=	CRenderer::shutterOpen;
 		
 		*dtimev = CRenderer::shutterClose - CRenderer::shutterOpen;
 		
 		for (i=num;i>0;i--) {
-			time[0] = (time[0]*dtime + t0);
+			time[0] = (time[0]*idtime + t0);
 			time++;
 		}
 	}
@@ -952,8 +952,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// available inside displacement shaders
 		
 		if (usedParameters & PARAMETER_DPDTIME) {
-			const	float	dtime		=	(CRenderer::shutterClose - CRenderer::shutterOpen) > 0 ?
-											1.0f/(CRenderer::shutterClose - CRenderer::shutterOpen) : 1.0f;
+			const	float	idtime		=	CRenderer::invShutterTime;
 
 			if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
 				float			*dPdtime	=	varying[VARIABLE_DPDTIME];
@@ -961,7 +960,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 				for (i=numVertices;i>0;i--) {
 					subvv(dPdtime,P);
-					mulvf(dPdtime,dtime);
+					mulvf(dPdtime,idtime);
 					dPdtime	+=	3;
 					P		+=	3;
 				}
@@ -971,7 +970,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 				for (i=numVertices;i>0;i--) {
 					subvv(dPdtime,P);
-					mulvf(dPdtime,-dtime);
+					mulvf(dPdtime,-idtime);
 					dPdtime	+=	3;
 					P		+=	3;
 				}
