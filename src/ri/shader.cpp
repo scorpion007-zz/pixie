@@ -489,6 +489,7 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 	}
 
 	// Clone the parent's parameter list
+	// BEWARE that this reverses the order (which matters when counting the globalIndex)
 	for (cVariable=parent->parameters;cVariable!=NULL;cVariable=cVariable->next) {
 		CVariable	*nVariable	=	new CVariable;
 
@@ -717,7 +718,8 @@ void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals
 //							iff var or globalIndex is NULL, we skip any parameters
 //							which are mutable
 int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVariable **var,int *globalIndex) {
-	int							j,storage,globalNumber = 0;
+	int							j,storage;
+	int							globalNumber = parent->numGlobals-1;
 	float						*destFloat;
 	float						*srcFloat;
 	const char					**destString;
@@ -726,12 +728,17 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 	int							*srcInt;
 	CVariable					*cParameter;
 
+	// BEWARE!
+	// the instance parameters are stored in the opposite order to the
+	// parent shader parameters.  The counting scheme for globals used here must
+	// match that used when saving lights
+	
 	for (cParameter=parameters;cParameter!=NULL;cParameter=cParameter->next) {
 		// retrieve the storage in which the parameter lives
 		storage = cParameter->storage;
 		if (strcmp(name,cParameter->name) == 0) {
 
-			// Note: ll parameters have storage, but for lights
+			// Note: all parameters have storage, but for lights
 			// all we have to save in the light cache are the mutable ones
 			// We also only return defaults for interior and exterior (var == NULL)
 			if (!(storage == STORAGE_PARAMETER && parent->type == SL_LIGHTSOURCE) && (var != NULL) && (globalIndex != NULL)) {
@@ -793,7 +800,7 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 
 			return	TRUE;
 		} else {
-			if (!(storage == STORAGE_PARAMETER && parent->type == SL_LIGHTSOURCE))	globalNumber++;
+			if (!(storage == STORAGE_PARAMETER && parent->type == SL_LIGHTSOURCE))	globalNumber--;
 		}
 	}
 
