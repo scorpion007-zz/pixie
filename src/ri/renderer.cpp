@@ -137,6 +137,7 @@ TMutex							CRenderer::tesselateMutex;
 TMutex							CRenderer::textureMutex;
 TMutex							CRenderer::refCountMutex;
 TMutex							CRenderer::shaderMutex;
+TMutex							CRenderer::dirtyShaderMutex;
 TMutex							CRenderer::delayedMutex;
 TMutex							CRenderer::deepShadowMutex;
 
@@ -207,7 +208,7 @@ CShadingContext					**CRenderer::contexts				=	NULL;						// intialized in begin
 int								CRenderer::numActiveThreads			=	0;							// intialized in beginFrame
 CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;						// intialized in beginFrame, destroyed in endFrame
 CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;						// intialized in beginFrame, destroyed in endFrame
-CArray<CProgrammableShaderInstance*>		*CRenderer::dirtyInstances			=	NULL;			// intialized in beginFrame, destroyed in endFrame
+CProgrammableShaderInstance		*CRenderer::dirtyInstances			=	NULL;						// intialized in beginFrame, destroyed in endFrame
 unsigned int					CRenderer::raytracingFlags			=	0;							// intialized in beginFrame
 CObject							*CRenderer::root					=	NULL;						// intialized in beginFrame, destroyed in endFrame
 CObject							*CRenderer::offendingObject			=	NULL;						// intialized in beginFrame
@@ -312,6 +313,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	osCreateMutex(textureMutex);
 	osCreateMutex(refCountMutex);
 	osCreateMutex(shaderMutex);
+	osCreateMutex(dirtyShaderMutex);
 	osCreateMutex(delayedMutex);
 	osCreateMutex(deepShadowMutex);
 	
@@ -386,6 +388,7 @@ void		CRenderer::endRenderer() {
 	osDeleteMutex(textureMutex);
 	osDeleteMutex(refCountMutex);
 	osDeleteMutex(shaderMutex);
+	osDeleteMutex(dirtyShaderMutex);
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);
 
@@ -973,28 +976,20 @@ void		CRenderer::endFrame() {
 	endDisplays();
 
 	// Reset the dirty shader instances
-	if (dirtyInstances != NULL) {
-		int							numShaderInstances	=	dirtyInstances->numItems;
-		CProgrammableShaderInstance	**instances			=	dirtyInstances->array;
+	while(dirtyInstances != NULL) {
+		int	i;
 
-		for (;numShaderInstances>0;numShaderInstances--) {
-			CProgrammableShaderInstance	*dirtyInstance	=	*instances++;
-			int							i;
-
-			for (i=0;i<dirtyInstance->parent->numPLs;i++) {
-				if (dirtyInstance->parameterLists[i] != NULL)	{
-					delete dirtyInstance->parameterLists[i];
-					dirtyInstance->parameterLists[i]	=	NULL;
-				}
+		// Delete the used parameter lists
+		for (i=0;i<dirtyInstances->parent->numPLs;i++) {
+			if (dirtyInstances->parameterLists[i] != NULL)	{
+				delete dirtyInstances->parameterLists[i];
+				dirtyInstances->parameterLists[i]	=	NULL;
 			}
-
-			// The shader is no longer dirty
-			dirtyInstance->dirty	=	FALSE;
-			dirtyInstance->detach();
 		}
 
-		delete dirtyInstances;
-		dirtyInstances	=	NULL;
+		// The shader is no longer dirty
+		dirtyInstances->dirty	=	FALSE;
+		dirtyInstances			=	dirtyInstances->nextDirty;
 	}
 
 	// Ditch the remote channels

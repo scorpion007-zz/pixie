@@ -581,6 +581,8 @@ static	RtFilterFunc	getFilter(char *n) {
 		f = RiTriangleFilter;
 	} else if (strcmp(name,RI_CATMULLROMFILTER) == 0) {
 		f = RiCatmullRomFilter;
+	} else if (strcmp(name,RI_BLACKMANHARRISFILTER) == 0) {
+		f = RiBlackmanHarrisFilter;
 	} else if (strcmp(name,RI_SINCFILTER) == 0) {
 		f = RiSincFilter;
 	} else {
@@ -787,22 +789,22 @@ static const short yyrhs[] = {   124,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   610,   613,   620,   630,   637,   646,   655,   666,   672,   681,
-   685,   692,   698,   707,   713,   725,   730,   734,   742,   746,
-   766,   777,   791,   797,   805,   809,   815,   822,   827,   833,
-   838,   843,   848,   856,   862,   871,   882,   891,   902,   909,
-   916,   927,   935,   940,   947,   953,   960,   972,   979,   989,
-   999,  1008,  1015,  1024,  1038,  1053,  1059,  1068,  1073,  1078,
-  1092,  1106,  1122,  1138,  1151,  1166,  1176,  1188,  1195,  1205,
-  1217,  1226,  1238,  1245,  1252,  1259,  1266,  1272,  1278,  1284,
-  1306,  1326,  1348,  1368,  1377,  1388,  1395,  1401,  1407,  1412,
-  1418,  1423,  1465,  1507,  1513,  1521,  1529,  1538,  1550,  1564,
-  1571,  1578,  1584,  1590,  1595,  1600,  1609,  1619,  1632,  1668,
-  1712,  1725,  1774,  1823,  1902,  1928,  2004,  2037,  2061,  2075,
-  2091,  2104,  2119,  2133,  2149,  2175,  2203,  2217,  2233,  2246,
-  2261,  2276,  2293,  2339,  2349,  2389,  2417,  2426,  2435,  2504,
-  2510,  2515,  2523,  2528,  2538,  2546,  2551,  2568,  2576,  2593,
-  2608,  2629,  2637,  2647,  2652,  2657
+   612,   615,   622,   632,   639,   648,   657,   668,   674,   683,
+   687,   694,   700,   709,   715,   727,   732,   736,   744,   748,
+   768,   779,   793,   799,   807,   811,   817,   824,   829,   835,
+   840,   845,   850,   858,   864,   873,   884,   893,   904,   911,
+   918,   929,   937,   942,   949,   955,   962,   974,   981,   991,
+  1001,  1010,  1017,  1026,  1040,  1055,  1061,  1070,  1075,  1080,
+  1094,  1108,  1124,  1140,  1153,  1168,  1178,  1190,  1197,  1207,
+  1219,  1228,  1240,  1247,  1254,  1261,  1268,  1274,  1280,  1286,
+  1308,  1328,  1350,  1370,  1379,  1390,  1397,  1403,  1409,  1414,
+  1420,  1425,  1467,  1509,  1515,  1523,  1531,  1540,  1552,  1566,
+  1573,  1580,  1586,  1592,  1597,  1602,  1611,  1621,  1634,  1670,
+  1714,  1727,  1776,  1825,  1904,  1930,  2006,  2039,  2063,  2077,
+  2093,  2106,  2121,  2135,  2151,  2177,  2205,  2219,  2235,  2248,
+  2263,  2278,  2295,  2341,  2351,  2391,  2419,  2428,  2437,  2506,
+  2512,  2517,  2525,  2530,  2540,  2548,  2553,  2570,  2578,  2595,
+  2610,  2631,  2639,  2649,  2654,  2659
 };
 #endif
 
@@ -1668,7 +1670,7 @@ yyreduce:
   switch (yyn) {
 
 case 2:
-#line 615 "../../../../src/ri/rib.y"
+#line 617 "../../../../src/ri/rib.y"
 {
 					args[numArguments++].integer				=	(int) yyvsp[0].real;
 					argCheck();
@@ -1676,7 +1678,7 @@ case 2:
 				;
     break;}
 case 3:
-#line 622 "../../../../src/ri/rib.y"
+#line 624 "../../../../src/ri/rib.y"
 {
 					args[numArguments++].integer				=	(int) yyvsp[0].real;
 					argCheck();
@@ -1684,7 +1686,7 @@ case 3:
 				;
     break;}
 case 4:
-#line 632 "../../../../src/ri/rib.y"
+#line 634 "../../../../src/ri/rib.y"
 {
 					args[numArguments++].real					=	yyvsp[0].real;
 					argCheck();
@@ -1692,7 +1694,7 @@ case 4:
 				;
     break;}
 case 5:
-#line 639 "../../../../src/ri/rib.y"
+#line 641 "../../../../src/ri/rib.y"
 {
 					args[numArguments++].real					=	yyvsp[0].real;
 					argCheck();
@@ -1700,7 +1702,7 @@ case 5:
 				;
     break;}
 case 6:
-#line 648 "../../../../src/ri/rib.y"
+#line 650 "../../../../src/ri/rib.y"
 {
 					char	*theString	=	strdup(yyvsp[0].string);
 					args[numArguments++].string					=	theString;
@@ -1710,7 +1712,7 @@ case 6:
 				;
     break;}
 case 7:
-#line 657 "../../../../src/ri/rib.y"
+#line 659 "../../../../src/ri/rib.y"
 {
 					char	*theString	=	strdup(yyvsp[0].string);
 					args[numArguments++].string					=	theString;
@@ -1720,49 +1722,49 @@ case 7:
 				;
     break;}
 case 8:
-#line 669 "../../../../src/ri/rib.y"
+#line 671 "../../../../src/ri/rib.y"
 {
 					yyval.integer = yyvsp[-1].integer;
 				;
     break;}
 case 9:
-#line 675 "../../../../src/ri/rib.y"
+#line 677 "../../../../src/ri/rib.y"
 {
 					yyval.integer = 0;
 				;
     break;}
 case 10:
-#line 682 "../../../../src/ri/rib.y"
+#line 684 "../../../../src/ri/rib.y"
 {
 					yyval.integer	=	yyvsp[0].integer;
 				;
     break;}
 case 11:
-#line 687 "../../../../src/ri/rib.y"
+#line 689 "../../../../src/ri/rib.y"
 {
 					yyval.integer	=	yyvsp[0].integer;
 				;
     break;}
 case 12:
-#line 695 "../../../../src/ri/rib.y"
+#line 697 "../../../../src/ri/rib.y"
 {
 					yyval.integer = yyvsp[-1].integer;
 				;
     break;}
 case 13:
-#line 701 "../../../../src/ri/rib.y"
+#line 703 "../../../../src/ri/rib.y"
 {
 					yyval.integer = 0;
 				;
     break;}
 case 14:
-#line 710 "../../../../src/ri/rib.y"
+#line 712 "../../../../src/ri/rib.y"
 {
 					yyval.integer	=	yyvsp[-1].integer;
 				;
     break;}
 case 15:
-#line 715 "../../../../src/ri/rib.y"
+#line 717 "../../../../src/ri/rib.y"
 {
 					char	*theString	=	strdup(yyvsp[0].string);
 					args[numArguments++].string					=	theString;
@@ -1772,24 +1774,24 @@ case 15:
 				;
     break;}
 case 17:
-#line 731 "../../../../src/ri/rib.y"
+#line 733 "../../../../src/ri/rib.y"
 {
 					yyval.integer	=	0;
 				;
     break;}
 case 18:
-#line 736 "../../../../src/ri/rib.y"
+#line 738 "../../../../src/ri/rib.y"
 {
 					yyval.integer	=	yyvsp[0].integer;
 				;
     break;}
 case 19:
-#line 744 "../../../../src/ri/rib.y"
+#line 746 "../../../../src/ri/rib.y"
 {
 				;
     break;}
 case 20:
-#line 747 "../../../../src/ri/rib.y"
+#line 749 "../../../../src/ri/rib.y"
 {
 					int	i;
 
@@ -1809,7 +1811,7 @@ case 20:
 				;
     break;}
 case 21:
-#line 768 "../../../../src/ri/rib.y"
+#line 770 "../../../../src/ri/rib.y"
 {
 					// A parameter is either a float array
 					parameters[numParameters].name			=	yyvsp[-1].string;
@@ -1821,7 +1823,7 @@ case 21:
 				;
     break;}
 case 22:
-#line 780 "../../../../src/ri/rib.y"
+#line 782 "../../../../src/ri/rib.y"
 {	
 					// Or a string array
 					parameters[numParameters].name			=	yyvsp[-1].string;
@@ -1833,14 +1835,14 @@ case 22:
 				;
     break;}
 case 23:
-#line 792 "../../../../src/ri/rib.y"
+#line 794 "../../../../src/ri/rib.y"
 {
 					// Save the line number in case we have an error
 					ribCommandLineno	=	ribLineno;
 				;
     break;}
 case 24:
-#line 797 "../../../../src/ri/rib.y"
+#line 799 "../../../../src/ri/rib.y"
 {
 					char	*currentString;
 					numArguments	=	0;
@@ -1851,7 +1853,7 @@ case 24:
 				;
     break;}
 case 26:
-#line 810 "../../../../src/ri/rib.y"
+#line 812 "../../../../src/ri/rib.y"
 {
 					if (callback != NULL) {
 						callback(yyvsp[0].string);
@@ -1859,127 +1861,127 @@ case 26:
 				;
     break;}
 case 27:
-#line 819 "../../../../src/ri/rib.y"
+#line 821 "../../../../src/ri/rib.y"
 {
 					RiDeclare(yyvsp[-1].string,yyvsp[0].string);
 				;
     break;}
 case 28:
-#line 824 "../../../../src/ri/rib.y"
+#line 826 "../../../../src/ri/rib.y"
 {
 					RiFrameBegin(0);
 				;
     break;}
 case 29:
-#line 830 "../../../../src/ri/rib.y"
+#line 832 "../../../../src/ri/rib.y"
 {
 					RiFrameBegin((int) yyvsp[0].real);
 				;
     break;}
 case 30:
-#line 835 "../../../../src/ri/rib.y"
+#line 837 "../../../../src/ri/rib.y"
 {
 					RiFrameEnd();
 				;
     break;}
 case 31:
-#line 840 "../../../../src/ri/rib.y"
+#line 842 "../../../../src/ri/rib.y"
 {
 					RiWorldBegin();
 				;
     break;}
 case 32:
-#line 845 "../../../../src/ri/rib.y"
+#line 847 "../../../../src/ri/rib.y"
 {
 					RiWorldEnd();
 				;
     break;}
 case 33:
-#line 853 "../../../../src/ri/rib.y"
+#line 855 "../../../../src/ri/rib.y"
 {
 					RiFormat((int) yyvsp[-2].real,(int) yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 34:
-#line 859 "../../../../src/ri/rib.y"
+#line 861 "../../../../src/ri/rib.y"
 {
 					RiFrameAspectRatio(yyvsp[0].real);
 				;
     break;}
 case 35:
-#line 868 "../../../../src/ri/rib.y"
+#line 870 "../../../../src/ri/rib.y"
 {
 					RiScreenWindow(yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 36:
-#line 879 "../../../../src/ri/rib.y"
+#line 881 "../../../../src/ri/rib.y"
 {
 					RiScreenWindow(yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real);
 				;
     break;}
 case 37:
-#line 888 "../../../../src/ri/rib.y"
+#line 890 "../../../../src/ri/rib.y"
 {
 					RiCropWindow(yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 38:
-#line 899 "../../../../src/ri/rib.y"
+#line 901 "../../../../src/ri/rib.y"
 {
 					RiCropWindow(yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real);
 				;
     break;}
 case 39:
-#line 906 "../../../../src/ri/rib.y"
+#line 908 "../../../../src/ri/rib.y"
 {
 					RiProjectionV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 40:
-#line 913 "../../../../src/ri/rib.y"
+#line 915 "../../../../src/ri/rib.y"
 {
 					RiClipping(yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 41:
-#line 924 "../../../../src/ri/rib.y"
+#line 926 "../../../../src/ri/rib.y"
 {
 					RiClippingPlane(yyvsp[-5].real,yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 42:
-#line 932 "../../../../src/ri/rib.y"
+#line 934 "../../../../src/ri/rib.y"
 {
 					RiDepthOfField(yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 43:
-#line 937 "../../../../src/ri/rib.y"
+#line 939 "../../../../src/ri/rib.y"
 {
 					RiDepthOfField(C_INFINITY,1,1);
 				;
     break;}
 case 44:
-#line 944 "../../../../src/ri/rib.y"
+#line 946 "../../../../src/ri/rib.y"
 {
 					RiShutter(yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 45:
-#line 950 "../../../../src/ri/rib.y"
+#line 952 "../../../../src/ri/rib.y"
 {
 					RiPixelVariance(yyvsp[0].real);
 				;
     break;}
 case 46:
-#line 957 "../../../../src/ri/rib.y"
+#line 959 "../../../../src/ri/rib.y"
 {
 					RiPixelSamples(yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 47:
-#line 965 "../../../../src/ri/rib.y"
+#line 967 "../../../../src/ri/rib.y"
 {
 					RtFilterFunc	f;
 
@@ -1989,13 +1991,13 @@ case 47:
 				;
     break;}
 case 48:
-#line 976 "../../../../src/ri/rib.y"
+#line 978 "../../../../src/ri/rib.y"
 {
 					RiExposure(yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 49:
-#line 983 "../../../../src/ri/rib.y"
+#line 985 "../../../../src/ri/rib.y"
 {
 					// No parameter list checking is performed for the shaders
 					if (parameterListCheck()) {
@@ -2004,25 +2006,25 @@ case 49:
 				;
     break;}
 case 50:
-#line 996 "../../../../src/ri/rib.y"
+#line 998 "../../../../src/ri/rib.y"
 {
 					RiQuantize(yyvsp[-4].string,(int) yyvsp[-3].real,(int) yyvsp[-2].real,(int) yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 51:
-#line 1005 "../../../../src/ri/rib.y"
+#line 1007 "../../../../src/ri/rib.y"
 {
 					RiDisplayV(yyvsp[-3].string,yyvsp[-2].string,yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 52:
-#line 1012 "../../../../src/ri/rib.y"
+#line 1014 "../../../../src/ri/rib.y"
 {
 					RiDisplayChannelV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 53:
-#line 1019 "../../../../src/ri/rib.y"
+#line 1021 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						RiHiderV(yyvsp[-1].string,numParameters,tokens,vals);
@@ -2030,7 +2032,7 @@ case 53:
 				;
     break;}
 case 54:
-#line 1027 "../../../../src/ri/rib.y"
+#line 1029 "../../../../src/ri/rib.y"
 {
 					if ((numArguments & 1) || ((numArguments % 6) != 0)) {
 						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",numArguments);
@@ -2044,7 +2046,7 @@ case 54:
 				;
     break;}
 case 55:
-#line 1042 "../../../../src/ri/rib.y"
+#line 1044 "../../../../src/ri/rib.y"
 {
 					if ((yyvsp[-1].integer != yyvsp[0].integer) || ((numArguments % 6) != 0)) {
 						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",numArguments);
@@ -2058,13 +2060,13 @@ case 55:
 				;
     break;}
 case 56:
-#line 1056 "../../../../src/ri/rib.y"
+#line 1058 "../../../../src/ri/rib.y"
 {
 					RiRelativeDetail(yyvsp[0].real);	
 				;
     break;}
 case 57:
-#line 1063 "../../../../src/ri/rib.y"
+#line 1065 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						RiOptionV(yyvsp[-1].string,numParameters,tokens,vals);
@@ -2072,19 +2074,19 @@ case 57:
 				;
     break;}
 case 58:
-#line 1070 "../../../../src/ri/rib.y"
+#line 1072 "../../../../src/ri/rib.y"
 {
 					RiAttributeBegin();
 				;
     break;}
 case 59:
-#line 1075 "../../../../src/ri/rib.y"
+#line 1077 "../../../../src/ri/rib.y"
 {
 					RiAttributeEnd();
 				;
     break;}
 case 60:
-#line 1083 "../../../../src/ri/rib.y"
+#line 1085 "../../../../src/ri/rib.y"
 {
 					RtColor	color;
 
@@ -2096,7 +2098,7 @@ case 60:
 				;
     break;}
 case 61:
-#line 1097 "../../../../src/ri/rib.y"
+#line 1099 "../../../../src/ri/rib.y"
 {
 					RtColor	color;
 
@@ -2108,7 +2110,7 @@ case 61:
 				;
     break;}
 case 62:
-#line 1113 "../../../../src/ri/rib.y"
+#line 1115 "../../../../src/ri/rib.y"
 {
 					RtColor	color;
 
@@ -2120,7 +2122,7 @@ case 62:
 				;
     break;}
 case 63:
-#line 1129 "../../../../src/ri/rib.y"
+#line 1131 "../../../../src/ri/rib.y"
 {
 					RtColor	color;
 
@@ -2132,19 +2134,19 @@ case 63:
 				;
     break;}
 case 64:
-#line 1148 "../../../../src/ri/rib.y"
+#line 1150 "../../../../src/ri/rib.y"
 {
 					RiTextureCoordinates(yyvsp[-7].real,yyvsp[-6].real,yyvsp[-5].real,yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 65:
-#line 1163 "../../../../src/ri/rib.y"
+#line 1165 "../../../../src/ri/rib.y"
 {
 					RiTextureCoordinates(yyvsp[-8].real,yyvsp[-7].real,yyvsp[-6].real,yyvsp[-5].real,yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real);
 				;
     break;}
 case 66:
-#line 1171 "../../../../src/ri/rib.y"
+#line 1173 "../../../../src/ri/rib.y"
 {
 					if (lights == NULL)	lights	=	new CArray<RtLightHandle>;
 
@@ -2152,7 +2154,7 @@ case 66:
 				;
     break;}
 case 67:
-#line 1181 "../../../../src/ri/rib.y"
+#line 1183 "../../../../src/ri/rib.y"
 {
 					if (lightNames == NULL)	lightNames	=	new CTrie<RtLightHandle>;
 					
@@ -2162,13 +2164,13 @@ case 67:
 				;
     break;}
 case 68:
-#line 1192 "../../../../src/ri/rib.y"
+#line 1194 "../../../../src/ri/rib.y"
 {
 					RiLightSourceV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 69:
-#line 1200 "../../../../src/ri/rib.y"
+#line 1202 "../../../../src/ri/rib.y"
 {
 					if (lights == NULL)	lights	=	new CArray<RtLightHandle>;
 
@@ -2176,7 +2178,7 @@ case 69:
 				;
     break;}
 case 70:
-#line 1210 "../../../../src/ri/rib.y"
+#line 1212 "../../../../src/ri/rib.y"
 {
 					if (lightNames == NULL)	lightNames	=	new CTrie<RtLightHandle>;
 					
@@ -2186,7 +2188,7 @@ case 70:
 				;
     break;}
 case 71:
-#line 1221 "../../../../src/ri/rib.y"
+#line 1223 "../../../../src/ri/rib.y"
 {
 					if (lights == NULL)	lights	=	new CArray<RtLightHandle>;
 
@@ -2194,7 +2196,7 @@ case 71:
 				;
     break;}
 case 72:
-#line 1230 "../../../../src/ri/rib.y"
+#line 1232 "../../../../src/ri/rib.y"
 {
 					if (lightNames == NULL)	lightNames	=	new CTrie<RtLightHandle>;
 					RtLightHandle lightHandle = NULL;
@@ -2205,49 +2207,49 @@ case 72:
 				;
     break;}
 case 73:
-#line 1242 "../../../../src/ri/rib.y"
+#line 1244 "../../../../src/ri/rib.y"
 {
 					RiSurfaceV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 74:
-#line 1249 "../../../../src/ri/rib.y"
+#line 1251 "../../../../src/ri/rib.y"
 {
 					RiAtmosphereV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 75:
-#line 1256 "../../../../src/ri/rib.y"
+#line 1258 "../../../../src/ri/rib.y"
 {
 					RiInteriorV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 76:
-#line 1263 "../../../../src/ri/rib.y"
+#line 1265 "../../../../src/ri/rib.y"
 {
 					RiExteriorV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 77:
-#line 1269 "../../../../src/ri/rib.y"
+#line 1271 "../../../../src/ri/rib.y"
 {
 					RiShadingRate(yyvsp[0].real);
 				;
     break;}
 case 78:
-#line 1275 "../../../../src/ri/rib.y"
+#line 1277 "../../../../src/ri/rib.y"
 {
 					RiShadingInterpolation(yyvsp[0].string);
 				;
     break;}
 case 79:
-#line 1281 "../../../../src/ri/rib.y"
+#line 1283 "../../../../src/ri/rib.y"
 {
 					RiMatte((RtBoolean) yyvsp[0].real);
 				;
     break;}
 case 80:
-#line 1294 "../../../../src/ri/rib.y"
+#line 1296 "../../../../src/ri/rib.y"
 {
 					RtBound	bound;
 
@@ -2262,7 +2264,7 @@ case 80:
 				;
     break;}
 case 81:
-#line 1314 "../../../../src/ri/rib.y"
+#line 1316 "../../../../src/ri/rib.y"
 {
 					RtBound	bound;
 
@@ -2277,7 +2279,7 @@ case 81:
 				;
     break;}
 case 82:
-#line 1336 "../../../../src/ri/rib.y"
+#line 1338 "../../../../src/ri/rib.y"
 {
 					RtBound	bound;
 
@@ -2292,7 +2294,7 @@ case 82:
 				;
     break;}
 case 83:
-#line 1356 "../../../../src/ri/rib.y"
+#line 1358 "../../../../src/ri/rib.y"
 {
 					RtBound	bound;
 
@@ -2307,55 +2309,55 @@ case 83:
 				;
     break;}
 case 84:
-#line 1374 "../../../../src/ri/rib.y"
+#line 1376 "../../../../src/ri/rib.y"
 {
 					RiDetailRange(yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 85:
-#line 1385 "../../../../src/ri/rib.y"
+#line 1387 "../../../../src/ri/rib.y"
 {
 					RiDetailRange(yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real);
 				;
     break;}
 case 86:
-#line 1392 "../../../../src/ri/rib.y"
+#line 1394 "../../../../src/ri/rib.y"
 {
 					RiGeometricApproximation(yyvsp[-1].string,yyvsp[0].real);
 				;
     break;}
 case 87:
-#line 1398 "../../../../src/ri/rib.y"
+#line 1400 "../../../../src/ri/rib.y"
 {
 					RiGeometricRepresentation(yyvsp[0].string);
 				;
     break;}
 case 88:
-#line 1404 "../../../../src/ri/rib.y"
+#line 1406 "../../../../src/ri/rib.y"
 {
 					RiOrientation(yyvsp[0].string);
 				;
     break;}
 case 89:
-#line 1409 "../../../../src/ri/rib.y"
+#line 1411 "../../../../src/ri/rib.y"
 {
 					RiReverseOrientation();
 				;
     break;}
 case 90:
-#line 1415 "../../../../src/ri/rib.y"
+#line 1417 "../../../../src/ri/rib.y"
 {
 					RiSides((int) yyvsp[0].real);
 				;
     break;}
 case 91:
-#line 1420 "../../../../src/ri/rib.y"
+#line 1422 "../../../../src/ri/rib.y"
 {
 					RiIdentity();
 				;
     break;}
 case 92:
-#line 1443 "../../../../src/ri/rib.y"
+#line 1445 "../../../../src/ri/rib.y"
 {
 					RtMatrix	tmp;
 
@@ -2380,7 +2382,7 @@ case 92:
 				;
     break;}
 case 93:
-#line 1485 "../../../../src/ri/rib.y"
+#line 1487 "../../../../src/ri/rib.y"
 {
 					RtMatrix	tmp;
 
@@ -2405,79 +2407,79 @@ case 93:
 				;
     break;}
 case 94:
-#line 1510 "../../../../src/ri/rib.y"
+#line 1512 "../../../../src/ri/rib.y"
 {
 					RiPerspective(yyvsp[0].real);
 				;
     break;}
 case 95:
-#line 1518 "../../../../src/ri/rib.y"
+#line 1520 "../../../../src/ri/rib.y"
 {
 					RiTranslate(yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 96:
-#line 1526 "../../../../src/ri/rib.y"
+#line 1528 "../../../../src/ri/rib.y"
 {
 					RiScale(yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 97:
-#line 1535 "../../../../src/ri/rib.y"
+#line 1537 "../../../../src/ri/rib.y"
 {
 					RiRotate(yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 98:
-#line 1547 "../../../../src/ri/rib.y"
+#line 1549 "../../../../src/ri/rib.y"
 {
 					RiSkew(yyvsp[-6].real,yyvsp[-5].real,yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real,yyvsp[0].real);
 				;
     break;}
 case 99:
-#line 1561 "../../../../src/ri/rib.y"
+#line 1563 "../../../../src/ri/rib.y"
 {
 					RiSkew(yyvsp[-7].real,yyvsp[-6].real,yyvsp[-5].real,yyvsp[-4].real,yyvsp[-3].real,yyvsp[-2].real,yyvsp[-1].real);
 				;
     break;}
 case 100:
-#line 1568 "../../../../src/ri/rib.y"
+#line 1570 "../../../../src/ri/rib.y"
 {
 					RiDeformationV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 101:
-#line 1575 "../../../../src/ri/rib.y"
+#line 1577 "../../../../src/ri/rib.y"
 {
 					RiDisplacementV(yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 102:
-#line 1581 "../../../../src/ri/rib.y"
+#line 1583 "../../../../src/ri/rib.y"
 {
 					RiCoordinateSystem(yyvsp[0].string);
 				;
     break;}
 case 103:
-#line 1587 "../../../../src/ri/rib.y"
+#line 1589 "../../../../src/ri/rib.y"
 {
 					RiCoordSysTransform(yyvsp[0].string);
 				;
     break;}
 case 104:
-#line 1592 "../../../../src/ri/rib.y"
+#line 1594 "../../../../src/ri/rib.y"
 {
 					RiTransformBegin();
 				;
     break;}
 case 105:
-#line 1597 "../../../../src/ri/rib.y"
+#line 1599 "../../../../src/ri/rib.y"
 {
 					RiTransformEnd();
 				;
     break;}
 case 106:
-#line 1604 "../../../../src/ri/rib.y"
+#line 1606 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						RiAttributeV(yyvsp[-1].string,numParameters,tokens,vals);
@@ -2485,7 +2487,7 @@ case 106:
 				;
     break;}
 case 107:
-#line 1612 "../../../../src/ri/rib.y"
+#line 1614 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {	
 						if (sizeCheck(numVertex,0,0,1)) {
@@ -2495,7 +2497,7 @@ case 107:
 				;
     break;}
 case 108:
-#line 1623 "../../../../src/ri/rib.y"
+#line 1625 "../../../../src/ri/rib.y"
 {
 					int		*argi	=	(int *) get(0);
 
@@ -2507,7 +2509,7 @@ case 108:
 				;
     break;}
 case 109:
-#line 1637 "../../../../src/ri/rib.y"
+#line 1639 "../../../../src/ri/rib.y"
 {
 					int	*argi1		=	(int *) get(0);
 					int	*argi2		=	(int *) get(yyvsp[-2].integer);
@@ -2541,7 +2543,7 @@ case 109:
 				;
     break;}
 case 110:
-#line 1674 "../../../../src/ri/rib.y"
+#line 1676 "../../../../src/ri/rib.y"
 {
 					int	*argi1		=	(int *) get(0);
 					int	*argi2		=	(int *) get(yyvsp[-3].integer);
@@ -2582,7 +2584,7 @@ case 110:
 				;
     break;}
 case 111:
-#line 1718 "../../../../src/ri/rib.y"
+#line 1720 "../../../../src/ri/rib.y"
 {
 					RtBasis	*argf1,*argf2;
 
@@ -2592,7 +2594,7 @@ case 111:
 				;
     break;}
 case 112:
-#line 1748 "../../../../src/ri/rib.y"
+#line 1750 "../../../../src/ri/rib.y"
 {
 					RtBasis	*argf2;
 
@@ -2621,7 +2623,7 @@ case 112:
 				;
     break;}
 case 113:
-#line 1797 "../../../../src/ri/rib.y"
+#line 1799 "../../../../src/ri/rib.y"
 {
 					RtBasis	*argf1;
 
@@ -2650,7 +2652,7 @@ case 113:
 				;
     break;}
 case 114:
-#line 1863 "../../../../src/ri/rib.y"
+#line 1865 "../../../../src/ri/rib.y"
 {
 					RtBasis	b1,b2;
 
@@ -2692,7 +2694,7 @@ case 114:
 				;
     break;}
 case 115:
-#line 1906 "../../../../src/ri/rib.y"
+#line 1908 "../../../../src/ri/rib.y"
 {
 					int	numExpectedVertices;
 					int	numExpectedPatches	=	1;
@@ -2717,7 +2719,7 @@ case 115:
 				;
     break;}
 case 116:
-#line 1936 "../../../../src/ri/rib.y"
+#line 1938 "../../../../src/ri/rib.y"
 {
 					int	numExpectedVertices;
 					int	numuPatches,numvPatches;
@@ -2788,7 +2790,7 @@ case 116:
 				;
     break;}
 case 117:
-#line 2017 "../../../../src/ri/rib.y"
+#line 2019 "../../../../src/ri/rib.y"
 {
 					float	*argf1	=	(float *) get(0);
 					float	*argf2	=	(float *) get(yyvsp[-8].integer);
@@ -2811,7 +2813,7 @@ case 117:
 				;
     break;}
 case 118:
-#line 2048 "../../../../src/ri/rib.y"
+#line 2050 "../../../../src/ri/rib.y"
 {
 					int		*argi1	=	(int *)		get(0);
 					int		*argi2	=	(int *)		get(yyvsp[-8].integer);
@@ -2827,7 +2829,7 @@ case 118:
 				;
     break;}
 case 119:
-#line 2068 "../../../../src/ri/rib.y"
+#line 2070 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2837,7 +2839,7 @@ case 119:
 				;
     break;}
 case 120:
-#line 2084 "../../../../src/ri/rib.y"
+#line 2086 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2847,7 +2849,7 @@ case 120:
 				;
     break;}
 case 121:
-#line 2097 "../../../../src/ri/rib.y"
+#line 2099 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2857,7 +2859,7 @@ case 121:
 				;
     break;}
 case 122:
-#line 2112 "../../../../src/ri/rib.y"
+#line 2114 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2867,7 +2869,7 @@ case 122:
 				;
     break;}
 case 123:
-#line 2126 "../../../../src/ri/rib.y"
+#line 2128 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2877,7 +2879,7 @@ case 123:
 				;
     break;}
 case 124:
-#line 2142 "../../../../src/ri/rib.y"
+#line 2144 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2887,7 +2889,7 @@ case 124:
 				;
     break;}
 case 125:
-#line 2159 "../../../../src/ri/rib.y"
+#line 2161 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2906,7 +2908,7 @@ case 125:
 				;
     break;}
 case 126:
-#line 2187 "../../../../src/ri/rib.y"
+#line 2189 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2925,7 +2927,7 @@ case 126:
 				;
     break;}
 case 127:
-#line 2210 "../../../../src/ri/rib.y"
+#line 2212 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2935,7 +2937,7 @@ case 127:
 				;
     break;}
 case 128:
-#line 2226 "../../../../src/ri/rib.y"
+#line 2228 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2945,7 +2947,7 @@ case 128:
 				;
     break;}
 case 129:
-#line 2239 "../../../../src/ri/rib.y"
+#line 2241 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2955,7 +2957,7 @@ case 129:
 				;
     break;}
 case 130:
-#line 2254 "../../../../src/ri/rib.y"
+#line 2256 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2965,7 +2967,7 @@ case 130:
 				;
     break;}
 case 131:
-#line 2269 "../../../../src/ri/rib.y"
+#line 2271 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2975,7 +2977,7 @@ case 131:
 				;
     break;}
 case 132:
-#line 2286 "../../../../src/ri/rib.y"
+#line 2288 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(0,4,4,1)) {
@@ -2985,7 +2987,7 @@ case 132:
 				;
     break;}
 case 133:
-#line 2299 "../../../../src/ri/rib.y"
+#line 2301 "../../../../src/ri/rib.y"
 {
 					int			*argi1		=	(int *) get(0);
 					int			numVertices,numUniforms;
@@ -3028,7 +3030,7 @@ case 133:
 				;
     break;}
 case 134:
-#line 2342 "../../../../src/ri/rib.y"
+#line 2344 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						if (sizeCheck(numVertex,0,0,1)) {
@@ -3038,7 +3040,7 @@ case 134:
 				;
     break;}
 case 135:
-#line 2361 "../../../../src/ri/rib.y"
+#line 2363 "../../../../src/ri/rib.y"
 {
 					int		*argi1,*argi2,*argi3,*argi4;
 					char	**args1;
@@ -3069,7 +3071,7 @@ case 135:
 				;
     break;}
 case 136:
-#line 2395 "../../../../src/ri/rib.y"
+#line 2397 "../../../../src/ri/rib.y"
 {
 					int		*argi1,*argi2;
 					int		numVertices,i,j;
@@ -3094,13 +3096,13 @@ case 136:
 				;
     break;}
 case 137:
-#line 2423 "../../../../src/ri/rib.y"
+#line 2425 "../../../../src/ri/rib.y"
 {
 					// FIXME: Not implemented
 				;
     break;}
 case 138:
-#line 2430 "../../../../src/ri/rib.y"
+#line 2432 "../../../../src/ri/rib.y"
 {
 					if (parameterListCheck()) {
 						RiGeometryV(yyvsp[-1].string,numParameters,tokens,vals);
@@ -3108,7 +3110,7 @@ case 138:
 				;
     break;}
 case 139:
-#line 2447 "../../../../src/ri/rib.y"
+#line 2449 "../../../../src/ri/rib.y"
 {
 					RtBound			bound;
 					CDelayedData	*cData	=	new CDelayedData;
@@ -3168,19 +3170,19 @@ case 139:
 				;
     break;}
 case 140:
-#line 2507 "../../../../src/ri/rib.y"
+#line 2509 "../../../../src/ri/rib.y"
 {
 					RiSolidBegin(yyvsp[0].string);
 				;
     break;}
 case 141:
-#line 2512 "../../../../src/ri/rib.y"
+#line 2514 "../../../../src/ri/rib.y"
 {
 					RiSolidEnd();
 				;
     break;}
 case 142:
-#line 2518 "../../../../src/ri/rib.y"
+#line 2520 "../../../../src/ri/rib.y"
 {
 					if (ribObjects == NULL)	ribObjects	=	new CArray<RtPointer>;
 
@@ -3188,13 +3190,13 @@ case 142:
 				;
     break;}
 case 143:
-#line 2525 "../../../../src/ri/rib.y"
+#line 2527 "../../../../src/ri/rib.y"
 {
 					RiObjectEnd();
 				;
     break;}
 case 144:
-#line 2531 "../../../../src/ri/rib.y"
+#line 2533 "../../../../src/ri/rib.y"
 {
 					if (ribObjects != NULL) {
 						RiObjectInstance((*ribObjects)[(int) yyvsp[0].real]);
@@ -3204,7 +3206,7 @@ case 144:
 				;
     break;}
 case 145:
-#line 2541 "../../../../src/ri/rib.y"
+#line 2543 "../../../../src/ri/rib.y"
 {
 					float	*argf	=	(float *) get(0);
 
@@ -3212,13 +3214,13 @@ case 145:
 				;
     break;}
 case 146:
-#line 2548 "../../../../src/ri/rib.y"
+#line 2550 "../../../../src/ri/rib.y"
 {
 					RiMotionEnd();
 				;
     break;}
 case 147:
-#line 2561 "../../../../src/ri/rib.y"
+#line 2563 "../../../../src/ri/rib.y"
 {
 					RtFilterFunc	f;
 
@@ -3228,13 +3230,13 @@ case 147:
 				;
     break;}
 case 148:
-#line 2573 "../../../../src/ri/rib.y"
+#line 2575 "../../../../src/ri/rib.y"
 {
 					RiMakeTexture3DV(yyvsp[-2].string,yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 149:
-#line 2586 "../../../../src/ri/rib.y"
+#line 2588 "../../../../src/ri/rib.y"
 {
 					RtFilterFunc	f;
 
@@ -3244,7 +3246,7 @@ case 149:
 				;
     break;}
 case 150:
-#line 2601 "../../../../src/ri/rib.y"
+#line 2603 "../../../../src/ri/rib.y"
 {
 					RtFilterFunc	f;
 
@@ -3254,7 +3256,7 @@ case 150:
 				;
     break;}
 case 151:
-#line 2622 "../../../../src/ri/rib.y"
+#line 2624 "../../../../src/ri/rib.y"
 {
 					RtFilterFunc	f;
 
@@ -3264,13 +3266,13 @@ case 151:
 				;
     break;}
 case 152:
-#line 2634 "../../../../src/ri/rib.y"
+#line 2636 "../../../../src/ri/rib.y"
 {
 					RiMakeShadowV(yyvsp[-2].string,yyvsp[-1].string,numParameters,tokens,vals);
 				;
     break;}
 case 153:
-#line 2640 "../../../../src/ri/rib.y"
+#line 2642 "../../../../src/ri/rib.y"
 {
 					RtErrorHandler 	e	=	getErrorHandler(yyvsp[0].string);
 
@@ -3280,17 +3282,17 @@ case 153:
 				;
     break;}
 case 154:
-#line 2650 "../../../../src/ri/rib.y"
+#line 2652 "../../../../src/ri/rib.y"
 {
 				;
     break;}
 case 155:
-#line 2655 "../../../../src/ri/rib.y"
+#line 2657 "../../../../src/ri/rib.y"
 {
 				;
     break;}
 case 156:
-#line 2659 "../../../../src/ri/rib.y"
+#line 2661 "../../../../src/ri/rib.y"
 {
 					if (YYRECOVERING() == 0) {
 						error(CODE_BADFILE,"Syntax error.\n");
@@ -3494,7 +3496,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 2666 "../../../../src/ri/rib.y"
+#line 2668 "../../../../src/ri/rib.y"
 
 
 #include "lex.rib.cpp"

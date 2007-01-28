@@ -478,6 +478,7 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 
 	strings				=	NULL;
 	parent				=	p;
+	nextDirty			=	NULL;
 	
 	if (parent->numPLs > 0) {
 		parameterLists	=	new CShaderLookup*[parent->numPLs];
@@ -535,16 +536,32 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 		delete cString;
 	}
 
+	// Remove this shader from the list
+	if (dirty == TRUE) {
+		CProgrammableShaderInstance	*pShader,*cShader;
+
+		osLock(CRenderer::dirtyShaderMutex);
+		for (pShader=NULL,cShader=CRenderer::dirtyInstances;cShader!=NULL;pShader=cShader,cShader=cShader->nextDirty) {
+			if (cShader == this) {
+				if (pShader == NULL)	CRenderer::dirtyInstances	=	nextDirty;
+				else					pShader->nextDirty			=	nextDirty;
+				break;
+			}
+		}
+		osUnlock(CRenderer::dirtyShaderMutex);
+
+		assert(cShader == this);
+	}
+
+	// Clear the parameter lists
 	if (parameterLists != NULL) {
-#ifdef _DEBUG
 		int	i;
 
 		for (i=0;i<parent->numPLs;i++) {
-			assert(parameterLists[i] == NULL);
+			if (parameterLists[i] != NULL)	delete parameterLists[i];
 		}
 
 		assert(dirty == FALSE);
-#endif
 
 		delete [] parameterLists;
 	}

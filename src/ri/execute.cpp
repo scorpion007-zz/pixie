@@ -232,11 +232,11 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 #define		parameterlist					cInstance->parameterLists[code[1].arguments.plNumber]
 
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
-												cInstance->dirty	=	TRUE;										\
-												if (CRenderer::dirtyInstances == NULL)								\
-													CRenderer::dirtyInstances	=	new CArray<CProgrammableShaderInstance *>;	\
-												cInstance->attach();												\
-												CRenderer::dirtyInstances->push(cInstance);							\
+												osLock(CRenderer::dirtyShaderMutex);								\
+												cInstance->dirty			=	TRUE;								\
+												cInstance->nextDirty		=	CRenderer::dirtyInstances;			\
+												CRenderer::dirtyInstances	=	cInstance;							\
+												osUnlock(CRenderer::dirtyShaderMutex);								\
 											}
 
 //	Retrieve an integer operand (label references are integer)

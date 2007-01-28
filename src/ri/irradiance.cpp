@@ -869,7 +869,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		// Clamp the radius of validity
 		rMean					=	max(rMean, lookup->minFGRadius);
 		rMean					=	min(rMean, lookup->maxFGRadius);
-		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5);
+		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5f);
 				
 		// Record the data
 		movvv(cSample->P,P);

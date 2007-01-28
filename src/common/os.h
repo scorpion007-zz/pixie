@@ -231,7 +231,7 @@ inline	void osCreateRWLock(TRWLock &l) {
 	l.readerEvent	=	CreateEvent(NULL,TRUE,FALSE,NULL);
 	l.mutex			=	CreateEvent(NULL,FALSE,TRUE,NULL);
 	l.writerMutex	=	CreateMutex(NULL,FALSE,NULL);
-	l.readerCount	=	-1;
+	l.readCount		=	-1;
 #else
 	pthread_rwlock_init(&l,NULL);
 #endif

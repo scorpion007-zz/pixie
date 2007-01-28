@@ -429,22 +429,23 @@ class	CProgrammableShaderInstance : public CShaderInstance {
 			CAllocatedString	*next;
 	};
 public:
-								CProgrammableShaderInstance(CShader *,CAttributes *,CXform *);
-		virtual					~CProgrammableShaderInstance();
+									CProgrammableShaderInstance(CShader *,CAttributes *,CXform *);
+		virtual						~CProgrammableShaderInstance();
 
-		void					illuminate(CShadingContext *,float **);
-		void					setParameters(int,char **,void **);
-		int						getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
-		void					execute(CShadingContext *,float **);				// Execute the shader
-		unsigned int			requiredParameters();
-		const char				*getName();
-		float					**prepare(CMemPage*&,float **,int);
+		void						illuminate(CShadingContext *,float **);
+		void						setParameters(int,char **,void **);
+		int							getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
+		void						execute(CShadingContext *,float **);				// Execute the shader
+		unsigned int				requiredParameters();
+		const char					*getName();
+		float						**prepare(CMemPage*&,float **,int);
 
 
-		CAllocatedString		*strings;					// The strings we allocated for parameters
-		CShader					*parent;					// The parent shader
-		CShaderLookup			**parameterLists;			// The parameter lists
-		int						dirty;						// TRUE if the shader is dirty
+		CAllocatedString			*strings;					// The strings we allocated for parameters
+		CShader						*parent;					// The parent shader
+		CProgrammableShaderInstance	*nextDirty;					// The next dirty shader instance
+		CShaderLookup				**parameterLists;			// The parameter lists
+		int							dirty;						// TRUE if the shader is dirty
 private:
 		int						setParameter(char *,void *);
 };
