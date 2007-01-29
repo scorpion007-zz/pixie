@@ -209,7 +209,7 @@ void	rndrc(char *ribFile,int port) {
 	#endif
 #endif
 
-	u_int32_t	attemptAddress	=	INADDR_ANY;
+	unsigned int	attemptAddress	=	INADDR_ANY;
 	
 	// Here we include robustness for Win32 not allowing bind / connect to ANY
 retryBind:

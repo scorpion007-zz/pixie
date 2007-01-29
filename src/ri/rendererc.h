@@ -212,7 +212,6 @@ const	unsigned	int		PARAMETER_BEGIN_SAMPLE		=	1 << 27;
 const	unsigned	int		PARAMETER_END_SAMPLE		=	1 << 28;
 const	unsigned	int		PARAMETER_RAYTRACE			=	1 << 29;	// Requires raytracing
 const	unsigned	int		PARAMETER_NONAMBIENT		=	1 << 30;	// A non-ambient light source
-const	unsigned	int		PARAMETER_MESSAGEPASSING	=	1 << 31;	// Requires message passing
 
 
 

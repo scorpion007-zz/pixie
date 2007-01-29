@@ -561,8 +561,6 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 			if (parameterLists[i] != NULL)	delete parameterLists[i];
 		}
 
-		assert(dirty == FALSE);
-
 		delete [] parameterLists;
 	}
 }
