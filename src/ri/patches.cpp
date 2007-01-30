@@ -1482,7 +1482,9 @@ void	CPatchMesh::create(CShadingContext *context) {
 				
 				gatherData(context,j,i,2,2,j,i,k,vertex,parameters);
 
+				osLock(CRenderer::refCountMutex);
 				nObject				=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
+				osUnlock(CRenderer::refCountMutex);
 
 				nObject->sibling	=	allChildren;
 				allChildren			=	nObject;
@@ -1520,7 +1522,9 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 				gatherData(context,j*us,i*vs,4,4,j,i,k,vertex,parameters);
 
+				osLock(CRenderer::refCountMutex);
 				nObject				=	new CBicubicPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
+				osUnlock(CRenderer::refCountMutex);
 
 				nObject->sibling	=	allChildren;
 				allChildren			=	nObject;
@@ -1720,7 +1724,9 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 
 				gatherData(context,i,j,uOrder,vOrder,i,j,k,vertex,parameters);
 
+				osLock(CRenderer::refCountMutex);
 				nObject				=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
+				osUnlock(CRenderer::refCountMutex);
 
 				nObject->sibling	=	allChildren;
 				allChildren			=	nObject;

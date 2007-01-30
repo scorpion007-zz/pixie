@@ -467,11 +467,15 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 	const float vmid = (vmin + vmax) * 0.5f;
 
-	// Create vmin - vmid group
-	rasterizer->drawObject(new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax));
+	// Create the children
+	osLock(CRenderer::refCountMutex);
+	CCubicCurve	*c0	=	new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
+	CCubicCurve	*c1	=	new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
+	osUnlock(CRenderer::refCountMutex);
 
-	// Create vmid - vmax group
-	rasterizer->drawObject(new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax));
+	// Insert the children
+	rasterizer->drawObject(c0);
+	rasterizer->drawObject(c1);
 }
 
 
@@ -594,11 +598,15 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 	const float		vmid = (vmin + vmax) * 0.5f;
 
-	// Create vmin - vmid group
-	rasterizer->drawObject(new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax));
+	// Create the children
+	osLock(CRenderer::refCountMutex);
+	CLinearCurve	*c0	=	new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
+	CLinearCurve	*c1	=	new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
+	osUnlock(CRenderer::refCountMutex);
 
-	// Create vmid - vmax group
-	rasterizer->drawObject(new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax));
+	// Insert the children
+	rasterizer->drawObject(c0);
+	rasterizer->drawObject(c1);
 }
 
 
@@ -869,7 +877,9 @@ void	CCurveMesh::create(CShadingContext *context) {
 				memcpy(base->vertex + 2*vertexSize,v2,vertexSize*sizeof(float));
 				memcpy(base->vertex + 3*vertexSize,v3,vertexSize*sizeof(float));
 
+				osLock(CRenderer::refCountMutex);
 				cCurve				=	new CCubicCurve(attributes,xform,base,0,1,vmin,vmax);
+				osUnlock(CRenderer::refCountMutex);
 				cCurve->sibling		=	allChildren;
 				allChildren			=	cCurve;	
 			}
@@ -910,7 +920,9 @@ void	CCurveMesh::create(CShadingContext *context) {
 				memcpy(base->vertex + 0*vertexSize,v0,vertexSize*sizeof(float));
 				memcpy(base->vertex + 1*vertexSize,v1,vertexSize*sizeof(float));
 
+				osLock(CRenderer::refCountMutex);
 				cCurve				=	new CLinearCurve(attributes,xform,base,0,1,vmin,vmax);
+				osUnlock(CRenderer::refCountMutex);
 				cCurve->sibling		=	allChildren;
 				allChildren			=	cCurve;
 			}

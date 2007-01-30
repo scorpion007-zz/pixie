@@ -187,7 +187,10 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 			osLock(CRenderer::hierarchyMutex);
 	
 			if (children == NULL) {
+				osLock(CRenderer::refCountMutex);
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
+				osUnlock(CRenderer::refCountMutex);
+
 				tesselation->initTesselation(context);
 				tesselation->attach();
 				children				=	tesselation;
@@ -684,7 +687,10 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 			osLock(CRenderer::hierarchyMutex);
 	
 			if (children == NULL) {
+				osLock(CRenderer::refCountMutex);
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
+				osUnlock(CRenderer::refCountMutex);
+
 				tesselation->initTesselation(context);
 				tesselation->attach();
 				children				=	tesselation;
@@ -1292,6 +1298,7 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 	const float			*vs3			=	P+vindices[vi3]*3;
 
 	// Create the triangle
+	osLock(CRenderer::refCountMutex);
 	cQuad				=	new CPolygonQuad(data.meshAttributes,data.meshXform,data.mesh
 		,vindices[vi0]
 		,vindices[vi1]
@@ -1302,6 +1309,7 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 		,data.meshFacevaryingNumber+vi3
 		,data.meshFacevaryingNumber+vi2
 		,data.meshUniformNumber);
+	osUnlock(CRenderer::refCountMutex);
 
 
 	// Add the children into the pool
@@ -1331,6 +1339,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 	}
 
 	// Create the triangle
+	osLock(CRenderer::refCountMutex);
 	cTriangle				=	new CPolygonTriangle(data.meshAttributes,data.meshXform,data.mesh
 		,vindices[vi0]
 		,vindices[vi1]
@@ -1339,6 +1348,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 		,data.meshFacevaryingNumber+vi1
 		,data.meshFacevaryingNumber+vi2
 		,data.meshUniformNumber);
+	osUnlock(CRenderer::refCountMutex);
 
 
 	// Add the children into the pool

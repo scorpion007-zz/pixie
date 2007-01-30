@@ -65,7 +65,9 @@
 			osLock(CRenderer::hierarchyMutex);					\
 																\
 			if (children == NULL) {								\
+				osLock(CRenderer::refCountMutex);				\
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);	\
+				osLock(CRenderer::refCountMutex);				\
 				tesselation->initTesselation(context);			\
 				tesselation->attach();							\
 				children				=	tesselation;		\
