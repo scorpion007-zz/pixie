@@ -34,6 +34,9 @@
 #include "common/global.h"
 #include "object.h"
 
+#define	TESSELATION_LOCK_PER_ENTRY			// Use a mutex per tesselation entry
+#define TESSELATION_NUM_LEVELS			3	// The number of levels before we split
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
 // Description			:	Encapsulates a piece of 2D surface
@@ -67,11 +70,20 @@ private:
 // Comments				:
 class	CTesselationPatch : public CObject {
 
-	struct CSubTesselation {
+	struct CPurgableTesselation {
 		float					*P;						// The P
 		int						size;					// The size (in bytes) of the grid
-		int						lastRefNumber;			// Last time we accessed this grid
-		CSubTesselation			*next,*prev;			// To maintain the linked list	
+		int						*lastRefNumber;			// Last time we accessed this grid
+	};
+	
+	struct CTesselationEntry {
+		CPurgableTesselation	*tesselation;			// The global tesselation if it exists
+		CPurgableTesselation	**threadTesselation;	// The entry per thread
+		int						refCount;				// How many threads share this tesselation
+		
+		#ifdef TESSELATION_LOCK_PER_ENTRY
+		TMutex					mutex;					// Mutex if we're mutexing per entry
+		#endif
 	};
 	
 	
@@ -86,9 +98,12 @@ public:
 
 	void					initTesselation(CShadingContext *context);
 	
+	static void				initTesselations(int geoCacheMemory);
+	static void				shutdownTesselations();
+
 private:
 	
-	CSubTesselation*		tesselate(CShadingContext *context,char div,int estimateOnly);
+	CPurgableTesselation*	tesselate(CShadingContext *context,char div,int estimateOnly);
 	void					splitToChildren(CShadingContext *context);	
 	
 	char					depth;							// Depth of the patch
@@ -98,7 +113,19 @@ private:
 	
 	float					rmax;
 	
-	CSubTesselation			*tesselations[3];
+	CTesselationEntry		levels[TESSELATION_NUM_LEVELS];	// Each tesselation level
+	CTesselationPatch		*next,*prev;					// To maintain the linked list
+
+
+	// record keeping data
+	
+	static int					*lastRefNumbers[TESSELATION_NUM_LEVELS];		// Reference numbers for each thread per cache level
+	static int					*tesselationUsedMemory[TESSELATION_NUM_LEVELS];	// How much each thread has used per cache level
+	static int					tesselationMaxMemory[TESSELATION_NUM_LEVELS];	// The maximum memory allowed per thread per cache level
+	static CTesselationPatch	*tesselationList;								// Linked list of all tesselations (all levels are listed together)
+	
+	static void					purgeTesselations(int level, int thread, int all);
+	static void					tesselationQuickSort(CTesselationEntry **activeTesselations,int start,int end,int thread);
 };
 
 #endif

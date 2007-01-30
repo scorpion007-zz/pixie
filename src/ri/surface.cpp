@@ -196,7 +196,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
+			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE | PARAMETER_RAYTRACE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 			
 			movvv(Pmov,varying[VARIABLE_P]);
@@ -470,6 +470,10 @@ support untesselation
 #define DEBUG_TESSELATIONS 0
 
 
+int					*CTesselationPatch::lastRefNumbers[TESSELATION_NUM_LEVELS];
+int					*CTesselationPatch::tesselationUsedMemory[TESSELATION_NUM_LEVELS];
+int					CTesselationPatch::tesselationMaxMemory[TESSELATION_NUM_LEVELS];
+CTesselationPatch	*CTesselationPatch::tesselationList;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -491,10 +495,30 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 	movvv(this->bmin,o->bmin);
 	movvv(this->bmax,o->bmax);
 	
-	tesselations[0] =
-	tesselations[1]	=
-	tesselations[2]	=	NULL;
+	// Initialize each subtesselation
+	for (int i=0;i<TESSELATION_NUM_LEVELS; i++) {
+		CPurgableTesselation **cTess		=	new CPurgableTesselation*[CRenderer::numThreads];
+		for (int j=0;j<CRenderer::numThreads; j++) {
+			cTess[j]	=	NULL;
+		}
+		
+		levels[i].tesselation			=	NULL;
+		levels[i].threadTesselation	=	cTess;
+		levels[i].refCount			=	0;
+		
+		#ifdef TESSELATION_LOCK_PER_ENTRY
+			osCreateMutex(levels[i].mutex);
+		#endif
+	}
 	
+	// Maintain the linked list
+	prev						=	NULL;
+	next						=	tesselationList;
+	if (tesselationList != NULL)
+		tesselationList->prev	=	this;
+	tesselationList				=	this;
+	
+	// Set the initial guess for the grid size
 	this->rmax		=	r;
 }
 
@@ -506,9 +530,18 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 // Return Value			:	-
 // Comments				:
 CTesselationPatch::~CTesselationPatch() {
+	// Maintain the linked list
+	if (next != NULL)	next->prev						=	prev;
+	if (prev != NULL)	prev->next						=	next;
+	else				tesselationList					=	next;
+
 	// clean up tesselations
-	for(int i=0;i<3;i++) {
-		if (tesselations[i] == NULL) delete tesselations[i];
+	for(int i=0;i<TESSELATION_NUM_LEVELS;i++) {
+		if (levels[i].tesselation != NULL) delete levels[i].tesselation;
+		delete[] levels[i].threadTesselation;
+		#ifdef TESSELATION_LOCK_PER_ENTRY
+			osDeleteMutex(levels[i].mutex);
+		#endif
 	}
 }
 
@@ -519,7 +552,6 @@ CTesselationPatch::~CTesselationPatch() {
 // Return Value			:	-
 // Comments				:
 void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
-
 	// check the ray conditions before proceeding
 	
 	if (! (cRay->flags & attributes->flags) )	return;
@@ -551,7 +583,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	float	rCur	=	rmax;
 	int		div		=	1;
 	int		level	=	0;
-	for (level=0;level<3;level++) {
+	for (level=0;level<TESSELATION_NUM_LEVELS;level++) {
 		if (rCur < requiredR) {
 			break;
 		}
@@ -567,7 +599,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	
 	#if 0
 		// HACK - dissallow recursive splitting
-		if (level == 3)	{
+		if (level == TESSELATION_NUM_LEVELS)	{
 			level = 2;
 			rCur = rmax/16.0f;
 			div = 16;
@@ -582,20 +614,59 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	#endif
 		
 	// did we find one?
-	if (level < 3) {
-		// r for level is sufficient. verify we have a tesselation
-				
-		//osLock(CRenderer::tesselateMutex);
+	if (level < TESSELATION_NUM_LEVELS) {
+		// r for level is sufficient
 		
-		if (tesselations[level] == NULL) {
-			osLock(CRenderer::tesselateMutex);
+		const int thread = context->thread;
+		
+		// Verify we have a tesselation
+		if (levels[level].threadTesselation[thread] == NULL) {
+			// No, we must get one, lock first
 			
-			if (tesselations[level] == NULL) {
-				tesselations[level] = tesselate(context,div,FALSE);
+			#ifdef TESSELATION_LOCK_PER_ENTRY
+				osLock(levels[level].mutex);
+			#else
+				osLock(CRenderer::tesselateMutex);
+			#endif
+			
+			if (levels[level].tesselation == NULL) {
+				// Create the tesselation
+				levels[level].tesselation		=	tesselate(context,div,FALSE);
+				levels[level].refCount			=	1;
+				
+				// Restore the refCount
+				levels[level].tesselation->lastRefNumber[thread]	=	lastRefNumbers[level][thread];
+				
+				// Update stats
+				stats.tesselationMemory								+=	levels[level].tesselation->size;
+				if (stats.tesselationPeakMemory < stats.tesselationMemory) {
+					stats.tesselationPeakMemory = stats.tesselationMemory;
+				}
+				
+				// Purge if we exceeded the max memory for this thread
+				if (tesselationUsedMemory[level][thread] > tesselationMaxMemory[level]) {
+					purgeTesselations(thread,level,FALSE);
+				}
+			} else {
+				// We already have this tesselation in another thread
+				levels[level].refCount++;
 			}
+			tesselationUsedMemory[level][thread] += levels[level].tesselation->size;
+			levels[level].threadTesselation[thread] = levels[level].tesselation;
 			
-			osUnlock(CRenderer::tesselateMutex);
+			#ifdef TESSELATION_LOCK_PER_ENTRY
+				osUnlock(levels[level].mutex);
+			#else
+				osUnlock(CRenderer::tesselateMutex);
+			#endif
 		}
+		
+		// Bump the tesselation refCount
+		lastRefNumbers[level][thread]++;
+		levels[level].tesselation->lastRefNumber[thread]	=	lastRefNumbers[level][thread];
+		
+		// Grab the threadTesselation and use from now on
+		CPurgableTesselation *thisTesselation	=	levels[level].threadTesselation[thread];
 		
 		// Intersect the ray
 		
@@ -708,7 +779,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 			const float	*r		=	cRay->from;
 			const float	*q		=	cRay->dir;
 		
-			const float	*P00	=	tesselations[level]->P;
+			const float	*P00	=	levels[level].tesselation->P;
 			const float	*P10	=	P00+3;
 			const float	*P01	=	P00+6;
 			const float	*P11	=	P00+9;
@@ -733,7 +804,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				const float urg		=	2.0f*(umax - umin) / (float) div;
 				const float vrg		=	2.0f*(vmax - vmin) / (float) div;
 				
-				const float	*cP		=	tesselations[level]->P;
+				const float	*cP		=	thisTesselation->P;
 				
 				const int nb = div>>1;
 				
@@ -757,7 +828,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				const float urg		=	(umax - umin) / (float) div;
 				const float vrg		=	(vmax - vmin) / (float) div;
 				
-				const float	*cP		=	tesselations[level]->P;
+				const float	*cP		=	thisTesselation->P;
 		
 				for (int j=0;j<div;j++) {
 					for (int i=0;i<div;i++,cP += 3) {
@@ -784,7 +855,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				const float urg		=	2.0f*(umax - umin) / (float) div;
 				const float vrg		=	2.0f*(vmax - vmin) / (float) div;
 		
-				const float	*P		=	tesselations[level]->P;
+				const float	*P		=	thisTesselation->P;
 				const float	*cB		=	P+(div+1)*(div+1)*3;
 		
 				int nb				=	div>>2;
@@ -826,7 +897,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				const float urg		=	(umax - umin) / (float) div;
 				const float vrg		=	(vmax - vmin) / (float) div;
 		
-				const float	*P		=	tesselations[level]->P;
+				const float	*P		=	thisTesselation->P;
 				const float	*cB		=	P+(div+1)*(div+1)*3;
 		
 				int nb				=	div>>2;
@@ -863,6 +934,9 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		}
 	} else {
 		if (children == NULL) {
+			// We must lock the hierarchyMutex so that the list of known tesselation patches
+			// is maintained in a thread safe manner
+
 			osLock(CRenderer::hierarchyMutex);
 			
 			if (children != NULL) {
@@ -875,11 +949,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 			osUnlock(CRenderer::hierarchyMutex);
 		}
-	}
-
-	
-	//osUnlock(CRenderer::tesselateMutex);
-	
+	}	
 }
 
 
@@ -928,7 +998,7 @@ void CTesselationPatch::initTesselation(CShadingContext *context) {
 // Description			:	Find the best tesselation for this object
 // Return Value			:
 // Comments				:
-CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContext *context,char rdiv,int estimateOnly) {
+CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingContext *context,char rdiv,int estimateOnly) {
 	// Get some misc variables for fast access
 	
 	void	*savedState = context->saveState();
@@ -1024,13 +1094,13 @@ CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContex
 		if (rdiv == 1) {
 			// subsampling our 2x2 to 1x1, no bounds
 			
-			void			*mem			=	malloc(sizeof(CSubTesselation) + 2*2*3*sizeof(float));
-			CSubTesselation	*cTesselation	=	(CSubTesselation*) mem;
+			void					*mem			=	malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*3*sizeof(float));
+			CPurgableTesselation	*cTesselation	=	(CPurgableTesselation*) mem;
 			
-			cTesselation->P					=	(float*) ((char*) mem + sizeof(CSubTesselation));
-			cTesselation->size				=	2*2*3*sizeof(float);			
-			cTesselation->lastRefNumber		=	-1;
-			//rmax							=	max(rmax,(uAvg+vAvg)/4.0f);	// we're subsampling
+			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
+			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+			cTesselation->size						=	2*2*3*sizeof(float);			
+			//rmax									=	max(rmax,(uAvg+vAvg)/4.0f);	// we're subsampling
 	
 			movvv(cTesselation->P,		varying[VARIABLE_P]);
 			movvv(cTesselation->P+3,	varying[VARIABLE_P]+6);
@@ -1044,13 +1114,13 @@ CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContex
 			
 		} else if (rdiv <= 4) {
 			// not saving bounds here
-			void				*mem			= malloc(sizeof(CSubTesselation) + (div+1)*(div+1)*3*sizeof(float));
-			CSubTesselation		*cTesselation	= (CSubTesselation*) mem;
+			void					*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float));
+			CPurgableTesselation	*cTesselation	= (CPurgableTesselation*) mem;
 
-			cTesselation->P						=	(float*) ((char*) mem + sizeof(CSubTesselation));
-			cTesselation->size					=	(div+1)*(div+1)*3*sizeof(float);
-			cTesselation->lastRefNumber			=	-1;
-			//rmax								=	max(rmax,div*(uAvg+vAvg)/2.0f);
+			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
+			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+			cTesselation->size						=	(div+1)*(div+1)*3*sizeof(float);
+			//rmax									=	max(rmax,div*(uAvg+vAvg)/2.0f);
 			
 			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
 			
@@ -1065,15 +1135,15 @@ CTesselationPatch::CSubTesselation*		CTesselationPatch::tesselate(CShadingContex
 			
 			// save off the data
 			
-			void				*mem			= malloc(sizeof(CSubTesselation) + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
-			CSubTesselation		*cTesselation	= (CSubTesselation*) mem;
+			void					*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
+			CPurgableTesselation	*cTesselation	= (CPurgableTesselation*) mem;
 
-			cTesselation->P						=	(float*) ((char*) mem + sizeof(CSubTesselation));
-			cTesselation->size					=	((div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
-			cTesselation->lastRefNumber			=	-1;
-			//rmax								=	max(rmax,div*(uAvg+vAvg)/2.0f);
+			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
+			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+			cTesselation->size						=	((div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
+			//rmax									=	max(rmax,div*(uAvg+vAvg)/2.0f);
 			
-			float *bounds						=	cTesselation->P + (div+1)*(div+1)*3;
+			float *bounds							=	cTesselation->P + (div+1)*(div+1)*3;
 			
 			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
 			
@@ -1210,8 +1280,11 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 				continue;
 			}
 			
-			// emit the new subpatch
+			// emit the new subpatch			
+			osLock(CRenderer::refCountMutex);
 			CTesselationPatch *cPatch = new CTesselationPatch(attributes,xform,object,uv[0],uv[1],vv[0],vv[1],depth+1,minDepth,-1);
+			osUnlock(CRenderer::refCountMutex);
+			
 			cPatch->tesselate(context,16,TRUE);
 			cPatch->sibling = subPatches;
 			subPatches = cPatch;
@@ -1221,3 +1294,149 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 	// attach them
 	setChildren(context,subPatches);
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	initTesselations
+// Description			:	initialize the thread data for tesselations
+// Return Value			:
+// Comments				:
+void		CTesselationPatch::initTesselations(int geoCacheMemory) {
+	for (int i=0;i<TESSELATION_NUM_LEVELS;i++) {
+		lastRefNumbers[i]			=	new int[CRenderer::numThreads];
+		tesselationUsedMemory[i]	=	new int[CRenderer::numThreads];
+		
+		for (int j=0;j<CRenderer::numThreads;j++) {
+			tesselationUsedMemory[i][j]	=	0;
+		}
+		
+		// calculate the maximum tesselation cache size per thread, per level
+		tesselationMaxMemory[i] = (int) ceil((float) geoCacheMemory / (float) TESSELATION_NUM_LEVELS / (float) CRenderer::numThreads);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	shutdownTesselations
+// Description			:	shutdown tesselations
+// Return Value			:
+// Comments				:
+void		CTesselationPatch::shutdownTesselations() {
+	for (int i=0;i<TESSELATION_NUM_LEVELS;i++) {
+		delete[] lastRefNumbers[i];
+		delete[] tesselationUsedMemory[i];
+	}
+
+	assert(tesselationList == NULL);
+	tesselationList = NULL;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	tesselationQuickSort
+// Description			:	Sort the tesselations in the order of increasing last ref number
+// Return Value			:
+// Comments				:
+void	CTesselationPatch::tesselationQuickSort(CTesselationEntry **activeTesselations,int start,int end,int thread) {
+	int					i,last;
+	CTesselationEntry	*cTess;
+
+	for (last=start,i=start+1;i<=end;i++) {
+		if (activeTesselations[i]->tesselation->lastRefNumber[thread] < activeTesselations[start]->tesselation->lastRefNumber[thread]) {
+			last++;
+			cTess						=	activeTesselations[last];
+			activeTesselations[last]	=	activeTesselations[i];
+			activeTesselations[i]		=	cTess;
+		}
+	}
+
+	cTess						=	activeTesselations[last];
+	activeTesselations[last]	=	activeTesselations[start];
+	activeTesselations[start]	=	cTess;
+
+	// Speed is not an issue since this is not done very frequently, so recursion is OK
+	if ((last-1) > start)
+		tesselationQuickSort(activeTesselations,start,last-1,thread);
+
+	if (end > (last+1))
+		tesselationQuickSort(activeTesselations,last+1,end,thread);
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	purgeTesselations
+// Description			:	purge tesselations of level from thread
+// Return Value			:
+// Comments				:
+void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
+fprintf(stderr,"purging level %d thread %d memory %d\n",level,thread,tesselationUsedMemory[level][thread]);
+	// Do we have stuff to free ?
+	if (tesselationList == NULL)	return;
+
+	// No other thread may flush at the same time
+	#ifdef TESSELATION_LOCK_PER_ENTRY
+		osLock(CRenderer::hierarchyMutex);
+	#endif
+	
+	osLock(CRenderer::memoryMutex);
+	memBegin(CRenderer::globalMemory);
+
+	// Figure out how many tesselations of this level we have in memory
+	int				i,j;
+	CTesselationEntry	**activeTesselations;
+	CTesselationPatch	*cPatch;
+	CTesselationEntry	*cTess;
+	for (cPatch=tesselationList,i=0;cPatch!=NULL;cPatch=cPatch->next) {
+		if (cPatch->levels[level].threadTesselation[thread] != NULL) {
+			i++;
+		}
+	}
+	
+	// Collect those tesselations into an array
+	activeTesselations	=	(CTesselationEntry **) ralloc(i*sizeof(CTesselationEntry *),CRenderer::globalMemory);
+	for (cPatch=tesselationList,i=0;cPatch!=NULL;cPatch=cPatch->next) {
+		if (cPatch->levels[level].threadTesselation[thread] != NULL) {
+			activeTesselations[i++]	=	&cPatch->levels[level];
+		}
+	}
+
+	// Sort the tesselations from last used to the most recently used
+	if (i > 1)	tesselationQuickSort(activeTesselations,0,i-1,thread);
+
+	// Free the memory
+	if (all)	tesselationMaxMemory[level]	=	0;
+	for (j=0;(j<i) && (tesselationUsedMemory[level][thread] > (tesselationMaxMemory[level]/2));j++) {
+		cTess									=	activeTesselations[j];
+
+		tesselationUsedMemory[level][thread]	-=	cTess->tesselation->size;
+		cTess->threadTesselation[thread]		=	NULL;
+		
+		#ifdef TESSELATION_LOCK_PER_ENTRY
+			osLock(cTess->mutex);
+		#endif
+		
+		if (--cTess->refCount == 0) {
+			stats.tesselationMemory				-=	cTess->tesselation->size;
+			
+			free((unsigned char *) cTess->tesselation);
+			cTess->tesselation						=	NULL;
+		}
+		
+		#ifdef TESSELATION_LOCK_PER_ENTRY
+			osUnlock(cTess->mutex);
+		#endif
+
+	}
+
+	memEnd(CRenderer::globalMemory);
+	osUnlock(CRenderer::memoryMutex);
+	
+	#ifdef TESSELATION_LOCK_PER_ENTRY
+		osUnlock(CRenderer::hierarchyMutex);
+	#endif
+}
+
+
+
+

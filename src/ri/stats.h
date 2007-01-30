@@ -124,11 +124,13 @@ public:
 	int				numIndirectDiffuseRays;			// The number of final gather samples taken
 	int				numOcclusionRays;				// The number of final gather samples taken
 	int				numIndirectDiffusePhotonmapLookups;			// The number of final gather photonmap lookups
-	int				numBrickmapLookups;
-	int				numBrickmapCacheHits;
-	int				numBrickmapCachePageouts;
-	int				numBrickmapCachePageins;
-	int				brickmapPeakMem;
+	int				numBrickmapLookups;				// The number of brickmap lookups
+	int				numBrickmapCacheHits;			// The number of brickmap cache hits
+	int				numBrickmapCachePageouts;		// The number of bricks paged out
+	int				numBrickmapCachePageins;		// The number of bricks paged in
+	int				brickmapPeakMem;				// The peak memory usage for brickmaps
+	int				tesselationMemory;				// The total memory usage for tesselations
+	int				tesselationPeakMemory;			// The peak total memory usage for tesselations
 };
 
 

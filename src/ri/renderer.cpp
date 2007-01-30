@@ -191,6 +191,7 @@ int								CRenderer::maxPhotonDepth;
 int								CRenderer::bucketWidth,CRenderer::bucketHeight;
 int								CRenderer::netXBuckets,CRenderer::netYBuckets;
 int								CRenderer::threadStride;
+int								CRenderer::geoCacheSize;
 int								CRenderer::maxEyeSplits;
 float							CRenderer::tsmThreshold;
 char							*CRenderer::causticIn,*CRenderer::causticOut;
@@ -480,6 +481,7 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::netXBuckets				=	o->netXBuckets;
 	CRenderer::netYBuckets				=	o->netYBuckets;
 	CRenderer::threadStride				=	o->threadStride;
+	CRenderer::geoCacheSize				=	o->geoCacheMemory;
 	CRenderer::maxEyeSplits				=	o->maxEyeSplits;
 	CRenderer::tsmThreshold				=	o->tsmThreshold;
 	CRenderer::causticIn				=	o->causticIn;
@@ -891,6 +893,11 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		numThreads = 1;
 	}
 	
+	// All of these must be after we determine the number of threads
+	
+	// Initialize tesselations
+	CTesselationPatch::initTesselations(geoCacheSize);
+
 	// Initialize the brickmaps
 	CBrickMap::brickMapInit(maxBrickSize);
 
@@ -1009,6 +1016,9 @@ void		CRenderer::endFrame() {
 		
 	// Shutdown the texturing system
 	CBrickMap::brickMapShutdown();
+	
+	// Cleanup the tesselations
+	CTesselationPatch::shutdownTesselations();
 
 	// Release the world
 	world->detach();

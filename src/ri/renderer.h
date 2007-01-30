@@ -374,6 +374,7 @@ public:
 		static	int						bucketWidth,bucketHeight;						// Bucket dimentions in samples
 		static	int						netXBuckets,netYBuckets;						// The meta bucket size
 		static	int						threadStride;									// The number of buckets per thread at a time
+		static	int						geoCacheSize;									// The ammount of memory to dedicate to tesselation caches
 		static	int						maxEyeSplits;									// Maximum number of eye splits
 		static	float					tsmThreshold;									// Transparency shadow map threshold
 		static	char					*causticIn,*causticOut;							// The caustics in/out file name

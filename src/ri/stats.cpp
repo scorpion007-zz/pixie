@@ -197,6 +197,10 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"        Cache Hits: %d (times)\n",numBrickmapCacheHits);
 		info(CODE_STATS,"   Bricks paged in: %d (bricks)\n",numBrickmapCachePageins);
 		info(CODE_STATS,"  Bricks paged out: %d (bricks)\n",numBrickmapCachePageouts);
+		
+		info(CODE_STATS,"->Tesselation Cache\n");
+		info(CODE_STATS,"       Peak memory: %d (bytes)\n",tesselationPeakMemory);
+		info(CODE_STATS,"            memory: %d (bytes)\n",tesselationMemory);
 	}
 }
 
