@@ -387,11 +387,8 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CShadingContext::CShadingContext(int t) {
+CShadingContext::CShadingContext(int t) : thread(t) {
 	int	i;
-
-	// This is our thread number
-	thread					=	t;
 
 	// Initialize the shading state
 	currentShadingState		=	NULL;

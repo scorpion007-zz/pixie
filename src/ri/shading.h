@@ -260,14 +260,14 @@ public:
 									return float(y) * (float(1.0)/float(0x3FFFFFFF));
 								}
 
+		const int				thread;													// The thread number for this context
+
 protected:
 		// Hiders can hook into the following functions
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }
 		virtual	void			illuminateEnd() { }
-
-		int						thread;													// The thread number for this context		
 
 		int						numShade;												// Number of times shade is called
 		int						numSampled;												// Number of points sampled
