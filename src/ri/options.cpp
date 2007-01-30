@@ -360,6 +360,8 @@ COptions::COptions() {
 	netYBuckets				=	DEFAULT_NET_YBUCKETS;
 
 	threadStride			=	DEFAULT_THREAD_STRIDE;
+	
+	geoCacheMemory			=	DEFAULT_GEO_CACHE_SIZE;
 
 	maxEyeSplits			=	10;
 

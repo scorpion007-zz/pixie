@@ -287,6 +287,7 @@ RtToken		RI_BRICKMEMORY			=	"brickmemory";
 RtToken		RI_EYESPLITS			=	"eyesplits";
 RtToken		RI_NUMTHREADS			=	"numthreads";
 RtToken		RI_THREADSTRIDE			=	"threadstride";
+RtToken		RI_GEOCACHEMEMORY		=	"geocachememory";
 
 // Trace options
 RtToken		RI_MAXDEPTH				=	"maxdepth";
