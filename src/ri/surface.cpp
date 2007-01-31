@@ -1370,7 +1370,6 @@ void	CTesselationPatch::tesselationQuickSort(CTesselationEntry **activeTesselati
 // Return Value			:
 // Comments				:
 void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
-fprintf(stderr,"purging level %d thread %d memory %d\n",level,thread,tesselationUsedMemory[level][thread]);
 	// Do we have stuff to free ?
 	if (tesselationList == NULL)	return;
 
