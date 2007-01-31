@@ -488,6 +488,7 @@ inline	int		intersectBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,const S
 }
 
 
+
 // True if a ray intersects a box
 inline	SCALAR_TYPE		nearestBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,const SCALAR_TYPE *F,const SCALAR_TYPE *D,SCALAR_TYPE tmin,SCALAR_TYPE tmax) {
 	SCALAR_TYPE		tnear,tfar;
@@ -531,7 +532,7 @@ inline	SCALAR_TYPE		nearestBoxInv(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bma
 	tfar	=	tmax;
 
 	for (i=0;i<3;i++) {
-		if (invD[i] >= C_INFINITY) {
+		if (invD[i] > C_INFINITY) {
 			if ((F[i] > bmax[i]) || (F[i] < bmin[i])) return C_INFINITY;
 		} else {
 			t1		=	(bmin[i] - F[i]) * invD[i];
@@ -566,8 +567,9 @@ inline	void	refract(SCALAR_TYPE *r,const SCALAR_TYPE *I,const SCALAR_TYPE *N,SCA
 	SCALAR_TYPE	IdotN,k;
 	IdotN	=	dotvv(N,I); 
 	k		=	1 - eta*eta*(1-IdotN*IdotN);
-	if (k < 0) {
-		initv(r,0);
+	if (k <= 0) {
+		//initv(r,0);
+		movvv(r,I);
 	} else	{
 		mulvf(vtmp,N,(eta*IdotN+sqrt(k)));
 		mulvf(r,I,eta);
