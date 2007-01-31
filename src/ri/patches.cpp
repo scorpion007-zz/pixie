@@ -788,18 +788,18 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	if (variables->moving) {
-		vertex	=	new float[uOrder*vOrder*vertexSize*2];
+		vertex	=	new double[uOrder*vOrder*vertexSize*2];
 
 		precomputeVertexData(vertex								,uCoefficients,vCoefficients,vertex0,0);
 		precomputeVertexData(vertex + uOrder*vOrder*vertexSize	,uCoefficients,vCoefficients,vertex0,vertexSize);
 
-		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*2*sizeof(float);
+		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*2*sizeof(double);
 	} else {
-		vertex	=	new float[uOrder*vOrder*vertexSize];
+		vertex	=	new double[uOrder*vOrder*vertexSize];
 
 		precomputeVertexData(vertex								,uCoefficients,vCoefficients,vertex0,0);
 
-		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*sizeof(float);
+		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*sizeof(double);
 	}
 
 	makeBound(bmin,bmax);
@@ -814,7 +814,7 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 CNURBSPatch::~CNURBSPatch() {
 	const int vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
-	stats.gprimMemory	-=	sizeof(CNURBSPatch) + sizeof(float)*vertexSize*uOrder*vOrder;
+	stats.gprimMemory	-=	sizeof(CNURBSPatch) + sizeof(double)*vertexSize*uOrder*vOrder;
 	stats.numGprims--;
 
 	if (parameters	!= NULL) delete parameters;
@@ -830,17 +830,17 @@ CNURBSPatch::~CNURBSPatch() {
 // Description			:	Precompute uBasis*G*vBasis'
 // Return Value			:	-
 // Comments				:	-
-void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients,const double *vCoefficients,float *vertexData,int disp) {
+void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficients,const double *vCoefficients,float *vertexData,int disp) {
 	const int	vertexSize	=	variables->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
 	int			i,j,k;
-	float		*cVertex;
+	double		*cVertex;
 	double		*tmp		=	(double *) alloca(uOrder*vOrder*sizeof(double));
 
 	for (cVertex=vertex,i=0;i<vertexSize;i++,cVertex+=uOrder*vOrder) {
 		int		u,v;
 
-		for (j=0;j<uOrder*vOrder;j++)	tmp[j]	=	0;
+		for (j=0;j<uOrder*vOrder;j++)	cVertex[j]	=	0;
 
 		for (v=0;v<vOrder;v++) {
 			const double *vRow	=	&vCoefficients[v*vOrder];
@@ -850,14 +850,11 @@ void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients
 
 				for (j=0;j<uOrder;j++) {
 					for (k=0;k<vOrder;k++) {
-						tmp[j*vOrder+k]	+=	data*uRow[j]*vRow[k];
+						cVertex[j*vOrder+k]	+=	data*uRow[j]*vRow[k];
 					}
 				}
 			}
 		}
-
-		// Demote to float
-		for (j=0;j<uOrder*vOrder;j++)	cVertex[j]	=	(float) tmp[j];
 	}
 
 	// Update the bounding box
@@ -883,7 +880,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 	const float			*u			=	varying[VARIABLE_U]+start;
 	const float			*v			=	varying[VARIABLE_V]+start;
 	int					vertexSize	=	variables->vertexSize;
-	float				*vertexData;
+	double				*vertexData;
 	int					vertexDataStep;
 
 	if (variables->moving == FALSE) {
@@ -897,13 +894,13 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 			vertexData		=	vertex + vertexSize*uOrder*vOrder;		// No need for interpolation
 			vertexDataStep	=	0;
 		} else {
-			float			*interpolate;
+			double			*interpolate;
 			const float		*time		=	varying[VARIABLE_TIME] + start;
 			int				j;
-			const float		*vertex0	=	vertex;
-			const float		*vertex1	=	vertex + vertexSize*uOrder*vOrder;
+			const double	*vertex0	=	vertex;
+			const double	*vertex1	=	vertex + vertexSize*uOrder*vOrder;
 
-			vertexData		=	(float *) alloca(numVertices*vertexSize*uOrder*vOrder*sizeof(float));
+			vertexData		=	(double *) alloca(numVertices*vertexSize*uOrder*vOrder*sizeof(double));
 			vertexDataStep	=	vertexSize*uOrder*vOrder;
 			interpolate		=	vertexData;
 
@@ -953,7 +950,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 				dvPowers[j]	=	j*vPowers[j-1];														\
 			}																						\
 																									\
-			const float *cVertex	=	vertexData;													\
+			const double *cVertex	=	vertexData;													\
 			vertexStart		=	intr;																\
 			for (var=0;var<4;var++) {																\
 				denominator		=	0;																\

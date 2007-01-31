@@ -109,11 +109,11 @@ public:
 
 private:
 		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);
-		void			precomputeVertexData(float *,const double *,const double *,float *,int);
+		void			precomputeVertexData(double *,const double *,const double *,float *,int);
 
 		CVertexData		*variables;						// The variable data
 		CParameter		*parameters;					// The parameters for this patch
-		float			*vertex;						// The vertex data
+		double			*vertex;						// The vertex data
 		int				uOrder,vOrder;					// The order of the patch
 		float			uOrg,vOrg,uMult,vMult;			// The parametric range of the patch
 };
