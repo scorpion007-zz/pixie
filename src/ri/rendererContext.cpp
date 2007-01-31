@@ -2445,7 +2445,7 @@ void	CRendererContext::RiCoordSysTransform(char *space) {
 	ECoordinateSystem	cSystem;
 	CXform				*xform;
 
-	xform	=	getXform(FALSE);
+	xform	=	getXform(TRUE);
 
 	if (xform != NULL) {
 		CRenderer::findCoordinateSystem(space,from,to,cSystem);

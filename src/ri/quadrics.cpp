@@ -2851,7 +2851,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 
 		// Set Ng if needed
 		if (up & (PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV)) {
-			float	*Ng	=	&varying[VARIABLE_NG][start*3];
+			float	*Ng		=	&varying[VARIABLE_NG][start*3];
 			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
 			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
 

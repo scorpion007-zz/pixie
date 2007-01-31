@@ -406,7 +406,7 @@ public:
 		
 		void					createCategories();
 
-		CVariable				*parameters;				// The list of parameter (cloded from the parent)
+		CVariable				*parameters;				// The list of parameter (cloned from the parent)
 		int						refCount;					// The refcount to manage the clones
 		CXform					*xform;
 		int						*categories;				// Categories for light shaders

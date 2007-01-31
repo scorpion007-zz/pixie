@@ -771,9 +771,8 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	uMult				=	umax	-	uOrg;
 	vMult				=	vmax	-	vOrg;
 
-	double	*uCoefficients,*vCoefficients;
-	uCoefficients		=	(double *) alloca(uOrder*uOrder*sizeof(double));
-	vCoefficients		=	(double *) alloca(vOrder*vOrder*sizeof(double));
+	double	*uCoefficients		=	(double *) alloca(uOrder*uOrder*sizeof(double));
+	double	*vCoefficients		=	(double *) alloca(vOrder*vOrder*sizeof(double));
 
 	// For each basis function
 	// Compute the coefficients
@@ -813,12 +812,12 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 // Return Value			:	-
 // Comments				:	-
 CNURBSPatch::~CNURBSPatch() {
-	const int			vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
+	const int vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
 	stats.gprimMemory	-=	sizeof(CNURBSPatch) + sizeof(float)*vertexSize*uOrder*vOrder;
 	stats.numGprims--;
 
-	if (parameters	!= NULL)	delete parameters;
+	if (parameters	!= NULL) delete parameters;
 	delete [] vertex;
 
 	variables->detach();
@@ -846,7 +845,7 @@ void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients
 		for (v=0;v<vOrder;v++) {
 			const double *vRow	=	&vCoefficients[v*vOrder];
 			for (u=0;u<uOrder;u++) {
-				double			data	=	vertexData[i+(v*uOrder+u)*vs+disp];
+				const double	data	=	vertexData[i+(v*uOrder+u)*vs+disp];
 				const double	*uRow	=	&uCoefficients[u*uOrder];
 
 				for (j=0;j<uOrder;j++) {
@@ -880,10 +879,10 @@ void	CNURBSPatch::precomputeVertexData(float *vertex,const double *uCoefficients
 // Return Value			:	-
 // Comments				:	-
 void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
-	int					i,k;
-	const float			*u					=	varying[VARIABLE_U]+start;
-	const float			*v					=	varying[VARIABLE_V]+start;
-	int					vertexSize			=	variables->vertexSize;
+	int					i;
+	const float			*u			=	varying[VARIABLE_U]+start;
+	const float			*v			=	varying[VARIABLE_V]+start;
+	int					vertexSize	=	variables->vertexSize;
 	float				*vertexData;
 	int					vertexDataStep;
 
@@ -934,11 +933,11 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 		double	*duPowers		=	vPowers + VORDER;												\
 		double	*dvPowers		=	duPowers + UORDER;												\
 																									\
-		for (i=0,k=0;i<numVertices;i++) {															\
+		for (i=0;i<numVertices;i++) {																\
 			int				j,t,var;																\
 			double			denominator;															\
-			const double	cu				=	u[i]*uMult + uOrg;									\
-			const double	cv				=	v[i]*vMult + vOrg;									\
+			const double	cu	=	u[i]*uMult + uOrg;												\
+			const double	cv	=	v[i]*vMult + vOrg;												\
 																									\
 			uPowers[0]		=	1;																	\
 			duPowers[0]		=	0;																	\
@@ -954,7 +953,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 				dvPowers[j]	=	j*vPowers[j-1];														\
 			}																						\
 																									\
-			const float *cVertex			=	vertexData;											\
+			const float *cVertex	=	vertexData;													\
 			vertexStart		=	intr;																\
 			for (var=0;var<4;var++) {																\
 				denominator		=	0;																\
@@ -1137,12 +1136,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 			float		*P	=	varying[VARIABLE_P]		+	start*3;
 			const float	*Pw	=	varying[VARIABLE_PW]	+	start*4;
 
-			for (i=numVertices;i>=0;i--) {
-				*P++	=	*Pw++;
-				*P++	=	*Pw++;
-				*P++	=	*Pw++;
-				Pw++;
-			}
+			for (i=numVertices;i>=0;i--,P+=3,Pw+=4)	movvv(P,Pw);
 		}
 
 #undef computeNURBS

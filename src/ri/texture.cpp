@@ -1829,7 +1829,7 @@ public:
 // Description			:	Read the pyramid layers
 // Return Value			:	TRUE on success
 // Comments				:
-template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int dstart,int width,int height,char *smode,char *tmode,T enforcer) {
+template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int &dstart,int width,int height,char *smode,char *tmode,T enforcer) {
 	CMadeTexture			*cTexture;
 	int						i,j;
 	uint32					fileWidth,fileHeight;
@@ -2095,7 +2095,9 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 				int			i;
 				CTexture	*sides[6];
 
-				for (i=0;i<6;i++)	sides[i]	=	texLoad(fileName,name,in,directory);
+				for (i=0;i<6;i++) {
+					sides[i]	=	texLoad(fileName,name,in,directory);
+				}
 
 				cTexture	=	new CCubicEnvironment(name,sides);
 			} else if (strcmp(textureFormat,TIFF_SPHERICAL_ENVIRONMENT) == 0) {
