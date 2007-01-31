@@ -201,6 +201,8 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"->Tesselation Cache\n");
 		info(CODE_STATS,"       Peak memory: %d (bytes)\n",tesselationPeakMemory);
 		info(CODE_STATS,"            memory: %d (bytes)\n",tesselationMemory);
+		info(CODE_STATS,"        Cache hits: %d (times)\n",tesselationCacheHits);
+		info(CODE_STATS,"      Cache misses: %d (times)\n",tesselationCacheMisses);
 	}
 }
 

@@ -642,6 +642,8 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				if (stats.tesselationPeakMemory < stats.tesselationMemory) {
 					stats.tesselationPeakMemory = stats.tesselationMemory;
 				}
+				// Update stats
+				stats.tesselationCacheMisses++;
 				
 				// Purge if we exceeded the max memory for this thread
 				if (tesselationUsedMemory[level][thread] > tesselationMaxMemory[level]) {
@@ -651,6 +653,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				// We already have this tesselation in another thread
 				levels[level].refCount++;
 			}
+			
 			tesselationUsedMemory[level][thread] += levels[level].tesselation->size;
 			levels[level].threadTesselation[thread] = levels[level].tesselation;
 			
@@ -659,6 +662,9 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 			#else
 				osUnlock(CRenderer::tesselateMutex);
 			#endif
+		} else {
+			// Update stats
+			stats.tesselationCacheHits++;
 		}
 		
 		// Bump the tesselation refCount
