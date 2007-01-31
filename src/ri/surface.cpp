@@ -537,7 +537,7 @@ CTesselationPatch::~CTesselationPatch() {
 
 	// clean up tesselations
 	for(int i=0;i<TESSELATION_NUM_LEVELS;i++) {
-		if (levels[i].tesselation != NULL) delete levels[i].tesselation;
+		if (levels[i].tesselation != NULL) free(levels[i].tesselation);
 		delete[] levels[i].threadTesselation;
 		#ifdef TESSELATION_LOCK_PER_ENTRY
 			osDeleteMutex(levels[i].mutex);
@@ -1038,7 +1038,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			*timev++	=	0;
 		}
 	}
-	context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+	context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE | PARAMETER_RAYTRACE);
 	
 	// Evaluate the quality of this tesselation in u and v separately
 	int		i;
