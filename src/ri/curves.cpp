@@ -134,10 +134,10 @@ CCurve::~CCurve() {
 // Description			:	Interpolate the junk
 // Return Value			:	-
 // Comments				:
-void			CCurve::interpolate(int numVertices,float **varying) const {
+void			CCurve::interpolate(int numVertices,float **varying,float ***locals) const {
 
 	// Dispatch the parameters
-	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying);
+	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying,locals);
 
 	// Normalize the v parameter
 	float	*v	=	varying[VARIABLE_V];
@@ -369,7 +369,7 @@ CCubicCurve::~CCubicCurve() {
 // Description			:	Sample the curves
 // Return Value			:	-
 // Comments				:
-void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				i,k;
 	float			*intr,*intrStart;
 	const	float	*vBasis				=	attributes->vBasis;
@@ -421,7 +421,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	}
 
 	// Dispatch the variables
-	variables->dispatch(intrStart,0,numVertices,varying);
+	variables->dispatch(intrStart,0,numVertices,varying,locals);
 
 	float		*dPdv	=	varying[VARIABLE_DPDV]	+ start*3;
 	float		*dPdu	=	varying[VARIABLE_DPDU]	+ start*3;
@@ -536,7 +536,7 @@ CLinearCurve::~CLinearCurve() {
 // Description			:	Sample the curves
 // Return Value			:	-
 // Comments				:
-void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				j,k;
 	float			*intr,*intrStart;
 	CVertexData		*variables			=	base->variables;
@@ -570,7 +570,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned i
 	}
 
 	// Dispatch the variables
-	variables->dispatch(intrStart,0,numSavedVertices,varying);
+	variables->dispatch(intrStart,0,numSavedVertices,varying,locals);
 
 	// Compute the normal and derivatives
 	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;

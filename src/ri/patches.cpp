@@ -319,7 +319,7 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				i,j;
 	const float		*u				=	varying[VARIABLE_U]+start;
 	const float		*v				=	varying[VARIABLE_V]+start;
@@ -382,7 +382,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 			v3			+=	vertexDataStep;
 		}
 
-		variables->dispatch(intr,start,numVertices,varying);
+		variables->dispatch(intr,start,numVertices,varying,locals);
 
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG)) {
@@ -448,10 +448,10 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
+void	CBilinearPatch::interpolate(int numVertices,float **varying,float ***locals) const {
 
 	// Dispatch the parameters first
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
@@ -608,7 +608,7 @@ void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i,k;
 	const float			*u					=	varying[VARIABLE_U]+start;
 	const float			*v					=	varying[VARIABLE_V]+start;
@@ -701,7 +701,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 		// Most of the time though, surface normal is required
 
 		// Dispatch the vertex data
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 
 	// Fix the degenerate normals
@@ -715,10 +715,10 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 // Method				:	interpolate
 // Description			:	See object.h// Return Value			:	-
 // Comments				:	-
-void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
+void	CBicubicPatch::interpolate(int numVertices,float **varying,float ***locals) const {
 
 	// Dispatch the parameters first
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
@@ -875,7 +875,7 @@ void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficient
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i;
 	const float			*u			=	varying[VARIABLE_U]+start;
 	const float			*v			=	varying[VARIABLE_V]+start;
@@ -1126,7 +1126,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 		// Most of the time though, surface normal is required
 
 		// Dispatch the vertex data
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 
 		// Convert to P
 		{
@@ -1152,10 +1152,10 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
+void			CNURBSPatch::interpolate(int numVertices,float **varying,float ***locals) const {
 
 	// Dispatch the parameters first
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {

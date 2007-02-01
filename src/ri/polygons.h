@@ -84,8 +84,8 @@ public:
 	
 
 		int					moving() const												{	return mesh->pl->data1 != NULL;		}
-		void				sample(int,int,float **,unsigned int &) const;
-		void				interpolate(int,float **) const;
+		void				sample(int,int,float **,float ***,unsigned int &) const;
+		void				interpolate(int,float **,float ***) const;
 
 
 		CPolygonMesh		*mesh;				// The mesh data
@@ -107,8 +107,8 @@ public:
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 
 		int					moving() const												{	return mesh->pl->data1 != NULL;		}
-		void				sample(int,int,float **,unsigned int &) const;
-		void				interpolate(int,float **) const;
+		void				sample(int,int,float **,float ***,unsigned int &) const;
+		void				interpolate(int,float **,float ***) const;
 
 
 		CPolygonMesh		*mesh;				// The mesh data

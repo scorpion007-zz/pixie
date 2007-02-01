@@ -48,8 +48,8 @@ public:
 	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
 
 	int				moving() const												{	return vertexData->moving;			}
-	void			sample(int,int,float **,unsigned int &) const;
-	void			interpolate(int,float **) const;
+	void			sample(int,int,float **,float ***,unsigned int &) const;
+	void			interpolate(int,float **,float ***) const;
 
 	CVertexData		*vertexData;	// The variables
 	CParameter		*parameters;	// The parameters

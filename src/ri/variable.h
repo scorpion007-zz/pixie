@@ -49,8 +49,8 @@ public:
 	int					usageMarker;	// The usage or flag
 	EVariableStorage	storage;		// If the variable is global, parameter or mutable parameter
 	void				*defaultValue;	// Points to the memory area that holds the default value for the variable
-	float				*value;			// This is a transient pointer that points to the memory area that holds the value
-	CVariable			*next;			// Linked list next (FIXME: Is this used ?)
+	int					accessor;		// Which entry in the locals array are we?
+	CVariable			*next;			// Linked list next (used to maintain shader parameter lists)
 };
 
 

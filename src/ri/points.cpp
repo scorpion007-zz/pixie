@@ -298,7 +298,7 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 // Description			:	Push all the defined variables into the arrays
 // Return Value			:	-
 // Comments				:
-void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &usedParameters) const {
+void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &usedParameters) const {
 	CVertexData		*variables	=	base->variables;
 	const int		vertexSize	=	variables->vertexSize;
 	float			*vertexData	=	(float *) alloca(numPoints*vertexSize*sizeof(float));
@@ -330,7 +330,7 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 		}
 	}
 
-	variables->dispatch(vertexBase,0,numPoints,varying);
+	variables->dispatch(vertexBase,0,numPoints,varying,locals);
 
 	usedParameters	&=	~(PARAMETER_N | variables->parameters);
 }
@@ -343,8 +343,8 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 // Description			:	Interpolate the varying junck and save the uniform stuff
 // Return Value			:	-
 // Comments				:
-void	CPoints::interpolate(int numVertices,float **varying) const {
-	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying);
+void	CPoints::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying,locals);
 }
 
 

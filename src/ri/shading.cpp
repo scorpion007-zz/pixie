@@ -619,8 +619,11 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			const int	savedParameters	=	usedParameters;
 
 			// No, just sample the geometry
-			object->sample(0,numVertices,varying,usedParameters);
-			object->interpolate(numVertices,varying);
+			// Note: we pass NULL for the locals here because we do not wish
+			// to expand them (we're not running shaders) yet
+			// this causes the interpolation to local shader vars not to occur
+			object->sample(0,numVertices,varying,NULL,usedParameters);
+			object->interpolate(numVertices,varying,NULL);
 
 			// We're not shading just sampling
 			if (usedParameters & PARAMETER_N) {
@@ -663,12 +666,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	memSave(shaderVarCheckpoint,shaderStateMemory);
 	
 	// Allocate the caches for the shaders being executed
-	if (surface != NULL)							currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
-	if (displacement != NULL)						currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
-	if (atmosphere != NULL)							currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
+	float		***locals	= 	currentShadingState->locals;
+	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
+	if (atmosphere != NULL)							locals[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
-
 
 	// If we need derivative information, treat differently
 	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
@@ -687,7 +690,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// Sample the object at the main intersection points
 			usedParameters							|=	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_P;
 			shadingParameters						=	usedParameters;
-			object->sample(0,numRealVertices,varying,usedParameters);
+			object->sample(0,numRealVertices,varying,locals,usedParameters);
 			usedParameters							=	shadingParameters;		// Restore the required parameters for the second round of shading
 			
 			float	*dPdu			=	varying[VARIABLE_DPDU];
@@ -735,10 +738,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			}
 
 			// Sample the object again, this time at the extra shading points
-			object->sample(numRealVertices,2*numRealVertices,varying,usedParameters);
+			object->sample(numRealVertices,2*numRealVertices,varying,locals,usedParameters);
 
 			// Interpolate the various variables defined on the object
-			object->interpolate(numVertices,varying);
+			object->interpolate(numVertices,varying,locals);
 
 		} else {
 			// We're shading a regular grid, so take the shortcut while computing the surface derivatives
@@ -762,10 +765,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			usedParameters	|=	PARAMETER_P;
 
 			// Sample the object
-			object->sample(0,numVertices,varying,usedParameters);
+			object->sample(0,numVertices,varying,locals,usedParameters);
 
 			// Interpolate the various variables defined on the object
-			object->interpolate(numVertices,varying);
+			object->interpolate(numVertices,varying,locals);
 
 			// We're rasterizing, so the derivative information is already available
 			memBegin(threadMemory);
@@ -909,10 +912,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		currentShadingState->numPassive			=	0;
 
 		// Sample the object
-		object->sample(0,numVertices,varying,usedParameters);
+		object->sample(0,numVertices,varying,locals,usedParameters);
 
 		// Interpolate the various variables defined on the object
-		object->interpolate(numVertices,varying);
+		object->interpolate(numVertices,varying,locals);
 
 		// Compute the I
 		if (currentRayDepth == 0) {
@@ -940,7 +943,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	memBegin(threadMemory);
 
 	if (displacement != NULL) {
-		displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
+		displacement->execute(this,locals[ACCESSOR_DISPLACEMENT]);
 	}
 
 	if (displaceOnly == FALSE) {
@@ -987,7 +990,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 		if (surface != NULL) {
 			numShaded					+=	numVertices;
-			surface->execute(this,currentShadingState->locals[ACCESSOR_SURFACE]);
+			surface->execute(this,locals[ACCESSOR_SURFACE]);
 		} else {
 			float			*color		=	varying[VARIABLE_CI];
 			float			*opacity	=	varying[VARIABLE_OI];
@@ -1010,13 +1013,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 		if (currentRayDepth == 0) {  // do not execute atmosphere for non-camera rays
 			if (atmosphere != NULL) {
-				atmosphere->execute(this,currentShadingState->locals[ACCESSOR_ATMOSPHERE]);
+				atmosphere->execute(this,locals[ACCESSOR_ATMOSPHERE]);
 			}
 		}
 
 		if (currentShadingState->postShader != NULL) {
-			currentShadingState->locals[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
-			currentShadingState->postShader->execute(this,currentShadingState->locals[ACCESSOR_POSTSHADER]);
+			locals[ACCESSOR_POSTSHADER]		=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
+			currentShadingState->postShader->execute(this,locals[ACCESSOR_POSTSHADER]);
 		}
 	}
 

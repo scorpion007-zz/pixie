@@ -215,7 +215,7 @@ CPatchGrid::~CPatchGrid() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i,j;
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
@@ -319,7 +319,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 			}
 		}
 
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
@@ -331,8 +331,8 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void		CPatchGrid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void		CPatchGrid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 

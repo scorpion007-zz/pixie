@@ -81,7 +81,7 @@ public:
 
 					// Surface interface
 	int				moving() const													{	return base->variables->moving;	}
-	void			interpolate(int,float **) const;
+	void			interpolate(int,float **,float ***) const;
 
 protected:
 	virtual	void	splitToChildren(CShadingContext *)	=	0;
@@ -101,7 +101,7 @@ public:
 					~CCubicCurve();
 
 					// Surface interface
-	void			sample(int,int,float **,unsigned int &) const;
+	void			sample(int,int,float **,float ***,unsigned int &) const;
 
 protected:
 	void			splitToChildren(CShadingContext *);
@@ -117,7 +117,7 @@ public:
 					~CLinearCurve();
 
 					// Surface interface
-	void			sample(int,int,float **,unsigned int &) const;
+	void			sample(int,int,float **,float ***,unsigned int &) const;
 
 protected:
 	void			splitToChildren(CShadingContext *);

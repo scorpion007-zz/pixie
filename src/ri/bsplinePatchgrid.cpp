@@ -171,7 +171,7 @@ CBSplinePatchGrid::~CBSplinePatchGrid() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i,j,k;
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
@@ -280,7 +280,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 		// Most of the time though, surface normal is required
 
 		// Dispatch the vertex data
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 	
 	normalFix();
@@ -294,7 +294,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,unsign
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void		CBSplinePatchGrid::interpolate(int numVertices,float **varying) const {
+void		CBSplinePatchGrid::interpolate(int numVertices,float **varying,float ***locals) const {
 	// perform u,v rescale first to interpolate from larger patch
 	if ((uMult != 1) || (vMult != 1)) {
 		float	*u,*v,*du,*dv,*dPdu,*dPdv;
@@ -317,7 +317,7 @@ void		CBSplinePatchGrid::interpolate(int numVertices,float **varying) const {
 		}
 	}
 	
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 

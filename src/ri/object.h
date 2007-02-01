@@ -125,10 +125,10 @@ public:
 	virtual	void			dice(CShadingContext *);							// Split or render this object
 	
 							// CSurface interface
-	virtual	int				moving() const;										// TRUE if we're moving
-	virtual	void			sample(int,int,float **,unsigned int &) const;		// Sample the surface of the object
-	virtual	void			interpolate(int,float **)	const;					// Interpolate the variables
-	virtual	void			shade(CShadingContext *,int,CRay **);				// Shade the object
+	virtual	int				moving() const;												// TRUE if we're moving
+	virtual	void			sample(int,int,float **,float ***,unsigned int &) const;	// Sample the surface of the object
+	virtual	void			interpolate(int,float **,float ***)	const;					// Interpolate the variables
+	virtual	void			shade(CShadingContext *,int,CRay **);						// Shade the object
 
 protected:
 

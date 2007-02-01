@@ -73,9 +73,9 @@ public:
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 						// Surface interface
-		void			sample(int,int,float **,unsigned int &) const;
+		void			sample(int,int,float **,float ***,unsigned int &) const;
 		int				moving() const { return (pl != NULL ? (pl->data1 !=NULL) : base->variables->moving);	}
-		void			interpolate(int,float **) const;
+		void			interpolate(int,float **,float ***) const;
 		
 
 private:

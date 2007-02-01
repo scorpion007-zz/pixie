@@ -52,7 +52,7 @@ public:
 	void					attach()		{	refCount++;	}
 	void					detach()		{	if (--refCount == 0)	delete this;	}
 
-	void					dispatch(const float *,int,int,float **);
+	void					dispatch(const float *,int,int,float **,float ***);
 
 	int						refCount;				// The reference counter
 	int						parameters;				// The parameters that the user attached (includes varying/uniform/facevarying parameters)
@@ -73,9 +73,9 @@ public:
 	virtual					~CParameter();
 
 
-	virtual	void			dispatch(int,float **)			=	0;	// Dispatch the parameter
-	virtual	void			dispatch(int,int,float **)		=	0;	// Dispatch the parameter
-	virtual	CParameter		*clone(CAttributes *)			=	0;	// Clone the parameter
+	virtual	void			dispatch(int,float **,float ***)		=	0;	// Dispatch the parameter
+	virtual	void			dispatch(int,int,float **,float ***)	=	0;	// Dispatch the parameter
+	virtual	CParameter		*clone(CAttributes *)					=	0;	// Clone the parameter
 
 	CVariable				*variable;
 	CParameter				*next;
@@ -97,13 +97,10 @@ public:
 							// Class				:	CPlParameter
 							// Description			:	This function is used to obtain the variable to write to
 							// Comments				:
-	float					*resolve(float **varying) const {
+	float					*resolve(float **varying,float ***locals) const {
 								if (variable->storage == STORAGE_GLOBAL)	return varying[variable->entry];
-								else {
-									float	*value	=	variable->value;
-									variable->value	=	NULL;
-									return value;
-								}
+								else if (locals != NULL)					return locals[variable->accessor][variable->entry];
+								return NULL;
 							}
 };
 

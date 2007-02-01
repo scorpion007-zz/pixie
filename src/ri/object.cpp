@@ -472,7 +472,7 @@ int					CSurface::moving() const {
 // Description			:	Sample a bunch of points on the surface
 // Return Value			:	TRUE if the sampling was done and shaders need to be executed
 // Comments				:
-void				CSurface::sample(int,int,float **,unsigned int &) const {
+void				CSurface::sample(int,int,float **,float ***,unsigned int &) const {
 	error(CODE_BUG,"An object is missing the \"sample\" function\n");
 	assert(FALSE);
 }
@@ -483,7 +483,7 @@ void				CSurface::sample(int,int,float **,unsigned int &) const {
 // Description			:	Interpolate the varying data and set the uniform data
 // Return Value			:
 // Comments				:
-void				CSurface::interpolate(int,float **)	const {
+void				CSurface::interpolate(int,float **,float ***)	const {
 	error(CODE_BUG,"An object is missing the \"interpolate\" function\n");
 	assert(FALSE);
 }

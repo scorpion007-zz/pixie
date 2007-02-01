@@ -290,7 +290,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	Sample bunch of points on the triangle
 // Return Value			:	-
 // Comments				:
-void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U] + start;
 	const float	*v				=	varying[VARIABLE_V] + start;
@@ -314,7 +314,7 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 			const int		numFloats	=	variable->numFloats;
 
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
-				float		*dest	=	pl->parameters[j].resolve(varying) + start*numFloats;
+				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
 					const float	*sv00	=	data0 + this->v0*variable->numFloats;
@@ -418,7 +418,7 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 			const int		numFloats	=	variable->numFloats;
 
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
-				float		*dest	=	pl->parameters[j].resolve(varying) + start*numFloats;
+				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
 					const float	*sv0	=	data + this->v0*variable->numFloats;
@@ -492,7 +492,7 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,unsigne
 // Description			:	Core interpolation
 // Return Value			:	-
 // Comments				:
-void			CPolygonTriangle::interpolate(int numVertices,float **varying) const {
+void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***locals) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U];
 	const float	*v				=	varying[VARIABLE_V];
@@ -503,7 +503,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying) const {
 		const CPlParameter	*cParameter	=	pl->parameters+i;
 		const CVariable		*cVariable	=	cParameter->variable;
 		const int			numFloats	=	cVariable->numFloats;
-		float				*dest		=	cParameter->resolve(varying);
+		float				*dest		=	cParameter->resolve(varying,locals);
 		const float			*src;
 		const float			*v0,*v1,*v2;
 
@@ -819,7 +819,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 // Description			:	Sample bunch of points on the quad
 // Return Value			:	-
 // Comments				:
-void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U] + start;
 	const float	*v				=	varying[VARIABLE_V] + start;
@@ -845,7 +845,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned in
 			const int		numFloats	=	variable->numFloats;
 
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
-				float		*dest	=	pl->parameters[j].resolve(varying) + start*numFloats;
+				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
 					const float	*sv00	=	data0 + this->v0*variable->numFloats;
@@ -949,7 +949,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned in
 			const int		numFloats	=	variable->numFloats;
 
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
-				float		*dest	=	pl->parameters[j].resolve(varying) + start*numFloats;
+				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
 					const float	*sv0	=	data + this->v0*variable->numFloats;
@@ -1022,7 +1022,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	Core interpolation
 // Return Value			:	-
 // Comments				:
-void			CPolygonQuad::interpolate(int numVertices,float **varying) const {
+void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals) const {
 	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U];
 	const float	*v				=	varying[VARIABLE_V];
@@ -1033,7 +1033,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying) const {
 		const CPlParameter	*cParameter	=	pl->parameters+i;
 		const CVariable		*cVariable	=	cParameter->variable;
 		const int			numFloats	=	cVariable->numFloats;
-		float				*dest		=	cParameter->resolve(varying);
+		float				*dest		=	cParameter->resolve(varying,locals);
 		const float			*src;
 		const float			*v0,*v1,*v2,*v3;
 

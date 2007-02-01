@@ -441,7 +441,7 @@ CVariable		*CRenderer::declareVariable(const char *name,const char *type,int mar
 		nVariable->next						=	variables;
 		nVariable->usageMarker				=	marker;
 		nVariable->defaultValue				=	NULL;
-		nVariable->value					=	NULL;
+		nVariable->accessor					=	-1;
 		variables							=	nVariable;
 		
 		// Insert the variable into the variables trie

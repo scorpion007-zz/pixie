@@ -347,7 +347,7 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CSphere::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				currentVertex;
 	float			*dest;
 	const float		*u		=	varying[VARIABLE_U] + start;
@@ -509,8 +509,8 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CSphere::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CSphere::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -736,7 +736,7 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float			*sinu;
 	float			*cosu;
 	int				i;
@@ -856,8 +856,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CDisk::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CDisk::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1106,7 +1106,7 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CCone::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float		*cosu;
 	float		*sinu;
 	int			i;
@@ -1250,8 +1250,8 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CCone::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CCone::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1503,7 +1503,7 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CParaboloid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	float	*sqrtz;
@@ -1652,8 +1652,8 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CParaboloid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CParaboloid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1889,7 +1889,7 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CCylinder::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	int		i;
@@ -2035,8 +2035,8 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CCylinder::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CCylinder::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2329,7 +2329,7 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	int		i;
@@ -2499,8 +2499,8 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CHyperboloid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CHyperboloid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2801,7 +2801,7 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CToroid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	float	*sinv;
@@ -2948,8 +2948,8 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CToroid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CToroid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -135,6 +135,7 @@ static	TSlFunction		functions[]	=	{
 				int						passNumber;				// Current pass number (we make 2 passes)
 				int						parsingInit;			// TRUE if we're parsing the init code
 				int						numErrors;				// Number of errors encountered during parse
+				int						accessorType;			// Accessor type for _interpolatable_ parameters
 
 				// Pass 1
 				int						numCode;				// The number of code blocks
@@ -286,6 +287,7 @@ static	TSlFunction		functions[]	=	{
 													newVariable->usageMarker	=	0;
 													newVariable->storage		=	currentData.currentParameterMutable	? STORAGE_MUTABLEPARAMETER : STORAGE_PARAMETER;
 													newVariable->defaultValue	=	new TCode[numItems*numComp];
+													newVariable->accessor		=	currentData.accessorType;
 													newVariable->next			=	NULL;													
 													cVariable->variable			=	newVariable;
 													
@@ -778,25 +780,32 @@ slType:
 				SCRL_SURFACE
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_SURFACE;
+					currentData.shaderType		=	SL_SURFACE;
+					currentData.accessorType 	=	ACCESSOR_SURFACE;
 				}
 				|
 				SCRL_DISPLACEMENT
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_DISPLACEMENT;
+					currentData.shaderType		=	SL_DISPLACEMENT;
+					currentData.accessorType	=	ACCESSOR_DISPLACEMENT;
 				}
 				|
 				SCRL_LIGHTSOURCE
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_LIGHTSOURCE;
+					currentData.shaderType		=	SL_LIGHTSOURCE;
+					// Note: we don't set accessorType because you can't interpolate into
+					// light shader parameters
 				}
 				|
 				SCRL_VOLUME
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_ATMOSPHERE;
+					currentData.shaderType		=	SL_ATMOSPHERE;
+					currentData.accessorType	=	ACCESSOR_ATMOSPHERE;
+					// Note: we can assume the accessor is atmosphere as that's the only
+					// volume shader that can be interpolated into
 				}
 				|
 				SCRL_IMAGER
@@ -2173,6 +2182,7 @@ void	reset() {
 	currentData.passNumber				=	0;
 	currentData.parsingInit				=	FALSE;
 	currentData.numErrors				=	0;
+	currentData.accessorType			=	-1;
 
 				// Pass 1
 	currentData.numCode					=	0;

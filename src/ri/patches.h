@@ -53,8 +53,8 @@ public:
 
 						// CSurface interface
 		int				moving() const {	return variables->moving;			}
-		void			sample(int,int,float **,unsigned int &) const;
-		void			interpolate(int,float **) const;
+		void			sample(int,int,float **,float ***,unsigned int &) const;
+		void			interpolate(int,float **,float ***) const;
 
 private:
 		CVertexData		*variables;						// The variables for the patch
@@ -78,8 +78,8 @@ public:
 
 						// CSurface interface
 		int				moving() const	{	return variables->moving;			}
-		void			sample(int,int,float **,unsigned int &) const;
-		void			interpolate(int,float **) const;
+		void			sample(int,int,float **,float ***,unsigned int &) const;
+		void			interpolate(int,float **,float ***) const;
 
 private:
 		void			computeVertexData(float *,const float *,int,const float *,const float *);
@@ -104,8 +104,8 @@ public:
 
 						// CSurface interface
 		int				moving() const	{	return variables->moving;			}
-		void			sample(int,int,float **,unsigned int &) const;
-		void			interpolate(int,float **) const;
+		void			sample(int,int,float **,float ***,unsigned int &) const;
+		void			interpolate(int,float **,float ***) const;
 
 private:
 		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);

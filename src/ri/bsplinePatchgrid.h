@@ -50,8 +50,8 @@ public:
 
 					// Surface interface
 	int				moving() const													{	return variables->moving;			}
-	void			sample(int,int,float **,unsigned int &) const;
-	void			interpolate(int,float **) const;
+	void			sample(int,int,float **,float ***,unsigned int &) const;
+	void			interpolate(int,float **,float ***) const;
 
 	CVertexData		*variables;					// The variables
 	CParameter		*parameters;				// The parameters

@@ -83,15 +83,16 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float	*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
+						
 
 						
 						if (dest != NULL) {
-							variable->value	=	NULL;
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(dest,data,variable->numFloats*sizeof(float));
 							} else {
@@ -103,17 +104,17 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float	*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
-							variable->value	=	NULL;
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(dest + start*variable->numFloats,data,variable->numFloats*sizeof(float));
 							} else {
@@ -125,7 +126,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(start,numVertices,varying);
+						if (next != NULL)	next->dispatch(start,numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -160,11 +161,12 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -176,8 +178,6 @@ public:
 							const float	*u			=	varying[VARIABLE_U];
 							const float	*v			=	varying[VARIABLE_V];
 
-							variable->value			=	NULL;
-
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
 								const float	cv	=	*v++;
@@ -188,14 +188,15 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -208,8 +209,6 @@ public:
 							const float	*v			=	varying[VARIABLE_V] + start;
 
 							dest					+=	start*numFloats;
-							variable->value			=	NULL;
-
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
 								const float	cv	=	*v++;
@@ -220,7 +219,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -254,11 +253,12 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -268,8 +268,6 @@ public:
 							const float	*v2			=	v1 + numFloats;
 							const float	*u			=	varying[VARIABLE_U];
 							const float	*v			=	varying[VARIABLE_V];
-
-							variable->value			=	NULL;
 
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
@@ -281,14 +279,15 @@ public:
 							}	
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -300,7 +299,6 @@ public:
 							const float	*v			=	varying[VARIABLE_V] + start;
 
 							dest					+=	start*numFloats;
-							variable->value			=	NULL;
 
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
@@ -312,7 +310,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -348,11 +346,12 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -360,8 +359,6 @@ public:
 							const float	*v0			=	data;
 							const float	*v1			=	v0 + numFloats;
 							const float	*v			=	varying[VARIABLE_V];
-
-							variable->value			=	NULL;
 
 							for (i=numVertices;i>0;i--) {
 								const float	cv	=	*v++;
@@ -372,15 +369,16 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
-
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
+						
 						if (dest != NULL) {
 							int			i,j;
 							const int	numFloats	=	variable->numFloats;
@@ -388,7 +386,6 @@ public:
 							const float	*v1			=	v0 + numFloats;
 							const float	*v			=	varying[VARIABLE_V] + start;
 
-							variable->value			=	NULL;
 							dest					+=	start*numFloats;
 
 							for (i=numVertices;i>0;i--) {
@@ -400,7 +397,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -495,7 +492,7 @@ CVertexData::~CVertexData() {
 // Description			:	Dispatch vertex data
 // Return Value			:
 // Comments				:
-void	CVertexData::dispatch(const float *data,int start,int numVertices,float **varying) {
+void	CVertexData::dispatch(const float *data,int start,int numVertices,float **varying,float ***locals) {
 	int			i;
 	CVariable	**dispatch	=	variables;
 
@@ -505,10 +502,10 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 		float		*dest;
 
 		if (dispatch[0]->storage == STORAGE_GLOBAL)	dest	=	varying[dispatch[0]->entry] + start*numFloats;
-		else										dest	=	dispatch[0]->value + start*numFloats;
+		else if (locals != NULL)					dest	=	locals[dispatch[0]->accessor][dispatch[0]->entry]  + start*numFloats;
+		else										dest	=	NULL;
 
 		if (dest != NULL) {
-			dispatch[0]->value	=	NULL;
 			dispatchData(src,dest,vertexSize,numFloats,numVertices);
 		}
 

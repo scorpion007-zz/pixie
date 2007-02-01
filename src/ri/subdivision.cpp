@@ -161,7 +161,7 @@ void	CSubdivision::projectVertices(float *fvertex,float *vertexData,int disp) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void		CSubdivision::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i,j,k,t;
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
@@ -325,7 +325,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 
 #undef real
 
-		this->vertexData->dispatch(intr,start,numVertices,varying);
+		this->vertexData->dispatch(intr,start,numVertices,varying,locals);
 	}
 
 	// Fix the degenerate normals
@@ -340,7 +340,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void		CSubdivision::interpolate(int numVertices,float **varying) const {
+void		CSubdivision::interpolate(int numVertices,float **varying,float ***locals) const {
 	// Correct the parametric range of the primitive
 	// do it first so we interpolate varyings on larger patch
 	if ((uMult != 1) || (vMult != 1)) {
@@ -364,7 +364,7 @@ void		CSubdivision::interpolate(int numVertices,float **varying) const {
 		}
 	}
 	
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 

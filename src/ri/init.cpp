@@ -422,7 +422,6 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 			CVariable	*cVar	=	CRenderer::retrieveVariable(cParameter->name);
 			cParameter->entry	=	cVar->entry;
 		}
-		cParameter->value		=	NULL;
 	}
 
 
