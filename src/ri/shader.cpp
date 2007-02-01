@@ -907,7 +907,7 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 		
 		// Find where we're writing
 		if (cVariable->storage == STORAGE_GLOBAL)	{
-//			cVariable->value		=	varying[cVariable->entry];		// THIS SHOULDN'T BE NEEDED!
+			cVariable->value		=	varying[cVariable->entry];		// THIS SHOULDN'T BE NEEDED!
 			dest					=	(TCode *) cVariable->value;
 		} else {
 			assert(cVariable->entry < parent->numVariables);
