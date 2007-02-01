@@ -907,11 +907,12 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 		
 		// Find where we're writing
 		if (cVariable->storage == STORAGE_GLOBAL)	{
-			cVariable->value		=	varying[cVariable->entry];
+//			cVariable->value		=	varying[cVariable->entry];		// THIS SHOULDN'T BE NEEDED!
 			dest					=	(TCode *) cVariable->value;
 		} else {
 			assert(cVariable->entry < parent->numVariables);
 			dest					=	locals[cVariable->entry];
+			cVariable->value		=	(float*) dest;		// allow interpolation to shader params
 		}
 
 		// This is the repetition amount
