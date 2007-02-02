@@ -863,8 +863,8 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 						const	float	ctime	=	time[i];
 
 						for (k=0;k<numFloats;k++) {
-							*dest++	=	((sv00[k]*(1-cu) + sv01[k]*cu)*(1-cv) + (sv02[k]*cu + sv03[k]*(1-cu))*cv)*(1-ctime) + 
-										((sv10[k]*(1-cu) + sv11[k]*cu)*(1-cv) + (sv12[k]*cu + sv13[k]*(1-cu))*cv)*ctime;
+							*dest++	=	((sv00[k]*(1-cu) + sv01[k]*cu)*(1-cv) + (sv02[k]*(1-cu) + sv03[k]*cu)*cv)*(1-ctime) + 
+										((sv10[k]*(1-cu) + sv11[k]*cu)*(1-cv) + (sv12[k]*(1-cu) + sv13[k]*cu)*cv)*ctime;
 						}
 					}
 				}
