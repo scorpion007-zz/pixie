@@ -574,42 +574,45 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		
 		// Prepare dPdtime if needed, do this _before_ saving our locals
 		if (usedParameters & PARAMETER_DPDTIME) {
-			// Save u,v,t
-			float	*u		=	varying[VARIABLE_U];
-			float	*v		=	varying[VARIABLE_V];
-			float	*t		=	varying[VARIABLE_T];
+			// Only sample ends if the object is moving (has data1)
+			if (object->moving()) {
+				// Save u,v,t
+				float	*u		=	varying[VARIABLE_U];
+				float	*v		=	varying[VARIABLE_V];
+				float	*t		=	varying[VARIABLE_T];
+				
+				int		num		=	(dim == SHADING_2D) ? numVertices : numVertices*3;
+				float 	*uSave	=	(float *) ralloc(num*3*sizeof(float),threadMemory);
+				float 	*vSave	=	uSave+num;
+				float 	*tSave	=	vSave+num;
+				
+				memcpy(uSave,u,num*sizeof(float));
+				memcpy(vSave,v,num*sizeof(float));
+				memcpy(tSave,t,num*sizeof(float));
+				
+				// Flip to the other end of sampling
+				unsigned int tempParameters = (usedParameters | PARAMETER_P) & ~(PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE | PARAMETER_DPDTIME);
+				if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
+					tempParameters |= PARAMETER_END_SAMPLE;
+					for (int i=0;i<num;i++) t[i] = 1;
+				} else {
+					tempParameters |= PARAMETER_BEGIN_SAMPLE;
+					for (int i=0;i<num;i++) t[i] = 0;
+				}
+				
+				// Re-run shade in displaceOnly mode (to get P at the other time sample)
+				displace(object,uVertices,vVertices,dim,tempParameters);
 			
-			int		num		=	(dim == SHADING_2D) ? numVertices : numVertices*3;
-			float 	*uSave	=	(float *) ralloc(num*3*sizeof(float),threadMemory);
-			float 	*vSave	=	uSave+num;
-			float 	*tSave	=	vSave+num;
-			
-			memcpy(uSave,u,num*sizeof(float));
-			memcpy(vSave,v,num*sizeof(float));
-			memcpy(tSave,t,num*sizeof(float));
-			
-			// Flip to the other end of sampling
-			unsigned int tempParameters = (usedParameters | PARAMETER_P) & ~(PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE | PARAMETER_DPDTIME);
-			if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
-				tempParameters |= PARAMETER_END_SAMPLE;
-				for (int i=0;i<num;i++) t[i] = 1;
-			} else {
-				tempParameters |= PARAMETER_BEGIN_SAMPLE;
-				for (int i=0;i<num;i++) t[i] = 0;
+				// Save off P
+				float		*dPdtime	=	varying[VARIABLE_DPDTIME];
+				const float	*P			=	varying[VARIABLE_P];
+				memcpy(dPdtime,P,sizeof(float)*3*num);
+				
+				// Restore u,v,t
+				memcpy(u,uSave,num*sizeof(float));
+				memcpy(v,vSave,num*sizeof(float));
+				memcpy(t,tSave,num*sizeof(float));
 			}
-			
-			// Re-run shade in displaceOnly mode (to get P at the other time sample)
-			displace(object,uVertices,vVertices,dim,tempParameters);
-		
-			// Save off P
-			float		*dPdtime	=	varying[VARIABLE_DPDTIME];
-			const float	*P			=	varying[VARIABLE_P];
-			memcpy(dPdtime,P,sizeof(float)*3*num);
-			
-			// Restore u,v,t
-			memcpy(u,uSave,num*sizeof(float));
-			memcpy(v,vSave,num*sizeof(float));
-			memcpy(t,tSave,num*sizeof(float));
 		}
 	} else {
 
@@ -952,27 +955,37 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// available inside displacement shaders
 		
 		if (usedParameters & PARAMETER_DPDTIME) {
-			const	float	idtime		=	CRenderer::invShutterTime;
-
-			if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
-				float			*dPdtime	=	varying[VARIABLE_DPDTIME];
-				const	float	*P			=	varying[VARIABLE_P];
-
-				for (i=numVertices;i>0;i--) {
-					subvv(dPdtime,P);
-					mulvf(dPdtime,idtime);
-					dPdtime	+=	3;
-					P		+=	3;
+			// Only sample ends if the object is moving (has data1)
+			if (object->moving()) {
+				const	float	idtime		=	CRenderer::invShutterTime;
+	
+				if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
+					float			*dPdtime	=	varying[VARIABLE_DPDTIME];
+					const	float	*P			=	varying[VARIABLE_P];
+	
+					for (i=numVertices;i>0;i--) {
+						subvv(dPdtime,P);
+						mulvf(dPdtime,idtime);
+						dPdtime	+=	3;
+						P		+=	3;
+					}
+				} else {
+					float			*dPdtime	=	varying[VARIABLE_DPDTIME];
+					const	float	*P			=	varying[VARIABLE_P];
+	
+					for (i=numVertices;i>0;i--) {
+						subvv(dPdtime,P);
+						mulvf(dPdtime,-idtime);
+						dPdtime	+=	3;
+						P		+=	3;
+					}
 				}
 			} else {
 				float			*dPdtime	=	varying[VARIABLE_DPDTIME];
-				const	float	*P			=	varying[VARIABLE_P];
 
 				for (i=numVertices;i>0;i--) {
-					subvv(dPdtime,P);
-					mulvf(dPdtime,-idtime);
+					initv(dPdtime,0);
 					dPdtime	+=	3;
-					P		+=	3;
 				}
 			}
 		}
