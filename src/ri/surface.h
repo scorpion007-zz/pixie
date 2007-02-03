@@ -124,7 +124,7 @@ private:
 	static int					tesselationMaxMemory[TESSELATION_NUM_LEVELS];	// The maximum memory allowed per thread per cache level
 	static CTesselationPatch	*tesselationList;								// Linked list of all tesselations (all levels are listed together)
 	
-	static void					purgeTesselations(int level, int thread, int all);
+	static void					purgeTesselations(CShadingContext *context,int level, int thread, int all);
 	static void					tesselationQuickSort(CTesselationEntry **activeTesselations,int start,int end,int thread);
 };
 

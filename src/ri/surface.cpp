@@ -648,7 +648,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				
 				// Purge if we exceeded the max memory for this thread
 				if (tesselationUsedMemory[level][thread] > tesselationMaxMemory[level]) {
-					purgeTesselations(thread,level,FALSE);
+					purgeTesselations(context,thread,level,FALSE);
 				}
 			} else {
 				// We already have this tesselation in another thread
@@ -1369,7 +1369,7 @@ void	CTesselationPatch::tesselationQuickSort(CTesselationEntry **activeTesselati
 // Description			:	purge tesselations of level from thread
 // Return Value			:
 // Comments				:
-void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
+void		CTesselationPatch::purgeTesselations(CShadingContext *context,int thread,int level,int all) {
 	// Do we have stuff to free ?
 	if (tesselationList == NULL)	return;
 
@@ -1378,9 +1378,6 @@ void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
 		osLock(CRenderer::tesselateMutex);
 	#endif
 	
-	osLock(CRenderer::memoryMutex);
-	memBegin(CRenderer::globalMemory);
-
 	// Figure out how many tesselations of this level we have in memory
 	int				i,j;
 	CTesselationEntry	**activeTesselations;
@@ -1393,7 +1390,7 @@ void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
 	}
 	
 	// Collect those tesselations into an array
-	activeTesselations	=	(CTesselationEntry **) ralloc(i*sizeof(CTesselationEntry *),CRenderer::globalMemory);
+	activeTesselations	=	(CTesselationEntry **) ralloc(i*sizeof(CTesselationEntry *),context->threadMemory);
 	for (cPatch=tesselationList,i=0;cPatch!=NULL;cPatch=cPatch->next) {
 		if (cPatch->levels[level].threadTesselation[thread] != NULL) {
 			activeTesselations[i++]	=	&cPatch->levels[level];
@@ -1427,9 +1424,6 @@ void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
 		#endif
 
 	}
-
-	memEnd(CRenderer::globalMemory);
-	osUnlock(CRenderer::memoryMutex);
 	
 	#ifdef TESSELATION_LOCK_PER_ENTRY
 		osUnlock(CRenderer::tesselateMutex);
