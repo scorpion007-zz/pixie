@@ -41,7 +41,6 @@
 							int			numIntRays		=	0;										\
 							int			numExtRays		=	0;										\
 							const float	*ab				=	lastGather->ab;							\
-							const float	*time			=	varying[VARIABLE_TIME];					\
 							int			i;															\
 							for (i=0;i<numRealVertices;i++) {										\
 								if (tags[i]) {														\
@@ -55,7 +54,7 @@
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	lookup->bias;								\
 									raysBase->t		=	lookup->maxDist;							\
-									raysBase->time	=	*time;										\
+									raysBase->time	=	urand();									\
 									raysBase->da	=	max(ab[0],lookup->da);						\
 									raysBase->db	=	ab[1];										\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;				\
@@ -68,7 +67,6 @@
 								}																	\
 								N	+=	3;															\
 								ab	+=	2;															\
-								time++;																\
 							}																		\
 							if ( (numIntRays+numExtRays) > 0 ) {									\
 								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\

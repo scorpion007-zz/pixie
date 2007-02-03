@@ -241,6 +241,8 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 	}
 	
 	// Finally, range-correct time
+	// Note: It is important this is last, as before this we assume a 0-1
+	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
 		float	*time		=	varying[VARIABLE_TIME];
 		float	*dtimev		=	varying[VARIABLE_DTIME];
@@ -363,6 +365,8 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	}
 	
 	// Finally, range-correct time
+	// Note: It is important this is last, as before this we assume a 0-1
+	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
 		float	*time		=	varying[VARIABLE_TIME];
 		float	*dtimev		=	varying[VARIABLE_DTIME];

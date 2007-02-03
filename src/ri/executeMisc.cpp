@@ -473,10 +473,9 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 
 	// Compute the ray differential
 	const float	*ab			=	rayDiff(from,L,NULL);
-	const float	*time		=	currentShadingState->varying[VARIABLE_TIME];
 
 	// Create the rays
-	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2,time++) {
+	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2) {
 		if (*tags == 0) {
 			const	float	d	=	lengthv(L);
 			mulvf(dir,L,-1/d);
@@ -490,7 +489,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 				movvv(cRay->from,from);
 				cRay->t				=	min(maxDist,d) - bias;
 				cRay->tmin			=	bias;
-				cRay->time			=	*time;
+				cRay->time			=	urand();
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 				cRay->dest			=	dest;
 				cRay->multiplier	=	multiplier;
@@ -559,9 +558,8 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 
 	// Compute the ray differential
 	const float	*ab			=	rayDiff(from,dir,NULL);
-	const float	*time		=	currentShadingState->varying[VARIABLE_TIME];
 
-	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2,time++) {
+	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2) {
 		if (*tags == 0) {
 			normalizev(D,dir);
 
@@ -569,7 +567,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
 				sampleHemisphere(cRay->dir,D,coneAngle,traceGenerator);
 				movvv(cRay->from,from);
-				cRay->time			=	*time;
+				cRay->time			=	urand();
 				cRay->t				=	C_INFINITY;
 				cRay->tmin			=	bias;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;

@@ -157,7 +157,6 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 #define	TRACEEXPR_PRE			FUN3EXPR_PRE																					\
 								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;		\
 								const float			*ab		=	rayDiff((float *) op1,(float *) op2,NULL);						\
-								const float			*time	=	varying[VARIABLE_TIME];											\
 								vector				D;																			\
 								CRay				ray;
 
@@ -166,7 +165,7 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 								mulvf(ray.dir,D,1/ray.t);																		\
 								movvv(ray.from,&op1->real);																		\
 								ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;										\
-								ray.time				=	*time;																\
+								ray.time				=	urand();															\
 								ray.tmin				=	bias;																\
 								ray.t					-=	bias;																\
 								ray.da					=	ab[0];																\
@@ -179,7 +178,6 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 
 
 #define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(1,3,3)																			\
-								time++;																							\
 								ab	+=	2;
 
 #else
@@ -322,7 +320,6 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 #define	VISIBILITYEXPR_PRE		FUN3EXPR_PRE																				\
 								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;	\
 								const float			*ab		=	rayDiff((float *) op1,NULL,(float *) op2);					\
-								const float			*time	=	varying[VARIABLE_TIME];										\
 								vector				D;																		\
 								CRay				ray;
 
@@ -331,7 +328,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								mulvf(ray.dir,D,1/ray.t);																	\
 								movvv(ray.from,&op1->real);																	\
 								ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;							\
-								ray.time				=	*time;															\
+								ray.time				=	urand();														\
 								ray.tmin				=	bias;															\
 								ray.t					-=	bias;															\
 								ray.da					=	ab[0];															\
@@ -344,7 +341,6 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								else					res[0].real	=	1;
 
 #define	VISIBILITYEXPR_UPDATE	FUN3EXPR_UPDATE(1,3,3)																		\
-								time++;																						\
 								ab	+=	2;
 
 #else
