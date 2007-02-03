@@ -1716,10 +1716,10 @@ void	CRendererContext::RiGeometricApproximation(char *type,float value) {
 	attributes	=	getAttributes(TRUE);
 
 	if (strcmp(type,RI_NORMALDEVIATION) == 0) {
-		attributes->normalDeviation		=	(float) cos(radians(value));
+		warning(CODE_BADTOKEN,"Deprecated GeometricApproximation \"%s\" will be ignored\n",type);
 	} else if (strcmp(type,RI_POINTDEVIATION) == 0) {
-		attributes->pointDeviation		=	value;
-	} else if (strcmp(type,RI_FLATNESS) == 0) {
+		warning(CODE_BADTOKEN,"Deprecated GeometricApproximation \"%s\" will be ignored\n",type);
+	} else if (strcmp(type,RI_FLATNESS) == 0) {			// deprecated, but in standard
 		attributes->flatness			=	value;
 	} else if (strcmp(type,RI_MOTIONFACTOR) == 0) {
 		attributes->motionFactor		=	value;
@@ -2520,7 +2520,7 @@ void	CRendererContext::RiTransformEnd (void) {
 
 
 void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
-	int			i;
+	int			i,dummy;
 	CAttributes	*attributes;
 
 	if (CRenderer::netNumServers > 0)	return;
@@ -2538,9 +2538,11 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 						attributes->numUProbes	=	val[0];
 						attributes->numVProbes	=	val[1];
 					}
-				attributeCheck(RI_MINSUBDIVISION,			attributes->minSubdivision,				1, 100000,int)
-				attributeCheck(RI_MAXSUBDIVISION,			attributes->maxSubdivision,				1, 100000,int)				
-				attributeCheck(RI_MINSPLITS,				attributes->minSplits,					1, 100000,int)				
+				attributeCheck(RI_MINSUBDIVISION,			dummy,				1, 100000,int)
+					warning(CODE_BADTOKEN,"Deprecated attribute \"%s\" will be ignored\n",tokens[i]);
+				attributeCheck(RI_MAXSUBDIVISION,			dummy,				1, 100000,int)
+					warning(CODE_BADTOKEN,"Deprecated attribute \"%s\" will be ignored\n",tokens[i]);
+				attributeCheck(RI_MINSPLITS,				attributes->minSplits,					1, 100000,int)
 				attributeCheck(RI_BOUNDEXPAND,				attributes->rasterExpand,				-C_INFINITY, C_INFINITY,float)				
 				attributeCheckFlag(RI_BINARY,				attributes->flags,						ATTRIBUTES_FLAGS_BINARY_DICE)
 				attributeCheckInvertFlag(RI_RASTERORIENT,	attributes->flags,						ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)

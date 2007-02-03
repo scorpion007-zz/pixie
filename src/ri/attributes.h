@@ -133,12 +133,8 @@ public:
 
 		unsigned int		flags;										// Attribute flags
 
-		int					minSubdivision,maxSubdivision;				// Min - Max depths of the refinement tree
-
 																		// Tesselation attributes
-		float				flatness;									// The pixel space flatness
-		float				pointDeviation;								// The maximum flatness amount
-		float				normalDeviation;							// The normal deviation
+		float				flatness;									// Deprecated but in standard -  The pixel space flatness
 
 		float				maxDisplacement;							// Maximum amount of displacement in camera system
 		char				*maxDisplacementSpace;						// The current space in which the maximum displacement is given
