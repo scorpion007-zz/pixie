@@ -49,6 +49,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				rendererDisplay.cpp \
 				rendererFiles.cpp \
 				rendererJobs.cpp \
+				rendererMutexes.cpp \
 				rendererNetwork.cpp \
 				reyes.cpp \
 				ri.cpp \

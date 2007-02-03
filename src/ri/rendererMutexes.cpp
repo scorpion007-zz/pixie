@@ -131,8 +131,6 @@ TMutex							CRenderer::textureMutex;
 //	Used to ensure that  each CObject's refCount is only altered
 //	by one thread at a time.
 //	- every attach() and detach() of a CObject must be mutexed
-//
-//	FIXME - CObject::dice, CObject::setChildren
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::refCountMutex;
 
@@ -162,6 +160,8 @@ TMutex							CRenderer::shaderMutex;
 //	is no longer referenced.
 //	- all modifications of the dirty shader array must be
 //	  mutexed
+//
+//	VERIFIED
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::dirtyShaderMutex;
 
