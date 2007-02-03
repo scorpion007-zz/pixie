@@ -327,14 +327,12 @@ void	CShadingContext::trace(CRay *ray) {
 	CTraceObject		*heap		=	heapBase;
 	int					numObjects	=	1;
 	int					maxObjects	=	100;
-
-	vector iD;
 	
-	iD[0] = 1.0f/ray->dir[0];
-	iD[1] = 1.0f/ray->dir[1];
-	iD[2] = 1.0f/ray->dir[2];
+	ray->invDir[0]	= 1.0 / (double) ray->dir[0];
+	ray->invDir[1]	= 1.0 / (double) ray->dir[1];
+	ray->invDir[2]	= 1.0 / (double) ray->dir[2];
 	
-	heap[1].tmin		=	nearestBoxInv(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,iD,ray->tmin,ray->t);
+	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
 	heap[1].object		=	CRenderer::root;
 	ray->jimp			=	urand();
 	ray->object			=	NULL;
@@ -379,7 +377,7 @@ void	CShadingContext::trace(CRay *ray) {
 			}
 
 			// Insert the child into the heap
-			const float	tmin	=	nearestBoxInv(cChild->bmin,cChild->bmax,ray->from,iD,ray->tmin,ray->t);
+			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
 			
 			if (tmin < ray->t) {
 				// Maintain the heap

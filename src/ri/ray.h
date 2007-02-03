@@ -58,6 +58,7 @@ public:
 
 						// ------------------> I N T E R M E D I A T E
 	float				jimp;						// The jittered importance (sampled automatically before tracing)
+	dvector				invDir;						// 1/dir
 	CRay				*child;						// For keeping track of the opacity
 };
 

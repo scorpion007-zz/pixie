@@ -780,7 +780,7 @@ void	CRendererContext::RiScreenWindow(float left,float right,float bot,float top
 void	CRendererContext::RiCropWindow(float xmin,float xmax,float ymin,float ymax) {
 	COptions	*options;
 
-	if ((xmin < 0) || (xmin > 1) || (ymin < 0) || (ymax > 1) || (xmax < xmin) || (ymax < ymin)) {
+	if ((xmin < 0) || (xmin > 1) || (ymin < 0) || (ymax > 1) || (xmax <= xmin) || (ymax <= ymin)) {
 		error(CODE_RANGE,"Invalid crop window boundaries (%.3f,%.3f,%.3f,%.3f).\n",xmin,xmax,ymin,ymax);
 		return;
 	}

@@ -566,7 +566,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	}
 	
 	// intersect with our bounding box
-	float t = nearestBox(bmin,bmax,cRay->from,cRay->dir,cRay->tmin,cRay->t);
+	float t = nearestBox(bmin,bmax,cRay->from,cRay->invDir,cRay->tmin,cRay->t);
 	
 	// bail out if the hit point is already further than the ray got
 	if (!(t < cRay->t)) return;
@@ -1015,8 +1015,6 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 
 	int div = rdiv;
 	if (div == 1) div = 2;			// sample() cannot do 1x1, so we do 2x2 and drop down
-	
-	assert((udiv+1)*(vdiv+1) <= CRenderer::maxGridSize);
 	
 	// Sample points on the patch
 	const float	ustep	=	(umax-umin) / (float) div;

@@ -511,6 +511,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\rendererMutexes.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\rendererNetwork.cpp"
 				>
 			</File>
