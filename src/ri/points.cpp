@@ -276,16 +276,26 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 
 		// Create the children primitives
 
+		osLock(CRenderer::refCountMutex);
 		child	=	new CPoints(attributes,xform,base,numFront,front);
 		child->attach();
+		osUnlock(CRenderer::refCountMutex);
+		
 		rasterizer->drawObject(child);
+		
+		osLock(CRenderer::refCountMutex);
 		child->detach();
-
+		
 		child	=	new CPoints(attributes,xform,base,numBack,back);
+		
 		child->attach();
+		osUnlock(CRenderer::refCountMutex);
+		
 		rasterizer->drawObject(child);
+		
+		osLock(CRenderer::refCountMutex);
 		child->detach();
-
+		osUnlock(CRenderer::refCountMutex);
 
 		memEnd(rasterizer->threadMemory);
 	}

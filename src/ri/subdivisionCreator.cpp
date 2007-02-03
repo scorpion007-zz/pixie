@@ -1688,9 +1688,16 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 	CObject	*cObject,*nObject;
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
 		nObject	=	cObject->sibling;
+		
+		osLock(CRenderer::refCountMutex);
 		cObject->attach();
+		osUnlock(CRenderer::refCountMutex);
+		
 		rasterizer->drawObject(cObject);
+		
+		osLock(CRenderer::refCountMutex);
 		cObject->detach();
+		osUnlock(CRenderer::refCountMutex);
 	}
 }
 							
