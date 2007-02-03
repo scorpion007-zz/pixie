@@ -127,19 +127,6 @@ int								CRenderer::netNumServers				=	0;						// initialized in initNetwork
 SOCKET							*CRenderer::netServers					=	NULL;					// initialized in initNetwork, destroyed in shutdownNetwork
 char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];						// initialized in beginRenderer
 
-// Global synchronization objects
-TMutex							CRenderer::commitMutex;
-TMutex							CRenderer::dispatchMutex;
-TMutex							CRenderer::memoryMutex;
-TMutex							CRenderer::networkMutex;
-TMutex							CRenderer::hierarchyMutex;
-TMutex							CRenderer::tesselateMutex;
-TMutex							CRenderer::textureMutex;
-TMutex							CRenderer::refCountMutex;
-TMutex							CRenderer::shaderMutex;
-TMutex							CRenderer::dirtyShaderMutex;
-TMutex							CRenderer::delayedMutex;
-TMutex							CRenderer::deepShadowMutex;
 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())

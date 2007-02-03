@@ -97,9 +97,15 @@ void			CObject::dice(CShadingContext *rasterizer) {
 	CObject	*cObject,*nObject;
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
 		nObject	=	cObject->sibling;
+		osLock(CRenderer::refCountMutex);
 		cObject->attach();
+		osUnlock(CRenderer::refCountMutex);
+		
 		rasterizer->drawObject(cObject);
+		
+		osLock(CRenderer::refCountMutex);
 		cObject->detach();
+		osUnlock(CRenderer::refCountMutex);
 	}
 }
 
@@ -291,7 +297,11 @@ void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 	// If raytraced, attach to the children
 	if (raytraced()) {
 		CObject	*cObject;
+		
+		osLock(CRenderer::refCountMutex);
 		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
+		osUnlock(CRenderer::refCountMutex);
+		
 		children	=	cluster(context,allChildren);
 	} else {
 		children	=	allChildren;
