@@ -183,7 +183,7 @@ martchLoop:;
 // Description			:	Sample the surface
 // Return Value			:	-
 // Comments				:
-void					CImplicit::sample(int,int,float **,unsigned int &up) const {
+void					CImplicit::sample(int,int,float **,float ***,unsigned int &up) const {
 	up	&=	~(PARAMETER_P | PARAMETER_NG);
 }
 
@@ -193,7 +193,7 @@ void					CImplicit::sample(int,int,float **,unsigned int &up) const {
 // Description			:	Interpolate the surface
 // Return Value			:	-
 // Comments				:
-void					CImplicit::interpolate(int,float **)	const {
+void					CImplicit::interpolate(int,float **,float ***)	const {
 }
 
 ///////////////////////////////////////////////////////////////////////

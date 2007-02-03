@@ -219,7 +219,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					CommandLine="flex -i -Psdr -o../../../../src/sdr/lex.sdr.cpp ../../../../src/sdr/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/srd/lex.sdr.cpp"
+					Outputs="../../../../src/sdr/lex.sdr.cpp"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -228,7 +228,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					CommandLine="flex -i -Psdr -o../../../../src/sdr/lex.sdr.cpp ../../../../src/sdr/sdr.l&#x0D;&#x0A;"
-					Outputs="../../../../src/srd/lex.sdr.cpp"
+					Outputs="../../../../src/sdr/lex.sdr.cpp"
 				/>
 			</FileConfiguration>
 		</File>

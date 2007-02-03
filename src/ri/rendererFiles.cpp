@@ -35,7 +35,6 @@
 #include "error.h"
 #include "texture.h"
 #include "photonMap.h"
-#include "radiance.h"
 #include "irradiance.h"
 #include "texture3d.h"
 #include "remoteChannel.h"

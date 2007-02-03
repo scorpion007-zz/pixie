@@ -51,8 +51,8 @@ public:
 	void						instantiate(CAttributes *,CXform *,CRendererContext *) const;			// Instanciate this object
 
 								// Surface interface
-	void						sample(int,int,float **,unsigned int &) const;							// Sample the surface of the object
-	void						interpolate(int,float **)	const;										// Interpolate the variables
+	void						sample(int,int,float **,float ***,unsigned int &) const;				// Sample the surface of the object
+	void						interpolate(int,float **,float ***)	const;								// Interpolate the variables
 	void						shade(CShadingContext *,int,CRay **);									// Shade the object
 
 

@@ -387,7 +387,7 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 								cache	=	lookup->cache;
 
 
-#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,*b,this,lookup,thread);										\
+#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,*b,this,lookup);												\
 								movvv(&res->real,C);																				\
 								movvv(&envdir->real,C+4);																			\
 								coverage->real = C[3];
@@ -443,7 +443,7 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 								const float	*b	=	rayDiff(&op1->real);															\
 								cache	=	lookup->cache;
 
-#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,*b,this,lookup,thread);										\
+#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,*b,this,lookup);												\
 								res->real	=	C[3];																				\
 								movvv(&irradiance->real,C);																			\
 								movvv(&envdir->real,C+4);

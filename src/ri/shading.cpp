@@ -44,7 +44,6 @@
 #include	"memory.h"
 #include	"random.h"
 #include	"points.h"
-#include	"radiance.h"
 #include	"error.h"
 #include	"remoteChannel.h"
 #include	"renderer.h"

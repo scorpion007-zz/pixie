@@ -121,7 +121,7 @@ void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 // Description			:	Sample the surface
 // Return Value			:	-
 // Comments				:
-void					CDLObject::sample(int,int,float **,unsigned int &up) const {
+void					CDLObject::sample(int,int,float **,float ***,unsigned int &up) const {
 	up	&=	~(PARAMETER_P | PARAMETER_NG);
 }
 
@@ -131,7 +131,7 @@ void					CDLObject::sample(int,int,float **,unsigned int &up) const {
 // Description			:	Interpolate the surface
 // Return Value			:	-
 // Comments				:
-void					CDLObject::interpolate(int,float **)	const {
+void					CDLObject::interpolate(int,float **,float ***)	const {
 }
 
 ///////////////////////////////////////////////////////////////////////
