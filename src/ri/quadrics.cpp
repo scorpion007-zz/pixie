@@ -62,7 +62,7 @@
 	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)) {						\
 		/* Do we have a grid ? */								\
 		if (children == NULL) {									\
-			osLock(CRenderer::hierarchyMutex);					\
+			osLock(CRenderer::tesselateMutex);					\
 																\
 			if (children == NULL) {								\
 				osLock(CRenderer::refCountMutex);				\
@@ -72,7 +72,7 @@
 				tesselation->attach();							\
 				children				=	tesselation;		\
 			}													\
-			osUnlock(CRenderer::hierarchyMutex);				\
+			osUnlock(CRenderer::tesselateMutex);				\
 		}														\
 		return;													\
 	}															\

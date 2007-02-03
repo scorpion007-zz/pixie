@@ -184,7 +184,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) || FORCE_TESSELATED_TRACE) {
 		// Do we have a grid ?
 		if (children == NULL) {
-			osLock(CRenderer::hierarchyMutex);
+			osLock(CRenderer::tesselateMutex);
 	
 			if (children == NULL) {
 				osLock(CRenderer::refCountMutex);
@@ -196,7 +196,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 				children				=	tesselation;
 			}
 	
-			osUnlock(CRenderer::hierarchyMutex);
+			osUnlock(CRenderer::tesselateMutex);
 		}
 		return;
 	}
@@ -684,7 +684,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) || FORCE_TESSELATED_TRACE) {
 		// Do we have a grid ?
 		if (children == NULL) {
-			osLock(CRenderer::hierarchyMutex);
+			osLock(CRenderer::tesselateMutex);
 	
 			if (children == NULL) {
 				osLock(CRenderer::refCountMutex);
@@ -696,7 +696,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 				children				=	tesselation;
 			}
 	
-			osUnlock(CRenderer::hierarchyMutex);
+			osUnlock(CRenderer::tesselateMutex);
 		}
 		return;
 	}

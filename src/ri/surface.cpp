@@ -637,6 +637,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				// Restore the refCount
 				levels[level].tesselation->lastRefNumber[thread]	=	lastRefNumbers[level][thread];
 				
+				/// FIXME make these context stats
 				// Update stats
 				stats.tesselationMemory								+=	levels[level].tesselation->size;
 				if (stats.tesselationPeakMemory < stats.tesselationMemory) {
@@ -663,6 +664,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				osUnlock(CRenderer::tesselateMutex);
 			#endif
 		} else {
+			/// FIXME make these context stats
 			// Update stats
 			stats.tesselationCacheHits++;
 		}
@@ -943,17 +945,17 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 			// We must lock the hierarchyMutex so that the list of known tesselation patches
 			// is maintained in a thread safe manner
 
-			osLock(CRenderer::hierarchyMutex);
+			osLock(CRenderer::tesselateMutex);
 			
 			if (children != NULL) {
-				osUnlock(CRenderer::hierarchyMutex);
+				osUnlock(CRenderer::tesselateMutex);
 				return;
 			}
 	
 			// we have no sufficient level, split to children.  Let them deal with it
 			splitToChildren(context);
 
-			osUnlock(CRenderer::hierarchyMutex);
+			osUnlock(CRenderer::tesselateMutex);
 		}
 	}	
 }
@@ -1012,14 +1014,9 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	float	**varying	=	context->currentShadingState->varying;
 
 	int div = rdiv;
-	if (div == 1) div = 2;
-
-
-//	This should now be guaranteed	
-//	if((udiv+1)*(vdiv+1) > CRenderer::maxGridSize) {
-//		udiv	=	udiv>>1;
-//		vdiv	=	vdiv>>1;
-//	}
+	if (div == 1) div = 2;			// sample() cannot do 1x1, so we do 2x2 and drop down
+	
+	assert((udiv+1)*(vdiv+1) <= CRenderer::maxGridSize);
 	
 	// Sample points on the patch
 	const float	ustep	=	(umax-umin) / (float) div;
@@ -1106,7 +1103,6 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
 			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
 			cTesselation->size						=	2*2*3*sizeof(float);			
-			//rmax									=	max(rmax,(uAvg+vAvg)/4.0f);	// we're subsampling
 	
 			movvv(cTesselation->P,		varying[VARIABLE_P]);
 			movvv(cTesselation->P+3,	varying[VARIABLE_P]+6);
@@ -1126,7 +1122,6 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
 			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
 			cTesselation->size						=	(div+1)*(div+1)*3*sizeof(float);
-			//rmax									=	max(rmax,div*(uAvg+vAvg)/2.0f);
 			
 			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
 			
@@ -1137,7 +1132,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 		} else {
 			// create bounds, but only if it saves us work later
 						
-			int nb = div>>2;					// number of bounds in each direction
+			int nb = div>>2;						// number of bounds in each direction
 			
 			// save off the data
 			
@@ -1147,8 +1142,8 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
 			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
 			cTesselation->size						=	((div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
-			//rmax									=	max(rmax,div*(uAvg+vAvg)/2.0f);
 			
+			// FIXME: bounds should be first for cache efficiency
 			float *bounds							=	cTesselation->P + (div+1)*(div+1)*3;
 			
 			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
@@ -1202,7 +1197,8 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	
 	// simply save the coarse r estimate
 	if (rdiv == 1) {
-		rmax							=	max(rmax,(uAvg+vAvg)/4.0f);	// we're subsampling
+		// we sampled 2x2 because we have to, but we wanted 1x1
+		rmax							=	max(rmax,(uAvg+vAvg)/4.0f);
 	} else {
 		rmax							=	max(rmax,div*(uAvg+vAvg)/2.0f);
 	}
@@ -1379,9 +1375,9 @@ void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
 	// Do we have stuff to free ?
 	if (tesselationList == NULL)	return;
 
-	// No other thread may flush at the same time
+	// Ensure no other thread creates new tesselations whilst we flush
 	#ifdef TESSELATION_LOCK_PER_ENTRY
-		osLock(CRenderer::hierarchyMutex);
+		osLock(CRenderer::tesselateMutex);
 	#endif
 	
 	osLock(CRenderer::memoryMutex);
@@ -1405,7 +1401,7 @@ void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
 			activeTesselations[i++]	=	&cPatch->levels[level];
 		}
 	}
-
+	
 	// Sort the tesselations from last used to the most recently used
 	if (i > 1)	tesselationQuickSort(activeTesselations,0,i-1,thread);
 
@@ -1438,7 +1434,7 @@ void		CTesselationPatch::purgeTesselations(int thread,int level,int all) {
 	osUnlock(CRenderer::memoryMutex);
 	
 	#ifdef TESSELATION_LOCK_PER_ENTRY
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(CRenderer::tesselateMutex);
 	#endif
 }
 
