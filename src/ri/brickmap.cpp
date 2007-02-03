@@ -1185,9 +1185,6 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 	CBrickMap	*cMap;
 	int			i;
 
-	osLock(CRenderer::memoryMutex);
-	memBegin(CRenderer::globalMemory);
-
 	// Collect the loaded bricks into an array
 	numNodes	=	0;
 	for (cMap=brickMaps;cMap!=NULL;cMap=cMap->nextMap) {
@@ -1197,7 +1194,8 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 			}
 		}
 	}
-	nodes		=	(CBrickNode **) ralloc(numNodes*2*sizeof(CBrickNode *),CRenderer::globalMemory);
+
+	nodes		=	new CBrickNode*[numNodes*2];
 	numNodes	=	0;
 	for (cMap=brickMaps;cMap!=NULL;cMap=cMap->nextMap) {
 		for (i=0;i<BRICK_HASHSIZE;i++) {
@@ -1296,8 +1294,7 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 		}
 	}
 
-	memEnd(CRenderer::globalMemory);
-	osUnlock(CRenderer::memoryMutex);
+	delete [] nodes;
 }
 
 

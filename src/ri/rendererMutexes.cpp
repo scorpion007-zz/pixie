@@ -32,6 +32,13 @@
 #include "renderer.h"
 
 
+/////////////////////////////////////////////////////////////
+//   This mutex serializes the job assignments.
+//   
+//  VERIFIED
+/////////////////////////////////////////////////////////////
+TMutex							CRenderer::jobMutex;
+
 
 /////////////////////////////////////////////////////////////
 //	This mutex is used to serialize job assignment of buckets
@@ -48,36 +55,25 @@ TMutex							CRenderer::commitMutex;
 
 
 /////////////////////////////////////////////////////////////
-//	This mutex is used to serialize dispatching of buckets
-//	to display drivers.
-//	- currently it is simply used to ensure that if a display
-//	quits out, we don't unload it multiple times
+//  This mutex is used to make sure we unload a display driver
+//  only once
 //	
-//	FIXME - there's some issue here if one thread bails
+//  VERIFIED
 /////////////////////////////////////////////////////////////
-TMutex							CRenderer::dispatchMutex;
-
-
-
-/////////////////////////////////////////////////////////////
-//	This mutex is used to serialize allocation of memory
-//	in the global space
-//	- all allocations (and checkpoints) using globalMemory must
-//	  be mutexed using this mutex
-//
-//	FIXME - there are uses in init.cpp rendererContext.cpp which
-//	  are not mutexed.  This will matter if a delayed object
-//	  uses these whilst the other threads continue
-/////////////////////////////////////////////////////////////
-TMutex							CRenderer::memoryMutex;
+TMutex							CRenderer::displayKillMutex;
 
 
 
 /////////////////////////////////////////////////////////////
 //	This mutex is used to serialize usage of network resources
-//	in the global space
+//	in the global space.
 //
-//	FIXME - understand this proplery
+//  Only the servers actually use this mutex:
+//   - To ask for bucket index to render from the client
+//   - To send rendered bucket data to the renderer
+//   - To receive a file from the client
+//
+//  VERIFIED
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::networkMutex;
 
@@ -192,3 +188,47 @@ TMutex							CRenderer::deepShadowMutex;
 
 // TODO: Comment on
 // Per block mutexes for textures, tesselations, grid objects
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	beginMutexes
+// Description			:	Create the synchronization mutexes
+// Return Value			:	-
+// Comments				:
+void							CRenderer::beginMutexes() {
+	osCreateMutex(jobMutex);
+	osCreateMutex(commitMutex);
+	osCreateMutex(displayKillMutex);
+	osCreateMutex(networkMutex);
+	osCreateMutex(hierarchyMutex);
+	osCreateMutex(tesselateMutex);
+	osCreateMutex(textureMutex);
+	osCreateMutex(refCountMutex);
+	osCreateMutex(shaderMutex);
+	osCreateMutex(dirtyShaderMutex);
+	osCreateMutex(delayedMutex);
+	osCreateMutex(deepShadowMutex);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	endMutexes
+// Description			:	Delete the synchronization mutexes
+// Return Value			:	-
+// Comments				:
+void							CRenderer::endMutexes() {
+	osDeleteMutex(jobMutex);
+	osDeleteMutex(commitMutex);
+	osDeleteMutex(displayKillMutex);
+	osDeleteMutex(networkMutex);
+	osDeleteMutex(hierarchyMutex);
+	osDeleteMutex(tesselateMutex);
+	osDeleteMutex(textureMutex);
+	osDeleteMutex(refCountMutex);
+	osDeleteMutex(shaderMutex);
+	osDeleteMutex(dirtyShaderMutex);
+	osDeleteMutex(delayedMutex);
+	osDeleteMutex(deepShadowMutex);
+}

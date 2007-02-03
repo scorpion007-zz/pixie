@@ -291,20 +291,8 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Reset the stats
 	stats.reset();
 
-	// Create the commit mutex (globally active)
-	osCreateMutex(commitMutex);
-	osCreateMutex(dispatchMutex);
-	osCreateMutex(memoryMutex);
-	osCreateMutex(networkMutex);
-	osCreateMutex(hierarchyMutex);
-	osCreateMutex(tesselateMutex);
-	osCreateMutex(textureMutex);
-	osCreateMutex(refCountMutex);
-	osCreateMutex(shaderMutex);
-	osCreateMutex(dirtyShaderMutex);
-	osCreateMutex(delayedMutex);
-	osCreateMutex(deepShadowMutex);
-	
+	// Create the synchronization objects
+	beginMutexes();
 
 	// Init the memory
 	memoryInit(globalMemory);
@@ -366,19 +354,8 @@ void		CRenderer::endRenderer() {
 	// Cleanup the parser
 	parserCleanup();
 
-	// Delete the commit mutex (globally active)
-	osDeleteMutex(commitMutex);
-	osDeleteMutex(dispatchMutex);
-	osDeleteMutex(memoryMutex);
-	osDeleteMutex(networkMutex);
-	osDeleteMutex(hierarchyMutex);
-	osDeleteMutex(tesselateMutex);
-	osDeleteMutex(textureMutex);
-	osDeleteMutex(refCountMutex);
-	osDeleteMutex(shaderMutex);
-	osDeleteMutex(dirtyShaderMutex);
-	osDeleteMutex(delayedMutex);
-	osDeleteMutex(deepShadowMutex);
+	// Delete the synchronization objects
+	endMutexes();
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);

@@ -467,8 +467,6 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
-	osLock(CRenderer::memoryMutex);
-
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
 	} else {
@@ -516,8 +514,6 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 			memEnd(CRenderer::globalMemory);
 		}
 	}
-
-	osUnlock(CRenderer::memoryMutex);
 }
 
 
@@ -528,8 +524,6 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 // Comments				:
 void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
-
-	osLock(CRenderer::memoryMutex);
 
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
@@ -598,8 +592,6 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 			memEnd(CRenderer::globalMemory);
 		}
 	}
-
-	osUnlock(CRenderer::memoryMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -617,8 +609,6 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 	names[3]	=	ny;
 	names[4]	=	pz;
 	names[5]	=	nz;
-
-	osLock(CRenderer::memoryMutex);
 
 	if (CRenderer::locateFile(inputFileName,names[0],path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",names[0]);
@@ -677,8 +667,6 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 			error(CODE_SYSTEM,"Unable to create %s for writing\n",output);
 		}
 	}
-
-	osUnlock(CRenderer::memoryMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -688,8 +676,6 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 // Comments				:
 void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
-
-	osLock(CRenderer::memoryMutex);
 
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
@@ -732,8 +718,6 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 			memEnd(CRenderer::globalMemory);
 		}
 	}
-
-	osUnlock(CRenderer::memoryMutex);
 }
 
 
@@ -745,8 +729,6 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 // Comments				:
 void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
-
-	osLock(CRenderer::memoryMutex);
 
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
@@ -789,7 +771,5 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			memEnd(CRenderer::globalMemory);
 		}
 	}
-
-	osUnlock(CRenderer::memoryMutex);
 }
 

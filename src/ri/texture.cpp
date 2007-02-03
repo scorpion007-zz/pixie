@@ -137,7 +137,7 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end,int 
 // Description			:	Try to deallocate some textures from memory
 // Return Value			:
 // Comments				:
-static inline void	textureMemFlush(CTextureBlock *entry,int thread,int all) {
+static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context,int all) {
 
 	// Do we have stuff to free ?
 	if (CRenderer::textureUsedBlocks == NULL)	return;
@@ -146,23 +146,22 @@ static inline void	textureMemFlush(CTextureBlock *entry,int thread,int all) {
 		osLock(CRenderer::textureMutex);
 	#endif
 	
-	osLock(CRenderer::memoryMutex);
-	memBegin(CRenderer::globalMemory);
+	memBegin(context->threadMemory);
 
 	// Figure out how many blocks we have in memory
 	int				i,j;
 	CTextureBlock	**activeBlocks;
 	CTextureBlock	*cBlock;
 	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
-		if (cBlock->threadData[thread].data != NULL) {
+		if (cBlock->threadData[context->thread].data != NULL) {
 			i++;
 		}
 	}
 	
 	// Collect those blocks into an array
-	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),CRenderer::globalMemory);
+	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),context->threadMemory);
 	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
-		if (cBlock->threadData[thread].data != NULL) {
+		if (cBlock->threadData[context->thread].data != NULL) {
 			if (cBlock != entry) {
 				activeBlocks[i++]	=	cBlock;
 			}
@@ -170,15 +169,15 @@ static inline void	textureMemFlush(CTextureBlock *entry,int thread,int all) {
 	}
 
 	// Sort the blocks from last used to the most recently used
-	if (i > 1)	textureQuickSort(activeBlocks,0,i-1,thread);
+	if (i > 1)	textureQuickSort(activeBlocks,0,i-1,context->thread);
 
 	// Free the memory
-	if (all)	CRenderer::textureMaxMemory[thread]	=	0;
-	for (j=0;(j<i) && (CRenderer::textureUsedMemory[thread] > (CRenderer::textureMaxMemory[thread]/2));j++) {
+	if (all)	CRenderer::textureMaxMemory[context->thread]	=	0;
+	for (j=0;(j<i) && (CRenderer::textureUsedMemory[context->thread] > (CRenderer::textureMaxMemory[context->thread]/2));j++) {
 		cBlock							=	activeBlocks[j];
 
-		CRenderer::textureUsedMemory[thread]	-=	cBlock->size;
-		cBlock->threadData[thread].data			=	NULL;
+		CRenderer::textureUsedMemory[context->thread]	-=	cBlock->size;
+		cBlock->threadData[context->thread].data		=	NULL;
 		
 		#ifdef PERBLOCK_LOCK
 			osLock(cBlock->mutex);
@@ -198,8 +197,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,int thread,int all) {
 
 	}
 
-	memEnd(CRenderer::globalMemory);
-	osUnlock(CRenderer::memoryMutex);
+	memEnd(context->threadMemory);
 	
 	#ifdef PERBLOCK_LOCK
 		osUnlock(CRenderer::textureMutex);
@@ -213,18 +211,18 @@ static inline void	textureMemFlush(CTextureBlock *entry,int thread,int all) {
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,int thread) {
-	stats.textureSize						+=	entry->size;
-	stats.peakTextureSize					=	max(stats.textureSize,stats.peakTextureSize);
-	stats.textureMemory						+=	entry->size;
-	stats.transferredTextureData			+=	entry->size;
-	CRenderer::textureUsedMemory[thread]	+=	entry->size;
+static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,CShadingContext *context) {
+	stats.textureSize								+=	entry->size;
+	stats.peakTextureSize							=	max(stats.textureSize,stats.peakTextureSize);
+	stats.textureMemory								+=	entry->size;
+	stats.transferredTextureData					+=	entry->size;
+	CRenderer::textureUsedMemory[context->thread]	+=	entry->size;
 
 	unsigned char *data				=	new unsigned char[entry->size];
 
 	// If we exceeded the maximum texture memory, phase out the last texture
-	if (CRenderer::textureUsedMemory[thread] > CRenderer::textureMaxMemory[thread])
-		textureMemFlush(entry,thread,FALSE);
+	if (CRenderer::textureUsedMemory[context->thread] > CRenderer::textureMaxMemory[context->thread])
+		textureMemFlush(entry,context,FALSE);
 
 	return data;
 }
@@ -234,7 +232,7 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,int threa
 // Description			:	Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
-static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir,int thread) {
+static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir,CShadingContext *context) {
 	void			*data	=	NULL;
 	TIFF			*in;
 	
@@ -246,7 +244,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	
 	// if we already have the data, use that and increment the reference count
 	if (entry->data != NULL) {
-		entry->threadData[thread].data	=	data;
+		entry->threadData[context->thread].data	=	data;
 		entry->refCount++;
 		
 		#ifndef PERBLOCK_LOCK 
@@ -297,7 +295,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 
 		// Allocate space for the texture
 		assert(entry->data == NULL);
-		data		=	textureAllocateBlock(entry,thread);
+		data		=	textureAllocateBlock(entry,context);
 
 		// Do we need to read the entire texture ?
 		if ((x != 0) || (y != 0) || (w != (int) width) || (h != (int) height)) {
@@ -306,10 +304,9 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 				// No, read the required portion
 				unsigned char	*tdata;
 
-				osLock(CRenderer::memoryMutex);
-				memBegin(CRenderer::globalMemory);
+				memBegin(context->threadMemory);
 				
-				tdata		=	(unsigned char *) ralloc(width*height*pixelSize,CRenderer::globalMemory);
+				tdata		=	(unsigned char *) ralloc(width*height*pixelSize,context->threadMemory);
 
 				// Read the entire image
 				assert((int) (pixelSize*width) == TIFFScanlineSize(in));
@@ -322,8 +319,8 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 					memcpy(&((unsigned char *) data)[i*pixelSize*w],&tdata[((y+i)*width + x)*pixelSize],w*pixelSize);
 				}
 
-				memEnd(CRenderer::globalMemory);
-				osUnlock(CRenderer::memoryMutex);
+				memEnd(context->threadMemory);
+
 			} else {
 				uint32	tileWidth,tileHeight;
 
@@ -371,8 +368,8 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	assert(entry->refCount == 0);
 	
 	entry->refCount = 1;
-	entry->data						=	data;
-	entry->threadData[thread].data	=	data;
+	entry->data								=	data;
+	entry->threadData[context->thread].data	=	data;
 
 	#ifndef PERBLOCK_LOCK
 		osUnlock(CRenderer::textureMutex);
@@ -499,7 +496,7 @@ public:
 							free(name);
 						}
 
-	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,int thread) { 
+	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,CShadingContext *context) { 
 							s		*=	width;					// To the pixel space
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
@@ -513,7 +510,7 @@ public:
 							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
 
 							float	res[4*3];
-							lookupPixel(res,si,ti,lookup,thread);
+							lookupPixel(res,si,ti,lookup,context);
 
 							float	tmp;
 
@@ -538,7 +535,7 @@ public:
 							r[2]	+=	res[11]*tmp;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,int thread) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,CShadingContext *context) {
 							s		*=	width;						// To the pixel space
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
@@ -552,7 +549,7 @@ public:
 							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
 
 							float	res[4*3];
-							lookupPixel(res,si,ti,lookup,thread);
+							lookupPixel(res,si,ti,lookup,context);
 
 							float	r		=	0;
 
@@ -583,7 +580,7 @@ public:
 	TTextureMode		sMode,tMode;													// The wrap modes
 protected:
 	// This function must be overriden by the child class
-	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *,int thread)		=	0;		// Lookup 4 pixel values
+	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *,CShadingContext *context)		=	0;		// Lookup 4 pixel values
 };
 
 
@@ -617,17 +614,17 @@ public:
 
 protected:
 					// The pixel lookup
-			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l,int thread) {
+			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l,CShadingContext *context) {
 						
-						if (dataBlock.threadData[thread].data == NULL) {
+						if (dataBlock.threadData[context->thread].data == NULL) {
 							// The data is cached out
-							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory,thread);
+							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory,context);
 						}
 						
 
 						// Texture cache management
-						CRenderer::textureRefNumber[thread]++;
-						dataBlock.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
+						CRenderer::textureRefNumber[context->thread]++;
+						dataBlock.threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];
 
 						int	xi		=	x+1;
 						int	yi		=	y+1;
@@ -732,7 +729,7 @@ public:
 protected:
 
 					// Pixel lookup
-	void			lookupPixel(float *res,int x,int y,const CTextureLookup *l,int thread) {
+	void			lookupPixel(float *res,int x,int y,const CTextureLookup *l,CShadingContext *context) {
 						int					xTile;
 						int					yTile;
 						CTextureBlock		*block;
@@ -755,13 +752,13 @@ protected:
 							yTile	=	__y >> tileSizeShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
-							if (block->threadData[thread].data == NULL) {			\
-								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,thread);		\
-							}																					\
-							CRenderer::textureRefNumber[thread]++;												\
-							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];	\
-																												\
-							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
+							if (block->threadData[context->thread].data == NULL) {	\
+								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,context);		\
+							}																										\
+							CRenderer::textureRefNumber[context->thread]++;															\
+							block->threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];	\
+																																	\
+							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];		\
 							res[0]	=	(float) (data[0]*M);						\
 							res[1]	=	l->fill;									\
 							res[2]	=	l->fill;									\
@@ -780,13 +777,13 @@ protected:
 							yTile	=	__y >> tileSizeShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
-							if (block->threadData[thread].data == NULL) {			\
-								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,thread);		\
-							}																					\
-							CRenderer::textureRefNumber[thread]++;												\
-							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];	\
-																												\
-							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];	\
+							if (block->threadData[context->thread].data == NULL) {	\
+								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,context);		\
+							}																										\
+							CRenderer::textureRefNumber[context->thread]++;															\
+							block->threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];	\
+																																	\
+							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];		\
 							res[0]	=	(float) (data[0]*M);						\
 							res[1]	=	(float) (data[1]*M);						\
 							res[2]	=	(float) (data[2]*M);						\
@@ -840,12 +837,12 @@ public:
 							}
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,int thread) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,CShadingContext *context) {
 							assert(numLayers > 0);
-							return layers[0]->lookupz(s,t,z,lookup,thread);
+							return layers[0]->lookupz(s,t,z,lookup,context);
 						}
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l,int thread) {
+	void				lookup(float *result,float s,float t,const CTextureLookup *l,CShadingContext *context) {
 
 							// Do the s mode
 							switch(layers[0]->sMode) {
@@ -883,10 +880,10 @@ public:
 								break;
 							}
 
-							layers[0]->lookup(result,s,t,l,thread);
+							layers[0]->lookup(result,s,t,l,context);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,int thread) {
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context) {
 							int				i;
 							float			totalContribution	=	0;
 							CTextureLayer	*layer0,*layer1;
@@ -986,8 +983,8 @@ public:
 								}
 
 												// lookup (s,t) and add it to the result
-								layer0->lookup(CC0,s,t,lookup,thread);
-								layer1->lookup(CC1,s,t,lookup,thread);
+								layer0->lookup(CC0,s,t,lookup,context);
+								layer1->lookup(CC1,s,t,lookup,context);
 								interpolatev(C,CC0,CC1,offset);
 
 								result[0]		+=	C[0]*contribution;
@@ -1023,13 +1020,13 @@ public:
 							if (layer != NULL) delete  layer;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,int thread) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,CShadingContext *context) {
 							assert(layer != NULL);
-							return layer->lookupz(s,t,z,lookup,thread);
+							return layer->lookupz(s,t,z,lookup,context);
 						}
 
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l,int thread) {
+	void				lookup(float *result,float s,float t,const CTextureLookup *l,CShadingContext *context) {
 							// Do the s mode
 							switch(layer->sMode) {
 							case TEXTURE_PERIODIC:
@@ -1066,10 +1063,10 @@ public:
 								break;
 							}
 
-							layer->lookup(result,s,t,l,thread);
+							layer->lookup(result,s,t,l,context);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,int thread) {
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
 
@@ -1129,7 +1126,7 @@ public:
 									break;
 								}
 												// lookup (s,t) and add it to the result
-								layer->lookup(C,s,t,lookup,thread);
+								layer->lookup(C,s,t,lookup,context);
 
 								result[0]		+=	C[0]*contribution;
 								result[1]		+=	C[1]*contribution;
@@ -1165,7 +1162,7 @@ public:
 							if (side != NULL)	delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
 							float		r[4];
@@ -1203,7 +1200,7 @@ public:
 									continue;
 								}
 
-								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup,thread);
+								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup,context);
 
 								result[0]			+=	C*contribution;
 							}
@@ -1309,7 +1306,7 @@ public:
 							free(fileName);
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
 
@@ -1356,11 +1353,11 @@ public:
 
 								cTile				=	tiles[by]+bx;
 
-								CRenderer::textureRefNumber[thread]++;
-								cTile->block.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
+								CRenderer::textureRefNumber[context->thread]++;
+								cTile->block.threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];
 								
-								if (cTile->block.threadData[thread].data == NULL) {
-									loadTile(bx,by,thread);
+								if (cTile->block.threadData[context->thread].data == NULL) {
+									loadTile(bx,by,context);
 								}
 
 								cPixel				=	cTile->lastData[py*header.tileSize+px];
@@ -1405,7 +1402,7 @@ public:
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
 	
 private:
-	void				loadTile(int x,int y,int thread) {
+	void				loadTile(int x,int y,CShadingContext *context) {
 
 							CDeepTile	*cTile	=	tiles[y]+x;
 
@@ -1415,7 +1412,7 @@ private:
 								osLock(cTile->block.mutex);
 							#endif
 							if (cTile->block.data != NULL) {
-								cTile->block.threadData[thread].data	 = 	cTile->block.data;
+								cTile->block.threadData[context->thread].data	 = 	cTile->block.data;
 								cTile->block.refCount++;
 								#ifndef PERBLOCK_LOCK
 									osUnlock(CRenderer::textureMutex);
@@ -1437,7 +1434,7 @@ private:
 
 							startIndex	=	tileIndices[index];
 
-							dataStart	=	data	=	(float *) textureAllocateBlock(&(cTile->block),thread);
+							dataStart	=	data	=	(float *) textureAllocateBlock(&(cTile->block),context);
 							fseek(in,startIndex,SEEK_SET);
 							fread(data,sizeof(unsigned char),cTile->block.size,in);
 							//fclose(in);  // moved later, see below
@@ -1466,9 +1463,9 @@ private:
 							
 							assert(cTile->block.refCount == 0);
 							
-							cTile->block.refCount					=	1;
-							cTile->block.data						=	dataStart;
-							cTile->block.threadData[thread].data	=	dataStart;
+							cTile->block.refCount							=	1;
+							cTile->block.data								=	dataStart;
+							cTile->block.threadData[context->thread].data	=	dataStart;
 							
 							#ifndef PERBLOCK_LOCK
 								osUnlock(CRenderer::textureMutex);
@@ -1531,7 +1528,7 @@ public:
 						} EOrder;
 
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
 							EOrder		order;
 							CTexture	*side;
 							float		u,v;
@@ -1629,7 +1626,7 @@ public:
 								}
 
 
-								side->lookup(C,u,v,lookup,thread);
+								side->lookup(C,u,v,lookup,context);
 
 								result[0]	+=	C[0]*contribution;
 								result[1]	+=	C[1]*contribution;
@@ -1666,7 +1663,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
 							float		u[4],v[4];
 							float		m;
 
@@ -1686,7 +1683,7 @@ public:
 							u[3]				=	D3[COMP_X] / m + 0.5f;
 							v[3]				=	D3[COMP_Y] / m + 0.5f;
 
-							side->lookup4(result,u,v,lookup,thread);
+							side->lookup4(result,u,v,lookup,context);
 						}
 
 	// textureinfo support
@@ -1714,7 +1711,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
 							float		u[4],v[4];
 							double		a,b,c;
 							vector		D,Dsamp;
@@ -1745,7 +1742,7 @@ public:
 								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
 								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
 								
-								side->lookup4(result,u,v,lookup,thread);
+								side->lookup4(result,u,v,lookup,context);
 							} else {
 								initv(result,0,0,0);
 							}

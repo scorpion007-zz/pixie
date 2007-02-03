@@ -54,7 +54,9 @@
 																						\
 	assert(vertexSize > 0);																\
 																						\
-	__dest = __vertex = (float *) ralloc(vertexSize*(__nu)*(__nv)*sizeof(float),__context->threadMemory);	\
+	if (__vertex == NULL)	__vertex = (float *) ralloc(vertexSize*(__nu)*(__nv)*sizeof(float),__context->threadMemory);	\
+																						\
+	__dest	=	__vertex;																\
 																						\
 	for (__j=0;__j<(__nv);__j++) {														\
 		const int __vVertex	=	((__v) + __j) % vvertices;								\
@@ -1449,7 +1451,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 	if (degree == 1) {
 		float			uMult;
 		float			vMult;
-		float			*vertex;
+		float			*vertex	=	NULL;
 		CParameter		*parameters;
 		int				upatches,vpatches;
 
@@ -1485,7 +1487,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 		int				i,j,k;
 		float			uMult;
 		float			vMult;
-		float			*vertex;
+		float			*vertex	=	NULL;
 		int				upatches,vpatches;
 		CParameter		*parameters;
 		const int		us		=	attributes->uStep;
@@ -1672,7 +1674,7 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	const int		uPatches		=	uVertices - uOrder+1;
 	const int		vPatches		=	vVertices - vOrder+1;
 	int				i,j,k;
-	float			*vertex;
+	float			*vertex			=	NULL;
 	CParameter		*parameters;
 	CPl				*parameterList;
 	CVertexData		*vertexData;

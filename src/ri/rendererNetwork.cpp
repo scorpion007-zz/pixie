@@ -381,10 +381,7 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	i					=	(i / sizeof(T32))+2;
 
 	// Allocate tmp space
-	osLock(memoryMutex);
-	memBegin(globalMemory);
-
-	buffer				=	(T32 *) ralloc((i+4)*sizeof(T32),globalMemory);
+	buffer				=	(T32 *) alloca((i+4)*sizeof(T32));
 
 	buffer[0].integer	=	NET_SEND_FILE;
 	buffer[1].integer	=	start;
@@ -416,9 +413,6 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 
 		r	=	tsize;
 	}
-
-	memEnd(globalMemory);
-	osUnlock(memoryMutex);
 
 	return r;
 }

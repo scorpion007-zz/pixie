@@ -217,13 +217,13 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 
 			if (datas[i].data(datas[i].handle,left,top,width,height,dispatch) == FALSE) {
 				// Lock this piece of code
-				osLock(dispatchMutex);
+				osLock(displayKillMutex);
 				datas[i].handle	=	NULL;
 				numActiveDisplays--;
 				if (numActiveDisplays == 0)	hiderFlags	|=	HIDER_BREAK;
 				osUnloadModule(datas[i].module);
 				datas[i].module	=	NULL;
-				osUnlock(dispatchMutex);
+				osUnlock(displayKillMutex);
 			}
 		}
 	}

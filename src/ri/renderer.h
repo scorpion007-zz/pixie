@@ -174,9 +174,9 @@ public:
 		//    we're defining them as global
 		//
 		////////////////////////////////////////////////////////////////////
+		static	TMutex							jobMutex;					// The mutex that controls job dispatch
 		static	TMutex							commitMutex;				// The mutex that controls job dispatch
-		static	TMutex							dispatchMutex;				// To serialize the bucket dispatch if needed
-		static	TMutex							memoryMutex;				// To serialize accesses to the global memory
+		static	TMutex							displayKillMutex;			// To serialize the killing of a thread
 		static	TMutex							networkMutex;				// To serialize the network communication
 		static	TMutex							hierarchyMutex;				// To serialize the raytracing hierarchy
 		static	TMutex							tesselateMutex;				// To serialize the tesselation
@@ -206,6 +206,13 @@ public:
 		static	void			endFrame();														// Called in WorldEnd
 		static	void			renderFrame();													// Called in WorldEnd
 		static	void			render(CObject *object);										// Called to insert an object into the scene
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with thread synthronication (defined in rendererMutexes.cpp)
+		////////////////////////////////////////////////////////////////////
+		static	void			beginMutexes();
+		static	void			endMutexes();
+
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with rendering (defined in rendererJobs.cpp)

@@ -1266,7 +1266,6 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		if (strcmp(cVar->name,"st") == 0) {
 			CPl		*npl;
 
-			osLock(CRenderer::memoryMutex);
 			memBegin(CRenderer::globalMemory);
 
 			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *),CRenderer::globalMemory);
@@ -1340,7 +1339,6 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 			npl	=	parseParameterList(numUniform,numVertex,numVarying,numFaceVarying,j,ntokens,nvals,required,flags,attributes);
 
 			memEnd(CRenderer::globalMemory);
-			osUnlock(CRenderer::memoryMutex);
 
 			return npl;
 		}

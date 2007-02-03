@@ -168,12 +168,19 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 	// Unable to find the file, check the network
 	// Check the net if we can find the file
 	if (netClient != INVALID_SOCKET) {
+
+		// Lock the network
+		osLock(networkMutex);
+
 		if (getFile(result,name) == TRUE) {
 			if (osFileExists(result)) {
 				info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",name,result);
 				return TRUE;
 			}
 		}
+
+		// Unlock the network
+		osUnlock(networkMutex);
 	}
 
 	info(CODE_RESOLUTION,"\"%s\" -> ???\n",name);
@@ -192,9 +199,9 @@ public:
 						CDummyTexture(const char *name) : CTexture(name) {}
 						~CDummyTexture() {}
 
-	float				lookupz(float u,float v,float z,const CTextureLookup *lookup,int thread)					{ return 0;	}
-	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup,int thread)					{ initv(dest,lookup->fill);	}
-	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,int thread)	{ initv(dest,lookup->fill);	}
+	float				lookupz(float u,float v,float z,const CTextureLookup *lookup,CShadingContext *context)						{ return 0;	}
+	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup,CShadingContext *context)					{ initv(dest,lookup->fill);	}
+	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context)	{ initv(dest,lookup->fill);	}
 	};
 
 
@@ -207,7 +214,7 @@ public:
 						CDummyEnvironment(const char *name) : CEnvironment(name) {}
 						~CDummyEnvironment() {}
 						
-	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,int thread) { initv(dest,lookup->fill);	}
+	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) { initv(dest,lookup->fill);	}
 };
 
 

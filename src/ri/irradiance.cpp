@@ -708,7 +708,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup,context->thread);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -813,7 +813,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup,context->thread);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{

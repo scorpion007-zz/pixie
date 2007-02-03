@@ -61,8 +61,6 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			job.xBucket				=	netBuffer[1].integer;
 			job.yBucket				=	netBuffer[2].integer;
 
-			osUnlock(networkMutex);
-			return;
 		} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
 			// We have finished the frame, so terminate
 			netBuffer[0].integer	=	NET_ACK;
@@ -72,15 +70,13 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			sendFrameDataChannels();
 			
 			job.type				=	CJob::TERMINATE;
-			
-			osUnlock(networkMutex);
-			return;
 		} else {
 			error(CODE_BUG,"Unrecognised network request\n");
 			job.type				=	CJob::TERMINATE;
-			osUnlock(networkMutex);
-			return;
 		}
+
+		osUnlock(networkMutex);
+		return;
 	}
 
 	// We do not have a client
@@ -89,7 +85,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 
 
 	// Lock the bucket info
-	osLock(commitMutex);
+	osLock(jobMutex);
 
 	// If we're done, tell the hider to terminate
 	if (hiderFlags & (HIDER_DONE | HIDER_BREAK)) {
@@ -146,7 +142,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 	}
 
 	// Release the bucket info
-	osUnlock(commitMutex);
+	osUnlock(jobMutex);
 }
 
 
@@ -160,7 +156,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 
 	// Lock
-	osLock(commitMutex);
+	osLock(jobMutex);
 
 	if (currentPhoton < numEmitPhotons) {
 
@@ -182,7 +178,7 @@ void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 	}
 
 	// Unlock
-	osUnlock(commitMutex);
+	osUnlock(jobMutex);
 }
 
 
@@ -291,7 +287,7 @@ void		CRenderer::serverThread(void *w) {
 		float	*buffer;
 
 		// Find the needed bucket
-		osLock(commitMutex);
+		osLock(jobMutex);
 
 		// Get the current bucket and advance the bucket
 		if (advanceBucket(index,x,y) == FALSE) {
@@ -299,7 +295,7 @@ void		CRenderer::serverThread(void *w) {
 		}
 
 		// Release the bucket
-		osUnlock(commitMutex);
+		osUnlock(jobMutex);
 
 		if (done == FALSE) {
 
