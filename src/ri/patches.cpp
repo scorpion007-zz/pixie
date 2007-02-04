@@ -1275,8 +1275,15 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		}
 
 		if (pl->data1 != NULL) {
+			const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 			for (P=pl->data1,i=0;i<(uVertices*vVertices);i++,P+=3) {
-				mulmp(tmp,xform->from,P);
+				mulmp(tmp,from,P);
+				addBox(bmin,bmax,tmp);
+			}
+		} else if (xform->next != NULL) {
+			const float *from = xform->next->from;
+			for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=3) {
+				mulmp(tmp,from,P);
 				addBox(bmin,bmax,tmp);
 			}
 		}
@@ -1333,7 +1340,7 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 						zg[element(r,c)]	=	P[COMP_Z];
 					}
 				}
-
+				
 				makeCubicBoundX(bmin,bmax,xg,yg,zg,xform);
 
 				if (pl->data1 != NULL) {
@@ -1348,14 +1355,19 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 							zg[element(r,c)]	=	P[COMP_Z];
 						}
 					}
-
-					makeCubicBoundX(bmin,bmax,xg,yg,zg,xform);
+					
+					if (xform->next != NULL) {
+						makeCubicBoundX(bmin,bmax,xg,yg,zg,xform->next);
+					} else {
+						makeCubicBoundX(bmin,bmax,xg,yg,zg,xform);
+					}
+				} else if (xform->next != NULL) {
+					makeCubicBoundX(bmin,bmax,xg,yg,zg,xform->next);
 				}
-
 			}
 		}
 	}
-
+	
 	makeBound(bmin,bmax);
 }
 
@@ -1592,10 +1604,20 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 	}
 
 	if (pl->data1 != NULL) {
+		const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 		for (P=pl->data1,i=0;i<(uVertices*vVertices);i++,P+=4) {
 			htpoint	tmp;
 
-			mulmp4(tmp,xform->from,P);
+			mulmp4(tmp,from,P);
+			mulvf(tmp,1/tmp[3]);
+			addBox(bmin,bmax,tmp);
+		}
+	} else if (xform->next != NULL) {
+		const float *from = xform->next->from;
+		for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=4) {
+			htpoint	tmp;
+	
+			mulmp4(tmp,from,P);
 			mulvf(tmp,1/tmp[3]);
 			addBox(bmin,bmax,tmp);
 		}

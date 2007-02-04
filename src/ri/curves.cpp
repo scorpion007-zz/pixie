@@ -689,8 +689,15 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 		}
 
 		if (pl->data1 != NULL) {
+			const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 			for (P=pl->data1,i=numVertices;i>0;i--,P+=3) {
-				mulmp(tmp,xform->from,P);
+				mulmp(tmp,from,P);
+				addBox(bmin,bmax,tmp);
+			}
+		} else if (xform->next != NULL) {
+			const float *from = xform->next->from;
+			for (P=pl->data0,i=numVertices;i>0;i--,P+=3) {
+				mulmp(tmp,from,P);
 				addBox(bmin,bmax,tmp);
 			}
 		}
@@ -723,7 +730,13 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 					v2			=	pl->data1 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 					v3			=	pl->data1 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-					makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform);
+					if (xform->next != NULL) {
+						makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform->next);
+					} else {
+						makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform);
+					}
+				} else if (xform->next != NULL) {
+					makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform->next);
 				}
 			}
 

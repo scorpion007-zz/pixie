@@ -102,8 +102,15 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	}
 
 	if (pl->data1 != NULL) {
+		const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 		for (vertex=pl->data1,i=0;i<numPoints;i++,vertex+=3) {
-			mulmp(tmp,xform->from,vertex);
+			mulmp(tmp,from,vertex);
+			addBox(bmin,bmax,tmp);
+		}
+	} else if (xform->next != NULL) {
+		const float *from = xform->next->from;
+		for (vertex=pl->data0,i=0;i<numPoints;i++,vertex+=3) {
+			mulmp(tmp,from,vertex);
 			addBox(bmin,bmax,tmp);
 		}
 	}
