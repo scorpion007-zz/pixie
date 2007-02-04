@@ -615,12 +615,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				memcpy(u,uSave,num*sizeof(float));
 				memcpy(v,vSave,num*sizeof(float));
 				memcpy(t,tSave,num*sizeof(float));
-			} else {
-				float		*dPdtime	=	varying[VARIABLE_DPDTIME];
-				int			num			=	(dim == SHADING_2D) ? numVertices : numVertices*3;
-
-				for (;num>0;num--,dPdtime+=3)	initv(dPdtime,0);
 			}
+			// Note: we do not deal with the no-motion case here, it is filled below
+			// when we fill the current time sample
 		}
 	} else {
 
