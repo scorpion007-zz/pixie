@@ -967,7 +967,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					const int nb = div>>1;
 					
 					const float	*cP0	=	thisTesselation->P;
-					const float	*cP1	=	thisTesselation->P + (div+1)*(div+1)*3;
+					const float	*cP1	=	cP0 + (div+1)*(div+1)*3;
 					
 					for (int j=0;j<nb;j++) {
 						for (int i=0;i<nb;i++,cP0+=6,cP1+=6) {
@@ -991,7 +991,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					const float vrg		=	(vmax - vmin) / (float) div;
 					
 					const float	*cP0	=	thisTesselation->P;
-					const float	*cP1	=	thisTesselation->P + (div+1)*(div+1)*3;
+					const float	*cP1	=	cP0 + (div+1)*(div+1)*3;
 			
 					for (int j=0;j<div;j++) {
 						for (int i=0;i<div;i++,cP0+=3,cP1+=3) {
@@ -1083,7 +1083,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 							const float	*cP1	=	Pt1 + (x*4 + y*4*(div+1))*3;
 			
 							for (int cj=0;cj<4;cj++) {
-								for (int ci=0;ci<4;ci++,cP0+=3,cP1) {
+								for (int ci=0;ci<4;ci++,cP0+=3,cP1+=3) {
 									interpolatev(P00,	cP0,				cP1,				timev);
 									interpolatev(P10,	cP0+3,				cP1+3,				timev);
 									interpolatev(P01,	cP0+(div+1)*3,		cP1+(div+1)*3,		timev);
