@@ -942,7 +942,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				interpolatev(P00,Pt0,  Pt1,  timev);
 				interpolatev(P10,Pt0+3,Pt1+3,timev);
 				interpolatev(P01,Pt0+6,Pt1+6,timev);
-				interpolatev(P10,Pt0+9,Pt1+9,timev);
+				interpolatev(P11,Pt0+9,Pt1+9,timev);
 								
 				const float urg		=	(umax - umin);
 				const float vrg		=	(vmax - vmin);
