@@ -333,11 +333,11 @@ public:
 					// Description			:	Ctor
 					// Return Value			:	-
 					// Comments				:
-					CSFace(CSubdivData &d) : data(d) {
+					CSFace(CSubdivData &d,int ui) : data(d) {
 						numEdges		=	0;
 						edges			=	NULL;
 						vertices		=	NULL;
-						uniformIndex	=	0;
+						uniformIndex	=	ui;
 						children		=	NULL;
 						childVertex		=	NULL;
 						hole			=	FALSE;
@@ -378,10 +378,9 @@ public:
 
 							// Create the edges connected to the center
 							for (i=0;i<numEdges;i++) {
-								CSFace	*cFace		=	new (data.context) CSFace(data);
+								CSFace	*cFace		=	new (data.context) CSFace(data,uniformIndex);
 								CSEdge	*cEdge		=	new (data.context) CSEdge(data);
 
-								cFace->uniformIndex	=	uniformIndex;
 								cFace->numEdges		=	4;
 								cFace->edges		=	(CSEdge **)		ralloc(4*sizeof(CSEdge *),data.context->threadMemory);
 								cFace->vertices		=	(CSVertex **)	ralloc(4*sizeof(CSVertex *),data.context->threadMemory);
@@ -1793,7 +1792,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 
 	// Create the faces
 	for (i=0;i<numFaces;i++) {
-		faces[i]				=	new (data.context) CSFace(data);
+		faces[i]				=	new (data.context) CSFace(data,i);
 	}
 	
 	// Manage the connectivity

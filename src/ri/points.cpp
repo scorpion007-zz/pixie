@@ -55,7 +55,7 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	this->points				=	NULL;
 
 	// Find the maximum size we'll have
-	const float	expansion		=	(float) (pow((double) fabs(determinantm(xform->from)),1.0 / 3.0) / 2.0);
+	const float	expansion		=	(float) pow((double) fabs(determinantm(xform->from)),1.0 / 3.0);
 	float		maxSize			=	0;
 
 	// Compute the maximum point size (for bounding volume computation)
@@ -109,7 +109,7 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	}
 
 	if (maxSize < 0)	maxSize	=	1;
-	maxSize	*=	expansion;
+	maxSize	*=	expansion*0.5f;
 	subvf(bmin,maxSize);
 	addvf(bmax,maxSize);
 	makeBound(bmin,bmax);
@@ -403,7 +403,7 @@ void	CPoints::prep() {
 	pl->transform(xform);
 
 	// Transform the size variable
-	const float	expansion		=	(float) (pow((double) fabs(determinantm(xform->from)),1.0 / 3.0) / 2.0);
+	const float	expansion		=	(float) pow((double) fabs(determinantm(xform->from)),1.0 / 3.0);
 	float		*vertex;
 	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;

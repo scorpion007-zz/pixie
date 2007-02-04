@@ -274,12 +274,12 @@ private:
 				// Comments				:	(inline for speed)
 				inline void		distance2samples(int n,float *dist,float *P) {
 									if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-										for (;n>0;n--,P+=3) {
-											*dist++		=	CRenderer::dSampledx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
+										for (;n>0;n--,P+=3,dist++) {
+											*dist		=	CRenderer::dSampledx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
 										}
 									} else {
-										for (;n>0;n--,P+=3) {
-											*dist++		=	CRenderer::dSampledx*dist[0];
+										for (;n>0;n--,P+=3,dist++) {
+											*dist		=	CRenderer::dSampledx*dist[0];
 										}
 									}
 								}

@@ -824,7 +824,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 			// Make sure we record the point sizes
 			for (sizes=grid->sizes,i=numPoints;i>0;i--,sizes+=2) {
-				sizes[0]	=	*sizeArray++;
+				sizes[0]	=	(*sizeArray++*0.5f);
 			}
 
 		} else {
@@ -886,7 +886,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 				// Make sure we record the point sizes
 				for (sizes=grid->sizes,i=numPoints;i>0;i--,sizes+=2) {
-					sizes[1]	=	*sizeArray++;
+					sizes[1]	=	(*sizeArray++)*0.5f;
 				}
 			} else {
 				// Shade the points
@@ -1333,10 +1333,8 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 	// Account for the motion if applicable
 	if (grid->flags & RASTER_MOVING) {
-		const float	*sVertex;
 
-		for (sVertex=grid->vertices,i=grid->numVertices;i>0;i--,sVertex+=numVertexSamples) {
-			const float	*cVertex	=	sVertex + CRenderer::numExtraSamples+10;
+		for (cVertex=grid->vertices+CRenderer::numExtraSamples+10,i=grid->numVertices;i>0;i--,cVertex+=numVertexSamples) {
 			if (cVertex[0] < xmin)	xmin	=	cVertex[0];
 			if (cVertex[1] < ymin)	ymin	=	cVertex[1];
 			if (cVertex[2] < zmin)	zmin	=	cVertex[2];

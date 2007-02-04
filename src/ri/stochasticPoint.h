@@ -314,10 +314,10 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 			const	float	dx		=	xcent - v0[0];
 			const	float	dy		=	ycent - v0[1];
 
+			v0	=	vertices;
+
 			if ((dx*dx + dy*dy) < (size*size)) {
 				const	float	z	=	v0[2];
-
-				v0	=	vertices;
 
 				drawPixelCheck();
 			}

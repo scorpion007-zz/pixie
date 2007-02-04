@@ -615,6 +615,11 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				memcpy(u,uSave,num*sizeof(float));
 				memcpy(v,vSave,num*sizeof(float));
 				memcpy(t,tSave,num*sizeof(float));
+			} else {
+				float		*dPdtime	=	varying[VARIABLE_DPDTIME];
+				int			num			=	(dim == SHADING_2D) ? numVertices : numVertices*3;
+
+				for (;num>0;num--,dPdtime+=3)	initv(dPdtime,0);
 			}
 		}
 	} else {
@@ -1008,22 +1013,22 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			numShaded					+=	numVertices;
 			surface->execute(this,locals[ACCESSOR_SURFACE]);
 		} else {
-			float			*color		=	varying[VARIABLE_CI];
-			float			*opacity	=	varying[VARIABLE_OI];
-			float			*normal		=	varying[VARIABLE_N];
-			float			*point		=	varying[VARIABLE_P];
-			const float		*Cs			=	currentAttributes->surfaceColor;
-			const float		*Os			=	currentAttributes->surfaceOpacity;
+			float			*C		=	varying[VARIABLE_CI];
+			float			*O		=	varying[VARIABLE_OI];
+			float			*N		=	varying[VARIABLE_N];
+			float			*I		=	varying[VARIABLE_I];
+			const float		*Cs		=	currentAttributes->surfaceColor;
+			const float		*Os		=	currentAttributes->surfaceOpacity;
 
 			for (i=numVertices;i>0;i--) {
-				normalizevf(normal);
-				normalizevf(point);
-				mulvf(color,Cs,absf(dotvv(point,normal)));
-				movvv(opacity,Os);
-				color	+=	3;
-				opacity	+=	3;
-				normal	+=	3;
-				point	+=	3;
+				normalizevf(N);
+				normalizevf(I);
+				mulvf(C,Cs,absf(dotvv(I,N)));
+				movvv(O,Os);
+				C	+=	3;
+				O	+=	3;
+				N	+=	3;
+				I	+=	3;
 			}
 		}
 
