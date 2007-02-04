@@ -456,15 +456,10 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 /////////////////////////////////////////////
 
 
-//FIXMES:
-/*
-make r,ru,rv guesses constructor params
-remove minDepth stuff
-remove udiv,vdiv
-support untesselation
-	mutex per patch?
-
-*/
+// FIXMES:
+// remove or support minDepth / maxDepth usage (reinstate splits attributes)
+//	- careful because we us r tests to bail from higher tesselations
+// remove udiv,vdiv and hardcode the divisions?
 
 //#define DEBUG_HITS
 #define DEBUG_TESSELATIONS 0
@@ -483,7 +478,11 @@ CTesselationPatch	*CTesselationPatch::tesselationList;
 // Return Value			:	-
 // Comments				:
 CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,char depth,char minDepth,float r) : CObject(a,x) {
+	// Work out whether we're moving and mark us as a tesselation
 	this->flags		|=	OBJECT_TESSELATION;
+	if (o->moving()) 
+		this->flags |= OBJECT_MOVING_TESSELATION;
+	
 	// Record the stuff
 	this->object	=	o;
 	this->umin		=	umin;
@@ -552,7 +551,7 @@ CTesselationPatch::~CTesselationPatch() {
 // Return Value			:	-
 // Comments				:
 void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
-	// check the ray conditions before proceeding
+	// Check the ray conditions before proceeding
 	
 	if (! (cRay->flags & attributes->flags) )	return;
 
@@ -565,21 +564,21 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		}
 	}
 	
-	// intersect with our bounding box
+	// Intersect with our bounding box
 	float t = nearestBox(bmin,bmax,cRay->from,cRay->invDir,cRay->tmin,cRay->t);
 	
-	// bail out if the hit point is already further than the ray got
+	// Bail out if the hit point is already further than the ray got
 	if (!(t < cRay->t)) return;
 	
 	float requiredR = cRay->da * t + cRay->db;
 
-	// bail very early if this ray should have been handled by a coarser tesselation
+	// Bail very early if this ray should have been handled by a coarser tesselation
 	if (rmax*2.0f < requiredR && depth > 0) {
 		// do not proceed further
 		return;
 	}
 		
-	// find a tesselation level
+	// We must find the appropriate tesselation level
 	float	rCur	=	rmax;
 	int		div		=	1;
 	int		level	=	0;
@@ -590,34 +589,13 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		rCur	*=	0.25;
 		div		=	div<<2;
 	}
-	
-	#if 0
-		level = 0;
-		rCur = rmax;
-		div = 1;
-	#endif
-	
-	#if 0
-		// HACK - dissallow recursive splitting
-		if (level == TESSELATION_NUM_LEVELS)	{
-			level = 2;
-			rCur = rmax/16.0f;
-			div = 16;
-		}
-	#endif
-	
-	#if 0
-		//HACK for testing
-		level = 2;
-		rCur = rmax/16.2;
-		div = 16;
-	#endif
 		
-	// did we find one?
+	// Did we find a tesselation in this tesselationPatch?
 	if (level < TESSELATION_NUM_LEVELS) {
-		// r for level is sufficient
+		// Yes, our r is sufficient
 		
 		const int thread = context->thread;
+		
 		
 		// Verify we have a tesselation
 		if (levels[level].threadTesselation[thread] == NULL) {
@@ -676,17 +654,19 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		// Grab the threadTesselation and use from now on
 		CPurgableTesselation *thisTesselation	=	levels[level].threadTesselation[thread];
 		
+		
+		
 		// Intersect the ray
 		
 		#ifdef DEBUG_HITS
-		#define debugHit()															\
+			#define debugHit()														\
 										CDebugView	d("/tmp/tesselate.dat",TRUE);	\
 										vector p;									\
 										mulvf(p,cRay->dir,cRay->t);					\
 										addvv(p,cRay->from);						\
 										d.point(p);
 		#else
-		#define debugHit()
+			#define debugHit()
 		#endif
 	
 		#define solve()															\
@@ -782,177 +762,364 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 						break;													\
 				}
 		
+		// We treat moving patches differently
+		if (!(flags & OBJECT_MOVING_TESSELATION)) {
 		
-		if (div == 1) {
-			const float	*r		=	cRay->from;
-			const float	*q		=	cRay->dir;
-		
-			const float	*P00	=	levels[level].tesselation->P;
-			const float	*P10	=	P00+3;
-			const float	*P01	=	P00+6;
-			const float	*P11	=	P00+9;
-			
-			const float urg		=	(umax - umin);
-			const float vrg		=	(vmax - vmin);
-		
-			const int i = 0;
-			const int j = 0;
-			
-			intersectQuads();
-			return;
-			
-		} else if (div <= 4) {
-			if (rCur*0.5 < requiredR) {
-				// downsample 4x4 to 2x2 (not the same as above because we divided
-				// in the parametric space here we quads intersect directly
-				
+			// No motion
+			if (div == 1) {
+				// 1x1
 				const float	*r		=	cRay->from;
 				const float	*q		=	cRay->dir;
+			
+				const float	*P00	=	levels[level].tesselation->P;
+				const float	*P10	=	P00+3;
+				const float	*P01	=	P00+6;
+				const float	*P11	=	P00+9;
 				
-				const float urg		=	2.0f*(umax - umin) / (float) div;
-				const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+				const float urg		=	(umax - umin);
+				const float vrg		=	(vmax - vmin);
+			
+				const int i = 0;
+				const int j = 0;
 				
-				const float	*cP		=	thisTesselation->P;
+				intersectQuads();
+				return;
 				
-				const int nb = div>>1;
-				
-				for (int j=0;j<nb;j++) {
-					for (int i=0;i<nb;i++,cP += 6) {
-						const float	*P00	=	cP;
-						const float	*P10	=	cP+6;
-						const float	*P01	=	cP+(div+1)*6;
-						const float	*P11	=	cP+(div+1)*6+6;
-		
-						intersectQuads();
+			} else if (div <= 4) {
+				if (rCur*0.5 < requiredR) {
+					// downsample 4x4 to 2x2 (not the same as above because we divided
+					// in the parametric space here we quads intersect directly
+					
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	2.0f*(umax - umin) / (float) div;
+					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+					
+					const int nb = div>>1;
+					
+					const float	*cP		=	thisTesselation->P;
+					
+					for (int j=0;j<nb;j++) {
+						for (int i=0;i<nb;i++,cP+=6) {
+							const float	*P00	=	cP;
+							const float	*P10	=	cP+6;
+							const float	*P01	=	cP+(div+1)*6;
+							const float	*P11	=	cP+(div+1)*6+6;
+			
+							intersectQuads();
+						}
+						cP += (div+1)*3 +3;
 					}
-					cP += (div+1)*3 +3;
+				} else {
+					// 2x2 or 4x4 quads intersect directly
+					
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	(umax - umin) / (float) div;
+					const float vrg		=	(vmax - vmin) / (float) div;
+					
+					const float	*cP		=	thisTesselation->P;
+			
+					for (int j=0;j<div;j++) {
+						for (int i=0;i<div;i++,cP+=3) {
+							const float	*P00	=	cP;
+							const float	*P10	=	cP+3;
+							const float	*P01	=	cP+(div+1)*3;
+							const float	*P11	=	cP+(div+1)*3+3;
+			
+							intersectQuads();
+						}
+						cP += 3;
+					}
 				}
+				return;
 			} else {
-				// 2x2 or 4x4 quads intersect directly
-				
-				const float	*r		=	cRay->from;
-				const float	*q		=	cRay->dir;
-				
-				const float urg		=	(umax - umin) / (float) div;
-				const float vrg		=	(vmax - vmin) / (float) div;
-				
-				const float	*cP		=	thisTesselation->P;
-		
-				for (int j=0;j<div;j++) {
-					for (int i=0;i<div;i++,cP += 3) {
-						const float	*P00	=	cP;
-						const float	*P10	=	cP+3;
-						const float	*P01	=	cP+(div+1)*3;
-						const float	*P11	=	cP+(div+1)*3+3;
-		
-						intersectQuads();
+				if (rCur*0.5 < requiredR) {
+					// downsample 8x8 to 4x4 or 16x16 to 8x8
+					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
+					// we bound-intersect each 2x2 subgrid before intersecting quads
+									
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	2.0f*(umax - umin) / (float) div;
+					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+			
+					int nb				=	div>>2;
+					
+					const float	*P		=	thisTesselation->P;
+					const float	*cB		=	P+(div+1)*(div+1)*3;
+					
+					for (int y=0;y<nb;y++) {
+						for (int x=0;x<nb;x++,cB+=6) {
+							
+							float tmin = cRay->tmin;
+							float tmax = cRay->t;
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+								continue;
+							}
+							
+							const float	*cP	=	P + (x*4 + y*4*(div+1))*3;
+			
+							for (int cj=0;cj<2;cj++) {
+								for (int ci=0;ci<2;ci++,cP+=6) {
+									const float	*P00	=	cP;
+									const float	*P10	=	cP+6;
+									const float	*P01	=	cP+(div+1)*6;
+									const float	*P11	=	cP+(div+1)*6 + 6;
+					
+									const int i = x*2+ci;
+									const int j	= y*2+cj;
+									
+									intersectQuads();
+								}
+								cP += (div+1)*3 + (div-4+1)*3;
+							}
+						}
 					}
-					cP += 3;
+				} else {
+					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
+					// we bound-intersect each 4x4 subgrid before intersecting quads
+					
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	(umax - umin) / (float) div;
+					const float vrg		=	(vmax - vmin) / (float) div;
+			
+					int nb				=	div>>2;
+								
+					const float	*P		=	thisTesselation->P;
+					const float	*cB		=	P+(div+1)*(div+1)*3;
+					
+					for (int y=0;y<nb;y++) {
+						for (int x=0;x<nb;x++,cB+=6) {
+							
+							float tmin = cRay->tmin;
+							float tmax = cRay->t;
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+								continue;
+							}
+							
+							const float	*cP	=	P + (x*4 + y*4*(div+1))*3;
+			
+							for (int cj=0;cj<4;cj++) {
+								for (int ci=0;ci<4;ci++,cP += 3) {
+									const float	*P00	=	cP;
+									const float	*P10	=	cP+3;
+									const float	*P01	=	cP+(div+1)*3;
+									const float	*P11	=	cP+(div+1)*3 + 3;
+					
+									const int i = x*4+ci;
+									const int j	= y*4+cj;
+									
+									intersectQuads();
+								}
+								cP += (div-4+1)*3;
+							}
+						}
+					}
+		
 				}
 			}
-			return;
 		} else {
-			if (rCur*0.5 < requiredR) {
-				// downsample 8x8 to 4x4 or 16x16 to 8x8
-				// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
-				// we bound-intersect each 2x2 subgrid before intersecting quads
-								
+		
+			// We're moving
+			
+			const float timev = cRay->time;
+			
+			vector P00,P10,P01,P11;
+			
+			if (div == 1) {
 				const float	*r		=	cRay->from;
 				const float	*q		=	cRay->dir;
 				
-				const float urg		=	2.0f*(umax - umin) / (float) div;
-				const float vrg		=	2.0f*(vmax - vmin) / (float) div;
-		
-				const float	*P		=	thisTesselation->P;
-				const float	*cB		=	P+(div+1)*(div+1)*3;
-		
-				int nb				=	div>>2;
+				const float	*Pt0	=	levels[level].tesselation->P;
+				const float	*Pt1	=	Pt0 + 4*3;
 				
-				for (int y=0;y<nb;y++) {
-					for (int x=0;x<nb;x++,cB += 6) {
-						
-						float tmin = cRay->tmin;
-						float tmax = cRay->t;
-						if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// pull out ray t etc to shadows
-							continue;
-						}
-						
-						const float	*cP	=	P + (x*4 + y*4*(div+1))*3;
-		
-						for (int cj=0;cj<2;cj++) {
-							for (int ci=0;ci<2;ci++,cP += 6) {
-								const float	*P00	=	cP;
-								const float	*P10	=	cP+6;
-								const float	*P01	=	cP+(div+1)*6;
-								const float	*P11	=	cP+(div+1)*6 + 6;
-				
-								const int i = x*2+ci;
-								const int j	= y*2+cj;
+				interpolatev(P00,Pt0,  Pt1,  timev);
+				interpolatev(P10,Pt0+3,Pt1+3,timev);
+				interpolatev(P01,Pt0+6,Pt1+6,timev);
+				interpolatev(P10,Pt0+9,Pt1+9,timev);
 								
-								intersectQuads();
-							}
-							cP += (div+1)*3 + (div-4+1)*3;
+				const float urg		=	(umax - umin);
+				const float vrg		=	(vmax - vmin);
+			
+				const int i = 0;
+				const int j = 0;
+				
+				intersectQuads();
+				return;
+				
+			} else if (div <= 4) {
+				if (rCur*0.5 < requiredR) {
+					// downsample 4x4 to 2x2 (not the same as above because we divided
+					// in the parametric space here we quads intersect directly
+					
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	2.0f*(umax - umin) / (float) div;
+					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+										
+					const int nb = div>>1;
+					
+					const float	*cP0	=	thisTesselation->P;
+					const float	*cP1	=	thisTesselation->P + (div+1)*(div+1)*3;
+					
+					for (int j=0;j<nb;j++) {
+						for (int i=0;i<nb;i++,cP0+=6,cP1+=6) {
+							interpolatev(P00,	cP0,				cP1,			timev);
+							interpolatev(P10,	cP0+6,				cP1+6,			timev);
+							interpolatev(P01,	cP0+(div+1)*6,		cP1+(div+1)*6,	timev);
+							interpolatev(P11,	cP0+(div+1)*6+6,	cP1+(div+1)*6+6,timev);
+			
+							intersectQuads();
 						}
+						cP0 += (div+1)*3 +3;
+						cP1 += (div+1)*3 +3;
+					}
+				} else {
+					// 2x2 or 4x4 quads intersect directly
+					
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	(umax - umin) / (float) div;
+					const float vrg		=	(vmax - vmin) / (float) div;
+					
+					const float	*cP0	=	thisTesselation->P;
+					const float	*cP1	=	thisTesselation->P + (div+1)*(div+1)*3;
+			
+					for (int j=0;j<div;j++) {
+						for (int i=0;i<div;i++,cP0+=3,cP1+=3) {
+							interpolatev(P00,	cP0,				cP1,			timev);
+							interpolatev(P10,	cP0+3,				cP1+3,			timev);
+							interpolatev(P01,	cP0+(div+1)*3,		cP1+(div+1)*3,	timev);
+							interpolatev(P11,	cP0+(div+1)*3+3,	cP1+(div+1)*3+3,timev);
+			
+							intersectQuads();
+						}
+						cP0 += 3;
+						cP1 += 3;
 					}
 				}
+				return;
 			} else {
-				// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
-				// we bound-intersect each 4x4 subgrid before intersecting quads
-				
-				const float	*r		=	cRay->from;
-				const float	*q		=	cRay->dir;
-				
-				const float urg		=	(umax - umin) / (float) div;
-				const float vrg		=	(vmax - vmin) / (float) div;
-		
-				const float	*P		=	thisTesselation->P;
-				const float	*cB		=	P+(div+1)*(div+1)*3;
-		
-				int nb				=	div>>2;
-				
-				for (int y=0;y<nb;y++) {
-					for (int x=0;x<nb;x++,cB += 6) {
-						
-						float tmin = cRay->tmin;
-						float tmax = cRay->t;
-						if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// pull out ray t etc to shadows
-							continue;
-						}
-						
-						const float	*cP	=	P + (x*4 + y*4*(div+1))*3;
-		
-						for (int cj=0;cj<4;cj++) {
-							for (int ci=0;ci<4;ci++,cP += 3) {
-								const float	*P00	=	cP;
-								const float	*P10	=	cP+3;
-								const float	*P01	=	cP+(div+1)*3;
-								const float	*P11	=	cP+(div+1)*3 + 3;
-				
-								const int i = x*4+ci;
-								const int j	= y*4+cj;
-								
-								intersectQuads();
+				if (rCur*0.5 < requiredR) {
+					// downsample 8x8 to 4x4 or 16x16 to 8x8
+					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
+					// we bound-intersect each 2x2 subgrid before intersecting quads
+									
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	2.0f*(umax - umin) / (float) div;
+					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
+			
+					int nb				=	div>>2;
+					
+					const float	*Pt0	=	thisTesselation->P;
+					const float	*Pt1	=	Pt0+(div+1)*(div+1)*3;
+					const float	*cB		=	Pt1+(div+1)*(div+1)*3;
+					
+					for (int y=0;y<nb;y++) {
+						for (int x=0;x<nb;x++,cB += 6) {
+							
+							float tmin = cRay->tmin;
+							float tmax = cRay->t;
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+								continue;
 							}
-							cP += (div-4+1)*3;
+							
+							const float	*cP0	=	Pt0 + (x*4 + y*4*(div+1))*3;
+							const float	*cP1	=	Pt1 + (x*4 + y*4*(div+1))*3;
+
+							for (int cj=0;cj<2;cj++) {
+								for (int ci=0;ci<2;ci++,cP0+=6,cP1+=6) {
+									interpolatev(P00,	cP0,				cP1,				timev);
+									interpolatev(P10,	cP0+6,				cP1+6,				timev);
+									interpolatev(P01,	cP0+(div+1)*6,		cP1+(div+1)*6,		timev);
+									interpolatev(P11,	cP0+(div+1)*6 + 6,	cP1+(div+1)*6 + 6,	timev);
+					
+									const int i = x*2+ci;
+									const int j	= y*2+cj;
+									
+									intersectQuads();
+								}
+								cP0 += (div+1)*3 + (div-4+1)*3;
+								cP1 += (div+1)*3 + (div-4+1)*3;
+							}
 						}
 					}
+				} else {
+					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
+					// we bound-intersect each 4x4 subgrid before intersecting quads
+					
+					const float	*r		=	cRay->from;
+					const float	*q		=	cRay->dir;
+					
+					const float urg		=	(umax - umin) / (float) div;
+					const float vrg		=	(vmax - vmin) / (float) div;
+					
+					int nb				=	div>>2;
+					
+					const float	*Pt0	=	thisTesselation->P;
+					const float	*Pt1	=	Pt0+(div+1)*(div+1)*3;
+					const float	*cB		=	Pt1+(div+1)*(div+1)*3;
+			
+					for (int y=0;y<nb;y++) {
+						for (int x=0;x<nb;x++,cB += 6) {
+							
+							float tmin = cRay->tmin;
+							float tmax = cRay->t;
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+								continue;
+							}
+							
+							const float	*cP0	=	Pt0 + (x*4 + y*4*(div+1))*3;
+							const float	*cP1	=	Pt1 + (x*4 + y*4*(div+1))*3;
+			
+							for (int cj=0;cj<4;cj++) {
+								for (int ci=0;ci<4;ci++,cP0+=3,cP1) {
+									interpolatev(P00,	cP0,				cP1,				timev);
+									interpolatev(P10,	cP0+3,				cP1+3,				timev);
+									interpolatev(P01,	cP0+(div+1)*3,		cP1+(div+1)*3,		timev);
+									interpolatev(P11,	cP0+(div+1)*3 + 3,	cP1+(div+1)*3 + 3,	timev);
+					
+									const int i = x*4+ci;
+									const int j	= y*4+cj;
+									
+									intersectQuads();
+								}
+								cP0 += (div-4+1)*3;
+								cP1 += (div-4+1)*3;
+							}
+						}
+					}
+		
 				}
-	
 			}
 		}
 	} else {
+		// We do not posess a fine enough tesselation, check if we have
+		// already generated a finer set by splitting
+		
 		if (children == NULL) {
-			// We must lock the hierarchyMutex so that the list of known tesselation patches
+			// We must lock the tesselateMutex so that the list of known tesselation patches
 			// is maintained in a thread safe manner
 
 			osLock(CRenderer::tesselateMutex);
 			
 			if (children != NULL) {
+				// Another thread already did it
 				osUnlock(CRenderer::tesselateMutex);
 				return;
 			}
 	
-			// we have no sufficient level, split to children.  Let them deal with it
+			// Split to children to generate finer patches.  Let them deal with it
 			splitToChildren(context);
 
 			osUnlock(CRenderer::tesselateMutex);
@@ -1006,6 +1173,12 @@ void CTesselationPatch::initTesselation(CShadingContext *context) {
 // Description			:	Find the best tesselation for this object
 // Return Value			:
 // Comments				:
+///////////////////////////////////////////////////////////////////////
+// Class				:	CSurface
+// Method				:	tesselate
+// Description			:	Find the best tesselation for this object
+// Return Value			:
+// Comments				:
 CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingContext *context,char rdiv,int estimateOnly) {
 	// Get some misc variables for fast access
 	
@@ -1021,43 +1194,27 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	const float	vstep	=	(vmax-vmin) / (float) div;
 
 	// Compute the sample positions and corresponding normal vectors
-	float	*uv			=	varying[VARIABLE_U];
-	float	*vv			=	varying[VARIABLE_V];
-	float	*timev		=	varying[VARIABLE_TIME];
-	int		up,vp;
-	float	u,v;
-	for (vp=div+1,v=vmin;vp>0;vp--,v+=vstep) {
-		for (up=div+1,u=umin;up>0;up--,u+=ustep) {
-			*uv++		=	u;
-			*vv++		=	v;
-			*timev++	=	0;
-		}
+#define sampleTesselation(sample,time)											\
+	{																			\
+		float	*uv			=	varying[VARIABLE_U];							\
+		float	*vv			=	varying[VARIABLE_V];							\
+		float	*timev		=	varying[VARIABLE_TIME];							\
+		int		up,vp;															\
+		float	u,v;															\
+		for (vp=div+1,v=vmin;vp>0;vp--,v+=vstep) {								\
+			for (up=div+1,u=umin;up>0;up--,u+=ustep) {							\
+				*uv++		=	u;												\
+				*vv++		=	v;												\
+				*timev++	=	time;											\
+			}																	\
+		}																		\
+		context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | sample | PARAMETER_RAYTRACE);	\
 	}
-	context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE | PARAMETER_RAYTRACE);
 	
-	// Evaluate the quality of this tesselation in u and v separately
-	int		i;
-	float	vMax	=	0;
-	float	vAvg	=	0;
-	for (i=0;i<=div;i++) {
-		const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(div+1)*3,div);
-		vMax			=	max(vMax,l);
-		vAvg			+=	l;
-	}
-
-	float	uMax	=	0;
-	float	uAvg	=	0;
-	for (i=0;i<=div;i++) {
-		const float	l	=	measureLength(varying[VARIABLE_P] + i*(div+1)*3,3,div);
-		uMax			=	max(uMax,l);
-		uAvg			+=	l;
-	}
-
-	vAvg	/=	(float) (div+1)*div;
-	uAvg	/=	(float) (div+1)*div;
-		
-	// At this point, I should have the tesselation. So create the grid and return it
+	sampleTesselation(PARAMETER_BEGIN_SAMPLE,0);
 	
+	// At this point, We have the tesselation. So create the grid and return it, or initialize our
+	// grid size guess
 	
 	#if DEBUG_TESSELATIONS
 	{
@@ -1091,109 +1248,250 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 
 	// create P if it is so required
 	if (!estimateOnly) {
+		CPurgableTesselation	*cTesselation	=	NULL;
 		
-		if (rdiv == 1) {
-			// subsampling our 2x2 to 1x1, no bounds
-			
-			void					*mem			=	malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*3*sizeof(float));
-			CPurgableTesselation	*cTesselation	=	(CPurgableTesselation*) mem;
-			
-			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
-			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
-			cTesselation->size						=	2*2*3*sizeof(float);			
-	
-			movvv(cTesselation->P,		varying[VARIABLE_P]);
-			movvv(cTesselation->P+3,	varying[VARIABLE_P]+6);
-			movvv(cTesselation->P+6,	varying[VARIABLE_P]+18);
-			movvv(cTesselation->P+9,	varying[VARIABLE_P]+24);
-			
-			context->restoreState(savedState);
-			
-			// install tesselation last so other threads don't use bounds/P before they're ready
-			return cTesselation;
-			
-		} else if (rdiv <= 4) {
-			// not saving bounds here
-			void					*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float));
-			CPurgableTesselation	*cTesselation	= (CPurgableTesselation*) mem;
-
-			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
-			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
-			cTesselation->size						=	(div+1)*(div+1)*3*sizeof(float);
-			
-			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
-			
-			context->restoreState(savedState);
-			
-			// install tesselation last so other threads don't use bounds/P before they're ready
-			return cTesselation;
-		} else {
-			// create bounds, but only if it saves us work later
-						
-			int nb = div>>2;						// number of bounds in each direction
-			
-			// save off the data
-			
-			void					*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
-			CPurgableTesselation	*cTesselation	= (CPurgableTesselation*) mem;
-
-			cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
-			cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
-			cTesselation->size						=	((div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
-			
-			// FIXME: bounds should be first for cache efficiency
-			float *bounds							=	cTesselation->P + (div+1)*(div+1)*3;
-			
-			memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
-			
-			
-			// clear them
-			float *bnds = bounds;
-			for (i=0;i<nb*nb;i++,bnds+=6) {
-				initv(bnds,C_INFINITY);
-				initv(bnds+3,-C_INFINITY);
-			}
+		// Deal with moving tesselations differently, we
+		// must save off both ends of the sample if we have motion
+		if (!(flags & OBJECT_MOVING_TESSELATION)) {
 		
-			// sum them
-			bnds = bounds;
-			for (int y=0;y<nb;y++) {
-				for (int x=0; x<nb;x++,bnds+=6) {
-					const float *cP		=	cTesselation->P + (x*4 + y*4*(div+1))*3;
+			// No motion
+			if (rdiv == 1) {
+				// subsampling our 2x2 to 1x1, no bounds
 				
-					for (i=0;i<5;i++) {
-						for (int j=0;j<5;j++,cP+=3) {
-							addBox(bnds,bnds+3,cP);
+				void	*mem			=	malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*3*sizeof(float));
+						cTesselation	=	(CPurgableTesselation*) mem;
+				
+				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
+				cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+				cTesselation->size						=	2*2*3*sizeof(float);			
+		
+				movvv(cTesselation->P,		varying[VARIABLE_P]);
+				movvv(cTesselation->P+3,	varying[VARIABLE_P]+6);
+				movvv(cTesselation->P+6,	varying[VARIABLE_P]+18);
+				movvv(cTesselation->P+9,	varying[VARIABLE_P]+24);
+			} else if (rdiv <= 4) {
+				// not saving bounds here
+				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float));
+							cTesselation	= (CPurgableTesselation*) mem;
+	
+				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
+				cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+				cTesselation->size						=	(div+1)*(div+1)*3*sizeof(float);
+				
+				memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+			} else {
+				// create bounds, but only if it saves us work later
+							
+				int nb = div>>2;						// number of bounds in each direction
+				
+				// save the data
+				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
+							cTesselation	= (CPurgableTesselation*) mem;
+	
+				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
+				cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+				cTesselation->size						=	((div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
+				
+				// FIXME: bounds should be first for cache efficiency
+				float *bounds							=	cTesselation->P + (div+1)*(div+1)*3;
+				
+				memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+				
+				
+				// Clear bounds
+				float *bnds = bounds;
+				for (int i=0;i<nb*nb;i++,bnds+=6) {
+					initv(bnds,C_INFINITY);
+					initv(bnds+3,-C_INFINITY);
+				}
+			
+				// Sum them
+				bnds = bounds;
+				for (int y=0;y<nb;y++) {
+					for (int x=0; x<nb;x++,bnds+=6) {
+						const float *cP		=	cTesselation->P + (x*4 + y*4*(div+1))*3;
+					
+						for (int i=0;i<5;i++) {
+							for (int j=0;j<5;j++,cP+=3) {
+								addBox(bnds,bnds+3,cP);
+							}
+							cP += ((div+1)-5)*3;
 						}
-						cP += ((div+1)-5)*3;
 					}
 				}
-			}
-			
-			// expand them
-			bnds = bounds;
-			for(i=0;i<nb*nb;i++){
-				float maxBound	=	max(bnds[3+COMP_X]-bnds[COMP_X],bnds[3+COMP_Y]-bnds[COMP_Y]);
-				maxBound		=	max(bnds[3+COMP_Z]-bnds[COMP_Z],maxBound);
-				maxBound		*=	boundExpander;
-	
-				bnds[COMP_X]	-=	maxBound;
-				bnds[COMP_Y]	-=	maxBound;
-				bnds[COMP_Z]	-=	maxBound;
-				bnds[3+COMP_X]	+=	maxBound;
-				bnds[3+COMP_Y]	+=	maxBound;
-				bnds[3+COMP_Z]	+=	maxBound;
 				
-				bnds+=6;
+				// Expand bounds
+				bnds = bounds;
+				for(int i=0;i<nb*nb;i++){
+					float maxBound	=	max(bnds[3+COMP_X]-bnds[COMP_X],bnds[3+COMP_Y]-bnds[COMP_Y]);
+					maxBound		=	max(bnds[3+COMP_Z]-bnds[COMP_Z],maxBound);
+					maxBound		*=	boundExpander;
+		
+					bnds[COMP_X]	-=	maxBound;
+					bnds[COMP_Y]	-=	maxBound;
+					bnds[COMP_Z]	-=	maxBound;
+					bnds[3+COMP_X]	+=	maxBound;
+					bnds[3+COMP_Y]	+=	maxBound;
+					bnds[3+COMP_Z]	+=	maxBound;
+					
+					bnds+=6;
+				}	
 			}
+		} else {
+		
+			// We're moving
+			if (rdiv == 1) {
+				// Subsampling our 2x2 to 1x1, no bounds
+				
+				void	*mem			=	malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*2*3*sizeof(float));
+						cTesselation	=	(CPurgableTesselation*) mem;
+				
+				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
+				cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+				cTesselation->size						=	2*2*2*3*sizeof(float);
+		
+				// Save first sample
+				movvv(cTesselation->P,		varying[VARIABLE_P]);
+				movvv(cTesselation->P+3,	varying[VARIABLE_P]+6);
+				movvv(cTesselation->P+6,	varying[VARIABLE_P]+18);
+				movvv(cTesselation->P+9,	varying[VARIABLE_P]+24);
+				
+				// Displace again
+				sampleTesselation(PARAMETER_END_SAMPLE,1);
+				
+				// Copy the second sample
+				movvv(cTesselation->P+12,	varying[VARIABLE_P]);
+				movvv(cTesselation->P+15,	varying[VARIABLE_P]+6);
+				movvv(cTesselation->P+18,	varying[VARIABLE_P]+18);
+				movvv(cTesselation->P+21,	varying[VARIABLE_P]+24);
+			} else if (rdiv <= 4) {
+				// Not saving bounds here
+				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*(div+1)*(div+1)*3*sizeof(float));
+							cTesselation	= (CPurgableTesselation*) mem;
+	
+				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
+				cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+				cTesselation->size						=	2*(div+1)*(div+1)*3*sizeof(float);
+				
+				// Save first sample
+				memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+				
+				// Displace again
+				sampleTesselation(PARAMETER_END_SAMPLE,1);
+				
+				// Save second sample
+				memcpy(cTesselation->P+(div+1)*(div+1)*3,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+			} else {
+				// create bounds, but only if it saves us work later
+							
+				int nb = div>>2;						// number of bounds in each direction
+				
+				// save the data
+				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*(div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
+							cTesselation	= (CPurgableTesselation*) mem;
+	
+				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
+				cTesselation->lastRefNumber				=	(int*)   ((char*) mem + sizeof(CPurgableTesselation));
+				cTesselation->size						=	(2*(div+1)*(div+1)*3 + nb*nb*6)*sizeof(float);
+				
+				// FIXME: bounds should be first for cache efficiency
+				float *bounds							=	cTesselation->P + 2*(div+1)*(div+1)*3;
+				
+				// Save the first sample
+				memcpy(cTesselation->P,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+				
+				// Clear the bounds
+				float *bnds = bounds;
+				for (int i=0;i<nb*nb;i++,bnds+=6) {
+					initv(bnds,C_INFINITY);
+					initv(bnds+3,-C_INFINITY);
+				}
 			
-			context->restoreState(savedState);
-			
-			// install tesselation last so other threads don't use bounds/P before they're ready
-			return cTesselation;
+				// Sum them
+				bnds = bounds;
+				for (int y=0;y<nb;y++) {
+					for (int x=0; x<nb;x++,bnds+=6) {
+						const float *cP		=	cTesselation->P + (x*4 + y*4*(div+1))*3;
+					
+						for (int i=0;i<5;i++) {
+							for (int j=0;j<5;j++,cP+=3) {
+								addBox(bnds,bnds+3,cP);
+							}
+							cP += ((div+1)-5)*3;
+						}
+					}
+				}
+				
+				// Displace again
+				sampleTesselation(PARAMETER_END_SAMPLE,1);
+				
+				// Save the second sample
+				memcpy(cTesselation->P+(div+1)*(div+1)*3,varying[VARIABLE_P],(div+1)*(div+1)*3*sizeof(float));
+				
+				// Sum the second sample
+				bnds = bounds;
+				for (int y=0;y<nb;y++) {
+					for (int x=0; x<nb;x++,bnds+=6) {
+						const float *cP		=	cTesselation->P + (div+1)*(div+1)*3 + (x*4 + y*4*(div+1))*3;
+					
+						for (int i=0;i<5;i++) {
+							for (int j=0;j<5;j++,cP+=3) {
+								addBox(bnds,bnds+3,cP);
+							}
+							cP += ((div+1)-5)*3;
+						}
+					}
+				}
+
+				// Expand bounds
+				bnds = bounds;
+				for(int i=0;i<nb*nb;i++){
+					float maxBound	=	max(bnds[3+COMP_X]-bnds[COMP_X],bnds[3+COMP_Y]-bnds[COMP_Y]);
+					maxBound		=	max(bnds[3+COMP_Z]-bnds[COMP_Z],maxBound);
+					maxBound		*=	boundExpander;
+		
+					bnds[COMP_X]	-=	maxBound;
+					bnds[COMP_Y]	-=	maxBound;
+					bnds[COMP_Z]	-=	maxBound;
+					bnds[3+COMP_X]	+=	maxBound;
+					bnds[3+COMP_Y]	+=	maxBound;
+					bnds[3+COMP_Z]	+=	maxBound;
+					
+					bnds+=6;
+				}	
+			}
 		}
+		
+		context->restoreState(savedState);
+		
+		// install tesselation last so other threads don't use bounds/P before they're ready
+		return cTesselation;
+
 	}
 	
-	// simply save the coarse r estimate
+	// If we get here, we are estimating only
+	
+	// Evaluate the quality of this tesselation in u and v separately
+	float	vMax	=	0;
+	float	vAvg	=	0;
+	for (int i=0;i<=div;i++) {
+		const float	l	=	measureLength(varying[VARIABLE_P] + i*3,(div+1)*3,div);
+		vMax			=	max(vMax,l);
+		vAvg			+=	l;
+	}
+
+	float	uMax	=	0;
+	float	uAvg	=	0;
+	for (int i=0;i<=div;i++) {
+		const float	l	=	measureLength(varying[VARIABLE_P] + i*(div+1)*3,3,div);
+		uMax			=	max(uMax,l);
+		uAvg			+=	l;
+	}
+
+	vAvg	/=	(float) (div+1)*div;
+	uAvg	/=	(float) (div+1)*div;
+	
+	// Simply save the coarse r estimate
 	if (rdiv == 1) {
 		// we sampled 2x2 because we have to, but we wanted 1x1
 		rmax							=	max(rmax,(uAvg+vAvg)/4.0f);
@@ -1201,7 +1499,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 		rmax							=	max(rmax,div*(uAvg+vAvg)/2.0f);
 	}
 	
-	// save a tighter bound
+	// Calculate a tighter bound
 	initv(bmin,C_INFINITY);
 	initv(bmax,-C_INFINITY);
 
@@ -1211,6 +1509,23 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 		Pcur			+=	3;
 	}
 	
+	// If we have motion, account for it
+	if (flags & OBJECT_MOVING_TESSELATION) {
+		// Displace again
+		sampleTesselation(PARAMETER_END_SAMPLE,1);
+		
+		// Bound the second sample
+		Pcur = varying[VARIABLE_P];
+		for (int i =(div+1)*(div+1);i>0;i--) {
+			addBox(bmin,bmax,Pcur);
+			Pcur			+=	3;
+		}
+		
+		// We will use the r estimate from the first sample
+		// Perhaps we should do better
+	}
+	
+	// Expand the bound
 	float maxBound	=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
 	maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
 	maxBound		*=	boundExpander;

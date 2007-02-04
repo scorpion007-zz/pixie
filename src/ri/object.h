@@ -49,8 +49,9 @@ class	CRendererContext;
 class	CTesselationPatch;
 
 // Various object flags
-const unsigned int	OBJECT_DUMMY			=	1;	// Set if the object is a dummy object
-const unsigned int	OBJECT_TESSELATION		=	2;	// Set if the object is an intermediate tesselation
+const unsigned int	OBJECT_DUMMY				=	1;	// Set if the object is a dummy object
+const unsigned int	OBJECT_TESSELATION			=	2;	// Set if the object is an intermediate tesselation
+const unsigned int	OBJECT_MOVING_TESSELATION	=	4;	// Set if the object is an intermediate tesselation which is moving
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
