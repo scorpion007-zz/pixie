@@ -1208,7 +1208,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 				*timev++	=	time;											\
 			}																	\
 		}																		\
-		context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | sample | PARAMETER_RAYTRACE);	\
+		context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | sample | PARAMETER_RAYTRACE);	\
 	}
 	
 	sampleTesselation(PARAMETER_BEGIN_SAMPLE,0);
@@ -1216,7 +1216,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	// At this point, We have the tesselation. So create the grid and return it, or initialize our
 	// grid size guess
 	
-	#if DEBUG_TESSELATIONS
+	#if DEBUG_TESSELATIONS > 0
 	{
 		CDebugView	d("/tmp/tesselate.dat",TRUE);
 	
@@ -1232,11 +1232,13 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			d.line(Pcur+div*3,Pcur+div*3+(div+1)*3);
 			Pcur += (div+1)*3;
 		}
+		#if DEBUG_TESSELATIONS > 2
 		Pcur = varying[VARIABLE_P];
 		for (int i =(div+1)*(div+1);i>0;i--) {
 			d.point(Pcur);
 			Pcur += 3;
 		}
+		#endif
 	}
 	#endif
 	
@@ -1536,7 +1538,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	bmax[COMP_X]	+=	maxBound;
 	bmax[COMP_Y]	+=	maxBound;
 	bmax[COMP_Z]	+=	maxBound;
-	
+
 	context->restoreState(savedState);
 	
 	return NULL;
