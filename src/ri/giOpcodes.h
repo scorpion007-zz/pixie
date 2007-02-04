@@ -54,7 +54,7 @@
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	lookup->bias;								\
 									raysBase->t		=	lookup->maxDist;							\
-									raysBase->time	=	urand();									\
+									raysBase->time	=	(urand() + lastGather->remainingSamples + 1) / (float) lookup->numSamples;	\
 									raysBase->da	=	max(ab[0],lookup->da);						\
 									raysBase->db	=	ab[1];										\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;				\

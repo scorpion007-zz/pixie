@@ -456,7 +456,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 	const float			coneAngle		=	lookup->coneAngle;
 	const float			maxDist			=	lookup->maxDist;
 	int					numRemaining	=	shootStep;
-	const float			multiplier		=	1 / (float) lookup->numSamples;
+	const float			multiplier		=	1 / (float) numSamples;
 	int					currentSample;
 	int					i;
 	CTransmissionBundle	bundle;
@@ -489,7 +489,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 				movvv(cRay->from,from);
 				cRay->t				=	min(maxDist,d) - bias;
 				cRay->tmin			=	bias;
-				cRay->time			=	urand();
+				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 				cRay->dest			=	dest;
 				cRay->multiplier	=	multiplier;
@@ -567,7 +567,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
 				sampleHemisphere(cRay->dir,D,coneAngle,traceGenerator);
 				movvv(cRay->from,from);
-				cRay->time			=	urand();
+				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->t				=	C_INFINITY;
 				cRay->tmin			=	bias;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;

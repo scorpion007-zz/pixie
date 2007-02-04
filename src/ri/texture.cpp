@@ -148,20 +148,23 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 	
 	memBegin(context->threadMemory);
 
+	const int thread	=	context->thread;
+
 	// Figure out how many blocks we have in memory
 	int				i,j;
 	CTextureBlock	**activeBlocks;
 	CTextureBlock	*cBlock;
 	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
-		if (cBlock->threadData[context->thread].data != NULL) {
+		if (cBlock->threadData[thread].data != NULL) {
 			i++;
 		}
 	}
 	
+
 	// Collect those blocks into an array
 	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),context->threadMemory);
 	for (cBlock=CRenderer::textureUsedBlocks,i=0;cBlock!=NULL;cBlock=cBlock->next) {
-		if (cBlock->threadData[context->thread].data != NULL) {
+		if (cBlock->threadData[thread].data != NULL) {
 			if (cBlock != entry) {
 				activeBlocks[i++]	=	cBlock;
 			}
@@ -169,15 +172,15 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 	}
 
 	// Sort the blocks from last used to the most recently used
-	if (i > 1)	textureQuickSort(activeBlocks,0,i-1,context->thread);
+	if (i > 1)	textureQuickSort(activeBlocks,0,i-1,thread);
 
 	// Free the memory
-	if (all)	CRenderer::textureMaxMemory[context->thread]	=	0;
-	for (j=0;(j<i) && (CRenderer::textureUsedMemory[context->thread] > (CRenderer::textureMaxMemory[context->thread]/2));j++) {
+	if (all)	CRenderer::textureMaxMemory[thread]	=	0;
+	for (j=0;(j<i) && (CRenderer::textureUsedMemory[thread] > (CRenderer::textureMaxMemory[thread]/2));j++) {
 		cBlock							=	activeBlocks[j];
 
-		CRenderer::textureUsedMemory[context->thread]	-=	cBlock->size;
-		cBlock->threadData[context->thread].data		=	NULL;
+		CRenderer::textureUsedMemory[thread]	-=	cBlock->size;
+		cBlock->threadData[thread].data			=	NULL;
 		
 		#ifdef PERBLOCK_LOCK
 			osLock(cBlock->mutex);
@@ -216,12 +219,15 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,CShadingC
 	stats.peakTextureSize							=	max(stats.textureSize,stats.peakTextureSize);
 	stats.textureMemory								+=	entry->size;
 	stats.transferredTextureData					+=	entry->size;
-	CRenderer::textureUsedMemory[context->thread]	+=	entry->size;
+
+	const int	thread								=	context->thread;
+
+	CRenderer::textureUsedMemory[thread]			+=	entry->size;
 
 	unsigned char *data				=	new unsigned char[entry->size];
 
 	// If we exceeded the maximum texture memory, phase out the last texture
-	if (CRenderer::textureUsedMemory[context->thread] > CRenderer::textureMaxMemory[context->thread])
+	if (CRenderer::textureUsedMemory[thread] > CRenderer::textureMaxMemory[thread])
 		textureMemFlush(entry,context,FALSE);
 
 	return data;
@@ -616,15 +622,17 @@ protected:
 					// The pixel lookup
 			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l,CShadingContext *context) {
 						
-						if (dataBlock.threadData[context->thread].data == NULL) {
+						const int	thread	=	context->thread;
+
+						if (dataBlock.threadData[thread].data == NULL) {
 							// The data is cached out
 							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory,context);
 						}
 						
 
 						// Texture cache management
-						CRenderer::textureRefNumber[context->thread]++;
-						dataBlock.threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];
+						CRenderer::textureRefNumber[thread]++;
+						dataBlock.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
 
 						int	xi		=	x+1;
 						int	yi		=	y+1;
@@ -746,17 +754,19 @@ protected:
 						if (xi >= width)	xi = (sMode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
 						if (yi >= height)	yi = (tMode == TEXTURE_PERIODIC) ? (yi - height) : (height - 1);
 
+						const int	thread	=	context->thread;
+
 						if (l->lookupFloat) {
 #define	access(__x,__y)																\
 							xTile	=	__x >> tileSizeShift;						\
 							yTile	=	__y >> tileSizeShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
-							if (block->threadData[context->thread].data == NULL) {	\
+							if (block->threadData[thread].data == NULL) {			\
 								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,context);		\
 							}																										\
-							CRenderer::textureRefNumber[context->thread]++;															\
-							block->threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];	\
+							CRenderer::textureRefNumber[thread]++;																	\
+							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
 																																	\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];		\
 							res[0]	=	(float) (data[0]*M);						\
@@ -777,11 +787,11 @@ protected:
 							yTile	=	__y >> tileSizeShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
-							if (block->threadData[context->thread].data == NULL) {	\
+							if (block->threadData[thread].data == NULL) {			\
 								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,context);		\
 							}																										\
-							CRenderer::textureRefNumber[context->thread]++;															\
-							block->threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];	\
+							CRenderer::textureRefNumber[thread]++;																	\
+							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
 																																	\
 							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];		\
 							res[0]	=	(float) (data[0]*M);						\
@@ -1353,10 +1363,12 @@ public:
 
 								cTile				=	tiles[by]+bx;
 
-								CRenderer::textureRefNumber[context->thread]++;
-								cTile->block.threadData[context->thread].lastRefNumber	=	CRenderer::textureRefNumber[context->thread];
+								const int thread	=	context->thread;
+
+								CRenderer::textureRefNumber[thread]++;
+								cTile->block.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
 								
-								if (cTile->block.threadData[context->thread].data == NULL) {
+								if (cTile->block.threadData[thread].data == NULL) {
 									loadTile(bx,by,context);
 								}
 
