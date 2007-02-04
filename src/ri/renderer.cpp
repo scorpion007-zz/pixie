@@ -1053,7 +1053,7 @@ void		CRenderer::endFrame() {
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
-void			CRenderer::render(CObject *cObject) {				// FIXME - this is not thread safe!!!!
+void			CRenderer::render(CObject *cObject) {
 	CAttributes	*cAttributes	=	cObject->attributes;
 
 	// Assign the photon map is necessary
