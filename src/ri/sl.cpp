@@ -1,11 +1,8 @@
 
-/*  A Bison parser, made from ../../../../src/ri/sdr.y
- by  GNU Bison version 1.25
-  */
+/*  A Bison parser, made from sdr.y
+    by GNU Bison version 1.28  */
 
 #define YYBISON 1  /* Identify Bison output.  */
-
-#define alloca
 
 #define yyparse slparse
 #define yylex sllex
@@ -14,43 +11,43 @@
 #define yychar slchar
 #define yydebug sldebug
 #define yynerrs slnerrs
-#define	SCRL_PARAMETERS	258
-#define	SCRL_VARIABLES	259
-#define	SCRL_OUTPUT	260
-#define	SCRL_VARYING	261
-#define	SCRL_UNIFORM	262
-#define	SCRL_BOOLEAN	263
-#define	SCRL_FLOAT	264
-#define	SCRL_COLOR	265
-#define	SCRL_VECTOR	266
-#define	SCRL_NORMAL	267
-#define	SCRL_POINT	268
-#define	SCRL_MATRIX	269
-#define	SCRL_STRING	270
-#define	SCRL_SURFACE	271
-#define	SCRL_DISPLACEMENT	272
-#define	SCRL_IMAGER	273
-#define	SCRL_LIGHTSOURCE	274
-#define	SCRL_VOLUME	275
-#define	SCRL_GENERIC	276
-#define	SCRL_DSO	277
-#define	SCRL_INIT	278
-#define	SCRL_CODE	279
-#define	SCRL_DOT	280
-#define	SCRL_COLON	281
-#define	SCRL_EQUAL	282
-#define	SCRL_OPEN_PARANTHESIS	283
-#define	SCRL_CLOSE_PARANTHESIS	284
-#define	SCRL_OPEN_SQR_PARANTHESIS	285
-#define	SCRL_CLOSE_SQR_PARANTHESIS	286
-#define	SCRL_COMMA	287
-#define	SCRL_NL	288
-#define	SCRL_TEXT_VALUE	289
-#define	SCRL_IDENTIFIER_VALUE	290
-#define	SCRL_LABEL_VALUE	291
-#define	SCRL_FLOAT_VALUE	292
+#define	SCRL_PARAMETERS	257
+#define	SCRL_VARIABLES	258
+#define	SCRL_OUTPUT	259
+#define	SCRL_VARYING	260
+#define	SCRL_UNIFORM	261
+#define	SCRL_BOOLEAN	262
+#define	SCRL_FLOAT	263
+#define	SCRL_COLOR	264
+#define	SCRL_VECTOR	265
+#define	SCRL_NORMAL	266
+#define	SCRL_POINT	267
+#define	SCRL_MATRIX	268
+#define	SCRL_STRING	269
+#define	SCRL_SURFACE	270
+#define	SCRL_DISPLACEMENT	271
+#define	SCRL_IMAGER	272
+#define	SCRL_LIGHTSOURCE	273
+#define	SCRL_VOLUME	274
+#define	SCRL_GENERIC	275
+#define	SCRL_DSO	276
+#define	SCRL_INIT	277
+#define	SCRL_CODE	278
+#define	SCRL_DOT	279
+#define	SCRL_COLON	280
+#define	SCRL_EQUAL	281
+#define	SCRL_OPEN_PARANTHESIS	282
+#define	SCRL_CLOSE_PARANTHESIS	283
+#define	SCRL_OPEN_SQR_PARANTHESIS	284
+#define	SCRL_CLOSE_SQR_PARANTHESIS	285
+#define	SCRL_COMMA	286
+#define	SCRL_NL	287
+#define	SCRL_TEXT_VALUE	288
+#define	SCRL_IDENTIFIER_VALUE	289
+#define	SCRL_LABEL_VALUE	290
+#define	SCRL_FLOAT_VALUE	291
 
-#line 1 "../../../../src/ri/sdr.y"
+#line 1 "sdr.y"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -705,17 +702,13 @@ static	TSlFunction		functions[]	=	{
 		TSlLabel					*newLabelRef(char *,int);
 		void						processEscapes(char *);
 
-#line 655 "../../../../src/ri/sdr.y"
+#line 655 "sdr.y"
 typedef union slval {
 	float	real;
 	char	string[64];
 	matrix	m;
 	vector	v;
 } YYSTYPE;
-#ifndef YYDEBUG
-#define YYDEBUG 1
-#endif
-
 #include <stdio.h>
 
 #ifndef __cplusplus
@@ -727,10 +720,10 @@ typedef union slval {
 
 
 #define	YYFINAL		316
-#define	YYFLAG		32768
+#define	YYFLAG		-32768
 #define	YYNTBASE	38
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 292 ? yytranslate[x] : 98)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 291 ? yytranslate[x] : 98)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -758,11 +751,11 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
-     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
-    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-    26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-    36,    37
+     2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
+     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+    27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+    37
 };
 
 #if YYDEBUG != 0
@@ -1076,6 +1069,8 @@ static const short yycheck[] = {   124,
     32,    37,    32,    32,    37,    29,    37,    34,    31
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
+#line 3 "/usr/share/bison.simple"
+/* This file comes from bison-1.28.  */
 
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Free Software Foundation, Inc.
@@ -1092,46 +1087,66 @@ static const short yycheck[] = {   124,
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, when this file is copied by Bison into a
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef alloca
-#ifdef __GNUC__
-#define alloca __builtin_alloca
-#else /* not GNU C.  */
-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi)
-#include <alloca.h>
-#else /* not sparc */
-#if defined (MSDOS) && !defined (__TURBOC__)
-#include <malloc.h>
-#else /* not MSDOS, or __TURBOC__ */
-#if defined(_AIX)
-#include <malloc.h>
- #pragma alloca
-#else /* not MSDOS, __TURBOC__, or _AIX */
-#ifdef __hpux
-#ifdef __cplusplus
-extern "C" {
-void *alloca (unsigned int);
-};
-#else /* not __cplusplus */
-void *alloca ();
-#endif /* not __cplusplus */
-#endif /* __hpux */
-#endif /* not _AIX */
-#endif /* not MSDOS, or __TURBOC__ */
-#endif /* not sparc.  */
-#endif /* not GNU C.  */
-#endif /* alloca not defined.  */
-
 /* This is the parser code that is written into each bison parser
   when the %semantic_parser declaration is not specified in the grammar.
   It was written by Richard Stallman by simplifying the hairy parser
   used when %semantic_parser is specified.  */
+
+#ifndef YYSTACK_USE_ALLOCA
+#ifdef alloca
+#define YYSTACK_USE_ALLOCA
+#else /* alloca not defined */
+#ifdef __GNUC__
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#else /* not GNU C.  */
+#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi) || (defined (__sun) && defined (__i386))
+#define YYSTACK_USE_ALLOCA
+#include <alloca.h>
+#else /* not sparc */
+/* We think this test detects Watcom and Microsoft C.  */
+/* This used to test MSDOS, but that is a bad idea
+   since that symbol is in the user namespace.  */
+#if (defined (_MSDOS) || defined (_MSDOS_)) && !defined (__TURBOC__)
+#if 0 /* No need for malloc.h, which pollutes the namespace;
+	 instead, just don't use alloca.  */
+#include <malloc.h>
+#endif
+#else /* not MSDOS, or __TURBOC__ */
+#if defined(_AIX)
+/* I don't know what this was needed for, but it pollutes the namespace.
+   So I turned it off.   rms, 2 May 1997.  */
+/* #include <malloc.h>  */
+ #pragma alloca
+#define YYSTACK_USE_ALLOCA
+#else /* not MSDOS, or __TURBOC__, or _AIX */
+#if 0
+#ifdef __hpux /* haible@ilog.fr says this works for HPUX 9.05 and up,
+		 and on HPUX 10.  Eventually we can turn this on.  */
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#endif /* __hpux */
+#endif
+#endif /* not _AIX */
+#endif /* not MSDOS, or __TURBOC__ */
+#endif /* not sparc */
+#endif /* not GNU C */
+#endif /* alloca not defined */
+#endif /* YYSTACK_USE_ALLOCA not defined */
+
+#ifdef YYSTACK_USE_ALLOCA
+#define YYSTACK_ALLOC alloca
+#else
+#define YYSTACK_ALLOC malloc
+#endif
 
 /* Note: there must be only one dollar sign in this file.
    It is replaced by the list of actions, each action
@@ -1141,8 +1156,8 @@ void *alloca ();
 #define yyclearin	(yychar = YYEMPTY)
 #define YYEMPTY		-2
 #define YYEOF		0
-#define YYACCEPT	return(0)
-#define YYABORT 	return(1)
+#define YYACCEPT	goto yyacceptlab
+#define YYABORT 	goto yyabortlab
 #define YYERROR		goto yyerrlab1
 /* Like YYERROR except do call yyerror.
    This remains here temporarily to ease the
@@ -1223,12 +1238,12 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #ifndef YYMAXDEPTH
 #define YYMAXDEPTH 10000
 #endif
-
-/* Prevent warning if -Wstrict-prototypes.  */
-#ifdef __GNUC__
-int yyparse (void);
-#endif
 
+/* Define __yy_memcpy.  Note that the size argument
+   should be passed with type unsigned int, because that is what the non-GCC
+   definitions require.  With GCC, __builtin_memcpy takes an arg
+   of type size_t, but it can handle unsigned int.  */
+
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
 #define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
 #else				/* not GNU C or C++ */
@@ -1240,7 +1255,7 @@ static void
 __yy_memcpy (to, from, count)
      char *to;
      char *from;
-     int count;
+     unsigned int count;
 {
   register char *f = from;
   register char *t = to;
@@ -1255,10 +1270,10 @@ __yy_memcpy (to, from, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (char *to, char *from, int count)
+__yy_memcpy (char *to, char *from, unsigned int count)
 {
-  register char *f = from;
   register char *t = to;
+  register char *f = from;
   register int i = count;
 
   while (i-- > 0)
@@ -1268,6 +1283,7 @@ __yy_memcpy (char *to, char *from, int count)
 #endif
 #endif
 
+#line 217 "/usr/share/bison.simple"
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
    into yyparse.  The argument should have type void *.
@@ -1287,6 +1303,15 @@ __yy_memcpy (char *to, char *from, int count)
 #define YYPARSE_PARAM_ARG
 #define YYPARSE_PARAM_DECL
 #endif /* not YYPARSE_PARAM */
+
+/* Prevent warning if -Wstrict-prototypes.  */
+#ifdef __GNUC__
+#ifdef YYPARSE_PARAM
+int yyparse (void *);
+#else
+int yyparse (void);
+#endif
+#endif
 
 int
 yyparse(YYPARSE_PARAM_ARG)
@@ -1316,6 +1341,7 @@ yyparse(YYPARSE_PARAM_ARG)
 #endif
 
   int yystacksize = YYINITDEPTH;
+  int yyfree_stacks = 0;
 
 #ifdef YYPURE
   int yychar;
@@ -1400,18 +1426,32 @@ yynewstate:
       if (yystacksize >= YYMAXDEPTH)
 	{
 	  yyerror("parser stack overflow");
+	  if (yyfree_stacks)
+	    {
+	      free (yyss);
+	      free (yyvs);
+#ifdef YYLSP_NEEDED
+	      free (yyls);
+#endif
+	    }
 	  return 2;
 	}
       yystacksize *= 2;
       if (yystacksize > YYMAXDEPTH)
 	yystacksize = YYMAXDEPTH;
-      yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
-      __yy_memcpy ((char *)yyss, (char *)yyss1, size * sizeof (*yyssp));
-      yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
-      __yy_memcpy ((char *)yyvs, (char *)yyvs1, size * sizeof (*yyvsp));
+#ifndef YYSTACK_USE_ALLOCA
+      yyfree_stacks = 1;
+#endif
+      yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
+      __yy_memcpy ((char *)yyss, (char *)yyss1,
+		   size * (unsigned int) sizeof (*yyssp));
+      yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
+      __yy_memcpy ((char *)yyvs, (char *)yyvs1,
+		   size * (unsigned int) sizeof (*yyvsp));
 #ifdef YYLSP_NEEDED
-      yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
-      __yy_memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
+      yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
+      __yy_memcpy ((char *)yyls, (char *)yyls1,
+		   size * (unsigned int) sizeof (*yylsp));
 #endif
 #endif /* no yyoverflow */
 
@@ -1572,7 +1612,7 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 725 "../../../../src/ri/sdr.y"
+#line 725 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1580,7 +1620,7 @@ case 4:
 				;
     break;}
 case 5:
-#line 738 "../../../../src/ri/sdr.y"
+#line 738 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1588,7 +1628,7 @@ case 5:
 				;
     break;}
 case 6:
-#line 746 "../../../../src/ri/sdr.y"
+#line 746 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1596,7 +1636,7 @@ case 6:
 				;
     break;}
 case 7:
-#line 758 "../../../../src/ri/sdr.y"
+#line 758 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1604,7 +1644,7 @@ case 7:
 				;
     break;}
 case 8:
-#line 764 "../../../../src/ri/sdr.y"
+#line 764 "sdr.y"
 {
 					yyval.v[0]	=	0;
 					yyval.v[1]	=	0;
@@ -1612,7 +1652,7 @@ case 8:
 				;
     break;}
 case 9:
-#line 772 "../../../../src/ri/sdr.y"
+#line 772 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].v[0];
 					yyval.v[1]	=	yyvsp[0].v[1];
@@ -1620,21 +1660,21 @@ case 9:
 				;
     break;}
 case 10:
-#line 782 "../../../../src/ri/sdr.y"
+#line 782 "sdr.y"
 {
 					currentData.shaderType		=	SL_SURFACE;
 					currentData.accessorType 	=	ACCESSOR_SURFACE;
 				;
     break;}
 case 11:
-#line 789 "../../../../src/ri/sdr.y"
+#line 789 "sdr.y"
 {
 					currentData.shaderType		=	SL_DISPLACEMENT;
 					currentData.accessorType	=	ACCESSOR_DISPLACEMENT;
 				;
     break;}
 case 12:
-#line 796 "../../../../src/ri/sdr.y"
+#line 796 "sdr.y"
 {
 					currentData.shaderType		=	SL_LIGHTSOURCE;
 					// Note: we don't set accessorType because you can't interpolate into
@@ -1642,7 +1682,7 @@ case 12:
 				;
     break;}
 case 13:
-#line 804 "../../../../src/ri/sdr.y"
+#line 804 "sdr.y"
 {
 					currentData.shaderType		=	SL_ATMOSPHERE;
 					currentData.accessorType	=	ACCESSOR_ATMOSPHERE;
@@ -1651,13 +1691,13 @@ case 13:
 				;
     break;}
 case 14:
-#line 813 "../../../../src/ri/sdr.y"
+#line 813 "sdr.y"
 {
 					currentData.shaderType	=	SL_IMAGER;
 				;
     break;}
 case 18:
-#line 834 "../../../../src/ri/sdr.y"
+#line 834 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1665,7 +1705,7 @@ case 18:
 				;
     break;}
 case 19:
-#line 841 "../../../../src/ri/sdr.y"
+#line 841 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1673,7 +1713,7 @@ case 19:
 				;
     break;}
 case 20:
-#line 849 "../../../../src/ri/sdr.y"
+#line 849 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1681,7 +1721,7 @@ case 20:
 				;
     break;}
 case 21:
-#line 857 "../../../../src/ri/sdr.y"
+#line 857 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1689,7 +1729,7 @@ case 21:
 				;
     break;}
 case 22:
-#line 864 "../../../../src/ri/sdr.y"
+#line 864 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1697,7 +1737,7 @@ case 22:
 				;
     break;}
 case 23:
-#line 870 "../../../../src/ri/sdr.y"
+#line 870 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1705,7 +1745,7 @@ case 23:
 				;
     break;}
 case 32:
-#line 906 "../../../../src/ri/sdr.y"
+#line 906 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_FLOAT,1,TRUE);
 
@@ -1715,7 +1755,7 @@ case 32:
 				;
     break;}
 case 33:
-#line 916 "../../../../src/ri/sdr.y"
+#line 916 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_FLOAT,1,TRUE);
 
@@ -1725,7 +1765,7 @@ case 33:
 				;
     break;}
 case 34:
-#line 930 "../../../../src/ri/sdr.y"
+#line 930 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_FLOAT,(int) yyvsp[-2].real,TRUE);
 					
@@ -1742,7 +1782,7 @@ case 34:
 				;
     break;}
 case 36:
-#line 951 "../../../../src/ri/sdr.y"
+#line 951 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,TRUE);
 
@@ -1755,7 +1795,7 @@ case 36:
 				;
     break;}
 case 37:
-#line 968 "../../../../src/ri/sdr.y"
+#line 968 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1763,7 +1803,7 @@ case 37:
 				;
     break;}
 case 38:
-#line 978 "../../../../src/ri/sdr.y"
+#line 978 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -1777,7 +1817,7 @@ case 38:
 				;
     break;}
 case 40:
-#line 996 "../../../../src/ri/sdr.y"
+#line 996 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_STRING,1,TRUE);
 
@@ -1796,7 +1836,7 @@ case 40:
 				;
     break;}
 case 41:
-#line 1017 "../../../../src/ri/sdr.y"
+#line 1017 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_STRING,1,TRUE);
 
@@ -1815,7 +1855,7 @@ case 41:
 				;
     break;}
 case 42:
-#line 1040 "../../../../src/ri/sdr.y"
+#line 1040 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_STRING,(int) yyvsp[-2].real,TRUE);
 					
@@ -1841,7 +1881,7 @@ case 42:
 				;
     break;}
 case 44:
-#line 1070 "../../../../src/ri/sdr.y"
+#line 1070 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,TRUE);
 
@@ -1854,7 +1894,7 @@ case 44:
 				;
     break;}
 case 45:
-#line 1085 "../../../../src/ri/sdr.y"
+#line 1085 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1862,7 +1902,7 @@ case 45:
 				;
     break;}
 case 46:
-#line 1095 "../../../../src/ri/sdr.y"
+#line 1095 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -1877,13 +1917,13 @@ case 46:
 				;
     break;}
 case 48:
-#line 1114 "../../../../src/ri/sdr.y"
+#line 1114 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_COLOR;
 				;
     break;}
 case 49:
-#line 1118 "../../../../src/ri/sdr.y"
+#line 1118 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1898,7 +1938,7 @@ case 49:
 				;
     break;}
 case 50:
-#line 1137 "../../../../src/ri/sdr.y"
+#line 1137 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_COLOR,(int) yyvsp[-2].real,TRUE);
 					
@@ -1908,19 +1948,19 @@ case 50:
 				;
     break;}
 case 52:
-#line 1151 "../../../../src/ri/sdr.y"
+#line 1151 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 53:
-#line 1159 "../../../../src/ri/sdr.y"
+#line 1159 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_VECTOR;
 				;
     break;}
 case 54:
-#line 1163 "../../../../src/ri/sdr.y"
+#line 1163 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1935,7 +1975,7 @@ case 54:
 				;
     break;}
 case 55:
-#line 1182 "../../../../src/ri/sdr.y"
+#line 1182 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_VECTOR,(int) yyvsp[-2].real,TRUE);
 					
@@ -1947,19 +1987,19 @@ case 55:
 				;
     break;}
 case 57:
-#line 1198 "../../../../src/ri/sdr.y"
+#line 1198 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 58:
-#line 1206 "../../../../src/ri/sdr.y"
+#line 1206 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_NORMAL;
 				;
     break;}
 case 59:
-#line 1210 "../../../../src/ri/sdr.y"
+#line 1210 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1974,7 +2014,7 @@ case 59:
 				;
     break;}
 case 60:
-#line 1229 "../../../../src/ri/sdr.y"
+#line 1229 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_NORMAL,(int) yyvsp[-2].real,TRUE);
 					
@@ -1986,19 +2026,19 @@ case 60:
 				;
     break;}
 case 62:
-#line 1245 "../../../../src/ri/sdr.y"
+#line 1245 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 63:
-#line 1253 "../../../../src/ri/sdr.y"
+#line 1253 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_POINT;
 				;
     break;}
 case 64:
-#line 1257 "../../../../src/ri/sdr.y"
+#line 1257 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -2013,7 +2053,7 @@ case 64:
 				;
     break;}
 case 65:
-#line 1276 "../../../../src/ri/sdr.y"
+#line 1276 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_POINT,(int) yyvsp[-2].real,TRUE);
 					
@@ -2025,13 +2065,13 @@ case 65:
 				;
     break;}
 case 67:
-#line 1292 "../../../../src/ri/sdr.y"
+#line 1292 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 68:
-#line 1299 "../../../../src/ri/sdr.y"
+#line 1299 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2039,7 +2079,7 @@ case 68:
 				;
     break;}
 case 69:
-#line 1311 "../../../../src/ri/sdr.y"
+#line 1311 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2047,7 +2087,7 @@ case 69:
 				;
     break;}
 case 70:
-#line 1318 "../../../../src/ri/sdr.y"
+#line 1318 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2055,7 +2095,7 @@ case 70:
 				;
     break;}
 case 71:
-#line 1329 "../../../../src/ri/sdr.y"
+#line 1329 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2063,7 +2103,7 @@ case 71:
 				;
     break;}
 case 72:
-#line 1341 "../../../../src/ri/sdr.y"
+#line 1341 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -2071,7 +2111,7 @@ case 72:
 				;
     break;}
 case 73:
-#line 1351 "../../../../src/ri/sdr.y"
+#line 1351 "sdr.y"
 {
 					float *v;
 					
@@ -2090,7 +2130,7 @@ case 73:
 				;
     break;}
 case 75:
-#line 1393 "../../../../src/ri/sdr.y"
+#line 1393 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-19].string,TYPE_MATRIX,1,TRUE);
 
@@ -2115,7 +2155,7 @@ case 75:
 				;
     break;}
 case 76:
-#line 1420 "../../../../src/ri/sdr.y"
+#line 1420 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_MATRIX,1,TRUE);
 
@@ -2140,7 +2180,7 @@ case 76:
 				;
     break;}
 case 77:
-#line 1445 "../../../../src/ri/sdr.y"
+#line 1445 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_MATRIX,1,TRUE);
 
@@ -2165,7 +2205,7 @@ case 77:
 				;
     break;}
 case 78:
-#line 1474 "../../../../src/ri/sdr.y"
+#line 1474 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_MATRIX,(int) yyvsp[-2].real,TRUE);
 					
@@ -2181,7 +2221,7 @@ case 78:
 				;
     break;}
 case 80:
-#line 1494 "../../../../src/ri/sdr.y"
+#line 1494 "sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,TRUE);
 
@@ -2194,7 +2234,7 @@ case 80:
 				;
     break;}
 case 81:
-#line 1511 "../../../../src/ri/sdr.y"
+#line 1511 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("wrong number of items in array initializer\n");
@@ -2202,7 +2242,7 @@ case 81:
 				;
     break;}
 case 82:
-#line 1538 "../../../../src/ri/sdr.y"
+#line 1538 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -2233,7 +2273,7 @@ case 82:
 				;
     break;}
 case 83:
-#line 1569 "../../../../src/ri/sdr.y"
+#line 1569 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -2264,117 +2304,117 @@ case 83:
 				;
     break;}
 case 96:
-#line 1644 "../../../../src/ri/sdr.y"
+#line 1644 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_BOOLEAN,1,FALSE);
 				;
     break;}
 case 97:
-#line 1653 "../../../../src/ri/sdr.y"
+#line 1653 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_BOOLEAN,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 98:
-#line 1662 "../../../../src/ri/sdr.y"
+#line 1662 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_FLOAT,1,FALSE);
 				;
     break;}
 case 99:
-#line 1671 "../../../../src/ri/sdr.y"
+#line 1671 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 100:
-#line 1679 "../../../../src/ri/sdr.y"
+#line 1679 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_STRING,1,FALSE);
 				;
     break;}
 case 101:
-#line 1688 "../../../../src/ri/sdr.y"
+#line 1688 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 102:
-#line 1696 "../../../../src/ri/sdr.y"
+#line 1696 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_VECTOR,1,FALSE);
 				;
     break;}
 case 103:
-#line 1705 "../../../../src/ri/sdr.y"
+#line 1705 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 104:
-#line 1713 "../../../../src/ri/sdr.y"
+#line 1713 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_COLOR,1,FALSE);
 				;
     break;}
 case 105:
-#line 1722 "../../../../src/ri/sdr.y"
+#line 1722 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 106:
-#line 1730 "../../../../src/ri/sdr.y"
+#line 1730 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_NORMAL,1,FALSE);
 				;
     break;}
 case 107:
-#line 1739 "../../../../src/ri/sdr.y"
+#line 1739 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 108:
-#line 1747 "../../../../src/ri/sdr.y"
+#line 1747 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_POINT,1,FALSE);
 				;
     break;}
 case 109:
-#line 1756 "../../../../src/ri/sdr.y"
+#line 1756 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 110:
-#line 1764 "../../../../src/ri/sdr.y"
+#line 1764 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_MATRIX,1,FALSE);
 				;
     break;}
 case 111:
-#line 1773 "../../../../src/ri/sdr.y"
+#line 1773 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 112:
-#line 1780 "../../../../src/ri/sdr.y"
+#line 1780 "sdr.y"
 {
 					currentData.parsingInit	=	TRUE;
 					newLabel(initLabel,FALSE);
 				;
     break;}
 case 114:
-#line 1789 "../../../../src/ri/sdr.y"
+#line 1789 "sdr.y"
 {
 					currentData.parsingInit	=	FALSE;
 					newLabel(codeLabel,FALSE);
 				;
     break;}
 case 120:
-#line 1814 "../../../../src/ri/sdr.y"
+#line 1814 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2394,7 +2434,7 @@ case 120:
 				;
     break;}
 case 121:
-#line 1835 "../../../../src/ri/sdr.y"
+#line 1835 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2428,7 +2468,7 @@ case 121:
 				;
     break;}
 case 122:
-#line 1870 "../../../../src/ri/sdr.y"
+#line 1870 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2448,7 +2488,7 @@ case 122:
 				;
     break;}
 case 123:
-#line 1889 "../../../../src/ri/sdr.y"
+#line 1889 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2468,7 +2508,7 @@ case 123:
 				;
     break;}
 case 124:
-#line 1908 "../../../../src/ri/sdr.y"
+#line 1908 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2488,29 +2528,29 @@ case 124:
 				;
     break;}
 case 125:
-#line 1930 "../../../../src/ri/sdr.y"
+#line 1930 "sdr.y"
 {
 				;
     break;}
 case 126:
-#line 1933 "../../../../src/ri/sdr.y"
+#line 1933 "sdr.y"
 {
 				;
     break;}
 case 127:
-#line 1940 "../../../../src/ri/sdr.y"
+#line 1940 "sdr.y"
 {
 					setOpcode();
 				;
     break;}
 case 128:
-#line 1948 "../../../../src/ri/sdr.y"
+#line 1948 "sdr.y"
 {
 					newLabel(yyvsp[-1].string,FALSE);
 				;
     break;}
 case 129:
-#line 1955 "../../../../src/ri/sdr.y"
+#line 1955 "sdr.y"
 {
 					char	*str	=	yyvsp[0].string;
 
@@ -2518,25 +2558,25 @@ case 129:
 				;
     break;}
 case 130:
-#line 1962 "../../../../src/ri/sdr.y"
+#line 1962 "sdr.y"
 {
 					newLabel(yyvsp[0].string,TRUE);
 				;
     break;}
 case 131:
-#line 1967 "../../../../src/ri/sdr.y"
+#line 1967 "sdr.y"
 {
 					addVariableReference(yyvsp[0].string);
 				;
     break;}
 case 132:
-#line 1972 "../../../../src/ri/sdr.y"
+#line 1972 "sdr.y"
 {
 					addFloatReference(&yyvsp[0].real,1);
 				;
     break;}
 case 133:
-#line 1983 "../../../../src/ri/sdr.y"
+#line 1983 "sdr.y"
 {
 					vector	tmp;
 
@@ -2548,7 +2588,7 @@ case 133:
 				;
     break;}
 case 134:
-#line 2026 "../../../../src/ri/sdr.y"
+#line 2026 "sdr.y"
 {
 					matrix	tmp;
 
@@ -2573,13 +2613,14 @@ case 134:
 				;
     break;}
 case 135:
-#line 2052 "../../../../src/ri/sdr.y"
+#line 2052 "sdr.y"
 {
 					strcpy(currentData.currentPrototype,yyvsp[-1].string);
 				;
     break;}
 }
    /* the action file gets copied in in place of this dollarsign */
+#line 543 "/usr/share/bison.simple"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -2774,8 +2815,32 @@ yyerrhandle:
 
   yystate = yyn;
   goto yynewstate;
+
+ yyacceptlab:
+  /* YYACCEPT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 0;
+
+ yyabortlab:
+  /* YYABORT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 1;
 }
-#line 2057 "../../../../src/ri/sdr.y"
+#line 2057 "sdr.y"
 
 #include "lex.sl.cpp"
 

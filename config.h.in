@@ -144,6 +144,9 @@
 /* Directory where we store models */
 #undef PIXIE_MODELS
 
+/* Directory where we store modules */
+#undef PIXIE_MODULES
+
 /* Directory where we store procedurals */
 #undef PIXIE_PROCEDURALS
 

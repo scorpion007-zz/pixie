@@ -52,7 +52,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		183D2A670B2BC6BB001BB8F4 /* libri.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
 		183D2A6C0B2BC732001BB8F4 /* ri.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F820AD6E196003C2D7B /* ri.h */; };
 		183D2A6D0B2BC741001BB8F4 /* dsply.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F080AD6E143003C2D7B /* dsply.h */; };
 		183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9E09B300AD9BCF300A33716 /* sdr.h */; };
@@ -78,6 +77,7 @@
 		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
 		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
 		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
+		18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18E9F1060B75B07500DA484A /* rendererMutexes.cpp */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -588,16 +588,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		183D2A650B2BC6AD001BB8F4 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /bin;
-			dstSubfolderSpec = 0;
-			files = (
-				183D2A670B2BC6BB001BB8F4 /* libri.dylib in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		183D2A6A0B2BC718001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
@@ -828,6 +818,7 @@
 		188383E00B2FB38F00166E3E /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = LICENSE; path = ../../LICENSE; sourceTree = SOURCE_ROOT; };
 		188383E10B2FB38F00166E3E /* NEWS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = NEWS; path = ../../NEWS; sourceTree = SOURCE_ROOT; };
 		188383E20B2FB38F00166E3E /* README */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = README; path = ../../README; sourceTree = SOURCE_ROOT; };
+		18E9F1060B75B07500DA484A /* rendererMutexes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rendererMutexes.cpp; path = ../../src/ri/rendererMutexes.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E2F0AD6D651003C2D7B /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = algebra.cpp; path = ../../src/common/algebra.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E300AD6D651003C2D7B /* algebra.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = algebra.h; path = ../../src/common/algebra.h; sourceTree = SOURCE_ROOT; };
@@ -1629,6 +1620,7 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
+				18E9F1060B75B07500DA484A /* rendererMutexes.cpp */,
 				1862D7650B2A8FCD00111435 /* objectMisc.h */,
 				1862D7630B2A8FB100111435 /* tiff.h */,
 				1862D75F0B2A8F8100111435 /* gi.cpp */,
@@ -2103,7 +2095,6 @@
 				C96A6EBE0AD6E08A003C2D7B /* Headers */,
 				C96A6EBF0AD6E08A003C2D7B /* Sources */,
 				C96A6EC00AD6E08A003C2D7B /* Frameworks */,
-				183D2A650B2BC6AD001BB8F4 /* CopyFiles */,
 				183D2A6A0B2BC718001BB8F4 /* CopyFiles */,
 			);
 			buildRules = (
@@ -2495,6 +2486,7 @@
 				C983E7920AF300EE00648461 /* dso.cpp in Sources */,
 				1862D75C0B2A8F5A00111435 /* debug.cpp in Sources */,
 				1862D7610B2A8F8100111435 /* gi.cpp in Sources */,
+				18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
