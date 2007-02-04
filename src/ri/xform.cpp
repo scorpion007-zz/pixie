@@ -430,3 +430,22 @@ void	transformBound(float *lbmin,float *lbmax,const float *to,const float *bmin,
 		addBox(lbmin,lbmax,corners[i]);
 	}
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CXform
+// Method				:	updateBound
+// Description			:	Update the bounding box
+// Return Value			:	-
+// Comments				:
+void		CXform::updateBound(float *bmin,float *bmax,int numPoints,const float *P) {
+	vector		tmp;
+	int			i;
+	const float	*cP;
+	
+	for (i=numPoints,cP=P;i>0;i--,cP+=3) {
+		mulmp(tmp,from,cP);
+		addBox(bmin,bmax,tmp);
+	}
+	
+	if (next != NULL)	next->updateBound(bmin,bmax,numPoints,P);
+}

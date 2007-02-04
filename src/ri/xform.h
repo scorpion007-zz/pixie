@@ -63,6 +63,7 @@ public:
 	void		invert();
 	void		transformBound(float *,float *) const;
 	void		invTransformBound(float *,float *) const;
+	void		updateBound(float *,float *,int,const float *);
 
 	int			normalFlip()		{
 					if (flip == -1) {
