@@ -180,12 +180,15 @@ void	CRenderer::endDisplays() {
 	}
 }
 
+// The maximum memory we should try to allocate on the stack in dispatch / clear
+#define MAX_DISPATCH_SIZE 100000
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	dispatch
 // Description			:	Dispatch a rendered window to the out devices
 // Return Value			:	-
-// Comments				:	Thread safe, FIXME: The dispatch size can get too big (CRASH)
+// Comments				:	Thread safe
 void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 	float	*dest;
 	int		i,j,k,l;
@@ -194,14 +197,18 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 	// Send the pixels to the output servers
 	for (i=0;i<numDisplays;i++) {
 		if (datas[i].module != NULL) {
-			int		imageSamples	=	datas[i].numSamples;
-			float	*dispatch		=	(float *) alloca(width*height*imageSamples*sizeof(float));
+			float	*dispatchData;
+			int		imageSamples							=	datas[i].numSamples;
+			int		size									=	width*height*imageSamples*sizeof(float);
+			
+			if (size < MAX_DISPATCH_SIZE) 	dispatchData	=	(float *) alloca(size);
+			else							dispatchData	=	(float *) malloc(size);
 			
 			for (j=0,disp=0;j<datas[i].numChannels;j++){
 				const float		*tmp			=	&pixels[datas[i].channels[j].sampleStart];
 				const int		channelSamples	=	datas[i].channels[j].numSamples;
 				
-				dest		=	dispatch + disp;
+				dest		=	dispatchData + disp;
 				srcStep		=	numSamples - channelSamples;
 				dstStep		=	imageSamples - channelSamples;
 				disp		+=	channelSamples;
@@ -215,7 +222,7 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 				}
 			}
 
-			if (datas[i].data(datas[i].handle,left,top,width,height,dispatch) == FALSE) {
+			if (datas[i].data(datas[i].handle,left,top,width,height,dispatchData) == FALSE) {
 				// Lock this piece of code
 				osLock(displayKillMutex);
 				datas[i].handle	=	NULL;
@@ -225,6 +232,8 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 				datas[i].module	=	NULL;
 				osUnlock(displayKillMutex);
 			}
+
+			if (size >= MAX_DISPATCH_SIZE)	free(dispatchData);
 		}
 	}
 }
@@ -234,14 +243,18 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 // Method				:	clear
 // Description			:	Send a clear window to the out devices
 // Return Value			:	-
-// Comments				:	Thread safe, FIXME: The clear size can get too big (CRASH)
+// Comments				:	Thread safe
 void	CRenderer::clear(int left,int top,int width,int height) {
-	float	*pixels	=	(float *) alloca(width*height*numSamples*sizeof(float));
-	int		i;
+	float	*pixels;
+	int		size								=	width*height*numSamples*sizeof(float);
+	if (size < MAX_DISPATCH_SIZE)	pixels	=	(float *) alloca(size);
+	else							pixels	=	(float *) malloc(size);
 
-	for (i=0;i<width*height*numSamples;i++)	pixels[i]	=	0;
+	for (int i=0;i<width*height*numSamples;i++)	pixels[i]	=	0;
 
 	dispatch(left,top,width,height,pixels);
+	
+	if (size >= MAX_DISPATCH_SIZE)	free(pixels);
 }
 
 
