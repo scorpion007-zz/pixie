@@ -202,7 +202,7 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 			int		size									=	width*height*imageSamples*sizeof(float);
 			
 			if (size < MAX_DISPATCH_SIZE) 	dispatchData	=	(float *) alloca(size);
-			else							dispatchData	=	(float *) malloc(size);
+			else							dispatchData	=	new float[width*height*imageSamples];
 			
 			for (j=0,disp=0;j<datas[i].numChannels;j++){
 				const float		*tmp			=	&pixels[datas[i].channels[j].sampleStart];
@@ -233,7 +233,7 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 				osUnlock(displayKillMutex);
 			}
 
-			if (size >= MAX_DISPATCH_SIZE)	free(dispatchData);
+			if (size >= MAX_DISPATCH_SIZE)	delete [] dispatchData;
 		}
 	}
 }
@@ -248,13 +248,13 @@ void	CRenderer::clear(int left,int top,int width,int height) {
 	float	*pixels;
 	int		size								=	width*height*numSamples*sizeof(float);
 	if (size < MAX_DISPATCH_SIZE)	pixels	=	(float *) alloca(size);
-	else							pixels	=	(float *) malloc(size);
+	else							pixels	=	new float[width*height*numSamples];
 
 	for (int i=0;i<width*height*numSamples;i++)	pixels[i]	=	0;
 
 	dispatch(left,top,width,height,pixels);
 	
-	if (size >= MAX_DISPATCH_SIZE)	free(pixels);
+	if (size >= MAX_DISPATCH_SIZE)	delete [] pixels;
 }
 
 
@@ -541,7 +541,7 @@ void	CRenderer::computeDisplayData() {
 			memcpy(datas[numDisplays].channels + dspNumChannels,oChannel,sizeof(CDisplayChannel));
 			if (oChannel->fill) {
 				// ensure a deep copy
-				datas[numDisplays].channels[dspNumChannels].fill = (float*) malloc(sizeof(float)*oChannel->numSamples);
+				datas[numDisplays].channels[dspNumChannels].fill = new float[oChannel->numSamples];
 				for(s=0;s<datas[numDisplays].channels[dspNumChannels].numSamples;s++)
 					datas[numDisplays].channels[dspNumChannels].fill[s] = oChannel->fill[s];
 			}

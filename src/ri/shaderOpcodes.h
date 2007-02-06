@@ -516,14 +516,14 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 
 
 #define	PFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
 							operand(2,op);											\
 							findCoordinateSystem(sys->string,from,to,cSystem);
 
-#define	PFROMEXPR			mulmp(&res->real,from[0],&op->real);
+#define	PFROMEXPR			mulmp(&res->real,from,&op->real);
 
 #define	PFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;
@@ -531,7 +531,7 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 #define	PFROMEXPR_POST
 
 #define	CFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
@@ -547,14 +547,14 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 
 
 #define	MFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
 							operand(2,op);											\
 							findCoordinateSystem(sys->string,from,to,cSystem);
 
-#define	MFROMEXPR			mulmm(&res->real,from[0],&op->real);
+#define	MFROMEXPR			mulmm(&res->real,from,&op->real);
 
 #define	MFROMEXPR_UPDATE	res	+=	16;												\
 							op	+=	16;
@@ -562,14 +562,14 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 #define	MFROMEXPR_POST
 
 #define	VFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
 							operand(2,op);											\
 							findCoordinateSystem(sys->string,from,to,cSystem);
 
-#define	VFROMEXPR			mulmv(&res->real,from[0],&op->real);
+#define	VFROMEXPR			mulmv(&res->real,from,&op->real);
 
 #define	VFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;

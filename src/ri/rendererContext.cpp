@@ -101,7 +101,7 @@ CDisplayChannel::CDisplayChannel() {
 // Return Value			:
 // Comments				:	var can be NULL
 CDisplayChannel::~CDisplayChannel() {
-	if (fill) free(fill);
+	if (fill) delete [] fill;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1132,7 +1132,7 @@ void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void
 				if (strcmp(cVar->name,"fill") == 0) {
 					if ((cVar->numFloats == nChannel->numSamples) &&
 						(cVar->type == nChannel->variable->type)) {
-						nChannel->fill = (float*) malloc(sizeof(float)*nChannel->numSamples);
+						nChannel->fill = new float[nChannel->numSamples];
 						memcpy(nChannel->fill,params[i],nChannel->numSamples*sizeof(float));
 					} else {
 						error(CODE_BADTOKEN,"Invalid number of items for fill\n");
@@ -2441,7 +2441,7 @@ void	CRendererContext::RiCoordinateSystem(char *space) {
 }
 
 void	CRendererContext::RiCoordSysTransform(char *space) {
-	matrix				*from,*to;
+	const float			*from,*to;
 	ECoordinateSystem	cSystem;
 	CXform				*xform;
 
@@ -2450,14 +2450,14 @@ void	CRendererContext::RiCoordSysTransform(char *space) {
 	if (xform != NULL) {
 		CRenderer::findCoordinateSystem(space,from,to,cSystem);
 
-		movmm(xform->from,from[0]);
-		movmm(xform->to,to[0]);
+		movmm(xform->from,from);
+		movmm(xform->to,to);
 	}
 }
 
 void	CRendererContext::RiTransformPoints(char *fromspace,char *tospace,int npoints,float points[][3]) {
-	matrix				*from1,*to1;
-	matrix				*from2,*to2;
+	const float			*from1,*to1;
+	const float			*from2,*to2;
 	ECoordinateSystem	cSystem1,cSystem2;
 	int					i;
 	vector				tmp;
@@ -2466,8 +2466,8 @@ void	CRendererContext::RiTransformPoints(char *fromspace,char *tospace,int npoin
 	CRenderer::findCoordinateSystem(tospace,from2,to2,cSystem2);
 
 	for (i=0;i<npoints;i++) {
-		mulmp(tmp,from1[0],points[i]);
-		mulmp(points[i],to2[0],tmp);
+		mulmp(tmp,from1,points[i]);
+		mulmp(points[i],to2,tmp);
 	}
 }
 

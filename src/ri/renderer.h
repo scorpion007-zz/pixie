@@ -266,8 +266,8 @@ public:
 		// Functions that deal with declerations (implemented in rendererDeclerations.cpp)
 		////////////////////////////////////////////////////////////////////
 		static	void			initDeclerations();
-		static	void			defineCoordinateSystem(const char *,matrix &,matrix &,ECoordinateSystem type = COORDINATE_CUSTOM);
-		static	int				findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
+		static	void			defineCoordinateSystem(const char *,const float *,const float *,ECoordinateSystem type = COORDINATE_CUSTOM);
+		static	int				findCoordinateSystem(const char *,const float *&,const float *&,ECoordinateSystem &);
 		static	CVariable		*declareVariable(const char *,const char *,int um = 0);
 		static	void			makeGlobalVariable(CVariable *);
 		static	CVariable		*retrieveVariable(const char *);
@@ -393,7 +393,7 @@ public:
 
 
 		// Second, some other data structures
-		static	CMemStack				*frameMemory;				// Where we allocate permanent frame data
+		static	T64						frameCheckpoint[3];			// A checkpoint in the global memory
 		static	CTrie<CFileResource  *>	*frameFiles;				// Files that have been loaded (they stick around only during the frame)
 		static	CArray<const char*>		*frameTemporaryFiles;		// This hold the name of temporary files
 		static	CShadingContext			**contexts;					// The array of shading contexts

@@ -189,7 +189,7 @@ int								CRenderer::shootStep;
 EDepthFilter					CRenderer::depthFilter;
 
 // Frame data
-CMemStack						*CRenderer::frameMemory				=	NULL;						// intialized in beginFrame, destroyed in endFrame
+T64								CRenderer::frameCheckpoint[3];										// initialized in beginFrame
 CTrie<CFileResource  *>			*CRenderer::frameFiles				=	NULL;						// intialized in beginFrame, destroyed in endFrame
 CArray<const char*>				*CRenderer::frameTemporaryFiles		=	NULL;						// intialized in beginFrame, destroyed in endFrame
 CShadingContext					**CRenderer::contexts				=	NULL;						// intialized in beginFrame, destroyed in endFrame
@@ -471,8 +471,8 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	// Record the frame start time
 	stats.frameStartTime	=	osCPUTime();
 
-	// Allocate the frame zone
-	frameMemory				=	new CMemStack(1000000);
+	// Create a checkpoint in the global memory
+	memSave(frameCheckpoint,globalMemory);
 
 	// Make a local copy of the options
 	copyOptions(o);
@@ -576,7 +576,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	metaYBuckets		=	(int) ceil(yBuckets / (float) netYBuckets);
 
 	// If we have servers, this array will hold the server assignment for each bucket
-	jobAssignment		=	(int *) frameMemory->alloc(xBuckets*yBuckets*sizeof(int));
+	jobAssignment		=	(int *) ralloc(xBuckets*yBuckets*sizeof(int),CRenderer::globalMemory);
 
 	// Create the job assignment
 	for (i=0;i<xBuckets*yBuckets;i++)	jobAssignment[i]	=	-1;
@@ -764,7 +764,8 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 	// Create a default display if not there
 	if (displays == NULL) {
-		displays				=	(COptions::CDisplay *) frameMemory->alloc(sizeof(COptions::CDisplay));
+		// (globalMemory is checkpointed)
+		displays				=	(COptions::CDisplay *) ralloc(sizeof(COptions::CDisplay),CRenderer::globalMemory);
 		displays->next			=	NULL;
 		displays->outDevice		=	RI_FILE;
 		displays->outName		=	"ri.tif";
@@ -788,8 +789,8 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		const float		halfFilterWidth			=	(float) filterWidth*0.5f;
 		const float		halfFilterHeight		=	(float) filterHeight*0.5f;
 
-		// Allocate the pixel filter
-		pixelFilterKernel = (float *) frameMemory->alloc(filterWidth*filterHeight*sizeof(float));
+		// Allocate the pixel filter (globalMemory is checkpointed)
+		pixelFilterKernel = (float *) ralloc(filterWidth*filterHeight*sizeof(float),CRenderer::globalMemory);
 	
 		// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
 		float	totalWeight	=	0;
@@ -1031,9 +1032,8 @@ void		CRenderer::endFrame() {
 		}
 	}
 
-	// Ditch the frame memory
-	delete frameMemory;
-	frameMemory	=	NULL;
+	// Restore the memory to the checkpoint, effectively deallocating everything we allocated for the frame
+	memRestore(frameCheckpoint,globalMemory);
 
 	// Print the stats (before we discard the memory)
 	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;

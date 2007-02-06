@@ -1389,16 +1389,13 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	if (CRenderer::locateFile(fileName,src,searchPath)) {
 		FILE *in;
 		if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-			matrix	identity;
 
 			// create backing store in a temp file
 			// FIXME: make osTempname not always prefix dir
 			sprintf(tempName,"%s.tmp",dest);
-		
-			identitym(identity);
 
-			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identity,identity,in);
-			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identity,identity,cPtCloud->channels,cPtCloud->numChannels);
+			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identityMatrix,identityMatrix,in);
+			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->channels,cPtCloud->numChannels);
 			
 			float **dataPointers =	cPtCloud->dataPointers->array;
 			for (i=1;i<cPtCloud->numPhotons;i++) {

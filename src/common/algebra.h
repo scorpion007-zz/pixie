@@ -118,6 +118,7 @@ typedef double	dmatrix[16];								// an array of 16 doubles
 // Row major matrix element order (compatible with openGL)
 #define	element(row,column)	(row+(column<<2))
 
+extern const matrix	identityMatrix;						// Points to the identity matrix
 
 #define COMP_X	0
 #define COMP_Y	1

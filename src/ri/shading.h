@@ -154,12 +154,12 @@ public:
 // Comments				:
 class	CRayBundle {
 public:
-		int						numRays;									// The number of rays to trace
-		CRay					**rays;										// The array of rays to trace
-		const char				*label;										// The label of these rays
-		int						last;										// The last transparent ray
-		int						depth;										// The transparency depth of the bundle
-		CShaderInstance			*postShader;								// The shader to execute after the raytrace
+		int						numRays;							// The number of rays to trace
+		CRay					**rays;								// The array of rays to trace
+		const char				*label;								// The label of these rays
+		int						last;								// The last transparent ray
+		int						depth;								// The transparency depth of the bundle
+		CShaderInstance			*postShader;						// The shader to execute after the raytrace
 
 		virtual	int				postTraceAction()				=	0;		// The function to be called after the rays are traced
 		virtual	void			postShade(int,CRay **,float **)	=	0;		// The function that's called with the shade results
@@ -260,7 +260,7 @@ public:
 									return float(y) * (float(1.0)/float(0x3FFFFFFF));
 								}
 
-		const int				thread;													// The thread number for this context
+		const int				thread;												// The thread number for this context
 
 protected:
 		// Hiders can hook into the following functions
@@ -269,31 +269,31 @@ protected:
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }
 		virtual	void			illuminateEnd() { }
 
-		int						numShade;												// Number of times shade is called
-		int						numSampled;												// Number of points sampled
-		int						numShaded;												// Number of points shaded
-		int						vertexMemory;											// The amount of vertex memory allocated by this context
-		int						peakVertexMemory;										// The maximum peak vertex memory
-		int						numTracedRays;											// The number of rays traced
+		int						numShade;											// Number of times shade is called
+		int						numSampled;											// Number of points sampled
+		int						numShaded;											// Number of points shaded
+		int						vertexMemory;										// The amount of vertex memory allocated by this context
+		int						peakVertexMemory;									// The maximum peak vertex memory
+		int						numTracedRays;										// The number of rays traced
 		int						numReflectionRays;
 		int						numTransmissionRays;
 		int						numGatherRays;
 private:
-		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
+		CMemPage				*shaderStateMemory;									// Memory from which we allocate shader instance variables
 
-		CConditional			*conditionals;											// Holds nested conditionals
-		int						currentRayDepth;										// Current shading depth
-		const char				*currentRayLabel;										// The current ray label
-		CShadingState			*freeStates;											// The list of free states
-		int						inShadow;												// TRUE if we're in a shadow
+		CConditional			*conditionals;										// Holds nested conditionals
+		int						currentRayDepth;									// Current shading depth
+		const char				*currentRayLabel;									// The current ray label
+		CShadingState			*freeStates;										// The list of free states
+		int						inShadow;											// TRUE if we're in a shadow
 
-		CSobol<4>				traceGenerator;											// Random number generator for "trace"
-		CSobol<4>				transmissionGenerator;									// Random number generator for "transmission"
-		CSobol<4>				gatherGenerator;										// Random number generator for "gather"
+		CSobol<4>				traceGenerator;										// Random number generator for "trace"
+		CSobol<4>				transmissionGenerator;								// Random number generator for "transmission"
+		CSobol<4>				gatherGenerator;									// Random number generator for "gather"
 
-		TObjectHash				*traceObjectHash;										// An object hash array for raytraced objects
+		TObjectHash				*traceObjectHash;									// An object hash array for raytraced objects
 	
-		void					execute(CProgrammableShaderInstance *,float **);		// Execute a shader
+		void					execute(CProgrammableShaderInstance *,float **);	// Execute a shader
 
 		// The following functions are used in the shaders
 		void					duFloat(float *,const float *);
@@ -327,7 +327,7 @@ private:
 		void					displace(CSurface *,int,CQuadVertex **);
 
 		// Some misc shading functions
-		void					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
+		void					findCoordinateSystem(const char *,const float *&,const float *&,ECoordinateSystem &);
 
 		// Some data structures for urand()
 		//

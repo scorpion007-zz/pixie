@@ -37,12 +37,6 @@
 #include "shading.h"
 
 
-static	matrix	identity	=	{	1,	0,	0,	0,
-									0,	1,	0,	0,
-									0,	0,	1,	0,
-									0,	0,	0,	1	};
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	initDeclerations
@@ -251,31 +245,26 @@ void			CRenderer::initDeclerations() {
 	//
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////
-	// Identity matrix for unknown transformations
-	matrix	identity	=	{	1,	0,	0,	0,
-								0,	1,	0,	0,
-								0,	0,	1,	0,
-								0,	0,	0,	1	};
 
 
-	defineCoordinateSystem(coordinateCameraSystem,identity,identity,COORDINATE_CAMERA);
-	defineCoordinateSystem(coordinateWorldSystem,identity,identity,COORDINATE_WORLD);
-	defineCoordinateSystem(coordinateObjectSystem,identity,identity,COORDINATE_OBJECT);
-	defineCoordinateSystem(coordinateShaderSystem,identity,identity,COORDINATE_SHADER);
-	defineCoordinateSystem(coordinateLightSystem,identity,identity,COORDINATE_LIGHT);
-	defineCoordinateSystem(coordinateNDCSystem,identity,identity,COORDINATE_NDC);
-	defineCoordinateSystem(coordinateRasterSystem,identity,identity,COORDINATE_RASTER);
-	defineCoordinateSystem(coordinateScreenSystem,identity,identity,COORDINATE_SCREEN);
-	defineCoordinateSystem(coordinateCurrentSystem,identity,identity,COORDINATE_CURRENT);
+	defineCoordinateSystem(coordinateCameraSystem,identityMatrix,identityMatrix,COORDINATE_CAMERA);
+	defineCoordinateSystem(coordinateWorldSystem,identityMatrix,identityMatrix,COORDINATE_WORLD);
+	defineCoordinateSystem(coordinateObjectSystem,identityMatrix,identityMatrix,COORDINATE_OBJECT);
+	defineCoordinateSystem(coordinateShaderSystem,identityMatrix,identityMatrix,COORDINATE_SHADER);
+	defineCoordinateSystem(coordinateLightSystem,identityMatrix,identityMatrix,COORDINATE_LIGHT);
+	defineCoordinateSystem(coordinateNDCSystem,identityMatrix,identityMatrix,COORDINATE_NDC);
+	defineCoordinateSystem(coordinateRasterSystem,identityMatrix,identityMatrix,COORDINATE_RASTER);
+	defineCoordinateSystem(coordinateScreenSystem,identityMatrix,identityMatrix,COORDINATE_SCREEN);
+	defineCoordinateSystem(coordinateCurrentSystem,identityMatrix,identityMatrix,COORDINATE_CURRENT);
 
 	// Define the default color systems
-	defineCoordinateSystem(colorRgbSystem,identity,identity,COLOR_RGB);
-	defineCoordinateSystem(colorHslSystem,identity,identity,COLOR_HSL);
-	defineCoordinateSystem(colorHsvSystem,identity,identity,COLOR_HSV);
-	defineCoordinateSystem(colorXyzSystem,identity,identity,COLOR_XYZ);
-	defineCoordinateSystem(colorCieSystem,identity,identity,COLOR_CIE);
-	defineCoordinateSystem(colorYiqSystem,identity,identity,COLOR_YIQ);
-	defineCoordinateSystem(colorXyySystem,identity,identity,COLOR_XYY);
+	defineCoordinateSystem(colorRgbSystem,identityMatrix,identityMatrix,COLOR_RGB);
+	defineCoordinateSystem(colorHslSystem,identityMatrix,identityMatrix,COLOR_HSL);
+	defineCoordinateSystem(colorHsvSystem,identityMatrix,identityMatrix,COLOR_HSV);
+	defineCoordinateSystem(colorXyzSystem,identityMatrix,identityMatrix,COLOR_XYZ);
+	defineCoordinateSystem(colorCieSystem,identityMatrix,identityMatrix,COLOR_CIE);
+	defineCoordinateSystem(colorYiqSystem,identityMatrix,identityMatrix,COLOR_YIQ);
+	defineCoordinateSystem(colorXyySystem,identityMatrix,identityMatrix,COLOR_XYY);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -313,7 +302,7 @@ void			CRenderer::shutdownDeclerations() {
 // Description			:	Define a coordinate system
 // Return Value			:
 // Comments				:
-void			CRenderer::defineCoordinateSystem(const char *name,matrix &from,matrix &to,ECoordinateSystem type) {
+void			CRenderer::defineCoordinateSystem(const char *name,const float *from,const float *to,ECoordinateSystem type) {
 	CNamedCoordinateSystem	*newEntry;
 	
 	assert(definedCoordinateSystems	!=	NULL);
@@ -341,32 +330,32 @@ void			CRenderer::defineCoordinateSystem(const char *name,matrix &from,matrix &t
 // Description			:	Find a coordinate system
 // Return Value			:	TRUE on success
 // Comments				:
-int			CRenderer::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
+int			CRenderer::findCoordinateSystem(const char *name,const float *&from,const float *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;
 
 	assert(CRenderer::definedCoordinateSystems	!=	NULL);
 
 	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
-		from		=	&currentSystem->from;
-		to			=	&currentSystem->to;
+		from		=	currentSystem->from;
+		to			=	currentSystem->to;
 		cSystem		=	currentSystem->systemType;
 
 		switch(cSystem) {
 			case COORDINATE_OBJECT:
 				break;
 			case COORDINATE_CAMERA:
-				from	=	&identity;
-				to		=	&identity;
+				from	=	identityMatrix;
+				to		=	identityMatrix;
 				break;
 			case COORDINATE_WORLD:
-				from	=	&CRenderer::fromWorld;
-				to		=	&CRenderer::toWorld;
+				from	=	CRenderer::fromWorld;
+				to		=	CRenderer::toWorld;
 				break;
 			case COORDINATE_SHADER:
 				{
 					CXform	*currentXform	=	context->getXform(FALSE);
-					from	=	&currentXform->from;
-					to		=	&currentXform->to;
+					from	=	currentXform->from;
+					to		=	currentXform->to;
 					break;
 				}
 			case COORDINATE_LIGHT:
@@ -377,8 +366,8 @@ int			CRenderer::findCoordinateSystem(const char *name,matrix *&from,matrix *&to
 			case COORDINATE_CURRENT:
 				{
 					CXform	*currentXform	=	context->getXform(FALSE);
-					from	=	&currentXform->from;
-					to		=	&currentXform->to;
+					from	=	currentXform->from;
+					to		=	currentXform->to;
 					break;
 				}
 		}

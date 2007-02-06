@@ -424,7 +424,7 @@ DEFFUNC(PNoise3D4			,"pnoise"		,"v=pfpf",	FUN5EXPR_PRE,PNOISE3D4EXPR,FUN5EXPR_UP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ctransform "c=Sc"
-#define	CTRANSFORMEXPR_PRE	matrix				*from,*to;											\
+#define	CTRANSFORMEXPR_PRE	const float			*from,*to;											\
 							ECoordinateSystem	cSystem;											\
 							FUN3EXPR_PRE															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
@@ -435,7 +435,7 @@ DEFFUNC(CTransform		,"ctransform"			,"c=Sc"	,CTRANSFORMEXPR_PRE,CTRANSFORMEXPR,F
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ctransform "c=SSc"
-#define	CTRANSFORMSEXPR_PRE	matrix				*from,*to;											\
+#define	CTRANSFORMSEXPR_PRE	const float			*from,*to;											\
 							vector				vtmp;												\
 							ECoordinateSystem	cSystemFrom,cSystemTo;								\
 							FUN4EXPR_PRE															\
@@ -451,12 +451,12 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=Sp
 #define	TRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							FUN3EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
 
-#define	TRANSFORM1EXPR		mulmp(&res->real,to[0],&op2->real);
+#define	TRANSFORM1EXPR		mulmp(&res->real,to,&op2->real);
 
 
 #define	TRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);
@@ -464,14 +464,14 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=SSp"
 #define	TRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;											\
-							matrix				*from1,*to1,*from2,*to2;										\
+							const float			*from1,*to1,*from2,*to2;										\
 							vector				vtmp;															\
 							FUN4EXPR_PRE;																		\
 							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);							\
 							findCoordinateSystem(op2->string,from2,to2,cSystemTo);
 
-#define	TRANSFORM2EXPR		mulmp(vtmp,from1[0],&op3->real);													\
-							mulmp(&res->real,to2[0],vtmp);
+#define	TRANSFORM2EXPR		mulmp(vtmp,from1,&op3->real);														\
+							mulmp(&res->real,to2,vtmp);
 
 #define	TRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
@@ -482,22 +482,22 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=Smp"
 #define	TRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							vector				vtmp;												\
 							FUN4EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
-#define	TRANSFORM4EXPR		mulmp(vtmp,from[0],&op3->real);											\
+#define	TRANSFORM4EXPR		mulmp(vtmp,from,&op3->real);											\
 							mulmp(&res->real,&op2->real,vtmp);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=Sp
 #define	VTRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							FUN3EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
-#define	VTRANSFORM1EXPR		mulmv(&res->real,to[0],&op2->real);
+#define	VTRANSFORM1EXPR		mulmv(&res->real,to,&op2->real);
 
 
 #define	VTRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);
@@ -506,11 +506,11 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=Sp
 #define	NTRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							FUN3EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);						\
 
-#define	NTRANSFORM1EXPR		mulmn(&res->real,from[0],&op2->real);
+#define	NTRANSFORM1EXPR		mulmn(&res->real,from,&op2->real);
 
 #define	NTRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);												\
 
@@ -518,28 +518,28 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=SSp"
 #define VTRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
-							matrix				*from1,*to1,*from2,*to2;							\
+							const float			*from1,*to1,*from2,*to2;							\
 							vector				vtmp;												\
 							FUN4EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);				\
 							findCoordinateSystem(op2->string,from2,to2,cSystemTo);
 
-#define	VTRANSFORM2EXPR		mulmv(vtmp,from1[0],&op3->real);										\
-							mulmv(&res->real,to2[0],vtmp);
+#define	VTRANSFORM2EXPR		mulmv(vtmp,from1,&op3->real);											\
+							mulmv(&res->real,to2,vtmp);
 
 #define VTRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=SSp"
 #define NTRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
-							matrix				*from1,*to1,*from2,*to2;							\
+							const float			*from1,*to1,*from2,*to2;							\
 							vector				vtmp;												\
 							FUN4EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);				\
 							findCoordinateSystem(op2->string,from2,to2,cSystemTo);					\
 
-#define	NTRANSFORM2EXPR		mulmn(vtmp,to1[0],&op3->real);											\
-							mulmn(&res->real,from2[0],vtmp);
+#define	NTRANSFORM2EXPR		mulmn(vtmp,to1,&op3->real);												\
+							mulmn(&res->real,from2,vtmp);
 
 #define NTRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
@@ -557,12 +557,12 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=Smp"
 #define	VTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;												\
-							matrix				*from,*to;												\
+							const float			*from,*to;												\
 							vector				vtmp;													\
 							FUN4EXPR_PRE;																\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
-#define	VTRANSFORM4EXPR		mulmv(vtmp,from[0],&op3->real);												\
+#define	VTRANSFORM4EXPR		mulmv(vtmp,from,&op3->real);												\
 							mulmv(&res->real,&op2->real,vtmp);
 
 #define	VTRANSFORM4EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,16,3);
@@ -570,14 +570,14 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=Smp"
 #define	NTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;												\
-							matrix				*from,*to;												\
+							const float			*from,*to;												\
 							matrix				mtmp;													\
 							vector				vtmp;													\
 							FUN4EXPR_PRE;																\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
 #define	NTRANSFORM4EXPR		invertm(mtmp,&op2->real);													\
-							mulmn(vtmp,to[0],&op3->real);												\
+							mulmn(vtmp,to,&op3->real);													\
 							mulmn(&res->real,mtmp,vtmp);
 
 #define	NTRANSFORM4EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,16,3);
@@ -2193,13 +2193,13 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1,*op2;												\
-									matrix				*from,*to;												\
+									const float			*from,*to;												\
 									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(5,(numArguments-5) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
 									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,*from,*to);						\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,from,to);						\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
 									lookup->nv			=	CRenderer::numThreads;								\
 									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
@@ -2271,12 +2271,12 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									TCode				*op1;													\
-									matrix				*from,*to;												\
+									const float			*from,*to;												\
 									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1);																\
 									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
-									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,*from,*to);								\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,from,to);								\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
 									lookup->nv			=	CRenderer::numThreads;								\
 									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\

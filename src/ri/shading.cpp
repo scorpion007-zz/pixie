@@ -51,13 +51,6 @@
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
 
-// In case we need identity matrix
-static		matrix	identity	=	{	1,	0,	0,	0,
-										0,	1,	0,	0,
-										0,	0,	1,	0,
-										0,	0,	0,	1	};
-
-
 // Options that are defined and responded
 static	char	*optionsFormat				=	"Format";
 static	char	*optionsDeviceFrame			=	"Frame";
@@ -244,12 +237,11 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 	// Note: It is important this is last, as before this we assume a 0-1
 	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
-		float	*time		=	varying[VARIABLE_TIME];
-		float	*dtimev		=	varying[VARIABLE_DTIME];
-		const float idtime	= 	CRenderer::invShutterTime;
-		const float t0		=	CRenderer::shutterOpen;
+		float		*time		=	varying[VARIABLE_TIME];
+		const float idtime		= 	CRenderer::invShutterTime;
+		const float t0			=	CRenderer::shutterOpen;
 		
-		*dtimev = CRenderer::shutterClose - CRenderer::shutterOpen;
+		varying[VARIABLE_DTIME][0] = CRenderer::shutterClose - CRenderer::shutterOpen;
 		
 		for (i=num;i>0;i--) {
 			time[0] = (time[0]*idtime + t0);
@@ -368,12 +360,11 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	// Note: It is important this is last, as before this we assume a 0-1
 	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
-		float	*time		=	varying[VARIABLE_TIME];
-		float	*dtimev		=	varying[VARIABLE_DTIME];
-		const float idtime	= 	CRenderer::invShutterTime;
-		const float t0		=	CRenderer::shutterOpen;
+		float		*time		=	varying[VARIABLE_TIME];
+		const float idtime		= 	CRenderer::invShutterTime;
+		const float t0			=	CRenderer::shutterOpen;
 		
-		*dtimev = CRenderer::shutterClose - CRenderer::shutterOpen;
+		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
 		
 		for (i=num;i>0;i--) {
 			time[0] = (time[0]*idtime + t0);
@@ -412,7 +403,9 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 	currentRayLabel			=	rayLabelPrimary;
 	freeStates				=	NULL;
 	inShadow				=	FALSE;
-	traceObjectHash			=	(TObjectHash *) CRenderer::frameMemory->alloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE);
+
+	// (globalMemory is checkpointed)
+	traceObjectHash			=	(TObjectHash *) ralloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE,CRenderer::globalMemory);
 
 	// Fill the object pointers with impossible data
 	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
@@ -1516,60 +1509,60 @@ const char	*CShadingContext::shaderName(const char *type) {
 // Description			:	Locate a coordinate system
 // Return Value			:	-
 // Comments				:
-void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
+void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;
 
 	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
-		from		=	&currentSystem->from;
-		to			=	&currentSystem->to;
+		from		=	currentSystem->from;
+		to			=	currentSystem->to;
 		cSystem		=	currentSystem->systemType;
 
 		switch(currentSystem->systemType) {
 		case COORDINATE_OBJECT:
 			if (currentShadingState->currentObject == NULL) {
 				error(CODE_SYSTEM,"Object system reference without an object\n");
-				from		=	&identity;
-				to			=	&identity;
+				from		=	identityMatrix;
+				to			=	identityMatrix;
 			} else {
-				from		=	&(currentShadingState->currentObject->xform->from);
-				to			=	&(currentShadingState->currentObject->xform->to);
+				from		=	currentShadingState->currentObject->xform->from;
+				to			=	currentShadingState->currentObject->xform->to;
 			}
 			break;
 		case COORDINATE_CAMERA:
-			from		=	&identity;
-			to			=	&identity;
+			from		=	identityMatrix;
+			to			=	identityMatrix;
 			break;
 		case COORDINATE_WORLD:
-			from		=	&CRenderer::fromWorld;
-			to			=	&CRenderer::toWorld;
+			from		=	CRenderer::fromWorld;
+			to			=	CRenderer::toWorld;
 			break;
 		case COORDINATE_SHADER:
 			assert(currentShadingState->currentShaderInstance != NULL);
 
-			from		=	&(currentShadingState->currentShaderInstance->xform->from);
-			to			=	&(currentShadingState->currentShaderInstance->xform->to);
+			from		=	currentShadingState->currentShaderInstance->xform->from;
+			to			=	currentShadingState->currentShaderInstance->xform->to;
 			break;
 		case COORDINATE_LIGHT:
 			assert(currentShadingState->currentLightInstance != NULL);
 
-			from		=	&(currentShadingState->currentLightInstance->xform->from);
-			to			=	&(currentShadingState->currentLightInstance->xform->to);
+			from		=	currentShadingState->currentLightInstance->xform->from;
+			to			=	currentShadingState->currentLightInstance->xform->to;
 			break;
 		case COORDINATE_NDC:
-			from		=	&CRenderer::fromNDC;
-			to			=	&CRenderer::toNDC;
+			from		=	CRenderer::fromNDC;
+			to			=	CRenderer::toNDC;
 			break;
 		case COORDINATE_RASTER:
-			from		=	&CRenderer::fromRaster;
-			to			=	&CRenderer::toRaster;
+			from		=	CRenderer::fromRaster;
+			to			=	CRenderer::toRaster;
 			break;
 		case COORDINATE_SCREEN:
-			from		=	&CRenderer::fromScreen;
-			to			=	&CRenderer::toScreen;
+			from		=	CRenderer::fromScreen;
+			to			=	CRenderer::toScreen;
 			break;
 		case COORDINATE_CURRENT:
-			from		=	&identity;
-			to			=	&identity;
+			from		=	identityMatrix;
+			to			=	identityMatrix;
 			break;
 		case COLOR_RGB:
 		case COLOR_HSL:
@@ -1582,19 +1575,19 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 			break;
 		case COORDINATE_CUSTOM:
 			// Don't handle color, the custom must have been handled
-			from		=	&currentSystem->from;
-			to			=	&currentSystem->to;
+			from		=	currentSystem->from;
+			to			=	currentSystem->to;
 			break;
 		default:
 			warning(CODE_BUG,"Unknown coordinate system: %s\n",name);
-			from		=	&identity;
-			to			=	&identity;
+			from		=	identityMatrix;
+			to			=	identityMatrix;
 			break;
 		}	
 	} else {
 		warning(CODE_BUG,"Unknown coordinate system: %s\n",name);
-		from	=	&identity;
-		to		=	&identity;
+		from	=	identityMatrix;
+		to		=	identityMatrix;
 	}
 }
 

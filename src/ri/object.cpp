@@ -111,7 +111,7 @@ void			CObject::dice(CShadingContext *rasterizer) {
 }
 
 
-static	float	getDisp(float *mat,float disp) {
+static	float	getDisp(const float *mat,float disp) {
 	float	tmp[4],tmp2[4];
 	int		i;
 	float	alpha;
@@ -338,12 +338,11 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 
 	// Add the displacement amount of the surface
 	if (attributes->maxDisplacementSpace != NULL) {
-		matrix				*from;
-		matrix				*to;
+		const float			*from,*to;
 		ECoordinateSystem	sys;
 
 		if (CRenderer::findCoordinateSystem(attributes->maxDisplacementSpace,from,to,sys)) {
-			maxDisp	=	attributes->maxDisplacement	* getDisp(*from,attributes->maxDisplacement);
+			maxDisp	=	attributes->maxDisplacement	* getDisp(from,attributes->maxDisplacement);
 		}
 
 		free(attributes->maxDisplacementSpace);

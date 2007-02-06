@@ -59,7 +59,8 @@ COcclusionCuller::~COcclusionCuller() {
 void	COcclusionCuller::initCuller(int w,float *ma) {
 	for (depth=0,width=1;width < w;depth++,width=width<<1);
 
-	nodes			=	(COcclusionNode **) CRenderer::frameMemory->alloc(width*width*sizeof(COcclusionNode *));
+	// (globalMemory is checkpointed)
+	nodes			=	(COcclusionNode **) ralloc(width*width*sizeof(COcclusionNode *),CRenderer::globalMemory);
 	root			=	newNode(NULL,width,0,0);
 	maxOpaqueDepth	=	ma;
 }
@@ -118,7 +119,8 @@ void	COcclusionCuller::initToZero() {
 // Return Value			:	-
 // Comments				:
 COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int x,int y) {
-	COcclusionNode	*cNode	=	(COcclusionNode *) CRenderer::frameMemory->alloc(sizeof(COcclusionNode));
+	// (globalMemory is checkpointed)
+	COcclusionNode	*cNode	=	(COcclusionNode *) ralloc(sizeof(COcclusionNode),CRenderer::globalMemory);
 
 	cNode->parent		=	p;
 	cNode->width		=	w;
