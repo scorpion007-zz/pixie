@@ -237,11 +237,12 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 	// Note: It is important this is last, as before this we assume a 0-1
 	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
-		float		*time		=	varying[VARIABLE_TIME];
-		const float idtime		= 	CRenderer::invShutterTime;
-		const float t0			=	CRenderer::shutterOpen;
+	
+		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
 		
-		varying[VARIABLE_DTIME][0] = CRenderer::shutterClose - CRenderer::shutterOpen;
+		float		*time			=	varying[VARIABLE_TIME];
+		const float idtime			= 	CRenderer::invShutterTime;
+		const float t0				=	CRenderer::shutterOpen;
 		
 		for (i=num;i>0;i--) {
 			time[0] = (time[0]*idtime + t0);
@@ -360,11 +361,12 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	// Note: It is important this is last, as before this we assume a 0-1
 	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
+		
+		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
+		
 		float		*time		=	varying[VARIABLE_TIME];
 		const float idtime		= 	CRenderer::invShutterTime;
 		const float t0			=	CRenderer::shutterOpen;
-		
-		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
 		
 		for (i=num;i>0;i--) {
 			time[0] = (time[0]*idtime + t0);
@@ -505,7 +507,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	CShaderInstance		*atmosphere;
 	int					i;
 	CSurface			*savedObject;
-	T64					shaderVarCheckpoint[3];
+	TMemCheckpoint		shaderVarCheckpoint;
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);

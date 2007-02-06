@@ -36,6 +36,7 @@
 #include "common/os.h"
 #include "options.h"
 #include "shadeop.h"
+#include "memory.h"
 
 // Compute the circle of confusion as a function of the depth
 #define	cocPixels(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorPixels
@@ -393,7 +394,7 @@ public:
 
 
 		// Second, some other data structures
-		static	T64						frameCheckpoint[3];			// A checkpoint in the global memory
+		static	TMemCheckpoint			frameCheckpoint;			// A checkpoint in the global memory
 		static	CTrie<CFileResource  *>	*frameFiles;				// Files that have been loaded (they stick around only during the frame)
 		static	CArray<const char*>		*frameTemporaryFiles;		// This hold the name of temporary files
 		static	CShadingContext			**contexts;					// The array of shading contexts

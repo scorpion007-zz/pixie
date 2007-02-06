@@ -70,11 +70,11 @@ am_libri_la_OBJECTS = attributes.lo brickmap.lo bundles.lo cache.lo \
 	quadrics.lo random.lo raytracer.lo remoteChannel.lo \
 	renderer.lo rendererClipping.lo rendererContext.lo \
 	rendererDeclerations.lo rendererDisplay.lo rendererFiles.lo \
-	rendererJobs.lo rendererNetwork.lo reyes.lo ri.lo rib.lo \
-	riInterface.lo ribOut.lo shader.lo shading.lo show.lo sl.lo \
-	stats.lo stochastic.lo subdivision.lo subdivisionCreator.lo \
-	surface.lo texmake.lo texture.lo texture3d.lo trace.lo \
-	variable.lo xform.lo zbuffer.lo
+	rendererJobs.lo rendererMutexes.lo rendererNetwork.lo reyes.lo \
+	ri.lo rib.lo riInterface.lo ribOut.lo shader.lo shading.lo \
+	show.lo sl.lo stats.lo stochastic.lo subdivision.lo \
+	subdivisionCreator.lo surface.lo texmake.lo texture.lo \
+	texture3d.lo trace.lo variable.lo xform.lo zbuffer.lo
 libri_la_OBJECTS = $(am_libri_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -274,6 +274,7 @@ libri_la_SOURCES = attributes.cpp \
 				rendererDisplay.cpp \
 				rendererFiles.cpp \
 				rendererJobs.cpp \
+				rendererMutexes.cpp \
 				rendererNetwork.cpp \
 				reyes.cpp \
 				ri.cpp \
@@ -413,6 +414,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rendererDisplay.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rendererFiles.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rendererJobs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rendererMutexes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rendererNetwork.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reyes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ri.Plo@am__quote@

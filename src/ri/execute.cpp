@@ -291,7 +291,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													for (cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {	\
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
-															T64		shaderVarCheckpoint[3];											\
+															TMemCheckpoint		shaderVarCheckpoint;								\
 															memSave(shaderVarCheckpoint,shaderStateMemory);							\
 															currentShadingState->currentLightInstance	=	light;					\
 															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(shaderStateMemory,varying,numVertices);	\
@@ -355,7 +355,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 														CProgrammableShaderInstance	*light	=	cLight->light;							\
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
-															T64		shaderVarCheckpoint[3];												\
+															TMemCheckpoint		shaderVarCheckpoint;									\
 															memSave(shaderVarCheckpoint,shaderStateMemory);								\
 															currentShadingState->currentLightInstance	=	light;						\
 															currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = light->prepare(shaderStateMemory,varying,numVertices);	\

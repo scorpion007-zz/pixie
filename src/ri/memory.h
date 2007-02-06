@@ -96,18 +96,23 @@ inline void *ralloc(int size,CMemPage *&stack) {
 		__page->memory			=	savedMem;					\
 	}
 
-
+// This structure can be used to put a checkpoint
+typedef struct {
+	CMemPage		*stack;
+	int				availableSize;
+	char			*memory;
+} TMemCheckpoint;
 
 // Mem save and mem restore does the same thing, but they explicitly store the checkpoint in T64 data[3];
 #define	memSave(__data,__stack)													\
-	__data[0].pointer		=	__stack->memory;								\
-	__data[1].integer		=	__stack->availableSize;							\
-	__data[2].pointer		=	__stack;
+	__data.memory			=	__stack->memory;								\
+	__data.availableSize	=	__stack->availableSize;							\
+	__data.stack			=	__stack;
 
 #define memRestore(__data,__stack)												\
-	__stack					=	(CMemPage *) __data[2].pointer;					\
-	__stack->availableSize	=	__data[1].integer;								\
-	__stack->memory			=	(char *) __data[0].pointer;
+	__stack					=	__data.stack;									\
+	__stack->availableSize	=	__data.availableSize;							\
+	__stack->memory			=	__data.memory;
 
 
 #endif

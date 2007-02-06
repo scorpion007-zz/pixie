@@ -131,7 +131,7 @@ char							CRenderer::temporaryPath[OS_MAX_PATH_LENGTH];						// initialized in 
 ////////////////////////////////////////////////////////////////////
 // Local members (active between RiWorldBegin() - RiWorldEnd())
 ////////////////////////////////////////////////////////////////////
-// Frame options - intialized in copyOptions()
+// Frame options - initialized in copyOptions()
 int								CRenderer::xres,CRenderer::yres;
 int								CRenderer::frame;
 float							CRenderer::pixelAR;
@@ -189,64 +189,64 @@ int								CRenderer::shootStep;
 EDepthFilter					CRenderer::depthFilter;
 
 // Frame data
-T64								CRenderer::frameCheckpoint[3];										// initialized in beginFrame
-CTrie<CFileResource  *>			*CRenderer::frameFiles				=	NULL;						// intialized in beginFrame, destroyed in endFrame
-CArray<const char*>				*CRenderer::frameTemporaryFiles		=	NULL;						// intialized in beginFrame, destroyed in endFrame
-CShadingContext					**CRenderer::contexts				=	NULL;						// intialized in beginFrame, destroyed in endFrame
-int								CRenderer::numActiveThreads			=	0;							// intialized in beginFrame
-CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;						// intialized in beginFrame, destroyed in endFrame
-CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;						// intialized in beginFrame, destroyed in endFrame
-CProgrammableShaderInstance		*CRenderer::dirtyInstances			=	NULL;						// intialized in beginFrame, destroyed in endFrame
-unsigned int					CRenderer::raytracingFlags			=	0;							// intialized in beginFrame
-CObject							*CRenderer::root					=	NULL;						// intialized in beginFrame, destroyed in endFrame
-CObject							*CRenderer::offendingObject			=	NULL;						// intialized in beginFrame
-matrix							CRenderer::fromWorld,CRenderer::toWorld;							// intialized in beginFrame
-vector							CRenderer::worldBmin,CRenderer::worldBmax;							// intialized in beginFrame
-CXform							*CRenderer::world					=	NULL;						// intialized in beginFrame, destroyed in endFrame
-matrix							CRenderer::fromNDC,CRenderer::toNDC;								// intialized in beginFrame
-matrix							CRenderer::fromRaster,CRenderer::toRaster;							// intialized in beginFrame
-matrix							CRenderer::fromScreen,CRenderer::toScreen;							// intialized in beginFrame
-matrix							CRenderer::worldToNDC;												// intialized in beginFrame
-unsigned int					CRenderer::hiderFlags;												// intialized in beginFrame
+TMemCheckpoint					CRenderer::frameCheckpoint;											// initialized in beginFrame
+CTrie<CFileResource  *>			*CRenderer::frameFiles				=	NULL;						// initialized in beginFrame, destroyed in endFrame
+CArray<const char*>				*CRenderer::frameTemporaryFiles		=	NULL;						// initialized in beginFrame, destroyed in endFrame
+CShadingContext					**CRenderer::contexts				=	NULL;						// initialized in beginFrame, destroyed in endFrame
+int								CRenderer::numActiveThreads			=	0;							// initialized in beginFrame
+CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;						// initialized in beginFrame, destroyed in endFrame
+CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;						// initialized in beginFrame, destroyed in endFrame
+CProgrammableShaderInstance		*CRenderer::dirtyInstances			=	NULL;						// initialized in beginFrame, destroyed in endFrame
+unsigned int					CRenderer::raytracingFlags			=	0;							// initialized in beginFrame
+CObject							*CRenderer::root					=	NULL;						// initialized in beginFrame, destroyed in endFrame
+CObject							*CRenderer::offendingObject			=	NULL;						// initialized in beginFrame
+matrix							CRenderer::fromWorld,CRenderer::toWorld;							// initialized in beginFrame
+vector							CRenderer::worldBmin,CRenderer::worldBmax;							// initialized in beginFrame
+CXform							*CRenderer::world					=	NULL;						// initialized in beginFrame, destroyed in endFrame
+matrix							CRenderer::fromNDC,CRenderer::toNDC;								// initialized in beginFrame
+matrix							CRenderer::fromRaster,CRenderer::toRaster;							// initialized in beginFrame
+matrix							CRenderer::fromScreen,CRenderer::toScreen;							// initialized in beginFrame
+matrix							CRenderer::worldToNDC;												// initialized in beginFrame
+unsigned int					CRenderer::hiderFlags;												// initialized in beginFrame
 int								CRenderer::numSamples;												// initialized in beginDisplays
 int								CRenderer::numExtraSamples;											// initialized in beginDisplays
-int								CRenderer::xPixels,CRenderer::yPixels;								// intialized in beginFrame
+int								CRenderer::xPixels,CRenderer::yPixels;								// initialized in beginFrame
 unsigned int					CRenderer::additionalParameters;									// initialized in beginDisplays
-float							CRenderer::pixelLeft,CRenderer::pixelRight;							// intialized in beginFrame
-float							CRenderer::pixelTop,CRenderer::pixelBottom;							// intialized in beginFrame
-float							CRenderer::dydPixel,CRenderer::dxdPixel;							// intialized in beginFrame
-float							CRenderer::dPixeldx,CRenderer::dPixeldy;							// intialized in beginFrame
-float							CRenderer::dSampledx,CRenderer::dSampledy;							// intialized in beginFrame
-int								CRenderer::renderLeft,CRenderer::renderRight;						// intialized in beginFrame
-int								CRenderer::renderTop,CRenderer::renderBottom;						// intialized in beginFrame
-int								CRenderer::xBuckets,CRenderer::yBuckets;							// intialized in beginFrame
-int								CRenderer::xBucketsMinusOne;										// intialized in beginFrame
-int								CRenderer::yBucketsMinusOne;										// intialized in beginFrame
-float							CRenderer::invBucketSampleWidth,CRenderer::invBucketSampleHeight;	// intialized in beginFrame
-int								CRenderer::metaXBuckets,CRenderer::metaYBuckets;					// intialized in beginFrame
-float							CRenderer::aperture;												// intialized in beginFrame
-float							CRenderer::imagePlane;												// intialized in beginFrame
-float							CRenderer::invImagePlane;											// intialized in beginFrame
-float							CRenderer::cocFactorPixels;											// intialized in beginFrame
-float							CRenderer::cocFactorSamples;										// intialized in beginFrame
-float							CRenderer::cocFactorScreen;											// intialized in beginFrame
-float							CRenderer::invFocaldistance;										// intialized in beginFrame
-float							CRenderer::lengthA,CRenderer::lengthB;								// intialized in beginFrame
+float							CRenderer::pixelLeft,CRenderer::pixelRight;							// initialized in beginFrame
+float							CRenderer::pixelTop,CRenderer::pixelBottom;							// initialized in beginFrame
+float							CRenderer::dydPixel,CRenderer::dxdPixel;							// initialized in beginFrame
+float							CRenderer::dPixeldx,CRenderer::dPixeldy;							// initialized in beginFrame
+float							CRenderer::dSampledx,CRenderer::dSampledy;							// initialized in beginFrame
+int								CRenderer::renderLeft,CRenderer::renderRight;						// initialized in beginFrame
+int								CRenderer::renderTop,CRenderer::renderBottom;						// initialized in beginFrame
+int								CRenderer::xBuckets,CRenderer::yBuckets;							// initialized in beginFrame
+int								CRenderer::xBucketsMinusOne;										// initialized in beginFrame
+int								CRenderer::yBucketsMinusOne;										// initialized in beginFrame
+float							CRenderer::invBucketSampleWidth,CRenderer::invBucketSampleHeight;	// initialized in beginFrame
+int								CRenderer::metaXBuckets,CRenderer::metaYBuckets;					// initialized in beginFrame
+float							CRenderer::aperture;												// initialized in beginFrame
+float							CRenderer::imagePlane;												// initialized in beginFrame
+float							CRenderer::invImagePlane;											// initialized in beginFrame
+float							CRenderer::cocFactorPixels;											// initialized in beginFrame
+float							CRenderer::cocFactorSamples;										// initialized in beginFrame
+float							CRenderer::cocFactorScreen;											// initialized in beginFrame
+float							CRenderer::invFocaldistance;										// initialized in beginFrame
+float							CRenderer::lengthA,CRenderer::lengthB;								// initialized in beginFrame
 
-int								CRenderer::xSampleOffset,CRenderer::ySampleOffset;					// intialized in beginFrame
-float							CRenderer::sampleClipRight,CRenderer::sampleClipLeft;				// intialized in beginFrame
-float							CRenderer::sampleClipTop,CRenderer::sampleClipBottom;				// intialized in beginFrame
-float							*CRenderer::pixelFilterKernel;										// intialized in beginFrame
+int								CRenderer::xSampleOffset,CRenderer::ySampleOffset;					// initialized in beginFrame
+float							CRenderer::sampleClipRight,CRenderer::sampleClipLeft;				// initialized in beginFrame
+float							CRenderer::sampleClipTop,CRenderer::sampleClipBottom;				// initialized in beginFrame
+float							*CRenderer::pixelFilterKernel;										// initialized in beginFrame
 
 float							CRenderer::leftX,CRenderer::leftZ,CRenderer::leftD;					// initialized in beginClipping
 float							CRenderer::rightX,CRenderer::rightZ,CRenderer::rightD;				// initialized in beginClipping
 float							CRenderer::topY,CRenderer::topZ,CRenderer::topD;					// initialized in beginClipping
 float							CRenderer::bottomY,CRenderer::bottomZ,CRenderer::bottomD;			// initialized in beginClipping
 int								CRenderer::numActiveDisplays;										// initialized in beginDisplays
-int								CRenderer::currentXBucket;											// intialized in beginFrame
-int								CRenderer::currentYBucket;											// intialized in beginFrame
-int								CRenderer::currentPhoton;											// intialized in beginFrame
-int								*CRenderer::jobAssignment;											// intialized in beginFrame
+int								CRenderer::currentXBucket;											// initialized in beginFrame
+int								CRenderer::currentYBucket;											// initialized in beginFrame
+int								CRenderer::currentPhoton;											// initialized in beginFrame
+int								*CRenderer::jobAssignment;											// initialized in beginFrame
 FILE							*CRenderer::deepShadowFile			=	NULL;						// initialized in beginDisplays
 int								*CRenderer::deepShadowIndex			=	NULL;						// initialized in beginDisplays
 int								CRenderer::deepShadowIndexStart;									// initialized in beginDisplays
