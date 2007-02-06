@@ -291,12 +291,11 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													for (cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {	\
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
-															TMemCheckpoint		shaderVarCheckpoint;								\
-															memSave(shaderVarCheckpoint,shaderStateMemory);							\
-															currentShadingState->currentLightInstance	=	light;					\
+															memBegin(shaderStateMemory);											\
+															currentShadingState->currentLightInstance			=	light;			\
 															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(shaderStateMemory,varying,numVertices);	\
 															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);										\
-															memRestore(shaderVarCheckpoint,shaderStateMemory);						\
+															memEnd(shaderStateMemory);						\
 														}													\
 													}														\
 												}															\
@@ -355,12 +354,11 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 														CProgrammableShaderInstance	*light	=	cLight->light;							\
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
-															TMemCheckpoint		shaderVarCheckpoint;									\
-															memSave(shaderVarCheckpoint,shaderStateMemory);								\
-															currentShadingState->currentLightInstance	=	light;						\
-															currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = light->prepare(shaderStateMemory,varying,numVertices);	\
-															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);									\
-															memRestore(shaderVarCheckpoint,shaderStateMemory);							\
+															memBegin(shaderStateMemory);												\
+															currentShadingState->currentLightInstance			=	light;				\
+															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(shaderStateMemory,varying,numVertices);	\
+															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);										\
+															memEnd(shaderStateMemory);						\
 														}													\
 													}														\
 												}															\
