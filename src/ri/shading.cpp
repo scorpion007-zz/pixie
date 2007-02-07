@@ -507,7 +507,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	CShaderInstance		*atmosphere;
 	int					i;
 	CSurface			*savedObject;
-	TMemCheckpoint		shaderVarCheckpoint;
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);
@@ -676,7 +675,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	currentShadingState->numVertices	=	numVertices;
 
 	// Checkpoint the shader state stack
-	memSave(shaderVarCheckpoint,shaderStateMemory);
+	memBegin(shaderStateMemory);
 	
 	// Allocate the caches for the shaders being executed
 	float		***locals	= 	currentShadingState->locals;
@@ -1056,7 +1055,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	memEnd(threadMemory);
 	
 	// Unwind the stack of shader states
-	memRestore(shaderVarCheckpoint,shaderStateMemory);
+	memEnd(shaderStateMemory);
 
 	// Restore the shaded object
 	currentShadingState->currentObject	=	savedObject;
