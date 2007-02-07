@@ -283,7 +283,7 @@ int								*CRenderer::textureMaxMemory			=	NULL;					// initialized in initText
 // Return Value			:	-
 // Comments				:
 void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetString) {
-	float			startTime	=	osCPUTime();
+	const float		startTime	=	osCPUTime();
 
 	// Save the context
 	context		=	c;
@@ -291,11 +291,11 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Reset the stats
 	stats.reset();
 
-	// Create the synchronization objects
-	beginMutexes();
-
-	// Init the memory
+	// Init the global memory
 	memoryInit(globalMemory);
+
+	// Create the synchronization objects
+	initMutexes();
 
 	// Init the files
 	initFiles();
@@ -303,7 +303,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Init the declerations
 	initDeclerations();
 
-	// Init the network
+	// Init the network (if applicable)
 	initNetwork(ribFile,riNetString);
 	
 	// Init the light sources we use
@@ -312,9 +312,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Record the start overhead
 	stats.rendererStartOverhead		=	osCPUTime() - startTime;
 
-	// Create a temporary directory for the lifetime of the renderer
-
-		
+	// Create a temporary directory for the lifetime of the renderer		
 	// Make the temporary directory pid-unique in case we have more than one on a given host
 #ifdef WIN32
 	sprintf(temporaryPath,"PixieTemp_%d",GetCurrentProcessId());
@@ -355,7 +353,7 @@ void		CRenderer::endRenderer() {
 	parserCleanup();
 
 	// Delete the synchronization objects
-	endMutexes();
+	shutdownMutexes();
 
 	// Turn off the memory manager
 	memoryTini(globalMemory);
@@ -509,20 +507,19 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		// The user explicitly entered the screen window, so we don't have to make sure it matches the frame aspect ratio
 	} else {
 		if (frameAR > (float) 1.0) {
-			screenTop			=	(float) 1.0;
-			screenBottom		=	(float) -1.0;
+			screenTop			=	1.0f;
+			screenBottom		=	-1.0f;
 			screenLeft			=	-frameAR;
 			screenRight			=	frameAR;
 		} else {
 			screenTop			=	1/frameAR;
 			screenBottom		=	-1/frameAR;
-			screenLeft			=	(float) -1.0;
-			screenRight			=	(float) 1.0;
+			screenLeft			=	-1.0f;
+			screenRight			=	1.0f;
 		}
 	}
 
 	// Compute the image plane depth
-	imagePlane		=	1;
 	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		imagePlane	=	(float) (1/tan(radians(fov*0.5f)));
 	} else {
@@ -790,11 +787,10 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		const float		halfFilterHeight		=	(float) filterHeight*0.5f;
 
 		// Allocate the pixel filter (globalMemory is checkpointed)
-		pixelFilterKernel = (float *) ralloc(filterWidth*filterHeight*sizeof(float),CRenderer::globalMemory);
+		pixelFilterKernel						=	(float *) ralloc(filterWidth*filterHeight*sizeof(float),CRenderer::globalMemory);
 	
 		// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
 		float	totalWeight	=	0;
-		double	invWeight;
 		int		sx,sy;
 
 		// Evaluate the filter
@@ -811,7 +807,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		}
 
 		// Normalize the filter kernel
-		invWeight	=	1 / (double) totalWeight;
+		double	invWeight	=	1 / (double) totalWeight;
 		for (i=0;i<filterWidth*filterHeight;i++) {
 			pixelFilterKernel[i]			=	(float) (pixelFilterKernel[i] * invWeight);
 		}
@@ -864,7 +860,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	CTesselationPatch::initTesselations(geoCacheSize);
 
 	// Initialize the brickmaps
-	CBrickMap::brickMapInit(maxBrickSize);
+	CBrickMap::initBrickMap(maxBrickSize);
 
 	// Initialize the texturing (after we worked out how many threads)
 	initTextures(maxTextureSize);
@@ -980,7 +976,7 @@ void		CRenderer::endFrame() {
 	shutdownTextures();
 		
 	// Shutdown the texturing system
-	CBrickMap::brickMapShutdown();
+	CBrickMap::shutdownBrickMap();
 	
 	// Cleanup the tesselations
 	CTesselationPatch::shutdownTesselations();
@@ -1018,7 +1014,7 @@ void		CRenderer::endFrame() {
 		frameTemporaryFiles = NULL;
 	}
 
-	// Receive an end of frame confirmation to the server
+	// Receive an end of frame confirmation from the server
 	if (netClient != INVALID_SOCKET) {
 		T32		netBuffer;
 
@@ -1145,7 +1141,6 @@ void		CRenderer::renderFrame() {
 	if (netNumServers != 0) {
 		int				i;
 		TThread			*threads;
-
 
 		// Spawn the threads
 		threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));

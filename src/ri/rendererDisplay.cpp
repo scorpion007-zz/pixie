@@ -268,6 +268,8 @@ void	CRenderer::clear(int left,int top,int width,int height) {
 void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	// Progress stats
 	if (flags & OPTIONS_FLAGS_PROGRESS)	{
+		// FIXME: This is not thread safe !!!
+		// But it's just for reporting progress, so who cares
 		numRenderedBuckets++;
 		stats.progress		=	(numRenderedBuckets*100) / (float) (xBuckets * yBuckets);
 		if (numRenderedBuckets == xBuckets*yBuckets)	info(CODE_PROGRESS,"Done                    \r\n");

@@ -1555,6 +1555,7 @@ void	CRendererContext::RiSurfaceV(char *name,int n,char *tokens[],void *params[]
 		attributes->surface->detach();
 
 	attributes->surface = cShader;
+	attributes->checkParameters();
 }
 
 void	CRendererContext::RiAtmosphereV(char *name,int n,char *tokens[],void *params[]) {
@@ -1570,6 +1571,7 @@ void	CRendererContext::RiAtmosphereV(char *name,int n,char *tokens[],void *param
 		attributes->atmosphere->detach();
 
 	attributes->atmosphere = cShader;
+	attributes->checkParameters();
 }
 
 void	CRendererContext::RiInteriorV(char *name,int n,char *tokens[],void *params[]) {
@@ -1585,6 +1587,7 @@ void	CRendererContext::RiInteriorV(char *name,int n,char *tokens[],void *params[
 		attributes->interior->detach();
 
 	attributes->interior = cShader;
+	attributes->checkParameters();
 }
 
 void	CRendererContext::RiExteriorV (char *name,int n,char *tokens[],void *params[]) {
@@ -1600,6 +1603,7 @@ void	CRendererContext::RiExteriorV (char *name,int n,char *tokens[],void *params
 		attributes->exterior->detach();
 
 	attributes->exterior = cShader;
+	attributes->checkParameters();
 }
 
 void	CRendererContext::RiShadingRate(float size) {
@@ -2430,6 +2434,7 @@ void	CRendererContext::RiDisplacementV(char *name,int n,char *tokens[],void *par
 		attributes->displacement->detach();
 
 	attributes->displacement = cShader;
+	attributes->checkParameters();
 }
 
 void	CRendererContext::RiCoordinateSystem(char *space) {

@@ -214,7 +214,7 @@ CBrickMap::~CBrickMap() {
 	CBrickMap	*cMap,*pMap;
 
 	// Flush the memory
-	brickMapFlush(TRUE);
+	flushBrickMap(TRUE);
 
 	// Remove us from the list of bricks in memory
 	for (pMap=NULL,cMap=brickMaps;cMap!=NULL;pMap=cMap,cMap=cMap->nextMap) {
@@ -586,7 +586,7 @@ void				CBrickMap::finalize() {
 	}
 	
 	// Flush all the bricks to disk
-	brickMapFlush(TRUE);
+	flushBrickMap(TRUE);
 
 	// Save the current file position. This is the file index
 	fseek(file,0,SEEK_END);
@@ -645,7 +645,7 @@ CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 	CBrick	*cBrick;
 
 	// If we're using too much memory, swap some bricks out
-	if (currentMemory > maxMemory)	brickMapFlush(FALSE);
+	if (currentMemory > maxMemory)	flushBrickMap(FALSE);
 
 	// Allocate the brick
 	cBrick			=	(CBrick *) new char[sizeof(CBrick) + (sizeof(CVoxel) + dataSize*sizeof(float))*(BRICK_SIZE*BRICK_SIZE*BRICK_SIZE)];
@@ -1157,11 +1157,11 @@ void				CBrickMap::bound(float *bmin,float *bmax) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickMapInit
+// Method				:	initBrickMap
 // Description			:	Initialize the brickmaps at the beginning of a frame
 // Return Value			:	-
 // Comments				:
-void				CBrickMap::brickMapInit(int m) {
+void				CBrickMap::initBrickMap(int m) {
 	// This function is guaranteed to be called once and only once for each frame
 	brickMaps		=	NULL;
 	referenceNumber	=	0;
@@ -1174,11 +1174,11 @@ void				CBrickMap::brickMapInit(int m) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickMapFlush
+// Method				:	flushBrickMap
 // Description			:	This function is called to re-claim some of the memory from the brickmap
 // Return Value			:	-
 // Comments				:
-void				CBrickMap::brickMapFlush(int allBricks) {
+void				CBrickMap::flushBrickMap(int allBricks) {
 	int			numNodes;
 	CBrickNode	**nodes;
 	CBrickNode	*cNode;
@@ -1300,11 +1300,11 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickMapShutdown
+// Method				:	shutdownBrickMap
 // Description			:	Clear the memory used by the brickmaps
 // Return Value			:	-
 // Comments				:
-void				CBrickMap::brickMapShutdown() {
+void				CBrickMap::shutdownBrickMap() {
 	// This function is guaranteed to be called once and only once for each frame
 	assert(currentMemory == 0);
 }
@@ -1384,7 +1384,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	// Use a large memory limit when creating brickmaps
 	// Note: needed as RiMakeXYZ can only be called outside a frame, and then
 	// the shading context is gone
-	CBrickMap::brickMapInit(100000000);
+	CBrickMap::initBrickMap(100000000);
 	
 	if (CRenderer::locateFile(fileName,src,searchPath)) {
 		FILE *in;
@@ -1420,7 +1420,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 		error(CODE_BADTOKEN,"Point cloud file \"%s\" not found\n");
 	}
 	
-	CBrickMap::brickMapShutdown();
+	CBrickMap::shutdownBrickMap();
 }
 
 

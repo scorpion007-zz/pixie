@@ -71,8 +71,8 @@ protected:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRasterPatch
-	// Description			:	Holds an object
-	// Comments				:
+	// Description			:	Holds an object associated with a bucket
+	// Comments				:	The same instance of this class may be associated with multiple buckets in multiple threads
 	class	CRasterObject {
 	public:
 			CObject				*object;				// The object
@@ -187,10 +187,6 @@ protected:
 		int						numItems,maxItems,stepSize;	// Misc junk
 	};
 
-
-
-
-	
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CBucket

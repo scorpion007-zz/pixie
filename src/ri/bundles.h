@@ -63,31 +63,6 @@ public:
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceRay
-// Description			:	Expands the ray for "trace" shading language command
-// Comments				:
-class	CTraceExRay : public CRay {
-public:
-		vector					opacity;
-		vector					color;
-		float					*dest;
-		float					*destT;
-		float					multiplier;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceBundle
-// Description			:	Encapsulates a bundle of rays
-// Comments				:
-class	CTraceExBundle : public CRayBundle {
-public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
-};
-
 
 
 
@@ -115,30 +90,11 @@ public:
 				void			post();
 };
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceRay
-// Description			:	Expands the ray for "transmission" shading language command
-// Comments				:	Note that we do not have color
-class	CIrradianceRay : public CRay {
-public:
-		float					*dest;
-};
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceBundle
-// Description			:	Encapsulates an irradiance bundle
-// Comments				:
-class	CIrradianceBundle : public CRayBundle {
-public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
 
-				int				shade;
-};
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherRay
 // Description			:	The ray used for gathering

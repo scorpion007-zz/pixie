@@ -108,6 +108,7 @@ class	CTextureBlock;
 //     The implementation for this class is split into several files:
 //
 //		renderer.cpp			- Init / shutdown code
+//		rendererMutexes.cpp		- The portion that holds the synchronization objects
 //		rendererDeclerations	- The portion that deals with declerations such as variables/coordinate systems etc.
 //		rendererDisplay			- The portion that handles the output
 //		rendererFiles			- The portion that manages files and loads stuff
@@ -158,7 +159,6 @@ public:
 		static	SOCKET							netClient;					// The client that we're serving (-1 if client)
 		static	int								netNumServers;				// The number of servers (0 if server)
 		static	SOCKET							*netServers;				// The array of servers that are serving us		
-		static	int								userRaytracing;				// TRUE if we're raytracing for the user
 		static	int								numRenderedBuckets;			// The number of rendered buckets
 		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
 		static	int								*textureRefNumber;			// The last reference number for each thread's textures
@@ -194,7 +194,7 @@ public:
 		//
 		//		beginFrame is called in WorldBegin
 		//		renderFrame is called in WorldEnd to do the rendering
-		//		endFrame is called in WorldEnd
+		//		endFrame is called in WorldEnd to do the cleaning up
 		//
 		// Between these functions, objects can be added to the scene using
 		//		render
@@ -211,8 +211,8 @@ public:
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with thread synthronication (defined in rendererMutexes.cpp)
 		////////////////////////////////////////////////////////////////////
-		static	void			beginMutexes();
-		static	void			endMutexes();
+		static	void			initMutexes();
+		static	void			shutdownMutexes();
 
 
 		////////////////////////////////////////////////////////////////////
@@ -233,13 +233,12 @@ public:
 				}	type;
 
 			int			xBucket,yBucket;	// For a bucket job, the bucket to render
-			int			numPhotons;			// The number of photons to emit
-			CJob		*next;				// The next job to perform
+			int			numPhotons;			// For a photon job, the number of photons to emit
 		};
 
 		static void				(*dispatchJob)(int thread,CJob &job);				// This function is used by the hiders to ask for a job
 
-		static void				serverThread(void *w);								// Each client has one thread running this function on the client side to dispatch jobs to servers
+		static void				serverThread(void *w);								// Clients run a separate thread for each server. This is the entry point for those client side threads
 		static void				processServerRequest(T32 req,int index);			// This function is used to serve the client requests
 		static void				dispatchReyes(int thread,CJob &job);				// This function dispatches single threaded buckets
 		static void				dispatchPhoton(int thread,CJob &job);				// This function dispatches single threaded photon bundles

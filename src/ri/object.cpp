@@ -67,7 +67,7 @@ CObject::CObject(CAttributes *a,CXform *x) {
 
 	attributes->attach();
 	xform->attach();
-
+	
 	children	=	NULL;
 	sibling		=	NULL;
 }

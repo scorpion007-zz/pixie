@@ -174,9 +174,9 @@ public:
 			int					keyDown(int key);
 
 			// Some global static functions for the renderer interface
-	static	void				brickMapInit(int maxMemory = 10000000);
-	static	void				brickMapFlush(int all=FALSE);
-	static	void				brickMapShutdown();
+	static	void				initBrickMap(int maxMemory = 10000000);
+	static	void				flushBrickMap(int all=FALSE);
+	static	void				shutdownBrickMap();
 protected:
 			void				lookup(const float *P,const float *N,float dP,float *data,int depth);
 			void				flushBricks(int allBricks);		// Free memory by flushing bricks

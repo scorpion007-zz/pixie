@@ -141,6 +141,8 @@ CAttributes::CAttributes() {
 	lodRange[3]					=	C_INFINITY;
 	lodSize						=	0;
 	lodImportance				=	1;
+	
+	checkParameters();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -252,6 +254,7 @@ void	CAttributes::addLight(CShaderInstance *cLight) {
 	
 	nLight->light		=	(CProgrammableShaderInstance*) cLight;
 	nLight->next		=	NULL;
+	checkParameters();
 }
 
 ///////////////////////////////////////////////////////////////////////

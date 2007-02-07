@@ -239,7 +239,6 @@ void		CReyes::renderingLoop() {
 
 			// Skip the buckets reach the bucket we want
 			while((currentXBucket != x) || (currentYBucket != y)) {
-
 				computeExtends;
 				skip();
 			}
@@ -303,11 +302,11 @@ void	CReyes::render() {
 			
 			// Is this a grid ?
 			if (cObject->grid) {
-				CRasterGrid			*grid				=	(CRasterGrid *) cObject;
+				CRasterGrid	*grid	=	(CRasterGrid *) cObject;
 				
 				// Update the stats
 				numGridsRendered++;
-				numQuadsRendered					+=	grid->udiv*grid->vdiv;
+				numQuadsRendered	+=	grid->udiv*grid->vdiv;
 
 				// Render the grid
 				rasterDrawPrimitives(grid);
@@ -426,7 +425,6 @@ void	CReyes::render() {
 
 	// Just have rendered this bucket, so deallocate it
 	assert(cBucket->objects == NULL);
-	//assert(cBucket->queue->numItems == 1);
 	delete cBucket;
 
 	// Advance the bucket
@@ -438,9 +436,6 @@ void	CReyes::render() {
 
 	// Unlock the bucket
 	osUnlock(bucketMutex);
-
-	// Update the statistics
-	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -476,9 +471,6 @@ void	CReyes::skip() {
 
 	// Delete the objects we do not need
 	flushObjects(objectsToDelete);
-
-	// Update the statistics
-	const int	cnBucket			=	currentYBucket*CRenderer::xBuckets+currentXBucket;
 }
 
 
@@ -513,8 +505,6 @@ void		CReyes::drawObject(CObject *object) {
 	float				xmin,xmax,ymin,ymax;
 	float				x[4],y[4];
 	int					i;
-	CRasterObject		*cObject;
-	float				zmin,zmax;
 	const float			*bmin	=	object->bmin;
 	const float			*bmax	=	object->bmax;
 
@@ -523,9 +513,11 @@ void		CReyes::drawObject(CObject *object) {
 	if (bmin[COMP_Z] > CRenderer::clipMax)	{	return;	}
 
 	// Clamp da bounding box
-	zmin	=	max(bmin[COMP_Z],CRenderer::clipMin);
-	zmax	=	min(bmax[COMP_Z],CRenderer::clipMax);
+	const float	zmin	=	max(bmin[COMP_Z],CRenderer::clipMin);
+	const float	zmax	=	min(bmax[COMP_Z],CRenderer::clipMax);
 
+	assert(zmin <= zmax);
+	
 	// Compute the projected extend of the bound in the pixel space
 	if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		if (zmin < C_EPSILON)	{					// Spanning the eye plane ?
@@ -611,7 +603,7 @@ void		CReyes::drawObject(CObject *object) {
 	ymax							=	min(ymax,CRenderer::sampleClipBottom);
 
 	// Record the object
-	cObject							=	newObject(object);
+	CRasterObject	*cObject		=	newObject(object);
 	cObject->xbound[0]				=	(int) floor(xmin);	// Save the bound of the object for future reference
 	cObject->xbound[1]				=	(int) floor(xmax);
 	cObject->ybound[0]				=	(int) floor(ymin);
@@ -689,7 +681,7 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
-																// Create the grid
+															// Create the grid
 	nGrid			=	newGrid(object,numPoints);
 	nGrid->dim		=	SHADING_0D;
 	nGrid->umin		=	0;
@@ -864,7 +856,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 				// Shade the points
 				displace(object,numPoints,1,SHADING_0D,PARAMETER_END_SAMPLE | PARAMETER_P);
 
-				// Figure out the size of the ribbon
+				// Figure out the size of the points
 				sizeArray	=	varying[VARIABLE_WIDTH];
 				if (varying[VARIABLE_WIDTH][0] == -C_INFINITY) {
 					if (varying[VARIABLE_CONSTANTWIDTH][0] == -C_INFINITY) {
@@ -901,12 +893,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 		// This is a 2 dimensional surface
 		int					i,j;
-		float				ustart;
-		float				ustep;
-		float				vstart;
-		float				vstep;
 		int					k;
-		int					numVertices;
 		float				**varying	=	currentShadingState->varying;
 		T32					one;
 		CSurface			*object		=	(CSurface *) (grid->object);
@@ -920,11 +907,11 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		T32					*Oi;
 
 
-		numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
-		ustart		=	grid->umin;					// The minimum step sizes
-		ustep		=	(grid->umax - ustart) / (float) udiv;
-		vstart		=	grid->vmin;
-		vstep		=	(grid->vmax - vstart) / (float) vdiv;
+		const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
+		const float			ustart		=	grid->umin;					// The minimum step sizes
+		const float			ustep		=	(grid->umax - ustart) / (float) udiv;
+		const float			vstart		=	grid->vmin;
+		const float			vstep		=	(grid->vmax - vstart) / (float) vdiv;
 
 		assert(numVertices <= (int) CRenderer::maxGridSize);
 
@@ -943,6 +930,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 
 		if (Ponly) {
+		
 			// Set the flags
 			if (attributes->nSides == 2) {
 				grid->flags	=	RASTER_DRAW_FRONT | RASTER_DRAW_BACK | RASTER_UNSHADED | extraPrimitiveFlags;
@@ -983,7 +971,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			// Check the transparency
 			Oi			=	(T32 *) varying[VARIABLE_OI];
 			one.real	=	1;
-			for (k=0;k<numVertices;k++,Oi+=3) {
+			for (k=numVertices;k>0;k--,Oi+=3) {
 				if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
@@ -1032,6 +1020,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		}
 	}
 
+	// If we've been shading, reset the flags and unlock the mutex
 	if (Ponly == FALSE)	{
 		assert(grid->flags & RASTER_UNSHADED);
 		grid->flags		&=	~(RASTER_UNSHADED | RASTER_SHADE_HIDDEN | RASTER_SHADE_BACKFACE | RASTER_UNDERCULL);
@@ -1049,17 +1038,22 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 // Return Value			:	-
 // Comments				:
 void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int stage) {
-	const	float	*P			=	varying[VARIABLE_P];
-	const	int		disp		=	(CRenderer::numExtraSamples + 10)*stage;
+	const	float	*P		=	varying[VARIABLE_P];
+	const	int		disp	=	(CRenderer::numExtraSamples + 10)*stage;
 	int				i;
 
 	// Copy the samples
+	vertices	+=	disp;
 	for (i=numVertices;i>0;i--,P+=3,vertices+=numVertexSamples) {
-		movvv(vertices+disp,P);
+		movvv(vertices,P);
 	}
 
 	// If we have depth of field, compute that
 	if ((CRenderer::aperture != 0) && (stage == 0)) {
+	
+		assert(disp == 0);
+		
+		// Roll back to the beginning
 		vertices	-=	numVertices*numVertexSamples;
 
 		// Compute the circle of confusion amount
@@ -1087,12 +1081,10 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 	const	float	*s;
 	float			*d;
 
-	// Copy the samples
-	for (i=numVertices;i>0;i--,C+=3,O+=3,vertices+=numVertexSamples) {
-		float	*dest	=	vertices + disp;
-
-		movvv(dest+3,C);
-		movvv(dest+6,O);
+	// Copy the color and opacity
+	for (d=vertices+disp,i=numVertices;i>0;i--,C+=3,O+=3,d+=numVertexSamples) {
+		movvv(d+3,C);
+		movvv(d+6,O);
 	}
 
 
@@ -1102,58 +1094,48 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 		const int outType			= *cOrder++;
 		const int channelSamples	= *cOrder++;
 
+		// This is the source
+		s			=	varying[outType];
+		
+		// This is where we want to save it
+		d			=	vertices + k;
+			
 		switch(channelSamples) {
 		case 0:
 			break;
 		case 1:
-			vertices	-=	numVertices*numVertexSamples;
-			s			=	varying[outType];
-			for (j=0;j<numVertices;j++,vertices+=numVertexSamples) {
-				d		=	vertices + k;
-				*d++	=	*s++;
+			for (j=0;j<numVertices;j++,d+=numVertexSamples) {
+				d[0]	=	*s++;
 			}
 			k++;
 			break;
 		case 2:
-			vertices	-=	numVertices*numVertexSamples;
-			s			=	varying[outType];
-			for (j=0;j<numVertices;j++,vertices+=numVertexSamples) {
-				d		=	vertices + k;
-				*d++	=	*s++;
-				*d++	=	*s++;
+			for (j=0;j<numVertices;j++,d+=numVertexSamples) {
+				d[0]	=	*s++;
+				d[1]	=	*s++;
 			}
 			k	+=	2;
 			break;
 		case 3:
-			vertices	-=	numVertices*numVertexSamples;
-			s			=	varying[outType];
-			for (j=0;j<numVertices;j++,vertices+=numVertexSamples) {
-				d		=	vertices + k;
-				*d++	=	*s++;
-				*d++	=	*s++;
-				*d++	=	*s++;
+			for (j=0;j<numVertices;j++,d+=numVertexSamples) {
+				d[0]	=	*s++;
+				d[1]	=	*s++;
+				d[2]	=	*s++;
 			}
 			k	+=	3;
 			break;
 		case 4:
-			vertices	-=	numVertices*numVertexSamples;
-			s			=	varying[outType];
-			for (j=0;j<numVertices;j++,vertices+=numVertexSamples) {
-				d		=	vertices + k;
-				*d++	=	*s++;
-				*d++	=	*s++;
-				*d++	=	*s++;
-				*d++	=	*s++;
+			for (j=0;j<numVertices;j++,d+=numVertexSamples) {
+				d[0]	=	*s++;
+				d[1]	=	*s++;
+				d[2]	=	*s++;
+				d[3]	=	*s++;
 			}
 			k	+=	4;
 			break;
 		default:
-			vertices	-=	numVertices*numVertexSamples;
-			s			=	varying[outType];
-			for (j=0;j<numVertices;j++,vertices+=numVertexSamples) {
-				d		=	vertices + k;
-				for (l=channelSamples;l>0;l--)
-					*d++	=	*s++;
+			for (j=0;j<numVertices;j++,d+=numVertexSamples) {
+				for (l=0;l<channelSamples;l++) d[l]	=	*s++;
 			}
 			k	+=	channelSamples;
 		}
@@ -1310,18 +1292,16 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 // Comments				:	Thread safe
 void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	// Compute the grid bound and insert it
-	float				xmin,xmax,ymin,ymax;
 	int					i;
-	float				zmin,zmax;
 	const float			*cVertex;
 
 	// Compute the bound of the grid
-	xmin	=	C_INFINITY;
-	ymin	=	C_INFINITY;
-	zmin	=	C_INFINITY;
-	xmax	=	-C_INFINITY;
-	ymax	=	-C_INFINITY;
-	zmax	=	-C_INFINITY;
+	float xmin	=	C_INFINITY;
+	float ymin	=	C_INFINITY;
+	float zmin	=	C_INFINITY;
+	float xmax	=	-C_INFINITY;
+	float ymax	=	-C_INFINITY;
+	float zmax	=	-C_INFINITY;
 	for (cVertex=grid->vertices,i=grid->numVertices;i>0;i--,cVertex+=numVertexSamples) {
 		if (cVertex[0] < xmin)	xmin	=	cVertex[0];
 		if (cVertex[1] < ymin)	ymin	=	cVertex[1];
@@ -1536,9 +1516,6 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 
 	// Insert the object into the bucket its in
 	insertObject(grid);
-
-	// Update stats
-	
 }
 
 
@@ -1605,7 +1582,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 					object->next[i]		=	cBucket->objects;
 					cBucket->objects	=	object;
 				} else {
-					// The thread is processinf this bucket
+					// The thread is processing this bucket
 					cBucket->queue->insert(object);
 				}
 			}

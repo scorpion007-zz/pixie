@@ -197,7 +197,7 @@ TMutex							CRenderer::deepShadowMutex;
 // Description			:	Create the synchronization mutexes
 // Return Value			:	-
 // Comments				:
-void							CRenderer::beginMutexes() {
+void							CRenderer::initMutexes() {
 	osCreateMutex(jobMutex);
 	osCreateMutex(commitMutex);
 	osCreateMutex(displayKillMutex);
@@ -218,7 +218,7 @@ void							CRenderer::beginMutexes() {
 // Description			:	Delete the synchronization mutexes
 // Return Value			:	-
 // Comments				:
-void							CRenderer::endMutexes() {
+void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(jobMutex);
 	osDeleteMutex(commitMutex);
 	osDeleteMutex(displayKillMutex);

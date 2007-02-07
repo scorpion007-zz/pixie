@@ -384,8 +384,6 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Return Value			:	-
 // Comments				:
 CShadingContext::CShadingContext(int t) : thread(t) {
-	int	i;
-
 	// Initialize the shading state
 	currentShadingState		=	NULL;
 	
@@ -410,6 +408,7 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 	traceObjectHash			=	(TObjectHash *) ralloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE,CRenderer::globalMemory);
 
 	// Fill the object pointers with impossible data
+	int	i;
 	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
 
 	// Init the random number generator
@@ -430,10 +429,9 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 // Return Value			:	-
 // Comments				:
 CShadingContext::~CShadingContext() {
-	CShadingState	*cState;
-	CConditional	*cConditional;
 
 	// Delete the conditionals we allocated
+	CConditional	*cConditional;
 	while((cConditional = conditionals) != NULL) {
 		conditionals	=	conditionals->next;
 		delete cConditional;
@@ -445,6 +443,7 @@ CShadingContext::~CShadingContext() {
 	// Ditch the shading states that have been allocated
 	assert(currentShadingState != NULL);
 	freeState(currentShadingState);
+	CShadingState	*cState;
 	while ((cState=freeStates) != NULL) {
 		freeStates	=	cState->next;
 
@@ -461,6 +460,7 @@ CShadingContext::~CShadingContext() {
 	// The frame assertions
 	assert(vertexMemory == 0);
 
+	// Update the global statistics
 	stats.numShade				+=		numShade;
 	stats.numSampled			+=		numSampled;
 	stats.numShaded				+=		numShaded;
@@ -500,7 +500,7 @@ void	CShadingContext::drawObject(CObject *cObject) {
 //	Preconditions:
 //	!!!	->	u,v,time,I		fields of varying must be set
 void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadingDim dim,unsigned int usedParameters,int displaceOnly) {
-	CAttributes			*currentAttributes	=	object->attributes;
+	const CAttributes	*currentAttributes	=	object->attributes;
 	float				**varying			=	currentShadingState->varying;
 	CShaderInstance		*displacement;
 	CShaderInstance		*surface;
@@ -513,18 +513,18 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	assert(vVertices > 0);
 
 	// This is the number of vertices we will be sampling/shading
-	int	numVertices					=	uVertices*vVertices;
+	int	numVertices		=	uVertices*vVertices;
 	assert(numVertices <= CRenderer::maxGridSize);
+	assert(numVertices > 0);
 
 	// Update the stats
 	numShade++;
-	numSampled					+=	numVertices;
+	numSampled			+=	numVertices;
 
-	
 	// Are we just displacing the surface ?
 	if (displaceOnly == FALSE) {
 
-		// Are we a shadow ray ?
+		// Are we in a shadow ray ?
 		if (inShadow == TRUE) {
 
 			// Yes, are we supposed to shade the objects in the shadow ?
@@ -536,6 +536,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 				for (i=numVertices;i>0;i--,opacity+=3)	initv(opacity,1,1,1);
 
+				// Nothing more to do here, just return
 				return;
 			} else if (currentAttributes->transmission == 'i') {
 
@@ -546,14 +547,17 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 				for (i=numVertices;i>0;i--,opacity+=3)	movvv(opacity,so);
 
+				// Nothing more to do here, just return
 				return;
 			}
+			
 			// We need to execute the shaders
 			displacement	=	NULL;	//currentAttributes->displacement;	// We probably don't need to execute the displacement shader
 			surface			=	currentAttributes->surface;
 			atmosphere		=	NULL;
 
 		} else {
+		
 			// We need to execute the shaders
 			if (currentAttributes->flags & ATTRIBUTES_FLAGS_MATTE) {
 				displacement	=	currentAttributes->displacement;
@@ -567,22 +571,26 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		}
 
 		// Prepare the used parameters by the shaders 
-		if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
-		usedParameters						|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
+		usedParameters			|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
 		
 		// Prepare dPdtime if needed, do this _before_ saving our locals
 		if (usedParameters & PARAMETER_DPDTIME) {
+		
 			// Only sample ends if the object is moving (has data1)
 			if (object->moving()) {
-				// Save u,v,t
-				float	*u		=	varying[VARIABLE_U];
-				float	*v		=	varying[VARIABLE_V];
-				float	*t		=	varying[VARIABLE_T];
+			
+				// Save memory
+				memBegin(threadMemory);
 				
-				int		num		=	(dim == SHADING_2D) ? numVertices : numVertices*3;
-				float 	*uSave	=	(float *) ralloc(num*3*sizeof(float),threadMemory);
-				float 	*vSave	=	uSave+num;
-				float 	*tSave	=	vSave+num;
+				// Save u,v,t
+				float		*u		=	varying[VARIABLE_U];
+				float		*v		=	varying[VARIABLE_V];
+				float		*t		=	varying[VARIABLE_T];
+				
+				const int	num		=	(dim == SHADING_2D) ? numVertices : numVertices*3;
+				float		*uSave	=	(float *) ralloc(num*3*sizeof(float),threadMemory);
+				float		*vSave	=	uSave+num;
+				float		*tSave	=	vSave+num;
 				
 				memcpy(uSave,u,num*sizeof(float));
 				memcpy(vSave,v,num*sizeof(float));
@@ -602,14 +610,15 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				displace(object,uVertices,vVertices,dim,tempParameters);
 			
 				// Save off P
-				float		*dPdtime	=	varying[VARIABLE_DPDTIME];
-				const float	*P			=	varying[VARIABLE_P];
-				memcpy(dPdtime,P,sizeof(float)*3*num);
+				memcpy(varying[VARIABLE_DPDTIME],varying[VARIABLE_P],sizeof(float)*3*num);
 				
 				// Restore u,v,t
 				memcpy(u,uSave,num*sizeof(float));
 				memcpy(v,vSave,num*sizeof(float));
 				memcpy(t,tSave,num*sizeof(float));
+				
+				// Restore
+				memEnd(threadMemory);
 			}
 			// Note: we do not deal with the no-motion case here, it is filled below
 			// when we fill the current time sample
@@ -658,6 +667,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
 	}
 
+	
 	// We're shading
 	savedObject							=	currentShadingState->currentObject;
 	currentShadingState->currentObject	=	object;
@@ -678,12 +688,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 	// If we need derivative information, treat differently
 	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
+	
 		if (dim == SHADING_2D) {											// We're raytracing, so the derivative computation is different
-			int					numRealVertices;
-			unsigned int		shadingParameters;
-
-			numRealVertices							=	numVertices;
-			numVertices								*=	3;	// For the extra derivative vertices
+			const int numRealVertices				=	numVertices;
+			numVertices								*=	3;					// For the extra derivative vertices
 			currentShadingState->numVertices		=	numVertices;
 			currentShadingState->numRealVertices	=	numRealVertices;
 			currentShadingState->shadingDim			=	SHADING_2D;
@@ -692,7 +700,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 			// Sample the object at the main intersection points
 			usedParameters							|=	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_P;
-			shadingParameters						=	usedParameters;
+			const unsigned int shadingParameters	=	usedParameters;
 			object->sample(0,numRealVertices,varying,locals,usedParameters);
 			usedParameters							=	shadingParameters;		// Restore the required parameters for the second round of shading
 			
@@ -932,7 +940,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		}
 	}
 
-
 	// Clear the tags for shader execution
 	memset(currentShadingState->tags,0,numVertices*sizeof(int));
 
@@ -943,18 +950,21 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		complete(numVertices,varying,usedParameters,currentAttributes);
 	}
 
+	// Save the memory here
 	memBegin(threadMemory);
-
+	
+	// Run the displacement shader here
 	if (displacement != NULL) {
 		displacement->execute(this,locals[ACCESSOR_DISPLACEMENT]);
 	}
 
+	// Do we need to run the surface shader?
 	if (displaceOnly == FALSE) {
 
 		// Complete dPdtime if needed _after_ displacement is done, it is not
 		// available inside displacement shaders
-		
 		if (usedParameters & PARAMETER_DPDTIME) {
+		
 			// Only sample ends if the object is moving (has data1)
 			if (object->moving()) {
 				const	float	idtime		=	CRenderer::invShutterTime;
@@ -1001,10 +1011,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		currentShadingState->currentLight			=	NULL;
 		currentShadingState->freeLights				=	NULL;
 
+		// Is there a surface shader ?
 		if (surface != NULL) {
-			numShaded					+=	numVertices;
+			numShaded				+=	numVertices;
 			surface->execute(this,locals[ACCESSOR_SURFACE]);
 		} else {
+			// No surface shader eh, make up a color
 			float			*C		=	varying[VARIABLE_CI];
 			float			*O		=	varying[VARIABLE_OI];
 			float			*N		=	varying[VARIABLE_N];
@@ -1024,18 +1036,23 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			}
 		}
 
-		if (currentRayDepth == 0) {  // do not execute atmosphere for non-camera rays
-			if (atmosphere != NULL) {
+		// Is there an atmosphere shader ?
+		if (atmosphere != NULL) {
+		
+			// Do not execute atmosphere for non-camera rays
+			if (currentRayDepth == 0) {  
 				atmosphere->execute(this,locals[ACCESSOR_ATMOSPHERE]);
 			}
 		}
 
+		// Is there an interior/exterior shader waiting to be executed?
 		if (currentShadingState->postShader != NULL) {
 			locals[ACCESSOR_POSTSHADER]		=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
 			currentShadingState->postShader->execute(this,locals[ACCESSOR_POSTSHADER]);
 		}
 	}
 
+	// Restore the thread memory
 	memEnd(threadMemory);
 	
 	// Unwind the stack of shader states
@@ -1062,6 +1079,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 // Return Value			:	-
 // Comments				:
 CShadingState	*CShadingContext::newState() {
+
 	if (freeStates == NULL) {
 		CShadingState	*newState			=	new CShadingState;
 		int				j;
@@ -1220,7 +1238,7 @@ void	CShadingContext::restoreState(void *state) {
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->surface != NULL)
 		return currentAttributes->surface->getParameter(name,dest,var,globalIndex);
@@ -1234,7 +1252,7 @@ int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **v
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::displacementParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->displacement != NULL)
 		return currentAttributes->displacement->getParameter(name,dest,var,globalIndex);
@@ -1249,7 +1267,7 @@ int		CShadingContext::displacementParameter(void *dest,const char *name,CVariabl
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->atmosphere != NULL)
 		return currentAttributes->atmosphere->getParameter(name,dest,var,globalIndex);
@@ -1263,7 +1281,7 @@ int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable 
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->interior != NULL)
 		return currentAttributes->interior->getParameter(name,dest,NULL,NULL);	// skip mutable parameters
@@ -1277,7 +1295,7 @@ int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->exterior != NULL)
 		return currentAttributes->exterior->getParameter(name,dest,NULL,NULL);	// skip mutable parameters
@@ -1387,7 +1405,7 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (strcmp(name,attributesShadingRate) == 0) {
 		float	*d	=	(float *) dest;
@@ -1463,8 +1481,8 @@ int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
-// Description			:	Execute light sources
+// Method				:	shaderName
+// Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
 const char	*CShadingContext::shaderName() {
@@ -1475,8 +1493,8 @@ const char	*CShadingContext::shaderName() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
-// Description			:	Execute light sources
+// Method				:	shaderName
+// Description			:	Get the name of a particular shader
 // Return Value			:	-
 // Comments				:
 const char	*CShadingContext::shaderName(const char *type) {

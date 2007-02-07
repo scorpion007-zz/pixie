@@ -84,13 +84,11 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 	const	COptions::CClipPlane	*cPlane;
 	float							t;
 	float							tt;
-	CRay							**rays;
-	int								numRays;
 	float							**varying;
 
 	// Compute some of the ray junk
-	rays			=	bundle->rays;
-	numRays			=	bundle->numRays;
+	CRay		**rays	=	bundle->rays;
+	int			numRays	=	bundle->numRays;
 
 	assert(numRays != 0);
 
@@ -165,14 +163,14 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 					// Did we find it ?
 					if (cHash == NULL) {
-						cHash				=	(TObjectHash *) ralloc(sizeof(TObjectHash),threadMemory);
-						cHash->object		=	cRay->object;
-						cHash->numRays		=	0;
-						cHash->rays			=	NULL;
-						cHash->next			=	traceObjectHash[key].next;
+						cHash						=	(TObjectHash *) ralloc(sizeof(TObjectHash),threadMemory);
+						cHash->object				=	cRay->object;
+						cHash->numRays				=	0;
+						cHash->rays					=	NULL;
+						cHash->next					=	traceObjectHash[key].next;
 						traceObjectHash[key].next	=	cHash;
-						cHash->shadeNext	=	objects;
-						objects				=	cHash;
+						cHash->shadeNext			=	objects;
+						objects						=	cHash;
 					}
 				}
 
@@ -294,6 +292,7 @@ void	CShadingContext::traceEx(CRayBundle *bundle) {
 
 	} else {
 		//GSHTODO: what about postTrace(), post() here??
+		//Okan: postShade function (in this form) must take care of the rays that don't hit anything
 		bundle->postShade(bundle->numRays,bundle->rays);
 	}
 }
@@ -328,10 +327,12 @@ void	CShadingContext::trace(CRay *ray) {
 	int					numObjects	=	1;
 	int					maxObjects	=	100;
 	
+	// Compute the inverse of the ray direction first
 	ray->invDir[0]	= 1.0 / (double) ray->dir[0];
 	ray->invDir[1]	= 1.0 / (double) ray->dir[1];
 	ray->invDir[2]	= 1.0 / (double) ray->dir[2];
 	
+	// Compute the first entry in the heap
 	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
 	heap[1].object		=	CRenderer::root;
 	ray->jimp			=	urand();
@@ -341,7 +342,7 @@ void	CShadingContext::trace(CRay *ray) {
 
 	// While we have objects in the heap, pop the object and process it
 	while((numObjects > 0) && (heap[1].tmin < ray->t)) {
-		CObject	*object	=	heap[1].object;
+		CObject	*object		=	heap[1].object;
 
 		// Remove the topmost item from da heap
 		int			parent	=	1;
