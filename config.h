@@ -136,27 +136,6 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION ""
 
-/* Directory where we store displays */
-#define PIXIE_DISPLAYS "/Applications/Graphics/Pixie/displays"
-
-/* Directory where we store documentation */
-#define PIXIE_DOCS "/Applications/Graphics/Pixie/doc"
-
-/* Directory where we store models */
-#define PIXIE_MODELS "/Applications/Graphics/Pixie/models"
-
-/* Directory where we store modules */
-#define PIXIE_MODULES "/Applications/Graphics/Pixie/modules"
-
-/* Directory where we store procedurals */
-#define PIXIE_PROCEDURALS "/Applications/Graphics/Pixie/procedurals"
-
-/* Directory where we store shaders */
-#define PIXIE_SHADERS "/Applications/Graphics/Pixie/shaders"
-
-/* Directory where we store textures */
-#define PIXIE_TEXTURES "/Applications/Graphics/Pixie/textures"
-
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
    automatically deduced at run-time.

@@ -752,6 +752,9 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 
 	// Make it a bound
 	makeBound(bmin,bmax);
+
+	// Create the sync mutex
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -765,6 +768,8 @@ CCurveMesh::~CCurveMesh() {
 
 	delete pl;
 	delete [] nverts;
+
+	osDeleteMutex(mutex);
 }
 
 
@@ -805,9 +810,9 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 // Comments				:
 void	CCurveMesh::create(CShadingContext *context) {
 
-	osLock(CRenderer::hierarchyMutex);
+	osLock(mutex);
 	if (children != NULL) {
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(mutex);
 		return;
 	}
 
@@ -950,7 +955,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 	// Set the child objects
 	setChildren(context,allChildren);
 	
-	osUnlock(CRenderer::hierarchyMutex);
+	osUnlock(mutex);
 }
 
 

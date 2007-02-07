@@ -50,8 +50,8 @@ class	CPoints : public CSurface {
 		// Comments				:
 		class CPointBase {
 		public:
-							CPointBase()	{	refCount	=	0;							}
-							~CPointBase()	{	variables->detach();	if (parameters != NULL) delete parameters;	if (vertex != NULL) delete vertex; }
+							CPointBase()	{	refCount	=	0;	osCreateMutex(mutex);			}
+							~CPointBase()	{	variables->detach();	if (parameters != NULL) delete parameters;	if (vertex != NULL) delete vertex; osDeleteMutex(mutex);	}
 
 			void			attach()		{	refCount++;									}
 			void			detach()		{	if ((--refCount) == 0)	delete this;		}
@@ -61,6 +61,7 @@ class	CPoints : public CSurface {
 			CVertexData		*variables;				// The vertex data
 			float			maxSize;				// The maximum size of the point in camera space
 			int				refCount;				// The reference count for the points
+			TMutex			mutex;					// Holds the synchronization object
 		};
 public:
 						CPoints(CAttributes *,CXform *,CPl *,int);

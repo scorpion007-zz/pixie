@@ -72,51 +72,13 @@
 #include "dlobject.h"
 #include "show.h"
 #include "brickmap.h"
+#include "displayChannel.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // The global variables are defined here
 extern	int			ribCommandLineno;					// These two are defined in rib.y
 extern	const char	*ribFile;
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisplayChannel
-// Description			:	display channel info ctor
-// Return Value			:
-// Comments				:	var can be NULL
-CDisplayChannel::CDisplayChannel() {
-	strcpy(this->name,"*INVALID*");
-	variable		=	NULL;
-	numSamples		= 	0;
-	sampleStart		=	-1;
-	outType			=	-1;
-	fill			=	NULL;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisplayChannel
-// Description			:	display channel info dtor
-// Return Value			:
-// Comments				:	var can be NULL
-CDisplayChannel::~CDisplayChannel() {
-	if (fill) delete [] fill;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisplayChannel
-// Description			:	display channel info ctor
-// Return Value			:
-// Comments				:	var can be NULL
-CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int start,int entry) {
-	strcpy(this->name,name);
-	variable	=	var;
-	numSamples	=	samples;
-	sampleStart	=	start;
-	outType		=	entry;
-	fill		=	NULL;
-}
 
 
 ///////////////////////////////////////////////////////////////////////

@@ -375,7 +375,6 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 //	The	shading variables and junk
 	TCode						**stuff[3];			// Where we keep pointers to the variables
-	ESlCode						opcode;				// :)
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;
 	int							numPassive;
@@ -440,7 +439,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 	// Execute
 execStart:
-	opcode	=	(ESlCode)	code[0].integer;
+	const ESlCode	opcode	=	(ESlCode)	code[0].integer;
 
 	tags	=	tagStart;
 

@@ -1194,6 +1194,9 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 	makeBound(bmin,bmax);
 
 	children			=	NULL;
+
+	// Create the synch. object
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1211,6 +1214,9 @@ CPolygonMesh::~CPolygonMesh() {
 	delete [] nholes;
 	delete [] nvertices;
 	delete [] vertices;
+
+	// We're done with this object
+	osDeleteMutex(mutex);
 }
 
 
@@ -1750,9 +1756,9 @@ nextLoop:;
 // Return Value			:	-
 // Comments				:
 void				CPolygonMesh::create(CShadingContext *context) {
-	osLock(CRenderer::hierarchyMutex);
+	osLock(mutex);
 	if (children != NULL) {
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(mutex);
 		return;
 	}
 
@@ -1848,7 +1854,7 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	// Set the children
 	setChildren(context,data.meshChildren);
 	
-	osUnlock(CRenderer::hierarchyMutex);
+	osUnlock(mutex);
 }
 
 

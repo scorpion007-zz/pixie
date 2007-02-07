@@ -63,9 +63,9 @@ class	CGatherRay;
 class	CMemPage;
 
 // Meanings of the accessor field of TReference
-const	unsigned int		SL_IMMEDIATE_OPERAND			=	0;	// Constants
-const	unsigned int		SL_GLOBAL_OPERAND				=	1;	// Global variable references
-const	unsigned int		SL_VARYING_OPERAND				=	2;	// Local variable references (this includes parameters)
+const	unsigned int	SL_IMMEDIATE_OPERAND	=	0;	// Constants
+const	unsigned int	SL_GLOBAL_OPERAND		=	1;	// Global variable references
+const	unsigned int	SL_VARYING_OPERAND		=	2;	// Local variable references (this includes parameters)
 
 // This comes right after the opcode to denote the number of parameters passed to the function / opcode
 typedef struct {
@@ -107,7 +107,9 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
 // Description			:	This class encapsulates a shader lookup
-// Comments				:
+// Comments				:	Shader lookups are cached in the lifetime of a frame
+//							so they're only allocated once and can store information
+//							relevant to a particular shading language command
 class	CShaderLookup {
 public:
 							CShaderLookup();
@@ -345,6 +347,15 @@ public:
 };
 
 
+
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShader
 // Description			:	This class encapsulates a shader
@@ -353,8 +364,6 @@ class	CShader	: public CFileResource {
 public:
 								CShader(const char *);
 								~CShader();
-
-		void					nullify();						// Make sure the shader is never executed again
 
 		int						type;							// Type of the shader
 
@@ -444,6 +453,7 @@ public:
 		CAllocatedString			*strings;					// The strings we allocated for parameters
 		CShader						*parent;					// The parent shader
 		CProgrammableShaderInstance	*nextDirty;					// The next dirty shader instance
+		CProgrammableShaderInstance	*prevDirty;					// The previous dirty shader instance
 		CShaderLookup				**parameterLists;			// The parameter lists
 		int							dirty;						// TRUE if the shader is dirty
 private:

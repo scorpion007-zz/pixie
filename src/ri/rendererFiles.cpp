@@ -44,6 +44,25 @@
 #include "rendererContext.h"
 #include "shadeop.h"
 #include "options.h"
+#include "netFileMapping.h"
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDSO
+// Description			:	Holds a DSO shader info
+// Comments				:
+class	CDSO {
+public:
+	void				*handle;		// The handle to the module that implements the DSO shader
+	dsoInitFunction		init;			// Init function
+	dsoExecFunction		exec;			// Execute function
+	dsoCleanupFunction	cleanup;		// Cleanup function
+	char				*name;			// Name of the DSO shader
+	char				*prototype;		// Prototype of the DSO shader
+	CDSO				*next;
+};
+
+
 
 
 

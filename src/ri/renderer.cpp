@@ -69,7 +69,7 @@
 #include "show.h"
 #include "remoteChannel.h"
 #include "rendererContext.h"
-
+#include "netFileMapping.h"
 
 
 

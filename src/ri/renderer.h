@@ -634,71 +634,9 @@ public:
 	matrix				to;
 };
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDSO
-// Description			:	Holds a DSO shader info
-// Comments				:
-class	CDSO {
-public:
-	void				*handle;		// The handle to the module that implements the DSO shader
-	dsoInitFunction		init;			// Init function
-	dsoExecFunction		exec;			// Execute function
-	dsoCleanupFunction	cleanup;		// Cleanup function
-	char				*name;			// Name of the DSO shader
-	char				*prototype;		// Prototype of the DSO shader
-	CDSO				*next;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CGlobalIdentifier
-// Description			:	Holds a global identifier
-// Comments				:
-class  CGlobalIdentifier {
-public:
-	char				name[64];		// Name of the identifier
-	int					id;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisplayChannel
-// Description			:	Holds information on a display channel
-// Comments				:	if variable is NULL and entry is -1 this is
-//						:	one of the standard rgbaz channels
-//						:	sampleStart is filled at render time
-class  CDisplayChannel {
-public:
-	CDisplayChannel();
-	~CDisplayChannel();
-	CDisplayChannel(const char*,CVariable*,int,int,int entry = -1);
-	
-	char				name[64];		// Name of the channel
-	CVariable			*variable;		// The variable representing channel (may be NULL)
-	int					numSamples;		// The size of channel sample
-	int					outType;		// The entry index of the variable
-	int					sampleStart;	// The offset in the shaded vertex array (-1 is unassigned)
-	float				*fill;			// The sample defaults
-};
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CNetFileMapping
-// Description			:	Maps files to alternate paths
-// Comments				:
-class CNetFileMapping{
-public:
 
-	CNetFileMapping(const char *from,const char *to) {
-		this->from	= strdup(from);
-		this->to	= strdup(to);
-	}
-
-	~CNetFileMapping() {
-		free(from);
-		free(to);
-	}
-	
-	char *from,*to;
-};
 
 #endif
 

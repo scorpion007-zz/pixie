@@ -319,6 +319,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\displayChannel.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\displayChannel.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\dlo.h"
 				>
 			</File>
@@ -372,6 +380,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\netFileMapping.h"
 				>
 			</File>
 			<File
@@ -1056,10 +1068,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\executeMisc.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\executeMisc.h"
 				>
 			</File>
 			<File

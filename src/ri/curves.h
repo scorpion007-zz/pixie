@@ -148,6 +148,7 @@ private:
 		int					numCurves;
 		int					*nverts;
 		int					degree,wrap;
+		TMutex				mutex;
 
 		const CVariable		*sizeVariable;
 		float				maxSize;

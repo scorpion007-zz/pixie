@@ -31,6 +31,7 @@
 #include "texture3d.h"
 #include "error.h"
 #include "renderer.h"
+#include "displayChannel.h"
 
 
 

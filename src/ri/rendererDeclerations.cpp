@@ -35,6 +35,20 @@
 #include "rendererContext.h"
 #include "error.h"
 #include "shading.h"
+#include "displayChannel.h"
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CGlobalIdentifier
+// Description			:	Holds a global identifier
+// Comments				:
+class  CGlobalIdentifier {
+public:
+	char				name[64];		// Name of the identifier
+	int					id;
+};
+
+
 
 
 ///////////////////////////////////////////////////////////////////////

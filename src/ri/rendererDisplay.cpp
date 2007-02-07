@@ -38,6 +38,7 @@
 #include "stats.h"
 #include "options.h"
 #include "remoteChannel.h"
+#include "displayChannel.h"
 
 
 

@@ -60,6 +60,7 @@ private:
 		int					*nholes,*nvertices,*vertices;
 
 		unsigned int		parameters;
+		TMutex				mutex;
 
 		friend	class		CPolygonTriangle;
 		friend	class		CPolygonQuad;

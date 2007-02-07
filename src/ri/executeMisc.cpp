@@ -33,7 +33,6 @@
 
 #include "common/global.h"
 #include "bundles.h"
-#include "executeMisc.h"
 #include "memory.h"
 #include "attributes.h"
 #include "renderer.h"
@@ -72,19 +71,28 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
+			assert(u[1] > u[0]);
 
+			// These values are constant accross a grid
+			double		invDu1		=	1 / (double) (u[1] - u[0]);
+			double		invDu2		=	1 / (double) (2*(u[1] - u[0]));			
+
+			// Compute the Du
 			for (j=vVertices;j>0;j--) {
-				*dest++	=	(src[1] - src[0]) / (u[1] - u[0]);			assert(u[1] > u[0]);
+
+				// Forward differencing
+				*dest++	=	(float) ((src[1] - src[0]) * invDu1);
 				src++;
-				u++;
+
+				// Central differencing
 				for (i=uVertices-2;i>0;i--) {
-					*dest++	=	(src[1] - src[-1]) / (u[1] - u[-1]);	assert(u[1] > u[-1]);
+					*dest++	=	(float) ((src[1] - src[-1]) * invDu2);
 					src++;
-					u++;
 				}
-				*dest++	=	(src[0] - src[-1]) / (u[0] - u[-1]);		assert(u[0] > u[-1]);
+
+				// Backward differencing
+				*dest++	=	(float) ((src[0] - src[-1]) * invDu1);
 				src++;
-				u++;
 			}
 		}
 		break;
@@ -145,31 +153,37 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			const int	uVertices	=	currentShadingState->numUvertices;
-			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i,j;
-			const float	*v			=	currentShadingState->varying[VARIABLE_V];
+			const int		uVertices	=	currentShadingState->numUvertices;
+			const int		vVertices	=	currentShadingState->numVvertices;
+			int				i,j;
+			const float		*v			=	currentShadingState->varying[VARIABLE_V];
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
+			assert(v[uVertices] > v[0]);
 
+			const double	invDv1		=	1 / (double) (v[uVertices] - v[0]);
+			const double	invDv2		=	1 / (double) (2*(v[uVertices] - v[0]));
+
+			// Compute the DV
 			for (j=0;j<uVertices;j++) {
 				float		*cRes	=	dest + j;
 				const float	*cOp	=	src + j;
-				const float	*cv		=	v + j;
-				cRes[0]				=	(cOp[uVertices] - cOp[0]) / (cv[uVertices] - cv[0]);	assert(cv[uVertices] > cv[0]);
+
+				// Forward differencing
+				cRes[0]				=	(float) ((cOp[uVertices] - cOp[0]) * invDv1);
 				cRes				+=	uVertices;
 				cOp					+=	uVertices;
-				cv					+=	uVertices;
 
+				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]		=	(cOp[uVertices] - cOp[-uVertices]) / (cv[uVertices] - cv[-uVertices]);	assert(cv[uVertices] > cv[-uVertices]);
-					cRes		+=	uVertices;
-					cOp			+=	uVertices;
-					cv			+=	uVertices;
+					cRes[0]			=	(float) ((cOp[uVertices] - cOp[-uVertices]) * invDv2);
+					cRes			+=	uVertices;
+					cOp				+=	uVertices;
 				}
 
-				cRes[0]			=	(cOp[0] - cOp[-uVertices]) / (cv[0] - cv[-uVertices]);	assert(cv[0] > cv[-uVertices]);
+				// Backward differencing
+				cRes[0]				=	(float) ((cOp[0] - cOp[-uVertices]) * invDv1);
 			}
 		}
 		break;
@@ -256,36 +270,39 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 		// Du executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			const int	uVertices	=	currentShadingState->numUvertices;
-			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i,j;
-			const float	*u			=	currentShadingState->varying[VARIABLE_U];
+			const int		uVertices	=	currentShadingState->numUvertices;
+			const int		vVertices	=	currentShadingState->numVvertices;
+			int				i,j;
+			const float		*u			=	currentShadingState->varying[VARIABLE_U];
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
+			assert(u[1] > u[0]);
+
+			const double	invDu1		=	1 / (double) (u[1] - u[0]);		
+			const double	invDu2		=	1 / (double) (2*(u[1] - u[0]));
 
 			for (j=vVertices;j>0;j--) {
-				float	invDu	=	1 / (u[1] - u[0]);	assert(u[1] > u[0]);
-				*dest++	=	(src[3] - src[0]) * invDu;
-				*dest++	=	(src[4] - src[1]) * invDu;
-				*dest++	=	(src[5] - src[2]) * invDu;
+
+				// Use forward difference
+				*dest++	=	(float) ((src[3] - src[0]) * invDu1);
+				*dest++	=	(float) ((src[4] - src[1]) * invDu1);
+				*dest++	=	(float) ((src[5] - src[2]) * invDu1);
 				src		+=	3;
-				u++;
+
+				// Use central difference
 				for (i=uVertices-2;i>0;i--) {
-					invDu	=	1 / (u[1] - u[-1]);		assert(u[1] > u[-1]);
-					*dest++	=	(src[3] - src[-3]) * invDu;
-					*dest++	=	(src[4] - src[-2]) * invDu;
-					*dest++	=	(src[5] - src[-1]) * invDu;
+					*dest++	=	(float) ((src[3] - src[-3]) * invDu2);
+					*dest++	=	(float) ((src[4] - src[-2]) * invDu2);
+					*dest++	=	(float) ((src[5] - src[-1]) * invDu2);
 					src		+=	3;
-					u++;
 				}
 
-				invDu	=	1 / (u[0] - u[-1]);			assert(u[0] > u[-1]);
-				*dest++	=	(src[0] - src[-3]) * invDu;
-				*dest++	=	(src[1] - src[-2]) * invDu;
-				*dest++	=	(src[2] - src[-1]) * invDu;
+				// Use backward difference
+				*dest++	=	(float) ((src[0] - src[-3]) * invDu1);
+				*dest++	=	(float) ((src[1] - src[-2]) * invDu1);
+				*dest++	=	(float) ((src[2] - src[-1]) * invDu1);
 				src		+=	3;
-				u++;
 			}
 		}
 		break;
@@ -356,44 +373,43 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
-			const int	uVertices	=	currentShadingState->numUvertices;
-			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i,j;
-			const float	*v			=	currentShadingState->varying[VARIABLE_V];
+			const int		uVertices	=	currentShadingState->numUvertices;
+			const int		vVertices	=	currentShadingState->numVvertices;
+			int				i,j;
+			const float		*v			=	currentShadingState->varying[VARIABLE_V];
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
+			assert(v[uVertices] > v[0]);
 
+			const double	invDv1		=	1 / (double) (v[uVertices] - v[0]);
+			const double	invDv2		=	1 / (double) (2*(v[uVertices] - v[0]));
+
+			
 			for (j=0;j<uVertices;j++) {
-				float		invDv;
 				float		*cRes	=	dest + j*3;
 				const float	*cOp	=	src + j*3;
-				const float	*cv		=	v + j;
 
-				invDv				=	1 / (cv[uVertices] - cv[0]);	assert(cv[uVertices] > cv[0]);
-
-				cRes[0]				=	(cOp[uVertices*3+0] - cOp[0]) * invDv;
-				cRes[1]				=	(cOp[uVertices*3+1] - cOp[1]) * invDv;
-				cRes[2]				=	(cOp[uVertices*3+2] - cOp[2]) * invDv;
+				// Forward differencing
+				cRes[0]				=	(float) ((cOp[uVertices*3+0] - cOp[0]) * invDv1);
+				cRes[1]				=	(float) ((cOp[uVertices*3+1] - cOp[1]) * invDv1);
+				cRes[2]				=	(float) ((cOp[uVertices*3+2] - cOp[2]) * invDv1);
 				cRes				+=	uVertices*3;
 				cOp					+=	uVertices*3;
-				cv					+=	uVertices;
 
+				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					invDv			=	1 / (cv[uVertices] - cv[-uVertices]);	assert(cv[uVertices] > cv[-uVertices]);
-
-					cRes[0]			=	(cOp[uVertices*3+0] - cOp[-uVertices*3+0]) * invDv;
-					cRes[1]			=	(cOp[uVertices*3+1] - cOp[-uVertices*3+1]) * invDv;
-					cRes[2]			=	(cOp[uVertices*3+2] - cOp[-uVertices*3+2]) * invDv;
+					cRes[0]			=	(float) ((cOp[uVertices*3+0] - cOp[-uVertices*3+0]) * invDv2);
+					cRes[1]			=	(float) ((cOp[uVertices*3+1] - cOp[-uVertices*3+1]) * invDv2);
+					cRes[2]			=	(float) ((cOp[uVertices*3+2] - cOp[-uVertices*3+2]) * invDv2);
 					cRes			+=	uVertices*3;
 					cOp				+=	uVertices*3;
-					cv				+=	uVertices;
 				}
 
-				invDv				=	1 / (cv[0] - cv[-uVertices]);			assert(cv[0] > cv[-uVertices]);
-				cRes[0]				=	(cOp[0] - cOp[-uVertices*3+0]) * invDv;
-				cRes[1]				=	(cOp[1] - cOp[-uVertices*3+1]) * invDv;
-				cRes[2]				=	(cOp[2] - cOp[-uVertices*3+2]) * invDv;
+				// Backward differencing
+				cRes[0]				=	(float) ((cOp[0] - cOp[-uVertices*3+0]) * invDv1);
+				cRes[1]				=	(float) ((cOp[1] - cOp[-uVertices*3+1]) * invDv1);
+				cRes[2]				=	(float) ((cOp[2] - cOp[-uVertices*3+2]) * invDv1);
 			}
 		}
 		break;
@@ -469,6 +485,8 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
 	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*),threadMemory);
 
+	assert(inShadow == FALSE);
+
 	inShadow		=	TRUE;					// We're in shadow
 
 	// Compute the ray differential
@@ -524,6 +542,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 		bundle.postShader	=	NULL;
 		traceEx(&bundle);
 	}
+
 	inShadow		=	FALSE;
 }
 

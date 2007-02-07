@@ -151,6 +151,7 @@ private:
 		CPl					*pl;
 		int					degree;
 		int					uVertices,vVertices,uWrap,vWrap;
+		TMutex				mutex;
 };
 
 
@@ -175,6 +176,7 @@ private:
 		CPl					*pl;
 		int					uVertices,vVertices,uOrder,vOrder;
 		float				*uKnots,*vKnots;
+		TMutex				mutex;
 };
 
 #endif

@@ -35,6 +35,7 @@
 #include "error.h"
 #include "stats.h"
 #include "memory.h"
+#include "netFileMapping.h"
 
 // The default network port
 #define	DEFAULT_PORT	24914

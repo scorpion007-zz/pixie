@@ -393,16 +393,16 @@ void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 // Comments				:
 void	CPoints::prep() {
 
-	osLock(CRenderer::hierarchyMutex);
+	assert(base != NULL);
+
+	osLock(base->mutex);
 	if (children != NULL) {
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(base->mutex);
 		return;
 	}
 
 	int					i;
 	const CVertexData	*variables;
-
-	assert(base != NULL);
 	variables					=	base->variables;
 
 	const int	vertexSize		=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
@@ -464,5 +464,5 @@ void	CPoints::prep() {
 	delete pl;
 	pl							=	NULL;
 
-	osUnlock(CRenderer::hierarchyMutex);
+	osUnlock(base->mutex);
 }

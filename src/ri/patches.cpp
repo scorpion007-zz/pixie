@@ -1369,6 +1369,9 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 	}
 	
 	makeBound(bmin,bmax);
+
+	// Create the synchronization object
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1381,6 +1384,9 @@ CPatchMesh::~CPatchMesh() {
 	stats.gprimMemory	-=	sizeof(CPatchMesh);
 
 	if (pl != NULL)	delete pl;
+
+	// Delete the synchronization object
+	osDeleteMutex(mutex);
 }
 
 
@@ -1433,9 +1439,9 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 // Comments				:
 void	CPatchMesh::create(CShadingContext *context) {
 
-	osLock(CRenderer::hierarchyMutex);
+	osLock(mutex);
 	if (children != NULL) {
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(mutex);
 		return;
 	}
 
@@ -1549,7 +1555,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 	setChildren(context,allChildren);
 	
 	// Release the lock
-	osUnlock(CRenderer::hierarchyMutex);
+	osUnlock(mutex);
 }
 
 
@@ -1624,6 +1630,9 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 	}
 
 	makeBound(bmin,bmax);
+
+	// Create the synch. object
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1638,6 +1647,9 @@ CNURBSPatchMesh::~CNURBSPatchMesh() {
 	delete [] uKnots;
 	delete [] vKnots;
 	delete pl;
+
+	// We're done with the synch. object
+	osDeleteMutex(mutex);
 }
 
 
@@ -1687,9 +1699,9 @@ void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 // Comments				:	-
 void	CNURBSPatchMesh::create(CShadingContext *context) {
 
-	osLock(CRenderer::hierarchyMutex);
+	osLock(mutex);
 	if (children != NULL) {
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(mutex);
 		return;
 	}
 
@@ -1757,6 +1769,6 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 	setChildren(context,allChildren);
 
 	// Release the lock
-	osUnlock(CRenderer::hierarchyMutex);
+	osUnlock(mutex);
 }
 
