@@ -55,8 +55,7 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
-	apertureGenerator(CRenderer::frame) {
+CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(), apertureGenerator(CRenderer::frame) {
 	int		i,j;
 	float	*cExtraSample;
 	CPixel	*cPixel;
@@ -65,14 +64,15 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 	totalWidth		=	CRenderer::pixelXsamples*CRenderer::bucketWidth + 2*CRenderer::xSampleOffset;
 	totalHeight		=	CRenderer::pixelYsamples*CRenderer::bucketHeight + 2*CRenderer::ySampleOffset;
 
-	// Allocate the framebuffer
-	if (CRenderer::numExtraSamples > 0)	extraSampleMemory	=	new float[totalWidth*totalHeight*CRenderer::numExtraSamples];
+	// Allocate the framebuffer for extra samples (checkpointed)
+	if (CRenderer::numExtraSamples > 0)	extraSampleMemory	=	(float *) ralloc(totalWidth*totalHeight*CRenderer::numExtraSamples*sizeof(float),CRenderer::globalMemory);
 	else								extraSampleMemory	=	NULL;
 
+	// Allocate the pixels (checkpointed)
 	cExtraSample	=	extraSampleMemory;
-	fb				=	new CPixel*[totalHeight];
+	fb				=	(CPixel **) ralloc(totalHeight*sizeof(CPixel *),CRenderer::globalMemory);
 	for (i=0;i<totalHeight;i++) {
-		cPixel		=	fb[i]		=	new CPixel[totalWidth];
+		cPixel		=	fb[i]		=	 (CPixel *) ralloc(totalWidth*sizeof(CPixel),CRenderer::globalMemory);
 
 		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=CRenderer::numExtraSamples)	cPixel->extraSamples	=	cExtraSample;
 	}
@@ -92,17 +92,7 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(),
 // Return Value			:	-
 // Comments				:
 CStochastic::~CStochastic() {
-	int			i;
 	CFragment	*cFragment;
-	
-	// Ditch the memory we allocated for extra samples
-	if (extraSampleMemory != NULL) delete [] extraSampleMemory;
-
-	// Ditch the pixels
-	for (i=0;i<totalHeight;i++) {
-		delete [] fb[i];
-	}
-	delete [] fb;
 
 	// Ditch the extra fragments
 	while((cFragment = freeFragments) != NULL) {
@@ -177,17 +167,17 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			pixel->jimp					=	1.0f - ( pxj*CRenderer::pixelYsamples + pxi + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/(float)(CRenderer::pixelXsamples*CRenderer::pixelYsamples);
 
 			if (CRenderer::flags & OPTIONS_FLAGS_FOCALBLUR) {
-				// Aperture sample for depth of field
 
+				// Aperture sample for depth of field
 				while (TRUE) {
 					apertureGenerator.get(aperture);
 					aperture[0] 			= 2.0f*aperture[0] - 1.0f;
 					aperture[1] 			= 2.0f*aperture[1] - 1.0f;
 					if ((aperture[0]*aperture[0] + aperture[1]*aperture[1]) < 1.0f) break;
 				}
+
 				pixel->jdx					=	aperture[0];
 				pixel->jdy					=	aperture[1];
-
 			} else {
 				pixel->jdx					=	0;
 				pixel->jdy					=	0;
@@ -236,15 +226,16 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 // Return Value			:	-
 // Comments				:
 void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
+
 // Instantiate the dispatch switch
 #define DEFINE_STOCHASTIC_SWITCH
 	#include "stochasticPrimitives.h"
 #undef DEFINE_STOCHASTIC_SWITCH
 }
 
-// Instantiate the rasterization functions
 
 
+// The following macros help various fragment operations
 #define depthFilterIfZMin()
 #define depthFilterElseZMin()
 
@@ -256,16 +247,6 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 
 #define depthFilterIfZMid()		pixel->zold		=	pixel->z;
 #define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//   There are two sets of parameters, for quads and for points
-//      Within each set, some parameters are only required when there is motion blur, depth of field etc.
-//      The macros below define local variables for each set, so that we do not end up with a huge amount
-//      of unused variables. This not only makes the compiler happy, but also produces leaner code
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 // This macro is used to insert a fragment into the linked list for a pixel
@@ -296,7 +277,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 }
 
 
-	// This macro is called when an opaque fragment is inserted
+// This macro is called when an opaque fragment is inserted
 #define updateOpaque() {																			\
 	CFragment *cSample=pixel->last.prev;															\
 	while(cSample->z > z) {																			\
@@ -495,44 +476,44 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	switch(CRenderer::depthFilter) {
 	case DEPTH_MIN:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
 				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
-				else											cFb[1]	=	cPixel->z;
+				else									cFb[1]	=	cPixel->z;
 			}
 		}
 
 		break;
 	case DEPTH_MAX:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
 				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
-				else											cFb[1]	=	cPixel->zold;
+				else									cFb[1]	=	cPixel->zold;
 			}
 		}
 
 		break;
 	case DEPTH_AVG:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
 				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
-				else											cFb[1]	=	cPixel->zold / (float) cPixel->numSplats;
+				else									cFb[1]	=	cPixel->zold / (float) cPixel->numSplats;
 			}
 		}
 
 		break;
 	case DEPTH_MID:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
 				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;

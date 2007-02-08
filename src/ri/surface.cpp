@@ -501,7 +501,7 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 			cTess[j]	=	NULL;
 		}
 		
-		levels[i].tesselation			=	NULL;
+		levels[i].tesselation		=	NULL;
 		levels[i].threadTesselation	=	cTess;
 		levels[i].refCount			=	0;
 		

@@ -228,8 +228,6 @@ void		CPhotonHider::solarBegin(const float *L,const float *theta) {
 		int		numVertices	=	currentShadingState->numVertices;
 		float	xy[2];
 		vector	cX;
-		double	r;
-		double	theta;
 		vector	X,Y;
 
 		powerScale			=	(float) (C_PI*worldRadius*worldRadius);
@@ -246,11 +244,11 @@ void		CPhotonHider::solarBegin(const float *L,const float *theta) {
 		for (;numVertices>0;numVertices--,shaderL+=3,shaderPs+=3) {
 			gen2.get(xy);
 
-			r		=	sqrtf(xy[0]);
-			theta	=	xy[1]*2*C_PI;
+			const float	r		=	sqrtf(xy[0]);
+			const float	theta	=	(float) (xy[1]*2*C_PI);
 
-			mulvf(cX,X,(float) (r*cos(theta)));
-			mulvf(shaderPs,Y,(float) (r*sin(theta)));
+			mulvf(cX,X,r*cosf(theta));
+			mulvf(shaderPs,Y,r*sinf(theta));
 			addvv(shaderPs,cX);
 			addvv(shaderPs,worldCenter);
 			normalizev(shaderL,L);
@@ -275,12 +273,12 @@ void		CPhotonHider::solarEnd() {
 	int			i;
 
 	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLESPECTRUM) {
-		vector		T;
-		vector		Ce,Cc;
-		float*		ubasis			=	(float*) RiBSplineBasis;
-		const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
-		const int	step			=	1;
-		const int	n				=	(numPoints-4)/step+1;
+		vector			T;
+		vector			Ce,Cc;
+		const float		*ubasis			=	(const float *) RiBSplineBasis;
+		const int		numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
+		const int		step			=	1;
+		const int		n				=	(numPoints-4)/step+1;
 		
 		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {	
 			
@@ -467,8 +465,6 @@ void		CPhotonHider::illuminateEnd() {
 void		CPhotonHider::tracePhoton(float *P,float *L,float *C,float wavelength) {
 	CRay				ray;
 	vector				Cl,Pl,Nl;
-	CAttributes			*attributes;
-	const float			*surfaceColor;
 	int					numDiffuseBounces,numSpecularBounces,lastBounceSpecular;
 
 	ray.flags				=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
@@ -502,8 +498,8 @@ processBounce:;
 
 	// Do we have an intersection ?
 	if (ray.object != NULL) {
-		attributes				=	ray.object->attributes;
-		surfaceColor			=	attributes->surfaceColor;
+		CAttributes	*attributes		=	ray.object->attributes;
+		const float	*surfaceColor	=	attributes->surfaceColor;
 
 		if (attributes->flags & ATTRIBUTES_FLAGS_ILLUMINATE_FRONT_ONLY) {
 			if (dotvv(ray.N,ray.dir) > 0) return;
@@ -800,9 +796,9 @@ processBounce:;
 				normalizev(Nl,ray.N);
 				if (dotvv(ray.dir,Nl) > 0) {
 					mulvf(Nl,-1);
-					eta	=	1 / (float) 1.5;
+					eta	=	1 / 1.5f;
 				} else {
-					eta	=	(float) 1.5;
+					eta	=	1.5f;
 				}
 
 				assert(dotvv(ray.dir,Nl) < 0);
@@ -846,9 +842,9 @@ processBounce:;
 				normalizev(Nl,ray.N);
 				if (dotvv(ray.dir,Nl) > 0) {
 					mulvf(Nl,-1);
-					eta	=	1 / (float) 1.3333333;
+					eta	=	1 / 1.3333333f;
 				} else {
-					eta	=	(float) 1.3333333;
+					eta	=	1.3333333f;
 				}
 
 				assert(dotvv(ray.dir,Nl) < 0);

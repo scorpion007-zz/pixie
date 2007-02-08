@@ -122,8 +122,8 @@ public:
 							~CSurface() { }
 
 							// CObject interface
-	virtual	void			intersect(CShadingContext *,CRay *);				// Intersect a ray with the surface
-	virtual	void			dice(CShadingContext *);							// Split or render this object
+	virtual	void			intersect(CShadingContext *,CRay *);						// Intersect a ray with the surface
+	virtual	void			dice(CShadingContext *);									// Split or render this object
 	
 							// CSurface interface
 	virtual	int				moving() const;												// TRUE if we're moving
