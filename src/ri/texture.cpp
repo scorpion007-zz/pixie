@@ -264,9 +264,17 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	// Update the state
 	stats.numTextureMisses++;
 
+	// Note: that we are thread safe because each TIFFOpen returns a fresh
+	// handle which we can operate on provided it's not used in any other thread
+	// We don't set the error handler here, as it will have been set when we
+	// loaded the texture.  Error handler installation invocation is the only
+	// thread-unsafe part of libtiff.  It's important the innards of the handler
+	// don't do anything which would be problematic if more than one thread
+	// executed it
+	
 	// Set the error handler so we don't crash
-	TIFFSetErrorHandler(tiffErrorHandler);
-	TIFFSetWarningHandler(tiffErrorHandler);
+	//TIFFSetErrorHandler(tiffErrorHandler);
+	//TIFFSetWarningHandler(tiffErrorHandler);
 
 	// Open the file
 	in		=	TIFFOpen(name,"r");
