@@ -77,6 +77,9 @@
 		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
 		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
 		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
+		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
+		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
+		18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D3515A0B7AD20E009F0DAE /* netFileMapping.h */; };
 		18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18E9F1060B75B07500DA484A /* rendererMutexes.cpp */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
@@ -118,7 +121,6 @@
 		C96A6F390AD6E143003C2D7B /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F0A0AD6E143003C2D7B /* error.h */; };
 		C96A6F3A0AD6E143003C2D7B /* execute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F0B0AD6E143003C2D7B /* execute.cpp */; };
 		C96A6F3B0AD6E143003C2D7B /* executeMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F0C0AD6E143003C2D7B /* executeMisc.cpp */; };
-		C96A6F3C0AD6E143003C2D7B /* executeMisc.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F0D0AD6E143003C2D7B /* executeMisc.h */; };
 		C96A6F3D0AD6E143003C2D7B /* fileResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F0E0AD6E143003C2D7B /* fileResource.cpp */; };
 		C96A6F3E0AD6E143003C2D7B /* fileResource.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F0F0AD6E143003C2D7B /* fileResource.h */; };
 		C96A6F3F0AD6E143003C2D7B /* giFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F100AD6E143003C2D7B /* giFunctions.h */; };
@@ -818,6 +820,9 @@
 		188383E00B2FB38F00166E3E /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = LICENSE; path = ../../LICENSE; sourceTree = SOURCE_ROOT; };
 		188383E10B2FB38F00166E3E /* NEWS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = NEWS; path = ../../NEWS; sourceTree = SOURCE_ROOT; };
 		188383E20B2FB38F00166E3E /* README */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = README; path = ../../README; sourceTree = SOURCE_ROOT; };
+		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
+		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
+		18D3515A0B7AD20E009F0DAE /* netFileMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = netFileMapping.h; path = ../../src/ri/netFileMapping.h; sourceTree = SOURCE_ROOT; };
 		18E9F1060B75B07500DA484A /* rendererMutexes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rendererMutexes.cpp; path = ../../src/ri/rendererMutexes.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E2F0AD6D651003C2D7B /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = algebra.cpp; path = ../../src/common/algebra.cpp; sourceTree = SOURCE_ROOT; };
@@ -865,7 +870,6 @@
 		C96A6F0A0AD6E143003C2D7B /* error.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = error.h; path = ../../src/ri/error.h; sourceTree = SOURCE_ROOT; };
 		C96A6F0B0AD6E143003C2D7B /* execute.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = execute.cpp; path = ../../src/ri/execute.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6F0C0AD6E143003C2D7B /* executeMisc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = executeMisc.cpp; path = ../../src/ri/executeMisc.cpp; sourceTree = SOURCE_ROOT; };
-		C96A6F0D0AD6E143003C2D7B /* executeMisc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = executeMisc.h; path = ../../src/ri/executeMisc.h; sourceTree = SOURCE_ROOT; };
 		C96A6F0E0AD6E143003C2D7B /* fileResource.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fileResource.cpp; path = ../../src/ri/fileResource.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6F0F0AD6E143003C2D7B /* fileResource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fileResource.h; path = ../../src/ri/fileResource.h; sourceTree = SOURCE_ROOT; };
 		C96A6F100AD6E143003C2D7B /* giFunctions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = giFunctions.h; path = ../../src/ri/giFunctions.h; sourceTree = SOURCE_ROOT; };
@@ -1620,6 +1624,9 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
+				18D3515A0B7AD20E009F0DAE /* netFileMapping.h */,
+				18D351560B7AD1F5009F0DAE /* displayChannel.cpp */,
+				18D351570B7AD1F5009F0DAE /* displayChannel.h */,
 				18E9F1060B75B07500DA484A /* rendererMutexes.cpp */,
 				1862D7650B2A8FCD00111435 /* objectMisc.h */,
 				1862D7630B2A8FB100111435 /* tiff.h */,
@@ -1662,7 +1669,6 @@
 				C96A6F0A0AD6E143003C2D7B /* error.h */,
 				C96A6F0B0AD6E143003C2D7B /* execute.cpp */,
 				C96A6F0C0AD6E143003C2D7B /* executeMisc.cpp */,
-				C96A6F0D0AD6E143003C2D7B /* executeMisc.h */,
 				C96A6F0E0AD6E143003C2D7B /* fileResource.cpp */,
 				C96A6F0F0AD6E143003C2D7B /* fileResource.h */,
 				C96A6F100AD6E143003C2D7B /* giFunctions.h */,
@@ -1910,7 +1916,6 @@
 				C96A6F330AD6E143003C2D7B /* dso.h in Headers */,
 				C96A6F370AD6E143003C2D7B /* dsply.h in Headers */,
 				C96A6F390AD6E143003C2D7B /* error.h in Headers */,
-				C96A6F3C0AD6E143003C2D7B /* executeMisc.h in Headers */,
 				C96A6F3E0AD6E143003C2D7B /* fileResource.h in Headers */,
 				C96A6F3F0AD6E143003C2D7B /* giFunctions.h in Headers */,
 				C96A6F400AD6E143003C2D7B /* giOpcodes.h in Headers */,
@@ -1980,6 +1985,8 @@
 				1862D7620B2A8F8100111435 /* gi.h in Headers */,
 				1862D7640B2A8FB100111435 /* tiff.h in Headers */,
 				1862D7660B2A8FCD00111435 /* objectMisc.h in Headers */,
+				18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */,
+				18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2487,6 +2494,7 @@
 				1862D75C0B2A8F5A00111435 /* debug.cpp in Sources */,
 				1862D7610B2A8F8100111435 /* gi.cpp in Sources */,
 				18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */,
+				18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
