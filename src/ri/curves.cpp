@@ -148,11 +148,11 @@ void			CCurve::interpolate(int numVertices,float **varying,float ***locals) cons
 	const float	*size;
 	int			sizeStep;
 
-	if (base->sizeVariable->entry == VARIABLE_WIDTH) {
+	if (base->sizeEntry == VARIABLE_WIDTH) {
 		size		=	varying[VARIABLE_WIDTH];
 		sizeStep	=	1;
 	} else {
-		assert(base->sizeVariable->entry == VARIABLE_CONSTANTWIDTH);
+		assert(base->sizeEntry == VARIABLE_CONSTANTWIDTH);
 		size		=	varying[VARIABLE_CONSTANTWIDTH];
 		sizeStep	=	0;
 	}
@@ -449,7 +449,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		dPdv[1]	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
 		dPdv[2]	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
-		crossvv(dPdu,dPdv,P);
+		crossvv(dPdu,P,dPdv);
 		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
@@ -580,7 +580,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 
 	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
 		subvv(dPdv,v1,v0);
-		crossvv(dPdu,dPdv,P);
+		crossvv(dPdu,P,dPdv);
 		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
@@ -887,7 +887,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 				variables->attach();
 				base->maxSize		=	maxSize;
 				base->variables		=	variables;
-				base->sizeVariable	=	sizeVariable;
+				base->sizeEntry		=	sizeVariable->entry;
 				base->parameters	=	parameters;
 				base->vertex		=	new float[vertexSize*4];
 				memcpy(base->vertex + 0*vertexSize,v0,vertexSize*sizeof(float));
@@ -931,7 +931,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 				variables->attach();
 				base->maxSize		=	maxSize;
 				base->variables		=	variables;
-				base->sizeVariable	=	sizeVariable;
+				base->sizeEntry		=	sizeVariable->entry;
 				base->refCount		=	0;
 				base->parameters	=	parameters;
 				base->vertex		=	new float[vertexSize*2];

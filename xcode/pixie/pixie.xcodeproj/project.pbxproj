@@ -110,8 +110,6 @@
 		C96A6F2A0AD6E143003C2D7B /* curves.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EFB0AD6E143003C2D7B /* curves.h */; };
 		C96A6F2B0AD6E143003C2D7B /* delayed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6EFC0AD6E143003C2D7B /* delayed.cpp */; };
 		C96A6F2C0AD6E143003C2D7B /* delayed.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EFD0AD6E143003C2D7B /* delayed.h */; };
-		C96A6F2D0AD6E143003C2D7B /* depository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6EFE0AD6E143003C2D7B /* depository.cpp */; };
-		C96A6F2E0AD6E143003C2D7B /* depository.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EFF0AD6E143003C2D7B /* depository.h */; };
 		C96A6F2F0AD6E143003C2D7B /* dlo.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
 		C96A6F300AD6E143003C2D7B /* dlobject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F010AD6E143003C2D7B /* dlobject.cpp */; };
 		C96A6F310AD6E143003C2D7B /* dlobject.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F020AD6E143003C2D7B /* dlobject.h */; };
@@ -859,8 +857,6 @@
 		C96A6EFB0AD6E143003C2D7B /* curves.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = curves.h; path = ../../src/ri/curves.h; sourceTree = SOURCE_ROOT; };
 		C96A6EFC0AD6E143003C2D7B /* delayed.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = delayed.cpp; path = ../../src/ri/delayed.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6EFD0AD6E143003C2D7B /* delayed.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = delayed.h; path = ../../src/ri/delayed.h; sourceTree = SOURCE_ROOT; };
-		C96A6EFE0AD6E143003C2D7B /* depository.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = depository.cpp; path = ../../src/ri/depository.cpp; sourceTree = SOURCE_ROOT; };
-		C96A6EFF0AD6E143003C2D7B /* depository.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = depository.h; path = ../../src/ri/depository.h; sourceTree = SOURCE_ROOT; };
 		C96A6F000AD6E143003C2D7B /* dlo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dlo.h; path = ../../src/ri/dlo.h; sourceTree = SOURCE_ROOT; };
 		C96A6F010AD6E143003C2D7B /* dlobject.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dlobject.cpp; path = ../../src/ri/dlobject.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6F020AD6E143003C2D7B /* dlobject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dlobject.h; path = ../../src/ri/dlobject.h; sourceTree = SOURCE_ROOT; };
@@ -1658,8 +1654,6 @@
 				C96A6EFB0AD6E143003C2D7B /* curves.h */,
 				C96A6EFC0AD6E143003C2D7B /* delayed.cpp */,
 				C96A6EFD0AD6E143003C2D7B /* delayed.h */,
-				C96A6EFE0AD6E143003C2D7B /* depository.cpp */,
-				C96A6EFF0AD6E143003C2D7B /* depository.h */,
 				C96A6F000AD6E143003C2D7B /* dlo.h */,
 				C96A6F010AD6E143003C2D7B /* dlobject.cpp */,
 				C96A6F020AD6E143003C2D7B /* dlobject.h */,
@@ -1910,7 +1904,6 @@
 				C96A6F280AD6E143003C2D7B /* cache.h in Headers */,
 				C96A6F2A0AD6E143003C2D7B /* curves.h in Headers */,
 				C96A6F2C0AD6E143003C2D7B /* delayed.h in Headers */,
-				C96A6F2E0AD6E143003C2D7B /* depository.h in Headers */,
 				C96A6F2F0AD6E143003C2D7B /* dlo.h in Headers */,
 				C96A6F310AD6E143003C2D7B /* dlobject.h in Headers */,
 				C96A6F330AD6E143003C2D7B /* dso.h in Headers */,
@@ -2436,7 +2429,6 @@
 				C96A6F270AD6E143003C2D7B /* cache.cpp in Sources */,
 				C96A6F290AD6E143003C2D7B /* curves.cpp in Sources */,
 				C96A6F2B0AD6E143003C2D7B /* delayed.cpp in Sources */,
-				C96A6F2D0AD6E143003C2D7B /* depository.cpp in Sources */,
 				C96A6F300AD6E143003C2D7B /* dlobject.cpp in Sources */,
 				C96A6F380AD6E143003C2D7B /* error.cpp in Sources */,
 				C96A6F3A0AD6E143003C2D7B /* execute.cpp in Sources */,

@@ -13,7 +13,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				bsplinePatchgrid.cpp \
 				debug.cpp \
 				delayed.cpp \
-				depository.cpp \
+				displayChannel.cpp \
 				dlobject.cpp \
 				dso.cpp \
 				error.cpp \

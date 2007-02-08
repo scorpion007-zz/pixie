@@ -62,7 +62,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libri_la_DEPENDENCIES = ../common/libpixiecommon.la
 am_libri_la_OBJECTS = attributes.lo brickmap.lo bundles.lo cache.lo \
 	curves.lo bsplinePatchgrid.lo debug.lo delayed.lo \
-	depository.lo dlobject.lo dso.lo error.lo execute.lo \
+	displayChannel.lo dlobject.lo dso.lo error.lo execute.lo \
 	executeMisc.lo fileResource.lo hcshader.lo implicitSurface.lo \
 	init.lo irradiance.lo linsys.lo memory.lo noise.lo object.lo \
 	occlusion.lo options.lo patches.lo patchgrid.lo photon.lo \
@@ -238,7 +238,7 @@ libri_la_SOURCES = attributes.cpp \
 				bsplinePatchgrid.cpp \
 				debug.cpp \
 				delayed.cpp \
-				depository.cpp \
+				displayChannel.cpp \
 				dlobject.cpp \
 				dso.cpp \
 				error.cpp \
@@ -378,7 +378,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/curves.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/delayed.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depository.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/displayChannel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlobject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dso.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Plo@am__quote@

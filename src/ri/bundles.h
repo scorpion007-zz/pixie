@@ -53,10 +53,10 @@ public:
 // Comments				:
 class	CTraceBundle : public CRayBundle {
 public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
+		int						postTraceAction();
+		void					postShade(int,CRay **,float **);
+		void					postShade(int,CRay **);
+		void					post();
 };
 
 
@@ -84,10 +84,10 @@ public:
 // Comments				:
 class	CTransmissionBundle : public CRayBundle {
 public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
+		int						postTraceAction();
+		void					postShade(int,CRay **,float **);
+		void					postShade(int,CRay **);
+		void					post();
 };
 
 
@@ -119,10 +119,10 @@ public:
 					CGatherBundle();
 					~CGatherBundle();
 
-			int		postTraceAction();
-			void	postShade(int nr,CRay **r,float **varying);
-			void	postShade(int nr,CRay **r);
-			void	post();
+	int				postTraceAction();
+	void			postShade(int nr,CRay **r,float **varying);
+	void			postShade(int nr,CRay **r);
+	void			post();
 
 	CGatherRay		*raysBase;
 	CRay			**raysStorage;

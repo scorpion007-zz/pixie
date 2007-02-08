@@ -63,7 +63,7 @@ public:
 						void			attach()	{	refCount++;	}
 						void			detach()	{	if ((--refCount) == 0) delete this;	}
 
-						const CVariable	*sizeVariable;	// The size variable
+						int				sizeEntry;		// The size variable entry
 						float			maxSize;		// The maximum size of the curve
 						CVertexData		*variables;		// The variables for the curve
 						CParameter		*parameters;	// Da parameters

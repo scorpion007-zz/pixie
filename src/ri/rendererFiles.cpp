@@ -249,7 +249,10 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 	if (*name == '\0')	return NULL;
 
-	if (frameFiles->find(name,tex) == FALSE){
+	assert(frameFiles != NULL);
+	
+	if (frameFiles->find(name,tex) == FALSE) {
+	
 		// Load the texture
 		tex	=	textureLoad(name,texturePath);
 
@@ -277,7 +280,10 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 
 	if (*name == '\0')	return NULL;
 
-	if (frameFiles->find(name,tex) == FALSE){
+	assert(frameFiles != NULL);
+	
+	if (frameFiles->find(name,tex) == FALSE) {
+	
 		tex	=	environmentLoad(name,texturePath,toWorld);
 
 		if (tex == NULL)	{
@@ -304,6 +310,8 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	FILE			*in;
 
 	if (*name == '\0')	return NULL;
+	
+	assert(frameFiles != NULL);
 
 	// Check the cache to see if the file is in the memory
 	if (frameFiles->find(name,map) == FALSE){
@@ -335,6 +343,8 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 
 	if (*name == '\0')	return NULL;
 
+	assert(frameFiles != NULL);
+	
 	// Check the memory first
 	if (frameFiles->find(name,cache) == FALSE){
 		char				fileName[OS_MAX_PATH_LENGTH];
@@ -425,6 +435,8 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 
 	if (*name == '\0')	return NULL;
 
+	assert(frameFiles != NULL);
+	
 	if (frameFiles->find(name,tex) == FALSE){
 		// try environments first
 		tex	=	environmentLoad(name,texturePath,toWorld);
@@ -457,6 +469,8 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 
 	if (*name == '\0')	return NULL;
 
+	assert(frameFiles != NULL);
+	
 	if (frameFiles->find(name,texture3d) == FALSE){
 
 		if (from == NULL) {
@@ -522,6 +536,8 @@ CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 
 	if (strcmp(name,RI_DEFAULTSURFACE) == 0)	name	=	RI_MATTE;
 
+	assert(globalFiles != NULL);
+	
 	// Check if we already loaded this shader before ...
 	cShader		=	NULL;
 	if (globalFiles->find(name,file)) {
