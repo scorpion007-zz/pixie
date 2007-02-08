@@ -277,6 +277,7 @@ void	CAttributes::removeLight(CShaderInstance *light) {
 			break;
 		}
 	}
+	checkParameters();
 }
 
 ///////////////////////////////////////////////////////////////////////
