@@ -313,3 +313,4 @@ int main (int argc, char*argv[])
   AC_SUBST(QT_POSTPROCESS)
   rm -f conf.qttest
 ])
+

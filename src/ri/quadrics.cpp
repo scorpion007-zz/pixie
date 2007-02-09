@@ -2988,27 +2988,3 @@ void			CToroid::computeObjectBound(float *bmin,float *bmax,float rmin,float rmax
 	bmax[COMP_Z]		=	absf(rmin);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

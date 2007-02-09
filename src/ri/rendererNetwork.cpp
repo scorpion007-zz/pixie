@@ -727,3 +727,4 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 		error(CODE_BUG,"Unknown net string %s\n",tmp);
 	}
 }
+

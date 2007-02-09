@@ -3631,5 +3631,3 @@ static	float	g1[NOISESIZE + NOISESIZE + 2] = {
 	 ,(float) -0.714844 
 };
 
-
-

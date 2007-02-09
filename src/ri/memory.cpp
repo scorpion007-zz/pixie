@@ -123,8 +123,3 @@ void		memoryDeletePage(CMemPage *cPage) {
 	delete cPage;
 }
 
-
-
-
-
-

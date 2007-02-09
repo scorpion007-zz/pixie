@@ -246,5 +246,3 @@ inline	void	normalizevf(float *v) {
 
 #endif
 
-
-

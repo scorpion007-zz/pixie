@@ -1765,4 +1765,3 @@ void				CScriptContext::releaseRegister(CVariable *cVar) {
 	cVar->type	^=	SLC_LOCKED;
 }
 
-

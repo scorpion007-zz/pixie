@@ -190,3 +190,4 @@ char	*constantBlockName				=			"1__$$__$$__$$__block";
 char	*constantShaderMain				=			"1__$$__$$__$$__main";
 char	*constantReturnValue			=			"__ReturnValue__";
 char	*constantBug					=			"Compiler bug, please report";
+

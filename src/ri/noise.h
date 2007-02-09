@@ -67,7 +67,3 @@ void							cellNoiseVector(float *,const float *,float);
 
 #endif
 
-
-
-
-

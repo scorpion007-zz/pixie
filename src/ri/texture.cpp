@@ -2202,3 +2202,4 @@ void			CRenderer::shutdownTextures() {
 	
 	delete[] CRenderer::textureRefNumber;
 }
+

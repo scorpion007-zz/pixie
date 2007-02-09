@@ -246,6 +246,3 @@ version												return RIB_VERSION;
 													}
 %%
 
-
-
-

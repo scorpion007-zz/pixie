@@ -114,3 +114,4 @@ void		CDebugView::bound(float *bmin,float *bmax) {
 	movvv(bmin,this->bmin);
 	movvv(bmax,this->bmax);
 }
+

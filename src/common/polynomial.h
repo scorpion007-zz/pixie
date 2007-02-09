@@ -205,6 +205,3 @@ template <class T> inline	int solveQuartic(T c[5],T s[4]) {
 
 #endif
 
-
-
-

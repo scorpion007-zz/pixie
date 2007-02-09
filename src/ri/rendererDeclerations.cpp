@@ -646,7 +646,3 @@ void CRenderer::registerFrameTemporary(const char *name, int deleteFile) {
 	frameTemporaryFiles->push(tmp);
 }
 
-
-
-
-

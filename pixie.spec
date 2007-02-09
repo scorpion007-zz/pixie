@@ -94,3 +94,4 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/*.a
 %{prefix}/lib/*.la
 %{prefix}/lib/*.so
+

@@ -720,3 +720,4 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 
 	return newPath;
 }
+

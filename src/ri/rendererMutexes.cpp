@@ -232,3 +232,4 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);
 }
+

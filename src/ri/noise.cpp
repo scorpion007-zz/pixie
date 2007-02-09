@@ -950,8 +950,3 @@ void	cellNoiseVector(float *r,const float *arg,float w) {
 	r[2]	=	(g3[index][2]+1)*(float) 0.5;
 }
 
-
-
-
-
-

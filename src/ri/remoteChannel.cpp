@@ -756,3 +756,4 @@ int	CRemotePtCloudChannel::setup(SOCKET s) {
 	
 	return TRUE;
 }
+

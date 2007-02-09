@@ -320,5 +320,3 @@ void		CBSplinePatchGrid::interpolate(int numVertices,float **varying,float ***lo
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
-
-

@@ -3425,7 +3425,3 @@ CExpression		*getAssignment(CArray<CVariable *> *variables,CArray<CExpression *>
 #endif
 }
 
-
-
-
-

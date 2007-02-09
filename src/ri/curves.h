@@ -159,12 +159,3 @@ void				curvesCreate(CAttributes *,CXform *,CPl *,int,int,int,int *,int,CRendere
 
 #endif
 
-
-
-
-
-
-
-
-
-

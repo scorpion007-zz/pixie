@@ -733,3 +733,4 @@ inline	void	qfromR(SCALAR_TYPE *q,const SCALAR_TYPE *R) {
 	q[2]	=	(SCALAR_TYPE) c;
 	q[3]	=	(SCALAR_TYPE) d;
 }
+

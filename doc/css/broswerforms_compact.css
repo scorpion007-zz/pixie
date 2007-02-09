@@ -65,3 +65,4 @@ button {text-indent:0;white-space:normal;}
 button,input[type="reset"],input[type="button"],input[type="submit"] {background-color:ButtonFace;border:2px outset ButtonFace;color:ButtonText;cursor:default;line-height:normal !important;padding:0px 6px 0px 6px;white-space:pre;}
 button:active:hover,input[type="reset"]:active:hover,input[type="button"]:active:hover,input[type="submit"]:active:hover {border-style:inset;padding:0px 5px 0px 7px;}
 button[disabled]:active,button[disabled],input[type="reset"][disabled]:active,input[type="reset"][disabled],input[type="button"][disabled]:active,input[type="button"][disabled],select[disabled] > input[type="button"],select[disabled] > input[type="button"]:active,input[type="submit"][disabled]:active,input[type="submit"][disabled] {border:1px outset ButtonShadow;color:GrayText;padding:1px 7px 1px 7px;}
+

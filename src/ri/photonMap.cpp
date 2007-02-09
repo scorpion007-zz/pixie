@@ -540,3 +540,4 @@ void	CPhotonMap::draw() {
 
 	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
 }
+

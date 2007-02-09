@@ -152,4 +152,3 @@ void	displayFinish(void *im) {
 	delete fb;
 }
 
-

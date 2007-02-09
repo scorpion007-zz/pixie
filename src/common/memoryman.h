@@ -117,4 +117,3 @@ extern	void	operator delete[](void *ptr);
 
 #endif
 
-

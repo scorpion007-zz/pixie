@@ -598,5 +598,3 @@ void	osDeleteSemaphore(TSemaphore &sem) {
 #endif
 }
 
-
-

@@ -240,5 +240,3 @@ void	CStats::check() {
 	assert(zoneMemory				==	0);
 }
 
-
-

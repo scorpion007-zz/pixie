@@ -1857,5 +1857,3 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	osUnlock(mutex);
 }
 
-
-

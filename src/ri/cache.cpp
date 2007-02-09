@@ -52,7 +52,3 @@ CCache::CCache(const char *name,unsigned int f) : CFileResource(name) {
 CCache::~CCache() {
 }
 
-
-
-
-

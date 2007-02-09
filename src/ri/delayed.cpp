@@ -250,3 +250,4 @@ void	CDelayedInstance::instantiate(CAttributes *a,CXform *x,CRendererContext *c)
 
 	c->addObject(new CDelayedInstance(a,nx,instance));
 }
+

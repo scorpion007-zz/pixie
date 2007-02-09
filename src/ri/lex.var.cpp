@@ -1729,5 +1729,3 @@ int main()
 #endif
 #line 50 "../../../../src/ri/variable.l"
 
-
-

@@ -623,4 +623,3 @@ EXTERN(RtVoid)
 
 #endif  /* RI_H */
 
-

@@ -8,4 +8,3 @@ openexr_la_LDFLAGS = -module -avoid-version @OPENEXR_LDFLAGS@
 
 INCLUDES = -I.. @OPENEXR_INCLUDES@
 
-

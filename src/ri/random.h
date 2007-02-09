@@ -189,6 +189,3 @@ void	sampleSphere(float *P,CSobol<3> &generator);
 
 #endif
 
-
-
-

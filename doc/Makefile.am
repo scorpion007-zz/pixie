@@ -11,4 +11,3 @@ nobase_doc_DATA = 		\
 	thumbs/*/*/*		\
 	thumbs/*/*/*/*
 
-

@@ -183,3 +183,4 @@ protected:
 extern	CRiInterface	*renderMan;		// This is the global variable that's implementing the RenderMan interface
 
 #endif
+

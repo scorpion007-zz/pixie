@@ -57,3 +57,4 @@ public:
 int	parseVariable(CVariable *,const char *,const char *);
 
 #endif
+

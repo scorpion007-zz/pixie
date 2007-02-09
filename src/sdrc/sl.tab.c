@@ -3437,5 +3437,3 @@ void	yyerror(char *mes) {
 	sdr->error("Parse error\n");
 }
 
-
-

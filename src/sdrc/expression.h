@@ -488,5 +488,3 @@ CExpression	*getAssignment(CArray<CVariable *> *,CArray<CExpression *> *);
 //CCodeBlock	*getAssignment(char *,CExpression *);
 #endif
 
-
-

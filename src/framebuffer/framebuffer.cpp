@@ -144,6 +144,3 @@ void	displayFinish(void *im) {
 
 }
 
-
-
-

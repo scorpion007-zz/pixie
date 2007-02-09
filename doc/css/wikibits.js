@@ -709,3 +709,4 @@ function allmessagesshow() {
 }
 
 hookEvent("load", allmessagesshow);
+

@@ -1635,3 +1635,4 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable("texturename",		"string");
 	declareVariable("to",				"point");
 }
+

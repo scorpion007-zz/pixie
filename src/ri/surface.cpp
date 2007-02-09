@@ -1747,6 +1747,3 @@ void		CTesselationPatch::purgeTesselations(CShadingContext *context,int thread,i
 	#endif
 }
 
-
-
-

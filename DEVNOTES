@@ -20,3 +20,4 @@ Todos:
 - patch crack stitching
 - 64 bit compatibility. 
   The main issue is the shaders keeping all the data in a linear array. This can be fixed by separating the opcodes from arguments.
+

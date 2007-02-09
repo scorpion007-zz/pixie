@@ -217,10 +217,3 @@ void	info(EErrorCode code,char *mes,...) {
 	va_end(args);
 }
 
-
-
-
-
-
-
-

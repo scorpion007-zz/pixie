@@ -367,30 +367,3 @@ void		CSubdivision::interpolate(int numVertices,float **varying,float ***locals)
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

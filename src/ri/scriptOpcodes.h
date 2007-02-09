@@ -807,4 +807,3 @@ DEFOPCODE(Return	,"return"	,0,RETURN_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 // Include RenderMan Shading Language specific opcodes here
 #include "shaderOpcodes.h"
 
-

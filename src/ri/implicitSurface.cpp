@@ -254,3 +254,4 @@ void					CImplicit::shade(CShadingContext *context,int numRays,CRay **rays) {
 
 	context->shade(this,numRays,1,SHADING_0D,0);
 }
+

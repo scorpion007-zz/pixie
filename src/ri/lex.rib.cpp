@@ -2686,7 +2686,3 @@ int main()
 #endif
 #line 247 "../../../../src/ri/rib.l"
 
-
-
-
-

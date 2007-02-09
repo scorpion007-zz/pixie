@@ -1480,4 +1480,3 @@ void			sdrDelete(TSdrShader *cShader) {
 	memShutdown();
 }
 
-

@@ -333,3 +333,4 @@ CVariable	*CAttributes::findParameter(const char *name) {
 
 	return NULL;
 }
+

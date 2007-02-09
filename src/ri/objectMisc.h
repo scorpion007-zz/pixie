@@ -208,7 +208,3 @@ inline	void	transform(float *oFrom,float *oDir,const CXform *xform,CRay *ray) {
 
 #endif
 
-
-
-
-

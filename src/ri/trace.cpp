@@ -396,4 +396,3 @@ void	CShadingContext::trace(CRay *ray) {
 	}
 }
 
-

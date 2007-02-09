@@ -68,3 +68,4 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 	outType		=	entry;
 	fill		=	NULL;
 }
+

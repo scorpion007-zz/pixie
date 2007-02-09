@@ -379,4 +379,3 @@ void	CGatherBundle::post() {
 	depth++;
 }
 
-

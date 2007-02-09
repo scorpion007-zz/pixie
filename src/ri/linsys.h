@@ -36,3 +36,4 @@
 void	linSolve(float *A,float *b,int n,int nrhs);
 
 #endif
+

@@ -727,6 +727,3 @@ void	CRenderer::computeDisplayData() {
 	if (numActiveDisplays == 0) hiderFlags	|=	HIDER_BREAK;
 }
 
-
-
-

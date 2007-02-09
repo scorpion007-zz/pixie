@@ -242,3 +242,4 @@ void CTexture3d::unpackSample(float *C,float **samples,CTexture3dChannel **bindi
 		}
 	}
 }
+

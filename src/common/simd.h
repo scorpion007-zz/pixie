@@ -80,8 +80,3 @@ void	simdDiv(int count,float *dest,const float *src1)					{	perform1(count,dest,
 
 #endif
 
-
-
-
-
-

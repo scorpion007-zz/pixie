@@ -183,3 +183,4 @@ void					CDLObject::shade(CShadingContext *context,int numRays,CRay **rays) {
 
 	context->shade(this,numRays,-1,SHADING_2D,0);
 }
+

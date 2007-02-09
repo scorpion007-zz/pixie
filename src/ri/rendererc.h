@@ -217,4 +217,3 @@ const	unsigned	int		PARAMETER_NONAMBIENT		=	1 << 30;	// A non-ambient light sour
 
 #endif
 
-

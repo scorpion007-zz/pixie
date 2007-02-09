@@ -760,4 +760,3 @@ int main(int argc, char* argv[]) {
 	return (RiLastError != RIE_NOERROR) ? -1 : 0;
 }
 
-

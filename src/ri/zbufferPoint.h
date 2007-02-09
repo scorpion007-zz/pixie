@@ -91,6 +91,3 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 	}
 }
 
-
-
-

@@ -140,7 +140,3 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 #endif
 
-
-
-
-

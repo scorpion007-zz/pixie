@@ -202,5 +202,3 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	}
 }
 
-
-

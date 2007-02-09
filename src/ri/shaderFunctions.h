@@ -2342,3 +2342,4 @@ DEFFUNC(Texture3d			,"texture3d"					,"f=Spn!"		,TEXTURE3DEXPR_PRE,TEXTURE3DEXPR
 
 
 #include "giFunctions.h"
+

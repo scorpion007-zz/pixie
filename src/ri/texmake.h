@@ -44,6 +44,3 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 
 #endif
 
-
-
-

@@ -997,3 +997,4 @@ int		dsoParse(const char *decl,char *&name,char *&prototype) {
 void	dsoerror(char *,...) {
 	numErrors++;
 }
+

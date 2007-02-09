@@ -68,7 +68,3 @@ SHADEOP(green1) {
 	result[2]	=	0;
 }
 
-
-
-
-

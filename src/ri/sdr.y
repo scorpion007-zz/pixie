@@ -2420,4 +2420,3 @@ void	processEscapes(char *str) {
 
 extern	void		convertColorFrom(float *out,const float *in,ECoordinateSystem s);
 
-

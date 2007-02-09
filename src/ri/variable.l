@@ -49,4 +49,3 @@ string												return	VAR_STRING;
 [\t ]												;
 %%
 
-

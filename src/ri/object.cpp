@@ -592,3 +592,4 @@ void			   CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,i
    nudiv   =   max(1,nudiv);
    nvdiv   =   max(1,nvdiv);
 }
+

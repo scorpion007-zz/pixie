@@ -742,4 +742,3 @@ int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunct
 	return FALSE;
 }
 
-

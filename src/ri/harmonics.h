@@ -230,3 +230,4 @@ inline	void	harmonicDot(float *C,const float *Y,const float *y) {
 
 
 #endif
+

@@ -950,3 +950,4 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 void	debugFunction(float *op) {
 	fprintf(stderr,"Debug\n");
 }
+

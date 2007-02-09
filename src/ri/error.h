@@ -78,6 +78,3 @@ void	info(EErrorCode,char *,...);
 
 #endif
 
-
-
-

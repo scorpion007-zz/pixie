@@ -1608,3 +1608,4 @@ void	CReyes::insertObject(CRasterObject *object) {
 		osUnlock(object->mutex);
 	}
 }
+

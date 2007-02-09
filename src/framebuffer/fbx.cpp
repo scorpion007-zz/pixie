@@ -548,11 +548,3 @@ int		CXDisplay::data(int x,int y,int w,int h,float *d) {
 	return TRUE;
 }
 
-
-
-
-
-
-
-
-

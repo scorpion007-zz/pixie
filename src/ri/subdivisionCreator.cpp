@@ -1916,3 +1916,4 @@ void		CSubdivMesh::create(CShadingContext *context) {
 
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
 }
+

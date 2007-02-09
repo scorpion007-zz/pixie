@@ -936,3 +936,4 @@ void		CStochastic::deepShadowCompute() {
 	
 	osUnlock(CRenderer::deepShadowMutex);
 }
+

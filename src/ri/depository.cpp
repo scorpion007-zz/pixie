@@ -116,3 +116,4 @@ void		CDepository::lookup(float *C,const float *P,const float *N) {
 		C[3]			*=	totalWeight;
 	}
 }
+

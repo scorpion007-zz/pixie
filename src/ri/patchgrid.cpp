@@ -335,4 +335,3 @@ void		CPatchGrid::interpolate(int numVertices,float **varying,float ***locals) c
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
-

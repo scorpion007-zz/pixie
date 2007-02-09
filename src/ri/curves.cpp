@@ -958,14 +958,3 @@ void	CCurveMesh::create(CShadingContext *context) {
 	osUnlock(mutex);
 }
 
-
-
-
-
-
-
-
-
-
-
-

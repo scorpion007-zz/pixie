@@ -1017,4 +1017,3 @@ DEFFUNC(DSO_VOID				,"XXX",			"XXX",	DSOVOIDEXEC_PRE,DSOVOIDEXEC,DSOVOIDEXEC_UPD
 // Include the RenderMan Shading Language specific built - in functions
 #include "shaderFunctions.h"
 
-

@@ -141,5 +141,3 @@ extern	CStats	stats;
 
 #endif
 
-
-

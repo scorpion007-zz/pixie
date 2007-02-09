@@ -804,17 +804,3 @@ DEFSHORTFUNC(RayDepth		,"raydepth"	,"f="	,FUN1EXPR_PRE,RAYDEPTHEXPR,FUN1EXPR_UPD
 
 #undef	RAYDEPTHEXPR
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-

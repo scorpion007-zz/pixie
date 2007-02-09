@@ -1078,5 +1078,3 @@ void		CIrradianceCache::bound(float *bmin,float *bmax) {
 	bmax[2]	=	root->center[2] + root->side*0.5f;
 }
 
-
-

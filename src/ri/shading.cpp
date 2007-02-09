@@ -1708,3 +1708,4 @@ void			CShadingContext::next_state() {
     next = state + N;
     return;
 }
+
