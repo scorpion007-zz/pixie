@@ -1,6 +1,6 @@
 #!/bin/sh
 
-nativefiles="'*.cpp' '*.h' '*.l' '*.y' '*.html' '*.css' '*.js' '*.am' '*.in' '*.m4' '*.c' '*.guess' '*.sub' missing depcomp install-sh makeunix COMPILING.txt AUTHORS COPYING ChangeLog DEVNOTES INSTALL LICENSE NEWS README pixie.spec"
+nativefiles="'*.cpp' '*.h' '*.l' '*.y' '*.html' '*.css' '*.js' '*.am' '*.in' '*.m4' '*.c' '*.guess' '*.sub' ltmain.sh missing depcomp install-sh makeunix COMPILING.txt AUTHORS COPYING ChangeLog DEVNOTES INSTALL LICENSE NEWS README pixie.spec"
 
 #.h may need doing
 for f in $nativefiles; do
