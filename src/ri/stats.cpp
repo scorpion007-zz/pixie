@@ -117,6 +117,11 @@ void	CStats::reset() {
 	numBrickmapCachePageouts			=	0;
 	numBrickmapCachePageins				=	0;
 	brickmapPeakMem						=	0;
+	tesselationPeakMemory				=	0;
+	tesselationMemory					=	0;
+	tesselationCacheHits				=	0;
+	tesselationCacheMisses				=	0;
+	tesselationOverhead					=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -203,6 +208,7 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"            memory: %d (bytes)\n",tesselationMemory);
 		info(CODE_STATS,"        Cache hits: %d (times)\n",tesselationCacheHits);
 		info(CODE_STATS,"      Cache misses: %d (times)\n",tesselationCacheMisses);
+		info(CODE_STATS,"    Tess. Overhead: %d (times)\n",tesselationOverhead);
 	}
 }
 

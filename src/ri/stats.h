@@ -133,6 +133,7 @@ public:
 	int				tesselationPeakMemory;			// The peak total memory usage for tesselations
 	int				tesselationCacheMisses;			// The number of tesselation cache misses
 	int				tesselationCacheHits;			// The number of tesselation cache hits
+	int				tesselationOverhead;			// The memory overhead of tesselation patches
 };
 
 

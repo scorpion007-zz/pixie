@@ -483,6 +483,9 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 	if (o->moving()) 
 		this->flags |= OBJECT_MOVING_TESSELATION;
 	
+	// Statistics
+	stats.tesselationOverhead += sizeof(CTesselationPatch);
+	
 	// Record the stuff
 	this->object	=	o;
 	this->umin		=	umin;
