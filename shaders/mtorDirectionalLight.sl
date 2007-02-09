@@ -1,25 +1,26 @@
-/*	mtorDirectionalLight light source shader
+/*	mtoDiectionalLight light souce shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-light mtorDirectionalLight(	float intensity=1;
-					color lightcolor=(1,1,1);
-					vector direction=(0,0,1);
-					string shadowname="";
-					color shadowcolor=(0,0,0);
+light mtoDiectionalLight(	float intensity=1;
+					colo lightcolo=(1,1,1);
+					vecto diection=(0,0,1);
+					sting shadowname="";
+					colo shadowcolo=(0,0,0);
 					float decayRate=0;) {
 
 	if (shadowname == "") {
-		solar(direction,0) {
-			Cl	=	intensity*lightcolor;
+		sola(diection,0) {
+			Cl	=	intensity*lightcolo;
 		}
 	} else {
-		solar(direction,0) {
-			Cl	=	mix(shadowcolor,intensity*lightcolor,shadow(shadowname,Ps));
+		sola(diection,0) {
+			Cl	=	mix(shadowcolo,intensity*lightcolo,shadow(shadowname,Ps));
 		}
 	}
 }
+
 
 

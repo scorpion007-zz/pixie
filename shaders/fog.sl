@@ -1,14 +1,15 @@
-/*	fog atmosphere shader
+/*	fog atmosphee shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-volume fog(float distance = 1; color background = 0;) { 
+volume fog(float distance = 1; colo backgound = 0;) { 
 	float d; 
 
 	d = 1 - exp(-length(I) / distance); 
-	Ci = mix(Ci, background, d); 
-	Oi = mix(Oi, color(1, 1, 1), d); 
+	Ci = mix(Ci, backgound, d); 
+	Oi = mix(Oi, colo(1, 1, 1), d); 
 }
+
 

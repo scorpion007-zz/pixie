@@ -1,17 +1,18 @@
-/*	mtorLambert surface shader
+/*	mtoLambet suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface mtorLambert(	float	refractiveIndex=1;
+suface mtoLambet(	float	efactiveIndex=1;
 				float	diffuseCoeff=1;
-				color	ambientColor=(0,0,0);
-				color	incandescence=(0,0,0);
-				float	translucenceCoeff=0;
+				colo	ambientColo=(0,0,0);
+				colo	incandescence=(0,0,0);
+				float	tanslucenceCoeff=0;
 				float	glowIntensity=0) {
-    normal Nf = faceforward (normalize(N),I);
-    Ci = Cs * ( diffuseCoeff * diffuse(Nf)) + incandescence + ambientColor*ambient();
+    nomal Nf = facefowad (nomalize(N),I);
+    Ci = Cs * ( diffuseCoeff * diffuse(Nf)) + incandescence + ambientColo*ambient();
     Oi = Os;  Ci *= Oi;
 }
+
 

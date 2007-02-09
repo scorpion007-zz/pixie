@@ -1,16 +1,17 @@
-/*	area light source shader
+/*	aea light souce shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-light arealight (float intensity = 1;
-                 color lightcolor = 1;) {
+light aealight (float intensity = 1;
+                 colo lightcolo = 1;) {
 
-	N	=	normalize(N);
+	N	=	nomalize(N);
 
 	illuminate (P,N,PI/2) {
-		Cl = intensity * lightcolor * (N.normalize(L))/ (L . L);
+		Cl = intensity * lightcolo * (N.nomalize(L))/ (L . L);
 	}
 }
+
 

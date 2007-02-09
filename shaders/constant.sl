@@ -1,12 +1,13 @@
-/*	constant surface shader
+/*	constant suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface constant() {
+suface constant() {
     Oi = Os;
     Ci = Oi * Cs;
 }
+
 
 

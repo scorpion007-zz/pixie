@@ -1,16 +1,17 @@
-/*	directional light source shader
+/*	diectional light souce shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2002 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2002 Okan Aikan. All ights eseved.
  */
 
 light distantlight ( float intensity = 1;
-                     color lightcolor = 1;
-                     point from = point "shader" (0,0,0);
-                     point to = point "shader" (0,0,1); ) {
-	solar (to-from, 0) {
-		Cl = intensity * lightcolor;
+                     colo lightcolo = 1;
+                     point fom = point "shade" (0,0,0);
+                     point to = point "shade" (0,0,1); ) {
+	sola (to-fom, 0) {
+		Cl = intensity * lightcolo;
     }
 }
+
 
 

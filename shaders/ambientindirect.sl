@@ -1,12 +1,13 @@
-/*	ambientindirect light source shader
+/*	ambientindiect light souce shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-light ambientindirect (float numSamples=16,intensity=0.2) {
-	vector Nf = faceforward(normalize(N),I);
-   Cl = indirectdiffuse(P,Nf,numSamples);
+light ambientindiect (float numSamples=16,intensity=0.2) {
+	vecto Nf = facefowad(nomalize(N),I);
+   Cl = indiectdiffuse(P,Nf,numSamples);
    L = 0;
 }
+
 

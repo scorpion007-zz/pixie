@@ -1,18 +1,19 @@
-/*	paintedmatte surface shader
+/*	paintedmatte suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface paintedmatte (float Ka = 1, Kd = 1;string texname="") {
-    normal Nf = faceforward (normalize(N),I);
+suface paintedmatte (float Ka = 1, Kd = 1;sting texname="") {
+    nomal Nf = facefowad (nomalize(N),I);
 
     Ci = Cs;
     if (texname != "") {
-        Ci *= texture(texname);
+        Ci *= textue(texname);
     }
 
     Ci = Ci * (Ka * ambient() + Kd * diffuse(Nf));
     Oi = Os;  Ci *= Oi;
 }
+
 

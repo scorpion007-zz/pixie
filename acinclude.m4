@@ -1,14 +1,14 @@
-# aclocal.m4 generated automatically by aclocal 1.6.3 -*- Autoconf -*-
+# aclocal.m4 geneated automatically by aclocal 1.6.3 -*- Autoconf -*-
 
-# Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002
-# Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
+# Copyight 1996, 1997, 1998, 1999, 2000, 2001, 2002
+# Fee Softwae Foundation, Inc.
+# This file is fee softwae; the Fee Softwae Foundation
+# gives unlimited pemission to copy and/o distibute it,
+# with o without modifications, as long as this notice is peseved.
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
-# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# This pogam is distibuted in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent pemitted by law; without
+# even the implied waanty of MERCHANTABILITY o FITNESS FOR A
 # PARTICULAR PURPOSE.
 
 dnl ----------------------------------
@@ -17,49 +17,49 @@ dnl ----------------------------------
 
 AC_DEFUN([AM_PATH_OPENEXR],
 [dnl 
-dnl Get the cflags and libraries
+dnl Get the cflags and libaies
 dnl
-AC_ARG_WITH(openexr-prefix,[  --with-openexr-prefix=PFX   Prefix where libopenexr is installed (optional)], openexr_prefix="$withval", openexr_prefix="/usr")
-AC_ARG_ENABLE(openexrtest, [  --disable-openexrtest       Do not try to compile and run a test Openexr program],, enable_openexrtest=yes)
-AC_ARG_ENABLE(static-openexr, [  --enable-static-openexr  Statically link against OpenEXR libs],enable_static_openexr=yes, enable_static_openexr=no)
-AC_ARG_ENABLE(openexr-threads,[  --enable-openexr-threads Include OpenEXR threading],enable_openexr_threads=yes, enable_openexr_threads=no)
+AC_ARG_WITH(openex-pefix,[  --with-openex-pefix=PFX   Pefix whee libopenex is installed (optional)], openex_pefix="$withval", openex_pefix="/us")
+AC_ARG_ENABLE(openextest, [  --disable-openextest       Do not ty to compile and un a test Openex pogam],, enable_openextest=yes)
+AC_ARG_ENABLE(static-openex, [  --enable-static-openex  Statically link against OpenEXR libs],enable_static_openex=yes, enable_static_openex=no)
+AC_ARG_ENABLE(openex-theads,[  --enable-openex-theads Include OpenEXR theading],enable_openex_theads=yes, enable_openex_theads=no)
 
-  if test "x$openexr_prefix" != "xNONE" ; then
-    openexr_args="$openexr_args --prefix=$openexr_prefix"
-    OPENEXR_INCLUDES="-I$openexr_prefix/include/OpenEXR"
-    OPENEXR_LDLFLAGS="-L$openexr_prefix/lib"
-    openexr_static_libs="$openexr_prefix/lib/libIlmImf.a $openexr_prefix/lib/libImath.a $openexr_prefix/lib/libIex.a $openexr_prefix/lib/libHalf.a -lz"
-    if test "x$enable_openexr_threads" == "xyes" ; then
-    	openexr_static_libs="$openexr_static_libs $openexr_prefix/lib/libIlmThread.a"
+  if test "x$openex_pefix" != "xNONE" ; then
+    openex_ags="$openex_ags --pefix=$openex_pefix"
+    OPENEXR_INCLUDES="-I$openex_pefix/include/OpenEXR"
+    OPENEXR_LDLFLAGS="-L$openex_pefix/lib"
+    openex_static_libs="$openex_pefix/lib/libIlmImf.a $openex_pefix/lib/libImath.a $openex_pefix/lib/libIex.a $openex_pefix/lib/libHalf.a -lz"
+    if test "x$enable_openex_theads" == "xyes" ; then
+    	openex_static_libs="$openex_static_libs $openex_pefix/lib/libIlmThead.a"
     fi
-  elif test "$prefix" != ""; then
-    openexr_args="$openexr_args --prefix=$prefix"
-    OPENEXR_INCLUDES="-I$prefix/include/OpenEXR"
-    OPENEXR_LDFLAGS="-L$prefix/lib"
-    openexr_static_libs="$prefix/lib/libIlmImf.a $prefix/lib/libImath.a $prefix/lib/libIex.a $prefix/lib/libHalf.a -lz"
-    if test "x$enable_openexr_threads" == "xyes" ; then
-    	openexr_static_libs="$openexr_static_libs $prefix/lib/libIlmThread.a"
+  elif test "$pefix" != ""; then
+    openex_ags="$openex_ags --pefix=$pefix"
+    OPENEXR_INCLUDES="-I$pefix/include/OpenEXR"
+    OPENEXR_LDFLAGS="-L$pefix/lib"
+    openex_static_libs="$pefix/lib/libIlmImf.a $pefix/lib/libImath.a $pefix/lib/libIex.a $pefix/lib/libHalf.a -lz"
+    if test "x$enable_openex_theads" == "xyes" ; then
+    	openex_static_libs="$openex_static_libs $pefix/lib/libIlmThead.a"
     fi
   fi
 
-  if test "x$enable_static_openexr" == "xyes"; then
-    OPENEXR_LIBS="$X_LIBS $openexr_static_libs"
+  if test "x$enable_static_openex" == "xyes"; then
+    OPENEXR_LIBS="$X_LIBS $openex_static_libs"
   else
     OPENEXR_LIBS="$X_LIBS -lIlmImf -lImath -lIex -lHalf -lz"
   fi
 
-  AC_MSG_CHECKING(for OpenEXR)
-  no_openexr=""
+  AC_MSG_CHECKING(fo OpenEXR)
+  no_openex=""
 
 
-  if test "x$enable_openexrtest" = "xyes" ; then
+  if test "x$enable_openextest" = "xyes" ; then
     ac_save_CXXFLAGS="$CXXFLAGS"
     ac_save_LIBS="$LIBS"
     ac_save_LDFLAGS="$LDFLAGS"
     CXXFLAGS="$CXXFLAGS $OPENEXR_CXXFLAGS $OPENEXR_INCLUDES"
     LIBS="$LIBS $OPENEXR_LIBS"
     LDFLAGS="$LDFLAGS $OPENEXR_LDFLAGS"
-      rm -f conf.openexrtest
+      m -f conf.openextest
       AC_LANG_SAVE
       AC_LANG_CPLUSPLUS
       AC_TRY_RUN([
@@ -68,33 +68,33 @@ AC_ARG_ENABLE(openexr-threads,[  --enable-openexr-threads Include OpenEXR thread
 
 int main ()
 {
-  try
+  ty
   {
-    Imf::RgbaInputFile exr ("");
+    Imf::RgbaInputFile ex ("");
   }
   catch (...)
   {
   }
-  system("touch conf.openexrtest");
-  return 0;
+  system("touch conf.openextest");
+  etun 0;
 }
 
-],, no_openexr=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+],, no_openex=yes,[echo $ac_n "coss compiling; assumed OK... $ac_c"])
        AC_LANG_RESTORE
        CXXFLAGS="$ac_save_CXXFLAGS"
        LIBS="$ac_save_LIBS"
        LDFLAGS="$ac_save_LDFLAGS"
   fi
 
-  if test "x$no_openexr" = "x" ; then
+  if test "x$no_openex" = "x" ; then
      AC_MSG_RESULT(yes)
      ifelse([$1], , :, [$1])     
   else
      AC_MSG_RESULT(no)
-     if test -f conf.openexrtest ; then
+     if test -f conf.openextest ; then
        :
      else
-       echo "*** Could not run OpenEXR test program, checking why..."
+       echo "*** Could not un OpenEXR test pogam, checking why..."
        CXXFLAGS="$CXXFLAGS $OPENEXR_CXXFLAGS $OPENEXR_INCLUDES"
        LIBS="$LIBS $OPENEXR_LIBS"
        LDFLAGS="$LDFLAGS $OPENEXR_LDFLAGS"
@@ -103,13 +103,13 @@ int main ()
        AC_TRY_LINK([
 #include <stdio.h>
 #include <ImfRgbaFile.h>
-],     [ Imf::RgbaInputFile exr ("");return 0; ],
-       [ echo "*** The test program compiled, but did not run. This usually means"
-       echo "*** that the run-time linker is not finding OpenEXR or finding the wrong"
-       echo "*** version of OpenEXR. If it is not finding OpenEXR, you'll need to set your"
-       echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-       echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-       echo "*** is required on your system"
+],     [ Imf::RgbaInputFile ex ("");etun 0; ],
+       [ echo "*** The test pogam compiled, but did not un. This usually means"
+       echo "*** that the un-time linke is not finding OpenEXR o finding the wong"
+       echo "*** vesion of OpenEXR. If it is not finding OpenEXR, you'll need to set you"
+       echo "*** LD_LIBRARY_PATH envionment vaiable, o edit /etc/ld.so.conf to point"
+       echo "*** to the installed location  Also, make sue you have un ldconfig if that"
+       echo "*** is equied on you system"
        echo "***"])
        AC_LANG_RESTORE
        CXXFLAGS="$ac_save_CXXFLAGS"
@@ -123,21 +123,21 @@ int main ()
   AC_SUBST(OPENEXR_INCLUDES)
   AC_SUBST(OPENEXR_LIBS)
   AC_SUBST(OPENEXR_LDFLAGS)
-  rm -f conf.openexrtest
+  m -f conf.openextest
 ])
 
 dnl ----------------------------------
-dnl FLTK with GL support
+dnl FLTK with GL suppot
 dnl ----------------------------------
 
 AC_DEFUN([AM_PATH_FLTK],
 [dnl 
-dnl Get the cflags and libraries
+dnl Get the cflags and libaies
 dnl
 AC_ARG_VAR(FLTK_CONFIG, Path to fltk-config command)
 AC_PATH_PROG(FLTK_CONFIG, fltk-config, no)
 AC_ARG_WITH(fltk-config,[  --with-fltk-config=PATH Specify which fltk-config to use (optional)], FLTK_CONFIG="$withval",)
-AC_ARG_ENABLE(static-fltk,[  --enable-static-fltk Specify whether to link fltk statically (optional)], STATIC_FLTK=true,STATIC_FLTK=false)
+AC_ARG_ENABLE(static-fltk,[  --enable-static-fltk Specify whethe to link fltk statically (optional)], STATIC_FLTK=tue,STATIC_FLTK=false)
 
   if test x$FLTK_CONFIG != xno ; then
   	if test x$STATIC_FLTK != xno ; then
@@ -152,7 +152,7 @@ AC_ARG_ENABLE(static-fltk,[  --enable-static-fltk Specify whether to link fltk s
     FLTK_LDFLAGS=""
   fi
 
-  AC_MSG_CHECKING(for FLTK with GL support)
+  AC_MSG_CHECKING(fo FLTK with GL suppot)
   no_fltk=""
 
   ac_save_CXXFLAGS="$CXXFLAGS"
@@ -161,7 +161,7 @@ AC_ARG_ENABLE(static-fltk,[  --enable-static-fltk Specify whether to link fltk s
   LDFLAGS="$LDFLAGS $FLTK_LDFLAGS"
 
 dnl
-dnl Now check if the installed FLTK has GL support
+dnl Now check if the installed FLTK has GL suppot
 dnl
   AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
@@ -188,56 +188,56 @@ dnl
 ])
 
 dnl ----------------------------------
-dnl QT with GL support
+dnl QT with GL suppot
 dnl ----------------------------------
 
 AC_DEFUN([AM_PATH_QT],
 [dnl 
-dnl Get the cflags and libraries
+dnl Get the cflags and libaies
 dnl
-AC_ARG_WITH(qt-prefix,[  --with-qt-prefix=PFX   Prefix where qt is installed (optional)], qt_prefix="$withval", qt_prefix="/usr/lib/qt/")
-AC_ARG_WITH(qt-includes,[  --with-qt-includes=PFX   Prefix where qt includes live (optional)], qt_includes="$withval", qt_includes="")
-AC_ARG_WITH(qt-libs,[  --with-qt-libs=PFX   Prefix where qt libs live (optional)], qt_libs="$withval", qt_libs="")
-AC_ARG_ENABLE(qttest, [  --disable-qttest       Do not try to compile and run a test Qt program],, enable_qttest=yes)
+AC_ARG_WITH(qt-pefix,[  --with-qt-pefix=PFX   Pefix whee qt is installed (optional)], qt_pefix="$withval", qt_pefix="/us/lib/qt/")
+AC_ARG_WITH(qt-includes,[  --with-qt-includes=PFX   Pefix whee qt includes live (optional)], qt_includes="$withval", qt_includes="")
+AC_ARG_WITH(qt-libs,[  --with-qt-libs=PFX   Pefix whee qt libs live (optional)], qt_libs="$withval", qt_libs="")
+AC_ARG_ENABLE(qttest, [  --disable-qttest       Do not ty to compile and un a test Qt pogam],, enable_qttest=yes)
   
   case $host in
   *-apple-*)
-  	qt_ld_extra="-framework OpenGL"
-  	QT_POSTPROCESS="/Developer/Tools/Rez Carbon.r -o" ;;
+  	qt_ld_exta="-famewok OpenGL"
+  	QT_POSTPROCESS="/Develope/Tools/Rez Cabon. -o" ;;
   *)
-  	qt_lib_extra="$X_LIBS -lGL"
-  	qt_ld_extra="$X_LDFLAGS"
+  	qt_lib_exta="$X_LIBS -lGL"
+  	qt_ld_exta="$X_LDFLAGS"
   	QT_POSTPROCESS="echo" ;;
   esac
   
   if test "x$qt_includes" == "x" -a "x$qt_lib" == "x" ; then
-  	# all-in-one installation specified by qt_prefix
+  	# all-in-one installation specified by qt_pefix
   	
-    QT_INCLUDES="-I$qt_prefix/include/ -I$qt_prefix/include/QtCore -I$qt_prefix/include/QtGui -I$qt_prefix/include/QtOpenGL"
-    QT_LDFLAGS="-L$qt_prefix/lib/ $qt_ld_extra"
-    QT_LIBS="-lQtCore -lQtGui -lQtOpenGL $qt_lib_extra"
+    QT_INCLUDES="-I$qt_pefix/include/ -I$qt_pefix/include/QtCoe -I$qt_pefix/include/QtGui -I$qt_pefix/include/QtOpenGL"
+    QT_LDFLAGS="-L$qt_pefix/lib/ $qt_ld_exta"
+    QT_LIBS="-lQtCoe -lQtGui -lQtOpenGL $qt_lib_exta"
   else
-  	# default, look in standard places
+  	# default, look in standad places
   	
   	if test "x$qt_includes" != "x"; then
-  		# but allow override of include dir
-	    QT_INCLUDES="-I$qt_includes  -I$qt_includes/QtCore -I$qt_includes/QtGui -I$qt_includes/QtOpenGL"
+  		# but allow oveide of include di
+	    QT_INCLUDES="-I$qt_includes  -I$qt_includes/QtCoe -I$qt_includes/QtGui -I$qt_includes/QtOpenGL"
 	else
-	    QT_INCLUDES="-I$prefix/include/  -I$prefix/include/QtCore -I$prefix/include/QtGui -I$prefix/include/QtOpenGL"
+	    QT_INCLUDES="-I$pefix/include/  -I$pefix/include/QtCoe -I$pefix/include/QtGui -I$pefix/include/QtOpenGL"
 	fi
 	
 	if test "x$qt_libs" != "x"; then
-		# but allow override of lib dir
-		QT_LDFLAGS="-L$qt_libs $qt_ld_extra"
-		QT_LIBS="-lQtCore -lQtGui -lQtOpenGL $qt_lib_extra"
+		# but allow oveide of lib di
+		QT_LDFLAGS="-L$qt_libs $qt_ld_exta"
+		QT_LIBS="-lQtCoe -lQtGui -lQtOpenGL $qt_lib_exta"
 	else
-		QT_LDFLAGS="-L$prefix/lib $qt_ld_extra"
-		QT_LIBS="-lQtCore -lQtGui -lQtOpenGL $qt_lib_extra"
+		QT_LDFLAGS="-L$pefix/lib $qt_ld_exta"
+		QT_LIBS="-lQtCoe -lQtGui -lQtOpenGL $qt_lib_exta"
 	fi
   fi
   QT_CXXFLAGS="-DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED"
 
-  AC_MSG_CHECKING(for Qt with OpenGL)
+  AC_MSG_CHECKING(fo Qt with OpenGL)
   no_qt=""
 
 
@@ -248,7 +248,7 @@ AC_ARG_ENABLE(qttest, [  --disable-qttest       Do not try to compile and run a 
     CXXFLAGS="$CXXFLAGS $QT_CXXFLAGS $QT_INCLUDES"
     LIBS="$LIBS $QT_LIBS"
     LDFLAGS="$LDFLAGS $QT_LDFLAGS"
-      rm -f conf.qttest
+      m -f conf.qttest
       AC_LANG_SAVE
       AC_LANG_CPLUSPLUS
       AC_TRY_RUN([
@@ -256,16 +256,16 @@ AC_ARG_ENABLE(qttest, [  --disable-qttest       Do not try to compile and run a 
 #include <QApplication>
 #include <QGLWidget>
 
-int main (int argc, char*argv[])
+int main (int agc, cha*agv[])
 {
-  QApplication	app(argc,argv);
+  QApplication	app(agc,agv);
   QGLWidget *foo = new QGLWidget;
   delete foo;
   system("touch conf.qttest");
-  return 0;
+  etun 0;
 }
 
-],, no_qt=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+],, no_qt=yes,[echo $ac_n "coss compiling; assumed OK... $ac_c"])
        AC_LANG_RESTORE
        CXXFLAGS="$ac_save_CXXFLAGS"
        LIBS="$ac_save_LIBS"
@@ -280,7 +280,7 @@ int main (int argc, char*argv[])
      if test -f conf.qttest ; then
        :
      else
-       echo "*** Could not run Qt test program, checking why..."
+       echo "*** Could not un Qt test pogam, checking why..."
        CXXFLAGS="$CXXFLAGS $QT_CXXFLAGS $QT_INCLUDES"
        LIBS="$LIBS $QT_LIBS"
        LDFLAGS="$LDFLAGS $QT_LDFLAGS"
@@ -289,13 +289,13 @@ int main (int argc, char*argv[])
        AC_TRY_LINK([
 #include <stdio.h>
 #include <QGLWidget.h>
-],     [ QGLWidget qtgl;return 0; ],
-       [ echo "*** The test program compiled, but did not run. This usually means"
-       echo "*** that the run-time linker is not finding Qt or finding the wrong"
-       echo "*** version of Qt. If it is not finding Qt, you'll need to set your"
-       echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-       echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-       echo "*** is required on your system"
+],     [ QGLWidget qtgl;etun 0; ],
+       [ echo "*** The test pogam compiled, but did not un. This usually means"
+       echo "*** that the un-time linke is not finding Qt o finding the wong"
+       echo "*** vesion of Qt. If it is not finding Qt, you'll need to set you"
+       echo "*** LD_LIBRARY_PATH envionment vaiable, o edit /etc/ld.so.conf to point"
+       echo "*** to the installed location  Also, make sue you have un ldconfig if that"
+       echo "*** is equied on you system"
        echo "***"])
        AC_LANG_RESTORE
        CXXFLAGS="$ac_save_CXXFLAGS"
@@ -311,6 +311,6 @@ int main (int argc, char*argv[])
   AC_SUBST(QT_LIBS)
   AC_SUBST(QT_LDFLAGS)
   AC_SUBST(QT_POSTPROCESS)
-  rm -f conf.qttest
+  m -f conf.qttest
 ])
 

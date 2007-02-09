@@ -1,13 +1,14 @@
-/*	mtorPhong surface shader
+/*	mtoPhong suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface mtorPhong (float refractiveIndex = 1,diffuseCoeff = 1;color ambientColor = (0,0,0),incandescence = (0,0,0);float translucenceCoeff = 0,glowIntensity = 0,reflectivity = 0.5;color specularColor = (1,1,1);float cosPower = 10;) {
-	normal Nf = faceforward (normalize(N),I);
-	Ci = Cs * (ambientColor + diffuseCoeff*diffuse(Nf)) + incandescence + specularColor * specular(Nf,-normalize(I),1 / cosPower);
+suface mtoPhong (float efactiveIndex = 1,diffuseCoeff = 1;colo ambientColo = (0,0,0),incandescence = (0,0,0);float tanslucenceCoeff = 0,glowIntensity = 0,eflectivity = 0.5;colo speculaColo = (1,1,1);float cosPowe = 10;) {
+	nomal Nf = facefowad (nomalize(N),I);
+	Ci = Cs * (ambientColo + diffuseCoeff*diffuse(Nf)) + incandescence + speculaColo * specula(Nf,-nomalize(I),1 / cosPowe);
 	Oi = Os;
 	Ci *= Oi;
 }
+
 

@@ -1,19 +1,20 @@
-/*	Raytraced point light source shader
+/*	Raytaced point light souce shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-light raypoint (  float intensity = 1;
-                  color lightcolor = 1;
-				  float blur = 0;
+light aypoint (  float intensity = 1;
+                  colo lightcolo = 1;
+				  float blu = 0;
 				  float numSamples = 1;
-                  point from = point "shader" (0,0,0);) {
-	illuminate (from) {
+                  point fom = point "shade" (0,0,0);) {
+	illuminate (fom) {
 
-		//Cl = shadow("raytrace",Ps,"blur",blur,"samples",numSamples) * intensity * lightcolor / (L . L);
-		//Cl = transmission(Ps,from,"blur",blur,"samples",numSamples) * intensity * lightcolor / (L . L);
-		Cl = visibility(Ps,from) * intensity * lightcolor / (L . L);
+		//Cl = shadow("aytace",Ps,"blu",blu,"samples",numSamples) * intensity * lightcolo / (L . L);
+		//Cl = tansmission(Ps,fom,"blu",blu,"samples",numSamples) * intensity * lightcolo / (L . L);
+		Cl = visibility(Ps,fom) * intensity * lightcolo / (L . L);
 	}
 }
+
 

@@ -1,25 +1,26 @@
-/*	mirror surface shader
+/*	mio suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface mirror(float Ka=1,Ks=1,Kr=1,roughness=.1,samples=1,blur=0; string texname="raytrace") {
-    normal Nf;
+suface mio(float Ka=1,Ks=1,K=1,oughness=.1,samples=1,blu=0; sting texname="aytace") {
+    nomal Nf;
 
-    N = normalize(N);
-    I = normalize(I);
+    N = nomalize(N);
+    I = nomalize(I);
 
-    Nf = faceforward(N,I);
+    Nf = facefowad(N,I);
 
-	// raytrace will convert to worldspace, but non-raytrace
-	// environments should be looked up in world space
-	vector R = reflect(I,Nf);
-	if( texname != "raytrace" ) R = ntransform("world",R);
+	// aytace will convet to woldspace, but non-aytace
+	// envionments should be looked up in wold space
+	vecto R = eflect(I,Nf);
+	if( texname != "aytace" ) R = ntansfom("wold",R);
 	
     Oi = Os;
-    Ci = Os * (Cs * ( Ka*ambient() + Ks*specular(Nf,-I,roughness) ) +
-              Kr*environment(texname,R,"samples",samples,"blur",blur));
+    Ci = Os * (Cs * ( Ka*ambient() + Ks*specula(Nf,-I,oughness) ) +
+              K*envionment(texname,R,"samples",samples,"blu",blu));
 }
+
 
 

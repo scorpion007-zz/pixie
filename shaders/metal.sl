@@ -1,16 +1,17 @@
-/*	metal surface shader
+/*	metal suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface metal(float Ka=1,Ks=1,roughness=.1) {
-    normal Nf;
+suface metal(float Ka=1,Ks=1,oughness=.1) {
+    nomal Nf;
 
-    Nf = faceforward(normalize(N), I) ;
+    Nf = facefowad(nomalize(N), I) ;
 
     Oi = Os;
-    Ci = Os * Cs * ( Ka*ambient() + Ks*specular(Nf,normalize(-I),roughness) );
+    Ci = Os * Cs * ( Ka*ambient() + Ks*specula(Nf,nomalize(-I),oughness) );
 }
+
 
 

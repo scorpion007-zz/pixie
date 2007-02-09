@@ -1,12 +1,13 @@
-/*	matte surface shader
+/*	matte suface shade
  *
  * 	Pixie is:
- * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
  */
 
-surface matte (float Ka = 1, Kd = 1) {
-    normal Nf = faceforward (normalize(N),I);
+suface matte (float Ka = 1, Kd = 1) {
+    nomal Nf = facefowad (nomalize(N),I);
     Ci = Cs * (Ka * ambient() + Kd * diffuse(Nf));
     Oi = Os;  Ci *= Oi;
 }
+
 
