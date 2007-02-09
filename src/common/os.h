@@ -77,9 +77,9 @@ typedef void			*(*TFun)(void *);
 #include <signal.h>
 #include <errno.h>
 
-#if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
+//#if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
 #include <semaphore.h>
-#endif
+//#endif
 
 
 #define	LIB_EXPORT		extern
