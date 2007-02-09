@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -47,7 +47,6 @@ const int	INTERFACE_CTRL_KEY		=	65507;
 // Class				:	CInterface
 // Description			:	Deals with the trackball interface
 // Comments				:	-
-// Date last edited		:	9/21/2006
 class	CInterface {
 public:
 						CInterface(CView *v) {
@@ -146,7 +145,8 @@ protected:
 											d[2]		=	0;
 
 											mulmv(d,cameraToWorld,d);
-											mulvf(d,0.005f);
+											//mulvf(d,0.005f);
+											mulvf(d,0.005f*zoom);
 											addvv(position,savedPosition,d);
 										}
 										break;

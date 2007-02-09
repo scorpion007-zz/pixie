@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -42,12 +42,16 @@
 // Description			:	Da main function for show
 // Return Value			:	1 on failure, 0 on success
 // Comments				:
-// Date last edited		:	9/22/2006
 int	main(int argc,char *argv[]) {
 
 	if (argc == 1) {
 		fprintf(stdout,"Usage: show <options> <file_name>[,mode]\n");
-
+		fprintf(stdout,"\tKeys:\tbrickmap\tm:more detailed level\n");
+		fprintf(stdout,"\t\t\t\tl:less detailed level\n");
+		fprintf(stdout,"\t\tpoint cloud\tp:show points\n");
+		fprintf(stdout,"\t\t\t\td:show discs\n");
+		fprintf(stdout,"\t\tirradiance\tp:show points\n");
+		fprintf(stdout,"\t\t\t\td:show discs\n");
 		return 1;
 	} else {
 		char	tmp[OS_MAX_PATH_LENGTH+6];

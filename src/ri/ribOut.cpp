@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,8 +35,8 @@
 #include "ribOut.h"
 #include "common/os.h"
 #include "ri.h"
-#include "renderer.h"
 #include "error.h"
+#include "variable.h"
 
 // This is the size of the temporary buffer we use before going to the file
 const	int	ribOutScratchSize	=	1000;
@@ -54,6 +54,8 @@ static	char	*getFilter(float (*function)(float,float,float,float)) {
 		return	RI_TRIANGLEFILTER;
 	} else if (function == RiCatmullRomFilter) {
 		return	RI_CATMULLROMFILTER;
+	} else if (function == RiBlackmanHarrisFilter) {
+		return	RI_BLACKMANHARRISFILTER;
 	} else if (function == RiSincFilter) {
 		return	RI_SINCFILTER;
 	} else {
@@ -373,12 +375,9 @@ void		CRibOut::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
 			optionCheckInt(RI_METABUCKETS,2)
 			optionCheckInt(RI_INHERITATTRIBUTES,1)
 			optionCheckInt(RI_GRIDSIZE,1)
-			optionCheckInt(RI_HIERARCHYDEPTH,1)
-			optionCheckInt(RI_HIERARCHYOBJECTS,1)
 			optionCheckInt(RI_EYESPLITS,1)
 			optionCheckInt(RI_TEXTUREMEMORY,1)
 			optionCheckInt(RI_BRICKMEMORY,1)
-			optionCheckInt(RI_SHADERCACHE,1)
 			optionEndCheck
 		}
 	// Check the hider options
@@ -1266,15 +1265,6 @@ void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *),int 
 	out("ReadArchive \"%s\"\n",filename);
 }
 
-void		CRibOut::RiTrace(int,float [][3],float [][3],float [][3]) {
-}
-
-void		CRibOut::RiTrace(int,float [][3],float [][3],float [][3],float []) {
-}
-
-void		CRibOut::RiVisibility(int,float [][3],float [][3],float [][3]) {
-}
-
 void		CRibOut::writePL(int numParameters,char *tokens[],void *vals[]) {
 	int		i,j;
 	float	*f;
@@ -1517,12 +1507,9 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable(RI_METABUCKETS,			"int[2]");
 	declareVariable(RI_INHERITATTRIBUTES,	"int");
 	declareVariable(RI_GRIDSIZE,			"int");
-	declareVariable(RI_HIERARCHYDEPTH,		"int");
-	declareVariable(RI_HIERARCHYOBJECTS,	"int");
 	declareVariable(RI_EYESPLITS,			"int");
 	declareVariable(RI_TEXTUREMEMORY,		"int");
 	declareVariable(RI_BRICKMEMORY,			"int");
-	declareVariable(RI_SHADERCACHE,			"int");
 
 	declareVariable(RI_RADIANCECACHE,		"int");
 	declareVariable(RI_JITTER,				"float");

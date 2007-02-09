@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -30,18 +30,22 @@
 ////////////////////////////////////////////////////////////////////////
 #include "show.h"
 #include "cache.h"
-#include "renderer.h"
 #include "error.h"
 #include "fileResource.h"
 #include "photonMap.h"
 #include "texture3d.h"
 #include "gui/opengl.h"
+#include "renderer.h"
+#include "debug.h"
 
 
 // The static members of the CView class that visualizable classes derive from
 void					*CView::handle			=	NULL;
 TGlTrianglesFunction	CView::drawTriangles	=	NULL;
+TGlLinesFunction		CView::drawLines		=	NULL;
 TGlPointsFunction		CView::drawPoints		=	NULL;
+TGlDisksFunction		CView::drawDisks		=	NULL;
+TGlFileFunction			CView::drawFile			=	NULL;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
@@ -49,78 +53,89 @@ TGlPointsFunction		CView::drawPoints		=	NULL;
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
-CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODISPLAY) {
-	char		moduleFile[OS_MAX_PATH_LENGTH];
+CShow::CShow(int thread) : CShadingContext(thread) {
 
-	// First, try to load the dynamic library
-	CView::handle	=	NULL;
-	if(currentRenderer->locateFileEx(moduleFile,"gui",osModuleExtension,modulePath)) {
-		CView::handle		=	osLoadModule(moduleFile);
-	}
+	if (thread == 0) {
+		char		moduleFile[OS_MAX_PATH_LENGTH];
 
-	if (CView::handle != NULL) {
+		// First, try to load the dynamic library
+		CView::handle	=	NULL;
+		if(CRenderer::locateFileEx(moduleFile,"gui",osModuleExtension,CRenderer::modulePath)) {
+			CView::handle		=	osLoadModule(moduleFile);
+		}
 
-		// Is this the library we were expecting ?
-		TGlVisualizeFunction	visualize	=	(TGlVisualizeFunction) osResolve(CView::handle,"pglVisualize");
-		CView					*view		=	NULL;
+		if (CView::handle != NULL) {
 
-		if (visualize != NULL) {
+			// Is this the library we were expecting ?
+			TGlVisualizeFunction	visualize	=	(TGlVisualizeFunction) osResolve(CView::handle,"pglVisualize");
+			CView					*view		=	NULL;
 
-			// Try to load the file
-			const char	*fileName	=	hider + 5;
-			FILE		*in			=	fopen(fileName,"rb");
+			if (visualize != NULL) {
 
-			CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
-			CView::drawPoints		=	(TGlPointsFunction)		osResolve(CView::handle,"pglPoints");
+				// Try to load the file
+				const char	*fileName	=	CRenderer::hider + 5;
+				FILE		*in			=	fopen(fileName,"rb");
 
-			assert(CView::drawTriangles != NULL);
-			assert(CView::drawPoints != NULL);
+				CView::drawTriangles	=	(TGlTrianglesFunction)	osResolve(CView::handle,"pglTriangles");
+				CView::drawLines		=	(TGlLinesFunction)		osResolve(CView::handle,"pglLines");
+				CView::drawPoints		=	(TGlPointsFunction)		osResolve(CView::handle,"pglPoints");
+				CView::drawDisks		=	(TGlDisksFunction)		osResolve(CView::handle,"pglDisks");
+				CView::drawFile			=	(TGlFileFunction)		osResolve(CView::handle,"pglFile");
 
-			if (in != NULL)	{
-				unsigned int	magic	=	0;
-				int				version[3],i;
-				char			*t;
+				assert(CView::drawTriangles != NULL);
+				assert(CView::drawPoints != NULL);
 
-				fread(&magic,1,sizeof(int),in);
+				if (in != NULL)	{
+					unsigned int	magic	=	0;
+					int				version[3],i;
+					char			*t;
 
-				if (magic == magicNumber) {
-					fread(version,3,sizeof(int),in);
+					fread(&magic,1,sizeof(int),in);
 
-					if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
-						error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
-					} else {
-						fread(&i,1,sizeof(int),in);
-						t	=	(char *) alloca((i+1)*sizeof(char));
-						fread(t,i+1,sizeof(char),in);
+					if (magic == magicNumber) {
+						fread(version,3,sizeof(int),in);
 
-						info(CODE_PRINTF,"File:    %s\n",fileName);
-						info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
-						info(CODE_PRINTF,"Type:    %s\n",t);
-						fclose(in);
+						if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
+							error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
+						} else {
+							fread(&i,1,sizeof(int),in);
+							t	=	(char *) alloca((i+1)*sizeof(char));
+							fread(t,i+1,sizeof(char),in);
 
-						if (strcmp(t,filePhotonMap) == 0) {
-							view	=	getPhotonMap(fileName);
-						} else if (strcmp(t,fileIrradianceCache) == 0) {
-							view	=	getCache(fileName,"R");
-						} else if (strcmp(t,fileGatherCache) == 0) {
-							view	=	getCache(fileName,"R");
-						} else if (strcmp(t,filePointCloud) == 0) {
-							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
-						} else if (strcmp(t,fileBrickMap) == 0) {
-							view	=	getTexture3d(fileName,FALSE,NULL,NULL);
+							info(CODE_PRINTF,"File:    %s\n",fileName);
+							info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
+							info(CODE_PRINTF,"Type:    %s\n",t);
+							fclose(in);
+
+							if (strcmp(t,filePhotonMap) == 0) {
+								view	=	CRenderer::getPhotonMap(fileName);
+							} else if (strcmp(t,fileIrradianceCache) == 0) {
+								view	=	CRenderer::getCache(fileName,"R");
+							} else if (strcmp(t,fileGatherCache) == 0) {
+								view	=	CRenderer::getCache(fileName,"R");
+							} else if (strcmp(t,filePointCloud) == 0) {
+								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+							} else if (strcmp(t,fileBrickMap) == 0) {
+								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+							}
+
+							// Create / display the window
+							if (view != NULL)	visualize(view);
 						}
+					} else {
 
-						// Create / display the window
-						if (view != NULL)	visualize(view);
+						fseek(in,0,SEEK_SET);
+						view	=	new CDebugView(in,fileName);
+
+						visualize(view);
+
+						delete view;
 					}
-				} else {
-					error(CODE_BADFILE,"File %s doesn't seem to be a Pixie file\n",fileName);
 				}
 			}
+		} else {
+			error(CODE_SYSTEM,"Opengl wrapper not found...");
 		}
-	} else {
-		error(CODE_SYSTEM,"Opengl wrapper not found...");
 	}
 }
 
@@ -131,6 +146,16 @@ CShow::CShow(COptions *o,CXform *x,SOCKET s) : CShadingContext(o,x,s,HIDER_NODIS
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/21/2006
 CShow::~CShow() {
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class                :   CShow
+// Method               :   preDisplaySetup
+// Description          :   allow the hider to affect display setup
+// Return Value         :   -
+// Comments             :
+void CShow::preDisplaySetup() {
+	CRenderer::hiderFlags	|=	HIDER_NODISPLAY;
+}
+

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,13 +33,16 @@
 #include "pointCloud.h"
 #include "object.h"
 #include "raytracer.h"
-#include "stats.h"
 #include "memory.h"
 #include "random.h"
 #include "error.h"
 
 
+///////////////////////////////////////////////////////////////////////
+// globals
+///////////////////////////////////////////////////////////////////////
 
+int			CPointCloud::drawDiscs		=	TRUE;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -48,12 +51,13 @@
 // Description			:	Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
-// Date last edited		:	06/27/2006
-CPointCloud::CPointCloud(const char *n,CXform *world,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,world) {
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	// Create our data areas
 	memory				= new CMemStack;
 	dataPointers		= new CArray<float*>;
 	flush				= write;
+
+	osCreateMutex(mutex);
 
 	// Assign the channels
 	defineChannels(channelDefs);
@@ -69,14 +73,16 @@ CPointCloud::CPointCloud(const char *n,CXform *world,const char *channelDefs,int
 // Description			:	Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
-// Date last edited		:	06/27/2006
-CPointCloud::CPointCloud(const char *n,CXform *world,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,world) {
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	int		i;
 
 	// Create our data areas
 	memory				= new CMemStack;
 	dataPointers		= new CArray<float*>;
 	flush				= FALSE;
+	
+	osCreateMutex(mutex);
+
 	
 	// Try to read the point cloud
 
@@ -108,8 +114,9 @@ CPointCloud::CPointCloud(const char *n,CXform *world,FILE *in) : CMap<CPointClou
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 CPointCloud::~CPointCloud() {
+	osDeleteMutex(mutex);
+
 	if (flush) write();
 	
 	delete dataPointers;
@@ -123,9 +130,10 @@ CPointCloud::~CPointCloud() {
 // Description			:	Reset the photonmap
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 void	CPointCloud::reset() {
+	osLock(mutex);
 	CMap<CPointCloudPoint>::reset();
+	osUnlock(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -134,7 +142,6 @@ void	CPointCloud::reset() {
 // Description			:	Write the photon map into a file
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/11/2003
 void	CPointCloud::write() {
 	// Flush the photonmap
 	FILE		*out		=	ropen(name,"wb",filePointCloud);
@@ -172,7 +179,6 @@ void	CPointCloud::write() {
 // Return Value			:
 // Comments				:	Nl	must be normalized
 //							Il	must be normalized
-// Date last edited		:	4/1/2002
 void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
 	int						numFound	=	0;
 	const int 				maxFound	=	16;
@@ -191,8 +197,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	l.numFound			=	0;
 
 	// Perform lookup in the world coordinate system
-	mulmp(l.P,world->to,Pl);
-	mulmn(l.N,world->from,Nl);
+	mulmp(l.P,to,Pl);
+	mulmn(l.N,from,Nl);
 	mulvf(l.N,-1);				// Photonmaps have N reversed, we must reverse
 								// N when looking up it it
 
@@ -202,11 +208,16 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	l.indices			=	indices;
 	l.distances			=	distances;
 
+	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
+		
 	CMap<CPointCloudPoint>::lookupWithN(&l,1);
 
 	for (i=0;i<dataSize;i++) Cl[i] = 0.0f;	//GSHTODO: channel fill values
 
-	if (l.numFound < 2)	return;
+	if (l.numFound < 2)	{
+		osUnlock(mutex);
+		return;
+	}
 
 	numFound		=	l.numFound;
 	totalWeight		=	0;
@@ -229,6 +240,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 			totalWeight += weight;
 		}
 	}
+	osUnlock(mutex);
+	
 	// Divide the contribution
 	weight	= 1.0f/totalWeight;
 	for (i=0;i<dataSize;i++) Cl[i]	*=	weight;
@@ -240,7 +253,6 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 // Description			:	Balance the map
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::balance() {
 	// If we have no points in the map, add a dummy one to avoid an if statement during the lookup
 	if (numPhotons == 0) {
@@ -267,16 +279,16 @@ void	CPointCloud::balance() {
 // Description			:	Store a photon
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP) {
 	vector				P,N;
 	CPointCloudPoint	*point;
 
 	// Store in the world coordinate system
-	mulmp(P,world->to,cP);
-	mulmn(N,world->from,cN);
+	mulmp(P,to,cP);
+	mulmn(N,from,cN);
 	dP			*=	dPscale;
-
+	
+	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
 	point		=	CMap<CPointCloudPoint>::store(P,N);
 	
 	float *data = (float*) memory->alloc(dataSize*sizeof(float));
@@ -285,6 +297,7 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	point->dP			=	dP;
 	
 	dataPointers->push(data);
+	osUnlock(mutex);
 }
 
 
@@ -295,29 +308,58 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 // Description			:	Gui interface
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
+	float		N[chunkSize*3];
+	float		dP[chunkSize];
 	int			i,j;
-	float		*cP	=	P;
-	float		*cC	=	C;
+	float		*cP		=	P;
+	float		*cC		=	C;
+	float		*cN		=	N;
+	float		*cdP	=	dP;
 	CPointCloudPoint	*cT	=	photons+1;
 
 	// Collect and dispatch the photons
-	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cC+=3,j--) {
+	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
 		if (j == 0)	{
-			drawPoints(chunkSize,P,C);
+			if (drawDiscs)		drawDisks(chunkSize,P,dP,N,C);
+			else			 	drawPoints(chunkSize,P,C);
 			cP	=	P;
 			cC	=	C;
+			cN	=	N;
+			cdP	=	dP;
 			j	=	chunkSize;
 		}
 		
 		movvv(cP,cT->P);
+		movvv(cN,cT->N);
+		*cdP	=	cT->dP/dPscale;
 		movvv(cC,dataPointers->array[cT->entryNumber]);
 	}
 
-	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+	if (j != chunkSize) {
+		if (drawDiscs)		drawDisks(chunkSize-j,P,dP,N,C);
+		else			 	drawPoints(chunkSize-j,P,C);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPointCloud
+// Method				:	keyDown
+// Description			:	handle keypresses
+// Return Value			:	-
+// Comments				:
+int			CPointCloud::keyDown(int key) {
+	if ((key == 'd') || (key == 'D')) {
+		drawDiscs = TRUE;
+		return TRUE;
+	} else if ((key == 'p') || (key == 'P')) {
+		drawDiscs = FALSE;
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -326,7 +368,6 @@ void	CPointCloud::draw() {
 // Description			:	Gui interface
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/18/2002
 void	CPointCloud::bound(float *bmin,float *bmax) {
 	movvv(bmin,this->bmin);
 	movvv(bmax,this->bmax);

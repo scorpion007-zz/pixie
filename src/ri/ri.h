@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -134,6 +134,7 @@ EXTERN(RtToken)	RI_TRIANGLEFILTER;
 EXTERN(RtToken)	RI_GAUSSIANFILTER;
 EXTERN(RtToken)	RI_SINCFILTER;
 EXTERN(RtToken)	RI_CATMULLROMFILTER;
+EXTERN(RtToken)	RI_BLACKMANHARRISFILTER;
 EXTERN(RtToken)	RI_CUSTOM;
 
 
@@ -235,10 +236,10 @@ EXTERN(RtToken)		RI_GRIDSIZE;
 EXTERN(RtToken)		RI_MAXRECURSION;
 EXTERN(RtToken)		RI_TEXTUREMEMORY;
 EXTERN(RtToken)		RI_BRICKMEMORY;
-EXTERN(RtToken)		RI_HIERARCHYDEPTH;
-EXTERN(RtToken)		RI_HIERARCHYOBJECTS;
-EXTERN(RtToken)		RI_SHADERCACHE;
 EXTERN(RtToken)		RI_EYESPLITS;
+EXTERN(RtToken)		RI_NUMTHREADS;
+EXTERN(RtToken)		RI_THREADSTRIDE;
+EXTERN(RtToken)		RI_GEOCACHEMEMORY;
 
 // Trace options
 EXTERN(RtToken)		RI_MAXDEPTH;
@@ -262,6 +263,7 @@ EXTERN(RtToken)		RI_EMIT;
 EXTERN(RtToken)		RI_SAMPLESPECTRUM;
 EXTERN(RtToken)		RI_DEPTHFILTER;
 EXTERN(RtToken)		RI_RADIANCECACHE;
+EXTERN(RtToken)		RI_SAMPLEMOTION;
 
 // IO options
 EXTERN(RtToken)		RI_MASKRESOLUTION;
@@ -333,6 +335,7 @@ EXTERN(RtFloat)
     RiBoxFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiTriangleFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
+    RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth);
 
 EXTERN(RtVoid)
@@ -554,15 +557,6 @@ EXTERN(RtVoid)
 		    int n, RtToken tokens[], RtPointer params[]);
 
 			
-
-EXTERN(RtVoid)
-	RiTrace(RtInt,RtPoint *,RtPoint *,RtPoint *);
-
-EXTERN(RtVoid)
-	RiTraceEx(RtInt,RtPoint *,RtPoint *,RtPoint *,RtFloat *);
-
-EXTERN(RtVoid)
-	RiVisibility(RtInt,RtPoint *,RtPoint *,RtPoint *);
 
 
 /*

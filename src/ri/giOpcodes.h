@@ -37,10 +37,10 @@
 							CGatherRay	*raysBase		=	lastGather->raysBase;					\
 							CGatherRay	**rays			=	(CGatherRay **) lastGather->raysStorage;\
 							CGatherLookup	*lookup		=	lastGather->lookup;						\
-							const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\
-							float	*N = varying[VARIABLE_N];										\
-							int		numIntRays		=	0;											\
-							int		numExtRays		=	0;											\
+							float		*N				=	varying[VARIABLE_N];					\
+							int			numIntRays		=	0;										\
+							int			numExtRays		=	0;										\
+							const float	*ab				=	lastGather->ab;							\
 							int			i;															\
 							for (i=0;i<numRealVertices;i++) {										\
 								if (tags[i]) {														\
@@ -54,7 +54,9 @@
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	lookup->bias;								\
 									raysBase->t		=	lookup->maxDist;							\
-									raysBase->time	=	urand();									\
+									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / (float) lookup->numSamples;	\
+									raysBase->da	=	max(ab[0],lookup->da);						\
+									raysBase->db	=	ab[1];										\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;				\
 									raysBase->tags	=	&tags[i];									\
 									if (dotvv(raysBase->dir,N) > 0) {								\
@@ -63,9 +65,11 @@
 										rays[numRealVertices-1-numIntRays++] = raysBase++;			\
 									}																\
 								}																	\
-								N += 3;																\
+								N	+=	3;															\
+								ab	+=	2;															\
 							}																		\
 							if ( (numIntRays+numExtRays) > 0 ) {									\
+								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\
 								if (numIntRays > 0) {												\
 									lastGather->numRays		=	numIntRays;							\
 									lastGather->rays		=	(CRay **) rays+numRealVertices-numIntRays;	\
@@ -88,6 +92,7 @@
 									numActive				-=	lastGather->numMisses;				\
 									numPassive				+=	lastGather->numMisses;				\
 								}																	\
+																									\
 								if (numActive == 0) {												\
 									jmp(argument(0));												\
 								}																	\
@@ -105,6 +110,7 @@ DEFOPCODE(Gather	,"gather"	,1,	GATHEREXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARA
 //	gatheElse <endLabel>
 #ifndef INIT_SHADING
 #define	GATHERELSEEXPR_PRE	int	numRealVertices = currentShadingState->numRealVertices;				\
+																									\
 							for (;numRealVertices>0;numRealVertices--,tags++)	{					\
 								if (*tags <= 1) {													\
 									if (*tags == 1) {												\
@@ -118,6 +124,7 @@ DEFOPCODE(Gather	,"gather"	,1,	GATHEREXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARA
 									}																\
 								}																	\
 							}																		\
+																									\
 							if (numActive == 0) {													\
 								jmp(argument(0));													\
 							}
@@ -134,6 +141,7 @@ DEFOPCODE(GatherElse	,"gatherElse"	,1,	GATHERELSEEXPR_PRE,NULL_EXPR,NULL_EXPR,NU
 //	gatheEnd <gatherLabel>
 #ifndef INIT_SHADING
 #define	GATHERENDEXPR_PRE	int	numRealVertices = currentShadingState->numRealVertices;				\
+																									\
 							for (;numRealVertices>0;numRealVertices--,tags++) {						\
 								if (*tags) {														\
 									(*tags)--;														\
@@ -143,28 +151,15 @@ DEFOPCODE(GatherElse	,"gatherElse"	,1,	GATHERELSEEXPR_PRE,NULL_EXPR,NULL_EXPR,NU
 									}																\
 								}																	\
 							}																		\
+																									\
 							lastGather->numMisses	=	0;											\
-								lastGather->remainingSamples--;										\
+							lastGather->remainingSamples--;											\
 							if (lastGather->remainingSamples > 0) {									\
 								jmp(argument(0));													\
 							} else {																\
-								CGatherVariable	*var;												\
-								CGatherLookup	*lookup		=	lastGather->lookup;					\
-																									\
 								delete lastGather;													\
-																									\
-								for (var=lookup->outputs;var!=NULL;var=var->next) {					\
-									var->cDepth--;													\
-									var->dest	=	var->cDepth[0];									\
-									assert((var->cDepth-var->destForEachLevel) >= 0);				\
-								}																	\
-								for (var=lookup->nonShadeOutputs;var!=NULL;var=var->next) {			\
-									var->cDepth--;													\
-									var->dest	=	var->cDepth[0];									\
-									assert((var->cDepth-var->destForEachLevel) >= 0);				\
-								}																	\
 							}
-
+								
 #else
 #define GATHERENDEXPR_PRE
 #endif

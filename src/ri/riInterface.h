@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Class				:	CRiInterface
 // Description			:	This is the virtual class that implements the RenderMan interface
 // Comments				:
-// Date last edited		:	6/1/2004
 class	CRiInterface {
 public:
 						CRiInterface();
@@ -173,10 +172,6 @@ public:
 
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
-
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3]);
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3],float []);
-	virtual	void		RiVisibility(int,float [][3],float [][3],float [][3]);
 
 	virtual	void		RiError(int,int,char *);
 

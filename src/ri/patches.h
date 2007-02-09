@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -42,26 +42,25 @@
 // Class				:	CBilinearPatch
 // Description			:	Encapsulates a bilinear patch
 // Comments				:
-// Date last edited		:	6/28/2001
-class	CBilinearPatch : public CSurface , public CTracable{
+class	CBilinearPatch : public CSurface {
 public:
-						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *);
+						CBilinearPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *);
 						~CBilinearPatch();
 
-		int				intersect(const float *,const float *) const;
-		void			intersect(CRay *,int &);
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
-		int				moving() const												{	return variables->moving;			}
-		void			sample(int,int,float **,unsigned int &) const;
-		void			interpolate(int,float **) const;
+						// CObject interface
+		void			intersect(CShadingContext *,CRay *);
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
+
+						// CSurface interface
+		int				moving() const {	return variables->moving;			}
+		void			sample(int,int,float **,float ***,unsigned int &) const;
+		void			interpolate(int,float **,float ***) const;
 
 private:
-		vector			bmin,bmax;
-		CVertexData		*variables;
-		CParameter		*parameters;
-		float			*vertex;
-		float			uMult,vMult,uOrg,vOrg;				// The parametric range of the patch
+		CVertexData		*variables;						// The variables for the patch
+		CParameter		*parameters;					// The parameters for the patch
+		float			*vertex;						// The vertex data
+		float			uMult,vMult,uOrg,vOrg;			// The parametric range of the patch
 };
 
 
@@ -69,54 +68,54 @@ private:
 // Class				:	CBicubicPatch
 // Description			:	Encapsulates a bicubic patch
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CBicubicPatch : public CSurface {
 public:
-						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,double *,const float *uBasis=NULL,const float *vBasis=NULL);
+						CBicubicPatch(CAttributes *,CXform *,CVertexData *,CParameter *,float,float,float,float,float *,const float *uBasis=NULL,const float *vBasis=NULL);
 						~CBicubicPatch();
 
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
-		int				moving() const												{	return variables->moving;			}
-		void			sample(int,int,float **,unsigned int &) const;
-		void			interpolate(int,float **) const;
+						// CObject interface
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const {	assert(FALSE);	}
+
+						// CSurface interface
+		int				moving() const	{	return variables->moving;			}
+		void			sample(int,int,float **,float ***,unsigned int &) const;
+		void			interpolate(int,float **,float ***) const;
 
 private:
-		void			computeVertexData(double *,const double *,int,const float *,const float *);
+		void			computeVertexData(float *,const float *,int,const float *,const float *);
 
-		CVertexData		*variables;
-		CParameter		*parameters;
-		double			*vertex;
-		vector			bmin,bmax;							// The original bounding box
-		float			uOrg,vOrg,uMult,vMult;				// The parametric range of the patch
+		CVertexData		*variables;						// Variables for the patch
+		CParameter		*parameters;					// Parameters for the patch
+		float			*vertex;						// The vertex data
+		float			uOrg,vOrg,uMult,vMult;			// The parametric range of the patch
 };
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatch
 // Description			:	Encapsulates a NURBS patch
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CNURBSPatch : public CSurface {
 public:
-						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,double *);
+						CNURBSPatch(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float *,float *,float *);
 						~CNURBSPatch();
 
-		void			bound(float *,float *) const;
-		void			tesselate(CShadingContext *);
-		int				moving() const												{	return variables->moving;			}
-		void			sample(int,int,float **,unsigned int &) const;
-		void			interpolate(int,float **) const;
+						// CObject interface
+		void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+						// CSurface interface
+		int				moving() const	{	return variables->moving;			}
+		void			sample(int,int,float **,float ***,unsigned int &) const;
+		void			interpolate(int,float **,float ***) const;
 
 private:
 		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);
-		void			precomputeVertexData(double *,const double *,const double *,double *,int);
+		void			precomputeVertexData(double *,const double *,const double *,float *,int);
 
-		CVertexData		*variables;
-		CParameter		*parameters;
-		double			*vertex;							// These are double precision to reduce roundoff errors
-		vector			bmin,bmax;
-		int				uOrder,vOrder;
-		float			uOrg,vOrg,uMult,vMult;
+		CVertexData		*variables;						// The variable data
+		CParameter		*parameters;					// The parameters for this patch
+		double			*vertex;						// The vertex data
+		int				uOrder,vOrder;					// The order of the patch
+		float			uOrg,vOrg,uMult,vMult;			// The parametric range of the patch
 };
 
 
@@ -136,25 +135,23 @@ private:
 // Class				:	CPatchMesh
 // Description			:	Encapsulates a patch mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CPatchMesh : public CObject {
 public:
 							CPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,int);
 							~CPatchMesh();
 
-		void				bound(float *,float *) const;
-		void				copy(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *context);
+							// CObject interface
+		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
-		void				create();
+		void				create(CShadingContext *context);
 
 		CPl					*pl;
 		int					degree;
 		int					uVertices,vVertices,uWrap,vWrap;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
-		CArray<CObject *>	*children;
+		TMutex				mutex;
 };
 
 
@@ -163,25 +160,23 @@ private:
 // Class				:	CNURBSPatchMesh
 // Description			:	Encapsulates a NURBS patch mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CNURBSPatchMesh : public CObject {
 public:
 							CNURBSPatchMesh(CAttributes *,CXform *,CPl *,int,int,int,int,float *,float *);
 							~CNURBSPatchMesh();
 
-		void				bound(float *,float *) const;
-		void				copy(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *context);
+							// CObject interface
+		void				intersect(CShadingContext *,CRay *);
 		void				dice(CShadingContext *rasterizer);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
 private:
-		void				create();
+		void				create(CShadingContext *context);
 
 		CPl					*pl;
 		int					uVertices,vVertices,uOrder,vOrder;
 		float				*uKnots,*vKnots;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
-		CArray<CObject *>	*children;
+		TMutex				mutex;
 };
 
 #endif

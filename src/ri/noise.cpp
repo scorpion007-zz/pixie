@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -56,7 +56,6 @@
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float noiseFloat(float arg) {
 	int bx0, bx1;
 	float rx0, rx1, sx, t, u, v, vec[1];
@@ -78,7 +77,6 @@ float noiseFloat(float arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float noiseFloat(float uarg,float varg)
 {
 	int bx0, bx1, by0, by1, b00, b10, b01, b11;
@@ -121,7 +119,6 @@ float noiseFloat(float uarg,float varg)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float noiseFloat(const float *vec)
 {
 	int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
@@ -174,7 +171,6 @@ float noiseFloat(const float *vec)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void noiseVector(float *r,float arg)
 {
 	int bx0, bx1;
@@ -207,7 +203,6 @@ void noiseVector(float *r,float arg)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void noiseVector(float *r,float uarg,float varg)
 {
 	int bx0, bx1, by0, by1, b00, b10, b01, b11;
@@ -289,7 +284,6 @@ void noiseVector(float *r,float uarg,float varg)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void noiseVector(float *r,const float *vec)
 {
 	int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
@@ -409,9 +403,9 @@ void noiseVector(float *r,const float *vec)
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 float	noiseFloat(const float *argu,float argv) {
 	int bx0, bx1, by0, by1, bz0, bz1, bw0, bw1, b00, b10, b01, b11;
+	int b000,b100,b010,b110, b001,b101,b011,b111;
 	float rx0, rx1, ry0, ry1, rz0, rz1, rw0, rw1, *q, sy, sz, sw, a, b, c, d, e, t, u, v, vec[4];
 	register int i, j;
 
@@ -433,6 +427,16 @@ float	noiseFloat(const float *argu,float argv) {
 	b01 = p[ i + by1 ];
 	b11 = p[ j + by1 ];
 
+	b000 = p[ b00 + bz0 ];
+	b100 = p[ b10 + bz0 ];
+	b010 = p[ b01 + bz0 ];
+	b110 = p[ b11 + bz0 ];
+	
+	b001 = p[ b00 + bz1 ];
+	b101 = p[ b10 + bz1 ];
+	b011 = p[ b01 + bz1 ];
+	b111 = p[ b11 + bz1 ];
+	
 	t  = s_curve(rx0);
 	sy = s_curve(ry0);
 	sz = s_curve(rz0);
@@ -440,43 +444,43 @@ float	noiseFloat(const float *argu,float argv) {
 
 #define at4(rx,ry,rz,rw) ( rx * q[0] + ry * q[1] + rz * q[2] + rw * q[3])
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw0);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw0);
+	q = g4[ b000 + bw0 ] ; u = at4(rx0,ry0,rz0,rw0);
+	q = g4[ b100 + bw0 ] ; v = at4(rx1,ry0,rz0,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw0);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw0);
+	q = g4[ b010 + bw0 ] ; u = at4(rx0,ry1,rz0,rw0);
+	q = g4[ b110 + bw0 ] ; v = at4(rx1,ry1,rz0,rw0);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw0);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw0);
+	q = g4[ b001 + bw0 ] ; u = at4(rx0,ry0,rz1,rw0);
+	q = g4[ b101 + bw0 ] ; v = at4(rx1,ry0,rz1,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw0);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw0);
+	q = g4[ b011 + bw0 ] ; u = at4(rx0,ry1,rz1,rw0);
+	q = g4[ b111 + bw0 ] ; v = at4(rx1,ry1,rz1,rw0);
 	b = lerp(t, u, v);
 
 	d = lerp(sy, a, b);
 	d = lerp(sz, c, d);
-
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw1);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw1);
+	
+	q = g4[ b000 + bw1 ] ; u = at4(rx0,ry0,rz0,rw1);
+	q = g4[ b100 + bw1 ] ; v = at4(rx1,ry0,rz0,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw1);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw1);
+	q = g4[ b010 + bw1 ] ; u = at4(rx0,ry1,rz0,rw1);
+	q = g4[ b110 + bw1 ] ; v = at4(rx1,ry1,rz0,rw1);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw1);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw1);
+	q = g4[ b001 + bw1 ] ; u = at4(rx0,ry0,rz1,rw1);
+	q = g4[ b101 + bw1 ] ; v = at4(rx1,ry0,rz1,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw1);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw1);
+	q = g4[ b011 + bw1 ] ; u = at4(rx0,ry1,rz1,rw1);
+	q = g4[ b111 + bw1 ] ; v = at4(rx1,ry1,rz1,rw1);
 	b = lerp(t, u, v);
 
 	e = lerp(sy, a, b);
@@ -490,9 +494,9 @@ float	noiseFloat(const float *argu,float argv) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	noiseVector(float *r,const float *argu,float argv) {
 	int bx0, bx1, by0, by1, bz0, bz1, bw0, bw1, b00, b10, b01, b11;
+	int b000,b100,b010,b110, b001,b101,b011,b111;
 	float rx0, rx1, ry0, ry1, rz0, rz1, rw0, rw1, *q, sy, sz, sw, a, b, c, d, e, t, u, v, vec[4];
 	register int i, j;
 
@@ -506,6 +510,7 @@ void	noiseVector(float *r,const float *argu,float argv) {
 	setup(2, bz0,bz1, rz0,rz1);
 	setup(3, bw0,bw1, rw0,rw1);
 
+	// xcomp
 	i = p[ bx0 ];
 	j = p[ bx1 ];
 
@@ -514,48 +519,58 @@ void	noiseVector(float *r,const float *argu,float argv) {
 	b01 = p[ i + by1 ];
 	b11 = p[ j + by1 ];
 
+	b000 = p[ b00 + bz0 ];
+	b100 = p[ b10 + bz0 ];
+	b010 = p[ b01 + bz0 ];
+	b110 = p[ b11 + bz0 ];
+	
+	b001 = p[ b00 + bz1 ];
+	b101 = p[ b10 + bz1 ];
+	b011 = p[ b01 + bz1 ];
+	b111 = p[ b11 + bz1 ];
+
 	t  = s_curve(rx0);
 	sy = s_curve(ry0);
 	sz = s_curve(rz0);
 	sw = s_curve(rw0);
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw0);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw0);
+	q = g4[ b000 + bw0 ] ; u = at4(rx0,ry0,rz0,rw0);
+	q = g4[ b100 + bw0 ] ; v = at4(rx1,ry0,rz0,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw0);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw0);
+	q = g4[ b010 + bw0 ] ; u = at4(rx0,ry1,rz0,rw0);
+	q = g4[ b110 + bw0 ] ; v = at4(rx1,ry1,rz0,rw0);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw0);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw0);
+	q = g4[ b001 + bw0 ] ; u = at4(rx0,ry0,rz1,rw0);
+	q = g4[ b101 + bw0 ] ; v = at4(rx1,ry0,rz1,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw0);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw0);
+	q = g4[ b011 + bw0 ] ; u = at4(rx0,ry1,rz1,rw0);
+	q = g4[ b111 + bw0 ] ; v = at4(rx1,ry1,rz1,rw0);
 	b = lerp(t, u, v);
 
 	d = lerp(sy, a, b);
 	d = lerp(sz, c, d);
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw1);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw1);
+	q = g4[ b000 + bw1 ] ; u = at4(rx0,ry0,rz0,rw1);
+	q = g4[ b100 + bw1 ] ; v = at4(rx1,ry0,rz0,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw1);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw1);
+	q = g4[ b010 + bw1 ] ; u = at4(rx0,ry1,rz0,rw1);
+	q = g4[ b110 + bw1 ] ; v = at4(rx1,ry1,rz0,rw1);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw1);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw1);
+	q = g4[ b001 + bw1 ] ; u = at4(rx0,ry0,rz1,rw1);
+	q = g4[ b101 + bw1 ] ; v = at4(rx1,ry0,rz1,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw1);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw1);
+	q = g4[ b011 + bw1 ] ; u = at4(rx0,ry1,rz1,rw1);
+	q = g4[ b111 + bw1 ] ; v = at4(rx1,ry1,rz1,rw1);
 	b = lerp(t, u, v);
 
 	e = lerp(sy, a, b);
@@ -563,6 +578,8 @@ void	noiseVector(float *r,const float *argu,float argv) {
 
 	r[0] = (lerp(sw, d, e) + (float) 1)*((float) 0.5);
 
+	// y comp
+	
 	i = p2[ bx0 ];
 	j = p2[ bx1 ];
 
@@ -571,54 +588,66 @@ void	noiseVector(float *r,const float *argu,float argv) {
 	b01 = p2[ i + by1 ];
 	b11 = p2[ j + by1 ];
 
+	b000 = p2[ b00 + bz0 ];
+	b100 = p2[ b10 + bz0 ];
+	b010 = p2[ b01 + bz0 ];
+	b110 = p2[ b11 + bz0 ];
+	
+	b001 = p2[ b00 + bz1 ];
+	b101 = p2[ b10 + bz1 ];
+	b011 = p2[ b01 + bz1 ];
+	b111 = p2[ b11 + bz1 ];
+
 	t  = s_curve(rx0);
 	sy = s_curve(ry0);
 	sz = s_curve(rz0);
 	sw = s_curve(rw0);
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw0);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw0);
+	q = g4[ b000 + bw0 ] ; u = at4(rx0,ry0,rz0,rw0);
+	q = g4[ b100 + bw0 ] ; v = at4(rx1,ry0,rz0,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw0);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw0);
+	q = g4[ b010 + bw0 ] ; u = at4(rx0,ry1,rz0,rw0);
+	q = g4[ b110 + bw0 ] ; v = at4(rx1,ry1,rz0,rw0);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw0);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw0);
+	q = g4[ b001 + bw0 ] ; u = at4(rx0,ry0,rz1,rw0);
+	q = g4[ b101 + bw0 ] ; v = at4(rx1,ry0,rz1,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw0);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw0);
+	q = g4[ b011 + bw0 ] ; u = at4(rx0,ry1,rz1,rw0);
+	q = g4[ b111 + bw0 ] ; v = at4(rx1,ry1,rz1,rw0);
 	b = lerp(t, u, v);
 
 	d = lerp(sy, a, b);
 	d = lerp(sz, c, d);
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw1);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw1);
+	q = g4[ b000 + bw1 ] ; u = at4(rx0,ry0,rz0,rw1);
+	q = g4[ b100 + bw1 ] ; v = at4(rx1,ry0,rz0,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw1);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw1);
+	q = g4[ b010 + bw1 ] ; u = at4(rx0,ry1,rz0,rw1);
+	q = g4[ b110 + bw1 ] ; v = at4(rx1,ry1,rz0,rw1);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw1);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw1);
+	q = g4[ b001 + bw1 ] ; u = at4(rx0,ry0,rz1,rw1);
+	q = g4[ b101 + bw1 ] ; v = at4(rx1,ry0,rz1,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw1);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw1);
+	q = g4[ b011 + bw1 ] ; u = at4(rx0,ry1,rz1,rw1);
+	q = g4[ b111 + bw1 ] ; v = at4(rx1,ry1,rz1,rw1);
 	b = lerp(t, u, v);
 
 	e = lerp(sy, a, b);
 	e = lerp(sz, c, e);
 
 	r[1] = (lerp(sw, d, e) + (float) 1)*((float) 0.5);
+
+	// zcomp
 
 	i = p3[ bx0 ];
 	j = p3[ bx1 ];
@@ -628,48 +657,58 @@ void	noiseVector(float *r,const float *argu,float argv) {
 	b01 = p3[ i + by1 ];
 	b11 = p3[ j + by1 ];
 
+	b000 = p3[ b00 + bz0 ];
+	b100 = p3[ b10 + bz0 ];
+	b010 = p3[ b01 + bz0 ];
+	b110 = p3[ b11 + bz0 ];
+	
+	b001 = p3[ b00 + bz1 ];
+	b101 = p3[ b10 + bz1 ];
+	b011 = p3[ b01 + bz1 ];
+	b111 = p3[ b11 + bz1 ];
+
 	t  = s_curve(rx0);
 	sy = s_curve(ry0);
 	sz = s_curve(rz0);
 	sw = s_curve(rw0);
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw0);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw0);
+	q = g4[ b000 + bw0 ] ; u = at4(rx0,ry0,rz0,rw0);
+	q = g4[ b100 + bw0 ] ; v = at4(rx1,ry0,rz0,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw0);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw0);
+	q = g4[ b010 + bw0 ] ; u = at4(rx0,ry1,rz0,rw0);
+	q = g4[ b110 + bw0 ] ; v = at4(rx1,ry1,rz0,rw0);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw0);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw0);
+	q = g4[ b001 + bw0 ] ; u = at4(rx0,ry0,rz1,rw0);
+	q = g4[ b101 + bw0 ] ; v = at4(rx1,ry0,rz1,rw0);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw0);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw0);
+	q = g4[ b011 + bw0 ] ; u = at4(rx0,ry1,rz1,rw0);
+	q = g4[ b111 + bw0 ] ; v = at4(rx1,ry1,rz1,rw0);
 	b = lerp(t, u, v);
 
 	d = lerp(sy, a, b);
 	d = lerp(sz, c, d);
 
-	q = g4[ b00 + bz0 ] ; u = at4(rx0,ry0,rz0,rw1);
-	q = g4[ b10 + bz0 ] ; v = at4(rx1,ry0,rz0,rw1);
+	q = g4[ b000 + bw1 ] ; u = at4(rx0,ry0,rz0,rw1);
+	q = g4[ b100 + bw1 ] ; v = at4(rx1,ry0,rz0,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz0 ] ; u = at4(rx0,ry1,rz0,rw1);
-	q = g4[ b11 + bz0 ] ; v = at4(rx1,ry1,rz0,rw1);
+	q = g4[ b010 + bw1 ] ; u = at4(rx0,ry1,rz0,rw1);
+	q = g4[ b110 + bw1 ] ; v = at4(rx1,ry1,rz0,rw1);
 	b = lerp(t, u, v);
 
 	c = lerp(sy, a, b);
 
-	q = g4[ b00 + bz1 ] ; u = at4(rx0,ry0,rz1,rw1);
-	q = g4[ b10 + bz1 ] ; v = at4(rx1,ry0,rz1,rw1);
+	q = g4[ b001 + bw1 ] ; u = at4(rx0,ry0,rz1,rw1);
+	q = g4[ b101 + bw1 ] ; v = at4(rx1,ry0,rz1,rw1);
 	a = lerp(t, u, v);
 
-	q = g4[ b01 + bz1 ] ; u = at4(rx0,ry1,rz1,rw1);
-	q = g4[ b11 + bz1 ] ; v = at4(rx1,ry1,rz1,rw1);
+	q = g4[ b011 + bw1 ] ; u = at4(rx0,ry1,rz1,rw1);
+	q = g4[ b111 + bw1 ] ; v = at4(rx1,ry1,rz1,rw1);
 	b = lerp(t, u, v);
 
 	e = lerp(sy, a, b);
@@ -685,7 +724,6 @@ void	noiseVector(float *r,const float *argu,float argv) {
 // Description			:	I cheaply use the other noise function
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(float u,float uperiod) {
 	return noiseFloat((float) fmod(u,uperiod));
 }
@@ -696,7 +734,6 @@ float	pnoiseFloat(float u,float uperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(float u,float v,float uperiod,float vperiod) {
 	return noiseFloat((float) fmod(u,uperiod),(float) fmod(v,vperiod));
 }
@@ -706,7 +743,6 @@ float	pnoiseFloat(float u,float v,float uperiod,float vperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(const float *arg,const float *periods) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -720,7 +756,6 @@ float	pnoiseFloat(const float *arg,const float *periods) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	pnoiseFloat(const float *arg,float w,const float *periods,float wperiod) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -734,7 +769,6 @@ float	pnoiseFloat(const float *arg,float w,const float *periods,float wperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,float u,float uperiod) {
 	noiseVector(r,(float) fmod(u,uperiod));
 }
@@ -744,7 +778,6 @@ void	pnoiseVector(float *r,float u,float uperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,float u,float v,float uperiod,float vperiod) {
 	noiseVector(r,(float) fmod(u,uperiod),(float) fmod(v,vperiod));
 }
@@ -754,7 +787,6 @@ void	pnoiseVector(float *r,float u,float v,float uperiod,float vperiod) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,const float *arg,const float *periods) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -768,7 +800,6 @@ void	pnoiseVector(float *r,const float *arg,const float *periods) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	pnoiseVector(float *r,const float *arg,float w,const float *periods,float wperiod) {
 	float	vec[3];
 	vec[0]	=	(float) fmod(arg[0],periods[0]);
@@ -782,7 +813,6 @@ void	pnoiseVector(float *r,const float *arg,float w,const float *periods,float w
 // Description			:	Fast cell noise implementation
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(float arg) {
 	int		bx0;
 	int		index;
@@ -798,7 +828,6 @@ float	cellNoiseFloat(float arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(float u,float v) {
 	int		bx0, by0;
 	int		index;
@@ -816,7 +845,6 @@ float	cellNoiseFloat(float u,float v) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(const float *arg) {
 	int		bx0, by0, bz0;
 	int		index;
@@ -834,7 +862,6 @@ float	cellNoiseFloat(const float *arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 float	cellNoiseFloat(const float *arg,float w) {
 	int		bx0, by0, bz0, bw0;
 	int		index;
@@ -853,7 +880,6 @@ float	cellNoiseFloat(const float *arg,float w) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,float arg) {
 	int		bx0;
 	int		index;
@@ -871,7 +897,6 @@ void	cellNoiseVector(float *r,float arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,float u,float v) {
 	int		bx0, by0;
 	int		index;
@@ -891,7 +916,6 @@ void	cellNoiseVector(float *r,float u,float v) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,const float *arg) {
 	int		bx0, by0, bz0;
 	int		index;
@@ -911,7 +935,6 @@ void	cellNoiseVector(float *r,const float *arg) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:	3/13/2001
 void	cellNoiseVector(float *r,const float *arg,float w) {
 	int		bx0, by0, bz0, bw0;
 	int		index;

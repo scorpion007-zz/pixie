@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,7 +33,6 @@
 #include	<stdio.h>
 #include	<string.h>
 
-#include	"renderer.h"
 #include	"error.h"
 #include	"shader.h"
 #include	"stats.h"
@@ -41,6 +40,7 @@
 #include	"cache.h"
 #include	"bundles.h"
 #include	"memory.h"
+#include	"renderer.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
@@ -48,7 +48,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderLookup::CShaderLookup() {
 }
 
@@ -59,7 +58,6 @@ CShaderLookup::CShaderLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderLookup::~CShaderLookup() {
 }
 
@@ -69,7 +67,6 @@ CShaderLookup::~CShaderLookup() {
 // Description			:	Lookup filter values at discrete intelvals
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void	CFilterLookup::compute() {
 	int		i;
 	float	val;
@@ -90,13 +87,12 @@ void	CFilterLookup::compute() {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
-void	CShaderVectorVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CShaderVectorVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
 
 	for (i=nr;i>0;i--,src+=3) {
-		CGatherRay	*ray	=	(CGatherRay *) (*r++);
+		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
 		movvv((float *) dest + ray->index*3,src);
 	}
@@ -108,13 +104,12 @@ void	CShaderVectorVariable::record(int nr,CGatherRay **r,float **varying) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
-void	CShaderFloatVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CShaderFloatVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
 
 	for (i=nr;i>0;i--) {
-		CGatherRay	*ray	=	(CGatherRay *) (*r++);
+		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
 		dest[ray->index].real	=	*src++;
 	}
@@ -127,12 +122,11 @@ void	CShaderFloatVariable::record(int nr,CGatherRay **r,float **varying) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
-void	CRayOriginVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CRayOriginVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
-		CGatherRay	*ray	=	(CGatherRay *) (*r++);
+		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
 		movvv((float *) dest + ray->index*3,ray->from);
 	}
@@ -145,12 +139,11 @@ void	CRayOriginVariable::record(int nr,CGatherRay **r,float **varying) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
-void	CRayDirVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CRayDirVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
-		CGatherRay	*ray	=	(CGatherRay *) (*r++);
+		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
 		movvv((float *) dest + ray->index*3,ray->dir);
 	}
@@ -163,12 +156,11 @@ void	CRayDirVariable::record(int nr,CGatherRay **r,float **varying) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
-void	CRayLengthVariable::record(int nr,CGatherRay **r,float **varying) {
+void	CRayLengthVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
-		CGatherRay	*ray	=	(CGatherRay *) (*r++);
+		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
 		dest[ray->index].real	=	ray->t;
 	}
@@ -181,10 +173,11 @@ void	CRayLengthVariable::record(int nr,CGatherRay **r,float **varying) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherLookup::CGatherLookup() {
-	outputs			=	NULL;
-	nonShadeOutputs	=	NULL;
+	outputs				=	NULL;
+	numOutputs			=	0;
+	nonShadeOutputs		=	NULL;
+	numNonShadeOutputs	=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -193,19 +186,16 @@ CGatherLookup::CGatherLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherLookup::~CGatherLookup() {
 	CGatherVariable	*cVar;
 
 	while((cVar=outputs) != NULL) {
 		outputs	=	cVar->next;
-		if (cVar->destForEachLevel != NULL) delete [] cVar->destForEachLevel;
 		delete cVar;
 	}
 
 	while((cVar=nonShadeOutputs) != NULL) {
 		nonShadeOutputs	=	cVar->next;
-		if (cVar->destForEachLevel != NULL) delete [] cVar->destForEachLevel;
 		delete cVar;
 	}
 }
@@ -217,12 +207,11 @@ CGatherLookup::~CGatherLookup() {
 // Description			:	Adds an output
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherLookup::addOutput(const char *output,int destIndex) {
 	CGatherVariable	*nVar	=	NULL;
 
 	if (strncmp(output,"surface:",8) == 0) {
-		CVariable				*var	=	currentRenderer->retrieveVariable(output+8);
+		CVariable				*var	=	CRenderer::retrieveVariable(output+8);
 		if (var == NULL)							error(CODE_BADTOKEN,"Variable %s not found\n",output);
 		else if (var->storage != STORAGE_GLOBAL)	error(CODE_BADTOKEN,"Variable %s not found\n",output);
 		else {
@@ -236,6 +225,7 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 				outVar->destIndex	=	destIndex;
 				outVar->next		=	outputs;
 				outputs				=	outVar;
+				numOutputs++;
 				nVar				=	outVar;
 			} else if (var->type == TYPE_FLOAT) {
 				CShaderFloatVariable	*outVar	=	new CShaderFloatVariable;
@@ -244,6 +234,7 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 				outVar->destIndex	=	destIndex;
 				outVar->next		=	outputs;
 				outputs				=	outVar;
+				numOutputs++;
 				nVar				=	outVar;
 			} else {
 				error(CODE_BADTOKEN,"Unknown output variable type for gather\n");
@@ -254,26 +245,24 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 		outVar->destIndex	=	destIndex;
 		outVar->next		=	nonShadeOutputs;
 		nonShadeOutputs		=	outVar;
+		numNonShadeOutputs++;
 		nVar				=	outVar;
 	} else if (strcmp(output,"ray:direction") == 0) {
 		CRayDirVariable	*outVar	=	new CRayDirVariable;
 		outVar->destIndex	=	destIndex;
 		outVar->next		=	nonShadeOutputs;
 		nonShadeOutputs		=	outVar;
+		numNonShadeOutputs++;
 		nVar				=	outVar;
 	} else if (strcmp(output,"ray:length") == 0) {
 		CRayLengthVariable	*outVar	=	new CRayLengthVariable;
 		outVar->destIndex	=	destIndex;
 		outVar->next		=	nonShadeOutputs;
 		nonShadeOutputs		=	outVar;
+		numNonShadeOutputs++;
 		nVar				=	outVar;
 	} else {
 		error(CODE_BADTOKEN,"Unknown output variable for gather\n");
-	}
-
-	if (nVar != NULL) {
-		nVar->destForEachLevel	=	new TCode*[maxRayDepth+1];
-		nVar->cDepth			=	nVar->destForEachLevel;
 	}
 }
 
@@ -284,7 +273,6 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CGlobalIllumLookup::CGlobalIllumLookup() {
 }
 
@@ -294,7 +282,6 @@ CGlobalIllumLookup::CGlobalIllumLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CGlobalIllumLookup::~CGlobalIllumLookup() {
 	if (cache != NULL) cache->finalize(this);
 }
@@ -305,7 +292,6 @@ CGlobalIllumLookup::~CGlobalIllumLookup() {
 // Description			:	Constructor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShader::CShader(const char *name) : CFileResource(name) {
 	stats.numShaders++;
 
@@ -325,7 +311,6 @@ CShader::CShader(const char *name) : CFileResource(name) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShader::~CShader() {
 	int			i;
 	CVariable	*cParameter;
@@ -352,18 +337,6 @@ CShader::~CShader() {
 	if (memory != NULL)					delete [] memory;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShader
-// Method				:	nullify
-// Description			:	This function must make sure the shader can never execute again
-// Return Value			:
-// Comments				:	
-// Date last edited		:	3/10/2001
-void	CShader::nullify() {
-	codeEntryPoint	=	-1;
-	initEntryPoint	=	-1;
-}
-
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -372,7 +345,6 @@ void	CShader::nullify() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 	stats.numShaderInstances++;
 
@@ -381,7 +353,7 @@ CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 	xform->attach();
 	
 	categories	=	NULL;
-	parameters	=	NULL;	// FIXME: Clone the parent's parameters here
+	parameters	=	NULL;	// The children class may want to clone the parent's parameters here
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -390,7 +362,6 @@ CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CShaderInstance::~CShaderInstance() {
 	stats.numShaderInstances--;
 
@@ -398,7 +369,7 @@ CShaderInstance::~CShaderInstance() {
 	
 	if (categories != NULL)	delete[] categories;
 
-	// FIXME: Delete the parameters here
+	// The children class must clear the parameter list here
 }
 
 
@@ -408,7 +379,6 @@ CShaderInstance::~CShaderInstance() {
 // Description			:	This function implements "strsep" which is non portable
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/1/2005
 static char	*token(char **str,char *tok) {
 	char	*cStr	=	*str;
 	char	*oStr	=	cStr;
@@ -449,7 +419,6 @@ static char	*token(char **str,char *tok) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void CShaderInstance::createCategories() {
 	char	*categoryString,*cCat,*tmp;
 	int		i,numCategories;
@@ -469,7 +438,7 @@ void CShaderInstance::createCategories() {
 		i=0;
 		do {
 			cCat = token(&tmp,",\t ");
-			if (*cCat != '\0') categories[i++] = currentRenderer->getGlobalID(cCat);
+			if (*cCat != '\0') categories[i++] = CRenderer::getGlobalID(cCat);
 		} while (tmp != NULL);
 		categories[i++] = 0;	// terminate the list
 		
@@ -492,13 +461,14 @@ void CShaderInstance::createCategories() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	int			i;
 	CVariable	*cVariable;
 
 	strings				=	NULL;
 	parent				=	p;
+	nextDirty			=	NULL;
+	prevDirty			=	NULL;
 	
 	if (parent->numPLs > 0) {
 		parameterLists	=	new CShaderLookup*[parent->numPLs];
@@ -510,6 +480,7 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 	}
 
 	// Clone the parent's parameter list
+	// BEWARE that this reverses the order (which matters when counting the globalIndex)
 	for (cVariable=parent->parameters;cVariable!=NULL;cVariable=cVariable->next) {
 		CVariable	*nVariable	=	new CVariable;
 
@@ -532,7 +503,6 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 	CVariable			*cParameter;
 	CAllocatedString	*cString;
@@ -556,16 +526,34 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 		delete cString;
 	}
 
+	// Remove this shader from the list
+	if (dirty == TRUE) {
+
+		// Remove the shader from the list of dirty shaders
+		osLock(CRenderer::dirtyShaderMutex);
+
+		if (prevDirty == NULL) {
+			CRenderer::dirtyInstances	=	nextDirty;
+		} else {
+			assert(prevDirty->nextDirty == this);
+			prevDirty->nextDirty		=	nextDirty;
+		}
+
+		if (nextDirty != NULL)	{
+			assert(nextDirty->prevDirty == this);
+			nextDirty->prevDirty		=	prevDirty;
+		}
+
+		osUnlock(CRenderer::dirtyShaderMutex);
+	}
+
+	// Clear the parameter lists
 	if (parameterLists != NULL) {
-#ifdef _DEBUG
 		int	i;
 
 		for (i=0;i<parent->numPLs;i++) {
-			assert(parameterLists[i] == NULL);
+			if (parameterLists[i] != NULL)	delete parameterLists[i];
 		}
-
-		assert(dirty == FALSE);
-#endif
 
 		delete [] parameterLists;
 	}
@@ -578,7 +566,6 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 // Description			:	Set the values of the parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 	CVariable	*cParameter;
 
@@ -599,10 +586,8 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 					const float	*src	=	(const float *) val;
 					float		*dest	=	(float *)		cParameter->defaultValue;
 
-					for (p=0;p<cParameter->numItems;p++) {
+					for (p=cParameter->numItems;p>0;p--,dest+=3,src+=3) {
 						movvv(dest,src);
-						dest	+=	3;
-						src		+=	3;
 					}
 				}
 				break;
@@ -612,10 +597,8 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 					const float	*src	=	(const float *) val;
 					float		*dest	=	(float *)		cParameter->defaultValue;
 
-					for (p=0;p<cParameter->numItems;p++) {
+					for (p=cParameter->numItems;p>0;p--,dest+=3,src+=3) {
 						mulmv(dest,xform->from,src);
-						dest	+=	3;
-						src		+=	3;
 					}
 				}
 				break;
@@ -625,10 +608,8 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 					const float	*src	=	(const float *) val;
 					float		*dest	=	(float *)		cParameter->defaultValue;
 
-					for (p=0;p<cParameter->numItems;p++) {
+					for (p=cParameter->numItems;p>0;p--,dest+=3,src+=3) {
 						mulmn(dest,xform->to,src);
-						dest	+=	3;
-						src		+=	3;
 					}
 				}
 				break;
@@ -638,10 +619,8 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 					const float	*src	=	(const float *) val;
 					float		*dest	=	(float *)		cParameter->defaultValue;
 
-					for (p=0;p<cParameter->numItems;p++) {
+					for (p=cParameter->numItems;p>0;p--,dest+=3,src+=3) {
 						mulmp(dest,xform->from,src);
-						dest	+=	3;
-						src		+=	3;
 					}
 				}
 				break;
@@ -673,7 +652,7 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 					int					t;
 					CAllocatedString	*nString;
 
-					for (t=0;t<cParameter->numItems;t++) {
+					for (t=cParameter->numItems;t>0;t--) {
 
 						nString			=	new CAllocatedString;
 						nString->string	=	strdup(*src++);
@@ -709,7 +688,6 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 // Description			:	Set the values of the parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals) {
 	int	i;
 
@@ -740,23 +718,30 @@ void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals
 //							and char ** if the type of the parameter is string.
 //							iff var or globalIndex is NULL, we skip any parameters
 //							which are mutable
-// Date last edited		:	3/10/2001
 int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVariable **var,int *globalIndex) {
-	int							j,storage,globalNumber = 0;
+	int							j;
+	int							globalNumber = 0;
 	float						*destFloat;
-	float						*srcFloat;
+	const float					*srcFloat;
 	const char					**destString;
 	const char					**srcString;
 	int							*destInt;
-	int							*srcInt;
+	const int					*srcInt;
 	CVariable					*cParameter;
 
+	// BEWARE!
+	// the instance parameters are stored in the opposite order to the
+	// parent shader parameters.  The counting scheme for globals used here must
+	// match that used when saving lights.  In both cases, we loop the instance
+	// not the parent parameters
+	
 	for (cParameter=parameters;cParameter!=NULL;cParameter=cParameter->next) {
+
 		// retrieve the storage in which the parameter lives
-		storage = cParameter->storage;
+		const int storage = cParameter->storage;
 		if (strcmp(name,cParameter->name) == 0) {
 
-			// Note: ll parameters have storage, but for lights
+			// Note: all parameters have storage, but for lights
 			// all we have to save in the light cache are the mutable ones
 			// We also only return defaults for interior and exterior (var == NULL)
 			if (!(storage == STORAGE_PARAMETER && parent->type == SL_LIGHTSOURCE) && (var != NULL) && (globalIndex != NULL)) {
@@ -767,49 +752,51 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 
 			switch(cParameter->type) {
 			case TYPE_FLOAT:
-				destFloat	=	(float *)	dest;
-				srcFloat	=	(float *)	cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems;j++)
+				destFloat	=	(float *)		dest;
+				srcFloat	=	(const float *)	cParameter->defaultValue;
+				for (j=cParameter->numItems;j>0;j--)
 					*destFloat++	=	*srcFloat++;
 				break;
 			case TYPE_COLOR:
 			case TYPE_VECTOR:
 			case TYPE_NORMAL:
 			case TYPE_POINT:
-				destFloat	=	(float *)	dest;
-				srcFloat	=	(float *)	cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems*3;j++)
-					*destFloat++	=	*srcFloat++;
+				destFloat	=	(float *)		dest;
+				srcFloat	=	(const float *)	cParameter->defaultValue;
+				for (j=cParameter->numItems;j>0;j--,destFloat+=3,srcFloat+=3)
+					movvv(destFloat,srcFloat);
 				break;
 			case TYPE_MATRIX:
-				destFloat	=	(float *)	dest;
-				srcFloat	=	(float *)	cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems*16;j++)
-					*destFloat++	=	*srcFloat++;
+				destFloat	=	(float *)		dest;
+				srcFloat	=	(const float *)	cParameter->defaultValue;
+				for (j=cParameter->numItems;j>0;j--,destFloat+=16,srcFloat+=16)
+					movmm(destFloat,srcFloat);
 				break;
 			case TYPE_QUAD:
-				destFloat	=	(float *)	dest;
-				srcFloat	=	(float *)	cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems*4;j++)
-					*destFloat++	=	*srcFloat++;
+				destFloat	=	(float *)		dest;
+				srcFloat	=	(const float *)	cParameter->defaultValue;
+				for (j=cParameter->numItems;j>0;j--,destFloat+=4,srcFloat+=4)
+					movqq(destFloat,srcFloat);
 				break;
 			case TYPE_DOUBLE:
-				destFloat	=	(float *)	dest;
-				srcFloat	=	(float *)	cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems*2;j++)
+				destFloat	=	(float *)		dest;
+				srcFloat	=	(const float *)	cParameter->defaultValue;
+				for (j=cParameter->numItems;j>0;j--) {
 					*destFloat++	=	*srcFloat++;
+					*destFloat++	=	*srcFloat++;
+				}
 				break;
 			case TYPE_STRING:
 				destString	=	(const char **) dest;
 				srcString	=	(const char **)	cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems;j++)
+				for (j=cParameter->numItems;j>0;j--)
 					*destString++	=	*srcString++;
 				break;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
-				destInt		=	(int *)		dest;
-				srcInt		=	(int *)		cParameter->defaultValue;
-				for (j=0;j<cParameter->numItems;j++)
+				destInt		=	(int *)			dest;
+				srcInt		=	(const int *)	cParameter->defaultValue;
+				for (j=cParameter->numItems;j>0;j--)
 					*destInt++	=	*srcInt++;
 				break;
 			default:
@@ -832,7 +819,6 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 // Description			:	Actually execute the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void			CProgrammableShaderInstance::execute(CShadingContext *context,float **locals) {
 	context->execute(this,locals);
 }
@@ -843,7 +829,6 @@ void			CProgrammableShaderInstance::execute(CShadingContext *context,float **loc
 // Description			:	Return the required parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 unsigned int	CProgrammableShaderInstance::requiredParameters() {
 	return parent->usedParameters;
 }
@@ -856,7 +841,6 @@ unsigned int	CProgrammableShaderInstance::requiredParameters() {
 // Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 const char		*CProgrammableShaderInstance::getName() {
 	return parent->name;
 }
@@ -867,9 +851,10 @@ const char		*CProgrammableShaderInstance::getName() {
 // Description			:	Illuminate the shading state is a lightsource shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/10/2001
 void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **locals) {
+
 	// This function should never be called for non-light shaders
+	assert(parent->type == SL_LIGHTSOURCE);
 	context->execute(this,locals);
 }
 
@@ -881,7 +866,6 @@ void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **
 // Description			:	Allocate the cache and set the parameter defaults
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/24/2006
 float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **varying,int numVertices) {
 	CVariable	*cVariable;
 	TCode		*data;
@@ -889,22 +873,26 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 	int			totalVaryingSize;
 	int			i;
 
-	// Compute the total memory we will need
-	for (totalVaryingSize=0,i=0;i<parent->numVariables;i++) {
-		if (parent->varyingSizes[i] < 0)	totalVaryingSize	+=	-parent->varyingSizes[i];
-		else								totalVaryingSize	+=	parent->varyingSizes[i]*numVertices*3;
+	// Get const pointers for fast access
+	const int	numVariables	=	parent->numVariables;
+	const int	*varyingSizes	=	parent->varyingSizes;
+
+	// Compute the total memory we will need for the shader parameters
+	for (totalVaryingSize=0,i=0;i<numVariables;i++) {
+		if (varyingSizes[i] < 0)	totalVaryingSize	+=	-varyingSizes[i];
+		else						totalVaryingSize	+=	varyingSizes[i]*numVertices*3;
 	}
 
 	// Allocate memory for the temporary shader variables
-	data	=	(TCode *) ralloc((totalVaryingSize + parent->numVariables)*sizeof(TCode),namedMemory);
+	data	=	(TCode *) ralloc((totalVaryingSize + numVariables)*sizeof(TCode),namedMemory);
 	locals	=	(TCode **) data;
-	data	+=	parent->numVariables;
+	data	+=	numVariables;
 
 	// Save the memory
-	for (i=0;i<parent->numVariables;i++) {
+	for (i=0;i<numVariables;i++) {
 		locals[i]	=	data;
-		if (parent->varyingSizes[i] < 0)	data	+=	-parent->varyingSizes[i];
-		else								data	+=	parent->varyingSizes[i]*numVertices*3;
+		if (varyingSizes[i] < 0)	data	+=	-varyingSizes[i];
+		else						data	+=	varyingSizes[i]*numVertices*3;
 	}
 
 	// For each parameter, copy over the default value of the parameter
@@ -914,17 +902,16 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 		
 		// Find where we're writing
 		if (cVariable->storage == STORAGE_GLOBAL)	{
-			cVariable->value		=	varying[cVariable->entry];
-			dest					=	(TCode *) cVariable->value;
+			dest					=	(TCode *) varying[cVariable->entry];
 		} else {
-			assert(cVariable->entry < parent->numVariables);
+			assert(cVariable->entry < numVariables);
 			dest					=	locals[cVariable->entry];
 		}
 
 		// This is the repetition amount
 		if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 
-			assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
+			//assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
 
 			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
 				int	i;
@@ -932,11 +919,13 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 			}
 		} else {
 
-			assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
+			//assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
 
 			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
 				int			n;
 				const int	c	=	cVariable->numFloats;
+
+				// FIXME: We may want to unroll these two loops
 				for(n=numVertices*3;n>0;n--) {
 					for (i=0;i<c;i++)	*dest++	=	src[i];
 				}
@@ -956,8 +945,8 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 // Function				:	debugFunction
 // Description			:	This function is used to debugging purposes
 // Return Value			:	-
-// Comments				:
-// Date last edited		:	2/4/2003
+// Comments				:	You can trigger this function from the compiled shader
+//							code by debug ("f=o")
 void	debugFunction(float *op) {
 	fprintf(stderr,"Debug\n");
 }

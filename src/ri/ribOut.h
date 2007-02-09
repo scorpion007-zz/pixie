@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -45,14 +45,12 @@ class	CVariable;
 // Class				:	CRibOut
 // Description			:	This class implements a RIB file output
 // Comments				:
-// Date last edited		:	6/1/2004
 class	CRibOut : public CRiInterface {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRibAttributes
 	// Description			:	The attributes holder for the RIB file output
 	// Comments				:
-	// Date last edited		:	6/1/2004
 	class	CRibAttributes {
 	public:
 							CRibAttributes();
@@ -199,10 +197,6 @@ public:
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
 
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3]);
-	virtual	void		RiTrace(int,float [][3],float [][3],float [][3],float []);
-	virtual	void		RiVisibility(int,float [][3],float [][3],float [][3]);
-
 private:
 	void				writePL(int,char *[],void *[]);
 	void				writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int,char *[],void *[]);
@@ -225,7 +219,6 @@ private:
 											// Description			:	Write a variable argument list
 											// Return Value			:	-
 											// Comments				:
-											// Date last edited		:	6/8/2006
 	void									vout(const char *mes,va_list args) {
 												const int	l	=	vsprintf(scratch,mes,args);
 
@@ -239,7 +232,6 @@ private:
 											// Description			:	Write an argument list
 											// Return Value			:	-
 											// Comments				:
-											// Date last edited		:	6/8/2006
 	void									out(const char *mes,...) {
 												va_list	args;
 

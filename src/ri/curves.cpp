@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -31,9 +31,10 @@
 #include <math.h>
 
 #include "curves.h"
-#include "renderer.h"
 #include "memory.h"
 #include "stats.h"
+#include "renderer.h"
+#include "rendererContext.h"
 
 // The inverse of the Bezier basis
 static	matrix	invBezier	=	{	0,	0,				0,				1,
@@ -41,17 +42,13 @@ static	matrix	invBezier	=	{	0,	0,				0,				1,
 									0,	1/(float) 3,	2/(float) 3,	1,
 									1,	1,				1,				1};
 
-// Temp variable
-static	matrix	geometryMatrix;
-
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeCubicBound
 // Description			:	Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/25/2004
-static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3) {
+static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3,const float *geometryMatrix,const CXform *xform) {
 	htpoint	tmp,tmp2;
 	vector	vtmp0,vtmp1,vtmp2,vtmp3;
 
@@ -85,6 +82,13 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 	vtmp2[COMP_Z]	=	tmp2[2];
 	vtmp3[COMP_Z]	=	tmp2[3];
 
+	if (xform != NULL) {
+		mulmp(vtmp0,xform->from,vtmp0);
+		mulmp(vtmp1,xform->from,vtmp1);
+		mulmp(vtmp2,xform->from,vtmp2);
+		mulmp(vtmp3,xform->from,vtmp3);
+	}
+
 	addBox(bmin,bmax,vtmp0);
 	addBox(bmin,bmax,vtmp1);
 	addBox(bmin,bmax,vtmp2);
@@ -98,10 +102,9 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	6/2/2003
 CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CSurface(a,x) {
 	stats.numGprims++;
-	stats.gprimCoreMemory	+=	sizeof(CCurve);
+	stats.gprimMemory	+=	sizeof(CCurve);
 
 	vmin				=	vmi;
 	vmax				=	vma;
@@ -117,10 +120,9 @@ CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 CCurve::~CCurve() {
 	stats.numGprims--;
-	stats.gprimCoreMemory	-=	sizeof(CCurve);
+	stats.gprimMemory	-=	sizeof(CCurve);
 
 	base->detach();
 }
@@ -132,15 +134,38 @@ CCurve::~CCurve() {
 // Description			:	Interpolate the junk
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
-void			CCurve::interpolate(int numVertices,float **varying) const {
+void			CCurve::interpolate(int numVertices,float **varying,float ***locals) const {
+
+	// Dispatch the parameters
+	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying,locals);
+
+	// Normalize the v parameter
 	float	*v	=	varying[VARIABLE_V];
 	int		i;
+	for (i=numVertices;i>0;i--)	*v++	=	(gvmax - gvmin)*v[0] + gvmin;
 
-	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying);
+	// Get the width
+	const float	*size;
+	int			sizeStep;
 
-	for (i=numVertices;i>0;i--) {
-		*v++	=	(gvmax - gvmin)*v[0] + gvmin;
+	if (base->sizeEntry == VARIABLE_WIDTH) {
+		size		=	varying[VARIABLE_WIDTH];
+		sizeStep	=	1;
+	} else {
+		assert(base->sizeEntry == VARIABLE_CONSTANTWIDTH);
+		size		=	varying[VARIABLE_CONSTANTWIDTH];
+		sizeStep	=	0;
+	}
+
+	float		*dPdu	=	varying[VARIABLE_DPDU];
+	float		*P		=	varying[VARIABLE_P];
+	const float	*u		=	varying[VARIABLE_U];
+	int			j;
+	vector		tmp;
+	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,size+=sizeStep) {
+		mulvf(tmp,dPdu,(*u++ - 0.5f)*size[0]);
+		mulvf(dPdu,-size[0]);
+		addvv(P,tmp);
 	}
 }
 
@@ -151,84 +176,116 @@ void			CCurve::interpolate(int numVertices,float **varying) const {
 // Description			:	Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CCurve::dice(CShadingContext *rasterizer) {
-	memBegin();
-
 	// We can sample the object, so do so
 	float	**varying		=	rasterizer->currentShadingState->varying;
 	float	*u				=	varying[VARIABLE_U];
 	float	*v				=	varying[VARIABLE_V];
-	float	*time			=	varying[VARIABLE_TIME];
-	float	*P;
-	int		shouldSplit;
-	int		numPoints;
-	vector	bmin,bmax;
-
-	// Sample 3 points on the curve
-	*v++			=	vmin;
-	*v++			=	(vmin + vmax) * 0.5f;
-	*v++			=	vmax;
-	*u++			=	0;
-	*u++			=	0;
-	*u++			=	0;
-	*time++			=	0;
-	*time++			=	0;
-	*time++			=	0;
-
-	// Sample the curves
-	rasterizer->displace(this,1,3,1,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
+	float	*timev			=	varying[VARIABLE_TIME];
 
 	// Compute the curve bounding box
-	P				=	varying[VARIABLE_P];
+	float	*P		=	varying[VARIABLE_P];
+	vector	bmin,bmax;
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-	addBox(bmin,bmax,P);
-	addBox(bmin,bmax,P+3);
-	addBox(bmin,bmax,P+6);
+	int		i;
+	
+	// Take care of the motion first
+	if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && moving()) {
+		
+		// Sample 6 points on the curve
 
-	shouldSplit		=	FALSE;
+		// Top
+		*v++	=	vmin;
+		*u++	=	0;
+		*v++	=	vmin;
+		*u++	=	1;
+
+		// Middle
+		*v++	=	(vmin + vmax) * 0.5f;
+		*u++	=	0;
+		*v++	=	(vmin + vmax) * 0.5f;
+		*u++	=	1;
+
+		// Bottom
+		*v++	=	vmax;
+		*u++	=	0;
+		*v++	=	vmax;
+		*u++	=	1;
+
+		// Compute the sample positions and corresponding normal vectors
+		for (i=0;i<6;i++) 	timev[i]    =   1;
+
+		rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
+		
+		for (i=0;i<6;i++) 	addBox(bmin,bmax,P + i*3);
+		
+		// The u,v from the end sample will not have changed
+		
+		u				=	varying[VARIABLE_U];
+		v				=	varying[VARIABLE_V];
+		timev			=	varying[VARIABLE_TIME];
+	}
+	
+
+	// Sample 6 points on the curve
+
+	// Top
+	*v++	=	vmin;
+	*u++	=	0;
+	*v++	=	vmin;
+	*u++	=	1;
+
+	// Middle
+	*v++	=	(vmin + vmax) * 0.5f;
+	*u++	=	0;
+	*v++	=	(vmin + vmax) * 0.5f;
+	*u++	=	1;
+
+	// Bottom
+	*v++	=	vmax;
+	*u++	=	0;
+	*v++	=	vmax;
+	*u++	=	1;
+	
+	// Time 0
+	for (i=0;i<6;i++)		timev[i]	=	0;
+	
+	// Sample the curves
+	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
+
+	// Add start sample bounds
+	for (i=0;i<6;i++)	addBox(bmin,bmax,P + i*3);
+
 	if (bmin[COMP_Z] < C_EPSILON) {
-		if (bmax[COMP_Z] < rasterizer->clipMin) {
-			numPoints		=	-1;
-		} else if (rasterizer->inFrustrum(bmin,bmax) == FALSE) {
+		if (bmax[COMP_Z] < CRenderer::clipMin) {
+			// The curve is behind the screen
+
+		} else if (CRenderer::inFrustrum(bmin,bmax) == FALSE) {
 			// The curve is out of the viewing frustrum
-			numPoints		=	-1;
+			
 		} else {
 			// Split the curve into two pieces
-			numPoints		=	0;
-			shouldSplit		=	TRUE;
+			splitToChildren(rasterizer);
 		}
 	} else {
-		float	dx,dy;
-		int		j;
+		// We can do the perspective division
+		camera2pixels(6,P);
 
-		// we can do the perspective division
-		rasterizer->camera2pixels(3,P);
+		// Estimate the dicing amount
+		int		udiv,vdiv;
+		estimateDicing(P,1,2,udiv,vdiv,attributes->shadingRate);
 
-		dx				=	P[6+0] - P[0];
-		dy				=	P[6+1] - P[1];
-		j				=	(int) ceil(C_EPSILON + sqrt(dx*dx + dy*dy) / attributes->shadingRate);
+		// Make sure we don't split along u
+		if (vdiv == 1)	udiv	=	min(udiv,(CRenderer::maxGridSize >> 1) - 1);
 
-		if ((j + 1) < rasterizer->maxGridSize) {
-			// We can shade this curve
-			numPoints	=	j;
+		// Can we render this sucker ?
+		if ((udiv+1)*(vdiv+1) > CRenderer::maxGridSize) {
+			splitToChildren(rasterizer);
 		} else {
-			// We can not shade this curve - so split into two
-			numPoints	=	0;
-			shouldSplit	=	TRUE;
+			rasterizer->drawGrid(this,udiv,vdiv,0,1,vmin,vmax);
 		}
 	}
-
-	if (shouldSplit) {
-		splitToChildren(rasterizer);
-	} else {
-		if (numPoints > 0) {
-			rasterizer->drawRibbon(this,numPoints,vmin,vmax);
-		}
-	}
-
-	memEnd();
 }
 
 
@@ -264,8 +321,37 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	6/2/2003
 CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
+
+	// Compute the bounding box
+	const CVertexData	*variables	=	base->variables;
+	const int			vertexSize	=	variables->vertexSize;
+	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
+	const float			*vertex		=	base->vertex;
+	const float			*v0			=	vertex;
+	const float			*v1			=	v0 + vs;
+	const float			*v2			=	v1 + vs;
+	const float			*v3			=	v2 + vs;
+	matrix				geometryMatrix;
+
+	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
+	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
+
+	mulmm(geometryMatrix,attributes->vBasis,invBezier);
+
+	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,NULL);
+	
+	if (variables->moving) {
+		v0	+=	vertexSize;
+		v1	+=	vertexSize;
+		v2	+=	vertexSize;
+		v3	+=	vertexSize;
+
+		makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,NULL);
+	}
+
+	subvf(bmin,base->maxSize);
+	addvf(bmax,base->maxSize);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -274,7 +360,6 @@ CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,f
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 CCubicCurve::~CCubicCurve() {
 }
 
@@ -284,11 +369,9 @@ CCubicCurve::~CCubicCurve() {
 // Description			:	Sample the curves
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
-void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				i,k;
 	float			*intr,*intrStart;
-	const	float	*v					=	varying[VARIABLE_V] + start;
 	const	float	*vBasis				=	attributes->vBasis;
 	CVertexData		*variables			=	base->variables;
 	const	int		vertexSize			=	variables->vertexSize;
@@ -297,12 +380,8 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 	const	float	*v1;
 	const	float	*v2;
 	const	float	*v3;
-	float			*N;
 
-
-	memBegin();
-
-	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+	intr	=	intrStart	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 
 	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
 		v0		=	base->vertex;
@@ -316,9 +395,8 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		v3		=	v2 + vs;
 	}
 
-	N		=	varying[VARIABLE_NG] + start*3;
-
-	for (i=0;i<numVertices;i++) {
+	const	float	*v					=	varying[VARIABLE_V] + start;
+	for (i=numVertices;i>0;i--) {
 		const	float	cv				=	*v++;
 		float			vb[4];
 		float			tmp[4];
@@ -333,52 +411,52 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 		tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)] + vb[3]*vBasis[element(2,3)];
 		tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)] + vb[3]*vBasis[element(3,3)];
 
-		*intr++	=	*N++	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
-		*intr++	=	*N++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
-		*intr++	=	*N++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+		*intr++	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
+		*intr++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
+		*intr++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
 		for (k=3;k<vertexSize;k++) {
 			*intr++	=	tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k];
 		}
 	}
 
-	if (up & (PARAMETER_DPDU | PARAMETER_DPDV)) {
-		float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-		float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+	// Dispatch the variables
+	variables->dispatch(intrStart,0,numVertices,varying,locals);
 
-		v	=	varying[VARIABLE_V] + start*3;
+	float		*dPdv	=	varying[VARIABLE_DPDV]	+ start*3;
+	float		*dPdu	=	varying[VARIABLE_DPDU]	+ start*3;
+	const float	*P		=	varying[VARIABLE_P]		+ start*3;
+	float		*N		=	varying[VARIABLE_NG]	+ start*3;
 
-		for (i=0;i<numVertices;i++) {
-			const	float	cv				=	*v++;
-			float			vb[4];
-			float			tmp[4];
+	v	=	varying[VARIABLE_V] + start*3;
 
-			vb[3]	=	0;
-			vb[2]	=	1;
-			vb[1]	=	2*cv;
-			vb[0]	=	3*cv*cv;
+	for (i=numVertices;i>0;i--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
+		const	float	cv	= *v++;
+		float			vb[4];
+		float			tmp[4];
 
-			tmp[0]	=	vb[0]*vBasis[element(0,0)] + vb[1]*vBasis[element(0,1)] + vb[2]*vBasis[element(0,2)];
-			tmp[1]	=	vb[0]*vBasis[element(1,0)] + vb[1]*vBasis[element(1,1)] + vb[2]*vBasis[element(1,2)];
-			tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)];
-			tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)];
+		vb[3]	=	0;
+		vb[2]	=	1;
+		vb[1]	=	2*cv;
+		vb[0]	=	3*cv*cv;
 
-			*dPdv++	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
-			*dPdv++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
-			*dPdv++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+		tmp[0]	=	vb[0]*vBasis[element(0,0)] + vb[1]*vBasis[element(0,1)] + vb[2]*vBasis[element(0,2)];
+		tmp[1]	=	vb[0]*vBasis[element(1,0)] + vb[1]*vBasis[element(1,1)] + vb[2]*vBasis[element(1,2)];
+		tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)];
+		tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)];
 
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-		}
+		dPdv[0]	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
+		dPdv[1]	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
+		dPdv[2]	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+
+		crossvv(dPdu,dPdv,P);
+		crossvv(N,dPdv,dPdu);
+		normalizevf(dPdu);
 	}
-
-	variables->dispatch(intrStart,0,numVertices,varying);
 
 	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
-
-	memEnd();
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
@@ -386,58 +464,18 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
-void			CCubicCurve::bound(float *bmin,float *bmax) const {
-	const CVertexData	*variables	=	base->variables;
-	const int			vertexSize	=	variables->vertexSize;
-	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
-	const float			*vertex		=	base->vertex;
-	const float			*v0			=	vertex;
-	const float			*v1			=	v0 + vs;
-	const float			*v2			=	v1 + vs;
-	const float			*v3			=	v2 + vs;
-
-	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
-	mulmm(geometryMatrix,attributes->vBasis,invBezier);
-
-	makeCubicBound(bmin,bmax,v0,v1,v2,v3);
-	
-	if (variables->moving) {
-		v0	+=	vertexSize;
-		v1	+=	vertexSize;
-		v2	+=	vertexSize;
-		v3	+=	vertexSize;
-
-		makeCubicBound(bmin,bmax,v0,v1,v2,v3);
-	}
-
-	subvf(bmin,base->maxSize);
-	addvf(bmax,base->maxSize);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCubicCurve
-// Method				:	dice
-// Description			:	Dice the curve group into smaller ones
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/2/2003
 void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
-	CCubicCurve		*cGroup;
-	float			vmid		=	(vmin + vmax) * 0.5f;
-	vector			bmin,bmax;
+	const float vmid = (vmin + vmax) * 0.5f;
 
-	// Create vmin - vmid group
-	cGroup	=	new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	// Create the children
+	osLock(CRenderer::refCountMutex);
+	CCubicCurve	*c0	=	new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
+	CCubicCurve	*c1	=	new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
+	osUnlock(CRenderer::refCountMutex);
 
-	// Create vmid - vmax group
-	cGroup	=	new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	// Insert the children
+	rasterizer->drawObject(c0);
+	rasterizer->drawObject(c1);
 }
 
 
@@ -463,94 +501,9 @@ void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	
-// Date last edited		:	6/2/2003
 CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CLinearCurve
-// Method				:	~CLinearCurve
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/2/2003
-CLinearCurve::~CLinearCurve() {
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CLinearCurve
-// Method				:	sample
-// Description			:	Sample the curves
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/2/2003
-void			CLinearCurve::sample(int start,int numVertices,float **varying,unsigned int &up) const {
-	int				j,k;
-	float			*intr,*intrStart;
-	const	float	*v					=	varying[VARIABLE_V];
-	CVertexData		*variables			=	base->variables;
-	const	int		vertexSize			=	variables->vertexSize;
-	const	int		vs					=	(variables->moving ? vertexSize*2 : vertexSize);
-	const	int		numSavedVertices	=	numVertices;
-	const	float	*v0;
-	const	float	*v1;
-	float			*N;
-
-	memBegin();
-
-	intr	=	intrStart	=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
-
-	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
-		v0					=	base->vertex;
-		v1					=	v0 + vs;
-	} else {
-		v0					=	base->vertex + vertexSize;
-		v1					=	v0 + vs;
-	}
-
-	N						=	varying[VARIABLE_NG] + start*3;
-
-	for (j=numVertices;j>0;j--) {
-		const	float	cv	=	*v++;
-
-		*intr++	=	*N++	=	v0[0]*(1-cv) + v1[0]*cv;
-		*intr++	=	*N++	=	v0[1]*(1-cv) + v1[1]*cv;
-		*intr++	=	*N++	=	v0[2]*(1-cv) + v1[2]*cv;
-
-		for (k=3;k<vertexSize;k++) {
-			*intr++			=	v0[k]*(1-cv) + v1[k]*cv;
-		}
-	}
-
-	if (up & (PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_N)) {
-		float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-		float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
-
-		for (j=numVertices;j>0;j--) {
-			*dPdv++	=	v1[0] - v0[0];
-			*dPdv++	=	v1[1] - v0[1];
-			*dPdv++	=	v1[2] - v0[2];
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-			*dPdu++	=	0;
-		}
-	}
-
-	variables->dispatch(intrStart,0,numSavedVertices,varying);
-
-	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
-
-	memEnd();
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CLinearCurve
-// Method				:	dice
-// Description			:	Dice the curve group into smaller ones
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	6/2/2003
-void			CLinearCurve::bound(float *bmin,float *bmax) const {
+	// Compute the bounding box
 	const CVertexData	*variables	=	base->variables;
 	const int			vertexSize	=	variables->vertexSize;
 	const float			*vertex		=	base->vertex;
@@ -570,25 +523,90 @@ void			CLinearCurve::bound(float *bmin,float *bmax) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurve
+// Method				:	~CLinearCurve
+// Description			:	Dtor
+// Return Value			:	-
+// Comments				:
+CLinearCurve::~CLinearCurve() {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CLinearCurve
+// Method				:	sample
+// Description			:	Sample the curves
+// Return Value			:	-
+// Comments				:
+void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
+	int				j,k;
+	float			*intr,*intrStart;
+	CVertexData		*variables			=	base->variables;
+	const	int		vertexSize			=	variables->vertexSize;
+	const	int		vs					=	(variables->moving ? vertexSize*2 : vertexSize);
+	const	int		numSavedVertices	=	numVertices;
+	const	float	*v0;
+	const	float	*v1;
+
+	intr	=	intrStart	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
+
+	if ((variables->moving == FALSE) || (up & PARAMETER_BEGIN_SAMPLE)) {
+		v0					=	base->vertex;
+		v1					=	v0 + vs;
+	} else {
+		v0					=	base->vertex + vertexSize;
+		v1					=	v0 + vs;
+	}
+
+	const	float	*v = varying[VARIABLE_V];
+	for (j=numVertices;j>0;j--) {
+		const	float	cv	=	*v++;
+
+		*intr++	=	v0[0]*(1-cv) + v1[0]*cv;
+		*intr++	=	v0[1]*(1-cv) + v1[1]*cv;
+		*intr++	=	v0[2]*(1-cv) + v1[2]*cv;
+
+		for (k=3;k<vertexSize;k++) {
+			*intr++			=	v0[k]*(1-cv) + v1[k]*cv;
+		}
+	}
+
+	// Dispatch the variables
+	variables->dispatch(intrStart,0,numSavedVertices,varying,locals);
+
+	// Compute the normal and derivatives
+	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;
+	float		*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+	const float	*P		=	varying[VARIABLE_P] + start*3;
+	float		*N		=	varying[VARIABLE_NG] + start*3;
+
+	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
+		subvv(dPdv,v1,v0);
+		crossvv(dPdu,dPdv,P);
+		crossvv(N,dPdv,dPdu);
+		normalizevf(dPdu);
+	}
+
+	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CLinearCurve
 // Method				:	split
 // Description			:	Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/2/2003
 void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
-	CLinearCurve	*cGroup;
-	const float		vmid				=	(vmin + vmax) * 0.5f;
-	vector			bmin,bmax;
+	const float		vmid = (vmin + vmax) * 0.5f;
 
-	// Create vmin - vmid group
-	cGroup	=	new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	// Create the children
+	osLock(CRenderer::refCountMutex);
+	CLinearCurve	*c0	=	new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
+	CLinearCurve	*c1	=	new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
+	osUnlock(CRenderer::refCountMutex);
 
-	// Create vmid - vmax group
-	cGroup	=	new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
-	cGroup->bound(bmin,bmax);
-	rasterizer->drawObject(cGroup,bmin,bmax);
+	// Insert the children
+	rasterizer->drawObject(c0);
+	rasterizer->drawObject(c1);
 }
 
 
@@ -609,45 +627,45 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 // Description			:	CCurveMesh
 // Return Value			:	Ctor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *nve,int w) : CObject(a,x) {
 	int			i;
 	const float	*P;
-	const float	expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
 	float		*vertex;
 
 	stats.numGprims++;
 	stats.gprimMemory		+=	sizeof(CCurveMesh) + sizeof(int)*nc;
 
-	pl			=	c;
+	// Attach to the PL
+	pl				=	c;
 
-	numVertices	=	nv;
-	numCurves	=	nc;
-	degree		=	d;
-	nverts		=	new int[numCurves];				memcpy(nverts,nve,sizeof(int)*numCurves);
-	wrap		=	w;
+	// Save the data
+	numVertices		=	nv;
+	numCurves		=	nc;
+	degree			=	d;
+	nverts			=	new int[numCurves]; memcpy(nverts,nve,sizeof(int)*numCurves);
+	wrap			=	w;
 
-	// Extract the size parameter
-	sizeVariable				=	NULL;
-	maxSize						=	0;
+	// Extract the maximum width without touching the PL
+	sizeVariable	=	NULL;
+	maxSize			=	0;
 	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
 
-		if ((strcmp(cVar->name,"width") == 0) || (strcmp(cVar->name,"constantwidth") == 0)) {
+		if ((cVar->entry == VARIABLE_WIDTH) || (cVar->entry == VARIABLE_CONSTANTWIDTH)) {
 			const	int	np	=	pl->parameters[i].numItems;
+
+			assert(cVar->numFloats == 1);
 
 			sizeVariable		=	cVar;
 
 			for (i=0;i<np;i++) {
-				vertex[i]		*=	expansion;
 				maxSize			=	max(maxSize,vertex[i]);
 			}
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0) - np;
+				vertex	=	pl->data1 + (vertex - pl->data0);
 
 				for (i=0;i<np;i++) {
-					vertex[i]		*=	expansion;
 					maxSize			=	max(maxSize,vertex[i]);
 				}
 			}
@@ -655,31 +673,43 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 			break;
 		}
 
-		vertex	+=	pl->parameters[i].numItems*cVar->numFloats;
+		vertex +=	pl->parameters[i].numItems*cVar->numFloats;
 	}
 
-	if (sizeVariable == NULL)	maxSize	=	1;
-	maxSize		*=	0.5f;
-
 	// Compute the bound
-
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	if (degree == 1) {
+		vector	tmp;
+
 		for (P=pl->data0,i=numVertices;i>0;i--,P+=3) {
-			addBox(bmin,bmax,P);
+			mulmp(tmp,xform->from,P);
+			addBox(bmin,bmax,tmp);
 		}
 
 		if (pl->data1 != NULL) {
+			const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 			for (P=pl->data1,i=numVertices;i>0;i--,P+=3) {
-				addBox(bmin,bmax,P);
+				mulmp(tmp,from,P);
+				addBox(bmin,bmax,tmp);
+			}
+		} else if (xform->next != NULL) {
+			const float *from = xform->next->from;
+			for (P=pl->data0,i=numVertices;i>0;i--,P+=3) {
+				mulmp(tmp,from,P);
+				addBox(bmin,bmax,tmp);
 			}
 		}
 	} else {
 		int				k			=	0;
 		int				cVertex		=	0;
+		matrix			geometryMatrix;
 
+		assert(degree == 3);
+
+		// Convert to Bezier Matrix
+		// FIXME: The order of the multiplication may be wrong !!!
 		mulmm(geometryMatrix,attributes->vBasis,invBezier);
 
 		for (i=0;i<numCurves;i++) {
@@ -692,7 +722,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 				float	*v2		=	pl->data0 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 				float	*v3		=	pl->data0 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-				makeCubicBound(bmin,bmax,v0,v1,v2,v3);
+				makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform);
 
 				if (pl->data1 != NULL) {
 					v0			=	pl->data1 + (cVertex+(j*attributes->vStep + 0) % nverts[i])*3;
@@ -700,7 +730,13 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 					v2			=	pl->data1 + (cVertex+(j*attributes->vStep + 2) % nverts[i])*3;
 					v3			=	pl->data1 + (cVertex+(j*attributes->vStep + 3) % nverts[i])*3;
 
-					makeCubicBound(bmin,bmax,v0,v1,v2,v3);
+					if (xform->next != NULL) {
+						makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform->next);
+					} else {
+						makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform);
+					}
+				} else if (xform->next != NULL) {
+					makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,xform->next);
 				}
 			}
 
@@ -708,10 +744,17 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 		}
 	}
 
+	// Expand the bounding box by the width of the curves
+	if (sizeVariable == NULL)	maxSize	=	1;
+	maxSize		*=	0.5f*powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
 	addvf(bmax,maxSize);
 	subvf(bmin,maxSize);
 
-	children	=	NULL;
+	// Make it a bound
+	makeBound(bmin,bmax);
+
+	// Create the sync mutex
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -719,7 +762,6 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 // Description			:	~CCurveMesh
 // Return Value			:	Dtor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CCurveMesh::~CCurveMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CCurveMesh) + sizeof(int)*numCurves;
@@ -727,36 +769,16 @@ CCurveMesh::~CCurveMesh() {
 	delete pl;
 	delete [] nverts;
 
-	if (children != NULL) {
-		CObject	**c	=	children->array;
-		int		i	=	children->numItems;
-
-		for (;i>0;i--)	(*c++)->detach();
-
-		delete children;
-	}
+	osDeleteMutex(mutex);
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CCurveMesh
-// Description			:	bound
-// Return Value			:	Bound the mesh
-// Comments				:	-
-// Date last edited		:	6/10/2003
-void	CCurveMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	CCurveMesh
-// Description			:	clone
+// Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
-// Date last edited		:	6/10/2003
-void	CCurveMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -768,34 +790,15 @@ void	CCurveMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurveMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	5/28/2003
-void	CCurveMesh::tesselate(CShadingContext *context)	{
-	// We can not be raytraced
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCurveMesh
 // Method				:	dice
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CCurveMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	CObject	**c;
 
-	if (children == NULL)	create();
+	if (children == NULL)	create(rasterizer);
 
-	c	=	children->array;
-	i	=	children->numItems;
-
-	for (;i>0;i--) {
-		(*c++)->dice(rasterizer);
-	}
+	CObject::dice(rasterizer);
 }
 
 
@@ -805,23 +808,55 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
-void	CCurveMesh::create() {
+void	CCurveMesh::create(CShadingContext *context) {
+
+	osLock(mutex);
+	if (children != NULL) {
+		osUnlock(mutex);
+		return;
+	}
+
 	int					i;
 	CVertexData			*variables;
 	int					vertexSize;
 	float				*vertex;
+	CObject				*allChildren;
 
-	children			=	new CArray<CObject *>;
+	memBegin(context->threadMemory);
 
+	// Extract the vertices
 	vertex	=	NULL;
-	pl->transform(xform);								// Transform the core
-	pl->collect(vertexSize,vertex,CONTAINER_VERTEX);	// Obtain the vertex data
+	pl->transform(xform);													// Transform the core
+	pl->collect(vertexSize,vertex,CONTAINER_VERTEX,context->threadMemory);	// Obtain the vertex data
+
+	// Multiply the curve width by the expansion in the coordinate system
+	{
+		const float expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
+		float		*vertex;
+		for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+			const CVariable	*cVar	=	pl->parameters[i].variable;
+
+			if (cVar == sizeVariable) {
+				const	int	np	=	pl->parameters[i].numItems;
+
+				for (i=0;i<np;i++) vertex[i] *=	expansion;
+
+				if (pl->data1 != NULL) {
+					vertex	=	pl->data1 + (vertex - pl->data0);
+
+					for (i=0;i<np;i++)	vertex[i] *= expansion;
+				}
+
+				break;
+			}
+
+			vertex+=pl->parameters[i].numItems*cVar->numFloats;
+		}
+	}
 
 	// Allocate the variables
 	variables		=	pl->vertexData();
-
-	memBegin();
+	allChildren		=	NULL;
 
 	// Instanciate
 	if (degree == 3) {
@@ -852,7 +887,7 @@ void	CCurveMesh::create() {
 				variables->attach();
 				base->maxSize		=	maxSize;
 				base->variables		=	variables;
-				base->sizeVariable	=	sizeVariable;
+				base->sizeEntry		=	sizeVariable->entry;
 				base->parameters	=	parameters;
 				base->vertex		=	new float[vertexSize*4];
 				memcpy(base->vertex + 0*vertexSize,v0,vertexSize*sizeof(float));
@@ -860,10 +895,11 @@ void	CCurveMesh::create() {
 				memcpy(base->vertex + 2*vertexSize,v2,vertexSize*sizeof(float));
 				memcpy(base->vertex + 3*vertexSize,v3,vertexSize*sizeof(float));
 
+				osLock(CRenderer::refCountMutex);
 				cCurve				=	new CCubicCurve(attributes,xform,base,0,1,vmin,vmax);
-				cCurve->attach();
-				children->push(cCurve);
-				
+				osUnlock(CRenderer::refCountMutex);
+				cCurve->sibling		=	allChildren;
+				allChildren			=	cCurve;	
 			}
 
 			cVertex					+=	nverts[i];
@@ -895,16 +931,18 @@ void	CCurveMesh::create() {
 				variables->attach();
 				base->maxSize		=	maxSize;
 				base->variables		=	variables;
-				base->sizeVariable	=	sizeVariable;
+				base->sizeEntry		=	sizeVariable->entry;
 				base->refCount		=	0;
 				base->parameters	=	parameters;
 				base->vertex		=	new float[vertexSize*2];
 				memcpy(base->vertex + 0*vertexSize,v0,vertexSize*sizeof(float));
 				memcpy(base->vertex + 1*vertexSize,v1,vertexSize*sizeof(float));
 
+				osLock(CRenderer::refCountMutex);
 				cCurve				=	new CLinearCurve(attributes,xform,base,0,1,vmin,vmax);
-				cCurve->attach();
-				children->push(cCurve);
+				osUnlock(CRenderer::refCountMutex);
+				cCurve->sibling		=	allChildren;
+				allChildren			=	cCurve;
 			}
 
 			cVertex					+=	nverts[i];
@@ -912,7 +950,12 @@ void	CCurveMesh::create() {
 		}
 	}
 
-	memEnd();
+	memEnd(context->threadMemory);
+
+	// Set the child objects
+	setChildren(context,allChildren);
+	
+	osUnlock(mutex);
 }
 
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -41,11 +41,12 @@
 // Class				:	CZbuffer
 // Description			:	This is the zbuffer hider (a scanline renderer)
 // Comments				:
-// Date last edited		:	7/31/2002
 class	CZbuffer : public CReyes , public COcclusionCuller {
 public:
-				CZbuffer(COptions *,CXform *,SOCKET);
+				CZbuffer(int thread);
 				~CZbuffer();
+
+	static void	preDisplaySetup();
 
 				// The functions inherited from the CReyes
 	void		rasterBegin(int,int,int,int,int);

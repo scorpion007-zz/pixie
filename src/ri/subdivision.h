@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -40,27 +40,25 @@
 // Class				:	CSubdivision
 // Description			:	Implements a non-regular catmull-clark subdivision patch
 // Comments				:	Regular patches are implemented as bi-cubic patches
-// Date last edited		:	10/12/2002
 class	CSubdivision : public CSurface {
 public:
-					CSubdivision(CAttributes *,CXform *,CVertexData *,CParameter *,int,float,float,float,float,double *);
+					CSubdivision(CAttributes *,CXform *,CVertexData *,CParameter *,int,float,float,float,float,float *);
 					~CSubdivision();
 
-	void			bound(float *,float *) const;
-	void			tesselate(CShadingContext *);
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
 	int				moving() const												{	return vertexData->moving;			}
-	void			sample(int,int,float **,unsigned int &) const;
-	void			interpolate(int,float **) const;
+	void			sample(int,int,float **,float ***,unsigned int &) const;
+	void			interpolate(int,float **,float ***) const;
 
 	CVertexData		*vertexData;	// The variables
 	CParameter		*parameters;	// The parameters
 	int				N;				// The valence
 	float			*vertex;		// The vertex data
 	float			uOrg,vOrg,uMult,vMult;
-	vector			bmin,bmax;
 
 private:
-	void			projectVertices(float *,double *,int);
+	void			projectVertices(float *,float *,int);
 };
 
 #endif

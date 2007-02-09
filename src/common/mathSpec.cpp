@@ -14,7 +14,6 @@
 // Description			:	4 by 4 determinant computation
 // Return Value			:	Determinant
 // Comments				:
-// Date last edited		:	6/20/2002
 // Matrix:
 // | a1 a2 a3 a4 |
 // | b1 b2 b3 b4 |
@@ -46,7 +45,6 @@ static	inline double det4x4( const SCALAR_TYPE *m ) {
 // Description			:	Compute the adjoint of a 4 by 4 matrix
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/20/2002
 // Construct the adjoint matrix
 // | a1 a2 a3 a4 |
 // | b1 b2 b3 b4 |
@@ -95,7 +93,6 @@ static	inline void adjoint( SCALAR_TYPE *out,const SCALAR_TYPE *in) {
 // Description			:	invert a 4 by 4 matrix
 // Return Value			:	Determinant
 // Comments				:
-// Date last edited		:	6/20/2002
 int			invertm(SCALAR_TYPE *d,const SCALAR_TYPE *s)	{
 	int		i;
     double	det;
@@ -120,7 +117,6 @@ int			invertm(SCALAR_TYPE *d,const SCALAR_TYPE *s)	{
 // Description			:	compute the skewed symmetic matrix
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/20/2002
 void	skewsymm(SCALAR_TYPE *dest,const SCALAR_TYPE *src) {
 	identitym(dest);
 
@@ -140,7 +136,6 @@ void	skewsymm(SCALAR_TYPE *dest,const SCALAR_TYPE *src) {
 // Description			:	4 by 4 determinant computation
 // Return Value			:	Determinant
 // Comments				:
-// Date last edited		:	6/20/2002
 SCALAR_TYPE	determinantm(const SCALAR_TYPE *r) {
 	return (SCALAR_TYPE) det4x4(r);
 }
@@ -150,7 +145,6 @@ SCALAR_TYPE	determinantm(const SCALAR_TYPE *r) {
 // Description			:	create identity matrix
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/20/2002
 void	identitym(SCALAR_TYPE *r) {
 	int i;
 
@@ -167,7 +161,6 @@ void	identitym(SCALAR_TYPE *r) {
 // Description			:	create translation matrix
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/20/2002
 void	translatem(SCALAR_TYPE *r,const SCALAR_TYPE tx,const SCALAR_TYPE ty,const SCALAR_TYPE tz) {
 	identitym(r);
 
@@ -181,7 +174,6 @@ void	translatem(SCALAR_TYPE *r,const SCALAR_TYPE tx,const SCALAR_TYPE ty,const S
 // Description			:	create scale matrix
 // Return Value			:	Determinant
 // Comments				:
-// Date last edited		:	6/20/2002
 void	scalem(SCALAR_TYPE *r,const SCALAR_TYPE sx,const SCALAR_TYPE sy,const SCALAR_TYPE sz) {
 	identitym(r);
 
@@ -195,7 +187,6 @@ void	scalem(SCALAR_TYPE *r,const SCALAR_TYPE sx,const SCALAR_TYPE sy,const SCALA
 // Description			:	create a rotation matrix
 // Return Value			:	-
 // Comments				:	the angle is in degrees
-// Date last edited		:	6/20/2002
 void	rotatem(SCALAR_TYPE *r,const SCALAR_TYPE *v,const SCALAR_TYPE angle) {
 	rotatem(r,v[0],v[1],v[2],angle);
 }
@@ -205,7 +196,6 @@ void	rotatem(SCALAR_TYPE *r,const SCALAR_TYPE *v,const SCALAR_TYPE angle) {
 // Description			:	create a rotation matrix
 // Return Value			:	-
 // Comments				:	the angle is in degrees
-// Date last edited		:	6/20/2002
 void	rotatem(SCALAR_TYPE *r,SCALAR_TYPE x,SCALAR_TYPE y,SCALAR_TYPE z,const SCALAR_TYPE angle) {
 	double	s	=	cos(angle/2);
 	double	sp	=	sin(angle/2);
@@ -242,7 +232,6 @@ void	rotatem(SCALAR_TYPE *r,SCALAR_TYPE x,SCALAR_TYPE y,SCALAR_TYPE z,const SCAL
 // Description			:	create a skew matrix
 // Return Value			:	-
 // Comments				:	the angle is in degrees
-// Date last edited		:	6/20/2002
 void	skewm(SCALAR_TYPE *r,const SCALAR_TYPE angle,const SCALAR_TYPE dx1,const SCALAR_TYPE dy1,const SCALAR_TYPE dz1,const SCALAR_TYPE dx2,const SCALAR_TYPE dy2,const SCALAR_TYPE dz2) {
 	VECTOR_TYPE	v1,v2,d;
 	MATRIX_TYPE	R,S,tmp,tmp2;
@@ -304,7 +293,6 @@ void	skewm(SCALAR_TYPE *r,const SCALAR_TYPE angle,const SCALAR_TYPE dx1,const SC
 // Description			:	create a rotation matrix
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/20/2002
 void	rotatem(SCALAR_TYPE *to,const SCALAR_TYPE *from) {
 	to[element(0,0)]	=	1-2*from[VY]*from[VY] - 2*from[VZ]*from[VZ];
 	to[element(0,1)]	=	2*from[VX]*from[VY] - 2*from[S]*from[VZ];

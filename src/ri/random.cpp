@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -104,83 +104,6 @@ const int v_init[8][SOBOL_MAX_DIMENSION] = {
 };
 
 
-unsigned long state[624];
-unsigned long *next;
-
-
-//Period parameters
-#define N 624
-#define M 397
-#define MATRIX_A 0x9908b0dfUL	//constant vector a
-#define UMASK 0x80000000UL		//most significant w-r bits
-#define LMASK 0x7fffffffUL		//least significant r bits
-#define MIXBITS(u,v) ( ((u) & UMASK) | ((v) & LMASK) )
-#define TWIST(u,v) ((MIXBITS(u,v) >> 1) ^ (_uTable[v & 1UL] ))
-
-
-void	randomInit(unsigned long s) {
-    int j;
-    state[0]= s & 0xffffffffUL;
-    for (j=1; j<N; j++) {
-        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j); 
-        state[j] &= 0xffffffffUL;  /* for >32 bit machines */
-    }
-    next = state;
-    return;
-}
-
-void	randomShutdown() {
-}
-
-void	next_state() {
-    static const unsigned long _uTable[2] = { 0UL, MATRIX_A };
-    register signed int j;
-    
-    register unsigned long *p0;
-    register unsigned long *p1;
-
-    j = ( N-M ) >> 1;
-    p0 = state;
-    p1 = p0 + 1;
-    while(j) {
-       --j;
-        *p0 = TWIST( *p0, *p1 );
-		*p0 ^= p0[M];
-		++p1;
-		++p0;
-
-		*p0 = TWIST( *p0, *p1 );
-		*p0 ^= p0[M];
-		++p1; 
-		++p0;
-    }
-
-    *p0 = TWIST( *p0, *p1);
-    *p0 ^= p0[M];
-    ++p1; 
-    ++p0;
-
-    j = (M-1) >> 1;
-    while( j ) {
-       --j;
-       *p0 = TWIST( *p0, *p1 );
-       *p0 ^= p0[M-N];
-       ++p1;
-       ++p0;
-
-       *p0 = TWIST( *p0, *p1 );
-       *p0 ^= p0[M-N];
-       ++p1;
-       ++p0;
-    }
-    *p0 = TWIST( *p0, *state );
-    *p0 ^= p0[M-N];
-
-    next = state + N;
-    return;
-}
-
-
 
 
 
@@ -197,7 +120,6 @@ void	next_state() {
 // Description			:	Sample vectors distributed uniformly in a hemisphere
 // Return Value			:
 // Comments				:	Z must be unit
-// Date last edited		:	9/17/2002
 void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator) {
 	float	P[4];
 	vector	Po;
@@ -236,7 +158,6 @@ void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &gener
 // Description			:	Sample vectors distributed uniformly in a hemisphere
 // Return Value			:
 // Comments				:	Z must be unit
-// Date last edited		:	9/17/2002
 void		sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator) {
 	float			P[4];
 	vector			Po;
@@ -276,31 +197,19 @@ void		sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4>
 // Description			:	Sample a point in a unit sphere
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/17/2002
-void	sampleSphere(float *P) {
+void	sampleSphere(float *P,CSobol<3> &generator) {
+	float	r[3];
+
 	while(TRUE) {
-		// Rample a uniformly distributed point on a sphere
-		P[COMP_X]	=	2*urand()-1;
-		P[COMP_Y]	=	2*urand()-1;
-		P[COMP_Z]	=	2*urand()-1;
+
+		generator.get(r);
+
+		// Sample a uniformly distributed point on a sphere
+		P[COMP_X]	=	2*r[0]-1;
+		P[COMP_Y]	=	2*r[1]-1;
+		P[COMP_Z]	=	2*r[2]-1;
 
 		if (dotvv(P,P) < 1)	break;
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	sampleDisk
-// Description			:	Sample a point in a unit disk
-// Return Value			:
-// Comments				:
-// Date last edited		:	9/17/2002
-void	sampleDisk(float &x,float &y) {
-	while(TRUE) {
-		// Sample a uniformly distributed point on a sphere
-		x	=	2*urand()-1;
-		y	=	2*urand()-1;
-
-		if ((x*x + y*y) < 1)	break;
 	}
 }
 

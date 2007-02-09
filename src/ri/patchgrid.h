@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -40,24 +40,24 @@
 // Class				:	CPatchGrid
 // Description			:	Implements a non-regular catmull-clark subdivision patch
 // Comments				:	Regular patches are implemented as bi-cubic patches
-// Date last edited		:	5/30/2003
 class	CPatchGrid : public CSurface {
 public:
-					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,double *);
+					CPatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,int,int,int,int,float *);
 					~CPatchGrid();
 
-	void			bound(float *,float *) const;
-	void			tesselate(CShadingContext *);
+					// Object interface
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+					// Surface interface
 	int				moving() const												{	return variables->moving;			}
-	void			sample(int,int,float **,unsigned int &) const;
-	void			interpolate(int,float **) const;
+	void			sample(int,int,float **,float ***,unsigned int &) const;
+	void			interpolate(int,float **,float ***) const;
 
 	CVertexData		*variables;		// The variables
 	CParameter		*parameters;
 
 	float			*vertex;
 	float			*Pu,*Pv;
-	vector			bmin,bmax;
 	int				nu,nv;			// The number of samples in u and v
 };
 

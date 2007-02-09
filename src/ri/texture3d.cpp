@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -28,11 +28,11 @@
 //  Description			:	Implementation - George
 //
 ////////////////////////////////////////////////////////////////////////
-#include <string.h>
-
-#include "renderer.h"
-#include "error.h"
 #include "texture3d.h"
+#include "error.h"
+#include "renderer.h"
+#include "displayChannel.h"
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -41,15 +41,13 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
-CTexture3d::CTexture3d(const char *n,CXform *w,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
-	refCount	=	0;
+CTexture3d::CTexture3d(const char *n,const float *f,const float *t,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
 	dataSize	=	0;
 	channels	=	NULL;
 	numChannels	=	0;
-	world		=	w; 
-	world->attach();
-	dPscale		=	pow(fabs(determinantm(world->to)),1.0f / 3.0f);
+	movmm(from,f);
+	movmm(to,t);
+	dPscale		=	pow(fabs(determinantm(to)),1.0f / 3.0f);
 
 	if (nc > 0) {
 		int	i;
@@ -68,10 +66,7 @@ CTexture3d::CTexture3d(const char *n,CXform *w,int nc,CTexture3dChannel *ch) : C
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 CTexture3d::~CTexture3d() { 
-	world->detach();
-
 	if (channels != NULL) delete [] channels;
 }
 	
@@ -81,7 +76,6 @@ CTexture3d::~CTexture3d() {
 // Description			:	Define the channels
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::defineChannels(const char *channelDefinitions) {
 	char				*nextComma,*sampleName,*tmp;
 	CDisplayChannel		*oChannel;
@@ -117,7 +111,7 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 		while (isspace(*sampleName)) sampleName++;
 		
 		// is the sample name a channel we know about?
-		oChannel = currentRenderer->retrieveDisplayChannel(sampleName);
+		oChannel = CRenderer::retrieveDisplayChannel(sampleName);
 		if (oChannel != NULL) {
 			// it's a predefined / already seen channel
 			strcpy(channels[numChannels].name,oChannel->name);
@@ -144,7 +138,6 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 // Description			:	Write the channels to file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::writeChannels(FILE *out) {
 	// Write out the header and channels
 	fwrite(&numChannels,1,sizeof(int),out);
@@ -160,7 +153,6 @@ void CTexture3d::writeChannels(FILE *out) {
 // Description			:	Read the channels from file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::readChannels(FILE *in) {
 	if (channels != NULL)	delete [] channels;
 
@@ -180,7 +172,6 @@ void CTexture3d::readChannels(FILE *in) {
 // Description			:	Resolve the channel names
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 int CTexture3d::bindChannelNames(int &n,const char **names,CTexture3dChannel ***bindings) {
 	CTexture3dChannel	**entryPointers		= new CTexture3dChannel*[numChannels];
 	int					numChannelsBound	= 0;
@@ -214,7 +205,6 @@ int CTexture3d::bindChannelNames(int &n,const char **names,CTexture3dChannel ***
 // Description			:	prepareSample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::prepareSample(float *C,float **samples,CTexture3dChannel **bindings) {
 	float *src,*dest;
 
@@ -239,7 +229,6 @@ void CTexture3d::prepareSample(float *C,float **samples,CTexture3dChannel **bind
 // Description			:	unpackSample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/23/2006
 void CTexture3d::unpackSample(float *C,float **samples,CTexture3dChannel **bindings) {
 	float *src,*dest;
 

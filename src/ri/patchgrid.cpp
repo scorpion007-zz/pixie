@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,6 +35,7 @@
 #include "shading.h"
 #include "memory.h"
 #include "stats.h"
+#include "renderer.h"
 
 // Note:
 //	The patgrid is instantiated with a grid of (nu+2)*(nv+2) vertices which
@@ -50,8 +51,7 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
-CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,int bTop,int bRgt,int bBot,int bLft,double *ve) : CSurface(a,x) {
+CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,int bTop,int bRgt,int bBot,int bLft,float *ve) : CSurface(a,x) {
 	int				numVertices,realNumVertices;
 	int				i;
 	float			*dest;
@@ -72,7 +72,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 	realNumVertices	=	(nu*nv);
 
 	if (variables->moving) {
-		const double	*src;
+		const float	*src;
 
 		dest		=	vertex		=	new float[numVertices*vertexSize*2];
 		stats.gprimMemory			+=	sizeof(float)*numVertices*vertexSize*2;
@@ -81,7 +81,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 			int	j;
 
 			for (j=vertexSize;j>0;j--) {
-				*dest++ = (float) *src++;
+				*dest++ = *src++;
 			}
 
 			src	+=	vertexSize;
@@ -91,7 +91,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 			int	j;
 
 			for (j=vertexSize;j>0;j--) {
-				*dest++ = (float) *src++;
+				*dest++ = *src++;
 			}
 
 			src	+=	vertexSize;
@@ -100,7 +100,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 		dest		=	vertex		=	new float[numVertices*vertexSize];
 		stats.gprimMemory			+=	sizeof(float)*numVertices*vertexSize;
 
-		for (i=numVertices*vertexSize;i>0;i--) *dest++ = (float) *ve++;
+		for (i=numVertices*vertexSize;i>0;i--) *dest++ = *ve++;
 	}
 
 	
@@ -193,7 +193,6 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
 CPatchGrid::~CPatchGrid() {
 	int	numVertices		=	(nu+2)*(nv+2);
 	int realNumVertices	=	(nu*nv);
@@ -212,43 +211,17 @@ CPatchGrid::~CPatchGrid() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchGrid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/12/2002
-void		CPatchGrid::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPatchGrid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CPatchGrid::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPatchGrid
 // Method				:	sample
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
-void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i,j;
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
 	const int			vertexSize				=	variables->vertexSize;
 	float				*vertexData;
 	int					vertexDataStep;
-
-	memBegin();
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;									// No need for interpolation
@@ -268,7 +241,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*(nu+2)*(nv+2);
 
-			vertexData				=	(float *) ralloc(numVertices*(nu+2)*(nv+2)*vertexSize*sizeof(float));
+			vertexData				=	(float *) alloca(numVertices*(nu+2)*(nv+2)*vertexSize*sizeof(float));
 			vertexDataStep			=	(nu+2)*(nv+2)*vertexSize;
 
 			interpolate				=	vertexData;
@@ -284,7 +257,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 	}
 
 	{	// Do the vertices
-		float	*intr		=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+		float	*intr		=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv		=	varying[VARIABLE_DPDV] + start*3;
 		float	*intrStart	=	intr;
@@ -346,12 +319,10 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 			}
 		}
 
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -360,9 +331,8 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/12/2002
-void		CPatchGrid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void		CPatchGrid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 

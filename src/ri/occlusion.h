@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Class				:	COcclusionCuller
 // Description			:	The occlusion culler class
 // Comments				:
-// Date last edited		:	12/23/2003
 class	COcclusionCuller {
 public:
 
@@ -46,7 +45,6 @@ public:
 					// Class				:	COcclusionCuller
 					// Description			:	The occlusion culler class
 					// Comments				:
-					// Date last edited		:	12/23/2003
 					class COcclusionNode {
 					public:
 							COcclusionNode	*parent;		// The parent pointer
@@ -111,7 +109,6 @@ private:
 
 
 	COcclusionNode	*newNode(COcclusionNode *,int,int,int);
-	void			deleteNode(COcclusionNode *);
 };
 
 

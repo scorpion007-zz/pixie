@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -31,11 +31,8 @@
 #include <math.h>
 
 #include "stochastic.h"
-#include "renderer.h"
 #include "memory.h"
 #include "random.h"
-
-static	int	numFragments	=	0;
 
 // This macro is used to allocate fragments
 #define	newFragment(__a)	if (freeFragments == NULL)	{						\
@@ -58,73 +55,34 @@ static	int	numFragments	=	0;
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
-CStochastic::CStochastic(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,0), COcclusionCuller(),
-	apertureGenerator(frame) {
-	int		i,j,sx,sy;
+CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(), apertureGenerator(CRenderer::frame) {
+	int		i,j;
 	float	*cExtraSample;
 	CPixel	*cPixel;
 
 	// The maximum width/height we should handle
-	totalWidth		=	pixelXsamples*bucketWidth + 2*xSampleOffset;
-	totalHeight		=	pixelYsamples*bucketHeight + 2*ySampleOffset;
+	totalWidth		=	CRenderer::pixelXsamples*CRenderer::bucketWidth + 2*CRenderer::xSampleOffset;
+	totalHeight		=	CRenderer::pixelYsamples*CRenderer::bucketHeight + 2*CRenderer::ySampleOffset;
 
-	// Allocate the framebuffer
-	if (numExtraSamples > 0)	extraSampleMemory	=	new float[totalWidth*totalHeight*numExtraSamples];
-	else						extraSampleMemory	=	NULL;
+	// Allocate the framebuffer for extra samples (checkpointed)
+	if (CRenderer::numExtraSamples > 0)	extraSampleMemory	=	(float *) ralloc(totalWidth*totalHeight*CRenderer::numExtraSamples*sizeof(float),CRenderer::globalMemory);
+	else								extraSampleMemory	=	NULL;
 
+	// Allocate the pixels (checkpointed)
 	cExtraSample	=	extraSampleMemory;
-	fb				=	new CPixel*[totalHeight];
+	fb				=	(CPixel **) ralloc(totalHeight*sizeof(CPixel *),CRenderer::globalMemory);
 	for (i=0;i<totalHeight;i++) {
-		cPixel		=	fb[i]		=	new CPixel[totalWidth];
+		cPixel		=	fb[i]		=	 (CPixel *) ralloc(totalWidth*sizeof(CPixel),CRenderer::globalMemory);
 
-		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=numExtraSamples)	cPixel->extraSamples	=	cExtraSample;
+		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=CRenderer::numExtraSamples)	cPixel->extraSamples	=	cExtraSample;
 	}
 
 	// Init the fragment buffer
 	freeFragments	=	NULL;
+	numFragments	=	0;
 
 	// Initialize the occlusion culler
 	initCuller(max(totalWidth,totalHeight), &maxDepth);
-	
-	// Set up the pixel filter
-	const int		filterWidth				=	pixelXsamples + 2*xSampleOffset;
-	const int		filterHeight			=	pixelYsamples + 2*ySampleOffset;
-	const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
-	const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
-	const float		invPixelXsamples		=	1 / (float) pixelXsamples;
-	const float		invPixelYsamples		=	1 / (float) pixelYsamples;
-
-	
-	pixelFilterWeights	=	new float[filterWidth*filterHeight];
-	
-	// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
-	{
-		float	totalWeight	=	0;
-		double	invWeight;
-
-		for (sy=0;sy<filterHeight;sy++) {
-			for (sx=0;sx<filterWidth;sx++) {
-				const float	cx								=	(sx - halfFilterWidth + 0.5f)*invPixelXsamples;
-				const float	cy								=	(sy - halfFilterHeight + 0.5f)*invPixelYsamples;
-				float		filterResponse					=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
-
-				// Account for the partial area out of the bounds
-				//if (fabs(cx) > marginX)	filterResponse		*=	marginXcoverage;
-				//if (fabs(cy) > marginY)	filterResponse		*=	marginYcoverage;
-
-				// Record
-				pixelFilterWeights[sy*filterWidth + sx]		=	filterResponse;
-				totalWeight									+=	filterResponse;
-			}
-		}
-
-		// Normalize the filter kernel
-		invWeight	=	1 / (double) totalWeight;
-		for (i=0;i<filterWidth*filterHeight;i++) {
-			pixelFilterWeights[i]							=	(float) (pixelFilterWeights[i] * invWeight);
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -133,22 +91,8 @@ CStochastic::CStochastic(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,0), COcc
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 CStochastic::~CStochastic() {
-	int			i;
 	CFragment	*cFragment;
-	
-	// Ditch the pixel filter
-	delete[] pixelFilterWeights;
-
-	// Ditch the memory we allocated for extra samples
-	if (extraSampleMemory != NULL) delete [] extraSampleMemory;
-
-	// Ditch the pixels
-	for (i=0;i<totalHeight;i++) {
-		delete [] fb[i];
-	}
-	delete [] fb;
 
 	// Ditch the extra fragments
 	while((cFragment = freeFragments) != NULL) {
@@ -163,7 +107,6 @@ CStochastic::~CStochastic() {
 // Description			:	Begin drawing an image
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	int			i,j,k,pxi,pxj;
 	float		zoldStart;
@@ -171,18 +114,18 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	
 	assert(numFragments == 0);
 
-	switch(depthFilter) {
+	switch(CRenderer::depthFilter) {
 	case DEPTH_MIN:
-		zoldStart	=	clipMax;
+		zoldStart	=	CRenderer::clipMax;
 		break;
 	case DEPTH_MAX:
-		zoldStart	=	-clipMax;
+		zoldStart	=	-CRenderer::clipMax;
 		break;
 	case DEPTH_AVG:
 		zoldStart	=	0;
 		break;
 	case DEPTH_MID:
-		zoldStart	=	clipMax;
+		zoldStart	=	CRenderer::clipMax;
 		break;
 	}
 
@@ -191,39 +134,40 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	height				=	h;
 	left				=	l;
 	top					=	t;
-	sampleWidth			=	width*pixelXsamples + 2*xSampleOffset;
-	sampleHeight		=	height*pixelYsamples + 2*ySampleOffset;
+	sampleWidth			=	width*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	sampleHeight		=	height*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	right				=	left + sampleWidth;
 	bottom				=	top + sampleHeight;
 
 	// Early-out if we have no data
-	if (!(flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket) return;
+	if (!(CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket) return;
 
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);
 
 	// Init the occlusion culler to zero
 	initToZero();
-	for (i=0,pxi=pixelYsamples-ySampleOffset;i<sampleHeight;i++,pxi++) {
+	for (i=0,pxi=CRenderer::pixelYsamples-CRenderer::ySampleOffset;i<sampleHeight;i++,pxi++) {
 		CPixel	*pixel	=	fb[i];
 		
-		if (pxi >= pixelYsamples)	pxi = 0;
+		if (pxi >= CRenderer::pixelYsamples)	pxi = 0;
 		
-		for (j=0,pxj=pixelXsamples-xSampleOffset;j<sampleWidth;j++,pxj++,pixel++) {
+		for (j=0,pxj=CRenderer::pixelXsamples-CRenderer::xSampleOffset;j<sampleWidth;j++,pxj++,pixel++) {
 			float	aperture[2];
 
 			// The stratified sample
-			pixel->jx					=	(jitter*(urand()-0.5f) + 0.5001011f);
-			pixel->jy					=	(jitter*(urand()-0.5f) + 0.5001017f);
+			pixel->jx					=	(CRenderer::jitter*(urand()-0.5f) + 0.5001011f);
+			pixel->jy					=	(CRenderer::jitter*(urand()-0.5f) + 0.5001017f);
 
 			// Time of the sample for motion blur
-			if (pxj >= pixelXsamples)	pxj = 0;
-			pixel->jt					=	( pxi*pixelXsamples + pxj + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);
+			if (pxj >= CRenderer::pixelXsamples)	pxj = 0;
+			pixel->jt					=	( pxi*CRenderer::pixelXsamples + pxj + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/(float)(CRenderer::pixelXsamples*CRenderer::pixelYsamples);
 			
 			// Importance blend / jitter
-			pixel->jimp					=	1.0f - ( pxj*pixelYsamples + pxi + jitter*(urand()-0.5f) + 0.5001011f)/(float)(pixelXsamples*pixelYsamples);
+			pixel->jimp					=	1.0f - ( pxj*CRenderer::pixelYsamples + pxi + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/(float)(CRenderer::pixelXsamples*CRenderer::pixelYsamples);
 
-			if (flags & OPTIONS_FLAGS_FOCALBLUR) {
+			if (CRenderer::flags & OPTIONS_FLAGS_FOCALBLUR) {
+
 				// Aperture sample for depth of field
 				while (TRUE) {
 					apertureGenerator.get(aperture);
@@ -231,6 +175,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 					aperture[1] 			= 2.0f*aperture[1] - 1.0f;
 					if ((aperture[0]*aperture[0] + aperture[1]*aperture[1]) < 1.0f) break;
 				}
+
 				pixel->jdx					=	aperture[0];
 				pixel->jdy					=	aperture[1];
 			} else {
@@ -242,15 +187,15 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			pixel->xcent				=	(j+pixel->jx) + left;
 			pixel->ycent				=	(i+pixel->jy) + top;
 
-			pixel->z					=	clipMax;
+			pixel->z					=	CRenderer::clipMax;
 			pixel->zold					=	zoldStart;
 			pixel->numSplats			=	0;
 			pixel->node					=	getNode(j,i);
-			pixel->node->zmax			=	clipMax;
+			pixel->node->zmax			=	CRenderer::clipMax;
 
 
 			cFragment					=	&pixel->last;
-			cFragment->z				=	clipMax;
+			cFragment->z				=	CRenderer::clipMax;
 			initv(cFragment->color,0);
 			initv(cFragment->opacity,0);
 			cFragment->next				=	NULL;
@@ -263,8 +208,8 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			cFragment->next				=	&pixel->last;
 			cFragment->prev				=	NULL;
 			
-			for (k=0;k<numExtraSamples;k++) {
-				pixel->extraSamples[k]	=	sampleDefaults[k];
+			for (k=0;k<CRenderer::numExtraSamples;k++) {
+				pixel->extraSamples[k]	=	CRenderer::sampleDefaults[k];
 			}
 
 			pixel->update				=	&pixel->first;
@@ -280,17 +225,17 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 // Description			:	Draw bunch of primitives
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
+
 // Instantiate the dispatch switch
 #define DEFINE_STOCHASTIC_SWITCH
 	#include "stochasticPrimitives.h"
 #undef DEFINE_STOCHASTIC_SWITCH
 }
 
-// Instantiate the rasterization functions
 
 
+// The following macros help various fragment operations
 #define depthFilterIfZMin()
 #define depthFilterElseZMin()
 
@@ -302,16 +247,6 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 
 #define depthFilterIfZMid()		pixel->zold		=	pixel->z;
 #define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//   There are two sets of parameters, for quads and for points
-//      Within each set, some parameters are only required when there is motion blur, depth of field etc.
-//      The macros below define local variables for each set, so that we do not end up with a huge amount
-//      of unused variables. This not only makes the compiler happy, but also produces leaner code
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 // This macro is used to insert a fragment into the linked list for a pixel
@@ -342,7 +277,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 }
 
 
-	// This macro is called when an opaque fragment is inserted
+// This macro is called when an opaque fragment is inserted
 #define updateOpaque() {																			\
 	CFragment *cSample=pixel->last.prev;															\
 	while(cSample->z > z) {																			\
@@ -379,23 +314,22 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // Description			:	Get the image from the screen
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	int				i,y;
 	int				sx,sy;
 	const int		xres					=	width;
 	const int		yres					=	height;
-	const int		filterWidth				=	pixelXsamples + 2*xSampleOffset;
-	const int		filterHeight			=	pixelYsamples + 2*ySampleOffset;
-	const float		halfFilterWidth			=	(float) filterWidth / (float) 2;
-	const float		halfFilterHeight		=	(float) filterHeight / (float) 2;
+	const int		filterWidth				=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int		filterHeight			=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
+	const float		halfFilterWidth			=	(float) filterWidth*0.5f;
+	const float		halfFilterHeight		=	(float) filterHeight*0.5f;
 	float			*fbs;
-	const int		pixelSize				=	8	+ numExtraSamples;	// alpha + depth + color + opacity + extra samples
+	const int		pixelSize				=	8	+ CRenderer::numExtraSamples;	// alpha + depth + color + opacity + extra samples
 	float			*tmp;
-	const int		sampleLineDisplacement	=	pixelXsamples*pixelSize;
+	const int		sampleLineDisplacement	=	CRenderer::pixelXsamples*pixelSize;
 
 	// Deep shadow map computation
-	if (flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)	deepShadowCompute();
+	if (CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)	deepShadowCompute();
 	else if (noObjects) {
 		// early-out if we have no data
 		
@@ -408,10 +342,10 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			*tmp++	=	C_INFINITY;			// z
 			
 			// extra samples
-			if (numExtraSamples > 0) {
-				memcpy(tmp,sampleDefaults,numExtraSamples*sizeof(float));
+			if (CRenderer::numExtraSamples > 0) {
+				memcpy(tmp,CRenderer::sampleDefaults,CRenderer::numExtraSamples*sizeof(float));
 			
-				tmp += numExtraSamples;
+				tmp += CRenderer::numExtraSamples;
 			}
 		}
 
@@ -419,10 +353,10 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		return;
 	}
 
-	memBegin();
+	memBegin(threadMemory);
 
 	// Allocate the framebuffer
-	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float));
+	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
 
 	// Collapse the samples (transparency composite)
 
@@ -443,8 +377,8 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
  
 			assert(cPixel->first.z == -C_INFINITY);
 
-			if (numExtraSamples > 0)
-				memcpy(cFb+8,cPixel->extraSamples,numExtraSamples*sizeof(float));
+			if (CRenderer::numExtraSamples > 0)
+				memcpy(cFb+8,cPixel->extraSamples,CRenderer::numExtraSamples*sizeof(float));
 
 			// We re-use cPixel->first as a marker as to whether the pixel has any matte samples,
 			// cPixel->last ise really used, but cPixel->first is not (it's always skipped in the composite),
@@ -539,54 +473,54 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	}
 
 	// Find the depth component
-	switch(depthFilter) {
+	switch(CRenderer::depthFilter) {
 	case DEPTH_MIN:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
-				if (cPixel->z == clipMax)	cFb[1]	=	C_INFINITY;
-				else						cFb[1]	=	cPixel->z;
+				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
+				else									cFb[1]	=	cPixel->z;
 			}
 		}
 
 		break;
 	case DEPTH_MAX:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
-				if (cPixel->z == clipMax)	cFb[1]	=	C_INFINITY;
-				else						cFb[1]	=	cPixel->zold;
+				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
+				else									cFb[1]	=	cPixel->zold;
 			}
 		}
 
 		break;
 	case DEPTH_AVG:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
-				if (cPixel->z == clipMax)	cFb[1]	=	C_INFINITY;
-				else						cFb[1]	=	cPixel->zold / (float) cPixel->numSplats;
+				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
+				else									cFb[1]	=	cPixel->zold / (float) cPixel->numSplats;
 			}
 		}
 
 		break;
 	case DEPTH_MID:
 		for (y=0;y<sampleHeight;y++) {
-			CPixel	*cPixel		=	fb[y];
-			float	*cFb		=	&fbs[y*totalWidth*pixelSize];
+			const CPixel	*cPixel		=	fb[y];
+			float			*cFb		=	&fbs[y*totalWidth*pixelSize];
 
 			for (i=sampleWidth;i>0;i--,cPixel++,cFb+=pixelSize) {
-				if (cPixel->z == clipMax)	cFb[1]	=	C_INFINITY;
+				if (cPixel->z == CRenderer::clipMax)	cFb[1]	=	C_INFINITY;
 				else {
 
-					assert(cPixel->z < clipMax);
-					assert(cPixel->zold <= clipMax);
+					assert(cPixel->z < CRenderer::clipMax);
+					assert(cPixel->zold <= CRenderer::clipMax);
 					assert(cPixel->z <= cPixel->zold);
 
 					if (cPixel->zold < culledDepth)	cFb[1]		=	(cPixel->z + cPixel->zold) * 0.5f;
@@ -599,18 +533,18 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	}
 
 	// Clear the memory first
-	for (tmp=fb2,i=xres*yres*numSamples;i>0;i--)	*tmp++	=	0;
+	for (tmp=fb2,i=xres*yres*CRenderer::numSamples;i>0;i--)	*tmp++	=	0;
 
 	// Filter the samples
 	for (y=0;y<yres;y++) {
 		for (sy=0;sy<filterHeight;sy++) {
 			for (sx=0;sx<filterWidth;sx++) {
-				const CPixel	*pixels			=	&fb[y*pixelYsamples+sy][sx];
-				float			*pixelLine		=	&fb2[y*xres*numSamples];
-				const float		*sampleLine		=	&fbs[((y*pixelYsamples+sy)*totalWidth + sx)*pixelSize];
+				const CPixel	*pixels			=	&fb[y*CRenderer::pixelYsamples+sy][sx];
+				float			*pixelLine		=	&fb2[y*xres*CRenderer::numSamples];
+				const float		*sampleLine		=	&fbs[((y*CRenderer::pixelYsamples+sy)*totalWidth + sx)*pixelSize];
 				const float		xOffset			=	sx - halfFilterWidth;
 				const float		yOffset			=	sy - halfFilterHeight;
-				const float		filterResponse	=	pixelFilterWeights[sy*filterWidth + sx];
+				const float		filterResponse	=	CRenderer::pixelFilterKernel[sy*filterWidth + sx];
 
 				for (i=0;i<xres;i++) {
 					int			es;
@@ -622,59 +556,61 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					pixelLine[4]				+=	filterResponse*sampleLine[1];
 
 					// Filter the extra samples here
-					for (es=0;es<numExtraSamples;es++) {
+					for (es=0;es<CRenderer::numExtraSamples;es++) {
 						pixelLine[5+es]			+=	filterResponse*sampleLine[8+es];
 					}
 
 					// Advance
-					pixelLine					+=	numSamples;
+					pixelLine					+=	CRenderer::numSamples;
 					sampleLine					+=	sampleLineDisplacement;
-					pixels						+=	pixelXsamples;
+					pixels						+=	CRenderer::pixelXsamples;
 				}
 			}
 		}
 	}
 
-	memEnd();
+	memEnd(threadMemory);
 }
 
 
-// The origin, the last depth sample we output
-static	float	origin[4];
-static	float	lastZ;
-static	float	rSlopeMin;
-static	float	gSlopeMin;
-static	float	bSlopeMin;
-static	float	rSlopeMax;
-static	float	gSlopeMax;
-static	float	bSlopeMax;
-static	FILE	*deepShadowFile;
-static	float	tsmThreshold;
+// A transient data structure to hold TSM data
+class	CTSMData {
+public:
+	float	origin[4];
+	float	lastZ;
+	float	rSlopeMin;
+	float	gSlopeMin;
+	float	bSlopeMin;
+	float	rSlopeMax;
+	float	gSlopeMax;
+	float	bSlopeMax;
+	FILE	*deepShadowFile;
+	float	tsmThreshold;
+};
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	outSample
 // Description			:	This function is used to output a depth sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/26/2003
-inline	void	startSample(FILE *outFile,float threshold) {
-	deepShadowFile	=	outFile;
-	tsmThreshold	=	threshold;
+inline	void	startSample(FILE *outFile,float threshold,CTSMData &data) {
+	data.deepShadowFile		=	outFile;
+	data.tsmThreshold		=	threshold;
 
-	rSlopeMax		=	C_INFINITY;
-	gSlopeMax		=	C_INFINITY;
-	bSlopeMax		=	C_INFINITY;
-	rSlopeMin		=	-C_INFINITY;
-	gSlopeMin		=	-C_INFINITY;
-	bSlopeMin		=	-C_INFINITY;
+	data.rSlopeMax		=	C_INFINITY;
+	data.gSlopeMax		=	C_INFINITY;
+	data.bSlopeMax		=	C_INFINITY;
+	data.rSlopeMin		=	-C_INFINITY;
+	data.gSlopeMin		=	-C_INFINITY;
+	data.bSlopeMin		=	-C_INFINITY;
 
 	// Output the first sample (at z=-C_INFINITY)
-	origin[0]		=	-C_INFINITY;
-	origin[1]		=	1;
-	origin[2]		=	1;
-	origin[3]		=	1;
-	fwrite(origin,sizeof(float),4,deepShadowFile);
-	lastZ			=	-C_INFINITY;
+	data.origin[0]		=	-C_INFINITY;
+	data.origin[1]		=	1;
+	data.origin[2]		=	1;
+	data.origin[3]		=	1;
+	fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
+	data.lastZ			=	-C_INFINITY;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -682,99 +618,98 @@ inline	void	startSample(FILE *outFile,float threshold) {
 // Description			:	This function is used to output a depth sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/26/2003
-inline	void	outSample(float cZ,const float *opacity) {
+inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 	// Always output the closest sample
-	if (origin[0] == -C_INFINITY) {
-		origin[0]	=	cZ;
-		origin[1]	=	opacity[0];
-		origin[2]	=	opacity[1];
-		origin[3]	=	opacity[2];
+	if (data.origin[0] == -C_INFINITY) {
+		data.origin[0]	=	cZ;
+		data.origin[1]	=	opacity[0];
+		data.origin[2]	=	opacity[1];
+		data.origin[3]	=	opacity[2];
 
-		fwrite(origin,sizeof(float),4,deepShadowFile);
-	} else if (cZ == origin[0]) {	// Do we have a step ?
-		const float	dr	=	absf(origin[1] - opacity[0]);							
-		const float	dg	=	absf(origin[2] - opacity[1]);
-		const float	db	=	absf(origin[3] - opacity[2]);
+		fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
+	} else if (cZ == data.origin[0]) {	// Do we have a step ?
+		const float	dr	=	absf(data.origin[1] - opacity[0]);							
+		const float	dg	=	absf(data.origin[2] - opacity[1]);
+		const float	db	=	absf(data.origin[3] - opacity[2]);
 
 		// Is the step small enough ?
-		if ((dr >= tsmThreshold) || (dg >= tsmThreshold) || (db >= tsmThreshold)) {
+		if ((dr >= data.tsmThreshold) || (dg >= data.tsmThreshold) || (db >= data.tsmThreshold)) {
 
 			// No, output the step
-			origin[1]	=	opacity[0];
-			origin[2]	=	opacity[1];
-			origin[3]	=	opacity[2];
-			fwrite(origin,sizeof(float),4,deepShadowFile);
+			data.origin[1]	=	opacity[0];
+			data.origin[2]	=	opacity[1];
+			data.origin[3]	=	opacity[2];
+			fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 		}
 	} else {
 		// Check for the window of validity
-		const float	denom		=	1 / (cZ - origin[0]);
-		float		crSlopeMax	=	(opacity[0] - origin[1] + tsmThreshold) * denom;
-		float		cgSlopeMax	=	(opacity[1] - origin[2] + tsmThreshold) * denom;
-		float		cbSlopeMax	=	(opacity[2] - origin[3] + tsmThreshold) * denom;
-		float		crSlopeMin	=	(opacity[0] - origin[1] - tsmThreshold) * denom;
-		float		cgSlopeMin	=	(opacity[1] - origin[2] - tsmThreshold) * denom;
-		float		cbSlopeMin	=	(opacity[2] - origin[3] - tsmThreshold) * denom;
+		const float	denom		=	1 / (cZ - data.origin[0]);
+		float		crSlopeMax	=	(opacity[0] - data.origin[1] + data.tsmThreshold) * denom;
+		float		cgSlopeMax	=	(opacity[1] - data.origin[2] + data.tsmThreshold) * denom;
+		float		cbSlopeMax	=	(opacity[2] - data.origin[3] + data.tsmThreshold) * denom;
+		float		crSlopeMin	=	(opacity[0] - data.origin[1] - data.tsmThreshold) * denom;
+		float		cgSlopeMin	=	(opacity[1] - data.origin[2] - data.tsmThreshold) * denom;
+		float		cbSlopeMin	=	(opacity[2] - data.origin[3] - data.tsmThreshold) * denom;
 
-		crSlopeMax				=	min(crSlopeMax,rSlopeMax);
-		cgSlopeMax				=	min(cgSlopeMax,gSlopeMax);
-		cbSlopeMax				=	min(cbSlopeMax,bSlopeMax);
+		crSlopeMax				=	min(crSlopeMax,data.rSlopeMax);
+		cgSlopeMax				=	min(cgSlopeMax,data.gSlopeMax);
+		cbSlopeMax				=	min(cbSlopeMax,data.bSlopeMax);
 
-		crSlopeMin				=	max(crSlopeMin,rSlopeMin);
-		cgSlopeMin				=	max(cgSlopeMin,gSlopeMin);
-		cbSlopeMin				=	max(cbSlopeMin,bSlopeMin);
+		crSlopeMin				=	max(crSlopeMin,data.rSlopeMin);
+		cgSlopeMin				=	max(cgSlopeMin,data.gSlopeMin);
+		cbSlopeMin				=	max(cbSlopeMin,data.bSlopeMin);
 
 		if ((crSlopeMin < crSlopeMax) && (cgSlopeMin < cgSlopeMax) && (cbSlopeMin < cbSlopeMax)) {			
 			// We're in range
-			rSlopeMax		=	crSlopeMax;
-			gSlopeMax		=	cgSlopeMax;
-			bSlopeMax		=	cbSlopeMax;
+			data.rSlopeMax		=	crSlopeMax;
+			data.gSlopeMax		=	cgSlopeMax;
+			data.bSlopeMax		=	cbSlopeMax;
 
-			rSlopeMin		=	crSlopeMin;
-			gSlopeMin		=	cgSlopeMin;
-			bSlopeMin		=	cbSlopeMin;
+			data.rSlopeMin		=	crSlopeMin;
+			data.gSlopeMin		=	cgSlopeMin;
+			data.bSlopeMin		=	cbSlopeMin;
 		} else {
-			origin[1]		+=	(rSlopeMin + rSlopeMax)*(lastZ - origin[0])*0.5f;
-			origin[2]		+=	(gSlopeMin + gSlopeMax)*(lastZ - origin[0])*0.5f;
-			origin[3]		+=	(bSlopeMin + bSlopeMax)*(lastZ - origin[0])*0.5f;
-			origin[0]		=	lastZ;
-			fwrite(origin,sizeof(float),4,deepShadowFile);
+			data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+			data.origin[2]		+=	(data.gSlopeMin + data.gSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+			data.origin[3]		+=	(data.bSlopeMin + data.bSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+			data.origin[0]		=	data.lastZ;
+			fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 
-			rSlopeMax		=	C_INFINITY;
-			gSlopeMax		=	C_INFINITY;
-			bSlopeMax		=	C_INFINITY;
-			rSlopeMin		=	-C_INFINITY;
-			gSlopeMin		=	-C_INFINITY;
-			bSlopeMin		=	-C_INFINITY;
+			data.rSlopeMax		=	C_INFINITY;
+			data.gSlopeMax		=	C_INFINITY;
+			data.bSlopeMax		=	C_INFINITY;
+			data.rSlopeMin		=	-C_INFINITY;
+			data.gSlopeMin		=	-C_INFINITY;
+			data.bSlopeMin		=	-C_INFINITY;
 
 			// Do we have a step ?
-			if (cZ == origin[0]) {
-				const float	dr	=	absf(origin[1] - opacity[0]);							
-				const float	dg	=	absf(origin[2] - opacity[1]);
-				const float	db	=	absf(origin[3] - opacity[2]);
+			if (cZ == data.origin[0]) {
+				const float	dr	=	absf(data.origin[1] - opacity[0]);							
+				const float	dg	=	absf(data.origin[2] - opacity[1]);
+				const float	db	=	absf(data.origin[3] - opacity[2]);
 
 				// Is the step small enough ?
-				if ((dr >= tsmThreshold) || (dg >= tsmThreshold) || (db >= tsmThreshold)) {
+				if ((dr >= data.tsmThreshold) || (dg >= data.tsmThreshold) || (db >= data.tsmThreshold)) {
 
 					// No, output the step
-					origin[1]	=	opacity[0];
-					origin[2]	=	opacity[1];
-					origin[3]	=	opacity[2];
-					fwrite(origin,sizeof(float),4,deepShadowFile);
+					data.origin[1]	=	opacity[0];
+					data.origin[2]	=	opacity[1];
+					data.origin[3]	=	opacity[2];
+					fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 				}
 			} else {
-				const float	denom		=	1 / (cZ - origin[0]);
-				rSlopeMax	=	(opacity[0] - origin[1] + tsmThreshold) * denom;
-				gSlopeMax	=	(opacity[1] - origin[2] + tsmThreshold) * denom;
-				bSlopeMax	=	(opacity[2] - origin[3] + tsmThreshold) * denom;
-				rSlopeMin	=	(opacity[0] - origin[1] - tsmThreshold) * denom;
-				gSlopeMin	=	(opacity[1] - origin[2] - tsmThreshold) * denom;
-				bSlopeMin	=	(opacity[2] - origin[3] - tsmThreshold) * denom;
+				const float	denom		=	1 / (cZ - data.origin[0]);
+				data.rSlopeMax	=	(opacity[0] - data.origin[1] + data.tsmThreshold) * denom;
+				data.gSlopeMax	=	(opacity[1] - data.origin[2] + data.tsmThreshold) * denom;
+				data.bSlopeMax	=	(opacity[2] - data.origin[3] + data.tsmThreshold) * denom;
+				data.rSlopeMin	=	(opacity[0] - data.origin[1] - data.tsmThreshold) * denom;
+				data.gSlopeMin	=	(opacity[1] - data.origin[2] - data.tsmThreshold) * denom;
+				data.bSlopeMin	=	(opacity[2] - data.origin[3] - data.tsmThreshold) * denom;
 			}
 		}
 	}
 
-	lastZ	=	cZ;
+	data.lastZ	=	cZ;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -782,24 +717,23 @@ inline	void	outSample(float cZ,const float *opacity) {
 // Description			:	This function is used to output the last sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/26/2003
-inline	void	finishSample(float cZ,const float *opacity) {
-	if (origin[0] < cZ) {
-		origin[1]		+=	(rSlopeMin + rSlopeMax)*(lastZ - origin[0])*0.5f;	
-		origin[2]		+=	(gSlopeMin + gSlopeMax)*(lastZ - origin[0])*0.5f;
-		origin[3]		+=	(bSlopeMin + bSlopeMax)*(lastZ - origin[0])*0.5f;
-		origin[0]		=	lastZ;
-		fwrite(origin,sizeof(float),4,deepShadowFile);
+inline	void	finishSample(float cZ,const float *opacity,CTSMData &data) {
+	if (data.origin[0] < cZ) {
+		data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;	
+		data.origin[2]		+=	(data.gSlopeMin + data.gSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+		data.origin[3]		+=	(data.bSlopeMin + data.bSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
+		data.origin[0]		=	data.lastZ;
+		fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 	}
 
-	origin[0]		=	cZ;
-	origin[1]		=	opacity[0];
-	origin[2]		=	opacity[1];
-	origin[3]		=	opacity[2];
-	fwrite(origin,sizeof(float),4,deepShadowFile);
+	data.origin[0]		=	cZ;
+	data.origin[1]		=	opacity[0];
+	data.origin[2]		=	opacity[1];
+	data.origin[3]		=	opacity[2];
+	fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 
-	origin[0]		=	C_INFINITY;
-	fwrite(origin,sizeof(float),4,deepShadowFile);
+	data.origin[0]		=	C_INFINITY;
+	fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -808,15 +742,15 @@ inline	void	finishSample(float cZ,const float *opacity) {
 // Description			:	Filter / output the pixel
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weights) {
-	int		minSample		=	0;
-	int		i;
-	vector	opacity;
+	int			minSample		=	0;
+	int			i;
+	vector		opacity;
+	CTSMData	data;
 
 	initv(opacity,1,1,1);		// The current opacity
 
-	startSample(deepShadowFile,tsmThreshold);				// The beginning of a pixel
+	startSample(CRenderer::deepShadowFile,CRenderer::tsmThreshold,data);				// The beginning of a pixel
 
 	// Find the closest sample
 	for (i=1;i<numSamples;i++) {
@@ -833,7 +767,7 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 		float			*oldOpacity	=	weights + (minSample<<2);
 		vector			newOpacity;
 
-		outSample(cZ,opacity);
+		outSample(cZ,opacity,data);
 
 		newOpacity[0]				=	oldOpacity[1]*(1-cSample->opacity[0]);
 		newOpacity[1]				=	oldOpacity[2]*(1-cSample->opacity[1]);
@@ -879,10 +813,10 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 
 		// Decide whether we should stop or keep going
 		if (stop == 3) {
-			finishSample(cZ,opacity);
+			finishSample(cZ,opacity,data);
 			break;
 		} else {
-			outSample(cZ,opacity);
+			outSample(cZ,opacity,data);
 		}
 
 		for (minSample=0,i=1;i<numSamples;i++) {
@@ -899,15 +833,14 @@ void			CStochastic::filterSamples(int numSamples,CFragment **samples,float *weig
 // Description			:	Compute/write deep shadow map data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 void		CStochastic::deepShadowCompute() {
 	int			i;
 	const int	xres				=	width;
 	const int	yres				=	height;
-	const int	filterWidth			=	pixelXsamples + 2*xSampleOffset;
-	const int	filterHeight		=	pixelYsamples + 2*ySampleOffset;
-	const float	invPixelXsamples	=	1 / (float) pixelXsamples;
-	const float	invPixelYsamples	=	1 / (float) pixelYsamples;
+	const int	filterWidth			=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int	filterHeight		=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
+	const float	invPixelXsamples	=	1 / (float) CRenderer::pixelXsamples;
+	const float	invPixelYsamples	=	1 / (float) CRenderer::pixelYsamples;
 	int			prevFilePos;
 	int			numSamples;
 	int			x,y;
@@ -915,14 +848,16 @@ void		CStochastic::deepShadowCompute() {
 	CFragment	**fSamples;
 	float		*fWeights;
 
-	memBegin();
+	osLock(CRenderer::deepShadowMutex);
 	
-	prevFilePos		=	ftell(deepShadowFile);
+	memBegin(threadMemory);
+	
+	prevFilePos		=	ftell(CRenderer::deepShadowFile);
 
 	// Allocate the memory for misc junk
-	samples			=	(CFragment **)	ralloc(totalHeight*totalWidth*sizeof(CFragment*));
-	fSamples		=	(CFragment **)	ralloc(filterWidth*filterHeight*sizeof(CFragment*));
-	fWeights		=	(float *)		ralloc(filterWidth*filterHeight*sizeof(float)*4);
+	samples			=	(CFragment **)	ralloc(totalHeight*totalWidth*sizeof(CFragment*),threadMemory);
+	fSamples		=	(CFragment **)	ralloc(filterWidth*filterHeight*sizeof(CFragment*),threadMemory);
+	fWeights		=	(float *)		ralloc(filterWidth*filterHeight*sizeof(float)*4,threadMemory);
 
 	// Init the samples
 	for (i=0;i<totalWidth*totalHeight;i++)	samples[i]	=	NULL;
@@ -934,12 +869,12 @@ void		CStochastic::deepShadowCompute() {
 		}
 	}
 
-	assert(bucketWidth	>= xres);
-	assert(bucketHeight	>= yres);
+	assert(CRenderer::bucketWidth	>= xres);
+	assert(CRenderer::bucketHeight	>= yres);
 
 	// Compute the visibility function for each pixel
-	for (y=0;y<bucketHeight;y++) {
-		for (x=0;x<bucketWidth;x++) {
+	for (y=0;y<CRenderer::bucketHeight;y++) {
+		for (x=0;x<CRenderer::bucketWidth;x++) {
 
 			if ((x < xres) && (y < yres)) {
 				// Gather the samples for this pixel and the filter response
@@ -948,13 +883,13 @@ void		CStochastic::deepShadowCompute() {
 
 				for (i=0,sy=0;sy<filterHeight;sy++) {
 					for (sx=0;sx<filterWidth;sx++,i++) {
-						const int		xsample	=	x*pixelXsamples + sx;
-						const int		ysample	=	y*pixelYsamples + sy;
+						const int		xsample	=	x*CRenderer::pixelXsamples + sx;
+						const int		ysample	=	y*CRenderer::pixelYsamples + sy;
 						const CPixel	*pixels	=	&fb[ysample][xsample];
 						const float		cx		=	(sx + pixels->jx - filterWidth*0.5f*invPixelXsamples);
 						const float		cy		=	(sy + pixels->jy - filterHeight*0.5f*invPixelYsamples);
 						fSamples[i]				=	samples[ysample*sampleWidth+xsample];
-						fWeights[i<<2]			=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
+						fWeights[i<<2]			=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
 						filterSum				+=	fWeights[i<<2];
 					}
 				}
@@ -979,13 +914,13 @@ void		CStochastic::deepShadowCompute() {
 				dummy[1]	=	1;
 				dummy[2]	=	1;
 				dummy[3]	=	1;
-				fwrite(dummy,sizeof(float),4,deepShadowFile);
+				fwrite(dummy,sizeof(float),4,CRenderer::deepShadowFile);
 
 				dummy[0]	=	C_INFINITY;
 				dummy[1]	=	1;
 				dummy[2]	=	1;
 				dummy[3]	=	1;
-				fwrite(dummy,sizeof(float),4,deepShadowFile);
+				fwrite(dummy,sizeof(float),4,CRenderer::deepShadowFile);
 			}
 		}
 	}
@@ -993,9 +928,11 @@ void		CStochastic::deepShadowCompute() {
 	// Record the index in the file
 	//	we now save sizes too in order to support arbitrary bucket orders
 	//	indices are now bucket starts
-	const int tileIndex = currentYBucket*xBuckets + currentXBucket;
-	deepShadowIndex[tileIndex]						=	prevFilePos;
-	deepShadowIndex[tileIndex + xBuckets*yBuckets]	=	ftell(deepShadowFile) - prevFilePos;
+	const int tileIndex = currentYBucket*CRenderer::xBuckets + currentXBucket;
+	CRenderer::deepShadowIndex[tileIndex]											=	prevFilePos;
+	CRenderer::deepShadowIndex[tileIndex + CRenderer::xBuckets*CRenderer::yBuckets]	=	ftell(CRenderer::deepShadowFile) - prevFilePos;
 
-	memEnd();
+	memEnd(threadMemory);
+	
+	osUnlock(CRenderer::deepShadowMutex);
 }

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,12 +32,12 @@
 #define VARIABLE_H
 
 #include "common/global.h"		// The global header file
+#include "rendererc.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVariable
 // Description			:	This class holds information about a variable
 // Comments				:	FIXME: Maximum length of a variable's name is 63 characters
-// Date last edited		:	8/2/2001
 class CVariable {
 public:
 	char				name[64];		// Name as it is referenced
@@ -49,8 +49,8 @@ public:
 	int					usageMarker;	// The usage or flag
 	EVariableStorage	storage;		// If the variable is global, parameter or mutable parameter
 	void				*defaultValue;	// Points to the memory area that holds the default value for the variable
-	float				*value;			// This is a transient pointer that points to the memory area that holds the value
-	CVariable			*next;			// Linked list next (FIXME: Is this used ?)
+	int					accessor;		// Which entry in the locals array are we?
+	CVariable			*next;			// Linked list next (used to maintain shader parameter lists)
 };
 
 

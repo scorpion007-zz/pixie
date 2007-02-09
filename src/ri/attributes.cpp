@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,7 +33,6 @@
 
 #include "attributes.h"
 #include "ri.h"
-#include "renderer.h"
 #include "stats.h"
 #include "photonMap.h"
 #include "irradiance.h"
@@ -46,7 +45,6 @@
 //							attributes are given here
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/11/2003
 CAttributes::CAttributes() {
 	next					=	NULL;
 	refCount				=	0;
@@ -96,12 +94,7 @@ CAttributes::CAttributes() {
 	flags						|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 	flags						|=	ATTRIBUTES_FLAGS_SINGULARITYFIX;
 
-	minSubdivision				=	2;
-	maxSubdivision				=	5;
-
 	flatness					=	0.5f;
-	pointDeviation				=	C_INFINITY;
-	normalDeviation				=	cosf(radians(45));
 
 	maxDisplacement				=	0;
 	maxDisplacementSpace		=	NULL;
@@ -132,7 +125,7 @@ CAttributes::CAttributes() {
 	causticMap					=	NULL;
 	irradianceHandle			=	NULL;
 	irradianceHandleMode		=	NULL;
-	irradianceMaxError			=	1.0f;
+	irradianceMaxError			=	0.6f;
 	irradianceMaxPixelDistance	=	20.0f;
 	photonEstimator				=	100;
 	photonIor[0]				=	1.5;
@@ -148,6 +141,8 @@ CAttributes::CAttributes() {
 	lodRange[3]					=	C_INFINITY;
 	lodSize						=	0;
 	lodImportance				=	1;
+	
+	checkParameters();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -157,7 +152,6 @@ CAttributes::CAttributes() {
 //							another attribute set
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/13/2003
 CAttributes::CAttributes(const CAttributes *a) {
 	CActiveLight	*cLight,*nLight;
 
@@ -205,7 +199,6 @@ CAttributes::CAttributes(const CAttributes *a) {
 // Description			:	Deallocate everything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 CAttributes::~CAttributes(){
 	CActiveLight	*cLight;
 
@@ -243,7 +236,6 @@ CAttributes::~CAttributes(){
 // Description			:	Obvious !
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CAttributes::addLight(CShaderInstance *cLight) {
 	CActiveLight	*nLight,*pLight;
 
@@ -262,6 +254,7 @@ void	CAttributes::addLight(CShaderInstance *cLight) {
 	
 	nLight->light		=	(CProgrammableShaderInstance*) cLight;
 	nLight->next		=	NULL;
+	checkParameters();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -271,7 +264,6 @@ void	CAttributes::addLight(CShaderInstance *cLight) {
 //							source from the active light source list
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CAttributes::removeLight(CShaderInstance *light) {
 	CActiveLight	*cLight,*pLight;
 
@@ -285,6 +277,7 @@ void	CAttributes::removeLight(CShaderInstance *light) {
 			break;
 		}
 	}
+	checkParameters();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -293,7 +286,6 @@ void	CAttributes::removeLight(CShaderInstance *light) {
 // Description			:	Check the light parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	CAttributes::checkParameters() {
 	CActiveLight	*cLight;
 
@@ -318,7 +310,6 @@ void	CAttributes::checkParameters() {
 // Description			:	Find a particular parameter
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2006
 CVariable	*CAttributes::findParameter(const char *name) {
 	CVariable	*cParameter;
 

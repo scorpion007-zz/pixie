@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -43,12 +43,14 @@ typedef union TMemoryHeader {
 
 #define	MEMORY_PAGE_SIZE	1 << 18
 
-TMemoryHeader			*memoryChunks[NUM_CHUNKS];
-unsigned char			*memoryPage					=	NULL;
-unsigned int			memoryAvailable				=	0;
-unsigned int			memoryUsage					=	0;
-TMemoryHeader			*memoryAllPages				=	NULL;
-static	int				memoryManagerInited			=	0;
+static	TMemoryHeader			*memoryChunks[NUM_CHUNKS];
+static	unsigned char			*memoryPage					=	NULL;
+static	unsigned int			memoryAvailable				=	0;
+static	unsigned int			memoryUsage					=	0;
+static	TMemoryHeader			*memoryAllPages				=	NULL;
+static	int						memoryManagerInited			=	0;
+static	int						memoryManagerInitInNew		=	0;
+static	TMutex					memoryMutex;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -56,13 +58,25 @@ static	int				memoryManagerInited			=	0;
 // Description			:	Allocate memory from the manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 inline	void	*allocMem(size_t size) {
 	unsigned int	 index	=	size >> 3;	// Align at 8 byte boundary
 	TMemoryHeader	*ptri;
 
 	// Round up
 	if (size & 7) index++;
+
+	// Init the memory manager if not already have
+	if (memoryManagerInited == 0) {
+
+		// Initialize the memory manager
+		memInit();
+
+		// Set this variable so we know that we actually inited the memory inside the allocator
+		memoryManagerInitInNew	=	1;
+	}
+
+	// Secure the area
+	osLock(memoryMutex);
 
 	// Is the requested size too large ?
 	if (index >= NUM_CHUNKS) {
@@ -88,9 +102,12 @@ inline	void	*allocMem(size_t size) {
 		}
 	}
 
-	ptri->index	=	index;
-
 	memoryUsage	+=	index;
+
+	// Release the area
+	osUnlock(memoryMutex);
+
+	ptri->index	=	index;
 
 	return ptri+1;
 }
@@ -100,10 +117,12 @@ inline	void	*allocMem(size_t size) {
 // Description			:	Delete memory from manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 inline	void	delMem(void *ptr) {
 	if (ptr != 0) {
 		TMemoryHeader	*ptri	=	(TMemoryHeader *) ptr;
+
+		// Secure the area
+		osLock(memoryMutex);
 
 		ptri--;
 		memoryUsage	-=	ptri->index;
@@ -114,8 +133,10 @@ inline	void	delMem(void *ptr) {
 			unsigned int	index	=	ptri->index;
 			ptri->next				=	memoryChunks[index];
 			memoryChunks[index]		=	ptri;
-
 		}
+
+		// Release the area
+		osUnlock(memoryMutex);
 	}
 }
 
@@ -125,7 +146,6 @@ inline	void	delMem(void *ptr) {
 // Description			:	Overloaded new
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	*operator new(size_t size) {
 	return allocMem(size);
 }
@@ -136,7 +156,6 @@ void	*operator new(size_t size) {
 // Description			:	Overloaded new
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	*operator new[](size_t size) {
 	return allocMem(size);
 }
@@ -146,7 +165,6 @@ void	*operator new[](size_t size) {
 // Description			:	Overloaded delete
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	operator delete(void *ptr) {
 	delMem(ptr);
 }
@@ -156,7 +174,6 @@ void	operator delete(void *ptr) {
 // Description			:	Overloaded delete
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	operator delete[](void *ptr) {
 	delMem(ptr);
 }
@@ -167,9 +184,9 @@ void	operator delete[](void *ptr) {
 // Description			:	Init the memory manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	memInit() {
 
+	// Did we initialize the memory manager before ?
 	if (memoryManagerInited == 0) {
 		int	i;
 
@@ -179,6 +196,7 @@ void	memInit() {
 		memoryUsage			=	0;
 		memoryPage			=	0;
 		memoryAllPages		=	0;
+		osCreateMutex(memoryMutex);
 	}
 
 	memoryManagerInited++;
@@ -189,20 +207,29 @@ void	memInit() {
 // Description			:	Shutdown the memory manager
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	memShutdown() {
 	memoryManagerInited--;
 
-	if (memoryManagerInited == 0) {
+	// Is this the last shutdown ?
+	if (memoryManagerInited == memoryManagerInitInNew) {
 		TMemoryHeader	*cPage;
 
-		assert(memoryManagerInited == TRUE);
+		osDeleteMutex(memoryMutex);
 
+		// Free the memory pages we allocated
 		while((cPage=memoryAllPages) != NULL) {
 			memoryAllPages	=	cPage->next;
 
 			free(cPage);
 		}
+
+		// Reset the local variables
+		memoryPage					=	NULL;
+		memoryAvailable				=	0;
+		memoryUsage					=	0;
+		memoryAllPages				=	NULL;
+		memoryManagerInited			=	0;
+		memoryManagerInitInNew		=	0;
 	}
 }
 
@@ -211,7 +238,6 @@ void	memShutdown() {
 // Description			:	Allocate a new page of memory
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/21/2003
 void	memNewPage(unsigned int size) {
 
 	assert(memoryManagerInited > 0);

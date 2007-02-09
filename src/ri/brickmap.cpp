@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,10 +32,10 @@
 #include "common/os.h"
 #include "brickmap.h"
 #include "random.h"
-#include "renderer.h"
 #include "error.h"
 #include "pointCloud.h"
 #include "memory.h"
+#include "renderer.h"
 
 
 
@@ -58,7 +58,6 @@ int			CBrickMap::detailLevel		=	2;				// The detail level
 // Description			:	Compute the volume of the intersection of the cube centered at P with side dP, with the cube centered at x,y,z with side d
 // Return Value			:	the volume of the intersection
 // Comments				:
-// Date last edited		:	7/16/2006
 static	inline	float	intersect(const float *P,float dP,float x,float y,float z,float d) {
 	float	tmin1,tmin2,tmax1,tmax2,tmin,tmax;
 	float	w;
@@ -112,8 +111,7 @@ static	inline	float	intersect(const float *P,float dP,float x,float y,float z,fl
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
-CBrickMap::CBrickMap(FILE *in,const char *name,CXform *world) : CTexture3d(name,world) {
+CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to) : CTexture3d(name,from,to) {
 	int		offset,i;
 
 	// Init the data
@@ -122,6 +120,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,CXform *world) : CTexture3d(name,
 	normalThreshold	=	0.7f;
 	file			=	in;
 	modifying		=	FALSE;
+	osCreateMutex(mutex);
 
 	// Read the header offset
 	fseek(file,-4,SEEK_END);
@@ -172,8 +171,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,CXform *world) : CTexture3d(name,
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Use this contructor to compute from sctratch
-// Date last edited		:	7/15/2006
-CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,CXform *world,CTexture3dChannel *ch,int nc) : CTexture3d(name,world,nc,ch) {
+CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,CTexture3dChannel *ch,int nc) : CTexture3d(name,from,to,nc,ch) {
 	int	i;
 	
 	// Init the data
@@ -182,6 +180,7 @@ CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,CXform *
 	normalThreshold	=	0.7f;
 	file			=	NULL;
 	modifying		=	TRUE;
+	osCreateMutex(mutex);
 
 
 	// Compute the bounding cube
@@ -209,14 +208,13 @@ CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,CXform *
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::~CBrickMap() {
 	int			i;
 	CBrickNode	*cNode;
 	CBrickMap	*cMap,*pMap;
 
 	// Flush the memory
-	brickMapFlush(TRUE);
+	flushBrickMap(TRUE);
 
 	// Remove us from the list of bricks in memory
 	for (pMap=NULL,cMap=brickMaps;cMap!=NULL;pMap=cMap,cMap=cMap->nextMap) {
@@ -238,6 +236,8 @@ CBrickMap::~CBrickMap() {
 
 	// Close the file if not already have done so
 	if (file != NULL)	fclose(file);
+
+	osDeleteMutex(mutex);
 }
 
 
@@ -346,7 +346,6 @@ CBrickMap::~CBrickMap() {
 // Description			:	Add a point into the structure
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP) {
 	dP	*=	dPscale;
 
@@ -358,12 +357,15 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	if (depth > maxDepth)	depth	=	maxDepth;
 
 	// First, transform the point to world coordinate system
-	mulmp(P,world->to,cP);
+	mulmp(P,to,cP);
 	assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
-	mulmn(N,world->from,cN);
+	mulmn(N,from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
 	
+	// Lock the structure
+	osLock(mutex);
+
 	// Iterate over the bricks we want
 	forEachBrick(depth)
 		int		cDepth,cx,cy,cz;
@@ -417,6 +419,9 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 			}
 		}
 	}
+
+	// Release the structure
+	osUnlock(mutex);
 }
 
 
@@ -427,7 +432,6 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 // Description			:	Lookup data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	dP	*=	dPscale;
 
@@ -440,16 +444,19 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	int		i;
 
 	// First, transform the point to world coordinate system
-	mulmp(P,world->to,cP);
+	mulmp(P,to,cP);
 	assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
-	mulmn(N,world->from,cN);
+	mulmn(N,from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
-
-	stats.numBrickmapLookups	+=	2;
 	
+	// Perform the lookup
+	osLock(mutex);
+	stats.numBrickmapLookups	+=	2;
 	lookup(P,N,dP,data0,depth);
 	lookup(P,N,dP,data1,depth+1);
+	osUnlock(mutex);
+
 	for (i=0;i<dataSize;i++)	data[i]	=	data0[i]*(1-t) + data1[i]*t;
 }
 
@@ -461,7 +468,6 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 // Description			:	Lookup a particular depth
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int depth) {
 	CBrick	*cBrick;
 	float	totalWeight	=	0;
@@ -515,7 +521,6 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 // Description			:	Finalize the creation of the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::finalize() {
 	int			*stack		=	(int *) alloca(maxDepth*8*5*sizeof(int));
 	int			*stackBase	=	stack;
@@ -581,7 +586,7 @@ void				CBrickMap::finalize() {
 	}
 	
 	// Flush all the bricks to disk
-	brickMapFlush(TRUE);
+	flushBrickMap(TRUE);
 
 	// Save the current file position. This is the file index
 	fseek(file,0,SEEK_END);
@@ -636,12 +641,11 @@ void				CBrickMap::finalize() {
 // Description			:	Create a new brick
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 	CBrick	*cBrick;
 
 	// If we're using too much memory, swap some bricks out
-	if (currentMemory > maxMemory)	brickMapFlush(FALSE);
+	if (currentMemory > maxMemory)	flushBrickMap(FALSE);
 
 	// Allocate the brick
 	cBrick			=	(CBrick *) new char[sizeof(CBrick) + (sizeof(CVoxel) + dataSize*sizeof(float))*(BRICK_SIZE*BRICK_SIZE*BRICK_SIZE)];
@@ -676,7 +680,6 @@ CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 // Description			:	Load a brick
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {	
 	CBrick	*cBrick	=	newBrick(FALSE);
 	CVoxel	*cVoxel,*tVoxel;
@@ -762,7 +765,6 @@ CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {
 // Description			:	This function is called to re-claim some of the memory from the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	int			numNodes;
 	CBrickNode	*cNode;
@@ -771,13 +773,15 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	int			i,j,k,vCnt,nullCnt,numCulled;
 
 	FILE		*outfile 	=	ropen(outFileName,"wb+",fileBrickMap);
-		
 	
-	memBegin();
+	// Use our own temp memory so we don't get mutex-reentrancy locking issues
+	CMemPage	*tempMemory = NULL;
+	memoryInit(tempMemory);
+	memBegin(tempMemory);
 	
-	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float));
-	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*));
-	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float));
+	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float),tempMemory);
+	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*),tempMemory);
+	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float),tempMemory);
 	float 		*dataVar	=	dataMean + dataSize;
 	
 	// Initialize the hash
@@ -875,7 +879,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			}
 			
 			
-			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode));
+			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode),tempMemory);
 			
 			// Initialize temporary node data over
 			*tNode				=	*cNode;
@@ -982,7 +986,8 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	
 	fclose(outfile);
 
-	memEnd();
+	memEnd(tempMemory);
+	memoryTini(tempMemory);
 }
 
 
@@ -994,7 +999,6 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 // Description			:	Draw the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2006
 void				CBrickMap::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
@@ -1121,11 +1125,10 @@ void				CBrickMap::draw() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickQuickSort
-// Description			:	Quick sort the bricks wrt. to the referenceNumbers
+// Method				:	keyDown
+// Description			:	handle interface keys
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 int			CBrickMap::keyDown(int key) {
 	if ((key == 'M') || (key == 'm')) {
 		detailLevel++;
@@ -1146,7 +1149,6 @@ int			CBrickMap::keyDown(int key) {
 // Description			:	Bound the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2006
 void				CBrickMap::bound(float *bmin,float *bmax) {
 	movvv(bmin,this->bmin);
 	movvv(bmax,this->bmax);
@@ -1155,12 +1157,11 @@ void				CBrickMap::bound(float *bmin,float *bmax) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickMapInit
+// Method				:	initBrickMap
 // Description			:	Initialize the brickmaps at the beginning of a frame
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
-void				CBrickMap::brickMapInit(int m) {
+void				CBrickMap::initBrickMap(int m) {
 	// This function is guaranteed to be called once and only once for each frame
 	brickMaps		=	NULL;
 	referenceNumber	=	0;
@@ -1173,19 +1174,16 @@ void				CBrickMap::brickMapInit(int m) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickMapFlush
+// Method				:	flushBrickMap
 // Description			:	This function is called to re-claim some of the memory from the brickmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
-void				CBrickMap::brickMapFlush(int allBricks) {
+void				CBrickMap::flushBrickMap(int allBricks) {
 	int			numNodes;
 	CBrickNode	**nodes;
 	CBrickNode	*cNode;
 	CBrickMap	*cMap;
 	int			i;
-
-	memBegin();
 
 	// Collect the loaded bricks into an array
 	numNodes	=	0;
@@ -1196,7 +1194,8 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 			}
 		}
 	}
-	nodes		=	(CBrickNode **) ralloc(numNodes*2*sizeof(CBrickNode *));
+
+	nodes		=	new CBrickNode*[numNodes*2];
 	numNodes	=	0;
 	for (cMap=brickMaps;cMap!=NULL;cMap=cMap->nextMap) {
 		for (i=0;i<BRICK_HASHSIZE;i++) {
@@ -1295,18 +1294,17 @@ void				CBrickMap::brickMapFlush(int allBricks) {
 		}
 	}
 
-	memEnd();
+	delete [] nodes;
 }
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Method				:	brickMapShutdown
+// Method				:	shutdownBrickMap
 // Description			:	Clear the memory used by the brickmaps
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
-void				CBrickMap::brickMapShutdown() {
+void				CBrickMap::shutdownBrickMap() {
 	// This function is guaranteed to be called once and only once for each frame
 	assert(currentMemory == 0);
 }
@@ -1318,7 +1316,6 @@ void				CBrickMap::brickMapShutdown() {
 // Description			:	Quick sort the bricks wrt. to the referenceNumbers
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/15/2006
 void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 	int			i,last;
 	CBrickNode	*cNode;
@@ -1371,7 +1368,6 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 // Description			:	This function creates the 3D baed texture from point cloud representation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/16/2006
 void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
 	char	tempName[OS_MAX_PATH_LENGTH];
 	char	fileName[OS_MAX_PATH_LENGTH];
@@ -1388,18 +1384,18 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	// Use a large memory limit when creating brickmaps
 	// Note: needed as RiMakeXYZ can only be called outside a frame, and then
 	// the shading context is gone
-	CBrickMap::brickMapInit(100000000);
+	CBrickMap::initBrickMap(100000000);
 	
-	if (currentRenderer->locateFile(fileName,src,searchPath)) {
+	if (CRenderer::locateFile(fileName,src,searchPath)) {
 		FILE *in;
 		if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
+
 			// create backing store in a temp file
 			// FIXME: make osTempname not always prefix dir
 			sprintf(tempName,"%s.tmp",dest);
-		
-			CXform		*dummyXform	=	new CXform;	dummyXform->attach();
-			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,dummyXform,in);
-			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,dummyXform,cPtCloud->channels,cPtCloud->numChannels);
+
+			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identityMatrix,identityMatrix,in);
+			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->channels,cPtCloud->numChannels);
 			
 			float **dataPointers =	cPtCloud->dataPointers->array;
 			for (i=1;i<cPtCloud->numPhotons;i++) {
@@ -1415,7 +1411,6 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			
 			delete cBMap;
 			delete cPtCloud;
-			dummyXform->detach();
 			// clean up
 			osDeleteFile(tempName);
 		} else {
@@ -1425,7 +1420,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 		error(CODE_BADTOKEN,"Point cloud file \"%s\" not found\n");
 	}
 	
-	CBrickMap::brickMapShutdown();
+	CBrickMap::shutdownBrickMap();
 }
 
 

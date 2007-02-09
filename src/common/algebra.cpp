@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -30,7 +30,11 @@
 ////////////////////////////////////////////////////////////////////////
 #include "algebra.h"
 
-
+// The identity matrix
+const matrix	identityMatrix	=	{	1,	0,	0,	0,
+										0,	1,	0,	0,
+										0,	0,	1,	0,
+										0,	0,	0,	1	};
 
 ///////////////////////////////////////////////////////////////////////
 // 2 by 2 determinant computation
@@ -63,18 +67,3 @@ static	inline double det3x3(const double  a1,const double  a2,const double  a3,c
 #undef SCALAR_TYPE
 #undef VECTOR_TYPE
 #undef MATRIX_TYPE
-
-
-
-
-
-/////////////////////////////////////////////////////////////
-// Initialize the math
-void	mathInit() {
-}
-
-/////////////////////////////////////////////////////////////
-// Shutdown the math
-void	mathShutdown() {
-}
-

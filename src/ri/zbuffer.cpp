@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -48,18 +48,17 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
-CZbuffer::CZbuffer(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,HIDER_RGBAZ_ONLY) , COcclusionCuller() {
+CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 	int	i;
 
-	totalWidth		=	bucketWidth*pixelXsamples + 2*xSampleOffset;
-	totalHeight		=	bucketHeight*pixelYsamples + 2*ySampleOffset;
+	totalWidth				=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	totalHeight				=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	
 
-	// Allocate the framebuffer
-	fb					=	new float*[totalHeight];
+	// Allocate the framebuffer (globalMemory is checkpointed)
+	fb		=	(float **) ralloc(totalHeight*sizeof(float *),CRenderer::globalMemory);
 	for (i=0;i<totalHeight;i++) {
-		fb[i]			=	new float[totalWidth*SAMPLES_PER_PIXEL];
+		fb[i]	=	(float *) ralloc(totalWidth*SAMPLES_PER_PIXEL*sizeof(float),CRenderer::globalMemory);
 	}
 
 	// Initialize the occlusion culler
@@ -73,25 +72,27 @@ CZbuffer::CZbuffer(COptions *o,CXform *x,SOCKET s) : CReyes(o,x,s,HIDER_RGBAZ_ON
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/31/2002
 CZbuffer::~CZbuffer() {
-	int	i;
-
-	for (i=0;i<totalHeight;i++) {
-		delete [] fb[i];
-	}
-
-	delete [] fb;
+	
+	// Framebuffer is allocated from the frame memory
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class                :   CZBuffer
+// Method               :   preDisplaySetup
+// Description          :   allow the hider to affect display setup
+// Return Value         :   -
+// Comments             :
+void CZbuffer::preDisplaySetup() {
+	CRenderer::hiderFlags	|=	HIDER_RGBAZ_ONLY;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
 // Method				:	rasterBegin
 // Description			:	Init the framebuffer
 // Return Value			:	-
-// Comments				:
-// Date last edited		:	7/31/2002
+// Comments				:	Thread safe
 void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	int	i,j;
 
@@ -100,17 +101,16 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	height				=	h;
 	left				=	l;
 	top					=	t;
-	sampleWidth			=	width*pixelXsamples + 2*xSampleOffset;
-	sampleHeight		=	height*pixelYsamples + 2*ySampleOffset;
+	sampleWidth			=	width*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	sampleHeight		=	height*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	right				=	left + sampleWidth;
 	bottom				=	top + sampleHeight;
 
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);
 
-
-	assert(width <= bucketWidth);
-	assert(height <= bucketHeight);
+	assert(width <= CRenderer::bucketWidth);
+	assert(height <= CRenderer::bucketHeight);
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);
 
@@ -122,15 +122,15 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 		for (j=0;j<sampleWidth;j++) {
 			COcclusionNode	*cNode;
 
-			cLine[0]	=	clipMax;			// z
-			cLine[1]	=	0;					// r
-			cLine[2]	=	0;					// g
-			cLine[3]	=	0;					// b
+			cLine[0]	=	CRenderer::clipMax;	// z
+			cLine[1]	=	0;							// r
+			cLine[2]	=	0;							// g
+			cLine[3]	=	0;							// b
 			cLine		+=	SAMPLES_PER_PIXEL;
 
 			// Set the occlusion cache entry
 			cNode		=	getNode(j,i);
-			cNode->zmax	=	clipMax;
+			cNode->zmax	=	CRenderer::clipMax;
 		}
 	}
 	resetHierarchy();
@@ -141,8 +141,7 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 // Method				:	rasterDrawTriangles
 // Description			:	Draw rectangles
 // Return Value			:	-
-// Comments				:
-// Date last edited		:	7/31/2002
+// Comments				:	Thread safe
 void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 
 	// Draw the suckers one by one
@@ -159,23 +158,19 @@ void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 // Method				:	rasterEnd
 // Description			:	Retrieve the image
 // Return Value			:	-
-// Comments				:
-// Date last edited		:	7/31/2002
+// Comments				:	Thread safe
 void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			sx,sy;
 	int			i,y;
 	const int	xres				=	width;
 	const int	yres				=	height;
-	const int	filterWidth			=	pixelXsamples + 2*xSampleOffset;
-	const int	filterHeight		=	pixelYsamples + 2*ySampleOffset;
-	const float	invPixelXsamples	=	1 / (float) pixelXsamples;
-	const float	invPixelYsamples	=	1 / (float) pixelYsamples;
+	const int	filterWidth			=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int	filterHeight		=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
+	const float	invPixelXsamples	=	1 / (float) CRenderer::pixelXsamples;
+	const float	invPixelYsamples	=	1 / (float) CRenderer::pixelYsamples;
 	float		*tmp;
-	float		*pixelFilterWeights;
 
-	memBegin();
-
-	assert(numSamples == 5);
+	assert(CRenderer::numSamples == 5);
 
 	for (tmp=fb2,i=xres*yres;i>0;i--) {
 		*tmp++	=	0;
@@ -185,61 +180,26 @@ void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 		*tmp++	=	0;
 	}
 
-	// Allocate the memory for the pixel filter
-	pixelFilterWeights	=	(float *) alloca(filterHeight*filterHeight*sizeof(float));
-
-	// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
-	{
-		float		totalWeight			=	0;
-		double		invWeight;
-		const float	halfFilterWidth		=	filterWidth / 2.0f;
-		const float	halfFilterHeight	=	filterHeight / 2.0f;
-
-
-		for (sy=0;sy<filterHeight;sy++) {
-			for (sx=0;sx<filterWidth;sx++) {
-				const float	cx								=	(sx - halfFilterWidth + 0.5f)*invPixelXsamples;
-				const float	cy								=	(sy - halfFilterHeight + 0.5f)*invPixelYsamples;
-				float		filterResponse					=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
-
-				// Account for the partial area out of the bounds
-				//if (fabs(cx) > marginX)	filterResponse		*=	marginXcoverage;
-				//if (fabs(cy) > marginY)	filterResponse		*=	marginYcoverage;
-
-				// Record
-				pixelFilterWeights[sy*filterWidth + sx]		=	filterResponse;
-				totalWeight									+=	filterResponse;
-			}
-		}
-
-		// Normalize the filter kernel
-		invWeight	=	1 / (double) totalWeight;
-		for (i=0;i<filterWidth*filterHeight;i++) {
-			pixelFilterWeights[i]							=	(float) (pixelFilterWeights[i] * invWeight);
-		}
-	}
 
 	for (y=0;y<yres;y++) {
 		for (sy=0;sy<filterHeight;sy++) {
 			for (sx=0;sx<filterWidth;sx++) {
-				const float	*sampleLine		=	&fb[y*pixelYsamples+sy][sx*SAMPLES_PER_PIXEL];
+				const float	*sampleLine		=	&fb[y*CRenderer::pixelYsamples+sy][sx*SAMPLES_PER_PIXEL];
 				float		*pixelLine		=	&fb2[y*xres*5];
-				const float	filterResponse	=	pixelFilterWeights[sy*filterWidth + sx];
+				const float	filterResponse	=	CRenderer::pixelFilterKernel[sy*filterWidth + sx];
 
 				for (i=0;i<xres;i++) {
 					pixelLine[0]			+=	filterResponse*sampleLine[1];
 					pixelLine[1]			+=	filterResponse*sampleLine[2];
 					pixelLine[2]			+=	filterResponse*sampleLine[3];
-					pixelLine[3]			+=  filterResponse*((sampleLine[0] != clipMax) ? 1.0f : 0.0f);
+					pixelLine[3]			+=  filterResponse*((sampleLine[0] != CRenderer::clipMax) ? 1.0f : 0.0f);
 					pixelLine[4]			+=  filterResponse*sampleLine[0];
 					pixelLine				+=	5;
-					sampleLine				+=	pixelXsamples*SAMPLES_PER_PIXEL;
+					sampleLine				+=	CRenderer::pixelXsamples*SAMPLES_PER_PIXEL;
 				}
 			}
 		}
 	}
-
-	memEnd();
 }
 
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,19 +33,19 @@
 
 #include "common/global.h"
 #include "memory.h"
-#include "output.h"
-#include "renderer.h"
 #include "shader.h"
 #include "slcode.h"
 #include "shading.h"
 #include "noise.h"
-#include "stats.h"
 #include "photonMap.h"
 #include "texture3d.h"
 #include "irradiance.h"
 #include "bundles.h"
 #include "error.h"
-#include "executeMisc.h"
+#include "renderer.h"
+#include "surface.h"
+#include "texture.h"
+#include "defaults.h"
 
 // This function is defined in shader.cpp for debugging purposes
 void							debugFunction(float *);
@@ -57,20 +57,20 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 #define	saveLighting(__L)																	\
 	if (numActive != 0) {																	\
 		CShadedLight	*cLight		= 	NULL;												\
-		int				numGlobals	=	cInstance->parent->numGlobals;						\
+		const int		numGlobals	=	cInstance->parent->numGlobals;						\
 		if (*freeLights != NULL) {															\
 			cLight					= *freeLights;											\
 			*freeLights				= (*freeLights)->next;									\
-			float**		savedState	= (float**) ralloc((2+numGlobals)*sizeof(float*));		\
+			float**		savedState	= (float**) ralloc((2+numGlobals)*sizeof(float*),threadMemory);		\
 			savedState[0]			= cLight->savedState[0];								\
 			savedState[1]			= cLight->savedState[1];								\
 			cLight->savedState		= savedState;											\
 		} else {																			\
-			cLight					= (CShadedLight*) ralloc(sizeof(CShadedLight));			\
-			cLight->lightTags		= (int*)	ralloc(sizeof(int)*numVertices);			\
-			cLight->savedState		= (float**) ralloc((2+numGlobals)*sizeof(float*));		\
-			cLight->savedState[0]	= (float*)	ralloc(3*sizeof(float)*numVertices);		\
-			cLight->savedState[1]	= (float*)	ralloc(3*sizeof(float)*numVertices);		\
+			cLight					= (CShadedLight*) ralloc(sizeof(CShadedLight),threadMemory);		\
+			cLight->lightTags		= (int*)	ralloc(sizeof(int)*numVertices,threadMemory);			\
+			cLight->savedState		= (float**) ralloc((2+numGlobals)*sizeof(float*),threadMemory);		\
+			cLight->savedState[0]	= (float*)	ralloc(3*sizeof(float)*numVertices,threadMemory);		\
+			cLight->savedState[1]	= (float*)	ralloc(3*sizeof(float)*numVertices,threadMemory);		\
 			cLight->instance		= cInstance;											\
 		}																					\
 		cLight->next			= *lights;													\
@@ -80,27 +80,26 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 		__L						= cLight->savedState[0];									\
 		/*save extra variables if needed*/													\
 		if (numGlobals != 0) {																\
-			CShader						*cShader 	=	cInstance->parent;					\
 			int							globNum		=	0;									\
 			CVariable					*cVariable;											\
-			for (cVariable=cShader->parameters;cVariable!=NULL;cVariable=cVariable->next) {	\
+			for (cVariable=cInstance->parameters;cVariable!=NULL;cVariable=cVariable->next) {	\
 				if (cVariable->storage == STORAGE_GLOBAL) {									\
 					/* globals come from the global varyings */								\
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {					\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats);						\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats,threadMemory);			\
 						memcpy(cLight->savedState[2+globNum],varying[cVariable->entry],sizeof(float)*cVariable->numFloats);				\
 					} else {																											\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices);			\
-						memcpy(cLight->savedState[2+globNum],varying[cVariable->entry],sizeof(float)*cVariable->numFloats*numVertices);	\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices,threadMemory);	\
+						memcpy(cLight->savedState[2+globNum],varying[cVariable->entry],sizeof(float)*cVariable->numFloats*numVertices);		\
 					}																		\
 					globNum++;																\
 				} else if (cVariable->storage == STORAGE_MUTABLEPARAMETER) {				\
 					/* mutable parameters come from the shader varyings */					\
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {										\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats);											\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats,threadMemory);								\
 						memcpy(cLight->savedState[2+globNum],stuff[SL_VARYING_OPERAND][cVariable->entry],sizeof(float)*cVariable->numFloats);				\
 					} else {																																\
-						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices);								\
+						cLight->savedState[2+globNum]  =	(float*) ralloc(sizeof(float)*cVariable->numFloats*numVertices,threadMemory);					\
 						memcpy(cLight->savedState[2+globNum],stuff[SL_VARYING_OPERAND][cVariable->entry],sizeof(float)*cVariable->numFloats*numVertices);	\
 					}																		\
 					globNum++;																\
@@ -116,8 +115,8 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 }
 
 #define enterLightingConditional() {									\
-	int tmpTag;															\
-	int *lightTags	=	(*currentLight)->lightTags;						\
+	int			tmpTag;													\
+	const int	*lightTags	=	(*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
 	for (i=numVertices;i>0;i--,tags++,lightTags++) {					\
 		tmpTag = (*tags == 0);											\
@@ -131,8 +130,8 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 }
 
 #define exitLightingConditional() {										\
-	int tmpTag;															\
-	int *lightTags	= (*currentLight)->lightTags;						\
+	int			tmpTag;													\
+	const int	*lightTags	= (*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
 	for (i=numVertices;i>0;i--,tags++,lightTags++) {					\
 		tmpTag = *tags;													\
@@ -146,7 +145,7 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 }
 
 #define enterFastLightingConditional() {								\
-	int *lightTags	=	(*currentLight)->lightTags;						\
+	const int *lightTags	=	(*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
 	for (i=numVertices;i>0;i--) {										\
 		(*tags++) += (*lightTags++);									\
@@ -155,7 +154,7 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 }
 
 #define exitFastLightingConditional() {									\
-	int *lightTags	= (*currentLight)->lightTags;						\
+	const int *lightTags	= (*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
 	for (i=numVertices;i>0;i--) {										\
 		(*tags++) -= (*lightTags++);									\
@@ -176,7 +175,6 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 // Description			:	Execute a shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **locals) {
 // At this point, the shader sends us the arrays for parameters/constants/variables/uniforms for the shader
 	
@@ -185,6 +183,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 
 #define		scripterror(mes)				{																	\
+												CRenderer::offendingObject	=	currentShadingState->currentObject;	\
 												error(CODE_SCRIPT,"\"%s\", (nullified)\n",mes);					\
 												cInstance->parent->codeEntryPoint	=	-1;						\
 												cInstance->parent->initEntryPoint	=	-1;						\
@@ -192,16 +191,16 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											}
 //	Allocate temporary memory for the string and save it
 #define		savestring(r,n)					{																	\
-												int		strLen	=	strlen(n) + 1;								\
-												int		strSize	=	(strLen & ~3) + 4;							\
-												char	*strmem	=	(char *) ralloc(strSize);					\
+												const int	strLen	=	strlen(n) + 1;							\
+												const int	strSize	=	(strLen & ~3) + 4;						\
+												char		*strmem	=	(char *) ralloc(strSize,threadMemory);	\
 												strcpy(strmem,n);												\
 												r				=	strmem;										\
 											}
 
 //	Begin a conditional block execution
 #define		beginConditional()				if (conditionals == NULL) {											\
-												conditionals		=	(CConditional *) frameMemory->alloc(sizeof(CConditional));						\
+												conditionals		=	new CConditional;						\
 												conditionals->next	=	NULL;									\
 												conditionals->prev	=	NULL;									\
 											}																	\
@@ -233,21 +232,24 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 #define		parameterlist					cInstance->parameterLists[code[1].arguments.plNumber]
 
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
-												cInstance->dirty	=	TRUE;										\
-												if (dirtyInstances == NULL)											\
-													dirtyInstances	=	new CArray<CProgrammableShaderInstance *>;	\
-												cInstance->attach();												\
-												dirtyInstances->push(cInstance);									\
+												osLock(CRenderer::dirtyShaderMutex);								\
+												cInstance->dirty			=	TRUE;								\
+												cInstance->nextDirty		=	CRenderer::dirtyInstances;			\
+												cInstance->prevDirty		=	NULL;								\
+												if (CRenderer::dirtyInstances != NULL)								\
+													CRenderer::dirtyInstances->prevDirty	=	cInstance;			\
+												CRenderer::dirtyInstances	=	cInstance;							\
+												osUnlock(CRenderer::dirtyShaderMutex);								\
 											}
 
 //	Retrieve an integer operand (label references are integer)
-#define		argument(i)						code[i+2].integer;
+#define		argument(i)						code[i+2].integer
 
 //	Retrieve an integer operand (label references are integer)
 #define		argumentCode(i)					code[i+2]
 
 //	Retrieve the number of arguments
-#define		argumentcount(n)				n = code[1].arguments.numArguments;
+#define		argumentcount(n)				n = code[1].arguments.numArguments
 
 //	Control transfer
 #define		jmp(n)							{																\
@@ -271,18 +273,17 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												currentShadingState->ambientLightsExecuted	=	TRUE;		\
 																											\
 												if (*alights == NULL) {										\
-													*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight));							\
-													(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight));							\
-													(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices);					\
+													*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight),threadMemory);				\
+													(*alights)->savedState		=		(float**)		ralloc(2*sizeof(CShadedLight),threadMemory);			\
+													(*alights)->savedState[1]	=		(float*)		ralloc(3*sizeof(float)*numVertices,threadMemory);		\
 													(*alights)->savedState[0]	=		NULL;			/* ambient lights do not use tags or save L */			\
 													(*alights)->lightTags		=		NULL;				\
 													(*alights)->instance		=		NULL;				\
 													(*alights)->next			=		NULL;				\
 																											\
 													Clsave	= (*alights)->savedState[1];					\
-													for (i=0;i<numVertices;i++) {							\
-														initv(Clsave,0,0,0);								\
-														Clsave	+=	3;										\
+													for (i=numVertices;i>0;i--,Clsave+=3) {					\
+														initv(Clsave,0);									\
 													}														\
 												}															\
 																											\
@@ -292,12 +293,11 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													for (cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {	\
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
-															T64		shaderVarCheckpoint[3];											\
-															memSave(shaderVarCheckpoint,shaderStateMemory);							\
-															currentShadingState->currentLightInstance	=	light;					\
+															memBegin(shaderStateMemory);											\
+															currentShadingState->currentLightInstance			=	light;			\
 															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(shaderStateMemory,varying,numVertices);	\
 															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);										\
-															memRestore(shaderVarCheckpoint,shaderStateMemory);						\
+															memEnd(shaderStateMemory);						\
 														}													\
 													}														\
 												}															\
@@ -356,12 +356,11 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 														CProgrammableShaderInstance	*light	=	cLight->light;							\
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
-															T64		shaderVarCheckpoint[3];												\
-															memSave(shaderVarCheckpoint,shaderStateMemory);								\
-															currentShadingState->currentLightInstance	=	light;						\
-															currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = light->prepare(shaderStateMemory,varying,numVertices);	\
-															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);									\
-															memRestore(shaderVarCheckpoint,shaderStateMemory);							\
+															memBegin(shaderStateMemory);												\
+															currentShadingState->currentLightInstance			=	light;				\
+															currentShadingState->locals[ACCESSOR_LIGHTSOURCE]	=	light->prepare(shaderStateMemory,varying,numVertices);	\
+															light->illuminate(this,currentShadingState->locals[ACCESSOR_LIGHTSOURCE]);										\
+															memEnd(shaderStateMemory);						\
 														}													\
 													}														\
 												}															\
@@ -375,16 +374,16 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											int	invertCatMatch = FALSE;										\
 											if (*(lC->string) != '\0') {									\
 												if (*(lC->string) == '-') {									\
-													saveCat = -(runCat = currentRenderer->getGlobalID(lC->string+1));	\
+													saveCat = -(runCat = CRenderer::getGlobalID(lC->string+1));	\
 													invertCatMatch = TRUE;									\
 												} else {													\
-													saveCat = runCat = currentRenderer->getGlobalID(lC->string);		\
+													saveCat = runCat = CRenderer::getGlobalID(lC->string);	\
 												}															\
 											}
 
 #define		CATEGORYLIGHT_CHECK				if (light->categories != NULL) {								\
-												int	validLight = FALSE;										\
-												int *cCat;													\
+												int			validLight = FALSE;								\
+												const int	*cCat;											\
 												for (cCat=light->categories;(*cCat!=0);cCat++) {			\
 													if (*cCat == runCat) {									\
 														validLight = TRUE;									\
@@ -417,7 +416,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	//	The	shading variables and junk
 	TCode						**stuff[3];			// Where we keep pointers to the variables
-	ESlCode						opcode;				// :)
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;			// The number of active points being shaded
 	int							numPassive;			// The number of passive points being not shaded (numPassive+numActive = numVertices)
@@ -438,8 +436,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 	assert((currentShadingState->numActive+currentShadingState->numPassive) == currentShadingState->numVertices);
 
 	currentShadingState->currentShaderInstance	=	cInstance;
-	code								=	currentShader->codeArea + currentShader->codeEntryPoint;
-	tagStart							=	currentShadingState->tags;
+	code										=	currentShader->codeArea + currentShader->codeEntryPoint;
+	tagStart									=	currentShadingState->tags;
 
 	// Save this stuff for fast access
 	numVertices							=	currentShadingState->numVertices;
@@ -460,7 +458,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	// Execute
 execStart:
-	opcode	=	(ESlCode)	code[0].integer;	// Get the opcode
+	const ESlCode	opcode	=	(ESlCode)	code[0].integer;	// Get the opcode
 
 	tags	=	tagStart;						// Set the tags to the start
 
@@ -743,7 +741,7 @@ execEnd:
 			// Save the ambient junk
 			Clsave	= (*alights)->savedState[1];
 			tags	= tagStart;
-			for (int i=0;i<numVertices;i++,Cl+=3,Ol+=3,Clsave+=3) {
+			for (int i=numVertices;i>0;i--,Cl+=3,Ol+=3,Clsave+=3) {
 				if (*tags==0) {
 					addvv(Clsave,Cl);
 				}

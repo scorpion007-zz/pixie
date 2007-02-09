@@ -8,7 +8,7 @@ libsdr_la_LDFLAGS = -export-dynamic -version-info $(LIBSDR_CURRENT_VERSION):$(LI
 
 libsdr_la_SOURCES = sdr.cpp
 
-libsdr_la_LIBADD = ../common/libcommon.la
+libsdr_la_LIBADD = ../common/libpixiecommon.la
 
 INCLUDES = -I..
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -29,6 +29,11 @@
 //							that sends the image into a file
 //
 ////////////////////////////////////////////////////////////////////////
+#include "common/global.h"
+#include "common/algebra.h"
+#include "common/os.h"
+#include "ri/dsply.h"							// The display driver interface
+
 #include <stdlib.h>								// Ensure we have NULL defined before libtiff
 #include <tiffio.h>								// Libtiff is required
 #include <stdio.h>
@@ -36,33 +41,26 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/global.h"
-#include "common/algebra.h"
-#include "ri/dsply.h"							// The display driver interface
-
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFramebuffer
+// Class				:	CRendererbuffer
 // Description			:	Holds the framebuffer
 // Comments				:
-// Date last edited		:	5/9/2002
 class	CFileFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	CRendererbuffer
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	5/9/2002
 				CFileFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 					int			i;
 					float		*tmp;
 					float		worldToNDC[16];
 					float		worldToCamera[16];
 					char		*software;
-					char		desc[1024];
 					const char	*compression	=	NULL;
 
 					// Open the image file
@@ -138,12 +136,6 @@ public:
 						sampleformat	=	SAMPLEFORMAT_UINT;
 					}
 
-					sprintf(desc,"WorldToNDC=[%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]"
-						,worldToNDC[0],worldToNDC[1],worldToNDC[2],worldToNDC[3]
-						,worldToNDC[4],worldToNDC[5],worldToNDC[6],worldToNDC[7]
-						,worldToNDC[8],worldToNDC[9],worldToNDC[10],worldToNDC[11]
-						,worldToNDC[12],worldToNDC[13],worldToNDC[14],worldToNDC[15]);
-
 					// Set the tiff fields
 					TIFFSetField(image, TIFFTAG_IMAGEWIDTH,			(unsigned long) width);
 					TIFFSetField(image, TIFFTAG_IMAGELENGTH,		(unsigned long) height);
@@ -182,7 +174,6 @@ public:
 						TIFFSetField(image, TIFFTAG_EXTRASAMPLES, 1, &sampleinfo);
 					}
 
-					TIFFSetField(image, TIFFTAG_IMAGEDESCRIPTION,		desc);
 					if (software != NULL)	TIFFSetField(image, TIFFTAG_SOFTWARE,		software);
 
 					lastSavedLine	=	0;
@@ -197,17 +188,20 @@ public:
 					this->width			=	width;
 					this->height		=	height;
 					this->numSamples	=	numSamples;
+
+					osCreateMutex(fileMutex);
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	~CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	~CRendererbuffer
 				// Description			:	Dtor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	11/28/2001
 				~CFileFramebuffer() {
 					int	i;
+
+					osDeleteMutex(fileMutex);
 
 					if (image != NULL)	TIFFClose(image);
 					else	return;
@@ -222,12 +216,11 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
+				// Class				:	CRendererbuffer
 				// Method				:	write
 				// Description			:	Swrite some data to the out file
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	11/28/2001
 	void		write(int x,int y,int w,int h,float *data) {
 					int				i,j;
 					int				check		=	FALSE;
@@ -253,6 +246,9 @@ public:
 							else if (data[i] > qmax)	data[i]	=	qmax;
 						}
 					}
+
+					// Lock the file
+					osLock(fileMutex);
 
 					// Record the data
 					for (i=0;i<h;i++) {
@@ -323,6 +319,9 @@ public:
 							}
 						}
 					}
+
+					// Release the file
+					osUnlock(fileMutex);
 				}
 
 	unsigned char	**scanlines;
@@ -332,6 +331,7 @@ public:
 	int				pixelSize;
 	int				numSamples;
 	int				lastSavedLine;
+	TMutex			fileMutex;
 
 	float			qmin,qmax,qone,qzero,qamp;
 	float			gamma,gain;
@@ -343,7 +343,6 @@ public:
 // Description			:	Begin receiving an image
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 	CFileFramebuffer	*fb	=	new CFileFramebuffer(name,width,height,numSamples,samples,findParameter);
 	
@@ -360,7 +359,6 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Description			:	Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
 	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
 	
@@ -376,7 +374,6 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Description			:	Finish receiving an image
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
 	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
 

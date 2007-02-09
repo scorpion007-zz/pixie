@@ -11,8 +11,9 @@ libri_la_SOURCES = 		attributes.cpp \
 				cache.cpp \
 				curves.cpp \
 				bsplinePatchgrid.cpp \
+				debug.cpp \
 				delayed.cpp \
-				depository.cpp \
+				displayChannel.cpp \
 				dlobject.cpp \
 				dso.cpp \
 				error.cpp \
@@ -20,10 +21,8 @@ libri_la_SOURCES = 		attributes.cpp \
 				executeMisc.cpp \
 				fileResource.cpp \
 				hcshader.cpp \
-				hierarchy.cpp \
 				implicitSurface.cpp \
 				init.cpp \
-				instance.cpp \
 				irradiance.cpp \
 				linsys.cpp \
 				memory.cpp \
@@ -31,7 +30,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				object.cpp \
 				occlusion.cpp \
 				options.cpp \
-				output.cpp \
 				patches.cpp \
 				patchgrid.cpp \
 				photon.cpp \
@@ -41,11 +39,18 @@ libri_la_SOURCES = 		attributes.cpp \
 				pointCloud.cpp \
 				polygons.cpp \
 				quadrics.cpp \
-				radiance.cpp \
 				random.cpp \
 				raytracer.cpp \
 				remoteChannel.cpp \
 				renderer.cpp \
+				rendererClipping.cpp \
+				rendererContext.cpp \
+				rendererDeclerations.cpp \
+				rendererDisplay.cpp \
+				rendererFiles.cpp \
+				rendererJobs.cpp \
+				rendererMutexes.cpp \
+				rendererNetwork.cpp \
 				reyes.cpp \
 				ri.cpp \
 				rib.cpp \
@@ -60,7 +65,6 @@ libri_la_SOURCES = 		attributes.cpp \
 				subdivision.cpp \
 				subdivisionCreator.cpp \
 				surface.cpp \
-				tesselate.cpp \
 				texmake.cpp \
 				texture.cpp \
 				texture3d.cpp \
@@ -69,7 +73,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				xform.cpp	\
 				zbuffer.cpp
 
-libri_la_LIBADD = ../common/libcommon.la @TIFF_LIBS@ @ZLIB_LIBS@
+libri_la_LIBADD = ../common/libpixiecommon.la @TIFF_LIBS@ @ZLIB_LIBS@
 
 INCLUDES = -I..
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,7 +32,6 @@
 #include	<math.h>
 #include	<string.h>
 
-#include	"renderer.h"
 #include	"shading.h"
 #include	"object.h"
 #include	"raytracer.h"
@@ -45,19 +44,12 @@
 #include	"memory.h"
 #include	"random.h"
 #include	"points.h"
-#include	"radiance.h"
 #include	"error.h"
 #include	"remoteChannel.h"
+#include	"renderer.h"
 
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
-
-// In case we need identity matrix
-static		matrix	identity	=	{	1,	0,	0,	0,
-										0,	1,	0,	0,
-										0,	0,	1,	0,
-										0,	0,	0,	1	};
-
 
 // Options that are defined and responded
 static	char	*optionsFormat				=	"Format";
@@ -106,8 +98,7 @@ static	char	*rendererinfoVersionStr		=	"versionstring";
 // Function				:	complete
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
-// Comments				:
-// Date last edited		:	4/18/2002
+// Comments				:	Thread safe
 inline void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes1,const CAttributes *attributes2) {
 	int		i;
 
@@ -241,14 +232,31 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 			time	++;
 		}
 	}
+	
+	// Finally, range-correct time
+	// Note: It is important this is last, as before this we assume a 0-1
+	// range for time.  After this we must never use time assuing 0-1 range
+	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
+	
+		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
+		
+		float		*time			=	varying[VARIABLE_TIME];
+		const float idtime			= 	CRenderer::invShutterTime;
+		const float t0				=	CRenderer::shutterOpen;
+		
+		for (i=num;i>0;i--) {
+			time[0] = (time[0]*idtime + t0);
+			time++;
+		}
+	}
+	
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	complete
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
-// Comments				:
-// Date last edited		:	4/18/2002
+// Comments				:	Thread safe
 inline	void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes) {
 	int		i;
 
@@ -348,6 +356,23 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 			dest	+=	3;
 		}
 	}
+	
+	// Finally, range-correct time
+	// Note: It is important this is last, as before this we assume a 0-1
+	// range for time.  After this we must never use time assuing 0-1 range
+	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
+		
+		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
+		
+		float		*time		=	varying[VARIABLE_TIME];
+		const float idtime		= 	CRenderer::invShutterTime;
+		const float t0			=	CRenderer::shutterOpen;
+		
+		for (i=num;i>0;i--) {
+			time[0] = (time[0]*idtime + t0);
+			time++;
+		}
+	}
 }
 
 
@@ -358,61 +383,43 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
-CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf) : COutput(o,x,s,hf) {
-
-	// Initialize the extend of the world
-	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
+CShadingContext::CShadingContext(int t) : thread(t) {
 	// Initialize the shading state
 	currentShadingState		=	NULL;
-
-	// This is the memory we allocate our junk from
-	frameMemory				=	new CMemStack(1 << 20);
 	
 	// Initialize the shader state memory stack
 	memoryInit(shaderStateMemory);
 
-	// This is the set of raytraced objects
-	raytraced				=	new CArray<CSurface *>;
+	// Initialize the thread memory stack
+	memoryInit(threadMemory);
 
-	// Init the loaded files
-	loadedFiles				=	new CTrie<CFileResource *>;
-	dirtyInstances			=	NULL;
+	// Init the bucket we're rendering
+	currentXBucket			=	0;
+	currentYBucket			=	0;
 
+	// Init the conditionals
 	conditionals			=	NULL;
 	currentRayDepth			=	0;
 	currentRayLabel			=	rayLabelPrimary;
 	freeStates				=	NULL;
 	inShadow				=	FALSE;
-	
-	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE			|
-								ATTRIBUTES_FLAGS_TRACE_VISIBLE			|
-								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 
-	if (hiderFlags & HIDER_NEEDS_RAYTRACING) {
-		raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-	}
+	// (globalMemory is checkpointed)
+	traceObjectHash			=	(TObjectHash *) ralloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE,CRenderer::globalMemory);
 
-	globalVariables			=	NULL;
-	numGlobalVariables		=	0;
-	maxGlobalVariables		=	0;
+	// Fill the object pointers with impossible data
+	int	i;
+	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
 
-	traceObjectHash			=	NULL;
+	// Init the random number generator
+	randomInit(5489*(thread+1));
 
-	hierarchy				=	NULL;
-	tracables				=	NULL;
-	triangles				=	NULL;
-
-	// Initialize remote channels
-	remoteChannels			=	new CArray<CRemoteChannel*>;
-	declaredRemoteChannels	=	new CTrie<CRemoteChannel*>;
-	
-	// Initialize the texturing
-	CTexture::textureInit(maxTextureSize);	// Make sure we convert the size to bytes (from KB)
-	CBrickMap::brickMapInit(maxBrickSize);
-	randomInit();
+	// Init the stats
+	numShade				=	0;
+	numSampled				=	0;
+	numShaded				=	0;
+	vertexMemory			=	0;
+	peakVertexMemory		=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -421,233 +428,49 @@ CShadingContext::CShadingContext(COptions *o,CXform *x,SOCKET s,unsigned int hf)
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 CShadingContext::~CShadingContext() {
-	CShadingState	*cState;
+
+	// Delete the conditionals we allocated
+	CConditional	*cConditional;
+	while((cConditional = conditionals) != NULL) {
+		conditionals	=	conditionals->next;
+		delete cConditional;
+	}
 	
-	// Print the stats (before we discard the memory)
-	stats.frameTime		=	osCPUTime()		-	stats.frameStartTime;
-
-	// Display the stats if applicable
-	if (endofframe > 0) {
-		stats.printStats(endofframe);
-	}
-
-	// Reset the dirty shader instances
-	if (dirtyInstances != NULL) {
-		int							numShaderInstances	=	dirtyInstances->numItems;
-		CProgrammableShaderInstance	**instances			=	dirtyInstances->array;
-
-		for (;numShaderInstances>0;numShaderInstances--) {
-			CProgrammableShaderInstance	*dirtyInstance	=	*instances++;
-			int							i;
-
-			for (i=0;i<dirtyInstance->parent->numPLs;i++) {
-				if (dirtyInstance->parameterLists[i] != NULL)	{
-					delete dirtyInstance->parameterLists[i];
-					dirtyInstance->parameterLists[i]	=	NULL;
-				}
-			}
-
-			// The shader is no longer dirty
-			dirtyInstance->dirty	=	FALSE;
-			dirtyInstance->detach();
-		}
-
-		delete dirtyInstances;
-	}
-
-	// Ditch the remote channels
-	for (int i=0;i<remoteChannels->numItems;i++) {
-		if (remoteChannels->array[i] != NULL) delete remoteChannels->array[i];
-	}
-	delete remoteChannels;
-	delete declaredRemoteChannels;
-
-	// Ditch the loaded files
-	assert(loadedFiles != NULL);
-	loadedFiles->destroy();
+	// Shutdown the random number generator
+	randomShutdown();
 
 	// Ditch the shading states that have been allocated
 	assert(currentShadingState != NULL);
 	freeState(currentShadingState);
+	CShadingState	*cState;
 	while ((cState=freeStates) != NULL) {
 		freeStates	=	cState->next;
 
 		freeState(cState);
 	}
 	currentShadingState	=	NULL;
-
-	// Ditch the raytraced objects
-	if (raytraced != NULL) {
-		int			i;
-		CSurface	**surfaces	=	raytraced->array;
-
-		for (i=raytraced->numItems;i>0;i--) {
-			(*surfaces++)->detach();
-		}
-
-		delete raytraced;
-	}
-
-	assert(tracables == NULL);
-
-	// Ditch the triangle list if it's still around
-	if (triangles != NULL) delete triangles;
-
-	// Ditch the global variables
-	if (globalVariables != NULL) {
-		delete [] globalVariables;
-	}
-
-	// Ditch the raytracing hierarchy
-	if (hierarchy != NULL) {
-		delete hierarchy;
-	}
 	
-	// Ditch the frame memory
-	delete frameMemory;
-	
+	// Ditch the thread memory stack
+	memoryTini(threadMemory);
+
 	// Ditch the shader state memory stack
 	memoryTini(shaderStateMemory);
 
+	// The frame assertions
+	assert(vertexMemory == 0);
 
-	// Reset the dirty attributes
-	if (dirtyAttributes != NULL) {
-		int			numAttributes	=	dirtyAttributes->numItems;
-		CAttributes	**dirty			=	dirtyAttributes->array;
-		CAttributes	*cAttribute;
-
-		for (;numAttributes>0;numAttributes--) {
-			cAttribute				=	*dirty++;
-			cAttribute->globalMap	=	NULL;
-			cAttribute->causticMap	=	NULL;
-			cAttribute->detach();
-		}
-
-		delete dirtyAttributes;
-	}
-
-	// Close the texturing system
-	CBrickMap::brickMapShutdown();
-	CTexture::textureShutdown();
-	randomShutdown();
+	// Update the global statistics
+	stats.numShade				+=		numShade;
+	stats.numSampled			+=		numSampled;
+	stats.numShaded				+=		numShaded;
+	stats.numTracedRays			+=		numTracedRays;
+	stats.numReflectionRays		+=		numReflectionRays;
+	stats.numTransmissionRays	+=		numTransmissionRays;
+	stats.numGatherRays			+=		numGatherRays;
 }
 
 
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	render
-// Description			:	Add an object into the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::render(CObject *cObject) {
-	vector		bmin,bmax;
-	CAttributes	*cAttributes	=	cObject->attributes;
-
-	// Assign the photon map is necessary
-	if (cAttributes->globalMapName != NULL) {
-		cAttributes->globalMap	=	getPhotonMap(cAttributes->globalMapName);
-		cAttributes->globalMap->attach();
-	}
-
-	if (cAttributes->causticMapName != NULL) {
-		cAttributes->causticMap	=	getPhotonMap(cAttributes->causticMapName);
-		cAttributes->causticMap->attach();
-	}
-
-	if ((cAttributes->globalMap != NULL) || (cAttributes->causticMap != NULL)) {
-		if (dirtyAttributes == NULL) dirtyAttributes	=	new CArray<CAttributes *>;
-
-		cAttributes->attach();
-		dirtyAttributes->push(cAttributes);
-	}
-
-	// Bound the object
-	cObject->bound(bmin,bmax);
-
-	// Update the world bounding box
-	addBox(worldBmin,worldBmax,bmin);
-	addBox(worldBmin,worldBmax,bmax);
-
-	// Tesselate the object if applicable
-	if (cObject->attributes->flags & raytracingFlags) {
-		cObject->tesselate(this);
-	}
-
-	if (cObject->attributes->flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) {
-		// Dispatch the object to the hider
-		drawObject(cObject,bmin,bmax);
-	}
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::addTracable(CTracable *tracable,CSurface *object) {
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::addTracable(CTriangle *tracable,CSurface *object) {
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-
-	if (triangles != NULL) triangles->push(tracable);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::addTracable(CMovingTriangle *tracable,CSurface *object) {
-	object->attach();
-
-	tracables->push(tracable);
-	raytraced->push(object);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	remove
-// Description			:	Remove an object from the scene
-// Return Value			:
-// Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::remove(CTracable *cObject) {
-	if (hierarchy != NULL) {
-		vector	bmin,bmax;
-
-		// Bound the object
-		cObject->bound(bmin,bmax);
-
-		hierarchy->remove(cObject,bmin,bmax);
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -656,51 +479,12 @@ void	CShadingContext::remove(CTracable *cObject) {
 // Description			:	Add an object into the scene
 // Return Value			:
 // Comments				:
-// Date last edited		:	2/15/2003
-void	CShadingContext::drawObject(CObject *cObject,const float *,const float *) {
+void	CShadingContext::drawObject(CObject *cObject) {
 	// This function must be overriden
 }
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	beginWorld
-// Description			:	Start a world block
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/9/2002
-void	CShadingContext::beginWorld() {
-	assert(tracables == NULL);
-	tracables	=	new CArray<CTracable *>;
 
-	if (flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
-		triangles	=	new CArray<CTriangle *>;
-	}
-	
-	// Start a TSM channel if needed
-	if ((netClient != INVALID_SOCKET) && (flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)) {
-		requestRemoteChannel(new CRemoteTSMChannel(deepShadowFileName,deepShadowFile,deepShadowIndex,xBuckets,yBuckets));
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	endWorld
-// Description			:	End a world block
-// Return Value			:
-// Comments				:
-// Date last edited		:	11/9/2002
-void	CShadingContext::endWorld() {
-	if (hierarchy == NULL) {
-		// Init the hierarchy
-		hierarchy	=	new CHierarchy(tracables->numItems,tracables->array,worldBmin,worldBmax,this,frameMemory);
-	} else {
-		hierarchy->add(tracables->numItems,tracables->array);
-	}
-
-	delete tracables;
-	tracables	=	NULL;
-}
 
 
 
@@ -709,88 +493,180 @@ void	CShadingContext::endWorld() {
 // Method				:	shade2D
 // Description			:	Sample/Shade bunch of points
 // Return Value			:	-
-// Comments				:
-// Date last edited		:	8/30/2002
+// Comments				:	Thread safe
 //
 //
 //
 //	Preconditions:
 //	!!!	->	u,v,time,I		fields of varying must be set
-void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim,unsigned int usedParameters) {
-	CAttributes			*currentAttributes	=	object->attributes;
-	float				**varying;
+void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadingDim dim,unsigned int usedParameters,int displaceOnly) {
+	const CAttributes	*currentAttributes	=	object->attributes;
+	float				**varying			=	currentShadingState->varying;
 	CShaderInstance		*displacement;
 	CShaderInstance		*surface;
 	CShaderInstance		*atmosphere;
 	int					i;
-	int					numVertices;
 	CSurface			*savedObject;
-	T64					shaderVarCheckpoint[3];
 
 	assert(uVertices > 0);
 	assert(vVertices > 0);
 
-	numVertices	=	uVertices*vVertices;
+	// This is the number of vertices we will be sampling/shading
+	int	numVertices		=	uVertices*vVertices;
+	assert(numVertices <= CRenderer::maxGridSize);
+	assert(numVertices > 0);
 
-	stats.numSampled++;
-	stats.numShaded							+=	numVertices;
+	// Update the stats
+	numShade++;
+	numSampled			+=	numVertices;
 
-	assert(numVertices <= maxGridSize);
+	// Are we just displacing the surface ?
+	if (displaceOnly == FALSE) {
 
-	// Are we a shadow ray ?
-	if (inShadow == TRUE) {
+		// Are we in a shadow ray ?
+		if (inShadow == TRUE) {
 
-		// Yes, are we supposed to shade the objects in the shadow ?
-		if (currentAttributes->transmission == 'o') {
-			// No, just copy the color/opacity from the attributes field
-			float			*opacity	=	currentShadingState->varying[VARIABLE_OI];
-			int				i;
+			// Yes, are we supposed to shade the objects in the shadow ?
+			if (currentAttributes->transmission == 'o') {
 
-			for (i=numVertices;i>0;i--) {
-				initv(opacity,1,1,1);
-				opacity	+=	3;
+				// No, just copy the color/opacity from the attributes field
+				float	*opacity	=	varying[VARIABLE_OI];
+				int		i;
+
+				for (i=numVertices;i>0;i--,opacity+=3)	initv(opacity,1,1,1);
+
+				// Nothing more to do here, just return
+				return;
+			} else if (currentAttributes->transmission == 'i') {
+
+				// No, just copy the color/opacity from the attributes field
+				float			*opacity	=	varying[VARIABLE_OI];
+				int				i;
+				const	float	*so			=	currentAttributes->surfaceOpacity;
+
+				for (i=numVertices;i>0;i--,opacity+=3)	movvv(opacity,so);
+
+				// Nothing more to do here, just return
+				return;
 			}
-
-			return;
-		} else if (currentAttributes->transmission == 'i') {
-			// No, just copy the color/opacity from the attributes field
-			float			*opacity	=	currentShadingState->varying[VARIABLE_OI];
-			int				i;
-			const	float	*so			=	currentAttributes->surfaceOpacity;
-
-
-			for (i=numVertices;i>0;i--) {
-				movvv(opacity,so);
-				opacity	+=	3;
-			}
-
-			return;
-		}
-		// We need to execute the shaders
-		displacement	=	NULL;	//currentAttributes->displacement;	// We probably don't need to execute the displacement shader
-		surface			=	currentAttributes->surface;
-		atmosphere		=	NULL;
-
-	} else {
-		// We need to execute the shaders
-		if (currentAttributes->flags & ATTRIBUTES_FLAGS_MATTE) {
-			displacement	=	currentAttributes->displacement;
-			surface			=	currentAttributes->surface;				// execute the surface shader for the output opacity
-			atmosphere		=	NULL;
-		} else {
-			displacement	=	currentAttributes->displacement;
+			
+			// We need to execute the shaders
+			displacement	=	NULL;	//currentAttributes->displacement;	// We probably don't need to execute the displacement shader
 			surface			=	currentAttributes->surface;
-			atmosphere		=	currentAttributes->atmosphere;
+			atmosphere		=	NULL;
+
+		} else {
+		
+			// We need to execute the shaders
+			if (currentAttributes->flags & ATTRIBUTES_FLAGS_MATTE) {
+				displacement	=	currentAttributes->displacement;
+				surface			=	currentAttributes->surface;				// execute the surface shader for the output opacity
+				atmosphere		=	NULL;
+			} else {
+				displacement	=	currentAttributes->displacement;
+				surface			=	currentAttributes->surface;
+				atmosphere		=	currentAttributes->atmosphere;
+			}
 		}
+
+		// Prepare the used parameters by the shaders 
+		usedParameters			|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
+		
+		// Prepare dPdtime if needed, do this _before_ saving our locals
+		if (usedParameters & PARAMETER_DPDTIME) {
+		
+			// Only sample ends if the object is moving (has data1)
+			if (object->moving()) {
+			
+				// Save memory
+				memBegin(threadMemory);
+				
+				// Save u,v,t
+				float		*u		=	varying[VARIABLE_U];
+				float		*v		=	varying[VARIABLE_V];
+				float		*t		=	varying[VARIABLE_T];
+				
+				const int	num		=	(dim == SHADING_2D) ? numVertices : numVertices*3;
+				float		*uSave	=	(float *) ralloc(num*3*sizeof(float),threadMemory);
+				float		*vSave	=	uSave+num;
+				float		*tSave	=	vSave+num;
+				
+				memcpy(uSave,u,num*sizeof(float));
+				memcpy(vSave,v,num*sizeof(float));
+				memcpy(tSave,t,num*sizeof(float));
+				
+				// Flip to the other end of sampling
+				unsigned int tempParameters = (usedParameters | PARAMETER_P) & ~(PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE | PARAMETER_DPDTIME);
+				if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
+					tempParameters |= PARAMETER_END_SAMPLE;
+					for (int i=0;i<num;i++) t[i] = 1;
+				} else {
+					tempParameters |= PARAMETER_BEGIN_SAMPLE;
+					for (int i=0;i<num;i++) t[i] = 0;
+				}
+				
+				// Re-run shade in displaceOnly mode (to get P at the other time sample)
+				displace(object,uVertices,vVertices,dim,tempParameters);
+			
+				// Save off P
+				memcpy(varying[VARIABLE_DPDTIME],varying[VARIABLE_P],sizeof(float)*3*num);
+				
+				// Restore u,v,t
+				memcpy(u,uSave,num*sizeof(float));
+				memcpy(v,vSave,num*sizeof(float));
+				memcpy(t,tSave,num*sizeof(float));
+				
+				// Restore
+				memEnd(threadMemory);
+			}
+			// Note: we do not deal with the no-motion case here, it is filled below
+			// when we fill the current time sample
+		}
+	} else {
+
+		// We are only interested in the surface position, not the color
+		if (	(currentAttributes->displacement == NULL) || 
+			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)))) {
+			const int	savedParameters	=	usedParameters;
+
+			// No, just sample the geometry
+			// Note: we pass NULL for the locals here because we do not wish
+			// to expand them (we're not running shaders) yet
+			// this causes the interpolation to local shader vars not to occur
+			object->sample(0,numVertices,varying,NULL,usedParameters);
+			object->interpolate(numVertices,varying,NULL);
+
+			// We're not shading just sampling
+			if (usedParameters & PARAMETER_N) {
+				assert(savedParameters & PARAMETER_NG);
+
+				// Flip the normal vector ?
+				if (currentAttributes->flags & ATTRIBUTES_FLAGS_INSIDE) {
+					int		i	=	numVertices;
+					float	*N	=	varying[VARIABLE_NG];
+
+					for (;i>0;i--) {
+						*N++	*=	-1;
+						*N++	*=	-1;
+						*N++	*=	-1;
+					}
+				}
+
+				memcpy(varying[VARIABLE_N],varying[VARIABLE_NG],numVertices*3*sizeof(float));
+			}
+
+			// We're done here
+			return;
+		}
+
+		// We need to execute the displacement shader, so get ready
+		displacement	=	currentAttributes->displacement;
+		surface			=	NULL;
+		atmosphere		=	NULL;
+		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
 	}
 
-	if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
-
-	usedParameters						|=	currentAttributes->usedParameters | additionalParameters;
-
-	// Prepare the shading state
-	varying								=	currentShadingState->varying;
-
+	
 	// We're shading
 	savedObject							=	currentShadingState->currentObject;
 	currentShadingState->currentObject	=	object;
@@ -799,119 +675,84 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 	currentShadingState->numVertices	=	numVertices;
 
 	// Checkpoint the shader state stack
-	memSave(shaderVarCheckpoint,shaderStateMemory);
+	memBegin(shaderStateMemory);
 	
 	// Allocate the caches for the shaders being executed
-	if (surface != NULL)							currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
-	if (displacement != NULL)						currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
-	if (atmosphere != NULL)							currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
+	float		***locals	= 	currentShadingState->locals;
+	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
+	if (atmosphere != NULL)							locals[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
-	// If we need derivative information, treat differently
-	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != 0)) {	// Notice: we can not differentiate a 0 dimentional point set
-		if (dim == -1) {											// We're raytracing, so the derivative computation is different
-			float				*P;									// Notice: we can not differentiate a 1 dimentional point set along this dimention
-			float				*dPdu;
-			float				*dPdv;
-			int					numRealVertices;
-			float				dud,dvd;
-			float				*u,*v,*du,*dv,*time,*I;
-			unsigned int		shadingParameters;
-			int					j;
 
-			numRealVertices							=	numVertices;
-			numVertices								*=	3;	// For the extra derivative vertices
+	// If we need derivative information, treat differently
+	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
+	
+		if (dim == SHADING_2D) {											// We're raytracing, so the derivative computation is different
+			const int numRealVertices				=	numVertices;
+			numVertices								*=	3;					// For the extra derivative vertices
 			currentShadingState->numVertices		=	numVertices;
 			currentShadingState->numRealVertices	=	numRealVertices;
 			currentShadingState->shadingDim			=	SHADING_2D;
 			currentShadingState->numActive			=	numVertices;
 			currentShadingState->numPassive			=	0;
 
-			// Sample the object
+			// Sample the object at the main intersection points
 			usedParameters							|=	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_P;
-			shadingParameters						=	usedParameters;
-			object->sample(0,numRealVertices,varying,usedParameters);
+			const unsigned int shadingParameters	=	usedParameters;
+			object->sample(0,numRealVertices,varying,locals,usedParameters);
 			usedParameters							=	shadingParameters;		// Restore the required parameters for the second round of shading
+			
+			float	*dPdu			=	varying[VARIABLE_DPDU];
+			float	*dPdv			=	varying[VARIABLE_DPDV];
+			float	*du				=	varying[VARIABLE_DU];
+			float	*dv				=	varying[VARIABLE_DV];
+			float	*u				=	varying[VARIABLE_U];
+			float	*v				=	varying[VARIABLE_V];
+			float	*time			=	varying[VARIABLE_TIME];
+			float	*I				=	varying[VARIABLE_I];
+			int		j;
 
-			P				=	varying[VARIABLE_P];
-			dPdu			=	varying[VARIABLE_DPDU];
-			dPdv			=	varying[VARIABLE_DPDV];
-			du				=	varying[VARIABLE_DU];
-			dv				=	varying[VARIABLE_DV];
-			u				=	varying[VARIABLE_U];
-			v				=	varying[VARIABLE_V];
-			time			=	varying[VARIABLE_TIME];
-			I				=	varying[VARIABLE_I];
+			// Compute du/dv
+			for (i=0,j=numRealVertices;i<numRealVertices;i++,I+=3,dPdu+=3,dPdv+=3) {
+				const float	lengthu	=	dotvv(dPdu,dPdu);
+				const float	lengthv	=	dotvv(dPdv,dPdv);
+				const float	lengthi	=	dotvv(I,I);
 
-			// Compute the derivative evaluation u/v
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				const float	d	=	dxdPixel / imagePlane;
+				float	ku			=	dotvv(I,dPdu);	ku	=	isqrtf((lengthu*lengthi - (ku*ku)) / (lengthu*lengthi + C_EPSILON));
+				float	kv			=	dotvv(I,dPdv);	kv	=	isqrtf((lengthv*lengthi - (kv*kv)) / (lengthv*lengthi + C_EPSILON));
 
-				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
-					float		ku,kv;
-					const float	lengthu	=	dotvv(dPdu,dPdu);
-					const float	lengthv	=	dotvv(dPdv,dPdv);
-					const float	lengthi	=	dotvv(P,P);
+				const float	dest	=	du[i];				// The ray crosssection at the intersection
+				const float	dud		=	ku * dest * isqrtf(lengthu) + C_EPSILON;
+				const float	dvd		=	kv * dest * isqrtf(lengthv) + C_EPSILON;
 
-					ku			=	dotvv(P,dPdu);	ku	=	isqrtf((lengthu*lengthi - (ku*ku)) / (lengthu*lengthi + C_EPSILON));
-					kv			=	dotvv(P,dPdv);	kv	=	isqrtf((lengthv*lengthi - (kv*kv)) / (lengthv*lengthi + C_EPSILON));
+				// Create one more shading point at (u + du,v)
+				u[j]		=	u[i] + dud;
+				v[j]		=	v[i];
+				time[j]		=	time[i];
+				movvv(varying[VARIABLE_I] + j*3,I);
+				du[i]		=	dud;
+				du[j]		=	dud;
+				dv[j]		=	dvd;
+				j++;
 
-					dud			=	ku * d * isqrtf(lengthu/(lengthi+C_EPSILON)) + C_EPSILON;
-					dvd			=	kv * d * isqrtf(lengthv/(lengthi+C_EPSILON)) + C_EPSILON;
-
-					u[j]		=	u[i] + dud;
-					v[j]		=	v[i];
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					du[i]		=	dud;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-
-					u[j]		=	u[i];
-					v[j]		=	v[i] + dvd;
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					dv[i]		=	dvd;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-				}
-			} else {
-				const float	d	=	dxdPixel;
-
-				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
-					float		ku,kv;
-					const float	lengthu	=	dotvv(dPdu,dPdu);
-					const float	lengthv	=	dotvv(dPdv,dPdv);
-
-					ku			=	isqrtf((lengthu - (dPdu[COMP_Z]*dPdu[COMP_Z])) / (lengthu + C_EPSILON));
-					kv			=	isqrtf((lengthv - (dPdv[COMP_Z]*dPdv[COMP_Z])) / (lengthv + C_EPSILON));
-
-					dud			=	ku * d * isqrtf(lengthu) + C_EPSILON;
-					dvd			=	kv * d * isqrtf(lengthv) + C_EPSILON;
-
-					u[j]		=	u[i] + dud;
-					v[j]		=	v[i];
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					du[i]		=	dud;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-
-					u[j]		=	u[i];
-					v[j]		=	v[i] + dvd;
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					dv[i]		=	dvd;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-				}
+				// Create one more shading point at (u,v + dv)
+				u[j]		=	u[i];
+				v[j]		=	v[i] + dvd;
+				time[j]		=	time[i];
+				movvv(varying[VARIABLE_I] + j*3,I);
+				dv[i]		=	dvd;
+				du[j]		=	dud;
+				dv[j]		=	dvd;
+				j++;
 			}
 
-			object->sample(numRealVertices,2*numRealVertices,varying,usedParameters);
+			// Sample the object again, this time at the extra shading points
+			object->sample(numRealVertices,2*numRealVertices,varying,locals,usedParameters);
+
+			// Interpolate the various variables defined on the object
+			object->interpolate(numVertices,varying,locals);
+
 		} else {
 			// We're shading a regular grid, so take the shortcut while computing the surface derivatives
 			float			*P;
@@ -923,8 +764,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			const float		shadingRate				=	currentAttributes->shadingRate;
 			float			*sru,*srv;
 
+			assert(dim == SHADING_2D_GRID);
+
 			currentShadingState->numRealVertices	=	numVertices;
-			currentShadingState->shadingDim			=	(dim == 2 ? SHADING_2D_GRID : SHADING_1D_GRID);
+			currentShadingState->shadingDim			=	SHADING_2D_GRID;
 			currentShadingState->numActive			=	numVertices;
 			currentShadingState->numPassive			=	0;
 
@@ -932,59 +775,73 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			usedParameters	|=	PARAMETER_P;
 
 			// Sample the object
-			object->sample(0,numVertices,varying,usedParameters);
+			object->sample(0,numVertices,varying,locals,usedParameters);
+
+			// Interpolate the various variables defined on the object
+			object->interpolate(numVertices,varying,locals);
 
 			// We're rasterizing, so the derivative information is already available
-			memBegin();
+			memBegin(threadMemory);
 
-			xy					=	(float *) ralloc(numVertices*2*sizeof(float));
-
+			// This array holds the projected xy pixel positions for the vertices
+			xy					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
 			P					=	varying[VARIABLE_P];
+			
+			// Project the grid vertices first
+			// PS: The offset is not important, so do not compute it
+			if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+				float	*cXy	=	xy;
+
+				for (i=numVertices;i>0;i--) {
+					cXy[0]		=	(P[COMP_X] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldx;
+					cXy[1]		=	(P[COMP_Y] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldy;
+					cXy			+=	2;
+					P			+=	3;
+				}
+
+				// Compute the I
+				memcpy(varying[VARIABLE_I],varying[VARIABLE_P],numVertices*3*sizeof(float));
+			} else {
+				float	*cXy	=	xy;
+
+				for (i=numVertices;i>0;i--) {
+					cXy[0]		=	P[COMP_X]*CRenderer::dPixeldx;
+					cXy[1]		=	P[COMP_Y]*CRenderer::dPixeldy;
+					cXy			+=	2;
+					P			+=	3;
+				}
+
+				// Compute the I
+				float		*I	=	varying[VARIABLE_I];
+				P	=	varying[VARIABLE_P];
+				for (i=numVertices;i>0;i--,I+=3,P+=3)	initv(I,0,0,P[COMP_Z]);
+			}
+
 			du					=	varying[VARIABLE_DU];
 			dv					=	varying[VARIABLE_DV];
 			u					=	varying[VARIABLE_U];
 			v					=	varying[VARIABLE_V];
 			sru					=	varying[VARIABLE_SRU];
 			srv					=	varying[VARIABLE_SRV];
-
-			// Project the grid vertices first
-			// PS: The offset is not important, so do not compute it
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				float	*cXy	=	xy;
-
-				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * imagePlane / P[COMP_Z])*dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * imagePlane / P[COMP_Z])*dPixeldy;
-					cXy			+=	2;
-					P			+=	3;
-				}
-			} else {
-				float	*cXy	=	xy;
-
-				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*dPixeldx;
-					cXy[1]		=	P[COMP_Y]*dPixeldy;
-					cXy			+=	2;
-					P			+=	3;
-				}
-			}
 
 			// Compute the du
 			for (i=0;i<vVertices;i++) {
-				int		tmp		=	i*uVertices;
-				float	*cDU	=	du	+ tmp;
-				float	*cU		=	u	+ tmp;
-				float	*cSr	=	sru	+ tmp;
-				float	*cXy	=	xy	+ tmp*2;
-				float	dx,dy,d;
+				const int	tmp		=	i*uVertices;
+				float		*cDU	=	du	+ tmp;
+				float		*cU		=	u	+ tmp;
+				float		*cSr	=	sru	+ tmp;
+				float		*cXy	=	xy	+ tmp*2;
+				float		dx,dy,d;
 
 				P				=	varying[VARIABLE_P]		+	tmp*3;
+				d				=	0;
 				for (j=uVertices-1;j>0;j--) {
 					dx		=	cXy[2] - cXy[0];
 					dy		=	cXy[3] - cXy[1];
 					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
 					d		=	cSr[0]*(cU[1] - cU[0]);
 					d		=	min(d,1);
+					d		=	max(d,C_EPSILON);
 					assert(d > 0);
 					assert(d <= 1);
 					cDU[0]	=	d;
@@ -1020,11 +877,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 				float	dx,dy,d;
 
 				P				=	varying[VARIABLE_P]		+	i*3;
+				d				=	0;
 				for (j=0;j<vVertices-1;j++) {
 					dx		=	cXy[uVertices*2]	- cXy[0];
 					dy		=	cXy[uVertices*2+1]	- cXy[1];
 					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
 					d		=	cSr[0]*(cV[uVertices] - cV[0]);
+					d		=	max(d,C_EPSILON);
 					d		=	min(d,1);
 					assert(d > 0);
 					assert(d <= 1);
@@ -1053,556 +912,157 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,int dim
 			}
 
 			// Done and done
-			memEnd();
+			memEnd(threadMemory);
 		}
 	} else {
 		// No derivative information is needed
-		currentShadingState->shadingDim			=	SHADING_0D;
+		currentShadingState->shadingDim			=	dim;
 		currentShadingState->numRealVertices	=	numVertices;
 		currentShadingState->numActive			=	numVertices;
 		currentShadingState->numPassive			=	0;
 
 		// Sample the object
-		object->sample(0,numVertices,varying,usedParameters);
-	}
+		object->sample(0,numVertices,varying,locals,usedParameters);
 
+		// Interpolate the various variables defined on the object
+		object->interpolate(numVertices,varying,locals);
 
-	// Compute the "I"
-	if (currentRayDepth == 0) {
-		float			*I				=	varying[VARIABLE_I];
-
-		if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-			memcpy(I,varying[VARIABLE_P],numVertices*3*sizeof(float));
-		} else {
-			for (i=numVertices;i>0;i--) {
-				initv(I,0,0,1);
-				I	+=	3;
+		// Compute the I
+		if (currentRayDepth == 0) {
+			if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+				memcpy(varying[VARIABLE_I],varying[VARIABLE_P],numVertices*3*sizeof(float));
+			} else {
+				float		*I	=	varying[VARIABLE_I];
+				const float	*P	=	varying[VARIABLE_P];
+				for (i=numVertices;i>0;i--,I+=3,P+=3)	initv(I,0,0,P[COMP_Z]);
 			}
 		}
-	} else {
-		float			*I				=	varying[VARIABLE_I];
-		const float		*P				=	varying[VARIABLE_P];
-
-		for (i=numVertices;i>0;i--) {
-			I[0]	=	P[0] - I[0];
-			I[1]	=	P[1] - I[1];
-			I[2]	=	P[2] - I[2];
-			I		+=	3;
-			P		+=	3;
-		}
 	}
 
-	{
-		CShadedLight	**lights					=	&currentShadingState->lights;
-		CShadedLight	**alights					=	&currentShadingState->alights;
-		CShadedLight	**currentLight				=	&currentShadingState->currentLight;
-		CShadedLight	**freeLights				=	&currentShadingState->freeLights;
-		int				*tags						=	currentShadingState->tags;
+	// Clear the tags for shader execution
+	memset(currentShadingState->tags,0,numVertices*sizeof(int));
 
+	// Fill in the uninitialized variables from the attributes
+	if (currentAttributes->next != NULL) {
+		complete(numVertices,varying,usedParameters,currentAttributes,currentAttributes->next);
+	} else {
+		complete(numVertices,varying,usedParameters,currentAttributes);
+	}
+
+	// Save the memory here
+	memBegin(threadMemory);
+	
+	// Run the displacement shader here
+	if (displacement != NULL) {
+		displacement->execute(this,locals[ACCESSOR_DISPLACEMENT]);
+	}
+
+	// Do we need to run the surface shader?
+	if (displaceOnly == FALSE) {
+
+		// Complete dPdtime if needed _after_ displacement is done, it is not
+		// available inside displacement shaders
+		if (usedParameters & PARAMETER_DPDTIME) {
+		
+			// Only sample ends if the object is moving (has data1)
+			if (object->moving()) {
+				const	float	idtime		=	CRenderer::invShutterTime;
+	
+				if (usedParameters & PARAMETER_BEGIN_SAMPLE) {
+					float			*dPdtime	=	varying[VARIABLE_DPDTIME];
+					const	float	*P			=	varying[VARIABLE_P];
+	
+					for (i=numVertices;i>0;i--) {
+						subvv(dPdtime,P);
+						mulvf(dPdtime,idtime);
+						dPdtime	+=	3;
+						P		+=	3;
+					}
+				} else {
+					float			*dPdtime	=	varying[VARIABLE_DPDTIME];
+					const	float	*P			=	varying[VARIABLE_P];
+	
+					for (i=numVertices;i>0;i--) {
+						subvv(dPdtime,P);
+						mulvf(dPdtime,-idtime);
+						dPdtime	+=	3;
+						P		+=	3;
+					}
+				}
+			} else {
+				float			*dPdtime	=	varying[VARIABLE_DPDTIME];
+
+				for (i=numVertices;i>0;i--) {
+					initv(dPdtime,0);
+					dPdtime	+=	3;
+				}
+			}
+		}
+		
+		// No lights are executed yet
 		currentShadingState->lightsExecuted			=	FALSE;
 		currentShadingState->ambientLightsExecuted	=	FALSE;
 		currentShadingState->lightCategory			=	0;
-
+		
 		// Clear out previous lights etc
-		*lights			=	NULL;
-		*currentLight	=	NULL;
-		*freeLights		=	NULL;
-		*alights		=	NULL;
-		for (i=0;i<numVertices;i++) {
-			tags[i]		=	0;
-		}
+		currentShadingState->lights					=	NULL;
+		currentShadingState->alights				=	NULL;
+		currentShadingState->currentLight			=	NULL;
+		currentShadingState->freeLights				=	NULL;
 
-		object->interpolate(numVertices,varying);
-
-		if (currentAttributes->next != NULL) {
-			complete(numVertices,varying,usedParameters,currentAttributes,currentAttributes->next);
-		} else {
-			complete(numVertices,varying,usedParameters,currentAttributes);
-		}
-
-		memBegin();
-
-		if (displacement != NULL) {
-			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
-		}
-
+		// Is there a surface shader ?
 		if (surface != NULL) {
-			surface->execute(this,currentShadingState->locals[ACCESSOR_SURFACE]);
+			numShaded				+=	numVertices;
+			surface->execute(this,locals[ACCESSOR_SURFACE]);
 		} else {
-			float			*color		=	varying[VARIABLE_CI];
-			float			*opacity	=	varying[VARIABLE_OI];
-			float			*normal		=	varying[VARIABLE_N];
-			float			*point		=	varying[VARIABLE_P];
-			const float		*Cs			=	currentAttributes->surfaceColor;
-			const float		*Os			=	currentAttributes->surfaceOpacity;
+			// No surface shader eh, make up a color
+			float			*C		=	varying[VARIABLE_CI];
+			float			*O		=	varying[VARIABLE_OI];
+			float			*N		=	varying[VARIABLE_N];
+			float			*I		=	varying[VARIABLE_I];
+			const float		*Cs		=	currentAttributes->surfaceColor;
+			const float		*Os		=	currentAttributes->surfaceOpacity;
 
 			for (i=numVertices;i>0;i--) {
-				normalizevf(normal);
-				normalizevf(point);
-				mulvf(color,Cs,absf(dotvv(point,normal)));
-				movvv(opacity,Os);
-				color	+=	3;
-				opacity	+=	3;
-				normal	+=	3;
-				point	+=	3;
-			}
-		}
-
-		if (currentRayDepth == 0) {  // do not execute atmosphere for non-camera rays
-			if (atmosphere != NULL) {
-				atmosphere->execute(this,currentShadingState->locals[ACCESSOR_ATMOSPHERE]);
-			}
-		}
-
-		if (currentShadingState->postShader != NULL) {
-			currentShadingState->locals[ACCESSOR_POSTSHADER]	=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
-			currentShadingState->postShader->execute(this,currentShadingState->locals[ACCESSOR_POSTSHADER]);
-		}
-
-		memEnd();
-	}
-	
-	// Unwind the stack of shader states
-	memRestore(shaderVarCheckpoint,shaderStateMemory);
-
-	currentShadingState->currentObject	=	savedObject;
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	displace
-// Description			:	Sample/Shade bunch of points
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/30/2002
-//
-//
-//
-//	Preconditions:
-//	!!!	->	u,v,time,I		fields of varying must be set
-void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int dim,unsigned int usedParameters) {
-	CAttributes			*currentAttributes	=	object->attributes;
-	float				**varying;
-	CShaderInstance		*displacement;
-	CShaderInstance		*surface;
-	CShaderInstance		*atmosphere;
-	int					i;
-	int					numVertices;
-	CSurface			*savedObject;
-	T64					shaderVarCheckpoint[3];
-
-	assert(uVertices > 0);
-	assert(vVertices > 0);
-
-	numVertices	=	uVertices*vVertices;
-
-	stats.numSampled++;
-	stats.numShaded							+=	numVertices;
-
-	assert(numVertices <= maxGridSize);
-
-	// Yes, is there a displacement shader on the surface ?
-	if (	(currentAttributes->displacement == NULL) || 
-			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)))) {
-		const int	savedParameters	=	usedParameters;
-
-		// No, just sample the geometry
-		object->sample(0,numVertices,currentShadingState->varying,usedParameters);
-		object->interpolate(numVertices,currentShadingState->varying);
-
-		// We're not shading just sampling
-		if (usedParameters & PARAMETER_N) {
-			assert(savedParameters & PARAMETER_NG);
-
-			varying								=	currentShadingState->varying;
-
-			if (currentAttributes->flags & ATTRIBUTES_FLAGS_INSIDE) {
-				int		i	=	numVertices;
-				float	*N	=	varying[VARIABLE_NG];
-
-				for (;i>0;i--) {
-					*N++	*=	-1;
-					*N++	*=	-1;
-					*N++	*=	-1;
-				}
-			}
-
-			memcpy(varying[VARIABLE_N],varying[VARIABLE_NG],numVertices*3*sizeof(float));
-		}
-
-		// We're done here
-		return;
-	}
-
-	// We need to execute the displacement shader, so get ready
-	displacement	=	currentAttributes->displacement;
-	surface			=	NULL;
-	atmosphere		=	NULL;
-
-	if (currentAttributes->usedParameters == 0)	currentAttributes->checkParameters();
-
-	usedParameters						|=	currentAttributes->usedParameters | additionalParameters;
-
-	// Prepare the shading state
-	varying								=	currentShadingState->varying;
-
-	// We're shading
-	savedObject							=	currentShadingState->currentObject;
-	currentShadingState->currentObject	=	object;
-	currentShadingState->numUvertices	=	uVertices;
-	currentShadingState->numVvertices	=	vVertices;
-	currentShadingState->numVertices	=	numVertices;
-
-	// Checkpoint the shader state stack
-	memSave(shaderVarCheckpoint,shaderStateMemory);
-
-	// Set the parameters of the displacement shader
-	if (displacement != NULL)	currentShadingState->locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
-	
-	if (usedParameters & PARAMETER_MESSAGEPASSING) {
-		// Iff. we require message passing in the displacement shader, set up the caches
-		if (surface != NULL)	currentShadingState->locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
-		if (atmosphere != NULL)	currentShadingState->locals[ACCESSOR_ATMOSPHERE]	=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
-		// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
-	}
-
-	// If we need derivative information, treat differently
-	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != 0)) {	// Notice: we can not differentiate a 0 dimentional point set
-		if (dim == -1) {											// We're raytracing, so the derivative computation is different
-			float				*P;									// Notice: we can not differentiate a 1 dimentional point set along this dimention
-			float				*dPdu;
-			float				*dPdv;
-			int					numRealVertices;
-			float				dud,dvd;
-			float				*u,*v,*du,*dv,*time,*I;
-			unsigned int		shadingParameters;
-			int					j;
-
-			numRealVertices							=	numVertices;
-			numVertices								*=	3;	// For the extra derivative vertices
-			currentShadingState->numVertices		=	numVertices;
-			currentShadingState->numRealVertices	=	numRealVertices;
-			currentShadingState->shadingDim			=	SHADING_2D;
-			currentShadingState->numActive			=	numVertices;
-			currentShadingState->numPassive			=	0;
-
-			// Sample the object
-			usedParameters							|=	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_P;
-			shadingParameters						=	usedParameters;
-			object->sample(0,numRealVertices,varying,usedParameters);
-			usedParameters							=	shadingParameters;		// Restore the required parameters for the second round of shading
-
-			P				=	varying[VARIABLE_P];
-			dPdu			=	varying[VARIABLE_DPDU];
-			dPdv			=	varying[VARIABLE_DPDV];
-			du				=	varying[VARIABLE_DU];
-			dv				=	varying[VARIABLE_DV];
-			u				=	varying[VARIABLE_U];
-			v				=	varying[VARIABLE_V];
-			time			=	varying[VARIABLE_TIME];
-			I				=	varying[VARIABLE_I];
-
-			// Compute the derivative evaluation u/v
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				const float	d	=	dxdPixel / imagePlane;
-
-				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
-					float		ku,kv;
-					const float	lengthu	=	dotvv(dPdu,dPdu);
-					const float	lengthv	=	dotvv(dPdv,dPdv);
-					const float	lengthi	=	dotvv(P,P);
-
-					ku			=	dotvv(P,dPdu);	ku	=	isqrtf((lengthu*lengthi - (ku*ku)) / (lengthu*lengthi + C_EPSILON));
-					kv			=	dotvv(P,dPdv);	kv	=	isqrtf((lengthv*lengthi - (kv*kv)) / (lengthv*lengthi + C_EPSILON));
-
-					dud			=	ku * d * isqrtf(lengthu/(lengthi+C_EPSILON)) + C_EPSILON;
-					dvd			=	kv * d * isqrtf(lengthv/(lengthi+C_EPSILON)) + C_EPSILON;
-
-					u[j]		=	u[i] + dud;
-					v[j]		=	v[i];
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					du[i]		=	dud;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-
-					u[j]		=	u[i];
-					v[j]		=	v[i] + dvd;
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					dv[i]		=	dvd;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-				}
-			} else {
-				const float	d	=	dxdPixel;
-
-				for (i=0,j=numRealVertices;i<numRealVertices;i++,P+=3,dPdu+=3,dPdv+=3) {
-					float		ku,kv;
-					const float	lengthu	=	dotvv(dPdu,dPdu);
-					const float	lengthv	=	dotvv(dPdv,dPdv);
-
-					ku			=	isqrtf((lengthu - (dPdu[COMP_Z]*dPdu[COMP_Z])) / (lengthu + C_EPSILON));
-					kv			=	isqrtf((lengthv - (dPdv[COMP_Z]*dPdv[COMP_Z])) / (lengthv + C_EPSILON));
-
-					dud			=	ku * d * isqrtf(lengthu) + C_EPSILON;
-					dvd			=	kv * d * isqrtf(lengthv) + C_EPSILON;
-
-					u[j]		=	u[i] + dud;
-					v[j]		=	v[i];
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					du[i]		=	dud;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-
-					u[j]		=	u[i];
-					v[j]		=	v[i] + dvd;
-					time[j]		=	time[i];
-					movvv(I + j*3,I + i*3);
-					dv[i]		=	dvd;
-					du[j]		=	dud;
-					dv[j]		=	dvd;
-					j++;
-				}
-			}
-
-			object->sample(numRealVertices,2*numRealVertices,varying,usedParameters);
-		} else {
-			// We're shading a regular grid, so take the shortcut while computing the surface derivatives
-			float			*P;
-			float			*dPdu,*dPdv;
-			float			*du;
-			float			*dv;
-			float			*u,*v;
-			float			*xy;
-			int				i,j;
-			const float		shadingRate				=	currentAttributes->shadingRate;
-			float			*sru,*srv;
-
-			currentShadingState->numRealVertices	=	numVertices;
-			currentShadingState->shadingDim			=	(dim == 2 ? SHADING_2D_GRID : SHADING_1D_GRID);
-			currentShadingState->numActive			=	numVertices;
-			currentShadingState->numPassive			=	0;
-
-			// First sample the object at the grid vertices
-			usedParameters	|=	PARAMETER_P;
-			usedParameters	&=	~(PARAMETER_DPDU | PARAMETER_DPDV);
-
-			// Sample the object
-			object->sample(0,numVertices,varying,usedParameters);
-
-			// We're rasterizing, so the derivative information is already available
-			memBegin();
-
-			xy					=	(float *) ralloc(numVertices*2*sizeof(float));
-
-			P					=	varying[VARIABLE_P];
-			du					=	varying[VARIABLE_DU];
-			dv					=	varying[VARIABLE_DV];
-			u					=	varying[VARIABLE_U];
-			v					=	varying[VARIABLE_V];
-			sru					=	varying[VARIABLE_SRU];
-			srv					=	varying[VARIABLE_SRV];
-
-			// Project the grid vertices first
-			// PS: The offset is not important, so do not compute it
-			if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-				float	*cXy	=	xy;
-
-				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * imagePlane / P[COMP_Z])*dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * imagePlane / P[COMP_Z])*dPixeldy;
-					cXy			+=	2;
-					P			+=	3;
-				}
-			} else {
-				float	*cXy	=	xy;
-
-				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*dPixeldx;
-					cXy[1]		=	P[COMP_Y]*dPixeldy;
-					cXy			+=	2;
-					P			+=	3;
-				}
-			}
-
-			// Compute the du,dPdu
-			for (i=0;i<vVertices;i++) {
-				int		tmp		=	i*uVertices;
-				float	*cDU	=	du	+ tmp;
-				float	*cU		=	u	+ tmp;
-				float	*cSr	=	sru	+ tmp;
-				float	*cXy	=	xy	+ tmp*2;
-				float	dx,dy,d;
-
-				dPdu			=	varying[VARIABLE_DPDU]	+	tmp*3;
-				P				=	varying[VARIABLE_P]		+	tmp*3;
-				for (j=uVertices-1;j>0;j--) {
-					dx		=	cXy[2] - cXy[0];
-					dy		=	cXy[3] - cXy[1];
-					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
-					d		=	cSr[0]*(cU[1] - cU[0]);
-					d		=	min(d,1);
-					assert(d > 0);
-					assert(d <= 1);
-					cDU[0]	=	d;
-					dPdu[0]	=	P[3] - P[0];
-					dPdu[1]	=	P[4] - P[1];
-					dPdu[2]	=	P[5] - P[2];
-					mulvf(dPdu,1 / (cU[1] - cU[0]));
-					cDU		+=	1;
-					cU		+=	1;
-					cSr		+=	1;
-					cXy		+=	2;
-					dPdu	+=	3;
-					P		+=	3;
-				}
-				
-#ifdef USE_EXTRAPOLATED_DERIV
-				if (uVertices > 3) {
-					const float A =	(cDU[-3] - cDU[-2])/((cU[-3]-cU[-2])*(cU[-3]-cU[-1])) -
-									(cDU[-1] - cDU[-2])/((cU[-1]-cU[-2])*(cU[-3]-cU[-1]));
-					const float B =	(cDU[-1] - cDU[-2] + A*(cU[-2]*cU[-2] - cU[-1]*cU[-1])) /
-									(cU[-1] - cU[-2]);
-					const float C = (cDU[-1] - A*cU[-1]*cU[-1] - B*cU[-1]);
-					
-					d		= A*cU[0]*cU[0] + B*cU[0] + C;
-				}
-#endif
-				
-				cSr[0]		=	cSr[-1];
-				cDU[0]		=	d;
-				dPdu[0]		=	dPdu[-3];
-				dPdu[1]		=	dPdu[-2];
-				dPdu[2]		=	dPdu[-1];
-			}
-
-			// Compute the dv,dPdv
-			for (i=0;i<uVertices;i++) {
-				float	*cDV	=	dv	+	i;
-				float	*cV		=	v	+	i;
-				float	*cSr	=	srv	+	i;
-				float	*cXy	=	xy	+	i*2;
-				float	dx,dy,d;
-
-				dPdv			=	varying[VARIABLE_DPDV]	+	i*3;
-				P				=	varying[VARIABLE_P]		+	i*3;
-				for (j=0;j<vVertices-1;j++) {
-					dx		=	cXy[uVertices*2]	- cXy[0];
-					dy		=	cXy[uVertices*2+1]	- cXy[1];
-					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
-					d		=	cSr[0]*(cV[uVertices] - cV[0]);
-					d		=	min(d,1);
-					assert(d > 0);
-					assert(d <= 1);
-					cDV[0]	=	d;
-					dPdv[0]	=	P[uVertices*3+0] - P[0];
-					dPdv[1]	=	P[uVertices*3+1] - P[1];
-					dPdv[2]	=	P[uVertices*3+2] - P[2];
-					mulvf(dPdv,1 / (cV[uVertices] - cV[0]));
-					cDV		+=	uVertices;
-					cV		+=	uVertices;
-					cSr		+=	uVertices;
-					cXy		+=	uVertices*2;
-					dPdv	+=	uVertices*3;
-					P		+=	uVertices*3;
-				}
-				
-#ifdef USE_EXTRAPOLATED_DERIV
-				if (vVertices > 3) {
-					const float A =	(cDV[-uVertices*3] - cDV[-uVertices*2])/((cV[-uVertices*3]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1])) -
-									(cDV[-uVertices*1] - cDV[-uVertices*2])/((cV[-uVertices*1]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1]));
-					const float B =	(cDV[-uVertices*1] - cDV[-uVertices*2] + A*(cV[-uVertices*2]*cV[-uVertices*2] - cV[-uVertices*1]*cV[-uVertices*1])) /
-									(cV[-uVertices*1] - cV[-uVertices*2]);
-					const float C = (cDV[-uVertices*1] - A*cV[-uVertices*1]*cV[-uVertices*1] - B*cV[-uVertices*1]);
-					
-					d		= A*cV[0]*cV[0] + B*cV[0] + C;
-				}
-#endif
-				
-				cSr[0]		=	cSr[-uVertices];
-				cDV[0]		=	d;
-				dPdv[0]		=	dPdv[-uVertices*3+0];
-				dPdv[1]		=	dPdv[-uVertices*3+1];
-				dPdv[2]		=	dPdv[-uVertices*3+2];
-			}
-
-			// Done and done
-			memEnd();
-		}
-	} else {
-		// No derivative information is needed
-		currentShadingState->shadingDim			=	SHADING_0D;
-		currentShadingState->numRealVertices	=	numVertices;
-		currentShadingState->numActive			=	numVertices;
-		currentShadingState->numPassive			=	0;
-
-		// Sample the object
-		object->sample(0,numVertices,varying,usedParameters);
-	}
-
-
-	if (currentRayDepth == 0) {
-		float			*I				=	varying[VARIABLE_I];
-
-		if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-			memcpy(I,varying[VARIABLE_P],numVertices*3*sizeof(float));
-		} else {
-			for (i=numVertices;i>0;i--) {
-				initv(I,0,0,1);
+				normalizevf(N);
+				normalizevf(I);
+				mulvf(C,Cs,absf(dotvv(I,N)));
+				movvv(O,Os);
+				C	+=	3;
+				O	+=	3;
+				N	+=	3;
 				I	+=	3;
 			}
 		}
-	} else {
-		float			*I				=	varying[VARIABLE_I];
-		const float		*P				=	varying[VARIABLE_P];
 
-		for (i=numVertices;i>0;i--) {
-			I[0]	=	P[0] - I[0];
-			I[1]	=	P[1] - I[1];
-			I[2]	=	P[2] - I[2];
-			I		+=	3;
-			P		+=	3;
+		// Is there an atmosphere shader ?
+		if (atmosphere != NULL) {
+		
+			// Do not execute atmosphere for non-camera rays
+			if (currentRayDepth == 0) {  
+				atmosphere->execute(this,locals[ACCESSOR_ATMOSPHERE]);
+			}
+		}
+
+		// Is there an interior/exterior shader waiting to be executed?
+		if (currentShadingState->postShader != NULL) {
+			locals[ACCESSOR_POSTSHADER]		=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
+			currentShadingState->postShader->execute(this,locals[ACCESSOR_POSTSHADER]);
 		}
 	}
 
-	{
-		int				*tags				=	currentShadingState->tags;
-
-		for (i=0;i<numVertices;i++) {
-			tags[i]						=	0;
-		}
-
-		object->interpolate(numVertices,varying);
-
-		if (currentAttributes->next != NULL) {
-			complete(numVertices,varying,usedParameters,currentAttributes,currentAttributes->next);
-		} else {
-			complete(numVertices,varying,usedParameters,currentAttributes);
-		}
-
-		memBegin();
-
-		if (displacement != NULL) {
-			displacement->execute(this,currentShadingState->locals[ACCESSOR_DISPLACEMENT]);
-		}
-
-		memEnd();
-	}
+	// Restore the thread memory
+	memEnd(threadMemory);
 	
 	// Unwind the stack of shader states
-	memRestore(shaderVarCheckpoint,shaderStateMemory);
+	memEnd(shaderStateMemory);
 
+	// Restore the shaded object
 	currentShadingState->currentObject	=	savedObject;
 }
+
+
+
 
 
 
@@ -1617,25 +1077,23 @@ void	CShadingContext::displace(CSurface *object,int uVertices,int vVertices,int 
 // Description			:	Allocate a new shading state
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 CShadingState	*CShadingContext::newState() {
+
 	if (freeStates == NULL) {
-		CShadingState	*newState		=	new CShadingState;
+		CShadingState	*newState			=	new CShadingState;
 		int				j;
 		float			*E;
+		const int		numGlobalVariables	=	CRenderer::globalVariables->numItems;
+		CVariable		**globalVariables	=	CRenderer::globalVariables->array;
 
-		newState->varying				=	new float*[maxGlobalVariables];				stats.vertexMemory	+=	maxGlobalVariables*sizeof(float *);
-		newState->tags					=	new int[maxGridSize*3];						stats.vertexMemory	+=	maxGridSize*3*sizeof(int);
-		newState->lightingTags			=	new int[maxGridSize*3];						stats.vertexMemory	+=	maxGridSize*3*sizeof(int);
-		newState->Ns					=	new float[maxGridSize*9];					stats.vertexMemory	+=	maxGridSize*3*sizeof(float);
+		newState->varying				=	new float*[numGlobalVariables];					vertexMemory	+=	numGlobalVariables*sizeof(float *);
+		newState->tags					=	new int[CRenderer::maxGridSize*3];				vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
+		newState->lightingTags			=	new int[CRenderer::maxGridSize*3];				vertexMemory	+=	CRenderer::maxGridSize*3*sizeof(int);
+		newState->Ns					=	new float[CRenderer::maxGridSize*9];			vertexMemory	+=	CRenderer::maxGridSize*9*sizeof(float);
 		newState->alights				=	NULL;
 		newState->freeLights			=	NULL;
 		newState->postShader			=	NULL;
 		newState->currentObject			=	NULL;
-
-		for (j=0;j<maxGlobalVariables;j++) {
-			newState->varying[j]	=	NULL;
-		}
 
 		for (j=0;j<numGlobalVariables;j++) {
 			const	CVariable	*var	=	globalVariables[j];
@@ -1644,21 +1102,18 @@ CShadingState	*CShadingContext::newState() {
 
 			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
 				newState->varying[j]	=	new float[var->numFloats];
-				stats.vertexMemory		+=	var->numFloats*sizeof(float);
+				vertexMemory		+=	var->numFloats*sizeof(float);
 			} else {
-				newState->varying[j]	=	new float[var->numFloats*maxGridSize*3];
-				stats.vertexMemory		+=	var->numFloats*maxGridSize*3*sizeof(float);
+				newState->varying[j]	=	new float[var->numFloats*CRenderer::maxGridSize*3];
+				vertexMemory		+=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 			}
 		}
 
 		// E is always (0,0,0)
 		E	=	newState->varying[VARIABLE_E];
-		for (j=maxGridSize*3;j>0;j--) {
-			initv(E,0,0,0);
-			E	+=	3;
-		}
+		for (j=CRenderer::maxGridSize*3;j>0;j--,E+=3)	initv(E,0,0,0);
 
-		if (stats.vertexMemory > stats.peakVertexMemory)	stats.peakVertexMemory=	stats.vertexMemory;
+		if (vertexMemory > peakVertexMemory)	peakVertexMemory=	vertexMemory;
 
 		newState->next				=	NULL;
 		return	newState;
@@ -1676,7 +1131,6 @@ CShadingState	*CShadingContext::newState() {
 // Description			:	Allocate a new shading state
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void				CShadingContext::deleteState(CShadingState *cState) {
 	cState->next	=	freeStates;
 	freeStates		=	cState;
@@ -1689,28 +1143,27 @@ void				CShadingContext::deleteState(CShadingState *cState) {
 // Description			:	Ditch a shading state
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void			CShadingContext::freeState(CShadingState *cState) {
-	int	j;
+	int			j;
+	const int	numGlobalVariables	=	CRenderer::globalVariables->numItems;
+	CVariable	**globalVariables	=	CRenderer::globalVariables->array;
 
 	for (j=0;j<numGlobalVariables;j++) {
-		if (globalVariables[j] != NULL) {
-			const CVariable	*var	=	globalVariables[j];
+		const CVariable	*var	=	globalVariables[j];
 
-			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-				delete [] cState->varying[j];
-				stats.vertexMemory		-=	var->numFloats*sizeof(float);
-			} else {
-				delete [] cState->varying[j];
-				stats.vertexMemory		-=	var->numFloats*maxGridSize*3*sizeof(float);
-			}
+		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
+			delete [] cState->varying[j];
+			vertexMemory		-=	var->numFloats*sizeof(float);
+		} else {
+			delete [] cState->varying[j];
+			vertexMemory		-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 		}
 	}
 
-	delete [] cState->varying;					stats.vertexMemory	-=	maxGlobalVariables*sizeof(float *);
-	delete [] cState->tags;						stats.vertexMemory	-=	maxGridSize*3*sizeof(int);
-	delete [] cState->lightingTags;				stats.vertexMemory	-=	maxGridSize*3*sizeof(int);
-	delete [] cState->Ns;						stats.vertexMemory	-=	maxGridSize*9*sizeof(float);
+	delete [] cState->varying;					vertexMemory	-=	numGlobalVariables*sizeof(float *);
+	delete [] cState->tags;						vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
+	delete [] cState->lightingTags;				vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
+	delete [] cState->Ns;						vertexMemory	-=	CRenderer::maxGridSize*9*sizeof(float);
 	
 	delete cState;
 }
@@ -1720,31 +1173,6 @@ void			CShadingContext::freeState(CShadingState *cState) {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	variableUpdate
-// Description			:	This function is called to signal that there has been
-//							a modification on the set of active variables
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/25/2002
-void		CShadingContext::initState(CVariable *var,int numGlobal) {
-	numGlobalVariables	=	numGlobal;
-	maxGlobalVariables	=	numGlobal + 50;
-	globalVariables		=	new CVariable*[maxGlobalVariables];
-
-	for (;var!=NULL;var=var->next) {
-		if (var->storage == STORAGE_GLOBAL) {
-			assert(var->entry <= numGlobal);
-			globalVariables[var->entry]		=	var;
-		}
-	}
-
-	assert(freeStates == NULL);
-	assert(currentShadingState == NULL);
-
-	currentShadingState	=	newState();
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -1753,12 +1181,8 @@ void		CShadingContext::initState(CVariable *var,int numGlobal) {
 //							a modification on the set of active variables
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
-void		CShadingContext::updateState(CVariable *var) {
+void		CShadingContext::updateState() {
 	CShadingState	*cState;
-
-	assert(var->storage == STORAGE_GLOBAL);
-	assert(var->entry == numGlobalVariables);
 
 	// Ditch the shading states that have been allocated
 	while ((cState=freeStates) != NULL) {
@@ -1766,326 +1190,43 @@ void		CShadingContext::updateState(CVariable *var) {
 		freeState(cState);
 	}
 
-	if (numGlobalVariables == maxGlobalVariables) {
-		CVariable	**nvariables;
+	// Recreate
+	if (currentShadingState != NULL)	freeState(currentShadingState);
 
-		freeState(currentShadingState);
-		currentShadingState	=	NULL;
-
-		nvariables			=	new CVariable*[maxGlobalVariables + 50];
-		memcpy(nvariables,globalVariables,numGlobalVariables*sizeof(CVariable *));
-		delete [] globalVariables;
-		globalVariables		=	nvariables;
-		maxGlobalVariables	+=	50;
-	}
-
-	globalVariables[numGlobalVariables++]	=	var;
-
-	if (currentShadingState == NULL)	currentShadingState	=	newState();
-	else {
-		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-			currentShadingState->varying[var->entry]	=	new float[var->numFloats];
-			stats.vertexMemory							+=	var->numFloats*sizeof(float);
-		} else {
-			currentShadingState->varying[var->entry]	=	new float[var->numFloats*maxGridSize*3];
-			stats.vertexMemory							+=	var->numFloats*maxGridSize*3*sizeof(float);
-		}
-	}
+	currentShadingState	=	NULL;
+	currentShadingState	=	newState();
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	getTexture
-// Description			:	Load a texture from file
-// Return Value			:
+// Method				:	saveState
+// Description			:	Save the shading state so a nested tesselation
+//							doesn't trash our variables
+// Return Value			:	an opaque shading state reference
 // Comments				:
-// Date last edited		:	8/25/2002
-CTexture	*CShadingContext::getTexture(const char *name) {
-	CFileResource	*tex;
+void	*CShadingContext::saveState() {
+	CShadingState	*savedState		=	currentShadingState;
+	if (freeStates == NULL)			freeStates	=	newState();
 
-	if (loadedFiles->find(name,tex) == FALSE){
-		// Load the texture
-		tex	=	currentRenderer->textureLoad(name,texturePath);
-
-		if (tex == NULL)	{
-			// Not found, substitude with a dummy one
-			error(CODE_NOFILE,"Unable open texture \"%s\"\n",name);
-			tex					=	new CTexture(name,128,128,TEXTURE_PERIODIC,TEXTURE_PERIODIC);
-		}
-
-		loadedFiles->insert(tex->name,tex);
-	}
-
-	return (CTexture *) tex;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getEnvironment
-// Description			:	Load an environment map (which can also be a shadow map)
-// Return Value			:
-// Comments				:
-// Date last edited		:	8/25/2002
-CEnvironment	*CShadingContext::getEnvironment(const char *name) {
-	CFileResource	*tex;
-
-	if (loadedFiles->find(name,tex) == FALSE){
-		tex	=	currentRenderer->environmentLoad(name,texturePath,world->to);
-
-		if (tex == NULL)	{
-			// Not found, substitude with a dummy one
-			error(CODE_NOFILE,"Unable open environment \"%s\"\n",name);
-			tex					=	new CEnvironment(name);
-		}
-
-		loadedFiles->insert(tex->name,tex);
-	}
-
-	return (CEnvironment *) tex;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getPhotonMap
-// Description			:	Load a photon map
-// Return Value			:
-// Comments				:
-// Date last edited		:	3/11/2003
-CPhotonMap		*CShadingContext::getPhotonMap(const char *name) {
-	CFileResource	*map;
-	char			fileName[OS_MAX_PATH_LENGTH];
-	FILE			*in;
-
-	// Check the cache to see if the file is in the memory
-	if (loadedFiles->find(name,map) == FALSE){
-
-		// Locate the file
-		if (currentRenderer->locateFile(fileName,name,texturePath)) {
-			// Try to open the file
-			in		=	ropen(fileName,"rb",filePhotonMap,TRUE);
-		} else {
-			in		=	NULL;
-		}
-
-		// Read it
-		map		=	new CPhotonMap(name,world,in);
-		loadedFiles->insert(map->name,map);
-	}
-
-	return (CPhotonMap *) map;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getCache
-// Description			:	Load a cache
-// Return Value			:
-// Comments				:
-// Date last edited		:	3/11/2003
-CCache		*CShadingContext::getCache(const char *name,const char *mode) {
-	CFileResource	*cache;
+	currentShadingState				=	freeStates;
+	freeStates						=	currentShadingState->next;
 	
-	// Check the memory first
-	if (loadedFiles->find(name,cache) == FALSE){
-		char				fileName[OS_MAX_PATH_LENGTH];
-		int					flags;
-		char				type[128];
-		int					createChannel = FALSE;
-		CIrradianceCache	*icache = NULL;
-		CRadianceCache		*rcache = NULL;
-
-		// Process the file mode
-		if (strcmp(mode,"r") == 0) {
-			flags	=	CACHE_READ| CACHE_SAMPLE;
-		} else if (strcmp(mode,"w") == 0) {
-			flags	=	CACHE_WRITE | CACHE_SAMPLE;
-		} else if (strcmp(mode,"R") == 0) {
-			flags	=	CACHE_READ | CACHE_RDONLY;
-		} else if (strcmp(mode,"rw") == 0) {
-			flags	=	CACHE_READ | CACHE_WRITE | CACHE_SAMPLE;
-		} else {
-			flags	=	CACHE_SAMPLE;
-		}
-		
-		// Try to read the file
-		cache		=	NULL;
-		if (flags & CACHE_READ) {
-
-			// Locate the file
-			if (currentRenderer->locateFile(fileName,name,texturePath)) {
-				FILE	*in	=	ropen(fileName,type);
-
-				if (in != NULL) {
-					// If we're netrendering and writing, treat specially
-					if ((netClient != INVALID_SOCKET) && (flags & CACHE_WRITE)) {
-						flags			&=	~CACHE_WRITE;		// don't flush cache to disk
-						createChannel	=	TRUE;
-						if (strncmp(fileName,temporaryPath,strlen(temporaryPath)) == 0) {
-							// it's a temp file, delete it after we're done
-							currentRenderer->registerFrameTemporary(fileName,TRUE);
-						}
-						// always remove the file mapping when writing
-						currentRenderer->registerFrameTemporary(name,FALSE);
-					}
-					
-					// Create the cache
-					if (strcmp(type,fileIrradianceCache) == 0) {
-						cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,in);
-					} else if (strcmp(type,fileGatherCache) == 0) {
-						cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,in,triangles);
-					} else {
-						error(CODE_BUG,"This seems to be a Pixie file of unrecognised type (%s)\n",name);
-						fclose(in);
-					}
-				}
-			}
-		}
-
-		// If there is no cache, create it
-		if (cache == NULL) {
-			// If we're netrendering and writing, treat specially
-			if ((netClient != INVALID_SOCKET) && (flags & CACHE_WRITE)) {
-				flags			&=	~CACHE_WRITE;		// don't flush cache to 
-				createChannel	=	TRUE;
-				// always remove the file mapping when writing
-				currentRenderer->registerFrameTemporary(name,FALSE);
-			}
-			
-			// go ahead and create the cache
-			if (this->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE) {
-				cache	=	rcache	=	new CRadianceCache(name,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
-			} else {
-				cache	=	icache	=	new CIrradianceCache(name,flags,worldBmin,worldBmax,world,hierarchy,NULL);
-			}
-		}
-		
-		// Create channels if possible
-		if (createChannel == TRUE) {
-			if (icache != NULL) {
-				requestRemoteChannel(new CRemoteICacheChannel(icache));
-			} else if (rcache != NULL) {
-				error(CODE_LIMIT,"Radiancecache file \"%s\" cannot be written to in paralell / network renders\n",name);
-
-				// Prevent crashes caused by unwritable empty cache
-				delete cache;
-				flags |= CACHE_WRITE;
-				osTempname(temporaryPath,"rndr",fileName);
-				cache = new CRadianceCache(fileName,flags,worldBmin,worldBmax,hierarchy,NULL,triangles);
-			}
-		}
-
-		loadedFiles->insert(cache->name,cache);
-	}
-
-	return (CCache *) cache;
+	return (void*) savedState;
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	getTextureInfo
-// Description			:	Load a texture from file
-// Return Value			:
+// Method				:	restoreState
+// Description			:	Restore the shading state from a previous save
+// Return Value			:	-
 // Comments				:
-// Date last edited		:	02/22/2006
-CTextureInfoBase	*CShadingContext::getTextureInfo(const char *name) {
-	CFileResource	*tex;
-
-	if (loadedFiles->find(name,tex) == FALSE){
-		// try environments first
-		tex	=	currentRenderer->environmentLoad(name,texturePath,world->to);
-
-		if (tex == NULL)	{
-			// else try as textures
-			tex	=	currentRenderer->textureLoad(name,texturePath);
-		}
-
-		if (tex != NULL) {
-			// only store the result if found
-			loadedFiles->insert(tex->name,tex);
-		}
-	}
-
-	return (CTextureInfoBase *) tex;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
-// Method				:	getTexture3d
-// Description			:	Get a point cloud or brickmap
-// Return Value			:
-// Comments				:
-// Date last edited		:	02/22/2006
-CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const char* channels,const char *coordsys) {
-	CFileResource	*texture3d;
-	char			fileName[OS_MAX_PATH_LENGTH];
-	FILE			*in;
-
-	if (loadedFiles->find(name,texture3d) == FALSE){
+void	CShadingContext::restoreState(void *state) {
+	CShadingState	*savedState		=	(CShadingState*) state;
 	
-		CXform *xform = world;
-		if (coordsys != NULL) {
-			ECoordinateSystem	esys;
-			matrix				*from,*to;
-			
-			// non worldspace texture
-			xform = new CXform();
-			findCoordinateSystem(coordsys,from,to,esys);
-	
-			movmm(xform->from,from[0]);	// construct the transform to put us in the desired system
-			movmm(xform->to,to[0]);
-		}
-		
-		// If we are writing, it must be a point cloud
-		if (write == TRUE) {
-			
-			if (netClient != INVALID_SOCKET) {
-				CPointCloud	*cloud	=	new CPointCloud(name,xform,channels,FALSE);
-				texture3d			=	cloud;
-			
-				// Ensure we unmap the file when done.  Do not delete it
-				// as we mark the file to never be written in the server
-				currentRenderer->registerFrameTemporary(name,FALSE);
-				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
-			} else {
-				// alloate a point cloud which will be written to disk
-				CXform *dummy = new CXform;
-				texture3d	=	new CPointCloud(name,xform,channels,TRUE);
-			}
-			
-		} else {
-			// Locate the file
-			if (currentRenderer->locateFile(fileName,name,texturePath)) {
-				// Try to open the file
-				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-					CXform *dummy = new CXform;
-					texture3d	=	new CPointCloud(name,xform,in);
-				} else {
-					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
-						texture3d	=	new CBrickMap(in,name,xform);
-					}
-				}
-			} else {
-				in		=	NULL;
-			}
-			
-			if (in == NULL) {
-				// allocate a dummy blank-channel point cloud
-				error(CODE_BADTOKEN,"Cannot find or open Texture3d file \"%s\"\n",name);
-				texture3d	=	new CPointCloud(name,xform,NULL,FALSE);
-				// remove the dummy mapping once the frame ends
-				currentRenderer->registerFrameTemporary(name,FALSE);
-			}
-		}
-		
-		// tidy up in case something went wrong
-		xform->check();
-		
-		loadedFiles->insert(texture3d->name,texture3d);
-	}
+	currentShadingState->next		=	freeStates;
+	freeStates						=	currentShadingState;
 
-	return (CPointCloud *) texture3d;
+	currentShadingState				=	savedState;
 }
 
 
@@ -2095,9 +1236,8 @@ CTexture3d			*CShadingContext::getTexture3d(const char *name,int write,const cha
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->surface != NULL)
 		return currentAttributes->surface->getParameter(name,dest,var,globalIndex);
@@ -2110,9 +1250,8 @@ int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **v
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::displacementParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->displacement != NULL)
 		return currentAttributes->displacement->getParameter(name,dest,var,globalIndex);
@@ -2126,9 +1265,8 @@ int		CShadingContext::displacementParameter(void *dest,const char *name,CVariabl
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->atmosphere != NULL)
 		return currentAttributes->atmosphere->getParameter(name,dest,var,globalIndex);
@@ -2141,9 +1279,8 @@ int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable 
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->interior != NULL)
 		return currentAttributes->interior->getParameter(name,dest,NULL,NULL);	// skip mutable parameters
@@ -2156,9 +1293,8 @@ int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (currentAttributes->exterior != NULL)
 		return currentAttributes->exterior->getParameter(name,dest,NULL,NULL);	// skip mutable parameters
@@ -2171,92 +1307,91 @@ int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 	if (strcmp(name,optionsFormat) == 0) {
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) xres;
-		d[1]		=	(float) yres;
+		d[0]		=	(float) CRenderer::xres;
+		d[1]		=	(float) CRenderer::yres;
 		d[2]		=	(float) 1;
 		return TRUE;
 	} else if (strcmp(name,optionsDeviceFrame) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) frame;
+		d[0]		=	(float) CRenderer::frame;
 		return TRUE;
 	} else if (strcmp(name,optionsDeviceResolution) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) xres;
-		d[1]		=	(float) yres;
+		d[0]		=	(float) CRenderer::xres;
+		d[1]		=	(float) CRenderer::yres;
 		d[2]		=	(float) 1;
 		return TRUE;
 	} else if (strcmp(name,optionsFrameAspectRatio) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) frameAR;
+		d[0]		=	(float) CRenderer::frameAR;
 		return TRUE;
 	} else if (strcmp(name,optionsCropWindow) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) cropLeft;
-		d[1]		=	(float) cropTop;
-		d[2]		=	(float) cropRight;
-		d[3]		=	(float) cropBottom;
+		d[0]		=	(float) CRenderer::cropLeft;
+		d[1]		=	(float) CRenderer::cropTop;
+		d[2]		=	(float) CRenderer::cropRight;
+		d[3]		=	(float) CRenderer::cropBottom;
 		return TRUE;
 	} else if (strcmp(name,optionsDepthOfField) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) fstop;
-		d[1]		=	(float) focallength;
-		d[2]		=	(float) focaldistance;
+		d[0]		=	(float) CRenderer::fstop;
+		d[1]		=	(float) CRenderer::focallength;
+		d[2]		=	(float) CRenderer::focaldistance;
 		return TRUE;
 	} else if (strcmp(name,optionsShutter) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) shutterOpen;
-		d[1]		=	(float) shutterClose;
+		d[0]		=	(float) CRenderer::shutterOpen;
+		d[1]		=	(float) CRenderer::shutterClose;
 		return TRUE;
 	} else if (strcmp(name,optionsClipping) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) clipMin;
-		d[1]		=	(float) clipMax;
+		d[0]		=	(float) CRenderer::clipMin;
+		d[1]		=	(float) CRenderer::clipMax;
 		return TRUE;
 	} else if (strcmp(name,optionsBucketSize) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) bucketWidth;
-		d[1]		=	(float) bucketHeight;
+		d[0]		=	(float) CRenderer::bucketWidth;
+		d[1]		=	(float) CRenderer::bucketHeight;
 		return TRUE;
 	} else if (strcmp(name,optionsColorQuantizer) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) colorQuantizer[0];
-		d[1]		=	(float) colorQuantizer[1];
-		d[2]		=	(float) colorQuantizer[2];
-		d[3]		=	(float) colorQuantizer[3];
+		d[0]		=	(float) CRenderer::colorQuantizer[0];
+		d[1]		=	(float) CRenderer::colorQuantizer[1];
+		d[2]		=	(float) CRenderer::colorQuantizer[2];
+		d[3]		=	(float) CRenderer::colorQuantizer[3];
 		return TRUE;
 	} else if (strcmp(name,optionsDepthQuantizer) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) depthQuantizer[0];
-		d[1]		=	(float) depthQuantizer[1];
-		d[2]		=	(float) depthQuantizer[2];
-		d[3]		=	(float) depthQuantizer[3];
+		d[0]		=	(float) CRenderer::depthQuantizer[0];
+		d[1]		=	(float) CRenderer::depthQuantizer[1];
+		d[2]		=	(float) CRenderer::depthQuantizer[2];
+		d[3]		=	(float) CRenderer::depthQuantizer[3];
 		return TRUE;
 	} else if (strcmp(name,optionsPixelFilter) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) pixelFilterWidth;
-		d[1]		=	(float) pixelFilterHeight;
+		d[0]		=	(float) CRenderer::pixelFilterWidth;
+		d[1]		=	(float) CRenderer::pixelFilterHeight;
 		return TRUE;
 	} else if (strcmp(name,optionsGamma) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) gamma;
-		d[1]		=	(float) gain;
+		d[0]		=	(float) CRenderer::gamma;
+		d[1]		=	(float) CRenderer::gain;
 		return TRUE;
 	} else if (strcmp(name,optionsMaxRayDepth) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) maxRayDepth;
+		d[0]		=	(float) CRenderer::maxRayDepth;
 		return TRUE;
 	} else if (strcmp(name,optionsRelativeDetail) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) relativeDetail;
+		d[0]		=	(float) CRenderer::relativeDetail;
 		return TRUE;
 	} else if (strcmp(name,optionsPixelSamples) == 0) { 
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) pixelXsamples;
-		d[1]		=	(float) pixelYsamples;
+		d[0]		=	(float) CRenderer::pixelXsamples;
+		d[1]		=	(float) CRenderer::pixelYsamples;
 		return TRUE;
 	}
 	return FALSE;
@@ -2268,9 +1403,8 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *) {
-	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
+	const CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
 	if (strcmp(name,attributesShadingRate) == 0) {
 		float	*d	=	(float *) dest;
@@ -2326,7 +1460,6 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int *) {
 	
 	if (strcmp(name,rendererinfoRenderer) == 0) {
@@ -2347,11 +1480,10 @@ int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
-// Description			:	Execute light sources
+// Method				:	shaderName
+// Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 const char	*CShadingContext::shaderName() {
 	assert(currentShadingState->currentShaderInstance != NULL);
 
@@ -2360,11 +1492,10 @@ const char	*CShadingContext::shaderName() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
-// Description			:	Execute light sources
+// Method				:	shaderName
+// Description			:	Get the name of a particular shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 const char	*CShadingContext::shaderName(const char *type) {
 	CAttributes	*currentAttributes	=	currentShadingState->currentObject->attributes;
 
@@ -2397,58 +1528,60 @@ const char	*CShadingContext::shaderName(const char *type) {
 // Description			:	Locate a coordinate system
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
-void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matrix *&to,ECoordinateSystem &cSystem) {
-	if (currentRenderer->findCoordinateSystem(name,from,to,cSystem)) {
-		// The coordinate systems that don't have ant implementation will be pushed into the
-		// CDictionary as a custom coordinate system for they are constant accross a frame
-		
-		switch(cSystem) {
+void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to,ECoordinateSystem &cSystem) {
+	CNamedCoordinateSystem	*currentSystem;
+
+	if(CRenderer::definedCoordinateSystems->find(name,currentSystem)) {
+		from		=	currentSystem->from;
+		to			=	currentSystem->to;
+		cSystem		=	currentSystem->systemType;
+
+		switch(currentSystem->systemType) {
 		case COORDINATE_OBJECT:
 			if (currentShadingState->currentObject == NULL) {
 				error(CODE_SYSTEM,"Object system reference without an object\n");
-				from		=	&identity;
-				to			=	&identity;
+				from		=	identityMatrix;
+				to			=	identityMatrix;
 			} else {
-				from		=	&(currentShadingState->currentObject->xform->from);
-				to			=	&(currentShadingState->currentObject->xform->to);
+				from		=	currentShadingState->currentObject->xform->from;
+				to			=	currentShadingState->currentObject->xform->to;
 			}
 			break;
 		case COORDINATE_CAMERA:
-			from		=	&identity;
-			to			=	&identity;
+			from		=	identityMatrix;
+			to			=	identityMatrix;
 			break;
 		case COORDINATE_WORLD:
-			from		=	&world->from;
-			to			=	&world->to;
+			from		=	CRenderer::fromWorld;
+			to			=	CRenderer::toWorld;
 			break;
 		case COORDINATE_SHADER:
 			assert(currentShadingState->currentShaderInstance != NULL);
 
-			from		=	&(currentShadingState->currentShaderInstance->xform->from);
-			to			=	&(currentShadingState->currentShaderInstance->xform->to);
+			from		=	currentShadingState->currentShaderInstance->xform->from;
+			to			=	currentShadingState->currentShaderInstance->xform->to;
 			break;
 		case COORDINATE_LIGHT:
 			assert(currentShadingState->currentLightInstance != NULL);
 
-			from		=	&(currentShadingState->currentLightInstance->xform->from);
-			to			=	&(currentShadingState->currentLightInstance->xform->to);
+			from		=	currentShadingState->currentLightInstance->xform->from;
+			to			=	currentShadingState->currentLightInstance->xform->to;
 			break;
 		case COORDINATE_NDC:
-			from		=	&fromNDC;
-			to			=	&toNDC;
+			from		=	CRenderer::fromNDC;
+			to			=	CRenderer::toNDC;
 			break;
 		case COORDINATE_RASTER:
-			from		=	&fromRaster;
-			to			=	&toRaster;
+			from		=	CRenderer::fromRaster;
+			to			=	CRenderer::toRaster;
 			break;
 		case COORDINATE_SCREEN:
-			from		=	&fromScreen;
-			to			=	&toScreen;
+			from		=	CRenderer::fromScreen;
+			to			=	CRenderer::toScreen;
 			break;
 		case COORDINATE_CURRENT:
-			from		=	&identity;
-			to			=	&identity;
+			from		=	identityMatrix;
+			to			=	identityMatrix;
 			break;
 		case COLOR_RGB:
 		case COLOR_HSL:
@@ -2457,17 +1590,121 @@ void		CShadingContext::findCoordinateSystem(const char *name,matrix *&from,matri
 		case COLOR_CIE:
 		case COLOR_YIQ:
 		case COLOR_XYY:
+			// Don't handle color, the custom must have been handled
+			break;
 		case COORDINATE_CUSTOM:
 			// Don't handle color, the custom must have been handled
+			from		=	currentSystem->from;
+			to			=	currentSystem->to;
 			break;
 		default:
 			warning(CODE_BUG,"Unknown coordinate system: %s\n",name);
-			from	=	&identity;
-			to		=	&identity;
+			from		=	identityMatrix;
+			to			=	identityMatrix;
+			break;
 		}	
 	} else {
 		warning(CODE_BUG,"Unknown coordinate system: %s\n",name);
-		from	=	&identity;
-		to		=	&identity;
+		from	=	identityMatrix;
+		to		=	identityMatrix;
 	}
+}
+
+
+
+
+
+
+
+
+
+
+//Period parameters
+#define N 624
+#define M 397
+#define MATRIX_A 0x9908b0dfUL	//constant vector a
+#define UMASK 0x80000000UL		//most significant w-r bits
+#define LMASK 0x7fffffffUL		//least significant r bits
+#define MIXBITS(u,v) ( ((u) & UMASK) | ((v) & LMASK) )
+#define TWIST(u,v) ((MIXBITS(u,v) >> 1) ^ (_uTable[v & 1UL] ))
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	randomInit
+// Description			:	Init the random number generator
+// Return Value			:	-
+// Comments				:
+void			CShadingContext::randomInit(unsigned long s) {
+    int j;
+    state[0]= s & 0xffffffffUL;
+    for (j=1; j<N; j++) {
+        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j); 
+        state[j] &= 0xffffffffUL;  /* for >32 bit machines */
+    }
+    next = state;
+    return;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	randomShutdown
+// Description			:	Shutdown the random number generator
+// Return Value			:	-
+// Comments				:
+void			CShadingContext::randomShutdown() {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	next_state
+// Description			:	Get the next stage for the random number generator
+// Return Value			:	-
+// Comments				:
+void			CShadingContext::next_state() {
+    static const unsigned long _uTable[2] = { 0UL, MATRIX_A };
+    register signed int j;
+    
+    register unsigned long *p0;
+    register unsigned long *p1;
+
+    j = ( N-M ) >> 1;
+    p0 = state;
+    p1 = p0 + 1;
+    while(j) {
+       --j;
+        *p0 = TWIST( *p0, *p1 );
+		*p0 ^= p0[M];
+		++p1;
+		++p0;
+
+		*p0 = TWIST( *p0, *p1 );
+		*p0 ^= p0[M];
+		++p1; 
+		++p0;
+    }
+
+    *p0 = TWIST( *p0, *p1);
+    *p0 ^= p0[M];
+    ++p1; 
+    ++p0;
+
+    j = (M-1) >> 1;
+    while( j ) {
+       --j;
+       *p0 = TWIST( *p0, *p1 );
+       *p0 ^= p0[M-N];
+       ++p1;
+       ++p0;
+
+       *p0 = TWIST( *p0, *p1 );
+       *p0 ^= p0[M-N];
+       ++p1;
+       ++p0;
+    }
+    *p0 = TWIST( *p0, *state );
+    *p0 ^= p0[M-N];
+
+    next = state + N;
+    return;
 }

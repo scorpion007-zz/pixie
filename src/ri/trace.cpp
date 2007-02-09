@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -30,13 +30,12 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
-#include "hierarchy.h"
-#include "renderer.h"
 #include "shading.h"
 #include "stats.h"
 #include "memory.h"
-#include "output.h"
 #include "points.h"
+#include "options.h"
+#include "renderer.h"
 
 
 
@@ -49,18 +48,6 @@
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	TObjectHash
-// Description			:	Holds an object hash root
-// Comments				:
-// Date last edited		:	8/16/2004
-typedef struct TObjectHash {
-	CSurface		*object;
-	CRay			*rays;
-	int				numRays;
-	TObjectHash		*next;
-	TObjectHash		*shadeNext;
-} TObjectHash;
 
 
 
@@ -92,19 +79,16 @@ typedef struct TObjectHash {
 //							3. t
 //							4. tmin
 //							5. flags
-// Date last edited		:	8/30/2002
 void	CShadingContext::trace(CRayBundle *bundle) {
 	int								i;
 	const	COptions::CClipPlane	*cPlane;
 	float							t;
 	float							tt;
-	CRay							**rays;
-	int								numRays;
 	float							**varying;
 
 	// Compute some of the ray junk
-	rays			=	bundle->rays;
-	numRays			=	bundle->numRays;
+	CRay		**rays	=	bundle->rays;
+	int			numRays	=	bundle->numRays;
 
 	assert(numRays != 0);
 
@@ -112,28 +96,17 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 		CRay	*ray	=	rays[i];
 		
 		t				=	ray->t;
-
-		addvv(ray->to,ray->from,ray->dir);
 		
 		// Check the ray against the clipping planes
-		for (cPlane=clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
+		for (cPlane=CRenderer::clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
 			tt	=	-(dotvv(cPlane->normal,ray->from)+cPlane->d) / dotvv(cPlane->normal,ray->dir);
 
 			if ((tt > 0) && (tt < t))	t	=	tt;
 		}
 
-		ray->invDir[COMP_X]		=	1/ray->dir[COMP_X];
-		ray->invDir[COMP_Y]		=	1/ray->dir[COMP_Y];
-		ray->invDir[COMP_Z]		=	1/ray->dir[COMP_Z];
 		ray->t					=	t;
-		ray->jimp				=	-1.0f;
-		ray->lastXform			=	NULL;
-		ray->object				=	NULL;
-		hierarchy->intersect(ray);
+		trace(ray);
 	}
-
-	// Increment the traced ray counter
-	stats.numTracedRays	+=	numRays;
 
 	// The transparency pass loop
 	while(TRUE) {
@@ -155,12 +128,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			TShadingGroup	*shadingGroups	=	NULL;	// Holds a list of shading groups
 
 			// Check we have the hash table allocated
-			if (traceObjectHash == NULL) {
-				traceObjectHash	=	(TObjectHash *) frameMemory->alloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE);
-
-				// Fill the object pointers with impossible data
-				for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
-			}
+			assert(traceObjectHash != NULL);
 
 			// Hash the rays into the table
 			for (i=0;i<numRays;i++) {
@@ -195,14 +163,14 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 					// Did we find it ?
 					if (cHash == NULL) {
-						cHash				=	(TObjectHash *) frameMemory->alloc(sizeof(TObjectHash));//GSHHACK //ralloc(sizeof(TObjectHash));
-						cHash->object		=	cRay->object;
-						cHash->numRays		=	0;
-						cHash->rays			=	NULL;
-						cHash->next			=	traceObjectHash[key].next;
+						cHash						=	(TObjectHash *) ralloc(sizeof(TObjectHash),threadMemory);
+						cHash->object				=	cRay->object;
+						cHash->numRays				=	0;
+						cHash->rays					=	NULL;
+						cHash->next					=	traceObjectHash[key].next;
 						traceObjectHash[key].next	=	cHash;
-						cHash->shadeNext	=	objects;
-						objects				=	cHash;
+						cHash->shadeNext			=	objects;
+						objects						=	cHash;
 					}
 				}
 
@@ -216,7 +184,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			rays				+=	numRays;
 			while((cHash=objects) != NULL) {
 				CRay			*cRay;
-				TShadingGroup	*cGroup	=	(TShadingGroup *) ralloc(sizeof(TShadingGroup));
+				TShadingGroup	*cGroup	=	(TShadingGroup *) ralloc(sizeof(TShadingGroup),threadMemory);
 
 				// Put the rays in this bin into an array
 				for (cRay=cHash->rays;cRay!=NULL;cRay = (CRay *) (cRay->object)) {
@@ -242,7 +210,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				int	numShading;
 
 				while((numShading = shadingGroups->numRays) > 0) {
-					if (numShading > maxGridSize)	numShading	=	maxGridSize;
+					if (numShading > CRenderer::maxGridSize)	numShading	=	CRenderer::maxGridSize;
 					
 					// Restore the object pointers in the rays for the bundle code
 					for (i=0;i<numShading;i++) {
@@ -276,13 +244,11 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 				CRay	*cRay	=	*rays++;
 
 				cRay->tmin		=	cRay->t + C_EPSILON;
-				cRay->object	=	NULL;
 				cRay->t			=	C_INFINITY;
-				hierarchy->intersect(cRay);
+				trace(cRay);
 			}
 
 			// Increment the traced ray counter
-			stats.numTracedRays	+=	numRays;
 			rays				=	bundle->rays;
 		}
 	}
@@ -301,9 +267,8 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 // Description			:	Trace/Shade bunch of rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/30/2002
 void	CShadingContext::traceEx(CRayBundle *bundle) {
-	if (currentRayDepth < maxRayDepth) {
+	if (currentRayDepth < CRenderer::maxRayDepth) {
 		CShadingState	*savedState		=	currentShadingState;
 		const char		*savedLabel		=	currentRayLabel;
 
@@ -327,10 +292,108 @@ void	CShadingContext::traceEx(CRayBundle *bundle) {
 
 	} else {
 		//GSHTODO: what about postTrace(), post() here??
+		//Okan: postShade function (in this form) must take care of the rays that don't hit anything
 		bundle->postShade(bundle->numRays,bundle->rays);
 	}
 }
 
 
+// This is a temp class to hold the heap
+class	CTraceObject {
+public:
+		float		tmin;
+		CObject		*object;
+};
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	trace
+// Description			:	Trace a single ray
+// Return Value			:	-
+// Comments				:	Assume the following fields of CRay have been set:
+//							1. from
+//							2. dir (must be unit length)
+//							3. t
+//							4. tmin
+//							5. flags
+void	CShadingContext::trace(CRay *ray) {
+
+	
+	CTraceObject		heapBase[101];
+	CTraceObject		*heap		=	heapBase;
+	int					numObjects	=	1;
+	int					maxObjects	=	100;
+	
+	// Compute the inverse of the ray direction first
+	ray->invDir[0]	= 1.0 / (double) ray->dir[0];
+	ray->invDir[1]	= 1.0 / (double) ray->dir[1];
+	ray->invDir[2]	= 1.0 / (double) ray->dir[2];
+	
+	// Compute the first entry in the heap
+	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
+	heap[1].object		=	CRenderer::root;
+	ray->jimp			=	urand();
+	ray->object			=	NULL;
+
+	numTracedRays++;
+
+	// While we have objects in the heap, pop the object and process it
+	while((numObjects > 0) && (heap[1].tmin < ray->t)) {
+		CObject	*object		=	heap[1].object;
+
+		// Remove the topmost item from da heap
+		int			parent	=	1;
+		int			child	=	2;
+		const float	tmin	=	heap[numObjects].tmin;
+		while(child < numObjects) {
+			if (((child+1) < numObjects) && (heap[child].tmin > heap[child+1].tmin))	child++;
+
+			if (tmin < heap[child].tmin)	break;
+
+			heap[parent]	=	heap[child];
+			parent			=	child;
+			child			=	child+child;
+		}
+		heap[parent]	=	heap[numObjects];
+		numObjects--;
+
+		// If this is a real object, intersect it with the ray
+		if ((object->flags & OBJECT_DUMMY) == 0) {
+			object->intersect(this,ray);
+		}
+
+		// Insert the children objects into the queue
+		CObject	*cChild;
+		for (cChild=object->children;cChild!=NULL;cChild=cChild->sibling) {
+
+			// Allocate more heap space if we need it (very unlikely)
+			if (numObjects == maxObjects) {
+				maxObjects					*=	2;
+				CTraceObject	*newHeap	=	(CTraceObject *) ralloc((maxObjects+1)*sizeof(CTraceObject),threadMemory);
+				memcpy(newHeap,heap,(numObjects+1)*sizeof(CTraceObject));
+				heap						=	newHeap;
+			}
+
+			// Insert the child into the heap
+			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
+			
+			if (tmin < ray->t) {
+				// Maintain the heap
+				int	child	=	++numObjects;
+				int	parent	=	child >> 1;
+				while ((child > 1) && (tmin < heap[parent].tmin)) {
+					heap[child]			=	heap[parent];
+					child				=	parent;
+					parent				=	parent >> 1;
+				}
+				heap[child].tmin	=	tmin;
+				heap[child].object	=	cChild;
+			}
+		}
+	}
+}
 
 

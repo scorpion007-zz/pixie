@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -41,19 +41,17 @@
 #include "rgbe.h"
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CFramebuffer
+// Class				:	CRendererbuffer
 // Description			:	Holds the framebuffer
 // Comments				:
-// Date last edited		:	5/9/2002
 class	CRgbeFramebuffer {
 public:
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	CRendererbuffer
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	5/9/2002
 				CRgbeFramebuffer(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 					char	fileName[256];
 
@@ -74,12 +72,11 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
-				// Method				:	~CFramebuffer
+				// Class				:	CRendererbuffer
+				// Method				:	~CRendererbuffer
 				// Description			:	Dtor
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	11/28/2001
 				~CRgbeFramebuffer() {
 					RGBE_WritePixels(image,data,width*height);
 
@@ -89,12 +86,11 @@ public:
 				}
 
 				///////////////////////////////////////////////////////////////////////
-				// Class				:	CFramebuffer
+				// Class				:	CRendererbuffer
 				// Method				:	write
 				// Description			:	Swrite some data to the out file
 				// Return Value			:	-
 				// Comments				:
-				// Date last edited		:	11/28/2001
 	void		write(int x,int y,int w,int h,float *data) {
 					int				i,j;
 
@@ -124,7 +120,6 @@ public:
 // Description			:	Begin receiving an image
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 	return new CRgbeFramebuffer(name,width,height,numSamples,samples,findParameter);
 }
@@ -134,7 +129,6 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Description			:	Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
 	CRgbeFramebuffer	*fb	=	(CRgbeFramebuffer *) im;
 	
@@ -150,7 +144,6 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Description			:	Finish receiving an image
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
 	CRgbeFramebuffer	*fb	=	(CRgbeFramebuffer *) im;
 

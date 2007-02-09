@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -59,7 +59,6 @@ typedef enum {
 // Class				:	CRemoteChannel
 // Description			:	base class for remote channels
 // Comments				:	
-// Date last edited		:	03/13/06
 class CRemoteChannel {
 public:
 					CRemoteChannel(const char *n,int f,int d) : name(strdup(n)), flags(f), channelType(d), remoteId(-1) { }
@@ -83,7 +82,6 @@ public:
 // Class				:	CRemoteTSMChannel
 // Description			:	remote channel for tsm
 // Comments				:	
-// Date last edited		:	03/13/06
 class	CRemoteTSMChannel : public CRemoteChannel {
 public:
 	CRemoteTSMChannel(const char*,FILE*,int*,int,int);
@@ -103,7 +101,6 @@ private:
 // Class				:	CRemoteICacheChannel
 // Description			:	remote channel for irradiance caches
 // Comments				:	
-// Date last edited		:	03/13/06
 class	CRemoteICacheChannel : public CRemoteChannel {
 public:
 	CRemoteICacheChannel(CIrradianceCache *);
@@ -122,7 +119,6 @@ private:
 // Class				:	CRemotePtCloudChannel
 // Description			:	remote channel for point clouds
 // Comments				:	
-// Date last edited		:	03/13/06
 class	CRemotePtCloudChannel : public CRemoteChannel {
 public:
 	CRemotePtCloudChannel(CPointCloud *);

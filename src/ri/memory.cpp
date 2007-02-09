@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -42,49 +42,13 @@ static	int					allocatedPages			=	0;
 static	int					freedPages				=	0;
 static	int					memoryPageSize			=	1000000;
 static	float				lastPagingTime			=	0;
-		CMemPage			*currentMemoryPage		=	NULL;
 
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	memoryInit
-// Description			:	Initialize the memory manager
-// Return Value			:
-// Comments				:
-// Date last edited		:	1/14/2002
-void			memoryInit() {
-	currentMemoryPage	=	memoryNewPage(INIT_ZONE_SIZE);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	memoryTini
-// Description			:	Destroy memory manager
-// Return Value			:
-// Comments				:
-// Date last edited		:	1/14/2002
-void			memoryTini() {
-	CMemPage	*cPage;
-
-	// We must be the first page
-	assert(currentMemoryPage->prev == NULL);
-
-	while(currentMemoryPage != NULL) {
-		cPage				=	currentMemoryPage;
-		currentMemoryPage	=	cPage->next;
-
-		memoryDeletePage(cPage);
-	}
-
-	assert(allocatedZoneMemory	==	freedZoneMemory);
-	assert(allocatedPages		==	freedPages);
-	assert(stats.zoneMemory		==	0);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	memoryInit
 // Description			:	Initialize a named memory manager
 // Return Value			:
 // Comments				:	Should be called after memInit
-// Date last edited		:	1/14/2002
 void			memoryInit(CMemPage *&stack) {
 	stack	=	memoryNewPage(INIT_ZONE_SIZE);
 }
@@ -94,7 +58,6 @@ void			memoryInit(CMemPage *&stack) {
 // Description			:	Destroy a named memory manager
 // Return Value			:
 // Comments				:	Should be called before memTini so counts are correct
-// Date last edited		:	1/14/2002
 void			memoryTini(CMemPage *&stack) {
 	CMemPage	*cPage;
 
@@ -102,7 +65,7 @@ void			memoryTini(CMemPage *&stack) {
 	assert(stack->prev == NULL);
 
 	while(stack != NULL) {
-		cPage				=	stack;
+		cPage	=	stack;
 		stack	=	cPage->next;
 
 		memoryDeletePage(cPage);
@@ -114,7 +77,6 @@ void			memoryTini(CMemPage *&stack) {
 // Description			:	Allocate a new memory page whose size is at least "size"
 // Return Value			:
 // Comments				:
-// Date last edited		:	1/14/2002
 CMemPage		*memoryNewPage(int size) {
 	CMemPage	*newPage	=	new CMemPage;
 	float		time		=	osCPUTime();
@@ -151,7 +113,6 @@ CMemPage		*memoryNewPage(int size) {
 // Description			:	Dealoocate memory page
 // Return Value			:
 // Comments				:
-// Date last edited		:	1/14/2002
 void		memoryDeletePage(CMemPage *cPage) {
 	// Stats update
 	freedPages++;

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -163,7 +163,6 @@ typedef struct TSearchpath {
 //							as it appears in the source code. Thus it may not be unique.
 //							The defLineNo and defFileName holds the position of the definition
 //							of this symbol. They can be NULL.
-// Date last edited		:	4/25/2002
 class	CSymbol {
 public:
 						CSymbol(char *);								// The parameter is the name of the symbol
@@ -190,7 +189,6 @@ public:
 //							is set, it should contain the number of items in the array.
 //							The parent field can not be NULL. The script context will create a dummy function
 //							that owns all variables (including global ones) at the beginning.
-// Date last edited		:	4/27/2002
 class	CVariable : public CSymbol {
 public:
 																		// The parameters to constructor are:
@@ -217,7 +215,6 @@ public:
 // Comments				:	The parameterNumber field holds the position of the parameter in the parameter
 //							list. (0 being the leftmost parameter). The defaultValue field holds the default
 //							value of the parameter. The parent field can not be NULL.
-// Date last edited		:	1/10/2001
 class	CParameter : public CVariable {
 public:
 																		// The constructor parameters are:
@@ -254,7 +251,6 @@ public:
 //							The parent function can be NULL only for the top level function (only one exists)
 //							Note that functions are expanded as in-line, so they don't need unique names
 //							to appear in the generated code
-// Date last edited		:	1/10/2001
 class	CFunction : public CSymbol {
 public:
 																		// The parameters to the constructor are:
@@ -309,7 +305,6 @@ public:
 //							they are passed by value. Actually, screw this, all variables are passed
 //							by value but since non-output variables are marked RD_ONLY, they won't be
 //							changed anyway
-// Date last edited		:	1/10/2001
 class	CFunctionPrototype : public CSymbol {
 public:
 																		// The constructor parameters are:
@@ -348,7 +343,6 @@ public:
 // Class				:	CScriptContext
 // Description			:	This class is used to hold information about the file being compiled
 // Comments				:	The main compiler manager class.
-// Date last edited		:	1/10/2001
 class	CScriptContext {
 	typedef	void	(*dsoCallbackFunction)(char *name,char *prototype);
 public:

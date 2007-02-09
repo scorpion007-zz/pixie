@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -30,25 +30,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 // The inverse of the Bezier basis
-static	double	invBezier[16]	=	{	0,		0,			0,			1.0,
+static	matrix	invBezier		=	{	0,		0,			0,			1.0f,
+										0,		0,			1.0f/3.0f,	1.0f,
+										0,		1.0f/3.0f,	2.0f/3.0f,	1.0f,
+										1.0f,	1.0f,		1.0f,		1.0f};
+
+static	dmatrix	dinvBezier		=	{	0,		0,			0,			1.0,
 										0,		0,			1.0/3.0,	1.0,
 										0,		1.0/3.0,	2.0/3.0,	1.0,
 										1.0,	1.0,		1.0,		1.0};
-
-
-static	double	geometryU[16],geometryV[16];
-
-#define	mulmmd(__result,__s1,__s2) {												\
-	int i,j,k;																		\
-																					\
-	for (i=0;i<4;i++)																\
-		for (j=0;j<4;j++) {															\
-				double &dest	=	__result[element(i,j)];							\
-																					\
-				dest		=	0;													\
-				for (k=0;k<4;k++) dest	+=	__s1[element(i,k)]*__s2[element(k,j)];	\
-		}																			\
-}
 
 // This macro is used to fix the degenerate normal vectors
 #define	normalFix()	{																				\
@@ -91,33 +81,63 @@ static	double	geometryU[16],geometryV[16];
 // Description			:	Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/25/2004
-static	inline	void	makeCubicBound(float *bmin,float *bmax,double *gx,double *gy,double *gz) {
-	double	tmp1[16];
-	double	tmp2[16];
-	int		i;
+#define	makeCubicBound(__bmin,__bmax,__gx,__gy,__gz) {							\
+	matrix	tmp1;																\
+	matrix	tmp2;																\
+	int		i;																	\
+																				\
+	mulmm(tmp1,geometryV,__gx);													\
+	mulmm(tmp2,tmp1,geometryU);													\
+																				\
+	for (i=0;i<16;i++) {														\
+		if (tmp2[i] < __bmin[COMP_X])	__bmin[COMP_X]	=	(float) tmp2[i];	\
+		if (tmp2[i] > __bmax[COMP_X])	__bmax[COMP_X]	=	(float) tmp2[i];	\
+	}																			\
+																				\
+	mulmm(tmp1,geometryV,__gy);													\
+	mulmm(tmp2,tmp1,geometryU);													\
+																				\
+	for (i=0;i<16;i++) {														\
+		if (tmp2[i] < __bmin[COMP_Y])	__bmin[COMP_Y]	=	(float) tmp2[i];	\
+		if (tmp2[i] > __bmax[COMP_Y])	__bmax[COMP_Y]	=	(float) tmp2[i];	\
+	}																			\
+																				\
+	mulmm(tmp1,geometryV,__gz);													\
+	mulmm(tmp2,tmp1,geometryU);													\
+																				\
+	for (i=0;i<16;i++) {														\
+		if (tmp2[i] < __bmin[COMP_Z])	__bmin[COMP_Z]	=	(float) tmp2[i];	\
+		if (tmp2[i] > __bmax[COMP_Z])	__bmax[COMP_Z]	=	(float) tmp2[i];	\
+	}																			\
+}
 
-	mulmmd(tmp1,geometryV,gx);
-	mulmmd(tmp2,tmp1,geometryU);
 
-	for (i=0;i<16;i++) {
-		if (tmp2[i] < bmin[COMP_X])	bmin[COMP_X]	=	(float) tmp2[i];
-		if (tmp2[i] > bmax[COMP_X])	bmax[COMP_X]	=	(float) tmp2[i];
-	}
 
-	mulmmd(tmp1,geometryV,gy);
-	mulmmd(tmp2,tmp1,geometryU);
-
-	for (i=0;i<16;i++) {
-		if (tmp2[i] < bmin[COMP_Y])	bmin[COMP_Y]	=	(float) tmp2[i];
-		if (tmp2[i] > bmax[COMP_Y])	bmax[COMP_Y]	=	(float) tmp2[i];
-	}
-
-	mulmmd(tmp1,geometryV,gz);
-	mulmmd(tmp2,tmp1,geometryU);
-
-	for (i=0;i<16;i++) {
-		if (tmp2[i] < bmin[COMP_Z])	bmin[COMP_Z]	=	(float) tmp2[i];
-		if (tmp2[i] > bmax[COMP_Z])	bmax[COMP_Z]	=	(float) tmp2[i];
-	}
+///////////////////////////////////////////////////////////////////////
+// Function				:	makeCubicBound
+// Description			:	Converts the control vertices to Bezier control vertices
+// Return Value			:	-
+// Comments				:
+#define	makeCubicBoundX(__bmin,__bmax,__gx,__gy,__gz,__xform) {					\
+	dmatrix	tmp1;																\
+	dmatrix	tmpX;																\
+	dmatrix	tmpY;																\
+	dmatrix	tmpZ;																\
+	int		i;																	\
+																				\
+	mulmm(tmp1,geometryV,__gx);													\
+	mulmm(tmpX,tmp1,geometryU);													\
+																				\
+	mulmm(tmp1,geometryV,__gy);													\
+	mulmm(tmpY,tmp1,geometryU);													\
+																				\
+	mulmm(tmp1,geometryV,__gz);													\
+	mulmm(tmpZ,tmp1,geometryU);													\
+																				\
+	for (i=0;i<16;i++) {														\
+		vector	D,Dw;															\
+		initv(D,(float) tmpX[i],(float) tmpY[i],(float) tmpZ[i]);				\
+		mulmp(Dw,__xform->from,D);												\
+		addBox(__bmin,__bmax,Dw);												\
+	}																			\
 }

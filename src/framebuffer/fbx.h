@@ -46,7 +46,6 @@
 // Class				:	CXDisplay
 // Description			:	The windows display class
 // Comments				:
-// Date last edited		:	2/28/2002
 class	CXDisplay : public CDisplay {
 public:
 							CXDisplay(const char *,const char *,int,int,int);

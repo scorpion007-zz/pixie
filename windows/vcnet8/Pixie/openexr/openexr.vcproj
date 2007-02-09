@@ -44,7 +44,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;OPENEXR_EXPORTS"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
+				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="1"
@@ -66,11 +66,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="IlmImf.lib Iex.lib Imath.lib Half.lib zlib.lib"
+				AdditionalDependencies="IlmImf_d.lib Iex_d.lib Imath_d.lib Half_d.lib IlmThread_d.lib zlibd.lib"
 				OutputFile="$(OutDir)/openexr.dll"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames="libcmtd"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/openexr.pdb"
 				SubSystem="2"
@@ -154,7 +154,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="IlmImf_dll.lib Iex_dll.lib Imath_dll.lib Half_dll.lib zlib.lib"
+				AdditionalDependencies="IlmImf.lib Iex.lib Imath.lib Half.lib IlmThread.lib zlib.lib"
 				OutputFile="$(OutDir)/openexr.dll"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames=""

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -40,23 +40,23 @@
 // Class				:	CBSplinePatchGrid
 // Description			:	Implements a non-regular catmull-clark subdivision patch
 // Comments				:	This is valid for irregular patches away from the border
-// Date last edited		:	5/30/2003
 class	CBSplinePatchGrid : public CSurface {
 public:
-					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,double *);
+					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,float *);
 					~CBSplinePatchGrid();
 
-	void			bound(float *,float *) const;
-	void			tesselate(CShadingContext *);
-	int				moving() const												{	return variables->moving;			}
-	void			sample(int,int,float **,unsigned int &) const;
-	void			interpolate(int,float **) const;
+					// Object interface
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+					// Surface interface
+	int				moving() const													{	return variables->moving;			}
+	void			sample(int,int,float **,float ***,unsigned int &) const;
+	void			interpolate(int,float **,float ***) const;
 
 	CVertexData		*variables;					// The variables
 	CParameter		*parameters;				// The parameters
 
-	double			*vertex;					// The vertex data (premultiplied Bu*G*Bu')
-	vector			bmin,bmax;					// The bounds
+	float			*vertex;					// The vertex data (premultiplied Bu*G*Bu')
 	float			uOrg,vOrg,uMult,vMult;		// The u,v ranges
 	int				uVertices,vVertices;		// The number of samples in u and v
 };

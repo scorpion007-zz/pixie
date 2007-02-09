@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,10 +32,10 @@
 #include <math.h>
 
 #include "pl.h"
-#include "renderer.h"
 #include "stats.h"
 #include "error.h"
 #include "memory.h"
+#include "renderer.h"
 
 
 
@@ -45,7 +45,6 @@
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter::CParameter(CVariable *v) {
 	stats.numParameters++;
 
@@ -61,7 +60,6 @@ CParameter::CParameter(CVariable *v) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter::~CParameter() {
 	stats.numParameters--;
 
@@ -73,7 +71,6 @@ CParameter::~CParameter() {
 // Class				:	CUniformParameter
 // Description			:	Encapsulates a uniform parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CUniformParameter : public CParameter {
 public:
 					CUniformParameter(CVariable *v) : CParameter(v) {
@@ -86,15 +83,16 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float	*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
+						
 
 						
 						if (dest != NULL) {
-							variable->value	=	NULL;
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(dest,data,variable->numFloats*sizeof(float));
 							} else {
@@ -106,17 +104,17 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float	*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
-							variable->value	=	NULL;
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(dest + start*variable->numFloats,data,variable->numFloats*sizeof(float));
 							} else {
@@ -128,7 +126,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(start,numVertices,varying);
+						if (next != NULL)	next->dispatch(start,numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -153,7 +151,6 @@ public:
 // Class				:	CUniformParameter
 // Description			:	Encapsulates a varying parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVaryingParameter : public CParameter {
 public:
 					CVaryingParameter(CVariable *v) : CParameter(v) {
@@ -164,11 +161,12 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -180,8 +178,6 @@ public:
 							const float	*u			=	varying[VARIABLE_U];
 							const float	*v			=	varying[VARIABLE_V];
 
-							variable->value			=	NULL;
-
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
 								const float	cv	=	*v++;
@@ -192,14 +188,15 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -212,8 +209,6 @@ public:
 							const float	*v			=	varying[VARIABLE_V] + start;
 
 							dest					+=	start*numFloats;
-							variable->value			=	NULL;
-
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
 								const float	cv	=	*v++;
@@ -224,7 +219,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -248,7 +243,6 @@ public:
 // Class				:	CUniformParameter
 // Description			:	Encapsulates a varying parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVarying3Parameter : public CParameter {
 public:
 					CVarying3Parameter(CVariable *v) : CParameter(v) {
@@ -259,11 +253,12 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -273,8 +268,6 @@ public:
 							const float	*v2			=	v1 + numFloats;
 							const float	*u			=	varying[VARIABLE_U];
 							const float	*v			=	varying[VARIABLE_V];
-
-							variable->value			=	NULL;
 
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
@@ -286,14 +279,15 @@ public:
 							}	
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -305,7 +299,6 @@ public:
 							const float	*v			=	varying[VARIABLE_V] + start;
 
 							dest					+=	start*numFloats;
-							variable->value			=	NULL;
 
 							for (i=numVertices;i>0;i--) {
 								const float	cu	=	*u++;
@@ -317,7 +310,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -343,7 +336,6 @@ public:
 // Class				:	CVarying2Parameter
 // Description			:	Encapsulates a varying parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVarying2Parameter : public CParameter {
 public:
 					CVarying2Parameter(CVariable *v) : CParameter(v) {
@@ -354,11 +346,12 @@ public:
 						delete [] data;
 					}
 
-	void			dispatch(int numVertices,float **varying) {
+	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -366,8 +359,6 @@ public:
 							const float	*v0			=	data;
 							const float	*v1			=	v0 + numFloats;
 							const float	*v			=	varying[VARIABLE_V];
-
-							variable->value			=	NULL;
 
 							for (i=numVertices;i>0;i--) {
 								const float	cv	=	*v++;
@@ -378,15 +369,16 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
-	void			dispatch(int start,int numVertices,float **varying) {
+	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
 						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else										dest	=	variable->value;
-
+						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
+						else										dest	=	NULL;
+						
 						if (dest != NULL) {
 							int			i,j;
 							const int	numFloats	=	variable->numFloats;
@@ -394,7 +386,6 @@ public:
 							const float	*v1			=	v0 + numFloats;
 							const float	*v			=	varying[VARIABLE_V] + start;
 
-							variable->value			=	NULL;
 							dest					+=	start*numFloats;
 
 							for (i=numVertices;i>0;i--) {
@@ -406,7 +397,7 @@ public:
 							}
 						}
 
-						if (next != NULL)	next->dispatch(numVertices,varying);
+						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	CParameter		*clone(CAttributes *a) {
@@ -474,7 +465,6 @@ public:
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CVertexData::CVertexData() {
 	stats.numVertexDatas++;
 	stats.gprimCoreMemory	+=	sizeof(CVertexData);
@@ -488,7 +478,6 @@ CVertexData::CVertexData() {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CVertexData::~CVertexData() {
 	stats.numVertexDatas--;
 	stats.gprimCoreMemory	-=	(sizeof(CVertexData) + numVariables*sizeof(CVariable *));
@@ -503,8 +492,7 @@ CVertexData::~CVertexData() {
 // Description			:	Dispatch vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
-void	CVertexData::dispatch(const float *data,int start,int numVertices,float **varying) {
+void	CVertexData::dispatch(const float *data,int start,int numVertices,float **varying,float ***locals) {
 	int			i;
 	CVariable	**dispatch	=	variables;
 
@@ -514,10 +502,10 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 		float		*dest;
 
 		if (dispatch[0]->storage == STORAGE_GLOBAL)	dest	=	varying[dispatch[0]->entry] + start*numFloats;
-		else										dest	=	dispatch[0]->value + start*numFloats;
+		else if (locals != NULL)					dest	=	locals[dispatch[0]->accessor][dispatch[0]->entry]  + start*numFloats;
+		else										dest	=	NULL;
 
 		if (dest != NULL) {
-			dispatch[0]->value	=	NULL;
 			dispatchData(src,dest,vertexSize,numFloats,numVertices);
 		}
 
@@ -532,7 +520,6 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
 	stats.numPls++;
 	stats.gprimCoreMemory	+=	sizeof(CPl);
@@ -551,7 +538,6 @@ CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl::~CPl() {
 	stats.numPls--;
 	stats.gprimCoreMemory	-=	sizeof(CPl);
@@ -580,7 +566,6 @@ CPl::~CPl() {
 // Description			:	Append another data block for the shutter close
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 void		CPl::append(float *d) {
 	if (data1 == NULL) {
 		data1					=	new float[dataSize];
@@ -596,7 +581,6 @@ void		CPl::append(float *d) {
 // Description			:	Transform the variables into another coordinaye system
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 void		CPl::transform(CXform *x,float *cData) {
 	if (cData == NULL) {
 		if ((x->next != NULL) && (data1 == NULL)) {
@@ -679,7 +663,6 @@ void		CPl::transform(CXform *x,float *cData) {
 // Description			:	Extract the vertex data from the parameter list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CVertexData	*CPl::vertexData() {
 	int			i,j;
 	CVertexData	*vd	=	new CVertexData;
@@ -728,7 +711,6 @@ CVertexData	*CPl::vertexData() {
 // Description			:	Extract the vertex data from the parameter list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl				*CPl::clone(CAttributes *a) {
 	float			*ndata0,*ndata1;
 	CPlParameter	*nParameters;
@@ -776,7 +758,6 @@ CPl				*CPl::clone(CAttributes *a) {
 // Description			:	Find a variable in the parameter list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 	int	i,disp;
 
@@ -799,8 +780,7 @@ CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
-void	CPl::collect(int &size,float *&data,EVariableClass container) {
+void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page) {
 	int			i,j,k;
 	const float	*cData		=	data0;
 	float		*oData;
@@ -824,7 +804,11 @@ void	CPl::collect(int &size,float *&data,EVariableClass container) {
 
 	assert(numItems > 0);
 
-	if (data == NULL)	data	=	(float *) ralloc(size*numItems*sizeof(float));
+	// Allocate the memory to keep things around
+	if (data == NULL)	{
+		assert(page != NULL);
+		data	=	(float *) ralloc(size*numItems*sizeof(float),page);
+	}
 
 	oData	=	data;
 
@@ -875,7 +859,6 @@ void	CPl::collect(int &size,float *&data,EVariableClass container) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::uniform(int u,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -914,7 +897,6 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -948,7 +930,6 @@ CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -980,7 +961,6 @@ CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p) {
 	int				i;
 	CPlParameter	*cParameter	=	parameters;
@@ -1017,7 +997,6 @@ CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p)
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -1051,7 +1030,6 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter *p) {
 	int				i;
 	CPlParameter	*cParameter	=	parameters;
@@ -1088,7 +1066,6 @@ CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter
 // Description			:	Extract the vertex data
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 	int				i;
 	const	float	*cData		=	data0;
@@ -1121,7 +1098,6 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 // Description			:	Extracts the parameters set by the list
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/19/2003
 unsigned int CPl::parameterUsage() {
 	unsigned int	p;
 	int				i;
@@ -1143,7 +1119,6 @@ unsigned int CPl::parameterUsage() {
 // Description			:	Parse a parameter list
 // Return Value			:	The parsed parameter list
 // Comments				:
-// Date last edited		:	8/19/2003
 CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,char **params,void **vals,char *required,int flags,CAttributes *attributes) {
 	int					i,numDefinedParams = 0;
 	CPlParameter		*parameters,*finalParameters;
@@ -1162,7 +1137,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		int				declaredParam = FALSE;
 
 		// Fetch the parameter
-		cVar	=	currentRenderer->retrieveVariable(params[i]);
+		cVar	=	CRenderer::retrieveVariable(params[i]);
 		if (cVar == NULL) {
 
 			// This may be an inline decl., try to parse it into a temp var
@@ -1172,7 +1147,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				container		=	tmp.container;
 				declaredParam	=	TRUE;
 
-				cVar			=	currentRenderer->retrieveVariable(tmp.name);
+				cVar			=	CRenderer::retrieveVariable(tmp.name);
 				if (cVar == NULL) {
 					// No match, query the shaders
 					sVar		=	&tmp;
@@ -1291,15 +1266,15 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		if (strcmp(cVar->name,"st") == 0) {
 			CPl		*npl;
 
-			memBegin();
+			memBegin(CRenderer::globalMemory);
 
-			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *));
-			void	**nvals		=	(void **) ralloc((numParams+1)*sizeof(void *));
+			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *),CRenderer::globalMemory);
+			void	**nvals		=	(void **) ralloc((numParams+1)*sizeof(void *),CRenderer::globalMemory);
 			int		j;
 			float	*sval,*tval,*src;
 
-			sval				=	(float *) ralloc(numItems*sizeof(float));
-			tval				=	(float *) ralloc(numItems*sizeof(float));
+			sval				=	(float *) ralloc(numItems*sizeof(float),CRenderer::globalMemory);
+			tval				=	(float *) ralloc(numItems*sizeof(float),CRenderer::globalMemory);
 			src					=	(float *) vals[i];
 
 			// Separate s and t
@@ -1342,8 +1317,8 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 						decl	=	"uniform float";
 						break;
 				}
-				sDecl = (char*) ralloc(strlen(decl) + strlen(RI_S) + 2);
-				tDecl = (char*) ralloc(strlen(decl) + strlen(RI_T) + 2);
+				sDecl = (char*) ralloc(strlen(decl) + strlen(RI_S) + 2,CRenderer::globalMemory);
+				tDecl = (char*) ralloc(strlen(decl) + strlen(RI_T) + 2,CRenderer::globalMemory);
 				sprintf(sDecl,"%s %s",decl,RI_S);
 				sprintf(tDecl,"%s %s",decl,RI_T);
 			}
@@ -1363,7 +1338,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 			npl	=	parseParameterList(numUniform,numVertex,numVarying,numFaceVarying,j,ntokens,nvals,required,flags,attributes);
 
-			memEnd();
+			memEnd(CRenderer::globalMemory);
 
 			return npl;
 		}

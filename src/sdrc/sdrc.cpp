@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -104,7 +104,6 @@ static	char	*argumentPrintVersionInfo		=			"-v";
 // Description			:	Print the version
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	4/28/2002
 void	printVersion() {
 	printf("RenderMan Shading Language Compiler (%s) v%d.%d.%d\n",compilerName,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 }
@@ -114,7 +113,6 @@ void	printVersion() {
 // Description			:	Print the compiler usage
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	4/28/2002
 void	printUsage() {
 	printVersion();
 	printf("Usage:\n");
@@ -149,7 +147,6 @@ void	printUsage() {
 // Description			:	Display an error and exit
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	4/28/2002
 void	initError(char *mes,...) {
 	va_list	args;
 
@@ -164,7 +161,6 @@ void	initError(char *mes,...) {
 // Description			:	Append a file name
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	4/28/2002
 int		append(const char *file,void *ud) {
 	CArray<char *>	*sourceFiles	=	(CArray<char *> *)	ud;
 
@@ -179,7 +175,6 @@ int		append(const char *file,void *ud) {
 // Description			:	Shading compiler main
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	4/28/2002
 int main(int argc, char* argv[]) {
 	CScriptContext	*currentCompiler;
 	int				i;

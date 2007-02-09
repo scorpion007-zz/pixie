@@ -5,7 +5,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -37,8 +37,9 @@
 #include "common/containers.h"
 #include "shader.h"
 #include "slcode.h"
-#include "renderer.h"
 #include "error.h"
+#include "renderer.h"
+#include "dso.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   First some temporary data structures used during the script parsing
@@ -134,6 +135,7 @@ static	TSlFunction		functions[]	=	{
 				int						passNumber;				// Current pass number (we make 2 passes)
 				int						parsingInit;			// TRUE if we're parsing the init code
 				int						numErrors;				// Number of errors encountered during parse
+				int						accessorType;			// Accessor type for _interpolatable_ parameters
 
 				// Pass 1
 				int						numCode;				// The number of code blocks
@@ -193,7 +195,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Returns the number of codes that a particular type takes
 									// Return Value			:	Size in codes
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	int					numComponents(EVariableType type) {
 										switch(type) {
 										case TYPE_FLOAT:
@@ -241,7 +242,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a new variable/parameter
 									// Return Value			:	The default area if available
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	TCode				*newVariable(char *name,EVariableType type,int numItems,int parameter) {
 										const int	numComp			=	numComponents(type);
 
@@ -287,11 +287,12 @@ static	TSlFunction		functions[]	=	{
 													newVariable->usageMarker	=	0;
 													newVariable->storage		=	currentData.currentParameterMutable	? STORAGE_MUTABLEPARAMETER : STORAGE_PARAMETER;
 													newVariable->defaultValue	=	new TCode[numItems*numComp];
+													newVariable->accessor		=	currentData.accessorType;
 													newVariable->next			=	NULL;													
 													cVariable->variable			=	newVariable;
 													
 													// Is this a global variable ?
-													gVariable					=	currentRenderer->retrieveVariable(name);
+													gVariable					=	CRenderer::retrieveVariable(name);
 													if (gVariable != NULL)	{
 														if (gVariable->storage == STORAGE_GLOBAL) {
 															// If the variable is actually defined
@@ -332,7 +333,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a reference to a string
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				addStringReference(char **items,int numItems) {
 										int	i;
 										
@@ -369,7 +369,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a reference to a float
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				addFloatReference(float *items,int numItems) {
 										int	i;
 										switch(currentData.passNumber) {
@@ -403,7 +402,6 @@ static	TSlFunction		functions[]	=	{
 										// Description			:	Add a reference to a variable/parameter
 										// Return Value			:	-
 										// Comments				:
-										// Date last edited		:	8/8/2001
 		static	void					addVariableReference(char *name) {
 											CVariable		*var;
 											TSlVariable		*cVariable;
@@ -440,7 +438,7 @@ static	TSlFunction		functions[]	=	{
 													}
 												}
 
-												var	=	currentRenderer->retrieveVariable(name);
+												var	=	CRenderer::retrieveVariable(name);
 
 												if (var != NULL) {
 													currentData.usedParameters										|=	var->usageMarker;
@@ -471,7 +469,6 @@ static	TSlFunction		functions[]	=	{
 										// Description			:	Find/Set an opcode/function
 										// Return Value			:	-
 										// Comments				:
-										// Date last edited		:	8/8/2001
 		static	void					setOpcode() {
 											switch(currentData.passNumber) {
 											case 1:
@@ -587,7 +584,7 @@ static	TSlFunction		functions[]	=	{
 														void			*handle;
 														dsoExecFunction	exec;
 
-														if (currentRenderer->getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
+														if (CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
 															// We have the DSO
 														} else {
 															slerror("Unknown function");
@@ -606,7 +603,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Create a new label definition/reference
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				newLabel(char *name,int reference) {
 										switch(currentData.passNumber) {
 										case 1:
@@ -784,25 +780,32 @@ slType:
 				SCRL_SURFACE
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_SURFACE;
+					currentData.shaderType		=	SL_SURFACE;
+					currentData.accessorType 	=	ACCESSOR_SURFACE;
 				}
 				|
 				SCRL_DISPLACEMENT
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_DISPLACEMENT;
+					currentData.shaderType		=	SL_DISPLACEMENT;
+					currentData.accessorType	=	ACCESSOR_DISPLACEMENT;
 				}
 				|
 				SCRL_LIGHTSOURCE
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_LIGHTSOURCE;
+					currentData.shaderType		=	SL_LIGHTSOURCE;
+					// Note: we don't set accessorType because you can't interpolate into
+					// light shader parameters
 				}
 				|
 				SCRL_VOLUME
 				SCRL_NL
 				{
-					currentData.shaderType	=	SL_ATMOSPHERE;
+					currentData.shaderType		=	SL_ATMOSPHERE;
+					currentData.accessorType	=	ACCESSOR_ATMOSPHERE;
+					// Note: we can assume the accessor is atmosphere as that's the only
+					// volume shader that can be interpolated into
 				}
 				|
 				SCRL_IMAGER
@@ -1838,7 +1841,7 @@ slDSO:			SCRL_DSO
 						void			*handle;
 						dsoExecFunction	exec;
 
-						if (currentRenderer->getDSO($2,$5,handle,exec) == TRUE) {
+						if (CRenderer::getDSO($2,$5,handle,exec) == TRUE) {
 							if ($5[0] == 'o')
 								currentData.currentOpcodePlace[0].integer	=	FUNCTION_DSO_VOID;
 							else
@@ -2061,7 +2064,6 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 void	slerror(char *s) {
 	warning(CODE_BADFILE,"Error in shader \"%s\" (%d) (\"%s\") (v%d.%d.%d)\n",currentData.name,slLineno,s,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 	currentData.numErrors++;
@@ -2073,7 +2075,6 @@ void	slerror(char *s) {
 // Description			:	Parse a shader
 // Return Value			:	Parsed shader if successful
 // Comments				:
-// Date last edited		:	8/8/2001
 CShader	*parseShader(const char *shaderName,const char *name) {
 	YY_BUFFER_STATE	oldState;
 
@@ -2096,7 +2097,9 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 	slparse();
 
 	if (currentData.numErrors != 0) {
+		sl_delete_buffer( YY_CURRENT_BUFFER );
 		fclose(fin);
+		sl_switch_to_buffer( oldState );
 		return NULL;
 	}
 
@@ -2128,7 +2131,6 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 // Description			:	Deallocate any previously allocated memory for the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2001
 void	reset() {
 	if (currentData.strings != NULL) {
 		int	i;
@@ -2180,6 +2182,7 @@ void	reset() {
 	currentData.passNumber				=	0;
 	currentData.parsingInit				=	FALSE;
 	currentData.numErrors				=	0;
+	currentData.accessorType			=	-1;
 
 				// Pass 1
 	currentData.numCode					=	0;
@@ -2224,7 +2227,6 @@ void	reset() {
 // Description			:	Allocate required space for the shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 void	alloc() {
 	TCode	*mem;
 
@@ -2273,7 +2275,6 @@ void	alloc() {
 // Description			:	Parse successful, allocate the shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 CShader	*shaderCreate(const char *shaderName) {
 	CShader	*cShader;
 
@@ -2382,7 +2383,6 @@ CShader	*shaderCreate(const char *shaderName) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void	processEscapes(char *str) {
 	int		i,n,j;
 

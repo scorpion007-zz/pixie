@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Class				:	CQuadLight
 // Description			:	This is a quadratic area light source
 // Comments				:
-// Date last edited		:	11/2/2003
 class	CQuadLight : public CShaderInstance {
 public:
 								CQuadLight(CAttributes *,CXform *);
@@ -53,7 +52,9 @@ public:
 		const char				*getName();
 		float					**prepare(CMemPage*&,float **,int) { return NULL;	}
 private:
-		vector					corners[4];
+		vector					corners[4];		// 4 corners of the light
+		vector					center;			// Center of the light
+		float					r;				// Radius of the light
 		vector					lightColor;		// The color of the light
 		float					intensity;		// The intensity of the light
 		int						numSamples;		// The number of samples to take
@@ -65,7 +66,6 @@ private:
 // Class				:	CSphereLight
 // Description			:	This is a spherical area light source
 // Comments				:
-// Date last edited		:	11/2/2003
 class	CSphereLight : public CShaderInstance {
 public:
 								CSphereLight(CAttributes *,CXform *);

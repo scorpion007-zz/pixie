@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,29 +35,24 @@
 #include "common/os.h"
 #include "implicit.h"
 #include "object.h"
-#include "hierarchy.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Description			:	This class encapsulates an implicit surface defined by a signed distance function
 // Comments				:
-// Date last edited		:	3/11/2001
-class	CImplicit : public CSurface , public CTracable {
+class	CImplicit : public CSurface {
 public:
 								CImplicit(CAttributes *,CXform *,int,const char *,float,float);
 								~CImplicit();
 
-								// Raytracing functionality
-	void						intersect(CRay *,int &);
-	int							intersect(const float *,const float *) const;
-
-								// Object functionality
-	void						bound(float *,float *) const;											// Compute the bounding box
-	void						sample(int,int,float **,unsigned int &) const;							// Sample the surface of the object
-	void						interpolate(int,float **)	const;										// Interpolate the variables
-	void						tesselate(CShadingContext *);											// Create a raytraceable object for this
+								// Object interface
+	void						intersect(CShadingContext *,CRay *);
 	void						dice(CShadingContext *);												// Split or render this object
-	void						copy(CAttributes *,CXform *,CRendererContext *) const;					// Instanciate this object
+	void						instantiate(CAttributes *,CXform *,CRendererContext *) const;			// Instanciate this object
+
+								// Surface functionality
+	void						sample(int,int,float **,float ***,unsigned int &) const;				// Sample the surface of the object
+	void						interpolate(int,float **,float ***)	const;								// Interpolate the variables
 	void						shade(CShadingContext *,int,CRay **);									// Shade the object
 
 
@@ -67,8 +62,6 @@ private:
 	implicitEvalNormalFunction	evalNormalFunction;
 	implicitTiniFunction		tiniFunction;
 
-	vector						bmin,bmax;				// Bounding box
-	vector						cameraBmin,cameraBmax;	// The camera space bounding box
 	void						*handle;				// Handle
 	void						*data;					// Implicit data
 	float						stepSize;				// The step size for the matching

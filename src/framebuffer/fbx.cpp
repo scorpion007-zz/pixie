@@ -72,7 +72,6 @@
 // Description			:	Starts the display thread
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void		*displayThread(void *w) {
 	CXDisplay	*cDisplay		=	(CXDisplay *) w;
 
@@ -89,7 +88,6 @@ void		*displayThread(void *w) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 CXDisplay::CXDisplay(const char *name,const char *samples,int width,int height,int numSamples)
 : CDisplay(name,samples,width,height,numSamples) {
 	int				x,y;
@@ -230,7 +228,6 @@ CXDisplay::CXDisplay(const char *name,const char *samples,int width,int height,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 CXDisplay::~CXDisplay() {
 }
 
@@ -241,7 +238,6 @@ CXDisplay::~CXDisplay() {
 // Description			:	The main display loop
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 void	CXDisplay::main() {
 	int			i,j;
 
@@ -371,7 +367,6 @@ void	CXDisplay::main() {
 // Description			:	Finish displaying data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 void		CXDisplay::finish() {
 	if(!windowDown){
 		XPutImage (display, xcanvas, image_gc, xim, 0, 0, 0, 0, width, height);
@@ -387,7 +382,6 @@ void		CXDisplay::finish() {
 // Description			:	Stuff data into pixmap
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2004
 
 #define STUFF_MONO_ROW(colorPacker,v)										\
 	for (j=0;j<w;j++) {														\
@@ -537,7 +531,6 @@ DEFINE_DATA_HANDLER(abgr32,color_abgr,get_pix_abgr)
 // Description			:	Commit the image data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 int		CXDisplay::data(int x,int y,int w,int h,float *d) {
 	int	i,j;
 

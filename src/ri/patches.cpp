@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,62 +33,50 @@
 #include <math.h>
 
 #include "patches.h"
-#include "renderer.h"
 #include "stats.h"
 #include "memory.h"
 #include "shading.h"
 #include "error.h"
 #include "patchUtils.h"
+#include "renderer.h"
+#include "rendererContext.h"
+#include "common/polynomial.h"
 
-
-
-////////////////////////////////////////////////////////////////////////
-//
-//	Some static variables used while creating primitives
-//
-////////////////////////////////////////////////////////////////////////
-static	int				uvaryings,vvaryings;
-static	int				uvertices,vvertices;
-static	CPl				*parameterList;
-static	CVertexData		*vertexData;
-static	float			*vertices;
-static	int				vertexSize;
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	gatherData
-// Description			:	Get the data
+// Macro				:	gatherData
+// Description			:	Get the data to create the primitive
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-static	inline	void	gatherData(int u,int v,int nu,int nv,int uv,int vv,int un,double *&vertex,CParameter *&parameters) {
-	int			i,j,k;
-	double		*dest;
-	const int	v0		=	vv*uvaryings+uv;
-	const int	v1		=	vv*uvaryings+((uv+1) % uvaryings);
-	const int	v2		=	((vv+1) % vvaryings)*uvaryings+uv;
-	const int	v3		=	((vv+1) % vvaryings)*uvaryings+((uv+1) % uvaryings);
-
-	vertex		=	NULL;
-
-	assert(vertexSize > 0);
-
-	dest	=	vertex	=	(double *) ralloc(vertexSize*nu*nv*sizeof(double));
-
-	// Copy the vertex variables over
-	for (j=0;j<nv;j++) {
-		const int		vVertex	=	(v + j) % vvertices;
-		for (i=0;i<nu;i++) {
-			const int		uVertex	=	(u + i) % uvertices;
-		
-			const int		index	=	vVertex * uvertices + uVertex;
-			const float		*src	=	vertices + index*vertexSize;
-
-			for (k=vertexSize;k>0;k--)	*dest++	=	*src++;
-		}
-	}
-
-	parameters	=	parameterList->uniform(un,NULL);
-	parameters	=	parameterList->varying(v0,v1,v2,v3,parameters);
+#define	gatherData(__context,__u,__v,__nu,__nv,__uv,__vv,__un,__vertex,__parameters) {	\
+	int			__i,__j;																\
+	float		*__dest;																\
+																						\
+	assert(vertexSize > 0);																\
+																						\
+	if (__vertex == NULL)	__vertex = (float *) ralloc(vertexSize*(__nu)*(__nv)*sizeof(float),__context->threadMemory);	\
+																						\
+	__dest	=	__vertex;																\
+																						\
+	for (__j=0;__j<(__nv);__j++) {														\
+		const int __vVertex	=	((__v) + __j) % vvertices;								\
+		for (__i=0;__i<(__nu);__i++) {													\
+			const int		__uVertex	=	((__u) + __i) % uvertices;					\
+			const int		__index		=	__vVertex * uvertices + __uVertex;			\
+			const float		*__src		=	vertices + __index*vertexSize;				\
+			int				__k;														\
+																						\
+			for (__k=vertexSize;__k>0;__k--)	*__dest++	=	*__src++;				\
+		}																				\
+	}																					\
+																						\
+	__parameters	=	parameterList->uniform(__un,NULL);								\
+																						\
+	const int	__v0 =	(__vv)*uvaryings+(__uv);										\
+	const int	__v1 =	(__vv)*uvaryings+(((__uv)+1) % uvaryings);						\
+	const int	__v2 =	(((__vv)+1) % vvaryings)*uvaryings+(__uv);						\
+	const int	__v3 =	(((__vv)+1) % vvaryings)*uvaryings+(((__uv)+1) % uvaryings);	\
+	__parameters	=	parameterList->varying(__v0,__v1,__v2,__v3,__parameters);		\
 }
 
 
@@ -98,11 +86,7 @@ static	inline	void	gatherData(int u,int v,int nu,int nv,int uv,int vv,int un,dou
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,double *vertex0) : CSurface(a,x) {
-	int			i;
-	float		*dest;
-	const	int	vertexSize	=	v->vertexSize;
+CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertex0) : CSurface(a,x) {
 
 	stats.gprimMemory	+=	sizeof(CBilinearPatch);
 	stats.numGprims++;
@@ -116,9 +100,11 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 	this->vMult			=	vMult;
 
 	// Copy the data
+	const	int	vertexSize	=	v->vertexSize;
 	if (variables->moving) {
-		const double *src;
-		int			j;
+		const float *src;
+		int			i,j;
+		float		*dest;
 
 		dest	=	vertex	=	new float[vertexSize*8];
 
@@ -134,6 +120,9 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 
 		stats.gprimMemory	+=	vertexSize*8*sizeof(float);
 	} else {
+		int			i;
+		float		*dest;
+
 		dest	=	vertex	=	new float[vertexSize*4];
 
 		for (i=vertexSize*4;i>0;i--) *dest++ = (float) *vertex0++;
@@ -146,10 +135,10 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 		float	*ver0,*ver1,*ver2,*ver3;
 		int		vertexSize	=	variables->vertexSize;
 
-		ver0				=	vertex;
-		ver1				=	ver0	+	vertexSize;
-		ver2				=	ver1	+	vertexSize;
-		ver3				=	ver2	+	vertexSize;
+		ver0	=	vertex;
+		ver1	=	ver0	+	vertexSize;
+		ver2	=	ver1	+	vertexSize;
+		ver3	=	ver2	+	vertexSize;
 
 		movvv(bmin,ver0);
 		movvv(bmax,ver0);
@@ -169,9 +158,9 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 			addBox(bmin,bmax,ver2);
 			addBox(bmin,bmax,ver3);
 		}
-
-		makeBound(bmin,bmax);
 	}
+
+	makeBound(bmin,bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -180,7 +169,6 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CBilinearPatch::~CBilinearPatch() {
 	const	int	vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
@@ -201,25 +189,12 @@ CBilinearPatch::~CBilinearPatch() {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-int		CBilinearPatch::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBilinearPatch
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void		CBilinearPatch::intersect(CRay *cRay,int &) {
+void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 	if (! (cRay->flags & attributes->flags) )	return;
 
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		const float importance = attributes->lodImportance;
-		if (cRay->jimp < 0) cRay->jimp = urand();
 		if (importance >= 0) {
 			if (cRay->jimp > importance)			return;
 		} else {
@@ -227,12 +202,11 @@ void		CBilinearPatch::intersect(CRay *cRay,int &) {
 		}
 	}
 
-	const int	vertexSize	=	vertexData->vertexSize;
-
-	const float	*P00	=	vertex;
-	const float	*P10	=	P00 + vertexSize;
-	const float	*P01	=	P10 + vertexSize;
-	const float	*P11	=	P01 + vertexSize;
+	const int	vertexSize	=	variables->vertexSize;
+	const float	*P00		=	vertex;
+	const float	*P10		=	P00 + vertexSize;
+	const float	*P01		=	P10 + vertexSize;
+	const float	*P11		=	P01 + vertexSize;
 	vector	t0,t1,t2,t3;
 
 	if (variables->moving) {
@@ -337,31 +311,8 @@ void		CBilinearPatch::intersect(CRay *cRay,int &) {
 			solve();
 			break;
 	}
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBilinearPatch
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBilinearPatch
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -370,16 +321,13 @@ void	CBilinearPatch::tesselate(CShadingContext *context) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				i,j;
-	const float		*u						=	varying[VARIABLE_U]+start;
-	const float		*v						=	varying[VARIABLE_V]+start;
-	int				vertexSize				=	variables->vertexSize;
+	const float		*u				=	varying[VARIABLE_U]+start;
+	const float		*v				=	varying[VARIABLE_V]+start;
+	const int		vertexSize		=	variables->vertexSize;
 	float			*vertexData;
 	int				vertexDataStep;
-
-	memBegin();
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;							// No need for interpolation
@@ -398,7 +346,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*4;
 
-			vertexData		=	(float *) ralloc(numVertices*vertexSize*4*sizeof(float));
+			vertexData		=	(float *) alloca(numVertices*vertexSize*4*sizeof(float));
 			vertexDataStep	=	vertexSize*4;
 			interpolate		=	vertexData;
 			k				=	vertexSize*4;
@@ -414,7 +362,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 
 	{	// Do the vertices
 		// Interpolate the vertices
-		float		*intr	=	(float *) ralloc(numVertices*vertexSize*sizeof(float));
+		float		*intr	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 		const float	*v0		=	vertexData;
 		const float	*v1		=	v0 + vertexSize;
 		const float	*v2		=	v1 + vertexSize;
@@ -436,7 +384,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 			v3			+=	vertexDataStep;
 		}
 
-		variables->dispatch(intr,start,numVertices,varying);
+		variables->dispatch(intr,start,numVertices,varying,locals);
 
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG)) {
@@ -494,8 +442,6 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 	normalFix();
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -504,21 +450,20 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void	CBilinearPatch::interpolate(int numVertices,float **varying,float ***locals) const {
+
+	// Dispatch the parameters first
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
-		float	*u,*v,*du,*dv,*dPdu,*dPdv;
+		float	*u		=	varying[VARIABLE_U];
+		float	*v		=	varying[VARIABLE_V];
+		float	*du		=	varying[VARIABLE_DU];
+		float	*dv		=	varying[VARIABLE_DV];
+		float	*dPdu	=	varying[VARIABLE_DPDU];
+		float	*dPdv	=	varying[VARIABLE_DPDV];
 		int		i;
-
-		u		=	varying[VARIABLE_U];
-		v		=	varying[VARIABLE_V];
-		du		=	varying[VARIABLE_DU];
-		dv		=	varying[VARIABLE_DV];
-		dPdu	=	varying[VARIABLE_DPDU];
-		dPdv	=	varying[VARIABLE_DPDV];
 
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
@@ -544,8 +489,7 @@ void	CBilinearPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,double *vertexData,const float *uBasis,const float *vBasis) : CSurface(a,x) {
+CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertexData,const float *uBasis,const float *vBasis) : CSurface(a,x) {
 	const unsigned int vertexSize	=	v->vertexSize;
 
 	stats.numGprims++;
@@ -567,18 +511,18 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	if (variables->moving) {
-		vertex	=	new double[vertexSize*32];
+		vertex	=	new float[vertexSize*32];
 
 		computeVertexData(vertex					,vertexData,0,uBasis,vBasis);
 		computeVertexData(vertex + vertexSize*16	,vertexData,vertexSize,uBasis,vBasis);
 
-		stats.gprimMemory	+=	vertexSize*32*sizeof(double);
+		stats.gprimMemory	+=	vertexSize*32*sizeof(float);
 	} else {
-		vertex	=	new double[vertexSize*16];
+		vertex	=	new float[vertexSize*16];
 
 		computeVertexData(vertex,vertexData,0,uBasis,vBasis);
 
-		stats.gprimMemory	+=	vertexSize*16*sizeof(double);
+		stats.gprimMemory	+=	vertexSize*16*sizeof(float);
 	}
 
 	makeBound(bmin,bmax);
@@ -590,11 +534,10 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CBicubicPatch::~CBicubicPatch() {
 	const int	vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
-	stats.gprimMemory	-=	sizeof(CBicubicPatch) + sizeof(double)*vertexSize*16;
+	stats.gprimMemory	-=	sizeof(CBicubicPatch) + sizeof(float)*vertexSize*16;
 	stats.numGprims--;
 
 	if (parameters	!= NULL)	delete parameters;
@@ -606,96 +549,59 @@ CBicubicPatch::~CBicubicPatch() {
 }
 
 
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
 // Method				:	computeVertexData
 // Description			:	Compute the Bu*G*Bv' matrix as the matrix data so that we don't need to do this multiplication at runtime
 // Return Value			:	The new vertex data
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::computeVertexData(double *vertex,const double *vertexData,int disp,const float *uBasis,const float *vBasis) {
+void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int disp,const float *uBasis,const float *vBasis) {
 	int					k,l;
 	const int			vertexSize	=	variables->vertexSize;
 	const int			vs			=	(variables->moving ? vertexSize*2 : vertexSize);
-	double				data[16];
-	double				ut[16];
-	double				ub[16],vb[16];
+	dmatrix				data;
+	dmatrix				ut,uB,vB;
 
-	// Promote the basis matrices to double
+	// Promote the basis to double
 	for (k=0;k<16;k++) {
-		ub[k]	=	uBasis[k];
-		vb[k]	=	vBasis[k];
+		uB[k]	=	uBasis[k];
+		vB[k]	=	vBasis[k];
 	}
-	
-	transposem(ut,ub);
+
+	// Compute the utranspose
+	transposem(ut,uB);
 
 	// Compute the premultiplied geometry matrix
 	for	(k=0;k<vertexSize;k++) {
-		double			tmp[16],tmp2[16];
+		dmatrix			tmp,tmp2;
 		unsigned int	x,y;
 
 		for (y=0;y<4;y++)
 			for (x=0;x<4;x++)
 				data[element(y,x)]	=	vertexData[(y*4+x)*vs+k+disp];
 
-		mulmmd(tmp2,ut,data);
-		mulmmd(tmp,tmp2,vb);
+		mulmm(tmp2,ut,data);
+		mulmm(tmp,tmp2,vB);
 
-		for (l=0;l<16;l++)
-			vertex[16*k+l]	=	tmp[l];
-	}
+		// Demote to float
+		for (l=0;l<16;l++)	vertex[16*k+l]	=	(float) tmp[l];
 
-	// Computhe the bound
-	{
-		double	tmp1[16],tmp2[16];
-		double	*cVertex	=	vertex;
+		// Update the bounding box
+		if (k < 3) {
 
-		mulmm(tmp1,invBezier,cVertex);
-		mulmm(tmp2,tmp1,invBezier);
-		for (k=0;k<16;k++) {
-			if (tmp2[k] < bmin[COMP_X])	bmin[COMP_X]	=	(float) tmp2[k];
-			if (tmp2[k] > bmax[COMP_X])	bmax[COMP_X]	=	(float) tmp2[k];
-		}
+			// Convert to the bezier control vertices
+			mulmm(tmp2,dinvBezier,tmp);
+			mulmm(tmp,tmp2,dinvBezier);
 
-		cVertex	+=	16;
-		mulmm(tmp1,invBezier,cVertex);
-		mulmm(tmp2,tmp1,invBezier);
-		for (k=0;k<16;k++) {
-			if (tmp2[k] < bmin[COMP_Y])	bmin[COMP_Y]	=	(float) tmp2[k];
-			if (tmp2[k] > bmax[COMP_Y])	bmax[COMP_Y]	=	(float) tmp2[k];
-		}
-
-		cVertex	+=	16;
-		mulmm(tmp1,invBezier,cVertex);
-		mulmm(tmp2,tmp1,invBezier);
-		for (k=0;k<16;k++) {
-			if (tmp2[k] < bmin[COMP_Z])	bmin[COMP_Z]	=	(float) tmp2[k];
-			if (tmp2[k] > bmax[COMP_Z])	bmax[COMP_Z]	=	(float) tmp2[k];
+			// Expand the bound appropriately
+			int	i;
+			for (i=0;i<16;i++) {
+				if (tmp[i] < bmin[k])	bmin[k]	=	(float) tmp[i];
+				if (tmp[i] > bmax[k])	bmax[k]	=	(float) tmp[i];
+			}
 		}
 	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBicubicPatch
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CBicubicPatch
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -704,16 +610,15 @@ void	CBicubicPatch::tesselate(CShadingContext *context) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int					i,k;
 	const float			*u					=	varying[VARIABLE_U]+start;
 	const float			*v					=	varying[VARIABLE_V]+start;
-	int					vertexSize			=	variables->vertexSize;
-	double				*vertexData;
+	const int			vertexSize			=	variables->vertexSize;
+	float				*vertexData;
 	int					vertexDataStep;
 
-	memBegin();
+	assert(vertexSize > 0);
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;
@@ -726,13 +631,13 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 			vertexData		=	vertex + vertexSize*16;		// No need for interpolation
 			vertexDataStep	=	0;
 		} else {
-			double			*interpolate;
-			const float		*time	=	varying[VARIABLE_TIME] + start;
+			float			*interpolate;
+			const float		*time		=	varying[VARIABLE_TIME] + start;
 			int				j;
-			const double	*vertex0	=	vertex;
-			const double	*vertex1	=	vertex + vertexSize*16;
+			const float		*vertex0	=	vertex;
+			const float		*vertex1	=	vertex + vertexSize*16;
 
-			vertexData		=	(double *) ralloc(numVertices*vertexSize*16*sizeof(double));
+			vertexData		=	(float *) alloca(numVertices*vertexSize*16*sizeof(float));
 			vertexDataStep	=	vertexSize*16;
 			interpolate		=	vertexData;
 
@@ -747,8 +652,8 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 	}
 
 	{	// Do the vertices
-		float	*intr		=	(float *) ralloc(vertexSize*numVertices*sizeof(float));
-		double	*data;
+		float	*intr		=	(float *) alloca(vertexSize*numVertices*sizeof(float));
+		float	*data;
 		float	*intrStart	=	intr;
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv		=	varying[VARIABLE_DPDV] + start*3;
@@ -779,7 +684,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 
 			for (;j<vertexSize;j++) {
 				for (int t=0;t<4;t++) {
-					tmp1[t]	=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
+					tmp1[t]		=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
 				}
 
 				intr[k++]		=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
@@ -798,38 +703,34 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,unsigned in
 		// Most of the time though, surface normal is required
 
 		// Dispatch the vertex data
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 
 	// Fix the degenerate normals
 	normalFix();
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
 // Method				:	interpolate
-// Description			:	See object.h
-// Return Value			:	-
+// Description			:	See object.h// Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void	CBicubicPatch::interpolate(int numVertices,float **varying,float ***locals) const {
+
+	// Dispatch the parameters first
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
-		float	*u,*v,*du,*dv,*dPdu,*dPdv;
+		float	*u		=	varying[VARIABLE_U];
+		float	*v		=	varying[VARIABLE_V];
+		float	*du		=	varying[VARIABLE_DU];
+		float	*dv		=	varying[VARIABLE_DV];
+		float	*dPdu	=	varying[VARIABLE_DPDU];
+		float	*dPdv	=	varying[VARIABLE_DPDV];
 		int		i;
-
-		u		=	varying[VARIABLE_U];
-		v		=	varying[VARIABLE_V];
-		du		=	varying[VARIABLE_DU];
-		dv		=	varying[VARIABLE_DV];
-		dPdu	=	varying[VARIABLE_DPDU];
-		dPdv	=	varying[VARIABLE_DPDV];
 
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
@@ -852,10 +753,8 @@ void	CBicubicPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,int uOrder,int vOrder,float *uKnots,float *vKnots,double *vertex0) : CSurface(a,x) {
+CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,int uOrder,int vOrder,float *uKnots,float *vKnots,float *vertex0) : CSurface(a,x) {
 	int			j;
-	double		*uCoefficients,*vCoefficients;
 	const int	vertexSize	=	v->vertexSize;
 
 	stats.gprimMemory	+=	sizeof(CNURBSPatch);
@@ -874,10 +773,8 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	uMult				=	umax	-	uOrg;
 	vMult				=	vmax	-	vOrg;
 
-	memBegin();
-
-	uCoefficients		=	(double *) ralloc(uOrder*uOrder*sizeof(double));
-	vCoefficients		=	(double *) ralloc(vOrder*vOrder*sizeof(double));
+	double	*uCoefficients		=	(double *) alloca(uOrder*uOrder*sizeof(double));
+	double	*vCoefficients		=	(double *) alloca(vOrder*vOrder*sizeof(double));
 
 	// For each basis function
 	// Compute the coefficients
@@ -907,8 +804,6 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*sizeof(double);
 	}
 
-	memEnd();
-
 	makeBound(bmin,bmax);
 }
 
@@ -918,14 +813,13 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
 CNURBSPatch::~CNURBSPatch() {
-	const int			vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
+	const int vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
 	stats.gprimMemory	-=	sizeof(CNURBSPatch) + sizeof(double)*vertexSize*uOrder*vOrder;
 	stats.numGprims--;
 
-	if (parameters	!= NULL)	delete parameters;
+	if (parameters	!= NULL) delete parameters;
 	delete [] vertex;
 
 	variables->detach();
@@ -938,25 +832,23 @@ CNURBSPatch::~CNURBSPatch() {
 // Description			:	Precompute uBasis*G*vBasis'
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficients,const double *vCoefficients,double *vertexData,int disp) {
+void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficients,const double *vCoefficients,float *vertexData,int disp) {
 	const int	vertexSize	=	variables->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
 	int			i,j,k;
 	double		*cVertex;
+	double		*tmp		=	(double *) alloca(uOrder*vOrder*sizeof(double));
 
 	for (cVertex=vertex,i=0;i<vertexSize;i++,cVertex+=uOrder*vOrder) {
 		int		u,v;
 
-		for (j=0;j<uOrder*vOrder;j++) {
-			cVertex[j]	=	0;
-		}
+		for (j=0;j<uOrder*vOrder;j++)	cVertex[j]	=	0;
 
 		for (v=0;v<vOrder;v++) {
 			const double *vRow	=	&vCoefficients[v*vOrder];
 			for (u=0;u<uOrder;u++) {
-				double		data	=	vertexData[i+(v*uOrder+u)*vs+disp];
-				const double *uRow	=	&uCoefficients[u*uOrder];
+				const double	data	=	vertexData[i+(v*uOrder+u)*vs+disp];
+				const double	*uRow	=	&uCoefficients[u*uOrder];
 
 				for (j=0;j<uOrder;j++) {
 					for (k=0;k<vOrder;k++) {
@@ -967,6 +859,7 @@ void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficient
 		}
 	}
 
+	// Update the bounding box
 	for (vertexData+=disp,i=0;i<uOrder*vOrder;i++,vertexData+=vs) {
 		vector	P;
 
@@ -980,43 +873,17 @@ void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficient
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatch
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CNURBSPatch::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CNURBSPatch
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:	-
-// Date last edited		:	6/21/2001
-void	CNURBSPatch::tesselate(CShadingContext *context) {
-	context->tesselate2D(this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CNURBSPatch
 // Method				:	sample
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int &up) const {
-	int					i,k;
-	const float			*u					=	varying[VARIABLE_U]+start;
-	const float			*v					=	varying[VARIABLE_V]+start;
-	int					vertexSize			=	variables->vertexSize;
+void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
+	int					i;
+	const float			*u			=	varying[VARIABLE_U]+start;
+	const float			*v			=	varying[VARIABLE_V]+start;
+	int					vertexSize	=	variables->vertexSize;
 	double				*vertexData;
 	int					vertexDataStep;
-
-	memBegin();
 
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;
@@ -1035,7 +902,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 			const double	*vertex0	=	vertex;
 			const double	*vertex1	=	vertex + vertexSize*uOrder*vOrder;
 
-			vertexData		=	(double *) ralloc(numVertices*vertexSize*uOrder*vOrder*sizeof(double));
+			vertexData		=	(double *) alloca(numVertices*vertexSize*uOrder*vOrder*sizeof(double));
 			vertexDataStep	=	vertexSize*uOrder*vOrder;
 			interpolate		=	vertexData;
 
@@ -1049,7 +916,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 	}
 
 	{	// Do the vertices
-		float	*intr			=	(float *) ralloc(vertexSize*numVertices*sizeof(float));
+		float	*intr			=	(float *) alloca(vertexSize*numVertices*sizeof(float));
 		float	*intrStart		=	intr;
 		float	*dPdu			=	varying[VARIABLE_DPDU] + start*3;
 		float	*dPdv			=	varying[VARIABLE_DPDV] + start*3;
@@ -1059,18 +926,17 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 		double	pdv[4];
 
 #define computeNURBS(UORDER,VORDER) {																\
-		double	*memBase		=	(double *) ralloc((UORDER*3 + VORDER*3)*sizeof(double));		\
+		double	*memBase		=	(double *) alloca((UORDER*3 + VORDER*3)*sizeof(double));		\
 		double	*uPowers		=	memBase;														\
 		double	*vPowers		=	uPowers + UORDER;												\
 		double	*duPowers		=	vPowers + VORDER;												\
 		double	*dvPowers		=	duPowers + UORDER;												\
 																									\
-		for (i=0,k=0;i<numVertices;i++) {															\
+		for (i=0;i<numVertices;i++) {																\
 			int				j,t,var;																\
-			double			*cVertex;																\
 			double			denominator;															\
-			const double	cu				=	u[i]*uMult + uOrg;									\
-			const double	cv				=	v[i]*vMult + vOrg;									\
+			const double	cu	=	u[i]*uMult + uOrg;												\
+			const double	cv	=	v[i]*vMult + vOrg;												\
 																									\
 			uPowers[0]		=	1;																	\
 			duPowers[0]		=	0;																	\
@@ -1086,7 +952,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 				dvPowers[j]	=	j*vPowers[j-1];														\
 			}																						\
 																									\
-			cVertex			=	vertexData;															\
+			const double *cVertex	=	vertexData;													\
 			vertexStart		=	intr;																\
 			for (var=0;var<4;var++) {																\
 				denominator		=	0;																\
@@ -1262,19 +1128,14 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 		// Most of the time though, surface normal is required
 
 		// Dispatch the vertex data
-		variables->dispatch(intrStart,start,numVertices,varying);
+		variables->dispatch(intrStart,start,numVertices,varying,locals);
 
 		// Convert to P
 		{
 			float		*P	=	varying[VARIABLE_P]		+	start*3;
 			const float	*Pw	=	varying[VARIABLE_PW]	+	start*4;
 
-			for (i=numVertices;i>=0;i--) {
-				*P++	=	*Pw++;
-				*P++	=	*Pw++;
-				*P++	=	*Pw++;
-				Pw++;
-			}
+			for (i=numVertices;i>=0;i--,P+=3,Pw+=4)	movvv(P,Pw);
 		}
 
 #undef computeNURBS
@@ -1285,8 +1146,6 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 	normalFix();
 
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1295,21 +1154,20 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:	-
-// Date last edited		:	6/21/2001
-void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CNURBSPatch::interpolate(int numVertices,float **varying,float ***locals) const {
+
+	// Dispatch the parameters first
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 
 	// Correct the parametric range of the primitive
 	if ((uMult != 1) || (vMult != 1)) {
-		float	*u,*v,*du,*dv,*dPdu,*dPdv;
-		int		i;
-
-		u		=	varying[VARIABLE_U];
-		v		=	varying[VARIABLE_V];
-		du		=	varying[VARIABLE_DU];
-		dv		=	varying[VARIABLE_DV];
-		dPdu	=	varying[VARIABLE_DPDU];
-		dPdv	=	varying[VARIABLE_DPDV];
+		float *u	=	varying[VARIABLE_U];
+		float *v	=	varying[VARIABLE_V];
+		float *du	=	varying[VARIABLE_DU];
+		float *dv	=	varying[VARIABLE_DV];
+		float *dPdu	=	varying[VARIABLE_DPDU];
+		float *dPdv	=	varying[VARIABLE_DPDV];
+		int	  i;
 
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
@@ -1328,7 +1186,6 @@ void			CNURBSPatch::interpolate(int numVertices,float **varying) const {
 // Description			:	Compute the coefficients of a basis
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/22/2001
 void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int order,unsigned int start,unsigned int interval,const float *knots) {
 	if (order == 1) {
 		if (start == interval)
@@ -1337,11 +1194,9 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 			coefficients[0]	=	0;
 	} else {
 
-		memBegin();
-
-		double	*lowerCoefficients1	=	(double *) ralloc((order-1)*sizeof(double));
-		double	*lowerCoefficients2	=	(double *) ralloc((order-1)*sizeof(double));
-		unsigned int		i;
+		double			*lowerCoefficients1	=	(double *) alloca((order-1)*sizeof(double));
+		double			*lowerCoefficients2	=	(double *) alloca((order-1)*sizeof(double));
+		unsigned int	i;
 
 		precompBasisCoefficients(lowerCoefficients1,order-1,start,interval,knots);
 		precompBasisCoefficients(lowerCoefficients2,order-1,start+1,interval,knots);
@@ -1363,8 +1218,6 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 			if (knots[start+order] != knots[start+1])
 				coefficients[i]		+=	 lowerCoefficients2[i]*(knots[start+order]/(knots[start+order]-knots[start+1]));
 		}
-
-		memEnd();
 	}
 }
 
@@ -1395,7 +1248,6 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 // Description			:	CPatchMesh
 // Return Value			:	Ctor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int uw,int vw) : CObject(a,x) {
 	int			i;
 	const float	*P;
@@ -1404,25 +1256,35 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 	stats.gprimMemory	+=	sizeof(CPatchMesh);
 
 	pl			=	c;
-
 	degree		=	d;
 	uVertices	=	nu;
 	vVertices	=	nv;
 	uWrap		=	uw;
 	vWrap		=	vw;
 
-	// Compute the bounding box in the local object coordinate system
+	// Compute the bounding box in the camera system
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	if (degree == 1) {
+		vector	tmp;
+
 		for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=3) {
-			addBox(bmin,bmax,P);
+			mulmp(tmp,xform->from,P);
+			addBox(bmin,bmax,tmp);
 		}
 
 		if (pl->data1 != NULL) {
+			const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 			for (P=pl->data1,i=0;i<(uVertices*vVertices);i++,P+=3) {
-				addBox(bmin,bmax,P);
+				mulmp(tmp,from,P);
+				addBox(bmin,bmax,tmp);
+			}
+		} else if (xform->next != NULL) {
+			const float *from = xform->next->from;
+			for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=3) {
+				mulmp(tmp,from,P);
+				addBox(bmin,bmax,tmp);
 			}
 		}
 	} else {
@@ -1432,8 +1294,10 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		int				upatches,vpatches;
 		const int		us		=	attributes->uStep;
 		const int		vs		=	attributes->vStep;
-		double			xg[16],yg[16],zg[16];
-		matrix			ut;
+		dmatrix			xg,yg,zg;
+		matrix			ub;
+		dmatrix			ut,vb;
+		dmatrix			geometryU,geometryV;
 
 		assert(degree == 3);
 
@@ -1447,9 +1311,16 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 		vMult					=	1 / (float) vpatches;
 
 		// Note that u basis and v basis are swapped to take the transpose into account done during the precomputation
-		transposem(ut,attributes->uBasis);
-		mulmmd(geometryV,invBezier,ut);
-		mulmmd(geometryU,attributes->vBasis,invBezier);
+		transposem(ub,attributes->uBasis);
+
+		// Promote the precision
+		for (i=0;i<16;i++)	{
+			ut[i]	=	ub[i];
+			vb[i]	=	attributes->vBasis[i];
+		}
+
+		mulmm(geometryV,dinvBezier,ut);
+		mulmm(geometryU,vb,dinvBezier);
 
 		for (i=0;i<vpatches;i++) {
 			for (j=0;j<upatches;j++) {
@@ -1469,8 +1340,8 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 						zg[element(r,c)]	=	P[COMP_Z];
 					}
 				}
-
-				makeCubicBound(bmin,bmax,xg,yg,zg);
+				
+				makeCubicBoundX(bmin,bmax,xg,yg,zg,xform);
 
 				if (pl->data1 != NULL) {
 					for (r=0;r<4;r++) {
@@ -1484,15 +1355,23 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 							zg[element(r,c)]	=	P[COMP_Z];
 						}
 					}
-
-					makeCubicBound(bmin,bmax,xg,yg,zg);
+					
+					if (xform->next != NULL) {
+						makeCubicBoundX(bmin,bmax,xg,yg,zg,xform->next);
+					} else {
+						makeCubicBoundX(bmin,bmax,xg,yg,zg,xform);
+					}
+				} else if (xform->next != NULL) {
+					makeCubicBoundX(bmin,bmax,xg,yg,zg,xform->next);
 				}
-
 			}
 		}
 	}
+	
+	makeBound(bmin,bmax);
 
-	children	=	NULL;
+	// Create the synchronization object
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1500,73 +1379,43 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 // Description			:	~CPatchMesh
 // Return Value			:	Dtor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CPatchMesh::~CPatchMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CPatchMesh);
 
-	delete pl;
+	if (pl != NULL)	delete pl;
 
-	if (children != NULL) {
-		CObject	**objects	=	children->array;
-		int		numObjects	=	children->numItems;
-		int		i;
-
-		for (i=0;i<numObjects;i++)	objects[i]->detach();
-
-		delete children;
-	}
+	// Delete the synchronization object
+	osDeleteMutex(mutex);
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CPatchMesh
-// Description			:	bound
-// Return Value			:	Bound the mesh
-// Comments				:	-
-// Date last edited		:	6/10/2003
-void	CPatchMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	CPatchMesh
-// Description			:	copy
+// Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
-// Date last edited		:	6/10/2003
-void	CPatchMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
 
 	if (a == NULL)	a	=	attributes;
 
+	assert(pl != NULL);
+
 	c->addObject(new CPatchMesh(a,nx,pl->clone(a),degree,uVertices,vVertices,uWrap,vWrap));
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
+// Method				:	intersect
+// Description			:	Intersect a ray with this pritimive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
-void	CPatchMesh::tesselate(CShadingContext *context)	{
-	int		i;
-	int		numChildren;
-	CObject	**c;
+void	CPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 
-	if (children == NULL)	create();
-
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		c[i]->tesselate(context);
-	}
+	if (children == NULL)	create(rasterizer);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1575,23 +1424,11 @@ void	CPatchMesh::tesselate(CShadingContext *context)	{
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CPatchMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	int		numChildren;
-	CObject	**c;
 
-	if (children == NULL)	create();
+	if (children == NULL)	create(rasterizer);
 
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		vector	bmin,bmax;
-
-		c[i]->bound(bmin,bmax);
-		rasterizer->drawObject(c[i],bmin,bmax);
-	}
+	CObject::dice(rasterizer);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1600,20 +1437,31 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 // Description			:	Create the children
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
-void	CPatchMesh::create() {
+void	CPatchMesh::create(CShadingContext *context) {
+
+	osLock(mutex);
+	if (children != NULL) {
+		osUnlock(mutex);
+		return;
+	}
+
 	int				i,j,k;
+	int				uvaryings,vvaryings;
+	int				uvertices,vvertices;
+	CPl				*parameterList;
+	CVertexData		*vertexData;
+	float			*vertices;
+	int				vertexSize;
+	CObject			*allChildren	=	NULL;
 
-	children			=	new CArray<CObject *>;
-
-	memBegin();
+	memBegin(context->threadMemory);
 
 	uvertices			=	uVertices;
 	vvertices			=	vVertices;
 
 	vertices			=	NULL;
 	pl->transform(xform);
-	pl->collect(vertexSize,vertices,CONTAINER_VERTEX);
+	pl->collect(vertexSize,vertices,CONTAINER_VERTEX,context->threadMemory);
 	parameterList		=	pl;
 	vertexData			=	pl->vertexData();
 	vertexData->attach();
@@ -1621,7 +1469,7 @@ void	CPatchMesh::create() {
 	if (degree == 1) {
 		float			uMult;
 		float			vMult;
-		double			*vertex;
+		float			*vertex	=	NULL;
 		CParameter		*parameters;
 		int				upatches,vpatches;
 
@@ -1643,20 +1491,21 @@ void	CPatchMesh::create() {
 				float			vOrg		=	i * vMult;
 				CObject			*nObject;
 				
-				gatherData(j,i,2,2,j,i,k,vertex,parameters);
+				gatherData(context,j,i,2,2,j,i,k,vertex,parameters);
 
-				nObject	=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
+				osLock(CRenderer::refCountMutex);
+				nObject				=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
+				osUnlock(CRenderer::refCountMutex);
 
-				nObject->attach();
-
-				children->push(nObject);
+				nObject->sibling	=	allChildren;
+				allChildren			=	nObject;
 			}
 		}
 	} else {
 		int				i,j,k;
 		float			uMult;
 		float			vMult;
-		double			*vertex;
+		float			*vertex	=	NULL;
 		int				upatches,vpatches;
 		CParameter		*parameters;
 		const int		us		=	attributes->uStep;
@@ -1682,20 +1531,31 @@ void	CPatchMesh::create() {
 				float			vOrg	=	i * vMult;
 				CObject			*nObject;
 
-				gatherData(j*us,i*vs,4,4,j,i,k,vertex,parameters);
+				gatherData(context,j*us,i*vs,4,4,j,i,k,vertex,parameters);
 
-				nObject	=	new CBicubicPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
+				osLock(CRenderer::refCountMutex);
+				nObject				=	new CBicubicPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
+				osUnlock(CRenderer::refCountMutex);
 
-				nObject->attach();
-
-				children->push(nObject);
+				nObject->sibling	=	allChildren;
+				allChildren			=	nObject;
 			}
 		}
 	}
 
 	vertexData->detach();
 
-	memEnd();
+	memEnd(context->threadMemory);
+
+	// We're done with the parameter list
+	delete pl;
+	pl	=	NULL;
+
+	// Set the children pointer
+	setChildren(context,allChildren);
+	
+	// Release the lock
+	osUnlock(mutex);
 }
 
 
@@ -1722,7 +1582,6 @@ void	CPatchMesh::create() {
 // Description			:	CNURBSPatchMesh
 // Return Value			:	Ctor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,int uo,int vo,float *uk,float *vk) : CObject(a,x) {
 	int			i;
 	const float	*P;
@@ -1743,26 +1602,37 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
 	for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=4) {
-		vector	tmp;
+		htpoint	tmp;
 
-		tmp[0]	=	P[0] / P[3];
-		tmp[1]	=	P[1] / P[3];
-		tmp[2]	=	P[2] / P[3];
+		mulmp4(tmp,xform->from,P);
+		mulvf(tmp,1/tmp[3]);
 		addBox(bmin,bmax,tmp);
 	}
 
 	if (pl->data1 != NULL) {
+		const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 		for (P=pl->data1,i=0;i<(uVertices*vVertices);i++,P+=4) {
-			vector	tmp;
+			htpoint	tmp;
 
-			tmp[0]	=	P[0] / P[3];
-			tmp[1]	=	P[1] / P[3];
-			tmp[2]	=	P[2] / P[3];
+			mulmp4(tmp,from,P);
+			mulvf(tmp,1/tmp[3]);
+			addBox(bmin,bmax,tmp);
+		}
+	} else if (xform->next != NULL) {
+		const float *from = xform->next->from;
+		for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=4) {
+			htpoint	tmp;
+	
+			mulmp4(tmp,from,P);
+			mulvf(tmp,1/tmp[3]);
 			addBox(bmin,bmax,tmp);
 		}
 	}
 
-	children	=	NULL;
+	makeBound(bmin,bmax);
+
+	// Create the synch. object
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1770,7 +1640,6 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 // Description			:	~CNURBSPatchMesh
 // Return Value			:	Dtor
 // Comments				:	-
-// Date last edited		:	6/10/2003
 CNURBSPatchMesh::~CNURBSPatchMesh() {
 	stats.numGprims--;
 	stats.gprimMemory	-=	sizeof(CNURBSPatchMesh) + (uVertices+uOrder)*sizeof(float) + (vVertices+vOrder)*sizeof(float);
@@ -1779,37 +1648,17 @@ CNURBSPatchMesh::~CNURBSPatchMesh() {
 	delete [] vKnots;
 	delete pl;
 
-	if (children != NULL) {
-		CObject	**objects	=	children->array;
-		int		numObjects	=	children->numItems;
-		int		i;
-
-		for (i=0;i<numObjects;i++)	objects[i]->detach();
-
-		delete children;
-	}
+	// We're done with the synch. object
+	osDeleteMutex(mutex);
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CNURBSPatchMesh
-// Description			:	bound
-// Return Value			:	Bound the mesh
-// Comments				:	-
-// Date last edited		:	6/10/2003
-void	CNURBSPatchMesh::bound(float *bmi,float *bma) const {
-	movvv(bmi,bmin);
-	movvv(bma,bmax);
-	xform->transformBound(bmi,bma);
-	makeBound(bmi,bma);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	CNURBSPatchMesh
-// Description			:	clone
+// Description			:	instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
-// Date last edited		:	6/10/2003
-void	CNURBSPatchMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 	CXform	*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1821,24 +1670,13 @@ void	CNURBSPatchMesh::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatchMesh
-// Method				:	tesselate
-// Description			:	Tesselate the primitive if possible
+// Method				:	dice
+// Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
-void	CNURBSPatchMesh::tesselate(CShadingContext *context)	{
-	int		i;
-	int		numChildren;
-	CObject	**c;
+void	CNURBSPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 
-	if (children == NULL)	create();
-
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		c[i]->tesselate(context);
-	}
+	if (children == NULL)	create(rasterizer);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1847,23 +1685,11 @@ void	CNURBSPatchMesh::tesselate(CShadingContext *context)	{
 // Description			:	Dice the primitive
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/28/2003
 void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
-	int		i;
-	int		numChildren;
-	CObject	**c;
 
-	if (children == NULL)	create();
+	if (children == NULL)	create(rasterizer);
 
-	numChildren	=	children->numItems;
-	c			=	children->array;
-
-	for (i=0;i<numChildren;i++) {
-		vector	bmin,bmax;
-
-		c[i]->bound(bmin,bmax);
-		rasterizer->drawObject(c[i],bmin,bmax);
-	}
+	CObject::dice(rasterizer);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1871,33 +1697,42 @@ void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 // Description			:	split
 // Return Value			:	Split the mesh
 // Comments				:	-
-// Date last edited		:	6/10/2003
-void	CNURBSPatchMesh::create() {
-	int				uPatches	=	uVertices - uOrder+1;
-	int				vPatches	=	vVertices - vOrder+1;
+void	CNURBSPatchMesh::create(CShadingContext *context) {
+
+	osLock(mutex);
+	if (children != NULL) {
+		osUnlock(mutex);
+		return;
+	}
+
+	const int		uPatches		=	uVertices - uOrder+1;
+	const int		vPatches		=	vVertices - vOrder+1;
 	int				i,j,k;
-	double			*vertex;
-	int				upatches,vpatches;
+	float			*vertex			=	NULL;
 	CParameter		*parameters;
+	CPl				*parameterList;
+	CVertexData		*vertexData;
+	float			*vertices;
+	int				vertexSize;
+	CObject			*allChildren	=	NULL;
 
-	children		=	new CArray<CObject *>;
 
-	uvertices		=	uVertices;
-	vvertices		=	vVertices;
-	upatches		=	uPatches;
-	vpatches		=	vPatches;
-	uvaryings		=	uVertices-uOrder+2;
-	vvaryings		=	vVertices-vOrder+2;
+	const int	uvertices		=	uVertices;
+	const int	vvertices		=	vVertices;
+	const int	upatches		=	uPatches;
+	const int	vpatches		=	vPatches;
+	const int	uvaryings		=	uVertices-uOrder+2;
+	const int	vvaryings		=	vVertices-vOrder+2;
 
 	// Transform the core into the camera coordinate system
 	vertices		=	NULL;
 	pl->transform(xform);
-	pl->collect(vertexSize,vertices,CONTAINER_VERTEX);
+	pl->collect(vertexSize,vertices,CONTAINER_VERTEX,context->threadMemory);
 	parameterList	=	pl;
 	vertexData		=	pl->vertexData();
 	vertexData->attach();
 
-	memBegin();
+	memBegin(context->threadMemory);
 
 	// Create the NURBS patches
 	for (k=0,j=0;j<vPatches;j++) {
@@ -1914,19 +1749,26 @@ void	CNURBSPatchMesh::create() {
 			} else {
 				CObject	*nObject;
 
-				gatherData(i,j,uOrder,vOrder,i,j,k,vertex,parameters);
+				gatherData(context,i,j,uOrder,vOrder,i,j,k,vertex,parameters);
 
-				nObject	=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
+				osLock(CRenderer::refCountMutex);
+				nObject				=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
+				osUnlock(CRenderer::refCountMutex);
 
-				nObject->attach();
-
-				children->push(nObject);
+				nObject->sibling	=	allChildren;
+				allChildren			=	nObject;
 			}
 		}
 	}
 
-	memEnd();
+	memEnd(context->threadMemory);
 
 	vertexData->detach();
+
+	// Set the children 
+	setChildren(context,allChildren);
+
+	// Release the lock
+	osUnlock(mutex);
 }
 

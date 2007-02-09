@@ -1641,9 +1641,9 @@ YY_RULE_SETUP
 
 														fileName[strlen(fileName)-1]	=	'\0';
 
-														options		=	currentRenderer->getOptions();
+														options		=	CRenderer::context->getOptions();
 
-														if (currentRenderer->locateFile(location,fileName,options->archivePath) == TRUE) {
+														if (CRenderer::locateFile(location,fileName,options->archivePath) == TRUE) {
 															FILE	*in;
 
 															info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",fileName,location);

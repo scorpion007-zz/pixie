@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -41,46 +41,47 @@
 // Class				:	CCubicCurves
 // Description			:	Implements a curve primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CCurve : public CSurface {
 public:
 
-	///////////////////////////////////////////////////////////////////////
-	// Class				:	CBase
-	// Description			:	This class holds the data about a single curve
-	// Comments				:
-	// Date last edited		:	10/8/2002
-	class	CBase {
-	public:
-						CBase() {
-							refCount	=	0;
-						}
+					///////////////////////////////////////////////////////////////////////
+					// Class				:	CBase
+					// Description			:	This class holds the data about a single curve
+					// Comments				:
+					class	CBase {
+					public:
+										CBase() {
+											refCount	=	0;
+										}
 
-						~CBase() {
-							delete [] vertex;
-							variables->detach();
-							if (parameters != NULL)	delete parameters;
-						}
+										~CBase() {
+											delete [] vertex;
+											variables->detach();
+											if (parameters != NULL)	delete parameters;
+										}
 
-		void			attach()	{	refCount++;	}
+						void			attach()	{	refCount++;	}
+						void			detach()	{	if ((--refCount) == 0) delete this;	}
 
-		void			detach()	{	if ((--refCount) == 0) delete this;	}
+						int				sizeEntry;		// The size variable entry
+						float			maxSize;		// The maximum size of the curve
+						CVertexData		*variables;		// The variables for the curve
+						CParameter		*parameters;	// Da parameters
+						float			*vertex;		// Da vertex data
+						int				refCount;		// Da ref count
+					};
 
-		const CVariable	*sizeVariable;	// The size variable
-		float			maxSize;		// The maximum size of the curve
-		CVertexData		*variables;		// The variables for the curve
-		CParameter		*parameters;	// Da parameters
-		float			*vertex;		// Da vertex data
-		int				refCount;		// Da ref count
-	};
 public:
 					CCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCurve();
 
-	void			tesselate(CShadingContext *)	{	}
-	int				moving() const												{	return base->variables->moving;	}
-	void			interpolate(int,float **) const;
+					// Object interface
 	void			dice(CShadingContext *);
+	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
+
+					// Surface interface
+	int				moving() const													{	return base->variables->moving;	}
+	void			interpolate(int,float **,float ***) const;
 
 protected:
 	virtual	void	splitToChildren(CShadingContext *)	=	0;
@@ -94,14 +95,13 @@ protected:
 // Class				:	CCubicCurves
 // Description			:	Implements a curve primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CCubicCurve : public CCurve {
 public:
 					CCubicCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CCubicCurve();
 
-	void			sample(int,int,float **,unsigned int &) const;
-	void			bound(float *,float *) const;
+					// Surface interface
+	void			sample(int,int,float **,float ***,unsigned int &) const;
 
 protected:
 	void			splitToChildren(CShadingContext *);
@@ -111,14 +111,13 @@ protected:
 // Class				:	CLinearCurves
 // Description			:	Implements a linear primitive
 // Comments				:
-// Date last edited		:	10/8/2002
 class	CLinearCurve : public CCurve {
 public:
 					CLinearCurve(CAttributes *,CXform *,CBase *,float,float,float,float);
 					~CLinearCurve();
 
-	void			sample(int,int,float **,unsigned int &) const;
-	void			bound(float *,float *) const;
+					// Surface interface
+	void			sample(int,int,float **,float ***,unsigned int &) const;
 
 protected:
 	void			splitToChildren(CShadingContext *);
@@ -130,31 +129,29 @@ protected:
 // Class				:	CCurvesMesh
 // Description			:	Encapsulates a curves mesh
 // Comments				:
-// Date last edited		:	6/28/2001
 class	CCurveMesh : public CObject {
 public:
 							CCurveMesh(CAttributes *,CXform *,CPl *,int,int,int,int *,int);
 							~CCurveMesh();
 
-		void				bound(float *,float *) const;
-		void				copy(CAttributes *,CXform *,CRendererContext *) const;
-		void				tesselate(CShadingContext *context);
+							// Object interface
+		void				intersect(CShadingContext *,CRay *)	{	}
 		void				dice(CShadingContext *rasterizer);
+		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
 
 private:
-		void				create();
+		void				create(CShadingContext *context);
 
 		CPl					*pl;
 		int					numVertices;
 		int					numCurves;
 		int					*nverts;
 		int					degree,wrap;
-		vector				bmin,bmax;			// The bounding box in the original object coordinate system
+		TMutex				mutex;
 
 		const CVariable		*sizeVariable;
 		float				maxSize;
-
-		CArray<CObject *>	*children;
 };
 
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -67,7 +67,6 @@ class	CScriptContext;						// The main shader context. Holds everything
 // Class				:	CExpression
 // Description			:	This class holds an expression (multiplication , function call, etc)
 // Comments				:	
-// Date last edited		:	4/25/2002
 class	CExpression {
 public:
 						CExpression(int);
@@ -86,7 +85,6 @@ public:
 // Class				:	CTwoExpressions
 // Description			:	This expression is used to encapsulate multiple expressions
 // Comments				:	
-// Date last edited		:	4/25/2002
 class	CTwoExpressions : public CExpression {
 public:
 						CTwoExpressions(CExpression *,CExpression *);
@@ -102,7 +100,6 @@ public:
 // Class				:	CNullExpression
 // Description			:	This class is instanciated if there has been an error
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CNullExpression : public CExpression {
 public:
 						CNullExpression();
@@ -114,7 +111,6 @@ public:
 // Class				:	CVectorExpression
 // Description			:	Cast a vector from a collection of floats
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CVectorExpression : public CExpression {
 public:
 						CVectorExpression(CExpression *,CExpression *,CExpression *);
@@ -130,7 +126,6 @@ public:
 // Class				:	CMatrixExpression
 // Description			:	Cast a matrix from a collection of 16 floats
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CMatrixExpression : public CExpression {
 public:
 						CMatrixExpression(CExpression **);
@@ -146,7 +141,6 @@ public:
 // Class				:	CTerminalExpression
 // Description			:	This encapsulates a variable reference
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CTerminalExpression : public CExpression {
 public:
 						CTerminalExpression(CVariable *);
@@ -162,7 +156,6 @@ public:
 // Class				:	CArrayExpression
 // Description			:	Extract a particular item from an array
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CArrayExpression : public CExpression {
 public:
 						CArrayExpression(CVariable *,CExpression *);
@@ -178,7 +171,6 @@ public:
 // Class				:	CConstantExpression
 // Description			:	This encapsulates a constant expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CConstantTerminalExpression : public CExpression {
 public:
 						CConstantTerminalExpression(int,char *);
@@ -196,7 +188,6 @@ public:
 // Class				:	CBinaryExpression
 // Description			:	A binary expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CBinaryExpression : public CExpression {
 public:
 						CBinaryExpression(int,char *,CExpression *,CExpression *);
@@ -212,7 +203,6 @@ public:
 // Class				:	CUnaryExpression
 // Description			:	A unary expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CUnaryExpression : public CExpression {
 public:
 						CUnaryExpression(int,char *,CExpression *);
@@ -228,7 +218,6 @@ public:
 // Class				:	CSysConversionExpression
 // Description			:	System conversion
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CSysConversionExpression : public CExpression {
 public:
 						CSysConversionExpression(int,char *,char *,CExpression *);
@@ -246,7 +235,6 @@ public:
 // Class				:	CFuncallExpression
 // Description			:	Function call
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CFuncallExpression : public CExpression {
 public:
 						CFuncallExpression(CFunction *,CArray<CExpression *> *);
@@ -263,7 +251,6 @@ public:
 // Class				:	CBuiltinExpression
 // Description			:	A built in function call
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CBuiltinExpression : public CExpression {
 public:
 						CBuiltinExpression(CFunctionPrototype *,CArray<CExpression *> *);
@@ -280,7 +267,6 @@ public:
 // Class				:	CConditionalExpression
 // Description			:	A conditional statement (?:)
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CConditionalExpression : public CExpression {
 public:
 						CConditionalExpression(int,CExpression *,CExpression *,CExpression *);
@@ -298,7 +284,6 @@ public:
 // Class				:	CAssignmentExpression
 // Description			:	Assignment expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CAssignmentExpression : public CExpression {
 public:
 						CAssignmentExpression(CVariable *,CExpression *);
@@ -314,7 +299,6 @@ public:
 // Class				:	CArrayAssignmentExpression
 // Description			:	Assignment expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CArrayAssignmentExpression : public CExpression {
 public:
 						CArrayAssignmentExpression(CVariable *,CExpression *,CExpression *);
@@ -332,7 +316,6 @@ public:
 // Class				:	CArrayAssignmentExpression
 // Description			:	Assignment expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CArrayUpdateExpression : public CExpression {
 public:
 						CArrayUpdateExpression(CVariable *,CExpression *,CExpression *,char *,char *,char *);
@@ -351,7 +334,6 @@ public:
 // Class				:	CArray
 // Description			:	Assignment expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CArrayMove : public CExpression {
 public:
 						CArrayMove(CVariable *,CArray<CExpression *> *);
@@ -369,7 +351,6 @@ public:
 // Class				:	CUpdateExpression
 // Description			:	Update expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CUpdateExpression : public CExpression {
 public:
 						CUpdateExpression(CVariable *,char *,char *,int,CExpression *);
@@ -388,7 +369,6 @@ public:
 // Class				:	CIfThenElse
 // Description			:	If - Then - Else expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CIfThenElse : public CExpression {
 public:
 						CIfThenElse(CExpression *,CExpression *,CExpression *);
@@ -405,7 +385,6 @@ public:
 // Class				:	CGatherThenElse
 // Description			:	Gather - Then - Else expression
 // Comments				:
-// Date last edited		:	3/24/2003
 class	CGatherThenElse : public CExpression {
 public:
 						CGatherThenElse(CArray<CExpression *> *,CExpression *,CExpression *);
@@ -424,7 +403,6 @@ public:
 // Class				:	CForLoop
 // Description			:	For loop
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CForLoop : public CExpression {
 public:
 						CForLoop(CExpression *,CExpression *,CExpression *,CExpression *);
@@ -442,7 +420,6 @@ public:
 // Class				:	CIlluminationLoop
 // Description			:	Illumination loop
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CIlluminationLoop : public CExpression {
 public:
 						CIlluminationLoop(CExpression *,CExpression *,CExpression *,CExpression *,CExpression *);
@@ -459,7 +436,6 @@ public:
 // Class				:	CIlluminateSolar
 // Description			:	Illuminate/solar loop
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CIlluminateSolar : public CExpression {
 public:
 						CIlluminateSolar(char *,char *,CExpression *,CExpression *,CExpression *,CExpression *);
@@ -478,7 +454,6 @@ public:
 // Class				:	CFixedExpression
 // Description			:	A fixed string expression
 // Comments				:
-// Date last edited		:	7/20/2001
 class	CFixedExpression : public CExpression {
 public:
 						CFixedExpression(char *);

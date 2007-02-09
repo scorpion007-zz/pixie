@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -48,14 +48,13 @@ const	unsigned int	CACHE_RDONLY	=	8;		// ONLY Read the cache
 // Class				:	CCache
 // Description			:	Encapsulates a renderer cache
 // Comments				:
-// Date last edited		:	10/15/2005
 class	CCache : public CFileResource, public CView {
 public:
 					CCache(const char *,unsigned int);
 					~CCache();
 
-	virtual	void	lookup(float *,const float *,const float *,const CGlobalIllumLookup *)		=	0;
-	virtual	void	cachesample(float *,const float *,const float *,float)						=	0;
+	virtual	void	lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *)	=	0;
+	virtual	void	cachesample(float *,const float *,const float *,float)											=	0;
 	virtual	void	finalize(const CGlobalIllumLookup *)	{	}
 
 protected:

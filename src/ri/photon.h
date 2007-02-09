@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,49 +35,47 @@
 #include "shading.h"
 #include "ray.h"
 #include "random.h"
+#include "attributes.h"
+#include "options.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonHider
 // Description			:	This class implements the photon hider
 // Comments				:
-// Date last edited		:	3/8/2003
 class	CPhotonHider : public CShadingContext {
-	typedef enum {
-		PHOTON_ESTIMATE,		// Estimate the energy per unit area
-		PHOTON_TRACE			// Create/trace photons from the light source
-	} EPhotonStage;
-
 public:
-									CPhotonHider(COptions *,CXform *,SOCKET,CAttributes *);
+									CPhotonHider(int thread,CAttributes *);
 			virtual					~CPhotonHider();
-
+			
+			static void				preDisplaySetup();
+			
 			// The main hider interface
 			// The following functions are commented out for we want the CShadingContext to handle those
-			void					renderFrame();									// Right after world end to force rendering of the entire frame
+			void					renderingLoop();		// Right after world end to force rendering of the entire frame
 
 			// Since we're not doing any rasterization, the following functions are simple stubs
 
 			// Delayed rendering functions
-			void					drawObject(CObject *,const float *,const float *) { }
+			void					drawObject(CObject *) { }
 
 			// Primitive creation functions
 			void					drawGrid(CSurface *,int,int,float,float,float,float) { }
-			void					drawRibbon(CSurface *,int,float,float) { }
 			void					drawPoints(CSurface *,int) { }
 protected:
 			void					solarBegin(const float *,const float *);
 			void					solarEnd();
 			void					illuminateBegin(const float *,const float *,const float *);
 			void					illuminateEnd();
+
+			int						numTracedPhotons;
 private:
 			void					tracePhoton(float *,float *,float *,float);
-
-			EPhotonStage			stage;					// The current stage
+	
 			float					bias;					// The initial intersection bias
 
 			float					powerScale;				// The scaling factor for individual photon powers
 			float					minPower;				// The variables to find the range of the illumination
-			float					maxPower;				//     for the current light
+			float					maxPower;				// for the current light
 			float					avgPower;
 			float					numPower;
 

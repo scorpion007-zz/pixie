@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Class				:	CMemPage
 // Description			:	This class coltains memory that's allocated on the fly
 // Comments				:
-// Date last edited		:	8/2/2001
 class CMemPage {
 public:
 		char			*memory;					// Points to the current free memory
@@ -49,13 +48,6 @@ public:
 		CMemPage		*prev;						// points to the previous valid memory block
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	Renderer memory stack management
-extern	CMemPage	*currentMemoryPage;				// The page that we're allocating from
-
-
-void				memoryInit();					// Init the memory
-void				memoryTini();					// Destroy the allocated memory
 void				memoryInit(CMemPage *&);		// Init named memory stack
 void				memoryTini(CMemPage *&);		// Destroy the named allocated memory
 CMemPage			*memoryNewPage(int);			// Allocate a new memory page
@@ -64,28 +56,6 @@ void				memoryDeletePage(CMemPage *);	// Allocate a new memory page
 
 
 
-// This macro allocates memory in the global stack
-inline void *ralloc(int size) {
-	void	*ptr;
-
-	while(currentMemoryPage->availableSize < size) {
-		if (currentMemoryPage->next == NULL) {
-			CMemPage	*cPage				=	memoryNewPage(size);
-			cPage->prev						=	currentMemoryPage;
-			currentMemoryPage->next			=	cPage;
-		}
-
-		currentMemoryPage					=	currentMemoryPage->next;
-		currentMemoryPage->availableSize	=	currentMemoryPage->totalSize;
-		currentMemoryPage->memory			=	currentMemoryPage->base;
-	}
-
-
-	ptr									=	currentMemoryPage->memory;
-	currentMemoryPage->memory			=	currentMemoryPage->memory+size;
-	currentMemoryPage->availableSize	-=	size;
-	return	ptr;
-}
 
 // This macro allocates memory in the named stack
 inline void *ralloc(int size,CMemPage *&stack) {
@@ -112,31 +82,37 @@ inline void *ralloc(int size,CMemPage *&stack) {
 
 
 // This macro places a checkpoint
-#define	memBegin()	{														\
-	char		*savedMem		=	currentMemoryPage->memory;				\
-	int			savedAvailable	=	currentMemoryPage->availableSize;		\
-	CMemPage	*savedPage		=	currentMemoryPage;
+#define	memBegin(__page)	{									\
+	char		*savedMem		=	__page->memory;				\
+	int			savedAvailable	=	__page->availableSize;		\
+	CMemPage	*savedPage		=	__page;
 
 // This macro restores the memory to the last checkpoint
 // It is important that the scope between the matching begin-end
 // pairs mist not be exitted
-#define	memEnd()															\
-		currentMemoryPage					=	savedPage;					\
-		currentMemoryPage->availableSize	=	savedAvailable;				\
-		currentMemoryPage->memory			=	savedMem;					\
+#define	memEnd(__page)											\
+		__page					=	savedPage;					\
+		__page->availableSize	=	savedAvailable;				\
+		__page->memory			=	savedMem;					\
 	}
 
+// This structure can be used to put a checkpoint
+typedef struct {
+	CMemPage		*stack;
+	int				availableSize;
+	char			*memory;
+} TMemCheckpoint;
 
 // Mem save and mem restore does the same thing, but they explicitly store the checkpoint in T64 data[3];
 #define	memSave(__data,__stack)													\
-	__data[0].pointer		=	__stack->memory;								\
-	__data[1].integer		=	__stack->availableSize;							\
-	__data[2].pointer		=	__stack;
+	__data.memory			=	__stack->memory;								\
+	__data.availableSize	=	__stack->availableSize;							\
+	__data.stack			=	__stack;
 
 #define memRestore(__data,__stack)												\
-	__stack					=	(CMemPage *) __data[2].pointer;					\
-	__stack->availableSize	=	__data[1].integer;								\
-	__stack->memory			=	(char *) __data[0].pointer;
+	__stack					=	__data.stack;									\
+	__stack->availableSize	=	__data.availableSize;							\
+	__stack->memory			=	__data.memory;
 
 
 #endif

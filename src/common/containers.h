@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -55,7 +55,6 @@
 // Class				:	CDictionary
 // Description			:	Pure virtual parent class for dictionary
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class keyType,class valType> class CDictionary  {
 public:
 						CDictionary()	{	}
@@ -84,14 +83,12 @@ public:
 // Class				:	CHash
 // Description			:	Hash table
 // Comments				:
-// Date last edited		:	2/8/2003
 template <class keyType,class valType>	class CHash : public CDictionary<keyType,valType> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CHashBucket
 	// Description			:	Hash table
 	// Comments				:
-	// Date last edited		:	2/8/2003
 	class CHashBucket {
 	public:
 		keyType		key;
@@ -248,14 +245,12 @@ const	int		TRIE_NODE_LEAF				=	1;
 // Class				:	CTrie
 // Description			:	Trie class
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class valType> class CTrie : public CDictionary<const char *,valType> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CTrieLeaf
 	// Description			:	Encapsulates a trie leaf
 	// Comments				:
-	// Date last edited		:	11/28/2001
 	class CTrieLeaf {
 	public:
 		CTrieLeaf(const char *k,valType v) {
@@ -271,7 +266,6 @@ template <class valType> class CTrie : public CDictionary<const char *,valType> 
 	// Class				:	CTrieNode
 	// Description			:	Encapsulates a trie internal node
 	// Comments				:
-	// Date last edited		:	11/28/2001
 	class CTrieNode {
 	public:
 		CTrieNode() {
@@ -305,7 +299,7 @@ public:
 
 						// Dtor
 						~CTrie() {
-							delete root;
+							if (root != NULL) delete root;
 						}
 
 						// Insert an object into the trie
@@ -401,14 +395,16 @@ public:
 		CTrieNode		*root;
 
 private:
+
 		void			destroyNode(CTrieNode *cNode) {
-							int	i;
 
 							if (isLeaf(cNode)) {
 								CTrieLeaf	*cLeaf	=	getLeaf(cNode);
 								delete cLeaf->val;
 								delete cLeaf;
 							} else {
+								int	i;
+
 								for (i=0;i<256;i++) {
 									if (cNode->pointers[i] != NULL) {
 										destroyNode(cNode->pointers[i]);
@@ -439,14 +435,12 @@ private:
 // Class				:	CPqueue
 // Description			:	Priority queue
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class ItemType,class PriorityType> class CPqueue  {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPqueueItem
 	// Description			:	Holds a priority queue item
 	// Comments				:
-	// Date last edited		:	11/28/2001
 	class	CPqueueItem	{
 	public:
 		ItemType		item;
@@ -566,7 +560,6 @@ private:
 // Class				:	CMemPool
 // Description			:	Memory pool for a particular class that's allocated frequently
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class T>	class CMemPool {
 public:
 	
@@ -662,69 +655,111 @@ public:
 // Class				:	CMemStack
 // Description			:	A stack based memory manager
 // Comments				:
-// Date last edited		:
-class	CMemStack {
+class CMemStack {
+
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CMemPage
+	// Description			:	This class contains a memory page
+	// Comments				:
+	class CMemPage {
+	public:
+			char			*memory;					// Points to the current free memory
+			char			*base;						// Points to the base memory
+			int				availableSize;				// The available number of bytes
+			int				totalSize;					// The total size of the block
+			CMemPage		*next;						// Points to the next free memory block
+			CMemPage		*prev;						// points to the previous valid memory block
+	};
+
 public:
 						CMemStack(int bs = 1 << 12) {
-							pageSize		=	bs;
-
-							// Align the bucket size to 16 byte boundary
-							pageSize		=	(pageSize & ~15) + 16;
-							memoryBase		=	new unsigned char[pageSize+16];
-							memory			=	memoryBase+16;
-							available		=	pageSize;
-							savedPages		=	NULL;
+							pageSize	=	bs;
+							firstPage	=	stack	=	memoryNewPage(pageSize);
 						}
 
 						~CMemStack() {
-							T64	*cPage;
-
-							// Delete
-							while(savedPages != NULL) {
-								cPage		=	savedPages;
-								savedPages	=	(T64 *) cPage->pointer;
-
-								delete [] (unsigned char *) cPage;
+							while((stack = firstPage) != NULL) {
+								firstPage	=	stack->next;
+								
+								memoryDeletePage(stack);
 							}
-
-							delete [] memoryBase;
 						}
 
-		void			*alloc(int size) {
-							void	*data;
+		inline void		*alloc(int size) {
 
-							if (available < size) {
-								int				allocSize	=	max(pageSize,size);
-								T64				*oPage;
+							while(stack->availableSize < size) {
 
-								// Save the old memory area
-								oPage			=	(T64 *) memoryBase;
-								oPage->pointer	=	savedPages;
-								savedPages		=	oPage;
+								if (stack->next == NULL) {
+									CMemPage	*cPage				=	memoryNewPage(max(pageSize,size));
+									cPage->prev						=	stack;
+									stack->next						=	cPage;
+								}
 
-								// Allocate the new memory
-								memoryBase		=	new unsigned char[allocSize+16];
-								memory			=	memoryBase + 16;
-								available		=	allocSize;
-								pageSize		*=	2;
+								stack								=	stack->next;
+								stack->availableSize				=	stack->totalSize;
+								stack->memory						=	stack->base;
 							}
 
-							data		=	memory;
-							memory		+=	size;
-							available	-=	size;
 
-							return	data;
+							void *ptr								=	stack->memory;
+							stack->memory							=	stack->memory+size;
+							stack->availableSize					-=	size;
+							return	ptr;
 						}
 
-		T64				*savedPages;		// Keeps a linked list of already allocated memory pages
-		unsigned char	*memory;			// Keeps the current memory
-		unsigned char	*memoryBase;		// The allocated page
-		int				available;			// Available size in the current page
-		int				pageSize;			// The default page size
+		inline void		save(T64 *data) {
+							data[0].pointer			=	stack->memory;
+							data[1].integer			=	stack->availableSize;
+							data[2].pointer			=	stack;
+						}
+
+		inline void		restore(T64 *data) {
+							stack					=	(CMemPage *) data[2].pointer;
+							stack->availableSize	=	data[1].integer;
+							stack->memory			=	(char *) data[0].pointer;
+						}
+
+		CMemPage		*stack;
+private:
+		CMemPage		*firstPage;
+		int				pageSize;
+
+		CMemPage		*memoryNewPage(int size) {
+							CMemPage	*newPage	=	new CMemPage;
+
+							newPage->availableSize	=	size;
+							newPage->totalSize		=	size;
+							newPage->base			=	new char[size];
+							newPage->memory			=	newPage->base;
+							newPage->next			=	NULL;
+							newPage->prev			=	NULL;
+
+							return newPage;
+						}
+
+		void			memoryDeletePage(CMemPage *cPage) {
+							delete [] cPage->base;
+							delete cPage;
+						}
 
 };
 
+/*
+// This macro places a checkpoint in the stack
+#define	memBegin(__stack)	{											\
+	char				*savedMem		=	__stack->memory;			\
+	int					savedAvailable	=	__stack->availableSize;		\
+	CMemStack::CMemPage	*savedPage		=	__stack;
 
+// This macro restores the memory to the last checkpoint
+// It is important that the scope between the matching begin-end
+// pairs must not be exitted
+#define	memEnd(__stack)													\
+		__stack							=	savedPage;					\
+		__stack->availableSize			=	savedAvailable;				\
+		__stack->memory					=	savedMem;					\
+	}
+*/
 
 
 
@@ -744,7 +779,6 @@ public:
 // Class				:	CArray
 // Description			:	Array
 // Comments				:
-// Date last edited		:	11/28/2001
 template <class T> class CArray {
 public:
 						CArray(int ss = 100) {

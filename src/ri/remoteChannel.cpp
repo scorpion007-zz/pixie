@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,10 +35,9 @@
 #include	"common/global.h"
 #include	"common/containers.h"
 
+#include	"renderer.h"
 #include	"remoteChannel.h"
 #include	"error.h"
-#include	"renderer.h"
-#include	"shading.h"
 #include	"irradiance.h"
 #include	"pointCloud.h"
 
@@ -46,14 +45,13 @@
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CRenderer
 // Method				:	requestRemoteChannel
 // Description			:	Ask client to set up remote channel like the
 //							one passed as an argument
 // Return Value			:
 // Comments				:	The channel will either be deleted or managed
-// Date last edited		:	03/24/2006
-int		CShadingContext::requestRemoteChannel(CRemoteChannel *serverChannel){
+int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 	int nameLength			= strlen(serverChannel->name)+1;
 	int clientInitialized	= FALSE;	
 	T32 buffer[3];
@@ -120,14 +118,13 @@ int		CShadingContext::requestRemoteChannel(CRemoteChannel *serverChannel){
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CRenderer
 // Method				:	processChannelRequest
 // Description			:	Service request for channel, adding the
 //							newly created channel to the list if successful
 // Return Value			:
 // Comments				:	called from CRendererContext:processServerRequest
-// Date last edited		:	03/24/2006
-int		CShadingContext::processChannelRequest(int index,SOCKET s){
+int		CRenderer::processChannelRequest(int index,SOCKET s){
 	int				channelNameLength	= 0;
 	int				channelType			= 0;
 	CRemoteChannel	*rChannel			= NULL;
@@ -188,7 +185,7 @@ int		CShadingContext::processChannelRequest(int index,SOCKET s){
 			{
 			// create an pointcloud channel.
 			// Note: the channel definitions are duff
-			CPointCloud *cloud = (CPointCloud*)  getTexture3d(channelName,TRUE,NULL,NULL);			
+			CPointCloud *cloud = (CPointCloud*)  getTexture3d(channelName,TRUE,NULL,CRenderer::fromWorld,CRenderer::toWorld);			
 			rChannel = new CRemotePtCloudChannel(cloud);
 			rChannel->remoteId = remoteChannels->numItems;
 			buffer[0].integer	=	rChannel->remoteId;
@@ -241,13 +238,12 @@ int		CShadingContext::processChannelRequest(int index,SOCKET s){
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CRenderer
 // Method				:	sendBucketDataChannels
 // Description			:	Send all bucket-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
-// Date last edited		:	03/24/2006
-void CShadingContext::sendBucketDataChannels(int x,int y) {
+void CRenderer::sendBucketDataChannels(int x,int y) {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
@@ -289,14 +285,13 @@ void CShadingContext::sendBucketDataChannels(int x,int y) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CRenderer
 // Method				:	recvBucketDataChannels
 // Description			:	Recieve all bucket-data channels
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
-// Date last edited		:	03/24/2006
-void CShadingContext::recvBucketDataChannels(SOCKET s,int x,int y) {
+void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
@@ -336,13 +331,12 @@ void CShadingContext::recvBucketDataChannels(SOCKET s,int x,int y) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CRenderer
 // Method				:	sendFrameDataChannels
 // Description			:	Send all frame-data channels
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
-// Date last edited		:	03/24/2006
-void CShadingContext::sendFrameDataChannels() {
+void CRenderer::sendFrameDataChannels() {
 	long			numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
@@ -383,14 +377,13 @@ void CShadingContext::sendFrameDataChannels() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingContext
+// Class				:	CRenderer
 // Method				:	recvFrameDataChannels
 // Description			:	Recieve all frame-data channels
 // Return Value			:
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
-// Date last edited		:	03/24/2006
-void CShadingContext::recvFrameDataChannels(SOCKET s) {
+void CRenderer::recvFrameDataChannels(SOCKET s) {
 	long			numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
@@ -435,7 +428,6 @@ void CShadingContext::recvFrameDataChannels(SOCKET s) {
 // Method				:	ctor
 // Description			:	-
 // Comments				:	The file is opened elsewhere and closed elsewhere
-// Date last edited		:	03/24/2006
 CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,int yb) : CRemoteChannel(name,REMOTECHANNEL_PERBUCKET,CHANNELTYPE_TSM) {
 	tsmFile = f;
 	index = idx;
@@ -450,7 +442,6 @@ CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,in
 // Description			:	send a buckets worth of tsm data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	// record current position, seek back to tile start
 	long curPos = ftell(tsmFile);
@@ -482,7 +473,6 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 // Description			:	receive a buckets worth of tsm data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	// record where we are
 	long prevPos = ftell(tsmFile);
@@ -514,7 +504,6 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 // Method				:	ctor
 // Description			:	-
 // Comments				:	The cache is opened elsewhere and closed elsewhere
-// Date last edited		:	03/24/2006
 CRemoteICacheChannel::CRemoteICacheChannel(CIrradianceCache *c) : CRemoteChannel(c->name,REMOTECHANNEL_PERFRAME,CHANNELTYPE_ICACHE) {
 	cache = c;
 }
@@ -526,7 +515,6 @@ CRemoteICacheChannel::CRemoteICacheChannel(CIrradianceCache *c) : CRemoteChannel
 // Description			:	send all the cache's data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteICacheChannel::sendRemoteFrame(SOCKET s) {
 	CIrradianceCache::CCacheNode			**stackBase;
 	CIrradianceCache::CCacheNode			**stack;
@@ -576,7 +564,6 @@ int		CRemoteICacheChannel::sendRemoteFrame(SOCKET s) {
 // Description			:	receive all the server's cache data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 	CIrradianceCache::CCacheNode			*cNode;
 	CIrradianceCache::CCacheSample			*cSample;
@@ -623,7 +610,7 @@ int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 					}
 		
 					cNode->children[j]	=	nNode;
-					nNode->side			=	cNode->side / (float) 2;
+					nNode->side			=	cNode->side*0.5f;
 					nNode->samples		=	NULL;
 					for (i=0;i<8;i++)	nNode->children[i]	=	NULL;
 				}
@@ -667,7 +654,6 @@ int	CRemoteICacheChannel::setup(SOCKET s) {
 // Method				:	ctor
 // Description			:	-
 // Comments				:	The cache is opened elsewhere and closed elsewhere
-// Date last edited		:	03/24/2006
 CRemotePtCloudChannel::CRemotePtCloudChannel(CPointCloud *c) : CRemoteChannel(c->name,REMOTECHANNEL_PERFRAME,CHANNELTYPE_PTCLOUD) {
 	cloud = c;
 }
@@ -679,7 +665,6 @@ CRemotePtCloudChannel::CRemotePtCloudChannel(CPointCloud *c) : CRemoteChannel(c-
 // Description			:	send all the cache's data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
 	int i,numSamples;
 
@@ -705,7 +690,6 @@ int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
 // Description			:	receive all the server's cache data
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemotePtCloudChannel::recvRemoteFrame(SOCKET s) {
 	int					i,numSamples;
 	CPointCloudPoint	pt;
@@ -732,7 +716,6 @@ int		CRemotePtCloudChannel::recvRemoteFrame(SOCKET s) {
 // Description			:	sendSetupData
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int		CRemotePtCloudChannel::sendSetupData(SOCKET s) {
 	char	channelDef[1024];
 	char	*ptr = channelDef;
@@ -757,7 +740,6 @@ int		CRemotePtCloudChannel::sendSetupData(SOCKET s) {
 // Description			:	setup
 // Return Value			:	success or failure
 // Comments				:	
-// Date last edited		:	03/24/2006
 int	CRemotePtCloudChannel::setup(SOCKET s) {
 	char	channelDef[1024];
 	
@@ -765,14 +747,8 @@ int	CRemotePtCloudChannel::setup(SOCKET s) {
 	rcRecv(s,channelDef,1024,FALSE);
 	cloud->defineChannels(channelDef);
 	
-	// detach the transform
-	cloud->world->detach();
-	
-	CXform *dummy = new CXform();	// points have already been transformed into worldspace
-									// by the client -> this must be done only for netrender servers
-	
-	dummy->attach();
-	cloud->world = dummy;
+	identitym(cloud->to);
+	identitym(cloud->from);
 	
 	// set the scale to 1
 	

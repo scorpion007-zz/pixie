@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -41,7 +41,7 @@ const	int	yres		=	sampleHeight - 1;
 
 
 #ifdef STOCHASTIC_EXTRA_SAMPLES
-#define	displacement	(10 + numExtraSamples)
+#define	displacement	(10 + CRenderer::numExtraSamples)
 #else
 #define	displacement	10
 #endif
@@ -76,7 +76,7 @@ const	int	yres		=	sampleHeight - 1;
 	const	float	*s0	=	v0+10;													\
 	float			*dest;															\
 																					\
-	for (dest=pixel->extraSamples,currentSample=numExtraSamples;currentSample>0;currentSample--,s0++) {		\
+	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
 		*dest++		=	(s0[0]*(1-jt)+s0[displacement]*jt);							\
 	}																				\
 }
@@ -87,7 +87,7 @@ const	int	yres		=	sampleHeight - 1;
 	const	float	*s0	=	v0+10;													\
 	float			*dest;															\
 																					\
-	for (dest=pixel->extraSamples,currentSample=numExtraSamples;currentSample>0;currentSample--,s0++) {		\
+	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
 		*dest++		=	s0[currentSample];											\
 	}																				\
 }
@@ -314,10 +314,10 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 			const	float	dx		=	xcent - v0[0];
 			const	float	dy		=	ycent - v0[1];
 
+			v0	=	vertices;
+
 			if ((dx*dx + dy*dy) < (size*size)) {
 				const	float	z	=	v0[2];
-
-				v0	=	vertices;
 
 				drawPixelCheck();
 			}

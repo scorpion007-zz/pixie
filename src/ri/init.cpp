@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -30,15 +30,14 @@
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
 
-#include "renderer.h"
 #include "shader.h"
 #include "slcode.h"
 #include "noise.h"
 #include "shading.h"
-#include "stats.h"
+#include "renderer.h"
 #include "memory.h"
-#include "output.h"
 #include "error.h"
+#include "rendererContext.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,10 +55,11 @@
 #define exitFastLightingConditional()		scripterror("Invalid environment function call during init\n")
 #define	rendererInfo(a,b)					scripterror("Invalid environment function call during init\n")
 #define	emission(a,b)						scripterror("Invalid environment function call during init\n")
-#define	clipMin								0
-#define	clipMax								1
 #define debugFunction(a)
 #define	illuminateBegin(a,b,c,d,e,f)
+#define findCoordinateSystem				CRenderer::findCoordinateSystem
+#define threadMemory						CRenderer::globalMemory
+#define urand()								(rand() / (float) RAND_MAX)
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -67,7 +67,6 @@
 // Description			:	Do color conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
 	switch(s) {
 	case COLOR_RGB:
@@ -184,7 +183,6 @@ void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
 // Description			:	Do color conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void		convertColorTo(float *out,const float *in,ECoordinateSystem s) {
 	switch(s) {
 	case COLOR_RGB:
@@ -290,7 +288,6 @@ void		convertColorTo(float *out,const float *in,ECoordinateSystem s) {
 // Description			:	Execute the current shader's init code
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/28/2001
 void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) {
 // At this point, the shader sends us the arrays for parameters/constants/variables/uniforms for the shader
 	
@@ -309,7 +306,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 #define		savestring(r,n)					{																	\
 												int		strLen	=	strlen(n) + 1;								\
 												int		strSize	=	(strLen & ~3) + 4;							\
-												char	*strmem	=	(char *) ralloc(strSize);					\
+												char	*strmem	=	(char *) ralloc(strSize,threadMemory);		\
 												strcpy(strmem,n);												\
 												r				=	strmem;										\
 											}
@@ -378,7 +375,6 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 //	The	shading variables and junk
 	TCode						**stuff[3];			// Where we keep pointers to the variables
-	ESlCode						opcode;				// :)
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;
 	int							numPassive;
@@ -404,13 +400,13 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	tmpTags									=	0;
 
 	// Setup local variables
-	stuff[SL_VARYING_OPERAND]				=	(TCode **) ralloc(currentShader->numVariables*sizeof(TCode*));	// Shader varying variables
+	stuff[SL_VARYING_OPERAND]				=	(TCode **) ralloc(currentShader->numVariables*sizeof(TCode*),threadMemory);	// Shader varying variables
 	for (i=0;i<currentShader->numVariables;i++) {											// Allocate memory for every varying variable
 		int	size							=	currentShader->varyingSizes[i];
 
 		if (size != 0) {
 			if (size < 0)	size				=	-size;
-			stuff[SL_VARYING_OPERAND][i]		=	(TCode *) ralloc(size*sizeof(TCode));
+			stuff[SL_VARYING_OPERAND][i]		=	(TCode *) ralloc(size*sizeof(TCode),threadMemory);
 		}
 	}
 
@@ -422,10 +418,9 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 		// Relink the entry point to the global, we already verified the match
 		if (cParameter->storage == STORAGE_GLOBAL) {
-			CVariable	*cVar	=	retrieveVariable(cParameter->name);
+			CVariable	*cVar	=	CRenderer::retrieveVariable(cParameter->name);
 			cParameter->entry	=	cVar->entry;
 		}
-		cParameter->value		=	NULL;
 	}
 
 
@@ -444,7 +439,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 	// Execute
 execStart:
-	opcode	=	(ESlCode)	code[0].integer;
+	const ESlCode	opcode	=	(ESlCode)	code[0].integer;
 
 	tags	=	tagStart;
 

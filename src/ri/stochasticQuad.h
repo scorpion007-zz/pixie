@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,7 +32,7 @@
 
 
 #ifdef STOCHASTIC_EXTRA_SAMPLES
-	const int displacement	=	10 + numExtraSamples;
+	const int displacement	=	10 + CRenderer::numExtraSamples;
 #else
 	#define	displacement	10
 #endif
@@ -70,7 +70,7 @@
 	const	float	*s3	=	v3+10;															\
 	float			*dest;																	\
 																							\
-	for (dest=pixel->extraSamples,currentSample=numExtraSamples;currentSample>0;currentSample--,s0++,s1++,s2++,s3++) {		\
+	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++,s1++,s2++,s3++) {		\
 		*dest++	=	((s0[0]*(1-jt)+s0[displacement]*jt)*(1-u) + (s1[0]*(1-jt)+s1[displacement]*jt)*u)*(1-v)	+	\
 					((s2[0]*(1-jt)+s2[displacement]*jt)*(1-u) + (s3[0]*(1-jt)+s3[displacement]*jt)*u)*v;		\
 	}																						\
@@ -87,7 +87,7 @@
 	const	float	*s3	=	v2+10;															\
 	float			*dest;																	\
 																							\
-	for (dest=pixel->extraSamples,currentSample=numExtraSamples;currentSample>0;currentSample--) {	\
+	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--) {	\
 		*dest++	=	((*s0++)*(1-u) + (*s1++)*u)*(1-v) + ((*s2++)*(1-u) + (*s3++)*u)*v;		\
 	}																						\
 }
@@ -341,7 +341,7 @@
 	const float u	=	aleft / (aleft + aright);															\
 	const float v	=	atop / (atop + abottom);															\
 	const float	z	=	(v0[COMP_Z]*(1-u) + v1[COMP_Z]*u)*(1-v) + (v2[COMP_Z]*(1-u) + v3[COMP_Z]*u)*v;		\
-	if (z < clipMin)	continue;
+	if (z < CRenderer::clipMin)	continue;
 
 
 

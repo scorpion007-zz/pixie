@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -77,7 +77,6 @@ extern "C" {
 //							we're running a server, it can spawn another one
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 void	exitFunction() {
 	if (deamon == TRUE) {
 		// Close socket before respawning
@@ -118,7 +117,6 @@ void	exitFunction() {
 // Description			:	Print the stinking usage
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 void	printUsage() {
 	fprintf(stdout,"PIXIE v%d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 
@@ -158,7 +156,6 @@ void	printUsage() {
 // Description			:	The main rendering thread
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 void	riThread(void *w) {
 	T32		*buffer	=	(T32 *) w;
 	char	managerString[1024];
@@ -191,7 +188,6 @@ void	riThread(void *w) {
 // Description			:	run as a local server and connect to client
 // Return Value			:	-
 // Comments				:	Servers connect back to client to avoid race
-// Date last edited		:	02/23/2006
 void	rndrc(char *ribFile,int port) {
 	char		managerString[1024];
 	SOCKET		sock;
@@ -213,6 +209,11 @@ void	rndrc(char *ribFile,int port) {
 	#endif
 #endif
 
+	unsigned int	attemptAddress	=	INADDR_ANY;
+	
+	// Here we include robustness for Win32 not allowing bind / connect to ANY
+retryBind:
+
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == INVALID_SOCKET) {
 		if (silent == FALSE)	fprintf(stderr,"Socket error\n");
@@ -228,10 +229,16 @@ void	rndrc(char *ribFile,int port) {
 	// connect to server
 	
 	client.sin_family		= AF_INET;
-	client.sin_addr.s_addr	= htonl(INADDR_ANY);
+	client.sin_addr.s_addr	= htonl(attemptAddress);
 	client.sin_port			= htons(port);
 	
 	if (connect(sock, (struct sockaddr *) &client, sizeof(client)) < 0) {
+		// Retry with loopback
+		if (attemptAddress != INADDR_LOOPBACK) {
+			closesocket(sock);
+			attemptAddress = INADDR_LOOPBACK;
+			goto retryBind;
+		}
 		if (silent == FALSE)	fprintf(stderr,"Connection error\n");
 		closesocket(sock);
 		return;
@@ -259,7 +266,6 @@ void	rndrc(char *ribFile,int port) {
 // Description			:	Run a set of subprocess and pre-accept connects
 // Return Value			:	-
 // Comments				:	the accepted sockets are handed back in managerString
-// Date last edited		:	02/23/2006
 int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	SOCKET		sock;
 	struct		sockaddr_in	me;
@@ -431,7 +437,6 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 // Description			:	Run the network deamon
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 void	rndrd(int port) {
 	SOCKET		sock;
 	struct		sockaddr_in	me;
@@ -539,7 +544,6 @@ void	rndrd(int port) {
 // Description			:	The god
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	12/01/2001
 int main(int argc, char* argv[]) {
 	int				i;
 	char			managerString[1024];
@@ -555,6 +559,7 @@ int main(int argc, char* argv[]) {
 	int				frameBufferOnly	=	FALSE;
 	int				displayStats	=	FALSE;
 	int				displayProgress	=	FALSE;
+	int				numThreads		=	-1;
 	int				localChildren	=	0;
 
 	// Init the memory manager
@@ -634,6 +639,8 @@ int main(int argc, char* argv[]) {
 			}
 		} else if (strcmp(argv[i],"-d") == 0) {
 			frameBufferOnly	=	TRUE;
+		} else if (strncmp(argv[i],"-t:",3) == 0) {
+			numThreads			=	atoi(argv[i]+3);
 		} else if (strcmp(argv[i],"-t") == 0) {
 			displayStats	=	TRUE;
 		} else if (strcmp(argv[i],"-p") == 0) {
@@ -649,6 +656,12 @@ int main(int argc, char* argv[]) {
 			fprintf(stderr,"Invalid combination of client and server options\n");
 			exit(0);
 		}
+	}
+	
+	// FIXME: remove once multithreaded netrenders are working
+	if ((client | server | localserver) && numThreads > 0) {
+		fprintf(stderr,"You cannot specify multithreaded for network / multiprocessor renders\n");
+		exit(0);
 	}
 
 	// Launch into daemon mode if appropriate
@@ -734,6 +747,10 @@ int main(int argc, char* argv[]) {
 		RiOption(RI_STATISTICS,RI_PROGRESS,&progress,RI_NULL);
 	}
 
+	if (numThreads > 0) {
+		RiOption(RI_LIMITS,RI_NUMTHREADS,&numThreads,RI_NULL);
+	}
+	
 	if (!killservers) RiReadArchive(source,NULL,NULL);
 
 	RiEnd();

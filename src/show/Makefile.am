@@ -6,7 +6,7 @@ EXTRA_DIST = *.h show.dsp
 
 show_SOURCES = show.cpp
 
-show_LDADD = ../common/libcommon.la ../ri/libri.la
+show_LDADD = ../common/libpixiecommon.la ../ri/libri.la
 
 INCLUDES = -I..
 

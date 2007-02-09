@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -56,7 +56,6 @@ class CBrickMapView;
 // Class				:	CBrickMap
 // Description			:	Implements a 3D texture
 // Comments				:
-// Date last edited		:	7/15/2006
 class	CBrickMap : public CTexture3d {
 
 
@@ -64,7 +63,6 @@ class	CBrickMap : public CTexture3d {
 	// Class				:	CVoxel
 	// Description			:	Holds a voxel data
 	// Comments				:	The data is implicitly stored after the voxel in memory
-	// Date last edited		:	7/15/2006
 	class CVoxel {
 	public:
 		float			weight;				// The weight of the voxel
@@ -77,7 +75,6 @@ class	CBrickMap : public CTexture3d {
 	// Class				:	CBrick
 	// Description			:	Holds a brick
 	// Comments				:
-	// Date last edited		:	7/15/2006
 	class CBrick {
 	public:
 		CVoxel			*voxels;			// The brick data
@@ -90,7 +87,6 @@ class	CBrickMap : public CTexture3d {
 	// Class				:	CBrickNode
 	// Description			:	Holds a hash bucket entry for a bucket
 	// Comments				:	FIXME: We should make this structure 16 bytes (it is currently 20 bytes)
-	// Date last edited		:	7/15/2006
 	class CBrickNode {
 	public:
 		CBrick			*brick;				// The brick (NULL if on disk)
@@ -101,8 +97,8 @@ class	CBrickMap : public CTexture3d {
 	};
 
 public:
-								CBrickMap(FILE *in,const char *name,CXform *world);
-								CBrickMap(const char *name,const float *bmin,const float *bmax,CXform *world,CTexture3dChannel*,int);
+								CBrickMap(FILE *in,const char *name,const float *from,const float *to);
+								CBrickMap(const char *name,const float *bmin,const float *bmax,const float *from,const float *to,CTexture3dChannel*,int);
 			virtual				~CBrickMap();
 			
 								///////////////////////////////////////////////////////////////////////
@@ -111,7 +107,6 @@ public:
 								// Description			:	Locate a brick given it's spatial index
 								// Return Value			:	The brick if found
 								// Comments				:
-								// Date last edited		:	7/15/2006
 			inline	CBrick		*findBrick(int x,int y,int z,int d,int forceCreate,CBrickNode **n) {
 									int			key		=	(x + y + z + d) & (BRICK_HASHSIZE-1);	// FIXME: this is a horrible key
 									CBrickNode	*cNode	=	activeBricks[key];
@@ -179,9 +174,9 @@ public:
 			int					keyDown(int key);
 
 			// Some global static functions for the renderer interface
-	static	void				brickMapInit(int maxMemory = 10000000);
-	static	void				brickMapFlush(int all=FALSE);
-	static	void				brickMapShutdown();
+	static	void				initBrickMap(int maxMemory = 10000000);
+	static	void				flushBrickMap(int all=FALSE);
+	static	void				shutdownBrickMap();
 protected:
 			void				lookup(const float *P,const float *N,float dP,float *data,int depth);
 			void				flushBricks(int allBricks);		// Free memory by flushing bricks
@@ -197,6 +192,7 @@ protected:
 			int					maxDepth;						// The maximum depth of the structure
 			CBrickMap			*nextMap;						// Maintain a linked list of brickmaps
 			int					modifying;
+			TMutex				mutex;
 
 
 																// Some static variables

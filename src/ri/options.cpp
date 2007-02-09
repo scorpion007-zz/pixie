@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -34,8 +34,8 @@
 
 #include "options.h"
 #include "texture.h"
-#include "renderer.h"
 #include "stats.h"
+#include "defaults.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,7 +71,6 @@
 // Description			:	Delete the searchpath
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 static	void		optionsDeleteSearchPath(TSearchpath *cPath) {
 	TSearchpath	*nPath;
 
@@ -89,7 +88,6 @@ static	void		optionsDeleteSearchPath(TSearchpath *cPath) {
 // Description			:	Clone a search path
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 static	TSearchpath	*optionsCloneSearchPath(TSearchpath *cPath) {
 	TSearchpath	*nPath	=	NULL;
 	TSearchpath	*lPath	=	NULL;
@@ -119,7 +117,6 @@ static	TSearchpath	*optionsCloneSearchPath(TSearchpath *cPath) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CDisplay::CDisplay() {
 	outDevice		=	NULL;
 	outName			=	NULL;
@@ -138,7 +135,6 @@ COptions::CDisplay::CDisplay() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CDisplay::CDisplay(const CDisplay *other) {
 
 	outDevice		=	strdup(other->outDevice);
@@ -199,7 +195,6 @@ COptions::CDisplay::CDisplay(const CDisplay *other) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CDisplay::~CDisplay() {
 	if (outDevice	!= NULL)	free(outDevice);
 	if (outName		!= NULL)	free(outName);
@@ -233,7 +228,6 @@ COptions::CDisplay::~CDisplay() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CClipPlane::CClipPlane() {
 }
 
@@ -244,11 +238,11 @@ COptions::CClipPlane::CClipPlane() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
 	movvv(normal,other->normal);
 	d		=	other->d;
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
@@ -256,7 +250,6 @@ COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
 // Description			:	All the default frame specific settings are defined here
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::COptions() {
 	stats.numOptions++;
 	stats.optionsMemory		+=	sizeof(COptions);
@@ -301,10 +294,6 @@ COptions::COptions() {
 	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/modules:" PIXIE_MODULES,NULL);
 #endif
 
-	
-	temporaryPath			=	strdup("temp");
-
-
 	// Override the official defaults for testing
 	pixelXsamples			=	2;
 	pixelYsamples			=	2;
@@ -327,9 +316,9 @@ COptions::COptions() {
 	depthQuantizer[3]		=	0;				// Max
 	depthQuantizer[4]		=	0;
 
-	flags					=	0;
-
-	allLights				=	new CArray<CShaderInstance *>;
+	// We default to sampling motion, but this can be turned off.
+	// Additionally, if there's no motionblur in the scene, it will be turned off
+	flags					=	OPTIONS_FLAGS_SAMPLEMOTION;
 
 	displays				=	NULL;
 
@@ -354,28 +343,29 @@ COptions::COptions() {
 	endofframe				=	0;
 	filelog					=	NULL;
 
-	maxTextureSize			=	20000000;
-	maxBrickSize			=	10000000;
+	numThreads				=	DEFAULT_NUM_THREADS;
 
-	maxShaderCache			=	1000000;
+	maxTextureSize			=	DEFAULT_MAX_TEXTURESIZE;
+	maxBrickSize			=	DEFAULT_MAX_BRICKSIZE;
 
-	maxGridSize				=	16*16;
+	maxGridSize				=	DEFAULT_MAX_GRIDSIZE;
 
 	maxRayDepth				=	5;
 	maxPhotonDepth			=	10;
 
-	bucketWidth				=	32;
-	bucketHeight			=	32;
+	bucketWidth				=	DEFAULT_TILE_WIDTH;
+	bucketHeight			=	DEFAULT_TILE_HEIGHT;
 
-	netXBuckets				=	5;
-	netYBuckets				=	5;
+	netXBuckets				=	DEFAULT_NET_XBUCKETS;
+	netYBuckets				=	DEFAULT_NET_YBUCKETS;
+
+	threadStride			=	DEFAULT_THREAD_STRIDE;
+	
+	geoCacheMemory			=	DEFAULT_GEO_CACHE_SIZE;
 
 	maxEyeSplits			=	10;
 
-	maxHierarchyDepth		=	40;
-	maxHierarchyLeafObjects	=	5;
-
-	tsmThreshold			=	(float ) 0.1;
+	tsmThreshold			=	DEFAULT_TSM_THRESHOLD;
 
 	causticIn				=	NULL;
 	causticOut				=	NULL;
@@ -400,7 +390,6 @@ COptions::COptions() {
 // Description			:	Create an exact copy of another options block
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::COptions(const COptions *o) {
 	stats.numOptions++;
 	stats.optionsMemory		+=	sizeof(COptions);
@@ -415,22 +404,6 @@ COptions::COptions(const COptions *o) {
 	shaderPath				=	optionsCloneSearchPath(o->shaderPath);
 	displayPath				=	optionsCloneSearchPath(o->displayPath);
 	modulePath				=	optionsCloneSearchPath(o->modulePath);
-	temporaryPath			=	strdup(o->temporaryPath);
-
-	{
-		CShaderInstance	**array	=	o->allLights->array;
-		int				size	=	o->allLights->numItems;
-		int				i;
-
-		allLights				=	new CArray<CShaderInstance *>;
-		for (i=0;i<size;i++) {
-			CShaderInstance	*cInstance	=	array[i];
-
-			cInstance->attach();
-
-			allLights->push(cInstance);
-		}
-	}
 
 	if (o->displays != NULL) {
 		CDisplay	*cDisplay,*nDisplay;
@@ -525,7 +498,6 @@ COptions::COptions(const COptions *o) {
 // Description			:	Destructor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 COptions::~COptions(){
 	stats.numOptions--;
 	stats.optionsMemory		-=	sizeof(COptions);
@@ -567,20 +539,6 @@ COptions::~COptions(){
 	optionsDeleteSearchPath(shaderPath);
 	optionsDeleteSearchPath(displayPath);
 	optionsDeleteSearchPath(modulePath);
-	free(temporaryPath);
-
-	// Ditch the lights allocated in this context
-	{
-		CShaderInstance	**array	=	allLights->array;
-		int				size	=	allLights->numItems;
-		int				i;
-
-		for (i=0;i<size;i++) {
-			array[i]->detach();
-		}
-
-		delete allLights;
-	}
 
 	if (causticIn				!= NULL)	free(causticIn);
 	if (causticOut				!= NULL)	free(causticOut);
@@ -597,7 +555,6 @@ COptions::~COptions(){
 // Description			:	Convert color to RGB space from whatever space entered
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 void	COptions::convertColor(vector &c,const float *f)	const	{
 	int	i,j;
 	if (toRGB == NULL) {
@@ -615,11 +572,50 @@ void	COptions::convertColor(vector &c,const float *f)	const	{
 
 
 ///////////////////////////////////////////////////////////////////////
+// Class				:	COptions
+// Method				:	pickSearchpath
+// Description			:	Pick a searchpath from name
+// Return Value			:	-
+// Comments				:
+TSearchpath		*COptions::pickSearchpath(const char *name) {
+
+	if (strstr(name,"rib") != NULL) {
+		return archivePath;
+
+	} else if (strstr(name,"tif") != NULL) {
+		return texturePath;
+
+	} else if (strstr(name,"tiff") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"tex") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"tx") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"ptc") != NULL) {
+		return texturePath;
+	
+	} else if (strstr(name,"bm") != NULL) {
+		return texturePath;
+		
+	} else if (strstr(name,"sdr") != NULL) {
+		return shaderPath;
+
+	} else if (strstr(name,osModuleExtension) != NULL) {
+		return proceduralPath;
+	}
+
+	return NULL;
+}
+
+
+///////////////////////////////////////////////////////////////////////
 // Function				:	optionsGetSearchPath
 // Description			:	Get the searchpath
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 	TSearchpath		*newPath	=	NULL;
 	TSearchpath		*lastPath	=	NULL;

@@ -42,7 +42,6 @@
 // Class				:	CTimeMemory
 // Description			:	Holds info about time and memory
 // Comments				:
-// Date last edited		:	10/6/2006
 class CTimeMemory : public QWidget {
     Q_OBJECT
 public:
@@ -60,7 +59,6 @@ public:
 // Class				:	CNumbers
 // Description			:	Numbers of various items
 // Comments				:
-// Date last edited		:	10/6/2006
 class CNumbers : public QWidget {
     Q_OBJECT
 public:
@@ -96,7 +94,6 @@ public:
 // Class				:	CStatView
 // Description			:	This is the main statistics view class
 // Comments				:
-// Date last edited		:	10/6/2006
 class CStatView : public QDialog {
     Q_OBJECT
 public:

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -39,7 +39,6 @@
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "trace" shading language command
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTraceRay : public CRay {
 public:
 		vector					opacity;
@@ -52,45 +51,17 @@ public:
 // Class				:	CTraceBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTraceBundle : public CRayBundle {
 public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
+		int						postTraceAction();
+		void					postShade(int,CRay **,float **);
+		void					postShade(int,CRay **);
+		void					post();
 };
 
 
 
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceRay
-// Description			:	Expands the ray for "trace" shading language command
-// Comments				:
-// Date last edited		:	3/21/2003
-class	CTraceExRay : public CRay {
-public:
-		vector					opacity;
-		vector					color;
-		float					*dest;
-		float					*destT;
-		float					multiplier;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceBundle
-// Description			:	Encapsulates a bundle of rays
-// Comments				:
-// Date last edited		:	3/21/2003
-class	CTraceExBundle : public CRayBundle {
-public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
-};
 
 
 
@@ -100,7 +71,6 @@ public:
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "transmission" shading language command
 // Comments				:	Note that we do not have color
-// Date last edited		:	3/21/2003
 class	CTransmissionRay : public CRay {
 public:
 		vector					opacity;
@@ -112,46 +82,23 @@ public:
 // Class				:	CTraceBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/21/2003
 class	CTransmissionBundle : public CRayBundle {
 public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceRay
-// Description			:	Expands the ray for "transmission" shading language command
-// Comments				:	Note that we do not have color
-// Date last edited		:	3/21/2003
-class	CIrradianceRay : public CRay {
-public:
-		float					*dest;
+		int						postTraceAction();
+		void					postShade(int,CRay **,float **);
+		void					postShade(int,CRay **);
+		void					post();
 };
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceBundle
-// Description			:	Encapsulates an irradiance bundle
-// Comments				:
-// Date last edited		:	3/21/2003
-class	CIrradianceBundle : public CRayBundle {
-public:
-				int				postTraceAction();
-				void			postShade(int,CRay **,float **);
-				void			postShade(int,CRay **);
-				void			post();
 
-				int				shade;
-};
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherRay
 // Description			:	The ray used for gathering
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherRay : public CRay {
 public:
 	int				*tags;		// The tag
@@ -166,21 +113,23 @@ public:
 // Class				:	CGatherBundle
 // Description			:	Bundle of gather rays
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherBundle : public CRayBundle {
 public:
 
 					CGatherBundle();
 					~CGatherBundle();
 
-			int		postTraceAction();
-			void	postShade(int nr,CRay **r,float **varying);
-			void	postShade(int nr,CRay **r);
-			void	post();
+	int				postTraceAction();
+	void			postShade(int nr,CRay **r,float **varying);
+	void			postShade(int nr,CRay **r);
+	void			post();
 
 	CGatherRay		*raysBase;
 	CRay			**raysStorage;
+	TCode			**outputs;				// The array of outputs
+	TCode			**nonShadeOutputs;		// The array of non-shade outputs
 	CGatherLookup	*lookup;				// The parameters for this bundle
+	const float		*ab;					// The ray differential
 	int				numMisses;				// The number of missed rays
 	int				remainingSamples;		// The number of remaining samples
 };

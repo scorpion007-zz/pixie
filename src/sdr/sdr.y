@@ -5,7 +5,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -50,7 +50,6 @@
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 static	void	processEscapes(char *str) {
 	char	*cstr;
 
@@ -1324,7 +1323,6 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/20/2003
 void			sdrerror(char *s) {
 	fprintf(stdout,"%s\n",s);
 }
@@ -1335,7 +1333,6 @@ void			sdrerror(char *s) {
 // Description			:	Parse a shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/20/2003
 TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 	TSdrShader		*cShader;
 	char			tmp[512];
@@ -1438,7 +1435,6 @@ TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 // Description			:	Delete a shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/20/2003
 void			sdrDelete(TSdrShader *cShader) {
 	TSdrParameter	*cParameter;
 

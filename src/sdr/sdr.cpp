@@ -58,7 +58,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -103,7 +103,6 @@
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 static	void	processEscapes(char *str) {
 	char	*cstr;
 
@@ -148,7 +147,7 @@ static	void	processEscapes(char *str) {
 		ESdrShaderType	shaderType;
 
 
-#line 98 "../../../../src/sdr/sdr.y"
+#line 97 "../../../../src/sdr/sdr.y"
 typedef union slval {
 	float			real;
 	char			string[64];
@@ -289,20 +288,20 @@ static const short yyrhs[] = {    44,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   150,   163,   164,   169,   178,   192,   200,   214,   219,   221,
-   230,   233,   237,   242,   248,   254,   260,   266,   274,   281,
-   287,   292,   300,   305,   314,   320,   322,   324,   326,   328,
-   330,   332,   337,   343,   349,   356,   363,   371,   382,   391,
-   408,   408,   426,   437,   450,   453,   462,   473,   490,   490,
-   508,   519,   532,   535,   546,   548,   565,   565,   587,   598,
-   600,   617,   617,   639,   650,   661,   665,   668,   679,   681,
-   698,   698,   720,   731,   733,   750,   750,   772,   817,   845,
-   871,   889,   889,   925,   936,   983,  1010,  1013,  1020,  1023,
-  1026,  1030,  1034,  1038,  1042,  1046,  1050,  1054,  1060,  1065,
-  1076,  1081,  1091,  1096,  1106,  1111,  1121,  1126,  1136,  1141,
-  1151,  1156,  1166,  1171,  1181,  1185,  1189,  1193,  1197,  1202,
-  1209,  1213,  1217,  1223,  1228,  1233,  1240,  1247,  1251,  1255,
-  1259,  1263,  1273,  1309
+   149,   162,   163,   168,   177,   191,   199,   213,   218,   220,
+   229,   232,   236,   241,   247,   253,   259,   265,   273,   280,
+   286,   291,   299,   304,   313,   319,   321,   323,   325,   327,
+   329,   331,   336,   342,   348,   355,   362,   370,   381,   390,
+   407,   407,   425,   436,   449,   452,   461,   472,   489,   489,
+   507,   518,   531,   534,   545,   547,   564,   564,   586,   597,
+   599,   616,   616,   638,   649,   660,   664,   667,   678,   680,
+   697,   697,   719,   730,   732,   749,   749,   771,   816,   844,
+   870,   888,   888,   924,   935,   982,  1009,  1012,  1019,  1022,
+  1025,  1029,  1033,  1037,  1041,  1045,  1049,  1053,  1059,  1064,
+  1075,  1080,  1090,  1095,  1105,  1110,  1120,  1125,  1135,  1140,
+  1150,  1155,  1165,  1170,  1180,  1184,  1188,  1192,  1196,  1201,
+  1208,  1212,  1216,  1222,  1227,  1232,  1239,  1246,  1250,  1254,
+  1258,  1262,  1272,  1308
 };
 #endif
 
@@ -1015,7 +1014,7 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 171 "../../../../src/sdr/sdr.y"
+#line 170 "../../../../src/sdr/sdr.y"
 {
 				currentParameter->space			=	strdup(yyvsp[-1].string);
 				currentDefaultItem->vector		=	new float[3];
@@ -1025,7 +1024,7 @@ case 4:
 			;
     break;}
 case 5:
-#line 185 "../../../../src/sdr/sdr.y"
+#line 184 "../../../../src/sdr/sdr.y"
 {
 				currentParameter->space			=	strdup(yyvsp[-5].string);
 				currentDefaultItem->vector		=	new float[3];
@@ -1035,7 +1034,7 @@ case 5:
 			;
     break;}
 case 6:
-#line 194 "../../../../src/sdr/sdr.y"
+#line 193 "../../../../src/sdr/sdr.y"
 {
 				currentDefaultItem->vector		=	new float[3];
 				currentDefaultItem->vector[0]	=	yyvsp[0].real;
@@ -1044,7 +1043,7 @@ case 6:
 			;
     break;}
 case 7:
-#line 206 "../../../../src/sdr/sdr.y"
+#line 205 "../../../../src/sdr/sdr.y"
 {
 				currentDefaultItem->vector		=	new float[3];
 				currentDefaultItem->vector[0]	=	yyvsp[-3].real;
@@ -1053,12 +1052,12 @@ case 7:
 			;
     break;}
 case 8:
-#line 215 "../../../../src/sdr/sdr.y"
+#line 214 "../../../../src/sdr/sdr.y"
 {
 			;
     break;}
 case 10:
-#line 222 "../../../../src/sdr/sdr.y"
+#line 221 "../../../../src/sdr/sdr.y"
 {
 					currentParameter->defaultValue.vector		=	new float[3];
 					currentParameter->defaultValue.vector[0]	=	0;
@@ -1067,62 +1066,62 @@ case 10:
 			;
     break;}
 case 11:
-#line 231 "../../../../src/sdr/sdr.y"
+#line 230 "../../../../src/sdr/sdr.y"
 {
 				;
     break;}
 case 12:
-#line 235 "../../../../src/sdr/sdr.y"
+#line 234 "../../../../src/sdr/sdr.y"
 {
 				;
     break;}
 case 13:
-#line 238 "../../../../src/sdr/sdr.y"
+#line 237 "../../../../src/sdr/sdr.y"
 {
 				;
     break;}
 case 14:
-#line 245 "../../../../src/sdr/sdr.y"
+#line 244 "../../../../src/sdr/sdr.y"
 {
 			shaderType	=	SHADER_SURFACE;
 		;
     break;}
 case 15:
-#line 251 "../../../../src/sdr/sdr.y"
+#line 250 "../../../../src/sdr/sdr.y"
 {
 			shaderType	=	SHADER_DISPLACEMENT;
 		;
     break;}
 case 16:
-#line 257 "../../../../src/sdr/sdr.y"
+#line 256 "../../../../src/sdr/sdr.y"
 {
 			shaderType	=	SHADER_LIGHT;
 		;
     break;}
 case 17:
-#line 263 "../../../../src/sdr/sdr.y"
+#line 262 "../../../../src/sdr/sdr.y"
 {
 			shaderType	=	SHADER_VOLUME;
 		;
     break;}
 case 18:
-#line 269 "../../../../src/sdr/sdr.y"
+#line 268 "../../../../src/sdr/sdr.y"
 {
 			shaderType	=	SHADER_IMAGER;
 		;
     break;}
 case 20:
-#line 285 "../../../../src/sdr/sdr.y"
+#line 284 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 21:
-#line 288 "../../../../src/sdr/sdr.y"
+#line 287 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 22:
-#line 293 "../../../../src/sdr/sdr.y"
+#line 292 "../../../../src/sdr/sdr.y"
 {
 			currentParameter						=	new TSdrParameter;
 			currentParameter->space					=	NULL;
@@ -1131,14 +1130,14 @@ case 22:
 		;
     break;}
 case 23:
-#line 301 "../../../../src/sdr/sdr.y"
+#line 300 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->next	=	parameters;
 			parameters				=	currentParameter;
 		;
     break;}
 case 24:
-#line 306 "../../../../src/sdr/sdr.y"
+#line 305 "../../../../src/sdr/sdr.y"
 {
 			currentParameter						=	new TSdrParameter;
 			currentParameter->space					=	NULL;
@@ -1148,49 +1147,49 @@ case 24:
 		;
     break;}
 case 25:
-#line 314 "../../../../src/sdr/sdr.y"
+#line 313 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->next	=	parameters;
 			parameters				=	currentParameter;
 		;
     break;}
 case 33:
-#line 339 "../../../../src/sdr/sdr.y"
+#line 338 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container	=	CONTAINER_UNIFORM;
 			currentParameter->writable	=	FALSE;
 		;
     break;}
 case 34:
-#line 345 "../../../../src/sdr/sdr.y"
+#line 344 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container	=	CONTAINER_VARYING;
 			currentParameter->writable	=	FALSE;
 		;
     break;}
 case 35:
-#line 352 "../../../../src/sdr/sdr.y"
+#line 351 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container	=	CONTAINER_UNIFORM;
 			currentParameter->writable	=	TRUE;
 		;
     break;}
 case 36:
-#line 359 "../../../../src/sdr/sdr.y"
+#line 358 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container	=	CONTAINER_VARYING;
 			currentParameter->writable	=	TRUE;
 		;
     break;}
 case 37:
-#line 365 "../../../../src/sdr/sdr.y"
+#line 364 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container	=	CONTAINER_UNIFORM;
 			currentParameter->writable	=	TRUE;
 		;
     break;}
 case 38:
-#line 376 "../../../../src/sdr/sdr.y"
+#line 375 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[-2].string);
@@ -1199,7 +1198,7 @@ case 38:
 		;
     break;}
 case 39:
-#line 385 "../../../../src/sdr/sdr.y"
+#line 384 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1208,7 +1207,7 @@ case 39:
 		;
     break;}
 case 40:
-#line 398 "../../../../src/sdr/sdr.y"
+#line 397 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1220,7 +1219,7 @@ case 40:
 		;
     break;}
 case 42:
-#line 414 "../../../../src/sdr/sdr.y"
+#line 413 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1233,7 +1232,7 @@ case 42:
 		;
     break;}
 case 43:
-#line 430 "../../../../src/sdr/sdr.y"
+#line 429 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1241,7 +1240,7 @@ case 43:
 		;
     break;}
 case 44:
-#line 440 "../../../../src/sdr/sdr.y"
+#line 439 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->scalar = yyvsp[0].real;
@@ -1254,7 +1253,7 @@ case 44:
 		;
     break;}
 case 46:
-#line 456 "../../../../src/sdr/sdr.y"
+#line 455 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1263,7 +1262,7 @@ case 46:
 		;
     break;}
 case 47:
-#line 467 "../../../../src/sdr/sdr.y"
+#line 466 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[-2].string);
@@ -1272,7 +1271,7 @@ case 47:
 		;
     break;}
 case 48:
-#line 480 "../../../../src/sdr/sdr.y"
+#line 479 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1284,7 +1283,7 @@ case 48:
 		;
     break;}
 case 50:
-#line 496 "../../../../src/sdr/sdr.y"
+#line 495 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1297,7 +1296,7 @@ case 50:
 		;
     break;}
 case 51:
-#line 512 "../../../../src/sdr/sdr.y"
+#line 511 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1305,7 +1304,7 @@ case 51:
 		;
     break;}
 case 52:
-#line 522 "../../../../src/sdr/sdr.y"
+#line 521 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->string = strdup(yyvsp[0].string);
@@ -1318,7 +1317,7 @@ case 52:
 		;
     break;}
 case 54:
-#line 538 "../../../../src/sdr/sdr.y"
+#line 537 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_COLOR;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1328,12 +1327,12 @@ case 54:
 		;
     break;}
 case 55:
-#line 546 "../../../../src/sdr/sdr.y"
+#line 545 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 56:
-#line 555 "../../../../src/sdr/sdr.y"
+#line 554 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_COLOR;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1345,7 +1344,7 @@ case 56:
 		;
     break;}
 case 58:
-#line 571 "../../../../src/sdr/sdr.y"
+#line 570 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_COLOR;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1362,7 +1361,7 @@ case 58:
 		;
     break;}
 case 59:
-#line 590 "../../../../src/sdr/sdr.y"
+#line 589 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_VECTOR;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1372,12 +1371,12 @@ case 59:
 		;
     break;}
 case 60:
-#line 598 "../../../../src/sdr/sdr.y"
+#line 597 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 61:
-#line 607 "../../../../src/sdr/sdr.y"
+#line 606 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_VECTOR;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1389,7 +1388,7 @@ case 61:
 		;
     break;}
 case 63:
-#line 623 "../../../../src/sdr/sdr.y"
+#line 622 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_VECTOR;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1406,7 +1405,7 @@ case 63:
 		;
     break;}
 case 64:
-#line 643 "../../../../src/sdr/sdr.y"
+#line 642 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1414,7 +1413,7 @@ case 64:
 		;
     break;}
 case 65:
-#line 652 "../../../../src/sdr/sdr.y"
+#line 651 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->vector = new float[3];
@@ -1425,14 +1424,14 @@ case 65:
 		;
     break;}
 case 66:
-#line 661 "../../../../src/sdr/sdr.y"
+#line 660 "../../../../src/sdr/sdr.y"
 {
 			currentDefaultItem++;
 			numArrayItemsRemaining--;
 		;
     break;}
 case 68:
-#line 671 "../../../../src/sdr/sdr.y"
+#line 670 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_NORMAL;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1442,12 +1441,12 @@ case 68:
 		;
     break;}
 case 69:
-#line 679 "../../../../src/sdr/sdr.y"
+#line 678 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 70:
-#line 688 "../../../../src/sdr/sdr.y"
+#line 687 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_NORMAL;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1459,7 +1458,7 @@ case 70:
 		;
     break;}
 case 72:
-#line 704 "../../../../src/sdr/sdr.y"
+#line 703 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_NORMAL;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1476,7 +1475,7 @@ case 72:
 		;
     break;}
 case 73:
-#line 723 "../../../../src/sdr/sdr.y"
+#line 722 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_POINT;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1486,12 +1485,12 @@ case 73:
 		;
     break;}
 case 74:
-#line 731 "../../../../src/sdr/sdr.y"
+#line 730 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 75:
-#line 740 "../../../../src/sdr/sdr.y"
+#line 739 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_POINT;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1503,7 +1502,7 @@ case 75:
 		;
     break;}
 case 77:
-#line 756 "../../../../src/sdr/sdr.y"
+#line 755 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->type					=	TYPE_POINT;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1520,7 +1519,7 @@ case 77:
 		;
     break;}
 case 78:
-#line 794 "../../../../src/sdr/sdr.y"
+#line 793 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1546,7 +1545,7 @@ case 78:
 		;
     break;}
 case 79:
-#line 822 "../../../../src/sdr/sdr.y"
+#line 821 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1572,7 +1571,7 @@ case 79:
 		;
     break;}
 case 80:
-#line 848 "../../../../src/sdr/sdr.y"
+#line 847 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1598,7 +1597,7 @@ case 80:
 		;
     break;}
 case 81:
-#line 878 "../../../../src/sdr/sdr.y"
+#line 877 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1611,7 +1610,7 @@ case 81:
 		;
     break;}
 case 83:
-#line 895 "../../../../src/sdr/sdr.y"
+#line 894 "../../../../src/sdr/sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1642,7 +1641,7 @@ case 83:
 		;
     break;}
 case 84:
-#line 929 "../../../../src/sdr/sdr.y"
+#line 928 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1650,7 +1649,7 @@ case 84:
 		;
     break;}
 case 85:
-#line 956 "../../../../src/sdr/sdr.y"
+#line 955 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->matrix = new float[16];
@@ -1680,7 +1679,7 @@ case 85:
 		;
     break;}
 case 86:
-#line 986 "../../../../src/sdr/sdr.y"
+#line 985 "../../../../src/sdr/sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->matrix = new float[16];
@@ -1707,162 +1706,162 @@ case 86:
 		;
     break;}
 case 99:
-#line 1063 "../../../../src/sdr/sdr.y"
+#line 1062 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 100:
-#line 1071 "../../../../src/sdr/sdr.y"
+#line 1070 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 101:
-#line 1079 "../../../../src/sdr/sdr.y"
+#line 1078 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 102:
-#line 1087 "../../../../src/sdr/sdr.y"
+#line 1086 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 103:
-#line 1094 "../../../../src/sdr/sdr.y"
+#line 1093 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 104:
-#line 1102 "../../../../src/sdr/sdr.y"
+#line 1101 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 105:
-#line 1109 "../../../../src/sdr/sdr.y"
+#line 1108 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 106:
-#line 1117 "../../../../src/sdr/sdr.y"
+#line 1116 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 107:
-#line 1124 "../../../../src/sdr/sdr.y"
+#line 1123 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 108:
-#line 1132 "../../../../src/sdr/sdr.y"
+#line 1131 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 109:
-#line 1139 "../../../../src/sdr/sdr.y"
+#line 1138 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 110:
-#line 1147 "../../../../src/sdr/sdr.y"
+#line 1146 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 111:
-#line 1154 "../../../../src/sdr/sdr.y"
+#line 1153 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 112:
-#line 1162 "../../../../src/sdr/sdr.y"
+#line 1161 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 113:
-#line 1169 "../../../../src/sdr/sdr.y"
+#line 1168 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 114:
-#line 1177 "../../../../src/sdr/sdr.y"
+#line 1176 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 119:
-#line 1199 "../../../../src/sdr/sdr.y"
+#line 1198 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 120:
-#line 1205 "../../../../src/sdr/sdr.y"
+#line 1204 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 121:
-#line 1211 "../../../../src/sdr/sdr.y"
+#line 1210 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 122:
-#line 1215 "../../../../src/sdr/sdr.y"
+#line 1214 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 123:
-#line 1219 "../../../../src/sdr/sdr.y"
+#line 1218 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 124:
-#line 1226 "../../../../src/sdr/sdr.y"
+#line 1225 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 125:
-#line 1229 "../../../../src/sdr/sdr.y"
+#line 1228 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 126:
-#line 1236 "../../../../src/sdr/sdr.y"
+#line 1235 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 127:
-#line 1243 "../../../../src/sdr/sdr.y"
+#line 1242 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 128:
-#line 1249 "../../../../src/sdr/sdr.y"
+#line 1248 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 129:
-#line 1253 "../../../../src/sdr/sdr.y"
+#line 1252 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 130:
-#line 1257 "../../../../src/sdr/sdr.y"
+#line 1256 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 131:
-#line 1261 "../../../../src/sdr/sdr.y"
+#line 1260 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 132:
-#line 1271 "../../../../src/sdr/sdr.y"
+#line 1270 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 133:
-#line 1307 "../../../../src/sdr/sdr.y"
+#line 1306 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
 case 134:
-#line 1313 "../../../../src/sdr/sdr.y"
+#line 1312 "../../../../src/sdr/sdr.y"
 {
 		;
     break;}
@@ -2063,7 +2062,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 1317 "../../../../src/sdr/sdr.y"
+#line 1316 "../../../../src/sdr/sdr.y"
 
 #include "lex.sdr.cpp"
 
@@ -2074,7 +2073,6 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/20/2003
 void			sdrerror(char *s) {
 	fprintf(stdout,"%s\n",s);
 }
@@ -2085,7 +2083,6 @@ void			sdrerror(char *s) {
 // Description			:	Parse a shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/20/2003
 TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 	TSdrShader		*cShader;
 	char			tmp[512];
@@ -2188,7 +2185,6 @@ TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 // Description			:	Delete a shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	5/20/2003
 void			sdrDelete(TSdrShader *cShader) {
 	TSdrParameter	*cParameter;
 

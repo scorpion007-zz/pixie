@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -63,9 +63,9 @@ class	CGatherRay;
 class	CMemPage;
 
 // Meanings of the accessor field of TReference
-const	unsigned int		SL_IMMEDIATE_OPERAND			=	0;	// Constants
-const	unsigned int		SL_GLOBAL_OPERAND				=	1;	// Global variable references
-const	unsigned int		SL_VARYING_OPERAND				=	2;	// Local variable references (this includes parameters)
+const	unsigned int	SL_IMMEDIATE_OPERAND	=	0;	// Constants
+const	unsigned int	SL_GLOBAL_OPERAND		=	1;	// Global variable references
+const	unsigned int	SL_VARYING_OPERAND		=	2;	// Local variable references (this includes parameters)
 
 // This comes right after the opcode to denote the number of parameters passed to the function / opcode
 typedef struct {
@@ -107,8 +107,9 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
 // Description			:	This class encapsulates a shader lookup
-// Comments				:
-// Date last edited		:	2/13/2003
+// Comments				:	Shader lookups are cached in the lifetime of a frame
+//							so they're only allocated once and can store information
+//							relevant to a particular shading language command
 class	CShaderLookup {
 public:
 							CShaderLookup();
@@ -122,7 +123,6 @@ public:
 // Class				:	CTextureLookup
 // Description			:	This class holds information about a particular texture lookup
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CFilterLookup : public CShaderLookup	{
 public:
 		float				width;					// The width parameter
@@ -138,7 +138,6 @@ public:
 // Class				:	CTextureInfoLookup
 // Description			:	This class holds the base of a textureinfo lookup
 // Comments				:
-// Date last edited		:	02/24/2006
 class	CTextureInfoLookup : public CShaderLookup	{
 public:
 		CTextureInfoBase	*textureInfo;
@@ -148,7 +147,6 @@ public:
 // Class				:	CTraceLookup
 // Description			:	This class holds the base of a trace lookup
 // Comments				:
-// Date last edited		:	02/24/2006
 class	CTraceLookup : public CShaderLookup	{
 public:
 		float				bias;
@@ -159,7 +157,6 @@ public:
 // Class				:	CTextureLookup
 // Description			:	This class holds information about a particular texture lookup
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CTextureLookup : public CShaderLookup	{
 public:
 		RtFilterFunc		filter;					// Lookup filter
@@ -181,7 +178,6 @@ public:
 // Class				:	CGlobalIllumLookup
 // Description			:	This class encapsulates a global illumination lookup
 // Comments				:
-// Date last edited		:	2/13/2003
 class	CGlobalIllumLookup : public CShaderLookup {
 public:
 							CGlobalIllumLookup();
@@ -194,6 +190,7 @@ public:
 		float				maxBrightness;			// The maximum brightness amount
 		float				minFGRadius;			// The minimum final gather spacing
 		float				maxFGRadius;			// The maximum final gather spacing
+		float				sampleBase;				// The relative ammount to jitter ray origins
 		int					irradianceIndex;		// The index of the irradiance
 		int					coverageIndex;			// The index of the coverage
 		int					environmentIndex;		// The index of the environment direction
@@ -215,24 +212,25 @@ public:
 // Class				:	CTexture3dLookup
 // Description			:	This class holds information about a 3d texture bake
 // Comments				:
-// Date last edited		:	7/7/2001
 class	CTexture3dLookup : public CShaderLookup	{
 public:
 							~CTexture3dLookup()	{
 								delete[] bindings;
+								for (int t = 0; t<nv; t++)
+									delete[] valueSpace[t];
 								delete[] valueSpace;
-								if (coordsys != NULL) free(coordsys);
 							}
 		float				radius;					// The sample radius
 		float				radiusScale;			// Blur amount
 		char				**channels;				// The channels this bake3d provides
 		int					numChannels;			// The number of channels bake3d provides
 		int					dataStart;				// The argument at which data starts
-		char				*coordsys;				// The coordinate system to bake to
+		const char			*coordsys;				// The coordinate system to bake to
 		
 		int					sampleSize;				// The cloud's native sample size
 		CTexture3dChannel	**bindings;				// Points to the environment being looked up
-		float				*valueSpace;			// Space for one sample
+		int					nv;
+		float				**valueSpace;			// Space for one sample
 		
 		CTexture3d			*texture;
 };
@@ -255,29 +253,24 @@ public:
 // Class				:	CGatherVariable
 // Description			:	Encapsulates a variable to be saved
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherVariable {
 public:
 	virtual			~CGatherVariable() { }
-	virtual	void	record(int,CGatherRay **,float **varying)	=	0;
+	virtual	void	record(TCode *,int,CGatherRay **,float **varying)	=	0;
 
 	CGatherVariable	*next;		// The next item in the linked list
 	int				shade;		// TRUE if this variable requires shading
 	int				destIndex;	// The destination index
-	TCode			*dest;		// The destination to save
-	TCode			**destForEachLevel;	// As the name says
-	TCode			**cDepth;	// The dest pointer for the current depth
 };
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderVectorVariable
 // Description			:	Encapsulates a shader variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CShaderVectorVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -286,11 +279,10 @@ public:
 // Class				:	CShaderFloatVariable
 // Description			:	Encapsulates a shader variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CShaderFloatVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -299,33 +291,30 @@ public:
 // Class				:	CRayOriginVariable
 // Description			:	Ray origin variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CRayOriginVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRayDirVariable
 // Description			:	Ray direction variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CRayDirVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRayLengthVariable
 // Description			:	Ray direction variable
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CRayLengthVariable : public CGatherVariable {
 public:
 
-			void	record(int nr,CGatherRay **r,float **varying);
+			void	record(TCode *,int nr,CGatherRay **r,float **varying);
 };
 
 
@@ -333,7 +322,6 @@ public:
 // Class				:	CGatherLookup
 // Description			:	Lookup parameters for the gather
 // Comments				:
-// Date last edited		:	3/23/2003
 class	CGatherLookup : public CShaderLookup {
 public:
 
@@ -343,11 +331,14 @@ public:
 	void					addOutput(const char *,int);
 
 	CGatherVariable			*outputs;				// These are the outputs that require shading
+	int						numOutputs;				// The number of outputs
 	CGatherVariable			*nonShadeOutputs;		// These are the outputs that do not require shading
+	int						numNonShadeOutputs;		// The number of outputs that don't need shading
 
 	const char				*category;				// The gather category
 	const char				*label;					// The ray label
 	float					coneAngle;				// The distribution angle
+	float					da;						// The ray differential
 	int						numSamples;				// The number of samples to gather
 	float					bias;					// The shadow bias
 	float					maxDist;				// The maximum intersection distance
@@ -356,30 +347,23 @@ public:
 };
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CExplosionLookup
-// Description			:	Explosion related variables
-// Comments				:
-// Date last edited		:	2/13/2003
-class	CExplosionLookup : public CShaderLookup {
-public:
-		float				scatteringCoefficient;	// The scattering coefficient
-		CVolume				*volume;				// The volume lookup
-		CColorMap			*colormap;				// The colormap lookup
-		const char			*explosionSpace;		// The space of the explosion
-};
+
+
+
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShader
 // Description			:	This class encapsulates a shader
 // Comments				:
-// Date last edited		:	3/13/2001
 class	CShader	: public CFileResource {
 public:
 								CShader(const char *);
 								~CShader();
-
-		void					nullify();						// Make sure the shader is never executed again
 
 		int						type;							// Type of the shader
 
@@ -412,7 +396,6 @@ public:
 // Class				:	CShaderInstance
 // Description			:	This class encapsulates an instance of a shader
 // Comments				:
-// Date last edited		:	3/10/2001
 class	CShaderInstance {
 public:
 								CShaderInstance(CAttributes *,CXform *);
@@ -432,7 +415,7 @@ public:
 		
 		void					createCategories();
 
-		CVariable				*parameters;				// The list of parameter (cloded from the parent)
+		CVariable				*parameters;				// The list of parameter (cloned from the parent)
 		int						refCount;					// The refcount to manage the clones
 		CXform					*xform;
 		int						*categories;				// Categories for light shaders
@@ -443,36 +426,36 @@ public:
 // Class				:	CProgrammableShaderInstance
 // Description			:	This class encapsulates an instance of a programmable shader
 // Comments				:
-// Date last edited		:	3/10/2001
 class	CProgrammableShaderInstance : public CShaderInstance {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CAllocatedString
 	// Description			:	We use this class to keep track of the allocated strings for parameters
 	// Comments				:
-	// Date last edited		:	3/10/2001
 	class	CAllocatedString {
 	public:
 			char				*string;
 			CAllocatedString	*next;
 	};
 public:
-								CProgrammableShaderInstance(CShader *,CAttributes *,CXform *);
-		virtual					~CProgrammableShaderInstance();
+									CProgrammableShaderInstance(CShader *,CAttributes *,CXform *);
+		virtual						~CProgrammableShaderInstance();
 
-		void					illuminate(CShadingContext *,float **);
-		void					setParameters(int,char **,void **);
-		int						getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
-		void					execute(CShadingContext *,float **);				// Execute the shader
-		unsigned int			requiredParameters();
-		const char				*getName();
-		float					**prepare(CMemPage*&,float **,int);
+		void						illuminate(CShadingContext *,float **);
+		void						setParameters(int,char **,void **);
+		int							getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
+		void						execute(CShadingContext *,float **);				// Execute the shader
+		unsigned int				requiredParameters();
+		const char					*getName();
+		float						**prepare(CMemPage*&,float **,int);
 
 
-		CAllocatedString		*strings;					// The strings we allocated for parameters
-		CShader					*parent;					// The parent shader
-		CShaderLookup			**parameterLists;			// The parameter lists
-		int						dirty;						// TRUE if the shader is dirty
+		CAllocatedString			*strings;					// The strings we allocated for parameters
+		CShader						*parent;					// The parent shader
+		CProgrammableShaderInstance	*nextDirty;					// The next dirty shader instance
+		CProgrammableShaderInstance	*prevDirty;					// The previous dirty shader instance
+		CShaderLookup				**parameterLists;			// The parameter lists
+		int							dirty;						// TRUE if the shader is dirty
 private:
 		int						setParameter(char *,void *);
 };

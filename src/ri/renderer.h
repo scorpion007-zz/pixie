@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -24,25 +24,41 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	renderer.h
-//  Classes				:	CRendererContext
-//  Description			:	This file defines the main renderer interface
+//  Classes				:	CRenderer
+//  Description			:	This class holds global info about the renderer
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef FRAME_H
+#define FRAME_H
 
 #include "common/global.h"
-#include "common/algebra.h"
-#include "shader.h"
-#include "rendererc.h"				// Renderer constants
-#include "texture.h"
+#include "common/containers.h"
+#include "common/os.h"
 #include "options.h"
-#include "shader.h"
-#include "object.h"
-#include "delayed.h"
 #include "shadeop.h"
-#include "riInterface.h"
-#include "variable.h"
+#include "memory.h"
+
+// Compute the circle of confusion as a function of the depth
+#define	cocPixels(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorPixels
+#define	cocSamples(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorSamples
+#define	cocScreen(z)	absf((1 / z) - CRenderer::invFocaldistance)*CRenderer::cocFactorScreen
+
+// The following bits can be used by the hiders
+const	unsigned	int	HIDER_RGBAZ_ONLY			=	1;	// The hider can only produce RGBAZ channels
+const	unsigned	int	HIDER_BREAK					=	2;	// The hider should stop rendering
+const	unsigned	int	HIDER_NODISPLAY				=	4;	// The hider is not actually generating display output
+const	unsigned	int	HIDER_DONE					=	8;	// The image has been computed, so stop
+const	unsigned	int	HIDER_ILLUMINATIONHOOK		=	16;	// The hider requires the illumination hooks
+const	unsigned	int	HIDER_PHOTONMAP_OVERWRITE	=	32;	// Overwrite the photon maps
+const	unsigned	int	HIDER_GEOMETRYHOOK			=	64;	// The hider requires the geometry hooks
+
+// The clipping codes used by the clipcode()
+const	unsigned	int	CLIP_LEFT					=	1;
+const	unsigned	int	CLIP_RIGHT					=	2;
+const	unsigned	int	CLIP_TOP					=	4;
+const	unsigned	int	CLIP_BOTTOM					=	8;
+const	unsigned	int	CLIP_NEAR					=	16;
+const	unsigned	int	CLIP_FAR					=	32;
 
 // Textual definitions of predefined coordinate systems
 extern	const char	*coordinateCameraSystem;
@@ -64,11 +80,552 @@ extern	const char	*colorYiqSystem;
 extern	const char	*colorXyySystem;
 extern	const char	*colorCieSystem;
 
+// Forward definitions
+class	CDisplayChannel;
+class	CObject;
+class	CTracable;
+class	CRemoteChannel;
+class	CAttributes;
+class	CTriangle;
+class	CMovingTriangle;
+class	CTexture;
+class	CEnvironment;
+class	CSurface;
+class	CPhotonMap;
+class	CCache;
+class	CNamedCoordinateSystem;
+class	CGlobalIdentifier;
+class	CXform;
+class	CDSO;
+class	CRendererContext;
+class	CNetFileMapping;
+class	CRay;
+class	CTextureBlock;
+
+
+///////////////////////////////////////////////////////////////////////
+//
+//     The implementation for this class is split into several files:
+//
+//		renderer.cpp			- Init / shutdown code
+//		rendererMutexes.cpp		- The portion that holds the synchronization objects
+//		rendererDeclerations	- The portion that deals with declerations such as variables/coordinate systems etc.
+//		rendererDisplay			- The portion that handles the output
+//		rendererFiles			- The portion that manages files and loads stuff
+//		rendererNetwork			- The portion that manages the network
+//		rendererClipping		- The portion that handles the clipping
+//		rendererJob				- The portion that dispatches the rendering jobs to threads
+//
+///////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Description			:	This class holds data about the current frame being rendered
+// Comments				:	This class is invalid outside beginFrame / endFrame
+class CRenderer {
+public:
+
+		////////////////////////////////////////////////////////////////////
+		//
+		//	beginRenderer is called in RiBegin
+		//	endRenderer is called in RiEnd
+		//
+		//  They pretty much do what you would expect
+		// 
+		////////////////////////////////////////////////////////////////////
+		static void								beginRenderer(CRendererContext *context,char *ribFile,char *riNetString);
+		static void								endRenderer();
+
+								
+		////////////////////////////////////////////////////////////////////
+		//
+		// Some global data structures that hang around between beginRenderer and endRenderer
+		//
+		////////////////////////////////////////////////////////////////////
+		static	CMemPage						*globalMemory;				// The global memory stack
+		static	CRendererContext				*context;					// The renderer context (RenderMan Interface)
+		static	CArray<CShaderInstance *>		*allLights;					// An array of all allocated lights
+		static	CTrie<CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
+		static	CTrie<CVariable *>				*declaredVariables;			// Declared variables
+		static	CTrie<CFileResource  *>			*globalFiles;				// Files that have been loaded (they stick around for the entire rendering)
+		static	CTrie<CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
+		static	CTrie<CNetFileMapping *>		*netFileMappings;			// This holds name->name mappings of files
+		static	int								numKnownGlobalIds;			// The current free global ID
+		static	CVariable						*variables;					// List of all defined variables
+		static	CArray<CVariable *>				*globalVariables;			// Array of global variables only
+		static	CTrie<CDisplayChannel *>		*declaredChannels;			// The declared display channels
+		static	CArray<CDisplayChannel*>		*displayChannels;			// The list of all desclared display channels
+		static	CDSO							*dsos;						// The list of DSO's that have been loaded
+		static	SOCKET							netClient;					// The client that we're serving (-1 if client)
+		static	int								netNumServers;				// The number of servers (0 if server)
+		static	SOCKET							*netServers;				// The array of servers that are serving us		
+		static	int								numRenderedBuckets;			// The number of rendered buckets
+		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
+		static	int								*textureRefNumber;			// The last reference number for each thread's textures
+		static	CTextureBlock					*textureUsedBlocks;			// All texture blocks currently in use
+		static	int								*textureUsedMemory;			// The amount of texture memory in use for each thread
+		static	int								*textureMaxMemory;			// The maximum texture memory for each thread
+
+
+		////////////////////////////////////////////////////////////////////
+		//
+		// Synchronization objects ...
+		//
+		//    Even though some of them are mainly used between WorldBegin - WorldEnd, 
+		//    we're defining them as global
+		//
+		////////////////////////////////////////////////////////////////////
+		static	TMutex							jobMutex;					// The mutex that controls job dispatch
+		static	TMutex							commitMutex;				// The mutex that controls job dispatch
+		static	TMutex							displayKillMutex;			// To serialize the killing of a thread
+		static	TMutex							networkMutex;				// To serialize the network communication
+		static	TMutex							hierarchyMutex;				// To serialize the raytracing hierarchy
+		static	TMutex							tesselateMutex;				// To serialize the tesselation
+		static	TMutex							textureMutex;				// To serialize texture fetches
+		static	TMutex							refCountMutex;				// To serialize the object attach()/detach()
+		static	TMutex							shaderMutex;				// To serialize shader parameter list access
+		static	TMutex							dirtyShaderMutex;			// To serialize the dirty shader list
+		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
+		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_
+
+		////////////////////////////////////////////////////////////////////
+		//
+		// Here's how the rendering loop works:
+		//
+		//		beginFrame is called in WorldBegin
+		//		renderFrame is called in WorldEnd to do the rendering
+		//		endFrame is called in WorldEnd to do the cleaning up
+		//
+		// Between these functions, objects can be added to the scene using
+		//		render
+		//
+		// During rendering (in renderFrame), hiders can ask for a job using
+		//		getJob
+		//
+		////////////////////////////////////////////////////////////////////
+		static	void			beginFrame(const COptions *options,CAttributes *attributes,CXform *xform);		// Called in WorldBegin
+		static	void			endFrame();														// Called in WorldEnd
+		static	void			renderFrame();													// Called in WorldEnd
+		static	void			render(CObject *object);										// Called to insert an object into the scene
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with thread synthronication (defined in rendererMutexes.cpp)
+		////////////////////////////////////////////////////////////////////
+		static	void			initMutexes();
+		static	void			shutdownMutexes();
+
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with rendering (defined in rendererJobs.cpp)
+		////////////////////////////////////////////////////////////////////
+
+		///////////////////////////////////////////////////////////////////////
+		// Class				:	CJob
+		// Description			:	This class keeps track of a job to perform
+		// Comments				:
+		class	CJob {
+		public:
+			enum {	BUCKET,					// Render a bucket
+					NETWORK_BUCKET,			// Render a bucket from network
+					PHOTON_BUNDLE,			// Trace a photon bundle
+					NETWORK_PHOTON_BUNDLE,	// Trace a photon bundle from network
+					TERMINATE				// Terminate/cleanup the shading context
+				}	type;
+
+			int			xBucket,yBucket;	// For a bucket job, the bucket to render
+			int			numPhotons;			// For a photon job, the number of photons to emit
+		};
+
+		static void				(*dispatchJob)(int thread,CJob &job);				// This function is used by the hiders to ask for a job
+
+		static void				serverThread(void *w);								// Clients run a separate thread for each server. This is the entry point for those client side threads
+		static void				processServerRequest(T32 req,int index);			// This function is used to serve the client requests
+		static void				dispatchReyes(int thread,CJob &job);				// This function dispatches single threaded buckets
+		static void				dispatchPhoton(int thread,CJob &job);				// This function dispatches single threaded photon bundles
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with the clipping/projection (defined in rendererClipping.cpp)
+		////////////////////////////////////////////////////////////////////
+		static void				beginClipping();									// Compute the various quantities that have to do with clipping
+		static int				inFrustrum(const float *,const float *);			// Return TRUE if the box is in the frustrum
+		static int				inFrustrum(const float *);							// Return TRUE if the point is in the frustrum
+		static unsigned int		clipCode(const float *);							// Returns the clipping code
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with the displays (implemented in rendererDisplay.cpp)
+		////////////////////////////////////////////////////////////////////
+		static void				beginDisplays();									// Init the displays
+		static void				commit(int,int,int,int,float *);					// Send a chunk of computed framebuffer to the display drivers
+		static int				advanceBucket(int,int &,int &);						// Find the next bucket to render for network rendering
+		static void				clear(int,int,int,int);								// Clear a window
+		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
+		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
+		static void				endDisplays();										// Shutdown the displays
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with declerations (implemented in rendererDeclerations.cpp)
+		////////////////////////////////////////////////////////////////////
+		static	void			initDeclerations();
+		static	void			defineCoordinateSystem(const char *,const float *,const float *,ECoordinateSystem type = COORDINATE_CUSTOM);
+		static	int				findCoordinateSystem(const char *,const float *&,const float *&,ECoordinateSystem &);
+		static	CVariable		*declareVariable(const char *,const char *,int um = 0);
+		static	void			makeGlobalVariable(CVariable *);
+		static	CVariable		*retrieveVariable(const char *);
+		static	CDisplayChannel	*declareDisplayChannel(const char *);				// Display channel management
+		static	CDisplayChannel	*declareDisplayChannel(CVariable *);
+		static	CDisplayChannel	*retrieveDisplayChannel(const char *);
+		static	void			resetDisplayChannelUsage();
+		static	void			registerFrameTemporary(const char *,int);			// Register file for end-of-frame deletion
+		static	int				getGlobalID(const char *);							// Global ID management
+		static	void			shutdownDeclerations();
+								
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with files (implemented in rendererFiles.cpp)
+		////////////////////////////////////////////////////////////////////
+		static	void			initFiles();
+		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
+		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
+		
+		static	void			initTextures(int);										// Set the maximum texture memory and init texturing		
+		static	CTexture		*textureLoad(const char *,TSearchpath *);				// Load a new texture map
+		static	CEnvironment	*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
+		static	CTexture		*getTexture(const char *);								// Load a texture
+		static	CEnvironment	*getEnvironment(const char *);							// Load an environment
+		static	CPhotonMap		*getPhotonMap(const char *);							// Load a photon map
+		static	CCache			*getCache(const char *,const char *);					// Load a photon map
+		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
+		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *);	// Load a point cloud or brickmap
+		static	CShader			*getShader(const char *,TSearchpath *search=NULL);		// Load a shader
+		static	RtFilterFunc	getFilter(const char *);								// Get a filter
+		static	char			*getFilter(RtFilterFunc);								// The other way around
+		static	int				getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
+		static	void			shutdownFiles();
+		static	void			shutdownTextures();										// clean up texturing
+
+
+		////////////////////////////////////////////////////////////////////
+		// Functions that deal with network (implemented in rendererNetwork.cpp)
+		////////////////////////////////////////////////////////////////////
+		static	void			initNetwork(char *ribFile,char *riNetString);			// Initiate misc network functionality
+		static	void			netSetup(char *,char *);								// Setup the network for rendering
+		static	void			sendFile(int,char *,int,int);							// Send a particular file
+		static	int				getFile(char *,const char *);							// Get a particular file from network
+		static	int				getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network
+		static	void			shutdownNetwork();										// Shutdown the network
+
+		////////////////////////////////////////////////////////////////////
+		// Remote channel stuff (in remoteChannel.cpp)
+		////////////////////////////////////////////////////////////////////
+		static	int				requestRemoteChannel(CRemoteChannel *);					// request a remote channel (server requests from client)
+		static	int				processChannelRequest(int,SOCKET);						// service request for a remote channel in client
+		static	void			sendBucketDataChannels(int x,int y);					// send all per-bucket remote channels
+		static	void			recvBucketDataChannels(SOCKET s,int x,int y);			// receive one per-bucket remote channel
+		static	void			sendFrameDataChannels();								// send all per-frame remote channels
+		static	void			recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
+
+		
+
+
+
+
+
+		////////////////////////////////////////////////////////////////////
+		//
+		//    Data structures only valid between WorldBegin - WorldEnd
+		//
+		////////////////////////////////////////////////////////////////////
+
+
+		// First a copy of the options we're using for the frame
+		static	int						xres,yres;										// Output resolution
+		static	int						frame;											// The frame number given by frameBegin
+		static	float					pixelAR;										// Pixel aspect ratio
+		static	float					frameAR;										// Frame aspect ratio
+		static	float					cropLeft,cropRight,cropTop,cropBottom;			// The crop window
+		static	float					screenLeft,screenRight,screenTop,screenBottom;	// The screen window
+		static	float					clipMin,clipMax;								// Clipping bounds
+		static	float					pixelVariance;									// The maximum tolerable pixel color variation
+		static	float					jitter;											// Amount of jitter in samples
+		static	char					*hider;											// Hider name
+		static	TSearchpath				*archivePath;									// RIB search path
+		static	TSearchpath				*proceduralPath;								// Procedural primitive search path
+		static	TSearchpath				*texturePath;									// Texture search path
+		static	TSearchpath				*shaderPath;									// Shader search path
+		static	TSearchpath				*displayPath;									// Display search path
+		static	TSearchpath				*modulePath;									// Search path for Pixie modules
+		static	int						pixelXsamples,pixelYsamples;					// Number of samples to take in X and Y
+		static	float					gamma,gain;										// Gamma correction stuff
+		static	float					pixelFilterWidth,pixelFilterHeight;				// Pixel filter data
+		static	RtFilterFunc			pixelFilter;
+		static	float					colorQuantizer[5];								// The quantization data
+		static	float					depthQuantizer[5];
+		static	COptions::CDisplay		*displays;										// List of displays to send the output
+		static	COptions::CClipPlane	*clipPlanes;									// List of used defined clipping planes
+		static	float					relativeDetail;									// The relative detail multiplier
+		static	EProjectionType			projection;										// Projection type
+		static	float					fov;											// Field of view for perspective projection
+		static	int						nColorComps;									// Custom color space stuff
+		static	float					*fromRGB,*toRGB;
+		static	float					fstop,focallength,focaldistance;				// Depth of field stuff
+		static	float					shutterOpen,shutterClose;						// Motion blur stuff
+		static	float					shutterTime,invShutterTime;						// More motion stuff
+		static	unsigned int			flags;											// Flags	
+		static	int						endofframe;										// The end of frame statstics number
+		static	char					*filelog;										// The name of the log file
+		static	int						numThreads;										// The number of threads working
+		static	int						maxTextureSize;									// Maximum amount of texture data to keep in memory (in bytes)
+		static	int						maxBrickSize;									// Maximum amount of brick data to keep in memory (in bytes)
+		static	int						maxGridSize;									// Maximum number of points to shade at a time
+		static	int						maxRayDepth;									// Maximum raytracing recursion depth
+		static	int						maxPhotonDepth;									// The maximum number of photon bounces
+		static	int						bucketWidth,bucketHeight;						// Bucket dimentions in samples
+		static	int						netXBuckets,netYBuckets;						// The meta bucket size
+		static	int						threadStride;									// The number of buckets per thread at a time
+		static	int						geoCacheSize;									// The ammount of memory to dedicate to tesselation caches
+		static	int						maxEyeSplits;									// Maximum number of eye splits
+		static	float					tsmThreshold;									// Transparency shadow map threshold
+		static	char					*causticIn,*causticOut;							// The caustics in/out file name
+		static	char					*globalIn,*globalOut;							// The global photon map 
+		static	char					*volumeIn,*volumeOut;							// The volume photon map 
+		static	int						numEmitPhotons;									// The number of photons to emit for the scene
+		static	int						shootStep;										// The number of rays to shoot at a time
+		static	EDepthFilter			depthFilter;									// Holds the depth filter type
+
+
+		// Second, some other data structures
+		static	TMemCheckpoint			frameCheckpoint;			// A checkpoint in the global memory
+		static	CTrie<CFileResource  *>	*frameFiles;				// Files that have been loaded (they stick around only during the frame)
+		static	CArray<const char*>		*frameTemporaryFiles;		// This hold the name of temporary files
+		static	CShadingContext			**contexts;					// The array of shading contexts
+		static	int						numActiveThreads;			// The number of threads currently active
+		static	CTrie<CRemoteChannel *>	*declaredRemoteChannels;	// Known remote channel lookup
+		static	CArray<CRemoteChannel *>	*remoteChannels;		// all known channels
+		static	CProgrammableShaderInstance *dirtyInstances;
+		static	unsigned int			raytracingFlags;			// The raytracing flags that hold the combination that needs to be raytraced
+		static	CObject					*root;						// The root bounding volume object
+		static	CObject					*offendingObject;			// This points to the object creating an error
+		static	vector					worldBmin,worldBmax;		// The bounding box of the world
+		static	CXform					*world;						// The world xform
+		static	matrix					fromWorld,toWorld;			// Some misc matrices
+		static	matrix					fromNDC,toNDC;
+		static	matrix					fromRaster,toRaster;
+		static	matrix					fromScreen,toScreen;
+		static	matrix					worldToNDC;					// World to NDC matrix
+		static	unsigned int			hiderFlags;					// The hider flags
+		static	int						numSamples;					// The actual number of samples to compute
+		static	int						numExtraSamples;			// The number of actual samples
+		static	int						xPixels,yPixels;			// The number of pixels to compute in X and Y
+		static	unsigned int			additionalParameters;		// Any user specified parameters to be computed
+		static	float					pixelLeft,pixelRight,pixelTop,pixelBottom;		// The rendering window on the screen plane
+		static	float					dydPixel,dxdPixel;			// Stuff
+		static	float					dPixeldx,dPixeldy;			// dPixel / dx, dPixel / dy
+		static	float					dSampledx,dSampledy;		// dSample / dx, dSample / dy
+		static	int						renderLeft,renderRight,renderTop,renderBottom;					// The actual rendering window in pixels
+		static	int						xBuckets,yBuckets;			// The number of buckets
+		static	int						xBucketsMinusOne;			// Obvious ?
+		static	int						yBucketsMinusOne;
+		static	float					invBucketSampleWidth,invBucketSampleHeight;		// The 1 / sample
+		static	int						metaXBuckets,metaYBuckets;						// The number of meta buckets in X and Y
+		static	float					aperture;					// Aperture radius
+		static	float					imagePlane;					// The z coordinate of the image plane
+		static	float					invImagePlane;				// The reciprocal of that
+		static	float					cocFactorPixels;			// The circle of concusion factor for the pixels
+		static	float					cocFactorSamples;			// The circle of concusion factor for the samples
+		static	float					cocFactorScreen;			// The circle of concusion factor for the screen
+		static	float					invFocaldistance;			// 1 / focalDistance
+		static	float					lengthA,lengthB;			// The depth to length conversion
+
+		static	int						xSampleOffset,ySampleOffset;// The amount of offset around each bucket in samples
+		static	float					sampleClipRight,sampleClipLeft,sampleClipTop,sampleClipBottom;	// The actual rendering window in samples
+		static	float					*pixelFilterKernel;			// The precomputed pixel filter kernel
+
+		static	float					leftX,leftZ,leftD;			// The clipping plane equations
+		static	float					rightX,rightZ,rightD;
+		static	float					topY,topZ,topD;
+		static	float					bottomY,bottomZ,bottomD;
+		static	int						numActiveDisplays;			// The number of active displays
+		static	int						currentXBucket;				// The bucket counters
+		static	int						currentYBucket;
+		static	int						currentPhoton;				// The current photon counter for the photon mapping
+		static	int						*jobAssignment;				// The job assignment for the buckets
+		static	FILE					*deepShadowFile;			// Deep shadow map stuff
+		static	int						*deepShadowIndex;
+		static	int						deepShadowIndexStart;		// The offset in the file for the indices
+		static	char					*deepShadowFileName;
+
+		///////////////////////////////////////////////////////////////////////
+		// Class				:	CDisplayData
+		// Description			:	This class holds data about a display driver
+		// Comments				:
+		class CDisplayData {
+		public:
+				void						*module;						// The module handle for the out device
+				void						*handle;						// The handle for the out device
+				int							numSamples;						// The number of samples
+				CDisplayChannel				*channels;
+				int							numChannels;
+				char						*displayName;					// The computed display name
+				TDisplayStartFunction		start;							// The start function for the out device
+				TDisplayDataFunction		data;							// The data function
+				TDisplayRawDataFunction		rawData;						// The raw data function
+				TDisplayFinishFunction		finish;							// The finish function
+				COptions::CDisplay			*display;						// The display corresponding to this display
+		};
+
+		static	int							numDisplays;
+		static	CDisplayData				*datas;
+		static	int							*sampleOrder;		// variable entry, sample count pairs
+		static	float						*sampleDefaults;	// default values for each channel
+		static	int							numExtraChannels;	
+
+
+		static	void						computeDisplayData();
+};
+
+
+// These two are defined in frameNetwork.cpp and can be used to send/receive data over network
+void			rcSend(SOCKET,char *,int,int net = TRUE);				// Send data
+void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
+
+
+
+
+////////////////////////////////////////////////////////////////////
+// Some inline functions defined below for efficiency
+////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	camera2pixels
+// Description			:	Project from camera space into the pixel space
+// Return Value			:
+// Comments				:	(inline for speed)
+inline void		camera2pixels(float *P) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		P[COMP_X]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
+		P[COMP_Y]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
+	}
+
+	P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+	P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*CRenderer::dPixeldy;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	camera2pixels
+// Description			:	Project from camera space into the pixel space
+// Return Value			:
+// Comments				:	(inline for speed)
+inline void		camera2pixels(float *x,float *y,const float *P) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		x[0]	=	CRenderer::imagePlane*P[COMP_X]/P[COMP_Z];
+		y[0]	=	CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z];
+	} else {
+		x[0]	=	P[COMP_X];
+		y[0]	=	P[COMP_Y];
+	}
+
+	x[0]	=	(x[0] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+	y[0]	=	(y[0] - CRenderer::pixelTop)*CRenderer::dPixeldy;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	camera2pixels
+// Description			:	Project from camera space into the pixel space
+// Return Value			:
+// Comments				:	(inline for speed)
+inline void		camera2pixels(int n,float *P) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		for (;n>0;n--,P+=3) {
+			P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+			P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop)*CRenderer::dPixeldy;
+		}
+	} else {
+		for (;n>0;n--,P+=3) {
+			P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft)*CRenderer::dPixeldx;
+			P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop)*CRenderer::dPixeldy;
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	camera2screen
+// Description			:	Project from camera space into the screen space
+// Return Value			:
+// Comments				:	(inline for speed)
+inline void		camera2screen(int n,float *P) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		for (;n>0;n--,P+=3) {
+			P[COMP_X]	=	(CRenderer::imagePlane*P[COMP_X]/P[COMP_Z] - CRenderer::pixelLeft);
+			P[COMP_Y]	=	(CRenderer::imagePlane*P[COMP_Y]/P[COMP_Z] - CRenderer::pixelTop);
+		}
+	} else {
+		for (;n>0;n--,P+=3) {
+			P[COMP_X]	=	(P[COMP_X] - CRenderer::pixelLeft);
+			P[COMP_Y]	=	(P[COMP_Y] - CRenderer::pixelTop);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	distance2pixels
+// Description			:	Project a distance in camera space into a distance in the pixel space
+// Return Value			:
+// Comments				:	(inline for speed)
+inline void		distance2pixels(int n,float *dist,float *P) {
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		for (;n>0;n--,P+=3) {
+			*dist++		=	CRenderer::dPixeldx*CRenderer::imagePlane*dist[0]/P[COMP_Z];
+		}
+	} else {
+		for (;n>0;n--,P+=3) {
+			*dist++		=	CRenderer::dPixeldx*dist[0];
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	pixels2distance
+// Description			:	Convert from pixel distance to camera space distance
+// Return Value			:	-
+// Comments				:
+inline void			pixels2distance(float &a,float &b,float d) {
+	a	=	CRenderer::lengthA*d;
+	b	=	CRenderer::lengthB*d;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	samples2camera
+// Description			:	Back project from sample space into the camera space
+// Return Value			:
+// Comments				:	(inline for speed)
+inline void		pixels2camera(float *P,float x,float y,float z) {
+	x	=	x*CRenderer::dxdPixel + CRenderer::pixelLeft;
+	y	=	y*CRenderer::dydPixel + CRenderer::pixelTop;
+
+	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		P[COMP_X]	=	x*z*CRenderer::invImagePlane;
+		P[COMP_Y]	=	y*z*CRenderer::invImagePlane;
+		P[COMP_Z]	=	z;
+	} else {
+		P[COMP_X]	=	x;
+		P[COMP_Y]	=	y;
+		P[COMP_Z]	=	z;
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////////////
+// Some misc data structures
+////////////////////////////////////////////////////////////////////
+
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNamedCoordinateSystem
 // Description			:	Holds a coordinate system
 // Comments				:
-// Date last edited		:	10/13/2001
 class  CNamedCoordinateSystem {
 public:
 	char				name[64];		// Name of the coordinate system
@@ -77,309 +634,13 @@ public:
 	matrix				to;
 };
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDSO
-// Description			:	Holds a DSO shader info
-// Comments				:
-// Date last edited		:	8/05/2002
-class	CDSO {
-public:
-	void				*handle;		// The handle to the module that implements the DSO shader
-	dsoInitFunction		init;			// Init function
-	dsoExecFunction		exec;			// Execute function
-	dsoCleanupFunction	cleanup;		// Cleanup function
-	char				*name;			// Name of the DSO shader
-	char				*prototype;		// Prototype of the DSO shader
-	CDSO				*next;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CGlobalIdentifier
-// Description			:	Holds a global identifier
-// Comments				:
-// Date last edited		:	10/13/2001
-class  CGlobalIdentifier {
-public:
-	char				name[64];		// Name of the identifier
-	int					id;
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisplayChannel
-// Description			:	Holds information on a display channel
-// Comments				:	if variable is NULL and entry is -1 this is
-//						:	one of the standard rgbaz channels
-//						:	sampleStart is filled at render time
-// Date last edited		:	03/08/2006
-class  CDisplayChannel {
-public:
-	CDisplayChannel();
-	~CDisplayChannel();
-	CDisplayChannel(const char*,CVariable*,int,int,int entry = -1);
-	
-	char				name[64];		// Name of the channel
-	CVariable			*variable;		// The variable representing channel (may be NULL)
-	int					numSamples;		// The size of channel sample
-	int					outType;		// The entry index of the variable
-	int					sampleStart;	// The offset in the shaded vertex array (-1 is unassigned)
-	float				*fill;			// The sample defaults
-};
-
-class	COutput;
-class	CShadingContext;
-class	CIrradianceCache;
-class	CPhotonMap;
-class	CParticipatingMedium;
-class	CDelayedObject;
-class	CNetFileMapping;
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Description			:	Holds the global rendering context
-// Comments				:
-// Date last edited		:	10/13/2001
-class	CRendererContext : public CRiInterface {
-public:
-
-						CRendererContext(char *ribName=NULL,char *netString=NULL);
-						~CRendererContext();
-
-	///////////////////////////////////////////////////////////////////////
-	// Renderer interface
-	///////////////////////////////////////////////////////////////////////
-	void				RiDeclare(char *,char *);
-
-	void				RiFrameBegin(int);
-	void				RiFrameEnd(void);
-	void				RiWorldBegin(void);
-	void				RiWorldEnd(void);
-
-	void				RiFormat(int xres,int yres,float aspect);
-	void				RiFrameAspectRatio(float aspect);
-	void				RiScreenWindow(float left,float right,float bot,float top);
-	void				RiCropWindow(float xmin,float xmax,float ymin,float ymax);
-	void				RiProjectionV(char *name,int n,char *tokens[],void *params[]);
-	void				RiClipping(float hither,float yon);
-	void				RiClippingPlane(float x,float y,float z,float nx,float ny,float nz);
-	void				RiDepthOfField(float fstop,float focallength,float focaldistance);
-	void				RiShutter(float smin,float smax);
-
-	void				RiPixelVariance(float variation);
-	void				RiPixelSamples(float xsamples,float ysamples);
-	void				RiPixelFilter(float (*function)(float,float,float,float),float xwidth,float ywidth);
-	void				RiExposure(float gain,float gamma);
-	void				RiImagerV(char *name,int n,char *tokens[],void *params[]);
-	void				RiQuantize(char * type,int one,int qmin,int qmax,float ampl);
-	void				RiDisplayV(char *name,char * type,char * mode,int n,char *tokens[],void *params[]);
-	void				RiDisplayChannelV(char * channel,int n,char *tokens[],void *params[]);
-
-	void				RiHiderV(char * type,int n,char *tokens[],void *params[]);
-	void				RiColorSamples(int N,float *nRGB,float *RGBn);
-	void				RiRelativeDetail(float relativedetail);
-	void				RiOptionV(char *name,int n,char *tokens[],void *params[]);
-
-	void				RiAttributeBegin(void);
-	void				RiAttributeEnd(void);
-	void				RiColor(float *Cs);
-	void				RiOpacity(float *Cs);
-	void				RiTextureCoordinates(float s1,float t1,float s2,float t2,float s3,float t3,float s4,float t4);
-
-	void				*RiLightSourceV(char *name,int n,char *tokens[],void *params[]);
-	void				*RiAreaLightSourceV(char *name,int n,char *tokens[],void *params[]);
-
-	void				RiIlluminate(void *light,int onoff);
-	void				RiSurfaceV(char *name,int n,char *tokens[],void *params[]);
-	void				RiAtmosphereV(char *name,int n,char *tokens[],void *params[]);
-	void				RiInteriorV(char *name,int n,char *tokens[],void *params[]);
-	void				RiExteriorV(char *name,int n,char *tokens[],void *params[]);
-	void				RiShadingRate(float size);
-	void				RiShadingInterpolation(char * type);
-	void				RiMatte(int onoff);
-
-	void				RiBound(float *bound);
-	void				RiDetail(float *bound);
-	void				RiDetailRange(float minvis,float lowtran,float uptran,float maxvis);
-	void				RiGeometricApproximation(char * type,float value);
-	void				RiGeometricRepresentation(char * type);
-	void				RiOrientation(char * orientation),RiReverseOrientation(void);
-	void				RiSides(int nsides);
-
-	void				RiIdentity(void);
-	void				RiTransform(float transform[][4]);
-	void				RiConcatTransform(float transform[][4]);
-	void				RiPerspective(float fov);
-	void				RiTranslate(float dx,float dy,float dz);
-	void				RiRotate(float angle,float dx,float dy,float dz);
-	void				RiScale(float dx,float dy,float dz);
-	void				RiSkew(float angle,float dx1,float dy1,float dz1,float dx2,float dy2,float dz2);
-	void				RiDeformationV(char *name,int n,char *tokens[],void *params[]);
-	void				RiDisplacementV(char *name,int n,char *tokens[],void *params[]);
-	void				RiCoordinateSystem(char * space);
-	void				RiCoordSysTransform(char * space);
-
-	void				RiTransformPoints(char *fromspace,char *tospace,int npoints,float points[][3]);
-
-	void				RiTransformBegin(void);
-	void				RiTransformEnd(void);
-
-	void				RiAttributeV(char *name,int n,char *tokens[],void *params[]);
-
-	void				RiPolygonV(int nvertices,int n,char *tokens[],void *params[]);
-	void				RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],void *params[]);
-	void				RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *tokens[],void *params[]);
-	void				RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,char *tokens[],void *params[]);
-	void				RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep);
-	void				RiPatchV(char * type,int n,char *tokens[],void *params[]);
-	void				RiPatchMeshV(char * type,int nu,char * uwrap,int nv,char * vwrap,int n,char *tokens[],void *params[]);
-	void				RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,char *tokens[],void *params[]);
-	void				RiTrimCurve(int nloops,int *ncurves,int *order,float *knot,float *amin,float *amax,int *n,float *u,float *v,float *w);
-
-	void				RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiConeV(float height,float radius,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiCylinderV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiHyperboloidV(float *point1,float *point2,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiParaboloidV(float rmax,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiDiskV(float height,float radius,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiTorusV(float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,char *tokens[],void *params[]);
-	void				RiProcedural(void * data,float *bound,void (*subdivfunc)(void *,float),void (*freefunc)(void *));
-	void				RiGeometryV(char * type,int n,char *tokens[],void *params[]);
-
-	void				RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int n,char *tokens[],void *params[]);
-	void				RiPointsV(int npts,int n,char *tokens[],void *params[]);
-	void				RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int vertices[],int ntags,char * tags[],int nargs[],int intargs[],float floatargs[],int n,char *tokens[],void *params[]);
-	void				RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]);
-
-	void				RiSolidBegin(char * type);
-	void				RiSolidEnd(void);
-	void				*RiObjectBegin(void);
-
-	void				RiObjectEnd(void);
-	void				RiObjectInstance(void *handle);
-	void				RiMotionBeginV(int N,float times[]);
-	void				RiMotionEnd(void);
-
-	void				RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]);
-	void				RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]);
-
-	void				RiArchiveRecord(char * type,char *format,va_list args);
-	void				RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
-
-	void				RiTrace(int,float [][3],float [][3],float [][3]);
-	void				RiTrace(int,float [][3],float [][3],float [][3],float []);
-	void				RiVisibility(int,float [][3],float [][3],float [][3]);
-
-	void				RiError(int,int,char *);
 
 
-	// The following functions provide access to the graphics state
-	CXform				*getXform(int);											// Get the active XForm
-	CAttributes			*getAttributes(int);									// Get the active Attributes
-	COptions			*getOptions();											// Get the active Options
-	CShaderInstance		*getShader(const char *,int,int,char **,void **);		// Load a shader
-	RtFilterFunc		getFilter(const char *);								// Get a filter
-	char				*getFilter(RtFilterFunc);								// The other way around
-	int					getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
-
-	CTexture			*textureLoad(const char *,TSearchpath *);				// Load a new texture map
-	CEnvironment		*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
-
-																				// Delayed object junk
-	void				processDelayedObject(CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *,CRay *ray = NULL);
-	void				processDelayedInstance(CDelayedInstance *,CRay *ray = NULL);
-
-	void				addObject(CObject *);									// Add an object into the scene
-	void				addInstance(void *);									// Add an instance into the scene
-
-																				// Coordinate system functions
-	void				defineCoordinateSystem(const char *,matrix &,matrix &,ECoordinateSystem type = COORDINATE_CUSTOM);
-	int					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
-																				// Variable management
-	CVariable			*declareVariable(const char *,const char *,int um = 0);
-	void				makeGlobalVariable(CVariable *);
-	CVariable			*retrieveVariable(const char *);
-	
-	CDisplayChannel		*declareDisplayChannel(const char *);					// Display channel management
-	CDisplayChannel		*declareDisplayChannel(CVariable *);
-	CDisplayChannel		*retrieveDisplayChannel(const char *);
-	void				resetDisplayChannelUsage();
-	
-	void				registerFrameTemporary(const char *,int);				// Register file for end-of-frame deletion
-
-	int					getGlobalID(const char *);								// Global ID management
-
-																				// Locate (download) a file
-	int					locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
-	int					locateFile(char *,const char *,TSearchpath *search=NULL);
-
-																				// The following functions are about texture management and are implemented in texture.cpp
-	void				rendererThread(void *);
-
-private:
-	CDictionary<const char *,CNamedCoordinateSystem *>	*definedCoordinateSystems;	// This holds the named coordinate systems defined for this context
-	CDictionary<const char *,CVariable *>				*declaredVariables;			// Declared variables
-	CDictionary<const char *,CFileResource  *>			*loadedFiles;				// Files that have been loaded
-	CDictionary<const char *,CGlobalIdentifier *>		*globalIdHash;				// This holds global string to id mappings (light categories for example)
-	CDictionary<const char *,CNetFileMapping *>			*netFileMappings;			// This holds name->name mappings of files
-	CArray<const char*>									*frameTemporaryFiles;		// This hold the name of temporary files
-	int													numKnownGlobalIds;
-	CVariable											*variables;					// List of all defined variables
-	int													numGlobalVariables;			// The number of global variables
-	CDictionary<const char *,CDisplayChannel *>			*declaredChannels;			// The declared display channels
-	CArray<CDisplayChannel*>							*displayChannels;			// The list of all desclared display channels
-	CArray<CXform *>									*savedXforms;				// Used to save/restore the graphics state
-	CArray<CAttributes *>								*savedAttributes;
-	CArray<COptions *>									*savedOptions;
-	CArray<CObject *>									*objects;					// The list of all objects recorded so far
-	CArray<CArray<CObject *> *>							*objectsStack;				// The stack of object lists
-	CArray<CArray<CObject *> *>							*allocatedInstances;		// The list of allocated object instances
-	CXform				*currentXform;											// The current graphics state
-	CAttributes			*currentAttributes;
-	COptions			*currentOptions;
-	CDSO				*dsos;													// The list of DSO's that have been loaded
-	SOCKET				netClient;												// The client that we're serving (-1 if client)
-	int					netNumServers;											// The number of servers (0 if server)
-	SOCKET				*netServers;											// The array of servers that are serving us
-	TMutex				commitMutex;											// The mutex that controls job dispatch
-	CShadingContext		*renderer;												// The renderer doing the current world block
-	int					userRaytracing;											// TRUE if we're raytracing for the user
-	int					numNetrenderedBuckets;									// The number of netrendered buckets
-
-																				// Some RenderMan Interface related variables
-	int					numExpectedMotions;										// The number of expected motions in a motion block
-	int					numMotions;												// The number of motions so far
-	float				*keyTimes;												// The key times
-	float				*motionParameters;										// The arrays of motion parameters
-	int					maxMotionParameters;									// The maximum number of motion parameters that can be stored
-	char				*lastCommand;											// The text of the last motion command
-
-	void				netSetup(char *,char *);								// Setup the network for rendering
-	void				sendFile(int,char *,int,int);							// Send a particular file
-	int					getFile(char *,const char *);							// Get a particular file from network
-	int					getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network
-	void				clientRenderFrame();									// Isn't that obvious
-	void				processServerRequest(T32,int);							// Process a request from the server
-	void				init(CProgrammableShaderInstance *);					// Execute the init code of a shader
-	int					loadDSO(char *,char *,TSearchpath *,dsoInitFunction *,dsoExecFunction *,dsoCleanupFunction *);	// Find/load a DSO shader
-	int					addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1);
-};
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	The global variables
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-extern	CRendererContext	*currentRenderer;
-
-// Some global functions
-void	rcSend(SOCKET,char *,int,int net = TRUE);								// Send data
-void	rcRecv(SOCKET,char *,int,int net = TRUE);								// Recv data
 
 
 #endif
+
+
+
 
 

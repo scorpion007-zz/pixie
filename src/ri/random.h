@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -57,64 +57,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 
-
-// implementation of  Takuji Nishimura and Makoto Matsumoto's
-// MT19937 (Mersenne Twister pseudorandom number generator)
-// with optimizations by Shawn Cokus, Matthe Bellew.
-// This generator is not cryptoraphically secure. 
-//
-// M. Matsumoto and T. Nishimura,
-// "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform  
-// Pseudo-Random Number Generator",
-// ACM Transactions on Modeling and Computer Simulation,
-// Vol. 8, No. 1, January 1998, pp 3--30.
-//
-// C++ interface and further optimization by Mayur Patel
-//
-extern	unsigned long	state[624];
-extern	unsigned long	*next;
-extern	void			next_state();
-extern	void			randomInit(unsigned long u = 5489UL);
-extern	void			randomShutdown();
-
-inline	unsigned long	irand() {
-	register unsigned long y;
-
-	if( state == next )
-	 next_state();
-
-	y = *( --next);
-
-	// Tempering
-	y ^= (y >> 11);
-	y ^= (y << 7) & 0x9d2c5680UL;
-	y ^= (y << 15) & 0xefc60000UL;
-	y ^= (y >> 18);
-
-	return y;
-}
-      
-inline	float			urand() {
-	register unsigned long y;
-
-	if( state == next )	next_state();
-
-	y = *( --next);
-
-	// Tempering
-	y ^= (y >> 11);
-	y ^= (y << 7) & 0x9d2c5680UL;
-	y ^= (y << 15) & 0xefc60000UL;
-	y ^= (y >> 18);
-
-	y &= 0x3FFFFFFF;
-	return float(y) * (float(1.0)/float(0x3FFFFFFF));
-}
-
-
-
-
-
 // maximum allowed space dimension
 #define SOBOL_MAX_DIMENSION 40
 
@@ -136,7 +78,6 @@ extern const int v_init[8][SOBOL_MAX_DIMENSION];
 // Class				:	CSobol
 // Description			:	Sobol quasi random generator
 // Comments				:
-// Date last edited		:	9/12/2002
 template <int dimension> class CSobol {
 public:
 					CSobol(int seq = 1) {
@@ -244,11 +185,7 @@ public:
 // Different sampling functions
 void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator);
 void	sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator);
-void	sampleSphere(float *P);
-void	sampleDisk(float &x,float &y);
-
-
-   
+void	sampleSphere(float *P,CSobol<3> &generator);
 
 #endif
 

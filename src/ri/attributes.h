@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -68,7 +68,6 @@ const	float				ATTRIBUTES_MIN_SHADINGRATE					=	C_EPSILON;
 // Class				:	CActiveLight
 // Description			:	Holds an active light source instance
 // Comments				:
-// Date last edited		:	2/9/2003
 class	CActiveLight {
 public:
 	CProgrammableShaderInstance		*light;
@@ -93,7 +92,6 @@ typedef enum {
 //							attributes share a common clone to avoid unnecessary
 //							memory allocation.
 // Comments				:
-// Date last edited		:	2/9/2003
 class CAttributes {
 public: 
 							CAttributes();
@@ -135,12 +133,8 @@ public:
 
 		unsigned int		flags;										// Attribute flags
 
-		int					minSubdivision,maxSubdivision;				// Min - Max depths of the refinement tree
-
 																		// Tesselation attributes
-		float				flatness;									// The pixel space flatness
-		float				pointDeviation;								// The maximum flatness amount
-		float				normalDeviation;							// The normal deviation
+		float				flatness;									// Deprecated but in standard -  The pixel space flatness
 
 		float				maxDisplacement;							// Maximum amount of displacement in camera system
 		char				*maxDisplacementSpace;						// The current space in which the maximum displacement is given

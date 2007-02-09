@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -43,7 +43,6 @@
 // Class				:	symbol
 // Method				:	CSymbol(char *)
 // Description			:	Allocate memory ...
-// Date last edited		:	1/10/2001
 // Comments				:	The first parameter is the name of the variable as referenced in the code
 CSymbol::CSymbol(char *name) {
 	assert(name != NULL);
@@ -58,7 +57,6 @@ CSymbol::CSymbol(char *name) {
 // Class				:	CSymbol
 // Method				:	~CSymbol()
 // Description			:	De-allocate memory
-// Date last edited		:	1/10/2001
 // Comments				:
 CSymbol::~CSymbol() {
 	free(symbolName);
@@ -81,7 +79,6 @@ CSymbol::~CSymbol() {
 // Class				:	CVariable
 // Method				:	CVariable(char *,function *)
 // Description			:	Init the structure
-// Date last edited		:	1/10/2001
 // Comments				:	The first parameter is the name of the variable as referenced in the code and
 //							the second parameter is the function defining this variable
 CVariable::CVariable(char *name,int type,int multiplicity) : CSymbol(name) {
@@ -94,7 +91,6 @@ CVariable::CVariable(char *name,int type,int multiplicity) : CSymbol(name) {
 // Class				:	CVariable
 // Method				:	~CVariable()
 // Description			:	De-allocate memory
-// Date last edited		:	1/10/2001
 // Comments				:
 CVariable::~CVariable() {
 	if (cName != NULL)	free(cName);
@@ -104,7 +100,6 @@ CVariable::~CVariable() {
 // Class				:	CVariable
 // Method				:	codeName
 // Description			:	Get the codename for the variable
-// Date last edited		:	1/10/2001
 // Comments				:
 char	*CVariable::codeName() {
 	assert(cName != NULL);
@@ -128,7 +123,6 @@ char	*CVariable::codeName() {
 // Class				:	CParameter
 // Method				:	CParameter
 // Description			:	Ctor
-// Date last edited		:	1/10/2001
 // Comments				:	The first two parameters are directly passed to CVariable. The last parameter
 //							designates the number of the parameter in the order from left to right starting
 //							from 0. Thus this function replaces the actual parameter name with "$0", "$1" ...
@@ -143,7 +137,6 @@ CParameter::CParameter(char *name,int type,int multiplicity) : CVariable(name,ty
 // Class				:	CParameter
 // Method				:	~CParameter()
 // Description			:	De-allocate the memory
-// Date last edited		:	1/10/2001
 // Comments				:
 CParameter::~CParameter() {
 	if (defaultValue != NULL)
@@ -154,7 +147,6 @@ CParameter::~CParameter() {
 // Class				:	CParameter
 // Method				:	codeName
 // Description			:	Get the code name
-// Date last edited		:	1/10/2001
 // Comments				:
 char	*CParameter::codeName() {
 	if (mapping != NULL)	return	mapping->codeName();
@@ -179,7 +171,6 @@ char	*CParameter::codeName() {
 // Method				:	CFunction
 // Description			:	Ctor
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunction::CFunction(char *name,CFunction *p) : CSymbol(name) {
 	this->returnValue		=	NULL;
@@ -200,7 +191,6 @@ CFunction::CFunction(char *name,CFunction *p) : CSymbol(name) {
 // Method				:	~CFunction
 // Description			:	Dtor
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunction::~CFunction() {
 	if (initExpression != NULL)	delete initExpression;
@@ -218,7 +208,6 @@ CFunction::~CFunction() {
 // Method				:	addParameter(char *)
 // Description			:	This method creates a new parameter and adds it into the the function.
 // Return Value			:	The newly added parameter
-// Date last edited		:	1/10/2001
 // Comments				:
 CParameter	*CFunction::addParameter(char *name,int type,int multiplicity) {
 	CParameter	*cParameter;
@@ -244,7 +233,6 @@ CParameter	*CFunction::addParameter(char *name,int type,int multiplicity) {
 // Method				:	addVariable(char *)
 // Description			:	This method creates a new variable and adds it into the function
 // Return Value			:	The newly create variable (NULL if the variable (or parameter) already exists)
-// Date last edited		:	1/10/2001
 // Comments				:	This method adds a copy of the variable into the parent's list as well
 //							This is done so that variables declared in the scope are propegated to the parent function
 CVariable	*CFunction::addVariable(char *name,int type,int multiplicity) {
@@ -280,7 +268,6 @@ CVariable	*CFunction::addVariable(char *name,int type,int multiplicity) {
 // Method				:	addFunction(char *name)
 // Description			:	This method adds a new function to the current function
 // Return Value			:	The newly added function
-// Date last edited		:	1/10/2001
 // Comments				:	This function does not check the existance of another function
 //							with the exact same signature.
 CFunction	*CFunction::addFunction(char *name) {
@@ -295,7 +282,6 @@ CFunction	*CFunction::addFunction(char *name) {
 // Method				:	getVariable(char *name,int depth)
 // Description			:	This method searches for a variable. The name is the variable's name as it is in the source code
 // Return Value			:	NULL if the variable not found, pointer to the variable (or parameter) othervise
-// Date last edited		:	1/10/2001
 // Comments				:	If the variable is not found in this function, method searches the parents as well.
 //							The second parameter is used to controll the number functions above the current function.
 //							e.g.: depth=0 means only this function is searched for the variable
@@ -335,7 +321,6 @@ CVariable	*CFunction::getVariable(char *name,int probe) {
 // Method				:	getFunction(char *,CCArray<CCodeBlock *> *,int)	
 // Description			:	This method searches all the defined functions for a match
 // Return Value			:	NULL if no compatible function exists, a pointer to the function othervise
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunction	*CFunction::getFunction(char *name,CArray<CExpression *> *args,int returnType) {
 	CFunction	*cFun;
@@ -448,7 +433,6 @@ CFunction	*CFunction::getFunction(char *name,CArray<CExpression *> *args,int ret
 // Method				:	functionPrototype(char *,char *)
 // Description			:	Init the data structures
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunctionPrototype::CFunctionPrototype(char *name,char *p,int compatible,int nonuniform)  : CSymbol(name) {
 	prototype			=	strdup(p);
@@ -490,7 +474,6 @@ CFunctionPrototype::CFunctionPrototype(char *name,char *p,int compatible,int non
 // Method				:	~CFunctionPrototype
 // Description			:	Destroy the structures
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunctionPrototype::~CFunctionPrototype() {
 	free(prototype);
@@ -502,7 +485,6 @@ CFunctionPrototype::~CFunctionPrototype() {
 // Method				:	perfectMatch(char *,CCArray<CCodeBlock *> *,int)
 // Description			:	This function returns TRUE if the prototype matches to the given name,argument list and return type exactly
 // Return Value			:	TRUE if the prototype matches exactly
-// Date last edited		:	1/10/2001
 // Comments				:
 
 //////////////////////////////////////////////////////////////////////
@@ -604,7 +586,6 @@ int			CFunctionPrototype::perfectMatch(char *name,CArray<CExpression *> *pl,int 
 // Method				:	match(char *,CCArray<CCodeBlock *> *,int)
 // Description			:	This function checks if the prototype is compatible to the given signature
 // Return Value			:	TRUE if compatible, FALSE othervise
-// Date last edited		:	1/10/2001
 // Comments				:
 int			CFunctionPrototype::match(char *name,CArray<CExpression *> *pl,int dt) {
 	CExpression	*cCode;
@@ -686,7 +667,6 @@ int			CFunctionPrototype::match(char *name,CArray<CExpression *> *pl,int dt) {
 // Method				:	CShaderContext(FILE *)
 // Description			:	This method initializes the data structures
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 CScriptContext::CScriptContext(int s) {
 																	// Create a dummy "root" function that will contain
@@ -793,6 +773,11 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("random","n=",0,TRUE);
 	addBuiltInFunction("random","p=",0,TRUE);
 	addBuiltInFunction("random","c=",0,TRUE);
+	addBuiltInFunction("urandom","f=",0);
+	addBuiltInFunction("urandom","v=",0);
+	addBuiltInFunction("urandom","n=",0);
+	addBuiltInFunction("urandom","p=",0);
+	addBuiltInFunction("urandom","c=",0);
 	addBuiltInFunction("noise","f=f",0);
 	addBuiltInFunction("noise","f=ff",0);
 	addBuiltInFunction("noise","f=p",0);
@@ -1061,8 +1046,8 @@ CScriptContext::CScriptContext(int s) {
 	addGlobalVariable("s",		SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("t",		SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("ncomps",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
-	addGlobalVariable("time",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
-	addGlobalVariable("dtime",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
+	addGlobalVariable("time",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);	// FIXME should be uniform
+	addGlobalVariable("dtime",	SLC_FLOAT | SLC_UNIFORM,	SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("dPdtime",	SLC_VECTOR | SLC_VVECTOR,	SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 	addGlobalVariable("alpha",	SLC_FLOAT,					SLC_SURFACE | SLC_DISPLACEMENT | SLC_LIGHT | SLC_VOLUME);
 }
@@ -1072,7 +1057,6 @@ CScriptContext::CScriptContext(int s) {
 // Method				:	~CScriptContext()
 // Description			:	Destroy Destroy Destroy
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:		
 CScriptContext::~CScriptContext() {
 	char		*str;
@@ -1120,7 +1104,6 @@ CScriptContext::~CScriptContext() {
 // Method				:	addBuiltInFunction
 // Description			:	Add a built in function
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:		
 CFunctionPrototype	*CScriptContext::addBuiltInFunction(char *name,char *prototype,int scope,int nonuniform) {
 	CFunctionPrototype	*cFun	=	new CFunctionPrototype(name,prototype,scope,nonuniform);
@@ -1137,7 +1120,6 @@ CFunctionPrototype	*CScriptContext::addBuiltInFunction(char *name,char *prototyp
 // Method				:	addGlobalVariable
 // Description			:	Add a built in function
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:		
 void	CScriptContext::addGlobalVariable(char *name,int type,int scope) {
 	CVariable			*cVar	=	lastFunction->addVariable(name,type | SLC_GLOBAL,1);
@@ -1153,7 +1135,6 @@ void	CScriptContext::addGlobalVariable(char *name,int type,int scope) {
 // Method				:	getFunction(char *,CArray<CCodeBlock *>)
 // Description			:	Search for a function in the current context
 // Return Value			:	NULL if the function is not found, pointer to the function otherwise
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunction	*CScriptContext::getFunction(char *fn,CArray<CExpression *> *params) {
 	CFunction	*f	=	lastFunction->getFunction(fn,params,desiredType);
@@ -1168,7 +1149,6 @@ CFunction	*CScriptContext::getFunction(char *fn,CArray<CExpression *> *params) {
 // Method				:	getVariable(char *,int,int);
 // Description			:	Search for a variable in the current context
 // Return Value			:	NULL if the variable is not found, pointer to the variable otherwise
-// Date last edited		:	1/10/2001
 // Comments				:
 CVariable	*CScriptContext::getVariable(char *vn) {
 	CVariable	*v	=	lastFunction->getVariable(vn);
@@ -1200,7 +1180,6 @@ CVariable	*CScriptContext::getVariable(char *vn) {
 // Method				:	define(CSymbol *)
 // Description			:	This method fills in the information about the definition position of the variable
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 void		CScriptContext::define(CSymbol *s) {
 	if (sourceFile != NULL) {
@@ -1221,7 +1200,6 @@ void		CScriptContext::define(CSymbol *s) {
 // Method				:	printDefine(CSymbol *)
 // Description			:	This method prints the information about which variable is used to resolve this symbol
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 void		CScriptContext::printDefine(CSymbol *s) {
 	if (settings & COMPILER_SURPRESS_DEFINITIONS) return ;
@@ -1238,7 +1216,6 @@ void		CScriptContext::printDefine(CSymbol *s) {
 // Method				:	newParameter(char *)
 // Description			:	This function creates a new parameter
 // Return Value			:	NULL if the parameter already defined
-// Date last edited		:	1/10/2001
 // Comments				:
 CParameter		*CScriptContext::newParameter(char *name,int type,int multiplicity) {
 	CParameter	*cParameter	=	lastFunction->addParameter(name,type,multiplicity);
@@ -1258,7 +1235,6 @@ CParameter		*CScriptContext::newParameter(char *name,int type,int multiplicity) 
 // Method				:	newVariable(char *)
 // Description			:	This function creates a new variable
 // Return Value			:	NULL if the variable already exists
-// Date last edited		:	1/10/2001
 // Comments				:
 CVariable		*CScriptContext::newVariable(char *name,int type,int multiplicity) {
 	CVariable	*cVariable	=	lastFunction->addVariable(name,type,multiplicity);
@@ -1271,7 +1247,6 @@ CVariable		*CScriptContext::newVariable(char *name,int type,int multiplicity) {
 // Method				:	newFunction(char *)
 // Description			:	This function creates a new function :)
 // Return Value			:	pointer to the new function (this method never fails)
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunction		*CScriptContext::newFunction(char *name) {
 	CFunction	*cFunction	=	new CFunction(name,lastFunction);
@@ -1294,7 +1269,6 @@ CFunction		*CScriptContext::newFunction(char *name) {
 // Method				:	addVariable
 // Description			:	Add a new variable to the system
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 void	CScriptContext::addVariable(CVariable *cVariable) {
 	CVariable	*tVar;
@@ -1346,7 +1320,6 @@ void	CScriptContext::addVariable(CVariable *cVariable) {
 // Method				:	newLabel
 // Description			:	This function creates a new function :)
 // Return Value			:	pointer to the new function (this method never fails)
-// Date last edited		:	1/10/2001
 // Comments				:
 void			CScriptContext::newLabel(char *dest) {
 	numLabels++;
@@ -1359,7 +1332,6 @@ void			CScriptContext::newLabel(char *dest) {
 // Method				:	popFunction()
 // Description			:	This method is used to pop a function from the function stack
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 CFunction		*CScriptContext::popFunction() {
 	CFunction	*cFunction	=	lastFunction;
@@ -1375,7 +1347,6 @@ CFunction		*CScriptContext::popFunction() {
 // Method				:	uniformParameters
 // Description			:	Make all the parameters uniform
 // Return Value			:
-// Date last edited		:	2/2/2005
 // Comments				:
 void			CScriptContext::uniformParameters() {
 	CParameter	**parameters	=	shaderFunction->parameters->array;
@@ -1397,7 +1368,6 @@ void			CScriptContext::uniformParameters() {
 // Method				:	restoreParameters
 // Description			:	Restore the parameters to their original type
 // Return Value			:
-// Date last edited		:	2/2/2005
 // Comments				:
 void			CScriptContext::restoreParameters() {
 	CParameter	**parameters	=	shaderFunction->parameters->array;
@@ -1418,7 +1388,6 @@ void			CScriptContext::restoreParameters() {
 // Method				:	generateCode(FILE *out)
 // Description			:	This method prints the code into a file
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 void			CScriptContext::generateCode(char *o) {
 	CParameter			*cParameter;
@@ -1588,7 +1557,6 @@ void			CScriptContext::generateCode(char *o) {
 // Description			:	This function will be called for each module
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/30/2002
 static	int	dsoEnumerateCallback(const char *file,void *ud) {
 	void	*module		=	osLoadModule(file);
 
@@ -1635,7 +1603,6 @@ static	int	dsoEnumerateCallback(const char *file,void *ud) {
 // Description			:	Enumerate a particular DSO
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/30/2002
 void		CScriptContext::enumerateDso(char *name) {
 	char		searchPath[OS_MAX_PATH_LENGTH];
 	TSearchpath	*inPath;
@@ -1652,7 +1619,6 @@ void		CScriptContext::enumerateDso(char *name) {
 // Method				:	CScriptContext::error(char *,...)
 // Description			:	Print an CScriptContext::error message and terminate
 // Return Value			:
-// Date last edited		:	1/10/2001
 // Comments				:
 void		CScriptContext::error(char *mes,...) {
 	char	tmp[1024];
@@ -1674,7 +1640,6 @@ void		CScriptContext::error(char *mes,...) {
 // Method				:	warning(char *,...)
 // Description			:	Print a warning message
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 void		CScriptContext::warning(char *mes,...) {
 	char	tmp[1024];
@@ -1696,7 +1661,6 @@ void		CScriptContext::warning(char *mes,...) {
 // Method				:	fatal(char *,...)
 // Description			:	Unrecoverable error
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 void		CScriptContext::fatal(char *mes,...) {
 	char	tmp[1024];
@@ -1716,7 +1680,6 @@ void		CScriptContext::fatal(char *mes,...) {
 // Method				:	desire
 // Description			:	Expect a particular variable type
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 void		CScriptContext::desire(int type) {
 	desiredTypeStack->push(desiredType);
@@ -1729,7 +1692,6 @@ void		CScriptContext::desire(int type) {
 // Method				:	undesire
 // Description			:	Return to the previous desired type
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 int			CScriptContext::undesire() {
 	if (desiredTypeStack->numItems == 0) {
@@ -1745,7 +1707,6 @@ int			CScriptContext::undesire() {
 // Method				:	desired
 // Description			:	Get the expected type
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 int			CScriptContext::desired() {
 	return desiredType;
@@ -1758,7 +1719,6 @@ int			CScriptContext::desired() {
 // Method				:	lockRegister
 // Description			:	Allocate a temporary register
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 CVariable			*CScriptContext::lockRegister(int type,int numItems) {
 	CVariable	*cVar;
@@ -1800,7 +1760,6 @@ CVariable			*CScriptContext::lockRegister(int type,int numItems) {
 // Method				:	releaseRegister
 // Description			:	Release a previously allocated register
 // Return Value			:	
-// Date last edited		:	1/10/2001
 // Comments				:
 void				CScriptContext::releaseRegister(CVariable *cVar) {
 	cVar->type	^=	SLC_LOCKED;

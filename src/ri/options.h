@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -67,19 +67,19 @@ const	unsigned int		OPTIONS_FLAGS_CUSTOM_RESOLUTION		=	1<<2;	// The resolution i
 const	unsigned int		OPTIONS_FLAGS_CUSTOM_CLIPPING		=	1<<3;	// The near/far clipping planes have been set by user
 const	unsigned int		OPTIONS_FLAGS_FALSECOLOR_RAYTRACES	=	1<<4;	// Create a false color image of the effort being spent on the image
 const	unsigned int		OPTIONS_FLAGS_INHERIT_ATTRIBUTES	=	1<<12;	// The object instance inherit attributes from the parent
-const	unsigned int		OPTIONS_FLAGS_MOTIONBLUR			=	1<<13;	// We have motion blur in the scene
+const	unsigned int		OPTIONS_FLAGS_MOTIONBLUR			=	1<<13;	// We have motion blur in the scene (shutter open != shutter close)
 const	unsigned int		OPTIONS_FLAGS_FOCALBLUR				=	1<<14;	// We have depth of field in the scene
 const	unsigned int		OPTIONS_FLAGS_DEEP_SHADOW_RENDERING	=	1<<16;	// We're rendering a deep shadow map
 const	unsigned int		OPTIONS_FLAGS_USE_RADIANCE_CACHE	=	1<<17;	// Use the new radiance cache
 const	unsigned int		OPTIONS_FLAGS_PROGRESS				=	1<<18;	// Display the progress
 const	unsigned int		OPTIONS_FLAGS_SAMPLESPECTRUM		=	1<<19;	// Sample the spectrum in photon hider
+const	unsigned int		OPTIONS_FLAGS_SAMPLEMOTION			=	1<<20;	// We want the hider to sample motion blur (perform motion blur)
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Description			:	This class settings that are constant accross a frame
 // Comments				:
-// Date last edited		:	7/4/2001
 class COptions {
 public:
 
@@ -88,14 +88,12 @@ public:
 	// Class				:	CDisplay
 	// Description			:	Holds a display setting
 	// Comments				:
-	// Date last edited		:	7/4/2001
 	class CDisplay {
 	public:
 									///////////////////////////////////////////////////////////////////////
 									// Class				:	TDisplayParameter
 									// Description			:	Holds a display parameter
 									// Comments				:
-									// Date last edited		:	7/4/2001
 									typedef struct {
 										char			*name;
 										ParameterType	type;
@@ -122,7 +120,6 @@ public:
 	// Class				:	CClipPlane
 	// Description			:	Holds a user defined clip plane description
 	// Comments				:
-	// Date last edited		:	7/4/2001
 	class CClipPlane {
 	public:
 									CClipPlane();
@@ -140,6 +137,9 @@ public:
 
 								// The following method is used to convert from a custom color space to RGB if- entered
 	void						convertColor(vector &c,const float *f)	const;
+
+								// Guess where to search by looking into the extension
+	TSearchpath					*pickSearchpath(const char *name);
 
 
 
@@ -176,7 +176,6 @@ public:
 	TSearchpath					*shaderPath;									// Shader search path
 	TSearchpath					*displayPath;									// Display search path
 	TSearchpath					*modulePath;									// Search path for Pixie modules
-	char						*temporaryPath;									// Where tmp files are stored
 
 	int							pixelXsamples,pixelYsamples;					// Number of samples to take in X and Y
 
@@ -204,9 +203,7 @@ public:
 
 	float						shutterOpen,shutterClose;						// Motion blur stuff
 
-	unsigned int				flags;											// Flags
-
-	CArray<CShaderInstance *>	*allLights;										// An array of all allocated lights in the options context
+	unsigned int				flags;											// Flags	
 
 								////////////////////////////////////////////////////////////////////
 								// Pixie dependent options
@@ -215,11 +212,11 @@ public:
 	int							endofframe;										// The end of frame statstics number
 	char						*filelog;										// The name of the log file
 
+	int							numThreads;										// The number of threads working
+
 	int							maxTextureSize;									// Maximum amount of texture data to keep in memory (in bytes)
 
 	int							maxBrickSize;									// Maximum amount of brick data to keep in memory (in bytes)
-
-	int							maxShaderCache;									// The maximum shader cache amount
 
 	int							maxGridSize;									// Maximum number of points to shade at a time
 
@@ -231,10 +228,12 @@ public:
 
 	int							netXBuckets,netYBuckets;						// The meta bucket size
 
+	int							threadStride;									// The number of buckets to distribute to threads at a time
+	
+	int							geoCacheMemory;									// The ammount of memory to dedicate to tesselation caches
+
 	int							maxEyeSplits;									// Maximum number of eye splits
 																				// The number of times the bucket will be rendered
-	int							maxHierarchyDepth;								// The maximum depth of the hierarchy
-	int							maxHierarchyLeafObjects;						// The maximum number of objects for a leaf
 
 	float						tsmThreshold;									// Transparency shadow map threshold
 

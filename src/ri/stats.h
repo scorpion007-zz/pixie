@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -37,7 +37,6 @@
 // Class				:	CStats
 // Description			:	Holds statistics
 // Comments				:
-// Date last edited		:	1/19/2001
 class CStats {
 public:
 
@@ -54,30 +53,21 @@ public:
 	///////////////////////////////////////////////////////////////////////////////
 	int				zoneMemory;						// The current zone memory size
 	int				peakZoneMemory;					// The peak zone memeory size
-	int				vertexMemory;					// The current vertex memory size
-	int				peakVertexMemory;				// The peak size of the vertex memory
 	float			rendererStartTime;				// The time when the renderer was started
 	float			rendererStartOverhead;			// The time it took to initialize the renderer
-	float			rendererTime;					// The current renderer time
 	int				numAttributes;					// The number of objects allocated of each type
 	int				numXforms;
 	int				numOptions;
 	int				numShaders;
 	int				numShaderInstances;
-	int				numOutDevices;
-	int				numGprimCores;
-	int				numVariableDatas;
 	int				numVertexDatas;
 	int				numParameters;
-	int				numParameterLists;
 	int				numPls;
 	int				numObjects;
 	int				numGprims;
 	int				numSurfaces;
 	int				numPeakSurfaces;
-	int				numComposites;
 	int				numDelayeds;
-	int				numInstances;
 	int				numTextures;
 	int				numEnvironments;
 	int				optionsMemory;					// The amount of memory allocated for each of the following
@@ -85,7 +75,6 @@ public:
 	int				xformMemory;
 	int				gprimCoreMemory;
 	int				gprimMemory;
-	int				variableDataMemory;
 	int				textureMemory;
 	int				sequenceNumber;					// The sequence number
 	int				runningSequenceNumber;			// The running sequence number
@@ -100,33 +89,30 @@ public:
 	///////////////////////////////////////////////////////////////////////////////
 	float			frameStartTime;					// The time when we started rendering
 	float			frameTime;						// The current frame time
-	float			frameStartOverhead;				// The start overhead
-	float			frameEndOverhead;				// The end overhead
-	float			frameRaytracerOverhead;			// The start overhead used by the raytracer
-	const	char	*activity;						// Holds the current activity being performed
 	float			progress;						// The progress in the current frame
-	char			frameName[64];					// The name of the current frame
-	int				frameNumber;					// The number of the current frame
-	int				numShaded;						// The number of shaded points
-	int				numSampled;						// The number of sampled points
+
+	int				numShade;						// Number of times shade is called
+	int				numSampled;						// The number of vertices that passed thru shade
+	int				numShaded;						// The number of vertices that ended up being shaded
+	int				numTracedRays;
+	int				numReflectionRays;
+	int				numTransmissionRays;
+	int				numGatherRays;
+	int				numPhotonRays;
+
+	int				numRasterGrids;					// The following stats come from the CReyes
+	int				numRasterObjects;
 	int				numRasterGridsCreated;
+	int				numRasterVerticesCreated;
 	int				numRasterGridsShaded;
 	int				numRasterGridsRendered;
-	int				numPeakRasterGrids;
-	int				numPeakRasterObjects;
-	float			avgRasterGrids;
-	float			avgRasterObjects;
-	int				numObjectDeferRight;
-	int				numObjectDeferBottom;
-	int				numObjectOccluded;
-	int				numSplits;
+	int				numRasterQuadsRendered;
+
+	int				numSplits;						// The stats that come from CPatch
 	int				numVsplits,numUsplits,numUVsplits;
-	int				numQuadsCreated;
-	int				numQuadsRendered;
-	int				numTracedRays,numShadingRays,numShadowRays;
-	int				numRayTriangles;
-	int				numHierarchyLeaves,numHierarchyInternals,numHierarchyUncomputeds;
-	int				numLeafItems;
+
+	
+
 	int				numTextureMisses;				// The number of texture misses
 	int				transferredTextureData;			// The amount the texture data transmitted
 	int				textureSize;					// The current amount of textures in the memory
@@ -138,11 +124,15 @@ public:
 	int				numIndirectDiffuseRays;			// The number of final gather samples taken
 	int				numOcclusionRays;				// The number of final gather samples taken
 	int				numIndirectDiffusePhotonmapLookups;			// The number of final gather photonmap lookups
-	int				numBrickmapLookups;
-	int				numBrickmapCacheHits;
-	int				numBrickmapCachePageouts;
-	int				numBrickmapCachePageins;
-	int				brickmapPeakMem;
+	int				numBrickmapLookups;				// The number of brickmap lookups
+	int				numBrickmapCacheHits;			// The number of brickmap cache hits
+	int				numBrickmapCachePageouts;		// The number of bricks paged out
+	int				numBrickmapCachePageins;		// The number of bricks paged in
+	int				brickmapPeakMem;				// The peak memory usage for brickmaps
+	int				tesselationMemory;				// The total memory usage for tesselations
+	int				tesselationPeakMemory;			// The peak total memory usage for tesselations
+	int				tesselationCacheMisses;			// The number of tesselation cache misses
+	int				tesselationCacheHits;			// The number of tesselation cache hits
 };
 
 

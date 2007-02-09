@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -51,7 +51,7 @@ typedef struct {
 
 #else
 
-#define	SHADEOP_TABLE(__shadeopname)	extern "C" SHADEOP_SPEC	__shadeopname##_shadeops[]
+#define	SHADEOP_TABLE(__shadeopname)	extern "C" SHADEOP_SPEC __shadeopname##_shadeops[]; SHADEOP_SPEC __shadeopname##_shadeops[]
 
 #define	SHADEOP_INIT(__shadeopname)		extern "C" void *__shadeopname(int ctx, void *texturectx) 
 

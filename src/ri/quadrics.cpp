@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,56 +35,50 @@
 #include <math.h>
 
 #include "quadrics.h"
-#include "renderer.h"
 #include "common/os.h"
 #include "object.h"
 #include "stats.h"
+#include "surface.h"
 #include "memory.h"
 #include "shading.h"
-
-
-
+#include "renderer.h"
+#include "rendererContext.h"
+#include "objectMisc.h"
+#include "common/polynomial.h"
 
 
 #define	checkRay(rv)											\
-	if (! (rv->flags & attributes->flags) )	return;		\
+	if (! (rv->flags & attributes->flags) )	return;				\
 																\
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {				\
 		const float importance = attributes->lodImportance;		\
-		if (rv->jimp < 0) rv->jimp = urand();					\
 		if (importance >= 0) {									\
-			if (rv->jimp > importance)			return;	\
+			if (rv->jimp > importance)			return;			\
 		} else {												\
-			if ((1-rv->jimp) >= -importance)	return;	\
+			if ((1-rv->jimp) >= -importance)	return;			\
 		}														\
 	}															\
 																\
-	if (rv->lastXform != xform) {								\
-		if (xform->next != NULL) {								\
-			vector	tmp[4];										\
-			vector	to;											\
-			addvv(to,rv->from,rv->dir);							\
+	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)) {						\
+		/* Do we have a grid ? */								\
+		if (children == NULL) {									\
+			osLock(CRenderer::tesselateMutex);					\
 																\
-			mulmp(tmp[0],xform->to,rv->from);					\
-			mulmp(tmp[1],xform->to,to);							\
-																\
-			mulmp(tmp[2],xform->next->to,rv->from);				\
-			mulmp(tmp[3],xform->next->to,to);					\
-																\
-			interpolatev(rv->oFrom,tmp[0],tmp[2],rv->time);		\
-			interpolatev(rv->oTo,tmp[1],tmp[3],rv->time);		\
-			subvv(rv->oDir,rv->oTo,rv->oFrom);					\
-		} else {												\
-			vector	to;											\
-			addvv(to,rv->from,rv->dir);							\
-																\
-			mulmp(rv->oFrom,xform->to,rv->from);				\
-			mulmp(rv->oTo,xform->to,to);						\
-			subvv(rv->oDir,rv->oTo,rv->oFrom);					\
+			if (children == NULL) {								\
+				osLock(CRenderer::refCountMutex);				\
+				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);	\
+				osUnlock(CRenderer::refCountMutex);				\
+				tesselation->initTesselation(context);			\
+				tesselation->attach();							\
+				children				=	tesselation;		\
+			}													\
+			osUnlock(CRenderer::tesselateMutex);				\
 		}														\
+		return;													\
+	}															\
 																\
-		rv->lastXform	=	xform;								\
-	}
+	vector	oFrom,oDir;											\
+	transform(oFrom,oDir,xform,rv);
 
 
 
@@ -177,7 +171,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float vmina,float vmaxa,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CSphere);
 	stats.numGprims++;
@@ -203,7 +196,6 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float vmin0,float vmax0,float angle0,float r1,float vmin1,float vmax1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -239,7 +231,6 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CSphere::~CSphere() {
 	stats.gprimMemory	-=	sizeof(CSphere);
 	stats.gprimMemory	-=	(nextData != NULL ? 4*sizeof(float) : 0);
@@ -252,37 +243,11 @@ CSphere::~CSphere() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void				CSphere::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphere
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CSphere::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphere
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CSphere::intersect(CRay *rv,int &) {
+void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 	unsigned int	ns,i;
 	double			s[2];
 	double			r,umax,vmin,vmax;
@@ -302,9 +267,9 @@ void		CSphere::intersect(CRay *rv,int &) {
 	}
 	
 
-	const double a	=	dotvv(rv->oDir,rv->oDir);
-	const double b	=	2*dotvv(rv->oDir,rv->oFrom);
-	const double c	=	dotvv(rv->oFrom,rv->oFrom) - r*r;
+	const double a	=	dotvv(oDir,oDir);
+	const double b	=	2*dotvv(oDir,oFrom);
+	const double c	=	dotvv(oFrom,oFrom) - r*r;
 
 	if ((ns		=	solveQuadric<double>(a,b,c,s)) == 0) return;
 
@@ -319,9 +284,9 @@ void		CSphere::intersect(CRay *rv,int &) {
 		if (t	<=	rv->tmin)		continue;
 		if (t	>=	rv->t)			return;
 
-		P[0]	=	rv->oDir[0]*t + rv->oFrom[0];
-		P[1]	=	rv->oDir[1]*t + rv->oFrom[1];
-		P[2]	=	rv->oDir[2]*t + rv->oFrom[2];
+		P[0]	=	oDir[0]*t + oFrom[0];
+		P[1]	=	oDir[1]*t + oFrom[1];
+		P[2]	=	oDir[2]*t + oFrom[2];
 
 		if (r > 0) {
 			u									=	atan2(P[COMP_Y],P[COMP_X]);
@@ -359,7 +324,7 @@ void		CSphere::intersect(CRay *rv,int &) {
 		}
 
 		if (attributes->nSides == 1) {
-			if ((rv->oDir[0]*P[0] + rv->oDir[1]*P[1] + rv->oDir[2]*P[2]) > 0) continue;
+			if ((oDir[0]*P[0] + oDir[1]*P[1] + oDir[2]*P[2]) > 0) continue;
 		}
 
 		tmp[0]			=	(float) P[0];
@@ -375,17 +340,6 @@ void		CSphere::intersect(CRay *rv,int &) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CSphere
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CSphere::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
@@ -393,8 +347,7 @@ void			CSphere::bound(float *bmin,float *bmax) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CSphere::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	int				currentVertex;
 	float			*dest;
 	const float		*u		=	varying[VARIABLE_U] + start;
@@ -405,9 +358,7 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 	float			*cosv;
 	float			*memBase;
 
-	memBegin();
-
-	memBase			=	(float *)	ralloc(numVertices*4*sizeof(float));
+	memBase			=	(float *)	alloca(numVertices*4*sizeof(float));
 	sinu			=	memBase;
 	cosu			=	sinu + numVertices;
 	sinv			=	cosu + numVertices;
@@ -417,7 +368,7 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 		const float	*time	=	&varying[VARIABLE_TIME][start];
 		float		*r,*umax,*vmax,*vmin;
 
-		memBase			=	(float *)	ralloc(numVertices*4*sizeof(float));
+		memBase			=	(float *)	alloca(numVertices*4*sizeof(float));
 		r				=	memBase;
 		umax			=	r + numVertices;
 		vmax			=	umax + numVertices;
@@ -550,8 +501,6 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -560,19 +509,17 @@ void			CSphere::sample(int start,int numVertices,float **varying,unsigned int &u
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CSphere::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CSphere::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void	CSphere::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void	CSphere::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -591,7 +538,6 @@ void	CSphere::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CSphere::computeObjectBound(float *bmin,float *bmax,float r,float vmin,float vmax,float umax) {
 	float	maxRadius;
 	float	vmi		=	min(vmin,vmax);
@@ -648,7 +594,6 @@ void			CSphere::computeObjectBound(float *bmin,float *bmax,float r,float vmin,fl
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float za,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CDisk);
 	stats.numGprims++;
@@ -673,7 +618,6 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float z0,float angle0,float r1,float z1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -707,7 +651,6 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CDisk::~CDisk() {
 	stats.gprimMemory	-=	sizeof(CDisk);
 	stats.gprimMemory	-=	(nextData != NULL ? 3*sizeof(float) : 0);
@@ -720,38 +663,11 @@ CDisk::~CDisk() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CDisk::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisk
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CDisk::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisk
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CDisk::intersect(CRay *rv,int &) {
+void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 	float	t;
 	double	u;
 	double	x,y;
@@ -771,12 +687,12 @@ void		CDisk::intersect(CRay *rv,int &) {
 		umax	=	this->umax;
 	}
 
-	t	=	(float) (z - rv->oFrom[COMP_Z])/rv->oDir[COMP_Z];
+	t	=	(float) (z - oFrom[COMP_Z])/oDir[COMP_Z];
 
 	if ((t <= rv->tmin) || (t >= rv->t)) return;
 
-	x	=	rv->oFrom[COMP_X] + rv->oDir[COMP_X]*t;
-	y	=	rv->oFrom[COMP_Y] + rv->oDir[COMP_Y]*t;
+	x	=	oFrom[COMP_X] + oDir[COMP_X]*t;
+	y	=	oFrom[COMP_Y] + oDir[COMP_Y]*t;
 	if ((x*x+y*y) > r*r) return;
 
 	if (r < 0)	u	=	atan2(-y,-x);
@@ -798,7 +714,7 @@ void		CDisk::intersect(CRay *rv,int &) {
 	}
 
 	if (attributes->nSides == 1) {
-		if (dotvv(rv->oDir,Nt) > 0) {
+		if (dotvv(oDir,Nt) > 0) {
 			return;
 		}
 	}
@@ -816,24 +732,11 @@ void		CDisk::intersect(CRay *rv,int &) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CDisk::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDisk
 // Method				:	sample
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float			*sinu;
 	float			*cosu;
 	int				i;
@@ -842,10 +745,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 	float			*dest;
 	float			*memBase;
 
-	memBegin();
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	memBase	=	(float *)	ralloc(numVertices*2*sizeof(float));
+	memBase	=	(float *)	alloca(numVertices*2*sizeof(float));
 	sinu	=	memBase;
 	cosu	=	sinu + numVertices;
 
@@ -855,7 +756,7 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 		float		*z;
 		float		*umax;
 
-		memBase				=	(float *)	ralloc(numVertices*3*sizeof(float));
+		memBase				=	(float *)	alloca(numVertices*3*sizeof(float));
 		r					=	memBase;
 		z					=	r + numVertices;
 		umax				=	z + numVertices;
@@ -947,8 +848,6 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -957,19 +856,17 @@ void			CDisk::sample(int start,int numVertices,float **varying,unsigned int &up)
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CDisk::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CDisk::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void			CDisk::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void			CDisk::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -988,7 +885,6 @@ void			CDisk::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CDisk::computeObjectBound(float *bmin,float *bmax,float r,float z,float umax) {
 	r	=	absf(r);
 
@@ -1028,7 +924,6 @@ void			CDisk::computeObjectBound(float *bmin,float *bmax,float r,float z,float u
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float heighta,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CCone);
 	stats.numGprims++;
@@ -1053,7 +948,6 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float height0,float angle0,float r1,float height1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -1087,7 +981,6 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCone::~CCone() {
 	stats.gprimMemory	-=	sizeof(CCone);
 	stats.gprimMemory	-=	(nextData != NULL ? 3*sizeof(float) : 0);
@@ -1097,32 +990,6 @@ CCone::~CCone() {
 	if (nextData	!= NULL)	delete [] nextData;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCone
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void				CCone::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCone
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CCone::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
@@ -1130,8 +997,7 @@ int				CCone::intersect(const float *bmin,const float *bmax) const {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CCone::intersect(CRay *rv,int &) {
+void	CCone::intersect(CShadingContext *context,CRay *rv) {
 	float			*from;
 	float			*dir;
 	double			s[2];
@@ -1141,8 +1007,8 @@ void		CCone::intersect(CRay *rv,int &) {
 
 	checkRay(rv);
 
-	from	=	rv->oFrom;
-	dir		=	rv->oDir;
+	from	=	oFrom;
+	dir		=	oDir;
 
 	if (nextData != NULL) {
 		r		=	this->r *		(1-rv->time) + nextData[0] * rv->time;
@@ -1176,7 +1042,7 @@ void		CCone::intersect(CRay *rv,int &) {
 		if (t <= rv->tmin)	continue;
 		if (t >= rv->t)		return;
 
-		P[COMP_Z]	=	rv->oDir[COMP_Z]*t + rv->oFrom[COMP_Z];
+		P[COMP_Z]	=	oDir[COMP_Z]*t + oFrom[COMP_Z];
 
 		if (height < 0) {
 			if (P[COMP_Z] < height) continue;
@@ -1186,8 +1052,8 @@ void		CCone::intersect(CRay *rv,int &) {
 			if (P[COMP_Z] < 0) 		continue;
 		}
 
-		P[COMP_X]					=	rv->oDir[COMP_X]*t + rv->oFrom[COMP_X];
-		P[COMP_Y]					=	rv->oDir[COMP_Y]*t + rv->oFrom[COMP_Y];
+		P[COMP_X]					=	oDir[COMP_X]*t + oFrom[COMP_X];
+		P[COMP_Y]					=	oDir[COMP_Y]*t + oFrom[COMP_Y];
 
 		if (r > 0) 	u				=	atan2(P[COMP_Y],P[COMP_X]);
 		else 		u				=	atan2(-P[COMP_Y],-P[COMP_X]);
@@ -1219,7 +1085,7 @@ void		CCone::intersect(CRay *rv,int &) {
 		}
 
 		if (attributes->nSides == 1) {
-			if (dotvv(rv->oDir,Nt) > 0) {
+			if (dotvv(oDir,Nt) > 0) {
 				continue;
 			}
 		}
@@ -1233,17 +1099,6 @@ void		CCone::intersect(CRay *rv,int &) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCone
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CCone::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
@@ -1251,8 +1106,7 @@ void			CCone::bound(float *bmin,float *bmax) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CCone::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float		*cosu;
 	float		*sinu;
 	int			i;
@@ -1261,10 +1115,8 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 	float		*dest;
 	float		*memBase;
 
-	memBegin();
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	memBase	=	(float *)	ralloc(numVertices*2*sizeof(float));
+	memBase	=	(float *)	alloca(numVertices*2*sizeof(float));
 	sinu	=	memBase;
 	cosu	=	sinu + numVertices;
 
@@ -1281,7 +1133,7 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 		float		*height;
 		float		*umax;
 
-		memBase			=	(float *)	ralloc(numVertices*sizeof(float));
+		memBase			=	(float *)	alloca(numVertices*sizeof(float));
 		r				=	memBase;
 		height			=	r + numVertices;
 		umax			=	height + numVertices;
@@ -1390,8 +1242,6 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1400,19 +1250,17 @@ void			CCone::sample(int start,int numVertices,float **varying,unsigned int &up)
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CCone::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CCone::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void			CCone::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void			CCone::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1432,7 +1280,6 @@ void			CCone::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCone::computeObjectBound(float *bmin,float *bmax,float r,float height,float umax) {
 
 	r	=	absf(r);
@@ -1479,7 +1326,6 @@ void			CCone::computeObjectBound(float *bmin,float *bmax,float r,float height,fl
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float zmina,float zmaxa,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CParaboloid);
 	stats.numGprims++;
@@ -1505,7 +1351,6 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float zmin0,float zmax0,float angle0,float r1,float zmin1,float zmax1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -1542,7 +1387,6 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CParaboloid::~CParaboloid() {
 	stats.gprimMemory	-=	sizeof(CParaboloid);
 	stats.gprimMemory	-=	(nextData != NULL ? 4*sizeof(float) : 0);
@@ -1552,30 +1396,6 @@ CParaboloid::~CParaboloid() {
 	if (nextData	!= NULL)	delete [] nextData;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CParaboloid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CParaboloid::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CParaboloid
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CParaboloid::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
@@ -1583,14 +1403,13 @@ int				CParaboloid::intersect(const float *bmin,const float *bmax) const {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CParaboloid::intersect(CRay *rv,int &) {
+void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 	vector	Nt;
 
 	checkRay(rv);
 
-	float	*from	=	rv->oFrom;
-	float	*dir	=	rv->oDir;
+	float	*from	=	oFrom;
+	float	*dir	=	oDir;
 	double	a,b,c,s[2];
 	unsigned int		ns,i;
 	float	zmi,zma;
@@ -1666,7 +1485,7 @@ void		CParaboloid::intersect(CRay *rv,int &) {
 		}
 
 		if (attributes->nSides == 1) {
-			if (dotvv(rv->oDir,Nt) > 0) continue;
+			if (dotvv(oDir,Nt) > 0) continue;
 		}
 
 		rv->object	=	this;
@@ -1680,24 +1499,11 @@ void		CParaboloid::intersect(CRay *rv,int &) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CParaboloid::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CParaboloid
 // Method				:	sample
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CParaboloid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	float	*sqrtz;
@@ -1706,19 +1512,17 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 	float	*v		=	&varying[VARIABLE_V][start];
 	float	*dest;
 
-	memBegin();
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float));
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float));
-	sqrtz	=	(float *)	ralloc(numVertices*sizeof(float));
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
+	sqrtz	=	(float *)	alloca(numVertices*sizeof(float));
 
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*r	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*zmax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*zmin	=	(float *)	ralloc(numVertices*sizeof(float));
+		float	*r		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmin	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*time	=	&varying[VARIABLE_TIME][start];
 
 		// Precompute the sin/cos for u points
@@ -1840,8 +1644,6 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1850,19 +1652,17 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,unsigned in
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CParaboloid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CParaboloid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void		CParaboloid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void		CParaboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -1881,7 +1681,6 @@ void		CParaboloid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CParaboloid::computeObjectBound(float *bmin,float *bmax,float r,float zmin,float zmax,float umax) {
 	r	=	absf(r);
 
@@ -1917,7 +1716,6 @@ void			CParaboloid::computeObjectBound(float *bmin,float *bmax,float r,float zmi
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float zmina,float zmaxa,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CCylinder);
 	stats.numGprims++;
@@ -1944,7 +1742,6 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float zmin0,float zmax0,float angle0,float r1,float zmin1,float zmax1,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -1980,7 +1777,6 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CCylinder::~CCylinder() {
 	stats.gprimMemory	-=	sizeof(CCylinder);
 	stats.gprimMemory	-=	(nextData != NULL ? 4*sizeof(float) : 0);
@@ -1990,31 +1786,6 @@ CCylinder::~CCylinder() {
 	if (nextData	!= NULL)	delete [] nextData;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylinder
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CCylinder::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylinder
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CCylinder::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
@@ -2022,14 +1793,13 @@ int				CCylinder::intersect(const float *bmin,const float *bmax) const {
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CCylinder::intersect(CRay *rv,int &) {
+void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 	vector	Nt;
 
 	checkRay(rv);
 
-	float	*from	=	rv->oFrom;
-	float	*dir	=	rv->oDir;
+	float	*from	=	oFrom;
+	float	*dir	=	oDir;
 	double	a,b,c,s[2];
 	unsigned int		ns,i;
 	float	r,zmin,zmax,umax;
@@ -2099,7 +1869,7 @@ void		CCylinder::intersect(CRay *rv,int &) {
 		}
 
 		if (attributes->nSides == 1) {
-			if (dotvv(rv->oDir,Nt) > 0) continue;
+			if (dotvv(oDir,Nt) > 0) continue;
 		}
 
 		rv->object	=	this;
@@ -2109,19 +1879,9 @@ void		CCylinder::intersect(CRay *rv,int &) {
 		mulmn(rv->N,xform->to,Nt);
 		return;
 	}
+
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CCylinder
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CCylinder::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
@@ -2129,8 +1889,7 @@ void			CCylinder::bound(float *bmin,float *bmax) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CCylinder::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	int		i;
@@ -2138,17 +1897,15 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 	float	*v		=	varying[VARIABLE_V];
 	float	*dest;
 
-	memBegin();
-
 	// Allocate memory for precomputing sin(u) , cos(u)
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float));
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float));
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*r	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*zmax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*zmin	=	(float *)	ralloc(numVertices*sizeof(float));
+		float	*r		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*zmin	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*time	=	&varying[VARIABLE_TIME][start];
 
 		// Precompute the sin/cos for u points
@@ -2270,8 +2027,6 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2280,19 +2035,17 @@ void			CCylinder::sample(int start,int numVertices,float **varying,unsigned int 
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CCylinder::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CCylinder::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void	CCylinder::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void	CCylinder::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -2311,7 +2064,6 @@ void	CCylinder::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CCylinder::computeObjectBound(float *bmin,float *bmax,float r,float zmin,float zmax,float umax) {
 	r	=	absf(r);
 
@@ -2348,7 +2100,6 @@ void			CCylinder::computeObjectBound(float *bmin,float *bmax,float r,float zmin,
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,const float *p1a,const float *p2a,float anglea) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CHyperboloid);
 	stats.numGprims++;
@@ -2374,7 +2125,6 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,const float *p10,const float *p20,float angle0,const float *p11,const float *p21,float angle1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -2409,7 +2159,6 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CHyperboloid::~CHyperboloid() {
 	stats.gprimMemory	-=	sizeof(CHyperboloid);
 	stats.gprimMemory	-=	(nextData != NULL ? 7*sizeof(float) : 0);
@@ -2422,42 +2171,16 @@ CHyperboloid::~CHyperboloid() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CHyperboloid::tesselate(CShadingContext *context) {
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CHyperboloid
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CHyperboloid::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CHyperboloid
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CHyperboloid::intersect(CRay *rv,int &) {
+void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
-	float	*from	=	rv->oFrom;
-	float	*dir	=	rv->oDir;
+	float	*from	=	oFrom;
+	float	*dir	=	oDir;
 	unsigned int		ns,i;
 	double	ts[2];
 	double	P[3];
@@ -2586,7 +2309,7 @@ void		CHyperboloid::intersect(CRay *rv,int &) {
 			}
 
 			if (attributes->nSides == 1) {
-				if (dotvv(rv->oDir,Nt) > 0) continue;
+				if (dotvv(oDir,Nt) > 0) continue;
 			}
 		}
 
@@ -2602,24 +2325,11 @@ void		CHyperboloid::intersect(CRay *rv,int &) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CHyperboloid::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CHyperboloid
 // Method				:	sample
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	int		i;
@@ -2627,18 +2337,16 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 	float	*v		=	&varying[VARIABLE_V][start];
 	float	*dest;
 
-	memBegin();
-
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float));
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float));
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*p1		=	(float *)	ralloc(numVertices*sizeof(float)*3);
-		float	*p2		=	(float *)	ralloc(numVertices*sizeof(float)*3);
-		float	*dx		=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*dy		=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*dz		=	(float *)	ralloc(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*p1		=	(float *)	alloca(numVertices*sizeof(float)*3);
+		float	*p2		=	(float *)	alloca(numVertices*sizeof(float)*3);
+		float	*dx		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*dy		=	(float *)	alloca(numVertices*sizeof(float));
+		float	*dz		=	(float *)	alloca(numVertices*sizeof(float));
 		const	float	*tp1	=	this->p1;
 		float	*np1	=	&nextData[0];
 		const	float	*tp2	=	this->p2;
@@ -2783,8 +2491,6 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 	transformPoints();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2793,19 +2499,17 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,unsigned i
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CHyperboloid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CHyperboloid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void			CHyperboloid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void			CHyperboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -2824,7 +2528,6 @@ void			CHyperboloid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CHyperboloid::computeObjectBound(float *bmin,float *bmax,float *p1,float *p2,float umax) {
 	float	d	=	p1[COMP_X] * p1[COMP_X] + p1[COMP_Y] * p1[COMP_Y];
 	float	d2	=	p2[COMP_X] * p2[COMP_X] + p2[COMP_Y] * p2[COMP_Y];
@@ -2871,7 +2574,6 @@ void			CHyperboloid::computeObjectBound(float *bmin,float *bmax,float *p1,float 
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rmina,float rmaxa,float vmina,float vmaxa,float umaxa) : CSurface(a,x)  {
 	stats.gprimMemory	+=	sizeof(CToroid);
 	stats.numGprims++;
@@ -2898,7 +2600,6 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rmin0,float rmax0,float vmin0,float vmax0,float umax0,float rmin1,float rmax1,float vmin1,float vmax1,float umax1) : CSurface(a,x) {
 	vector	tbmin,tbmax;
 
@@ -2937,7 +2638,6 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 CToroid::~CToroid() {
 	stats.gprimMemory	-=	sizeof(CToroid);
 	stats.gprimMemory	-=	(nextData != NULL ? 5*sizeof(float) : 0);
@@ -2950,44 +2650,11 @@ CToroid::~CToroid() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
-// Method				:	tesselate
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CToroid::tesselate(CShadingContext *context) {
-
-	// FIXME: Do the correct ray torus intersection
-	context->tesselate2D(this);
-	return;
-
-
-	if ((attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) ||
-		(context->flags & OPTIONS_FLAGS_USE_RADIANCE_CACHE))	context->tesselate2D(this);
-	else														context->addTracable(this,this);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CToroid
-// Method				:	intersect
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-int				CToroid::intersect(const float *bmin,const float *bmax) const {
-	//FIXME: a more accurate intersection computation is possible
-	return intersectBox(bmin,bmax,this->bmin,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CToroid
 // Method				:	intersect
 // Description			:	Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
-// Date last edited		:	3/17/2001
-void		CToroid::intersect(CRay *rv,int &) {
+void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 
 	checkRay(rv);
 
@@ -3013,8 +2680,8 @@ void		CToroid::intersect(CRay *rv,int &) {
 		double		s[5];
 		double		c[5];
 		int			i;
-		const float	*from	=	rv->oFrom;
-		const float	*dir	=	rv->oDir;
+		const float	*from	=	oFrom;
+		const float	*dir	=	oDir;
 
 		double		R2		=	rmax*rmax;
 		double		r2		=	rmin*rmin;
@@ -3109,7 +2776,7 @@ void		CToroid::intersect(CRay *rv,int &) {
 			}
 
 			if (attributes->nSides == 1) {
-				//if (dotvv(rv->oDir,Nt) > 0) continue;
+				//if (dotvv(oDir,Nt) > 0) continue;
 			}
 
 			u						=	u / umax;
@@ -3125,18 +2792,7 @@ void		CToroid::intersect(CRay *rv,int &) {
 			return;
 		}
 	}
-}
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CToroid
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/17/2001
-void			CToroid::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -3145,8 +2801,7 @@ void			CToroid::bound(float *bmin,float *bmax) const {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &up) const {
+void			CToroid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
 	float	*cosu;
 	float	*sinu;
 	float	*sinv;
@@ -3156,20 +2811,18 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 	float	*v		=	&varying[VARIABLE_V][start];
 	float	*dest;
 
-	memBegin();
-
-	sinu	=	(float *)	ralloc(numVertices*sizeof(float));
-	cosu	=	(float *)	ralloc(numVertices*sizeof(float));
-	sinv	=	(float *)	ralloc(numVertices*sizeof(float));
-	cosv	=	(float *)	ralloc(numVertices*sizeof(float));
+	sinu	=	(float *)	alloca(numVertices*sizeof(float));
+	cosu	=	(float *)	alloca(numVertices*sizeof(float));
+	sinv	=	(float *)	alloca(numVertices*sizeof(float));
+	cosv	=	(float *)	alloca(numVertices*sizeof(float));
 
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*rmin	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*rmax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*vmin	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*vmax	=	(float *)	ralloc(numVertices*sizeof(float));
-		float	*umax	=	(float *)	ralloc(numVertices*sizeof(float));
+		float	*rmin	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*rmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*vmin	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*vmax	=	(float *)	alloca(numVertices*sizeof(float));
+		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*time	=	&varying[VARIABLE_TIME][start];
 
 		// Precompute the sin/cos for u points
@@ -3198,7 +2851,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 
 		// Set Ng if needed
 		if (up & (PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV)) {
-			float	*Ng	=	&varying[VARIABLE_NG][start*3];
+			float	*Ng		=	&varying[VARIABLE_NG][start*3];
 			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
 			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
 
@@ -3287,8 +2940,6 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 	normalFix();
 
 	up	&=	~parametersF;
-
-	memEnd();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -3297,19 +2948,17 @@ void			CToroid::sample(int start,int numVertices,float **varying,unsigned int &u
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
-void			CToroid::interpolate(int numVertices,float **varying) const {
-	if (parameters != NULL)	parameters->dispatch(numVertices,varying);
+void			CToroid::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void	CToroid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
+void	CToroid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 	CXform		*nx	=	new CXform(x);
 
 	nx->concat(xform);	// Concetenate the local xform
@@ -3328,7 +2977,6 @@ void	CToroid::copy(CAttributes *a,CXform *x,CRendererContext *cx) const {
 // Description			:	Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/17/2001
 void			CToroid::computeObjectBound(float *bmin,float *bmax,float rmin,float rmax,float vmin,float vmax,float umax) {
 	float	r	=	absf(rmin) + absf(rmax);
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -163,7 +163,7 @@ DEFFUNC(Dvv			,"Dv"		,"v=v"	,DVVEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 // deriv "f=ff"
 #ifndef INIT_SHADING
 #define	DERIVFEXPR_PRE			FUN3EXPR_PRE																\
-								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*4);		\
+								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*4,threadMemory);		\
 								float	*duBottom	=	duTop + numVertices;								\
 								float	*dvTop		=	duBottom + numVertices;								\
 								float	*dvBottom	=	dvTop + numVertices;								\
@@ -208,7 +208,7 @@ DEFFUNC(Derivf		,"Deriv"			,"f=ff"	,DERIVFEXPR_PRE,DERIVFEXPR,DERIVFEXPR_UPDATE,
 // deriv "v=vf"
 #ifndef INIT_SHADING
 #define	DERIVVEXPR_PRE			FUN3EXPR_PRE																\
-								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*8);		\
+								float	*duTop		=	(float *) ralloc(numVertices*sizeof(float)*8,threadMemory);		\
 								float	*duBottom	=	duTop + numVertices*3;								\
 								float	*dvTop		=	duBottom + numVertices;								\
 								float	*dvBottom	=	dvTop + numVertices*3;								\
@@ -261,7 +261,7 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 #define	AREAEXPR_PRE			FUN2EXPR_PRE																\
 								float	*du		=	varying[VARIABLE_DU];									\
 								float	*dv		=	varying[VARIABLE_DV];									\
-								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float));			\
+								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
 								float	*dPdv	=	dPdu + numVertices*3;									\
 								vector	tmp;																\
 								duVector(dPdu,(float *) op);												\
@@ -296,7 +296,7 @@ DEFFUNC(Area		,"area"			,"f=p"	,AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 #ifndef INIT_SHADING
 
 #define	CALCULATENORMALEXPR_PRE		FUN2EXPR_PRE																\
-									float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float));			\
+									float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
 									float	*dPdv	=	dPdu + numVertices*3;									\
 									float	mult	=	((currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ? (float) -1 : (float) 1);	\
 									duVector(dPdu,(float *) op);												\
@@ -424,7 +424,7 @@ DEFFUNC(PNoise3D4			,"pnoise"		,"v=pfpf",	FUN5EXPR_PRE,PNOISE3D4EXPR,FUN5EXPR_UP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ctransform "c=Sc"
-#define	CTRANSFORMEXPR_PRE	matrix				*from,*to;											\
+#define	CTRANSFORMEXPR_PRE	const float			*from,*to;											\
 							ECoordinateSystem	cSystem;											\
 							FUN3EXPR_PRE															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
@@ -435,7 +435,7 @@ DEFFUNC(CTransform		,"ctransform"			,"c=Sc"	,CTRANSFORMEXPR_PRE,CTRANSFORMEXPR,F
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ctransform "c=SSc"
-#define	CTRANSFORMSEXPR_PRE	matrix				*from,*to;											\
+#define	CTRANSFORMSEXPR_PRE	const float			*from,*to;											\
 							vector				vtmp;												\
 							ECoordinateSystem	cSystemFrom,cSystemTo;								\
 							FUN4EXPR_PRE															\
@@ -451,12 +451,12 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=Sp
 #define	TRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							FUN3EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
 
-#define	TRANSFORM1EXPR		mulmp(&res->real,to[0],&op2->real);
+#define	TRANSFORM1EXPR		mulmp(&res->real,to,&op2->real);
 
 
 #define	TRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);
@@ -464,14 +464,14 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=SSp"
 #define	TRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;											\
-							matrix				*from1,*to1,*from2,*to2;										\
+							const float			*from1,*to1,*from2,*to2;										\
 							vector				vtmp;															\
 							FUN4EXPR_PRE;																		\
 							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);							\
 							findCoordinateSystem(op2->string,from2,to2,cSystemTo);
 
-#define	TRANSFORM2EXPR		mulmp(vtmp,from1[0],&op3->real);													\
-							mulmp(&res->real,to2[0],vtmp);
+#define	TRANSFORM2EXPR		mulmp(vtmp,from1,&op3->real);														\
+							mulmp(&res->real,to2,vtmp);
 
 #define	TRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
@@ -482,22 +482,22 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=Smp"
 #define	TRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							vector				vtmp;												\
 							FUN4EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
-#define	TRANSFORM4EXPR		mulmp(vtmp,from[0],&op3->real);											\
+#define	TRANSFORM4EXPR		mulmp(vtmp,from,&op3->real);											\
 							mulmp(&res->real,&op2->real,vtmp);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=Sp
 #define	VTRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							FUN3EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
-#define	VTRANSFORM1EXPR		mulmv(&res->real,to[0],&op2->real);
+#define	VTRANSFORM1EXPR		mulmv(&res->real,to,&op2->real);
 
 
 #define	VTRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);
@@ -506,11 +506,11 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=Sp
 #define	NTRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
-							matrix				*from,*to;											\
+							const float			*from,*to;											\
 							FUN3EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from,to,cSystem);						\
 
-#define	NTRANSFORM1EXPR		mulmn(&res->real,from[0],&op2->real);
+#define	NTRANSFORM1EXPR		mulmn(&res->real,from,&op2->real);
 
 #define	NTRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);												\
 
@@ -518,28 +518,28 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=SSp"
 #define VTRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
-							matrix				*from1,*to1,*from2,*to2;							\
+							const float			*from1,*to1,*from2,*to2;							\
 							vector				vtmp;												\
 							FUN4EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);				\
 							findCoordinateSystem(op2->string,from2,to2,cSystemTo);
 
-#define	VTRANSFORM2EXPR		mulmv(vtmp,from1[0],&op3->real);										\
-							mulmv(&res->real,to2[0],vtmp);
+#define	VTRANSFORM2EXPR		mulmv(vtmp,from1,&op3->real);											\
+							mulmv(&res->real,to2,vtmp);
 
 #define VTRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=SSp"
 #define NTRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
-							matrix				*from1,*to1,*from2,*to2;							\
+							const float			*from1,*to1,*from2,*to2;							\
 							vector				vtmp;												\
 							FUN4EXPR_PRE;															\
 							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);				\
 							findCoordinateSystem(op2->string,from2,to2,cSystemTo);					\
 
-#define	NTRANSFORM2EXPR		mulmn(vtmp,to1[0],&op3->real);											\
-							mulmn(&res->real,from2[0],vtmp);
+#define	NTRANSFORM2EXPR		mulmn(vtmp,to1,&op3->real);												\
+							mulmn(&res->real,from2,vtmp);
 
 #define NTRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
@@ -557,12 +557,12 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=Smp"
 #define	VTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;												\
-							matrix				*from,*to;												\
+							const float			*from,*to;												\
 							vector				vtmp;													\
 							FUN4EXPR_PRE;																\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
-#define	VTRANSFORM4EXPR		mulmv(vtmp,from[0],&op3->real);												\
+#define	VTRANSFORM4EXPR		mulmv(vtmp,from,&op3->real);												\
 							mulmv(&res->real,&op2->real,vtmp);
 
 #define	VTRANSFORM4EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,16,3);
@@ -570,14 +570,14 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=Smp"
 #define	NTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;												\
-							matrix				*from,*to;												\
+							const float			*from,*to;												\
 							matrix				mtmp;													\
 							vector				vtmp;													\
 							FUN4EXPR_PRE;																\
 							findCoordinateSystem(op1->string,from,to,cSystem);
 
 #define	NTRANSFORM4EXPR		invertm(mtmp,&op2->real);													\
-							mulmn(vtmp,to[0],&op3->real);												\
+							mulmn(vtmp,to,&op3->real);													\
 							mulmn(&res->real,mtmp,vtmp);
 
 #define	NTRANSFORM4EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,16,3);
@@ -600,7 +600,7 @@ DEFFUNC(NTransform4		,"ntransform"			,"n=Smn"	,NTRANSFORM4EXPR_PRE,NTRANSFORM4EX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // depth "f=p"
-#define DEPTHEXPR		res->real	=	(op[2].real - clipMin) / (clipMax - clipMin);
+#define DEPTHEXPR		res->real	=	(op[2].real - CRenderer::clipMin) / (CRenderer::clipMax - CRenderer::clipMin);
 
 DEFFUNC(Depth		,"depth"			,"f=p"	,FUN2EXPR_PRE,DEPTHEXPR,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 
@@ -629,7 +629,7 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 // diffuse	"c=n"
 #define	DIFFUSEEXPR_PRE		const float		*P,*N,*Cl,*L;										\
 							float			*R;													\
-							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
+							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 							const TCode		*op;												\
 							TCode			*res;												\
 							int				i;													\
@@ -683,7 +683,7 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 // diffuse	"c=pnf"
 #define	DIFFUSE2EXPR_PRE	const float		*P,*N,*Cl,*L;										\
 							float			*R;													\
-							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)); \
+							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory); \
 							const float		*cosangle;											\
 							const TCode		*op1,*op2,*op3;										\
 							TCode			*res;												\
@@ -746,8 +746,8 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 // specular	"c=nvf"
 #define	SPECULAREXPR_PRE		const float		*P,*N,*Cl,*L,*V;									\
 								float			*R,*power;											\
-								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
-								float			*powers		=	(float *) ralloc(numVertices*sizeof(float));	\
+								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
+								float			*powers		=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								const TCode		*op1,*op2,*op3;										\
 								TCode			*res;												\
 								int				i;													\
@@ -816,8 +816,8 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 // phong	"c=nvf"
 #define	PHONGEXPR_PRE			const float		*P,*N,*Cl,*L,*V,*size;								\
 								float			*refDir,*R;											\
-								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
-								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float));	\
+								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
+								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float),threadMemory);	\
 								const TCode		*op1,*op2,*op3;										\
 								TCode			*res;												\
 								float			coefficient;										\
@@ -1031,63 +1031,63 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 #endif
 
 #define	FUNCTION	displacementParameter
-DEFLINKFUNC(Displacement2			,"displacement"				,"f=SC",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Displacement3			,"displacement"				,"f=SN",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Displacement4			,"displacement"				,"f=SP",	PARAMETER_MESSAGEPASSING)
-DEFFUNC(DisplacementV				,"displacement"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(Displacement				,"displacement"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(DisplacementS				,"displacement"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(DisplacementM				,"displacement"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,PARAMETER_MESSAGEPASSING)
+DEFLINKFUNC(Displacement2			,"displacement"				,"f=SC",	0)
+DEFLINKFUNC(Displacement3			,"displacement"				,"f=SN",	0)
+DEFLINKFUNC(Displacement4			,"displacement"				,"f=SP",	0)
+DEFFUNC(DisplacementV				,"displacement"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Displacement				,"displacement"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(DisplacementS				,"displacement"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(DisplacementM				,"displacement"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_DISPLACEMENT),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,0)
 #undef FUNCTION
 
 #define	FUNCTION	surfaceParameter
-DEFLINKFUNC(Surface2			,"surface"				,"f=SC",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Surface3			,"surface"				,"f=SN",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Surface4			,"surface"				,"f=SP",	PARAMETER_MESSAGEPASSING)
-DEFFUNC(SurfaceV				,"surface"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(Surface					,"surface"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(SurfaceS				,"surface"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(SurfaceM				,"surface"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,PARAMETER_MESSAGEPASSING)
+DEFLINKFUNC(Surface2			,"surface"				,"f=SC",	0)
+DEFLINKFUNC(Surface3			,"surface"				,"f=SN",	0)
+DEFLINKFUNC(Surface4			,"surface"				,"f=SP",	0)
+DEFFUNC(SurfaceV				,"surface"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Surface					,"surface"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(SurfaceS				,"surface"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(SurfaceM				,"surface"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_SURFACE),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,0)
 #undef FUNCTION
 
-DEFLINKFUNC(Lightsource2			,"lightsource"				,"f=SC",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Lightsource3			,"lightsource"				,"f=SN",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Lightsource4			,"lightsource"				,"f=SP",	PARAMETER_MESSAGEPASSING)
-DEFFUNC(LightsourceV				,"lightsource"				,"f=SV"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(Lightsource					,"lightsource"				,"f=SF"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(LightsourceS				,"lightsource"				,"f=SS"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(LightsourceM				,"lightsource"				,"f=SM"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,PARAMETER_MESSAGEPASSING)
+DEFLINKFUNC(Lightsource2			,"lightsource"				,"f=SC",	0)
+DEFLINKFUNC(Lightsource3			,"lightsource"				,"f=SN",	0)
+DEFLINKFUNC(Lightsource4			,"lightsource"				,"f=SP",	0)
+DEFFUNC(LightsourceV				,"lightsource"				,"f=SV"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Lightsource					,"lightsource"				,"f=SF"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(LightsourceS				,"lightsource"				,"f=SS"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(LightsourceM				,"lightsource"				,"f=SM"		,LIGHTPARAMETEREXPR_PRE,PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,0)
 
 #define	FUNCTION	atmosphereParameter
-DEFLINKFUNC(Atmosphere2			,"atmosphere"				,"f=SC",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Atmosphere3			,"atmosphere"				,"f=SN",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Atmosphere4			,"atmosphere"				,"f=SP",	PARAMETER_MESSAGEPASSING)
-DEFFUNC(AtmosphereV				,"atmosphere"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(Atmosphere				,"atmosphere"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(AtmosphereS				,"atmosphere"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(AtmosphereM				,"atmosphere"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,PARAMETER_MESSAGEPASSING)
+DEFLINKFUNC(Atmosphere2			,"atmosphere"				,"f=SC",	0)
+DEFLINKFUNC(Atmosphere3			,"atmosphere"				,"f=SN",	0)
+DEFLINKFUNC(Atmosphere4			,"atmosphere"				,"f=SP",	0)
+DEFFUNC(AtmosphereV				,"atmosphere"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Atmosphere				,"atmosphere"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(AtmosphereS				,"atmosphere"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(AtmosphereM				,"atmosphere"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_ATMOSPHERE),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,0)
 #undef FUNCTION
 
 /* note that whilst we provide accessors for incident and opposite, they will never be used */
 
 #define	FUNCTION	incidentParameter
-DEFLINKFUNC(Incident2			,"incident"				,"f=SC",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Incident3			,"incident"				,"f=SN",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Incident4			,"incident"				,"f=SP",	PARAMETER_MESSAGEPASSING)
-DEFFUNC(IncidentV				,"incident"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(Incident				,"incident"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(IncidentS				,"incident"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(IncidentM				,"incident"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,PARAMETER_MESSAGEPASSING)
+DEFLINKFUNC(Incident2			,"incident"				,"f=SC",	0)
+DEFLINKFUNC(Incident3			,"incident"				,"f=SN",	0)
+DEFLINKFUNC(Incident4			,"incident"				,"f=SP",	0)
+DEFFUNC(IncidentV				,"incident"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRV,PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Incident				,"incident"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRF,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(IncidentS				,"incident"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRS,PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(IncidentM				,"incident"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_EXTERIOR),PARAMETEREXPRM,PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,0)
 #undef FUNCTION
 
 #define	FUNCTION	oppositeParameter
-DEFLINKFUNC(Opposite2			,"opposite"				,"f=SC",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Opposite3			,"opposite"				,"f=SN",	PARAMETER_MESSAGEPASSING)
-DEFLINKFUNC(Opposite4			,"opposite"				,"f=SP",	PARAMETER_MESSAGEPASSING)
-DEFFUNC(OppositeV				,"opposite"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRV(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(Opposite				,"opposite"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRF(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(OppositeS				,"opposite"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRS(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,PARAMETER_MESSAGEPASSING)
-DEFFUNC(OppositeM				,"opposite"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRM(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,PARAMETER_MESSAGEPASSING)
+DEFLINKFUNC(Opposite2			,"opposite"				,"f=SC",	0)
+DEFLINKFUNC(Opposite3			,"opposite"				,"f=SN",	0)
+DEFLINKFUNC(Opposite4			,"opposite"				,"f=SP",	0)
+DEFFUNC(OppositeV				,"opposite"				,"f=SV"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRV(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Opposite				,"opposite"				,"f=SF"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRF(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(OppositeS				,"opposite"				,"f=SS"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRS(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(OppositeM				,"opposite"				,"f=SM"		,PARAMETEREXPR_PRE(ACCESSOR_INTERIOR),PARAMETEREXPRM(ACCESSOR_INTERIOR),PARAMETEREXPR_UPDATE(1,16),NULL_EXPR,0)
 #undef FUNCTION
 
 /* note the accessor for the remaining functions is not used */
@@ -1133,13 +1133,15 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 								TCode				out[16*2];										\
 								TCode				*src = &out[0];									\
 								CTextureInfoLookup	*lookup;										\
+								osLock(CRenderer::shaderMutex);										\
 								if ((lookup = (CTextureInfoLookup *) parameterlist) == NULL) {		\
 									/* cache the texture lookup */									\
 									lookup					=	new CTextureInfoLookup;				\
 									parameterlist			=	lookup;								\
 									dirty();														\
-									lookup->textureInfo		=	getTextureInfo(op1->string);		\
+									lookup->textureInfo		=	CRenderer::getTextureInfo(op1->string);\
 								}																	\
+								osUnlock(CRenderer::shaderMutex);									\
 																									\
 								textureInfo = lookup->textureInfo;									\
 								if (textureInfo == NULL) {											\
@@ -1291,7 +1293,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 										operand(i*2+start+1,val);												\
 																												\
 										if (strcmp(param->string,"filter") == 0) {								\
-											lookup->filter	=	currentRenderer->getFilter(val->string);		\
+											lookup->filter	=	CRenderer::getFilter(val->string);					\
 										} else if (strcmp(param->string,"blur") == 0) {							\
 											lookup->blur		=	val->real;									\
 											lookup->coneAngle	=	(float) (C_PI*val->real);					\
@@ -1322,6 +1324,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 #define	TEXTUREFEXPR_PRE		TCode			*res;															\
 								const TCode		*op3,*op4;														\
 								CTextureLookup	*lookup;														\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
 									TCode		*op1,*op2;														\
@@ -1329,15 +1332,16 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CRenderer::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	TRUE;										\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float));	\
+								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
@@ -1373,7 +1377,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4(color,cs,ct,lookup);												\
+								tex->lookup4(color,cs,ct,lookup,this);											\
 								res[i].real	=	color[0];
 
 #define	TEXTUREFEXPR_UPDATE		i++;
@@ -1399,6 +1403,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 #define	TEXTURECEXPR_PRE		TCode			*res;															\
 								const TCode		*op3,*op4;														\
 								CTextureLookup	*lookup;														\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
 									TCode		*op1,*op2;														\
@@ -1406,15 +1411,16 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CRenderer::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	FALSE;										\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float));	\
+								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
@@ -1449,7 +1455,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4((float *) res,cs,ct,lookup);
+								tex->lookup4((float *) res,cs,ct,lookup,this);
 
 #define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;
 #else
@@ -1489,6 +1495,7 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 								CTextureLookup	*lookup;														\
 								float			cs[4],ct[4];													\
 								vector			tmp;															\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
 									TCode		*op1,*op2;														\
@@ -1496,10 +1503,11 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CRenderer::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	TRUE;										\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								CTexture		*tex		=	lookup->texture;								\
 								operand(0,res);																	\
 								operand(3,op3);																	\
@@ -1519,7 +1527,7 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 								ct[1]		=	op6->real;														\
 								ct[2]		=	op8->real;														\
 								ct[3]		=	op10->real;														\
-								tex->lookup4(tmp,cs,ct,lookup);													\
+								tex->lookup4(tmp,cs,ct,lookup,this);											\
 								res->real	=	tmp[0];
 
 #define	TEXTUREFFULLEXPR_UPDATE	res++;																			\
@@ -1557,6 +1565,7 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								const TCode		*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;						\
 								CTextureLookup	*lookup;														\
 								float			cs[4],ct[4];													\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
 									TCode		*op1,*op2;														\
@@ -1564,10 +1573,11 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture				=	getTexture(op1->string);					\
+									lookup->texture				=	CRenderer::getTexture(op1->string);			\
 									lookup->channel				=	(int) op2->real;							\
 									lookup->lookupFloat			=	FALSE;										\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								CTexture		*tex		=	lookup->texture;								\
 								operand(0,res);																	\
 								operand(3,op3);																	\
@@ -1587,7 +1597,7 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								ct[1]		=	op6->real;														\
 								ct[2]		=	op8->real;														\
 								ct[3]		=	op10->real;														\
-								tex->lookup4((float *) res,cs,ct,lookup);
+								tex->lookup4((float *) res,cs,ct,lookup,this);
 
 #define	TEXTURECFULLEXPR_UPDATE	res	+=	3;																		\
 								op3++;																			\
@@ -1639,6 +1649,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 								TCode			*res;																\
 								const TCode		*op3;																\
 								int				i;																	\
+								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
 									TCode			*op2,*op1;														\
 									int				numArguments;													\
@@ -1651,9 +1662,10 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"reflection") == 0)) {		\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CRenderer::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
+								osUnlock(CRenderer::shaderMutex);													\
 								if (lookup->environment == NULL) {													\
 									float			*color;															\
 									const int		numRealVertices = currentShadingState->numRealVertices;			\
@@ -1661,7 +1673,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									operand(0,res);																	\
 									operand(3,op3);																	\
 																													\
-									color						=	(float *) ralloc(numRealVertices*3*sizeof(float));	\
+									color						=	(float *) ralloc(numRealVertices*3*sizeof(float),threadMemory);	\
 									traceReflection(color,varying[VARIABLE_P],(float *) op3,numRealVertices,tags,lookup);	\
 																													\
 									for (i=numRealVertices;i>0;i--,tags++,res++,color+=3) {							\
@@ -1673,7 +1685,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									const float		*D;																\
 									vector			color;															\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1702,7 +1714,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(color,D0,D1,D2,D3,lookup);									\
+											tex->lookup(color,D0,D1,D2,D3,lookup,this);								\
 											res->real	=	color[0];												\
 										}																			\
 										res			++;																\
@@ -1731,6 +1743,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 								TCode			*res;																\
 								const TCode		*op3;																\
 								int				i;																	\
+								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
 									TCode			*op2,*op1;														\
 									int				numArguments;													\
@@ -1743,9 +1756,10 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"shadow") == 0)) {\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CRenderer::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
+								osUnlock(CRenderer::shaderMutex);													\
 								if (lookup->environment == NULL) {													\
 									float			*color;															\
 									const int		numRealVertices = currentShadingState->numRealVertices;			\
@@ -1753,7 +1767,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 									operand(0,res);																	\
 									operand(3,op3);																	\
 																													\
-									color						=	(float *) ralloc(numRealVertices*3*sizeof(float));	\
+									color						=	(float *) ralloc(numRealVertices*3*sizeof(float),threadMemory);	\
 																													\
 									traceTransmission(color,(float *) op3,varying[VARIABLE_L],numRealVertices,tags,lookup);	\
 																													\
@@ -1766,7 +1780,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 									const float		*D;																\
 									vector			color;															\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1795,7 +1809,7 @@ DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NU
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(color,D0,D1,D2,D3,lookup);									\
+											tex->lookup(color,D0,D1,D2,D3,lookup,this);								\
 											res->real	=	color[0];												\
 										}																			\
 										res			++;																\
@@ -1824,6 +1838,7 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 								TCode			*res;																\
 								const TCode		*op3;																\
 								int				i;																	\
+								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
 									TCode			*op2,*op1;														\
 									int				numArguments;													\
@@ -1836,9 +1851,10 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"reflection") == 0)) {		\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CRenderer::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
+								osUnlock(CRenderer::shaderMutex);													\
 								if (lookup->environment == NULL) {													\
 									const int		numRealVertices = currentShadingState->numRealVertices;			\
 																													\
@@ -1849,7 +1865,7 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 								} else {																			\
 									const float		*D;																\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1878,7 +1894,7 @@ DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EX
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(&res->real,D0,D1,D2,D3,lookup);								\
+											tex->lookup(&res->real,D0,D1,D2,D3,lookup,this);						\
 										}																			\
 										res			+=	3;															\
 										D			+=	3;															\
@@ -1906,6 +1922,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 								TCode			*res;																\
 								const TCode		*op3;																\
 								int				i;																	\
+								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
 									TCode			*op2,*op1;														\
 									int				numArguments;													\
@@ -1918,9 +1935,10 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"shadow") == 0)) {		\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	getEnvironment(op1->string);					\
+										lookup->environment		=	CRenderer::getEnvironment(op1->string);			\
 									}																				\
 								}																					\
+								osUnlock(CRenderer::shaderMutex);													\
 								if (lookup->environment == NULL) {													\
 									const int		numRealVertices = currentShadingState->numRealVertices;			\
 																													\
@@ -1937,7 +1955,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 								} else {																			\
 									const float		*D;																\
 									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float));	\
+									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
 									float			*dDdv		=	dDdu + numVertices*3;							\
 									const float		*du			=	varying[VARIABLE_DU];							\
 									const float		*dv			=	varying[VARIABLE_DV];							\
@@ -1966,7 +1984,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NU
 											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
 											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
 																													\
-											tex->lookup(&res->real,D0,D1,D2,D3,lookup);								\
+											tex->lookup(&res->real,D0,D1,D2,D3,lookup,this);						\
 										}																			\
 										res			+=	3;															\
 										D			+=	3;															\
@@ -2005,7 +2023,7 @@ DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWCEXPR_PRE,NULL_EXPR,NULL_EX
 										operand(i*2+start+1,val);												\
 																												\
 										if (strcmp(param->string,"filter") == 0) {								\
-											lookup->filter		=	currentRenderer->getFilter(val->string);	\
+											lookup->filter		=	CRenderer::getFilter(val->string);				\
 										} else if (strcmp(param->string,"width") == 0) {						\
 											lookup->width		=	val->real;									\
 										}																		\
@@ -2022,14 +2040,16 @@ DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWCEXPR_PRE,NULL_EXPR,NULL_EX
 							float			val;																\
 							int				i;																	\
 							float			step,vstep;															\
+							osLock(CRenderer::shaderMutex);														\
 							if ((lookup = (CFilterLookup *) parameterlist) == NULL) {							\
 								int				numArguments;													\
 								argumentcount(numArguments);													\
 								FILTERPARAMETERS(3,(numArguments-3) >> 1);										\
 								lookup->compute();																\
 							}																					\
+							osUnlock(CRenderer::shaderMutex);													\
 							const	float			width	=	lookup->width;									\
-							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float));	\
+							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
 							float	*dsdv					=	dsdu + numVertices;								\
 							float	*fwidth					=	dsdu;											\
 							const float		*du				=	varying[VARIABLE_DU];							\
@@ -2084,12 +2104,14 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 							float			val;																\
 							int				i;																	\
 							float			step,vstep,fwidth;													\
+							osLock(CRenderer::shaderMutex);														\
 							if ((lookup = (CFilterLookup *) parameterlist) == NULL) {							\
 								int				numArguments;													\
 								argumentcount(numArguments);													\
 								FILTERPARAMETERS(4,(numArguments-4) >> 1);										\
 								lookup->compute();																\
 							}																					\
+							osUnlock(CRenderer::shaderMutex);													\
 							const	float			width	=	lookup->width;
 
 #define	FILTERSTEP3EXPR		tmp		=	0;																		\
@@ -2126,12 +2148,12 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 // This macro is used to decode the bake3d parameter list
 #define	TEXTURE3DPARAMETERS(start,num)																			\
 								lookup						=	new CTexture3dLookup;							\
-								const char **channelNames	=	(const char **) ralloc(num*sizeof(char*));		\
+								const char **channelNames	=	(const char **) ralloc(num*sizeof(char*),threadMemory);		\
 								parameterlist				=	lookup;											\
 								dirty();																		\
 								lookup->radius			=	-1.0f;												\
 								lookup->radiusScale		=	1.0f;												\
-								lookup->coordsys		=	NULL;												\
+								lookup->coordsys		=	coordinateWorldSystem;								\
 								lookup->numChannels		=	0;													\
 								lookup->dataStart		=	start;												\
 								{																				\
@@ -2150,7 +2172,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											lookup->radius		=	val->real;									\
 											lookup->dataStart += 2;												\
 										} else if (strcmp(param->string,"coordsystem") == 0) {					\
-											lookup->coordsys	=	strdup(val->string);								\
+											lookup->coordsys	=	val->string;								\
 											lookup->dataStart += 2;												\
 										} else {																\
 											channelNames[lookup->numChannels++]	= param->string;				\
@@ -2167,67 +2189,44 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								CTexture3dLookup*lookup;														\
 								int				numArguments;													\
 								argumentcount(numArguments);													\
-								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*));	\
+								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*),threadMemory);	\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									TCode		*op1,*op2;														\
+									TCode				*op1,*op2;												\
+									const float			*from,*to;												\
+									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(5,(numArguments-5) >> 1);								\
 									operand(1,op1);																\
 									operand(2,op2);																\
-									lookup->texture		=	getTexture3d(op1->string,TRUE,op2->string,lookup->coordsys);							\
+									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,TRUE,op2->string,from,to);						\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
-									lookup->valueSpace	=	new float[lookup->sampleSize];						\
+									lookup->nv			=	CRenderer::numThreads;								\
+									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
+									for (int t = 0; t<CRenderer::numThreads; t++)								\
+										lookup->valueSpace[t] = new float[lookup->sampleSize];					\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
 								operand(3,op3);																	\
 								operand(4,op4);																	\
 								int				i;																\
-								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float));	\
-								float			*dPdv		=	dPdu + numVertices*3;							\
-								float			*radius		=	dPdv + numVertices*3;							\
-								const	float	radiiscale	=	lookup->radiusScale;							\
-								float			*r			=	radius;											\
+								float			*radius		=	rayDiff((const float *) op3);					\
 								CTexture3d		*tex		=	lookup->texture;								\
-								const float		*D			=	(const float *) op3;							\
-								const float		*du			=	varying[VARIABLE_DU];							\
-								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								duVector(dPdu,D);																\
-								dvVector(dPdv,D);																\
-																												\
-								if ( lookup->radius < 0 ) {														\
-									/* unless one was specified, calculate the radius */						\
-									for (i=0;i<numVertices;i++) {												\
-										vector	D0,D1,D2,D3;													\
-										vector	l0,l1,l2,l3;													\
-																												\
-										D0[0]	=	D[0];														\
-										D0[1]	=	D[1];														\
-										D0[2]	=	D[2];														\
-										D1[0]	=	D[0] + dPdu[0]*du[0];										\
-										D1[1]	=	D[1] + dPdu[1]*du[0];										\
-										D1[2]	=	D[2] + dPdu[2]*du[0];										\
-										D2[0]	=	D[0] + dPdv[0]*dv[0];										\
-										D2[1]	=	D[1] + dPdv[1]*dv[0];										\
-										D2[2]	=	D[2] + dPdv[2]*dv[0];										\
-										D3[0]	=	D[0] + dPdv[0]*dv[0] + dPdu[0]*du[0];						\
-										D3[1]	=	D[1] + dPdv[1]*dv[0] + dPdu[1]*du[0];						\
-										D3[2]	=	D[2] + dPdv[2]*dv[0] + dPdu[2]*du[0];						\
-																												\
-										subvv(l0,D0,D1);														\
-										subvv(l1,D1,D3);														\
-										subvv(l2,D3,D2);														\
-										subvv(l3,D2,D0);														\
-																												\
-										float rm = max(dotvv(l0,l0),dotvv(l1,l1));								\
-										rm = max(rm,dotvv(l2,l2));												\
-										rm = max(rm,dotvv(l3,l3));												\
-																												\
-										*r++ = radiiscale*0.5f*sqrtf(rm);										\
-									}																			\
-								} else {																		\
+								if ( lookup->radius > 0 ) {														\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
-										*r++ = radiiscale*lookup->radius;														\
+										*r++ = radiiscale*lookup->radius;										\
+									}																			\
+								} else {																		\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
+									/* no radius given, scale dP */												\
+									for (i=0;i<numVertices;i++,r++) {											\
+										r[0] = radiiscale*0.5f*r[0];												\
 									}																			\
 								}																				\
 																												\
@@ -2235,8 +2234,8 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									operand(lookup->dataStart+i*2+1,channelValues[i]);							\
 								} 
 
-#define	BAKE3DEXPR				tex->prepareSample(lookup->valueSpace,(float**)channelValues,lookup->bindings);	\
-								tex->store(lookup->valueSpace,&op3->real,&op4->real,*radius);					\
+#define	BAKE3DEXPR				tex->prepareSample(lookup->valueSpace[thread],(float**)channelValues,lookup->bindings);	\
+								tex->store(lookup->valueSpace[thread],&op3->real,&op4->real,*radius);					\
 								res->real		=	1;
 
 #define	BAKE3DEXPR_UPDATE		res++;																			\
@@ -2268,66 +2267,43 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 								CTexture3dLookup	*lookup;													\
 								int				numArguments;													\
 								argumentcount(numArguments);													\
-								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*));	\
+								const TCode		**channelValues = (const TCode **) ralloc(numArguments*sizeof(TCode*),threadMemory);	\
+								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									TCode		*op1;															\
+									TCode				*op1;													\
+									const float			*from,*to;												\
+									ECoordinateSystem	cSystem;												\
 									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1);																\
-									lookup->texture		=	getTexture3d(op1->string,FALSE,NULL,lookup->coordsys);									\
+									findCoordinateSystem(lookup->coordsys,from,to,cSystem);						\
+									lookup->texture		=	CRenderer::getTexture3d(op1->string,FALSE,NULL,from,to);								\
 									lookup->sampleSize	=	lookup->texture->bindChannelNames(lookup->numChannels,channelNames,&lookup->bindings);	\
-									lookup->valueSpace	=	new float[lookup->sampleSize];						\
+									lookup->nv			=	CRenderer::numThreads;								\
+									lookup->valueSpace	=	new float*[CRenderer::numThreads];					\
+									for (int t = 0; t<CRenderer::numThreads; t++)								\
+										lookup->valueSpace[t] = new float[lookup->sampleSize];					\
 								}																				\
+								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res);																	\
 								operand(2,op2);																	\
 								operand(3,op3);																	\
 								int				i;																\
-								float			*dPdu		=	(float *) ralloc(numVertices*7*sizeof(float));	\
-								float			*dPdv		=	dPdu + numVertices*3;							\
-								float			*radius		=	dPdv + numVertices*3;							\
-								const	float	radiiscale	=	lookup->radiusScale;							\
-								float			*r			=	radius;											\
+								float			*radius		=	rayDiff((const float *) op2);					\
 								CTexture3d		*tex		=	lookup->texture;								\
-								const float		*D			=	(const float *) op2;							\
-								const float		*du			=	varying[VARIABLE_DU];							\
-								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								duVector(dPdu,D);																\
-								dvVector(dPdv,D);																\
-																												\
-								if ( lookup->radius < 0 ) {														\
-									/* unless one was specified, calculate the radius */						\
-									for (i=0;i<numVertices;i++) {												\
-										vector	D0,D1,D2,D3;													\
-										vector	l0,l1,l2,l3;													\
-																												\
-										D0[0]	=	D[0];														\
-										D0[1]	=	D[1];														\
-										D0[2]	=	D[2];														\
-										D1[0]	=	D[0] + dPdu[0]*du[0];										\
-										D1[1]	=	D[1] + dPdu[1]*du[0];										\
-										D1[2]	=	D[2] + dPdu[2]*du[0];										\
-										D2[0]	=	D[0] + dPdv[0]*dv[0];										\
-										D2[1]	=	D[1] + dPdv[1]*dv[0];										\
-										D2[2]	=	D[2] + dPdv[2]*dv[0];										\
-										D3[0]	=	D[0] + dPdv[0]*dv[0] + dPdu[0]*du[0];						\
-										D3[1]	=	D[1] + dPdv[1]*dv[0] + dPdu[1]*du[0];						\
-										D3[2]	=	D[2] + dPdv[2]*dv[0] + dPdu[2]*du[0];						\
-																												\
-										subvv(l0,D0,D1);														\
-										subvv(l1,D1,D3);														\
-										subvv(l2,D3,D2);														\
-										subvv(l3,D2,D0);														\
-																												\
-										float rm = max(dotvv(l0,l0),dotvv(l1,l1));								\
-										rm = max(rm,dotvv(l2,l2));												\
-										rm = max(rm,dotvv(l3,l3));												\
-																												\
-										*r++ = radiiscale*0.5f*sqrtf(rm);										\
-									}																			\
-								} else {																		\
+								if ( lookup->radius > 0 ) {														\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
 									/* explicit radius given */													\
 									for (i=0;i<numVertices;i++) {												\
-										*r++ = radiiscale*lookup->radius;														\
+										*r++ = radiiscale*lookup->radius;										\
+									}																			\
+								} else {																		\
+									const	float	radiiscale	=	lookup->radiusScale;						\
+									float			*r			=	radius;										\
+									/* no radius given, scale dP */												\
+									for (i=0;i<numVertices;i++,r++) {											\
+										r[0] = radiiscale*0.5f*r[0];												\
 									}																			\
 								}																				\
 																												\
@@ -2335,8 +2311,8 @@ DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR
 									operand(lookup->dataStart+i*2+1,channelValues[i]);							\
 								}
 
-#define	TEXTURE3DEXPR			tex->lookup(lookup->valueSpace,&op2->real,&op3->real,*radius);							\
-								tex->unpackSample(lookup->valueSpace,(float**)channelValues,lookup->bindings);			\
+#define	TEXTURE3DEXPR			tex->lookup(lookup->valueSpace[thread],&op2->real,&op3->real,*radius);							\
+								tex->unpackSample(lookup->valueSpace[thread],(float**)channelValues,lookup->bindings);			\
 								res->real		=	1;
 
 #define	TEXTURE3DEXPR_UPDATE	res++;																			\

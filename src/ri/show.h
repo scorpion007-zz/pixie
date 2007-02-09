@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -34,26 +34,27 @@
 
 #include "common/global.h"
 #include "shading.h"
+#include "xform.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
 // Description			:	This is just a wrapper to visualize a file
 // Comments				:
-// Date last edited		:	8/26/2001
 class	CShow : public CShadingContext {
 public:
-							CShow(COptions *,CXform *,SOCKET);
+							CShow(int thread);
 			virtual			~CShow();
 
+			static void		preDisplaySetup();
+
 			// Right after world end to force rendering of the entire frame
-			void			renderFrame() { }
+			void			renderingLoop() { }
 
 			// Delayed rendering functions
-			void			drawObject(CObject *,const float *,const float *) { }
+			void			drawObject(CObject *) { }
 
 			// Primitive creation functions
 			void			drawGrid(CSurface *,int,int,float,float,float,float) { }
-			void			drawRibbon(CSurface *,int,float,float) { }
 			void			drawPoints(CSurface *,int) { }
 
 };

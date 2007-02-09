@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Class				:	CDelayedData
 // Description			:	This is a simple container used by the rib interface for procedural dynamic objects
 // Comments				:
-// Date last edited		:	8/10/2001
 class	CDelayedData {
 public:
 					CDelayedData() {
@@ -60,57 +59,46 @@ public:
 // Class				:	CDelayedObject
 // Description			:	Contains a delayed object
 // Comments				:
-// Date last edited		:	8/10/2001
-class	CDelayedObject : public CSurface , public CTracable {
+class	CDelayedObject : public CObject {
 public:
 							CDelayedObject(CAttributes *,CXform *,const float *,const float *,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *,int *drc=NULL);
 							~CDelayedObject();
 
-	void					tesselate(CShadingContext *);
+							// Object interface
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *);
-	int						intersect(const float *,const float *) const;
-	void					intersect(CRay *,int &);
-	void					bound(float *,float *) const;
-	int						moving() const													{	return FALSE;		}
-	void					copy(CAttributes *,CXform *,CRendererContext *) const;
-
+	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
+	
 	void					(*subdivisionFunction)(void *,float);
 	void					(*freeFunction)(void *);
 	void					*data;
 	int						*dataRefCount;
 
+	vector					objectBmin,objectBmax;
+
 	int						processed;
-
-	vector					bmin,bmax;					// Bound in the object space
-	vector					cbmin,cbmax;				// Bound in the camera space
-
 };
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedInstance
 // Description			:	Contains an instance object
 // Comments				:
-// Date last edited		:	8/10/2001
-class	CDelayedInstance : public CSurface , public CTracable {
+class	CDelayedInstance : public CObject {
 public:
-							CDelayedInstance(CAttributes *,CXform *,CArray<CObject *> *);
+							CDelayedInstance(CAttributes *,CXform *,CObject *);
 							~CDelayedInstance();
 
-	void					tesselate(CShadingContext *);
+							// Object interface
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *);
-	int						intersect(const float *,const float *) const;
-	void					intersect(CRay *,int &);
-	void					bound(float *,float *) const;
-	int						moving() const													{	return FALSE;		}
-	void					copy(CAttributes *,CXform *,CRendererContext *) const;
-
-	CArray<CObject *>		*instance;
+	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
+	
+	CObject					*instance;
 	int						processed;
-
-	vector					bmin,bmax;					// Bound in the object space
-	vector					cbmin,cbmax;				// Bound in the camera space
-
 };
+
+
 #endif
 
 

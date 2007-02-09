@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -144,11 +144,11 @@ DEFFUNC(Cos			,"cos"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NU
 DEFFUNC(Tan			,"tan"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	FUNCTION(x)	asin(x)
+#define	FUNCTION(x)	asin(max(min(x,1),-1))
 DEFFUNC(Asin		,"asin"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	FUNCTION(x)	acos(x)
+#define	FUNCTION(x)	acos(max(min(x,1),-1))
 DEFFUNC(Acos		,"acos"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
@@ -160,11 +160,11 @@ DEFFUNC(Atan		,"atan"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),N
 DEFFUNC(Exp			,"exp"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	FUNCTION(x)	log(x)
+#define	FUNCTION(x)	log(max(x,0))
 DEFFUNC(Log			,"log"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	FUNCTION(x)	sqrt(x)
+#define	FUNCTION(x)	sqrt(max(x,0))
 DEFFUNC(Sqrt		,"sqrt"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
@@ -260,16 +260,22 @@ DEFFUNC(Stepf		,"step"		,"f=ff",FUN3EXPR_PRE,STEPEXP,FUN3EXPR_UPDATE(1,1,1),NULL
 DEFFUNC(SmoothStepf		,"smoothstep"		,"f=fff",FUN4EXPR_PRE,SMOOTHSTEPEXP,FUN4EXPR_UPDATE(1,1,1,1),NULL_EXPR,0)
 
 #define	RANDOMFEXP		res->real	=	urand();
-DEFFUNC(Randomf		,"random"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 
 #define	RANDOMVEXP		res[0].real	=	urand();	\
 						res[1].real	=	urand();	\
 						res[2].real	=	urand();
 
+DEFFUNC(Randomf			,"random"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 DEFLINKFUNC(Random1		,"random"		,"c=", 0)
 DEFLINKFUNC(Random2		,"random"		,"p=", 0)
 DEFLINKFUNC(Random3		,"random"		,"n=", 0)
 DEFFUNC(Randomv			,"random"		,"v=",FUN1EXPR_PRE,RANDOMVEXP,FUN1EXPR_UPDATE(3),NULL_EXPR,0)
+
+DEFFUNC(URandomf		,"urandom"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
+DEFLINKFUNC(URandom1	,"urandom"		,"c=", 0)
+DEFLINKFUNC(URandom2	,"urandom"		,"p=", 0)
+DEFLINKFUNC(URandom3	,"urandom"		,"n=", 0)
+DEFFUNC(URandomv		,"urandom"		,"v=",FUN1EXPR_PRE,RANDOMVEXP,FUN1EXPR_UPDATE(3),NULL_EXPR,0)
 
 #define	XCOMPEXP		res->real	=	op[0].real;
 DEFLINKFUNC(Xcomp1		,"xcomp"		,"f=p", 0)
@@ -473,7 +479,7 @@ DEFFUNC(Scalem			,"scale"				,"m=mp"		,SCALEEXPR_PRE,SCALEEXPR,FUN3EXPR_UPDATE(1
 							operand(0,res);													\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
 								operand(i+1,op[i]);											\
@@ -502,7 +508,7 @@ DEFFUNC(Minf				,"min"						,"f=f+"		,MINFEXPR_PRE,MINFEXPR,MINFEXPR_UPDATE,MINF
 							operand(0,res);													\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
 								operand(i+1,op[i]);											\
@@ -537,7 +543,7 @@ DEFFUNC(Minv				,"min"						,"v=v+"		,MINVEXPR_PRE,MINVEXPR,MINVEXPR_UPDATE,MINV
 							operand(0,res);													\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
 								operand(i+1,op[i]);											\
@@ -567,7 +573,7 @@ DEFFUNC(Maxf				,"max"						,"f=f+"		,MAXFEXPR_PRE,MAXFEXPR,MAXFEXPR_UPDATE,MAXF
 							operand(0,res);													\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
 								operand(i+1,op[i]);											\
@@ -682,8 +688,8 @@ DEFFUNC(Match					,"match"						,"f=ss"		,FUN3EXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE
 							operandSize(0,res,resStep);											\
 							argumentcount(numArguments);										\
 							numArguments--;														\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int));			\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);			\
 																								\
 							for (i=0;i<numArguments;i++) {										\
 								operandSize(i+1,op[i],opSteps[i]);								\
@@ -736,8 +742,8 @@ DEFFUNC(Printf				,"printf"						,"o=s.*"		,PRINTFEXPR_PRE,PRINTFEXPR,PRINTF_UPD
 							argumentcount(numArguments);										\
 							numArguments--;														\
 							numArguments--;														\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int));			\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							opSteps	=	(int *)			ralloc(numArguments*sizeof(int),threadMemory);		\
 																								\
 							for (i=0;i<numArguments;i++) {										\
 								operandSize(i+2,op[i],opSteps[i]);								\
@@ -796,7 +802,7 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 							operand(2,val);														\
 							argumentcount(numArguments);										\
 							numArguments-=3;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
 							numPieces = (numArguments-4)/ustep+1;								\
 																								\
 							for (i=0;i<numArguments;i++) {										\
@@ -819,7 +825,7 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 							argumentcount(numArguments);										\
 							numArguments--;														\
 							numArguments--;														\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *));	\
+							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
 							numPieces = (numArguments-3);										\
 																								\
 							for (i=0;i<numArguments;i++) {										\
@@ -956,8 +962,8 @@ DEFFUNC(VSplinep		,"spline"		,"p=Sfpppp*"	,SPLINEVEXPR_PRE,SPLINEPEXPR,SPLINEPEX
 							int					i;											\
 																							\
 							argumentcount(numArguments);									\
-							op		=	(TCode **) ralloc(numArguments*sizeof(TCode *));	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int));		\
+							op		=	(TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
 							for (i=0;i<numArguments;i++) {									\
 								operandSize(i+2,op[i],opSteps[i]);							\
@@ -988,8 +994,8 @@ DEFFUNC(DSO				,"XXX",			"XXX",	DSOEXEC_PRE,DSOEXEC,DSOEXEC_UPDATE,DSOEXEC_POST,
 																							\
 							argumentcount(numArguments);									\
 							numArguments++;													\
-							op		=	(TCode **) ralloc(numArguments*sizeof(TCode *));	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int));		\
+							op		=	(TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
 							for (i=1;i<numArguments;i++) {									\
 								operandSize(i+1,op[i],opSteps[i]);							\

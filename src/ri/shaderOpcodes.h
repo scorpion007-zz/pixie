@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -44,7 +44,7 @@
 									TCode			*operand;												\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
-									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)*4);	\
+									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)*4,threadMemory);	\
 									float			*Ntmp		=	costheta + numVertices;					\
 									int				i;														\
 									lightCatPreExpr;														\
@@ -106,7 +106,7 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 									int				i;														\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
-									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float));	\
+									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 									lightCatPreExpr;														\
 									beginIndex		=	argument(3);										\
 									endIndex		=	argument(4);										\
@@ -220,7 +220,7 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 									operand(0,P);														\
 									Pl	=	(float *) P;												\
 																										\
-									if (hiderFlags & HIDER_ILLUMINATIONHOOK) {							\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
 										illuminateBegin(Pl,NULL,NULL);									\
 									} else {															\
 										float		*Ps			=	varying[VARIABLE_PS];				\
@@ -278,7 +278,7 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 									Nf		=	&N->real;												\
 									thetaf	=	&theta->real;											\
 																										\
-									if (hiderFlags & HIDER_ILLUMINATIONHOOK) {							\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
 										illuminateBegin(Pf,Nf,thetaf);									\
 									} else {															\
 										float		*Ps		=	varying[VARIABLE_PS];					\
@@ -327,7 +327,7 @@ DEFOPCODE(Illuminate3	,"illuminate"	,4, ILLUMINATE3EXPR_PRE, NULL_EXPR, NULL_EXP
 #ifdef INIT_SHADING
 #define	ILLUMINATEEND_PRE
 #else
-#define	ILLUMINATEEND_PRE			if (hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+#define	ILLUMINATEEND_PRE			if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
 										illuminateEnd();										\
 									} else {													\
 										const float		*L;										\
@@ -389,7 +389,7 @@ DEFOPCODE(EndIlluminate	,"endilluminate"	,0, ILLUMINATEEND_PRE, NULL_EXPR, NULL_
 #else
 #define	SOLAR1EXPR_PRE				int		i;													\
 																								\
-									if (hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
 										solarBegin(NULL,NULL);									\
 									} else {													\
 										float	*Ps		=	varying[VARIABLE_PS];				\
@@ -429,7 +429,7 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 									Nf		=	&N->real;										\
 									thetaf	=	&theta->real;									\
 																								\
-									if (hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
 										solarBegin(Nf,thetaf);									\
 									} else {													\
 										vector		R;											\
@@ -438,7 +438,7 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 										const float	*Ns			=	currentShadingState->Ns;	\
 										const float	*costheta	=	currentShadingState->costheta;		\
 																								\
-										subvv(R,worldBmax,worldBmin);							\
+										subvv(R,CRenderer::worldBmax,CRenderer::worldBmin);			\
 										worldRadius	=	dotvv(R,R);								\
 																								\
 										for (i=numVertices;i>0;i--,tags++) {					\
@@ -475,7 +475,7 @@ DEFOPCODE(Solar2	,"solar"	,3, SOLAR2EXPR_PRE, NULL_EXPR, NULL_EXPR, SOLAR2EXPR_P
 #ifdef INIT_SHADING
 #define SOLAREND_PRE
 #else
-#define	SOLAREND_PRE				if (hiderFlags & HIDER_ILLUMINATIONHOOK) {				\
+#define	SOLAREND_PRE				if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
 										solarEnd();											\
 									} else {												\
 										const float		*L;									\
@@ -516,14 +516,14 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 
 
 #define	PFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
 							operand(2,op);											\
 							findCoordinateSystem(sys->string,from,to,cSystem);
 
-#define	PFROMEXPR			mulmp(&res->real,from[0],&op->real);
+#define	PFROMEXPR			mulmp(&res->real,from,&op->real);
 
 #define	PFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;
@@ -531,7 +531,7 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 #define	PFROMEXPR_POST
 
 #define	CFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
@@ -547,14 +547,14 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 
 
 #define	MFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
 							operand(2,op);											\
 							findCoordinateSystem(sys->string,from,to,cSystem);
 
-#define	MFROMEXPR			mulmm(&res->real,from[0],&op->real);
+#define	MFROMEXPR			mulmm(&res->real,from,&op->real);
 
 #define	MFROMEXPR_UPDATE	res	+=	16;												\
 							op	+=	16;
@@ -562,14 +562,14 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 #define	MFROMEXPR_POST
 
 #define	VFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							matrix				*from,*to;							\
+							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
 							operand(0,res);											\
 							operand(1,sys);											\
 							operand(2,op);											\
 							findCoordinateSystem(sys->string,from,to,cSystem);
 
-#define	VFROMEXPR			mulmv(&res->real,from[0],&op->real);
+#define	VFROMEXPR			mulmv(&res->real,from,&op->real);
 
 #define	VFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;

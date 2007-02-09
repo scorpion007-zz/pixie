@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Description			:	Accumulate a sample into the matrices
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/16/2003
 inline	void	harmonicAccumulate(float *X,float *Y,const float *D,const float *C) {
 	float	y[9];
 	int		j,k;
@@ -72,7 +71,6 @@ inline	void	harmonicAccumulate(float *X,float *Y,const float *D,const float *C) 
 // Description			:	Evaluate spherical harmonics at a particular point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/16/2003
 inline	void	harmonicEvaluate(float *C,const float *Y,const float *D) {
 	float	y[9];
 
@@ -122,7 +120,6 @@ inline	void	harmonicEvaluate(float *C,const float *Y,const float *D) {
 // Description			:	Evaluate the diffuse illumination at a point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/16/2003
 inline	void	harmonicDiffuse(float *C,const float *Y,const float *D) {
 #define	c1	0.429043
 #define	c2	0.511664
@@ -165,7 +162,6 @@ inline	void	harmonicDiffuse(float *C,const float *Y,const float *D) {
 // Description			:	Multiply the harmonics with a normal vector
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/16/2003
 inline	void	harmonicTransform(float *y,const float *D) {
 #define	c1	0.429043
 #define	c2	0.511664
@@ -198,7 +194,6 @@ inline	void	harmonicTransform(float *y,const float *D) {
 // Description			:	Multiply the harmonics with a normal vector
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/16/2003
 inline	void	harmonicDot(float *C,const float *Y,const float *y) {
 	C[0]		=	Y[0*9+0]*y[0] + 
 					Y[0*9+1]*y[1] + 

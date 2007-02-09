@@ -2,7 +2,7 @@
 //Do not mess with it
 
 #ifdef DEFINE_STOCHASTIC_SWITCH
-switch((grid->flags & RASTER_GLOBAL_MASK) | (depthFilter << RASTER_HIGHBITS_SHIFT)) {
+switch((grid->flags & RASTER_GLOBAL_MASK) | (CRenderer::depthFilter << RASTER_HIGHBITS_SHIFT)) {
 case 0:
 	drawQuadGridZmin(grid);
 	break;

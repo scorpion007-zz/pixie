@@ -35,7 +35,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -968,7 +968,6 @@ yyerrhandle:
 // Description			:	Parse a parameter list and extract the function
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
-// Date last edited		:	7/30/2002
 int		dsoParse(const char *decl,char *&name,char *&prototype) {
 	YY_BUFFER_STATE savedState	=	YY_CURRENT_BUFFER;		// Save the old buffer
 	YY_BUFFER_STATE	newState;
@@ -995,7 +994,6 @@ int		dsoParse(const char *decl,char *&name,char *&prototype) {
 // Description			:	Count the parse errors
 // Return Value			:
 // Comments				:
-// Date last edited		:	7/30/2002
 void	dsoerror(char *,...) {
 	numErrors++;
 }

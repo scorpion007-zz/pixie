@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -41,7 +41,6 @@
 //							local system to the global system and "to"
 //							is the transformation from global to local system
 // Comments				:
-// Date last edited		:	3/3/2001
 class CXform {
 public:
 				CXform();
@@ -64,6 +63,7 @@ public:
 	void		invert();
 	void		transformBound(float *,float *) const;
 	void		invTransformBound(float *,float *) const;
+	void		updateBound(float *,float *,int,const float *);
 
 	int			normalFlip()		{
 					if (flip == -1) {
@@ -78,5 +78,6 @@ public:
 	int			flip;								// TRUE if the determinant is < 0
 };
 
+void	transformBound(float *bmax,float *bmin,const float *to,const float *obmin,const float *obmax);
 #endif
 

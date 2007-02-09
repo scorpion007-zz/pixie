@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -49,7 +49,6 @@ const	unsigned	int	magicNumber	=	123456789;
 // Class				:	CFileResource
 // Description			:	Any class that is read or written to a file must derive from this class
 // Comments				:
-// Date last edited		:	7/4/2001
 class	CFileResource {
 public:
 					CFileResource(const char *);

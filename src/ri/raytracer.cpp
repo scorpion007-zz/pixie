@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -31,12 +31,11 @@
 #include <math.h>
 
 #include "raytracer.h"
-#include "renderer.h"
 #include "shading.h"
-#include "stats.h"
 #include "random.h"
 #include "memory.h"
 #include "error.h"
+#include "renderer.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPrimaryBundle
@@ -44,22 +43,21 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOrder,int numExtraSamp,float *sampDefaults) {
 	int		i;
 	float	*src;
 
-	maxPrimaryRays	=	mr;
+	maxPrimaryRays		=	mr;
 	numExtraChannels	=	0;		// These will be filled in after constuction if needed
-	sampleOrder		=	NULL;
-	rayBase			=	new CPrimaryRay[maxPrimaryRays];
-	rays			=	new CRay*[maxPrimaryRays];
-	last			=	0;
-	depth			=	0;
-	numRays			=	0;
-	allSamples		=	new float[numSamples*maxPrimaryRays];
+	sampleOrder			=	NULL;
+	rayBase				=	new CPrimaryRay[maxPrimaryRays];
+	rays				=	new CRay*[maxPrimaryRays];
+	last				=	0;
+	depth				=	0;
+	numRays				=	0;
+	allSamples			=	new float[numSamples*maxPrimaryRays];
 
-	src				=	allSamples;
+	src					=	allSamples;
 	for (i=0;i<maxPrimaryRays;i++,src+=numSamples) {
 		rayBase[i].samples	=	src;
 	}
@@ -77,7 +75,6 @@ CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOr
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 CPrimaryBundle::~CPrimaryBundle() {
 	delete [] rayBase;
 	delete [] rays;
@@ -90,7 +87,6 @@ CPrimaryBundle::~CPrimaryBundle() {
 // Description			:	Post trace action, force shading
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 int		CPrimaryBundle::postTraceAction() {
 	return TRUE;
 }
@@ -101,7 +97,6 @@ int		CPrimaryBundle::postTraceAction() {
 // Description			:	Record the raytracing results
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/20/2003
 void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 	float		*Ci		=	varying[VARIABLE_CI];
 	float		*Oi		=	varying[VARIABLE_OI];
@@ -245,7 +240,6 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 void	CPrimaryBundle::postShade(int nr,CRay **r) {
 	int			i,j;
 
@@ -284,7 +278,6 @@ void	CPrimaryBundle::postShade(int nr,CRay **r) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 void	CPrimaryBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -298,17 +291,16 @@ void	CPrimaryBundle::post() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
-CRaytracer::CRaytracer(COptions *o,CXform *x,SOCKET s)	: CShadingContext(o,x,s,HIDER_NEEDS_RAYTRACING),
-	primaryBundle(o->shootStep,numSamples,numExtraChannels,sampleOrder,numExtraSamples,sampleDefaults)  {
+CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
+	CRenderer::raytracingFlags	|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
+
+	const int		xoffset		=	(int) ceil((CRenderer::pixelFilterWidth		- 1)*0.5f);
+	const int		yoffset		=	(int) ceil((CRenderer::pixelFilterHeight	- 1)*0.5f);
+	const int		xpixels		=	CRenderer::bucketWidth + 2*xoffset;
+	const int		ypixels		=	CRenderer::bucketHeight + 2*yoffset;
 	
-	const int		xoffset				=	(int) ceil((pixelFilterWidth	- 1) / (float) 2);
-	const int		yoffset				=	(int) ceil((pixelFilterHeight	- 1) / (float) 2);
-	const int		xpixels				=	bucketWidth + 2*xoffset;
-	const int		ypixels				=	bucketHeight + 2*yoffset;
-	
-	fbContribution						=	new float[xpixels*ypixels];
-	fbPixels							=	new float[xpixels*ypixels*numSamples];
+	fbContribution				=	new float[xpixels*ypixels];
+	fbPixels					=	new float[xpixels*ypixels*CRenderer::numSamples];
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -317,7 +309,6 @@ CRaytracer::CRaytracer(COptions *o,CXform *x,SOCKET s)	: CShadingContext(o,x,s,H
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/26/2001
 CRaytracer::~CRaytracer() {
 	delete [] fbContribution;
 	delete [] fbPixels;
@@ -330,87 +321,64 @@ CRaytracer::~CRaytracer() {
 // Description			:	Replace the occurance of a pointer with another
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
-void	CRaytracer::renderFrame() {
+void	CRaytracer::renderingLoop() {
 	int				left;
 	int				top;
 	int				width;
 	int				height;
-	int				numRenderedBuckets	=	0;
-	const	char	*previousActivity	=	stats.activity;
+	CRenderer::CJob	job;
 
-	stats.activity	=	"Raytracer - rendering";
+	memBegin(threadMemory);
 
-	memBegin();
-
-	if (netClient != INVALID_SOCKET) {
-		// Let the client know that we're starting to render
-		T32		netBuffer;
-
-		// Let the server know that we're ready
-		netBuffer.integer	=	NET_READY;
-		rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
-	}
-
-	// Do the job
+	// While not done
 	while(TRUE) {
-		if (netClient != INVALID_SOCKET) {
-			T32	netBuffer[3];
 
-			// Receive the bucket to render from the client
-			rcRecv(netClient,(char *) netBuffer,3*sizeof(T32));
+		// Get the job from the renderer
+		CRenderer::dispatchJob(thread,job);
 
-			if (netBuffer[0].integer == NET_RENDER_BUCKET) {
-				currentXBucket	=	netBuffer[1].integer;
-				currentYBucket	=	netBuffer[2].integer;
-			} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
-				// We have finished the frame, so terminate
-				netBuffer[0].integer	=	NET_ACK;
-				rcSend(netClient,(char *) netBuffer,1*sizeof(T32));
-				
-				// send end of frame channel data
-				sendFrameDataChannels();
-				
-				break;
-			} else {
-				error(CODE_BUG,"Unrecognised network request\n");
-				break;
+		// Process the job
+		if (job.type == CRenderer::CJob::TERMINATE) {
+
+			// End the context
+			break;
+		} else if (job.type == CRenderer::CJob::BUCKET) {
+			const int	x	=	job.xBucket;
+			const int	y	=	job.yBucket;
+
+			assert(x < CRenderer::xBuckets);
+			assert(y < CRenderer::yBuckets);
+
+			currentXBucket	=	x;
+			currentYBucket	=	y;
+
+			left			=	x*CRenderer::bucketWidth;
+			top				=	y*CRenderer::bucketHeight;
+			width			=	min(CRenderer::bucketWidth,CRenderer::xPixels-left);
+			height			=	min(CRenderer::bucketHeight,CRenderer::yPixels-top);
+
+			// Sample the framebuffer
+			sample(left,top,width,height);
+
+			// Flush the data to the out devices
+			CRenderer::commit(left,top,width,height,fbPixels);
+			
+			// Send bucket data if we're a netrender
+			if (CRenderer::netClient != INVALID_SOCKET) {
+				CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
 			}
+
+			currentXBucket++;
+			if (currentXBucket == CRenderer::xBuckets) {
+				currentXBucket	=	0;
+				currentYBucket++;
+			}
+
 		} else {
-			if (hiderFlags & HIDER_BREAK)	break;
+			error(CODE_BUG,"Invalid job for the hider.\n");
 		}
-
-		left	=	currentXBucket*bucketWidth;
-		top		=	currentYBucket*bucketHeight;
-		width	=	min(bucketWidth,xPixels-left);
-		height	=	min(bucketHeight,yPixels-top);
-
-									// Sample the framebuffer
-		sample(left,top,width,height);
-
-									// Flush the data to the out devices
-		commit(left,top,width,height,fbPixels);
-		
-		// Advance the current bucket
-		if (netClient != INVALID_SOCKET) {
-			// send end of bucket channel data
-			sendBucketDataChannels(currentXBucket,currentYBucket);
-		} else {
-			// advance bucket after sending channel data
-			numRenderedBuckets++;
-
-			advanceBucket();
-		}
-
-		stats.progress	=	(numRenderedBuckets*100) / (float) (xBuckets*yBuckets);
-		if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done %%%3.2f\r",stats.progress);
 	}
 
-	memEnd();
-
-	stats.progress	=	100;
-	if (flags & OPTIONS_FLAGS_PROGRESS)	info(CODE_PROGRESS,"Done               \r");
-	stats.activity	=	previousActivity;
+	memEnd(threadMemory);
 }
 
 
@@ -418,31 +386,30 @@ void	CRaytracer::renderFrame() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
-// Method				:	sample
+// Method				:	sampleFi
 // Description			:	Samples a rectangular array of pixels
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	int				maxShading			=	primaryBundle.maxPrimaryRays;
 	int				i,j;
 	int				k;
-	const int		xoffset				=	(int) ceil((pixelFilterWidth	- 1)*pixelXsamples / (float) 2);
-	const int		yoffset				=	(int) ceil((pixelFilterHeight	- 1)*pixelYsamples / (float) 2);
-	const int		xsamples			=	xpixels*pixelXsamples + 2*xoffset;
-	const int		ysamples			=	ypixels*pixelYsamples + 2*yoffset;
+	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	 - 1)*CRenderer::pixelXsamples*0.5f);
+	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight - 1)*CRenderer::pixelYsamples*0.5f);
+	const int		xsamples			=	xpixels*CRenderer::pixelXsamples + 2*xoffset;
+	const int		ysamples			=	ypixels*CRenderer::pixelYsamples + 2*yoffset;
 	CPrimaryRay		*rays				=	primaryBundle.rayBase;
 	CRay			**rayPointers		=	primaryBundle.rays;
 	CPrimaryRay		*cRay;
-	const float		invXsamples			=	1 / (float) pixelXsamples;
-	const float		invYsamples			=	1 / (float) pixelYsamples;
+	const float		invXsamples			=	1 / (float) CRenderer::pixelXsamples;
+	const float		invYsamples			=	1 / (float) CRenderer::pixelYsamples;
 
 	// Clear the framebuffer
 	for (i=0;i<(xpixels*ypixels);i++) {
 		fbContribution[i]	=	0;
 		fbPixels[i]			=	0;
 	}
-	for (;i<(xpixels*ypixels*numSamples);i++) {
+	for (;i<(xpixels*ypixels*CRenderer::numSamples);i++) {
 		fbPixels[i]			=	0;
 	}
 
@@ -459,8 +426,8 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 
 				for (y=0;y<my;y++) {
 					for (x=0;x<mx;x++) {
-						cRay->x						=	(float) left + (float) (i+x-xoffset+jitter*(urand()-(float) 0.5) + (float) 0.5)*invXsamples;	// Center the sample location in the pixel
-						cRay->y						=	(float) top  + (float) (j+y-yoffset+jitter*(urand()-(float) 0.5) + (float) 0.5)*invYsamples;
+						cRay->x						=	(float) left + (float) (i+x-xoffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invXsamples;	// Center the sample location in the pixel
+						cRay->y						=	(float) top  + (float) (j+y-yoffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invYsamples;
 
 						rayPointers[numShading++]	=	cRay;
 						cRay++;
@@ -487,8 +454,8 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	for (i=0;i<xpixels*ypixels;i++) {
 		const float	invContribution	=	1 / fbContribution[i];
 
-		for (k=0;k<numSamples;k++) {
-			fbPixels[i*numSamples+k]	*=	invContribution;
+		for (k=0;k<CRenderer::numSamples;k++) {
+			fbPixels[i*CRenderer::numSamples+k]	*=	invContribution;
 		}
 	}
 }
@@ -501,32 +468,28 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 // Description			:	Raytrace the sample locations
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 	int			i;
 	float		x,y;
 	CPrimaryRay	*cRay	=	rays;
 
-	if (aperture == 0) {
+	if (CRenderer::aperture == 0) {
 		// No Depth of field effect
 
 		for (i=numShading;i>0;i--,cRay++) {
 			// First two numbers in the samples list are the x/y coordinates in pixels of the sample location
-			const float	jtime		=	urand();
-			vector		from,to;
-
 			x					=	cRay->x;
 			y					=	cRay->y;
 
+			vector		from,to;
 			pixels2camera(from,x,y,0);
-			pixels2camera(to,x,y,imagePlane);
+			pixels2camera(to,x,y,CRenderer::imagePlane);
 
 			movvv(cRay->from,from);
 			subvv(cRay->dir,to,from);
 			normalizev(cRay->dir);
 
-			cRay->time			=	jtime;
-			cRay->jimp			=	-1.0f;
+			cRay->time			=	urand();
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;
@@ -534,29 +497,45 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 	} else {
 		for (i=numShading;i>0;i--,cRay++) {
 			// First two numbers in the samples list are the x/y coordinates in pixels of the sample location
-			const float	jtime			=	urand();
-			vector		from,to;
-			const float	theta			=	(float) (urand()*2*C_PI);
-			const float	r				=	urand()*aperture;
-
 			x					=	cRay->x;
 			y					=	cRay->y;
 
+			vector		from,to;
 			pixels2camera(from,x,y,0);
-			pixels2camera(to,x,y,focaldistance);
+			pixels2camera(to,x,y,CRenderer::focaldistance);
 
-			from[COMP_X]	+=	cosf(theta) * r;
-			from[COMP_Y]	+=	sinf(theta) * r;
+			const float	theta	=	(float) (urand()*2*C_PI);
+			const float	r		=	urand()*CRenderer::aperture;
+			from[COMP_X]		+=	cosf(theta) * r;
+			from[COMP_Y]		+=	sinf(theta) * r;
 
 			movvv(cRay->from,from);
 			subvv(cRay->dir,to,from);
 			normalizev(cRay->dir);
 
-			cRay->time			=	jtime;
-			cRay->jimp			=	-1.0f;
+			cRay->time			=	urand();
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;
+		}
+	}
+
+	// Setup the ray differentials
+	if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+		const float	a	=	1 / (CRenderer::imagePlane*CRenderer::dPixeldx);
+
+		cRay	=	rays;
+		for (i=numShading;i>0;i--,cRay++) {
+			cRay->db			=	0;
+			cRay->da			=	a;
+		}
+	} else{
+		const float	a	=	1 / CRenderer::dPixeldx;
+
+		cRay	=	rays;
+		for (i=numShading;i>0;i--,cRay++) {
+			cRay->db			=	a;
+			cRay->da			=	0;
 		}
 	}
 
@@ -566,7 +545,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 	primaryBundle.depth		=	0;
 	trace(&primaryBundle);
 
-	stats.numShadingRays	+=	numShading;
+	numRaytraceRays	+=	numShading;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -575,11 +554,10 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 // Description			:	Splat the samples on the image
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	9/25/2001
 void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int top,int xpixels,int ypixels) {
 	int				i,j;
-	const int		pw			=	(int) ceil((pixelFilterWidth-1) / (float) 2);
-	const int		ph			=	(int) ceil((pixelFilterHeight-1) / (float) 2);
+	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1)*0.5f);
+	const int		ph			=	(int) ceil((CRenderer::pixelFilterHeight-1)*0.5f);
 
 	for (i=0;i<numShading;i++,samples++) {
 		const float	x			=	samples->x;
@@ -601,13 +579,9 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 
 		for (cy=pt + (float) 0.5 - y,pixelY=pt;pixelY<=pb;pixelY++,cy++) {
 			for (cx=pl + (float) 0.5 - x,pixelX=pl;pixelX<=pr;pixelX++,cx++) {
-				float	contribution					=	pixelFilter(cx,cy,pixelFilterWidth,pixelFilterHeight);
-
-				if (fabs(cx) > marginX)	contribution	*=	marginXcoverage;
-				if (fabs(cy) > marginY)	contribution	*=	marginYcoverage;
-
-				float		*dest	=	&fbPixels[((pixelY-top)*xpixels+pixelX-left)*this->numSamples];
-				const float	*src	=	fbs;
+				const float	contribution	=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
+				float		*dest			=	&fbPixels[((pixelY-top)*xpixels+pixelX-left)*CRenderer::numSamples];
+				const float	*src			=	fbs;
 
 				assert((top+ypixels) > pixelY);
 				assert((left+xpixels) > pixelX);
@@ -615,7 +589,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 				// Save the contribution for later normalization
 				fbContribution[((pixelY-top)*xpixels+pixelX-left)]	+=	contribution;
 
-				for (j=this->numSamples;j>0;j--) {
+				for (j=CRenderer::numSamples;j>0;j--) {
 					*dest++	+=	(*src++)*contribution;
 				}
 			}

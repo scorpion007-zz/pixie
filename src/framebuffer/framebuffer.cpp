@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -51,7 +51,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 CDisplay::CDisplay(const char *name,const char *samples,int width,int height,int numSamples) {
 	this->failure		=	FALSE;
 	this->name			=	strdup(name);
@@ -67,7 +66,6 @@ CDisplay::CDisplay(const char *name,const char *samples,int width,int height,int
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 CDisplay::~CDisplay() {
 	free(name);
 	free(samples);
@@ -80,7 +78,6 @@ CDisplay::~CDisplay() {
 // Description			:	The main display loop
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 void	CDisplay::clampData(int w,int h,float *d) {
 	float	*cData	=	d;
 	int		c		=	w*h*numSamples;
@@ -97,7 +94,6 @@ void	CDisplay::clampData(int w,int h,float *d) {
 // Description			:	Begin receiving an image
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
 
 #ifdef WIN32
@@ -119,7 +115,6 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Description			:	Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-// Date last edited		:	11/28/2001
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
 	CDisplay	*cWindow	=	(CDisplay *) im;
 
@@ -138,7 +133,6 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Description			:	Finish receiving an image
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
-// Date last edited		:	11/28/2001
 void	displayFinish(void *im) {
 	CDisplay	*cWindow		=	(CDisplay *) im;
 

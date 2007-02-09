@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -47,7 +47,6 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 // Description			:	Starts the display thread
 // Return Value			:
 // Comments				:
-// Date last edited		:	11/28/2001
 DWORD WINAPI  displayThread(void *w) {
 	CWinDisplay	*cDisplay		=	(CWinDisplay *) w;
 
@@ -64,7 +63,6 @@ DWORD WINAPI  displayThread(void *w) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 CWinDisplay::CWinDisplay(const char *name,const char *samples,int width,int height,int numSamples)
 : CDisplay(name,samples,width,height,numSamples) {
 	int	i,j;
@@ -102,7 +100,6 @@ CWinDisplay::CWinDisplay(const char *name,const char *samples,int width,int heig
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 CWinDisplay::~CWinDisplay() {
 	delete [] imageData;
 }
@@ -114,7 +111,6 @@ CWinDisplay::~CWinDisplay() {
 // Description			:	The main display loop
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 void	CWinDisplay::main() {
 	WNDCLASSEX	wcex;
 	RECT		clientRect,windowRect;
@@ -196,7 +192,6 @@ void	CWinDisplay::main() {
 // Description			:	Redraw the image
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 void	CWinDisplay::redraw() {
 	RECT	windowRect;
 	RECT	imageRect;
@@ -225,7 +220,6 @@ void	CWinDisplay::redraw() {
 // Description			:	Draw the data onto the screen
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 	int	i,j;
 
@@ -321,7 +315,6 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 // Description			:	Finish displaying the data
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 void	CWinDisplay::finish() {
 	// Pump the redraw message
 	redraw();
@@ -335,7 +328,6 @@ void	CWinDisplay::finish() {
 // Description			:	Windows callback function
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2002
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 		case WM_DESTROY:

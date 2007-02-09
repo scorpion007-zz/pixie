@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -40,7 +40,6 @@
 // Description			:	Translate an error code
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/10/2003
 static	int	translate(EErrorCode c) {
 	int	code;
 
@@ -158,7 +157,6 @@ static	int	translate(EErrorCode c) {
 // Description			:	Generate an error message
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/10/2003
 void	error(EErrorCode code,char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
@@ -175,7 +173,6 @@ void	error(EErrorCode code,char *mes,...) {
 // Description			:	Generate a warning message
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/10/2003
 void	warning(EErrorCode code,char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
@@ -192,7 +189,6 @@ void	warning(EErrorCode code,char *mes,...) {
 // Description			:	Generate a fatal message
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/10/2003
 void	fatal(EErrorCode code,char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
@@ -210,7 +206,6 @@ void	fatal(EErrorCode code,char *mes,...) {
 // Description			:	Generate an info message
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/10/2003
 void	info(EErrorCode code,char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,6 +32,7 @@
 #define TEXTURE3D_H
 
 #include "common/global.h"
+#include "common/os.h"
 #include "fileResource.h"
 #include "xform.h"
 #include "gui/opengl.h"
@@ -40,7 +41,6 @@
 // Class				:	CTexture3dChannel
 // Description			:	A point cloud channel
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CTexture3dChannel {
 public:
 	char					name[64];		// Name of the channel
@@ -53,16 +53,11 @@ public:
 // Class				:	CTexture3d
 // Description			:	Base class for 3d textures
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CTexture3d : public CFileResource, public CView {
 public:
-							CTexture3d(const char *,CXform *,int numChannels=0,CTexture3dChannel *channels=NULL);
+							CTexture3d(const char *,const float *from,const float *to,int numChannels=0,CTexture3dChannel *channels=NULL);
 	virtual					~CTexture3d();
-	
-	void					attach()	{	refCount++;	}
-	void					detach()	{	refCount--; if (refCount == 0) delete this; }
-	void					check()		{	if (refCount == 0)	delete this;			}
-	
+
 	virtual	void			lookup(float *,const float *,const float *,float) = 0;
 	virtual	void			store(const float *,const float *,const float *,float) = 0;
 	int						bindChannelNames(int&,const char **,CTexture3dChannel ***);
@@ -74,11 +69,10 @@ protected:
 	void					writeChannels(FILE *);
 	void					readChannels(FILE *);
 	
-	int						refCount;
 	int						dataSize;			// The size of each data sample
 	CTexture3dChannel		*channels;			// List of channels
 	int						numChannels;
-	CXform					*world;				// The world xform
+	matrix					from,to;			// The transformation to the coordinate system
 	float					dPscale;			// The amount we need to scale dP by
 	
 	friend class CRemotePtCloudChannel;

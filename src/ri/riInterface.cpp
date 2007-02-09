@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -365,15 +365,6 @@ void		CRiInterface::RiArchiveRecord(char * type,char *format,va_list args) {
 }
 
 void		CRiInterface::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]) {
-}
-
-void		CRiInterface::RiTrace(int,float [][3],float [][3],float [][3]) {
-}
-
-void		CRiInterface::RiTrace(int,float [][3],float [][3],float [][3],float []) {
-}
-
-void		CRiInterface::RiVisibility(int,float [][3],float [][3],float [][3]) {
 }
 
 void		CRiInterface::RiError(int c,int s,char *m) {

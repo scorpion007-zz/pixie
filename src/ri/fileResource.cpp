@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -50,7 +50,6 @@ const	char	*fileBrickMap			=	"BrickMap";
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 CFileResource::CFileResource(const char *n) {
 	name	=	strdup(n);
 }
@@ -61,7 +60,6 @@ CFileResource::CFileResource(const char *n) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/3/2001
 CFileResource::~CFileResource() {
 	free((void *) name);
 }
@@ -72,7 +70,6 @@ CFileResource::~CFileResource() {
 // Description			:	Open a binary file
 // Return Value			:	File handle is successful
 // Comments				:	-
-// Date last edited		:	10/13/2003
 FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 	FILE	*f	=	fopen(name,mode);
 	int		i;
@@ -138,7 +135,6 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 // Description			:	Open a binary file
 // Return Value			:	File handle is successful
 // Comments				:	-
-// Date last edited		:	10/13/2003
 FILE	*ropen(const char *name,char *type) {
 	FILE			*f	=	fopen(name,"rb");
 	int				i;

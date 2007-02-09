@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -37,7 +37,6 @@
 #include "options.h"
 #include "shader.h"
 #include "cache.h"
-#include "hierarchy.h"
 #include "random.h"
 #include "depository.h"
 
@@ -48,7 +47,6 @@ class CRemoteICacheChannel;
 // Class				:	CIrradianceCache
 // Description			:	Encapsulates an irradiance cache
 // Comments				:
-// Date last edited		:	10/15/2005
 class	CIrradianceCache : public CCache {
 public:
 
@@ -56,7 +54,6 @@ public:
 	// Class				:	CIrradiance
 	// Description			:	Holds irradiance information on a surface
 	// Comments				:
-	// Date last edited		:	10/15/2005
 	class	CCacheSample {
 	public:
 		vector				P;					// Point
@@ -76,7 +73,6 @@ public:
 	// Class				:	CIrradianceNode
 	// Description			:	Holds information about incident illumination
 	// Comments				:
-	// Date last edited		:	10/15/2005
 	class	CCacheNode {
 	public:
 							CCacheNode(const float *);
@@ -93,30 +89,34 @@ public:
 
 public:
 
-								CIrradianceCache(const char *,unsigned int,const float *,const float *,CXform *,CHierarchy *,FILE *);
+								CIrradianceCache(const char *,unsigned int,FILE *);
 								~CIrradianceCache();
 
-		void					lookup(float *,const float *,const float *,const CGlobalIllumLookup *);
+		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
 		void					cachesample(float *,const float *,const float *,float);
 
 		void					draw();
+		int						keyDown(int key);
+		
 		void					bound(float *bmin,float *bmax);
 private:
 		void					writeNode(FILE *,CCacheNode *);
 		CCacheNode				*readNode(FILE *);
 
-		void					sample(float *,const float *,const float *,const CGlobalIllumLookup *);
+		void					sample(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
+		void					clamp(CCacheSample *);
 
 		CMemStack				*memory;
 
-		CHierarchy				*hierarchy;
-
 		CCacheNode				*root;
 		int						maxDepth;
-
-		matrix					fromWorld,toWorld;
-		matrix					from,to;
 		
+		matrix					from,to;
+
+		TMutex					mutex;
+		
+		static	int				drawDiscs;					// Which type to draw
+
 		friend class			CRemoteICacheChannel;
 };
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,8 +35,6 @@
 #include "common/global.h"
 #include "object.h"
 #include "options.h"
-#include "output.h"
-#include "hierarchy.h"
 #include "shading.h"
 
 
@@ -45,7 +43,6 @@
 // Class				:	CRaytracer
 // Description			:	Encapsulates a primary camera ray
 // Comments				:
-// Date last edited		:	3/20/2003
 class	CPrimaryRay : public CRay {
 public:
 	vector	color;					// Color of the ray
@@ -60,7 +57,6 @@ public:
 // Class				:	CRaytracer
 // Description			:	Defines a raytracer
 // Comments				:
-// Date last edited		:	3/20/2003
 class	CPrimaryBundle : public CRayBundle {
 public:
 				CPrimaryBundle(int,int,int,int*,int,float*);
@@ -85,24 +81,24 @@ public:
 // Class				:	CRaytracer
 // Description			:	Defines a raytracer
 // Comments				:
-// Date last edited		:	8/26/2001
 class	CRaytracer : public CShadingContext {
 public:
-									CRaytracer(COptions *,CXform *,SOCKET);
+									CRaytracer(int thread);
 			virtual					~CRaytracer();
+
+			static void				preDisplaySetup() { }
 
 			// The main hider interface
 			// The following functions are commented out for we want the CShadingContext to handle those
-			void					renderFrame();									// Right after world end to force rendering of the entire frame
+			void					renderingLoop();
 
 			// Since we're not doing any rasterization, the following functions are simple stubs
 
 			// Delayed rendering functions
-			void					drawObject(CObject *,const float *,const float *) { }
+			void					drawObject(CObject *) { }
 
 			// Primitive creation functions
 			void					drawGrid(CSurface *,int,int,float,float,float,float) { }
-			void					drawRibbon(CSurface *,int,float,float) { }
 			void					drawPoints(CSurface *,int) { }
 protected:
 			// Sampling functions
@@ -114,6 +110,9 @@ protected:
 
 			float					*fbContribution;
 			float					*fbPixels;
+
+			// Some stats
+			int						numRaytraceRays;
 };
 
 #endif

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -39,7 +39,6 @@
 // Class				:	CDisplay
 // Description			:	Holds image data to be passed to the window thread
 // Comments				:
-// Date last edited		:	2/28/2002
 class	CDisplay {
 public:
 					CDisplay(const char *,const char *,int,int,int);

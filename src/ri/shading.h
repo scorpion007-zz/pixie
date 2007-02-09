@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -34,7 +34,6 @@
 #include "common/global.h"
 #include "common/algebra.h"
 #include "common/containers.h"
-#include "output.h"
 #include "shader.h"
 #include "random.h"
 
@@ -59,9 +58,7 @@ class	CMovingVertex;
 class	CTriangle;
 class	CMovingTriangle;
 class	CMemPage;
-class	CHierarchy;
 class	CActiveSample;
-class	COutput;
 class	CPoints;
 class	CPointCloud;
 class	CVolume;
@@ -70,19 +67,14 @@ class	CCache;
 class	CVisorCache;
 class	CPl;
 class	CSphereLight;
-class	CRaySample;
 struct	TObjectHash;
 
 const int	SHADING_OBJECT_CACHE_SIZE	=	512;
 
-
 typedef enum {
 	SHADING_0D,				// Shading points
-	SHADING_1D_GRID,		// Shading lines (grid)
-	SHADING_1D,				// Shading lines
 	SHADING_2D_GRID,		// Shading a 2D grid
-	SHADING_2D,				// Shading a 2D surface that has been arbitraryly sampled
-	SHADING_NODIM			// Shading arbitraryly sampled points without any neighborhood info
+	SHADING_2D				// Shading a 2D surface that has been arbitraryly sampled
 } EShadingDim;
 
 // Predefined ray labels used during raytracing
@@ -96,7 +88,6 @@ extern	char	*rayLabelGather;
 // Class				:	CConditional
 // Description			:	This class is used to hold info about a conditional
 // Comments				:
-// Date last edited		:	10/13/2001
 class	CConditional {
 public:
 		int						forStart;							// The start IP of the conditional
@@ -111,7 +102,6 @@ public:
 // Class				:	CShadedLight
 // Description			:	Hold a shaded light
 // Comments				:	An instance of this class will be created for each execution of "solar" or "illuminate"
-// Date last edited		:	10/13/2001
 class	CShadedLight {
 public:
 		float					**savedState;						// the saved variables for this light
@@ -124,7 +114,6 @@ public:
 // Class				:	CShadingState
 // Description			:	Holds a shading state at a depth
 // Comments				:
-// Date last edited		:	10/13/2001
 class	CShadingState {
 public:
 																	// ---> Input fields
@@ -163,15 +152,14 @@ public:
 // Class				:	CRayBundle
 // Description			:	Encapsulates a bundle of rays
 // Comments				:
-// Date last edited		:	3/20/2003
 class	CRayBundle {
 public:
-		int						numRays;									// The number of rays to trace
-		CRay					**rays;										// The array of rays to trace
-		const char				*label;										// The label of these rays
-		int						last;										// The last transparent ray
-		int						depth;										// The transparency depth of the bundle
-		CShaderInstance			*postShader;								// The shader to execute after the raytrace
+		int						numRays;							// The number of rays to trace
+		CRay					**rays;								// The array of rays to trace
+		const char				*label;								// The label of these rays
+		int						last;								// The last transparent ray
+		int						depth;								// The transparency depth of the bundle
+		CShaderInstance			*postShader;						// The shader to execute after the raytrace
 
 		virtual	int				postTraceAction()				=	0;		// The function to be called after the rays are traced
 		virtual	void			postShade(int,CRay **,float **)	=	0;		// The function that's called with the shade results
@@ -179,132 +167,149 @@ public:
 		virtual	void			post()							=	0;		// The function that's called after each pass
 };
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	TObjectHash
+// Description			:	Holds an object hash root
+// Comments				:
+typedef struct TObjectHash {
+		CSurface				*object;
+		CRay					*rays;
+		int						numRays;
+		TObjectHash				*next;
+		TObjectHash				*shadeNext;
+} TObjectHash;
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CThreadContext
+// Class				:	CShadingContext
 // Description			:	Holds thread specific stuff
 // Comments				:
-// Date last edited		:	10/13/2001
-class	CShadingContext : public COutput {
+class	CShadingContext {
 public:
-								CShadingContext(COptions *,CXform *,SOCKET,unsigned int);
-								~CShadingContext();
+								CShadingContext(int thread);
+		virtual					~CShadingContext();
 
-								// The following functions must be overidden by the derived classes
-		void					render(CObject *);										// Called to insert an object into the scene
-		void					remove(CTracable *);									// Called to remove a delayed object from the scene
-
-								// A block that is used by the renderer
-		void					beginWorld();											// We're starting to specify geometry
-		void					endWorld();												// We're done specifying geometry
-
-		virtual	void			renderFrame()					=	0;					// Right after world end to force rendering of the entire frame
+		// This function is called to to render
+		virtual	void			renderingLoop()											=	0;
 
 		// Delayed rendering functions
-		virtual	void			drawObject(CObject *,const float *,const float *)		=	0;
+		virtual	void			drawObject(CObject *)									=	0;
 
 		// Primitive creation functions
 		virtual	void			drawGrid(CSurface *,int,int,float,float,float,float)	=	0;
-		virtual	void			drawRibbon(CSurface *,int,float,float)					=	0;
 		virtual	void			drawPoints(CSurface *,int)								=	0;
 
-		// Some shading functions
-		CShadingState			*currentShadingState;									// The current shading state
-		void					shade(CSurface *,int,int,int,unsigned int);				// Shade points on a surface
-		void					displace(CSurface *,int,int,int,unsigned int);			// Sample points on a surface
+		// The current shading state
+		CShadingState			*currentShadingState;
 
-								// The raytracing functions that can be called after prepareFrame
+		// Shade points on a surface
+		void					shade(CSurface *,int,int,EShadingDim,unsigned int,int displaceOnly=FALSE);
+		inline	void			displace(CSurface *surface,int u,int v,EShadingDim dim,unsigned int up)	{	shade(surface,u,v,dim,up,TRUE);	}
+
+		// Raytracing functions
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays
 		void					traceEx(CRayBundle *);									// Trace and maybe shade a bundle of rays. This version increments the shading depth
+		void					trace(CRay *);											// Trace a ray (no shading)
+		void					traceAny(CRay *);										// Trace any ray (no shading)
 
-								// Surface tesselation
-		void					tesselate2D(CSurface *);								// Tesselate a surface
-		virtual void			addTracable(CTracable *,CSurface *);					// Add a raytracable object into the scene
-		virtual void			addTracable(CTriangle *,CSurface *);
-		virtual void			addTracable(CMovingTriangle *,CSurface *);
-
-								// Variable management functions
-		void					initState(CVariable *,int);								// Initialize the shading state
-		void					updateState(CVariable *);								// Add a variable into the shading state
-
+		// Shading state management functions
+		void					updateState();											// Add a variable into the shading state
 		CShadingState			*newState();											// Allocate a new shading state
 		void					freeState(CShadingState *);								// Destroy a shading state
 		void					deleteState(CShadingState *);							// Delete a shading state
-
-		CMemStack				*frameMemory;											// The memory area for the frame
-		
-		// remote channels (remoteChannel.cpp)
-		int						requestRemoteChannel(CRemoteChannel *);					// request a remote channel (server requests from client)
-		int						processChannelRequest(int,SOCKET);						// service request for a remote channel in client
-		
-		void					sendBucketDataChannels(int x,int y);					// send all per-bucket remote channels
-		void					recvBucketDataChannels(SOCKET s,int x,int y);			// receive one per-bucket remote channel
-		void					sendFrameDataChannels();								// send all per-frame remote channels
-		void					recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
+		void					*saveState();											// Save the shading state
+		void					restoreState(void *state);								// Restore a saved shading state
 	
+		// Memory from which we allocate the temp thread stuff
+		CMemPage				*threadMemory;
+
+		// The current bucket we're processing in this thread
+		int						currentXBucket,currentYBucket;
+
+		// Thread safe random number generator for integers
+		inline	unsigned long	irand() {
+									register unsigned long y;
+
+									if(state == next)	next_state();
+
+									y = *( --next);
+
+									// Tempering
+									y ^= (y >> 11);
+									y ^= (y << 7) & 0x9d2c5680UL;
+									y ^= (y << 15) & 0xefc60000UL;
+									y ^= (y >> 18);
+
+									return y;
+								}
+      
+		// Thread safe random number generator for floats
+		inline	float			urand() {
+									register unsigned long y;
+
+									if(state == next)	next_state();
+
+									y = *( --next);
+
+									// Tempering
+									y ^= (y >> 11);
+									y ^= (y << 7) & 0x9d2c5680UL;
+									y ^= (y << 15) & 0xefc60000UL;
+									y ^= (y >> 18);
+
+									y &= 0x3FFFFFFF;
+									return float(y) * (float(1.0)/float(0x3FFFFFFF));
+								}
+
+		const int				thread;												// The thread number for this context
+
 protected:
+		// Hiders can hook into the following functions
 		virtual	void			solarBegin(const float *,const float *) { }
 		virtual	void			solarEnd() { }
 		virtual	void			illuminateBegin(const float *,const float *,const float *) { }
 		virtual	void			illuminateEnd() { }
-		vector					worldBmin,worldBmax;									// The bounding box of the entire scene
-		CHierarchy				*hierarchy;												// The raytracing hierarchy
 
-		CTexture				*getTexture(const char *);								// Load a texture
-		CEnvironment			*getEnvironment(const char *);							// Load an environment
-		CPhotonMap				*getPhotonMap(const char *);							// Load a photon map
-		CCache					*getCache(const char *,const char *);					// Load a photon map
-		CTextureInfoBase		*getTextureInfo(const char *);							// Load a textureinfo
-		CTexture3d				*getTexture3d(const char*,int,const char*,const char*);	// Load a point cloud or brickmap
-
-		CDictionary<const char *,CFileResource *>			*loadedFiles;				// This holds the files loaded so far
-
-		CArray<CAttributes *>	*dirtyAttributes;										// The list of attributes that need to be cleaned after the rendering
-		CArray<CTriangle *>		*triangles;												// The array of triangles
-		CArray<CSurface *>		*raytraced;												// The list of raytraced objects
-		CArray<CTracable *>		*tracables;												// The array of raytracable objects
+		int						numShade;											// Number of times shade is called
+		int						numSampled;											// Number of points sampled
+		int						numShaded;											// Number of points shaded
+		int						vertexMemory;										// The amount of vertex memory allocated by this context
+		int						peakVertexMemory;									// The maximum peak vertex memory
+		int						numTracedRays;										// The number of rays traced
+		int						numReflectionRays;
+		int						numTransmissionRays;
+		int						numGatherRays;
 private:
+		CMemPage				*shaderStateMemory;									// Memory from which we allocate shader instance variables
 
-		CMemPage				*shaderStateMemory;										// Memory from which we allocate shader instance variables
-								
-		CArray<CProgrammableShaderInstance *>	*dirtyInstances;						// The list of shader instances that need cleanup
+		CConditional			*conditionals;										// Holds nested conditionals
+		int						currentRayDepth;									// Current shading depth
+		const char				*currentRayLabel;									// The current ray label
+		CShadingState			*freeStates;										// The list of free states
+		int						inShadow;											// TRUE if we're in a shadow
 
-		CConditional			*conditionals;											// Holds nested conditionals
-		int						currentRayDepth;										// Current shading depth
-		const char				*currentRayLabel;										// The current ray label
-		CShadingState			*freeStates;											// The list of free states
-		int						inShadow;												// TRUE if we're in a shadow
-		unsigned int			raytracingFlags;										// The raytracing flags that hold the combination that needs to be raytraced
+		CSobol<4>				traceGenerator;										// Random number generator for "trace"
+		CSobol<4>				transmissionGenerator;								// Random number generator for "transmission"
+		CSobol<4>				gatherGenerator;									// Random number generator for "gather"
 
-		CVariable				**globalVariables;										// The array of global variables
-		int						numGlobalVariables;										// The current number of global variables
-		int						maxGlobalVariables;										// Maximum number of variables allocated
+		TObjectHash				*traceObjectHash;									// An object hash array for raytraced objects
+	
+		void					execute(CProgrammableShaderInstance *,float **);	// Execute a shader
 
-		CSobol<4>				traceGenerator;											// Random number generator for "trace"
-		CSobol<4>				transmissionGenerator;									// Random number generator for "transmission"
-		CSobol<4>				gatherGenerator;										// Random number generator for "gather"
-
-		TObjectHash				*traceObjectHash;										// An object hash array for raytraced objects
-		
-		CDictionary<const char *,CRemoteChannel *>			*declaredRemoteChannels;	// Known remote channel lookup
-		CArray<CRemoteChannel *>							*remoteChannels;			// all known channels
-
-		void					execute(CProgrammableShaderInstance *,float **);		// Execute a shader
-
+		// The following functions are used in the shaders
 		void					duFloat(float *,const float *);
 		void					dvFloat(float *,const float *);
 		void					duVector(float *,const float *);
 		void					dvVector(float *,const float *);
+		float					*rayDiff(const float *from,const float *dir,const float *to);
+		float					*rayDiff(const float *from);
 
 		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
 		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);
-		void					traceTransmission(int,CRaySample *,CTextureLookup *);
-		void					traceReflection(int,CRaySample *,CTextureLookup *);
 
 		void					indirectSample(CGlobalIllumLookup *,const float *,const float *);
 		void					occlusionSample(CGlobalIllumLookup *,const float *,const float *);
 
-																						// The following functions are used in the shaders
+		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);
 		int						displacementParameter(void *dest,const char *name,CVariable**,int*);
 		int						atmosphereParameter(void *dest,const char *name,CVariable**,int*);
@@ -322,7 +327,31 @@ private:
 		void					displace(CSurface *,int,CQuadVertex **);
 
 		// Some misc shading functions
-		void					findCoordinateSystem(const char *,matrix *&,matrix *&,ECoordinateSystem &);
+		void					findCoordinateSystem(const char *,const float *&,const float *&,ECoordinateSystem &);
+
+		// Some data structures for urand()
+		//
+		// implementation of  Takuji Nishimura and Makoto Matsumoto's
+		// MT19937 (Mersenne Twister pseudorandom number generator)
+		// with optimizations by Shawn Cokus, Matthe Bellew.
+		// This generator is not cryptoraphically secure. 
+		//
+		// M. Matsumoto and T. Nishimura,
+		// "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform  
+		// Pseudo-Random Number Generator",
+		// ACM Transactions on Modeling and Computer Simulation,
+		// Vol. 8, No. 1, January 1998, pp 3--30.
+		//
+		// C++ interface and further optimization by Mayur Patel
+		//
+
+		unsigned long			state[624];
+		unsigned long			*next;
+
+		void					next_state();
+		void					randomInit(unsigned long u = 5489UL);
+		void					randomShutdown();
+
 
 		friend	class			CPhotonHider;
 		friend	class			CProgrammableShaderInstance;

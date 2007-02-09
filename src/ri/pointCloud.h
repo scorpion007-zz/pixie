@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -32,16 +32,16 @@
 #define POINTCLOUD_H
 
 #include "common/global.h"
-#include "renderer.h"
+#include "common/containers.h"
 #include "photonMap.h"
 #include "texture3d.h"
+#include "options.h"
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloudPoint
 // Description			:	A point cloud point
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CPointCloudPoint : public CTon {
 public:
 	float			dP;				// The sample radius
@@ -52,29 +52,34 @@ public:
 // Class				:	CPhotonMap
 // Description			:	A Photon map
 // Comments				:
-// Date last edited		:	3/11/2003
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
-					CPointCloud(const char *,CXform *,const char*,int);
-					CPointCloud(const char *,CXform *,FILE *);
-					~CPointCloud();
+							CPointCloud(const char *,const float *from,const float *to,const char*,int);
+							CPointCloud(const char *,const float *from,const float *to,FILE *);
+							~CPointCloud();
 
-	void			reset();
-	void			write();
+	void					reset();
+	void					write();
 
-	void			balance();
+	void					balance();
 
-	void			store(const float *,const float *,const float *,float);
-	void			lookup(float *,const float *,const float *,float);
+	void					store(const float *,const float *,const float *,float);
+	void					lookup(float *,const float *,const float *,float);
 
-	void			draw();
-	void			bound(float *bmin,float *bmax);
+	void					draw();
+	int						keyDown(int);
+	
+	void					bound(float *bmin,float *bmax);
 
 private:
-	CMemStack		*memory;			// Storage for the data
-	CArray<float*>	*dataPointers;		// data pointers for each sample	
-	int				flush;				// Should this be written to disk?
-	float			searchRadius;
+	CMemStack				*memory;			// Storage for the data
+	CArray<float*>			*dataPointers;		// data pointers for each sample	
+	int						flush;				// Should this be written to disk?
+	float					searchRadius;
+	
+	TMutex					mutex;
+	
+	static	int				drawDiscs;					// Which type to draw
 	
 	friend			void	makeTexture3D(const char *,const char *,TSearchpath *,int,char **,void **);
 	

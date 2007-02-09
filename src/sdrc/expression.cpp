@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -44,7 +44,6 @@ extern	CScriptContext	*sdr;
 // Description			:	Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/29/2003
 inline	void	getContainer(FILE *out,int type,CVariable *&dest,CExpression *src) {
 	if (type & SLC_UNIFORM) {
 		if (src->type & SLC_UNIFORM) {
@@ -106,7 +105,6 @@ inline	void	getContainer(FILE *out,int type,CVariable *&dest,CExpression *src) {
 // Description			:	Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/29/2003
 inline	void	getContainer(FILE *out,CVariable *dest,CVariable *src) {
 	if (dest->type & SLC_UNIFORM) {
 		if (src->type & SLC_UNIFORM) {
@@ -147,7 +145,6 @@ inline	void	getContainer(FILE *out,CVariable *dest,CVariable *src) {
 // Description			:	Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/29/2003
 inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
 	if (dest->type & SLC_UNIFORM) {
 		if (src->type & SLC_UNIFORM) {
@@ -203,7 +200,6 @@ inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
 // Description			:	Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/29/2003
 inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 	CVariable	*dest;
 
@@ -299,7 +295,6 @@ inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression::CExpression(int t)	{	
 	type	=	t;
 
@@ -311,7 +306,6 @@ CExpression::CExpression(int t)	{
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression::~CExpression()	{	
 }
 
@@ -321,7 +315,6 @@ CExpression::~CExpression()	{
 // Description			:	Generate code that stores the result in "dest"
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CExpression::getCode(FILE *out,CVariable *dest)	{	
 }
 
@@ -332,7 +325,6 @@ void		CExpression::getCode(FILE *out,CVariable *dest)	{
 // Description			:	If this is a variable, return the variable
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CVariable	*CExpression::getVariable()	{	
 	return	NULL;
 }
@@ -344,7 +336,6 @@ CVariable	*CExpression::getVariable()	{
 // Description			:	This is another form of the get variable
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 int			CExpression::value(char *) {
 	return	FALSE;
 }
@@ -356,7 +347,6 @@ int			CExpression::value(char *) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CNullExpression::CNullExpression() : CExpression(SLC_NONE) {
 }
 
@@ -419,7 +409,6 @@ CNullExpression::CNullExpression() : CExpression(SLC_NONE) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CTwoExpressions::CTwoExpressions(CExpression *f,CExpression *s) : CExpression(SLC_NONE) {
 	first	=	f;
 	second	=	s;
@@ -440,7 +429,6 @@ CTwoExpressions::CTwoExpressions(CExpression *f,CExpression *s) : CExpression(SL
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CTwoExpressions::~CTwoExpressions() {
 	delete first;
 	delete second;
@@ -455,7 +443,6 @@ CTwoExpressions::~CTwoExpressions() {
 // Description			:	If this is a variable, return the variable
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CTwoExpressions::getCode(FILE *out,CVariable *dest) {
 	if (dest != NULL) {
 		sdr->error("Can not assign to a variable\n");
@@ -495,7 +482,6 @@ void		CTwoExpressions::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CVectorExpression::CVectorExpression(CExpression *x,CExpression *y,CExpression *z) : CExpression(SLC_VECTOR | (x->type & y->type & z->type & SLC_UNIFORM)) {
 	this->x	=	getConversion(SLC_FLOAT,x);
 	this->y	=	getConversion(SLC_FLOAT,y);
@@ -510,7 +496,6 @@ CVectorExpression::CVectorExpression(CExpression *x,CExpression *y,CExpression *
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CVectorExpression::~CVectorExpression() {
 	if (x != NULL)	delete x;
 	if (y != NULL)	delete y;
@@ -523,7 +508,6 @@ CVectorExpression::~CVectorExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CVectorExpression::getCode(FILE *out,CVariable *dest) {
 	if (dest == NULL) {
 		sdr->warning("Useless vector expression\n");
@@ -555,7 +539,6 @@ void		CVectorExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 int			CVectorExpression::value(char *dest) {
 	char	tmp1[128];
 	char	tmp2[128];
@@ -595,7 +578,6 @@ int			CVectorExpression::value(char *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CMatrixExpression::CMatrixExpression(CExpression **e) : CExpression(SLC_MATRIX) {
 	int	i;
 	int	f	=	SLC_UNIFORM;
@@ -614,7 +596,6 @@ CMatrixExpression::CMatrixExpression(CExpression **e) : CExpression(SLC_MATRIX) 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CMatrixExpression::~CMatrixExpression() {
 	int	i;
 
@@ -630,7 +611,6 @@ CMatrixExpression::~CMatrixExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CMatrixExpression::getCode(FILE *out,CVariable *dest) {
 	if (dest == NULL) {
 		sdr->warning("Useless matrix expression\n");
@@ -694,7 +674,6 @@ void		CMatrixExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 int			CMatrixExpression::value(char *dest) {
 	char	tmp[128];
 	int		i;
@@ -737,7 +716,6 @@ int			CMatrixExpression::value(char *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayExpression::CArrayExpression(CVariable *v,CExpression *i) : CExpression((v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK)) | (v->type & i->type & SLC_UNIFORM)) {
 	array	=	v;
 	item	=	getConversion(SLC_FLOAT,i);
@@ -754,7 +732,6 @@ CArrayExpression::CArrayExpression(CVariable *v,CExpression *i) : CExpression((v
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayExpression::~CArrayExpression() {
 	delete item;
 }
@@ -766,7 +743,6 @@ CArrayExpression::~CArrayExpression() {
 // Description			:	Code generation
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 	char	*opcode;
 
@@ -829,7 +805,6 @@ void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK | SLC_UNIFORM))	{	
 	variable	=	v;
 }
@@ -842,7 +817,6 @@ CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CTerminalExpression::~CTerminalExpression()	{	
 }
 
@@ -852,7 +826,6 @@ CTerminalExpression::~CTerminalExpression()	{
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CTerminalExpression::getCode(FILE *out,CVariable *dest) {
 	char	*opcode;
 
@@ -898,7 +871,6 @@ void		CTerminalExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpression(t | SLC_UNIFORM) {	
 	constant		=	c;
 	dummy			=	new CVariable(c,t | SLC_UNIFORM,1);
@@ -911,7 +883,6 @@ CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpre
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CConstantTerminalExpression::~CConstantTerminalExpression()	{	
 	free(constant);	
 	delete dummy;
@@ -923,7 +894,6 @@ CConstantTerminalExpression::~CConstantTerminalExpression()	{
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CConstantTerminalExpression::getCode(FILE *out,CVariable *dest) {
 	char	*opcode;
 
@@ -952,7 +922,6 @@ void		CConstantTerminalExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 int			CConstantTerminalExpression::value(char *dest) {
 	strcpy(dest,constant);
 	return TRUE;
@@ -993,7 +962,6 @@ int			CConstantTerminalExpression::value(char *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CBinaryExpression::CBinaryExpression(int t,char *o,CExpression *f,CExpression *s) : CExpression(t | (f->type & s->type & SLC_UNIFORM))	{ 
 	first	=	f;
 	second	=	s;
@@ -1007,7 +975,6 @@ CBinaryExpression::CBinaryExpression(int t,char *o,CExpression *f,CExpression *s
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CBinaryExpression::~CBinaryExpression() {
 	if (first	!= NULL)	delete first;
 	if (second	!= NULL)	delete second;
@@ -1019,7 +986,6 @@ CBinaryExpression::~CBinaryExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void	CBinaryExpression::getCode(FILE *out,CVariable *dest) {
 
 	if (dest == NULL) {
@@ -1071,7 +1037,6 @@ void	CBinaryExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CUnaryExpression::CUnaryExpression(int t,char *o,CExpression *f) : CExpression(t | (f->type & SLC_UNIFORM) ) { 
 	first	= f; 
 	opcode	= o; 
@@ -1084,7 +1049,6 @@ CUnaryExpression::CUnaryExpression(int t,char *o,CExpression *f) : CExpression(t
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CUnaryExpression::~CUnaryExpression() {
 	if (first != NULL)	delete first;
 }
@@ -1096,7 +1060,6 @@ CUnaryExpression::~CUnaryExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void	CUnaryExpression::getCode(FILE *out,CVariable *dest) {
 	if (dest == NULL) {
 		sdr->warning("Useless unary expression\n");
@@ -1147,7 +1110,6 @@ void	CUnaryExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CSysConversionExpression::CSysConversionExpression(int t,char *opcode,char *system,CExpression *ft) : CExpression(t | (ft->type & SLC_UNIFORM) ) {
 	this->opcode	=	opcode;
 	this->system	=	strdup(system);
@@ -1160,7 +1122,6 @@ CSysConversionExpression::CSysConversionExpression(int t,char *opcode,char *syst
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CSysConversionExpression::~CSysConversionExpression() {
 	if (first != NULL)	delete first;
 	free(system);
@@ -1172,7 +1133,6 @@ CSysConversionExpression::~CSysConversionExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CSysConversionExpression::getCode(FILE *out,CVariable *dest) {
 	if (dest == NULL) {
 		sdr->warning("Useless system conversion\n");
@@ -1195,7 +1155,6 @@ void		CSysConversionExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/1/2003
 int			CSysConversionExpression::value(char *dest) {
 	char	tmp[128];
 
@@ -1242,7 +1201,6 @@ int			CSysConversionExpression::value(char *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CFuncallExpression::CFuncallExpression(CFunction *f,CArray<CExpression *> *p) : CExpression(SLC_NONE) {
 	if (f->returnValue != NULL)	type	=	f->returnValue->type;
 	function	=	f;
@@ -1289,7 +1247,6 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CArray<CExpression *> *p) : 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CFuncallExpression::~CFuncallExpression() {
 	CExpression	*cExpression;
 
@@ -1305,7 +1262,6 @@ CFuncallExpression::~CFuncallExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 	CVariable		**c	=	NULL;
 	int				i,j;
@@ -1443,7 +1399,6 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression *> *p) : CExpression(f->functionType) {
 	int	fa	=	SLC_UNIFORM;
 	int	i;
@@ -1549,7 +1504,6 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CBuiltinExpression::~CBuiltinExpression() {
 	CExpression	*cExpression;
 
@@ -1566,7 +1520,6 @@ CBuiltinExpression::~CBuiltinExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 static	char	getExpressionType(CExpression *e) {
 	if		(e->type & SLC_FLOAT)	return	'f';
 	else if (e->type & SLC_VECTOR) {
@@ -1868,7 +1821,6 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/16/2001
 CConditionalExpression::CConditionalExpression(int type,CExpression *condition,CExpression *first,CExpression *second) : CExpression(type) {
 	this->condition			=	getConversion(SLC_BOOLEAN,condition);
 	this->trueExpression	=	getConversion(type,first);
@@ -1887,7 +1839,6 @@ CConditionalExpression::CConditionalExpression(int type,CExpression *condition,C
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/16/2001
 CConditionalExpression::~CConditionalExpression() {
 	delete condition;
 	delete trueExpression;
@@ -1900,7 +1851,6 @@ CConditionalExpression::~CConditionalExpression() {
 // Description			:	(see expression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/16/2001
 void		CConditionalExpression::getCode(FILE *out,CVariable *dest) {
 	char	elseLabel[32];
 	char	endLabel[32];
@@ -1950,7 +1900,6 @@ void		CConditionalExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CAssignmentExpression::CAssignmentExpression(CVariable *f,CExpression *s) : CExpression(f->type) {
 	if (f->type & SLC_RDONLY) {
 		sdr->error("Can not assign to rdonly %s\n",f->symbolName);
@@ -1973,7 +1922,6 @@ CAssignmentExpression::CAssignmentExpression(CVariable *f,CExpression *s) : CExp
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CAssignmentExpression::~CAssignmentExpression() {
 	if (second != NULL)	delete second;
 }
@@ -1984,7 +1932,6 @@ CAssignmentExpression::~CAssignmentExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 	getContainer(out,first,second);
 
@@ -2023,7 +1970,6 @@ void		CAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayAssignmentExpression::CArrayAssignmentExpression(CVariable *f,CExpression *i,CExpression *s) : CExpression(f->type) {
 	if (f->type & SLC_RDONLY) {
 		sdr->error("Can not assign to rdonly %s\n",f->symbolName);
@@ -2047,7 +1993,6 @@ CArrayAssignmentExpression::CArrayAssignmentExpression(CVariable *f,CExpression 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayAssignmentExpression::~CArrayAssignmentExpression() {
 	if (second != NULL)	delete second;
 	if (index != NULL)	delete index;
@@ -2059,7 +2004,6 @@ CArrayAssignmentExpression::~CArrayAssignmentExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 	char	*opcode;
 	char	*opcodeN;
@@ -2125,7 +2069,6 @@ void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpression *s,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix) : CExpression(f->type) {
 	first = f;
 	arrayAssigner = NULL;
@@ -2150,7 +2093,6 @@ CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpr
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayUpdateExpression::~CArrayUpdateExpression() {
 	if (index != NULL)			delete index;
 	if (arrayAssigner != NULL)	delete arrayAssigner;
@@ -2162,7 +2104,6 @@ CArrayUpdateExpression::~CArrayUpdateExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CArrayUpdateExpression::getCode(FILE *out,CVariable *dest) {
 	// generate the u->v conversion if needed of index
 	getContainer(out,indexVar,index);
@@ -2212,7 +2153,6 @@ void		CArrayUpdateExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Note that e array holds the last item first
-// Date last edited		:	7/20/2001
 CArrayMove::CArrayMove(CVariable *f,CArray<CExpression *> *e) : CExpression((f->type & SLC_UNIFORM) | SLC_UNIFORM) {
 	CExpression	*cExpression;
 	int			numItems	=	0;
@@ -2243,7 +2183,6 @@ CArrayMove::CArrayMove(CVariable *f,CArray<CExpression *> *e) : CExpression((f->
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CArrayMove::~CArrayMove() {
 	CExpression	*cExpression;
 
@@ -2258,7 +2197,6 @@ CArrayMove::~CArrayMove() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CArrayMove::getCode(FILE *out,CVariable *dest) {
 	int			i;
 	CExpression	*cExpression;
@@ -2333,7 +2271,6 @@ void		CArrayMove::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CUpdateExpression::CUpdateExpression(CVariable *f,char *opcodeFloat,char *opcodeVector,int pre,CExpression *s) : CExpression(f->type) {
 	first	=	f;
 	second	=	getConversion(f->type & SLC_TYPE_MASK,s);
@@ -2360,7 +2297,6 @@ CUpdateExpression::CUpdateExpression(CVariable *f,char *opcodeFloat,char *opcode
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CUpdateExpression::~CUpdateExpression() {
 	if (second != NULL)	delete second;
 }
@@ -2371,7 +2307,6 @@ CUpdateExpression::~CUpdateExpression() {
 // Description			:	(see CExpression)
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CUpdateExpression::getCode(FILE *out,CVariable *dest) {
 	char	*opcode,*opcodeM;
 
@@ -2446,7 +2381,6 @@ void		CUpdateExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CIfThenElse::CIfThenElse(CExpression *c,CExpression *f,CExpression *s) : CExpression(SLC_NONE) {
 	cond	=	getConversion(SLC_BOOLEAN,c);
 	first	=	f;
@@ -2460,7 +2394,6 @@ CIfThenElse::CIfThenElse(CExpression *c,CExpression *f,CExpression *s) : CExpres
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CIfThenElse::~CIfThenElse() {
 	delete cond;
 	delete first;
@@ -2474,7 +2407,6 @@ CIfThenElse::~CIfThenElse() {
 // Description			:	-
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CIfThenElse::getCode(FILE *out,CVariable *dest) {
 	char		elseLabel[32];
 	char		endLabel[32];
@@ -2546,7 +2478,6 @@ void		CIfThenElse::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/24/2003
 CGatherThenElse::CGatherThenElse(CArray<CExpression *> *pl,CExpression *f,CExpression *s) : CExpression(0) {
 	parameterList	=	pl;
 	first			=	f;
@@ -2560,7 +2491,6 @@ CGatherThenElse::CGatherThenElse(CArray<CExpression *> *pl,CExpression *f,CExpre
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/24/2003
 CGatherThenElse::~CGatherThenElse() {
 	delete first;
 	if (second)	delete second;
@@ -2574,7 +2504,6 @@ CGatherThenElse::~CGatherThenElse() {
 // Description			:	-
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CGatherThenElse::getCode(FILE *out,CVariable *dest) {
 	char		beginLabel[32];
 	char		elseLabel[32];
@@ -2740,7 +2669,6 @@ void		CGatherThenElse::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CForLoop::CForLoop(CExpression *s,CExpression *c,CExpression *u,CExpression *b) : CExpression(0) {
 	start	=	s;
 	cond	=	getConversion(SLC_BOOLEAN,c);
@@ -2755,7 +2683,6 @@ CForLoop::CForLoop(CExpression *s,CExpression *c,CExpression *u,CExpression *b) 
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CForLoop::~CForLoop() {
 	if (start != NULL)	delete start;
 	if (cond != NULL)	delete cond;
@@ -2770,7 +2697,6 @@ CForLoop::~CForLoop() {
 // Description			:	-
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CForLoop::getCode(FILE *out,CVariable *dest) {
 	char	bodyLabel[32];
 	char	contLabel[32];
@@ -2843,7 +2769,6 @@ void		CForLoop::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CIlluminationLoop::CIlluminationLoop(CExpression *c,CExpression *p,CExpression *n,CExpression *a,CExpression *b) : CExpression(0) {
 	this->category	=	(c != NULL ? getConversion(SLC_STRING,c) : NULL);
 	this->P			=	(p != NULL ? getConversion(SLC_VECTOR,p) : NULL);
@@ -2859,7 +2784,6 @@ CIlluminationLoop::CIlluminationLoop(CExpression *c,CExpression *p,CExpression *
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CIlluminationLoop::~CIlluminationLoop() {
 	if (category != NULL)	delete category;
 	if (P != NULL)			delete P;
@@ -2875,7 +2799,6 @@ CIlluminationLoop::~CIlluminationLoop() {
 // Description			:	-
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CIlluminationLoop::getCode(FILE *out,CVariable *dest) {
 	char	beginLabel[32];
 	char	endLabel[32];
@@ -2941,7 +2864,6 @@ void		CIlluminationLoop::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CIlluminateSolar::CIlluminateSolar(char *op1,char *op2,CExpression *p,CExpression *n,CExpression *a,CExpression *b) : CExpression(0) {
 	beginOpcode	=	strdup(op1);
 	endOpcode	=	strdup(op2);
@@ -2958,7 +2880,6 @@ CIlluminateSolar::CIlluminateSolar(char *op1,char *op2,CExpression *p,CExpressio
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CIlluminateSolar::~CIlluminateSolar() {
 	if (P != NULL)		delete P;
 	if (N != NULL)		delete N;
@@ -2973,7 +2894,6 @@ CIlluminateSolar::~CIlluminateSolar() {
 // Description			:	-
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void		CIlluminateSolar::getCode(FILE *out,CVariable *dest) {
 	char		endLabel[32];
 
@@ -3029,7 +2949,6 @@ void		CIlluminateSolar::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CFixedExpression::CFixedExpression(char *f) : CExpression(SLC_NONE)  {
 	fixed	=	strdup(f);
 }
@@ -3040,7 +2959,6 @@ CFixedExpression::CFixedExpression(char *f) : CExpression(SLC_NONE)  {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 CFixedExpression::~CFixedExpression() {
 	free(fixed);
 }
@@ -3052,7 +2970,6 @@ CFixedExpression::~CFixedExpression() {
 // Description			:	-
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	7/20/2001
 void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 	if (dest != NULL) {
 		sdr->error("Destination variable %s was not expected\n",dest->symbolName);
@@ -3093,7 +3010,6 @@ void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Generate code for a binary operation
 // Return Value			:	The generated expression
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,char *opcodeBoolean) {
 	if ((first->type | second->type) & SLC_ARRAY) {
 		delete first;
@@ -3187,7 +3103,6 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 // Description			:	Generate a unary operation
 // Return Value			:	The generated expression
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,char *opcodeBoolean) {
 	if (first->type & SLC_ARRAY) {
 		delete first;
@@ -3212,7 +3127,6 @@ CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVecto
 // Description			:	Convert an expression to a desired type
 // Return Value			:	The converted expression
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression	*getConversion(int type,CExpression *first) {
 	if (type & SLC_BOOLEAN) {
 		if (first->type & SLC_BOOLEAN)	return	first;
@@ -3258,7 +3172,6 @@ CExpression	*getConversion(int type,CExpression *first) {
 // Description			:	Convert an expression to a desired type
 // Return Value			:	The converted expression
 // Comments				:
-// Date last edited		:	7/20/2001
 void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 	CVariable	*cVar;
 
@@ -3350,7 +3263,6 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 // Description			:	Generates a coordinate system conversion code
 // Return Value			:	The generated expression
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression	*getConversion(int type,char *system,CExpression *first) {
 	if (type & SLC_VECTOR) {
 		if (type & (SLC_VVECTOR | SLC_VNORMAL))
@@ -3378,7 +3290,6 @@ CExpression	*getConversion(int type,char *system,CExpression *first) {
 // Description			:	Generates an assignment code
 // Return Value			:	The generated expression
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression		*getAssignment(CArray<CVariable *> *variables,CExpression *expression) {
 	CVariable	*cVar;
 	CExpression	*cExpression	=	expression;
@@ -3432,7 +3343,6 @@ CExpression		*getAssignment(CArray<CVariable *> *variables,CExpression *expressi
 // Description			:	Generates an assignment code
 // Return Value			:	The generated expression
 // Comments				:
-// Date last edited		:	7/20/2001
 CExpression		*getAssignment(CArray<CVariable *> *variables,CArray<CExpression *> *expressions) {
 	CVariable	*cVar;
 	CExpression	*pExpression	=	NULL;

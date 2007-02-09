@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -44,23 +44,21 @@ class	CSurface;
 class CRay  {
 public:
 						// ------------------> I N P U T
-	vector				from,to;					// The ray in global space
-	float				time;						// The time of the ray (shutterOpen <= time <= shutterClose)
-	int					flags;						// The flags that must be on in the object's attributes
-	float				t;							// The maximum intersection
+	vector				from,dir;					// The ray in camera coordinate system
+	float				time;						// The time of the ray (0 <= time <= 1)
+	int					flags;						// The intersection flags
+	float				t;							// The maximum intersection (if intersection, this is overwritten)
 	float				tmin;						// The intersection bias
-	float				jimp;						// The jittered importance (-ve means not set yet)
+	float				da,db;						// The linear ray differential (r = da*t + db)
 
 						// ------------------> O U T P U T
-	CSurface			*object;					// The intersection object
-	float				u,v;						// The parametric intersection coordinates
+	CSurface			*object;					// The intersection object (NULL if no intersection)
+	float				u,v;						// The parametric intersection coordinates on the object
 	vector				N;							// The normal vector at the intersection
 
 						// ------------------> I N T E R M E D I A T E
-	vector				dir,invDir;					// 1 / dir
-	vector				oFrom,oTo,oDir;				// The ray in object space
-	void				*lastXform;					// Pointer to the xform for which oFrom,oTo,oDir are valid
-	int					ID;							// Last checked object ID
+	float				jimp;						// The jittered importance (sampled automatically before tracing)
+	dvector				invDir;						// 1/dir
 	CRay				*child;						// For keeping track of the opacity
 };
 

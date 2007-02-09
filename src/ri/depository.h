@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 // Class				:	CDepositorySample
 // Description			:	This class holds a depository sample
 // Comments				:
-// Date last edited		:	11/5/2003
 class CDepositorySample : public CTon {
 public:
 	float	C[7];
@@ -50,7 +49,6 @@ public:
 // Class				:	CLocalHash
 // Description			:	A hash that holds the contribution that comes from nearby geometry
 // Comments				:
-// Date last edited		:	11/5/2003
 class	CDepository : public CMap<CDepositorySample> {
 public:
 				CDepository();

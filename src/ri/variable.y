@@ -5,7 +5,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -225,7 +225,6 @@ void	varerror(char *str) {
 // Description			:	Parse a variable but do not commit it into the global variables
 // Return Value			:
 // Comments				:
-// Date last edited		:	6/19/2001
 int	parseVariable(CVariable *var,const char *name,const char *decl) {
 	CVariable		*savedVariable;
 	const char		*savedName;

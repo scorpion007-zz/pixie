@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -40,7 +40,6 @@
 // Description			:	LU Decomposition routine
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	1/12/2003
 template <class T> void ludcmp(T **a, int n, int *indx, T *d) {
 	int i,imax,j,k;
 	T	 big,dum,sum,temp;
@@ -96,7 +95,6 @@ template <class T> void ludcmp(T **a, int n, int *indx, T *d) {
 // Description			:	LU backward substitution code
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	1/12/2003
 template <class T> void lubksb(T **a, int n, int *indx, T b[]) {
 	int		i,ii=0,ip,j;
 	T		sum;
@@ -122,7 +120,6 @@ template <class T> void lubksb(T **a, int n, int *indx, T b[]) {
 // Description			:	Solve Ax = b
 // Return Value			:	x , in b
 // Comments				:
-// Date last edited		:	1/12/2003
 void	linSolve(float *A,float *b,int n,int nrhs) {
 	float	**cA;
 	int		i;

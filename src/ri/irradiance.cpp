@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -36,12 +36,15 @@
 #include "shading.h"
 #include "bundles.h"
 #include "photonMap.h"
+#include "surface.h"
 #include "stats.h"
-
+#include "texture.h"
+#include "renderer.h"
+#include "defaults.h"
+#include "debug.h"
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
-
-
+const	float	horizonCutoff			=	(float) cosf(radians(80));
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -51,6 +54,7 @@ const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 //
 ///////////////////////////////////////////////////////////////////////
 
+int			CIrradianceCache::drawDiscs		=	TRUE;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
@@ -58,50 +62,53 @@ const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
-CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *bmin,const float *bmax,CXform *w,CHierarchy *h,FILE *in) : CCache(name,f) {
+CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in) : CCache(name,f) {
 	int	i;
 
 	memory				=	new CMemStack;		// Where we allocate our memory from
 	root				=	NULL;
 	maxDepth			=	1;
-	hierarchy			=	h;
+	osCreateMutex(mutex);
+
+	identitym(from);
+	identitym(to);
 
 	// Are we reading from file ?
 	if (flags & CACHE_READ) {
 		if (in == NULL)	in	=	ropen(name,"rb",fileIrradianceCache);
 
 		if (in != NULL) {
-			fread(fromWorld,	sizeof(matrix),1,in);
-			fread(toWorld,		sizeof(matrix),1,in);
+			matrix	fromWorld,toWorld;
+
+			// Read the world xform
+			fread(fromWorld,sizeof(float),16,in);
+			fread(toWorld,sizeof(float),16,in);
+			mulmm(to,fromWorld,CRenderer::toWorld);
+			mulmm(from,CRenderer::fromWorld,toWorld);
 
 			// Read the samples
 			fread(&maxDepth,	sizeof(int),1,in);
 			root	=	readNode(in);
 
 			fclose(in);
-
-			mulmm(from,fromWorld,w->to);
-			mulmm(to,w->from,toWorld);
 		}
 	}
 
 	// Are we creating a fresh cache ?
 	if (root == NULL) {
-		vector	center;
+		vector	center,bmin,bmax;
+
+		movvv(bmin,CRenderer::worldBmin);
+		movvv(bmax,CRenderer::worldBmax);
 
 		root			=	(CCacheNode *) memory->alloc(sizeof(CCacheNode));
 		for (i=0;i<8;i++)	root->children[i]	=	NULL;
 		addvv(center,bmin,bmax);
-		mulvf(center,1 / (float) 2);
+		mulvf(center,0.5f);
 		movvv(root->center,center);
-		root->side		=	max(max(bmax[0] - bmin[0],bmax[1] - bmin[1]),bmax[2] - bmin[2]);
+		subvv(bmax,bmin);
+		root->side		=	max(max(bmax[0],bmax[1]),bmax[2]);
 		root->samples	=	NULL;
-
-		movmm(fromWorld,w->from);
-		movmm(toWorld,w->to);
-		identitym(from);
-		identitym(to);
 	}
 }
 
@@ -114,15 +121,18 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,const float *
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 CIrradianceCache::~CIrradianceCache() {
+
+	osDeleteMutex(mutex);
+
 	// Are we writing the file out ?
 	if (flags & CACHE_WRITE) {
 		FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
 
 		if (out != NULL) {
-			fwrite(fromWorld,	sizeof(matrix),1,out);
-			fwrite(toWorld,		sizeof(matrix),1,out);
+			// Write the xform
+			fwrite(CRenderer::fromWorld,sizeof(float),16,out);
+			fwrite(CRenderer::toWorld,sizeof(float),16,out);
 
 			// Write the samples
 			fwrite(&maxDepth,	sizeof(int),1,out);
@@ -143,7 +153,6 @@ CIrradianceCache::~CIrradianceCache() {
 // Description			:	Write a node into a file
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 void			CIrradianceCache::writeNode(FILE *out,CCacheNode *cNode) {
 	int				numSamples,i;
 	CCacheSample	*cSample;
@@ -171,7 +180,6 @@ void			CIrradianceCache::writeNode(FILE *out,CCacheNode *cNode) {
 // Description			:	Read a node from file
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
 CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 	int				numSamples,i;
 	CCacheNode		*cNode	=	(CCacheNode *) memory->alloc(sizeof(CCacheNode));
@@ -203,9 +211,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Description			:	Lookup da cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
-void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGlobalIllumLookup *lookup) {
-	vector				P,N;
+void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
 	float				totalWeight		=	0;
@@ -214,18 +220,26 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 	int					i;
 	float				coverage;
 	vector				irradiance,envdir;
-	const float			maxError		=	lookup->maxError;
-	int					numSummed		=	0;
-	
-	// Convert the query point into the right coordinate system
-	mulmp(P,from,cP);
-	mulmn(N,to,cN);
+	vector				P,N;
 
+	// Transform the lookup point to the correct coordinate system
+	mulmp(P,to,cP);
+	mulmn(N,from,cN);
+	
 	// Init the result
 	coverage	=	0;
 	initv(irradiance,0);
 	initv(envdir,0);
 
+	// The weighting algorithm is that described in [Tabellion and Lamorlette 2004]
+	// We need to convert the max error as in Wald to Tabellion 
+	// The default value of maxError is 0.4f
+	const float			K		=	0.4f / lookup->maxError;
+
+	// Note, we do not need to lock the data for reading
+	// if word-writes are atomic
+	
+	// Prepare for the non recursive tree traversal
 	stack		=	stackBase;
 	*stack++	=	root;
 	while(stack > stackBase) {
@@ -234,32 +248,30 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 		// Sum the values in this level
 		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
 			vector	D;
-			float	e1,e2;
-			float	w;
 
 			// D = vector from sample to query point
 			subvv(D,P,cSample->P);
 
 			// Ignore sample in the front
-			if (dotvv(D,cSample->N) > C_EPSILON)	continue;
+			float	a	=	dotvv(D,cSample->N);
+			if ((a*a / dotvv(D,D)) > 0.1)	continue;
 
-			// The blending weight computation
+			// Positional error
+			float	e1 = sqrtf(dotvv(D,D)) / cSample->dP;
 
-			// Positional weight
-			e1		=	lengthv(D) / cSample->dP;
-
-			// Directional weight
-			e2		=	1 - dotvv(N,cSample->N);
+			// Directional error
+			float	e2 =	1 - dotvv(N,cSample->N);
 			if (e2 < 0)	e2	=	0;
-			e2		=	sqrtf(e2 * weightNormalDenominator);
+			e2		=	sqrtf(e2*weightNormalDenominator);
 
-			// Are we writing ?
-			w		=	1 - maxError * max(e1,e2);
-			if (w > 0) {
+			// Compute the weight
+			float	w		=	1 - K*max(e1,e2);
+			if (w > context->urand()*0.1f) {
 				vector	ntmp;
 
-				crossvv(ntmp,N,cSample->N);
-
+				crossvv(ntmp,cSample->N,N);
+				
+				// Sum the sample
 				totalWeight		+=	w;
 				coverage		+=	w*(cSample->coverage		+ dotvv(cSample->gP+0*3,D) + dotvv(cSample->gR+0*3,ntmp));
 				irradiance[0]	+=	w*(cSample->irradiance[0]	+ dotvv(cSample->gP+1*3,D) + dotvv(cSample->gR+1*3,ntmp));
@@ -268,8 +280,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 				envdir[0]		+=	w*(cSample->envdir[0]		+ dotvv(cSample->gP+4*3,D) + dotvv(cSample->gR+4*3,ntmp));
 				envdir[1]		+=	w*(cSample->envdir[1]		+ dotvv(cSample->gP+5*3,D) + dotvv(cSample->gR+5*3,ntmp));
 				envdir[2]		+=	w*(cSample->envdir[2]		+ dotvv(cSample->gP+6*3,D) + dotvv(cSample->gR+6*3,ntmp));
-
-				numSummed++;
 			}
 		}
 
@@ -292,6 +302,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 		}
 	}
 
+	// Do we have anything ?
 	if (totalWeight > C_EPSILON) {
 		double	normalizer	=	1 / totalWeight;
 
@@ -305,9 +316,14 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 		C[5]			=	envdir[1];
 		C[6]			=	envdir[2];
 	} else {
+		// Are we sampling the cache ?
 		if (flags & CACHE_SAMPLE) {
-			sample(C,cP,cN,lookup);
+
+			// Create a new sample
+			sample(C,P,N,dSample,context,lookup);
 		} else {
+
+			// No joy
 			C[0]	=	0;
 			C[1]	=	0;
 			C[2]	=	0;
@@ -317,6 +333,9 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 			C[6]	=	0;
 		}
 	}
+
+	// Make sure we don't have NaNs
+	assert(dotvv(C,C) >= 0);
 }
 
 
@@ -326,7 +345,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,const CGl
 // Description			:	Check if there's a nearby sample
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/6/2003
 void	CIrradianceCache::cachesample(float *C,const float *cP,const float *cN,float dP) {
 	CCacheSample	*cSample;
 	CCacheNode		*cNode;
@@ -335,9 +353,10 @@ void	CIrradianceCache::cachesample(float *C,const float *cP,const float *cN,floa
 	int				i;
 	vector			P,N,Pn;
 
-	// Convert the query point into the right coordinate system
-	mulmp(P,from,cP);
-	mulmn(N,to,cN);
+	// Transform the lookup point to the correct coordinate system
+	mulmp(P,to,cP);
+	mulmn(N,from,cN);
+
 	normalizev(Pn,P);
 
 	*stack++	=	root;
@@ -394,7 +413,6 @@ void	CIrradianceCache::cachesample(float *C,const float *cP,const float *cN,floa
 // Class				:	CHemisphereSample
 // Description			:	This class is used to hold data about a hemisphere sample
 // Comments				:	-
-// Date last edited		:	5/15/2004
 class	CHemisphereSample {
 public:
 		vector	dir;			// Direction in the camera coordinate system
@@ -414,8 +432,7 @@ public:
 // Description			:	Compute the positional gradient for bunch of data points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/15/2004
-inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
+inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
 	int					i,j,k;
 	double				nextsine, lastsine, d;
 	double				mag0[7], mag1[7];
@@ -441,13 +458,13 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 				if (dp[0].invDepth > d) d = dp[0].invDepth;
 
 				d		*= lastsine * (1.0 - (double)i/(double) nt);
-				mag0[0]	+= d*(dp->coverage - dp[-np].coverage);
+				mag0[0]	+= d*(dp->coverage		- dp[-np].coverage);
 				mag0[1]	+= d*(dp->irradiance[0] - dp[-np].irradiance[0]);
 				mag0[2]	+= d*(dp->irradiance[1] - dp[-np].irradiance[1]);
 				mag0[3]	+= d*(dp->irradiance[2] - dp[-np].irradiance[2]);
-				mag0[4]	+= d*(dp->envdir[0] - dp[-np].envdir[0]);
-				mag0[5]	+= d*(dp->envdir[1] - dp[-np].envdir[1]);
-				mag0[6]	+= d*(dp->envdir[2] - dp[-np].envdir[2]);
+				mag0[4]	+= d*(dp->envdir[0]		- dp[-np].envdir[0]);
+				mag0[5]	+= d*(dp->envdir[1]		- dp[-np].envdir[1]);
+				mag0[6]	+= d*(dp->envdir[2]		- dp[-np].envdir[2]);
 			}
 
 			nextsine = sqrt((double)(i+1)/(double) nt);
@@ -460,13 +477,13 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 
 				d		*=	(nextsine - lastsine);
 
-				mag1[0]	+= d*(dp->coverage - dp[-1].coverage);
+				mag1[0]	+= d*(dp->coverage		- dp[-1].coverage);
 				mag1[1]	+= d*(dp->irradiance[0] - dp[-1].irradiance[0]);
 				mag1[2]	+= d*(dp->irradiance[1] - dp[-1].irradiance[1]);
 				mag1[3]	+= d*(dp->irradiance[2] - dp[-1].irradiance[2]);
-				mag1[4]	+= d*(dp->envdir[0] - dp[-1].envdir[0]);
-				mag1[5]	+= d*(dp->envdir[1] - dp[-1].envdir[1]);
-				mag1[6]	+= d*(dp->envdir[2] - dp[-1].envdir[2]);
+				mag1[4]	+= d*(dp->envdir[0]		- dp[-1].envdir[0]);
+				mag1[5]	+= d*(dp->envdir[1]		- dp[-1].envdir[1]);
+				mag1[6]	+= d*(dp->envdir[2]		- dp[-1].envdir[2]);
 
 			} else {
 				assert((dp+np-1) < h+np*nt);
@@ -476,13 +493,13 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 
 				d		*=	(nextsine - lastsine);
 
-				mag1[0]	+= d*(dp->coverage - dp[np-1].coverage);
+				mag1[0]	+= d*(dp->coverage		- dp[np-1].coverage);
 				mag1[1]	+= d*(dp->irradiance[0] - dp[np-1].irradiance[0]);
 				mag1[2]	+= d*(dp->irradiance[1] - dp[np-1].irradiance[1]);
 				mag1[3]	+= d*(dp->irradiance[2] - dp[np-1].irradiance[2]);
-				mag1[4]	+= d*(dp->envdir[0] - dp[np-1].envdir[0]);
-				mag1[5]	+= d*(dp->envdir[1] - dp[np-1].envdir[1]);
-				mag1[6]	+= d*(dp->envdir[2] - dp[np-1].envdir[2]);
+				mag1[4]	+= d*(dp->envdir[0]		- dp[np-1].envdir[0]);
+				mag1[5]	+= d*(dp->envdir[1]		- dp[np-1].envdir[1]);
+				mag1[6]	+= d*(dp->envdir[2]		- dp[np-1].envdir[2]);
 
 			}
 
@@ -502,12 +519,12 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 		}
 	}
 
-	d			=	1 / C_PI;
+	d			=	1.0f / C_PI;
 
-	for (k=0;k<7;k++) {
-		dP[k*3 + COMP_X]	=	(float) (yd[k]*d);
-		dP[k*3 + COMP_Y]	=	(float) (xd[k]*d);
-		dP[k*3 + COMP_Z]	=	0;
+	for (i=0;i<7;i++) {
+		dP[i*3 + COMP_X]	=	(float) ((xd[i]*X[COMP_X] + yd[i]*Y[COMP_X])*d);
+		dP[i*3 + COMP_Y]	=	(float) ((xd[i]*X[COMP_Y] + yd[i]*Y[COMP_Y])*d);
+		dP[i*3 + COMP_Z]	=	(float) ((xd[i]*X[COMP_Z] + yd[i]*Y[COMP_Z])*d);
 	}
 }
 
@@ -516,11 +533,10 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 // Description			:	Compute the rotational gradient for bunch of data points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	5/15/2004
-inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
+inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
 	int					i,j,k;
 	double				mag[7];
-	double				phi, xd[7], yd[7],cosphi,sinphi;
+	double				xd[7], yd[7];
 	CHemisphereSample	*dp;
 
 	for (i=0;i<7;i++)	{	xd[i] = yd[i] = 0.0;	}
@@ -541,9 +557,10 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 			mag[6]	+= dp->envdir[2]*tmp;
 			dp		+= np;
 		}
-		phi		=	2.0*C_PI * (j+.5)/np + C_PI/2.0;
-		cosphi	=	cos(phi);
-		sinphi	=	sin(phi);
+
+		const double	phi		=	2.0*C_PI * (j+.5)/np + C_PI/2.0;
+		const double	cosphi	=	cos(phi);
+		const double	sinphi	=	sin(phi);
 
 		for (k=0;k<7;k++) {
 			xd[k]	+=	mag[k] * cosphi;
@@ -551,12 +568,13 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 		}
 	}
 
-	cosphi		=	1 / (double) (nt*np);
+	// Normalize the gradient
+	const double	d		=	1 / (double) (nt*np);
 
 	for (i=0;i<7;i++) {
-		dP[i*3 + COMP_X]	=	(float) (yd[i]*cosphi);
-		dP[i*3 + COMP_Y]	=	(float) (xd[i]*cosphi);
-		dP[i*3 + COMP_Z]	=	0;
+		dP[i*3 + COMP_X]	=	(float) ((xd[i]*X[COMP_X] + yd[i]*Y[COMP_X])*d);
+		dP[i*3 + COMP_Y]	=	(float) ((xd[i]*X[COMP_Y] + yd[i]*Y[COMP_Y])*d);
+		dP[i*3 + COMP_Z]	=	(float) ((xd[i]*X[COMP_Z] + yd[i]*Y[COMP_Z])*d);
 	}
 }
 
@@ -569,8 +587,7 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h) {
 // Description			:	Sample the occlusion
 // Return Value			:
 // Comments				:
-// Date last edited		:	10/15/2003
-void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlobalIllumLookup *lookup) {
+void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
 	CCacheSample		*cSample;
 	int					i,j;
 	int					numSamples		=	lookup->numSamples;
@@ -578,16 +595,13 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 	vector				irradiance;
 	vector				envdir;
 	float				rMean;
-	float				rMeanMin;
 	CRay				ray;
 	int					nt,np;
 	vector				X,Y;
 	CHemisphereSample	*hemisphere;
 	CCacheNode			*cNode;
 	int					depth;
-	float				tmp;
 	CTextureLookup		*texLookup;
-	const float			footprint	=	P[COMP_Z]*lookup->lengthA + lookup->lengthB;
 
 	// Allocate memory
 	nt								=	(int) (sqrtf(numSamples / C_PI) + 0.5);
@@ -596,7 +610,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 	hemisphere						=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
 
 	if(lookup->environment != NULL){
-		texLookup = (CTextureLookup*) alloca(sizeof(CTextureLookup));
+		texLookup				= (CTextureLookup*) alloca(sizeof(CTextureLookup));
 		texLookup->filter		= RiGaussianFilter;
 		texLookup->blur			= 0;
 		texLookup->swidth		= 1;
@@ -622,9 +636,14 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 	coverage						=	0;
 	initv(irradiance,0);
 	initv(envdir,0);
-	rMean							=	0;
-	rMeanMin						=	C_INFINITY;
-
+	rMean							=	C_INFINITY;
+	
+	// Calculate the ray differentials (use average spread in theta and phi)
+	//const float da					=	DEFAULT_RAY_DA;
+	//const float db					=	DEFAULT_RAY_DB;
+	const float da					=	tanf(C_PI/(2*(nt+np)));
+	const float db					=	dSample;
+	
 	if (lookup->occlusion == TRUE) {
 
 		// We're shading for occlusion
@@ -633,37 +652,32 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
-				float		tmp			=	sqrtf((i+urand()) / (float) nt);
-				const float	phi			=	(float) (2*C_PI*(j+urand()) / (float) np);
+				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
+				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
 				const float	sinPhi		=	(sinf(phi)*tmp);
-				const float	dx			=	(2*urand()-1)*footprint;
-				const float	dy			=	(2*urand()-1)*footprint;
 
 				tmp						=	sqrtf(1 - tmp*tmp);
 
-				ray.dir[0]				=	X[0]*sinPhi + Y[0]*cosPhi + N[0]*tmp;
-				ray.dir[1]				=	X[1]*sinPhi + Y[1]*cosPhi + N[1]*tmp;
-				ray.dir[2]				=	X[2]*sinPhi + Y[2]*cosPhi + N[2]*tmp;
+				ray.dir[0]				=	X[0]*cosPhi + Y[0]*sinPhi + N[0]*tmp;
+				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
+				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				ray.from[COMP_X]		=	P[COMP_X] + X[COMP_X]*dx + Y[COMP_X]*dy;
-				ray.from[COMP_Y]		=	P[COMP_Y] + X[COMP_Y]*dx + Y[COMP_Y]*dy;
-				ray.from[COMP_Z]		=	P[COMP_Z] + X[COMP_Z]*dx + Y[COMP_Z]*dy;
-
-				addvv(ray.to,ray.from,ray.dir);
+				const float originJitterX = context->urand()*dSample*0.5f*lookup->sampleBase;
+				const float originJitterY = context->urand()*dSample*0.5f*lookup->sampleBase;
+				
+				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*X[0] + originJitterX*Y[0];
+				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*X[1] + originJitterX*Y[1];
+				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*X[2] + originJitterX*Y[2];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
-				ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-				ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-				ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
-				ray.jimp				=	-1.0f;
-				ray.lastXform			=	NULL;
-				ray.object				=	NULL;
+				ray.da					=	da;
+				ray.db					=	db;
 
-				hierarchy->intersect(&ray);
+				context->trace(&ray);
 
 				// Do we have an intersection ?
 				if (ray.object != NULL) {
@@ -694,7 +708,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -702,11 +716,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 					}
 				}
 
-				rMean						+=	1 / ray.t;
-				rMeanMin					=	min(rMeanMin,ray.t);
-
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
+
+				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+				
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -720,37 +734,32 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
-				float		tmp			=	sqrtf((i+urand()) / (float) nt);
-				const float	phi			=	(float) (2*C_PI*(j+urand()) / (float) np);
+				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
+				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
 				const float	sinPhi		=	(sinf(phi)*tmp);
-				const float	dx			=	(2*urand()-1)*footprint;
-				const float	dy			=	(2*urand()-1)*footprint;
 
 				tmp						=	sqrtf(1 - tmp*tmp);
 
-				ray.dir[0]				=	X[0]*sinPhi + Y[0]*cosPhi + N[0]*tmp;
-				ray.dir[1]				=	X[1]*sinPhi + Y[1]*cosPhi + N[1]*tmp;
-				ray.dir[2]				=	X[2]*sinPhi + Y[2]*cosPhi + N[2]*tmp;
+				ray.dir[0]				=	X[0]*cosPhi + Y[0]*sinPhi + N[0]*tmp;
+				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
+				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				ray.from[COMP_X]		=	P[COMP_X] + X[COMP_X]*dx + Y[COMP_X]*dy;
-				ray.from[COMP_Y]		=	P[COMP_Y] + X[COMP_Y]*dx + Y[COMP_Y]*dy;
-				ray.from[COMP_Z]		=	P[COMP_Z] + X[COMP_Z]*dx + Y[COMP_Z]*dy;
-
-				addvv(ray.to,ray.from,ray.dir);
+				const float originJitterX = context->urand()*dSample*0.5f*lookup->sampleBase;
+				const float originJitterY = context->urand()*dSample*0.5f*lookup->sampleBase;
+				
+				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*X[0] + originJitterX*Y[0];
+				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*X[1] + originJitterX*Y[1];
+				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*X[2] + originJitterX*Y[2];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
-				ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-				ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-				ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
-				ray.jimp				=	-1.0f;
-				ray.lastXform			=	NULL;
-				ray.object				=	NULL;
+				ray.da					=	da;
+				ray.db					=	db;
 
-				hierarchy->intersect(&ray);
+				context->trace(&ray);
 
 				// Do we have an intersection ?
 				if (ray.object != NULL) {
@@ -804,7 +813,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -813,11 +822,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 					}
 				}
 
-				rMean						+=	1 / ray.t;
-				rMeanMin					=	min(rMeanMin,ray.t);
-
 				hemisphere->depth			=	ray.t;
 				hemisphere->invDepth		=	1 / ray.t;
+
+				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
+
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -825,12 +834,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 		}
 	}
 	hemisphere				-=	np*nt;
-
+	
 	// Normalize
-	tmp						=	1 / (float) numSamples;
+	const float	tmp			=	1 / (float) numSamples;
 	coverage				*=	tmp;
 	mulvf(irradiance,tmp);
-	mulvf(envdir,tmp);
 	normalizevf(envdir);
 
 	// Record the value
@@ -843,30 +851,26 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 	C[6]					=	envdir[2];
 
 	// Should we save it ?
-	if (lookup->maxError != 0) {
-		float	gP[7*3],gR[7*3];
+	if ((lookup->maxError != 0) && (coverage < 1-C_EPSILON)) {
 
-		// Compute the radius of validity
-		rMean					=	rMeanMin / 2;
-		rMean					=	max(rMean, lookup->lengthA*lookup->minFGRadius + lookup->lengthB);
-		rMean					=	min(rMean, lookup->lengthA*lookup->maxFGRadius + lookup->lengthB);
-
+		// We're modifying, lock the thing
+		osLock(mutex);
+		
 		// Create the sample
 		cSample					=	(CCacheSample *) memory->alloc(sizeof(CCacheSample));
 
-		// Compute the gradients
-		posGradient(gP,np,nt,hemisphere);
-		rotGradient(gR,np,nt,hemisphere);
-		for (i=0;i<7;i++) {
-			cSample->gP[i*3 + COMP_X]	=	X[COMP_X]*gP[i*3 + COMP_X] + Y[COMP_X]*gP[i*3 + COMP_Y];
-			cSample->gP[i*3 + COMP_Y]	=	X[COMP_Y]*gP[i*3 + COMP_X] + Y[COMP_Y]*gP[i*3 + COMP_Y];
-			cSample->gP[i*3 + COMP_Z]	=	X[COMP_Z]*gP[i*3 + COMP_X] + Y[COMP_Z]*gP[i*3 + COMP_Y];
+		// Compute the gradients of the illumination
+		posGradient(cSample->gP,np,nt,hemisphere,X,Y);
+		rotGradient(cSample->gR,np,nt,hemisphere,X,Y);
+		
+		// Compute the radius of validity
+		rMean					*=	0.5f;
 
-			cSample->gR[i*3 + COMP_X]	=	X[COMP_X]*gR[i*3 + COMP_X] + Y[COMP_X]*gR[i*3 + COMP_Y];
-			cSample->gR[i*3 + COMP_Y]	=	X[COMP_Y]*gR[i*3 + COMP_X] + Y[COMP_Y]*gR[i*3 + COMP_Y];
-			cSample->gR[i*3 + COMP_Z]	=	X[COMP_Z]*gR[i*3 + COMP_X] + Y[COMP_Z]*gR[i*3 + COMP_Y];
-		}
-
+		// Clamp the radius of validity
+		rMean					=	max(rMean, lookup->minFGRadius);
+		rMean					=	min(rMean, lookup->maxFGRadius);
+		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5f);
+				
 		// Record the data
 		movvv(cSample->P,P);
 		movvv(cSample->N,N);
@@ -874,9 +878,16 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 		cSample->coverage		=	coverage;
 		movvv(cSample->envdir,envdir);
 		movvv(cSample->irradiance,irradiance);
-
+		
+		// Do the neighbour clamping trick
+		clamp(cSample);
+		rMean	=	cSample->dP;	// copy dP back so we get the right place in the octree
+		
+		// The error multiplier
+		const float		K		=	0.4f / lookup->maxError;
+		rMean					/=	K;
+		
 		// Insert the new sample into the cache
-		rMean					=	rMean/lookup->maxError;
 		cNode					=	root;
 		depth					=	0;
 		while(cNode->side > (2*rMean)) {
@@ -893,14 +904,14 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 
 				for (i=0;i<3;i++) {
 					if (P[i] > cNode->center[i]) {
-						nNode->center[i]	=	cNode->center[i] + cNode->side / (float) 4;
+						nNode->center[i]	=	cNode->center[i] + cNode->side*0.25f;
 					} else {
-						nNode->center[i]	=	cNode->center[i] - cNode->side / (float) 4;
+						nNode->center[i]	=	cNode->center[i] - cNode->side*0.25f;
 					}
 				}
 
 				cNode->children[j]	=	nNode;
-				nNode->side			=	cNode->side / (float) 2;
+				nNode->side			=	cNode->side*0.5f;
 				nNode->samples		=	NULL;
 				for (i=0;i<8;i++)	nNode->children[i]	=	NULL;
 			}
@@ -911,9 +922,60 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 		cSample->next	=	cNode->samples;
 		cNode->samples	=	cSample;
 		maxDepth		=	max(depth,maxDepth);
+
+		osUnlock(mutex);
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CIrradianceCache
+// Method				:	clamp
+// Description			:	Clamp the radius
+// Return Value			:
+// Comments				:
+void		CIrradianceCache::clamp(CCacheSample *nSample) {
+	CCacheSample	*cSample;
+	CCacheNode		*cNode;
+	CCacheNode		**stackBase		=	(CCacheNode **)	alloca(maxDepth*sizeof(CCacheNode *)*8);
+	CCacheNode		**stack			=	stackBase;
+	int				i;
+
+	*stack++	=	root;
+	while(stack > stackBase) {
+		cNode	=	*(--stack);
+
+		// Sum the values in this level
+		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
+			vector	D;
+
+			subvv(D,cSample->P,nSample->P);
+			//const float	l	=	lengthv(D);
+			// Avoid issues with coincident points
+			const float 	l	= 	(dotvv(D,D) > C_EPSILON) ? lengthv(D) : C_EPSILON;
+
+			nSample->dP		=	min(nSample->dP,cSample->dP + l);
+			cSample->dP		=	min(cSample->dP,nSample->dP + l);
+		}
+
+		// Check the children
+		for (i=0;i<8;i++) {
+			CCacheNode	*tNode;
+
+			if ((tNode = cNode->children[i]) != NULL) {
+				const float	tSide	=	tNode->side*4;
+
+				if (	((tNode->center[0] + tSide) > nSample->P[0])	&&
+						((tNode->center[1] + tSide) > nSample->P[1])	&&
+						((tNode->center[2] + tSide) > nSample->P[2])	&&
+						((tNode->center[0] - tSide) < nSample->P[0])	&&
+						((tNode->center[1] - tSide) < nSample->P[1])	&&
+						((tNode->center[2] - tSide) < nSample->P[2])) {
+					*stack++	=	tNode;
+				}
+			}
+		}
+	}
+}
 
 
 
@@ -923,7 +985,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,const CGlo
 // Description			:	Draw the irradiance cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CIrradianceCache::draw() {
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
@@ -932,27 +993,35 @@ void		CIrradianceCache::draw() {
 	int					i,j;
 	float				P[chunkSize*3];
 	float				C[chunkSize*3];
-	float				*cP,*cC;
+	float				N[chunkSize*3];
+	float				dP[chunkSize];
+	float				*cP,*cC,*cN,*cdP;
 
 	j			=	chunkSize;
 	cP			=	P;
 	cC			=	C;
+	cN			=	N;
+	cdP			=	dP;
 	stack		=	stackBase;
 	*stack++	=	root;
 	while(stack > stackBase) {
 		cNode	=	*(--stack);
 
 		// Sum the values in this level
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--,cP+=3,cC+=3) {
+		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next,j--,cP+=3,cN+=3,cdP++,cC+=3) {
 			if (j == 0)	{
-				drawPoints(chunkSize,P,C);
+				if (drawDiscs)		drawDisks(chunkSize,P,dP,N,C);
+				else			 	drawPoints(chunkSize,P,C);
 				cP	=	P;
 				cC	=	C;
+				cN	=	N;
+				cdP	=	dP;
 				j	=	chunkSize;
 			}
 
-			// FIXME: Maybe we should draw disks instead of points here
 			movvv(cP,cSample->P);
+			movvv(cN,cSample->N);
+			*cdP		=	cSample->dP*0.5f;
 			movvv(cC,cSample->irradiance);
 		}
 
@@ -966,8 +1035,30 @@ void		CIrradianceCache::draw() {
 		}
 	}
 
-	if (j != chunkSize)	drawPoints(chunkSize-j,P,C);
+	if (j != chunkSize) {
+		if (drawDiscs)		drawDisks(chunkSize-j,P,dP,N,C);
+		else			 	drawPoints(chunkSize-j,P,C);
+	}
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CIrradianceCache
+// Method				:	keyDown
+// Description			:	handle keypresses
+// Return Value			:	-
+// Comments				:
+int			CIrradianceCache::keyDown(int key) {
+	if ((key == 'd') || (key == 'D')) {
+		drawDiscs = TRUE;
+		return TRUE;
+	} else if ((key == 'p') || (key == 'P')) {
+		drawDiscs = FALSE;
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
@@ -975,7 +1066,6 @@ void		CIrradianceCache::draw() {
 // Description			:	Bound the irradiance cache
 // Return Value			:
 // Comments				:
-// Date last edited		:	9/22/2006
 void		CIrradianceCache::bound(float *bmin,float *bmax) {
 	assert(root != NULL);
 

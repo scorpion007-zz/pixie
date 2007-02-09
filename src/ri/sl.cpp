@@ -58,7 +58,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -90,8 +90,9 @@
 #include "common/containers.h"
 #include "shader.h"
 #include "slcode.h"
-#include "renderer.h"
 #include "error.h"
+#include "renderer.h"
+#include "dso.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   First some temporary data structures used during the script parsing
@@ -187,6 +188,7 @@ static	TSlFunction		functions[]	=	{
 				int						passNumber;				// Current pass number (we make 2 passes)
 				int						parsingInit;			// TRUE if we're parsing the init code
 				int						numErrors;				// Number of errors encountered during parse
+				int						accessorType;			// Accessor type for _interpolatable_ parameters
 
 				// Pass 1
 				int						numCode;				// The number of code blocks
@@ -246,7 +248,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Returns the number of codes that a particular type takes
 									// Return Value			:	Size in codes
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	int					numComponents(EVariableType type) {
 										switch(type) {
 										case TYPE_FLOAT:
@@ -294,7 +295,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a new variable/parameter
 									// Return Value			:	The default area if available
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	TCode				*newVariable(char *name,EVariableType type,int numItems,int parameter) {
 										const int	numComp			=	numComponents(type);
 
@@ -340,11 +340,12 @@ static	TSlFunction		functions[]	=	{
 													newVariable->usageMarker	=	0;
 													newVariable->storage		=	currentData.currentParameterMutable	? STORAGE_MUTABLEPARAMETER : STORAGE_PARAMETER;
 													newVariable->defaultValue	=	new TCode[numItems*numComp];
+													newVariable->accessor		=	currentData.accessorType;
 													newVariable->next			=	NULL;													
 													cVariable->variable			=	newVariable;
 													
 													// Is this a global variable ?
-													gVariable					=	currentRenderer->retrieveVariable(name);
+													gVariable					=	CRenderer::retrieveVariable(name);
 													if (gVariable != NULL)	{
 														if (gVariable->storage == STORAGE_GLOBAL) {
 															// If the variable is actually defined
@@ -385,7 +386,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a reference to a string
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				addStringReference(char **items,int numItems) {
 										int	i;
 										
@@ -422,7 +422,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a reference to a float
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				addFloatReference(float *items,int numItems) {
 										int	i;
 										switch(currentData.passNumber) {
@@ -456,7 +455,6 @@ static	TSlFunction		functions[]	=	{
 										// Description			:	Add a reference to a variable/parameter
 										// Return Value			:	-
 										// Comments				:
-										// Date last edited		:	8/8/2001
 		static	void					addVariableReference(char *name) {
 											CVariable		*var;
 											TSlVariable		*cVariable;
@@ -493,7 +491,7 @@ static	TSlFunction		functions[]	=	{
 													}
 												}
 
-												var	=	currentRenderer->retrieveVariable(name);
+												var	=	CRenderer::retrieveVariable(name);
 
 												if (var != NULL) {
 													currentData.usedParameters										|=	var->usageMarker;
@@ -524,7 +522,6 @@ static	TSlFunction		functions[]	=	{
 										// Description			:	Find/Set an opcode/function
 										// Return Value			:	-
 										// Comments				:
-										// Date last edited		:	8/8/2001
 		static	void					setOpcode() {
 											switch(currentData.passNumber) {
 											case 1:
@@ -640,7 +637,7 @@ static	TSlFunction		functions[]	=	{
 														void			*handle;
 														dsoExecFunction	exec;
 
-														if (currentRenderer->getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
+														if (CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
 															// We have the DSO
 														} else {
 															slerror("Unknown function");
@@ -659,7 +656,6 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Create a new label definition/reference
 									// Return Value			:	-
 									// Comments				:
-									// Date last edited		:	8/8/2001
 		static	void				newLabel(char *name,int reference) {
 										switch(currentData.passNumber) {
 										case 1:
@@ -709,7 +705,7 @@ static	TSlFunction		functions[]	=	{
 		TSlLabel					*newLabelRef(char *,int);
 		void						processEscapes(char *);
 
-#line 659 "../../../../src/ri/sdr.y"
+#line 655 "../../../../src/ri/sdr.y"
 typedef union slval {
 	float	real;
 	char	string[64];
@@ -850,20 +846,20 @@ static const short yyrhs[] = {    42,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   711,   720,   721,   726,   734,   747,   755,   767,   775,   783,
-   789,   795,   801,   807,   815,   822,   826,   829,   836,   843,
-   851,   859,   866,   875,   881,   883,   885,   887,   889,   891,
-   893,   898,   910,   920,   942,   942,   961,   972,   986,   990,
-  1009,  1030,  1061,  1061,  1078,  1089,  1104,  1108,  1115,  1127,
-  1142,  1142,  1153,  1160,  1172,  1189,  1189,  1200,  1207,  1219,
-  1236,  1236,  1247,  1254,  1266,  1283,  1283,  1294,  1301,  1313,
-  1320,  1334,  1345,  1364,  1368,  1412,  1439,  1464,  1485,  1485,
-  1504,  1515,  1563,  1594,  1598,  1605,  1609,  1612,  1615,  1618,
-  1621,  1624,  1627,  1630,  1633,  1638,  1644,  1656,  1662,  1673,
-  1679,  1690,  1696,  1707,  1713,  1724,  1730,  1741,  1747,  1758,
-  1764,  1775,  1782,  1784,  1791,  1793,  1797,  1801,  1805,  1809,
-  1829,  1865,  1884,  1903,  1924,  1929,  1934,  1942,  1950,  1957,
-  1962,  1967,  1972,  1989,  2045
+   707,   716,   717,   722,   730,   743,   751,   763,   771,   779,
+   786,   793,   801,   810,   818,   825,   829,   832,   839,   846,
+   854,   862,   869,   878,   884,   886,   888,   890,   892,   894,
+   896,   901,   913,   923,   945,   945,   964,   975,   989,   993,
+  1012,  1033,  1064,  1064,  1081,  1092,  1107,  1111,  1118,  1130,
+  1145,  1145,  1156,  1163,  1175,  1192,  1192,  1203,  1210,  1222,
+  1239,  1239,  1250,  1257,  1269,  1286,  1286,  1297,  1304,  1316,
+  1323,  1337,  1348,  1367,  1371,  1415,  1442,  1467,  1488,  1488,
+  1507,  1518,  1566,  1597,  1601,  1608,  1612,  1615,  1618,  1621,
+  1624,  1627,  1630,  1633,  1636,  1641,  1647,  1659,  1665,  1676,
+  1682,  1693,  1699,  1710,  1716,  1727,  1733,  1744,  1750,  1761,
+  1767,  1778,  1785,  1787,  1794,  1796,  1800,  1804,  1808,  1812,
+  1832,  1868,  1887,  1906,  1927,  1932,  1937,  1945,  1953,  1960,
+  1965,  1970,  1975,  1992,  2048
 };
 #endif
 
@@ -1576,7 +1572,7 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 729 "../../../../src/ri/sdr.y"
+#line 725 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1584,7 +1580,7 @@ case 4:
 				;
     break;}
 case 5:
-#line 742 "../../../../src/ri/sdr.y"
+#line 738 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1592,7 +1588,7 @@ case 5:
 				;
     break;}
 case 6:
-#line 750 "../../../../src/ri/sdr.y"
+#line 746 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1600,7 +1596,7 @@ case 6:
 				;
     break;}
 case 7:
-#line 762 "../../../../src/ri/sdr.y"
+#line 758 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1608,7 +1604,7 @@ case 7:
 				;
     break;}
 case 8:
-#line 768 "../../../../src/ri/sdr.y"
+#line 764 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	0;
 					yyval.v[1]	=	0;
@@ -1616,7 +1612,7 @@ case 8:
 				;
     break;}
 case 9:
-#line 776 "../../../../src/ri/sdr.y"
+#line 772 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].v[0];
 					yyval.v[1]	=	yyvsp[0].v[1];
@@ -1624,37 +1620,44 @@ case 9:
 				;
     break;}
 case 10:
-#line 786 "../../../../src/ri/sdr.y"
+#line 782 "../../../../src/ri/sdr.y"
 {
-					currentData.shaderType	=	SL_SURFACE;
+					currentData.shaderType		=	SL_SURFACE;
+					currentData.accessorType 	=	ACCESSOR_SURFACE;
 				;
     break;}
 case 11:
-#line 792 "../../../../src/ri/sdr.y"
+#line 789 "../../../../src/ri/sdr.y"
 {
-					currentData.shaderType	=	SL_DISPLACEMENT;
+					currentData.shaderType		=	SL_DISPLACEMENT;
+					currentData.accessorType	=	ACCESSOR_DISPLACEMENT;
 				;
     break;}
 case 12:
-#line 798 "../../../../src/ri/sdr.y"
+#line 796 "../../../../src/ri/sdr.y"
 {
-					currentData.shaderType	=	SL_LIGHTSOURCE;
+					currentData.shaderType		=	SL_LIGHTSOURCE;
+					// Note: we don't set accessorType because you can't interpolate into
+					// light shader parameters
 				;
     break;}
 case 13:
 #line 804 "../../../../src/ri/sdr.y"
 {
-					currentData.shaderType	=	SL_ATMOSPHERE;
+					currentData.shaderType		=	SL_ATMOSPHERE;
+					currentData.accessorType	=	ACCESSOR_ATMOSPHERE;
+					// Note: we can assume the accessor is atmosphere as that's the only
+					// volume shader that can be interpolated into
 				;
     break;}
 case 14:
-#line 810 "../../../../src/ri/sdr.y"
+#line 813 "../../../../src/ri/sdr.y"
 {
 					currentData.shaderType	=	SL_IMAGER;
 				;
     break;}
 case 18:
-#line 831 "../../../../src/ri/sdr.y"
+#line 834 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1662,7 +1665,7 @@ case 18:
 				;
     break;}
 case 19:
-#line 838 "../../../../src/ri/sdr.y"
+#line 841 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1670,7 +1673,7 @@ case 19:
 				;
     break;}
 case 20:
-#line 846 "../../../../src/ri/sdr.y"
+#line 849 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1678,7 +1681,7 @@ case 20:
 				;
     break;}
 case 21:
-#line 854 "../../../../src/ri/sdr.y"
+#line 857 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1686,7 +1689,7 @@ case 21:
 				;
     break;}
 case 22:
-#line 861 "../../../../src/ri/sdr.y"
+#line 864 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1694,7 +1697,7 @@ case 22:
 				;
     break;}
 case 23:
-#line 867 "../../../../src/ri/sdr.y"
+#line 870 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1702,7 +1705,7 @@ case 23:
 				;
     break;}
 case 32:
-#line 903 "../../../../src/ri/sdr.y"
+#line 906 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_FLOAT,1,TRUE);
 
@@ -1712,7 +1715,7 @@ case 32:
 				;
     break;}
 case 33:
-#line 913 "../../../../src/ri/sdr.y"
+#line 916 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_FLOAT,1,TRUE);
 
@@ -1722,7 +1725,7 @@ case 33:
 				;
     break;}
 case 34:
-#line 927 "../../../../src/ri/sdr.y"
+#line 930 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_FLOAT,(int) yyvsp[-2].real,TRUE);
 					
@@ -1739,7 +1742,7 @@ case 34:
 				;
     break;}
 case 36:
-#line 948 "../../../../src/ri/sdr.y"
+#line 951 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,TRUE);
 
@@ -1752,7 +1755,7 @@ case 36:
 				;
     break;}
 case 37:
-#line 965 "../../../../src/ri/sdr.y"
+#line 968 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1760,7 +1763,7 @@ case 37:
 				;
     break;}
 case 38:
-#line 975 "../../../../src/ri/sdr.y"
+#line 978 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -1774,7 +1777,7 @@ case 38:
 				;
     break;}
 case 40:
-#line 993 "../../../../src/ri/sdr.y"
+#line 996 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_STRING,1,TRUE);
 
@@ -1793,7 +1796,7 @@ case 40:
 				;
     break;}
 case 41:
-#line 1014 "../../../../src/ri/sdr.y"
+#line 1017 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_STRING,1,TRUE);
 
@@ -1812,7 +1815,7 @@ case 41:
 				;
     break;}
 case 42:
-#line 1037 "../../../../src/ri/sdr.y"
+#line 1040 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_STRING,(int) yyvsp[-2].real,TRUE);
 					
@@ -1838,7 +1841,7 @@ case 42:
 				;
     break;}
 case 44:
-#line 1067 "../../../../src/ri/sdr.y"
+#line 1070 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,TRUE);
 
@@ -1851,7 +1854,7 @@ case 44:
 				;
     break;}
 case 45:
-#line 1082 "../../../../src/ri/sdr.y"
+#line 1085 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1859,7 +1862,7 @@ case 45:
 				;
     break;}
 case 46:
-#line 1092 "../../../../src/ri/sdr.y"
+#line 1095 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -1874,13 +1877,13 @@ case 46:
 				;
     break;}
 case 48:
-#line 1111 "../../../../src/ri/sdr.y"
+#line 1114 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_COLOR;
 				;
     break;}
 case 49:
-#line 1115 "../../../../src/ri/sdr.y"
+#line 1118 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1895,7 +1898,7 @@ case 49:
 				;
     break;}
 case 50:
-#line 1134 "../../../../src/ri/sdr.y"
+#line 1137 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_COLOR,(int) yyvsp[-2].real,TRUE);
 					
@@ -1905,19 +1908,19 @@ case 50:
 				;
     break;}
 case 52:
-#line 1148 "../../../../src/ri/sdr.y"
+#line 1151 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 53:
-#line 1156 "../../../../src/ri/sdr.y"
+#line 1159 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_VECTOR;
 				;
     break;}
 case 54:
-#line 1160 "../../../../src/ri/sdr.y"
+#line 1163 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1932,7 +1935,7 @@ case 54:
 				;
     break;}
 case 55:
-#line 1179 "../../../../src/ri/sdr.y"
+#line 1182 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_VECTOR,(int) yyvsp[-2].real,TRUE);
 					
@@ -1944,19 +1947,19 @@ case 55:
 				;
     break;}
 case 57:
-#line 1195 "../../../../src/ri/sdr.y"
+#line 1198 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 58:
-#line 1203 "../../../../src/ri/sdr.y"
+#line 1206 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_NORMAL;
 				;
     break;}
 case 59:
-#line 1207 "../../../../src/ri/sdr.y"
+#line 1210 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -1971,7 +1974,7 @@ case 59:
 				;
     break;}
 case 60:
-#line 1226 "../../../../src/ri/sdr.y"
+#line 1229 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_NORMAL,(int) yyvsp[-2].real,TRUE);
 					
@@ -1983,19 +1986,19 @@ case 60:
 				;
     break;}
 case 62:
-#line 1242 "../../../../src/ri/sdr.y"
+#line 1245 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 63:
-#line 1250 "../../../../src/ri/sdr.y"
+#line 1253 "../../../../src/ri/sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_POINT;
 				;
     break;}
 case 64:
-#line 1254 "../../../../src/ri/sdr.y"
+#line 1257 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 					float	*v;
@@ -2010,7 +2013,7 @@ case 64:
 				;
     break;}
 case 65:
-#line 1273 "../../../../src/ri/sdr.y"
+#line 1276 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_POINT,(int) yyvsp[-2].real,TRUE);
 					
@@ -2022,13 +2025,13 @@ case 65:
 				;
     break;}
 case 67:
-#line 1289 "../../../../src/ri/sdr.y"
+#line 1292 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 68:
-#line 1296 "../../../../src/ri/sdr.y"
+#line 1299 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2036,7 +2039,7 @@ case 68:
 				;
     break;}
 case 69:
-#line 1308 "../../../../src/ri/sdr.y"
+#line 1311 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2044,7 +2047,7 @@ case 69:
 				;
     break;}
 case 70:
-#line 1315 "../../../../src/ri/sdr.y"
+#line 1318 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2052,7 +2055,7 @@ case 70:
 				;
     break;}
 case 71:
-#line 1326 "../../../../src/ri/sdr.y"
+#line 1329 "../../../../src/ri/sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2060,7 +2063,7 @@ case 71:
 				;
     break;}
 case 72:
-#line 1338 "../../../../src/ri/sdr.y"
+#line 1341 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -2068,7 +2071,7 @@ case 72:
 				;
     break;}
 case 73:
-#line 1348 "../../../../src/ri/sdr.y"
+#line 1351 "../../../../src/ri/sdr.y"
 {
 					float *v;
 					
@@ -2087,7 +2090,7 @@ case 73:
 				;
     break;}
 case 75:
-#line 1390 "../../../../src/ri/sdr.y"
+#line 1393 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-19].string,TYPE_MATRIX,1,TRUE);
 
@@ -2112,7 +2115,7 @@ case 75:
 				;
     break;}
 case 76:
-#line 1417 "../../../../src/ri/sdr.y"
+#line 1420 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_MATRIX,1,TRUE);
 
@@ -2137,7 +2140,7 @@ case 76:
 				;
     break;}
 case 77:
-#line 1442 "../../../../src/ri/sdr.y"
+#line 1445 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_MATRIX,1,TRUE);
 
@@ -2162,7 +2165,7 @@ case 77:
 				;
     break;}
 case 78:
-#line 1471 "../../../../src/ri/sdr.y"
+#line 1474 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_MATRIX,(int) yyvsp[-2].real,TRUE);
 					
@@ -2178,7 +2181,7 @@ case 78:
 				;
     break;}
 case 80:
-#line 1491 "../../../../src/ri/sdr.y"
+#line 1494 "../../../../src/ri/sdr.y"
 {
 					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,TRUE);
 
@@ -2191,7 +2194,7 @@ case 80:
 				;
     break;}
 case 81:
-#line 1508 "../../../../src/ri/sdr.y"
+#line 1511 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("wrong number of items in array initializer\n");
@@ -2199,7 +2202,7 @@ case 81:
 				;
     break;}
 case 82:
-#line 1535 "../../../../src/ri/sdr.y"
+#line 1538 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -2230,7 +2233,7 @@ case 82:
 				;
     break;}
 case 83:
-#line 1566 "../../../../src/ri/sdr.y"
+#line 1569 "../../../../src/ri/sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
@@ -2261,117 +2264,117 @@ case 83:
 				;
     break;}
 case 96:
-#line 1641 "../../../../src/ri/sdr.y"
+#line 1644 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_BOOLEAN,1,FALSE);
 				;
     break;}
 case 97:
-#line 1650 "../../../../src/ri/sdr.y"
+#line 1653 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_BOOLEAN,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 98:
-#line 1659 "../../../../src/ri/sdr.y"
+#line 1662 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_FLOAT,1,FALSE);
 				;
     break;}
 case 99:
-#line 1668 "../../../../src/ri/sdr.y"
+#line 1671 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 100:
-#line 1676 "../../../../src/ri/sdr.y"
+#line 1679 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_STRING,1,FALSE);
 				;
     break;}
 case 101:
-#line 1685 "../../../../src/ri/sdr.y"
+#line 1688 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 102:
-#line 1693 "../../../../src/ri/sdr.y"
+#line 1696 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_VECTOR,1,FALSE);
 				;
     break;}
 case 103:
-#line 1702 "../../../../src/ri/sdr.y"
+#line 1705 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 104:
-#line 1710 "../../../../src/ri/sdr.y"
+#line 1713 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_COLOR,1,FALSE);
 				;
     break;}
 case 105:
-#line 1719 "../../../../src/ri/sdr.y"
+#line 1722 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 106:
-#line 1727 "../../../../src/ri/sdr.y"
+#line 1730 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_NORMAL,1,FALSE);
 				;
     break;}
 case 107:
-#line 1736 "../../../../src/ri/sdr.y"
+#line 1739 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 108:
-#line 1744 "../../../../src/ri/sdr.y"
+#line 1747 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_POINT,1,FALSE);
 				;
     break;}
 case 109:
-#line 1753 "../../../../src/ri/sdr.y"
+#line 1756 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 110:
-#line 1761 "../../../../src/ri/sdr.y"
+#line 1764 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_MATRIX,1,FALSE);
 				;
     break;}
 case 111:
-#line 1770 "../../../../src/ri/sdr.y"
+#line 1773 "../../../../src/ri/sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 112:
-#line 1777 "../../../../src/ri/sdr.y"
+#line 1780 "../../../../src/ri/sdr.y"
 {
 					currentData.parsingInit	=	TRUE;
 					newLabel(initLabel,FALSE);
 				;
     break;}
 case 114:
-#line 1786 "../../../../src/ri/sdr.y"
+#line 1789 "../../../../src/ri/sdr.y"
 {
 					currentData.parsingInit	=	FALSE;
 					newLabel(codeLabel,FALSE);
 				;
     break;}
 case 120:
-#line 1811 "../../../../src/ri/sdr.y"
+#line 1814 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2391,7 +2394,7 @@ case 120:
 				;
     break;}
 case 121:
-#line 1832 "../../../../src/ri/sdr.y"
+#line 1835 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2401,7 +2404,7 @@ case 121:
 						void			*handle;
 						dsoExecFunction	exec;
 
-						if (currentRenderer->getDSO(yyvsp[-5].string,yyvsp[-2].string,handle,exec) == TRUE) {
+						if (CRenderer::getDSO(yyvsp[-5].string,yyvsp[-2].string,handle,exec) == TRUE) {
 							if (yyvsp[-2].string[0] == 'o')
 								currentData.currentOpcodePlace[0].integer	=	FUNCTION_DSO_VOID;
 							else
@@ -2425,7 +2428,7 @@ case 121:
 				;
     break;}
 case 122:
-#line 1867 "../../../../src/ri/sdr.y"
+#line 1870 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2445,7 +2448,7 @@ case 122:
 				;
     break;}
 case 123:
-#line 1886 "../../../../src/ri/sdr.y"
+#line 1889 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2465,7 +2468,7 @@ case 123:
 				;
     break;}
 case 124:
-#line 1905 "../../../../src/ri/sdr.y"
+#line 1908 "../../../../src/ri/sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
@@ -2485,29 +2488,29 @@ case 124:
 				;
     break;}
 case 125:
-#line 1927 "../../../../src/ri/sdr.y"
-{
-				;
-    break;}
-case 126:
 #line 1930 "../../../../src/ri/sdr.y"
 {
 				;
     break;}
+case 126:
+#line 1933 "../../../../src/ri/sdr.y"
+{
+				;
+    break;}
 case 127:
-#line 1937 "../../../../src/ri/sdr.y"
+#line 1940 "../../../../src/ri/sdr.y"
 {
 					setOpcode();
 				;
     break;}
 case 128:
-#line 1945 "../../../../src/ri/sdr.y"
+#line 1948 "../../../../src/ri/sdr.y"
 {
 					newLabel(yyvsp[-1].string,FALSE);
 				;
     break;}
 case 129:
-#line 1952 "../../../../src/ri/sdr.y"
+#line 1955 "../../../../src/ri/sdr.y"
 {
 					char	*str	=	yyvsp[0].string;
 
@@ -2515,25 +2518,25 @@ case 129:
 				;
     break;}
 case 130:
-#line 1959 "../../../../src/ri/sdr.y"
+#line 1962 "../../../../src/ri/sdr.y"
 {
 					newLabel(yyvsp[0].string,TRUE);
 				;
     break;}
 case 131:
-#line 1964 "../../../../src/ri/sdr.y"
+#line 1967 "../../../../src/ri/sdr.y"
 {
 					addVariableReference(yyvsp[0].string);
 				;
     break;}
 case 132:
-#line 1969 "../../../../src/ri/sdr.y"
+#line 1972 "../../../../src/ri/sdr.y"
 {
 					addFloatReference(&yyvsp[0].real,1);
 				;
     break;}
 case 133:
-#line 1980 "../../../../src/ri/sdr.y"
+#line 1983 "../../../../src/ri/sdr.y"
 {
 					vector	tmp;
 
@@ -2545,7 +2548,7 @@ case 133:
 				;
     break;}
 case 134:
-#line 2023 "../../../../src/ri/sdr.y"
+#line 2026 "../../../../src/ri/sdr.y"
 {
 					matrix	tmp;
 
@@ -2570,7 +2573,7 @@ case 134:
 				;
     break;}
 case 135:
-#line 2049 "../../../../src/ri/sdr.y"
+#line 2052 "../../../../src/ri/sdr.y"
 {
 					strcpy(currentData.currentPrototype,yyvsp[-1].string);
 				;
@@ -2772,7 +2775,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 2054 "../../../../src/ri/sdr.y"
+#line 2057 "../../../../src/ri/sdr.y"
 
 #include "lex.sl.cpp"
 
@@ -2783,7 +2786,6 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 void	slerror(char *s) {
 	warning(CODE_BADFILE,"Error in shader \"%s\" (%d) (\"%s\") (v%d.%d.%d)\n",currentData.name,slLineno,s,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 	currentData.numErrors++;
@@ -2795,7 +2797,6 @@ void	slerror(char *s) {
 // Description			:	Parse a shader
 // Return Value			:	Parsed shader if successful
 // Comments				:
-// Date last edited		:	8/8/2001
 CShader	*parseShader(const char *shaderName,const char *name) {
 	YY_BUFFER_STATE	oldState;
 
@@ -2818,7 +2819,9 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 	slparse();
 
 	if (currentData.numErrors != 0) {
+		sl_delete_buffer( YY_CURRENT_BUFFER );
 		fclose(fin);
+		sl_switch_to_buffer( oldState );
 		return NULL;
 	}
 
@@ -2850,7 +2853,6 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 // Description			:	Deallocate any previously allocated memory for the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/8/2001
 void	reset() {
 	if (currentData.strings != NULL) {
 		int	i;
@@ -2902,6 +2904,7 @@ void	reset() {
 	currentData.passNumber				=	0;
 	currentData.parsingInit				=	FALSE;
 	currentData.numErrors				=	0;
+	currentData.accessorType			=	-1;
 
 				// Pass 1
 	currentData.numCode					=	0;
@@ -2946,7 +2949,6 @@ void	reset() {
 // Description			:	Allocate required space for the shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 void	alloc() {
 	TCode	*mem;
 
@@ -2995,7 +2997,6 @@ void	alloc() {
 // Description			:	Parse successful, allocate the shader
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/8/2001
 CShader	*shaderCreate(const char *shaderName) {
 	CShader	*cShader;
 
@@ -3104,7 +3105,6 @@ CShader	*shaderCreate(const char *shaderName) {
 // Description			:
 // Return Value			:
 // Comments				:
-// Date last edited		:
 void	processEscapes(char *str) {
 	int		i,n,j;
 

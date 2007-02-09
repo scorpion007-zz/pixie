@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -44,7 +44,6 @@ const	unsigned int	PL_VERTEX_TO_VARYING	=	2;	// Force vertex variables to be var
 // Class				:	CVertexData
 // Description			:	Holds vertex data
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CVertexData {
 public:
 							CVertexData();
@@ -53,7 +52,7 @@ public:
 	void					attach()		{	refCount++;	}
 	void					detach()		{	if (--refCount == 0)	delete this;	}
 
-	void					dispatch(const float *,int,int,float **);
+	void					dispatch(const float *,int,int,float **,float ***);
 
 	int						refCount;				// The reference counter
 	int						parameters;				// The parameters that the user attached (includes varying/uniform/facevarying parameters)
@@ -68,16 +67,15 @@ public:
 // Class				:	CParameter
 // Description			:	Encapsulates a parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class	CParameter {
 public:
 							CParameter(CVariable *);
 	virtual					~CParameter();
 
 
-	virtual	void			dispatch(int,float **)			=	0;	// Dispatch the parameter
-	virtual	void			dispatch(int,int,float **)		=	0;	// Dispatch the parameter
-	virtual	CParameter		*clone(CAttributes *)			=	0;	// Clone the parameter
+	virtual	void			dispatch(int,float **,float ***)		=	0;	// Dispatch the parameter
+	virtual	void			dispatch(int,int,float **,float ***)	=	0;	// Dispatch the parameter
+	virtual	CParameter		*clone(CAttributes *)					=	0;	// Clone the parameter
 
 	CVariable				*variable;
 	CParameter				*next;
@@ -87,7 +85,6 @@ public:
 // Class				:	CPlParameter
 // Description			:	Encapsulates a parameter
 // Comments				:
-// Date last edited		:	8/17/2003
 class CPlParameter {
 public:
 	CVariable				*variable;			// The variable
@@ -100,14 +97,10 @@ public:
 							// Class				:	CPlParameter
 							// Description			:	This function is used to obtain the variable to write to
 							// Comments				:
-							// Date last edited		:	5/28/2006
-	float					*resolve(float **varying) const {
+	float					*resolve(float **varying,float ***locals) const {
 								if (variable->storage == STORAGE_GLOBAL)	return varying[variable->entry];
-								else {
-									float	*value	=	variable->value;
-									variable->value	=	NULL;
-									return value;
-								}
+								else if (locals != NULL)					return locals[variable->accessor][variable->entry];
+								return NULL;
 							}
 };
 
@@ -115,7 +108,6 @@ public:
 // Class				:	CPl
 // Description			:	Holds a parameter list
 // Comments				:
-// Date last edited		:	5/28/2006
 class	CPl {
 public:
 							CPl(int,int,CPlParameter *,float *,float *d1 = NULL);
@@ -127,7 +119,7 @@ public:
 	CPlParameter			*find(int,const float *&,const float *&);
 
 	CVertexData				*vertexData();
-	void					collect(int &,float *&,EVariableClass);
+	void					collect(int &,float *&,EVariableClass,CMemPage *);
 
 	CParameter				*uniform(int,CParameter *);
 	CParameter				*varying(int,int,int,int,CParameter *);

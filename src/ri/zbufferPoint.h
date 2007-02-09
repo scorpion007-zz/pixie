@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -63,16 +63,16 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 				float		*sample		=	&fb[y][x*SAMPLES_PER_PIXEL];
 				const float	z			=	vertices[2];
 
-				if (z < sample[0] || (flags & RASTER_SHADE_HIDDEN)) {
-					if (z > clipMin) {
-						if (flags & RASTER_UNSHADED) {
+				if (z < sample[0] || (CRenderer::flags & RASTER_SHADE_HIDDEN)) {
+					if (z > CRenderer::clipMin) {
+						if (CRenderer::flags & RASTER_UNSHADED) {
 							shadeGrid(grid,FALSE);
 							rasterDrawPrimitives(grid);
 							return;
 						}
 
 						sample[0]	=	z;
-						if (flags & RASTER_MATTE ) {
+						if (CRenderer::flags & RASTER_MATTE ) {
 							initv(sample,0);
 						} else {
 							sample[1]	=	vertices[3];

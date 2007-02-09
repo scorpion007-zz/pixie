@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -176,8 +176,9 @@ const	unsigned	int		VARIABLE_SRU				=	24;
 const	unsigned	int		VARIABLE_SRV				=	25;
 const	unsigned	int		VARIABLE_NCOMPS				=	26;
 const	unsigned	int		VARIABLE_DTIME				=	27;
-const	unsigned	int		VARIABLE_WIDTH				=	28;
-const	unsigned	int		VARIABLE_CONSTANTWIDTH		=	29;
+const	unsigned	int		VARIABLE_DPDTIME			=	28;
+const	unsigned	int		VARIABLE_WIDTH				=	29;
+const	unsigned	int		VARIABLE_CONSTANTWIDTH		=	30;
 
 //	Some shader parameters
 const	unsigned	int		PARAMETER_DERIVATIVE		=	1 << 14;
@@ -211,7 +212,6 @@ const	unsigned	int		PARAMETER_BEGIN_SAMPLE		=	1 << 27;
 const	unsigned	int		PARAMETER_END_SAMPLE		=	1 << 28;
 const	unsigned	int		PARAMETER_RAYTRACE			=	1 << 29;	// Requires raytracing
 const	unsigned	int		PARAMETER_NONAMBIENT		=	1 << 30;	// A non-ambient light source
-const	unsigned	int		PARAMETER_MESSAGEPASSING	=	1 << 31;	// Requires message passing
 
 
 

@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -46,8 +46,8 @@
 #include "ri.h"
 #include "riInterface.h"
 #include "ribOut.h"
-#include "renderer.h"
 #include "delayed.h"
+#include "rendererContext.h"
 
 //////////////////////////////////////////////////////////////////
 // String definitions
@@ -186,6 +186,7 @@ RtToken		RI_TRIANGLEFILTER			=	"triangle";
 RtToken		RI_GAUSSIANFILTER			=	"gaussian";
 RtToken		RI_SINCFILTER				=	"sinc";
 RtToken		RI_CATMULLROMFILTER			=	"catmull-rom";
+RtToken		RI_BLACKMANHARRISFILTER		=	"blackman-harris";
 RtToken		RI_CUSTOM					=	"custom";
 
 
@@ -283,10 +284,10 @@ RtToken		RI_GRIDSIZE				=	"gridsize";
 RtToken		RI_MAXRECURSION			=	"raydepth";
 RtToken		RI_TEXTUREMEMORY		=	"texturememory";
 RtToken		RI_BRICKMEMORY			=	"brickmemory";
-RtToken		RI_HIERARCHYDEPTH		=	"hierarchydepth";
-RtToken		RI_HIERARCHYOBJECTS		=	"hierarchyleafobjects";
-RtToken		RI_SHADERCACHE			=	"shadercache";
 RtToken		RI_EYESPLITS			=	"eyesplits";
+RtToken		RI_NUMTHREADS			=	"numthreads";
+RtToken		RI_THREADSTRIDE			=	"threadstride";
+RtToken		RI_GEOCACHEMEMORY		=	"geocachememory";
 
 // Trace options
 RtToken		RI_MAXDEPTH				=	"maxdepth";
@@ -310,6 +311,7 @@ RtToken		RI_EMIT					=	"emit";
 RtToken		RI_SAMPLESPECTRUM		=	"samplespectrum";
 RtToken		RI_DEPTHFILTER			=	"depthfilter";
 RtToken		RI_RADIANCECACHE		=	"radiancecache";
+RtToken		RI_SAMPLEMOTION			=	"samplemotion";
 
 // IO options
 RtToken		RI_MASKRESOLUTION		=	"maskresolution";
@@ -407,7 +409,6 @@ static	int					allowedCommands		=	RENDERMAN_BLOCK	|
 // Description			:	Make sure the command is good for a given nesting
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	inline int		check(char *fun,int scope) {
 	if (ignoreFrame)							return TRUE;
 
@@ -427,7 +428,6 @@ static	inline int		check(char *fun,int scope) {
 // Description			:	Extract a parameter from the command string
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	inline int		extract(char *dest,const char *tag,const char *src) {
 	const char	*tmp,*tmpEnd;
 	int			length;
@@ -450,7 +450,6 @@ static	inline int		extract(char *dest,const char *tag,const char *src) {
 // Description			:	Read the parameter list and set nTokens,tokens,values
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	inline	void	getArgs(va_list args) {
 	RtToken		tmp;
 	tmp			= va_arg(args,RtToken);
@@ -486,7 +485,6 @@ static	inline	void	getArgs(va_list args) {
 // Description			:	Init the static variables
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	void RiInit() {
 	nTokens				=	0;
 	mTokens				=	0;
@@ -506,7 +504,6 @@ static	void RiInit() {
 // Description			:	Ditch the allocated static variables
 // Return Value			:
 // Comments				:
-// Date last edited		:	8/7/2001
 static	void RiTini() {
 	if (tokens != NULL)				delete [] tokens;
 	if (values != NULL)				delete [] values;
@@ -889,7 +886,7 @@ RiTriangleFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 
 EXTERN(RtFloat)
 RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
-   double r2 = (x*x + y*y)*0.5;
+   double r2 = (x*x + y*y);
    double r = sqrt(r2);
 
    if (r < 1.0) {
@@ -902,7 +899,29 @@ RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 }
 
 EXTERN(RtFloat)
+RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
+   double xc = x/xwidth;
+   double yc = y/ywidth;
+
+   double r2 = (xc*xc + yc*yc);
+   double r = 0.5-sqrt(r2);
+   
+   const float N  = 1;
+   const float a0 = 0.35875f;
+   const float a1 = 0.48829f;
+   const float a2 = 0.14128f;
+   const float a3 = 0.01168f;
+   
+   if (r <= N/2.0) {
+	   return	(float) (a0 - a1*cos(2*C_PI*r/N) + a2*cos(4*C_PI*r/N) - a3*cos(6*C_PI*r/N));
+   } else {
+       return	0;
+   }
+}
+
+EXTERN(RtFloat)
 RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
+	
 	if ( x != 0.0 )	{
 		x *= (float) C_PI;
 		x = cosf( 0.5 * x / xwidth ) * sinf( x ) / x;
@@ -2199,36 +2218,4 @@ EXTERN(RtVoid)
 	if (check("RiReadArchive",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK)) return;
 
 	renderMan->RiReadArchiveV(filename,callback,n,tokens,params);
-}
-
-EXTERN(RtVoid)
-RiTrace(RtInt n,RtPoint *from,RtPoint *to,RtPoint *Ci) {
-	if (!(currentBlock & RENDERMAN_WORLD_BLOCK)) {
-		error(CODE_NESTING,"RiTrace was not expected outside world\n");
-		return;
-	}
-
-	renderMan->RiTrace(n,from,to,Ci);
-}
-
-
-EXTERN(RtVoid)
-RiTraceEx(RtInt n,RtPoint *from,RtPoint *to,RtPoint *Ci,RtFloat *t) {
-	if (!(currentBlock & RENDERMAN_WORLD_BLOCK)) {
-		error(CODE_NESTING,"RiTrace was not expected outside world\n");
-		return;
-	}
-
-	renderMan->RiTrace(n,from,to,Ci,t);
-}
-
-
-EXTERN(RtVoid)
-RiVisibility(RtInt n,RtPoint *from,RtPoint *to,RtPoint *Oi) {
-	if (!(currentBlock & RENDERMAN_WORLD_BLOCK)) {
-		error(CODE_NESTING,"RiTrace was not expected outside world\n");
-		return;
-	}
-
-	renderMan->RiVisibility(n,from,to,Oi);
 }

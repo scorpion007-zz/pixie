@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -31,7 +31,6 @@
 #include <math.h>
 
 #include "bundles.h"
-#include "renderer.h"
 #include "error.h"
 #include "stats.h"
 
@@ -46,7 +45,6 @@
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 int		CTraceBundle::postTraceAction() {
 	return TRUE;
 }
@@ -57,15 +55,12 @@ int		CTraceBundle::postTraceAction() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	float	*Oi	=	varying[VARIABLE_OI];
 	int		i;
 	T32		one;
 	T32		*opacity;
-
-	stats.numShadingRays	+=	nr;
 
 	one.real	=	1.0f;
 
@@ -129,9 +124,7 @@ void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:	Called for the rays that don't hit anything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
 
 	if (depth > 0) {
 		int	i;
@@ -153,7 +146,6 @@ void	CTraceBundle::postShade(int nr,CRay **r) {
 // Description			:	Called after the first pass
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTraceBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -170,127 +162,6 @@ void	CTraceBundle::post() {
 
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceExBundle
-// Method				:	postTraceAction
-// Description			:	Make sure we trace the rays
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-int		CTraceExBundle::postTraceAction() {
-	return TRUE;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceExBundle
-// Method				:	postShade
-// Description			:	Make sure we trace the rays
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-void	CTraceExBundle::postShade(int nr,CRay **r,float **varying) {
-	float	*Ci	=	varying[VARIABLE_CI];
-	float	*Oi	=	varying[VARIABLE_OI];
-	int		i;
-	T32		one;
-	T32		*opacity;
-
-	stats.numShadingRays	+=	nr;
-
-	one.real	=	1.0f;
-
-	if (depth == 0) {
-		// First hit
-		for (i=nr;i>0;i--,Ci+=3,Oi+=3) {
-			CTraceExRay	*cRay	=	(CTraceExRay *) (*r++);
-
-			*(cRay->destT)	=	cRay->t;
-
-			opacity	=	(T32 *) Oi;
-			if (	(opacity[0].integer ^ one.integer) |
-					(opacity[1].integer ^ one.integer) |
-					(opacity[2].integer ^ one.integer)) {
-				// We hit a transparent surface
-				movvv(cRay->color,Ci);		// Save the color and opacity as we'll need those
-				movvv(cRay->opacity,Oi);
-				rays[last++]	=	cRay;
-			} else {
-				const	float	multiplier	=	cRay->multiplier;
-				// We hit an opaque surface
-				cRay->dest[0]	+=	Ci[0]*multiplier;
-				cRay->dest[1]	+=	Ci[1]*multiplier;
-				cRay->dest[2]	+=	Ci[2]*multiplier;
-			}
-		}
-	} else {
-		// Transparency hit
-		for (i=nr;i>0;i--,Ci+=3,Oi+=3) {
-			CTraceRay	*cRay		=	(CTraceRay *) (*r++);
-
-			opacity	=	(T32 *) Oi;
-
-			const	int		transparent		=	(opacity[0].integer ^ one.integer) | (opacity[1].integer ^ one.integer) | (opacity[2].integer ^ one.integer);
-			const	float	*backOpacity	=	cRay->opacity;
-
-			Ci[0]	*=	1 - backOpacity[0];
-			Ci[1]	*=	1 - backOpacity[1];
-			Ci[2]	*=	1 - backOpacity[2];
-			Oi[0]	*=	1 - backOpacity[0];
-			Oi[1]	*=	1 - backOpacity[1];
-			Oi[2]	*=	1 - backOpacity[2];
-			addvv(cRay->color,Ci);
-			addvv(cRay->opacity,Oi);
-
-			if (transparent) {
-				// We hit a transparent surface again, keep tracing
-				rays[last++]		=	cRay;
-			} else {
-				const	float	multiplier	=	cRay->multiplier;
-				// We hit an opaque surface
-				cRay->dest[0]	+=	cRay->color[0]*multiplier;
-				cRay->dest[1]	+=	cRay->color[1]*multiplier;
-				cRay->dest[2]	+=	cRay->color[2]*multiplier;
-			}
-		}
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceExBundle
-// Method				:	postShade
-// Description			:	Called for the rays that don't hit anything
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-void	CTraceExBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
-
-	if (depth > 0) {
-		int	i;
-
-		for (i=nr;i>0;i--) {
-			CTraceExRay		*cRay		=	(CTraceExRay *) (*r++);
-			const	float	multiplier	=	cRay->multiplier;
-
-			cRay->dest[0]	+=	cRay->color[0]*multiplier;
-			cRay->dest[1]	+=	cRay->color[1]*multiplier;
-			cRay->dest[2]	+=	cRay->color[2]*multiplier;
-		}
-	}	
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceExBundle
-// Method				:	post
-// Description			:	Called after the first pass
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-void	CTraceExBundle::post() {
-	numRays	=	last;
-	last	=	0;
-	depth++;
-}
 
 
 
@@ -313,64 +184,6 @@ void	CTraceExBundle::post() {
 
 
 
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceBundle
-// Method				:	postTraceAction
-// Description			:	Make sure we trace the rays
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-int		CIrradianceBundle::postTraceAction() {
-	return shade;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceBundle
-// Method				:	postShade
-// Description			:	Make sure we trace the rays
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-void	CIrradianceBundle::postShade(int nr,CRay **r,float **varying) {
-	float	*Ci	=	varying[VARIABLE_CI];
-	int		i;
-
-	stats.numShadingRays	+=	nr;
-
-	for (i=nr;i>0;i--,Ci+=3) {
-		CIrradianceRay	*cRay	=	(CIrradianceRay *) (*r++);
-
-		movvv(cRay->dest,Ci);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceBundle
-// Method				:	postShade
-// Description			:	Called for the rays that don't hit anything
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-void	CIrradianceBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceBundle
-// Method				:	post
-// Description			:	Called after the first pass
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	3/21/2003
-void	CIrradianceBundle::post() {
-	numRays	=	last;
-	last	=	0;
-	depth++;
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTransmissionBundle
@@ -378,7 +191,6 @@ void	CIrradianceBundle::post() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 int		CTransmissionBundle::postTraceAction() {
 	return TRUE;
 }
@@ -389,15 +201,12 @@ int		CTransmissionBundle::postTraceAction() {
 // Description			:	Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
 	float	*Ci	=	varying[VARIABLE_CI];
 	float	*Oi	=	varying[VARIABLE_OI];
 	int		i;
 	T32		one;
 	T32		*opacity;
-
-	stats.numShadowRays	+=	nr;
 
 	one.real	=	1.0f;
 
@@ -443,11 +252,8 @@ void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:	Called for the rays that don't hit anything
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTransmissionBundle::postShade(int nr,CRay **r) {
 	int	i;
-
-	stats.numShadowRays	+=	nr;
 
 	if (depth == 0) {
 		for (i=nr;i>0;i--) {
@@ -477,7 +283,6 @@ void	CTransmissionBundle::postShade(int nr,CRay **r) {
 // Description			:	Called after the first pass
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/21/2003
 void	CTransmissionBundle::post() {
 	numRays	=	last;
 	last	=	0;
@@ -496,7 +301,6 @@ void	CTransmissionBundle::post() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherBundle::CGatherBundle() {
 }
 
@@ -506,7 +310,6 @@ CGatherBundle::CGatherBundle() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 CGatherBundle::~CGatherBundle() {
 }
 
@@ -516,15 +319,15 @@ CGatherBundle::~CGatherBundle() {
 // Description			:
 // Return Value			:	TRUE if needs shading
 // Comments				:
-// Date last edited		:	3/23/2003
 int		CGatherBundle::postTraceAction() {
 	CGatherVariable	*cVariable;
 	int				i;
 
 	// Dispatch the outputs that don't need shading
 	for (cVariable=lookup->nonShadeOutputs;cVariable!=NULL;cVariable=cVariable->next) {
-		cVariable->record(numRays,(CGatherRay **) rays,NULL);
+		cVariable->record(*nonShadeOutputs++,numRays,(CGatherRay **) rays,NULL);
 	}
+	nonShadeOutputs	-=	lookup->numNonShadeOutputs;
 
 	// Adjust the tags
 	for (i=0;i<numRays;i++) {
@@ -545,15 +348,13 @@ int		CGatherBundle::postTraceAction() {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 	CGatherVariable	*cVariable;
 
-	stats.numShadingRays	+=	nr;
-
 	for (cVariable=lookup->outputs;cVariable!=NULL;cVariable=cVariable->next) {
-		cVariable->record(nr,(CGatherRay **) r,varying);
+		cVariable->record(*outputs++,nr,(CGatherRay **) r,varying);
 	}
+	outputs	-=	lookup->numOutputs;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -562,9 +363,7 @@ void	CGatherBundle::postShade(int nr,CRay **r,float **varying) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherBundle::postShade(int nr,CRay **r) {
-	stats.numShadingRays	+=	nr;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -573,7 +372,6 @@ void	CGatherBundle::postShade(int nr,CRay **r) {
 // Description			:
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	3/23/2003
 void	CGatherBundle::post() {
 	numRays	=	last;
 	numRays	=	0;

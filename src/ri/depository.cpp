@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -29,7 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
-
+#include "common/os.h"
 #include "depository.h"
 
 
@@ -41,7 +41,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2004
 CDepository::CDepository() : CMap<CDepositorySample>() {
 }
 
@@ -51,7 +50,6 @@ CDepository::CDepository() : CMap<CDepositorySample>() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2004
 CDepository::~CDepository() {
 }
 
@@ -61,7 +59,6 @@ CDepository::~CDepository() {
 // Description			:	Lookup function
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2004
 void		CDepository::lookup(float *C,const float *P,const float *N) {
 	int						numFound	=	0;
 	int						maxFound	=	5;

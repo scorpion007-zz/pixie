@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,10 +33,11 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
-#include "ray.h"
-#include "renderer.h"
-#include "output.h"
+#include "common/os.h"
 #include "gui/opengl.h"
+#include "fileResource.h"
+#include "ray.h"
+#include "xform.h"
 
 
 // Macros to pack/unpack directions
@@ -64,20 +65,20 @@
 }
 
 
-#define PDEBUG
+// Debug and build options
+//#define PHOTON_DEBUG
+#define PHOTON_LOOKUP_CACHE
 
 // Some extern variables defined in photon.cpp
-extern	int					inited;
-extern	float				costheta[256];
-extern	float				sintheta[256];
-extern	float				cosphi[256];
-extern	float				sinphi[256];
+extern	const float				costheta[];
+extern	const float				sintheta[];
+extern	const float				cosphi[];
+extern	const float				sinphi[];
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTon
 // Description			:	Holds a generic particle
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CTon {
 public:
 	vector			P,N;		// Position and normal
@@ -88,7 +89,6 @@ public:
 // Class				:	CMap
 // Description			:	Holds a generic map
 // Comments				:
-// Date last edited		:	4/1/2002
 template <class T> class	CMap {
 public:
 
@@ -98,7 +98,6 @@ public:
 				// Description			:	Ctor
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 				CMap() {
 					numPhotons	=	0;
 					maxPhotons	=	0;
@@ -106,20 +105,6 @@ public:
 					stepSize	=	10000;
 					initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 					initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
-					if (inited == FALSE) {
-						int	i;
-
-						inited	=	TRUE;
-
-						for (i=0;i<256;i++) {
-							const double	angle	=	(double) i * (1.0 / 256.0) * C_PI;
-							costheta[i]		=	(float) cos(angle);
-							sintheta[i]		=	(float) sin(angle);
-							cosphi[i]		=	(float) cos(2 * angle);
-							sinphi[i]		=	(float) sin(2 * angle);
-						}
-					}
 				}
 
 				///////////////////////////////////////////////////////////////////////
@@ -128,7 +113,6 @@ public:
 				// Description			:	Dtor
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 		virtual	~CMap() {
 					if (photons != NULL)	delete [] photons;
 				}
@@ -139,7 +123,6 @@ public:
 				// Description			:	Read the photonmap from a file
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	9/10/2002
 		void	read(FILE *in) {
 					fread(&numPhotons,1,sizeof(int),in);
 					fread(&maxPhotons,1,sizeof(int),in);
@@ -157,7 +140,6 @@ public:
 				// Description			:	Append the photon map into a file
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	9/10/2002
 		void	write(FILE *out) {
 					fwrite(&numPhotons,1,sizeof(int),out);
 					fwrite(&maxPhotons,1,sizeof(int),out);
@@ -172,7 +154,6 @@ public:
 				// Description			:	Reset the photonmap
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	9/10/2002
 		void	reset() {
 					if (photons != NULL)	delete photons;
 
@@ -189,7 +170,6 @@ public:
 				// Description			:	Store a photon
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 		T		*store(const float *P,const float *N) {
 					if (numPhotons < maxPhotons) {
 						T	*photon	=	&photons[++numPhotons];
@@ -230,7 +210,6 @@ public:
 				// Description			:	Store a photon
 				// Return Value			:
 				// Comments				:
-				// Date last edited		:	4/1/2002
 		T		*store(const T *item) {
 					if (numPhotons < maxPhotons) {
 						T	*photon	=	&photons[++numPhotons];
@@ -266,7 +245,6 @@ public:
 				// Description			:	Balance the map
 				// Return Value			:	-
 				// Comments				:	Must be called before the map is used
-				// Date last edited		:	4/1/2002
 	virtual	void	balance() {
 				if (numPhotons == 0)	return;
 
@@ -315,7 +293,6 @@ protected:
 			// Description			:	Balance a particular subset
 			// Return Value			:	Internally used by balance
 			// Comments				:
-			// Date last edited		:	4/1/2002
 	void	balance(T **ar1,T **ar2,int index,int start,int end) {
 				int	median	=	1;
 
@@ -363,7 +340,7 @@ protected:
 					}
 
 
-#ifdef PDEBUG
+#ifdef PHOTON_DEBUG
 					// FIXME: Remove
 					int	i;
 					for (i=start;i<median;i++) {
@@ -414,7 +391,6 @@ public:
 			// Description			:	Locate the nearest maxFoundPhoton photons
 			// Return Value			:	Internally used
 			// Comments				:
-			// Date last edited		:	4/1/2002
 	void	lookupWithN(CLookup *l,int index) {
 				const T		*photon	=	&photons[index];
 				float		d,t;
@@ -512,7 +488,6 @@ public:
 			// Description			:	Locate the nearest maxFoundPhoton photons
 			// Return Value			:	Internally used
 			// Comments				:
-			// Date last edited		:	4/1/2002
 	void	lookup(CLookup *l,int index) {
 				const T		*photon	=	&photons[index];
 				float		d;
@@ -640,7 +615,6 @@ public:
 // Class				:	CPhoton
 // Description			:	A Photon
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CPhoton : public CTon {
 public:
 	vector			C;				// The intensity
@@ -652,7 +626,6 @@ public:
 // Class				:	CPhotonRay
 // Description			:	A Photon
 // Comments				:
-// Date last edited		:	4/1/2002
 class	CPhotonRay : public CRay {
 public:
 	vector			intensity;		// The intensity
@@ -663,26 +636,27 @@ public:
 // Class				:	CPhotonMap
 // Description			:	A Photon map
 // Comments				:
-// Date last edited		:	3/11/2003
 class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView {
+	
+	#ifdef PHOTON_LOOKUP_CACHE
+		class	CPhotonSample {
+		public:
+			vector			C,P,N;
+			float			dP;
+			CPhotonSample	*next;
+		};
 
-	class	CPhotonSample {
-	public:
-		vector			C,P,N;
-		float			dP;
-		CPhotonSample	*next;
-	};
-
-	class	CPhotonNode {
-	public:
-		vector			center;
-		float			side;
-		CPhotonSample	*samples;
-		CPhotonNode		*children[8];
-	};
-
+		class	CPhotonNode {
+		public:
+			vector			center;
+			float			side;
+			CPhotonSample	*samples;
+			CPhotonNode		*children[8];
+		};
+	#endif
+	
 public:
-				CPhotonMap(const char *,const CXform *,FILE *);
+				CPhotonMap(const char *,FILE *);
 				~CPhotonMap();
 
 	void		attach()	{	refCount++;	}
@@ -691,9 +665,6 @@ public:
 
 	void		reset();
 	void		write(const CXform *);
-
-	int			probe(float *,const float *,const float *);
-	void		insert(const float *,const float *,const float *,float);
 
 	void		lookup(float *,const float *,int);
 	void		lookup(float *,const float *,const float *,int);
@@ -704,13 +675,20 @@ public:
 	void		draw();
 	void		bound(float *bmin,float *bmax);
 
-	CPhotonNode	*root;
-	int			maxDepth;			// The maximum depth of the hierarchy
+	#ifdef PHOTON_LOOKUP_CACHE
+		int			probe(float *,const float *,const float *);
+		void		insert(const float *,const float *,const float *,float);
+
+		CPhotonNode	*root;
+		int			maxDepth;			// The maximum depth of the hierarchy
+	#endif
+
 	int			refCount;
 	int			modifying;
-	matrix		toCamera,fromCamera;
+	matrix		from,to;
 	float		maxPower;			// The maximum photon power
 	float		searchRadius;
+	TMutex		mutex;				// For synchronization during writing
 };
 
 

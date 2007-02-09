@@ -5,7 +5,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -37,10 +37,10 @@
 #include "common/containers.h"
 #include "common/os.h"
 #include "ri.h"
-#include "renderer.h"
 #include "delayed.h"
-#include "stats.h"
 #include "rib.h"
+#include "rendererContext.h"
+#include "renderer.h"
 #include "error.h"
 
 #include <math.h>
@@ -187,7 +187,6 @@ void	test();
 // Description			:	Convert the argument to lowercase
 // Return Value			:	Pointer to the argument
 // Comments				:
-// Date last edited		:	8/10/2001
 static	char			*toLowerCase(char *s) {
 	int	i;
 	int	l	=	strlen(s);
@@ -206,7 +205,6 @@ static	char			*toLowerCase(char *s) {
 // Description			:	Count the number of variables inb the parameter list
 // Return Value			:	TRUE if OK
 // Comments				:	(This version is used by the primitives)
-// Date last edited		:	8/10/2001
 static	int		parameterListCheck() {
 	int			i;
 	CVariable	tmp;
@@ -221,7 +219,7 @@ static	int		parameterListCheck() {
 	// For each parameter encountered
 	for (i=0;i<numParameters;i++) {
 		TParameter		*par	=	parameters+i;
-		CVariable		*var	=	currentRenderer->retrieveVariable(par->name);
+		CVariable		*var	=	CRenderer::retrieveVariable(par->name);
 		EVariableClass	container;
 
 		// Get the variable container to check the number of items
@@ -233,7 +231,7 @@ static	int		parameterListCheck() {
 			} else {
 				if (FALSE) { 	// If we want to go through the shader parameters (performance hit)
 					// Not global, not inline, check the shaders
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					var						=	attributes->findParameter(par->name);
 					
 					if (var != NULL) {
@@ -370,7 +368,6 @@ static	int		parameterListCheck() {
 // Description			:	Get the basis matrix from a given text
 // Return Value			:	TRUE if OK
 // Comments				:
-// Date last edited		:	8/20/2003
 static	int		sizeCheck(int numExpVertex,int numExpVarying,int numExpFaceVarying,int numExpUniform) {
 	if (numExpVarying == 0)		numExpVarying		=	numExpVertex;
 	if (numExpVertex == 0)		numExpVertex		=	numExpVarying;
@@ -419,7 +416,6 @@ static	int		sizeCheck(int numExpVertex,int numExpVarying,int numExpFaceVarying,i
 // Description			:	Get the basis matrix from a given text
 // Return Value			:	TRUE if OK
 // Comments				:
-// Date last edited		:	8/10/2001
 static	int		getBasis(RtBasis **a,char *n) {
 	char	*name	=	toLowerCase(n);
 
@@ -446,7 +442,6 @@ static	int		getBasis(RtBasis **a,char *n) {
 // Description			:	Get the filter from a given text
 // Return Value			:	NULL if failed
 // Comments				:
-// Date last edited		:	8/10/2001
 static	RtFilterFunc	getFilter(char *n) {
 	char			*name	=	toLowerCase(n);
 	RtFilterFunc	f		=	NULL;
@@ -459,6 +454,8 @@ static	RtFilterFunc	getFilter(char *n) {
 		f = RiTriangleFilter;
 	} else if (strcmp(name,RI_CATMULLROMFILTER) == 0) {
 		f = RiCatmullRomFilter;
+	} else if (strcmp(name,RI_BLACKMANHARRISFILTER) == 0) {
+		f = RiBlackmanHarrisFilter;
 	} else if (strcmp(name,RI_SINCFILTER) == 0) {
 		f = RiSincFilter;
 	} else {
@@ -473,7 +470,6 @@ static	RtFilterFunc	getFilter(char *n) {
 // Description			:	Get the error handler from a given text
 // Return Value			:	NULL if failed
 // Comments				:
-// Date last edited		:	8/10/2001
 static	RtErrorHandler	getErrorHandler(char *n) {
 	char			*name	=	toLowerCase(n);
 	RtErrorHandler	f		=	NULL;
@@ -1944,7 +1940,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					int	numuPatches,numvPatches;
 					int	nu	=	(int) $3;
 					int	nv	=	(int) $5;
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int	uw,vw;
 					int	numVaryings;
 
@@ -2305,7 +2301,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				{
 					int			*argi1		=	(int *) get(0);
 					int			numVertices,numUniforms;
-					CAttributes	*attributes	=	currentRenderer->getAttributes(FALSE);
+					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int			wrap;
 					int			numVaryings,i;
 
@@ -2357,7 +2353,9 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribIntArray
 				ribIntArray
+				RIB_ARRAY_BEGIN
 				ribTexts
+				RIB_ARRAY_END
 				ribIntArray
 				ribIntArray
 				ribFloatArray
@@ -2372,9 +2370,9 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						argi1	=	(int *)		get(0);
 						argi2	=	(int *)		get($3);
 						args1	=	(char **)	get($3+$4);
-						argi3	=	(int *)		get($3+$4+$5);
-						argi4	=	(int *)		get($3+$4+$5+$6);
-						argf1	=	(float *)	get($3+$4+$5+$6+$7);
+						argi3	=	(int *)		get($3+$4+$6);
+						argi4	=	(int *)		get($3+$4+$6+$8);
+						argf1	=	(float *)	get($3+$4+$6+$8+$9);
 
 						// Count the number of faces / vertices
 						for (i=0,j=0;i<$3;j+=argi1[i],i++);
@@ -2386,7 +2384,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 
 						if (sizeCheck(numVertices,numVertices,j,$3)) {
-							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,args1,argi3,argi4,argf1,numParameters,tokens,vals);
+							RiSubdivisionMeshV($2,$3,argi1,argi2,$6,args1,argi3,argi4,argf1,numParameters,tokens,vals);
 						}
 					}
 				}
@@ -2680,7 +2678,6 @@ static	int		ribStep		=	5*(1<<10);	// Parse 5 KB at a time
 // Description			:	Parser error file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/8/2001
 void	riberror(char *s,...) {
 	warning(CODE_BADFILE,"RIB Parse error\n");
 }
@@ -2690,7 +2687,6 @@ void	riberror(char *s,...) {
 // Description			:	Parse a rib file
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/8/2001
 void	ribParse(const char *fileName,void (*c)(const char *)) {
 	if (fileName != NULL) {
 		
@@ -2701,7 +2697,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		CArray<RtPointer>	*savedObjects					=	ribObjects;
 		CArray<char *>		*savedAllocatedStrings			=	allocatedStrings;
 		int					savedRibLineno					=	ribLineno;
-		const char			*savedActivity					=	stats.activity;
 		void				(*savedCallback)(const char *)	=	callback;
 		ERIBValue			*savedArgs						=	args;
 		int					savedNumArguments				=	numArguments;
@@ -2717,9 +2712,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		TRibFile			*savedRibStack					=	ribStack;
 		const char			*savedRibFile					=	ribFile;
 		FILE				*savedRibIn						=	ribin;
-
 		
-
 		// Init the environment
 		if (fileName[0] == '-') {
 			// Read from stdin
@@ -2748,7 +2741,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		lightNames			=	NULL;
 		ribObjects			=	NULL;
 		allocatedStrings	=	new CArray<char *>;
-		stats.activity		=	"Rib parsing";
 		callback			=	c;
 		maxArgument			=	1000;
 		argumentStepSize	=	100000;
@@ -2775,6 +2767,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 			ribStack		=	NULL;	// prevent falling out of current ReadArchive
 		}
 		
+		ribFile				=	fileName;
 		ribLineno			=	1;
 
 		ribparse();
@@ -2787,9 +2780,9 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 #endif
 		}
 
-		if (lights != NULL)		delete lights;
-		if (lightNames != NULL)	delete lightNames;
-		if (ribObjects != NULL)	delete ribObjects;
+		if (lights		!= NULL)	delete lights;
+		if (lightNames	!= NULL)	delete lightNames;
+		if (ribObjects	!= NULL)	delete ribObjects;
 		delete allocatedStrings;
 		delete [] args;
 		delete [] parameters;
@@ -2813,7 +2806,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		ribObjects			=	savedObjects;
 		ribLineno			=	savedRibLineno;
 		allocatedStrings	=	savedAllocatedStrings;
-		stats.activity		=	savedActivity;
 		callback			=	savedCallback;
 		
 		if ((ribDepth = savedRibDepth) == 0) {
@@ -2843,7 +2835,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 // Description			:	Clean the memory allocated by the parser
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/8/2001
 void		parserCleanup() {
 	rib_delete_buffer(YY_CURRENT_BUFFER);
 	yy_init				= 1;

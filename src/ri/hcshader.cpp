@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -35,8 +35,9 @@
 #include "shading.h"
 #include "memory.h"
 #include "attributes.h"
-#include "hierarchy.h"
 #include "object.h"
+#include "renderer.h"
+#include "defaults.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -45,7 +46,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CSphereLight::CSphereLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	vector	P;
 
@@ -64,7 +64,6 @@ CSphereLight::CSphereLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CSphereLight::~CSphereLight() {
 }
 
@@ -75,11 +74,20 @@ CSphereLight::~CSphereLight() {
 // Description			:	Called chen we need to illuminate a point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 	
-	if (context->hiderFlags & HIDER_ILLUMINATIONHOOK) {
+#define sampleSphere(cP)								\
+	while(TRUE) {										\
+		cP[COMP_X]	=	2*context->urand()-1;			\
+		cP[COMP_Y]	=	2*context->urand()-1;			\
+		cP[COMP_Z]	=	2*context->urand()-1;			\
+														\
+		if (dotvv(cP,cP) < 1)	break;					\
+	}
+
+
+	if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {
 		const int	numVertices	=	currentShadingState->numVertices;
 		float		*Pf			=	(float *) alloca(numVertices*3*sizeof(float));
 		float		*Nf			=	(float *) alloca(numVertices*3*sizeof(float));
@@ -120,30 +128,29 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		CShadedLight	**lights				=	&currentShadingState->lights;
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
-		CHierarchy		*hierarchy				=	context->hierarchy;
 		int				j;
 		CRay			ray;
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
 		int				numVertices				=	currentShadingState->numRealVertices;
 		CShadedLight	*cLight;
-		float			*L,*Cl;
 		
 		if (currentShadingState->numActive == 0)
 			return;
 		
-		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight));
-		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices);
-		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*));
-		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
-		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
+		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight),context->threadMemory);
+		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices,context->threadMemory);
+		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*),context->threadMemory);
+		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices,context->threadMemory);
+		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices,context->threadMemory);
 		cLight->instance			=	this;
 		cLight->next				=	*lights;
 		*lights						=	cLight;
 		memcpy(cLight->lightTags,tags,sizeof(int)*numVertices);
-		L							=	cLight->savedState[0];
-		Cl							=	cLight->savedState[1];
+		float		*L				=	cLight->savedState[0];
+		float		*Cl				=	cLight->savedState[1];
+		const float	*time			=	currentShadingState->varying[VARIABLE_TIME];
 
-		for (int i=numVertices;i>0;i--,Ps+=3){
+		for (int i=numVertices;i>0;i--,Ps+=3,time++){
 			if (*tags++ == 0) {
 				vector			P;
 				float			visibility	=	0;
@@ -156,27 +163,27 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 
 					// Evaluate visibility between P and Ps
 					movvv(ray.from,Ps);
-					movvv(ray.to,P);
 					subvv(ray.dir,P,Ps);
 					const float	len	=	lengthv(ray.dir);
 					mulvf(ray.dir,1 / len);
 
 					ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 					ray.tmin				=	bias;
-					ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-					ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-					ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 					ray.t					=	len - bias;
-					ray.time				=	0;
-					ray.jimp				=	-1.0f;
-					ray.lastXform			=	NULL;
-					ray.object				=	NULL;
+					ray.time				=	*time;
 
-					hierarchy->intersect(&ray);
+					// Figure out the ray differential
+					const float	sina		=	radius / len;
+					const float	cosa		=	sqrtf(1 - sina*sina);
+					const float	da			=	sina / (cosa + C_EPSILON);
+					ray.da					=	min(DEFAULT_RAY_DA,da);
+					ray.db					=	DEFAULT_RAY_DB;
+
+					context->trace(&ray);
 
 					if (ray.object == NULL) {
 						subvv(P,Ps);
-						visibility	+=	intensity / dotvv(P,P);
+						visibility			+=	intensity / dotvv(P,P);
 					}
 				}
 
@@ -190,6 +197,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 			Cl	+=	3;
 		}
 	}
+#undef sampleSphere
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -198,7 +206,6 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 // Description			:	Set shader parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CSphereLight::setParameters(int n,char **params,void **vals) {
 	int	i;
 
@@ -233,7 +240,6 @@ void					CSphereLight::setParameters(int n,char **params,void **vals) {
 // Description			:	Query a shader parameter
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*) {
 	if (strcmp(param,"from") == 0) {
 		float	*cval	=	(float *) val;
@@ -271,7 +277,6 @@ int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*
 // Description			:	Execute the shader
 // Return Value			:	-
 // Comments				:	Should never be called
-// Date last edited		:	11/2/2003
 void					CSphereLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
@@ -283,7 +288,6 @@ void					CSphereLight::execute(CShadingContext *context,float **locals) {
 // Description			:	Get the required parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 unsigned int			CSphereLight::requiredParameters() {
 	return 0;
 }
@@ -294,7 +298,6 @@ unsigned int			CSphereLight::requiredParameters() {
 // Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 const char				*CSphereLight::getName() {
 	return "spherelight";
 }
@@ -328,7 +331,6 @@ const char				*CSphereLight::getName() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	vector	P;
 	vector	D0,D1;
@@ -354,6 +356,24 @@ CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	normalizev(N);
 
 	if (reverse)	mulvf(N,-1);
+
+	// Find the center point of the light
+	addvv(center,corners[0],corners[1]);
+	addvv(center,corners[2]);
+	addvv(center,corners[3]);
+	mulvf(center,1 / (float) 4);
+
+	// Find the radius of the light
+	vector	tmp;
+	subvv(tmp,corners[0],center);
+	r	=	lengthv(tmp);
+	subvv(tmp,corners[1],center);
+	r	+=	lengthv(tmp);
+	subvv(tmp,corners[2],center);
+	r	+=	lengthv(tmp);
+	subvv(tmp,corners[3],center);
+	r	+=	lengthv(tmp);
+	r	*=	0.25f;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -362,7 +382,6 @@ CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 CQuadLight::~CQuadLight() {
 }
 
@@ -373,11 +392,10 @@ CQuadLight::~CQuadLight() {
 // Description			:	Called chen we need to illuminate a point
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
 
-	if (context->hiderFlags & HIDER_ILLUMINATIONHOOK) {
+	if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {
 		const int	numVertices	=	currentShadingState->numVertices;
 		float		*Pf			=	(float *) alloca(numVertices*3*sizeof(float));
 		float		*Nf			=	(float *) alloca(numVertices*3*sizeof(float));
@@ -392,8 +410,8 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		// Generate points on the surface
 		for (i=numVertices;i>0;i--,cP+=3,cN+=3) {
 			vector			P0,P1;
-			const float		u	=	urand();
-			const float		v	=	urand();
+			const float		u	=	context->urand();
+			const float		v	=	context->urand();
 
 			interpolatev(P0,corners[0],corners[1],u);
 			interpolatev(P1,corners[2],corners[3],u);
@@ -427,39 +445,35 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
 		CRay			ray;
-		CHierarchy		*hierarchy				=	context->hierarchy;
 		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
 		vector			D;
 		int				j;
-		vector			center;
 		int				numVertices				=	currentShadingState->numRealVertices;
 		int				numLitPoints			=	0;
 		CShadedLight	*cLight;
 		int				*lightTags;
-		float			*L,*Cl;
 		
 		if (currentShadingState->numActive == 0)
 			return;
 		
-		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight));
-		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices);
-		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*));
-		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
-		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices);
+		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight),context->threadMemory);
+		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices,context->threadMemory);
+		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*),context->threadMemory);
+		cLight->savedState[0]		=	(float*)		ralloc(3*sizeof(float)*numVertices,context->threadMemory);
+		cLight->savedState[1]		=	(float*)		ralloc(3*sizeof(float)*numVertices,context->threadMemory);
 		cLight->instance			=	this;
 		memcpy(cLight->lightTags,tags,sizeof(int)*numVertices);
-		L							=	cLight->savedState[0];
-		Cl							=	cLight->savedState[1];
+		float		*L					=	cLight->savedState[0];
+		float		*Cl					=	cLight->savedState[1];
+		const float	*time				=	currentShadingState->varying[VARIABLE_TIME];
 		
 		// GSHTODO: do something to check Ps vs N angle before allocating light
 		
-		addvv(center,corners[0],corners[1]);
-		addvv(center,corners[2]);
-		addvv(center,corners[3]);
-		mulvf(center,1 / (float) 4);
+		
+
 		
 		lightTags = cLight->lightTags;
-		for (int i=currentShadingState->numRealVertices;i>0;i--,Ps+=3) {
+		for (int i=currentShadingState->numRealVertices;i>0;i--,Ps+=3,time++) {
 			if (*lightTags == 0) {
 				subvv(D,Ps,center);
 				if (dotvv(D,N) > 0) {
@@ -467,32 +481,31 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 					float			visibility	=	0;
 
 					for (j=numSamples;j>0;j--) {
-						const float	u	=	urand();
-						const float	v	=	urand();
+						const float	u	=	context->urand();
 
 						interpolatev(P0,corners[0],corners[1],u);
 						interpolatev(P1,corners[2],corners[3],u);
-						interpolatev(P,P0,P1,v);
+						interpolatev(P,P0,P1,context->urand());
 						
 						// Evaluate visibility between P and Ps
 						movvv(ray.from,Ps);
-						movvv(ray.to,P);
 						subvv(ray.dir,P,Ps);
 						const float	len	=	lengthv(ray.dir);
 						mulvf(ray.dir,1 / len);
 
 						ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 						ray.tmin				=	bias;
-						ray.invDir[COMP_X]		=	1/ray.dir[COMP_X];
-						ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
-						ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 						ray.t					=	len - bias;
-						ray.time				=	0;
-						ray.jimp				=	-1.0f;
-						ray.lastXform			=	NULL;
-						ray.object				=	NULL;
+						ray.time				=	*time;
 
-						hierarchy->intersect(&ray);
+						// Figure out the ray differential
+						const float	sina		=	r / len;
+						const float	cosa		=	sqrtf(1 - sina*sina);
+						const float	da			=	sina / (cosa + C_EPSILON);
+						ray.da					=	min(DEFAULT_RAY_DA,da);
+						ray.db					=	DEFAULT_RAY_DB;
+
+						context->trace(&ray);
 
 						if (ray.object == NULL) {
 							visibility++;
@@ -533,7 +546,6 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 // Description			:	Set shader parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 void					CQuadLight::setParameters(int n,char **params,void **vals) {
 	int	i;
 
@@ -580,7 +592,6 @@ void					CQuadLight::setParameters(int n,char **params,void **vals) {
 // Description			:	Query a shader parameter
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) {
 	if (strcmp(param,"P0") == 0) {
 		float	*cval	=	(float *) val;
@@ -633,7 +644,6 @@ int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) 
 // Description			:	Execute the shader
 // Return Value			:	-
 // Comments				:	Should never be called
-// Date last edited		:	11/2/2003
 void					CQuadLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
@@ -645,7 +655,6 @@ void					CQuadLight::execute(CShadingContext *context,float **locals) {
 // Description			:	Get the required parameters
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 unsigned int			CQuadLight::requiredParameters() {
 	return 0;
 }
@@ -656,7 +665,6 @@ unsigned int			CQuadLight::requiredParameters() {
 // Description			:	Get the name of the shader
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/2/2003
 const char				*CQuadLight::getName() {
 	return "quadlight";
 }

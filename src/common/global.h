@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -48,9 +48,9 @@
 #define	GLOBAL_H
 
 // The Pixie version
-#define	VERSION_RELEASE	1
-#define	VERSION_BETA	7
-#define	VERSION_ALPHA	5
+#define	VERSION_RELEASE	2
+#define	VERSION_BETA	0
+#define	VERSION_ALPHA	1
 
 // Some constant definitions
 
@@ -98,11 +98,6 @@
 #define			max(a,b)					((a) > (b) ? (a) : (b))
 #define			radians(a)					((a)*C_PI/180.)
 #define			degrees(a)					((a)*180./ C_PI)
-
-#define			getPointer(a)				(((unsigned long) a) & (~3))
-#define			getData(a)					(((unsigned long) a) & 3)
-#define			getToken(a,b)				(((unsigned long) a) | b)
-
 
 // This structure encapsulates a 32 bit word
 typedef union {

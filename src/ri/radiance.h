@@ -36,7 +36,6 @@
 #include "attributes.h"
 #include "fileResource.h"
 #include "cache.h"
-#include "hierarchy.h"
 #include "random.h"
 #include "depository.h"
 
@@ -47,14 +46,12 @@ class	CTriangleHash;
 // Class				:	CRadianceCache
 // Description			:	Radiance cache responsible for estimating stuff
 // Comments				:
-// Date last edited		:	11/5/2003
 class	CRadianceCache : public CCache {
 public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRadianceSample
 	// Description			:	Holds a radiance sample
 	// Comments				:
-	// Date last edited		:	11/5/2003
 	class	CRadianceHarmonic {
 	public:
 		float				Y[27];					// The spherical harmonic coefficients for this cluster
@@ -68,7 +65,6 @@ public:
 	// Class				:	CRadianceNode
 	// Description			:	Defines a radiance node
 	// Comments				:
-	// Date last edited		:	11/5/2003
 	class	CRadianceNode {
 	public:
 		CRadianceNode		*children[8];			// The children nodes
@@ -81,7 +77,6 @@ public:
 	// Class				:	CShadingPoint
 	// Description			:	Holds a shading point
 	// Comments				:
-	// Date last edited		:	11/5/2003
 	class	CShadingPoint {
 	public:
 		vector				P,N;					// The position and normal of the shading point
@@ -91,7 +86,7 @@ public:
 
 public:
 
-							CRadianceCache(const char *,unsigned int,const float *,const float *,CHierarchy *,FILE *,CArray<CTriangle *> *);
+							CRadianceCache(const char *,unsigned int,const float *,const float *,FILE *,CArray<CTriangle *> *);
 							~CRadianceCache();
 
 							// Overloaded cache functionality
@@ -122,7 +117,6 @@ private:
 
 		CSobol<4>			generator;				// Random number generator for the ray-casting
 
-		CHierarchy			*hierarchy;				// The raytracing hierarchy (read only)
 		CArray<CTriangle *> *tris;					// The triangles in the scene
 
 		CTriangleHash		*triangleHash;			// The hash for the triangles
@@ -131,6 +125,8 @@ private:
 		int					numRaysPerCluster;		// The number of rays to shoot per cluster
 		float				bias;					// The raytracing bias
 		vector				backgroundColor;		// The color of the background
+
+		TMutex				mutex;
 };
 
 

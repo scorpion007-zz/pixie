@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -39,20 +39,19 @@
 // Class				:	CSubdivMesh
 // Description			:	Holds a subdivision surface mesh
 // Comments				:
-// Date last edited		:	5/30/2003
 class	CSubdivMesh : public CObject {
 public:
 							CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,char **tags,int *nargs,int *intargs,float *floatargs);
 							~CSubdivMesh();
 
-	void					bound(float *bmi,float *bma) const;
-	void					tesselate(CShadingContext *context);
+	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *rasterizer);
+	void					instantiate(CAttributes *a,CXform *x,CRendererContext *c) const;
+
 	int						moving() const {	return pl->data1 != NULL;	}
-	void					copy(CAttributes *a,CXform *x,CRendererContext *c) const;
 
 private:
-	void					create();
+	void					create(CShadingContext *context);
 
 	CPl						*pl;
 	int						numFaces;
@@ -64,8 +63,6 @@ private:
 	int						*nargs;
 	int						*intargs;
 	float					*floatargs;
-	vector					bmin,bmax;
-	CArray<CObject *>		*objects;
 };
 
 #endif

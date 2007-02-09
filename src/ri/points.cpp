@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -31,11 +31,10 @@
 #include <math.h>
 
 #include "points.h"
-#include "hierarchy.h"
 #include "memory.h"
 #include "stats.h"
 #include "renderer.h"
-
+#include "rendererContext.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -44,12 +43,9 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	int				i;
 	float			*vertex;
-	float			expansion;
-	float			maxSize;
 
 	stats.numGprims++;
 	stats.gprimMemory			+=	sizeof(CPoints);
@@ -59,23 +55,22 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	this->points				=	NULL;
 
 	// Find the maximum size we'll have
-	expansion					=	(float) (pow((double) fabs(determinantm(xform->from)),1.0 / 3.0) / 2.0);
-	maxSize						=	-C_INFINITY;
+	const float	expansion		=	(float) pow((double) fabs(determinantm(xform->from)),1.0 / 3.0);
+	float		maxSize			=	0;
 
+	// Compute the maximum point size (for bounding volume computation)
 	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
 
 		if (cVar->entry == VARIABLE_WIDTH) {
 			for (i=0;i<np;i++) {
-				vertex[i]		*=	expansion;
 				maxSize			=	max(maxSize,vertex[i]);
 			}
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0) - np;
+				vertex	=	pl->data1 + (vertex - pl->data0);
 
 				for (i=0;i<np;i++) {
-					vertex[i]		*=	expansion;
 					maxSize			=	max(maxSize,vertex[i]);
 				}
 			}
@@ -83,13 +78,11 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 			break;
 		} else if (cVar->entry == VARIABLE_CONSTANTWIDTH) {
 
-			vertex[0]			*=	expansion;
 			maxSize				=	max(maxSize,vertex[0]);
 
 			if (pl->data1 != NULL) {
 				vertex	=	pl->data1 + (vertex - pl->data0);
 
-				vertex[0]		*=	expansion;
 				maxSize	=	max(maxSize,vertex[0]);
 			}
 
@@ -99,22 +92,31 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 		vertex	+=	pl->parameters[i].numItems*cVar->numFloats;
 	}
 
-	if (maxSize < 0)	maxSize	=	expansion;
-
 	// Init the bounding box
+	vector	tmp;
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 	for (vertex=pl->data0,i=0;i<numPoints;i++,vertex+=3) {
-		addBox(bmin,bmax,vertex);
+		mulmp(tmp,xform->from,vertex);
+		addBox(bmin,bmax,tmp);
 	}
 
 	if (pl->data1 != NULL) {
+		const float *from = (xform->next != NULL) ? xform->next->from : xform->from;
 		for (vertex=pl->data1,i=0;i<numPoints;i++,vertex+=3) {
-			addBox(bmin,bmax,vertex);
+			mulmp(tmp,from,vertex);
+			addBox(bmin,bmax,tmp);
+		}
+	} else if (xform->next != NULL) {
+		const float *from = xform->next->from;
+		for (vertex=pl->data0,i=0;i<numPoints;i++,vertex+=3) {
+			mulmp(tmp,from,vertex);
+			addBox(bmin,bmax,tmp);
 		}
 	}
 
-	xform->transformBound(bmin,bmax);
+	if (maxSize < 0)	maxSize	=	1;
+	maxSize	*=	expansion*0.5f;
 	subvf(bmin,maxSize);
 	addvf(bmax,maxSize);
 	makeBound(bmin,bmax);
@@ -136,7 +138,6 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi) : CSurface(a,x) {
 	int		i;
 
@@ -169,7 +170,6 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi)
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 CPoints::~CPoints() {
 	stats.numGprims--;
 	stats.gprimMemory		-=	sizeof(CPoints);
@@ -185,33 +185,20 @@ CPoints::~CPoints() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
-// Method				:	bound
-// Description			:	See object.h
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	10/15/2002
-void	CPoints::bound(float *bmin,float *bmax) const {
-	movvv(bmin,this->bmin);
-	movvv(bmax,this->bmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPoints
 // Method				:	dice
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
 void	CPoints::dice(CShadingContext *rasterizer)	{
 	if (pl != NULL)	prep();
 
-	if (numPoints < rasterizer->maxGridSize) {
+	if (numPoints < CRenderer::maxGridSize) {
 		// We're small enough to render directly
 		rasterizer->drawPoints(this,numPoints);
 	} else {
 
 		// We're too many, split us
-		memBegin();
+		memBegin(rasterizer->threadMemory);
 
 		vector		D;
 		int			numFront,numBack;
@@ -221,11 +208,10 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 		vector		P0,P1,nP0,nP1;
 		int			num0,num1,moved;
 		CPoints		*child;
-		vector		bmin,bmax;
 
-		front		=	(const float **)	ralloc(numPoints*sizeof(float *));
-		back		=	(const float **)	ralloc(numPoints*sizeof(float *));
-		membership	=	(int *)				ralloc(numPoints*sizeof(int));
+		front		=	(const float **)	ralloc(numPoints*sizeof(float *),rasterizer->threadMemory);
+		back		=	(const float **)	ralloc(numPoints*sizeof(float *),rasterizer->threadMemory);
+		membership	=	(int *)				ralloc(numPoints*sizeof(int),rasterizer->threadMemory);
 
 		for (i=0;i<numPoints;i++)	membership[i]	=	-1;
 
@@ -271,10 +257,10 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 			if (moved == FALSE)	break;
 
 			if (num0 > 0)	mulvf(P0,nP0,1 / (float) num0);
-			else			movvv(P0,points[irand() % numPoints]);
+			else			movvv(P0,points[rasterizer->irand() % numPoints]);
 
 			if (num1 > 0)	mulvf(P1,nP1,1 / (float) num1);
-			else			movvv(P1,points[irand() % numPoints]);
+			else			movvv(P1,points[rasterizer->irand() % numPoints]);
 		}
 
 
@@ -297,20 +283,28 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 
 		// Create the children primitives
 
+		osLock(CRenderer::refCountMutex);
 		child	=	new CPoints(attributes,xform,base,numFront,front);
 		child->attach();
-		child->bound(bmin,bmax);
-		rasterizer->drawObject(child,bmin,bmax);
+		osUnlock(CRenderer::refCountMutex);
+		
+		rasterizer->drawObject(child);
+		
+		osLock(CRenderer::refCountMutex);
 		child->detach();
-
+		
 		child	=	new CPoints(attributes,xform,base,numBack,back);
+		
 		child->attach();
-		child->bound(bmin,bmax);
-		rasterizer->drawObject(child,bmin,bmax);
+		osUnlock(CRenderer::refCountMutex);
+		
+		rasterizer->drawObject(child);
+		
+		osLock(CRenderer::refCountMutex);
 		child->detach();
+		osUnlock(CRenderer::refCountMutex);
 
-
-		memEnd();
+		memEnd(rasterizer->threadMemory);
 	}
 }
 
@@ -321,12 +315,10 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 // Description			:	Push all the defined variables into the arrays
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
-void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &usedParameters) const {
-	memBegin();
+void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &usedParameters) const {
 	CVertexData		*variables	=	base->variables;
 	const int		vertexSize	=	variables->vertexSize;
-	float			*vertexData	=	(float *) ralloc(numPoints*vertexSize*sizeof(float));
+	float			*vertexData	=	(float *) alloca(numPoints*vertexSize*sizeof(float));
 	int				i;
 	float			*vertexBase	=	vertexData;
 
@@ -355,11 +347,9 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 		}
 	}
 
-	variables->dispatch(vertexBase,0,numPoints,varying);
+	variables->dispatch(vertexBase,0,numPoints,varying,locals);
 
 	usedParameters	&=	~(PARAMETER_N | variables->parameters);
-
-	memEnd();
 }
 
 
@@ -370,21 +360,28 @@ void	CPoints::sample(int start,int numVertices,float **varying,unsigned int &use
 // Description			:	Interpolate the varying junck and save the uniform stuff
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	10/15/2002
-void	CPoints::interpolate(int numVertices,float **varying) const {
-	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying);
+void	CPoints::interpolate(int numVertices,float **varying,float ***locals) const {
+	if (base->parameters != NULL)	base->parameters->dispatch(numVertices,varying,locals);
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	Clone the points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
-void	CPoints::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
+void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
+	CXform	*nx	=	new CXform(x);
+
+	nx->concat(xform);	// Concetenate the local xform
+
+	if (a == NULL)	a	=	attributes;
+
+	assert(pl != NULL);
+
+	c->addObject(new CPoints(a,nx,pl->clone(a),numPoints));
 }
 
 
@@ -394,25 +391,63 @@ void	CPoints::copy(CAttributes *a,CXform *x,CRendererContext *c) const {
 // Description			:	Prepare the points
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	6/11/2003
 void	CPoints::prep() {
-	const float			*vertex;
-	int					i;
-	const CVertexData	*variables;
 
 	assert(base != NULL);
+
+	osLock(base->mutex);
+	if (children != NULL) {
+		osUnlock(base->mutex);
+		return;
+	}
+
+	int					i;
+	const CVertexData	*variables;
 	variables					=	base->variables;
 
 	const int	vertexSize		=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
 	pl->transform(xform);
 
-	base->vertex				=	new float[vertexSize*numPoints];
-	pl->collect(i,base->vertex,CONTAINER_VERTEX);
-	assert(i == vertexSize);
+	// Transform the size variable
+	const float	expansion		=	(float) pow((double) fabs(determinantm(xform->from)),1.0 / 3.0);
+	float		*vertex;
+	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+		const CVariable	*cVar	=	pl->parameters[i].variable;
 
-	delete pl;
-	pl							=	NULL;
+		if (cVar->entry == VARIABLE_WIDTH) {
+			for (i=0;i<numPoints;i++) {
+				vertex[i]		*=	expansion;
+			}
+
+			if (pl->data1 != NULL) {
+				vertex	=	pl->data1 + (vertex - pl->data0);
+
+				for (i=0;i<numPoints;i++) {
+					vertex[i]		*=	expansion;
+				}
+			}
+
+			break;
+		} else if (cVar->entry == VARIABLE_CONSTANTWIDTH) {
+
+			vertex[0]			*=	expansion;
+
+			if (pl->data1 != NULL) {
+				vertex	=	pl->data1 + (vertex - pl->data0);
+
+				vertex[0]		*=	expansion;
+			}
+
+			break;
+		}
+
+		vertex	+=	pl->parameters[i].numItems*cVar->numFloats;
+	}
+
+	base->vertex				=	new float[vertexSize*numPoints];
+	pl->collect(i,base->vertex,CONTAINER_VERTEX,NULL);
+	assert(i == vertexSize);	
 
 	assert(points == NULL);
 
@@ -425,4 +460,9 @@ void	CPoints::prep() {
 		points[i]				=	vertex;
 		vertex					+=	vertexSize;
 	}
+
+	delete pl;
+	pl							=	NULL;
+
+	osUnlock(base->mutex);
 }

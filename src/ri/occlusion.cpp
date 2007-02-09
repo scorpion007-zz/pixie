@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -29,7 +29,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include "occlusion.h"
-
+#include "renderer.h"
+#include "memory.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
@@ -37,7 +38,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 COcclusionCuller::COcclusionCuller() {
 }
 
@@ -47,10 +47,7 @@ COcclusionCuller::COcclusionCuller() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 COcclusionCuller::~COcclusionCuller() {
-	deleteNode(root);
-	delete [] nodes;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -59,11 +56,11 @@ COcclusionCuller::~COcclusionCuller() {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void	COcclusionCuller::initCuller(int w,float *ma) {
 	for (depth=0,width=1;width < w;depth++,width=width<<1);
 
-	nodes			=	new COcclusionNode*[width*width];
+	// (globalMemory is checkpointed)
+	nodes			=	(COcclusionNode **) ralloc(width*width*sizeof(COcclusionNode *),CRenderer::globalMemory);
 	root			=	newNode(NULL,width,0,0);
 	maxOpaqueDepth	=	ma;
 }
@@ -75,7 +72,6 @@ void	COcclusionCuller::initCuller(int w,float *ma) {
 // Description			:	Reset the occlusion hierarchy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void	COcclusionCuller::resetHierarchy(COcclusionNode *cNode) {
 	if (cNode==NULL)	cNode	=	root;
 
@@ -96,7 +92,6 @@ void	COcclusionCuller::resetHierarchy(COcclusionNode *cNode) {
 // Description			:	Reset the occlusion hierarchy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 void	COcclusionCuller::initToZero() {
 	int				i;
 	COcclusionNode	*cNode;
@@ -123,9 +118,9 @@ void	COcclusionCuller::initToZero() {
 // Description			:	Allocate a new occlusion node
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	8/25/2002
 COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int x,int y) {
-	COcclusionNode	*cNode	=	new COcclusionNode;
+	// (globalMemory is checkpointed)
+	COcclusionNode	*cNode	=	(COcclusionNode *) ralloc(sizeof(COcclusionNode),CRenderer::globalMemory);
 
 	cNode->parent		=	p;
 	cNode->width		=	w;
@@ -145,23 +140,5 @@ COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,in
 	}
 
 	return cNode;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	COcclusionCuller::COcclusionNode
-// Method				:	~COcclusionNode
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	8/25/2002
-void	COcclusionCuller::deleteNode(COcclusionNode *cNode) {
-	if (cNode->width > 1) {
-		deleteNode(cNode->children[0]);
-		deleteNode(cNode->children[1]);
-		deleteNode(cNode->children[2]);
-		deleteNode(cNode->children[3]);
-	}
-
-	delete cNode;
 }
 

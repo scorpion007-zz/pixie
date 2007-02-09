@@ -4,7 +4,7 @@
 //
 // Copyright © 1999 - 2003, Okan Arikan
 //
-// Contact: okan@cs.berkeley.edu
+// Contact: okan@cs.utexas.edu
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -33,7 +33,9 @@
 #include "dlobject.h"
 #include "error.h"
 #include "stats.h"
+#include "renderer.h"
 #include "shading.h"
+#include "objectMisc.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -42,7 +44,6 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const float *bmi,const float *bma,dloInitFunction initFunction,dloIntersectFunction intersectFunction,dloTiniFunction tiniFunction) : CSurface(a,x) {
 	stats.numGprims++;
 	stats.gprimMemory		+=	sizeof(CDLObject);
@@ -55,9 +56,8 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 	movvv(this->bmin,bmi);
 	movvv(this->bmax,bma);
 
-	movvv(cameraBmin,bmin);
-	movvv(cameraBmax,bmax);
-	xform->transformBound(cameraBmin,cameraBmax);
+	xform->transformBound(bmin,bmax);
+	makeBound(bmin,bmax);
 }
 
 
@@ -67,7 +67,6 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 CDLObject::~CDLObject() {
 	stats.numGprims--;
 	stats.gprimMemory		-=	sizeof(CDLObject);
@@ -84,8 +83,7 @@ CDLObject::~CDLObject() {
 // Description			:	Intersect the surface with the ray
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::intersect(CRay *ray,int &) {
+void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 	vector	oN;
 	float	t;
 
@@ -93,8 +91,7 @@ void					CDLObject::intersect(CRay *ray,int &) {
 	if (! (ray->flags & attributes->flags) )	return;
 	
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
-		float importance = attributes->lodImportance;
-		if (ray->jimp < 0) ray->jimp = urand();
+		const float importance = attributes->lodImportance;
 		if (importance >= 0) {
 			if (ray->jimp > importance)			return;
 		} else {
@@ -102,37 +99,13 @@ void					CDLObject::intersect(CRay *ray,int &) {
 		}
 	}
 	
-
-	// Convert the ray into the right coordinate system
-	if (ray->lastXform != xform) {
-		if (xform->next != NULL) {
-			vector	tmp[4];
-			vector	to;
-			addvv(to,ray->from,ray->dir);
-
-			mulmp(tmp[0],xform->to,ray->from);
-			mulmp(tmp[1],xform->to,to);
-
-			mulmp(tmp[2],xform->next->to,ray->from);
-			mulmp(tmp[3],xform->next->to,to);
-
-			interpolatev(ray->oFrom,tmp[0],tmp[2],ray->time);
-			interpolatev(ray->oTo,tmp[1],tmp[3],ray->time);
-			subvv(ray->oDir,ray->oTo,ray->oFrom);
-		} else {
-			vector	to;
-			addvv(to,ray->from,ray->dir);
-
-			mulmp(ray->oFrom,xform->to,ray->from);
-			mulmp(ray->oTo,xform->to,to);
-			subvv(ray->oDir,ray->oTo,ray->oFrom);
-		}
-
-		ray->lastXform	=	xform;
-	}
+	
+	// Transform the ray
+	vector	oFrom,oDir;
+	transform(oFrom,oDir,xform,ray);
 
 	// Perform the actual intersection
-	if (intersectFunction(data,ray->oFrom,ray->oDir,&t,oN)) {
+	if (intersectFunction(data,oFrom,oDir,&t,oN)) {
 		mulmn(ray->N,xform->to,oN);
 		ray->t		=	t;
 		ray->object	=	this;
@@ -141,28 +114,6 @@ void					CDLObject::intersect(CRay *ray,int &) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDLObject
-// Method				:	intersect
-// Description			:	Intersect the object with a box
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-int						CDLObject::intersect(const float *bmin,const float *bmax) const {
-	return intersectBox(bmin,bmax,cameraBmin,cameraBmax);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDLObject
-// Method				:	bound
-// Description			:	Bound the surface
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::bound(float *bmin,float *bmax) const {
-	movvv(bmin,cameraBmin);
-	movvv(bmax,cameraBmax);
-}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
@@ -170,8 +121,7 @@ void					CDLObject::bound(float *bmin,float *bmax) const {
 // Description			:	Sample the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::sample(int,int,float **,unsigned int &up) const {
+void					CDLObject::sample(int,int,float **,float ***,unsigned int &up) const {
 	up	&=	~(PARAMETER_P | PARAMETER_NG);
 }
 
@@ -181,19 +131,7 @@ void					CDLObject::sample(int,int,float **,unsigned int &up) const {
 // Description			:	Interpolate the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::interpolate(int,float **)	const {
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDLObject
-// Method				:	tesselate
-// Description			:	Tesselate the surface
-// Return Value			:	-
-// Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::tesselate(CShadingContext *context) {
-	context->addTracable(this,this);
+void					CDLObject::interpolate(int,float **,float ***)	const {
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -202,19 +140,17 @@ void					CDLObject::tesselate(CShadingContext *context) {
 // Description			:	Dice the surface for scan-line rendering
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::dice(CShadingContext *) {
 }
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
-// Method				:	copy
+// Method				:	instantiate
 // Description			:	Create a copy
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
-void					CDLObject::copy(CAttributes *a,CXform *x,CRendererContext *context) const {
+void					CDLObject::instantiate(CAttributes *a,CXform *x,CRendererContext *context) const {
 }
 
 
@@ -224,12 +160,11 @@ void					CDLObject::copy(CAttributes *a,CXform *x,CRendererContext *context) con
 // Description			:	Shade the surface
 // Return Value			:	-
 // Comments				:
-// Date last edited		:	11/7/2003
 void					CDLObject::shade(CShadingContext *context,int numRays,CRay **rays) {
 	float	**varying	=	context->currentShadingState->varying;
 	float	*P			=	varying[VARIABLE_P];
 	float	*N			=	varying[VARIABLE_NG];
-	float	*from		=	varying[VARIABLE_I];
+	float	*I			=	varying[VARIABLE_I];
 	int		i;
 
 	for (i=numRays;i>0;i--) {
@@ -239,12 +174,12 @@ void					CDLObject::shade(CShadingContext *context,int numRays,CRay **rays) {
 		P[1]			=	cRay->from[1] + cRay->dir[1]*cRay->t;
 		P[2]			=	cRay->from[2] + cRay->dir[2]*cRay->t;
 		movvv(N,cRay->N);
-		movvv(from,cRay->from);
+		subvv(I,P,cRay->from);
 
 		P				+=	3;
 		N				+=	3;
-		from			+=	3;
+		I				+=	3;
 	}
 
-	context->shade(this,numRays,-1,2,0);
+	context->shade(this,numRays,-1,SHADING_2D,0);
 }
