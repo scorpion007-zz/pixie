@@ -1,10 +1,10 @@
-/*	nomdi suface shade
+/*	normdir surface shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
-suface nomdi() {
+surface normdir() {
 	if (I.N < 0) {
 		Ci	=	(0,1,0);
 	} else {
@@ -13,5 +13,4 @@ suface nomdi() {
 
 	Oi	=	Os;
 }
-
 

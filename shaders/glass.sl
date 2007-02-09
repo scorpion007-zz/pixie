@@ -1,32 +1,31 @@
-suface glass(float eta=1.5;
+surface glass(float eta=1.5;
 	float Ka = 1;
 	float Kd = 1;
 	float Ks = 1;
-	float oughness = 0.5;) {
-	vecto R,T;
-	vecto In;
-	float K,Kt;
-	nomal Nf;
+	float roughness = 0.5;) {
+	vector R,T;
+	vector In;
+	float Kr,Kt;
+	normal Nf;
 
-	// Nomalize some vectos
-	Nf = facefowad(nomalize(N),I);
-	In = nomalize(I);
+	// Normalize some vectors
+	Nf = faceforward(normalize(N),I);
+	In = normalize(I);
 	Ci = 0;
 
-	// Compute the eflection and efaction
-	fesnel(In,Nf,(In.N < 0 ? 1/eta : eta),K,Kt,R,T);
+	// Compute the reflection and refraction
+	fresnel(In,Nf,(In.N < 0 ? 1/eta : eta),Kr,Kt,R,T);
 
 	if (I.N < 0) {
-		Ci = Ks*specula(Nf,-In,oughness);
+		Ci = Ks*specular(Nf,-In,roughness);
 	}
 
-	// Tace the eflection / efaction
-	if (K > 0.01) Ci += K*tace(P,R);
-	if (Kt > 0.01) Ci += Cs* Kt*tace(P,T);
+	// Trace the reflection / refraction
+	if (Kr > 0.01) Ci += Kr*trace(P,R);
+	if (Kt > 0.01) Ci += Cs* Kt*trace(P,T);
 
 	Ci *= Os;
 	Oi = Os;
 }
-
 
 

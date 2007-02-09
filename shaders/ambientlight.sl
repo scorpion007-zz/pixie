@@ -1,13 +1,12 @@
-/*	ambient light souce shade
+/*	ambient light source shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
 light ambientlight (float intensity = 1;
-                    colo lightcolo = 1;) {
-    Cl = intensity * lightcolo;
+                    color lightcolor = 1;) {
+    Cl = intensity * lightcolor;
     L = 0;
 }
-
 

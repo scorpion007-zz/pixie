@@ -1,25 +1,24 @@
-/*	spot light souce shade
+/*	spot light source shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
 light spotlight ( float intensity = 1;
-                  colo lightcolo = 1;
-                  point fom = point "shade" (0,0,0);
-                  point to = point "shade" (0,0,1);
-                  float coneangle = adians(30);
-                  float conedeltaangle = adians(5);
-                  float beamdistibution = 2; ) {
-	unifom vecto axis = nomalize(to-fom);
+                  color lightcolor = 1;
+                  point from = point "shader" (0,0,0);
+                  point to = point "shader" (0,0,1);
+                  float coneangle = radians(30);
+                  float conedeltaangle = radians(5);
+                  float beamdistribution = 2; ) {
+	uniform vector axis = normalize(to-from);
 
-	illuminate (fom, axis, coneangle) {
+	illuminate (from, axis, coneangle) {
 		float cosangle = (L . axis) / length(L);
-		float atten = pow (cosangle, beamdistibution) / (L . L);
+		float atten = pow (cosangle, beamdistribution) / (L . L);
 		atten *= smoothstep (cos(coneangle), cos(coneangle-conedeltaangle),cosangle);
-		Cl = atten * intensity * lightcolo;
+		Cl = atten * intensity * lightcolor;
 	}
 }
-
 
 

@@ -1,18 +1,17 @@
-/*	shadowaea light souce shade
+/*	shadowarea light source shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
-light shadowaea (float intensity = 1;
-                 colo lightcolo = 1;) {
+light shadowarea (float intensity = 1;
+                 color lightcolor = 1;) {
 
-	N	=	nomalize(N);
+	N	=	normalize(N);
 
 	illuminate (P,N,PI/2) {
-		Cl = visibility(Ps,P) * intensity * lightcolo * (N.nomalize(L))/ (L . L);
+		Cl = visibility(Ps,P) * intensity * lightcolor * (N.normalize(L))/ (L . L);
 
 	}
 }
-
 

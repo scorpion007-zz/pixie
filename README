@@ -4,23 +4,23 @@
       Pixie
       *******************************
 
-      Pixie is a photoealistic endee that uses a Pixa's RendeMan-like inteface.
+      Pixie is a photorealistic renderer that uses a Pixar's RenderMan-like interface.
 
-      Pixie is licensed unde GNU LGPL. See COPYING file fo details.
+      Pixie is licensed under GNU LGPL. See COPYING file for details.
 
-      This is a public distibution of the Pixie endee. Fo moe infomation on Pixie and its featues, visit http://pixie.soucefoge.net .
+      This is a public distribution of the Pixie renderer. For more information on Pixie and its features, visit http://pixie.sourceforge.net .
 
-      The diectoy stuctue:
-      sc                - The souce codes
-      shades            - The default shades
+      The directory structure:
+      src                - The source codes
+      shaders            - The default shaders
       doc                - Documentation
-      bin                - Release mode binaies (only afte compilation)
-      tmp                - Release mode object files (only afte compilation)
-      bind               - Debug mode binaies (only afte compilation)
-      tmpd               - Debug mode object files (only afte compilation)
+      bin                - Release mode binaries (only after compilation)
+      tmp                - Release mode object files (only after compilation)
+      bind               - Debug mode binaries (only after compilation)
+      tmpd               - Debug mode object files (only after compilation)
 
-      Fo compilation instuctions, see doc/Pixie.pdf
+      For compilation instructions, see doc/Pixie.pdf
 
 
-	Okan Aikan
+	Okan Arikan
 

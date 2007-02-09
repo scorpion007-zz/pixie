@@ -1,17 +1,17 @@
 
 	
-	Compilation Instuctions fo PIXIE
+	Compilation Instructions for PIXIE
 
-	Requiements:
-	- libtiff:    Available fom http://www.libtiff.og
-	- flex/bison: Available on Unix platfoms by default. You will have to seach the intenet to find the windows vesion. (available fo fee).
-	- fltk:       Available fom http://www.fltk.og This is only equied if you want to compile the inteactive viewe. This libay is not equied by the endee.
-	- openEXR:    Available fom http://www.openex.og This is only equied if you want to compile the OpenEXR output dive.
+	Requirements:
+	- libtiff:    Available from http://www.libtiff.org
+	- flex/bison: Available on Unix platforms by default. You will have to search the internet to find the windows version. (available for free).
+	- fltk:       Available from http://www.fltk.org This is only required if you want to compile the interactive viewer. This library is not required by the renderer.
+	- openEXR:    Available from http://www.openexr.org This is only required if you want to compile the OpenEXR output driver.
 
 
-	Compiling Pixie is a two step pocess:
+	Compiling Pixie is a two step process:
 	1. Compilation
-	2. Ceating a binay distibution
+	2. Creating a binary distribution
 
 
 -------->Compiling on Windows:
@@ -19,32 +19,32 @@
 	With Visual Studio .NET
 	- Open PIXIEHOME/windows/vcnetX/Pixie/Pixie.sln
 	- Select Build -> Batch Build
-	- Select the configuations to build
+	- Select the configurations to build
 	- Hit "Build"
 
-	Afte compilation
-	- PIXIEHOME/bin will contain the binaies
+	After compilation
+	- PIXIEHOME/bin will contain the binaries
 	- execute PIXIEHOME/makeinst.bat
-	- You binay distibution is in PIXIEHOME/Pixie
+	- Your binary distribution is in PIXIEHOME/Pixie
 
 
 -------->Compiling on UNIX:
 
-	Fo a self contained achive
+	For a self contained archive
 	- go to PIXIEHOME
-	- type "./configue --pefix=XXX --enable-selfcontained"
-	  (XXX = the diectoy to put Pixie. e.g. /tmp/Pixie)
+	- type "./configure --prefix=XXX --enable-selfcontained"
+	  (XXX = the directory to put Pixie. e.g. /tmp/Pixie)
 	- type "make"
 
-	Afte compilation
+	After compilation
 	- type "make install"
-	- You binay distibution is in XXX
+	- Your binary distribution is in XXX
 
-	Now you can take you binay distibution and move it anywhee. This is you new PIXIEHOME. This binay distibution should have the same diectoy stuctue and the same files no matte what platfom you'e on.
+	Now you can take your binary distribution and move it anywhere. This is your new PIXIEHOME. This binary distribution should have the same directory structure and the same files no matter what platform you're on.
 
 	
-	No matte what compile you'e using, Pixie takes quite long time to compile. This is pimaily due to the massive amount of macos to make the endee as efficient as possible. Some of the files that especially take long time ae execute.cpp and stochastic.cpp. Just take you time, go to you favoite cafe and enjoy a nice cup of Java.
+	No matter what compiler you're using, Pixie takes quite long time to compile. This is primarily due to the massive amount of macros to make the renderer as efficient as possible. Some of the files that especially take long time are execute.cpp and stochastic.cpp. Just take your time, go to your favorite cafe and enjoy a nice cup of Java.
 
 	Have fun ....
-	Okan Aikan
+	Okan Arikan
 

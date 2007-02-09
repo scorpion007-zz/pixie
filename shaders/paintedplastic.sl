@@ -1,19 +1,18 @@
-/*	paintedplastic suface shade
+/*	paintedplastic surface shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
-suface paintedplastic ( float Ka = 1, Kd = .5, Ks = .5, oughness = .1;
-                         colo speculacolo = 1;
-                         sting textuename = ""; ) {
+surface paintedplastic ( float Ka = 1, Kd = .5, Ks = .5, roughness = .1;
+                         color specularcolor = 1;
+                         string texturename = ""; ) {
     Ci = Cs;
-    if (textuename != "")
-	Ci *= colo textue (textuename);
+    if (texturename != "")
+	Ci *= color texture (texturename);
 
-    nomal Nf = facefowad (nomalize(N),I);
-    Ci = Ci * (Ka*ambient() + Kd*diffuse(Nf)) + speculacolo * Ks*specula(Nf,-nomalize(I),oughness);
+    normal Nf = faceforward (normalize(N),I);
+    Ci = Ci * (Ka*ambient() + Kd*diffuse(Nf)) + specularcolor * Ks*specular(Nf,-normalize(I),roughness);
     Oi = Os;  Ci *= Oi;
 }
-
 

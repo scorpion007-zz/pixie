@@ -1,13 +1,12 @@
-/*	ambientocclusion light souce shade
+/*	ambientocclusion light source shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
 light ambientocclusion (float numSamples=16;) {
-    vecto Nf = facefowad(nomalize(N),I);
+    vector Nf = faceforward(normalize(N),I);
     Cl = 1 - occlusion(P,Nf,numSamples);
     L = 0;
 }
-
 

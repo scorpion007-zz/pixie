@@ -1,26 +1,25 @@
-/*	Raytaced diectional light souce shade
+/*	Raytraced directional light source shader
  *
  * 	Pixie is:
- * 	(c) Copyight 1999-2003 Okan Aikan. All ights eseved.
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
  */
 
 light shadowdistant (   float intensity = 1;
-                     	colo lightcolo = 1;
-                   	point fom = point "shade" (0,0,0);
-                     	point to = point "shade" (0,0,1); 
-		     		sting shadowname = "") {
-	vecto di = to - fom;
+                     	color lightcolor = 1;
+                   	point from = point "shader" (0,0,0);
+                     	point to = point "shader" (0,0,1); 
+		     		string shadowname = "") {
+	vector dir = to - from;
 
-	sola (di, 0) {
-		colo vis;
+	solar (dir, 0) {
+		color vis;
 		if (shadowname == "")
-			vis	=	colo "gb" (1,1,1);
+			vis	=	color "rgb" (1,1,1);
 		else
 			vis	=	(1-shadow(shadowname,Ps));
 
-		Cl = vis*intensity * lightcolo;
+		Cl = vis*intensity * lightcolor;
     }
 }
-
 
 
