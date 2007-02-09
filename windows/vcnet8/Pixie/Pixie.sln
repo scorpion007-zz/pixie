@@ -90,6 +90,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gui", "gui\gui.vcproj", "{C
 		{9D01025F-82A2-4E47-9B37-7BDE5430A087} = {9D01025F-82A2-4E47-9B37-7BDE5430A087}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsotest", "dsotest\dsotest.vcproj", "{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -181,6 +183,12 @@ Global
 		{CC482007-8EFD-4855-8262-B92C89B328ED}.Release|Win32.Build.0 = Release|Win32
 		{CC482007-8EFD-4855-8262-B92C89B328ED}.test|Win32.ActiveCfg = Release|Win32
 		{CC482007-8EFD-4855-8262-B92C89B328ED}.test|Win32.Build.0 = Release|Win32
+		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Debug|Win32.Build.0 = Debug|Win32
+		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Release|Win32.ActiveCfg = Release|Win32
+		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Release|Win32.Build.0 = Release|Win32
+		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.test|Win32.ActiveCfg = Release|Win32
+		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.test|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

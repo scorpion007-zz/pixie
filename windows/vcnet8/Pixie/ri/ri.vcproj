@@ -415,10 +415,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\primvars.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\random.cpp"
 				>
 			</File>
