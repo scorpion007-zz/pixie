@@ -49,6 +49,7 @@ static	unsigned int			memoryAvailable				=	0;
 static	unsigned int			memoryUsage					=	0;
 static	TMemoryHeader			*memoryAllPages				=	NULL;
 static	int						memoryManagerInited			=	0;
+static	int						memoryManagerInitInNew		=	0;
 static	TMutex					memoryMutex;
 
 
@@ -63,6 +64,16 @@ inline	void	*allocMem(size_t size) {
 
 	// Round up
 	if (size & 7) index++;
+
+	// Init the memory manager if not already have
+	if (memoryManagerInited == 0) {
+
+		// Initialize the memory manager
+		memInit();
+
+		// Set this variable so we know that we actually inited the memory inside the allocator
+		memoryManagerInitInNew	=	1;
+	}
 
 	// Secure the area
 	osLock(memoryMutex);
@@ -175,6 +186,7 @@ void	operator delete[](void *ptr) {
 // Comments				:
 void	memInit() {
 
+	// Did we initialize the memory manager before ?
 	if (memoryManagerInited == 0) {
 		int	i;
 
@@ -198,18 +210,26 @@ void	memInit() {
 void	memShutdown() {
 	memoryManagerInited--;
 
-	if (memoryManagerInited == 0) {
+	// Is this the last shutdown ?
+	if (memoryManagerInited == memoryManagerInitInNew) {
 		TMemoryHeader	*cPage;
-
-		assert(memoryManagerInited == TRUE);
 
 		osDeleteMutex(memoryMutex);
 
+		// Free the memory pages we allocated
 		while((cPage=memoryAllPages) != NULL) {
 			memoryAllPages	=	cPage->next;
 
 			free(cPage);
 		}
+
+		// Reset the local variables
+		memoryPage					=	NULL;
+		memoryAvailable				=	0;
+		memoryUsage					=	0;
+		memoryAllPages				=	NULL;
+		memoryManagerInited			=	0;
+		memoryManagerInitInNew		=	0;
 	}
 }
 

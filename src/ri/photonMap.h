@@ -70,11 +70,10 @@
 #define PHOTON_LOOKUP_CACHE
 
 // Some extern variables defined in photon.cpp
-extern	int					inited;
-extern	float				costheta[256];
-extern	float				sintheta[256];
-extern	float				cosphi[256];
-extern	float				sinphi[256];
+extern	const float				costheta[];
+extern	const float				sintheta[];
+extern	const float				cosphi[];
+extern	const float				sinphi[];
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTon
@@ -106,20 +105,6 @@ public:
 					stepSize	=	10000;
 					initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 					initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-
-					if (inited == FALSE) {
-						int	i;
-
-						inited	=	TRUE;
-
-						for (i=0;i<256;i++) {
-							const double	angle	=	(double) i * (1.0 / 256.0) * C_PI;
-							costheta[i]		=	(float) cos(angle);
-							sintheta[i]		=	(float) sin(angle);
-							cosphi[i]		=	(float) cos(2 * angle);
-							sinphi[i]		=	(float) sin(2 * angle);
-						}
-					}
 				}
 
 				///////////////////////////////////////////////////////////////////////

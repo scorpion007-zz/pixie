@@ -99,11 +99,6 @@
 #define			radians(a)					((a)*C_PI/180.)
 #define			degrees(a)					((a)*180./ C_PI)
 
-#define			getPointer(a)				(((unsigned long) a) & (~3))
-#define			getData(a)					(((unsigned long) a) & 3)
-#define			getToken(a,b)				(((unsigned long) a) | b)
-
-
 // This structure encapsulates a 32 bit word
 typedef union {
 	int				integer;
