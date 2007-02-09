@@ -208,7 +208,7 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"            memory: %d (bytes)\n",tesselationMemory);
 		info(CODE_STATS,"        Cache hits: %d (times)\n",tesselationCacheHits);
 		info(CODE_STATS,"      Cache misses: %d (times)\n",tesselationCacheMisses);
-		info(CODE_STATS,"    Tess. Overhead: %d (times)\n",tesselationOverhead);
+		info(CODE_STATS,"    Tess. Overhead: %d (bytes)\n",tesselationOverhead);
 	}
 }
 
