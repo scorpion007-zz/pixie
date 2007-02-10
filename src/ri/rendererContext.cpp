@@ -4083,8 +4083,6 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 
 	switch(addMotion(pl->data0,pl->dataSize,"RiSubdivisionMesh",p0,p1)) {
 	case 0:
-		// Restore those attributes
-		attributeEnd();
 		// Clean up the unneeded pl
 		delete pl;
 		// Get out of here

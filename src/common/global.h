@@ -140,8 +140,5 @@ typedef union {
 #endif
 
 
-#include "../../config.h"
-
-
 #endif
 

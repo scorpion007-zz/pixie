@@ -34,6 +34,7 @@
 #include "common/global.h"		// The global header file
 #include "common/containers.h"
 #include "riInterface.h"
+#include "config.h"
 
 #ifdef HAVE_ZLIB
 #include <zlib.h>
@@ -222,8 +223,12 @@ private:
 	void									vout(const char *mes,va_list args) {
 												const int	l	=	vsprintf(scratch,mes,args);
 
-												if (outputCompressed)	gzwrite(outFile,scratch,l);
-												else					fwrite(scratch,1,l,outFile);
+												#ifdef HAVE_ZLIB
+													if (outputCompressed)	gzwrite(outFile,scratch,l);
+													else					fwrite(scratch,1,l,outFile);
+												#else
+													fwrite(scratch,1,l,outFile);
+												#endif
 											}
 
 											///////////////////////////////////////////////////////////////////////
@@ -239,8 +244,12 @@ private:
 
 												const int l	=	vsprintf(scratch,mes,args);
 
-												if (outputCompressed)	gzwrite(outFile,scratch,l);
-												else					fwrite(scratch,1,l,outFile);
+												#ifdef HAVE_ZLIB
+													if (outputCompressed)	gzwrite(outFile,scratch,l);
+													else					fwrite(scratch,1,l,outFile);
+												#else
+													fwrite(scratch,1,l,outFile);
+												#endif
 
 												va_end(args);
 											}

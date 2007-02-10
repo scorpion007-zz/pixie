@@ -37,7 +37,7 @@
 #include "attributes.h"
 #include "renderer.h"
 #include "stats.h"
-#include "defaults.h"
+#include "config.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -503,7 +503,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 			// Create the samples
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
 				// Sample a point in the cone
-				sampleHemisphere(cRay->dir,dir,coneAngle,transmissionGenerator);
+				sampleHemisphere(cRay->dir,dir,coneAngle,random4d);
 				movvv(cRay->from,from);
 				cRay->t				=	min(maxDist,d) - bias;
 				cRay->tmin			=	bias;
@@ -584,7 +584,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 
 			initv(dest,0,0,0);
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
-				sampleHemisphere(cRay->dir,D,coneAngle,traceGenerator);
+				sampleHemisphere(cRay->dir,D,coneAngle,random4d);
 				movvv(cRay->from,from);
 				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->t				=	C_INFINITY;

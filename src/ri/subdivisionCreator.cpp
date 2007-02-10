@@ -1031,7 +1031,7 @@ char	CSFace::findEdgeVertices(int eOrg,int vOrg,CSVertex* &v1,CSVertex* &v2) {
 	CSEdge		*cEdge = edges[eOrg];
 	CSVertex	*cVert = vertices[vOrg];
 	CSFace		*cFace = NULL;
-	int i;
+	int			i;
 	
 	if (cEdge->faces[0] == this)	cFace = cEdge->faces[1];
 	else							cFace = cEdge->faces[0];
@@ -1045,7 +1045,7 @@ char	CSFace::findEdgeVertices(int eOrg,int vOrg,CSVertex* &v1,CSVertex* &v2) {
 				} else {
 					v1 = cFace->vertices[(i + 3) & 3];
 					v2 = cFace->vertices[(i + 2) & 3];
-					assert(cFace->vertices[(i+1)&3] != cVert);
+					//assert(cFace->vertices[(i+1)&3] != cVert);
 				}
 				break;
 			}

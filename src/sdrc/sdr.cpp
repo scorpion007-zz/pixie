@@ -1009,6 +1009,7 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("irradiancecache","f=SSSpn!",0);
 	addBuiltInFunction("bump","n=SFnvv!",0);
 	addBuiltInFunction("bump","n=SFnvvff!",0);
+
 	addBuiltInFunction("spline","f=fffff*",0);
 	addBuiltInFunction("spline","c=fcccc*",0);
 	addBuiltInFunction("spline","p=fpppp*",0);
@@ -1019,6 +1020,18 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("spline","p=Sfpppp*",0);
 	addBuiltInFunction("spline","n=Sfnnnn*",0);
 	addBuiltInFunction("spline","v=Sfvvvv*",0);
+
+	addBuiltInFunction("spline","f=fF",0);
+	addBuiltInFunction("spline","c=fC",0);
+	addBuiltInFunction("spline","p=fP",0);
+	addBuiltInFunction("spline","n=fN",0);
+	addBuiltInFunction("spline","v=fV",0);
+	addBuiltInFunction("spline","f=SfF",0);
+	addBuiltInFunction("spline","c=SfC",0);
+	addBuiltInFunction("spline","p=SfP",0);
+	addBuiltInFunction("spline","n=SfN",0);
+	addBuiltInFunction("spline","v=SfV",0);
+
 	addBuiltInFunction("blackbody","c=f",0);
 	addBuiltInFunction("bake3d","f=SSpn!",0);
 	addBuiltInFunction("texture3d","f=Spn!",0);

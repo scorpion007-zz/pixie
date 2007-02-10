@@ -35,20 +35,12 @@
 #include "error.h"
 #include "renderer.h"
 #include "tiff.h"
+#include "config.h"
 
 #include <stddef.h>		// Ensure NULL is defined before libtiff
 #include <math.h>
 #include <string.h>
 #include <tiffio.h>
-
-// FIXME: rand() is not thread safe
-#define	urand()	(rand() / (float) RAND_MAX)
-
-
-// per block or global locking
-// per block is faster, but requires (fractionally) more memory
-#define PERBLOCK_LOCK
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexBlockThreadData
@@ -72,7 +64,7 @@ public:
 	void				*data;				// Where the block data is stored (NULL if the block has been paged out)
 	CTexBlockThreadData	*threadData;
 	
-#ifdef PERBLOCK_LOCK
+#ifdef TEXTURE_PERBLOCK_LOCK
 	TMutex				mutex;
 #endif
 
@@ -81,6 +73,17 @@ public:
 	CTextureBlock		*next;				// Pointer to the next used / empty block
 	CTextureBlock		*prev;				// Pointer to the previous used / empty block
 };
+
+
+
+
+
+
+
+
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -142,7 +145,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 	// Do we have stuff to free ?
 	if (CRenderer::textureUsedBlocks == NULL)	return;
 
-	#ifdef PERBLOCK_LOCK
+	#ifdef TEXTURE_PERBLOCK_LOCK
 		osLock(CRenderer::textureMutex);
 	#endif
 	
@@ -182,7 +185,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 		CRenderer::textureUsedMemory[thread]	-=	cBlock->size;
 		cBlock->threadData[thread].data			=	NULL;
 		
-		#ifdef PERBLOCK_LOCK
+		#ifdef TEXTURE_PERBLOCK_LOCK
 			osLock(cBlock->mutex);
 		#endif
 		
@@ -194,7 +197,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 			cBlock->data					=	NULL;
 		}
 		
-		#ifdef PERBLOCK_LOCK
+		#ifdef TEXTURE_PERBLOCK_LOCK
 			osUnlock(cBlock->mutex);
 		#endif
 
@@ -202,7 +205,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 
 	memEnd(context->threadMemory);
 	
-	#ifdef PERBLOCK_LOCK
+	#ifdef TEXTURE_PERBLOCK_LOCK
 		osUnlock(CRenderer::textureMutex);
 	#endif
 }
@@ -242,7 +245,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	void			*data	=	NULL;
 	TIFF			*in;
 	
-	#ifndef PERBLOCK_LOCK
+	#ifndef TEXTURE_PERBLOCK_LOCK
 		osLock(CRenderer::textureMutex);
 	#else
 		osLock(entry->mutex);
@@ -253,7 +256,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 		entry->threadData[context->thread].data	=	data;
 		entry->refCount++;
 		
-		#ifndef PERBLOCK_LOCK 
+		#ifndef TEXTURE_PERBLOCK_LOCK 
 			osUnlock(CRenderer::textureMutex);
 		#else
 			osUnlock(entry->mutex);
@@ -385,7 +388,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	entry->data								=	data;
 	entry->threadData[context->thread].data	=	data;
 
-	#ifndef PERBLOCK_LOCK
+	#ifndef TEXTURE_PERBLOCK_LOCK
 		osUnlock(CRenderer::textureMutex);
 	#else
 		osUnlock(entry->mutex);
@@ -410,7 +413,7 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 	cEntry->threadData					=	new CTexBlockThreadData[CRenderer::numThreads];
 	cEntry->size						=	size;
 	
-	#ifdef PERBLOCK_LOCK
+	#ifdef TEXTURE_PERBLOCK_LOCK
 		osCreateMutex(cEntry->mutex);
 	#endif
 	for (int i=0;i<CRenderer::numThreads;i++) {
@@ -447,7 +450,7 @@ static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
 	
 	delete[] cEntry->threadData;
 	
-	#ifdef PERBLOCK_LOCK
+	#ifdef TEXTURE_PERBLOCK_LOCK
 		osDeleteMutex(cEntry->mutex);
 	#endif
 }
@@ -912,6 +915,7 @@ public:
 							const float		ct	=	((v[0] + v[1] + v[2] + v[3]) * 0.25f);
 							float			ds,dt,d;
 
+
 							const int		width	=	layers[0]->width;
 							const int		height	=	layers[0]->height;
 
@@ -956,7 +960,7 @@ public:
 								vector			C,CC0,CC1;
 								float			contribution;
 
-								generator.get(r);
+								context->random2d.get(r);
 
 								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
 														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
@@ -1021,7 +1025,6 @@ public:
 
 	short				numLayers;					// The number of layers
 	CTextureLayer		**layers;					// The actual layers
-	CSobol<2>			generator;
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -1095,7 +1098,7 @@ public:
 								float			contribution;
 								float			r[2];
 
-								generator.get(r);
+								context->random2d.get(r);
 
 								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
 														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
@@ -1105,7 +1108,8 @@ public:
 								totalContribution	+=	contribution;
 
 								if (lookup->blur > 0) {
-									generator.get(r);
+									context->random2d.get(r);
+
 									s				+=	lookup->blur*(r[0] - 0.5f);
 									t				+=	lookup->blur*(r[1] - 0.5f);
 								}
@@ -1160,7 +1164,6 @@ public:
 	int 				getNumChannels()			{ return layer->numSamples; }
 	
 	CTextureLayer		*layer;						// There's only one layer
-	CSobol<2>			generator;
 };
 
 
@@ -1183,7 +1186,32 @@ public:
 	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
-							float		r[4];
+							vector		center;
+							vector		S0,S1,S2,S3;
+
+							// Compute the center of the lookup
+							addvv(center,D0,D1);
+							addvv(center,D2);
+							addvv(center,D3);
+							mulvf(center,0.25f);
+
+							// Apply the filter width
+							subvv(S0,D0,center);
+							mulvf(S0,lookup->width*2);
+							addvv(S0,center);
+
+							subvv(S1,D1,center);
+							mulvf(S1,lookup->width*2);
+							addvv(S1,center);
+
+							subvv(S2,D2,center);
+							mulvf(S2,lookup->width*2);
+							addvv(S2,center);
+
+							subvv(S3,D3,center);
+							mulvf(S3,lookup->width*2);
+							addvv(S3,center);
+
 
 							result[0]	=	0;
 							for (i=lookup->numSamples;i>0;i--) {
@@ -1192,27 +1220,23 @@ public:
 								float	C;
 								float	contribution;
 								float	tmp[4],cP[4];
+								float	r[2];
 
-								generator.get(r);
+								context->random2d.get(r);
 
-								x					=	r[0];	// Assume x,y are gaussian samples
+								x					=	r[0];
 								y					=	r[1];
 								contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
 								totalContribution	+=	contribution;
 
-								cP[COMP_X]			=	(D0[COMP_X]*(1-x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1-x) + D3[COMP_X]*x)*y;
-								cP[COMP_Y]			=	(D0[COMP_Y]*(1-x) + D1[COMP_Y]*x)*(1-y) + (D2[COMP_Y]*(1-x) + D3[COMP_Y]*x)*y;
-								cP[COMP_Z]			=	(D0[COMP_Z]*(1-x) + D1[COMP_Z]*x)*(1-y) + (D2[COMP_Z]*(1-x) + D3[COMP_Z]*x)*y;
+								cP[COMP_X]			=	(S0[COMP_X]*(1-x) + S1[COMP_X]*x)*(1-y) + (S2[COMP_X]*(1-x) + S3[COMP_X]*x)*y;
+								cP[COMP_Y]			=	(S0[COMP_Y]*(1-x) + S1[COMP_Y]*x)*(1-y) + (S2[COMP_Y]*(1-x) + S3[COMP_Y]*x)*y;
+								cP[COMP_Z]			=	(S0[COMP_Z]*(1-x) + S1[COMP_Z]*x)*(1-y) + (S2[COMP_Z]*(1-x) + S3[COMP_Z]*x)*y;
 								cP[3]				=	1;
 
 								mulmp4(tmp,toNDC,cP);
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
-
-								// Blur the result
-								s					+=	2*(r[2]-0.5f)*lookup->blur;
-								t					+=	2*(r[3]-0.5f)*lookup->blur;
-
 
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
 									continue;
@@ -1238,7 +1262,6 @@ public:
 private:
 	CTexture			*side;
 	matrix				toNDC;
-	CSobol<4>			generator;
 };
 
 
@@ -1332,7 +1355,6 @@ public:
 							result[1]	=	0;
 							result[2]	=	0;
 							for (i=lookup->numSamples;i>0;i--) {
-								float		x,y;		// Assume x,y are gaussian samples
 								float		s,t,w;
 								float		contribution;
 								float		tmp[4],cP[4];
@@ -1340,9 +1362,12 @@ public:
 								int			bx,by;
 								CDeepTile	*cTile;
 								float		*cPixel;
+								float		r[2];
 
-								x					=	urand();
-								y					=	urand();
+								context->random2d.get(r);
+
+								const float x		=	r[0];
+								const float y		=	r[1];
 								contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
 								totalContribution	+=	contribution;
 
@@ -1426,7 +1451,7 @@ private:
 
 							CDeepTile	*cTile	=	tiles[y]+x;
 
-							#ifndef PERBLOCK_LOCK
+							#ifndef TEXTURE_PERBLOCK_LOCK
 								osLock(CRenderer::textureMutex);
 							#else
 								osLock(cTile->block.mutex);
@@ -1434,7 +1459,7 @@ private:
 							if (cTile->block.data != NULL) {
 								cTile->block.threadData[context->thread].data	 = 	cTile->block.data;
 								cTile->block.refCount++;
-								#ifndef PERBLOCK_LOCK
+								#ifndef TEXTURE_PERBLOCK_LOCK
 									osUnlock(CRenderer::textureMutex);
 								#else
 									osUnlock(cTile->block.mutex);
@@ -1487,7 +1512,7 @@ private:
 							cTile->block.data								=	dataStart;
 							cTile->block.threadData[context->thread].data	=	dataStart;
 							
-							#ifndef PERBLOCK_LOCK
+							#ifndef TEXTURE_PERBLOCK_LOCK
 								osUnlock(CRenderer::textureMutex);
 							#else
 								osUnlock(cTile->block.mutex);
@@ -1555,7 +1580,6 @@ public:
 							vector		D;
 							int			i;
 							float		totalContribution	=	0;
-							float		r[2];
 							vector		C;
 
 							result[0]	=	0;
@@ -1565,14 +1589,14 @@ public:
 							if (dotvv(D0,D0) == 0)	return;
 
 							for (i=lookup->numSamples;i>0;i--) {
-								float	x,y;
 								float	t;
 								float	contribution;
+								float	r[2];
 
-								generator.get(r);
+								context->random2d.get(r);
 
-								x					=	r[0];	// Assume x,y are gaussian samples
-								y					=	r[1];
+								const float x		=	r[0];
+								const float y		=	r[1];
 								contribution		=	lookup->filter(x - (float) 0.5,y - (float) 0.5,1,1);
 								totalContribution	+=	contribution;
 
@@ -1664,7 +1688,6 @@ public:
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
 	
 	CTexture			*sides[6];
-	CSobol<2>			generator;
 };
 
 

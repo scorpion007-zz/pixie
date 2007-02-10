@@ -33,9 +33,8 @@
 
 #include "common/global.h"
 #include "object.h"
+#include "config.h"
 
-#define	TESSELATION_LOCK_PER_ENTRY			// Use a mutex per tesselation entry
-#define TESSELATION_NUM_LEVELS			3	// The number of levels before we split
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
@@ -81,7 +80,7 @@ class	CTesselationPatch : public CObject {
 		CPurgableTesselation	**threadTesselation;	// The entry per thread
 		int						refCount;				// How many threads share this tesselation
 		
-		#ifdef TESSELATION_LOCK_PER_ENTRY
+		#ifdef TESSELATION_PERENTRY_LOCK
 		TMutex					mutex;					// Mutex if we're mutexing per entry
 		#endif
 	};

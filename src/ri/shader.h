@@ -160,7 +160,7 @@ public:
 class	CTextureLookup : public CShaderLookup	{
 public:
 		RtFilterFunc		filter;					// Lookup filter
-		float				swidth,twidth;			// The filter width
+		float				width,swidth,twidth;	// The filter width
 		float				blur;					// Blur amount
 		int					numSamples;				// The number of samples to take in the texture
 		float				shadowBias;				// The shadow bias for the lookup

@@ -36,13 +36,7 @@
 #include "stats.h"
 #include "memory.h"
 #include "netFileMapping.h"
-
-// The default network port
-#define	DEFAULT_PORT	24914
-
-// The default zone size
-#define	BUFFER_LENGTH	1 << 12				// The size of the buffer to be used during the network file transfers
-
+#include "config.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcRecv

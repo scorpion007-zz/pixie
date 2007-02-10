@@ -31,16 +31,14 @@
 #include "common/os.h"
 #include "memory.h"
 #include "stats.h"
-
-// The default zone size
-#define	INIT_ZONE_SIZE	500000				// The intial size of the memory zone
+#include "config.h"
 
 // Some global variables
 static	int					allocatedZoneMemory		=	0;
 static	int					freedZoneMemory			=	0;
 static	int					allocatedPages			=	0;
 static	int					freedPages				=	0;
-static	int					memoryPageSize			=	1000000;
+static	int					memoryPageSize			=	ZONE_BASE_SIZE;
 static	float				lastPagingTime			=	0;
 
 
@@ -50,7 +48,7 @@ static	float				lastPagingTime			=	0;
 // Return Value			:
 // Comments				:	Should be called after memInit
 void			memoryInit(CMemPage *&stack) {
-	stack	=	memoryNewPage(INIT_ZONE_SIZE);
+	stack	=	memoryNewPage(ZONE_INIT_SIZE);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -83,7 +81,7 @@ CMemPage		*memoryNewPage(int size) {
 
 	// Are we allocating/deallocating too often ?
 	if ((time - lastPagingTime) < 1) {
-		memoryPageSize		+=	100000;	// Increase the zone size at 100k increments
+		memoryPageSize		+=	ZONE_INCREMENT_SIZE;	// Increase the page size
 	}
 	lastPagingTime			=	time;
 

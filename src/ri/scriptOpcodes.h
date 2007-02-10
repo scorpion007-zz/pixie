@@ -728,6 +728,7 @@ DEFOPCODE(VUBoolean	,"vuboolean",2,	OPERANDS2EXPR_PRE,FUNARYEXPR,OPERANDS2EXPR_U
 //
 //	FIXME : Array opcodes
 //
+// IMPORTANT: The array index is assumed to be uniform
 /////////////////////////////////////////////////////////////////
 #define	ARRAY_PRE		TCode		*res;							\
 						const TCode	*op1,*op2;						\
@@ -738,12 +739,10 @@ DEFOPCODE(VUBoolean	,"vuboolean",2,	OPERANDS2EXPR_PRE,FUNARYEXPR,OPERANDS2EXPR_U
 
 #define	ARRAY_UPDATE(__rs)											\
 						res		+=	__rs;							\
-						op1		+=	op1Step;						\
-						op2		++;
+						op1		+=	op1Step;
 
 #define	UARRAY_UPDATE(__rs)											\
-						res		+=	__rs;							\
-						op2		++;
+						res		+=	__rs;
 
 
 
@@ -775,9 +774,10 @@ DEFOPCODE(USFromA	,"usfroma"	,3,	ARRAY_PRE,SFROMAEXPR,UARRAY_UPDATE(1),	NULL_EXP
 						operand(1,op1);								\
 						operand(2,op2);
 
+// IMPORTANT: The array index is assumed to be uniform !!!
+
 #define	ARRAY_UPDATE(__os)											\
 						res		+=	resStep;						\
-						op1++;										\
 						op2		+=	__os;
 
 

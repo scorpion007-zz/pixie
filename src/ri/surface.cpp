@@ -174,6 +174,10 @@ void	CPatch::dice(CShadingContext *r) {
 		const double	vstep		=	(vmax - vstart) / (double) (numVprobes-1);
 		double			u,v;
 
+		// If the parametric range is too small, we have to abort
+		if (ustep < C_EPSILON)	return;
+		if (vstep < C_EPSILON)	return;
+
 		// The current u/v/time vectors
 		float			*uv			=	varying[VARIABLE_U];
 		float			*vv			=	varying[VARIABLE_V];
@@ -508,7 +512,7 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 		levels[i].threadTesselation	=	cTess;
 		levels[i].refCount			=	0;
 		
-		#ifdef TESSELATION_LOCK_PER_ENTRY
+		#ifdef TESSELATION_PERENTRY_LOCK
 			osCreateMutex(levels[i].mutex);
 		#endif
 	}
@@ -541,7 +545,7 @@ CTesselationPatch::~CTesselationPatch() {
 	for(int i=0;i<TESSELATION_NUM_LEVELS;i++) {
 		if (levels[i].tesselation != NULL) free(levels[i].tesselation);
 		delete[] levels[i].threadTesselation;
-		#ifdef TESSELATION_LOCK_PER_ENTRY
+		#ifdef TESSELATION_PERENTRY_LOCK
 			osDeleteMutex(levels[i].mutex);
 		#endif
 	}
@@ -604,7 +608,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		if (levels[level].threadTesselation[thread] == NULL) {
 			// No, we must get one, lock first
 			
-			#ifdef TESSELATION_LOCK_PER_ENTRY
+			#ifdef TESSELATION_PERENTRY_LOCK
 				osLock(levels[level].mutex);
 			#else
 				osLock(CRenderer::tesselateMutex);
@@ -639,7 +643,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 			tesselationUsedMemory[level][thread] += levels[level].tesselation->size;
 			levels[level].threadTesselation[thread] = levels[level].tesselation;
 			
-			#ifdef TESSELATION_LOCK_PER_ENTRY
+			#ifdef TESSELATION_PERENTRY_LOCK
 				osUnlock(levels[level].mutex);
 			#else
 				osUnlock(CRenderer::tesselateMutex);
@@ -1694,7 +1698,7 @@ void		CTesselationPatch::purgeTesselations(CShadingContext *context,int thread,i
 	if (tesselationList == NULL)	return;
 
 	// Ensure no other thread creates new tesselations whilst we flush
-	#ifdef TESSELATION_LOCK_PER_ENTRY
+	#ifdef TESSELATION_PERENTRY_LOCK
 		osLock(CRenderer::tesselateMutex);
 	#endif
 	
@@ -1728,7 +1732,7 @@ void		CTesselationPatch::purgeTesselations(CShadingContext *context,int thread,i
 		tesselationUsedMemory[level][thread]	-=	cTess->tesselation->size;
 		cTess->threadTesselation[thread]		=	NULL;
 		
-		#ifdef TESSELATION_LOCK_PER_ENTRY
+		#ifdef TESSELATION_PERENTRY_LOCK
 			osLock(cTess->mutex);
 		#endif
 		
@@ -1739,13 +1743,13 @@ void		CTesselationPatch::purgeTesselations(CShadingContext *context,int thread,i
 			cTess->tesselation						=	NULL;
 		}
 		
-		#ifdef TESSELATION_LOCK_PER_ENTRY
+		#ifdef TESSELATION_PERENTRY_LOCK
 			osUnlock(cTess->mutex);
 		#endif
 
 	}
 	
-	#ifdef TESSELATION_LOCK_PER_ENTRY
+	#ifdef TESSELATION_PERENTRY_LOCK
 		osUnlock(CRenderer::tesselateMutex);
 	#endif
 }

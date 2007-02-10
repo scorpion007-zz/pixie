@@ -23,13 +23,13 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	defaults.h
+//  File				:	config.h
 //  Classes				:
-//  Description			:	This file contains compile time specific defaults
+//  Description			:	This file contains the libri config settings
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef DEFAULTS_H
-#define DEFAULTS_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 // The default tile size for textures
 #define	DEFAULT_TILE_SIZE		32
@@ -43,13 +43,46 @@
 #define	DEFAULT_TILE_HEIGHT		32
 #define	DEFAULT_NET_XBUCKETS	5
 #define	DEFAULT_NET_YBUCKETS	5
-#define	DEFAULT_TSM_THRESHOLD	(float ) 0.1
+#define	DEFAULT_TSM_THRESHOLD	0.1f
 #define	DEFAULT_MAX_GRIDSIZE	16*16
 #define DEFAULT_NUM_THREADS		2
 #define DEFAULT_MAX_TEXTURESIZE	20000000
 #define DEFAULT_MAX_BRICKSIZE	10000000
 #define DEFAULT_THREAD_STRIDE	3
 #define	DEFAULT_GEO_CACHE_SIZE	30720*1024
+
+// The default network port
+#define	DEFAULT_PORT					24914
+
+// Per block or global locking for textures
+// Per block is faster, but requires (fractionally) more memory
+#define	TEXTURE_PERBLOCK_LOCK
+
+// Per entry or global locking for tesselations
+// Per entry is faster, but requires (fractionally) more memory
+#define TESSELATION_PERENTRY_LOCK
+
+// The number of levels before we split
+#define TESSELATION_NUM_LEVELS			3
+
+// The size of the buffer to be used during the network file transfers
+#define	BUFFER_LENGTH					1 << 12
+
+//	The maximum allowed string size that can be handled
+#define	MAX_SCRIPT_STRING_SIZE			256
+
+//	The initial zone size
+#define	ZONE_INIT_SIZE					500000
+
+//	The default page size for the zone
+#define ZONE_BASE_SIZE					1000000
+
+//	If we have threashing in the zone memory, we gradually increase the page size by this amount
+#define ZONE_INCREMENT_SIZE				100000
+
+
+// Include the global config file
+#include "../../config.h"
 
 #endif
 

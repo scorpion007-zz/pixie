@@ -38,6 +38,7 @@
 #include "memory.h"
 #include "error.h"
 #include "rendererContext.h"
+#include "config.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,11 +291,6 @@ void		convertColorTo(float *out,const float *in,ECoordinateSystem s) {
 // Comments				:
 void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) {
 // At this point, the shader sends us the arrays for parameters/constants/variables/uniforms for the shader
-	
-//	The maximum allowed string size that can be handled
-#define		MAX_SCRIPT_STRING_SIZE			256
-
-
 
 #define		scripterror(mes)				{																	\
 												error(CODE_SCRIPT,"\"%s\", (nullified)\n",mes);					\

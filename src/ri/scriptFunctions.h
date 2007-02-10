@@ -169,7 +169,7 @@ DEFFUNC(Sqrt		,"sqrt"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),N
 #undef	FUNCTION
 
 #define	FUNCTION(x)	isqrtf(x)
-DEFFUNC(InvSqrt		,"invsqrt"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(InvSqrt		,"inversesqrt"	,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
 #define	FUNCTION(x)	fabs(x)
@@ -950,6 +950,73 @@ DEFLINKFUNC(VSplinec	,"spline"		,"c=Sfcccc*", 0)
 DEFLINKFUNC(VSplinev	,"spline"		,"v=Sfvvvv*", 0)
 DEFLINKFUNC(VSplinen	,"spline"		,"n=Sfnnnn*", 0)
 DEFFUNC(VSplinep		,"spline"		,"p=Sfpppp*"	,SPLINEVEXPR_PRE,SPLINEPEXPR,SPLINEPEXPR_UPDATE,SPLINEPEXPR_POST,0)
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// spline	"p=fP"
+#define	SPLINEAPEXPR_PRE	TCode		*res;													\
+							const TCode	*op;													\
+							int			numArguments;											\
+							TCode		*val;													\
+							float		ub[4],tmp[4];											\
+							const float	*ubasis = (float*) RiCatmullRomBasis;					\
+							int			ustep = 1;												\
+							int			numPieces;												\
+																								\
+							operand(0,res);														\
+							operand(1,val);														\
+							operandSize(2,op,numArguments);										\
+							numArguments	/=	3;												\
+							numPieces		=	(numArguments-3);
+
+
+#define	SPLINEAPEXPR		if (val->real <= 0)			movvv(&res->real,&op[3].real);						\
+							else if (val->real >= 1)	movvv(&res->real,&op[(numArguments-2)*3].real);		\
+							else {																		\
+								int		piece	=	(int) floor(val->real * (float) numPieces);			\
+								int		pieceid	=	piece*ustep;										\
+								float	u		=	val->real*((float) numPieces) - (float) piece;		\
+								ub[3] = 1;																\
+								ub[2] =	u;																\
+								ub[1] =	u*u;															\
+								ub[0] =	u*ub[2];														\
+																										\
+								tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];	\
+								tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];	\
+								tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];	\
+								tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];	\
+																										\
+								res[0].real		=	tmp[0]*op[(pieceid+0)*3+0].real +					\
+													tmp[1]*op[(pieceid+1)*3+0].real +					\
+													tmp[2]*op[(pieceid+2)*3+0].real +					\
+													tmp[3]*op[(pieceid+3)*3+0].real;					\
+																										\
+								res[1].real		=	tmp[0]*op[(pieceid+0)*3+1].real +					\
+													tmp[1]*op[(pieceid+1)*3+1].real +					\
+													tmp[2]*op[(pieceid+2)*3+1].real +					\
+													tmp[3]*op[(pieceid+3)*3+1].real;					\
+																										\
+								res[2].real		=	tmp[0]*op[(pieceid+0)*3+2].real +					\
+													tmp[1]*op[(pieceid+1)*3+2].real +					\
+													tmp[2]*op[(pieceid+2)*3+2].real +					\
+													tmp[3]*op[(pieceid+3)*3+2].real;					\
+																										\
+							}																			\
+
+#define	SPLINEAPEXPR_UPDATE	res	+=	3;																	\
+							val +=	1;																	\
+							op	+=	numArguments*3;
+
+
+
+DEFLINKFUNC(Splineac		,"spline"		,"c=fC", 0)
+DEFLINKFUNC(Splineav		,"spline"		,"v=fV", 0)
+DEFLINKFUNC(Splinean		,"spline"		,"n=fN", 0)
+DEFFUNC(Splineap			,"spline"		,"p=fP"		,SPLINEAPEXPR_PRE,SPLINEAPEXPR,SPLINEAPEXPR_UPDATE,NULL_EXPR,0)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

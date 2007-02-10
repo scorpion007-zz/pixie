@@ -35,7 +35,7 @@
 #include "options.h"
 #include "texture.h"
 #include "stats.h"
-#include "defaults.h"
+#include "config.h"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

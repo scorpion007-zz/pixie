@@ -1272,6 +1272,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 								dirty();																		\
 								lookup->filter			=	RiGaussianFilter;									\
 								lookup->blur			=	0;													\
+								lookup->width			=	1;													\
 								lookup->swidth			=	1;													\
 								lookup->twidth			=	1;													\
 								lookup->numSamples		=	1;													\
@@ -1297,6 +1298,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 										} else if (strcmp(param->string,"blur") == 0) {							\
 											lookup->blur		=	val->real;									\
 											lookup->coneAngle	=	(float) (C_PI*val->real);					\
+										} else if (strcmp(param->string,"width") == 0) {						\
+											lookup->width		=	val->real;									\
 										} else if (strcmp(param->string,"swidth") == 0) {						\
 											lookup->swidth		=	val->real;									\
 										} else if (strcmp(param->string,"fill") == 0) {							\

@@ -262,6 +262,9 @@ public:
 
 		const int				thread;												// The thread number for this context
 
+		CSobol<2>				random2d;											// 2D random number generator
+		CSobol<3>				random3d;											// 3D random number generator
+		CSobol<4>				random4d;											// 4D random number generator
 protected:
 		// Hiders can hook into the following functions
 		virtual	void			solarBegin(const float *,const float *) { }
@@ -286,10 +289,6 @@ private:
 		const char				*currentRayLabel;									// The current ray label
 		CShadingState			*freeStates;										// The list of free states
 		int						inShadow;											// TRUE if we're in a shadow
-
-		CSobol<4>				traceGenerator;										// Random number generator for "trace"
-		CSobol<4>				transmissionGenerator;								// Random number generator for "transmission"
-		CSobol<4>				gatherGenerator;									// Random number generator for "gather"
 
 		TObjectHash				*traceObjectHash;									// An object hash array for raytraced objects
 	

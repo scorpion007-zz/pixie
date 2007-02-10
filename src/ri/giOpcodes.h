@@ -47,9 +47,9 @@
 									tags[i]++;														\
 								} else {															\
 									if (lookup->uniformDist) {										\
-										sampleHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,gatherGenerator);	\
+										sampleHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,random4d);	\
 									} else {														\
-										sampleCosineHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,gatherGenerator);	\
+										sampleCosineHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,random4d);	\
 									}																\
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	lookup->bias;								\

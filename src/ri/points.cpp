@@ -349,7 +349,7 @@ void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,u
 
 	variables->dispatch(vertexBase,0,numPoints,varying,locals);
 
-	usedParameters	&=	~(PARAMETER_N | variables->parameters);
+	usedParameters	&=	~(PARAMETER_NG | variables->parameters);
 }
 
 
