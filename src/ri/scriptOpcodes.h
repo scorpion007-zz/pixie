@@ -179,7 +179,7 @@ DEFOPCODE(Forbegin3	,"forbegin"	,3,	FORBEGIN3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_E
 								} else {														\
 									if (op->integer) {											\
 									} else	{													\
-										*tags	=	1;											\
+										*tags	=	lastConditional->forExecCount;				\
 										numActive--;											\
 										numPassive++;											\
 									}															\
@@ -204,11 +204,13 @@ DEFOPCODE(For3	,"for"	,1,	FOR3EXPR_PRE,NULL_EXPR,NULL_EXPR,FOR3EXPR_POST,0)
 							numActive	=	0;													\
 							numPassive	=	numVertices;										\
 							for (int i=numVertices;i>0;i--,tags++)	{							\
-								*tags	-=	lastConditional->forExecCount;						\
-								if (*tags	<= 0)	{											\
-									*tags	=	0;												\
-									numActive++;												\
-									numPassive--;												\
+								if (*tags) {													\
+									*tags	-=	lastConditional->forExecCount;					\
+									if (*tags	<= 0)	{										\
+										*tags	=	0;											\
+										numActive++;											\
+										numPassive--;											\
+									}															\
 								}																\
 							}																	\
 							endConditional();
@@ -221,13 +223,32 @@ DEFOPCODE(Forend3	,"forend"	,0,	FOREND3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 //	break
 #define	BREAK1EXPR_PRE		for (int i=0;i<numVertices;i++,tags++)	{							\
 								if (*tags	== 0)	{											\
-									*tags	=	0;												\
+									*tags	=	lastConditional->forExecCount;					\
+									numPassive++;												\
+									numActive--;												\
 								}																\
 							}
 
-DEFOPCODE(Break1	,"break"	,1,	BREAK1EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
+#define	BREAK1EXPR_POST		if (numActive == 0) {												\
+								jmp(lastConditional->forEnd);									\
+							}
+
+DEFOPCODE(Break1	,"break"	,1,	BREAK1EXPR_PRE,NULL_EXPR,NULL_EXPR,BREAK1EXPR_POST,0)
 
 #undef BREAK1EXPR_PRE
+#undef BREAK1EXPR_POST
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	continue
+//  FIXME: check this, I don't think it works inside a varying conditional
+
+#define	CONTINUE1EXPR_POST	if (numPassive != 0) {												\
+								jmp(lastConditional->forContinue);								\
+							}
+
+DEFOPCODE(Continue1	,"continue"	,1,	NULL_EXPR,NULL_EXPR,NULL_EXPR,CONTINUE1EXPR_POST,0)
+
+#undef CONTINUE1EXPR_POST
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
