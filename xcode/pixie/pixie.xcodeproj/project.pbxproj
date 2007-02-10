@@ -57,7 +57,6 @@
 		183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9E09B300AD9BCF300A33716 /* sdr.h */; };
 		1862D75C0B2A8F5A00111435 /* debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1862D7590B2A8F5A00111435 /* debug.cpp */; };
 		1862D75D0B2A8F5A00111435 /* debug.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D75A0B2A8F5A00111435 /* debug.h */; };
-		1862D75E0B2A8F5A00111435 /* defaults.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D75B0B2A8F5A00111435 /* defaults.h */; };
 		1862D7610B2A8F8100111435 /* gi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1862D75F0B2A8F8100111435 /* gi.cpp */; };
 		1862D7620B2A8F8100111435 /* gi.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D7600B2A8F8100111435 /* gi.h */; };
 		1862D7640B2A8FB100111435 /* tiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 1862D7630B2A8FB100111435 /* tiff.h */; };
@@ -77,6 +76,7 @@
 		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
 		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
 		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
+		18B045E20B7D794C00500420 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 18B045E10B7D794C00500420 /* config.h */; };
 		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
 		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
 		18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D3515A0B7AD20E009F0DAE /* netFileMapping.h */; };
@@ -700,7 +700,6 @@
 		1833986C0B2D2CA60055E484 /* spotlight.sl */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = spotlight.sl; sourceTree = "<group>"; };
 		1862D7590B2A8F5A00111435 /* debug.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = debug.cpp; path = ../../src/ri/debug.cpp; sourceTree = SOURCE_ROOT; };
 		1862D75A0B2A8F5A00111435 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = debug.h; path = ../../src/ri/debug.h; sourceTree = SOURCE_ROOT; };
-		1862D75B0B2A8F5A00111435 /* defaults.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = defaults.h; path = ../../src/ri/defaults.h; sourceTree = SOURCE_ROOT; };
 		1862D75F0B2A8F8100111435 /* gi.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = gi.cpp; path = ../../src/ri/gi.cpp; sourceTree = SOURCE_ROOT; };
 		1862D7600B2A8F8100111435 /* gi.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = gi.h; path = ../../src/ri/gi.h; sourceTree = SOURCE_ROOT; };
 		1862D7630B2A8FB100111435 /* tiff.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tiff.h; path = ../../src/ri/tiff.h; sourceTree = SOURCE_ROOT; };
@@ -818,6 +817,7 @@
 		188383E00B2FB38F00166E3E /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = LICENSE; path = ../../LICENSE; sourceTree = SOURCE_ROOT; };
 		188383E10B2FB38F00166E3E /* NEWS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = NEWS; path = ../../NEWS; sourceTree = SOURCE_ROOT; };
 		188383E20B2FB38F00166E3E /* README */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = README; path = ../../README; sourceTree = SOURCE_ROOT; };
+		18B045E10B7D794C00500420 /* config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../src/ri/config.h; sourceTree = SOURCE_ROOT; };
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
 		18D3515A0B7AD20E009F0DAE /* netFileMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = netFileMapping.h; path = ../../src/ri/netFileMapping.h; sourceTree = SOURCE_ROOT; };
@@ -1620,6 +1620,7 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
+				18B045E10B7D794C00500420 /* config.h */,
 				18D3515A0B7AD20E009F0DAE /* netFileMapping.h */,
 				18D351560B7AD1F5009F0DAE /* displayChannel.cpp */,
 				18D351570B7AD1F5009F0DAE /* displayChannel.h */,
@@ -1630,7 +1631,6 @@
 				1862D7600B2A8F8100111435 /* gi.h */,
 				1862D7590B2A8F5A00111435 /* debug.cpp */,
 				1862D75A0B2A8F5A00111435 /* debug.h */,
-				1862D75B0B2A8F5A00111435 /* defaults.h */,
 				C983E7910AF300EE00648461 /* dso.cpp */,
 				C98988B90AF1B645003DB17A /* rendererClipping.cpp */,
 				C98988BA0AF1B645003DB17A /* rendererContext.cpp */,
@@ -1974,12 +1974,12 @@
 				C96A70230AD6E196003C2D7B /* zbufferQuad.h in Headers */,
 				C98988C30AF1B645003DB17A /* rendererContext.h in Headers */,
 				1862D75D0B2A8F5A00111435 /* debug.h in Headers */,
-				1862D75E0B2A8F5A00111435 /* defaults.h in Headers */,
 				1862D7620B2A8F8100111435 /* gi.h in Headers */,
 				1862D7640B2A8FB100111435 /* tiff.h in Headers */,
 				1862D7660B2A8FCD00111435 /* objectMisc.h in Headers */,
 				18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */,
 				18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */,
+				18B045E20B7D794C00500420 /* config.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
