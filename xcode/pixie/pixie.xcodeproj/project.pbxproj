@@ -2719,7 +2719,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				DEPLOYMENT_LOCATION = YES;
-				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				DSTROOT = /Applications/Graphics/Pixie;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				HEADER_SEARCH_PATHS = (
@@ -2738,7 +2738,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				DSTROOT = /Applications/Graphics/Pixie;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -2893,17 +2893,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					../../src,
-				);
 				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = (
 					"-lz",
@@ -2919,15 +2914,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					../../src,
-				);
 				INSTALL_PATH = /lib;
 				OTHER_LDFLAGS = (
 					"-lz",
