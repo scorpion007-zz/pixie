@@ -309,6 +309,10 @@ DEFOPCODE(Continue1	,"continue"	,1,	NULL_EXPR,NULL_EXPR,NULL_EXPR,CONTINUE1EXPR_
 							else	res->integer	=	FALSE;
 
 
+#define	VNCMPEXPR			if (	(op1[0].real OPERATION op2[0].real) ||								\
+									(op1[1].real OPERATION op2[1].real) ||								\
+									(op1[2].real OPERATION op2[2].real)	)	res->integer	=	TRUE;	\
+							else	res->integer	=	FALSE;
 
 
 
@@ -318,6 +322,12 @@ DEFOPCODE(Continue1	,"continue"	,1,	NULL_EXPR,NULL_EXPR,NULL_EXPR,CONTINUE1EXPR_
 							int	result	=	TRUE;															\
 							for (index=0;index<16;index++)													\
 								if (!(op1[index].real OPERATION op2[index].real))	result	&=	FALSE;		\
+							res->integer	=	result;
+
+#define	MNCMPEXPR			int	index;																		\
+							int	result	=	TRUE;															\
+							for (index=0;index<16;index++)													\
+								if (!(op1[index].real OPERATION op2[index].real))	result	|=	FALSE;		\
 							res->integer	=	result;
 
 
@@ -339,8 +349,8 @@ DEFOPCODE(Seql2		,"seql"		,3,	OPERANDS3EXPR_PRE,SEQLEXPR,OPERANDS3EXPR_UPDATE(1,
 
 #define	OPERATION			!=
 DEFOPCODE(Fneql2	,"fneql"	,3,	OPERANDS3EXPR_PRE,FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Vneql2	,"vneql"	,3,	OPERANDS3EXPR_PRE,VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
-DEFOPCODE(Mneql2	,"mneql"	,3,	OPERANDS3EXPR_PRE,MCMPEXPR,OPERANDS3EXPR_UPDATE(1,16,16),	NULL_EXPR,0)
+DEFOPCODE(Vneql2	,"vneql"	,3,	OPERANDS3EXPR_PRE,VNCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),	NULL_EXPR,0)
+DEFOPCODE(Mneql2	,"mneql"	,3,	OPERANDS3EXPR_PRE,MNCMPEXPR,OPERANDS3EXPR_UPDATE(1,16,16),	NULL_EXPR,0)
 DEFOPCODE(Sneql2	,"sneql"	,3,	OPERANDS3EXPR_PRE,SNEQLEXPR,OPERANDS3EXPR_UPDATE(1,1,1),	NULL_EXPR,0)
 #undef OPERATION
 
