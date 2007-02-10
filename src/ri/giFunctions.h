@@ -161,20 +161,24 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 								CRay				ray;
 
 #define	TRACEEXPR				subvv(D,(float *) op2,(float *) op1);															\
-								ray.t					=	lengthv(D);															\
-								mulvf(ray.dir,D,1/ray.t);																		\
-								movvv(ray.from,&op1->real);																		\
-								ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;										\
-								ray.time				=	urand();															\
-								ray.tmin				=	bias;																\
-								ray.t					-=	bias;																\
-								ray.da					=	ab[0];																\
-								ray.db					=	ab[1];																\
+								if (dotvv(D,D) > 0) {																			\
+									ray.t					=	lengthv(D);														\
+									mulvf(ray.dir,D,1/ray.t);																	\
+									movvv(ray.from,&op1->real);																	\
+									ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;									\
+									ray.time				=	urand();														\
+									ray.tmin				=	bias;															\
+									ray.t					-=	bias;															\
+									ray.da					=	ab[0];															\
+									ray.db					=	ab[1];															\
 																																\
-								numReflectionRays++;																			\
-								trace(&ray);																					\
+									numReflectionRays++;																		\
+									trace(&ray);																				\
 																																\
-								res->real				=	ray.t
+									res->real				=	ray.t;															\
+								} else {																						\
+									res->real				=	0.0f;															\
+								}
 
 
 #define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(1,3,3)																			\
@@ -324,21 +328,25 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								CRay				ray;
 
 #define	VISIBILITYEXPR			subvv(D,(float *) op2,(float *) op1);														\
-								ray.t					=	lengthv(D);														\
-								mulvf(ray.dir,D,1/ray.t);																	\
-								movvv(ray.from,&op1->real);																	\
-								ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;							\
-								ray.time				=	urand();														\
-								ray.tmin				=	bias;															\
-								ray.t					-=	bias;															\
-								ray.da					=	ab[0];															\
-								ray.db					=	ab[1];															\
+								if (dotvv(D,D) > 0) {																		\
+									ray.t					=	lengthv(D);													\
+									mulvf(ray.dir,D,1/ray.t);																\
+									movvv(ray.from,&op1->real);																\
+									ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;						\
+									ray.time				=	urand();													\
+									ray.tmin				=	bias;														\
+									ray.t					-=	bias;														\
+									ray.da					=	ab[0];														\
+									ray.db					=	ab[1];														\
 																															\
-								numTransmissionRays++;																		\
-								trace(&ray);																				\
+									numTransmissionRays++;																	\
+									trace(&ray);																			\
 																															\
-								if (ray.object != NULL)	res[0].real	=	0;													\
-								else					res[0].real	=	1;
+									if (ray.object != NULL)	res[0].real	=	0;												\
+									else					res[0].real	=	1;												\
+								} else {																					\
+									res[0].real	=	1;																		\
+								}
 
 #define	VISIBILITYEXPR_UPDATE	FUN3EXPR_UPDATE(1,3,3)																		\
 								ab	+=	2;
