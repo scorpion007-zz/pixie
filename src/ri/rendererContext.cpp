@@ -3387,42 +3387,56 @@ void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetam
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+		// Do we have a sphere ?
+		if (	(p0[0] != 0)		&&
+				(p0[1] != p0[2])	&&
+				(p0[3] != 0)	) {
 
-		tmp			=	absf(p0[0]);
-		p0[1]		=	min(max(p0[1],-tmp),tmp);
-		p0[2]		=	min(max(p0[2],-tmp),tmp);
-		p0[1]		=	(float) asin(p0[1] / p0[0]);
-		p0[2]		=	(float) asin(p0[2] / p0[0]);
+			if (pl != NULL)	memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
 
-		addObject(new CSphere(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3])));
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			tmp			=	absf(p0[0]);
+			p0[1]		=	min(max(p0[1],-tmp),tmp);
+			p0[2]		=	min(max(p0[2],-tmp),tmp);
+			p0[1]		=	(float) asin(p0[1] / p0[0]);
+			p0[2]		=	(float) asin(p0[2] / p0[0]);
+
+			addObject(new CSphere(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
-			pl->append(p1+4);
+
+		// Do we have a moving sphere ?
+		if (	((p0[0] != 0)		||	(p1[0] != 0))		&&
+				((p0[1] != p0[2])	||	(p1[1] != p1[2]))	&&
+				((p0[3] != 0)		||	(p1[3] != 0))) {
+
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
+				pl->append(p1+4);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			tmp			=	absf(p0[0]);
+			p0[1]		=	min(max(p0[1],-tmp),tmp);
+			p0[2]		=	min(max(p0[2],-tmp),tmp);
+			p0[1]		=	(float) asin(p0[1] / p0[0]);
+			p0[2]		=	(float) asin(p0[2] / p0[0]);
+
+			tmp			=	absf(p0[1]);
+			p1[1]		=	min(max(p1[1],-tmp),tmp);
+			p1[2]		=	min(max(p1[2],-tmp),tmp);
+			p1[1]		=	(float) asin(p1[1] / p1[0]);
+			p1[2]		=	(float) asin(p1[2] / p1[0]);
+
+			addObject(new CSphere(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3]),p1[0],p1[1],p1[2],(float) radians(p1[3])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		tmp			=	absf(p0[0]);
-		p0[1]		=	min(max(p0[1],-tmp),tmp);
-		p0[2]		=	min(max(p0[2],-tmp),tmp);
-		p0[1]		=	(float) asin(p0[1] / p0[0]);
-		p0[2]		=	(float) asin(p0[2] / p0[0]);
-
-		tmp			=	absf(p0[1]);
-		p1[1]		=	min(max(p1[1],-tmp),tmp);
-		p1[2]		=	min(max(p1[2],-tmp),tmp);
-		p1[1]		=	(float) asin(p1[1] / p1[0]);
-		p1[2]		=	(float) asin(p1[2] / p1[0]);
-
-		addObject(new CSphere(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3]),p1[0],p1[1],p1[2],(float) radians(p1[3])));
 		break;
 	default:
 		break;
@@ -3474,24 +3488,34 @@ void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,c
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+		// Do we have a cone ?
+		if (	(p0[0] != 0)	&&
+				(p0[2] != 0)	) {
+			if (pl != NULL)	memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
 
-		addObject(new CCone(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2])));
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CCone(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
-			pl->append(p1+3);
+
+		// Do we have a moving cone ?
+		if (	((p0[0] != 0)	||	(p1[0] != 0))	&&
+				((p0[2] != 0)	||	(p1[2] != 0))) {
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
+				pl->append(p1+3);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CCone(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),p1[0],p1[1],(float) radians(p1[2])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		addObject(new CCone(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),p1[0],p1[1],(float) radians(p1[2])));
 		break;
 	default:
 		break;
@@ -3544,24 +3568,38 @@ void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float the
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+		// Do we have a cylinder ?
+		if (	(p0[0] != 0)		&&
+				(p0[1] != p0[2])	&&
+				(p0[3] != 0)	) {
 
-		addObject(new CCylinder(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3])));
+			if (pl != NULL)	memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CCylinder(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
-			pl->append(p1+4);
+
+		// Do we have a moving cylinder ?
+		if (	((p0[0] != 0)		||	(p1[0] != 0))		&&
+				((p0[1] != p0[2])	||	(p1[1] != p1[2]))	&&
+				((p0[3] != 0)		||	(p1[3] != 0))) {
+
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
+				pl->append(p1+4);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CCylinder(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3]),p1[0],p1[1],p1[2],(float) radians(p1[3])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		addObject(new CCylinder(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3]),p1[0],p1[1],p1[2],(float) radians(p1[3])));
 		break;
 	default:
 		break;
@@ -3581,6 +3619,7 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 	CPl				*pl;
 	CParameter		*parameters;
 	unsigned int	parametersF;
+	vector			D0,D1;
 
 	if (CRenderer::netNumServers > 0)	return;
 
@@ -3617,24 +3656,39 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[7],sizeof(float)*pl->dataSize);
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+		// Do we have a hyperboloid ?
+		subvv(D0,p0+3,p0);
+		if (	(dotvv(D0,D0) != 0)	&&
+				(p0[6] != 0)	) {
 
-		addObject(new CHyperboloid(attributes,xform,parameters,parametersF,&p0[0],&p0[3],(float) radians(p0[6])));
+			if (pl != NULL)	memcpy(pl->data0,&p0[7],sizeof(float)*pl->dataSize);
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CHyperboloid(attributes,xform,parameters,parametersF,&p0[0],&p0[3],(float) radians(p0[6])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[7],sizeof(float)*pl->dataSize);
-			pl->append(p1+7);
+
+		// Do we have a moving hyperboloid ?
+		subvv(D0,p0+3,p0);
+		subvv(D1,p1+3,p1);
+		if (	((dotvv(D0,D0) != 0)	||	(dotvv(D1,D1) != 0))	&&
+				((p0[6] != 0)			||	(p1[6] != 0))	) {
+
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[7],sizeof(float)*pl->dataSize);
+				pl->append(p1+7);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CHyperboloid(attributes,xform,parameters,parametersF,&p0[0],&p0[3],(float) radians(p0[6]),&p1[0],&p1[3],(float) radians(p1[6])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		addObject(new CHyperboloid(attributes,xform,parameters,parametersF,&p0[0],&p0[3],(float) radians(p0[6]),&p1[0],&p1[3],(float) radians(p1[6])));
 		break;
 	default:
 		break;
@@ -3687,26 +3741,40 @@ void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float th
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+		// Do we have a paraboloid ?
+		if (	(p0[0] != 0)		&&
+				(p0[1] != p0[2])	&&
+				(p0[3] != 0)	) {
 
-		if (p0[1] != p0[2])
-			addObject(new CParaboloid(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3])));
+			if (pl != NULL)	memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			if (p0[1] != p0[2])
+				addObject(new CParaboloid(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
-			pl->append(p1+4);
+
+		// Do we have a moving paraboloid ?
+		if (	((p0[0] != 0)		||	(p1[0] != 0))		&&
+				((p0[1] != p0[2])	||	(p1[1] != p1[2]))	&&
+				((p0[3] != 0)		||	(p1[3] != 0))) {
+
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[4],sizeof(float)*pl->dataSize);
+				pl->append(p1+4);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			if ((p0[1] != p0[2]) || (p1[1] != p1[2]))
+				addObject(new CParaboloid(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3]),p1[0],p1[1],p1[2],(float) radians(p1[3])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		if ((p0[1] != p0[2]) || (p1[1] != p1[2]))
-			addObject(new CParaboloid(attributes,xform,parameters,parametersF,p0[0],p0[1],p0[2],(float) radians(p0[3]),p1[0],p1[1],p1[2],(float) radians(p1[3])));
 		break;
 	default:
 		break;
@@ -3759,24 +3827,36 @@ void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,c
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+		// Do we have a disk ?
+		if (	(p0[0]	!= 0)	&&
+				(p0[2]	!= 0)) {
 
-		addObject(new CDisk(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2])));
+			if (pl != NULL)	memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CDisk(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
-			pl->append(p1+3);
+
+		// Do we have a moving disk ?
+		if (	((p0[0]	!= 0)	||	(p1[0]	!= 0))	&&
+				((p0[2]	!= 0)	|	(p1[2]	!= 0))) {
+
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[3],sizeof(float)*pl->dataSize);
+				pl->append(p1+3);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CDisk(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),p1[0],p1[1],(float) radians(p1[2])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		addObject(new CDisk(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),p1[0],p1[1],(float) radians(p1[2])));
 		break;
 	default:
 		break;
@@ -3830,24 +3910,36 @@ void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,floa
 	case 0:
 		break;
 	case 1:
-		if (pl != NULL)	memcpy(pl->data0,&p0[5],sizeof(float)*pl->dataSize);
+		// Do we have a torus ?
+		if (	(p0[0] != p0[1]) && 
+				(p0[2] != p0[3]) && 
+				(p0[4] != 0)) {
 
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
+			if (pl != NULL)	memcpy(pl->data0,&p0[5],sizeof(float)*pl->dataSize);
 
-		addObject(new CToroid(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),(float) radians(p0[3]),(float) radians(p0[4])));
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CToroid(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),(float) radians(p0[3]),(float) radians(p0[4])));
+		}
 		break;
 	case 2:
-		// Restore the parameters
-		if (pl != NULL)	{
-			memcpy(pl->data0,&p0[5],sizeof(float)*pl->dataSize);
-			pl->append(p1+5);
+		// Do we have a torus ?
+		if (	((p0[0] != p0[1]) || (p1[0] != p1[1])) &&
+				((p0[2] != p0[3]) || (p1[2] != p1[3])) &&
+				((p0[4] != 0)	  || (p1[4] != 0))) {
+
+			// Restore the parameters
+			if (pl != NULL)	{
+				memcpy(pl->data0,&p0[5],sizeof(float)*pl->dataSize);
+				pl->append(p1+5);
+			}
+
+			parameters	=	pl->uniform(0,NULL);
+			parameters	=	pl->varying(0,1,2,3,parameters);;
+
+			addObject(new CToroid(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),(float) radians(p0[3]),(float) radians(p0[4]),p1[0],p1[1],(float) radians(p1[2]),(float) radians(p1[3]),(float) radians(p1[4])));
 		}
-
-		parameters	=	pl->uniform(0,NULL);
-		parameters	=	pl->varying(0,1,2,3,parameters);;
-
-		addObject(new CToroid(attributes,xform,parameters,parametersF,p0[0],p0[1],(float) radians(p0[2]),(float) radians(p0[3]),(float) radians(p0[4]),p1[0],p1[1],(float) radians(p1[2]),(float) radians(p1[3]),(float) radians(p1[4])));
 		break;
 	default:
 		break;

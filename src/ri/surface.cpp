@@ -200,7 +200,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);		// We had PARAMETER_RAYTRACE here, why?
+			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 			
 			movvv(Pmov,varying[VARIABLE_P]);
