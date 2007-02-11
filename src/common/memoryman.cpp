@@ -184,7 +184,8 @@ void	operator delete[](void *ptr) {
 // Return Value			:
 // Comments				:
 void	*allocate_untyped(size_t size) {
-	return allocMem(size);
+	// FIXME: size must be sizeof(int) multiple
+	return (void*) new int[size / sizeof(int)];
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -193,7 +194,7 @@ void	*allocate_untyped(size_t size) {
 // Return Value			:
 // Comments				:
 void	free_untyped(void *ptr) {
-	delMem(ptr);
+	delete[] ((int*) ptr);
 }
 
 ///////////////////////////////////////////////////////////////////////
