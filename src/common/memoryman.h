@@ -61,6 +61,9 @@ extern	void	operator delete(void *ptr);
 extern	void	*operator new[](size_t size);
 extern	void	operator delete[](void *ptr);
 
+extern	void	*allocate_untyped(size_t size);
+extern	void	free_untyped(void *);
+
 #else		// USE_MEMORY_MANAGER
 
 #ifdef WIN32
@@ -107,6 +110,16 @@ extern	void	operator delete[](void *ptr);
 
 #ifndef memShutdown
 #define	memShutdown()
+#endif
+
+
+#ifndef allocate_untyped
+#define allocate_untyped(size) malloc(size)
+#endif
+
+
+#ifndef free_untyped
+#define free_untyped(mem) free(mem)
 #endif
 
 

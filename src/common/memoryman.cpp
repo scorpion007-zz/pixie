@@ -178,6 +178,23 @@ void	operator delete[](void *ptr) {
 	delMem(ptr);
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	allocate_untyped
+// Description			:	malloc replacement
+// Return Value			:
+// Comments				:
+void	*allocate_untyped(size_t size) {
+	return allocMem(size);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	allocate_untyped
+// Description			:	free replacement
+// Return Value			:
+// Comments				:
+void	free_untyped(void *ptr) {
+	delMem(ptr);
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	memInit
