@@ -1,7 +1,18 @@
-/* generated javascript */var skin = 'monobook';
-var stylepath = '/pixiewiki/skins';/* MediaWiki:Monobook */
+/* generated javascript */
+var skin = 'monobook';
+var stylepath = '/pixiewiki_install/skins';
+
+/* MediaWiki:Common.js */
+/* Any JavaScript here will be loaded for all users on every page load. */
+
+var isViewingMainPage = (/^Main Page(\/..)? - PixieWiki$/.test(document.title));
+if (isViewingMainPage) {
+	document.write('<style type="text/css">/*<![CDATA[*/ #lastmod, #siteSub, h1.firstHeading { display: none !important; } #content { padding-top: 1em; } #jump-to-nav { display: none !important; }  #p-cactions, #p-tb { display:none; } /*]]>*/</style>');
+}
+
+/* MediaWiki:Monobook.js (deprecated; migrate to Common.js!) */
 /* tooltips and access keys */
-ta = new Object();
+var ta = new Object();
 ta['pt-userpage'] = new Array('.','My user page');
 ta['pt-anonuserpage'] = new Array('.','The user page for the ip you\'re editing as');
 ta['pt-mytalk'] = new Array('n','My talk page');
@@ -11,7 +22,7 @@ ta['pt-watchlist'] = new Array('l','The list of pages you\'re monitoring for cha
 ta['pt-mycontris'] = new Array('y','List of my contributions');
 ta['pt-login'] = new Array('o','You are encouraged to log in, it is not mandatory however.');
 ta['pt-anonlogin'] = new Array('o','You are encouraged to log in, it is not mandatory however.');
-ta['pt-logout'] = new Array('o','Log out');
+ta['pt-logout'] = new Array('','Log out');
 ta['ca-talk'] = new Array('t','Discussion about the content page');
 ta['ca-edit'] = new Array('e','You can edit this page. Please use the preview button before saving.');
 ta['ca-addsection'] = new Array('+','Add a comment to this discussion.');
@@ -44,7 +55,7 @@ ta['ca-nstab-main'] = new Array('c','View the content page');
 ta['ca-nstab-user'] = new Array('c','View the user page');
 ta['ca-nstab-media'] = new Array('c','View the media page');
 ta['ca-nstab-special'] = new Array('','This is a special page, you can\'t edit the page itself.');
-ta['ca-nstab-wp'] = new Array('a','View the project page');
+ta['ca-nstab-project'] = new Array('a','View the project page');
 ta['ca-nstab-image'] = new Array('c','View the image page');
 ta['ca-nstab-mediawiki'] = new Array('c','View the system message');
 ta['ca-nstab-template'] = new Array('c','View the template');

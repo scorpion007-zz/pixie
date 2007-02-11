@@ -1,20 +1,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="keywords" content="Tutorials/Global Illumination,EfficientlyCachingIrradiance" />
 <link rel="shortcut icon" href="favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Tutorials/Global Illumination - PixieWiki</title>
-		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
-		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
-		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
-		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
-		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
-		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
-		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42a"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42a" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42a" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42a";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42a"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
-		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
-		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "/pixiewiki_install/skins";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Tutorials/Global_Illumination";
+var wgTitle = "Tutorials/Global Illumination";
+var wgArticleId = "1284";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "2162";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
 		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
 		<style type="text/css">/*<![CDATA[*/
 @import "../css/MediaWiki_Common.css";
@@ -23,12 +45,12 @@
 /*]]>*/</style>
 		<!-- Head Scripts -->
 			</head>
-<body  class="ns-0 ltr">
+<body  class="mediawiki ns-0 ltr page-Tutorials_Global_Illumination">
  <div id="titleBar"></div>
 	<div id="globalWrapper">
 		<div id="column-content">
 	<div id="content">
-		<a name="top" id="contentTop"></a>
+		<a name="contentTop" id="top"></a>
 				<h1 class="firstHeading">Tutorials/Global Illumination</h1>
 		<div id="bodyContent">
 			<h3 id="siteSub">From PixieWiki</h3>
@@ -38,27 +60,27 @@
 </p>
 <table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
 <ul>
-<li class='toclevel-1'><a href="#Overview"><span class="tocnumber">1</span> <span class="toctext">Overview</span></a></li>
-<li class='toclevel-1'><a href="#Photons"><span class="tocnumber">2</span> <span class="toctext">Photons</span></a></li>
-<li class='toclevel-1'><a href="#Irradiance_Caches_.28RIB.29"><span class="tocnumber">3</span> <span class="toctext">Irradiance Caches (RIB)</span></a></li>
-<li class='toclevel-1'><a href="#Irradiance_Caches_.28SL.29"><span class="tocnumber">4</span> <span class="toctext">Irradiance Caches (SL)</span></a></li>
-<li class='toclevel-1'><a href="#Multi-Pass_approaches"><span class="tocnumber">5</span> <span class="toctext">Multi-Pass approaches</span></a></li>
-<li class='toclevel-1'><a href="#Controlling_the_cache_Density"><span class="tocnumber">6</span> <span class="toctext">Controlling the cache Density</span></a></li>
-<li class='toclevel-1'><a href="#Global_Illumination_parameters"><span class="tocnumber">7</span> <span class="toctext">Global Illumination parameters</span></a>
+<li class="toclevel-1"><a href="#Overview"><span class="tocnumber">1</span> <span class="toctext">Overview</span></a></li>
+<li class="toclevel-1"><a href="#Photons"><span class="tocnumber">2</span> <span class="toctext">Photons</span></a></li>
+<li class="toclevel-1"><a href="#Irradiance_Caches_.28RIB.29"><span class="tocnumber">3</span> <span class="toctext">Irradiance Caches (RIB)</span></a></li>
+<li class="toclevel-1"><a href="#Irradiance_Caches_.28SL.29"><span class="tocnumber">4</span> <span class="toctext">Irradiance Caches (SL)</span></a></li>
+<li class="toclevel-1"><a href="#Multi-Pass_approaches"><span class="tocnumber">5</span> <span class="toctext">Multi-Pass approaches</span></a></li>
+<li class="toclevel-1"><a href="#Controlling_the_cache_Density"><span class="tocnumber">6</span> <span class="toctext">Controlling the cache Density</span></a></li>
+<li class="toclevel-1"><a href="#Global_Illumination_parameters"><span class="tocnumber">7</span> <span class="toctext">Global Illumination parameters</span></a>
 <ul>
-<li class='toclevel-2'><a href="#Radiance_Caches"><span class="tocnumber">7.1</span> <span class="toctext">Radiance Caches</span></a></li>
-<li class='toclevel-2'><a href="#Occlusion"><span class="tocnumber">7.2</span> <span class="toctext">Occlusion</span></a></li>
+<li class="toclevel-2"><a href="#Radiance_Caches"><span class="tocnumber">7.1</span> <span class="toctext">Radiance Caches</span></a></li>
+<li class="toclevel-2"><a href="#Occlusion"><span class="tocnumber">7.2</span> <span class="toctext">Occlusion</span></a></li>
 </ul>
 </li>
 </ul>
 </td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Overview">edit</a>]</div><a name="Overview"></a><h1> Overview </h1>
+<a name="Overview"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=1" title="Edit section: Overview">edit</a>]</span> <span class="mw-headline"> Overview </span></h1>
 <p>This page describes a liitle about how to get the best from Pixie's Global Illumination support.
 </p><p>First off, it's probably worth explaining a bit about how Pixie calculates global illumination:  It's actually a pretty broad term and refers to 'global' solutions to the lightin (considering all surface interactions).  It also encompasses a number of techniques.  I'll talk first about color bleeding.  Occlusion (soft ambient shadowing is covered next).  Both technqiues share acceleration via the irradiance cache, so I'll talk at the end about tweaks to keep things fast and other hints.
-</p><p>Eventually, I'll add proper examples for all of the cases.  For now, Per Christensen's paper "Global Illumination and All That" has a very good explanation <a href="http://www.seanet.com/~myandper/abstract/sig03c09.htm" class='external autonumber' title="http://www.seanet.com/~myandper/abstract/sig03c09.htm" rel="nofollow">[1]</a>.
+</p><p>Eventually, I'll add proper examples for all of the cases.  For now, Per Christensen's paper "Global Illumination and All That" has a very good explanation <a href="http://www.seanet.com/~myandper/abstract/sig03c09.htm" class="external autonumber" title="http://www.seanet.com/~myandper/abstract/sig03c09.htm" rel="nofollow">[1]</a>.
 </p><p><br />
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Photons">edit</a>]</div><a name="Photons"></a><h1> Photons </h1>
+<a name="Photons"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=2" title="Edit section: Photons">edit</a>]</span> <span class="mw-headline"> Photons </span></h1>
 <p>Firstly, if you want colour bleeding between diffuse surfaces, you'll need a photon map.  If you don't want colour bleeding, you don't need a photon map pass.  Photon maps record the irradiance on a surface as light bounces from surface to surface.  Photon maps are baked using the photon hider (use this snippet):
 </p>
 <pre>Hider "photon" "emit" 300000
@@ -73,10 +95,10 @@ Attribute "photon" "estimator" 100
 </p><p><b>Photons are emitted by lights - so if there's no lights, you'll get no photons</b>.
 </p><p>You can use the <tt>show</tt> program to view the contents of a photon map on disk, to check the density of photons.
 </p>
-<div class="thumb tright"><div style="width:182px;"><a href="images/GSHPhotonMapVis.png" class="internal" title="Photon map displayed with show"><img src="../thumbs/c/c7/GSHPhotonMapVis.png/180px-GSHPhotonMapVis.png" alt="Photon map displayed with show" width="180" height="127" longdesc="images/GSHPhotonMapVis.png" /></a>  <div class="thumbcaption" ><div class="magnify" style="float:right"><a href="images/GSHPhotonMapVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="Enlarge" /></a></div>Photon map displayed with <tt>show</tt></div></div></div>
+<div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="images/GSHPhotonMapVis.png" class="internal" title="Photon map displayed with show"><img src="../thumbs/c/c7/GSHPhotonMapVis.png/180px-GSHPhotonMapVis.png" alt="Photon map displayed with show" width="180" height="127" longdesc="images/GSHPhotonMapVis.png" class="thumbimage" /></a>  <div class="thumbcaption"><div class="magnify" style="float:right"><a href="images/GSHPhotonMapVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="" /></a></div>Photon map displayed with <tt>show</tt></div></div></div>
 <p>Having gotten a photon map from your first pass, you can now calculate the indirect lighting.  This works by sampling a hemisphere at various points in your scene to evalute the incoming light.  These sampled hemispheres are costly to evaluate.  Therefore, a cache (the irradiancecache) is used to speed up the evaluation.  This interpolates between samples from nearby places to work out the lighting in between sample points.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Irradiance Caches (RIB)">edit</a>]</div><a name="Irradiance_Caches_.28RIB.29"></a><h1> Irradiance Caches (RIB) </h1>
+<a name="Irradiance_Caches_.28RIB.29"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=3" title="Edit section: Irradiance Caches (RIB)">edit</a>]</span> <span class="mw-headline"> Irradiance Caches (RIB) </span></h1>
 <p>The cache to use is specified using an attribute:
 </p>
 <pre> Attribute "irradiance" "handle" "irr.icf"
@@ -101,7 +123,7 @@ Attribute "photon" "estimator" [500]
 </pre>
 <p><b>Both irradiance caches and photonmaps are specified by attributes - you can use different one or different settings for each primitive if you want</b>.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Irradiance Caches (SL)">edit</a>]</div><a name="Irradiance_Caches_.28SL.29"></a><h1> Irradiance Caches (SL) </h1>
+<a name="Irradiance_Caches_.28SL.29"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=4" title="Edit section: Irradiance Caches (SL)">edit</a>]</span> <span class="mw-headline"> Irradiance Caches (SL) </span></h1>
 <p>When baking out irradiance, your shader should have a call to indirectdiffuse
 </p>
 <pre>...
@@ -116,7 +138,7 @@ color indirect = indirectdiffuse(P, Nn, samples);
 </p><p>The resulting color 'indirect' can then be used along with direct lighting contributions to shade the surface color.  The other effect of this shadeop running, is that the cache will be filled up.  Depending on the values for maxError (and some of the other parameters), many samples will end up in the cache, or only a few.  Either way, some samples may be interpolated from those already in the cache, and maxError controls 'how often' this happens.
 </p><p>Of course you can use these results straight away (you don't even have to explictly save out or name a cache).  But it's often more powerful and more flexible to use this first step to save out a cache, then to reuse it later.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Multi-Pass approaches">edit</a>]</div><a name="Multi-Pass_approaches"></a><h1> Multi-Pass approaches </h1>
+<a name="Multi-Pass_approaches"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=5" title="Edit section: Multi-Pass approaches">edit</a>]</span> <span class="mw-headline"> Multi-Pass approaches </span></h1>
 <p>Broadly speaking, multi-pass approaches consist of saving out a cache using the 'w' mode above.  The cache is then read back using either 'r','rw' or 'R' modes.  Once again, the indirectdiffuse shadeop will interact with the cache.  The idea is that the cache has been properly constructed in the first pass, so reading it back is fast, and results will be estimated from samples in the cache.
 </p><p>If the mode is 'r' or 'rw' then additional samples may be added to the cache where needed, this is exactly like the cache construction in the previous pass. 
 </p><p><b>For the r or rw modes in a multi-pass approach, remember to add the globalmap and photon estimator attributes so that illumination can be estimated for the new samples</b>
@@ -146,10 +168,10 @@ Attribute "cull" "hidden" 0         # shade hidden faces too
 <div class="center"><div class="floatnone"><span><a href="images/GSHGiBakePass.jpg" class="image" title="the baked image"><img src="../images/GSHGiBakePass.jpg" alt="the baked image" width="400" height="400" longdesc="images/GSHGiBakePass.jpg" /></a></span></div></div>
 <p>Using the cache with a different viewpoint (see the errors where insufficient data is available in the cache):
 </p>
-<div class="thumb tright"><div style="width:182px;"><a href="images/GSHGIReusedError.png" class="internal" title="errors when reusing a cache"><img src="../thumbs/d/d6/GSHGIReusedError.png/180px-GSHGIReusedError.png" alt="errors when reusing a cache" width="180" height="178" longdesc="images/GSHGIReusedError.png" /></a>  <div class="thumbcaption" ><div class="magnify" style="float:right"><a href="images/GSHGIReusedError.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="Enlarge" /></a></div>errors when reusing a cache</div></div></div>
+<div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="images/GSHGIReusedError.png" class="internal" title="errors when reusing a cache"><img src="../thumbs/d/d6/GSHGIReusedError.png/180px-GSHGIReusedError.png" alt="errors when reusing a cache" width="180" height="178" longdesc="images/GSHGIReusedError.png" class="thumbimage" /></a>  <div class="thumbcaption"><div class="magnify" style="float:right"><a href="images/GSHGIReusedError.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="" /></a></div>errors when reusing a cache</div></div></div>
 <p>Fixed image (either rebake the cache with higher shading rate, or use a slightly higher maxError when reading the cache)
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Controlling the cache Density">edit</a>]</div><a name="Controlling_the_cache_Density"></a><h1> Controlling the cache Density </h1>
+<a name="Controlling_the_cache_Density"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=6" title="Edit section: Controlling the cache Density">edit</a>]</span> <span class="mw-headline"> Controlling the cache Density </span></h1>
 <p>The main parameter you have for cache quality / density is <tt>maxError</tt>.  It is 0.5 by default.  Higher values when baking result in quicker renders, smaller (less dense) caches.  Lower values result in more dense caches.  A value of 0 means never interpolate.
 </p><p><b>Higher values of maxError give more error but are faster.  Lower values are more accurate, and take longer</b>
 </p><p>So basically, you bake with the smallest tollerable maxError, perhaps 0.1.  However, because the cache is filled using the shading execution points, you need to ensure these are sufficiently dense if the cache is to be reused from other viewpoints.  Generally using a higher shading rate (numerically smaller number to ShadingRate) will achieve more shading points and result in a denser cache.  Also a bigger resolution in the bake scene may achieve a similar result.  Note that shading rate is specified in terms of the area of final pixels - more pixelSamples won't do the job.  
@@ -157,8 +179,8 @@ Attribute "cull" "hidden" 0         # shade hidden faces too
 </p><p>A larger maxError when reading a cache that already has values allows a larger number of samples to be used to estimate the irradiance.  In other words, it blurs the results in the cache slightly.  In combination with the above technique for producing a relatively dense cache in the first place, this can be used to smooth out areas where the samples are too sparse after moving the view.
 </p><p>The <tt>show</tt> program can be used to view a cache and to see it's sample density.
 </p>
-<div class="thumb tright"><div style="width:182px;"><a href="images/GSHICacheVis.png" class="internal" title="cache density as visualized with show"><img src="../thumbs/8/8c/GSHICacheVis.png/180px-GSHICacheVis.png" alt="cache density as visualized with show" width="180" height="131" longdesc="images/GSHICacheVis.png" /></a>  <div class="thumbcaption" ><div class="magnify" style="float:right"><a href="images/GSHICacheVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="Enlarge" /></a></div>cache density as visualized with <tt>show</tt></div></div></div>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Global Illumination parameters">edit</a>]</div><a name="Global_Illumination_parameters"></a><h1> Global Illumination parameters </h1>
+<div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="images/GSHICacheVis.png" class="internal" title="cache density as visualized with show"><img src="../thumbs/8/8c/GSHICacheVis.png/180px-GSHICacheVis.png" alt="cache density as visualized with show" width="180" height="131" longdesc="images/GSHICacheVis.png" class="thumbimage" /></a>  <div class="thumbcaption"><div class="magnify" style="float:right"><a href="images/GSHICacheVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="" /></a></div>cache density as visualized with <tt>show</tt></div></div></div>
+<a name="Global_Illumination_parameters"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=7" title="Edit section: Global Illumination parameters">edit</a>]</span> <span class="mw-headline"> Global Illumination parameters </span></h1>
 <p><b>maxError</b>
 </p><p>As discussed, maxError controls two things.  Firstly when it's OK to use samples already in the cache (and hence the blurriness of using such samples.  Secondly it controls when to add samples to the cache (because none are available in the cache).  It's an attribute set in the RIB.
 </p><p><b>minR and maxR</b>
@@ -174,17 +196,17 @@ The <tt>minR</tt> parameter on the other hand can prevent the radius of validity
 </p><p><b>trace bias</b>
 </p><p>Trace Bias ( <tt>Attribute "trace" "float bias" [0.01]</tt> ) isn't a GI attribute per-se but because irradiancecaches use raytracing to sample the irradiance hemisphere, you need to make sure the bias is appropriate for your scene.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Radiance Caches">edit</a>]</div><a name="Radiance_Caches"></a><h2> Radiance Caches </h2>
+<a name="Radiance_Caches"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=8" title="Edit section: Radiance Caches">edit</a>]</span> <span class="mw-headline"> Radiance Caches </span></h2>
 <p><i>TODO</i>
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Occlusion">edit</a>]</div><a name="Occlusion"></a><h2> Occlusion </h2>
+<a name="Occlusion"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=9" title="Edit section: Occlusion">edit</a>]</span> <span class="mw-headline"> Occlusion </span></h2>
 <p><i>TODO</i>
 </p><p><b>See also</b>
 </p><p><a href="../NotIncludedStatic.html" title="EfficientlyCachingIrradiance">EfficientlyCachingIrradiance</a>
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!0!!en!2 and timestamp 20060925161138 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!!en!2 and timestamp 20070211181313 -->
 <div class="printfooter">
-Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tutorials/Global_Illumination">http://www.george-graphics.co.uk/pixiewiki/index.php/Tutorials/Global_Illumination</a>"</div>
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Global_Illumination">http://www.george-graphics.co.uk/pixiewiki/Tutorials/Global_Illumination</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Tutorials.html" title="Category:Tutorials">Tutorials</a></span></p></div>			<!-- end content -->
 			<div class="visualClear"></div>
 		</div>
@@ -193,23 +215,25 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tu
 		<div id="column-one">
 	<div id="p-cactions" class="portlet">
 		<h5>Views</h5>
-		<ul>
-				 <li id="ca-nstab-main" class="selected"><a href="../Tutorials/Global_Illumination.html">Article</a></li>
-				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
-				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
-				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
-		</ul>
+		<div class="pBody">
+			<ul>
+						 <li id="ca-nstab-main" class="selected"><a href="../Tutorials/Global_Illumination.html">Article</a></li>
+						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Tutorials/Global_Illumination&amp;action=edit">Discussion</a></li>
+						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit">Edit</a></li>
+						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=history">History</a></li>
+				</ul>
+		</div>
 	</div>
 	<div class="portlet" id="p-personal">
 		<h5>Personal tools</h5>
 		<div class="pBody">
 			<ul>
-				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Tutorials/Global_Illumination">Log in / create account</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
 		<div class='portlet' id='p-navigation'>
@@ -217,10 +241,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tu
 		<div class='pBody'>
 			<ul>
 				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
-				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
-				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
 				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
-				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
 				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
 			</ul>
 		</div>
@@ -231,7 +255,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tu
 			<form action="../NotSupportedStatic.html" id="searchform"><div>
 				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
 				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
-				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
 			</div></form>
 		</div>
 	</div>
@@ -243,23 +267,23 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Tu
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Tutorials/Global_Illumination&amp;oldid=2162">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;oldid=2162">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
 			<div class="visualClear"></div>
 			<div id="footer">
-				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
 				<li id="f-lastmod"> This page was last modified 20:32, 7 July 2006.</li>
-				<li id="f-viewcount">This page has been accessed 1,512 times.</li>
+				<li id="f-viewcount">This page has been accessed 2,145 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
 			</ul>
 		</div>
-	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.17 secs. -->
-</body></html>
-
+<!-- Served by mercury.svr9-speedyservers.com in 0.228 secs. --></body></html>

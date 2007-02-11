@@ -1,20 +1,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="keywords" content="Documentation/Installing And Running,InstallingOnOSX/EnvironmentSetup" />
 <link rel="shortcut icon" href="favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Documentation/Installing And Running - PixieWiki</title>
-		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
-		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
-		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
-		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
-		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
-		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
-		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42a"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42a" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42a" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42a";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42a"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
-		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
-		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "/pixiewiki_install/skins";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/Installing_And_Running";
+var wgTitle = "Documentation/Installing And Running";
+var wgArticleId = "1296";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "2208";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
 		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
 		<style type="text/css">/*<![CDATA[*/
 @import "../css/MediaWiki_Common.css";
@@ -23,12 +45,12 @@
 /*]]>*/</style>
 		<!-- Head Scripts -->
 			</head>
-<body  class="ns-0 ltr">
+<body  class="mediawiki ns-0 ltr page-Documentation_Installing_And_Running">
  <div id="titleBar"></div>
 	<div id="globalWrapper">
 		<div id="column-content">
 	<div id="content">
-		<a name="top" id="contentTop"></a>
+		<a name="contentTop" id="top"></a>
 				<h1 class="firstHeading">Documentation/Installing And Running</h1>
 		<div id="bodyContent">
 			<h3 id="siteSub">From PixieWiki</h3>
@@ -37,7 +59,7 @@
 			<p><br />
 <b>This tutorial shows what you need to do to render images with Pixie.</b>
 </p><p>Pixie is a photorealistic renderer which communicates with modelers or your application through a RenderMan - like interface. Pixie is not a modeler or an animation system. So it does not have any graphical user interface.
-</p><p>The scenes you want to render are described in a text file in a language very similar to Pixar's RenderMan. Pixie also comes as a C/C++ library which you can link against your application. In order to find the details of this interface, you should read RenderMan Companion or RenderMan interface on <a href="http://www.pixar.com" class='external free' title="http://www.pixar.com" rel="nofollow">http://www.pixar.com</a>.
+</p><p>The scenes you want to render are described in a text file in a language very similar to Pixar's RenderMan. Pixie also comes as a C/C++ library which you can link against your application. In order to find the details of this interface, you should read RenderMan Companion or RenderMan interface on <a href="http://www.pixar.com" class="external free" title="http://www.pixar.com" rel="nofollow">http://www.pixar.com</a>.
 </p><p>Pixie comes in following forms:
 </p>
 <ul><li> <b>Source code for Windows</b> (Pixie-src-X.Y.Z.zip)
@@ -56,12 +78,12 @@
 <p><br />
 To compile Pixie, you will need:
 </p>
-<ul><li> flex / bison ( <a href="http://www.gnu.org/software/flex/" class='external free' title="http://www.gnu.org/software/flex/" rel="nofollow">http://www.gnu.org/software/flex/</a> and <a href="http://www.gnu.org/software/bison/" class='external free' title="http://www.gnu.org/software/bison/" rel="nofollow">http://www.gnu.org/software/bison/</a> )
-</li><li> libtiff ( <a href="http://www.libtiff.org" class='external free' title="http://www.libtiff.org" rel="nofollow">http://www.libtiff.org</a> )
-</li><li> fltk ( <a href="http://www.fltk.org" class='external free' title="http://www.fltk.org" rel="nofollow">http://www.fltk.org</a> )
+<ul><li> flex / bison ( <a href="http://www.gnu.org/software/flex/" class="external free" title="http://www.gnu.org/software/flex/" rel="nofollow">http://www.gnu.org/software/flex/</a> and <a href="http://www.gnu.org/software/bison/" class="external free" title="http://www.gnu.org/software/bison/" rel="nofollow">http://www.gnu.org/software/bison/</a> )
+</li><li> libtiff ( <a href="http://www.libtiff.org" class="external free" title="http://www.libtiff.org" rel="nofollow">http://www.libtiff.org</a> )
+</li><li> fltk ( <a href="http://www.fltk.org" class="external free" title="http://www.fltk.org" rel="nofollow">http://www.fltk.org</a> )
 <ul><li> Optional, only needed if you want to build "show"
 </li></ul>
-</li><li> OpenEXR ( <a href="http://www.openexr.org" class='external free' title="http://www.openexr.org" rel="nofollow">http://www.openexr.org</a> )
+</li><li> OpenEXR ( <a href="http://www.openexr.org" class="external free" title="http://www.openexr.org" rel="nofollow">http://www.openexr.org</a> )
 <ul><li> Optional, only needed if you want to build "openexr" display driver
 </li></ul>
 </li></ul>
@@ -70,14 +92,14 @@ To compile Pixie, you will need:
 <hr />
 <table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
 <ul>
-<li class='toclevel-1'><a href="#Compilation_.2F_Installation__for_WINDOWS"><span class="tocnumber">1</span> <span class="toctext">Compilation / Installation  for WINDOWS</span></a></li>
-<li class='toclevel-1'><a href="#Compilation_.2F_Installation__for_UNIX"><span class="tocnumber">2</span> <span class="toctext">Compilation / Installation  for UNIX</span></a></li>
-<li class='toclevel-1'><a href="#RPM_Installation_for_UNIX"><span class="tocnumber">3</span> <span class="toctext">RPM Installation for UNIX</span></a></li>
-<li class='toclevel-1'><a href="#Binary__Installation_for_MAC_OSX"><span class="tocnumber">4</span> <span class="toctext">Binary  Installation for MAC OSX</span></a></li>
-<li class='toclevel-1'><a href="#Common_instructions_for_using_Pixie"><span class="tocnumber">5</span> <span class="toctext">Common instructions for using Pixie</span></a></li>
+<li class="toclevel-1"><a href="#Compilation_.2F_Installation__for_WINDOWS"><span class="tocnumber">1</span> <span class="toctext">Compilation / Installation  for WINDOWS</span></a></li>
+<li class="toclevel-1"><a href="#Compilation_.2F_Installation__for_UNIX"><span class="tocnumber">2</span> <span class="toctext">Compilation / Installation  for UNIX</span></a></li>
+<li class="toclevel-1"><a href="#RPM_Installation_for_UNIX"><span class="tocnumber">3</span> <span class="toctext">RPM Installation for UNIX</span></a></li>
+<li class="toclevel-1"><a href="#Binary__Installation_for_MAC_OSX"><span class="tocnumber">4</span> <span class="toctext">Binary  Installation for MAC OSX</span></a></li>
+<li class="toclevel-1"><a href="#Common_instructions_for_using_Pixie"><span class="tocnumber">5</span> <span class="toctext">Common instructions for using Pixie</span></a></li>
 </ul>
 </td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Compilation / Installation  for WINDOWS">edit</a>]</div><a name="Compilation_.2F_Installation__for_WINDOWS"></a><h1> Compilation / Installation  for WINDOWS </h1>
+<a name="Compilation_.2F_Installation__for_WINDOWS"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=1" title="Edit section: Compilation / Installation  for WINDOWS">edit</a>]</span> <span class="mw-headline"> Compilation / Installation  for WINDOWS </span></h1>
 <p>You can download the Pixie source code as a zip file. To compile Pixie, you need Microsoft Visual Studio 6.0 or Microsoft Visual Studio .NET.
 </p>
 <ul><li> Open <tt>Pixie.dsw / Pixie.sln</tt> (in Pixie/windows/vcXXX)
@@ -90,7 +112,7 @@ To compile Pixie, you will need:
 </p><p>You can also use the Windows installer which directly installs binary distribution.
 </p>
 <hr />
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Compilation / Installation  for UNIX">edit</a>]</div><a name="Compilation_.2F_Installation__for_UNIX"></a><h1> Compilation / Installation  for UNIX </h1>
+<a name="Compilation_.2F_Installation__for_UNIX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=2" title="Edit section: Compilation / Installation  for UNIX">edit</a>]</span> <span class="mw-headline"> Compilation / Installation  for UNIX </span></h1>
 <p>You can download the Pixie source code as a tgz file. Do not download the zipped source code as the file permissions will be wrong.
 </p>
 <ul><li> execute <tt>./configure --prefix=/usr/local/Pixie --enable-selfcontained</tt>
@@ -101,7 +123,7 @@ To compile Pixie, you will need:
 </p><p>You can set <tt>CXXFLAGS</tt> to whatever compilation flags you want to have during the compilation.
 </p>
 <hr />
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: RPM Installation for UNIX">edit</a>]</div><a name="RPM_Installation_for_UNIX"></a><h1> RPM Installation for UNIX </h1>
+<a name="RPM_Installation_for_UNIX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=3" title="Edit section: RPM Installation for UNIX">edit</a>]</span> <span class="mw-headline"> RPM Installation for UNIX </span></h1>
 <p>RPM is available in two packages.
 </p>
 <ul><li> Pixie-X.Y.Z.i586.rpm&nbsp;: the application itself (with shaders, doc, etc).
@@ -125,9 +147,9 @@ To compile Pixie, you will need:
 </li></ul>
 <p>You can add these lines in your ".tcshrc" script in your home directory (~/.tcshrc).
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Binary  Installation for MAC OSX">edit</a>]</div><a name="Binary__Installation_for_MAC_OSX"></a><h1> Binary  Installation for MAC OSX </h1>
+<a name="Binary__Installation_for_MAC_OSX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=4" title="Edit section: Binary  Installation for MAC OSX">edit</a>]</span> <span class="mw-headline"> Binary  Installation for MAC OSX </span></h1>
 <p>Currently Pixie is compiled against <tt>libtiff</tt> from fink. Under OSX 10.2 or earlier, it will also require you to use fink's dlcompat and dlcompat-shlibs libraries.
-</p><p>Please install fink ( <a href="http://fink.sourceforge.net" class='external free' title="http://fink.sourceforge.net" rel="nofollow">http://fink.sourceforge.net</a> ) to get a hold of the required libraries. I can recommend fink commander ( <a href="http://finkcommander.sourceforge.net" class='external free' title="http://finkcommander.sourceforge.net" rel="nofollow">http://finkcommander.sourceforge.net</a> ) to help ease installation of fink projects, but you'll still need to install fink. Follow the instructions over at fink for how to set it up.
+</p><p>Please install fink ( <a href="http://fink.sourceforge.net" class="external free" title="http://fink.sourceforge.net" rel="nofollow">http://fink.sourceforge.net</a> ) to get a hold of the required libraries. I can recommend fink commander ( <a href="http://finkcommander.sourceforge.net" class="external free" title="http://finkcommander.sourceforge.net" rel="nofollow">http://finkcommander.sourceforge.net</a> ) to help ease installation of fink projects, but you'll still need to install fink. Follow the instructions over at fink for how to set it up.
 </p><p>Install <tt>libtiff</tt> from fink. Also, especially for 10.2 or earlier, ensure you install up to date <tt>dlcompat</tt> and <tt>dlcompat-shlib</tt> packages.
 </p><p>Get the binary distribution of Pixie and unpack it at <tt>/Applications/Graphics</tt>.  There should be now a folder in <tt>/Applications/Graphics</tt> called <tt>Pixie</tt>. You may have issues unpacking with some of the gui apps. Ensure you've got the latest stuffit, or use the command line:
 </p><p>(Assuming package is on your desktop)
@@ -167,10 +189,10 @@ To compile Pixie, you will need:
 </p>
 <pre>export PATH=$PATH:/Applications/Graphics/Pixie/bin
 </pre>
-<p>That's about it. I've put these commands in my login files. There are quite a few different oppinions/preferences on how to do this. <a href="../NotSupportedStatic.html" class="new" title="InstallingOnOSX/EnvironmentSetup">InstallingOnOSX/EnvironmentSetup</a> shows how I do mine, for tcsh - bash will be different.
+<p>That's about it. I've put these commands in my login files. There are quite a few different oppinions/preferences on how to do this. <a href="/pixiewiki_install/index.php?title=InstallingOnOSX/EnvironmentSetup&amp;action=edit" class="new" title="InstallingOnOSX/EnvironmentSetup">InstallingOnOSX/EnvironmentSetup</a> shows how I do mine, for tcsh - bash will be different.
 </p>
 <hr />
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Common instructions for using Pixie">edit</a>]</div><a name="Common_instructions_for_using_Pixie"></a><h1> Common instructions for using Pixie </h1>
+<a name="Common_instructions_for_using_Pixie"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=5" title="Edit section: Common instructions for using Pixie">edit</a>]</span> <span class="mw-headline"> Common instructions for using Pixie </span></h1>
 <p>You should set PIXIEHOME environment variable to the location of your binary distribution. You can also specify search paths for various external resources that Pixie may need using:
 </p>
 <pre>Option "searchpath" "..." "..."
@@ -217,9 +239,9 @@ To compile Pixie, you will need:
 <td> </td><td> <tt>doc/</tt> </td><td>  </td><td> Documentation for Pixie
 </td></tr></table>
 
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1296-0!1!0!0!!en!2 and timestamp 20060925124310 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1296-0!1!0!!en!2 and timestamp 20070211181353 -->
 <div class="printfooter">
-Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Installing_And_Running">http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Installing_And_Running</a>"</div>
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Installing_And_Running">http://www.george-graphics.co.uk/pixiewiki/Documentation/Installing_And_Running</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
 			<div class="visualClear"></div>
 		</div>
@@ -228,23 +250,25 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		<div id="column-one">
 	<div id="p-cactions" class="portlet">
 		<h5>Views</h5>
-		<ul>
-				 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Installing_And_Running.html">Article</a></li>
-				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
-				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
-				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
-		</ul>
+		<div class="pBody">
+			<ul>
+						 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Installing_And_Running.html">Article</a></li>
+						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Installing_And_Running&amp;action=edit">Discussion</a></li>
+						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit">Edit</a></li>
+						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=history">History</a></li>
+				</ul>
+		</div>
 	</div>
 	<div class="portlet" id="p-personal">
 		<h5>Personal tools</h5>
 		<div class="pBody">
 			<ul>
-				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Installing_And_Running">Log in / create account</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
 		<div class='portlet' id='p-navigation'>
@@ -252,10 +276,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		<div class='pBody'>
 			<ul>
 				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
-				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
-				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
 				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
-				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
 				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
 			</ul>
 		</div>
@@ -266,7 +290,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 			<form action="../NotSupportedStatic.html" id="searchform"><div>
 				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
 				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
-				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
 			</div></form>
 		</div>
 	</div>
@@ -278,23 +302,23 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Installing_And_Running&amp;oldid=2208">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;oldid=2208">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
 			<div class="visualClear"></div>
 			<div id="footer">
-				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
 				<li id="f-lastmod"> This page was last modified 06:32, 29 August 2006.</li>
-				<li id="f-viewcount">This page has been accessed 865 times.</li>
+				<li id="f-viewcount">This page has been accessed 1,375 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
 			</ul>
 		</div>
-	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.17 secs. -->
-</body></html>
-
+<!-- Served by mercury.svr9-speedyservers.com in 0.221 secs. --></body></html>

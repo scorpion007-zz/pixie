@@ -1,20 +1,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="keywords" content="Documentation/Network parallel rendering" />
 <link rel="shortcut icon" href="favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Documentation/Network parallel rendering - PixieWiki</title>
-		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
-		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
-		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
-		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
-		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
-		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
-		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42a"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42a" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42a" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42a";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42a"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
-		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
-		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "/pixiewiki_install/skins";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/Network_parallel_rendering";
+var wgTitle = "Documentation/Network parallel rendering";
+var wgArticleId = "1304";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "1966";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
 		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
 		<style type="text/css">/*<![CDATA[*/
 @import "../css/MediaWiki_Common.css";
@@ -23,12 +45,12 @@
 /*]]>*/</style>
 		<!-- Head Scripts -->
 			</head>
-<body  class="ns-0 ltr">
+<body  class="mediawiki ns-0 ltr page-Documentation_Network_parallel_rendering">
  <div id="titleBar"></div>
 	<div id="globalWrapper">
 		<div id="column-content">
 	<div id="content">
-		<a name="top" id="contentTop"></a>
+		<a name="contentTop" id="top"></a>
 				<h1 class="firstHeading">Documentation/Network parallel rendering</h1>
 		<div id="bodyContent">
 			<h3 id="siteSub">From PixieWiki</h3>
@@ -36,7 +58,7 @@
 									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
 			<p><br />
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Network Rendering">edit</a>]</div><a name="Network_Rendering"></a><h1> Network Rendering </h1>
+<a name="Network_Rendering"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;action=edit&amp;section=1" title="Edit section: Network Rendering">edit</a>]</span> <span class="mw-headline"> Network Rendering </span></h1>
 <p>Pixie supports network parallel rendering where bunch of computers work on a single frame. Through this document, I'll use "client" as the computer that's dispatching the rendering job. This is usually the computer that you are working on. I'll use "server" for the computers that actually do the rendering. So for a given rib file, multiple servers work for a single client. For a computer to work as a server, a network rendering deamon has to be running on it. You can spawn a network rendering deamon on a computer by  
 </p>
 <pre>rndr -r
@@ -47,16 +69,16 @@
 </pre>
 <p>Where  <tt>&lt;server:port&gt;</tt> is an address descriptor for the server. The address of a server is displayed when you start the deamon. All the external files (rib, sdr, [dll/so], tif etc.) that the server can not find on the local computer will be downloaded from the client computer to a temporary folder (default:  temp). At the end of rendering, the contents of the default folder is deleted. It is important that the directory that you launch the deamon is writable for this purpose. You also want this directory to be a local one so that the renderer does not have to go thru an NFS.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Multiprocessor Rendering">edit</a>]</div><a name="Multiprocessor_Rendering"></a><h1> Multiprocessor Rendering </h1>
+<a name="Multiprocessor_Rendering"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;action=edit&amp;section=2" title="Edit section: Multiprocessor Rendering">edit</a>]</span> <span class="mw-headline"> Multiprocessor Rendering </span></h1>
 <p>To render using more than one processor (on a multiprocessor system) you can do the following:
 </p>
 <pre>rndr -P:&lt;n&gt; &lt;rib_file&gt;
 </pre>
 <p>Where <tt>&lt;n&gt;</tt> is the number of processors to use.  There is some overhead in paralellizing a render, so very simple renders may not achieve the full speed possible.  In general the most efficiency will be attained when the scene is shading-heavy.
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1304-0!1!0!0!!en!2 and timestamp 20060925161135 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1304-0!1!0!!en!2 and timestamp 20070211181345 -->
 <div class="printfooter">
-Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Network_parallel_rendering">http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Network_parallel_rendering</a>"</div>
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Network_parallel_rendering">http://www.george-graphics.co.uk/pixiewiki/Documentation/Network_parallel_rendering</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
 			<div class="visualClear"></div>
 		</div>
@@ -65,23 +87,25 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		<div id="column-one">
 	<div id="p-cactions" class="portlet">
 		<h5>Views</h5>
-		<ul>
-				 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Network_parallel_rendering.html">Article</a></li>
-				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
-				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
-				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
-		</ul>
+		<div class="pBody">
+			<ul>
+						 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Network_parallel_rendering.html">Article</a></li>
+						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Network_parallel_rendering&amp;action=edit">Discussion</a></li>
+						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;action=edit">Edit</a></li>
+						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;action=history">History</a></li>
+				</ul>
+		</div>
 	</div>
 	<div class="portlet" id="p-personal">
 		<h5>Personal tools</h5>
 		<div class="pBody">
 			<ul>
-				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Network_parallel_rendering">Log in / create account</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
 		<div class='portlet' id='p-navigation'>
@@ -89,10 +113,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		<div class='pBody'>
 			<ul>
 				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
-				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
-				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
 				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
-				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
 				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
 			</ul>
 		</div>
@@ -103,7 +127,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 			<form action="../NotSupportedStatic.html" id="searchform"><div>
 				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
 				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
-				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
 			</div></form>
 		</div>
 	</div>
@@ -115,23 +139,23 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Network_parallel_rendering&amp;oldid=1966">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;oldid=1966">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
 			<div class="visualClear"></div>
 			<div id="footer">
-				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
 				<li id="f-lastmod"> This page was last modified 10:14, 6 May 2006.</li>
-				<li id="f-viewcount">This page has been accessed 355 times.</li>
+				<li id="f-viewcount">This page has been accessed 483 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
 			</ul>
 		</div>
-	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.17 secs. -->
-</body></html>
-
+<!-- Served by mercury.svr9-speedyservers.com in 0.268 secs. --></body></html>

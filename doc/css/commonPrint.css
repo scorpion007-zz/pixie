@@ -22,13 +22,11 @@ a.new{ color:#ba0000; text-decoration:none; }
 .tocline {
 	margin-bottom: 0px;
 }
-.toctoggle, .editsection {
-	font-size: smaller;
-}
 
 /* images */
 div.floatright { 
-    float: right; 
+    float: right;
+    clear: right;
     margin: 0;
     position:relative;
     border: 0.5em solid White;
@@ -67,6 +65,7 @@ div.thumb div div.thumbcaption {
 div.magnify { display: none; }
 div.tright {
     float: right;
+    clear: right;
     border-width: 0.5em 0 0.8em 1.4em;
 }
 div.tleft {
@@ -130,12 +129,12 @@ ul {
 
 h1, h2, h3, h4, h5, h6
 {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 p, .documentDescription {
     margin: 1em 0 ! important;
-    line-height: 1.2em;    
+    line-height: 1.2em;
 }
 
 .tocindent p {
@@ -159,6 +158,8 @@ table.listing td {
 /* these screw up icon formatting and are ugly
 a {
     color: Black !important;
+    background: none !important;
+    padding: 0 !important;
 }
 
 a:link, a:visited {
@@ -191,7 +192,7 @@ a:link, a:visited {
     padding: 1em;
     margin: 0 !important;
 }
-/*
+/* MSIE/Win doesn't understand 'inherit'
 a, a.external, a.new, a.stub {
 	color: black ! important;
 	text-decoration: none ! important;
@@ -200,8 +201,7 @@ a, a.external, a.new, a.stub {
 a, a.external, a.new, a.stub {
 	color: inherit ! important;
 	text-decoration: inherit ! important;
-}
-*/
+}*/
 
 img { border: none; }
 img.tex { vertical-align: middle; }

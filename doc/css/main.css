@@ -149,7 +149,9 @@ body {
 #column-one {
 	position: absolute;
 	top: 125px;
-	width: 185px;
+	margin-top: 2.3em;	/* push column-one down to align with content */
+	padding-right: 1em;
+	width: 160px;
 	}
 
 #footer {
@@ -165,7 +167,7 @@ body {
 h1, h2 {border-bottom: 1px dotted #333333;  line-height: 1.1em; padding-bottom: 0.2em;}
 
 .firstHeading {border-bottom-style: solid; border-bottom-color: #d5d5d5; font-size: 1.8em; color: #1860AC}
-.editsection {margin-top: 1em;}
+.editsection {margin-top: 1em; font-size: 0.4em; float:right;}
 
 .portlet h5 { /* blocks within #column-one */
 	border-top: 1px solid #eeeeee;
@@ -173,6 +175,9 @@ h1, h2 {border-bottom: 1px dotted #333333;  line-height: 1.1em; padding-bottom: 
 	padding-top: 0.25em;
 	}
 
+.portlet {
+	font-size: 95%;
+}
 
 /* Images ------------------------------------------------------------*/
 #titleBar {
@@ -253,6 +258,11 @@ html>body dd {
 	margin: 0.15em 0;
 	}
 
+.portlet #searchInput {
+	width: 150px;
+}
+
+
 /* Various Tags & Classes --------------------------------------------*/
 #siteSub, .urlexpansion, .printfooter {
 	display: none;
@@ -298,8 +308,9 @@ html>body dd {
 /* Content -----------------------------------------------------------*/
 /* BEGIN Table of Contents */
 #toc {
-	float: right;
-	margin: 0 0 1em 1em;
+	/*float: right;*/
+	float: none;
+	margin: 0 0 2em 1em;
 	}
 #toc td {padding: 0.5em;}
 #toc .tocindent {margin-left: 1em;}
@@ -480,7 +491,7 @@ img {
 	border: 0px solid #333;
 	}
 
-pre {
+pre, div.pre {
         border: 1px dashed #808080;
         padding: 3px;
 	    margin: 0.8em;
@@ -504,4 +515,3 @@ tt {
 hr {
 	border-top: 1px solid #d5d5d5;
 }
-

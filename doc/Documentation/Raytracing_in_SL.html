@@ -1,20 +1,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="keywords" content="Documentation/Raytracing in SL" />
 <link rel="shortcut icon" href="favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Documentation/Raytracing in SL - PixieWiki</title>
-		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?7"; /*]]>*/</style>
-		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css" />
-		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css";</style><![endif]-->
-		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css";</style><![endif]-->
-		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css";</style><![endif]-->
-		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?1";</style><![endif]-->
-		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js"></script>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42a"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42a" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42a" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42a";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42a"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
-		<script type="text/javascript">var skin = 'monobook';var stylepath = '/pixiewiki/skins';</script>
-		<script type="text/javascript" src="../css/wikibits.js"><!-- wikibits js --></script>
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "/pixiewiki_install/skins";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/Raytracing_in_SL";
+var wgTitle = "Documentation/Raytracing in SL";
+var wgArticleId = "1539";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "1970";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
 		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
 		<style type="text/css">/*<![CDATA[*/
 @import "../css/MediaWiki_Common.css";
@@ -23,12 +45,12 @@
 /*]]>*/</style>
 		<!-- Head Scripts -->
 			</head>
-<body  class="ns-0 ltr">
+<body  class="mediawiki ns-0 ltr page-Documentation_Raytracing_in_SL">
  <div id="titleBar"></div>
 	<div id="globalWrapper">
 		<div id="column-content">
 	<div id="content">
-		<a name="top" id="contentTop"></a>
+		<a name="contentTop" id="top"></a>
 				<h1 class="firstHeading">Documentation/Raytracing in SL</h1>
 		<div id="bodyContent">
 			<h3 id="siteSub">From PixieWiki</h3>
@@ -38,28 +60,28 @@
 </p>
 <table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
 <ul>
-<li class='toclevel-1'><a href="#Raytracing_in_shading_language"><span class="tocnumber">1</span> <span class="toctext">Raytracing in shading language</span></a>
+<li class="toclevel-1"><a href="#Raytracing_in_shading_language"><span class="tocnumber">1</span> <span class="toctext">Raytracing in shading language</span></a>
 <ul>
-<li class='toclevel-2'><a href="#trace"><span class="tocnumber">1.1</span> <span class="toctext">trace</span></a></li>
-<li class='toclevel-2'><a href="#gather"><span class="tocnumber">1.2</span> <span class="toctext">gather</span></a></li>
-<li class='toclevel-2'><a href="#tranmission"><span class="tocnumber">1.3</span> <span class="toctext">tranmission</span></a></li>
-<li class='toclevel-2'><a href="#indirectdiffuse"><span class="tocnumber">1.4</span> <span class="toctext">indirectdiffuse</span></a></li>
-<li class='toclevel-2'><a href="#occlusion"><span class="tocnumber">1.5</span> <span class="toctext">occlusion</span></a></li>
-<li class='toclevel-2'><a href="#raydepth"><span class="tocnumber">1.6</span> <span class="toctext">raydepth</span></a></li>
-<li class='toclevel-2'><a href="#raylabel"><span class="tocnumber">1.7</span> <span class="toctext">raylabel</span></a></li>
-<li class='toclevel-2'><a href="#rayinfo"><span class="tocnumber">1.8</span> <span class="toctext">rayinfo</span></a></li>
+<li class="toclevel-2"><a href="#trace"><span class="tocnumber">1.1</span> <span class="toctext">trace</span></a></li>
+<li class="toclevel-2"><a href="#gather"><span class="tocnumber">1.2</span> <span class="toctext">gather</span></a></li>
+<li class="toclevel-2"><a href="#tranmission"><span class="tocnumber">1.3</span> <span class="toctext">tranmission</span></a></li>
+<li class="toclevel-2"><a href="#indirectdiffuse"><span class="tocnumber">1.4</span> <span class="toctext">indirectdiffuse</span></a></li>
+<li class="toclevel-2"><a href="#occlusion"><span class="tocnumber">1.5</span> <span class="toctext">occlusion</span></a></li>
+<li class="toclevel-2"><a href="#raydepth"><span class="tocnumber">1.6</span> <span class="toctext">raydepth</span></a></li>
+<li class="toclevel-2"><a href="#raylabel"><span class="tocnumber">1.7</span> <span class="toctext">raylabel</span></a></li>
+<li class="toclevel-2"><a href="#rayinfo"><span class="tocnumber">1.8</span> <span class="toctext">rayinfo</span></a></li>
 </ul>
 </li>
 </ul>
 </td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: Raytracing in shading language">edit</a>]</div><a name="Raytracing_in_shading_language"></a><h1> Raytracing in shading language </h1>
+<a name="Raytracing_in_shading_language"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=1" title="Edit section: Raytracing in shading language">edit</a>]</span> <span class="mw-headline"> Raytracing in shading language </span></h1>
 <p>For an object to be raytraced, it must be marked as raytraceable by setting the visibility attribute.
 </p>
 <pre>Attribute "visibility" "trace" 1
 </pre>
 <p>The following new shading language constructs and functions are available:
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: trace">edit</a>]</div><a name="trace"></a><h2> trace </h2>
+<a name="trace"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=2" title="Edit section: trace">edit</a>]</span> <span class="mw-headline"> trace </span></h2>
 <pre>color trace(point P,vector R);
 float trace(point P,vector R);
 </pre>
@@ -72,7 +94,7 @@ float trace(point P,vector R);
 <tr>
 <td> <tt>uniform string label</tt></td><td>		A label for the ray
 </td></tr></table>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: gather">edit</a>]</div><a name="gather"></a><h2> gather </h2>
+<a name="gather"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=3" title="Edit section: gather">edit</a>]</span> <span class="mw-headline"> gather </span></h2>
 <pre>gather(	string category,
     point P,
     vector dir,
@@ -120,7 +142,7 @@ totalColor /= numHits;
 </p>
 <pre>totalColor = indirectdiffuse(P,N,256);
 </pre>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: tranmission">edit</a>]</div><a name="tranmission"></a><h2> tranmission </h2>
+<a name="tranmission"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=4" title="Edit section: tranmission">edit</a>]</span> <span class="mw-headline"> tranmission </span></h2>
 <pre>color transmission(point P1,point P2,...);
 </pre>
 <p>This function gives the transmission between the two points. This function can be used to get raytraced shadows in light source shaders:
@@ -129,7 +151,7 @@ totalColor /= numHits;
     Cl = transmission(Ps,from) * intensity * lightcolor / (L . L);
 }
 </pre>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: indirectdiffuse">edit</a>]</div><a name="indirectdiffuse"></a><h2> indirectdiffuse </h2>
+<a name="indirectdiffuse"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=5" title="Edit section: indirectdiffuse">edit</a>]</span> <span class="mw-headline"> indirectdiffuse </span></h2>
 <pre>color indirectdiffuse(point P,vector N,float numSamples ...);
 </pre>
 <p>This function gives the average irradiance as seen be a hemisphere centered at  <tt>P</tt> <tt>N</tt>. The irradiance is computed by raytracing.  numSamples gives the number of rays to shoot. Depending on the  irradiance attributes of the current primitive, this value can be cached. The following optional parameters can be provided:
@@ -165,7 +187,7 @@ totalColor /= numHits;
 <tr>
 <td> <tt>output varying color occlusion</tt> </td><td>		The argument takes a variable, into which the value of occlusion will be placed
 </td></tr></table>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: occlusion">edit</a>]</div><a name="occlusion"></a><h2> occlusion </h2>
+<a name="occlusion"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=6" title="Edit section: occlusion">edit</a>]</span> <span class="mw-headline"> occlusion </span></h2>
 <pre>float occlusion(point P,vector N,float numSamples ...);
 </pre>
 <p>This function computes the fraction of the hemisphere that is not occluded by another geometry. The interpretation of the parameters is the same with  indirectdiffuse. The following parameters can be passed:
@@ -186,17 +208,17 @@ totalColor /= numHits;
 <tr>
 <td> <tt>uniform float maxdist</tt></td><td>		The maximum intersection distance
 </td></tr></table>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: raydepth">edit</a>]</div><a name="raydepth"></a><h2> raydepth </h2>
+<a name="raydepth"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=7" title="Edit section: raydepth">edit</a>]</span> <span class="mw-headline"> raydepth </span></h2>
 <pre>uniform float raydepth();
 </pre>
 <p>This function returns the depth of the current shading point. It returns 0 for the camera rays.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: raylabel">edit</a>]</div><a name="raylabel"></a><h2> raylabel </h2>
+<a name="raylabel"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=8" title="Edit section: raylabel">edit</a>]</span> <span class="mw-headline"> raylabel </span></h2>
 <pre>uniform string raylabel();
 </pre>
 <p>This function returns the label of ray that caused the shading. You can assign labels to rays that are generated by the  gather statement.
 </p>
-<div class="editsection" style="float:right;margin-left:5px;">[<a href="../NotSupportedStatic.html" title="Edit section: rayinfo">edit</a>]</div><a name="rayinfo"></a><h2> rayinfo </h2>
+<a name="rayinfo"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit&amp;section=9" title="Edit section: rayinfo">edit</a>]</span> <span class="mw-headline"> rayinfo </span></h2>
 <pre>uniform float rayinfo(uniform string arg,varying &lt;type&gt; val);
 </pre>
 <p>The <tt>rayinfo</tt> shadeop returns information about a ray.  The <tt>arg</tt> parameter specifies which piece of information to fetch.  The value will be placed in <tt>val</tt>.  If no value can be found, <tt>rayinfo</tt> returns 0.  The table below shows what information can be obtained.  Note it's that values are premoted to varying as each ray hitting the surface can have different values.
@@ -217,8 +239,10 @@ totalColor /= numHits;
 <tr>
 <td> <tt>varying float length</tt></td><td>  The length of the ray (distance from <tt>P</tt>)
 </td></tr></table>
+
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1539-0!1!0!!en!2 and timestamp 20070211181333 -->
 <div class="printfooter">
-Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Raytracing_in_SL">http://www.george-graphics.co.uk/pixiewiki/index.php/Documentation/Raytracing_in_SL</a>"</div>
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Raytracing_in_SL">http://www.george-graphics.co.uk/pixiewiki/Documentation/Raytracing_in_SL</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
 			<div class="visualClear"></div>
 		</div>
@@ -227,23 +251,25 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		<div id="column-one">
 	<div id="p-cactions" class="portlet">
 		<h5>Views</h5>
-		<ul>
-				 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Raytracing_in_SL.html">Article</a></li>
-				 <li id="ca-talk" class="new"><a href="../NotSupportedStatic.html">Discussion</a></li>
-				 <li id="ca-edit"><a href="../NotSupportedStatic.html">Edit</a></li>
-				 <li id="ca-history"><a href="../NotSupportedStatic.html">History</a></li>
-		</ul>
+		<div class="pBody">
+			<ul>
+						 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Raytracing_in_SL.html">Article</a></li>
+						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Raytracing_in_SL&amp;action=edit">Discussion</a></li>
+						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=edit">Edit</a></li>
+						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;action=history">History</a></li>
+				</ul>
+		</div>
 	</div>
 	<div class="portlet" id="p-personal">
 		<h5>Personal tools</h5>
 		<div class="pBody">
 			<ul>
-				<li id="pt-login"><a href="../NotSupportedStatic.html">Log in / create account</a></li>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Raytracing_in_SL">Log in / create account</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(/pixiewiki/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
 		<div class='portlet' id='p-navigation'>
@@ -251,10 +277,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 		<div class='pBody'>
 			<ul>
 				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
-				<li id="n-portal"><a href="../NotSupportedStatic.html">Community portal</a></li>
-				<li id="n-currentevents"><a href="../NotIncludedStatic.html">Current events</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
 				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
-				<li id="n-randompage"><a href="../NotSupportedStatic.html">Random page</a></li>
 				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
 			</ul>
 		</div>
@@ -265,7 +291,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 			<form action="../NotSupportedStatic.html" id="searchform"><div>
 				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
 				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
-				<input type='submit' name="fulltext" class="searchButton" value="Search" />
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
 			</div></form>
 		</div>
 	</div>
@@ -277,23 +303,23 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/index.php/Do
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="../NotSupportedStatic.html">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki/index.php?title=Documentation/Raytracing_in_SL&amp;oldid=1970">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Raytracing_in_SL&amp;oldid=1970">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
 			<div class="visualClear"></div>
 			<div id="footer">
-				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="MediaWiki" /></a></div>
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
 				<li id="f-lastmod"> This page was last modified 10:16, 6 May 2006.</li>
-				<li id="f-viewcount">This page has been accessed 432 times.</li>
+				<li id="f-viewcount">This page has been accessed 664 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
 			</ul>
 		</div>
-	<script type="text/javascript"> if (window.runOnloadHook) runOnloadHook();</script>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.54 secs. -->
-</body></html>
-
+<!-- Served by mercury.svr9-speedyservers.com in 1.418 secs. --></body></html>
