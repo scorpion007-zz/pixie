@@ -200,7 +200,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE | PARAMETER_RAYTRACE);
+			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);		// We had PARAMETER_RAYTRACE here, why?
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
 			
 			movvv(Pmov,varying[VARIABLE_P]);
@@ -488,7 +488,7 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 		this->flags |= OBJECT_MOVING_TESSELATION;
 	
 	// Statistics
-	stats.tesselationOverhead += sizeof(CTesselationPatch);
+	stats.tesselationOverhead += sizeof(CTesselationPatch) + sizeof(int)*CRenderer::numThreads;
 	
 	// Record the stuff
 	this->object	=	o;
@@ -543,12 +543,18 @@ CTesselationPatch::~CTesselationPatch() {
 
 	// clean up tesselations
 	for(int i=0;i<TESSELATION_NUM_LEVELS;i++) {
-		if (levels[i].tesselation != NULL) free(levels[i].tesselation);
+		if (levels[i].tesselation != NULL) {
+			stats.tesselationMemory -= levels[i].tesselation->size;
+			free_untyped(levels[i].tesselation);
+		}
 		delete[] levels[i].threadTesselation;
 		#ifdef TESSELATION_PERENTRY_LOCK
 			osDeleteMutex(levels[i].mutex);
 		#endif
 	}
+	
+	// Statistics
+	stats.tesselationOverhead -= sizeof(CTesselationPatch) + sizeof(int)*CRenderer::numThreads;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1267,7 +1273,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			if (rdiv == 1) {
 				// subsampling our 2x2 to 1x1, no bounds
 				
-				void	*mem			=	malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*3*sizeof(float));
+				void	*mem			=	allocate_untyped(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*3*sizeof(float));
 						cTesselation	=	(CPurgableTesselation*) mem;
 				
 				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
@@ -1280,7 +1286,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 				movvv(cTesselation->P+9,	varying[VARIABLE_P]+24);
 			} else if (rdiv <= 4) {
 				// not saving bounds here
-				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float));
+				void		*mem			= allocate_untyped(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float));
 							cTesselation	= (CPurgableTesselation*) mem;
 	
 				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
@@ -1294,7 +1300,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 				int nb = div>>2;						// number of bounds in each direction
 				
 				// save the data
-				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
+				void		*mem			= allocate_untyped(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + (div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
 							cTesselation	= (CPurgableTesselation*) mem;
 	
 				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
@@ -1352,7 +1358,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 			if (rdiv == 1) {
 				// Subsampling our 2x2 to 1x1, no bounds
 				
-				void	*mem			=	malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*2*3*sizeof(float));
+				void	*mem			=	allocate_untyped(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*2*2*3*sizeof(float));
 						cTesselation	=	(CPurgableTesselation*) mem;
 				
 				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation)+ sizeof(int)*CRenderer::numThreads);
@@ -1375,7 +1381,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 				movvv(cTesselation->P+21,	varying[VARIABLE_P]+24);
 			} else if (rdiv <= 4) {
 				// Not saving bounds here
-				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*(div+1)*(div+1)*3*sizeof(float));
+				void		*mem			= allocate_untyped(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*(div+1)*(div+1)*3*sizeof(float));
 							cTesselation	= (CPurgableTesselation*) mem;
 	
 				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
@@ -1396,7 +1402,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 				int nb = div>>2;						// number of bounds in each direction
 				
 				// save the data
-				void		*mem			= malloc(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*(div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
+				void		*mem			= allocate_untyped(sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads + 2*(div+1)*(div+1)*3*sizeof(float) + nb*nb*6*sizeof(float));
 							cTesselation	= (CPurgableTesselation*) mem;
 	
 				cTesselation->P							=	(float*) ((char*) mem + sizeof(CPurgableTesselation) + sizeof(int)*CRenderer::numThreads);
@@ -1739,7 +1745,7 @@ void		CTesselationPatch::purgeTesselations(CShadingContext *context,int thread,i
 		if (--cTess->refCount == 0) {
 			stats.tesselationMemory				-=	cTess->tesselation->size;
 			
-			free((unsigned char *) cTess->tesselation);
+			free_untyped((unsigned char *) cTess->tesselation);
 			cTess->tesselation						=	NULL;
 		}
 		
