@@ -2,7 +2,7 @@
 .SH NAME
 rndr \- render a rib file
 .SH SYNOPSIS
-\fBrndr\fR [ -f <range> ] [ options ... ] [ -P:n ] [ name.rib ...  ]
+\fBrndr\fR [ -f <range> ] [ options ... ] [ -P:n | -t:n ] [ name.rib ...  ]
 .br
 \fBrndr\fR -r <port>
 .br
@@ -43,6 +43,9 @@ Display progress.  Displays an updating progress line on the terminal.
 .B \-P:n
 Specify the number of subprocesses for a multiprocessor render.  May not be used with -r
 or -s.
+.TP
+.B \-t:n
+Specify the number of threads for a multithreaded render.  May not be used with -r or -s.
 .TP
 .B \-c <client port>
 Specify a client (for subprocesses, used internally by rndr).
