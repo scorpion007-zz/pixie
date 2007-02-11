@@ -44,11 +44,13 @@
 
 // FIXME: NOISEMIN is creating a numerical problem here
 // FIXME: I don't see any reason to use it
+// FIXED: do not cast the floor(t) to float, otherwise if
+//			we are greater than INT_MAX it doesn't work
 #define			setup(i,b0,b1,r0,r1)	\
 	t = ((float) (vec[i]));				\
 	b0 = ((int) floor(t)) & NOISEMASK;	\
 	b1 = (b0+1) & NOISEMASK;			\
-	r0 = t - (int) floor(t);			\
+	r0 = t - floor(t);					\
 	r1 = ((float) (r0 - 1.));
 
 ///////////////////////////////////////////////////////////////////////
