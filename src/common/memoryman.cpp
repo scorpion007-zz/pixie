@@ -31,6 +31,27 @@
 #include "global.h"
 #include "os.h"
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	allocate_untyped
+// Description			:	malloc replacement
+// Return Value			:
+// Comments				:
+void	*allocate_untyped(size_t size) {
+	return (void*) new int[(size + sizeof(int)-1) / sizeof(int)];
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	allocate_untyped
+// Description			:	free replacement
+// Return Value			:
+// Comments				:
+void	free_untyped(void *ptr) {
+	delete[] ((int*) ptr);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Memory manager implementation
+
 #ifdef USE_MEMORY_MANAGER
 
 #define	NUM_CHUNKS	512
@@ -176,24 +197,6 @@ void	operator delete(void *ptr) {
 // Comments				:
 void	operator delete[](void *ptr) {
 	delMem(ptr);
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	allocate_untyped
-// Description			:	malloc replacement
-// Return Value			:
-// Comments				:
-void	*allocate_untyped(size_t size) {
-	return (void*) new int[(size + sizeof(int)-1) / sizeof(int)];
-}
-
-///////////////////////////////////////////////////////////////////////
-// Function				:	allocate_untyped
-// Description			:	free replacement
-// Return Value			:
-// Comments				:
-void	free_untyped(void *ptr) {
-	delete[] ((int*) ptr);
 }
 
 ///////////////////////////////////////////////////////////////////////
