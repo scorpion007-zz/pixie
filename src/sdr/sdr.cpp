@@ -1,11 +1,8 @@
 
-/*  A Bison parser, made from ../../../../src/sdr/sdr.y
- by  GNU Bison version 1.25
-  */
+/*  A Bison parser, made from sdr.y
+    by GNU Bison version 1.28  */
 
 #define YYBISON 1  /* Identify Bison output.  */
-
-#define alloca
 
 #define yyparse sdrparse
 #define yylex sdrlex
@@ -14,43 +11,43 @@
 #define yychar sdrchar
 #define yydebug sdrdebug
 #define yynerrs sdrnerrs
-#define	SCRL_PARAMETERS	258
-#define	SCRL_VARIABLES	259
-#define	SCRL_INIT	260
-#define	SCRL_CODE	261
-#define	SCRL_OUTPUT	262
-#define	SCRL_VARYING	263
-#define	SCRL_UNIFORM	264
-#define	SCRL_BOOLEAN	265
-#define	SCRL_FLOAT	266
-#define	SCRL_COLOR	267
-#define	SCRL_VECTOR	268
-#define	SCRL_NORMAL	269
-#define	SCRL_POINT	270
-#define	SCRL_MATRIX	271
-#define	SCRL_STRING	272
-#define	SCRL_SURFACE	273
-#define	SCRL_DISPLACEMENT	274
-#define	SCRL_IMAGER	275
-#define	SCRL_LIGHTSOURCE	276
-#define	SCRL_VOLUME	277
-#define	SCRL_GENERIC	278
-#define	SCRL_DSO	279
-#define	SCRL_DOT	280
-#define	SCRL_COLON	281
-#define	SCRL_EQUAL	282
-#define	SCRL_OPEN_PARANTHESIS	283
-#define	SCRL_CLOSE_PARANTHESIS	284
-#define	SCRL_OPEN_SQR_PARANTHESIS	285
-#define	SCRL_CLOSE_SQR_PARANTHESIS	286
-#define	SCRL_COMMA	287
-#define	SCRL_NL	288
-#define	SCRL_TEXT_VALUE	289
-#define	SCRL_IDENTIFIER_VALUE	290
-#define	SCRL_LABEL_VALUE	291
-#define	SCRL_FLOAT_VALUE	292
+#define	SCRL_PARAMETERS	257
+#define	SCRL_VARIABLES	258
+#define	SCRL_INIT	259
+#define	SCRL_CODE	260
+#define	SCRL_OUTPUT	261
+#define	SCRL_VARYING	262
+#define	SCRL_UNIFORM	263
+#define	SCRL_BOOLEAN	264
+#define	SCRL_FLOAT	265
+#define	SCRL_COLOR	266
+#define	SCRL_VECTOR	267
+#define	SCRL_NORMAL	268
+#define	SCRL_POINT	269
+#define	SCRL_MATRIX	270
+#define	SCRL_STRING	271
+#define	SCRL_SURFACE	272
+#define	SCRL_DISPLACEMENT	273
+#define	SCRL_IMAGER	274
+#define	SCRL_LIGHTSOURCE	275
+#define	SCRL_VOLUME	276
+#define	SCRL_GENERIC	277
+#define	SCRL_DSO	278
+#define	SCRL_DOT	279
+#define	SCRL_COLON	280
+#define	SCRL_EQUAL	281
+#define	SCRL_OPEN_PARANTHESIS	282
+#define	SCRL_CLOSE_PARANTHESIS	283
+#define	SCRL_OPEN_SQR_PARANTHESIS	284
+#define	SCRL_CLOSE_SQR_PARANTHESIS	285
+#define	SCRL_COMMA	286
+#define	SCRL_NL	287
+#define	SCRL_TEXT_VALUE	288
+#define	SCRL_IDENTIFIER_VALUE	289
+#define	SCRL_LABEL_VALUE	290
+#define	SCRL_FLOAT_VALUE	291
 
-#line 1 "../../../../src/sdr/sdr.y"
+#line 1 "sdr.y"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -147,7 +144,7 @@ static	void	processEscapes(char *str) {
 		ESdrShaderType	shaderType;
 
 
-#line 97 "../../../../src/sdr/sdr.y"
+#line 97 "sdr.y"
 typedef union slval {
 	float			real;
 	char			string[64];
@@ -155,10 +152,6 @@ typedef union slval {
 	vector			v;
 	TSdrParameter *parameter;
 } YYSTYPE;
-#ifndef YYDEBUG
-#define YYDEBUG 1
-#endif
-
 #include <stdio.h>
 
 #ifndef __cplusplus
@@ -170,10 +163,10 @@ typedef union slval {
 
 
 #define	YYFINAL		313
-#define	YYFLAG		32768
+#define	YYFLAG		-32768
 #define	YYNTBASE	38
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 292 ? yytranslate[x] : 98)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 291 ? yytranslate[x] : 98)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -201,11 +194,11 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
-     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
-    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-    26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-    36,    37
+     2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
+     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+    27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+    37
 };
 
 #if YYDEBUG != 0
@@ -518,6 +511,8 @@ static const short yycheck[] = {    98,
     32,    37,    32,     0,    37,     0,    32
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
+#line 3 "/usr/share/bison.simple"
+/* This file comes from bison-1.28.  */
 
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Free Software Foundation, Inc.
@@ -534,46 +529,66 @@ static const short yycheck[] = {    98,
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, when this file is copied by Bison into a
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef alloca
-#ifdef __GNUC__
-#define alloca __builtin_alloca
-#else /* not GNU C.  */
-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi)
-#include <alloca.h>
-#else /* not sparc */
-#if defined (MSDOS) && !defined (__TURBOC__)
-#include <malloc.h>
-#else /* not MSDOS, or __TURBOC__ */
-#if defined(_AIX)
-#include <malloc.h>
- #pragma alloca
-#else /* not MSDOS, __TURBOC__, or _AIX */
-#ifdef __hpux
-#ifdef __cplusplus
-extern "C" {
-void *alloca (unsigned int);
-};
-#else /* not __cplusplus */
-void *alloca ();
-#endif /* not __cplusplus */
-#endif /* __hpux */
-#endif /* not _AIX */
-#endif /* not MSDOS, or __TURBOC__ */
-#endif /* not sparc.  */
-#endif /* not GNU C.  */
-#endif /* alloca not defined.  */
-
 /* This is the parser code that is written into each bison parser
   when the %semantic_parser declaration is not specified in the grammar.
   It was written by Richard Stallman by simplifying the hairy parser
   used when %semantic_parser is specified.  */
+
+#ifndef YYSTACK_USE_ALLOCA
+#ifdef alloca
+#define YYSTACK_USE_ALLOCA
+#else /* alloca not defined */
+#ifdef __GNUC__
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#else /* not GNU C.  */
+#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi) || (defined (__sun) && defined (__i386))
+#define YYSTACK_USE_ALLOCA
+#include <alloca.h>
+#else /* not sparc */
+/* We think this test detects Watcom and Microsoft C.  */
+/* This used to test MSDOS, but that is a bad idea
+   since that symbol is in the user namespace.  */
+#if (defined (_MSDOS) || defined (_MSDOS_)) && !defined (__TURBOC__)
+#if 0 /* No need for malloc.h, which pollutes the namespace;
+	 instead, just don't use alloca.  */
+#include <malloc.h>
+#endif
+#else /* not MSDOS, or __TURBOC__ */
+#if defined(_AIX)
+/* I don't know what this was needed for, but it pollutes the namespace.
+   So I turned it off.   rms, 2 May 1997.  */
+/* #include <malloc.h>  */
+ #pragma alloca
+#define YYSTACK_USE_ALLOCA
+#else /* not MSDOS, or __TURBOC__, or _AIX */
+#if 0
+#ifdef __hpux /* haible@ilog.fr says this works for HPUX 9.05 and up,
+		 and on HPUX 10.  Eventually we can turn this on.  */
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#endif /* __hpux */
+#endif
+#endif /* not _AIX */
+#endif /* not MSDOS, or __TURBOC__ */
+#endif /* not sparc */
+#endif /* not GNU C */
+#endif /* alloca not defined */
+#endif /* YYSTACK_USE_ALLOCA not defined */
+
+#ifdef YYSTACK_USE_ALLOCA
+#define YYSTACK_ALLOC alloca
+#else
+#define YYSTACK_ALLOC malloc
+#endif
 
 /* Note: there must be only one dollar sign in this file.
    It is replaced by the list of actions, each action
@@ -583,8 +598,8 @@ void *alloca ();
 #define yyclearin	(yychar = YYEMPTY)
 #define YYEMPTY		-2
 #define YYEOF		0
-#define YYACCEPT	return(0)
-#define YYABORT 	return(1)
+#define YYACCEPT	goto yyacceptlab
+#define YYABORT 	goto yyabortlab
 #define YYERROR		goto yyerrlab1
 /* Like YYERROR except do call yyerror.
    This remains here temporarily to ease the
@@ -665,12 +680,12 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #ifndef YYMAXDEPTH
 #define YYMAXDEPTH 10000
 #endif
-
-/* Prevent warning if -Wstrict-prototypes.  */
-#ifdef __GNUC__
-int yyparse (void);
-#endif
 
+/* Define __yy_memcpy.  Note that the size argument
+   should be passed with type unsigned int, because that is what the non-GCC
+   definitions require.  With GCC, __builtin_memcpy takes an arg
+   of type size_t, but it can handle unsigned int.  */
+
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
 #define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
 #else				/* not GNU C or C++ */
@@ -682,7 +697,7 @@ static void
 __yy_memcpy (to, from, count)
      char *to;
      char *from;
-     int count;
+     unsigned int count;
 {
   register char *f = from;
   register char *t = to;
@@ -697,10 +712,10 @@ __yy_memcpy (to, from, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (char *to, char *from, int count)
+__yy_memcpy (char *to, char *from, unsigned int count)
 {
-  register char *f = from;
   register char *t = to;
+  register char *f = from;
   register int i = count;
 
   while (i-- > 0)
@@ -710,6 +725,7 @@ __yy_memcpy (char *to, char *from, int count)
 #endif
 #endif
 
+#line 217 "/usr/share/bison.simple"
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
    into yyparse.  The argument should have type void *.
@@ -729,6 +745,15 @@ __yy_memcpy (char *to, char *from, int count)
 #define YYPARSE_PARAM_ARG
 #define YYPARSE_PARAM_DECL
 #endif /* not YYPARSE_PARAM */
+
+/* Prevent warning if -Wstrict-prototypes.  */
+#ifdef __GNUC__
+#ifdef YYPARSE_PARAM
+int yyparse (void *);
+#else
+int yyparse (void);
+#endif
+#endif
 
 int
 yyparse(YYPARSE_PARAM_ARG)
@@ -758,6 +783,7 @@ yyparse(YYPARSE_PARAM_ARG)
 #endif
 
   int yystacksize = YYINITDEPTH;
+  int yyfree_stacks = 0;
 
 #ifdef YYPURE
   int yychar;
@@ -842,18 +868,32 @@ yynewstate:
       if (yystacksize >= YYMAXDEPTH)
 	{
 	  yyerror("parser stack overflow");
+	  if (yyfree_stacks)
+	    {
+	      free (yyss);
+	      free (yyvs);
+#ifdef YYLSP_NEEDED
+	      free (yyls);
+#endif
+	    }
 	  return 2;
 	}
       yystacksize *= 2;
       if (yystacksize > YYMAXDEPTH)
 	yystacksize = YYMAXDEPTH;
-      yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
-      __yy_memcpy ((char *)yyss, (char *)yyss1, size * sizeof (*yyssp));
-      yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
-      __yy_memcpy ((char *)yyvs, (char *)yyvs1, size * sizeof (*yyvsp));
+#ifndef YYSTACK_USE_ALLOCA
+      yyfree_stacks = 1;
+#endif
+      yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
+      __yy_memcpy ((char *)yyss, (char *)yyss1,
+		   size * (unsigned int) sizeof (*yyssp));
+      yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
+      __yy_memcpy ((char *)yyvs, (char *)yyvs1,
+		   size * (unsigned int) sizeof (*yyvsp));
 #ifdef YYLSP_NEEDED
-      yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
-      __yy_memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
+      yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
+      __yy_memcpy ((char *)yyls, (char *)yyls1,
+		   size * (unsigned int) sizeof (*yylsp));
 #endif
 #endif /* no yyoverflow */
 
@@ -1014,7 +1054,7 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 170 "../../../../src/sdr/sdr.y"
+#line 170 "sdr.y"
 {
 				currentParameter->space			=	strdup(yyvsp[-1].string);
 				currentDefaultItem->vector		=	new float[3];
@@ -1024,7 +1064,7 @@ case 4:
 			;
     break;}
 case 5:
-#line 184 "../../../../src/sdr/sdr.y"
+#line 184 "sdr.y"
 {
 				currentParameter->space			=	strdup(yyvsp[-5].string);
 				currentDefaultItem->vector		=	new float[3];
@@ -1034,7 +1074,7 @@ case 5:
 			;
     break;}
 case 6:
-#line 193 "../../../../src/sdr/sdr.y"
+#line 193 "sdr.y"
 {
 				currentDefaultItem->vector		=	new float[3];
 				currentDefaultItem->vector[0]	=	yyvsp[0].real;
@@ -1043,7 +1083,7 @@ case 6:
 			;
     break;}
 case 7:
-#line 205 "../../../../src/sdr/sdr.y"
+#line 205 "sdr.y"
 {
 				currentDefaultItem->vector		=	new float[3];
 				currentDefaultItem->vector[0]	=	yyvsp[-3].real;
@@ -1052,12 +1092,12 @@ case 7:
 			;
     break;}
 case 8:
-#line 214 "../../../../src/sdr/sdr.y"
+#line 214 "sdr.y"
 {
 			;
     break;}
 case 10:
-#line 221 "../../../../src/sdr/sdr.y"
+#line 221 "sdr.y"
 {
 					currentParameter->defaultValue.vector		=	new float[3];
 					currentParameter->defaultValue.vector[0]	=	0;
@@ -1066,62 +1106,62 @@ case 10:
 			;
     break;}
 case 11:
-#line 230 "../../../../src/sdr/sdr.y"
+#line 230 "sdr.y"
 {
 				;
     break;}
 case 12:
-#line 234 "../../../../src/sdr/sdr.y"
+#line 234 "sdr.y"
 {
 				;
     break;}
 case 13:
-#line 237 "../../../../src/sdr/sdr.y"
+#line 237 "sdr.y"
 {
 				;
     break;}
 case 14:
-#line 244 "../../../../src/sdr/sdr.y"
+#line 244 "sdr.y"
 {
 			shaderType	=	SHADER_SURFACE;
 		;
     break;}
 case 15:
-#line 250 "../../../../src/sdr/sdr.y"
+#line 250 "sdr.y"
 {
 			shaderType	=	SHADER_DISPLACEMENT;
 		;
     break;}
 case 16:
-#line 256 "../../../../src/sdr/sdr.y"
+#line 256 "sdr.y"
 {
 			shaderType	=	SHADER_LIGHT;
 		;
     break;}
 case 17:
-#line 262 "../../../../src/sdr/sdr.y"
+#line 262 "sdr.y"
 {
 			shaderType	=	SHADER_VOLUME;
 		;
     break;}
 case 18:
-#line 268 "../../../../src/sdr/sdr.y"
+#line 268 "sdr.y"
 {
 			shaderType	=	SHADER_IMAGER;
 		;
     break;}
 case 20:
-#line 284 "../../../../src/sdr/sdr.y"
+#line 284 "sdr.y"
 {
 		;
     break;}
 case 21:
-#line 287 "../../../../src/sdr/sdr.y"
+#line 287 "sdr.y"
 {
 		;
     break;}
 case 22:
-#line 292 "../../../../src/sdr/sdr.y"
+#line 292 "sdr.y"
 {
 			currentParameter						=	new TSdrParameter;
 			currentParameter->space					=	NULL;
@@ -1130,14 +1170,14 @@ case 22:
 		;
     break;}
 case 23:
-#line 300 "../../../../src/sdr/sdr.y"
+#line 300 "sdr.y"
 {
 			currentParameter->next	=	parameters;
 			parameters				=	currentParameter;
 		;
     break;}
 case 24:
-#line 305 "../../../../src/sdr/sdr.y"
+#line 305 "sdr.y"
 {
 			currentParameter						=	new TSdrParameter;
 			currentParameter->space					=	NULL;
@@ -1147,49 +1187,49 @@ case 24:
 		;
     break;}
 case 25:
-#line 313 "../../../../src/sdr/sdr.y"
+#line 313 "sdr.y"
 {
 			currentParameter->next	=	parameters;
 			parameters				=	currentParameter;
 		;
     break;}
 case 33:
-#line 338 "../../../../src/sdr/sdr.y"
+#line 338 "sdr.y"
 {
 			currentParameter->container	=	CONTAINER_UNIFORM;
 			currentParameter->writable	=	FALSE;
 		;
     break;}
 case 34:
-#line 344 "../../../../src/sdr/sdr.y"
+#line 344 "sdr.y"
 {
 			currentParameter->container	=	CONTAINER_VARYING;
 			currentParameter->writable	=	FALSE;
 		;
     break;}
 case 35:
-#line 351 "../../../../src/sdr/sdr.y"
+#line 351 "sdr.y"
 {
 			currentParameter->container	=	CONTAINER_UNIFORM;
 			currentParameter->writable	=	TRUE;
 		;
     break;}
 case 36:
-#line 358 "../../../../src/sdr/sdr.y"
+#line 358 "sdr.y"
 {
 			currentParameter->container	=	CONTAINER_VARYING;
 			currentParameter->writable	=	TRUE;
 		;
     break;}
 case 37:
-#line 364 "../../../../src/sdr/sdr.y"
+#line 364 "sdr.y"
 {
 			currentParameter->container	=	CONTAINER_UNIFORM;
 			currentParameter->writable	=	TRUE;
 		;
     break;}
 case 38:
-#line 375 "../../../../src/sdr/sdr.y"
+#line 375 "sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[-2].string);
@@ -1198,7 +1238,7 @@ case 38:
 		;
     break;}
 case 39:
-#line 384 "../../../../src/sdr/sdr.y"
+#line 384 "sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1207,7 +1247,7 @@ case 39:
 		;
     break;}
 case 40:
-#line 397 "../../../../src/sdr/sdr.y"
+#line 397 "sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1219,7 +1259,7 @@ case 40:
 		;
     break;}
 case 42:
-#line 413 "../../../../src/sdr/sdr.y"
+#line 413 "sdr.y"
 {
 			currentParameter->type					=	TYPE_FLOAT;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1232,7 +1272,7 @@ case 42:
 		;
     break;}
 case 43:
-#line 429 "../../../../src/sdr/sdr.y"
+#line 429 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1240,7 +1280,7 @@ case 43:
 		;
     break;}
 case 44:
-#line 439 "../../../../src/sdr/sdr.y"
+#line 439 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->scalar = yyvsp[0].real;
@@ -1253,7 +1293,7 @@ case 44:
 		;
     break;}
 case 46:
-#line 455 "../../../../src/sdr/sdr.y"
+#line 455 "sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1262,7 +1302,7 @@ case 46:
 		;
     break;}
 case 47:
-#line 466 "../../../../src/sdr/sdr.y"
+#line 466 "sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[-2].string);
@@ -1271,7 +1311,7 @@ case 47:
 		;
     break;}
 case 48:
-#line 479 "../../../../src/sdr/sdr.y"
+#line 479 "sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1283,7 +1323,7 @@ case 48:
 		;
     break;}
 case 50:
-#line 495 "../../../../src/sdr/sdr.y"
+#line 495 "sdr.y"
 {
 			currentParameter->type					=	TYPE_STRING;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1296,7 +1336,7 @@ case 50:
 		;
     break;}
 case 51:
-#line 511 "../../../../src/sdr/sdr.y"
+#line 511 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1304,7 +1344,7 @@ case 51:
 		;
     break;}
 case 52:
-#line 521 "../../../../src/sdr/sdr.y"
+#line 521 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->string = strdup(yyvsp[0].string);
@@ -1317,7 +1357,7 @@ case 52:
 		;
     break;}
 case 54:
-#line 537 "../../../../src/sdr/sdr.y"
+#line 537 "sdr.y"
 {
 			currentParameter->type					=	TYPE_COLOR;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1327,12 +1367,12 @@ case 54:
 		;
     break;}
 case 55:
-#line 545 "../../../../src/sdr/sdr.y"
+#line 545 "sdr.y"
 {
 		;
     break;}
 case 56:
-#line 554 "../../../../src/sdr/sdr.y"
+#line 554 "sdr.y"
 {
 			currentParameter->type					=	TYPE_COLOR;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1344,7 +1384,7 @@ case 56:
 		;
     break;}
 case 58:
-#line 570 "../../../../src/sdr/sdr.y"
+#line 570 "sdr.y"
 {
 			currentParameter->type					=	TYPE_COLOR;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1361,7 +1401,7 @@ case 58:
 		;
     break;}
 case 59:
-#line 589 "../../../../src/sdr/sdr.y"
+#line 589 "sdr.y"
 {
 			currentParameter->type					=	TYPE_VECTOR;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1371,12 +1411,12 @@ case 59:
 		;
     break;}
 case 60:
-#line 597 "../../../../src/sdr/sdr.y"
+#line 597 "sdr.y"
 {
 		;
     break;}
 case 61:
-#line 606 "../../../../src/sdr/sdr.y"
+#line 606 "sdr.y"
 {
 			currentParameter->type					=	TYPE_VECTOR;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1388,7 +1428,7 @@ case 61:
 		;
     break;}
 case 63:
-#line 622 "../../../../src/sdr/sdr.y"
+#line 622 "sdr.y"
 {
 			currentParameter->type					=	TYPE_VECTOR;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1405,7 +1445,7 @@ case 63:
 		;
     break;}
 case 64:
-#line 642 "../../../../src/sdr/sdr.y"
+#line 642 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1413,7 +1453,7 @@ case 64:
 		;
     break;}
 case 65:
-#line 651 "../../../../src/sdr/sdr.y"
+#line 651 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->vector = new float[3];
@@ -1424,14 +1464,14 @@ case 65:
 		;
     break;}
 case 66:
-#line 660 "../../../../src/sdr/sdr.y"
+#line 660 "sdr.y"
 {
 			currentDefaultItem++;
 			numArrayItemsRemaining--;
 		;
     break;}
 case 68:
-#line 670 "../../../../src/sdr/sdr.y"
+#line 670 "sdr.y"
 {
 			currentParameter->type					=	TYPE_NORMAL;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1441,12 +1481,12 @@ case 68:
 		;
     break;}
 case 69:
-#line 678 "../../../../src/sdr/sdr.y"
+#line 678 "sdr.y"
 {
 		;
     break;}
 case 70:
-#line 687 "../../../../src/sdr/sdr.y"
+#line 687 "sdr.y"
 {
 			currentParameter->type					=	TYPE_NORMAL;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1458,7 +1498,7 @@ case 70:
 		;
     break;}
 case 72:
-#line 703 "../../../../src/sdr/sdr.y"
+#line 703 "sdr.y"
 {
 			currentParameter->type					=	TYPE_NORMAL;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1475,7 +1515,7 @@ case 72:
 		;
     break;}
 case 73:
-#line 722 "../../../../src/sdr/sdr.y"
+#line 722 "sdr.y"
 {
 			currentParameter->type					=	TYPE_POINT;
 			currentParameter->name					=	strdup(yyvsp[0].string);
@@ -1485,12 +1525,12 @@ case 73:
 		;
     break;}
 case 74:
-#line 730 "../../../../src/sdr/sdr.y"
+#line 730 "sdr.y"
 {
 		;
     break;}
 case 75:
-#line 739 "../../../../src/sdr/sdr.y"
+#line 739 "sdr.y"
 {
 			currentParameter->type					=	TYPE_POINT;
 			currentParameter->name					=	strdup(yyvsp[-4].string);
@@ -1502,7 +1542,7 @@ case 75:
 		;
     break;}
 case 77:
-#line 755 "../../../../src/sdr/sdr.y"
+#line 755 "sdr.y"
 {
 			currentParameter->type					=	TYPE_POINT;
 			currentParameter->name					=	strdup(yyvsp[-3].string);
@@ -1519,7 +1559,7 @@ case 77:
 		;
     break;}
 case 78:
-#line 793 "../../../../src/sdr/sdr.y"
+#line 793 "sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1545,7 +1585,7 @@ case 78:
 		;
     break;}
 case 79:
-#line 821 "../../../../src/sdr/sdr.y"
+#line 821 "sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1571,7 +1611,7 @@ case 79:
 		;
     break;}
 case 80:
-#line 847 "../../../../src/sdr/sdr.y"
+#line 847 "sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1597,7 +1637,7 @@ case 80:
 		;
     break;}
 case 81:
-#line 877 "../../../../src/sdr/sdr.y"
+#line 877 "sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1610,7 +1650,7 @@ case 81:
 		;
     break;}
 case 83:
-#line 894 "../../../../src/sdr/sdr.y"
+#line 894 "sdr.y"
 {
 			currentParameter->container					=	CONTAINER_UNIFORM;
 			currentParameter->type						=	TYPE_MATRIX;
@@ -1641,7 +1681,7 @@ case 83:
 		;
     break;}
 case 84:
-#line 928 "../../../../src/sdr/sdr.y"
+#line 928 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				sdrerror("wrong number of items in array initializer\n");
@@ -1649,7 +1689,7 @@ case 84:
 		;
     break;}
 case 85:
-#line 955 "../../../../src/sdr/sdr.y"
+#line 955 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->matrix = new float[16];
@@ -1679,7 +1719,7 @@ case 85:
 		;
     break;}
 case 86:
-#line 985 "../../../../src/sdr/sdr.y"
+#line 985 "sdr.y"
 {
 			if(numArrayItemsRemaining){
 				currentDefaultItem->matrix = new float[16];
@@ -1706,167 +1746,168 @@ case 86:
 		;
     break;}
 case 99:
-#line 1062 "../../../../src/sdr/sdr.y"
+#line 1062 "sdr.y"
 {
 		;
     break;}
 case 100:
-#line 1070 "../../../../src/sdr/sdr.y"
+#line 1070 "sdr.y"
 {
 		;
     break;}
 case 101:
-#line 1078 "../../../../src/sdr/sdr.y"
+#line 1078 "sdr.y"
 {
 		;
     break;}
 case 102:
-#line 1086 "../../../../src/sdr/sdr.y"
+#line 1086 "sdr.y"
 {
 		;
     break;}
 case 103:
-#line 1093 "../../../../src/sdr/sdr.y"
+#line 1093 "sdr.y"
 {
 		;
     break;}
 case 104:
-#line 1101 "../../../../src/sdr/sdr.y"
+#line 1101 "sdr.y"
 {
 		;
     break;}
 case 105:
-#line 1108 "../../../../src/sdr/sdr.y"
+#line 1108 "sdr.y"
 {
 		;
     break;}
 case 106:
-#line 1116 "../../../../src/sdr/sdr.y"
+#line 1116 "sdr.y"
 {
 		;
     break;}
 case 107:
-#line 1123 "../../../../src/sdr/sdr.y"
+#line 1123 "sdr.y"
 {
 		;
     break;}
 case 108:
-#line 1131 "../../../../src/sdr/sdr.y"
+#line 1131 "sdr.y"
 {
 		;
     break;}
 case 109:
-#line 1138 "../../../../src/sdr/sdr.y"
+#line 1138 "sdr.y"
 {
 		;
     break;}
 case 110:
-#line 1146 "../../../../src/sdr/sdr.y"
+#line 1146 "sdr.y"
 {
 		;
     break;}
 case 111:
-#line 1153 "../../../../src/sdr/sdr.y"
+#line 1153 "sdr.y"
 {
 		;
     break;}
 case 112:
-#line 1161 "../../../../src/sdr/sdr.y"
+#line 1161 "sdr.y"
 {
 		;
     break;}
 case 113:
-#line 1168 "../../../../src/sdr/sdr.y"
+#line 1168 "sdr.y"
 {
 		;
     break;}
 case 114:
-#line 1176 "../../../../src/sdr/sdr.y"
+#line 1176 "sdr.y"
 {
 		;
     break;}
 case 119:
-#line 1198 "../../../../src/sdr/sdr.y"
+#line 1198 "sdr.y"
 {
 		;
     break;}
 case 120:
-#line 1204 "../../../../src/sdr/sdr.y"
+#line 1204 "sdr.y"
 {
 		;
     break;}
 case 121:
-#line 1210 "../../../../src/sdr/sdr.y"
+#line 1210 "sdr.y"
 {
 		;
     break;}
 case 122:
-#line 1214 "../../../../src/sdr/sdr.y"
+#line 1214 "sdr.y"
 {
 		;
     break;}
 case 123:
-#line 1218 "../../../../src/sdr/sdr.y"
+#line 1218 "sdr.y"
 {
 		;
     break;}
 case 124:
-#line 1225 "../../../../src/sdr/sdr.y"
+#line 1225 "sdr.y"
 {
 		;
     break;}
 case 125:
-#line 1228 "../../../../src/sdr/sdr.y"
+#line 1228 "sdr.y"
 {
 		;
     break;}
 case 126:
-#line 1235 "../../../../src/sdr/sdr.y"
+#line 1235 "sdr.y"
 {
 		;
     break;}
 case 127:
-#line 1242 "../../../../src/sdr/sdr.y"
+#line 1242 "sdr.y"
 {
 		;
     break;}
 case 128:
-#line 1248 "../../../../src/sdr/sdr.y"
+#line 1248 "sdr.y"
 {
 		;
     break;}
 case 129:
-#line 1252 "../../../../src/sdr/sdr.y"
+#line 1252 "sdr.y"
 {
 		;
     break;}
 case 130:
-#line 1256 "../../../../src/sdr/sdr.y"
+#line 1256 "sdr.y"
 {
 		;
     break;}
 case 131:
-#line 1260 "../../../../src/sdr/sdr.y"
+#line 1260 "sdr.y"
 {
 		;
     break;}
 case 132:
-#line 1270 "../../../../src/sdr/sdr.y"
+#line 1270 "sdr.y"
 {
 		;
     break;}
 case 133:
-#line 1306 "../../../../src/sdr/sdr.y"
+#line 1306 "sdr.y"
 {
 		;
     break;}
 case 134:
-#line 1312 "../../../../src/sdr/sdr.y"
+#line 1312 "sdr.y"
 {
 		;
     break;}
 }
    /* the action file gets copied in in place of this dollarsign */
+#line 543 "/usr/share/bison.simple"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -2061,8 +2102,32 @@ yyerrhandle:
 
   yystate = yyn;
   goto yynewstate;
+
+ yyacceptlab:
+  /* YYACCEPT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 0;
+
+ yyabortlab:
+  /* YYABORT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 1;
 }
-#line 1316 "../../../../src/sdr/sdr.y"
+#line 1316 "sdr.y"
 
 #include "lex.sdr.cpp"
 

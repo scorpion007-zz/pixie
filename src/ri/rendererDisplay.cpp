@@ -112,7 +112,7 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 // Return Value			:	-
 // Comments				:
 void	CRenderer::beginDisplays() {
-
+	
 	// Clear the data first
 	numDisplays			=	0;
 	numActiveDisplays	=	0;
@@ -661,6 +661,7 @@ void	CRenderer::computeDisplayData() {
 				}
 			}
 		} else if (netClient == INVALID_SOCKET) {
+			
 			if (locateFileEx(deviceFile,outDevice,osModuleExtension,displayPath)) {
 				datas[numDisplays].module		=	osLoadModule(deviceFile);
 				if (datas[numDisplays].module != NULL) {

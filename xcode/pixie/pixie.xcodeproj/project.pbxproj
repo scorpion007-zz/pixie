@@ -162,7 +162,6 @@
 		C96A6FD60AD6E196003C2D7B /* points.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F6D0AD6E196003C2D7B /* points.h */; };
 		C96A6FD70AD6E196003C2D7B /* polygons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F6E0AD6E196003C2D7B /* polygons.cpp */; };
 		C96A6FD80AD6E196003C2D7B /* polygons.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F6F0AD6E196003C2D7B /* polygons.h */; };
-		C96A6FD90AD6E196003C2D7B /* primvars.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F700AD6E196003C2D7B /* primvars.h */; };
 		C96A6FDA0AD6E196003C2D7B /* quadrics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F710AD6E196003C2D7B /* quadrics.cpp */; };
 		C96A6FDB0AD6E196003C2D7B /* quadrics.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6F720AD6E196003C2D7B /* quadrics.h */; };
 		C96A6FDE0AD6E196003C2D7B /* random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6F750AD6E196003C2D7B /* random.cpp */; };
@@ -591,7 +590,7 @@
 		183D2A6A0B2BC718001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = /include;
+			dstPath = /Applications/Graphics/Pixie/include;
 			dstSubfolderSpec = 0;
 			files = (
 				18A299030B44F040006B9ABE /* dlo.h in CopyFiles */,
@@ -605,7 +604,7 @@
 		183D2A700B2BC76A001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /include;
+			dstPath = /Applications/Graphics/Pixie/include;
 			dstSubfolderSpec = 0;
 			files = (
 				183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */,
@@ -615,7 +614,7 @@
 		188383500B2FB2D100166E3E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /man;
+			dstPath = /Applications/Graphics/Pixie/man;
 			dstSubfolderSpec = 0;
 			files = (
 				188383520B2FB2E300166E3E /* rndr.1 in CopyFiles */,
@@ -628,7 +627,7 @@
 		188383560B2FB2ED00166E3E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /;
+			dstPath = /Applications/Graphics/Pixie;
 			dstSubfolderSpec = 0;
 			files = (
 				188383E30B2FB39D00166E3E /* AUTHORS in CopyFiles */,
@@ -833,8 +832,8 @@
 		C96A6E3B0AD6D66C003C2D7B /* os.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = os.cpp; path = ../../src/common/os.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E3C0AD6D66C003C2D7B /* os.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = os.h; path = ../../src/common/os.h; sourceTree = SOURCE_ROOT; };
 		C96A6E3D0AD6D66C003C2D7B /* simd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = simd.h; path = ../../src/common/simd.h; sourceTree = SOURCE_ROOT; };
-		C96A6E580AD6D73A003C2D7B /* file.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = file.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		C96A6E5D0AD6D746003C2D7B /* framebuffer.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = framebuffer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C96A6E580AD6D73A003C2D7B /* file.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = file.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		C96A6E5D0AD6D746003C2D7B /* framebuffer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = framebuffer.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E660AD6D778003C2D7B /* file.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file.cpp; path = ../../src/file/file.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E680AD6D791003C2D7B /* fbx.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fbx.cpp; path = ../../src/framebuffer/fbx.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E690AD6D791003C2D7B /* fbx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fbx.h; path = ../../src/framebuffer/fbx.h; sourceTree = SOURCE_ROOT; };
@@ -909,7 +908,6 @@
 		C96A6F6D0AD6E196003C2D7B /* points.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = points.h; path = ../../src/ri/points.h; sourceTree = SOURCE_ROOT; };
 		C96A6F6E0AD6E196003C2D7B /* polygons.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = polygons.cpp; path = ../../src/ri/polygons.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6F6F0AD6E196003C2D7B /* polygons.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = polygons.h; path = ../../src/ri/polygons.h; sourceTree = SOURCE_ROOT; };
-		C96A6F700AD6E196003C2D7B /* primvars.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = primvars.h; path = ../../src/ri/primvars.h; sourceTree = SOURCE_ROOT; };
 		C96A6F710AD6E196003C2D7B /* quadrics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = quadrics.cpp; path = ../../src/ri/quadrics.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6F720AD6E196003C2D7B /* quadrics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = quadrics.h; path = ../../src/ri/quadrics.h; sourceTree = SOURCE_ROOT; };
 		C96A6F750AD6E196003C2D7B /* random.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = random.cpp; path = ../../src/ri/random.cpp; sourceTree = SOURCE_ROOT; };
@@ -1012,7 +1010,7 @@
 		C9E09B170AD9B8E600A33716 /* precomp.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = precomp.cpp; path = ../../src/precomp/precomp.cpp; sourceTree = SOURCE_ROOT; };
 		C9E09B2F0AD9BCF300A33716 /* sdr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = sdr.cpp; path = ../../src/sdr/sdr.cpp; sourceTree = SOURCE_ROOT; };
 		C9E09B300AD9BCF300A33716 /* sdr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sdr.h; path = ../../src/sdr/sdr.h; sourceTree = SOURCE_ROOT; };
-		C9E09B420AD9BEBE00A33716 /* rgbe.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = rgbe.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9E09B420AD9BEBE00A33716 /* rgbe.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = rgbe.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9E09B5B0AD9BF4300A33716 /* rgbe.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rgbe.cpp; path = ../../src/rgbe/rgbe.cpp; sourceTree = SOURCE_ROOT; };
 		C9E09B5C0AD9BF4300A33716 /* rgbe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rgbe.h; path = ../../src/rgbe/rgbe.h; sourceTree = SOURCE_ROOT; };
 		C9E09B5F0AD9BF5600A33716 /* file.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file.cpp; path = ../../src/rgbe/file.cpp; sourceTree = SOURCE_ROOT; };
@@ -1566,12 +1564,12 @@
 			isa = PBXGroup;
 			children = (
 				C96A6E290AD6D5E5003C2D7B /* libcommon.a */,
-				C96A6E580AD6D73A003C2D7B /* file.dylib */,
-				C96A6E5D0AD6D746003C2D7B /* framebuffer.dylib */,
+				C96A6E580AD6D73A003C2D7B /* file.so */,
+				C96A6E5D0AD6D746003C2D7B /* framebuffer.so */,
 				C96A6EC20AD6E08A003C2D7B /* libri.dylib */,
 				C96A6EC70AD6E096003C2D7B /* libdsotest.dylib */,
 				C96A6EE20AD6E0F6003C2D7B /* libsdr.dylib */,
-				C9E09B420AD9BEBE00A33716 /* rgbe.dylib */,
+				C9E09B420AD9BEBE00A33716 /* rgbe.so */,
 				C983E6C20AF2E8FB00648461 /* rndr */,
 				C983E6D20AF2E9C900648461 /* sdrc */,
 				C983E6ED0AF2E9FE00648461 /* precomp */,
@@ -1706,7 +1704,6 @@
 				C96A6F6D0AD6E196003C2D7B /* points.h */,
 				C96A6F6E0AD6E196003C2D7B /* polygons.cpp */,
 				C96A6F6F0AD6E196003C2D7B /* polygons.h */,
-				C96A6F700AD6E196003C2D7B /* primvars.h */,
 				C96A6F710AD6E196003C2D7B /* quadrics.cpp */,
 				C96A6F720AD6E196003C2D7B /* quadrics.h */,
 				C96A6F750AD6E196003C2D7B /* random.cpp */,
@@ -1933,7 +1930,6 @@
 				C96A6FD40AD6E196003C2D7B /* pointCloud.h in Headers */,
 				C96A6FD60AD6E196003C2D7B /* points.h in Headers */,
 				C96A6FD80AD6E196003C2D7B /* polygons.h in Headers */,
-				C96A6FD90AD6E196003C2D7B /* primvars.h in Headers */,
 				C96A6FDB0AD6E196003C2D7B /* quadrics.h in Headers */,
 				C96A6FDF0AD6E196003C2D7B /* random.h in Headers */,
 				C96A6FE00AD6E196003C2D7B /* ray.h in Headers */,
@@ -2058,7 +2054,7 @@
 			);
 			name = file;
 			productName = file;
-			productReference = C96A6E580AD6D73A003C2D7B /* file.dylib */;
+			productReference = C96A6E580AD6D73A003C2D7B /* file.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		C96A6E5C0AD6D746003C2D7B /* framebuffer */ = {
@@ -2085,7 +2081,7 @@
 			);
 			name = framebuffer;
 			productName = framebuffer;
-			productReference = C96A6E5D0AD6D746003C2D7B /* framebuffer.dylib */;
+			productReference = C96A6E5D0AD6D746003C2D7B /* framebuffer.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		C96A6EC10AD6E08A003C2D7B /* ri */ = {
@@ -2333,7 +2329,7 @@
 			);
 			name = rgbe;
 			productName = rgbe;
-			productReference = C9E09B420AD9BEBE00A33716 /* rgbe.dylib */;
+			productReference = C9E09B420AD9BEBE00A33716 /* rgbe.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -2719,14 +2715,13 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				DEPLOYMENT_LOCATION = YES;
-				DSTROOT = /Applications/Graphics/Pixie;
+				DSTROOT = /;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				HEADER_SEARCH_PATHS = (
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /tmp;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				ZERO_LINK = NO;
@@ -2738,7 +2733,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DSTROOT = /Applications/Graphics/Pixie;
+				DSTROOT = /;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -2746,7 +2741,6 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /tmp;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				ZERO_LINK = NO;
@@ -2762,7 +2756,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = common;
 				ZERO_LINK = NO;
@@ -2776,7 +2770,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = common;
 				ZERO_LINK = NO;
@@ -2788,6 +2782,7 @@
 			buildSettings = {
 				BUILD_VARIANTS = normal;
 				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2798,7 +2793,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /displays;
+				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				OTHER_LDFLAGS = "-ltiff";
@@ -2813,6 +2808,7 @@
 			buildSettings = {
 				BUILD_VARIANTS = normal;
 				COPY_PHASE_STRIP = YES;
+				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -2821,7 +2817,7 @@
 					/sw/include,
 					../../src,
 				);
-				INSTALL_PATH = /displays;
+				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				OTHER_LDFLAGS = "-ltiff";
@@ -2835,6 +2831,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2846,7 +2843,7 @@
 					"~/Pixie/trunk/src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /displays;
+				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = (
 					/sw/lib,
 					/usr/X11R6/lib,
@@ -2865,6 +2862,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -2874,7 +2872,7 @@
 					"~/Pixie/trunk/src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /displays;
+				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = (
 					/sw/lib,
 					/usr/X11R6/lib,
@@ -2899,7 +2897,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -2918,7 +2916,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
@@ -2939,7 +2937,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = dsotest;
 				ZERO_LINK = NO;
@@ -2954,7 +2952,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = dsotest;
 				ZERO_LINK = NO;
@@ -2971,7 +2969,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = "-lcommon";
 				PREBINDING = NO;
 				PRODUCT_NAME = sdr;
@@ -2987,7 +2985,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /lib;
+				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = "-lcommon";
 				PREBINDING = NO;
 				PRODUCT_NAME = sdr;
@@ -3004,7 +3002,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = rndr;
@@ -3019,7 +3017,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = rndr;
@@ -3036,7 +3034,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrc;
 				ZERO_LINK = NO;
@@ -3050,7 +3048,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrc;
 				ZERO_LINK = NO;
@@ -3066,7 +3064,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = precomp;
 				ZERO_LINK = NO;
@@ -3080,7 +3078,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = precomp;
 				ZERO_LINK = NO;
@@ -3096,7 +3094,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrinfo;
 				ZERO_LINK = NO;
@@ -3110,7 +3108,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = sdrinfo;
 				ZERO_LINK = NO;
@@ -3126,7 +3124,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = texmake;
 				ZERO_LINK = NO;
@@ -3140,7 +3138,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /bin;
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = texmake;
 				ZERO_LINK = NO;
@@ -3196,13 +3194,14 @@
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /displays;
+				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
@@ -3216,11 +3215,12 @@
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = YES;
+				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /displays;
+				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
