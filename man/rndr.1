@@ -1,0 +1,91 @@
+.TH RNDR 1
+.SH NAME
+rndr \- render a rib file
+.SH SYNOPSIS
+\fBrndr\fR [ -f <range> ] [ options ... ] [ -P:n | -t:n ] [ name.rib ...  ]
+.br
+\fBrndr\fR -r <port>
+.br
+\fBrndr\fR -k <port>
+.br
+\fBrndr\fR [ options... ] [ name.rib ...  ] -s <srv1:port1,srv2:port2...>
+.SH DESCRIPTION
+.I  Rndr
+Renders a file with Pixie.
+.P
+The main documentation is maintained in html form
+and should be included with your distribution in the html or doc directories.
+.P
+Note: If the filename given is '-' or no filename is given, then 
+.I	rndr
+will read from standard input.  This is not valid for network renders, where the
+file needs to be shipped to the server
+.I rndr
+instances for them to read.
+.SH OPTIONS
+.TP
+.B \-f <range>
+Render only selected frames.  Range can be of the form N for a single frame, N1:N2
+for N1 through to N2, or N1:N2:N3 for N1 to N3 skipping, but only every N2 frames.
+.TP
+.B \-q
+Quiet mode.  Errors and warnings are not displayed.
+.TP
+.B \-d
+Framebuffer display.  Overrides the display drivers and uses framebuffer.
+.TP
+.B \-t
+Display statistics.  At the end of each frame, statistics are output.
+.TP
+.B \-p
+Display progress.  Displays an updating progress line on the terminal.
+.TP
+.B \-P:n
+Specify the number of subprocesses for a multiprocessor render.  May not be used with -r
+or -s.
+.TP
+.B \-t:n
+Specify the number of threads for a multithreaded render.  May not be used with -r or -s.
+.TP
+.B \-c <client port>
+Specify a client (for subprocesses, used internally by rndr).
+.SH ENVIRONMENT
+.TP
+.B PIXIEHOME
+The directory $(PIXIEHOME)/shaders is used to locate the display drivers, shaders, and
+procedurals for a render.  
+.B PIXIEHOME
+is contain the directories 'shaders' and 'displays', but may contain:
+.RS
+.TP
+.B $(PIXIEHOME)/shaders
+Location for shaders
+.TP
+.B $(PIXIEHOME)/displays
+Location for display drivers
+.TP
+.B $(PIXIEHOME)/procedurals
+Location for procedural generators
+.TP
+.B $(PIXIEHOME)/textures
+Location for textures
+.RE
+.TP
+.B SHADERS
+Also searched for shaders
+.TP
+.B TEXTURES
+Also searched for textures
+.TP
+.B PROCEDURALS
+Also searched for procedurals
+.TP
+.B DISPLAYS
+Also searched for display drivers
+.TP
+.B DISPLAY
+Which X11 display to open for the framebuffer
+.SH "SEE ALSO"
+sdrc(1), texmake(1), show(1), sdrinfo(1)
+.SH BUGS
+See the sourceforge forums / tracker at http://pixie.sourceforge.net
