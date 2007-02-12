@@ -4342,6 +4342,8 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 
 			// Success, parse the file
 			ribParse(tmp,callback);
+		} else {
+			error(CODE_BADFILE,"Unable to find %s\n",filename);
 		}
 	} else {
 		ribParse(filename,callback);

@@ -726,7 +726,7 @@ int main(int argc, char* argv[]) {
 	if (frameBufferOnly) {
 		strcat(managerString2," fbonly:");
 	}
-	
+
 	RiBegin(managerString2);
 	
 #ifndef WIN32
