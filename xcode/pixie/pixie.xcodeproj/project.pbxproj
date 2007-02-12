@@ -972,7 +972,7 @@
 		C96A6FB80AD6E196003C2D7B /* zbuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbuffer.h; path = ../../src/ri/zbuffer.h; sourceTree = SOURCE_ROOT; };
 		C96A6FB90AD6E196003C2D7B /* zbufferPoint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbufferPoint.h; path = ../../src/ri/zbufferPoint.h; sourceTree = SOURCE_ROOT; };
 		C96A6FBA0AD6E196003C2D7B /* zbufferQuad.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbufferQuad.h; path = ../../src/ri/zbufferQuad.h; sourceTree = SOURCE_ROOT; };
-		C983E6C20AF2E8FB00648461 /* rndr */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = rndr; sourceTree = BUILT_PRODUCTS_DIR; };
+		C983E6C20AF2E8FB00648461 /* rndr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rndr; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6D20AF2E9C900648461 /* sdrc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6ED0AF2E9FE00648461 /* precomp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = precomp; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6F60AF2EA3400648461 /* sdrinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrinfo; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2713,75 +2713,52 @@
 		C96A6E1C0AD6D5C5003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				COPY_PHASE_STRIP = NO;
+				ARCHS = i386;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = /;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
 				HEADER_SEARCH_PATHS = (
 					/sw/include,
 					../../src,
 				);
 				LIBRARY_SEARCH_PATHS = /sw/lib;
+				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C96A6E1D0AD6D5C5003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				COPY_PHASE_STRIP = YES;
+				ARCHS = i386;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = /;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = (
 					/sw/include,
 					../../src,
 				);
 				LIBRARY_SEARCH_PATHS = /sw/lib;
+				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C96A6E2C0AD6D5E6003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
-				PREBINDING = NO;
 				PRODUCT_NAME = common;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C96A6E2D0AD6D5E6003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
-				PREBINDING = NO;
 				PRODUCT_NAME = common;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -2789,8 +2766,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
 				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = file;
@@ -2810,14 +2785,7 @@
 		C96A6E630AD6D74C003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					/sw/include,
 					"~/Pixie/trunk/src",
@@ -2832,21 +2800,14 @@
 					"-lX11",
 					"-lXext",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = framebuffer;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C96A6E640AD6D74C003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
 				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
 					/sw/include,
 					"~/Pixie/trunk/src",
@@ -2861,267 +2822,151 @@
 					"-lX11",
 					"-lXext",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = framebuffer;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C96A6EC90AD6E0B5003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_PREFIX = lib;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = ri;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C96A6ECA0AD6E0B5003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
 				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-ltiff",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = ri;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C96A6ECC0AD6E0B5003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_PREFIX = lib;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = dsotest;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C96A6ECD0AD6E0B5003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
 				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = dsotest;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C96A6EEB0AD6E103003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_PREFIX = lib;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = "-lcommon";
-				PREBINDING = NO;
 				PRODUCT_NAME = sdr;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C96A6EEC0AD6E103003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
 				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
 				OTHER_LDFLAGS = "-lcommon";
-				PREBINDING = NO;
 				PRODUCT_NAME = sdr;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C983E6C60AF2E93400648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = rndr;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C983E6C70AF2E93400648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = rndr;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C983E6D50AF2E9E700648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = sdrc;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C983E6D60AF2E9E700648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = sdrc;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C983E6F10AF2EA3000648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = precomp;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C983E6F20AF2EA3000648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = precomp;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C983E6FA0AF2EA5E00648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = sdrinfo;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C983E6FB0AF2EA5E00648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = sdrinfo;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		C983E7050AF2EAD200648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = texmake;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C983E7060AF2EAD200648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = texmake;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -3172,40 +3017,18 @@
 		C9E09B460AD9BEC200A33716 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = /sw/lib;
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = rgbe;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		C9E09B470AD9BEC200A33716 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = YES;
 				EXECUTABLE_EXTENSION = so;
-				EXECUTABLE_PREFIX = "";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = /sw/lib;
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = rgbe;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
