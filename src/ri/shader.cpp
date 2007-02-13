@@ -298,7 +298,6 @@ CShader::CShader(const char *name) : CFileResource(name) {
 	name					=	NULL;
 	memory					=	NULL;
 	codeArea				=	NULL;
-	constantsArea			=	NULL;
 	constantEntries			=	NULL;
 	varyingSizes			=	NULL;
 	strings					=	NULL;

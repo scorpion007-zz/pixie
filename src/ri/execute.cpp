@@ -212,16 +212,16 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											lastConditional			=	lastConditional->prev;
 
 //	Retrieve a pointer to an operand and obtain it's size
-#define		operand(i,n)					{																	\
-												const TCode	ref	=	code[i+2];									\
-												n	= stuff[ref.reference.accessor][ref.reference.index];		\
+#define		operand(i,n,t)					{																	\
+												const TArgument	ref	=	code->arguments[i];						\
+												n	= (t) stuff[ref.accessor][ref.index];						\
 											}
 
 //	Retrieve an operand's size
-#define		operandSize(i,n,s)				{																	\
-												const TCode	ref	=	code[i+2];									\
-												n	= stuff[ref.reference.accessor][ref.reference.index];		\
-												s	= ref.reference.numItems;									\
+#define		operandSize(i,n,s,t)				{																\
+												const TArgument	ref	=	code->arguments[i];						\
+												n	= (t) stuff[ref.accessor][ref.index];						\
+												s	= ref.numItems;												\
 											}
 
 // Retrieve the parameterlist
@@ -239,13 +239,10 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											}
 
 //	Retrieve an integer operand (label references are integer)
-#define		argument(i)						code[i+2].integer
-
-//	Retrieve an integer operand (label references are integer)
-#define		argumentCode(i)					code[i+2]
+#define		argument(i)						code->arguments[i].index
 
 //	Retrieve the number of arguments
-#define		argumentcount(n)				n = code[1].arguments.numArguments
+#define		argumentcount(n)				n = code->numArguments
 
 //	Control transfer
 #define		jmp(n)							{																\
@@ -368,12 +365,12 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		CATEGORYLIGHT_PRE(lC)			int	runCat = 0,saveCat = 0;										\
 											int	invertCatMatch = FALSE;										\
-											if (*(lC->string) != '\0') {									\
-												if (*(lC->string) == '-') {									\
-													saveCat = -(runCat = CRenderer::getGlobalID(lC->string+1));	\
+											if (*(*lC) != '\0') {											\
+												if (*(*lC) == '-') {										\
+													saveCat = -(runCat = CRenderer::getGlobalID(*lC+1));	\
 													invertCatMatch = TRUE;									\
 												} else {													\
-													saveCat = runCat = CRenderer::getGlobalID(lC->string);	\
+													saveCat = runCat = CRenderer::getGlobalID(*lC);			\
 												}															\
 											}
 
@@ -411,7 +408,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 
 	//	The	shading variables and junk
-	TCode						**stuff[3];			// Where we keep pointers to the variables
+	void						**stuff[3];			// Where we keep pointers to the variables
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;			// The number of active points being shaded
 	int							numPassive;			// The number of passive points being not shaded (numPassive+numActive = numVertices)
@@ -445,8 +442,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	// Set the access arrays
 	stuff[SL_IMMEDIATE_OPERAND]			=	currentShader->constantEntries;				// Immediate operands
-	stuff[SL_GLOBAL_OPERAND]			=	(TCode **) varying;							// Global variables
-	stuff[SL_VARYING_OPERAND]			=	(TCode **) locals;							// Local variables
+	stuff[SL_GLOBAL_OPERAND]			=	(void **) varying;							// Global variables
+	stuff[SL_VARYING_OPERAND]			=	(void **) locals;							// Local variables
 
 	numActive							=	currentShadingState->numActive;
 	numPassive							=	currentShadingState->numPassive;
@@ -454,18 +451,18 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	// Execute
 execStart:
-	const ESlCode	opcode	=	(ESlCode)	code[0].integer;	// Get the opcode
+	const ESlCode	opcode	=	(ESlCode)	code->opcode;	// Get the opcode
 
 	tags	=	tagStart;						// Set the tags to the start
 
-	if (code[1].arguments.uniform) {			// If the opcode is uniform , execute once
+	if (code->uniform) {			// If the opcode is uniform , execute once
 #define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -475,7 +472,7 @@ execStart:
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -486,7 +483,7 @@ execStart:
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -494,7 +491,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				scripterror("invalid uniform lighting call");										\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -504,7 +501,7 @@ execStart:
 				expr_pre;																			\
 				expr;																				\
 				expr_post;																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -520,7 +517,7 @@ execStart:
 		}
 
 		// Resume executing instructions
-		code	+=	code[1].arguments.numCodes;
+		code++;
 		goto execStart;
 
 #undef DEFOPCODE
@@ -543,7 +540,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -559,7 +556,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -575,7 +572,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -590,7 +587,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 			
@@ -605,7 +602,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -621,7 +618,7 @@ execStart:
 				goto execEnd;
 			}
 
-			code	+=	code[1].arguments.numCodes;
+			code++;
 			goto execStart;
 		} else {
 
@@ -640,7 +637,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -653,7 +650,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -667,7 +664,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -682,7 +679,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -696,7 +693,7 @@ execStart:
 					expr_update;																	\
 				}																					\
 				expr_post																			\
-				code	+=	code[1].arguments.numCodes;												\
+				code++;																				\
 				goto execStart;																		\
 			}
 
@@ -711,7 +708,7 @@ execStart:
 				goto execEnd;
 			}
 
-			code	+=	code[1].arguments.numCodes;
+			code++;
 			goto execStart;
 		}
 

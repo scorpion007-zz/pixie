@@ -48,16 +48,16 @@ DEFFUNC(DebugVector		,"debug"		,"o=v", FUN1EXPR_PRE, DEBUGVEXPR, FUN1EXPR_UPDATE
 #define	FACEFORWARDEXPR_PRE		const float	*Ng	=	varying[VARIABLE_NG];			\
 								FUN3EXPR_PRE
 								
-#define	FACEFORWARDEXPR			if (dotvv(&op1->real,Ng) > 0) {						\
-									if (dotvv(&op2->real,Ng) > 0)					\
-										mulvf(&res->real,&op1->real,-1);			\
+#define	FACEFORWARDEXPR			if (dotvv(op1,Ng) > 0) {							\
+									if (dotvv(op2,Ng) > 0)							\
+										mulvf(res,op1,-1);							\
 									else											\
-										movvv(&res->real,&op1->real);				\
+										movvv(res,op1);								\
 								} else {											\
-									if (dotvv(&op2->real,Ng) > 0)					\
-										movvv(&res->real,&op1->real);				\
+									if (dotvv(op2,Ng) > 0)							\
+										movvv(res,op1);								\
 									else											\
-										mulvf(&res->real,&op1->real,-1);			\
+										mulvf(res,op1,-1);							\
 								}
 
 
@@ -68,16 +68,16 @@ DEFFUNC(FaceForward		,"faceforward"			,"v=vv"	,FACEFORWARDEXPR_PRE,FACEFORWARDEX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // faceforward "v=vvv"
-#define	FACEFORWARD2EXPR		if (dotvv(&op1->real,&op3->real) > 0) {				\
-									if (dotvv(&op2->real,&op3->real) > 0)			\
-										mulvf(&res->real,&op1->real,-1);			\
+#define	FACEFORWARD2EXPR		if (dotvv(op1,op3) > 0) {							\
+									if (dotvv(op2,op3) > 0)							\
+										mulvf(res,op1,-1);							\
 									else											\
-										movvv(&res->real,&op1->real);				\
+										movvv(res,op1);								\
 								} else {											\
-									if (dotvv(&op2->real,&op3->real) > 0)			\
-										movvv(&res->real,&op1->real);				\
+									if (dotvv(op2,op3) > 0)							\
+										movvv(res,op1);								\
 									else											\
-										mulvf(&res->real,&op1->real,-1);			\
+										mulvf(res,op1,-1);							\
 								}
 
 
@@ -99,7 +99,7 @@ DEFFUNC(FaceForward3		,"faceforward"		,"v=vvv",FUN4EXPR_PRE,FACEFORWARD2EXPR,FUN
 // du "f=f"
 #ifndef INIT_SHADING
 #define	DUFEXPR_PRE				FUN2EXPR_PRE																		\
-								duFloat((float *) res,(float *) op);
+								duFloat(res,op);
 #else
 #undef	DUFEXPR_PRE
 #define	DUFEXPR_PRE
@@ -112,7 +112,7 @@ DEFFUNC(Duf		,"Du"			,"f=f"	,DUFEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 // du "v=v"
 #ifndef INIT_SHADING
 #define	DUVEXPR_PRE				FUN2EXPR_PRE																		\
-								duVector((float *) res,(float *) op);
+								duVector(res,op);
 
 #else
 #undef	DUVEXPR_PRE
@@ -131,7 +131,7 @@ DEFFUNC(Duv			,"Du"		,"v=v"	,DUVEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 // dv "f=f"
 #ifndef INIT_SHADING
 #define	DVFEXPR_PRE				FUN2EXPR_PRE																	\
-								dvFloat((float *) res,(float *) op);
+								dvFloat(res,op);
 #else
 #undef	DVFEXPR_PRE
 #define	DVFEXPR_PRE
@@ -145,7 +145,7 @@ DEFFUNC(Dvf		,"Dv"			,"f=f"	,DVFEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 // dv "v=v"
 #ifndef INIT_SHADING
 #define	DVVEXPR_PRE				FUN2EXPR_PRE																	\
-								dvVector((float *) res,(float *) op);
+								dvVector(res,op);
 #else
 #undef	DVVEXPR_PRE
 #define	DVVEXPR_PRE	
@@ -167,19 +167,19 @@ DEFFUNC(Dvv			,"Dv"		,"v=v"	,DVVEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 								float	*duBottom	=	duTop + numVertices;								\
 								float	*dvTop		=	duBottom + numVertices;								\
 								float	*dvBottom	=	dvTop + numVertices;								\
-								duFloat(duTop,		(float *) op1);											\
-								duFloat(duBottom,	(float *) op2);											\
-								dvFloat(dvTop,		(float *) op1);											\
-								dvFloat(dvBottom,	(float *) op2);
+								duFloat(duTop,		op1);													\
+								duFloat(duBottom,	op2);													\
+								dvFloat(dvTop,		op1);													\
+								dvFloat(dvBottom,	op2);
 
 #define	DERIVFEXPR				if (duBottom[0] != 0) {														\
-									res[0].real	=	duTop[0] / duBottom[0];									\
+									res[0]	=	duTop[0] / duBottom[0];										\
 								} else {																	\
-									res[0].real	=	0;														\
+									res[0]	=	0;															\
 								}																			\
 																											\
 								if (dvBottom[0] != 0) {														\
-									res[0].real	+=	dvTop[0] / dvBottom[0];									\
+									res[0]	+=	dvTop[0] / dvBottom[0];										\
 								}
 
 
@@ -212,25 +212,25 @@ DEFFUNC(Derivf		,"Deriv"			,"f=ff"	,DERIVFEXPR_PRE,DERIVFEXPR,DERIVFEXPR_UPDATE,
 								float	*duBottom	=	duTop + numVertices*3;								\
 								float	*dvTop		=	duBottom + numVertices;								\
 								float	*dvBottom	=	dvTop + numVertices*3;								\
-								duVector(duTop,		(float *) op1);											\
-								duFloat(duBottom,	(float *) op2);											\
-								dvVector(dvTop,		(float *) op1);											\
-								dvFloat(dvBottom,	(float *) op2);
+								duVector(duTop,		op1);													\
+								duFloat(duBottom,	op2);													\
+								dvVector(dvTop,		op1);													\
+								dvFloat(dvBottom,	op2);
 
 #define	DERIVVEXPR				if (duBottom[0] != 0) {														\
-									res[0].real	=	duTop[0] / duBottom[0];									\
-									res[1].real	=	duTop[1] / duBottom[0];									\
-									res[2].real	=	duTop[2] / duBottom[0];									\
+									res[0]	=	duTop[0] / duBottom[0];										\
+									res[1]	=	duTop[1] / duBottom[0];										\
+									res[2]	=	duTop[2] / duBottom[0];										\
 								} else {																	\
-									res[0].real	=	0;														\
-									res[1].real	=	0;														\
-									res[2].real	=	0;														\
+									res[0]	=	0;															\
+									res[1]	=	0;															\
+									res[2]	=	0;															\
 								}																			\
 																											\
 								if (dvBottom[0] != 0) {														\
-									res[0].real	+=	dvTop[0] / dvBottom[0];									\
-									res[1].real	+=	dvTop[1] / dvBottom[0];									\
-									res[2].real	+=	dvTop[2] / dvBottom[0];									\
+									res[0]	+=	dvTop[0] / dvBottom[0];										\
+									res[1]	+=	dvTop[1] / dvBottom[0];										\
+									res[2]	+=	dvTop[2] / dvBottom[0];										\
 								}
 
 
@@ -264,14 +264,14 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
 								float	*dPdv	=	dPdu + numVertices*3;									\
 								vector	tmp;																\
-								duVector(dPdu,(float *) op);												\
-								dvVector(dPdv,(float *) op);
+								duVector(dPdu,op);															\
+								dvVector(dPdv,op);
 								
 
 #define	AREAEXPR				mulvf(dPdu,du[0]);															\
 								mulvf(dPdv,dv[0]);															\
 								crossvv(tmp,dPdu,dPdv);														\
-								res->real	=	lengthv(tmp);
+								*res	=	lengthv(tmp);
 
 #define	AREAEXPR_UPDATE			res++;																		\
 								dPdu	+=	3;																\
@@ -299,11 +299,11 @@ DEFFUNC(Area		,"area"			,"f=p"	,AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 									float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
 									float	*dPdv	=	dPdu + numVertices*3;									\
 									float	mult	=	((currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ? (float) -1 : (float) 1);	\
-									duVector(dPdu,(float *) op);												\
-									dvVector(dPdv,(float *) op);
+									duVector(dPdu,op);															\
+									dvVector(dPdv,op);
 
-#define	CALCULATENORMALEXPR			crossvv((float *) res,dPdu,dPdv);											\
-									mulvf((float *) res,mult);
+#define	CALCULATENORMALEXPR			crossvv(res,dPdu,dPdv);														\
+									mulvf(res,mult);
 
 #define	CALCULATENORMALEXPR_UPDATE	res		+=	3;																\
 									dPdu	+=	3;																\
@@ -323,15 +323,15 @@ DEFFUNC(CalculateNormal		,"calculatenormal"			,"p=p"	,CALCULATENORMALEXPR_PRE,CA
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // noise	"f=f"
-#define	NOISE1D1EXPR				res->real	=	FUNCTION(op->real);
-#define	NOISE1D2EXPR				res->real	=	FUNCTION(op1->real,op2->real);
-#define	NOISE1D3EXPR				res->real	=	FUNCTION(&op->real);
-#define	NOISE1D4EXPR				res->real	=	FUNCTION(&op1->real,op2->real);
+#define	NOISE1D1EXPR				*res	=	FUNCTION(*op);
+#define	NOISE1D2EXPR				*res	=	FUNCTION(*op1,*op2);
+#define	NOISE1D3EXPR				*res	=	FUNCTION(op);
+#define	NOISE1D4EXPR				*res	=	FUNCTION(op1,*op2);
 
-#define	NOISE3D1EXPR				FUNCTION(&res->real,op->real);
-#define	NOISE3D2EXPR				FUNCTION(&res->real,op1->real,op2->real);
-#define	NOISE3D3EXPR				FUNCTION(&res->real,&op->real);
-#define	NOISE3D4EXPR				FUNCTION(&res->real,&op1->real,op2->real);
+#define	NOISE3D1EXPR				FUNCTION(res,*op);
+#define	NOISE3D2EXPR				FUNCTION(res,*op1,*op2);
+#define	NOISE3D3EXPR				FUNCTION(res,op);
+#define	NOISE3D4EXPR				FUNCTION(res,op1,*op2);
 
 #define	FUNCTION	noiseFloat
 DEFFUNC(Noise1D1			,"noise"		,"f=f"	,FUN2EXPR_PRE,NOISE1D1EXPR,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
@@ -386,15 +386,15 @@ DEFFUNC(CellNoise3D4			,"cellnoise"		,"v=pf"	,FUN3EXPR_PRE,NOISE3D4EXPR,FUN3EXPR
 #undef FUNCTION
 
 
-#define	PNOISE1D1EXPR				res->real	=	FUNCTION(op1->real,op2->real);
-#define	PNOISE1D2EXPR				res->real	=	FUNCTION(op1->real,op2->real,op3->real,op4->real);
-#define	PNOISE1D3EXPR				res->real	=	FUNCTION(&op1->real,&op2->real);
-#define	PNOISE1D4EXPR				res->real	=	FUNCTION(&op1->real,op2->real,&op3->real,op4->real);
+#define	PNOISE1D1EXPR				*res	=	FUNCTION(*op1,*op2);
+#define	PNOISE1D2EXPR				*res	=	FUNCTION(*op1,*op2,*op3,*op4);
+#define	PNOISE1D3EXPR				*res	=	FUNCTION(op1,op2);
+#define	PNOISE1D4EXPR				*res	=	FUNCTION(op1,*op2,op3,*op4);
 
-#define	PNOISE3D1EXPR				FUNCTION(&res->real,op1->real,op2->real);
-#define	PNOISE3D2EXPR				FUNCTION(&res->real,op1->real,op2->real,op3->real,op4->real);
-#define	PNOISE3D3EXPR				FUNCTION(&res->real,&op1->real,&op2->real);
-#define	PNOISE3D4EXPR				FUNCTION(&res->real,&op1->real,op2->real,&op3->real,op4->real);
+#define	PNOISE3D1EXPR				FUNCTION(res,*op1,*op2);
+#define	PNOISE3D2EXPR				FUNCTION(res,*op1,*op2,*op3,*op4);
+#define	PNOISE3D3EXPR				FUNCTION(res,op1,op2);
+#define	PNOISE3D4EXPR				FUNCTION(res,op1,*op2,op3,*op4);
 
 #define	FUNCTION	pnoiseFloat
 DEFFUNC(PNoise1D1			,"pnoise"		,"f=ff"		,FUN3EXPR_PRE,PNOISE1D1EXPR,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
@@ -425,11 +425,16 @@ DEFFUNC(PNoise3D4			,"pnoise"		,"v=pfpf",	FUN5EXPR_PRE,PNOISE3D4EXPR,FUN5EXPR_UP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ctransform "c=Sc"
 #define	CTRANSFORMEXPR_PRE	const float			*from,*to;											\
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
 							ECoordinateSystem	cSystem;											\
-							FUN3EXPR_PRE															\
-							findCoordinateSystem(op1->string,from,to,cSystem);
+							findCoordinateSystem(*op1,from,to,cSystem);
 							
-#define	CTRANSFORMEXPR		convertColorTo(&res->real,&op2->real,cSystem);
+#define	CTRANSFORMEXPR		convertColorTo(res,op2,cSystem);
 
 DEFFUNC(CTransform		,"ctransform"			,"c=Sc"	,CTRANSFORMEXPR_PRE,CTRANSFORMEXPR,FUN3EXPR_UPDATE(3,0,3),NULL_EXPR,0)
 
@@ -438,12 +443,19 @@ DEFFUNC(CTransform		,"ctransform"			,"c=Sc"	,CTRANSFORMEXPR_PRE,CTRANSFORMEXPR,F
 #define	CTRANSFORMSEXPR_PRE	const float			*from,*to;											\
 							vector				vtmp;												\
 							ECoordinateSystem	cSystemFrom,cSystemTo;								\
-							FUN4EXPR_PRE															\
-							findCoordinateSystem(op1->string,from,to,cSystemFrom);					\
-							findCoordinateSystem(op2->string,from,to,cSystemTo);
+							float				*res;												\
+							const char			**op1;												\
+							const char			**op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const char **);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystemFrom);							\
+							findCoordinateSystem(*op2,from,to,cSystemTo);
 
-#define CTRANSFORMSEXPR		convertColorFrom(vtmp,&op3->real,cSystemFrom);							\
-							convertColorTo(&res->real,vtmp,cSystemTo);
+#define CTRANSFORMSEXPR		convertColorFrom(vtmp,op3,cSystemFrom);									\
+							convertColorTo(res,vtmp,cSystemTo);
 
 
 DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEXPR,FUN4EXPR_UPDATE(3,0,0,3),NULL_EXPR,0)
@@ -452,52 +464,76 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 // transform "p=Sp
 #define	TRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
 							const float			*from,*to;											\
-							FUN3EXPR_PRE;															\
-							findCoordinateSystem(op1->string,from,to,cSystem);
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystem);
 
 
-#define	TRANSFORM1EXPR		mulmp(&res->real,to,&op2->real);
+#define	TRANSFORM1EXPR		mulmp(res,to,op2);
 
 
 #define	TRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=SSp"
-#define	TRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;											\
-							const float			*from1,*to1,*from2,*to2;										\
-							vector				vtmp;															\
-							FUN4EXPR_PRE;																		\
-							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);							\
-							findCoordinateSystem(op2->string,from2,to2,cSystemTo);
+#define	TRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
+							const float			*from1,*to1,*from2,*to2;							\
+							vector				vtmp;												\
+							float				*res;												\
+							const char			**op1;												\
+							const char			**op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const char **);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from1,to1,cSystemFrom);						\
+							findCoordinateSystem(*op2,from2,to2,cSystemTo);
 
-#define	TRANSFORM2EXPR		mulmp(vtmp,from1,&op3->real);														\
-							mulmp(&res->real,to2,vtmp);
+#define	TRANSFORM2EXPR		mulmp(vtmp,from1,op3);													\
+							mulmp(res,to2,vtmp);
 
 #define	TRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=mp"
-#define	TRANSFORM3EXPR		mulmp(&res->real,&op1->real,&op2->real);
+#define	TRANSFORM3EXPR		mulmp(res,op1,op2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transform "p=Smp"
 #define	TRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;											\
 							const float			*from,*to;											\
 							vector				vtmp;												\
-							FUN4EXPR_PRE;															\
-							findCoordinateSystem(op1->string,from,to,cSystem);
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystem);
 
-#define	TRANSFORM4EXPR		mulmp(vtmp,from,&op3->real);											\
-							mulmp(&res->real,&op2->real,vtmp);
+#define	TRANSFORM4EXPR		mulmp(vtmp,from,op3);													\
+							mulmp(res,op2,vtmp);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=Sp
 #define	VTRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
 							const float			*from,*to;											\
-							FUN3EXPR_PRE;															\
-							findCoordinateSystem(op1->string,from,to,cSystem);
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystem);
 
-#define	VTRANSFORM1EXPR		mulmv(&res->real,to,&op2->real);
+#define	VTRANSFORM1EXPR		mulmv(res,to,op2);
 
 
 #define	VTRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);
@@ -507,10 +543,15 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 // ntransform "p=Sp
 #define	NTRANSFORM1EXPR_PRE	ECoordinateSystem	cSystem;											\
 							const float			*from,*to;											\
-							FUN3EXPR_PRE;															\
-							findCoordinateSystem(op1->string,from,to,cSystem);						\
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystem);								\
 
-#define	NTRANSFORM1EXPR		mulmn(&res->real,from,&op2->real);
+#define	NTRANSFORM1EXPR		mulmn(res,from,op2);
 
 #define	NTRANSFORM1EXPR_UPDATE	FUN3EXPR_UPDATE(3,0,3);												\
 
@@ -520,12 +561,19 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 #define VTRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
 							const float			*from1,*to1,*from2,*to2;							\
 							vector				vtmp;												\
-							FUN4EXPR_PRE;															\
-							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);				\
-							findCoordinateSystem(op2->string,from2,to2,cSystemTo);
+							float				*res;												\
+							const char			**op1;												\
+							const char			**op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const char **);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from1,to1,cSystemFrom);						\
+							findCoordinateSystem(*op2,from2,to2,cSystemTo);
 
-#define	VTRANSFORM2EXPR		mulmv(vtmp,from1,&op3->real);											\
-							mulmv(&res->real,to2,vtmp);
+#define	VTRANSFORM2EXPR		mulmv(vtmp,from1,op3);													\
+							mulmv(res,to2,vtmp);
 
 #define VTRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
@@ -534,51 +582,72 @@ DEFFUNC(CTransforms		,"ctransform"			,"c=SSc"	,CTRANSFORMSEXPR_PRE,CTRANSFORMSEX
 #define NTRANSFORM2EXPR_PRE	ECoordinateSystem	cSystemFrom,cSystemTo;								\
 							const float			*from1,*to1,*from2,*to2;							\
 							vector				vtmp;												\
-							FUN4EXPR_PRE;															\
-							findCoordinateSystem(op1->string,from1,to1,cSystemFrom);				\
-							findCoordinateSystem(op2->string,from2,to2,cSystemTo);					\
+							float				*res;												\
+							const char			**op1;												\
+							const char			**op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const char **);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from1,to1,cSystemFrom);						\
+							findCoordinateSystem(*op2,from2,to2,cSystemTo);
 
-#define	NTRANSFORM2EXPR		mulmn(vtmp,to1,&op3->real);												\
-							mulmn(&res->real,from2,vtmp);
+#define	NTRANSFORM2EXPR		mulmn(vtmp,to1,op3);													\
+							mulmn(res,from2,vtmp);
 
 #define NTRANSFORM2EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,0,3);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=mp"
-#define	VTRANSFORM3EXPR		mulmv(&res->real,&op1->real,&op2->real);
+#define	VTRANSFORM3EXPR		mulmv(res,op1,op2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=mp"
 #define	NTRANSFORM3EXPR		matrix	mtmp;							\
-							invertm(mtmp,&op1->real);				\
-							mulmn(&res->real,mtmp,&op2->real);
+							invertm(mtmp,op1);						\
+							mulmn(res,mtmp,op2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vtransform "p=Smp"
-#define	VTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;												\
-							const float			*from,*to;												\
-							vector				vtmp;													\
-							FUN4EXPR_PRE;																\
-							findCoordinateSystem(op1->string,from,to,cSystem);
+#define	VTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;											\
+							const float			*from,*to;											\
+							vector				vtmp;												\
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystem);
 
-#define	VTRANSFORM4EXPR		mulmv(vtmp,from,&op3->real);												\
-							mulmv(&res->real,&op2->real,vtmp);
+#define	VTRANSFORM4EXPR		mulmv(vtmp,from,op3);													\
+							mulmv(res,op2,vtmp);
 
 #define	VTRANSFORM4EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,16,3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ntransform "p=Smp"
-#define	NTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;												\
-							const float			*from,*to;												\
-							matrix				mtmp;													\
-							vector				vtmp;													\
-							FUN4EXPR_PRE;																\
-							findCoordinateSystem(op1->string,from,to,cSystem);
+#define	NTRANSFORM4EXPR_PRE	ECoordinateSystem	cSystem;											\
+							const float			*from,*to;											\
+							matrix				mtmp;												\
+							vector				vtmp;												\
+							float				*res;												\
+							const char			**op1;												\
+							const float			*op2;												\
+							const float			*op3;												\
+							operand(0,res,float *);													\
+							operand(1,op1,const char **);											\
+							operand(2,op2,const float *);											\
+							operand(3,op3,const float *);											\
+							findCoordinateSystem(*op1,from,to,cSystem);
 
-#define	NTRANSFORM4EXPR		invertm(mtmp,&op2->real);													\
-							mulmn(vtmp,to,&op3->real);													\
-							mulmn(&res->real,mtmp,vtmp);
+#define	NTRANSFORM4EXPR		invertm(mtmp,op2);														\
+							mulmn(vtmp,to,op3);														\
+							mulmn(res,mtmp,vtmp);
 
 #define	NTRANSFORM4EXPR_UPDATE	FUN4EXPR_UPDATE(3,0,16,3);
 
@@ -600,7 +669,7 @@ DEFFUNC(NTransform4		,"ntransform"			,"n=Smn"	,NTRANSFORM4EXPR_PRE,NTRANSFORM4EX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // depth "f=p"
-#define DEPTHEXPR		res->real	=	(op[2].real - CRenderer::clipMin) / (CRenderer::clipMax - CRenderer::clipMin);
+#define DEPTHEXPR		*res	=	(op[2] - CRenderer::clipMin) / (CRenderer::clipMax - CRenderer::clipMin);
 
 DEFFUNC(Depth		,"depth"			,"f=p"	,FUN2EXPR_PRE,DEPTHEXPR,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 
@@ -613,12 +682,12 @@ DEFFUNC(Clearlighting			,"clearlighting"				,"o="		,CLEARLIGHTINGEXPR_PRE,NULL_E
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ambient	"c="
 #define	AMBIENTEXPR_PRE		const float		*Clsave;											\
-							TCode			*res;												\
-							operand(0,res);														\
+							float			*res;												\
+							operand(0,res,float *);												\
 							runAmbientLights();													\
 							Clsave = (*alights)->savedState[1];
 
-#define AMBIENTEXPR			movvv(&res->real,Clsave);
+#define AMBIENTEXPR			movvv(res,Clsave);
 
 #define	AMBIENTEXPR_UPDATE	res		+=	3;														\
 							Clsave	+=	3;
@@ -630,19 +699,15 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 #define	DIFFUSEEXPR_PRE		const float		*P,*N,*Cl,*L;										\
 							float			*R;													\
 							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
-							const TCode		*op;												\
-							TCode			*res;												\
 							int				i;													\
 							float			coefficient;										\
 							vector			Ltmp;												\
 							for (i=0;i<numVertices;i++) costheta[i]	=	0;						\
-							operand(0,res);														\
-							operand(1,op);														\
+							operand(0,R,float *);												\
+							operand(1,N,const float *);											\
 							P		=	varying[VARIABLE_P];									\
-							N		=	&op->real;												\
 							runLights(P,N,costheta);											\
 							/* initialize output appropriately */								\
-							R		=	&res->real;												\
 							tags	=	tagStart;												\
 							for (i=0;i<numVertices;i++) {										\
 								if (*tags == 0) initv(R,0,0,0);									\
@@ -685,21 +750,17 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 							float			*R;													\
 							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory); \
 							const float		*cosangle;											\
-							const TCode		*op1,*op2,*op3;										\
-							TCode			*res;												\
+							const float		*op3;												\
 							float			coefficient;										\
 							vector			Ltmp;												\
 							int				i;													\
-							operand(0,res);														\
-							operand(1,op1);														\
-							operand(2,op2);														\
-							operand(3,op3);														\
-							for (i=0;i<numVertices;i++) costheta[i] = (float) cos(op3[i].real);	\
-							P		=	&op1->real;												\
-							N		=	&op2->real;												\
+							operand(0,R,float *);												\
+							operand(1,P,const float *);											\
+							operand(2,N,const float *);											\
+							operand(3,op3,const float *);										\
+							for (i=0;i<numVertices;i++) costheta[i] = (float) cos(op3[i]);		\
 							runLights(P,N,costheta);											\
 							/* initialize output appropriately */								\
-							R		=	&res->real;												\
 							tags 	=	tagStart;												\
 							for (i=0;i<numVertices;i++) {										\
 								if (*tags==0) initv(R,0,0,0);									\
@@ -748,15 +809,15 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 								float			*R,*power;											\
 								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								float			*powers		=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
-								const TCode		*op1,*op2,*op3;										\
-								TCode			*res;												\
+								const float		*op1,*op2,*op3;										\
+								float			*res;												\
 								int				i;													\
 								float			coefficient;										\
 								vector			Ltmp,halfway;										\
-								operand(0,res);														\
-								operand(1,op1);														\
-								operand(2,op2);														\
-								operand(3,op3);														\
+								operand(0,res,float *);												\
+								operand(1,op1,const float *);										\
+								operand(2,op2,const float *);										\
+								operand(3,op3,const float *);										\
 								for (i=0;i<numVertices;i++)	costheta[i]	=	0;						\
 								P		=	varying[VARIABLE_P];									\
 								N		=	&op1->real;												\
@@ -768,7 +829,7 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 								for (i=0;i<numVertices;i++) {										\
 									if (*tags==0) {													\
 										initv(R,0,0,0);												\
-										*power = 10.0f / op3->real;									\
+										*power = 10.0f / *op3;										\
 									}																\
 									R			+=	3;												\
 									op3			+=	1;												\
@@ -781,9 +842,9 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 									enterFastLightingConditional();									\
 									L			=	(*currentLight)->savedState[0];					\
 									Cl			=	(*currentLight)->savedState[1];					\
-									R			=	&res->real;										\
-									N			=	&op1->real;										\
-									V			=	&op2->real;										\
+									R			=	res;											\
+									N			=	op1;											\
+									V			=	op2;											\
 									power		=	powers;											\
 									tags		=	tagStart;
 
@@ -818,23 +879,23 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 								float			*refDir,*R;											\
 								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float),threadMemory);	\
-								const TCode		*op1,*op2,*op3;										\
-								TCode			*res;												\
+								const float		*op1,*op2,*op3;										\
+								float			*res;												\
 								float			coefficient;										\
 								vector			Ltmp;												\
 								int				i;													\
-								operand(0,res);														\
-								operand(1,op1);														\
-								operand(2,op2);														\
-								operand(3,op3);														\
+								operand(0,res,float *);												\
+								operand(1,op1,const float *);										\
+								operand(2,op2,const float *);										\
+								operand(3,op3,const float *);										\
 								for (i=0;i<numVertices;i++)	costheta[i]	=	0;						\
 								P		=	varying[VARIABLE_P];									\
-								N		=	&op1->real;												\
+								N		=	op1;													\
 								runLights(P,N,costheta);											\
 								/* initialize output appropriately */								\
-								R			=	&res->real;											\
-								N			=	&op1->real;											\
-								V			=	&op2->real;											\
+								R			=	res;												\
+								N			=	op1;												\
+								V			=	op2;												\
 								refDir		=	refDirs;											\
 								tags		=	tagStart;											\
 								for (i=0;i<numVertices;i++) {										\
@@ -855,8 +916,8 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 									enterFastLightingConditional();									\
 									L			=	(*currentLight)->savedState[0];					\
 									Cl			=	(*currentLight)->savedState[1];					\
-									R			=	&res->real;										\
-									size		=	&op3->real;										\
+									R			=	res;											\
+									size		=	op3;											\
 									refDir		=	refDirs;										\
 									tags		=	tagStart;
 
@@ -882,20 +943,20 @@ DEFLIGHTFUNC(Phong				,"phong"				,"c=nvf"		,PHONGEXPR_PRE, PHONGEXPR, PHONGEXPR
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // specularBRDF	"c=vnvf"
-#define	SPECULARBRDFEXPR_PRE	TCode			*res;												\
-								const TCode		*op1,*op2,*op3,*op4;								\
+#define	SPECULARBRDFEXPR_PRE	float			*res;												\
+								const float		*op1,*op2,*op3,*op4;								\
 								vector			halfway;											\
-								operand(0,res);														\
-								operand(1,op1);														\
-								operand(2,op2);														\
-								operand(3,op3);														\
-								operand(4,op4);
+								operand(0,res,float *);												\
+								operand(1,op1,const float *);										\
+								operand(2,op2,const float *);										\
+								operand(3,op3,const float *);										\
+								operand(4,op4,const float *);
 
-#define SPECULARBRDFEXPR		addvv(halfway,&op3->real,&op1->real);								\
+#define SPECULARBRDFEXPR		addvv(halfway,op3,op1);												\
 								normalizev(halfway);												\
-								res[0].real	=	(float) pow(max(0,dotvv(&op2->real,halfway)),(10.0f)/op4->real);	\
-								res[1].real	=	res[0].real;										\
-								res[2].real	=	res[1].real;										\
+								res[0]	=	(float) pow(max(0,dotvv(op2,halfway)),(10.0f)/(*op4));	\
+								res[1]	=	res[0];													\
+								res[2]	=	res[1];													\
 
 #define	SPECULARBRDFEXPR_UPDATE	res		+=	3;														\
 								op1		+=	3;														\

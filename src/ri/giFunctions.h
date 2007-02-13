@@ -66,50 +66,53 @@
 								lookup->map					=	NULL;															\
 								lookup->environment			=	NULL;															\
 								{																								\
-									int		i;																					\
-									TCode	*param,*val;																		\
+									int			i;																				\
+									const char	**param;																		\
+									const float	*valf;																			\
+									const char	**vals;																			\
 																																\
 									for (i=0;i<num;i++) {																		\
-										operand(i*2+start,param);																\
-										operand(i*2+start+1,val);																\
+										operand(i*2+start,param,const char **);													\
+										operand(i*2+start+1,valf,const float *);												\
+										operand(i*2+start+1,vals,const char **);												\
 																																\
-										if (strcmp(param->string,"estimator") == 0) {											\
-											lookup->numLookupSamples	=	(int) val->real;									\
-										} else if (strcmp(param->string,"maxdist") == 0) {										\
-											lookup->maxDistance	=	val->real;													\
-										} else if (strcmp(param->string,"maxerror") == 0) {										\
-											lookup->maxError	=	val->real;													\
-										} else if (strcmp(param->string,"samples") == 0) {										\
-											lookup->numSamples	=	(int) val->real;											\
-										} else if (strcmp(param->string,"bias") == 0) {											\
-											lookup->bias		=	val->real;													\
-										} else if (strcmp(param->string,"localThreshold") == 0) {								\
-											lookup->localThreshold	=	val->real;												\
-										} else if (strcmp(param->string,"backgroundColor") == 0) {								\
-											movvv(lookup->backgroundColor,&val->real);											\
-										} else if (strcmp(param->string,"maxBrightness") == 0) {								\
-											lookup->maxBrightness	=	val->real;												\
-										} else if (strcmp(param->string,"minR") == 0) {											\
-											lookup->minFGRadius	=	val->real;													\
-										} else if (strcmp(param->string,"maxR") == 0) {											\
-											lookup->maxFGRadius	=	val->real;													\
-										} else if (strcmp(param->string,"samplebase") == 0) {									\
-											lookup->sampleBase	=	val->real;													\
-										} else if (strcmp(param->string,"global") == 0) {										\
-											lookup->gatherGlobal	=	(int) val->real;										\
-										} else if (strcmp(param->string,"local") == 0) {										\
-											lookup->gatherLocal		=	(int) val->real;										\
-										} else if (strcmp(param->string,"handle") == 0) {										\
-											lookup->handle			=	(const char *) val->string;								\
-										} else if (strcmp(param->string,"filemode") == 0) {										\
-											lookup->filemode		=	(const char *) val->string;								\
-										} else if (strcmp(param->string,"environmentmap") == 0) {								\
-											lookup->environment		=	CRenderer::getEnvironment(val->string);					\
-										} else if (strcmp(param->string,"irradiance") == 0) {									\
+										if (strcmp(*param,"estimator") == 0) {													\
+											lookup->numLookupSamples	=	(int) valf[0];										\
+										} else if (strcmp(*param,"maxdist") == 0) {												\
+											lookup->maxDistance	=	valf[0];													\
+										} else if (strcmp(*param,"maxerror") == 0) {											\
+											lookup->maxError	=	valf[0];													\
+										} else if (strcmp(*param,"samples") == 0) {												\
+											lookup->numSamples	=	(int) valf[0];												\
+										} else if (strcmp(*param,"bias") == 0) {												\
+											lookup->bias		=	val[0];														\
+										} else if (strcmp(*param,"localThreshold") == 0) {										\
+											lookup->localThreshold	=	val[0];													\
+										} else if (strcmp(*param,"backgroundColor") == 0) {										\
+											movvv(lookup->backgroundColor,val);													\
+										} else if (strcmp(*param,"maxBrightness") == 0) {										\
+											lookup->maxBrightness	=	val[0];													\
+										} else if (strcmp(*param,"minR") == 0) {												\
+											lookup->minFGRadius	=	val[0];														\
+										} else if (strcmp(*param,"maxR") == 0) {												\
+											lookup->maxFGRadius	=	val[0];														\
+										} else if (strcmp(*param,"samplebase") == 0) {											\
+											lookup->sampleBase	=	val[0];														\
+										} else if (strcmp(*param,"global") == 0) {												\
+											lookup->gatherGlobal	=	(int) val[0];											\
+										} else if (strcmp(*param,"local") == 0) {												\
+											lookup->gatherLocal		=	(int) val[0];											\
+										} else if (strcmp(*param,"handle") == 0) {												\
+											lookup->handle			=	(const char *) val[0];									\
+										} else if (strcmp(*param,"filemode") == 0) {											\
+											lookup->filemode		=	(const char *) val[0];									\
+										} else if (strcmp(*param,"environmentmap") == 0) {										\
+											lookup->environment		=	CRenderer::getEnvironment(val[0]);						\
+										} else if (strcmp(*param,"irradiance") == 0) {											\
 											lookup->irradianceIndex	=	i*2+start+1;											\
-										} else if (strcmp(param->string,"occlusion") == 0) {									\
+										} else if (strcmp(*param,"occlusion") == 0) {											\
 											lookup->coverageIndex	=	i*2+start+1;											\
-										} else if (strcmp(param->string,"environmentdir") == 0) {								\
+										} else if (strcmp(*param,"environmentdir") == 0) {										\
 											lookup->environmentIndex=	i*2+start+1;											\
 										}																						\
 									}																							\
@@ -119,7 +122,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	TCode			*res,*op1,*op2;																	\
+#define	TRANSMISSIONEXPR_PRE	float			*res,*op1,*op2;																	\
 								CTextureLookup	*lookup;																		\
 								osLock(CRenderer::shaderMutex);																	\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {										\
@@ -128,9 +131,9 @@
 									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);													\
 								}																								\
 								osUnlock(CRenderer::shaderMutex);																\
-								operand(0,res);																					\
-								operand(1,op1);																					\
-								operand(2,op2);																					\
+								operand(0,res,float *);																			\
+								operand(1,op1,float *);																			\
+								operand(2,op2,float *);																			\
 								float	*L	=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);						\
 								int		t;																						\
 								for (t=0;t<numVertices;t++)	subvv(L + t*3,(float *) op1 + t*3,(float *) op2 + t*3);				\

@@ -31,8 +31,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // illumination <P> <begin> <end>  [ <category> ]
-#define ILLUMINATION1RUNLIGHT_PRE	TCode			*lightCat;												\
-									operand(3,lightCat);
+#define ILLUMINATION1RUNLIGHT_PRE	char			**lightCat;												\
+									operand(3,lightCat,char **);
 
 #define ILLUMINATION_RUNLIGHTS		runLights(P,N,costheta);
 
@@ -41,7 +41,6 @@
 #define	ILLUMINATION1EXPR_PRE(lightCatPreExpr,runlightsExpr)												\
 									int				endIndex;												\
 									int				beginIndex;												\
-									TCode			*operand;												\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
 									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)*4,threadMemory);	\
@@ -55,8 +54,7 @@
 									lastConditional->forContinue	=	endIndex;							\
 									lastConditional->forEnd			=	endIndex;							\
 									lastConditional->forExecCount	=	1;									\
-									operand(0,operand);														\
-									P	=	&operand->real;													\
+									operand(0,P,const float *);												\
 									N	=	Ntmp;															\
 									for (i=0;i<numVertices;i++) {											\
 										initv(Ntmp+i*3,0,0,1);												\
@@ -95,14 +93,13 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // illumination <P> <axis> <angle> <begin> <end>  [ <category> ]
-#define ILLUMINATION2RUNLIGHT_PRE	TCode			*lightCat;												\
-									operand(5,lightCat);
+#define ILLUMINATION2RUNLIGHT_PRE	char			**lightCat;												\
+									operand(5,lightCat,char **);
 
 #define	ILLUMINATION2EXPR_PRE(lightCatPreExpr,runlightsExpr)												\
 									int				endIndex;												\
 									int				beginIndex;												\
-									TCode			*operand;												\
-									const TCode		*axis,*angle;											\
+									const float		*angle;													\
 									int				i;														\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
@@ -115,12 +112,10 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 									lastConditional->forContinue	=	endIndex;							\
 									lastConditional->forEnd			=	endIndex;							\
 									lastConditional->forExecCount	=	1;									\
-									operand(0,operand);														\
-									operand(1,axis);														\
-									operand(2,angle);														\
-									P	=	&operand->real;													\
-									N	=	&axis->real;													\
-									for (i=0;i<numVertices;i++) costheta[i]	=	(float) cos(angle[i].real);	\
+									operand(0,P,const float *);												\
+									operand(1,N,const float *);												\
+									operand(2,angle,const float *);											\
+									for (i=0;i<numVertices;i++) costheta[i]	=	(float) cos(angle[i]);		\
 									runlightsExpr;															\
 									if ((*currentLight=*lights) != NULL) {									\
 										enterLightingConditional();											\
@@ -213,14 +208,12 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // illuminate <P> <end>
 // always execute (no shadow checking)
-#define	ILLUMINATE1EXPR_PRE			const TCode	*P;														\
+#define	ILLUMINATE1EXPR_PRE			const float	*Pl;													\
 									int			i;														\
-									const float	*Pl;													\
 																										\
-									operand(0,P);														\
-									Pl	=	(float *) P;												\
+									operand(0,Pl,const float *);										\
 																										\
-									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {				\
 										illuminateBegin(Pl,NULL,NULL);									\
 									} else {															\
 										float		*Ps			=	varying[VARIABLE_PS];				\
@@ -265,20 +258,14 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 #ifdef INIT_SHADING
 #define	ILLUMINATE3EXPR_PRE
 #else
-#define	ILLUMINATE3EXPR_PRE			const TCode	*P,*N,*theta;											\
+#define	ILLUMINATE3EXPR_PRE			const float	*Pf,*Nf,*thetaf;										\
 									int			i;														\
-									const float	*Pf;													\
-									const float	*Nf;													\
-									const float	*thetaf;												\
 																										\
-									operand(0,P);														\
-									operand(1,N);														\
-									operand(2,theta);													\
-									Pf		=	&P->real;												\
-									Nf		=	&N->real;												\
-									thetaf	=	&theta->real;											\
+									operand(0,Pf,const float *);										\
+									operand(1,Nf,const float *);										\
+									operand(2,thetaf,const float *);									\
 																										\
-									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {					\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {				\
 										illuminateBegin(Pf,Nf,thetaf);									\
 									} else {															\
 										float		*Ps		=	varying[VARIABLE_PS];					\
@@ -327,13 +314,12 @@ DEFOPCODE(Illuminate3	,"illuminate"	,4, ILLUMINATE3EXPR_PRE, NULL_EXPR, NULL_EXP
 #ifdef INIT_SHADING
 #define	ILLUMINATEEND_PRE
 #else
-#define	ILLUMINATEEND_PRE			if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
+#define	ILLUMINATEEND_PRE			if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
 										illuminateEnd();										\
 									} else {													\
-										const float		*L;										\
+										const float		*L =	varying[VARIABLE_L];			\
 										float 			*Lsave;									\
 										int				i;										\
-										L	=	varying[VARIABLE_L];							\
 																								\
 										saveLighting(Lsave);									\
 										for (i=0;i<numVertices;i++,tags++) {					\
@@ -418,18 +404,13 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 #ifdef INIT_SHADING
 #define	SOLAR2EXPR_PRE
 #else
-#define	SOLAR2EXPR_PRE				const TCode	*N,*theta;										\
+#define	SOLAR2EXPR_PRE				const float	*Nf,*thetaf;									\
 									int			i;												\
-									const float	*Nf;											\
-									const float	*thetaf;										\
 																								\
-									operand(0,N);												\
-									operand(1,theta);											\
+									operand(0,Nf,const float *);								\
+									operand(1,thetaf,const float *);							\
 																								\
-									Nf		=	&N->real;										\
-									thetaf	=	&theta->real;									\
-																								\
-									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
+									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
 										solarBegin(Nf,thetaf);									\
 									} else {													\
 										vector		R;											\
@@ -515,61 +496,38 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 
 
 
-#define	PFROMEXPR_PRE		TCode				*res,*sys,*op;						\
+#define	PFROMEXPR_PRE		float				*res;								\
+							const float			*op;								\
+							const char			**sys;								\
 							const float			*from,*to;							\
 							ECoordinateSystem	cSystem;							\
-							operand(0,res);											\
-							operand(1,sys);											\
-							operand(2,op);											\
-							findCoordinateSystem(sys->string,from,to,cSystem);
+							operand(0,res,float *);									\
+							operand(1,sys,const char **);							\
+							operand(2,op,const float *);							\
+							findCoordinateSystem(*sys,from,to,cSystem);
 
-#define	PFROMEXPR			mulmp(&res->real,from,&op->real);
+#define	PFROMEXPR			mulmp(res,from,op);
 
 #define	PFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;
 
 #define	PFROMEXPR_POST
 
-#define	CFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							const float			*from,*to;							\
-							ECoordinateSystem	cSystem;							\
-							operand(0,res);											\
-							operand(1,sys);											\
-							operand(2,op);											\
-							findCoordinateSystem(sys->string,from,to,cSystem);
-
-#define	CFROMEXPR			convertColorFrom(&res->real,&op->real,cSystem);
+#define	CFROMEXPR			convertColorFrom(res,op,cSystem);
 
 #define	CFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;
 
 #define	CFROMEXPR_POST
 
-
-#define	MFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							const float			*from,*to;							\
-							ECoordinateSystem	cSystem;							\
-							operand(0,res);											\
-							operand(1,sys);											\
-							operand(2,op);											\
-							findCoordinateSystem(sys->string,from,to,cSystem);
-
-#define	MFROMEXPR			mulmm(&res->real,from,&op->real);
+#define	MFROMEXPR			mulmm(res,from,op);
 
 #define	MFROMEXPR_UPDATE	res	+=	16;												\
 							op	+=	16;
 
 #define	MFROMEXPR_POST
 
-#define	VFROMEXPR_PRE		TCode				*res,*sys,*op;						\
-							const float			*from,*to;							\
-							ECoordinateSystem	cSystem;							\
-							operand(0,res);											\
-							operand(1,sys);											\
-							operand(2,op);											\
-							findCoordinateSystem(sys->string,from,to,cSystem);
-
-#define	VFROMEXPR			mulmv(&res->real,from,&op->real);
+#define	VFROMEXPR			mulmv(res,from,op);
 
 #define	VFROMEXPR_UPDATE	res	+=	3;												\
 							op	+=	3;
@@ -577,10 +535,10 @@ DEFOPCODE(EndSolar	,"endsolar"	,0, SOLAREND_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR
 #define	VFROMEXPR_POST
 
 
-DEFOPCODE(CFrom		,"cfrom"	,3, CFROMEXPR_PRE,CFROMEXPR,CFROMEXPR_UPDATE,CFROMEXPR_POST,0)
-DEFOPCODE(VFrom		,"vfrom"	,3, VFROMEXPR_PRE,VFROMEXPR,VFROMEXPR_UPDATE,VFROMEXPR_POST,0)
+DEFOPCODE(CFrom		,"cfrom"	,3, PFROMEXPR_PRE,CFROMEXPR,CFROMEXPR_UPDATE,CFROMEXPR_POST,0)
+DEFOPCODE(VFrom		,"vfrom"	,3, PFROMEXPR_PRE,VFROMEXPR,VFROMEXPR_UPDATE,VFROMEXPR_POST,0)
 DEFOPCODE(PFrom		,"pfrom"	,3, PFROMEXPR_PRE,PFROMEXPR,PFROMEXPR_UPDATE,PFROMEXPR_POST,0)
-DEFOPCODE(MFrom		,"mfrom"	,3, MFROMEXPR_PRE,MFROMEXPR,MFROMEXPR_UPDATE,MFROMEXPR_POST,0)
+DEFOPCODE(MFrom		,"mfrom"	,3, PFROMEXPR_PRE,MFROMEXPR,MFROMEXPR_UPDATE,MFROMEXPR_POST,0)
 
 #include "giOpcodes.h"
 
