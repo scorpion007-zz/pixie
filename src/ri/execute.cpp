@@ -225,7 +225,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											}
 
 // Retrieve the parameterlist
-#define		parameterlist					cInstance->parameterLists[code[1].arguments.plNumber]
+#define		parameterlist					cInstance->parameterLists[code->plNumber]
 
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
 												osLock(CRenderer::dirtyShaderMutex);								\

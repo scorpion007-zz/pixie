@@ -974,28 +974,33 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 
 #ifndef INIT_SHADING
 
+
+////////////////////
+// FIXME: Not 64 bit compatible
 #define	PARAMETEREXPR_PRE(accessor)																			\
-								TCode		*res,*op1,*op2;													\
-								const TCode	*src;															\
+								float		*res;															\
+								const char	**op1;															\
+								float	*op2;																\
+								const float	*src;															\
 								int			srcStep,op2Step;												\
 								float		found;															\
 								CVariable	*cVar = NULL;													\
 								int			globalIndex = -1;												\
-								operand(0,res);																\
-								operand(1,op1);																\
-								operandSize(2,op2,op2Step);													\
+								operand(0,res,float *);														\
+								operand(1,op1,const char **);												\
+								operandSize(2,op2,op2Step,float *);											\
 								src		= op2;																\
 								srcStep = op2Step;															\
 																											\
-								found		=	(float) FUNCTION(op2,op1->string,&cVar,&globalIndex);		\
+								found		=	(float) FUNCTION(op2,*op1,&cVar,&globalIndex);				\
 																											\
 								if (found != 0) {															\
 									srcStep					=	0;											\
 									if (cVar != NULL) {														\
 										if (cVar->storage == STORAGE_PARAMETER || cVar->storage == STORAGE_MUTABLEPARAMETER) { 				\
-											src					=	(TCode *) currentShadingState->locals[accessor][cVar->entry];			\
+											src					=	currentShadingState->locals[accessor][cVar->entry];						\
 										} else {																							\
-											src					=	(TCode *) varying[cVar->entry];											\
+											src					=	varying[cVar->entry];													\
 										}																									\
 										srcStep				=	cVar->numFloats;															\
 										if ((cVar->container == CONTAINER_UNIFORM) || (cVar->container == CONTAINER_CONSTANT)) {			\
@@ -1009,24 +1014,26 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 									}																		\
 								}
 
-#define LIGHTPARAMETEREXPR_PRE	TCode		*res,*op1,*op2;													\
-								const TCode	*src;															\
+#define LIGHTPARAMETEREXPR_PRE	float		*res;															\
+								const char	**op1;															\
+								float		*op2;															\
+								const float	*src;															\
 								int			srcStep,op2Step;												\
 								float		found;															\
 								CVariable	*cVar = NULL;													\
 								int			globalIndex = -1;												\
-								operand(0,res);																\
-								operand(1,op1);																\
-								operandSize(2,op2,op2Step);													\
+								operand(0,res,float *);														\
+								operand(1,op1,const char **);												\
+								operandSize(2,op2,op2Step,float *);											\
 								src		= op2;																\
 								srcStep = op2Step;															\
 																											\
-								found		=	(float) (*currentLight)->instance->getParameter(op1->string,op2,&cVar,&globalIndex);\
+								found		=	(float) (*currentLight)->instance->getParameter(*op1,op2,&cVar,&globalIndex);\
 																											\
 								if (found != 0) {															\
 									srcStep				=	0;												\
 									if (cVar != NULL) {														\
-										src					=	(TCode *) (*currentLight)->savedState[2+globalIndex];					\
+										src					=	(*currentLight)->savedState[2+globalIndex];								\
 										srcStep				=	cVar->numFloats;														\
 										if ((cVar->container == CONTAINER_UNIFORM) || (cVar->container == CONTAINER_CONSTANT)) {		\
 											srcStep	=	0;													\
@@ -1039,18 +1046,18 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 									}																		\
 								}
 
-#define	PARAMETEREXPRF			res->real	=	found;												\
+#define	PARAMETEREXPRF			*res		=	found;												\
 								*op2		=	*src;
 
-#define	PARAMETEREXPRS			res->real	=	found;												\
+#define	PARAMETEREXPRS			*res		=	found;												\
 								*op2		=	*src;
 
-#define	PARAMETEREXPRV			res->real	=	found;												\
+#define	PARAMETEREXPRV			*res		=	found;												\
 								op2[0]		=	src[0];												\
 								op2[1]		=	src[1];												\
 								op2[2]		=	src[2];
 
-#define	PARAMETEREXPRM			res->real	=	found;												\
+#define	PARAMETEREXPRM			*res		=	found;												\
 								op2[0]		=	src[0];												\
 								op2[1]		=	src[1];												\
 								op2[2]		=	src[2];												\
@@ -1188,19 +1195,28 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 
 #ifndef INIT_SHADING
 
-#define	TEXTUREINFO_PRE			FUN4OUTEXPR_PRE														\
+#define	TEXTUREINFO_PRE(_t)		float				*res;											\
+								const char			**op1;											\
+								const char			**op2;											\
+								_t					op3;											\
 								float				found;											\
 								CTextureInfoBase	*textureInfo;									\
-								TCode				out[16*2];										\
-								TCode				*src = &out[0];									\
+								float				out[16*2];										\
+								char				*outS;											\
+								_t					src = (_t) out;									\
+																									\
 								CTextureInfoLookup	*lookup;										\
+								operand(0,res,float *);												\
+								operand(2,op2,const char **);										\
+								operand(3,op3,_t);													\
 								osLock(CRenderer::shaderMutex);										\
 								if ((lookup = (CTextureInfoLookup *) parameterlist) == NULL) {		\
 									/* cache the texture lookup */									\
 									lookup					=	new CTextureInfoLookup;				\
 									parameterlist			=	lookup;								\
 									dirty();														\
-									lookup->textureInfo		=	CRenderer::getTextureInfo(op1->string);\
+									operand(1,op1,const char **);									\
+									lookup->textureInfo		=	CRenderer::getTextureInfo(*op1);	\
 								}																	\
 								osUnlock(CRenderer::shaderMutex);									\
 																									\
@@ -1211,40 +1227,41 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 								} else {															\
 									int	i;															\
 																									\
-									for (i=0;i<16*2;i++) out[i].real = 0;							\
+									for (i=0;i<16*2;i++) out[i] = 0;								\
 																									\
 									found				=	1;										\
 																									\
-									if (strcmp(op2->string,"resolution") == 0) {					\
-										textureInfo->getResolution(&out[0].real);					\
-									} else if (strcmp(op2->string,"type") == 0) {					\
-										out[0].string	=	textureInfo->getTextureType();			\
-									} else if (strcmp(op2->string,"channels") == 0) {				\
-										out[0].real		=	(float) textureInfo->getNumChannels();	\
-									} else if (strcmp(op2->string,"viewingmatrix") == 0) {			\
-										found = (float) textureInfo->getViewMatrix(&out[0].real);	\
-									} else if (strcmp(op2->string,"projectionmatrix") == 0) {		\
-										found = (float) textureInfo->getProjectionMatrix(&out[0].real);		\
-									} else if (strcmp(op2->string,"exists") == 0) {					\
-										src		=	op3;	/* prevent writing result */			\
+									if (strcmp(*op2,"resolution") == 0) {							\
+										textureInfo->getResolution(out);							\
+									} else if (strcmp(*op2,"type") == 0) {							\
+										outS		=	textureInfo->getTextureType();				\
+										src			=	(_t) &outS;									\
+									} else if (strcmp(*op2,"channels") == 0) {						\
+										out[0]		=	(float) textureInfo->getNumChannels();		\
+									} else if (strcmp(*op2,"viewingmatrix") == 0) {					\
+										found		= (float) textureInfo->getViewMatrix(out);		\
+									} else if (strcmp(*op2,"projectionmatrix") == 0) {				\
+										found		= (float) textureInfo->getProjectionMatrix(out);\
+									} else if (strcmp(*op2,"exists") == 0) {						\
+										src			=	op3;	/* prevent writing result */		\
 									} else {														\
 										found	=	0;												\
 										src		=	op3;	/* prevent writing result */			\
 									}																\
 								}
 
-#define	TEXTUREINFOF			res->real	=	found;												\
+#define	TEXTUREINFOF			*res		=	found;												\
 								*op3		=	src[0];
 
-#define	TEXTUREINFOS			res->real	=	found;												\
+#define	TEXTUREINFOS			*res		=	found;												\
 								*op3		=	src[0];
 
-#define	TEXTUREINFOV			res->real	=	found;												\
+#define	TEXTUREINFOV			*res		=	found;												\
 								op3[0]		=	src[0];												\
 								op3[1]		=	src[1];												\
 								op3[2]		=	src[2];
 
-#define	TEXTUREINFOM			res->real	=	found;												\
+#define	TEXTUREINFOM			*res		=	found;												\
 								op3[0]		=	src[0];												\
 								op3[1]		=	src[1];												\
 								op3[2]		=	src[2];												\
@@ -1286,28 +1303,37 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 DEFLINKFUNC(Textureinfo2			,"textureinfo"				,"f=SSC!",	0)
 DEFLINKFUNC(Textureinfo3			,"textureinfo"				,"f=SSN!",	0)
 DEFLINKFUNC(Textureinfo4			,"textureinfo"				,"f=SSP!",	0)
-DEFFUNC(TextureinfoV				,"textureinfo"				,"f=SSV!"	,TEXTUREINFO_PRE,TEXTUREINFOV,TEXTUREINFO_UPDATE(1,3),NULL_EXPR,0)
-DEFFUNC(Textureinfo					,"textureinfo"				,"f=SSF!"	,TEXTUREINFO_PRE,TEXTUREINFOF,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
-DEFFUNC(TextureinfoS				,"textureinfo"				,"f=SSS!"	,TEXTUREINFO_PRE,TEXTUREINFOS,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
-DEFFUNC(TextureinfoM				,"textureinfo"				,"f=SSM!"	,TEXTUREINFO_PRE,TEXTUREINFOM,TEXTUREINFO_UPDATE(1,16),NULL_EXPR,0)
+DEFFUNC(TextureinfoV				,"textureinfo"				,"f=SSV!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOV,TEXTUREINFO_UPDATE(1,3),NULL_EXPR,0)
+DEFFUNC(Textureinfo					,"textureinfo"				,"f=SSF!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOF,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(TextureinfoS				,"textureinfo"				,"f=SSS!"	,TEXTUREINFO_PRE(char **),TEXTUREINFOS,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(TextureinfoM				,"textureinfo"				,"f=SSM!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOM,TEXTUREINFO_UPDATE(1,16),NULL_EXPR,0)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // shadername	"s="
-#define SHADERNAMEEXPR		res->string	=	(char *) currentShader->name;
+#define SHADERNAMEEXPR_PRE	char	**res;								\
+							operand(0,res,char **);
 
-DEFFUNC(ShaderName				,"shadername"					,"s="		,FUN1EXPR_PRE,SHADERNAMEEXPR,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
+#define SHADERNAMEEXPR		*res	=	(char *) currentShader->name;
+
+DEFFUNC(ShaderName				,"shadername"					,"s="		,SHADERNAMEEXPR_PRE,SHADERNAMEEXPR,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // shadername	"s=s"
 #ifndef INIT_SHADING
-#define SHADERNAMESEXPR		res->string	=	(char *) shaderName(op->string);
+#define SHADERNAMESEXPR_PRE	char	**res,**op;								\
+							operand(0,res,char **);							\
+							operand(1,op,char **);
+
+#define SHADERNAMESEXPR		*res	=	(char *) shaderName(*op);
 #else
+#undef SHADERNAMESEXPR_PRE
 #undef SHADERNAMESEXPR
+#define SHADERNAMESEXPR_PRE
 #define SHADERNAMESEXPR
 #endif
 
-DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAMESEXPR,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 
 
 
@@ -1347,36 +1373,39 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 								lookup->texture			=	NULL;												\
 								lookup->environment		=	NULL;												\
 								{																				\
-									int		i;																	\
-									TCode	*param,*val;														\
+									int			i;																\
+									const char	**param;														\
+									const float	*valf;															\
+									const char	**vals;															\
 																												\
 									for (i=0;i<num;i++) {														\
-										operand(i*2+start,param);												\
-										operand(i*2+start+1,val);												\
+										operand(i*2+start,param,const char **);									\
+										operand(i*2+start+1,valf,const float *);								\
+										operand(i*2+start+1,vals,const char **);								\
 																												\
-										if (strcmp(param->string,"filter") == 0) {								\
-											lookup->filter	=	CRenderer::getFilter(val->string);					\
-										} else if (strcmp(param->string,"blur") == 0) {							\
-											lookup->blur		=	val->real;									\
-											lookup->coneAngle	=	(float) (C_PI*val->real);					\
-										} else if (strcmp(param->string,"width") == 0) {						\
-											lookup->width		=	val->real;									\
-										} else if (strcmp(param->string,"swidth") == 0) {						\
-											lookup->swidth		=	val->real;									\
-										} else if (strcmp(param->string,"fill") == 0) {							\
-											lookup->fill			=	val->real;								\
-										} else if (strcmp(param->string,"twidth") == 0) {						\
-											lookup->twidth		=	val->real;									\
-										} else if (strcmp(param->string,"samples") == 0) {						\
-											lookup->numSamples	=	(int) val->real;							\
-										} else if (strcmp(param->string,"bias") == 0) {							\
-											lookup->shadowBias	=	val->real;									\
-										} else if (strcmp(param->string,"maxdist") == 0) {						\
-											lookup->maxDist		=	val->real;									\
-										} else if (strcmp(param->string,"samplecone") == 0) {					\
-											lookup->coneAngle	=	val->real;									\
-										} else if (strcmp(param->string,"label") == 0) {						\
-											lookup->label		=	val->string;								\
+										if (strcmp(*param,"filter") == 0) {										\
+											lookup->filter	=	CRenderer::getFilter(*vals);					\
+										} else if (strcmp(*param,"blur") == 0) {								\
+											lookup->blur		=	*valf;										\
+											lookup->coneAngle	=	(float) (C_PI*(*valf));						\
+										} else if (strcmp(*param,"width") == 0) {								\
+											lookup->width		=	*valf;										\
+										} else if (strcmp(*param,"swidth") == 0) {								\
+											lookup->swidth		=	*valf;										\
+										} else if (strcmp(*param,"fill") == 0) {								\
+											lookup->fill			=	*valf;									\
+										} else if (strcmp(*param,"twidth") == 0) {								\
+											lookup->twidth		=	*valf;										\
+										} else if (strcmp(*param,"samples") == 0) {								\
+											lookup->numSamples	=	(int) *valf;								\
+										} else if (strcmp(*param,"bias") == 0) {								\
+											lookup->shadowBias	=	*valf;										\
+										} else if (strcmp(*param,"maxdist") == 0) {								\
+											lookup->maxDist		=	*valf;										\
+										} else if (strcmp(*param,"samplecone") == 0) {							\
+											lookup->coneAngle	=	*valf;										\
+										} else if (strcmp(*param,"label") == 0) {								\
+											lookup->label		=	*vals;										\
 										}																		\
 									}																			\
 								}
@@ -1385,32 +1414,31 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"f=SFff"
 #ifndef INIT_SHADING
-#define	TEXTUREFEXPR_PRE		TCode			*res;															\
-								const TCode		*op3,*op4;														\
+#define	TEXTUREFEXPR_PRE		float			*res;															\
+								const float		*s,*t;															\
 								CTextureLookup	*lookup;														\
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
-									TCode		*op1,*op2;														\
+									const char	**op1;															\
+									const float	*op2;															\
 									argumentcount(numArguments);												\
 									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
-									operand(1,op1);																\
-									operand(2,op2);																\
-									lookup->texture				=	CRenderer::getTexture(op1->string);			\
-									lookup->channel				=	(int) op2->real;							\
+									operand(1,op1,const char **);												\
+									operand(2,op2,const float *);												\
+									lookup->texture				=	CRenderer::getTexture(*op1);				\
+									lookup->channel				=	(int) *op2;									\
 									lookup->lookupFloat			=	TRUE;										\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
-								operand(0,res);																	\
-								operand(3,op3);																	\
-								operand(4,op4);																	\
+								operand(0,res,float *);															\
+								operand(3,s,const float *);													\
+								operand(4,t,const float *);													\
 								int				i;																\
 								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
-								const float		*s			=	(const float *) op3;							\
-								const float		*t			=	(const float *) op4;							\
 								float			cs[4],ct[4];													\
 								vector			color;															\
 								const	float	swidth		=	lookup->swidth;									\
@@ -1442,7 +1470,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,FUN2EXPR_PRE,SHADERNAMESEXPR,F
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
 								tex->lookup4(color,cs,ct,lookup,this);											\
-								res[i].real	=	color[0];
+								res[i]		=	color[0];
 
 #define	TEXTUREFEXPR_UPDATE		i++;
 #else
@@ -1464,32 +1492,31 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"c=SFff"
 #ifndef INIT_SHADING
-#define	TEXTURECEXPR_PRE		TCode			*res;															\
-								const TCode		*op3,*op4;														\
+#define	TEXTURECEXPR_PRE		float			*res;															\
+								const float		*s,*t;															\
 								CTextureLookup	*lookup;														\
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
-									TCode		*op1,*op2;														\
+									const char	**op1;															\
+									const float	*op2;															\
 									argumentcount(numArguments);												\
 									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
-									operand(1,op1);																\
-									operand(2,op2);																\
-									lookup->texture				=	CRenderer::getTexture(op1->string);			\
-									lookup->channel				=	(int) op2->real;							\
+									operand(1,op1,const char **);												\
+									operand(2,op2,const float *);												\
+									lookup->texture				=	CRenderer::getTexture(*op1);				\
+									lookup->channel				=	(int) *op2;									\
 									lookup->lookupFloat			=	FALSE;										\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
-								operand(0,res);																	\
-								operand(3,op3);																	\
-								operand(4,op4);																	\
+								operand(0,res,float *);															\
+								operand(3,s,const float *);														\
+								operand(4,t,const float *);														\
 								int				i;																\
 								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
-								const float		*s			=	(const float *) op3;							\
-								const float		*t			=	(const float *) op4;							\
 								float			cs[4],ct[4];													\
 								const	float	swidth		=	lookup->swidth;									\
 								const	float	twidth		=	lookup->twidth;									\
@@ -1519,7 +1546,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4((float *) res,cs,ct,lookup,this);
+								tex->lookup4(res,cs,ct,lookup,this);
 
 #define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;
 #else
@@ -1554,45 +1581,46 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"f=SFffffffff"
 #ifndef INIT_SHADING
-#define	TEXTUREFFULLEXPR_PRE	TCode			*res;															\
-								const TCode		*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;						\
+#define	TEXTUREFFULLEXPR_PRE	float			*res;															\
+								const float		*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;						\
 								CTextureLookup	*lookup;														\
 								float			cs[4],ct[4];													\
 								vector			tmp;															\
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
-									TCode		*op1,*op2;														\
+									const char	**op1;															\
+									const float	*op2;															\
 									argumentcount(numArguments);												\
 									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
-									operand(1,op1);																\
-									operand(2,op2);																\
-									lookup->texture				=	CRenderer::getTexture(op1->string);			\
-									lookup->channel				=	(int) op2->real;							\
+									operand(1,op1,const char **);												\
+									operand(2,op2,const float *);												\
+									lookup->texture				=	CRenderer::getTexture(*op1);				\
+									lookup->channel				=	(int) *op2;									\
 									lookup->lookupFloat			=	TRUE;										\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								CTexture		*tex		=	lookup->texture;								\
-								operand(0,res);																	\
-								operand(3,op3);																	\
-								operand(4,op4);																	\
-								operand(5,op5);																	\
-								operand(6,op6);																	\
-								operand(7,op7);																	\
-								operand(8,op8);																	\
-								operand(9,op9);																	\
-								operand(10,op10);
+								operand(0,res,float *);															\
+								operand(3,op3,const float *);													\
+								operand(4,op4,const float *);													\
+								operand(5,op5,const float *);													\
+								operand(6,op6,const float *);													\
+								operand(7,op7,const float *);													\
+								operand(8,op8,const float *);													\
+								operand(9,op9,const float *);													\
+								operand(10,op10,const float *);
 
-#define	TEXTUREFFULLEXPR		cs[0]		=	op3->real;														\
-								cs[1]		=	op5->real;														\
-								cs[2]		=	op7->real;														\
-								cs[3]		=	op9->real;														\
-								ct[0]		=	op4->real;														\
-								ct[1]		=	op6->real;														\
-								ct[2]		=	op8->real;														\
-								ct[3]		=	op10->real;														\
+#define	TEXTUREFFULLEXPR		cs[0]		=	*op3;															\
+								cs[1]		=	*op5;															\
+								cs[2]		=	*op7;															\
+								cs[3]		=	*op9;															\
+								ct[0]		=	*op4;															\
+								ct[1]		=	*op6;															\
+								ct[2]		=	*op8;															\
+								ct[3]		=	*op10;															\
 								tex->lookup4(tmp,cs,ct,lookup,this);											\
-								res->real	=	tmp[0];
+								*res	=	tmp[0];
 
 #define	TEXTUREFFULLEXPR_UPDATE	res++;																			\
 								op3++;																			\
@@ -1625,43 +1653,44 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"c=SFffffffff"
 #ifndef INIT_SHADING
-#define	TEXTURECFULLEXPR_PRE	TCode			*res;															\
-								const TCode		*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;						\
+#define	TEXTURECFULLEXPR_PRE	float			*res;															\
+								const float		*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;						\
 								CTextureLookup	*lookup;														\
 								float			cs[4],ct[4];													\
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
 									int			numArguments;													\
-									TCode		*op1,*op2;														\
+									const char	**op1;															\
+									const float	*op2;															\
 									argumentcount(numArguments);												\
 									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
-									operand(1,op1);																\
-									operand(2,op2);																\
-									lookup->texture				=	CRenderer::getTexture(op1->string);			\
-									lookup->channel				=	(int) op2->real;							\
+									operand(1,op1,const char **);												\
+									operand(2,op2,const float *);												\
+									lookup->texture				=	CRenderer::getTexture(*op1);				\
+									lookup->channel				=	(int) *op2;									\
 									lookup->lookupFloat			=	FALSE;										\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								CTexture		*tex		=	lookup->texture;								\
-								operand(0,res);																	\
-								operand(3,op3);																	\
-								operand(4,op4);																	\
-								operand(5,op5);																	\
-								operand(6,op6);																	\
-								operand(7,op7);																	\
-								operand(8,op8);																	\
-								operand(9,op9);																	\
-								operand(10,op10);
+								operand(0,res,float *);															\
+								operand(3,op3,const float *);													\
+								operand(4,op4,const float *);													\
+								operand(5,op5,const float *);													\
+								operand(6,op6,const float *);													\
+								operand(7,op7,const float *);													\
+								operand(8,op8,const float *);													\
+								operand(9,op9,const float *);													\
+								operand(10,op10,const float *);
 
-#define	TEXTURECFULLEXPR		cs[0]		=	op3->real;														\
-								cs[1]		=	op5->real;														\
-								cs[2]		=	op7->real;														\
-								cs[3]		=	op9->real;														\
-								ct[0]		=	op4->real;														\
-								ct[1]		=	op6->real;														\
-								ct[2]		=	op8->real;														\
-								ct[3]		=	op10->real;														\
-								tex->lookup4((float *) res,cs,ct,lookup,this);
+#define	TEXTURECFULLEXPR		cs[0]		=	*op3;															\
+								cs[1]		=	*op5;															\
+								cs[2]		=	*op7;															\
+								cs[3]		=	*op9;															\
+								ct[0]		=	*op4;															\
+								ct[1]		=	*op6;															\
+								ct[2]		=	*op8;															\
+								ct[3]		=	*op10;															\
+								tex->lookup4(res,cs,ct,lookup,this);
 
 #define	TEXTURECFULLEXPR_UPDATE	res	+=	3;																		\
 								op3++;																			\
@@ -1710,23 +1739,24 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 // environment	"f=SFv"
 #ifndef INIT_SHADING
 #define	ENVIRONMENTFEXPR_PRE	CTextureLookup	*lookup;															\
-								TCode			*res;																\
-								const TCode		*op3;																\
+								float			*res;																\
+								const float		*op3;																\
 								int				i;																	\
 								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
-									TCode			*op2,*op1;														\
+									const char		**op2;															\
+									const float		*op1;															\
 									int				numArguments;													\
 									argumentcount(numArguments);													\
 									TEXTUREPARAMETERS(4,(numArguments-4) >> 1);										\
-									operand(1,op1);																	\
-									operand(2,op2);																	\
-									lookup->channel				=	(int) op2->real;								\
+									operand(1,op1,const char **);													\
+									operand(2,op2,const float *);													\
+									lookup->channel				=	(int) *op2;										\
 									lookup->lookupFloat			=	TRUE;											\
-									if ((strcmp(op1->string,"raytrace")==0) || (strcmp(op1->string,"reflection") == 0)) {		\
+									if ((strcmp(*op1,"raytrace")==0) || (strcmp(*op1,"reflection") == 0)) {			\
 										lookup->environment		=	NULL;											\
 									} else {																		\
-										lookup->environment		=	CRenderer::getEnvironment(op1->string);			\
+										lookup->environment		=	CRenderer::getEnvironment(*op1);				\
 									}																				\
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
