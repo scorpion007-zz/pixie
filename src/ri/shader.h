@@ -360,7 +360,6 @@ public:
 
 		void					*memory;						// The memory base allocated for this shader
 		TCode					*codeArea;						// The code array
-		TArgument				*argumentsArea;					// The argument array
 
 		void					**constantEntries;				// The constant entries
 

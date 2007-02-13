@@ -2827,7 +2827,7 @@ void	reset() {
 	if (currentData.memory != NULL)		delete [] currentData.memory;
 
 	// Clear currentData
-	memset(&currentData,sizeof(TShaderData),0);
+	memset(&currentData,0,sizeof(TShaderData));
 }
 
 ///////////////////////////////////////////////////////////////////////
