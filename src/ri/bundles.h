@@ -126,8 +126,8 @@ public:
 
 	CGatherRay		*raysBase;
 	CRay			**raysStorage;
-	TCode			**outputs;				// The array of outputs
-	TCode			**nonShadeOutputs;		// The array of non-shade outputs
+	float			**outputs;				// The array of outputs
+	float			**nonShadeOutputs;		// The array of non-shade outputs
 	CGatherLookup	*lookup;				// The parameters for this bundle
 	const float		*ab;					// The ray differential
 	int				numMisses;				// The number of missed rays

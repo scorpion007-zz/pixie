@@ -2191,11 +2191,13 @@ void	alloc() {
 
 	if (currentData.numCode != 0) {
 		currentData.code						=	(TCode *) mem;
+		currentData.currentOpcodePlace			=	currentData.code;
 		mem										+=	currentData.numCode*sizeof(TCode);
 	}
 	
 	if (currentData.numArgument != 0) {
 		currentData.arguments					=	(TArgument *) mem;
+		currentData.currentArgumentPlace		=	currentData.arguments;
 		mem										+=	currentData.numArgument*sizeof(TArgument);
 	}
 

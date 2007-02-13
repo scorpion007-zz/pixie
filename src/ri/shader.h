@@ -245,7 +245,7 @@ public:
 class	CGatherVariable {
 public:
 	virtual			~CGatherVariable() { }
-	virtual	void	record(TCode *,int,CGatherRay **,float **varying)	=	0;
+	virtual	void	record(float *,int,CGatherRay **,float **varying)	=	0;
 
 	CGatherVariable	*next;		// The next item in the linked list
 	int				shade;		// TRUE if this variable requires shading
@@ -259,7 +259,7 @@ public:
 class	CShaderVectorVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -271,7 +271,7 @@ public:
 class	CShaderFloatVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -283,7 +283,7 @@ public:
 class	CRayOriginVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -293,7 +293,7 @@ public:
 class	CRayDirVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ public:
 class	CRayLengthVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 };
 
 

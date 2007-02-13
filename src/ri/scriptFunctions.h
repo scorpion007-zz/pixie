@@ -710,8 +710,10 @@ DEFFUNC(Match					,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDAT
 							}
 
 #define	PRINTF_UPDATE		res	+=	resStep;													\
-							for (i=0;i<numArguments;i++)										\
-								op[i]	+=	opSteps[i];											\
+							for (i=0;i<numArguments;i++) {										\
+								opf[i]	+=	opSteps[i];											\
+								ops[i]	+=	opSteps[i];											\
+							}																	\
 							vertexN++;															\
 
 #define	PRINTF_POST
@@ -767,8 +769,10 @@ DEFFUNC(Printf				,"printf"						,"o=s.*"		,PRINTFEXPR_PRE,PRINTFEXPR,PRINTF_UPD
 
 #define	FORMAT_UPDATE		res	+=	resStep;												\
 							strArg +=	strStep;											\
-							for (i=0;i<numArguments;i++)									\
-								op[i]	+=	opSteps[i];
+							for (i=0;i<numArguments;i++) {									\
+								opf[i]	+=	opSteps[i];										\
+								ops[i]	+=	opSteps[i];										\
+							}
 
 #define	FORMAT_POST
 
