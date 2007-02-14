@@ -1551,7 +1551,7 @@ case 77:
 			
 			currentDefaultItem = currentParameter->defaultValue.array;
 			for(int i=0;i<currentParameter->numItems;i++){
-				currentDefaultItem[i].vector = new float[3];
+				currentDefaultItem[i].vector	= new float[3];
 				currentDefaultItem[i].vector[0] = 0;
 				currentDefaultItem[i].vector[1] = 0;
 				currentDefaultItem[i].vector[2] = 0;
@@ -2203,7 +2203,7 @@ TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 					char			environmentVariable[OS_MAX_PATH_LENGTH];
 
 					if (endOfCurrentPath!=NULL) {
-						const	int		environmentLength	=	endOfCurrentPath - currentPath - 1;
+						const	int		environmentLength	=	(int) (endOfCurrentPath - currentPath) - 1;
 						const	char	*value;
 
 						strncpy(environmentVariable,currentPath+1,environmentLength);

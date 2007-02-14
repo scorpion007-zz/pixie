@@ -61,37 +61,33 @@ class	CShadingContext;
 class	CPhotonHider;
 class	CGatherRay;
 class	CMemPage;
+class	CDSO;
 
-// Meanings of the accessor field of TReference
+// Meanings of the accessor field of TArgument
 const	unsigned int	SL_IMMEDIATE_OPERAND	=	0;	// Constants
 const	unsigned int	SL_GLOBAL_OPERAND		=	1;	// Global variable references
 const	unsigned int	SL_VARYING_OPERAND		=	2;	// Local variable references (this includes parameters)
 
-// This comes right after the opcode to denote the number of parameters passed to the function / opcode
-typedef struct {
-	unsigned	char	numArguments;			// The number of stack arguments
-	unsigned	char	uniform;				// TRUE if all the arguments are uniform
-	unsigned	char	numCodes;				// The number of codes after this one
-	unsigned	char	plNumber;				// The parameter list number of the function
-} TArguments;
-
-// This is a variable reference
+// This structure holds an argument for a code
 typedef struct {
 	unsigned	char	numItems;				// The number of items to step for this variable (0 for constants,parameters, cardinality for variables,globals)
 	unsigned	char	accessor;				// The type of the variable (SL_IMMEDIATE,SL_PARAMETER,SL_VARIABLE,SL_GLOBAL)
-	unsigned	short	index;					// The index of the variable in the corresponding entry array
-} TReference;
+	unsigned	char	bytesPerItem;			// The number of bytes per item
+	unsigned	char	padding;				// PADDING ... Not used ... PADDING
+	unsigned	int		index;					// The index of the variable in the corresponding entry array
+} TArgument;
 
-// This is the glorious TCode that holds everything
-// !!!! FATAL	-	sizeof(TCode) must be 4 !!!!
-// !!!! This is a major piece of code that makes Pixie 64 bit incompatible !!!!
-typedef union {
-	TArguments	arguments;
-	TReference	reference;
-	float		real;
-	int			integer;
-	const char	*string;
-	void		*pointer;
+// This structure holds a code
+// In the future, we may want to make this a class 
+//    and have the shading language opcodes subclass from it
+typedef struct {
+	int					opcode;					// The opcode
+	unsigned	char	uniform;				// TRUE if all the arguments are uniform
+	unsigned	char	plNumber;				// The parameter list number of the function
+	unsigned	char	numArguments;			// The number of stack arguments
+	unsigned	char	padding;				// PADDING ... Not used ... PADDING
+	TArgument			*arguments;				// The array of arguments
+	CDSO				*dso;					// If this is a DSO, points to the DSO function
 } TCode;
 
 // Shader types
@@ -256,7 +252,7 @@ public:
 class	CGatherVariable {
 public:
 	virtual			~CGatherVariable() { }
-	virtual	void	record(TCode *,int,CGatherRay **,float **varying)	=	0;
+	virtual	void	record(float *,int,CGatherRay **,float **varying)	=	0;
 
 	CGatherVariable	*next;		// The next item in the linked list
 	int				shade;		// TRUE if this variable requires shading
@@ -270,7 +266,7 @@ public:
 class	CShaderVectorVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -282,7 +278,7 @@ public:
 class	CShaderFloatVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 
 			int		entry;		// Variable index
 };
@@ -294,7 +290,7 @@ public:
 class	CRayOriginVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -304,7 +300,7 @@ public:
 class	CRayDirVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -314,7 +310,7 @@ public:
 class	CRayLengthVariable : public CGatherVariable {
 public:
 
-			void	record(TCode *,int nr,CGatherRay **r,float **varying);
+			void	record(float *,int nr,CGatherRay **r,float **varying);
 };
 
 
@@ -369,10 +365,10 @@ public:
 
 		CVariable				*parameters;					// List of parameters
 
-		TCode					*memory;						// The memory base allocated for this shader
+		void					*memory;						// The memory base allocated for this shader
 		TCode					*codeArea;						// The code array
-		TCode					*constantsArea;					// The constant values
-		TCode					**constantEntries;				// The constant entries
+
+		void					**constantEntries;				// The constant entries
 
 		int						*varyingSizes;					// The size of a variable (if negative, it is uniform)
 

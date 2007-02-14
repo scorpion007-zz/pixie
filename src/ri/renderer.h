@@ -298,7 +298,7 @@ public:
 		static	CShader			*getShader(const char *,TSearchpath *search=NULL);		// Load a shader
 		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 		static	char			*getFilter(RtFilterFunc);								// The other way around
-		static	int				getDSO(char *,char *,void *&,dsoExecFunction &);		// Find a DSO
+		static	CDSO			*getDSO(char *,char *);									// Find a DSO function
 		static	void			shutdownFiles();
 		static	void			shutdownTextures();										// clean up texturing
 
@@ -635,6 +635,20 @@ public:
 };
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDSO
+// Description			:	Holds a DSO shader info
+// Comments				:
+class	CDSO {
+public:
+	void				*handle;		// The handle to the module that implements the DSO shader
+	dsoInitFunction		init;			// Init function
+	dsoExecFunction		exec;			// Execute function
+	dsoCleanupFunction	cleanup;		// Cleanup function
+	char				*name;			// Name of the DSO shader
+	char				*prototype;		// Prototype of the DSO shader
+	CDSO				*next;
+};
 
 
 

@@ -6,5 +6,5 @@ LIBCOMMON_AGE_VERSION=0
   
 libpixiecommon_la_LDFLAGS = -export-dynamic -version-info $(LIBCOMMON_CURRENT_VERSION):$(LIBCOMMON_REVISION_VERSION):$(LIBCOMMON_AGE_VERSION)
   
-libpixiecommon_la_SOURCES = algebra.cpp os.cpp memoryman.cpp
+libpixiecommon_la_SOURCES = algebra.cpp os.cpp
 

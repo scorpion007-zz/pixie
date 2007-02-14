@@ -186,10 +186,6 @@ int main(int argc, char* argv[]) {
 	int				ppargc;
 	char			*outName	=	NULL;
 	char 			*includeEnv = getenv(INCLUDE);
-
-
-	// Init the memory manager
-	memInit();
 	
 	sourceFiles					=	new CArray<char *>;
 
@@ -335,9 +331,6 @@ int main(int argc, char* argv[]) {
 
 
 	delete sourceFiles;
-
-	// Shutdown the memort manager
-	memShutdown();
 
 	return 0;
 }

@@ -86,8 +86,6 @@
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
 		C96A6E370AD6D651003C2D7B /* containers.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E320AD6D651003C2D7B /* containers.h */; };
 		C96A6E380AD6D651003C2D7B /* global.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E330AD6D651003C2D7B /* global.h */; };
-		C96A6E3E0AD6D66C003C2D7B /* memoryman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E390AD6D66C003C2D7B /* memoryman.cpp */; };
-		C96A6E3F0AD6D66C003C2D7B /* memoryman.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E3A0AD6D66C003C2D7B /* memoryman.h */; };
 		C96A6E400AD6D66C003C2D7B /* os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E3B0AD6D66C003C2D7B /* os.cpp */; };
 		C96A6E410AD6D66C003C2D7B /* os.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E3C0AD6D66C003C2D7B /* os.h */; };
 		C96A6E420AD6D66C003C2D7B /* simd.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E3D0AD6D66C003C2D7B /* simd.h */; };
@@ -827,8 +825,6 @@
 		C96A6E310AD6D651003C2D7B /* comments.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = comments.h; path = ../../src/common/comments.h; sourceTree = SOURCE_ROOT; };
 		C96A6E320AD6D651003C2D7B /* containers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = containers.h; path = ../../src/common/containers.h; sourceTree = SOURCE_ROOT; };
 		C96A6E330AD6D651003C2D7B /* global.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = global.h; path = ../../src/common/global.h; sourceTree = SOURCE_ROOT; };
-		C96A6E390AD6D66C003C2D7B /* memoryman.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = memoryman.cpp; path = ../../src/common/memoryman.cpp; sourceTree = SOURCE_ROOT; };
-		C96A6E3A0AD6D66C003C2D7B /* memoryman.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = memoryman.h; path = ../../src/common/memoryman.h; sourceTree = SOURCE_ROOT; };
 		C96A6E3B0AD6D66C003C2D7B /* os.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = os.cpp; path = ../../src/common/os.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E3C0AD6D66C003C2D7B /* os.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = os.h; path = ../../src/common/os.h; sourceTree = SOURCE_ROOT; };
 		C96A6E3D0AD6D66C003C2D7B /* simd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = simd.h; path = ../../src/common/simd.h; sourceTree = SOURCE_ROOT; };
@@ -1582,8 +1578,6 @@
 		C96A6E2E0AD6D602003C2D7B /* common */ = {
 			isa = PBXGroup;
 			children = (
-				C96A6E390AD6D66C003C2D7B /* memoryman.cpp */,
-				C96A6E3A0AD6D66C003C2D7B /* memoryman.h */,
 				C96A6E3B0AD6D66C003C2D7B /* os.cpp */,
 				C96A6E3C0AD6D66C003C2D7B /* os.h */,
 				C96A6E3D0AD6D66C003C2D7B /* simd.h */,
@@ -1868,7 +1862,6 @@
 				C96A6E360AD6D651003C2D7B /* comments.h in Headers */,
 				C96A6E370AD6D651003C2D7B /* containers.h in Headers */,
 				C96A6E380AD6D651003C2D7B /* global.h in Headers */,
-				C96A6E3F0AD6D66C003C2D7B /* memoryman.h in Headers */,
 				C96A6E410AD6D66C003C2D7B /* os.h in Headers */,
 				C96A6E420AD6D66C003C2D7B /* simd.h in Headers */,
 			);
@@ -2389,7 +2382,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */,
-				C96A6E3E0AD6D66C003C2D7B /* memoryman.cpp in Sources */,
 				C96A6E400AD6D66C003C2D7B /* os.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

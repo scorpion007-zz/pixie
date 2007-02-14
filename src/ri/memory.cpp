@@ -46,7 +46,7 @@ static	float				lastPagingTime			=	0;
 // Function				:	memoryInit
 // Description			:	Initialize a named memory manager
 // Return Value			:
-// Comments				:	Should be called after memInit
+// Comments				:
 void			memoryInit(CMemPage *&stack) {
 	stack	=	memoryNewPage(ZONE_INIT_SIZE);
 }

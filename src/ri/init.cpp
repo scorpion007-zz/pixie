@@ -300,7 +300,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 											}
 //	Allocate temporary memory for the string and save it
 #define		savestring(r,n)					{																	\
-												int		strLen	=	strlen(n) + 1;								\
+												int		strLen	=	(int) strlen(n) + 1;						\
 												int		strSize	=	(strLen & ~3) + 4;							\
 												char	*strmem	=	(char *) ralloc(strSize,threadMemory);		\
 												strcpy(strmem,n);												\
@@ -325,25 +325,28 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 											lastConditional			=	lastConditional->prev;
 
 //	Retrieve a pointer to an operand and obtain it's size
-#define		operand(i,n)					{																	\
-												const TCode	ref	=	code[i+2];									\
-												n	= stuff[ref.reference.accessor][ref.reference.index];		\
+#define		operand(i,n,t)					{																	\
+												const TArgument	ref	=	code->arguments[i];						\
+												n	= (t) stuff[ref.accessor][ref.index];						\
 											}
 
-//	Retrieve an operand's size
-#define		operandSize(i,n,s)				{																	\
-												const TCode	ref	=	code[i+2];									\
-												n	= stuff[ref.reference.accessor][ref.reference.index];		\
-												s	= ref.reference.numItems;									\
+	//	Retrieve an operand's size
+#define		operandSize(i,n,s,t)			{																	\
+												const TArgument	ref	=	code->arguments[i];						\
+												n	= (t) stuff[ref.accessor][ref.index];						\
+												s	= ref.numItems;												\
 											}
 
+#define		operandNumItems(i)				code->arguments[i].numItems
+
+#define		operandBytesPerItem(i)			code->arguments[i].bytesPerItem
 
 
 //	Retrieve an integer operand (label references are integer)
-#define		argument(i)						code[i+2].integer;
+#define		argument(i)						code->arguments[i].index
 
 //	Retrieve the number of arguments
-#define		argumentcount(n)				n = code[1].arguments.numArguments;
+#define		argumentcount(n)				n = code->numArguments
 
 //	Control transfer
 #define		jmp(n)							{																	\
@@ -370,7 +373,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 
 //	The	shading variables and junk
-	TCode						**stuff[3];			// Where we keep pointers to the variables
+	void						**stuff[3];			// Where we keep pointers to the variables
 	CConditional				*lastConditional;	// The last conditional
 	int							numActive;
 	int							numPassive;
@@ -396,13 +399,13 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 	tmpTags									=	0;
 
 	// Setup local variables
-	stuff[SL_VARYING_OPERAND]				=	(TCode **) ralloc(currentShader->numVariables*sizeof(TCode*),threadMemory);	// Shader varying variables
+	stuff[SL_VARYING_OPERAND]				=	(void **) ralloc(currentShader->numVariables*sizeof(void *),threadMemory);	// Shader varying variables
 	for (i=0;i<currentShader->numVariables;i++) {											// Allocate memory for every varying variable
 		int	size							=	currentShader->varyingSizes[i];
 
 		if (size != 0) {
 			if (size < 0)	size				=	-size;
-			stuff[SL_VARYING_OPERAND][i]		=	(TCode *) ralloc(size*sizeof(TCode),threadMemory);
+			stuff[SL_VARYING_OPERAND][i]		=	(void *) ralloc(size*max(sizeof(float),sizeof(char *)),threadMemory);
 		}
 	}
 
@@ -427,15 +430,15 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 	// Set the access arrays
 	stuff[SL_IMMEDIATE_OPERAND]				=	currentShader->constantEntries;				// Immediate operands
-	stuff[SL_GLOBAL_OPERAND]				=	(TCode **) varying;							// Varying globals
+	stuff[SL_GLOBAL_OPERAND]				=	(void **) varying;							// Varying globals
 
 	numActive								=	numVertices;
 	numPassive								=	0;
-	lastConditional							=	NULL;				// The last conditional block
+	lastConditional							=	NULL;										// The last conditional block
 
 	// Execute
 execStart:
-	const ESlCode	opcode	=	(ESlCode)	code[0].integer;
+	const ESlCode	opcode	=	(ESlCode)	code->opcode;
 
 	tags	=	tagStart;
 
@@ -446,7 +449,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		code	+=	code[1].arguments.numCodes;												\
+		code++;																				\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -457,7 +460,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		code	+=	code[1].arguments.numCodes;												\
+		code++;																				\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -469,7 +472,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		code	+=	code[1].arguments.numCodes;												\
+		code++;																				\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -480,7 +483,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		code	+=	code[1].arguments.numCodes;												\
+		code++;																				\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -492,7 +495,7 @@ execStart:
 		expr_pre;																			\
 		expr;																				\
 		expr_post																			\
-		code	+=	code[1].arguments.numCodes;												\
+		code++;																				\
 		goto execStart;																		\
 	}																						\
 	break;
@@ -507,7 +510,7 @@ execStart:
 		goto execEnd;
 	}
 
-	code	+=	code[1].arguments.numCodes;
+	code++;
 	goto execStart;
 #undef	DEFOPCODE
 #undef	DEFFUNC

@@ -44,9 +44,6 @@
 int main(int argc, char* argv[]) {
 	char	tmp[1024];
 
-	// Init the memory manager
-	memInit();
-
 	if (argc > 1) {
 		TSdrShader		*cShader;
 		TSdrParameter	*cParameter;
@@ -212,9 +209,6 @@ int main(int argc, char* argv[]) {
 
 		sdrDelete(cShader);
 	}
-
-	// Shutdown the memory manager
-	memShutdown();
 
 	return 0;
 }

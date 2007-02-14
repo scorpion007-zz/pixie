@@ -66,50 +66,53 @@
 								lookup->map					=	NULL;															\
 								lookup->environment			=	NULL;															\
 								{																								\
-									int		i;																					\
-									TCode	*param,*val;																		\
+									int			i;																				\
+									const char	**param;																		\
+									const float	*valf;																			\
+									const char	**vals;																			\
 																																\
 									for (i=0;i<num;i++) {																		\
-										operand(i*2+start,param);																\
-										operand(i*2+start+1,val);																\
+										operand(i*2+start,param,const char **);													\
+										operand(i*2+start+1,valf,const float *);												\
+										operand(i*2+start+1,vals,const char **);												\
 																																\
-										if (strcmp(param->string,"estimator") == 0) {											\
-											lookup->numLookupSamples	=	(int) val->real;									\
-										} else if (strcmp(param->string,"maxdist") == 0) {										\
-											lookup->maxDistance	=	val->real;													\
-										} else if (strcmp(param->string,"maxerror") == 0) {										\
-											lookup->maxError	=	val->real;													\
-										} else if (strcmp(param->string,"samples") == 0) {										\
-											lookup->numSamples	=	(int) val->real;											\
-										} else if (strcmp(param->string,"bias") == 0) {											\
-											lookup->bias		=	val->real;													\
-										} else if (strcmp(param->string,"localThreshold") == 0) {								\
-											lookup->localThreshold	=	val->real;												\
-										} else if (strcmp(param->string,"backgroundColor") == 0) {								\
-											movvv(lookup->backgroundColor,&val->real);											\
-										} else if (strcmp(param->string,"maxBrightness") == 0) {								\
-											lookup->maxBrightness	=	val->real;												\
-										} else if (strcmp(param->string,"minR") == 0) {											\
-											lookup->minFGRadius	=	val->real;													\
-										} else if (strcmp(param->string,"maxR") == 0) {											\
-											lookup->maxFGRadius	=	val->real;													\
-										} else if (strcmp(param->string,"samplebase") == 0) {									\
-											lookup->sampleBase	=	val->real;													\
-										} else if (strcmp(param->string,"global") == 0) {										\
-											lookup->gatherGlobal	=	(int) val->real;										\
-										} else if (strcmp(param->string,"local") == 0) {										\
-											lookup->gatherLocal		=	(int) val->real;										\
-										} else if (strcmp(param->string,"handle") == 0) {										\
-											lookup->handle			=	(const char *) val->string;								\
-										} else if (strcmp(param->string,"filemode") == 0) {										\
-											lookup->filemode		=	(const char *) val->string;								\
-										} else if (strcmp(param->string,"environmentmap") == 0) {								\
-											lookup->environment		=	CRenderer::getEnvironment(val->string);					\
-										} else if (strcmp(param->string,"irradiance") == 0) {									\
+										if (strcmp(*param,"estimator") == 0) {													\
+											lookup->numLookupSamples	=	(int) valf[0];										\
+										} else if (strcmp(*param,"maxdist") == 0) {												\
+											lookup->maxDistance	=	valf[0];													\
+										} else if (strcmp(*param,"maxerror") == 0) {											\
+											lookup->maxError	=	valf[0];													\
+										} else if (strcmp(*param,"samples") == 0) {												\
+											lookup->numSamples	=	(int) valf[0];												\
+										} else if (strcmp(*param,"bias") == 0) {												\
+											lookup->bias		=	valf[0];													\
+										} else if (strcmp(*param,"localThreshold") == 0) {										\
+											lookup->localThreshold	=	valf[0];												\
+										} else if (strcmp(*param,"backgroundColor") == 0) {										\
+											movvv(lookup->backgroundColor,valf);												\
+										} else if (strcmp(*param,"maxBrightness") == 0) {										\
+											lookup->maxBrightness	=	valf[0];												\
+										} else if (strcmp(*param,"minR") == 0) {												\
+											lookup->minFGRadius	=	valf[0];													\
+										} else if (strcmp(*param,"maxR") == 0) {												\
+											lookup->maxFGRadius	=	valf[0];													\
+										} else if (strcmp(*param,"samplebase") == 0) {											\
+											lookup->sampleBase	=	valf[0];													\
+										} else if (strcmp(*param,"global") == 0) {												\
+											lookup->gatherGlobal	=	(int) valf[0];											\
+										} else if (strcmp(*param,"local") == 0) {												\
+											lookup->gatherLocal		=	(int) valf[0];											\
+										} else if (strcmp(*param,"handle") == 0) {												\
+											lookup->handle			=	vals[0];												\
+										} else if (strcmp(*param,"filemode") == 0) {											\
+											lookup->filemode		=	vals[0];												\
+										} else if (strcmp(*param,"environmentmap") == 0) {										\
+											lookup->environment		=	CRenderer::getEnvironment(vals[0]);						\
+										} else if (strcmp(*param,"irradiance") == 0) {											\
 											lookup->irradianceIndex	=	i*2+start+1;											\
-										} else if (strcmp(param->string,"occlusion") == 0) {									\
+										} else if (strcmp(*param,"occlusion") == 0) {											\
 											lookup->coverageIndex	=	i*2+start+1;											\
-										} else if (strcmp(param->string,"environmentdir") == 0) {								\
+										} else if (strcmp(*param,"environmentdir") == 0) {										\
 											lookup->environmentIndex=	i*2+start+1;											\
 										}																						\
 									}																							\
@@ -119,7 +122,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	TCode			*res,*op1,*op2;																	\
+#define	TRANSMISSIONEXPR_PRE	float			*res,*op1,*op2;																	\
 								CTextureLookup	*lookup;																		\
 								osLock(CRenderer::shaderMutex);																	\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {										\
@@ -128,9 +131,9 @@
 									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);													\
 								}																								\
 								osUnlock(CRenderer::shaderMutex);																\
-								operand(0,res);																					\
-								operand(1,op1);																					\
-								operand(2,op2);																					\
+								operand(0,res,float *);																			\
+								operand(1,op1,float *);																			\
+								operand(2,op2,float *);																			\
 								float	*L	=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);						\
 								int		t;																						\
 								for (t=0;t<numVertices;t++)	subvv(L + t*3,(float *) op1 + t*3,(float *) op2 + t*3);				\
@@ -156,15 +159,15 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 #ifndef INIT_SHADING
 #define	TRACEEXPR_PRE			FUN3EXPR_PRE																					\
 								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;		\
-								const float			*ab		=	rayDiff((float *) op1,(float *) op2,NULL);						\
+								const float			*ab		=	rayDiff(op1,op2,NULL);											\
 								vector				D;																			\
 								CRay				ray;
 
-#define	TRACEEXPR				subvv(D,(float *) op2,(float *) op1);															\
+#define	TRACEEXPR				subvv(D,op2,op1);																				\
 								if (dotvv(D,D) > 0) {																			\
 									ray.t					=	lengthv(D);														\
 									mulvf(ray.dir,D,1/ray.t);																	\
-									movvv(ray.from,&op1->real);																	\
+									movvv(ray.from,op1);																		\
 									ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;									\
 									ray.time				=	urand();														\
 									ray.tmin				=	bias;															\
@@ -175,9 +178,9 @@ DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EX
 									numReflectionRays++;																		\
 									trace(&ray);																				\
 																																\
-									res->real				=	ray.t;															\
+									*res					=	ray.t;															\
 								} else {																						\
-									res->real				=	0.0f;															\
+									*res					=	0.0f;															\
 								}
 
 
@@ -209,16 +212,19 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 								lookup->label			=	rayLabelTrace;											\
 								{																					\
 									int		i;																		\
-									TCode	*param,*val;															\
+									const char	**param;															\
+									const float	*valf;																\
+									const char	**vals;																\
 																													\
 									for (i=0;i<num;i++) {															\
-										operand(i*2+start,param);													\
-										operand(i*2+start+1,val);													\
+										operand(i*2+start,param,const char **);										\
+										operand(i*2+start+1,valf,const float *);									\
+										operand(i*2+start+1,vals,const char **);									\
 																													\
-										if (strcmp(param->string,"bias") == 0) {									\
-											lookup->bias		=	val->real;										\
-										} else if (strcmp(param->string,"label") == 0) {							\
-											lookup->label		=	val->string;									\
+										if (strcmp(*param,"bias") == 0) {											\
+											lookup->bias		=	valf[0];										\
+										} else if (strcmp(*param,"label") == 0) {									\
+											lookup->label		=	vals[0];										\
 										}																			\
 									}																				\
 								}
@@ -227,8 +233,8 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // trace	"c=pv!"
 #ifndef INIT_SHADING
-#define	TRACEEXPR_PRE			TCode				*res;																		\
-								const TCode			*op1,*op2;																	\
+#define	TRACEEXPR_PRE			float				*res;																		\
+								const float			*op1,*op2;																	\
 								CTraceBundle		interiorBundle,exteriorBundle;												\
 								CTraceRay			*rays;																		\
 								CTraceRay			**interiorRays,**exteriorRays;												\
@@ -248,16 +254,16 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 								interiorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
 								exteriorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
 								N				=	varying[VARIABLE_N];														\
-								operand(0,res);																					\
-								operand(1,op1);																					\
-								operand(2,op2);																					\
-								const float *ab	=	rayDiff((const float *) op1,(const float *) op2,NULL);
+								operand(0,res,float *);																			\
+								operand(1,op1,const float *);																	\
+								operand(2,op2,const float *);																	\
+								const float *ab	=	rayDiff(op1,op2,NULL);
 
-#define	TRACEEXPR				if (dotvv((float *) op2,(float *) op2) > 0) {													\
-									movvv(rays->from,(float *) op1);															\
-									normalizev(rays->dir,(float *) op2);														\
-									initv((float *) res,0);																		\
-									rays->dest			=	(float *) res;														\
+#define	TRACEEXPR				if (dotvv(op2,op2) > 0) {																		\
+									movvv(rays->from,op1);																		\
+									normalizev(rays->dir,op2);																	\
+									initv(res,0);																				\
+									rays->dest			=	res;																\
 									rays->multiplier	=	1;																	\
 									rays->t				=	C_INFINITY;															\
 									rays->time			=	urand();															\
@@ -265,13 +271,13 @@ DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPD
 									rays->tmin			=	lookup->bias;														\
 									rays->da			=	ab[0];																\
 									rays->db			=	ab[1];																\
-									if (dotvv(&op2->real,N) > 0) {																\
+									if (dotvv(op2,N) > 0) {																		\
 										exteriorRays[cExterior++]	=	rays++;													\
 									} else {																					\
 										interiorRays[cInterior++]	=	rays++;													\
 									}																							\
 								} else {																						\
-									initv((float *) res,0);																		\
+									initv(res,0);																				\
 								}
 
 
@@ -323,15 +329,15 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 #ifndef INIT_SHADING
 #define	VISIBILITYEXPR_PRE		FUN3EXPR_PRE																				\
 								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;	\
-								const float			*ab		=	rayDiff((float *) op1,NULL,(float *) op2);					\
+								const float			*ab		=	rayDiff(op1,NULL,op2);										\
 								vector				D;																		\
 								CRay				ray;
 
-#define	VISIBILITYEXPR			subvv(D,(float *) op2,(float *) op1);														\
+#define	VISIBILITYEXPR			subvv(D,op2,op1);																			\
 								if (dotvv(D,D) > 0) {																		\
 									ray.t					=	lengthv(D);													\
 									mulvf(ray.dir,D,1/ray.t);																\
-									movvv(ray.from,&op1->real);																\
+									movvv(ray.from,op1);																	\
 									ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;						\
 									ray.time				=	urand();													\
 									ray.tmin				=	bias;														\
@@ -342,10 +348,10 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 									numTransmissionRays++;																	\
 									trace(&ray);																			\
 																															\
-									if (ray.object != NULL)	res[0].real	=	0;												\
-									else					res[0].real	=	1;												\
+									if (ray.object != NULL)	res[0]	=	0;													\
+									else					res[0]	=	1;													\
 								} else {																					\
-									res[0].real	=	1;																		\
+									res[0]	=	1;																			\
 								}
 
 #define	VISIBILITYEXPR_UPDATE	FUN3EXPR_UPDATE(1,3,3)																		\
@@ -369,8 +375,8 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 #define	IDEXPR_PRE				CGlobalIllumLookup	*lookup;																		\
 								CCache				*cache;																			\
 								float				C[7];																			\
-								TCode				*envdir;																		\
-								TCode				*coverage;																		\
+								float				*envdir;																		\
+								float				*coverage;																		\
 								FUN4EXPR_PRE;																						\
 								osLock(CRenderer::shaderMutex);																		\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
@@ -379,22 +385,22 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
 									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
-									lookup->numSamples	=	(int) op3->real;														\
+									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	FALSE;																	\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
-								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir);	}				\
-								else envdir = (TCode *) varying[VARIABLE_PW];														\
-								if (lookup->coverageIndex != -1)	{	operand(lookup->coverageIndex,coverage);	}				\
-								else coverage = (TCode *) varying[VARIABLE_PW];														\
-								const float	*b	=	rayDiff(&op1->real);															\
+								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir,float *);	}		\
+								else envdir = varying[VARIABLE_PW];														\
+								if (lookup->coverageIndex != -1)	{	operand(lookup->coverageIndex,coverage,float *);	}		\
+								else coverage = varying[VARIABLE_PW];														\
+								const float	*b	=	rayDiff(op1);																	\
 								cache	=	lookup->cache;
 
 
-#define	IDEXPR					cache->lookup(C,&op1->real,&op2->real,*b,this,lookup);												\
-								movvv(&res->real,C);																				\
-								movvv(&envdir->real,C+4);																			\
-								coverage->real = C[3];
+#define	IDEXPR					cache->lookup(C,op1,op2,*b,this,lookup);															\
+								movvv(res,C);																						\
+								movvv(envdir,C+4);																					\
+								*coverage = C[3];
 
 
 #define	IDEXPR_UPDATE			FUN4EXPR_UPDATE(3,3,3,0)																			\
@@ -425,8 +431,8 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 #define	OCCLUSIONEXPR_PRE		CGlobalIllumLookup	*lookup;																		\
 								CCache				*cache;																			\
 								float				C[7];																			\
-								TCode				*envdir;																		\
-								TCode				*irradiance;																	\
+								float				*envdir;																		\
+								float				*irradiance;																	\
 								FUN4EXPR_PRE;																						\
 								osLock(CRenderer::shaderMutex);																		\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
@@ -435,22 +441,22 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
 									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
-									lookup->numSamples	=	(int) op3->real;														\
+									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	TRUE;																	\
 									if (lookup->irradianceIndex != -1) lookup->occlusion = FALSE;									\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
-								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir);	}				\
-								else envdir = (TCode *) varying[VARIABLE_PW];														\
-								if (lookup->irradianceIndex != -1)	{	operand(lookup->irradianceIndex,irradiance);	}			\
-								else irradiance = (TCode *) varying[VARIABLE_PW];													\
-								const float	*b	=	rayDiff(&op1->real);															\
+								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir,float *);	}		\
+								else envdir = varying[VARIABLE_PW];																	\
+								if (lookup->irradianceIndex != -1)	{	operand(lookup->irradianceIndex,irradiance,float *);	}	\
+								else irradiance =  varying[VARIABLE_PW];															\
+								const float	*b	=	rayDiff(op1);																	\
 								cache	=	lookup->cache;
 
-#define	OCCLUSIONEXPR			cache->lookup(C,&op1->real,&op2->real,*b,this,lookup);												\
-								res->real	=	C[3];																				\
-								movvv(&irradiance->real,C);																			\
-								movvv(&envdir->real,C+4);
+#define	OCCLUSIONEXPR			cache->lookup(C,op1,op2,*b,this,lookup);															\
+								*res	=	C[3];																					\
+								movvv(irradiance,C);																				\
+								movvv(envdir,C+4);
 
 
 #define	OCCLUSIONEXPR_UPDATE	FUN4EXPR_UPDATE(1,3,3,0)																			\
@@ -486,14 +492,14 @@ DEFSHORTFUNC(occlusion	,"occlusion"	,"f=pnf!"	,OCCLUSIONEXPR_PRE,OCCLUSIONEXPR,O
 									argumentcount(numArguments);																	\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
 									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
-									lookup->numSamples	=	(int) op3->real;														\
+									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	FALSE;																	\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
 								cache	=	lookup->cache;
 
 
-#define	CACSAMPLEEXPR			cache->cachesample(&res->real,&op1->real,&op2->real,(CRenderer::lengthA*op1[COMP_Z].real + CRenderer::lengthB)*op3->real);
+#define	CACSAMPLEEXPR			cache->cachesample(res,op1,op2,(CRenderer::lengthA*op1[COMP_Z] + CRenderer::lengthB)*op3[0]);
 
 #else
 #define	CACSAMPLEEXPR_PRE
@@ -514,26 +520,26 @@ DEFSHORTFUNC(Cachesample	,"cachesample"	,"f=pnf!"	,CACSAMPLEEXPR_PRE,CACSAMPLEEX
 #ifndef INIT_SHADING
 #define	PHOTONMAPEXPR_PRE		CGlobalIllumLookup	*lookup;													\
 								CPhotonMap			*map;														\
-								TCode				*res;														\
-								const TCode			*op2,*op3;													\
+								float				*res;														\
+								const float			*op2,*op3;													\
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {					\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;	\
 									int			numArguments;													\
-									const TCode	*op1;															\
+									const char	**op1;															\
 									argumentcount(numArguments);												\
 									GLOBPARAMETERS(4,(numArguments-4) >> 1);									\
-									operand(1,op1);																\
-									lookup->map			=	CRenderer::getPhotonMap(op1->string);				\
+									operand(1,op1,const char **);												\
+									lookup->map			=	CRenderer::getPhotonMap(*op1);						\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
-								operand(0,res);																	\
-								operand(2,op2);																	\
-								operand(3,op3);																	\
+								operand(0,res,float *);															\
+								operand(2,op2,const float *);													\
+								operand(3,op3,const float *);													\
 								map						=	lookup->map;
 
 
-#define	PHOTONMAPEXPR			map->lookup(&res->real,&op2->real,&op3->real,lookup->numLookupSamples);
+#define	PHOTONMAPEXPR			map->lookup(res,op2,op3,lookup->numLookupSamples);
 
 #define	PHOTONMAPEXPR_UPDATE	res	+=	3;																		\
 								op2	+=	3;																		\
@@ -562,24 +568,24 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 #ifndef INIT_SHADING
 #define	PHOTONMAP2EXPR_PRE		CGlobalIllumLookup	*lookup;													\
 								CPhotonMap			*map;														\
-								TCode				*res;														\
-								const TCode			*op2;														\
+								float				*res;														\
+								const float			*op2;														\
 								osLock(CRenderer::shaderMutex);													\
 								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {					\
 									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;	\
 									int			numArguments;													\
-									const TCode	*op1;															\
+									const char	**op1;															\
 									argumentcount(numArguments);												\
 									GLOBPARAMETERS(3,(numArguments-3) >> 1);									\
-									operand(1,op1);																\
-									lookup->map			=	CRenderer::getPhotonMap(op1->string);				\
+									operand(1,op1,const char **);												\
+									lookup->map			=	CRenderer::getPhotonMap(*op1);						\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
-								operand(0,res);																	\
-								operand(2,op2);																	\
+								operand(0,res,float *);															\
+								operand(2,op2,const float *);													\
 								map						=	lookup->map;
 
-#define	PHOTONMAP2EXPR			map->lookup(&res->real,&op2->real,lookup->numLookupSamples);
+#define	PHOTONMAP2EXPR			map->lookup(res,op2,lookup->numLookupSamples);
 
 #define	PHOTONMAP2EXPR_UPDATE	res	+=	3;																		\
 								op2	+=	3;
@@ -625,33 +631,36 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lookup->uniformDist		=	FALSE;													\
 								{																					\
 									int		i;																		\
-									TCode	*param,*val;															\
+									const char	**param;															\
+									const float	*valf;																\
+									const char	**vals;																\
 																													\
 									for (i=0;i<num;i++) {															\
-										operand(i*2+start,param);													\
-										operand(i*2+start+1,val);													\
+										operand(i*2+start,param,const char **);										\
+										operand(i*2+start+1,valf,const float *);									\
+										operand(i*2+start+1,vals,const char **);									\
 																													\
-										if (strcmp(param->string,"bias") == 0) {									\
-											lookup->bias		=	val->real;										\
-										} else if (strcmp(param->string,"blur") == 0) {								\
-											lookup->coneAngle	=	(float) (C_PI*val->real/2.0);					\
-										} else if (strcmp(param->string,"maxdist") == 0) {							\
-											lookup->maxDist		=	val->real;										\
-										} else if (strcmp(param->string,"samplecone") == 0) {						\
-											lookup->coneAngle	=	val->real;										\
+										if (strcmp(*param,"bias") == 0) {											\
+											lookup->bias		=	valf[0];										\
+										} else if (strcmp(*param,"blur") == 0) {									\
+											lookup->coneAngle	=	(float) (C_PI*valf[0]/2.0);						\
+										} else if (strcmp(*param,"maxdist") == 0) {									\
+											lookup->maxDist		=	valf[0];										\
+										} else if (strcmp(*param,"samplecone") == 0) {								\
+											lookup->coneAngle	=	valf[0];										\
 											lookup->da			=	min(tanf(lookup->coneAngle),DEFAULT_RAY_DA);	\
-										} else if (strcmp(param->string,"label") == 0) {							\
-											lookup->label		=	val->string;									\
-										} else if (strcmp(param->string,"distribution") == 0) {						\
-											if (strcmp(val->string,"uniform") == 0) {								\
+										} else if (strcmp(*param,"label") == 0) {									\
+											lookup->label		=	*vals;											\
+										} else if (strcmp(*param,"distribution") == 0) {							\
+											if (strcmp(*vals,"uniform") == 0) {										\
 												lookup->uniformDist	=	TRUE;										\
-											} else if (strcmp(val->string,"cosine") == 0) {							\
+											} else if (strcmp(*vals,"cosine") == 0) {								\
 												lookup->uniformDist	=	FALSE;										\
 											} else {																\
-												error(CODE_BADTOKEN,"Unknown gather distribution: \"%s\"\n",val->string);	\
+												error(CODE_BADTOKEN,"Unknown gather distribution: \"%s\"\n",vals[0]);	\
 											}																		\
 										} else { 																	\
-											lookup->addOutput(param->string,i*2+start+1);							\
+											lookup->addOutput(*param,i*2+start+1);									\
 										}																			\
 									}																				\
 								}
@@ -663,22 +672,22 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 #define	GATHERHEADEREXPR_PRE	CGatherLookup	*lookup;															\
 								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CGatherLookup *) parameterlist) == NULL) {							\
-									TCode			*samples,*sampleCone;											\
+									const float		*samples,*sampleCone;											\
 									int				numArguments;													\
-									TCode			*category;														\
+									const char		**category;														\
 									argumentcount(numArguments);													\
 									GATHERPARAMETERS(5,(numArguments-5) >> 1);										\
-									operand(0,category);															\
-									operand(3,sampleCone);															\
-									operand(4,samples);																\
-									lookup->numSamples				=	(int) samples->real;						\
-									lookup->coneAngle				=	sampleCone->real;							\
+									operand(0,category,const char **);												\
+									operand(3,sampleCone,float *);													\
+									operand(4,samples,float *);														\
+									lookup->numSamples				=	(int) *samples;								\
+									lookup->coneAngle				=	*sampleCone;								\
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
 																													\
 																													\
 								lastGather							=	new CGatherBundle;							\
-								lastGather->outputs					=	(TCode **) ralloc((lookup->numOutputs + lookup->numNonShadeOutputs)*sizeof(TCode *),threadMemory);	\
+								lastGather->outputs					=	(float **) ralloc((lookup->numOutputs + lookup->numNonShadeOutputs)*sizeof(float *),threadMemory);	\
 								lastGather->nonShadeOutputs			=	lastGather->outputs + lookup->numOutputs;	\
 								lastGather->lookup					=	lookup;										\
 								lastGather->remainingSamples		=	lookup->numSamples;							\
@@ -688,28 +697,28 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								CGatherVariable	*var;																\
 								int				cOutput;															\
 								for (cOutput=0,var=lookup->outputs;var!=NULL;var=var->next,cOutput++) {				\
-									operand(var->destIndex,lastGather->outputs[cOutput]);							\
+									operand(var->destIndex,lastGather->outputs[cOutput],float *);					\
 								}																					\
 								assert(cOutput == lookup->numOutputs);												\
 																													\
 								for (cOutput=0,var=lookup->nonShadeOutputs;var!=NULL;var=var->next,cOutput++) {		\
-									operand(var->destIndex,lastGather->nonShadeOutputs[cOutput]);					\
+									operand(var->destIndex,lastGather->nonShadeOutputs[cOutput],float *);			\
 								}																					\
 																													\
-								TCode	*P,*N;																		\
-								operand(1,P);																		\
-								operand(2,N);																		\
+								const float *P,*N;																	\
+								operand(1,P,const float *);															\
+								operand(2,N,const float *);															\
 																													\
 								CGatherRay		*rays;																\
-								lastGather->ab						=	rayDiff((float *) P,(float *) N,NULL);		\
+								lastGather->ab						=	rayDiff(P,N,NULL);							\
 								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
 								lastGather->raysStorage				=	lastGather->rays;							\
 								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);
 								
 
 
-#define GATHERHEADEREXPR		movvv(rays->from,(float *) P);														\
-								movvv(rays->gatherDir,(float *) N);
+#define GATHERHEADEREXPR		movvv(rays->from,P);																\
+								movvv(rays->gatherDir,N);
 
 #define GATHERHEADEREXPR_UPDATE	P	+=	3;																			\
 								N	+=	3;																			\
@@ -733,42 +742,52 @@ DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GAT
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // rayinfo	"f=s."
 #ifndef INIT_SHADING
-#define	RAYINFOEXPR_PRE		FUN3OUTEXPR_PRE;													\
-							const	float	*P	=	varying[VARIABLE_P];						\
-							const	float	*I	=	varying[VARIABLE_I];						\
-							int				stepSize;
+#define	RAYINFOEXPR_PRE		float		*res;													\
+							const char	**op1;													\
+							const char	**op2s;													\
+							float		*op2f;													\
+							const float	*P	=	varying[VARIABLE_P];							\
+							const float	*I	=	varying[VARIABLE_I];							\
+							int			stepSize;												\
+							operand(0,res,float *);												\
+							operand(1,op1,const char **);										\
+							operand(2,op2f,float *);											\
+							operand(2,op2s,const char **);
 
-#define	RAYINFOEXPR			if (strcmp(op1->string,"label") == 0) {								\
-								op2->string	=	currentRayLabel;								\
-								res->real	=	1;												\
+#define	RAYINFOEXPR			if (strcmp(*op1,"label") == 0) {									\
+								*op2s		=	currentRayLabel;								\
+								*res		=	1;												\
 								stepSize	=	1;												\
-							} else if (strcmp(op1->string,"depth") == 0) {						\
-								op2->real	=	(float) currentRayDepth;						\
-								res->real	=	(float ) 1;										\
+							} else if (strcmp(*op1,"depth") == 0) {								\
+								*op2f		=	(float) currentRayDepth;						\
+								*res		=	1;												\
 								stepSize	=	1;												\
-							} else if (strcmp(op1->string,"origin") == 0) {						\
-								op2[0].real	=	P[0] - I[0];									\
-								op2[1].real	=	P[1] - I[1];									\
-								op2[2].real	=	P[2] - I[2];									\
-								res->real	=	(float) 1;										\
+							} else if (strcmp(*op1,"origin") == 0) {							\
+								op2f[0]		=	P[0] - I[0];									\
+								op2f[1]		=	P[1] - I[1];									\
+								op2f[2]		=	P[2] - I[2];									\
+								*res		=	1;												\
 								stepSize	=	3;												\
-							} else if (strcmp(op1->string,"direction") == 0) {					\
-								normalizev((float *) op2,I);									\
-								res->real	=	(float) 1;										\
+							} else if (strcmp(*op1,"direction") == 0) {							\
+								normalizev(op2f,I);												\
+								*res		=	1;												\
 								stepSize	=	3;												\
-							} else if (strcmp(op1->string,"length") == 0) {						\
-								op2[0].real	=	lengthv(I);										\
-								res->real	=	(float) 1;										\
+							} else if (strcmp(*op1,"length") == 0) {							\
+								*op2f		=	lengthv(I);										\
+								*res		=	1;												\
 								stepSize	=	1;												\
 							} else {															\
-								res->real	=	(float) 0;										\
+								*res		=	(float) 0;										\
 								stepSize	=	1;												\
 							}
 
 
-#define	RAYINFOEXPR_UPDATE	FUN3EXPR_UPDATE(1,1,stepSize);										\
-							P				+=	3;												\
-							I				+=	3;
+#define	RAYINFOEXPR_UPDATE	res++;																\
+							op1++;																\
+							op2s	+=	stepSize;												\
+							op2f	+=	stepSize;												\
+							P		+=	3;														\
+							I		+=	3;
 
 #else
 #define	RAYINFOEXPR_PRE
@@ -788,21 +807,26 @@ DEFSHORTFUNC(RayInfo		,"rayinfo"	,"f=s."	,RAYINFOEXPR_PRE,RAYINFOEXPR,RAYINFOEXP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // raylabel	"s="
 #ifndef INIT_SHADING
-#define	RAYLABELEXPR	res->string	=	currentRayLabel;
+#define	RAYLABELEXPR_PRE	const char	**res;					\
+							operand(0,res,const char **);
+
+#define	RAYLABELEXPR		*res	=	currentRayLabel;
 
 #else
+#define	RAYLABELEXPR_PRE
 #define	RAYLABELEXPR
 #endif
 
-DEFSHORTFUNC(RayLabel		,"raylabel"	,"s="	,FUN1EXPR_PRE,RAYLABELEXPR,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
+DEFSHORTFUNC(RayLabel		,"raylabel"	,"s="	,RAYLABELEXPR_PRE,RAYLABELEXPR,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 
+#undef	RAYLABELEXPR_PRE
 #undef	RAYLABELEXPR
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // raydepth	"f="
 #ifndef INIT_SHADING
-#define	RAYDEPTHEXPR	res->real	=	(float) currentRayDepth;
+#define	RAYDEPTHEXPR	*res	=	(float) currentRayDepth;
 
 #else
 #define	RAYDEPTHEXPR

@@ -47,22 +47,6 @@
 #include "netFileMapping.h"
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDSO
-// Description			:	Holds a DSO shader info
-// Comments				:
-class	CDSO {
-public:
-	void				*handle;		// The handle to the module that implements the DSO shader
-	dsoInitFunction		init;			// Init function
-	dsoExecFunction		exec;			// Execute function
-	dsoCleanupFunction	cleanup;		// Cleanup function
-	char				*name;			// Name of the DSO shader
-	char				*prototype;		// Prototype of the DSO shader
-	CDSO				*next;
-};
-
-
 
 
 
@@ -683,24 +667,22 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 // Description			:	Load a DSO matching the prototyoe
 // Return Value			:
 // Comments				:	This function does not need to be thread safe
-int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunction &exec) {
+CDSO				*CRenderer::getDSO(char *name,char *prototype) {
 	CDSO				*cDso;
 
 	// Check if the DSO had been loaded before
 	for (cDso=dsos;cDso!=NULL;cDso=cDso->next) {
 		if (strcmp(cDso->name,name) == 0) {
 			if (strcmp(cDso->prototype,prototype) == 0) {
-				handle	=	cDso->handle;
-				exec	=	cDso->exec;
-				return	TRUE;
+				return	cDso;
 			}
 		}
-	}
-
-	
+	}	
 	
 	dsoInitFunction		init;
+	dsoExecFunction		exec;
 	dsoCleanupFunction	cleanup;
+
 	init		=	NULL;
 	exec		=	NULL;
 	cleanup		=	NULL;
@@ -721,6 +703,8 @@ int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunct
 	}
 
 	if (exec != NULL) {
+		void	*handle;
+
 		// OK, we found the shader
 		if (init !=	NULL)	handle	=	init(0,NULL);
 		else				handle	=	NULL;
@@ -736,9 +720,9 @@ int						CRenderer::getDSO(char *name,char *prototype,void *&handle,dsoExecFunct
 		cDso->next		=	CRenderer::dsos;
 		CRenderer::dsos	=	cDso;
 
-		return TRUE;
+		return cDso;
 	}
 
-	return FALSE;
+	return NULL;
 }
 

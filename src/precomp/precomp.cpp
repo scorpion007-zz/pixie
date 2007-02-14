@@ -814,8 +814,6 @@ int		precomputeStochasticPrimitivesH() {
 // Comments				:
 int	main(int argc,char *argv[]) {
 
-	memInit();
-
 	/*
 	if (precomputeSubdivisionData() == TRUE) {
 		return 1;
@@ -833,8 +831,6 @@ int	main(int argc,char *argv[]) {
 	if (precomputeStochasticPrimitivesH() == TRUE) {
 		return 1;
 	}
-
-	memShutdown();
 
 	return 0;
 }

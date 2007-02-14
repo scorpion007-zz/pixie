@@ -351,7 +351,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 			#ifdef WIN32
 				// use _spawnvp to search PATH, incase pixie
 				// isn't on the default search path
-				long pid = _spawnvp(_P_NOWAIT,argv[0],argv);
+				intptr_t pid = _spawnvp(_P_NOWAIT,argv[0],argv);
 				if (pid <= 0) {
 					if (silent == FALSE)	fprintf(stderr,"Subprocess launch failed\n");
 					return FALSE;
@@ -398,7 +398,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 		FD_SET(sock,&fds);
 		timeout.tv_sec	= 4;
 		timeout.tv_usec = 0;
-		if ( select(sock+1,&fds,NULL,NULL,&timeout) <= 0) {
+		if ( select((int) sock+1,&fds,NULL,NULL,&timeout) <= 0) {
 			if (silent == FALSE)	fprintf(stderr,"Timeout waiting for socket\n");
 			j	=	closesocket(sock);
 			return FALSE;
@@ -521,7 +521,9 @@ void	rndrd(int port) {
 				noRestart	=	TRUE;
 				running		=	FALSE;
 			} else {
-				buffer[0].integer	=	peer;
+				buffer[0].integer	=	(int) peer;
+
+				assert(sizeof(SOCKET) == sizeof(int));
 
 				riThread((void *) buffer);
 				
@@ -561,9 +563,6 @@ int main(int argc, char* argv[]) {
 	int				displayProgress	=	FALSE;
 	int				numThreads		=	-1;
 	int				localChildren	=	0;
-
-	// Init the memory manager
-	memInit();
 
 	// Register the exit stuff
 	sprintf(managerString,"");
@@ -754,8 +753,6 @@ int main(int argc, char* argv[]) {
 	if (!killservers) RiReadArchive(source,NULL,NULL);
 
 	RiEnd();
-
-	memShutdown();
 
 	return (RiLastError != RIE_NOERROR) ? -1 : 0;
 }

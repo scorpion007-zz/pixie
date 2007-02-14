@@ -1586,9 +1586,9 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		cVertex = loops[0];
 		pVertex = cVertex->prev;
 		nVertex = cVertex->next;
-		const int	vi0	=	(nVertex->xy - xy) >> 1;
-		const int	vi1	=	(cVertex->xy - xy) >> 1;
-		const int	vi2	=	(pVertex->xy - xy) >> 1;
+		const int	vi0	=	(int) (nVertex->xy - xy) >> 1;
+		const int	vi1	=	(int) (cVertex->xy - xy) >> 1;
+		const int	vi2	=	(int) (pVertex->xy - xy) >> 1;
 
 		if (reverse == FALSE) {
 			createTriangle(vindices,vi0,vi1,vi2,data);
@@ -1605,10 +1605,10 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		pVertex		= cVertex->prev;
 		nnVertex	= pVertex->prev;
 		nVertex		= cVertex->next;
-		const int	vi0	=	(nVertex->xy - xy) >> 1;
-		const int	vi1	=	(cVertex->xy - xy) >> 1;
-		const int	vi2	=	(pVertex->xy - xy) >> 1;
-		const int	vi3	=	(nnVertex->xy - xy) >> 1;
+		const int	vi0	=	(int) (nVertex->xy - xy) >> 1;
+		const int	vi1	=	(int) (cVertex->xy - xy) >> 1;
+		const int	vi2	=	(int) (pVertex->xy - xy) >> 1;
+		const int	vi3	=	(int) (nnVertex->xy - xy) >> 1;
 
 		if (reverse == FALSE) {
 			createQuad(vindices,vi3,vi2,vi1,vi0,data);
@@ -1711,9 +1711,9 @@ nextLoop:;
 
 				if (a >= 0) {
 					if (valid(sVertex,nVertex,pVertex)) {
-						const int	vi0	=	(nVertex->xy - xy) >> 1;
-						const int	vi1	=	(cVertex->xy - xy) >> 1;
-						const int	vi2	=	(pVertex->xy - xy) >> 1;
+						const int	vi0	=	(int) (nVertex->xy - xy) >> 1;
+						const int	vi1	=	(int) (cVertex->xy - xy) >> 1;
+						const int	vi2	=	(int) (pVertex->xy - xy) >> 1;
 
 						if (reverse == FALSE) {
 							createTriangle(vindices,vi0,vi1,vi2,data);

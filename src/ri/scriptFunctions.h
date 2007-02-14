@@ -37,21 +37,21 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-#define	FUN1EXPR_PRE		TCode	*res;									\
-							operand(0,res);
+#define	FUN1EXPR_PRE		float	*res;									\
+							operand(0,res,float *);
 
 #define	FUN1EXPR_UPDATE(__rs)												\
 							res	+=	__rs;
 
 
-#define	FUN2EXPR_PRE		TCode		*res;								\
-							const TCode	*op;								\
-							operand(0,res);									\
-							operand(1,op);
+#define	FUN2EXPR_PRE		float		*res;								\
+							const float	*op;								\
+							operand(0,res,float *);							\
+							operand(1,op,const float *);
 
-#define	FUN2OUTEXPR_PRE		TCode		*res,*op;							\
-							operand(0,res);									\
-							operand(1,op);
+#define	FUN2OUTEXPR_PRE		float		*res,*op;							\
+							operand(0,res,float *);							\
+							operand(1,op,float *);
 
 
 
@@ -60,16 +60,16 @@
 							op	+=	__op1s;
 
 
-#define	FUN3EXPR_PRE		TCode		*res;								\
-							const TCode	*op1,*op2;							\
-							operand(0,res);									\
-							operand(1,op1);									\
-							operand(2,op2);
+#define	FUN3EXPR_PRE		float		*res;								\
+							const float	*op1,*op2;							\
+							operand(0,res,float *);							\
+							operand(1,op1,const float *);					\
+							operand(2,op2,const float *);
 
-#define	FUN3OUTEXPR_PRE		TCode		*res,*op1,*op2;						\
-							operand(0,res);									\
-							operand(1,op1);									\
-							operand(2,op2);
+#define	FUN3OUTEXPR_PRE		float		*res,*op1,*op2;						\
+							operand(0,res,float *);							\
+							operand(1,op1,float *);							\
+							operand(2,op2,float *);
 
 
 #define	FUN3EXPR_UPDATE(__rs,__op1s,__op2s)									\
@@ -78,18 +78,18 @@
 							op2	+=	__op2s;
 
 
-#define	FUN4EXPR_PRE		TCode		*res;								\
-							const TCode	*op1,*op2,*op3;						\
-							operand(0,res);									\
-							operand(1,op1);									\
-							operand(2,op2);									\
-							operand(3,op3);
+#define	FUN4EXPR_PRE		float		*res;								\
+							const float	*op1,*op2,*op3;						\
+							operand(0,res,float *);							\
+							operand(1,op1,const float *);					\
+							operand(2,op2,const float *);					\
+							operand(3,op3,const float *);
 
-#define	FUN4OUTEXPR_PRE		TCode		*res,*op1,*op2,*op3;				\
-							operand(0,res);									\
-							operand(1,op1);									\
-							operand(2,op2);									\
-							operand(3,op3);
+#define	FUN4OUTEXPR_PRE		float		*res,*op1,*op2,*op3;				\
+							operand(0,res,float *);							\
+							operand(1,op1,float *);							\
+							operand(2,op2,float *);							\
+							operand(3,op3,float *);
 
 
 #define	FUN4EXPR_UPDATE(__rs,__op1s,__op2s,__op3s)							\
@@ -98,20 +98,20 @@
 							op2	+=	__op2s;									\
 							op3	+=	__op3s;
 
-#define	FUN5EXPR_PRE		TCode		*res;								\
-							const TCode	*op1,*op2,*op3,*op4;				\
-							operand(0,res);									\
-							operand(1,op1);									\
-							operand(2,op2);									\
-							operand(3,op3);									\
-							operand(4,op4);
+#define	FUN5EXPR_PRE		float		*res;								\
+							const float	*op1,*op2,*op3,*op4;				\
+							operand(0,res,float *);							\
+							operand(1,op1,const float *);					\
+							operand(2,op2,const float *);					\
+							operand(3,op3,const float *);					\
+							operand(4,op4,const float *);
 
-#define	FUN5OUTEXPR_PRE		TCode	*res,*op1,*op2,*op3,*op4;				\
-							operand(0,res);									\
-							operand(1,op1);									\
-							operand(2,op2);									\
-							operand(3,op3);									\
-							operand(4,op4);
+#define	FUN5OUTEXPR_PRE		float	*res,*op1,*op2,*op3,*op4;				\
+							operand(0,res,float *);							\
+							operand(1,op1,float *);							\
+							operand(2,op2,float *);							\
+							operand(3,op3,float *);							\
+							operand(4,op4,float *);
 
 
 #define	FUN5EXPR_UPDATE(__rs,__op1s,__op2s,__op3s,__op4s)					\
@@ -121,7 +121,7 @@
 							op3	+=	__op3s;									\
 							op4	+=	__op4s;
 
-#define	SIMPLEFUNCTION		res->real	=	(float) FUNCTION(op->real);
+#define	SIMPLEFUNCTION		*res	=	(float) FUNCTION(*op);
 
 
 #define	FUNCTION(x)	degrees(x)
@@ -192,24 +192,24 @@ DEFFUNC(Ceil		,"ceil"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),N
 DEFFUNC(Round		,"round"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	ATAN2EXP	res->real	=	atan2f(op1->real,op2->real);
+#define	ATAN2EXP	*res		=	atan2f(*op1,*op2);
 DEFFUNC(Atan2		,"atan"			,"f=ff",FUN3EXPR_PRE,ATAN2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	POW2EXP		res->real	=	powf(op1->real,op2->real); if (res->real*res->real < 0) res->real = 0;
+#define	POW2EXP		*res		=	powf(*op1,*op2); if ((*res)*(*res) < 0) *res = 0;
 DEFFUNC(Pow2		,"pow"			,"f=ff",FUN3EXPR_PRE,POW2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	LOG2EXP		res->real	=	logf(op1->real) / logf(op2->real);
+#define	LOG2EXP		*res		=	logf(*op1) / logf(*op2);
 DEFFUNC(Log2		,"log"			,"f=ff",FUN3EXPR_PRE,LOG2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	MOD2EXP		res->real	=	fmodf(op1->real,op2->real); if (res->real < 0) res->real += op2->real; assert(res->real >= 0);
+#define	MOD2EXP		*res		=	fmodf(*op1,*op2); if (*res < 0) *res += *op2; assert(*res >= 0);
 DEFFUNC(Mod2		,"mod"			,"f=ff",FUN3EXPR_PRE,MOD2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	CLAMPFEXP	res->real	=	(op1->real < op2->real ? op2->real: op1->real > op3->real ? op3->real : op1->real);
+#define	CLAMPFEXP	*res		=	(*op1 < *op2 ? *op2: *op1 > *op3 ? *op3 : *op1);
 DEFFUNC(Clampf		,"clamp"		,"f=fff",FUN4EXPR_PRE,CLAMPFEXP,FUN4EXPR_UPDATE(1,1,1,1),NULL_EXPR,0)
 
-#define	CLAMPVEXP	res[0].real	=	(op1[0].real < op2[0].real ? op2[0].real: op1[0].real > op3[0].real ? op3[0].real : op1[0].real);	\
-					res[1].real	=	(op1[1].real < op2[1].real ? op2[1].real: op1[1].real > op3[1].real ? op3[1].real : op1[1].real);	\
-					res[2].real	=	(op1[2].real < op2[2].real ? op2[2].real: op1[2].real > op3[2].real ? op3[2].real : op1[2].real);
+#define	CLAMPVEXP	res[0]	=	(op1[0] < op2[0] ? op2[0]: op1[0] > op3[0] ? op3[0] : op1[0]);	\
+					res[1]	=	(op1[1] < op2[1] ? op2[1]: op1[1] > op3[1] ? op3[1] : op1[1]);	\
+					res[2]	=	(op1[2] < op2[2] ? op2[2]: op1[2] > op3[2] ? op3[2] : op1[2]);
 
 DEFLINKFUNC(Clampp		,"clamp"		,	"p=ppp" , 0)
 DEFLINKFUNC(Clampn		,"clamp"		,	"n=nnn"	, 0)
@@ -224,21 +224,21 @@ DEFFUNC(Clampv			,"clamp"		,	"v=vvv"	,FUN4EXPR_PRE,CLAMPVEXP,FUN4EXPR_UPDATE(3,3
 
 
 
-#define	MIXFEXP		res[0].real	=	op1[0].real*(1-op3[0].real) + op2[0].real*op3[0].real;
+#define	MIXFEXP		res[0]	=	op1[0]*(1-op3[0]) + op2[0]*op3[0];
 DEFFUNC(Mixf		,"mix"		,"f=fff",FUN4EXPR_PRE,MIXFEXP,FUN4EXPR_UPDATE(1,1,1,1),NULL_EXPR,0)
 
-#define	MIXVEXP		res[0].real	=	op1[0].real*(1-op3[0].real) + op2[0].real*op3[0].real;	\
-					res[1].real	=	op1[1].real*(1-op3[0].real) + op2[1].real*op3[0].real;	\
-					res[2].real	=	op1[2].real*(1-op3[0].real) + op2[2].real*op3[0].real;
+#define	MIXVEXP		res[0]	=	op1[0]*(1-op3[0]) + op2[0]*op3[0];	\
+					res[1]	=	op1[1]*(1-op3[0]) + op2[1]*op3[0];	\
+					res[2]	=	op1[2]*(1-op3[0]) + op2[2]*op3[0];
 
 DEFLINKFUNC(Mixc		,"mix"			,	"c=ccf", 0)
 DEFLINKFUNC(Mixp		,"mix"			,	"p=ppf", 0)
 DEFLINKFUNC(Mixn		,"mix"			,	"n=nnf", 0)
 DEFFUNC(Mixv			,"mix"			,	"v=vvf",FUN4EXPR_PRE,MIXVEXP,FUN4EXPR_UPDATE(3,3,3,1),NULL_EXPR,0)
 
-#define	MIXVVEXP	res[0].real	=	op1[0].real*(1-op3[0].real) + op2[0].real*op3[0].real;	\
-					res[1].real	=	op1[1].real*(1-op3[1].real) + op2[1].real*op3[1].real;	\
-					res[2].real	=	op1[2].real*(1-op3[2].real) + op2[2].real*op3[2].real;
+#define	MIXVVEXP	res[0]	=	op1[0]*(1-op3[0]) + op2[0]*op3[0];	\
+					res[1]	=	op1[1]*(1-op3[1]) + op2[1]*op3[1];	\
+					res[2]	=	op1[2]*(1-op3[2]) + op2[2]*op3[2];
 
 DEFLINKFUNC(Mixcc		,"mix"			,	"c=ccc", 0)
 DEFLINKFUNC(Mixpp		,"mix"			,	"p=ppp", 0)
@@ -246,24 +246,24 @@ DEFLINKFUNC(Mixnn		,"mix"			,	"n=nnn", 0)
 DEFFUNC(Mixvv			,"mix"			,	"v=vvv",FUN4EXPR_PRE,MIXVVEXP,FUN4EXPR_UPDATE(3,3,3,3),NULL_EXPR,0)
 
 
-#define	STEPEXP		res->real	=	(op2->real < op1->real ? 0.0f : 1.0f);
+#define	STEPEXP		*res	=	(*op2 < *op1 ? 0.0f : 1.0f);
 DEFFUNC(Stepf		,"step"		,"f=ff",FUN3EXPR_PRE,STEPEXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
 
-#define	SMOOTHSTEPEXP	if (op3->real < op1->real)		res->real	=	0;							\
-						else if (op3->real > op2->real)	res->real	=	1;							\
-						else {																		\
-							float	u	=	(op3->real - op1->real) / (op2->real - op1->real);		\
-							res->real	=	-2*u*u*u + 3*u*u;										\
+#define	SMOOTHSTEPEXP	if (*op3 < *op1)		*res	=	0;							\
+						else if (*op3 > *op2)	*res	=	1;							\
+						else {															\
+							float	u	=	(*op3 - *op1) / (*op2 - *op1);				\
+							*res		=	-2*u*u*u + 3*u*u;							\
 						}
 
 DEFFUNC(SmoothStepf		,"smoothstep"		,"f=fff",FUN4EXPR_PRE,SMOOTHSTEPEXP,FUN4EXPR_UPDATE(1,1,1,1),NULL_EXPR,0)
 
-#define	RANDOMFEXP		res->real	=	urand();
+#define	RANDOMFEXP		*res	=	urand();
 
-#define	RANDOMVEXP		res[0].real	=	urand();	\
-						res[1].real	=	urand();	\
-						res[2].real	=	urand();
+#define	RANDOMVEXP		res[0]	=	urand();	\
+						res[1]	=	urand();	\
+						res[2]	=	urand();
 
 DEFFUNC(Randomf			,"random"		,"f=",FUN1EXPR_PRE,RANDOMFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
 DEFLINKFUNC(Random1		,"random"		,"c=", 0)
@@ -277,17 +277,17 @@ DEFLINKFUNC(URandom2	,"urandom"		,"p=", 0)
 DEFLINKFUNC(URandom3	,"urandom"		,"n=", 0)
 DEFFUNC(URandomv		,"urandom"		,"v=",FUN1EXPR_PRE,RANDOMVEXP,FUN1EXPR_UPDATE(3),NULL_EXPR,0)
 
-#define	XCOMPEXP		res->real	=	op[0].real;
+#define	XCOMPEXP		*res	=	op[0];
 DEFLINKFUNC(Xcomp1		,"xcomp"		,"f=p", 0)
 DEFLINKFUNC(Xcomp2		,"xcomp"		,"f=n", 0)
 DEFFUNC(XComp			,"xcomp"		,"f=v",FUN2EXPR_PRE,XCOMPEXP,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 
-#define	YCOMPEXP		res->real	=	op[1].real;
+#define	YCOMPEXP		*res	=	op[1];
 DEFLINKFUNC(Ycomp1		,"ycomp"		,"f=p", 0)
 DEFLINKFUNC(Ycomp2		,"ycomp"		,"f=n", 0)
 DEFFUNC(YComp			,"ycomp"		,"f=v",FUN2EXPR_PRE,YCOMPEXP,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 
-#define	ZCOMPEXP		res->real	=	op[2].real;
+#define	ZCOMPEXP		*res	=	op[2];
 DEFLINKFUNC(Zcomp1		,"zcomp"		,"f=p", 0)
 DEFLINKFUNC(Zcomp2		,"zcomp"		,"f=n", 0)
 DEFFUNC(ZComp			,"zcomp"		,"f=v",FUN2EXPR_PRE,ZCOMPEXP,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
@@ -296,9 +296,9 @@ DEFFUNC(ZComp			,"zcomp"		,"f=v",FUN2EXPR_PRE,ZCOMPEXP,FUN2EXPR_UPDATE(1,3),NULL
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // setxcomp "o=Vf"
-#define	SETXCOMPEXP			res[0].real	=	op->real;
-#define	SETYCOMPEXP			res[1].real	=	op->real;
-#define	SETZCOMPEXP			res[2].real	=	op->real;
+#define	SETXCOMPEXP			res[0]	=	*op;
+#define	SETYCOMPEXP			res[1]	=	*op;
+#define	SETZCOMPEXP			res[2]	=	*op;
 
 DEFLINKFUNC(SetXcomp1		,"setxcomp"		,"o=Pf", 0)
 DEFLINKFUNC(SetXcomp2		,"setxcomp"		,"o=Nf", 0)
@@ -310,18 +310,18 @@ DEFLINKFUNC(SetZcomp1		,"setzcomp"		,"o=Pf", 0)
 DEFLINKFUNC(SetZcomp2		,"setzcomp"		,"o=Nf", 0)
 DEFFUNC(SetZComp			,"setzcomp"		,"o=Vf",FUN2EXPR_PRE,SETZCOMPEXP,FUN2EXPR_UPDATE(3,1),NULL_EXPR,0)
 
-#define	COMPEXP				res->real		=	op1[(int) op2->real].real;
+#define	COMPEXP				*res		=	op1[(int) *op2];
 DEFLINKFUNC(Comp1		,"comp"		,"f=pf", 0)
 DEFLINKFUNC(Comp2		,"comp"		,"f=nf", 0)
 DEFLINKFUNC(Comp3		,"comp"		,"f=cf", 0)
 DEFFUNC(Comp			,"comp"		,"f=vf"	,FUN3EXPR_PRE,COMPEXP,FUN3EXPR_UPDATE(1,3,1),NULL_EXPR,0)
 
-#define	MCOMPEXP		res->real		=	op1[((int) op2->real)*4 + ((int) op3->real)].real;
+#define	MCOMPEXP		*res			=	op1[((int) *op2)*4 + ((int) *op3)];
 DEFFUNC(MComp			,"comp"		,"f=mff",FUN4EXPR_PRE,MCOMPEXP,FUN4EXPR_UPDATE(1,16,1,1),NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // setcomp "o=Vff"
-#define	SETCOMPEXP			res[(int) op1->real].real	=	op2->real;
+#define	SETCOMPEXP			res[(int) *op1]	=	*op2;
 
 DEFLINKFUNC(SetComp1	,"setcomp"		,"o=Pff", 0)
 DEFLINKFUNC(SetComp2	,"setcomp"		,"o=Nff", 0)
@@ -330,26 +330,26 @@ DEFFUNC(SetComp			,"setcomp"		,"o=Vff",FUN3EXPR_PRE,SETCOMPEXP,FUN3EXPR_UPDATE(3
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // setcomp "o=Mfff"
-#define	SETMCOMPEXP			res[element((int) op1->real,(int) op2->real)].real	=	op3->real;
+#define	SETMCOMPEXP			res[element((int) *op1,(int) *op2)]	=	*op3;
 DEFFUNC(SetMComp			,"setcomp"		,"o=Mfff",FUN4EXPR_PRE,SETMCOMPEXP,FUN4EXPR_UPDATE(16,1,1,1),NULL_EXPR,0)
 
-#define	LENGTHEXP			res->real	=	lengthv(&op->real);
+#define	LENGTHEXP			*res	=	lengthv(op);
 DEFLINKFUNC(Length3	,"length"		,"f=c", 0)
 DEFLINKFUNC(Length1	,"length"		,"f=p", 0)
 DEFLINKFUNC(Length2	,"length"		,"f=n", 0)
 DEFFUNC(Length		,"length"		,"f=v"	,FUN2EXPR_PRE,LENGTHEXP,FUN2EXPR_UPDATE(1,3),NULL_EXPR,0)
 
-#define	NORMALIZEXP			if (dotvv(&op->real,&op->real) > 0) normalizev(&res->real,&op->real);	else initv(&res->real,0,0,0);
+#define	NORMALIZEXP			if (dotvv(op,op) > 0) normalizev(res,op);	else initv(res,0,0,0);
 DEFLINKFUNC(Normalize3	,"normalize"		,"c=c", 0)
 DEFLINKFUNC(Normalize1	,"normalize"		,"p=p", 0)
 DEFLINKFUNC(Normalize2	,"normalize"		,"n=n", 0)
 DEFFUNC(Normalize		,"normalize"		,"v=v"	,FUN2EXPR_PRE,NORMALIZEXP,FUN2EXPR_UPDATE(3,3),NULL_EXPR,0)
 
-#define	DISTANCEEXP_PRE		FUN3EXPR_PRE;										\
+#define	DISTANCEEXP_PRE		FUN3EXPR_PRE;							\
 							vector	vtmp;
 
-#define	DISTANCEEXP			subvv(vtmp,&op1->real,&op2->real);					\
-							res->real	=	lengthv(vtmp);
+#define	DISTANCEEXP			subvv(vtmp,op1,op2);					\
+							*res	=	lengthv(vtmp);
 
 DEFFUNC(Distance		,"distance"			,"f=pp"	,DISTANCEEXP_PRE,DISTANCEEXP,FUN3EXPR_UPDATE(1,3,3),NULL_EXPR,0)
 
@@ -361,9 +361,9 @@ DEFFUNC(Distance		,"distance"			,"f=pp"	,DISTANCEEXP_PRE,DISTANCEEXP,FUN3EXPR_UP
 							vector		vtmp,vtmp2,vtmp3;							\
 							float		l;
 
-#define	PTLINEDEXP			ftmp	=	&op1->real;									\
-							ftmp2	=	&op2->real;									\
-							ftmp3	=	&op3->real;									\
+#define	PTLINEDEXP			ftmp	=	op1;										\
+							ftmp2	=	op2;										\
+							ftmp3	=	op3;										\
 																					\
 							subvv(vtmp,ftmp3,ftmp2);								\
 							subvv(vtmp2,ftmp,ftmp2);								\
@@ -381,7 +381,7 @@ DEFFUNC(Distance		,"distance"			,"f=pp"	,DISTANCEEXP_PRE,DISTANCEEXP,FUN3EXPR_UP
 									l = sqrtf(dotvv(vtmp3,vtmp3))/sqrtf(dotvv(vtmp,vtmp));	\
 								}													\
 							}														\
-							res->real	=	l;
+							*res	=	l;
 
 DEFFUNC(Ptlined		,"ptlined"			,"f=ppp"	,PTLINEDEXP_PRE,PTLINEDEXP,FUN4EXPR_UPDATE(1,3,3,3),NULL_EXPR,0)
 
@@ -390,27 +390,27 @@ DEFFUNC(Ptlined		,"ptlined"			,"f=ppp"	,PTLINEDEXP_PRE,PTLINEDEXP,FUN4EXPR_UPDAT
 						vector	vtmp,vtmp2;											\
 						matrix	mtmp;
 
-#define	ROTATEEXP		subvv(vtmp,&op3->real,&op4->real);							\
-						rotatem(mtmp,vtmp,op2->real);								\
-						subvv(vtmp2,&op1->real,&op4->real);							\
+#define	ROTATEEXP		subvv(vtmp,op3,op4);										\
+						rotatem(mtmp,vtmp,*op2);									\
+						subvv(vtmp2,op1,op4);										\
 						mulmp(vtmp,mtmp,vtmp2);										\
-						addvv(&res->real,vtmp,&op4->real);
+						addvv(res,vtmp,op4);
 
 DEFFUNC(Rotatep		,"rotate"			,"p=pfpp"	,ROTATEEXP_PRE,ROTATEEXP,FUN5EXPR_UPDATE(3,3,1,3,3),NULL_EXPR,0)
 
-#define	REFLECTEXP	reflect(&res->real,&op1->real,&op2->real);
+#define	REFLECTEXP	reflect(res,op1,op2);
 					
 
 DEFFUNC(Reflect		,"reflect"			,"v=vv"	,FUN3EXPR_PRE,REFLECTEXP,FUN3EXPR_UPDATE(3,3,3),NULL_EXPR,0)
 
-#define	REFRACTEXP	::refract(&res->real,&op1->real,&op2->real,op3->real);
+#define	REFRACTEXP	::refract(res,op1,op2,*op3);
 
 DEFFUNC(Refract		,"refract"			,"v=vvf"	,FUN4EXPR_PRE,REFRACTEXP,FUN4EXPR_UPDATE(3,3,3,1),NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // fresnel "o=vvfFF"
 #define	FRESNELEXP		vector	dummy0,dummy1;															\
-						fresnel(&res->real,&op1->real,op2->real,op3->real,op4->real,dummy0,dummy1);
+						fresnel(res,op1,*op2,*op3,*op4,dummy0,dummy1);
 
 
 
@@ -420,14 +420,14 @@ DEFFUNC(Fresnel			,"fresnel"		,"o=vvfFF",FUN5OUTEXPR_PRE,FRESNELEXP,FUN5EXPR_UPD
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // fresnel "o=vvfFFVV"
-#define	FRESNEL7EXPR_PRE	TCode	*op[7];																\
+#define	FRESNEL7EXPR_PRE	float	*op[7];																\
 							int		i;																	\
 																										\
 							for (i=0;i<7;i++) {															\
-								operand(i,op[i]);														\
+								operand(i,op[i],float *);												\
 							}
 
-#define FRESNEL7EXPR		fresnel(&op[0]->real,&op[1]->real,op[2]->real,op[3]->real,op[4]->real,&op[5]->real,&op[6]->real);
+#define FRESNEL7EXPR		fresnel(op[0],op[1],*op[2],*op[3],*op[4],op[5],op[6]);
 
 #define	FRESNEL7EXPR_UPDATE		op[0]	+=	3;															\
 								op[1]	+=	3;															\
@@ -440,56 +440,56 @@ DEFFUNC(Fresnel			,"fresnel"		,"o=vvfFF",FUN5OUTEXPR_PRE,FRESNELEXP,FUN5EXPR_UPD
 
 DEFFUNC(Fresnel2		,"fresnel"		,"o=vvfFFVV",FRESNEL7EXPR_PRE,FRESNEL7EXPR,FRESNEL7EXPR_UPDATE,NULL_EXPR,0)
 
-#define	DETERMINANTEXP		res->real	=	determinantm(&op->real);
+#define	DETERMINANTEXP		*res	=	determinantm(op);
 
 DEFFUNC(Determinant		,"determinant"			,"f=m"	,FUN2EXPR_PRE,DETERMINANTEXP,FUN2EXPR_UPDATE(1,16),NULL_EXPR,0)
 
 
-#define	TRANSLATEEXP_PRE	FUN3EXPR_PRE;													\
+#define	TRANSLATEEXP_PRE	FUN3EXPR_PRE;									\
 							matrix	mtmp;
 
-#define	TRANSLATEEXP		translatem(mtmp,op2[0].real,op2[1].real,op2[2].real);			\
-							mulmm(&res->real,&op1->real,mtmp);
+#define	TRANSLATEEXP		translatem(mtmp,op2[0],op2[1],op2[2]);			\
+							mulmm(res,op1,mtmp);
 
 DEFFUNC(Translatem		,"translate"			,"m=mp"	,TRANSLATEEXP_PRE,TRANSLATEEXP,FUN3EXPR_UPDATE(16,16,3),NULL_EXPR,0)
 
-#define	ROTATEEXPR_PRE		FUN4EXPR_PRE;													\
+#define	ROTATEEXPR_PRE		FUN4EXPR_PRE;									\
 							matrix	mtmp;
 
-#define	ROTATEEXPR			rotatem(mtmp,op3[0].real,op3[1].real,op3[2].real,op2->real);	\
-							mulmm(&res->real,&op1->real,mtmp);
+#define	ROTATEEXPR			rotatem(mtmp,op3[0],op3[1],op3[2],*op2);		\
+							mulmm(res,op1,mtmp);
 
 DEFFUNC(Rotatem			,"rotate"				,"m=mfv"	,ROTATEEXPR_PRE,ROTATEEXPR,FUN4EXPR_UPDATE(16,16,1,3),NULL_EXPR,0)
 
-#define	SCALEEXPR_PRE		FUN3EXPR_PRE;													\
+#define	SCALEEXPR_PRE		FUN3EXPR_PRE;									\
 							matrix	mtmp;
 
-#define	SCALEEXPR			scalem(mtmp,op2[0].real,op2[1].real,op2[2].real);				\
-							mulmm(&res->real,&op1->real,mtmp);
+#define	SCALEEXPR			scalem(mtmp,op2[0],op2[1],op2[2]);				\
+							mulmm(res,op1,mtmp);
 
 DEFFUNC(Scalem			,"scale"				,"m=mp"		,SCALEEXPR_PRE,SCALEEXPR,FUN3EXPR_UPDATE(16,16,3),NULL_EXPR,0)
 
 
-#define	MINFEXPR_PRE		TCode		*res;												\
-							const TCode	**op;												\
+#define	MINFEXPR_PRE		float		*res;												\
+							const float	**op;												\
 							int			numArguments;										\
 							int			i;													\
 							float		min;												\
 																							\
-							operand(0,res);													\
+							operand(0,res,float *);											\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
-								operand(i+1,op[i]);											\
+								operand(i+1,op[i],const float *);							\
 							}
 
-#define	MINFEXPR			min	=	op[0]->real;											\
+#define	MINFEXPR			min	=	*op[0];													\
 							for (i=1;i<numArguments;i++) {									\
-								if (op[i]->real < min)	min = op[i]->real;					\
+								if (*op[i] < min)	min = *op[i];							\
 							}																\
-							res->real	=	min;
+							*res	=	min;
 
 #define	MINFEXPR_UPDATE		res	++;															\
 							for (i=0;i<numArguments;i++)									\
@@ -499,32 +499,32 @@ DEFFUNC(Scalem			,"scale"				,"m=mp"		,SCALEEXPR_PRE,SCALEEXPR,FUN3EXPR_UPDATE(1
 
 DEFFUNC(Minf				,"min"						,"f=f+"		,MINFEXPR_PRE,MINFEXPR,MINFEXPR_UPDATE,MINFEXPR_POST,0)
 
-#define	MINVEXPR_PRE		TCode		*res;												\
-							const TCode	**op;												\
+#define	MINVEXPR_PRE		float		*res;												\
+							const float	**op;												\
 							int			numArguments;										\
 							int			i;													\
 							float		minx,miny,minz;										\
 																							\
-							operand(0,res);													\
+							operand(0,res,float *);											\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
-								operand(i+1,op[i]);											\
+								operand(i+1,op[i],const float *);							\
 							}
 
-#define	MINVEXPR			minx	=	op[0][0].real;										\
-							miny	=	op[0][1].real;										\
-							minz	=	op[0][2].real;										\
+#define	MINVEXPR			minx	=	op[0][0];											\
+							miny	=	op[0][1];											\
+							minz	=	op[0][2];											\
 							for (i=1;i<numArguments;i++) {									\
-								if (op[i][0].real < minx)	minx = op[i][0].real;			\
-								if (op[i][1].real < miny)	miny = op[i][1].real;			\
-								if (op[i][2].real < minz)	minz = op[i][2].real;			\
+								if (op[i][0] < minx)	minx = op[i][0];					\
+								if (op[i][1] < miny)	miny = op[i][1];					\
+								if (op[i][2] < minz)	minz = op[i][2];					\
 							}																\
-							res[0].real	=	minx;											\
-							res[1].real	=	miny;											\
-							res[2].real	=	minz;
+							res[0]	=	minx;												\
+							res[1]	=	miny;												\
+							res[2]	=	minz;
 
 #define	MINVEXPR_UPDATE		res	+=	3;														\
 							for (i=0;i<numArguments;i++)									\
@@ -534,26 +534,26 @@ DEFFUNC(Minf				,"min"						,"f=f+"		,MINFEXPR_PRE,MINFEXPR,MINFEXPR_UPDATE,MINF
 
 DEFFUNC(Minv				,"min"						,"v=v+"		,MINVEXPR_PRE,MINVEXPR,MINVEXPR_UPDATE,MINVEXPR_POST,0)
 
-#define	MAXFEXPR_PRE		TCode		*res;												\
-							const TCode	**op;												\
+#define	MAXFEXPR_PRE		float		*res;												\
+							const float	**op;												\
 							int			numArguments;										\
 							int			i;													\
 							float		max;												\
 																							\
-							operand(0,res);													\
+							operand(0,res,float *);											\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
-								operand(i+1,op[i]);											\
+								operand(i+1,op[i],const float *);							\
 							}
 
-#define	MAXFEXPR			max	=	op[0]->real;											\
+#define	MAXFEXPR			max	=	*op[0];													\
 							for (i=1;i<numArguments;i++) {									\
-								if (op[i]->real > max)	max = op[i]->real;					\
+								if (*op[i] > max)	max = *op[i];							\
 							}																\
-							res->real	=	max;
+							*res	=	max;
 
 #define	MAXFEXPR_UPDATE		res++;															\
 							for (i=0;i<numArguments;i++)									\
@@ -564,32 +564,32 @@ DEFFUNC(Minv				,"min"						,"v=v+"		,MINVEXPR_PRE,MINVEXPR,MINVEXPR_UPDATE,MINV
 DEFFUNC(Maxf				,"max"						,"f=f+"		,MAXFEXPR_PRE,MAXFEXPR,MAXFEXPR_UPDATE,MAXFEXPR_POST,0)
 
 
-#define	MAXVEXPR_PRE		TCode		*res;												\
-							const TCode	**op;												\
+#define	MAXVEXPR_PRE		float		*res;												\
+							const float	**op;												\
 							int			numArguments;										\
 							int			i;													\
 							float		maxx,maxy,maxz;										\
 																							\
-							operand(0,res);													\
+							operand(0,res,float *);											\
 							argumentcount(numArguments);									\
 							numArguments--;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
 							for (i=0;i<numArguments;i++) {									\
-								operand(i+1,op[i]);											\
+								operand(i+1,op[i],const float *);							\
 							}
 
-#define	MAXVEXPR			maxx	=	op[0][0].real;										\
-							maxy	=	op[0][1].real;										\
-							maxz	=	op[0][2].real;										\
+#define	MAXVEXPR			maxx	=	op[0][0];											\
+							maxy	=	op[0][1];											\
+							maxz	=	op[0][2];											\
 							for (i=1;i<numArguments;i++) {									\
-								if (op[i][0].real > maxx)	maxx = op[i][0].real;			\
-								if (op[i][1].real > maxy)	maxy = op[i][1].real;			\
-								if (op[i][2].real > maxz)	maxz = op[i][2].real;			\
+								if (op[i][0] > maxx)	maxx = op[i][0];					\
+								if (op[i][1] > maxy)	maxy = op[i][1];					\
+								if (op[i][2] > maxz)	maxz = op[i][2];					\
 							}																\
-							res[0].real	=	maxx;											\
-							res[1].real	=	maxy;											\
-							res[2].real	=	maxz;
+							res[0]	=	maxx;												\
+							res[1]	=	maxy;												\
+							res[2]	=	maxz;
 
 #define	MAXVEXPR_UPDATE		res	+=	3;														\
 							for (i=0;i<numArguments;i++)									\
@@ -602,15 +602,15 @@ DEFFUNC(Maxv					,"max"						,"v=v+"		,MAXVEXPR_PRE,MAXVEXPR,MAXVEXPR_UPDATE,MAX
 
 
 #define	CONCATEXPR_PRE		char		tmp[MAX_SCRIPT_STRING_SIZE];				\
-							TCode		*res;										\
-							const TCode	*op1,*op2;									\
-							operand(0,res);											\
-							operand(1,op1);											\
-							operand(2,op2);
+							char		**res;										\
+							const char	**op1,**op2;								\
+							operand(0,res,char **);									\
+							operand(1,op1,const char **);							\
+							operand(2,op2,const char **);
 
-#define CONCATEXPR			strcpy(tmp,op1->string);								\
-							strcat(tmp,op2->string);								\
-							savestring(res->string,tmp);
+#define CONCATEXPR			strcpy(tmp,*op1);										\
+							strcat(tmp,*op2);										\
+							savestring(*res,tmp);
 
 #define	CONCATEXPR_UPDATE	res++;													\
 							op1++;													\
@@ -622,62 +622,69 @@ DEFFUNC(Concat					,"concat"						,"s=ss"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // match	"f=ss"
 // FIXME: Subpattern matching is not implemented yet
-#define MATCHEXPR		if (strcmp(op1->string,op2->string) == 0)					\
-							res->real	=	1;										\
-						else														\
-							res->real	=	0;
+#define FUN3SEXPR_PRE		float		*res;										\
+							const char	**op1,**op2;								\
+							operand(0,res,float *);									\
+							operand(1,op1,const char **);							\
+							operand(2,op2,const char **);
 
-DEFFUNC(Match					,"match"						,"f=ss"		,FUN3EXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
+#define MATCHEXPR		if (strcmp(*op1,*op2) == 0)									\
+							*res	=	1;											\
+						else														\
+							*res	=	0;
+
+DEFFUNC(Match					,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // printf	"o=s.*"
-#define	PRINTEXPR(r,s,a)	const char	*str;												\
-							char		*tmp;												\
-							int			cp	=	-1;											\
-							tmp	=	r;														\
-							str =   s->string;												\
-							while(*str != '\0')	{											\
-								if (*str == '%') {											\
-									str++;													\
-									if (*str == '\0') break;								\
-									if (*str == 'f') {										\
-										cp++;												\
-										sprintf(tmp,"%f",a[cp]->real);						\
-									} else if (*str == 'c') {								\
-										cp++;												\
-										sprintf(tmp,"(%f,%f,%f)",a[cp][0].real,a[cp][1].real,a[cp][2].real);		\
-									} else if (*str == 'n') {								\
-										cp++;												\
-										sprintf(tmp,"(%f,%f,%f)",a[cp][0].real,a[cp][1].real,a[cp][2].real);		\
-									} else if (*str == 'p') {								\
-										cp++;												\
-										sprintf(tmp,"(%f,%f,%f)",a[cp][0].real,a[cp][1].real,a[cp][2].real);		\
-									} else if (*str == 's') {								\
-										cp++;												\
-										sprintf(tmp,"%s",a[cp]->string);					\
-									} else if (*str == 'm') {								\
-										cp++;												\
-										sprintf(tmp,"((%f,%f,%f,%f),(%f,%f,%f,%f),(%f,%f,%f,%f),(%f,%f,%f,%f))",a[cp][0].real,a[cp][1].real,a[cp][2].real,a[cp][3].real,a[cp][4].real,a[cp][5].real,a[cp][6].real,a[cp][7].real,a[cp][8].real,a[cp][9].real,a[cp][10].real,a[cp][11].real,a[cp][12].real,a[cp][13].real,a[cp][14].real,a[cp][15].real);		\
-									} else {												\
-										*tmp	=	*str;									\
-										tmp++;												\
-									}														\
-									str++;													\
-									tmp	=	strchr(tmp,'\0');								\
-								} else {													\
-									*tmp	=	*str;										\
-									tmp++;													\
-									str++;													\
-								}															\
-							}																\
-							*tmp	=	'\0';
+#define	PRINTEXPR(r,s,af,as)	const char	*str;												\
+								char		*tmp;												\
+								int			cp	=	-1;											\
+								tmp	=	r;														\
+								str =   *s;														\
+								while(*str != '\0')	{											\
+									if (*str == '%') {											\
+										str++;													\
+										if (*str == '\0') break;								\
+										if (*str == 'f') {										\
+											cp++;												\
+											sprintf(tmp,"%f",*af[cp]);							\
+										} else if (*str == 'c') {								\
+											cp++;												\
+											sprintf(tmp,"(%f,%f,%f)",af[cp][0],af[cp][1],af[cp][2]);		\
+										} else if (*str == 'n') {								\
+											cp++;												\
+											sprintf(tmp,"(%f,%f,%f)",af[cp][0],af[cp][1],af[cp][2]);		\
+										} else if (*str == 'p') {								\
+											cp++;												\
+											sprintf(tmp,"(%f,%f,%f)",af[cp][0],af[cp][1],af[cp][2]);		\
+										} else if (*str == 's') {								\
+											cp++;												\
+											sprintf(tmp,"%s",*as[cp]);					\
+										} else if (*str == 'm') {								\
+											cp++;												\
+											sprintf(tmp,"((%f,%f,%f,%f),(%f,%f,%f,%f),(%f,%f,%f,%f),(%f,%f,%f,%f))",af[cp][0],af[cp][1],af[cp][2],af[cp][3],af[cp][4],af[cp][5],af[cp][6],af[cp][7],af[cp][8],af[cp][9],af[cp][10],af[cp][11],af[cp][12],af[cp][13],af[cp][14],af[cp][15]);		\
+										} else {												\
+											*tmp	=	*str;									\
+											tmp++;												\
+										}														\
+										str++;													\
+										tmp	=	strchr(tmp,'\0');								\
+									} else {													\
+										*tmp	=	*str;										\
+										tmp++;													\
+										str++;													\
+									}															\
+								}																\
+								*tmp	=	'\0';
 
 #ifndef INIT_SHADING
 #define PRINTFEXPR_PRE		char		output[MAX_SCRIPT_STRING_SIZE];							\
-							TCode		*res;													\
-							const TCode	**op;													\
+							char		**res;													\
+							const float	**opf;													\
+							const char	***ops;													\
 							int			*opSteps;												\
 							int			resStep;												\
 							int			numArguments;											\
@@ -685,24 +692,28 @@ DEFFUNC(Match					,"match"						,"f=ss"		,FUN3EXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE
 							int			numRealVertices = currentShadingState->numRealVertices;	\
 							int			vertexN	=	0;											\
 																								\
-							operandSize(0,res,resStep);											\
+							operandSize(0,res,resStep,char **);									\
 							argumentcount(numArguments);										\
 							numArguments--;														\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);			\
+							opf		=	(const float **)	ralloc(numArguments*sizeof(float *),threadMemory);	\
+							ops		=	(const char ***)	ralloc(numArguments*sizeof(char **),threadMemory);	\
+							opSteps	=	(int *)				ralloc(numArguments*sizeof(int),threadMemory);		\
 																								\
 							for (i=0;i<numArguments;i++) {										\
-								operandSize(i+1,op[i],opSteps[i]);								\
+								operandSize(i+1,ops[i],opSteps[i],const char **);				\
+								operandSize(i+1,opf[i],opSteps[i],const float *);				\
 							}
 
 #define	PRINTFEXPR			if (vertexN < numRealVertices) {									\
-								PRINTEXPR(output,res,op);										\
+								PRINTEXPR(output,res,opf,ops);									\
 								printf(output);													\
 							}
 
 #define	PRINTF_UPDATE		res	+=	resStep;													\
-							for (i=0;i<numArguments;i++)										\
-								op[i]	+=	opSteps[i];											\
+							for (i=0;i<numArguments;i++) {										\
+								opf[i]	+=	opSteps[i];											\
+								ops[i]	+=	opSteps[i];											\
+							}																	\
 							vertexN++;															\
 
 #define	PRINTF_POST
@@ -730,33 +741,38 @@ DEFFUNC(Printf				,"printf"						,"o=s.*"		,PRINTFEXPR_PRE,PRINTFEXPR,PRINTF_UPD
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // format	"s=s.*"
 #define FORMATEXPR_PRE		char		output[MAX_SCRIPT_STRING_SIZE];							\
-							TCode		*res,*strArg;											\
-							const TCode	**op;													\
+							char		**res,**strArg;											\
+							const float	**opf;													\
+							const char	***ops;													\
 							int			*opSteps;												\
 							int			resStep,strStep;										\
 							int			numArguments;											\
 							int			i;														\
 																								\
-							operandSize(0,res,resStep);											\
-							operandSize(1,strArg,strStep);										\
+							operandSize(0,res,resStep,char **);									\
+							operandSize(1,strArg,strStep,char **);								\
 							argumentcount(numArguments);										\
 							numArguments--;														\
 							numArguments--;														\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
-							opSteps	=	(int *)			ralloc(numArguments*sizeof(int),threadMemory);		\
+							opf		=	(const float **)	ralloc(numArguments*sizeof(float *),threadMemory);	\
+							ops		=	(const char ***)	ralloc(numArguments*sizeof(char **),threadMemory);	\
+							opSteps	=	(int *)				ralloc(numArguments*sizeof(int),threadMemory);		\
 																								\
 							for (i=0;i<numArguments;i++) {										\
-								operandSize(i+2,op[i],opSteps[i]);								\
+								operandSize(i+2,opf[i],opSteps[i],const float *);				\
+								operandSize(i+2,ops[i],opSteps[i],const char **);				\
 							}
 
-#define	FORMATEXPR			PRINTEXPR(output,strArg,op);										\
-							savestring(res->string,output);
+#define	FORMATEXPR			PRINTEXPR(output,strArg,opf,ops);									\
+							savestring(*res,output);
 
 
 #define	FORMAT_UPDATE		res	+=	resStep;												\
 							strArg +=	strStep;											\
-							for (i=0;i<numArguments;i++)									\
-								op[i]	+=	opSteps[i];
+							for (i=0;i<numArguments;i++) {									\
+								opf[i]	+=	opSteps[i];										\
+								ops[i]	+=	opSteps[i];										\
+							}
 
 #define	FORMAT_POST
 
@@ -770,74 +786,75 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 
 #ifndef INIT_SHADING
 
-#define	SPLINEVEXPR_PRE		TCode		*res;													\
-							const TCode	**op;													\
+#define	SPLINEVEXPR_PRE		float		*res;													\
+							const float	**op;													\
 							int			numArguments;											\
 							int			i;														\
-							TCode		*val,*splineType;										\
+							const float *val;													\
+							const char	**splineType;											\
 							float		ub[4],tmp[4];											\
 							const float	*ubasis = (float*) RiCatmullRomBasis;					\
 							int			ustep = 1;												\
 							int			numPieces;												\
 																								\
-							operand(1,splineType);												\
+							operand(1,splineType,const char **);								\
 							ubasis 	=	(float*) RiCatmullRomBasis;								\
 							ustep	=	1;														\
-							if (!strcmp(splineType->string,"catmull-rom")) {					\
+							if (!strcmp(*splineType,"catmull-rom")) {							\
 								/* do nothing */												\
-							} else if (!strcmp(splineType->string,"bezier")) {					\
+							} else if (!strcmp(*splineType,"bezier")) {							\
 								ubasis 	=	(float*) RiBezierBasis;								\
 								ustep	=	3;													\
-							} else if (!strcmp(splineType->string,"bspline")) {					\
+							} else if (!strcmp(*splineType,"bspline")) {						\
 								ubasis 	=	(float*) RiBSplineBasis;							\
 								ustep	=	1;													\
-							} else if (!strcmp(splineType->string,"hermite")) {					\
+							} else if (!strcmp(*splineType,"hermite")) {						\
 								ubasis 	=	(float*) RiHermiteBasis;							\
 								ustep	=	2;													\
 							} else {															\
-								error(CODE_BADTOKEN,"Unknown spline basis \"%s\"\n",splineType->string);	\
+								error(CODE_BADTOKEN,"Unknown spline basis \"%s\"\n",*splineType);	\
 							}																	\
 																								\
-							operand(0,res);														\
-							operand(2,val);														\
+							operand(0,res,float *);												\
+							operand(2,val,const float *);										\
 							argumentcount(numArguments);										\
 							numArguments-=3;													\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 							numPieces = (numArguments-4)/ustep+1;								\
 																								\
 							for (i=0;i<numArguments;i++) {										\
-								operand(i+3,op[i]);												\
+								operand(i+3,op[i],float *);										\
 							}
 
 
-#define	SPLINEEXPR_PRE		TCode		*res;													\
-							const TCode	**op;													\
+#define	SPLINEEXPR_PRE		float		*res;													\
+							const float	**op;													\
 							int			numArguments;											\
 							int			i;														\
-							TCode		*val;													\
+							const float	*val;													\
 							float		ub[4],tmp[4];											\
 							const float	*ubasis = (float*) RiCatmullRomBasis;					\
 							int			ustep = 1;												\
 							int			numPieces;												\
 																								\
-							operand(0,res);														\
-							operand(1,val);														\
+							operand(0,res,float *);												\
+							operand(1,val,const float *);										\
 							argumentcount(numArguments);										\
 							numArguments--;														\
 							numArguments--;														\
-							op		=	(const TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
+							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 							numPieces = (numArguments-3);										\
 																								\
 							for (i=0;i<numArguments;i++) {										\
-								operand(i+2,op[i]);												\
+								operand(i+2,op[i],const float *);								\
 							}
 
-#define	SPLINEFEXPR			if (val->real <= 0)			res->real	=	op[1]->real;					\
-							else if (val->real >= 1)	res->real	=	op[numArguments-2]->real;		\
+#define	SPLINEFEXPR			if (*val <= 0)		*res	=	*op[1];										\
+							else if (*val >= 1)	*res	=	*op[numArguments-2];						\
 							else {																		\
-								int		piece	=	(int) floor(val->real * (float) numPieces);			\
+								int		piece	=	(int) floor(*val * (float) numPieces);				\
 								int		pieceid	=	piece*ustep;										\
-								float	u		=	val->real*((float) numPieces) - (float) piece;		\
+								float	u		=	(*val)*((float) numPieces) - (float) piece;			\
 								ub[3] = 1;																\
 								ub[2] =	u;																\
 								ub[1] =	u*u;															\
@@ -848,16 +865,16 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 								tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];	\
 								tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];	\
 																										\
-								res->real		=	tmp[0]*op[pieceid+0]->real +						\
-													tmp[1]*op[pieceid+1]->real +						\
-													tmp[2]*op[pieceid+2]->real +						\
-													tmp[3]*op[pieceid+3]->real;							\
+								*res	=	tmp[0]*op[pieceid+0][0] +									\
+											tmp[1]*op[pieceid+1][0] +									\
+											tmp[2]*op[pieceid+2][0] +									\
+											tmp[3]*op[pieceid+3][0];									\
 							}																			\
 
 
-#define	SPLINEFEXPR_UPDATE	res++;																\
-							val++;																\
-							for (i=0;i<numArguments;i++)										\
+#define	SPLINEFEXPR_UPDATE	res++;																		\
+							val++;																		\
+							for (i=0;i<numArguments;i++)												\
 								op[i]++;
 
 #define	SPLINEFEXPR_POST
@@ -888,12 +905,12 @@ DEFFUNC(Splinesf				,"spline"						,"f=Sfffff*"	,SPLINEVEXPR_PRE,SPLINEFEXPR,SPL
 
 #ifndef INIT_SHADING
 
-#define	SPLINEPEXPR			if (val->real <= 0)			movvv(&res->real,&op[1]->real);					\
-							else if (val->real >= 1)	movvv(&res->real,&op[numArguments-2]->real);	\
+#define	SPLINEPEXPR			if (*val <= 0)			movvv(res,op[1]);									\
+							else if (*val >= 1)		movvv(res,op[numArguments-2]);						\
 							else {																		\
-								int		piece	=	(int) floor(val->real * (float) numPieces);			\
+								int		piece	=	(int) floor((*val) * (float) numPieces);			\
 								int		pieceid	=	piece*ustep;										\
-								float	u		=	val->real*((float) numPieces) - (float) piece;		\
+								float	u		=	(*val)*((float) numPieces) - (float) piece;			\
 								ub[3] = 1;																\
 								ub[2] =	u;																\
 								ub[1] =	u*u;															\
@@ -904,20 +921,20 @@ DEFFUNC(Splinesf				,"spline"						,"f=Sfffff*"	,SPLINEVEXPR_PRE,SPLINEFEXPR,SPL
 								tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];	\
 								tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];	\
 																										\
-								res[0].real		=	tmp[0]*op[pieceid+0][0].real +						\
-													tmp[1]*op[pieceid+1][0].real +						\
-													tmp[2]*op[pieceid+2][0].real +						\
-													tmp[3]*op[pieceid+3][0].real;						\
+								res[0]		=	tmp[0]*op[pieceid+0][0] +								\
+												tmp[1]*op[pieceid+1][0] +								\
+												tmp[2]*op[pieceid+2][0] +								\
+												tmp[3]*op[pieceid+3][0];								\
 																										\
-								res[1].real		=	tmp[0]*op[pieceid+0][1].real +						\
-													tmp[1]*op[pieceid+1][1].real +						\
-													tmp[2]*op[pieceid+2][1].real +						\
-													tmp[3]*op[pieceid+3][1].real;						\
+								res[1]		=	tmp[0]*op[pieceid+0][1] +								\
+												tmp[1]*op[pieceid+1][1] +								\
+												tmp[2]*op[pieceid+2][1] +								\
+												tmp[3]*op[pieceid+3][1];								\
 																										\
-								res[2].real		=	tmp[0]*op[pieceid+0][2].real +						\
-													tmp[1]*op[pieceid+1][2].real +						\
-													tmp[2]*op[pieceid+2][2].real +						\
-													tmp[3]*op[pieceid+3][2].real;						\
+								res[2]		=	tmp[0]*op[pieceid+0][2] +								\
+												tmp[1]*op[pieceid+1][2] +								\
+												tmp[2]*op[pieceid+2][2] +								\
+												tmp[3]*op[pieceid+3][2];								\
 							}																			\
 
 
@@ -958,28 +975,28 @@ DEFFUNC(VSplinep		,"spline"		,"p=Sfpppp*"	,SPLINEVEXPR_PRE,SPLINEPEXPR,SPLINEPEX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // spline	"p=fP"
-#define	SPLINEAPEXPR_PRE	TCode		*res;													\
-							const TCode	*op;													\
+#define	SPLINEAPEXPR_PRE	float		*res;													\
+							const float	*op;													\
 							int			numArguments;											\
-							TCode		*val;													\
+							const float	*val;													\
 							float		ub[4],tmp[4];											\
 							const float	*ubasis = (float*) RiCatmullRomBasis;					\
 							int			ustep = 1;												\
 							int			numPieces;												\
 																								\
-							operand(0,res);														\
-							operand(1,val);														\
-							operandSize(2,op,numArguments);										\
+							operand(0,res,float *);												\
+							operand(1,val,const float *);										\
+							operandSize(2,op,numArguments,const float *);						\
 							numArguments	/=	3;												\
 							numPieces		=	(numArguments-3);
 
 
-#define	SPLINEAPEXPR		if (val->real <= 0)			movvv(&res->real,&op[3].real);						\
-							else if (val->real >= 1)	movvv(&res->real,&op[(numArguments-2)*3].real);		\
+#define	SPLINEAPEXPR		if (*val <= 0)				movvv(res,&op[3]);						\
+							else if (*val >= 1)			movvv(res,&op[(numArguments-2)*3]);		\
 							else {																		\
-								int		piece	=	(int) floor(val->real * (float) numPieces);			\
+								int		piece	=	(int) floor((*val) * (float) numPieces);			\
 								int		pieceid	=	piece*ustep;										\
-								float	u		=	val->real*((float) numPieces) - (float) piece;		\
+								float	u		=	(*val)*((float) numPieces) - (float) piece;		\
 								ub[3] = 1;																\
 								ub[2] =	u;																\
 								ub[1] =	u*u;															\
@@ -990,20 +1007,20 @@ DEFFUNC(VSplinep		,"spline"		,"p=Sfpppp*"	,SPLINEVEXPR_PRE,SPLINEPEXPR,SPLINEPEX
 								tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];	\
 								tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];	\
 																										\
-								res[0].real		=	tmp[0]*op[(pieceid+0)*3+0].real +					\
-													tmp[1]*op[(pieceid+1)*3+0].real +					\
-													tmp[2]*op[(pieceid+2)*3+0].real +					\
-													tmp[3]*op[(pieceid+3)*3+0].real;					\
+								res[0]		=	tmp[0]*op[(pieceid+0)*3+0] +							\
+												tmp[1]*op[(pieceid+1)*3+0] +							\
+												tmp[2]*op[(pieceid+2)*3+0] +							\
+												tmp[3]*op[(pieceid+3)*3+0];								\
 																										\
-								res[1].real		=	tmp[0]*op[(pieceid+0)*3+1].real +					\
-													tmp[1]*op[(pieceid+1)*3+1].real +					\
-													tmp[2]*op[(pieceid+2)*3+1].real +					\
-													tmp[3]*op[(pieceid+3)*3+1].real;					\
+								res[1]		=	tmp[0]*op[(pieceid+0)*3+1] +							\
+												tmp[1]*op[(pieceid+1)*3+1] +							\
+												tmp[2]*op[(pieceid+2)*3+1] +							\
+												tmp[3]*op[(pieceid+3)*3+1];								\
 																										\
-								res[2].real		=	tmp[0]*op[(pieceid+0)*3+2].real +					\
-													tmp[1]*op[(pieceid+1)*3+2].real +					\
-													tmp[2]*op[(pieceid+2)*3+2].real +					\
-													tmp[3]*op[(pieceid+3)*3+2].real;					\
+								res[2]		=	tmp[0]*op[(pieceid+0)*3+2] +							\
+												tmp[1]*op[(pieceid+1)*3+2] +							\
+												tmp[2]*op[(pieceid+2)*3+2] +							\
+												tmp[3]*op[(pieceid+3)*3+2];								\
 																										\
 							}																			\
 
@@ -1022,25 +1039,25 @@ DEFFUNC(Splineap			,"spline"		,"p=fP"		,SPLINEAPEXPR_PRE,SPLINEAPEXPR,SPLINEAPEX
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DSO dispatcher
 #define	DSOEXEC_PRE			int					numArguments;								\
-							void				*handle;									\
-							dsoExecFunction		exec;										\
-							TCode				**op;										\
+							char				**op;										\
 							int					*opSteps;									\
 							int					i;											\
 																							\
 							argumentcount(numArguments);									\
-							op		=	(TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);		\
+																							\
+							op		=	(char **)	ralloc(numArguments*sizeof(char *),threadMemory);	\
+							opSteps	=	(int *)		ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
 							for (i=0;i<numArguments;i++) {									\
-								operandSize(i+2,op[i],opSteps[i]);							\
+								operandSize(i,op[i],opSteps[i],char *);						\
+								opSteps[i]	*=	operandBytesPerItem(i);						\
 							}																\
 																							\
-							handle	=	(void *) argument(0);								\
-							exec	=	(dsoExecFunction) argument(1);
+							void			*handle	=	code->dso->handle;					\
+							dsoExecFunction exec	=	code->dso->exec;
 						
 
-#define	DSOEXEC				exec(handle,numArguments,(void **) op);
+#define	DSOEXEC				exec(handle,numArguments-1,(void **) op);
 
 #define	DSOEXEC_UPDATE		for (i=0;i<numArguments;i++) {									\
 								op[i]	+=	opSteps[i];										\
@@ -1053,28 +1070,27 @@ DEFFUNC(DSO				,"XXX",			"XXX",	DSOEXEC_PRE,DSOEXEC,DSOEXEC_UPDATE,DSOEXEC_POST,
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // VOID DSO dispatcher
 #define	DSOVOIDEXEC_PRE		int					numArguments;								\
-							void				*handle;									\
-							dsoExecFunction		exec;										\
-							TCode				**op;										\
+							float				**op;										\
 							int					*opSteps;									\
 							int					i;											\
 																							\
 							argumentcount(numArguments);									\
-							numArguments++;													\
-							op		=	(TCode **) ralloc(numArguments*sizeof(TCode *),threadMemory);	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
-							for (i=1;i<numArguments;i++) {									\
-								operandSize(i+1,op[i],opSteps[i]);							\
+							op		=	(float **) ralloc((numArguments+1)*sizeof(float *),threadMemory);	\
+							opSteps	=	(int *)	   ralloc((numArguments+1)*sizeof(int),threadMemory);		\
+																							\
+							for (i=0;i<numArguments;i++) {									\
+								operandSize(i,op[i+1],opSteps[i+1],float *);				\
+								opSteps[i+1]	*=	operandBytesPerItem(i);					\
 							}																\
 																							\
-							handle	=	(void *) argument(0);								\
-							exec	=	(dsoExecFunction) argument(1);
+							void			*handle	=	code->dso->handle;					\
+							dsoExecFunction exec	=	code->dso->exec;
 
 #define	DSOVOIDEXEC			exec(handle,numArguments,(void **) op);
 
-#define	DSOVOIDEXEC_UPDATE	for (i=1;i<numArguments;i++) {									\
-								op[i]	+=	opSteps[i];										\
+#define	DSOVOIDEXEC_UPDATE	for (i=0;i<numArguments;i++) {									\
+								op[i+1]	+=	opSteps[i+1];									\
 							}
 
 #define	DSOVOIDEXEC_POST

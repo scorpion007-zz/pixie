@@ -369,7 +369,7 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 // Comments				:
 int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	T32		*buffer;
-	int		i			=	strlen(inName);
+	int		i			=	(int) strlen(inName);
 	int		r;
 
 	// Compute the file name length
@@ -590,7 +590,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 					setsockopt(control,IPPROTO_TCP,TCP_NODELAY,(const char *) &val,sizeof(int));
 					
 					// The following sequence will be processed by RNDR
-					send(control,ribFile,strlen(ribFile)+1,0);		// Send the name of the rib file
+					send(control,ribFile,(int) strlen(ribFile)+1,0);	// Send the name of the rib file
 					recv(control,(char *) netBuffer,sizeof(T32),0);		// Expect an ACK
 
 					// Try to establist the connection
@@ -652,7 +652,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 				setsockopt(control,IPPROTO_TCP,TCP_NODELAY,(const char *) &val,sizeof(int));
 			
 				// The following sequence will be processed by RNDR
-				send(control,ribFile,strlen(ribFile)+1,0);		// Send the name of the rib file
+				send(control,ribFile,(int) strlen(ribFile)+1,0);	// Send the name of the rib file
 				recv(control,(char *) netBuffer,sizeof(T32),0);		// Expect an ACK
 
 				// Try to establist the connection

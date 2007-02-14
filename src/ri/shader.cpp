@@ -87,14 +87,14 @@ void	CFilterLookup::compute() {
 // Description			:
 // Return Value			:	-
 // Comments				:
-void	CShaderVectorVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
+void	CShaderVectorVariable::record(float *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
 
 	for (i=nr;i>0;i--,src+=3) {
 		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
-		movvv((float *) dest + ray->index*3,src);
+		movvv(dest + ray->index*3,src);
 	}
 }
 
@@ -104,14 +104,14 @@ void	CShaderVectorVariable::record(TCode *dest,int nr,CGatherRay **r,float **var
 // Description			:
 // Return Value			:	-
 // Comments				:
-void	CShaderFloatVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
+void	CShaderFloatVariable::record(float *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 	float	*src	=	varying[entry];
 
 	for (i=nr;i>0;i--) {
 		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
-		dest[ray->index].real	=	*src++;
+		dest[ray->index]	=	*src++;
 	}
 }
 
@@ -122,13 +122,13 @@ void	CShaderFloatVariable::record(TCode *dest,int nr,CGatherRay **r,float **vary
 // Description			:
 // Return Value			:	-
 // Comments				:
-void	CRayOriginVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
+void	CRayOriginVariable::record(float *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
 		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
-		movvv((float *) dest + ray->index*3,ray->from);
+		movvv(dest + ray->index*3,ray->from);
 	}
 }
 
@@ -139,13 +139,13 @@ void	CRayOriginVariable::record(TCode *dest,int nr,CGatherRay **r,float **varyin
 // Description			:
 // Return Value			:	-
 // Comments				:
-void	CRayDirVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
+void	CRayDirVariable::record(float *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
 		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
-		movvv((float *) dest + ray->index*3,ray->dir);
+		movvv(dest + ray->index*3,ray->dir);
 	}
 }
 
@@ -156,13 +156,13 @@ void	CRayDirVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) 
 // Description			:
 // Return Value			:	-
 // Comments				:
-void	CRayLengthVariable::record(TCode *dest,int nr,CGatherRay **r,float **varying) {
+void	CRayLengthVariable::record(float *dest,int nr,CGatherRay **r,float **varying) {
 	int		i;
 
 	for (i=nr;i>0;i--) {
 		const CGatherRay	*ray	=	(CGatherRay *) (*r++);
 
-		dest[ray->index].real	=	ray->t;
+		dest[ray->index]	=	ray->t;
 	}
 }
 
@@ -298,7 +298,6 @@ CShader::CShader(const char *name) : CFileResource(name) {
 	name					=	NULL;
 	memory					=	NULL;
 	codeArea				=	NULL;
-	constantsArea			=	NULL;
 	constantEntries			=	NULL;
 	varyingSizes			=	NULL;
 	strings					=	NULL;
@@ -334,7 +333,7 @@ CShader::~CShader() {
 	}
 
 	// Ditch the memory baby
-	if (memory != NULL)					delete [] memory;
+	if (memory != NULL)					free_untyped(memory);
 }
 
 
@@ -382,7 +381,7 @@ CShaderInstance::~CShaderInstance() {
 static char	*token(char **str,char *tok) {
 	char	*cStr	=	*str;
 	char	*oStr	=	cStr;
-	int		n		=	strlen(tok);
+	int		n		=	(int) strlen(tok);
 	int		i;
 
 	if (cStr == NULL)	return NULL;

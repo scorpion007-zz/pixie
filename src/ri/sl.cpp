@@ -99,8 +99,8 @@
 		void							slerror(char *);			// Forward definition for stupid yacc
 		int								sllex(void );				// Forward definition for stupid yacc
 
-		static	char					*initLabel	=	"#!Init";	// The label for the init
-		static	char					*codeLabel	=	"#!Code";	// The label for the code
+		const	char					*initLabel	=	"#!Init";	// The label for the init
+		const	char					*codeLabel	=	"#!Code";	// The label for the code
 
 typedef struct TSlVariable {
 	char			name[64];
@@ -116,6 +116,7 @@ typedef struct TSlVariable {
 typedef struct TSlLabel {
 	char			name[64];
 	int				index;
+	TArgument		*argument;
 	TSlLabel		*next;
 } TSlLabel;
 
@@ -189,6 +190,7 @@ static	TSlFunction		functions[]	=	{
 
 				// Pass 1
 				int						numCode;				// The number of code blocks
+				int						numArgument;			// The number of argument blocks
 				int						numConstants;			// The number of constants
 				int						numVariables;			// The number of variables (local + parameters)
 				int						numStrings;				// The number of strings
@@ -205,7 +207,6 @@ static	TSlFunction		functions[]	=	{
 				EVariableType			currentParameterType;	// The type of the current parameter
 				int						currentParameterMutable;// TRUE if the current parameter is global or writable
 				EVariableClass			currentParameterClass;	// The container class of the current parameter
-				int						currentCode;			// Current xXx
 				int						currentConstant;
 				int						currentVariable;
 				int						currentString;
@@ -214,7 +215,8 @@ static	TSlFunction		functions[]	=	{
 				int						currentConstantSize;
 				int						currentVaryingSize;
 
-				TCode					*currentArray;			// Array items go here as we read them
+				float					*currentArray;			// Array items go here as we read them
+				char					**currentStringArray;	// If the array is string, we this pointer instead
 				int						numArrayItemsRemaining;	// Number of array items we're still expecting to read
 				
 				char					currentOpcode[32];		// Holds the opcode being parsed
@@ -222,16 +224,18 @@ static	TSlFunction		functions[]	=	{
 				int						currentArgument;		// The current argument number
 				unsigned int			usedParameters;			// Used parameters by this shader
 				TCode					*currentOpcodePlace;	// Points to the code that should holds the opcode
+				TArgument				*currentArgumentPlace;	// Points to the current argument that should hold the argument
 
 				int						codeEntryPoint;			// Indices in the code array for corresponding entry points
 				int						initEntryPoint;
 				
-				TCode					*memory;				// The memory base for the area that's allocated
+				char					*memory;				// The memory base for the area that's allocated
 				TCode					*code;					// Code blocks
-				TCode					*constants;				// Constants blocks
+				TArgument				*arguments;				// Argument blocks
+				char					*constants;				// Constants blocks
 				int						*varyingSizes;			// Holds the size of each varying in codes
 				char					**strings;				// Strings defined
-				TCode					**constantEntries;
+				void					**constantEntries;		// Where the constant entries are stored
 
 				TSlVariable				*definedVariables;		// List of defined variables
 				TSlLabel				*labelReferences;		// List of label references
@@ -292,7 +296,7 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Add a new variable/parameter
 									// Return Value			:	The default area if available
 									// Comments				:
-		static	TCode				*newVariable(char *name,EVariableType type,int numItems,int parameter) {
+		static	void				*newVariable(char *name,EVariableType type,int numItems,int parameter) {
 										const int	numComp			=	numComponents(type);
 
 										switch(currentData.passNumber) {
@@ -367,7 +371,7 @@ static	TSlFunction		functions[]	=	{
 														}
 													} //If so, then lets ensure we don't delete it by taking a copy
 													
-													return	(TCode *) (newVariable->defaultValue);
+													return	newVariable->defaultValue;
 												}
 											}
 											break;
@@ -388,25 +392,31 @@ static	TSlFunction		functions[]	=	{
 										
 										switch(currentData.passNumber) {
 										case 1:
-											currentData.numCode			+=	1;
-											currentData.numConstants	+=	1;
-											currentData.numStrings		+=	numItems;
-											currentData.constantSize	+=	numItems;
+											currentData.numArgument		+=	1;							// Add one argument
+											currentData.numConstants	+=	1;							// We have one more constant
+											currentData.numStrings		+=	numItems;					// Reserve numItems strings
+											currentData.constantSize	+=	numItems*sizeof(char *);	// This is the final constant size we consume
 											break;
 										case 2:
 											assert(currentData.currentConstant < 65535);
 											
-											currentData.code[currentData.currentCode].reference.numItems	=	0;
-											currentData.code[currentData.currentCode].reference.index		=	(unsigned short) currentData.currentConstant;
-											currentData.code[currentData.currentCode].reference.accessor	=	SL_IMMEDIATE_OPERAND;
-											currentData.constantEntries[currentData.currentConstant]		=	&currentData.constants[currentData.currentConstantSize];
-											currentData.currentCode++;
+											char	**dest;
+											
+											currentData.currentArgumentPlace->numItems									=	numItems;
+											currentData.currentArgumentPlace->bytesPerItem								=	sizeof(char *);
+											currentData.currentArgumentPlace->index										=	(unsigned short) currentData.currentConstant;
+											currentData.currentArgumentPlace->accessor									=	SL_IMMEDIATE_OPERAND;
+											currentData.constantEntries[currentData.currentConstant]					=	currentData.constants + currentData.currentConstantSize;
+											dest																		=	(char **) currentData.constantEntries[currentData.currentConstant];
 											currentData.currentConstant++;
-
-											for (i=0;i<numItems;i++)
-												currentData.constants[currentData.currentConstantSize++].string		=	currentData.strings[currentData.currentString++]	=	strdup(items[i]);
-
+											currentData.currentArgumentPlace++;
 											currentData.currentArgument++;
+											currentData.currentConstantSize	+=	numItems*sizeof(char *);
+
+											// Acturally record the strings
+											for (i=0;i<numItems;i++)
+												dest[i]	=	currentData.strings[currentData.currentString++]	=	strdup(items[i]);
+											
 											break;
 										default:
 											break;
@@ -423,24 +433,28 @@ static	TSlFunction		functions[]	=	{
 										int	i;
 										switch(currentData.passNumber) {
 											case 1:
-												currentData.numCode			+=	1;
+												currentData.numArgument		+=	1;
 												currentData.numConstants	+=	1;
-												currentData.constantSize	+=	numItems;
+												currentData.constantSize	+=	numItems*sizeof(float);
 												break;
 											case 2:
 												assert(currentData.currentConstant < 65536);
 												
-												currentData.code[currentData.currentCode].reference.numItems	=	0;
-												currentData.code[currentData.currentCode].reference.index		=	(unsigned short) currentData.currentConstant;
-												currentData.code[currentData.currentCode].reference.accessor	=	SL_IMMEDIATE_OPERAND;
-												currentData.constantEntries[currentData.currentConstant]		=	&currentData.constants[currentData.currentConstantSize];
-												currentData.currentCode++;
+												float	*dest;
+												
+												currentData.currentArgumentPlace->numItems						=	numItems;
+												currentData.currentArgumentPlace->bytesPerItem					=	sizeof(float);
+												currentData.currentArgumentPlace->index							=	(unsigned short) currentData.currentConstant;
+												currentData.currentArgumentPlace->accessor						=	SL_IMMEDIATE_OPERAND;
+												currentData.constantEntries[currentData.currentConstant]		=	currentData.constants + currentData.currentConstantSize;
+												dest															=	(float *) currentData.constantEntries[currentData.currentConstant];
 												currentData.currentConstant++;
-
-												for (i=0;i<numItems;i++)
-													currentData.constants[currentData.currentConstantSize++].real	=	items[i];
-
+												currentData.currentArgumentPlace++;
 												currentData.currentArgument++;
+												currentData.currentConstantSize	+=	numItems*sizeof(float);
+
+												for (i=0;i<numItems;i++) dest[i]	=	items[i];
+
 												break;
 											default:
 												break;
@@ -458,7 +472,7 @@ static	TSlFunction		functions[]	=	{
 
 											switch(currentData.passNumber) {
 											case 1:
-												currentData.numCode	+=	1;
+												currentData.numArgument	+=	1;
 												break;
 											case 2:
 												currentData.currentArgument++;
@@ -476,14 +490,15 @@ static	TSlFunction		functions[]	=	{
 														assert(cVariable->index < 65536);
 														assert((cVariable->multiplicity*numComponents(cVariable->type)) < 256);
 														
-														currentData.code[currentData.currentCode].reference.index		=	(unsigned short) cVariable->index;
-														currentData.code[currentData.currentCode].reference.numItems	=	(char) (cVariable->multiplicity*numComponents(cVariable->type));
-														currentData.code[currentData.currentCode].reference.accessor	=	SL_VARYING_OPERAND;
+														currentData.currentArgumentPlace->index			=	(unsigned short) cVariable->index;
+														currentData.currentArgumentPlace->numItems		=	(char) (cVariable->multiplicity*numComponents(cVariable->type));
+														currentData.currentArgumentPlace->bytesPerItem	=	(cVariable->type == TYPE_STRING ? sizeof(char *) : sizeof(float));
+														currentData.currentArgumentPlace->accessor		=	SL_VARYING_OPERAND;
+														currentData.currentArgumentPlace++;
 														
 														if (cVariable->uniform == FALSE)
 															currentData.opcodeUniform									=	FALSE;
-
-														currentData.currentCode++;
+														
 														return;
 													}
 												}
@@ -496,14 +511,15 @@ static	TSlFunction		functions[]	=	{
 													assert(var->entry < 65536);
 													assert(var->numFloats < 256);
 													
-													currentData.code[currentData.currentCode].reference.index		=	(unsigned short) var->entry;
-													currentData.code[currentData.currentCode].reference.numItems	=	(char) var->numFloats;
-													currentData.code[currentData.currentCode].reference.accessor	=	SL_GLOBAL_OPERAND;
+													currentData.currentArgumentPlace->index			=	(unsigned short) var->entry;
+													currentData.currentArgumentPlace->numItems		=	(char) var->numFloats;
+													currentData.currentArgumentPlace->bytesPerItem	=	(var->type == TYPE_STRING ? sizeof(char *) : sizeof(float));
+													currentData.currentArgumentPlace->accessor		=	SL_GLOBAL_OPERAND;
+													currentData.currentArgumentPlace++;
 													
 													if ((var->container != CONTAINER_UNIFORM) || (var->container != CONTAINER_CONSTANT))
 															currentData.opcodeUniform								=	FALSE;
 															
-													currentData.currentCode++;
 												} else {
 													slerror("Unknown variable");
 												}
@@ -544,11 +560,12 @@ static	TSlFunction		functions[]	=	{
 														assert((currentData.opcodeUniform) < 256);
 														
 														// Save the opcode
-														currentData.usedParameters									|=	opcodes[i].usedParameters;
-														currentData.currentOpcodePlace[0].integer					=	(int) opcode;
-														currentData.currentOpcodePlace[1].arguments.numCodes		=	(unsigned char) (currentData.currentArgument+2);
-														currentData.currentOpcodePlace[1].arguments.numArguments	=	(unsigned char) (currentData.currentArgument);
-														currentData.currentOpcodePlace[1].arguments.uniform			=	(unsigned char) (currentData.opcodeUniform);
+														currentData.usedParameters						|=	opcodes[i].usedParameters;
+														currentData.currentOpcodePlace->opcode			=	(int) opcode;
+														currentData.currentOpcodePlace->plNumber		=	0;
+														currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
+														currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);
+														currentData.currentOpcodePlace++;
 													}
 												} else {
 													int			i;
@@ -623,19 +640,28 @@ static	TSlFunction		functions[]	=	{
 														assert(currentData.currentPL < 256);
 														assert(currentData.opcodeUniform < 256);
 														
-														currentData.currentOpcodePlace[0].integer						=	(int) opcode;
-														currentData.currentOpcodePlace[1].arguments.numCodes			=	(unsigned char) (currentData.currentArgument+2);
-														currentData.currentOpcodePlace[1].arguments.plNumber			=	(unsigned char) (currentData.currentPL);
-														currentData.currentOpcodePlace[1].arguments.numArguments		=	(unsigned char) (currentData.currentArgument);
-														currentData.currentOpcodePlace[1].arguments.uniform				=	(unsigned char) (currentData.opcodeUniform);
+														currentData.currentOpcodePlace->opcode				=	(int) opcode;
+														currentData.currentOpcodePlace->plNumber			=	(unsigned char) (currentData.currentPL);
+														currentData.currentOpcodePlace->numArguments		=	(unsigned char) (currentData.currentArgument);
+														currentData.currentOpcodePlace->uniform				=	(unsigned char) (currentData.opcodeUniform);
 														if (strchr(functions[i].prototype,'!') != NULL)	currentData.currentPL++;
+														currentData.currentOpcodePlace++;
 													} else {
 														// Allright, we could not find the function, check the DSO shaders
-														void			*handle;
-														dsoExecFunction	exec;
+														CDSO	*dso;
 
-														if (CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
+														// See if this is a DSO function
+														if ((dso = CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype)) != NULL) {
+														
 															// We have the DSO
+															if (currentData.currentPrototype[0] == 'o')		currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO_VOID;
+															else											currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO;
+								
+															currentData.currentOpcodePlace->plNumber		=	(unsigned char) (currentData.currentPL);
+															currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
+															currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);
+															currentData.currentOpcodePlace->dso				=	dso;
+															currentData.currentOpcodePlace++;
 														} else {
 															slerror("Unknown function");
 														}
@@ -653,23 +679,23 @@ static	TSlFunction		functions[]	=	{
 									// Description			:	Create a new label definition/reference
 									// Return Value			:	-
 									// Comments				:
-		static	void				newLabel(char *name,int reference) {
+		static	void				newLabel(const char *name,int reference) {
 										switch(currentData.passNumber) {
 										case 1:
 											if (reference)
-												currentData.numCode++;
+												currentData.numArgument++;
 											break;
 										case 2:
 											{
 												TSlLabel	*cLabel	=	new TSlLabel;
 
 												strcpy(cLabel->name,name);
-												cLabel->index	=	currentData.currentCode;
+												cLabel->index	=	(int) (currentData.currentOpcodePlace - currentData.code);
 
 												if (reference) {
 													cLabel->next					=	currentData.labelReferences;
 													currentData.labelReferences		=	cLabel;
-													currentData.currentCode++;
+													cLabel->argument				=	currentData.currentArgumentPlace++;
 													currentData.currentArgument++;
 												} else {
 													TSlLabel	*tLabel;
@@ -680,6 +706,7 @@ static	TSlFunction		functions[]	=	{
 														}
 													}
 
+													cLabel->argument				=	NULL;
 													cLabel->next					=	currentData.labelDefinitions;
 													currentData.labelDefinitions	=	cLabel;
 												}
@@ -702,7 +729,7 @@ static	TSlFunction		functions[]	=	{
 		TSlLabel					*newLabelRef(char *,int);
 		void						processEscapes(char *);
 
-#line 655 "sdr.y"
+#line 682 "sdr.y"
 typedef union slval {
 	float	real;
 	char	string[64];
@@ -839,20 +866,20 @@ static const short yyrhs[] = {    42,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   707,   716,   717,   722,   730,   743,   751,   763,   771,   779,
-   786,   793,   801,   810,   818,   825,   829,   832,   839,   846,
-   854,   862,   869,   878,   884,   886,   888,   890,   892,   894,
-   896,   901,   913,   923,   945,   945,   964,   975,   989,   993,
-  1012,  1033,  1064,  1064,  1081,  1092,  1107,  1111,  1118,  1130,
-  1145,  1145,  1156,  1163,  1175,  1192,  1192,  1203,  1210,  1222,
-  1239,  1239,  1250,  1257,  1269,  1286,  1286,  1297,  1304,  1316,
-  1323,  1337,  1348,  1367,  1371,  1415,  1442,  1467,  1488,  1488,
-  1507,  1518,  1566,  1597,  1601,  1608,  1612,  1615,  1618,  1621,
-  1624,  1627,  1630,  1633,  1636,  1641,  1647,  1659,  1665,  1676,
-  1682,  1693,  1699,  1710,  1716,  1727,  1733,  1744,  1750,  1761,
-  1767,  1778,  1785,  1787,  1794,  1796,  1800,  1804,  1808,  1812,
-  1832,  1868,  1887,  1906,  1927,  1932,  1937,  1945,  1953,  1960,
-  1965,  1970,  1975,  1992,  2048
+   734,   743,   744,   749,   757,   770,   778,   790,   798,   806,
+   813,   820,   828,   837,   845,   852,   856,   859,   866,   873,
+   881,   889,   896,   905,   911,   913,   915,   917,   919,   921,
+   923,   928,   940,   950,   972,   972,   991,  1002,  1015,  1019,
+  1038,  1059,  1090,  1090,  1107,  1118,  1132,  1136,  1143,  1150,
+  1165,  1165,  1176,  1183,  1190,  1207,  1207,  1218,  1225,  1232,
+  1249,  1249,  1260,  1267,  1274,  1291,  1291,  1302,  1309,  1321,
+  1328,  1342,  1353,  1368,  1372,  1416,  1443,  1468,  1490,  1490,
+  1509,  1520,  1568,  1599,  1603,  1610,  1614,  1617,  1620,  1623,
+  1626,  1629,  1632,  1635,  1638,  1643,  1649,  1661,  1667,  1678,
+  1684,  1695,  1701,  1712,  1718,  1729,  1735,  1746,  1752,  1763,
+  1769,  1780,  1787,  1789,  1796,  1798,  1802,  1806,  1810,  1814,
+  1835,  1868,  1886,  1904,  1924,  1929,  1934,  1942,  1950,  1957,
+  1962,  1967,  1972,  1989,  2045
 };
 #endif
 
@@ -1612,7 +1639,7 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 725 "sdr.y"
+#line 752 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1620,7 +1647,7 @@ case 4:
 				;
     break;}
 case 5:
-#line 738 "sdr.y"
+#line 765 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1628,7 +1655,7 @@ case 5:
 				;
     break;}
 case 6:
-#line 746 "sdr.y"
+#line 773 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -1636,7 +1663,7 @@ case 6:
 				;
     break;}
 case 7:
-#line 758 "sdr.y"
+#line 785 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -1644,7 +1671,7 @@ case 7:
 				;
     break;}
 case 8:
-#line 764 "sdr.y"
+#line 791 "sdr.y"
 {
 					yyval.v[0]	=	0;
 					yyval.v[1]	=	0;
@@ -1652,7 +1679,7 @@ case 8:
 				;
     break;}
 case 9:
-#line 772 "sdr.y"
+#line 799 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].v[0];
 					yyval.v[1]	=	yyvsp[0].v[1];
@@ -1660,21 +1687,21 @@ case 9:
 				;
     break;}
 case 10:
-#line 782 "sdr.y"
+#line 809 "sdr.y"
 {
 					currentData.shaderType		=	SL_SURFACE;
 					currentData.accessorType 	=	ACCESSOR_SURFACE;
 				;
     break;}
 case 11:
-#line 789 "sdr.y"
+#line 816 "sdr.y"
 {
 					currentData.shaderType		=	SL_DISPLACEMENT;
 					currentData.accessorType	=	ACCESSOR_DISPLACEMENT;
 				;
     break;}
 case 12:
-#line 796 "sdr.y"
+#line 823 "sdr.y"
 {
 					currentData.shaderType		=	SL_LIGHTSOURCE;
 					// Note: we don't set accessorType because you can't interpolate into
@@ -1682,7 +1709,7 @@ case 12:
 				;
     break;}
 case 13:
-#line 804 "sdr.y"
+#line 831 "sdr.y"
 {
 					currentData.shaderType		=	SL_ATMOSPHERE;
 					currentData.accessorType	=	ACCESSOR_ATMOSPHERE;
@@ -1691,13 +1718,13 @@ case 13:
 				;
     break;}
 case 14:
-#line 813 "sdr.y"
+#line 840 "sdr.y"
 {
-					currentData.shaderType	=	SL_IMAGER;
+					currentData.shaderType		=	SL_IMAGER;
 				;
     break;}
 case 18:
-#line 834 "sdr.y"
+#line 861 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1705,7 +1732,7 @@ case 18:
 				;
     break;}
 case 19:
-#line 841 "sdr.y"
+#line 868 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1713,7 +1740,7 @@ case 19:
 				;
     break;}
 case 20:
-#line 849 "sdr.y"
+#line 876 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1721,7 +1748,7 @@ case 20:
 				;
     break;}
 case 21:
-#line 857 "sdr.y"
+#line 884 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_VARYING;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1729,7 +1756,7 @@ case 21:
 				;
     break;}
 case 22:
-#line 864 "sdr.y"
+#line 891 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	TRUE;
@@ -1737,7 +1764,7 @@ case 22:
 				;
     break;}
 case 23:
-#line 870 "sdr.y"
+#line 897 "sdr.y"
 {
 					currentData.currentParameterClass	=	CONTAINER_UNIFORM;
 					currentData.currentParameterMutable	=	FALSE;
@@ -1745,35 +1772,35 @@ case 23:
 				;
     break;}
 case 32:
-#line 906 "sdr.y"
+#line 933 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_FLOAT,1,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-2].string,TYPE_FLOAT,1,TRUE);
 
 					if (def != NULL) {
-						def->real	=	yyvsp[0].real;
+						def[0]	=	yyvsp[0].real;
 					}
 				;
     break;}
 case 33:
-#line 916 "sdr.y"
+#line 943 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_FLOAT,1,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[0].string,TYPE_FLOAT,1,TRUE);
 
 					if (def != NULL) {
-						def->real	=	0;
+						def[0]		=	0;
 					}
 				;
     break;}
 case 34:
-#line 930 "sdr.y"
+#line 957 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_FLOAT,(int) yyvsp[-2].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-4].string,TYPE_FLOAT,(int) yyvsp[-2].real,TRUE);
 					
 					if (def != NULL) {
 						int	i;
 
 						for (i=0;i<(int) yyvsp[-2].real;i++)
-							def[i].real	=	0;
+							def[i]	=	0;
 						
 						currentData.currentArray = def;
 					}
@@ -1782,20 +1809,20 @@ case 34:
 				;
     break;}
 case 36:
-#line 951 "sdr.y"
+#line 978 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,TRUE);
 
 					if (def != NULL) {
 						int	i;
 
 						for (i=0;i<(int) yyvsp[-1].real;i++)
-							def[i].real	=	0;
+							def[i]	=	0;
 					}
 				;
     break;}
 case 37:
-#line 968 "sdr.y"
+#line 995 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1803,12 +1830,11 @@ case 37:
 				;
     break;}
 case 38:
-#line 978 "sdr.y"
+#line 1005 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
-							currentData.currentArray->real = yyvsp[0].real;
-							currentData.currentArray++;
+							*currentData.currentArray++ = yyvsp[0].real;
 						}
 						currentData.numArrayItemsRemaining--;
 					} else{
@@ -1817,9 +1843,9 @@ case 38:
 				;
     break;}
 case 40:
-#line 996 "sdr.y"
+#line 1022 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_STRING,1,TRUE);
+					char	**def	=	(char **) newVariable(yyvsp[0].string,TYPE_STRING,1,TRUE);
 
 					switch(currentData.passNumber) {
 					case 1:
@@ -1827,7 +1853,7 @@ case 40:
 						break;
 					case 2:
 						if (def != NULL) {
-							def->string	=	currentData.strings[currentData.currentString++]	=	strdup("*");
+							*def	=	currentData.strings[currentData.currentString++]	=	strdup("*");
 						}
 						break;
 					default:
@@ -1836,9 +1862,9 @@ case 40:
 				;
     break;}
 case 41:
-#line 1017 "sdr.y"
+#line 1043 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_STRING,1,TRUE);
+					char	**def	=	(char **) newVariable(yyvsp[-2].string,TYPE_STRING,1,TRUE);
 
 					switch(currentData.passNumber) {
 					case 1:
@@ -1846,7 +1872,7 @@ case 41:
 						break;
 					case 2:
 						if (def != NULL) {
-							def->string	=	currentData.strings[currentData.currentString++]	=	strdup(yyvsp[0].string);
+							*def	=	currentData.strings[currentData.currentString++]	=	strdup(yyvsp[0].string);
 						}
 						break;
 					default:
@@ -1855,9 +1881,9 @@ case 41:
 				;
     break;}
 case 42:
-#line 1040 "sdr.y"
+#line 1066 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_STRING,(int) yyvsp[-2].real,TRUE);
+					char	**def	=	(char **) newVariable(yyvsp[-4].string,TYPE_STRING,(int) yyvsp[-2].real,TRUE);
 					
 					switch(currentData.passNumber) {
 					case 1:
@@ -1868,9 +1894,9 @@ case 42:
 							int	i;
 
 							for (i=0;i<(int) yyvsp[-2].real;i++)
-								def[i].string	=	NULL;
+								def[i]	=	NULL;
 							
-							currentData.currentArray = def;
+							currentData.currentStringArray = def;
 						}
 						break;
 					default:
@@ -1881,20 +1907,20 @@ case 42:
 				;
     break;}
 case 44:
-#line 1070 "sdr.y"
+#line 1096 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,TRUE);
+					char	**def	=	(char **) newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,TRUE);
 
 					if (def != NULL) {
 						int	i;
 
 						for (i=0;i<(int) yyvsp[-1].real;i++)
-							def[i].string	=	NULL;
+							def[i]	=	NULL;
 					}
 				;
     break;}
 case 45:
-#line 1085 "sdr.y"
+#line 1111 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -1902,12 +1928,11 @@ case 45:
 				;
     break;}
 case 46:
-#line 1095 "sdr.y"
+#line 1121 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
-							currentData.currentArray->string	=	currentData.strings[currentData.currentString++]	=	strdup(yyvsp[0].string);
-							currentData.currentArray++;
+							*currentData.currentStringArray++	=	currentData.strings[currentData.currentString++]	=	strdup(yyvsp[0].string);
 						}
 						currentData.numArrayItemsRemaining--;
 					}
@@ -1917,30 +1942,25 @@ case 46:
 				;
     break;}
 case 48:
-#line 1114 "sdr.y"
+#line 1139 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_COLOR;
 				;
     break;}
 case 49:
-#line 1118 "sdr.y"
+#line 1143 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
-					float	*v;
+					float	*def	=	(float *) newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 
 					if (def != NULL) {
-						v	=	yyvsp[0].v;
-
-						def[0].real	=	v[0];
-						def[1].real	=	v[1];
-						def[2].real	=	v[2];
+						movvv(def,yyvsp[0].v);
 					}
 				;
     break;}
 case 50:
-#line 1137 "sdr.y"
+#line 1157 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_COLOR,(int) yyvsp[-2].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-4].string,TYPE_COLOR,(int) yyvsp[-2].real,TRUE);
 					
 					if(def != NULL)
 						currentData.currentArray = def;
@@ -1948,36 +1968,31 @@ case 50:
 				;
     break;}
 case 52:
-#line 1151 "sdr.y"
+#line 1171 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 53:
-#line 1159 "sdr.y"
+#line 1179 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_VECTOR;
 				;
     break;}
 case 54:
-#line 1163 "sdr.y"
+#line 1183 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
-					float	*v;
+					float	*def	=	(float *) newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 
 					if (def != NULL) {
-						v	=	yyvsp[0].v;
-
-						def[0].real	=	v[0];
-						def[1].real	=	v[1];
-						def[2].real	=	v[2];
+						movvv(def,yyvsp[0].v);
 					}
 				;
     break;}
 case 55:
-#line 1182 "sdr.y"
+#line 1197 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_VECTOR,(int) yyvsp[-2].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-4].string,TYPE_VECTOR,(int) yyvsp[-2].real,TRUE);
 					
 					if(def != NULL) {
 						currentData.currentArray = def;
@@ -1987,36 +2002,31 @@ case 55:
 				;
     break;}
 case 57:
-#line 1198 "sdr.y"
+#line 1213 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 58:
-#line 1206 "sdr.y"
+#line 1221 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_NORMAL;
 				;
     break;}
 case 59:
-#line 1210 "sdr.y"
+#line 1225 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
-					float	*v;
+					float	*def	=	(float *) newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 
 					if (def != NULL) {
-						v	=	yyvsp[0].v;
-
-						def[0].real	=	v[0];
-						def[1].real	=	v[1];
-						def[2].real	=	v[2];
+						movvv(def,yyvsp[0].v);
 					}
 				;
     break;}
 case 60:
-#line 1229 "sdr.y"
+#line 1239 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_NORMAL,(int) yyvsp[-2].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-4].string,TYPE_NORMAL,(int) yyvsp[-2].real,TRUE);
 					
 					if(def != NULL) {
 						currentData.currentArray = def;
@@ -2026,36 +2036,31 @@ case 60:
 				;
     break;}
 case 62:
-#line 1245 "sdr.y"
+#line 1255 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 63:
-#line 1253 "sdr.y"
+#line 1263 "sdr.y"
 {
 					currentData.currentParameterType	=	TYPE_POINT;
 				;
     break;}
 case 64:
-#line 1257 "sdr.y"
+#line 1267 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
-					float	*v;
+					float	*def	=	(float *)newVariable(yyvsp[-2].string,currentData.currentParameterType,1,TRUE);
 
 					if (def != NULL) {
-						v	=	yyvsp[0].v;
-
-						def[0].real	=	v[0];
-						def[1].real	=	v[1];
-						def[2].real	=	v[2];
+						movvv(def,yyvsp[0].v);
 					}
 				;
     break;}
 case 65:
-#line 1276 "sdr.y"
+#line 1281 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_POINT,(int) yyvsp[-2].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-4].string,TYPE_POINT,(int) yyvsp[-2].real,TRUE);
 					
 					if(def != NULL) {
 						currentData.currentArray = def;
@@ -2065,13 +2070,13 @@ case 65:
 				;
     break;}
 case 67:
-#line 1292 "sdr.y"
+#line 1297 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,TRUE);
+					float 	*def	=	(float *) newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,TRUE);
 				;
     break;}
 case 68:
-#line 1299 "sdr.y"
+#line 1304 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2079,7 +2084,7 @@ case 68:
 				;
     break;}
 case 69:
-#line 1311 "sdr.y"
+#line 1316 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2087,7 +2092,7 @@ case 69:
 				;
     break;}
 case 70:
-#line 1318 "sdr.y"
+#line 1323 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[0].real;
 					yyval.v[1]	=	yyvsp[0].real;
@@ -2095,7 +2100,7 @@ case 70:
 				;
     break;}
 case 71:
-#line 1329 "sdr.y"
+#line 1334 "sdr.y"
 {
 					yyval.v[0]	=	yyvsp[-3].real;
 					yyval.v[1]	=	yyvsp[-2].real;
@@ -2103,7 +2108,7 @@ case 71:
 				;
     break;}
 case 72:
-#line 1341 "sdr.y"
+#line 1346 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("Wrong number of items in array initializer\n");
@@ -2111,16 +2116,12 @@ case 72:
 				;
     break;}
 case 73:
-#line 1351 "sdr.y"
+#line 1356 "sdr.y"
 {
-					float *v;
 					
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
-							v = yyvsp[0].v;
-							currentData.currentArray[0].real = v[0];
-							currentData.currentArray[1].real = v[1];
-							currentData.currentArray[2].real = v[2];
+							movvv(currentData.currentArray,yyvsp[0].v);
 							currentData.currentArray += 3;
 						}
 						currentData.numArrayItemsRemaining--;
@@ -2130,90 +2131,91 @@ case 73:
 				;
     break;}
 case 75:
-#line 1393 "sdr.y"
+#line 1394 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-19].string,TYPE_MATRIX,1,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-19].string,TYPE_MATRIX,1,TRUE);
 
 					if (def != NULL) {
-						def[0].real		=	yyvsp[-16].real;
-						def[1].real		=	yyvsp[-15].real;
-						def[2].real		=	yyvsp[-14].real;
-						def[3].real		=	yyvsp[-13].real;
-						def[4].real		=	yyvsp[-12].real;
-						def[5].real		=	yyvsp[-11].real;
-						def[6].real		=	yyvsp[-10].real;
-						def[7].real		=	yyvsp[-9].real;
-						def[8].real		=	yyvsp[-8].real;
-						def[9].real		=	yyvsp[-7].real;
-						def[10].real	=	yyvsp[-6].real;
-						def[11].real	=	yyvsp[-5].real;
-						def[12].real	=	yyvsp[-4].real;
-						def[13].real	=	yyvsp[-3].real;
-						def[14].real	=	yyvsp[-2].real;
-						def[15].real	=	yyvsp[-1].real;
+						def[0]		=	yyvsp[-16].real;
+						def[1]		=	yyvsp[-15].real;
+						def[2]		=	yyvsp[-14].real;
+						def[3]		=	yyvsp[-13].real;
+						def[4]		=	yyvsp[-12].real;
+						def[5]		=	yyvsp[-11].real;
+						def[6]		=	yyvsp[-10].real;
+						def[7]		=	yyvsp[-9].real;
+						def[8]		=	yyvsp[-8].real;
+						def[9]		=	yyvsp[-7].real;
+						def[10]		=	yyvsp[-6].real;
+						def[11]		=	yyvsp[-5].real;
+						def[12]		=	yyvsp[-4].real;
+						def[13]		=	yyvsp[-3].real;
+						def[14]		=	yyvsp[-2].real;
+						def[15]		=	yyvsp[-1].real;
 					}
 				;
     break;}
 case 76:
-#line 1420 "sdr.y"
+#line 1421 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-2].string,TYPE_MATRIX,1,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-2].string,TYPE_MATRIX,1,TRUE);
 
 					if (def != NULL) {
-						def[0].real		=	yyvsp[0].real;
-						def[1].real		=	0;
-						def[2].real		=	0;
-						def[3].real		=	0;
-						def[4].real		=	0;
-						def[5].real		=	yyvsp[0].real;
-						def[6].real		=	0;
-						def[7].real		=	0;
-						def[8].real		=	0;
-						def[9].real		=	0;
-						def[10].real	=	yyvsp[0].real;
-						def[11].real	=	0;
-						def[12].real	=	0;
-						def[13].real	=	0;
-						def[14].real	=	0;
-						def[15].real	=	1;
+						def[0]		=	yyvsp[0].real;
+						def[1]		=	0;
+						def[2]		=	0;
+						def[3]		=	0;
+						def[4]		=	0;
+						def[5]		=	yyvsp[0].real;
+						def[6]		=	0;
+						def[7]		=	0;
+						def[8]		=	0;
+						def[9]		=	0;
+						def[10]		=	yyvsp[0].real;
+						def[11]		=	0;
+						def[12]		=	0;
+						def[13]		=	0;
+						def[14]		=	0;
+						def[15]		=	1;
 					}
 				;
     break;}
 case 77:
-#line 1445 "sdr.y"
+#line 1446 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[0].string,TYPE_MATRIX,1,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[0].string,TYPE_MATRIX,1,TRUE);
 
 					if (def != NULL) {
-						def[0].real		=	1;
-						def[1].real		=	0;
-						def[2].real		=	0;
-						def[3].real		=	0;
-						def[4].real		=	0;
-						def[5].real		=	1;
-						def[6].real		=	0;
-						def[7].real		=	0;
-						def[8].real		=	0;
-						def[9].real		=	0;
-						def[10].real	=	1;
-						def[11].real	=	0;
-						def[12].real	=	0;
-						def[13].real	=	0;
-						def[14].real	=	0;
-						def[15].real	=	1;
+						def[0]		=	1;
+						def[1]		=	0;
+						def[2]		=	0;
+						def[3]		=	0;
+						def[4]		=	0;
+						def[5]		=	1;
+						def[6]		=	0;
+						def[7]		=	0;
+						def[8]		=	0;
+						def[9]		=	0;
+						def[10]		=	1;
+						def[11]		=	0;
+						def[12]		=	0;
+						def[13]		=	0;
+						def[14]		=	0;
+						def[15]		=	1;
 					}
 				;
     break;}
 case 78:
-#line 1474 "sdr.y"
+#line 1475 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-4].string,TYPE_MATRIX,(int) yyvsp[-2].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-4].string,TYPE_MATRIX,(int) yyvsp[-2].real,TRUE);
 					
 					if (def != NULL) {
 						int	i;
 
 						for (i=0;i<((int) yyvsp[-2].real)*16;i++)
-							def[i].real	=	0;
+							def[i]	=	0;
+							
 						currentData.currentArray = def;
 					}
 					
@@ -2221,20 +2223,20 @@ case 78:
 				;
     break;}
 case 80:
-#line 1494 "sdr.y"
+#line 1496 "sdr.y"
 {
-					TCode	*def	=	newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,TRUE);
+					float	*def	=	(float *) newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,TRUE);
 
 					if (def != NULL) {
 						int	i;
 
 						for (i=0;i<((int) yyvsp[-1].real)*16;i++)
-							def[i].real	=	0;
+							def[i]	=	0;
 					}
 				;
     break;}
 case 81:
-#line 1511 "sdr.y"
+#line 1513 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining){
 						slerror("wrong number of items in array initializer\n");
@@ -2242,26 +2244,26 @@ case 81:
 				;
     break;}
 case 82:
-#line 1538 "sdr.y"
+#line 1540 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
-							currentData.currentArray[0].real = yyvsp[-16].real;
-							currentData.currentArray[1].real = yyvsp[-15].real;
-							currentData.currentArray[2].real = yyvsp[-14].real;
-							currentData.currentArray[3].real = yyvsp[-13].real;
-							currentData.currentArray[4].real = yyvsp[-12].real;
-							currentData.currentArray[5].real = yyvsp[-11].real;
-							currentData.currentArray[6].real = yyvsp[-10].real;
-							currentData.currentArray[7].real = yyvsp[-9].real;
-							currentData.currentArray[8].real = yyvsp[-8].real;
-							currentData.currentArray[9].real = yyvsp[-7].real;
-							currentData.currentArray[10].real = yyvsp[-6].real;
-							currentData.currentArray[11].real = yyvsp[-5].real;
-							currentData.currentArray[12].real = yyvsp[-4].real;
-							currentData.currentArray[13].real = yyvsp[-3].real;
-							currentData.currentArray[14].real = yyvsp[-2].real;
-							currentData.currentArray[15].real = yyvsp[-1].real;
+							currentData.currentArray[0] = yyvsp[-16].real;
+							currentData.currentArray[1] = yyvsp[-15].real;
+							currentData.currentArray[2] = yyvsp[-14].real;
+							currentData.currentArray[3] = yyvsp[-13].real;
+							currentData.currentArray[4] = yyvsp[-12].real;
+							currentData.currentArray[5] = yyvsp[-11].real;
+							currentData.currentArray[6] = yyvsp[-10].real;
+							currentData.currentArray[7] = yyvsp[-9].real;
+							currentData.currentArray[8] = yyvsp[-8].real;
+							currentData.currentArray[9] = yyvsp[-7].real;
+							currentData.currentArray[10] = yyvsp[-6].real;
+							currentData.currentArray[11] = yyvsp[-5].real;
+							currentData.currentArray[12] = yyvsp[-4].real;
+							currentData.currentArray[13] = yyvsp[-3].real;
+							currentData.currentArray[14] = yyvsp[-2].real;
+							currentData.currentArray[15] = yyvsp[-1].real;
 							
 							currentData.currentArray += 16;
 						}
@@ -2273,26 +2275,26 @@ case 82:
 				;
     break;}
 case 83:
-#line 1569 "sdr.y"
+#line 1571 "sdr.y"
 {
 					if(currentData.numArrayItemsRemaining > 0){
 						if(currentData.currentArray){
-							currentData.currentArray[0].real = yyvsp[0].real;
-							currentData.currentArray[1].real = 0;
-							currentData.currentArray[2].real = 0;
-							currentData.currentArray[3].real = 0;
-							currentData.currentArray[4].real = 0;
-							currentData.currentArray[5].real = yyvsp[0].real;
-							currentData.currentArray[6].real = 0;
-							currentData.currentArray[7].real = 0;
-							currentData.currentArray[8].real = 0;
-							currentData.currentArray[9].real = 0;
-							currentData.currentArray[10].real = yyvsp[0].real;
-							currentData.currentArray[11].real = 0;
-							currentData.currentArray[12].real = 0;
-							currentData.currentArray[13].real = 0;
-							currentData.currentArray[14].real = 0;
-							currentData.currentArray[15].real = 1;
+							currentData.currentArray[0] = yyvsp[0].real;
+							currentData.currentArray[1] = 0;
+							currentData.currentArray[2] = 0;
+							currentData.currentArray[3] = 0;
+							currentData.currentArray[4] = 0;
+							currentData.currentArray[5] = yyvsp[0].real;
+							currentData.currentArray[6] = 0;
+							currentData.currentArray[7] = 0;
+							currentData.currentArray[8] = 0;
+							currentData.currentArray[9] = 0;
+							currentData.currentArray[10] = yyvsp[0].real;
+							currentData.currentArray[11] = 0;
+							currentData.currentArray[12] = 0;
+							currentData.currentArray[13] = 0;
+							currentData.currentArray[14] = 0;
+							currentData.currentArray[15] = 1;
 							
 							currentData.currentArray += 16;
 						}
@@ -2304,129 +2306,130 @@ case 83:
 				;
     break;}
 case 96:
-#line 1644 "sdr.y"
+#line 1646 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_BOOLEAN,1,FALSE);
 				;
     break;}
 case 97:
-#line 1653 "sdr.y"
+#line 1655 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_BOOLEAN,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 98:
-#line 1662 "sdr.y"
+#line 1664 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_FLOAT,1,FALSE);
 				;
     break;}
 case 99:
-#line 1671 "sdr.y"
+#line 1673 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_FLOAT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 100:
-#line 1679 "sdr.y"
+#line 1681 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_STRING,1,FALSE);
 				;
     break;}
 case 101:
-#line 1688 "sdr.y"
+#line 1690 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_STRING,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 102:
-#line 1696 "sdr.y"
+#line 1698 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_VECTOR,1,FALSE);
 				;
     break;}
 case 103:
-#line 1705 "sdr.y"
+#line 1707 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_VECTOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 104:
-#line 1713 "sdr.y"
+#line 1715 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_COLOR,1,FALSE);
 				;
     break;}
 case 105:
-#line 1722 "sdr.y"
+#line 1724 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_COLOR,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 106:
-#line 1730 "sdr.y"
+#line 1732 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_NORMAL,1,FALSE);
 				;
     break;}
 case 107:
-#line 1739 "sdr.y"
+#line 1741 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_NORMAL,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 108:
-#line 1747 "sdr.y"
+#line 1749 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_POINT,1,FALSE);
 				;
     break;}
 case 109:
-#line 1756 "sdr.y"
+#line 1758 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_POINT,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 110:
-#line 1764 "sdr.y"
+#line 1766 "sdr.y"
 {
 					newVariable(yyvsp[0].string,TYPE_MATRIX,1,FALSE);
 				;
     break;}
 case 111:
-#line 1773 "sdr.y"
+#line 1775 "sdr.y"
 {
 					newVariable(yyvsp[-3].string,TYPE_MATRIX,(int) yyvsp[-1].real,FALSE);
 				;
     break;}
 case 112:
-#line 1780 "sdr.y"
+#line 1782 "sdr.y"
 {
 					currentData.parsingInit	=	TRUE;
 					newLabel(initLabel,FALSE);
 				;
     break;}
 case 114:
-#line 1789 "sdr.y"
+#line 1791 "sdr.y"
 {
 					currentData.parsingInit	=	FALSE;
 					newLabel(codeLabel,FALSE);
 				;
     break;}
 case 120:
-#line 1814 "sdr.y"
+#line 1816 "sdr.y"
 {
+					char	*dsoName	=	yyvsp[0].string;
+					
 					switch(currentData.passNumber) {
 					case 1:
-						currentData.numCode					+=	4;		// opcode
+						currentData.numCode++;					// opcode
 						break;
 					case 2:
 						strcpy(currentData.currentOpcode,yyvsp[0].string);
-						currentData.currentArgument			=	0;
-						currentData.currentOpcodePlace		=	&currentData.code[currentData.currentCode];
-						currentData.currentCode				+=	4;
-						currentData.currentPrototype[0]		=	'~';
-						currentData.opcodeUniform			=	TRUE;
+						currentData.currentArgument					=	0;
+						currentData.currentOpcodePlace->arguments	=	currentData.currentArgumentPlace;
+						currentData.currentPrototype[0]				=	'~';
+						currentData.opcodeUniform					=	TRUE;
 						break;
 					default:
 						break;
@@ -2434,30 +2437,27 @@ case 120:
 				;
     break;}
 case 121:
-#line 1835 "sdr.y"
+#line 1838 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
 						break;
 					case 2:
 						// Set the opcode here
-						void			*handle;
-						dsoExecFunction	exec;
+						CDSO	*dso;
 
-						if (CRenderer::getDSO(yyvsp[-5].string,yyvsp[-2].string,handle,exec) == TRUE) {
-							if (yyvsp[-2].string[0] == 'o')
-								currentData.currentOpcodePlace[0].integer	=	FUNCTION_DSO_VOID;
-							else
-								currentData.currentOpcodePlace[0].integer	=	FUNCTION_DSO;
+						if ((dso = CRenderer::getDSO(yyvsp[-5].string,yyvsp[-2].string)) != NULL) {
+							// Save the DSO opcode
+							if (yyvsp[-2].string[0] == 'o')	currentData.currentOpcodePlace->opcode		=	FUNCTION_DSO_VOID;
+							else				currentData.currentOpcodePlace->opcode		=	FUNCTION_DSO;
 
-							assert((currentData.currentArgument+4) < 256);
 							assert(currentData.opcodeUniform < 256);
 							
-							currentData.currentOpcodePlace[1].arguments.numCodes			=	(unsigned char) (currentData.currentArgument+4);
-							currentData.currentOpcodePlace[1].arguments.numArguments		=	(unsigned char) (currentData.currentArgument);
-							currentData.currentOpcodePlace[1].arguments.uniform				=	(unsigned char) (currentData.opcodeUniform);
-							currentData.currentOpcodePlace[2].integer						=	(int) handle;
-							currentData.currentOpcodePlace[3].integer						=	(int) exec;
+							currentData.currentOpcodePlace->plNumber		=	(unsigned char) (currentData.currentPL);
+							currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
+							currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);															
+							currentData.currentOpcodePlace->dso				=	dso;
+							currentData.currentOpcodePlace++;
 						} else {
 							slerror("Unable to locate DSO function\n");
 						}
@@ -2472,15 +2472,14 @@ case 122:
 {
 					switch(currentData.passNumber) {
 					case 1:
-						currentData.numCode					+=	2;		// opcode
+						currentData.numCode++;		// opcode
 						break;
 					case 2:
 						strcpy(currentData.currentOpcode,yyvsp[0].string);
-						currentData.currentArgument			=	0;
-						currentData.currentOpcodePlace		=	&currentData.code[currentData.currentCode];
-						currentData.currentCode				+=	2;
-						currentData.currentPrototype[0]		=	'~';
-						currentData.opcodeUniform			=	TRUE;
+						currentData.currentArgument					=	0;
+						currentData.currentOpcodePlace->arguments	=	currentData.currentArgumentPlace;
+						currentData.currentPrototype[0]				=	'~';
+						currentData.opcodeUniform					=	TRUE;
 						break;
 					default:
 						break;
@@ -2488,19 +2487,18 @@ case 122:
 				;
     break;}
 case 123:
-#line 1889 "sdr.y"
+#line 1888 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
-						currentData.numCode					+=	2;		// opcode
+						currentData.numCode++;		// opcode
 						break;
 					case 2:
 						strcpy(currentData.currentOpcode,"surface");
-						currentData.currentArgument			=	0;
-						currentData.currentOpcodePlace		=	&currentData.code[currentData.currentCode];
-						currentData.currentCode				+=	2;
-						currentData.currentPrototype[0]		=	'~';
-						currentData.opcodeUniform			=	TRUE;
+						currentData.currentArgument					=	0;
+						currentData.currentOpcodePlace->arguments	=	currentData.currentArgumentPlace;
+						currentData.currentPrototype[0]				=	'~';
+						currentData.opcodeUniform					=	TRUE;
 						break;
 					default:
 						break;
@@ -2508,19 +2506,18 @@ case 123:
 				;
     break;}
 case 124:
-#line 1908 "sdr.y"
+#line 1906 "sdr.y"
 {
 					switch(currentData.passNumber) {
 					case 1:
-						currentData.numCode					+=	2;		// opcode
+						currentData.numCode++;		// opcode
 						break;
 					case 2:
 						strcpy(currentData.currentOpcode,"displacement");
-						currentData.currentArgument			=	0;
-						currentData.currentOpcodePlace		=	&currentData.code[currentData.currentCode];
-						currentData.currentCode				+=	2;
-						currentData.currentPrototype[0]		=	'~';
-						currentData.opcodeUniform			=	TRUE;
+						currentData.currentArgument					=	0;
+						currentData.currentOpcodePlace->arguments	=	currentData.currentArgumentPlace;
+						currentData.currentPrototype[0]				=	'~';
+						currentData.opcodeUniform					=	TRUE;
 						break;
 					default:
 						break;
@@ -2528,29 +2525,29 @@ case 124:
 				;
     break;}
 case 125:
-#line 1930 "sdr.y"
+#line 1927 "sdr.y"
 {
 				;
     break;}
 case 126:
-#line 1933 "sdr.y"
+#line 1930 "sdr.y"
 {
 				;
     break;}
 case 127:
-#line 1940 "sdr.y"
+#line 1937 "sdr.y"
 {
 					setOpcode();
 				;
     break;}
 case 128:
-#line 1948 "sdr.y"
+#line 1945 "sdr.y"
 {
 					newLabel(yyvsp[-1].string,FALSE);
 				;
     break;}
 case 129:
-#line 1955 "sdr.y"
+#line 1952 "sdr.y"
 {
 					char	*str	=	yyvsp[0].string;
 
@@ -2558,25 +2555,25 @@ case 129:
 				;
     break;}
 case 130:
-#line 1962 "sdr.y"
+#line 1959 "sdr.y"
 {
 					newLabel(yyvsp[0].string,TRUE);
 				;
     break;}
 case 131:
-#line 1967 "sdr.y"
+#line 1964 "sdr.y"
 {
 					addVariableReference(yyvsp[0].string);
 				;
     break;}
 case 132:
-#line 1972 "sdr.y"
+#line 1969 "sdr.y"
 {
 					addFloatReference(&yyvsp[0].real,1);
 				;
     break;}
 case 133:
-#line 1983 "sdr.y"
+#line 1980 "sdr.y"
 {
 					vector	tmp;
 
@@ -2588,7 +2585,7 @@ case 133:
 				;
     break;}
 case 134:
-#line 2026 "sdr.y"
+#line 2023 "sdr.y"
 {
 					matrix	tmp;
 
@@ -2613,7 +2610,7 @@ case 134:
 				;
     break;}
 case 135:
-#line 2052 "sdr.y"
+#line 2049 "sdr.y"
 {
 					strcpy(currentData.currentPrototype,yyvsp[-1].string);
 				;
@@ -2840,7 +2837,7 @@ yyerrhandle:
     }
   return 1;
 }
-#line 2057 "sdr.y"
+#line 2054 "sdr.y"
 
 #include "lex.sl.cpp"
 
@@ -2961,52 +2958,10 @@ void	reset() {
 		}
 	}
 
-
 	if (currentData.memory != NULL)		delete [] currentData.memory;
 
-
-	currentData.name					=	NULL;
-	currentData.passNumber				=	0;
-	currentData.parsingInit				=	FALSE;
-	currentData.numErrors				=	0;
-	currentData.accessorType			=	-1;
-
-				// Pass 1
-	currentData.numCode					=	0;
-	currentData.numConstants			=	0;
-	currentData.numVariables			=	0;
-	currentData.numStrings				=	0;
-	currentData.constantSize			=	0;
-	currentData.varyingSize				=	0;
-	currentData.shaderType				=	SL_SURFACE;
-	currentData.uniform					=	FALSE;
-	currentData.opcodeUniform			=	FALSE;
-
-				// Pass 2
-	currentData.currentCode				=	0;
-	currentData.currentConstant			=	0;
-	currentData.currentVariable			=	0;
-	currentData.currentString			=	0;
-	currentData.currentPL				=	0;
-	currentData.currentConstantSize		=	0;
-	currentData.currentVaryingSize		=	0;
-	strcpy(currentData.currentOpcode,"");
-	strcpy(currentData.currentPrototype,"");
-	currentData.currentArgument			=	0;
-	currentData.usedParameters			=	0;
-	currentData.currentOpcodePlace		=	NULL;
-	currentData.codeEntryPoint			=	-1;
-	currentData.initEntryPoint			=	-1;
-				
-	currentData.memory					=	NULL;
-	currentData.code					=	NULL;
-	currentData.constants				=	NULL;
-	currentData.varyingSizes			=	NULL;
-	currentData.strings					=	NULL;
-	currentData.constantEntries			=	NULL;
-	currentData.definedVariables		=	NULL;
-	currentData.labelReferences			=	NULL;
-	currentData.labelDefinitions		=	NULL;
+	// Clear currentData
+	memset(&currentData,0,sizeof(TShaderData));
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -3015,19 +2970,27 @@ void	reset() {
 // Return Value			:
 // Comments				:
 void	alloc() {
-	TCode	*mem;
+	char	*mem;
 
-	currentData.memory	=	new TCode[	currentData.numCode	+
-										currentData.constantSize +
-										currentData.numConstants + 
-										currentData.numVariables + 
-										currentData.numStrings];
+	currentData.memory	=	(char *) allocate_untyped(	currentData.numCode*sizeof(TCode)	+
+														currentData.numArgument*sizeof(TArgument)	+
+														currentData.constantSize +
+														currentData.numConstants*sizeof(void *) + 
+														currentData.numVariables*sizeof(int) + 
+														currentData.numStrings*sizeof(char *));
 
 	mem		=	currentData.memory;
 
 	if (currentData.numCode != 0) {
-		currentData.code						=	mem;
-		mem										+=	currentData.numCode;
+		currentData.code						=	(TCode *) mem;
+		currentData.currentOpcodePlace			=	currentData.code;
+		mem										+=	currentData.numCode*sizeof(TCode);
+	}
+	
+	if (currentData.numArgument != 0) {
+		currentData.arguments					=	(TArgument *) mem;
+		currentData.currentArgumentPlace		=	currentData.arguments;
+		mem										+=	currentData.numArgument*sizeof(TArgument);
 	}
 
 	if (currentData.constantSize != 0) {
@@ -3036,20 +2999,20 @@ void	alloc() {
 	}
 
 	if (currentData.numConstants != 0) {
-		currentData.constantEntries				=	(TCode **) mem;
-		mem										+=	currentData.numConstants;
+		currentData.constantEntries				=	(void **) mem;
+		mem										+=	currentData.numConstants*sizeof(void *);
 	}
 
 	if (currentData.numVariables != 0) {
 		currentData.varyingSizes				=	(int *) mem;
-		mem										+=	currentData.numVariables;
+		mem										+=	currentData.numVariables*sizeof(int);
 	}
 
 	if (currentData.numStrings != 0) {
 		int	i;
 
 		currentData.strings						=	(char **) mem;
-		mem										+=	currentData.numStrings;
+		mem										+=	currentData.numStrings*sizeof(char *);
 
 		for (i=0;i<currentData.numStrings;i++) {
 			currentData.strings[i]				=	NULL;
@@ -3080,7 +3043,7 @@ CShader	*shaderCreate(const char *shaderName) {
 		for (cLabel = currentData.labelReferences;cLabel != NULL;cLabel = cLabel->next) {
 			for (nLabel = currentData.labelDefinitions;nLabel != NULL;nLabel = nLabel->next) {
 				if (strcmp(cLabel->name,nLabel->name) == 0) {
-					currentData.code[cLabel->index].integer	=	nLabel->index;
+					cLabel->argument->index	=	nLabel->index;
 					break;
 				}
 			}
@@ -3107,7 +3070,6 @@ CShader	*shaderCreate(const char *shaderName) {
 	cShader->memory						=	currentData.memory;
 
 	cShader->codeArea					=	currentData.code;
-	cShader->constantsArea				=	currentData.constants;
 
 	cShader->constantEntries			=	currentData.constantEntries;
 	cShader->varyingSizes				=	currentData.varyingSizes;
@@ -3173,7 +3135,7 @@ CShader	*shaderCreate(const char *shaderName) {
 void	processEscapes(char *str) {
 	int		i,n,j;
 
-	n	=	strlen(str);
+	n	=	(int) strlen(str);
 	for (i=0;i<n;i++) {
 		if (str[i] == '\\') {
 			switch(str[i+1]) {

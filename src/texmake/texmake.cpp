@@ -83,9 +83,6 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	// Init the memory manager
-	memInit();
-
 	for (i=1;i<argc;i++) {
 		if (strcmp(argv[i],"--help") == 0) {
 			printUsage();
@@ -198,8 +195,6 @@ int main(int argc, char* argv[]) {
 	if (processed == FALSE) {
 		fprintf(stderr,"Unknown texture mode (\"%s\") or invalid number of arguments (%d)\n",textureMode,currentFile);
 	}
-
-	memShutdown();
 
 	return 0;
 }

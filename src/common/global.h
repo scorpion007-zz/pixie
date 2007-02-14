@@ -109,31 +109,30 @@ typedef union {
 
 // This structure encapsulates a 64 bit word
 typedef union {
-	long int		integer;
+	long long		integer;
 	void			*pointer;
 	char			*string;
-	float			real;
-	double			dreal;
+	double			real;
 } T64;
 
 
-#ifndef __APPLE_CC__
-	// Enable the memory manager
-	#define USE_MEMORY_MANAGER
-	// But under OSX, this seems to cause some issues
-	// We use __APPLE_CC_ because fltk insists on __APPLE__
-	// being undefined
-#endif
-
-// For Windows/debug build, turn off the memory manager so we can check the memory leaks
+// Some useful machinery for memory management
 #ifdef		WIN32
 #ifdef		_DEBUG
-#undef		USE_MEMORY_MANAGER
 #include	<assert.h>
+
+// Register some junk for memory leak detection
+#define _CRTDBG_MAP_ALLOC
+#include <malloc.h>
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #endif
 #endif
 
-#include "memoryman.h"
+// Useful macros for allocating/deallocating untyped memory (aligned to 8 bytes)
+#define	allocate_untyped(__size)	(void*) new long long[(__size + sizeof(long long) - 1) / sizeof(long long)]
+#define	free_untyped(__ptr)			delete[] ((long long *) __ptr)
 
 #ifndef		assert
 #define		assert(__cond)

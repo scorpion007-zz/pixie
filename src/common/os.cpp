@@ -325,7 +325,7 @@ void			osWriteFloat(void *handle,float *data,int number) {
 // Return Value			:	-
 // Comments				:
 void			osWriteString(void *handle,const char *data) {
-	int	i	=	strlen(data);
+	int	i	=	(int) strlen(data);
 
 	osWriteInt(handle,&i);
 	osWrite(handle,(void *) data,i);
