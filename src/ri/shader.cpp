@@ -321,7 +321,7 @@ CShader::~CShader() {
 		parameters	=	parameters->next;
 
 		// Delete the default values
-		if (cParameter->defaultValue != NULL)	delete [] (TCode *) cParameter->defaultValue;
+		if (cParameter->defaultValue != NULL)	delete [] (float *) cParameter->defaultValue;
 
 		// Delete the parameter
 		delete cParameter;
@@ -488,8 +488,13 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 		parameters		=	nVariable;
 
 		// Allocate a new default value
-		nVariable->defaultValue	=	new TCode[nVariable->numFloats];
-		memcpy(nVariable->defaultValue,cVariable->defaultValue,nVariable->numFloats*sizeof(TCode));
+		if (nVariable->type == TYPE_STRING) {
+			nVariable->defaultValue	=	new char *[nVariable->numFloats];
+			memcpy(nVariable->defaultValue,cVariable->defaultValue,nVariable->numFloats*sizeof(char*));
+		} else {
+			nVariable->defaultValue	=	new float[nVariable->numFloats];
+			memcpy(nVariable->defaultValue,cVariable->defaultValue,nVariable->numFloats*sizeof(float));
+		}
 	}
 
 	flags				=	(parent->usedParameters & PARAMETER_NONAMBIENT) ? SHADERFLAGS_NONAMBIENT : 0;
@@ -511,7 +516,7 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 		parameters	=	parameters->next;
 
 		// Delete the default values
-		if (cParameter->defaultValue != NULL)	delete [] (TCode *) cParameter->defaultValue;
+		if (cParameter->defaultValue != NULL)	delete [] (float*) cParameter->defaultValue;
 
 		// Delete the parameter
 		delete cParameter;
@@ -867,8 +872,8 @@ void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **
 // Comments				:
 float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **varying,int numVertices) {
 	CVariable	*cVariable;
-	TCode		*data;
-	TCode		**locals;
+	char		*data;
+	float		**locals;
 	int			totalVaryingSize;
 	int			i;
 
@@ -883,28 +888,32 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 	}
 
 	// Allocate memory for the temporary shader variables
-	data	=	(TCode *) ralloc((totalVaryingSize + numVariables)*sizeof(TCode),namedMemory);
-	locals	=	(TCode **) data;
-	data	+=	numVariables;
+	data	=	(char *) ralloc(totalVaryingSize + numVariables*sizeof(int),namedMemory);
+	locals	=	(float **) data;
+	data	+=	numVariables*sizeof(float*);
 
 	// Save the memory
 	for (i=0;i<numVariables;i++) {
-		locals[i]	=	data;
+		locals[i]	=	(float*) data;
 		if (varyingSizes[i] < 0)	data	+=	-varyingSizes[i];
 		else						data	+=	varyingSizes[i]*numVertices*3;
 	}
 
 	// For each parameter, copy over the default value of the parameter
 	for (cVariable=parameters;cVariable!=NULL;cVariable=cVariable->next) {
-		TCode		*dest;
-		const TCode	*src;
+		float		*destf;
+		const float	*srcf;
+		const char	**dests;
+		const char	**srcs;
 		
 		// Find where we're writing
 		if (cVariable->storage == STORAGE_GLOBAL)	{
-			dest					=	(TCode *) varying[cVariable->entry];
+			destf					=	(float *) varying[cVariable->entry];
+			dests					=	(const char **) varying[cVariable->entry];
 		} else {
 			assert(cVariable->entry < numVariables);
-			dest					=	locals[cVariable->entry];
+			destf					=	(float *) locals[cVariable->entry];
+			dests					=	(const char **) locals[cVariable->entry];
 		}
 
 		// This is the repetition amount
@@ -912,21 +921,40 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 
 			//assert(cVariable->numFloats == -parent->varyingSizes[cVariable->entry]);
 
-			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
-				int	i;
-				for (i=cVariable->numFloats;i>0;i--)	*dest++	=	*src++;
+			if (cVariable->type == TYPE_STRING) {
+				if ((srcs = (const char **) cVariable->defaultValue) != NULL) {
+					int	i;
+					for (i=cVariable->numFloats;i>0;i--)	*dests++	=	*srcs++;
+				}
+			} else {
+				if ((srcf = (const float *) cVariable->defaultValue) != NULL) {
+					int	i;
+					for (i=cVariable->numFloats;i>0;i--)	*destf++	=	*srcf++;
+				}
 			}
 		} else {
 
 			//assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
+			
+			if (cVariable->type == TYPE_STRING) {
+				if ((srcs = (const char **) cVariable->defaultValue) != NULL) {
+					int			n;
+					const int	c	=	cVariable->numFloats;
 
-			if ((src = (const TCode *) cVariable->defaultValue) != NULL) {
-				int			n;
-				const int	c	=	cVariable->numFloats;
+					// FIXME: We may want to unroll these two loops
+					for(n=numVertices*3;n>0;n--) {
+						for (i=0;i<c;i++)	*dests++	=	srcs[i];
+					}
+				}
+			} else {
+				if ((srcf = (const float *) cVariable->defaultValue) != NULL) {
+					int			n;
+					const int	c	=	cVariable->numFloats;
 
-				// FIXME: We may want to unroll these two loops
-				for(n=numVertices*3;n>0;n--) {
-					for (i=0;i<c;i++)	*dest++	=	src[i];
+					// FIXME: We may want to unroll these two loops
+					for(n=numVertices*3;n>0;n--) {
+						for (i=0;i<c;i++)	*destf++	=	srcf[i];
+					}
 				}
 			}
 		}
