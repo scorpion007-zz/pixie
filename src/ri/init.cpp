@@ -405,7 +405,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 		if (size != 0) {
 			if (size < 0)	size				=	-size;
-			stuff[SL_VARYING_OPERAND][i]		=	(void *) ralloc(size*max(sizeof(float),sizeof(char *)),threadMemory);
+			stuff[SL_VARYING_OPERAND][i]		=	(void *) ralloc(size,threadMemory);
 		}
 	}
 

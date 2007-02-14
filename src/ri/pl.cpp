@@ -84,22 +84,41 @@ public:
 					}
 
 	void			dispatch(int numVertices,float **varying,float ***locals) {
-						float	*dest;
+						float	*destf;
+						char	**dests;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
-						
+						// Note: we only worry about strings in the uniform
+						// case, as they can't be varying in the RIB stream
+
+						if (variable->type == TYPE_STRING) {
+							if (variable->storage == STORAGE_GLOBAL)	dests	=	(char**) varying[variable->entry];
+							else if (locals != NULL)					dests	=	(char**) locals[variable->accessor][variable->entry];
+							else										dests	=	(char**) NULL;
+						} else {
+							if (variable->storage == STORAGE_GLOBAL)	destf	=	varying[variable->entry];
+							else if (locals != NULL)					destf	=	locals[variable->accessor][variable->entry];
+							else										destf	=	NULL;
+						}
 
 						
-						if (dest != NULL) {
+						if (destf != NULL) {
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
-								memcpy(dest,data,variable->numFloats*sizeof(float));
+								memcpy(destf,data,variable->numFloats*sizeof(char*));
 							} else {
 								// premote
 								for (int i=0;i<numVertices;i++) {
-									memcpy(dest,data,variable->numFloats*sizeof(float));
-									dest += variable->numFloats;
+									memcpy(destf,data,variable->numFloats*sizeof(float));
+									destf += variable->numFloats;
+								}
+							}
+						} else if (dests != NULL) {
+							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
+								memcpy(dests,data,variable->numFloats*sizeof(float));
+							} else {
+								// premote
+								for (int i=0;i<numVertices;i++) {
+									memcpy(dests,data,variable->numFloats*sizeof(char*));
+									dests += variable->numFloats;
 								}
 							}
 						}
@@ -108,20 +127,37 @@ public:
 					}
 
 	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
-						float	*dest;
+						float	*destf = NULL;
+						char	**dests = NULL;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->type == TYPE_STRING) {
+							if (variable->storage == STORAGE_GLOBAL)	dests	=	(char**) varying[variable->entry];
+							else if (locals != NULL)					dests	=	(char**) locals[variable->accessor][variable->entry];
+							else										dests	=	(char**) NULL;
+						} else {
+							if (variable->storage == STORAGE_GLOBAL)	destf	=	varying[variable->entry];
+							else if (locals != NULL)					destf	=	locals[variable->accessor][variable->entry];
+							else										destf	=	NULL;
+						}
 
-						if (dest != NULL) {
+						if (destf != NULL) {
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
-								memcpy(dest + start*variable->numFloats,data,variable->numFloats*sizeof(float));
+								memcpy(destf + start*variable->numFloats,data,variable->numFloats*sizeof(float));
 							} else {
 								// premote
 								for (int i=0;i<numVertices;i++) {
-									memcpy(dest,data,variable->numFloats*sizeof(float));
-									dest += variable->numFloats;
+									memcpy(destf,data,variable->numFloats*sizeof(float));
+									destf += variable->numFloats;
+								}
+							}
+						} else if (dests != NULL) {
+							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
+								memcpy(dests + start*variable->numFloats,data,variable->numFloats*sizeof(char*));
+							} else {
+								// premote
+								for (int i=0;i<numVertices;i++) {
+									memcpy(dests,data,variable->numFloats*sizeof(char*));
+									dests += variable->numFloats;
 								}
 							}
 						}
@@ -134,9 +170,14 @@ public:
 						
 						if (variable->storage == STORAGE_GLOBAL)	cUniform	=	new CUniformParameter(variable);
 						else										cUniform	=	new CUniformParameter(a->findParameter(variable->name));
-
-						cUniform->data					=	new float[variable->numFloats];
-						memcpy(cUniform->data,data,variable->numFloats*sizeof(float));
+						
+						if (variable->type == TYPE_STRING) {
+							cUniform->data					=	(float*) new char*[variable->numFloats];
+							memcpy(cUniform->data,data,variable->numFloats*sizeof(char*));
+						} else {
+							cUniform->data					=	new float[variable->numFloats];
+							memcpy(cUniform->data,data,variable->numFloats*sizeof(float));
+						}
 
 						if (next != NULL)	cUniform->next	=	next->clone(a);
 
