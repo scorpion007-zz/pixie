@@ -260,7 +260,11 @@ int				CRenderer::advanceBucket(int index,int &x,int &y) {
 // Return Value			:
 // Comments				:
 void		CRenderer::serverThread(void *w) {
-	int		index			=	(int) w;	// This is the server index, 1 thread for every server
+	T64		tmp;
+
+	tmp.pointer				=	w;
+
+	int		index			=	(int) tmp.integer;	// This is the server index, 1 thread for every server
 	int		done			=	FALSE;
 	T32		netBuffer[3];
 	int		x,y;

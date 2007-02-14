@@ -1388,7 +1388,7 @@ TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 					char			environmentVariable[OS_MAX_PATH_LENGTH];
 
 					if (endOfCurrentPath!=NULL) {
-						const	int		environmentLength	=	endOfCurrentPath - currentPath - 1;
+						const	int		environmentLength	=	(int) (endOfCurrentPath - currentPath) - 1;
 						const	char	*value;
 
 						strncpy(environmentVariable,currentPath+1,environmentLength);

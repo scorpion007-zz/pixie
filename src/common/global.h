@@ -109,11 +109,10 @@ typedef union {
 
 // This structure encapsulates a 64 bit word
 typedef union {
-	long int		integer;
+	long long		integer;
 	void			*pointer;
 	char			*string;
-	float			real;
-	double			dreal;
+	double			real;
 } T64;
 
 

@@ -300,7 +300,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 											}
 //	Allocate temporary memory for the string and save it
 #define		savestring(r,n)					{																	\
-												int		strLen	=	strlen(n) + 1;								\
+												int		strLen	=	(int) strlen(n) + 1;						\
 												int		strSize	=	(strLen & ~3) + 4;							\
 												char	*strmem	=	(char *) ralloc(strSize,threadMemory);		\
 												strcpy(strmem,n);												\

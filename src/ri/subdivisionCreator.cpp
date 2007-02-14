@@ -263,7 +263,7 @@ public:
 	CSEdge			*children[2];					// The child edges
 
 	void			*operator new(size_t s,CShadingContext *context) {
-						return ralloc(s,context->threadMemory);
+						return ralloc((int) s,context->threadMemory);
 					}
 
 					///////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ public:
 	CSVertex		*childVertex;
 
 	void			*operator new(size_t s,CShadingContext *context) {
-						return ralloc(s,context->threadMemory);
+						return ralloc((int) s,context->threadMemory);
 					}
 
 					///////////////////////////////////////////////////////////////////////

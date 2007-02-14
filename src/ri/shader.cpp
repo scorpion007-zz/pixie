@@ -381,7 +381,7 @@ CShaderInstance::~CShaderInstance() {
 static char	*token(char **str,char *tok) {
 	char	*cStr	=	*str;
 	char	*oStr	=	cStr;
-	int		n		=	strlen(tok);
+	int		n		=	(int) strlen(tok);
 	int		i;
 
 	if (cStr == NULL)	return NULL;

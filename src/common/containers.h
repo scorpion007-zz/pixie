@@ -715,7 +715,7 @@ public:
 
 		inline void		restore(T64 *data) {
 							stack					=	(CMemPage *) data[2].pointer;
-							stack->availableSize	=	data[1].integer;
+							stack->availableSize	=	(int) data[1].integer;
 							stack->memory			=	(char *) data[0].pointer;
 						}
 

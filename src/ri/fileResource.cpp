@@ -91,7 +91,7 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 
 		fwrite(version,3,sizeof(int),f);
 
-		i	=	strlen(type);
+		i	=	(int) strlen(type);
 		fwrite(&i,1,sizeof(int),f);
 		fwrite(type,i+1,sizeof(char),f);
 	} else {

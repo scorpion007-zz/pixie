@@ -561,7 +561,7 @@ pbcstr(s)
 	char			*cp;
 	unsigned	int	length;
 
-	if((cp = malloc((unsigned) (length = (strlen(s) + 1)))) == NULL)
+	if((cp = malloc((unsigned) (length = ((unsigned int) strlen(s) + 1)))) == NULL)
 		out_of_memory();
 	memmov(s,cp,length);		/* Make a copy of memory */
 
@@ -592,7 +592,7 @@ pbstr(in)
 	{
 	register	int	i;
 
-	for(i = strlen(in) - 1; i >= 0; i--)
+	for(i = (int) strlen(in) - 1; i >= 0; i--)
 		pushback(in[i] & 0xFF);
 	}
 

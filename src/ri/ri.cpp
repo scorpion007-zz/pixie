@@ -435,7 +435,7 @@ static	inline int		extract(char *dest,const char *tag,const char *src) {
 	if ((tmp = strstr(src,tag)) != NULL) {
 		if ((tmpEnd	= strchr(tmp+1,' ')) == NULL)	tmpEnd	=	tmp + strlen(tmp);
 
-		length	=	tmpEnd - tmp - (int) strlen(tag);
+		length	=	(int) (tmpEnd - tmp - strlen(tag));
 
 		strncpy(dest,tmp+strlen(tag),length);
 		dest[length]	=	'\0';

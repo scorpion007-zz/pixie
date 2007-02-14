@@ -138,10 +138,10 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 				// Compute the hash key (fast and easy)
 				object.pointer	=	cRay->object;
-				key				=	(	(object.integer >> 0) ^ 
-										(object.integer >> 4) ^ 
-										(object.integer >> 8) ^ 
-										(object.integer >> 16)) & (SHADING_OBJECT_CACHE_SIZE - 1);
+				key				=	(int) (	(object.integer >> 0) ^ 
+											(object.integer >> 4) ^ 
+											(object.integer >> 8) ^ 
+											(object.integer >> 16)) & (SHADING_OBJECT_CACHE_SIZE - 1);
 
 				cHash			=	traceObjectHash + key;
 

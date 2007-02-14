@@ -190,7 +190,7 @@ void	test();
 // Comments				:
 static	char			*toLowerCase(char *s) {
 	int	i;
-	int	l	=	strlen(s);
+	int	l	=	(int) strlen(s);
 
 	for (i=0;i<l;i++) {
 		if ((s[i] >= 'A') && (s[i] <= 'Z'))

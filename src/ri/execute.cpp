@@ -187,7 +187,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											}
 //	Allocate temporary memory for the string and save it
 #define		savestring(r,n)					{																	\
-												const int	strLen	=	strlen(n) + 1;							\
+												const int	strLen	=	(int) strlen(n) + 1;					\
 												const int	strSize	=	(strLen & ~3) + 4;						\
 												char		*strmem	=	(char *) ralloc(strSize,threadMemory);	\
 												strcpy(strmem,n);												\

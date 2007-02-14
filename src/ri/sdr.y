@@ -640,7 +640,7 @@ static	TSlFunction		functions[]	=	{
 												TSlLabel	*cLabel	=	new TSlLabel;
 
 												strcpy(cLabel->name,name);
-												cLabel->index	=	currentData.currentOpcodePlace - currentData.code;
+												cLabel->index	=	(int) (currentData.currentOpcodePlace - currentData.code);
 
 												if (reference) {
 													cLabel->next					=	currentData.labelReferences;
@@ -2348,7 +2348,7 @@ CShader	*shaderCreate(const char *shaderName) {
 void	processEscapes(char *str) {
 	int		i,n,j;
 
-	n	=	strlen(str);
+	n	=	(int) strlen(str);
 	for (i=0;i<n;i++) {
 		if (str[i] == '\\') {
 			switch(str[i+1]) {
