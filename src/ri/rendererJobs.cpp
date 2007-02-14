@@ -262,6 +262,7 @@ int				CRenderer::advanceBucket(int index,int &x,int &y) {
 void		CRenderer::serverThread(void *w) {
 	T64		tmp;
 
+	tmp.integer				=	0;
 	tmp.pointer				=	w;
 
 	int		index			=	(int) tmp.integer;	// This is the server index, 1 thread for every server

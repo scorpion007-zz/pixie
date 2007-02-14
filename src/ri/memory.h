@@ -33,6 +33,7 @@
 
 #include "common/global.h"
 #include "common/os.h"
+#include "common/align.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMemPage
@@ -59,7 +60,9 @@ void				memoryDeletePage(CMemPage *);	// Allocate a new memory page
 
 // This macro allocates memory in the named stack
 inline void *ralloc(int size,CMemPage *&stack) {
-	void	*ptr;
+
+	// Align the size with 8 byte boundaries
+	size	=	align64(size);
 
 	while(stack->availableSize < size) {
 		if (stack->next == NULL) {
@@ -74,7 +77,7 @@ inline void *ralloc(int size,CMemPage *&stack) {
 	}
 
 
-	ptr										=	stack->memory;
+	void *ptr								=	stack->memory;
 	stack->memory							=	stack->memory+size;
 	stack->availableSize					-=	size;
 	return	ptr;

@@ -1119,6 +1119,7 @@ static	void		*serverDispatchThread(void *w) {
 static	void		*rendererDispatchThread(void *w) {
 	T64	tmp;
 
+	tmp.integer	=	0;
 	tmp.pointer	=	w;
 
 	CRenderer::contexts[tmp.integer]->renderingLoop();

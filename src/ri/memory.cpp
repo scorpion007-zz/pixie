@@ -86,6 +86,7 @@ CMemPage		*memoryNewPage(int size) {
 	lastPagingTime			=	time;
 
 	size					+=	memoryPageSize;
+	size					=	align64(size);
 
 	newPage->availableSize	=	size;
 	newPage->totalSize		=	size;

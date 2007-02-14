@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\common\align.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\common\comments.h"
 				>
 			</File>

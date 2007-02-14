@@ -35,6 +35,7 @@
 #include "shading.h"
 #include "object.h"
 #include "renderer.h"
+#include "config.h"
 
 // Note:
 // The low bits are spliced with the zfilter mode and used to dispatch in stochastic hider
@@ -80,6 +81,8 @@ protected:
 			int					refCount;				// The number of threads working on this object
 			int					diced;					// TRUE if this object has already been diced
 			int					grid;					// TRUE if this is a grid
+			int					cached;					// TRUE if this is a cached object
+
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
 			TMutex				mutex;					// To secure the object
@@ -261,6 +264,15 @@ private:
 	int							tbucketTop;										// Right of the current bucket in samples
 	int							tbucketRight;
 	int							tbucketBottom;
+
+#ifdef REYES_OBJECT_CACHE_SIZE
+	CRasterObject				*freeRasterObjects;								// List of free objects
+#endif
+
+#ifdef REYES_GRID_CACHE_SIZE
+	CRasterGrid					*freeRasterGrids;								// List of free raster grids
+#endif
+
 
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CReyes
