@@ -1101,11 +1101,21 @@ CShadingState	*CShadingContext::newState() {
 			assert(var != NULL);
 
 			if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-				newState->varying[j]	=	new float[var->numFloats];
-				vertexMemory		+=	var->numFloats*sizeof(float);
+				if (var->type == TYPE_STRING) {
+					newState->varying[j]	=	(float*) new char*[var->numFloats];
+					vertexMemory		+=	var->numFloats*sizeof(char*);
+				} else {
+					newState->varying[j]	=	new float[var->numFloats];
+					vertexMemory		+=	var->numFloats*sizeof(float);
+				}
 			} else {
-				newState->varying[j]	=	new float[var->numFloats*CRenderer::maxGridSize*3];
-				vertexMemory		+=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
+				if (var->type == TYPE_STRING) {
+					newState->varying[j]	=	(float*) new char*[var->numFloats*CRenderer::maxGridSize*3];
+					vertexMemory		+=	var->numFloats*CRenderer::maxGridSize*3*sizeof(char*);
+				} else {
+					newState->varying[j]	=	new float[var->numFloats*CRenderer::maxGridSize*3];
+					vertexMemory		+=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
+				}
 			}
 		}
 
