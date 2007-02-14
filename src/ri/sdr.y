@@ -252,7 +252,10 @@ static	TSlFunction		functions[]	=	{
 										switch(currentData.passNumber) {
 										case 1:
 											currentData.numVariables++;
-											currentData.varyingSize		+=	numItems*numComp;
+											if (type == TYPE_STRING)
+												currentData.varyingSize		+=	numItems*numComp*sizeof(char*);
+											else
+												currentData.varyingSize		+=	numItems*numComp*sizeof(float);
 											break;
 										case 2:
 											{
@@ -271,7 +274,12 @@ static	TSlFunction		functions[]	=	{
 												if (cVariable->uniform)	currentData.varyingSizes[currentData.currentVariable]	=	-currentData.varyingSizes[currentData.currentVariable];
 												
 												currentData.currentVariable++;
-												currentData.currentVaryingSize	+=	numItems*numComp;
+												if (type == TYPE_STRING)
+													currentData.currentVaryingSize	+=	numItems*numComp*sizeof(char*);
+												else
+													currentData.currentVaryingSize	+=	numItems*numComp*sizeof(float);
+
+													
 												cVariable->next					=	currentData.definedVariables;
 												currentData.definedVariables	=	cVariable;
 												
