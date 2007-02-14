@@ -760,7 +760,7 @@ slPointParameter:
 			
 			currentDefaultItem = currentParameter->defaultValue.array;
 			for(int i=0;i<currentParameter->numItems;i++){
-				currentDefaultItem[i].vector = new float[3];
+				currentDefaultItem[i].vector	= new float[3];
 				currentDefaultItem[i].vector[0] = 0;
 				currentDefaultItem[i].vector[1] = 0;
 				currentDefaultItem[i].vector[2] = 0;

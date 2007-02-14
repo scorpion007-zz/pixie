@@ -237,9 +237,9 @@ private:
 const	int		TRIE_NODE_LEAF				=	1;	
 
 // Some misc macros
-#define	isLeaf(__node)		(((unsigned int) __node) & TRIE_NODE_LEAF)
-#define	getLeaf(__node)		(CTrieLeaf *) (((unsigned int) __node) & (~TRIE_NODE_LEAF))
-#define	makeNode(__node)	(CTrieNode *) (((unsigned int) __node) | TRIE_NODE_LEAF)
+#define	isLeaf(__node)		(((unsigned long long) __node) & TRIE_NODE_LEAF)
+#define	getLeaf(__node)		(CTrieLeaf *) (((unsigned long long) __node) & (~TRIE_NODE_LEAF))
+#define	makeNode(__node)	(CTrieNode *) (((unsigned long long) __node) | TRIE_NODE_LEAF)
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTrie

@@ -352,7 +352,8 @@ static	TSlFunction		functions[]	=	{
 											
 											char	**dest;
 											
-											currentData.currentArgumentPlace->numItems									=	0;
+											currentData.currentArgumentPlace->numItems									=	numItems;
+											currentData.currentArgumentPlace->bytesPerItem								=	sizeof(char *);
 											currentData.currentArgumentPlace->index										=	(unsigned short) currentData.currentConstant;
 											currentData.currentArgumentPlace->accessor									=	SL_IMMEDIATE_OPERAND;
 											currentData.constantEntries[currentData.currentConstant]					=	currentData.constants + currentData.currentConstantSize;
@@ -391,7 +392,8 @@ static	TSlFunction		functions[]	=	{
 												
 												float	*dest;
 												
-												currentData.currentArgumentPlace->numItems						=	0;
+												currentData.currentArgumentPlace->numItems						=	numItems;
+												currentData.currentArgumentPlace->bytesPerItem					=	sizeof(float);
 												currentData.currentArgumentPlace->index							=	(unsigned short) currentData.currentConstant;
 												currentData.currentArgumentPlace->accessor						=	SL_IMMEDIATE_OPERAND;
 												currentData.constantEntries[currentData.currentConstant]		=	currentData.constants + currentData.currentConstantSize;
@@ -438,9 +440,10 @@ static	TSlFunction		functions[]	=	{
 														assert(cVariable->index < 65536);
 														assert((cVariable->multiplicity*numComponents(cVariable->type)) < 256);
 														
-														currentData.currentArgumentPlace->index		=	(unsigned short) cVariable->index;
-														currentData.currentArgumentPlace->numItems	=	(char) (cVariable->multiplicity*numComponents(cVariable->type));
-														currentData.currentArgumentPlace->accessor	=	SL_VARYING_OPERAND;
+														currentData.currentArgumentPlace->index			=	(unsigned short) cVariable->index;
+														currentData.currentArgumentPlace->numItems		=	(char) (cVariable->multiplicity*numComponents(cVariable->type));
+														currentData.currentArgumentPlace->bytesPerItem	=	(cVariable->type == TYPE_STRING ? sizeof(char *) : sizeof(float));
+														currentData.currentArgumentPlace->accessor		=	SL_VARYING_OPERAND;
 														currentData.currentArgumentPlace++;
 														
 														if (cVariable->uniform == FALSE)
@@ -458,9 +461,10 @@ static	TSlFunction		functions[]	=	{
 													assert(var->entry < 65536);
 													assert(var->numFloats < 256);
 													
-													currentData.currentArgumentPlace->index		=	(unsigned short) var->entry;
-													currentData.currentArgumentPlace->numItems	=	(char) var->numFloats;
-													currentData.currentArgumentPlace->accessor	=	SL_GLOBAL_OPERAND;
+													currentData.currentArgumentPlace->index			=	(unsigned short) var->entry;
+													currentData.currentArgumentPlace->numItems		=	(char) var->numFloats;
+													currentData.currentArgumentPlace->bytesPerItem	=	(var->type == TYPE_STRING ? sizeof(char *) : sizeof(float));
+													currentData.currentArgumentPlace->accessor		=	SL_GLOBAL_OPERAND;
 													currentData.currentArgumentPlace++;
 													
 													if ((var->container != CONTAINER_UNIFORM) || (var->container != CONTAINER_CONSTANT))
@@ -594,11 +598,20 @@ static	TSlFunction		functions[]	=	{
 														currentData.currentOpcodePlace++;
 													} else {
 														// Allright, we could not find the function, check the DSO shaders
-														void			*handle;
-														dsoExecFunction	exec;
+														CDSO	*dso;
 
-														if (CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype,handle,exec) == TRUE) {
+														// See if this is a DSO function
+														if ((dso = CRenderer::getDSO(currentData.currentOpcode,currentData.currentPrototype)) != NULL) {
+														
 															// We have the DSO
+															if (currentData.currentPrototype[0] == 'o')		currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO_VOID;
+															else											currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO;
+								
+															currentData.currentOpcodePlace->plNumber		=	(unsigned char) (currentData.currentPL);
+															currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
+															currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);
+															currentData.currentOpcodePlace->dso				=	dso;
+															currentData.currentOpcodePlace++;
 														} else {
 															slerror("Unknown function");
 														}
@@ -1790,33 +1803,29 @@ slShaderLine:
 				slShaderLine
 				slLabelDefinition
 				SCRL_NL
-				/*
 				|
 				slShaderLine
 				slDSO
 				SCRL_NL	
-				*/
 				|
 				;
 
 
-				/*
 slDSO:			SCRL_DSO
 				SCRL_IDENTIFIER_VALUE
 				{
+					char	*dsoName	=	$2;
+					
 					switch(currentData.passNumber) {
 					case 1:
 						currentData.numCode++;					// opcode
-						currentData.numArguments	+=	2;		// To hold the handle and the exec function pointers
 						break;
 					case 2:
 						strcpy(currentData.currentOpcode,$2);
-						currentData.currentArgument			=	0;
-						currentData.currentOpcodePlace		=	currentData.code + currentData.currentCode;
-						currentData.currentArgumentPlace	=	currentData.arguments;
-						currentData.currentCode++;
-						currentData.currentPrototype[0]		=	'~';
-						currentData.opcodeUniform			=	TRUE;
+						currentData.currentArgument					=	0;
+						currentData.currentOpcodePlace->arguments	=	currentData.currentArgumentPlace;
+						currentData.currentPrototype[0]				=	'~';
+						currentData.opcodeUniform					=	TRUE;
 						break;
 					default:
 						break;
@@ -1832,23 +1841,20 @@ slDSO:			SCRL_DSO
 						break;
 					case 2:
 						// Set the opcode here
-						void			*handle;
-						dsoExecFunction	exec;
+						CDSO	*dso;
 
-						if (CRenderer::getDSO($2,$5,handle,exec) == TRUE) {
-							if ($5[0] == 'o')
-								currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO_VOID;
-							else
-								currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO;
+						if ((dso = CRenderer::getDSO($2,$5)) != NULL) {
+							// Save the DSO opcode
+							if ($5[0] == 'o')	currentData.currentOpcodePlace->opcode		=	FUNCTION_DSO_VOID;
+							else				currentData.currentOpcodePlace->opcode		=	FUNCTION_DSO;
 
-							assert((currentData.currentArgument+4) < 256);
 							assert(currentData.opcodeUniform < 256);
 							
-							currentData.currentOpcodePlace->numCodes			=	(unsigned char) (currentData.currentArgument+4);
-							currentData.currentOpcodePlace->numArguments		=	(unsigned char) (currentData.currentArgument);
-							currentData.currentOpcodePlace->uniform				=	(unsigned char) (currentData.opcodeUniform);
-							currentData.currentOpcodePlace[2].integer			=	(int) handle;
-							currentData.currentOpcodePlace[3].integer			=	(int) exec;
+							currentData.currentOpcodePlace->plNumber		=	(unsigned char) (currentData.currentPL);
+							currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
+							currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);															
+							currentData.currentOpcodePlace->dso				=	dso;
+							currentData.currentOpcodePlace++;
 						} else {
 							slerror("Unable to locate DSO function\n");
 						}
@@ -1858,7 +1864,6 @@ slDSO:			SCRL_DSO
 					}
 				}
 				;
-				*/
 
 slOpcode:
 				SCRL_IDENTIFIER_VALUE

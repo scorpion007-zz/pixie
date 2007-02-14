@@ -213,16 +213,20 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 //	Retrieve a pointer to an operand and obtain it's size
 #define		operand(i,n,t)					{																	\
-												const TArgument	ref	=	code->arguments[i];						\
-												n	= (t) stuff[ref.accessor][ref.index];						\
+												const TArgument	*ref	=	code->arguments + i;				\
+												n	= (t) stuff[ref->accessor][ref->index];						\
 											}
 
 //	Retrieve an operand's size
-#define		operandSize(i,n,s,t)				{																\
-												const TArgument	ref	=	code->arguments[i];						\
-												n	= (t) stuff[ref.accessor][ref.index];						\
-												s	= ref.numItems;												\
+#define		operandSize(i,n,s,t)			{																	\
+												const TArgument	*ref	=	code->arguments + i;				\
+												n	= (t) stuff[ref->accessor][ref->index];						\
+												s	= ref->numItems;											\
 											}
+
+#define		operandNumItems(i)				code->arguments[i].numItems
+
+#define		operandBytesPerItem(i)			code->arguments[i].bytesPerItem
 
 // Retrieve the parameterlist
 #define		parameterlist					cInstance->parameterLists[code->plNumber]

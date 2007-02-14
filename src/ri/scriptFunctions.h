@@ -1038,28 +1038,26 @@ DEFFUNC(Splineap			,"spline"		,"p=fP"		,SPLINEAPEXPR_PRE,SPLINEAPEXPR,SPLINEAPEX
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DSO dispatcher
-// FIXME: There's a bug here ... 
-// If a string argument is present on a 64 bit platform, this code will crash
 #define	DSOEXEC_PRE			int					numArguments;								\
-							void				*handle;									\
-							dsoExecFunction		exec;										\
-							float				**op;										\
+							char				**op;										\
 							int					*opSteps;									\
 							int					i;											\
 																							\
 							argumentcount(numArguments);									\
-							op		=	(float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);		\
+																							\
+							op		=	(char **)	ralloc(numArguments*sizeof(char *),threadMemory);	\
+							opSteps	=	(int *)		ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
 							for (i=0;i<numArguments;i++) {									\
-								operandSize(i+2,op[i],opSteps[i],float *);					\
+								operandSize(i,op[i],opSteps[i],char *);						\
+								opSteps[i]	*=	operandBytesPerItem(i);						\
 							}																\
 																							\
-							handle	=	(void *)			argument(0);					\
-							exec	=	(dsoExecFunction)	argument(1);
+							void			*handle	=	code->dso->handle;					\
+							dsoExecFunction exec	=	code->dso->exec;
 						
 
-#define	DSOEXEC				exec(handle,numArguments,(void **) op);
+#define	DSOEXEC				exec(handle,numArguments-1,(void **) op);
 
 #define	DSOEXEC_UPDATE		for (i=0;i<numArguments;i++) {									\
 								op[i]	+=	opSteps[i];										\
@@ -1072,28 +1070,27 @@ DEFFUNC(DSO				,"XXX",			"XXX",	DSOEXEC_PRE,DSOEXEC,DSOEXEC_UPDATE,DSOEXEC_POST,
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // VOID DSO dispatcher
 #define	DSOVOIDEXEC_PRE		int					numArguments;								\
-							void				*handle;									\
-							dsoExecFunction		exec;										\
 							float				**op;										\
 							int					*opSteps;									\
 							int					i;											\
 																							\
 							argumentcount(numArguments);									\
-							numArguments++;													\
-							op		=	(float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
-							opSteps	=	(int *)	   ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
-							for (i=1;i<numArguments;i++) {									\
-								operandSize(i+1,op[i],opSteps[i],float *);					\
+							op		=	(float **) ralloc((numArguments+1)*sizeof(float *),threadMemory);	\
+							opSteps	=	(int *)	   ralloc((numArguments+1)*sizeof(int),threadMemory);		\
+																							\
+							for (i=0;i<numArguments;i++) {									\
+								operandSize(i,op[i+1],opSteps[i+1],float *);				\
+								opSteps[i+1]	*=	operandBytesPerItem(i);					\
 							}																\
 																							\
-							handle	=	(void *)			argument(0);					\
-							exec	=	(dsoExecFunction)	argument(1);
+							void			*handle	=	code->dso->handle;					\
+							dsoExecFunction exec	=	code->dso->exec;
 
 #define	DSOVOIDEXEC			exec(handle,numArguments,(void **) op);
 
-#define	DSOVOIDEXEC_UPDATE	for (i=1;i<numArguments;i++) {									\
-								op[i]	+=	opSteps[i];										\
+#define	DSOVOIDEXEC_UPDATE	for (i=0;i<numArguments;i++) {									\
+								op[i+1]	+=	opSteps[i+1];									\
 							}
 
 #define	DSOVOIDEXEC_POST

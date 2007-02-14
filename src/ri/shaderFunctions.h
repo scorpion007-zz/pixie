@@ -709,8 +709,10 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 							operand(1,op,const float *);										\
 							P		=	varying[VARIABLE_P];									\
 							N		=	op;														\
+																								\
 							runLights(P,N,costheta);											\
 							/* initialize output appropriately */								\
+							R		=	res;													\
 							tags	=	tagStart;												\
 							for (i=0;i<numVertices;i++) {										\
 								if (*tags == 0) initv(R,0,0,0);									\
@@ -718,7 +720,6 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 								tags++;															\
 							}																	\
 							/* loop the lighting contributions */								\
-							R				=	res;											\
 							*currentLight	=	*lights;										\
 							while (*currentLight) {												\
 								enterFastLightingConditional();									\
@@ -1440,8 +1441,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
 								operand(0,res,float *);															\
-								operand(3,s,const float *);													\
-								operand(4,t,const float *);													\
+								operand(3,s,const float *);														\
+								operand(4,t,const float *);														\
 								int				i;																\
 								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\

@@ -333,7 +333,7 @@ CShader::~CShader() {
 	}
 
 	// Ditch the memory baby
-	if (memory != NULL)					delete [] memory;
+	if (memory != NULL)					free_untyped(memory);
 }
 
 

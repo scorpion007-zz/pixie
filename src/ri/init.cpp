@@ -330,12 +330,16 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 												n	= (t) stuff[ref.accessor][ref.index];						\
 											}
 
-//	Retrieve an operand's size
-#define		operandSize(i,n,s,t)				{																\
+	//	Retrieve an operand's size
+#define		operandSize(i,n,s,t)			{																	\
 												const TArgument	ref	=	code->arguments[i];						\
 												n	= (t) stuff[ref.accessor][ref.index];						\
 												s	= ref.numItems;												\
 											}
+
+#define		operandNumItems(i)				code->arguments[i].numItems
+
+#define		operandBytesPerItem(i)			code->arguments[i].bytesPerItem
 
 
 //	Retrieve an integer operand (label references are integer)

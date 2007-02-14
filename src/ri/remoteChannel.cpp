@@ -52,7 +52,7 @@
 // Return Value			:
 // Comments				:	The channel will either be deleted or managed
 int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
-	int nameLength			= strlen(serverChannel->name)+1;
+	int nameLength			= (int) strlen(serverChannel->name)+1;
 	int clientInitialized	= FALSE;	
 	T32 buffer[3];
 	

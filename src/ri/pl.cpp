@@ -1317,8 +1317,8 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 						decl	=	"uniform float";
 						break;
 				}
-				sDecl = (char*) ralloc(strlen(decl) + strlen(RI_S) + 2,CRenderer::globalMemory);
-				tDecl = (char*) ralloc(strlen(decl) + strlen(RI_T) + 2,CRenderer::globalMemory);
+				sDecl = (char*) ralloc((int) strlen(decl) + (int) strlen(RI_S) + 2,CRenderer::globalMemory);
+				tDecl = (char*) ralloc((int) strlen(decl) + (int) strlen(RI_T) + 2,CRenderer::globalMemory);
 				sprintf(sDecl,"%s %s",decl,RI_S);
 				sprintf(tDecl,"%s %s",decl,RI_T);
 			}

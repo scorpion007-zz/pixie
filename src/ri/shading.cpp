@@ -513,7 +513,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 	// This is the number of vertices we will be sampling/shading
 	int	numVertices		=	uVertices*vVertices;
-	assert(numVertices <= CRenderer::maxGridSize);
+	//assert(numVertices <= CRenderer::maxGridSize);
 	assert(numVertices > 0);
 
 	// Update the stats
