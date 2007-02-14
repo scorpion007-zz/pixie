@@ -1339,8 +1339,6 @@ TSdrShader		*sdrGet(const char *in,const char *searchpath) {
 	const	char	*currentPath;
 	char			*dest;
 
-	memInit();
-
 	sdrin	=	fopen(in,"r");
 
 	if (sdrin == NULL) {
@@ -1476,7 +1474,5 @@ void			sdrDelete(TSdrShader *cShader) {
 
 	free(cShader->name);
 	delete cShader;
-
-	memShutdown();
 }
 

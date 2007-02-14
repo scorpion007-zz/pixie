@@ -168,10 +168,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\common\memoryman.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\common\os.cpp"
 				>
 			</File>
@@ -195,10 +191,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\common\global.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\common\memoryman.h"
 				>
 			</File>
 			<File

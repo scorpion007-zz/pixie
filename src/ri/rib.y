@@ -100,7 +100,7 @@ static	int					numVarying					=	0;		// The number of varyings
 static	int					numFaceVarying				=	0;		// The number of facevaryings
 static	int					numUniform					=	0;		// The number of uniforms
 static	CArray<RtPointer>	*lights						=	NULL;	// Number -> handle mapping for lights
-static	CTrie<RtPointer>	*lightNames					=	NULL;	// Name -> handle mapping for lights
+static	CTrie<char *>		*lightNames					=	NULL;	// Name -> handle mapping for lights (we define it as char * to avoid the annoying gcc warning)
 static	CArray<RtPointer>	*ribObjects					=	NULL;	// Number -> handle mapping for ribObjects
 static	CArray<char *>		*allocatedStrings			=	NULL;	// Strings that have been allocated for the last command
 static	CArray<char *>		*permaStrings				=	NULL;	// Strings that have been allocated for the whole rib stack
@@ -1165,11 +1165,11 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribPL
 				{
-					if (lightNames == NULL)	lightNames	=	new CTrie<RtLightHandle>;
+					if (lightNames == NULL)	lightNames	=	new CTrie<char *>;
 					
 					char *lName = strdup($3);
 					permaStrings->push(lName);
-					lightNames->insert(lName,RiLightSourceV($2,numParameters,tokens,vals));
+					lightNames->insert(lName,(char *) RiLightSourceV($2,numParameters,tokens,vals));
 				}
 				|
 				RIB_LIGHT_SOURCE
@@ -1194,11 +1194,11 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribPL
 				{
-					if (lightNames == NULL)	lightNames	=	new CTrie<RtLightHandle>;
+					if (lightNames == NULL)	lightNames	=	new CTrie<char *>;
 					
 					char *lName = strdup($3);
 					permaStrings->push(lName);
-					lightNames->insert(lName,RiLightSourceV($2,numParameters,tokens,vals));
+					lightNames->insert(lName,(char *) RiLightSourceV($2,numParameters,tokens,vals));
 				}
 				|
 				RIB_ILLUMINATE
@@ -1214,11 +1214,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				RIB_FLOAT
 				{
-					if (lightNames == NULL)	lightNames	=	new CTrie<RtLightHandle>;
-					RtLightHandle lightHandle = NULL;
+					if (lightNames == NULL)	lightNames	=	new CTrie<char *>;
+					
+					char	*lightHandle = NULL;
 					
 					if(lightNames->find($2,lightHandle)){
-						RiIlluminate(lightHandle,(int) $3);
+						RiIlluminate((RtPointer) lightHandle,(int) $3);
 					}
 				}
 				|
@@ -2675,7 +2676,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 
 		// Save the environment first
 		CArray<RtPointer>	*savedLights					=	lights;
-		CTrie<RtPointer>	*savedLightNames				=	lightNames;
+		CTrie<char *>		*savedLightNames				=	lightNames;
 		CArray<RtPointer>	*savedObjects					=	ribObjects;
 		CArray<char *>		*savedAllocatedStrings			=	allocatedStrings;
 		int					savedRibLineno					=	ribLineno;
