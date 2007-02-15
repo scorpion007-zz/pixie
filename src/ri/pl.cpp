@@ -80,7 +80,8 @@ public:
 					~CUniformParameter() {
 						assert(data != NULL);
 
-						delete [] data;
+						if (variable->type == TYPE_STRING)	delete [] (char **) data;
+						else								delete [] (float *) data;
 					}
 
 	void			dispatch(int numVertices,float **varying,float ***locals) {
@@ -918,6 +919,7 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 		CVariable	*cVariable	=	cParameter->variable;
 		const	int	numFloats	=	cVariable->numFloats;
 
+		// FIXME: Not 64 bit compliant
 		if (cParameter->container == CONTAINER_UNIFORM) {
 			CUniformParameter	*np	=	new CUniformParameter(cVariable);
 

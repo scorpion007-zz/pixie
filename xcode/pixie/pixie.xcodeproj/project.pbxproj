@@ -80,6 +80,8 @@
 		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
 		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
 		18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D3515A0B7AD20E009F0DAE /* netFileMapping.h */; };
+		18D51FEC0B843CE90039A966 /* align.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FEB0B843CE80039A966 /* align.h */; };
+		18D51FEE0B843D020039A966 /* polynomial.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FED0B843D020039A966 /* polynomial.h */; };
 		18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18E9F1060B75B07500DA484A /* rendererMutexes.cpp */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
@@ -818,6 +820,8 @@
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
 		18D3515A0B7AD20E009F0DAE /* netFileMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = netFileMapping.h; path = ../../src/ri/netFileMapping.h; sourceTree = SOURCE_ROOT; };
+		18D51FEB0B843CE80039A966 /* align.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = align.h; path = ../../src/common/align.h; sourceTree = SOURCE_ROOT; };
+		18D51FED0B843D020039A966 /* polynomial.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = polynomial.h; path = ../../src/common/polynomial.h; sourceTree = SOURCE_ROOT; };
 		18E9F1060B75B07500DA484A /* rendererMutexes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rendererMutexes.cpp; path = ../../src/ri/rendererMutexes.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E2F0AD6D651003C2D7B /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = algebra.cpp; path = ../../src/common/algebra.cpp; sourceTree = SOURCE_ROOT; };
@@ -1578,6 +1582,8 @@
 		C96A6E2E0AD6D602003C2D7B /* common */ = {
 			isa = PBXGroup;
 			children = (
+				18D51FED0B843D020039A966 /* polynomial.h */,
+				18D51FEB0B843CE80039A966 /* align.h */,
 				C96A6E3B0AD6D66C003C2D7B /* os.cpp */,
 				C96A6E3C0AD6D66C003C2D7B /* os.h */,
 				C96A6E3D0AD6D66C003C2D7B /* simd.h */,
@@ -1864,6 +1870,8 @@
 				C96A6E380AD6D651003C2D7B /* global.h in Headers */,
 				C96A6E410AD6D66C003C2D7B /* os.h in Headers */,
 				C96A6E420AD6D66C003C2D7B /* simd.h in Headers */,
+				18D51FEC0B843CE90039A966 /* align.h in Headers */,
+				18D51FEE0B843D020039A966 /* polynomial.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -32,6 +32,10 @@
 #define ALIGN_N
 #include "global.h"
 
+// Include the pointer types if necessary
+#ifdef __APPLE_CC__
+#include "inttypes.h"
+#endif
 
 // For 32 bits, we may want to turn these off
 
