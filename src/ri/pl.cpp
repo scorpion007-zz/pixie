@@ -36,7 +36,7 @@
 #include "error.h"
 #include "memory.h"
 #include "renderer.h"
-
+#include "common/align.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -84,8 +84,8 @@ public:
 					}
 
 	void			dispatch(int numVertices,float **varying,float ***locals) {
-						float	*destf;
-						char	**dests;
+						float	*destf	=	NULL;
+						char	**dests	=	NULL;
 
 						// Note: we only worry about strings in the uniform
 						// case, as they can't be varying in the RIB stream
@@ -102,33 +102,38 @@ public:
 
 						
 						if (destf != NULL) {
+
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
-								memcpy(destf,data,variable->numFloats*sizeof(char*));
+								memcpy(destf,data,variable->numFloats*sizeof(float));
 							} else {
 								// premote
-								for (int i=0;i<numVertices;i++) {
+								for (int i=0;i<numVertices;i++,destf += variable->numFloats) {
 									memcpy(destf,data,variable->numFloats*sizeof(float));
-									destf += variable->numFloats;
 								}
 							}
+
 						} else if (dests != NULL) {
+
+							assert(isAligned64(dests));
+							assert(isAligned64(data));
+
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
-								memcpy(dests,data,variable->numFloats*sizeof(float));
+								memcpy(dests,data,variable->numFloats*sizeof(char *));
 							} else {
 								// premote
-								for (int i=0;i<numVertices;i++) {
-									memcpy(dests,data,variable->numFloats*sizeof(char*));
-									dests += variable->numFloats;
+								for (int i=0;i<numVertices;i++,dests += variable->numFloats) {
+									memcpy(dests,data,variable->numFloats*sizeof(char *));
 								}
 							}
+
 						}
 
 						if (next != NULL)	next->dispatch(numVertices,varying,locals);
 					}
 
 	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
-						float	*destf = NULL;
-						char	**dests = NULL;
+						float	*destf	=	NULL;
+						char	**dests	=	NULL;
 
 						if (variable->type == TYPE_STRING) {
 							if (variable->storage == STORAGE_GLOBAL)	dests	=	(char**) varying[variable->entry];
@@ -141,23 +146,27 @@ public:
 						}
 
 						if (destf != NULL) {
+
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(destf + start*variable->numFloats,data,variable->numFloats*sizeof(float));
 							} else {
 								// premote
-								for (int i=0;i<numVertices;i++) {
+								for (int i=0;i<numVertices;i++,destf += variable->numFloats) {
 									memcpy(destf,data,variable->numFloats*sizeof(float));
-									destf += variable->numFloats;
 								}
 							}
+
 						} else if (dests != NULL) {
+
+							assert(isAligned64(dests));
+							assert(isAligned64(data));
+
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
-								memcpy(dests + start*variable->numFloats,data,variable->numFloats*sizeof(char*));
+								memcpy(dests + start*variable->numFloats,data,variable->numFloats*sizeof(char *));
 							} else {
 								// premote
-								for (int i=0;i<numVertices;i++) {
-									memcpy(dests,data,variable->numFloats*sizeof(char*));
-									dests += variable->numFloats;
+								for (int i=0;i<numVertices;i++,dests += variable->numFloats) {
+									memcpy(dests,data,variable->numFloats*sizeof(char *));
 								}
 							}
 						}
@@ -172,7 +181,7 @@ public:
 						else										cUniform	=	new CUniformParameter(a->findParameter(variable->name));
 						
 						if (variable->type == TYPE_STRING) {
-							cUniform->data					=	(float*) new char*[variable->numFloats];
+							cUniform->data					=	new char*[variable->numFloats];
 							memcpy(cUniform->data,data,variable->numFloats*sizeof(char*));
 						} else {
 							cUniform->data					=	new float[variable->numFloats];
@@ -184,7 +193,7 @@ public:
 						return cUniform;
 					}
 
-	float			*data;
+	void			*data;
 };
 
 

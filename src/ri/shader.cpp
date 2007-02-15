@@ -41,6 +41,8 @@
 #include	"bundles.h"
 #include	"memory.h"
 #include	"renderer.h"
+#include	"common/align.h"
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderLookup
@@ -888,12 +890,17 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 	}
 
 	// Allocate memory for the temporary shader variables
-	data	=	(char *) ralloc(totalVaryingSize + numVariables*sizeof(int),namedMemory);
+	// Allocate some extra space for alignment
+	data	=	(char *) ralloc(totalVaryingSize + numVariables*(sizeof(float *) + sizeof(float)),namedMemory);
 	locals	=	(float **) data;
 	data	+=	numVariables*sizeof(float*);
 
 	// Save the memory
 	for (i=0;i<numVariables;i++) {
+
+		// Align the data to 64 bits
+		align64(data);
+
 		locals[i]	=	(float*) data;
 		if (varyingSizes[i] < 0)	data	+=	-varyingSizes[i];
 		else						data	+=	varyingSizes[i]*numVertices*3;

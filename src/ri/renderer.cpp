@@ -1117,12 +1117,7 @@ static	void		*serverDispatchThread(void *w) {
 // Return Value			:
 // Comments				:
 static	void		*rendererDispatchThread(void *w) {
-	T64	tmp;
-
-	tmp.integer	=	0;
-	tmp.pointer	=	w;
-
-	CRenderer::contexts[tmp.integer]->renderingLoop();
+	CRenderer::contexts[(uintptr_t) w]->renderingLoop();
 
 	return NULL;
 }
@@ -1146,13 +1141,11 @@ void		CRenderer::renderFrame() {
 	if (netNumServers != 0) {
 		int				i;
 		TThread			*threads;
-		T64				tmp;
 
 		// Spawn the threads
 		threads	=	(TThread *) alloca(netNumServers*sizeof(TThread));
 		for (i=0;i<netNumServers;i++) {
-			tmp.integer	=	i;
-			threads[i]	=	osCreateThread(serverDispatchThread,tmp.pointer);
+			threads[i]	=	osCreateThread(serverDispatchThread,(void *) (intptr_t) i);
 		}
 
 		// Go to sleep until we're done
@@ -1170,7 +1163,6 @@ void		CRenderer::renderFrame() {
 	} else {
 		int				i;
 		TThread			*threads;
-		T64				tmp;
 
 		// Let the client know that we're ready to render
 		if (netClient != INVALID_SOCKET) {
@@ -1183,8 +1175,7 @@ void		CRenderer::renderFrame() {
 		// Spawn the threads
 		threads	=	(TThread *) alloca(numThreads*sizeof(TThread));
 		for (i=0;i<numThreads;i++) {
-			tmp.integer	=	i;
-			threads[i]	=	osCreateThread(rendererDispatchThread,tmp.pointer);
+			threads[i]	=	osCreateThread(rendererDispatchThread,(void *) (intptr_t) i);
 		}
 
 		// Go to sleep until we're done

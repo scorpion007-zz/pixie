@@ -30,16 +30,17 @@
 ////////////////////////////////////////////////////////////////////////
 #ifndef ALIGN_H
 #define ALIGN_N
+#include "global.h"
+
+
+// For 32 bits, we may want to turn these off
 
 
 // Check if a pointer is 8 byte aligned
-#define	isAligned64(__data)	(const char *) __data & 0x7
+#define	isAligned64(__data)	(uintptr_t) __data & 0x7
 
-// IMPORTANT: This macro only works with char* or int
-// 8 byte align
-#define	align64(__data)		__data	+=	__data & 0x1;	\
-							__data	+=	__data & 0x2;	\
-							__data	+=	__data & 0x4;	\
+// IMPORTANT: This macro only works with char *
+#define	align64(__data)		__data = (char *) (((uintptr_t) __data + 7) & (~7))
 
 
 #endif

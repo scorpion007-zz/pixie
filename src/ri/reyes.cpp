@@ -1373,6 +1373,7 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 
 		// If the grid is cached, put it back into the free list
 		if (grid->cached) {
+			osUnlock(grid->mutex);
 			grid->next[0]		=	freeRasterGrids;
 			freeRasterGrids		=	grid;
 			return;
@@ -1396,6 +1397,7 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 
 		// If the object is cached, put it back into the free list
 		if (dObject->cached) {
+			osUnlock(dObject->mutex);
 			dObject->next[0]	=	freeRasterObjects;
 			freeRasterObjects	=	dObject;
 			return;

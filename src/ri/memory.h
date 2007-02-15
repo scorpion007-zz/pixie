@@ -33,7 +33,6 @@
 
 #include "common/global.h"
 #include "common/os.h"
-#include "common/align.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMemPage
@@ -62,7 +61,7 @@ void				memoryDeletePage(CMemPage *);	// Allocate a new memory page
 inline void *ralloc(int size,CMemPage *&stack) {
 
 	// Align the size with 8 byte boundaries
-	size	=	align64(size);
+	size	=	(size + 7) & (~7);
 
 	while(stack->availableSize < size) {
 		if (stack->next == NULL) {
@@ -106,7 +105,7 @@ typedef struct {
 	char			*memory;
 } TMemCheckpoint;
 
-// Mem save and mem restore does the same thing, but they explicitly store the checkpoint in T64 data[3];
+// Mem save and mem restore does the same thing, but they explicitly store the checkpoint
 #define	memSave(__data,__stack)													\
 	__data.memory			=	__stack->memory;								\
 	__data.availableSize	=	__stack->availableSize;							\

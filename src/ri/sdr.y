@@ -270,7 +270,11 @@ static	TSlFunction		functions[]	=	{
 												cVariable->variable		=	NULL;
 												cVariable->index		=	currentData.currentVariable;
 												
-												currentData.varyingSizes[currentData.currentVariable]	=	numItems*numComp;
+												if (type == TYPE_STRING)
+													currentData.varyingSizes[currentData.currentVariable]	=	numItems*numComp*sizeof(char*);
+												else
+													currentData.varyingSizes[currentData.currentVariable]	=	numItems*numComp*sizeof(float);
+												
 												if (cVariable->uniform)	currentData.varyingSizes[currentData.currentVariable]	=	-currentData.varyingSizes[currentData.currentVariable];
 												
 												currentData.currentVariable++;
@@ -2192,7 +2196,7 @@ void	reset() {
 // Comments				:
 void	alloc() {
 	char	*mem;
-
+	
 	currentData.memory	=	(char *) allocate_untyped(	currentData.numCode*sizeof(TCode)	+
 														currentData.numArgument*sizeof(TArgument)	+
 														currentData.constantSize +
@@ -2249,13 +2253,14 @@ void	alloc() {
 CShader	*shaderCreate(const char *shaderName) {
 	CShader	*cShader;
 
-
+	// Sanity check for the shaders
 	assert(currentData.numConstants		==	currentData.currentConstant);
 	assert(currentData.numVariables		==	currentData.currentVariable);
 	assert(currentData.numStrings		==	currentData.currentString);
 	assert(currentData.constantSize		==	currentData.currentConstantSize);
 	assert(currentData.varyingSize		==	currentData.currentVaryingSize);
-
+	assert((currentData.currentOpcodePlace - currentData.code)			== currentData.numCode);
+	assert((currentData.currentArgumentPlace - currentData.arguments)	== currentData.numArgument);
 
 	// Fix the labels
 	{

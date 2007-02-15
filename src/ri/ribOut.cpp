@@ -465,18 +465,14 @@ void		*CRibOut::RiLightSourceV(char *name,int n,char *tokens[],void *params[]) {
 	out("LightSource \"%s\" %d ",name,numLightSources);
 	writePL(n,tokens,params);
 
-	T64	tmp;
-	tmp.integer	=	numLightSources++;
-	return tmp.pointer;
+	return (void *) (uintptr_t) numLightSources++;
 }
 
 void		*CRibOut::RiAreaLightSourceV(char *name,int n,char *tokens[],void *params[]) {
 	out("AreaLightSource \"%s\" %d ",name,numLightSources);
 	writePL(n,tokens,params);
 
-	T64	tmp;
-	tmp.integer	=	numLightSources++;
-	return tmp.pointer;
+	return (void *) (uintptr_t) numLightSources++;
 }
 
 void		CRibOut::RiIlluminate(void *light,int onoff) {
@@ -1190,9 +1186,7 @@ void		CRibOut::RiSolidEnd(void) {
 void		*CRibOut::RiObjectBegin(void) {
 	out("ObjectBegin %d\n",numObjects);
 
-	T64	tmp;
-	tmp.integer	=	numObjects++;
-	return tmp.pointer;
+	return (void *) (uintptr_t) numObjects++;
 }
 
 void		CRibOut::RiObjectEnd(void) {
