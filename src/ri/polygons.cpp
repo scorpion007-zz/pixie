@@ -510,17 +510,45 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 		if (dest != NULL) {
 			switch(cParameter->container) {
 			case CONTAINER_UNIFORM:
-				if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
-					src	=	data + this->uniform*numFloats;
-					for (j=numFloats;j>0;j--) {
-						*dest++	=	*src++;
+				if (cVariable->type == TYPE_STRING) {
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+						src	=	data + this->uniform*numFloats;
+						for (j=numFloats;j>0;j--) {
+							*dest++	=	*src++;
+						}
+					} else {
+						// premote
+						for(j=0;j<numVertices;j++) {
+							src	=	data + this->uniform*numFloats;
+							for (k=numFloats;k>0;k--) {
+								*dest++	=	*src++;
+							}
+						}
 					}
 				} else {
-					// premote
-					for(j=0;j<numVertices;j++) {
-						src	=	data + this->uniform*numFloats;
-						for (k=numFloats;k>0;k--) {
-							*dest++	=	*src++;
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
+						const char ** dests		=	(const char **) dest;
+						
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+
+						for (j=numFloats;j>0;j--) {
+							*dests++	=	*srcs++;
+						}
+					} else {
+						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
+						const char ** dests		=	(const char **) dest;
+						
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+						
+						// premote
+						for(j=0;j<numVertices;j++) {
+							const char **csrcs	=	srcs;
+							for (k=numFloats;k>0;k--) {
+								*dests++	=	*csrcs++;
+							}
 						}
 					}
 				}
@@ -556,17 +584,45 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 				}
 				break;
 			case CONTAINER_CONSTANT:
-				if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
-					src	=	data;
-					for (j=numFloats;j>0;j--) {
-						*dest++	=	*src++;
+				if (cVariable->type == TYPE_STRING) {
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+						const char **srcs	=	(const char**) data;
+						const char **dests	=	(const char**) dest;
+
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+						
+						for (j=numFloats;j>0;j--) {
+							*dests++	=	*srcs++;
+						}
+					} else {
+						const char **srcs	=	(const char**) data;
+						const char **dests	=	(const char**) dest;
+
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+						
+						// premote
+						for(j=0;j<numVertices;j++) {
+							const char **csrcs	=	srcs;
+							for (k=numFloats;k>0;k--) {
+								*dests++	=	*csrcs++;
+							}
+						}
 					}
 				} else {
-					// premote
-					for(j=0;j<numVertices;j++) {
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						src	=	data;
-						for (k=numFloats;k>0;k--) {
+						for (j=numFloats;j>0;j--) {
 							*dest++	=	*src++;
+						}
+					} else {
+						// premote
+						for(j=0;j<numVertices;j++) {
+							src	=	data;
+							for (k=numFloats;k>0;k--) {
+								*dest++	=	*src++;
+							}
 						}
 					}
 				}
@@ -574,7 +630,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 			}
 		}
 
-		data	+=	cParameter->numItems*numFloats;
+		data	+=	cParameter->numItems*numFloats;		/// FIXME: 64Bit alignment
 	}
 }
 
@@ -1040,17 +1096,45 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 		if (dest != NULL) {
 			switch(cParameter->container) {
 			case CONTAINER_UNIFORM:
-				if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
-					src	=	data + this->uniform*numFloats;
-					for (j=numFloats;j>0;j--) {
-						*dest++	=	*src++;
+				if (cVariable->type == TYPE_STRING) {
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+						src	=	data + this->uniform*numFloats;
+						for (j=numFloats;j>0;j--) {
+							*dest++	=	*src++;
+						}
+					} else {
+						// premote
+						for(j=0;j<numVertices;j++) {
+							src	=	data + this->uniform*numFloats;
+							for (k=numFloats;k>0;k--) {
+								*dest++	=	*src++;
+							}
+						}
 					}
 				} else {
-					// premote
-					for(j=0;j<numVertices;j++) {
-						src	=	data + this->uniform*numFloats;
-						for (k=numFloats;k>0;k--) {
-							*dest++	=	*src++;
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
+						const char ** dests		=	(const char **) dest;
+						
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+
+						for (j=numFloats;j>0;j--) {
+							*dests++	=	*srcs++;
+						}
+					} else {
+						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
+						const char ** dests		=	(const char **) dest;
+						
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+						
+						// premote
+						for(j=0;j<numVertices;j++) {
+							const char **csrcs	=	srcs;
+							for (k=numFloats;k>0;k--) {
+								*dests++	=	*csrcs++;
+							}
 						}
 					}
 				}
@@ -1088,17 +1172,45 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 				}
 				break;
 			case CONTAINER_CONSTANT:
-				if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
-					src	=	data;
-					for (j=numFloats;j>0;j--) {
-						*dest++	=	*src++;
+				if (cVariable->type == TYPE_STRING) {
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
+						const char **srcs	=	(const char**) data;
+						const char **dests	=	(const char**) dest;
+
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+						
+						for (j=numFloats;j>0;j--) {
+							*dests++	=	*srcs++;
+						}
+					} else {
+						const char **srcs	=	(const char**) data;
+						const char **dests	=	(const char**) dest;
+
+						assert(isAligned64(srcs));
+						assert(isAligned64(dests));
+						
+						// premote
+						for(j=0;j<numVertices;j++) {
+							const char **csrcs	=	srcs;
+							for (k=numFloats;k>0;k--) {
+								*dests++	=	*csrcs++;
+							}
+						}
 					}
 				} else {
-					// premote
-					for(j=0;j<numVertices;j++) {
+					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						src	=	data;
-						for (k=numFloats;k>0;k--) {
+						for (j=numFloats;j>0;j--) {
 							*dest++	=	*src++;
+						}
+					} else {
+						// premote
+						for(j=0;j<numVertices;j++) {
+							src	=	data;
+							for (k=numFloats;k>0;k--) {
+								*dest++	=	*src++;
+							}
 						}
 					}
 				}
@@ -1106,7 +1218,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 			}
 		}
 
-		data	+=	cParameter->numItems*numFloats;
+		data	+=	cParameter->numItems*numFloats;		// FIXME: 64bit alignment
 	}
 }
 
