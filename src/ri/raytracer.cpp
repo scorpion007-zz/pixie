@@ -522,7 +522,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 
 	// Setup the ray differentials
 	if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-		const float	a	=	CRenderer::dxdPixel;
+		const float	a	=	CRenderer::dxdPixel/CRenderer::imagePlane;
 
 		cRay	=	rays;
 		for (i=numShading;i>0;i--,cRay++) {
@@ -530,12 +530,12 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			cRay->da			=	a;
 		}
 	} else{
-		const float	a	=	CRenderer::dxdPixel;
+		const float	b	=	CRenderer::dxdPixel;
 
 		cRay	=	rays;
 		for (i=numShading;i>0;i--,cRay++) {
-			cRay->db			=	a;
 			cRay->da			=	0;
+			cRay->db			=	b;
 		}
 	}
 
