@@ -117,6 +117,7 @@ public:
 
 							assert(isAligned64(dests));
 							assert(isAligned64(data));
+							assert(variable->numFloats == variable->numItems);
 
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(dests,data,variable->numFloats*sizeof(char *));
@@ -161,6 +162,7 @@ public:
 
 							assert(isAligned64(dests));
 							assert(isAligned64(data));
+							assert(variable->numFloats == variable->numItems);
 
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
 								memcpy(dests + start*variable->numFloats,data,variable->numFloats*sizeof(char *));
@@ -632,8 +634,8 @@ void		CPl::append(float *d) {
 // Description			:	Transform the variables into another coordinaye system
 // Return Value			:
 // Comments				:
-void		CPl::transform(CXform *x,float *cData) {
-	if (cData == NULL) {
+void		CPl::transform(CXform *x,float *data) {
+	if (data == NULL) {
 		if ((x->next != NULL) && (data1 == NULL)) {
 			data1	=	new float[dataSize];
 			memcpy(data1,data0,dataSize*sizeof(float));
@@ -644,12 +646,11 @@ void		CPl::transform(CXform *x,float *cData) {
 		if (data1 != NULL)	transform(x,data1);
 	} else {
 		int					i,j;
-		float				*src;
 		const CPlParameter	*cPl	=	parameters;
 		const float			*from,*to;
 
 		if (x->next != NULL) {
-			if (cData == data1) {
+			if (data == data1) {
 				from	=	x->next->from;
 				to		=	x->next->to;
 			} else {
@@ -663,6 +664,7 @@ void		CPl::transform(CXform *x,float *cData) {
 
 		for (i=numParameters;i>0;i--,cPl++) {
 			const CVariable		*cVar	=	cPl->variable;
+			float				*src	=	data + cPl->index;
 
 			switch(cVar->type) {
 			case TYPE_FLOAT:
@@ -671,19 +673,19 @@ void		CPl::transform(CXform *x,float *cData) {
 				break;
 			case TYPE_VECTOR:
 				// Vector transform
-				for (src=cData,j=cPl->numItems;j>0;j--,src+=3) {
+				for (j=cPl->numItems;j>0;j--,src+=3) {
 					mulmv(src,from,src);
 				}
 				break;
 			case TYPE_NORMAL:
 				// Vector transform
-				for (src=cData,j=cPl->numItems;j>0;j--,src+=3) {
+				for (j=cPl->numItems;j>0;j--,src+=3) {
 					mulmn(src,to,src);
 				}
 				break;
 			case TYPE_POINT:
 				// Vector transform
-				for (src=cData,j=cPl->numItems;j>0;j--,src+=3) {
+				for (j=cPl->numItems;j>0;j--,src+=3) {
 					mulmp(src,from,src);
 				}
 				break;
@@ -691,7 +693,7 @@ void		CPl::transform(CXform *x,float *cData) {
 				break;
 			case TYPE_QUAD:
 				// Vector transform
-				for (src=cData,j=cPl->numItems;j>0;j--,src+=4) {
+				for (j=cPl->numItems;j>0;j--,src+=4) {
 					mulmp4(src,from,src);
 				}
 				break;
@@ -702,8 +704,6 @@ void		CPl::transform(CXform *x,float *cData) {
 				// No transformation is required
 				break;
 			}
-
-			cData	+=	cPl->numItems*cVar->numFloats;
 		}
 	}
 }
@@ -834,9 +834,11 @@ CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page) {
 	int			i,j,k;
 	const float	*cData		=	data0;
-	float		*oData;
 	int			vs			=	0;
 	int			numItems	=	0;
+
+	// If the container is uniform or constant, we may have strings involved in which case this code doesn't work
+	assert((container != CONTAINER_UNIFORM) && (container != CONTAINER_CONSTANT));
 
 	for (i=0;i<numParameters;i++) {
 		if (parameters[i].container == container) {
@@ -861,14 +863,16 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 		data	=	(float *) ralloc(size*numItems*sizeof(float),page);
 	}
 
-	oData	=	data;
-
+	// Copy the data over
+	float	*oData	=	data;
 	for (i=0;i<numParameters;i++) {
-		const int	numFloats	=	parameters[i].variable->numFloats;
 
 		if (parameters[i].container == container) {
-			const float	*sData	=	cData;
-			float		*dData	=	oData;
+			const float	*sData		=	data0 + parameters[i].index;
+			const int	numFloats	=	parameters[i].variable->numFloats;
+			float		*dData		=	oData;
+
+			assert(isAligned64(sData));
 
 			for (j=parameters[i].numItems;j>0;j--,dData+=(size-numFloats)) {
 				for (k=numFloats;k>0;k--)
@@ -877,19 +881,18 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 
 			oData	+=	numFloats;
 		}
-
-		cData	+=	parameters[i].numItems*numFloats;
 	}
 
 	if (data1 != NULL) {
-		cData	=	data1;
 
 		for (i=0;i<numParameters;i++) {
-			const int	numFloats	=	parameters[i].variable->numFloats;
-
+			
 			if (parameters[i].container == container) {
-				const float	*sData	=	cData;
-				float		*dData	=	oData;
+				const float	*sData		=	data1 + parameters[i].index;
+				const int	numFloats	=	parameters[i].variable->numFloats;
+				float		*dData		=	oData;
+
+				assert(isAligned64(sData));
 
 				for (j=parameters[i].numItems;j>0;j--,dData+=(size-numFloats)) {
 					for (k=numFloats;k>0;k--)
@@ -898,8 +901,6 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 
 				oData	+=	numFloats;
 			}
-
-			cData	+=	parameters[i].numItems*numFloats;
 		}
 	}
 }
@@ -912,32 +913,53 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 // Comments				:
 CParameter		*CPl::uniform(int u,CParameter *p) {
 	int				i;
-	const	float	*cData		=	data0;
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
-
-		// FIXME: Not 64 bit compliant
+		
+		// Is this a uniform parameter ?
 		if (cParameter->container == CONTAINER_UNIFORM) {
-			CUniformParameter	*np	=	new CUniformParameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CUniformParameter	*np			=	new CUniformParameter(cVariable);
+			const float			*cData		=	data0 + cParameter->index;
+			const int			numFloats	=	cVariable->numFloats;
 
-			np->data				=	new float[numFloats];
-			memcpy(np->data,cData+u*numFloats,numFloats*sizeof(float));
+			if (cVariable->type == TYPE_STRING) {
+				np->data				=	new char*[numFloats];
+
+				assert(isAligned64(np->data));
+				assert(isAligned64(((char **) cData)+u*numFloats));
+
+				memcpy(np->data,((char **) cData)+u*numFloats,numFloats*sizeof(char *));
+			} else {
+				np->data				=	new float[numFloats];
+				memcpy(np->data,cData+u*numFloats,numFloats*sizeof(float));
+			}
+			
+
 			np->next				=	p;
 			p						=	np;
 		} else if (cParameter->container == CONTAINER_CONSTANT) {
-			CUniformParameter	*np	=	new CUniformParameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CUniformParameter	*np			=	new CUniformParameter(cVariable);
+			const float			*cData		=	data0 + cParameter->index;
+			const int			numFloats	=	cVariable->numFloats;
 
-			np->variable			=	cVariable;
-			np->data				=	new float[numFloats];
-			memcpy(np->data,cData,numFloats*sizeof(float));
+			if (cVariable->type == TYPE_STRING) {
+				np->data				=	new char*[numFloats];
+
+				assert(isAligned64(np->data));
+				assert(isAligned64(cData));
+
+				memcpy(np->data,cData,numFloats*sizeof(char *));
+			} else {
+				np->data				=	new float[numFloats];
+				memcpy(np->data,cData,numFloats*sizeof(float));
+			}
+
 			np->next				=	p;
 			p						=	np;
 		}
-
-		cData	+=	cParameter->numItems*numFloats;
 	}
 
 	return p;
@@ -951,15 +973,15 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 // Comments				:
 CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 	int				i;
-	const	float	*cData		=	data0;
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
 
 		if (cParameter->container == CONTAINER_VARYING) {
-			CVaryingParameter	*np	=	new CVaryingParameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
+			const int			numFloats	=	cVariable->numFloats;
+			const float			*cData		=	data0 + cParameter->index;
 
 			np->data				=	new float[numFloats*4];
 			memcpy(np->data+0*numFloats,cData+v0*numFloats,numFloats*sizeof(float));
@@ -969,8 +991,6 @@ CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 			np->next				=	p;
 			p						=	np;
 		}
-
-		cData	+=	cParameter->numItems*numFloats;
 	}
 
 	return p;
@@ -984,15 +1004,15 @@ CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 // Comments				:
 CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 	int				i;
-	const	float	*cData		=	data0;
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
 
 		if (cParameter->container == CONTAINER_VARYING) {
-			CVarying2Parameter	*np	=	new CVarying2Parameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CVarying2Parameter	*np			=	new CVarying2Parameter(cVariable);
+			const int			numFloats	=	cVariable->numFloats;
+			const float			*cData		=	data0 + cParameter->index;
 
 			np->data				=	new float[numFloats*2];
 			memcpy(np->data+0*numFloats,cData+v0*numFloats,numFloats*sizeof(float));
@@ -1000,8 +1020,6 @@ CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 			np->next				=	p;
 			p						=	np;
 		}
-
-		cData	+=	cParameter->numItems*numFloats;
 	}
 
 	return p;
@@ -1018,11 +1036,11 @@ CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p)
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
-
+		
 		if (cParameter->container == CONTAINER_VARYING) {
-			CVaryingParameter	*np	=	new CVaryingParameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
+			const	int			numFloats	=	cVariable->numFloats;
 
 			np->data				=	new float[numFloats*4];
 			memcpy(np->data+0*numFloats,v0,numFloats*sizeof(float));
@@ -1051,15 +1069,15 @@ CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p)
 // Comments				:
 CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 	int				i;
-	const	float	*cData		=	data0;
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
-
+		
 		if (cParameter->container == CONTAINER_FACEVARYING) {
-			CVaryingParameter	*np	=	new CVaryingParameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
+			const	int			numFloats	=	cVariable->numFloats;
+			const	float		*cData		=	data0 + cParameter->index;;
 
 			np->data				=	new float[numFloats*4];
 			memcpy(np->data+0*numFloats,cData+v0*numFloats,numFloats*sizeof(float));
@@ -1069,8 +1087,6 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 			np->next				=	p;
 			p						=	np;
 		}
-
-		cData	+=	cParameter->numItems*numFloats;
 	}
 
 	return p;
@@ -1087,11 +1103,11 @@ CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
-
+		
 		if (cParameter->container == CONTAINER_FACEVARYING) {
-			CVaryingParameter	*np	=	new CVaryingParameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
+			const	int			numFloats	=	cVariable->numFloats;
 
 			np->data				=	new float[numFloats*4];
 			memcpy(np->data+0*numFloats,v0,numFloats*sizeof(float));
@@ -1120,15 +1136,15 @@ CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter
 // Comments				:
 CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 	int				i;
-	const	float	*cData		=	data0;
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		CVariable	*cVariable	=	cParameter->variable;
-		const	int	numFloats	=	cVariable->numFloats;
-
+		
 		if (cParameter->container == CONTAINER_FACEVARYING) {
-			CVarying3Parameter	*np	=	new CVarying3Parameter(cVariable);
+			CVariable			*cVariable	=	cParameter->variable;
+			CVarying3Parameter	*np			=	new CVarying3Parameter(cVariable);
+			const	int			numFloats	=	cVariable->numFloats;
+			const	float		*cData		=	data0 + cParameter->index;
 
 			np->data				=	new float[numFloats*3];
 			memcpy(np->data+0*numFloats,cData+v0*numFloats,numFloats*sizeof(float));
@@ -1137,8 +1153,6 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 			np->next				=	p;
 			p						=	np;
 		}
-
-		cData	+=	cParameter->numItems*numFloats;
 	}
 
 	return p;
@@ -1400,12 +1414,18 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		parameters[numDefinedParams].container	=	container;
 		parameters[numDefinedParams].numItems	=	numItems;
 		
+		// We're gonna fill in the index value later
+		
 		paramvals[numDefinedParams]				=	vals[i];
 		
 		numDefinedParams++;
 
 		// Count the size of the data field we need
-		dataSize								+=	numItems*cVar->numFloats;
+		if (cVar->type == TYPE_STRING)	dataSize	+=	numItems*cVar->numFloats*(sizeof(char *) / sizeof(float));
+		else							dataSize	+=	numItems*cVar->numFloats;
+
+		// Make sure the data size is even for 64 bit alignment
+		dataSize	+=	dataSize & 1;
 	}
 
 
@@ -1441,18 +1461,34 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 	// Save the data
 	for (i=0;i<numDefinedParams;i++) {
-		CVariable		*cVar		=	parameters[i].variable;
-		int				num			=	parameters[i].numItems;
+		CVariable	*cVar	=	parameters[i].variable;
+		int			num		=	parameters[i].numItems;
 
-		memcpy(cData,(float *) paramvals[i],sizeof(float)*num*cVar->numFloats);
+		parameters[i].index	=	(int) (cData - data);
 
-		cData	+=	num*cVar->numFloats;
+		// Make sure the target is aligned
+		assert(isAligned64(cData));
+
+		// Copy the parameters into the data field
+		if (cVar->type == TYPE_STRING) {
+			memcpy(cData,(char **) paramvals[i],sizeof(char *)*num*cVar->numFloats / sizeof(float));
+			cData	+=	num*cVar->numFloats*sizeof(char *)/sizeof(float);
+		} else {
+			memcpy(cData,(float *) paramvals[i],sizeof(float)*num*cVar->numFloats);
+			cData	+=	num*cVar->numFloats;
+		}
+		
+		// Ensure alignment
+		cData	=	(float *) align64(cData);
 	}
 
+	// Sanity check
+	assert((cData - data) == dataSize);
+
 	// Create the memory for the final pl
-	finalParameters					=	new CPlParameter[numDefinedParams];	
+	finalParameters			=	new CPlParameter[numDefinedParams];	
 	memcpy(finalParameters,parameters,numDefinedParams*sizeof(CPlParameter));
-	stats.gprimCoreMemory			+=	numDefinedParams*sizeof(CPlParameter);
+	stats.gprimCoreMemory	+=	numDefinedParams*sizeof(CPlParameter);
 	
 	// Return the parameter list
 	return	new CPl(dataSize,numDefinedParams,finalParameters,data);

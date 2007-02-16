@@ -88,8 +88,9 @@ public:
 class CPlParameter {
 public:
 	CVariable				*variable;			// The variable
-	EVariableClass			container;			// The container that the user specified
 	int						numItems;			// The number of items in this class
+	int						index;				// The index in the data array for this variable
+	EVariableClass			container;			// The container that the user specified
 
 
 

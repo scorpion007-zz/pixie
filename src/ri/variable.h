@@ -41,16 +41,20 @@
 class CVariable {
 public:
 	char				name[64];		// Name as it is referenced
-	EVariableType		type;			// Type
-	EVariableClass		container;		// Container type
+	
 	int					numItems;		// Number of items if this is an array
 	int					numFloats;		// Number of floats per variable (1 for float, 3 for color, 16 for matrix)
 	int					entry;			// The global variable number as it's referenced from a grid (-1 if not global)
 	int					usageMarker;	// The usage or flag
-	EVariableStorage	storage;		// If the variable is global, parameter or mutable parameter
+	
 	void				*defaultValue;	// Points to the memory area that holds the default value for the variable
-	int					accessor;		// Which entry in the locals array are we?
 	CVariable			*next;			// Linked list next (used to maintain shader parameter lists)
+
+	int					accessor;		// Which entry in the locals array are we?
+	
+	EVariableType		type;			// Type
+	EVariableClass		container;		// Container type
+	EVariableStorage	storage;		// If the variable is global, parameter or mutable parameter
 };
 
 

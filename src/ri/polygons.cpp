@@ -510,7 +510,9 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 		if (dest != NULL) {
 			switch(cParameter->container) {
 			case CONTAINER_UNIFORM:
-				if (cVariable->type == TYPE_STRING) {
+
+				if (cVariable->type != TYPE_STRING) {
+
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						src	=	data + this->uniform*numFloats;
 						for (j=numFloats;j>0;j--) {
@@ -526,6 +528,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 						}
 					}
 				} else {
+
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
 						const char ** dests		=	(const char **) dest;
@@ -585,6 +588,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 				break;
 			case CONTAINER_CONSTANT:
 				if (cVariable->type == TYPE_STRING) {
+
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						const char **srcs	=	(const char**) data;
 						const char **dests	=	(const char**) dest;

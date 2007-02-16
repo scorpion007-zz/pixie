@@ -29,6 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include "common/os.h"
+#include "common/align.h"
 #include "memory.h"
 #include "stats.h"
 #include "config.h"
@@ -76,7 +77,6 @@ void			memoryTini(CMemPage *&stack) {
 // Return Value			:
 // Comments				:
 CMemPage		*memoryNewPage(int size) {
-	CMemPage	*newPage	=	new CMemPage;
 	float		time		=	osCPUTime();
 
 	// Are we allocating/deallocating too often ?
@@ -85,15 +85,19 @@ CMemPage		*memoryNewPage(int size) {
 	}
 	lastPagingTime			=	time;
 
-	size					+=	memoryPageSize;
+	size					=	max(size,memoryPageSize);
 	size					=	(size + 7) & (~7);
 
+	CMemPage	*newPage	=	new CMemPage;
 	newPage->availableSize	=	size;
 	newPage->totalSize		=	size;
-	newPage->base			=	new char[size];
+	newPage->base			=	(char *) allocate_untyped(size);
 	newPage->memory			=	newPage->base;
 	newPage->next			=	NULL;
 	newPage->prev			=	NULL;
+
+	// Make sure the memory is aligned
+	assert(isAligned64(newPage->base));
 
 	// Stats update
 	allocatedPages++;
@@ -118,7 +122,7 @@ void		memoryDeletePage(CMemPage *cPage) {
 	freedZoneMemory			+=	cPage->totalSize;
 	stats.zoneMemory		-=	cPage->totalSize;
 
-	delete [] cPage->base;
+	free_untyped(cPage->base);
 	delete cPage;
 }
 
