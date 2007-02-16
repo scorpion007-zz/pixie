@@ -18,10 +18,10 @@ copy bin\ri.lib Pixie\lib
 copy bin\sdr.lib Pixie\lib
 copy bin\sdr.dll Pixie\lib
 copy bin\sdr.dll Pixie\bin
-copy bin\file.dll Pixie\displays
-copy bin\framebuffer.dll Pixie\displays
-copy bin\rgbe.dll Pixie\displays
-copy bin\openexr.dll Pixie\displays
+copy displays\file.dll Pixie\displays
+copy displays\framebuffer.dll Pixie\displays
+copy displays\rgbe.dll Pixie\displays
+copy displays\openexr.dll Pixie\displays
 copy bin\opengl.dll Pixie\lib
 copy src\ri\ri.h Pixie\include
 copy src\ri\dsply.h Pixie\include

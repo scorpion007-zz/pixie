@@ -1,7 +1,5 @@
 rmdir /q /s bin
-rmdir /q /s bind
 rmdir /q /s tmp
-rmdir /q /s tmpd
 rmdir /q /s lib
 rmdir /q /s displays
 rmdir /q /s Pixie

@@ -282,17 +282,11 @@ COptions::COptions() {
 	hider					=	strdup("stochastic");
 
 	archivePath				=	optionsGetSearchPath(".:%RIBS%:" PIXIE_MODELS,NULL);
-	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEHOME%/procedurals:%PIXIEHOME%/bind:%PIXIE_PROCEDURALS%",NULL);
+	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEHOME%/procedurals:%PIXIEHOME%/bin:%PIXIE_PROCEDURALS%",NULL);
 	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:" PIXIE_TEXTURES,NULL);
 	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:" PIXIE_SHADERS,NULL);
-
-#ifdef _DEBUG
-	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/bind:" PIXIE_DISPLAYS,NULL);
-	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/bind:" PIXIE_MODULES,NULL);
-#else
 	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:" PIXIE_DISPLAYS,NULL);
 	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/modules:" PIXIE_MODULES,NULL);
-#endif
 
 	// Override the official defaults for testing
 	pixelXsamples			=	2;
