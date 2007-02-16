@@ -304,8 +304,6 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 		const float		*v10;
 		const float		*v11;
 		const float		*v12;
-		const float		*data0	=	pl->data0;
-		const float		*data1	=	pl->data1;
 		const float		*time	=	varying[VARIABLE_TIME] + start*3;
 
 		// Interpolate the vertex variables accross the triangle
@@ -317,6 +315,12 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
+					const float	*data0	=	pl->data0 + pl->parameters[j].index;
+					const float	*data1	=	pl->data1 + pl->parameters[j].index;
+					
+					assert(isAligned64(data0));
+					assert(isAligned64(data1));
+					
 					const float	*sv00	=	data0 + this->v0*variable->numFloats;
 					const float	*sv01	=	data0 + this->v1*variable->numFloats;
 					const float	*sv02	=	data0 + this->v2*variable->numFloats;
@@ -336,17 +340,14 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 					}
 				}
 			}
-
-			data0	+=	numFloats*pl->parameters[j].numItems;
-			data1	+=	numFloats*pl->parameters[j].numItems;
 		}
 
-		v00	=	data0 + this->v0*3;
-		v01	=	data0 + this->v1*3;
-		v02	=	data0 + this->v2*3;
-		v10	=	data1 + this->v0*3;
-		v11	=	data1 + this->v1*3;
-		v12	=	data1 + this->v2*3;
+		v00	=	pl->data0 + this->v0*3;
+		v01	=	pl->data0 + this->v1*3;
+		v02	=	pl->data0 + this->v2*3;
+		v10	=	pl->data1 + this->v0*3;
+		v11	=	pl->data1 + this->v1*3;
+		v12	=	pl->data1 + this->v2*3;
 
 		// Compute surface derivatives and normal if required
 		if (up & PARAMETER_DPDU) {
@@ -421,9 +422,12 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
-					const float	*sv0	=	data + this->v0*variable->numFloats;
-					const float	*sv1	=	data + this->v1*variable->numFloats;
-					const float	*sv2	=	data + this->v2*variable->numFloats;
+				
+					assert(isAligned64(data + pl->parameters[j].index));
+					
+					const float	*sv0	=	data + pl->parameters[j].index + this->v0*variable->numFloats;
+					const float	*sv1	=	data + pl->parameters[j].index + this->v1*variable->numFloats;
+					const float	*sv2	=	data + pl->parameters[j].index + this->v2*variable->numFloats;
 
 					for (i=0;i<numVertices;i++) {
 						const	float	cu	=	u[i];
@@ -497,8 +501,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 	const float	*u				=	varying[VARIABLE_U];
 	const float	*v				=	varying[VARIABLE_V];
 	const CPl	*pl				=	mesh->pl;
-	const float	*data			=	pl->data0;
-
+	
 	for (i=0;i<pl->numParameters;i++) {
 		const CPlParameter	*cParameter	=	pl->parameters+i;
 		const CVariable		*cVariable	=	cParameter->variable;
@@ -508,6 +511,8 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 		const float			*v0,*v1,*v2;
 
 		if (dest != NULL) {
+			const float	*data			=	pl->data0 + cParameter->index;
+
 			switch(cParameter->container) {
 			case CONTAINER_UNIFORM:
 
@@ -633,8 +638,6 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 				break;
 			}
 		}
-
-		data	+=	cParameter->numItems*numFloats;		/// FIXME: 64Bit alignment
 	}
 }
 
@@ -895,19 +898,23 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 		const float		*v11;
 		const float		*v12;
 		const float		*v13;
-		const float		*data0	=	pl->data0;
-		const float		*data1	=	pl->data1;
 		const float		*time	=	varying[VARIABLE_TIME] + start*3;
 
 		// Interpolate the vertex variables accross the triangle
 		for (j=0;j<pl->numParameters;j++) {
-			const CVariable	*variable	=	pl->parameters[j].variable;
-			const int		numFloats	=	variable->numFloats;
-
+			
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
-				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
+				const CVariable	*variable	=	pl->parameters[j].variable;
+				const int		numFloats	=	variable->numFloats;
+				float			*dest		=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
+					const float	*data0	=	pl->data0 + pl->parameters[j].index;
+					const float	*data1	=	pl->data1 + pl->parameters[j].index;
+					
+					assert(isAligned64(data0));
+					assert(isAligned64(data1));
+
 					const float	*sv00	=	data0 + this->v0*variable->numFloats;
 					const float	*sv01	=	data0 + this->v1*variable->numFloats;
 					const float	*sv02	=	data0 + this->v2*variable->numFloats;
@@ -929,19 +936,16 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 					}
 				}
 			}
-
-			data0	+=	numFloats*pl->parameters[j].numItems;
-			data1	+=	numFloats*pl->parameters[j].numItems;
 		}
 
-		v00	=	data0 + this->v0*3;
-		v01	=	data0 + this->v1*3;
-		v02	=	data0 + this->v2*3;
-		v03	=	data0 + this->v3*3;
-		v10	=	data1 + this->v0*3;
-		v11	=	data1 + this->v1*3;
-		v12	=	data1 + this->v2*3;
-		v13	=	data1 + this->v3*3;
+		v00	=	pl->data0 + this->v0*3;
+		v01	=	pl->data0 + this->v1*3;
+		v02	=	pl->data0 + this->v2*3;
+		v03	=	pl->data0 + this->v3*3;
+		v10	=	pl->data1 + this->v0*3;
+		v11	=	pl->data1 + this->v1*3;
+		v12	=	pl->data1 + this->v2*3;
+		v13	=	pl->data1 + this->v3*3;
 
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
@@ -1012,10 +1016,10 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
 				if (dest != NULL) {
-					const float	*sv0	=	data + this->v0*variable->numFloats;
-					const float	*sv1	=	data + this->v1*variable->numFloats;
-					const float	*sv2	=	data + this->v2*variable->numFloats;
-					const float	*sv3	=	data + this->v3*variable->numFloats;
+					const float	*sv0	=	data + pl->parameters[j].index + this->v0*variable->numFloats;
+					const float	*sv1	=	data + pl->parameters[j].index + this->v1*variable->numFloats;
+					const float	*sv2	=	data + pl->parameters[j].index + this->v2*variable->numFloats;
+					const float	*sv3	=	data + pl->parameters[j].index + this->v3*variable->numFloats;
 
 					for (i=0;i<numVertices;i++) {
 						const	float	cu	=	u[i];
@@ -1027,8 +1031,6 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 					}
 				}
 			}
-
-			data	+=	numFloats*pl->parameters[j].numItems;
 		}
 
 		// Compute surface derivatives and normal if required
@@ -1087,8 +1089,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 	const float	*u				=	varying[VARIABLE_U];
 	const float	*v				=	varying[VARIABLE_V];
 	const CPl	*pl				=	mesh->pl;
-	const float	*data			=	pl->data0;
-
+	
 	for (i=0;i<pl->numParameters;i++) {
 		const CPlParameter	*cParameter	=	pl->parameters+i;
 		const CVariable		*cVariable	=	cParameter->variable;
@@ -1098,6 +1099,8 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 		const float			*v0,*v1,*v2,*v3;
 
 		if (dest != NULL) {
+			const float	*data			=	pl->data0 + cParameter->index;
+
 			switch(cParameter->container) {
 			case CONTAINER_UNIFORM:
 				if (cVariable->type == TYPE_STRING) {
@@ -1221,8 +1224,6 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 				break;
 			}
 		}
-
-		data	+=	cParameter->numItems*numFloats;		// FIXME: 64bit alignment
 	}
 }
 

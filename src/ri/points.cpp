@@ -45,7 +45,6 @@
 // Comments				:
 CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	int				i;
-	float			*vertex;
 
 	stats.numGprims++;
 	stats.gprimMemory			+=	sizeof(CPoints);
@@ -59,16 +58,18 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	float		maxSize			=	0;
 
 	// Compute the maximum point size (for bounding volume computation)
-	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+	for (i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
-
+		
 		if (cVar->entry == VARIABLE_WIDTH) {
+			const float		*vertex	=	pl->data0 + pl->parameters[i].index;
+
 			for (i=0;i<np;i++) {
 				maxSize			=	max(maxSize,vertex[i]);
 			}
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0);
+				vertex	=	pl->data1 + pl->parameters[i].index;
 
 				for (i=0;i<np;i++) {
 					maxSize			=	max(maxSize,vertex[i]);
@@ -77,23 +78,23 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 
 			break;
 		} else if (cVar->entry == VARIABLE_CONSTANTWIDTH) {
+			const float		*vertex	=	pl->data0 + pl->parameters[i].index;
 
 			maxSize				=	max(maxSize,vertex[0]);
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0);
+				vertex	=	pl->data1 + pl->parameters[i].index;
 
 				maxSize	=	max(maxSize,vertex[0]);
 			}
 
 			break;
 		}
-
-		vertex	+=	pl->parameters[i].numItems*cVar->numFloats;
 	}
 
 	// Init the bounding box
-	vector	tmp;
+	vector		tmp;
+	const float	*vertex;
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 	for (vertex=pl->data0,i=0;i<numPoints;i++,vertex+=3) {
@@ -411,17 +412,18 @@ void	CPoints::prep() {
 
 	// Transform the size variable
 	const float	expansion		=	(float) pow((double) fabs(determinantm(xform->from)),1.0 / 3.0);
-	float		*vertex;
-	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+	for (i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
 
 		if (cVar->entry == VARIABLE_WIDTH) {
+			float		*vertex	=	pl->data0 + pl->parameters[i].index;
+			
 			for (i=0;i<numPoints;i++) {
 				vertex[i]		*=	expansion;
 			}
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0);
+				vertex	=	pl->data1 + pl->parameters[i].index;
 
 				for (i=0;i<numPoints;i++) {
 					vertex[i]		*=	expansion;
@@ -430,19 +432,18 @@ void	CPoints::prep() {
 
 			break;
 		} else if (cVar->entry == VARIABLE_CONSTANTWIDTH) {
+			float		*vertex	=	pl->data0 + pl->parameters[i].index;
 
 			vertex[0]			*=	expansion;
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0);
+				vertex	=	pl->data1 + pl->parameters[i].index;
 
 				vertex[0]		*=	expansion;
 			}
 
 			break;
 		}
-
-		vertex	+=	pl->parameters[i].numItems*cVar->numFloats;
 	}
 
 	base->vertex				=	new float[vertexSize*numPoints];
@@ -452,7 +453,7 @@ void	CPoints::prep() {
 	assert(points == NULL);
 
 	points						=	new const float*[numPoints];
-	vertex						=	base->vertex;
+	const float *vertex			=	base->vertex;
 
 	stats.gprimMemory			+=	numPoints*sizeof(float *);
 

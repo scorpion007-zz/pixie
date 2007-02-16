@@ -630,7 +630,6 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *nve,int w) : CObject(a,x) {
 	int			i;
 	const float	*P;
-	float		*vertex;
 
 	stats.numGprims++;
 	stats.gprimMemory		+=	sizeof(CCurveMesh) + sizeof(int)*nc;
@@ -648,11 +647,12 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 	// Extract the maximum width without touching the PL
 	sizeVariable	=	NULL;
 	maxSize			=	0;
-	for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+	for (i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
 
 		if ((cVar->entry == VARIABLE_WIDTH) || (cVar->entry == VARIABLE_CONSTANTWIDTH)) {
-			const	int	np	=	pl->parameters[i].numItems;
+			const int	np		=	pl->parameters[i].numItems;
+			const float	*vertex	=	pl->data0 + pl->parameters[i].index;
 
 			assert(cVar->numFloats == 1);
 
@@ -663,7 +663,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 			}
 
 			if (pl->data1 != NULL) {
-				vertex	=	pl->data1 + (vertex - pl->data0);
+				vertex	=	pl->data1 + pl->parameters[i].index;
 
 				for (i=0;i<np;i++) {
 					maxSize			=	max(maxSize,vertex[i]);
@@ -672,8 +672,6 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 
 			break;
 		}
-
-		vertex +=	pl->parameters[i].numItems*cVar->numFloats;
 	}
 
 	// Compute the bound
@@ -832,25 +830,24 @@ void	CCurveMesh::create(CShadingContext *context) {
 	// Multiply the curve width by the expansion in the coordinate system
 	{
 		const float expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
-		float		*vertex;
-		for (vertex=pl->data0,i=0;i<pl->numParameters;i++) {
+		
+		for (i=0;i<pl->numParameters;i++) {
 			const CVariable	*cVar	=	pl->parameters[i].variable;
 
 			if (cVar == sizeVariable) {
-				const	int	np	=	pl->parameters[i].numItems;
+				const	int	np		=	pl->parameters[i].numItems;
+				float		*vertex	=	pl->data0 + pl->parameters[i].index;
 
 				for (i=0;i<np;i++) vertex[i] *=	expansion;
 
 				if (pl->data1 != NULL) {
-					vertex	=	pl->data1 + (vertex - pl->data0);
+					vertex	=	pl->data1 + pl->parameters[i].index;
 
 					for (i=0;i<np;i++)	vertex[i] *= expansion;
 				}
 
 				break;
 			}
-
-			vertex+=pl->parameters[i].numItems*cVar->numFloats;
 		}
 	}
 

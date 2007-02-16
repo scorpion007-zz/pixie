@@ -13,6 +13,7 @@
 			buildPhases = (
 				188383500B2FB2D100166E3E /* CopyFiles */,
 				188383560B2FB2ED00166E3E /* CopyFiles */,
+				18FD22750B856BAD00681F0C /* CopyFiles */,
 			);
 			buildSettings = {
 				PRODUCT_NAME = all;
@@ -83,6 +84,60 @@
 		18D51FEC0B843CE90039A966 /* align.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FEB0B843CE80039A966 /* align.h */; };
 		18D51FEE0B843D020039A966 /* polynomial.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FED0B843D020039A966 /* polynomial.h */; };
 		18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18E9F1060B75B07500DA484A /* rendererMutexes.cpp */; };
+		18FD22770B856BE600681F0C /* ambientindirect.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398370B2D2CA60055E484 /* ambientindirect.sdr */; };
+		18FD22780B856BE600681F0C /* ambientindirect.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398380B2D2CA60055E484 /* ambientindirect.sl */; };
+		18FD22790B856BE600681F0C /* ambientlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398390B2D2CA60055E484 /* ambientlight.sdr */; };
+		18FD227A0B856BE600681F0C /* ambientlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983A0B2D2CA60055E484 /* ambientlight.sl */; };
+		18FD227B0B856BE600681F0C /* ambientocclusion.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983B0B2D2CA60055E484 /* ambientocclusion.sdr */; };
+		18FD227C0B856BE600681F0C /* ambientocclusion.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983C0B2D2CA60055E484 /* ambientocclusion.sl */; };
+		18FD227D0B856BE600681F0C /* arealight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983D0B2D2CA60055E484 /* arealight.sdr */; };
+		18FD227E0B856BE600681F0C /* arealight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983E0B2D2CA60055E484 /* arealight.sl */; };
+		18FD227F0B856BE600681F0C /* constant.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833983F0B2D2CA60055E484 /* constant.sdr */; };
+		18FD22800B856BE600681F0C /* constant.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398400B2D2CA60055E484 /* constant.sl */; };
+		18FD22810B856BE600681F0C /* distantlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398410B2D2CA60055E484 /* distantlight.sdr */; };
+		18FD22820B856BE600681F0C /* distantlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398420B2D2CA60055E484 /* distantlight.sl */; };
+		18FD22830B856BE600681F0C /* fog.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398430B2D2CA60055E484 /* fog.sdr */; };
+		18FD22840B856BE600681F0C /* fog.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398440B2D2CA60055E484 /* fog.sl */; };
+		18FD22850B856BE600681F0C /* glass.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398450B2D2CA60055E484 /* glass.sdr */; };
+		18FD22860B856BE600681F0C /* glass.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398460B2D2CA60055E484 /* glass.sl */; };
+		18FD22870B856BE600681F0C /* matte.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398470B2D2CA60055E484 /* matte.sdr */; };
+		18FD22880B856BE600681F0C /* matte.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398480B2D2CA60055E484 /* matte.sl */; };
+		18FD22890B856BE600681F0C /* metal.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398490B2D2CA60055E484 /* metal.sdr */; };
+		18FD228A0B856BE600681F0C /* metal.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984A0B2D2CA60055E484 /* metal.sl */; };
+		18FD228B0B856BE600681F0C /* mirror.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984B0B2D2CA60055E484 /* mirror.sdr */; };
+		18FD228C0B856BE600681F0C /* mirror.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984C0B2D2CA60055E484 /* mirror.sl */; };
+		18FD228D0B856BE600681F0C /* mtorDirectionalLight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984D0B2D2CA60055E484 /* mtorDirectionalLight.sdr */; };
+		18FD228E0B856BE600681F0C /* mtorDirectionalLight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984E0B2D2CA60055E484 /* mtorDirectionalLight.sl */; };
+		18FD228F0B856BE600681F0C /* mtorLambert.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833984F0B2D2CA60055E484 /* mtorLambert.sdr */; };
+		18FD22900B856BE600681F0C /* mtorLambert.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398500B2D2CA60055E484 /* mtorLambert.sl */; };
+		18FD22910B856BE600681F0C /* mtorPhong.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398510B2D2CA60055E484 /* mtorPhong.sdr */; };
+		18FD22920B856BE600681F0C /* mtorPhong.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398520B2D2CA60055E484 /* mtorPhong.sl */; };
+		18FD22930B856BE600681F0C /* normdir.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398530B2D2CA60055E484 /* normdir.sdr */; };
+		18FD22940B856BE600681F0C /* normdir.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398540B2D2CA60055E484 /* normdir.sl */; };
+		18FD22950B856BE600681F0C /* paintedmatte.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398550B2D2CA60055E484 /* paintedmatte.sdr */; };
+		18FD22960B856BE600681F0C /* paintedmatte.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398560B2D2CA60055E484 /* paintedmatte.sl */; };
+		18FD22970B856BE600681F0C /* paintedplastic.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398570B2D2CA60055E484 /* paintedplastic.sdr */; };
+		18FD22980B856BE600681F0C /* paintedplastic.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398580B2D2CA60055E484 /* paintedplastic.sl */; };
+		18FD22990B856BE600681F0C /* plastic.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398590B2D2CA60055E484 /* plastic.sdr */; };
+		18FD229A0B856BE600681F0C /* plastic.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985A0B2D2CA60055E484 /* plastic.sl */; };
+		18FD229B0B856BE600681F0C /* pointlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985B0B2D2CA60055E484 /* pointlight.sdr */; };
+		18FD229C0B856BE600681F0C /* pointlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985C0B2D2CA60055E484 /* pointlight.sl */; };
+		18FD229D0B856BE600681F0C /* rayarea.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985D0B2D2CA60055E484 /* rayarea.sdr */; };
+		18FD229E0B856BE600681F0C /* rayarea.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985E0B2D2CA60055E484 /* rayarea.sl */; };
+		18FD229F0B856BE600681F0C /* raydistant.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833985F0B2D2CA60055E484 /* raydistant.sdr */; };
+		18FD22A00B856BE600681F0C /* raydistant.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398600B2D2CA60055E484 /* raydistant.sl */; };
+		18FD22A10B856BE600681F0C /* raypoint.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398610B2D2CA60055E484 /* raypoint.sdr */; };
+		18FD22A20B856BE600681F0C /* raypoint.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398620B2D2CA60055E484 /* raypoint.sl */; };
+		18FD22A30B856BE600681F0C /* shadowarea.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398630B2D2CA60055E484 /* shadowarea.sdr */; };
+		18FD22A40B856BE600681F0C /* shadowarea.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398640B2D2CA60055E484 /* shadowarea.sl */; };
+		18FD22A50B856BE600681F0C /* shadowdistant.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398650B2D2CA60055E484 /* shadowdistant.sdr */; };
+		18FD22A60B856BE600681F0C /* shadowdistant.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398660B2D2CA60055E484 /* shadowdistant.sl */; };
+		18FD22A70B856BE600681F0C /* shadowpoint.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398670B2D2CA60055E484 /* shadowpoint.sdr */; };
+		18FD22A80B856BE600681F0C /* shadowpoint.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398680B2D2CA60055E484 /* shadowpoint.sl */; };
+		18FD22A90B856BE600681F0C /* shadowspot.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398690B2D2CA60055E484 /* shadowspot.sdr */; };
+		18FD22AA0B856BE600681F0C /* shadowspot.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833986A0B2D2CA60055E484 /* shadowspot.sl */; };
+		18FD22AB0B856BE600681F0C /* spotlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833986B0B2D2CA60055E484 /* spotlight.sdr */; };
+		18FD22AC0B856BE600681F0C /* spotlight.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1833986C0B2D2CA60055E484 /* spotlight.sl */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -637,6 +692,69 @@
 				188383E70B2FB39D00166E3E /* LICENSE in CopyFiles */,
 				188383E80B2FB39D00166E3E /* NEWS in CopyFiles */,
 				188383E90B2FB39D00166E3E /* README in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		18FD22750B856BAD00681F0C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /Applications/Graphics/Pixie/shaders;
+			dstSubfolderSpec = 0;
+			files = (
+				18FD22770B856BE600681F0C /* ambientindirect.sdr in CopyFiles */,
+				18FD22780B856BE600681F0C /* ambientindirect.sl in CopyFiles */,
+				18FD22790B856BE600681F0C /* ambientlight.sdr in CopyFiles */,
+				18FD227A0B856BE600681F0C /* ambientlight.sl in CopyFiles */,
+				18FD227B0B856BE600681F0C /* ambientocclusion.sdr in CopyFiles */,
+				18FD227C0B856BE600681F0C /* ambientocclusion.sl in CopyFiles */,
+				18FD227D0B856BE600681F0C /* arealight.sdr in CopyFiles */,
+				18FD227E0B856BE600681F0C /* arealight.sl in CopyFiles */,
+				18FD227F0B856BE600681F0C /* constant.sdr in CopyFiles */,
+				18FD22800B856BE600681F0C /* constant.sl in CopyFiles */,
+				18FD22810B856BE600681F0C /* distantlight.sdr in CopyFiles */,
+				18FD22820B856BE600681F0C /* distantlight.sl in CopyFiles */,
+				18FD22830B856BE600681F0C /* fog.sdr in CopyFiles */,
+				18FD22840B856BE600681F0C /* fog.sl in CopyFiles */,
+				18FD22850B856BE600681F0C /* glass.sdr in CopyFiles */,
+				18FD22860B856BE600681F0C /* glass.sl in CopyFiles */,
+				18FD22870B856BE600681F0C /* matte.sdr in CopyFiles */,
+				18FD22880B856BE600681F0C /* matte.sl in CopyFiles */,
+				18FD22890B856BE600681F0C /* metal.sdr in CopyFiles */,
+				18FD228A0B856BE600681F0C /* metal.sl in CopyFiles */,
+				18FD228B0B856BE600681F0C /* mirror.sdr in CopyFiles */,
+				18FD228C0B856BE600681F0C /* mirror.sl in CopyFiles */,
+				18FD228D0B856BE600681F0C /* mtorDirectionalLight.sdr in CopyFiles */,
+				18FD228E0B856BE600681F0C /* mtorDirectionalLight.sl in CopyFiles */,
+				18FD228F0B856BE600681F0C /* mtorLambert.sdr in CopyFiles */,
+				18FD22900B856BE600681F0C /* mtorLambert.sl in CopyFiles */,
+				18FD22910B856BE600681F0C /* mtorPhong.sdr in CopyFiles */,
+				18FD22920B856BE600681F0C /* mtorPhong.sl in CopyFiles */,
+				18FD22930B856BE600681F0C /* normdir.sdr in CopyFiles */,
+				18FD22940B856BE600681F0C /* normdir.sl in CopyFiles */,
+				18FD22950B856BE600681F0C /* paintedmatte.sdr in CopyFiles */,
+				18FD22960B856BE600681F0C /* paintedmatte.sl in CopyFiles */,
+				18FD22970B856BE600681F0C /* paintedplastic.sdr in CopyFiles */,
+				18FD22980B856BE600681F0C /* paintedplastic.sl in CopyFiles */,
+				18FD22990B856BE600681F0C /* plastic.sdr in CopyFiles */,
+				18FD229A0B856BE600681F0C /* plastic.sl in CopyFiles */,
+				18FD229B0B856BE600681F0C /* pointlight.sdr in CopyFiles */,
+				18FD229C0B856BE600681F0C /* pointlight.sl in CopyFiles */,
+				18FD229D0B856BE600681F0C /* rayarea.sdr in CopyFiles */,
+				18FD229E0B856BE600681F0C /* rayarea.sl in CopyFiles */,
+				18FD229F0B856BE600681F0C /* raydistant.sdr in CopyFiles */,
+				18FD22A00B856BE600681F0C /* raydistant.sl in CopyFiles */,
+				18FD22A10B856BE600681F0C /* raypoint.sdr in CopyFiles */,
+				18FD22A20B856BE600681F0C /* raypoint.sl in CopyFiles */,
+				18FD22A30B856BE600681F0C /* shadowarea.sdr in CopyFiles */,
+				18FD22A40B856BE600681F0C /* shadowarea.sl in CopyFiles */,
+				18FD22A50B856BE600681F0C /* shadowdistant.sdr in CopyFiles */,
+				18FD22A60B856BE600681F0C /* shadowdistant.sl in CopyFiles */,
+				18FD22A70B856BE600681F0C /* shadowpoint.sdr in CopyFiles */,
+				18FD22A80B856BE600681F0C /* shadowpoint.sl in CopyFiles */,
+				18FD22A90B856BE600681F0C /* shadowspot.sdr in CopyFiles */,
+				18FD22AA0B856BE600681F0C /* shadowspot.sl in CopyFiles */,
+				18FD22AB0B856BE600681F0C /* spotlight.sdr in CopyFiles */,
+				18FD22AC0B856BE600681F0C /* spotlight.sl in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

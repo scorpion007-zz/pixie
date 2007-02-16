@@ -810,16 +810,14 @@ CPl				*CPl::clone(CAttributes *a) {
 // Return Value			:
 // Comments				:
 CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
-	int	i,disp;
+	int	i;
 
-	for (disp=0,i=0;i<numParameters;i++) {
+	for (i=0;i<numParameters;i++) {
 		if (parameters[i].variable->entry == t)	{
-			d0	=	data0	+	disp;
-			d1	=	(data1 == NULL ? NULL : data1 + disp);
+			d0	=	data0 + parameters[i].index;
+			d1	=	(data1 == NULL ? NULL : data1 + parameters[i].index);
 			return parameters+i;
 		}
-
-		disp	+=	parameters[i].numItems*parameters[i].variable->numFloats;
 	}
 
 	return NULL;
@@ -833,7 +831,6 @@ CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 // Comments				:
 void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page) {
 	int			i,j,k;
-	const float	*cData		=	data0;
 	int			vs			=	0;
 	int			numItems	=	0;
 
