@@ -76,20 +76,11 @@ typedef enum {
 	RT_NULL
 } ERIBType;
 
-// Every command has an argument list composed of this type
-typedef union {
-	ERIBType	type;
-	float		real;
-	int			integer;
-	char		*string;
-} ERIBValue;
-
 // Holds information about a parameter
 typedef struct {
 	char		*name;			// Name of the parameter
 	ERIBType	type;			// Type of the parameter
 	int			numItems;		// Number of items of type ERIBValue
-	ERIBValue	*values;		// Points to the array of values for this parameter
 	int			valuesStart;	// Index in the argument list where the parameter starts
 } TParameter;
 
@@ -102,13 +93,13 @@ static	int					numUniform					=	0;		// The number of uniforms
 static	CArray<RtPointer>	*lights						=	NULL;	// Number -> handle mapping for lights
 static	CTrie<char *>		*lightNames					=	NULL;	// Name -> handle mapping for lights (we define it as char * to avoid the annoying gcc warning)
 static	CArray<RtPointer>	*ribObjects					=	NULL;	// Number -> handle mapping for ribObjects
-static	CArray<char *>		*allocatedStrings			=	NULL;	// Strings that have been allocated for the last command
 static	CArray<char *>		*permaStrings				=	NULL;	// Strings that have been allocated for the whole rib stack
 static	void				(*callback)(const char *)	=	NULL;	// The callback function for the parser
-static	ERIBValue			*args						=	NULL;
-static	int					numArguments				=	0;
-static	int					argumentStepSize			=	100000;
-static	int					maxArgument					=	0;
+
+static	CArray<float>		*floatArgs					=	NULL;	// The array of float arguments
+static	CArray<int>			*intArgs					=	NULL;	// The array of integer arguments
+static	CArray<char *>		*stringArgs					=	NULL;	// The array of string arguments
+
 static	int					numParameters				=	0;
 static	int					maxParameter				=	0;
 static	RtToken				*tokens						=	NULL;
@@ -119,19 +110,6 @@ static	TParameter			*parameters					=	NULL;
 		int					ribLineno					=	-1;		// The line number in the rib file (where the parser is at)
 		int					ribCommandLineno			=	-1;		// The line number of the last executed command in the RIB
 
-
-#define	argCheck()															\
-	if (numArguments == maxArgument) {										\
-		ERIBValue	*tmp	=	new ERIBValue[maxArgument+argumentStepSize];\
-																			\
-		memcpy(tmp,args,numArguments*sizeof(ERIBValue));					\
-																			\
-		maxArgument			+=	argumentStepSize;							\
-		argumentStepSize	*=	2;											\
-																			\
-		delete [] args;														\
-		args				=	tmp;										\
-	}
 
 #define	paramCheck()														\
 	if (numParameters == maxParameter) {									\
@@ -154,8 +132,9 @@ static	TParameter			*parameters					=	NULL;
 		maxParameter				+=	10;									\
 	}
 
-#define	get(__n)		(args + __n)
-
+#define	getFloat(__n)		(floatArgs->array + __n)
+#define	getInt(__n)			(intArgs->array + __n)
+#define	getString(__n)		(stringArgs->array + __n)
 
 // Some textual descriptions for the rib-ri parser
 
@@ -300,14 +279,21 @@ static	int		parameterListCheck() {
 			error(CODE_MISSINGDATA,"Invalid number of items for the parameter \"%s\" (expecting n*%d, found %d)\n",par->name,var->numFloats,par->numItems);
 			return FALSE;
 		}
-
+		
 		// Type checking
 		if (var->type == TYPE_INTEGER) {
 			if (par->type == RT_FLOAT) {
+				// We need to convert the float argument list to int
 				int	j;
+				T32	*dest	=	(T32 *) vals[i];
 
-				for (j=0;j<par->numItems;j++) {
-					par->values[j].integer	=	(int) par->values[j].real;
+				// FIXME: We're doing an ugly conversion here
+				// These assertions must be valid even on 64 bit platforms
+				assert(sizeof(T32) == 4);
+				assert(sizeof(float) == sizeof(int));
+				
+				for (j=par->numItems;j>0;j--,dest++) {
+					dest->integer	=	(int) dest->real;
 				}
 			} else {
 				error(CODE_RANGE,"Type mismatch for parameter \"%s\" (expecting integer, found string)\n",par->name);
@@ -615,15 +601,13 @@ start:			ribCommands;
 ribIntString:	ribIntString
 				RIB_FLOAT
 				{
-					args[numArguments++].integer				=	(int) $2;
-					argCheck();
+					intArgs->push((int) $2);
 					$$	=	$1	+	1;
 				}
 				|
 				RIB_FLOAT
 				{
-					args[numArguments++].integer				=	(int) $1;
-					argCheck();
+					intArgs->push((int) $1);
 					$$	=	1;
 				}
 				;
@@ -632,15 +616,13 @@ ribIntString:	ribIntString
 ribFloatString:	ribFloatString
 				RIB_FLOAT
 				{
-					args[numArguments++].real					=	$2;
-					argCheck();
+					floatArgs->push($2);
 					$$	=	$1	+	1;
 				}
 				|
 				RIB_FLOAT
 				{
-					args[numArguments++].real					=	$1;
-					argCheck();
+					floatArgs->push($1);
 					$$	=	1;
 				}
 				;
@@ -649,18 +631,14 @@ ribTextString:	ribTextString
 				RIB_TEXT
 				{
 					char	*theString	=	strdup($2);
-					args[numArguments++].string					=	theString;
-					allocatedStrings->push(theString);
-					argCheck();
+					stringArgs->push(theString);
 					$$	=	$1	+	1;
 				}
 				|
 				RIB_TEXT
 				{
 					char	*theString	=	strdup($1);
-					args[numArguments++].string					=	theString;
-					allocatedStrings->push(theString);
-					argCheck();
+					stringArgs->push(theString);
 					$$	=	1;
 				}
 				;
@@ -716,9 +694,7 @@ ribTextArray:	RIB_ARRAY_BEGIN
 				RIB_TEXT
 				{
 					char	*theString	=	strdup($1);
-					args[numArguments++].string					=	theString;
-					allocatedStrings->push(theString);
-					argCheck();
+					stringArgs->push(theString);
 					$$	= 1;
 				}
 				;
@@ -740,11 +716,10 @@ ribPL:			ribParameter
 						tokens[i]				=	parameters[i].name;
 
 						if (parameters[i].type == RT_TEXT)
-							vals[i]				=	(RtPointer) &args[parameters[i].valuesStart].string;
+							vals[i]				=	(RtPointer) (stringArgs->array + parameters[i].valuesStart);
 						else
-							vals[i]				=	(RtPointer) &args[parameters[i].valuesStart];
+							vals[i]				=	(RtPointer) (floatArgs->array + parameters[i].valuesStart);
 
-						parameters[i].values	=	args + parameters[i].valuesStart;
 					}
 				}
 				;
@@ -756,7 +731,7 @@ ribParameter:	RIB_TEXT
 					parameters[numParameters].name			=	$1;
 					parameters[numParameters].type			=	RT_FLOAT;
 					parameters[numParameters].numItems		=	$2;
-					parameters[numParameters].valuesStart	=	numArguments-$2;
+					parameters[numParameters].valuesStart	=	floatArgs->numItems-$2;
 					numParameters++;
 					paramCheck();
 				}
@@ -768,7 +743,7 @@ ribParameter:	RIB_TEXT
 					parameters[numParameters].name			=	$1;
 					parameters[numParameters].type			=	RT_TEXT;
 					parameters[numParameters].numItems		=	$2;
-					parameters[numParameters].valuesStart	=	numArguments-$2;
+					parameters[numParameters].valuesStart	=	stringArgs->numItems-$2;
 					numParameters++;
 					paramCheck();
 				}
@@ -781,11 +756,12 @@ ribCommands:	ribCommands
 				}
 				ribComm
 				{
+					floatArgs->numItems	=	0;
+					intArgs->numItems	=	0;
 					char	*currentString;
-					numArguments	=	0;
-					numParameters	=	0;
-					while((currentString=allocatedStrings->pop()) != NULL)
+					while((currentString=stringArgs->pop()) != NULL)
 						free(currentString);
+					numParameters		=	0;
 
 				}
 				|
@@ -1011,12 +987,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_COLOR_SAMPLES
 				ribFloats
 				{
-					if ((numArguments & 1) || ((numArguments % 6) != 0)) {
-						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",numArguments);
+					if ((floatArgs->numItems & 1) || ((floatArgs->numItems % 6) != 0)) {
+						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs->numItems);
 					} else {
-						int		n		=	numArguments/6;
-						float	*argf1	=	(float *) get(0);
-						float	*argf2	=	(float *) get(n*3);
+						int		n		=	floatArgs->numItems/6;
+						float	*argf1	=	getFloat(0);
+						float	*argf2	=	getFloat(n*3);
 
 						RiColorSamples(n,argf1,argf2);
 					}
@@ -1026,12 +1002,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribFloatArray
 				ribFloatArray
 				{
-					if (($2 != $3) || ((numArguments % 6) != 0)) {
-						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",numArguments);
+					if (($2 != $3) || ((floatArgs->numItems % 6) != 0)) {
+						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs->numItems);
 					} else {
-						int		n		=	numArguments/6;
-						float	*argf1	=	(float *) get(0);
-						float	*argf2	=	(float *) get(n*3);
+						int		n		=	floatArgs->numItems/6;
+						float	*argf1	=	getFloat(0);
+						float	*argf2	=	getFloat(n*3);
 
 						RiColorSamples(n,argf1,argf2);
 					}
@@ -1608,7 +1584,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribIntArray
 				ribPL
 				{
-					int		*argi	=	(int *) get(0);
+					int		*argi	=	getInt(0);
 
 					if (parameterListCheck()) {
 						if (sizeCheck(numVertex,0,0,1)) {
@@ -1622,8 +1598,8 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribIntArray
 				ribPL
 				{
-					int	*argi1		=	(int *) get(0);
-					int	*argi2		=	(int *) get($2);
+					int	*argi1		=	getInt(0);
+					int	*argi2		=	getInt($2);
 					int	nvertices	=	0;
 					int	i;
 					int	maxVertex	=	0;
@@ -1659,9 +1635,9 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribIntArray
 				ribPL
 				{
-					int	*argi1		=	(int *) get(0);
-					int	*argi2		=	(int *) get($2);
-					int	*argi3		=	(int *) get($3+$2);
+					int	*argi1		=	getInt(0);
+					int	*argi2		=	getInt($2);
+					int	*argi3		=	getInt($3+$2);
 					int	numvertices	=	0;
 					int	numloops	=	0;
 					int	maxVertex	=	0;
@@ -2002,8 +1978,8 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_FLOAT
 				ribPL
 				{
-					float	*argf1	=	(float *) get(0);
-					float	*argf2	=	(float *) get($4);
+					float	*argf1	=	getFloat(0);
+					float	*argf2	=	getFloat($4);
 
 					int		uPoints	=	(int) $2;
 					int		uOrder	=	(int) $3;
@@ -2023,25 +1999,25 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				}
 				|
 				RIB_TRIM_CURVE
+				ribIntArray
+				ribIntArray
 				ribFloatArray
 				ribFloatArray
 				ribFloatArray
-				ribFloatArray
-				ribFloatArray
-				ribFloatArray
+				ribIntArray
 				ribFloatArray
 				ribFloatArray
 				ribFloatArray
 				{
-					int		*argi1	=	(int *)		get(0);
-					int		*argi2	=	(int *)		get($2);
-					float	*argf3	=	(float *)	get($3+$2);
-					float	*argf4	=	(float *)	get($4+$3+$3);
-					float	*argf5	=	(float *)	get($5+$4+$3+$2);
-					int		*argi6	=	(int *)		get($6+$5+$4+$3+$2);
-					float	*argf7	=	(float *)	get($7+$6+$5+$4+$3+$2);
-					float	*argf8	=	(float *)	get($8+$7+$6+$5+$4+$3+$2);
-					float	*argf9	=	(float *)	get($9+$8+$7+$6+$5+$4+$3+$2);
+					int		*argi1	=	getInt(0);
+					int		*argi2	=	getInt($2);
+					float	*argf3	=	getFloat(0);
+					float	*argf4	=	getFloat($4);
+					float	*argf5	=	getFloat($5+$4);
+					int		*argi6	=	getInt($3+$2);
+					float	*argf7	=	getFloat($6+$5+$4);
+					float	*argf8	=	getFloat($8+$6+$5+$4);
+					float	*argf9	=	getFloat($9+$8+$6+$5+$4);
 
 					RiTrimCurve($2,argi1,argi2,argf3,argf4,argf5,argi6,argf7,argf8,argf9);
 				}
@@ -2284,7 +2260,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribPL
 				{
-					int			*argi1		=	(int *) get(0);
+					int			*argi1		=	getInt(0);
 					int			numVertices,numUniforms;
 					CAttributes	*attributes	=	CRenderer::context->getAttributes(FALSE);
 					int			wrap;
@@ -2350,12 +2326,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					int		numVertices,i,j;
 
 					if (parameterListCheck()) {
-						argi1	=	(int *)		get(0);
-						argi2	=	(int *)		get($3);
-						args1	=	(char **)	get($3+$4);
-						argi3	=	(int *)		get($3+$4+$5);
-						argi4	=	(int *)		get($3+$4+$5+$6);
-						argf1	=	(float *)	get($3+$4+$5+$6+$7);
+						argi1	=	getInt(0);
+						argi2	=	getInt($3);
+						args1	=	getString(0);
+						argi3	=	getInt($3+$4);
+						argi4	=	getInt($3+$4+$6);
+						argf1	=	getFloat(0);
 
 						// Count the number of faces / vertices
 						for (i=0,j=0;i<$3;j+=argi1[i],i++);
@@ -2382,8 +2358,8 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					int		numVertices,i,j;
 
 					if (parameterListCheck()) {
-						argi1	=	(int *) get(0);
-						argi2	=	(int *) get($3);
+						argi1	=	getInt(0);
+						argi2	=	getInt($3);
 
 						// Count the number of faces / vertices
 						for (i=0,j=0;i<$3;j+=argi1[i],i++);
@@ -2453,7 +2429,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						if ($3 != 1) {
 							error(CODE_MISSINGDATA,"Proc delayed archive expects one argument (given %d)\n",$3);
 						} else {
-							arg		=	(char **) get(0);
+							arg		=	getString(0);
 
 							cData->generator	=	strdup(arg[0]);
 
@@ -2463,7 +2439,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						if ($3 != 2) {
 							error(CODE_MISSINGDATA,"Proc delayed archive expects two arguments (given %d)\n",$3);
 						} else {
-							arg		=	(char **) get(0);
+							arg		=	getString(0);
 
 							cData->generator	=	strdup(arg[0]);
 							cData->helper		=	strdup(arg[1]);
@@ -2474,7 +2450,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						if ($3 != 2) {
 							error(CODE_MISSINGDATA,"Proc delayed archive expects two arguments (given %d)\n",$3);
 						} else {
-							arg		=	(char **) get(0);
+							arg		=	getString(0);
 
 							cData->generator	=	strdup(arg[0]);
 							cData->helper		=	strdup(arg[1]);
@@ -2524,7 +2500,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_MOTION_BEGIN
 				ribFloats
 				{
-					float	*argf	=	(float *) get(0);
+					float	*argf	=	getFloat(0);
 
 					RiMotionBeginV($2,argf);
 				}
@@ -2678,13 +2654,11 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		CArray<RtPointer>	*savedLights					=	lights;
 		CTrie<char *>		*savedLightNames				=	lightNames;
 		CArray<RtPointer>	*savedObjects					=	ribObjects;
-		CArray<char *>		*savedAllocatedStrings			=	allocatedStrings;
 		int					savedRibLineno					=	ribLineno;
 		void				(*savedCallback)(const char *)	=	callback;
-		ERIBValue			*savedArgs						=	args;
-		int					savedNumArguments				=	numArguments;
-		int					savedMaxArgument				=	maxArgument;
-		int					savedArgumentStepSize			=	argumentStepSize;
+		CArray<float>		*savedFloatArgs					=	floatArgs;
+		CArray<int>			*savedIntArgs					=	intArgs;
+		CArray<char *>		*savedStringArgs				=	stringArgs;
 		int					savedNumParameters				=	numParameters;
 		int					savedMaxParameter				=	maxParameter;
 		TParameter			*savedParameters				=	parameters;
@@ -2728,12 +2702,10 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		lights				=	NULL;
 		lightNames			=	NULL;
 		ribObjects			=	NULL;
-		allocatedStrings	=	new CArray<char *>;
 		callback			=	c;
-		maxArgument			=	1000;
-		argumentStepSize	=	100000;
-		numArguments		=	0;
-		args				=	new ERIBValue[maxArgument];
+		floatArgs			=	new CArray<float>;
+		intArgs				=	new CArray<int>;
+		stringArgs			=	new CArray<char *>;
 		maxParameter		=	20;
 		numParameters		=	0;
 		parameters			=	new TParameter[maxParameter];
@@ -2771,8 +2743,9 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		if (lights		!= NULL)	delete lights;
 		if (lightNames	!= NULL)	delete lightNames;
 		if (ribObjects	!= NULL)	delete ribObjects;
-		delete allocatedStrings;
-		delete [] args;
+		delete floatArgs;
+		delete intArgs;
+		delete stringArgs;
 		delete [] parameters;
 		delete [] tokens;
 		delete [] vals;
@@ -2785,15 +2758,13 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		parameters			=	savedParameters;
 		numParameters		=	savedNumParameters;
 		maxParameter		=	savedMaxParameter;
-		maxArgument			=	savedMaxArgument;
-		numArguments		=	savedNumArguments;
-		argumentStepSize	=	savedArgumentStepSize;
-		args				=	savedArgs;
+		floatArgs			=	savedFloatArgs;
+		intArgs				=	savedIntArgs;
+		stringArgs			=	savedStringArgs;
 		lightNames			=	savedLightNames;
 		lights				=	savedLights;
 		ribObjects			=	savedObjects;
 		ribLineno			=	savedRibLineno;
-		allocatedStrings	=	savedAllocatedStrings;
 		callback			=	savedCallback;
 		
 		if ((ribDepth = savedRibDepth) == 0) {
