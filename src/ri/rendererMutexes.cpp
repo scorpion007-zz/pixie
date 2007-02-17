@@ -80,18 +80,6 @@ TMutex							CRenderer::networkMutex;
 
 
 /////////////////////////////////////////////////////////////
-//	This mutex is used to ensure only one thread attempts to create
-//	subobjects for a mesh (eg. CPolygonMesh)
-//	
-//	TODO - this could be done per object
-//
-//	VERIFIED
-/////////////////////////////////////////////////////////////
-TMutex							CRenderer::hierarchyMutex;
-
-
-
-/////////////////////////////////////////////////////////////
 //	Used to ensure we serialize creation of CTesselationPatch objects
 //	so the list of tesselations is maintained.  This also means that
 //	we must lock the mutex whilst examining the list in purge
@@ -202,7 +190,6 @@ void							CRenderer::initMutexes() {
 	osCreateMutex(commitMutex);
 	osCreateMutex(displayKillMutex);
 	osCreateMutex(networkMutex);
-	osCreateMutex(hierarchyMutex);
 	osCreateMutex(tesselateMutex);
 	osCreateMutex(textureMutex);
 	osCreateMutex(refCountMutex);
@@ -223,7 +210,6 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(commitMutex);
 	osDeleteMutex(displayKillMutex);
 	osDeleteMutex(networkMutex);
-	osDeleteMutex(hierarchyMutex);
 	osDeleteMutex(tesselateMutex);
 	osDeleteMutex(textureMutex);
 	osDeleteMutex(refCountMutex);
