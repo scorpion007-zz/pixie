@@ -72,20 +72,13 @@ class	CTesselationPatch : public CObject {
 	struct CPurgableTesselation {
 		float					*P;						// The P
 		int						size;					// The size (in bytes) of the grid
-		int						*lastRefNumber;			// Last time we accessed this grid
+		int						lastRefNumber;			// Last time we accessed this grid
 	};
 	
 	struct CTesselationEntry {
-		CPurgableTesselation	*tesselation;			// The global tesselation if it exists
 		CPurgableTesselation	**threadTesselation;	// The entry per thread
-		int						refCount;				// How many threads share this tesselation
-		
-		#ifdef TESSELATION_PERENTRY_LOCK
-		TMutex					mutex;					// Mutex if we're mutexing per entry
-		#endif
 	};
-	
-	
+		
 public:
 							CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,char depth,char minDepth,float r);
 							~CTesselationPatch();
@@ -103,7 +96,8 @@ public:
 private:
 	
 	CPurgableTesselation*	tesselate(CShadingContext *context,char div,int estimateOnly);
-	void					splitToChildren(CShadingContext *context);	
+	void					splitToChildren(CShadingContext *context);
+	void					sampleTesselation(CShadingContext *context,int div,unsigned int sample,float *&P);
 	
 	char					depth;							// Depth of the patch
 	char					minDepth;						// The minimum depth of the patch
@@ -123,7 +117,9 @@ private:
 	static int					tesselationMaxMemory[TESSELATION_NUM_LEVELS];	// The maximum memory allowed per thread per cache level
 	static CTesselationPatch	*tesselationList;								// Linked list of all tesselations (all levels are listed together)
 	
-	static void					purgeTesselations(CShadingContext *context,int level, int thread, int all);
+	// Helper static functions
+	
+	static void					purgeTesselations(CShadingContext *context,CTesselationPatch *entry,int level, int thread, int all);
 	static void					tesselationQuickSort(CTesselationEntry **activeTesselations,int start,int end,int thread);
 };
 
