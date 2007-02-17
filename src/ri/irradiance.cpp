@@ -221,6 +221,9 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 	float				coverage;
 	vector				irradiance,envdir;
 	vector				P,N;
+	
+	// A small value for discard-smoothing of irradiance
+	const float			smallSampleWeight = (flags & CACHE_SAMPLE) ? 0.1f : 0.0f;
 
 	// Transform the lookup point to the correct coordinate system
 	mulmp(P,to,cP);
@@ -266,7 +269,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 
 			// Compute the weight
 			float	w		=	1 - K*max(e1,e2);
-			if (w > context->urand()*0.1f) {
+			if (w > context->urand()*smallSampleWeight) {
 				vector	ntmp;
 
 				crossvv(ntmp,cSample->N,N);
