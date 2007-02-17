@@ -52,6 +52,8 @@ class	CTesselationPatch;
 const unsigned int	OBJECT_DUMMY				=	1;	// Set if the object is a dummy object
 const unsigned int	OBJECT_TESSELATION			=	2;	// Set if the object is an intermediate tesselation
 const unsigned int	OBJECT_MOVING_TESSELATION	=	4;	// Set if the object is an intermediate tesselation which is moving
+const unsigned int	OBJECT_HIERARCHY_READY		=	8;	// Set if the children pointer is processed
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
@@ -79,8 +81,8 @@ public:
 	virtual	void			dice(CShadingContext *);
 	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	0;
 
-														// Take a list of objects and cluster them
-			CObject			*cluster(CShadingContext *,CObject *);	
+														// Cluster the children
+			void			cluster(CShadingContext *);	
 
 														// Set the children objects
 			void			setChildren(CShadingContext *,CObject *);

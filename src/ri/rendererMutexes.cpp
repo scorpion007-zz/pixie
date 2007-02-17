@@ -173,6 +173,15 @@ TMutex							CRenderer::delayedMutex;
 TMutex							CRenderer::deepShadowMutex;
 
 
+/////////////////////////////////////////////////////////////
+//	Used to serialize the bounding volume hierarchy creation
+//
+//	VERIFIED
+/////////////////////////////////////////////////////////////
+TMutex							CRenderer::hierarchyMutex;
+
+
+
 
 // TODO: Comment on
 // Per block mutexes for textures, tesselations, grid objects
@@ -197,6 +206,7 @@ void							CRenderer::initMutexes() {
 	osCreateMutex(dirtyShaderMutex);
 	osCreateMutex(delayedMutex);
 	osCreateMutex(deepShadowMutex);
+	osCreateMutex(hierarchyMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -217,5 +227,6 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(dirtyShaderMutex);
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);
+	osDeleteMutex(hierarchyMutex);
 }
 

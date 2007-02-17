@@ -148,7 +148,7 @@ static	float	getDisp(const float *mat,float disp) {
 // Description			:	Cluster the objects
 // Return Value			:
 // Comments				:
-CObject		*CObject::cluster(CShadingContext *context,CObject *children) {
+void		CObject::cluster(CShadingContext *context) {
 	int		numChildren;
 	CObject	*cObject;
 
@@ -156,7 +156,7 @@ CObject		*CObject::cluster(CShadingContext *context,CObject *children) {
 	for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++);
 
 	// If we have too few children, continue
-	if (numChildren <= 2)	return children;
+	if (numChildren <= 2)	return;
 
 	// These are the two children
 	CObject	*front,*frontChildren;
@@ -275,16 +275,15 @@ CObject		*CObject::cluster(CShadingContext *context,CObject *children) {
 	memEnd(context->threadMemory);
 
 	// Recurse
-	front->children	=	front->cluster(context,frontChildren);
-	back->children	=	back->cluster(context,backChildren);
+	front->children	=	frontChildren;
+	back->children	=	backChildren;
 	
 	front->attach();
 	back->attach();
 
 	front->sibling	=	back;
 	back->sibling	=	NULL;
-
-	return front;
+	children		=	front;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -299,11 +298,9 @@ void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 	if (raytraced()) {
 		CObject	*cObject;
 		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
-		children	=	cluster(context,allChildren);
-	} else {
-		children	=	allChildren;
 	}
-
+	
+	children	=	allChildren;
 }
 
 ///////////////////////////////////////////////////////////////////////

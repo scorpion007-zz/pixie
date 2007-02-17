@@ -365,6 +365,23 @@ void	CShadingContext::trace(CRay *ray) {
 			object->intersect(this,ray);
 		}
 
+		// Is the object hierarchy ready ?
+		if ((object->flags & OBJECT_HIERARCHY_READY) == 0) {
+		
+			// Lock the thing
+			// IDEA: This mutex can be per object, but it would increase the dummy object overhead
+			osLock(CRenderer::hierarchyMutex);
+			if ((object->flags & OBJECT_HIERARCHY_READY) == 0) {
+			
+				// Do the clustering
+				object->cluster(this);
+				
+				// Mark the object as ready
+				object->flags		|=	OBJECT_HIERARCHY_READY;
+			}
+			osUnlock(CRenderer::hierarchyMutex);
+		}
+		
 		// Insert the children objects into the queue
 		CObject	*cChild;
 		for (cChild=object->children;cChild!=NULL;cChild=cChild->sibling) {
