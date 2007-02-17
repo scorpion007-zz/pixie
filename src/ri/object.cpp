@@ -422,9 +422,9 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 	// Do we have a grid ?
 	if (children == NULL) {
-		// We must lock the hierarchyMutex so that the list of known tesselation patches
+		// We must lock the tesselateMutex so that the list of known tesselation patches
 		// is maintained in a thread safe manner
-		osLock(CRenderer::hierarchyMutex);
+		osLock(CRenderer::tesselateMutex);
 
 		if (children == NULL) {
 
@@ -437,7 +437,7 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 			children				=	tesselation;
 		}
 
-		osUnlock(CRenderer::hierarchyMutex);
+		osUnlock(CRenderer::tesselateMutex);
 	}
 }
 
