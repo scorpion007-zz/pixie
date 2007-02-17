@@ -422,6 +422,13 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 	// Do we have a grid ?
 	if (children == NULL) {
+		// Intersect with our bounding box
+		float t = nearestBox(bmin,bmax,cRay->from,cRay->invDir,cRay->tmin,cRay->t);
+	
+		// Bail out if the hit point is already further than the ray got
+		// Note: this avoids unneeded top level tesselations
+		if (!(t < cRay->t)) return;
+
 		// We must lock the tesselateMutex so that the list of known tesselation patches
 		// is maintained in a thread safe manner
 		osLock(CRenderer::tesselateMutex);
