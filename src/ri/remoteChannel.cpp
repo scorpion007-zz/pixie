@@ -244,7 +244,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
 void CRenderer::sendBucketDataChannels(int x,int y) {
-	long			numChannelsToSend	= remoteChannels->numItems;
+	unsigned int	numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
 	
@@ -292,7 +292,7 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
 void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
-	long			numKnownChannels	= remoteChannels->numItems;
+	unsigned int	numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
 	int				remoteId;
@@ -337,7 +337,7 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 // Return Value			:
 // Comments				:	called from render loop (reyes.cpp or raytracer.cpp)
 void CRenderer::sendFrameDataChannels() {
-	long			numChannelsToSend	= remoteChannels->numItems;
+	unsigned int	numChannelsToSend	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
 	
@@ -384,7 +384,7 @@ void CRenderer::sendFrameDataChannels() {
 // Comments				:	Each channel update is preceeded by identified
 //							which was assigned when creating it
 void CRenderer::recvFrameDataChannels(SOCKET s) {
-	long			numKnownChannels	= remoteChannels->numItems;
+	unsigned int	numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
 	int				remoteId;
@@ -444,10 +444,10 @@ CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,in
 // Comments				:	
 int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	// record current position, seek back to tile start
-	long curPos = ftell(tsmFile);
+	uintt64_t curPos = ftell(tsmFile);
 	fseek(tsmFile,lastPosition,SEEK_SET);
-	long sz = curPos - lastPosition;
-	rcSend(s,(char*) &sz,sizeof(long));
+	uint64_t sz = curPos - lastPosition;
+	rcSend(s,(char*) &sz,sizeof(uint64_t));
 	
 	// send the tile data
 	char buf[BUFFER_LENGTH];
@@ -457,7 +457,7 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 		rcSend(s,buf,nn,FALSE);
 		sz -= nn;
 	}
-	long newPos = ftell(tsmFile);
+	uint64_t newPos = ftell(tsmFile);
 	if(newPos != curPos) {
 		fseek(tsmFile,curPos,SEEK_SET);
 		error(CODE_BUG,"Error reading tsm file.\n");
@@ -475,11 +475,11 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 // Comments				:	
 int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	// record where we are
-	long prevPos = ftell(tsmFile);
+	uint64_t prevPos = ftell(tsmFile);
 	
 	// recieve data
-	long sz;
-	rcRecv(s,(char*)&sz,sizeof(long));
+	uint64_t sz;
+	rcRecv(s,(char*)&sz,sizeof(uint64_t));
 	char buf[BUFFER_LENGTH];
 	while(sz > 0){
 		int nn = (sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz;
@@ -489,7 +489,7 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	}
 	
 	// record the bucket start and bucket index
-	long newPos = ftell(tsmFile);
+	uint64_t newPos = ftell(tsmFile);
 	index[y*xBuckets +x] = prevPos;
 	index[y*xBuckets +x + xBuckets*yBuckets] = newPos-prevPos;
 	
