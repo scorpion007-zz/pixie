@@ -691,11 +691,11 @@ CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {
 	if (file == NULL)	file	=	ropen(name,"w+",fileBrickMap);
 	fseek(file,fileIndex,SEEK_SET);
 
-	unsigned long bs[BRICK_PRESENCE_LONGS];
-	unsigned long b;
+	unsigned int bs[BRICK_PRESENCE_LONGS];
+	unsigned int b;
 	
 	// work out which top-level voxels are present
-	fread(bs,sizeof(unsigned long)*BRICK_PRESENCE_LONGS,1,file);
+	fread(bs,sizeof(unsigned int)*BRICK_PRESENCE_LONGS,1,file);
 	
 	// read those that are
 	for(i=0,cVoxel=cBrick->voxels;i<BRICK_PRESENCE_LONGS;i++){
@@ -893,8 +893,8 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			fseek(outfile,0,SEEK_END);
 			tNode->fileIndex	=	ftell(outfile);
 			
-			unsigned long bs[BRICK_PRESENCE_LONGS];
-			unsigned long b;
+			unsigned int bs[BRICK_PRESENCE_LONGS];
+			unsigned int b;
 			
 			// Work out for each voxel if there is anything at all
 			for (k=0,cVoxel=cBrick->voxels;k<BRICK_PRESENCE_LONGS;k++) {
@@ -919,7 +919,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			}
 			
 			// Write the voxel-presence bits
-			fwrite(bs,sizeof(unsigned long)*BRICK_PRESENCE_LONGS,1,outfile);
+			fwrite(bs,sizeof(unsigned int)*BRICK_PRESENCE_LONGS,1,outfile);
 			
 			// Write each voxel which exists
 			for(j=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE,cVoxel=cBrick->voxels;j>0;j--) {
@@ -1240,12 +1240,12 @@ void				CBrickMap::flushBrickMap(int allBricks) {
 				fseek(cMap->file,cNode->fileIndex,SEEK_SET);
 			}
 			
-			unsigned long bs[BRICK_PRESENCE_LONGS];
+			unsigned int bs[BRICK_PRESENCE_LONGS];
 			
 			// Write all voxels, do not spend time compressing
 			for(j=0;j<BRICK_PRESENCE_LONGS;j++) bs[j] = 0xFFFFFFFFL;
 			
-			fwrite(bs,sizeof(unsigned long)*BRICK_PRESENCE_LONGS,1,cMap->file);
+			fwrite(bs,sizeof(unsigned int)*BRICK_PRESENCE_LONGS,1,cMap->file);
 		
 			for(j=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE,cVoxel=cNode->brick->voxels;j>0;j--) {
 				float *vdata = (float*) (cVoxel + 1);
