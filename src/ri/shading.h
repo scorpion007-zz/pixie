@@ -226,8 +226,8 @@ public:
 		int						currentXBucket,currentYBucket;
 
 		// Thread safe random number generator for integers
-		inline	unsigned long	irand() {
-									register unsigned long y;
+		inline	uint32_t	irand() {
+									register uint32_t y;
 
 									if(state == next)	next_state();
 
@@ -244,7 +244,7 @@ public:
       
 		// Thread safe random number generator for floats
 		inline	float			urand() {
-									register unsigned long y;
+									register uint32_t y;
 
 									if(state == next)	next_state();
 
@@ -344,11 +344,11 @@ private:
 		// C++ interface and further optimization by Mayur Patel
 		//
 
-		unsigned long			state[624];
-		unsigned long			*next;
+		uint32_t				state[624];
+		uint32_t				*next;
 
 		void					next_state();
-		void					randomInit(unsigned long u = 5489UL);
+		void					randomInit(uint32_t u = 5489UL);
 		void					randomShutdown();
 
 

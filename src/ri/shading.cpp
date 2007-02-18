@@ -1645,7 +1645,7 @@ void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,
 // Description			:	Init the random number generator
 // Return Value			:	-
 // Comments				:
-void			CShadingContext::randomInit(unsigned long s) {
+void			CShadingContext::randomInit(uint32_t s) {
     int j;
     state[0]= s & 0xffffffffUL;
     for (j=1; j<N; j++) {
@@ -1672,11 +1672,11 @@ void			CShadingContext::randomShutdown() {
 // Return Value			:	-
 // Comments				:
 void			CShadingContext::next_state() {
-    static const unsigned long _uTable[2] = { 0UL, MATRIX_A };
+    static const uint32_t _uTable[2] = { 0UL, MATRIX_A };
     register signed int j;
     
-    register unsigned long *p0;
-    register unsigned long *p1;
+    register uint32_t *p0;
+    register uint32_t *p1;
 
     j = ( N-M ) >> 1;
     p0 = state;
