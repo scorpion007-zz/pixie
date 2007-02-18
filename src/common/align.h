@@ -33,8 +33,31 @@
 #include "global.h"
 
 // Include the pointer types if necessary
-#ifdef __APPLE_CC__
+#ifdef __APPLE_CC__	// >>OSX
 #include "inttypes.h"
+
+#else				// <<OSX
+
+#ifndef WIN32		// >>Not Win32
+
+// Get the types for other platforms
+#include "../../config.h"
+#ifdef HAVE_STDINT_H
+	#include <stdint.h>
+#endif
+
+#else				// >>Win32
+
+#ifndef uint32_t 
+#define uint32_t unsigned int
+#endif
+
+#ifndef uint64_t 
+#define uint64_t unsigned long long
+#endif
+
+#endif				// <<Win32
+
 #endif
 
 // For 32 bits, we may want to turn these off
