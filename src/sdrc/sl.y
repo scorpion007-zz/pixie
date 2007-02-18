@@ -1349,8 +1349,35 @@ slAssignmentStatement:
 
 			if (cVar == NULL) {
 				$$	=	new CNullExpression;
-			} else {
+			} else if (cVar->type & SLC_ARRAY) {
 				$$	=	new CArrayAssignmentExpression(cVar,$3,$7);
+				sdr->undesire();
+			} else {
+				CArray<CExpression *>	*dummyParams = new CArray<CExpression *>;
+				CFunctionPrototype		*cFun;
+
+				dummyParams->push(new CTerminalExpression(cVar));
+				dummyParams->push($3);
+				dummyParams->push($7);
+
+				// Check the builtin functions
+				for (cFun = sdr->builtinFunctions->first(); cFun != NULL; cFun = sdr->builtinFunctions->next()) {
+					if (cFun->match("setcomp",dummyParams,sdr->desired())) break;
+				}
+				
+				if (cFun == NULL) {
+					// Cleanup
+					CExpression	*cCode;
+					while((cCode = dummyParams->pop()) != NULL) {
+						delete cCode;
+					}
+					delete dummyParams;
+					// Report error
+					sdr->error("Can't assign to non array\n");
+					$$	=	new CNullExpression;
+				} else {
+					$$	=	new CBuiltinExpression(cFun,dummyParams);
+				}
 				sdr->undesire();
 			}
 		}
@@ -2231,8 +2258,33 @@ slAritmeticTerminalValue:
 			if (cVar == NULL) {
 				sdr->error("Identifier %s not found\n",$1);
 				$$	=	new CNullExpression;
-			} else { 
+			} else if (cVar->type & SLC_ARRAY) { 
 				$$	=	new CArrayExpression(cVar,$3);
+			} else {
+				CArray<CExpression *>	*dummyParams = new CArray<CExpression *>;
+				CFunctionPrototype		*cFun;
+
+				dummyParams->push(new CTerminalExpression(cVar));
+				dummyParams->push($3);
+
+				// Check the builtin functions
+				for (cFun = sdr->builtinFunctions->first(); cFun != NULL; cFun = sdr->builtinFunctions->next()) {
+					if (cFun->match("comp",dummyParams,SLC_FLOAT)) break;
+				}
+				
+				if (cFun == NULL) {
+					// Cleanup
+					CExpression	*cCode;
+					while((cCode = dummyParams->pop()) != NULL) {
+						delete cCode;
+					}
+					delete dummyParams;
+					// Report error
+					sdr->error("Can't index non array\n");
+					$$	=	new CNullExpression;
+				} else {
+					$$	=	new CBuiltinExpression(cFun,dummyParams);
+				}
 			}
 		}
 	|
