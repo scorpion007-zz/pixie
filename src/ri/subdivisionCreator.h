@@ -63,6 +63,7 @@ private:
 	int						*nargs;
 	int						*intargs;
 	float					*floatargs;
+	TMutex					mutex;
 };
 
 #endif

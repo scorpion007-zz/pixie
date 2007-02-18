@@ -1632,6 +1632,9 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 
 	xform->transformBound(bmin,bmax);
 	makeBound(bmin,bmax);
+	
+	// Create the synch. object
+	osCreateMutex(mutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1659,6 +1662,9 @@ CSubdivMesh::~CSubdivMesh() {
 		if (intargs != NULL)	delete [] intargs;
 		if (floatargs != NULL)	delete [] floatargs;
 	}
+	
+	// Delete the synch. object
+	osDeleteMutex(mutex);
 }
 
 
@@ -1734,6 +1740,12 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	int			*cvertexIndex;
 	CSubdivData	data;
 	CObject		*allChildren;
+
+	osLock(mutex);
+	if (children != NULL) {
+		osUnlock(mutex);
+		return;
+	}
 
 	memBegin(context->threadMemory);
 
@@ -1915,5 +1927,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	setChildren(context,allChildren);
 
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
+	
+	osUnlock(mutex);
 }
 
