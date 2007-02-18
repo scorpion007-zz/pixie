@@ -34,6 +34,7 @@
 #include <math.h>
 
 #include "global.h"
+#include "align.h"
 
 
 
@@ -151,10 +152,10 @@ extern const matrix	identityMatrix;						// Points to the identity matrix
 ////////////////////////////////////////////////////////////////////////////
 // Fast inverse square root
 inline	float	isqrtf(float number) {
-	unsigned int	i;
-	float			x2, y;
-	const float		threehalfs = 1.5F;
-	union { float f; unsigned int i; } u;
+	uint32_t	i;
+	float		x2, y;
+	const float	threehalfs = 1.5F;
+	union { float f; uint32_t i; } u;
 	
 	
 	x2 = number * 0.5F;
@@ -173,7 +174,7 @@ inline	float	isqrtf(float number) {
 ////////////////////////////////////////////////////////////////////////////
 // Fast floating point absolute value
 inline float absf(float f) {
- 	union { float f; unsigned int i; } u;
+ 	union { float f; uint32_t i; } u;
  	u.f = f;
 	u.i = u.i & 0x7FFFFFFF;
 	return u.f;
