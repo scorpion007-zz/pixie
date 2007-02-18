@@ -151,18 +151,18 @@ extern const matrix	identityMatrix;						// Points to the identity matrix
 ////////////////////////////////////////////////////////////////////////////
 // Fast inverse square root
 inline	float	isqrtf(float number) {
-	long		i;
-	float		x2, y;
-	const float threehalfs = 1.5F;
-	union { float f; unsigned int l; } u;
+	unsigned int	i;
+	float			x2, y;
+	const float		threehalfs = 1.5F;
+	union { float f; unsigned int i; } u;
 	
 	
 	x2 = number * 0.5F;
 	y  = number;
 	u.f = number;
-	i  = u.l;
+	i  = u.i;
 	i  = 0x5f3759df - ( i >> 1 );
-	u.l = i;
+	u.i = i;
 	y  = u.f;
 	y  = y * ( threehalfs - ( x2 * y * y ) );
 	//	y  = y * ( threehalfs - ( x2 * y * y ) );			// Da second iteration
@@ -173,7 +173,7 @@ inline	float	isqrtf(float number) {
 ////////////////////////////////////////////////////////////////////////////
 // Fast floating point absolute value
 inline float absf(float f) {
- 	union { float f; int i; } u;
+ 	union { float f; unsigned int i; } u;
  	u.f = f;
 	u.i = u.i & 0x7FFFFFFF;
 	return u.f;
