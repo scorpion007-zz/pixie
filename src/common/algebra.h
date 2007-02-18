@@ -154,7 +154,7 @@ inline	float	isqrtf(float number) {
 	long		i;
 	float		x2, y;
 	const float threehalfs = 1.5F;
-	union { float f; long l; } u;
+	union { float f; unsigned int l; } u;
 	
 	
 	x2 = number * 0.5F;
