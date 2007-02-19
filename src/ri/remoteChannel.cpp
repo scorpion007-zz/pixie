@@ -249,7 +249,7 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 	T32				buffer[2];
 	
 	
-	for(int i=0;i<numChannelsToSend;i++){
+	for(unsigned int i=0;i<numChannelsToSend;i++){
 		if (channels[i] == NULL) continue;					// it's an errored-out channel
 		
 		if (channels[i]->flags & REMOTECHANNEL_PERBUCKET) {
@@ -295,7 +295,6 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 	unsigned int	numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
-	int				remoteId;
 	
 	
 	while(TRUE) {
@@ -305,9 +304,9 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 		
 		if(buffer[0].integer == NET_ACK) {
 			// if we have updates then figure out what channel index
-			remoteId = buffer[1].integer;
+			unsigned int remoteId = (unsigned int) buffer[1].integer;
 			
-			if ((remoteId>=0) && (remoteId<numKnownChannels) && (channels[remoteId]!=NULL)){
+			if ((remoteId<numKnownChannels) && (channels[remoteId]!=NULL)){
 				// Accept the update
 				buffer[0].integer = NET_ACK;
 				rcSend(s,(char*) buffer,1*sizeof(T32));
@@ -341,7 +340,7 @@ void CRenderer::sendFrameDataChannels() {
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32 			buffer[2];
 	
-	for(int i=0;i<numChannelsToSend;i++){
+	for(unsigned int i=0;i<numChannelsToSend;i++){
 		if (channels[i] == NULL) continue;					// it's an errored-out channel
 		
 		if (channels[i]->flags & REMOTECHANNEL_PERFRAME) {
@@ -387,7 +386,6 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 	unsigned int	numKnownChannels	= remoteChannels->numItems;
 	CRemoteChannel	**channels			= remoteChannels->array;
 	T32				buffer[2];
-	int				remoteId;
 	
 	while(TRUE) {
 		// receive update request - buffer[0] tells us
@@ -396,9 +394,9 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 		
 		if(buffer[0].integer == NET_ACK) {
 			// if we have updates then figure out what channel index
-			remoteId = buffer[1].integer;
+			unsigned int remoteId = (unsigned int) buffer[1].integer;
 			
-			if ((remoteId>=0) && (remoteId<numKnownChannels) && (channels[remoteId]!=NULL)){
+			if ((remoteId<numKnownChannels) && (channels[remoteId]!=NULL)){
 				// Accept the update
 				buffer[0].integer = NET_ACK;
 				rcSend(s,(char*) buffer,1*sizeof(T32));
@@ -452,17 +450,17 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	// send the tile data
 	char buf[BUFFER_LENGTH];
 	while(sz > 0){
-		int nn = (sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz;
+		int nn = (int) ((sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz);
 		fread(buf,nn,1,tsmFile);
 		rcSend(s,buf,nn,FALSE);
 		sz -= nn;
 	}
 	uint64_t newPos = ftell(tsmFile);
 	if(newPos != curPos) {
-		fseek(tsmFile,curPos,SEEK_SET);
+		fseek(tsmFile,(long) curPos,SEEK_SET);
 		error(CODE_BUG,"Error reading tsm file.\n");
 	}
-	lastPosition = curPos;
+	lastPosition = (long) curPos;
 	
 	return TRUE;
 }
@@ -482,7 +480,7 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	rcRecv(s,(char*)&sz,sizeof(uint64_t));
 	char buf[BUFFER_LENGTH];
 	while(sz > 0){
-		int nn = (sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz;
+		int nn = (int) ((sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz);
 		rcRecv(s,buf,nn,FALSE);
 		fwrite(buf,nn,1,tsmFile);
 		sz -= nn;
@@ -490,8 +488,8 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	
 	// record the bucket start and bucket index
 	uint64_t newPos = ftell(tsmFile);
-	index[y*xBuckets +x] = prevPos;
-	index[y*xBuckets +x + xBuckets*yBuckets] = newPos-prevPos;
+	index[y*xBuckets +x] = (int) prevPos;
+	index[y*xBuckets +x + xBuckets*yBuckets] = (int) (newPos-prevPos);
 	
 	return TRUE;
 }

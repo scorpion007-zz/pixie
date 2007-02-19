@@ -136,17 +136,6 @@ char			*osEnvironment(const char *);
 int				osFileExists(const char *);
 void			osFixSlashes(char *);
 void			osTempname(const char *,const char *,char*);
-void			*osOpen(const char *name,const char *mode);
-void			osClose(void *handle);
-void			osWrite(void *handle,void *data,int bytes);
-void			osWriteInt(void *handle,int *data,int number=1);
-void			osWriteFloat(void *handle,float *data,int number=1);
-void			osWriteString(void *handle,const char *data);
-void			osRead(void *handle,void *data,int bytes);
-int				osReadInt(void *handle,int *data=NULL,int number=1);
-float			osReadFloat(void *handle,float *data=NULL,int number=1);
-char			*osReadString(void *handle,char **data=NULL);
-
 
 // Directory IO
 void			osCreateDir(const char *);

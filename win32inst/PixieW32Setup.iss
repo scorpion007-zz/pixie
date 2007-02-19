@@ -32,25 +32,38 @@ Name: {app}\displays; Components: main
 Name: {app}\shaders; Components: content
 
 [Files]
+; Distribute the top level stuff
 Source: ..\AUTHORS; DestDir: {app}; Components: main
 Source: ..\LICENSE; DestDir: {app}; Components: main
 Source: ..\README; DestDir: {app}; Components: main
+; Distribute the bin directory
 Source: ..\bin\ri.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\gui.dll; DestDir: {app}\displays; Components: main
+Source: ..\bin\sdr.dll; DestDir: {app}\bin; Components: main
+; Distribute the dependant DLLs
+Source: C:\okan\software\GnuWin32\bin\jpeg62.dll; DestDir: {app}\bin; Components: main
+Source: C:\okan\software\GnuWin32\bin\libpng13.dll; DestDir: {app}\bin; Components: main
+Source: C:\okan\software\GnuWin32\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
+Source: C:\okan\software\GnuWin32\bin\zlib1.dll; DestDir: {app}\bin; Components: main
+Source: C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll; DestDir: {app}\bin; Components: main
+; Distribute the executables
 Source: ..\bin\*.exe; DestDir: {app}\bin; Components: main
-Source: ..\doc\*.*; DestDir: {app}\html; Components: documentation; Flags: recursesubdirs
+; Distribute the display drivers
+Source: ..\displays\rgbe.dll; DestDir: {app}\displays; Components: main
+Source: ..\displays\openexr.dll; DestDir: {app}\displays; Components: main
+Source: ..\displays\framebuffer.dll; DestDir: {app}\displays; Components: main
+Source: ..\displays\file.dll; DestDir: {app}\displays; Components: main
+; Distribute the header files
 Source: ..\src\ri\ri.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\dsply.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\shadeop.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\sdr\sdr.h; DestDir: {app}\include; Components: libraries
-Source: ..\bin\rgbe.dll; DestDir: {app}\displays; Components: main
-Source: ..\bin\gui.dll; DestDir: {app}\displays; Components: main
-;Source: ..\bin\openexr.dll; DestDir: {app}\displays; Components: main
-Source: ..\bin\framebuffer.dll; DestDir: {app}\displays; Components: main
-Source: ..\bin\file.dll; DestDir: {app}\displays; Components: main
+; Distribute the libs
 Source: ..\bin\ri.lib; DestDir: {app}\lib; Components: libraries
 Source: ..\bin\sdr.lib; DestDir: {app}\lib; Components: libraries
-Source: ..\bin\sdr.dll; DestDir: {app}\lib; Components: libraries
-Source: ..\bin\sdr.dll; DestDir: {app}\bin; Components: main
+; Distribute the documentation
+Source: ..\doc\*.*; DestDir: {app}\html; Components: documentation; Flags: recursesubdirs
+; Distribute the shaders
 Source: ..\shaders\*.sdr; DestDir: {app}\shaders; Components: content
 Source: ..\shaders\*.sl; DestDir: {app}\shaders; Components: content
 

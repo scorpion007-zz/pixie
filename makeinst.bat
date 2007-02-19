@@ -13,11 +13,15 @@ copy bin\texmake.exe Pixie\bin
 copy bin\sdrinfo.exe Pixie\bin
 copy bin\show.exe Pixie\bin
 copy bin\ri.dll Pixie\bin
-copy bin\ri.dll Pixie\lib
+copy bin\gui.dll Pixie\bin
+copy bin\sdr.dll Pixie\bin
 copy bin\ri.lib Pixie\lib
 copy bin\sdr.lib Pixie\lib
-copy bin\sdr.dll Pixie\lib
-copy bin\sdr.dll Pixie\bin
+copy C:\okan\software\GnuWin32\bin\jpeg62.dll Pixie\bin
+copy C:\okan\software\GnuWin32\bin\libpng13.dll Pixie\bin
+copy C:\okan\software\GnuWin32\bin\libtiff3.dll Pixie\bin
+copy C:\okan\software\GnuWin32\bin\zlib1.dll Pixie\bin
+copy "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll" Pixie\bin
 copy displays\file.dll Pixie\displays
 copy displays\framebuffer.dll Pixie\displays
 copy displays\rgbe.dll Pixie\displays
@@ -31,7 +35,6 @@ copy shaders\*.* Pixie\shaders
 xcopy doc Pixie\doc /s
 copy README Pixie
 copy LICENSE Pixie
-copy COPYING Pixie
 copy AUTHORS Pixie
 echo *********************************************
 echo At this point, the directory "Pixie" contains

@@ -44,7 +44,7 @@ typedef enum {
 	VECTOR_PARAMETER,
 	MATRIX_PARAMETER,
 	STRING_PARAMETER,
-	INTEGER_PARAMETER,
+	INTEGER_PARAMETER
 } ParameterType;
 
 typedef void	*(*TDisplayParameterFunction)(const char *,ParameterType,int);
