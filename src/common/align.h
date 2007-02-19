@@ -64,10 +64,10 @@
 
 
 // Check if a pointer is 8 byte aligned
-#define	isAligned64(__data)	(((uintptr_t) __data & 0x7) == 0)
+#define	isAligned64(__data)	(((uintptr_t) (__data) & 0x7) == 0)
 
 // Alignment macro (returns a 64 bit aligned data)
-#define	align64(__data)		(((uintptr_t) __data + 7) & (~7))
+#define	align64(__data)		(((uintptr_t) (__data) + 7) & (~7))
 
 
 #endif

@@ -439,8 +439,6 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 					}
 				}
 			}
-
-			data	+=	numFloats*pl->parameters[j].numItems;
 		}
 
 		// Compute surface derivatives and normal if required

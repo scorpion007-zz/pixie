@@ -1454,6 +1454,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 	// Allocate the data field
 	cData	=	data	=	new float[dataSize];
+	assert(isAligned64(data));
 	stats.gprimCoreMemory	+=	dataSize*sizeof(float);
 
 	// Save the data
