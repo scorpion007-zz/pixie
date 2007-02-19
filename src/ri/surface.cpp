@@ -588,8 +588,12 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	// Bail out if the hit point is already further than the ray got
 	if (!(t < cRay->t)) return;
 	
+	// Calculate the required tesselation
 	float requiredR = cRay->da * t + cRay->db;
 
+	// Check we calculated our tesselation level
+//	if (rmax < 0) initTesselation(context);
+	
 	// Bail very early if this ray should have been handled by a coarser tesselation
 	if (rmax*2.0f < requiredR && depth > 0) {
 		// do not proceed further
@@ -1737,6 +1741,9 @@ void		CTesselationPatch::initTesselations(int geoCacheMemory) {
 		// calculate the maximum tesselation cache size per thread, per level
 		tesselationMaxMemory[i] = (int) ceil((float) geoCacheMemory / (float) TESSELATION_NUM_LEVELS / (float) CRenderer::numThreads);
 	}
+	
+	// Init stats
+	stats.tesselationOverhead = 0;
 	
 	#ifdef DEBUG_STATS
 	for(int i=0;i<TESSELATION_NUM_LEVELS*DEBUG_STATS;i++)	tessPerLevel[i] = 0;
