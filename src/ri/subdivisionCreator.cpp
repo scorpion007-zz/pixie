@@ -1618,8 +1618,8 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 	}
 
 	// Compute the bounding box
-	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
-	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
+	initv(bmin,C_INFINITY);
+	initv(bmax,-C_INFINITY);
 	for (P=pl->data0,i=0;i<numVertices;i++,P+=3) {
 		addBox(bmin,bmax,P);
 	}

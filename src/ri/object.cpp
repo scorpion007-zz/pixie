@@ -151,7 +151,7 @@ static	float	getDisp(const float *mat,float disp) {
 void		CObject::cluster(CShadingContext *context) {
 	int		numChildren;
 	CObject	*cObject;
-
+	
 	// Count the number of children
 	for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++);
 
@@ -172,7 +172,7 @@ void		CObject::cluster(CShadingContext *context) {
 
 	// For 5 iterations
 	int	iteration;
-	for (iteration=0;iteration<5;iteration++) {
+	for (iteration=0;iteration<15;iteration++) {
 
 		// Compute a slightly jittered center position for the object
 		for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++) {
@@ -236,10 +236,6 @@ void		CObject::cluster(CShadingContext *context) {
 
 		if (done == TRUE)	break;
 	}
-
-
-
-
 
 
 	// Cluster the rest of the objects
