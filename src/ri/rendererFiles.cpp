@@ -47,7 +47,8 @@
 #include "netFileMapping.h"
 
 
-
+// This one is defined in sdr.y
+CShader			*parseShader(const char *,const char *);
 
 
 ///////////////////////////////////////////////////////////////////////
