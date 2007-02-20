@@ -590,16 +590,13 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	
 	// Calculate the required tesselation
 	float requiredR = cRay->da * t + cRay->db;
-
-	// Check we calculated our tesselation level
-//	if (rmax < 0) initTesselation(context);
 	
 	// Bail very early if this ray should have been handled by a coarser tesselation
 	if (rmax*2.0f < requiredR && depth > 0) {
 		// do not proceed further
 		return;
 	}
-		
+
 	// We must find the appropriate tesselation level
 	float	rCur	=	rmax;
 	int		div		=	1;
@@ -611,7 +608,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		rCur	*=	0.25;
 		div		=	div<<2;
 	}
-		
+	
 	// Did we find a tesselation in this tesselationPatch?
 	if (level < TESSELATION_NUM_LEVELS) {
 		// Yes, our r is sufficient
@@ -1583,23 +1580,37 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	
 	// Evaluate the quality of this tesselation in u and v separately
 	float	vMax	=	0;
+	float	vMin	=	C_INFINITY;
 	float	vAvg	=	0;
 	for (int i=0;i<=div;i++) {
 		const float	l	=	measureLength(Pstorage + i*3,(div+1)*3,div);
 		vMax			=	max(vMax,l);
+		vMin			=	min(vMin,l);
 		vAvg			+=	l;
 	}
 
 	float	uMax	=	0;
+	float	uMin	=	C_INFINITY;
 	float	uAvg	=	0;
 	for (int i=0;i<=div;i++) {
 		const float	l	=	measureLength(Pstorage + i*(div+1)*3,3,div);
 		uMax			=	max(uMax,l);
+		uMin			=	min(uMin,l);
 		uAvg			+=	l;
 	}
 
 	vAvg	/=	(float) (div+1)*div;
 	uAvg	/=	(float) (div+1)*div;
+	
+	// Force overestimation on grids with large variation is quad size
+	// Note: the min and max are grid-side minima and maxima, not quad
+	// maxima.  This means that they are unlikely to be drastically
+	// different, but we can use this to cope with undertesselation of
+	// edge-pinched grids
+	const float uDev = fabs(uMax-uMin)/(float)(div);
+	const float vDev = fabs(vMax-vMin)/(float)(div);
+	uAvg += uDev;
+	vAvg += vDev;
 	
 	// Simply save the coarse r estimate
 	if (rdiv == 1) {
