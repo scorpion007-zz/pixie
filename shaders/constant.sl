@@ -9,4 +9,3 @@ surface constant() {
     Ci = Oi * Cs;
 }
 
-

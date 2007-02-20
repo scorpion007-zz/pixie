@@ -22,4 +22,3 @@ light shadowdistant (   float intensity = 1;
     }
 }
 
-

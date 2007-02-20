@@ -26,4 +26,3 @@ light shadowspot ( float intensity = 1;
 	}
 }
 
-

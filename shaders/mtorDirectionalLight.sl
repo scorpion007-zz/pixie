@@ -22,4 +22,3 @@ light mtorDirectionalLight(	float intensity=1;
 	}
 }
 
-

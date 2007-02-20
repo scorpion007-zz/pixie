@@ -22,4 +22,3 @@ surface mirror(float Ka=1,Ks=1,Kr=1,roughness=.1,samples=1,blur=0; string texnam
               Kr*environment(texname,R,"samples",samples,"blur",blur));
 }
 
-

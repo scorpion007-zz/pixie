@@ -28,4 +28,3 @@ surface glass(float eta=1.5;
 	Oi = Os;
 }
 
-

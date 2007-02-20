@@ -13,4 +13,3 @@ light distantlight ( float intensity = 1;
     }
 }
 
-

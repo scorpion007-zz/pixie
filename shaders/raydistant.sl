@@ -14,4 +14,3 @@ light raydistant (   float intensity = 1;
     }
 }
 
-

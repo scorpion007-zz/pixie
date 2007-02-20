@@ -21,4 +21,3 @@ light spotlight ( float intensity = 1;
 	}
 }
 
-
