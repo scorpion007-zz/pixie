@@ -952,6 +952,19 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	// Save the memory here
 	memBegin(threadMemory);
 	
+	// Set up lighting here incase displacement shader uses lighting
+	
+	// No lights are executed yet
+	currentShadingState->lightsExecuted			=	FALSE;
+	currentShadingState->ambientLightsExecuted	=	FALSE;
+	currentShadingState->lightCategory			=	0;
+	
+	// Clear out previous lights etc
+	currentShadingState->lights					=	NULL;
+	currentShadingState->alights				=	NULL;
+	currentShadingState->currentLight			=	NULL;
+	currentShadingState->freeLights				=	NULL;
+		
 	// Run the displacement shader here
 	if (displacement != NULL) {
 		displacement->execute(this,locals[ACCESSOR_DISPLACEMENT]);
@@ -999,16 +1012,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			}
 		}
 		
-		// No lights are executed yet
-		currentShadingState->lightsExecuted			=	FALSE;
-		currentShadingState->ambientLightsExecuted	=	FALSE;
-		currentShadingState->lightCategory			=	0;
-		
-		// Clear out previous lights etc
-		currentShadingState->lights					=	NULL;
-		currentShadingState->alights				=	NULL;
-		currentShadingState->currentLight			=	NULL;
-		currentShadingState->freeLights				=	NULL;
 
 		// Is there a surface shader ?
 		if (surface != NULL) {
