@@ -598,17 +598,25 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 	}
 
 	// We must find the appropriate tesselation level
-	float	rCur	=	rmax;
-	int		div		=	1;
-	int		level	=	0;
+	float	rCur		=	rmax;
+	int		div			=	1;
+	int		level		=	0;
+	int		subsample	=	FALSE;
 	for (level=0;level<TESSELATION_NUM_LEVELS;level++) {
-		if (rCur <= requiredR+C_EPSILON) {
+		if (rCur < requiredR+C_EPSILON) {
 			break;
 		}
 		rCur	*=	0.25;
 		div		=	div<<2;
 	}
+	//rCur = rmax/(float)div;
 	
+	// Decide whether to subsample
+	if (rCur*2.0f < requiredR+C_EPSILON) {
+		rCur		*=	2.0f;
+		subsample	=	TRUE;
+	}
+		
 	// Did we find a tesselation in this tesselationPatch?
 	if (level < TESSELATION_NUM_LEVELS) {
 		// Yes, our r is sufficient
@@ -790,7 +798,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				return;
 				
 			} else if (div <= 4) {
-				if (rCur*0.5 < requiredR) {
+				if (subsample) {
 					// downsample 4x4 to 2x2 (not the same as above because we divided
 					// in the parametric space here we quads intersect directly
 					
@@ -840,7 +848,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				}
 				return;
 			} else {
-				if (rCur*0.5 < requiredR) {
+				if (subsample) {
 					// downsample 8x8 to 4x4 or 16x16 to 8x8
 					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
 					// we bound-intersect each 2x2 subgrid before intersecting quads
@@ -958,7 +966,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				return;
 				
 			} else if (div <= 4) {
-				if (rCur*0.5 < requiredR) {
+				if (subsample) {
 					// downsample 4x4 to 2x2 (not the same as above because we divided
 					// in the parametric space here we quads intersect directly
 					
@@ -1012,7 +1020,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				}
 				return;
 			} else {
-				if (rCur*0.5 < requiredR) {
+				if (subsample) {
 					// downsample 8x8 to 4x4 or 16x16 to 8x8
 					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
 					// we bound-intersect each 2x2 subgrid before intersecting quads
@@ -1199,6 +1207,7 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 				*timev++	=	time;
 			}
 		}
+		
 		context->displace(object,div+1,div+1,SHADING_2D_GRID,PARAMETER_P | sample | PARAMETER_RAYTRACE);
 		
 		P = varying[VARIABLE_P];
@@ -1326,6 +1335,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	// grid size guess
 	
 	#if DEBUG_TESSELATIONS > 0
+	if (!estimateOnly || DEBUG_TESSELATIONS > 1)
 	{
 		CDebugView	d("/tmp/tesselate.dat",TRUE);
 	
