@@ -238,7 +238,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 			real	normalScale;
 
 			if ((cu == 0) && (cv == 0)) {
-				n		=	10;
+				n		=	/*10*/24;
 			} else {
 				n		=		(int)  floor(min(-log(cu),-log(cv))/log(2.0))+1;
 				if (n <= 0)	n	=	1;	// Need at least one subdivision
