@@ -849,8 +849,8 @@ void	CRendererContext::RiShutter(float smin,float smax) {
 	}
 
 	options					=	getOptions(TRUE);
-	options->shutterOpen	=	smin;
-	options->shutterClose	=	smax;
+	options->shutterOpen	=	smin + options->shutterOffset;
+	options->shutterClose	=	smax + options->shutterOffset;
 }
 
 
@@ -1298,6 +1298,12 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 			optionCheck(RI_ENDOFFRAME,			options->endofframe,				0,3,int)
 			optionCheckString(RI_FILELOG,		options->filelog)
 			optionCheckFlag(RI_PROGRESS,		options->flags,						OPTIONS_FLAGS_PROGRESS)
+			optionEndCheck
+		}
+	} else if (strcmp(name,RI_SHUTTER) == 0) {
+		for (i=0;i<n;i++) {
+			if (FALSE) {
+			optionCheck(RI_OFFSET,				options->shutterOffset,				0,C_INFINITY,float);
 			optionEndCheck
 		}
 	} else {
@@ -4256,13 +4262,15 @@ void	CRendererContext::RiObjectInstance(void *handle) {
 }
 
 void	CRendererContext::RiMotionBeginV(int N,float times[]) {
+	COptions *options =	getOptions(FALSE);
+
 	int	i;
 	
 	numExpectedMotions	=	N;
 	numMotions			=	0;
 	keyTimes			=	new float[numExpectedMotions];
 	for (i=0;i<numExpectedMotions;i++) {
-		keyTimes[i]	=	times[i];
+		keyTimes[i]	=	times[i] + options->shutterOffset;
 	}
 }
 

@@ -333,6 +333,7 @@ COptions::COptions() {
 
 	shutterOpen				=	0;
 	shutterClose			=	0;
+	shutterOffset			=	0;
 
 	endofframe				=	0;
 	filelog					=	NULL;

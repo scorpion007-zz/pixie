@@ -202,6 +202,7 @@ public:
 	float						fstop,focallength,focaldistance;				// Depth of field stuff
 
 	float						shutterOpen,shutterClose;						// Motion blur stuff
+	float						shutterOffset;									// Shutter offset
 
 	unsigned int				flags;											// Flags	
 
