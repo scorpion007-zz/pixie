@@ -210,6 +210,7 @@ RtToken		RI_IRRADIANCE			=	"irradiance";
 RtToken		RI_CULL					=	"cull";
 RtToken		RI_COMPRESSION			=	"compression";
 RtToken		RI_RIB					=	"rib";
+RtToken		RI_SHUTTER				=	"shutter";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -320,6 +321,9 @@ RtToken		RI_MASKLOG				=	"masklog";
 RtToken		RI_MASKPROGRESS			=	"maskprogress";
 RtToken		RI_MASKSTATS			=	"maskstats";
 RtToken		RI_INHERITATTRIBUTES	=	"inheritattributes";
+
+// Shutter options
+RtToken		RI_OFFSET				=	"offset";
 
 // Misc junk
 RtToken		RI_DEFAULTSURFACE		=	"defaultsurface";

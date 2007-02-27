@@ -159,6 +159,7 @@ EXTERN(RtToken)		RI_IRRADIANCE;
 EXTERN(RtToken)		RI_CULL;
 EXTERN(RtToken)		RI_COMPRESSION;
 EXTERN(RtToken)		RI_RIB;
+EXTERN(RtToken)		RI_SHUTTER;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -272,6 +273,9 @@ EXTERN(RtToken)		RI_MASKLOG;
 EXTERN(RtToken)		RI_MASKPROGRESS;
 EXTERN(RtToken)		RI_MASKSTATS;
 EXTERN(RtToken)		RI_INHERITATTRIBUTES;
+
+// Shutter options
+EXTERN(RtToken)		RI_OFFSET;
 
 // Misc junk
 EXTERN(RtToken)		RI_DEFAULTSURFACE;
