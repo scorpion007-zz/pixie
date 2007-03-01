@@ -1306,6 +1306,23 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 			optionCheck(RI_OFFSET,				options->shutterOffset,				0,C_INFINITY,float);
 			optionEndCheck
 		}
+	} else if (strcmp(name,RI_USER) == 0) {
+		CVariable var;
+		
+		for(i=0;i<n;i++) {
+			if (parseVariable(&var,NULL,tokens[i])) {
+				// got an inline declaration
+				options->userOptions.insert(&var,params[i]);
+			} else {
+				CVariable *cVar = CRenderer::retrieveVariable(tokens[i]);
+				
+				if (cVar != NULL) {
+					options->userOptions.insert(cVar,params[i]);
+				} else {
+					error(CODE_BADTOKEN,"User option: \"%s\" is predeclared declared or declared inline\n",name);
+				}
+			}
+		}
 	} else {
 		error(CODE_BADTOKEN,"Unknown option: \"%s\"\n",name);
 	}
@@ -2632,6 +2649,23 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 				attributeCheckInvertFlag(RI_HIDDEN,		attributes->flags,	ATTRIBUTES_FLAGS_SHADE_HIDDEN)
 				attributeCheckInvertFlag(RI_BACKFACING,	attributes->flags,	ATTRIBUTES_FLAGS_SHADE_BACKFACE)
 				attributeEndCheck
+			}
+		} else if (strcmp(name,RI_USER) == 0) {
+			CVariable var;
+			
+			for(i=0;i<n;i++) {
+				if (parseVariable(&var,NULL,tokens[i])) {
+					// got an inline declaration
+					attributes->userAttributes.insert(&var,params[i]);
+				} else {
+					CVariable *cVar = CRenderer::retrieveVariable(tokens[i]);
+					
+					if (cVar != NULL) {
+						attributes->userAttributes.insert(cVar,params[i]);
+					} else {
+						error(CODE_BADTOKEN,"User attribute: \"%s\" is predeclared declared or declared inline\n",name);
+					}
+				}
 			}
 		} else {
 			error(CODE_BADTOKEN,"Unknown attribute: \"%s\"\n",name);

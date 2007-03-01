@@ -160,6 +160,7 @@ EXTERN(RtToken)		RI_CULL;
 EXTERN(RtToken)		RI_COMPRESSION;
 EXTERN(RtToken)		RI_RIB;
 EXTERN(RtToken)		RI_SHUTTER;
+EXTERN(RtToken)		RI_USER;
 
 ////////////////////////////////////////////////////////////////////////
 //

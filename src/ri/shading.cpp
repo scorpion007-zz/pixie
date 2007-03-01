@@ -82,6 +82,8 @@ static	char	*attributesTraceBias		=	"trace:bias";
 static	char	*attributesTraceMaxDiffuse	=	"trace:maxdiffusedepth";
 static	char	*attributesTraceMaxSpecular	=	"trace:maxspeculardepth";
 
+static	char	*attributesUser				=	"user:";
+
 // Rendererinfo requests
 static	char	*rendererinfoRenderer		=	"renderer";
 static	char	*rendererinfoVersion		=	"version";
@@ -723,9 +725,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				float	kv			=	dotvv(I,dPdv);	kv	=	isqrtf((lengthv*lengthi - (kv*kv)) / (lengthv*lengthi + C_EPSILON));
 
 				const float	dest	=	du[i];				// The ray crosssection at the intersection
-				const float	dud		=	ku * dest * isqrtf(lengthu) + C_EPSILON;
+				const float	dud		=	ku * dest * isqrtf(lengthu) + C_EPSILON;		// FIXME: Ensure absolute bounds on du and dv (if above divisor is very small)
 				const float	dvd		=	kv * dest * isqrtf(lengthv) + C_EPSILON;
-
+				
 				// Create one more shading point at (u + du,v)
 				u[j]		=	u[i] + dud;
 				v[j]		=	v[i];
@@ -1407,6 +1409,25 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 		d[1]		=	(float) CRenderer::pixelYsamples;
 		return TRUE;
 	}
+	// User options
+	else if (strncmp(name,attributesUser,strlen(attributesUser)) == 0) {
+		CVariable *var;
+		
+		if (CRenderer::userOptions->lookup(name+strlen(attributesUser),var) == TRUE) {
+			if (var->type == TYPE_STRING) {
+				char **d	=	(char **) dest;
+				char **s	=	(char **) var->defaultValue;
+				for (int i=0;i<var->numFloats;i++) {
+					d[i] = s[i];
+				}
+			} else {
+				float	*d	=	(float *) dest;
+				memcpy(d,var->defaultValue,sizeof(float)*var->numFloats);
+			}
+			return TRUE;
+		}
+	}
+	
 	return FALSE;
 }
 
@@ -1461,6 +1482,24 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) currentAttributes->maxSpecularDepth;
 		return TRUE;
+	}
+	// User attributes
+	else if (strncmp(name,attributesUser,strlen(attributesUser)) == 0) {
+		CVariable *var;
+		
+		if (currentAttributes->userAttributes.lookup(name+strlen(attributesUser),var) == TRUE) {
+			if (var->type == TYPE_STRING) {
+				char **d	=	(char **) dest;
+				char **s	=	(char **) var->defaultValue;
+				for (int i=0;i<var->numFloats;i++) {
+					d[i] = s[i];
+				}
+			} else {
+				float	*d	=	(float *) dest;
+				memcpy(d,var->defaultValue,sizeof(float)*var->numFloats);
+			}
+			return TRUE;
+		}
 	}
 	
 	return FALSE;

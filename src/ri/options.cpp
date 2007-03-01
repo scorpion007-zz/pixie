@@ -484,6 +484,8 @@ COptions::COptions(const COptions *o) {
 	} else {
 		filelog					=	NULL;
 	}
+	
+	userOptions					=	o->userOptions;
 }
 
 

@@ -36,6 +36,7 @@
 #include "common/containers.h"	// Misc data structures
 #include "xform.h"				// Transformations
 #include "shader.h"				// Shader stuff
+#include "userAttributes.h"		// Attribute dictionary stuff
 
 class	CPhotonMap;
 
@@ -178,6 +179,8 @@ public:
 		float				lodRange[4];								// LOD variables
 		float				lodSize;
 		float				lodImportance;
+		
+		CUserAttributeDictionary		userAttributes;					// Duh.
 };
 
 #endif

@@ -39,6 +39,7 @@
 #include "ri.h"
 #include "shader.h"
 #include "dsply.h"
+#include "userAttributes.h"
 
 // Possible projections
 typedef enum {
@@ -247,6 +248,8 @@ public:
 	int							shootStep;										// The number of rays to shoot at a time
 
 	EDepthFilter				depthFilter;									// Holds the depth filter type
+	
+	CUserAttributeDictionary	userOptions;									// User options
 };
 
 

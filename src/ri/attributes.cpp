@@ -179,7 +179,7 @@ CAttributes::CAttributes(const CAttributes *a) {
 	if (a->maxDisplacementSpace != NULL)	maxDisplacementSpace	=	strdup(a->maxDisplacementSpace);
 
 	lightSources				=	NULL;
-		
+
 	for (cLight=a->lightSources;cLight!=NULL;cLight=cLight->next) {
 		nLight			=	new CActiveLight;
 
@@ -188,7 +188,9 @@ CAttributes::CAttributes(const CAttributes *a) {
 		lightSources		=	nLight;
 	}
 
-	name						=	(a->name != NULL ? strdup(a->name) : NULL);
+	name					=	(a->name != NULL ? strdup(a->name) : NULL);
+
+	userAttributes			=	a->userAttributes;
 
 	if (a->next != NULL) next	=	new CAttributes(a->next);
 }
@@ -226,7 +228,7 @@ CAttributes::~CAttributes(){
 		lightSources	=	cLight->next;
 		delete cLight;
 	}
-	
+
 	if (next != NULL)			delete next;
 }
 

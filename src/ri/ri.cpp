@@ -211,6 +211,7 @@ RtToken		RI_CULL					=	"cull";
 RtToken		RI_COMPRESSION			=	"compression";
 RtToken		RI_RIB					=	"rib";
 RtToken		RI_SHUTTER				=	"shutter";
+RtToken		RI_USER					=	"user";
 
 ////////////////////////////////////////////////////////////////////////
 //

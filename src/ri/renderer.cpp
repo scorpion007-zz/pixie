@@ -262,7 +262,7 @@ CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;					// initialized in 
 int								*CRenderer::textureUsedMemory			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
 int								*CRenderer::textureMaxMemory			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
 
-
+CUserAttributeDictionary		*CRenderer::userOptions					=	NULL;					// initialized in beginFrame
 
 
 
@@ -455,6 +455,9 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::numEmitPhotons			=	o->numEmitPhotons;
 	CRenderer::shootStep				=	o->shootStep;
 	CRenderer::depthFilter				=	o->depthFilter;
+	
+	CRenderer::userOptions				=	new CUserAttributeDictionary;
+	*CRenderer::userOptions				=	o->userOptions;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1027,7 +1030,11 @@ void		CRenderer::endFrame() {
 			fatal(CODE_BADTOKEN,"Invalid net command\n");
 		}
 	}
-
+	
+	// Clear our cooy of the user options
+	delete CRenderer::userOptions;
+	CRenderer::userOptions = NULL;
+	
 	// Restore the memory to the checkpoint, effectively deallocating everything we allocated for the frame
 	memRestore(frameCheckpoint,globalMemory);
 
