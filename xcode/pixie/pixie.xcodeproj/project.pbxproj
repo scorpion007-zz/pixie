@@ -815,6 +815,15 @@
 		1833986A0B2D2CA60055E484 /* shadowspot.sl */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = shadowspot.sl; sourceTree = "<group>"; };
 		1833986B0B2D2CA60055E484 /* spotlight.sdr */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = spotlight.sdr; sourceTree = "<group>"; };
 		1833986C0B2D2CA60055E484 /* spotlight.sl */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = spotlight.sl; sourceTree = "<group>"; };
+		186156040B97EEFC007BE5EA /* sl.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = sl.l; path = ../../src/sdrc/sl.l; sourceTree = SOURCE_ROOT; };
+		186156050B97EEFC007BE5EA /* sl.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = sl.y; path = ../../src/sdrc/sl.y; sourceTree = SOURCE_ROOT; };
+		186156060B97EF3D007BE5EA /* dso.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = dso.l; path = ../../src/ri/dso.l; sourceTree = SOURCE_ROOT; };
+		186156070B97EF3D007BE5EA /* dso.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = dso.y; path = ../../src/ri/dso.y; sourceTree = SOURCE_ROOT; };
+		186156080B97EF6A007BE5EA /* rib.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = rib.l; path = ../../src/ri/rib.l; sourceTree = SOURCE_ROOT; };
+		186156090B97EF6A007BE5EA /* sdr.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = sdr.l; path = ../../src/ri/sdr.l; sourceTree = SOURCE_ROOT; };
+		1861560A0B97EF6A007BE5EA /* sdr.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = sdr.y; path = ../../src/ri/sdr.y; sourceTree = SOURCE_ROOT; };
+		1861560B0B97EF6A007BE5EA /* variable.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = variable.l; path = ../../src/ri/variable.l; sourceTree = SOURCE_ROOT; };
+		1861560C0B97EF6A007BE5EA /* variable.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = variable.y; path = ../../src/ri/variable.y; sourceTree = SOURCE_ROOT; };
 		1862D7590B2A8F5A00111435 /* debug.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = debug.cpp; path = ../../src/ri/debug.cpp; sourceTree = SOURCE_ROOT; };
 		1862D75A0B2A8F5A00111435 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = debug.h; path = ../../src/ri/debug.h; sourceTree = SOURCE_ROOT; };
 		1862D75F0B2A8F8100111435 /* gi.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = gi.cpp; path = ../../src/ri/gi.cpp; sourceTree = SOURCE_ROOT; };
@@ -1296,6 +1305,22 @@
 			path = ../../shaders;
 			sourceTree = SOURCE_ROOT;
 		};
+		186156030B97EED2007BE5EA /* parsers */ = {
+			isa = PBXGroup;
+			children = (
+				186156080B97EF6A007BE5EA /* rib.l */,
+				186156090B97EF6A007BE5EA /* sdr.l */,
+				1861560A0B97EF6A007BE5EA /* sdr.y */,
+				1861560B0B97EF6A007BE5EA /* variable.l */,
+				1861560C0B97EF6A007BE5EA /* variable.y */,
+				186156060B97EF3D007BE5EA /* dso.l */,
+				186156070B97EF3D007BE5EA /* dso.y */,
+				186156040B97EEFC007BE5EA /* sl.l */,
+				186156050B97EEFC007BE5EA /* sl.y */,
+			);
+			name = parsers;
+			sourceTree = "<group>";
+		};
 		1883834B0B2FB29C00166E3E /* man */ = {
 			isa = PBXGroup;
 			children = (
@@ -1658,6 +1683,7 @@
 		C96A6E180AD6D5C5003C2D7B = {
 			isa = PBXGroup;
 			children = (
+				186156030B97EED2007BE5EA /* parsers */,
 				188383DB0B2FB33F00166E3E /* toplevel */,
 				188383580B2FB2F700166E3E /* doc */,
 				1883834B0B2FB29C00166E3E /* man */,

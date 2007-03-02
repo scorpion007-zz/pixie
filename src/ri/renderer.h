@@ -187,7 +187,8 @@ public:
 		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
 		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_
 		static	TMutex							hierarchyMutex;				// To serialize lazy construction of bounding volume hierarchy
-
+		static	TMutex							stitchMutex;				// To serialize accesses to the stitching hash
+		
 		////////////////////////////////////////////////////////////////////
 		//
 		// Here's how the rendering loop works:

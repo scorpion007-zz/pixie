@@ -180,7 +180,12 @@ TMutex							CRenderer::deepShadowMutex;
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::hierarchyMutex;
 
-
+/////////////////////////////////////////////////////////////
+//	Used to serialize accesses to the stitching hash table
+//
+//	VERIFIED
+/////////////////////////////////////////////////////////////
+TMutex							CRenderer::stitchMutex;
 
 
 // TODO: Comment on
@@ -207,6 +212,7 @@ void							CRenderer::initMutexes() {
 	osCreateMutex(delayedMutex);
 	osCreateMutex(deepShadowMutex);
 	osCreateMutex(hierarchyMutex);
+	osCreateMutex(stitchMutex);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -228,5 +234,6 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);
 	osDeleteMutex(hierarchyMutex);
+	osDeleteMutex(stitchMutex);
 }
 

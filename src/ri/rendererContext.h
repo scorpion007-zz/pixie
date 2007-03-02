@@ -208,6 +208,12 @@ public:
 
 private:
 
+	
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CInstance
+	// Description			:	This class is allocated at objectBegin only to hold
+	//							a list of objects
+	// Comments				:
 	class	CInstance {
 	public:
 			CObject		*objects;

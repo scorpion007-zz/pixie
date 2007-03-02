@@ -93,9 +93,9 @@
 
 //////////////////////////////////////////////////////////////
 // Some static variables for the CReyes class
-int		CReyes::extraPrimitiveFlags;
-int		CReyes::numVertexSamples;
-
+int				CReyes::extraPrimitiveFlags;
+int				CReyes::numVertexSamples;
+CReyes::CSpan	*CReyes::stitchingHash[REYES_STITCHING_HASH_SIZE];	
 
 
 
@@ -192,9 +192,9 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 			osCreateMutex(grids[i].mutex);
 
 			// Allocate the cache grids with maximum grid size
-			grids[i].vertices		=	(float *) ralloc(CRenderer::maxGridSize*numVertexSamples*sizeof(float),CRenderer::globalMemory);
-			grids[i].bounds			=	(int *) ralloc(CRenderer::maxGridSize*4*sizeof(int),CRenderer::globalMemory);
-			grids[i].sizes			=	(float *) ralloc(CRenderer::maxGridSize*2*sizeof(float),CRenderer::globalMemory);
+			grids[i].vertices		=	(float *)	ralloc(CRenderer::maxGridSize*numVertexSamples*sizeof(float),CRenderer::globalMemory);
+			grids[i].bounds			=	(int *)		ralloc(CRenderer::maxGridSize*4*sizeof(int),CRenderer::globalMemory);
+			grids[i].sizes			=	(float *)	ralloc(CRenderer::maxGridSize*2*sizeof(float),CRenderer::globalMemory);
 
 			grids[i].next[0]		=	freeRasterGrids;
 			freeRasterGrids			=	grids + i;
@@ -202,6 +202,9 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	}
 #endif
 
+	// Clear the hash table
+	int	i;
+	for (i=0;i<REYES_STITCHING_HASH_SIZE;i++)	stitchingHash[i]	=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -65,9 +65,9 @@ class	CBrickMap : public CTexture3d {
 	// Comments				:	The data is implicitly stored after the voxel in memory
 	class CVoxel {
 	public:
+		CVoxel			*next;				// The next voxel in the list if incoherent
 		float			weight;				// The weight of the voxel
 		vector			N;					// The normal vector of the voxel
-		CVoxel			*next;				// The next voxel in the list if incoherent
 		// 5 * 4 bytes (ugly)
 	};
 
@@ -78,8 +78,8 @@ class	CBrickMap : public CTexture3d {
 	class CBrick {
 	public:
 		CVoxel			*voxels;			// The brick data
-		int				referenceNumber;	// The reference counter
 		CBrick			*next;				// Next brick in the list (not absolutely necessary)
+		int				referenceNumber;	// The reference counter
 		// 3 * 4 bytes (ugly)
 	};
 
@@ -90,9 +90,9 @@ class	CBrickMap : public CTexture3d {
 	class CBrickNode {
 	public:
 		CBrick			*brick;				// The brick (NULL if on disk)
+		CBrickNode		*next;				// The next brick in the hash bucket
 		short			x,y,z,d;			// The spatial index of the node
 		int				fileIndex;			// The location in the master file
-		CBrickNode		*next;				// The next brick in the hash bucket
 		// 5 * 4 bytes (ugly)
 	};
 

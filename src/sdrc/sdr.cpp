@@ -407,7 +407,7 @@ CFunction	*CFunction::getFunction(char *name,CArray<CExpression *> *args,int ret
 
 		if (cPar == NULL) {
 			if (!(returnType & SLC_NONE)) {
-				//if (cFun->returnValue == NULL) continue;
+				if (cFun->returnValue == NULL) continue;
 
 				if ((returnType & SLC_TYPE_MASK) & (cFun->returnValue->type & SLC_TYPE_MASK)) return cFun;
 

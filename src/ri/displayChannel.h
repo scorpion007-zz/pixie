@@ -48,10 +48,10 @@ public:
 	
 	char				name[64];		// Name of the channel
 	CVariable			*variable;		// The variable representing channel (may be NULL)
+	float				*fill;			// The sample defaults
 	int					numSamples;		// The size of channel sample
 	int					outType;		// The entry index of the variable
 	int					sampleStart;	// The offset in the shaded vertex array (-1 is unassigned)
-	float				*fill;			// The sample defaults
 };
 
 

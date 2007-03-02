@@ -40,19 +40,19 @@
 // Comments				:
 class	CDelayedData {
 public:
-					CDelayedData() {
-						generator	=	NULL;
-						helper		=	NULL;
-					}
+							CDelayedData() {
+								generator	=	NULL;
+								helper		=	NULL;
+							}
 
-					~CDelayedData() {
-						if (generator != NULL)	free(generator);
-						if (helper != NULL)		free(helper);
-					}
+							~CDelayedData() {
+								if (generator != NULL)	free(generator);
+								if (helper != NULL)		free(helper);
+							}
 
-	char			*generator;
-	char			*helper;
-	vector			bmin,bmax;
+	char					*generator;
+	char					*helper;
+	vector					bmin,bmax;
 };
 
 ///////////////////////////////////////////////////////////////////////
