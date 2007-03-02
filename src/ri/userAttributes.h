@@ -28,35 +28,61 @@
 //  Description			:	Holds user attributes dictionary
 //
 ////////////////////////////////////////////////////////////////////////
-
-#include "variable.h"
-
 #ifndef USER_ATTRIBUTES_H
 #define USER_ATTRIBUTES_H
 
+#include "variable.h"
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CUserAttributeDictionary
+// Description			:	The user options/attributes
+// Comments				:	We may want to call this class CUserVariables
 class CUserAttributeDictionary {	
 	CVariable *attribs;
 
 public:
+
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CUserAttributeDictionary
+	// Method				:	CUserAttributeDictionary
+	// Description			:	Ctor
+	// Return Value			:
+	// Comments				:
 	CUserAttributeDictionary() : attribs(NULL) { }
 	
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CUserAttributeDictionary
+	// Method				:	~CUserAttributeDictionary
+	// Description			:	Dtor
+	// Return Value			:
+	// Comments				:
 	~CUserAttributeDictionary() {
 		CVariable *cAttr = attribs;
+
 		while (cAttr != NULL)  {
 			CVariable *tAttr = cAttr->next;
+
 			if (cAttr->type == TYPE_STRING) {
 				char **tmp = (char**) cAttr->defaultValue;
+
 				for (int i=0;i<cAttr->numFloats;i++) free(tmp[i]);
+
 				delete[] (char**) cAttr->defaultValue; 
 			} else {
 				delete[] (float*) cAttr->defaultValue;
 			}
+
 			delete cAttr;
 			cAttr = tAttr;
 		}
 	}
 	
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CUserAttributeDictionary
+	// Method				:	=
+	// Description			:	Assignment operator
+	// Return Value			:
+	// Comments				:
 	CUserAttributeDictionary &operator=(const CUserAttributeDictionary &rhs) {
 		attribs = NULL;//FIXME
 		
@@ -66,10 +92,12 @@ public:
 		while (cAttr != NULL)  {
 			CVariable *tAttr = new CVariable;
 			*tAttr = *cAttr;
+
 			// allocate and copy default value
 			if (tAttr->type == TYPE_STRING) {
 				tAttr->defaultValue	= (float*) new char *[cAttr->numFloats];
 				char **src			= (char**) cAttr->defaultValue;
+
 				for (int i = 0; i < tAttr->numFloats;	i++) {
 					((char**) tAttr->defaultValue)[i] = strdup(src[i]);
 				}
@@ -77,6 +105,7 @@ public:
 				tAttr->defaultValue = new float[cAttr->numFloats];
 				memcpy(tAttr->defaultValue,cAttr->defaultValue,sizeof(float)*cAttr->numFloats);
 			}
+
 			// maintain list
 			if (nAttr == NULL) attribs = tAttr;
 			tAttr->next = NULL;
@@ -87,6 +116,12 @@ public:
 		return *this;
 	}
 	
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CUserAttributeDictionary
+	// Method				:	insert
+	// Description			:	Insert a variable
+	// Return Value			:
+	// Comments				:
 	void insert(CVariable *var,void *value) {
 		CVariable *cAttr	=	attribs;
 		CVariable *pAttr	=	NULL;
@@ -146,6 +181,12 @@ public:
 		}
 	}
 	
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CUserAttributeDictionary
+	// Method				:	lookup
+	// Description			:	Lookup a variable
+	// Return Value			:
+	// Comments				:
 	int lookup(const char *name, CVariable *&var) const {
 		CVariable *cAttr	=	attribs;
 		while (cAttr != NULL)  {
