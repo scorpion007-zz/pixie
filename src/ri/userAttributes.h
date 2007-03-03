@@ -87,7 +87,7 @@ public:
 		attribs = NULL;//FIXME
 		
 		CVariable *cAttr = rhs.attribs;
-		CVariable *nAttr = NULL;
+		CVariable *pAttr = NULL;
 		
 		while (cAttr != NULL)  {
 			CVariable *tAttr = new CVariable;
@@ -107,10 +107,12 @@ public:
 			}
 
 			// maintain list
-			if (nAttr == NULL) attribs = tAttr;
-			tAttr->next = NULL;
+			if (pAttr == NULL)	attribs		= tAttr;
+			else				pAttr->next	= tAttr;
+
+			// Advance
 			cAttr	=	cAttr->next;
-			nAttr	=	tAttr;
+			pAttr	=	tAttr;
 		}
 		
 		return *this;
@@ -127,7 +129,7 @@ public:
 		CVariable *pAttr	=	NULL;
 		
 		while (cAttr != NULL)  {
-			int cmp = strcmp(var->name,cAttr->name);
+			int cmp = strcmp(cAttr->name,var->name);
 			
 			if (cmp > 0)	break;	// past the place it would be
 			if (cmp == 0)	{		// exact match, remove this element
@@ -154,7 +156,7 @@ public:
 			cAttr = cAttr->next;
 		}
 		
-		// pAttr now points to the loation _before_ which to insert
+		// cAttr now points to the loation _before_ which to insert
 		CVariable *nAttr = new CVariable;
 		*nAttr = *var;
 		
@@ -190,7 +192,7 @@ public:
 	int lookup(const char *name, CVariable *&var) const {
 		CVariable *cAttr	=	attribs;
 		while (cAttr != NULL)  {
-			int cmp = strcmp(name,cAttr->name);
+			int cmp = strcmp(cAttr->name,name);
 			
 			if (cmp > 0)	return FALSE;	// past the place it would be
 			if (cmp == 0)	{				// exact match, return this element
