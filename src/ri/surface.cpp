@@ -310,14 +310,9 @@ void	CPatch::dice(CShadingContext *r) {
 			// Did we converge ?
 			if ((numUprobes == (udiv+1)) && (numVprobes == (vdiv+1))) {
 
-				// FIXME: We shouldn't have to evaluate the displacement again in CReyes,
-				// Because we already evaluated the grid at the desired resolution
-
-				// We're small enough, just dispatch the grid
-				r->drawGrid(object,udiv,vdiv,umin,umax,vmin,vmax);
-
-				// We will not be added as a separate object
-				return;
+				// FIXME: If the grid is close to the bucket we're rendering, we must dispatch now
+				
+				break;
 			}
 
 			// Go again
@@ -342,8 +337,8 @@ void	CPatch::dice(CShadingContext *r) {
 				splitToChildren(r,1);
 			}
 		} else {
-			// We must have dispatched the grid above ...
-			// There's nothing more to do
+			// We're small enough, just dispatch the grid
+			r->drawGrid(object,udiv,vdiv,umin,umax,vmin,vmax);
 		}
 	}
 }
