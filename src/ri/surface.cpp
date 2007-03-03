@@ -149,12 +149,10 @@ void	CPatch::dice(CShadingContext *r) {
 
 	// Have we checked size of this piece before ?
 	if ((udiv == -1) && (vdiv == -1)) {
+
 		// No, probe the surface and find the bounding box
-		vector		D;
-		float		Pmov[4*3];
+		float		*Pmov		=	(float *) alloca(CRenderer::maxGridSize*3*sizeof(float));
 		float		maxBound;
-		float		dx,dy;
-		float		*P;
 		int			up,vp;
 		int			k;
 		int			cullFlags	=	TRUE;
@@ -162,187 +160,173 @@ void	CPatch::dice(CShadingContext *r) {
 		// We need to split this patch, so no need to compute udiv / vdiv
 
 		// Get some misc variables for fast access
-		const int	disableCull		=	attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE;
-		const int	numUprobes		=	attributes->numUProbes;
-		const int	numVprobes		=	attributes->numVProbes;
-		float		**varying		=	r->currentShadingState->varying;
+		const int		disableCull		=	attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE;
+		int				numUprobes		=	attributes->numUProbes;
+		int				numVprobes		=	attributes->numVProbes;
+		float			**varying		=	r->currentShadingState->varying;
+		int				numTries;
 
-		// Sample points on the patch
-		const double	ustart		=	umin;
-		const double	vstart		=	vmin;
-		const double	ustep		=	(umax - ustart) / (double) (numUprobes-1);
-		const double	vstep		=	(vmax - vstart) / (double) (numVprobes-1);
-		double			u,v;
+		// Estimate the grid size until convergence
+		for(numTries=0;numTries<5;numTries++) {
 
-		// If the parametric range is too small, we have to abort
-		if (ustep < C_EPSILON)	return;
-		if (vstep < C_EPSILON)	return;
+			// Sample points on the patch
+			const double	ustart			=	umin;
+			const double	vstart			=	vmin;
+			const double	ustep			=	(umax - ustart) / (double) (numUprobes-1);
+			const double	vstep			=	(vmax - vstart) / (double) (numVprobes-1);
+			double			u,v;
 
-		// The current u/v/time vectors
-		float			*uv			=	varying[VARIABLE_U];
-		float			*vv			=	varying[VARIABLE_V];
-		float			*timev		=	varying[VARIABLE_TIME];
+			// If the parametric range is too small, we have to abort
+			if (ustep < C_EPSILON)	return;
+			if (vstep < C_EPSILON)	return;
 
-		// Init the bounding box to zero
-		initv(bmin,C_INFINITY);
-		initv(bmax,-C_INFINITY);
+			// The current u/v/time vectors
+			float			*uv				=	varying[VARIABLE_U];
+			float			*vv				=	varying[VARIABLE_V];
+			float			*timev			=	varying[VARIABLE_TIME];
 
-		// Take care of the motion first
-		if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+			// Init the bounding box to zero
+			initv(bmin,C_INFINITY);
+			initv(bmax,-C_INFINITY);
+
+			// Take care of the motion first
+			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+
+				// Compute the sample positions and corresponding normal vectors
+				for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
+					for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
+						uv[k]		=	(float) u;
+						vv[k]		=	(float) v;
+						timev[k]	=	1;
+					}
+				}
+				
+				assert(k <= (int) CRenderer::maxGridSize);
+				r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
+				cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
+
+				// Save the end positions
+				assert(numUprobes*numVprobes <= CRenderer::maxGridSize);
+				memcpy(Pmov,varying[VARIABLE_P],numUprobes*numVprobes*3*sizeof(float));
+			}
 
 			// Compute the sample positions and corresponding normal vectors
 			for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
 				for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
 					uv[k]		=	(float) u;
 					vv[k]		=	(float) v;
-					timev[k]	=	1;
+					timev[k]	=	0;
 				}
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
+			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
-			
-			movvv(Pmov,varying[VARIABLE_P]);
-			movvv(Pmov+3,varying[VARIABLE_P]+(numUprobes-1)*3);
-			movvv(Pmov+6,varying[VARIABLE_P]+(numVprobes*numUprobes-1)*3);
-			movvv(Pmov+9,varying[VARIABLE_P]+((numVprobes-1)*numUprobes)*3);
-		}
 
-		// Compute the sample positions and corresponding normal vectors
-		for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
-			for (up=0,u=ustart;up<numUprobes;up++,u+=ustep,k++) {
-				uv[k]		=	(float) u;
-				vv[k]		=	(float) v;
-				timev[k]	=	0;
-			}
-		}
-		
-		assert(k <= (int) CRenderer::maxGridSize);
-		r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-		cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
+			// Are we culled ?
+			if (cullFlags)	return;
 
-		// Are we culled
-		if (cullFlags)	return;
+			// Expand the bound
+			maxBound		=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
+			maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
+			maxBound		*=	attributes->rasterExpand;
+			if (maxBound == 0)	return;
 
-		// Expand the bound
-		maxBound		=	max(bmax[COMP_X]-bmin[COMP_X],bmax[COMP_Y]-bmin[COMP_Y]);
-		maxBound		=	max(bmax[COMP_Z]-bmin[COMP_Z],maxBound);
-		maxBound		*=	attributes->rasterExpand;
-		if (maxBound == 0)	return;
+			bmin[COMP_X]	-=	maxBound;
+			bmin[COMP_Y]	-=	maxBound;
+			bmin[COMP_Z]	-=	maxBound;
+			bmax[COMP_X]	+=	maxBound;
+			bmax[COMP_Y]	+=	maxBound;
+			bmax[COMP_Z]	+=	maxBound;
 
-		bmin[COMP_X]	-=	maxBound;
-		bmin[COMP_Y]	-=	maxBound;
-		bmin[COMP_Z]	-=	maxBound;
-		bmax[COMP_X]	+=	maxBound;
-		bmax[COMP_Y]	+=	maxBound;
-		bmax[COMP_Z]	+=	maxBound;
+			// Account for the displacement on the surface
+			subvf(bmin,attributes->maxDisplacement);
+			addvf(bmax,attributes->maxDisplacement);
 
-		// Account for the displacement on the surface
-		subvf(bmin,attributes->maxDisplacement);
-		addvf(bmax,attributes->maxDisplacement);
+			// Frustrum culling
+			if (CRenderer::inFrustrum(bmin,bmax) == FALSE)	return;
 
-		// Frustrum culling
-		if (CRenderer::inFrustrum(bmin,bmax) == FALSE)	return;
+			// Can we make the perspective divide ?
+			if ((bmin[COMP_Z] > C_EPSILON) && (depth >= minDepth)) {
 
-		// Can we make the perspective divide ?
-		if ((bmin[COMP_Z] > C_EPSILON) && (depth >= minDepth)) {
-			// Figure out the subdivision we want to make
-			int		i1		=	0;								// Index of the top left
-			int		i2		=	numUprobes-1;					// Index of the top right
-			int		i3		=	numVprobes*numUprobes-1;		// Index of the bottom right
-			int		i4		=	(numVprobes-1)*numUprobes;		// Index of the bottom left
-			float	uLength[2],vLength[2];
-			float	umLength,vmLength;
-			float	shadingRate	=	attributes->shadingRate;
+				// Project the vertices
+				float *P			=	varying[VARIABLE_P];
+				camera2pixels(numUprobes*numVprobes,P);
+				
+				// Figure out the subdivision we want to make
+				float	shadingRate	=	attributes->shadingRate;
 
-			// Project all the shaded vertices
-			i1				*=	3;
-			i2				*=	3;
-			i3				*=	3;
-			i4				*=	3;
-			P				=	varying[VARIABLE_P];
-			camera2pixels(numUprobes*numVprobes,P);
-			
-			// Correct shading rate with dof factor
-			if (CRenderer::flags & OPTIONS_FLAGS_FOCALBLUR) {
-				const float coc = minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
-				shadingRate *= max(1,0.5f*coc);
-			}
-			
-			// Optionally correct shading rate with motionfactor
-			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+				// Correct shading rate with dof factor
+				if (CRenderer::flags & OPTIONS_FLAGS_FOCALBLUR) {
+					const float coc =	minCocPixels(bmin[COMP_Z],bmax[COMP_Z]);
+					shadingRate		*=	max(1,0.5f*coc);
+				}
+				
+				// Optionally correct shading rate with motionfactor
+				if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 
-				camera2pixels(4,(float*)Pmov);
+					// Project the vertices
+					camera2pixels(numUprobes*numVprobes,Pmov);
 
-				subvv(Pmov,P + i1);		Pmov[2] = 0;
-				subvv(Pmov+3,P + i2);	Pmov[5] = 0;
-				subvv(Pmov+6,P + i3);	Pmov[8] = 0;
-				subvv(Pmov+9,P + i4);	Pmov[11] = 0;
+					// Compute the amount of motion on the screen
+					float	blurDistance	=	0;
+					for (int i=0;i<numUprobes*numVprobes;i++) {
+						vector	D;
+						subvv(D,Pmov + i*3,P + i*3);
+						blurDistance		+=	sqrtf(D[0]*D[0] + D[1]*D[1]);
+					}
 
-				const float blurDistance = 0.25f*(sqrtf(dotvv(Pmov,Pmov)) + sqrtf(dotvv(Pmov+3,Pmov+3)) + sqrtf(dotvv(Pmov+6,Pmov+6)) + sqrtf(dotvv(Pmov+9,Pmov+9)));
+					// Update the shading rate accordingly
+					shadingRate += attributes->motionFactor*shadingRate*blurDistance / (float) (numUprobes*numVprobes);
+				}
+				
+				// Estimate the grid size
+				estimateDicing(P,numUprobes-1,numVprobes-1,udiv,vdiv,shadingRate);
 
-				shadingRate += attributes->motionFactor*shadingRate*blurDistance;
-			}
-			
-			if (attributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE) {
-				subvv(D,P+i1,P+i2);	uLength[0] = lengthv(D);			// Length of the top
-				subvv(D,P+i3,P+i4);	uLength[1] = lengthv(D);			// Length of the bottom
-				subvv(D,P+i1,P+i4);	vLength[0] = lengthv(D);			// Length of the left
-				subvv(D,P+i2,P+i3);	vLength[1] = lengthv(D);			// Length of the right
 			} else {
-				dx				=	P[i1+0] - P[i2+0];					// Length of the top
-				dy				=	P[i1+1] - P[i2+1];
-				uLength[0]		=	sqrtf(dx*dx + dy*dy);
-				dx				=	P[i3+0] - P[i4+0];					// Length of the bottom
-				dy				=	P[i3+1] - P[i4+1];
-				uLength[1]		=	sqrtf(dx*dx + dy*dy);
-				dx				=	P[i1+0] - P[i4+0];					// Length of the left
-				dy				=	P[i1+1] - P[i4+1];
-				vLength[0]		=	sqrtf(dx*dx + dy*dy);
-				dx				=	P[i2+0] - P[i3+0];					// Length of the right
-				dy				=	P[i2+1] - P[i3+1];
-				vLength[1]		=	sqrtf(dx*dx + dy*dy);
+
+				// Are we making too many splits ?
+				if (depth >= CRenderer::maxEyeSplits) {
+					warning(CODE_SYSTEM,"Too many eye splits for primitive \"%s\"\n",attributes->name);
+					return;
+				}
+
+				// We can not make the perspective divide, so make sure we split into 4 next time
+				udiv	=	0;
+				break;
 			}
 
-			umLength		=	(uLength[0]+uLength[1]) *0.5f;// The length of the u and v extremal edges
-			vmLength		=	(vLength[0]+vLength[1]) *0.5f;
+			// Check the size ... If we're too big, we should be split
+			if ((udiv+1)*(vdiv+1) > CRenderer::maxGridSize)	{
 
-			umLength		=	min(umLength,1000);						// FIXME: This is really ugly
-			vmLength		=	min(vmLength,1000);
+				if (depth > 10) {
+					float	ar	=	vdiv / (float) udiv;
+				}
 
-			// Do some regularization on the shading rate
-			if (umLength > vmLength) {
-				vmLength	=	(float) max(umLength * 0.5,vmLength);
-			} else {
-				umLength	=	(float) max(vmLength * 0.5,umLength);
+				break;
 			}
 
-			if (attributes->flags & ATTRIBUTES_FLAGS_BINARY_DICE) {
-				const double	log2		=	log(2.0);
-				const float		udivf		=	max(1,(float) (C_EPSILON + umLength / shadingRate));
-				const float		vdivf		=	max(1,(float) (C_EPSILON + vmLength / shadingRate));
+			// Did we converge ?
+			if ((numUprobes == (udiv+1)) && (numVprobes == (vdiv+1))) {
 
-				udiv	=	1 << (unsigned int) (ceil(log(udivf) / log2));
-				vdiv	=	1 << (unsigned int) (ceil(log(vdivf) / log2));
-			} else {
-				udiv	=	(unsigned int) (ceil(C_EPSILON + umLength / shadingRate));
-				vdiv	=	(unsigned int) (ceil(C_EPSILON + vmLength / shadingRate));
-			}
+				// FIXME: We shouldn't have to evaluate the displacement again in CReyes,
+				// Because we already evaluated the grid at the desired resolution
 
-		} else {
-			// Are we making too many splits ?
-			if (depth >= CRenderer::maxEyeSplits) {
-				warning(CODE_SYSTEM,"Too many eye splits for primitive \"%s\"\n",attributes->name);
+				// We're small enough, just dispatch the grid
+				r->drawGrid(object,udiv,vdiv,umin,umax,vmin,vmax);
+
+				// We will not be added as a separate object
 				return;
 			}
 
-			// We can not make the perspective divide, so make sure we split into 4 next time
-			udiv	=	0;
+			// Go again
+			numUprobes	=	udiv+1;
+			numVprobes	=	vdiv+1;
 		}
 
 		// Finally record the surface with the rasterizer
 		r->drawObject(this);
+
 	} else {
 		if (udiv == 0) {
 			// We're spanning the eye plane
@@ -357,7 +341,8 @@ void	CPatch::dice(CShadingContext *r) {
 				splitToChildren(r,1);
 			}
 		} else {
-			r->drawGrid(object,udiv,vdiv,umin,umax,vmin,vmax);
+			// We must have dispatched the grid above ...
+			// There's nothing more to do
 		}
 	}
 }

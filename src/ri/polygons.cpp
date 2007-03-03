@@ -1101,7 +1101,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 
 			switch(cParameter->container) {
 			case CONTAINER_UNIFORM:
-				if (cVariable->type == TYPE_STRING) {
+				if (cVariable->type != TYPE_STRING) {
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						src	=	data + this->uniform*numFloats;
 						for (j=numFloats;j>0;j--) {

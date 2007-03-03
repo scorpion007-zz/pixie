@@ -84,9 +84,6 @@
 //#define	REYES_OBJECT_CACHE_SIZE			10
 //#define REYES_GRID_CACHE_SIZE			10
 
-// The size of the hash we use for stitching (must be a power of two)
-#define	REYES_STITCHING_HASH_SIZE	512
-
 // Include the global config file
 #include "../../config.h"
 

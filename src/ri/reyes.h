@@ -204,18 +204,6 @@ protected:
 			CPqueue				*queue;					// If this is not null, we're currently rendering this bucket
 	};
 
-	///////////////////////////////////////////////////////////////////////
-	// Class				:	CSpan
-	// Description			:	Holds a span in a parametric range
-	// Comments				:
-	class	CSpan {
-	public:
-			CSurface			*surface;				// The surface causing the span
-			CRasterGrid			*grid;					// The grid that originated the span
-			CSpan				*next;					// The next span in the list
-			int					uv;						// 0 = u, 1 = v
-			float				min,max;				// The range
-	};
 
 public:
 
@@ -276,8 +264,6 @@ private:
 	int							tbucketTop;										// Right of the current bucket in samples
 	int							tbucketRight;
 	int							tbucketBottom;
-
-	static	CSpan				*stitchingHash[REYES_STITCHING_HASH_SIZE];		// The hash table for accessing the spans
 	
 #ifdef REYES_OBJECT_CACHE_SIZE
 	CRasterObject				*freeRasterObjects;								// List of free objects

@@ -96,7 +96,11 @@ public:
 	CObject					*children,*sibling;			// The hierarchy
 	vector					bmin,bmax;					// The bounding box
 protected:
+	// This function must be used to expand the bound to take the displacements into account
 	void					makeBound(float *,float *) const;
+
+	// This function can be used to estimate the grid size
+	void					estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
 };
 
 
@@ -120,8 +124,8 @@ public:
 // Comments				:
 class	CSurface : public CObject {
 public:
-							CSurface(CAttributes *a,CXform *x) : CObject(a,x) { }
-							~CSurface() { }
+							CSurface(CAttributes *a,CXform *x) : CObject(a,x)	{ }
+							~CSurface()											{ }
 
 							// CObject interface
 	virtual	void			intersect(CShadingContext *,CRay *);						// Intersect a ray with the surface
@@ -134,11 +138,6 @@ public:
 	virtual	void			shade(CShadingContext *,int,CRay **);						// Shade the object
 
 protected:
-
-
-			// The following two functions can be used to estimate the shading rate and the dicing amount
-			float			estimateShadingRate(const float *P0,const float *P1);
-			void			estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate);
 };
 
 #endif

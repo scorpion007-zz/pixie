@@ -349,6 +349,93 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 	addvf(bmax,maxD);
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class			   :   CObject
+// Method			   :   estimateDicing
+// Description		   :   Estimate the dicing size on the screen
+// Return Value		   :
+// Comments			   :   P must be in pixels
+void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate) {
+   float	   uAvg,vAvg;  // The average edge length
+   float	   uMin,vMin;  // The minimum edge length
+   float	   uMax,vMax;  // The maximum edge length
+   int		   i,j;
+   const float *cP,*nP,*tP;
+   float	   l;
+   float	   dx,dy;
+
+   uAvg	   =   vAvg	   =   0;
+   uMax	   =   vMax	   =   0;
+   uMin	   =   vMin	   =   C_INFINITY;
+
+   // U stats
+   cP  =   P;
+   for (j=(vdiv+1);j>0;j--) {
+
+	   float	total	=	0;
+	   for (i=udiv;i>0;i--,cP+=3) {
+		   dx		=   cP[3 + COMP_X] - cP[COMP_X];
+		   dy		=   cP[3 + COMP_Y] - cP[COMP_Y];
+		   l		=   sqrtf(dx*dx + dy*dy);
+		   uAvg		+=	l;
+		   total	+=	l;
+		   if (l < uMin)   uMin	   =   l;
+		   if (l > uMax)   uMax	   =   l;
+	   }
+	   cP  +=  3;
+	   uMax	=	max(uMax,total);
+	   uMin	=	min(uMin,total);
+   }
+
+   // V stats
+   cP  =   P;
+   for (i=(udiv+1);i>0;i--,cP+=3) {
+	   nP  =   cP;
+	   tP  =   nP  +   (udiv+1)*3;
+	   float	total	=	0;
+	   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+		   dx		=   tP[COMP_X] - nP[COMP_X];
+		   dy		=   tP[COMP_Y] - nP[COMP_Y];
+		   l		=   sqrtf(dx*dx + dy*dy);
+		   vAvg		+=  l; 
+		   total	+=	l;
+		   if (l < vMin)   vMin	   =   l;
+		   if (l > vMax)   vMax	   =   l;
+	   }
+
+	   vMax	=	max(vMax,total);
+	   vMin	=	min(vMin,total);
+   }
+
+   float	udivf,vdivf;
+
+   if (FALSE) {
+	   // Compute the new grid size based on the average size
+	   udivf   =  (uAvg / (shadingRate*(vdiv+1)));
+	   vdivf   =  (vAvg / (shadingRate*(udiv+1)));
+   } else {
+	   // Compute the new grid size based on the maximum size
+	   udivf   =  uMax / shadingRate;
+	   vdivf   =  vMax / shadingRate;
+   }
+   
+   // Clamp the division amount
+   udivf	=   max(1,udivf);
+   vdivf	=   max(1,vdivf);
+   udivf	=	min(10000,udivf);
+   vdivf	=	min(10000,vdivf);
+
+   // Estimate the dicing amount
+   if (attributes->flags & ATTRIBUTES_FLAGS_BINARY_DICE) {
+		const double	log2		=	log(2.0);
+
+		nudiv	=	1 << (unsigned int) (ceil(log(udivf) / log2));
+		nvdiv	=	1 << (unsigned int) (ceil(log(vdivf) / log2));
+	} else {
+		nudiv   =   (int) udivf;
+		nvdiv   =   (int) vdivf;
+	}
+}
 
 
 
@@ -524,72 +611,5 @@ void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {
 	context->shade(this,numRays,1,SHADING_2D,0);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class			   :   CSurface
-// Method			   :   estimateShadingRate
-// Description		   :   Estimate the shading rate
-// Return Value			   :
-// Comments				   :   P must be in pixels
-float			   CSurface::estimateShadingRate(const float *P0,const float *P1) {
-   return attributes->shadingRate;
-}
 
-
-///////////////////////////////////////////////////////////////////////
-// Class			   :   CSurface
-// Method			   :   estimateDicing
-// Description		   :   Estimate the dicing size on the screen
-// Return Value			   :
-// Comments				   :   P must be in pixels
-void			   CSurface::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float motionFactor) {
-   float	   uAvg,vAvg;  // The average edge length
-   float	   uMin,vMin;  // The minimum edge length
-   float	   uMax,vMax;  // The maximum edge length
-   int		   numU,numV;
-   int		   i,j;
-   const float *cP,*nP,*tP;
-   float	   l;
-   float	   dx,dy;
-
-   uAvg	   =   vAvg	   =   0;
-   uMax	   =   vMax	   =   0;
-   uMin	   =   vMin	   =   C_INFINITY;
-   numU	   =   numV	   =   0;
-
-   // U stats
-   cP  =   P;
-   for (j=(vdiv+1);j>0;j--) {
-	   for (i=udiv;i>0;i--,cP+=3) {
-		   dx	   =   cP[3 + COMP_X] - cP[COMP_X];
-		   dy	   =   cP[3 + COMP_Y] - cP[COMP_Y];
-		   l	   =   sqrtf(dx*dx + dy*dy);
-		   uAvg	+=	l;	numU++;
-		   if (l < uMin)   uMin	   =   l;
-		   if (l > uMax)   uMax	   =   l;
-	   }
-	   cP  +=  3;
-   }
-
-   // V stats
-   cP  =   P;
-   for (i=(udiv+1);i>0;i--,cP+=3) {
-	   nP  =   cP;
-	   tP  =   nP  +   (udiv+1)*3;
-	   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
-		   dx	   =   tP[COMP_X] - nP[COMP_X];
-		   dy	   =   tP[COMP_Y] - nP[COMP_Y];
-		   l	   =   sqrtf(dx*dx + dy*dy);
-		   vAvg	   +=  l;  numV++;
-		   if (l < vMin)   vMin	   =   l;
-		   if (l > vMax)   vMax	   =   l;
-	   }
-   }
-
-   // Compute the new grid size
-   nudiv   =   (int) (uAvg*udiv / (attributes->shadingRate*numU));
-   nvdiv   =   (int) (vAvg*vdiv / (attributes->shadingRate*numV));
-   
-   nudiv   =   max(1,nudiv);
-   nvdiv   =   max(1,nvdiv);
-}
 

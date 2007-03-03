@@ -160,7 +160,7 @@ DEFFUNC(Atan		,"atan"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),N
 DEFFUNC(Exp			,"exp"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	FUNCTION(x)	log(max(x,0))
+#define	FUNCTION(x)	log(max(x,C_EPSILON))
 DEFFUNC(Log			,"log"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
@@ -168,7 +168,7 @@ DEFFUNC(Log			,"log"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NU
 DEFFUNC(Sqrt		,"sqrt"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
-#define	FUNCTION(x)	isqrtf(x)
+#define	FUNCTION(x)	isqrtf(max(x,0))
 DEFFUNC(InvSqrt		,"inversesqrt"	,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1),NULL_EXPR,0)
 #undef	FUNCTION
 
@@ -601,23 +601,27 @@ DEFFUNC(Maxv					,"max"						,"v=v+"		,MAXVEXPR_PRE,MAXVEXPR,MAXVEXPR_UPDATE,MAX
 
 
 
-#define	CONCATEXPR_PRE		char		tmp[MAX_SCRIPT_STRING_SIZE];				\
-							char		**res;										\
-							const char	**op1,**op2;								\
-							operand(0,res,char **);									\
-							operand(1,op1,const char **);							\
-							operand(2,op2,const char **);
+#define	CONCATEXPR_PRE		char		tmp[MAX_SCRIPT_STRING_SIZE];									\
+							char		**res;															\
+							const char	***op;															\
+							int			i,numArguments;													\
+							argumentcount(numArguments);												\
+							numArguments--;																\
+							operand(0,res,char **);														\
+							op	=	(const char ***) ralloc(numArguments*sizeof(char **),threadMemory);	\
+							for (i=0;i<numArguments;i++) {												\
+								operand(i+1,op[i],const char **);										\
+							}
 
-#define CONCATEXPR			strcpy(tmp,*op1);										\
-							strcat(tmp,*op2);										\
+#define CONCATEXPR			strcpy(tmp,*op[0]);															\
+							for (i=1;i<numArguments;i++)	strcat(tmp,*op[i]);							\
 							savestring(*res,tmp);
 
-#define	CONCATEXPR_UPDATE	res++;													\
-							op1++;													\
-							op2++;
+#define	CONCATEXPR_UPDATE	res++;																		\
+							for (i=0;i<numArguments;i++)	op[i]++;
 
 
-DEFFUNC(Concat					,"concat"						,"s=ss"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR_UPDATE,NULL_EXPR,0)
+DEFFUNC(Concat					,"concat"						,"s=ss*"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR_UPDATE,NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // match	"f=ss"

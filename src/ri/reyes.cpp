@@ -95,9 +95,6 @@
 // Some static variables for the CReyes class
 int				CReyes::extraPrimitiveFlags;
 int				CReyes::numVertexSamples;
-CReyes::CSpan	*CReyes::stitchingHash[REYES_STITCHING_HASH_SIZE];	
-
-
 
 
 
@@ -202,9 +199,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	}
 #endif
 
-	// Clear the hash table
-	int	i;
-	for (i=0;i<REYES_STITCHING_HASH_SIZE;i++)	stitchingHash[i]	=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1746,4 +1740,3 @@ void	CReyes::insertObject(CRasterObject *object) {
 		osUnlock(object->mutex);
 	}
 }
-

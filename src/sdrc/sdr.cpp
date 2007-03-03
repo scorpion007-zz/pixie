@@ -981,7 +981,7 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("textureinfo","f=SSM",0);
 	addBuiltInFunction("shadername","s=",0);
 	addBuiltInFunction("shadername","s=S",0);
-	addBuiltInFunction("concat","s=ss",0);
+	addBuiltInFunction("concat","s=ss*",0);
 	addBuiltInFunction("match","f=ss",0);
 	addBuiltInFunction("printf","o=s.*",0);
 	addBuiltInFunction("format","s=s.*",0);
