@@ -355,7 +355,7 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Description		   :   Estimate the dicing size on the screen
 // Return Value		   :
 // Comments			   :   P must be in pixels
-void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate) {
+void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient) {
    float	   uAvg,vAvg;  // The average edge length
    float	   uMin,vMin;  // The minimum edge length
    float	   uMax,vMax;  // The maximum edge length
@@ -368,45 +368,85 @@ void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,in
    uMax	   =   vMax	   =   0;
    uMin	   =   vMin	   =   C_INFINITY;
 
-   // U stats
-   cP  =   P;
-   for (j=(vdiv+1);j>0;j--) {
-
-	   float	total	=	0;
-	   for (i=udiv;i>0;i--,cP+=3) {
-		   dx		=   cP[3 + COMP_X] - cP[COMP_X];
-		   dy		=   cP[3 + COMP_Y] - cP[COMP_Y];
-		   l		=   sqrtf(dx*dx + dy*dy);
-		   uAvg		+=	l;
-		   total	+=	l;
-		   if (l < uMin)   uMin	   =   l;
-		   if (l > uMax)   uMax	   =   l;
+   if (!nonrasterorient) {
+	   // U stats
+	   cP  =   P;
+	   for (j=(vdiv+1);j>0;j--) {
+	
+		   float	total	=	0;
+		   for (i=udiv;i>0;i--,cP+=3) {
+			   dx		=   cP[3 + COMP_X] - cP[COMP_X];
+			   dy		=   cP[3 + COMP_Y] - cP[COMP_Y];
+			   l		=   sqrtf(dx*dx + dy*dy);
+			   uAvg		+=	l;
+			   total	+=	l;
+			   if (l < uMin)   uMin	   =   l;
+			   if (l > uMax)   uMax	   =   l;
+		   }
+		   cP  +=  3;
+		   uMax	=	max(uMax,total);
+		   uMin	=	min(uMin,total);
 	   }
-	   cP  +=  3;
-	   uMax	=	max(uMax,total);
-	   uMin	=	min(uMin,total);
-   }
-
-   // V stats
-   cP  =   P;
-   for (i=(udiv+1);i>0;i--,cP+=3) {
-	   nP  =   cP;
-	   tP  =   nP  +   (udiv+1)*3;
-	   float	total	=	0;
-	   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
-		   dx		=   tP[COMP_X] - nP[COMP_X];
-		   dy		=   tP[COMP_Y] - nP[COMP_Y];
-		   l		=   sqrtf(dx*dx + dy*dy);
-		   vAvg		+=  l; 
-		   total	+=	l;
-		   if (l < vMin)   vMin	   =   l;
-		   if (l > vMax)   vMax	   =   l;
+	
+	   // V stats
+	   cP  =   P;
+	   for (i=(udiv+1);i>0;i--,cP+=3) {
+		   nP  =   cP;
+		   tP  =   nP  +   (udiv+1)*3;
+		   float	total	=	0;
+		   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+			   dx		=   tP[COMP_X] - nP[COMP_X];
+			   dy		=   tP[COMP_Y] - nP[COMP_Y];
+			   l		=   sqrtf(dx*dx + dy*dy);
+			   vAvg		+=  l; 
+			   total	+=	l;
+			   if (l < vMin)   vMin	   =   l;
+			   if (l > vMax)   vMax	   =   l;
+		   }
+	
+		   vMax	=	max(vMax,total);
+		   vMin	=	min(vMin,total);
 	   }
-
-	   vMax	=	max(vMax,total);
-	   vMin	=	min(vMin,total);
-   }
-
+	} else {	// non raster oriented
+	   vector tmp;
+	   
+	   // U stats
+	   cP  =   P;
+	   for (j=(vdiv+1);j>0;j--) {
+	
+		   float	total	=	0;
+		   for (i=udiv;i>0;i--,cP+=3) {
+			   subvv(tmp,cP+3,cP);
+			   l		=   lengthv(tmp);
+			   uAvg		+=	l;
+			   total	+=	l;
+			   if (l < uMin)   uMin	   =   l;
+			   if (l > uMax)   uMax	   =   l;
+		   }
+		   cP  +=  3;
+		   uMax	=	max(uMax,total);
+		   uMin	=	min(uMin,total);
+	   }
+	
+	   // V stats
+	   cP  =   P;
+	   for (i=(udiv+1);i>0;i--,cP+=3) {
+		   nP  =   cP;
+		   tP  =   nP  +   (udiv+1)*3;
+		   float	total	=	0;
+		   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+			   subvv(tmp,tP,nP);
+			   l		=   lengthv(tmp);
+			   vAvg		+=  l; 
+			   total	+=	l;
+			   if (l < vMin)   vMin	   =   l;
+			   if (l > vMax)   vMax	   =   l;
+		   }
+	
+		   vMax	=	max(vMax,total);
+		   vMin	=	min(vMin,total);
+	   }
+	}
    float	udivf,vdivf;
 
    if (FALSE) {

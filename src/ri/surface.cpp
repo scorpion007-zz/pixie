@@ -161,6 +161,7 @@ void	CPatch::dice(CShadingContext *r) {
 
 		// Get some misc variables for fast access
 		const int		disableCull		=	attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE;
+		const int		nonrasterorient	=	attributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE;
 		int				numUprobes		=	attributes->numUProbes;
 		int				numVprobes		=	attributes->numVProbes;
 		float			**varying		=	r->currentShadingState->varying;
@@ -251,7 +252,9 @@ void	CPatch::dice(CShadingContext *r) {
 
 				// Project the vertices
 				float *P			=	varying[VARIABLE_P];
-				camera2pixels(numUprobes*numVprobes,P);
+				if (!nonrasterorient) {
+					camera2pixels(numUprobes*numVprobes,P);
+				}
 				
 				// Figure out the subdivision we want to make
 				float	shadingRate	=	attributes->shadingRate;
@@ -281,7 +284,7 @@ void	CPatch::dice(CShadingContext *r) {
 				}
 				
 				// Estimate the grid size
-				estimateDicing(P,numUprobes-1,numVprobes-1,udiv,vdiv,shadingRate);
+				estimateDicing(P,numUprobes-1,numVprobes-1,udiv,vdiv,shadingRate,nonrasterorient);
 
 			} else {
 

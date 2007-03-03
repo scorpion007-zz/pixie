@@ -274,7 +274,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 
 		// Estimate the dicing amount
 		int		udiv,vdiv;
-		estimateDicing(P,1,2,udiv,vdiv,attributes->shadingRate);
+		estimateDicing(P,1,2,udiv,vdiv,attributes->shadingRate,attributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE);
 
 		// Make sure we don't split along u
 		if (vdiv == 1)	udiv	=	min(udiv,(CRenderer::maxGridSize >> 1) - 1);
