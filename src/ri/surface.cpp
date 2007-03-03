@@ -252,9 +252,7 @@ void	CPatch::dice(CShadingContext *r) {
 
 				// Project the vertices
 				float *P			=	varying[VARIABLE_P];
-				if (!nonrasterorient) {
-					camera2pixels(numUprobes*numVprobes,P);
-				}
+				camera2pixels(numUprobes*numVprobes,P);
 				
 				// Figure out the subdivision we want to make
 				float	shadingRate	=	attributes->shadingRate;
