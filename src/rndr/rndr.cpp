@@ -120,33 +120,23 @@ void	exitFunction() {
 void	printUsage() {
 	fprintf(stdout,"PIXIE v%d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 
-	fprintf(stdout,"Command-line options:\n");
-	fprintf(stdout,"  -f <range>: Render only a subsequence of frames\n");
-	fprintf(stdout,"               -f 43     = Render only 43'rd frame\n");
-	fprintf(stdout,"               -f 5:15   = Render frames 5 thru 15\n");
-	fprintf(stdout,"               -f 5:2:15 = Render frames 5 thru 15 skipping every other one\n");
-	fprintf(stdout,"  -q        : Quiet mode (errors/warning ignored)\n");
-	fprintf(stdout,"  -d        : Ignore the display drivers and use framebuffer\n");
-	fprintf(stdout,"  -t        : Print renderer statistics after every frame\n");
-	fprintf(stdout,"  -p        : Display the progress\n\n");
-
-
-	fprintf(stdout,"To render a RIB file:\n");
-	fprintf(stdout,"       rndr <rib_file>\n\n");
-
-	fprintf(stdout,"To start a multiprocessor render:\n");
-	fprintf(stdout,"       rndr -P:<n> <rib_file>\n");
-
-	fprintf(stdout,"To start a net rendering deamon:\n");
-	fprintf(stdout,"       rndr -r <port>\n");
-	fprintf(stdout,"       *** WARNING: The deamon will restart itself after each frame\n\n");
-
-	fprintf(stdout,"To kill a net rendering deamon:\n");
-	fprintf(stdout,"       rndr -k <port>\n\n");
-
-	fprintf(stdout,"To render a RIB file on network:\n");
-	fprintf(stdout,"       rndr <rib_file> -s <server1:port1,server2:port2...>\n\n");
-
+	fprintf(stdout,"\nrndr rib_file <options>\n\n");
+	fprintf(stdout,"Comman line options:\n");
+	fprintf(stdout,"  -f <range>   : Render only a subsequence of frames\n");
+	fprintf(stdout,"                  -f 43     = Render only 43'rd frame\n");
+	fprintf(stdout,"                  -f 5:15   = Render frames 5 thru 15\n");
+	fprintf(stdout,"                  -f 5:2:15 = Render frames 5 thru 15 skipping every other one\n");
+	fprintf(stdout,"  -q           : Quiet mode (errors/warning ignored)\n");
+	fprintf(stdout,"  -d           : Ignore the display drivers and use framebuffer\n");
+	fprintf(stdout,"  -t           : Print renderer statistics after every frame\n");
+	fprintf(stdout,"  -p           : Display the progress\n");
+	fprintf(stdout,"  -P:n         : Use n processoes\n");
+	fprintf(stdout,"  -t:n         : Use n threads (more efficient than -P:n)\n");
+	fprintf(stdout,"  -r <port>    : Start a server\n");
+	fprintf(stdout,"  -k <port>    : Kill the server\n");
+	fprintf(stdout,"  -s <servers> : Network render\n");
+	fprintf(stdout,"                   where servers is the list of <servers> specified\n");
+	fprintf(stdout,"                   as <IP:port,IP:port,IP:port,...> \n");
 
 }
 
