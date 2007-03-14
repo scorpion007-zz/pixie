@@ -60,14 +60,20 @@ typedef char   *RtToken;
 #define NCOMPS 3
 #endif
 
-typedef RtFloat RtColor[NCOMPS];
-typedef RtFloat RtPoint[3];
-typedef RtFloat RtMatrix[4][4];
-typedef RtFloat RtBasis[4][4];
-typedef RtFloat RtBound[6];
-typedef char   *RtString;
+typedef RtFloat		RtColor[NCOMPS];
+typedef RtFloat		RtPoint[3];
+typedef RtFloat		RtMatrix[4][4];
+typedef RtFloat		RtBasis[4][4];
+typedef RtFloat		RtBound[6];
+typedef char		*RtString;
+typedef void		*RtPointer;
+typedef RtPointer	RtObjectHandle;
+typedef RtPointer	RtLightHandle;
+typedef RtPointer	RtContextHandle;
+typedef RtString	RtArchiveHandle;
+typedef RtString	RtShaderHandle;
 
-typedef void   *RtPointer;
+
 #define RtVoid void
 typedef RtFloat (*RtFilterFunc)(RtFloat, RtFloat, RtFloat, RtFloat);
 typedef RtVoid  (*RtErrorHandler)(RtInt code, RtInt severity, char *msg);
@@ -556,10 +562,30 @@ EXTERN(RtVoid)
     RiErrorAbort (RtInt code, RtInt severity, char *message);
 
 EXTERN(RtVoid)
+	RiResource(RtToken handle, RtToken type, ...),
+	RiResourceV(RtToken handle, RtToken type,RtInt n, RtToken tokens[], RtPointer parms[]),
+	RiResourceBegin(void),
+	RiResourceEnd(void);
+
+EXTERN(RtArchiveHandle)
+	RiArchiveBegin(RtToken name, ...),
+	RiArchiveBeginV(RtToken name, RtInt n, RtToken tokens[], RtPointer parms[]);
+
+EXTERN(RtVoid)
+	RiArchiveEnd(void);
+
+EXTERN(RtVoid)
+	RiIfBegin(char *expr, ...),
+	RiIfBeginV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
+	RiElseIf(char *expr, ...),
+	RiElseIfV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
+	RiElse(void),
+	RiIfEnd(void);
+
+EXTERN(RtVoid)
     RiArchiveRecord (RtToken type, char *format, ...),
     RiReadArchive (RtString filename, RtFunc callback, ...),
-    RiReadArchiveV (RtString filename, RtFunc callback,
-		    int n, RtToken tokens[], RtPointer params[]);
+    RiReadArchiveV (RtString filename, RtFunc callback, int n, RtToken tokens[], RtPointer params[]);
 
 			
 

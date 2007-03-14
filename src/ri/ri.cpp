@@ -412,7 +412,7 @@ static	int					allowedCommands		=	RENDERMAN_BLOCK	|
 ///////////////////////////////////////////////////////////////////////
 // Function				:	check
 // Description			:	Make sure the command is good for a given nesting
-// Return Value			:
+// Return Value			:	TRUE if the command should be executed
 // Comments				:
 static	inline int		check(char *fun,int scope) {
 	if (ignoreFrame)							return TRUE;
@@ -517,8 +517,7 @@ static	void RiTini() {
 /*****************************************************************************************/
 // Action begins here
 /*****************************************************************************************/
-EXTERN(RtToken)
-RiDeclare (char *name, char *declaration) {
+EXTERN(RtToken) RiDeclare (char *name, char *declaration) {
 	if (check("RiDeclare",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK)) return RI_NULL;
 
 	renderMan->RiDeclare(name,declaration);
@@ -526,8 +525,7 @@ RiDeclare (char *name, char *declaration) {
 	return name;
 }
 
-EXTERN(RtContextHandle)
-RiGetContext(void) {
+EXTERN(RtContextHandle)	RiGetContext(void) {
 	if (check("RiGetContext",RENDERMAN_BLOCK)) return RI_NULL;
 
 	return (RtContextHandle) renderMan;
@@ -2188,6 +2186,102 @@ RiErrorAbort (RtInt code, RtInt severity, char *message) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//  Resource related functions
+//
+EXTERN(RtVoid)	RiResource(RtToken handle, RtToken type,...) {
+	va_list	args;
+
+	va_start(args,type);
+	getArgs(args);
+	RiResourceV(handle,type,nTokens,tokens,values);
+	va_end(args);
+}
+
+EXTERN(RtVoid)	RiResourceV(RtToken handle, RtToken type,RtInt n, RtToken tokens[], RtPointer parms[]) {
+	// FIXME: Implement
+}
+
+EXTERN(RtVoid)	RiResourceBegin(void) {
+	// FIXME: Implement
+}
+
+EXTERN(RtVoid)	RiResourceEnd(void) {
+	// FIXME: Implement
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//  Archieving functions
+//
+EXTERN(RtArchiveHandle)	RiArchiveBegin(RtToken name, ...) {
+	RtArchiveHandle	handle;
+	va_list			args;
+
+	va_start(args,name);
+	getArgs(args);
+	handle	=	RiArchiveBeginV(name,nTokens,tokens,values);
+	va_end(args);
+
+	return handle;
+}
+
+EXTERN(RtArchiveHandle)	RiArchiveBeginV(RtToken name, RtInt n, RtToken tokens[], RtPointer parms[]) {
+	// FIXME: Implement
+	return NULL;
+}
+
+EXTERN(RtVoid)			RiArchiveEnd(void) {
+	// FIXME: Implement
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//  Conditional evaluation functions
+//
+EXTERN(RtVoid)			RiIfBegin(char *expr, ...) {
+	va_list	args;
+
+	va_start(args,expr);
+	getArgs(args);
+	RiIfBeginV(expr,nTokens,tokens,values);
+	va_end(args);
+}
+
+EXTERN(RtVoid)			RiIfBeginV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
+	// FIXME: Implement
+}
+
+EXTERN(RtVoid)			RiElseIf(char *expr, ...) {
+	va_list	args;
+
+	va_start(args,expr);
+	getArgs(args);
+	RiElseIfV(expr,nTokens,tokens,values);
+	va_end(args);
+}
+
+EXTERN(RtVoid)			RiElseIfV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
+	// FIXME: Implement
+}
+
+EXTERN(RtVoid)			RiElse(void) {
+	// FIXME: Implement
+}
+
+EXTERN(RtVoid)			RiIfEnd(void) {
+	// FIXME: Implement
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//  Archieve reading functions
+//
 EXTERN(RtVoid)
 RiArchiveRecord (RtToken type, char *format, ...) {
 	va_list	args;
