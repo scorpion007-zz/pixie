@@ -140,6 +140,19 @@ MakeShadow											return RIB_MAKE_SHADOW;
 
 ArchiveRecord										return RIB_ARCHIVE_RECORD;
 
+ArchiveBegin										return RIB_ARCHIVE_BEGIN;
+ArchiveEnd											return RIB_ARCHIVE_END;
+
+Resource											return RIB_RESOURCE;
+ResourceBegin										return RIB_RESOURCE_BEGIN;
+ResourceEnd											return RIB_RESOURCE_END;
+
+IfBegin												return RIB_IFBEGIN;
+IfEnd												return RIB_IFEND;
+ElseIf												return RIB_ELSEIF;
+Else												return RIB_ELSE;
+
+
 ReadArchive[ \t]*\"[^\"]*\"							{
 														char			fileName[256];
 														char			*start	=	strchr(ribtext,'\"');

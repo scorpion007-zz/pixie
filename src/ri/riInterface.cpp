@@ -367,6 +367,34 @@ void		CRiInterface::RiArchiveRecord(char * type,char *format,va_list args) {
 void		CRiInterface::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]) {
 }
 
+void		*CRiInterface::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+	return NULL;
+}
+
+void		CRiInterface::RiArchiveEnd(void) {
+}
+	
+void		CRiInterface::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
+}
+
+void		CRiInterface::RiResourceBegin(void) {
+}
+
+void		CRiInterface::RiResourceEnd(void) {
+}
+
+void		CRiInterface::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {
+}
+
+void		CRiInterface::RiElseIfV(const char *expr,int n,char *tokens[],void *parms[]) {
+}
+
+void		CRiInterface::RiElse(void) {
+}
+
+void		CRiInterface::RiIfEnd(void) {
+}
+
 void		CRiInterface::RiError(int c,int s,char *m) {
 	if (errorHandler != NULL) {
 		errorHandler(c,s,m);

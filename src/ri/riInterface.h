@@ -119,7 +119,6 @@ public:
 	virtual	void		RiTransformEnd(void);
 
 	virtual	void		RiAttributeV(char *name,int n,char *tokens[],void *params[]);
-
 	
 	virtual	void		RiPolygonV(int nvertices,int n,char *tokens[],void *params[]);
 	virtual	void		RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],void *params[]);
@@ -173,6 +172,18 @@ public:
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
 
+	virtual	void		*RiArchiveBeginV(const char *name, int n, char *tokens[], void *parms[]);
+	virtual	void		RiArchiveEnd(void);
+	
+	virtual	void		RiResourceV(const char *handle,const char *type,int n, char *tokens[],void *parms[]);
+	virtual	void		RiResourceBegin(void);
+	virtual	void		RiResourceEnd(void);
+
+	virtual	void		RiIfBeginV(const char *expr,int n, char *tokens[], void *parms[]);
+	virtual	void		RiElseIfV(const char *expr,int n, char *tokens[], void *parms[]);
+	virtual	void		RiElse(void);
+	virtual	void		RiIfEnd(void);
+		
 	virtual	void		RiError(int,int,char *);
 
 protected:

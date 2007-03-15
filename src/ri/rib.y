@@ -577,6 +577,15 @@ static	RtErrorHandler	getErrorHandler(char *n) {
 %token	RIB_MAKE_CUBE_FACE_ENVIRONMENT
 %token	RIB_MAKE_SHADOW
 %token	RIB_ARCHIVE_RECORD
+%token	RIB_ARCHIVE_BEGIN
+%token	RIB_ARCHIVE_END
+%token	RIB_RESOURCE
+%token	RIB_RESOURCE_BEGIN
+%token	RIB_RESOURCE_END
+%token	RIB_IFBEGIN
+%token	RIB_IFEND
+%token	RIB_ELSEIF
+%token	RIB_ELSE
 %token	RIB_ERROR_HANDLER
 %token	RIB_VERSION
 %token	RIB_VERSION_STRING
@@ -2594,6 +2603,60 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribPL
 				{
 					RiMakeShadowV($2,$3,numParameters,tokens,vals);
+				}
+				|
+				RIB_ARCHIVE_BEGIN
+				RIB_TEXT
+				ribPL
+				{
+					RiArchiveBeginV($2,numParameters,tokens,vals);
+				}
+				|
+				RIB_ARCHIVE_END
+				{
+					RiArchiveEnd();
+				}
+				|
+				RIB_RESOURCE_BEGIN
+				{
+					RiResourceBegin();
+				}
+				|
+				RIB_RESOURCE_END
+				{
+					RiResourceEnd();
+				}
+				|
+				RIB_RESOURCE
+				RIB_TEXT
+				RIB_TEXT
+				ribPL
+				{
+					RiResourceV($2,$3,numParameters,tokens,vals);
+				}
+				|
+				RIB_IFBEGIN
+				RIB_TEXT
+				ribPL
+				{
+					RiIfBeginV($2,numParameters,tokens,vals);
+				}
+				|
+				RIB_IFEND
+				{
+					RiIfEnd();
+				}
+				|
+				RIB_ELSEIF
+				RIB_TEXT
+				ribPL
+				{
+					RiElseIfV($2,numParameters,tokens,vals);
+				}
+				|
+				RIB_ELSE
+				{
+					RiElse();
 				}
 				|
 				RIB_ERROR_HANDLER
