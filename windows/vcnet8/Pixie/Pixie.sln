@@ -81,6 +81,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\..\LICENSE = ..\..\..\LICENSE
 		..\..\..\NEWS = ..\..\..\NEWS
 		..\..\..\pixie.spec = ..\..\..\pixie.spec
+		..\..\..\win32inst\PixieW32Setup.iss = ..\..\..\win32inst\PixieW32Setup.iss
 		..\..\..\README = ..\..\..\README
 	EndProjectSection
 EndProject

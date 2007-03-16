@@ -44,7 +44,7 @@
 #include "debug.h"
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
-const	float	horizonCutoff			=	(float) cosf(radians(80));
+const	float	horizonCutoff			=	(float) cosf((float) radians(80));
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -607,7 +607,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	CTextureLookup		*texLookup;
 
 	// Allocate memory
-	nt								=	(int) (sqrtf(numSamples / C_PI) + 0.5);
+	nt								=	(int) (sqrtf(numSamples / (float) C_PI) + 0.5);
 	np								=	(int) (C_PI*nt + 0.5);
 	numSamples						=	nt*np;
 	hemisphere						=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
@@ -644,7 +644,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	// Calculate the ray differentials (use average spread in theta and phi)
 	//const float da					=	DEFAULT_RAY_DA;
 	//const float db					=	DEFAULT_RAY_DB;
-	const float da					=	tanf(C_PI/(2*(nt+np)));
+	const float da					=	tanf((float) C_PI/(2*(nt+np)));
 	const float db					=	dSample;
 	
 	if (lookup->occlusion == TRUE) {

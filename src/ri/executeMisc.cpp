@@ -738,7 +738,7 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 					ab[0]				*=	0.25f;
 					ab[1]				*=	0.25f;
 
-					ab[0]				=	tanf(min(ab[0],C_PI*0.5f - C_EPSILON));
+					ab[0]				=	tanf(min(ab[0],((float) C_PI)*0.5f - C_EPSILON));
 					ab[0]				=	min(ab[0],DEFAULT_RAY_DA);
 					
 					// guard against bad differentials
@@ -791,7 +791,7 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 				
 				ab[0]				*=	0.5f;
 				ab[1]				*=	0.5f;
-				ab[0]				=	tanf(min(ab[0],C_PI*0.5f - C_EPSILON));
+				ab[0]				=	tanf(min(ab[0],((float) C_PI)*0.5f - C_EPSILON));
 				ab[0]				=	min(ab[0],DEFAULT_RAY_DA);
 				
 				// guard against bad differentials

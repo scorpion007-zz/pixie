@@ -50,7 +50,7 @@
 // The Pixie version
 #define	VERSION_RELEASE	2
 #define	VERSION_BETA	0
-#define	VERSION_ALPHA	2
+#define	VERSION_ALPHA	3
 
 // Some constant definitions
 
@@ -137,6 +137,10 @@ typedef union {
 #ifndef		assert
 #define		assert(__cond)
 #endif
+
+
+// Include the global config file
+#include "../../config.h"
 
 
 #endif

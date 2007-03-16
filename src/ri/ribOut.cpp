@@ -56,6 +56,8 @@ static	char	*getFilter(float (*function)(float,float,float,float)) {
 		return	RI_CATMULLROMFILTER;
 	} else if (function == RiBlackmanHarrisFilter) {
 		return	RI_BLACKMANHARRISFILTER;
+	} else if (function == RiMitchellFilter) {
+		return	RI_MITCHELLFILTER;
 	} else if (function == RiSincFilter) {
 		return	RI_SINCFILTER;
 	} else {
@@ -251,6 +253,10 @@ void		CRibOut::RiPixelFilter(float (*function)(float,float,float,float),float xw
 		out("PixelFilter \"%s\" %g %g\n",RI_TRIANGLEFILTER,xwidth,ywidth);
 	} else if (function == RiCatmullRomFilter) {
 		out("PixelFilter \"%s\" %g %g\n",RI_CATMULLROMFILTER,xwidth,ywidth);
+	} else if (function == RiBlackmanHarrisFilter) {
+		out("PixelFilter \"%s\" %g %g\n",RI_BLACKMANHARRISFILTER,xwidth,ywidth);
+	} else if (function == RiMitchellFilter) {
+		out("PixelFilter \"%s\" %g %g\n",RI_MITCHELLFILTER,xwidth,ywidth);
 	} else if (function == RiSincFilter) {
 		out("PixelFilter \"%s\" %g %g\n",RI_SINCFILTER,xwidth,ywidth);
 	} else {

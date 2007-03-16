@@ -128,35 +128,35 @@ inline float absf(float f) {
 //  FIXME: check the avalibility of sqrtf etc thru configure.in
 //
 ////////////////////////////////////////////////////////////////////////////
-#ifndef sqrtf
+#ifndef HAVE_SQRTF
 #define	sqrtf	(float) sqrt
 #endif
 
-#ifndef cosf
+#ifndef HAVE_COSF
 #define	cosf	(float) cos
 #endif
 
-#ifndef sinf
+#ifndef HAVE_SINF
 #define	sinf	(float) sin
 #endif
 
-#ifndef tanf
+#ifndef HAVE_TANF
 #define	tanf	(float) tan
 #endif
 
-#ifndef atan2f
+#ifndef HAVE_ATAN2F
 #define	atan2f	(float) atan2
 #endif
 
-#ifndef powf
+#ifndef HAVE_POWF
 #define	powf	(float) pow
 #endif
 
-#ifndef logf
+#ifndef HAVE_LOGF
 #define	logf	(float) log
 #endif
 
-#ifndef fmodf
+#ifndef HAVE_FMODF
 #define	fmodf	(float) fmod
 #endif
 

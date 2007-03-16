@@ -84,8 +84,5 @@
 //#define	REYES_OBJECT_CACHE_SIZE			10
 //#define REYES_GRID_CACHE_SIZE			10
 
-// Include the global config file
-#include "../../config.h"
-
 #endif
 

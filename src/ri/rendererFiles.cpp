@@ -562,6 +562,8 @@ RtFilterFunc			CRenderer::getFilter(const char *name) {
 		return	RiCatmullRomFilter;
 	} else if (strcmp(name,RI_BLACKMANHARRISFILTER) == 0) {
 		return	RiBlackmanHarrisFilter;
+	} else if (strcmp(name,RI_MITCHELLFILTER) == 0) {
+		return	RiMitchellFilter;
 	}
 
 	return	RiGaussianFilter;
@@ -586,6 +588,8 @@ char					*CRenderer::getFilter(RtFilterFunc func) {
 		return	RI_CATMULLROMFILTER;
 	} else if (func == RiBlackmanHarrisFilter) {
 		return	RI_BLACKMANHARRISFILTER;
+	} else if (func == RiMitchellFilter) {
+		return	RI_MITCHELLFILTER;
 	}
 
 	return	RI_GAUSSIANFILTER;
