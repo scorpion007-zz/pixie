@@ -37,67 +37,6 @@
 #include "align.h"
 
 
-
-
-////////////////////////////////////////////////////////////////////////////
-//
-//
-//
-//	Low precision routines are not available on all platforms
-//
-//
-//
-////////////////////////////////////////////////////////////////////////////
-#ifndef sqrtf
-#define	sqrtf	(float) sqrt
-#endif
-
-#ifndef cosf
-#define	cosf	(float) cos
-#endif
-
-#ifndef sinf
-#define	sinf	(float) sin
-#endif
-
-#ifndef tanf
-#define	tanf	(float) tan
-#endif
-
-#ifndef atan2f
-#define	atan2f	(float) atan2
-#endif
-
-#ifndef powf
-#define	powf	(float) pow
-#endif
-
-#ifndef logf
-#define	logf	(float) log
-#endif
-
-#ifndef fmodf
-#define	fmodf	(float) fmod
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -129,13 +68,6 @@ extern const matrix	identityMatrix;						// Points to the identity matrix
 #define COMP_R	0
 #define COMP_G	1
 #define COMP_B	2
-
-
-
-
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -186,6 +118,47 @@ inline float absf(float f) {
 
 
 
+
+////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//	Low precision routines are not available on all platforms
+//
+//  FIXME: check the avalibility of sqrtf etc thru configure.in
+//
+////////////////////////////////////////////////////////////////////////////
+#ifndef sqrtf
+#define	sqrtf	(float) sqrt
+#endif
+
+#ifndef cosf
+#define	cosf	(float) cos
+#endif
+
+#ifndef sinf
+#define	sinf	(float) sin
+#endif
+
+#ifndef tanf
+#define	tanf	(float) tan
+#endif
+
+#ifndef atan2f
+#define	atan2f	(float) atan2
+#endif
+
+#ifndef powf
+#define	powf	(float) pow
+#endif
+
+#ifndef logf
+#define	logf	(float) log
+#endif
+
+#ifndef fmodf
+#define	fmodf	(float) fmod
+#endif
 
 
 

@@ -297,7 +297,7 @@ EXTERN(RtBasis)		RiBezierBasis, RiBSplineBasis, RiCatmullRomBasis, RiHermiteBasi
 ////////////////////////////////////////////////////////////////////////
 
 EXTERN(RtToken)
-    RiDeclare (char *name, char *declaration);
+    RiDeclare (const char *name,const char *declaration);
 
 EXTERN(RtContextHandle)
 	RiGetContext(void);
