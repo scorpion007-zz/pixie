@@ -42,7 +42,7 @@ CRiInterface::CRiInterface() {
 CRiInterface::~CRiInterface() {
 }
 
-void		CRiInterface::RiDeclare(char *,char *) {
+void		CRiInterface::RiDeclare(const char *,const char *) {
 }
 
 void		CRiInterface::RiFrameBegin(int) {

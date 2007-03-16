@@ -619,7 +619,7 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,char *name,
 ////////////////////////////////////////////////////////////////////////////////
 //	Renderer Interface
 ////////////////////////////////////////////////////////////////////////////////
-void	CRendererContext::RiDeclare(char *name,char *declaration) {
+void	CRendererContext::RiDeclare(const char *name,const char *declaration) {
 	CRenderer::declareVariable(name,declaration);
 }
    
@@ -4392,6 +4392,37 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+// FIXME: Implement Begin
+void	*CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+	return NULL;
+}
+
+void	CRendererContext::RiArchiveEnd(void) {
+}
+	
+void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
+}
+
+void	CRendererContext::RiResourceBegin(void) {
+}
+
+void	CRendererContext::RiResourceEnd(void) {
+}
+
+void	CRendererContext::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {
+}
+
+void	CRendererContext::RiElseIfV(const char *expr,int n,char *tokens[],void *parms[]) {
+}
+
+void	CRendererContext::RiElse(void) {
+}
+
+void	CRendererContext::RiIfEnd(void) {
+}
+// FIXME: Implement end
+//////////////////////////////////////////////////////////////////////////////////////
 
 void	CRendererContext::RiError(int code,int severity,char *mes) {
 	char		tmp[OS_MAX_PATH_LENGTH];

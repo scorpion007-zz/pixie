@@ -68,7 +68,7 @@ public:
 						CRibOut(FILE *);
 	virtual				~CRibOut();
 
-	virtual	void		RiDeclare(char *,char *);
+	virtual	void		RiDeclare(const char *,const char *);
 
 	virtual	void		RiFrameBegin(int);
 	virtual	void		RiFrameEnd(void);
@@ -198,10 +198,22 @@ public:
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
 
+	virtual	void		*RiArchiveBeginV(const char *name, int n, char *tokens[], void *parms[]);
+	virtual	void		RiArchiveEnd(void);
+	
+	virtual	void		RiResourceV(const char *handle,const char *type,int n, char *tokens[],void *parms[]);
+	virtual	void		RiResourceBegin(void);
+	virtual	void		RiResourceEnd(void);
+
+	virtual	void		RiIfBeginV(const char *expr,int n, char *tokens[], void *parms[]);
+	virtual	void		RiElseIfV(const char *expr,int n, char *tokens[], void *parms[]);
+	virtual	void		RiElse(void);
+	virtual	void		RiIfEnd(void);
+
 private:
 	void				writePL(int,char *[],void *[]);
 	void				writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int,char *[],void *[]);
-	void				declareVariable(char *,char *);
+	void				declareVariable(const char *,const char *);
 	void				declareDefaultVariables();
 
 	const	char							*outName;

@@ -176,7 +176,7 @@ CRibOut::~CRibOut() {
 	delete [] scratch;
 }
 
-void		CRibOut::RiDeclare(char *name,char *type) {
+void		CRibOut::RiDeclare(const char *name,const char *type) {
 	out("Declare \"%s\" \"%s\"\n",name,type);
 	declareVariable(name,type);
 }
@@ -1266,6 +1266,48 @@ void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *),int 
 	out("ReadArchive \"%s\"\n",filename);
 }
 
+void		*CRibOut::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+	out("ArchiveBegin \"%s\" ",name);
+	writePL(n,tokens,parms);
+	return NULL;
+}
+
+void		CRibOut::RiArchiveEnd(void) {
+	out("ArchiveEnd\n");
+}
+	
+void		CRibOut::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
+	out("Resource \"%s\" \"%s\" ",handle,type);
+	writePL(n,tokens,parms);
+}
+
+void		CRibOut::RiResourceBegin(void) {
+	out("ResourceBegin\n");
+}
+
+void		CRibOut::RiResourceEnd(void) {
+	out("ResourceEnd\n");
+}
+
+void		CRibOut::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {
+	out("IfBegin \"%s\" ",expr);
+	writePL(n,tokens,parms);
+}
+
+void		CRibOut::RiElseIfV(const char *expr,int n,char *tokens[],void *parms[]) {
+	out("ElseIf \"%s\" ",expr);
+	writePL(n,tokens,parms);
+}
+
+void		CRibOut::RiElse(void) {
+	out("Else\n");
+}
+
+void		CRibOut::RiIfEnd(void) {
+	out("IfEnd\n");
+}
+
+
 void		CRibOut::writePL(int numParameters,char *tokens[],void *vals[]) {
 	int		i,j;
 	float	*f;
@@ -1354,6 +1396,7 @@ retry:;
 		}
 	}
 
+	// Print the final newline
 	out("\n");
 }
 
@@ -1467,12 +1510,13 @@ retry:;
 		}
 	}
 
+	// Print the final newline
 	out("\n");
 
 #undef numItems
 }
 
-void		CRibOut::declareVariable(char *name,char *decl) {
+void		CRibOut::declareVariable(const char *name,const char *decl) {
 	CVariable	cVariable,*nVariable;
 
 	assert(declaredVariables	!=	NULL);

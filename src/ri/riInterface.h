@@ -43,7 +43,7 @@ public:
 						CRiInterface();
 	virtual				~CRiInterface();
 
-	virtual	void		RiDeclare(char *,char *);
+	virtual	void		RiDeclare(const char *,const char *);
 
 	virtual	void		RiFrameBegin(int);
 	virtual	void		RiFrameEnd(void);
