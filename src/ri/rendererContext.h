@@ -40,6 +40,7 @@
 #include "shader.h"
 #include "object.h"
 #include "shadeop.h"
+#include "resource.h"
 #include "riInterface.h"
 #include "variable.h"
 
@@ -202,25 +203,21 @@ public:
 
 
 	// The following functions provide access to the graphics state
-	CXform				*getXform(int);											// Get the active XForm
-	CAttributes			*getAttributes(int);									// Get the active Attributes
-	COptions			*getOptions();											// Get the active Options
-	CShaderInstance		*getShader(const char *,int,int,char **,void **);		// Load a shader
+	CXform				*getXform(int);										// Get the active XForm
+	CAttributes			*getAttributes(int);								// Get the active Attributes
+	COptions			*getOptions();										// Get the active Options
+	CShaderInstance		*getShader(const char *,int,int,char **,void **);	// Load a shader
 
-																				// Delayed object junk
+																			// Delayed object junk
 	void				processDelayedObject(CShadingContext *context,CDelayedObject *,void	(*subdivisionFunction)(void *,float),void *,const float *,const float *);
 	void				processDelayedInstance(CShadingContext *context,CDelayedInstance *instance);
 
-	void				addObject(CObject *);									// Add an object into the scene
-	void				addInstance(void *);									// Add an instance into the scene
-																				// Find a coordinate system
-
-																				// The following functions are about texture management and are implemented in texture.cpp
+	void				addObject(CObject *);								// Add an object into the scene
+	void				addInstance(void *);								// Add an instance into the scene
 	void				rendererThread(void *);
 
 private:
 
-	
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CInstance
 	// Description			:	This class is allocated at objectBegin only to hold
@@ -228,12 +225,13 @@ private:
 	// Comments				:
 	class	CInstance {
 	public:
-			CObject		*objects;
+			CObject			*objects;
 	};
 
 	CArray<CXform *>			*savedXforms;				// Used to save/restore the graphics state
-	CArray<CAttributes *>		*savedAttributes;
-	CArray<COptions *>			*savedOptions;
+	CArray<CAttributes *>		*savedAttributes;			// Saved attributes
+	CArray<COptions *>			*savedOptions;				// Saved options
+	CArray<CResource *>			*savedResources;			// Saved resources
 	CInstance					*instance;					// The current instance object
 	CObject						*delayed;					// The current delayed object
 	CArray<CInstance *>			*instanceStack;				// The stack of object lists
@@ -241,6 +239,7 @@ private:
 	CXform						*currentXform;				// The current graphics state
 	CAttributes					*currentAttributes;
 	COptions					*currentOptions;
+	CResource					*currentResource;
 															// Some RenderMan Interface related variables
 	int							numExpectedMotions;			// The number of expected motions in a motion block
 	int							numMotions;					// The number of motions so far
@@ -249,7 +248,6 @@ private:
 	int							maxMotionParameters;		// The maximum number of motion parameters that can be stored
 	char						*lastCommand;				// The text of the last motion command
 
-	
 	void						init(CProgrammableShaderInstance *);		// Execute the init code of a shader
 	int							addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1);
 };

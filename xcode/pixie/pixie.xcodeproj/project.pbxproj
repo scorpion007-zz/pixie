@@ -81,6 +81,8 @@
 		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
 		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
 		18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D3515A0B7AD20E009F0DAE /* netFileMapping.h */; };
+		18D4F7270BAB9A9E0090673B /* resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D4F7250BAB9A9E0090673B /* resource.cpp */; };
+		18D4F7280BAB9A9E0090673B /* resource.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D4F7260BAB9A9E0090673B /* resource.h */; };
 		18D51FEC0B843CE90039A966 /* align.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FEB0B843CE80039A966 /* align.h */; };
 		18D51FEE0B843D020039A966 /* polynomial.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FED0B843D020039A966 /* polynomial.h */; };
 		18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18E9F1060B75B07500DA484A /* rendererMutexes.cpp */; };
@@ -947,6 +949,8 @@
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
 		18D3515A0B7AD20E009F0DAE /* netFileMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = netFileMapping.h; path = ../../src/ri/netFileMapping.h; sourceTree = SOURCE_ROOT; };
+		18D4F7250BAB9A9E0090673B /* resource.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = resource.cpp; path = ../../src/ri/resource.cpp; sourceTree = SOURCE_ROOT; };
+		18D4F7260BAB9A9E0090673B /* resource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = resource.h; path = ../../src/ri/resource.h; sourceTree = SOURCE_ROOT; };
 		18D51FEB0B843CE80039A966 /* align.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = align.h; path = ../../src/common/align.h; sourceTree = SOURCE_ROOT; };
 		18D51FED0B843D020039A966 /* polynomial.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = polynomial.h; path = ../../src/common/polynomial.h; sourceTree = SOURCE_ROOT; };
 		18E9F1060B75B07500DA484A /* rendererMutexes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rendererMutexes.cpp; path = ../../src/ri/rendererMutexes.cpp; sourceTree = SOURCE_ROOT; };
@@ -1762,26 +1766,6 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
-				18B045E10B7D794C00500420 /* config.h */,
-				18D3515A0B7AD20E009F0DAE /* netFileMapping.h */,
-				18D351560B7AD1F5009F0DAE /* displayChannel.cpp */,
-				18D351570B7AD1F5009F0DAE /* displayChannel.h */,
-				18E9F1060B75B07500DA484A /* rendererMutexes.cpp */,
-				1862D7650B2A8FCD00111435 /* objectMisc.h */,
-				1862D7630B2A8FB100111435 /* tiff.h */,
-				1862D75F0B2A8F8100111435 /* gi.cpp */,
-				1862D7600B2A8F8100111435 /* gi.h */,
-				1862D7590B2A8F5A00111435 /* debug.cpp */,
-				1862D75A0B2A8F5A00111435 /* debug.h */,
-				C983E7910AF300EE00648461 /* dso.cpp */,
-				C98988B90AF1B645003DB17A /* rendererClipping.cpp */,
-				C98988BA0AF1B645003DB17A /* rendererContext.cpp */,
-				C98988BB0AF1B645003DB17A /* rendererContext.h */,
-				C98988BC0AF1B645003DB17A /* rendererDeclerations.cpp */,
-				C98988BD0AF1B645003DB17A /* rendererDisplay.cpp */,
-				C98988BE0AF1B645003DB17A /* rendererFiles.cpp */,
-				C98988BF0AF1B645003DB17A /* rendererJobs.cpp */,
-				C98988C00AF1B645003DB17A /* rendererNetwork.cpp */,
 				C96A6EF00AD6E143003C2D7B /* attributes.cpp */,
 				C96A6EF10AD6E143003C2D7B /* attributes.h */,
 				C96A6EF20AD6E143003C2D7B /* brickmap.cpp */,
@@ -1792,13 +1776,19 @@
 				C96A6EF70AD6E143003C2D7B /* bundles.h */,
 				C96A6EF80AD6E143003C2D7B /* cache.cpp */,
 				C96A6EF90AD6E143003C2D7B /* cache.h */,
+				18B045E10B7D794C00500420 /* config.h */,
 				C96A6EFA0AD6E143003C2D7B /* curves.cpp */,
 				C96A6EFB0AD6E143003C2D7B /* curves.h */,
+				1862D7590B2A8F5A00111435 /* debug.cpp */,
+				1862D75A0B2A8F5A00111435 /* debug.h */,
 				C96A6EFC0AD6E143003C2D7B /* delayed.cpp */,
 				C96A6EFD0AD6E143003C2D7B /* delayed.h */,
+				18D351560B7AD1F5009F0DAE /* displayChannel.cpp */,
+				18D351570B7AD1F5009F0DAE /* displayChannel.h */,
 				C96A6F000AD6E143003C2D7B /* dlo.h */,
 				C96A6F010AD6E143003C2D7B /* dlobject.cpp */,
 				C96A6F020AD6E143003C2D7B /* dlobject.h */,
+				C983E7910AF300EE00648461 /* dso.cpp */,
 				C96A6F040AD6E143003C2D7B /* dso.h */,
 				C96A6F080AD6E143003C2D7B /* dsply.h */,
 				C96A6F090AD6E143003C2D7B /* error.cpp */,
@@ -1807,6 +1797,8 @@
 				C96A6F0C0AD6E143003C2D7B /* executeMisc.cpp */,
 				C96A6F0E0AD6E143003C2D7B /* fileResource.cpp */,
 				C96A6F0F0AD6E143003C2D7B /* fileResource.h */,
+				1862D75F0B2A8F8100111435 /* gi.cpp */,
+				1862D7600B2A8F8100111435 /* gi.h */,
 				C96A6F100AD6E143003C2D7B /* giFunctions.h */,
 				C96A6F110AD6E143003C2D7B /* giOpcodes.h */,
 				C96A6F120AD6E143003C2D7B /* harmonics.h */,
@@ -1822,11 +1814,13 @@
 				C96A6F4F0AD6E174003C2D7B /* linsys.h */,
 				C96A6F520AD6E196003C2D7B /* memory.cpp */,
 				C96A6F530AD6E196003C2D7B /* memory.h */,
+				18D3515A0B7AD20E009F0DAE /* netFileMapping.h */,
 				C96A6F540AD6E196003C2D7B /* noise.cpp */,
 				C96A6F550AD6E196003C2D7B /* noise.h */,
 				C96A6F560AD6E196003C2D7B /* noiseTables.h */,
 				C96A6F570AD6E196003C2D7B /* object.cpp */,
 				C96A6F580AD6E196003C2D7B /* object.h */,
+				1862D7650B2A8FCD00111435 /* objectMisc.h */,
 				C96A6F590AD6E196003C2D7B /* occlusion.cpp */,
 				C96A6F5A0AD6E196003C2D7B /* occlusion.h */,
 				C96A6F5B0AD6E196003C2D7B /* options.cpp */,
@@ -1860,6 +1854,17 @@
 				C96A6F7C0AD6E196003C2D7B /* renderer.cpp */,
 				C96A6F7D0AD6E196003C2D7B /* renderer.h */,
 				C96A6F7E0AD6E196003C2D7B /* rendererc.h */,
+				C98988B90AF1B645003DB17A /* rendererClipping.cpp */,
+				C98988BA0AF1B645003DB17A /* rendererContext.cpp */,
+				C98988BB0AF1B645003DB17A /* rendererContext.h */,
+				C98988BC0AF1B645003DB17A /* rendererDeclerations.cpp */,
+				C98988BD0AF1B645003DB17A /* rendererDisplay.cpp */,
+				C98988BE0AF1B645003DB17A /* rendererFiles.cpp */,
+				C98988BF0AF1B645003DB17A /* rendererJobs.cpp */,
+				18E9F1060B75B07500DA484A /* rendererMutexes.cpp */,
+				C98988C00AF1B645003DB17A /* rendererNetwork.cpp */,
+				18D4F7250BAB9A9E0090673B /* resource.cpp */,
+				18D4F7260BAB9A9E0090673B /* resource.h */,
 				C96A6F7F0AD6E196003C2D7B /* reyes.cpp */,
 				C96A6F800AD6E196003C2D7B /* reyes.h */,
 				C96A6F810AD6E196003C2D7B /* ri.cpp */,
@@ -1903,6 +1908,7 @@
 				C96A6FAC0AD6E196003C2D7B /* texture.h */,
 				C96A6FAD0AD6E196003C2D7B /* texture3d.cpp */,
 				C96A6FAE0AD6E196003C2D7B /* texture3d.h */,
+				1862D7630B2A8FB100111435 /* tiff.h */,
 				C96A6FAF0AD6E196003C2D7B /* trace.cpp */,
 				C96A6FB10AD6E196003C2D7B /* variable.cpp */,
 				C96A6FB20AD6E196003C2D7B /* variable.h */,
@@ -2121,6 +2127,7 @@
 				18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */,
 				18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */,
 				18B045E20B7D794C00500420 /* config.h in Headers */,
+				18D4F7280BAB9A9E0090673B /* resource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2627,6 +2634,7 @@
 				1862D7610B2A8F8100111435 /* gi.cpp in Sources */,
 				18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */,
 				18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */,
+				18D4F7270BAB9A9E0090673B /* resource.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

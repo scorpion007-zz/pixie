@@ -379,6 +379,7 @@ const	unsigned int		RENDERMAN_SOLID_INTERSECTION_BLOCK	=	RENDERMAN_SOLID_PRIMITI
 const	unsigned int		RENDERMAN_SOLID_DIFFERENCE_BLOCK	=	RENDERMAN_SOLID_INTERSECTION_BLOCK << 1;
 const	unsigned int		RENDERMAN_SOLID_UNION_BLOCK			=	RENDERMAN_SOLID_DIFFERENCE_BLOCK << 1;
 const	unsigned int		RENDERMAN_RESOURCE_BLOCK			=	RENDERMAN_SOLID_UNION_BLOCK << 1;
+const	unsigned int		RENDERMAN_ARCHIVE_BLOCK				=	RENDERMAN_RESOURCE_BLOCK << 1;
 
 const	unsigned int		RENDERMAN_ALL_BLOCKS				=	RENDERMAN_BLOCK
 																	| RENDERMAN_XFORM_BLOCK
@@ -391,20 +392,21 @@ const	unsigned int		RENDERMAN_ALL_BLOCKS				=	RENDERMAN_BLOCK
 																	| RENDERMAN_SOLID_INTERSECTION_BLOCK
 																	| RENDERMAN_SOLID_DIFFERENCE_BLOCK
 																	| RENDERMAN_SOLID_UNION_BLOCK
-																	| RENDERMAN_RESOURCE_BLOCK;
+																	| RENDERMAN_RESOURCE_BLOCK
+																	| RENDERMAN_ARCHIVE_BLOCK;
 
 
 // This is the blocks that options can be changed
-const	unsigned int		VALID_OPTION_BLOCKS					=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK;
+const	unsigned int		VALID_OPTION_BLOCKS					=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_ARCHIVE_BLOCK;
 
 // This is the blocks that attributes can be changed
-const	unsigned int		VALID_ATTRIBUTE_BLOCKS				=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;																
+const	unsigned int		VALID_ATTRIBUTE_BLOCKS				=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ARCHIVE_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;																
 
 // This is the blocks that xforms can be changed
-const	unsigned int		VALID_XFORM_BLOCKS					=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;
+const	unsigned int		VALID_XFORM_BLOCKS					=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ARCHIVE_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;
 
 // This is the blocks that primitives can be issued
-const	unsigned int		VALID_PRIMITIVE_BLOCKS				=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;
+const	unsigned int		VALID_PRIMITIVE_BLOCKS				=	RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ARCHIVE_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;
 
 // Global variables to convert calls to the vector form
 static	int					nTokens,mTokens;							// Parameter list info
@@ -650,7 +652,7 @@ RiEnd (void) {
 // FrameBegin - End stuff
 EXTERN(RtVoid)
 RiFrameBegin (RtInt number) {
-	if (check("RiFrameBegin",RENDERMAN_BLOCK)) return;
+	if (check("RiFrameBegin",RENDERMAN_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return;
 
 	if (frameRangeActive) {
 		if ((number < frameBegin) || (number > frameEnd))	ignoreFrame	=	TRUE;
@@ -681,26 +683,13 @@ RiFrameEnd (void) {
 
 	currentBlock	=	blocks.pop();
 
-	if (allowedCommands == RENDERMAN_FRAME_BLOCK) {
-		allowedCommands		=	RENDERMAN_BLOCK	|
-								RENDERMAN_XFORM_BLOCK |
-								RENDERMAN_WORLD_BLOCK |
-								RENDERMAN_ATTRIBUTE_BLOCK |
-								RENDERMAN_FRAME_BLOCK |
-								RENDERMAN_OBJECT_BLOCK |
-								RENDERMAN_MOTION_BLOCK |
-								RENDERMAN_SOLID_PRIMITIVE_BLOCK |
-								RENDERMAN_SOLID_INTERSECTION_BLOCK |
-								RENDERMAN_SOLID_DIFFERENCE_BLOCK |
-								RENDERMAN_SOLID_UNION_BLOCK |
-								RENDERMAN_RESOURCE_BLOCK;
-	}
+	if (allowedCommands == RENDERMAN_FRAME_BLOCK)	allowedCommands		=	RENDERMAN_ALL_BLOCKS;
 }
 
 // WorldBegin - End stuff
 EXTERN(RtVoid)
 RiWorldBegin (void) {
-	if (check("RiWorldBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK)) return;
+	if (check("RiWorldBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return;
 
 	renderMan->RiWorldBegin();
 
@@ -796,7 +785,6 @@ RiShutter (RtFloat smin, RtFloat smax) {
 	renderMan->RiShutter(smin,smax);
 }
 
-
 EXTERN(RtVoid)
 RiPixelVariance (RtFloat variation) {
 	if (check("RiPixelVariance",VALID_OPTION_BLOCKS)) return;
@@ -881,7 +869,7 @@ RiDisplayChannel (RtToken channel, ...) {
 
 EXTERN(RtVoid)
 RiDisplayChannelV (RtToken channel,RtInt n, RtToken tokens[], RtPointer params[]) {
-	if (check("RiDisplayChannel",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK)) return;
+	if (check("RiDisplayChannel",VALID_OPTION_BLOCKS)) return;
 
 	renderMan->RiDisplayChannelV(channel,n,tokens,params);
 }
@@ -1070,7 +1058,7 @@ RiOptionV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 
 EXTERN(RtVoid)
 RiAttributeBegin (void) {
-	if (check("RiAttributeBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return;
+	if (check("RiAttributeBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return;
 
 	renderMan->RiAttributeBegin();
 
@@ -1615,6 +1603,7 @@ EXTERN(RtVoid)
 		 RtFloat *knot, RtFloat *amin, RtFloat *amax,
 		 RtInt *n, RtFloat *u, RtFloat *v, RtFloat *w) {
 
+	// Trim curve is an attribute
 	if (check("RiTrimCurve",VALID_ATTRIBUTE_BLOCKS)) return;
 
 	renderMan->RiTrimCurve(nloops,ncurves,order,knot,amin,amax,n,u,v,w);
@@ -2002,21 +1991,21 @@ EXTERN(RtVoid)	RiProcFree(RtPointer data) {
 
 EXTERN(RtVoid)
 RiSolidBegin (RtToken type) {
-	if (check("RiSolidBegin",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return;
+	if (check("RiSolidBegin",RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return;
 
 	renderMan->RiSolidBegin(type);
 }
 
 EXTERN(RtVoid)
 RiSolidEnd(void) {
-	if (check("RiSolidEnd",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return;
+	if (check("RiSolidEnd",RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return;
 
 	renderMan->RiSolidEnd();
 }
 
 EXTERN(RtObjectHandle)
 RiObjectBegin (void) {
-	if (check("RiObjectBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return NULL;
+	if (check("RiObjectBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return NULL;
 
 	blocks.push(currentBlock);
 	currentBlock	=	RENDERMAN_OBJECT_BLOCK;
@@ -2067,7 +2056,7 @@ RiMotionBegin (RtInt N, ...) {
 
 EXTERN(RtVoid)
 RiMotionBeginV (RtInt N, RtFloat times[]) {
-	if (check("RiMotionBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return;	
+	if (check("RiMotionBegin",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return;	
 	
 	renderMan->RiMotionBeginV(N,times);
 
@@ -2278,13 +2267,24 @@ EXTERN(RtVoid)	RiResourceV(RtToken handle, RtToken type,RtInt n, RtToken tokens[
 EXTERN(RtVoid)	RiResourceBegin(void) {
 	if (check("RiResourceBegin",VALID_ATTRIBUTE_BLOCKS | VALID_XFORM_BLOCKS)) return;
 
+	blocks.push(currentBlock);
+	currentBlock	=	RENDERMAN_RESOURCE_BLOCK;
+	
 	renderMan->RiResourceBegin();
 }
+
 
 EXTERN(RtVoid)	RiResourceEnd(void) {
 	if (check("RiResourceEnd",RENDERMAN_RESOURCE_BLOCK)) return;
 
+	if (currentBlock != RENDERMAN_RESOURCE_BLOCK) {
+		error(CODE_NESTING,"Matching RiResourceBegin not found.\n");
+		return;
+	}
+
 	renderMan->RiResourceEnd();
+
+	currentBlock	=	blocks.pop();	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -2305,16 +2305,26 @@ EXTERN(RtArchiveHandle)	RiArchiveBegin(RtToken name, ...) {
 
 EXTERN(RtArchiveHandle)	RiArchiveBeginV(RtToken name, RtInt n, RtToken tokens[], RtPointer parms[]) {
 
-	if (check("RiArchiveBegin",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return NULL;
+	if (check("RiArchiveBegin",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return NULL;
 
+	blocks.push(currentBlock);
+	currentBlock	=	RENDERMAN_ARCHIVE_BLOCK;
+	
 	return (RtArchiveHandle) renderMan->RiArchiveBeginV(name,n,tokens,parms);
 }
 
 EXTERN(RtVoid)			RiArchiveEnd(void) {
 	
-	if (check("RiArchiveEnd",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK)) return;
+	if (check("RiArchiveEnd",RENDERMAN_ARCHIVE_BLOCK)) return;
+
+	if (currentBlock != RENDERMAN_ARCHIVE_BLOCK) {
+		error(CODE_NESTING,"Matching RiResourceBegin not found.\n");
+		return;
+	}
 
 	renderMan->RiArchiveEnd();
+	
+	currentBlock	=	blocks.pop();	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -2397,7 +2407,7 @@ EXTERN(RtVoid)
     RiReadArchiveV (RtString filename, RtFunc callback,
 	int n, RtToken tokens[], RtPointer params[]) {
 
-	if (check("RiReadArchive",RENDERMAN_BLOCK | RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK)) return;
+	if (check("RiReadArchive",RENDERMAN_ALL_BLOCKS)) return;
 
 	renderMan->RiReadArchiveV(filename,callback,n,tokens,params);
 }

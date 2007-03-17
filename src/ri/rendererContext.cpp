@@ -96,6 +96,7 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 	savedXforms						=	new CArray<CXform *>;
 	savedAttributes					=	new CArray<CAttributes *>;
 	savedOptions					=	new CArray<COptions *>;
+	savedResources					=	new CArray<CResource *>;
 
 	// Init the object stack
 	instance						=	NULL;
@@ -106,6 +107,7 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 	allocatedInstances				=	new CArray<CInstance *>;
 
 	// Allocate the initial graphics state
+	currentResource					=	NULL;
 	currentOptions					=	new COptions;
 	currentXform					=	new CXform;
 	currentAttributes				=	new CAttributes;
@@ -164,12 +166,15 @@ CRendererContext::~CRendererContext() {
 	assert(savedXforms					!=	NULL);	
 	assert(savedAttributes				!=	NULL);	
 	assert(savedOptions					!=	NULL);	
+	assert(savedResources				!=	NULL);
 	assert(savedXforms->numItems		==	0);
 	assert(savedAttributes->numItems	==	0);
 	assert(savedOptions->numItems		==	0);
-	savedXforms->destroy();
-	savedAttributes->destroy();
-	savedOptions->destroy();
+	assert(savedResources->numItems		==	0);
+	delete savedXforms;
+	delete savedAttributes;
+	delete savedOptions;
+	delete savedResources;
 
 	// Terminate the renderer
 	CRenderer::endRenderer();
