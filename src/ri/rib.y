@@ -2331,6 +2331,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribFloatArray
 				ribPL
 				{
+					/*
 					int		*argi1,*argi2,*argi3,*argi4;
 					char	**args1;
 					float	*argf1;
@@ -2357,6 +2358,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,args1,argi3,argi4,argf1,numParameters,tokens,vals);
 						}
 					}
+					*/
 				}
 				|
 				RIB_SUBDIVISION_MESH

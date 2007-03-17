@@ -843,6 +843,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\resource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\resource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\userAttributes.h"
 				>
 			</File>
