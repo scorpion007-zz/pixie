@@ -302,7 +302,8 @@ static	TSlFunction		functions[]	=	{
 													newVariable->entry			=	cVariable->index;
 													newVariable->usageMarker	=	0;
 													newVariable->storage		=	currentData.currentParameterMutable	? STORAGE_MUTABLEPARAMETER : STORAGE_PARAMETER;
-													newVariable->defaultValue	=	new TCode[numItems*numComp];
+													if (type == TYPE_STRING) 	newVariable->defaultValue	=	new char*[numItems*numComp];
+													else						newVariable->defaultValue	=	new float[numItems*numComp];
 													newVariable->accessor		=	currentData.accessorType;
 													newVariable->next			=	NULL;													
 													cVariable->variable			=	newVariable;
