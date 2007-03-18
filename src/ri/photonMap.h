@@ -124,12 +124,12 @@ public:
 				// Return Value			:
 				// Comments				:
 		void	read(FILE *in) {
-					fread(&numPhotons,1,sizeof(int),in);
-					fread(&maxPhotons,1,sizeof(int),in);
+					fread(&numPhotons,sizeof(int),1,in);
+					fread(&maxPhotons,sizeof(int),1,in);
 					photons		=	new T[maxPhotons+1];
-					fread(photons,numPhotons+1,sizeof(T),in);
-					fread(bmin,3,sizeof(float),in);
-					fread(bmax,3,sizeof(float),in);
+					fread(photons,sizeof(T),numPhotons+1,in);
+					fread(bmin,sizeof(float),3,in);
+					fread(bmax,sizeof(float),3,in);
 
 					numPhotonsh			=	numPhotons >> 1;
 				}
@@ -141,11 +141,11 @@ public:
 				// Return Value			:
 				// Comments				:
 		void	write(FILE *out) {
-					fwrite(&numPhotons,1,sizeof(int),out);
-					fwrite(&maxPhotons,1,sizeof(int),out);
-					fwrite(photons,numPhotons+1,sizeof(T),out);
-					fwrite(bmin,3,sizeof(float),out);
-					fwrite(bmax,3,sizeof(float),out);
+					fwrite(&numPhotons,sizeof(int),1,out);
+					fwrite(&maxPhotons,sizeof(int),1,out);
+					fwrite(photons,sizeof(T),numPhotons+1,out);
+					fwrite(bmin,sizeof(float),3,out);
+					fwrite(bmax,sizeof(float),3,out);
 				}
 
 				///////////////////////////////////////////////////////////////////////

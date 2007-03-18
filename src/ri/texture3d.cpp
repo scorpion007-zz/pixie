@@ -140,9 +140,9 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 // Comments				:
 void CTexture3d::writeChannels(FILE *out) {
 	// Write out the header and channels
-	fwrite(&numChannels,1,sizeof(int),out);
+	fwrite(&numChannels,sizeof(int),1,out);
 	for (int i=0;i<numChannels;i++) {
-		fwrite(&channels[i],1,sizeof(CTexture3dChannel),out);
+		fwrite(&channels[i],sizeof(CTexture3dChannel),1,out);
 		//GSHTODO:  deal with fill
 	}
 }
@@ -157,10 +157,10 @@ void CTexture3d::readChannels(FILE *in) {
 	if (channels != NULL)	delete [] channels;
 
 	// Write out the header and channels
-	fread(&numChannels,1,sizeof(int),in);
+	fread(&numChannels,sizeof(int),1,in);
 	channels = new CTexture3dChannel[numChannels];
 	for (int i=0;i<numChannels;i++) {
-		fread(&channels[i],1,sizeof(CTexture3dChannel),in);
+		fread(&channels[i],sizeof(CTexture3dChannel),1,in);
 		dataSize += channels[i].numSamples;
 		//GSHTODO:  deal with fill
 	}

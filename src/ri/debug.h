@@ -50,17 +50,17 @@ public:
 				void			point(const float *P)	{
 									addBox(bmin,bmax,P);
 									int	i	=	0;
-									fwrite(&i,1,sizeof(int),file);
-									fwrite(P,3,sizeof(float),file);
+									fwrite(&i,sizeof(int),1,file);
+									fwrite(P,sizeof(float),3,file);
 								}
 
 				void			line(const float *P1,const float *P2) {
 									addBox(bmin,bmax,P1);
 									addBox(bmin,bmax,P2);
 									int	i	=	1;
-									fwrite(&i,1,sizeof(int),file);
-									fwrite(P1,3,sizeof(float),file);
-									fwrite(P2,3,sizeof(float),file);
+									fwrite(&i,sizeof(int),1,file);
+									fwrite(P1,sizeof(float),3,file);
+									fwrite(P2,sizeof(float),3,file);
 								}
 
 				void			triangle(const float *P1,const float *P2,const float *P3) {
@@ -68,10 +68,10 @@ public:
 									addBox(bmin,bmax,P2);
 									addBox(bmin,bmax,P3);
 									int	i	=	2;
-									fwrite(&i,1,sizeof(int),file);
-									fwrite(P1,3,sizeof(float),file);
-									fwrite(P2,3,sizeof(float),file);
-									fwrite(P3,3,sizeof(float),file);
+									fwrite(&i,sizeof(int),1,file);
+									fwrite(P1,sizeof(float),3,file);
+									fwrite(P2,sizeof(float),3,file);
+									fwrite(P3,sizeof(float),3,file);
 								}
 
 				void			quad(const float *P1,const float *P2,const float *P3,const float *P4) {
@@ -79,11 +79,11 @@ public:
 									addBox(bmin,bmax,P2);
 									addBox(bmin,bmax,P3);
 									int	i	=	3;
-									fwrite(&i,1,sizeof(int),file);
-									fwrite(P1,3,sizeof(float),file);
-									fwrite(P2,3,sizeof(float),file);
-									fwrite(P3,3,sizeof(float),file);
-									fwrite(P4,3,sizeof(float),file);
+									fwrite(&i,sizeof(int),1,file);
+									fwrite(P1,sizeof(float),3,file);
+									fwrite(P2,sizeof(float),3,file);
+									fwrite(P3,sizeof(float),3,file);
+									fwrite(P4,sizeof(float),3,file);
 								}
 
 				// Stuff inherited from CView

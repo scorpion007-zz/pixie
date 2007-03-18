@@ -596,12 +596,12 @@ void				CBrickMap::finalize() {
 	writeChannels(file);
 	
 	// Write the class data
-	fwrite(bmin,1,sizeof(vector),file);
-	fwrite(bmax,1,sizeof(vector),file);
-	fwrite(center,1,sizeof(vector),file);
-	fwrite(&side,1,sizeof(float),file);
-	fwrite(&maxDepth,1,sizeof(int),file);
-	fwrite(activeBricks,BRICK_HASHSIZE,sizeof(CBrickNode *),file);
+	fwrite(bmin,sizeof(vector),1,file);
+	fwrite(bmax,sizeof(vector),1,file);
+	fwrite(center,sizeof(vector),1,file);
+	fwrite(&side,sizeof(float),1,file);
+	fwrite(&maxDepth,sizeof(int),1,file);
+	fwrite(activeBricks,sizeof(CBrickNode *),BRICK_HASHSIZE,file);
 	for (i=0;i<BRICK_HASHSIZE;i++) {
 		for (cNode=activeBricks[i];cNode!=NULL;cNode=cNode->next) {
 
@@ -609,12 +609,12 @@ void				CBrickMap::finalize() {
 			assert(cNode->brick == NULL);
 			assert(cNode->fileIndex != -1);
 
-			fwrite(cNode,1,sizeof(CBrickNode),file);
+			fwrite(cNode,sizeof(CBrickNode),1,file);
 		}
 	}
 
 	// Write the file header at the beginning
-	fwrite(&headerOffset,1,sizeof(int),file);
+	fwrite(&headerOffset,sizeof(int),1,file);
 
 	// Mark the map as non-modifying, meaning
 	// we will no longer page out nodes
@@ -964,12 +964,12 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	// Write the class data here
 	writeChannels(outfile);
 	
-	fwrite(bmin,1,sizeof(vector),outfile);
-	fwrite(bmax,1,sizeof(vector),outfile);
-	fwrite(center,1,sizeof(vector),outfile);
-	fwrite(&side,1,sizeof(float),outfile);
-	fwrite(&maxDepth,1,sizeof(int),outfile);
-	fwrite(newHash,BRICK_HASHSIZE,sizeof(CBrickNode *),outfile);
+	fwrite(bmin,sizeof(vector),1,outfile);
+	fwrite(bmax,sizeof(vector),1,outfile);
+	fwrite(center,sizeof(vector),1,outfile);
+	fwrite(&side,sizeof(float),1,outfile);
+	fwrite(&maxDepth,sizeof(int),1,outfile);
+	fwrite(newHash,sizeof(CBrickNode *),BRICK_HASHSIZE,outfile);
 	for (i=0;i<BRICK_HASHSIZE;i++) {
 		for (cNode=newHash[i];cNode!=NULL;cNode=cNode->next) {
 
@@ -977,12 +977,12 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			assert(cNode->brick == NULL);
 			assert(cNode->fileIndex != -1);
 
-			fwrite(cNode,1,sizeof(CBrickNode),outfile);
+			fwrite(cNode,sizeof(CBrickNode),1,outfile);
 		}
 	}
 
 	// Write the file header at the beginning
-	fwrite(&headerOffset,1,sizeof(int),outfile);
+	fwrite(&headerOffset,sizeof(int),1,outfile);
 	
 	fclose(outfile);
 

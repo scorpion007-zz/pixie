@@ -83,17 +83,17 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 		unsigned int	magic	=	magicNumber;
 		int				version[3];
 
-		fwrite(&magic,1,sizeof(int),f);
+		fwrite(&magic,sizeof(int),1,f);
 
 		version[0]	=	VERSION_RELEASE;
 		version[1]	=	VERSION_BETA;
 		version[2]	=	VERSION_ALPHA;
 
-		fwrite(version,3,sizeof(int),f);
+		fwrite(version,sizeof(int),3,f);
 
 		i	=	(int) strlen(type);
-		fwrite(&i,1,sizeof(int),f);
-		fwrite(type,i+1,sizeof(char),f);
+		fwrite(&i,sizeof(int),1,f);
+		fwrite(type,sizeof(char),i+1,f);
 	} else {
 		unsigned int	magic	=	0;
 		int				version[3];

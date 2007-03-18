@@ -90,17 +90,17 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 					int				version[3],i;
 					char			*t;
 
-					fread(&magic,1,sizeof(int),in);
+					fread(&magic,sizeof(int),1,in);
 
 					if (magic == magicNumber) {
-						fread(version,3,sizeof(int),in);
+						fread(version,sizeof(int),3,in);
 
 						if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
 							error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
 						} else {
-							fread(&i,1,sizeof(int),in);
+							fread(&i,sizeof(int),1,in);
 							t	=	(char *) alloca((i+1)*sizeof(char));
-							fread(t,i+1,sizeof(char),in);
+							fread(t,sizeof(char),i+1,in);
 
 							info(CODE_PRINTF,"File:    %s\n",fileName);
 							info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);

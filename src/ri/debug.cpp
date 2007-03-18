@@ -45,17 +45,18 @@ CDebugView::CDebugView(const char *fileName,int append) {
 
 	if (append == FALSE) {
 		file	=	fopen(fileName,"wb");
-		fwrite(bmin,3,sizeof(float),file);
-		fwrite(bmax,3,sizeof(float),file);
+		fwrite(bmin,sizeof(float),3,file);
+		fwrite(bmax,sizeof(float),3,file);
 	} else {
-		file	=	fopen(fileName,"ab");
+		file	=	fopen(fileName,"r+b");
+		if (file == NULL) file	=	fopen(fileName,"w+b");
 		if (!feof(file)) {
-			fread(bmin,3,sizeof(float),file);
-			fread(bmax,3,sizeof(float),file);
+			fread(bmin,sizeof(float),3,file);
+			fread(bmax,sizeof(float),3,file);
 			fseek(file,0,SEEK_END);
 		} else {
-			fwrite(bmin,3,sizeof(float),file);
-			fwrite(bmax,3,sizeof(float),file);
+			fwrite(bmin,sizeof(float),3,file);
+			fwrite(bmax,sizeof(float),3,file);
 		}
 	}
 }
@@ -72,8 +73,8 @@ CDebugView::CDebugView(FILE *in,const char *fn) {
 	writing		=	FALSE;
 	fileName	=	fn;
 
-	fread(bmin,3,sizeof(float),file);
-	fread(bmax,3,sizeof(float),file);
+	fread(bmin,sizeof(float),3,file);
+	fread(bmax,sizeof(float),3,file);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -85,8 +86,8 @@ CDebugView::CDebugView(FILE *in,const char *fn) {
 CDebugView::~CDebugView() {
 	if (writing == TRUE) {
 		fseek(file,0,SEEK_SET);
-		fwrite(bmin,3,sizeof(float),file);
-		fwrite(bmax,3,sizeof(float),file);
+		fwrite(bmin,sizeof(float),3,file);
+		fwrite(bmax,sizeof(float),3,file);
 	}
 
 	fclose(file);

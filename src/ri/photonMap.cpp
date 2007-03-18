@@ -91,9 +91,9 @@ CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource
 		CMap<CPhoton>::read(in);
 
 		// Read the transformation matrices
-		fread(fromWorld,1,sizeof(matrix),in);
-		fread(toWorld,1,sizeof(matrix),in);
-		fread(&maxPower,1,sizeof(float),in);
+		fread(fromWorld,sizeof(matrix),1,in);
+		fread(toWorld,sizeof(matrix),1,in);
+		fread(&maxPower,sizeof(float),1,in);
 
 		mulmm(to,fromWorld,CRenderer::toWorld);
 		mulmm(from,CRenderer::fromWorld,toWorld);
@@ -186,10 +186,10 @@ void	CPhotonMap::write(const CXform *world) {
 			CMap<CPhoton>::write(out);
 	
 			// Write the matrices
-			fwrite(CRenderer::fromWorld,1,sizeof(matrix),out);
-			fwrite(CRenderer::toWorld,1,sizeof(matrix),out);
+			fwrite(CRenderer::fromWorld,sizeof(matrix),1,out);
+			fwrite(CRenderer::toWorld,sizeof(matrix),1,out);
 			maxPower	=	sqrtf(maxPower);
-			fwrite(&maxPower,1,sizeof(float),out);
+			fwrite(&maxPower,sizeof(float),1,out);
 	
 			fclose(out);
 		} else {
