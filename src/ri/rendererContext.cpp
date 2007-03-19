@@ -2589,25 +2589,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 					if (attributes->causticMapName != NULL) free(attributes->causticMapName);
 					attributes->causticMapName	=	strdup(((char **) params[i])[0]);
 				} else if (strcmp(tokens[i],RI_SHADINGMODEL) == 0) {
-					const char *val	=	((const char **) params[i])[0];
-
-					if (strcmp(val,"matte") == 0) {
-						attributes->shadingModel	=	SM_MATTE;
-					} else if (strcmp(val,"translucent") == 0) {
-						attributes->shadingModel	=	SM_TRANSLUCENT;
-					} else if (strcmp(val,"chrome") == 0) {
-						attributes->shadingModel	=	SM_CHROME;
-					} else if (strcmp(val,"glass") == 0) {
-						attributes->shadingModel	=	SM_GLASS;
-					} else if (strcmp(val,"water") == 0) {
-						attributes->shadingModel	=	SM_WATER;
-					} else if (strcmp(val,"dielectric") == 0) {
-						attributes->shadingModel	=	SM_DIELECTRIC;
-					} else if (strcmp(val,"transparent") == 0) {
-						attributes->shadingModel	=	SM_TRANSPARENT;
-					} else {
-						error(CODE_BADTOKEN,"Unknown shading model: \"%s\"\n",val);
-					}
+					attributes->shadingModel	=	CAttributes::findShadingModel(((const char **) params[i])[0]);
 				} else if (strcmp(tokens[i],RI_IOR) == 0) {
 					float	*val	=	(float *) params[i];
 					if (val[0] < 0) {

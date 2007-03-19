@@ -224,22 +224,42 @@ static	int					result		=	0;	// 0 - FALSE
 	// Description			:	Find a float expression
 	// Return Value			:
 	// Comments				:
-	static	void				findExpr(CExpr &expr,const char *name) {
+	static	void				findExpr(CExpr &expr,const char *name,const char *decl=NULL,int attributes=FALSE) {
 		if (strncmp(name,"Attribute:",10) == 0) {
 			name	+=	10;
 			
-			// Lookup the attributes
+			findExpr(expr,name,NULL,TRUE);
 		} else if (strncmp(name,"Option:",7) == 0) {
 			name	+=	7;
 			
-			// Lookup the options
+			findExpr(expr,name,NULL,FALSE);
+		} else if (strchr(name,':') != NULL) {
+			char		tmp[256];
+			const char	*p	=	strchr(name,':');
+			
+			strncpy(tmp,name,p-name);
+			tmp[p-name]		=	'\0';
+			
+			findExpr(expr,name,tmp,attributes);
 		} else {
+			
+			if (attributes) {
+				// Lookup the attributes
+				CAttributes	*cAttributes	=	context->getAttributes(TRUE);
+				
+				cAttributes->find(name,decl,expr.type,expr.value);
+			} else {
+				// Lookup the options
+				COptions	*cOptions		=	context->getOptions();
+				
+				cOptions->find(name,decl,expr.type,expr.value);
+			}
 		}
 	}
 
 
 
-#line 197 "../../../../src/ri/ifexpr.y"
+#line 217 "../../../../src/ri/ifexpr.y"
 typedef union slval {
 	char	string[PARSER_MAX_STRING_SIZE];
 	CExpr	expr;
@@ -321,9 +341,9 @@ static const short yyrhs[] = {    31,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   251,   259,   267,   278,   283,   290,   299,   306,   313,   320,
-   329,   336,   343,   356,   367,   378,   389,   400,   411,   421,
-   430,   437,   443,   452,   462
+   271,   279,   287,   298,   303,   310,   319,   326,   333,   340,
+   349,   356,   363,   376,   387,   398,   409,   420,   431,   441,
+   450,   457,   463,   472,   482
 };
 #endif
 
@@ -950,7 +970,7 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 252 "../../../../src/ri/ifexpr.y"
+#line 272 "../../../../src/ri/ifexpr.y"
 {
 					////////////////////////////////////////////////////////////////////
 					// Compute the value of the expression
@@ -959,14 +979,14 @@ case 1:
 				;
     break;}
 case 2:
-#line 263 "../../../../src/ri/ifexpr.y"
+#line 283 "../../../../src/ri/ifexpr.y"
 {
 					// Find the variable here
 					findExpr(yyval.expr,yyvsp[0].string);
 				;
     break;}
 case 3:
-#line 272 "../../../../src/ri/ifexpr.y"
+#line 292 "../../../../src/ri/ifexpr.y"
 {
 					// FIXME: This is wrong. What are we supposed to do here ?
 					
@@ -975,13 +995,13 @@ case 3:
 				;
     break;}
 case 4:
-#line 280 "../../../../src/ri/ifexpr.y"
+#line 300 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,yyvsp[0].real);
 				;
     break;}
 case 5:
-#line 285 "../../../../src/ri/ifexpr.y"
+#line 305 "../../../../src/ri/ifexpr.y"
 {
 					yyval.expr.type		=	TYPE_STRING;
 					yyval.expr.value	=	yyval.expr.tmpString;
@@ -989,49 +1009,49 @@ case 5:
 				;
     break;}
 case 6:
-#line 296 "../../../../src/ri/ifexpr.y"
+#line 316 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) + getFloat(yyvsp[0].expr));
 				;
     break;}
 case 7:
-#line 303 "../../../../src/ri/ifexpr.y"
+#line 323 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) - getFloat(yyvsp[0].expr));
 				;
     break;}
 case 8:
-#line 310 "../../../../src/ri/ifexpr.y"
+#line 330 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) * getFloat(yyvsp[0].expr));
 				;
     break;}
 case 9:
-#line 317 "../../../../src/ri/ifexpr.y"
+#line 337 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) / getFloat(yyvsp[0].expr));
 				;
     break;}
 case 10:
-#line 326 "../../../../src/ri/ifexpr.y"
+#line 346 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) & getInt(yyvsp[0].expr));
 				;
     break;}
 case 11:
-#line 333 "../../../../src/ri/ifexpr.y"
+#line 353 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) | getInt(yyvsp[0].expr));
 				;
     break;}
 case 12:
-#line 340 "../../../../src/ri/ifexpr.y"
+#line 360 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) ^ getInt(yyvsp[0].expr));
 				;
     break;}
 case 13:
-#line 349 "../../../../src/ri/ifexpr.y"
+#line 369 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) == 0);
@@ -1041,7 +1061,7 @@ case 13:
 				;
     break;}
 case 14:
-#line 360 "../../../../src/ri/ifexpr.y"
+#line 380 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) != 0);
@@ -1051,7 +1071,7 @@ case 14:
 				;
     break;}
 case 15:
-#line 371 "../../../../src/ri/ifexpr.y"
+#line 391 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) > 0);
@@ -1061,7 +1081,7 @@ case 15:
 				;
     break;}
 case 16:
-#line 382 "../../../../src/ri/ifexpr.y"
+#line 402 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) < 0);
@@ -1071,7 +1091,7 @@ case 16:
 				;
     break;}
 case 17:
-#line 393 "../../../../src/ri/ifexpr.y"
+#line 413 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) >= 0);
@@ -1081,7 +1101,7 @@ case 17:
 				;
     break;}
 case 18:
-#line 404 "../../../../src/ri/ifexpr.y"
+#line 424 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) <= 0);
@@ -1091,44 +1111,44 @@ case 18:
 				;
     break;}
 case 19:
-#line 417 "../../../../src/ri/ifexpr.y"
+#line 437 "../../../../src/ri/ifexpr.y"
 {
 					// FIXME: Implement pattern matching
 					setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) == 0);
 				;
     break;}
 case 20:
-#line 427 "../../../../src/ri/ifexpr.y"
+#line 447 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) && getInt(yyvsp[0].expr));
 				;
     break;}
 case 21:
-#line 434 "../../../../src/ri/ifexpr.y"
+#line 454 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) || getInt(yyvsp[0].expr));
 				;
     break;}
 case 22:
-#line 440 "../../../../src/ri/ifexpr.y"
+#line 460 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,! getInt(yyvsp[0].expr));
 				;
     break;}
 case 23:
-#line 449 "../../../../src/ri/ifexpr.y"
+#line 469 "../../../../src/ri/ifexpr.y"
 {
 					yyval.expr	=	yyvsp[-1].expr;
 				;
     break;}
 case 24:
-#line 459 "../../../../src/ri/ifexpr.y"
+#line 479 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,CRenderer::retrieveVariable(getString(yyvsp[-1].expr)) != NULL);
 				;
     break;}
 case 25:
-#line 471 "../../../../src/ri/ifexpr.y"
+#line 491 "../../../../src/ri/ifexpr.y"
 {
 					yyval.expr.type		=	TYPE_STRING;
 					yyval.expr.value	=	yyval.expr.tmpString;
@@ -1333,7 +1353,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 479 "../../../../src/ri/ifexpr.y"
+#line 499 "../../../../src/ri/ifexpr.y"
 
 
 #include "lex.if.cpp"

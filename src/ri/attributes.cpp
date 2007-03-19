@@ -426,10 +426,110 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 int		CAttributes::find(const char *name,const char *category,EVariableType &type,void *&value) {
 
 	if ((category == NULL) || (strcmp(category,RI_DICE) == 0)) {
-		if (strcmp(name,RI_NUMPROBES) == 0)				{	type	=	TYPE_INTEGER;	value	=	&numUProbes;}
-		else if (strcmp(name,RI_MINSPLITS) == 0)		{	type	=	TYPE_INTEGER;	value	=	&minSplits;}
-		else if (strcmp(name,RI_BOUNDEXPAND) == 0)		{	type	=	TYPE_FLOAT;		value	=	&rasterExpand;}
+		if (strcmp(name,RI_NUMPROBES) == 0)				{	type	=	TYPE_INTEGER;	value	=	&numUProbes;			return TRUE;}
+		else if (strcmp(name,RI_MINSPLITS) == 0)		{	type	=	TYPE_INTEGER;	value	=	&minSplits;				return TRUE;}
+		else if (strcmp(name,RI_BOUNDEXPAND) == 0)		{	type	=	TYPE_FLOAT;		value	=	&rasterExpand;			return TRUE;}
 	}
 
+	if ((category == NULL) || (strcmp(category,RI_DISPLACEMENTBOUND) == 0)) {
+		if (strcmp(name,RI_SPHERE) == 0)				{	type	=	TYPE_FLOAT;		value	=	&maxDisplacement;		return TRUE;}
+		else if (strcmp(name,RI_COORDINATESYSYTEM) == 0){	type	=	TYPE_INTEGER;	value	=	&maxDiffuseDepth;		return TRUE;}
+	}
+
+	if ((category == NULL) || (strcmp(category,RI_TRACE) == 0)) {
+		if (strcmp(name,RI_BIAS) == 0)					{	type	=	TYPE_FLOAT;		value	=	&shadowBias;			return TRUE;}
+		else if (strcmp(name,RI_MAXDIFFUSEDEPTH) == 0)	{	type	=	TYPE_STRING;	value	=	maxDisplacementSpace;	return TRUE;}
+		else if (strcmp(name,RI_MAXSPECULARDEPTH) == 0)	{	type	=	TYPE_STRING;	value	=	&maxSpecularDepth;		return TRUE;}
+	}
+
+	if ((category == NULL) || (strcmp(category,RI_IRRADIANCE) == 0)) {
+		if (strcmp(name,RI_HANDLE) == 0)				{	type	=	TYPE_STRING;	value	=	irradianceHandle;		return TRUE;}
+		else if (strcmp(name,RI_FILEMODE) == 0)			{	type	=	TYPE_STRING;	value	=	irradianceHandleMode;	return TRUE;}
+		else if (strcmp(name,RI_MAXERROR) == 0)			{	type	=	TYPE_FLOAT;		value	=	&irradianceMaxError;	return TRUE;}
+	}
+
+	if ((category == NULL) || (strcmp(category,RI_PHOTON) == 0)) {
+		if (strcmp(name,RI_GLOBALMAP) == 0)				{	type	=	TYPE_STRING;	value	=	globalMapName;			return TRUE;}
+		else if (strcmp(name,RI_CAUSTICMAP) == 0)		{	type	=	TYPE_STRING;	value	=	causticMapName;			return TRUE;}
+		else if (strcmp(name,RI_IOR) == 0)				{	type	=	TYPE_FLOAT;		value	=	photonIor;				return TRUE;}
+		else if (strcmp(name,RI_IORRANGE) == 0)			{	type	=	TYPE_FLOAT;		value	=	photonIor;				return TRUE;}
+		else if (strcmp(name,RI_ESTIMATOR) == 0)		{	type	=	TYPE_FLOAT;		value	=	&photonEstimator;		return TRUE;}
+	}
+
+	// Is this is a user attribute ?
+	if ((category == NULL) || (strcmp(category,RI_USER) == 0)) {
+		CVariable	*cVariable;
+
+		// Lookup the attribute
+		if (userAttributes.lookup(name,cVariable)) {
+			type	=	cVariable->type;
+			value	=	cVariable->defaultValue;
+
+			if (value != NULL)	return TRUE;
+		}
+	}
+
+	// Unable to find it
 	return FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	findShadingModel
+// Description			:	Find the shading model from text
+// Return Value			:	-
+// Comments				:
+EShadingModel		CAttributes::findShadingModel(const char *val) {
+	if (strcmp(val,"matte") == 0) {
+		return SM_MATTE;
+	} else if (strcmp(val,"translucent") == 0) {
+		return SM_TRANSLUCENT;
+	} else if (strcmp(val,"chrome") == 0) {
+		return SM_CHROME;
+	} else if (strcmp(val,"glass") == 0) {
+		return SM_GLASS;
+	} else if (strcmp(val,"water") == 0) {
+		return SM_WATER;
+	} else if (strcmp(val,"dielectric") == 0) {
+		return SM_DIELECTRIC;
+	} else if (strcmp(val,"transparent") == 0) {
+		return SM_TRANSPARENT;
+	} else {
+		error(CODE_BADTOKEN,"Unknown shading model: \"%s\"\n",val);
+		return SM_MATTE;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	findShadingModel
+// Description			:	The other way around
+// Return Value			:	-
+// Comments				:
+const char			*CAttributes::findShadingModel(EShadingModel model) {
+	switch(model) {
+	case SM_MATTE:
+		return "matte";
+		break;
+	case SM_TRANSLUCENT:
+		return "translucent";
+		break;
+	case SM_CHROME:
+		return "chrome";
+		break;
+	case SM_GLASS:
+		return "glass";
+		break;
+	case SM_WATER:
+		return "water";
+		break;
+	case SM_DIELECTRIC:
+		return "dielectric";
+		break;
+	case SM_TRANSPARENT:
+		return "transparent";
+		break;
+	}
+
+	return "matte";
 }

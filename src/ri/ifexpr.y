@@ -179,16 +179,36 @@ static	int					result		=	0;	// 0 - FALSE
 	// Description			:	Find a float expression
 	// Return Value			:
 	// Comments				:
-	static	void				findExpr(CExpr &expr,const char *name) {
+	static	void				findExpr(CExpr &expr,const char *name,const char *decl=NULL,int attributes=FALSE) {
 		if (strncmp(name,"Attribute:",10) == 0) {
 			name	+=	10;
 			
-			// Lookup the attributes
+			findExpr(expr,name,NULL,TRUE);
 		} else if (strncmp(name,"Option:",7) == 0) {
 			name	+=	7;
 			
-			// Lookup the options
+			findExpr(expr,name,NULL,FALSE);
+		} else if (strchr(name,':') != NULL) {
+			char		tmp[256];
+			const char	*p	=	strchr(name,':');
+			
+			strncpy(tmp,name,p-name);
+			tmp[p-name]		=	'\0';
+			
+			findExpr(expr,name,tmp,attributes);
 		} else {
+			
+			if (attributes) {
+				// Lookup the attributes
+				CAttributes	*cAttributes	=	context->getAttributes(TRUE);
+				
+				cAttributes->find(name,decl,expr.type,expr.value);
+			} else {
+				// Lookup the options
+				COptions	*cOptions		=	context->getOptions();
+				
+				cOptions->find(name,decl,expr.type,expr.value);
+			}
 		}
 	}
 

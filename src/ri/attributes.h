@@ -183,6 +183,9 @@ public:
 		float				lodImportance;
 		
 		CUserAttributeDictionary		userAttributes;					// Duh.
+
+static	EShadingModel		findShadingModel(const char *name);
+static	const char			*findShadingModel(EShadingModel model);
 };
 
 #endif
