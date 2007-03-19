@@ -21,6 +21,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				executeMisc.cpp \
 				fileResource.cpp \
 				hcshader.cpp \
+				ifexpr.cpp \
 				implicitSurface.cpp \
 				init.cpp \
 				irradiance.cpp \
