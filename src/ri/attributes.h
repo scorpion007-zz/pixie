@@ -107,7 +107,8 @@ public:
 		void				removeLight(CShaderInstance *);
 		void				checkParameters();							// Re-compute the required shader parameters
 		CVariable			*findParameter(const char *);				// Find a shader parameter
-
+		void				restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding);
+		
 		int					refCount;									// Refcount used by the objects and the general graphics state
 		
 		CAttributes			*next;										// points to the next attribute if there's motion blur

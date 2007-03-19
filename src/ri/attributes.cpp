@@ -336,3 +336,20 @@ CVariable	*CAttributes::findParameter(const char *name) {
 	return NULL;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	restore
+// Description			:	Restore some portion of the shading state from another attribute block
+// Return Value			:	-
+// Comments				:
+void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding) {
+	if (shading) {
+		if (surface != NULL)		surface->detach();
+		if (displacement != NULL)	displacement->detach();
+		if (atmosphere != NULL)		atmosphere->detach();
+		if (interior != NULL)		interior->detach();
+		if (exterior != NULL)		exterior->detach();
+		
+		surface	=	other->surface;	
+	}
+}

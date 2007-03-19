@@ -86,6 +86,7 @@
 		18D51FEC0B843CE90039A966 /* align.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FEB0B843CE80039A966 /* align.h */; };
 		18D51FEE0B843D020039A966 /* polynomial.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D51FED0B843D020039A966 /* polynomial.h */; };
 		18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18E9F1060B75B07500DA484A /* rendererMutexes.cpp */; };
+		18EFE5090BACBBA400CC743A /* userAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 18EFE5080BACBBA400CC743A /* userAttributes.h */; };
 		18FD22770B856BE600681F0C /* ambientindirect.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398370B2D2CA60055E484 /* ambientindirect.sdr */; };
 		18FD22780B856BE600681F0C /* ambientindirect.sl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398380B2D2CA60055E484 /* ambientindirect.sl */; };
 		18FD22790B856BE600681F0C /* ambientlight.sdr in CopyFiles */ = {isa = PBXBuildFile; fileRef = 183398390B2D2CA60055E484 /* ambientlight.sdr */; };
@@ -954,6 +955,7 @@
 		18D51FEB0B843CE80039A966 /* align.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = align.h; path = ../../src/common/align.h; sourceTree = SOURCE_ROOT; };
 		18D51FED0B843D020039A966 /* polynomial.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = polynomial.h; path = ../../src/common/polynomial.h; sourceTree = SOURCE_ROOT; };
 		18E9F1060B75B07500DA484A /* rendererMutexes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rendererMutexes.cpp; path = ../../src/ri/rendererMutexes.cpp; sourceTree = SOURCE_ROOT; };
+		18EFE5080BACBBA400CC743A /* userAttributes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = userAttributes.h; path = ../../src/ri/userAttributes.h; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E2F0AD6D651003C2D7B /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = algebra.cpp; path = ../../src/common/algebra.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E300AD6D651003C2D7B /* algebra.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = algebra.h; path = ../../src/common/algebra.h; sourceTree = SOURCE_ROOT; };
@@ -1766,6 +1768,7 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
+				18EFE5080BACBBA400CC743A /* userAttributes.h */,
 				C96A6EF00AD6E143003C2D7B /* attributes.cpp */,
 				C96A6EF10AD6E143003C2D7B /* attributes.h */,
 				C96A6EF20AD6E143003C2D7B /* brickmap.cpp */,
@@ -2128,6 +2131,7 @@
 				18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */,
 				18B045E20B7D794C00500420 /* config.h in Headers */,
 				18D4F7280BAB9A9E0090673B /* resource.h in Headers */,
+				18EFE5090BACBBA400CC743A /* userAttributes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

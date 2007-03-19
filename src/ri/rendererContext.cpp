@@ -4407,12 +4407,106 @@ void	CRendererContext::RiArchiveEnd(void) {
 }
 	
 void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
+	
+	// Check the parameters
+	if (n == 0) {
+		error(CODE_BADTOKEN,"Was expecting arguments with resource");
+		return;
+	}
+
+	// Does PrMan support anything other than attribute ?
+	if (strcmp(type,"attributes") != 0) {
+		error(CODE_LIMIT,"Don't know how to handle this type\nPlease tell us know what this type means at the Pixie forums\n");
+		return;
+	}
+	
+	int			i;
+	CVariable	tmp;
+	CVariable	*cVariable;	
+	int			save		=	FALSE;
+	int			transform	=	FALSE;
+	int			shading		=	FALSE;
+	
+	// Parse variables
+	for (i=0;i<n;i++) {
+		cVariable	=	CRenderer::retrieveVariable(tokens[i]);
+		
+		if (cVariable == NULL)	parseVariable(&tmp,NULL,tokens[i]);
+		
+		if (cVariable != NULL) {
+			if (strcmp(cVariable->name,"operation") == 0) {
+				if (strcmp((const char *) parms[i],"save") == 0)			save	=	TRUE;
+				else if (strcmp((const char *) parms[i],"restore") == 0)	save	=	FALSE;
+				else {
+					error(CODE_BADTOKEN,"Invalid operation for resource: %s\n",(const char *) parms[i]);
+					return;
+				}
+			} else if (strcmp(cVariable->name,"subset") == 0) {
+				if (strcmp((const char *) parms[i],"shading") == 0)			shading		=	TRUE;
+				else if (strcmp((const char *) parms[i],"transform") == 0)	transform	=	TRUE;
+				else {
+					error(CODE_BADTOKEN,"Invalid subset for resource: %s\n",(const char *) parms[i]);
+					return;
+				}
+			} else {
+				error(CODE_BADTOKEN,"Unrecognised parameter in resource: %s\n",(const char *) tokens[i]);
+				return;
+			}
+		} else {
+			error(CODE_BADTOKEN,"Unrecognised parameter in resource: %s\n",(const char *) tokens[i]);
+			return;
+		}
+	}
+	
+	// Are we saving ?
+	if (save) {
+		CResource	*nResource	=	new CResource(handle,currentAttributes,currentXform);
+		
+		nResource->next	=	currentResource;
+		currentResource	=	nResource;
+	} else {
+		CResource	*cResource	=	NULL;
+		int			i;
+		
+		// Remporarily push the current resource list into the stack to make our life easier
+		savedResources->push(currentResource);
+		
+		// Search the saved resources for the handle we're looking for
+		for (i=savedResources->numItems;i>0;i--) {
+			for (cResource=savedResources->array[i-1];cResource!=NULL;cResource=cResource->next) {
+			
+				// Did we find a match ?
+				if (strcmp(cResource->name,handle) == 0)	break;
+			}
+			
+			if (cResource != NULL)	break;
+		}
+		savedResources->pop();
+		
+		if (cResource == NULL) error(CODE_NOTATTRIBS,"Named resource \"%s\" not found\n",handle);
+		else {
+			
+		}
+	}
 }
 
 void	CRendererContext::RiResourceBegin(void) {
+
+	// Save the resources
+	savedResources->push(currentResource);
 }
 
 void	CRendererContext::RiResourceEnd(void) {
+	
+	// Delete the resources
+	CResource	*cResource;
+	while((cResource = currentResource) != NULL) {
+		currentResource	=	currentResource->next;
+		delete cResource;
+	}
+	
+	// Restore the resources
+	currentResource	=	savedResources->pop();
 }
 
 void	CRendererContext::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {

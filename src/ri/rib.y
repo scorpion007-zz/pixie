@@ -702,11 +702,10 @@ ribTextArray:	RIB_ARRAY_BEGIN
 					$$	=	$2;
 				}
 				|
-				RIB_TEXT
+				RIB_ARRAY_BEGIN
+				RIB_ARRAY_END
 				{
-					char	*theString	=	strdup($1);
-					stringArgs->push(theString);
-					$$	= 1;
+					$$	=	0;
 				}
 				;
 
