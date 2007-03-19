@@ -273,7 +273,7 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 					// FIXME: This is wrong. What are we supposed to do here ?
 					
 					// Find the variable here
-					findExpr($$,getString($2));
+					findExpr($$,getString($3));
 				}
 				|
 				IF_FLOAT_VALUE
