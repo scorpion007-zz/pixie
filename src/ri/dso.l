@@ -12,7 +12,7 @@ string							return DSO_STRING;
 output							;
 \(								return DSO_OPEN;
 \)								return DSO_CLOSE;
-[a-zA-Z0-9\_]+					{	strcpy(yylval.string,yytext);	return DSO_TEXT;	}
+[a-zA-Z0-9\_]+					{	assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,yytext);	return DSO_TEXT;	}
 \,								return DSO_COMMA;
 [\n\t ]							;
 

@@ -57,7 +57,7 @@
 
 %union ribval {
 	float	real;
-	char	string[2048];
+	char	string[PARSER_MAX_STRING_SIZE];
 	int		integer;
 }
 
@@ -702,10 +702,11 @@ ribTextArray:	RIB_ARRAY_BEGIN
 					$$	=	$2;
 				}
 				|
-				RIB_ARRAY_BEGIN
-				RIB_ARRAY_END
+				RIB_TEXT
 				{
-					$$	=	0;
+					char	*theString	=	strdup($1);
+					stringArgs->push(theString);
+					$$	= 1;
 				}
 				;
 

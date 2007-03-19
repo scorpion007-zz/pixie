@@ -12,6 +12,8 @@ flex -Psl -olex.sl.cpp sdr.l
 bison -p sl -o sl.cpp sdr.y
 flex -Pvar -olex.var.cpp variable.l
 bison -p var -o variable.cpp variable.y
+flex -Pif -olex.if.cpp ifexpr.l
+bison -p if -o ifexpr.cpp ifexpr.y
 cd ../sdr
 flex -Psdr -olex.sdr.cpp sdr.l
 bison -p sdr -o sdr.cpp sdr.y

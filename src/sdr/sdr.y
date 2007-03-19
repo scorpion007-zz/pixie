@@ -45,45 +45,6 @@
 		void							sdrerror(char *);			// Forward definition for stupid yacc
 		int								sdrlex(void );				// Forward definition for stupid yacc
 
-///////////////////////////////////////////////////////////////////////
-// Function				:
-// Description			:
-// Return Value			:
-// Comments				:
-static	void	processEscapes(char *str) {
-	char	*cstr;
-
-	while((cstr = strchr(str,'\\')) != NULL) {
-		switch(cstr[1]) {
-		case 'n':
-			cstr[0]	=	'\n';
-			break;
-		case 't':
-			cstr[0]	=	'\t';
-			break;
-		case 'r':
-			cstr[0]	=	'\r';
-			break;
-		default:
-			if (((cstr[1] >= 'a') && (cstr[1] <= 'z')) || ((cstr[1] >= 'A') && (cstr[1] <= 'Z'))) {
-				// Unrecognised escape sequence
-				sdrerror("Unrecognised escape sequence");
-			} else {
-				cstr[0]	=	cstr[1];
-			}
-		}
-
-		{
-			int i;
-
-			for (i=2;cstr[i] != '\0';i++) {
-				cstr[i-1]	=	cstr[i];
-			}
-
-			cstr[i-1]	=	cstr[i];
-		}
-	}
-}
 
 
 

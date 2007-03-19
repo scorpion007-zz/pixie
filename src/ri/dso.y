@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "common/os.h"
+#include "config.h"
 
 int								dsolex(void );				// Forward definition for stupid yacc
 void							dsoerror(char *,...);
@@ -45,7 +46,7 @@ static	int						numErrors;
 
 %}
 %union slval {
-	char	string[64];
+	char	string[PARSER_MAX_STRING_SIZE];
 }
 %token	DSO_VOID
 %token	DSO_FLOAT

@@ -37,7 +37,7 @@ DSO													return SCRL_DSO;
 \,													return SCRL_COMMA;
 
 \#\!version[ ]+[0-9]+\.[0-9]+\.[0-9]+\n				{	int	r,b,a;	sscanf(yytext+9,"%d.%d.%d",&r,&b,&a);	if ((r != VERSION_RELEASE) || (b != VERSION_BETA)) sdrerror("Version mismatch");	}
-\"[^\"]*\"											{   strcpy(yylval.string,&yytext[1]);	yylval.string[strlen(yylval.string)-1] = '\0'; processEscapes(yylval.string); return SCRL_TEXT_VALUE;}
+\"[^\"]*\"											{   strcpy(yylval.string,&yytext[1]);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return SCRL_TEXT_VALUE;}
 [a-zA-Z\_][a-zA-Z0-9\_]*							{	strcpy(yylval.string,yytext); return SCRL_IDENTIFIER_VALUE; }
 \#\![a-zA-Z][a-zA-Z0-9\_]*							{	strcpy(yylval.string,yytext); return SCRL_LABEL_VALUE; }
 

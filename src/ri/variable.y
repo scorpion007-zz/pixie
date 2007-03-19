@@ -36,6 +36,7 @@
 #include	"common/containers.h"
 #include	"renderer.h"
 #include	"error.h"
+#include	"config.h"
 
 // Some forward definitions
 		void							varerror(char *);			// Forward definition for stupid yacc
@@ -47,7 +48,7 @@
 %}
 %union varval {
 	float	real;
-	char	string[64];
+	char	string[PARSER_MAX_STRING_SIZE];
 }
 %token	VAR_GLOBAL
 %token	VAR_CONSTANT

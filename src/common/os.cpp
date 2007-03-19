@@ -483,3 +483,43 @@ void	osDeleteSemaphore(TSemaphore &sem) {
 #endif
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	osProcessEscapes
+// Description			:	Process the escape characters in a string
+// Return Value			:
+// Comments				:
+void	osProcessEscapes(char *str) {
+	int		i,n,j;
+
+	n	=	(int) strlen(str);
+	for (i=0;i<n;i++) {
+		if (str[i] == '\\') {
+			switch(str[i+1]) {
+			case 'n':
+				str[i]	=	'\n';
+				break;
+			case 't':
+				str[i]	=	'\t';
+				break;
+			case 'r':
+				str[i]	=	'\r';
+				break;
+			case '\\':
+				str[i]	=	'\\';
+				break;
+			default:
+				break;
+			}
+
+			j	=	i+2;
+			do {
+				str[j-1]	=	str[j];
+				j++;
+			} while(str[j] != '\0');
+			n--;
+			i++;
+		}
+	}
+	str[i]	=	'\0';
+}

@@ -91,6 +91,31 @@ CXform::~CXform() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
+// Method				:	restore
+// Description			:	Restore from a saved Xform
+// Return Value			:	-
+// Comments				:
+void	CXform::restore(const CXform *xform) {
+	movmm(from,xform->from);
+	movmm(to,xform->to);
+	flip	=	xform->flip;
+
+	if (xform->next != NULL) {
+		if (next != NULL) {
+			next->restore(xform->next);
+		} else {
+			next	=	new CXform(xform->next);
+		}
+	} else {
+		if (next != NULL) {
+			delete next;
+			next	=	NULL;
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CXform
 // Method				:	identity
 // Description			:	Initialize the transformation to identity
 // Return Value			:	-

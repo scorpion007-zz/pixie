@@ -247,8 +247,10 @@ private:
 	float						*motionParameters;			// The arrays of motion parameters
 	int							maxMotionParameters;		// The maximum number of motion parameters that can be stored
 	char						*lastCommand;				// The text of the last motion command
+	int							riExecTag;					// The exec tag count for the RI interface
 
 	void						init(CProgrammableShaderInstance *);		// Execute the init code of a shader
+	int							ifParse(const char *expr);	// Evaluate a condition
 	int							addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1);
 };
 

@@ -73,13 +73,16 @@
 #include "show.h"
 #include "brickmap.h"
 #include "displayChannel.h"
+#include "ribout.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // The global variables are defined here
-extern	int			ribCommandLineno;					// These two are defined in rib.y
-extern	const char	*ribFile;
-
+extern	int				ribCommandLineno;					// Defined in rib.y
+extern	const char		*ribFile;							// Defined in rib.y
+extern	int				ignoreCommand;						// Defined in ri.cpp
+extern	CRiInterface	*savedRenderMan;					// Defined in ri.cpp
+extern	CRiInterface	*renderMan;							// Defined in ri.cpp
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
@@ -121,6 +124,7 @@ CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
 	motionParameters				=	NULL;
 	maxMotionParameters				=	0;
 	lastCommand						=	NULL;
+	riExecTag						=	0;
 }
 
 
@@ -4397,13 +4401,19 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
-// FIXME: Implement Begin
 void	*CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+
+	// FIXME: We should probably save the archive into the frame temp. directory
+
+	// Save the interface
+	savedRenderMan	=	renderMan;
+	renderMan		=	new CRibOut(name);
+
 	return NULL;
 }
 
 void	CRendererContext::RiArchiveEnd(void) {
+	savedRenderMan	=	NULL;
 }
 	
 void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
@@ -4416,23 +4426,30 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,cha
 
 	// Does PrMan support anything other than attribute ?
 	if (strcmp(type,"attributes") != 0) {
-		error(CODE_LIMIT,"Don't know how to handle this type\nPlease tell us know what this type means at the Pixie forums\n");
+		error(CODE_BADTOKEN,"Don't know how to handle this type\nPlease tell us know what this type means at the Pixie forums\n");
 		return;
 	}
 	
 	int			i;
 	CVariable	tmp;
 	CVariable	*cVariable;	
-	int			save		=	FALSE;
-	int			transform	=	FALSE;
-	int			shading		=	FALSE;
+	int			save					=	FALSE;
+	int			transform				=	FALSE;
+	int			shading					=	FALSE;
+	int			geometrymodification	=	FALSE;
+	int			geometrydefinition		=	FALSE;
+	int			hiding					=	FALSE;
 	
-	// Parse variables
+	// Parse the parameter list
 	for (i=0;i<n;i++) {
+
+		// Get the variable
 		cVariable	=	CRenderer::retrieveVariable(tokens[i]);
 		
+		// Parse if necessary
 		if (cVariable == NULL)	parseVariable(&tmp,NULL,tokens[i]);
 		
+		// Do we have something?
 		if (cVariable != NULL) {
 			if (strcmp(cVariable->name,"operation") == 0) {
 				if (strcmp((const char *) parms[i],"save") == 0)			save	=	TRUE;
@@ -4442,8 +4459,11 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,cha
 					return;
 				}
 			} else if (strcmp(cVariable->name,"subset") == 0) {
-				if (strcmp((const char *) parms[i],"shading") == 0)			shading		=	TRUE;
-				else if (strcmp((const char *) parms[i],"transform") == 0)	transform	=	TRUE;
+				if (strcmp((const char *) parms[i],"shading") == 0)						shading					=	TRUE;
+				else if (strcmp((const char *) parms[i],"geometrymodification") == 0)	geometrymodification	=	TRUE;
+				else if (strcmp((const char *) parms[i],"geometrydefinition") == 0)		geometrydefinition		=	TRUE;
+				else if (strcmp((const char *) parms[i],"hiding") == 0)					hiding					=	TRUE;
+				else if (strcmp((const char *) parms[i],"transform") == 0)				transform				=	TRUE;
 				else {
 					error(CODE_BADTOKEN,"Invalid subset for resource: %s\n",(const char *) parms[i]);
 					return;
@@ -4485,7 +4505,20 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,cha
 		
 		if (cResource == NULL) error(CODE_NOTATTRIBS,"Named resource \"%s\" not found\n",handle);
 		else {
-			
+
+			if (shading | geometrymodification | geometrydefinition | hiding) {
+				CAttributes	*cAttributes;
+
+				cAttributes	=	getAttributes(FALSE);
+				cAttributes->restore(cResource->attributes,shading,geometrymodification,geometrydefinition,hiding);
+			}
+
+			if (transform) {
+				CXform		*cXform;
+
+				cXform		=	getXform(FALSE);
+				cXform->restore(cResource->xform);
+			}
 		}
 	}
 }
@@ -4510,18 +4543,60 @@ void	CRendererContext::RiResourceEnd(void) {
 }
 
 void	CRendererContext::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {
+
+	if (riExecTag == 0) {
+		if (ifParse(expr)) {
+			// We're executing ...
+		} else {
+			ignoreCommand	=	TRUE;
+			riExecTag++;
+		}
+	} else {
+		assert(ignoreCommand == TRUE);
+		riExecTag++;
+	}
 }
 
 void	CRendererContext::RiElseIfV(const char *expr,int n,char *tokens[],void *parms[]) {
+	
+	if (riExecTag == 0) {
+		ignoreCommand	=	TRUE;
+		riExecTag++;
+	} else if (riExecTag == 1) {
+		if (ifParse(expr)) {
+			// We're executing
+			riExecTag--;
+			ignoreCommand	=	FALSE;
+		} else {
+			// We're already ignoring
+			assert(ignoreCommand == TRUE);
+		}
+	} else {
+		// We're already ignoring
+		assert(ignoreCommand == TRUE);
+	}
 }
 
 void	CRendererContext::RiElse(void) {
+	if (riExecTag == 0) {
+		ignoreCommand	=	TRUE;
+		riExecTag++;
+	} else if (riExecTag == 1) {
+		riExecTag--;
+		ignoreCommand	=	FALSE;
+	} else {
+		// We're already ignoring
+		assert(ignoreCommand == TRUE);
+	}
 }
 
 void	CRendererContext::RiIfEnd(void) {
+	if (riExecTag == 0) {
+	} else {
+		riExecTag--;
+		if (riExecTag == 0)	ignoreCommand	=	FALSE;
+	}
 }
-// FIXME: Implement end
-//////////////////////////////////////////////////////////////////////////////////////
 
 void	CRendererContext::RiError(int code,int severity,char *mes) {
 	char		tmp[OS_MAX_PATH_LENGTH];

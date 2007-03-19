@@ -54,6 +54,8 @@ public:
 	void		detach()	{	refCount--; if (refCount == 0) delete this; }
 	void		check()		{	if (refCount == 0)	delete this;			}
 
+	void		restore(const CXform *xform);
+
 	void		identity();							// Transformations
 	void		translate(float,float,float);		// Concetenate from right
 	void		rotate(float,float,float,float);

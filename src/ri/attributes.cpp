@@ -350,6 +350,86 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 		if (interior != NULL)		interior->detach();
 		if (exterior != NULL)		exterior->detach();
 		
-		surface	=	other->surface;	
+		surface			=	other->surface;			if (surface != NULL)		surface->attach();
+		displacement	=	other->displacement;	if (displacement != NULL)	displacement->attach();
+		atmosphere		=	other->atmosphere;		if (atmosphere != NULL)		atmosphere->attach();
+		interior		=	other->interior;		if (interior != NULL)		interior->attach();
+		exterior		=	other->exterior;		if (exterior != NULL)		exterior->attach();
+
+		movvv(surfaceColor,other->surfaceColor);
+		movvv(surfaceColor,other->surfaceColor);
+
+		// Delete the light sources
+		CActiveLight	*cLight;
+		while((cLight=lightSources) != NULL) {
+			lightSources	=	lightSources->next;
+			delete cLight;
+		}
+
+		// Copy the light sources
+		for (cLight=other->lightSources;cLight!=NULL;cLight=cLight->next) {
+			CActiveLight	*nLight	=	new CActiveLight;
+			nLight->light			=	cLight->light;
+			nLight->next			=	lightSources;
+			lightSources			=	nLight;
+		}
+
+		shadingRate	=	other->shadingRate;
+		memcpy(s,other->s,4*sizeof(float));
+		memcpy(t,other->t,4*sizeof(float));
+
+		// Do the irradiance stuff
+		if (irradianceHandle		!= NULL)	free(irradianceHandle);
+		if (irradianceHandleMode	!= NULL)	free(irradianceHandleMode);
+		irradianceHandle		=	(other->irradianceHandle == NULL ? NULL : strdup(other->irradianceHandle));
+		irradianceHandleMode	=	(other->irradianceHandleMode == NULL ? NULL : strdup(other->irradianceHandleMode));
+
+		// Do the photon map stuff
+		if (globalMapName	!= NULL)	free(globalMapName);
+		if (causticMapName	!= NULL)	free(causticMapName);
+		globalMapName			=	(other->globalMapName == NULL ? NULL : strdup(other->globalMapName));
+		causticMapName			=	(other->causticMapName == NULL ? NULL : strdup(other->causticMapName));
+
+		// Copy the user attributes
+		userAttributes			=	other->userAttributes;
+
+		// Copy the flags
+		flags					=	other->flags;
+
 	}
+
+	if (geometrymodification) {
+		memcpy(lodRange,other->lodRange,4*sizeof(float));
+		lodSize			=	other->lodSize;
+		lodImportance	=	other->lodImportance;
+
+		nSides			=	other->nSides;
+	}
+
+	if (geometrydefinition) {
+		movmm(uBasis,other->uBasis);
+		movmm(vBasis,other->vBasis);
+		uStep	=	other->uStep;
+		vStep	=	other->vStep;
+
+		if (name != NULL)	free(name);
+		name	=	(other->name == NULL ? NULL : strdup(other->name));
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	find
+// Description			:	Find a particular attribute
+// Return Value			:	-
+// Comments				:
+int		CAttributes::find(const char *name,const char *category,EVariableType &type,void *&value) {
+
+	if ((category == NULL) || (strcmp(category,RI_DICE) == 0)) {
+		if (strcmp(name,RI_NUMPROBES) == 0)				{	type	=	TYPE_INTEGER;	value	=	&numUProbes;}
+		else if (strcmp(name,RI_MINSPLITS) == 0)		{	type	=	TYPE_INTEGER;	value	=	&minSplits;}
+		else if (strcmp(name,RI_BOUNDEXPAND) == 0)		{	type	=	TYPE_FLOAT;		value	=	&rasterExpand;}
+	}
+
+	return FALSE;
 }

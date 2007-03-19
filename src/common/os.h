@@ -157,6 +157,9 @@ void			osDeleteMutex(TMutex &);
 void			osCreateSemaphore(TMutex &,int);
 void			osDeleteSemaphore(TMutex &);
 
+// Misc functions
+void			osProcessEscapes(char *str);
+
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osLock
 // Description			:	Lock a mutex

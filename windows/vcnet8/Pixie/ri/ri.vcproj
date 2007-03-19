@@ -959,6 +959,56 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\ifexpr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ifexpr.l"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
+						Outputs="../../../../src/ri/lex.if.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
+						Outputs="../../../../src/ri/lex.if.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\ifexpr.y"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
+						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
+						Outputs="../../../../src/ri/ifexpr.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
+						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
+						Outputs="../../../../src/ri/ifexpr.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\rib.cpp"
 				>
 			</File>

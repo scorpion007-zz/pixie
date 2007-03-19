@@ -142,6 +142,9 @@ public:
 								// Guess where to search by looking into the extension
 	TSearchpath					*pickSearchpath(const char *name);
 
+								// Find a particular option
+	int							find(const char *name,const char *category,EVariableType &type,void *&value);
+
 
 
 

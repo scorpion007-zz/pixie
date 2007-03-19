@@ -421,20 +421,12 @@ static	int					frameStep			=	0;
 static	int					ignoreFrame			=	FALSE;
 static	int					currentBlock		=	0;
 static	int					raytracingInited	=	FALSE;
-static	int					allowedCommands		=	RENDERMAN_BLOCK	|
-													RENDERMAN_XFORM_BLOCK |
-													RENDERMAN_WORLD_BLOCK |
-													RENDERMAN_ATTRIBUTE_BLOCK |
-													RENDERMAN_FRAME_BLOCK |
-													RENDERMAN_OBJECT_BLOCK |
-													RENDERMAN_MOTION_BLOCK |
-													RENDERMAN_SOLID_PRIMITIVE_BLOCK |
-													RENDERMAN_SOLID_INTERSECTION_BLOCK |
-													RENDERMAN_SOLID_DIFFERENCE_BLOCK |
-													RENDERMAN_SOLID_UNION_BLOCK |
-													RENDERMAN_RESOURCE_BLOCK;
+static	int					allowedCommands		=	RENDERMAN_ALL_BLOCKS;
+static	int					archiveNesting		=	0;
 
+		CRiInterface		*savedRenderMan		=	NULL;	// This variable contains the parent context for arhiving
 		CRiInterface		*renderMan			=	NULL;	// This variable is exported for error reporting
+		int					ignoreCommand		=	FALSE;	// This variable can be set to force ignore ri commands (used for conditional execution)
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -443,7 +435,7 @@ static	int					allowedCommands		=	RENDERMAN_BLOCK	|
 // Return Value			:	TRUE if the command should be ignored
 // Comments				:
 static	inline int		check(char *fun,int scope) {
-	if (ignoreFrame)							return TRUE;
+	if (ignoreFrame | ignoreCommand)	return TRUE;
 
 	if (scope & currentBlock & allowedCommands)	return FALSE;
 
@@ -2310,6 +2302,10 @@ EXTERN(RtArchiveHandle)	RiArchiveBeginV(RtToken name, RtInt n, RtToken tokens[],
 	blocks.push(currentBlock);
 	currentBlock	=	RENDERMAN_ARCHIVE_BLOCK;
 	
+	// Keep track of the nesting count
+	archiveNesting++;
+
+	// Always call the current renderMan
 	return (RtArchiveHandle) renderMan->RiArchiveBeginV(name,n,tokens,parms);
 }
 
@@ -2320,6 +2316,12 @@ EXTERN(RtVoid)			RiArchiveEnd(void) {
 	if (currentBlock != RENDERMAN_ARCHIVE_BLOCK) {
 		error(CODE_NESTING,"Matching RiResourceBegin not found.\n");
 		return;
+	}
+
+	// Decrease the nesting and recover the original context
+	archiveNesting--;
+	if (archiveNesting == 0) {
+		if (savedRenderMan != NULL)	renderMan	=	savedRenderMan;
 	}
 
 	renderMan->RiArchiveEnd();
@@ -2341,8 +2343,8 @@ EXTERN(RtVoid)			RiIfBegin(char *expr, ...) {
 }
 
 EXTERN(RtVoid)			RiIfBeginV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
-	if (check("RiIfBegin",RENDERMAN_ALL_BLOCKS)) return;
 	
+	// Do not check for scope
 	renderMan->RiIfBeginV(expr,n,tokens,parms);
 }
 
@@ -2356,21 +2358,20 @@ EXTERN(RtVoid)			RiElseIf(char *expr, ...) {
 }
 
 EXTERN(RtVoid)			RiElseIfV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
-	if (check("RiElseIf",RENDERMAN_ALL_BLOCKS)) return;
 	
+	// Do not check for scope
 	renderMan->RiElseIfV(expr,n,tokens,parms);}
 
 EXTERN(RtVoid)			RiElse(void) {
-	if (check("RiElse",RENDERMAN_ALL_BLOCKS)) return;
-	
+
+	// Do not check for scope
 	renderMan->RiElse();
 }
 
 EXTERN(RtVoid)			RiIfEnd(void) {
-	if (check("RiIfEnd",RENDERMAN_ALL_BLOCKS)) return;
 	
+	// Do not check for scope
 	renderMan->RiIfEnd();
-
 }
 
 

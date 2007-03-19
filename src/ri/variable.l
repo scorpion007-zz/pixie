@@ -44,7 +44,7 @@ double												return	VAR_DOUBLE;
 string												return	VAR_STRING;
 \[													return	VAR_OPEN;
 \]													return	VAR_CLOSE;
-[a-zA-Z\_][a-zA-Z0-9\_]*								{	strcpy(yylval.string,yytext); return VAR_IDENTIFIER; }
+[a-zA-Z\_][a-zA-Z0-9\_]*							{	assert(strlen(yytext) < PARSER_MAX_STRING_SIZE); strcpy(yylval.string,yytext); return VAR_IDENTIFIER; }
 ([0-9]+|([0-9]*(\.[0-9]+)?)([eE][+-]?[0-9]+)?)		{	sscanf(yytext,"%f",&yylval.real); return VAR_FLOAT; }
 [\t ]												;
 %%

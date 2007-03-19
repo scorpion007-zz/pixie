@@ -718,3 +718,12 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 	return newPath;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	COptions
+// Method				:	find
+// Description			:	Find the value of a particular option
+// Return Value			:	-
+// Comments				:
+int			COptions::find(const char *name,const char *category,EVariableType &type,void *&value) {
+	return FALSE;
+}

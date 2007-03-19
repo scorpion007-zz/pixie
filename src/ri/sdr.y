@@ -40,6 +40,7 @@
 #include "error.h"
 #include "renderer.h"
 #include "dso.h"
+#include "config.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   First some temporary data structures used during the script parsing
@@ -690,11 +691,10 @@ static	TSlFunction		functions[]	=	{
 		void						*newVariable(char *,int,int,int,int m=1);
 		TSlLabel					*newLabelDef(char *,int);
 		TSlLabel					*newLabelRef(char *,int);
-		void						processEscapes(char *);
 %}
 %union slval {
 	float	real;
-	char	string[64];
+	char	string[PARSER_MAX_STRING_SIZE];
 	matrix	m;
 	vector	v;
 }
@@ -2354,45 +2354,6 @@ CShader	*shaderCreate(const char *shaderName) {
 	return cShader;
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:
-// Description			:
-// Return Value			:
-// Comments				:
-void	processEscapes(char *str) {
-	int		i,n,j;
-
-	n	=	(int) strlen(str);
-	for (i=0;i<n;i++) {
-		if (str[i] == '\\') {
-			switch(str[i+1]) {
-			case 'n':
-				str[i]	=	'\n';
-				break;
-			case 't':
-				str[i]	=	'\t';
-				break;
-			case 'r':
-				str[i]	=	'\r';
-				break;
-			case '\\':
-				str[i]	=	'\\';
-				break;
-			default:
-				break;
-			}
-
-			j	=	i+2;
-			do {
-				str[j-1]	=	str[j];
-				j++;
-			} while(str[j] != '\0');
-			n--;
-			i++;
-		}
-	}
-	str[i]	=	'\0';
-}
 
 extern	void		convertColorFrom(float *out,const float *in,ECoordinateSystem s);
 
