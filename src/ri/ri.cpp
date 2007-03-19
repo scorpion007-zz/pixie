@@ -1879,7 +1879,7 @@ RiProcRunProgram (RtPointer data, RtFloat detail) {
 #else
 	int				fdin[2];
 	int				fdout[2];
-
+	
 	if ((pipe(fdin) != -1) && (pipe(fdout) != -1)) {
 		int cpid;
 		
@@ -1930,7 +1930,7 @@ RiProcRunProgram (RtPointer data, RtFloat detail) {
 					error(CODE_SYSTEM,"Failed to execute \"%s\"\n",delayed->generator);
 				}
 				
-				exit(0);
+				_exit(0);	// call _exit() NOT exit() to avoid flushing stdio twice
 			}
 		} else {
 			error(CODE_SYSTEM,"Failed to execute \"%s\"\n",delayed->generator);
