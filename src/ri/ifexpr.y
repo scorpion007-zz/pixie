@@ -67,7 +67,9 @@ static	int					result		=	0;	// 0 - FALSE
 	// Description			:	Take the expression and form a string
 	// Return Value			:	The string
 	// Comments				:
-	static	inline	const char	*getString(const CExpr &expr) {
+	static	inline	const char	*getString(const CExpr &expr) {	
+		void 	*value = expr.value;
+		
 		switch (expr.type) {
 			case TYPE_FLOAT:
 			case TYPE_COLOR:
@@ -79,7 +81,8 @@ static	int					result		=	0;	// 0 - FALSE
 			case TYPE_DOUBLE:
 				break;
 			case TYPE_STRING:
-				return (const char *) expr.value;
+				if (value == NULL)	return (const char *) expr.tmpString;
+				else				return (const char*) expr.value;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
 			default:
@@ -98,9 +101,12 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:	The float
 	// Comments				:
 	static	inline	float		getFloat(const CExpr &expr) {
+		void	*value = expr.value;
+		
 		switch (expr.type) {
 			case TYPE_FLOAT:
-				return *((float *) expr.value);
+				if (value == NULL)	return expr.tmp;
+				else				return *((float *) expr.value);
 			case TYPE_COLOR:
 			case TYPE_VECTOR:
 			case TYPE_NORMAL:
@@ -112,7 +118,8 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
-				return (float) *((int *) expr.value);
+				if (value == NULL)	return (float) expr.tmpInt;
+				else				return (float) *((int *) expr.value);
 			default:
 				break;
 		};
@@ -128,9 +135,12 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:	The int
 	// Comments				:
 	static	inline	int		getInt(const CExpr &expr) {
+		void	*value = expr.value;
+		
 		switch (expr.type) {
 			case TYPE_FLOAT:
-				return (int) *((float *) expr.value);
+				if (value == NULL)	return (int) expr.tmp;
+				else				return (int) *((float *) expr.value);
 			case TYPE_COLOR:
 			case TYPE_VECTOR:
 			case TYPE_NORMAL:
@@ -142,7 +152,8 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
-				return *((int *) expr.value);
+				if (value == NULL)	return expr.tmpInt;
+				else				return *((int *) expr.value);
 			default:
 				break;
 		};
@@ -159,7 +170,7 @@ static	int					result		=	0;	// 0 - FALSE
 	// Comments				:
 	static	inline	void		setFloat(CExpr &expr,float val) {
 		expr.type	=	TYPE_FLOAT;
-		expr.value	=	&expr.tmp;
+		expr.value	=	NULL;
 		expr.tmp	=	val;
 	}
 
@@ -170,7 +181,7 @@ static	int					result		=	0;	// 0 - FALSE
 	// Comments				:
 	static	inline	void		setInt(CExpr &expr,int val) {
 		expr.type	=	TYPE_INTEGER;
-		expr.value	=	&expr.tmpInt;
+		expr.value	=	NULL;
 		expr.tmpInt	=	val;
 	}
 
@@ -188,14 +199,14 @@ static	int					result		=	0;	// 0 - FALSE
 			name	+=	7;
 			
 			findExpr(expr,name,NULL,FALSE);
-		} else if (strchr(name,':') != NULL) {
+		/*} else if (strchr(name,':') != NULL) {		// causes infinite loop.
 			char		tmp[256];
 			const char	*p	=	strchr(name,':');
 			
 			strncpy(tmp,name,p-name);
 			tmp[p-name]		=	'\0';
 			
-			findExpr(expr,name,tmp,attributes);
+			findExpr(expr,name,tmp,attributes);*/
 		} else {
 			
 			if (attributes) {
@@ -210,6 +221,7 @@ static	int					result		=	0;	// 0 - FALSE
 				cOptions->find(name,decl,expr.type,expr.value);
 			}
 		}
+		// FIXME: error reporting
 	}
 
 
@@ -273,7 +285,7 @@ start:			ifExpr
 					////////////////////////////////////////////////////////////////////
 					// Compute the value of the expression
 					if ($1.type == TYPE_STRING)	result	=	TRUE;
-					else						result	=	getFloat($1) != 0;
+					else						result	=	(getFloat($1) != 0);
 				};
 				
 ifExpr:			//////////////////////////////////////////////////////////////////////////
@@ -304,7 +316,7 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				IF_TEXT_VALUE
 				{
 					$$.type		=	TYPE_STRING;
-					$$.value	=	$$.tmpString;
+					$$.value	=	NULL;
 					strcpy($$.tmpString,$1);
 				}
 				|

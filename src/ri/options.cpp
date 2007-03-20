@@ -725,5 +725,13 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 // Return Value			:	-
 // Comments				:
 int			COptions::find(const char *name,const char *category,EVariableType &type,void *&value) {
+	if (strncmp(name,"user:",strlen("user:")) == 0) {
+		CVariable *var;
+        if (userOptions.lookup(name+strlen("user:"),var) == TRUE) {
+			type = var->type;
+			value = var->defaultValue;
+			return TRUE;
+		}
+	}
 	return FALSE;
 }
