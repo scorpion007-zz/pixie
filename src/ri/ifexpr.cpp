@@ -1,11 +1,8 @@
 
-/*  A Bison parser, made from ../../../../src/ri/ifexpr.y
- by  GNU Bison version 1.25
-  */
+/*  A Bison parser, made from ifexpr.y
+    by GNU Bison version 1.28  */
 
 #define YYBISON 1  /* Identify Bison output.  */
-
-#define alloca
 
 #define yyparse ifparse
 #define yylex iflex
@@ -14,35 +11,35 @@
 #define yychar ifchar
 #define yydebug ifdebug
 #define yynerrs ifnerrs
-#define	IF_OPEN	258
-#define	IF_CLOSE	259
-#define	IF_PLUS	260
-#define	IF_MINUS	261
-#define	IF_MUL	262
-#define	IF_DIV	263
-#define	IF_MULMUL	264
-#define	IF_AND	265
-#define	IF_POW	266
-#define	IF_OR	267
-#define	IF_EQUAL	268
-#define	IF_NEQUAL	269
-#define	IF_LESSE	270
-#define	IF_GREATERE	271
-#define	IF_LESS	272
-#define	IF_GREATER	273
-#define	IF_ANDAND	274
-#define	IF_OROR	275
-#define	IF_NOT	276
-#define	IF_DOLLAR	277
-#define	IF_MATCH	278
-#define	IF_DEFINED	279
-#define	IF_CONCAT	280
-#define	IF_COMMA	281
-#define	IF_TEXT_VALUE	282
-#define	IF_IDENTIFIER_VALUE	283
-#define	IF_FLOAT_VALUE	284
+#define	IF_OPEN	257
+#define	IF_CLOSE	258
+#define	IF_PLUS	259
+#define	IF_MINUS	260
+#define	IF_MUL	261
+#define	IF_DIV	262
+#define	IF_MULMUL	263
+#define	IF_AND	264
+#define	IF_POW	265
+#define	IF_OR	266
+#define	IF_EQUAL	267
+#define	IF_NEQUAL	268
+#define	IF_LESSE	269
+#define	IF_GREATERE	270
+#define	IF_LESS	271
+#define	IF_GREATER	272
+#define	IF_ANDAND	273
+#define	IF_OROR	274
+#define	IF_NOT	275
+#define	IF_DOLLAR	276
+#define	IF_MATCH	277
+#define	IF_DEFINED	278
+#define	IF_CONCAT	279
+#define	IF_COMMA	280
+#define	IF_TEXT_VALUE	281
+#define	IF_IDENTIFIER_VALUE	282
+#define	IF_FLOAT_VALUE	283
 
-#line 1 "../../../../src/ri/ifexpr.y"
+#line 1 "ifexpr.y"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -259,16 +256,12 @@ static	int					result		=	0;	// 0 - FALSE
 
 
 
-#line 217 "../../../../src/ri/ifexpr.y"
+#line 217 "ifexpr.y"
 typedef union slval {
 	char	string[PARSER_MAX_STRING_SIZE];
 	CExpr	expr;
 	float	real;
 } YYSTYPE;
-#ifndef YYDEBUG
-#define YYDEBUG 1
-#endif
-
 #include <stdio.h>
 
 #ifndef __cplusplus
@@ -280,10 +273,10 @@ typedef union slval {
 
 
 #define	YYFINAL		58
-#define	YYFLAG		32768
+#define	YYFLAG		-32768
 #define	YYNTBASE	30
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 284 ? yytranslate[x] : 32)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 283 ? yytranslate[x] : 32)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -311,10 +304,10 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
-     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
-    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
-    26,    27,    28,    29
+     2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
+     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
+    27,    28,    29
 };
 
 #if YYDEBUG != 0
@@ -474,6 +467,8 @@ static const short yycheck[] = {     1,
     23,    19,    20,    -1,    -1,    23
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
+#line 3 "/usr/share/bison.simple"
+/* This file comes from bison-1.28.  */
 
 /* Skeleton output parser for bison,
    Copyright (C) 1984, 1989, 1990 Free Software Foundation, Inc.
@@ -490,46 +485,66 @@ static const short yycheck[] = {     1,
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
+   Foundation, Inc., 59 Temple Place - Suite 330,
+   Boston, MA 02111-1307, USA.  */
 
 /* As a special exception, when this file is copied by Bison into a
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef alloca
-#ifdef __GNUC__
-#define alloca __builtin_alloca
-#else /* not GNU C.  */
-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi)
-#include <alloca.h>
-#else /* not sparc */
-#if defined (MSDOS) && !defined (__TURBOC__)
-#include <malloc.h>
-#else /* not MSDOS, or __TURBOC__ */
-#if defined(_AIX)
-#include <malloc.h>
- #pragma alloca
-#else /* not MSDOS, __TURBOC__, or _AIX */
-#ifdef __hpux
-#ifdef __cplusplus
-extern "C" {
-void *alloca (unsigned int);
-};
-#else /* not __cplusplus */
-void *alloca ();
-#endif /* not __cplusplus */
-#endif /* __hpux */
-#endif /* not _AIX */
-#endif /* not MSDOS, or __TURBOC__ */
-#endif /* not sparc.  */
-#endif /* not GNU C.  */
-#endif /* alloca not defined.  */
-
 /* This is the parser code that is written into each bison parser
   when the %semantic_parser declaration is not specified in the grammar.
   It was written by Richard Stallman by simplifying the hairy parser
   used when %semantic_parser is specified.  */
+
+#ifndef YYSTACK_USE_ALLOCA
+#ifdef alloca
+#define YYSTACK_USE_ALLOCA
+#else /* alloca not defined */
+#ifdef __GNUC__
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#else /* not GNU C.  */
+#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi) || (defined (__sun) && defined (__i386))
+#define YYSTACK_USE_ALLOCA
+#include <alloca.h>
+#else /* not sparc */
+/* We think this test detects Watcom and Microsoft C.  */
+/* This used to test MSDOS, but that is a bad idea
+   since that symbol is in the user namespace.  */
+#if (defined (_MSDOS) || defined (_MSDOS_)) && !defined (__TURBOC__)
+#if 0 /* No need for malloc.h, which pollutes the namespace;
+	 instead, just don't use alloca.  */
+#include <malloc.h>
+#endif
+#else /* not MSDOS, or __TURBOC__ */
+#if defined(_AIX)
+/* I don't know what this was needed for, but it pollutes the namespace.
+   So I turned it off.   rms, 2 May 1997.  */
+/* #include <malloc.h>  */
+ #pragma alloca
+#define YYSTACK_USE_ALLOCA
+#else /* not MSDOS, or __TURBOC__, or _AIX */
+#if 0
+#ifdef __hpux /* haible@ilog.fr says this works for HPUX 9.05 and up,
+		 and on HPUX 10.  Eventually we can turn this on.  */
+#define YYSTACK_USE_ALLOCA
+#define alloca __builtin_alloca
+#endif /* __hpux */
+#endif
+#endif /* not _AIX */
+#endif /* not MSDOS, or __TURBOC__ */
+#endif /* not sparc */
+#endif /* not GNU C */
+#endif /* alloca not defined */
+#endif /* YYSTACK_USE_ALLOCA not defined */
+
+#ifdef YYSTACK_USE_ALLOCA
+#define YYSTACK_ALLOC alloca
+#else
+#define YYSTACK_ALLOC malloc
+#endif
 
 /* Note: there must be only one dollar sign in this file.
    It is replaced by the list of actions, each action
@@ -539,8 +554,8 @@ void *alloca ();
 #define yyclearin	(yychar = YYEMPTY)
 #define YYEMPTY		-2
 #define YYEOF		0
-#define YYACCEPT	return(0)
-#define YYABORT 	return(1)
+#define YYACCEPT	goto yyacceptlab
+#define YYABORT 	goto yyabortlab
 #define YYERROR		goto yyerrlab1
 /* Like YYERROR except do call yyerror.
    This remains here temporarily to ease the
@@ -621,12 +636,12 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #ifndef YYMAXDEPTH
 #define YYMAXDEPTH 10000
 #endif
-
-/* Prevent warning if -Wstrict-prototypes.  */
-#ifdef __GNUC__
-int yyparse (void);
-#endif
 
+/* Define __yy_memcpy.  Note that the size argument
+   should be passed with type unsigned int, because that is what the non-GCC
+   definitions require.  With GCC, __builtin_memcpy takes an arg
+   of type size_t, but it can handle unsigned int.  */
+
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
 #define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
 #else				/* not GNU C or C++ */
@@ -638,7 +653,7 @@ static void
 __yy_memcpy (to, from, count)
      char *to;
      char *from;
-     int count;
+     unsigned int count;
 {
   register char *f = from;
   register char *t = to;
@@ -653,10 +668,10 @@ __yy_memcpy (to, from, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_memcpy (char *to, char *from, int count)
+__yy_memcpy (char *to, char *from, unsigned int count)
 {
-  register char *f = from;
   register char *t = to;
+  register char *f = from;
   register int i = count;
 
   while (i-- > 0)
@@ -666,6 +681,7 @@ __yy_memcpy (char *to, char *from, int count)
 #endif
 #endif
 
+#line 217 "/usr/share/bison.simple"
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
    into yyparse.  The argument should have type void *.
@@ -685,6 +701,15 @@ __yy_memcpy (char *to, char *from, int count)
 #define YYPARSE_PARAM_ARG
 #define YYPARSE_PARAM_DECL
 #endif /* not YYPARSE_PARAM */
+
+/* Prevent warning if -Wstrict-prototypes.  */
+#ifdef __GNUC__
+#ifdef YYPARSE_PARAM
+int yyparse (void *);
+#else
+int yyparse (void);
+#endif
+#endif
 
 int
 yyparse(YYPARSE_PARAM_ARG)
@@ -714,6 +739,7 @@ yyparse(YYPARSE_PARAM_ARG)
 #endif
 
   int yystacksize = YYINITDEPTH;
+  int yyfree_stacks = 0;
 
 #ifdef YYPURE
   int yychar;
@@ -798,18 +824,32 @@ yynewstate:
       if (yystacksize >= YYMAXDEPTH)
 	{
 	  yyerror("parser stack overflow");
+	  if (yyfree_stacks)
+	    {
+	      free (yyss);
+	      free (yyvs);
+#ifdef YYLSP_NEEDED
+	      free (yyls);
+#endif
+	    }
 	  return 2;
 	}
       yystacksize *= 2;
       if (yystacksize > YYMAXDEPTH)
 	yystacksize = YYMAXDEPTH;
-      yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
-      __yy_memcpy ((char *)yyss, (char *)yyss1, size * sizeof (*yyssp));
-      yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
-      __yy_memcpy ((char *)yyvs, (char *)yyvs1, size * sizeof (*yyvsp));
+#ifndef YYSTACK_USE_ALLOCA
+      yyfree_stacks = 1;
+#endif
+      yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
+      __yy_memcpy ((char *)yyss, (char *)yyss1,
+		   size * (unsigned int) sizeof (*yyssp));
+      yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
+      __yy_memcpy ((char *)yyvs, (char *)yyvs1,
+		   size * (unsigned int) sizeof (*yyvsp));
 #ifdef YYLSP_NEEDED
-      yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
-      __yy_memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
+      yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
+      __yy_memcpy ((char *)yyls, (char *)yyls1,
+		   size * (unsigned int) sizeof (*yylsp));
 #endif
 #endif /* no yyoverflow */
 
@@ -970,7 +1010,7 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 272 "../../../../src/ri/ifexpr.y"
+#line 272 "ifexpr.y"
 {
 					////////////////////////////////////////////////////////////////////
 					// Compute the value of the expression
@@ -979,14 +1019,14 @@ case 1:
 				;
     break;}
 case 2:
-#line 283 "../../../../src/ri/ifexpr.y"
+#line 283 "ifexpr.y"
 {
 					// Find the variable here
 					findExpr(yyval.expr,yyvsp[0].string);
 				;
     break;}
 case 3:
-#line 292 "../../../../src/ri/ifexpr.y"
+#line 292 "ifexpr.y"
 {
 					// FIXME: This is wrong. What are we supposed to do here ?
 					
@@ -995,13 +1035,13 @@ case 3:
 				;
     break;}
 case 4:
-#line 300 "../../../../src/ri/ifexpr.y"
+#line 300 "ifexpr.y"
 {
 					setFloat(yyval.expr,yyvsp[0].real);
 				;
     break;}
 case 5:
-#line 305 "../../../../src/ri/ifexpr.y"
+#line 305 "ifexpr.y"
 {
 					yyval.expr.type		=	TYPE_STRING;
 					yyval.expr.value	=	yyval.expr.tmpString;
@@ -1009,49 +1049,49 @@ case 5:
 				;
     break;}
 case 6:
-#line 316 "../../../../src/ri/ifexpr.y"
+#line 316 "ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) + getFloat(yyvsp[0].expr));
 				;
     break;}
 case 7:
-#line 323 "../../../../src/ri/ifexpr.y"
+#line 323 "ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) - getFloat(yyvsp[0].expr));
 				;
     break;}
 case 8:
-#line 330 "../../../../src/ri/ifexpr.y"
+#line 330 "ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) * getFloat(yyvsp[0].expr));
 				;
     break;}
 case 9:
-#line 337 "../../../../src/ri/ifexpr.y"
+#line 337 "ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) / getFloat(yyvsp[0].expr));
 				;
     break;}
 case 10:
-#line 346 "../../../../src/ri/ifexpr.y"
+#line 346 "ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) & getInt(yyvsp[0].expr));
 				;
     break;}
 case 11:
-#line 353 "../../../../src/ri/ifexpr.y"
+#line 353 "ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) | getInt(yyvsp[0].expr));
 				;
     break;}
 case 12:
-#line 360 "../../../../src/ri/ifexpr.y"
+#line 360 "ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) ^ getInt(yyvsp[0].expr));
 				;
     break;}
 case 13:
-#line 369 "../../../../src/ri/ifexpr.y"
+#line 369 "ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) == 0);
@@ -1061,7 +1101,7 @@ case 13:
 				;
     break;}
 case 14:
-#line 380 "../../../../src/ri/ifexpr.y"
+#line 380 "ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) != 0);
@@ -1071,7 +1111,7 @@ case 14:
 				;
     break;}
 case 15:
-#line 391 "../../../../src/ri/ifexpr.y"
+#line 391 "ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) > 0);
@@ -1081,7 +1121,7 @@ case 15:
 				;
     break;}
 case 16:
-#line 402 "../../../../src/ri/ifexpr.y"
+#line 402 "ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) < 0);
@@ -1091,7 +1131,7 @@ case 16:
 				;
     break;}
 case 17:
-#line 413 "../../../../src/ri/ifexpr.y"
+#line 413 "ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) >= 0);
@@ -1101,7 +1141,7 @@ case 17:
 				;
     break;}
 case 18:
-#line 424 "../../../../src/ri/ifexpr.y"
+#line 424 "ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) <= 0);
@@ -1111,44 +1151,44 @@ case 18:
 				;
     break;}
 case 19:
-#line 437 "../../../../src/ri/ifexpr.y"
+#line 437 "ifexpr.y"
 {
 					// FIXME: Implement pattern matching
 					setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) == 0);
 				;
     break;}
 case 20:
-#line 447 "../../../../src/ri/ifexpr.y"
+#line 447 "ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) && getInt(yyvsp[0].expr));
 				;
     break;}
 case 21:
-#line 454 "../../../../src/ri/ifexpr.y"
+#line 454 "ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) || getInt(yyvsp[0].expr));
 				;
     break;}
 case 22:
-#line 460 "../../../../src/ri/ifexpr.y"
+#line 460 "ifexpr.y"
 {
 					setInt(yyval.expr,! getInt(yyvsp[0].expr));
 				;
     break;}
 case 23:
-#line 469 "../../../../src/ri/ifexpr.y"
+#line 469 "ifexpr.y"
 {
 					yyval.expr	=	yyvsp[-1].expr;
 				;
     break;}
 case 24:
-#line 479 "../../../../src/ri/ifexpr.y"
+#line 479 "ifexpr.y"
 {
 					setInt(yyval.expr,CRenderer::retrieveVariable(getString(yyvsp[-1].expr)) != NULL);
 				;
     break;}
 case 25:
-#line 491 "../../../../src/ri/ifexpr.y"
+#line 491 "ifexpr.y"
 {
 					yyval.expr.type		=	TYPE_STRING;
 					yyval.expr.value	=	yyval.expr.tmpString;
@@ -1158,6 +1198,7 @@ case 25:
     break;}
 }
    /* the action file gets copied in in place of this dollarsign */
+#line 543 "/usr/share/bison.simple"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1352,8 +1393,32 @@ yyerrhandle:
 
   yystate = yyn;
   goto yynewstate;
+
+ yyacceptlab:
+  /* YYACCEPT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 0;
+
+ yyabortlab:
+  /* YYABORT comes here.  */
+  if (yyfree_stacks)
+    {
+      free (yyss);
+      free (yyvs);
+#ifdef YYLSP_NEEDED
+      free (yyls);
+#endif
+    }
+  return 1;
 }
-#line 499 "../../../../src/ri/ifexpr.y"
+#line 499 "ifexpr.y"
 
 
 #include "lex.if.cpp"

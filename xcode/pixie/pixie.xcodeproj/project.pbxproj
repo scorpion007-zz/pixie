@@ -73,6 +73,7 @@
 		188383E70B2FB39D00166E3E /* LICENSE in CopyFiles */ = {isa = PBXBuildFile; fileRef = 188383E00B2FB38F00166E3E /* LICENSE */; };
 		188383E80B2FB39D00166E3E /* NEWS in CopyFiles */ = {isa = PBXBuildFile; fileRef = 188383E10B2FB38F00166E3E /* NEWS */; };
 		188383E90B2FB39D00166E3E /* README in CopyFiles */ = {isa = PBXBuildFile; fileRef = 188383E20B2FB38F00166E3E /* README */; };
+		189830A30BAF8618004D6C61 /* ifexpr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 189830A20BAF8618004D6C61 /* ifexpr.cpp */; };
 		18A298DB0B44E80E006B9ABE /* libri.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
 		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
 		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
@@ -946,6 +947,9 @@
 		188383E00B2FB38F00166E3E /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = LICENSE; path = ../../LICENSE; sourceTree = SOURCE_ROOT; };
 		188383E10B2FB38F00166E3E /* NEWS */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = NEWS; path = ../../NEWS; sourceTree = SOURCE_ROOT; };
 		188383E20B2FB38F00166E3E /* README */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = README; path = ../../README; sourceTree = SOURCE_ROOT; };
+		189830A00BAF85F9004D6C61 /* ifexpr.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = ifexpr.l; path = ../../src/ri/ifexpr.l; sourceTree = SOURCE_ROOT; };
+		189830A10BAF85F9004D6C61 /* ifexpr.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = ifexpr.y; path = ../../src/ri/ifexpr.y; sourceTree = SOURCE_ROOT; };
+		189830A20BAF8618004D6C61 /* ifexpr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ifexpr.cpp; path = ../../src/ri/ifexpr.cpp; sourceTree = SOURCE_ROOT; };
 		18B045E10B7D794C00500420 /* config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../src/ri/config.h; sourceTree = SOURCE_ROOT; };
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
@@ -1314,6 +1318,8 @@
 		186156030B97EED2007BE5EA /* parsers */ = {
 			isa = PBXGroup;
 			children = (
+				189830A00BAF85F9004D6C61 /* ifexpr.l */,
+				189830A10BAF85F9004D6C61 /* ifexpr.y */,
 				186156080B97EF6A007BE5EA /* rib.l */,
 				186156090B97EF6A007BE5EA /* sdr.l */,
 				1861560A0B97EF6A007BE5EA /* sdr.y */,
@@ -1768,6 +1774,7 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
+				189830A20BAF8618004D6C61 /* ifexpr.cpp */,
 				18EFE5080BACBBA400CC743A /* userAttributes.h */,
 				C96A6EF00AD6E143003C2D7B /* attributes.cpp */,
 				C96A6EF10AD6E143003C2D7B /* attributes.h */,
@@ -2535,7 +2542,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\ncd ../../src/ri\nflex -i -Pdso -olex.dso.cpp dso.l\nbison -p dso -o dso.cpp dso.y\nflex -i -Prib -olex.rib.cpp rib.l\nbison -p rib -o rib.cpp rib.y\nflex -Psl -olex.sl.cpp sdr.l\nbison -p sl -o sl.cpp sdr.y\nflex -Pvar -olex.var.cpp variable.l\nbison -p var -o variable.cpp variable.y\ncd ../sdr\nflex -Psdr -olex.sdr.cpp sdr.l\nbison -p sdr -o sdr.cpp sdr.y\ncd ../sdrc\nflex -Psl -olex.sl.cpp sl.l\nbison -p sl -o sl.cpp sl.y\nexit 0";
+			shellScript = "# shell script goes here\ncd ../../src/ri\nflex -i -Pdso -olex.dso.cpp dso.l\nbison -p dso -o dso.cpp dso.y\nflex -i -Prib -olex.rib.cpp rib.l\nbison -p rib -o rib.cpp rib.y\nflex -Psl -olex.sl.cpp sdr.l\nbison -p sl -o sl.cpp sdr.y\nflex -Pvar -olex.var.cpp variable.l\nbison -p var -o variable.cpp variable.y\nflex -Pif -olex.if.cpp ifexpr.l\nbison -p if -o ifexpr.cpp ifexpr.y\ncd ../sdr\nflex -Psdr -olex.sdr.cpp sdr.l\nbison -p sdr -o sdr.cpp sdr.y\ncd ../sdrc\nflex -Psl -olex.sl.cpp sl.l\nbison -p sl -o sl.cpp sl.y\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2639,6 +2646,7 @@
 				18E9F1070B75B07500DA484A /* rendererMutexes.cpp in Sources */,
 				18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */,
 				18D4F7270BAB9A9E0090673B /* resource.cpp in Sources */,
+				189830A30BAF8618004D6C61 /* ifexpr.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
