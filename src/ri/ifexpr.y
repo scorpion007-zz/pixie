@@ -39,8 +39,8 @@
 #include "renderer.h"
 #include "rendererContext.h"
 
-int				iflex(void );					// Forward definition for stupid yacc
-void			iferror(char *,...);
+int							iflex(void );		// Forward definition for stupid yacc
+void						iferror(char *,...);
 
 static	CRendererContext	*context	=	NULL;
 static	int					result		=	0;	// 0 - FALSE
@@ -56,10 +56,10 @@ static	int					result		=	0;	// 0 - FALSE
 	class CExpr {
 	public:
 			EVariableType	type;
-			void			*value;
-			float			tmp;
-			int				tmpInt;
-			char			tmpString[128];	// HACK
+			const void		*value;
+			float			floatValue;
+			int				intValue;
+			char			stringValue[128];	// HACK
 	};
 
 	///////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:	The string
 	// Comments				:
 	static	inline	const char	*getString(const CExpr &expr) {	
-		void 	*value = expr.value;
+		const void 	*value = expr.value;
 		
 		switch (expr.type) {
 			case TYPE_FLOAT:
@@ -81,8 +81,8 @@ static	int					result		=	0;	// 0 - FALSE
 			case TYPE_DOUBLE:
 				break;
 			case TYPE_STRING:
-				if (value == NULL)	return (const char *) expr.tmpString;
-				else				return (const char*) expr.value;
+				if (value == NULL)	return (const char *) expr.stringValue;
+				else				return (const char *) value;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
 			default:
@@ -101,12 +101,12 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:	The float
 	// Comments				:
 	static	inline	float		getFloat(const CExpr &expr) {
-		void	*value = expr.value;
-		
+		const void	*value = expr.value;
+				
 		switch (expr.type) {
 			case TYPE_FLOAT:
-				if (value == NULL)	return expr.tmp;
-				else				return *((float *) expr.value);
+				if (value == NULL)	return expr.floatValue;
+				else				return *((float *) value);
 			case TYPE_COLOR:
 			case TYPE_VECTOR:
 			case TYPE_NORMAL:
@@ -118,8 +118,8 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
-				if (value == NULL)	return (float) expr.tmpInt;
-				else				return (float) *((int *) expr.value);
+				if (value == NULL)	return (float) expr.intValue;
+				else				return (float) *((int *) value);
 			default:
 				break;
 		};
@@ -135,12 +135,12 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:	The int
 	// Comments				:
 	static	inline	int		getInt(const CExpr &expr) {
-		void	*value = expr.value;
+		const void	*value = expr.value;
 		
 		switch (expr.type) {
 			case TYPE_FLOAT:
-				if (value == NULL)	return (int) expr.tmp;
-				else				return (int) *((float *) expr.value);
+				if (value == NULL)	return (int) expr.floatValue;
+				else				return (int) *((float *) value);
 			case TYPE_COLOR:
 			case TYPE_VECTOR:
 			case TYPE_NORMAL:
@@ -152,8 +152,8 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
-				if (value == NULL)	return expr.tmpInt;
-				else				return *((int *) expr.value);
+				if (value == NULL)	return expr.intValue;
+				else				return *((int *) value);
 			default:
 				break;
 		};
@@ -169,9 +169,9 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:
 	// Comments				:
 	static	inline	void		setFloat(CExpr &expr,float val) {
-		expr.type	=	TYPE_FLOAT;
-		expr.value	=	NULL;
-		expr.tmp	=	val;
+		expr.type		=	TYPE_FLOAT;
+		expr.value		=	NULL;
+		expr.floatValue	=	val;
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ static	int					result		=	0;	// 0 - FALSE
 	static	inline	void		setInt(CExpr &expr,int val) {
 		expr.type	=	TYPE_INTEGER;
 		expr.value	=	NULL;
-		expr.tmpInt	=	val;
+		expr.intValue	=	val;
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -190,38 +190,61 @@ static	int					result		=	0;	// 0 - FALSE
 	// Description			:	Find a float expression
 	// Return Value			:
 	// Comments				:
-	static	void				findExpr(CExpr &expr,const char *name,const char *decl=NULL,int attributes=FALSE) {
+	static	void				findExpr(CExpr &expr,const char *name,const char *decl=NULL,int attributes=FALSE,int typeSet=FALSE) {
+		const char	*p;
+		
 		if (strncmp(name,"Attribute:",10) == 0) {
 			name	+=	10;
 			
-			findExpr(expr,name,NULL,TRUE);
+			findExpr(expr,name,NULL,TRUE,TRUE);
 		} else if (strncmp(name,"Option:",7) == 0) {
 			name	+=	7;
 			
-			findExpr(expr,name,NULL,FALSE);
-		/*} else if (strchr(name,':') != NULL) {		// causes infinite loop.
-			char		tmp[256];
-			const char	*p	=	strchr(name,':');
+			findExpr(expr,name,NULL,FALSE,TRUE);
+		} else if ((p = strchr(name,':')) != NULL) {
+			char category[256];		
+				
+			assert((p-name) < 255);				// Sanity check
+			strncpy(category,name,p-name);		// Copy the category
+			category[p-name]		=	'\0';	// Make sure it terminates
 			
-			strncpy(tmp,name,p-name);
-			tmp[p-name]		=	'\0';
-			
-			findExpr(expr,name,tmp,attributes);*/
+			findExpr(expr,p+1,category,attributes,typeSet);
 		} else {
 			
 			if (attributes) {
 				// Lookup the attributes
 				CAttributes	*cAttributes	=	context->getAttributes(TRUE);
 				
-				cAttributes->find(name,decl,expr.type,expr.value);
+				if (cAttributes->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
+					if (typeSet == FALSE) {
+						COptions	*cOptions		=	context->getOptions();
+						if (cOptions->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
+							error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+							result	=	FALSE;
+						}
+					} else {
+						error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+						result	=	FALSE;
+					}
+				}
 			} else {
 				// Lookup the options
 				COptions	*cOptions		=	context->getOptions();
 				
-				cOptions->find(name,decl,expr.type,expr.value);
+				if (cOptions->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
+					if (typeSet == FALSE) {
+						CAttributes	*cAttributes	=	context->getAttributes(TRUE);
+						if (cAttributes->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
+							error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+							result	=	FALSE;
+						}
+					} else {
+						error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+						result	=	FALSE;
+					}
+				}
 			}
 		}
-		// FIXME: error reporting
 	}
 
 
@@ -282,10 +305,14 @@ static	int					result		=	0;	// 0 - FALSE
 %%
 start:			ifExpr
 				{
-					////////////////////////////////////////////////////////////////////
-					// Compute the value of the expression
-					if ($1.type == TYPE_STRING)	result	=	TRUE;
-					else						result	=	(getFloat($1) != 0);
+					// If no result set so far
+					if (result == 2) {
+					
+						////////////////////////////////////////////////////////////////////
+						// Compute the value of the expression
+						if ($1.type == TYPE_STRING)	result	=	TRUE;
+						else						result	=	(getFloat($1) != 0);
+					}
 				};
 				
 ifExpr:			//////////////////////////////////////////////////////////////////////////
@@ -309,7 +336,7 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				}
 				|
 				IF_FLOAT_VALUE
-				{
+				{					
 					setFloat($$,$1);
 				}
 				|
@@ -317,7 +344,7 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				{
 					$$.type		=	TYPE_STRING;
 					$$.value	=	NULL;
-					strcpy($$.tmpString,$1);
+					strcpy($$.stringValue,$1);
 				}
 				|
 				//////////////////////////////////////////////////////////////////////////
@@ -502,9 +529,9 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				IF_CLOSE
 				{
 					$$.type		=	TYPE_STRING;
-					$$.value	=	$$.tmpString;
-					strcpy($$.tmpString,getString($3));
-					strcat($$.tmpString,getString($5));
+					$$.value	=	$$.stringValue;
+					strcpy($$.stringValue,getString($3));
+					strcat($$.stringValue,getString($5));
 				}
 				;
 				
@@ -524,7 +551,7 @@ int		CRendererContext::ifParse(const char *expr) {
 
 	// Save the necessary info
 	context			=	this;
-	result			=	0;
+	result			=	2;
 
 	newState		=	if_scan_string(expr);				// Create a new buffer
 	ifparse();												// Scan the buffer

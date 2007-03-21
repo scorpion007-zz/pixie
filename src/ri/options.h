@@ -143,7 +143,7 @@ public:
 	TSearchpath					*pickSearchpath(const char *name);
 
 								// Find a particular option
-	int							find(const char *name,const char *category,EVariableType &type,void *&value);
+	int							find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const;
 
 
 

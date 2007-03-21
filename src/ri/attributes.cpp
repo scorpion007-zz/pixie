@@ -423,12 +423,27 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 // Description			:	Find a particular attribute
 // Return Value			:	-
 // Comments				:
-int		CAttributes::find(const char *name,const char *category,EVariableType &type,void *&value) {
+int		CAttributes::find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const {
 
+	// Make the common case fast
+	if ((category == NULL) || (strcmp(category,RI_USER) == 0)) {
+		CVariable	*cVariable;
+
+		// Lookup the attribute
+		if (userAttributes.lookup(name,cVariable)) {
+			type	=	cVariable->type;
+			value	=	cVariable->defaultValue;
+
+			if (value != NULL)	return TRUE;
+		}
+	}
+	
 	if ((category == NULL) || (strcmp(category,RI_DICE) == 0)) {
 		if (strcmp(name,RI_NUMPROBES) == 0)				{	type	=	TYPE_INTEGER;	value	=	&numUProbes;			return TRUE;}
 		else if (strcmp(name,RI_MINSPLITS) == 0)		{	type	=	TYPE_INTEGER;	value	=	&minSplits;				return TRUE;}
 		else if (strcmp(name,RI_BOUNDEXPAND) == 0)		{	type	=	TYPE_FLOAT;		value	=	&rasterExpand;			return TRUE;}
+		else if (strcmp(name,RI_BINARY) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_BINARY_DICE) != 0;				return TRUE;}
+		else if (strcmp(name,RI_RASTERORIENT) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE) != 0;	return TRUE;}
 	}
 
 	if ((category == NULL) || (strcmp(category,RI_DISPLACEMENTBOUND) == 0)) {
@@ -440,6 +455,7 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 		if (strcmp(name,RI_BIAS) == 0)					{	type	=	TYPE_FLOAT;		value	=	&shadowBias;			return TRUE;}
 		else if (strcmp(name,RI_MAXDIFFUSEDEPTH) == 0)	{	type	=	TYPE_STRING;	value	=	maxDisplacementSpace;	return TRUE;}
 		else if (strcmp(name,RI_MAXSPECULARDEPTH) == 0)	{	type	=	TYPE_STRING;	value	=	&maxSpecularDepth;		return TRUE;}
+		else if (strcmp(name,RI_DISPLACEMENTS) == 0)	{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) != 0;			return TRUE;}
 	}
 
 	if ((category == NULL) || (strcmp(category,RI_IRRADIANCE) == 0)) {
@@ -453,20 +469,24 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 		else if (strcmp(name,RI_CAUSTICMAP) == 0)		{	type	=	TYPE_STRING;	value	=	causticMapName;			return TRUE;}
 		else if (strcmp(name,RI_IOR) == 0)				{	type	=	TYPE_FLOAT;		value	=	photonIor;				return TRUE;}
 		else if (strcmp(name,RI_IORRANGE) == 0)			{	type	=	TYPE_FLOAT;		value	=	photonIor;				return TRUE;}
-		else if (strcmp(name,RI_ESTIMATOR) == 0)		{	type	=	TYPE_FLOAT;		value	=	&photonEstimator;		return TRUE;}
+		else if (strcmp(name,RI_ESTIMATOR) == 0)		{	type	=	TYPE_INTEGER;	value	=	&photonEstimator;		return TRUE;}
+		else if (strcmp(name,RI_SHADINGMODEL) == 0)		{	type	=	TYPE_STRING;	value	=	findShadingModel(shadingModel);		return TRUE;}
 	}
 
-	// Is this is a user attribute ?
-	if ((category == NULL) || (strcmp(category,RI_USER) == 0)) {
-		CVariable	*cVariable;
+	if ((category == NULL) || (strcmp(category,RI_VISIBILITY) == 0)) {
+		if (strcmp(name,RI_CAMERA) == 0)				{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) != 0;			return TRUE;}
+		else if (strcmp(name,RI_TRACE) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_TRACE_VISIBLE) != 0;			return TRUE;}
+		else if (strcmp(name,RI_PHOTON) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_PHOTON_VISIBLE) != 0;			return TRUE;}
+		else if (strcmp(name,RI_TRANSMISSION) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE) != 0;	return TRUE;}
+	}
+	
+	if ((category == NULL) || (strcmp(category,RI_IDENTIFIER) == 0)) {
+		if (strcmp(name,RI_NAME) == 0)					{	type	=	TYPE_STRING;	value	=	name;	return TRUE;}
+	}
 
-		// Lookup the attribute
-		if (userAttributes.lookup(name,cVariable)) {
-			type	=	cVariable->type;
-			value	=	cVariable->defaultValue;
-
-			if (value != NULL)	return TRUE;
-		}
+	if ((category == NULL) || (strcmp(category,RI_CULL) == 0)) {
+		if (strcmp(name,RI_HIDDEN) == 0)				{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) != 0;			return TRUE;}
+		else if (strcmp(name,RI_BACKFACING) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) != 0;			return TRUE;}
 	}
 
 	// Unable to find it

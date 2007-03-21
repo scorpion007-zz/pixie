@@ -108,7 +108,7 @@ public:
 		void				checkParameters();							// Re-compute the required shader parameters
 		CVariable			*findParameter(const char *);				// Find a shader parameter
 		void				restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding);
-		int					find(const char *name,const char *category,EVariableType &type,void *&value);
+		int					find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const;
 
 		int					refCount;									// Refcount used by the objects and the general graphics state
 		

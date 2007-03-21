@@ -724,7 +724,9 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 // Description			:	Find the value of a particular option
 // Return Value			:	-
 // Comments				:
-int			COptions::find(const char *name,const char *category,EVariableType &type,void *&value) {
+int			COptions::find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const {
+
+	// Check the common case first
 	if (strncmp(name,"user:",strlen("user:")) == 0) {
 		CVariable *var;
         if (userOptions.lookup(name+strlen("user:"),var) == TRUE) {
@@ -733,5 +735,43 @@ int			COptions::find(const char *name,const char *category,EVariableType &type,v
 			return TRUE;
 		}
 	}
+
+	if ((category == NULL) || (strcmp(category,RI_LIMITS) == 0)) {
+		if (strcmp(name,RI_BUCKETSIZE) == 0)				{	type	=	TYPE_INTEGER;	value	=	&bucketWidth;			return TRUE;}
+		else if (strcmp(name,RI_METABUCKETS) == 0)			{	type	=	TYPE_INTEGER;	value	=	&netXBuckets;			return TRUE;}
+		else if (strcmp(name,RI_GRIDSIZE) == 0)				{	type	=	TYPE_INTEGER;	value	=	&maxGridSize;			return TRUE;}
+		else if (strcmp(name,RI_EYESPLITS) == 0)			{	type	=	TYPE_INTEGER;	value	=	&maxEyeSplits;			return TRUE;}
+		else if (strcmp(name,RI_TEXTUREMEMORY) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = maxTextureSize / 1000;	return TRUE;}
+		else if (strcmp(name,RI_BRICKMEMORY) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = maxBrickSize / 1000;		return TRUE;}
+		else if (strcmp(name,RI_NUMTHREADS) == 0)			{	type	=	TYPE_INTEGER;	value	=	&numThreads;			return TRUE;}
+		else if (strcmp(name,RI_THREADSTRIDE) == 0)			{	type	=	TYPE_INTEGER;	value	=	&threadStride;			return TRUE;}
+		else if (strcmp(name,RI_GEOCACHEMEMORY) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = geoCacheMemory / 1000;	return TRUE;}
+		else if (strcmp(name,RI_INHERITATTRIBUTES) == 0)	{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) != 0;				return TRUE;}
+		else if (strcmp(name,"frame") == 0)					{	type	=	TYPE_INTEGER;	value	=	&frame;					return TRUE;}
+	}
+	
+	if ((category == NULL) || (strcmp(category,RI_HIDER) == 0)) {
+		if (strcmp(name,RI_JITTER) == 0)					{	type	=	TYPE_FLOAT;		value	=	&jitter;				return TRUE;}
+		else if (strcmp(name,RI_EMIT) == 0)					{	type	=	TYPE_INTEGER;	value	=	&numEmitPhotons;		return TRUE;}
+		else if (strcmp(name,RI_SAMPLESPECTRUM) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_SAMPLESPECTRUM) != 0;				return TRUE;}
+		else if (strcmp(name,RI_SAMPLEMOTION) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_SAMPLEMOTION) != 0;				return TRUE;}
+	}
+	
+	if ((category == NULL) || (strcmp(category,RI_TRACE) == 0)) {
+		if (strcmp(name,RI_MAXDEPTH) == 0)					{	type	=	TYPE_INTEGER;	value	=	&maxRayDepth;			return TRUE;}
+	}
+
+	if ((category == NULL) || (strcmp(category,RI_STATISTICS) == 0)) {
+		if (strcmp(name,RI_ENDOFFRAME) == 0)				{	type	=	TYPE_INTEGER;	value	=	&endofframe;			return TRUE;}
+		else if (strcmp(name,RI_FILELOG) == 0)				{	type	=	TYPE_STRING;	value	=	filelog;				return TRUE;}
+		else if (strcmp(name,RI_PROGRESS) == 0)				{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_PROGRESS) != 0;				return TRUE;}
+
+	}
+	
+	if ((category == NULL) || (strcmp(category,RI_SHUTTER) == 0)) {
+		if (strcmp(name,RI_OFFSET) == 0)					{	type	=	TYPE_FLOAT;		value	=	&shutterOffset;			return TRUE;}
+	}
+
+	
 	return FALSE;
 }
