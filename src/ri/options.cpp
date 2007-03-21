@@ -727,12 +727,12 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 int			COptions::find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const {
 
 	// Check the common case first
-	if (strncmp(name,"user:",strlen("user:")) == 0) {
+	if ((category == NULL) || (strcmp(category,RI_USER) == 0)) {
 		CVariable *var;
-        if (userOptions.lookup(name+strlen("user:"),var) == TRUE) {
+        if (userOptions.lookup(name,var) == TRUE) {
 			type = var->type;
 			value = var->defaultValue;
-			return TRUE;
+			if (value != NULL)	return TRUE;
 		}
 	}
 
