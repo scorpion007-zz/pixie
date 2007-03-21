@@ -43,6 +43,7 @@ int							iflex(void );		// Forward definition for stupid yacc
 void						iferror(char *,...);
 
 static	CRendererContext	*context	=	NULL;
+static	int					silent		=	FALSE;
 static	int					result		=	0;	// 0 - FALSE
 												// 1 - TRUE
 												// 2 - error
@@ -82,7 +83,7 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 			case TYPE_STRING:
 				if (value == NULL)	return (const char *) expr.stringValue;
-				else				return (const char *) value;
+				else				return *((const char **) value);
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
 			default:
@@ -219,11 +220,11 @@ static	int					result		=	0;	// 0 - FALSE
 					if (typeSet == FALSE) {
 						COptions	*cOptions		=	context->getOptions();
 						if (cOptions->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
-							error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+							if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
 							result	=	FALSE;
 						}
 					} else {
-						error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+						if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
 						result	=	FALSE;
 					}
 				}
@@ -235,11 +236,11 @@ static	int					result		=	0;	// 0 - FALSE
 					if (typeSet == FALSE) {
 						CAttributes	*cAttributes	=	context->getAttributes(TRUE);
 						if (cAttributes->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
-							error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+							if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
 							result	=	FALSE;
 						}
 					} else {
-						error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+						if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
 						result	=	FALSE;
 					}
 				}
@@ -407,6 +408,9 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				ifExpr
 				{
 					if ($1.type == TYPE_STRING || $3.type == TYPE_STRING) {
+						CExpr a,b;
+						a = $1;
+						b = $3;
 						setInt($$,strcmp(getString($1),getString($3)) == 0);
 					} else {
 						setInt($$,getFloat($1) == getFloat($3));
@@ -516,7 +520,37 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				ifExpr
 				IF_CLOSE
 				{
-					setInt($$,CRenderer::retrieveVariable(getString($3)) != NULL);
+					CExpr e;
+					// save previous result & silent status
+					int prevResult = result;
+					int prevSilent = silent;
+					silent = TRUE;
+					result = TRUE;
+					// lookup (result will be false if it fails)
+					findExpr(e,getString($3));
+					setInt($$,result == TRUE);
+					// restore state
+					result = prevResult;
+					silent = prevSilent;
+				}
+				|
+				IF_DEFINED
+				IF_OPEN
+				IF_IDENTIFIER_VALUE
+				IF_CLOSE
+				{
+					CExpr e;
+					// save previous result & silent status
+					int prevResult = result;
+					int prevSilent = silent;
+					silent = TRUE;
+					result = TRUE;
+					// lookup (result will be false if it fails)
+					findExpr(e,$3);
+					setInt($$,result == TRUE);
+					// restore state
+					result = prevResult;
+					silent = prevSilent;
 				}
 				|
 				//////////////////////////////////////////////////////////////////////////
@@ -529,7 +563,7 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				IF_CLOSE
 				{
 					$$.type		=	TYPE_STRING;
-					$$.value	=	$$.stringValue;
+					$$.value	=	NULL;
 					strcpy($$.stringValue,getString($3));
 					strcat($$.stringValue,getString($5));
 				}
@@ -552,6 +586,7 @@ int		CRendererContext::ifParse(const char *expr) {
 	// Save the necessary info
 	context			=	this;
 	result			=	2;
+	silent			=	FALSE;
 
 	newState		=	if_scan_string(expr);				// Create a new buffer
 	ifparse();												// Scan the buffer
