@@ -4385,11 +4385,16 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 
 void	*CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
 
-	// FIXME: We should probably save the archive into the frame temp. directory
+	// Make sure we have the temporary directory created
+	if (!osFileExists(CRenderer::temporaryPath))	osCreateDir(CRenderer::temporaryPath);
+
+	char	fileName[OS_MAX_PATH_LENGTH];
+	strcpy(fileName,CRenderer::temporaryPath);
+	strcat(fileName,name);
 
 	// Save the interface
 	savedRenderMan	=	renderMan;
-	renderMan		=	new CRibOut(name);
+	renderMan		=	new CRibOut(fileName);
 
 	return NULL;
 }

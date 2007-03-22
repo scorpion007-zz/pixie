@@ -89,15 +89,13 @@ static int	rcClearTemp(const char *fileName,void *userData) {
 void		CRenderer::shutdownFiles() {
 
 	// Ditch the temporary files created
-	if (temporaryPath != NULL) {
-		if (osFileExists(temporaryPath)) {
-			char	tmp[OS_MAX_PATH_LENGTH];
+	if (osFileExists(temporaryPath)) {
+		char	tmp[OS_MAX_PATH_LENGTH];
 
-			sprintf(tmp,"%s\\*",temporaryPath);
-			osFixSlashes(tmp);
-			osEnumerate(tmp,rcClearTemp,NULL);
-			osDeleteDir(temporaryPath);
-		}
+		sprintf(tmp,"%s*",temporaryPath);
+		osFixSlashes(tmp);
+		osEnumerate(tmp,rcClearTemp,NULL);
+		osDeleteDir(temporaryPath);
 	}
 	
 	// Ditch the DSO shaders that have been loaded
@@ -159,7 +157,7 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 		return TRUE;
 	}
 
-	
+	// Look at the search path
 	for (;searchpath!=NULL;searchpath=searchpath->next) {
 		sprintf(result,"%s%s",searchpath->directory,name);
 		osFixSlashes(result);
@@ -167,6 +165,14 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 			info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",name,result);
 			return TRUE;
 		}
+	}
+
+	// Last resort, look into the temporary directory
+	sprintf(result,"%s%s",temporaryPath,name);
+	osFixSlashes(result);
+	if (osFileExists(result)) {
+		info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",name,result);
+		return TRUE;
 	}
 
 	// Unable to find the file, check the network

@@ -2321,7 +2321,10 @@ EXTERN(RtVoid)			RiArchiveEnd(void) {
 	// Decrease the nesting and recover the original context
 	archiveNesting--;
 	if (archiveNesting == 0) {
-		if (savedRenderMan != NULL)	renderMan	=	savedRenderMan;
+		if (savedRenderMan != NULL)	{
+			delete renderMan;
+			renderMan	=	savedRenderMan;
+		}
 	}
 
 	renderMan->RiArchiveEnd();

@@ -554,6 +554,11 @@ int main(int argc, char* argv[]) {
 	int				numThreads		=	-1;
 	int				localChildren	=	0;
 
+	// Enable memory leak detection/report
+#ifdef WIN32
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 	// Register the exit stuff
 	sprintf(managerString,"");
 	gargc				=	argc;

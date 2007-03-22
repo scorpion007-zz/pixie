@@ -123,9 +123,11 @@ typedef union {
 
 // Register some junk for memory leak detection
 #define _CRTDBG_MAP_ALLOC
-#include <malloc.h>
-#include <stdlib.h>
-#include <crtdbg.h>
+#include	<stdlib.h>
+#include	<crtdbg.h>
+
+#define MYDEBUG_NEW   new( _NORMAL_BLOCK, __FILE__, __LINE__)
+#define new MYDEBUG_NEW
 
 #endif
 #endif

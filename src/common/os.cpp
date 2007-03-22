@@ -254,21 +254,18 @@ void	osFixSlashes(char *st) {
 // Function				:	osTempname
 // Description			:	Create a temporary file
 // Return Value			:	-
-// Comments				:
+// Comments				:	The directory must end with / (or \)
 void	osTempname(const char *directory,const char *prefix,char *result) {
 	#ifdef WIN32
 		// avoid some windows shortcomings by extending count when we
 		// start to get clashes
 		static int i = 0;
-		sprintf(result,"%s\\%s-%4xXXXXXXXX",directory,prefix,i);
-		osFixSlashes(result);
+		sprintf(result,"%s%s-%4xXXXXXXXX",directory,prefix,i);
 		while(_mktemp(result) == NULL) {
-			sprintf(result,"%s\\%s-%4xXXXXXXXX",directory,prefix,i++);
-			osFixSlashes(result);
+			sprintf(result,"%s%s-%4xXXXXXXXX",directory,prefix,i++);
 		}
 	#else
-		sprintf(result,"%s\\%s-XXXXXXXX",directory,prefix);
-		osFixSlashes(result);
+		sprintf(result,"%s%s-XXXXXXXX",directory,prefix);
 		mktemp(result);
 	#endif
 }
