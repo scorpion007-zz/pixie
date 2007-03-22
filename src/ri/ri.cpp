@@ -2297,7 +2297,10 @@ EXTERN(RtArchiveHandle)	RiArchiveBegin(RtToken name, ...) {
 
 EXTERN(RtArchiveHandle)	RiArchiveBeginV(RtToken name, RtInt n, RtToken tokens[], RtPointer parms[]) {
 
-	if (check("RiArchiveBegin",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return NULL;
+	//if (check("RiArchiveBegin",RENDERMAN_FRAME_BLOCK | RENDERMAN_WORLD_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_RESOURCE_BLOCK | RENDERMAN_ARCHIVE_BLOCK)) return NULL;
+	// Archives should be allowed anywhere
+	if (check("RiArchiveBegin",RENDERMAN_ALL_BLOCKS)) return NULL;
+
 
 	blocks.push(currentBlock);
 	currentBlock	=	RENDERMAN_ARCHIVE_BLOCK;

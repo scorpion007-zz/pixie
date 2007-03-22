@@ -4421,11 +4421,11 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,cha
 	CVariable	tmp;
 	CVariable	*cVariable;	
 	int			save					=	FALSE;
-	int			transform				=	FALSE;
-	int			shading					=	FALSE;
-	int			geometrymodification	=	FALSE;
-	int			geometrydefinition		=	FALSE;
-	int			hiding					=	FALSE;
+	int			transform				=	TRUE;
+	int			shading					=	TRUE;
+	int			geometrymodification	=	TRUE;
+	int			geometrydefinition		=	TRUE;
+	int			hiding					=	TRUE;
 	
 	// Parse the parameter list
 	for (i=0;i<n;i++) {
@@ -4434,25 +4434,45 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,cha
 		cVariable	=	CRenderer::retrieveVariable(tokens[i]);
 		
 		// Parse if necessary
-		if (cVariable == NULL)	parseVariable(&tmp,NULL,tokens[i]);
+		if (cVariable == NULL) {
+			parseVariable(&tmp,NULL,tokens[i]);
+			cVariable = &tmp;
+		}
 		
 		// Do we have something?
 		if (cVariable != NULL) {
 			if (strcmp(cVariable->name,"operation") == 0) {
-				if (strcmp((const char *) parms[i],"save") == 0)			save	=	TRUE;
-				else if (strcmp((const char *) parms[i],"restore") == 0)	save	=	FALSE;
+				const char *operation = ((const char **) parms[i])[0];
+				if (strcmp(operation,"save") == 0)			save	=	TRUE;
+				else if (strcmp(operation,"restore") == 0)	save	=	FALSE;
 				else {
-					error(CODE_BADTOKEN,"Invalid operation for resource: %s\n",(const char *) parms[i]);
+					error(CODE_BADTOKEN,"Invalid operation for resource: %s\n",operation);
 					return;
 				}
 			} else if (strcmp(cVariable->name,"subset") == 0) {
-				if (strcmp((const char *) parms[i],"shading") == 0)						shading					=	TRUE;
-				else if (strcmp((const char *) parms[i],"geometrymodification") == 0)	geometrymodification	=	TRUE;
-				else if (strcmp((const char *) parms[i],"geometrydefinition") == 0)		geometrydefinition		=	TRUE;
-				else if (strcmp((const char *) parms[i],"hiding") == 0)					hiding					=	TRUE;
-				else if (strcmp((const char *) parms[i],"transform") == 0)				transform				=	TRUE;
+				// subset, so don't do anything by default
+				transform				=	FALSE;
+				shading					=	FALSE;
+				geometrymodification	=	FALSE;
+				geometrydefinition		=	FALSE;
+				hiding					=	FALSE;
+
+				const char *subset = ((const char **)parms[i])[0];
+				
+				if (strcmp(subset,"shading") == 0)						shading					=	TRUE;
+				else if (strcmp(subset,"geometrymodification") == 0)	geometrymodification	=	TRUE;
+				else if (strcmp(subset,"geometrydefinition") == 0)		geometrydefinition		=	TRUE;
+				else if (strcmp(subset,"hiding") == 0)					hiding					=	TRUE;
+				else if (strcmp(subset,"transform") == 0)				transform				=	TRUE;
+				else if (strcmp(subset,"all") == 0) {
+					transform				=	TRUE;
+					shading					=	TRUE;
+					geometrymodification	=	TRUE;
+					geometrydefinition		=	TRUE;
+					hiding					=	TRUE;
+				}
 				else {
-					error(CODE_BADTOKEN,"Invalid subset for resource: %s\n",(const char *) parms[i]);
+					error(CODE_BADTOKEN,"Invalid subset for resource: %s\n",subset);
 					return;
 				}
 			} else {

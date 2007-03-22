@@ -373,6 +373,8 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 			nLight->next			=	lightSources;
 			lightSources			=	nLight;
 		}
+		
+		checkParameters();
 
 		shadingRate	=	other->shadingRate;
 		memcpy(s,other->s,4*sizeof(float));
