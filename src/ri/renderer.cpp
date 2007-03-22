@@ -317,7 +317,11 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 #ifdef WIN32
 	sprintf(temporaryPath,"PixieTemp_%d\\",GetCurrentProcessId());
 #else
-	sprintf(temporaryPath,"PixieTemp_%d/",getpid());
+	const char *tempDirEnv = getenv("TMPDIR");
+	if (tempDirEnv != NULL)
+		sprintf(temporaryPath,"%s/PixieTemp_%d/",tempDirEnv,getpid());
+	else
+		sprintf(temporaryPath,"PixieTemp_%d/",getpid());
 #endif
 	osFixSlashes(temporaryPath);
 
