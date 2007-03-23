@@ -48,10 +48,16 @@ int	main(int argc,char *argv[]) {
 		fprintf(stdout,"Usage: show <options> <file_name>[,mode]\n");
 		fprintf(stdout,"\tKeys:\tbrickmap\tm:more detailed level\n");
 		fprintf(stdout,"\t\t\t\tl:less detailed level\n");
+		fprintf(stdout,"\t\t\t\tb:show boxes\n");
+		fprintf(stdout,"\t\t\t\td:show discs\n");
+		fprintf(stdout,"\t\t\t\tp:show points\n");
 		fprintf(stdout,"\t\tpoint cloud\tp:show points\n");
 		fprintf(stdout,"\t\t\t\td:show discs\n");
 		fprintf(stdout,"\t\tirradiance\tp:show points\n");
-		fprintf(stdout,"\t\t\t\td:show discs\n");
+		fprintf(stdout,"\t\t\t\td:show discs\n\n");
+		fprintf(stdout,"\tMouse:\tleft\t\trotate\n");
+		fprintf(stdout,"\t\tmiddle\t\tzoom\n");
+		fprintf(stdout,"\t\tright\t\tpan\n");
 		return 1;
 	} else {
 		char	tmp[OS_MAX_PATH_LENGTH+6];

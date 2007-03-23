@@ -202,6 +202,8 @@ protected:
 	static	int					currentMemory;					// The amount of used memory
 	static	int					maxMemory;						// The maximum amount of memory to allocate
 	static	int					detailLevel;					// The brickmap detail level for visualization
+	static	int					drawType;						// Which type to draw
+
 
 	static	void				brickQuickSort(CBrickNode **nodes,int start,int end);
 	

@@ -46,6 +46,7 @@ int			CBrickMap::referenceNumber	=	0;				// The last reference number
 int			CBrickMap::currentMemory	=	0;				// The currently used memory abount
 int			CBrickMap::maxMemory		=	0;				// The maximum memory for brickmaps
 int			CBrickMap::detailLevel		=	2;				// The detail level
+int			CBrickMap::drawType			=	0;				// Draw boxes
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1002,11 +1003,14 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 void				CBrickMap::draw() {
 	float		P[chunkSize*3];
 	float		C[chunkSize*3];
+	float		N[chunkSize*3];
+	float		R[chunkSize];
 	int			j;
 	float		*cP				=	P;
 	float		*cC				=	C;
+	float		*cN				=	N;
+	float		*cR				=	R;
 	int			level			=	min(max(0,detailLevel),maxDepth);
-	int			fast			=	FALSE;
 	int			nb				=	1 << level;
 	float		cubePoints[]	=	{	0, 0, 0,
 										1, 0, 0,
@@ -1061,14 +1065,16 @@ void				CBrickMap::draw() {
 			// Save values before we update
 			float *DDs = DD;
 			float wt = vx->weight;
+			float *norm = vx->N;
 			
 			// Update for next iteration, incase we skip
 			vx = (CBrickMap::CVoxel*)((char*)vx + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
 			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));	
 			
-			if (wt < C_EPSILON) continue;			
+			//if (wt <= C_EPSILON) continue;			
+			if (wt <= 0.01) continue;			
 
-			if (!fast) {
+			if (drawType == 0) {
 
 				float	*pts = cubePoints;
 				for(int k =0; k<6; k++) {
@@ -1098,7 +1104,28 @@ void				CBrickMap::draw() {
 					
 					pts += 12;
 				}
-			} else {
+			}
+			else if (drawType == 1) {
+				if (j == 0) {
+					drawDisks(chunkSize,P,R,N,C);
+					cP	=	P;
+					cC	=	C;
+					cN	=	N;
+					cR	=	R;
+					j	=	chunkSize;
+				}
+
+				movvv(cP,cent);
+				movvv(cC,DD);
+				movvv(cN,norm);
+				cR[0] = sz/(float) BRICK_SIZE;
+
+				cP		+=	3;
+				cC		+=	3;
+				cN		+=	3;
+				cR		+=	1;
+				j--;
+			} else if (drawType == 2) {
 				if (j == 0) {
 					drawPoints(chunkSize,P,C);
 					cP	=	P;
@@ -1117,8 +1144,9 @@ void				CBrickMap::draw() {
 	}
 
 	if (j != chunkSize) {
-		if (!fast)		drawTriangles((chunkSize-j)/3,P,C);
-		else			drawPoints(chunkSize,P,C);
+		if (drawType == 0)		drawTriangles((chunkSize-j)/3,P,C);
+		else if (drawType == 1) drawDisks(chunkSize,P,R,N,C);
+		else					drawPoints(chunkSize,P,C);
 	}
 }
 
@@ -1136,6 +1164,15 @@ int			CBrickMap::keyDown(int key) {
 	} else if ((key == 'L') || (key == 'l')) {
 		detailLevel--;
 		if (detailLevel < 0)	detailLevel	=	0;
+		return TRUE;
+	} else if ((key == 'b') || (key == 'B')) {
+		drawType = 0;
+		return TRUE;
+	} else if ((key == 'd') || (key == 'D')) {
+		drawType = 1;
+		return TRUE;
+	} else if ((key == 'p') || (key == 'P')) {
+		drawType = 2;
 		return TRUE;
 	}
 

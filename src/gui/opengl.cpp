@@ -153,8 +153,8 @@ void		pglFile(const char *fileName) {
 	FILE	*file	=	fopen(fileName,"rb");
 	vector	bmin,bmax;
 
-	fread(bmin,3,sizeof(float),file);
-	fread(bmax,3,sizeof(float),file);
+	fread(bmin,sizeof(float),3,file);
+	fread(bmax,sizeof(float),3,file);
 
 	int	lastType	=	-1;
 
@@ -173,7 +173,7 @@ void		pglFile(const char *fileName) {
 				}
 
 				// Point
-				fread(P1,3,sizeof(float),file);
+				fread(P1,sizeof(float),3,file);
 				glVertex3fv(P1);
 				break;
 			case 1:
@@ -185,8 +185,8 @@ void		pglFile(const char *fileName) {
 				}
 
 				// Line
-				fread(P1,3,sizeof(float),file);
-				fread(P2,3,sizeof(float),file);
+				fread(P1,sizeof(float),3,file);
+				fread(P2,sizeof(float),3,file);
 				glVertex3fv(P1);
 				glVertex3fv(P2);
 				break;
@@ -199,9 +199,9 @@ void		pglFile(const char *fileName) {
 				}
 
 				// Triangle
-				fread(P1,3,sizeof(float),file);
-				fread(P2,3,sizeof(float),file);
-				fread(P3,3,sizeof(float),file);
+				fread(P1,sizeof(float),3,file);
+				fread(P2,sizeof(float),3,file);
+				fread(P3,sizeof(float),3,file);
 				glVertex3fv(P1);
 				glVertex3fv(P2);
 				glVertex3fv(P3);
@@ -215,10 +215,10 @@ void		pglFile(const char *fileName) {
 				}
 
 				// Quad
-				fread(P1,3,sizeof(float),file);
-				fread(P2,3,sizeof(float),file);
-				fread(P3,3,sizeof(float),file);
-				fread(P4,3,sizeof(float),file);
+				fread(P1,sizeof(float),3,file);
+				fread(P2,sizeof(float),3,file);
+				fread(P3,sizeof(float),3,file);
+				fread(P4,sizeof(float),3,file);
 				glVertex3fv(P1);
 				glVertex3fv(P2);
 				glVertex3fv(P3);
