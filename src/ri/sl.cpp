@@ -748,7 +748,7 @@ static	TSlFunction		functions[]	=	{
 #line 695 "../../../../src/ri/sdr.y"
 typedef union slval {
 	float	real;
-	char	string[PARSER_MAX_STRING_SIZE];
+	char	*string;
 	matrix	m;
 	vector	v;
 } YYSTYPE;
@@ -2824,9 +2824,13 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 	slin					=	fin;
 
 	reset();
-	currentData.name					=	name;
-	currentData.passNumber				=	1;
+	currentData.name		=	name;
+	currentData.passNumber	=	1;
+	
+	// The first pass
+	memBegin(CRenderer::globalMemory);
 	slparse();
+	memEnd(CRenderer::globalMemory);
 
 	if (currentData.numErrors != 0) {
 		sl_delete_buffer( YY_CURRENT_BUFFER );
@@ -2841,7 +2845,11 @@ CShader	*parseShader(const char *shaderName,const char *name) {
 	alloc();
 	currentData.passNumber				=	2;
 	
+	// The second pass
+	memBegin(CRenderer::globalMemory);
 	slparse();
+	memEnd(CRenderer::globalMemory);
+	
 	if (currentData.numErrors != 0) {
 		reset();
 		sl_delete_buffer( YY_CURRENT_BUFFER );

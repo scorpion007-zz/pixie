@@ -82,6 +82,14 @@ inline void *ralloc(int size,CMemPage *&stack) {
 	return	ptr;
 }
 
+// This macro duplicates a string in the stack
+inline char *rstrdup(const char *string,CMemPage *&stack) {
+	char	*dest	=	(char *) ralloc(strlen(string)+1,stack);
+
+	strcpy(dest,string);
+
+	return dest;
+}
 
 // This macro places a checkpoint
 #define	memBegin(__page)	{									\

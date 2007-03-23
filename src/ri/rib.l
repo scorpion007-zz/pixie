@@ -208,13 +208,12 @@ version												return RIB_VERSION;
 \[													return RIB_ARRAY_BEGIN;
 \]													return RIB_ARRAY_END;
 
-\"[^\"]*\"											{   assert(strlen(ribtext) < PARSER_MAX_STRING_SIZE);	strcpy(riblval->string,&ribtext[1]);	riblval->string[strlen(riblval->string)-1] = '\0'; return RIB_TEXT;}
-[a-zA-Z][a-zA-Z0-9\_]*								{	assert(strlen(ribtext) < PARSER_MAX_STRING_SIZE);	strcpy(riblval->string,ribtext);		return RIB_IDENTIFIER; }
+\"[^\"]*\"											{   riblval->string	=	strdup(ribtext+1);	allStrings.push(riblval->string);	riblval->string[strlen(riblval->string)-1] = '\0'; return RIB_TEXT;}
 [+-]?([0-9]+|([0-9]*(\.[0-9]+)?)([eE][+-]?[0-9]+)?)	{	sscanf(ribtext,"%f",&riblval->real); return RIB_FLOAT; }
 [+-]?([0-9]+|([0-9]+(\.[0-9]*)?)([eE][+-]?[0-9]+)?)	{	sscanf(ribtext,"%f",&riblval->real); return RIB_FLOAT; }
 
 [\t ]												;
-#\!.*												{	assert(strlen(ribtext) < PARSER_MAX_STRING_SIZE);	strcpy(riblval->string,&ribtext[2]);	return RIB_STRUCTURE_COMMENT;	}
+#\!.*												{	riblval->string	=	strdup(ribtext+2);	allStrings.push(riblval->string);	return RIB_STRUCTURE_COMMENT;	}
 #.*													;
 \n													{	ribLineno++; }
 <<EOF>>												{

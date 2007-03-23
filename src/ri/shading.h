@@ -69,8 +69,6 @@ class	CPl;
 class	CSphereLight;
 struct	TObjectHash;
 
-const int	SHADING_OBJECT_CACHE_SIZE	=	512;
-
 typedef enum {
 	SHADING_0D,				// Shading points
 	SHADING_2D_GRID,		// Shading a 2D grid

@@ -37,9 +37,9 @@ DSO													return SCRL_DSO;
 \,													return SCRL_COMMA;
 
 \#\!version[ ]+[0-9]+\.[0-9]+\.[0-9]+\n				{	int	r,b,a;	sscanf(yytext+9,"%d.%d.%d",&r,&b,&a);	if ((r != VERSION_RELEASE) || (b != VERSION_BETA)) slerror("Version mismatch");	}
-\"[^\"]*\"											{   assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,&yytext[1]);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return SCRL_TEXT_VALUE;}
-[a-zA-Z\_][a-zA-Z0-9\_]*							{	assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,yytext); return SCRL_IDENTIFIER_VALUE; }
-\#\![a-zA-Z][a-zA-Z0-9\_]*							{	assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,yytext); return SCRL_LABEL_VALUE; }
+\"[^\"]*\"											{   yylval.string	=	rstrdup(yytext+1,CRenderer::globalMemory);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return SCRL_TEXT_VALUE;}
+[a-zA-Z\_][a-zA-Z0-9\_]*							{	yylval.string	=	rstrdup(yytext,CRenderer::globalMemory); return SCRL_IDENTIFIER_VALUE; }
+\#\![a-zA-Z][a-zA-Z0-9\_]*							{	yylval.string	=	rstrdup(yytext,CRenderer::globalMemory); return SCRL_LABEL_VALUE; }
 (([0-9]*\.[0-9]+)([eE][+-]?[0-9]+)?)				{	sscanf(yytext,"%f",&yylval.real); return SCRL_FLOAT_VALUE; }
 (([0-9]+\.[0-9]*)([eE][+-]?[0-9]+)?)				{	sscanf(yytext,"%f",&yylval.real); return SCRL_FLOAT_VALUE; }
 (([0-9]+)([eE][+-]?[0-9]+)?)						{	sscanf(yytext,"%f",&yylval.real); return SCRL_FLOAT_VALUE; }

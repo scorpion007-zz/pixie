@@ -27,8 +27,8 @@
 defined												return IF_DEFINED;
 concat												return IF_CONCAT;
 
-\'[^\'\"]*\'											{   assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,&yytext[1]);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return IF_TEXT_VALUE;}
-[a-zA-Z\_][a-zA-Z0-9:\_]*							{	assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,yytext);		return IF_IDENTIFIER_VALUE; }
+\'[^\'\"]*\'										{   yylval.string = rstrdup(yytext+1,CRenderer::globalMemory);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return IF_TEXT_VALUE;}
+[a-zA-Z\_][a-zA-Z0-9:\_]*							{	yylval.string = rstrdup(yytext,CRenderer::globalMemory);	return IF_IDENTIFIER_VALUE; }
 [+-]?([0-9]+|([0-9]*(\.[0-9]+)?)([eE][+-]?[0-9]+)?)	{	sscanf(yytext,"%f",&yylval.real); return IF_FLOAT_VALUE; }
 [+-]?([0-9]+|([0-9]+(\.[0-9]*)?)([eE][+-]?[0-9]+)?)	{	sscanf(yytext,"%f",&yylval.real); return IF_FLOAT_VALUE; }
 [\t ]												;

@@ -101,11 +101,11 @@ static	int					result		=	0;	// 0 - FALSE
 	// Comments				:
 	class CExpr {
 	public:
-			EVariableType	type;
-			const void		*value;
+			EVariableType	type;				// The type of the expression
+			const void		*value;				// Value of the expression
 			float			floatValue;
 			int				intValue;
-			char			stringValue[128];	// HACK
+			char			*stringValue;
 	};
 
 	///////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ static	int					result		=	0;	// 0 - FALSE
 			case TYPE_DOUBLE:
 				break;
 			case TYPE_STRING:
-				if (value == NULL)	return (const char *) expr.stringValue;
+				if (value == NULL)	return expr.stringValue;
 				else				return *((const char **) value);
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
@@ -226,8 +226,8 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:
 	// Comments				:
 	static	inline	void		setInt(CExpr &expr,int val) {
-		expr.type	=	TYPE_INTEGER;
-		expr.value	=	NULL;
+		expr.type		=	TYPE_INTEGER;
+		expr.value		=	NULL;
 		expr.intValue	=	val;
 	}
 
@@ -297,7 +297,7 @@ static	int					result		=	0;	// 0 - FALSE
 
 #line 253 "../../../../src/ri/ifexpr.y"
 typedef union slval {
-	char	string[PARSER_MAX_STRING_SIZE];
+	char	*string;
 	CExpr	expr;
 	float	real;
 } YYSTYPE;
@@ -378,9 +378,9 @@ static const short yyrhs[] = {    31,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   307,   319,   327,   338,   343,   350,   359,   366,   373,   380,
-   389,   396,   403,   419,   430,   441,   452,   463,   474,   484,
-   493,   500,   506,   515,   536,   555
+   307,   319,   327,   336,   341,   348,   357,   364,   371,   378,
+   387,   394,   401,   414,   425,   436,   447,   458,   469,   479,
+   488,   495,   501,   510,   531,   550
 };
 #endif
 
@@ -1031,75 +1031,70 @@ case 2:
 case 3:
 #line 332 "../../../../src/ri/ifexpr.y"
 {
-					// FIXME: This is wrong. What are we supposed to do here ?
-					
 					// Find the variable here
 					findExpr(yyval.expr,getString(yyvsp[-1].expr));
 				;
     break;}
 case 4:
-#line 340 "../../../../src/ri/ifexpr.y"
+#line 338 "../../../../src/ri/ifexpr.y"
 {					
 					setFloat(yyval.expr,yyvsp[0].real);
 				;
     break;}
 case 5:
-#line 345 "../../../../src/ri/ifexpr.y"
+#line 343 "../../../../src/ri/ifexpr.y"
 {
-					yyval.expr.type		=	TYPE_STRING;
-					yyval.expr.value	=	NULL;
-					strcpy(yyval.expr.stringValue,yyvsp[0].string);
+					yyval.expr.type			=	TYPE_STRING;
+					yyval.expr.value		=	NULL;
+					yyval.expr.stringValue	=	yyvsp[0].string;
 				;
     break;}
 case 6:
-#line 356 "../../../../src/ri/ifexpr.y"
+#line 354 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) + getFloat(yyvsp[0].expr));
 				;
     break;}
 case 7:
-#line 363 "../../../../src/ri/ifexpr.y"
+#line 361 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) - getFloat(yyvsp[0].expr));
 				;
     break;}
 case 8:
-#line 370 "../../../../src/ri/ifexpr.y"
+#line 368 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) * getFloat(yyvsp[0].expr));
 				;
     break;}
 case 9:
-#line 377 "../../../../src/ri/ifexpr.y"
+#line 375 "../../../../src/ri/ifexpr.y"
 {
 					setFloat(yyval.expr,getFloat(yyvsp[-2].expr) / getFloat(yyvsp[0].expr));
 				;
     break;}
 case 10:
-#line 386 "../../../../src/ri/ifexpr.y"
+#line 384 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) & getInt(yyvsp[0].expr));
 				;
     break;}
 case 11:
-#line 393 "../../../../src/ri/ifexpr.y"
+#line 391 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) | getInt(yyvsp[0].expr));
 				;
     break;}
 case 12:
-#line 400 "../../../../src/ri/ifexpr.y"
+#line 398 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) ^ getInt(yyvsp[0].expr));
 				;
     break;}
 case 13:
-#line 409 "../../../../src/ri/ifexpr.y"
+#line 407 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
-						CExpr a,b;
-						a = yyvsp[-2].expr;
-						b = yyvsp[0].expr;
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) == 0);
 					} else {
 						setInt(yyval.expr,getFloat(yyvsp[-2].expr) == getFloat(yyvsp[0].expr));
@@ -1107,7 +1102,7 @@ case 13:
 				;
     break;}
 case 14:
-#line 423 "../../../../src/ri/ifexpr.y"
+#line 418 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) != 0);
@@ -1117,7 +1112,7 @@ case 14:
 				;
     break;}
 case 15:
-#line 434 "../../../../src/ri/ifexpr.y"
+#line 429 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) > 0);
@@ -1127,7 +1122,7 @@ case 15:
 				;
     break;}
 case 16:
-#line 445 "../../../../src/ri/ifexpr.y"
+#line 440 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) < 0);
@@ -1137,7 +1132,7 @@ case 16:
 				;
     break;}
 case 17:
-#line 456 "../../../../src/ri/ifexpr.y"
+#line 451 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) >= 0);
@@ -1147,7 +1142,7 @@ case 17:
 				;
     break;}
 case 18:
-#line 467 "../../../../src/ri/ifexpr.y"
+#line 462 "../../../../src/ri/ifexpr.y"
 {
 					if (yyvsp[-2].expr.type == TYPE_STRING || yyvsp[0].expr.type == TYPE_STRING) {
 						setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) <= 0);
@@ -1157,38 +1152,38 @@ case 18:
 				;
     break;}
 case 19:
-#line 480 "../../../../src/ri/ifexpr.y"
+#line 475 "../../../../src/ri/ifexpr.y"
 {
 					// FIXME: Implement pattern matching
 					setInt(yyval.expr,strcmp(getString(yyvsp[-2].expr),getString(yyvsp[0].expr)) == 0);
 				;
     break;}
 case 20:
-#line 490 "../../../../src/ri/ifexpr.y"
+#line 485 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) && getInt(yyvsp[0].expr));
 				;
     break;}
 case 21:
-#line 497 "../../../../src/ri/ifexpr.y"
+#line 492 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,getInt(yyvsp[-2].expr) || getInt(yyvsp[0].expr));
 				;
     break;}
 case 22:
-#line 503 "../../../../src/ri/ifexpr.y"
+#line 498 "../../../../src/ri/ifexpr.y"
 {
 					setInt(yyval.expr,! getInt(yyvsp[0].expr));
 				;
     break;}
 case 23:
-#line 512 "../../../../src/ri/ifexpr.y"
+#line 507 "../../../../src/ri/ifexpr.y"
 {
 					yyval.expr	=	yyvsp[-1].expr;
 				;
     break;}
 case 24:
-#line 522 "../../../../src/ri/ifexpr.y"
+#line 517 "../../../../src/ri/ifexpr.y"
 {
 					CExpr e;
 					// save previous result & silent status
@@ -1205,7 +1200,7 @@ case 24:
 				;
     break;}
 case 25:
-#line 541 "../../../../src/ri/ifexpr.y"
+#line 536 "../../../../src/ri/ifexpr.y"
 {
 					CExpr e;
 					// save previous result & silent status
@@ -1222,10 +1217,11 @@ case 25:
 				;
     break;}
 case 26:
-#line 564 "../../../../src/ri/ifexpr.y"
+#line 559 "../../../../src/ri/ifexpr.y"
 {
-					yyval.expr.type		=	TYPE_STRING;
-					yyval.expr.value	=	NULL;
+					yyval.expr.type			=	TYPE_STRING;
+					yyval.expr.value		=	NULL;
+					yyval.expr.stringValue	=	(char *) ralloc(strlen(getString(yyvsp[-3].expr)) + strlen(getString(yyvsp[-1].expr)) + 2,CRenderer::globalMemory);
 					strcpy(yyval.expr.stringValue,getString(yyvsp[-3].expr));
 					strcat(yyval.expr.stringValue,getString(yyvsp[-1].expr));
 				;
@@ -1427,7 +1423,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 572 "../../../../src/ri/ifexpr.y"
+#line 568 "../../../../src/ri/ifexpr.y"
 
 
 #include "lex.if.cpp"
@@ -1439,6 +1435,10 @@ yyerrhandle:
 // Return Value			:	TRUE/FALSE
 // Comments				:
 int		CRendererContext::ifParse(const char *expr) {
+
+	// Begin a new page
+	memBegin(CRenderer::globalMemory);
+	
 	YY_BUFFER_STATE savedState	=	YY_CURRENT_BUFFER;		// Save the old buffer
 	YY_BUFFER_STATE	newState;
 
@@ -1453,6 +1453,9 @@ int		CRendererContext::ifParse(const char *expr) {
 
 	if_switch_to_buffer( savedState );						// Switch to the old buffer
 
+	// Restore the memory page
+	memEnd(CRenderer::globalMemory);
+	
 	return result;
 }
 

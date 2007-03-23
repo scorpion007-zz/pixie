@@ -41,12 +41,12 @@ void							dsoerror(char *,...);
 static	char					nameBuffer[256];
 static	char					prototypeBuffer[256];
 static	char					*currentPrototype;
-static	char					funName[256];
+static	char					*funName;
 static	int						numErrors;
 
 %}
 %union slval {
-	char	string[PARSER_MAX_STRING_SIZE];
+	char	*string;
 }
 %token	DSO_VOID
 %token	DSO_FLOAT
@@ -68,7 +68,7 @@ start:			{
 				DSO_TEXT
 				{
 					*currentPrototype++	=	'=';
-					strcpy(funName,$3);	// Save the name of the function
+					funName	=	$3;		// Save the name of the function
 				}
 				DSO_OPEN
 				dsoPL
@@ -91,6 +91,10 @@ dsoParameter:
 				|
 				dsoType
 				DSO_TEXT
+				{
+					// We're not using the parameter
+					free($2);
+				}
 				;
 
 dsoType:		DSO_VOID
@@ -156,7 +160,7 @@ int		dsoParse(const char *decl,char *&name,char *&prototype) {
 	dso_switch_to_buffer( savedState );						// Switch to the old buffer
 
 	if (numErrors == 0) {
-		name		=	strdup(funName);
+		name		=	funName;
 		prototype	=	strdup(prototypeBuffer);
 		return TRUE;
 	}

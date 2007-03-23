@@ -234,7 +234,6 @@ private:
 
 
 
-
 const	int		TRIE_NODE_LEAF				=	1;	
 
 // Some misc macros

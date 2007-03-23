@@ -597,7 +597,7 @@ DEFFUNC(Maxf				,"max"						,"f=f+"		,MAXFEXPR_PRE,MAXFEXPR,MAXFEXPR_UPDATE,MAXF
 
 #define	MAXVEXPR_POST
 
-DEFFUNC(Maxv					,"max"						,"v=v+"		,MAXVEXPR_PRE,MAXVEXPR,MAXVEXPR_UPDATE,MAXVEXPR_POST,0)
+DEFFUNC(Maxv				,"max"						,"v=v+"		,MAXVEXPR_PRE,MAXVEXPR,MAXVEXPR_UPDATE,MAXVEXPR_POST,0)
 
 
 
@@ -621,7 +621,7 @@ DEFFUNC(Maxv					,"max"						,"v=v+"		,MAXVEXPR_PRE,MAXVEXPR,MAXVEXPR_UPDATE,MAX
 							for (i=0;i<numArguments;i++)	op[i]++;
 
 
-DEFFUNC(Concat					,"concat"						,"s=ss*"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR_UPDATE,NULL_EXPR,0)
+DEFFUNC(Concat				,"concat"						,"s=ss*"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR_UPDATE,NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // match	"f=ss"
@@ -637,7 +637,7 @@ DEFFUNC(Concat					,"concat"						,"s=ss*"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXP
 						else														\
 							*res	=	0;
 
-DEFFUNC(Match					,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
+DEFFUNC(Match				,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
 
 

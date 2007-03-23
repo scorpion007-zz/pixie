@@ -48,7 +48,6 @@
 %}
 %union varval {
 	float	real;
-	char	string[PARSER_MAX_STRING_SIZE];
 }
 %token	VAR_GLOBAL
 %token	VAR_CONSTANT
@@ -69,7 +68,7 @@
 %token	VAR_OPEN
 %token	VAR_CLOSE
 %token<real>	VAR_FLOAT
-%token<string>	VAR_IDENTIFIER
+%token	VAR_IDENTIFIER
 %%
 start:	varStorage
 		varType
@@ -188,9 +187,6 @@ varType:	VAR_INTEGER
 			;
 
 varName:	VAR_IDENTIFIER
-			{
-				strcpy(currentVariable->name,$1);
-			}
 			|
 			{
 				strcpy(currentVariable->name,"");

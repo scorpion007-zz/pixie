@@ -80,8 +80,11 @@
 //	If we have threashing in the zone memory, we gradually increase the page size by this amount
 #define ZONE_INCREMENT_SIZE				100000
 
-//	Parser max string size
-#define	PARSER_MAX_STRING_SIZE			2048
+// The maximum length of the variable name
+#define VARIABLE_NAME_LENGTH			64
+
+// The size of the hash that maps object pointers
+#define	SHADING_OBJECT_CACHE_SIZE		512
 
 // The various cache sizes in reyes
 //#define	REYES_OBJECT_CACHE_SIZE			10

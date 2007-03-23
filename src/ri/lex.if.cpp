@@ -789,12 +789,12 @@ return IF_CONCAT;
 case 25:
 YY_RULE_SETUP
 #line 30 "../../../../src/ri/ifexpr.l"
-{   assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,&yytext[1]);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return IF_TEXT_VALUE;}
+{   yylval.string = rstrdup(yytext+1,CRenderer::globalMemory);	yylval.string[strlen(yylval.string)-1] = '\0'; osProcessEscapes(yylval.string); return IF_TEXT_VALUE;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 31 "../../../../src/ri/ifexpr.l"
-{	assert(strlen(yytext) < PARSER_MAX_STRING_SIZE);	strcpy(yylval.string,yytext);		return IF_IDENTIFIER_VALUE; }
+{	yylval.string = rstrdup(yytext,CRenderer::globalMemory);	return IF_IDENTIFIER_VALUE; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP

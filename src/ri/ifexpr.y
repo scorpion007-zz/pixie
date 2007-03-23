@@ -56,11 +56,11 @@ static	int					result		=	0;	// 0 - FALSE
 	// Comments				:
 	class CExpr {
 	public:
-			EVariableType	type;
-			const void		*value;
+			EVariableType	type;				// The type of the expression
+			const void		*value;				// Value of the expression
 			float			floatValue;
 			int				intValue;
-			char			stringValue[128];	// HACK
+			char			*stringValue;
 	};
 
 	///////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ static	int					result		=	0;	// 0 - FALSE
 			case TYPE_DOUBLE:
 				break;
 			case TYPE_STRING:
-				if (value == NULL)	return (const char *) expr.stringValue;
+				if (value == NULL)	return expr.stringValue;
 				else				return *((const char **) value);
 			case TYPE_INTEGER:
 			case TYPE_BOOLEAN:
@@ -181,8 +181,8 @@ static	int					result		=	0;	// 0 - FALSE
 	// Return Value			:
 	// Comments				:
 	static	inline	void		setInt(CExpr &expr,int val) {
-		expr.type	=	TYPE_INTEGER;
-		expr.value	=	NULL;
+		expr.type		=	TYPE_INTEGER;
+		expr.value		=	NULL;
 		expr.intValue	=	val;
 	}
 
@@ -251,7 +251,7 @@ static	int					result		=	0;	// 0 - FALSE
 
 %}
 %union slval {
-	char	string[PARSER_MAX_STRING_SIZE];
+	char	*string;
 	CExpr	expr;
 	float	real;
 }
@@ -330,8 +330,6 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				ifExpr
 				IF_CLOSE
 				{
-					// FIXME: This is wrong. What are we supposed to do here ?
-					
 					// Find the variable here
 					findExpr($$,getString($3));
 				}
@@ -343,9 +341,9 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				|
 				IF_TEXT_VALUE
 				{
-					$$.type		=	TYPE_STRING;
-					$$.value	=	NULL;
-					strcpy($$.stringValue,$1);
+					$$.type			=	TYPE_STRING;
+					$$.value		=	NULL;
+					$$.stringValue	=	$1;
 				}
 				|
 				//////////////////////////////////////////////////////////////////////////
@@ -408,9 +406,6 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				ifExpr
 				{
 					if ($1.type == TYPE_STRING || $3.type == TYPE_STRING) {
-						CExpr a,b;
-						a = $1;
-						b = $3;
 						setInt($$,strcmp(getString($1),getString($3)) == 0);
 					} else {
 						setInt($$,getFloat($1) == getFloat($3));
@@ -562,8 +557,9 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				ifExpr
 				IF_CLOSE
 				{
-					$$.type		=	TYPE_STRING;
-					$$.value	=	NULL;
+					$$.type			=	TYPE_STRING;
+					$$.value		=	NULL;
+					$$.stringValue	=	(char *) ralloc(strlen(getString($3)) + strlen(getString($5)) + 2,CRenderer::globalMemory);
 					strcpy($$.stringValue,getString($3));
 					strcat($$.stringValue,getString($5));
 				}
@@ -580,6 +576,10 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 // Return Value			:	TRUE/FALSE
 // Comments				:
 int		CRendererContext::ifParse(const char *expr) {
+
+	// Begin a new page
+	memBegin(CRenderer::globalMemory);
+	
 	YY_BUFFER_STATE savedState	=	YY_CURRENT_BUFFER;		// Save the old buffer
 	YY_BUFFER_STATE	newState;
 
@@ -594,6 +594,9 @@ int		CRendererContext::ifParse(const char *expr) {
 
 	if_switch_to_buffer( savedState );						// Switch to the old buffer
 
+	// Restore the memory page
+	memEnd(CRenderer::globalMemory);
+	
 	return result;
 }
 

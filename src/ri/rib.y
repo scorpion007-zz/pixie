@@ -57,7 +57,7 @@
 
 %union ribval {
 	float	real;
-	char	string[PARSER_MAX_STRING_SIZE];
+	char	*string;
 	int		integer;
 }
 
@@ -96,9 +96,10 @@ static	CArray<RtPointer>	*ribObjects					=	NULL;	// Number -> handle mapping for
 static	CArray<char *>		*permaStrings				=	NULL;	// Strings that have been allocated for the whole rib stack
 static	void				(*callback)(const char *)	=	NULL;	// The callback function for the parser
 
-static	CArray<float>		*floatArgs					=	NULL;	// The array of float arguments
-static	CArray<int>			*intArgs					=	NULL;	// The array of integer arguments
-static	CArray<char *>		*stringArgs					=	NULL;	// The array of string arguments
+static	CArray<char *>		allStrings;								// Array of all strings (cleared after every command)
+static	CArray<float>		floatArgs;								// The array of float arguments
+static	CArray<int>			intArgs;								// The array of integer arguments
+static	CArray<char *>		stringArgs;								// The array of string arguments
 
 static	int					numParameters				=	0;
 static	int					maxParameter				=	0;
@@ -132,9 +133,9 @@ static	TParameter			*parameters					=	NULL;
 		maxParameter				+=	10;									\
 	}
 
-#define	getFloat(__n)		(floatArgs->array + __n)
-#define	getInt(__n)			(intArgs->array + __n)
-#define	getString(__n)		(stringArgs->array + __n)
+#define	getFloat(__n)		(floatArgs.array + __n)
+#define	getInt(__n)			(intArgs.array + __n)
+#define	getString(__n)		(stringArgs.array + __n)
 
 // Some textual descriptions for the rib-ri parser
 
@@ -594,7 +595,6 @@ static	RtErrorHandler	getErrorHandler(char *n) {
 %token	RIB_ARRAY_BEGIN
 %token	RIB_ARRAY_END
 %left<string>	RIB_TEXT
-%token<string>	RIB_IDENTIFIER
 %token<real>	RIB_FLOAT
 %token<string>	RIB_STRUCTURE_COMMENT
 %type<integer>	ribFloats
@@ -612,13 +612,13 @@ start:			ribCommands;
 ribIntString:	ribIntString
 				RIB_FLOAT
 				{
-					intArgs->push((int) $2);
+					intArgs.push((int) $2);
 					$$	=	$1	+	1;
 				}
 				|
 				RIB_FLOAT
 				{
-					intArgs->push((int) $1);
+					intArgs.push((int) $1);
 					$$	=	1;
 				}
 				;
@@ -627,13 +627,13 @@ ribIntString:	ribIntString
 ribFloatString:	ribFloatString
 				RIB_FLOAT
 				{
-					floatArgs->push($2);
+					floatArgs.push($2);
 					$$	=	$1	+	1;
 				}
 				|
 				RIB_FLOAT
 				{
-					floatArgs->push($1);
+					floatArgs.push($1);
 					$$	=	1;
 				}
 				;
@@ -641,15 +641,13 @@ ribFloatString:	ribFloatString
 ribTextString:	ribTextString
 				RIB_TEXT
 				{
-					char	*theString	=	strdup($2);
-					stringArgs->push(theString);
+					stringArgs.push($2);
 					$$	=	$1	+	1;
 				}
 				|
 				RIB_TEXT
 				{
-					char	*theString	=	strdup($1);
-					stringArgs->push(theString);
+					stringArgs.push($1);
 					$$	=	1;
 				}
 				;
@@ -704,8 +702,7 @@ ribTextArray:	RIB_ARRAY_BEGIN
 				|
 				RIB_TEXT
 				{
-					char	*theString	=	strdup($1);
-					stringArgs->push(theString);
+					stringArgs.push($1);
 					$$	= 1;
 				}
 				;
@@ -727,9 +724,9 @@ ribPL:			ribParameter
 						tokens[i]				=	parameters[i].name;
 
 						if (parameters[i].type == RT_TEXT)
-							vals[i]				=	(RtPointer) (stringArgs->array + parameters[i].valuesStart);
+							vals[i]				=	(RtPointer) (stringArgs.array + parameters[i].valuesStart);
 						else
-							vals[i]				=	(RtPointer) (floatArgs->array + parameters[i].valuesStart);
+							vals[i]				=	(RtPointer) (floatArgs.array + parameters[i].valuesStart);
 
 					}
 				}
@@ -742,7 +739,7 @@ ribParameter:	RIB_TEXT
 					parameters[numParameters].name			=	$1;
 					parameters[numParameters].type			=	RT_FLOAT;
 					parameters[numParameters].numItems		=	$2;
-					parameters[numParameters].valuesStart	=	floatArgs->numItems-$2;
+					parameters[numParameters].valuesStart	=	floatArgs.numItems-$2;
 					numParameters++;
 					paramCheck();
 				}
@@ -754,7 +751,7 @@ ribParameter:	RIB_TEXT
 					parameters[numParameters].name			=	$1;
 					parameters[numParameters].type			=	RT_TEXT;
 					parameters[numParameters].numItems		=	$2;
-					parameters[numParameters].valuesStart	=	stringArgs->numItems-$2;
+					parameters[numParameters].valuesStart	=	stringArgs.numItems-$2;
 					numParameters++;
 					paramCheck();
 				}
@@ -763,17 +760,20 @@ ribParameter:	RIB_TEXT
 ribCommands:	ribCommands
 				{
 					// Save the line number in case we have an error
-					ribCommandLineno	=	ribLineno;
+					ribCommandLineno		=	ribLineno;
 				}
 				ribComm
 				{
-					floatArgs->numItems	=	0;
-					intArgs->numItems	=	0;
+				
+					// Reset the number of parameters
+					floatArgs.numItems		=	0;
+					intArgs.numItems		=	0;
+					stringArgs.numItems		=	0;
+					numParameters			=	0;
+					
+					// Delete the strings we allocated for this command
 					char	*currentString;
-					while((currentString=stringArgs->pop()) != NULL)
-						free(currentString);
-					numParameters		=	0;
-
+					while((currentString=allStrings.pop()) != NULL)	free(currentString);
 				}
 				|
 				;
@@ -998,10 +998,10 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_COLOR_SAMPLES
 				ribFloats
 				{
-					if ((floatArgs->numItems & 1) || ((floatArgs->numItems % 6) != 0)) {
-						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs->numItems);
+					if ((floatArgs.numItems & 1) || ((floatArgs.numItems % 6) != 0)) {
+						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs.numItems);
 					} else {
-						int		n		=	floatArgs->numItems/6;
+						int		n		=	floatArgs.numItems/6;
 						float	*argf1	=	getFloat(0);
 						float	*argf2	=	getFloat(n*3);
 
@@ -1013,10 +1013,10 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribFloatArray
 				ribFloatArray
 				{
-					if (($2 != $3) || ((floatArgs->numItems % 6) != 0)) {
-						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs->numItems);
+					if (($2 != $3) || ((floatArgs.numItems % 6) != 0)) {
+						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs.numItems);
 					} else {
-						int		n		=	floatArgs->numItems/6;
+						int		n		=	floatArgs.numItems/6;
 						float	*argf1	=	getFloat(0);
 						float	*argf2	=	getFloat(n*3);
 
@@ -2721,9 +2721,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		CArray<RtPointer>	*savedObjects					=	ribObjects;
 		int					savedRibLineno					=	ribLineno;
 		void				(*savedCallback)(const char *)	=	callback;
-		CArray<float>		*savedFloatArgs					=	floatArgs;
-		CArray<int>			*savedIntArgs					=	intArgs;
-		CArray<char *>		*savedStringArgs				=	stringArgs;
 		int					savedNumParameters				=	numParameters;
 		int					savedMaxParameter				=	maxParameter;
 		TParameter			*savedParameters				=	parameters;
@@ -2768,9 +2765,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		lightNames			=	NULL;
 		ribObjects			=	NULL;
 		callback			=	c;
-		floatArgs			=	new CArray<float>;
-		intArgs				=	new CArray<int>;
-		stringArgs			=	new CArray<char *>;
 		maxParameter		=	20;
 		numParameters		=	0;
 		parameters			=	new TParameter[maxParameter];
@@ -2808,9 +2802,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		if (lights		!= NULL)	delete lights;
 		if (lightNames	!= NULL)	delete lightNames;
 		if (ribObjects	!= NULL)	delete ribObjects;
-		delete floatArgs;
-		delete intArgs;
-		delete stringArgs;
 		delete [] parameters;
 		delete [] tokens;
 		delete [] vals;
@@ -2823,9 +2814,6 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		parameters			=	savedParameters;
 		numParameters		=	savedNumParameters;
 		maxParameter		=	savedMaxParameter;
-		floatArgs			=	savedFloatArgs;
-		intArgs				=	savedIntArgs;
-		stringArgs			=	savedStringArgs;
 		lightNames			=	savedLightNames;
 		lights				=	savedLights;
 		ribObjects			=	savedObjects;

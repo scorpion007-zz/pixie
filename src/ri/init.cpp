@@ -532,7 +532,6 @@ execEnd:
 	assert(numPassive	== 0);
 
 // Undefine junk
-#undef		MAX_SCRIPT_STRING_SIZE
 #undef		savestring
 #undef		allocbuffer
 #undef		freebuffer

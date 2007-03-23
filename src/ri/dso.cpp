@@ -71,13 +71,13 @@ void							dsoerror(char *,...);
 static	char					nameBuffer[256];
 static	char					prototypeBuffer[256];
 static	char					*currentPrototype;
-static	char					funName[256];
+static	char					*funName;
 static	int						numErrors;
 
 
 #line 48 "../../../../src/ri/dso.y"
 typedef union slval {
-	char	string[PARSER_MAX_STRING_SIZE];
+	char	*string;
 } YYSTYPE;
 #ifndef YYDEBUG
 #define YYDEBUG 1
@@ -146,8 +146,8 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    64,    68,    74,    78,    79,    82,    83,    89,    91,    96,
-   100,   105,   110,   115,   120,   125,   130
+    64,    68,    74,    78,    79,    82,    83,    89,    91,   100,
+   104,   109,   114,   119,   124,   129,   134
 };
 #endif
 
@@ -710,53 +710,60 @@ case 2:
 #line 69 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'=';
-					strcpy(funName,yyvsp[0].string);	// Save the name of the function
+					funName	=	yyvsp[0].string;		// Save the name of the function
+				;
+    break;}
+case 9:
+#line 94 "../../../../src/ri/dso.y"
+{
+					// We're not using the parameter
+					free(yyvsp[0].string);
 				;
     break;}
 case 10:
-#line 97 "../../../../src/ri/dso.y"
+#line 101 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'o';
 				;
     break;}
 case 11:
-#line 102 "../../../../src/ri/dso.y"
+#line 106 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'f';
 				;
     break;}
 case 12:
-#line 107 "../../../../src/ri/dso.y"
+#line 111 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'v';
 				;
     break;}
 case 13:
-#line 112 "../../../../src/ri/dso.y"
+#line 116 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'n';
 				;
     break;}
 case 14:
-#line 117 "../../../../src/ri/dso.y"
+#line 121 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'p';
 				;
     break;}
 case 15:
-#line 122 "../../../../src/ri/dso.y"
+#line 126 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'c';
 				;
     break;}
 case 16:
-#line 127 "../../../../src/ri/dso.y"
+#line 131 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	'm';
 				;
     break;}
 case 17:
-#line 132 "../../../../src/ri/dso.y"
+#line 136 "../../../../src/ri/dso.y"
 {
 					*currentPrototype++	=	's';
 				;
@@ -958,7 +965,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 136 "../../../../src/ri/dso.y"
+#line 140 "../../../../src/ri/dso.y"
 
 
 #include "lex.dso.cpp"
@@ -982,7 +989,7 @@ int		dsoParse(const char *decl,char *&name,char *&prototype) {
 	dso_switch_to_buffer( savedState );						// Switch to the old buffer
 
 	if (numErrors == 0) {
-		name		=	strdup(funName);
+		name		=	funName;
 		prototype	=	strdup(prototypeBuffer);
 		return TRUE;
 	}
