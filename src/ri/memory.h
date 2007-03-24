@@ -34,6 +34,8 @@
 #include "common/global.h"
 #include "common/os.h"
 
+#include <string.h>
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMemPage
 // Description			:	This class coltains memory that's allocated on the fly
