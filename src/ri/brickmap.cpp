@@ -1012,6 +1012,7 @@ void				CBrickMap::draw() {
 	float		*cR				=	R;
 	int			level			=	min(max(0,detailLevel),maxDepth);
 	int			nb				=	1 << level;
+	const float sqrt2			=	sqrtf(0.5f);
 	float		cubePoints[]	=	{	0, 0, 0,
 										1, 0, 0,
 										1, 0, 1,
@@ -1071,8 +1072,7 @@ void				CBrickMap::draw() {
 			vx = (CBrickMap::CVoxel*)((char*)vx + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
 			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));	
 			
-			//if (wt <= C_EPSILON) continue;			
-			if (wt <= 0.01) continue;			
+			if (wt <= C_EPSILON) continue;			
 
 			if (drawType == 0) {
 
@@ -1116,9 +1116,9 @@ void				CBrickMap::draw() {
 				}
 
 				movvv(cP,cent);
-				movvv(cC,DD);
+				movvv(cC,DDs);
 				movvv(cN,norm);
-				cR[0] = sz/(float) BRICK_SIZE;
+				cR[0] = sqrt2*sz/(float) BRICK_SIZE;
 
 				cP		+=	3;
 				cC		+=	3;
@@ -1134,7 +1134,7 @@ void				CBrickMap::draw() {
 				}
 
 				movvv(cP,cent);
-				movvv(cC,DD);
+				movvv(cC,DDs);
 
 				cP		+=	3;
 				cC		+=	3;
