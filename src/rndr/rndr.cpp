@@ -556,7 +556,9 @@ int main(int argc, char* argv[]) {
 
 	// Enable memory leak detection/report
 #ifdef WIN32
+#ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 #endif
 
 	// Register the exit stuff
