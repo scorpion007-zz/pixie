@@ -155,6 +155,8 @@ void	CRenderer::endDisplays() {
 
 	// Finish the out images
 	for (i=0;i<numDisplays;i++) {
+	
+		// Is the module up ?
 		if (datas[i].module != NULL) {
 			datas[i].finish(datas[i].handle);
 			if (strcmp(datas[i].display->outDevice,RI_SHADOW) == 0) {
@@ -162,6 +164,14 @@ void	CRenderer::endDisplays() {
 			}
 		}
 		if (datas[i].displayName != NULL) free(datas[i].displayName);
+		
+		// Delete the fill array if set
+		int	j;
+		for (j=0;j<datas[i].numChannels;j++) {
+			if (datas[i].channels[j].fill != NULL) delete [] datas[i].channels[j].fill;
+		}
+		
+		// Delete the channels
 		delete[] datas[i].channels;
 	}
 
