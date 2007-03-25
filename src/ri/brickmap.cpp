@@ -288,9 +288,9 @@ CBrickMap::~CBrickMap() {
 	if (xs < 0)	xs	=	0;																\
 	if (ys < 0)	ys	=	0;																\
 	if (zs < 0)	zs	=	0;																\
-	if (xe >= (1 << depth))	xe	=	(1 << depth) - 1;									\
-	if (ye >= (1 << depth))	ye	=	(1 << depth) - 1;									\
-	if (ze >= (1 << depth))	ze	=	(1 << depth) - 1;									\
+	if (xe >= (1 << __depth))	xe	=	(1 << __depth) - 1;								\
+	if (ye >= (1 << __depth))	ye	=	(1 << __depth) - 1;								\
+	if (ze >= (1 << __depth))	ze	=	(1 << __depth) - 1;								\
 	for (x=xs;x<=xe;x++) for (y=ys;y<=ye;y++) for (z=zs;z<=ze;z++) {
 
 ///////////////////////////////////////////////////////////
@@ -1044,9 +1044,57 @@ void				CBrickMap::draw() {
 										1, 0, 1
 										};
 
+	if (0) {
+		// draw bounding box lines
+		j	=	chunkSize;
+		float	*pts = cubePoints;
+		for(int k =0; k<6; k++) {
+			vector tmp;
+			
+			#define emitLn(i)						\
+				if (j == 0) {						\
+					drawLines(chunkSize,P,C);		\
+					cP	=	P;						\
+					cC	=	C;						\
+					j	=	chunkSize;				\
+				}									\
+				mulvf(cP,pts+ i*3,side);			\
+				initv(cC,0);						\
+				cP	+=	3;							\
+				cC	+=	3;							\
+				j--;
+			
+				emitLn(0);
+				emitLn(1);
+				emitLn(1);
+				emitLn(2);
+				emitLn(2);
+				emitLn(3);
+				emitLn(3);
+				emitLn(0);
+			
+			pts += 12;
+		}
+		if (j != chunkSize) {
+			drawLines(chunkSize-j,P,C);
+			cP	=	P;
+			cC	=	C;
+			j	=	chunkSize;
+		}
+		
+		{
+			const float hd = side/2.0;
+			const float d = side+side/2.0;
+			float tmp[9] = { d,hd,hd,  hd,d,hd,  hd,hd,d};
+			float tmpc[9] = { 0 };
+			
+			drawPoints(3,tmp,tmpc);
+		}
+	}
+	
 	// For each brick at this level
 	j	=	chunkSize;
-	for (int xe=0;xe<nb-1;xe++) for (int ye=0;ye<nb-1;ye++) for (int ze=0;ze<nb-1;ze++) {
+	for (int xe=0;xe<nb;xe++) for (int ye=0;ye<nb;ye++) for (int ze=0;ze<nb;ze++) {
 		float				sz		= side/(float) nb;
 		int					x=xe,y=ye,z=ze;
 		CBrickMap::CBrick	*bk		= findBrick(x,y,z,level,false,NULL);
@@ -1144,9 +1192,9 @@ void				CBrickMap::draw() {
 	}
 
 	if (j != chunkSize) {
-		if (drawType == 0)		drawTriangles((chunkSize-j)/3,P,C);
-		else if (drawType == 1) drawDisks(chunkSize,P,R,N,C);
-		else					drawPoints(chunkSize,P,C);
+		if (drawType == 0)		drawTriangles(chunkSize-j,P,C);
+		else if (drawType == 1) drawDisks(chunkSize-j,P,R,N,C);
+		else					drawPoints(chunkSize-j,P,C);
 	}
 }
 
@@ -1160,10 +1208,12 @@ void				CBrickMap::draw() {
 int			CBrickMap::keyDown(int key) {
 	if ((key == 'M') || (key == 'm')) {
 		detailLevel++;
+		printf("level : %d\n",detailLevel);
 		return TRUE;
 	} else if ((key == 'L') || (key == 'l')) {
 		detailLevel--;
 		if (detailLevel < 0)	detailLevel	=	0;
+		printf("level : %d\n",detailLevel);
 		return TRUE;
 	} else if ((key == 'b') || (key == 'B')) {
 		drawType = 0;
