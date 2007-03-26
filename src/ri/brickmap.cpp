@@ -1484,9 +1484,9 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identityMatrix,identityMatrix,in);
 			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->channels,cPtCloud->numChannels);
 			
-			float **dataPointers =	cPtCloud->dataPointers->array;
-			for (i=1;i<cPtCloud->numPhotons;i++) {
-				CPointCloudPoint	*p = cPtCloud->photons + i;
+			float **dataPointers	=	cPtCloud->dataPointers.array;
+			for (i=1;i<cPtCloud->numItems;i++) {
+				CPointCloudPoint	*p = cPtCloud->items + i;
 				float			 	*C = dataPointers[p->entryNumber];
 				cBMap->store(C,p->P,p->N,p->dP);
 			}

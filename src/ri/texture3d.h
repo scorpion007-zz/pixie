@@ -70,10 +70,10 @@ protected:
 	void					readChannels(FILE *);
 	
 	int						dataSize;			// The size of each data sample
-	CTexture3dChannel		*channels;			// List of channels
-	int						numChannels;
 	matrix					from,to;			// The transformation to the coordinate system
 	float					dPscale;			// The amount we need to scale dP by
+	int						numChannels;		// Number of channels
+	CTexture3dChannel		*channels;			// List of channels
 	
 	friend class CRemotePtCloudChannel;
 };

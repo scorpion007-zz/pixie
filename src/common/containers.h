@@ -848,17 +848,7 @@ public:
 
 						// Array interface
 		T				& operator[](int index) {
-							while (index >= arraySize) {
-								T	*newArray	=	new T[arraySize+stepSize];
-
-								memcpy(newArray,array,arraySize*sizeof(T));
-
-								arraySize	+=	stepSize;
-								stepSize	*=	2;
-								delete [] array;
-								array		=	newArray;
-							}
-
+							assert(index < numItems);
 							return array[index];
 						}
 

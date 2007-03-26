@@ -386,7 +386,7 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 	
 			assert(distances[i] <= distances[0]);
 	
-			photonToDir(I,p->theta,p->phi);
+			itemToDir(I,p->theta,p->phi);
 	
 			if (dotvv(I,l.N) < 0) {
 				addvv(Cl,p->C);
@@ -465,7 +465,7 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 // Comments				:
 void	CPhotonMap::balance() {
 	// If we have no photons in the map, add a dummy one to avoid an if statement during the lookup
-	if (numPhotons == 0) {
+	if (numItems == 0) {
 		vector	P		=	{0,0,0};
 		vector	I		=	{0,0,1};
 		CPhoton	*photon	=	CMap<CPhoton>::store(P,I);
@@ -487,7 +487,7 @@ void	CPhotonMap::store(const float *P,const float *N,const float *I,const float 
 
 	osLock(mutex);
 	CPhoton	*ton	=	CMap<CPhoton>::store(P,N);
-	dirToPhoton(ton->theta,ton->phi,I);
+	dirToItem(ton->theta,ton->phi,I);
 	movvv(ton->C,C);
 	maxPower	=	max(maxPower,dotvv(C,C));
 	osUnlock(mutex);
@@ -506,7 +506,7 @@ void	CPhotonMap::bound(float *bmin,float *bmax) {
 	initv(bmin,C_INFINITY);
 	initv(bmax,-C_INFINITY);
 
-	for (i=1;i<numPhotons;i++)	addBox(bmin,bmax,photons[i].P);
+	for (i=1;i<numItems;i++)	addBox(bmin,bmax,items[i].P);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -521,10 +521,10 @@ void	CPhotonMap::draw() {
 	int			i,j;
 	float		*cP	=	P;
 	float		*cC	=	C;
-	CPhoton		*cT	=	photons+1;
+	CPhoton		*cT	=	items+1;
 
 	// Collect and dispatch the photons
-	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cC+=3,j--) {
+	for (i=numItems-1,j=chunkSize;i>0;i--,cT++,cP+=3,cC+=3,j--) {
 		if (j == 0)	{
 			drawPoints(chunkSize,P,C);
 			cP	=	P;

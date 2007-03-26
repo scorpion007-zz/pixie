@@ -54,7 +54,6 @@ int			CPointCloud::drawDiscs		=	TRUE;
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
 	// Create our data areas
 	memory				= new CMemStack;
-	dataPointers		= new CArray<float*>;
 	flush				= write;
 
 	osCreateMutex(mutex);
@@ -78,7 +77,6 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 
 	// Create our data areas
 	memory				= new CMemStack;
-	dataPointers		= new CArray<float*>;
 	flush				= FALSE;
 	
 	osCreateMutex(mutex);
@@ -96,11 +94,11 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	// Note that we have one additional layer of indirection
 	// here, but it allows us to reorder the data on load so that
 	// it is more likely to be cache-coherent
-	for (i=1;i<numPhotons;i++) {
-		CPointCloudPoint *p = photons + i;
+	for (i=1;i<numItems;i++) {
+		CPointCloudPoint *p = items + i;
 		float *mem = (float*) memory->alloc(dataSize*sizeof(float));
 		fread(mem,sizeof(float),dataSize,in);
-		(*dataPointers)[p->entryNumber] = mem;
+		dataPointers[p->entryNumber] = mem;
 			// entries are not in entryNumber order, but are now locality
 			// sorted
 	}
@@ -119,7 +117,6 @@ CPointCloud::~CPointCloud() {
 
 	if (flush) write();
 	
-	delete dataPointers;
 	delete memory;
 }
 
@@ -159,9 +156,9 @@ void	CPointCloud::write() {
 	
 		
 		// Write out the data
-		for (int i = 1; i < numPhotons; i++) {
-			CPointCloudPoint *p = photons + i;
-			fwrite(dataPointers->array[p->entryNumber],sizeof(float),dataSize,out);
+		for (int i = 1; i < numItems; i++) {
+			CPointCloudPoint *p = items + i;
+			fwrite(dataPointers.array[p->entryNumber],sizeof(float),dataSize,out);
 		}
 
 		fclose(out);
@@ -180,14 +177,10 @@ void	CPointCloud::write() {
 // Comments				:	Nl	must be normalized
 //							Il	must be normalized
 void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
-	int						numFound	=	0;
 	const int 				maxFound	=	16;
 	const CPointCloudPoint	**indices	=	(const CPointCloudPoint **)	alloca((maxFound+1)*sizeof(CPointCloudPoint *)); 
 	float					*distances	=	(float	*)					alloca((maxFound+1)*sizeof(float)); 
 	CLookup					l;
-	const float				*src;
-	float					*dest;
-	float					weight,totalWeight;
 	int						i,j;
 
 	searchRadius		=	8*radius*dPscale;		//FIXME: this should possibly be 2* but it seems to give artifacts
@@ -208,19 +201,15 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	l.indices			=	indices;
 	l.distances			=	distances;
 
-	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
-		
+	// No need to lock the mutex here, CMap::lookup is thread safe
 	CMap<CPointCloudPoint>::lookupWithN(&l,1);
 
 	for (i=0;i<dataSize;i++) Cl[i] = 0.0f;	//GSHTODO: channel fill values
 
-	if (l.numFound < 2)	{
-		osUnlock(mutex);
-		return;
-	}
+	if (l.numFound < 2)	return;
 
-	numFound		=	l.numFound;
-	totalWeight		=	0;
+	int		numFound		=	l.numFound;
+	float	totalWeight		=	0;
 	
 	for (i=1;i<=numFound;i++) {
 		const	CPointCloudPoint	*p	=	indices[i];
@@ -231,19 +220,18 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		// only entries coherent with N contribute
 		// but l.N is reversed...
 		if ((dotvv(p->N,l.N) < 0) || (NdotN <= 0)) {
-			weight	=	1.0f/(distances[i]+C_EPSILON);
-			dest	=	Cl;
-			src		=	dataPointers->array[p->entryNumber];
+			const float	weight	=	1.0f/(distances[i]+C_EPSILON);
+			float		*dest	=	Cl;
+			const float	*src	=	dataPointers.array[p->entryNumber];
 			for (j=0;j<dataSize;j++) {
 				*dest++			+=	(*src++)*weight;
 			}
 			totalWeight += weight;
 		}
 	}
-	osUnlock(mutex);
 	
 	// Divide the contribution
-	weight	= 1.0f/totalWeight;
+	const float weight	= 1.0f/totalWeight;
 	for (i=0;i<dataSize;i++) Cl[i]	*=	weight;
 }
 
@@ -255,7 +243,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 // Comments				:
 void	CPointCloud::balance() {
 	// If we have no points in the map, add a dummy one to avoid an if statement during the lookup
-	if (numPhotons == 0) {
+	if (numItems == 0) {
 		vector	P		=	{0,0,0};
 		vector	N		=	{0,0,0};
 		
@@ -263,9 +251,9 @@ void	CPointCloud::balance() {
 		
 		float *data = (float*) memory->alloc(dataSize*sizeof(float));
 		for (int i=0;i<dataSize;i++)	data[i] = 0;
-		point->entryNumber	=	dataPointers->numItems;
+		point->entryNumber	=	dataPointers.numItems;
 		point->dP			=	0;
-		dataPointers->push(data);
+		dataPointers.push(data);
 	}
 
 	CMap<CPointCloudPoint>::balance();
@@ -289,14 +277,14 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	dP			*=	dPscale;
 	
 	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
-	point		=	CMap<CPointCloudPoint>::store(P,N);
+	point				=	CMap<CPointCloudPoint>::store(P,N);
 	
-	float *data = (float*) memory->alloc(dataSize*sizeof(float));
+	float *data			=	(float*) memory->alloc(dataSize*sizeof(float));
 	memcpy(data,C,dataSize*sizeof(float));
-	point->entryNumber	=	dataPointers->numItems;
+	point->entryNumber	=	dataPointers.numItems;
 	point->dP			=	dP;
 	
-	dataPointers->push(data);
+	dataPointers.push(data);
 	osUnlock(mutex);
 }
 
@@ -318,10 +306,10 @@ void	CPointCloud::draw() {
 	float		*cC		=	C;
 	float		*cN		=	N;
 	float		*cdP	=	dP;
-	CPointCloudPoint	*cT	=	photons+1;
+	CPointCloudPoint	*cT	=	items+1;
 
 	// Collect and dispatch the photons
-	for (i=numPhotons-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
+	for (i=numItems-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
 		if (j == 0)	{
 			if (drawDiscs)		drawDisks(chunkSize,P,dP,N,C);
 			else			 	drawPoints(chunkSize,P,C);
@@ -335,7 +323,7 @@ void	CPointCloud::draw() {
 		movvv(cP,cT->P);
 		movvv(cN,cT->N);
 		*cdP	=	cT->dP/dPscale;
-		movvv(cC,dataPointers->array[cT->entryNumber]);
+		movvv(cC,dataPointers.array[cT->entryNumber]);
 	}
 
 	if (j != chunkSize) {

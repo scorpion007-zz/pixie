@@ -32,7 +32,6 @@
 #define POINTS_H
 
 #include "common/global.h"
-#include "photonMap.h"
 #include "ray.h"
 #include "shading.h"
 #include "surface.h"

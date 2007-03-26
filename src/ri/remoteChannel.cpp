@@ -668,13 +668,13 @@ int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
 
 	// Send the points
 	
-	numSamples = cloud->numPhotons-1;
+	numSamples = cloud->numItems-1;
 	rcSend(s,(char*) &numSamples,sizeof(int),FALSE);
 	
-	float **dataPointers = cloud->dataPointers->array;
+	float **dataPointers = cloud->dataPointers.array;
 	
-	for (i=1;i<cloud->numPhotons;i++) {
-		CPointCloudPoint *pt = cloud->photons + i;
+	for (i=1;i<cloud->numItems;i++) {
+		CPointCloudPoint *pt = cloud->items + i;
 		rcSend(s,(char*) pt,sizeof(CPointCloudPoint),FALSE);
 		rcSend(s,(char*) dataPointers[pt->entryNumber],sizeof(float)*cloud->dataSize,FALSE);
 	}

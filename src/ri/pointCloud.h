@@ -33,7 +33,7 @@
 
 #include "common/global.h"
 #include "common/containers.h"
-#include "photonMap.h"
+#include "map.h"
 #include "texture3d.h"
 #include "options.h"
 
@@ -42,7 +42,7 @@
 // Class				:	CPointCloudPoint
 // Description			:	A point cloud point
 // Comments				:
-class	CPointCloudPoint : public CTon {
+class	CPointCloudPoint : public CMapItem {
 public:
 	float			dP;				// The sample radius
 	int				entryNumber;	// The index to find the associated data
@@ -73,13 +73,13 @@ public:
 
 private:
 	CMemStack				*memory;			// Storage for the data
-	CArray<float*>			*dataPointers;		// data pointers for each sample	
+	CArray<float*>			dataPointers;		// data pointers for each sample	
 	int						flush;				// Should this be written to disk?
 	float					searchRadius;
 	
 	TMutex					mutex;
 	
-	static	int				drawDiscs;					// Which type to draw
+	static	int				drawDiscs;			// Which type to draw
 	
 	friend			void	makeTexture3D(const char *,const char *,TSearchpath *,int,char **,void **);
 	

@@ -32,13 +32,13 @@
 #define DEPOSITORY_H
 
 #include "common/global.h"
-#include "photonMap.h"
+#include "map.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDepositorySample
 // Description			:	This class holds a depository sample
 // Comments				:
-class CDepositorySample : public CTon {
+class CDepositorySample : public CMapItem {
 public:
 	float	C[7];
 };
