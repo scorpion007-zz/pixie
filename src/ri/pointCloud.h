@@ -55,6 +55,7 @@ public:
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
 							CPointCloud(const char *,const float *from,const float *to,const char*,int);
+							CPointCloud(const char *,const float *from,const float *to,int,char **,char **,int);
 							CPointCloud(const char *,const float *from,const float *to,FILE *);
 							~CPointCloud();
 
@@ -70,6 +71,10 @@ public:
 	int						keyDown(int);
 	
 	void					bound(float *bmin,float *bmax);
+	
+	// ptcApi interface
+	int						getNumPoints() { return numItems; }
+	void					getPoint(int i,float *C,float *P,float *N,float *dP);
 
 private:
 	CMemStack				*memory;			// Storage for the data
