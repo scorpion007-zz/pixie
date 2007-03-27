@@ -39,6 +39,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				points.cpp \
 				pointCloud.cpp \
 				polygons.cpp \
+				ptcapi.cpp \
 				quadrics.cpp \
 				random.cpp \
 				raytracer.cpp \
@@ -60,7 +61,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				ribOut.cpp \
 				shader.cpp \
 				shading.cpp \
-                                show.cpp \
+				show.cpp \
 				sl.cpp \
 				stats.cpp \
 				stochastic.cpp \
@@ -81,5 +82,5 @@ INCLUDES = -I..
 
 includedir = $(prefix)/include
 
-include_HEADERS = ri.h dsply.h shadeop.h implicit.h dlo.h
+include_HEADERS = ri.h dsply.h shadeop.h implicit.h dlo.h ptcapi.h
 
