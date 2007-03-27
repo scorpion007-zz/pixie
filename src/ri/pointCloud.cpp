@@ -65,6 +65,26 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const c
 	balance();
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPointCloud
+// Method				:	CPointCloud
+// Description			:	Ctor
+// Return Value			:
+// Comments				:	for a write-mode map via ptcapi, ch and nc must be provided
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,int numChannels,char **channelNames,char **channelTypes,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
+	// Create our data areas
+	memory				= new CMemStack;
+	flush				= write;
+
+	osCreateMutex(mutex);
+
+	// Assign the channels
+	defineChannels(numChannels,channelNames,channelTypes);
+
+	// Make sure we have a root
+	balance();
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
@@ -262,7 +282,7 @@ void	CPointCloud::balance() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
+// Class				:	CPointCloud
 // Method				:	store
 // Description			:	Store a photon
 // Return Value			:
@@ -288,6 +308,25 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	osUnlock(mutex);
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPointCloud
+// Method				:	getPoint
+// Description			:	Retrieve an indexed point
+// Return Value			:
+// Comments				:
+void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
+	const	CPointCloudPoint	*p		=	items + i;
+	const float 				*src	=	dataPointers.array[p->entryNumber];
+	float						*dest	=	C;
+	
+	for (int j=0;j<dataSize;j++) {
+		*dest++		+=	*src++;
+	}
+	
+	movvv(P,p->P);
+	movvv(N,p->N);
+	dP[0] = p->dP;
+}
 
 
 ///////////////////////////////////////////////////////////////////////
