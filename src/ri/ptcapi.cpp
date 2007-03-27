@@ -126,9 +126,14 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) 
 	} else if(strcmp(request,"format") == 0) {
 		float *fmt = ((float*) result);
 		fmt[0] = fmt[1] = fmt[2] = 1;
-		warning(CODE_UNIMPLEMENT,"format request is not supported\"%s\"\n",request);
+		
+		//warning(CODE_UNIMPLEMENT,"format request is not supported\"%s\"\n",request);
+		// Don't use warning or error as Ri may not be initialized
+		fprintf(stderr,"format request is not supported\n");
 	} else {
-		error(CODE_BADTOKEN,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
+		//error(CODE_BADTOKEN,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
+		// Don't use warning or error as Ri may not be initialized
+		fprintf(stderr,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
 	}
 }
 
