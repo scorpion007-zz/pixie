@@ -172,7 +172,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Use this contructor to compute from sctratch
-CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,CTexture3dChannel *ch,int nc) : CTexture3d(name,from,to,nc,ch) {
+CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CTexture3dChannel *ch,int nc) : CTexture3d(name,from,to,toNDC,nc,ch) {
 	int	i;
 	
 	// Init the data
@@ -1481,7 +1481,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			sprintf(tempName,"%s.tmp",dest);
 
 			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identityMatrix,identityMatrix,in);
-			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->channels,cPtCloud->numChannels);
+			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->toNDC,cPtCloud->channels,cPtCloud->numChannels);
 			
 			float **dataPointers	=	cPtCloud->dataPointers.array;
 			for (i=1;i<cPtCloud->numItems;i++) {

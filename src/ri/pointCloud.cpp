@@ -51,7 +51,7 @@ int			CPointCloud::drawDiscs		=	TRUE;
 // Description			:	Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
-CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
 	// Create our data areas
 	memory				= new CMemStack;
 	flush				= write;
@@ -71,7 +71,7 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const c
 // Description			:	Ctor
 // Return Value			:
 // Comments				:	for a write-mode map via ptcapi, ch and nc must be provided
-CPointCloud::CPointCloud(const char *n,const float *from,const float *to,int numChannels,char **channelNames,char **channelTypes,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
+CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,int numChannels,char **channelNames,char **channelTypes,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
 	// Create our data areas
 	memory				= new CMemStack;
 	flush				= write;
