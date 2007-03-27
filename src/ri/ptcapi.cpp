@@ -106,7 +106,7 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) 
 	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
 
 	if (strcmp(request,"npoints") == 0) {
-		((float*)result)[0] = ptcInternal->numPoints;
+		((int*)result)[0] = ptcInternal->numPoints;
 	} else if(strcmp(request,"bbox") == 0) {
 		float *bmin = ((float*)result);
 		float *bmax = bmin + 3;

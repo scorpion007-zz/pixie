@@ -288,29 +288,29 @@ void CTexture3d::unpackSample(float *C,float **samples,CTexture3dChannel **bindi
 // Method				:	unpackSample
 // Description			:	unpackSample
 // Return Value			:	-
-// Comments				:
+// Comments				:	FIXME and return enums, do the ptcapi conversion there
 void CTexture3d::queryChannels(int *num,char **vartypes,char **varnames) {
 	num[0] = numChannels;
 	for (int i=0;i<numChannels;i++)	{
-		strcpy(varnames[i],channels[i].name);
+		varnames[i] = channels[i].name;
 		switch(channels[i].type) {
 			case TYPE_FLOAT:
-				strcpy(vartypes[i],"float");
+				vartypes[i] = "float";
 				break;
 			case TYPE_COLOR:
-				strcpy(vartypes[i],"color");
+				vartypes[i] = "color";
 				break;
 			case TYPE_VECTOR:
-				strcpy(vartypes[i],"vector");
+				vartypes[i] = "vector";
 				break;
 			case TYPE_NORMAL:
-				strcpy(vartypes[i],"normal");
+				vartypes[i] = "normal";
 				break;
 			case TYPE_POINT:
-				strcpy(vartypes[i],"point");
+				vartypes[i] = "point";
 				break;
 			case TYPE_MATRIX:
-				strcpy(vartypes[i],"matrix");
+				vartypes[i] = "matrix";
 				break;
 			default:
 				error(CODE_BADTOKEN,"Unknown texture3d channel type\n");
