@@ -89,8 +89,6 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes,
 		identitym(to);
 		
 		ptcInternal->ptc			=	new CPointCloud(fileName,from,to,in);
-		ptcInternal->numPoints		=	0;
-		ptcInternal->curPoint		=	0;
 		
 		ptcInternal->ptc->queryChannels(nvars,vartypes,varnames);
 		
@@ -100,10 +98,12 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes,
 		delete ptcInternal;
 		return NULL;
 	}
+
+	return (PtcPointCloud) ptcInternal;
 }
 
 int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) {
-	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
+	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
 	if (strcmp(request,"npoints") == 0) {
 		((int*)result)[0] = ptcInternal->numPoints;
@@ -124,19 +124,20 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) 
 }
 
 int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data) {
-	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
+	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 	
-	if (ptcInternal->curPoint < ptcInternal->numPoints) return 1;
+	if (ptcInternal->curPoint >= ptcInternal->numPoints) return FALSE;
 	
 	ptcInternal->ptc->getPoint(ptcInternal->curPoint++,data,point,normal,radius);
-	return 0;
+	return TRUE;
 }
 
 void PtcClosePointCloudFile(PtcPointCloud pointcloud) {
-		PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
+	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
 	// Will write out the point cloud
 	delete	ptcInternal->ptc;
 		
 	delete	ptcInternal;
 }
+
