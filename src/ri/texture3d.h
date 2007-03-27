@@ -33,8 +33,11 @@
 
 #include "common/global.h"
 #include "common/os.h"
+
 #include "fileResource.h"
+#include "rendererc.h"
 #include "xform.h"
+
 #include "gui/opengl.h"
 
 ///////////////////////////////////////////////////////////////////////
@@ -46,6 +49,7 @@ public:
 	char					name[64];		// Name of the channel
 	int						numSamples;		// The size of channel sample
 	int						sampleStart;	// Offset of the sample in the stack
+	EVariableType			type;			// The funamental type
 	float					*fill;			// The sample defaults
 };
 
@@ -63,9 +67,16 @@ public:
 	int						bindChannelNames(int&,const char **,CTexture3dChannel ***);
 	void					prepareSample(float*,float **,CTexture3dChannel **);
 	void					unpackSample(float*,float **,CTexture3dChannel **);
+	void					queryChannels(int *,char **,char **);
+	
+	// ptcAPI interface
+	int						getDataSize()			{ return dataSize; }
+	void					getFromMatrix(float *m) { movmm(m,from); }
+	void					getToMatrix(float *m)	{ movmm(m,to); }
 
 protected:
 	void					defineChannels(const char *);
+	void					defineChannels(int,char **,char **);
 	void					writeChannels(FILE *);
 	void					readChannels(FILE *);
 	
