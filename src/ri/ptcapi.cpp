@@ -48,7 +48,10 @@ PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes
 		
 	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
 	
-	ptcInternal->ptc = new CPointCloud(filename,world2eye,world2ndc,nvars,varnames,vartypes,TRUE);
+	matrix eye2world;
+	invertm(eye2world,world2eye);
+	
+	ptcInternal->ptc = new CPointCloud(filename,eye2world,world2eye,world2ndc,nvars,varnames,vartypes,TRUE);
 	
 	ptcInternal->numPoints		=	0;
 	ptcInternal->curPoint		=	0;
@@ -114,13 +117,19 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) 
 	} else if(strcmp(request,"datasize") == 0) {
 		int *ds = ((int*) result);
 		ds[0] = ptcInternal->ptc->getDataSize();		
+	} else if(strcmp(request,"world2eye") == 0) {
+		float *from = ((float*) result);
+		ptcInternal->ptc->getFromMatrix(from);
+	} else if(strcmp(request,"world2ndc") == 0) {
+		float *tondc = ((float*) result);
+		ptcInternal->ptc->getNDCMatrix(tondc);
+	} else if(strcmp(request,"format") == 0) {
+		float *fmt = ((float*) result);
+		fmt[0] = fmt[1] = fmt[2] = 1;
+		warning(CODE_UNIMPLEMENT,"format request is not supported\"%s\"\n",request);
 	} else {
 		error(CODE_BADTOKEN,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
 	}
-/*	"world2eye"
-	"world2ndc"
-	"format"
-*/
 }
 
 int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data) {
