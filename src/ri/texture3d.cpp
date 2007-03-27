@@ -117,6 +117,10 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 			strcpy(channels[numChannels].name,oChannel->name);
 			channels[numChannels].sampleStart		= dataSize;
 			channels[numChannels].numSamples		= oChannel->numSamples;
+			if (oChannel->variable != NULL)
+				channels[numChannels].type			= oChannel->variable->type;
+			else
+				channels[numChannels].type			= TYPE_FLOAT;
 			channels[numChannels].fill				= oChannel->fill;
 			//GSHTODO: duplicate fill
 			
@@ -131,6 +135,42 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 
 	free(sampleDefinition);
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTexture3d
+// Method				:	defineChannels
+// Description			:	Define the channels
+// Return Value			:	-
+// Comments				:	used by ptcapi, does not require RiBegin()
+void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
+	// determinte the channels
+	dataSize		=	0;	
+	channels		=	new CTexture3dChannel[numChannels];
+	
+	// parse the channels / sample types
+	numChannels = 0;
+	for (int i=0;i<n;i++) {
+		// parse to next comma, remove spaces
+		
+		CVariable var;
+		if (parseVariable(&var,channelNames[i],channelTypes[i]) == TRUE) {
+
+			// it's a predefined / already seen channel
+			strcpy(channels[numChannels].name,channelNames[i]);
+			channels[numChannels].sampleStart		= dataSize;
+			channels[numChannels].numSamples		= var.numFloats;
+			channels[numChannels].fill				= NULL;
+			channels[numChannels].type				= var.type;
+			//GSHTODO: deal with fill
+			
+			dataSize								+= var.numFloats;
+			numChannels++;	
+		} else  {
+			error(CODE_BADTOKEN,"Unable to interpret display channel name \"%s\"\n",channelNames[i]);
+		}		
+	}
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
@@ -239,6 +279,41 @@ void CTexture3d::unpackSample(float *C,float **samples,CTexture3dChannel **bindi
 			dest	= samples[i];
 			for (int j=0;j<binding->numSamples;j++)
 				*dest++ = *src++;
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTexture3d
+// Method				:	unpackSample
+// Description			:	unpackSample
+// Return Value			:	-
+// Comments				:
+void CTexture3d::queryChannels(int *num,char **vartypes,char **varnames) {
+	num[0] = numChannels;
+	for (int i=0;i<numChannels;i++)	{
+		strcpy(varnames[i],channels[i].name);
+		switch(channels[i].type) {
+			case TYPE_FLOAT:
+				strcpy(vartypes[i],"float");
+				break;
+			case TYPE_COLOR:
+				strcpy(vartypes[i],"color");
+				break;
+			case TYPE_VECTOR:
+				strcpy(vartypes[i],"vector");
+				break;
+			case TYPE_NORMAL:
+				strcpy(vartypes[i],"normal");
+				break;
+			case TYPE_POINT:
+				strcpy(vartypes[i],"point");
+				break;
+			case TYPE_MATRIX:
+				strcpy(vartypes[i],"matrix");
+				break;
+			default:
+				error(CODE_BADTOKEN,"Unknown texture3d channel type\n");
 		}
 	}
 }
