@@ -59,7 +59,7 @@ public:
 // Comments				:
 class	CTexture3d : public CFileResource, public CView {
 public:
-							CTexture3d(const char *,const float *from,const float *to,int numChannels=0,CTexture3dChannel *channels=NULL);
+							CTexture3d(const char *,const float *from,const float *to,const float *tondc=NULL,int numChannels=0,CTexture3dChannel *channels=NULL);
 	virtual					~CTexture3d();
 
 	virtual	void			lookup(float *,const float *,const float *,float) = 0;
@@ -73,6 +73,7 @@ public:
 	int						getDataSize()			{ return dataSize; }
 	void					getFromMatrix(float *m) { movmm(m,from); }
 	void					getToMatrix(float *m)	{ movmm(m,to); }
+	void					getNDCMatrix(float *m)	{ movmm(m,toNDC); }
 
 protected:
 	void					defineChannels(const char *);
@@ -82,6 +83,7 @@ protected:
 	
 	int						dataSize;			// The size of each data sample
 	matrix					from,to;			// The transformation to the coordinate system
+	matrix					toNDC;				// the viewing transform
 	float					dPscale;			// The amount we need to scale dP by
 	int						numChannels;		// Number of channels
 	CTexture3dChannel		*channels;			// List of channels

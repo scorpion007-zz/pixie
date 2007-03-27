@@ -41,12 +41,16 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CTexture3d::CTexture3d(const char *n,const float *f,const float *t,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
+CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *tndc,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
 	dataSize	=	0;
 	channels	=	NULL;
 	numChannels	=	0;
 	movmm(from,f);
 	movmm(to,t);
+
+	// will be read from file if not provided
+	if (tndc != NULL)	movmm(toNDC,tndc);
+	
 	dPscale		=	pow(fabs(determinantm(to)),1.0f / 3.0f);
 
 	if (nc > 0) {
@@ -180,6 +184,7 @@ void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 // Comments				:
 void CTexture3d::writeChannels(FILE *out) {
 	// Write out the header and channels
+	fwrite(toNDC,sizeof(float)*16,1,out);
 	fwrite(&numChannels,sizeof(int),1,out);
 	for (int i=0;i<numChannels;i++) {
 		fwrite(&channels[i],sizeof(CTexture3dChannel),1,out);
@@ -197,6 +202,7 @@ void CTexture3d::readChannels(FILE *in) {
 	if (channels != NULL)	delete [] channels;
 
 	// Write out the header and channels
+	fread(toNDC,sizeof(float)*16,1,in);
 	fread(&numChannels,sizeof(int),1,in);
 	channels = new CTexture3dChannel[numChannels];
 	for (int i=0;i<numChannels;i++) {

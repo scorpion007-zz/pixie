@@ -473,7 +473,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 		if (write == TRUE) {
 			
 			if (netClient != INVALID_SOCKET) {
-				CPointCloud	*cloud	=	new CPointCloud(name,world->from,world->to,channels,FALSE);
+				CPointCloud	*cloud	=	new CPointCloud(name,world->from,world->to,CRenderer::toNDC,channels,FALSE);
 				texture3d			=	cloud;
 			
 				// Ensure we unmap the file when done.  Do not delete it
@@ -482,7 +482,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 				requestRemoteChannel(new CRemotePtCloudChannel(cloud));
 			} else {
 				// alloate a point cloud which will be written to disk
-				texture3d	=	new CPointCloud(name,from,to,channels,TRUE);
+				texture3d	=	new CPointCloud(name,from,to,CRenderer::toNDC,channels,TRUE);
 			}
 			
 		} else {
@@ -503,7 +503,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			if (in == NULL) {
 				// allocate a dummy blank-channel point cloud
 				error(CODE_BADTOKEN,"Cannot find or open Texture3d file \"%s\"\n",name);
-				texture3d	=	new CPointCloud(name,world->from,world->to,NULL,FALSE);
+				texture3d	=	new CPointCloud(name,world->from,world->to,NULL,NULL,FALSE);
 				// remove the dummy mapping once the frame ends
 				registerFrameTemporary(name,FALSE);
 			}
