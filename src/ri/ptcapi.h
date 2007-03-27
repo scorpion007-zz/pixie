@@ -53,7 +53,6 @@ extern "C" {
 	// Finish an close the file
 	LIB_EXPORT	void PtcFinishPointCloudFile(PtcPointCloud pointcloud);
 
-
 	// Open an existing point cloud
 	LIB_EXPORT	PtcPointCloud PtcOpenPointCloudFile(char *filename, int *nvars, char **vartypes, char **varnames);
 

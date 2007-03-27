@@ -169,7 +169,6 @@ void			CCurve::interpolate(int numVertices,float **varying,float ***locals) cons
 	}
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	CCurve
@@ -415,20 +414,30 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		*intr++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
 		*intr++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
+		if (intr[-3] > 5) {
+			int	y	=	1;
+		}
+
+		/*
+		FILE	*out	=	fopen("c:\\temp\\o.txt","a");
+		fprintf(out,"%g %g %g \n",intr[-3],intr[-2],intr[-1]);
+		fclose(out);
+		*/
+
 		for (k=3;k<vertexSize;k++) {
 			*intr++	=	tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k];
 		}
 	}
 
 	// Dispatch the variables
-	variables->dispatch(intrStart,0,numVertices,varying,locals);
+	variables->dispatch(intrStart,start,numVertices,varying,locals);
 
 	float		*dPdv	=	varying[VARIABLE_DPDV]	+ start*3;
 	float		*dPdu	=	varying[VARIABLE_DPDU]	+ start*3;
 	const float	*P		=	varying[VARIABLE_P]		+ start*3;
 	float		*N		=	varying[VARIABLE_NG]	+ start*3;
 
-	v	=	varying[VARIABLE_V] + start*3;
+	v	=	varying[VARIABLE_V] + start;
 
 	for (i=numVertices;i>0;i--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
 		const	float	cv	= *v++;
@@ -448,6 +457,41 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		dPdv[0]	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
 		dPdv[1]	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
 		dPdv[2]	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+
+		// Do we have a numerical problem?
+		if (dotvv(dPdv,dPdv) < C_EPSILON) {
+			float	step;
+
+			// Perform a parametric search
+			for (step=1e-5f;step<0.1f;step*=2) {
+				int	k;
+
+				// On either side
+				for (k=0;k<2;k++) {
+					const float	tv	=	cv + (k == 0 ? step : -step);
+
+					if ((tv >= 0) && (tv <= 1)) {
+						vb[3]	=	0;
+						vb[2]	=	1;
+						vb[1]	=	2*tv;
+						vb[0]	=	3*tv*tv;
+
+						tmp[0]	=	vb[0]*vBasis[element(0,0)] + vb[1]*vBasis[element(0,1)] + vb[2]*vBasis[element(0,2)];
+						tmp[1]	=	vb[0]*vBasis[element(1,0)] + vb[1]*vBasis[element(1,1)] + vb[2]*vBasis[element(1,2)];
+						tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)];
+						tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)];
+
+						dPdv[0]	=	tmp[0]*v0[0] + tmp[1]*v1[0] + tmp[2]*v2[0] + tmp[3]*v3[0];
+						dPdv[1]	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
+						dPdv[2]	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
+
+						if (dotvv(dPdv,dPdv) > C_EPSILON) break;
+					}
+				}
+
+				if (k < 2) break;
+			}
+		}
 
 		crossvv(dPdu,dPdv,P);
 		crossvv(N,dPdv,dPdu);

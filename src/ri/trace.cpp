@@ -132,9 +132,14 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 			// Hash the rays into the table
 			for (i=0;i<numRays;i++) {
-				T64			object;
 				int			key;
 				CRay		*cRay	=	rays[i];
+
+				// This is more efficient on 64 bit platforms
+				union {
+					CObject		*pointer;
+					uintptr_t	integer;
+				} object;
 
 				// Compute the hash key (fast and easy)
 				object.pointer	=	cRay->object;

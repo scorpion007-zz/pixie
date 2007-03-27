@@ -507,6 +507,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\ptcapi.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\random.cpp"
 				>
 			</File>
@@ -970,7 +974,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l&#x0D;&#x0A;"
 						Outputs="../../../../src/ri/lex.if.cpp"
 					/>
 				</FileConfiguration>
@@ -979,7 +983,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l&#x0D;&#x0A;"
 						Outputs="../../../../src/ri/lex.if.cpp"
 					/>
 				</FileConfiguration>
@@ -992,7 +996,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose&#x0D;&#x0A;"
 						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
 						Outputs="../../../../src/ri/ifexpr.cpp"
 					/>
@@ -1002,7 +1006,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose&#x0D;&#x0A;"
 						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
 						Outputs="../../../../src/ri/ifexpr.cpp"
 					/>
