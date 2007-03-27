@@ -323,7 +323,7 @@ void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
 	float						*dest	=	C;
 	
 	for (int j=0;j<dataSize;j++) {
-		*dest++		+=	*src++;
+		*dest++		=	*src++;
 	}
 	
 	movvv(P,p->P);
