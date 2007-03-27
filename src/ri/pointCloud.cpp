@@ -110,6 +110,9 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	// Read the points
 	CMap<CPointCloudPoint>::read(in);
 
+	// reserve dataPointer space
+	dataPointers.reserve(numItems);
+	
 	// Read the data
 	// Note that we have one additional layer of indirection
 	// here, but it allows us to reorder the data on load so that
