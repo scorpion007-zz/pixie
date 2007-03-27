@@ -1049,7 +1049,6 @@ void				CBrickMap::draw() {
 		j	=	chunkSize;
 		float	*pts = cubePoints;
 		for(int k =0; k<6; k++) {
-			vector tmp;
 			
 			#define emitLn(i)						\
 				if (j == 0) {						\
@@ -1083,8 +1082,8 @@ void				CBrickMap::draw() {
 		}
 		
 		{
-			const float hd = side/2.0;
-			const float d = side+side/2.0;
+			const float hd = side/2.0f;
+			const float d = side+side/2.0f;
 			float tmp[9] = { d,hd,hd,  hd,d,hd,  hd,hd,d};
 			float tmpc[9] = { 0 };
 			

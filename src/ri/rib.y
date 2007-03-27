@@ -78,11 +78,24 @@ typedef enum {
 
 // Holds information about a parameter
 typedef struct {
-	char		*name;			// Name of the parameter
-	ERIBType	type;			// Type of the parameter
-	int			numItems;		// Number of items of type ERIBValue
-	int			valuesStart;	// Index in the argument list where the parameter starts
+	char			*name;			// Name of the parameter
+	ERIBType		type;			// Type of the parameter
+	int				numItems;		// Number of items of type ERIBValue
+	int				valuesStart;	// Index in the argument list where the parameter starts
 } TParameter;
+
+typedef struct TLight {
+	char			*name;			// The name of the light (if any)
+	RtLightHandle	handle;			// The returned handle
+	TLight			*next;			// The next light in the list
+	int				index;			// The index of the light
+} TLight;
+
+typedef struct TObject {
+	RtObjectHandle	handle;			// The handle of the object
+	TObject			*next;			// The next in the list
+	int				index;			// The index of the object
+} TObject;
 
 static	int					ribDepth					=	0;		// The rib parsing stack depth
 static	int					numConstant					=	0;		// The number of constant
@@ -90,13 +103,12 @@ static	int					numVertex					=	0;		// The number of vertices
 static	int					numVarying					=	0;		// The number of varyings
 static	int					numFaceVarying				=	0;		// The number of facevaryings
 static	int					numUniform					=	0;		// The number of uniforms
-static	CArray<RtPointer>	*lights						=	NULL;	// Number -> handle mapping for lights
-static	CTrie<char *>		*lightNames					=	NULL;	// Name -> handle mapping for lights (we define it as char * to avoid the annoying gcc warning)
-static	CArray<RtPointer>	*ribObjects					=	NULL;	// Number -> handle mapping for ribObjects
-static	CArray<char *>		*permaStrings				=	NULL;	// Strings that have been allocated for the whole rib stack
+static	TLight				*lights						=	NULL;	// The linked list of light handles
+static	TObject				*objects					=	NULL;	// The linked list of object handles
 static	void				(*callback)(const char *)	=	NULL;	// The callback function for the parser
 
-static	CArray<char *>		allStrings;								// Array of all strings (cleared after every command)
+static	TMemCheckpoint		worldCheckpoint;
+static	TMemCheckpoint		memoryCheckpoint;						// We use this to put a checkpoint to the memory
 static	CArray<float>		floatArgs;								// The array of float arguments
 static	CArray<int>			intArgs;								// The array of integer arguments
 static	CArray<char *>		stringArgs;								// The array of string arguments
@@ -761,19 +773,18 @@ ribCommands:	ribCommands
 				{
 					// Save the line number in case we have an error
 					ribCommandLineno		=	ribLineno;
-				}
-				ribComm
-				{
-				
+					
 					// Reset the number of parameters
 					floatArgs.numItems		=	0;
 					intArgs.numItems		=	0;
 					stringArgs.numItems		=	0;
 					numParameters			=	0;
 					
-					// Delete the strings we allocated for this command
-					char	*currentString;
-					while((currentString=allStrings.pop()) != NULL)	free(currentString);
+					// Restore the memory
+					memRestore(memoryCheckpoint,CRenderer::globalMemory);
+				}
+				ribComm
+				{	
 				}
 				|
 				;
@@ -811,12 +822,23 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				|
 				RIB_WORLD_BEGIN
 				{
+					// Save the checkpoint
+					worldCheckpoint		=	memoryCheckpoint;
+					
+					// Call the worldbegin
 					RiWorldBegin();
+					
+					// Create a new checkpoint because we allocate some stuff in RiWorldBegin
+					memSave(memoryCheckpoint,CRenderer::globalMemory);
+					
 				}
 				|
 				RIB_WORLD_END
 				{
 					RiWorldEnd();
+					
+					// Restore the checkpoint to that before the world begin
+					memoryCheckpoint	=	worldCheckpoint;
 				}
 				|
 				RIB_FORMAT
@@ -1142,9 +1164,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_FLOAT
 				ribPL
 				{
-					if (lights == NULL)	lights	=	new CArray<RtLightHandle>;
-
-					(*lights)[(int) $3]	=	RiLightSourceV($2,numParameters,tokens,vals);
+					TLight	*nLight	=	new TLight;
+					nLight->index	=	(int) $3;
+					nLight->name	=	NULL;
+					nLight->handle	=	RiLightSourceV($2,numParameters,tokens,vals);					
+					nLight->next	=	lights;
+					lights			=	nLight;
 				}
 				|
 				RIB_LIGHT_SOURCE
@@ -1152,11 +1177,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribPL
 				{
-					if (lightNames == NULL)	lightNames	=	new CTrie<char *>;
-					
-					char *lName = strdup($3);
-					permaStrings->push(lName);
-					lightNames->insert(lName,(char *) RiLightSourceV($2,numParameters,tokens,vals));
+					TLight	*nLight	=	new TLight;
+					nLight->index	=	0;
+					nLight->name	=	strdup($3);
+					nLight->handle	=	RiLightSourceV($2,numParameters,tokens,vals);					
+					nLight->next	=	lights;
+					lights			=	nLight;
 				}
 				|
 				RIB_LIGHT_SOURCE
@@ -1171,9 +1197,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_FLOAT
 				ribPL
 				{
-					if (lights == NULL)	lights	=	new CArray<RtLightHandle>;
-
-					(*lights)[(int) $3]	=	RiAreaLightSourceV($2,numParameters,tokens,vals);
+					TLight	*nLight	=	new TLight;
+					nLight->index	=	(int) $3;
+					nLight->name	=	NULL;
+					nLight->handle	=	RiAreaLightSourceV($2,numParameters,tokens,vals);					
+					nLight->next	=	lights;
+					lights			=	nLight;
 				}
 				|
 				RIB_AREA_LIGHT_SOURCE
@@ -1181,32 +1210,45 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_TEXT
 				ribPL
 				{
-					if (lightNames == NULL)	lightNames	=	new CTrie<char *>;
-					
-					char *lName = strdup($3);
-					permaStrings->push(lName);
-					lightNames->insert(lName,(char *) RiLightSourceV($2,numParameters,tokens,vals));
+					TLight	*nLight	=	new TLight;
+					nLight->index	=	0;
+					nLight->name	=	strdup($3);
+					nLight->handle	=	RiAreaLightSourceV($2,numParameters,tokens,vals);					
+					nLight->next	=	lights;
+					lights			=	nLight;
 				}
 				|
 				RIB_ILLUMINATE
 				RIB_FLOAT
 				RIB_FLOAT
 				{
-					if (lights == NULL)	lights	=	new CArray<RtLightHandle>;
-
-					RiIlluminate((*lights)[(int) $2],(int) $3);
+					TLight	*cLight;
+					
+					for (cLight=lights;cLight!=NULL;cLight=cLight->next)
+						if (cLight->index == (int) $2)	break;
+						
+					if (cLight != NULL) {
+						RiIlluminate(cLight->handle,(int) $3);
+					} else {
+						error(CODE_RANGE,"The light %d is not found",(int) $2);
+					}
 				}
 				|
 				RIB_ILLUMINATE
 				RIB_TEXT
 				RIB_FLOAT
 				{
-					if (lightNames == NULL)	lightNames	=	new CTrie<char *>;
+					TLight	*cLight;
 					
-					char	*lightHandle = NULL;
-					
-					if(lightNames->find($2,lightHandle)){
-						RiIlluminate((RtPointer) lightHandle,(int) $3);
+					for (cLight=lights;cLight!=NULL;cLight=cLight->next)
+						if (cLight->name != NULL) {
+							if (strcmp(cLight->name,$2) == 0) break;
+						}
+						
+					if (cLight != NULL) {
+						RiIlluminate(cLight->handle,(int) $3);
+					} else {
+						error(CODE_RANGE,"The light \"%s\" is not found",$2);
 					}
 				}
 				|
@@ -2488,9 +2530,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_OBJECT_BEGIN
 				RIB_FLOAT
 				{
-					if (ribObjects == NULL)	ribObjects	=	new CArray<RtPointer>;
-
-					(*ribObjects)[(int) $2]	=	RiObjectBegin();
+					TObject	*nObject	=	new TObject;
+					
+					nObject->handle	=	RiObjectBegin();
+					nObject->index	=	(int) $2;
+					nObject->next	=	objects;
+					objects			=	nObject;
 				}
 				|
 				RIB_OBJECT_END
@@ -2501,8 +2546,14 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				RIB_OBJECT_INSTANCE
 				RIB_FLOAT
 				{
-					if (ribObjects != NULL) {
-						RiObjectInstance((*ribObjects)[(int) $2]);
+					TObject	*cObject;
+					
+					for (cObject=objects;cObject!=NULL;cObject=cObject->next) {
+						if (cObject->index == (int) $2)	break;
+					}
+					
+					if (cObject != NULL) {
+						RiObjectInstance(cObject->handle);
 					} else {
 						error(CODE_MISSINGDATA,"Object %d is not found\n",(int) $2);
 					}
@@ -2712,13 +2763,14 @@ void	riberror(char *s,...) {
 // Return Value			:	-
 // Comments				:
 void	ribParse(const char *fileName,void (*c)(const char *)) {
+
+
 	if (fileName != NULL) {
 		
 
 		// Save the environment first
-		CArray<RtPointer>	*savedLights					=	lights;
-		CTrie<char *>		*savedLightNames				=	lightNames;
-		CArray<RtPointer>	*savedObjects					=	ribObjects;
+		TLight				*savedLights					=	lights;
+		TObject				*savedObjects					=	objects;
 		int					savedRibLineno					=	ribLineno;
 		void				(*savedCallback)(const char *)	=	callback;
 		int					savedNumParameters				=	numParameters;
@@ -2762,8 +2814,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		}
 
 		lights				=	NULL;
-		lightNames			=	NULL;
-		ribObjects			=	NULL;
+		objects				=	NULL;
 		callback			=	c;
 		maxParameter		=	20;
 		numParameters		=	0;
@@ -2772,9 +2823,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		vals				=	new RtPointer[maxParameter];
 		
 		if ( ribDepth++ == 0) {
-			// for the outermost depth only,
-			// allocate storage for strings valid over the while rib
-			permaStrings	=	new CArray<char *>;
+			// outhermost
 		} else {
 			// create a new lex buffer and switch to it
 			
@@ -2789,8 +2838,16 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		ribFile				=	fileName;
 		ribLineno			=	1;
 
+		// Put a checkpoint in the global memory
+		// This checkpoint is restored after every RIB command
+		memSave(memoryCheckpoint,CRenderer::globalMemory);
+
+		// Parse the RIB
 		ribparse();
 
+		// Restore the memory to the latest checkpoint
+		memRestore(memoryCheckpoint,CRenderer::globalMemory);
+		
 		if (ribin != NULL) {
 #ifdef HAVE_ZLIB
 			gzclose(ribin);
@@ -2799,9 +2856,20 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 #endif
 		}
 
-		if (lights		!= NULL)	delete lights;
-		if (lightNames	!= NULL)	delete lightNames;
-		if (ribObjects	!= NULL)	delete ribObjects;
+		// Clear the lights
+		TLight	*cLight;
+		while((cLight=lights) != NULL) {
+			lights	=	lights->next;
+			if (cLight->name != NULL)	free(cLight->name);
+			delete cLight;
+		}
+		
+		TObject	*cObject;
+		while((cObject=objects) != NULL) {
+			objects	=	objects->next;
+			delete cObject;
+		}
+		
 		delete [] parameters;
 		delete [] tokens;
 		delete [] vals;
@@ -2814,21 +2882,13 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		parameters			=	savedParameters;
 		numParameters		=	savedNumParameters;
 		maxParameter		=	savedMaxParameter;
-		lightNames			=	savedLightNames;
 		lights				=	savedLights;
-		ribObjects			=	savedObjects;
+		objects				=	savedObjects;
 		ribLineno			=	savedRibLineno;
 		callback			=	savedCallback;
 		
 		if ((ribDepth = savedRibDepth) == 0) {
-			// for the outermost depth only,
-			// deallocate storage for strings valid over the while rib
-			char *currentString;
-			while((currentString=permaStrings->pop()) != NULL) {
-				free(currentString);
-			}
-			
-			delete permaStrings;
+			// outhermost
 		} else {
 			// We're done parsing an inner level, switch the lex buffer back
 			

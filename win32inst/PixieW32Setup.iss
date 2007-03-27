@@ -109,7 +109,7 @@ Name: {app}; Type: filesandordirs; Components: main content
 Type: files; Name: {app}\Pixie.url
 
 [INI]
-Filename: {app}\Pixie.url; Section: InternetShortcut; Key: URL; String: http://www.cs.berkeley.edu/~okan/Pixie/pixie.htm
+Filename: {app}\Pixie.url; Section: InternetShortcut; Key: URL; String: http://pixie.sourcefornet.net
 
 [LangOptions]
 WelcomeFontName=Tahoma

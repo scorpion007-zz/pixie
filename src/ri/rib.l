@@ -208,12 +208,12 @@ version												return RIB_VERSION;
 \[													return RIB_ARRAY_BEGIN;
 \]													return RIB_ARRAY_END;
 
-\"[^\"]*\"											{   riblval->string	=	strdup(ribtext+1);	allStrings.push(riblval->string);	riblval->string[strlen(riblval->string)-1] = '\0'; return RIB_TEXT;}
+\"[^\"]*\"											{   riblval->string	=	rstrdup(ribtext+1,CRenderer::globalMemory);	riblval->string[strlen(riblval->string)-1] = '\0'; return RIB_TEXT;}
 [+-]?([0-9]+|([0-9]*(\.[0-9]+)?)([eE][+-]?[0-9]+)?)	{	sscanf(ribtext,"%f",&riblval->real); return RIB_FLOAT; }
 [+-]?([0-9]+|([0-9]+(\.[0-9]*)?)([eE][+-]?[0-9]+)?)	{	sscanf(ribtext,"%f",&riblval->real); return RIB_FLOAT; }
 
 [\t ]												;
-#\!.*												{	riblval->string	=	strdup(ribtext+2);	allStrings.push(riblval->string);	return RIB_STRUCTURE_COMMENT;	}
+#\!.*												{	riblval->string	=	rstrdup(ribtext+2,CRenderer::globalMemory);	return RIB_STRUCTURE_COMMENT;	}
 #.*													;
 \n													{	ribLineno++; }
 <<EOF>>												{
@@ -227,7 +227,7 @@ version												return RIB_VERSION;
 #else
 															fclose(ribin);
 #endif
-															free((char*) ribFile);		// slightly dirty, remove const as we allocated it
+															free((char *) ribFile);
 															rib_switch_to_buffer(ribStack->ribState);
 															ribLineno	=	ribStack->ribLineno;
 															ribFile		=	ribStack->ribFile;
@@ -235,7 +235,7 @@ version												return RIB_VERSION;
 															ribStack	=	nextFile;
 														}
 													}
-\377												{	/* terminate parsing for a runprogram */
+\377												{	// Terminate parsing for a runprogram
 														if (ribStack == NULL) {
 															yyterminate();
 														} else 	{
@@ -248,7 +248,7 @@ version												return RIB_VERSION;
 															fclose(ribin);
 #endif
 
-															free((char*) ribFile);		// slightly dirty, remove const as we allocated it
+															free((char *) ribFile);
 															rib_switch_to_buffer(ribStack->ribState);
 															ribLineno	=	ribStack->ribLineno;
 															ribFile		=	ribStack->ribFile;
