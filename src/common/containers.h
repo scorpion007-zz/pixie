@@ -847,6 +847,20 @@ public:
 						}
 
 						// Array interface
+
+		void			reserve(int sz) {
+							while (sz >= arraySize) {
+								 T       *newArray	=	new T[arraySize+stepSize];
+
+								 memcpy(newArray,array,arraySize*sizeof(T));
+
+								 arraySize			+=	stepSize;
+								 stepSize			*=	2;
+								 delete [] array;
+								 array				=	newArray;
+							 }		
+						}
+						
 		T				& operator[](int index) {
 							assert(index < numItems);
 							return array[index];
