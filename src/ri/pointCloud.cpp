@@ -364,7 +364,7 @@ void	CPointCloud::draw() {
 		
 		movvv(cP,cT->P);
 		movvv(cN,cT->N);
-		*cdP	=	cT->dP/dPscale;
+		*cdP	=	cT->dP;		// was /dPscale;	but should already be in world
 		movvv(cC,dataPointers.array[cT->entryNumber]);
 	}
 
