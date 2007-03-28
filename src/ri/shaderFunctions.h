@@ -2346,7 +2346,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									float			*r			=	radius;										\
 									/* no radius given, scale dP */												\
 									for (i=0;i<numVertices;i++,r++) {											\
-										r[0] = radiiscale*r[0];											\
+										r[0] = radiiscale*0.5f*r[0];											\
 									}																			\
 								}																				\
 																												\
@@ -2438,7 +2438,7 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 									float			*r			=	radius;										\
 									/* no radius given, scale dP */												\
 									for (i=0;i<numVertices;i++,r++) {											\
-										r[0] = radiiscale*r[0];											\
+										r[0] = radiiscale*0.5f*r[0];											\
 									}																			\
 								}																				\
 																												\
