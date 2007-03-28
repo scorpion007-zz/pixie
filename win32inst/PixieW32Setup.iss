@@ -45,6 +45,7 @@ Source: C:\okan\software\GnuWin32\bin\jpeg62.dll; DestDir: {app}\bin; Components
 Source: C:\okan\software\GnuWin32\bin\libpng13.dll; DestDir: {app}\bin; Components: main
 Source: C:\okan\software\GnuWin32\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
 Source: C:\okan\software\GnuWin32\bin\zlib1.dll; DestDir: {app}\bin; Components: main
+Source: C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin\libmmd.dll; DestDir: {app}\bin; Components: main
 Source: C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll; DestDir: {app}\bin; Components: main
 ; Distribute the executables
 Source: ..\bin\*.exe; DestDir: {app}\bin; Components: main
@@ -57,6 +58,7 @@ Source: ..\displays\file.dll; DestDir: {app}\displays; Components: main
 Source: ..\src\ri\ri.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\dsply.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\shadeop.h; DestDir: {app}\include; Components: libraries
+Source: ..\src\ri\ptcapi.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\sdr\sdr.h; DestDir: {app}\include; Components: libraries
 ; Distribute the libs
 Source: ..\bin\ri.lib; DestDir: {app}\lib; Components: libraries
