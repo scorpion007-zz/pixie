@@ -271,6 +271,47 @@ void CTexture3d::prepareSample(float *C,float **samples,CTexture3dChannel **bind
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
+// Method				:	prepareInterpolatedSample
+// Description			:	prepareInterpolatedSample
+// Return Value			:	-
+// Comments				:	pack an interpolated / averaged value from grid neighbors
+void CTexture3d::prepareInterpolatedSample(float *C,float **samples,CTexture3dChannel **bindings,int uVerts,int vVerts) {
+	float *src,*dest;
+
+	for (int i=0;i<numChannels;i++)	{
+		CTexture3dChannel *binding = bindings[i];
+
+		if (binding != NULL) {
+			dest	= C + binding->sampleStart;
+			for (int j=0;j<binding->numSamples;j++,dest++)			*dest = 0;
+			
+			dest	= C + binding->sampleStart;
+			src		= samples[i];
+			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
+			
+			dest	= C + binding->sampleStart;
+			src		= samples[i] + binding->numSamples;
+			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
+			
+			dest	= C + binding->sampleStart;
+			src		= samples[i] + uVerts*binding->numSamples;
+			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
+			
+			dest	= C + binding->sampleStart;
+			src		= samples[i] + (1+uVerts)*binding->numSamples;
+			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
+			
+			dest	= C + binding->sampleStart;
+			for (int j=0;j<binding->numSamples;j++,dest++)			*dest *= 0.25;
+		} else {
+			// GSHTODO : zero / fill the samples
+		}
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTexture3d
 // Method				:	unpackSample
 // Description			:	unpackSample
 // Return Value			:	-

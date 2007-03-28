@@ -66,6 +66,7 @@ public:
 	virtual	void			store(const float *,const float *,const float *,float) = 0;
 	int						bindChannelNames(int&,const char **,CTexture3dChannel ***);
 	void					prepareSample(float*,float **,CTexture3dChannel **);
+	void					prepareInterpolatedSample(float*,float **,CTexture3dChannel **,int,int);
 	void					unpackSample(float*,float **,CTexture3dChannel **);
 	void					queryChannels(int *,char **,char **);
 	

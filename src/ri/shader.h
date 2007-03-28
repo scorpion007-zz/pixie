@@ -218,6 +218,7 @@ public:
 							}
 		float				radius;					// The sample radius
 		float				radiusScale;			// Blur amount
+		int					interpolate;			// Bake polygon centres
 		char				**channels;				// The channels this bake3d provides
 		int					numChannels;			// The number of channels bake3d provides
 		int					dataStart;				// The argument at which data starts

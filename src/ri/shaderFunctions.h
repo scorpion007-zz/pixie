@@ -2261,6 +2261,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								dirty();																		\
 								lookup->radius			=	-1.0f;												\
 								lookup->radiusScale		=	1.0f;												\
+								lookup->interpolate		=	FALSE;												\
 								lookup->coordsys		=	coordinateWorldSystem;								\
 								lookup->numChannels		=	0;													\
 								lookup->dataStart		=	start;												\
@@ -2269,11 +2270,13 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									int		i;																	\
 									const char	**param;														\
 									const float	*valf;															\
+									const int	*vali;															\
 									const char	**vals;															\
 																												\
 									for (i=0;i<num;i++) {														\
 										operand(i*2+start,param,const char **);									\
 										operand(i*2+start+1,valf,const float *);								\
+										operand(i*2+start+1,vali,const int *);									\
 										operand(i*2+start+1,vals,const char **);								\
 																												\
 										if (strcmp(*param,"radiusscale") == 0) {								\
@@ -2284,6 +2287,9 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											lookup->dataStart += 2;												\
 										} else if (strcmp(*param,"coordsystem") == 0) {							\
 											lookup->coordsys	=	*vals;										\
+											lookup->dataStart += 2;												\
+										} else if (strcmp(*param,"interpolate") == 0) {							\
+											lookup->interpolate =	*vali;										\
 											lookup->dataStart += 2;												\
 										} else {																\
 											channelNames[lookup->numChannels++]	= *param;						\
@@ -2321,7 +2327,10 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								operand(0,res,float *);															\
 								operand(3,op3,const float *);													\
 								operand(4,op4,const float *);													\
-								int				i;																\
+								int				i,curU=0,curV=0;												\
+								const int		uVerts		=	currentShadingState->numUvertices;				\
+								const int		vVerts		=	currentShadingState->numVvertices;				\
+								const int		doInterp	=	(lookup->interpolate && currentShadingState->numVertices == currentShadingState->numRealVertices);	\
 								float			*radius		=	rayDiff(op3);									\
 								CTexture3d		*tex		=	lookup->texture;								\
 																												\
@@ -2345,14 +2354,29 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									operand(lookup->dataStart+i*2+1,channelValues[i],float *);					\
 								} 
 
-#define	BAKE3DEXPR				tex->prepareSample(lookup->valueSpace[thread],channelValues,lookup->bindings);	\
-								tex->store(lookup->valueSpace[thread],op3,op4,*radius);							\
-								*res		=	1;
+#define	BAKE3DEXPR				if (doInterp == FALSE) {															\
+									tex->prepareSample(lookup->valueSpace[thread],channelValues,lookup->bindings);	\
+									tex->store(lookup->valueSpace[thread],op3,op4,*radius);							\
+								} else if (curU < uVerts-1 && curV < vVerts-1) {									\
+									const float	Rinterp = 0.25*(radius[0] + radius[1] + radius[uVerts] + radius[uVerts+1]);		\
+									vector		Pinterp,Ninterp;													\
+									Pinterp[0] = 0.25f*(op3[0] + op3[3] + op3[3*uVerts]   + op3[3+3*uVerts]);		\
+									Pinterp[1] = 0.25f*(op3[1] + op3[4] + op3[1+3*uVerts] + op3[4+3*uVerts]);		\
+									Pinterp[2] = 0.25f*(op3[2] + op3[5] + op3[2+3*uVerts] + op3[5+3*uVerts]);		\
+									Ninterp[0] = 0.25f*(op4[0] + op4[3] + op4[3*uVerts]   + op4[3+3*uVerts]);		\
+									Ninterp[1] = 0.25f*(op4[1] + op4[4] + op4[1+3*uVerts] + op4[4+3*uVerts]);		\
+									Ninterp[2] = 0.25f*(op4[2] + op4[5] + op4[2+3*uVerts] + op4[5+3*uVerts]);		\
+									tex->prepareInterpolatedSample(lookup->valueSpace[thread],channelValues,lookup->bindings,uVerts,vVerts);	\
+									tex->store(lookup->valueSpace[thread],Pinterp,Ninterp,Rinterp);					\
+								}																					\
+								*res		=	1;																	\
 
 #define	BAKE3DEXPR_UPDATE		res++;																			\
 								op3+=3;																			\
 								op4+=3;																			\
 								radius++;																		\
+								curU++;																			\
+								if (curU == uVerts) { curV++; curU = 0; }										\
 								for (int j=0;j<lookup->numChannels;j++) {										\
 									channelValues[j]	+=	lookup->bindings[j]->numSamples;					\
 								}
@@ -2362,7 +2386,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 #define	BAKE3DEXPR_UPDATE
 #endif
 
-DEFFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	BAKE3DEXPR_PRE
 #undef	BAKE3DEXPR
