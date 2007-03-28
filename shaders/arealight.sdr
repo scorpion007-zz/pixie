@@ -1,4 +1,4 @@
-#!version 2.0.2
+#!version 2.1.1
 light
 #!parameters:
 uniform	float	intensity	=	1
@@ -33,4 +33,3 @@ varying	vector	temporary_8
 #!Label2:
 	endilluminate     
 	return            
-

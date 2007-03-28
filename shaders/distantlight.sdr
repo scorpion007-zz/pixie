@@ -1,4 +1,4 @@
-#!version 2.0.2
+#!version 2.1.1
 light
 #!parameters:
 uniform	float	intensity	=	1
@@ -28,4 +28,3 @@ uniform	vector	temporary_3
 #!Label2:
 	endsolar          
 	return            
-

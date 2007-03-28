@@ -1,4 +1,4 @@
-#!version 2.0.2
+#!version 2.1.1
 light
 #!parameters:
 uniform	float	intensity	=	1
@@ -155,4 +155,3 @@ varying	float	temporary_21
 #!Label17:
 	endif             
 	return            
-

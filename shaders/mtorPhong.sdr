@@ -1,4 +1,4 @@
-#!version 2.0.2
+#!version 2.1.1
 surface
 #!parameters:
 uniform	float	refractiveIndex	=	1
@@ -47,4 +47,3 @@ uniform	float	temporary_9
 	movevv            	Oi Os
 	mulvv             	Ci Ci Oi
 	return            
-
