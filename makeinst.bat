@@ -30,6 +30,8 @@ copy displays\openexr.dll Pixie\displays
 copy bin\opengl.dll Pixie\lib
 copy src\ri\ri.h Pixie\include
 copy src\ri\dsply.h Pixie\include
+copy src\ri\dlo.h Pixie\include
+copy src\ri\implicit.h Pixie\include
 copy src\ri\shadeop.h Pixie\include
 copy src\ri\ptcapi.h Pixie\include
 copy src\sdr\sdr.h Pixie\include

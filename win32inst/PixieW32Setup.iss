@@ -57,6 +57,8 @@ Source: ..\displays\file.dll; DestDir: {app}\displays; Components: main
 ; Distribute the header files
 Source: ..\src\ri\ri.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\dsply.h; DestDir: {app}\include; Components: libraries
+Source: ..\src\ri\dlo.h; DestDir: {app}\include; Components: libraries
+Source: ..\src\ri\implicit.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\shadeop.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\ri\ptcapi.h; DestDir: {app}\include; Components: libraries
 Source: ..\src\sdr\sdr.h; DestDir: {app}\include; Components: libraries
