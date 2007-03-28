@@ -507,6 +507,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\ptcapi.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\ptcapi.h"
 				>
 			</File>

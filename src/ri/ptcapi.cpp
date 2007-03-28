@@ -28,7 +28,6 @@
 //  Description			:	Point Cloud API
 //
 ////////////////////////////////////////////////////////////////////////
-
 #include "fileResource.h"
 #include "pointCloud.h"
 #include "error.h"
@@ -44,23 +43,30 @@ struct PtcPointCloudInternal {
 
 
 
-PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,float *world2eye, float *world2ndc, float *format) {
-		
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcCreatePointCloudFile
+// Description			:	Create a point cloud file
+// Return Value			:
+// Comments				:	Handle
+PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,float *world2eye, float *world2ndc, float *format) {		
 	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
 	
 	matrix eye2world;
 	invertm(eye2world,world2eye);
 	
-	ptcInternal->ptc = new CPointCloud(filename,eye2world,world2eye,world2ndc,nvars,varnames,vartypes,TRUE);
-	
+	ptcInternal->ptc			=	new CPointCloud(filename,eye2world,world2eye,world2ndc,nvars,varnames,vartypes,TRUE);
 	ptcInternal->numPoints		=	0;
 	ptcInternal->curPoint		=	0;
 	
 	return (PtcPointCloud) ptcInternal;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcWriteDataPoint
+// Description			:	Write into a point cloud file
+// Return Value			:
+// Comments				:
 void PtcWriteDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float radius, float *data) {
-	
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 	
 	ptcInternal->ptc->store(data,point,normal,radius);
@@ -69,6 +75,11 @@ void PtcWriteDataPoint(PtcPointCloud pointcloud, float *point, float *normal, fl
 	ptcInternal->curPoint++;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcFinishPointCloudFile
+// Description			:	Close the handle
+// Return Value			:
+// Comments				:
 void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
@@ -82,9 +93,14 @@ void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcOpenPointCloudFile
+// Description			:	Open an existing point cloud file
+// Return Value			:
+// Comments				:	Handle
 PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes, char **varnames) {
-	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
-	FILE *in;
+	PtcPointCloudInternal	*ptcInternal = new PtcPointCloudInternal;
+	FILE					*in;
 	
 	if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
 		matrix from,to;
@@ -95,8 +111,8 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes,
 		
 		ptcInternal->ptc->queryChannels(nvars,vartypes,varnames);
 		
-		ptcInternal->numPoints	=	ptcInternal->ptc->getNumPoints();
-		ptcInternal->curPoint	=	0;
+		ptcInternal->numPoints		=	ptcInternal->ptc->getNumPoints();
+		ptcInternal->curPoint		=	0;
 	} else {
 		delete ptcInternal;
 		return NULL;
@@ -105,6 +121,11 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes,
 	return (PtcPointCloud) ptcInternal;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcGetPointCloudInfo
+// Description			:	Query the point cloud
+// Return Value			:
+// Comments				:	Handle
 int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
@@ -135,8 +156,15 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) 
 		// Don't use warning or error as Ri may not be initialized
 		fprintf(stderr,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
 	}
+
+	return TRUE;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcReadDataPoint
+// Description			:	Read data from the point cloud
+// Return Value			:
+// Comments				:
 int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 	
@@ -146,6 +174,11 @@ int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, floa
 	return TRUE;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Function				:	PtcClosePointCloudFile
+// Description			:	Close the handle
+// Return Value			:
+// Comments				:
 void PtcClosePointCloudFile(PtcPointCloud pointcloud) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
