@@ -250,6 +250,7 @@ RtToken		RI_MAXSPECULARDEPTH		=	"maxspeculardepth";
 RtToken		RI_GLOBALMAP			=	"globalmap";
 RtToken		RI_CAUSTICMAP			=	"causticmap";
 RtToken		RI_ESTIMATOR			=	"estimator";
+RtToken		RI_MAXDISTANCE			=	"maxdistance";
 RtToken		RI_SHADINGMODEL			=	"shadingmodel";
 RtToken		RI_ILLUMINATEFRONT		=	"illuminatefront";
 RtToken		RI_IOR					=	"ior";
