@@ -149,7 +149,7 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 	// determinte the channels
 	dataSize		=	0;	
-	channels		=	new CTexture3dChannel[numChannels];
+	channels		=	new CTexture3dChannel[n];
 	
 	// parse the channels / sample types
 	numChannels = 0;
