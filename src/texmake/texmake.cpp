@@ -51,10 +51,11 @@ const	char	*envcubeArgument			=	"-envcube";
 const	char	*fovArgument				=	"-fov";
 const	char	*texture3dArgument			=	"-texture3d";
 const	char	*maxerrorArgument			=	"-maxerror";
+const	char	*radiusscaleArgument		=	"-radiusscale";
 
 void	printUsage() {
 	printf("Usage: texmake [-(shadow|envlatl|envcube)] [-smode <mode>] [-tmode <mode>] [-filter <filter>] [-filterwidth <width>] [-filterheight <height>] [-sfilterwidth <width>] [-tfilterwidth <width>] <inputfile> <outputfile>\n");
-	printf("       texmake -texture3d [-maxerror <number>] <inputfile> <outputfile>\n");
+	printf("       texmake -texture3d [-maxerror <number>] [-radiusscale <number>] <inputfile> <outputfile>\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -68,6 +69,7 @@ int main(int argc, char* argv[]) {
 	float			fov				=	90;
 	RtFilterFunc	filter			=	RiCatmullRomFilter;
 	float			maxerror		=	0.002f;
+	float			radiusScale		=	0.002f;
 	int				i;
 	char			*textureMode	=	"texture";
 	int				processed;
@@ -134,6 +136,9 @@ int main(int argc, char* argv[]) {
 		} else if (strcmp(argv[i],maxerrorArgument) == 0) {
 			i++;
 			maxerror		=	(float) atof(argv[i]);
+		} else if (strcmp(argv[i],radiusscaleArgument) == 0) {
+			i++;
+			radiusScale		=	(float) atof(argv[i]);
 		} else if (strcmp(argv[i],inputPathArgument) == 0) {
 			i++;
 			inPath		=	argv[i];
@@ -184,7 +189,9 @@ int main(int argc, char* argv[]) {
 			RiBegin(RI_NULL);
 			tokens[0]			=	RI_MAXERROR;
 			vals[0]				= 	(RtPointer) &maxerror;
-			currentParameter	=	1;
+			tokens[1]			=	"radiusscale";
+			vals[1]				= 	(RtPointer) &radiusScale;
+			currentParameter	=	2;
 			RiMakeTexture3DV(files[0],files[1],currentParameter,tokens,vals);
 			RiEnd();
 
