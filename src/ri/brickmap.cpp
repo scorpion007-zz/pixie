@@ -1464,7 +1464,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	for(i =0;i<n;i++){
 		if(!strcmp(tokens[i],"maxerror")){
 			maxVariation = ((float*)params[i])[0];
-		} else if (!strcmp(tokens[i],"maxerror")){
+		} else if (!strcmp(tokens[i],"radiusscale")){
 			radiusScale = ((float*)params[i])[0];
 		}
 	}
