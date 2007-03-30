@@ -1460,9 +1460,12 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	int		i;
 	
 	float maxVariation = 0.002f;
+	float radiusScale = 1.0f;
 	for(i =0;i<n;i++){
 		if(!strcmp(tokens[i],"maxerror")){
 			maxVariation = ((float*)params[i])[0];
+		} else if (!strcmp(tokens[i],"maxerror")){
+			radiusScale = ((float*)params[i])[0];
 		}
 	}
 	
@@ -1470,7 +1473,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	// Use a large memory limit when creating brickmaps
 	// Note: needed as RiMakeXYZ can only be called outside a frame, and then
 	// the shading context is gone
-	CBrickMap::initBrickMap(100000000);
+	CBrickMap::initBrickMap(300000000);
 	
 	if (CRenderer::locateFile(fileName,src,searchPath)) {
 		FILE *in;
@@ -1487,7 +1490,7 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			for (i=1;i<cPtCloud->numItems;i++) {
 				CPointCloudPoint	*p = cPtCloud->items + i;
 				float			 	*C = dataPointers[p->entryNumber];
-				cBMap->store(C,p->P,p->N,p->dP);
+				cBMap->store(C,p->P,p->N,p->dP * radiusScale);
 			}
 			
 			cBMap->finalize();
