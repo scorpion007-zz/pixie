@@ -63,7 +63,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 	defineChannels(channelDefs);
 
 	// Make sure we have a root
-	balance();
+	// (but only if we're looking up, otherwise we'd add duff data)
+	if (!write) balance();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -83,7 +84,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 	defineChannels(numChannels,channelNames,channelTypes);
 
 	// Make sure we have a root
-	balance();
+	// (but only if we're looking up, otherwise we'd add duff data)
+	if (!write) balance();
 }
 
 
