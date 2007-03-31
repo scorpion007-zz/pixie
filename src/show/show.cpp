@@ -51,8 +51,12 @@ int	main(int argc,char *argv[]) {
 		fprintf(stdout,"\t\t\t\tb:show boxes\n");
 		fprintf(stdout,"\t\t\t\td:show discs\n");
 		fprintf(stdout,"\t\t\t\tp:show points\n");
+		fprintf(stdout,"\t\t\t\tq:previous channel\n");
+		fprintf(stdout,"\t\t\t\tw:next channel\n");
 		fprintf(stdout,"\t\tpoint cloud\tp:show points\n");
 		fprintf(stdout,"\t\t\t\td:show discs\n");
+		fprintf(stdout,"\t\t\t\tq:previous channel\n");
+		fprintf(stdout,"\t\t\t\tw:next channel\n");
 		fprintf(stdout,"\t\tirradiance\tp:show points\n");
 		fprintf(stdout,"\t\t\t\td:show discs\n\n");
 		fprintf(stdout,"\tMouse:\tleft\t\trotate\n");
