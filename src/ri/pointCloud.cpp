@@ -43,6 +43,7 @@
 ///////////////////////////////////////////////////////////////////////
 
 int			CPointCloud::drawDiscs		=	TRUE;
+int			CPointCloud::drawChannel	=	0;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -344,11 +345,13 @@ void	CPointCloud::draw() {
 	float		N[chunkSize*3];
 	float		dP[chunkSize];
 	int			i,j;
-	float		*cP		=	P;
-	float		*cC		=	C;
-	float		*cN		=	N;
-	float		*cdP	=	dP;
-	CPointCloudPoint	*cT	=	items+1;
+	int			sampleStart		=	channels[drawChannel].sampleStart;
+	int			numSamples		=	channels[drawChannel].numSamples;
+	float		*cP				=	P;
+	float		*cC				=	C;
+	float		*cN				=	N;
+	float		*cdP			=	dP;
+	CPointCloudPoint	*cT		=	items+1;
 
 	// Collect and dispatch the photons
 	for (i=numItems-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
@@ -365,7 +368,15 @@ void	CPointCloud::draw() {
 		movvv(cP,cT->P);
 		movvv(cN,cT->N);
 		*cdP	=	cT->dP;		// was /dPscale;	but should already be in world
-		movvv(cC,dataPointers.array[cT->entryNumber]);
+		
+		float *DDs = dataPointers.array[cT->entryNumber]+sampleStart;
+		if (numSamples == 1) {
+			initv(cC,DDs[0]);
+		} else if (numSamples == 2) {
+			initv(cC,DDs[0],DDs[1],0);
+		} else {
+			movvv(cC,DDs);
+		}
 	}
 
 	if (j != chunkSize) {
@@ -386,6 +397,16 @@ int			CPointCloud::keyDown(int key) {
 		return TRUE;
 	} else if ((key == 'p') || (key == 'P')) {
 		drawDiscs = FALSE;
+		return TRUE;
+	} else if ((key == 'q') || (key == 'Q')) {
+		drawChannel--;
+		if (drawChannel < 0) drawChannel = 0;
+		printf("channel : %s\n",channels[drawChannel].name);
+		return TRUE;
+	} else if ((key == 'w') || (key == 'W')) {
+		drawChannel++;
+		if (drawChannel >= numChannels) drawChannel = numChannels-1;
+		printf("channel : %s\n",channels[drawChannel].name);
 		return TRUE;
 	}
 

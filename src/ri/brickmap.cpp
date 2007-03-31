@@ -47,6 +47,7 @@ int			CBrickMap::currentMemory	=	0;				// The currently used memory abount
 int			CBrickMap::maxMemory		=	0;				// The maximum memory for brickmaps
 int			CBrickMap::detailLevel		=	2;				// The detail level
 int			CBrickMap::drawType			=	0;				// Draw boxes
+int			CBrickMap::drawChannel		=	0;				// Which channel to draw
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1006,6 +1007,8 @@ void				CBrickMap::draw() {
 	float		N[chunkSize*3];
 	float		R[chunkSize];
 	int			j;
+	int			sampleStart		=	channels[drawChannel].sampleStart;
+	int			numSamples		=	channels[drawChannel].numSamples;
 	float		*cP				=	P;
 	float		*cC				=	C;
 	float		*cN				=	N;
@@ -1106,12 +1109,19 @@ void				CBrickMap::draw() {
 		
 		// For each voxel
 		for(int zi=0;zi<BRICK_SIZE;zi++) for(int yi=0;yi<BRICK_SIZE;yi++) for(int xi=0;xi<BRICK_SIZE;xi++) {
-			vector	cent;
+			vector	cent,Ctmp;
 
 			initv(cent,x*sz + xi*(sz/(float) BRICK_SIZE),y*sz + yi*(sz/(float) BRICK_SIZE),z*sz + zi*(sz/(float) BRICK_SIZE));
 	
 			// Save values before we update
-			float *DDs = DD;
+			float *DDs = DD + sampleStart;
+			if (numSamples == 1) {
+				initv(Ctmp,DDs[0]);
+				DDs = Ctmp;
+			} else if (numSamples == 2) {
+				initv(Ctmp,DDs[0],DDs[1],0);
+				DDs = Ctmp;
+			}
 			float wt = vx->weight;
 			float *norm = vx->N;
 			
@@ -1222,6 +1232,16 @@ int			CBrickMap::keyDown(int key) {
 		return TRUE;
 	} else if ((key == 'p') || (key == 'P')) {
 		drawType = 2;
+		return TRUE;
+	} else if ((key == 'q') || (key == 'Q')) {
+		drawChannel--;
+		if (drawChannel < 0) drawChannel = 0;
+		printf("channel : %s\n",channels[drawChannel].name);
+		return TRUE;
+	} else if ((key == 'w') || (key == 'W')) {
+		drawChannel++;
+		if (drawChannel >= numChannels) drawChannel = numChannels-1;
+		printf("channel : %s\n",channels[drawChannel].name);
 		return TRUE;
 	}
 

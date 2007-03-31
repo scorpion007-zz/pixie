@@ -85,6 +85,7 @@ private:
 	TMutex					mutex;
 	
 	static	int				drawDiscs;			// Which type to draw
+	static	int				drawChannel;		// Which channel to draw
 	
 	friend			void	makeTexture3D(const char *,const char *,TSearchpath *,int,char **,void **);
 	
