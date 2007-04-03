@@ -54,6 +54,14 @@ public:
 	void					lookup(float *,const float *,const float *,float);
 
 protected:
+	void					average(CPointCloudPoint *dest,int numItems,int *indices) {
+
+								dest->dP	=	0;
+								for (int i=0;i<numItems;i++) {
+									dest->dP	+=	items[indices[i]].dP;
+								}
+								dest->dP	/=	(float) numItems;
+							}
 };
 
 #endif

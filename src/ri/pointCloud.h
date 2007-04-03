@@ -54,9 +54,9 @@ public:
 // Comments				:
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
-							CPointCloud(const char *,const float *from,const float *to,const float *toNDC,const char*,int);
-							CPointCloud(const char *,const float *from,const float *to,const float *toNDC,int,char **,char **,int);
-							CPointCloud(const char *,const float *from,const float *to,FILE *);
+							CPointCloud(const char *name,const float *from,const float *to,const float *toNDC,const char*,int);
+							CPointCloud(const char *name,const float *from,const float *to,const float *toNDC,int,char **,char **,int);
+							CPointCloud(const char *name,const float *from,const float *to,FILE *);
 							~CPointCloud();
 
 							// Misc interface
