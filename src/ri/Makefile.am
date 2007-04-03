@@ -38,6 +38,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				pl.cpp \
 				points.cpp \
 				pointCloud.cpp \
+				pointHierarchy.cpp \
 				polygons.cpp \
 				ptcapi.cpp \
 				quadrics.cpp \

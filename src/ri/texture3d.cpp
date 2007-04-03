@@ -302,7 +302,7 @@ void CTexture3d::prepareInterpolatedSample(float *C,float **samples,CTexture3dCh
 			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
 			
 			dest	= C + binding->sampleStart;
-			for (int j=0;j<binding->numSamples;j++,dest++)			*dest *= 0.25;
+			for (int j=0;j<binding->numSamples;j++,dest++)			*dest *= 0.25f;
 		} else {
 			// GSHTODO : zero / fill the samples
 		}

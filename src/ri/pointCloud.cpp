@@ -99,8 +99,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	int		i;
 
 	// Create our data areas
-	memory				= new CMemStack;
-	flush				= FALSE;
+	memory	=	new CMemStack;
+	flush	=	FALSE;
 	
 	osCreateMutex(mutex);
 
@@ -120,7 +120,7 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	// Note that we have one additional layer of indirection
 	// here, but it allows us to reorder the data on load so that
 	// it is more likely to be cache-coherent
-	for (i=1;i<numItems;i++) {
+	for (i=1;i<=numItems;i++) {
 		CPointCloudPoint *p = items + i;
 		float *mem = (float*) memory->alloc(dataSize*sizeof(float));
 		fread(mem,sizeof(float),dataSize,in);
@@ -182,7 +182,7 @@ void	CPointCloud::write() {
 	
 		
 		// Write out the data
-		for (int i = 1; i < numItems; i++) {
+		for (int i = 1; i <= numItems; i++) {
 			CPointCloudPoint *p = items + i;
 			fwrite(dataPointers.array[p->entryNumber],sizeof(float),dataSize,out);
 		}
@@ -356,7 +356,7 @@ void	CPointCloud::draw() {
 	CPointCloudPoint	*cT		=	items+1;
 
 	// Collect and dispatch the photons
-	for (i=numItems-1,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
+	for (i=numItems,j=chunkSize;i>0;i--,cT++,cP+=3,cdP++,cN+=3,cC+=3,j--) {
 		if (j == 0)	{
 			if (drawDiscs)		drawDisks(chunkSize,P,dP,N,C);
 			else			 	drawPoints(chunkSize,P,C);

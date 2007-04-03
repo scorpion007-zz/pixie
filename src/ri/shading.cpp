@@ -378,7 +378,6 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	CShadingContext

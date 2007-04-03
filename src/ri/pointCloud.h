@@ -44,13 +44,13 @@
 // Comments				:
 class	CPointCloudPoint : public CMapItem {
 public:
-	float			dP;				// The sample radius
-	int				entryNumber;	// The index to find the associated data
+	float					dP;				// The sample radius
+	int						entryNumber;	// The index to find the associated data
 };
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
-// Description			:	A Photon map
+// Class				:	CPointCloud
+// Description			:	A collection of points
 // Comments				:
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
@@ -59,20 +59,21 @@ public:
 							CPointCloud(const char *,const float *from,const float *to,FILE *);
 							~CPointCloud();
 
+							// Misc interface
 	void					reset();
 	void					write();
-
 	void					balance();
 
+							// Store/Lookup interface
 	void					store(const float *,const float *,const float *,float);
 	void					lookup(float *,const float *,const float *,float);
 
+							// CView interface for drawing
 	void					draw();
 	int						keyDown(int);
-	
 	void					bound(float *bmin,float *bmax);
 	
-	// ptcApi interface
+							// ptcApi interface
 	int						getNumPoints() { return numItems; }
 	void					getPoint(int i,float *C,float *P,float *N,float *dP);
 

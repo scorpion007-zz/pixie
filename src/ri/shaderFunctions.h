@@ -2358,7 +2358,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									tex->prepareSample(lookup->valueSpace[thread],channelValues,lookup->bindings);	\
 									tex->store(lookup->valueSpace[thread],op3,op4,*radius);							\
 								} else if (curU < uVerts-1 && curV < vVerts-1) {									\
-									const float	Rinterp = 0.25*(radius[0] + radius[1] + radius[uVerts] + radius[uVerts+1]);		\
+									const float	Rinterp = 0.25f*(radius[0] + radius[1] + radius[uVerts] + radius[uVerts+1]);		\
 									vector		Pinterp,Ninterp;													\
 									Pinterp[0] = 0.25f*(op3[0] + op3[3] + op3[3*uVerts]   + op3[3+3*uVerts]);		\
 									Pinterp[1] = 0.25f*(op3[1] + op3[4] + op3[1+3*uVerts] + op3[4+3*uVerts]);		\

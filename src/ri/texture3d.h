@@ -49,8 +49,8 @@ public:
 	char					name[64];		// Name of the channel
 	int						numSamples;		// The size of channel sample
 	int						sampleStart;	// Offset of the sample in the stack
-	EVariableType			type;			// The funamental type
 	float					*fill;			// The sample defaults
+	EVariableType			type;			// The funamental type
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -59,11 +59,12 @@ public:
 // Comments				:
 class	CTexture3d : public CFileResource, public CView {
 public:
-							CTexture3d(const char *,const float *from,const float *to,const float *tondc=NULL,int numChannels=0,CTexture3dChannel *channels=NULL);
+							CTexture3d(const char *name,const float *from,const float *to,const float *tondc=NULL,int numChannels=0,CTexture3dChannel *channels=NULL);
 	virtual					~CTexture3d();
 
-	virtual	void			lookup(float *,const float *,const float *,float) = 0;
-	virtual	void			store(const float *,const float *,const float *,float) = 0;
+	virtual	void			lookup(float *,const float *,const float *,float)		= 0;
+	virtual	void			store(const float *,const float *,const float *,float)	= 0;
+
 	int						bindChannelNames(int&,const char **,CTexture3dChannel ***);
 	void					prepareSample(float*,float **,CTexture3dChannel **);
 	void					prepareInterpolatedSample(float*,float **,CTexture3dChannel **,int,int);
@@ -84,7 +85,7 @@ protected:
 	
 	int						dataSize;			// The size of each data sample
 	matrix					from,to;			// The transformation to the coordinate system
-	matrix					toNDC;				// the viewing transform
+	matrix					toNDC;				// The viewing transform
 	float					dPscale;			// The amount we need to scale dP by
 	int						numChannels;		// Number of channels
 	CTexture3dChannel		*channels;			// List of channels

@@ -439,14 +439,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\gi.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\gi.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\harmonics.h"
 				>
 			</File>
@@ -464,6 +456,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\linsys.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\map.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\mapHierarchy.h"
 				>
 			</File>
 			<File
@@ -1414,6 +1414,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\ri\pointCloud.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\pointHierarchy.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\pointHierarchy.h"
 				>
 			</File>
 			<File
