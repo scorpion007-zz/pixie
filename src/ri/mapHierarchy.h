@@ -109,9 +109,9 @@ public:
 							CMap<T>::write(out);
 
 							// Write the hierarchy next
-							fwrite(&nodes.numItems,sizeof(int),1,in);
-							fwrite(&root,sizeof(int),1,in);
-							fwrite(nodes.array,sizeof(T),nodes.numItems,in);
+							fwrite(&nodes.numItems,sizeof(int),1,out);
+							fwrite(&root,sizeof(int),1,out);
+							fwrite(nodes.array,sizeof(T),nodes.numItems,out);
 						}
 
 
@@ -128,11 +128,11 @@ public:
 						
 							// Get the item pointers into a temporary array
 							int	i;
-							int	*tmp	=	(int *) ralloc(numItems*sizeof(int),context->threadMemory);
-							for (i=1;i<=numItems;i++)	tmp[i-1]	=	i;
+							int	*tmp	=	(int *) ralloc(CMap<T>::numItems*sizeof(int),context->threadMemory);
+							for (i=1;i<=CMap<T>::numItems;i++)	tmp[i-1]	=	i;
 		
 							// Compute the map hierarchy
-							root	=	cluster(numItems,tmp,context);
+							root	=	cluster(CMap<T>::numItems,tmp,context);
 							assert(root == nodes.numItems-1);
 
 							// Free the temp memory
@@ -153,8 +153,8 @@ public:
 							initv(P,0);
 							initv(N,0);
 							for (i=0;i<numItems;i++) {
-								addvv(P,items[indices[i]].P);
-								addvv(N,items[indices[i]].N);
+								addvv(P,CMap<T>::items[indices[i]].P);
+								addvv(N,CMap<T>::items[indices[i]].N);
 							}
 
 							// Normalize the thing
@@ -162,10 +162,10 @@ public:
 							normalizev(N);
 
 							// Perform further averagining if necessary
-							T	*newItem	=	store(P,N);
+							T	*newItem	=	CMap<T>::store(P,N);
 							average(newItem,numItems,indices);
 
-							return newItem - items;
+							return newItem - CMap<T>::items;
 						}
 
 private:
@@ -218,7 +218,7 @@ private:
 								// The membership is dummy
 								for (i=0;i<numItems;i++) {
 									membership[i]	=	-1;
-									addBox(bmin,bmax,items[indices[i]].P);
+									addBox(bmin,bmax,CMap<T>::items[indices[i]].P);
 								}
 								
 								vector	C0,C1;
@@ -249,10 +249,10 @@ private:
 									for (i=0;i<numItems;i++) {
 										vector	D;
 										
-										subvv(D,items[indices[i]].P,C0);
+										subvv(D,CMap<T>::items[indices[i]].P,C0);
 										const float d0	=	dotvv(D,D);
 										
-										subvv(D,items[indices[i]].P,C1);
+										subvv(D,CMap<T>::items[indices[i]].P,C1);
 										const float d1	=	dotvv(D,D);
 										
 										if (d0 < d1) {
@@ -261,7 +261,7 @@ private:
 												membership[i]	=	0;
 											}
 
-											addvv(nC0,items[indices[i]].P);
+											addvv(nC0,CMap<T>::items[indices[i]].P);
 											num0++;
 										} else {
 											if (membership[i] != 1) {
@@ -269,7 +269,7 @@ private:
 												membership[i]	=	1;
 											}
 
-											addvv(nC1,items[indices[i]].P);
+											addvv(nC1,CMap<T>::items[indices[i]].P);
 											num1++;
 										}
 									}

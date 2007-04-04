@@ -831,7 +831,7 @@ public:
 		T				*array;
 		int				numItems;
 		int				arraySize;
-private:
+protected:
 		int				stepSize;
 };
 
@@ -844,31 +844,31 @@ private:
 // Comments				:	This class provides iteration functionality over an array
 template <class T>	class CList : public CArray<T> {
 public:
-						CList() : CArray() {
+						CList() {
 							currentItem	=	0;
 						}
 
 
 		T				first()	{
-							if (numItems == 0)	return 0;
+							if (CArray<T>::numItems == 0)	return 0;
 
 							currentItem	=	0;
-							return array[currentItem];
+							return CArray<T>::array[currentItem];
 						}
 
 		T				last() {
-							if (numItems == 0)	return 0;
+							if (CArray<T>::numItems == 0)	return 0;
 
-							currentItem	=	numItems-1;
-							return array[currentItem];
+							currentItem	=	CArray<T>::numItems-1;
+							return CArray<T>::array[currentItem];
 						}
 
 		T				next() {
 							currentItem++;
 
-							if (currentItem == numItems)	return 0;
+							if (currentItem == CArray<T>::numItems)	return 0;
 
-							return array[currentItem];
+							return CArray<T>::array[currentItem];
 						}
 
 		T				prev() {
@@ -876,7 +876,7 @@ public:
 
 							if (currentItem == -1)			return 0;
 
-							return array[currentItem];
+							return CArray<T>::array[currentItem];
 						}
 
 

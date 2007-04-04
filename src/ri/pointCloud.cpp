@@ -114,6 +114,7 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	
 	// Read the data
 	fread(data.array,sizeof(float),numItems*dataSize,in);
+	data.numItems	=	numItems*dataSize;
 
 	// Close the file
 	fclose(in);

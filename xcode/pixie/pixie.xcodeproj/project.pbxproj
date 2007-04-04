@@ -78,6 +78,7 @@
 		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
 		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
 		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
+		18AC98FF0BC340D6003682A7 /* mapHierarchy.h in Headers */ = {isa = PBXBuildFile; fileRef = 18AC98FE0BC340D6003682A7 /* mapHierarchy.h */; };
 		18B045E20B7D794C00500420 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 18B045E10B7D794C00500420 /* config.h */; };
 		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
 		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
@@ -953,6 +954,7 @@
 		189830A00BAF85F9004D6C61 /* ifexpr.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = ifexpr.l; path = ../../src/ri/ifexpr.l; sourceTree = SOURCE_ROOT; };
 		189830A10BAF85F9004D6C61 /* ifexpr.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = ifexpr.y; path = ../../src/ri/ifexpr.y; sourceTree = SOURCE_ROOT; };
 		189830A20BAF8618004D6C61 /* ifexpr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ifexpr.cpp; path = ../../src/ri/ifexpr.cpp; sourceTree = SOURCE_ROOT; };
+		18AC98FE0BC340D6003682A7 /* mapHierarchy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mapHierarchy.h; path = ../../src/ri/mapHierarchy.h; sourceTree = SOURCE_ROOT; };
 		18B045E10B7D794C00500420 /* config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = config.h; path = ../../src/ri/config.h; sourceTree = SOURCE_ROOT; };
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
@@ -1780,6 +1782,7 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
+				18AC98FE0BC340D6003682A7 /* mapHierarchy.h */,
 				18E14A5E0BC216490061F88C /* ptcapi.cpp */,
 				18E14A5A0BC2161E0061F88C /* pointHierarchy.cpp */,
 				18E14A5B0BC2161E0061F88C /* pointHierarchy.h */,
@@ -2150,6 +2153,7 @@
 				182D83380BB70AE300B0689A /* map.h in Headers */,
 				182651CB0BBA0B52007B2C37 /* ptcapi.h in Headers */,
 				18E14A5D0BC2161E0061F88C /* pointHierarchy.h in Headers */,
+				18AC98FF0BC340D6003682A7 /* mapHierarchy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
