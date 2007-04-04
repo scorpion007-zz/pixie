@@ -152,9 +152,6 @@ typedef struct TSearchpath {
 
 
 
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSymbol
 // Description			:	This class is used as a base class for anything that has a name.
@@ -265,16 +262,16 @@ public:
 
 	CVariable				*getVariable(char *,int probe=FALSE);		// Gets the variable record associated with the name. Returns null if the variable doesn't exist
 																		// Gets the function associated with the name and the parameter list. Retuns NULL if not found
-	CFunction				*getFunction(char *,CArray<CExpression *> *,int returnType = SLC_NONE);	
+	CFunction				*getFunction(char *,CList<CExpression *> *,int returnType = SLC_NONE);	
 
 	CExpression				*initExpression;
 	CExpression				*code;
 
 	CParameter				*returnValue;								// The return value
 	int						returnValueGiven;							// TRUE if the return value was given
-	CArray<CParameter *>	*parameters;								// List of parameters
-	CArray<CVariable *>		*variables;									// List of variables
-	CArray<CFunction *>		*functions;									// List of functions
+	CList<CParameter *>		*parameters;								// List of parameters
+	CList<CVariable *>		*variables;									// List of variables
+	CList<CFunction *>		*functions;									// List of functions
 	char					*name;										// Name of the function
 	CFunction				*parent;									// Parent function (in static scope)
 };
@@ -315,9 +312,9 @@ public:
 						~CFunctionPrototype();
 
 																		// Returns TRUE if the given function matches perfectly to this
-	int					perfectMatch(char *,CArray<CExpression *> *,int dt = SLC_NONE);	
+	int					perfectMatch(char *,CList<CExpression *> *,int dt = SLC_NONE);	
 																		// Returns TRUE if these two functions are compatible
-	int					match(char *,CArray<CExpression *> *,int dt = SLC_NONE);	
+	int					match(char *,CList<CExpression *> *,int dt = SLC_NONE);	
 																		// Returns the function call code
 	
 	char				*prototype;										// The prototype of the function (e.g.: "f=f" for sin)
@@ -359,7 +356,7 @@ public:
 																		// The following two functions are
 																		// used to search the context for a function
 																		// or a variable
-	CFunction			*getFunction(char *,CArray<CExpression *> *);
+	CFunction			*getFunction(char *,CList<CExpression *> *);
 	CVariable			*getVariable(char *);
 
 	void				define(CSymbol *);								// Define a symbol here
@@ -402,16 +399,16 @@ int						settings;										// The compiler settings
 
 CFunction				*rootFunction;									// The topmost function
 CFunction				*shaderFunction;								// The shader function
-CArray<CVariable *>		*variables;										// List of all the variables
-CArray<CVariable *>		*temporaryRegisters;							// List of temporary registers
+CList<CVariable *>		*variables;										// List of all the variables
+CList<CVariable *>		*temporaryRegisters;							// List of temporary registers
 int						numTemporaryRegisters;							// Number of temporary registers
 int						numLabels;										// Number of labels
 
-CArray<CFunction *>		*functionStack;									// The current function stack
-CArray<CFunction *>		*runtimeFunctionStack;							// The runtime function stack
+CList<CFunction *>		*functionStack;									// The current function stack
+CList<CFunction *>		*runtimeFunctionStack;							// The runtime function stack
 CFunction				*lastFunction;									// The stack top in the function stack
 
-CArray<char *>			*allocatedStrings;								// A list of all the allocated strings
+CList<char *>			*allocatedStrings;								// A list of all the allocated strings
 																		// (So that we can deallocated them later at once)
 																		// FIXME: This structure can also be used to prune the allocated strings in
 																		// the middle of compilation if the allocated strings are not needed anymore.
@@ -426,21 +423,21 @@ char					*sourceFile;									// The current source file
 char					*shaderName;									// The name of the shader
 int						shaderType;										// The type of the shader
 
-CArray<CFunctionPrototype *>		*builtinFunctions;					// List of all the built-in functions
-CArray<CVariable *>					*globalVariables;					// List of all global variables
+CList<CFunctionPrototype *>		*builtinFunctions;					// List of all the built-in functions
+CList<CVariable *>				*globalVariables;					// List of all global variables
 
 																		// The stuff below is used to keep track of the type context information so that
 																		// We can figure out what variable type we want to have for "texture" or "noise" like calls
 																		// The management routines are extremely ugly
 int						desiredType;									// The desired type in the current context
-CArray<int>				*desiredTypeStack;
+CList<int>				*desiredTypeStack;
 
 																		// The following stuff is used to manage the 
 																		// parameter lists that are passed to functions
 																		// (somewhat ugly)
-CArray<CVariable *>				*variableList;							// Internal stuff
-CArray<CArray<CExpression *> *>	*actualParameterStack;
-CArray<CExpression *>			*actualParameters;
+CList<CVariable *>				*variableList;							// Internal stuff
+CList<CList<CExpression *> *>	*actualParameterStack;
+CList<CExpression *>			*actualParameters;
 
 int								requiredShaderContext;					// This holds the shader types that the code expects
 																		// For example, is the code has an illuminate statement, the

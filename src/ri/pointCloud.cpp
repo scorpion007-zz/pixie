@@ -54,7 +54,6 @@ int			CPointCloud::drawChannel	=	0;
 // Comments				:	for a write-mode map, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
 	// Create our data areas
-	memory				= new CMemStack;
 	flush				= write;
 
 	osCreateMutex(mutex);
@@ -75,7 +74,6 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 // Comments				:	for a write-mode map via ptcapi, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,int numChannels,char **channelNames,char **channelTypes,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
 	// Create our data areas
-	memory				= new CMemStack;
 	flush				= write;
 
 	osCreateMutex(mutex);
@@ -96,10 +94,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
-	int		i;
 
 	// Create our data areas
-	memory	=	new CMemStack;
 	flush	=	FALSE;
 	
 	osCreateMutex(mutex);
@@ -113,22 +109,13 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	// Read the points
 	CMap<CPointCloudPoint>::read(in);
 
-	// reserve dataPointer space
-	dataPointers.reserve(numItems);
+	// Reserve the actual space
+	data.reserve(numItems*dataSize);
 	
 	// Read the data
-	// Note that we have one additional layer of indirection
-	// here, but it allows us to reorder the data on load so that
-	// it is more likely to be cache-coherent
-	for (i=1;i<=numItems;i++) {
-		CPointCloudPoint *p = items + i;
-		float *mem = (float*) memory->alloc(dataSize*sizeof(float));
-		fread(mem,sizeof(float),dataSize,in);
-		dataPointers[p->entryNumber] = mem;
-			// entries are not in entryNumber order, but are now locality
-			// sorted
-	}
-			
+	fread(data.array,sizeof(float),numItems*dataSize,in);
+
+	// Close the file
 	fclose(in);
 }
 
@@ -142,8 +129,6 @@ CPointCloud::~CPointCloud() {
 	osDeleteMutex(mutex);
 
 	if (flush) write();
-	
-	delete memory;
 }
 
 
@@ -180,13 +165,10 @@ void	CPointCloud::write() {
 		// Write the map
 		CMap<CPointCloudPoint>::write(out);
 	
-		
-		// Write out the data
-		for (int i = 1; i <= numItems; i++) {
-			CPointCloudPoint *p = items + i;
-			fwrite(dataPointers.array[p->entryNumber],sizeof(float),dataSize,out);
-		}
+		// Write the data
+		fwrite(data.array,sizeof(float),numItems*dataSize,out);
 
+		// Close the file
 		fclose(out);
 	} else {
 		error(CODE_BADFILE,"Unable to open %s for writing\n",name);
@@ -248,7 +230,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		if ((dotvv(p->N,l.N) < 0) || (NdotN <= 0)) {
 			const float	weight	=	1.0f/(distances[i]+C_EPSILON);
 			float		*dest	=	Cl;
-			const float	*src	=	dataPointers.array[p->entryNumber];
+			const float	*src	=	data.array + p->entryNumber;
 			for (j=0;j<dataSize;j++) {
 				*dest++			+=	(*src++)*weight;
 			}
@@ -272,16 +254,15 @@ void	CPointCloud::balance() {
 	if (numItems == 0) {
 		vector	P		=	{0,0,0};
 		vector	N		=	{0,0,0};
-		
-		CPointCloudPoint	*point	=	CMap<CPointCloudPoint>::store(P,N);
-		
-		float *data = (float*) memory->alloc(dataSize*sizeof(float));
+		float	*data	=	(float*) alloca(dataSize*sizeof(float));
+
 		for (int i=0;i<dataSize;i++)	data[i] = 0;
-		point->entryNumber	=	dataPointers.numItems;
-		point->dP			=	0;
-		dataPointers.push(data);
+
+		// Store the fake data
+		store(data,P,N,0);
 	}
 
+	// Balance the data
 	CMap<CPointCloudPoint>::balance();
 }
 
@@ -300,17 +281,15 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	// Store in the world coordinate system
 	mulmp(P,to,cP);
 	mulmn(N,from,cN);
-	dP			*=	dPscale;
+	dP					*=	dPscale;
 	
 	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
 	point				=	CMap<CPointCloudPoint>::store(P,N);
-	
-	float *data			=	(float*) memory->alloc(dataSize*sizeof(float));
-	memcpy(data,C,dataSize*sizeof(float));
-	point->entryNumber	=	dataPointers.numItems;
+	point->entryNumber	=	data.numItems;
 	point->dP			=	dP;
-	
-	dataPointers.push(data);
+
+	for (int i=0;i<dataSize;i++)	data.push(C[i]);
+
 	osUnlock(mutex);
 }
 
@@ -322,7 +301,7 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 // Comments				:
 void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
 	const	CPointCloudPoint	*p		=	items + i;
-	const float 				*src	=	dataPointers.array[p->entryNumber];
+	const float 				*src	=	data.array + p->entryNumber;
 	float						*dest	=	C;
 	
 	for (int j=0;j<dataSize;j++) {
@@ -371,7 +350,7 @@ void	CPointCloud::draw() {
 		movvv(cN,cT->N);
 		*cdP	=	cT->dP;		// was /dPscale;	but should already be in world
 		
-		float *DDs = dataPointers.array[cT->entryNumber]+sampleStart;
+		float *DDs = data.array + cT->entryNumber + sampleStart;
 		if (numSamples == 1) {
 			initv(cC,DDs[0]);
 		} else if (numSamples == 2) {

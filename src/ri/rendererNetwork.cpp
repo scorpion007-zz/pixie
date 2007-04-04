@@ -90,16 +90,18 @@ void			CRenderer::shutdownNetwork() {
 // Description			:	Send data on the network
 // Return Value			:
 // Comments				:
-void		rcSend(SOCKET s,char *data,int n,int toNetwork) {
+void		rcSend(SOCKET s,const void *dataToSend,int n,int toNetwork) {
 	int	i,j;
 
 	if (toNetwork) {
-		T32	*buf	=	(T32 *) data;
+		T32	*buf	=	(T32 *) dataToSend;
 
 		for (i=n>>2;i>0;i--,buf++) {
 			buf->integer	=	htonl(buf->integer);
 		}
 	}
+
+	const char	*data	=	(const char *) dataToSend;
 
 	j	= n;
 	i	= send(s,data,j,0);
@@ -132,9 +134,9 @@ void		rcSend(SOCKET s,char *data,int n,int toNetwork) {
 // Description			:	Receive data from network
 // Return Value			:
 // Comments				:
-void		rcRecv(SOCKET s,char *data,int n,int toNetwork) {
-	int	i,j;
-	T32	*buf = (T32 *) data;
+void		rcRecv(SOCKET s,void *dataToReceive,int n,int toNetwork) {
+	int		i,j;
+	char	*data	=	(char *) dataToReceive;
 
 	j	= n;
 	i	= recv(s,data,j,0);
@@ -156,6 +158,8 @@ void		rcRecv(SOCKET s,char *data,int n,int toNetwork) {
 	}
 
 	if (toNetwork) {
+		T32		*buf	=	 (T32 *) dataToReceive;
+
 		for (i=n>>2;i>0;i--,buf++) {
 			buf->integer	=	ntohl(buf->integer);
 		}
@@ -329,7 +333,7 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 
 		// Tell the server that we found the file
 		netBuffer[0].integer	=	NET_ACK;
-		rcSend(netServers[index],(char *) netBuffer,sizeof(T32));
+		rcSend(netServers[index],netBuffer,sizeof(T32));
 
 		// Get the size of the file to send
 		if (size == 0) {
@@ -343,7 +347,7 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 
 		// Tell the server the length of the file
 		netBuffer[0].integer	=	size;
-		rcSend(netServers[index],(char *) netBuffer,sizeof(T32));
+		rcSend(netServers[index],netBuffer,sizeof(T32));
 
 		// Transfer the file
 		fseek(in,start,SEEK_SET);
@@ -358,7 +362,7 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 
 		// File could not be found
 		netBuffer[0].integer	=	NET_NACK;
-		rcSend(netServers[index],(char *) netBuffer,sizeof(T32));
+		rcSend(netServers[index],netBuffer,sizeof(T32));
 	}
 }
 
@@ -384,13 +388,13 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 	buffer[3].integer	=	i*sizeof(T32);
 
 	// Send the file request
-	rcSend(netClient,(char *) buffer,4*sizeof(T32));
+	rcSend(netClient,buffer,4*sizeof(T32));
 
 	// Send the file name
 	strcpy(&buffer[0].character,inName);
-	rcSend(netClient,(char *) buffer,i*sizeof(T32),FALSE);
+	rcSend(netClient,buffer,i*sizeof(T32),FALSE);
 
-	rcRecv(netClient,(char *) buffer,1*sizeof(T32));
+	rcRecv(netClient,buffer,1*sizeof(T32));
 	if (buffer->integer == NET_NACK) {
 		r	=	0;
 	} else {
@@ -398,7 +402,7 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 		char	buf[BUFFER_LENGTH];
 
 		// Get the size of the file first
-		rcRecv(netClient,(char *) &tsize,sizeof(int));
+		rcRecv(netClient,&tsize,sizeof(int));
 
 		// Write down the file
 		for (csize=tsize;csize>0;csize-=BUFFER_LENGTH) {
@@ -486,7 +490,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 		sscanf(tmp,"%d",&netClient);
 
 		// Figure out the version junk
-		rcRecv(netClient,(char *) netBuffer,4*sizeof(T32));
+		rcRecv(netClient,netBuffer,4*sizeof(T32));
 
 		// Check the message
 		if (netBuffer[0].integer != NET_CONNECT) {
@@ -504,7 +508,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 		}
 
 		// Accept or decline the connection
-		rcSend(netClient,(char *) netBuffer,sizeof(T32));
+		rcSend(netClient,netBuffer,sizeof(T32));
 	} else if ((strncmp(tmp,"servers=",8) == 0) || (strncmp(tmp,"killservers=",12) == 0)) {
 		socklen_t	servLen		=	sizeof(sockaddr_in);
 		sockaddr_in	serv;
@@ -598,8 +602,8 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 					netBuffer[1].integer	=	VERSION_RELEASE;
 					netBuffer[2].integer	=	VERSION_BETA;
 					netBuffer[3].integer	=	VERSION_ALPHA;
-					rcSend(control,(char *) netBuffer,4*sizeof(T32));	// Send the client version
-					rcRecv(control,(char *) netBuffer,1*sizeof(T32));	// Expect an ACK
+					rcSend(control,netBuffer,4*sizeof(T32));	// Send the client version
+					rcRecv(control,netBuffer,1*sizeof(T32));	// Expect an ACK
 
 					if (netBuffer[0].integer == NET_ACK) {
 						// Connection is successful
@@ -660,8 +664,8 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 				netBuffer[1].integer	=	VERSION_RELEASE;
 				netBuffer[2].integer	=	VERSION_BETA;
 				netBuffer[3].integer	=	VERSION_ALPHA;
-				rcSend(control,(char *) netBuffer,4*sizeof(T32));	// Send the client version
-				rcRecv(control,(char *) netBuffer,1*sizeof(T32));	// Expect an ACK
+				rcSend(control,netBuffer,4*sizeof(T32));	// Send the client version
+				rcRecv(control,netBuffer,1*sizeof(T32));	// Expect an ACK
 
 				if (netBuffer[0].integer == NET_ACK) {
 					// Connection is successful

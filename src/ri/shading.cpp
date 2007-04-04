@@ -416,11 +416,20 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 	randomInit(5489*(thread+1));
 
 	// Init the stats
-	numShade				=	0;
-	numSampled				=	0;
-	numShaded				=	0;
-	vertexMemory			=	0;
-	peakVertexMemory		=	0;
+	numIndirectDiffuseRays				=	0;
+	numIndirectDiffuseSamples			=	0;
+	numOcclusionRays					=	0;
+	numOcclusionSamples					=	0;
+	numIndirectDiffusePhotonmapLookups	=	0;
+	numShade							=	0;
+	numSampled							=	0;
+	numShaded							=	0;
+	vertexMemory						=	0;
+	peakVertexMemory					=	0;
+	numTracedRays						=	0;
+	numReflectionRays					=	0;
+	numTransmissionRays					=	0;
+	numGatherRays						=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -462,13 +471,18 @@ CShadingContext::~CShadingContext() {
 	assert(vertexMemory == 0);
 
 	// Update the global statistics
-	stats.numShade				+=		numShade;
-	stats.numSampled			+=		numSampled;
-	stats.numShaded				+=		numShaded;
-	stats.numTracedRays			+=		numTracedRays;
-	stats.numReflectionRays		+=		numReflectionRays;
-	stats.numTransmissionRays	+=		numTransmissionRays;
-	stats.numGatherRays			+=		numGatherRays;
+	stats.numIndirectDiffuseRays				+=	numIndirectDiffuseRays;
+	stats.numIndirectDiffuseSamples				+=	numIndirectDiffuseSamples;
+	stats.numOcclusionRays						+=	numOcclusionRays;
+	stats.numOcclusionSamples					+=	numOcclusionSamples;
+	stats.numIndirectDiffusePhotonmapLookups	+=	numIndirectDiffusePhotonmapLookups;
+	stats.numShade								+=	numShade;
+	stats.numSampled							+=	numSampled;
+	stats.numShaded								+=	numShaded;
+	stats.numTracedRays							+=	numTracedRays;
+	stats.numReflectionRays						+=	numReflectionRays;
+	stats.numTransmissionRays					+=	numTransmissionRays;
+	stats.numGatherRays							+=	numGatherRays;
 }
 
 

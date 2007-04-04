@@ -296,7 +296,7 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 		osLock(networkMutex);
 
 		header[0].integer	=	NET_READY;
-		rcSend(netClient,(char *) header,	1*sizeof(T32));
+		rcSend(netClient,header,	1*sizeof(T32));
 
 		header[0].integer	=	left;
 		header[1].integer	=	top;
@@ -304,9 +304,9 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 		header[3].integer	=	ypixels;
 		header[4].integer	=	xpixels*ypixels*numSamples;
 
-		rcSend(netClient,(char *) header,	5*sizeof(T32));
-		rcRecv(netClient,(char *) &a,		1*sizeof(T32));
-		rcSend(netClient,(char *) pixels,xpixels*ypixels*numSamples*sizeof(T32));
+		rcSend(netClient,header,	5*sizeof(T32));
+		rcRecv(netClient,&a,		1*sizeof(T32));
+		rcSend(netClient,pixels,xpixels*ypixels*numSamples*sizeof(T32));
 
 		// Unlock network
 		osUnlock(networkMutex);

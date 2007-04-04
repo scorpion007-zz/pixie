@@ -263,6 +263,12 @@ public:
 		CSobol<2>				random2d;											// 2D random number generator
 		CSobol<3>				random3d;											// 3D random number generator
 		CSobol<4>				random4d;											// 4D random number generator
+
+		int						numIndirectDiffuseRays;
+		int						numIndirectDiffuseSamples;
+		int						numOcclusionRays;
+		int						numOcclusionSamples;
+		int						numIndirectDiffusePhotonmapLookups;
 protected:
 		// Hiders can hook into the following functions
 		virtual	void			solarBegin(const float *,const float *) { }

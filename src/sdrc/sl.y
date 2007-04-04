@@ -88,7 +88,7 @@
   CExpression			*expression;
   float					real;
   int					integer;
-  CArray<CExpression *>	*array;
+  CList<CExpression *>	*array;
 }
 //////////////////////////////////////////////////////////////////////////
 // Token definitions
@@ -1353,7 +1353,7 @@ slAssignmentStatement:
 				$$	=	new CArrayAssignmentExpression(cVar,$3,$7);
 				sdr->undesire();
 			} else {
-				CArray<CExpression *>	*dummyParams = new CArray<CExpression *>;
+				CList<CExpression *>	*dummyParams = new CList<CExpression *>;
 				CFunctionPrototype		*cFun;
 
 				dummyParams->push(new CTerminalExpression(cVar));
@@ -1797,7 +1797,7 @@ slGatherHeader:
 		SL_OPEN_PARANTHESIS
 		{
 			sdr->actualParameterStack->push(sdr->actualParameters);
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 		}
 		slGatherParameterList
 		SL_CLOSE_PARANTHESIS
@@ -2204,7 +2204,7 @@ slArrayItems:
 		|
 		slAritmeticExpression
 		{
-			$$	=	new CArray<CExpression *>;
+			$$	=	new CList<CExpression *>;
 			$$->push($1);
 		}
 		;
@@ -2261,7 +2261,7 @@ slAritmeticTerminalValue:
 			} else if (cVar->type & SLC_ARRAY) { 
 				$$	=	new CArrayExpression(cVar,$3);
 			} else {
-				CArray<CExpression *>	*dummyParams = new CArray<CExpression *>;
+				CList<CExpression *>	*dummyParams = new CList<CExpression *>;
 				CFunctionPrototype		*cFun;
 
 				dummyParams->push(new CTerminalExpression(cVar));
@@ -2493,7 +2493,7 @@ slFunctionCall:
 		slTextureCall
 		{
 			CFunctionPrototype		*cFun;
-			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
+			CList<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
 
 			char					*funName	=	$1;
 
@@ -2545,7 +2545,7 @@ slFunCallHeader:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);
@@ -2560,7 +2560,7 @@ slFunCallHeader:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);
@@ -2575,7 +2575,7 @@ slFunCallHeader:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);
@@ -2591,7 +2591,7 @@ slFunCall:
 		SL_CLOSE_PARANTHESIS
 		{
 			CFunction				*cFun;
-			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
+			CList<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
 
 			char					*funName	=	$1;
 
@@ -2708,8 +2708,8 @@ slTextureCall:
 		SL_CLOSE_PARANTHESIS
 		{
 			// Fake the parameters
-			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
-			CArray<CExpression *>	*pl			=	new CArray<CExpression *>;
+			CList<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
+			CList<CExpression *>	*pl			=	new CList<CExpression *>;
 			CExpression				*cExpression;
 
 			pl->push($3);
@@ -2730,8 +2730,8 @@ slTextureCall:
 		SL_CLOSE_PARANTHESIS
 		{
 			// Fake the parameters
-			CArray<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
-			CArray<CExpression *>	*pl			=	new CArray<CExpression *>;
+			CList<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
+			CList<CExpression *>	*pl			=	new CList<CExpression *>;
 			CExpression				*cExpression;
 
 			pl->push($3);
@@ -2754,7 +2754,7 @@ slTextureName:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);
@@ -2767,7 +2767,7 @@ slTextureName:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);
@@ -2780,7 +2780,7 @@ slTextureName:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);
@@ -2793,7 +2793,7 @@ slTextureName:
 			// Save the old parameters
 			sdr->actualParameterStack->push(sdr->actualParameters);
 			// Start a new parameter list
-			sdr->actualParameters	=	new CArray<CExpression *>;
+			sdr->actualParameters	=	new CList<CExpression *>;
 
 			// Make sure we do not do something stupid with the parameters
 			sdr->desire(SLC_NONE);

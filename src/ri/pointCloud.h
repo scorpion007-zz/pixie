@@ -45,7 +45,7 @@
 class	CPointCloudPoint : public CMapItem {
 public:
 	float					dP;				// The sample radius
-	int						entryNumber;	// The index to find the associated data
+	int						entryNumber;	// The index to find the associated data in the "data" array
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -78,8 +78,8 @@ public:
 	void					getPoint(int i,float *C,float *P,float *N,float *dP);
 
 private:
-	CMemStack				*memory;			// Storage for the data
-	CArray<float*>			dataPointers;		// data pointers for each sample	
+	CArray<float>			data;				// This is where we actually keep the data
+
 	int						flush;				// Should this be written to disk?
 	float					searchRadius;
 	

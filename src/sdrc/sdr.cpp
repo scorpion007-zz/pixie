@@ -177,9 +177,9 @@ CFunction::CFunction(char *name,CFunction *p) : CSymbol(name) {
 	this->returnValueGiven	=	FALSE;
 	this->initExpression	=	NULL;
 	this->code				=	NULL;
-	this->parameters		=	new CArray<CParameter *>;
-	this->variables			=	new CArray<CVariable *>;
-	this->functions			=	new CArray<CFunction *>;
+	this->parameters		=	new CList<CParameter *>;
+	this->variables			=	new CList<CVariable *>;
+	this->functions			=	new CList<CFunction *>;
 
 	this->name				=	strdup(name);
 	this->parent			=	p;
@@ -318,11 +318,11 @@ CVariable	*CFunction::getVariable(char *name,int probe) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFunction
-// Method				:	getFunction(char *,CCArray<CCodeBlock *> *,int)	
+// Method				:	getFunction(char *,CList<CCodeBlock *> *,int)	
 // Description			:	This method searches all the defined functions for a match
 // Return Value			:	NULL if no compatible function exists, a pointer to the function othervise
 // Comments				:
-CFunction	*CFunction::getFunction(char *name,CArray<CExpression *> *args,int returnType) {
+CFunction	*CFunction::getFunction(char *name,CList<CExpression *> *args,int returnType) {
 	CFunction	*cFun;
 
 	// Look for an exact match first
@@ -482,7 +482,7 @@ CFunctionPrototype::~CFunctionPrototype() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFunctionPrototype
-// Method				:	perfectMatch(char *,CCArray<CCodeBlock *> *,int)
+// Method				:	perfectMatch(char *,CList<CCodeBlock *> *,int)
 // Description			:	This function returns TRUE if the prototype matches to the given name,argument list and return type exactly
 // Return Value			:	TRUE if the prototype matches exactly
 // Comments				:
@@ -507,7 +507,7 @@ CFunctionPrototype::~CFunctionPrototype() {
 //
 // General prototype format:
 // <return_type>=<parameterType>*
-int			CFunctionPrototype::perfectMatch(char *name,CArray<CExpression *> *pl,int dt) {
+int			CFunctionPrototype::perfectMatch(char *name,CList<CExpression *> *pl,int dt) {
 	CExpression	*cCode;
 	int			cPrototype;
 
@@ -583,11 +583,11 @@ int			CFunctionPrototype::perfectMatch(char *name,CArray<CExpression *> *pl,int 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFunctionPrototype
-// Method				:	match(char *,CCArray<CCodeBlock *> *,int)
+// Method				:	match(char *,CList<CCodeBlock *> *,int)
 // Description			:	This function checks if the prototype is compatible to the given signature
 // Return Value			:	TRUE if compatible, FALSE othervise
 // Comments				:
-int			CFunctionPrototype::match(char *name,CArray<CExpression *> *pl,int dt) {
+int			CFunctionPrototype::match(char *name,CList<CExpression *> *pl,int dt) {
 	CExpression	*cCode;
 	int			cPrototype;
 
@@ -673,16 +673,16 @@ CScriptContext::CScriptContext(int s) {
 																	// all the global variables defined
 	rootFunction			=	new CFunction("root",NULL);
 
-	variables				=	new CArray<CVariable *>;			// Pointers to all defined variables (except function parameters)
-	temporaryRegisters		=	new CArray<CVariable *>;			// Temporary variables used
+	variables				=	new CList<CVariable *>;				// Pointers to all defined variables (except function parameters)
+	temporaryRegisters		=	new CList<CVariable *>;				// Temporary variables used
 	numTemporaryRegisters	=	0;
 	numLabels				=	0;
 
-	functionStack			=	new CArray<CFunction *>;			// The function stack hierarchy
-	runtimeFunctionStack	=	new CArray<CFunction *>;			// The function stack hierarchy
+	functionStack			=	new CList<CFunction *>;				// The function stack hierarchy
+	runtimeFunctionStack	=	new CList<CFunction *>;				// The function stack hierarchy
 	lastFunction			=	rootFunction;
 
-	allocatedStrings		=	new CArray<char *>;					// Pointers to the allocated strings by lex
+	allocatedStrings		=	new CList<char *>;					// Pointers to the allocated strings by lex
 
 	dsoPath					=	NULL;
 
@@ -697,15 +697,15 @@ CScriptContext::CScriptContext(int s) {
 	shaderName				=	NULL;								// The name of the shader
 	shaderType				=	0;
 
-	builtinFunctions		=	new CArray<CFunctionPrototype *>;	// List of built in functions
-	globalVariables			=	new CArray<CVariable *>;			// List of global variables
+	builtinFunctions		=	new CList<CFunctionPrototype *>;	// List of built in functions
+	globalVariables			=	new CList<CVariable *>;			// List of global variables
 
-	desiredTypeStack		=	new CArray<int>;
+	desiredTypeStack		=	new CList<int>;
 	desiredType				=	SLC_NONE;
 
-	variableList			=	new CArray<CVariable *>;
-	actualParameterStack	=	new CArray<CArray<CExpression *> *>;
-	actualParameters		=	new CArray<CExpression *>;
+	variableList			=	new CList<CVariable *>;
+	actualParameterStack	=	new CList<CList<CExpression *> *>;
+	actualParameters		=	new CList<CExpression *>;
 
 	requiredShaderContext	=	SLC_GENERIC | SLC_SURFACE | SLC_LIGHT | SLC_DISPLACEMENT | SLC_TRANSFORMATION | SLC_IMAGER | SLC_VOLUME;
 
@@ -1145,11 +1145,11 @@ void	CScriptContext::addGlobalVariable(char *name,int type,int scope) {
 }
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CScriptContext
-// Method				:	getFunction(char *,CArray<CCodeBlock *>)
+// Method				:	getFunction(char *,CList<CCodeBlock *>)
 // Description			:	Search for a function in the current context
 // Return Value			:	NULL if the function is not found, pointer to the function otherwise
 // Comments				:
-CFunction	*CScriptContext::getFunction(char *fn,CArray<CExpression *> *params) {
+CFunction	*CScriptContext::getFunction(char *fn,CList<CExpression *> *params) {
 	CFunction	*f	=	lastFunction->getFunction(fn,params,desiredType);
 
 	if (f != NULL) printDefine(f);

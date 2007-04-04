@@ -237,12 +237,12 @@ public:
 // Comments				:
 class	CFuncallExpression : public CExpression {
 public:
-						CFuncallExpression(CFunction *,CArray<CExpression *> *);
+						CFuncallExpression(CFunction *,CList<CExpression *> *);
 						~CFuncallExpression();
 
 			void		getCode(FILE *,CVariable *);
 
-			CArray<CExpression *>	*arguments;
+			CList<CExpression *>	*arguments;
 			CFunction				*function;
 			int			error;
 };
@@ -253,12 +253,12 @@ public:
 // Comments				:
 class	CBuiltinExpression : public CExpression {
 public:
-						CBuiltinExpression(CFunctionPrototype *,CArray<CExpression *> *);
+						CBuiltinExpression(CFunctionPrototype *,CList<CExpression *> *);
 						~CBuiltinExpression();
 
 			void		getCode(FILE *,CVariable *);
 
-			CArray<CExpression *>	*arguments;
+			CList<CExpression *>	*arguments;
 			CFunctionPrototype		*function;
 			char					*replacementPrototype;
 };
@@ -336,13 +336,13 @@ public:
 // Comments				:
 class	CArrayMove : public CExpression {
 public:
-						CArrayMove(CVariable *,CArray<CExpression *> *);
+						CArrayMove(CVariable *,CList<CExpression *> *);
 						~CArrayMove();
 
 			void		getCode(FILE *,CVariable *);
 
 			CVariable				*first;
-			CArray<CExpression *>	*items;
+			CList<CExpression *>	*items;
 };
 
 
@@ -387,12 +387,12 @@ public:
 // Comments				:
 class	CGatherThenElse : public CExpression {
 public:
-						CGatherThenElse(CArray<CExpression *> *,CExpression *,CExpression *);
+						CGatherThenElse(CList<CExpression *> *,CExpression *,CExpression *);
 						~CGatherThenElse();
 
 			void		getCode(FILE *,CVariable *);
 
-			CArray<CExpression *>	*parameterList;
+			CList<CExpression *>	*parameterList;
 			CExpression				*first;
 			CExpression				*second;
 };
@@ -482,8 +482,8 @@ CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVecto
 CExpression	*getConversion(int type,CExpression *first);
 CExpression	*getConversion(int type,char *system,CExpression *first);
 void		getConversion(FILE *,CVariable *,CExpression *);
-CExpression	*getAssignment(CArray<CVariable *> *,CExpression *);
-CExpression	*getAssignment(CArray<CVariable *> *,CArray<CExpression *> *);
+CExpression	*getAssignment(CList<CVariable *> *,CExpression *);
+CExpression	*getAssignment(CList<CVariable *> *,CList<CExpression *> *);
 
 //CCodeBlock	*getAssignment(char *,CExpression *);
 #endif

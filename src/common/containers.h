@@ -234,12 +234,11 @@ private:
 
 
 
-const	int		TRIE_NODE_LEAF				=	1;	
 
 // Some misc macros
-#define	isLeaf(__node)		(((uintptr_t) __node) & TRIE_NODE_LEAF)
-#define	getLeaf(__node)		(CTrieLeaf *) (((uintptr_t) __node) & (~TRIE_NODE_LEAF))
-#define	makeNode(__node)	(CTrieNode *) (((uintptr_t) __node) | TRIE_NODE_LEAF)
+#define	isLeaf(__node)		(((uintptr_t) __node) & 1)
+#define	getLeaf(__node)		(CTrieLeaf *) (((uintptr_t) __node) & (~1))
+#define	makeNode(__node)	(CTrieNode *) (((uintptr_t) __node) | 1)
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTrie
@@ -744,22 +743,6 @@ private:
 
 };
 
-/*
-// This macro places a checkpoint in the stack
-#define	memBegin(__stack)	{											\
-	char				*savedMem		=	__stack->memory;			\
-	int					savedAvailable	=	__stack->availableSize;		\
-	CMemStack::CMemPage	*savedPage		=	__stack;
-
-// This macro restores the memory to the last checkpoint
-// It is important that the scope between the matching begin-end
-// pairs must not be exitted
-#define	memEnd(__stack)													\
-		__stack							=	savedPage;					\
-		__stack->availableSize			=	savedAvailable;				\
-		__stack->memory					=	savedMem;					\
-	}
-*/
 
 
 
@@ -786,28 +769,12 @@ public:
 							stepSize	=	ss;
 							array		=	new T[arraySize];
 							numItems	=	0;
-							currentItem	=	0;
 						}
 
 						~CArray() {
 							delete [] array;
 						}
 
-
-						// The stack interface
-		T				first()	{
-							if (numItems == 0)	return 0;
-
-							currentItem	=	0;
-							return array[currentItem];
-						}
-
-		T				last() {
-							if (numItems == 0)	return 0;
-
-							currentItem	=	numItems-1;
-							return array[currentItem];
-						}
 
 		void			push(T item) {
 							array[numItems++]	=	item;
@@ -830,35 +797,20 @@ public:
 							return array[--numItems];
 						}
 
-		T				next() {
-							currentItem++;
-
-							if (currentItem == numItems)	return 0;
-
-							return array[currentItem];
-						}
-
-		T				prev() {
-							currentItem--;
-
-							if (currentItem == -1)			return 0;
-
-							return array[currentItem];
-						}
 
 						// Array interface
 
 		void			reserve(int sz) {
-							while (sz >= arraySize) {
-								 T       *newArray	=	new T[arraySize+stepSize];
+
+							if (sz > arraySize) {
+								T       *newArray	=	new T[sz];
 
 								 memcpy(newArray,array,arraySize*sizeof(T));
 
-								 arraySize			+=	stepSize;
-								 stepSize			*=	2;
+								 arraySize			=	sz;
 								 delete [] array;
 								 array				=	newArray;
-							 }		
+							}
 						}
 						
 		T				& operator[](int index) {
@@ -876,12 +828,61 @@ public:
 							delete this;
 						}
 
-		int				numItems;
 		T				*array;
-private:
+		int				numItems;
 		int				arraySize;
+private:
 		int				stepSize;
-		int				currentItem;
+};
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CList
+// Description			:	List
+// Comments				:	This class provides iteration functionality over an array
+template <class T>	class CList : public CArray<T> {
+public:
+						CList() : CArray() {
+							currentItem	=	0;
+						}
+
+
+		T				first()	{
+							if (numItems == 0)	return 0;
+
+							currentItem	=	0;
+							return array[currentItem];
+						}
+
+		T				last() {
+							if (numItems == 0)	return 0;
+
+							currentItem	=	numItems-1;
+							return array[currentItem];
+						}
+
+		T				next() {
+							currentItem++;
+
+							if (currentItem == numItems)	return 0;
+
+							return array[currentItem];
+						}
+
+		T				prev() {
+							currentItem--;
+
+							if (currentItem == -1)			return 0;
+
+							return array[currentItem];
+						}
+
+
+private:
+	int					currentItem;
+
 };
 
 #endif

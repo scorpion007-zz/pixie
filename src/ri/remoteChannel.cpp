@@ -61,12 +61,12 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 	buffer[0].integer	=	NET_CREATE_CHANNEL;
 	buffer[1].integer	=	nameLength;
 	buffer[2].integer	=	(serverChannel->channelType << 8) | CHANNELTYPE_BOM;
-	rcSend(netClient,(char *) &buffer[0],2*sizeof(T32));
-	rcSend(netClient,(char *) &buffer[2],1*sizeof(T32),FALSE);
-	rcSend(netClient,(char *) serverChannel->name,nameLength,FALSE);
+	rcSend(netClient,&buffer[0],2*sizeof(T32));
+	rcSend(netClient,&buffer[2],1*sizeof(T32),FALSE);
+	rcSend(netClient,serverChannel->name,nameLength,FALSE);
 	
 	// Does the client accept the request?
-	rcRecv(netClient,(char *) buffer,2*sizeof(T32));
+	rcRecv(netClient,buffer,2*sizeof(T32));
 	if (buffer[0].integer != -1) {
 		serverChannel->remoteId = buffer[0].integer;
 		
@@ -76,11 +76,11 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 			// yes? initialize the client channel
 			if (serverChannel->sendSetupData(netClient) == FALSE) {
 				// Doesn't matter what the client thought, just ignore it
-				rcRecv(netClient,(char *) buffer,sizeof(T32));
+				rcRecv(netClient,buffer,sizeof(T32));
 				
 				// Notify client of failure
 				buffer[0].integer	=	NET_NACK;
-				rcSend(netClient,(char *) buffer,sizeof(T32));
+				rcSend(netClient,buffer,sizeof(T32));
 				
 				error(CODE_BUG,"Remote channel initialization failed.\n");
 				delete serverChannel;
@@ -88,12 +88,12 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 			}
 			
 			// Did the client initialize correctly
-			rcRecv(netClient,(char *) buffer,sizeof(T32));
+			rcRecv(netClient,buffer,sizeof(T32));
 			clientInitialized = (buffer[0].integer == NET_ACK);
 			
 			// let client know we initialized
 			buffer[0].integer	=	NET_ACK;
-			rcSend(netClient,(char *) buffer,sizeof(T32));
+			rcSend(netClient,buffer,sizeof(T32));
 			
 		} else {
 			clientInitialized = TRUE;
@@ -133,21 +133,21 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 	T32 buffer[2];
 	buffer[0].integer	=	REMOTECHANNEL_NONE;
 	buffer[1].integer	=	0;
-	rcRecv(s,(char *) &buffer[0],sizeof(T32));
-	rcRecv(s,(char *) &buffer[1],sizeof(T32),FALSE);
+	rcRecv(s,&buffer[0],sizeof(T32));
+	rcRecv(s,&buffer[1],sizeof(T32),FALSE);
 	
 	// verify type
 	channelNameLength	=	buffer[0].integer;
 	channelType			=	buffer[1].integer;
 	char *channelName	=	(char *) alloca(channelNameLength);
-	rcRecv(s,(char *) channelName,channelNameLength,FALSE);
+	rcRecv(s,channelName,channelNameLength,FALSE);
 	
 	// check channel byte order
 	if ((channelType & CHANNELTYPE_BOM) != CHANNELTYPE_BOM) {
 		// unknown type!
 		buffer[0].integer	=	-1;
 		buffer[1].integer	=	NET_NACK;
-		rcSend(s,(char *) buffer,2*sizeof(T32));
+		rcSend(s,buffer,2*sizeof(T32));
 		error(CODE_BUG,"Remote channels may not communicate over different byte orders.\n");
 		return FALSE;
 	}
@@ -160,7 +160,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 		// If so, trivially accept it
 		buffer[0].integer	=	rChannel->remoteId;
 		buffer[1].integer	=	NET_NACK;
-		rcSend(s,(char *) buffer,2*sizeof(T32));
+		rcSend(s,buffer,2*sizeof(T32));
 		return TRUE;
 	} else {
 		switch (channelType) {
@@ -197,32 +197,32 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 			// unknown type!
 			buffer[0].integer	=	-1;
 			buffer[1].integer	=	NET_NACK;
-			rcSend(s,(char *) buffer,2*sizeof(T32));
+			rcSend(s,buffer,2*sizeof(T32));
 			error(CODE_BUG,"Invalid remote channel type requested.\n");
 			return FALSE;
 		}
 		
 		// Send the accept
-		rcSend(s,(char *) buffer,2*sizeof(T32));
+		rcSend(s,buffer,2*sizeof(T32));
 		
 		// Attempt to setup the channel
 		if (rChannel->setup(s) == FALSE) {
 			// tell server that initialization failed
 			buffer[0].integer = NET_NACK;
-			rcSend(s,(char *) buffer,sizeof(T32));
+			rcSend(s,buffer,sizeof(T32));
 			
 			// Ignore the server response
-			rcRecv(s,(char *) buffer,sizeof(T32));
+			rcRecv(s,buffer,sizeof(T32));
 			error(CODE_BUG,"Remote channel initialization failed.\n");
 			return FALSE;
 		}
 		
 		// Notify server that we succeeded
 		buffer[0].integer = NET_ACK;
-		rcSend(s,(char *) buffer,sizeof(T32));
+		rcSend(s,buffer,sizeof(T32));
 		
 		// Find out if the server succeeded...
-		rcRecv(s,(char *) buffer,sizeof(T32));
+		rcRecv(s,buffer,sizeof(T32));
 		if (buffer[0].integer == NET_ACK) {
 			remoteChannels->push(rChannel);
 			declaredRemoteChannels->insert(rChannel->name,rChannel);
@@ -256,8 +256,8 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 			// Request update and send channel index
 			buffer[0].integer = NET_ACK;
 			buffer[1].integer = channels[i]->remoteId;
-			rcSend(netClient,(char*) buffer,2*sizeof(T32));
-			rcRecv(netClient,(char*) buffer,1*sizeof(T32));	// get response back
+			rcSend(netClient,buffer,2*sizeof(T32));
+			rcRecv(netClient,buffer,1*sizeof(T32));	// get response back
 			
 			if (buffer[0].integer == NET_ACK) {
 				if (channels[i]->sendRemoteBucket(netClient,x,y) == FALSE){
@@ -279,8 +279,8 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 		}
 	}
 	buffer[0].integer = NET_NACK;
-	rcSend(netClient,(char*) buffer,2*sizeof(T32));
-	rcRecv(netClient,(char*) buffer,1*sizeof(T32));	// get response back
+	rcSend(netClient,buffer,2*sizeof(T32));
+	rcRecv(netClient,buffer,1*sizeof(T32));	// get response back
 }
 
 
@@ -300,7 +300,7 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 	while(TRUE) {
 		// receive update request - buffer[0] tells us
 		// if there are any pending updates
-		rcRecv(s,(char*) buffer,2*sizeof(T32));
+		rcRecv(s,buffer,2*sizeof(T32));
 		
 		if(buffer[0].integer == NET_ACK) {
 			// if we have updates then figure out what channel index
@@ -309,7 +309,7 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 			if ((remoteId<numKnownChannels) && (channels[remoteId]!=NULL)){
 				// Accept the update
 				buffer[0].integer = NET_ACK;
-				rcSend(s,(char*) buffer,1*sizeof(T32));
+				rcSend(s,buffer,1*sizeof(T32));
 				// Perform it
 				if (channels[remoteId]->recvRemoteBucket(s,x,y) == FALSE) {
 					error(CODE_BUG,"Remote channel communication error.\n");
@@ -317,7 +317,7 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 			} else {
 				error(CODE_BUG,"Update received for unkown remote channel.\n");
 				buffer[0].integer = NET_NACK;
-				rcSend(s,(char*) buffer,1*sizeof(T32));
+				rcSend(s,buffer,1*sizeof(T32));
 			}
 		} else {
 			// No pending updates - we are done
@@ -325,7 +325,7 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 		}
 	}	
 	buffer[0].integer = NET_ACK;
-	rcSend(s,(char*) buffer,1*sizeof(T32));
+	rcSend(s, buffer,1*sizeof(T32));
 }
 
 
@@ -347,8 +347,8 @@ void CRenderer::sendFrameDataChannels() {
 			// Request update and send channel index
 			buffer[0].integer = NET_ACK;
 			buffer[1].integer = channels[i]->remoteId;
-			rcSend(netClient,(char*) buffer,2*sizeof(T32));
-			rcRecv(netClient,(char*) buffer,1*sizeof(T32));	// get response back
+			rcSend(netClient,buffer,2*sizeof(T32));
+			rcRecv(netClient,buffer,1*sizeof(T32));	// get response back
 			
 			if (buffer[0].integer == NET_ACK) {
 				if (channels[i]->sendRemoteFrame(netClient) == FALSE){
@@ -370,8 +370,8 @@ void CRenderer::sendFrameDataChannels() {
 		}
 	}
 	buffer[0].integer = NET_NACK;
-	rcSend(netClient,(char*) buffer,2*sizeof(T32));
-	rcRecv(netClient,(char*) buffer,1*sizeof(T32));	// get response back
+	rcSend(netClient,buffer,2*sizeof(T32));
+	rcRecv(netClient,buffer,1*sizeof(T32));	// get response back
 }
 
 
@@ -390,7 +390,7 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 	while(TRUE) {
 		// receive update request - buffer[0] tells us
 		// if there are any pending updates
-		rcRecv(s,(char*) buffer,2*sizeof(T32));
+		rcRecv(s,buffer,2*sizeof(T32));
 		
 		if(buffer[0].integer == NET_ACK) {
 			// if we have updates then figure out what channel index
@@ -399,7 +399,7 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 			if ((remoteId<numKnownChannels) && (channels[remoteId]!=NULL)){
 				// Accept the update
 				buffer[0].integer = NET_ACK;
-				rcSend(s,(char*) buffer,1*sizeof(T32));
+				rcSend(s,buffer,1*sizeof(T32));
 				// Perform it
 				if (channels[remoteId]->recvRemoteFrame(s) == FALSE) {
 					error(CODE_BUG,"Remote channel communication error.\n");
@@ -407,7 +407,7 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 			} else {
 				error(CODE_BUG,"Update received for unkown remote channel.\n");
 				buffer[0].integer = NET_NACK;
-				rcSend(s,(char*) buffer,1*sizeof(T32));
+				rcSend(s,buffer,1*sizeof(T32));
 			}
 		} else {
 			// No pending updates - we are done
@@ -415,7 +415,7 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 		}
 	}	
 	buffer[0].integer = NET_ACK;
-	rcSend(s,(char*) buffer,1*sizeof(T32));
+	rcSend(s,buffer,1*sizeof(T32));
 }
 
 
@@ -445,7 +445,7 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	uint64_t curPos = ftell(tsmFile);
 	fseek(tsmFile,lastPosition,SEEK_SET);
 	uint64_t sz = curPos - lastPosition;
-	rcSend(s,(char*) &sz,sizeof(uint64_t));
+	rcSend(s,&sz,sizeof(uint64_t));
 	
 	// send the tile data
 	char buf[BUFFER_LENGTH];
@@ -477,7 +477,7 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	
 	// recieve data
 	uint64_t sz;
-	rcRecv(s,(char*)&sz,sizeof(uint64_t));
+	rcRecv(s,&sz,sizeof(uint64_t));
 	char buf[BUFFER_LENGTH];
 	while(sz > 0){
 		int nn = (int) ((sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz);
@@ -533,10 +533,10 @@ int		CRemoteICacheChannel::sendRemoteFrame(SOCKET s) {
 			numSamples++;
 		
 		if (numSamples != 0) {
-			rcSend(s,(char*) &numSamples,sizeof(int),FALSE);
+			rcSend(s,&numSamples,sizeof(int),FALSE);
 			
 			for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
-				rcSend(s,(char*) cSample,sizeof(CIrradianceCache::CCacheSample),FALSE);
+				rcSend(s,cSample,sizeof(CIrradianceCache::CCacheSample),FALSE);
 			}
 		}
 		
@@ -551,7 +551,7 @@ int		CRemoteICacheChannel::sendRemoteFrame(SOCKET s) {
 	}
 	
 	numSamples = 0;
-	rcSend(s,(char*) &numSamples,sizeof(int),FALSE);
+	rcSend(s,&numSamples,sizeof(int),FALSE);
 	
 	return TRUE;
 }
@@ -569,13 +569,13 @@ int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 	int		i,j,t,numSamples,depth;
 	float	rMean,P[3];
 
-	rcRecv(s,(char*) &numSamples,sizeof(int),FALSE);
+	rcRecv(s,&numSamples,sizeof(int),FALSE);
 	
 	while (numSamples > 0) {
 		sampleMem = (CIrradianceCache::CCacheSample *)
 					cache->memory->alloc(numSamples * sizeof(CIrradianceCache::CCacheSample));
 		
-		rcRecv(s,(char*) sampleMem,numSamples * sizeof(CIrradianceCache::CCacheSample),FALSE);
+		rcRecv(s,sampleMem,numSamples * sizeof(CIrradianceCache::CCacheSample),FALSE);
 		for (t=0,cSample=sampleMem;t<numSamples;cSample++,t++) {
 			cSample->next =  NULL;
 		}
@@ -623,7 +623,7 @@ int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 			cache->maxDepth		=	max(depth,cache->maxDepth);
 		}
 		
-		rcRecv(s,(char*) &numSamples,sizeof(int),FALSE);
+		rcRecv(s,&numSamples,sizeof(int),FALSE);
 	}
 	
 	return TRUE;
@@ -631,15 +631,15 @@ int		CRemoteICacheChannel::recvRemoteFrame(SOCKET s) {
 
 // Help us set up the client cache (it's worldBound will be wrong)
 int	CRemoteICacheChannel::sendSetupData(SOCKET s) {
-	rcSend(s,(char*) &cache->root->center,sizeof(vector),FALSE);
-	rcSend(s,(char*) &cache->root->side,sizeof(float),FALSE);
+	rcSend(s,&cache->root->center,sizeof(vector),FALSE);
+	rcSend(s,&cache->root->side,sizeof(float),FALSE);
 	
 	return TRUE;
 }
 
 int	CRemoteICacheChannel::setup(SOCKET s) {
-	rcRecv(s,(char*) &cache->root->center,sizeof(vector),FALSE);
-	rcRecv(s,(char*) &cache->root->side,sizeof(float),FALSE);
+	rcRecv(s,&cache->root->center,sizeof(vector),FALSE);
+	rcRecv(s,&cache->root->side,sizeof(float),FALSE);
 	
 	return TRUE;
 }
@@ -664,20 +664,15 @@ CRemotePtCloudChannel::CRemotePtCloudChannel(CPointCloud *c) : CRemoteChannel(c-
 // Return Value			:	success or failure
 // Comments				:	
 int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
-	int i,numSamples;
+
+	// Send the number of items
+	rcSend(s,&cloud->numItems,sizeof(int),FALSE);
 
 	// Send the points
-	
-	numSamples = cloud->numItems-1;
-	rcSend(s,(char*) &numSamples,sizeof(int),FALSE);
-	
-	float **dataPointers = cloud->dataPointers.array;
-	
-	for (i=1;i<cloud->numItems;i++) {
-		CPointCloudPoint *pt = cloud->items + i;
-		rcSend(s,(char*) pt,sizeof(CPointCloudPoint),FALSE);
-		rcSend(s,(char*) dataPointers[pt->entryNumber],sizeof(float)*cloud->dataSize,FALSE);
-	}
+	rcSend(s,cloud->items+1,sizeof(CPointCloudPoint)*cloud->numItems,FALSE);
+
+	// Send the data
+	rcSend(s,cloud->data.array,sizeof(float)*cloud->dataSize*cloud->numItems,FALSE);
 		
 	return TRUE;
 }
@@ -689,21 +684,27 @@ int		CRemotePtCloudChannel::sendRemoteFrame(SOCKET s) {
 // Return Value			:	success or failure
 // Comments				:	
 int		CRemotePtCloudChannel::recvRemoteFrame(SOCKET s) {
-	int					i,numSamples;
-	CPointCloudPoint	pt;
-	float				*data = new float[cloud->dataSize];
+	int	i,numItems;
 
 	// recive the points
-	
-	rcRecv(s,(char*) &numSamples,sizeof(int),FALSE);
-	
-	for (i=0;i<numSamples;i++) {
-		rcRecv(s,(char*) &pt,sizeof(CPointCloudPoint),FALSE);
-		rcRecv(s,(char*) data,sizeof(float)*cloud->dataSize,FALSE);
-		cloud->store(data,pt.P,pt.N,pt.dP);
-	}
-	
-	delete[] data;
+	rcRecv(s,&numItems,sizeof(int),FALSE);
+
+	// Allocate some temp memory
+	CPointCloudPoint	*items	=	new CPointCloudPoint[numItems];
+	float				*data	=	new float[cloud->dataSize*numItems];
+
+	// Receive the points
+	rcRecv(s,items,sizeof(CPointCloudPoint)*numItems,FALSE);
+
+	// Receive the data
+	rcRecv(s,data,sizeof(float)*cloud->dataSize*numItems,FALSE);
+
+	// Store the data
+	for (i=0;i<numItems;i++)	cloud->store(data + items[i].entryNumber,items[i].P,items[i].N,items[i].dP);
+
+	// Delete the data
+	delete [] items;
+	delete [] data;
 	
 	return TRUE;
 }

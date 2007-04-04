@@ -1201,7 +1201,7 @@ int			CSysConversionExpression::value(char *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CFuncallExpression::CFuncallExpression(CFunction *f,CArray<CExpression *> *p) : CExpression(SLC_NONE) {
+CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : CExpression(SLC_NONE) {
 	if (f->returnValue != NULL)	type	=	f->returnValue->type;
 	function	=	f;
 	error		=	FALSE;
@@ -1222,7 +1222,7 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CArray<CExpression *> *p) : 
 		// Make sure the parameters match
 		CExpression				*argument;
 		CParameter				*parameter;
-		CArray<CExpression *>	*newArguments	=	new CArray<CExpression *>;
+		CList<CExpression *>	*newArguments	=	new CList<CExpression *>;
 
 		if (p->numItems != function->parameters->numItems) {
 			sdr->fatal("Argument count mismatch for %s\n",function->symbolName);
@@ -1399,7 +1399,7 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression *> *p) : CExpression(f->functionType) {
+CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CList<CExpression *> *p) : CExpression(f->functionType) {
 	int	fa	=	SLC_UNIFORM;
 	int	i;
 
@@ -1423,7 +1423,7 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression 
 		arguments	=	NULL;
 
 		if (strcmp(f->prototype,"c=SF!") == 0) {
-			arguments	=	new CArray<CExpression *>;
+			arguments	=	new CList<CExpression *>;
 			arguments->push((*p)[0]);
 			arguments->push((*p)[1]);
 			arguments->push(new CTerminalExpression(sdr->getVariable("s")));
@@ -1434,7 +1434,7 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression 
 
 			replacementPrototype	=	"c=SFff!";
 		} else if (strcmp(f->prototype,"f=SF!") == 0) {
-			arguments	=	new CArray<CExpression *>;
+			arguments	=	new CList<CExpression *>;
 			arguments->push((*p)[0]);
 			arguments->push((*p)[1]);
 			arguments->push(new CTerminalExpression(sdr->getVariable("s")));
@@ -1445,7 +1445,7 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression 
 
 			replacementPrototype	=	"f=SFff!";
 		} else if (strcmp(f->prototype,"f=SFfffffff!") == 0) {
-			arguments	=	new CArray<CExpression *>;
+			arguments	=	new CList<CExpression *>;
 			arguments->push((*p)[0]);
 			arguments->push(new CConstantTerminalExpression(SLC_FLOAT | SLC_UNIFORM,strdup("0")));
 			arguments->push((*p)[1]);
@@ -1462,7 +1462,7 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CArray<CExpression 
 
 			replacementPrototype	=	"f=SFffffffff!";
 		} else if (strcmp(f->prototype,"c=SFfffffff!") == 0) {
-			arguments	=	new CArray<CExpression *>;
+			arguments	=	new CList<CExpression *>;
 			arguments->push((*p)[0]);
 			arguments->push(new CConstantTerminalExpression(SLC_FLOAT | SLC_UNIFORM,strdup("0")));
 			arguments->push((*p)[1]);
@@ -2153,12 +2153,12 @@ void		CArrayUpdateExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Note that e array holds the last item first
-CArrayMove::CArrayMove(CVariable *f,CArray<CExpression *> *e) : CExpression((f->type & SLC_UNIFORM) | SLC_UNIFORM) {
+CArrayMove::CArrayMove(CVariable *f,CList<CExpression *> *e) : CExpression((f->type & SLC_UNIFORM) | SLC_UNIFORM) {
 	CExpression	*cExpression;
 	int			numItems	=	0;
 
 	first	=	f;
-	items	=	new CArray<CExpression *>;
+	items	=	new CList<CExpression *>;
 
 	while((cExpression=e->pop()) != NULL) {
 
@@ -2478,7 +2478,7 @@ void		CIfThenElse::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CGatherThenElse::CGatherThenElse(CArray<CExpression *> *pl,CExpression *f,CExpression *s) : CExpression(0) {
+CGatherThenElse::CGatherThenElse(CList<CExpression *> *pl,CExpression *f,CExpression *s) : CExpression(0) {
 	parameterList	=	pl;
 	first			=	f;
 	second			=	s;
@@ -3290,7 +3290,7 @@ CExpression	*getConversion(int type,char *system,CExpression *first) {
 // Description			:	Generates an assignment code
 // Return Value			:	The generated expression
 // Comments				:
-CExpression		*getAssignment(CArray<CVariable *> *variables,CExpression *expression) {
+CExpression		*getAssignment(CList<CVariable *> *variables,CExpression *expression) {
 	CVariable	*cVar;
 	CExpression	*cExpression	=	expression;
 	char		tmp[256];
@@ -3343,7 +3343,7 @@ CExpression		*getAssignment(CArray<CVariable *> *variables,CExpression *expressi
 // Description			:	Generates an assignment code
 // Return Value			:	The generated expression
 // Comments				:
-CExpression		*getAssignment(CArray<CVariable *> *variables,CArray<CExpression *> *expressions) {
+CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *expressions) {
 	CVariable	*cVar;
 	CExpression	*pExpression	=	NULL;
 	int i,hasNamedSpace,hasComplexRef;

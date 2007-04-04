@@ -650,8 +650,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	if (lookup->occlusion == TRUE) {
 
 		// We're shading for occlusion
-		stats.numOcclusionRays			+=	numSamples;
-		stats.numOcclusionSamples++;
+		context->numOcclusionRays			+=	numSamples;
+		context->numOcclusionSamples++;
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
@@ -732,8 +732,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	} else {
 
 		// We're shading for indirectdiffuse
-		stats.numIndirectDiffuseRays	+=	numSamples;
-		stats.numIndirectDiffuseSamples++;
+		context->numIndirectDiffuseRays	+=	numSamples;
+		context->numIndirectDiffuseSamples++;
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
@@ -788,7 +788,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 						addvv(irradiance,C);
 						movvv(hemisphere->irradiance,C);
 
-						stats.numIndirectDiffusePhotonmapLookups++;
+						context->numIndirectDiffusePhotonmapLookups++;
 					} else {
 						initv(hemisphere->irradiance,0);
 					}

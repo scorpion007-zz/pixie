@@ -162,7 +162,7 @@ void	initError(char *mes,...) {
 // Return Value			:	-
 // Comments				:
 int		append(const char *file,void *ud) {
-	CArray<char *>	*sourceFiles	=	(CArray<char *> *)	ud;
+	CList<char *>	*sourceFiles	=	(CList<char *> *)	ud;
 
 	sourceFiles->push(strdup(file));
 
@@ -180,14 +180,14 @@ int main(int argc, char* argv[]) {
 	int				i;
 	int				settings	=	COMPILER_SURPRESS_DEFINITIONS;
 	TSearchpath		*dsoPath;
-	CArray<char *>	*sourceFiles;
+	CList<char *>	*sourceFiles;
 	char			*sourceFile;
 	char			*ppargv[100];
 	int				ppargc;
 	char			*outName	=	NULL;
 	char 			*includeEnv = getenv(INCLUDE);
 	
-	sourceFiles					=	new CArray<char *>;
+	sourceFiles					=	new CList<char *>;
 
 	dsoPath						=	new TSearchpath;
 	dsoPath->directory			=	strdup(".");
@@ -248,7 +248,7 @@ int main(int argc, char* argv[]) {
 	// Go over the arguments and replace the wildcards
 	{
 		char			*file;
-		CArray<char *>	*newSources	=	new CArray<char *>;
+		CList<char *>	*newSources	=	new CList<char *>;
 
 		for (file=sourceFiles->first();file != NULL;file = sourceFiles->next()) {
 			if ((strchr(file,'*') != NULL) || (strchr(file,'?') != NULL)) {

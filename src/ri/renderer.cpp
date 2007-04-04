@@ -1026,7 +1026,7 @@ void		CRenderer::endFrame() {
 		T32		netBuffer;
 
 		// Expect the ready message
-		rcRecv(netClient,(char *) &netBuffer,1*sizeof(T32));
+		rcRecv(netClient,&netBuffer,1*sizeof(T32));
 
 		if (netBuffer.integer == NET_READY) {
 			// We're proceeding to the next frame
@@ -1168,7 +1168,7 @@ void		CRenderer::renderFrame() {
 		for (i=0;i<netNumServers;i++) {
 			T32	netBuffer;
 			netBuffer.integer	=	NET_READY;
-			rcSend(netServers[i],(char *) &netBuffer,sizeof(T32));
+			rcSend(netServers[i],&netBuffer,sizeof(T32));
 		}
 
 	} else {
@@ -1180,7 +1180,7 @@ void		CRenderer::renderFrame() {
 			T32		netBuffer;
 
 			netBuffer.integer	=	NET_READY;
-			rcSend(netClient,(char *) &netBuffer,1*sizeof(T32));
+			rcSend(netClient,&netBuffer,1*sizeof(T32));
 		}
 		
 		// Spawn the threads

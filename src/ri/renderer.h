@@ -461,23 +461,23 @@ public:
 		// Comments				:
 		class CDisplayData {
 		public:
-				void						*module;						// The module handle for the out device
-				void						*handle;						// The handle for the out device
-				int							numSamples;						// The number of samples
+				void						*module;				// The module handle for the out device
+				void						*handle;				// The handle for the out device
+				int							numSamples;				// The number of samples
 				CDisplayChannel				*channels;
 				int							numChannels;
-				char						*displayName;					// The computed display name
-				TDisplayStartFunction		start;							// The start function for the out device
-				TDisplayDataFunction		data;							// The data function
-				TDisplayRawDataFunction		rawData;						// The raw data function
-				TDisplayFinishFunction		finish;							// The finish function
-				COptions::CDisplay			*display;						// The display corresponding to this display
+				char						*displayName;			// The computed display name
+				TDisplayStartFunction		start;					// The start function for the out device
+				TDisplayDataFunction		data;					// The data function
+				TDisplayRawDataFunction		rawData;				// The raw data function
+				TDisplayFinishFunction		finish;					// The finish function
+				COptions::CDisplay			*display;				// The display corresponding to this display
 		};
 
 		static	int							numDisplays;
 		static	CDisplayData				*datas;
-		static	int							*sampleOrder;		// variable entry, sample count pairs
-		static	float						*sampleDefaults;	// default values for each channel
+		static	int							*sampleOrder;			// variable entry, sample count pairs
+		static	float						*sampleDefaults;		// default values for each channel
 		static	int							numExtraChannels;	
 
 
@@ -486,8 +486,8 @@ public:
 
 
 // These two are defined in frameNetwork.cpp and can be used to send/receive data over network
-void			rcSend(SOCKET,char *,int,int net = TRUE);				// Send data
-void			rcRecv(SOCKET,char *,int,int net = TRUE);				// Recv data
+void			rcSend(SOCKET,const void *,int,int net = TRUE);		// Send data
+void			rcRecv(SOCKET,void *,int,int net = TRUE);			// Recv data
 
 
 

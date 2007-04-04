@@ -53,7 +53,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 
 		// Receive the bucket to render from the client
 		osLock(networkMutex);
-		rcRecv(netClient,(char *) netBuffer,3*sizeof(T32));
+		rcRecv(netClient,netBuffer,3*sizeof(T32));
 		
 		// Process the render order
 		if (netBuffer[0].integer == NET_RENDER_BUCKET) {
@@ -64,7 +64,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 		} else if (netBuffer[0].integer == NET_FINISH_FRAME) {
 			// We have finished the frame, so terminate
 			netBuffer[0].integer	=	NET_ACK;
-			rcSend(netClient,(char *) netBuffer,1*sizeof(T32));
+			rcSend(netClient,netBuffer,1*sizeof(T32));
 			
 			// send end of frame channel data
 			sendFrameDataChannels();
@@ -269,7 +269,7 @@ void		CRenderer::serverThread(void *w) {
 	while(TRUE) {
 
 		// Expect the ready message
-		rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));
+		rcRecv(netServers[index],netBuffer,1*sizeof(T32));
 
 		if (netBuffer[0].integer == NET_READY)	break;
 
@@ -303,11 +303,11 @@ void		CRenderer::serverThread(void *w) {
 			netBuffer[0].integer	=	NET_RENDER_BUCKET;
 			netBuffer[1].integer	=	x;
 			netBuffer[2].integer	=	y;
-			rcSend(netServers[index],(char *) netBuffer,3*sizeof(T32));
+			rcSend(netServers[index],netBuffer,3*sizeof(T32));
 
 			while(TRUE) {
 				// Expect the ready message
-				rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));
+				rcRecv(netServers[index],netBuffer,1*sizeof(T32));
 
 				if (netBuffer[0].integer == NET_READY)	break;
 
@@ -316,12 +316,12 @@ void		CRenderer::serverThread(void *w) {
 			}
 
 			// Receive the result
-			rcRecv(netServers[index],(char *) &header,5*sizeof(T32));		// Receive the response header
-			rcSend(netServers[index],(char *) &netBuffer,1*sizeof(T32));	// Echo the message back
+			rcRecv(netServers[index],&header,5*sizeof(T32));		// Receive the response header
+			rcSend(netServers[index],&netBuffer,1*sizeof(T32));	// Echo the message back
 
 			buffer					=	new float[header[4].integer];
 																			// Receive the framebuffer
-			rcRecv(netServers[index],(char *) buffer,header[4].integer*sizeof(T32));
+			rcRecv(netServers[index],buffer,header[4].integer*sizeof(T32));
 
 			// Commit the bucket
 			osLock(commitMutex);
@@ -340,8 +340,8 @@ void		CRenderer::serverThread(void *w) {
 			netBuffer[0].integer	=	NET_FINISH_FRAME;
 			netBuffer[1].integer	=	0;
 			netBuffer[2].integer	=	0;
-			rcSend(netServers[index],(char *) netBuffer,3*sizeof(T32));
-			rcRecv(netServers[index],(char *) netBuffer,1*sizeof(T32));	// Expect ACK
+			rcSend(netServers[index],netBuffer,3*sizeof(T32));
+			rcRecv(netServers[index],netBuffer,1*sizeof(T32));	// Expect ACK
 			
 			osLock(commitMutex);
 			
@@ -371,13 +371,13 @@ void			CRenderer::processServerRequest(T32 req,int index) {
 		TSearchpath	*search;
 
 		// Receive the length of the fileName
-		rcRecv(netServers[index],(char *) buffer,3*sizeof(T32));
+		rcRecv(netServers[index],buffer,3*sizeof(T32));
 		start		=	buffer[0].integer;
 		size		=	buffer[1].integer;
 		nameLength	=	buffer[2].integer;
 
 		fileName	=	(char *) alloca(nameLength);
-		rcRecv(netServers[index],(char *) fileName,nameLength,FALSE);
+		rcRecv(netServers[index],fileName,nameLength,FALSE);
 		
 		// Figure out what type of file it is
 		if (strstr(fileName,".sdr") != NULL)		search	=	shaderPath;
@@ -399,7 +399,7 @@ void			CRenderer::processServerRequest(T32 req,int index) {
 			T32	response;
 
 			response.integer	=	NET_NACK;
-			rcSend(netServers[index],(char *) &response,sizeof(T32));
+			rcSend(netServers[index],&response,sizeof(T32));
 		}
 	} else if (req.integer == NET_CREATE_CHANNEL) {
 		// This must be atomic
