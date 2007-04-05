@@ -36,7 +36,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/time.h>
 
 // Needed for OSX 10.2.x fix
 #if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
@@ -49,6 +48,7 @@
 #include <io.h>
 #include <direct.h>
 #include <errno.h>
+#include <sys/timeb.h>
 
 
 #define	OS_DIR_SEPERATOR					'\\'
@@ -78,6 +78,7 @@ static	DWORD WINAPI  dispatcherThread(void *w) {
 // << Win32
 #else
 // >> Unix
+#include <sys/time.h>
 #include <sys/param.h>
 #include <dlfcn.h>
 #include <glob.h>
@@ -110,6 +111,14 @@ static	time_t	osStartTimeMsec;
 // Return Value			:	-
 // Comments				:
 void	osInit() {
+#ifdef WIN32
+	timeb	ti;
+
+	ftime(&ti);
+
+	osStartTimeSec	=	ti.time;
+	osStartTimeMsec	=	ti.millitm;
+#else
 	struct timeval	ti;
 	struct timezone	tz;
 
@@ -117,6 +126,7 @@ void	osInit() {
 
 	osStartTimeSec	=	ti.tv_sec;
 	osStartTimeMsec	=	ti.tv_usec;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -370,12 +380,20 @@ void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *use
 // Return Value			:
 // Comments				:
 float	osTime() {
+#ifdef WIN32
+	timeb	ti;
+
+	ftime(&ti);
+
+	return (float) (ti.time - osStartTimeSec) + (ti.millitm - osStartTimeMsec) / 1000.0f;
+#else
 	struct timeval	ti;
 	struct timezone	tz;
 
 	gettimeofday(&ti, &tz);
 
 	return (float) (ti.tv_sec - osStartTimeSec) + (ti.tv_usec - osStartTimeMsec) / 1000000.0f;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////

@@ -41,30 +41,6 @@
 #include "config.h"
 #endif
 
-#ifndef PIXIE_MODELS
-#define PIXIE_MODELS "%PIXIEHOME%/models"
-#endif
-
-#ifndef PIXIE_PROCEDURALS
-#define PIXIE_PROCEDURALS "%PIXIE_PROCEDURALS%"
-#endif
-
-#ifndef PIXIE_TEXTURES
-#define PIXIE_TEXTURES "%PIXIEHOME%/textures"
-#endif
-
-#ifndef PIXIE_SHADERS
-#define PIXIE_SHADERS "%PIXIEHOME%/shaders"
-#endif
-
-#ifndef PIXIE_DISPLAYS
-#define PIXIE_DISPLAYS "%PIXIE_DISPLAY%"
-#endif
-
-#ifndef PIXIE_MODULES
-#define PIXIE_MODULES "%PIXIE_MODULES%"
-#endif
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	optionsDeleteSearchPath
@@ -260,35 +236,34 @@ COptions::COptions() {
 	frame					=	-1;
 
 	pixelAR					=	1;
-	frameAR					=	4/(float) 3;
+	frameAR					=	4.0f/3.0f;
 
 	cropLeft				=	0;
 	cropRight				=	1;
 	cropTop					=	0;
 	cropBottom				=	1;
 
-	screenLeft				=	-4/(float) 3;
-	screenRight				=	4/(float) 3;
+	screenLeft				=	-4.0f/3.0f;
+	screenRight				=	4.0f/3.0f;
 	screenTop				=	1;
 	screenBottom			=	-1;
 	
 	clipMin					=	C_EPSILON;
 	clipMax					=	C_INFINITY;
 
-	pixelVariance			=	(float) 0.05;
+	pixelVariance			=	0.05f;
 
-	jitter					=	(float) 0.99;
+	jitter					=	0.99f;
 
 	hider					=	strdup("stochastic");
 
-	archivePath				=	optionsGetSearchPath(".:%RIBS%:" PIXIE_MODELS,NULL);
-	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEHOME%/procedurals:%PIXIEHOME%/bin:%PIXIE_PROCEDURALS%",NULL);
-	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:" PIXIE_TEXTURES,NULL);
-	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:" PIXIE_SHADERS,NULL);
-	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:" PIXIE_DISPLAYS,NULL);
-	modulePath				=	optionsGetSearchPath(".:%PIXIEHOME%/modules:" PIXIE_MODULES,NULL);
+	archivePath				=	optionsGetSearchPath(".:%RIBS%:%PIXIEHOME%/ribs:",NULL);
+	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEHOME%/procedurals:",NULL);
+	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:%PIXIEHOME%/textures:",NULL);
+	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:%PIXIEHOME%/shaders:",NULL);
+	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:",NULL);
+	modulePath				=	optionsGetSearchPath(".:%MODULES%:%PIXIEHOME%/bin:",NULL);
 
-	// Override the official defaults for testing
 	pixelXsamples			=	2;
 	pixelYsamples			=	2;
 
@@ -443,49 +418,15 @@ COptions::COptions(const COptions *o) {
 		toRGB		=	NULL;
 	}
 
-	if (o->causticIn != NULL) {
-		causticIn				=	strdup(o->causticIn);
-	} else {
-		causticIn				=	NULL;
-	}
-
-	if (o->causticOut != NULL) {
-		causticOut				=	strdup(o->causticOut);
-	} else {
-		causticOut				=	NULL;
-	}
-
-	if (o->globalIn != NULL) {
-		globalIn				=	strdup(o->globalIn);
-	} else {
-		globalIn				=	NULL;
-	}
-
-	if (o->globalOut != NULL) {
-		globalOut				=	strdup(o->globalOut);
-	} else {
-		globalOut				=	NULL;
-	}
-
-	if (o->volumeIn != NULL) {
-		volumeIn				=	strdup(o->volumeIn);
-	} else {
-		volumeIn				=	NULL;
-	}
-
-	if (o->volumeOut != NULL) {
-		volumeOut				=	strdup(o->volumeOut);
-	} else {
-		volumeOut				=	NULL;
-	}
-
-	if (o->filelog != NULL) {
-		filelog					=	strdup(o->filelog);
-	} else {
-		filelog					=	NULL;
-	}
+	causticIn				=	(o->causticIn != NULL ? strdup(o->causticIn) : NULL);
+	causticOut				=	(o->causticOut != NULL ? strdup(o->causticOut) : NULL);
+	globalIn				=	(o->globalIn != NULL ? strdup(o->globalIn) : NULL);
+	globalOut				=	(o->globalOut != NULL ? strdup(o->globalOut) : NULL);
+	volumeIn				=	(o->volumeIn != NULL ? strdup(o->volumeIn) : NULL);
+	volumeOut				=	(o->volumeOut != NULL ? strdup(o->volumeOut) : NULL);
+	filelog					=	(o->filelog != NULL ? strdup(o->filelog) : NULL);
 	
-	userOptions					=	o->userOptions;
+	userOptions				=	o->userOptions;
 }
 
 
