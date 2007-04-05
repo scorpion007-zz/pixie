@@ -103,7 +103,7 @@ CPatch::~CPatch() {
 }
 
 
-static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int nsides,int disable) {
+static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int k,int doubleSided,int disable) {
 	int	i;
 
 	// Update the bounding box
@@ -113,7 +113,7 @@ static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int
 	}
 
 	// Check the back face culling
-	if (nsides == 1  && !disable) {
+	if (doubleSided == FALSE  && !disable) {
 		P	-=	k*3;
 
 		if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
@@ -204,7 +204,7 @@ void	CPatch::dice(CShadingContext *r) {
 				
 				assert(k <= (int) CRenderer::maxGridSize);
 				r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
-				cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
+				cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
 				// Save the end positions
 				assert(numUprobes*numVprobes <= CRenderer::maxGridSize);
@@ -222,7 +222,7 @@ void	CPatch::dice(CShadingContext *r) {
 			
 			assert(k <= (int) CRenderer::maxGridSize);
 			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->nSides,disableCull);
+			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
 			// Are we culled ?
 			if (cullFlags)	return;
@@ -696,7 +696,14 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 							interpolatev(dPdv,tmp1,tmp2,(float) u);				\
 							crossvv(N,dPdu,dPdv);								\
 							if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
-							if (attributes->nSides == 1) {						\
+							if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {						\
+								cRay->object	=	object;						\
+								cRay->u			=	umin + ((float) u + i)*urg;	\
+								cRay->v			=	vmin + ((float) v + j)*vrg;	\
+								cRay->t			=	(float) t;					\
+								movvv(cRay->N,N);								\
+								debugHit();										\
+							} else {											\
 								if (dotvv(q,N) < 0) {							\
 									cRay->object	=	object;					\
 									cRay->u			=	umin + ((float) u + i)*urg;	\
@@ -705,13 +712,6 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 									movvv(cRay->N,N);								\
 									debugHit();										\
 								}												\
-							} else {											\
-								cRay->object	=	object;						\
-								cRay->u			=	umin + ((float) u + i)*urg;	\
-								cRay->v			=	vmin + ((float) v + j)*vrg;	\
-								cRay->t			=	(float) t;					\
-								movvv(cRay->N,N);								\
-								debugHit();										\
 							}													\
 						}														\
 					}															\

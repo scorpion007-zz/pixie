@@ -60,6 +60,7 @@ const	unsigned int		ATTRIBUTES_FLAGS_DISCARD_ALL				=	1 << 20;	// Discard all ca
 const	unsigned int		ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE		=	1 << 21;	// Perform non raster-oriented dicing
 const	unsigned int		ATTRIBUTES_FLAGS_SHADE_HIDDEN				=	1 << 22;	// Shade even if occluded
 const	unsigned int		ATTRIBUTES_FLAGS_SHADE_BACKFACE				=	1 << 23;	// Shade even if backfacing
+const	unsigned int		ATTRIBUTES_FLAGS_DOUBLE_SIDED				=	1 << 24;	// The surface is double sided
 
 
 // The minimum shading rate
@@ -132,12 +133,7 @@ public:
 		matrix				uBasis,vBasis;								// The basis for bicubic patches
 		int					uStep,vStep;								// The step sizes for bicubic patches
 
-		unsigned int		nSides;										// Number of sides
-
 		unsigned int		flags;										// Attribute flags
-
-																		// Tesselation attributes
-		float				flatness;									// Deprecated but in standard -  The pixel space flatness
 
 		float				maxDisplacement;							// Maximum amount of displacement in camera system
 		char				*maxDisplacementSpace;						// The current space in which the maximum displacement is given

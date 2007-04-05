@@ -227,7 +227,32 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 
 	const float det = dotvv(edge1, pvec);
 
-	if (attributes->nSides == 1) {
+	if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {
+		if ((det > -C_EPSILON) && (det < C_EPSILON))	return;
+
+		const float	inv_det = 1.0f / det;
+
+		subvv(tvec, cRay->from, vert0);
+
+		const float	u = dotvv(tvec, pvec) * inv_det;
+		if (u < 0.0 || u > 1.0)	return;
+
+		crossvv(qvec, tvec, edge1);
+
+		const float	v = dotvv(cRay->dir, qvec) * inv_det;
+		if (v < 0.0 || u + v > 1.0)	return;
+
+		const float t = dotvv(edge2, qvec) * inv_det;
+
+		if ((t > cRay->tmin) && (t < cRay->t)) {
+			cRay->object	=	this;
+			cRay->t			=	t;
+			cRay->u			=	u + v;
+			cRay->v			=	u / (u + v);
+			if	((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip)	crossvv(cRay->N,edge2,edge1);
+			else																crossvv(cRay->N,edge1,edge2);
+		}
+	} else {
 
 		if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) {
 			if (det < C_EPSILON)	return;
@@ -251,31 +276,6 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 			cRay->object	=	this;
 			cRay->t			=	t*inv_det;
 			cRay->u			=	(u + v)*inv_det;
-			cRay->v			=	u / (u + v);
-			if	((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip)	crossvv(cRay->N,edge2,edge1);
-			else																crossvv(cRay->N,edge1,edge2);
-		}
-	} else {
-		if ((det > -C_EPSILON) && (det < C_EPSILON))	return;
-
-		const float	inv_det = 1.0f / det;
-
-		subvv(tvec, cRay->from, vert0);
-
-		const float	u = dotvv(tvec, pvec) * inv_det;
-		if (u < 0.0 || u > 1.0)	return;
-
-		crossvv(qvec, tvec, edge1);
-
-		const float	v = dotvv(cRay->dir, qvec) * inv_det;
-		if (v < 0.0 || u + v > 1.0)	return;
-
-		const float t = dotvv(edge2, qvec) * inv_det;
-
-		if ((t > cRay->tmin) && (t < cRay->t)) {
-			cRay->object	=	this;
-			cRay->t			=	t;
-			cRay->u			=	u + v;
 			cRay->v			=	u / (u + v);
 			if	((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip)	crossvv(cRay->N,edge2,edge1);
 			else																crossvv(cRay->N,edge1,edge2);
@@ -833,7 +833,13 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 				interpolatev(dPdv,tmp1,tmp2,(float) u);				\
 				crossvv(N,dPdu,dPdv);								\
 				if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
-				if (attributes->nSides == 1) {						\
+				if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {						\
+					cRay->object	=	this;						\
+					cRay->u			=	(float) u;					\
+					cRay->v			=	(float) v;					\
+					cRay->t			=	(float) t;					\
+					movvv(cRay->N,N);								\
+				} else {											\
 					if (dotvv(q,N) < 0) {							\
 						cRay->object	=	this;					\
 						cRay->u			=	(float) u;				\
@@ -841,12 +847,6 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 						cRay->t			=	(float) t;				\
 						movvv(cRay->N,N);							\
 					}												\
-				} else {											\
-					cRay->object	=	this;						\
-					cRay->u			=	(float) u;					\
-					cRay->v			=	(float) v;					\
-					cRay->t			=	(float) t;					\
-					movvv(cRay->N,N);								\
 				}													\
 			}														\
 		}															\

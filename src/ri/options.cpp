@@ -343,9 +343,6 @@ COptions::COptions() {
 	globalIn				=	NULL;
 	globalOut				=	NULL;
 
-	volumeIn				=	NULL;
-	volumeOut				=	NULL;
-
 	numEmitPhotons			=	10000;
 
 	shootStep				=	1000;
@@ -422,8 +419,6 @@ COptions::COptions(const COptions *o) {
 	causticOut				=	(o->causticOut != NULL ? strdup(o->causticOut) : NULL);
 	globalIn				=	(o->globalIn != NULL ? strdup(o->globalIn) : NULL);
 	globalOut				=	(o->globalOut != NULL ? strdup(o->globalOut) : NULL);
-	volumeIn				=	(o->volumeIn != NULL ? strdup(o->volumeIn) : NULL);
-	volumeOut				=	(o->volumeOut != NULL ? strdup(o->volumeOut) : NULL);
 	filelog					=	(o->filelog != NULL ? strdup(o->filelog) : NULL);
 	
 	userOptions				=	o->userOptions;
@@ -482,8 +477,6 @@ COptions::~COptions(){
 	if (causticOut				!= NULL)	free(causticOut);
 	if (globalIn				!= NULL)	free(globalIn);
 	if (globalOut				!= NULL)	free(globalOut);
-	if (volumeIn				!= NULL)	free(volumeIn);
-	if (volumeOut				!= NULL)	free(volumeOut);
 	if (filelog					!= NULL)	free(filelog);
 }
 

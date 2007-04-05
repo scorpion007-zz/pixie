@@ -244,7 +244,6 @@ public:
 
 	char						*causticIn,*causticOut;							// The caustics in/out file name
 	char						*globalIn,*globalOut;							// The global photon map 
-	char						*volumeIn,*volumeOut;							// The volume photon map 
 
 	int							numEmitPhotons;									// The number of photons to emit for the scene
 

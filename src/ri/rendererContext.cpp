@@ -1717,8 +1717,8 @@ void	CRendererContext::RiGeometricApproximation(char *type,float value) {
 		warning(CODE_BADTOKEN,"Deprecated GeometricApproximation \"%s\" will be ignored\n",type);
 	} else if (strcmp(type,RI_POINTDEVIATION) == 0) {
 		warning(CODE_BADTOKEN,"Deprecated GeometricApproximation \"%s\" will be ignored\n",type);
-	} else if (strcmp(type,RI_FLATNESS) == 0) {			// deprecated, but in standard
-		attributes->flatness			=	value;
+	} else if (strcmp(type,RI_FLATNESS) == 0) {
+		warning(CODE_BADTOKEN,"Deprecated GeometricApproximation \"%s\" will be ignored\n",type);
 	} else if (strcmp(type,RI_MOTIONFACTOR) == 0) {
 		attributes->motionFactor		=	value;
 	} else {
@@ -1768,7 +1768,9 @@ void	CRendererContext::RiSides(int nsides) {
 	else {
 
 		attributes			=	getAttributes(TRUE);
-		attributes->nSides	=	nsides;
+
+		if (nsides == 1)	attributes->flags	&=	~ATTRIBUTES_FLAGS_DOUBLE_SIDED;
+		else				attributes->flags	|=	ATTRIBUTES_FLAGS_DOUBLE_SIDED;
 	}
 }
 

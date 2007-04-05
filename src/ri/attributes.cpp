@@ -88,13 +88,10 @@ CAttributes::CAttributes() {
 	uStep						=	3;
 	vStep						=	3;
 
-	nSides						=	2;
-
 	flags						=	0;
 	flags						|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 	flags						|=	ATTRIBUTES_FLAGS_SINGULARITYFIX;
-
-	flatness					=	0.5f;
+	flags						|=	ATTRIBUTES_FLAGS_DOUBLE_SIDED;
 
 	maxDisplacement				=	0;
 	maxDisplacementSpace		=	NULL;
@@ -405,7 +402,7 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 		lodSize			=	other->lodSize;
 		lodImportance	=	other->lodImportance;
 
-		nSides			=	other->nSides;
+		flags			|=	other->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED;
 	}
 
 	if (geometrydefinition) {

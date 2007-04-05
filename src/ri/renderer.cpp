@@ -183,7 +183,6 @@ int								CRenderer::maxEyeSplits;
 float							CRenderer::tsmThreshold;
 char							*CRenderer::causticIn,*CRenderer::causticOut;
 char							*CRenderer::globalIn,*CRenderer::globalOut;
-char							*CRenderer::volumeIn,*CRenderer::volumeOut;
 int								CRenderer::numEmitPhotons;
 int								CRenderer::shootStep;
 EDepthFilter					CRenderer::depthFilter;
@@ -454,8 +453,6 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::causticOut				=	o->causticOut;
 	CRenderer::globalIn					=	o->globalIn;
 	CRenderer::globalOut				=	o->globalOut;
-	CRenderer::volumeIn					=	o->volumeIn;
-	CRenderer::volumeOut				=	o->volumeOut;
 	CRenderer::numEmitPhotons			=	o->numEmitPhotons;
 	CRenderer::shootStep				=	o->shootStep;
 	CRenderer::depthFilter				=	o->depthFilter;

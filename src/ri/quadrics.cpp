@@ -323,7 +323,7 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 			P[2]	=	-P[2];
 		}
 
-		if (attributes->nSides == 1) {
+		if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 			if ((oDir[0]*P[0] + oDir[1]*P[1] + oDir[2]*P[2]) > 0) continue;
 		}
 
@@ -713,7 +713,7 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 		mulvf(Nt,-1);
 	}
 
-	if (attributes->nSides == 1) {
+	if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 		if (dotvv(oDir,Nt) > 0) {
 			return;
 		}
@@ -1084,7 +1084,7 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 			mulvf(Nt,-1);
 		}
 
-		if (attributes->nSides == 1) {
+		if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 			if (dotvv(oDir,Nt) > 0) {
 				continue;
 			}
@@ -1484,7 +1484,7 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 			mulvf(Nt,-1);
 		}
 
-		if (attributes->nSides == 1) {
+		if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 			if (dotvv(oDir,Nt) > 0) continue;
 		}
 
@@ -1868,7 +1868,7 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 			mulvf(Nt,-1);
 		}
 
-		if (attributes->nSides == 1) {
+		if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 			if (dotvv(oDir,Nt) > 0) continue;
 		}
 
@@ -2308,7 +2308,7 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 				mulvf(Nt,-1);
 			}
 
-			if (attributes->nSides == 1) {
+			if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 				if (dotvv(oDir,Nt) > 0) continue;
 			}
 		}
@@ -2775,7 +2775,7 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 				mulvf(Nt,-1);
 			}
 
-			if (attributes->nSides == 1) {
+			if (!(attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)) {
 				//if (dotvv(oDir,Nt) > 0) continue;
 			}
 

@@ -991,7 +991,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		if (Ponly) {
 		
 			// Set the flags
-			if (attributes->nSides == 2) {
+			if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {
 				grid->flags	=	RASTER_DRAW_FRONT | RASTER_DRAW_BACK | RASTER_UNSHADED | extraPrimitiveFlags;
 			} else {
 				if (attributes->flags & ATTRIBUTES_FLAGS_INSIDE) {	// Flip

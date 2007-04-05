@@ -1459,7 +1459,7 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 		return TRUE;
 	} else if (strcmp(name,attributesSides) == 0) {
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) currentAttributes->nSides;
+		d[0]		=	(float) (currentAttributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED ? 2 : 1);
 		return TRUE;
 	} else if (strcmp(name,attributesMatte) == 0) {
 		float	*d	=	(float *) dest;

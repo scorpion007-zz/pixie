@@ -272,7 +272,13 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 				interpolatev(dPdv,tmp1,tmp2,(float) u);				\
 				crossvv(N,dPdu,dPdv);								\
 				if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(N,-1);	\
-				if (attributes->nSides == 1) {						\
+				if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {						\
+					cRay->object	=	this;						\
+					cRay->u			=	(float) (u*uMult + uOrg);	\
+					cRay->v			=	(float) (v*vMult + vOrg);	\
+					cRay->t			=	(float) t;					\
+					movvv(cRay->N,N);								\
+				} else {											\
 					if (dotvv(q,N) < 0) {							\
 						cRay->object	=	this;					\
 						cRay->u			=	(float) (u*uMult + uOrg);	\
@@ -280,12 +286,6 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 						cRay->t			=	(float) t;				\
 						movvv(cRay->N,N);							\
 					}												\
-				} else {											\
-					cRay->object	=	this;						\
-					cRay->u			=	(float) (u*uMult + uOrg);	\
-					cRay->v			=	(float) (v*vMult + vOrg);	\
-					cRay->t			=	(float) t;					\
-					movvv(cRay->N,N);								\
 				}													\
 			}														\
 		}															\
