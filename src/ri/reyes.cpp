@@ -245,7 +245,8 @@ CReyes::~CReyes() {
 	delete [] buckets;
 
 	// Get rid of the bucket mutex
-	osDeleteMutex(bucketMutex);	// destroy the _locked_ mutex
+	osUnlock(bucketMutex);		// Unlock the mutex
+	osDeleteMutex(bucketMutex);	// Destroy the _unlocked_ mutex
 
 	// Update the global stats
 	stats.numRasterObjects			+=	numObjects;
@@ -1377,7 +1378,8 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		}
 #else
 		// Delete the grid data
-		osDeleteMutex(dObject->mutex);	// destroy the _locked_ mutex
+		osUnlock(dObject->mutex);		// Unlock the mutex
+		osDeleteMutex(dObject->mutex);	// Destroy the _unlocked_ mutex
 		delete [] dObject->next;
 		delete [] grid->vertices;
 		delete [] grid->bounds;
@@ -1401,7 +1403,8 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		}
 #else
 		// Delete the object data
-		osDeleteMutex(dObject->mutex);	// destroy the _locked_ mutex
+		osUnlock(dObject->mutex);		// Unlock the mutex
+		osDeleteMutex(dObject->mutex);	// Destroy the _unlocked_ mutex
 		delete [] dObject->next;
 		delete dObject;
 #endif

@@ -36,7 +36,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
+#include <sys/time.h>
 
 // Needed for OSX 10.2.x fix
 #if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
@@ -110,12 +110,13 @@ static	time_t	osStartTimeMsec;
 // Return Value			:	-
 // Comments				:
 void	osInit() {
-	timeb	ti;
+	struct timeval	ti;
+	struct timezone	tz;
 
-	ftime(&ti);
+	gettimeofday(&ti, &tz);
 
-	osStartTimeSec	=	ti.time;
-	osStartTimeMsec	=	ti.millitm;
+	osStartTimeSec	=	ti.tv_sec;
+	osStartTimeMsec	=	ti.tv_usec;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -369,11 +370,12 @@ void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *use
 // Return Value			:
 // Comments				:
 float	osTime() {
-	timeb	ti;
+	struct timeval	ti;
+	struct timezone	tz;
 
-	ftime(&ti);
+	gettimeofday(&ti, &tz);
 
-	return (float) (ti.time - osStartTimeSec) + (ti.millitm - osStartTimeMsec) / 1000.0f;
+	return (float) (ti.tv_sec - osStartTimeSec) + (ti.tv_usec - osStartTimeMsec) / 1000000.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////
