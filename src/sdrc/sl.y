@@ -1243,6 +1243,8 @@ slReturnStatement:
 					sdr->error("Function %s was not expecting a return value\n",cFun->symbolName);
 					c	=	new CNullExpression;
 				} else {
+					// if the return type is uniform, set the return value to uniform
+					if ($2->type & SLC_UNIFORM) cFun->returnValue->type |= SLC_UNIFORM;
 					c	=	new CAssignmentExpression(cFun->returnValue,$2);				
 				}
 
