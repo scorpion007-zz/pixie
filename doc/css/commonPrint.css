@@ -22,6 +22,9 @@ a.new{ color:#ba0000; text-decoration:none; }
 .tocline {
 	margin-bottom: 0px;
 }
+.toctoggle, .editsection {
+	font-size: smaller;
+}
 
 /* images */
 div.floatright { 
@@ -117,7 +120,8 @@ ul {
 #content {
     background: none;
     border: none ! important;
-    font-size: 11pt;
+	font-size: 1.2em;
+	line-height: 1.2em;
     padding: 1cm ! important;
     margin: 0 ! important;
 }
