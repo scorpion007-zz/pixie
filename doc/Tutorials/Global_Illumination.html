@@ -33,7 +33,7 @@ var wgUserName = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2162";
+var wgCurRevisionId = "2797";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
@@ -60,7 +60,7 @@ var wgCurRevisionId = "2162";
 </p>
 <table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
 <ul>
-<li class="toclevel-1"><a href="#Overview"><span class="tocnumber">1</span> <span class="toctext">Overview</span></a></li>
+<li class="toclevel-1"><a href="#A_Basic_Overview_on_Global_Illumination"><span class="tocnumber">1</span> <span class="toctext">A Basic Overview on Global Illumination</span></a></li>
 <li class="toclevel-1"><a href="#Photons"><span class="tocnumber">2</span> <span class="toctext">Photons</span></a></li>
 <li class="toclevel-1"><a href="#Irradiance_Caches_.28RIB.29"><span class="tocnumber">3</span> <span class="toctext">Irradiance Caches (RIB)</span></a></li>
 <li class="toclevel-1"><a href="#Irradiance_Caches_.28SL.29"><span class="tocnumber">4</span> <span class="toctext">Irradiance Caches (SL)</span></a></li>
@@ -74,11 +74,21 @@ var wgCurRevisionId = "2162";
 </li>
 </ul>
 </td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
-<a name="Overview"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=1" title="Edit section: Overview">edit</a>]</span> <span class="mw-headline"> Overview </span></h1>
-<p>This page describes a liitle about how to get the best from Pixie's Global Illumination support.
-</p><p>First off, it's probably worth explaining a bit about how Pixie calculates global illumination:  It's actually a pretty broad term and refers to 'global' solutions to the lightin (considering all surface interactions).  It also encompasses a number of techniques.  I'll talk first about color bleeding.  Occlusion (soft ambient shadowing is covered next).  Both technqiues share acceleration via the irradiance cache, so I'll talk at the end about tweaks to keep things fast and other hints.
-</p><p>Eventually, I'll add proper examples for all of the cases.  For now, Per Christensen's paper "Global Illumination and All That" has a very good explanation <a href="http://www.seanet.com/~myandper/abstract/sig03c09.htm" class="external autonumber" title="http://www.seanet.com/~myandper/abstract/sig03c09.htm" rel="nofollow">[1]</a>.
-</p><p><br />
+<a name="A_Basic_Overview_on_Global_Illumination"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=1" title="Edit section: A Basic Overview on Global Illumination">edit</a>]</span> <span class="mw-headline"> A Basic Overview on Global Illumination </span></h1>
+<p>This page describes a little about how to get the best from Pixie's Global Illumination support.
+</p><p>First off, it's probably worth explaining a bit about how Pixie calculates Global Illumination.
+</p><p>Global Illumination (people like to call it "GI") is actually a pretty broad term, which refers to 'global' solutions to lighting.  Rather than the direct, local interaction between a light and the surface, light interaction with all objects and surfaces, is taken into account.
+</p><p>For full <i>colour bleeding</i>, lighting interaction with surfaces is taken into account even if light from a lamp doesn't directly reach the surface.
+</p><p>For <i>ambient occlusion</i>, blocking of light by nearby surfaces is accounted for - even when the lightsource is not in a single defined position. 
+</p><p>Quick example: You put your lamp in a box, and the box has a ball in it. Without GI, the ball casts a pitch-black shadow, because light doesn't reach there (the the ball is blocking it). But, with GI, light might reach underneath the ball, because the light that reaches the walls of the box, from the lamp, bounces off and into the shadow.
+</p><p>Global illumination support consists of the following techniques
+</p><p><b>"photon mapping"</b>
+</p><p>Photon maps allow you to account for multiple bounces of light (and the interaction with each surface the light hits), and allow colour to diffusely 'bleed' from one surface to another.  They are prepared with the 'photon' hider.
+</p><p><b>"Irradiance Cacheing"</b>
+</p><p>Irradiance caches are an acelleration structure which allow diffuse colour bleeding or ambient occlusion to be calculated, without having to compute the expensive calculation at every shading point.
+Ambien
+</p><p>Eventually, I'll add proper examples for all of the cases. For now, you can look at Per Christensen's paper "Global Illumination and All That"
+<a href="http://www.seanet.com/~myandper/abstract/sig03c09.htm" class="external autonumber" title="http://www.seanet.com/~myandper/abstract/sig03c09.htm" rel="nofollow">[1]</a>. Link is at the bottom.
 </p>
 <a name="Photons"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=2" title="Edit section: Photons">edit</a>]</span> <span class="mw-headline"> Photons </span></h1>
 <p>Firstly, if you want colour bleeding between diffuse surfaces, you'll need a photon map.  If you don't want colour bleeding, you don't need a photon map pass.  Photon maps record the irradiance on a surface as light bounces from surface to surface.  Photon maps are baked using the photon hider (use this snippet):
@@ -204,7 +214,7 @@ The <tt>minR</tt> parameter on the other hand can prevent the radius of validity
 </p><p><b>See also</b>
 </p><p><a href="../NotIncludedStatic.html" title="EfficientlyCachingIrradiance">EfficientlyCachingIrradiance</a>
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!!en!2 and timestamp 20070211181313 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!!en!2 and timestamp 20070405151705 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Global_Illumination">http://www.george-graphics.co.uk/pixiewiki/Tutorials/Global_Illumination</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Tutorials.html" title="Category:Tutorials">Tutorials</a></span></p></div>			<!-- end content -->
@@ -218,7 +228,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 		<div class="pBody">
 			<ul>
 						 <li id="ca-nstab-main" class="selected"><a href="../Tutorials/Global_Illumination.html">Article</a></li>
-						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Tutorials/Global_Illumination&amp;action=edit">Discussion</a></li>
+						 <li id="ca-talk"><a href="../NotSupportedStatic.html">Discussion</a></li>
 						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit">Edit</a></li>
 						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=history">History</a></li>
 				</ul>
@@ -267,7 +277,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;oldid=2162">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;oldid=2797">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -275,8 +285,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 20:32, 7 July 2006.</li>
-				<li id="f-viewcount">This page has been accessed 2,145 times.</li>
+				<li id="f-lastmod"> This page was last modified 15:16, 5 April 2007.</li>
+				<li id="f-viewcount">This page has been accessed 2,656 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -286,4 +296,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.228 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.247 secs. --></body></html>

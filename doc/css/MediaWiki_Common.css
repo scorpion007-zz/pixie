@@ -1,4 +1,3 @@
-
 /* <pre><nowiki> */
 
 /* wikitable/prettytable class for skinning normal tables */
@@ -48,6 +47,7 @@ table.maintable caption {
 /* box layouts */
 .mainpage_box {
  border:1px  solid #aaaaaa;
+ margin-bottom: 0.4em;
 }
 
 .mainpage_boxheader {
@@ -81,7 +81,15 @@ div.notebox {
         color: #0020a0;
         font-size: 1.0em;
 	word-wrap: break-word;
-	font-weight: bold;
-	text-align: center;
 	max-width: 20em;
+}
+
+/* inset boxes */
+div.insetbox {
+        border: 1px solid #999999;
+        padding: 3px;
+	margin: 0.8em;
+        background-color: #efefef;
+        font-size: 1.0em;
+	word-wrap: break-word;
 }

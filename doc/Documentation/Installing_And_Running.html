@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="keywords" content="Documentation/Installing And Running,InstallingOnOSX/EnvironmentSetup" />
+		<meta name="keywords" content="Documentation/Installing And Running" />
 <link rel="shortcut icon" href="favicon.ico" />
 <link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Documentation/Installing And Running - PixieWiki</title>
@@ -33,7 +33,7 @@ var wgUserName = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2208";
+var wgCurRevisionId = "2790";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
@@ -94,24 +94,23 @@ To compile Pixie, you will need:
 <ul>
 <li class="toclevel-1"><a href="#Compilation_.2F_Installation__for_WINDOWS"><span class="tocnumber">1</span> <span class="toctext">Compilation / Installation  for WINDOWS</span></a></li>
 <li class="toclevel-1"><a href="#Compilation_.2F_Installation__for_UNIX"><span class="tocnumber">2</span> <span class="toctext">Compilation / Installation  for UNIX</span></a></li>
-<li class="toclevel-1"><a href="#RPM_Installation_for_UNIX"><span class="tocnumber">3</span> <span class="toctext">RPM Installation for UNIX</span></a></li>
-<li class="toclevel-1"><a href="#Binary__Installation_for_MAC_OSX"><span class="tocnumber">4</span> <span class="toctext">Binary  Installation for MAC OSX</span></a></li>
-<li class="toclevel-1"><a href="#Common_instructions_for_using_Pixie"><span class="tocnumber">5</span> <span class="toctext">Common instructions for using Pixie</span></a></li>
+<li class="toclevel-1"><a href="#Compilation_.2F_Installation__for_OS_X"><span class="tocnumber">3</span> <span class="toctext">Compilation / Installation  for OS X</span></a></li>
+<li class="toclevel-1"><a href="#RPM_Installation_for_UNIX"><span class="tocnumber">4</span> <span class="toctext">RPM Installation for UNIX</span></a></li>
+<li class="toclevel-1"><a href="#Binary__Installation_for_MAC_OSX"><span class="tocnumber">5</span> <span class="toctext">Binary  Installation for MAC OSX</span></a></li>
+<li class="toclevel-1"><a href="#Common_instructions_for_using_Pixie"><span class="tocnumber">6</span> <span class="toctext">Common instructions for using Pixie</span></a></li>
 </ul>
 </td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
 <a name="Compilation_.2F_Installation__for_WINDOWS"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=1" title="Edit section: Compilation / Installation  for WINDOWS">edit</a>]</span> <span class="mw-headline"> Compilation / Installation  for WINDOWS </span></h1>
-<p>You can download the Pixie source code as a zip file. To compile Pixie, you need Microsoft Visual Studio 6.0 or Microsoft Visual Studio .NET.
+<p>You can download the Pixie source code as a zip file. To compile Pixie, you need Microsoft Visual Studio .NET 2005.
 </p>
-<ul><li> Open <tt>Pixie.dsw / Pixie.sln</tt> (in Pixie/windows/vcXXX)
+<ul><li> Open <tt> Pixie.sln</tt> (in Pixie/windows/vcXXX)
 </li><li> Hit - <tt>Build - Batch Build</tt>
 </li><li> Select the components you want to build
 </li><li> Hit <tt>Build All</tt>
-</li><li> Execute <tt>makeinst.bat</tt> after the compilation ends
 </li></ul>
-<p>At this point you should have a <tt>Pixie</tt> directory which contains the binary distribution.
+<p>At this point, you can use this directory as your PIXIEHOME. Alternatively, you can run makeinst.bat which will create a Pixie directory (that's right inside the Pixie directory) and will copy all relevant files (except sources) into this new directory, which you can also use as your PIXIEHOME. 
 </p><p>You can also use the Windows installer which directly installs binary distribution.
 </p>
-<hr />
 <a name="Compilation_.2F_Installation__for_UNIX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=2" title="Edit section: Compilation / Installation  for UNIX">edit</a>]</span> <span class="mw-headline"> Compilation / Installation  for UNIX </span></h1>
 <p>You can download the Pixie source code as a tgz file. Do not download the zipped source code as the file permissions will be wrong.
 </p>
@@ -119,11 +118,33 @@ To compile Pixie, you will need:
 </li><li> execute <tt>make</tt>
 </li><li> execute <tt>make install</tt>
 </li></ul>
-<p>At this point you should have a <tt>/usr/local/Pixie</tt> directory which contains the binary distribution. You can substitute <tt>/usr/local/Pixie</tt> with whatever location you want Pixie in.
+<p>At this point you should have a <tt>/usr/local/Pixie</tt> directory which contains the binary distribution. You can substitute <tt>/usr/local/Pixie</tt> with whatever location you want Pixie in. This directory will be your PIXIEHOME.
 </p><p>You can set <tt>CXXFLAGS</tt> to whatever compilation flags you want to have during the compilation.
+</p><p><br />
 </p>
-<hr />
-<a name="RPM_Installation_for_UNIX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=3" title="Edit section: RPM Installation for UNIX">edit</a>]</span> <span class="mw-headline"> RPM Installation for UNIX </span></h1>
+<a name="Compilation_.2F_Installation__for_OS_X"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=3" title="Edit section: Compilation / Installation  for OS X">edit</a>]</span> <span class="mw-headline"> Compilation / Installation  for OS X </span></h1>
+<p>You can download the Pixie source code as a tgz file. Do not download the zipped source code as the file permissions will be wrong.
+</p><p>You will need to install libtiff and it's headers from somewhere.  You can do this with fink [<a href="http://www.finkproject.org/" class="external autonumber" title="http://www.finkproject.org/" rel="nofollow">[1]</a>], in which case, after following the installation instructions for fink, you can type:
+</p>
+<ul><li> execute <tt>fink install libtiff</tt>
+</li></ul>
+<p>Having done this and opened a new shell,
+</p>
+<ul><li> execute <tt>./configure --prefix=/Applications/Graphics/Pixie --enable-selfcontained LDFLAGS='-L/sw/lib/ -L/usr/X11R6/lib' CPPFLAGS='-I/sw/include/ -I/usr/X11R6/include'</tt>
+</li><li> execute <tt>make</tt>
+</li><li> execute <tt>make install</tt>
+</li></ul>
+<p>At this point you should have a <tt>/Applications/Graphics/Pixie</tt> directory which contains the binary distribution. You can substitute <tt>Applications/Graphics/Pixie</tt> with whatever location you want Pixie in. This directory will be your PIXIEHOME.
+</p><p>If you installed libtiff elsewhere (with headers say in <tt>/path/to/tiffprefix/tiffincludes</tt> and libraries at <tt>/path/to/tiffprefix/tifflibs</tt>, the the configure line needs to be altered appropriately
+</p>
+<ul><li> execute <tt>./configure --prefix=/Applications/Graphics/Pixie --enable-selfcontained LDFLAGS='-L/path/to/tiffprefix/tifflibs -L/usr/X11R6/lib' CPPFLAGS='-I/path/to/tiffprefix/tiffincludes -I/usr/X11R6/include'</tt>
+</li></ul>
+<p><br />
+You can set <tt>CXXFLAGS</tt> to whatever compilation flags you want to have during the compilation.
+</p><p>There is also an XCode project you can use for OSX.
+</p><p><br />
+</p>
+<a name="RPM_Installation_for_UNIX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=4" title="Edit section: RPM Installation for UNIX">edit</a>]</span> <span class="mw-headline"> RPM Installation for UNIX </span></h1>
 <p>RPM is available in two packages.
 </p>
 <ul><li> Pixie-X.Y.Z.i586.rpm&nbsp;: the application itself (with shaders, doc, etc).
@@ -131,23 +152,8 @@ To compile Pixie, you will need:
 </li></ul>
 <p>Install it with your favourite package manager ( I use Yast on Suse/Linux )
 </p><p>Files are installed in /opt/pixie.
-</p><p>The only things to do now is to set the environments variables.
-</p><p>For Bash:
 </p>
-<ul><li> export PIXIEHOME=/opt/pixie
-</li><li> export PATH=$PATH:/opt/pixie/bin
-</li><li> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/pixie/lib
-</li></ul>
-<p>You can add these lines in your ".profile" script in your home directory (~/.profile).
-</p><p>For tcsh:
-</p>
-<ul><li> setenv PIXIEHOME /opt/pixie
-</li><li> setp path=($path /opt/pixie/bin)
-</li><li> setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH:/opt/pixie/lib
-</li></ul>
-<p>You can add these lines in your ".tcshrc" script in your home directory (~/.tcshrc).
-</p>
-<a name="Binary__Installation_for_MAC_OSX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=4" title="Edit section: Binary  Installation for MAC OSX">edit</a>]</span> <span class="mw-headline"> Binary  Installation for MAC OSX </span></h1>
+<a name="Binary__Installation_for_MAC_OSX"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=5" title="Edit section: Binary  Installation for MAC OSX">edit</a>]</span> <span class="mw-headline"> Binary  Installation for MAC OSX </span></h1>
 <p>Currently Pixie is compiled against <tt>libtiff</tt> from fink. Under OSX 10.2 or earlier, it will also require you to use fink's dlcompat and dlcompat-shlibs libraries.
 </p><p>Please install fink ( <a href="http://fink.sourceforge.net" class="external free" title="http://fink.sourceforge.net" rel="nofollow">http://fink.sourceforge.net</a> ) to get a hold of the required libraries. I can recommend fink commander ( <a href="http://finkcommander.sourceforge.net" class="external free" title="http://finkcommander.sourceforge.net" rel="nofollow">http://finkcommander.sourceforge.net</a> ) to help ease installation of fink projects, but you'll still need to install fink. Follow the instructions over at fink for how to set it up.
 </p><p>Install <tt>libtiff</tt> from fink. Also, especially for 10.2 or earlier, ensure you install up to date <tt>dlcompat</tt> and <tt>dlcompat-shlib</tt> packages.
@@ -171,75 +177,77 @@ To compile Pixie, you will need:
 <pre>export DYLD_INSERT_LIBARARIES=/sw/lib/libdl.0.dylib
 </pre>
 <p>before running pixie.
-</p><p><b>For all OSX versions</b>:. You should be ready to roll with renders now. Remember to set up the environment variable <tt>PIXIEHOME</tt>:
-</p><p>for tcsh
 </p>
-<pre>setenv PIXIEHOME /Applications/Graphics/Pixie
-</pre>
-<p>for bash
+<a name="Common_instructions_for_using_Pixie"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=6" title="Edit section: Common instructions for using Pixie">edit</a>]</span> <span class="mw-headline"> Common instructions for using Pixie </span></h1>
+<p>You must set PIXIEHOME environment variable to the location of your binary distribution. You may also want to ass PIXIEHOME/bin to your path and add the lib directory into your LD_LIBRARY_PATH on Unix and DYLIB_LIBRARY_PATH on OSX.
+</p><p>For Windows XP:
 </p>
-<pre>export PIXIEHOME=/Applications/Graphics/Pixie
-</pre>
-<p>Finally, you'll probably want to put pixie binaries in your path, which you do with
-</p><p>for tcsh
+<ul><li> Open Control Panel -&gt; System -&gt; Advanced -&gt; Environment Variables
+</li><li> Hit New
+</li><li> Variable name: PIXIEHOME
+</li><li> Variable value: &lt;path-to-pixie&gt;
+</li></ul>
+<p>For bash:
 </p>
-<pre>set path=($path /Applications/Graphics/Pixie/bin)
-</pre>
-<p>for bash
+<ul><li> export PIXIEHOME=&lt;path-to-pixie&gt;
+</li><li> export PATH=$PATH:$PIXIEHOME/bin
+</li><li> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PIXIEHOME/lib
+</li></ul>
+<p>You can add these lines in your ".profile" script in your home directory (~/.profile).
+</p><p>For tcsh:
 </p>
-<pre>export PATH=$PATH:/Applications/Graphics/Pixie/bin
-</pre>
-<p>That's about it. I've put these commands in my login files. There are quite a few different oppinions/preferences on how to do this. <a href="/pixiewiki_install/index.php?title=InstallingOnOSX/EnvironmentSetup&amp;action=edit" class="new" title="InstallingOnOSX/EnvironmentSetup">InstallingOnOSX/EnvironmentSetup</a> shows how I do mine, for tcsh - bash will be different.
-</p>
-<hr />
-<a name="Common_instructions_for_using_Pixie"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;action=edit&amp;section=5" title="Edit section: Common instructions for using Pixie">edit</a>]</span> <span class="mw-headline"> Common instructions for using Pixie </span></h1>
-<p>You should set PIXIEHOME environment variable to the location of your binary distribution. You can also specify search paths for various external resources that Pixie may need using:
+<ul><li> setenv PIXIEHOME &lt;path-to-pixie&gt;
+</li><li> setp path=($path $PIXIEHOME/bin)
+</li><li> setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PIXIEHOME/lib
+</li></ul>
+<p>You can add these lines in your ".tcshrc" script in your home directory (~/.tcshrc).
+</p><p><br />
+You can also specify search paths for various external resources that Pixie may need using:
 </p>
 <pre>Option "searchpath" "..." "..."
 </pre>
-<p>On UNIX systems, you also need to add the lib directory in your binary distribution into your <tt>LD_LIBRARY_PATH</tt>, so that the shared objects will be loaded.
-</p><p>Your binary distribution should have the following structure:
+<p>Your binary distribution should have the following structure:
 </p>
 <table>
 
 <tr>
-<td> </td><td> <tt>Pixie/</tt>
+<td> </td><td> <tt>Pixie/</tt> </td><td> </td><td> </td><td> This is your PIXIEHOME
 </td></tr>
 <tr>
-<td> </td><td> <tt>bin/</tt> </td><td> </td><td> The executables are here.
+<td> </td><td> </td><td> <tt>bin/</tt> </td><td> </td><td> The executables are here.
 </td></tr>
 <tr>
-<td> </td><td>  </td><td> <tt>rndr</tt> </td><td> The RIB renderer.
+<td> </td><td> </td><td> </td><td> <tt>rndr</tt> </td><td> The RIB renderer.
 </td></tr>
 <tr>
-<td> </td><td>  </td><td> <tt>sdrc</tt> </td><td> Shading language compiler
+<td> </td><td> </td><td> </td><td> <tt>sdrc</tt> </td><td> Shading language compiler
 </td></tr>
 <tr>
-<td> </td><td>  </td><td> <tt>sdrinfo</tt> </td><td> Get information about a compiled shader
+<td> </td><td> </td><td> </td><td> <tt>sdrinfo</tt> </td><td> Get information about a compiled shader
 </td></tr>
 <tr>
-<td> </td><td>  </td><td> <tt>texmake</tt> </td><td> Texture preparation tool.
+<td> </td><td> </td><td> </td><td> <tt>texmake</tt> </td><td> Texture preparation tool.
 </td></tr>
 <tr>
-<td> </td><td>  </td><td> <tt>show</tt> </td><td> A viewer for photon maps/irradiance caches etc..
+<td> </td><td> </td><td> </td><td> <tt>show</tt> </td><td> A viewer for photon maps/irradiance caches etc..
 </td></tr>
 <tr>
-<td> </td><td> <tt>include/</tt> </td><td>  </td><td> The header files
+<td> </td><td> </td><td> <tt>include/</tt> </td><td>  </td><td> The header files
 </td></tr>
 <tr>
-<td> </td><td> <tt>lib/</tt> </td><td>  </td><td> The library files.
+<td> </td><td> </td><td> <tt>lib/</tt> </td><td>  </td><td> The library files.
 </td></tr>
 <tr>
-<td> </td><td> <tt>displays/</tt> </td><td>  </td><td> The display drivers.
+<td> </td><td> </td><td> <tt>displays/</tt> </td><td>  </td><td> The display drivers.
 </td></tr>
 <tr>
-<td> </td><td> <tt>tutorials/</tt> </td><td>  </td><td> The Pixie tutorials/examples
+<td> </td><td> </td><td> <tt>tutorials/</tt> </td><td>  </td><td> The Pixie tutorials/examples
 </td></tr>
 <tr>
-<td> </td><td> <tt>doc/</tt> </td><td>  </td><td> Documentation for Pixie
+<td> </td><td> </td><td> <tt>doc/</tt> </td><td>  </td><td> Documentation for Pixie
 </td></tr></table>
 
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1296-0!1!0!!en!2 and timestamp 20070211181353 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1296-0!1!0!!en!2 and timestamp 20070405234553 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Installing_And_Running">http://www.george-graphics.co.uk/pixiewiki/Documentation/Installing_And_Running</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -302,7 +310,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;oldid=2208">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Installing_And_Running&amp;oldid=2790">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -310,8 +318,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 06:32, 29 August 2006.</li>
-				<li id="f-viewcount">This page has been accessed 1,375 times.</li>
+				<li id="f-lastmod"> This page was last modified 17:33, 31 March 2007.</li>
+				<li id="f-viewcount">This page has been accessed 2,389 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -321,4 +329,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.221 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.261 secs. --></body></html>

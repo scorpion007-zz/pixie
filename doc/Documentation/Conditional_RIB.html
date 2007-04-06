@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="keywords" content="Documentation/Conditional RIB,Documentation/User Attributes And Options" />
+<link rel="shortcut icon" href="favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
+		<title>Documentation/Conditional RIB - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42a"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42a" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42a" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42a";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42a"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "/pixiewiki_install/skins";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/Conditional_RIB";
+var wgTitle = "Documentation/Conditional RIB";
+var wgArticleId = "1693";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "2769";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="mediawiki ns-0 ltr page-Documentation_Conditional_RIB">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="contentTop" id="top"></a>
+				<h1 class="firstHeading">Documentation/Conditional RIB</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Documentation.html" title="Documentation">Documentation</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+</p>
+<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1"><a href="#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-1"><a href="#New_RIB_Commands"><span class="tocnumber">2</span> <span class="toctext">New RIB Commands</span></a></li>
+<li class="toclevel-1"><a href="#Conditions"><span class="tocnumber">3</span> <span class="toctext">Conditions</span></a></li>
+<li class="toclevel-1"><a href="#New_C_Commands"><span class="tocnumber">4</span> <span class="toctext">New C Commands</span></a></li>
+</ul>
+</td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<a name="Introduction"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;action=edit&amp;section=1" title="Edit section: Introduction">edit</a>]</span> <span class="mw-headline"> Introduction </span></h1>
+<p>Conditional RIB allows a single rib file to be reused in multiple renders with different settings.  For example, you might choose to set options or attributes conditionally, or to swap shaders.
+</p><p>This is most often combined with <a href="../Documentation/User_Attributes_And_Options.html" title="Documentation/User Attributes And Options">user attributes</a>.
+</p><p>For example:
+</p>
+<pre>Option "user" "string mode" "bake"
+#Option "user" "string mode" "read"
+
+IfBegin "$Option:user:mode == 'bake'"
+  Attribute "dice" "rasterorient" 0
+  Attribute "cull" "backfacing" 0
+  Attribute "cull" "hidden" 0
+  Surface "bakingShader"
+Else
+  Suface "readingShader"
+IfEnd
+</pre>
+<a name="New_RIB_Commands"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;action=edit&amp;section=2" title="Edit section: New RIB Commands">edit</a>]</span> <span class="mw-headline"> New RIB Commands </span></h1>
+<pre>IfBegin "&lt;expression&gt;"
+</pre>
+<p>All command until either <tt>ElseIf</tt>, <tt>Else</tt> or <tt>End</tt> will only be executed if <tt>"&lt;condition&gt;"</tt> evaluates to true.  
+</p>
+<pre>Else
+</pre>
+<p>Commands until <tt>End</tt> will be executed if <tt>"&lt;condition&gt;"</tt> did not evaluate to true.  
+</p>
+<pre>ElseIf "&lt;condition&gt;"
+</pre>
+<p>Allows complex conditions to be built up.
+</p>
+<pre>End
+</pre>
+<p>Ends conditional RIB evaluation.
+</p><p>Conditions may be nested.
+</p>
+<a name="Conditions"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;action=edit&amp;section=3" title="Edit section: Conditions">edit</a>]</span> <span class="mw-headline"> Conditions </span></h1>
+<p>Conditions can take the following form:
+</p>
+<dl><dt><tt>$variable</tt></dt><dd>look up an attribute or option
+</dd><dt><tt>* / + -</tt></dt><dd>float or integer aritmetic
+</dd><dt><tt>(&lt;expr&gt;)</tt></dt><dd>evaluate a subexpression
+</dd><dt><tt>==  &nbsp;!=   &lt;   &lt;=   &gt;=   &gt;</tt></dt><dd>evaluate comparison between two expressions, strings may be compared with == or&nbsp;!=
+</dd><dt><tt>&amp;&amp; ||&nbsp;!</tt></dt><dd>boolean operation on subexpressions (as in C)
+</dd><dt><tt>'string literal'</tt></dt><dd>a string constant expression
+</dd><dt><tt>123</tt></dt><dd>a number constant
+</dd><dt><tt>defined(variable)</tt></dt><dd>is an option or attribute defined
+</dd><dt><tt>concat(expr1,expr2)</tt></dt><dd>concatenate two string subexpressions
+</dd><dt><tt>$(expr)</tt></dt><dd>look up a variable who'se name is the result of the string expression <tt>expr</tt>
+</dd></dl>
+<p>Options may be looked up with <tt>$Option:&lt;optionname&gt;</tt>, and attributes with <tt>$Attribute:&lt;attributename&gt;</tt>.  User options and attributes are therefore <tt>$Option:user:&lt;optionname&gt;</tt> and <tt>$Attribute:user:&lt;optionname&gt;</tt> respectively.
+</p>
+<a name="New_C_Commands"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;action=edit&amp;section=4" title="Edit section: New C Commands">edit</a>]</span> <span class="mw-headline"> New C Commands </span></h1>
+<p>Conditional RIB is also available via the C Ri Interface (in ri.h):
+</p>
+<pre>RtVoid RiIfBegin(char *expr, ...),
+RtVoid RiIfBeginV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
+RtVoid RiElseIf(char *expr, ...),
+RtVoid RiElseIfV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
+RtVoid RiElse(void),
+RtVoid RiIfEnd(void);
+</pre>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1693-0!1!0!!en!2 and timestamp 20070406094251 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Conditional_RIB">http://www.george-graphics.co.uk/pixiewiki/Documentation/Conditional_RIB</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+						 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Conditional_RIB.html">Article</a></li>
+						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Conditional_RIB&amp;action=edit">Discussion</a></li>
+						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;action=edit">Edit</a></li>
+						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;action=history">History</a></li>
+				</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Conditional_RIB">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Conditional_RIB&amp;oldid=2769">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 20:16, 29 March 2007.</li>
+				<li id="f-viewcount">This page has been accessed 53 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.452 secs. --></body></html>

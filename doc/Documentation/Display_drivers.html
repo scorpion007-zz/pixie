@@ -33,7 +33,7 @@ var wgUserName = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "1961";
+var wgCurRevisionId = "2680";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
@@ -100,6 +100,12 @@ var wgCurRevisionId = "1961";
 </p><p>The renderer will always cover every pixel once and only once. However, the renderer makes no guarantees about the order or the size of the tiles (i.e. the renderer may change the tile size and send tiles out of order). The raw data is given in data where every float gives a sample (i.e. first  numSamples floats give the first pixel).
 </p><p>The data is not quantized or clamped to (0,1) before calling this function. It is the receiver's responsibility to do that. This function must return 1 on success and 0 on failure. On failure, the renderer will <b>not</b> send any more data and will <b>not</b> call the function below (So you should clean whatever data you allocated before returning).
 </p>
+<div class="notebox" style="color: #00ff00">New in 2.0.1</div>
+<div class="insetbox">
+<p><b>note:</b>
+Care should be taken that <tt>displayData</tt> is thread safe.  In 2.0.1 it may be called simultaneously by multiple threads.  So if your function does anything that must be serialized - writing to file for example - then you must create a mutex in display start and lock it inside the <tt>displayData</tt> callback.  The Pixie source code has some built in display drivers you can look to for ideas, and <tt>libpixiecommon</tt> provides some cross-platform mutex functions like <tt>osCreateMutex</tt> and <tt>osLock</tt>.
+</p>
+</div>
 <pre>void    displayFinish(void *image);
 </pre>
 <p>This function is called after <tt>WorldEnd</tt> to signal the driver that the rendering is complete and all the pixels have been sent. The image is the transparent display handle returned by <tt>displayStart</tt>. This function will '<i>not</i> be called if <tt>displayStart</tt> returns <tt>NULL</tt> or if at any previous time <tt>displayData</tt> returns 0.
@@ -159,7 +165,7 @@ var wgCurRevisionId = "1961";
 <a name="OpenEXR"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Display_drivers&amp;action=edit&amp;section=7" title="Edit section: OpenEXR">edit</a>]</span> <span class="mw-headline"> OpenEXR </span></h2>
 <p>Outputs to OpenEXR format - a high quality HDR format which supports compression
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1484-0!1!0!!en!2 and timestamp 20070211114254 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1484-0!1!0!!en!2 and timestamp 20070406065924 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Display_drivers">http://www.george-graphics.co.uk/pixiewiki/Documentation/Display_drivers</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -222,7 +228,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Display_drivers&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Display_drivers&amp;oldid=1961">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Display_drivers&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Display_drivers&amp;oldid=2680">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -230,8 +236,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 10:13, 6 May 2006.</li>
-				<li id="f-viewcount">This page has been accessed 591 times.</li>
+				<li id="f-lastmod"> This page was last modified 08:47, 12 February 2007.</li>
+				<li id="f-viewcount">This page has been accessed 921 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -241,4 +247,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.221 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.338 secs. --></body></html>

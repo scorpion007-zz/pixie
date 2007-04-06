@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="keywords" content="Documentation/Network parallel rendering" />
+		<meta name="keywords" content="Documentation/Network parallel rendering,Documentation/Multithreading" />
 <link rel="shortcut icon" href="favicon.ico" />
 <link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Documentation/Network parallel rendering - PixieWiki</title>
@@ -33,7 +33,7 @@ var wgUserName = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "1966";
+var wgCurRevisionId = "2743";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
@@ -75,8 +75,13 @@ var wgCurRevisionId = "1966";
 <pre>rndr -P:&lt;n&gt; &lt;rib_file&gt;
 </pre>
 <p>Where <tt>&lt;n&gt;</tt> is the number of processors to use.  There is some overhead in paralellizing a render, so very simple renders may not achieve the full speed possible.  In general the most efficiency will be attained when the scene is shading-heavy.
+</p><p>Starting with 2.0.1, Pixie supports multi threaded rendering. In general, this is faster and leaner than multi-processor rendering as described above. To start a rendering job with n threads, use
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1304-0!1!0!!en!2 and timestamp 20070211181345 -->
+<pre>rndr -t:&lt;n&gt; &lt;rib_file&gt;
+</pre>
+<p>See <a href="../Documentation/Multithreading.html" title="Documentation/Multithreading">Documentation/Multithreading</a> for more information.
+</p>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1304-0!1!0!!en!2 and timestamp 20070405174346 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Network_parallel_rendering">http://www.george-graphics.co.uk/pixiewiki/Documentation/Network_parallel_rendering</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -139,7 +144,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;oldid=1966">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Network_parallel_rendering&amp;oldid=2743">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -147,8 +152,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 10:14, 6 May 2006.</li>
-				<li id="f-viewcount">This page has been accessed 483 times.</li>
+				<li id="f-lastmod"> This page was last modified 08:30, 3 March 2007.</li>
+				<li id="f-viewcount">This page has been accessed 634 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -158,4 +163,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.268 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.245 secs. --></body></html>

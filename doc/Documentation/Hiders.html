@@ -33,7 +33,7 @@ var wgUserName = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2133";
+var wgCurRevisionId = "2738";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
@@ -71,15 +71,11 @@ Pixie can generate images using raytracing or scan line rendering. As it is ofte
 <td> <b>zbuffer</b> </td><td> This hider is a stripped down version of Stochastic. It does not support motion blur, depth of field or transparency. If your scene does not involve these effects, this hider can generate an equal quality output with the Stochastic.
 </td></tr>
 <tr>
-<td> <b>opengl</b> </td><td> This is exactly the same with Zbuffer. However, the final stage of the rendering is implemented with OpenGl. The potential hardware acceleration makes this hider much faster than any other hider. If your computer does not have a hardware implemented opengl driver, Zbuffer is faster. OpenGL hider is only available on Windows systems for the time being.
-</td></tr>
-<tr>
 <td> <b>photon</b> </td><td> This hider is used to compute photonmaps in a preprocessing step. This hider does not create an image. The renderer simply goes through the light sources defined in a scene and shoots photons.
 <p><b>New in 1.7.2</b> The photon hider supports dispersion of light.
 </p>
 </td></tr></table>
-<p>If you notice,  OpenGL hider is implemented as a module. That means if you want to use it,  <tt>opengl.dll/so</tt> must be in your procedural path (check <tt>Option "searchpath" "procedural" </tt>).
-</p><p>The following table summarizes the capabilities of each hider:
+<p>The following table summarizes the capabilities of each hider:
 </p>
 <table class="wikitable">
 <tr>
@@ -102,9 +98,6 @@ Pixie can generate images using raytracing or scan line rendering. As it is ofte
 </td></tr>
 <tr>
 <td>zbuffer     </td><td>      </td><td>      </td><td>      </td><td>  X  </td><td>      </td><td>  X  </td><td>      </td><td>      </td><td>
-</td></tr>
-<tr>
-<td>opengl     </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>  X  </td><td>      </td><td>      </td><td>
 </td></tr>
 <tr>
 <td>photon     </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>      </td><td>
@@ -140,7 +133,7 @@ Pixie can generate images using raytracing or scan line rendering. As it is ofte
 <td> LOD </td><td> Level Of Detail
 </td></tr></table>
 
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1483-0!1!0!!en!2 and timestamp 20070211181351 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1483-0!1!0!!en!2 and timestamp 20070405173711 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Hiders">http://www.george-graphics.co.uk/pixiewiki/Documentation/Hiders</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -203,7 +196,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Hiders&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Hiders&amp;oldid=2133">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Hiders&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Hiders&amp;oldid=2738">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -211,8 +204,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 19:47, 7 July 2006.</li>
-				<li id="f-viewcount">This page has been accessed 510 times.</li>
+				<li id="f-lastmod"> This page was last modified 06:50, 3 March 2007.</li>
+				<li id="f-viewcount">This page has been accessed 735 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -222,4 +215,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.264 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.233 secs. --></body></html>

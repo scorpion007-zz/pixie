@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="keywords" content="Documentation/Ptc API" />
+<link rel="shortcut icon" href="favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
+		<title>Documentation/Ptc API - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42a"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42a" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42a" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42a";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42a";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42a"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "/pixiewiki_install/skins";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/Ptc_API";
+var wgTitle = "Documentation/Ptc API";
+var wgArticleId = "1696";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "2784";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+			</head>
+<body  class="mediawiki ns-0 ltr page-Documentation_Ptc_API">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="contentTop" id="top"></a>
+				<h1 class="firstHeading">Documentation/Ptc API</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Documentation.html" title="Documentation">Documentation</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p>An API has been added which allows both reading and writing of point cloud files.  Point clouds can be turned into brickmaps via <tt>texmake -texture3d &lt;in&gt; &lt;out&gt;</tt>, so this also allows an external program to generate brickmaps for efficient rendering of 3d texture data.
+</p><p>To use the API, include <tt>ptcapi.h</tt>, and link with <tt>libri</tt>.  The following functions are defined:
+</p>
+<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1"><a href="#Reading"><span class="tocnumber">1</span> <span class="toctext">Reading</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Open_an_existing_point_cloud"><span class="tocnumber">1.1</span> <span class="toctext">Open an existing point cloud</span></a></li>
+<li class="toclevel-2"><a href="#Get_info_on_the_point_cloud"><span class="tocnumber">1.2</span> <span class="toctext">Get info on the point cloud</span></a></li>
+<li class="toclevel-2"><a href="#Read_a_single_point"><span class="tocnumber">1.3</span> <span class="toctext">Read a single point</span></a></li>
+<li class="toclevel-2"><a href="#Close_the_file"><span class="tocnumber">1.4</span> <span class="toctext">Close the file</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1"><a href="#Writing"><span class="tocnumber">2</span> <span class="toctext">Writing</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Create_a_blank_point_cloud_with_nvars_channels"><span class="tocnumber">2.1</span> <span class="toctext">Create a blank point cloud with nvars channels</span></a></li>
+<li class="toclevel-2"><a href="#Write_a_point_to_the_file"><span class="tocnumber">2.2</span> <span class="toctext">Write a point to the file</span></a></li>
+<li class="toclevel-2"><a href="#Finish_an_close_the_file"><span class="tocnumber">2.3</span> <span class="toctext">Finish an close the file</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<a name="Reading"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=1" title="Edit section: Reading">edit</a>]</span> <span class="mw-headline"> Reading </span></h1>
+<a name="Open_an_existing_point_cloud"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=2" title="Edit section: Open an existing point cloud">edit</a>]</span> <span class="mw-headline"> Open an existing point cloud </span></h2>
+<pre>PtcPointCloud PtcOpenPointCloudFile(char *filename, int *nvars, char **vartypes, char **varnames);
+</pre>
+<p>Open filename, and retrieve the number of channels defined in the pointcloud.  The types (color,float,point,normal,matrix and so on) of each named channel are returned in the varnames array:
+</p>
+<pre>int nv;
+char *types[256];
+char *names[256];
+PtcPointCloud myPtc = PtcOpenPointCloudFile("cloud.ptc", int *nvars, types, names);
+// nv = number of channels
+// types[0] = first channel type
+// names[1] = first channel name
+</pre>
+<a name="Get_info_on_the_point_cloud"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=3" title="Edit section: Get info on the point cloud">edit</a>]</span> <span class="mw-headline"> Get info on the point cloud </span></h2>
+<pre>int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result);
+</pre>
+<p>Get information about a previously opened point cloud.  Request may be one of:
+</p>
+<dl><dt><tt>"npoints"</tt></dt><dd>the number of points in the file
+</dd><dt><tt>"bbox"</tt></dt><dd>the bounding box of the points
+</dd><dt><tt>"datasize"</tt></dt><dd>the size in floats of each point (the sum of all channel sizes)
+</dd><dt><tt>"world2eye"</tt></dt><dd>the world to eye transformation
+</dd><dt><tt>"world2ndc"</tt></dt><dd>the world to NDC transformation when the file was created
+</dd></dl>
+<a name="Read_a_single_point"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=4" title="Edit section: Read a single point">edit</a>]</span> <span class="mw-headline"> Read a single point </span></h2>
+<pre>int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data);
+</pre>
+<p>This function will return the next point from a previously opened file <tt>point</tt> (3 floats) will recieve the position, <tt>normal</tt> (3 floats) gets the normal of the point, and the radius of the point is returned in <tt>radius</tt>.  The data itself is returned in the <tt>data</tt> array which must be large enough to cope with <tt>datasize</tt> floats.
+</p>
+<a name="Close_the_file"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=5" title="Edit section: Close the file">edit</a>]</span> <span class="mw-headline"> Close the file </span></h2>
+<pre>void PtcClosePointCloudFile(PtcPointCloud pointcloud);
+</pre>
+<p>Close a previously read-opened file.
+</p>
+<a name="Writing"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=6" title="Edit section: Writing">edit</a>]</span> <span class="mw-headline"> Writing </span></h1>
+<a name="Create_a_blank_point_cloud_with_nvars_channels"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=7" title="Edit section: Create a blank point cloud with nvars channels">edit</a>]</span> <span class="mw-headline"> Create a blank point cloud with nvars channels </span></h2>
+<pre>PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,
+     float *world2eye, float *world2ndc, float *format);
+</pre>
+<pre>Returns a handle to the newly opend file, which has <tt>nvars</tt> channels, described by <tt>vartypes</tt> and <tt>varnames</tt>.  You need to provide the world to eye transform <tt>world2eye</tt>, a 4x4 matrix of floats.  Also specify <tt>world2ndc</tt> for the transform to the normalized device coordinate system in which the cloud was generated.  Note that currently this NDC transformation is simply stored for informational purposes.    The format parameter is currently unused.
+</pre>
+<a name="Write_a_point_to_the_file"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=8" title="Edit section: Write a point to the file">edit</a>]</span> <span class="mw-headline"> Write a point to the file </span></h2>
+<pre>void PtcWriteDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float radius, float *data);
+</pre>
+<p>Write <tt>data</tt> with the specified <tt>point</tt>, <tt>radius</tt> and <tt>normal</tt> to the file.
+</p>
+<a name="Finish_an_close_the_file"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit&amp;section=9" title="Edit section: Finish an close the file">edit</a>]</span> <span class="mw-headline"> Finish an close the file </span></h2>
+<pre>void PtcFinishPointCloudFile(PtcPointCloud pointcloud);
+</pre>
+<p>Finish and close a file which was opened for writing.
+</p>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1696-0!1!0!!en!2 and timestamp 20070406084823 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Ptc_API">http://www.george-graphics.co.uk/pixiewiki/Documentation/Ptc_API</a>"</div>
+						<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+						 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Ptc_API.html">Article</a></li>
+						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Ptc_API&amp;action=edit">Discussion</a></li>
+						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=edit">Edit</a></li>
+						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;action=history">History</a></li>
+				</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Ptc_API">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Ptc_API&amp;oldid=2784">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 21:01, 29 March 2007.</li>
+				<li id="f-viewcount">This page has been accessed 58 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.249 secs. --></body></html>
