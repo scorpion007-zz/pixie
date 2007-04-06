@@ -655,6 +655,9 @@ DEFFUNC(Match				,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE
 										if (*str == 'f') {										\
 											cp++;												\
 											sprintf(tmp,"%f",*af[cp]);							\
+										} else if (*str == 'd') {								\
+											cp++;												\
+											sprintf(tmp,"%d",(int) *af[cp]);					\
 										} else if (*str == 'c') {								\
 											cp++;												\
 											sprintf(tmp,"(%f,%f,%f)",af[cp][0],af[cp][1],af[cp][2]);		\

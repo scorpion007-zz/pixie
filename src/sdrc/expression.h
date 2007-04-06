@@ -147,7 +147,7 @@ public:
 						~CTerminalExpression();
 
 			void		getCode(FILE *,CVariable *);
-			CVariable	*getVariable()	{	return variable;	}
+			CVariable	*getVariable()	{	 return variable;	}
 
 			CVariable	*variable;
 };

@@ -268,8 +268,8 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {				\
 										illuminateBegin(Pf,Nf,thetaf);									\
 									} else {															\
-										float		*Ps		=	varying[VARIABLE_PS];					\
-										float		*L		=	varying[VARIABLE_L];					\
+										float		*Ps			=	varying[VARIABLE_PS];				\
+										float		*L			=	varying[VARIABLE_L];				\
 										const float	*Ns			=	currentShadingState->Ns;			\
 										const float	*costheta	=	currentShadingState->costheta;		\
 																										\
@@ -419,8 +419,8 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 										const float	*Ns			=	currentShadingState->Ns;	\
 										const float	*costheta	=	currentShadingState->costheta;		\
 																								\
-										subvv(R,CRenderer::worldBmax,CRenderer::worldBmin);			\
-										worldRadius	=	dotvv(R,R);								\
+										subvv(R,CRenderer::worldBmax,CRenderer::worldBmin);		\
+										worldRadius				=	dotvv(R,R);					\
 																								\
 										for (i=numVertices;i>0;i--,tags++) {					\
 											if (*tags) {										\
