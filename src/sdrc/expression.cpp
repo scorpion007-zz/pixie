@@ -3041,7 +3041,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 		sdr->error("You can not operate on arrays directly\n");
 		return	new CNullExpression;
 	}
-
+	
 	// Do the types match
 	if ((first->type & SLC_TYPE_MASK) == (second->type & SLC_TYPE_MASK)) {
 		// Yesss
@@ -3056,7 +3056,8 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 			if (opcodeVector == NULL) {
 				sdr->error("This operation is not defined on vectors\n");
 			} else {
-				return	new CBinaryExpression(SLC_VECTOR,opcodeVector,first,second);
+				int subtype = (first->type | second->type) & SLC_SUB_TYPE_MASK;
+				return	new CBinaryExpression(SLC_VECTOR|subtype,opcodeVector,first,second);
 			}
 		} else if (first->type & SLC_MATRIX) {	
 			if (opcodeMatrix == NULL) {
@@ -3097,7 +3098,8 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 			if (opcodeVector == NULL) {
 				sdr->error("This operation is not defined on vectors\n");
 			} else {
-				return	new CBinaryExpression(SLC_VECTOR,opcodeVector,getConversion(SLC_VECTOR,first),getConversion(SLC_VECTOR,second));
+				int subtype = (first->type | second->type) & SLC_SUB_TYPE_MASK;
+				return	new CBinaryExpression(SLC_VECTOR|subtype,opcodeVector,getConversion(SLC_VECTOR,first),getConversion(SLC_VECTOR,second));
 			}
 		} else if ((first->type | second->type) & SLC_FLOAT) {		
 			if (opcodeFloat == NULL) {
@@ -3135,7 +3137,7 @@ CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVecto
 	}
 		
 	if (first->type & SLC_FLOAT)		return	new CUnaryExpression(SLC_FLOAT,opcodeFloat,first);
-	else if (first->type & SLC_VECTOR)	return	new CUnaryExpression(SLC_VECTOR,opcodeVector,first);
+	else if (first->type & SLC_VECTOR)	return	new CUnaryExpression(SLC_VECTOR | (first->type & SLC_SUB_TYPE_MASK),opcodeVector,first);
 	else if (first->type & SLC_MATRIX)	return	new CUnaryExpression(SLC_MATRIX,opcodeMatrix,first);
 	else if (first->type & SLC_STRING)	return	new CUnaryExpression(SLC_STRING,opcodeString,first);
 	else if (first->type & SLC_BOOLEAN)	return	new CUnaryExpression(SLC_BOOLEAN,opcodeBoolean,first);
