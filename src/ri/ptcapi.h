@@ -42,7 +42,10 @@
 
 typedef void *PtcPointCloud;
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 	// Create a blank point cloud with nvars channels
 	LIB_EXPORT	PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,
 			   	float *world2eye, float *world2ndc, float *format);
@@ -64,7 +67,10 @@ extern "C" {
 
 	// Close the file
 	LIB_EXPORT	void PtcClosePointCloudFile(PtcPointCloud pointcloud);
+
+#ifdef __cplusplus
 };
+#endif
 
 #endif //_PTCAPI_H_
 
