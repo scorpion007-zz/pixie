@@ -141,13 +141,13 @@ p, .documentDescription {
 	margin: 0 0 0 0 ! important;
 }
 
-pre {
+/*pre {
     border: 1pt dashed black;
     white-space: pre;
     font-size: 8pt;
     overflow: auto;
     padding: 1em 0;
-}
+}*/
 
 table.listing,
 table.listing td {
