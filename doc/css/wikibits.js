@@ -40,11 +40,11 @@ function hookEvent(hookName, hookFunct) {
 // document.write special stylesheet links
 if (typeof stylepath != 'undefined' && typeof skin != 'undefined') {
 	if (is_opera_preseven) {
-		document.write('<link rel="stylesheet" type="text/css" href="css/Opera6Fixes.css">');
+		document.write('<link rel="stylesheet" type="text/css" href="'+stylepath+'/Opera6Fixes.css">');
 	} else if (is_opera_seven) {
-		document.write('<link rel="stylesheet" type="text/css" href="css/Opera7Fixes.css">');
+		document.write('<link rel="stylesheet" type="text/css" href="'+stylepath+'/Opera7Fixes.css">');
 	} else if (is_khtml) {
-		document.write('<link rel="stylesheet" type="text/css" href="css/KHTMLFixes.css">');
+		document.write('<link rel="stylesheet" type="text/css" href="'+stylepath+'/KHTMLFixes.css">');
 	}
 }
 
