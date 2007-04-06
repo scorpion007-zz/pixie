@@ -190,6 +190,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 texturedir = @texturedir@
 nobase_doc_DATA = \
+	*.ico				\
 	*.html				\
 	css/*				\
 	css/images/*		\

@@ -190,6 +190,7 @@ sysconfdir = ${prefix}/etc
 target_alias = 
 texturedir = /Applications/Graphics/Pixie//textures
 nobase_doc_DATA = \
+	*.ico				\
 	*.html				\
 	css/*				\
 	css/images/*		\

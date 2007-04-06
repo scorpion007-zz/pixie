@@ -1,5 +1,6 @@
 
 nobase_doc_DATA = 		\
+	*.ico				\
 	*.html				\
 	css/*				\
 	css/images/*		\
