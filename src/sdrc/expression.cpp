@@ -3173,8 +3173,8 @@ CExpression	*getConversion(int type,CExpression *first) {
 			sdr->error("Unable to cast a float\n");
 		}
 	} else if (type & SLC_VECTOR) {
-		if (first->type & SLC_VECTOR)		return first;
-		else if (first->type & SLC_FLOAT)	return new CUnaryExpression(SLC_VECTOR | (first->type & SLC_UNIFORM) ,opcodeVectorFromFloat,first);
+		if (first->type & SLC_VECTOR)		{ first->type |= (type & SLC_SUB_TYPE_MASK);	return first; }
+		else if (first->type & SLC_FLOAT)	return new CUnaryExpression(SLC_VECTOR | (first->type & SLC_UNIFORM) | (type & SLC_SUB_TYPE_MASK), opcodeVectorFromFloat,first);
 		else {
 			delete first;
 			sdr->error("Unable to cast a vector\n");
