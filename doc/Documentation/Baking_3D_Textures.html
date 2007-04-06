@@ -33,7 +33,7 @@ var wgUserName = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2202";
+var wgCurRevisionId = "2806";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?42a"><!-- wikibits js --></script>
@@ -132,6 +132,7 @@ var wgCurRevisionId = "2202";
 </p>
 <dl><dt><tt>radius</tt></dt><dd>Specifies the validity radius of each sample.  If you do not provide this, Pixie will calculate a value for you using the grid size.
 </dd><dt><tt>radiusscale</tt></dt><dd>Allows a scale to be applied to the calculated (or provided) radius
+</dd><dt><tt>interpolate</tt></dt><dd>if 1, then bake the centres of micropolygons, rather than the corners - this will produce fewer overlapping points at the borders between grids, and should be used if the point cloud is to be processed with a program for which overlapping points might be an issue.
 </dd></dl>
 <p>Data to be baked is then specified with name-value pairs, eg
 </p>
@@ -194,7 +195,7 @@ texture3d("cloud.ptc",P,N,"CoutDiff",Cd);
 <a name="Reference_Poses"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=13" title="Edit section: Reference Poses">edit</a>]</span> <span class="mw-headline"> Reference Poses </span></h1>
 <p>If the object you're baking is moving or deforming, you might wish to bake the data onto a reference pose, and look it up using that pose (using a vertex point __Pref to specify the vertices in reference pose).  Future releases may support baking to an arbitrary coordinate system other than 'world'.
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1643-0!1!0!!en!2 and timestamp 20070405200047 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1643-0!1!0!!en!2 and timestamp 20070406105032 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Baking_3D_Textures">http://www.george-graphics.co.uk/pixiewiki/Documentation/Baking_3D_Textures</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -233,6 +234,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
 				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
 				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Tutorials"><a href="../Tutorials.html">Tutorials</a></li>
 				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
 				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
 				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
@@ -257,7 +259,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;oldid=2202">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;oldid=2806">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -266,7 +268,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
 				<li id="f-lastmod"> This page was last modified 21:35, 21 August 2006.</li>
-				<li id="f-viewcount">This page has been accessed 993 times.</li>
+				<li id="f-viewcount">This page has been accessed 997 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -276,4 +278,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.332 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.289 secs. --></body></html>
