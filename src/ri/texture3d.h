@@ -129,6 +129,49 @@ inline	void	texture3Dflatten(float *dest,int n,const float **data,int *entry,int
 }
 
 ///////////////////////////////////////////////////////////////////////
+// Function				:	texture3DflattenInterpolated
+// Description			:	Flatten the channel datas into a vector
+// Return Value			:	-
+// Comments				:
+inline	void	texture3DflattenInterpolated(float *dest,int n,const float **data,int *entry,int *size, int uVertices) {
+	int	i;
+		
+	// For every channel
+	for (i=0;i<n;i++) {
+		const float	*src	=	*data++;
+		
+		// Unroll for the common cases
+		switch (size[i]) {
+		case 0:
+			// This can happen if the channel was not found
+			break;
+		case 1:
+			dest[entry[i]]		=	0.25f*(src[0] + src[1] + src[uVertices] + src[uVertices+1]);
+			break;
+		case 2:
+			dest[entry[i]]		=	0.25f*(src[0] + src[1] + src[uVertices] + src[uVertices+1]);
+			dest[entry[i]+1]	=	0.25f*(src[1] + src[2] + src[uVertices*2+1] + src[uVertices*2+2]);
+			break;
+		case 3:
+			initv(dest + entry[i],0);
+			addvv(dest + entry[i],src);
+			addvv(dest + entry[i],src+3);
+			addvv(dest + entry[i],src+uVertices*3);
+			addvv(dest + entry[i],src+uVertices*3+3);
+			mulvf(dest + entry[i],0.25f);
+			break;
+		default:
+			for (int j=0;j<size[i];j++)	dest[entry[i]+j]	=	0;
+			for (int j=0;j<size[i];j++) dest[entry[i]+j]	+=	src[j];
+			for (int j=0;j<size[i];j++) dest[entry[i]+j]	+=	src[j+size[i]];
+			for (int j=0;j<size[i];j++) dest[entry[i]+j]	+=	src[j+uVertices*size[i]];
+			for (int j=0;j<size[i];j++) dest[entry[i]+j]	+=	src[j+uVertices*size[i]+size[i]];
+			for (int j=0;j<size[i];j++)	dest[entry[i]+j]	*=	0.25f;
+			break;
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////////
 // Function				:	texture3Dunpack
 // Description			:	Unpack the data from a flat array
 // Return Value			:	-

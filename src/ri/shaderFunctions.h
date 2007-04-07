@@ -2368,7 +2368,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									Ninterp[0] = 0.25f*(op4[0] + op4[3] + op4[3*uVerts]   + op4[3+3*uVerts]);		\
 									Ninterp[1] = 0.25f*(op4[1] + op4[4] + op4[1+3*uVerts] + op4[4+3*uVerts]);		\
 									Ninterp[2] = 0.25f*(op4[2] + op4[5] + op4[2+3*uVerts] + op4[5+3*uVerts]);		\
-									texture3Dflatten(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
+									texture3DflattenInterpolated(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size,uVerts);	\
 									tex->store(dest,Pinterp,Ninterp,Rinterp);										\
 								}																					\
 								*res		=	1;																	\
@@ -2387,8 +2387,6 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 #define	BAKE3DEXPR
 #define	BAKE3DEXPR_UPDATE
 #endif
-
-/* tex->prepareInterpolatedSample(lookup->valueSpace[thread],channelValues,lookup->bindings,uVerts,vVerts);		*/
 
 DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
