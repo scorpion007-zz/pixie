@@ -262,7 +262,7 @@ COptions::COptions() {
 	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:%PIXIEHOME%/textures:",NULL);
 	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:%PIXIEHOME%/shaders:",NULL);
 	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:",NULL);
-	modulePath				=	optionsGetSearchPath(".:%MODULES%:%PIXIEHOME%/bin:",NULL);
+	modulePath				=	optionsGetSearchPath(".:%MODULES%:%PIXIEHOME%/modules:",NULL);
 
 	pixelXsamples			=	2;
 	pixelYsamples			=	2;
