@@ -1,8 +1,15 @@
 #!/bin/csh
+
 foreach fil  ( `find . -name "*.cpp" -print` `find . -name "*.c" -print` `find . -name "*.h" -print` `find . -name "*.l" -print` `find . -name "*.y" -print` `find . -name "*.in" -print` `find . -name "*.am" -print` `find . -name "*.sdr" -print` `find . -name "*.sl" -print`)
 printf '\n' >> $fil
 perl -p -i -e 's/\r\n$/\n/' $fil
 end
+
+aclocal
+autoheader
+automake --add-missing -f -c
+autoconf
+
 cd src/ri
 flex -i -Pdso -olex.dso.cpp dso.l
 bison -p dso -o dso.cpp dso.y
