@@ -504,27 +504,29 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
 				// Sample a point in the cone
 				sampleHemisphere(cRay->dir,dir,coneAngle,random4d);
-				movvv(cRay->from,from);
-				cRay->t				=	min(maxDist,d) - bias;
-				cRay->tmin			=	bias;
-				cRay->time			=	(urand() + currentSample - 1) * multiplier;
-				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
-				cRay->dest			=	dest;
-				cRay->multiplier	=	multiplier;
-				cRay->da			=	ab[0];		// The ray differential
-				cRay->db			=	ab[1];
-				*cRays++			=	cRay++;
-				if (--numRemaining == 0) {
-					numTransmissionRays	+=	shootStep;
-					bundle.numRays		=	shootStep;
-					bundle.rays			=	(CRay **) raysBase;
-					bundle.depth		=	0;
-					bundle.last			=	0;
-					bundle.postShader	=	NULL;
-					traceEx(&bundle);
-					cRay				=	rayBase;
-					cRays				=	raysBase;
-					numRemaining		=	shootStep;
+				if (dotvv(cRay->dir,cRay->dir) > C_EPSILON) {
+					movvv(cRay->from,from);
+					cRay->t				=	min(maxDist,d) - bias;
+					cRay->tmin			=	bias;
+					cRay->time			=	(urand() + currentSample - 1) * multiplier;
+					cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
+					cRay->dest			=	dest;
+					cRay->multiplier	=	multiplier;
+					cRay->da			=	ab[0];		// The ray differential
+					cRay->db			=	ab[1];
+					*cRays++			=	cRay++;
+					if (--numRemaining == 0) {
+						numTransmissionRays	+=	shootStep;
+						bundle.numRays		=	shootStep;
+						bundle.rays			=	(CRay **) raysBase;
+						bundle.depth		=	0;
+						bundle.last			=	0;
+						bundle.postShader	=	NULL;
+						traceEx(&bundle);
+						cRay				=	rayBase;
+						cRays				=	raysBase;
+						numRemaining		=	shootStep;
+					}
 				}
 			}
 		}
@@ -585,27 +587,29 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 			initv(dest,0,0,0);
 			for (currentSample=numSamples;currentSample>0;currentSample--) {
 				sampleHemisphere(cRay->dir,D,coneAngle,random4d);
-				movvv(cRay->from,from);
-				cRay->time			=	(urand() + currentSample - 1) * multiplier;
-				cRay->t				=	C_INFINITY;
-				cRay->tmin			=	bias;
-				cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
-				cRay->dest			=	dest;
-				cRay->multiplier	=	multiplier;
-				cRay->da			=	ab[0];		// The ray differential
-				cRay->db			=	ab[1];
-				*cRays++			=	cRay++;
-				if (--numRemaining == 0) {
-					numReflectionRays	+=	shootStep;
-					bundle.numRays		=	shootStep;
-					bundle.rays			=	(CRay **) raysBase;
-					bundle.depth		=	0;
-					bundle.last			=	0;
-					bundle.postShader	=	NULL;
-					traceEx(&bundle);
-					cRay				=	rayBase;
-					cRays				=	raysBase;
-					numRemaining		=	shootStep;
+				if (dotvv(cRay->dir,cRay->dir) > C_EPSILON) {
+					movvv(cRay->from,from);
+					cRay->time			=	(urand() + currentSample - 1) * multiplier;
+					cRay->t				=	C_INFINITY;
+					cRay->tmin			=	bias;
+					cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
+					cRay->dest			=	dest;
+					cRay->multiplier	=	multiplier;
+					cRay->da			=	ab[0];		// The ray differential
+					cRay->db			=	ab[1];
+					*cRays++			=	cRay++;
+					if (--numRemaining == 0) {
+						numReflectionRays	+=	shootStep;
+						bundle.numRays		=	shootStep;
+						bundle.rays			=	(CRay **) raysBase;
+						bundle.depth		=	0;
+						bundle.last			=	0;
+						bundle.postShader	=	NULL;
+						traceEx(&bundle);
+						cRay				=	rayBase;
+						cRays				=	raysBase;
+						numRemaining		=	shootStep;
+					}
 				}
 			}
 		}
