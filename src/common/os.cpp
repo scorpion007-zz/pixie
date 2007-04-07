@@ -74,6 +74,16 @@ static	DWORD WINAPI  dispatcherThread(void *w) {
 	return 0;
 }
 
+// Win32 doesn't have gettimeofday() for some archaic reason
+static int gettimeofday(struct timeval *tv,void* time_zone) {
+	timeb cur;
+	int retval = ftime(&cur);
+
+	tv->tv_sec = cur.time;
+	tv->tv_usec = cur.millitm * 1000;
+
+	return retval;
+}
 
 // << Win32
 #else
@@ -111,14 +121,6 @@ static	time_t	osStartTimeMsec;
 // Return Value			:	-
 // Comments				:
 void	osInit() {
-#ifdef WIN32
-	timeb	ti;
-
-	ftime(&ti);
-
-	osStartTimeSec	=	ti.time;
-	osStartTimeMsec	=	ti.millitm;
-#else
 	struct timeval	ti;
 	struct timezone	tz;
 
@@ -126,7 +128,6 @@ void	osInit() {
 
 	osStartTimeSec	=	ti.tv_sec;
 	osStartTimeMsec	=	ti.tv_usec;
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -380,20 +381,12 @@ void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *use
 // Return Value			:
 // Comments				:
 float	osTime() {
-#ifdef WIN32
-	timeb	ti;
-
-	ftime(&ti);
-
-	return (float) (ti.time - osStartTimeSec) + (ti.millitm - osStartTimeMsec) / 1000.0f;
-#else
 	struct timeval	ti;
 	struct timezone	tz;
 
 	gettimeofday(&ti, &tz);
 
 	return (float) (ti.tv_sec - osStartTimeSec) + (ti.tv_usec - osStartTimeMsec) / 1000000.0f;
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////

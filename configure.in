@@ -167,13 +167,13 @@ AC_ARG_WITH(shaderdir,
 	shaderdir="${withval}",
 	shaderdir="${datadir}/Pixie/shaders")
 
-AC_ARG_WITH(modeldir,
-	AS_HELP_STRING([--with-modeldir=DIR],[directory where we store models (Default: DATADIR/Pixie/models)]),
-	modeldir="${withval}",
-	modeldir="${datadir}/Pixie/models")
+AC_ARG_WITH(ribdir,
+	AS_HELP_STRING([--with-ribdir=DIR],[directory where we store rib files (Default: DATADIR/Pixie/ribs)]),
+	ribdir="${withval}",
+	ribdir="${datadir}/Pixie/ribs")
 
 AC_ARG_WITH(texturedir,
-	AS_HELP_STRING([--with-modeldir=DIR],[directory where we store models (Default: DATADIR/Pixie/textures)]),
+	AS_HELP_STRING([--with-texturedir=DIR],[directory where we store textures (Default: DATADIR/Pixie/textures)]),
 	texturedir="${withval}",
 	texturedir="${datadir}/Pixie/textures")
 
@@ -202,7 +202,7 @@ AS_HELP_STRING([--enable-selfcontained],[Build for a selfcontained setup (overri
 [case "${enableval}" in
 	yes)	docdir="\${prefix}/doc"
 		shaderdir="\${prefix}/shaders"
-		modeldir="\${prefix}/models"
+		ribdir="\${prefix}/ribs"
 		texturedir="\${prefix}/textures"
 		displaysdir="\${prefix}/displays"
 		proceduraldir="\${prefix}/procedurals"
@@ -232,7 +232,7 @@ AC_DEFUN([AC_DEFINE_DIR], [
 
 AC_DEFINE_DIR(PIXIE_DOCS,docdir,[Directory where we store documentation])
 AC_DEFINE_DIR(PIXIE_SHADERS,shaderdir,[Directory where we store shaders])
-AC_DEFINE_DIR(PIXIE_MODELS,modeldir,[Directory where we store models])
+AC_DEFINE_DIR(PIXIE_RIBS,ribdir,[Directory where we store ribs])
 AC_DEFINE_DIR(PIXIE_TEXTURES,texturedir,[Directory where we store textures])
 AC_DEFINE_DIR(PIXIE_DISPLAYS,displaysdir,[Directory where we store displays])
 AC_DEFINE_DIR(PIXIE_PROCEDURALS,proceduraldir,[Directory where we store procedurals])
@@ -283,7 +283,7 @@ echo " Installation info:"
 echo "     PIXIEHOME: " $prefix
 echo " Documentation: " $docdir
 echo "       Shaders: " $shaderdir
-echo "        Models: " $modeldir
+echo "          RIBs: " $ribdir
 echo "      Textures: " $texturedir
 echo "      Displays: " $displaysdir
 echo "   Procedurals: " $proceduraldir

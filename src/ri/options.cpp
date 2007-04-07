@@ -41,28 +41,28 @@
  * default values for systems that don't use configure and use the
  * standard directory layout
  */
-#ifndef PIXIE_MODELS
-#define PIXIE_MODELS "%PIXIEHOME%/models"
+#ifndef PIXIE_RIBS
+#define PIXIE_RIBS			"%PIXIEHOME%/ribs"
 #endif
 
 #ifndef PIXIE_PROCEDURALS
-#define PIXIE_PROCEDURALS "%PIXIEHOME%/prodedurals"
+#define PIXIE_PROCEDURALS	"%PIXIEHOME%/prodedurals"
 #endif
 
 #ifndef PIXIE_TEXTURES
-#define PIXIE_TEXTURES "%PIXIEHOME%/textures"
+#define PIXIE_TEXTURES		"%PIXIEHOME%/textures"
 #endif
 
 #ifndef PIXIE_SHADERS
-#define PIXIE_SHADERS "%PIXIEHOME%/shaders"
+#define PIXIE_SHADERS		"%PIXIEHOME%/shaders"
 #endif
 
 #ifndef PIXIE_DISPLAYS
-#define PIXIE_DISPLAYS "%PIXIEHOME%/displays"
+#define PIXIE_DISPLAYS		"%PIXIEHOME%/displays"
 #endif
 
 #ifndef PIXIE_MODULES
-#define PIXIE_MODULES "%PIXIEHOME%/modules"
+#define PIXIE_MODULES		"%PIXIEHOME%/modules"
 #endif
 
 
@@ -282,7 +282,7 @@ COptions::COptions() {
 
 	hider					=	strdup("stochastic");
 	
-	archivePath				=	optionsGetSearchPath(".:%RIBS%:" PIXIE_MODELS,NULL);
+	archivePath				=	optionsGetSearchPath(".:%RIBS%:" PIXIE_RIBS,NULL);
 	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:" PIXIE_PROCEDURALS,NULL);
 	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:" PIXIE_TEXTURES,NULL);
 	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:" PIXIE_SHADERS,NULL);
