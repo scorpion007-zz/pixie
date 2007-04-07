@@ -16,21 +16,27 @@ includedir = $(prefix)/include
 
 include_HEADERS = sdr.h
 
-## Additional rules for autogenerating flex products
+BUILT_SOURCES =
 
+## Additional rules for autogenerating flex products
 if HAVE_FLEX
+
+BUILT_SOURCES += lex.sdr.cpp
 
 lex.sdr.cpp: sdr.l
 	@FLEX@ -Psdr -olex.sdr.cpp sdr.l
 
 endif
+## Additional rules for autogenerating flex products
 
 
 ## Additional rules for autogenerating bison products
-
 if HAVE_BISON
+
+BUILT_SOURCES += sdr.cpp
 
 sdr.cpp: sdr.y
 	@BISON@ -p sdr -o sdr.cpp sdr.y
 
 endif
+## Additional rules for autogenerating bison products
