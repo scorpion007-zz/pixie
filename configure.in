@@ -29,19 +29,33 @@ AC_CHECK_LIB(pthread, pthread_create,,[AC_MSG_ERROR([pthread library is not foun
 
 dnl Check the single precision version of some math functions
 AC_CHECK_LIB([m], [acosf],	[AC_DEFINE([HAVE_ACOSF],[1],[libm includes acosf])])
+
 AC_CHECK_LIB([m], [asinf],	[AC_DEFINE([HAVE_ASINF],[1],[libm includes asinf])])
+
 AC_CHECK_LIB([m], [atan2f], [AC_DEFINE([HAVE_ATAN2F],[1],[libm includes atan2f])])
+
 AC_CHECK_LIB([m], [atanf],	[AC_DEFINE([HAVE_ATANF],[1],[libm includes atanf])])
+
 AC_CHECK_LIB([m], [cosf],	[AC_DEFINE([HAVE_COSF],[1],[libm includes cosf])])
+
 AC_CHECK_LIB([m], [expf],	[AC_DEFINE([HAVE_EXPF],[1],[libm includes expf])])
+
 AC_CHECK_LIB([m], [fabsf],	[AC_DEFINE([HAVE_FABSF],[1],[libm includes fabsf])])
+
 AC_CHECK_LIB([m], [floorf], [AC_DEFINE([HAVE_FLOORF],[1],[libm includes floorf])])
+
 AC_CHECK_LIB([m], [fmodf],	[AC_DEFINE([HAVE_FMODF],[1],[libm includes fmodf])])
+
 AC_CHECK_LIB([m], [hypotf], [AC_DEFINE([HAVE_HYPOTF],[1],[libm includes hypotf])])
+
 AC_CHECK_LIB([m], [logf],	[AC_DEFINE([HAVE_LOGF],[1],[libm includes logf])])
+
 AC_CHECK_LIB([m], [powf],	[AC_DEFINE([HAVE_POWF],[1],[libm includes powf])])
+
 AC_CHECK_LIB([m], [sinf],	[AC_DEFINE([HAVE_SINF],[1],[libm includes sinf])])
+
 AC_CHECK_LIB([m], [sqrtf],	[AC_DEFINE([HAVE_SQRTF],[1],[libm includes sqrtf])])
+
 AC_CHECK_LIB([m], [tanf],	[AC_DEFINE([HAVE_TANF],[1],[libm includes tanf])])
 
 dnl ---------------------------------------------------
@@ -142,6 +156,25 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gethostname gettimeofday mkdir rmdir socket strdup strstr strtod strtol)
 
 dnl ---------------------------------------------------
+dnl Check for bison and flex
+dnl
+
+dnl I am intentionally not using AC_PROG_LEX and AC_PROG_YACC here
+dnl we have never tested with lex / yacc, and they probably won't work
+
+AC_PATH_PROG(FLEX,flex,false)
+AM_CONDITIONAL(HAVE_FLEX, test "x$FLEX" != xfalse )
+if test "x$FLEX" == xfalse; then
+	AC_MSG_WARN([[flex not found, pre-generated files will be used, any changes to .l files will not affect build]])
+fi
+
+AC_PATH_PROG(BISON,bison,false)
+AM_CONDITIONAL(HAVE_BISON, test "x$BISON" != xfalse )
+if test "x$BISON" == xfalse; then
+	AC_MSG_WARN([[bison not found, pre-generated files will be used, any changes to .y files will not affect build]])
+fi
+
+dnl ---------------------------------------------------
 dnl Do variable substitution
 dnl
 AC_SUBST(X_LIBS)
@@ -198,7 +231,7 @@ dnl Are we building for self contained distribution
 dnl
 
 AC_ARG_ENABLE(selfcontained,
-AS_HELP_STRING([--enable-selfcontained],[Build for a selfcontained setup (overrides custom directory settings)]),
+AS_HELP_STRING([--disable-selfcontained],[Build for a selfcontained setup (overrides custom directory settings)]),
 [case "${enableval}" in
 	yes)	docdir="\${prefix}/doc"
 		shaderdir="\${prefix}/shaders"
@@ -210,7 +243,16 @@ AS_HELP_STRING([--enable-selfcontained],[Build for a selfcontained setup (overri
 		;;
 	no) ;;
 	*) AC_MSG_ERROR(bad value ${enableval} for --enable-selfcontained) ;;
-esac])
+esac],
+[
+docdir="\${prefix}/doc"
+shaderdir="\${prefix}/shaders"
+ribdir="\${prefix}/ribs"
+texturedir="\${prefix}/textures"
+displaysdir="\${prefix}/displays"
+proceduraldir="\${prefix}/procedurals"
+modulesdir="\${prefix}/modules"
+])
 
 dnl ---------------------------------------------------
 dnl Now tell the c preprocessor and the Makefiles where stuff goes
