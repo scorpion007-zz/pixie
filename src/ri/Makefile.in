@@ -104,6 +104,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BISON = @BISON@
 BUILD_FRAMEBUFFER_FALSE = @BUILD_FRAMEBUFFER_FALSE@
 BUILD_FRAMEBUFFER_TRUE = @BUILD_FRAMEBUFFER_TRUE@
 BUILD_OPENEXR_FALSE = @BUILD_OPENEXR_FALSE@
@@ -131,9 +132,14 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+FLEX = @FLEX@
 FLTK_CONFIG = @FLTK_CONFIG@
 FLTK_CXXFLAGS = @FLTK_CXXFLAGS@
 FLTK_LDFLAGS = @FLTK_LDFLAGS@
+HAVE_BISON_FALSE = @HAVE_BISON_FALSE@
+HAVE_BISON_TRUE = @HAVE_BISON_TRUE@
+HAVE_FLEX_FALSE = @HAVE_FLEX_FALSE@
+HAVE_FLEX_TRUE = @HAVE_FLEX_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -158,9 +164,9 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PIXIE_DISPLAYS = @PIXIE_DISPLAYS@
 PIXIE_DOCS = @PIXIE_DOCS@
-PIXIE_MODELS = @PIXIE_MODELS@
 PIXIE_MODULES = @PIXIE_MODULES@
 PIXIE_PROCEDURALS = @PIXIE_PROCEDURALS@
+PIXIE_RIBS = @PIXIE_RIBS@
 PIXIE_SHADERS = @PIXIE_SHADERS@
 PIXIE_TEXTURES = @PIXIE_TEXTURES@
 RANLIB = @RANLIB@
@@ -213,12 +219,12 @@ libexecdir = @libexecdir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
-modeldir = @modeldir@
 modulesdir = @modulesdir@
 oldincludedir = @oldincludedir@
 prefix = @prefix@
 proceduraldir = @proceduraldir@
 program_transform_name = @program_transform_name@
+ribdir = @ribdir@
 sbindir = @sbindir@
 shaderdir = @shaderdir@
 sharedstatedir = @sharedstatedir@
@@ -666,6 +672,36 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 	uninstall-includeHEADERS uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
+
+@HAVE_FLEX_TRUE@lex.dso.cpp: dso.l
+@HAVE_FLEX_TRUE@	@FLEX@ -i -Pdso -olex.dso.cpp dso.l
+
+@HAVE_FLEX_TRUE@dso.cpp: dso.y
+@HAVE_FLEX_TRUE@	@BISON@ -p dso -o dso.cpp dso.y
+
+@HAVE_FLEX_TRUE@lex.rib.cpp: rib.l
+@HAVE_FLEX_TRUE@	@FLEX@ -i -Prib -olex.rib.cpp rib.l
+
+@HAVE_FLEX_TRUE@lex.sl.cpp: sdr.l
+@HAVE_FLEX_TRUE@	@FLEX@ -Psl -olex.sl.cpp sdr.l
+
+@HAVE_FLEX_TRUE@lex.var.cpp: variable.l
+@HAVE_FLEX_TRUE@	@FLEX@ -Pvar -olex.var.cpp variable.l
+
+@HAVE_FLEX_TRUE@lex.if.cpp: ifexpr.l
+@HAVE_FLEX_TRUE@	@FLEX@ -Pif -olex.if.cpp ifexpr.l
+
+@HAVE_BISON_TRUE@rib.cpp: rib.y
+@HAVE_BISON_TRUE@	@BISON@ -p rib -o rib.cpp rib.y
+
+@HAVE_BISON_TRUE@sl.cpp: sdr.y
+@HAVE_BISON_TRUE@	@BISON@ -p sl -o sl.cpp sdr.y
+
+@HAVE_BISON_TRUE@variable.cpp: variable.y
+@HAVE_BISON_TRUE@	@BISON@ -p var -o variable.cpp variable.y
+
+@HAVE_BISON_TRUE@ifexpr.cpp: ifexpr.y
+@HAVE_BISON_TRUE@	@BISON@ -p if -o ifexpr.cpp ifexpr.y
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
