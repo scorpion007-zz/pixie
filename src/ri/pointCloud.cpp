@@ -121,8 +121,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
-// Method				:	~CPhotonMap
+// Class				:	CPointCloud
+// Method				:	~CPointCloud
 // Description			:	Dtor
 // Return Value			:
 // Comments				:
@@ -146,7 +146,7 @@ void	CPointCloud::reset() {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
+// Class				:	CPointCloud
 // Method				:	write
 // Description			:	Write the photon map into a file
 // Return Value			:
@@ -179,7 +179,7 @@ void	CPointCloud::write() {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
+// Class				:	CPointCloud
 // Method				:	lookup
 // Description			:	Locate the nearest points
 // Return Value			:
@@ -192,8 +192,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	CLookup					l;
 	int						i,j;
 
-	searchRadius		=	8*radius*dPscale;		//FIXME: this should possibly be 2* but it seems to give artifacts
-	distances[0]		=	searchRadius*searchRadius;
+	const float	searchRadius	=	8*radius*dPscale;		//FIXME: this should possibly be 2* but it seems to give artifacts
+	distances[0]				=	searchRadius*searchRadius;
 
 	l.maxFound			=	maxFound;
 	l.numFound			=	0;
@@ -316,7 +316,7 @@ void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
+// Class				:	CPointCloud
 // Method				:	draw
 // Description			:	Gui interface
 // Return Value			:
@@ -396,7 +396,7 @@ int			CPointCloud::keyDown(int key) {
 }
 
 //////////////////////////////////////////////////////////////////////
-// Class				:	CPhotonMap
+// Class				:	CPointCloud
 // Method				:	draw
 // Description			:	Gui interface
 // Return Value			:

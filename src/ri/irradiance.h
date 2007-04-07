@@ -93,7 +93,6 @@ public:
 								~CIrradianceCache();
 
 		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
-		void					cachesample(float *,const float *,const float *,float);
 
 		void					draw();
 		int						keyDown(int key);

@@ -342,62 +342,6 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 }
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CIrradianceCache
-// Method				:	sample
-// Description			:	Check if there's a nearby sample
-// Return Value			:	-
-// Comments				:
-void	CIrradianceCache::cachesample(float *C,const float *cP,const float *cN,float dP) {
-	CCacheSample	*cSample;
-	CCacheNode		*cNode;
-	CCacheNode		**stackBase		=	(CCacheNode **)	alloca(maxDepth*sizeof(CCacheNode *)*8);
-	CCacheNode		**stack			=	stackBase;
-	int				i;
-	vector			P,N,Pn;
-
-	// Transform the lookup point to the correct coordinate system
-	mulmp(P,to,cP);
-	mulmn(N,from,cN);
-
-	normalizev(Pn,P);
-
-	*stack++	=	root;
-	while(stack > stackBase) {
-		cNode	=	*(--stack);
-
-		// Sum the values in this level
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
-			float	d	=	dotvv(Pn,cSample->P);
-			float	q	=	dotvv(cSample->P,cSample->P) - d*d;
-
-			if (q < dP*dP) {
-				C[0]	=	1;
-				return;
-			}
-		}
-
-		// Check the children
-		for (i=0;i<8;i++) {
-			CCacheNode	*tNode;
-
-			if ((tNode = cNode->children[i]) != NULL) {
-				const float	tSide	=	tNode->side+dP;
-
-				if (	((tNode->center[0] + tSide) > P[0])	&&
-						((tNode->center[1] + tSide) > P[1])	&&
-						((tNode->center[2] + tSide) > P[2])	&&
-						((tNode->center[0] - tSide) < P[0])	&&
-						((tNode->center[1] - tSide) < P[1])	&&
-						((tNode->center[2] - tSide) < P[2])) {
-					*stack++	=	tNode;
-				}
-			}
-		}
-	}
-
-	C[0]	=	0;
-}
 
 
 

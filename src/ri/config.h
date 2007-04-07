@@ -86,6 +86,9 @@
 // The size of the hash that maps object pointers
 #define	SHADING_OBJECT_CACHE_SIZE		512
 
+// The number of items below which we allocate memory from stack
+#define	ALLOCA_MAX_ITEMS				200
+
 // The various cache sizes in reyes
 //#define	REYES_OBJECT_CACHE_SIZE			10
 //#define REYES_GRID_CACHE_SIZE			10

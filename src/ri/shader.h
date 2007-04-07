@@ -62,6 +62,7 @@ class	CPhotonHider;
 class	CGatherRay;
 class	CMemPage;
 class	CDSO;
+class	CPointHierarchy;
 
 // Meanings of the accessor field of TArgument
 const	unsigned int	SL_IMMEDIATE_OPERAND	=	0;	// Constants
@@ -198,9 +199,11 @@ public:
 		vector				backgroundColor;		// The color of the background for rays that don't hit anything
 		const char			*handle;				// The irradiance handle
 		const char			*filemode;				// The irradiance filemode
+		const char			*coordsys;				// The coordinate system to store
 		CCache				*cache;					// The cache to lookup
 		CPhotonMap			*map;					// The photon map to lookup
 		CEnvironment		*environment;			// The environment map to use if no intersection
+		CTexture3d			*pointHierarchy;		// The point hierarchy file to lookup
 };
 
 

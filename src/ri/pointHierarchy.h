@@ -45,8 +45,6 @@
 // Comments				:
 class	CPointHierarchy : public CTexture3d, public CMapHierarchy<CPointCloudPoint> {
 public:
-							CPointHierarchy(const char *,const float *from,const float *to,const float *toNDC,const char*,int);
-							CPointHierarchy(const char *,const float *from,const float *to,const float *toNDC,int,char **,char **,int);
 							CPointHierarchy(const char *,const float *from,const float *to,FILE *);
 							~CPointHierarchy();
 
@@ -54,6 +52,14 @@ public:
 	void					lookup(float *,const float *,const float *,float);
 
 protected:
+	CArray<float>			data;				// This is where we actually keep the data
+
+	void					draw() { }
+	void					bound(float *bmin,float *bmax) { }
+
+	void					write();
+
+							// Overwritten from CMapHierarchy class to perform averaging of the points
 	void					average(CPointCloudPoint *dest,int numItems,int *indices) {
 
 								dest->dP	=	0;

@@ -79,11 +79,8 @@ public:
 
 private:
 	CArray<float>			data;				// This is where we actually keep the data
-
 	int						flush;				// Should this be written to disk?
-	float					searchRadius;
-	
-	TMutex					mutex;
+	TMutex					mutex;				// To synchronize updates
 	
 	static	int				drawDiscs;			// Which type to draw
 	static	int				drawChannel;		// Which channel to draw

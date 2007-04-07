@@ -285,7 +285,6 @@ CGlobalIllumLookup::CGlobalIllumLookup() {
 // Return Value			:	-
 // Comments				:
 CGlobalIllumLookup::~CGlobalIllumLookup() {
-	if (cache != NULL) cache->finalize(this);
 }
 
 ///////////////////////////////////////////////////////////////////////	

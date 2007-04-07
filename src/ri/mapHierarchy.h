@@ -38,12 +38,15 @@
 #include "map.h"
 #include "shading.h"
 
+// FIXME: rand is not thread safe
+#define	urand()	(rand() / (float) RAND_MAX)
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapHierarchy
 // Description			:	Encapsulates a map hierarchy
 // Comments				:
 template <class T>	class	CMapHierarchy : public CMap<T> {
+protected:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CMapNode
@@ -121,22 +124,17 @@ public:
 						// Description			:	Constructs a hierarchy of the stored items
 						// Return Value			:	-
 						// Comments				:
-	void				computeHierarchy(CShadingContext *context) {
-
-							// Begin temp memory
-							memBegin(context->threadMemory);
-						
+	void				computeHierarchy() {
+			
 							// Get the item pointers into a temporary array
 							int	i;
-							int	*tmp	=	(int *) ralloc(CMap<T>::numItems*sizeof(int),context->threadMemory);
+							int	*tmp	=	new int[CMap<T>::numItems];
+							
 							for (i=1;i<=CMap<T>::numItems;i++)	tmp[i-1]	=	i;
 		
 							// Compute the map hierarchy
-							root	=	cluster(CMap<T>::numItems,tmp,context);
+							root	=	cluster(CMap<T>::numItems,tmp);
 							assert(root == nodes.numItems-1);
-
-							// Free the temp memory
-							memEnd(context->threadMemory);
 						}
 	
 						///////////////////////////////////////////////////////////////////////
@@ -168,7 +166,7 @@ public:
 							return newItem - CMap<T>::items;
 						}
 
-private:
+protected:
 
 	int					root;
 	CArray<CMapNode>	nodes;					// This is where we keep the internal nodes
@@ -189,7 +187,7 @@ private:
 						// Description			:	Cluster the items
 						// Return Value			:	-
 						// Comments				:
-	int					cluster(int numItems,int *indices,CShadingContext *context) {
+	int					cluster(int numItems,int *indices) {
 							if (numItems == 1) {
 								// Create a leaf
 								return -indices[0];
@@ -204,14 +202,18 @@ private:
 								return nodes.numItems - 1;
 
 							} else {
-								// Perform clustering
-								memBegin(context->threadMemory);
 								
 								// Allocate the memory
-								int	*membership	=	(int *) ralloc(numItems*sizeof(int),context->threadMemory);
-								int	i;
+								int	*membership,*subItems;
 								
+								if (numItems >= ALLOCA_MAX_ITEMS)	membership	=	new int[numItems*2];
+								else								membership	=	(int *) alloca(numItems*2*sizeof(int));
+
+								subItems	=	membership	+	numItems;
+
+								int		i;
 								vector	bmin,bmax;
+
 								initv(bmin,C_INFINITY);
 								initv(bmax,-C_INFINITY);
 								
@@ -224,12 +226,12 @@ private:
 								vector	C0,C1;
 								
 								// Create random cluster centers
-								initv(C0,	context->urand()*(bmax[0]-bmin[0]) + bmin[0],
-											context->urand()*(bmax[1]-bmin[1]) + bmin[1],
-											context->urand()*(bmax[2]-bmin[2]) + bmin[2]);
-								initv(C1,	context->urand()*(bmax[0]-bmin[0]) + bmin[0],
-											context->urand()*(bmax[1]-bmin[1]) + bmin[1],
-											context->urand()*(bmax[2]-bmin[2]) + bmin[2]);
+								initv(C0,	urand()*(bmax[0]-bmin[0]) + bmin[0],
+											urand()*(bmax[1]-bmin[1]) + bmin[1],
+											urand()*(bmax[2]-bmin[2]) + bmin[2]);
+								initv(C1,	urand()*(bmax[0]-bmin[0]) + bmin[0],
+											urand()*(bmax[1]-bmin[1]) + bmin[1],
+											urand()*(bmax[2]-bmin[2]) + bmin[2]);
 
 								int		changed	=	FALSE;
 								vector	nC0,nC1;
@@ -275,12 +277,12 @@ private:
 									}
 									
 									if ((num0 == 0) || (num1 == 0)) {
-										initv(C0,	context->urand()*(bmax[0]-bmin[0]) + bmin[0],
-													context->urand()*(bmax[1]-bmin[1]) + bmin[1],
-													context->urand()*(bmax[2]-bmin[2]) + bmin[2]);
-										initv(C1,	context->urand()*(bmax[0]-bmin[0]) + bmin[0],
-													context->urand()*(bmax[1]-bmin[1]) + bmin[1],
-													context->urand()*(bmax[2]-bmin[2]) + bmin[2]);
+										initv(C0,	urand()*(bmax[0]-bmin[0]) + bmin[0],
+													urand()*(bmax[1]-bmin[1]) + bmin[1],
+													urand()*(bmax[2]-bmin[2]) + bmin[2]);
+										initv(C1,	urand()*(bmax[0]-bmin[0]) + bmin[0],
+													urand()*(bmax[1]-bmin[1]) + bmin[1],
+													urand()*(bmax[2]-bmin[2]) + bmin[2]);
 
 									} else {
 
@@ -299,19 +301,20 @@ private:
 								node.average	=	average(numItems,indices);
 								
 								// OK, split the items into two
-								int	*subItems	=	(int *) ralloc(max(num0,num1)*sizeof(int),context->threadMemory);
 								int	j;
 								
 								for (i=0,j=0;i<numItems;i++)	if (membership[i] == 0)	subItems[j++]	=	indices[i];
 								assert(j == num0);
-								node.child0	=	cluster(num0,subItems,context);
+								node.child0	=	cluster(num0,subItems);
 								
 								for (i=0,j=0;i<numItems;i++)	if (membership[i] == 1)	subItems[j++]	=	indices[i];
 								assert(j == num1);
-								node.child1	=	cluster(num1,subItems,context);
+								node.child1	=	cluster(num1,subItems);
 								
 								nodes.push(node);
-								memEnd(context->threadMemory);
+
+								// Reclaim the memory if applicable
+								if (numItems >= ALLOCA_MAX_ITEMS)	delete [] membership;
 
 								return nodes.numItems-1;
 							}

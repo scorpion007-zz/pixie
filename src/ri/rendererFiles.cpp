@@ -45,6 +45,7 @@
 #include "shadeop.h"
 #include "options.h"
 #include "netFileMapping.h"
+#include "pointHierarchy.h"
 
 
 // This one is defined in sdr.y
@@ -453,7 +454,7 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 // Description			:	Get a point cloud or brickmap
 // Return Value			:
 // Comments				:
-CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to) {
+CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to,int hierarchy) {
 	CFileResource	*texture3d;
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
@@ -490,7 +491,11 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			if (locateFile(fileName,name,texturePath)) {
 				// Try to open the file
 				if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
-					texture3d	=	new CPointCloud(name,from,to,in);
+					if (hierarchy == TRUE) {
+						texture3d	=	new CPointHierarchy(name,from,to,in);
+					} else {
+						texture3d	=	new CPointCloud(name,from,to,in);
+					}
 				} else {
 					if ((in	=	ropen(fileName,"rb",fileBrickMap,TRUE)) != NULL) {
 						texture3d	=	new CBrickMap(in,name,from,to);

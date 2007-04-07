@@ -292,9 +292,9 @@ public:
 		static	CTexture		*getTexture(const char *);								// Load a texture
 		static	CEnvironment	*getEnvironment(const char *);							// Load an environment
 		static	CPhotonMap		*getPhotonMap(const char *);							// Load a photon map
-		static	CCache			*getCache(const char *,const char *);					// Load a photon map
+		static	CCache			*getCache(const char *,const char *);					// Load a cache
 		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
-		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *);	// Load a point cloud or brickmap
+		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *,int hierarchy=FALSE);	// Load a point cloud or brickmap
 		static	CShader			*getShader(const char *,TSearchpath *search=NULL);		// Load a shader
 		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 		static	char			*getFilter(RtFilterFunc);								// The other way around

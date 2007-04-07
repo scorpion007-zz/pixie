@@ -284,11 +284,14 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 #define	AREAEXPR_UPDATE
 #endif
 
-DEFFUNC(Area		,"area"			,"f=p"	,AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+// Totally ignore the measure argument for area
+DEFLINKFUNC(AreaS	,"area"		,"f=pS",	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	AREAEXPR_PRE
 #undef	AREAEXPR
 #undef	AREAEXPR_UPDATE
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2357,7 +2360,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 #define	BAKE3DEXPR				if (doInterp == FALSE) {															\
 									tex->prepareSample(lookup->valueSpace[thread],channelValues,lookup->bindings);	\
 									tex->store(lookup->valueSpace[thread],op3,op4,*radius);							\
-								} else if (curU < uVerts-1 && curV < vVerts-1) {									\
+								} else if ((curU < uVerts-1) && (curV < vVerts-1)) {								\
 									const float	Rinterp = 0.25f*(radius[0] + radius[1] + radius[uVerts] + radius[uVerts+1]);		\
 									vector		Pinterp,Ninterp;													\
 									Pinterp[0] = 0.25f*(op3[0] + op3[3] + op3[3*uVerts]   + op3[3+3*uVerts]);		\

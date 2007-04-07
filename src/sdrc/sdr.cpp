@@ -875,6 +875,7 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("ptlined","f=ppp",0);
 	addBuiltInFunction("rotate","p=pfpp",0);
 	addBuiltInFunction("area","f=p",0,TRUE);
+	addBuiltInFunction("area","f=pS",0,TRUE);
 	addBuiltInFunction("faceforward","v=vv",0);
 	addBuiltInFunction("faceforward","v=vvv",0);
 	addBuiltInFunction("reflect","v=vv",0);

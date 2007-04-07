@@ -54,8 +54,6 @@ public:
 					~CCache();
 
 	virtual	void	lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *)	=	0;
-	virtual	void	cachesample(float *,const float *,const float *,float)											=	0;
-	virtual	void	finalize(const CGlobalIllumLookup *)	{	}
 
 protected:
 	unsigned int	flags;

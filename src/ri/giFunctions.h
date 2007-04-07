@@ -61,10 +61,12 @@
 								lookup->lengthB				=	CRenderer::lengthB;												\
 								lookup->handle				=	(attributes->irradianceHandle		== NULL ? "temp.irr"	: attributes->irradianceHandle);			\
 								lookup->filemode			=	(attributes->irradianceHandleMode	== NULL ? ""			: attributes->irradianceHandleMode);		\
+								lookup->coordsys			=	coordinateWorldSystem;											\
 								initv(lookup->backgroundColor,0);																\
 								lookup->cache				=	NULL;															\
 								lookup->map					=	NULL;															\
 								lookup->environment			=	NULL;															\
+								lookup->pointHierarchy		=	NULL;															\
 								{																								\
 									int			i;																				\
 									const char	**param;																		\
@@ -106,6 +108,8 @@
 											lookup->handle			=	vals[0];												\
 										} else if (strcmp(*param,"filemode") == 0) {											\
 											lookup->filemode		=	vals[0];												\
+										} else if (strcmp(*param,"coordsystem") == 0) {											\
+											lookup->coordsys		=	vals[0];												\
 										} else if (strcmp(*param,"environmentmap") == 0) {										\
 											lookup->environment		=	CRenderer::getEnvironment(vals[0]);						\
 										} else if (strcmp(*param,"irradiance") == 0) {											\
@@ -114,6 +118,8 @@
 											lookup->coverageIndex	=	i*2+start+1;											\
 										} else if (strcmp(*param,"environmentdir") == 0) {										\
 											lookup->environmentIndex=	i*2+start+1;											\
+										} else if (strcmp(*param,"filename") == 0) {											\
+											lookup->pointHierarchy	=	CRenderer::getTexture3d(vals[0],FALSE,"_area",CRenderer::fromWorld,CRenderer::toWorld,TRUE);						\
 										}																						\
 									}																							\
 								}
@@ -390,9 +396,9 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
 								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir,float *);	}		\
-								else envdir = varying[VARIABLE_PW];														\
+								else envdir = varying[VARIABLE_PW];																	\
 								if (lookup->coverageIndex != -1)	{	operand(lookup->coverageIndex,coverage,float *);	}		\
-								else coverage = varying[VARIABLE_PW];														\
+								else coverage = varying[VARIABLE_PW];																\
 								const float	*b	=	rayDiff(op1);																	\
 								cache	=	lookup->cache;
 
@@ -478,40 +484,6 @@ DEFSHORTFUNC(occlusion	,"occlusion"	,"f=pnf!"	,OCCLUSIONEXPR_PRE,OCCLUSIONEXPR,O
 
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cachesample	"f=pnf!"
-#ifndef INIT_SHADING
-#define	CACSAMPLEEXPR_PRE		CGlobalIllumLookup	*lookup;																		\
-								CCache				*cache;																			\
-								FUN4EXPR_PRE;																						\
-								osLock(CRenderer::shaderMutex);																		\
-								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
-									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;						\
-									int			numArguments;																		\
-									argumentcount(numArguments);																	\
-									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
-									lookup->numSamples	=	(int) *op3;																\
-									lookup->occlusion	=	FALSE;																	\
-								}																									\
-								osUnlock(CRenderer::shaderMutex);																	\
-								cache	=	lookup->cache;
-
-
-#define	CACSAMPLEEXPR			cache->cachesample(res,op1,op2,(CRenderer::lengthA*op1[COMP_Z] + CRenderer::lengthB)*op3[0]);
-
-#else
-#define	CACSAMPLEEXPR_PRE
-
-#define	CACSAMPLEEXPR
-#endif
-
-DEFSHORTFUNC(Cachesample	,"cachesample"	,"f=pnf!"	,CACSAMPLEEXPR_PRE,CACSAMPLEEXPR,FUN4EXPR_UPDATE(1,3,3,1),NULL_EXPR,0)
-
-#undef	CACSAMPLEEXPR_PRE
-
-#undef	CACSAMPLEEXPR
 
 
 

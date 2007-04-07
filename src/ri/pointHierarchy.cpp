@@ -29,16 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include "pointHierarchy.h"
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPointHierarchy
-// Method				:	CPointHierarchy
-// Description			:	Ctor
-// Return Value			:
-// Comments				:
-CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to,const float *toNDC,const char*,int) : CMapHierarchy<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
-}
+#include "error.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
@@ -46,16 +37,28 @@ CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to,const float *toNDC,int,char **,char **,int) : CMapHierarchy<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
-}
+CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to,FILE *in) : CMapHierarchy<CPointCloudPoint>(), CTexture3d(n,from,to) {
+	
+	// Try to read the point cloud
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPointHierarchy
-// Method				:	CPointHierarchy
-// Description			:	Ctor
-// Return Value			:
-// Comments				:
-CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to,FILE *) : CMapHierarchy<CPointCloudPoint>(), CTexture3d(n,from,to) {
+	// Read the header
+	readChannels(in);
+	
+	// Read the points
+	CMap<CPointCloudPoint>::read(in);
+
+	// Reserve the actual space
+	data.reserve(numItems*dataSize);
+	
+	// Read the data
+	fread(data.array,sizeof(float),numItems*dataSize,in);
+	data.numItems	=	numItems*dataSize;
+
+	// Close the file
+	fclose(in);
+
+	// Compute the point hierarchy so that we can perform lookups
+	computeHierarchy();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -75,6 +78,8 @@ CPointHierarchy::~CPointHierarchy() {
 // Return Value			:
 // Comments				:
 void		CPointHierarchy::store(const float *,const float *,const float *,float) {
+	// Should never be called
+	assert(FALSE);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -83,7 +88,49 @@ void		CPointHierarchy::store(const float *,const float *,const float *,float) {
 // Description			:	Lookup smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::lookup(float *,const float *,const float *,float) {
+void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
+	int		*stack		=	(int *) alloca(100*sizeof(int));
+	int		*stackBase	=	stack;
+	int		i;
+
+	// Clear the data
+	for (i=0;i<dataSize;i++)	Cl[i]	=	0;
+
+	*stack++			=	root;
+	while(stack > stackBase) {
+		const int	currentNode	=	*(--stack);
+
+		// Is this a leaf ?
+		if (currentNode < 0) {
+			CPointCloudPoint	*item		=	CMap<CPointCloudPoint>::items - currentNode;
+			
+			// Sum this item
+		} else {
+			CMapNode			*node		=	nodes.array + currentNode;
+			CPointCloudPoint	*average	=	CMap<CPointCloudPoint>::items + node->average;
+
+			// Decide whether we want to split this node
+			vector	D;
+			subvv(D,average->P,Pl);
+
+			// Are we pointing towards each other?
+			if (	(dotvv(D,Nl) > 0) && (dotvv(D,average->N) < 0)		) {
+
+				// Compare the code angle to some random angle
+				if (	(average->dP / lengthv(D)) < cosf((float) radians(5))	) {
+					// Use the average
+				} else {
+
+					// Sanity check
+					assert((stack-stackBase) < 98);
+
+					// Split
+					*stack++	=	node->child0;
+					*stack++	=	node->child1;
+				}
+			}
+		}
+	}
 }
 
 
