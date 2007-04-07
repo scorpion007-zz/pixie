@@ -34,7 +34,7 @@
 #include "common/global.h"		// The global header file
 #include "common/containers.h"
 #include "riInterface.h"
-#include "config.h"
+#include "ri_config.h"
 
 #ifdef HAVE_ZLIB
 #include <zlib.h>

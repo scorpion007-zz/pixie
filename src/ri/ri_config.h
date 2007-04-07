@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	config.h
+//  File				:	ri_config.h
 //  Classes				:
 //  Description			:	This file contains the libri config settings
 //
@@ -92,6 +92,10 @@
 // The various cache sizes in reyes
 //#define	REYES_OBJECT_CACHE_SIZE			10
 //#define REYES_GRID_CACHE_SIZE			10
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #endif
 

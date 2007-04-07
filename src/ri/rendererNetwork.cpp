@@ -36,7 +36,7 @@
 #include "stats.h"
 #include "memory.h"
 #include "netFileMapping.h"
-#include "config.h"
+#include "ri_config.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcRecv

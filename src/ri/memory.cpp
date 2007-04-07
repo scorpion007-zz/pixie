@@ -32,7 +32,7 @@
 #include "common/align.h"
 #include "memory.h"
 #include "stats.h"
-#include "config.h"
+#include "ri_config.h"
 
 // Some global variables
 static	int					allocatedZoneMemory		=	0;

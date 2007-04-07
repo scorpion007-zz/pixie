@@ -40,7 +40,7 @@
 #include "error.h"
 #include "renderer.h"
 #include "dso.h"
-#include "config.h"
+#include "ri_config.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   First some temporary data structures used during the script parsing

@@ -36,7 +36,7 @@
 #include	"common/containers.h"
 #include	"renderer.h"
 #include	"error.h"
-#include	"config.h"
+#include	"ri_config.h"
 
 // Some forward definitions
 		void							varerror(char *);			// Forward definition for stupid yacc

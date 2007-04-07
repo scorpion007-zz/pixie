@@ -42,7 +42,7 @@
 #include "rendererContext.h"
 #include "renderer.h"
 #include "error.h"
-#include "config.h"
+#include "ri_config.h"
 
 #include <math.h>
 #include <string.h>

@@ -32,7 +32,7 @@
 #define VARIABLE_H
 
 #include "common/global.h"		// The global header file
-#include "config.h"
+#include "ri_config.h"
 #include "rendererc.h"
 
 ///////////////////////////////////////////////////////////////////////

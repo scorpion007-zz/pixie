@@ -37,7 +37,7 @@
 #include "attributes.h"
 #include "object.h"
 #include "renderer.h"
-#include "config.h"
+#include "ri_config.h"
 
 
 ///////////////////////////////////////////////////////////////////////

@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include "common/os.h"
-#include "config.h"
+#include "ri_config.h"
 
 int								dsolex(void );				// Forward definition for stupid yacc
 void							dsoerror(char *,...);

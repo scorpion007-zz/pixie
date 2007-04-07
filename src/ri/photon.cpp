@@ -38,7 +38,7 @@
 #include "stats.h"
 #include "error.h"
 #include "renderer.h"
-#include "config.h"
+#include "ri_config.h"
 
 
 static vector spectrumSpline[] = {			{ 0, 0, 0},

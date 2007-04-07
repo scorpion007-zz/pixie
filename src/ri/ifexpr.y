@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include "common/os.h"
-#include "config.h"
+#include "ri_config.h"
 #include "error.h"
 #include "rendererc.h"
 #include "renderer.h"

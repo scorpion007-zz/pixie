@@ -45,7 +45,7 @@
 #include "renderer.h"
 #include "surface.h"
 #include "texture.h"
-#include "config.h"
+#include "ri_config.h"
 
 // This function is defined in shader.cpp for debugging purposes
 void							debugFunction(float *);

@@ -33,7 +33,7 @@
 
 #include "common/global.h"
 #include "object.h"
-#include "config.h"
+#include "ri_config.h"
 
 
 ///////////////////////////////////////////////////////////////////////

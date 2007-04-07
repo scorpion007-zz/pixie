@@ -35,11 +35,36 @@
 #include "options.h"
 #include "texture.h"
 #include "stats.h"
-#include "config.h"
+#include "ri_config.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+/* These are set by configure on UNIX, but we should set them to their
+ * default values for systems that don't use configure and use the
+ * standard directory layout
+ */
+#ifndef PIXIE_MODELS
+#define PIXIE_MODELS "%PIXIEHOME%/models"
 #endif
+
+#ifndef PIXIE_PROCEDURALS
+#define PIXIE_PROCEDURALS "%PIXIEHOME%/prodedurals"
+#endif
+
+#ifndef PIXIE_TEXTURES
+#define PIXIE_TEXTURES "%PIXIEHOME%/textures"
+#endif
+
+#ifndef PIXIE_SHADERS
+#define PIXIE_SHADERS "%PIXIEHOME%/shaders"
+#endif
+
+#ifndef PIXIE_DISPLAYS
+#define PIXIE_DISPLAYS "%PIXIEHOME%/displays"
+#endif
+
+#ifndef PIXIE_MODULES
+#define PIXIE_MODULES "%PIXIEHOME%/modules"
+#endif
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
@@ -256,13 +281,13 @@ COptions::COptions() {
 	jitter					=	0.99f;
 
 	hider					=	strdup("stochastic");
-
-	archivePath				=	optionsGetSearchPath(".:%RIBS%:%PIXIEHOME%/ribs:",NULL);
-	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEHOME%/procedurals:",NULL);
-	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:%PIXIEHOME%/textures:",NULL);
-	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:%PIXIEHOME%/shaders:",NULL);
-	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:%PIXIEHOME%/displays:",NULL);
-	modulePath				=	optionsGetSearchPath(".:%MODULES%:%PIXIEHOME%/modules:",NULL);
+	
+	archivePath				=	optionsGetSearchPath(".:%RIBS%:" PIXIE_MODELS,NULL);
+	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:" PIXIE_PROCEDURALS,NULL);
+	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:" PIXIE_TEXTURES,NULL);
+	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:" PIXIE_SHADERS,NULL);
+	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:" PIXIE_DISPLAYS,NULL);
+	modulePath				=	optionsGetSearchPath(".:%MODULES%:" PIXIE_MODULES,NULL);
 
 	pixelXsamples			=	2;
 	pixelYsamples			=	2;

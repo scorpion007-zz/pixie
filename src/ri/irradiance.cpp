@@ -40,7 +40,7 @@
 #include "stats.h"
 #include "texture.h"
 #include "renderer.h"
-#include "config.h"
+#include "ri_config.h"
 #include "debug.h"
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));

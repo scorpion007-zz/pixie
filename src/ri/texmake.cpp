@@ -34,7 +34,7 @@
 #include "error.h"
 #include "renderer.h"
 #include "tiff.h"
-#include "config.h"
+#include "ri_config.h"
 
 #include <stddef.h>		// ensure we have NULL defined before libtiff
 #include <tiffio.h>

@@ -35,7 +35,7 @@
 #include "shading.h"
 #include "object.h"
 #include "renderer.h"
-#include "config.h"
+#include "ri_config.h"
 
 // Note:
 // The low bits are spliced with the zfilter mode and used to dispatch in stochastic hider
