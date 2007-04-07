@@ -41,7 +41,7 @@
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *tndc,int nc,CTexture3dChannel *ch) : CFileResource(n) { 
+CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *tndc,int nc,CChannel *ch) : CFileResource(n) { 
 	dataSize	=	0;
 	channels	=	NULL;
 	numChannels	=	0;
@@ -57,8 +57,8 @@ CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *
 		int	i;
 
 		numChannels		=	nc;
-		channels		=	new CTexture3dChannel[nc];
-		memcpy(channels,ch,sizeof(CTexture3dChannel)*numChannels);
+		channels		=	new CChannel[nc];
+		memcpy(channels,ch,sizeof(CChannel)*numChannels);
 		for (i=0,dataSize=0;i<numChannels;i++)
 			dataSize	+= channels[i].numSamples;
 	}
@@ -98,7 +98,7 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 		sd++;
 		numChannels++;
 	}
-	channels		=	new CTexture3dChannel[numChannels];
+	channels		=	new CChannel[numChannels];
 	
 	// parse the channels / sample types
 	char *sampleDefinition = strdup(channelDefinitions); // duplicate to tokenize
@@ -149,7 +149,7 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 	// determinte the channels
 	dataSize		=	0;	
-	channels		=	new CTexture3dChannel[n];
+	channels		=	new CChannel[n];
 	
 	// parse the channels / sample types
 	numChannels = 0;
@@ -187,7 +187,7 @@ void CTexture3d::writeChannels(FILE *out) {
 	fwrite(toNDC,sizeof(float)*16,1,out);
 	fwrite(&numChannels,sizeof(int),1,out);
 	for (int i=0;i<numChannels;i++) {
-		fwrite(&channels[i],sizeof(CTexture3dChannel),1,out);
+		fwrite(&channels[i],sizeof(CChannel),1,out);
 		//GSHTODO:  deal with fill
 	}
 }
@@ -204,136 +204,52 @@ void CTexture3d::readChannels(FILE *in) {
 	// Write out the header and channels
 	fread(toNDC,sizeof(float)*16,1,in);
 	fread(&numChannels,sizeof(int),1,in);
-	channels = new CTexture3dChannel[numChannels];
+	channels = new CChannel[numChannels];
 	for (int i=0;i<numChannels;i++) {
-		fread(&channels[i],sizeof(CTexture3dChannel),1,in);
+		fread(&channels[i],sizeof(CChannel),1,in);
 		dataSize += channels[i].numSamples;
 		//GSHTODO:  deal with fill
 	}
 }
 
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
-// Method				:	bindChannelNamess
-// Description			:	Resolve the channel names
+// Method				:	resolve
+// Description			:	Resolve the names of channels
 // Return Value			:	-
 // Comments				:
-int CTexture3d::bindChannelNames(int &n,const char **names,CTexture3dChannel ***bindings) {
-	CTexture3dChannel	**entryPointers		= new CTexture3dChannel*[numChannels];
-	int					numChannelsBound	= 0;
-	int					i,j;
+void	CTexture3d::resolve(int n,const char **names,int *entry,int *size) {
+	int	i;
 	
+	// Find the channel for every name
 	for (i=0;i<n;i++) {
-		for(j=0;j<numChannels;j++) {
-			if (strcmp(names[i],channels[j].name) ==0) {
-				entryPointers[numChannelsBound++] = &channels[j];
+		int	j;
+		
+		// Find the channel
+		for (j=0;j<numChannels;j++) {
+			if (strcmp(names[i],channels[j].name) == 0) {
+				entry[i]	=	channels[j].sampleStart;
+				size[i]		=	channels[j].numSamples;
 				break;
 			}
 		}
+		
 		if (j==numChannels) {
 			error(CODE_BADTOKEN,"Unknown 3d texture channel \"%s\"\n",names[i]);
-			bindings[i] = NULL;
-		}
-	}
-	// zero unbound channels
-	for (i=numChannelsBound;i<numChannels;i++) {
-		bindings[i] = NULL;
-	}
-	n			= numChannelsBound;
-	*bindings	= entryPointers;
-
-	return dataSize;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture3d
-// Method				:	prepareSample
-// Description			:	prepareSample
-// Return Value			:	-
-// Comments				:
-void CTexture3d::prepareSample(float *C,float **samples,CTexture3dChannel **bindings) {
-	float *src,*dest;
-
-	for (int i=0;i<numChannels;i++)	{
-		CTexture3dChannel *binding = bindings[i];
-
-		if (binding != NULL) {
-			dest	= C + binding->sampleStart;
-			src		= samples[i];
-			for (int j=0;j<binding->numSamples;j++)
-				*dest++ = *src++;
-		} else {
-			// GSHTODO : zero / fill the samples
+			entry[i]		=	0;
+			size[i]			=	0;
 		}
 	}
 }
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture3d
-// Method				:	prepareInterpolatedSample
-// Description			:	prepareInterpolatedSample
-// Return Value			:	-
-// Comments				:	pack an interpolated / averaged value from grid neighbors
-void CTexture3d::prepareInterpolatedSample(float *C,float **samples,CTexture3dChannel **bindings,int uVerts,int vVerts) {
-	float *src,*dest;
-
-	for (int i=0;i<numChannels;i++)	{
-		CTexture3dChannel *binding = bindings[i];
-
-		if (binding != NULL) {
-			dest	= C + binding->sampleStart;
-			for (int j=0;j<binding->numSamples;j++,dest++)			*dest = 0;
-			
-			dest	= C + binding->sampleStart;
-			src		= samples[i];
-			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
-			
-			dest	= C + binding->sampleStart;
-			src		= samples[i] + binding->numSamples;
-			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
-			
-			dest	= C + binding->sampleStart;
-			src		= samples[i] + uVerts*binding->numSamples;
-			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
-			
-			dest	= C + binding->sampleStart;
-			src		= samples[i] + (1+uVerts)*binding->numSamples;
-			for (int j=0;j<binding->numSamples;j++,dest++,src++)	*dest += *src;
-			
-			dest	= C + binding->sampleStart;
-			for (int j=0;j<binding->numSamples;j++,dest++)			*dest *= 0.25f;
-		} else {
-			// GSHTODO : zero / fill the samples
-		}
-	}
-}
 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
-// Method				:	unpackSample
-// Description			:	unpackSample
-// Return Value			:	-
-// Comments				:
-void CTexture3d::unpackSample(float *C,float **samples,CTexture3dChannel **bindings) {
-	float *src,*dest;
-
-	for (int i=0;i<numChannels;i++)	{
-		CTexture3dChannel *binding = bindings[i];
-		if (binding != NULL) {
-			src		= C + binding->sampleStart;
-			dest	= samples[i];
-			for (int j=0;j<binding->numSamples;j++)
-				*dest++ = *src++;
-		}
-	}
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture3d
-// Method				:	unpackSample
-// Description			:	unpackSample
+// Method				:	queryChannels
+// Description			:	queryChannels
 // Return Value			:	-
 // Comments				:	FIXME and return enums, do the ptcapi conversion there
 void CTexture3d::queryChannels(int *num,char **vartypes,char **varnames) {

@@ -173,7 +173,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Use this contructor to compute from sctratch
-CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CTexture3dChannel *ch,int nc) : CTexture3d(name,from,to,toNDC,nc,ch) {
+CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CChannel *ch,int nc) : CTexture3d(name,from,to,toNDC,nc,ch) {
 	int	i;
 	
 	// Init the data

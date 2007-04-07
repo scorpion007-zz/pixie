@@ -51,7 +51,6 @@ class	CActiveLight;
 class	CTexture;
 class	CTexture3d;
 class	CTextureInfoBase;
-class	CTexture3dChannel;
 class	CEnvironment;
 class	CCache;
 class	CVolume;
@@ -214,10 +213,8 @@ public:
 class	CTexture3dLookup : public CShaderLookup	{
 public:
 							~CTexture3dLookup()	{
-								delete[] bindings;
-								for (int t = 0; t<nv; t++)
-									delete[] valueSpace[t];
-								delete[] valueSpace;
+								delete [] entry;
+								delete [] size;
 							}
 		float				radius;					// The sample radius
 		float				radiusScale;			// Blur amount
@@ -226,11 +223,8 @@ public:
 		int					numChannels;			// The number of channels bake3d provides
 		int					dataStart;				// The argument at which data starts
 		const char			*coordsys;				// The coordinate system to bake to
-		
-		int					sampleSize;				// The cloud's native sample size
-		CTexture3dChannel	**bindings;				// Points to the environment being looked up
-		int					nv;
-		float				**valueSpace;			// Space for one sample
+				
+		int					*entry,*size;			// Entry points for every channel
 		
 		CTexture3d			*texture;
 };

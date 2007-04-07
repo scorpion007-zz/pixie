@@ -33,65 +33,135 @@
 
 #include "common/global.h"
 #include "common/os.h"
-
 #include "fileResource.h"
 #include "rendererc.h"
 #include "xform.h"
-
 #include "gui/opengl.h"
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture3dChannel
-// Description			:	A point cloud channel
-// Comments				:
-class	CTexture3dChannel {
-public:
-	char					name[64];		// Name of the channel
-	int						numSamples;		// The size of channel sample
-	int						sampleStart;	// Offset of the sample in the stack
-	float					*fill;			// The sample defaults
-	EVariableType			type;			// The funamental type
-};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Description			:	Base class for 3d textures
 // Comments				:
 class	CTexture3d : public CFileResource, public CView {
+protected:
+
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CChannel
+	// Description			:	A 3d texture channel
+	// Comments				:
+	class	CChannel {
+	public:
+		char					name[64];		// Name of the channel
+		int						numSamples;		// The size of channel sample
+		int						sampleStart;	// Offset of the sample in the stack
+		float					*fill;			// The sample defaults
+		EVariableType			type;			// The funamental type
+	};
+
 public:
-							CTexture3d(const char *name,const float *from,const float *to,const float *tondc=NULL,int numChannels=0,CTexture3dChannel *channels=NULL);
+							CTexture3d(const char *name,const float *from,const float *to,const float *tondc=NULL,int numChannels=0,CChannel *channels=NULL);
 	virtual					~CTexture3d();
 
+							// For storing/querying data
 	virtual	void			lookup(float *,const float *,const float *,float)		= 0;
 	virtual	void			store(const float *,const float *,const float *,float)	= 0;
 
-	int						bindChannelNames(int&,const char **,CTexture3dChannel ***);
-	void					prepareSample(float*,float **,CTexture3dChannel **);
-	void					prepareInterpolatedSample(float*,float **,CTexture3dChannel **,int,int);
-	void					unpackSample(float*,float **,CTexture3dChannel **);
-	void					queryChannels(int *,char **,char **);
+							// Resolve the names to channels
+	void					resolve(int n,const char **names,int *entry,int *size);
 	
-	// ptcAPI interface
+							// ptcAPI interface
+	void					queryChannels(int *,char **,char **);
 	int						getDataSize()			{ return dataSize; }
 	void					getFromMatrix(float *m) { movmm(m,from); }
 	void					getToMatrix(float *m)	{ movmm(m,to); }
 	void					getNDCMatrix(float *m)	{ movmm(m,toNDC); }
 
+	int						dataSize;			// The size of each data sample
 protected:
 	void					defineChannels(const char *);
 	void					defineChannels(int,char **,char **);
 	void					writeChannels(FILE *);
 	void					readChannels(FILE *);
 	
-	int						dataSize;			// The size of each data sample
 	matrix					from,to;			// The transformation to the coordinate system
 	matrix					toNDC;				// The viewing transform
 	float					dPscale;			// The amount we need to scale dP by
 	int						numChannels;		// Number of channels
-	CTexture3dChannel		*channels;			// List of channels
+	CChannel				*channels;			// List of channels
 	
 	friend class CRemotePtCloudChannel;
 };
+
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	texture3Dflatten
+// Description			:	Flatten the channel datas into a vector
+// Return Value			:	-
+// Comments				:
+inline	void	texture3Dflatten(float *dest,int n,const float **data,int *entry,int *size) {
+	int	i;
+	
+	// For every channel
+	for (i=0;i<n;i++) {
+		const float	*src	=	*data++;
+		
+		// Unroll for the common cases
+		switch (size[i]) {
+		case 0:
+			// This can happen if the channel was not found
+			break;
+		case 1:
+			dest[entry[i]]		=	*src;
+			break;
+		case 2:
+			dest[entry[i]]		=	*src++;
+			dest[entry[i]+1]	=	*src;
+			break;
+		case 3:
+			movvv(dest + entry[i],src);
+			break;
+		default:
+			for (int j=0;j<size[i];j++) dest[entry[i]+j]	=	*src++;
+			break;
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	texture3Dunpack
+// Description			:	Unpack the data from a flat array
+// Return Value			:	-
+// Comments				:
+inline	void	texture3Dunpack(const float *src,int n,float **data,int *entry,int *size) {
+	int	i;
+	
+	// For every channel
+	for (i=0;i<n;i++) {
+		float	*dest	=	*data++;
+		
+		// Unroll for the common cases
+		switch (size[i]) {
+		case 0:
+			// This can happen is the channel was not found
+			break;
+		case 1:
+			*dest		=	src[entry[i]];
+			break;
+		case 2:
+			dest[0]		=	src[entry[i]];
+			dest[1]		=	src[entry[i]+1];
+			break;
+		case 3:
+			movvv(dest,src + entry[i]);
+			break;
+		default:
+			for (int j=0;j<size[i];j++) dest[j]	=	src[entry[i]+j];
+			break;
+		}
+	}
+}
+
 
 #endif //TEXTURE3D_H
 
