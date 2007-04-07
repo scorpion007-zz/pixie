@@ -5,21 +5,27 @@ sdrc_LDADD = ../common/libpixiecommon.la
 
 INCLUDES = -I..
 
-## Additional rules for autogenerating flex products
+BUILT_SOURCES =
 
+## Additional rules for autogenerating flex products
 if HAVE_FLEX
+
+BUILT_SOURCES += lex.sl.cpp
 
 lex.sl.cpp: sl.l
 	@FLEX@ -Psl -olex.sl.cpp sl.l
 
 endif
+## Additional rules for autogenerating flex products
 
 
 ## Additional rules for autogenerating bison products
-
 if HAVE_BISON
 
-sdr.cpp: sl.y
+BUILT_SOURCES += sdr.cpp
+
+sl.cpp: sl.y
 	@BISON@ -p sl -o sl.cpp sl.y
 
 endif
+## Additional rules for autogenerating bison products
