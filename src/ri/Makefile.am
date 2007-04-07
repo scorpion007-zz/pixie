@@ -86,15 +86,15 @@ includedir = $(prefix)/include
 include_HEADERS = ri.h dsply.h shadeop.h implicit.h dlo.h ptcapi.h
 
 
-## Additional rules for autogenerating flex products
+BUILT_SOURCES =
 
+## Additional rules for autogenerating flex products
 if HAVE_FLEX
+
+BUILT_SOURCES +=  lex.dso.cpp lex.rib.cpp lex.sl.cpp lex.var.cpp lex.if.cpp
 
 lex.dso.cpp: dso.l
 	@FLEX@ -i -Pdso -olex.dso.cpp dso.l
-
-dso.cpp: dso.y
-	@BISON@ -p dso -o dso.cpp dso.y
 
 lex.rib.cpp: rib.l
 	@FLEX@ -i -Prib -olex.rib.cpp rib.l
@@ -109,11 +109,17 @@ lex.if.cpp: ifexpr.l
 	@FLEX@ -Pif -olex.if.cpp ifexpr.l
 
 endif
+## Additional rules for autogenerating flex products
 
 
 ## Additional rules for autogenerating bison products
-
 if HAVE_BISON
+
+BUILT_SOURCES +=  dso.cpp rib.cpp sl.cpp variable.cpp ifexpr.cpp
+
+
+dso.cpp: dso.y
+	@BISON@ -p dso -o dso.cpp dso.y
 
 rib.cpp: rib.y
 	@BISON@ -p rib -o rib.cpp rib.y
@@ -128,3 +134,4 @@ ifexpr.cpp: ifexpr.y
 	@BISON@ -p if -o ifexpr.cpp ifexpr.y
 
 endif
+## Additional rules for autogenerating bison products
