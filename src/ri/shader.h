@@ -193,6 +193,7 @@ public:
 		float				bias;					// The shadow bias
 		int					occlusion;				// TRUE if this is an occlusion lookup
 		int					gatherLocal,gatherGlobal;	// The gathering behaivor
+		int					pointbased;				// TRUE if we are using point based irradiance
 		float				localThreshold;			// The local threshold for the radiance cache
 		float				lengthA,lengthB;		// The depth to length conversion
 		vector				backgroundColor;		// The color of the background for rays that don't hit anything

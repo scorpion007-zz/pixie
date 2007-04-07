@@ -56,6 +56,7 @@
 								lookup->occlusion			=	FALSE;															\
 								lookup->gatherGlobal		=	1;																\
 								lookup->gatherLocal			=	1;																\
+								lookup->pointbased			=	FALSE;															\
 								lookup->localThreshold		=	1;																\
 								lookup->lengthA				=	CRenderer::lengthA;												\
 								lookup->lengthB				=	CRenderer::lengthB;												\
@@ -118,6 +119,8 @@
 											lookup->coverageIndex	=	i*2+start+1;											\
 										} else if (strcmp(*param,"environmentdir") == 0) {										\
 											lookup->environmentIndex=	i*2+start+1;											\
+										} else if (strcmp(*param,"pointbased") == 0) {											\
+											lookup->pointbased		=	vals[0];												\
 										} else if (strcmp(*param,"filename") == 0) {											\
 											lookup->pointHierarchy	=	CRenderer::getTexture3d(vals[0],FALSE,"_area",CRenderer::fromWorld,CRenderer::toWorld,TRUE);						\
 										}																						\
