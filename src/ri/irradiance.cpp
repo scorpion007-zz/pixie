@@ -78,6 +78,13 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 	flags				=	f;
 	osCreateMutex(mutex);
 
+	// HACK this should be removed once I work out what's correct here
+	identitym(this->from);
+	identitym(this->to);
+	// HACK we wish to bake into a specified space, and do lookups there
+	// raytraces must always be worldspace, but hierarchy bounds etc might not be
+	// current support = allow lookups in different space than currently we have
+
 	// Are we reading from file ?
 	if (flags & CACHE_READ) {
 		if (in == NULL)	in	=	ropen(name,"rb",fileIrradianceCache);
