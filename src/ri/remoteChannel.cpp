@@ -41,8 +41,6 @@
 #include	"irradiance.h"
 #include	"pointCloud.h"
 
-#define	BUFFER_LENGTH	1 << 12				// The size of the buffer to be used during the network file transfers
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
@@ -448,9 +446,9 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	rcSend(s,&sz,sizeof(uint64_t));
 	
 	// send the tile data
-	char buf[BUFFER_LENGTH];
+	char buf[NETWORK_BUFFER_LENGTH];
 	while(sz > 0){
-		int nn = (int) ((sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz);
+		int nn = (int) ((sz>(NETWORK_BUFFER_LENGTH)) ? (NETWORK_BUFFER_LENGTH) : sz);
 		fread(buf,nn,1,tsmFile);
 		rcSend(s,buf,nn,FALSE);
 		sz -= nn;
@@ -478,9 +476,9 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 	// recieve data
 	uint64_t sz;
 	rcRecv(s,&sz,sizeof(uint64_t));
-	char buf[BUFFER_LENGTH];
+	char buf[NETWORK_BUFFER_LENGTH];
 	while(sz > 0){
-		int nn = (int) ((sz>(BUFFER_LENGTH)) ? (BUFFER_LENGTH) : sz);
+		int nn = (int) ((sz>(NETWORK_BUFFER_LENGTH)) ? (NETWORK_BUFFER_LENGTH) : sz);
 		rcRecv(s,buf,nn,FALSE);
 		fwrite(buf,nn,1,tsmFile);
 		sz -= nn;

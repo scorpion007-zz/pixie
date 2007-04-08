@@ -66,7 +66,7 @@
 #define TESSELATION_NUM_LEVELS			3
 
 // The size of the buffer to be used during the network file transfers
-#define	BUFFER_LENGTH					1 << 12
+#define	NETWORK_BUFFER_LENGTH			1 << 12
 
 //	The maximum allowed string size that can be handled
 #define	MAX_SCRIPT_STRING_SIZE			256
@@ -91,11 +91,7 @@
 
 // The various cache sizes in reyes
 //#define	REYES_OBJECT_CACHE_SIZE			10
-//#define REYES_GRID_CACHE_SIZE			10
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+//#define	REYES_GRID_CACHE_SIZE			10
 
 #endif
 

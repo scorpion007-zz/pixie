@@ -118,18 +118,17 @@ typedef union {
 
 // Some useful machinery for memory management
 #ifdef		WIN32
-#ifdef		_DEBUG
-#include	<assert.h>
+	#ifdef		_DEBUG
+		#include	<assert.h>
 
-// Register some junk for memory leak detection
-#define _CRTDBG_MAP_ALLOC
-#include	<stdlib.h>
-#include	<crtdbg.h>
+		// Register some junk for memory leak detection
+		#define		_CRTDBG_MAP_ALLOC
+		#include	<stdlib.h>
+		#include	<crtdbg.h>
 
-#define MYDEBUG_NEW   new( _NORMAL_BLOCK, __FILE__, __LINE__)
-#define new MYDEBUG_NEW
-
-#endif
+		#define		MYDEBUG_NEW		new( _NORMAL_BLOCK, __FILE__, __LINE__)
+		#define		new				MYDEBUG_NEW
+	#endif
 #endif
 
 // Useful macros for allocating/deallocating untyped memory (aligned to 8 bytes)
@@ -141,9 +140,10 @@ typedef union {
 #endif
 
 
-// Include the global config file
-#include "../../config.h"
-
+// Include the global config file if available
+#ifdef HAVE_CONFIG_H
+	#include "../../config.h"
+#endif
 
 #endif
 

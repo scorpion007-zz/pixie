@@ -327,7 +327,7 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 	FILE	*in	=	fopen(fileToSend,"rb");
 
 	if (in != NULL) {
-		char	buffer[BUFFER_LENGTH];
+		char	buffer[NETWORK_BUFFER_LENGTH];
 		int		csize;
 		T32		netBuffer[1];
 
@@ -351,9 +351,9 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 
 		// Transfer the file
 		fseek(in,start,SEEK_SET);
-		for (csize=size;csize>0;csize-=BUFFER_LENGTH) {
-			fread(buffer,min(csize,BUFFER_LENGTH),sizeof(char),in);
-			rcSend(netServers[index],buffer,min(csize,BUFFER_LENGTH),FALSE);
+		for (csize=size;csize>0;csize-=NETWORK_BUFFER_LENGTH) {
+			fread(buffer,min(csize,NETWORK_BUFFER_LENGTH),sizeof(char),in);
+			rcSend(netServers[index],buffer,min(csize,NETWORK_BUFFER_LENGTH),FALSE);
 		}
 
 		fclose(in);
@@ -399,15 +399,15 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 		r	=	0;
 	} else {
 		int		tsize,csize;
-		char	buf[BUFFER_LENGTH];
+		char	buf[NETWORK_BUFFER_LENGTH];
 
 		// Get the size of the file first
 		rcRecv(netClient,&tsize,sizeof(int));
 
 		// Write down the file
-		for (csize=tsize;csize>0;csize-=BUFFER_LENGTH) {
-			rcRecv(netClient,buf,min(BUFFER_LENGTH,csize),FALSE);
-			fwrite(buf,min(BUFFER_LENGTH,csize),sizeof(char),file);
+		for (csize=tsize;csize>0;csize-=NETWORK_BUFFER_LENGTH) {
+			rcRecv(netClient,buf,min(NETWORK_BUFFER_LENGTH,csize),FALSE);
+			fwrite(buf,min(NETWORK_BUFFER_LENGTH,csize),sizeof(char),file);
 		}
 
 		r	=	tsize;

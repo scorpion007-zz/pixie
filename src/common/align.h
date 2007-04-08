@@ -40,8 +40,6 @@
 
 #ifndef WIN32		// >>Not Win32
 
-// Get the types for other platforms
-#include "../../config.h"
 #ifdef HAVE_STDINT_H
 	#include <stdint.h>
 #endif
