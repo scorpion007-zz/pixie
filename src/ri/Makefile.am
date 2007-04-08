@@ -8,7 +8,6 @@ libri_la_LDFLAGS = -export-dynamic -version-info $(LIBRI_CURRENT_VERSION):$(LIBR
 libri_la_SOURCES = 		attributes.cpp \
 				brickmap.cpp \
 				bundles.cpp \
-				cache.cpp \
 				curves.cpp \
 				bsplinePatchgrid.cpp \
 				debug.cpp \

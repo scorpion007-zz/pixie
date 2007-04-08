@@ -211,6 +211,7 @@ CXDisplay::CXDisplay(const char *name,const char *samples,int width,int height,i
 				break;
 
 			default:
+				fprintf(stderr,"Unsupported sample format for framebuffer display\n");
 				imageData = NULL;
 				failure = true;
 		}
