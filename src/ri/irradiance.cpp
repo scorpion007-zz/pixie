@@ -90,7 +90,14 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 		if (in == NULL)	in	=	ropen(name,"rb",fileIrradianceCache);
 
 		if (in != NULL) {
-		
+			matrix  fromWorld,toWorld;	 
+
+			// Read the world xform	 
+			fread(fromWorld,sizeof(float),16,in);	 
+			fread(toWorld,sizeof(float),16,in);	 
+			mulmm(to,fromWorld,CRenderer::toWorld);	 
+			mulmm(from,CRenderer::fromWorld,toWorld);
+                         
 			// Read the samples
 			fread(&maxDepth,	sizeof(int),1,in);
 			root	=	readNode(in);
@@ -136,7 +143,10 @@ CIrradianceCache::~CIrradianceCache() {
 		FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
 
 		if (out != NULL) {
-		
+			// Write the xform	 
+			fwrite(CRenderer::fromWorld,sizeof(float),16,out);	// fixme - should be specified space
+			fwrite(CRenderer::toWorld,sizeof(float),16,out);
+                         
 			// Write the samples
 			fwrite(&maxDepth,	sizeof(int),1,out);
 			writeNode(out,root);
