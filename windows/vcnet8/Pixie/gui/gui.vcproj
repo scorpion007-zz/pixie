@@ -20,7 +20,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\bin"
+			OutputDirectory="..\..\..\..\modules"
 			IntermediateDirectory="..\..\..\..\tmp\gui"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -180,7 +180,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\bin"
+			OutputDirectory="..\..\..\..\modules"
 			IntermediateDirectory="..\..\..\..\tmp\gui"
 			ConfigurationType="2"
 			CharacterSet="1"

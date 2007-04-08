@@ -6,6 +6,7 @@ mkdir Pixie\include
 mkdir Pixie\lib
 mkdir Pixie\shaders
 mkdir Pixie\displays
+mkdir Pixie\modules
 mkdir Pixie\doc
 copy bin\rndr.exe Pixie\bin
 copy bin\sdrc.exe Pixie\bin
@@ -13,10 +14,10 @@ copy bin\texmake.exe Pixie\bin
 copy bin\sdrinfo.exe Pixie\bin
 copy bin\show.exe Pixie\bin
 copy bin\ri.dll Pixie\bin
-copy bin\gui.dll Pixie\bin
 copy bin\sdr.dll Pixie\bin
 copy bin\ri.lib Pixie\lib
 copy bin\sdr.lib Pixie\lib
+copy modules\gui.dll Pixie\modules
 copy C:\okan\software\GnuWin32\bin\jpeg62.dll Pixie\bin
 copy C:\okan\software\GnuWin32\bin\libpng13.dll Pixie\bin
 copy C:\okan\software\GnuWin32\bin\libtiff3.dll Pixie\bin

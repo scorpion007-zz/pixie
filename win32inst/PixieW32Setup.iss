@@ -29,6 +29,7 @@ Name: {app}\html; Components: documentation
 Name: {app}\include; Components: libraries
 Name: {app}\lib; Components: main
 Name: {app}\displays; Components: main
+Name: {app}\modules; Components: main
 Name: {app}\shaders; Components: content
 
 [Files]
@@ -36,10 +37,11 @@ Name: {app}\shaders; Components: content
 Source: ..\AUTHORS; DestDir: {app}; Components: main
 Source: ..\LICENSE; DestDir: {app}; Components: main
 Source: ..\README; DestDir: {app}; Components: main
-; Distribute the bin directory
+; Distribute the dlls in bin directory
 Source: ..\bin\ri.dll; DestDir: {app}\bin; Components: main
-Source: ..\bin\gui.dll; DestDir: {app}\displays; Components: main
 Source: ..\bin\sdr.dll; DestDir: {app}\bin; Components: main
+; Distribute the modules
+Source: ..\modules\gui.dll; DestDir: {app}\modules; Components: main
 ; Distribute the dependant DLLs
 Source: C:\okan\software\GnuWin32\bin\jpeg62.dll; DestDir: {app}\bin; Components: main
 Source: C:\okan\software\GnuWin32\bin\libpng13.dll; DestDir: {app}\bin; Components: main

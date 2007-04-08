@@ -193,7 +193,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	int						i,j;
 
 	const float	searchRadius	=	8*radius*dPscale;		//FIXME: this should possibly be 2* but it seems to give artifacts
-	distances[0]				=	searchRadius*searchRadius;
+	//distances[0]				=	searchRadius*searchRadius;
+	distances[0]				=	C_INFINITY;
 
 	l.maxFound			=	maxFound;
 	l.numFound			=	0;
@@ -205,6 +206,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 								// N when looking up it it
 
 	const float NdotN = dotvv(l.N,l.N);
+	normalizevf(l.N);
 	
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
@@ -229,7 +231,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		// only entries coherent with N contribute
 		// but l.N is reversed...
 		if ((dotvv(p->N,l.N) < 0) || (NdotN <= 0)) {
-			const float	weight	=	1.0f/(distances[i]+C_EPSILON);
+			const float	t		=	distances[i] / (distances[0] + C_EPSILON);
+			const float	weight	=	(1 + 2*t*t*t - 3*t*t)*(-dotvv(l.N,p->N));
 			float		*dest	=	Cl;
 			const float	*src	=	data.array + p->entryNumber;
 			for (j=0;j<dataSize;j++) {
@@ -239,9 +242,13 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		}
 	}
 	
-	// Divide the contribution
-	const float weight	= 1.0f/totalWeight;
-	for (i=0;i<dataSize;i++) Cl[i]	*=	weight;
+	if (totalWeight > 0) {
+		// Divide the contribution
+		const float weight	= 1.0f/totalWeight;
+		for (i=0;i<dataSize;i++) Cl[i]	*=	weight;
+
+		assert(Cl[0] < 2);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
