@@ -300,6 +300,7 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	FALSE;																	\
 									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
+									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);			\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
 								const float	*b		=	rayDiff(op1);																\
@@ -357,6 +358,7 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	TRUE;																	\
 									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
+									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);			\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
 								const float	*b			=	rayDiff(op1);															\

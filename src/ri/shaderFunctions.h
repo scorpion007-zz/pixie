@@ -2294,9 +2294,9 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											movvv(lookup->backgroundColor,valf);								\
 										} else if (strcmp(*param,"maxBrightness") == 0) {						\
 											lookup->maxBrightness	=	valf[0];								\
-										} else if (strcmp(*param,"minR") == 0) {								\
+										} else if ((strcmp(*param,"minR") == 0) || (strcmp(*param,"minRadius") == 0)) {	\
 											lookup->minFGRadius	=	valf[0];									\
-										} else if (strcmp(*param,"maxR") == 0) {								\
+										} else if ((strcmp(*param,"maxR") == 0) || (strcmp(*param,"maxRadius") == 0)) {	\
 											lookup->maxFGRadius	=	valf[0];									\
 										} else if (strcmp(*param,"samplebase") == 0) {							\
 											lookup->sampleBase	=	valf[0];									\
@@ -2304,8 +2304,6 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											lookup->handle			=	vals[0];								\
 										} else if (strcmp(*param,"filemode") == 0) {							\
 											lookup->filemode		=	vals[0];								\
-										} else if (strcmp(*param,"coordsystem") == 0) {							\
-											lookup->coordsys		=	vals[0];								\
 										} else if (strcmp(*param,"environmentmap") == 0) {						\
 											lookup->environment		=	CRenderer::getEnvironment(vals[0]);		\
 										} else if (strcmp(*param,"pointbased") == 0) {							\
@@ -2317,11 +2315,13 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 										} else if (strcmp(*param,"radius") == 0) {								\
 											lookup->radius		=	*valf;										\
 										} else if (strcmp(*param,"coordsystem") == 0) {							\
-											lookup->coordsys	=	*vals;										\
+											/* null string counts as default */									\
+											if((*vals)[0] != '\0') lookup->coordsys	=	*vals;					\
 										} else if (strcmp(*param,"interpolate") == 0) {							\
 											lookup->interpolate =	*vali;										\
 										} else {																\
 											lookup->index[lookup->numChannels]	= i*2+start+1;					\
+											lookup->size[lookup->numChannels]	= 0; /* pre-bind, nothing matches */ \
 											channelNames[lookup->numChannels++]	= *param;						\
 										}																		\
 									}																			\
