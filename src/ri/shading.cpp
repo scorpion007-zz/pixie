@@ -1592,6 +1592,18 @@ const char	*CShadingContext::shaderName(const char *type) {
 // Method				:	findCoordinateSystem
 // Description			:	Locate a coordinate system
 // Return Value			:	-
+// Comments				:	Sometimes we just don't care about what system it is
+void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to) {
+	ECoordinateSystem	dummy;
+	
+	findCoordinateSystem(name,from,to,dummy);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	findCoordinateSystem
+// Description			:	Locate a coordinate system
+// Return Value			:	-
 // Comments				:
 void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to,ECoordinateSystem &cSystem) {
 	CNamedCoordinateSystem	*currentSystem;

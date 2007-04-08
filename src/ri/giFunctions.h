@@ -36,99 +36,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This macro is used to decode the texture parameter list
-#define	GLOBPARAMETERS(start,num)																								\
-								lookup						=	new CGlobalIllumLookup;											\
-								parameterlist				=	lookup;															\
-								dirty();																						\
-								lookup->numLookupSamples	=	attributes->photonEstimator;									\
-								lookup->maxDistance			=	C_INFINITY;														\
-								lookup->numSamples			=	200;															\
-								lookup->maxError			=	attributes->irradianceMaxError;									\
-								lookup->maxBrightness		=	1;																\
-								lookup->maxFGRadius			=	C_INFINITY;														\
-								lookup->minFGRadius			=	C_EPSILON;														\
-								lookup->sampleBase			=	0;																\
-								lookup->irradianceIndex		=	-1;																\
-								lookup->coverageIndex		=	-1;																\
-								lookup->environmentIndex	=	-1;																\
-								lookup->bias				=	attributes->shadowBias;											\
-								lookup->occlusion			=	FALSE;															\
-								lookup->gatherGlobal		=	1;																\
-								lookup->gatherLocal			=	1;																\
-								lookup->pointbased			=	FALSE;															\
-								lookup->localThreshold		=	1;																\
-								lookup->lengthA				=	CRenderer::lengthA;												\
-								lookup->lengthB				=	CRenderer::lengthB;												\
-								lookup->handle				=	(attributes->irradianceHandle		== NULL ? "temp.irr"	: attributes->irradianceHandle);			\
-								lookup->filemode			=	(attributes->irradianceHandleMode	== NULL ? ""			: attributes->irradianceHandleMode);		\
-								lookup->coordsys			=	coordinateWorldSystem;											\
-								initv(lookup->backgroundColor,0);																\
-								lookup->cache				=	NULL;															\
-								lookup->map					=	NULL;															\
-								lookup->environment			=	NULL;															\
-								lookup->pointHierarchy		=	NULL;															\
-								{																								\
-									int			i;																				\
-									const char	**param;																		\
-									const float	*valf;																			\
-									const char	**vals;																			\
-																																\
-									for (i=0;i<num;i++) {																		\
-										operand(i*2+start,param,const char **);													\
-										operand(i*2+start+1,valf,const float *);												\
-										operand(i*2+start+1,vals,const char **);												\
-																																\
-										if (strcmp(*param,"estimator") == 0) {													\
-											lookup->numLookupSamples	=	(int) valf[0];										\
-										} else if (strcmp(*param,"maxdist") == 0) {												\
-											lookup->maxDistance	=	valf[0];													\
-										} else if (strcmp(*param,"maxerror") == 0) {											\
-											lookup->maxError	=	valf[0];													\
-										} else if (strcmp(*param,"samples") == 0) {												\
-											lookup->numSamples	=	(int) valf[0];												\
-										} else if (strcmp(*param,"bias") == 0) {												\
-											lookup->bias		=	valf[0];													\
-										} else if (strcmp(*param,"localThreshold") == 0) {										\
-											lookup->localThreshold	=	valf[0];												\
-										} else if (strcmp(*param,"backgroundColor") == 0) {										\
-											movvv(lookup->backgroundColor,valf);												\
-										} else if (strcmp(*param,"maxBrightness") == 0) {										\
-											lookup->maxBrightness	=	valf[0];												\
-										} else if (strcmp(*param,"minR") == 0) {												\
-											lookup->minFGRadius	=	valf[0];													\
-										} else if (strcmp(*param,"maxR") == 0) {												\
-											lookup->maxFGRadius	=	valf[0];													\
-										} else if (strcmp(*param,"samplebase") == 0) {											\
-											lookup->sampleBase	=	valf[0];													\
-										} else if (strcmp(*param,"global") == 0) {												\
-											lookup->gatherGlobal	=	(int) valf[0];											\
-										} else if (strcmp(*param,"local") == 0) {												\
-											lookup->gatherLocal		=	(int) valf[0];											\
-										} else if (strcmp(*param,"handle") == 0) {												\
-											lookup->handle			=	vals[0];												\
-										} else if (strcmp(*param,"filemode") == 0) {											\
-											lookup->filemode		=	vals[0];												\
-										} else if (strcmp(*param,"coordsystem") == 0) {											\
-											lookup->coordsys		=	vals[0];												\
-										} else if (strcmp(*param,"environmentmap") == 0) {										\
-											lookup->environment		=	CRenderer::getEnvironment(vals[0]);						\
-										} else if (strcmp(*param,"irradiance") == 0) {											\
-											lookup->irradianceIndex	=	i*2+start+1;											\
-										} else if (strcmp(*param,"occlusion") == 0) {											\
-											lookup->coverageIndex	=	i*2+start+1;											\
-										} else if (strcmp(*param,"environmentdir") == 0) {										\
-											lookup->environmentIndex=	i*2+start+1;											\
-										} else if (strcmp(*param,"pointbased") == 0) {											\
-											lookup->pointbased		=	(vals[0] > 0);											\
-										} else if (strcmp(*param,"filename") == 0) {											\
-											lookup->pointHierarchy	=	CRenderer::getTexture3d(vals[0],FALSE,"_area",CRenderer::fromWorld,CRenderer::toWorld,TRUE);						\
-										}																						\
-									}																							\
-								}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
 #define	TRANSMISSIONEXPR_PRE	float			*res,*op1,*op2;																	\
@@ -381,42 +288,43 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // indirectdiffuse	"c=pnf!"
 #ifndef INIT_SHADING
-#define	IDEXPR_PRE				CGlobalIllumLookup	*lookup;																		\
-								CCache				*cache;																			\
-								float				C[7];																			\
-								float				*envdir;																		\
-								float				*coverage;																		\
+#define	IDEXPR_PRE				CTexture3dLookup	*lookup;																		\
 								FUN4EXPR_PRE;																						\
 								osLock(CRenderer::shaderMutex);																		\
-								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
-									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;						\
+								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {										\
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
-									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
+									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);													\
+									const float			*from,*to;																	\
+									findCoordinateSystem(lookup->coordsys,from,to);													\
 									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	FALSE;																	\
+									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
-								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir,float *);	}		\
-								else envdir = varying[VARIABLE_PW];																	\
-								if (lookup->coverageIndex != -1)	{	operand(lookup->coverageIndex,coverage,float *);	}		\
-								else coverage = varying[VARIABLE_PW];																\
-								const float	*b	=	rayDiff(op1);																	\
-								cache	=	lookup->cache;
+								const float	*b		=	rayDiff(op1);																\
+								CTexture3d	*cache	=	lookup->texture;															\
+								assert(cache->dataSize == 7);																		\
+																																	\
+								float	C[7];																						\
+								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);	\
+																																	\
+								int channel;																						\
+								for (channel=0;channel<lookup->numChannels;channel++) {												\
+									operand(lookup->index[channel],channelValues[channel],float *);									\
+								} 
 
 
 #define	IDEXPR					cache->lookup(C,op1,op2,*b,this,lookup);															\
-								movvv(res,C);																						\
-								movvv(envdir,C+4);																					\
-								*coverage = C[3];
+								texture3Dunpack(C,lookup->numChannels,channelValues,lookup->entry,lookup->size);					\
+								movvv(res,C);
 
 
 #define	IDEXPR_UPDATE			FUN4EXPR_UPDATE(3,3,3,0)																			\
 								b++;																								\
-								envdir	+=	3;																						\
-								coverage++;
-
+								for (channel=0;channel<lookup->numChannels;channel++) {												\
+									channelValues[channel]	+=	lookup->size[channel];												\
+								}
 #else
 #define	IDEXPR_PRE
 
@@ -437,42 +345,42 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // occlusion	"f=pnf!"
 #ifndef INIT_SHADING
-#define	OCCLUSIONEXPR_PRE		CGlobalIllumLookup	*lookup;																		\
-								CCache				*cache;																			\
-								float				C[7];																			\
-								float				*envdir;																		\
-								float				*irradiance;																	\
+#define	OCCLUSIONEXPR_PRE		CTexture3dLookup	*lookup;																		\
 								FUN4EXPR_PRE;																						\
 								osLock(CRenderer::shaderMutex);																		\
-								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {										\
-									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;						\
+								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {										\
 									int			numArguments;																		\
 									argumentcount(numArguments);																	\
-									GLOBPARAMETERS(4,(numArguments-4) >> 1);														\
-									lookup->cache		=	CRenderer::getCache(lookup->handle,lookup->filemode);					\
+									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);													\
+									const float			*from,*to;																	\
+									findCoordinateSystem(lookup->coordsys,from,to);													\
 									lookup->numSamples	=	(int) *op3;																\
 									lookup->occlusion	=	TRUE;																	\
-									if (lookup->irradianceIndex != -1) lookup->occlusion = FALSE;									\
+									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
-								if (lookup->environmentIndex != -1) {	operand(lookup->environmentIndex,envdir,float *);	}		\
-								else envdir = varying[VARIABLE_PW];																	\
-								if (lookup->irradianceIndex != -1)	{	operand(lookup->irradianceIndex,irradiance,float *);	}	\
-								else irradiance =  varying[VARIABLE_PW];															\
-								const float	*b	=	rayDiff(op1);																	\
-								cache	=	lookup->cache;
+								const float	*b			=	rayDiff(op1);															\
+								CTexture3d	*cache		=	lookup->texture;														\
+								assert(cache->dataSize == 7);																		\
+																																	\
+								float	C[7];																						\
+								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);	\
+																																	\
+								int channel;																						\
+								for (channel=0;channel<lookup->numChannels;channel++) {												\
+									operand(lookup->index[channel],channelValues[channel],float *);									\
+								} 
 
 #define	OCCLUSIONEXPR			cache->lookup(C,op1,op2,*b,this,lookup);															\
-								*res	=	C[3];																					\
-								movvv(irradiance,C);																				\
-								movvv(envdir,C+4);
+								texture3Dunpack(C,lookup->numChannels,channelValues,lookup->entry,lookup->size);					\
+								*res	=	C[3];
 
 
 #define	OCCLUSIONEXPR_UPDATE	FUN4EXPR_UPDATE(1,3,3,0)																			\
 								b++;																								\
-								irradiance	+=	3;																					\
-								envdir		+=	3;
-
+								for (channel=0;channel<lookup->numChannels;channel++) {												\
+									channelValues[channel]	+=	lookup->size[channel];												\
+								}
 #else
 #define	OCCLUSIONEXPR_PRE
 
@@ -493,25 +401,23 @@ DEFSHORTFUNC(occlusion	,"occlusion"	,"f=pnf!"	,OCCLUSIONEXPR_PRE,OCCLUSIONEXPR,O
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // photonmap	"c=spn!"
 #ifndef INIT_SHADING
-#define	PHOTONMAPEXPR_PRE		CGlobalIllumLookup	*lookup;													\
-								CPhotonMap			*map;														\
-								float				*res;														\
-								const float			*op2,*op3;													\
+#define	PHOTONMAPEXPR_PRE		CTexture3dLookup	*lookup;													\
 								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {					\
-									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;	\
+								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									int			numArguments;													\
 									const char	**op1;															\
 									argumentcount(numArguments);												\
-									GLOBPARAMETERS(4,(numArguments-4) >> 1);									\
+									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1,const char **);												\
 									lookup->map			=	CRenderer::getPhotonMap(*op1);						\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
+								float				*res;														\
+								const float			*op2,*op3;													\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
 								operand(3,op3,const float *);													\
-								map						=	lookup->map;
+								CPhotonMap	*map	=	lookup->map;
 
 
 #define	PHOTONMAPEXPR			map->lookup(res,op2,op3,lookup->numLookupSamples);
@@ -541,24 +447,22 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // photonmap	"c=sp!"
 #ifndef INIT_SHADING
-#define	PHOTONMAP2EXPR_PRE		CGlobalIllumLookup	*lookup;													\
-								CPhotonMap			*map;														\
-								float				*res;														\
-								const float			*op2;														\
+#define	PHOTONMAP2EXPR_PRE		CTexture3dLookup	*lookup;													\
 								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CGlobalIllumLookup *) parameterlist) == NULL) {					\
-									CAttributes	*attributes	=	currentShadingState->currentObject->attributes;	\
+								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
 									int			numArguments;													\
 									const char	**op1;															\
 									argumentcount(numArguments);												\
-									GLOBPARAMETERS(3,(numArguments-3) >> 1);									\
+									TEXTURE3DPARAMETERS(3,(numArguments-3) >> 1);								\
 									operand(1,op1,const char **);												\
 									lookup->map			=	CRenderer::getPhotonMap(*op1);						\
 								}																				\
 								osUnlock(CRenderer::shaderMutex);												\
+								float				*res;														\
+								const float			*op2;														\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
-								map						=	lookup->map;
+								CPhotonMap	*map	=	lookup->map;
 
 #define	PHOTONMAP2EXPR			map->lookup(res,op2,lookup->numLookupSamples);
 

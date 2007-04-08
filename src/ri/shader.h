@@ -52,7 +52,6 @@ class	CTexture;
 class	CTexture3d;
 class	CTextureInfoBase;
 class	CEnvironment;
-class	CCache;
 class	CVolume;
 class	CColorMap;
 class	CVisorCache;
@@ -174,10 +173,10 @@ public:
 // Class				:	CGlobalIllumLookup
 // Description			:	This class encapsulates a global illumination lookup
 // Comments				:
-class	CGlobalIllumLookup : public CShaderLookup {
+class	CTexture3dLookup : public CShaderLookup {
 public:
-							CGlobalIllumLookup();
-							~CGlobalIllumLookup();
+							CTexture3dLookup(const CAttributes *);
+							~CTexture3dLookup();
 
 		int					numLookupSamples;		// The number of nearest samples to use during the map access
 		float				maxDistance;			// The maximum ray intersection distance
@@ -187,12 +186,8 @@ public:
 		float				minFGRadius;			// The minimum final gather spacing
 		float				maxFGRadius;			// The maximum final gather spacing
 		float				sampleBase;				// The relative ammount to jitter ray origins
-		int					irradianceIndex;		// The index of the irradiance
-		int					coverageIndex;			// The index of the coverage
-		int					environmentIndex;		// The index of the environment direction
 		float				bias;					// The shadow bias
 		int					occlusion;				// TRUE if this is an occlusion lookup
-		int					gatherLocal,gatherGlobal;	// The gathering behaivor
 		int					pointbased;				// TRUE if we are using point based irradiance
 		float				localThreshold;			// The local threshold for the radiance cache
 		float				lengthA,lengthB;		// The depth to length conversion
@@ -200,34 +195,15 @@ public:
 		const char			*handle;				// The irradiance handle
 		const char			*filemode;				// The irradiance filemode
 		const char			*coordsys;				// The coordinate system to store
-		CCache				*cache;					// The cache to lookup
 		CPhotonMap			*map;					// The photon map to lookup
 		CEnvironment		*environment;			// The environment map to use if no intersection
 		CTexture3d			*pointHierarchy;		// The point hierarchy file to lookup
-};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTexture3dLookup
-// Description			:	This class holds information about a 3d texture bake
-// Comments				:
-class	CTexture3dLookup : public CShaderLookup	{
-public:
-							~CTexture3dLookup()	{
-								delete [] entry;
-								delete [] size;
-							}
+		CTexture3d			*texture;				// The texture to lookup
 		float				radius;					// The sample radius
 		float				radiusScale;			// Blur amount
 		int					interpolate;			// Bake polygon centres
-		char				**channels;				// The channels this bake3d provides
 		int					numChannels;			// The number of channels bake3d provides
-		int					dataStart;				// The argument at which data starts
-		const char			*coordsys;				// The coordinate system to bake to
-				
-		int					*entry,*size;			// Entry points for every channel
-		
-		CTexture3d			*texture;
+		int					*index,*entry,*size;	// Entry points for every channel
 };
 
 

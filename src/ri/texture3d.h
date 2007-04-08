@@ -39,6 +39,9 @@
 #include "gui/opengl.h"
 
 
+class	CShadingContext;
+class	CTexture3dLookup;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Description			:	Base class for 3d textures
@@ -65,6 +68,7 @@ public:
 
 							// For storing/querying data
 	virtual	void			lookup(float *,const float *,const float *,float)		= 0;
+	virtual	void			lookup(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *)		= 0;
 	virtual	void			store(const float *,const float *,const float *,float)	= 0;
 
 							// Resolve the names to channels

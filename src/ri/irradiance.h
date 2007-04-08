@@ -36,9 +36,16 @@
 #include "common/algebra.h"
 #include "options.h"
 #include "shader.h"
-#include "cache.h"
+#include "texture3d.h"
 #include "random.h"
 #include "depository.h"
+
+
+const	unsigned int	CACHE_SAMPLE	=	1;		// Cache needs to be sampled
+const	unsigned int	CACHE_READ		=	2;		// Read the cache
+const	unsigned int	CACHE_WRITE		=	4;		// Write the cache
+const	unsigned int	CACHE_RDONLY	=	8;		// ONLY Read the cache
+
 
 // Forward declarations
 class CRemoteICacheChannel;
@@ -47,7 +54,7 @@ class CRemoteICacheChannel;
 // Class				:	CIrradianceCache
 // Description			:	Encapsulates an irradiance cache
 // Comments				:
-class	CIrradianceCache : public CCache {
+class	CIrradianceCache : public CTexture3d {
 public:
 
 	///////////////////////////////////////////////////////////////////////
@@ -89,10 +96,13 @@ public:
 
 public:
 
-								CIrradianceCache(const char *,unsigned int,FILE *);
+								CIrradianceCache(const char *name,unsigned int flags,FILE *in,const float *from,const float *to,const float *tondc=NULL);
 								~CIrradianceCache();
 
-		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
+		void					lookup(float *,const float *,const float *,float)		{	assert(FALSE);	}
+		void					store(const float *,const float *,const float *,float)	{	assert(FALSE);	}
+
+		void					lookup(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *);
 
 		void					draw();
 		int						keyDown(int key);
@@ -102,19 +112,19 @@ private:
 		void					writeNode(FILE *,CCacheNode *);
 		CCacheNode				*readNode(FILE *);
 
-		void					sample(float *,const float *,const float *,float,CShadingContext *,const CGlobalIllumLookup *);
+		void					sample(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *);
 		void					clamp(CCacheSample *);
 
 		CMemStack				*memory;
 
 		CCacheNode				*root;
 		int						maxDepth;
+		int						flags;
 		
-		matrix					from,to;
-
 		TMutex					mutex;
 		
 		static	int				drawDiscs;					// Which type to draw
+		static	CChannel		cacheChannels[3];
 
 		friend class			CRemoteICacheChannel;
 };

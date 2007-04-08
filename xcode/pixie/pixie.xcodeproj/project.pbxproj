@@ -167,8 +167,6 @@
 		C96A6F240AD6E143003C2D7B /* bsplinePatchgrid.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EF50AD6E143003C2D7B /* bsplinePatchgrid.h */; };
 		C96A6F250AD6E143003C2D7B /* bundles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6EF60AD6E143003C2D7B /* bundles.cpp */; };
 		C96A6F260AD6E143003C2D7B /* bundles.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EF70AD6E143003C2D7B /* bundles.h */; };
-		C96A6F270AD6E143003C2D7B /* cache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6EF80AD6E143003C2D7B /* cache.cpp */; };
-		C96A6F280AD6E143003C2D7B /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EF90AD6E143003C2D7B /* cache.h */; };
 		C96A6F290AD6E143003C2D7B /* curves.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6EFA0AD6E143003C2D7B /* curves.cpp */; };
 		C96A6F2A0AD6E143003C2D7B /* curves.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6EFB0AD6E143003C2D7B /* curves.h */; };
 		C96A6F2B0AD6E143003C2D7B /* delayed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6EFC0AD6E143003C2D7B /* delayed.cpp */; };
@@ -995,8 +993,6 @@
 		C96A6EF50AD6E143003C2D7B /* bsplinePatchgrid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsplinePatchgrid.h; path = ../../src/ri/bsplinePatchgrid.h; sourceTree = SOURCE_ROOT; };
 		C96A6EF60AD6E143003C2D7B /* bundles.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = bundles.cpp; path = ../../src/ri/bundles.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6EF70AD6E143003C2D7B /* bundles.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bundles.h; path = ../../src/ri/bundles.h; sourceTree = SOURCE_ROOT; };
-		C96A6EF80AD6E143003C2D7B /* cache.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = cache.cpp; path = ../../src/ri/cache.cpp; sourceTree = SOURCE_ROOT; };
-		C96A6EF90AD6E143003C2D7B /* cache.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cache.h; path = ../../src/ri/cache.h; sourceTree = SOURCE_ROOT; };
 		C96A6EFA0AD6E143003C2D7B /* curves.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = curves.cpp; path = ../../src/ri/curves.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6EFB0AD6E143003C2D7B /* curves.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = curves.h; path = ../../src/ri/curves.h; sourceTree = SOURCE_ROOT; };
 		C96A6EFC0AD6E143003C2D7B /* delayed.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = delayed.cpp; path = ../../src/ri/delayed.cpp; sourceTree = SOURCE_ROOT; };
@@ -1118,7 +1114,7 @@
 		C96A6FB90AD6E196003C2D7B /* zbufferPoint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbufferPoint.h; path = ../../src/ri/zbufferPoint.h; sourceTree = SOURCE_ROOT; };
 		C96A6FBA0AD6E196003C2D7B /* zbufferQuad.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zbufferQuad.h; path = ../../src/ri/zbufferQuad.h; sourceTree = SOURCE_ROOT; };
 		C983E6C20AF2E8FB00648461 /* rndr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rndr; sourceTree = BUILT_PRODUCTS_DIR; };
-		C983E6D20AF2E9C900648461 /* sdrc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrc; sourceTree = BUILT_PRODUCTS_DIR; };
+		C983E6D20AF2E9C900648461 /* sdrc */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = sdrc; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6ED0AF2E9FE00648461 /* precomp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = precomp; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6F60AF2EA3400648461 /* sdrinfo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrinfo; sourceTree = BUILT_PRODUCTS_DIR; };
 		C983E6FF0AF2EA8400648461 /* texmake */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = texmake; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1799,8 +1795,6 @@
 				C96A6EF50AD6E143003C2D7B /* bsplinePatchgrid.h */,
 				C96A6EF60AD6E143003C2D7B /* bundles.cpp */,
 				C96A6EF70AD6E143003C2D7B /* bundles.h */,
-				C96A6EF80AD6E143003C2D7B /* cache.cpp */,
-				C96A6EF90AD6E143003C2D7B /* cache.h */,
 				C96A6EFA0AD6E143003C2D7B /* curves.cpp */,
 				C96A6EFB0AD6E143003C2D7B /* curves.h */,
 				1862D7590B2A8F5A00111435 /* debug.cpp */,
@@ -2071,7 +2065,6 @@
 				C96A6F220AD6E143003C2D7B /* brickmap.h in Headers */,
 				C96A6F240AD6E143003C2D7B /* bsplinePatchgrid.h in Headers */,
 				C96A6F260AD6E143003C2D7B /* bundles.h in Headers */,
-				C96A6F280AD6E143003C2D7B /* cache.h in Headers */,
 				C96A6F2A0AD6E143003C2D7B /* curves.h in Headers */,
 				C96A6F2C0AD6E143003C2D7B /* delayed.h in Headers */,
 				C96A6F2F0AD6E143003C2D7B /* dlo.h in Headers */,
@@ -2599,7 +2592,6 @@
 				C96A6F210AD6E143003C2D7B /* brickmap.cpp in Sources */,
 				C96A6F230AD6E143003C2D7B /* bsplinePatchgrid.cpp in Sources */,
 				C96A6F250AD6E143003C2D7B /* bundles.cpp in Sources */,
-				C96A6F270AD6E143003C2D7B /* cache.cpp in Sources */,
 				C96A6F290AD6E143003C2D7B /* curves.cpp in Sources */,
 				C96A6F2B0AD6E143003C2D7B /* delayed.cpp in Sources */,
 				C96A6F300AD6E143003C2D7B /* dlobject.cpp in Sources */,

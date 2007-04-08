@@ -330,7 +330,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 // Description			:	Load a cache
 // Return Value			:
 // Comments				:
-CCache		*CRenderer::getCache(const char *name,const char *mode) {
+CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *from,const float *to) {
 	CFileResource	*cache;
 
 	if (*name == '\0')	return NULL;
@@ -380,7 +380,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 					
 					// Create the cache
 					if (strcmp(type,fileIrradianceCache) == 0) {
-						cache	=	new CIrradianceCache(name,flags,in);
+						cache	=	new CIrradianceCache(name,flags,in,from,to,NULL);
 					} else {
 						error(CODE_BUG,"This seems to be a Pixie file of unrecognised type (%s)\n",name);
 						fclose(in);
@@ -400,7 +400,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 			}
 			
 			// go ahead and create the cache
-			cache	=	new CIrradianceCache(name,flags,NULL);
+			cache	=	new CIrradianceCache(name,flags,NULL,from,to,CRenderer::toNDC);
 		}
 		
 		// Create channels if possible
@@ -413,7 +413,7 @@ CCache		*CRenderer::getCache(const char *name,const char *mode) {
 		frameFiles->insert(cache->name,cache);
 	}
 
-	return (CCache *) cache;
+	return (CTexture3d *) cache;
 }
 
 ///////////////////////////////////////////////////////////////////////

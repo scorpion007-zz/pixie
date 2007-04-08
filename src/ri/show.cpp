@@ -29,7 +29,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include "show.h"
-#include "cache.h"
 #include "error.h"
 #include "fileResource.h"
 #include "photonMap.h"
@@ -110,9 +109,9 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 							if (strcmp(t,filePhotonMap) == 0) {
 								view	=	CRenderer::getPhotonMap(fileName);
 							} else if (strcmp(t,fileIrradianceCache) == 0) {
-								view	=	CRenderer::getCache(fileName,"R");
+								view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
 							} else if (strcmp(t,fileGatherCache) == 0) {
-								view	=	CRenderer::getCache(fileName,"R");
+								view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
 							} else if (strcmp(t,filePointCloud) == 0) {
 								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
 							} else if (strcmp(t,fileBrickMap) == 0) {

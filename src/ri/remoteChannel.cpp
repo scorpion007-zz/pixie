@@ -174,7 +174,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 		case CHANNELTYPE_ICACHE:
 			{
 			// create an irradiancecache channel
-			CIrradianceCache * cache = (CIrradianceCache*) getCache(channelName,"w");
+			CIrradianceCache * cache = (CIrradianceCache*) getCache(channelName,"w",CRenderer::fromWorld,CRenderer::toWorld);
 			rChannel = new CRemoteICacheChannel(cache);
 			rChannel->remoteId = remoteChannels->numItems;
 			buffer[0].integer	=	rChannel->remoteId;

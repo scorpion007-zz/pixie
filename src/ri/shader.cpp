@@ -37,10 +37,10 @@
 #include	"shader.h"
 #include	"stats.h"
 #include	"shading.h"
-#include	"cache.h"
 #include	"bundles.h"
 #include	"memory.h"
 #include	"renderer.h"
+#include	"attributes.h"
 #include	"common/align.h"
 
 
@@ -270,12 +270,41 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CGlobalIllumLookup
-// Method				:	CGlobalIllumLookup
+// Class				:	CTexture3dLookup
+// Method				:	CTexture3dLookup
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CGlobalIllumLookup::CGlobalIllumLookup() {
+CTexture3dLookup::CTexture3dLookup(const CAttributes *attributes) {
+	numLookupSamples	=	attributes->photonEstimator;
+	maxDistance			=	C_INFINITY;
+	numSamples			=	200;
+	maxError			=	attributes->irradianceMaxError;
+	maxBrightness		=	1;
+	maxFGRadius			=	C_INFINITY;
+	minFGRadius			=	C_EPSILON;
+	sampleBase			=	0;
+	bias				=	attributes->shadowBias;
+	occlusion			=	FALSE;
+	pointbased			=	FALSE;
+	localThreshold		=	1;
+	lengthA				=	CRenderer::lengthA;
+	lengthB				=	CRenderer::lengthB;
+	initv(backgroundColor,0);
+	handle				=	(attributes->irradianceHandle		== NULL ? "temp.irr"	: attributes->irradianceHandle);
+	filemode			=	(attributes->irradianceHandleMode	== NULL ? ""			: attributes->irradianceHandleMode);
+	coordsys			=	coordinateWorldSystem;
+	map					=	NULL;
+	environment			=	NULL;
+	pointHierarchy		=	NULL;
+	texture				=	NULL;
+	radius				=	-1.0f;
+	radiusScale			=	1.0f;
+	interpolate			=	FALSE;
+	numChannels			=	0;
+	index				=	NULL;
+	entry				=	NULL;
+	size				=	NULL;	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -284,7 +313,10 @@ CGlobalIllumLookup::CGlobalIllumLookup() {
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-CGlobalIllumLookup::~CGlobalIllumLookup() {
+CTexture3dLookup::~CTexture3dLookup() {
+	if (index != NULL)	delete [] index;
+	if (entry != NULL)	delete [] entry;
+	if (size != NULL)	delete [] size;
 }
 
 ///////////////////////////////////////////////////////////////////////	

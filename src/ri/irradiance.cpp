@@ -54,7 +54,11 @@ const	float	horizonCutoff			=	(float) cosf((float) radians(80));
 //
 ///////////////////////////////////////////////////////////////////////
 
-int			CIrradianceCache::drawDiscs		=	TRUE;
+int						CIrradianceCache::drawDiscs			=	TRUE;
+CTexture3d::CChannel	CIrradianceCache::cacheChannels[3]	=	{
+	{	"irradiance",		3,	0,	NULL,	TYPE_COLOR	},
+	{	"occlusion",		1,	3,	NULL,	TYPE_FLOAT	},
+	{	"environmentdir",	3,	4,	NULL,	TYPE_VECTOR	}};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
@@ -62,34 +66,29 @@ int			CIrradianceCache::drawDiscs		=	TRUE;
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in) : CCache(name,f) {
+CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,const float *from,const float *to,const float *tondc) : CTexture3d(name,from,to,tondc,3,cacheChannels) {
 	int	i;
 
+	assert(dataSize == 7);
+	assert(numChannels == 3);
+	
 	memory				=	new CMemStack;		// Where we allocate our memory from
 	root				=	NULL;
 	maxDepth			=	1;
+	flags				=	f;
 	osCreateMutex(mutex);
-
-	identitym(from);
-	identitym(to);
 
 	// Are we reading from file ?
 	if (flags & CACHE_READ) {
 		if (in == NULL)	in	=	ropen(name,"rb",fileIrradianceCache);
 
 		if (in != NULL) {
-			matrix	fromWorld,toWorld;
-
-			// Read the world xform
-			fread(fromWorld,sizeof(float),16,in);
-			fread(toWorld,sizeof(float),16,in);
-			mulmm(to,fromWorld,CRenderer::toWorld);
-			mulmm(from,CRenderer::fromWorld,toWorld);
-
+		
 			// Read the samples
 			fread(&maxDepth,	sizeof(int),1,in);
 			root	=	readNode(in);
 
+			// Close the file
 			fclose(in);
 		}
 	}
@@ -130,10 +129,7 @@ CIrradianceCache::~CIrradianceCache() {
 		FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
 
 		if (out != NULL) {
-			// Write the xform
-			fwrite(CRenderer::fromWorld,sizeof(float),16,out);
-			fwrite(CRenderer::toWorld,sizeof(float),16,out);
-
+		
 			// Write the samples
 			fwrite(&maxDepth,	sizeof(int),1,out);
 			writeNode(out,root);
@@ -211,7 +207,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Description			:	Lookup da cache
 // Return Value			:
 // Comments				:
-void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
+void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CTexture3dLookup *lookup) {
 	CCacheSample		*cSample;
 	CCacheNode			*cNode;
 	float				totalWeight		=	0;
@@ -534,7 +530,7 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Description			:	Sample the occlusion
 // Return Value			:
 // Comments				:
-void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CGlobalIllumLookup *lookup) {
+void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CTexture3dLookup *lookup) {
 	CCacheSample		*cSample;
 	int					i,j;
 	int					numSamples		=	lookup->numSamples;

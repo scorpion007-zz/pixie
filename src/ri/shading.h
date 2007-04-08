@@ -63,7 +63,6 @@ class	CPoints;
 class	CPointCloud;
 class	CVolume;
 class	CParticipatingMedium;
-class	CCache;
 class	CVisorCache;
 class	CPl;
 class	CSphereLight;
@@ -309,9 +308,6 @@ private:
 		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
 		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);
 
-		void					indirectSample(CGlobalIllumLookup *,const float *,const float *);
-		void					occlusionSample(CGlobalIllumLookup *,const float *,const float *);
-
 		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);
 		int						displacementParameter(void *dest,const char *name,CVariable**,int*);
@@ -330,6 +326,7 @@ private:
 		void					displace(CSurface *,int,CQuadVertex **);
 
 		// Some misc shading functions
+		void					findCoordinateSystem(const char *,const float *&,const float *&);
 		void					findCoordinateSystem(const char *,const float *&,const float *&,ECoordinateSystem &);
 
 		// Some data structures for urand()
