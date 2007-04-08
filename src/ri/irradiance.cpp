@@ -78,26 +78,12 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 	flags				=	f;
 	osCreateMutex(mutex);
 
-	// HACK this should be removed once I work out what's correct here
-	identitym(this->from);
-	identitym(this->to);
-	// HACK we wish to bake into a specified space, and do lookups there
-	// raytraces must always be worldspace, but hierarchy bounds etc might not be
-	// current support = allow lookups in different space than currently we have
-
 	// Are we reading from file ?
 	if (flags & CACHE_READ) {
 		if (in == NULL)	in	=	ropen(name,"rb",fileIrradianceCache);
 
 		if (in != NULL) {
-			matrix  fromWorld,toWorld;	 
-
-			// Read the world xform	 
-			fread(fromWorld,sizeof(float),16,in);	 
-			fread(toWorld,sizeof(float),16,in);	 
-			mulmm(to,fromWorld,CRenderer::toWorld);	 
-			mulmm(from,CRenderer::fromWorld,toWorld);
-                         
+		
 			// Read the samples
 			fread(&maxDepth,	sizeof(int),1,in);
 			root	=	readNode(in);
@@ -111,8 +97,8 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 	if (root == NULL) {
 		vector	center,bmin,bmax;
 
-		movvv(bmin,CRenderer::worldBmin);
-		movvv(bmax,CRenderer::worldBmax);
+		// Transform the bounding box to the world
+		transformBound(bmin,bmax,to,CRenderer::worldBmin,CRenderer::worldBmax);
 
 		root			=	(CCacheNode *) memory->alloc(sizeof(CCacheNode));
 		for (i=0;i<8;i++)	root->children[i]	=	NULL;
@@ -143,10 +129,7 @@ CIrradianceCache::~CIrradianceCache() {
 		FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
 
 		if (out != NULL) {
-			// Write the xform	 
-			fwrite(CRenderer::fromWorld,sizeof(float),16,out);	// fixme - should be specified space
-			fwrite(CRenderer::toWorld,sizeof(float),16,out);
-                         
+		
 			// Write the samples
 			fwrite(&maxDepth,	sizeof(int),1,out);
 			writeNode(out,root);
@@ -328,15 +311,14 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 		C[1]			=	(float) (irradiance[1]*normalizer);
 		C[2]			=	(float) (irradiance[2]*normalizer);
 		C[3]			=	(float) (coverage*normalizer);
-		C[4]			=	envdir[0];
-		C[5]			=	envdir[1];
-		C[6]			=	envdir[2];
+		mulmv(C+4,from,envdir);		// envdir is stored in the target coordinate system
 	} else {
 		// Are we sampling the cache ?
 		if (flags & CACHE_SAMPLE) {
 
 			// Create a new sample
 			sample(C,P,N,dSample,context,lookup);
+			mulmv(C+4,from,C+4);	// envdir is stored in the target coordinate system
 		} else {
 
 			// No joy
@@ -550,24 +532,21 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CTexture3dLookup *lookup) {
 	CCacheSample		*cSample;
 	int					i,j;
-	int					numSamples		=	lookup->numSamples;
 	float				coverage;
 	vector				irradiance;
 	vector				envdir;
 	float				rMean;
 	CRay				ray;
-	int					nt,np;
 	vector				X,Y;
-	CHemisphereSample	*hemisphere;
 	CCacheNode			*cNode;
 	int					depth;
 	CTextureLookup		*texLookup;
 
 	// Allocate memory
-	nt								=	(int) (sqrtf(numSamples / (float) C_PI) + 0.5);
-	np								=	(int) (C_PI*nt + 0.5);
-	numSamples						=	nt*np;
-	hemisphere						=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
+	const int			nt				=	(int) (sqrtf(lookup->numSamples / (float) C_PI) + 0.5);
+	const int			np				=	(int) (C_PI*nt + 0.5);
+	const int			numSamples		=	nt*np;
+	CHemisphereSample	*hemisphere		=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
 
 	if(lookup->environment != NULL){
 		texLookup				= (CTextureLookup*) alloca(sizeof(CTextureLookup));
@@ -599,8 +578,6 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	rMean							=	C_INFINITY;
 	
 	// Calculate the ray differentials (use average spread in theta and phi)
-	//const float da					=	DEFAULT_RAY_DA;
-	//const float db					=	DEFAULT_RAY_DB;
 	const float da					=	tanf((float) C_PI/(2*(nt+np)));
 	const float db					=	dSample;
 	
@@ -636,6 +613,10 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.time				=	0;
 				ray.da					=	da;
 				ray.db					=	db;
+
+				// Transform the ray into the right coordinate system
+				mulmp(ray.from,from,ray.from);
+				mulmv(ray.dir,from,ray.dir);
 
 				context->trace(&ray);
 
@@ -718,6 +699,10 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.time				=	0;
 				ray.da					=	da;
 				ray.db					=	db;
+
+				// Transform the ray into the right coordinate system
+				mulmp(ray.from,from,ray.from);
+				mulmv(ray.dir,from,ray.dir);
 
 				context->trace(&ray);
 
@@ -831,7 +816,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		rMean					=	min(rMean, lookup->maxFGRadius);
 		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5f);
 				
-		// Record the data
+		// Record the data (in the target coordinate system)
 		movvv(cSample->P,P);
 		movvv(cSample->N,N);
 		cSample->dP				=	rMean;

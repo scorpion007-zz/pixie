@@ -43,7 +43,7 @@
 #include "common/polynomial.h"
 
 #if 0
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 #if defined(__GNUC__) && (__GNUC__ < 4)
 // Stupid gcc doesn't allow explicit constructor invocation
 static void	*operator new(size_t size,void *buf) {

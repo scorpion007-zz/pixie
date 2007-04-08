@@ -1377,14 +1377,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\cache.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\src\ri\cache.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\fileResource.cpp"
 				>
 			</File>

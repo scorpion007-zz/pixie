@@ -2785,7 +2785,7 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 		FILE				*savedRibIn						=	ribin;
 	
 		// Guard against the depreciated fdopen on windoze	
-#ifdef WIN32
+#ifdef _WINDOWS
 #define fdopen _fdopen
 #endif
 		

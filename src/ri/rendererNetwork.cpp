@@ -221,7 +221,7 @@ static	int		netName(sockaddr_in *address,char *name) {
 	return	FALSE;
 }
 
-#ifdef WIN32
+#ifdef _WINDOWS
 #define netError() {									\
 		int		lastErrorNumber;						\
 		char	*lastError;								\
@@ -469,7 +469,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 
 	if (tmp == NULL)	return;
 
-#ifdef WIN32
+#ifdef _WINDOWS
 	WSADATA wsaData;
 
 	// Init the winsock

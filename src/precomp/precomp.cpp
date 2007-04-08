@@ -263,7 +263,7 @@ int	precomputeNoiseData() {
 	float	g1[NOISESIZE + NOISESIZE + 2];
 	int		i,j,k;
 
-	#ifdef _WIN32
+	#ifdef _WINDOWS
 		FILE	*noiseTables	=	fopen("..\\src\\ri\\noiseTables.h","w");
 	#else
 		FILE	*noiseTables	=	fopen("../ri/noiseTables.h","w");
@@ -411,7 +411,7 @@ int	precomputeSubdivisionData() {
 	double			basis[16];
 	int				j,k;
 
-#ifdef _WIN32
+#ifdef _WINDOWS
 	if (!(f=fopen("ccdata50NT.dat","rb"))) {
 		fprintf(stderr,"Unable to open ccdata50NT.dat\n");
 		return TRUE;
@@ -564,7 +564,7 @@ int	precomputeSubdivisionData() {
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
 int	precomputeExplosionData() {
-	#ifdef _WIN32
+	#ifdef _WINDOWS
 		FILE	*out	=	fopen("..\\src\\ri\\experimental\\explosionData.h","w");
 	#else
 		FILE	*out	=	fopen("../ri/experimental/explosionData.h","w");
@@ -651,7 +651,7 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 // Return Value			:	0 on success, 1 on failure
 // Comments				:
 int		precomputeStochasticPrimitivesH() {
-	#ifdef _WIN32
+	#ifdef _WINDOWS
 		FILE	*out	=	fopen("..\\src\\ri\\stochasticPrimitives.h","w");
 	#else
 		FILE	*out	=	fopen("../ri/stochasticPrimitives.h","w");

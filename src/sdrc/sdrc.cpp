@@ -62,7 +62,7 @@
 #include <stdarg.h>
 #include <string.h>
 #ifndef		__INTEL_COMPILER
-#ifdef		WIN32
+#ifdef		_WINDOWS
 #ifdef		_DEBUG
 #include <crtdbg.h>
 #endif

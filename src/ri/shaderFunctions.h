@@ -2351,7 +2351,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								operand(0,res,float *);															\
 								operand(3,op3,const float *);													\
 								operand(4,op4,const float *);													\
-								int				i,curU=0,curV=0;												\
+								int				curU=0,curV=0;													\
 								const int		uVerts		=	currentShadingState->numUvertices;				\
 								const int		vVerts		=	currentShadingState->numVvertices;				\
 								const int		doInterp	=	(lookup->interpolate && currentShadingState->numVertices == currentShadingState->numRealVertices);	\
@@ -2438,7 +2438,6 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
 								operand(3,op3,const float *);													\
-								int				i;																\
 								float			*radius;														\
 								CTexture3d		*tex		=	lookup->texture;								\
 								float			*dest		=	(float *) ralloc(tex->dataSize*sizeof(float),threadMemory);	\

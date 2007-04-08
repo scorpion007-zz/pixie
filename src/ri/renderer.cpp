@@ -313,7 +313,7 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 
 	// Create a temporary directory for the lifetime of the renderer		
 	// Make the temporary directory pid-unique in case we have more than one on a given host
-#ifdef WIN32
+#ifdef _WINDOWS
 	sprintf(temporaryPath,"PixieTemp_%d\\",GetCurrentProcessId());
 #else
 	const char *tempDirEnv = getenv("TMPDIR");

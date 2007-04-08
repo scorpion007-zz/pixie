@@ -43,8 +43,8 @@
 #endif
 
 // Environment seperators
-#ifdef WIN32
-// >> Win32
+#ifdef _WINDOWS
+// >> Windoze
 #include <io.h>
 #include <direct.h>
 #include <errno.h>
@@ -55,13 +55,13 @@
 #define OS_DIR_SEPERATOR_STRING				"\\"
 
 ///////////////////////////////////////////////////
-// For WIN32 we create encapsulate the thread in the following structure
+// For Windoze we create encapsulate the thread in the following structure
 typedef struct {
 	void	*userData;
 	TFun	thread;
 } TThreadData;
 
-// This is the entry point for WIN32 threads
+// This is the entry point for Windows threads
 static	DWORD WINAPI  dispatcherThread(void *w) {
 	TThreadData	*data		=	(TThreadData *) w;
 	TFun		thread		=	data->thread;
@@ -74,18 +74,23 @@ static	DWORD WINAPI  dispatcherThread(void *w) {
 	return 0;
 }
 
-// Win32 doesn't have gettimeofday() for some archaic reason
-static int gettimeofday(struct timeval *tv,void* time_zone) {
+struct timezone {
+	int tz_minuteswest;
+	int tz_dsttime;
+};
+
+
+// Windows doesn't have gettimeofday() for some archaic reason
+static void gettimeofday(struct timeval *tv,void* time_zone) {
 	timeb cur;
-	int retval = ftime(&cur);
 
-	tv->tv_sec = cur.time;
+	ftime(&cur);
+
+	tv->tv_sec	= (long) cur.time;
 	tv->tv_usec = cur.millitm * 1000;
-
-	return retval;
 }
 
-// << Win32
+// << Windows
 #else
 // >> Unix
 #include <sys/time.h>
@@ -147,8 +152,8 @@ void	osShutdown() {
 void	*osLoadModule(const char *name) {
 	void	*cModule	=	NULL;
 
-#ifdef WIN32
-	// Win32 stuff here
+#ifdef _WINDOWS
+	// Windows stuff here
 	cModule	=	LoadLibrary(name);
 #else
 	// Unix stuff here
@@ -175,7 +180,7 @@ void	*osLoadModule(const char *name) {
 // Return Value			:	The error string
 // Comments				:
 const char *osModuleError() {
-#ifdef WIN32
+#ifdef _WINDOWS
 	return NULL;
 #else
 	return dlerror();
@@ -188,7 +193,7 @@ const char *osModuleError() {
 // Return Value			:	The module handle
 // Comments				:
 void	osUnloadModule(void *cModule) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	if (cModule != NULL) FreeLibrary((HMODULE) cModule);
 #else
 	if (cModule != NULL) dlclose((void *) cModule);
@@ -205,7 +210,7 @@ void	*osResolve(void *cModule,const char *name) {
 	void	*result	=	NULL;
 
 	if (cModule != NULL) {
-#ifdef WIN32
+#ifdef _WINDOWS
 		result	=	GetProcAddress((HMODULE) cModule,name);
 #else
 		result	=	dlsym((void *) cModule,name);
@@ -240,7 +245,7 @@ char			*osEnvironment(const char *name) {
 // Return Value			:	TRUE if it does
 // Comments				:
 int		osFileExists(const char *name) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	if (_access(name,0) == 0) return TRUE;
 #else
 	if (access(name,0) == 0) return TRUE;
@@ -268,7 +273,7 @@ void	osFixSlashes(char *st) {
 // Return Value			:	-
 // Comments				:	The directory must end with / (or \)
 void	osTempname(const char *directory,const char *prefix,char *result) {
-	#ifdef WIN32
+	#ifdef _WINDOWS
 		// avoid some windows shortcomings by extending count when we
 		// start to get clashes
 		static int i = 0;
@@ -291,7 +296,7 @@ void	osTempname(const char *directory,const char *prefix,char *result) {
 // Return Value			:	-
 // Comments				:
 void	osCreateDir(const char *n) {
-#ifdef WIN32
+#ifdef _WINDOWS
 		_mkdir(n);
 #else
 		mkdir(n,S_IRWXU);
@@ -304,7 +309,7 @@ void	osCreateDir(const char *n) {
 // Return Value			:	-
 // Comments				:
 void	osDeleteDir(const char *n)	{
-#ifdef WIN32
+#ifdef _WINDOWS
 	_rmdir(n);	
 #else
 	rmdir(n);
@@ -317,7 +322,7 @@ void	osDeleteDir(const char *n)	{
 // Return Value			:	-
 // Comments				:
 void	osDeleteFile(const char *n)	{
-#ifdef WIN32
+#ifdef _WINDOWS
 	_unlink(n);	
 #else
 	unlink(n);	
@@ -331,7 +336,7 @@ void	osDeleteFile(const char *n)	{
 // Return Value			:
 // Comments				:
 void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *userData) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	_finddata_t	c_file;
 	intptr_t	hFile;
 	char		tmp[OS_MAX_PATH_LENGTH];
@@ -406,7 +411,7 @@ float	osCPUTime() {
 TThread	osCreateThread(TFun entry,void *d) {
 	TThread	cThread;
 
-#ifdef WIN32
+#ifdef _WINDOWS
 	DWORD		id;
 	TThreadData	*data	=	new TThreadData;
 
@@ -432,7 +437,7 @@ TThread	osCreateThread(TFun entry,void *d) {
 // Return Value			:
 // Comments				:
 int		osWaitThread(TThread	thread) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	WaitForSingleObject(thread,INFINITE);
 #else
 	return pthread_join(thread,NULL);
@@ -447,7 +452,7 @@ int		osWaitThread(TThread	thread) {
 // Return Value			:
 // Comments				:
 void	osCreateMutex(TMutex &mutex) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	InitializeCriticalSection(&mutex);
 #else
 	pthread_mutex_init(&mutex,NULL);
@@ -460,7 +465,7 @@ void	osCreateMutex(TMutex &mutex) {
 // Return Value			:
 // Comments				:
 void	osDeleteMutex(TMutex &mutex) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	DeleteCriticalSection(&mutex);
 #else
 	pthread_mutex_destroy(&mutex);
@@ -473,7 +478,7 @@ void	osDeleteMutex(TMutex &mutex) {
 // Return Value			:
 // Comments				:
 void	osCreateSemaphore(TSemaphore &sem,int count) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	sem	=	CreateSemaphore(NULL,0,count,NULL);
 #else
 	sem_init(&sem,PTHREAD_PROCESS_PRIVATE,count);
@@ -486,7 +491,7 @@ void	osCreateSemaphore(TSemaphore &sem,int count) {
 // Return Value			:
 // Comments				:
 void	osDeleteSemaphore(TSemaphore &sem) {
-#ifdef WIN32
+#ifdef _WINDOWS
 	CloseHandle(sem);
 #else
 	sem_destroy(&sem);

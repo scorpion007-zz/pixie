@@ -1857,7 +1857,7 @@ RiProcRunProgram (RtPointer data, RtFloat detail) {
 	
 	// GSHTODO: cache the open pipes and close on last RunProgram
 	
-#ifdef WIN32
+#ifdef _WINDOWS
 	char			progString[256];
 	char			tmpFile[512];
 

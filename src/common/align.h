@@ -38,13 +38,13 @@
 
 #else				// <<OSX
 
-#ifndef WIN32		// >>Not Win32
+#ifndef _WINDOWS	// >>Not Windoze
 
 #ifdef HAVE_STDINT_H
 	#include <stdint.h>
 #endif
 
-#else				// >>Win32
+#else				// >>Windoze
 
 #ifndef uint32_t 
 #define uint32_t unsigned int
@@ -54,7 +54,7 @@
 #define uint64_t unsigned long long
 #endif
 
-#endif				// <<Win32
+#endif				// <<Windoze
 
 #endif
 

@@ -39,7 +39,7 @@ typedef struct {
 } SHADEOP_SPEC;
 
 
-#ifdef WIN32
+#ifdef _WINDOWS
 
 #define	SHADEOP_TABLE(__shadeopname)	extern "C" __declspec(dllexport) SHADEOP_SPEC	__shadeopname##_shadeops[]
 

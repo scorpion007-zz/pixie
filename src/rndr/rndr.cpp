@@ -36,7 +36,7 @@
 #include "ri/ri.h"
 
 
-#ifdef WIN32
+#ifdef _WINDOWS
 #include <process.h>
 #else
 #include <sys/select.h>
@@ -48,8 +48,8 @@
 #define DEFAULT_PORT		24666
 #define	MAX_LOCALSERVERS	8
 
-// Whether non win32 implementations should exec after fork
-// win32 doesn't have / use fork anyway
+// Whether non Windows implementations should exec after fork
+// Windows doesn't have / use fork anyway
 
 #define USE_PURE_FORK		0
 
@@ -95,7 +95,7 @@ void	exitFunction() {
 			
 			// use execvp to search PATH, incase pixie
 			// isn't on the default search path
-#ifdef WIN32
+#ifdef _WINDOWS
 			_execvp(argv[0],argv);
 #else
 			execvp(argv[0],argv);
@@ -159,7 +159,7 @@ void	riThread(void *w) {
 	// I may want to do this in a seperate process
 	RiBegin(managerString);
 	
-#ifndef WIN32
+#ifndef _WINDOWS
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);
@@ -183,7 +183,7 @@ void	rndrc(char *ribFile,int port) {
 	SOCKET		sock;
 	struct		sockaddr_in	client;
 	
-#ifdef WIN32
+#ifdef _WINDOWS
 	WSADATA wsaData;
 
 	// Init the winsock
@@ -201,7 +201,7 @@ void	rndrc(char *ribFile,int port) {
 
 	unsigned int	attemptAddress	=	INADDR_ANY;
 	
-	// Here we include robustness for Win32 not allowing bind / connect to ANY
+	// Here we include robustness for Windows not allowing bind / connect to ANY
 retryBind:
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -240,7 +240,7 @@ retryBind:
 	
 	RiBegin(managerString);
 	
-#ifndef WIN32
+#ifndef _WINDOWS
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);
@@ -263,7 +263,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	char		*tmp = managerString + strlen(managerString);
 	int			i,j;
 
-#ifdef WIN32
+#ifdef _WINDOWS
 	WSADATA wsaData;
 
 	// Init the winsock
@@ -338,7 +338,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 		argv[5]	=	NULL;
 		
 		for(int k=0;k<numChildren;k++){
-			#ifdef WIN32
+			#ifdef _WINDOWS
 				// use _spawnvp to search PATH, incase pixie
 				// isn't on the default search path
 				intptr_t pid = _spawnvp(_P_NOWAIT,argv[0],argv);
@@ -433,7 +433,7 @@ void	rndrd(int port) {
 	T32			buffer[BUFFERSIZE];
 	int			running	=	TRUE;
 
-#ifdef WIN32
+#ifdef _WINDOWS
 	WSADATA wsaData;
 
 	// Init the winsock
@@ -555,7 +555,7 @@ int main(int argc, char* argv[]) {
 	int				localChildren	=	0;
 
 	// Enable memory leak detection/report
-#ifdef WIN32
+#ifdef _WINDOWS
 #ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -734,7 +734,7 @@ int main(int argc, char* argv[]) {
 
 	RiBegin(managerString2);
 	
-#ifndef WIN32
+#ifndef _WINDOWS
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);

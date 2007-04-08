@@ -49,7 +49,7 @@
 
 // The Pixie version
 #define	VERSION_RELEASE	2
-#define	VERSION_BETA	1
+#define	VERSION_BETA	2
 #define	VERSION_ALPHA	1
 
 // Some constant definitions
@@ -117,7 +117,7 @@ typedef union {
 
 
 // Some useful machinery for memory management
-#ifdef		WIN32
+#ifdef		_WINDOWS
 	#ifdef		_DEBUG
 		#include	<assert.h>
 

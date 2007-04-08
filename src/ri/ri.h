@@ -36,13 +36,13 @@ extern "C" {
 #endif
 
 #ifdef RENDERER
-#ifdef WIN32
+#ifdef _WINDOWS
 #define	EXTERN(type)	extern __declspec(dllexport) type
 #else
 #define EXTERN(type)	extern type
 #endif
 #else
-#ifdef WIN32
+#ifdef _WINDOWS
 #define	EXTERN(type)	extern __declspec(dllimport) type
 #else
 #define EXTERN(type)	extern type
