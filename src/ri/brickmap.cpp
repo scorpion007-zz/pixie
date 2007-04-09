@@ -658,7 +658,6 @@ CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 	// Update the used memory
 	currentMemory	+=	sizeof(CBrick) + (sizeof(CVoxel) + dataSize*sizeof(float))*(BRICK_SIZE*BRICK_SIZE*BRICK_SIZE);
 
-
 	if (clear) {
 		CVoxel	*cVoxel;
 		int		i,j;
@@ -823,7 +822,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 					if(cVoxel->weight >0) {
 						for (j=0;j<dataSize;j++)	dataMean[j]	+=	data[j];
 						vCnt++;
-					}else nullCnt++;
+					} else nullCnt++;
 
 					if (cVoxel->next != NULL) {
 						cVoxel = cVoxel->next;
