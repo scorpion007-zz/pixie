@@ -98,7 +98,7 @@ class	CBrickMap : public CTexture3d {
 
 public:
 								CBrickMap(FILE *in,const char *name,const float *from,const float *to);
-								CBrickMap(const char *name,const float *bmin,const float *bmax,const float *from,const float *to,const float *toNDC,CChannel *,int);
+								CBrickMap(const char *name,const float *bmin,const float *bmax,const float *from,const float *to,const float *toNDC,CChannel *channels,int numChannels,int maxDepth);
 			virtual				~CBrickMap();
 			
 								///////////////////////////////////////////////////////////////////////
