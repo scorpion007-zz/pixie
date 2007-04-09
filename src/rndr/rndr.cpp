@@ -605,6 +605,9 @@ int main(int argc, char* argv[]) {
 			printf("        sizeof(long): %d\n",sizeof(long));
 			printf("   sizeof(long long): %d\n",sizeof(long long));
 			printf("      sizeof(void *): %d\n",sizeof(void *));
+			printf("         sizeof(T32): %d\n",sizeof(T32));
+			printf("         sizeof(T64): %d\n",sizeof(T64));
+			printf("      sizeof(TMutex): %d\n",sizeof(TMutex));
 			exit(0);
 		} else if (strcmp(argv[i],"-s") == 0) {
 			server	=	TRUE;

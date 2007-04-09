@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
 			radiusScale		=	(float) atof(argv[i]);
 		} else if (strcmp(argv[i],maxdepthArgument) == 0) {
 			i++;
-			maxDepth		=	(float) atoi(argv[i]);
+			maxDepth		=	(int) atoi(argv[i]);
 		} else if (strcmp(argv[i],inputPathArgument) == 0) {
 			i++;
 			inPath		=	argv[i];

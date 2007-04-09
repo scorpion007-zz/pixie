@@ -253,7 +253,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 
 			// Ignore sample in the front
 			float	a	=	dotvv(D,cSample->N);
-			if ((a*a / dotvv(D,D)) > 0.1)	continue;
+			if ((a*a / (dotvv(D,D) + C_EPSILON)) > 0.1)	continue;
 
 			// Positional error
 			float	e1 = sqrtf(dotvv(D,D)) / cSample->dP;
@@ -325,7 +325,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 			C[0]	=	0;
 			C[1]	=	0;
 			C[2]	=	0;
-			C[3]	=	0;
+			C[3]	=	1;
 			C[4]	=	0;
 			C[5]	=	0;
 			C[6]	=	0;
@@ -814,7 +814,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		// Clamp the radius of validity
 		rMean					=	max(rMean, lookup->minFGRadius);
 		rMean					=	min(rMean, lookup->maxFGRadius);
-		rMean					=	max(min(rMean,dSample*5.0f),dSample*0.5f);
+		rMean					=	min(rMean,dSample*dPscale*5.0f);
 				
 		// Record the data (in the target coordinate system)
 		movvv(cSample->P,P);

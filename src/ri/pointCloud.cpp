@@ -200,7 +200,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	float					*distances	=	(float	*)					alloca((maxFound+1)*sizeof(float)); 
 	CPointLookup			l;
 	int						i,j;
-	const float				scale		=	2.0f;	// By controlling this, we 
+	const float				scale		=	2.5f;	// By controlling this, we 
 
 	distances[0]		=	maxdP*maxdP*scale*scale;
 	l.maxFound			=	maxFound;

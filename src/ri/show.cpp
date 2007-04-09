@@ -109,17 +109,22 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 								info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
 								info(CODE_PRINTF,"Type:    %s\n",t);
 								fclose(in);
+
+								matrix	from,to;
+
+								identitym(from);
+								identitym(to);
 	
 								if (strcmp(t,filePhotonMap) == 0) {
 									view	=	CRenderer::getPhotonMap(fileName);
 								} else if (strcmp(t,fileIrradianceCache) == 0) {
-									view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
+									view	=	CRenderer::getCache(fileName,"R",from,to);
 								} else if (strcmp(t,fileGatherCache) == 0) {
-									view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
+									view	=	CRenderer::getCache(fileName,"R",from,to);
 								} else if (strcmp(t,filePointCloud) == 0) {
-									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,from,to);
 								} else if (strcmp(t,fileBrickMap) == 0) {
-									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,from,to);
 								}
 	
 								// Create / display the window
