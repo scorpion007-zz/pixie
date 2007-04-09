@@ -75,34 +75,41 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 	int		i;
 
 	if (f == NULL)	{
-		if (probe == 0)	error(CODE_BADFILE,"Unable to open %s\n",name);
+		if (probe == FALSE)	error(CODE_BADFILE,"Unable to open %s\n",name);
 		return NULL;
 	}
 
 	if ((mode[0] == 'w') || (mode[1] == 'w')) {
 		unsigned int	magic	=	magicNumber;
-		int				version[3];
+		int				version[4];
 
 		fwrite(&magic,sizeof(int),1,f);
 
 		version[0]	=	VERSION_RELEASE;
 		version[1]	=	VERSION_BETA;
 		version[2]	=	VERSION_ALPHA;
+		version[3]	=	sizeof(int*);
 
-		fwrite(version,sizeof(int),3,f);
+		fwrite(version,sizeof(int),4,f);
 
 		i	=	(int) strlen(type);
 		fwrite(&i,sizeof(int),1,f);
 		fwrite(type,sizeof(char),i+1,f);
 	} else {
 		unsigned int	magic	=	0;
-		int				version[3];
+		int				version[4];
 		char			*t;
 
 		fread(&magic,1,sizeof(int),f);
 
 		if (magic != magicNumber) {
-			if (probe == 0)	error(CODE_BADFILE,"File %s is binary incompatible\n",name);
+			if (magic == magicNumberReversed) {
+				// This is a pixie file, but wrong endian
+				// Always report file wordsize errors
+				error(CODE_BADFILE,"File %s is binary incompatible (generated on a different endian machine)\n",name);
+			} else if (probe == FALSE) {
+				error(CODE_BADFILE,"File %s is binary incompatible\n",name);
+			}
 			fclose(f);
 			return NULL;
 		}
@@ -110,7 +117,18 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 		fread(version,3,sizeof(int),f);
 
 		if ((version[0] != VERSION_RELEASE) || (version[1] != VERSION_BETA)) {
-			if (probe == 0)	error(CODE_BADFILE,"File %s is of incompatible version\n",name);
+			// Always report file version errors
+			error(CODE_BADFILE,"File %s is of incompatible version\n",name);
+			fclose(f);
+			return NULL;
+		}
+		
+		// intentionally read separately for backward compatibility
+		fread(version+3,1,sizeof(int),f);
+		
+		if (version[3] != sizeof(int*)) {
+			// Always report file wordsize errors
+			error(CODE_BADFILE,"File %s is binary incompatible (generated on a machine with different word size)\n",name);
 			fclose(f);
 			return NULL;
 		}
@@ -120,7 +138,7 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 		fread(t,i+1,sizeof(char),f);
 
 		if (strcmp(t,type) != 0) {
-			if (probe == 0)	error(CODE_BADFILE,"File %s is of unexpected type\n",name);
+			if (probe == FALSE)		error(CODE_BADFILE,"File %s is of unexpected type\n",name);
 			fclose(f);
 			return NULL;
 		}
@@ -139,7 +157,7 @@ FILE	*ropen(const char *name,char *type) {
 	FILE			*f	=	fopen(name,"rb");
 	int				i;
 	unsigned int	magic	=	0;
-	int				version[3];
+	int				version[4];
 
 	if (f == NULL)	{
 		error(CODE_BADFILE,"Unable to open %s\n",name);
@@ -149,7 +167,11 @@ FILE	*ropen(const char *name,char *type) {
 	fread(&magic,1,sizeof(int),f);
 
 	if (magic != magicNumber) {
-		error(CODE_BADFILE,"File %s is binary incompatible\n",name);
+		if (magic == magicNumberReversed) {
+			error(CODE_BADFILE,"File %s is binary incompatible (generated on a different endian machine)\n",name);
+		} else {
+			error(CODE_BADFILE,"File %s is binary incompatible\n",name);
+		}
 		fclose(f);
 		return NULL;
 	}
@@ -158,6 +180,15 @@ FILE	*ropen(const char *name,char *type) {
 
 	if ((version[0] != VERSION_RELEASE) || (version[1] != VERSION_BETA)) {
 		error(CODE_BADFILE,"File %s is of incompatible version\n",name);
+		fclose(f);
+		return NULL;
+	}
+	
+	// intentionally read separately for backward compatibility
+	fread(version+3,1,sizeof(int),f);
+	
+	if (version[3] != sizeof(int*)) {
+		error(CODE_BADFILE,"File %s is binary incompatible (generated on a machine with different word size)\n",name);
 		fclose(f);
 		return NULL;
 	}

@@ -43,7 +43,11 @@ extern	const	char	*fileTransparencyShadow;
 extern	const	char	*filePointCloud;
 extern	const	char	*fileBrickMap;
 
-const	unsigned	int	magicNumber	=	123456789;
+const	unsigned	int	magicNumber			=	123456789;
+const	unsigned	int	magicNumberReversed	=	((magicNumber & 0xFF000000) >> 24) |
+												((magicNumber & 0xFF0000) >> 8) |
+												((magicNumber & 0xFF00) << 8) |
+												((magicNumber & 0xFF) << 24);
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileResource
@@ -58,7 +62,7 @@ public:
 };
 
 
-FILE	*ropen(const char *,const char *,const char *,int probe=0);
+FILE	*ropen(const char *,const char *,const char *,int probe=FALSE);
 FILE	*ropen(const char *,char *);
 
 #endif

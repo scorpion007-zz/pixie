@@ -86,43 +86,47 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 
 				if (in != NULL)	{
 					unsigned int	magic	=	0;
-					int				version[3],i;
+					int				version[4],i;
 					char			*t;
 
 					fread(&magic,sizeof(int),1,in);
 
 					if (magic == magicNumber) {
-						fread(version,sizeof(int),3,in);
+						fread(version,sizeof(int),4,in);
 
 						if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
 							error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
 						} else {
-							fread(&i,sizeof(int),1,in);
-							t	=	(char *) alloca((i+1)*sizeof(char));
-							fread(t,sizeof(char),i+1,in);
-
-							info(CODE_PRINTF,"File:    %s\n",fileName);
-							info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
-							info(CODE_PRINTF,"Type:    %s\n",t);
-							fclose(in);
-
-							if (strcmp(t,filePhotonMap) == 0) {
-								view	=	CRenderer::getPhotonMap(fileName);
-							} else if (strcmp(t,fileIrradianceCache) == 0) {
-								view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
-							} else if (strcmp(t,fileGatherCache) == 0) {
-								view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
-							} else if (strcmp(t,filePointCloud) == 0) {
-								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
-							} else if (strcmp(t,fileBrickMap) == 0) {
-								view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+							if (version[3] != sizeof(int*) ) {
+								error(CODE_VERSION,"File %s is binary an incompatible (generated on a machine with different word size)\n",fileName);
+							} else {
+								
+								fread(&i,sizeof(int),1,in);
+								t	=	(char *) alloca((i+1)*sizeof(char));
+								fread(t,sizeof(char),i+1,in);
+	
+								info(CODE_PRINTF,"File:    %s\n",fileName);
+								info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
+								info(CODE_PRINTF,"Type:    %s\n",t);
+								fclose(in);
+	
+								if (strcmp(t,filePhotonMap) == 0) {
+									view	=	CRenderer::getPhotonMap(fileName);
+								} else if (strcmp(t,fileIrradianceCache) == 0) {
+									view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
+								} else if (strcmp(t,fileGatherCache) == 0) {
+									view	=	CRenderer::getCache(fileName,"R",NULL,NULL);
+								} else if (strcmp(t,filePointCloud) == 0) {
+									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+								} else if (strcmp(t,fileBrickMap) == 0) {
+									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,NULL,NULL);
+								}
+	
+								// Create / display the window
+								if (view != NULL)	visualize(view);
 							}
-
-							// Create / display the window
-							if (view != NULL)	visualize(view);
 						}
 					} else {
-
 						fseek(in,0,SEEK_SET);
 						view	=	new CDebugView(in,fileName);
 
