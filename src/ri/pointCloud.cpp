@@ -54,7 +54,8 @@ int			CPointCloud::drawChannel	=	0;
 // Comments				:	for a write-mode map, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
 	// Create our data areas
-	flush				= write;
+	flush				=	write;
+	maxdP				=	0;
 
 	osCreateMutex(mutex);
 
@@ -74,7 +75,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 // Comments				:	for a write-mode map via ptcapi, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,int numChannels,char **channelNames,char **channelTypes,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
 	// Create our data areas
-	flush				= write;
+	flush				=	write;
+	maxdP				=	0;
 
 	osCreateMutex(mutex);
 
@@ -97,6 +99,7 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 
 	// Create our data areas
 	flush	=	FALSE;
+	maxdP	=	0;
 	
 	osCreateMutex(mutex);
 
@@ -116,6 +119,9 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	fread(data.array,sizeof(float),numItems*dataSize,in);
 	data.numItems	=	numItems*dataSize;
 
+	// Read the maximum radius
+	fread(&maxdP,sizeof(float),1,in);
+	
 	// Close the file
 	fclose(in);
 }
@@ -169,6 +175,9 @@ void	CPointCloud::write() {
 		// Write the data
 		fwrite(data.array,sizeof(float),numItems*dataSize,out);
 
+		// Read the maximum radius
+		fwrite(&maxdP,sizeof(float),1,out);
+	
 		// Close the file
 		fclose(out);
 	} else {
@@ -189,23 +198,20 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	const int 				maxFound	=	16;
 	const CPointCloudPoint	**indices	=	(const CPointCloudPoint **)	alloca((maxFound+1)*sizeof(CPointCloudPoint *)); 
 	float					*distances	=	(float	*)					alloca((maxFound+1)*sizeof(float)); 
-	CLookup					l;
+	CPointLookup			l;
 	int						i,j;
+	const float				scale		=	2.0f;	// By controlling this, we 
 
-	const float	searchRadius	=	8*radius*dPscale;		//FIXME: this should possibly be 2* but it seems to give artifacts
-	//distances[0]				=	searchRadius*searchRadius;
-	distances[0]				=	C_INFINITY;
-
+	distances[0]		=	maxdP*maxdP*scale*scale;
 	l.maxFound			=	maxFound;
 	l.numFound			=	0;
+	l.ignoreNormal		=	dotvv(Nl,Nl) == 0;
 
 	// Perform lookup in the world coordinate system
 	mulmp(l.P,to,Pl);
 	mulmn(l.N,from,Nl);
 	mulvf(l.N,-1);				// Photonmaps have N reversed, we must reverse
 								// N when looking up it it
-
-	const float NdotN = dotvv(l.N,l.N);
 	normalizevf(l.N);
 	
 	l.gotHeap			=	FALSE;
@@ -213,7 +219,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	l.distances			=	distances;
 
 	// No need to lock the mutex here, CMap::lookup is thread safe
-	CMap<CPointCloudPoint>::lookupWithN(&l,1);
+	lookup(&l,1,scale);
 
 	for (i=0;i<dataSize;i++) Cl[i] = 0.0f;	//GSHTODO: channel fill values
 
@@ -227,27 +233,21 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 
 		assert(distances[i] <= distances[0]);
 
-		// Note that we do the opposite to photonmaps
-		// only entries coherent with N contribute
-		// but l.N is reversed...
-		if ((dotvv(p->N,l.N) < 0) || (NdotN <= 0)) {
-			const float	t		=	distances[i] / (distances[0] + C_EPSILON);
-			const float	weight	=	(1 + 2*t*t*t - 3*t*t)*(-dotvv(l.N,p->N));
-			float		*dest	=	Cl;
-			const float	*src	=	data.array + p->entryNumber;
-			for (j=0;j<dataSize;j++) {
-				*dest++			+=	(*src++)*weight;
-			}
-			totalWeight += weight;
+		const float	t		=	sqrtf(distances[i]) / (p->dP*scale);
+		const float	weight	=	(1-t)*(-dotvv(l.N,p->N));
+		
+		float		*dest	=	Cl;
+		const float	*src	=	data.array + p->entryNumber;
+		for (j=0;j<dataSize;j++) {
+			*dest++			+=	(*src++)*weight;
 		}
+		totalWeight += weight;
 	}
 	
 	if (totalWeight > 0) {
 		// Divide the contribution
 		const float weight	= 1.0f/totalWeight;
 		for (i=0;i<dataSize;i++) Cl[i]	*=	weight;
-
-		assert(Cl[0] < 2);
 	}
 }
 
@@ -298,6 +298,8 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 
 	for (int i=0;i<dataSize;i++)	data.push(C[i]);
 
+	maxdP				=	max(maxdP,dP);
+	
 	osUnlock(mutex);
 }
 

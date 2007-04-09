@@ -79,9 +79,72 @@ public:
 	void					getPoint(int i,float *C,float *P,float *N,float *dP);
 
 private:
+
+
+							///////////////////////////////////////////////////////////////////////
+							// Class				:	CPointLookup
+							// Description			:	Extend the CLookup to include extra info
+							// Comments				:
+							class	CPointLookup : public CLookup {
+							public:
+								int				ignoreNormal;
+							};
+		
+							///////////////////////////////////////////////////////////////////////
+							// Class				:	CMap
+							// Method				:	lookup
+							// Description			:	Locate the nearest valid points
+							// Return Value			:	Internally used
+							// Comments				:
+					void	lookup(CPointLookup *l,int index,const float scale) {
+								const CPointCloudPoint	*photon	=	&items[index];
+								float					d;
+								vector					D;
+								int						axis	=	photon->flags;
+
+								if (index < numItemsh) {
+									d	=	l->P[axis] - photon->P[axis];
+
+									if (d > 0) {
+										lookup(l,2*index+1,scale);
+
+										if (d*d < l->distances[0]) {
+											lookup(l,2*index,scale);
+										}
+
+									} else {
+										lookup(l,2*index,scale);
+
+										if (d*d < l->distances[0]) {
+											lookup(l,2*index+1,scale);
+										}
+									}
+								}
+
+								subvv(D,photon->P,l->P);
+								d	=	dotvv(D,D);
+								const float t	=	dotvv(D,l->N);
+								d	+=	t*t*16;
+
+
+								// If the item is valid, insert it
+								if (d < l->distances[0]) {
+									if (d < (photon->dP*photon->dP*scale*scale)) {
+									
+										// Note that we do the opposite to photonmaps
+										// only entries coherent with N contribute
+										// but l.N is reversed...
+										if ((dotvv(photon->N,l->N) < 0) || l->ignoreNormal) {
+											insert(l,d,photon);
+										}
+									}
+								}
+							}
+						
 	CArray<float>			data;				// This is where we actually keep the data
 	int						flush;				// Should this be written to disk?
 	TMutex					mutex;				// To synchronize updates
+	float					maxdP;
 	
 	static	int				drawDiscs;			// Which type to draw
 	static	int				drawChannel;		// Which channel to draw

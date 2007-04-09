@@ -378,198 +378,151 @@ protected:
 
 public:
 
+				
 
-			///////////////////////////////////////////////////////////////////////
-			// Class				:	CMap
-			// Method				:	lookup
-			// Description			:	Locate the nearest maxFoundPhoton items
-			// Return Value			:	Internally used
-			// Comments				:
-	void	lookupWithN(CLookup *l,int index) {
-				const T		*photon	=	&items[index];
-				float		d,t;
-				vector		D;
-				int			axis	=	photon->flags;
+						///////////////////////////////////////////////////////////////////////
+						// Class				:	CMap
+						// Method				:	lookup
+						// Description			:	Locate the nearest maxFoundPhoton items
+						// Return Value			:	Internally used
+						// Comments				:
+				void	lookupWithN(CLookup *l,int index) {
+							const T		*photon	=	&items[index];
+							float		d,t;
+							vector		D;
+							int			axis	=	photon->flags;
 
-				if (index < numItemsh) {
-					d	=	l->P[axis] - photon->P[axis];
+							if (index < numItemsh) {
+								d	=	l->P[axis] - photon->P[axis];
 
-					if (d > 0) {
-						lookupWithN(l,2*index+1);
+								if (d > 0) {
+									lookupWithN(l,2*index+1);
 
-						if (d*d < l->distances[0]) {
-							lookupWithN(l,2*index);
+									if (d*d < l->distances[0]) {
+										lookupWithN(l,2*index);
+									}
+
+								} else {
+									lookupWithN(l,2*index);
+
+									if (d*d < l->distances[0]) {
+										lookupWithN(l,2*index+1);
+									}
+								}
+							}
+
+							subvv(D,photon->P,l->P);
+							d	=	dotvv(D,D);
+							t	=	dotvv(D,l->N);
+							d	+=	t*t*16;
+
+							if (d < l->distances[0]) {
+								insert(l,d,photon);
+							}
 						}
 
-					} else {
-						lookupWithN(l,2*index);
+						///////////////////////////////////////////////////////////////////////
+						// Class				:	CMap
+						// Method				:	lookup
+						// Description			:	Locate the nearest maxFoundPhoton items
+						// Return Value			:	Internally used
+						// Comments				:
+				void	lookup(CLookup *l,int index) {
+							const T		*photon	=	&items[index];
+							float		d;
+							vector		D;
+							int			axis	=	photon->flags;
 
-						if (d*d < l->distances[0]) {
-							lookupWithN(l,2*index+1);
+							if (index < numItemsh) {
+								d	=	l->P[axis] - photon->P[axis];
+
+								if (d > 0) {
+									lookup(l,2*index+1);
+
+									if (d*d < l->distances[0]) {
+										lookup(l,2*index);
+									}
+
+								} else {
+									lookup(l,2*index);
+
+									if (d*d < l->distances[0]) {
+										lookup(l,2*index+1);
+									}
+								}
+							}
+
+							subvv(D,photon->P,l->P);
+							d	=	dotvv(D,D);
+
+							if (d < l->distances[0]) {
+								insert(l,d,photon);
+							}
 						}
-					}
-				}
 
-				subvv(D,photon->P,l->P);
-				d	=	dotvv(D,D);
-				t	=	dotvv(D,l->N);
-				d	+=	t*t*16;
-
-				if (d < l->distances[0]) {
-
-					if (l->numFound < l->maxFound) {
-
-
-						l->numFound++;
-						l->distances[l->numFound]	=	d;
-						l->indices[l->numFound]		=	photon;
-					} else {
-						int	j,parent;
+						///////////////////////////////////////////////////////////////////////
+						// Class				:	CMap
+						// Method				:	insert
+						// Description			:	Insert an item into the list of founf items
+						// Return Value			:	Internally used
+						// Comments				:
+		void			insert(CLookup *l,const float d,const T *photon) {
+							if (l->numFound < l->maxFound) {
+								l->numFound++;
+								l->distances[l->numFound]	=	d;
+								l->indices[l->numFound]		=	photon;
+							} else {
+								int	j,parent;
 
 
-						if (l->gotHeap == FALSE) {
-							int		halfitems	=	l->numFound >> 1;
-							int		k;
-							float	dtmp;
-							const T	*ptmp;
+								if (l->gotHeap == FALSE) {
+									int		halfitems	=	l->numFound >> 1;
+									int		k;
+									float	dtmp;
+									const T	*ptmp;
 
-							for (k=halfitems;k>=1;k--) {
-								parent	=	k;
-								ptmp	=	l->indices[k];
-								dtmp	=	l->distances[k];
+									for (k=halfitems;k>=1;k--) {
+										parent	=	k;
+										ptmp	=	l->indices[k];
+										dtmp	=	l->distances[k];
 
-								while(parent <= halfitems) {
-									j	=	parent + parent;
-									if ((j < l->numFound) && (l->distances[j] < l->distances[j+1])) j++;
-									if (dtmp >= l->distances[j])	break;
+										while(parent <= halfitems) {
+											j	=	parent + parent;
+											if ((j < l->numFound) && (l->distances[j] < l->distances[j+1])) j++;
+											if (dtmp >= l->distances[j])	break;
+
+											l->distances[parent]	=	l->distances[j];
+											l->indices[parent]		=	l->indices[j];
+											parent					=	j;
+										}
+
+										l->distances[parent]		=	dtmp;
+										l->indices[parent]			=	ptmp;
+									}
+
+									l->gotHeap	=	TRUE;
+								}
+
+
+								for (parent=1,j=2;j<=l->numFound;) {
+									if ((j < l->numFound) && (l->distances[j] < l->distances[j+1]))
+										j++;
+
+									if (d > l->distances[j]) break;
 
 									l->distances[parent]	=	l->distances[j];
 									l->indices[parent]		=	l->indices[j];
-									parent					=	j;
+									parent	=	j;
+									j		+=	j;
 								}
 
-								l->distances[parent]		=	dtmp;
-								l->indices[parent]			=	ptmp;
+								l->distances[parent]	=	d;
+								l->indices[parent]		=	photon;
+								assert(l->distances[1] <= l->distances[0]);
+								l->distances[0]			=	l->distances[1];
 							}
 
-							l->gotHeap	=	TRUE;
 						}
-
-
-						for (parent=1,j=2;j<=l->numFound;) {
-							if ((j < l->numFound) && (l->distances[j] < l->distances[j+1]))
-								j++;
-
-							if (d > l->distances[j]) break;
-
-							l->distances[parent]	=	l->distances[j];
-							l->indices[parent]		=	l->indices[j];
-							parent	=	j;
-							j		+=	j;
-						}
-
-						l->distances[parent]	=	d;
-						l->indices[parent]		=	photon;
-						assert(l->distances[1] <= l->distances[0]);
-						l->distances[0]			=	l->distances[1];
-					}
-				}
-			}
-
-			///////////////////////////////////////////////////////////////////////
-			// Class				:	CMap
-			// Method				:	lookup
-			// Description			:	Locate the nearest maxFoundPhoton items
-			// Return Value			:	Internally used
-			// Comments				:
-	void	lookup(CLookup *l,int index) {
-				const T		*photon	=	&items[index];
-				float		d;
-				vector		D;
-				int			axis	=	photon->flags;
-
-				if (index < numItemsh) {
-					d	=	l->P[axis] - photon->P[axis];
-
-					if (d > 0) {
-						lookup(l,2*index+1);
-
-						if (d*d < l->distances[0]) {
-							lookup(l,2*index);
-						}
-
-					} else {
-						lookup(l,2*index);
-
-						if (d*d < l->distances[0]) {
-							lookup(l,2*index+1);
-						}
-					}
-				}
-
-				subvv(D,photon->P,l->P);
-				d	=	dotvv(D,D);
-
-				if (d < l->distances[0]) {
-
-					if (l->numFound < l->maxFound) {
-
-
-						l->numFound++;
-						l->distances[l->numFound]	=	d;
-						l->indices[l->numFound]		=	photon;
-					} else {
-						int	j,parent;
-
-
-						if (l->gotHeap == FALSE) {
-							int		halfitems	=	l->numFound >> 1;
-							int		k;
-							float	dtmp;
-							const T	*ptmp;
-
-							for (k=halfitems;k>=1;k--) {
-								parent	=	k;
-								ptmp	=	l->indices[k];
-								dtmp	=	l->distances[k];
-
-								while(parent <= halfitems) {
-									j	=	parent + parent;
-									if ((j < l->numFound) && (l->distances[j] < l->distances[j+1])) j++;
-									if (dtmp >= l->distances[j])	break;
-
-									l->distances[parent]	=	l->distances[j];
-									l->indices[parent]		=	l->indices[j];
-									parent					=	j;
-								}
-
-								l->distances[parent]		=	dtmp;
-								l->indices[parent]			=	ptmp;
-							}
-
-							l->gotHeap	=	TRUE;
-						}
-
-
-						for (parent=1,j=2;j<=l->numFound;) {
-							if ((j < l->numFound) && (l->distances[j] < l->distances[j+1]))
-								j++;
-
-							if (d > l->distances[j]) break;
-
-							l->distances[parent]	=	l->distances[j];
-							l->indices[parent]		=	l->indices[j];
-							parent	=	j;
-							j		+=	j;
-						}
-
-						l->distances[parent]	=	d;
-						l->indices[parent]		=	photon;
-						assert(l->distances[1] <= l->distances[0]);
-						l->distances[0]			=	l->distances[1];
-					}
-				}
-			}
 
 		T				*items;
 		int				numItems;
