@@ -672,7 +672,7 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 // Return Value			:	Ctor
 // Comments				:	-
 CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *nve,int w) : CObject(a,x) {
-	int			i;
+    int			i, j;
 	const float	*P;
 
 	stats.numGprims++;
@@ -702,15 +702,15 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 
 			sizeVariable		=	cVar;
 
-			for (i=0;i<np;i++) {
-				maxSize			=	max(maxSize,vertex[i]);
+			for (j=0;j<np;j++) {
+				maxSize			=	max(maxSize,vertex[j]);
 			}
 
 			if (pl->data1 != NULL) {
 				vertex	=	pl->data1 + pl->parameters[i].index;
 
-				for (i=0;i<np;i++) {
-					maxSize			=	max(maxSize,vertex[i]);
+				for (j=0;j<np;j++) {
+					maxSize			=	max(maxSize,vertex[j]);
 				}
 			}
 
@@ -858,7 +858,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 		return;
 	}
 
-	int					i;
+	int					i, j;
 	CVertexData			*variables;
 	int					vertexSize;
 	float				*vertex;
@@ -882,12 +882,12 @@ void	CCurveMesh::create(CShadingContext *context) {
 				const	int	np		=	pl->parameters[i].numItems;
 				float		*vertex	=	pl->data0 + pl->parameters[i].index;
 
-				for (i=0;i<np;i++) vertex[i] *=	expansion;
+				for (j=0;j<np;j++) vertex[j] *=	expansion;
 
 				if (pl->data1 != NULL) {
 					vertex	=	pl->data1 + pl->parameters[i].index;
 
-					for (i=0;i<np;i++)	vertex[i] *= expansion;
+					for (j=0;j<np;j++)	vertex[j] *= expansion;
 				}
 
 				break;
