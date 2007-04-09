@@ -52,10 +52,11 @@ const	char	*fovArgument				=	"-fov";
 const	char	*texture3dArgument			=	"-texture3d";
 const	char	*maxerrorArgument			=	"-maxerror";
 const	char	*radiusscaleArgument		=	"-radiusscale";
+const	char	*maxdepthArgument			=	"-maxdepth";
 
 void	printUsage() {
 	printf("Usage: texmake [-(shadow|envlatl|envcube)] [-smode <mode>] [-tmode <mode>] [-filter <filter>] [-filterwidth <width>] [-filterheight <height>] [-sfilterwidth <width>] [-tfilterwidth <width>] <inputfile> <outputfile>\n");
-	printf("       texmake -texture3d [-maxerror <number>] [-radiusscale <number>] <inputfile> <outputfile>\n");
+	printf("       texmake -texture3d [-maxerror <number>] [-radiusscale <number>] [-maxdepth <number>] <inputfile> <outputfile>\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -69,7 +70,8 @@ int main(int argc, char* argv[]) {
 	float			fov				=	90;
 	RtFilterFunc	filter			=	RiCatmullRomFilter;
 	float			maxerror		=	0.002f;
-	float			radiusScale		=	0.002f;
+	float			radiusScale		=	1.0f;
+	int				maxDepth		=	10;
 	int				i;
 	char			*textureMode	=	"texture";
 	int				processed;
@@ -139,6 +141,9 @@ int main(int argc, char* argv[]) {
 		} else if (strcmp(argv[i],radiusscaleArgument) == 0) {
 			i++;
 			radiusScale		=	(float) atof(argv[i]);
+		} else if (strcmp(argv[i],maxdepthArgument) == 0) {
+			i++;
+			maxDepth		=	(float) atoi(argv[i]);
 		} else if (strcmp(argv[i],inputPathArgument) == 0) {
 			i++;
 			inPath		=	argv[i];
@@ -187,11 +192,12 @@ int main(int argc, char* argv[]) {
 	} else if (strcmp(textureMode,"texture3d") == 0) {
 		if (currentFile == 2) {
 			RiBegin(RI_NULL);
-			tokens[0]			=	RI_MAXERROR;
-			vals[0]				= 	(RtPointer) &maxerror;
-			tokens[1]			=	"radiusscale";
-			vals[1]				= 	(RtPointer) &radiusScale;
-			currentParameter	=	2;
+			tokens[currentParameter]			=	RI_MAXERROR;
+			vals[currentParameter++]			= 	(RtPointer) &maxerror;
+			tokens[currentParameter]			=	"radiusscale";
+			vals[currentParameter++]			= 	(RtPointer) &radiusScale;
+			tokens[currentParameter]			=	"maxdepth";
+			vals[currentParameter++]			= 	(RtPointer) &maxDepth;
 			RiMakeTexture3DV(files[0],files[1],currentParameter,tokens,vals);
 			RiEnd();
 

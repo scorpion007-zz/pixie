@@ -173,7 +173,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Use this contructor to compute from sctratch
-CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CChannel *ch,int nc) : CTexture3d(name,from,to,toNDC,nc,ch) {
+CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CChannel *ch,int nc,int md = 10) : CTexture3d(name,from,to,toNDC,nc,ch) {
 	int	i;
 	
 	// Init the data
@@ -197,7 +197,7 @@ CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const fl
 	addvv(center,bmin,bmax);
 	mulvf(center,0.5f);
 
-	maxDepth		=	10;
+	maxDepth		=	md;
 	file			=	ropen(name,"wb+",fileBrickMap);		// This is the file we will be writing to
 
 	// Initialize the hash table
@@ -385,7 +385,9 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 				// Find the voxel we want to record
 				while(TRUE) {
 					const float	tmp	=	dotvv(N,cVoxel->N);
-					if (((tmp*tmp) >= (normalThreshold*normalThreshold*dotvv(cVoxel->N,cVoxel->N))) && (tmp >= 0)) {
+					// The small factor corrects for null normals / blank voxels not being matched
+					// numerical instability causes the first condition to fail when it should pass
+					if (((tmp*tmp + 1.0e-9f) >= (normalThreshold*normalThreshold*dotvv(cVoxel->N,cVoxel->N))) && (tmp*tmp >= 0)) {
 						break;
 					} else {
 						if (cVoxel->next == NULL) {
@@ -1481,11 +1483,14 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	
 	float maxVariation = 0.002f;
 	float radiusScale = 1.0f;
+	int maxDepth = 10;
 	for(i =0;i<n;i++){
 		if(!strcmp(tokens[i],"maxerror")){
 			maxVariation = ((float*)params[i])[0];
 		} else if (!strcmp(tokens[i],"radiusscale")){
 			radiusScale = ((float*)params[i])[0];
+		} else if (!strcmp(tokens[i],"maxdepth")){
+			maxDepth = ((int*)params[i])[0];
 		}
 	}
 	
@@ -1504,12 +1509,15 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 			sprintf(tempName,"%s.tmp",dest);
 
 			CPointCloud *cPtCloud	=	new CPointCloud(filePointCloud,identityMatrix,identityMatrix,in);
-			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->toNDC,cPtCloud->channels,cPtCloud->numChannels);
+			CBrickMap	*cBMap		=	new CBrickMap(tempName,cPtCloud->bmin,cPtCloud->bmax,identityMatrix,identityMatrix,cPtCloud->toNDC,cPtCloud->channels,cPtCloud->numChannels,maxDepth);
 			float		*data		=	cPtCloud->data.array;
 			for (i=1;i<=cPtCloud->numItems;i++) {
-				CPointCloudPoint	*p = cPtCloud->items + i;
-				float			 	*C = data + p->entryNumber;
-				cBMap->store(C,p->P,p->N,p->dP * radiusScale);
+				CPointCloudPoint	*p	=	cPtCloud->items + i;
+				float			 	*C	=	data + p->entryNumber;
+				const float			R	=	p->dP * radiusScale;
+				// guard against duff data making the map too deep
+				if (R<C_EPSILON || R!=R) continue;
+				cBMap->store(C,p->P,p->N,R);
 			}
 			
 			cBMap->finalize();
