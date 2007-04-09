@@ -1,4 +1,4 @@
-#!version 2.1.1
+#!version 2.2.1
 volume
 #!parameters:
 uniform	float	distance	=	1
