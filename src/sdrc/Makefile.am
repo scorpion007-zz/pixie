@@ -3,7 +3,7 @@ bin_PROGRAMS = sdrc
 sdrc_SOURCES = sdrc.cpp dso.cpp expression.cpp opcodes.cpp sdr.cpp sl.cpp pp1.c pp2.c pp3.c pp4.c pp5.c pp6.c pp7.c pp8.c
 sdrc_LDADD = ../common/libpixiecommon.la
 
-# ri is only included for ri_config.h
+# ri is only included for ri_config.h, which seems to be included by dso,y
 INCLUDES = -I.. -I../ri
 
 BUILT_SOURCES =
