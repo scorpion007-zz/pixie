@@ -205,14 +205,14 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	distances[0]		=	maxdP*maxdP*scale*scale;
 	l.maxFound			=	maxFound;
 	l.numFound			=	0;
-	l.ignoreNormal		=	dotvv(Nl,Nl) == 0;
+	l.ignoreNormal		=	dotvv(Nl,Nl) < C_EPSILON;
 
 	// Perform lookup in the world coordinate system
 	mulmp(l.P,to,Pl);
 	mulmn(l.N,from,Nl);
 	mulvf(l.N,-1);				// Photonmaps have N reversed, we must reverse
 								// N when looking up it it
-	normalizevf(l.N);
+	if (dotvv(Nl,Nl) > C_EPSILON) normalizevf(l.N);
 	
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
@@ -234,7 +234,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		assert(distances[i] <= distances[0]);
 
 		const float	t		=	sqrtf(distances[i]) / (p->dP*scale);
-		const float	weight	=	(1-t)*(-dotvv(l.N,p->N));
+		const float	weight	=	l.ignoreNormal ? (1-t) : (1-t)*(-dotvv(l.N,p->N));
 		
 		float		*dest	=	Cl;
 		const float	*src	=	data.array + p->entryNumber;
