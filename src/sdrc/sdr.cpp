@@ -1237,7 +1237,6 @@ CParameter		*CScriptContext::newParameter(char *name,int type,int multiplicity) 
 	if (type & SLC_PARAMETER) {
 		// Save the initial type of the parameter and make it a uniform
 		cParameter->savedType	=	cParameter->type;
-		cParameter->type		&=	~SLC_VARYING;
 		cParameter->type		|=	SLC_UNIFORM;
 	}
 
@@ -1371,7 +1370,6 @@ void			CScriptContext::uniformParameters() {
 		cParameter			=	*parameters++;
 
 		if (cParameter->type & SLC_PARAMETER) {	
-			cParameter->type	&=	~SLC_VARYING;
 			cParameter->type	|=	SLC_UNIFORM;
 		}
 	}
@@ -1474,10 +1472,8 @@ void			CScriptContext::generateCode(char *o) {
 			// Write the container class
 			if (cParameter->type & SLC_UNIFORM) {
 				fprintf(out,"uniform\t");
-			} else if (cParameter->type & SLC_VARYING) {
-				fprintf(out,"varying\t");
 			} else {
-				sdr->error("Unrecognised container class... Possibly a bug.\n");
+				fprintf(out,"varying\t");
 			}
 			
 			// Write the parameter type

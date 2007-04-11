@@ -284,26 +284,6 @@ inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 															}																\
 														}
 
-// Lock a value into a character
-#define	lockUniform(IIIdest,IIIexpression)	{																				\
-														char		*IIIdest		=	NULL;								\
-														CVariable	*IIIdest##Var	=	NULL;								\
-														if (IIIexpression != NULL) {										\
-															IIIdest##Var				=	IIIexpression->getVariable();	\
-															if (IIIdest##Var == NULL) {										\
-																getContainer(out,type | SLC_UNIFORM,IIIdest##Var,IIIexpression);			\
-																IIIdest					=	IIIdest##Var->codeName();		\
-															} else {														\
-																if ((IIIdest##Var->type & SLC_UNIFORM) ^ (SLC_UNIFORM)) {	\
-																	getContainer(out,type | SLC_UNIFORM,IIIdest##Var,IIIexpression);		\
-																	IIIdest			=	IIIdest##Var->codeName();			\
-																} else {													\
-																	IIIdest			=	IIIdest##Var->codeName();			\
-																	IIIdest##Var	=	NULL;								\
-																}															\
-															}																\
-														}
-
 
 #define	release(IIIdest)								if (IIIdest##Var != NULL)	sdr->releaseRegister(IIIdest##Var);	}
 
@@ -437,8 +417,6 @@ CTwoExpressions::CTwoExpressions(CExpression *f,CExpression *s) : CExpression(SL
 	// work out if the expression pair is varying
 	if ((f->type & SLC_UNIFORM) && (s->type & SLC_UNIFORM)) {
 		type |= SLC_UNIFORM;
-	} else if((f->type & SLC_VARYING) || (s->type & SLC_VARYING)) {
-		type |= SLC_VARYING;
 	}
 }
 
@@ -739,7 +717,7 @@ int			CMatrixExpression::value(char *dest) {
 // Comments				:
 CArrayExpression::CArrayExpression(CVariable *v,CExpression *i) : CExpression((v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK)) | (v->type & i->type & SLC_UNIFORM)) {
 	array	=	v;
-	item	=	getConversion(SLC_FLOAT | SLC_UNIFORM,i);
+	item	=	getConversion(SLC_FLOAT | (type & SLC_UNIFORM),i);
 	
 	if (v->type & SLC_ARRAY) {
 	} else {
@@ -775,9 +753,8 @@ void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 
 	assert(	((dest->type & SLC_UNIFORM) ^ (type & SLC_UNIFORM))	== 0);
 
-	lockUniform(op1,item);	
+	lock(op1,item);	
 	assert(item->type & SLC_FLOAT);
-	assert(item->type & SLC_UNIFORM);
 
 	if ((array->type & SLC_UNIFORM) ^ (type & SLC_UNIFORM)) {
 		if		(array->type & SLC_FLOAT)	opcode	=	opcodeUFFromArray;
@@ -1229,7 +1206,7 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : C
 	error		=	FALSE;
 	
 	// take the container from subexpressions
-	type		|=	function->code->type & (SLC_UNIFORM | SLC_VARYING);
+	type		|=	function->code->type & SLC_UNIFORM;
 	
 	// handle the parameters
 	if (p == NULL) {
@@ -1740,7 +1717,6 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 		op[i]	=	NULL;
 
 		if ((i >= plStart) || ((usedPrototype[i+2] >= 'A') && (usedPrototype[i+2] <= 'Z'))) {
-			dt	&= (~ SLC_VARYING);
 			dt	|=	SLC_UNIFORM;
 		}
 
@@ -2004,8 +1980,8 @@ CArrayAssignmentExpression::CArrayAssignmentExpression(CVariable *f,CExpression 
 	}
 	
 	first	=	f;
-	index	=	getConversion(SLC_FLOAT | SLC_UNIFORM,i);
-	second	=	getConversion((first->type & SLC_TYPE_MASK),s);
+	index	=	getConversion(SLC_FLOAT | (type & SLC_UNIFORM),i);
+	second	=	getConversion((first->type & SLC_TYPE_MASK) | (type & SLC_UNIFORM),s);
 }
 
 
@@ -2030,8 +2006,8 @@ void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 	char	*opcode;
 	char	*opcodeN;
 
-	lockUniform(opi,index);	// Get float index
-	lock(op,second);		// Get the second code
+	lock(opi,index);	// Get float index
+	lock(op,second);	// Get the second code
 	
 	if (first->type & SLC_FLOAT) {
 		opcode	=	opcodeFToArray;
@@ -2095,10 +2071,10 @@ CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpr
 	arrayAssigner = NULL;
 	
 	// Ensure index is float
-	index = getConversion(SLC_FLOAT | SLC_UNIFORM,i);
+	index = getConversion(SLC_FLOAT | (type & SLC_UNIFORM),i);
 
 	// pre-reseve the register (needs 1 register for index for both load and store)
-	indexVar = sdr->lockRegister(SLC_FLOAT | SLC_UNIFORM);
+	indexVar = sdr->lockRegister(SLC_FLOAT | (type & SLC_UNIFORM));
 	
 	// Create Accessor
 	if(CExpression *arrayAccessor = new CArrayExpression(first,new CTerminalExpression(indexVar))){
@@ -2177,7 +2153,7 @@ void		CArrayUpdateExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:	Note that e array holds the last item first
-CArrayMove::CArrayMove(CVariable *f,CList<CExpression *> *e) : CExpression((f->type & SLC_UNIFORM) | SLC_UNIFORM) {
+CArrayMove::CArrayMove(CVariable *f,CList<CExpression *> *e) : CExpression(f->type & (~SLC_ARRAY)) {
 	CExpression	*cExpression;
 	int			numItems	=	0;
 
@@ -2252,7 +2228,7 @@ void		CArrayMove::getCode(FILE *out,CVariable *dest) {
 
 		CExpression	*iVariable	=	new CConstantTerminalExpression(SLC_UNIFORM | SLC_FLOAT,tmp);
 
-		lockUniform(iname,iVariable);
+		lock(iname,iVariable);
 
 		fprintf(out,"%s %s %s %s\n",opcode,first->codeName(),iname,cVariable->codeName());
 

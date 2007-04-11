@@ -760,9 +760,8 @@ DEFOPCODE(VUBoolean	,"vuboolean",2,	OPERANDS2EXPR_PRE(float *,const float *),FUN
 
 /////////////////////////////////////////////////////////////////
 //
-//	FIXME : Array opcodes
+//	Array opcodes
 //
-// IMPORTANT: The array index is assumed to be uniform
 /////////////////////////////////////////////////////////////////
 #define	ARRAY_PRE(_t)	_t			res;							\
 						_t			op1;							\
@@ -770,22 +769,22 @@ DEFOPCODE(VUBoolean	,"vuboolean",2,	OPERANDS2EXPR_PRE(float *,const float *),FUN
 						int			op1Step;						\
 						operand(0,res,_t);							\
 						operandSize(1,op1,op1Step,_t);				\
-						operand(2,op2,const float *);				\
-						const int index = (int) (*op2);
+						operand(2,op2,const float *);
 
 #define	ARRAY_UPDATE(__rs)											\
 						res		+=	__rs;							\
-						op1		+=	op1Step;
+						op1		+=	op1Step;						\
+						op2++;
 
 #define	UARRAY_UPDATE(__rs)											\
 						res		+=	__rs;
 
 
 
-#define	FFROMAEXPR	*res	=	op1[index];
-#define	VFROMAEXPR	movvv(res,&op1[index*3]);
-#define	MFROMAEXPR	movmm(res,&op1[index*16]);
-#define	SFROMAEXPR	*res	=	op1[index];
+#define	FFROMAEXPR	*res	=	op1[(int) (*op2)];
+#define	VFROMAEXPR	movvv(res,&op1[((int) (*op2))*3]);
+#define	MFROMAEXPR	movmm(res,&op1[((int) (*op2))*16]);
+#define	SFROMAEXPR	*res	=	op1[(int) (*op2)];
 
 DEFOPCODE(FFromA	,"ffroma"	,3,	ARRAY_PRE(float *),FFROMAEXPR,ARRAY_UPDATE(1),	NULL_EXPR,0)
 DEFOPCODE(VFromA	,"vfroma"	,3,	ARRAY_PRE(float *),VFROMAEXPR,ARRAY_UPDATE(3),	NULL_EXPR,0)
@@ -809,20 +808,18 @@ DEFOPCODE(USFromA	,"usfroma"	,3,	ARRAY_PRE(char **),SFROMAEXPR,UARRAY_UPDATE(1),
 						int			resStep;						\
 						operandSize(0,res,resStep,_t);				\
 						operand(1,op1,const float *);				\
-						operand(2,op2,_t);							\
-						const int index	=	(int) (*op1)
-
-// IMPORTANT: The array index is assumed to be uniform !!!
+						operand(2,op2,_t);
 
 #define	ARRAY_UPDATE(__os)											\
 						res		+=	resStep;						\
+						op1++;										\
 						op2		+=	__os;
 
 
-#define	FTOAEXPR	res[index]	=	*op2;
-#define	VTOAEXPR	movvv(res + index*3,op2);
-#define	MTOAEXPR	movmm(res + index*16,op2);
-#define	STOAEXPR	res[index]	=	*op2;
+#define	FTOAEXPR	res[(int) (*op1)]	=	*op2;
+#define	VTOAEXPR	movvv(res + ((int) (*op1))*3,op2);
+#define	MTOAEXPR	movmm(res + ((int) (*op1))*16,op2);
+#define	STOAEXPR	res[(int) (*op1)]	=	*op2;
 
 
 DEFOPCODE(FToA		,"ftoa"		,3,	ARRAY_PRE(float *),FTOAEXPR,ARRAY_UPDATE(1),NULL_EXPR,0)
