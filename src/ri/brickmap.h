@@ -94,7 +94,6 @@ class	CBrickMap : public CTexture3d {
 		CBrickNode		*next;				// The next brick in the hash bucket
 		short			x,y,z,d;			// The spatial index of the node
 		int				fileIndex;			// The location in the master file
-		int				flags;
 		// 5 * 4 bytes (ugly)
 	};
 
