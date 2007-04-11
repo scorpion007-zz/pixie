@@ -3,6 +3,8 @@
 texmake \- Prepare a texture for use with Pixie. 
 .SH SYNOPSIS
 \fBtexmake\fR [ options... ] inname.tif [ iname2.tif ... ] outname.tex
+.P
+\fBtexmake\fR -texture3d [ brickmap options... ] inname.ptc outname.bm
 .SH DESCRIPTION
 .I  Texmake
 Prepares textures for efficient use in a render with 
@@ -90,6 +92,17 @@ Set the input file path to PATH.
 .TP
 .B \-output <PATH>
 Set the output file path the PATH.
+.SH BRICKMAP OPTIONS
+.TP
+.B -maxerror 0.002
+Set the maximum error factor for brickmap compression - 0 to disable.
+.TP
+.B -radiusscale 1
+Multiply point radii by radiussscale when making the brickmap, use values >1 if
+brickmaps are unnecessarily large due to overly small point radii.
+.TP
+.B -maxdepth 10
+Set the maximum depth of the brickmap
 .SH "SEE ALSO"
 rndr(1), sdrc(1), show(1), sdrinfo(1)
 .SH BUGS
