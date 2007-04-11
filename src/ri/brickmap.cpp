@@ -50,10 +50,18 @@ int			CBrickMap::drawType			=	0;				// Draw boxes
 int			CBrickMap::drawChannel		=	0;				// Which channel to draw
 
 
+// convert brick to voxel
+const float INV_BRICK_SIZE = 1.0f/ (float) BRICK_SIZE;
+const float	InvLog2 = 1.0f/log(2.0f);
+
 ////////////////////////////////////////////////////////////////////////
 // This number controls the density of the points in the finest level of the tree
 // Larger it is, the smaller the leaf level voxels will be (compared to the point size)
-#define	LEAF_FACTOR 0.4f
+//#define	LEAF_FACTOR 0.4f
+
+// the factor of 2 converts point radii to diameters, the factor of 1/8 from side to voxel size
+const float LEAF_FACTOR =  INV_BRICK_SIZE/2.0f;
+
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	intersect
@@ -125,7 +133,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 	osCreateMutex(mutex);
 
 	// Read the header offset
-	fseek(file,-4,SEEK_END);
+	fseek(file,-(long)sizeof(int),SEEK_END);
 	fread(&offset,1,sizeof(int),file);
 	fseek(file,offset,SEEK_SET);
 
@@ -309,7 +317,7 @@ CBrickMap::~CBrickMap() {
 	const	float	xS			=	cSide*__x;											\
 	const	float	yS			=	cSide*__y;											\
 	const	float	zS			=	cSide*__z;											\
-	const	float	dVoxel		=	cSide / (float) BRICK_SIZE;							\
+	const	float	dVoxel		=	cSide * INV_BRICK_SIZE;								\
 	const	float	invDvoxel	=	1 / dVoxel;											\
 	char			*cData		=	(char *) cBrick->voxels;							\
 	int				xvs			=	(int) floor(((P[0] - dP) - xS) * invDvoxel);		\
@@ -351,7 +359,7 @@ CBrickMap::~CBrickMap() {
 void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP) {
 	dP	*=	dPscale;
 
-	int			depth	=	(int) ceil(log(side*LEAF_FACTOR/dP));	// This is the depth we want to add
+	int			depth	=	(int) ceil(log(side*LEAF_FACTOR/dP)*InvLog2);	// This is the depth we want to add
 	CBrick		*cBrick;
 	CBrickNode	*cNode;
 	vector		P,N;
@@ -439,11 +447,12 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	dP	*=	dPscale;
 
-	float	depthf		=	log(side*LEAF_FACTOR/dP);
+	float	depthf		=	log(side*LEAF_FACTOR/dP)*InvLog2;
 	int		depth		=	(int) floor(depthf);
 	float	t			=	depthf - depth;
 	float	*data0		=	(float *) alloca(dataSize*2*sizeof(float));
 	float	*data1		=	data0 + dataSize;
+	float	normalFactor=	1.0f;
 	vector	P,N;
 	int		i;
 
@@ -453,12 +462,13 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 	subvv(P,bmin);
 	mulmn(N,from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
+	else				normalFactor = 0.0f;
 	
 	// Perform the lookup
 	osLock(mutex);
 	stats.numBrickmapLookups	+=	2;
-	lookup(P,N,dP,data0,depth);
-	lookup(P,N,dP,data1,depth+1);
+	lookup(P,N,dP,data0,depth,normalFactor);
+	lookup(P,N,dP,data1,depth+1,normalFactor);
 	osUnlock(mutex);
 
 	for (i=0;i<dataSize;i++)	data[i]	=	data0[i]*(1-t) + data1[i]*t;
@@ -472,7 +482,7 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 // Description			:	Lookup a particular depth
 // Return Value			:	-
 // Comments				:
-void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int depth) {
+void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int depth,float normalFactor) {
 	CBrick	*cBrick;
 	float	totalWeight	=	0;
 	int		i;
@@ -493,8 +503,7 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 					
 					// Find the voxel with the closest normal
 					for (;cVoxel!=NULL;cVoxel=cVoxel->next) {
-						const float Ncorrect	=	dotvv(cVoxel->N,cVoxel->N);
-						const float	weight		=	cWeight*(Ncorrect*dotvv(cVoxel->N,N) + cVoxel->weight*(1.0f-Ncorrect));
+						const float	weight		=	cWeight*cVoxel->weight*(normalFactor*dotvv(cVoxel->N,N) + (1.0f-normalFactor));
 
 						if (weight > 0) {
 							int			j;
@@ -891,7 +900,6 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 			tNode->brick		=	NULL;
 			numNodes++;
 			
-			
 			// write it out to a new location
 			fseek(outfile,0,SEEK_END);
 			tNode->fileIndex	=	ftell(outfile);
@@ -950,7 +958,10 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 					fseek(outfile,-(long)(sizeof(CVoxel)+dataSize*sizeof(float)),SEEK_CUR);
 					memcpy(tempVoxel,tVoxel,sizeof(CVoxel)+sizeof(float)*dataSize);
 					tempVoxel->next = NULL;
-					fwrite(tempVoxel,sizeof(CVoxel)+sizeof(float)*dataSize,1,outfile);
+					// only resave the voxel header
+					fwrite(tempVoxel,sizeof(CVoxel),1,outfile);
+					// but keep the file write pointer correct
+					fseek(outfile,sizeof(float)*dataSize,SEEK_CUR);
 				}
 				
 				cVoxel = (CVoxel*) (vdata + dataSize);
@@ -984,7 +995,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 		}
 	}
 
-	// Write the file header at the beginning
+	// Write the position of the file header right at the end
 	fwrite(&headerOffset,sizeof(int),1,outfile);
 	
 	fclose(outfile);
@@ -1112,7 +1123,7 @@ void				CBrickMap::draw() {
 		for(int zi=0;zi<BRICK_SIZE;zi++) for(int yi=0;yi<BRICK_SIZE;yi++) for(int xi=0;xi<BRICK_SIZE;xi++) {
 			vector	cent,Ctmp;
 
-			initv(cent,x*sz + xi*(sz/(float) BRICK_SIZE),y*sz + yi*(sz/(float) BRICK_SIZE),z*sz + zi*(sz/(float) BRICK_SIZE));
+			initv(cent,x*sz + xi*sz*INV_BRICK_SIZE,y*sz + yi*sz*INV_BRICK_SIZE,z*sz + zi*sz*INV_BRICK_SIZE);
 	
 			// Save values before we update
 			float *DDs = DD + sampleStart;
@@ -1176,7 +1187,7 @@ void				CBrickMap::draw() {
 				movvv(cP,cent);
 				movvv(cC,DDs);
 				movvv(cN,norm);
-				cR[0] = sqrt2*sz/(float) BRICK_SIZE;
+				cR[0] = sqrt2*sz*INV_BRICK_SIZE;
 
 				cP		+=	3;
 				cC		+=	3;

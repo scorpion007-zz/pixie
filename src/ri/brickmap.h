@@ -40,7 +40,7 @@
 
 // Forward
 
-class CBrickMapView;
+class CBrickMapGeometry;
 
 // Some hard coded constants to make our life easier
 #define	BRICK_SHIFT				3
@@ -51,6 +51,7 @@ class CBrickMapView;
 #define BRICK_PRESENCE_LONGS	16
 #define BRICK_VOXEL_BATCH 		32
 
+#define BRICKFLAGS_CULLED
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
@@ -93,6 +94,7 @@ class	CBrickMap : public CTexture3d {
 		CBrickNode		*next;				// The next brick in the hash bucket
 		short			x,y,z,d;			// The spatial index of the node
 		int				fileIndex;			// The location in the master file
+		int				flags;
 		// 5 * 4 bytes (ugly)
 	};
 
@@ -180,7 +182,7 @@ public:
 	static	void				flushBrickMap(int all=FALSE);
 	static	void				shutdownBrickMap();
 protected:
-			void				lookup(const float *P,const float *N,float dP,float *data,int depth);
+			void				lookup(const float *P,const float *N,float dP,float *data,int depth,float normalFactor);
 			void				flushBricks(int allBricks);		// Free memory by flushing bricks
 			CBrick				*newBrick(int clear);			// Allocate a brick
 			CBrick				*loadBrick(int fileIndex);		// Load a brick
@@ -210,7 +212,7 @@ protected:
 
 	static	void				brickQuickSort(CBrickNode **nodes,int start,int end);
 	
-	friend class CBrickMapView;
+	friend class CBrickMapGeometry;
 };
 
 
