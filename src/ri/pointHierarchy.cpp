@@ -77,7 +77,13 @@ CPointHierarchy::~CPointHierarchy() {
 // Description			:	Store smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::store(const float *,const float *,const float *,float) {
+void		CPointHierarchy::store(const float *Cl,const float *Pl,const float *Nl,float dP) {
+	vector	P,N;
+
+	mulmp(P,to,Pl);
+	mulmn(N,from,Nl);
+	dP	*=	dPscale;
+
 	// Should never be called
 	assert(FALSE);
 }
@@ -88,10 +94,16 @@ void		CPointHierarchy::store(const float *,const float *,const float *,float) {
 // Description			:	Lookup smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
+void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP) {
 	int		*stack		=	(int *) alloca(100*sizeof(int));
 	int		*stackBase	=	stack;
 	int		i;
+	vector	P,N;
+
+	// Transform the lookup point to the correct coordinate system
+	mulmp(P,to,Pl);
+	mulmn(N,from,Nl);
+	dP	*=	dP;
 
 	// Clear the data
 	for (i=0;i<dataSize;i++)	Cl[i]	=	0;
@@ -111,14 +123,15 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float ra
 
 			// Decide whether we want to split this node
 			vector	D;
-			subvv(D,average->P,Pl);
+			subvv(D,average->P,P);
 
 			// Are we pointing towards each other?
-			if (	(dotvv(D,Nl) > 0) && (dotvv(D,average->N) < 0)		) {
+			if (	(dotvv(D,N) > 0) && (dotvv(D,average->N) < 0)		) {
 
 				// Compare the code angle to some random angle
 				if (	(average->dP / lengthv(D)) < cosf((float) radians(5))	) {
 					// Use the average
+					Cl[0]	+=	0.5f;
 				} else {
 
 					// Sanity check

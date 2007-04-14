@@ -208,132 +208,142 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Return Value			:
 // Comments				:
 void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CTexture3dLookup *lookup) {
-	CCacheSample		*cSample;
-	CCacheNode			*cNode;
-	float				totalWeight		=	0;
-	CCacheNode			**stackBase		=	(CCacheNode **)	alloca(maxDepth*sizeof(CCacheNode *)*8);
-	CCacheNode			**stack;
-	int					i;
-	float				coverage;
-	vector				irradiance,envdir;
-	vector				P,N;
-	
-	// A small value for discard-smoothing of irradiance
-	const float			smallSampleWeight = (flags & CACHE_SAMPLE) ? 0.1f : 0.0f;
 
-	// Transform the lookup point to the correct coordinate system
-	mulmp(P,to,cP);
-	mulmn(N,from,cN);
-	
-	// Init the result
-	coverage	=	0;
-	initv(irradiance,0);
-	initv(envdir,0);
+	// Is this a point based lookup?
+	if ((lookup->pointbased) && (lookup->pointHierarchy != NULL)) {
+		int	i;
 
-	// The weighting algorithm is that described in [Tabellion and Lamorlette 2004]
-	// We need to convert the max error as in Wald to Tabellion 
-	// The default value of maxError is 0.4f
-	const float			K		=	0.4f / lookup->maxError;
+		for (i=0;i<7;i++)	C[i]	=	0;
 
-	// Note, we do not need to lock the data for reading
-	// if word-writes are atomic
-	
-	// Prepare for the non recursive tree traversal
-	stack		=	stackBase;
-	*stack++	=	root;
-	while(stack > stackBase) {
-		cNode	=	*(--stack);
+		lookup->pointHierarchy->lookup(C+3,cP,cN,dSample);
+	} else {
+		CCacheSample		*cSample;
+		CCacheNode			*cNode;
+		float				totalWeight		=	0;
+		CCacheNode			**stackBase		=	(CCacheNode **)	alloca(maxDepth*sizeof(CCacheNode *)*8);
+		CCacheNode			**stack;
+		int					i;
+		float				coverage;
+		vector				irradiance,envdir;
+		vector				P,N;
+		
+		// A small value for discard-smoothing of irradiance
+		const float			smallSampleWeight = (flags & CACHE_SAMPLE) ? 0.1f : 0.0f;
 
-		// Sum the values in this level
-		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
-			vector	D;
+		// Transform the lookup point to the correct coordinate system
+		mulmp(P,to,cP);
+		mulmn(N,from,cN);
+		
+		// Init the result
+		coverage	=	0;
+		initv(irradiance,0);
+		initv(envdir,0);
 
-			// D = vector from sample to query point
-			subvv(D,P,cSample->P);
+		// The weighting algorithm is that described in [Tabellion and Lamorlette 2004]
+		// We need to convert the max error as in Wald to Tabellion 
+		// The default value of maxError is 0.4f
+		const float			K		=	0.4f / lookup->maxError;
 
-			// Ignore sample in the front
-			float	a	=	dotvv(D,cSample->N);
-			if ((a*a / (dotvv(D,D) + C_EPSILON)) > 0.1)	continue;
+		// Note, we do not need to lock the data for reading
+		// if word-writes are atomic
+		
+		// Prepare for the non recursive tree traversal
+		stack		=	stackBase;
+		*stack++	=	root;
+		while(stack > stackBase) {
+			cNode	=	*(--stack);
 
-			// Positional error
-			float	e1 = sqrtf(dotvv(D,D)) / cSample->dP;
+			// Sum the values in this level
+			for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
+				vector	D;
 
-			// Directional error
-			float	e2 =	1 - dotvv(N,cSample->N);
-			if (e2 < 0)	e2	=	0;
-			e2		=	sqrtf(e2*weightNormalDenominator);
+				// D = vector from sample to query point
+				subvv(D,P,cSample->P);
 
-			// Compute the weight
-			float	w		=	1 - K*max(e1,e2);
-			if (w > context->urand()*smallSampleWeight) {
-				vector	ntmp;
+				// Ignore sample in the front
+				float	a	=	dotvv(D,cSample->N);
+				if ((a*a / (dotvv(D,D) + C_EPSILON)) > 0.1)	continue;
 
-				crossvv(ntmp,cSample->N,N);
-				
-				// Sum the sample
-				totalWeight		+=	w;
-				coverage		+=	w*(cSample->coverage		+ dotvv(cSample->gP+0*3,D) + dotvv(cSample->gR+0*3,ntmp));
-				irradiance[0]	+=	w*(cSample->irradiance[0]	+ dotvv(cSample->gP+1*3,D) + dotvv(cSample->gR+1*3,ntmp));
-				irradiance[1]	+=	w*(cSample->irradiance[1]	+ dotvv(cSample->gP+2*3,D) + dotvv(cSample->gR+2*3,ntmp));
-				irradiance[2]	+=	w*(cSample->irradiance[2]	+ dotvv(cSample->gP+3*3,D) + dotvv(cSample->gR+3*3,ntmp));
-				envdir[0]		+=	w*(cSample->envdir[0]		+ dotvv(cSample->gP+4*3,D) + dotvv(cSample->gR+4*3,ntmp));
-				envdir[1]		+=	w*(cSample->envdir[1]		+ dotvv(cSample->gP+5*3,D) + dotvv(cSample->gR+5*3,ntmp));
-				envdir[2]		+=	w*(cSample->envdir[2]		+ dotvv(cSample->gP+6*3,D) + dotvv(cSample->gR+6*3,ntmp));
+				// Positional error
+				float	e1 = sqrtf(dotvv(D,D)) / cSample->dP;
+
+				// Directional error
+				float	e2 =	1 - dotvv(N,cSample->N);
+				if (e2 < 0)	e2	=	0;
+				e2		=	sqrtf(e2*weightNormalDenominator);
+
+				// Compute the weight
+				float	w		=	1 - K*max(e1,e2);
+				if (w > context->urand()*smallSampleWeight) {
+					vector	ntmp;
+
+					crossvv(ntmp,cSample->N,N);
+					
+					// Sum the sample
+					totalWeight		+=	w;
+					coverage		+=	w*(cSample->coverage		+ dotvv(cSample->gP+0*3,D) + dotvv(cSample->gR+0*3,ntmp));
+					irradiance[0]	+=	w*(cSample->irradiance[0]	+ dotvv(cSample->gP+1*3,D) + dotvv(cSample->gR+1*3,ntmp));
+					irradiance[1]	+=	w*(cSample->irradiance[1]	+ dotvv(cSample->gP+2*3,D) + dotvv(cSample->gR+2*3,ntmp));
+					irradiance[2]	+=	w*(cSample->irradiance[2]	+ dotvv(cSample->gP+3*3,D) + dotvv(cSample->gR+3*3,ntmp));
+					envdir[0]		+=	w*(cSample->envdir[0]		+ dotvv(cSample->gP+4*3,D) + dotvv(cSample->gR+4*3,ntmp));
+					envdir[1]		+=	w*(cSample->envdir[1]		+ dotvv(cSample->gP+5*3,D) + dotvv(cSample->gR+5*3,ntmp));
+					envdir[2]		+=	w*(cSample->envdir[2]		+ dotvv(cSample->gP+6*3,D) + dotvv(cSample->gR+6*3,ntmp));
+				}
 			}
-		}
 
-		// Check the children
-		for (i=0;i<8;i++) {
-			CCacheNode	*tNode;
+			// Check the children
+			for (i=0;i<8;i++) {
+				CCacheNode	*tNode;
 
-			if ((tNode = cNode->children[i]) != NULL) {
-				const float	tSide	=	tNode->side;
+				if ((tNode = cNode->children[i]) != NULL) {
+					const float	tSide	=	tNode->side;
 
-				if (	((tNode->center[0] + tSide) > P[0])	&&
-						((tNode->center[1] + tSide) > P[1])	&&
-						((tNode->center[2] + tSide) > P[2])	&&
-						((tNode->center[0] - tSide) < P[0])	&&
-						((tNode->center[1] - tSide) < P[1])	&&
-						((tNode->center[2] - tSide) < P[2])) {
-					*stack++	=	tNode;
+					if (	((tNode->center[0] + tSide) > P[0])	&&
+							((tNode->center[1] + tSide) > P[1])	&&
+							((tNode->center[2] + tSide) > P[2])	&&
+							((tNode->center[0] - tSide) < P[0])	&&
+							((tNode->center[1] - tSide) < P[1])	&&
+							((tNode->center[2] - tSide) < P[2])) {
+						*stack++	=	tNode;
+					}
 				}
 			}
 		}
-	}
 
-	// Do we have anything ?
-	if (totalWeight > C_EPSILON) {
-		double	normalizer	=	1 / totalWeight;
+		// Do we have anything ?
+		if (totalWeight > C_EPSILON) {
+			double	normalizer	=	1 / totalWeight;
 
-		normalizevf(envdir);
+			normalizevf(envdir);
 
-		C[0]			=	(float) (irradiance[0]*normalizer);
-		C[1]			=	(float) (irradiance[1]*normalizer);
-		C[2]			=	(float) (irradiance[2]*normalizer);
-		C[3]			=	(float) (coverage*normalizer);
-		mulmv(C+4,from,envdir);		// envdir is stored in the target coordinate system
-	} else {
-		// Are we sampling the cache ?
-		if (flags & CACHE_SAMPLE) {
-
-			// Create a new sample
-			sample(C,P,N,dSample,context,lookup);
-			mulmv(C+4,from,C+4);	// envdir is stored in the target coordinate system
+			C[0]			=	(float) (irradiance[0]*normalizer);
+			C[1]			=	(float) (irradiance[1]*normalizer);
+			C[2]			=	(float) (irradiance[2]*normalizer);
+			C[3]			=	(float) (coverage*normalizer);
+			mulmv(C+4,from,envdir);		// envdir is stored in the target coordinate system
 		} else {
+			// Are we sampling the cache ?
+			if (flags & CACHE_SAMPLE) {
 
-			// No joy
-			C[0]	=	0;
-			C[1]	=	0;
-			C[2]	=	0;
-			C[3]	=	1;
-			C[4]	=	0;
-			C[5]	=	0;
-			C[6]	=	0;
+				// Create a new sample
+				sample(C,P,N,dSample,context,lookup);
+				mulmv(C+4,from,C+4);	// envdir is stored in the target coordinate system
+			} else {
+
+				// No joy
+				C[0]	=	0;
+				C[1]	=	0;
+				C[2]	=	0;
+				C[3]	=	1;
+				C[4]	=	0;
+				C[5]	=	0;
+				C[6]	=	0;
+			}
 		}
-	}
 
-	// Make sure we don't have NaNs
-	assert(dotvv(C,C) >= 0);
+		// Make sure we don't have NaNs
+		assert(dotvv(C,C) >= 0);
+	}
 }
 
 

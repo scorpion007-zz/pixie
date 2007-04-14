@@ -135,6 +135,8 @@ public:
 							// Compute the map hierarchy
 							root	=	cluster(CMap<T>::numItems,tmp);
 							assert(root == nodes.numItems-1);
+
+							delete [] tmp;
 						}
 	
 						///////////////////////////////////////////////////////////////////////
