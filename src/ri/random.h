@@ -35,17 +35,6 @@
 #include "common/os.h"
 #include "common/algebra.h"
 
-
-
-
-
-
-
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -187,5 +176,46 @@ void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &gener
 void	sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator);
 void	sampleSphere(float *P,CSobol<3> &generator);
 
+
+///////////////////////////////////////////////////////////////////////
+// rand() replacements
+///////////////////////////////////////////////////////////////////////
+
+// TODO: rand() and random() are not thread safe
+
+#ifndef HAVE_RANDOM
+// rand() does not return random lower-order bits, so fix it up since this
+// platform doesn't have random().
+
+static inline long int random() {
+	long int retval;
+
+	// Note that we are assuming RAND_MAX >= 0x7fffffff
+	// If you're on an arch with sizeof(int) <= 2, this won't work
+	// but then again, why would you be rendering there...
+
+#if RAND_MAX < 0x7fffffff
+#warn "RAND_MAX is < 0x7fffffff.  random() won't be truely random."
 #endif
 
+	retval  = (rand() >> 15) & 0x0000ffff;
+	retval |=  rand()        & 0x7fff0000;
+
+	return retval;
+}
+
+#endif
+
+// The variants of urand and irand that work without a shading context
+
+// Note that RAND_MAX is specific to rand().  random() always has a max
+// of 0x7fffffff
+static inline float _urand(){
+	return random() / (float) 0x7fffffff;
+}
+
+static inline long int _irand() {
+	return random();
+}
+
+#endif
