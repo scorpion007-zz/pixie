@@ -41,6 +41,7 @@
 #include "memory.h"
 #include "linsys.h"
 #include "texture.h"
+#include "random.h"
 
 #define	SINTABLE_SIZE		1000		// The size of the alpha / sin(alpha) table
 #define	LOCAL_LOOKUP		10			// The number of nearby local samples to look at
@@ -50,12 +51,6 @@
 #ifdef DEBUG_PRINT
 static	FILE	*out;					// Debugging output
 #endif
-
-
-// FIXME: rand() is not thread safe
-#define	urand()	(rand() / (float) RAND_MAX)
-#define	irand()	rand()
-
 
 // These two arrays are used to hold plusOne[i] = (i+1) % 3 and minusOne[i] = (i-1) % 3
 static	int		plusOne[3]				=	{1,2,0};
@@ -1052,7 +1047,7 @@ void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLoo
 		for (numRays=0;numRays<numRaysPerCluster;numRays++) {
 
 			// Pick a random shading point
-			cSample					=	points[irand() % numSamples];
+			cSample					=	points[_irand() % numSamples];
 
 			// Sample this shading point
 			sampleHemisphere(D,cSample->N,(float) (C_PI/2.0),generator);
@@ -1067,7 +1062,7 @@ void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLoo
 			ray.invDir[COMP_Y]		=	1/ray.dir[COMP_Y];
 			ray.invDir[COMP_Z]		=	1/ray.dir[COMP_Z];
 			ray.t					=	C_INFINITY;
-			ray.time				=	urand();
+			ray.time				=	_urand();
 			ray.jimp				=	-1.0f;
 			ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 			ray.tmin				=	bias;
@@ -1198,7 +1193,7 @@ void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLoo
 				vector	C;
 				int		i;
 
-				initv(C,urand(),urand(),urand());
+				initv(C,_urand(),_urand(),_urand());
 				normalizev(C);
 
 				fprintf(out,"%f %f %f - %f %f %f\n",P[0],P[1],P[2],C[0],C[1],C[2]);
@@ -1260,9 +1255,9 @@ int				CRadianceCache::partition(int numRays,CShadingPoint **rays) {
 	}
 
 	// Select two random cluster centers that are not the same
-	s1	=	rays[irand() % numRays];
+	s1	=	rays[_irand() % numRays];
 	do {
-		s2	=	rays[irand() % numRays];
+		s2	=	rays[_irand() % numRays];
 
 		subvv(D,s1->P,s2->P);
 	} while(dotvv(D,D) == 0);
