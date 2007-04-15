@@ -111,8 +111,8 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes,
 		
 		ptcInternal->ptc->queryChannels(nvars,vartypes,varnames);
 		
-		ptcInternal->numPoints		=	ptcInternal->ptc->getNumPoints();
-		ptcInternal->curPoint		=	0;
+		ptcInternal->numPoints		=	ptcInternal->ptc->getNumPoints()-1;
+		ptcInternal->curPoint		=	1;	// First point is dummy
 	} else {
 		delete ptcInternal;
 		return NULL;
