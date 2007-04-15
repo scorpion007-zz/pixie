@@ -39,7 +39,7 @@
 #include "surface.h"
 #include "rendererContext.h"
 #include "renderer.h"
-
+#include "random.h"
 
 
 
@@ -116,12 +116,10 @@ static	float	getDisp(const float *mat,float disp) {
 	int		i;
 	float	alpha;
 
-#define urand()	rand() / (float) RAND_MAX
-
-	tmp[0]	=	urand();
-	tmp[1]	=	urand();
-	tmp[2]	=	urand();
-	tmp[3]	=	urand();
+	tmp[0]	=	_urand();
+	tmp[1]	=	_urand();
+	tmp[2]	=	_urand();
+	tmp[3]	=	_urand();
 
 	for (i=0;i<10;i++) {
 		mulmp4(tmp2,mat,tmp);
