@@ -38,6 +38,7 @@
 #include "memory.h"
 #include "error.h"
 #include "rendererContext.h"
+#include "random.h"
 #include "ri_config.h"
 
 
@@ -60,7 +61,7 @@
 #define	illuminateBegin(a,b,c,d,e,f)
 #define findCoordinateSystem				CRenderer::findCoordinateSystem
 #define threadMemory						CRenderer::globalMemory
-#define urand()								(rand() / (float) RAND_MAX)
+#define urand()								_urand()
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
