@@ -37,9 +37,7 @@
 #include "renderer.h"
 #include "map.h"
 #include "shading.h"
-
-// FIXME: rand is not thread safe
-#define	urand()	(rand() / (float) RAND_MAX)
+#include "random.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapHierarchy
@@ -228,12 +226,12 @@ protected:
 								vector	C0,C1;
 								
 								// Create random cluster centers
-								initv(C0,	urand()*(bmax[0]-bmin[0]) + bmin[0],
-											urand()*(bmax[1]-bmin[1]) + bmin[1],
-											urand()*(bmax[2]-bmin[2]) + bmin[2]);
-								initv(C1,	urand()*(bmax[0]-bmin[0]) + bmin[0],
-											urand()*(bmax[1]-bmin[1]) + bmin[1],
-											urand()*(bmax[2]-bmin[2]) + bmin[2]);
+								initv(C0,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
+											_urand()*(bmax[1]-bmin[1]) + bmin[1],
+											_urand()*(bmax[2]-bmin[2]) + bmin[2]);
+								initv(C1,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
+											_urand()*(bmax[1]-bmin[1]) + bmin[1],
+											_urand()*(bmax[2]-bmin[2]) + bmin[2]);
 
 								int		changed	=	FALSE;
 								vector	nC0,nC1;
@@ -279,12 +277,12 @@ protected:
 									}
 									
 									if ((num0 == 0) || (num1 == 0)) {
-										initv(C0,	urand()*(bmax[0]-bmin[0]) + bmin[0],
-													urand()*(bmax[1]-bmin[1]) + bmin[1],
-													urand()*(bmax[2]-bmin[2]) + bmin[2]);
-										initv(C1,	urand()*(bmax[0]-bmin[0]) + bmin[0],
-													urand()*(bmax[1]-bmin[1]) + bmin[1],
-													urand()*(bmax[2]-bmin[2]) + bmin[2]);
+										initv(C0,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
+													_urand()*(bmax[1]-bmin[1]) + bmin[1],
+													_urand()*(bmax[2]-bmin[2]) + bmin[2]);
+										initv(C1,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
+													_urand()*(bmax[1]-bmin[1]) + bmin[1],
+													_urand()*(bmax[2]-bmin[2]) + bmin[2]);
 
 									} else {
 
