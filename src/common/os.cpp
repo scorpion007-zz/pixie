@@ -48,7 +48,6 @@
 #include <io.h>
 #include <direct.h>
 #include <errno.h>
-#include <sys/timeb.h>
 
 
 #define	OS_DIR_SEPERATOR					'\\'
@@ -74,26 +73,9 @@ static	DWORD WINAPI  dispatcherThread(void *w) {
 	return 0;
 }
 
-struct timezone {
-	int tz_minuteswest;
-	int tz_dsttime;
-};
-
-
-// Windows doesn't have gettimeofday() for some archaic reason
-static void gettimeofday(struct timeval *tv,void* time_zone) {
-	timeb cur;
-
-	ftime(&cur);
-
-	tv->tv_sec	= (long) cur.time;
-	tv->tv_usec = cur.millitm * 1000;
-}
-
 // << Windows
 #else
 // >> Unix
-#include <sys/time.h>
 #include <sys/param.h>
 #include <dlfcn.h>
 #include <glob.h>
@@ -103,9 +85,24 @@ static void gettimeofday(struct timeval *tv,void* time_zone) {
 // << Unix
 #endif
 
+#ifdef HAVE_SYS_TIME_H
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#endif
 
+#ifndef HAVE_GETTIMEOFDAY
+#include <sys/timeb.h>
 
+static void gettimeofday(struct timeval *tv,void* time_zone) {
+	timeb cur;
 
+	ftime(&cur);
+
+	tv->tv_sec	= (long) cur.time;
+	tv->tv_usec = cur.millitm * 1000;
+}
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////

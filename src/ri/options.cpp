@@ -37,35 +37,6 @@
 #include "stats.h"
 #include "ri_config.h"
 
-/* These are set by configure on UNIX, but we should set them to their
- * default values for systems that don't use configure and use the
- * standard directory layout
- */
-#ifndef PIXIE_RIBS
-#define PIXIE_RIBS			"%PIXIEHOME%/ribs"
-#endif
-
-#ifndef PIXIE_PROCEDURALS
-#define PIXIE_PROCEDURALS	"%PIXIEHOME%/prodedurals"
-#endif
-
-#ifndef PIXIE_TEXTURES
-#define PIXIE_TEXTURES		"%PIXIEHOME%/textures"
-#endif
-
-#ifndef PIXIE_SHADERS
-#define PIXIE_SHADERS		"%PIXIEHOME%/shaders"
-#endif
-
-#ifndef PIXIE_DISPLAYS
-#define PIXIE_DISPLAYS		"%PIXIEHOME%/displays"
-#endif
-
-#ifndef PIXIE_MODULES
-#define PIXIE_MODULES		"%PIXIEHOME%/modules"
-#endif
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	optionsDeleteSearchPath
