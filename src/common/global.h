@@ -63,8 +63,13 @@
 #undef C_EPSILON
 #endif
 
+#ifdef C_EPSILON_TINY
+#undef C_EPSILON_TINY
+#endif
+
 #define	C_INFINITY							1e30f
 #define	C_EPSILON							1e-6f
+#define	C_EPSILON_TINY						1e-12f
 #define C_PI                                3.141592653589793238462643383279502884197169399375105820974944592308
 
 // Logic constants

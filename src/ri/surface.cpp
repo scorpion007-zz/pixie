@@ -178,8 +178,8 @@ void	CPatch::dice(CShadingContext *r) {
 			double			u,v;
 
 			// If the parametric range is too small, we have to abort
-			if (ustep < C_EPSILON)	return;
-			if (vstep < C_EPSILON)	return;
+			if (ustep < C_EPSILON_TINY)	return;
+			if (vstep < C_EPSILON_TINY)	return;
 
 			// The current u/v/time vectors
 			float			*uv				=	varying[VARIABLE_U];
