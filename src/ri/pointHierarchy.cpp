@@ -116,7 +116,13 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 		if (currentNode < 0) {
 			CPointCloudPoint	*item		=	CMap<CPointCloudPoint>::items - currentNode;
 			
+			vector	D;
+			subvv(D,item->P,P);
+
 			// Sum this item
+			if (	(dotvv(D,N) < 0) && (dotvv(D,item->N) < 0)	) {				// map normals are the other way round
+				Cl[0]	+=	(float) (C_PI*item->dP*item->dP/dotvv(D,D));
+			}
 		} else {
 			CMapNode			*node		=	nodes.array + currentNode;
 			CPointCloudPoint	*average	=	CMap<CPointCloudPoint>::items + node->average;
@@ -125,13 +131,16 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 			vector	D;
 			subvv(D,average->P,P);
 
-			// Are we pointing towards each other?
-			if (	(dotvv(D,N) > 0) && (dotvv(D,average->N) < 0)		) {
+			// Compare the code angle to maximum solid angle
+			const float distSq	= dotvv(D,D);
+			const float dParea	= (float) (C_PI*average->dP*average->dP);
+			if (	(lengthv(D) > average->dP) && ((dParea / distSq) < 0.05)	) {
+			//if (	((dParea / distSq) < 0.05)	) {
 
-				// Compare the code angle to some random angle
-				if (	(average->dP / lengthv(D)) < cosf((float) radians(5))	) {
+				if (	(dotvv(D,N) < 0) && (dotvv(D,average->N) < 0)	) {		// map normals are the other way round
 					// Use the average
-					Cl[0]	+=	0.5f;
+					Cl[0]	+=	(float) (C_PI*average->dP*average->dP/dotvv(D,D));
+				} 
 				} else {
 
 					// Sanity check
@@ -143,7 +152,10 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 				}
 			}
 		}
-	}
+	
+	// FIXME: we should be weighting averages using the occlusion factor
+	// to avoid double-shadowing
+	Cl[0] /= (float) (4*C_PI);
 }
 
 
