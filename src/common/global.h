@@ -148,10 +148,12 @@ typedef union {
 // Include the global config file if available
 #ifdef HAVE_CONFIG_H
 	#include "../../config.h"
-#elifdef _WINDOWS
-	#include "../../config.windows.h"
 #else
-	#warn "The process you are using to build pixie lacks a config.h file."
+	#ifndef _WINDOWS
+		#include "../../config.windows.h"
+	#else
+		#warn "The process you are using to build pixie lacks a config.h file."
+	#endif
 #endif
 
 #endif
