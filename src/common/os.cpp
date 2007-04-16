@@ -124,9 +124,8 @@ static	time_t	osStartTimeMsec;
 // Comments				:
 void	osInit() {
 	struct timeval	ti;
-	struct timezone	tz;
 
-	gettimeofday(&ti, &tz);
+	gettimeofday(&ti, NULL);
 
 	osStartTimeSec	=	ti.tv_sec;
 	osStartTimeMsec	=	ti.tv_usec;
@@ -384,9 +383,8 @@ void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *use
 // Comments				:
 float	osTime() {
 	struct timeval	ti;
-	struct timezone	tz;
 
-	gettimeofday(&ti, &tz);
+	gettimeofday(&ti, NULL);
 
 	return (float) (ti.tv_sec - osStartTimeSec) + (ti.tv_usec - osStartTimeMsec) / 1000000.0f;
 }

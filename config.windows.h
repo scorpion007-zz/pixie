@@ -96,7 +96,7 @@
 #define HAVE_POWF 1
 
 /* Define to 1 if you have the `random' function. */
-#define HAVE_RANDOM 1
+/* #define HAVE_RANDOM 1 */
 
 /* Define to 1 if you have the `rmdir' function. */
 /* #undef HAVE_RMDIR */

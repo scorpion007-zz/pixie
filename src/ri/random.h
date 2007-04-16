@@ -194,10 +194,6 @@ static inline long int random() {
 	// If you're on an arch with sizeof(int) <= 2, this won't work
 	// but then again, why would you be rendering there...
 
-#if RAND_MAX < 0x7fffffff
-#warn "RAND_MAX is < 0x7fffffff.  random() won't be truely random."
-#endif
-
 	retval  = (rand() >> 15) & 0x0000ffff;
 	retval |=  rand()        & 0x7fff0000;
 

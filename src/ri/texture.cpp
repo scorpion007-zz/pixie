@@ -301,18 +301,22 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 		TIFFGetFieldDefaulted(in,TIFFTAG_BITSPERSAMPLE           ,&bitspersample);
 		tiled	=	TIFFIsTiled(in);
 
+		int bytesPerSample;
 		if (bitspersample == 8) {
-			pixelSize	=	numSamples*sizeof(unsigned char);
+			bytesPerSample	=	sizeof(unsigned char);
+			pixelSize		=	numSamples*sizeof(unsigned char);
 		} else if(bitspersample == 16){
-			pixelSize	=	numSamples*sizeof(unsigned short);
+			bytesPerSample	=	sizeof(unsigned short);
+			pixelSize		=	numSamples*sizeof(unsigned short);
 		} else {
 			assert(bitspersample == 32);
-			pixelSize	=	numSamples*sizeof(float);
+			bytesPerSample	=	sizeof(float);
+			pixelSize		=	numSamples*sizeof(float);
 		}
 
 		// Allocate space for the texture
 		assert(entry->data == NULL);
-		data		=	textureAllocateBlock(entry,context);
+		data				=	textureAllocateBlock(entry,context);
 
 		// Do we need to read the entire texture ?
 		if ((x != 0) || (y != 0) || (w != (int) width) || (h != (int) height)) {
@@ -348,7 +352,21 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 				assert((x % tileWidth)	== 0);
 				assert((y % tileHeight) == 0);
 
-				TIFFReadTile(in,data,x,y,0,0);
+				unsigned short planarConfig;
+				TIFFGetFieldDefaulted (in, TIFFTAG_PLANARCONFIG, &planarConfig);
+
+				if (planarConfig == PLANARCONFIG_SEPARATE)   {
+					unsigned char *buffer	= (unsigned char *) alloca(bytesPerSample*tileWidth*tileHeight);
+					unsigned char *cdata	= (unsigned char *) data;
+					for (int c = 0; c<numSamples; ++c) {
+						TIFFReadTile (in, buffer, x, y, 0, c);
+						for (unsigned int i = 0; i<tileWidth*tileHeight; ++i) {
+							memcpy (cdata + (i*numSamples+c)*bytesPerSample,buffer+i*bytesPerSample, bytesPerSample);					                         
+						}
+					}
+				} else {
+					TIFFReadTile(in,data,x,y,0,0);
+				}
 			}
 		} else {
 			// We need to read the entire texture
@@ -361,7 +379,21 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 				if ((x != 0) || (y != 0) || (w != (int) tileWidth) || (h != (int) tileHeight)) {
 					error(CODE_BUG,"Tiled unmade texture\n");
 				} else {
-					TIFFReadTile(in,data,x,y,0,0);
+					unsigned short planarConfig;
+					TIFFGetFieldDefaulted (in, TIFFTAG_PLANARCONFIG, &planarConfig);
+
+					if (planarConfig == PLANARCONFIG_SEPARATE)   {
+						unsigned char *buffer	= (unsigned char *)	alloca(bytesPerSample*tileWidth*tileHeight);
+						unsigned char *cdata	= (unsigned char *)	data;
+						for (int c = 0; c<numSamples; ++c) {
+							TIFFReadTile (in, buffer, x, y, 0, c);
+							for (unsigned int i = 0; i<tileWidth*tileHeight; ++i) {
+								memcpy (cdata + (i*numSamples+c)*bytesPerSample,buffer+i*bytesPerSample, bytesPerSample);
+							}
+						}
+					} else {	
+						TIFFReadTile(in,data,x,y,0,0);
+					}
 				}
 			} else {
 				int	i;
@@ -703,14 +735,16 @@ public:
 				// Description			:	Ctor
 				// Return Value			:	-
 				// Comments				:
-				CTiledTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,int tileSize,int tileSizeShift,double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
-					this->tileSize		=	tileSize;
-					this->tileSizeShift	=	tileSizeShift;
+				CTiledTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,int tileWidth,int tileWidthShift,int tileHeight, int tileHeightShift, double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
+					this->tileWidth			=	tileWidth;
+					this->tileWidthShift	=	tileWidthShift;
+					this->tileHeight		=	tileHeight;
+					this->tileHeightShift	=	tileHeightShift;
 
-					xTiles				=	(int) ceil((float) width / (float) tileSize);
-					yTiles				=	(int) ceil((float) height / (float) tileSize);
+					xTiles					=	(int) ceil((float) width / (float) tileWidth);
+					yTiles					=	(int) ceil((float) height / (float) tileHeight);
 
-					const int	tileLength	=	tileSize*tileSize*numSamples*sizeof(T);
+					const int	tileLength	=	tileWidth*tileHeight*numSamples*sizeof(T);
 					int			i,j;
 
 					dataBlocks			=	new CTextureBlock*[yTiles];
@@ -753,13 +787,14 @@ protected:
 						int					yTile;
 						CTextureBlock		*block;
 						const T				*data;
-						const int			t		=	tileSize - 1;
-						
+						const int			xt	=	tileWidth - 1;
+						const int			yt	=	tileHeight - 1;
+
 						int	xi		=	x+1;
 						int	yi		=	y+1;
 						
 						// these must be after the xi,yi calculation
-						
+						// x,y are relative to this layer
 						if (x < 0)			x  = (sMode == TEXTURE_PERIODIC) ? (x + width)   : 0;
 						if (y < 0)			y  = (tMode == TEXTURE_PERIODIC) ? (y + height)  : 0;
 						if (xi >= width)	xi = (sMode == TEXTURE_PERIODIC) ? (xi - width)  : (width - 1);
@@ -769,17 +804,17 @@ protected:
 
 						if (l->lookupFloat) {
 #define	access(__x,__y)																\
-							xTile	=	__x >> tileSizeShift;						\
-							yTile	=	__y >> tileSizeShift;						\
+							xTile	=	__x >> tileWidthShift;						\
+							yTile	=	__y >> tileHeightShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
 							if (block->threadData[thread].data == NULL) {			\
-								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,context);		\
+								textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
 							}																										\
 							CRenderer::textureRefNumber[thread]++;																	\
 							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
 																																	\
-							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];		\
+							data	=	&((T *) block->data)[(((__y & yt) )*tileWidth+(__x &xt))*numSamples+l->channel];			\
 							res[0]	=	(float) (data[0]*M);						\
 							res[1]	=	l->fill;									\
 							res[2]	=	l->fill;									\
@@ -794,17 +829,17 @@ protected:
 
 						} else {
 #define	access(__x,__y)																\
-							xTile	=	__x >> tileSizeShift;						\
-							yTile	=	__y >> tileSizeShift;						\
+							xTile	=	__x >> tileWidthShift;						\
+							yTile	=	__y >> tileHeightShift;						\
 							block	=	dataBlocks[yTile] + xTile;					\
 																					\
 							if (block->threadData[thread].data == NULL) {			\
-								textureLoadBlock(block,name,xTile << tileSizeShift,yTile << tileSizeShift,tileSize,tileSize,directory,context);		\
+								textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
 							}																										\
 							CRenderer::textureRefNumber[thread]++;																	\
 							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
 																																	\
-							data	=	&((T *) block->data)[(((__y & t) << tileSizeShift)+(__x & t))*numSamples+l->channel];		\
+							data	=	&((T *) block->data)[(((__y & yt))*tileWidth+(__x&xt))*numSamples+l->channel];				\
 							res[0]	=	(float) (data[0]*M);						\
 							res[1]	=	(float) (data[1]*M);						\
 							res[2]	=	(float) (data[2]*M);						\
@@ -823,7 +858,8 @@ protected:
 
 	CTextureBlock	**dataBlocks;
 	int				xTiles,yTiles;
-	int				tileSize,tileSizeShift;
+	int				tileWidth,tileWidthShift;
+	int				tileHeight,tileHeightShift;
 	double			M;
 };
 
@@ -1871,13 +1907,13 @@ public:
 // Comments				:
 template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int &dstart,int width,int height,char *smode,char *tmode,T enforcer) {
 	CMadeTexture			*cTexture;
-	int						i,j;
+	int						i;
 	uint32					fileWidth,fileHeight;
 	uint32					tileWidth,tileHeight;
 	uint16					numSamples;
 	int						cwidth,cheight;
 	TTextureMode			sMode,tMode;
-	int						tileSize,tileSizeShift;
+	int						tileWidthShift, tileHeightShift;
 	double					M;
 
 	fileWidth				=	0;
@@ -1888,12 +1924,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&fileWidth);
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&fileHeight);
 	TIFFGetFieldDefaulted(in,TIFFTAG_SAMPLESPERPIXEL         ,&numSamples);
-	TIFFGetFieldDefaulted(in,TIFFTAG_TILEWIDTH				 ,&tileWidth);
-	TIFFGetFieldDefaulted(in,TIFFTAG_TILELENGTH		         ,&tileHeight);
 
-	assert(tileWidth == tileHeight);
-
-	tileSize		=	tileWidth;
 
 	if (strcmp(smode,RI_PERIODIC) == 0) {
 		sMode	=	TEXTURE_PERIODIC;
@@ -1919,13 +1950,18 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 
 	cTexture	=	new CMadeTexture(aname);
 
-	for (i=1,j=0;i != tileSize;i = i << 1,j++);
-	tileSizeShift		=	j;
 
 	if (sizeof(T) == sizeof(float)) {
 		M		=	1;
 	} else if(sizeof(T) == sizeof(unsigned short)) {
-		M		= 	1.0/65535.0;
+		// This doesn't really make sense to me, but it does give correct results.
+		// It seems that pixar-txmake generated textures have the photometric RGB flag
+		// and they want to be dealt with by dividing the 16-bit val by 32k, not 65k.
+		// I guess that means it's a signed 16-bit value in pixar-land ?
+		unsigned short photoMetric = 0;
+		TIFFGetFieldDefaulted(in,TIFFTAG_PHOTOMETRIC              ,&photoMetric);
+		if (photoMetric == PHOTOMETRIC_RGB)		M	= 1.0/65535.0 * 2.0;
+		else									M	= 1.0/65535.0;
 	} else {
 		M		=	1.0/255.0;
 	}
@@ -1940,9 +1976,18 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 	cheight				=	height;
 	for (i=0;i<pyramidSize;i++) {
 		TIFFSetDirectory(in,dstart);
-		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&fileWidth);
-		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&fileHeight);
-		cTexture->layers[i]	=	new CTiledTexture<T>(name,dstart,cwidth,cheight,numSamples,fileWidth,fileHeight,sMode,tMode,tileSize,tileSizeShift,M);
+		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH             ,&fileWidth);
+		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH            ,&fileHeight);
+
+		TIFFGetFieldDefaulted(in,TIFFTAG_TILEWIDTH              ,&tileWidth);
+		TIFFGetFieldDefaulted(in,TIFFTAG_TILELENGTH             ,&tileHeight);
+		int ii, jj;
+		for (ii=1,jj=0;ii != tileWidth;ii = ii << 1,jj++);
+		tileWidthShift           =       jj;
+		for (ii=1,jj=0;ii != tileHeight;ii = ii << 1,jj++);
+		tileHeightShift           =       jj;
+
+		cTexture->layers[i]	=	new CTiledTexture<T>(name,dstart,cwidth,cheight,numSamples,fileWidth,fileHeight,sMode,tMode,tileWidth,tileWidthShift,tileHeight, tileHeightShift, M);
 		dstart++;
 
 		cwidth				=	cwidth >> 1;
@@ -2006,9 +2051,13 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 		width	=	0;
 		height	=	0;
 		mode	=	NULL;
+#if 0
 		if (	(TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH       ,&width)	== 1) &&
 				(TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH      ,&height)	== 1)) {
-
+#else
+		if (	(TIFFGetField(in,TIFFTAG_IMAGEWIDTH       ,&width)	== 1) &&
+				(TIFFGetField(in,TIFFTAG_IMAGELENGTH      ,&height)	== 1)) {   
+#endif
 			if (TIFFGetField(in,TIFFTAG_PIXAR_WRAPMODES ,&mode)		== 1) {
 				strcpy(tmp,mode);
 				smode	=	tmp;
@@ -2029,6 +2078,8 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 				cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,1);
 			}
 		}
+      else {
+      }
 	} 
 	
 	if (cTexture == NULL) {
@@ -2077,7 +2128,6 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 		char	*textureFormat = NULL;
 
 		if (TIFFGetField(in,TIFFTAG_PIXAR_TEXTUREFORMAT,&textureFormat) == 1) {
-			
 			if (strcmp(textureFormat,TIFF_TEXTURE) == 0)
 				// This seems like a made texture
 				cTexture	=	texLoad(fn,name,in,directory);
