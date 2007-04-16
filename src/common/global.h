@@ -149,7 +149,7 @@ typedef union {
 #ifdef HAVE_CONFIG_H
 	#include "../../config.h"
 #else
-	#ifndef _WINDOWS
+	#ifdef _WINDOWS
 		#include "../../config.windows.h"
 	#else
 		#warn "The process you are using to build pixie lacks a config.h file."
