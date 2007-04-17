@@ -120,7 +120,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 			subvv(D,item->P,P);
 
 			// Sum this item
-			if (	(dotvv(D,N) < 0) && (dotvv(D,item->N) < 0)	) {				// map normals are the other way round
+			if (	(dotvv(D,N) > 0) && (dotvv(D,item->N) < 0)	) {
 				Cl[0]	+=	(float) (C_PI*item->dP*item->dP/dotvv(D,D));
 			}
 		} else {
@@ -132,26 +132,25 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 			subvv(D,average->P,P);
 
 			// Compare the code angle to maximum solid angle
-			const float distSq	= dotvv(D,D);
-			const float dParea	= (float) (C_PI*average->dP*average->dP);
+			const float distSq	= dotvv(D,D) + C_EPSILON;
+			const float dParea	= C_PI*average->dP*average->dP;
 			if (	(lengthv(D) > average->dP) && ((dParea / distSq) < 0.05)	) {
 			//if (	((dParea / distSq) < 0.05)	) {
 
-				if (	(dotvv(D,N) < 0) && (dotvv(D,average->N) < 0)	) {		// map normals are the other way round
+				if (	(dotvv(D,N) > 0) && (dotvv(D,average->N) < 0)	) {
 					// Use the average
 					Cl[0]	+=	(float) (C_PI*average->dP*average->dP/dotvv(D,D));
-				} 
-				} else {
-
-					// Sanity check
-					assert((stack-stackBase) < 98);
-
-					// Split
-					*stack++	=	node->child0;
-					*stack++	=	node->child1;
 				}
+			} else {
+				// Sanity check
+				assert((stack-stackBase) < 98);
+		
+				// Split
+				*stack++	=	node->child0;
+				*stack++	=	node->child1;
 			}
 		}
+	}
 	
 	// FIXME: we should be weighting averages using the occlusion factor
 	// to avoid double-shadowing
