@@ -94,7 +94,7 @@ void		CPointHierarchy::store(const float *Cl,const float *Pl,const float *Nl,flo
 // Description			:	Lookup smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP) {
+void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP,float maxsolidangle) {
 	int		*stack		=	(int *) alloca(100*sizeof(int));
 	int		*stackBase	=	stack;
 	int		i;
@@ -134,7 +134,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 			// Compare the code angle to maximum solid angle
 			const float distSq	= dotvv(D,D) + C_EPSILON;
 			const float dParea	= C_PI*average->dP*average->dP;
-			if (	(lengthv(D) > average->dP) && ((dParea / distSq) < 0.05)	) {
+			if (	(lengthv(D) > average->dP) && ((dParea / distSq) < maxsolidangle)	) {
 			//if (	((dParea / distSq) < 0.05)	) {
 
 				if (	(dotvv(D,N) > 0) && (dotvv(D,average->N) < 0)	) {

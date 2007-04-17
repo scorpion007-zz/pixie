@@ -301,6 +301,7 @@ CTexture3dLookup::CTexture3dLookup(const CAttributes *attributes) {
 	radius				=	-1.0f;
 	radiusScale			=	1.0f;
 	interpolate			=	FALSE;
+	maxsolidangle		=	0.05f;
 	numChannels			=	0;
 	index				=	NULL;
 	entry				=	NULL;

@@ -202,6 +202,7 @@ public:
 		float				radius;					// The sample radius
 		float				radiusScale;			// Blur amount
 		int					interpolate;			// Bake polygon centres
+		float				maxsolidangle;			// Maximum solid angle for point based occlusion
 		int					numChannels;			// The number of channels bake3d provides
 		int					*index,*entry,*size;	// Entry points for every channel
 };

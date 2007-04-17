@@ -2312,6 +2312,8 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											lookup->pointHierarchy	=	CRenderer::getTexture3d(vals[0],FALSE,"_area",CRenderer::fromWorld,CRenderer::toWorld,TRUE);						\
 										} else if (strcmp(*param,"radiusscale") == 0) {							\
 											lookup->radiusScale	=	*valf;										\
+										} else if (strcmp(*param,"maxsolidangle") == 0) {							\
+											lookup->maxsolidangle	=	*valf;										\
 										} else if (strcmp(*param,"radius") == 0) {								\
 											lookup->radius		=	*valf;										\
 										} else if (strcmp(*param,"coordsystem") == 0) {							\
