@@ -552,3 +552,4 @@ const char			*CAttributes::findShadingModel(EShadingModel model) {
 
 	return "matte";
 }
+
