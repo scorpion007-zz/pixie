@@ -215,7 +215,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 
 		for (i=0;i<7;i++)	C[i]	=	0;
 
-		lookup->pointHierarchy->lookup(C+3,cP,cN,dSample,lookup->maxsolidangle);
+		lookup->pointHierarchy->lookup(C+3,cP,cN,dSample,context,lookup);
 	} else {
 		CCacheSample		*cSample;
 		CCacheNode			*cNode;

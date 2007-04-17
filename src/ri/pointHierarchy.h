@@ -48,9 +48,9 @@ public:
 							CPointHierarchy(const char *,const float *from,const float *to,FILE *);
 							~CPointHierarchy();
 
-	void					lookup(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *) {	assert(FALSE);	}
+	void					lookup(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *);
 	void					store(const float *,const float *,const float *,float);
-	void					lookup(float *,const float *,const float *,float);
+	void					lookup(float *,const float *,const float *,float)  {	assert(FALSE);	}
 
 protected:
 	CArray<float>			data;				// This is where we actually keep the data

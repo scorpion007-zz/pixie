@@ -94,9 +94,10 @@ void		CPointHierarchy::store(const float *Cl,const float *Pl,const float *Nl,flo
 // Description			:	Lookup smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP,float maxsolidangle) {
-	int		*stack		=	(int *) alloca(100*sizeof(int));
-	int		*stackBase	=	stack;
+void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP,CShadingContext *context,const CTexture3dLookup *l) {
+	const float maxsolidangle	=	l->maxsolidangle;
+	int		*stack				=	(int *) alloca(100*sizeof(int));
+	int		*stackBase			=	stack;
 	int		i;
 	vector	P,N;
 
