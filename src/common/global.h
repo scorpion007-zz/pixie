@@ -149,12 +149,17 @@ typedef union {
 #ifdef HAVE_CONFIG_H
 	#include "../../config.h"
 #else
+
+	// Are we running under Visual Studio?
 	#ifdef _WINDOWS
 		#include "../../config.windows.h"
-	#else
-		#warn "The process you are using to build pixie lacks a config.h file."
 	#endif
-#endif
+	
+	// Are we running under XCode?
+	#if defined(__APPLE__) || defined(__APPLE_CC__)
+		#include "../../config.xcode.h"
+	#endif
 
 #endif
 
+#endif
