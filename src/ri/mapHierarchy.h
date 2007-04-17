@@ -295,6 +295,18 @@ protected:
 									
 								}
 								
+								while (num0 == 0 || num1 == 0) {
+									// clustering failed - probably coincident points
+									// make random spilt
+									num0 = num1 = 0;
+									for (i=0;i<numItems;i++) {
+										const int which = _irand()%2;
+										if (which)	num1++;
+										else		num0++;
+										membership[i] = which;
+									}
+								}
+								
 								assert((num0 + num1) == numItems);
 								CMapNode	node;
 
