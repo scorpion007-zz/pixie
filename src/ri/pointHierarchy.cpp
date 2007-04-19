@@ -134,7 +134,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 
 			// Compare the code angle to maximum solid angle
 			const float distSq	= dotvv(D,D) + C_EPSILON;
-			const float dParea	= C_PI*average->dP*average->dP;
+			const float dParea	= (float) C_PI*average->dP*average->dP;
 			if (	(lengthv(D) > average->dP) && ((dParea / distSq) < maxsolidangle)	) {
 			//if (	((dParea / distSq) < 0.05)	) {
 

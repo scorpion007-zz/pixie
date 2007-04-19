@@ -188,6 +188,9 @@ protected:
 						// Return Value			:	-
 						// Comments				:
 	int					cluster(int numItems,int *indices) {
+
+							assert(numItems > 0);
+
 							if (numItems == 1) {
 								// Create a leaf
 								return -indices[0];
