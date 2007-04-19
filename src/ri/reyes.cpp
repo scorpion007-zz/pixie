@@ -962,15 +962,15 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		float				*u;
 		float				*v;
 		float				*time;
-		float				cu,cv;
+		double				cu,cv;
 		T32					*Oi;
 
 
 		const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
-		const float			ustart		=	grid->umin;					// The minimum step sizes
-		const float			ustep		=	(grid->umax - ustart) / (float) udiv;
-		const float			vstart		=	grid->vmin;
-		const float			vstep		=	(grid->vmax - vstart) / (float) vdiv;
+		const double		ustart		=	grid->umin;					// The minimum step sizes
+		const double		ustep		=	(grid->umax - ustart) / (double) udiv;
+		const double		vstart		=	grid->vmin;
+		const double		vstep		=	(grid->vmax - vstart) / (double) vdiv;
 
 		assert(numVertices <= (int) CRenderer::maxGridSize);
 
@@ -982,8 +982,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		// Shade the minimum grid
 		for (j=vdiv,cv=vstart;j>=0;j--,cv+=vstep) {
 			for (i=udiv,cu=ustart;i>=0;i--,cu+=ustep) {
-				*u++		=	cu;
-				*v++		=	cv;
+				*u++		=	(float) cu;
+				*v++		=	(float) cv;
 				*time++		=	0;
 			}
 		}
@@ -1051,8 +1051,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			// Shade the minimum grid
 			for (j=vdiv,cv=vstart;j>=0;j--,cv+=vstep) {
 				for (i=udiv,cu=ustart;i>=0;i--,cu+=ustep) {
-					*u++		=	cu;
-					*v++		=	cv;
+					*u++		=	(double) cu;
+					*v++		=	(double) cv;
 					*time++		=	1;
 				}
 			}
