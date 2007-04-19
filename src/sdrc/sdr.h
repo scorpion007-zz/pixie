@@ -114,6 +114,7 @@ const	int		SLC_ARRAY				=	1 << 11;	// Variable is an array
 const	int		SLC_EXTERN				=	1 << 12;	// Variable is an extern
 
 const	int		SLC_UNIFORM				=	1 << 13;	// Variable is uniform
+const	int		SLC_VARYING				=	1 << 14;	// Variable is varying (used only to differentiate non uniform params)
 														// Note 1<<15 was removed
 
 const	int		SLC_LOCKED				=	1 << 16;	// Variable is a locked temporary variable

@@ -259,7 +259,7 @@ slContainerClass:
 			|
 			SL_VARIABLE
 			{
-				$$	=	0;
+				$$	=	SLC_VARYING;
 			}
 			|
 			{
@@ -674,6 +674,14 @@ slShaderParameter:
 		slTypeDecl
 		{
 			int	type	=	$1;
+			
+			if (type & SLC_VARYING) {
+				// clear this marker, only used to invert the
+				// default from varying to uniform
+				type &= ~SLC_VARYING;
+			} else {	 
+				type |= SLC_UNIFORM;	 
+			}
 
 			sdr->undesire();
 			sdr->desire(type);
