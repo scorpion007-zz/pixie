@@ -311,6 +311,8 @@ void	CPatch::dice(CShadingContext *r) {
 			if ((numUprobes == (udiv+1)) && (numVprobes == (vdiv+1))) {
 
 				// FIXME: If the grid is close to the bucket we're rendering, we must dispatch now
+				// GSH: the disadvantage of doing this is that we will retain a higher cost grid
+				// even if it would get totally culled
 				
 				break;
 			}
@@ -1170,8 +1172,8 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 	float	**varying	=	context->currentShadingState->varying;
 
 	// Sample points on the patch
-	const float	ustep	=	(umax-umin) / (float) div;
-	const float	vstep	=	(vmax-vmin) / (float) div;
+	const double	ustep	=	(umax-umin) / (double) div;
+	const double	vstep	=	(vmax-vmin) / (double) div;
 
 	const	float time	=	(sample == PARAMETER_BEGIN_SAMPLE) ? 0.0f : 1.0f;
 	
@@ -1180,11 +1182,11 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 		float	*vv			=	varying[VARIABLE_V];
 		float	*timev		=	varying[VARIABLE_TIME];
 		int		up,vp;
-		float	u,v;
+		double	u,v;
 		for (vp=div+1,v=vmin;vp>0;vp--,v+=vstep) {
 			for (up=div+1,u=umin;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
+				*uv++		=	(float) u;
+				*vv++		=	(float) v;
 				*timev++	=	time;
 			}
 		}
@@ -1199,12 +1201,12 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 		
 		assert(div == 16);
 		
-		const int	hdiv	=	div/2;
-		const float	vh		=	vmin + ((float) hdiv+1)*vstep;
-		const float	uh		=	umin + ((float) hdiv+1)*ustep;
+		const int		hdiv	=	div/2;
+		const double	vh		=	vmin + ((double) hdiv+1)*vstep;
+		const double	uh		=	umin + ((double) hdiv+1)*ustep;
 		
 		int			up,vp;
-		float		u,v;
+		double		u,v;
 		float		*uv			=	varying[VARIABLE_U];
 		float		*vv			=	varying[VARIABLE_V];
 		float		*timev		=	varying[VARIABLE_TIME];
@@ -1214,8 +1216,8 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 		// top left 1/4			(hdiv+1 x hdiv+1)
 		for (vp=hdiv+1,v=vmin;vp>0;vp--,v+=vstep) {
 			for (up=hdiv+1,u=umin;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
+				*uv++		=	(float) u;
+				*vv++		=	(float) v;
 				*timev++	=	time;
 			}
 		}
@@ -1233,8 +1235,8 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 		timev		=	varying[VARIABLE_TIME];
 		for (vp=hdiv+1,v=vmin;vp>0;vp--,v+=vstep) {
 			for (up=hdiv,u=uh;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
+				*uv++		=	(float) u;
+				*vv++		=	(float) v;
 				*timev++	=	time;
 			}
 		}
@@ -1252,8 +1254,8 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 		timev		=	varying[VARIABLE_TIME];
 		for (vp=hdiv,v=vh;vp>0;vp--,v+=vstep) {
 			for (up=hdiv+1,u=umin;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
+				*uv++		=	(float) u;
+				*vv++		=	(float) v;
 				*timev++	=	time;
 			}
 		}
@@ -1271,8 +1273,8 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 		timev		=	varying[VARIABLE_TIME];
 		for (vp=hdiv,v=vh;vp>0;vp--,v+=vstep) {
 			for (up=hdiv,u=uh;up>0;up--,u+=ustep) {
-				*uv++		=	u;
-				*vv++		=	v;
+				*uv++		=	(float) u;
+				*vv++		=	(float) v;
 				*timev++	=	time;
 			}
 		}
@@ -1668,8 +1670,8 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 	
 	float	**varying	=	context->currentShadingState->varying;
 
-	const float	ustep	=	(umax-umin) / (float) udiv;
-	const float	vstep	=	(vmax-vmin) / (float) vdiv;
+	const double	ustep	=	(umax-umin) / (double) udiv;
+	const double	vstep	=	(vmax-vmin) / (double) vdiv;
 
 	// sanity check before dividing
 	if(umin>= umax || vmin>= vmax) {
@@ -1679,19 +1681,19 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 	// Compute the new patch parameteric splits
 	
 	int		cu,cv;
-	float	u,v;
+	double	u,v;
 
 	float *us = (float*) alloca(sizeof(float)*((udiv+1) + (vdiv+1)));	// don't use varyings as tesselate will smash them
 	float *vs = us + (udiv+1);
 	
 	
-	float	*vv			=	vs;
+	float	*vv		=	vs;
 	for (cv=0,v=vmin;cv<vdiv+1;cv++,v+=vstep) {
-		*vv++		=	v;
+		*vv++		=	(float) v;
 	}
 	float	*uv			=	us;
 	for (cu=0,u=umin;cu<udiv+1;cu++,u+=ustep) {
-		*uv++		=	u;
+		*uv++		=	(float) u;
 	}
 	
 	// ensure the ends are at the ends
