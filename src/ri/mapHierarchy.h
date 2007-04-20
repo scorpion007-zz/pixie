@@ -52,8 +52,9 @@ protected:
 	// Comments				:
 	class	CMapNode {
 	public:
-		int			average;			// The average item index
-		int			child0,child1;		// The children indices
+		vector		P,N;				// The center of the node
+		float		dP,dN;				// The average radius and maximum normal deviation (cosine)
+		int			child0,child1;		// The children indices (>=0 if internal nodes < if leaf)
 	};
 
 public:
@@ -90,7 +91,6 @@ public:
 							// Read the hierarchy next
 							int	numNodes;
 							fread(&numNodes,sizeof(int),1,in);
-							fread(&root,sizeof(int),1,in);
 							nodes.reserve(numNodes);
 							fread(nodes.array,sizeof(T),numNodes,in);
 							nodes.numItems	=	numNodes;
@@ -103,7 +103,6 @@ public:
 						// Return Value			:
 						// Comments				:
 	void				write(FILE *out) {
-							assert(root > 0);
 							assert(nodes.numItems > 0);
 
 							// Write the map first
@@ -111,7 +110,6 @@ public:
 
 							// Write the hierarchy next
 							fwrite(&nodes.numItems,sizeof(int),1,out);
-							fwrite(&root,sizeof(int),1,out);
 							fwrite(nodes.array,sizeof(T),nodes.numItems,out);
 						}
 
@@ -131,44 +129,59 @@ public:
 							for (i=1;i<=CMap<T>::numItems;i++)	tmp[i-1]	=	i;
 		
 							// Compute the map hierarchy
-							root	=	cluster(CMap<T>::numItems,tmp);
-							assert(root == nodes.numItems-1);
+							int	root	=	cluster(CMap<T>::numItems,tmp);
 
+							// Root is always the first item in the array
+							assert(root == 0);
+
+							// Ditch the temp memory
 							delete [] tmp;
 						}
 	
 						///////////////////////////////////////////////////////////////////////
 						// Class				:	CMapHierarchy
 						// Method				:	average
-						// Description			:	Average the items given by the indices
+						// Description			:	Create an internal node by averaging the point data
 						// Return Value			:	-
 						// Comments				:
 	int					average(int numItems,int *indices) {
-							int		i;
-							vector	P,N;
+							int			i;
+							CMapNode	node;
 
-							// Average the position/normal
-							initv(P,0);
-							initv(N,0);
+							// PASS 1:	Average the position/normal
+							initv(node.P,0);
+							initv(node.N,0);
 							for (i=0;i<numItems;i++) {
-								addvv(P,CMap<T>::items[indices[i]].P);
-								addvv(N,CMap<T>::items[indices[i]].N);
+								const T	*item	=	CMap<T>::items + indices[i];
+								addvv(node.P,item->P);
+								addvv(node.N,item->N);
 							}
 
 							// Normalize the thing
-							mulvf(P,1/(float) numItems);
-							normalizev(N);
+							assert(numItems > 0);
+							mulvf(node.P,1/(float) numItems);
+							normalizev(node.N);
 
-							// Perform further averagining if necessary
-							T	*newItem	=	CMap<T>::store(P,N);
-							average(newItem,numItems,indices);
+							// PASS 2:	Compute the maximum deviation
+							node.dP		=	0;
+							node.dN		=	1;
+							for (i=0;i<numItems;i++) {
+								vector	D;
+								const T	*item	=	CMap<T>::items + indices[i];
 
-							return newItem - CMap<T>::items;
+								subvv(D,node.P,item->P);
+								node.dP		+=	max((item->dP*item->dP*dotvv(node.N,item->N)),0);
+								node.dN		=	min(node.dN,dotvv(node.N,item->N));
+							}
+							node.dP		=	sqrtf(node.dP);
+
+							// Create the node
+							nodes.push(node);
+							return nodes.numItems - 1;
 						}
 
 protected:
 
-	int					root;
 	CArray<CMapNode>	nodes;					// This is where we keep the internal nodes
 
 
@@ -197,18 +210,18 @@ protected:
 
 							} else if (numItems == 2) {
 								// Easy case
-								CMapNode	node;
-								node.average	=	average(numItems,indices);
-								node.child0		=	-indices[0];
-								node.child1		=	-indices[1];
-								nodes.push(node);
-								return nodes.numItems - 1;
+								int			nodeIndex	=	average(numItems,indices);
+								CMapNode	*node		=	nodes.array + nodeIndex;
+								node->child0			=	-indices[0];
+								node->child1			=	-indices[1];
+								return nodeIndex;
 
 							} else {
 								
-								// Allocate the memory
+								// Allocate temp memory
 								int	*membership,*subItems;
 								
+								// Use alloca if the allocation size is low enough
 								if (numItems >= ALLOCA_MAX_ITEMS)	membership	=	new int[numItems*2];
 								else								membership	=	(int *) alloca(numItems*2*sizeof(int));
 
@@ -226,7 +239,8 @@ protected:
 									addBox(bmin,bmax,CMap<T>::items[indices[i]].P);
 								}
 								
-								vector	C0,C1;
+								vector	C0,C1;		// The cluster centers
+								vector	N0,N1;		// The cluster normals
 								
 								// Create random cluster centers
 								initv(C0,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
@@ -236,14 +250,20 @@ protected:
 											_urand()*(bmax[1]-bmin[1]) + bmin[1],
 											_urand()*(bmax[2]-bmin[2]) + bmin[2]);
 
-								int		changed	=	FALSE;
-								vector	nC0,nC1;
-								int		num0,num1;
-																		
+								// Create random cluster normals
+								initv(N0,	_urand()*2-1,	_urand()*2-1,	_urand()*2-1);
+								initv(N1,	_urand()*2-1,	_urand()*2-1,	_urand()*2-1);
+								normalizevf(N0);
+								normalizevf(N1);
 								
 								// Perform the clustering iterations
-								int	iterations;
+								int		num0,num1;
+								int		iterations;
 								for (iterations=0;iterations<5;iterations++) {
+
+									int		changed	=	FALSE;
+									vector	nC0,nC1;
+									vector	nN0,nN1;
 
 									// Clear the data
 									initv(nC0,0);
@@ -253,20 +273,25 @@ protected:
 									
 									for (i=0;i<numItems;i++) {
 										vector	D;
+										const	T	*cItem	=	CMap<T>::items + indices[i];
 										
-										subvv(D,CMap<T>::items[indices[i]].P,C0);
-										const float d0	=	dotvv(D,D);
+										// Compute the distance to the first cluster
+										subvv(D,cItem->P,C0);
+										const float d0	=	dotvv(D,D) / max(dotvv(N0,cItem->N),C_EPSILON);
 										
-										subvv(D,CMap<T>::items[indices[i]].P,C1);
-										const float d1	=	dotvv(D,D);
+										// Compute the distance to the second cluster
+										subvv(D,cItem->P,C1);
+										const float d1	=	dotvv(D,D) / max(dotvv(N1,cItem->N),C_EPSILON);;
 										
+										// Change the membership
 										if (d0 < d1) {
 											if (membership[i] != 0) {
 												changed			=	TRUE;
 												membership[i]	=	0;
 											}
 
-											addvv(nC0,CMap<T>::items[indices[i]].P);
+											addvv(nC0,cItem->P);
+											addvv(nN0,cItem->N);
 											num0++;
 										} else {
 											if (membership[i] != 1) {
@@ -274,7 +299,8 @@ protected:
 												membership[i]	=	1;
 											}
 
-											addvv(nC1,CMap<T>::items[indices[i]].P);
+											addvv(nC1,cItem->P);
+											addvv(nN1,cItem->N);
 											num1++;
 										}
 									}
@@ -287,23 +313,30 @@ protected:
 													_urand()*(bmax[1]-bmin[1]) + bmin[1],
 													_urand()*(bmax[2]-bmin[2]) + bmin[2]);
 
+										initv(N0,	_urand()*2-1,	_urand()*2-1,	_urand()*2-1);
+										initv(N1,	_urand()*2-1,	_urand()*2-1,	_urand()*2-1);
+										normalizevf(N0);
+										normalizevf(N1);
 									} else {
 
 										if (changed == FALSE)	break;
 
 										mulvf(C0,nC0,1 / (float) num0);
 										mulvf(C1,nC1,1 / (float) num1);
-									}
 
-									
+										// Normalize the normal vectors
+										normalizevf(N0,nN0);
+										normalizevf(N1,nN1);
+									}	
 								}
 								
+								// Do we have a bad clustering?
 								while (num0 == 0 || num1 == 0) {
-									// clustering failed - probably coincident points
-									// make random spilt
+
+									// Clustering failed - probably coincident points, make an arbitrary split
 									num0 = num1 = 0;
 									for (i=0;i<numItems;i++) {
-										const int which = _irand()%2;
+										const int which = i & 1;
 										if (which)	num1++;
 										else		num0++;
 										membership[i] = which;
@@ -311,27 +344,29 @@ protected:
 								}
 								
 								assert((num0 + num1) == numItems);
-								CMapNode	node;
 
-								node.average	=	average(numItems,indices);
+								int			nodeIndex	=	average(numItems,indices);
 								
 								// OK, split the items into two
 								int	j;
 								
 								for (i=0,j=0;i<numItems;i++)	if (membership[i] == 0)	subItems[j++]	=	indices[i];
 								assert(j == num0);
-								node.child0	=	cluster(num0,subItems);
+								int	child0	=	cluster(num0,subItems);
 								
 								for (i=0,j=0;i<numItems;i++)	if (membership[i] == 1)	subItems[j++]	=	indices[i];
 								assert(j == num1);
-								node.child1	=	cluster(num1,subItems);
+								int	child1	=	cluster(num1,subItems);
 								
-								nodes.push(node);
+								CMapNode *cNode	=	nodes.array + nodeIndex;
+								cNode->child0	=	child0;
+								cNode->child1	=	child1;
 
 								// Reclaim the memory if applicable
 								if (numItems >= ALLOCA_MAX_ITEMS)	delete [] membership;
 
-								return nodes.numItems-1;
+								// Return the index of the node
+								return nodeIndex;
 							}
 						}
 					

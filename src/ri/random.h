@@ -187,19 +187,25 @@ void	sampleSphere(float *P,CSobol<3> &generator);
 // rand() does not return random lower-order bits, so fix it up since this
 // platform doesn't have random().
 
-static inline long int random() {
-	long int retval;
+	#ifdef _WINDOWS
+	static inline long int random() {
+		// On Windows RAND_MAX is less than 0x7fffffff
+		return rand();
+	}
+	#else
+	static inline long int random() {
+		long int retval;
 
-	// Note that we are assuming RAND_MAX >= 0x7fffffff
-	// If you're on an arch with sizeof(int) <= 2, this won't work
-	// but then again, why would you be rendering there...
+		// Note that we are assuming RAND_MAX >= 0x7fffffff
+		// If you're on an arch with sizeof(int) <= 2, this won't work
+		// but then again, why would you be rendering there...
 
-	retval  = (rand() >> 15) & 0x0000ffff;
-	retval |=  rand()        & 0x7fff0000;
+		retval  = (rand() >> 15) & 0x0000ffff;
+		retval |=  rand()        & 0x7fff0000;
 
-	return retval;
-}
-
+		return retval;
+	}
+	#endif
 #endif
 
 // The variants of urand and irand that work without a shading context

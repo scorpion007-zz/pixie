@@ -63,13 +63,14 @@ protected:
 							// Overwritten from CMapHierarchy class to perform averaging of the points
 	void					average(CPointCloudPoint *dest,int numItems,int *indices) {
 
-								/*dest->dP	=	0;
+								dest->dP	=	0;
 								for (int i=0;i<numItems;i++) {
 									dest->dP	+=	items[indices[i]].dP;
 								}
-								dest->dP	/=	(float) numItems;
-								*/
-								
+								//dest->dP	/=	(float) numItems;
+
+
+								/*
 								vector bma,bmi;
 								initv(bmi,C_INFINITY);
 								initv(bma,-C_INFINITY);
@@ -78,6 +79,7 @@ protected:
 								}
 								subvv(bma,bmi);
 								dest->dP = max(max(bma[0],bma[1]),bma[2])*0.5f;
+								*/
 							}
 };
 
