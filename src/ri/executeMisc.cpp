@@ -490,7 +490,8 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 	inShadow		=	TRUE;					// We're in shadow
 
 	// Compute the ray differential
-	const float	*ab			=	rayDiff(from,L,NULL);
+	const float	*ab				=	rayDiff(from,L,NULL);
+	const float angleDeviation	=	tanf(coneAngle + C_EPSILON);
 
 	// Create the rays
 	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2) {
@@ -512,7 +513,7 @@ void	CShadingContext::traceTransmission(float *dest,const float *from,const floa
 					cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 					cRay->dest			=	dest;
 					cRay->multiplier	=	multiplier;
-					cRay->da			=	ab[0];		// The ray differential
+					cRay->da			=	ab[0] + angleDeviation;		// The ray differential
 					cRay->db			=	ab[1];
 					*cRays++			=	cRay++;
 					if (--numRemaining == 0) {
@@ -578,7 +579,8 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
 
 	// Compute the ray differential
-	const float	*ab			=	rayDiff(from,dir,NULL);
+	const float	*ab				=	rayDiff(from,dir,NULL);
+	const float angleDeviation	=	tanf(coneAngle + C_EPSILON);
 
 	for (i=currentShadingState->numRealVertices;i>0;i--,tags++,ab+=2) {
 		if (*tags == 0) {
@@ -595,7 +597,7 @@ void	CShadingContext::traceReflection(float *dest,const float *from,const float 
 					cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 					cRay->dest			=	dest;
 					cRay->multiplier	=	multiplier;
-					cRay->da			=	ab[0];		// The ray differential
+					cRay->da			=	ab[0] + angleDeviation;		// The ray differential
 					cRay->db			=	ab[1];
 					*cRays++			=	cRay++;
 					if (--numRemaining == 0) {
