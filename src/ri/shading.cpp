@@ -738,8 +738,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				float	kv			=	dotvv(I,dPdv);	kv	=	isqrtf((lengthv*lengthi - (kv*kv)) / (lengthv*lengthi + C_EPSILON));
 
 				const float	dest	=	du[i];				// The ray crosssection at the intersection
-				const float	dud		=	ku * dest * isqrtf(lengthu) + C_EPSILON;		// FIXME: Ensure absolute bounds on du and dv (if above divisor is very small)
-				const float	dvd		=	kv * dest * isqrtf(lengthv) + C_EPSILON;
+				// Note: we are clamping the maximal du dv because otherwise the surface
+				// sampling becomes grossly inaccurate, and in recursive raytracing, db
+				// grows unboundedly, causing inf and nan, and messing up filtering
+				// These are the 0-1 patch uvs, not the expanded range uvs, so this is OK.
+				const float	dud		=	min(ku * dest * isqrtf(lengthu) + C_EPSILON,1.0e3f);
+				const float	dvd		=	min(kv * dest * isqrtf(lengthv) + C_EPSILON,1.0e3f);
 				
 				// Create one more shading point at (u + du,v)
 				u[j]		=	u[i] + dud;
