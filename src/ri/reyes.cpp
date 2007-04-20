@@ -1051,8 +1051,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			// Shade the minimum grid
 			for (j=vdiv,cv=vstart;j>=0;j--,cv+=vstep) {
 				for (i=udiv,cu=ustart;i>=0;i--,cu+=ustep) {
-					*u++		=	(double) cu;
-					*v++		=	(double) cv;
+					*u++		=	(float) cu;
+					*v++		=	(float) cv;
 					*time++		=	1;
 				}
 			}
