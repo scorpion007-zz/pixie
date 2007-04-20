@@ -36,12 +36,42 @@
 #include "stats.h"
 #include "memory.h"
 #include "shading.h"
+#include "surface.h"
 #include "error.h"
 #include "patchUtils.h"
 #include "renderer.h"
 #include "rendererContext.h"
 #include "common/polynomial.h"
 
+#define	checkRay(rv)											\
+	if (! (rv->flags & attributes->flags) )	return;				\
+																\
+	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {				\
+		const float importance = attributes->lodImportance;		\
+		if (importance >= 0) {									\
+			if (rv->jimp > importance)			return;			\
+		} else {												\
+			if ((1-rv->jimp) >= -importance)	return;			\
+		}														\
+	}															\
+																\
+	if ((attributes->displacement != NULL) && (attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)) {						\
+		/* Do we have a grid ? */								\
+		if (children == NULL) {									\
+			osLock(CRenderer::tesselateMutex);					\
+																\
+			if (children == NULL) {								\
+				osLock(CRenderer::refCountMutex);				\
+				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);	\
+				osUnlock(CRenderer::refCountMutex);				\
+				tesselation->initTesselation(context);			\
+				tesselation->attach();							\
+				children				=	tesselation;		\
+			}													\
+			osUnlock(CRenderer::tesselateMutex);				\
+		}														\
+		return;													\
+	}
 
 ///////////////////////////////////////////////////////////////////////
 // Macro				:	gatherData
@@ -191,16 +221,7 @@ CBilinearPatch::~CBilinearPatch() {
 // Comments				:	-
 void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 
-	if (! (cRay->flags & attributes->flags) )	return;
-
-	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
-		const float importance = attributes->lodImportance;
-		if (importance >= 0) {
-			if (cRay->jimp > importance)			return;
-		} else {
-			if ((1-cRay->jimp) >= -importance)		return;
-		}
-	}
+	checkRay(cRay);
 
 	const int	vertexSize	=	variables->vertexSize;
 	const float	*P00		=	vertex;
