@@ -681,11 +681,11 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 						P[2]	=	a[2]*u*v + b[2]*u + c[2]*v + d[2];			\
 																				\
 						if ((q[COMP_X]*q[COMP_X] >= q[COMP_Y]*q[COMP_Y]) && (q[COMP_X]*q[COMP_X] >= q[COMP_Z]*q[COMP_Z]))	\
-							t	=	(P[COMP_X] - r[COMP_X]) / q[COMP_X];		\
+							t	=	(P[COMP_X] - r[COMP_X]) * iq[COMP_X];		\
 						else if (q[COMP_Y]*q[COMP_Y] >= q[COMP_Z]*q[COMP_Z])	\
-							t	=	(P[COMP_Y] - r[COMP_Y]) / q[COMP_Y];		\
+							t	=	(float) ((P[COMP_Y] - r[COMP_Y]) * iq[COMP_Y]);		\
 						else													\
-							t	=	(P[COMP_Z] - r[COMP_Z]) / q[COMP_Z];		\
+							t	=	(float) ((P[COMP_Z] - r[COMP_Z]) * iq[COMP_Z]);		\
 																				\
 						if ((t > cRay->tmin) && (t < cRay->t)) {				\
 							vector	dPdu,dPdv,N;								\
@@ -757,15 +757,17 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 						break;													\
 				}
 		
+		// Common ray properties
+		const float	*r		=	cRay->from;
+		const float	*q		=	cRay->dir;
+		const double*iq		=	cRay->invDir;
+
 		// We treat moving patches differently
 		if (!(flags & OBJECT_MOVING_TESSELATION)) {
 		
 			// No motion
 			if (div == 1) {
-				// 1x1
-				const float	*r		=	cRay->from;
-				const float	*q		=	cRay->dir;
-			
+				// 1x1			
 				const float	*P00	=	thisTesselation->P;
 				const float	*P10	=	P00+3;
 				const float	*P01	=	P00+6;
@@ -784,9 +786,6 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				if (subsample) {
 					// downsample 4x4 to 2x2 (not the same as above because we divided
 					// in the parametric space here we quads intersect directly
-					
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
 					
 					const float urg		=	2.0f*(umax - umin) / (float) div;
 					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
@@ -808,10 +807,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					}
 				} else {
 					// 2x2 or 4x4 quads intersect directly
-					
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
-					
+										
 					const float urg		=	(umax - umin) / (float) div;
 					const float vrg		=	(vmax - vmin) / (float) div;
 					
@@ -835,14 +831,11 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					// downsample 8x8 to 4x4 or 16x16 to 8x8
 					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
 					// we bound-intersect each 2x2 subgrid before intersecting quads
-									
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
-					
+										
 					const float urg		=	2.0f*(umax - umin) / (float) div;
 					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
-			
-					int nb				=	div>>2;
+					
+					const int nb		=	div>>2;
 					
 					const float	*P		=	thisTesselation->P;
 					const float	*cB		=	P+(div+1)*(div+1)*3;
@@ -877,14 +870,11 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				} else {
 					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
 					// we bound-intersect each 4x4 subgrid before intersecting quads
-					
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
-					
+										
 					const float urg		=	(umax - umin) / (float) div;
 					const float vrg		=	(vmax - vmin) / (float) div;
 			
-					int nb				=	div>>2;
+					const int nb		=	div>>2;
 								
 					const float	*P		=	thisTesselation->P;
 					const float	*cB		=	P+(div+1)*(div+1)*3;
@@ -928,9 +918,6 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 			vector P00,P10,P01,P11;
 			
 			if (div == 1) {
-				const float	*r		=	cRay->from;
-				const float	*q		=	cRay->dir;
-				
 				const float	*Pt0	=	thisTesselation->P;
 				const float	*Pt1	=	Pt0 + 4*3;
 				
@@ -948,18 +935,15 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				intersectQuads();
 				return;
 				
-			} else if (div <= 4) {
+			} else if (div <= 4) {				
 				if (subsample) {
 					// downsample 4x4 to 2x2 (not the same as above because we divided
 					// in the parametric space here we quads intersect directly
 					
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
-					
 					const float urg		=	2.0f*(umax - umin) / (float) div;
 					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
 										
-					const int nb = div>>1;
+					const int nb		=	div>>1;
 					
 					const float	*cP0	=	thisTesselation->P;
 					const float	*cP1	=	cP0 + (div+1)*(div+1)*3;
@@ -978,9 +962,6 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					}
 				} else {
 					// 2x2 or 4x4 quads intersect directly
-					
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
 					
 					const float urg		=	(umax - umin) / (float) div;
 					const float vrg		=	(vmax - vmin) / (float) div;
@@ -1007,14 +988,11 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					// downsample 8x8 to 4x4 or 16x16 to 8x8
 					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
 					// we bound-intersect each 2x2 subgrid before intersecting quads
-									
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
 					
 					const float urg		=	2.0f*(umax - umin) / (float) div;
 					const float vrg		=	2.0f*(vmax - vmin) / (float) div;
 			
-					int nb				=	div>>2;
+					const int nb		=	div>>2;
 					
 					const float	*Pt0	=	thisTesselation->P;
 					const float	*Pt1	=	Pt0+(div+1)*(div+1)*3;
@@ -1053,13 +1031,10 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 					// 8x8 or 16x16 quads (or greater if 3*maxGridSize allows)
 					// we bound-intersect each 4x4 subgrid before intersecting quads
 					
-					const float	*r		=	cRay->from;
-					const float	*q		=	cRay->dir;
-					
 					const float urg		=	(umax - umin) / (float) div;
 					const float vrg		=	(vmax - vmin) / (float) div;
 					
-					int nb				=	div>>2;
+					const int nb		=	div>>2;
 					
 					const float	*Pt0	=	thisTesselation->P;
 					const float	*Pt1	=	Pt0+(div+1)*(div+1)*3;
