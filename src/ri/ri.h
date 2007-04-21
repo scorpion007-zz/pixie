@@ -75,9 +75,6 @@ typedef RtString	RtShaderHandle;
 typedef RtFloat		(*RtFilterFunc)(RtFloat, RtFloat, RtFloat, RtFloat);
 typedef RtVoid		(*RtErrorHandler)(RtInt code, RtInt severity, char *msg);
 typedef RtVoid		(*RtFunc)(const char *);
-typedef RtPointer	RtObjectHandle;
-typedef RtPointer	RtLightHandle;
-typedef RtPointer	RtContextHandle;
 
 #define RI_FALSE    0
 #define RI_TRUE     1
