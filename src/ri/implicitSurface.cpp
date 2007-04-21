@@ -133,7 +133,7 @@ void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
 	tmax	=	ray->t;
 
 	// Find an intersection if any
-	if (intersectBox(bmin,bmax,ray->from,ray->dir,tmin,tmax)) {
+	if (intersectBox(bmin,bmax,ray->from,ray->dir,ray->invDir,tmin,tmax)) {
 		lastT		=	tmin;
 		lastP[0]	=	(float) (ray->from[0] + ray->dir[0]*lastT);
 		lastP[1]	=	(float) (ray->from[1] + ray->dir[1]*lastT);

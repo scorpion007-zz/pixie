@@ -852,7 +852,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 							
 							float tmin = cRay->tmin;
 							float tmax = cRay->t;
-							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,cRay->invDir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
 								continue;
 							}
 							
@@ -894,7 +894,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 							
 							float tmin = cRay->tmin;
 							float tmax = cRay->t;
-							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,cRay->invDir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
 								continue;
 							}
 							
@@ -1025,7 +1025,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 							
 							float tmin = cRay->tmin;
 							float tmax = cRay->t;
-							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,cRay->invDir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
 								continue;
 							}
 							
@@ -1070,7 +1070,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 							
 							float tmin = cRay->tmin;
 							float tmax = cRay->t;
-							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
+							if (!intersectBox(cB,cB+3,cRay->from,cRay->dir,cRay->invDir,tmin,tmax)) {	// TODO: pull out ray t etc to shadows
 								continue;
 							}
 							
