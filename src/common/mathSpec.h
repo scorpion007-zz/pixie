@@ -464,8 +464,8 @@ inline	int		intersectBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,const S
 		if (D[i] == 0) {
 			if ((F[i] > bmax[i]) || (F[i] < bmin[i])) return FALSE;
 		} else {
-			t1		=	(bmin[i] - F[i]) * invD[i];
-			t2		=	(bmax[i] - F[i]) * invD[i];
+			t1		=	(SCALAR_TYPE) ((bmin[i] - F[i]) * invD[i]);
+			t2		=	(SCALAR_TYPE) ((bmax[i] - F[i]) * invD[i]);
 
 			if (t1 < t2) {
 				if (t1 > tnear)	tnear = t1;
@@ -490,16 +490,16 @@ inline	int		intersectBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,const S
 
 // True if a ray intersects a box (the same as above but takes inverse of the direction)
 inline	SCALAR_TYPE		nearestBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,const SCALAR_TYPE *F,const double *invD,SCALAR_TYPE tmin,SCALAR_TYPE tmax) {
-	double			tnear,tfar;
-	double			t1,t2;
+	SCALAR_TYPE		tnear,tfar;
+	SCALAR_TYPE		t1,t2;
 	unsigned int	i;
 
 	tnear	=	tmin;
 	tfar	=	tmax;
 
 	for (i=0;i<3;i++) {
-		t1		=	(bmin[i] - F[i]) * invD[i];
-		t2		=	(bmax[i] - F[i]) * invD[i];
+		t1		=	(SCALAR_TYPE) ((bmin[i] - F[i]) * invD[i]);
+		t2		=	(SCALAR_TYPE) ((bmax[i] - F[i]) * invD[i]);
 
 		if (t1 < t2) {
 			if (t1 > tnear)	tnear = t1;
