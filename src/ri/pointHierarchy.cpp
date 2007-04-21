@@ -176,6 +176,15 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP
 			Cl[0]	+=	ff(P,N,item->P,item->N,item->dP);
 		} else {
 			const CMapNode			*node	=	nodes.array + currentNode;
+			
+			// Do we have any normal variation?
+			if (node->dN == 1) {
+			
+				// Are we behind the node?
+				if (dotvv(P,node->N) <= dotvv(node->P,node->N)) continue;
+			}
+			
+			// FIXME: A more general behind test would be nice
 
 			// Decide whether we want to split this node
 			vector	D;
