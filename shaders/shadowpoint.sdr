@@ -115,7 +115,7 @@ varying	float	temporary_21
 	shadow	("f=SFp")  atten  shadowname_py  0  Ps 
 #!Label28:
 	else              	#!Label27
-	shadow	("f=SFp")  atten  shadowname_nx  0  Ps 
+	shadow	("f=SFp")  atten  shadowname_ny  0  Ps 
 #!Label27:
 	endif             
 #!Label26:
@@ -131,7 +131,7 @@ varying	float	temporary_21
 	shadow	("f=SFp")  atten  shadowname_pz  0  Ps 
 #!Label32:
 	else              	#!Label31
-	shadow	("f=SFp")  atten  shadowname_nx  0  Ps 
+	shadow	("f=SFp")  atten  shadowname_nz  0  Ps 
 #!Label31:
 	endif             
 #!Label29:

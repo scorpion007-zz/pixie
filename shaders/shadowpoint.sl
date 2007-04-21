@@ -38,11 +38,11 @@ light shadowpoint (float intensity = 1;
 			}
 			else if ((ay > ax) && (ay > az)) {
 				if (ycomp(Lworld) > 0.0)	atten = shadow( shadowname_py, Ps);
-				else						atten = shadow( shadowname_nx, Ps);
+				else						atten = shadow( shadowname_ny, Ps);
 			}
 			else if ((az > ay) && (az > ax)) {
 				if (zcomp(Lworld) > 0.0)	atten = shadow( shadowname_pz, Ps);
-				else						atten = shadow( shadowname_nx, Ps);
+				else						atten = shadow( shadowname_nz, Ps);
 			}
 
 			Cl = (1.0 - atten) * intensity * lightcolor / (L . L);
