@@ -187,46 +187,6 @@ AC_SUBST(FLTK_CXXFLAGS)
 AC_SUBST(FLTK_LDFLAGS)
 
 dnl ---------------------------------------------------
-dnl Set custom directories for shaders, models, procedurals, and displays
-dnl
-
-AC_ARG_WITH(docdir,
-	AS_HELP_STRING([--with-docdir=DIR],[directory where we install documentation (Default: DATADIR/doc/Pixie)]),
-	docdir="${withval}",
-	docdir="${datadir}/doc/Pixie")
-
-AC_ARG_WITH(shaderdir,
-	AS_HELP_STRING([--with-shaderdir=DIR],[directory where we store shaders (Default: DATADIR/Pixie/shaders)]),
-	shaderdir="${withval}",
-	shaderdir="${datadir}/Pixie/shaders")
-
-AC_ARG_WITH(ribdir,
-	AS_HELP_STRING([--with-ribdir=DIR],[directory where we store rib files (Default: DATADIR/Pixie/ribs)]),
-	ribdir="${withval}",
-	ribdir="${datadir}/Pixie/ribs")
-
-AC_ARG_WITH(texturedir,
-	AS_HELP_STRING([--with-texturedir=DIR],[directory where we store textures (Default: DATADIR/Pixie/textures)]),
-	texturedir="${withval}",
-	texturedir="${datadir}/Pixie/textures")
-
-AC_ARG_WITH(proceduraldir,
-	AS_HELP_STRING([--with-shaderdir=DIR],[directory to store shaders (Default: LIBDIR/Pixie/procedurals)]),
-	proceduraldir="${withval}",
-	proceduraldir="${libdir}/Pixie/procedurals")
-
-AC_ARG_WITH(displaysdir,
-	AS_HELP_STRING([--with-displaysdir=DIR],[directory to store displays (Default: LIBDIR/Pixie/displays)]),
-	displaysdir="${withval}",
-	displaysdir="${libdir}/Pixie/displays")
-
-AC_ARG_WITH(modulesdir,
-	AS_HELP_STRING([--with-modulesdir=DIR],[directory to store modules (Default: LIBDIR/Pixie/modules)]),
-	modulesdir="${withval}",
-	modulesdir="${libdir}/Pixie/modules")
-
-
-dnl ---------------------------------------------------
 dnl Are we building for self contained distribution
 dnl
 
@@ -241,7 +201,15 @@ AS_HELP_STRING([--disable-selfcontained],[Build for a selfcontained setup (overr
 		proceduraldir="\${prefix}/procedurals"
 		modulesdir="\${prefix}/modules"
 		;;
-	no) ;;
+	no)
+		docdir="\${datadir}/doc/Pixie"
+		shaderdir="\${datadir}/Pixie/shaders"
+		ribdir="\${datadir}/Pixie/ribs"
+		texturedir="\${datadir}/Pixie/textures"
+		proceduraldir="${libdir}/Pixie/procedurals"
+		displaysdir="\${libdir}/Pixie/displays"
+		modulesdir="\${libdir}/Pixie/modules"
+		;;
 	*) AC_MSG_ERROR(bad value ${enableval} for --enable-selfcontained) ;;
 esac],
 [
@@ -253,6 +221,40 @@ displaysdir="\${prefix}/displays"
 proceduraldir="\${prefix}/procedurals"
 modulesdir="\${prefix}/modules"
 ])
+
+dnl ---------------------------------------------------
+dnl Set custom directories for shaders, models, procedurals, and displays
+dnl these defaults are set above, which is why we do overrides after
+dnl
+
+AC_ARG_WITH(docdir,
+	AS_HELP_STRING([--with-docdir=DIR],[directory where we install documentation (Default: DATADIR/doc/Pixie)]),
+	docdir="${withval}")
+
+AC_ARG_WITH(shaderdir,
+	AS_HELP_STRING([--with-shaderdir=DIR],[directory where we store shaders (Default: DATADIR/Pixie/shaders)]),
+	shaderdir="${withval}")
+
+AC_ARG_WITH(ribdir,
+	AS_HELP_STRING([--with-ribdir=DIR],[directory where we store rib files (Default: DATADIR/Pixie/ribs)]),
+	ribdir="${withval}")
+
+AC_ARG_WITH(texturedir,
+	AS_HELP_STRING([--with-texturedir=DIR],[directory where we store textures (Default: DATADIR/Pixie/textures)]),
+	texturedir="${withval}")
+
+AC_ARG_WITH(proceduraldir,
+	AS_HELP_STRING([--with-shaderdir=DIR],[directory to store shaders (Default: LIBDIR/Pixie/procedurals)]),
+	proceduraldir="${withval}")
+
+AC_ARG_WITH(displaysdir,
+	AS_HELP_STRING([--with-displaysdir=DIR],[directory to store displays (Default: LIBDIR/Pixie/displays)]),
+	displaysdir="${withval}")
+
+AC_ARG_WITH(modulesdir,
+	AS_HELP_STRING([--with-modulesdir=DIR],[directory to store modules (Default: LIBDIR/Pixie/modules)]),
+	modulesdir="${withval}")
+
 
 dnl ---------------------------------------------------
 dnl Now tell the c preprocessor and the Makefiles where stuff goes
