@@ -37,50 +37,48 @@
 #include "texture3d.h"
 #include "options.h"
 #include "pointCloud.h"
-#include "mapHierarchy.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Description			:	A hierarchy of points
 // Comments				:
-class	CPointHierarchy : public CTexture3d, public CMapHierarchy<CPointCloudPoint> {
+class	CPointHierarchy : public CTexture3d, public CMap<CPointCloudPoint> {
+
+	///////////////////////////////////////////////////////////////////////
+	// Class				:	CMapNode
+	// Description			:	Encapsulates a node in the hierarchy
+	// Comments				:
+	class	CMapNode {
+	public:
+		vector		P,N;				// The center of the node
+		vector		radiosity;			// The radiosity of the node
+		float		dP,dN;				// The average radius and maximum normal deviation (cosine)
+		int			child0,child1;		// The children indices (>=0 if internal nodes < if leaf)
+	};
+
+
 public:
 							CPointHierarchy(const char *,const float *from,const float *to,FILE *);
 							~CPointHierarchy();
 
 	void					lookup(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *);
-	void					store(const float *,const float *,const float *,float);
-	void					lookup(float *,const float *,const float *,float)  {	assert(FALSE);	}
+	void					store(const float *,const float *,const float *,float)	{	assert(FALSE);	}
+	void					lookup(float *,const float *,const float *,float)		{	assert(FALSE);	}
 
 protected:
-	CArray<float>			data;				// This is where we actually keep the data
+	CArray<CMapNode>		nodes;					// This is where we keep the internal nodes
+	CArray<float>			data;					// This is where we actually keep the data
+	int						areaIndex;				// Index of the area variable
+	int						radiosityIndex;			// Index of the radiosity variable
 
+							// Functions used to construct the hierarchy
+	void					computeHierarchy();
+	int						average(int numItems,int *indices);
+	int						cluster(int numItems,int *indices);
+
+							// CView interface
 	void					draw() { }
 	void					bound(float *bmin,float *bmax) { }
-
-	void					write();
-
-							// Overwritten from CMapHierarchy class to perform averaging of the points
-	void					average(CPointCloudPoint *dest,int numItems,int *indices) {
-
-								dest->dP	=	0;
-								for (int i=0;i<numItems;i++) {
-									dest->dP	+=	items[indices[i]].dP;
-								}
-								//dest->dP	/=	(float) numItems;
-
-
-								/*
-								vector bma,bmi;
-								initv(bmi,C_INFINITY);
-								initv(bma,-C_INFINITY);
-								for (int i=0;i<numItems;i++) {
-									addBox(bmi,bma,items[indices[i]].P);
-								}
-								subvv(bma,bmi);
-								dest->dP = max(max(bma[0],bma[1]),bma[2])*0.5f;
-								*/
-							}
 };
 
 #endif

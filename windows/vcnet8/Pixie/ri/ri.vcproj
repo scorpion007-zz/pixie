@@ -463,10 +463,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\src\ri\mapHierarchy.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\src\ri\memory.cpp"
 				>
 			</File>
