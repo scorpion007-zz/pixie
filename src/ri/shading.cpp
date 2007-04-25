@@ -648,7 +648,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// Note: we pass NULL for each of the locals here because we do not wish
 			// to expand them (we're not running shaders) yet
 			// this causes the interpolation to local shader vars not to occur
-			object->sample(0,numVertices,varying,NULL,usedParameters);
+			object->sample(0,numVertices,varying,locals,usedParameters);
 			
 			float		***locals	= 	currentShadingState->locals;
 			for (int i=0;i<NUM_ACCESSORS;i++) locals[i] = NULL;
