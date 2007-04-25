@@ -517,6 +517,7 @@ void	CShadingContext::drawObject(CObject *cObject) {
 void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadingDim dim,unsigned int usedParameters,int displaceOnly) {
 	const CAttributes	*currentAttributes	=	object->attributes;
 	float				**varying			=	currentShadingState->varying;
+	float				***locals			= 	currentShadingState->locals;
 	CShaderInstance		*displacement;
 	CShaderInstance		*surface;
 	CShaderInstance		*atmosphere;
@@ -587,6 +588,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// Prepare the used parameters by the shaders 
 		usedParameters			|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
 		
+		// Prepare the locals
+		for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
+
 		// Prepare dPdtime if needed, do this _before_ saving our locals
 		if (usedParameters & PARAMETER_DPDTIME) {
 		
@@ -648,7 +652,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// Note: we pass NULL for each of the locals here because we do not wish
 			// to expand them (we're not running shaders) yet.  This causes the
 			// interpolation to local shader vars from the pl not to occur
-			float		***locals	= 	currentShadingState->locals;
 			for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
 			
 			object->sample(0,numVertices,varying,locals,usedParameters);
@@ -676,18 +679,21 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// We're done here
 			return;
 		}
+		
+		// Prepare the locals
+		for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
 
 		// We need to execute the displacement shader, so get ready
 		displacement	=	currentAttributes->displacement;
+		surface			=	NULL;
+		atmosphere		=	NULL;
 		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
-		if (!(usedParameters & PARAMETER_MESSAGEPASSING)) {
-			surface			=	NULL;
-			atmosphere		=	NULL;
-		} else {
+		
+		if (usedParameters & PARAMETER_MESSAGEPASSING) {
 			// displacement shader uses messsage passing, must prepare but not execute
-			// the surface and attribute shaders
-			surface			=	currentAttributes->surface;
-			atmosphere		=	currentAttributes->atmosphere;
+			// the surface and atmosphere shaders
+			if (currentAttributes->surface != NULL)			locals[ACCESSOR_SURFACE]		=	currentAttributes->surface->prepare(shaderStateMemory,varying,numVertices);
+			if (currentAttributes->atmosphere != NULL)		locals[ACCESSOR_ATMOSPHERE]		=	currentAttributes->atmosphere->prepare(shaderStateMemory,varying,numVertices);
 		}
 	}
 
@@ -703,20 +709,11 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	memBegin(shaderStateMemory);
 	
 	// Allocate the caches for the shaders being executed
-	float		***locals	= 	currentShadingState->locals;
-	for (int a=0;a<NUM_ACCESSORS;a++)				locals[a] = NULL;
 	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
 	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
 	if (atmosphere != NULL)							locals[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
 	
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
-	
-	if (displaceOnly == TRUE) {
-		// If we're displacing only, do not execute surface or atmosphere (but we might have had to prepare them above if the displacement shader uses
-		// message passing
-		surface		=	NULL;
-		atmosphere	=	NULL;
-	}
 
 	// If we need derivative information, treat differently
 	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
