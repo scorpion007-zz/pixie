@@ -646,13 +646,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 			// No, just sample the geometry
 			// Note: we pass NULL for each of the locals here because we do not wish
-			// to expand them (we're not running shaders) yet
-			// this causes the interpolation to local shader vars not to occur
-			object->sample(0,numVertices,varying,locals,usedParameters);
-			
+			// to expand them (we're not running shaders) yet.  This causes the
+			// interpolation to local shader vars from the pl not to occur
 			float		***locals	= 	currentShadingState->locals;
-			for (int i=0;i<NUM_ACCESSORS;i++) locals[i] = NULL;
-			object->interpolate(numVertices,varying,NULL);
+			for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
+			
+			object->sample(0,numVertices,varying,locals,usedParameters);
+			object->interpolate(numVertices,varying,locals);
 
 			// We're not shading just sampling
 			if (usedParameters & PARAMETER_N) {
@@ -679,9 +679,16 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 		// We need to execute the displacement shader, so get ready
 		displacement	=	currentAttributes->displacement;
-		surface			=	NULL;
-		atmosphere		=	NULL;
 		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
+		if (!(usedParameters & PARAMETER_MESSAGEPASSING)) {
+			surface			=	NULL;
+			atmosphere		=	NULL;
+		} else {
+			// displacement shader uses messsage passing, must prepare but not execute
+			// the surface and attribute shaders
+			surface			=	currentAttributes->surface;
+			atmosphere		=	currentAttributes->atmosphere;
+		}
 	}
 
 	
@@ -697,15 +704,19 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	
 	// Allocate the caches for the shaders being executed
 	float		***locals	= 	currentShadingState->locals;
+	for (int a=0;a<NUM_ACCESSORS;a++)				locals[a] = NULL;
 	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
-	else											locals[ACCESSOR_SURFACE]		=	NULL;
 	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
-	else											locals[ACCESSOR_DISPLACEMENT]	=	NULL;
 	if (atmosphere != NULL)							locals[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
-	else											locals[ACCESSOR_ATMOSPHERE]		=	NULL;
 	
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
+	if (displaceOnly == TRUE) {
+		// If we're displacing only, do not execute surface or atmosphere (but we might have had to prepare them above if the displacement shader uses
+		// message passing
+		surface		=	NULL;
+		atmosphere	=	NULL;
+	}
 
 	// If we need derivative information, treat differently
 	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
