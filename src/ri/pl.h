@@ -99,8 +99,8 @@ public:
 							// Description			:	This function is used to obtain the variable to write to
 							// Comments				:
 	float					*resolve(float **varying,float ***locals) const {
-								if (variable->storage == STORAGE_GLOBAL)	return varying[variable->entry];
-								else if (locals != NULL)					return locals[variable->accessor][variable->entry];
+								if (variable->storage == STORAGE_GLOBAL)		return varying[variable->entry];
+								else if (locals[variable->accessor] != NULL)	return locals[variable->accessor][variable->entry];
 								return NULL;
 							}
 };

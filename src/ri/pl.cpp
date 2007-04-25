@@ -40,6 +40,12 @@
 
 
 ///////////////////////////////////////////////////////////////////////
+// Note:	if locals[accessor] is NULL it means we will not be running
+//			that shader (and didn't prepare it), so don't interpolate there
+///////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////
 // Class				:	CParameter
 // Method				:	CParameter
 // Description			:	Ctor
@@ -92,13 +98,13 @@ public:
 						// case, as they can't be varying in the RIB stream
 
 						if (variable->type == TYPE_STRING) {
-							if (variable->storage == STORAGE_GLOBAL)	dests	=	(char**) varying[variable->entry];
-							else if (locals != NULL)					dests	=	(char**) locals[variable->accessor][variable->entry];
-							else										dests	=	(char**) NULL;
+							if (variable->storage == STORAGE_GLOBAL)		dests	=	(char**) varying[variable->entry];
+							else if (locals[variable->accessor] != NULL)	dests	=	(char**) locals[variable->accessor][variable->entry];
+							else											dests	=	(char**) NULL;
 						} else {
-							if (variable->storage == STORAGE_GLOBAL)	destf	=	varying[variable->entry];
-							else if (locals != NULL)					destf	=	locals[variable->accessor][variable->entry];
-							else										destf	=	NULL;
+							if (variable->storage == STORAGE_GLOBAL)		destf	=	varying[variable->entry];
+							else if (locals[variable->accessor] != NULL)	destf	=	locals[variable->accessor][variable->entry];
+							else											destf	=	NULL;
 						}
 
 						
@@ -138,13 +144,13 @@ public:
 						char	**dests	=	NULL;
 
 						if (variable->type == TYPE_STRING) {
-							if (variable->storage == STORAGE_GLOBAL)	dests	=	(char**) varying[variable->entry];
-							else if (locals != NULL)					dests	=	(char**) locals[variable->accessor][variable->entry];
-							else										dests	=	(char**) NULL;
+							if (variable->storage == STORAGE_GLOBAL)		dests	=	(char**) varying[variable->entry];
+							else if (locals[variable->accessor] != NULL)	dests	=	(char**) locals[variable->accessor][variable->entry];
+							else											dests	=	(char**) NULL;
 						} else {
-							if (variable->storage == STORAGE_GLOBAL)	destf	=	varying[variable->entry];
-							else if (locals != NULL)					destf	=	locals[variable->accessor][variable->entry];
-							else										destf	=	NULL;
+							if (variable->storage == STORAGE_GLOBAL)		destf	=	varying[variable->entry];
+							else if (locals[variable->accessor] != NULL)	destf	=	locals[variable->accessor][variable->entry];
+							else											destf	=	NULL;
 						}
 
 						if (destf != NULL) {
@@ -217,9 +223,9 @@ public:
 	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
+						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
+						else											dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -247,9 +253,9 @@ public:
 	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
+						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
+						else											dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -309,9 +315,9 @@ public:
 	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
+						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
+						else											dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -338,9 +344,9 @@ public:
 	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
+						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
+						else											dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -402,9 +408,9 @@ public:
 	void			dispatch(int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
+						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
+						else											dest	=	NULL;
 
 						if (dest != NULL) {
 							int			i,j;
@@ -428,9 +434,9 @@ public:
 	void			dispatch(int start,int numVertices,float **varying,float ***locals) {
 						float		*dest;
 
-						if (variable->storage == STORAGE_GLOBAL)	dest	=	varying[variable->entry];
-						else if (locals != NULL)					dest	=	locals[variable->accessor][variable->entry];
-						else										dest	=	NULL;
+						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
+						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
+						else											dest	=	NULL;
 						
 						if (dest != NULL) {
 							int			i,j;
@@ -554,9 +560,9 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 		const float	*src		=	data;
 		float		*dest;
 
-		if (dispatch[0]->storage == STORAGE_GLOBAL)	dest	=	varying[dispatch[0]->entry] + start*numFloats;
-		else if (locals != NULL)					dest	=	locals[dispatch[0]->accessor][dispatch[0]->entry]  + start*numFloats;
-		else										dest	=	NULL;
+		if (dispatch[0]->storage == STORAGE_GLOBAL)		dest	=	varying[dispatch[0]->entry] + start*numFloats;
+		else if (locals[dispatch[0]->accessor] != NULL)	dest	=	locals[dispatch[0]->accessor][dispatch[0]->entry]  + start*numFloats;
+		else											dest	=	NULL;
 
 		if (dest != NULL) {
 			dispatchData(src,dest,vertexSize,numFloats,numVertices);

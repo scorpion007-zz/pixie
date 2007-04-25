@@ -645,10 +645,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			const int	savedParameters	=	usedParameters;
 
 			// No, just sample the geometry
-			// Note: we pass NULL for the locals here because we do not wish
+			// Note: we pass NULL for each of the locals here because we do not wish
 			// to expand them (we're not running shaders) yet
 			// this causes the interpolation to local shader vars not to occur
 			object->sample(0,numVertices,varying,NULL,usedParameters);
+			
+			float		***locals	= 	currentShadingState->locals;
+			for (int i=0;i<NUM_ACCESSORS;i++) locals[i] = NULL;
 			object->interpolate(numVertices,varying,NULL);
 
 			// We're not shading just sampling
@@ -695,8 +698,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	// Allocate the caches for the shaders being executed
 	float		***locals	= 	currentShadingState->locals;
 	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
+	else											locals[ACCESSOR_SURFACE]		=	NULL;
 	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
+	else											locals[ACCESSOR_DISPLACEMENT]	=	NULL;
 	if (atmosphere != NULL)							locals[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
+	else											locals[ACCESSOR_ATMOSPHERE]		=	NULL;
+	
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 	
 
