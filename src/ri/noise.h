@@ -33,10 +33,6 @@
 
 #include "common/global.h"
 
-void							noiseNormalize2(float *);
-void							noiseNormalize3(float *);
-void							noiseNormalize4(float *);
-
 float							noiseFloat(float);
 float							noiseFloat(float,float);
 float							noiseFloat(const float *);
