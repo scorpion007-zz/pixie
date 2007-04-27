@@ -48,8 +48,134 @@ typedef struct {
 #define IX(i,j,n) ((i)+(n)*(j))
 
 
+#define NOISE_PERM_SIZE 512
+#define NOISE_PPERM_SIZE 4096
 
 
+// Misc bits to compute randoms
+
+#ifndef HAVE_RANDOM
+// rand() does not return random lower-order bits, so fix it up since this
+// platform doesn't have random().
+
+	#ifdef _WINDOWS
+	static inline long int random() {
+		// On Windows RAND_MAX is less than 0x7fffffff
+		return rand();
+	}
+	#else
+	static inline long int random() {
+		long int retval;
+
+		// Note that we are assuming RAND_MAX >= 0x7fffffff
+		// If you're on an arch with sizeof(int) <= 2, this won't work
+		// but then again, why would you be rendering there...
+
+		retval  = (rand() >> 15) & 0x0000ffff;
+		retval |=  rand()        & 0x7fff0000;
+
+		return retval;
+	}
+	#endif
+#endif
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	precomputeNoiseData
+// Description			:	create noiseTables.h header file for the ri
+// Return Value			:	TRUE on success, FALSE otherwise
+// Comments				:
+int	precomputeNoiseData() {
+	int		px[NOISE_PERM_SIZE];
+	int		py[NOISE_PERM_SIZE];
+	int		pz[NOISE_PERM_SIZE];
+	int		pN[NOISE_PPERM_SIZE];
+	float	rN[NOISE_PPERM_SIZE];
+	int		i,j,k;
+
+	#ifdef _WINDOWS
+		FILE	*noiseTables	=	fopen("..\\src\\ri\\noiseTables.h","w");
+	#else
+		FILE	*noiseTables	=	fopen("../ri/noiseTables.h","w");
+	#endif	
+
+	if (noiseTables == NULL)	return FALSE;
+
+	for (i = 0 ; i < NOISE_PERM_SIZE ; i++) {
+		px[i] = (float)(random()%256);
+		py[i] = (float)(random()%256);
+		pz[i] = (float)(random()%256);
+	}
+
+	for (i = 0 ; i < NOISE_PPERM_SIZE ; i++) {
+		pN[i] = (float)(random()%4096);
+		rN[i] = (float)(random()/(float)0x7fffffff);
+	}
+	
+	fprintf(noiseTables,"// Internally generated noise data...\n// Do not mess with it\n\n");
+	
+	fprintf(noiseTables,"// Different permutation tables for x,y and z\n\n");
+
+	fprintf(noiseTables,"static	const unsigned char		permX[%d] = {\n",NOISE_PERM_SIZE);
+	for (i=1;i<=NOISE_PERM_SIZE;i++) {
+		if (i == NOISE_PERM_SIZE)
+			fprintf(noiseTables,"\t %d \n",px[i]);
+		else if (i%8 == 0)
+			fprintf(noiseTables,"\t %d, \n",px[i]);
+		else
+			fprintf(noiseTables,"\t %d, ",px[i]);
+	}
+	fprintf(noiseTables,"};\n\n\n");
+	
+	fprintf(noiseTables,"static	const unsigned char		permY[%d] = {\n",NOISE_PERM_SIZE);
+	for (i=1;i<=NOISE_PERM_SIZE;i++) {
+		if (i == NOISE_PERM_SIZE)
+			fprintf(noiseTables,"\t %d \n",py[i]);
+		else if (i%8 == 0)
+			fprintf(noiseTables,"\t %d, \n",py[i]);
+		else
+			fprintf(noiseTables,"\t %d, ",py[i]);
+	}
+	fprintf(noiseTables,"};\n\n\n");
+	
+	fprintf(noiseTables,"static	const unsigned char		permZ[%d] = {\n",NOISE_PERM_SIZE);
+	for (i=1;i<=NOISE_PERM_SIZE;i++) {
+		if (i == NOISE_PERM_SIZE)
+			fprintf(noiseTables,"\t %d \n",pz[i]);
+		else if (i%8 == 0)
+			fprintf(noiseTables,"\t %d, \n",pz[i]);
+		else
+			fprintf(noiseTables,"\t %d, ",pz[i]);
+	}
+	fprintf(noiseTables,"};\n\n\n");
+	
+	fprintf(noiseTables,"// // Permutation tables for the cell noise\n\n");
+	
+	fprintf(noiseTables,"static	const unsigned short	permN[%d] = {\n",NOISE_PPERM_SIZE);
+	for (i=1;i<=NOISE_PPERM_SIZE;i++) {
+		if (i == NOISE_PPERM_SIZE)
+			fprintf(noiseTables,"\t %d \n",pN[i]);
+		else if (i%8 == 0)
+			fprintf(noiseTables,"\t %d, \n",pN[i]);
+		else
+			fprintf(noiseTables,"\t %d, ",pN[i]);
+	}
+	fprintf(noiseTables,"};\n\n\n");
+
+	fprintf(noiseTables,"static	const float	randN[%d] = {\n",NOISE_PPERM_SIZE);
+	for (i=1;i<=NOISE_PPERM_SIZE;i++) {
+		if (i == NOISE_PPERM_SIZE)
+			fprintf(noiseTables,"\t %ff \n",rN[i]);
+		else if (i%4 == 0)
+			fprintf(noiseTables,"\t %ff, \n",rN[i]);
+		else
+			fprintf(noiseTables,"\t %ff, ",rN[i]);
+	}
+	fprintf(noiseTables,"};\n\n\n");
+
+	fclose(noiseTables);
+
+	return TRUE;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	precomputeSubdivisionData
