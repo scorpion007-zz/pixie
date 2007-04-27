@@ -602,8 +602,8 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	if (shutterClose	!= shutterOpen)			flags	|=	OPTIONS_FLAGS_MOTIONBLUR;
 
 	shutterTime			=	shutterClose - shutterOpen;
-	if (shutterTime <= 0 ) 	invShutterTime	=	1.0f/shutterTime;
-	else					invShutterTime	=	1.0f;
+	if (shutterTime <= 0 ) 	invShutterTime	=	1.0f;
+	else					invShutterTime	=	1.0f/shutterTime;
 	
 	// Clear samplemotion if we don't have any motionblur
 	// If we do, keep the user option to turn it off
