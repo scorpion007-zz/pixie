@@ -52,33 +52,6 @@ typedef struct {
 #define NOISE_PPERM_SIZE 4096
 
 
-// Misc bits to compute randoms
-
-#ifndef HAVE_RANDOM
-// rand() does not return random lower-order bits, so fix it up since this
-// platform doesn't have random().
-
-	#ifdef _WINDOWS
-	static inline long int random() {
-		// On Windows RAND_MAX is less than 0x7fffffff
-		return rand();
-	}
-	#else
-	static inline long int random() {
-		long int retval;
-
-		// Note that we are assuming RAND_MAX >= 0x7fffffff
-		// If you're on an arch with sizeof(int) <= 2, this won't work
-		// but then again, why would you be rendering there...
-
-		retval  = (rand() >> 15) & 0x0000ffff;
-		retval |=  rand()        & 0x7fff0000;
-
-		return retval;
-	}
-	#endif
-#endif
-
 ///////////////////////////////////////////////////////////////////////
 // Function				:	precomputeNoiseData
 // Description			:	create noiseTables.h header file for the ri
@@ -100,15 +73,16 @@ int	precomputeNoiseData() {
 
 	if (noiseTables == NULL)	return FALSE;
 
-	for (i = 0 ; i < NOISE_PERM_SIZE ; i++) {
-		px[i] = (float)(random()%256);
-		py[i] = (float)(random()%256);
-		pz[i] = (float)(random()%256);
+	const int hnp = NOISE_PERM_SIZE/2;
+	for (i = 0 ; i < hnp; i++) {
+		px[i] = px[i+hnp] = (float)(rand()%256);
+		py[i] = py[i+hnp] = (float)(rand()%256);
+		pz[i] = pz[i+hnp] = (float)(rand()%256);
 	}
 
 	for (i = 0 ; i < NOISE_PPERM_SIZE ; i++) {
-		pN[i] = (float)(random()%4096);
-		rN[i] = (float)(random()/(float)0x7fffffff);
+		pN[i] = (float)(rand()%4096);
+		rN[i] = (float)(rand()/(float)RAND_MAX);
 	}
 	
 	fprintf(noiseTables,"// Internally generated noise data...\n// Do not mess with it\n\n");
@@ -546,6 +520,12 @@ int		precomputeStochasticPrimitivesH() {
 int	main(int argc,char *argv[]) {
 
 	/*
+	// Warning: Re-running this will totally alter the noise values you get
+	if (precomputeNoiseData() == TRUE) {
+		return 1;
+	}
+	
+	
 	if (precomputeSubdivisionData() == TRUE) {
 		return 1;
 	}
