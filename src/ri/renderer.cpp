@@ -737,10 +737,10 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	fromScreen[element(1,2)]	=	0;
 	fromScreen[element(1,3)]	=	1;
 
-	fromScreen[element(1,0)]	=	0;
-	fromScreen[element(1,1)]	=	0;
-	fromScreen[element(1,2)]	=	0;
-	fromScreen[element(1,3)]	=	1;
+	fromScreen[element(2,0)]	=	0;
+	fromScreen[element(2,1)]	=	0;
+	fromScreen[element(2,2)]	=	0;
+	fromScreen[element(2,3)]	=	1;
 
 	fromScreen[element(3,0)]	=	0;
 	fromScreen[element(3,1)]	=	0;
