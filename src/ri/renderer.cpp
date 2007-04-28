@@ -716,10 +716,10 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	fromNDC[element(1,2)]		=	0;
 	fromNDC[element(1,3)]		=	screenTop;
 
-	fromNDC[element(1,0)]		=	0;
-	fromNDC[element(1,1)]		=	0;
-	fromNDC[element(1,2)]		=	0;
-	fromNDC[element(1,3)]		=	imagePlane;
+	fromNDC[element(2,0)]		=	0;
+	fromNDC[element(2,1)]		=	0;
+	fromNDC[element(2,2)]		=	0;
+	fromNDC[element(2,3)]		=	imagePlane;
 
 	fromNDC[element(3,0)]		=	0;
 	fromNDC[element(3,1)]		=	0;
