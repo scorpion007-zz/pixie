@@ -1273,7 +1273,13 @@ public:
 								mulmp4(tmp,toNDC,cP);
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
-
+								
+								if (lookup->blur > 0) {
+									context->random2d.get(r);
+									s				+=	lookup->blur*(r[0] - 0.5f);
+									t				+=	lookup->blur*(r[1] - 0.5f);
+								}
+								
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
 									continue;
 								}
@@ -1415,6 +1421,13 @@ public:
 								mulmp4(tmp,header.toNDC,cP);
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
+								
+								if (lookup->blur > 0) {
+									context->random2d.get(r);
+									s				+=	lookup->blur*(r[0] - 0.5f);
+									t				+=	lookup->blur*(r[1] - 0.5f);
+								}
+								
 								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
 									continue;
 								}
