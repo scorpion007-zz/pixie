@@ -1426,7 +1426,7 @@ void		CRibOut::writePL(int numVertex,int numVarying,int numFaceVarying,int numUn
 		__dest	=	__var->numItems*numFaceVarying;	\
 		break;										\
 	case CONTAINER_CONSTANT:						\
-		__dest	=	1;								\
+		__dest	=	__var->numItems;				\
 		break;										\
 	default:										\
 		error(CODE_BUG,"Unknown container in writePL.\n");	\
@@ -1655,7 +1655,7 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable("__srv","global varying float");
 	declareVariable("Pz",	"vertex float");
 	declareVariable("width","vertex float");
-	declareVariable("constantwidth","uniform float");
+	declareVariable("constantwidth","constant float");
 
 	// Define uniform variables
 	declareVariable("ncomps","global uniform float");
