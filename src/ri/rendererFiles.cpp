@@ -186,6 +186,7 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 		if (getFile(result,name) == TRUE) {
 			if (osFileExists(result)) {
 				info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",name,result);
+				osUnlock(networkMutex);
 				return TRUE;
 			}
 		}
