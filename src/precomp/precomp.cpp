@@ -122,14 +122,26 @@ int	precomputeNoiseData() {
 
 	if (noiseTables == NULL)	return FALSE;
 
+	// Reset the random number seed
+	srand(1);
+
 	// Generate permutation tables
 	permute(px,NOISE_PERM_SIZE);
 	permute(py,NOISE_PERM_SIZE);
 	permute(pz,NOISE_PERM_SIZE);
 	permute(pN,NOISE_PPERM_SIZE);
 	
-	// Generate the random numbers
-	for (i=0;i<NOISE_PPERM_SIZE;i++)	rN[i] = (float)(rand()/(float)RAND_MAX);
+	// Generate the random numbers, stratified
+	for (i=0;i<NOISE_PPERM_SIZE;i++)	rN[i] = (i + (float)(rand()/(float)RAND_MAX)) / NOISE_PPERM_SIZE;
+
+	// Permute the random numbers
+	for (i=0;i<NOISE_PPERM_SIZE;i++) {
+		const int	ti	=	rand() & (NOISE_PPERM_SIZE - 1);
+		const float	t	=	rN[ti];
+
+		rN[ti]			=	rN[i];
+		rN[i]			=	t;
+	}
 	
 	fprintf(noiseTables,"// Internally generated noise data...\n// Do not mess with it\n\n");
 	
