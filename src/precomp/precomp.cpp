@@ -48,8 +48,57 @@ typedef struct {
 #define IX(i,j,n) ((i)+(n)*(j))
 
 
-#define NOISE_PERM_SIZE 512
+#define NOISE_PERM_SIZE 256
 #define NOISE_PPERM_SIZE 4096
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	permute
+// Description			:	Create a permutation of numbers upto n
+// Return Value			:
+// Comments				:	n has to be a power of 2
+static	void	permute(int *a,int n) {
+	int	i;
+
+	for (i=0;i<n;i++)	a[i]	=	i;
+
+	// Do random swaps
+	for (i=0;i<n;i++) {
+		const int	ti	=	rand() & (n - 1);
+		const int	t	=	a[ti];
+
+		a[ti]			=	a[i];
+		a[i]			=	t;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function				:	print
+// Description			:	Print an array
+// Return Value			:
+// Comments				:	n has to be a power of 2
+template <class T> static	void	print(FILE *out,T *a,int n,const char *outName,const char *outType) {
+	int	i;
+
+	fprintf(out,"static const %s %s[%d] = {\n\t",outType,outName,n);
+
+	if (strstr(outType,"float") != 0) {
+		for (i=0;i<n;i++) {
+			if (i == 0)	fprintf(out,"%gf",a[i]);
+			else		fprintf(out,",%gf",a[i]);
+
+			if (((i+1) % 8) == 0)	fprintf(out,"\n\t");
+		}
+	} else {
+		for (i=0;i<n;i++) {
+			if (i == 0)	fprintf(out,"%d",a[i]);
+			else		fprintf(out,",%d",a[i]);
+
+			if (((i+1) % 8) == 0)	fprintf(out,"\n\t");
+		}
+	}
+
+	fprintf(out,"};\n\n\n");
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -63,7 +112,7 @@ int	precomputeNoiseData() {
 	int		pz[NOISE_PERM_SIZE];
 	int		pN[NOISE_PPERM_SIZE];
 	float	rN[NOISE_PPERM_SIZE];
-	int		i,j,k;
+	int		i;
 
 	#ifdef _WINDOWS
 		FILE	*noiseTables	=	fopen("..\\src\\ri\\noiseTables.h","w");
@@ -73,78 +122,24 @@ int	precomputeNoiseData() {
 
 	if (noiseTables == NULL)	return FALSE;
 
-	const int hnp = NOISE_PERM_SIZE/2;
-	for (i = 0 ; i < hnp; i++) {
-		px[i] = px[i+hnp] = (float)(rand()%256);
-		py[i] = py[i+hnp] = (float)(rand()%256);
-		pz[i] = pz[i+hnp] = (float)(rand()%256);
-	}
-
-	for (i = 0 ; i < NOISE_PPERM_SIZE ; i++) {
-		pN[i] = (float)(rand()%4096);
-		rN[i] = (float)(rand()/(float)RAND_MAX);
-	}
+	// Generate permutation tables
+	permute(px,NOISE_PERM_SIZE);
+	permute(py,NOISE_PERM_SIZE);
+	permute(pz,NOISE_PERM_SIZE);
+	permute(pN,NOISE_PPERM_SIZE);
+	
+	// Generate the random numbers
+	for (i=0;i<NOISE_PPERM_SIZE;i++)	rN[i] = (float)(rand()/(float)RAND_MAX);
 	
 	fprintf(noiseTables,"// Internally generated noise data...\n// Do not mess with it\n\n");
 	
 	fprintf(noiseTables,"// Different permutation tables for x,y and z\n\n");
 
-	fprintf(noiseTables,"static	const unsigned char		permX[%d] = {\n",NOISE_PERM_SIZE);
-	for (i=1;i<=NOISE_PERM_SIZE;i++) {
-		if (i == NOISE_PERM_SIZE)
-			fprintf(noiseTables,"\t %d \n",px[i]);
-		else if (i%8 == 0)
-			fprintf(noiseTables,"\t %d, \n",px[i]);
-		else
-			fprintf(noiseTables,"\t %d, ",px[i]);
-	}
-	fprintf(noiseTables,"};\n\n\n");
-	
-	fprintf(noiseTables,"static	const unsigned char		permY[%d] = {\n",NOISE_PERM_SIZE);
-	for (i=1;i<=NOISE_PERM_SIZE;i++) {
-		if (i == NOISE_PERM_SIZE)
-			fprintf(noiseTables,"\t %d \n",py[i]);
-		else if (i%8 == 0)
-			fprintf(noiseTables,"\t %d, \n",py[i]);
-		else
-			fprintf(noiseTables,"\t %d, ",py[i]);
-	}
-	fprintf(noiseTables,"};\n\n\n");
-	
-	fprintf(noiseTables,"static	const unsigned char		permZ[%d] = {\n",NOISE_PERM_SIZE);
-	for (i=1;i<=NOISE_PERM_SIZE;i++) {
-		if (i == NOISE_PERM_SIZE)
-			fprintf(noiseTables,"\t %d \n",pz[i]);
-		else if (i%8 == 0)
-			fprintf(noiseTables,"\t %d, \n",pz[i]);
-		else
-			fprintf(noiseTables,"\t %d, ",pz[i]);
-	}
-	fprintf(noiseTables,"};\n\n\n");
-	
-	fprintf(noiseTables,"// // Permutation tables for the cell noise\n\n");
-	
-	fprintf(noiseTables,"static	const unsigned short	permN[%d] = {\n",NOISE_PPERM_SIZE);
-	for (i=1;i<=NOISE_PPERM_SIZE;i++) {
-		if (i == NOISE_PPERM_SIZE)
-			fprintf(noiseTables,"\t %d \n",pN[i]);
-		else if (i%8 == 0)
-			fprintf(noiseTables,"\t %d, \n",pN[i]);
-		else
-			fprintf(noiseTables,"\t %d, ",pN[i]);
-	}
-	fprintf(noiseTables,"};\n\n\n");
-
-	fprintf(noiseTables,"static	const float	randN[%d] = {\n",NOISE_PPERM_SIZE);
-	for (i=1;i<=NOISE_PPERM_SIZE;i++) {
-		if (i == NOISE_PPERM_SIZE)
-			fprintf(noiseTables,"\t %ff \n",rN[i]);
-		else if (i%4 == 0)
-			fprintf(noiseTables,"\t %ff, \n",rN[i]);
-		else
-			fprintf(noiseTables,"\t %ff, ",rN[i]);
-	}
-	fprintf(noiseTables,"};\n\n\n");
+	print<int>(noiseTables,px,NOISE_PERM_SIZE,"permX","unsigned char");
+	print<int>(noiseTables,py,NOISE_PERM_SIZE,"permY","unsigned char");
+	print<int>(noiseTables,pz,NOISE_PERM_SIZE,"permZ","unsigned char");
+	print<int>(noiseTables,pN,NOISE_PPERM_SIZE,"permN","unsigned short");
+	print<float>(noiseTables,rN,NOISE_PPERM_SIZE,"randN","float");
 
 	fclose(noiseTables);
 
@@ -519,21 +514,21 @@ int		precomputeStochasticPrimitivesH() {
 // Comments				:
 int	main(int argc,char *argv[]) {
 
-	/*
+	
 	// Warning: Re-running this will totally alter the noise values you get
 	if (precomputeNoiseData() == TRUE) {
 		return 1;
 	}
 	
-	
+	/*
 	if (precomputeSubdivisionData() == TRUE) {
 		return 1;
 	}
-	*/
 
 	if (precomputeStochasticPrimitivesH() == TRUE) {
 		return 1;
 	}
+	*/
 
 	return 0;
 }
