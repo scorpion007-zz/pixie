@@ -477,7 +477,7 @@ void	rndrd(int port) {
 
 		if(gethostname(hostName,sizeof(hostName)) == 0) {
 			if((hostinfo = gethostbyname(hostName)) != NULL) {
-				if (silent == FALSE)	fprintf(stdout,"Active at %s:%d\n",inet_ntoa (*(struct in_addr *)*hostinfo->h_addr_list),ntohs(me.sin_port));
+				if (silent == FALSE) {	fprintf(stdout,"Active at %s:%d\n",inet_ntoa (*(struct in_addr *)*hostinfo->h_addr_list),ntohs(me.sin_port)); fflush(stdout); }
 			}
 		}
 	}
