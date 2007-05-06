@@ -819,6 +819,40 @@ void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *
 }
 
 void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) {
+	if ((ubasis == RiBezierBasis || ubasis == RiBSplineBasis | ubasis == RiCatmullRomBasis | ubasis == RiHermiteBasis | ubasis == RiPowerBasis) &&
+		(vbasis == RiBezierBasis || vbasis == RiBSplineBasis | vbasis == RiCatmullRomBasis | vbasis == RiHermiteBasis | vbasis == RiPowerBasis)) {
+	
+		const char *ubasis_str;
+		if (ubasis == RiBezierBasis)
+			ubasis_str = "bezier";
+		else if (ubasis == RiBSplineBasis)
+			ubasis_str = "b-spline";
+		else if (ubasis == RiCatmullRomBasis)
+			ubasis_str = "catmull-rom";
+		else if (ubasis == RiHermiteBasis)
+			ubasis_str = "hermite";
+		else if (ubasis == RiPowerBasis)
+			ubasis_str = "power";
+		
+		const char *vbasis_str;
+		if (vbasis == RiBezierBasis)
+			vbasis_str = "bezier";
+		else if (vbasis == RiBSplineBasis)
+			vbasis_str = "b-spline";
+		else if (vbasis == RiCatmullRomBasis)
+			vbasis_str = "catmull-rom";
+		else if (vbasis == RiHermiteBasis)
+			vbasis_str = "hermite";
+		else if (vbasis == RiPowerBasis)
+			vbasis_str = "power";
+		
+		out("Basis %s %d %s %d\n",
+			ubasis_str,ustep,
+			vbasis_str,vstep);
+		attributes->uStep	=	ustep;
+		attributes->vStep	=	vstep;
+		return;
+	}
 	out("Basis [%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g] %d [%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g] %d\n"
 		,ubasis[0][0],ubasis[0][1],ubasis[0][2],ubasis[0][3]
 		,ubasis[1][0],ubasis[1][1],ubasis[1][2],ubasis[1][3]
