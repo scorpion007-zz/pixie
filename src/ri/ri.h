@@ -58,7 +58,7 @@ extern "C" {
 typedef short		RtBoolean;
 typedef int			RtInt;
 typedef float		RtFloat;
-typedef const char	*RtToken;
+typedef char		*RtToken;
 typedef	void		RtVoid;
 typedef char		*RtString;
 typedef void		*RtPointer;
