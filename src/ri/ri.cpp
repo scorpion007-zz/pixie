@@ -332,32 +332,32 @@ RtInt		RiLastError				=	RIE_NOERROR;
 
 ////////////////////////////////////////////////////////////////////////
 // The cubic spline basis definition
-RtBasis		RiCatmullRomBasis	= {
+const RtBasis		RiCatmullRomBasis	= {
 	{(float)  (-1.0/2.0),	(float)  ( 3.0/2.0),	(float)  (-3.0/2.0),	(float)  ( 1.0/2.0)},
 	{(float)  ( 2.0/2.0),	(float)  (-5.0/2.0),	(float)  ( 4.0/2.0),	(float)  (-1.0/2.0)},
 	{(float)  (-1.0/2.0),	(float)  ( 0.0/2.0),	(float)  ( 1.0/2.0),	(float)  ( 0.0/2.0)},
 	{(float)  ( 0.0/2.0),	(float)  ( 2.0/2.0),	(float)  ( 0.0/2.0),	(float)  ( 0.0/2.0)}};
 
 
-RtBasis		RiBezierBasis		= { 
+const RtBasis		RiBezierBasis		= { 
 	{(float) -1,	(float)	3,		(float)	-3,		(float)	1},
 	{(float) 3,		(float)	-6,		(float)	3,		(float)	0},
 	{(float) -3,	(float)	3,		(float)	0,		(float)	0},
 	{(float) 1,		(float)	0,		(float)	0,		(float)	0 }};
 
-RtBasis		RiBSplineBasis		= {
+const RtBasis		RiBSplineBasis		= {
 	{(float) (-1.0/6.0),	(float) (3.0/6.0),	(float) (-3.0/6.0),	(float)  (1.0/6.0)},
 	{(float) (3.0/6.0),		(float) -(6.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0)},
 	{(float) (-3.0/6.0),	(float) (0.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0)},
 	{(float) (1.0/6.0),		(float) (4.0/6.0),	(float) (1.0/6.0),	(float)  (0.0/6.0)}};
 
-RtBasis		RiHermiteBasis		= { 
+const RtBasis		RiHermiteBasis		= { 
 	{(float) 1 ,	(float) 1 ,		(float)	-3 ,	(float)	1},
 	{(float) -1 ,	(float) -2 ,	(float)	4 ,		(float)	-1},
 	{(float) -1,	(float) 1 ,		(float)	0 ,		(float)	0},
 	{(float) 1 ,	(float) 0 ,		(float)	0 ,		(float)	0}};
 
-RtBasis		RiPowerBasis		= {
+const RtBasis		RiPowerBasis		= {
 	{(float)  1,	(float)	0,		(float)	0,		(float)	0},
 	{(float)  0,	(float)	1,		(float)	0,		(float)	0},
 	{(float)  0,	(float)	0,		(float)	1,		(float)	0},
@@ -604,8 +604,6 @@ RiBegin (RtToken name) {
 			else				renderMan	=	new CRendererContext();
 
 		} else {
-					insideRubProgram = TRUE;
-
 			renderMan	=	new CRibOut(name);
 		}
 	} else {

@@ -58,7 +58,7 @@ extern "C" {
 typedef short		RtBoolean;
 typedef int			RtInt;
 typedef float		RtFloat;
-typedef char		*RtToken;
+typedef const char	*RtToken;
 typedef	void		RtVoid;
 typedef char		*RtString;
 typedef void		*RtPointer;
@@ -228,8 +228,6 @@ EXTERN(RtToken)		RI_DISPLAY;
 // Limits options
 EXTERN(RtToken)		RI_BUCKETSIZE;
 EXTERN(RtToken)		RI_METABUCKETS;
-EXTERN(RtToken)		RI_FRAMERANGE;
-EXTERN(RtToken)		RI_FBONLY;
 EXTERN(RtToken)		RI_GRIDSIZE;
 EXTERN(RtToken)		RI_MAXRECURSION;
 EXTERN(RtToken)		RI_TEXTUREMEMORY;
@@ -279,7 +277,7 @@ EXTERN(RtToken)		RI_DEFAULTSURFACE;
 
 EXTERN(RtInt)		RiLastError;
 
-EXTERN(RtBasis)		RiBezierBasis, RiBSplineBasis, RiCatmullRomBasis, RiHermiteBasis, RiPowerBasis;
+EXTERN(const RtBasis)		RiBezierBasis, RiBSplineBasis, RiCatmullRomBasis, RiHermiteBasis, RiPowerBasis;
 
 #define RI_BEZIERSTEP       ((RtInt)3)
 #define RI_BSPLINESTEP      ((RtInt)1)
