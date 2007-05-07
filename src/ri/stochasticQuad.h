@@ -151,6 +151,7 @@
 		findSample(nSample,z);																	\
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
+		if (nSample->prev == &pixel->first) { drawExtraSamples(); }								\
 	}
 
 #else
@@ -236,6 +237,7 @@
 		findSample(nSample,z);																\
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
+		if (nSample->prev == &pixel->first) { drawExtraSamples(); }							\
 	}
 
 #else

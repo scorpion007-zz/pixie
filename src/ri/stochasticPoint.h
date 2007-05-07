@@ -210,7 +210,7 @@ const	int	yres		=	sampleHeight - 1;
 		findSample(nSample,z);														\
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
-		drawExtraSamples()															\
+		if (nSample->prev == &pixel->first) { drawExtraSamples(); }					\
 	}
 
 
@@ -221,7 +221,7 @@ const	int	yres		=	sampleHeight - 1;
 		findSample(nSample,z);														\
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
-		drawExtraSamples()															\
+		if (nSample->prev == &pixel->first) { drawExtraSamples(); }					\
 	}
 
 #endif
