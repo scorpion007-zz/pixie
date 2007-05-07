@@ -332,32 +332,32 @@ RtInt		RiLastError				=	RIE_NOERROR;
 
 ////////////////////////////////////////////////////////////////////////
 // The cubic spline basis definition
-const RtBasis		RiCatmullRomBasis	= {
+RtBasis		RiCatmullRomBasis	= {
 	{(float)  (-1.0/2.0),	(float)  ( 3.0/2.0),	(float)  (-3.0/2.0),	(float)  ( 1.0/2.0)},
 	{(float)  ( 2.0/2.0),	(float)  (-5.0/2.0),	(float)  ( 4.0/2.0),	(float)  (-1.0/2.0)},
 	{(float)  (-1.0/2.0),	(float)  ( 0.0/2.0),	(float)  ( 1.0/2.0),	(float)  ( 0.0/2.0)},
 	{(float)  ( 0.0/2.0),	(float)  ( 2.0/2.0),	(float)  ( 0.0/2.0),	(float)  ( 0.0/2.0)}};
 
 
-const RtBasis		RiBezierBasis		= { 
+RtBasis		RiBezierBasis		= { 
 	{(float) -1,	(float)	3,		(float)	-3,		(float)	1},
 	{(float) 3,		(float)	-6,		(float)	3,		(float)	0},
 	{(float) -3,	(float)	3,		(float)	0,		(float)	0},
 	{(float) 1,		(float)	0,		(float)	0,		(float)	0 }};
 
-const RtBasis		RiBSplineBasis		= {
+RtBasis		RiBSplineBasis		= {
 	{(float) (-1.0/6.0),	(float) (3.0/6.0),	(float) (-3.0/6.0),	(float)  (1.0/6.0)},
 	{(float) (3.0/6.0),		(float) -(6.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0)},
 	{(float) (-3.0/6.0),	(float) (0.0/6.0),	(float) (3.0/6.0),	(float)  (0.0/6.0)},
 	{(float) (1.0/6.0),		(float) (4.0/6.0),	(float) (1.0/6.0),	(float)  (0.0/6.0)}};
 
-const RtBasis		RiHermiteBasis		= { 
+RtBasis		RiHermiteBasis		= { 
 	{(float) 1 ,	(float) 1 ,		(float)	-3 ,	(float)	1},
 	{(float) -1 ,	(float) -2 ,	(float)	4 ,		(float)	-1},
 	{(float) -1,	(float) 1 ,		(float)	0 ,		(float)	0},
 	{(float) 1 ,	(float) 0 ,		(float)	0 ,		(float)	0}};
 
-const RtBasis		RiPowerBasis		= {
+RtBasis		RiPowerBasis		= {
 	{(float)  1,	(float)	0,		(float)	0,		(float)	0},
 	{(float)  0,	(float)	1,		(float)	0,		(float)	0},
 	{(float)  0,	(float)	0,		(float)	1,		(float)	0},
