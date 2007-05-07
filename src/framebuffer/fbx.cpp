@@ -441,6 +441,7 @@ void		CXDisplay::finish() {
 				unsigned short	*dest	=	&((unsigned short *) imageData)[((i+y)*width+x)];	\
 				STUFF_MONO_ROW(colorPacker,src[0])												\
 			}																					\
+			break;																				\
 		case 2:																					\
 			for (i=0;i<h;i++) {																	\
 				const float		*src	=	&d[i*w*numSamples];									\
@@ -482,6 +483,7 @@ void		CXDisplay::finish() {
 				unsigned int	*dest	=	&((unsigned int *) imageData)[((i+y)*width+x)];			\
 				STUFF_MONO_ROW(colorPacker,src[0])													\
 			}																						\
+			break;																					\
 		case 2:																						\
 			for (i=0;i<h;i++) {																		\
 				const float		*src	=	&d[i*w*numSamples];										\
