@@ -428,7 +428,7 @@ static	int					archiveNesting		=	0;
 		CRiInterface		*savedRenderMan		=	NULL;	// This variable contains the parent context for arhiving
 		CRiInterface		*renderMan			=	NULL;	// This variable is exported for error reporting
 		int					ignoreCommand		=	FALSE;	// This variable can be set to force ignore ri commands (used for conditional execution)
-		int					insideRubProgram	=	FALSE;	// Are we running inside a runprogram context
+		int					insideRunProgram	=	FALSE;	// Are we running inside a runprogram context
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -611,7 +611,7 @@ RiBegin (RtToken name) {
 		if (runProgEnv != NULL) {
 			// If we're a runprogram, we should be writing out to stdout
 			renderMan	=	new CRibOut(stdout);
-			insideRubProgram = TRUE;
+			insideRunProgram = TRUE;
 		} else {
 			renderMan	=	new CRendererContext();
 		}
@@ -621,7 +621,7 @@ RiBegin (RtToken name) {
 	RiInit();
 	
 	// Alter the state if we're inside a runprogram
-	if (insideRubProgram) {
+	if (insideRunProgram) {
 		// We're also inside the world block already
 		currentBlock = RENDERMAN_WORLD_BLOCK;
 	}
@@ -638,7 +638,7 @@ EXTERN(RtVoid)
 RiEnd (void) {
 
 	// Alter the state if we're inside a runprogram
-	if (insideRubProgram) {
+	if (insideRunProgram) {
 		RiArchiveRecord(RI_VERBATIM,"\n\377");
 		fflush(stdout);
 		// We're also inside the world block already
