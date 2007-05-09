@@ -468,7 +468,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						const int matteMode		= CRenderer::compChannelOrder[es*3+2];
 						if (matteMode) {
 							float *ESD				= ES + sampleOffset;
-							const float *ESS		= sampleDefaults + sampleOffset;
+							const float *ESS		= CRenderer::sampleDefaults + sampleOffset;
 							for(int ess=numSamples;ess>0;ess--) *ESD++ = *ESS++;
 						} else {
 							float *ESD				= ES + sampleOffset;
