@@ -846,7 +846,7 @@ void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) 
 		else if (vbasis == RiPowerBasis)
 			vbasis_str = "power";
 		
-		out("Basis %s %d %s %d\n",
+		out("Basis \"%s\" %d \"%s\" %d\n",
 			ubasis_str,ustep,
 			vbasis_str,vstep);
 		attributes->uStep	=	ustep;
