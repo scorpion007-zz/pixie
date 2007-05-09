@@ -52,6 +52,9 @@ public:
 	int					numSamples;		// The size of channel sample
 	int					outType;		// The entry index of the variable
 	int					sampleStart;	// The offset in the shaded vertex array (-1 is unassigned)
+	int					filterType;
+	float				quantizer[5];	// Default for the display
+	int					matteMode;		// Respect (default) or ignore mattes
 };
 
 

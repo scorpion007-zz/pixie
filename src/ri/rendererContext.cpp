@@ -1108,6 +1108,12 @@ void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void
 					} else {
 						error(CODE_BADTOKEN,"Invalid number of items for fill\n");
 					}
+				} else if (strcmp(cVar->name,"matte") == 0) {
+					if (cVar->type == TYPE_INTEGER) {
+						nChannel->matteMode = ((int*)params[i])[0];
+					} else {
+						error(CODE_BADTOKEN,"Invalid type for AOV matte mode\n");
+					}
 				} else if (strcmp(cVar->name,"quantize") == 0) {
 					// intentionally empty for compatibility
 					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not implemented (yet)\n",cVar->name);

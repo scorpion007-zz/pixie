@@ -254,6 +254,10 @@ int								CRenderer::numDisplays;												// initialized in beginDisplays
 CRenderer::CDisplayData			*CRenderer::datas;													// initialized in beginDisplays / computeDisplayData
 int								*CRenderer::sampleOrder;											// initialized in beginDisplays / computeDisplayData
 float							*CRenderer::sampleDefaults;											// initialized in beginDisplays / computeDisplayData
+int								*CRenderer::compChannelOrder;										// initialized in beginDisplays / computeDisplayData
+int								CRenderer::numExtraCompChannels;									// initialized in beginDisplays / computeDisplayData
+int								*CRenderer::nonCompChannelOrder;									// initialized in beginDisplays / computeDisplayData
+int								CRenderer::numExtraNonCompChannels;									// initialized in beginDisplays / computeDisplayData
 int								CRenderer::numExtraChannels;										// initialized in beginDisplays / computeDisplayData
 int								CRenderer::numRenderedBuckets			=	0;						// initialized in beginFrame
 int								*CRenderer::textureRefNumber			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures

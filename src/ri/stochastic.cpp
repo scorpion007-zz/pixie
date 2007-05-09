@@ -37,6 +37,9 @@
 // This macro is used to allocate fragments
 #define	newFragment(__a)	if (freeFragments == NULL)	{						\
 								__a					=	new CFragment;			\
+								if (CRenderer::numExtraSamples > 0) {							\
+									__a->extraSamples = new float[CRenderer::numExtraSamples]; 	\
+								}																\
 							} else {											\
 								__a					=	freeFragments;			\
 								freeFragments		=	freeFragments->next;	\
@@ -74,7 +77,10 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(), apert
 	for (i=0;i<totalHeight;i++) {
 		cPixel		=	fb[i]		=	 (CPixel *) ralloc(totalWidth*sizeof(CPixel),CRenderer::globalMemory);
 
-		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=CRenderer::numExtraSamples)	cPixel->extraSamples	=	cExtraSample;
+		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=CRenderer::numExtraSamples) {
+			cPixel->last.extraSamples	=	cExtraSample;
+			cPixel->first.extraSamples	=	NULL;
+		}
 	}
 
 	// Init the fragment buffer
@@ -97,6 +103,9 @@ CStochastic::~CStochastic() {
 	// Ditch the extra fragments
 	while((cFragment = freeFragments) != NULL) {
 		freeFragments	=	cFragment->next;
+		if (CRenderer::numExtraSamples > 0) {
+			delete[] cFragment->extraSamples;
+		}
 		delete cFragment;
 	}
 }
@@ -200,6 +209,10 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			initv(cFragment->opacity,0);
 			cFragment->next				=	NULL;
 			cFragment->prev				=	&pixel->first;
+			// The last sample's extra samples are genuine AOV data
+			if (CRenderer::numExtraSamples > 0)
+				memcpy(cFragment->extraSamples,CRenderer::sampleDefaults,sizeof(float)*CRenderer::numExtraSamples);
+
 
 			cFragment					=	&pixel->first;
 			cFragment->z				=	-C_INFINITY;
@@ -207,10 +220,8 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			initv(cFragment->opacity,0);
 			cFragment->next				=	&pixel->last;
 			cFragment->prev				=	NULL;
-			
-			for (k=0;k<CRenderer::numExtraSamples;k++) {
-				pixel->extraSamples[k]	=	CRenderer::sampleDefaults[k];
-			}
+			// Note: The first fragment's extra samples are not used, and the pointer is NULL
+			assert(cFragment->extraSamples == NULL);
 
 			pixel->update				=	&pixel->first;
 		}
@@ -341,7 +352,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			*tmp++	=	0;					// a
 			*tmp++	=	C_INFINITY;			// z
 			
-			// extra samples
+			// default-fill extra samples
 			if (CRenderer::numExtraSamples > 0) {
 				memcpy(tmp,CRenderer::sampleDefaults,CRenderer::numExtraSamples*sizeof(float));
 			
@@ -374,11 +385,9 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			CFragment	*oSample;
 			float		*C			=	&cFb[2];
 			float		*O			=	&cFb[5];
- 
+			float		*ES			=	&cFb[8];
+ 			
 			assert(cPixel->first.z == -C_INFINITY);
-
-			if (CRenderer::numExtraSamples > 0)
-				memcpy(cFb+8,cPixel->extraSamples,CRenderer::numExtraSamples*sizeof(float));
 
 			// We re-use cPixel->first as a marker as to whether the pixel has any matte samples,
 			// cPixel->last ise really used, but cPixel->first is not (it's always skipped in the composite),
@@ -391,14 +400,33 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				ropacity[0]	=	1-O[0];
 				ropacity[1]	=	1-O[1];
 				ropacity[2]	=	1-O[2];
-
+				
+				// Copy default non-composited aovs
+//FIXME: deal with the various filter mode options here
+				const float *sampleExtra = cSample->extraSamples;
+				for(int es = 0; es < CRenderer::numExtraNonCompChannels; es++) {
+					const int sampleOffset	= CRenderer::nonCompChannelOrder[es*3];
+					const int numSamples	= CRenderer::nonCompChannelOrder[es*3+1];
+					float *ESD				= ES + sampleOffset;
+					const float *ESS		= sampleExtra + sampleOffset;
+					for(int ess=numSamples;ess>0;ess--) *ESD++ = *ESS++;
+				}
+				
+				// If this sample has no valid samples, this will already be the sample defaults
+				sampleExtra = cSample->extraSamples;
+				for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+					const int sampleOffset = CRenderer::compChannelOrder[es*3];
+					movvv(ES + sampleOffset,sampleExtra + sampleOffset);
+				}
+				
 				oSample		=	cSample;
 				cSample		=	cSample->next;
 				for (;cSample!=NULL;) {
 					deleteFragment(oSample);
 					const float	*color		= cSample->color;
 					const float *opacity	= cSample->opacity;
-	
+					sampleExtra				= cSample->extraSamples;
+
 					// Composite
 					C[0]		+=	ropacity[0]*color[0];
 					C[1]		+=	ropacity[1]*color[1];
@@ -406,6 +434,14 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					O[0]		+=	ropacity[0]*opacity[0];
 					O[1]		+=	ropacity[1]*opacity[1];
 					O[2]		+=	ropacity[2]*opacity[2];
+					
+					for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+						const int sampleOffset = CRenderer::compChannelOrder[es*3];
+						ES[sampleOffset + 0] += ropacity[0]*sampleExtra[sampleOffset + 0];
+						ES[sampleOffset + 1] += ropacity[1]*sampleExtra[sampleOffset + 1];
+						ES[sampleOffset + 2] += ropacity[2]*sampleExtra[sampleOffset + 2];
+					}
+					
 					ropacity[0]	*=	1-opacity[0];
 					ropacity[1]	*=	1-opacity[1];
 					ropacity[2]	*=	1-opacity[2];
@@ -415,7 +451,6 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				}
 			}
 			else {
-				
 				// Get the base color and opacity
 				if (cSample->opacity[0] < 0 || cSample->opacity[1] < 0 || cSample->opacity[2] < 0) {
 					// Matte base sample
@@ -424,6 +459,32 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					ropacity[0]	=	1+cSample->opacity[0];
 					ropacity[1]	=	1+cSample->opacity[1];
 					ropacity[2]	=	1+cSample->opacity[2];
+					
+					// Copy default non-composited AOVs - default values unless ignoring matte
+					const float *sampleExtra = cSample->extraSamples;
+					for(int es = 0; es < CRenderer::numExtraNonCompChannels; es++) {
+						const int sampleOffset	= CRenderer::nonCompChannelOrder[es*3];
+						const int numSamples	= CRenderer::nonCompChannelOrder[es*3+1];
+						const int matteMode		= CRenderer::compChannelOrder[es*3+2];
+						if (matteMode) {
+							float *ESD				= ES + sampleOffset;
+							const float *ESS		= sampleDefaults + sampleOffset;
+							for(int ess=numSamples;ess>0;ess--) *ESD++ = *ESS++;
+						} else {
+							float *ESD				= ES + sampleOffset;
+							const float *ESS		= sampleExtra + sampleOffset;
+							for(int ess=numSamples;ess>0;ess--) *ESD++ = *ESS++;
+						}
+					}
+
+					// Composite AOVs with ignore matte flag
+					sampleExtra = cSample->extraSamples;
+					for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+						const int sampleOffset = CRenderer::compChannelOrder[es*3];
+						const int matteMode = CRenderer::compChannelOrder[es*3+2];
+						if (matteMode)		initv(ES + sampleOffset,0);
+						else				movvv(ES + sampleOffset,sampleExtra + sampleOffset);
+					}
 				}
 				else {
 					// Non-matte base sample
@@ -432,7 +493,23 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					ropacity[0]	=	1-O[0];
 					ropacity[1]	=	1-O[1];
 					ropacity[2]	=	1-O[2];
-
+					
+					// Copy default non-composited AOVs
+					const float *sampleExtra = cSample->extraSamples;
+					for(int es = 0; es < CRenderer::numExtraNonCompChannels; es++) {
+						const int sampleOffset	= CRenderer::nonCompChannelOrder[es*3];
+						const int numSamples	= CRenderer::nonCompChannelOrder[es*3+1];
+						float *ESD				= ES + sampleOffset;
+						const float *ESS		= sampleExtra + sampleOffset;
+						for(int ess=numSamples;ess>0;ess--) *ESD++ = *ESS++;
+					}
+					
+					// Composite
+					sampleExtra = cSample->extraSamples;
+					for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+						const int sampleOffset = CRenderer::compChannelOrder[es*3];
+						movvv(ES + sampleOffset,sampleExtra + sampleOffset);
+					}
 				}
 
 				oSample		=	cSample;
@@ -447,6 +524,15 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						ropacity[0]	*=	1+opacity[0];
 						ropacity[1]	*=	1+opacity[1];
 						ropacity[2]	*=	1+opacity[2];
+						
+						// Composite AOVs with ignore matte flag
+						const float *sampleExtra = cSample->extraSamples;
+						for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+							const int sampleOffset = CRenderer::compChannelOrder[es*3];
+							const int matteMode = CRenderer::compChannelOrder[es*3+2];
+
+							if (!matteMode)		movvv(ES + sampleOffset,sampleExtra + sampleOffset);
+						}
 					}
 					else {
 						// Composite non-matte
@@ -456,6 +542,16 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						O[0]		+=	ropacity[0]*opacity[0];
 						O[1]		+=	ropacity[1]*opacity[1];
 						O[2]		+=	ropacity[2]*opacity[2];
+						
+						const float *sampleExtra = cSample->extraSamples;
+						for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+							const int sampleOffset = CRenderer::compChannelOrder[es*3];
+							const int matteMode = CRenderer::compChannelOrder[es*3+2];
+							ES[sampleOffset + 0] += ropacity[0]*sampleExtra[sampleOffset + 0];
+							ES[sampleOffset + 1] += ropacity[1]*sampleExtra[sampleOffset + 1];
+							ES[sampleOffset + 2] += ropacity[2]*sampleExtra[sampleOffset + 2];
+						}
+						
 						ropacity[0]	*=	1-opacity[0];
 						ropacity[1]	*=	1-opacity[1];
 						ropacity[2]	*=	1-opacity[2];

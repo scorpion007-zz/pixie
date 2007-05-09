@@ -477,6 +477,11 @@ public:
 		static	CDisplayData				*datas;
 		static	int							*sampleOrder;			// variable entry, sample count pairs
 		static	float						*sampleDefaults;		// default values for each channel
+		static	int							*compChannelOrder;		// channels which need compositing
+		static	int							numExtraCompChannels;	// number of channels which need compositing
+		static	int							*nonCompChannelOrder;	// channels which do not need compositing
+		static	int							numExtraNonCompChannels;// number of channels which do not need compositing
+
 		static	int							numExtraChannels;	
 
 

@@ -44,6 +44,7 @@ CDisplayChannel::CDisplayChannel() {
 	sampleStart		=	-1;
 	outType			=	-1;
 	fill			=	NULL;
+	matteMode		=	1;		// Respect mattes
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -67,5 +68,6 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 	sampleStart	=	start;
 	outType		=	entry;
 	fill		=	NULL;
+	matteMode	=	1;		// Respect mattes
 }
 

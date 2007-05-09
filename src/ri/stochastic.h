@@ -64,6 +64,7 @@ private:
 		float			z;						// Depth of the sample
 		CFragment		*next;					// The next fragment wrt. depth
 		CFragment		*prev;					// The previous fragment wrt. depth
+		float			*extraSamples;			// Extra sample space
 	};
 
 	///////////////////////////////////////////////////////////////////////
@@ -82,7 +83,6 @@ private:
 		float			xcent,ycent;			// The center of the sampling window
 		CFragment		first,last;				// The first and last fragments always exist
 		CFragment		*update;				// The last fragment to be saved
-		float			*extraSamples;			// Pointer to the extra samples array if any
 		COcclusionNode	*node;					// The occlusion sample
 	};
 

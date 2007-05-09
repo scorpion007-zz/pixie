@@ -76,7 +76,7 @@ const	int	yres		=	sampleHeight - 1;
 	const	float	*s0	=	v0+10;													\
 	float			*dest;															\
 																					\
-	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
+	for (dest=nSample->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
 		*dest++		=	(s0[0]*(1-jt)+s0[displacement]*jt);							\
 	}																				\
 }
@@ -87,7 +87,7 @@ const	int	yres		=	sampleHeight - 1;
 	const	float	*s0	=	v0+10;													\
 	float			*dest;															\
 																					\
-	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
+	for (dest=nSample->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++) {		\
 		*dest++		=	s0[currentSample];											\
 	}																				\
 }
@@ -179,7 +179,7 @@ const	int	yres		=	sampleHeight - 1;
 	if (z < pixel->z) {																\
 		nSample							=	&pixel->last;							\
 		colorOpacityUpdate();														\
-		drawExtraSamples()															\
+		drawExtraSamples();															\
 		depthFilterIf();															\
 		pixel->z						=	z;										\
 		touchNode(pixel->node,z);													\
@@ -192,7 +192,7 @@ const	int	yres		=	sampleHeight - 1;
 	if (z < pixel->z) {																\
 		nSample							=	&pixel->last;							\
 		colorOpacityUpdate();														\
-		drawExtraSamples()															\
+		drawExtraSamples();															\
 		depthFilterIf();															\
 		pixel->z						=	z;										\
 		touchNode(pixel->node,z);													\
@@ -210,7 +210,7 @@ const	int	yres		=	sampleHeight - 1;
 		findSample(nSample,z);														\
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
-		if (nSample->prev == &pixel->first) { drawExtraSamples(); }					\
+		drawExtraSamples();															\
 	}
 
 
@@ -221,7 +221,7 @@ const	int	yres		=	sampleHeight - 1;
 		findSample(nSample,z);														\
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
-		if (nSample->prev == &pixel->first) { drawExtraSamples(); }					\
+		drawExtraSamples();															\
 	}
 
 #endif

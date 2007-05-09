@@ -54,6 +54,7 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	if (currentDisplay != NULL) {
 		int	i;
 
+		// parameters provided on the display line override everything else
 		for (i=0;i<currentDisplay->numParameters;i++) {
 			if (strcmp(name,currentDisplay->parameters[i].name) == 0) {
 				if (numItems == currentDisplay->parameters[i].numItems) {
@@ -64,7 +65,9 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 			}
 		}
 	}
-
+// FIXME: lookup the channel's quantizer
+	// Otherwise, we respect Quantize applied to the current display,
+	// falling back on the default color / depth quantizer
 	if (strcmp(name,"quantize") == 0) {
 		if ((numItems == 4) && (type == FLOAT_PARAMETER))	{
 			if (currentDisplay->quantizer[0] == -1) {
@@ -124,6 +127,8 @@ void	CRenderer::beginDisplays() {
 	
 	sampleOrder			=	NULL;
 	sampleDefaults		=	NULL;
+	compChannelOrder	=	NULL;
+	nonCompChannelOrder	=	NULL;
 
 	// Initiate the displays
 	if (!(hiderFlags & HIDER_NODISPLAY))
@@ -175,9 +180,11 @@ void	CRenderer::endDisplays() {
 		delete[] datas[i].channels;
 	}
 
-	if (datas != NULL)			delete[] datas;
-	if (sampleOrder != NULL)	delete[] sampleOrder;
-	if (sampleDefaults != NULL)	delete[] sampleDefaults;
+	if (datas != NULL)					delete[] datas;
+	if (sampleOrder != NULL)			delete[] sampleOrder;
+	if (sampleDefaults != NULL)			delete[] sampleDefaults;
+	if (compChannelOrder != NULL)		delete[] compChannelOrder;
+	if (nonCompChannelOrder != NULL)	delete[] nonCompChannelOrder;
 	
 	if (deepShadowFile != NULL) {
 		fseek(deepShadowFile,deepShadowIndexStart,SEEK_SET);
@@ -712,9 +719,22 @@ void	CRenderer::computeDisplayData() {
 	}
 	
 	// copy the sample and sampled defaults order for fast access
-	sampleOrder		=	new int[numExtraChannels*2];
-	sampleDefaults	=	new float[numExtraSamples];
-	for (i=0,k=0,t=0;i<numDisplays;i++) {
+	
+	// Note: sampleOrder is used to unpack variables from the varying state into
+	// the extraSamples buffer for each fragment
+	
+	// Note: compChannelOrder and nonCompChannelOrder are used during the composite
+	// loops to alter the way we composite AOV channels
+	
+	sampleOrder				=	new int[numExtraChannels*2];	// variableEntry,numSamples
+	sampleDefaults			=	new float[numExtraSamples];
+	compChannelOrder		=	new int[numExtraChannels*3];	// offset,numSamples,matteMode
+	nonCompChannelOrder		=	new int[numExtraChannels*3];
+	numExtraCompChannels	=	0;
+	numExtraNonCompChannels	=	0;
+	
+	int sampleOffset = 0;	// rgbaz
+	for (i=0,k=0;i<numDisplays;i++) {
 		for (j=0;j<datas[i].numChannels;j++) {
 			// skip standard channels
 			if (datas[i].channels[j].outType == -1) continue;
@@ -723,16 +743,38 @@ void	CRenderer::computeDisplayData() {
 			
 			if (datas[i].channels[j].fill) {
 				for(s=0;s<datas[i].channels[j].numSamples;s++)
-					sampleDefaults[t+s] = datas[i].channels[j].fill[s];
+					sampleDefaults[sampleOffset+s] = datas[i].channels[j].fill[s];
 			} else {
-				for(s=0;s<datas[i].channels[j].numSamples;s++) sampleDefaults[t+s] = 0;
+				for(s=0;s<datas[i].channels[j].numSamples;s++) sampleDefaults[sampleOffset+s] = 0;
 			}
-			t += datas[i].channels[j].numSamples;
 			
 			sampleOrder[k++] = datas[i].channels[j].outType;
 			sampleOrder[k++] = datas[i].channels[j].numSamples;
+
+			if (datas[i].channels[j].variable != NULL) {
+				if (datas[i].channels[j].variable->type == TYPE_COLOR) {
+// FIXME: this logic should cope with user filter choice
+					compChannelOrder[numExtraCompChannels*3]			= sampleOffset;
+					compChannelOrder[numExtraCompChannels*3+1]			= datas[i].channels[j].numSamples;
+					compChannelOrder[numExtraCompChannels*3+2]			= datas[i].channels[j].matteMode;
+					numExtraCompChannels++;
+				} else {
+					nonCompChannelOrder[numExtraNonCompChannels*3]		= sampleOffset;
+					nonCompChannelOrder[numExtraNonCompChannels*3+1] 	= datas[i].channels[j].numSamples;
+					nonCompChannelOrder[numExtraNonCompChannels*3+2] 	= datas[i].channels[j].matteMode;
+					numExtraNonCompChannels++;
+				}
+			} else {
+				nonCompChannelOrder[numExtraNonCompChannels*3]			= sampleOffset;
+				nonCompChannelOrder[numExtraNonCompChannels*3+1]		= datas[i].channels[j].numSamples;
+				nonCompChannelOrder[numExtraNonCompChannels*3+2]		= datas[i].channels[j].matteMode;
+				numExtraNonCompChannels++;
+			}
+			
+			sampleOffset += datas[i].channels[j].numSamples;
 		}
 	}
+	assert(numExtraCompChannel + numExtraNonCompChannels == numExtraChannels);
 	assert(k == 2*numExtraChannels);
 
 	if (numActiveDisplays == 0) hiderFlags	|=	HIDER_BREAK;

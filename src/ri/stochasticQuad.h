@@ -70,7 +70,7 @@
 	const	float	*s3	=	v3+10;															\
 	float			*dest;																	\
 																							\
-	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++,s1++,s2++,s3++) {		\
+	for (dest=nSample->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--,s0++,s1++,s2++,s3++) {		\
 		*dest++	=	((s0[0]*(1-jt)+s0[displacement]*jt)*(1-u) + (s1[0]*(1-jt)+s1[displacement]*jt)*u)*(1-v)	+	\
 					((s2[0]*(1-jt)+s2[displacement]*jt)*(1-u) + (s3[0]*(1-jt)+s3[displacement]*jt)*u)*v;		\
 	}																						\
@@ -87,7 +87,7 @@
 	const	float	*s3	=	v2+10;															\
 	float			*dest;																	\
 																							\
-	for (dest=pixel->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--) {	\
+	for (dest=nSample->extraSamples,currentSample=CRenderer::numExtraSamples;currentSample>0;currentSample--) {	\
 		*dest++	=	((*s0++)*(1-u) + (*s1++)*u)*(1-v) + ((*s2++)*(1-u) + (*s3++)*u)*v;		\
 	}																						\
 }
@@ -151,7 +151,7 @@
 		findSample(nSample,z);																	\
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
-		if (nSample->prev == &pixel->first) { drawExtraSamples(); }								\
+		drawExtraSamples();																		\
 	}
 
 #else
@@ -189,7 +189,7 @@
 		nSample					=	&pixel->last;												\
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
-		drawExtraSamples()																		\
+		drawExtraSamples();																		\
 		depthFilterIf();																		\
 		pixel->z				=	z;															\
 		touchNode(pixel->node,z);																\
@@ -237,7 +237,7 @@
 		findSample(nSample,z);																\
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
-		if (nSample->prev == &pixel->first) { drawExtraSamples(); }							\
+		drawExtraSamples();																	\
 	}
 
 #else
@@ -272,7 +272,7 @@
 		nSample					=	&pixel->last;											\
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
-		drawExtraSamples()																	\
+		drawExtraSamples();																	\
 		depthFilterIf();																	\
 		pixel->z				=	z;														\
 		touchNode(pixel->node,z);															\
