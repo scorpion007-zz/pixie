@@ -370,7 +370,10 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
 
 	// Collapse the samples (transparency composite)
-
+	
+	const int numExtraNonCompChannels	=	CRenderer::numExtraNonCompChannels;
+	const int numExtraCompChannels		=	CRenderer::numExtraCompChannels;
+	
 	// 0	=	alpha
 	// 1	=	z;
 	// 2-4	=	color
@@ -404,7 +407,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				// Copy default non-composited aovs
 //FIXME: deal with the various filter mode options here
 				const float *sampleExtra = cSample->extraSamples;
-				for(int es = 0; es < CRenderer::numExtraNonCompChannels; es++) {
+				for(int es = 0; es < numExtraNonCompChannels; es++) {
 					const int sampleOffset	= CRenderer::nonCompChannelOrder[es*3];
 					const int numSamples	= CRenderer::nonCompChannelOrder[es*3+1];
 					float *ESD				= ES + sampleOffset;
@@ -414,7 +417,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				
 				// If this sample has no valid samples, this will already be the sample defaults
 				sampleExtra = cSample->extraSamples;
-				for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+				for(int es = 0; es < numExtraCompChannels; es++) {
 					const int sampleOffset = CRenderer::compChannelOrder[es*3];
 					movvv(ES + sampleOffset,sampleExtra + sampleOffset);
 				}
@@ -435,7 +438,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					O[1]		+=	ropacity[1]*opacity[1];
 					O[2]		+=	ropacity[2]*opacity[2];
 					
-					for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+					for(int es = 0; es < numExtraCompChannels; es++) {
 						const int sampleOffset = CRenderer::compChannelOrder[es*3];
 						ES[sampleOffset + 0] += ropacity[0]*sampleExtra[sampleOffset + 0];
 						ES[sampleOffset + 1] += ropacity[1]*sampleExtra[sampleOffset + 1];
@@ -462,7 +465,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					
 					// Copy default non-composited AOVs - default values unless ignoring matte
 					const float *sampleExtra = cSample->extraSamples;
-					for(int es = 0; es < CRenderer::numExtraNonCompChannels; es++) {
+					for(int es = 0; es < numExtraNonCompChannels; es++) {
 						const int sampleOffset	= CRenderer::nonCompChannelOrder[es*3];
 						const int numSamples	= CRenderer::nonCompChannelOrder[es*3+1];
 						const int matteMode		= CRenderer::compChannelOrder[es*3+2];
@@ -479,7 +482,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 					// Composite AOVs with ignore matte flag
 					sampleExtra = cSample->extraSamples;
-					for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+					for(int es = 0; es < numExtraCompChannels; es++) {
 						const int sampleOffset = CRenderer::compChannelOrder[es*3];
 						const int matteMode = CRenderer::compChannelOrder[es*3+2];
 						if (matteMode)		initv(ES + sampleOffset,0);
@@ -506,7 +509,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					
 					// Composite
 					sampleExtra = cSample->extraSamples;
-					for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+					for(int es = 0; es < numExtraCompChannels; es++) {
 						const int sampleOffset = CRenderer::compChannelOrder[es*3];
 						movvv(ES + sampleOffset,sampleExtra + sampleOffset);
 					}
@@ -527,7 +530,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						
 						// Composite AOVs with ignore matte flag
 						const float *sampleExtra = cSample->extraSamples;
-						for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+						for(int es = 0; es < numExtraCompChannels; es++) {
 							const int sampleOffset = CRenderer::compChannelOrder[es*3];
 							const int matteMode = CRenderer::compChannelOrder[es*3+2];
 
@@ -544,7 +547,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						O[2]		+=	ropacity[2]*opacity[2];
 						
 						const float *sampleExtra = cSample->extraSamples;
-						for(int es = 0; es < CRenderer::numExtraCompChannels; es++) {
+						for(int es = 0; es < numExtraCompChannels; es++) {
 							const int sampleOffset = CRenderer::compChannelOrder[es*3];
 							const int matteMode = CRenderer::compChannelOrder[es*3+2];
 							ES[sampleOffset + 0] += ropacity[0]*sampleExtra[sampleOffset + 0];
