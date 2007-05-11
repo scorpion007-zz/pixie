@@ -114,6 +114,8 @@ public:
 
 #define	NUMFILTERSTEPS	10
 
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
 // Description			:	This class holds information about a particular texture lookup

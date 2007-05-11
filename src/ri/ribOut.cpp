@@ -819,8 +819,8 @@ void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *
 }
 
 void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) {
-	if ((ubasis == RiBezierBasis || ubasis == RiBSplineBasis | ubasis == RiCatmullRomBasis | ubasis == RiHermiteBasis | ubasis == RiPowerBasis) &&
-		(vbasis == RiBezierBasis || vbasis == RiBSplineBasis | vbasis == RiCatmullRomBasis | vbasis == RiHermiteBasis | vbasis == RiPowerBasis)) {
+	if ((ubasis == RiBezierBasis || ubasis == RiBSplineBasis || ubasis == RiCatmullRomBasis || ubasis == RiHermiteBasis || ubasis == RiPowerBasis) &&
+		(vbasis == RiBezierBasis || vbasis == RiBSplineBasis || vbasis == RiCatmullRomBasis || vbasis == RiHermiteBasis || vbasis == RiPowerBasis)) {
 	
 		const char *ubasis_str;
 		if (ubasis == RiBezierBasis)

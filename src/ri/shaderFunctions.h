@@ -271,7 +271,8 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 #define	AREAEXPR				mulvf(dPdu,du[0]);															\
 								mulvf(dPdv,dv[0]);															\
 								crossvv(tmp,dPdu,dPdv);														\
-								*res	=	lengthv(tmp);
+								*res	=	lengthv(tmp);													\
+								assert(*res >= 0);
 
 #define	AREAEXPR_UPDATE			res++;																		\
 								dPdu	+=	3;																\
@@ -285,8 +286,72 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 #endif
 
 // Totally ignore the measure argument for area
-DEFLINKFUNC(AreaS	,"area"		,"f=pS",	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+
+#undef	AREAEXPR_PRE
+#undef	AREAEXPR
+#undef	AREAEXPR_UPDATE
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// area "f=pS"
+#ifndef INIT_SHADING
+#define	AREAEXPR_PRE			FUN2EXPR_PRE																\
+								float		*du;															\
+								float		*dv;															\
+								float		*dPdu;															\
+								float		*dPdv;															\
+								vector		tmp;															\
+								duVector(dPdu,op);															\
+								dvVector(dPdv,op);															\
+								const char	**measure;														\
+								int			dicingMeasure;													\
+								operand(2,measure,(const char **));											\
+								if (strcmp(*measure,"shading") == 0) {										\
+									du		=	varying[VARIABLE_DU];										\
+									dv		=	varying[VARIABLE_DV];										\
+									dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
+									dPdv	=	dPdu + numVertices*3;										\
+									duVector(dPdu,op);														\
+									dvVector(dPdv,op);														\
+									dicingMeasure	=	FALSE;												\
+								} else if (strcmp(*measure,"dicing") == 0) {								\
+									du				=	rayDiff(op);										\
+									dicingMeasure	=	TRUE;												\
+								} else {																	\
+									error("Unrecognised area measure: \"%s\". Assuming \"dicing\"\n",*measure);					\
+									du				=	rayDiff(op);										\
+									dicingMeasure	=	TRUE;												\
+								}
+								
+
+#define	AREAEXPR				if (dicingMeasure) {														\
+									assert(*du >= 0);														\
+									*res	=	(*du)*(*du);												\
+								} else {																	\
+									mulvf(dPdu,du[0]);														\
+									mulvf(dPdv,dv[0]);														\
+									crossvv(tmp,dPdu,dPdv);													\
+									*res	=	lengthv(tmp);												\
+								}
+
+#define	AREAEXPR_UPDATE			res++;																		\
+								du++;																		\
+								if (dicingMeasure == FALSE) {												\
+									dPdu	+=	3;															\
+									dPdv	+=	3;															\
+									dv++;																	\
+								}
+#else
+#define	AREAEXPR_PRE
+#define	AREAEXPR
+#define	AREAEXPR_UPDATE
+#endif
+
+// Totally ignore the measure argument for area
+DEFLINKFUNC(AreaS	,"area"		,"f=pS",	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	AREAEXPR_PRE
 #undef	AREAEXPR
@@ -2312,15 +2377,15 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											lookup->pointHierarchy	=	CRenderer::getTexture3d(vals[0],FALSE,"_area",CRenderer::fromWorld,CRenderer::toWorld,TRUE);						\
 										} else if (strcmp(*param,"radiusscale") == 0) {							\
 											lookup->radiusScale	=	*valf;										\
-										} else if (strcmp(*param,"maxsolidangle") == 0) {							\
-											lookup->maxsolidangle	=	*valf;										\
+										} else if (strcmp(*param,"maxsolidangle") == 0) {						\
+											lookup->maxsolidangle	=	*valf;									\
 										} else if (strcmp(*param,"radius") == 0) {								\
-											lookup->radius		=	*valf;										\
+											lookup->radius			=	*valf;									\
 										} else if (strcmp(*param,"coordsystem") == 0) {							\
 											/* null string counts as default */									\
 											if((*vals)[0] != '\0') lookup->coordsys	=	*vals;					\
 										} else if (strcmp(*param,"interpolate") == 0) {							\
-											lookup->interpolate =	*vali;										\
+											lookup->interpolate		=	*vali;									\
 										} else {																\
 											lookup->index[lookup->numChannels]	= i*2+start+1;					\
 											lookup->size[lookup->numChannels]	= 0; /* pre-bind, nothing matches */ \

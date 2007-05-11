@@ -117,7 +117,7 @@ CStochastic::~CStochastic() {
 // Return Value			:	-
 // Comments				:
 void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
-	int			i,j,k,pxi,pxj;
+	int			i,j,pxi,pxj;
 	float		zoldStart;
 	CFragment	*cFragment;
 	

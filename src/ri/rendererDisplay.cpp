@@ -434,7 +434,7 @@ void	CRenderer::computeDisplayData() {
 	char				displayName[OS_MAX_PATH_LENGTH];
 	char				deviceFile[OS_MAX_PATH_LENGTH];
 	char				*sampleDefinition,*sampleName,*nextComma,*tmp;
-	int					i,j,k,s,t,isNewChannel;
+	int					i,j,k,s,isNewChannel;
 
 	// mark all channels as unallocated
 	resetDisplayChannelUsage();
@@ -774,7 +774,7 @@ void	CRenderer::computeDisplayData() {
 			sampleOffset += datas[i].channels[j].numSamples;
 		}
 	}
-	assert(numExtraCompChannel + numExtraNonCompChannels == numExtraChannels);
+	assert(numExtraCompChannels + numExtraNonCompChannels == numExtraChannels);
 	assert(k == 2*numExtraChannels);
 
 	if (numActiveDisplays == 0) hiderFlags	|=	HIDER_BREAK;

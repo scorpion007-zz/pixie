@@ -133,7 +133,7 @@ CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to
 
 	// FIXME: Use the implicit area in the point rather than the stored value
 	// We're doing this because our area function doesn't compute the micropolygon area yet
-	areaIndex		=	-1;
+	//areaIndex		=	-1;
 
 	// Compute the point hierarchy so that we can perform lookups
 	computeHierarchy();
@@ -236,6 +236,7 @@ int			CPointHierarchy::average(int numItems,int *indices) {
 // Comments				:
 int			CPointHierarchy::cluster(int numItems,int *indices) {
 
+	// Sanity check
 	assert(numItems > 0);
 
 	if (numItems == 1) {
@@ -251,7 +252,6 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 		return nodeIndex;
 
 	} else {
-		
 		// Allocate temp memory
 		int	*membership,*subItems;
 		
@@ -293,7 +293,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 		// Perform the clustering iterations
 		int		num0,num1;
 		int		iterations;
-		for (iterations=0;iterations<5;iterations++) {
+		for (iterations=0;iterations<5;iterations++) {	// Try 5 times
 
 			int		changed	=	FALSE;
 			vector	nC0,nC1;
