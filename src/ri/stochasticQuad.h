@@ -152,7 +152,7 @@
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
 		drawExtraSamples();																		\
-		updateTransparent();																	\
+		updateTransparent(depthFilterIf,depthFilterElse);										\
 	}
 
 #else
@@ -239,7 +239,7 @@
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
 		drawExtraSamples();																	\
-		updateTransparent();																\
+		updateTransparent(depthFilterIf,depthFilterElse);									\
 	}
 
 #else

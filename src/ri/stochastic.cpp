@@ -310,7 +310,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // beind it.  Otherwise, we need to update accumulated opacity, and cull samples
 // behind the point where we become opaque
 
-#define updateTransparent() {																		\
+#define updateTransparent(dfIf,dfElse) {															\
 	vector O,rO;																					\
 	const float *Oc;																				\
 	CFragment *cSample	=	nSample->prev;															\
@@ -350,7 +350,12 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 				pixel->last.prev	=	cSample;													\
 				pixel->update		=	cSample;													\
 			}																						\
-			touchNode(pixel->node,cSample->z);														\
+			const float z			=	cSample->z;													\
+			if (z < cPixel->z) {																	\
+				dfIf();																				\
+				pixel->z			=	z;															\
+				touchNode(pixel->node,cSample->z);													\
+			} dfElse();																				\
 			break;																					\
 		}																							\
 		cSample = cSample->next;																	\

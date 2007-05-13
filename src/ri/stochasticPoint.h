@@ -215,7 +215,7 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
-		updateTransparent();														\
+		updateTransparent(depthFilterIf,depthFilterElse);							\
 	}
 
 
@@ -227,7 +227,7 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
-		updateTransparent();														\
+		updateTransparent(depthFilterIf,depthFilterElse);							\
 	}
 
 #endif
