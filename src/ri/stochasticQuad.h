@@ -152,6 +152,7 @@
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
 		drawExtraSamples();																		\
+		updateTransparent();																	\
 	}
 
 #else
@@ -238,6 +239,7 @@
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
 		drawExtraSamples();																	\
+		updateTransparent();																\
 	}
 
 #else

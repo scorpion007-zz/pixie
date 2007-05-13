@@ -177,7 +177,9 @@ const	int	yres		=	sampleHeight - 1;
 //	  Non Moving
 #define	drawPixel() 																\
 	if (z < pixel->z) {																\
+		updateOpaque();																\
 		nSample							=	&pixel->last;							\
+		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
 		depthFilterIf();															\
@@ -190,7 +192,9 @@ const	int	yres		=	sampleHeight - 1;
 //	  Moving
 #define	drawPixel() 																\
 	if (z < pixel->z) {																\
+		updateOpaque();																\
 		nSample							=	&pixel->last;							\
+		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
 		depthFilterIf();															\
@@ -211,6 +215,7 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
+		updateTransparent();														\
 	}
 
 
@@ -222,6 +227,7 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
+		updateTransparent();														\
 	}
 
 #endif

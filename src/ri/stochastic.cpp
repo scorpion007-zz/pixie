@@ -212,6 +212,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			// The last sample's extra samples are genuine AOV data
 			if (CRenderer::numExtraSamples > 0)
 				memcpy(cFragment->extraSamples,CRenderer::sampleDefaults,sizeof(float)*CRenderer::numExtraSamples);
+			initv(cFragment->accumulatedOpacity,0);
 
 
 			cFragment					=	&pixel->first;
@@ -222,6 +223,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			cFragment->prev				=	NULL;
 			// Note: The first fragment's extra samples are not used, and the pointer is NULL
 			assert(cFragment->extraSamples == NULL);
+			initv(cFragment->accumulatedOpacity,0);
 
 			pixel->update				=	&pixel->first;
 		}
@@ -299,9 +301,61 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 		deleteFragment(cSample);																	\
 		cSample				=	nSample;															\
 	}																								\
+	initv(cSample->accumulatedOpacity,1);																	\
 	pixel->update			=	cSample;															\
 }
 
+// Note: due to the way we insert samples, we may have inserted a new one behind the 
+// maximum opaque depth - in which case we must flush the new sample and everything
+// beind it.  Otherwise, we need to update accumulated opacity, and cull samples
+// behind the point where we become opaque
+
+#define updateTransparent() {																		\
+	vector O,rO;																					\
+	const float *Oc;																				\
+	CFragment *cSample	=	nSample->prev;															\
+	movvv(O,cSample->accumulatedOpacity);															\
+	if (O[0] < CRenderer::othreshold[0] || O[1] < CRenderer::othreshold[1] || O[2] < CRenderer::othreshold[2]) {	\
+		/* not already opaque */																	\
+		cSample = nSample;																			\
+	}																								\
+	/* adjust accumulated opacities and test against threshold */									\
+	initv(rO,1-O[0],1-O[1],1-O[2]);																	\
+	while(cSample) {																				\
+		Oc = cSample->opacity;																		\
+		if (Oc[0] < 0 || Oc[1] < 0 || Oc[2] < 0) {													\
+			rO[0] *= 1+Oc[0];																		\
+			rO[1] *= 1+Oc[1];																		\
+			rO[2] *= 1+Oc[2];																		\
+		} else {																					\
+			O[0] += Oc[0]*rO[0];																	\
+			O[1] += Oc[1]*rO[1];																	\
+			O[2] += Oc[2]*rO[2];																	\
+			rO[0] += 1-O[0];																		\
+			rO[1] += 1-O[1];																		\
+			rO[2] += 1-O[2];																		\
+		}																							\
+		movvv(cSample->accumulatedOpacity,O);														\
+																									\
+		if (O[0] > CRenderer::othreshold[0] || O[1] > CRenderer::othreshold[1] || O[2] > CRenderer::othreshold[2]) {	\
+			/* opaque after this point */															\
+			CFragment *dSample	=	cSample->next;													\
+			if (dSample != &pixel->last) {															\
+				while(dSample && dSample != &pixel->last) {											\
+					CFragment *tSample	=	dSample->next;											\
+					deleteFragment(dSample);														\
+					dSample				=	tSample;												\
+				}																					\
+				cSample->next		=	&pixel->last;												\
+				pixel->last.prev	=	cSample;													\
+				pixel->update		=	cSample;													\
+			}																						\
+			touchNode(pixel->node,cSample->z);														\
+			break;																					\
+		}																							\
+		cSample = cSample->next;																	\
+	}																								\
+}
 
 #define DEFINE_STOCHASTIC_FUNCTIONS
 #include "stochasticPrimitives.h"
