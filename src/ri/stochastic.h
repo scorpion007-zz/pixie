@@ -61,6 +61,7 @@ private:
 	public:
 		vector			color;					// Color of the sample
 		vector			opacity;				// Opacity of the sample
+		vector			accumulatedOpacity;		// The accumulated opacity at this sample
 		float			z;						// Depth of the sample
 		CFragment		*next;					// The next fragment wrt. depth
 		CFragment		*prev;					// The previous fragment wrt. depth
