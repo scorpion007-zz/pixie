@@ -351,7 +351,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 				pixel->update		=	cSample;													\
 			}																						\
 			const float z			=	cSample->z;													\
-			if (z < cPixel->z) {																	\
+			if (z < pixel->z) {																		\
 				dfIf();																				\
 				pixel->z			=	z;															\
 				touchNode(pixel->node,cSample->z);													\
