@@ -315,7 +315,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 	const float *Oc;																				\
 	CFragment *cSample	=	nSample->prev;															\
 	movvv(O,cSample->accumulatedOpacity);															\
-	if (O[0] < CRenderer::othreshold[0] || O[1] < CRenderer::othreshold[1] || O[2] < CRenderer::othreshold[2]) {	\
+	if (O[0] < CRenderer::othreshold[0] && O[1] < CRenderer::othreshold[1] && O[2] < CRenderer::othreshold[2]) {	\
 		/* not already opaque */																	\
 		cSample = nSample;																			\
 	}																								\
@@ -337,7 +337,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 		}																							\
 		movvv(cSample->accumulatedOpacity,O);														\
 																									\
-		if (O[0] > CRenderer::othreshold[0] || O[1] > CRenderer::othreshold[1] || O[2] > CRenderer::othreshold[2]) {	\
+		if (O[0] > CRenderer::othreshold[0] && O[1] > CRenderer::othreshold[1] && O[2] > CRenderer::othreshold[2]) {	\
 			/* opaque after this point */															\
 			CFragment *dSample	=	cSample->next;													\
 			if (dSample != &pixel->last) {															\
