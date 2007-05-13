@@ -358,6 +358,7 @@ public:
 		static	RtFilterFunc			pixelFilter;
 		static	float					colorQuantizer[5];								// The quantization data
 		static	float					depthQuantizer[5];
+		static	vector					othreshold;										// The opacity threshold
 		static	COptions::CDisplay		*displays;										// List of displays to send the output
 		static	COptions::CClipPlane	*clipPlanes;									// List of used defined clipping planes
 		static	float					relativeDetail;									// The relative detail multiplier

@@ -288,6 +288,7 @@ RtToken		RI_EYESPLITS			=	"eyesplits";
 RtToken		RI_NUMTHREADS			=	"numthreads";
 RtToken		RI_THREADSTRIDE			=	"threadstride";
 RtToken		RI_GEOCACHEMEMORY		=	"geocachememory";
+RtToken		RI_OTHRESHOLD			=	"othreshold";
 
 // Trace options
 RtToken		RI_MAXDEPTH				=	"maxdepth";
