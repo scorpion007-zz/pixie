@@ -470,8 +470,8 @@ void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,in
 		nudiv	=	1 << (unsigned int) (ceil(log(udivf) / log2));
 		nvdiv	=	1 << (unsigned int) (ceil(log(vdivf) / log2));
 	} else {
-		nudiv   =   (int) udivf;
-		nvdiv   =   (int) vdivf;
+		nudiv   =   (int) ceil(udivf);
+		nvdiv   =   (int) ceil(vdivf);
 	}
 }
 
