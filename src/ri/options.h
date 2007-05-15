@@ -191,7 +191,7 @@ public:
 	float						colorQuantizer[5];								// The quantization data
 	float						depthQuantizer[5];
 
-	vector						othreshold;										// The opacity threshold
+	vector						opacityThreshold;								// The opacity threshold
 	
 	CDisplay					*displays;										// List of displays to send the output
 

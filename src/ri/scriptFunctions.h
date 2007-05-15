@@ -277,6 +277,23 @@ DEFLINKFUNC(URandom2	,"urandom"		,"p=", 0)
 DEFLINKFUNC(URandom3	,"urandom"		,"n=", 0)
 DEFFUNC(URandomv		,"urandom"		,"v=",FUN1EXPR_PRE,RANDOMVEXP,FUN1EXPR_UPDATE(3),NULL_EXPR,0)
 
+// Create a checkerboard pattern
+#ifndef INIT_SHADING
+#define	CHECKERFEXP		{																				\
+							const	int	i	=	currentShadingState->numRealVertices - currentVertex;	\
+							const	int	u	=	i / currentShadingState->numUvertices;					\
+							const	int	v	=	i % currentShadingState->numUvertices;					\
+							*res			=	(float) ((u ^ v) & 1);									\
+						}
+#else
+#define	CHECKERFEXP		*res	=	0;
+#endif
+
+DEFFUNC(Checkersf		,"checkers"		,"f=",FUN1EXPR_PRE,CHECKERFEXP,FUN1EXPR_UPDATE(1),NULL_EXPR,0)
+
+#undef CHECKERFEXP
+
+
 #define	XCOMPEXP		*res	=	op[0];
 DEFLINKFUNC(Xcomp1		,"xcomp"		,"f=p", 0)
 DEFLINKFUNC(Xcomp2		,"xcomp"		,"f=n", 0)
