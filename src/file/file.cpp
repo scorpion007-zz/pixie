@@ -201,10 +201,10 @@ public:
 				~CFileFramebuffer() {
 					int	i;
 
-					osDeleteMutex(fileMutex);
-
 					if (image != NULL)	TIFFClose(image);
 					else	return;
+
+					osDeleteMutex(fileMutex);
 
 					for (i=0;i<height;i++) {
 						if (scanlines[i] != NULL)	delete [] (unsigned char *) scanlines[i];

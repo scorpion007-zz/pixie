@@ -1815,10 +1815,9 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // environment	"f=SFv"
 #ifndef INIT_SHADING
-#define	ENVIRONMENTFEXPR_PRE	CTextureLookup	*lookup;															\
+#define	ENVIRONMENTEXPR_PRE(__float,__name)																			\
+								CTextureLookup	*lookup;															\
 								float			*res;																\
-								const float		*op3;																\
-								int				i;																	\
 								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
 									const char		**op1;															\
@@ -1829,353 +1828,189 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									operand(1,op1,const char **);													\
 									operand(2,op2,const float *);													\
 									lookup->channel				=	(int) *op2;										\
-									lookup->lookupFloat			=	TRUE;											\
-									if ((strcmp(*op1,"raytrace")==0) || (strcmp(*op1,"reflection") == 0)) {			\
+									lookup->lookupFloat			=	__float;										\
+									if ((strcmp(*op1,"raytrace")==0) || (strcmp(*op1,__name) == 0)) {				\
 										lookup->environment		=	NULL;											\
 									} else {																		\
 										lookup->environment		=	CRenderer::getEnvironment(*op1);				\
 									}																				\
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
+								CTraceLocation	*rays;																\
+								int				numRays;															\
+								float			*P,*dPdu,*dPdv;														\
 								if (lookup->environment == NULL) {													\
-									float			*color;															\
-									const int		numRealVertices = currentShadingState->numRealVertices;			\
+									rays	=	(CTraceLocation *) ralloc(currentShadingState->numVertices*sizeof(CTraceLocation),threadMemory);	\
+									P		=	varying[VARIABLE_P];												\
+									dPdu	=	varying[VARIABLE_DPDU];												\
+									dPdv	=	varying[VARIABLE_DPDV];												\
+									numRays	=	0;																	\
+								}																					\
 																													\
-									operand(0,res,float *);															\
-									operand(3,op3,const float *);													\
+								const float		*D;																	\
+								float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
+								float			*dDdv		=	dDdu + numVertices*3;								\
+								const float		*du			=	varying[VARIABLE_DU];								\
+								const float		*dv			=	varying[VARIABLE_DV];								\
+								operand(0,res,float *);																\
+								operand(3,D,const float *);															\
+								CEnvironment	*tex		=	lookup->environment;								\
 																													\
-									color						=	(float *) ralloc(numRealVertices*3*sizeof(float),threadMemory);	\
-									traceReflection(color,varying[VARIABLE_P],(float *) op3,numRealVertices,tags,lookup);	\
-																													\
-									for (i=numRealVertices;i>0;i--,tags++,res++,color+=3) {							\
-										if (*tags == 0) {															\
-											*res	=	(color[0] + color[1] + color[2]) / 3.0f;					\
-										}																			\
-									}																				\
+								duVector(dDdu,D);																	\
+								dvVector(dDdv,D);
+
+#define	ENVIRONMENTEXPR(__float)																					\
+								if (tex == NULL) {																	\
+									rays->res	=	res;															\
+									movvv(rays->D,D);																\
+									mulvf(rays->dDdu,dDdu,*du);														\
+									mulvf(rays->dDdv,dDdv,*dv);														\
+									movvv(rays->P,P);																\
+									mulvf(rays->dPdu,dPdu,*du);														\
+									mulvf(rays->dPdv,dPdv,*dv);														\
+									rays++;																			\
+									numRays++;																		\
 								} else {																			\
-									const float		*D;																\
-									vector			color;															\
-									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
-									float			*dDdv		=	dDdu + numVertices*3;							\
-									const float		*du			=	varying[VARIABLE_DU];							\
-									const float		*dv			=	varying[VARIABLE_DV];							\
-									operand(0,res,float *);															\
-									operand(3,D,const float *);														\
-									tex		=	lookup->environment;												\
-																													\
-									duVector(dDdu,D);																\
-									dvVector(dDdv,D);																\
-																													\
-									for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {					\
-										if (*tags == 0) {															\
-											vector	D0,D1,D2,D3;													\
-																													\
-											D0[0]	=	D[0];														\
-											D0[1]	=	D[1];														\
-											D0[2]	=	D[2];														\
-											D1[0]	=	D[0] + dDdu[0]*du[0];										\
-											D1[1]	=	D[1] + dDdu[1]*du[0];										\
-											D1[2]	=	D[2] + dDdu[2]*du[0];										\
-											D2[0]	=	D[0] + dDdv[0]*dv[0];										\
-											D2[1]	=	D[1] + dDdv[1]*dv[0];										\
-											D2[2]	=	D[2] + dDdv[2]*dv[0];										\
-											D3[0]	=	D[0] + dDdv[0]*dv[0] + dDdu[0]*du[0];						\
-											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
-											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
-																													\
-											tex->lookup(color,D0,D1,D2,D3,lookup,this);								\
-											*res	=	color[0];													\
-										}																			\
-										res			++;																\
-										D			+=	3;															\
-										dDdu		+=	3;															\
-										dDdv		+=	3;															\
-										du++;																		\
-										dv++;																		\
+									vector	D0,D1,D2,D3;															\
+									movvv(D0,D);																	\
+									mulvf(D1,dDdu,*du);																\
+									mulvf(D2,dDdv,*dv);																\
+									addvv(D3,D1,D2);																\
+									addvv(D1,D);																	\
+									addvv(D2,D);																	\
+									addvv(D3,D);																	\
+									if (__float) {																	\
+										vector	color;																\
+										tex->lookup(color,D0,D1,D2,D3,lookup,this);									\
+										*res	=	color[0];														\
+									} else {																		\
+										tex->lookup(res,D0,D1,D2,D3,lookup,this);									\
 									}																				\
 								}
 
+#define ENVIRONMENTEXPR_UPDATE(__n)																					\
+								res+=__n;																			\
+								D			+=	3;																	\
+								dDdu		+=	3;																	\
+								dDdv		+=	3;																	\
+								du++;																				\
+								dv++;																				\
+								if (tex == NULL) {																	\
+									P		+=	3;																	\
+									dPdu	+=	3;																	\
+									dPdv	+=	3;																	\
+								}
 
+
+
+#define ENVIRONMENTEXPR_POST(__float)																				\
+								if ((tex == NULL) && (numRays > 0))	{												\
+									rays	-=	numRays;															\
+									traceReflection(numRays,rays,lookup);											\
+									if (__float) {																	\
+										for (int i=numRays;i>0;i--,rays++) {										\
+											*(rays->res)	=	(rays->C[0] + rays->C[1] + rays->C[2]) / 3.0f;		\
+										}																			\
+									} else {																		\
+										for (int i=numRays;i>0;i--,rays++) movvv(rays->res,rays->C);				\
+									}																				\
+								}
+								
 #else
-#define	ENVIRONMENTFEXPR_PRE
+#define	ENVIRONMENTEXPR_PRE
+#define	ENVIRONMENTEXPR
+#define	ENVIRONMENTEXPR_UPDATE
+#define	ENVIRONMENTEXPR_POST(__float)
 #endif
 
-DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTFEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-
-#undef	ENVIRONMENTFEXPR_PRE
-
+DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTEXPR_PRE(TRUE,"reflection"),ENVIRONMENTEXPR(TRUE),ENVIRONMENTEXPR_UPDATE(1),ENVIRONMENTEXPR_POST(TRUE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE(FALSE,"reflection"),ENVIRONMENTEXPR(FALSE),ENVIRONMENTEXPR_UPDATE(3),ENVIRONMENTEXPR_POST(FALSE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // shadow	"f=Sfv"
 #ifndef INIT_SHADING
-#define	SHADOWFEXPR_PRE			CTextureLookup	*lookup;															\
-								float			*res;																\
-								const float		*op3;																\
-								int				i;																	\
-								osLock(CRenderer::shaderMutex);														\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
-									const char		**op1;															\
-									const float		*op2;															\
-									int				numArguments;													\
-									argumentcount(numArguments);													\
-									TEXTUREPARAMETERS(4,(numArguments-4) >> 1);										\
-									operand(1,op1,const char **);													\
-									operand(2,op2,const float *);													\
-									lookup->channel				=	(int) *op2;										\
-									lookup->lookupFloat			=	TRUE;											\
-									if ((strcmp(*op1,"raytrace")==0) || (strcmp(*op1,"shadow") == 0)) {				\
-										lookup->environment		=	NULL;											\
-									} else {																		\
-										lookup->environment		=	CRenderer::getEnvironment(*op1);				\
-									}																				\
-								}																					\
-								osUnlock(CRenderer::shaderMutex);													\
-								if (lookup->environment == NULL) {													\
-									float			*color;															\
-									const int		numRealVertices = currentShadingState->numRealVertices;			\
-																													\
-									operand(0,res,float *);															\
-									operand(3,op3,const float *);													\
-																													\
-									color						=	(float *) ralloc(numRealVertices*3*sizeof(float),threadMemory);	\
-																													\
-									traceTransmission(color,op3,varying[VARIABLE_L],numRealVertices,tags,lookup);	\
-																													\
-									for (i=numRealVertices;i>0;i--,tags++,res++,color+=3) {							\
-										if (*tags == 0) {															\
-											*res	=	1 - ((color[0] + color[1] + color[2]) / (float) 3);			\
-										}																			\
-									}																				\
+
+
+
+#define	SHADOWEXPR_PRE(__float)	ENVIRONMENTEXPR_PRE(__float,"shadow");												\
+								const float	*L	=	varying[VARIABLE_L];
+
+
+#define	SHADOWEXPR(__float)		if (tex == NULL) {																	\
+									rays->res	=	res;															\
+									movvv(rays->P,D);																\
+									mulvf(rays->dPdu,dDdu,*du);														\
+									mulvf(rays->dPdv,dDdv,*dv);														\
+									movvv(rays->D,L);																\
+									initv(rays->dDdu,0);															\
+									initv(rays->dDdv,0);															\
+									rays++;																			\
+									numRays++;																		\
 								} else {																			\
-									const float		*D;																\
-									vector			color;															\
-									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
-									float			*dDdv		=	dDdu + numVertices*3;							\
-									const float		*du			=	varying[VARIABLE_DU];							\
-									const float		*dv			=	varying[VARIABLE_DV];							\
-									operand(0,res,float *);															\
-									operand(3,D,const float *);														\
-																													\
-									tex		=	lookup->environment;												\
-																													\
-									duVector(dDdu,D);																\
-									dvVector(dDdv,D);																\
-																													\
-									for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {					\
-										if (*tags == 0) {															\
-											vector	D0,D1,D2,D3;													\
-																													\
-											D0[0]	=	D[0];														\
-											D0[1]	=	D[1];														\
-											D0[2]	=	D[2];														\
-											D1[0]	=	D[0] + dDdu[0]*du[0];										\
-											D1[1]	=	D[1] + dDdu[1]*du[0];										\
-											D1[2]	=	D[2] + dDdu[2]*du[0];										\
-											D2[0]	=	D[0] + dDdv[0]*dv[0];										\
-											D2[1]	=	D[1] + dDdv[1]*dv[0];										\
-											D2[2]	=	D[2] + dDdv[2]*dv[0];										\
-											D3[0]	=	D[0] + dDdv[0]*dv[0] + dDdu[0]*du[0];						\
-											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
-											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
-																													\
-											tex->lookup(color,D0,D1,D2,D3,lookup,this);								\
-											*res	=	color[0];													\
-										}																			\
-										res			++;																\
-										D			+=	3;															\
-										dDdu		+=	3;															\
-										dDdv		+=	3;															\
-										du++;																		\
-										dv++;																		\
+									vector	D0,D1,D2,D3;															\
+									movvv(D0,D);																	\
+									mulvf(D1,dDdu,*du);																\
+									mulvf(D2,dDdv,*dv);																\
+									addvv(D3,D1,D2);																\
+									addvv(D1,D);																	\
+									addvv(D2,D);																	\
+									addvv(D3,D);																	\
+									if (__float) {																	\
+										vector	color;																\
+										tex->lookup(color,D0,D1,D2,D3,lookup,this);									\
+										*res	=	(color[0] + color[1] + color[2])/3.0f;							\
+									} else {																		\
+										tex->lookup(res,D0,D1,D2,D3,lookup,this);									\
 									}																				\
 								}
 
-
-#else
-#define	SHADOWFEXPR_PRE
-#endif
-
-DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWFEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-
-#undef	SHADOWFEXPR_PRE
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// environment	"c=SFv"
-#ifndef INIT_SHADING
-#define	ENVIRONMENTCEXPR_PRE	CTextureLookup	*lookup;															\
-								float			*res;																\
-								const float		*op3;																\
-								int				i;																	\
-								osLock(CRenderer::shaderMutex);														\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
-									const char		**op1;															\
-									const float		*op2;															\
-									int				numArguments;													\
-									argumentcount(numArguments);													\
-									TEXTUREPARAMETERS(4,(numArguments-4) >> 1);										\
-									operand(1,op1,const char **);													\
-									operand(2,op2,const float *);													\
-									lookup->channel				=	(int) *op2;										\
-									lookup->lookupFloat			=	FALSE;											\
-									if ((strcmp(*op1,"raytrace")==0) || (strcmp(*op1,"reflection") == 0)) {			\
-										lookup->environment		=	NULL;											\
-									} else {																		\
-										lookup->environment		=	CRenderer::getEnvironment(*op1);				\
-									}																				\
-								}																					\
-								osUnlock(CRenderer::shaderMutex);													\
-								if (lookup->environment == NULL) {													\
-									const int		numRealVertices = currentShadingState->numRealVertices;			\
-																													\
-									operand(0,res,float *);															\
-									operand(3,op3,const float *);													\
-																													\
-									traceReflection(res,varying[VARIABLE_P],op3,numRealVertices,tags,lookup);		\
-								} else {																			\
-									const float		*D;																\
-									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
-									float			*dDdv		=	dDdu + numVertices*3;							\
-									const float		*du			=	varying[VARIABLE_DU];							\
-									const float		*dv			=	varying[VARIABLE_DV];							\
-									operand(0,res,float *);															\
-									operand(3,D,const float *);														\
-																													\
-									tex		=	lookup->environment;												\
-																													\
-									duVector(dDdu,D);																\
-									dvVector(dDdv,D);																\
-																													\
-									for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {					\
-										if (*tags == 0) {															\
-											vector	D0,D1,D2,D3;													\
-																													\
-											D0[0]	=	D[0];														\
-											D0[1]	=	D[1];														\
-											D0[2]	=	D[2];														\
-											D1[0]	=	D[0] + dDdu[0]*du[0];										\
-											D1[1]	=	D[1] + dDdu[1]*du[0];										\
-											D1[2]	=	D[2] + dDdu[2]*du[0];										\
-											D2[0]	=	D[0] + dDdv[0]*dv[0];										\
-											D2[1]	=	D[1] + dDdv[1]*dv[0];										\
-											D2[2]	=	D[2] + dDdv[2]*dv[0];										\
-											D3[0]	=	D[0] + dDdv[0]*dv[0] + dDdu[0]*du[0];						\
-											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
-											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
-																													\
-											tex->lookup(res,D0,D1,D2,D3,lookup,this);								\
-										}																			\
-										res			+=	3;															\
-										D			+=	3;															\
-										dDdu		+=	3;															\
-										dDdv		+=	3;															\
-										du++;																		\
-										dv++;																		\
-									}																				\
-								}
+#define SHADOWEXPR_UPDATE(__n)																						\
+								res+=__n;																			\
+								D			+=	3;																	\
+								dDdu		+=	3;																	\
+								dDdv		+=	3;																	\
+								du++;																				\
+								dv++;																				\
+								L			+=	3;
 
 
-#else
-#define	ENVIRONMENTCEXPR_PRE
-#endif
-
-DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTCEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-
-#undef	ENVIRONMENTCEXPR_PRE
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// shadow	"c=SFv"
-#ifndef INIT_SHADING
-#define	SHADOWCEXPR_PRE			CTextureLookup	*lookup;															\
-								float			*res;																\
-								const float		*op3;																\
-								int				i;																	\
-								osLock(CRenderer::shaderMutex);														\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {							\
-									const char		**op1;															\
-									const float		*op2;															\
-									int				numArguments;													\
-									argumentcount(numArguments);													\
-									TEXTUREPARAMETERS(4,(numArguments-4) >> 1);										\
-									operand(1,op1,const char **);													\
-									operand(2,op2,const float *);													\
-									lookup->channel				=	(int) *op2;										\
-									lookup->lookupFloat			=	TRUE;											\
-									if ((strcmp(*op1,"raytrace")==0) || (strcmp(*op1,"shadow") == 0)) {				\
-										lookup->environment		=	NULL;											\
-									} else {																		\
-										lookup->environment		=	CRenderer::getEnvironment(*op1);				\
-									}																				\
-								}																					\
-								osUnlock(CRenderer::shaderMutex);													\
-								if (lookup->environment == NULL) {													\
-									const int		numRealVertices = currentShadingState->numRealVertices;			\
-																													\
-									operand(0,res,float *);															\
-									operand(3,op3,const float *);													\
-																													\
-									traceTransmission(res,op3,varying[VARIABLE_L],numRealVertices,tags,lookup);		\
-																													\
-									for (i=numRealVertices;i>0;i--,res+=3) {										\
-										res[0]	=	1 - res[0];														\
-										res[1]	=	1 - res[1];														\
-										res[2]	=	1 - res[2];														\
+#define SHADOWEXPR_POST(__float)																					\
+							if ((tex == NULL) && (numRays > 0))	{													\
+								rays	-=	numRays;																\
+								traceTransmission(numRays,rays,lookup);												\
+								if (__float) {																		\
+									for (int i=numRays;i>0;i--,rays++) {											\
+										*(rays->res)	=	1 - (rays->C[0] + rays->C[1] + rays->C[2]) / 3.0f;		\
 									}																				\
 								} else {																			\
-									const float		*D;																\
-									CEnvironment	*tex;															\
-									float			*dDdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
-									float			*dDdv		=	dDdu + numVertices*3;							\
-									const float		*du			=	varying[VARIABLE_DU];							\
-									const float		*dv			=	varying[VARIABLE_DV];							\
-									operand(0,res,float *);															\
-									operand(3,D,const float *);														\
-																													\
-									tex		=	lookup->environment;												\
-																													\
-									duVector(dDdu,D);																\
-									dvVector(dDdv,D);																\
-																													\
-									for (i=currentShadingState->numRealVertices;i>0;i--,tags++) {					\
-										if (*tags == 0) {															\
-											vector	D0,D1,D2,D3;													\
-																													\
-											D0[0]	=	D[0];														\
-											D0[1]	=	D[1];														\
-											D0[2]	=	D[2];														\
-											D1[0]	=	D[0] + dDdu[0]*du[0];										\
-											D1[1]	=	D[1] + dDdu[1]*du[0];										\
-											D1[2]	=	D[2] + dDdu[2]*du[0];										\
-											D2[0]	=	D[0] + dDdv[0]*dv[0];										\
-											D2[1]	=	D[1] + dDdv[1]*dv[0];										\
-											D2[2]	=	D[2] + dDdv[2]*dv[0];										\
-											D3[0]	=	D[0] + dDdv[0]*dv[0] + dDdu[0]*du[0];						\
-											D3[1]	=	D[1] + dDdv[1]*dv[0] + dDdu[1]*du[0];						\
-											D3[2]	=	D[2] + dDdv[2]*dv[0] + dDdu[2]*du[0];						\
-																													\
-											tex->lookup(res,D0,D1,D2,D3,lookup,this);								\
-										}																			\
-										res			+=	3;															\
-										D			+=	3;															\
-										dDdu		+=	3;															\
-										dDdv		+=	3;															\
-										du++;																		\
-										dv++;																		\
+									for (int i=numRays;i>0;i--,rays++) {											\
+										res		=	rays->res;														\
+										res[0]	=	1 - rays->C[0];													\
+										res[1]	=	1 - rays->C[1];													\
+										res[2]	=	1 - rays->C[2];													\
 									}																				\
-								}
-
+								}																					\
+							}
 
 #else
-#define	SHADOWCEXPR_PRE
+#define	SHADOWEXPR_PRE
+#define	SHADOWEXPR
+#define	SHADOWEXPR_UPDATE
+#define	SHADOWEXPR_POST(__float)
 #endif
 
-DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWCEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWEXPR_PRE(TRUE),SHADOWEXPR(TRUE),SHADOWEXPR_UPDATE(1),SHADOWEXPR_POST(TRUE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE(FALSE),SHADOWEXPR(FALSE),SHADOWEXPR_UPDATE(3),SHADOWEXPR_POST(FALSE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
-#undef	SHADOWCEXPR_PRE
+#undef	ENVIRONMENTEXPR_PRE
+#undef	ENVIRONMENTEXPR
+#undef	ENVIRONMENTEXPR_UPDATE
+#undef	ENVIRONMENTEXPR_POST
+
+#undef	SHADOWEXPR_PRE
+#undef	SHADOWEXPR
+#undef	SHADOWEXPR_UPDATE
+#undef	SHADOWEXPR_POST
 
 
 

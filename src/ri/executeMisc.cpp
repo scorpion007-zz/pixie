@@ -456,6 +456,235 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 }
 
 
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//		New stuff begins
+
+
+// Common code for trace transmission and trace reflection
+#define	computeRayDifferentials																	\
+	const float	da	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;						\
+	const float	db	=	((lengthv(rays->dDdu) + lengthv(rays->dDdv))*0.5f) / lengthv(rays->D);
+
+#define	sampleRay(__from,__dir)			\
+	vector	tmp0,tmp1;					\
+	mulvf(tmp0,rays->dPdu,urand());		\
+	mulvf(tmp1,rays->dPdv,urand());		\
+	addvv(__from,tmp0,tmp1);			\
+	addvv(__from,rays->P);				\
+	mulvf(tmp0,rays->dDdu,urand());		\
+	mulvf(tmp1,rays->dDdv,urand());		\
+	addvv(__dir,tmp0,tmp1);				\
+	addvv(__dir,rays->D);
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	traceTransmission
+// Description			:	Trace transmission rays
+// Return Value			:	-
+// Comments				:
+void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup) {
+	CTransmissionRay	*rayBase;
+	CTransmissionRay	**raysBase;
+	CTransmissionRay	*cRay,**cRays;
+	const int			numSamples		=	lookup->numSamples;
+	const float			bias			=	lookup->shadowBias;
+	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
+	const float			coneAngle		=	lookup->coneAngle;
+	const float			maxDist			=	lookup->maxDist;
+	int					numRemaining	=	shootStep;
+	const float			multiplier		=	1 / (float) numSamples;
+	int					currentSample;
+	int					i;
+	CTransmissionBundle	bundle;
+	vector				dir;
+
+	if (lookup->label == NULL)	bundle.label	=	rayLabelTransmission;
+	else						bundle.label	=	lookup->label;
+
+	// Allocate the memory for the transmission rays
+	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
+	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*),threadMemory);
+
+	assert(inShadow == FALSE);
+
+	inShadow		=	TRUE;					// We're in shadow
+
+	// Create the rays
+	for (i=numRays;i>0;i--,rays++) {
+		
+		// Compute the ray differentials
+		computeRayDifferentials;
+
+		// Clear the transmission
+		initv(rays->C,0,0,0);
+
+		// Create the samples
+		for (currentSample=numSamples;currentSample>0;currentSample--) {
+			vector	from,L;
+
+			// Sample the ray
+			sampleRay(from,L);
+			const	float	d	=	lengthv(L);
+			mulvf(dir,L,-1/d);
+
+			// Sample a point in the cone
+			sampleHemisphere(cRay->dir,dir,coneAngle,random4d);
+			if (dotvv(cRay->dir,cRay->dir) > C_EPSILON) {
+
+				movvv(cRay->from,from);
+				cRay->t				=	min(maxDist,d) - bias;
+				cRay->tmin			=	bias;
+				cRay->time			=	(urand() + currentSample - 1) * multiplier;
+				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
+				cRay->dest			=	rays->C;
+				cRay->multiplier	=	multiplier;
+				cRay->da			=	da;		// The ray differential
+				cRay->db			=	db;
+				*cRays++			=	cRay++;
+				if (--numRemaining == 0) {
+					numTransmissionRays	+=	shootStep;
+					bundle.numRays		=	shootStep;
+					bundle.rays			=	(CRay **) raysBase;
+					bundle.depth		=	0;
+					bundle.last			=	0;
+					bundle.postShader	=	NULL;
+					traceEx(&bundle);
+					cRay				=	rayBase;
+					cRays				=	raysBase;
+					numRemaining		=	shootStep;
+				}
+			}
+		}
+	}
+
+	if (numRemaining != shootStep) {
+		numTransmissionRays	+=	shootStep-numRemaining;
+		bundle.numRays		=	shootStep-numRemaining;
+		bundle.rays			=	(CRay **) raysBase;
+		bundle.depth		=	0;
+		bundle.last			=	0;
+		bundle.postShader	=	NULL;
+		traceEx(&bundle);
+	}
+
+	inShadow		=	FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingContext
+// Method				:	traceReflection
+// Description			:	Trace reflected rays
+// Return Value			:	-
+// Comments				:
+void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup) {
+	CTraceRay			*rayBase;
+	CTraceRay			**raysBase;
+	CTraceRay			*cRay,**cRays;
+	const int			numSamples		=	lookup->numSamples;
+	const float			bias			=	lookup->shadowBias;
+	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
+	const float			coneAngle		=	lookup->coneAngle;
+	int					numRemaining	=	shootStep;
+	const float			multiplier		=	1 / (float) lookup->numSamples;
+	int					currentSample;
+	int					i;
+	CTraceBundle		bundle;
+
+	if (lookup->label == NULL)	bundle.label	=	rayLabelTransmission;
+	else						bundle.label	=	lookup->label;
+
+	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
+	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
+
+
+	for (i=numRays;i>0;i--,rays++) {
+		
+		// Compute the ray differentials
+		computeRayDifferentials;
+
+		initv(rays->C,0,0,0);	// Clear the reflection
+
+		for (currentSample=numSamples;currentSample>0;currentSample--) {
+			vector	from,D;
+			
+			sampleRay(from,D);
+
+			normalizev(D);
+
+			sampleHemisphere(cRay->dir,D,coneAngle,random4d);
+			if (dotvv(cRay->dir,cRay->dir) > C_EPSILON) {
+				movvv(cRay->from,from);
+				cRay->time			=	(urand() + currentSample - 1) * multiplier;
+				cRay->t				=	C_INFINITY;
+				cRay->tmin			=	bias;
+				cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
+				cRay->dest			=	rays->C;
+				cRay->multiplier	=	multiplier;
+				cRay->da			=	da;
+				cRay->db			=	db;
+				*cRays++			=	cRay++;
+				if (--numRemaining == 0) {
+					numReflectionRays	+=	shootStep;
+					bundle.numRays		=	shootStep;
+					bundle.rays			=	(CRay **) raysBase;
+					bundle.depth		=	0;
+					bundle.last			=	0;
+					bundle.postShader	=	NULL;
+					traceEx(&bundle);
+					cRay				=	rayBase;
+					cRays				=	raysBase;
+					numRemaining		=	shootStep;
+				}
+			}
+		}
+	}
+
+	if (numRemaining != shootStep) {
+		numReflectionRays	+=	shootStep-numRemaining;
+		bundle.numRays		=	shootStep-numRemaining;
+		bundle.rays			=	(CRay **) raysBase;
+		bundle.depth		=	0;
+		bundle.last			=	0;
+		bundle.postShader	=	NULL;
+		traceEx(&bundle);
+	}
+}
+
+
+//		New stuff end
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	traceTransmission

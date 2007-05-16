@@ -305,6 +305,17 @@ private:
 		float					*rayDiff(const float *from,const float *dir,const float *to);
 		float					*rayDiff(const float *from);
 
+		class	CTraceLocation {
+		public:
+			float				*res;				// Where we will store the result
+			vector				C;					// Temp area to store the result
+			vector				P,dPdu,dPdv;		// The from
+			vector				D,dDdu,dDdv;		// The direction
+		};
+
+		void					traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup);
+		void					traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup);
+
 		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
 		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);
 
