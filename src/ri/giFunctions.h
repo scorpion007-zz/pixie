@@ -38,257 +38,140 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	float			*res,*op1,*op2;																	\
-								CTextureLookup	*lookup;																		\
-								osLock(CRenderer::shaderMutex);																	\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {										\
-									int			numArguments;																	\
-									argumentcount(numArguments);																\
-									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);													\
-								}																								\
-								osUnlock(CRenderer::shaderMutex);																\
-								operand(0,res,float *);																			\
-								operand(1,op1,float *);																			\
-								operand(2,op2,float *);																			\
-								float	*L	=	(float *) ralloc(numVertices*3*sizeof(float),threadMemory);						\
-								int		t;																						\
-								for (t=0;t<numVertices;t++)	subvv(L + t*3,(float *) op1 + t*3,(float *) op2 + t*3);				\
-								traceTransmission((float *) res,(float *) op1,L,currentShadingState->numRealVertices,tags,lookup);
+#define	TRANSMISSIONEXPR_PRE	CTextureLookup	*lookup;										\
+								osLock(CRenderer::shaderMutex);									\
+								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {		\
+									int			numArguments;									\
+									argumentcount(numArguments);								\
+									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);					\
+								}																\
+								osUnlock(CRenderer::shaderMutex);								\
+								CTraceLocation	*rays	=	(CTraceLocation *)	ralloc(numVertices*sizeof(CTraceLocation),threadMemory);	\
+								float			*dFdu	=	(float *)			ralloc(numVertices*12*sizeof(float),threadMemory);			\
+								float			*dFdv	=	dFdu + numVertices*3;				\
+								float			*dTdu	=	dFdv + numVertices*3;				\
+								float			*dTdv	=	dTdu + numVertices*3;				\
+								float			*res;											\
+								const float		*op1,*op2;										\
+								operand(0,res,float *);											\
+								operand(1,op1,const float *);									\
+								duVector(dFdu,op1);												\
+								dvVector(dFdv,op1);												\
+								operand(2,op2,const float *);									\
+								duVector(dTdu,op2);												\
+								dvVector(dTdv,op2);												\
+								const float		*du		=	varying[VARIABLE_DU];				\
+								const float		*dv		=	varying[VARIABLE_DV];				\
+								int				numRays	=	0;
 
+
+#define	TRANSMISSIONEXPR		rays->res	=	res;			\
+								movvv(rays->P,op1);				\
+								mulvf(rays->dPdu,dFdu,*du);		\
+								mulvf(rays->dPdv,dFdv,*dv);		\
+								movvv(rays->D,op2);				\
+								mulvf(rays->dDdu,dTdu,*du);		\
+								mulvf(rays->dDdv,dTdv,*dv);		\
+								rays++;							\
+								numRays++;
+
+#define	TRANSMISSIONEXPR_UPDATE(__n)							\
+								res		+=	__n;				\
+								op1		+=	3;					\
+								op2		+=	3;					\
+								dFdu	+=	3;					\
+								dFdv	+=	3;					\
+								dTdu	+=	3;					\
+								dTdv	+=	3;					\
+								du++;	dv++;
+
+// Actually compule the transmission color
+#define	TRANSMISSIONEXPR_POST	if (numRays > 0) {				\
+									rays	-=	numRays;		\
+									traceTransmission(numRays,rays,lookup,FALSE);						\
+									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
+								}
+
+// Just check whether there's smtg between the end points
+#define	VISIBILITYEXPR_POST		if (numRays > 0) {				\
+									rays	-=	numRays;		\
+									traceTransmission(numRays,rays,lookup,TRUE);									\
+									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
+								}
 
 #else
 
 #define	TRANSMISSIONEXPR_PRE
-
+#define	TRANSMISSIONEXPR
+#define	TRANSMISSIONEXPR_UPDATE
+#define	TRANSMISSIONEXPR_POST
+#define	VISIBILITYEXPR_POST
 
 #endif
 
-DEFFUNC(TRANSMISSION			,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
+DEFFUNC(Visibility			,"visibility"			,"f=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(1),VISIBILITYEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
+DEFFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(3),TRANSMISSIONEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
 
-#undef	TRANSMISSIONEXPR_PRE
 
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// trace	"f=pv"
+// trace	"c=pv!"
+// NONE: Trace is derived from transmission
 #ifndef INIT_SHADING
-#define	TRACEEXPR_PRE			FUN3EXPR_PRE																					\
-								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;		\
-								const float			*ab		=	rayDiff(op1,op2,NULL);											\
-								vector				D;																			\
-								CRay				ray;
+#define	TRACEEXPR_PRE			TRANSMISSIONEXPR_PRE
 
-#define	TRACEEXPR				subvv(D,op2,op1);																				\
-								if (dotvv(D,D) > 0) {																			\
-									ray.t					=	lengthv(D);														\
-									mulvf(ray.dir,D,1/ray.t);																	\
-									movvv(ray.from,op1);																		\
-									ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;									\
-									ray.time				=	urand();														\
-									ray.tmin				=	bias;															\
-									ray.t					-=	bias;															\
-									ray.da					=	ab[0];															\
-									ray.db					=	ab[1];															\
-																																\
-									numReflectionRays++;																		\
-									trace(&ray);																				\
-																																\
-									*res					=	ray.t;															\
-								} else {																						\
-									*res					=	0.0f;															\
+#define	TRACEEXPR				TRANSMISSIONEXPR
+
+#define	TRACEEXPR_UPDATE(__n)	TRANSMISSIONEXPR_UPDATE(__n)
+
+// Do a full raytrace
+#define	TRACEEXPR_POST			if (numRays > 0) {														\
+									rays	-=	numRays;												\
+									traceReflection(numRays,rays,lookup,FALSE);							\
+									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
 								}
 
-
-#define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(1,3,3)																			\
-								ab	+=	2;
+// Just compute the nearest intersection
+#define	TRACE2EXPR_POST			if (numRays > 0) {														\
+									rays	-=	numRays;												\
+									traceReflection(numRays,rays,lookup,TRUE);							\
+									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;		\
+								}
 
 #else
+
 #define	TRACEEXPR_PRE
 #define	TRACEEXPR
 #define	TRACEEXPR_UPDATE
+#define	TRACEEXPR_POST
+#define	TRACE2EXPR_POST	
+
 #endif
 
-DEFSHORTFUNC(Tracef			,"trace"			,"f=pv"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(TraceF				,"trace"				,"f=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE(1),TRACE2EXPR_POST,PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
+DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE(3),TRACEEXPR_POST,PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
+
 
 #undef	TRACEEXPR_PRE
 #undef	TRACEEXPR
 #undef	TRACEEXPR_UPDATE
 #undef	TRACEEXPR_POST
+#undef	TRACE2EXPR_POST
+
+#undef	TRANSMISSIONEXPR_PRE
+#undef	TRANSMISSIONEXPR
+#undef	TRANSMISSIONEXPR_UPDATE
+#undef	TRANSMISSIONEXPR_POST
+#undef	VISIBILITYEXPR_POST
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This macro is used to decode the trace parameter list
-#define	TRACEPARAMETERS(start,num)																					\
-								lookup					=	new CTraceLookup;										\
-								parameterlist			=	(CShaderLookup *) lookup;								\
-								dirty();																			\
-								lookup->bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
-								lookup->label			=	rayLabelTrace;											\
-								{																					\
-									int		i;																		\
-									const char	**param;															\
-									const float	*valf;																\
-									const char	**vals;																\
-																													\
-									for (i=0;i<num;i++) {															\
-										operand(i*2+start,param,const char **);										\
-										operand(i*2+start+1,valf,const float *);									\
-										operand(i*2+start+1,vals,const char **);									\
-																													\
-										if (strcmp(*param,"bias") == 0) {											\
-											lookup->bias		=	valf[0];										\
-										} else if (strcmp(*param,"label") == 0) {									\
-											lookup->label		=	vals[0];										\
-										}																			\
-									}																				\
-								}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// trace	"c=pv!"
-#ifndef INIT_SHADING
-#define	TRACEEXPR_PRE			float				*res;																		\
-								const float			*op1,*op2;																	\
-								CTraceBundle		interiorBundle,exteriorBundle;												\
-								CTraceRay			*rays;																		\
-								CTraceRay			**interiorRays,**exteriorRays;												\
-								int					cExterior		=	0;														\
-								int					cInterior		=	0;														\
-								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;			\
-								float				*N;																			\
-								CTraceLookup		*lookup;																	\
-								osLock(CRenderer::shaderMutex);																	\
-								if ((lookup = (CTraceLookup *) parameterlist) == NULL) {										\
-									int			numArguments;																	\
-									argumentcount(numArguments);																\
-									TRACEPARAMETERS(3,(numArguments-3) >> 1);													\
-								}																								\
-								osUnlock(CRenderer::shaderMutex);																\
-								rays			=	(CTraceRay *) ralloc(numVertices*sizeof(CTraceRay),threadMemory);			\
-								interiorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
-								exteriorRays	=	(CTraceRay **) ralloc(numVertices*sizeof(CTraceRay *),threadMemory);		\
-								N				=	varying[VARIABLE_N];														\
-								operand(0,res,float *);																			\
-								operand(1,op1,const float *);																	\
-								operand(2,op2,const float *);																	\
-								const float *ab	=	rayDiff(op1,op2,NULL);
-
-#define	TRACEEXPR				if (dotvv(op2,op2) > 0) {																		\
-									movvv(rays->from,op1);																		\
-									normalizev(rays->dir,op2);																	\
-									initv(res,0);																				\
-									rays->dest			=	res;																\
-									rays->multiplier	=	1;																	\
-									rays->t				=	C_INFINITY;															\
-									rays->time			=	urand();															\
-									rays->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;										\
-									rays->tmin			=	lookup->bias;														\
-									rays->da			=	ab[0];																\
-									rays->db			=	ab[1];																\
-									if (dotvv(op2,N) > 0) {																		\
-										exteriorRays[cExterior++]	=	rays++;													\
-									} else {																					\
-										interiorRays[cInterior++]	=	rays++;													\
-									}																							\
-								} else {																						\
-									initv(res,0);																				\
-								}
-
-
-
-#define	TRACEEXPR_UPDATE		FUN3EXPR_UPDATE(3,3,3);																			\
-								ab					+=	2;																		\
-								N					+=	3;
-
-#define	TREACEEXPR_POST			if (inShadow == FALSE) {																		\
-									numReflectionRays	+=	cInterior + cExterior;												\
-									if (cInterior > 0) {																		\
-										interiorBundle.postShader	=	cAttributes->interior;									\
-										interiorBundle.numRays		=	cInterior;												\
-										interiorBundle.depth		=	0;														\
-										interiorBundle.last			=	0;														\
-										interiorBundle.rays			=	(CRay **) interiorRays;									\
-										interiorBundle.label		=	lookup->label;											\
-										traceEx(&interiorBundle);																\
-									}																							\
-									if (cExterior > 0) {																		\
-										exteriorBundle.postShader	=	cAttributes->exterior;									\
-										exteriorBundle.numRays		=	cExterior;												\
-										exteriorBundle.depth		=	0;														\
-										exteriorBundle.last			=	0;														\
-										exteriorBundle.rays			=	(CRay **) exteriorRays;									\
-										exteriorBundle.label		=	lookup->label;											\
-										traceEx(&exteriorBundle);																\
-									}																							\
-								}
-
-#else
-#define	TRACEEXPR_PRE
-#define	TRACEEXPR
-#define	TRACEEXPR_UPDATE
-#define	TREACEEXPR_POST
-#endif
-
-DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_UPDATE,TREACEEXPR_POST,PARAMETER_N | PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE)
-
-#undef	TRACEEXPR_PRE
-#undef	TRACEEXPR
-#undef	TRACEEXPR_UPDATE
-#undef	TREACEEXPR_POST
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// visibility	"f=pp"
-#ifndef INIT_SHADING
-#define	VISIBILITYEXPR_PRE		FUN3EXPR_PRE																				\
-								const float			bias	=	currentShadingState->currentObject->attributes->shadowBias;	\
-								const float			*ab		=	rayDiff(op1,NULL,op2);										\
-								vector				D;																		\
-								CRay				ray;
-
-#define	VISIBILITYEXPR			subvv(D,op2,op1);																			\
-								if (dotvv(D,D) > 0) {																		\
-									ray.t					=	lengthv(D);													\
-									mulvf(ray.dir,D,1/ray.t);																\
-									movvv(ray.from,op1);																	\
-									ray.flags				=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;						\
-									ray.time				=	urand();													\
-									ray.tmin				=	bias;														\
-									ray.t					-=	bias;														\
-									ray.da					=	ab[0];														\
-									ray.db					=	ab[1];														\
-																															\
-									numTransmissionRays++;																	\
-									trace(&ray);																			\
-																															\
-									if (ray.object != NULL)	res[0]	=	0;													\
-									else					res[0]	=	1;													\
-								} else {																					\
-									res[0]	=	1;																			\
-								}
-
-#define	VISIBILITYEXPR_UPDATE	FUN3EXPR_UPDATE(1,3,3)																		\
-								ab	+=	2;
-
-#else
-#define	VISIBILITYEXPR_PRE
-#define	VISIBILITYEXPR
-#define	VISIBILITYEXPR_UPDATE
-#endif
-
-DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILITYEXPR,VISIBILITYEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE  | PARAMETER_DERIVATIVE)
-
-#undef	VISIBILITYEXPR_PRE
-#undef	VISIBILITYEXPR
-#undef	VISIBILITYEXPR_UPDATE
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // indirectdiffuse	"c=pnf!"
 #ifndef INIT_SHADING
-#define	IDEXPR_PRE				CTexture3dLookup	*lookup;																		\
+#define	IDEXPR_PRE(__occlusion)	CTexture3dLookup	*lookup;																		\
 								FUN4EXPR_PRE;																						\
 								osLock(CRenderer::shaderMutex);																		\
 								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {										\
@@ -298,12 +181,17 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 									const float			*from,*to;																	\
 									findCoordinateSystem(lookup->coordsys,from,to);													\
 									lookup->numSamples	=	(int) *op3;																\
-									lookup->occlusion	=	FALSE;																	\
+									lookup->occlusion	=	__occlusion;															\
 									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
 									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);			\
 								}																									\
 								osUnlock(CRenderer::shaderMutex);																	\
-								const float	*b		=	rayDiff(op1);																\
+								float		*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);					\
+								float		*dPdv	=	dPdu + numVertices*3;														\
+								duVector(dPdu,op1);																					\
+								dvVector(dPdv,op1);																					\
+								const float	*du		=	varying[VARIABLE_DU];														\
+								const float	*dv		=	varying[VARIABLE_DV];														\
 								CTexture3d	*cache	=	lookup->texture;															\
 								assert(cache->dataSize == 7);																		\
 																																	\
@@ -316,13 +204,18 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 								} 
 
 
-#define	IDEXPR					cache->lookup(C,op1,op2,*b,this,lookup);															\
+#define	IDEXPR(__occlusion)		mulvf(dPdu,*du);																					\
+								mulvf(dPdv,*dv);																					\
+								cache->lookup(C,op1,dPdu,dPdv,op2,this,lookup);														\
 								texture3Dunpack(C,lookup->numChannels,channelValues,lookup->entry,lookup->size);					\
-								movvv(res,C);
+								if (__occlusion)	*res	=	C[3];																\
+								else				movvv(res,C);
 
 
-#define	IDEXPR_UPDATE			FUN4EXPR_UPDATE(3,3,3,0)																			\
-								b++;																								\
+#define	IDEXPR_UPDATE(__n)		FUN4EXPR_UPDATE(__n,3,3,0)																			\
+								dPdu	+=	3;																						\
+								dPdv	+=	3;																						\
+								du++;	dv++;																						\
 								for (channel=0;channel<lookup->numChannels;channel++) {												\
 									channelValues[channel]	+=	lookup->size[channel];												\
 								}
@@ -332,71 +225,12 @@ DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp"		,VISIBILITYEXPR_PRE,VISIBILIT
 #define	IDEXPR
 #endif
 
-DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE,IDEXPR,IDEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(Occlusion			,"occlusion"		,"f=pnf!"	,IDEXPR_PRE(TRUE),IDEXPR(TRUE),IDEXPR_UPDATE(1),NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDEXPR(FALSE),IDEXPR_UPDATE(3),NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
 
 #undef	IDEXPR_PRE
 
 #undef	IDEXPR
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// occlusion	"f=pnf!"
-#ifndef INIT_SHADING
-#define	OCCLUSIONEXPR_PRE		CTexture3dLookup	*lookup;																		\
-								FUN4EXPR_PRE;																						\
-								osLock(CRenderer::shaderMutex);																		\
-								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {										\
-									int			numArguments;																		\
-									argumentcount(numArguments);																	\
-									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);													\
-									const float			*from,*to;																	\
-									findCoordinateSystem(lookup->coordsys,from,to);													\
-									lookup->numSamples	=	(int) *op3;																\
-									lookup->occlusion	=	TRUE;																	\
-									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
-									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);			\
-								}																									\
-								osUnlock(CRenderer::shaderMutex);																	\
-								const float	*b			=	rayDiff(op1);															\
-								CTexture3d	*cache		=	lookup->texture;														\
-								assert(cache->dataSize == 7);																		\
-																																	\
-								float	C[7];																						\
-								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);	\
-																																	\
-								int channel;																						\
-								for (channel=0;channel<lookup->numChannels;channel++) {												\
-									operand(lookup->index[channel],channelValues[channel],float *);									\
-								} 
-
-#define	OCCLUSIONEXPR			cache->lookup(C,op1,op2,*b,this,lookup);															\
-								texture3Dunpack(C,lookup->numChannels,channelValues,lookup->entry,lookup->size);					\
-								*res	=	C[3];
-
-
-#define	OCCLUSIONEXPR_UPDATE	FUN4EXPR_UPDATE(1,3,3,0)																			\
-								b++;																								\
-								for (channel=0;channel<lookup->numChannels;channel++) {												\
-									channelValues[channel]	+=	lookup->size[channel];												\
-								}
-#else
-#define	OCCLUSIONEXPR_PRE
-
-#define	OCCLUSIONEXPR
-#endif
-
-DEFSHORTFUNC(occlusion	,"occlusion"	,"f=pnf!"	,OCCLUSIONEXPR_PRE,OCCLUSIONEXPR,OCCLUSIONEXPR_UPDATE,NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
-
-#undef	OCCLUSIONEXPR_PRE
-
-#undef	OCCLUSIONEXPR
-
-
-
 
 
 
@@ -589,20 +423,33 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								const float *P,*N;																	\
 								operand(1,P,const float *);															\
 								operand(2,N,const float *);															\
+								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);		\
+								float	*dPdv	=	dPdu + numVertices*3;											\
+								duVector(dPdu,P);																	\
+								dvVector(dPdv,P);																	\
+								const float	*du	=	varying[VARIABLE_DU];											\
+								const float	*dv	=	varying[VARIABLE_DV];											\
 																													\
 								CGatherRay		*rays;																\
-								lastGather->ab						=	rayDiff(P,N,NULL);							\
 								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
 								lastGather->raysStorage				=	lastGather->rays;							\
-								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);
+								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);		\
+								const float	db	=	tanf(lookup->coneAngle);
 								
 
 
-#define GATHERHEADEREXPR		movvv(rays->from,P);																\
-								movvv(rays->gatherDir,N);
+#define GATHERHEADEREXPR		movvv(rays->P,P);																	\
+								mulvf(rays->dPdu,dPdu,*du);															\
+								mulvf(rays->dPdv,dPdv,*dv);															\
+								movvv(rays->gatherDir,N);															\
+								rays->da	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;					\
+								rays->db	=	db;
 
-#define GATHERHEADEREXPR_UPDATE	P	+=	3;																			\
-								N	+=	3;																			\
+#define GATHERHEADEREXPR_UPDATE	P		+=	3;																		\
+								N		+=	3;																		\
+								dPdu	+=	3;																		\
+								dPdv	+=	3;																		\
+								du++; dv++;																			\
 								rays++;
 
 #else

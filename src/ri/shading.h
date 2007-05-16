@@ -308,16 +308,14 @@ private:
 		class	CTraceLocation {
 		public:
 			float				*res;				// Where we will store the result
+			float				t;					// The average intersection distance
 			vector				C;					// Temp area to store the result
-			vector				P,dPdu,dPdv;		// The from
-			vector				D,dDdu,dDdv;		// The direction
+			vector				P,dPdu,dPdv;		// The ray origin
+			vector				D,dDdu,dDdv;		// The direction (for reflection), the ray target (for transmission)
 		};
 
-		void					traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup);
-		void					traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup);
-
-		void					traceTransmission(float *,const float *,const float *,int,int *,CTextureLookup *);
-		void					traceReflection(float *,const float *,const float *,int,int *,CTextureLookup *);
+		void					traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly);
+		void					traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly);
 
 		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);

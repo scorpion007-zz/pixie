@@ -410,7 +410,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 // Description			:	Lookup smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *Nl,float dP,CShadingContext *context,const CTexture3dLookup *l) {
+void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const float *dPdvl,const float *Nl,CShadingContext *context,const CTexture3dLookup *l) {
 	const float maxsolidangle	=	l->maxsolidangle;
 	int			*stack			=	(int *) alloca(100*sizeof(int));
 	int			*stackBase		=	stack;

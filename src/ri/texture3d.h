@@ -66,10 +66,12 @@ public:
 							CTexture3d(const char *name,const float *from,const float *to,const float *tondc=NULL,int numChannels=0,CChannel *channels=NULL);
 	virtual					~CTexture3d();
 
-							// For storing/querying data
-	virtual	void			lookup(float *,const float *,const float *,float)		= 0;
-	virtual	void			lookup(float *,const float *,const float *,float,CShadingContext *,const CTexture3dLookup *)		= 0;
+							// For storing/querying data with radius
+	virtual	void			lookup(float *,const float *,const float *,float)		= 0;	
 	virtual	void			store(const float *,const float *,const float *,float)	= 0;
+
+							// For irradiance cache type of queries
+	virtual	void			lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *)		= 0;
 
 							// Resolve the names to channels
 	void					resolve(int n,const char **names,int *entry,int *size);

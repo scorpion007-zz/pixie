@@ -207,7 +207,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Description			:	Lookup da cache
 // Return Value			:
 // Comments				:
-void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSample,CShadingContext *context,const CTexture3dLookup *lookup) {
+void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const float *cdPdv,const float *cN,CShadingContext *context,const CTexture3dLookup *lookup) {
 
 	// Is this a point based lookup?
 	if ((lookup->pointbased) && (lookup->pointHierarchy != NULL)) {
@@ -215,7 +215,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 
 		for (i=0;i<7;i++)	C[i]	=	0;
 
-		lookup->pointHierarchy->lookup(C+3,cP,cN,dSample,context,lookup);
+		lookup->pointHierarchy->lookup(C+3,cP,cdPdu,cdPdv,cN,context,lookup);
 	} else {
 		CCacheSample		*cSample;
 		CCacheNode			*cNode;
@@ -324,9 +324,14 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cN,float dSa
 		} else {
 			// Are we sampling the cache ?
 			if (flags & CACHE_SAMPLE) {
+				vector	dPdu,dPdv;
+
+				// Convert the tangent space
+				mulmv(dPdu,to,cdPdu);
+				mulmv(dPdv,to,cdPdv);
 
 				// Create a new sample
-				sample(C,P,N,dSample,context,lookup);
+				sample(C,P,dPdu,dPdv,N,context,lookup);
 				mulmv(C+4,from,C+4);	// envdir is stored in the target coordinate system
 			} else {
 
@@ -539,7 +544,7 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Description			:	Sample the occlusion
 // Return Value			:
 // Comments				:
-void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSample,CShadingContext *context,const CTexture3dLookup *lookup) {
+void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const float *dPdv,const float *N,CShadingContext *context,const CTexture3dLookup *lookup) {
 	CCacheSample		*cSample;
 	int					i,j;
 	float				coverage;
@@ -571,14 +576,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		texLookup->maxDist		= C_INFINITY;
 		texLookup->coneAngle	= 0;
 		texLookup->label		= NULL;
-		texLookup->lookupFloat	= FALSE;
 		texLookup->texture		= NULL;
 		texLookup->environment	= lookup->environment;
 	}
 						
 	// Create an orthanormal coordinate system
-	crossvv(X,N,P);
-	normalizevf(X);
+	normalizevf(X,dPdu);
 	crossvv(Y,N,X);
 
 	// Sample the hemisphere
@@ -589,7 +592,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 	
 	// Calculate the ray differentials (use average spread in theta and phi)
 	const float da					=	tanf((float) C_PI/(2*(nt+np)));
-	const float db					=	dSample;
+	const float db					=	(lengthv(dPdu) + lengthv(dPdv))*0.5f;
 	
 	if (lookup->occlusion == TRUE) {
 
@@ -610,12 +613,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				const float originJitterX = context->urand()*dSample*0.5f*lookup->sampleBase;
-				const float originJitterY = context->urand()*dSample*0.5f*lookup->sampleBase;
+				const float originJitterX = context->urand() - 0.5f;
+				const float originJitterY = context->urand() - 0.5f;
 				
-				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*X[0] + originJitterX*Y[0];
-				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*X[1] + originJitterX*Y[1];
-				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*X[2] + originJitterX*Y[2];
+				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
+				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
+				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*dPdu[2] + originJitterY*dPdv[2];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
@@ -696,12 +699,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				const float originJitterX = context->urand()*dSample*0.5f*lookup->sampleBase;
-				const float originJitterY = context->urand()*dSample*0.5f*lookup->sampleBase;
+				const float originJitterX = context->urand() - 0.5f;
+				const float originJitterY = context->urand() - 0.5f;
 				
-				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*X[0] + originJitterX*Y[0];
-				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*X[1] + originJitterX*Y[1];
-				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*X[2] + originJitterX*Y[2];
+				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
+				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
+				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*dPdu[2] + originJitterY*dPdv[2];
 
 				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
 				ray.tmin				=	lookup->bias;
@@ -824,7 +827,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *N,float dSam
 		// Clamp the radius of validity
 		rMean					=	max(rMean, lookup->minFGRadius);
 		rMean					=	min(rMean, lookup->maxFGRadius);
-		rMean					=	min(rMean,dSample*dPscale*5.0f);
+		rMean					=	min(rMean,db*dPscale*5.0f);
 				
 		// Record the data (in the target coordinate system)
 		movvv(cSample->P,P);

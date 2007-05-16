@@ -140,15 +140,6 @@ public:
 		CTextureInfoBase	*textureInfo;
 };
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTraceLookup
-// Description			:	This class holds the base of a trace lookup
-// Comments				:
-class	CTraceLookup : public CShaderLookup	{
-public:
-		float				bias;
-		const char*			label;
-};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup

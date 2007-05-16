@@ -688,34 +688,18 @@ protected:
 
 						const T		*data;
 
-						if (l->lookupFloat) {
-#define access(__x,__y)											\
-							data	=	&((T *) dataBlock.data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
-							res[0]	=	(float) (data[0]*M);	\
-							res[1]	=	l->fill;				\
-							res[2]	=	l->fill;				\
-							res		+=	3;
+#define access(__x,__y)										\
+						data	=	&((T *) dataBlock.data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
+						res[0]	=	(float) (data[0]*M);	\
+						res[1]	=	(float) (data[1]*M);	\
+						res[2]	=	(float) (data[2]*M);	\
+						res		+=	3;
 
-							access(x,y);
-							access(xi,y);
-							access(x,yi);
-							access(xi,yi);
+						access(x,y);
+						access(xi,y);
+						access(x,yi);
+						access(xi,yi);
 #undef access
-
-						} else {
-#define access(__x,__y)											\
-							data	=	&((T *) dataBlock.data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
-							res[0]	=	(float) (data[0]*M);	\
-							res[1]	=	(float) (data[1]*M);	\
-							res[2]	=	(float) (data[2]*M);	\
-							res		+=	3;
-
-							access(x,y);
-							access(xi,y);
-							access(x,yi);
-							access(xi,yi);
-#undef access
-						}						
 					}
 
 private:
@@ -802,56 +786,28 @@ protected:
 
 						const int	thread	=	context->thread;
 
-						if (l->lookupFloat) {
 #define	access(__x,__y)																\
-							xTile	=	__x >> tileWidthShift;						\
-							yTile	=	__y >> tileHeightShift;						\
-							block	=	dataBlocks[yTile] + xTile;					\
-																					\
-							if (block->threadData[thread].data == NULL) {			\
-								textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
-							}																										\
-							CRenderer::textureRefNumber[thread]++;																	\
-							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
-																																	\
-							data	=	&((T *) block->data)[(((__y & yt) )*tileWidth+(__x &xt))*numSamples+l->channel];			\
-							res[0]	=	(float) (data[0]*M);						\
-							res[1]	=	l->fill;									\
-							res[2]	=	l->fill;									\
-							res		+=	3;
+						xTile	=	__x >> tileWidthShift;						\
+						yTile	=	__y >> tileHeightShift;						\
+						block	=	dataBlocks[yTile] + xTile;					\
+																				\
+						if (block->threadData[thread].data == NULL) {			\
+							textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
+						}																										\
+						CRenderer::textureRefNumber[thread]++;																	\
+						block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
+																																\
+						data	=	&((T *) block->data)[(((__y & yt))*tileWidth+(__x&xt))*numSamples+l->channel];				\
+						res[0]	=	(float) (data[0]*M);						\
+						res[1]	=	(float) (data[1]*M);						\
+						res[2]	=	(float) (data[2]*M);						\
+						res		+=	3;
 
-							access(x,y);
-							access(xi,y);
-							access(x,yi);
-							access(xi,yi);
-
+						access(x,y);
+						access(xi,y);
+						access(x,yi);
+						access(xi,yi);
 #undef access
-
-						} else {
-#define	access(__x,__y)																\
-							xTile	=	__x >> tileWidthShift;						\
-							yTile	=	__y >> tileHeightShift;						\
-							block	=	dataBlocks[yTile] + xTile;					\
-																					\
-							if (block->threadData[thread].data == NULL) {			\
-								textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
-							}																										\
-							CRenderer::textureRefNumber[thread]++;																	\
-							block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
-																																	\
-							data	=	&((T *) block->data)[(((__y & yt))*tileWidth+(__x&xt))*numSamples+l->channel];				\
-							res[0]	=	(float) (data[0]*M);						\
-							res[1]	=	(float) (data[1]*M);						\
-							res[2]	=	(float) (data[2]*M);						\
-							res		+=	3;
-
-							access(x,y);
-							access(xi,y);
-							access(x,yi);
-							access(xi,yi);
-
-#undef access
-						}
 					}
 
 						

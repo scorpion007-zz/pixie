@@ -101,10 +101,11 @@ public:
 // Comments				:
 class	CGatherRay : public CRay {
 public:
-	int				*tags;		// The tag
-	int				index;		// The ray index (the ray number)
+	int				*tags;			// The tag
+	int				index;			// The ray index (the ray number)
 
-	vector			gatherDir;	// Gather direction
+	vector			gatherDir;		// Gather direction
+	vector			dPdu,dPdv,P;	// The ray origin info
 };
 
 
@@ -129,7 +130,6 @@ public:
 	float			**outputs;				// The array of outputs
 	float			**nonShadeOutputs;		// The array of non-shade outputs
 	CGatherLookup	*lookup;				// The parameters for this bundle
-	const float		*ab;					// The ray differential
 	int				numMisses;				// The number of missed rays
 	int				remainingSamples;		// The number of remaining samples
 };

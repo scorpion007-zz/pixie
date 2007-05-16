@@ -40,12 +40,17 @@
 							float		*N				=	varying[VARIABLE_N];					\
 							int			numIntRays		=	0;										\
 							int			numExtRays		=	0;										\
-							const float	*ab				=	lastGather->ab;							\
 							int			i;															\
 							for (i=0;i<numRealVertices;i++) {										\
 								if (tags[i]) {														\
 									tags[i]++;														\
 								} else {															\
+									vector	tmp0,tmp1;												\
+									mulvf(tmp0,raysBase->dPdu,urand() - 0.5f);						\
+									mulvf(tmp1,raysBase->dPdv,urand() - 0.5f);						\
+									addvv(raysBase->from,tmp0,tmp1);								\
+									addvv(raysBase->from,raysBase->P);								\
+																									\
 									if (lookup->uniformDist) {										\
 										sampleHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,random4d);	\
 									} else {														\
@@ -55,8 +60,6 @@
 									raysBase->tmin	=	lookup->bias;								\
 									raysBase->t		=	lookup->maxDist;							\
 									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / (float) lookup->numSamples;	\
-									raysBase->da	=	max(ab[0],lookup->da);						\
-									raysBase->db	=	ab[1];										\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;				\
 									raysBase->tags	=	&tags[i];									\
 									if (dotvv(raysBase->dir,N) > 0) {								\
@@ -66,7 +69,6 @@
 									}																\
 								}																	\
 								N	+=	3;															\
-								ab	+=	2;															\
 							}																		\
 							if ( (numIntRays+numExtRays) > 0 ) {									\
 								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\
