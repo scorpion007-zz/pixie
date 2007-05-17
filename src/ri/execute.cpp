@@ -168,7 +168,6 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 
 
 
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	execute

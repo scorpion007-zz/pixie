@@ -365,6 +365,7 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	vector		P,N;
 
 	if (depth > maxDepth)	depth	=	maxDepth;
+	if (depth < 0)			depth	=	0;
 
 	// First, transform the point to world coordinate system
 	mulmp(P,to,cP);
@@ -458,12 +459,18 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 
 	// First, transform the point to world coordinate system
 	mulmp(P,to,cP);
-	assert(inBox(bmin,bmax,P));
+	//assert(inBox(bmin,bmax,P));
 	subvv(P,bmin);
 	mulmn(N,from,cN);
+
 	if (dotvv(N,N) > 0) normalizev(N);
 	else				normalFactor = 0.0f;
 	
+	if (depth < 0) {
+		depth	=	0;
+		depthf	=	0;
+	}
+
 	// Perform the lookup
 	osLock(mutex);
 	stats.numBrickmapLookups	+=	2;
@@ -1527,6 +1534,9 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 				const float			R	=	p->dP * radiusScale;
 				// guard against duff data making the map too deep
 				if (R<C_EPSILON || R!=R) continue;
+
+				assert(inBox(cPtCloud->bmin,cPtCloud->bmax,p->P));
+
 				cBMap->store(C,p->P,p->N,R);
 			}
 			

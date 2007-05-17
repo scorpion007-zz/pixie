@@ -2334,19 +2334,29 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 								CTexture3d		*tex		=	lookup->texture;								\
 								float			*dest		=	(float *) ralloc(tex->dataSize*sizeof(float),threadMemory);	\
 								float			**channelValues = (float **) ralloc(lookup->numChannels*sizeof(float*),threadMemory);	\
+								float			*dPdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
+								float			*dPdv		=	dPdu + numVertices*3;							\
+								duVector(dPdu,op2);																\
+								dvVector(dPdv,op2);																\
+								const float		*du			=	varying[VARIABLE_DU];							\
+								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
 								int	channel;																	\
 								for (channel=0;channel<lookup->numChannels;channel++) {							\
 									operand(lookup->index[channel],channelValues[channel],float *);				\
 								} 
 
-#define	TEXTURE3DEXPR			tex->lookup(dest,op2,op3,0);													\
+#define	TEXTURE3DEXPR			mulvf(dPdu,*du);																\
+								mulvf(dPdv,*dv);																\
+								tex->lookup(dest,op2,op3,(lengthv(dPdu) + lengthv(dPdv))*0.5f);					\
 								texture3Dunpack(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
 								*res		=	1;
 
 #define	TEXTURE3DEXPR_UPDATE	res++;																			\
-								op2+=3;																			\
-								op3+=3;																			\
+								op2		+=	3;																	\
+								op3		+=	3;																	\
+								dPdu	+=	3;																	\
+								du++;	dv++;																	\
 								for (channel=0;channel<lookup->numChannels;channel++) {							\
 									channelValues[channel]	+=	lookup->size[channel];							\
 								}
