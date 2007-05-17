@@ -433,8 +433,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								CGatherRay		*rays;																\
 								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
 								lastGather->raysStorage				=	lastGather->rays;							\
-								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);		\
-								const float	db	=	tanf(lookup->coneAngle);
+								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);
 								
 
 
@@ -442,8 +441,8 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								mulvf(rays->dPdu,dPdu,*du);															\
 								mulvf(rays->dPdv,dPdv,*dv);															\
 								movvv(rays->gatherDir,N);															\
-								rays->da	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;					\
-								rays->db	=	db;
+								rays->da	=	lookup->da;															\
+								rays->db	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;
 
 #define GATHERHEADEREXPR_UPDATE	P		+=	3;																		\
 								N		+=	3;																		\
