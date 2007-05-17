@@ -396,7 +396,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 									operand(3,sampleCone,float *);													\
 									operand(4,samples,float *);														\
 									lookup->numSamples				=	(int) *samples;								\
-									lookup->coneAngle				=	*sampleCone;								\
+									lookup->coneAngle				=	min(tanf(*sampleCone),1.0f);				\
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
 																													\
