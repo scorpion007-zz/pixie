@@ -466,8 +466,8 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 
 // Common code for trace transmission and trace reflection
 #define	computeRayDifferentials																	\
-	const float	da	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;						\
-	const float	db	=	((lengthv(rays->dDdu) + lengthv(rays->dDdv))*0.5f) / lengthv(rays->D);
+	const float	da	=	((lengthv(rays->dDdu) + lengthv(rays->dDdv))*0.5f) / lengthv(rays->D);	\
+	const float	db	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;
 
 #define	sampleRay(__from,__dir)				\
 	vector	tmp0,tmp1;						\
