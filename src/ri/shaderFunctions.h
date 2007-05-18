@@ -2247,6 +2247,9 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								operand(0,res,float *);															\
 								operand(3,op3,const float *);													\
 								operand(4,op4,const float *);													\
+								int				curU=0,curV=0;													\
+								const int		uVerts		=	currentShadingState->numUvertices;				\
+								const int		vVerts		=	currentShadingState->numVvertices;				\
 								const int		doInterp	=	(lookup->interpolate && currentShadingState->numVertices == currentShadingState->numRealVertices);	\
 								CTexture3d		*tex		=	lookup->texture;								\
 								float			*dest		=	(float *) ralloc(tex->dataSize*sizeof(float),threadMemory);	\
@@ -2274,14 +2277,14 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*lookup->radiusScale;		\
 								}																				\
 																												\
-								if (doInterp == TRUE) {															\
+								if (doInterp == FALSE) {														\
+									movvv(P,op3);																\
+								} else if ((curU < uVerts-1) && (curV < vVerts-1)) {							\
+									/* skip the end - do not double-bake seams */								\
 									P[0]	=	(dPdu[0] + dPdv[0])*0.5f + op3[0];								\
 									P[1]	=	(dPdu[1] + dPdv[1])*0.5f + op3[1];								\
 									P[2]	=	(dPdu[2] + dPdv[2])*0.5f + op3[2];								\
-								} else {																		\
-									movvv(P,op3);																\
 								}																				\
-																												\
 								texture3Dflatten(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
 								tex->store(dest,P,op4,radius);													\
 								*res		=	1;
@@ -2292,6 +2295,8 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								dPdu	+=	3;																	\
 								dPdv	+=	3;																	\
 								du++;	dv++;																	\
+								curU++;																			\
+								if (curU == uVerts) { curV++; curU = 0; }										\
 								for (channel=0;channel<lookup->numChannels;channel++) {							\
 									channelValues[channel]	+=	lookup->size[channel];							\
 								}
@@ -2346,9 +2351,15 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 									operand(lookup->index[channel],channelValues[channel],float *);				\
 								} 
 
-#define	TEXTURE3DEXPR			mulvf(dPdu,*du);																\
+#define	TEXTURE3DEXPR			float radius;																	\
+								mulvf(dPdu,*du);																\
 								mulvf(dPdv,*dv);																\
-								tex->lookup(dest,op2,op3,(lengthv(dPdu) + lengthv(dPdv))*0.5f);					\
+								if (lookup->radius > 0) {														\
+									radius	=	lookup->radius*lookup->radiusScale;								\
+								} else {																		\
+									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*lookup->radiusScale;		\
+								}																				\
+								tex->lookup(dest,op2,op3,radius);													\
 								texture3Dunpack(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
 								*res		=	1;
 
@@ -2356,6 +2367,9 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 								op2		+=	3;																	\
 								op3		+=	3;																	\
 								dPdu	+=	3;																	\
+								du++;	dv++;																	\
+								dPdu	+=	3;																	\
+								dPdv	+=	3;																	\
 								du++;	dv++;																	\
 								for (channel=0;channel<lookup->numChannels;channel++) {							\
 									channelValues[channel]	+=	lookup->size[channel];							\
