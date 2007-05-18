@@ -1855,15 +1855,17 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 
 #define	ENVIRONMENTEXPR(__float)																					\
 								if (tex == NULL) {																	\
-									rays->res	=	res;															\
-									movvv(rays->D,D);																\
-									mulvf(rays->dDdu,dDdu,*du);														\
-									mulvf(rays->dDdv,dDdv,*dv);														\
-									movvv(rays->P,P);																\
-									mulvf(rays->dPdu,dPdu,*du);														\
-									mulvf(rays->dPdv,dPdv,*dv);														\
-									rays++;																			\
-									numRays++;																		\
+									if ( numRays < currentShadingState->numRealVertices+1 ){						\
+										rays->res	=	res;														\
+										movvv(rays->D,D);															\
+										mulvf(rays->dDdu,dDdu,*du);													\
+										mulvf(rays->dDdv,dDdv,*dv);													\
+										movvv(rays->P,P);															\
+										mulvf(rays->dPdu,dPdu,*du);													\
+										mulvf(rays->dPdv,dPdv,*dv);													\
+										rays++;																		\
+										numRays++;																	\
+									}																				\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
 									movvv(D0,D);																	\
@@ -1931,15 +1933,17 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("re
 
 
 #define	SHADOWEXPR(__float)		if (tex == NULL) {																	\
-									rays->res	=	res;															\
-									movvv(rays->P,D);																\
-									mulvf(rays->dPdu,dDdu,*du);														\
-									mulvf(rays->dPdv,dDdv,*dv);														\
-									subvv(rays->D,D,L);																\
-									initv(rays->dDdu,0);															\
-									initv(rays->dDdv,0);															\
-									rays++;																			\
-									numRays++;																		\
+									if ( numRays < currentShadingState->numRealVertices+1 ){						\
+										rays->res	=	res;														\
+										movvv(rays->P,D);															\
+										mulvf(rays->dPdu,dDdu,*du);													\
+										mulvf(rays->dPdv,dDdv,*dv);													\
+										subvv(rays->D,D,L);															\
+										initv(rays->dDdu,0);														\
+										initv(rays->dDdv,0);														\
+										rays++;																		\
+										numRays++;																	\
+									}																				\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
 									movvv(D0,D);																	\
