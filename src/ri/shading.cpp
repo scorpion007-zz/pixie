@@ -757,8 +757,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				// sampling becomes grossly inaccurate, and in recursive raytracing, db
 				// grows unboundedly, causing inf and nan, and messing up filtering
 				// These are the 0-1 patch uvs, not the expanded range uvs, so this is OK.
-				const float	dud		=	min(ku * dest * isqrtf(lengthu) + C_EPSILON,1.0e3f);
-				const float	dvd		=	min(kv * dest * isqrtf(lengthv) + C_EPSILON,1.0e3f);
+				const float	dud		=	min(ku * dest * isqrtf(lengthu) + C_EPSILON,1.0f);
+				const float	dvd		=	min(kv * dest * isqrtf(lengthv) + C_EPSILON,1.0f);
 				
 				// Create one more shading point at (u + du,v)
 				u[j]		=	u[i] + dud;
