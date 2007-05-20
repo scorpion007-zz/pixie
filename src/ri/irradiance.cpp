@@ -613,8 +613,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				const float originJitterX = context->urand() - 0.5f;
-				const float originJitterY = context->urand() - 0.5f;
+				const float originJitterX = (context->urand() - 0.5f)*lookup->sampleBase;
+				const float originJitterY = (context->urand() - 0.5f)*lookup->sampleBase;
 				
 				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
@@ -699,8 +699,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				const float originJitterX = context->urand() - 0.5f;
-				const float originJitterY = context->urand() - 0.5f;
+				const float originJitterX = (context->urand() - 0.5f)*lookup->sampleBase;
+				const float originJitterY = (context->urand() - 0.5f)*lookup->sampleBase;
 				
 				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];

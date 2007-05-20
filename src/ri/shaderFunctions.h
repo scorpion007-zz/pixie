@@ -2225,6 +2225,8 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											if((*vals)[0] != '\0') lookup->coordsys	=	*vals;					\
 										} else if (strcmp(*param,"interpolate") == 0) {							\
 											lookup->interpolate		=	*vali;									\
+										} else if (strcmp(*param,"samplebase") == 0) {							\
+											lookup->sampleBase	=	*valf;										\
 										} else {																\
 											lookup->index[lookup->numChannels]	= i*2+start+1;					\
 											lookup->size[lookup->numChannels]	= 0; /* pre-bind, nothing matches */ \
