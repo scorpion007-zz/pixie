@@ -51,6 +51,7 @@
 // Return Value			:	-
 // Comments				:
 CShaderLookup::CShaderLookup() {
+	numParamBindings = 0;
 }
 
 
@@ -61,7 +62,9 @@ CShaderLookup::CShaderLookup() {
 // Return Value			:	-
 // Comments				:
 CShaderLookup::~CShaderLookup() {
+	if (paramBindings != NULL) delete[] paramBindings;
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFilterLookup

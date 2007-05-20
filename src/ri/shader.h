@@ -107,6 +107,16 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 //							relevant to a particular shading language command
 class	CShaderLookup {
 public:
+
+	struct CParamBinding {
+		int		opIndex;
+		int		type;
+		void	*dest;
+	};
+	
+	int numParamBindings;
+	CParamBinding *paramBindings;
+	
 							CShaderLookup();
 		virtual				~CShaderLookup();
 };
