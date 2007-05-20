@@ -54,6 +54,48 @@ void							debugFunction(float *);
 void							convertColorFrom(float *,const float *,ECoordinateSystem);
 void							convertColorTo(float *,const float *,ECoordinateSystem);
 
+
+// Parameter list helpers
+#define initParamBindings(__lookup,__numPossibleParams)												\
+	__lookup->paramBindings = (CShaderLookup::CParamBinding*) ralloc(sizeof(CShaderLookup::CParamBinding)*__numPossibleParams,threadMemory);
+	
+#define addParamBinding(__lookup,__start,__type,__dest)												\
+	__lookup->paramBindings[__lookup->numParamBindings].opIndex = i*2+__start+1;					\
+	__lookup->paramBindings[__lookup->numParamBindings].dest = &__lookup->__dest;					\
+	__lookup->paramBindings[__lookup->numParamBindings].type = 	__type;								\
+	__lookup->numParamBindings++;
+
+#define completeParamBindings(__lookup)																\
+	CShaderLookup::CParamBinding* __paramBindings	=	__lookup->paramBindings;					\
+	__lookup->paramBindings = new CShaderLookup::CParamBinding[__lookup->numParamBindings];			\
+	memcpy(__lookup->paramBindings,__paramBindings,sizeof(CShaderLookup::CParamBinding)*__lookup->numParamBindings);
+
+
+#define getUniformParams(__lookup) {										\
+	CShaderLookup::CParamBinding *cParamBind = __lookup->paramBindings;		\
+	for(int o=0;o<__lookup->numParamBindings;o++,cParamBind++){				\
+		switch(cParamBind->type) {											\
+			case TYPE_INTEGER:												\
+				{															\
+				const float *optmp;											\
+				operand(cParamBind->opIndex,optmp,const float *);			\
+				*((int*)cParamBind->dest) = (int) *optmp;					\
+				}															\
+				break;														\
+			case TYPE_FLOAT:												\
+				{															\
+				const float *optmp;											\
+				operand(cParamBind->opIndex,optmp,const float *);			\
+				*((float*)cParamBind->dest) = *optmp;						\
+				}															\
+				break;														\
+			default:														\
+				break;														\
+		}																	\
+	}																		\
+}
+
+// Lighting helpers
 #define	saveLighting(__L)																	\
 	if (numActive != 0) {																	\
 		CShadedLight	*cLight		= 	NULL;												\

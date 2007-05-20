@@ -1454,6 +1454,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 									const float	*valf;															\
 									const char	**vals;															\
 																												\
+									initParamBindings(lookup,1);												\
+																												\
 									for (i=0;i<num;i++) {														\
 										operand(i*2+start,param,const char **);									\
 										operand(i*2+start+1,valf,const float *);								\
@@ -1474,6 +1476,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 											lookup->twidth		=	*valf;										\
 										} else if (strcmp(*param,"samples") == 0) {								\
 											lookup->numSamples	=	(int) *valf;								\
+											addParamBinding(lookup,start,TYPE_INTEGER,numSamples);				\
 										} else if (strcmp(*param,"bias") == 0) {								\
 											lookup->shadowBias	=	*valf;										\
 										} else if (strcmp(*param,"maxdist") == 0) {								\
@@ -1484,6 +1487,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 											lookup->label		=	*vals;										\
 										}																		\
 									}																			\
+																												\
+									completeParamBindings(lookup);												\
 								}
 
 
@@ -1829,6 +1834,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 									}																				\
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
+								getUniformParams(lookup);															\
 								CTraceLocation	*rays;																\
 								int				numRays;															\
 								float			*P,*dPdu,*dPdv;														\
