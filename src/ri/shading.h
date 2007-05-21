@@ -300,8 +300,12 @@ private:
 		// The following functions are used in the shaders
 		void					duFloat(float *,const float *);
 		void					dvFloat(float *,const float *);
+		void					DuFloat(float *,const float *);
+		void					DvFloat(float *,const float *);
 		void					duVector(float *,const float *);
 		void					dvVector(float *,const float *);
+		void					DuVector(float *,const float *);
+		void					DvVector(float *,const float *);
 		float					*rayDiff(const float *from,const float *dir,const float *to);
 		float					*rayDiff(const float *from);
 

@@ -858,92 +858,171 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			sru					=	varying[VARIABLE_SRU];
 			srv					=	varying[VARIABLE_SRV];
 
-			// Compute the du
-			for (i=0;i<vVertices;i++) {
-				const int	tmp		=	i*uVertices;
-				float		*cDU	=	du	+ tmp;
-				float		*cU		=	u	+ tmp;
-				float		*cSr	=	sru	+ tmp;
-				float		*cXy	=	xy	+ tmp*2;
-				float		dx,dy,d;
-
-				P				=	varying[VARIABLE_P]		+	tmp*3;
-				d				=	0;
-				for (j=uVertices-1;j>0;j--) {
-					dx		=	cXy[2] - cXy[0];
-					dy		=	cXy[3] - cXy[1];
-					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
-					d		=	cSr[0]*(cU[1] - cU[0]);
-					d		=	min(d,1);
-					d		=	max(d,C_EPSILON);
-					assert(d > 0);
-					assert(d <= 1);
-					cDU[0]	=	d;
-					cDU		+=	1;
-					cU		+=	1;
-					cSr		+=	1;
-					cXy		+=	2;
-					P		+=	3;
-				}
-
-#ifdef USE_EXTRAPOLATED_DERIV
-				if (uVertices > 3) {
-					const float A =	(cDU[-3] - cDU[-2])/((cU[-3]-cU[-2])*(cU[-3]-cU[-1])) -
-									(cDU[-1] - cDU[-2])/((cU[-1]-cU[-2])*(cU[-3]-cU[-1]));
-					const float B =	(cDU[-1] - cDU[-2] + A*(cU[-2]*cU[-2] - cU[-1]*cU[-1])) /
-									(cU[-1] - cU[-2]);
-					const float C = (cDU[-1] - A*cU[-1]*cU[-1] - B*cU[-1]);
-
-					d		= A*cU[0]*cU[0] + B*cU[0] + C;
-				}
-#endif
+			#ifdef USE_EXTRAPOLATED_DERIV
+				#define extrapolateDerivU()																\
+					if (uVertices > 3) {																\
+						const float A =	(cDU[-3] - cDU[-2])/((cU[-3]-cU[-2])*(cU[-3]-cU[-1])) -			\
+										(cDU[-1] - cDU[-2])/((cU[-1]-cU[-2])*(cU[-3]-cU[-1]));			\
+						const float B =	(cDU[-1] - cDU[-2] + A*(cU[-2]*cU[-2] - cU[-1]*cU[-1])) /		\
+										(cU[-1] - cU[-2]);												\
+						const float C = (cDU[-1] - A*cU[-1]*cU[-1] - B*cU[-1]);							\
+						d		= A*cU[0]*cU[0] + B*cU[0] + C;											\
+					}
 				
-				cSr[0]		=	cSr[-1];
-				cDU[0]		=	d;
-			}
+				#define extrapolateDerivV()																														\
+					if (vVertices > 3) {																														\
+						const float A =	(cDV[-uVertices*3] - cDV[-uVertices*2])/((cV[-uVertices*3]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1])) -		\
+										(cDV[-uVertices*1] - cDV[-uVertices*2])/((cV[-uVertices*1]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1]));		\
+						const float B =	(cDV[-uVertices*1] - cDV[-uVertices*2] + A*(cV[-uVertices*2]*cV[-uVertices*2] - cV[-uVertices*1]*cV[-uVertices*1])) /	\
+										(cV[-uVertices*1] - cV[-uVertices*2]);																					\
+						const float C = (cDV[-uVertices*1] - A*cV[-uVertices*1]*cV[-uVertices*1] - B*cV[-uVertices*1]);											\
+						d		= A*cV[0]*cV[0] + B*cV[0] + C;																									\
+					}
 
-			// Compute the dv,dPdv
-			for (i=0;i<uVertices;i++) {
-				float	*cDV	=	dv	+	i;
-				float	*cV		=	v	+	i;
-				float	*cSr	=	srv	+	i;
-				float	*cXy	=	xy	+	i*2;
-				float	dx,dy,d;
+			#else
+				#define extrapolateDerivU()
+				#define extrapolateDerivV()
+			#endif
 
-				P				=	varying[VARIABLE_P]		+	i*3;
-				d				=	0;
-				for (j=0;j<vVertices-1;j++) {
-					dx		=	cXy[uVertices*2]	- cXy[0];
-					dy		=	cXy[uVertices*2+1]	- cXy[1];
-					cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
-					d		=	cSr[0]*(cV[uVertices] - cV[0]);
-					d		=	max(d,C_EPSILON);
-					d		=	min(d,1);
-					assert(d > 0);
-					assert(d <= 1);
-					cDV[0]	=	d;
-					cDV		+=	uVertices;
-					cV		+=	uVertices;
-					cSr		+=	uVertices;
-					cXy		+=	uVertices*2;
-					P		+=	uVertices*3;
-				}
-				
-#ifdef USE_EXTRAPOLATED_DERIV
-				if (vVertices > 3) {
-					const float A =	(cDV[-uVertices*3] - cDV[-uVertices*2])/((cV[-uVertices*3]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1])) -
-									(cDV[-uVertices*1] - cDV[-uVertices*2])/((cV[-uVertices*1]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1]));
-					const float B =	(cDV[-uVertices*1] - cDV[-uVertices*2] + A*(cV[-uVertices*2]*cV[-uVertices*2] - cV[-uVertices*1]*cV[-uVertices*1])) /
-									(cV[-uVertices*1] - cV[-uVertices*2]);
-					const float C = (cDV[-uVertices*1] - A*cV[-uVertices*1]*cV[-uVertices*1] - B*cV[-uVertices*1]);
+			if (!(currentAttributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)) {
+				// Compute the du
+				for (i=0;i<vVertices;i++) {
+					const int	tmp		=	i*uVertices;
+					float		*cDU	=	du	+ tmp;
+					float		*cU		=	u	+ tmp;
+					float		*cSr	=	sru	+ tmp;
+					float		*cXy	=	xy	+ tmp*2;
+					float		dx,dy,d;
+
+					d				=	0;
+					for (j=uVertices-1;j>0;j--) {
+						dx		=	cXy[2] - cXy[0];
+						dy		=	cXy[3] - cXy[1];
+						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
+						d		=	cSr[0]*(cU[1] - cU[0]);
+						d		=	min(d,1);
+						d		=	max(d,C_EPSILON_TINY);
+						assert(d > 0);
+						assert(d <= 1);
+						cDU[0]	=	d;
+						cDU		+=	1;
+						cU		+=	1;
+						cSr		+=	1;
+						cXy		+=	2;
+					}
+	
+					extrapolateDerivU();
 					
-					d		= A*cV[0]*cV[0] + B*cV[0] + C;
+					cSr[0]		=	cSr[-1];
+					cDU[0]		=	d;
 				}
-#endif
+	
+				// Compute the dv,dPdv
+				for (i=0;i<uVertices;i++) {
+					float	*cDV	=	dv	+	i;
+					float	*cV		=	v	+	i;
+					float	*cSr	=	srv	+	i;
+					float	*cXy	=	xy	+	i*2;
+					float	dx,dy,d;
+	
+					d				=	0;
+					for (j=0;j<vVertices-1;j++) {
+						dx		=	cXy[uVertices*2]	- cXy[0];
+						dy		=	cXy[uVertices*2+1]	- cXy[1];
+						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
+						d		=	cSr[0]*(cV[uVertices] - cV[0]);
+						d		=	max(d,C_EPSILON_TINY);
+						d		=	min(d,1);
+						assert(d > 0);
+						assert(d <= 1);
+						cDV[0]	=	d;
+						cDV		+=	uVertices;
+						cV		+=	uVertices;
+						cSr		+=	uVertices;
+						cXy		+=	uVertices*2;
+					}
+					
+					extrapolateDerivV();
+					
+					cSr[0]		=	cSr[-uVertices];
+					cDV[0]		=	d;
+				}
 				
-				cSr[0]		=	cSr[-uVertices];
-				cDV[0]		=	d;
+			} else {
+				// Non raster orient
+			
+				// Compute the du
+				for (i=0;i<vVertices;i++) {
+					const int	tmp		=	i*uVertices;
+					float		*cDU	=	du	+ tmp;
+					float		*cU		=	u	+ tmp;
+					float		*cSr	=	sru	+ tmp;
+					float		*cXy	=	xy	+ tmp*2;
+					float		dx,dy,dz,d;
+	
+					P				=	varying[VARIABLE_P]		+	tmp*3;
+					d				=	0;
+					for (j=uVertices-1;j>0;j--) {
+						dx		=	cXy[2] - cXy[0];
+						dy		=	cXy[3] - cXy[1];
+						dz		=	P[5] - P[2];
+						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
+						d		=	cSr[0]*(cU[1] - cU[0]);
+						d		=	min(d,1);
+						d		=	max(d,C_EPSILON_TINY);
+						assert(d > 0);
+						assert(d <= 1);
+						cDU[0]	=	d;
+						cDU		+=	1;
+						cU		+=	1;
+						cSr		+=	1;
+						cXy		+=	2;
+						P		+=	3;
+					}
+	
+					extrapolateDerivU();
+					
+					cSr[0]		=	cSr[-1];
+					cDU[0]		=	d;
+				}
+	
+				// Compute the dv,dPdv
+				for (i=0;i<uVertices;i++) {
+					float	*cDV	=	dv	+	i;
+					float	*cV		=	v	+	i;
+					float	*cSr	=	srv	+	i;
+					float	*cXy	=	xy	+	i*2;
+					float	dx,dy,dz,d;
+	
+					P				=	varying[VARIABLE_P]		+	i*3;
+					d				=	0;
+					for (j=0;j<vVertices-1;j++) {
+						dx		=	cXy[uVertices*2]	- cXy[0];
+						dy		=	cXy[uVertices*2+1]	- cXy[1];
+						dz		=	P[uVertices*3+2]	- P[2];
+						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
+						d		=	cSr[0]*(cV[uVertices] - cV[0]);
+						d		=	max(d,C_EPSILON_TINY);
+						d		=	min(d,1);
+						assert(d > 0);
+						assert(d <= 1);
+						cDV[0]	=	d;
+						cDV		+=	uVertices;
+						cV		+=	uVertices;
+						cSr		+=	uVertices;
+						cXy		+=	uVertices*2;
+						P		+=	uVertices*3;
+					}
+					
+					extrapolateDerivV();
+					
+					cSr[0]		=	cSr[-uVertices];
+					cDV[0]		=	d;
+				}
 			}
+			
+			#undef extrapolateDerivU
+			#undef extrapolateDerivV
 
 			// Done and done
 			memEnd(threadMemory);
