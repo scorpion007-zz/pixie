@@ -2293,16 +2293,17 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*lookup->radiusScale;		\
 								}																				\
 																												\
+								texture3Dflatten(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
 								if (doInterp == FALSE) {														\
 									movvv(P,op3);																\
+									tex->store(dest,P,op4,radius);												\
 								} else if ((curU < uVerts-1) && (curV < vVerts-1)) {							\
 									/* skip the end - do not double-bake seams */								\
 									P[0]	=	(dPdu[0] + dPdv[0])*0.5f + op3[0];								\
 									P[1]	=	(dPdu[1] + dPdv[1])*0.5f + op3[1];								\
 									P[2]	=	(dPdu[2] + dPdv[2])*0.5f + op3[2];								\
+									tex->store(dest,P,op4,radius);												\
 								}																				\
-								texture3Dflatten(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
-								tex->store(dest,P,op4,radius);													\
 								*res		=	1;
 
 #define	BAKE3DEXPR_UPDATE		res++;																			\
@@ -2382,8 +2383,6 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 #define	TEXTURE3DEXPR_UPDATE	res++;																			\
 								op2		+=	3;																	\
 								op3		+=	3;																	\
-								dPdu	+=	3;																	\
-								du++;	dv++;																	\
 								dPdu	+=	3;																	\
 								dPdv	+=	3;																	\
 								du++;	dv++;																	\
