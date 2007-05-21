@@ -89,18 +89,19 @@
 								du++;	dv++;
 
 // Actually compule the transmission color
-#define	TRANSMISSIONEXPR_POST	if (numRays > 0) {				\
-									rays	-=	numRays;		\
-									traceTransmission(numRays,rays,lookup,FALSE);						\
-									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
-								}
+#define	TRANSMISSIONEXPR_POST	assert(numRays > 0);			\
+								rays	-=	numRays;			\
+								traceTransmission(numRays,rays,lookup,FALSE);						\
+								for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
+								expandVector(res);
+
 
 // Just check whether there's smtg between the end points
-#define	VISIBILITYEXPR_POST		if (numRays > 0) {				\
-									rays	-=	numRays;		\
-									traceTransmission(numRays,rays,lookup,TRUE);									\
-									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
-								}
+#define	VISIBILITYEXPR_POST		assert(numRays > 0);			\
+								rays	-=	numRays;			\
+								traceTransmission(numRays,rays,lookup,TRUE);									\
+								for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
+								expandFloat(res);
 
 #else
 
@@ -112,8 +113,8 @@
 
 #endif
 
-DEFFUNC(Visibility			,"visibility"			,"f=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(1),VISIBILITYEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
-DEFFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(3),TRANSMISSIONEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
+DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(1),VISIBILITYEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
+DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(3),TRANSMISSIONEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
 
 
 
@@ -130,18 +131,18 @@ DEFFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMIS
 #define	TRACEEXPR_UPDATE(__n)	TRANSMISSIONEXPR_UPDATE(__n)
 
 // Do a full raytrace
-#define	TRACEEXPR_POST			if (numRays > 0) {														\
-									rays	-=	numRays;												\
-									traceReflection(numRays,rays,lookup,FALSE);							\
-									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
-								}
+#define	TRACEEXPR_POST			assert(numRays > 0);												\
+								rays	-=	numRays;												\
+								traceReflection(numRays,rays,lookup,FALSE);							\
+								for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
+								expandVector(res);
 
 // Just compute the nearest intersection
-#define	TRACE2EXPR_POST			if (numRays > 0) {														\
-									rays	-=	numRays;												\
-									traceReflection(numRays,rays,lookup,TRUE);							\
-									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;		\
-								}
+#define	TRACE2EXPR_POST			assert(numRays > 0);												\
+								rays	-=	numRays;												\
+								traceReflection(numRays,rays,lookup,TRUE);							\
+								for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;		\
+								expandFloat(res);
 
 #else
 
@@ -222,18 +223,27 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								for (channel=0;channel<lookup->numChannels;channel++) {												\
 									channelValues[channel]	+=	lookup->size[channel];												\
 								}
+
+#define	IDEXPR_POST(__occlusion)								\
+								if (__occlusion)	{			\
+									expandFloat(res);			\
+								} else {						\
+									expandVector(res);			\
+								}
 #else
 #define	IDEXPR_PRE
-
 #define	IDEXPR
+#define	IDEXPR_UPDATE
+#define	IDEXPR_POST(__occlusion)
 #endif
 
-DEFSHORTFUNC(Occlusion			,"occlusion"		,"f=pnf!"	,IDEXPR_PRE(TRUE),IDEXPR(TRUE),IDEXPR_UPDATE(1),NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
-DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDEXPR(FALSE),IDEXPR_UPDATE(3),NULL_EXPR,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(Occlusion			,"occlusion"		,"f=pnf!"	,IDEXPR_PRE(TRUE),IDEXPR(TRUE),IDEXPR_UPDATE(1),IDEXPR_POST(TRUE),PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDEXPR(FALSE),IDEXPR_UPDATE(3),IDEXPR_POST(TRUE),PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE)
 
 #undef	IDEXPR_PRE
-
 #undef	IDEXPR
+#undef	IDEXPR_UPDATE
+#undef	IDEXPR_POST
 
 
 
@@ -265,21 +275,21 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDE
 								op2	+=	3;																		\
 								op3	+=	3;
 
+#define	PHOTONMAPEXPR_POST		expandVector(res);
+
 #else
 #define	PHOTONMAPEXPR_PRE
-
 #define	PHOTONMAPEXPR
-
 #define	PHOTONMAPEXPR_UPDATE
+#define	PHOTONMAPEXPR_POST
 #endif
 
-DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR,PHOTONMAPEXPR_UPDATE,NULL_EXPR,0)
+DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR,PHOTONMAPEXPR_UPDATE,PHOTONMAPEXPR_POST,0)
 
 #undef	PHOTONMAPEXPR_PRE
-
 #undef	PHOTONMAPEXPR
-
 #undef	PHOTONMAPEXPR_UPDATE
+#undef	PHOTONMAPEXPR_POST
 
 
 
@@ -308,21 +318,27 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 #define	PHOTONMAP2EXPR_UPDATE	res	+=	3;																		\
 								op2	+=	3;
 
+#define	PHOTONMAP2EXPR_POST		expandVector(res);
+
 #else
 #define	PHOTONMAP2EXPR_PRE
 
 #define	PHOTONMAP2EXPR
 
 #define	PHOTONMAP2EXPR_UPDATE
+
+#define	PHOTONMAP2EXPR_POST
 #endif
 
-DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EXPR,PHOTONMAP2EXPR_UPDATE,NULL_EXPR,0)
+DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EXPR,PHOTONMAP2EXPR_UPDATE,PHOTONMAP2EXPR_POST,0)
 
 #undef	PHOTONMAP2EXPR_PRE
 
 #undef	PHOTONMAP2EXPR
 
 #undef	PHOTONMAP2EXPR_UPDATE
+
+#undef	PHOTONMAP2EXPR_POST
 
 
 

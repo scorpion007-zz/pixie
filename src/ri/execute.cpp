@@ -312,7 +312,23 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												goto execStart;												\
 											}
 
-#define		hashLookupNegative(__dest)
+//	Expand the results from primary shading points to all
+#define		expandVector(__res)				if (numVertices != currentShadingState->numRealVertices) {		\
+												const float	*src	=	__res - currentShadingState->numRealVertices*3;			\
+												for (int i=currentShadingState->numRealVertices;i>0;i--) {						\
+													movvv(__res,src);	__res	+=	3;	src	+=	3;			\
+													movvv(__res,src);	__res	+=	3;	src	+=	3;			\
+												}															\
+											}
+
+//	Expand the results from primary shading points to all
+#define		expandFloat(__res)				if (numVertices != currentShadingState->numRealVertices) {		\
+												const float	*src	=	__res - currentShadingState->numRealVertices;			\
+												for (int i=currentShadingState->numRealVertices;i>0;i--) {						\
+													*__res++	=	*src++;									\
+													*__res++	=	*src++;									\
+												}															\
+											}
 
 
 //	Run the ambient light source shaders for the lP

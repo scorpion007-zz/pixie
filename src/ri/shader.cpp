@@ -51,8 +51,8 @@
 // Return Value			:	-
 // Comments				:
 CShaderLookup::CShaderLookup() {
-	numParamBindings = 0;
-	paramBindings = NULL;
+	numParamBindings	= 0;
+	paramBindings		= NULL;
 }
 
 

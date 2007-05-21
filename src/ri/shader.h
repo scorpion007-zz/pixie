@@ -108,17 +108,17 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 class	CShaderLookup {
 public:
 
-	struct CParamBinding {
-		int		opIndex;
-		int		type;
-		void	*dest;
-	};
-	
-	int numParamBindings;
-	CParamBinding *paramBindings;
+		struct CParamBinding {
+			int		opIndex;
+			int		type;
+			void	*dest;
+		};
 	
 							CShaderLookup();
 		virtual				~CShaderLookup();
+
+		int					numParamBindings;
+		CParamBinding		*paramBindings;
 };
 
 

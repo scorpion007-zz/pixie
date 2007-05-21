@@ -1462,7 +1462,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 										operand(i*2+start+1,vals,const char **);								\
 																												\
 										if (strcmp(*param,"filter") == 0) {										\
-											lookup->filter	=	CRenderer::getFilter(*vals);					\
+											lookup->filter		=	CRenderer::getFilter(*vals);				\
 										} else if (strcmp(*param,"blur") == 0) {								\
 											lookup->blur		=	*valf;										\
 											lookup->coneAngle	=	(float) (C_PI*(*valf));						\
@@ -1862,18 +1862,15 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 
 #define	ENVIRONMENTEXPR(__float)																					\
 								if (tex == NULL) {																	\
-									if ( numRays < currentShadingState->numRealVertices+1 ){						\
-										rays->res	=	res;														\
-										movvv(rays->D,D);															\
-										mulvf(rays->dDdu,dDdu,*du);													\
-										mulvf(rays->dDdv,dDdv,*dv);													\
-										movvv(rays->P,P);															\
-										mulvf(rays->dPdu,dPdu,*du);													\
-										mulvf(rays->dPdv,dPdv,*dv);													\
-										movvv(rays->N,N);															\
-										rays++;																		\
-										numRays++;																	\
-									}																				\
+									rays->res	=	res;															\
+									movvv(rays->D,D);																\
+									mulvf(rays->dDdu,dDdu,*du);														\
+									mulvf(rays->dDdv,dDdv,*dv);														\
+									movvv(rays->P,P);																\
+									mulvf(rays->dPdu,dPdu,*du);														\
+									mulvf(rays->dPdv,dPdv,*dv);														\
+									rays++;																			\
+									numRays++;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
 									movvv(D0,D);																	\
@@ -1928,8 +1925,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 #define	ENVIRONMENTEXPR_POST(__float)
 #endif
 
-DEFFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(TRUE),ENVIRONMENTEXPR_UPDATE(1),ENVIRONMENTEXPR_POST(TRUE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(FALSE),ENVIRONMENTEXPR_UPDATE(3),ENVIRONMENTEXPR_POST(FALSE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(TRUE),ENVIRONMENTEXPR_UPDATE(1),ENVIRONMENTEXPR_POST(TRUE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(FALSE),ENVIRONMENTEXPR_UPDATE(3),ENVIRONMENTEXPR_POST(FALSE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // shadow	"f=Sfv"
@@ -1942,18 +1939,15 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("re
 
 
 #define	SHADOWEXPR(__float)		if (tex == NULL) {																	\
-									if ( numRays < currentShadingState->numRealVertices+1 ){						\
-										rays->res	=	res;														\
-										movvv(rays->P,D);															\
-										mulvf(rays->dPdu,dDdu,*du);													\
-										mulvf(rays->dPdv,dDdv,*dv);													\
-										subvv(rays->D,D,L);															\
-										initv(rays->dDdu,0);														\
-										initv(rays->dDdv,0);														\
-										initv(rays->N,0);															\
-										rays++;																		\
-										numRays++;																	\
-									}																				\
+									rays->res	=	res;															\
+									movvv(rays->P,D);																\
+									mulvf(rays->dPdu,dDdu,*du);														\
+									mulvf(rays->dPdv,dDdv,*dv);														\
+									subvv(rays->D,D,L);																\
+									initv(rays->dDdu,0);															\
+									initv(rays->dDdv,0);															\
+									rays++;																			\
+									numRays++;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
 									movvv(D0,D);																	\
@@ -2007,8 +2001,8 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("re
 #define	SHADOWEXPR_POST(__float)
 #endif
 
-DEFFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(TRUE),SHADOWEXPR_UPDATE(1),SHADOWEXPR_POST(TRUE),PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-DEFFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FALSE),SHADOWEXPR_UPDATE(3),SHADOWEXPR_POST(FALSE),PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(TRUE),SHADOWEXPR_UPDATE(1),SHADOWEXPR_POST(TRUE),PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FALSE),SHADOWEXPR_UPDATE(3),SHADOWEXPR_POST(FALSE),PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	ENVIRONMENTEXPR_PRE
 #undef	ENVIRONMENTEXPR
