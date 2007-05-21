@@ -151,7 +151,7 @@ void	CPatch::dice(CShadingContext *r) {
 	if ((udiv == -1) && (vdiv == -1)) {
 
 		// No, probe the surface and find the bounding box
-		float		*Pmov		=	(float *) alloca(CRenderer::maxGridSize*3*sizeof(float));
+		float		*Pmov		=	(float *) alloca(CRenderer::maxGridSize*3*2*sizeof(float));
 		float		maxBound;
 		int			up,vp;
 		int			k;
@@ -263,16 +263,15 @@ void	CPatch::dice(CShadingContext *r) {
 				if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
 
 					// Project the vertices
-					camera2pixels(numUprobes*numVprobes,Pmov);
+					memcpy(Pmov + numUprobes*numVprobes*3,varying[VARIABLE_P],numUprobes*numVprobes*3*sizeof(float));
+					camera2pixels(numUprobes*numVprobes*2,Pmov);
 
 					// Compute the amount of motion on the screen
 					float		blurDistance	=	0;
-					const float	*P				=	varying[VARIABLE_P];
+					const float	*P				=	Pmov + numUprobes*numVprobes*3;
 					for (int i=numUprobes*numVprobes;i>0;i--,Pmov+=3,P+=3) {
-						vector	D,S;
-						movvv(S,P);
-						camera2pixels(S);
-						subvv(D,Pmov,S);
+						vector	D;
+						subvv(D,Pmov,P);
 						blurDistance		+=	sqrtf(D[0]*D[0] + D[1]*D[1]);
 					}
 
