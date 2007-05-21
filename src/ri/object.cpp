@@ -353,7 +353,7 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Description		   :   Estimate the dicing size on the screen
 // Return Value		   :
 // Comments			   :   P must be in pixels
-void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient) {
+void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient) {
    float	   uAvg,vAvg;  // The average edge length
    float	   uMin,vMin;  // The minimum edge length
    float	   uMax,vMax;  // The maximum edge length
@@ -367,6 +367,10 @@ void			   CObject::estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,in
    uMin	   =   vMin	   =   C_INFINITY;
 
    if (!nonrasterorient) {
+
+	   // Project to pixels
+	   camera2pixels((udiv+1)*(vdiv+1),P);
+
 	   // U stats
 	   cP  =   P;
 	   for (j=(vdiv+1);j>0;j--) {

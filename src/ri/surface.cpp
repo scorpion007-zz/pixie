@@ -249,10 +249,6 @@ void	CPatch::dice(CShadingContext *r) {
 
 			// Can we make the perspective divide ?
 			if ((bmin[COMP_Z] > C_EPSILON) && (depth >= minDepth)) {
-
-				// Project the vertices
-				float *P			=	varying[VARIABLE_P];
-				camera2pixels(numUprobes*numVprobes,P);
 				
 				// Figure out the subdivision we want to make
 				float	shadingRate	=	attributes->shadingRate;
@@ -270,7 +266,8 @@ void	CPatch::dice(CShadingContext *r) {
 					camera2pixels(numUprobes*numVprobes,Pmov);
 
 					// Compute the amount of motion on the screen
-					float	blurDistance	=	0;
+					float		blurDistance	=	0;
+					const float	*P				=	varying[VARIABLE_P];
 					for (int i=0;i<numUprobes*numVprobes;i++) {
 						vector	D;
 						subvv(D,Pmov + i*3,P + i*3);
@@ -282,7 +279,7 @@ void	CPatch::dice(CShadingContext *r) {
 				}
 				
 				// Estimate the grid size
-				estimateDicing(P,numUprobes-1,numVprobes-1,udiv,vdiv,shadingRate,nonrasterorient);
+				estimateDicing(varying[VARIABLE_P],numUprobes-1,numVprobes-1,udiv,vdiv,shadingRate,nonrasterorient);
 
 			} else {
 

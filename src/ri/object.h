@@ -100,7 +100,7 @@ protected:
 	void					makeBound(float *,float *) const;
 
 	// This function can be used to estimate the grid size
-	void					estimateDicing(const float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient);
+	void					estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient);
 };
 
 

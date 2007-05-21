@@ -268,8 +268,6 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 			splitToChildren(rasterizer);
 		}
 	} else {
-		// We can do the perspective division
-		camera2pixels(6,P);
 
 		// Estimate the dicing amount
 		int		udiv,vdiv;
