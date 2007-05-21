@@ -901,7 +901,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
 						d		=	cSr[0]*(cU[1] - cU[0]);
 						d		=	min(d,1);
-						d		=	max(d,C_EPSILON_TINY);
+						d		=	max(d,C_EPSILON);
 						assert(d > 0);
 						assert(d <= 1);
 						cDU[0]	=	d;
@@ -931,7 +931,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						dy		=	cXy[uVertices*2+1]	- cXy[1];
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
 						d		=	cSr[0]*(cV[uVertices] - cV[0]);
-						d		=	max(d,C_EPSILON_TINY);
+						d		=	max(d,C_EPSILON);
 						d		=	min(d,1);
 						assert(d > 0);
 						assert(d <= 1);
@@ -969,7 +969,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						d		=	cSr[0]*(cU[1] - cU[0]);
 						d		=	min(d,1);
-						d		=	max(d,C_EPSILON_TINY);
+						d		=	max(d,C_EPSILON);
 						assert(d > 0);
 						assert(d <= 1);
 						cDU[0]	=	d;
@@ -1002,7 +1002,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						dz		=	P[uVertices*3+2]	- P[2];
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						d		=	cSr[0]*(cV[uVertices] - cV[0]);
-						d		=	max(d,C_EPSILON_TINY);
+						d		=	max(d,C_EPSILON);
 						d		=	min(d,1);
 						assert(d > 0);
 						assert(d <= 1);
