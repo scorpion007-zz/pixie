@@ -268,9 +268,11 @@ void	CPatch::dice(CShadingContext *r) {
 					// Compute the amount of motion on the screen
 					float		blurDistance	=	0;
 					const float	*P				=	varying[VARIABLE_P];
-					for (int i=0;i<numUprobes*numVprobes;i++) {
-						vector	D;
-						subvv(D,Pmov + i*3,P + i*3);
+					for (int i=numUprobes*numVprobes;i>0;i--,Pmov+=3,P+=3) {
+						vector	D,S;
+						movvv(S,P);
+						camera2pixels(S);
+						subvv(D,Pmov,S);
 						blurDistance		+=	sqrtf(D[0]*D[0] + D[1]*D[1]);
 					}
 
