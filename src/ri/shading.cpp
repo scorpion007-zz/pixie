@@ -957,14 +957,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					float		*cDU	=	du	+ tmp;
 					float		*cU		=	u	+ tmp;
 					float		*cSr	=	sru	+ tmp;
-					float		*cXy	=	xy	+ tmp*2;
 					float		dx,dy,dz,d;
 	
 					P				=	varying[VARIABLE_P]		+	tmp*3;
 					d				=	0;
 					for (j=uVertices-1;j>0;j--) {
-						dx		=	cXy[2] - cXy[0];
-						dy		=	cXy[3] - cXy[1];
+						dx		=	P[3] - P[0];
+						dy		=	P[4] - P[1];
 						dz		=	P[5] - P[2];
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						d		=	cSr[0]*(cU[1] - cU[0]);
@@ -976,7 +975,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDU		+=	1;
 						cU		+=	1;
 						cSr		+=	1;
-						cXy		+=	2;
 						P		+=	3;
 					}
 	
@@ -991,14 +989,13 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					float	*cDV	=	dv	+	i;
 					float	*cV		=	v	+	i;
 					float	*cSr	=	srv	+	i;
-					float	*cXy	=	xy	+	i*2;
 					float	dx,dy,dz,d;
 	
 					P				=	varying[VARIABLE_P]		+	i*3;
 					d				=	0;
 					for (j=0;j<vVertices-1;j++) {
-						dx		=	cXy[uVertices*2]	- cXy[0];
-						dy		=	cXy[uVertices*2+1]	- cXy[1];
+						dx		=	P[uVertices*3+0]	- P[0];
+						dy		=	P[uVertices*3+1]	- P[1];
 						dz		=	P[uVertices*3+2]	- P[2];
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						d		=	cSr[0]*(cV[uVertices] - cV[0]);
@@ -1010,7 +1007,6 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDV		+=	uVertices;
 						cV		+=	uVertices;
 						cSr		+=	uVertices;
-						cXy		+=	uVertices*2;
 						P		+=	uVertices*3;
 					}
 					
