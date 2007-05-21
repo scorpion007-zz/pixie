@@ -62,6 +62,7 @@
 								dvVector(dTdv,op2);												\
 								const float		*du		=	varying[VARIABLE_DU];				\
 								const float		*dv		=	varying[VARIABLE_DV];				\
+								const float		*N		=	varying[VARIABLE_N];				\
 								int				numRays	=	0;
 
 
@@ -72,6 +73,7 @@
 								movvv(rays->D,op2);				\
 								mulvf(rays->dDdu,dTdu,*du);		\
 								mulvf(rays->dDdv,dTdv,*dv);		\
+								movvv(rays->N,N);				\
 								rays++;							\
 								numRays++;
 
@@ -83,6 +85,7 @@
 								dFdv	+=	3;					\
 								dTdu	+=	3;					\
 								dTdv	+=	3;					\
+								N		+=	3;					\
 								du++;	dv++;
 
 // Actually compule the transmission color

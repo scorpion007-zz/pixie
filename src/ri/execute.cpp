@@ -56,19 +56,36 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 
 
 // Parameter list helpers
-#define initParamBindings(__lookup,__numPossibleParams)												\
-	__lookup->paramBindings = (CShaderLookup::CParamBinding*) ralloc(sizeof(CShaderLookup::CParamBinding)*__numPossibleParams,threadMemory);
-	
-#define addParamBinding(__lookup,__start,__type,__dest)												\
-	__lookup->paramBindings[__lookup->numParamBindings].opIndex = i*2+__start+1;					\
-	__lookup->paramBindings[__lookup->numParamBindings].dest = &__lookup->__dest;					\
-	__lookup->paramBindings[__lookup->numParamBindings].type = 	__type;								\
-	__lookup->numParamBindings++;
+struct CTempParamBinding {
+	CShaderLookup::CParamBinding	binding;
+	CTempParamBinding				*next;
+};
 
-#define completeParamBindings(__lookup)																\
-	CShaderLookup::CParamBinding* __paramBindings	=	__lookup->paramBindings;					\
-	__lookup->paramBindings = new CShaderLookup::CParamBinding[__lookup->numParamBindings];			\
-	memcpy(__lookup->paramBindings,__paramBindings,sizeof(CShaderLookup::CParamBinding)*__lookup->numParamBindings);
+#define initParamBindings(__lookup)												\
+	CTempParamBinding *__paramBindingsStart = NULL;								\
+	CTempParamBinding *__paramBindingsEnd	= NULL;
+	
+#define addParamBinding(__lookup,__start,__type,__dest)	{												\
+	CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);	\
+	if (__paramBindingsEnd == NULL) __paramBindingsEnd = __paramBindingsStart = __param;				\
+	else __paramBindingsEnd->next = __param;															\
+	__param->next = NULL;																				\
+	__param->binding.opIndex = i*2+__start+1;															\
+	__param->binding.dest = &__lookup->__dest;															\
+	__param->binding.type = 	__type;																	\
+	__lookup->numParamBindings++;																		\
+}
+
+#define completeParamBindings(__lookup)	{																				\
+	__lookup->paramBindings = new CShaderLookup::CParamBinding[__lookup->numParamBindings];								\
+	CShaderLookup::CParamBinding 	*cBinding		= __lookup->paramBindings;											\
+	CTempParamBinding				*cTempBinding	= __paramBindingsStart;												\
+	while (cTempBinding != NULL) {																						\
+		memcpy(cBinding,cTempBinding,sizeof(CShaderLookup::CParamBinding));												\
+		cBinding++;																										\
+		cTempBinding = cTempBinding->next;																				\
+	}																													\
+}
 
 
 #define getUniformParams(__lookup) {										\

@@ -37,6 +37,7 @@
 #include "attributes.h"
 #include "renderer.h"
 #include "stats.h"
+#include "surface.h"
 #include "ri_config.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -594,27 +595,43 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextur
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly) {
-	CTraceRay			*rayBase;
-	CTraceRay			**raysBase;
-	CTraceRay			*cRay,**cRays;
+	CTraceRay			*interiorRayBase,*cInteriorRay;
+	CTraceRay			*exteriorRayBase,*cExteriorRay;
+	CTraceRay			**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
-	int					numRemaining	=	shootStep;
+	int					numInteriorRemaining	=	shootStep;
+	int					numExteriorRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) lookup->numSamples;
 	int					currentSample;
 	int					i;
-	CTraceBundle		bundle;
+	CTraceBundle		interiorBundle,exteriorBundle;
 
+	// Verify atmosphere shaders
+	CAttributes *cAttr				=	currentShadingState->currentObject->attributes;
+	CShaderInstance *interiorShader	=	cAttr->interior;
+	CShaderInstance *exteriorShader	=	cAttr->exterior;
+	
 	// Set the ray label
-	if (lookup->label == NULL)	bundle.label	=	rayLabelTransmission;
-	else						bundle.label	=	lookup->label;
-
+	if (lookup->label == NULL)	{
+		exteriorBundle.label	=	rayLabelTransmission;
+		interiorBundle.label	=	rayLabelTransmission;
+	} else {
+		exteriorBundle.label	=	lookup->label;
+		interiorBundle.label	=	lookup->label;
+	}
+	
 	// Allocate temp memory
-	cRay	=	rayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
-	cRays	=	raysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
-
+	cExteriorRay	=	exteriorRayBase			=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
+	cExteriorRays	=	exteriorRaysBase		=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
+	
+	if (interiorShader != exteriorShader) {
+		cInteriorRay	=	interiorRayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
+		cInteriorRays	=	interiorRaysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
+	}
+	
 	// For each ray
 	for (i=numRays;i>0;i--,rays++) {
 		
@@ -627,14 +644,21 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 
 		// Sample
 		for (currentSample=numSamples;currentSample>0;currentSample--) {
-			vector	from,D;
+			vector	from,D,dir;
 			
 			sampleRay(from,D);
 
 			normalizev(D);
 
-			sampleHemisphere(cRay->dir,D,coneAngle,random4d);
-			if (dotvv(cRay->dir,cRay->dir) > C_EPSILON) {
+			sampleHemisphere(dir,D,coneAngle,random4d);
+			if (dotvv(dir,dir) > C_EPSILON) {
+				CTraceRay *cRay;
+				int isExterior = (dotvv(dir,rays->N) > 0) || (interiorShader == exteriorShader);			
+				
+				if (isExterior) cRay = cExteriorRay;
+				else			cRay = cInteriorRay;
+				
+				movvv(cRay->dir,dir);
 				movvv(cRay->from,from);
 				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->t				=	C_INFINITY;
@@ -650,33 +674,62 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 					trace(cRay);
 					rays->t					+=	cRay->t*multiplier;
 				} else {
-					*cRays++			=	cRay++;
-					if (--numRemaining == 0) {
-						numReflectionRays	+=	shootStep;
-						bundle.numRays		=	shootStep;
-						bundle.rays			=	(CRay **) raysBase;
-						bundle.depth		=	0;
-						bundle.last			=	0;
-						bundle.postShader	=	NULL;
-						traceEx(&bundle);
-						cRay				=	rayBase;
-						cRays				=	raysBase;
-						numRemaining		=	shootStep;
+					if (isExterior) {
+						*cExteriorRays++	=	cRay;
+						cExteriorRay++;
+						
+						if (--numExteriorRemaining == 0) {
+							numReflectionRays			+=	shootStep;
+							exteriorBundle.numRays		=	shootStep;
+							exteriorBundle.rays			=	(CRay **) exteriorRaysBase;
+							exteriorBundle.depth		=	0;
+							exteriorBundle.last			=	0;
+							exteriorBundle.postShader	=	exteriorShader;
+							traceEx(&exteriorBundle);	
+							cExteriorRay				=	exteriorRayBase;
+							cExteriorRays				=	exteriorRaysBase;
+							numExteriorRemaining		=	shootStep;
+						}
+					} else {
+						*cInteriorRays++	=	cRay;
+						cInteriorRay++;
+						
+						if (--numInteriorRemaining == 0) {
+							numReflectionRays	+=	shootStep;
+							interiorBundle.numRays		=	shootStep;
+							interiorBundle.rays			=	(CRay **) interiorRaysBase;
+							interiorBundle.depth		=	0;
+							interiorBundle.last			=	0;
+							interiorBundle.postShader	=	interiorShader;
+							traceEx(&interiorBundle);
+							cInteriorRay				=	interiorRayBase;
+							cInteriorRays				=	interiorRaysBase;
+							numInteriorRemaining		=	shootStep;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	// Finish the bundle
-	if (numRemaining != shootStep) {
-		numReflectionRays	+=	shootStep-numRemaining;
-		bundle.numRays		=	shootStep-numRemaining;
-		bundle.rays			=	(CRay **) raysBase;
-		bundle.depth		=	0;
-		bundle.last			=	0;
-		bundle.postShader	=	NULL;
-		traceEx(&bundle);
+	// Finish the bundles
+	if (numExteriorRemaining != shootStep) {
+		numReflectionRays			+=	shootStep-numExteriorRemaining;
+		exteriorBundle.numRays		=	shootStep-numExteriorRemaining;
+		exteriorBundle.rays			=	(CRay **) exteriorRaysBase;
+		exteriorBundle.depth		=	0;
+		exteriorBundle.last			=	0;
+		exteriorBundle.postShader	=	exteriorShader;
+		traceEx(&exteriorBundle);	
+	}
+	if (numInteriorRemaining != shootStep) {
+		numReflectionRays			+=	shootStep-numInteriorRemaining;
+		exteriorBundle.numRays		=	shootStep-numInteriorRemaining;
+		exteriorBundle.rays			=	(CRay **) interiorRaysBase;
+		exteriorBundle.depth		=	0;
+		exteriorBundle.last			=	0;
+		exteriorBundle.postShader	=	interiorShader;
+		traceEx(&interiorBundle);	
 	}
 }
 

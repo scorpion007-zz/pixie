@@ -312,6 +312,7 @@ private:
 			vector				C;					// Temp area to store the result
 			vector				P,dPdu,dPdv;		// The ray origin
 			vector				D,dDdu,dDdv;		// The direction (for reflection), the ray target (for transmission)
+			vector				N;					// Surface normal reference to determine interior or exterior
 		};
 
 		void					traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly);

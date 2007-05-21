@@ -1454,7 +1454,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 									const float	*valf;															\
 									const char	**vals;															\
 																												\
-									initParamBindings(lookup,1);												\
+									initParamBindings(lookup);													\
 																												\
 									for (i=0;i<num;i++) {														\
 										operand(i*2+start,param,const char **);									\
@@ -1837,10 +1837,11 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 								getUniformParams(lookup);															\
 								CTraceLocation	*rays;																\
 								int				numRays;															\
-								float			*P,*dPdu,*dPdv;														\
+								const float		*P,*dPdu,*dPdv,*N;													\
 								if (lookup->environment == NULL) {													\
 									rays	=	(CTraceLocation *) ralloc(currentShadingState->numVertices*sizeof(CTraceLocation),threadMemory);	\
 									P		=	varying[VARIABLE_P];												\
+									N		=	varying[VARIABLE_N];												\
 									dPdu	=	varying[VARIABLE_DPDU];												\
 									dPdv	=	varying[VARIABLE_DPDV];												\
 									numRays	=	0;																	\
@@ -1869,6 +1870,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 										movvv(rays->P,P);															\
 										mulvf(rays->dPdu,dPdu,*du);													\
 										mulvf(rays->dPdv,dPdv,*dv);													\
+										movvv(rays->N,N);															\
 										rays++;																		\
 										numRays++;																	\
 									}																				\
@@ -1899,6 +1901,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 								dv++;																				\
 								if (tex == NULL) {																	\
 									P		+=	3;																	\
+									N		+=	3;																	\
 									dPdu	+=	3;																	\
 									dPdv	+=	3;																	\
 								}
@@ -1947,6 +1950,7 @@ DEFFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("re
 										subvv(rays->D,D,L);															\
 										initv(rays->dDdu,0);														\
 										initv(rays->dDdv,0);														\
+										initv(rays->N,0);															\
 										rays++;																		\
 										numRays++;																	\
 									}																				\
