@@ -949,6 +949,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				}
 				
 			} else {
+				float maxDim = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
+
 				// Non raster orient
 			
 				// Compute the du
@@ -962,9 +964,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					P				=	varying[VARIABLE_P]		+	tmp*3;
 					d				=	0;
 					for (j=uVertices-1;j>0;j--) {
-						dx		=	P[3] - P[0];
-						dy		=	P[4] - P[1];
-						dz		=	P[5] - P[2];
+						dx		=	maxDim*(P[3] - P[0]);
+						dy		=	maxDim*(P[4] - P[1]);
+						dz		=	maxDim*(P[5] - P[2]);
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						d		=	cSr[0]*(cU[1] - cU[0]);
 						d		=	min(d,1);
@@ -994,9 +996,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					P				=	varying[VARIABLE_P]		+	i*3;
 					d				=	0;
 					for (j=0;j<vVertices-1;j++) {
-						dx		=	P[uVertices*3+0]	- P[0];
-						dy		=	P[uVertices*3+1]	- P[1];
-						dz		=	P[uVertices*3+2]	- P[2];
+						dx		=	maxDim*(P[uVertices*3+0]	- P[0]);
+						dy		=	maxDim*(P[uVertices*3+1]	- P[1]);
+						dz		=	maxDim*(P[uVertices*3+2]	- P[2]);
 						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						d		=	cSr[0]*(cV[uVertices] - cV[0]);
 						d		=	max(d,C_EPSILON);
