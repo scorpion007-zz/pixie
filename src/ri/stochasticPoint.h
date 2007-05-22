@@ -39,6 +39,20 @@ const	int	yres		=	sampleHeight - 1;
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+// Shade _very_ early if we know we are guaranteed to have to anyway
+// Points are always facing the screen, so there's no point checking if
+// they're visible before deciding to shade if RASTER_SHADE_HIDDEN is true
+
+#ifdef STOCHASTIC_UNSHADED
+#ifdef STOCHASTIC_UNDERCULL
+	if (grid->flags & RASTER_SHADE_HIDDEN) {
+		shadeGrid(grid,FALSE);
+		rasterDrawPrimitives(grid);
+		return;
+	}
+#endif
+#endif
+
 
 #ifdef STOCHASTIC_EXTRA_SAMPLES
 #define	displacement	(10 + CRenderer::numExtraSamples)
@@ -240,21 +254,13 @@ const	int	yres		=	sampleHeight - 1;
 // These macros decide whether we should draw a guad or not
 #ifdef STOCHASTIC_UNSHADED
 // We're not shaded yet, so if we pass the depth test, we need to back and shade the grid
-#ifdef STOCHASTIC_UNDERCULL
-#define drawPixelCheck()															\
-	if (z < pixel->z || (grid->flags & RASTER_SHADE_HIDDEN)) {						\
-		shadeGrid(grid,FALSE);														\
-		rasterDrawPrimitives(grid);													\
-		return;																		\
-	} depthFilterElse();
-#else
+// Note: we dealt with RASTER_SHADE_HIDDEN very early, no need to do so here
 #define drawPixelCheck()															\
 	if (z < pixel->z) {																\
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
 	} depthFilterElse();
-#endif // undercull
 #else
 #define drawPixelCheck()															\
 	CFragment *nSample;																\

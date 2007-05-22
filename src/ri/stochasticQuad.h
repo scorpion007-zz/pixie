@@ -31,6 +31,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
+// Shade _very_ early if we know we are guaranteed to have to anyway
+// This also solves issues with grids viewed exactly side-on never
+// being shaded when baking
+// Note: we retain the pre-rasterization method for the case where RASTER_SHADE_HIDDEN
+// is not set, and for the cases where 1 sidedness must be respected
+
+#ifdef STOCHASTIC_UNSHADED
+#ifdef STOCHASTIC_UNDERCULL
+	const	int	_flags = grid->flags;
+	if ((_flags & RASTER_SHADE_HIDDEN) &&
+		(_flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE)) &&
+		(_flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE))) {
+		
+		shadeGrid(grid,FALSE);
+		rasterDrawPrimitives(grid);
+		return;
+	}
+#endif
+#endif
+
 #ifdef STOCHASTIC_EXTRA_SAMPLES
 	const int displacement	=	10 + CRenderer::numExtraSamples;
 #else
@@ -288,7 +308,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// These macros decide whether we should draw a guad or not
+// These macros decide whether we should draw a quad or not
 #ifdef STOCHASTIC_UNDERCULL
 #define shouldDrawFront()			(flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE))
 #define shouldDrawBack()			(flags & (RASTER_DRAW_BACK  | RASTER_SHADE_BACKFACE))
