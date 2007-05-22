@@ -949,7 +949,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				}
 				
 			} else {
-				float maxDim = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
+				float maxDim = CRenderer::invImagePlane*max(CRenderer::dPixeldx,CRenderer::dPixeldy);
 
 				// Non raster orient
 			

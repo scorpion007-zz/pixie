@@ -412,7 +412,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	} else {	// non raster oriented
 	   vector tmp;
 	   
-	   float maxDim = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
+	   float maxDim = CRenderer::invImagePlane*max(CRenderer::dPixeldx,CRenderer::dPixeldy);
 	   						
 	   for (j=0;j<(vdiv+1)*(udiv+1);j++) {
 	      mulvf(P+j*3,maxDim);
