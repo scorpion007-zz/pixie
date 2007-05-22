@@ -412,6 +412,14 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	} else {	// non raster oriented
 	   vector tmp;
 	   
+	   float maxDim = max(CRenderer::pixelRight-CRenderer::pixelLeft,
+	   						CRenderer::pixelBottom-CRenderer::pixelTop);
+	   						
+	   for (j=0;j<(vdiv+1)*(udiv+1);j++) {
+	      mulvf(P+j*3,maxDim);
+	   }
+
+
 	   // U stats
 	   cP  =   P;
 	   for (j=(vdiv+1);j>0;j--) {
