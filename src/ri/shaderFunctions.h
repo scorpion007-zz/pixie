@@ -304,11 +304,9 @@ DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 								float		*dPdu;															\
 								float		*dPdv;															\
 								vector		tmp;															\
-								duVector(dPdu,op);															\
-								dvVector(dPdv,op);															\
 								const char	**measure;														\
 								int			dicingMeasure;													\
-								operand(2,measure,(const char **));											\
+								operand(2,measure,const char **);											\
 								if (strcmp(*measure,"shading") == 0) {										\
 									du		=	varying[VARIABLE_DU];										\
 									dv		=	varying[VARIABLE_DV];										\
@@ -321,7 +319,7 @@ DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 									du				=	rayDiff(op);										\
 									dicingMeasure	=	TRUE;												\
 								} else {																	\
-									error("Unrecognised area measure: \"%s\". Assuming \"dicing\"\n",*measure);					\
+									error(CODE_BADTOKEN,"Unrecognised area measure: \"%s\". Assuming \"dicing\"\n",*measure);					\
 									du				=	rayDiff(op);										\
 									dicingMeasure	=	TRUE;												\
 								}
@@ -351,7 +349,7 @@ DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 #endif
 
 // Totally ignore the measure argument for area
-DEFLINKFUNC(AreaS	,"area"		,"f=pS",	PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(AreaS	,"area"		,"f=pS",	AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	AREAEXPR_PRE
 #undef	AREAEXPR
