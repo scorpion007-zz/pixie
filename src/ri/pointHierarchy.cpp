@@ -437,7 +437,13 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			if (areaIndex == -1)	Cl[0]	+=	ff(P,N,item->P,item->N,item->dP);
 			else	{
 				const float	*src	=	data.array + item->entryNumber;
-				Cl[0]	+=	ff(P,N,item->P,item->N,sqrtf(src[areaIndex] / (float) C_PI));
+				const float form	=	ff(P,N,item->P,item->N,sqrtf(src[areaIndex] / (float) C_PI));
+				if (radiosityIndex > 0) {
+					Cl[0] += form*src[radiosityIndex+0];
+					Cl[1] += form*src[radiosityIndex+1];
+					Cl[2] += form*src[radiosityIndex+2];
+				}
+				Cl[3]	+=	form;
 			}
 
 		} else {
@@ -464,7 +470,13 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 
 			// The split decision
 			if (	(lengthv(D) > node->dP) && ((dParea / distSq) < maxsolidangle)	) {
-				Cl[0]	+=	ff(P,N,node->P,node->N,node->dP);
+				const float form = ff(P,N,node->P,node->N,node->dP);
+				if (radiosityIndex > 0) {
+					Cl[0] += form*node->radiosity[0];
+					Cl[1] += form*node->radiosity[1];
+					Cl[2] += form*node->radiosity[2];
+				}
+				Cl[3]	+=	form;
 			} else {
 				// Sanity check
 				assert((stack-stackBase) < 98);
