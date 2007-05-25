@@ -209,7 +209,7 @@ int			CPointHierarchy::average(int numItems,int *indices) {
 		subvv(D,node.P,item->P);
 		if (areaIndex == -1)		area	=	max(((float) C_PI*item->dP*item->dP*dotvv(node.N,item->N)),0);
 		else						area	=	max((src[areaIndex]*dotvv(node.N,item->N)),0);
-
+		
 		node.dP		+=	area;
 
 		if (radiosityIndex != -1) {
@@ -450,7 +450,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			const CMapNode			*node	=	nodes.array + currentNode;
 			
 			// Do we have any normal variation?
-			if (node->dN == 1) {
+			if (node->dN > 0.9) {
 			
 				// Are we behind the node?
 				if (dotvv(P,node->N) <= dotvv(node->P,node->N)) {
@@ -489,6 +489,10 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 	}
 }
 
+
+void RiPtFilter() {
+
+}
 
 
 
