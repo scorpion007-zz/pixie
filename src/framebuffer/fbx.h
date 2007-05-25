@@ -88,6 +88,7 @@ private:
 	XImage					*xim;
 	Atom					WM_DELETE_WINDOW;
 	Atom					WM_PROTOCOLS;
+	char					*displayName;
 };
 
 
