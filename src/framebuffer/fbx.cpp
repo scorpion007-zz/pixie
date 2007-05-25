@@ -311,11 +311,7 @@ void	CXDisplay::main() {
 
 	XChangeProperty(display, xcanvas, WM_PROTOCOLS,XA_ATOM, 32, 0, (unsigned char *)&WM_DELETE_WINDOW, 1);
 	
-	XTextProperty titleProperty;
-	XStringListToTextProperty(&displayName,1,&titleProperty);
-	XSetWMName(display, xcanvas, &titleProperty);
-	XFree(titleProperty.value);
-	
+	XStoreName(display, xcanvas, displayName);
 
 	XSelectInput(display, xcanvas, ExposureMask | StructureNotifyMask | KeyPressMask);
 
