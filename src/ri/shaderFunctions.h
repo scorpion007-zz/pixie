@@ -1279,11 +1279,12 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 								float				out[16*2];										\
 								char				*outS;											\
 								_t					src = (_t) out;									\
+								int					op3sz;											\
 																									\
 								CTextureInfoLookup	*lookup;										\
 								operand(0,res,float *);												\
 								operand(2,op2,const char **);										\
-								operand(3,op3,_t);													\
+								operandSize(3,op3,op3sz,_t);										\
 								osLock(CRenderer::shaderMutex);										\
 								if ((lookup = (CTextureInfoLookup *) parameterlist) == NULL) {		\
 									/* cache the texture lookup */									\
@@ -1326,7 +1327,8 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 								}
 
 #define	TEXTUREINFOF			*res		=	found;												\
-								*op3		=	src[0];
+								*op3		=	src[0];												\
+								if (op3sz > 1) op3[1]		=	src[1];
 
 #define	TEXTUREINFOS			*res		=	found;												\
 								*op3		=	src[0];
@@ -1379,7 +1381,7 @@ DEFLINKFUNC(Textureinfo2			,"textureinfo"				,"f=SSC!",	0)
 DEFLINKFUNC(Textureinfo3			,"textureinfo"				,"f=SSN!",	0)
 DEFLINKFUNC(Textureinfo4			,"textureinfo"				,"f=SSP!",	0)
 DEFFUNC(TextureinfoV				,"textureinfo"				,"f=SSV!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOV,TEXTUREINFO_UPDATE(1,3),NULL_EXPR,0)
-DEFFUNC(Textureinfo					,"textureinfo"				,"f=SSF!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOF,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
+DEFFUNC(Textureinfo					,"textureinfo"				,"f=SSF!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOF,TEXTUREINFO_UPDATE(1,op3sz),NULL_EXPR,0)
 DEFFUNC(TextureinfoS				,"textureinfo"				,"f=SSS!"	,TEXTUREINFO_PRE(char **),TEXTUREINFOS,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
 DEFFUNC(TextureinfoM				,"textureinfo"				,"f=SSM!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOM,TEXTUREINFO_UPDATE(1,16),NULL_EXPR,0)
 
