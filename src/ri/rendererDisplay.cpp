@@ -617,6 +617,7 @@ void	CRenderer::computeDisplayData() {
 			header.tileSize	=	bucketWidth;
 			for (header.tileShift=1;(1 << header.tileShift) < bucketWidth;header.tileShift++);
 			movmm(header.toNDC,worldToNDC);
+			movmm(header.toCamera,fromWorld);
 
 			// The sanity check
 			if ((1 << header.tileShift) != bucketWidth) {

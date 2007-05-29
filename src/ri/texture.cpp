@@ -1166,8 +1166,9 @@ public:
 class	CShadow : public CEnvironment{
 public:
 
-						CShadow(const char *name,float *toNDC,CTexture *side) : CEnvironment(name) {
+						CShadow(const char *name,float *toNDC,float *toCamera,CTexture *side) : CEnvironment(name) {
 							movmm(this->toNDC,toNDC);
+							movmm(this->toCamera,toCamera);
 							this->side	=	side;
 						}
 
@@ -1251,15 +1252,16 @@ public:
 						}
 	
 	// textureinfo support
-	void				getResolution(float *r) 	{ side->getResolution(r); }
-	char* 				getTextureType()			{ return "shadow"; }
-	int 				getNumChannels()			{ return side->getNumChannels(); }
-	int 				getViewMatrix(float *m)		{ movmm(m,toNDC); return TRUE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
+	void				getResolution(float *r) 		{ side->getResolution(r); }
+	char* 				getTextureType()				{ return "shadow"; }
+	int 				getNumChannels()				{ return side->getNumChannels(); }
+	int 				getViewMatrix(float *m)			{ movmm(m,toCamera); return TRUE; }
+	int 				getProjectionMatrix(float *m)	{ movmm(m,toNDC); return TRUE; }
 
 private:
 	CTexture			*side;
 	matrix				toNDC;
+	matrix				toCamera;
 };
 
 
@@ -1291,6 +1293,9 @@ public:
 							fread(&header,sizeof(CDeepShadowHeader),1,in);
 							mulmm(mtmp,header.toNDC,toWorld);
 							movmm(header.toNDC,mtmp);
+
+							mulmm(mtmp,header.toCamera,toWorld);
+							movmm(header.toCamera,mtmp);
 
 							// Read the tile end indices
 							tileIndices		=	new int[header.xTiles*header.yTiles];
@@ -1445,11 +1450,11 @@ public:
 						}
 	
 	// textureinfo support
-	void				getResolution(float *r) 	{ r[0] = (float) header.xres; r[1] = (float) header.yres; }
-	char* 				getTextureType()			{ return "shadow"; }
-	int 				getNumChannels()			{ return 4; }
-	int 				getViewMatrix(float *m)		{ movmm(m,header.toNDC); return TRUE; }
-	int 				getProjectionMatrix(float*)	{ return FALSE; }
+	void				getResolution(float *r) 		{ r[0] = (float) header.xres; r[1] = (float) header.yres; }
+	char* 				getTextureType()				{ return "shadow"; }
+	int 				getNumChannels()				{ return 4; }
+	int 				getViewMatrix(float *m)			{ movmm(m,header.toCamera); return TRUE; }
+	int 				getProjectionMatrix(float *m)	{ movmm(m,header.toNDC); return TRUE; }
 	
 private:
 	void				loadTile(int x,int y,CShadingContext *context) {
@@ -2176,7 +2181,7 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 			} else if (strcmp(textureFormat,TIFF_SHADOW) == 0)	{
 				CTexture	*side;
 				int			directory	=	0;
-				matrix		worldToCamera,worldToScreen,trans;
+				matrix		worldToCamera,worldToScreen,localToNDC,localToCamera;
 				float		*tmp;
 
 				TIFFGetField(in,TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	&tmp);	movmm(worldToCamera,tmp);
@@ -2185,9 +2190,10 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 				side		=	texLoad(fileName,name,in,directory);
 
 				// Compute the transformation matrix to the light space
-				mulmm(trans,worldToScreen,toWorld);
+				mulmm(localToNDC,worldToScreen,toWorld);
+				mulmm(localToCamera,worldToCamera,toWorld);
 
-				cTexture	=	new CShadow(name,trans,side);
+				cTexture	=	new CShadow(name,localToNDC,localToCamera,side);
 			}
 		} 
 	}

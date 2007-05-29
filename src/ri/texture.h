@@ -123,6 +123,7 @@ public:
 	int					tileSize;				// The tile dimensions
 	int					tileShift;				// The tile shift
 	matrix				toNDC;					// Xform to the normalized device coordinates
+	matrix				toCamera;				// The to camera transform
 };
 
 
