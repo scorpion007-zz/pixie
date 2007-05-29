@@ -319,6 +319,7 @@ public:
 	float					maxDist;				// The maximum intersection distance
 	int						maxRayDepth;			// The maximum ray depth
 	int						uniformDist;			// TRUE if we should sample uniformly
+	float					sampleBase;				// Whether to jutter the origin
 };
 
 

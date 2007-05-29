@@ -363,6 +363,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lookup->maxRayDepth		=	CRenderer::maxRayDepth;									\
 								lookup->label			=	rayLabelGather;											\
 								lookup->uniformDist		=	FALSE;													\
+								lookup->sampleBase		=	1.0f;													\
 								{																					\
 									int		i;																		\
 									const char	**param;															\
@@ -393,6 +394,8 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 											} else {																\
 												error(CODE_BADTOKEN,"Unknown gather distribution: \"%s\"\n",vals[0]);	\
 											}																		\
+										} else if (strcmp(*param,"samplebase")  == 0) {								\
+											lookup->sampleBase	=	valf[0];										\
 										} else { 																	\
 											lookup->addOutput(*param,i*2+start+1);									\
 										}																			\

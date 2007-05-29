@@ -46,8 +46,8 @@
 									tags[i]++;														\
 								} else {															\
 									vector	tmp0,tmp1;												\
-									mulvf(tmp0,raysBase->dPdu,urand() - 0.5f);						\
-									mulvf(tmp1,raysBase->dPdv,urand() - 0.5f);						\
+									mulvf(tmp0,raysBase->dPdu,lookup->sampleBase*(urand() - 0.5f));	\
+									mulvf(tmp1,raysBase->dPdv,lookup->sampleBase*(urand() - 0.5f));	\
 									addvv(raysBase->from,tmp0,tmp1);								\
 									addvv(raysBase->from,raysBase->P);								\
 																									\
