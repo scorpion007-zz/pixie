@@ -37,6 +37,7 @@
 #include "ri/ri.h"
 
 const	char	*tileSizeArgument			=	"-tilesize";
+const	char	*resizeModeArgument			=	"-resize";
 const	char	*smodeArgument				=	"-smode";
 const	char	*tmodeArgument				=	"-tmode";
 const	char	*filterArgument				=	"-filter";
@@ -55,12 +56,13 @@ const	char	*radiusscaleArgument		=	"-radiusscale";
 const	char	*maxdepthArgument			=	"-maxdepth";
 
 void	printUsage() {
-	printf("Usage: texmake [-(shadow|envlatl|envcube)] [-smode <mode>] [-tmode <mode>] [-filter <filter>] [-filterwidth <width>] [-filterheight <height>] [-sfilterwidth <width>] [-tfilterwidth <width>] <inputfile> <outputfile>\n");
+	printf("Usage: texmake [-(shadow|envlatl|envcube)] [-resize <mode>] [-smode <mode>] [-tmode <mode>] [-filter <filter>] [-filterwidth <width>] [-filterheight <height>] [-sfilterwidth <width>] [-tfilterwidth <width>] <inputfile> <outputfile>\n");
 	printf("       texmake -texture3d [-maxerror <number>] [-radiusscale <number>] [-maxdepth <number>] <inputfile> <outputfile>\n");
 }
 
 int main(int argc, char* argv[]) {
 	int				tileSize		=	32;
+	char			*resizeMode		=	"up";
 	char			*smode			=	"periodic";
 	char			*tmode			=	"periodic";
 	float			filterWidth		=	3;
@@ -101,6 +103,9 @@ int main(int argc, char* argv[]) {
 		} else if (strcmp(argv[i],tileSizeArgument) == 0) {
 			i++;
 			tileSize	=	atoi(argv[i]);
+		} else if (strcmp(argv[i],resizeModeArgument) == 0) {
+			i++;
+			resizeMode	=	argv[i];
 		} else if (strcmp(argv[i],smodeArgument) == 0) {
 			i++;
 			smode		=	argv[i];
@@ -160,6 +165,8 @@ int main(int argc, char* argv[]) {
 	if (strcmp(textureMode,"texture") == 0) {
 		if (currentFile == 2) {
 			RiBegin(RI_NULL);
+			tokens[currentParameter]	=	"resize";
+			vals[currentParameter++]	=	(RtPointer) &resizeMode;
 			RiMakeTextureV(files[0],files[1],smode,tmode,filter,filterWidth,filterHeight,currentParameter,tokens,vals);
 			RiEnd();
 
@@ -168,6 +175,8 @@ int main(int argc, char* argv[]) {
 	} else if (strcmp(textureMode,"shadow") == 0) {
 		if (currentFile == 2) {
 			RiBegin(RI_NULL);
+			tokens[currentParameter]	=	"resize";
+			vals[currentParameter++]	=	(RtPointer) &resizeMode;
 			RiMakeShadowV(files[0],files[1],currentParameter,tokens,vals);
 			RiEnd();
 
@@ -176,6 +185,8 @@ int main(int argc, char* argv[]) {
 	} else if (strcmp(textureMode,"envlat") == 0) {
 		if (currentFile == 2) {
 			RiBegin(RI_NULL);
+			tokens[currentParameter]	=	"resize";
+			vals[currentParameter++]	=	(RtPointer) &resizeMode;
 			RiMakeLatLongEnvironmentV(files[0],files[1],filter,filterWidth,filterHeight,currentParameter,tokens,vals);
 			RiEnd();
 
@@ -184,6 +195,8 @@ int main(int argc, char* argv[]) {
 	} else if (strcmp(textureMode,"envcube") == 0) {
 		if (currentFile == 7) {
 			RiBegin(RI_NULL);
+			tokens[currentParameter]	=	"resize";
+			vals[currentParameter++]	=	&resizeMode;
 			RiMakeCubeFaceEnvironmentV(files[0],files[1],files[2],files[3],files[4],files[5],files[6],fov,filter,filterWidth,filterHeight,currentParameter,tokens,vals);
 			RiEnd();
 
