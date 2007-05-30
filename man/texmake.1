@@ -20,7 +20,7 @@ will output a prepared texture in the same format as the input.  Supported modes
 are: 8bit per channel, 16bit per channel and float values per channel.
 .SH OPTIONS
 .TP
-.B -<MODE>
+.B \-mode <MODE>
 Is one of:
 .RS
 .TP
@@ -83,6 +83,32 @@ Set the swidth of the filter.
 .TP
 .B \-tfilterwidth <WIDTH>
 Set the twidth of the filter.
+.TP
+.B \-resize <MODE>
+Set the resize mode.
+The up down and round modes resize the image to be power of 2, but retain the image aspect ratio,
+filling the rest with black.  Adjustments are made in the renderer so this is not apparent.  The
+up- down- and  rount- modes resize the image to be power of 2 in all dimentions (stretching it).
+The none mode does not rescale the image (used to be the default mode).
+
+Resize mode may be one of:
+.RS
+.TP
+.B up
+.TP
+.B down
+.TP
+.B round
+.TP
+.B none
+.TP
+.B up-
+.TP
+.B down-
+.TP
+.B round-
+.TP
+.RE
 .TP
 .B \-fov <FOV>
 Set the field of view.
