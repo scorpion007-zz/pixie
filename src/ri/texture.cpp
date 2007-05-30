@@ -2025,13 +2025,12 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 		width	=	0;
 		height	=	0;
 		mode	=	NULL;
-#if 0
-		if (	(TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH       ,&width)	== 1) &&
-				(TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH      ,&height)	== 1)) {
-#else
-		if (	(TIFFGetField(in,TIFFTAG_IMAGEWIDTH       ,&width)	== 1) &&
-				(TIFFGetField(in,TIFFTAG_IMAGELENGTH      ,&height)	== 1)) {   
-#endif
+
+		if (	((TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH       ,&width)	== 1) &&
+				 (TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH      ,&height)	== 1))		||
+				((TIFFGetField(in,TIFFTAG_IMAGEWIDTH       			,&width)	== 1) &&
+				 (TIFFGetField(in,TIFFTAG_IMAGELENGTH      			,&height)	== 1))	) {
+
 			if (TIFFGetField(in,TIFFTAG_PIXAR_WRAPMODES ,&mode)		== 1) {
 				strcpy(tmp,mode);
 				smode	=	tmp;
