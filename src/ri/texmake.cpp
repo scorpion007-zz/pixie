@@ -560,10 +560,14 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 			// find new targetHeight
 			float nh		=	(float) newWidth*height[0] / (float) width[0];
 			targetHeight	=	ceil(nh);
+			// Rounding may have produced an overly small side
+			if ((strncmp(resizemode,resizeRoundMode,resizeModeLen) == 0) && (targetHeight > newHeight)) newHeight = newHeight << 1;
 		} else {
 			// find new targetWidth
 			float nw		=	(float) newHeight*width[0] / (float) height[0];
 			targetWidth		=	ceil(nw);
+			// Rounding may have produced an overly small side
+			if ((strncmp(resizemode,resizeRoundMode,resizeModeLen) == 0) && (targetWidth > newWidth)) newWidth = newWidth << 1;
 		}
 	}
 
