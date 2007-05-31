@@ -421,12 +421,12 @@ template <class T> void	filterScaleImage(int width,int height,int targetWidth,in
 	float	dy				=	filterYmarginal - filterYmargin;
 
 	// Clear the filtered image
-	for (i=0;i<width*height;i++) {
+	for (i=0;i<newHeight*newHeight;i++) {
 		normalizer[i]	=	0;
 		filteredData[i]	=	0;
 	}
 
-	for (;i<width*height*numSamples;i++) {
+	for (;i<newHeight*newHeight*numSamples;i++) {
 		filteredData[i]	=	0;
 	}
 
