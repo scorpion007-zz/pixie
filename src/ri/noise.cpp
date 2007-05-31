@@ -106,6 +106,8 @@ template <class T>	T	pnoise(T x,int px,const unsigned char *perm) {
     T	fx0, fx1;
     T	s, n0, n1;
 
+	px	=	max(px,1);
+
     ix0 = FASTFLOOR( x );
     fx0 = x - ix0;
     fx1 = fx0 - 1.0f;
@@ -154,6 +156,9 @@ template <class T>	T  pnoise(T x,T y, int px, int py,const unsigned char *perm) 
     int ix0, iy0, ix1, iy1;
     T	fx0, fy0, fx1, fy1;
     T	s, t, nx0, nx1, n0, n1;
+
+	px	=	max(px,1);
+	py	=	max(py,1);
 
     ix0 = FASTFLOOR( x );
     iy0 = FASTFLOOR( y );
@@ -235,6 +240,10 @@ template <class T>	T   pnoise(T x,T y,T z,int px,int py,int pz,const unsigned ch
     T fx0, fy0, fz0, fx1, fy1, fz1;
     T s, t, r;
     T nxy0, nxy1, nx0, nx1, n0, n1;
+
+	px	=	max(px,1);
+	py	=	max(py,1);
+	pz	=	max(pz,1);
 
     ix0 = FASTFLOOR( x );
     iy0 = FASTFLOOR( y );
@@ -364,6 +373,11 @@ template <class T>	T  pnoise(T x,T y,T z, float w,int px,int py,int pz,int pw,co
     T fx0, fy0, fz0, fw0, fx1, fy1, fz1, fw1;
     T s, t, r, q;
     T nxyz0, nxyz1, nxy0, nxy1, nx0, nx1, n0, n1;
+
+	px	=	max(px,1);
+	py	=	max(py,1);
+	pz	=	max(pz,1);
+	pw	=	max(pw,1);
 
     ix0 = FASTFLOOR( x );
     iy0 = FASTFLOOR( y );

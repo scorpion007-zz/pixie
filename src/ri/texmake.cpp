@@ -439,15 +439,15 @@ template <class T> void	filterScaleImage(int width,int height,int targetWidth,in
 			
 			float	xo		=	x*widthRatio;
 			float	yo		=	y*heightRatio;
-			int		xoi		=	floor(xo);
-			int		yoi		=	floor(yo);
+			int		xoi		=	(int) floor(xo);
+			int		yoi		=	(int) floor(yo);
 //			float	xof		=	xo-xoi;
 //			float	yof		=	yo-yoi;
 
 // FIXME: should periodic textures filter from the other side?
 
-			for (j=yo-fh;j<=yo+fh;j++) {
-				for (i=xo-fw;i<=xo+fw;i++) {
+			for (j=(int) (yo-fh);j<=yo+fh;j++) {
+				for (i=(int) (xo-fw);i<=xo+fw;i++) {
 					if ((i >= 0) && (i < width) && (j >= 0) && (j < height)) {
 						float	cx				=	(float) (i-xo);
 						float	cy				=	(float) (j-yo);
@@ -559,14 +559,14 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 		if (width[0] > height[0]) {
 			// find new targetHeight
 			float nh		=	(float) newWidth*height[0] / (float) width[0];
-			targetHeight	=	ceil(nh);
+			targetHeight	=	(int) ceil(nh);
 			// We may have produced an overly small side
 			// In order to preserve ratios, it might have to be larger
 			while (targetHeight > newHeight) newHeight = newHeight << 1;
 		} else {
 			// find new targetWidth
 			float nw		=	(float) newHeight*width[0] / (float) height[0];
-			targetWidth		=	ceil(nw);
+			targetWidth		=	(int) ceil(nw);
 			// We may have produced an overly small side
 			// In order to preserve ratios, it might have to be larger
 			while (targetWidth > newWidth) newWidth = newWidth << 1;
@@ -626,13 +626,14 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 			
 			// when resizing both dimentions, there's an extra corner to worry about
 			if ((newWidth != width[0]) && (newHeight != height[0])) {
-				if ((strcmp(smode,RI_PERIODIC) == 0) && (strcmp(smode,RI_PERIODIC) == 0)) {
+				if ((strcmp(smode,RI_PERIODIC) == 0) && (strcmp(tmode,RI_PERIODIC) == 0)) {
 					copyData<T>(data[0],width[0],height[0],0,0,newWidth-width[0],newHeight-height[0],newData,newWidth,newHeight,width[0],height[0],numSamples);
+				} else if ((strcmp(smode,RI_BLACK) == 0) || (strcmp(tmode,RI_BLACK) == 0)) {
+					initData<T>(newData,newWidth,newHeight,width[0],height[0],newWidth-width[0],newHeight-height[0],numSamples,0);
 				} else if (strcmp(smode,RI_CLAMP) == 0) {
+					// FIXME: This case is a little ambiguous
 					T *initValues = data[0] + width[0]*numSamples*(height[0]-1) + (width[0]-1)*numSamples;
 					initDataValues<T>(newData,newWidth,newHeight,width[0],height[0],newWidth-width[0],newHeight-height[0],numSamples,initValues);
-				} else if (strcmp(tmode,RI_BLACK) == 0) {
-					initData<T>(newData,newWidth,newHeight,width[0],height[0],newWidth-width[0],newHeight-height[0],numSamples,0);
 				}
 			}
 	
@@ -658,7 +659,7 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 		adjustSize<unsigned char>((unsigned char **) &data,&width,&height,&validWidth,&validHeight,numSamples,bitspersample,filterWidth,filterHeight,filter,smode,tmode,resizemode);
 		
 		// write adjusted sizes
-		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	validWidth);
+		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,		validWidth);
 		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	validHeight);
 
 		appendPyramid<unsigned char>(out,dstart,numSamples,bitspersample,tileSize,width,height,(unsigned char *) data);
@@ -666,7 +667,7 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 		adjustSize<unsigned short>((unsigned short **) &data,&width,&height,&validWidth,&validHeight,numSamples,bitspersample,filterWidth,filterHeight,filter,smode,tmode,resizemode);
 
 		// write adjusted sizes
-		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	validWidth);
+		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,		validWidth);
 		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	validHeight);
 
 		appendPyramid<unsigned short>(out,dstart,numSamples,bitspersample,tileSize,width,height,(unsigned short *) data);
@@ -674,7 +675,7 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 		adjustSize<float>((float **) &data,&width,&height,&validWidth,&validHeight,numSamples,bitspersample,filterWidth,filterHeight,filter,smode,tmode,resizemode);
 
 		// write adjusted sizes
-		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,	validWidth);
+		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,		validWidth);
 		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	validHeight);
 
 		appendPyramid<float>(out,dstart,numSamples,bitspersample,tileSize,width,height,(float *) data);

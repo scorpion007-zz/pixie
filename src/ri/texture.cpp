@@ -550,7 +550,7 @@ public:
 	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,CShadingContext *context) { 
 							s		*=	width;					// To the pixel space
 							t		*=	height;
-							s		-=	0.5;						// Pixel centers
+							s		-=	0.5;					// Pixel centers
 							t		-=	0.5;
 							int		si	=	(int) floor(s);		// The integer pixel coordinates
 							int		ti	=	(int) floor(t);
@@ -591,7 +591,7 @@ public:
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
 							t		-=	0.5;
-							int		si		=	(int) floor(s);				// The integer pixel coordinates
+							int		si		=	(int) floor(s);		// The integer pixel coordinates
 							int		ti		=	(int) floor(t);
 							float	ds		=	s - si;
 							float	dt		=	t - ti;
@@ -633,7 +633,6 @@ protected:
 	// This function must be overriden by the child class
 	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *,CShadingContext *context)		=	0;		// Lookup 4 pixel values
 };
-
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -2024,47 +2023,52 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 
 	// Is this a made texture file ?
 	if (unMade == FALSE) {
-		char			*smode,*tmode,*mode,tmp[128];
 		uint32			width,height;
 
 		width	=	0;
 		height	=	0;
-		mode	=	NULL;
 
 		// Use full image tags in preference to image size tags
 		// Allows us to rescale when texmake makes a texture power of 2
 		// but retains aspect ratio
-		if (	((TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH       ,&width)	== 1) &&
-				 (TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH      ,&height)	== 1))		||
+		if (	((TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH      ,&width)	== 1) &&
+				 (TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH     ,&height)	== 1))		||
 				((TIFFGetField(in,TIFFTAG_IMAGEWIDTH       			,&width)	== 1) &&
 				 (TIFFGetField(in,TIFFTAG_IMAGELENGTH      			,&height)	== 1))	) {
 
-			if (TIFFGetField(in,TIFFTAG_PIXAR_WRAPMODES ,&mode)		== 1) {
-				strcpy(tmp,mode);
-				smode	=	tmp;
-				tmode	=	strchr(smode,',');
-				assert(tmode != NULL);
-				*tmode++	=	'\0';
-			} else {
-				smode	=	RI_BLACK;
-				tmode	=	RI_BLACK;
-			}
+			// The input must be tiled
+			if (TIFFIsTiled(in)) {
+				char	*mode	=	NULL;
+
+				// The input must contain wrap modes
+				if (TIFFGetField(in,TIFFTAG_PIXAR_WRAPMODES ,&mode)		== 1) {
+					char	*smode,*tmode,tmp[128];
+
+					strcpy(tmp,mode);
+					smode	=	tmp;
+					tmode	=	strchr(smode,',');
+
+					if (tmode != NULL) {
+						*tmode++	=	'\0';
 
 
-			if (bitspersample == 8) {
-				cTexture	=	readMadeTexture<unsigned char>(name,aname,in,dstart,width,height,smode,tmode,1);
-			} else if (bitspersample == 16) {
-				cTexture	=	readMadeTexture<unsigned short>(name,aname,in,dstart,width,height,smode,tmode,1);
-			} else {
-				cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,1);
+						if (bitspersample == 8) {
+							cTexture	=	readMadeTexture<unsigned char>(name,aname,in,dstart,width,height,smode,tmode,1);
+						} else if (bitspersample == 16) {
+							cTexture	=	readMadeTexture<unsigned short>(name,aname,in,dstart,width,height,smode,tmode,1);
+						} else {
+							cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,1);
+						}
+					}
+				}
 			}
 		}
-      else {
-      }
 	} 
 	
+	// Were we able to read the texture ?
 	if (cTexture == NULL) {
 
+		// This must be an un-made texture then
 		if (bitspersample == 8) {
 			cTexture	=	readTexture<unsigned char>(name,aname,in,dstart,1);
 		} else if (bitspersample == 16) {
@@ -2074,7 +2078,7 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 		}
 	}
 
-
+	// We must have a texture
 	assert(cTexture != NULL);
 
 	return cTexture;
