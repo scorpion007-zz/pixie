@@ -295,6 +295,8 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 		TIFFSetDirectory(in,dir);
 
 		// Get the texture properties
+		// Note: using fileWidth, rather than the pixar full width is fine,
+		// we only use this to work out whether we're tiled or not
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&width);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&height);
 		TIFFGetFieldDefaulted(in,TIFFTAG_SAMPLESPERPIXEL         ,&numSamples);
@@ -1895,6 +1897,8 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 	numSamples				=	0;
 
 	TIFFSetDirectory(in,dstart);
+	// Note: using imagewidth rather than pixar full width is OK
+	// we want to work out how many pyramid levels there are
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&fileWidth);
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&fileHeight);
 	TIFFGetFieldDefaulted(in,TIFFTAG_SAMPLESPERPIXEL         ,&numSamples);
@@ -1985,6 +1989,7 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 	TIFFSetDirectory(in,dstart);
 	width				=	0;
 	height				=	0;
+	// Note: regular textures don't have pixar full image tag
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&width);
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&height);
 	TIFFGetFieldDefaulted(in,TIFFTAG_SAMPLESPERPIXEL         ,&numSamples);
@@ -2026,6 +2031,9 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 		height	=	0;
 		mode	=	NULL;
 
+		// Use full image tags in preference to image size tags
+		// Allows us to rescale when texmake makes a texture power of 2
+		// but retains aspect ratio
 		if (	((TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLWIDTH       ,&width)	== 1) &&
 				 (TIFFGetField(in,TIFFTAG_PIXAR_IMAGEFULLLENGTH      ,&height)	== 1))		||
 				((TIFFGetField(in,TIFFTAG_IMAGEWIDTH       			,&width)	== 1) &&
