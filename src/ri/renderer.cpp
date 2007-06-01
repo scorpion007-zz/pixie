@@ -650,12 +650,12 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		// Screen
 		toScreen[element(0,0)]	=	imagePlane;
 		toScreen[element(0,1)]	=	0;
-		toScreen[element(0,2)]	=	-1;
+		toScreen[element(0,2)]	=	0;
 		toScreen[element(0,3)]	=	0;
 
 		toScreen[element(1,0)]	=	0;
 		toScreen[element(1,1)]	=	imagePlane;
-		toScreen[element(1,2)]	=	-1;
+		toScreen[element(1,2)]	=	0;
 		toScreen[element(1,3)]	=	0;
 
 		toScreen[element(2,0)]	=	0;
@@ -693,12 +693,12 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		toScreen[element(0,0)]	=	1;
 		toScreen[element(0,1)]	=	0;
 		toScreen[element(0,2)]	=	0;
-		toScreen[element(0,3)]	=	-1;
+		toScreen[element(0,3)]	=	0;
 
 		toScreen[element(1,0)]	=	0;
 		toScreen[element(1,1)]	=	1;
 		toScreen[element(1,2)]	=	0;
-		toScreen[element(1,3)]	=	-1;
+		toScreen[element(1,3)]	=	0;
 
 		toScreen[element(2,0)]	=	0;
 		toScreen[element(2,1)]	=	0;
@@ -736,12 +736,12 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	fromScreen[element(0,0)]	=	1;
 	fromScreen[element(0,1)]	=	0;
 	fromScreen[element(0,2)]	=	0;
-	fromScreen[element(0,3)]	=	1;
+	fromScreen[element(0,3)]	=	0;
 
 	fromScreen[element(1,0)]	=	0;
 	fromScreen[element(1,1)]	=	1;
 	fromScreen[element(1,2)]	=	0;
-	fromScreen[element(1,3)]	=	1;
+	fromScreen[element(1,3)]	=	0;
 
 	fromScreen[element(2,0)]	=	0;
 	fromScreen[element(2,1)]	=	0;
