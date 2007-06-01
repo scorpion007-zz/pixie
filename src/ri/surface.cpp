@@ -139,8 +139,6 @@ static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int
 	return FALSE;
 }
 
-static	int	num	=	0;
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
 // Method				:	dice
@@ -148,12 +146,6 @@ static	int	num	=	0;
 // Return Value			:	-
 // Comments				:
 void	CPatch::dice(CShadingContext *r) {
-
-	num++;
-
-	if (num == 1101) {
-		num	=	0;
-	}
 
 	// Have we checked size of this piece before ?
 	if ((udiv == -1) && (vdiv == -1)) {
