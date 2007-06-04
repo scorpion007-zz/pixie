@@ -1938,7 +1938,7 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	data.meshAttributes			=	attributes;
 	data.meshXform				=	xform;
 	data.meshPl					=	pl;
-	data.meshChildren			=	children;
+	data.meshChildren			=	NULL;
 	data.meshP					=	pl->data0;
 	data.meshNormal				=	normal;
 	data.meshNormalData0		=	normalData0;

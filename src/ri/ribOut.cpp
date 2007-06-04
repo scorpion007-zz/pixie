@@ -1685,8 +1685,6 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable("alpha","global varying float");
 	declareVariable("time",	"global varying float");
 	declareVariable("Pw",	"global vertex htpoint");
-	declareVariable("__sru","global varying float");
-	declareVariable("__srv","global varying float");
 	declareVariable("Pz",	"vertex float");
 	declareVariable("width","vertex float");
 	declareVariable("constantwidth","constant float");

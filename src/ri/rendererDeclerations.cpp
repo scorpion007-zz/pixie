@@ -211,8 +211,6 @@ void			CRenderer::initDeclerations() {
 	tmp	=	declareVariable("alpha","global varying float",PARAMETER_ALPHA);	assert(tmp->entry	==	VARIABLE_ALPHA);
 	tmp	=	declareVariable("time",	"global varying float",PARAMETER_TIME);		assert(tmp->entry	==	VARIABLE_TIME);
 	tmp	=	declareVariable("Pw",	"global vertex htpoint",PARAMETER_P);		tmp->entry			=	VARIABLE_PW;
-	tmp	=	declareVariable("__sru","global varying float",0);					assert(tmp->entry	==	VARIABLE_SRU);
-	tmp	=	declareVariable("__srv","global varying float",0);					assert(tmp->entry	==	VARIABLE_SRV);
 	tmp	=	declareVariable("Pz",	"vertex float",PARAMETER_P);				tmp->entry			=	VARIABLE_P;
 	tmp	=	declareVariable("ncomps","global uniform float",PARAMETER_NCOMPS);	assert(tmp->entry	==	VARIABLE_NCOMPS);
 	tmp	=	declareVariable("dtime","global uniform float",PARAMETER_DTIME);	assert(tmp->entry	==	VARIABLE_DTIME);

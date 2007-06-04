@@ -94,7 +94,8 @@ typedef struct TLight {
 typedef struct TObject {
 	RtObjectHandle	handle;			// The handle of the object
 	TObject			*next;			// The next in the list
-	int				index;			// The index of the object
+	char			*name;			// The name of the object (NULL if not named)
+	int				index;			// The index of the object (-1 if named)
 } TObject;
 
 static	int					ribDepth					=	0;		// The rib parsing stack depth
@@ -2532,10 +2533,23 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				{
 					TObject	*nObject	=	new TObject;
 					
-					nObject->handle	=	RiObjectBegin();
-					nObject->index	=	(int) $2;
-					nObject->next	=	objects;
-					objects			=	nObject;
+					nObject->handle		=	RiObjectBegin();
+					nObject->index		=	(int) $2;
+					nObject->name		=	NULL;
+					nObject->next		=	objects;
+					objects				=	nObject;
+				}
+				|
+				RIB_OBJECT_BEGIN
+				RIB_TEXT
+				{
+					TObject	*nObject	=	new TObject;
+					
+					nObject->handle		=	RiObjectBegin();
+					nObject->index		=	-1;
+					nObject->name		=	strdup($2);
+					nObject->next		=	objects;
+					objects				=	nObject;
 				}
 				|
 				RIB_OBJECT_END
@@ -2550,6 +2564,22 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					
 					for (cObject=objects;cObject!=NULL;cObject=cObject->next) {
 						if (cObject->index == (int) $2)	break;
+					}
+					
+					if (cObject != NULL) {
+						RiObjectInstance(cObject->handle);
+					} else {
+						error(CODE_MISSINGDATA,"Object %d is not found\n",(int) $2);
+					}
+				}
+				|
+				RIB_OBJECT_INSTANCE
+				RIB_TEXT
+				{
+					TObject	*cObject;
+					
+					for (cObject=objects;cObject!=NULL;cObject=cObject->next) {
+						if (strcmp(cObject->name,$2) == 0)	break;
 					}
 					
 					if (cObject != NULL) {
@@ -2864,12 +2894,15 @@ void	ribParse(const char *fileName,void (*c)(const char *)) {
 			delete cLight;
 		}
 		
+		// Clear the objects
 		TObject	*cObject;
 		while((cObject=objects) != NULL) {
 			objects	=	objects->next;
+			if (cObject->name != NULL)	free(cObject->name);
 			delete cObject;
 		}
 		
+		// Clear the parameters
 		delete [] parameters;
 		delete [] tokens;
 		delete [] vals;

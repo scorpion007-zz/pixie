@@ -89,19 +89,21 @@
 								du++;	dv++;
 
 // Actually compule the transmission color
-#define	TRANSMISSIONEXPR_POST	assert(numRays > 0);			\
-								rays	-=	numRays;			\
-								traceTransmission(numRays,rays,lookup,FALSE);						\
-								for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
-								expandVector(res);
+#define	TRANSMISSIONEXPR_POST	if (numRays > 0) {				\
+									rays	-=	numRays;		\
+									traceTransmission(numRays,rays,lookup,FALSE);						\
+									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
+									expandVector(res);			\
+								}
 
 
 // Just check whether there's smtg between the end points
-#define	VISIBILITYEXPR_POST		assert(numRays > 0);			\
-								rays	-=	numRays;			\
-								traceTransmission(numRays,rays,lookup,TRUE);									\
-								for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
-								expandFloat(res);
+#define	VISIBILITYEXPR_POST		if (numRays > 0) {				\
+									rays	-=	numRays;		\
+									traceTransmission(numRays,rays,lookup,TRUE);									\
+									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
+									expandFloat(res);			\
+								}
 
 #else
 
@@ -131,18 +133,20 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 #define	TRACEEXPR_UPDATE(__n)	TRANSMISSIONEXPR_UPDATE(__n)
 
 // Do a full raytrace
-#define	TRACEEXPR_POST			assert(numRays > 0);												\
-								rays	-=	numRays;												\
-								traceReflection(numRays,rays,lookup,FALSE);							\
-								for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
-								expandVector(res);
+#define	TRACEEXPR_POST			if (numRays > 0) {													\
+									rays	-=	numRays;											\
+									traceReflection(numRays,rays,lookup,FALSE);						\
+									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);	\
+									expandVector(res);												\
+								}
 
 // Just compute the nearest intersection
-#define	TRACE2EXPR_POST			assert(numRays > 0);												\
-								rays	-=	numRays;												\
-								traceReflection(numRays,rays,lookup,TRUE);							\
-								for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;		\
-								expandFloat(res);
+#define	TRACE2EXPR_POST			if (numRays > 0) {													\
+									rays	-=	numRays;											\
+									traceReflection(numRays,rays,lookup,TRUE);						\
+									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;	\
+									expandFloat(res);												\
+								}
 
 #else
 

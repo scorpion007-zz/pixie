@@ -169,8 +169,7 @@ void		CObject::cluster(CShadingContext *context) {
 
 
 	// For 5 iterations
-	int	iteration;
-	for (iteration=0;iteration<15;iteration++) {
+	for (int iteration=0;iteration<15;iteration++) {
 
 		// Compute a slightly jittered center position for the object
 		for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++) {
@@ -290,8 +289,7 @@ void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 
 	// If raytraced, attach to the children
 	if (raytraced()) {
-		CObject	*cObject;
-		for (cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
+		for (CObject *cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
 	}
 	
 	children	=	allChildren;

@@ -178,8 +178,7 @@ CAttributes::CAttributes(const CAttributes *a) {
 	lightSources				=	NULL;
 
 	for (cLight=a->lightSources;cLight!=NULL;cLight=cLight->next) {
-		nLight			=	new CActiveLight;
-
+		nLight				=	new CActiveLight;
 		nLight->light		=	cLight->light;
 		nLight->next		=	lightSources;
 		lightSources		=	nLight;

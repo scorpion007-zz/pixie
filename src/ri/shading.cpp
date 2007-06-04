@@ -789,14 +789,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 		} else {
 			// We're shading a regular grid, so take the shortcut while computing the surface derivatives
-			float			*P;
-			float			*du;
-			float			*dv;
-			float			*u,*v;
-			float			*xy;
 			int				i,j;
 			const float		shadingRate				=	currentAttributes->shadingRate;
-			float			*sru,*srv;
 
 			assert(dim == SHADING_2D_GRID);
 
@@ -818,8 +812,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			memBegin(threadMemory);
 
 			// This array holds the projected xy pixel positions for the vertices
-			xy					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
-			P					=	varying[VARIABLE_P];
+			float		*xy		=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
+			const float	*P		=	varying[VARIABLE_P];
 			
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
@@ -851,12 +845,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				for (i=numVertices;i>0;i--,I+=3,P+=3)	initv(I,0,0,P[COMP_Z]);
 			}
 
-			du					=	varying[VARIABLE_DU];
-			dv					=	varying[VARIABLE_DV];
-			u					=	varying[VARIABLE_U];
-			v					=	varying[VARIABLE_V];
-			sru					=	varying[VARIABLE_SRU];
-			srv					=	varying[VARIABLE_SRV];
+			float		*du			=	varying[VARIABLE_DU];
+			float		*dv			=	varying[VARIABLE_DV];
+			const float *u			=	varying[VARIABLE_U];
+			const float	*v			=	varying[VARIABLE_V];
 
 			#ifdef USE_EXTRAPOLATED_DERIV
 				#define extrapolateDerivU()																\
@@ -884,22 +876,23 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				#define extrapolateDerivV()
 			#endif
 
+#define	MAX_DIFFERENTIAL_DISCREPANCY	4
+
 			if (!(currentAttributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)) {
 				// Compute the du
 				for (i=0;i<vVertices;i++) {
 					const int	tmp		=	i*uVertices;
 					float		*cDU	=	du	+ tmp;
-					float		*cU		=	u	+ tmp;
-					float		*cSr	=	sru	+ tmp;
+					const float	*cU		=	u	+ tmp;
 					float		*cXy	=	xy	+ tmp*2;
-					float		dx,dy,d;
+					float		d		=	0;
 
-					d				=	0;
 					for (j=uVertices-1;j>0;j--) {
-						dx		=	cXy[2] - cXy[0];
-						dy		=	cXy[3] - cXy[1];
-						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
-						d		=	cSr[0]*(cU[1] - cU[0]);
+						const float	dx	=	cXy[2] - cXy[0];
+						const float	dy	=	cXy[3] - cXy[1];
+						float		cSr	=	shadingRate*isqrtf(dx*dx + dy*dy);
+						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
+						d		=	cSr*(cU[1] - cU[0]);
 						d		=	min(d,1);
 						d		=	max(d,C_EPSILON);
 						assert(d > 0);
@@ -907,30 +900,27 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDU[0]	=	d;
 						cDU		+=	1;
 						cU		+=	1;
-						cSr		+=	1;
 						cXy		+=	2;
 					}
 	
 					extrapolateDerivU();
 					
-					cSr[0]		=	cSr[-1];
 					cDU[0]		=	d;
 				}
 	
 				// Compute the dv,dPdv
 				for (i=0;i<uVertices;i++) {
-					float	*cDV	=	dv	+	i;
-					float	*cV		=	v	+	i;
-					float	*cSr	=	srv	+	i;
-					float	*cXy	=	xy	+	i*2;
-					float	dx,dy,d;
+					float		*cDV	=	dv	+	i;
+					const float	*cV		=	v	+	i;
+					float		*cXy	=	xy	+	i*2;
+					float		d		=	0;
 	
-					d				=	0;
 					for (j=0;j<vVertices-1;j++) {
-						dx		=	cXy[uVertices*2]	- cXy[0];
-						dy		=	cXy[uVertices*2+1]	- cXy[1];
-						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy);
-						d		=	cSr[0]*(cV[uVertices] - cV[0]);
+						const float	dx		=	cXy[uVertices*2]	- cXy[0];
+						const float	dy		=	cXy[uVertices*2+1]	- cXy[1];
+						float		cSr		=	shadingRate*isqrtf(dx*dx + dy*dy);
+						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
+						d		=	cSr*(cV[uVertices] - cV[0]);
 						d		=	max(d,C_EPSILON);
 						d		=	min(d,1);
 						assert(d > 0);
@@ -938,13 +928,11 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDV[0]	=	d;
 						cDV		+=	uVertices;
 						cV		+=	uVertices;
-						cSr		+=	uVertices;
 						cXy		+=	uVertices*2;
 					}
 					
 					extrapolateDerivV();
 					
-					cSr[0]		=	cSr[-uVertices];
 					cDV[0]		=	d;
 				}
 				
@@ -957,18 +945,17 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				for (i=0;i<vVertices;i++) {
 					const int	tmp		=	i*uVertices;
 					float		*cDU	=	du	+ tmp;
-					float		*cU		=	u	+ tmp;
-					float		*cSr	=	sru	+ tmp;
-					float		dx,dy,dz,d;
+					const float	*cU		=	u	+ tmp;
+					float		d		=	0;
 	
 					P				=	varying[VARIABLE_P]		+	tmp*3;
-					d				=	0;
 					for (j=uVertices-1;j>0;j--) {
-						dx		=	maxDim*(P[3] - P[0]);
-						dy		=	maxDim*(P[4] - P[1]);
-						dz		=	maxDim*(P[5] - P[2]);
-						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
-						d		=	cSr[0]*(cU[1] - cU[0]);
+						const float	dx		=	maxDim*(P[3] - P[0]);
+						const float	dy		=	maxDim*(P[4] - P[1]);
+						const float	dz		=	maxDim*(P[5] - P[2]);
+						float		cSr		=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
+						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
+						d		=	cSr*(cU[1] - cU[0]);
 						d		=	min(d,1);
 						d		=	max(d,C_EPSILON);
 						assert(d > 0);
@@ -976,31 +963,28 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDU[0]	=	d;
 						cDU		+=	1;
 						cU		+=	1;
-						cSr		+=	1;
 						P		+=	3;
 					}
 	
 					extrapolateDerivU();
 					
-					cSr[0]		=	cSr[-1];
 					cDU[0]		=	d;
 				}
 	
 				// Compute the dv,dPdv
 				for (i=0;i<uVertices;i++) {
-					float	*cDV	=	dv	+	i;
-					float	*cV		=	v	+	i;
-					float	*cSr	=	srv	+	i;
-					float	dx,dy,dz,d;
+					float		*cDV	=	dv	+	i;
+					const float	*cV		=	v	+	i;
+					float		d		=	0;
 	
 					P				=	varying[VARIABLE_P]		+	i*3;
-					d				=	0;
 					for (j=0;j<vVertices-1;j++) {
-						dx		=	maxDim*(P[uVertices*3+0]	- P[0]);
-						dy		=	maxDim*(P[uVertices*3+1]	- P[1]);
-						dz		=	maxDim*(P[uVertices*3+2]	- P[2]);
-						cSr[0]	=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
-						d		=	cSr[0]*(cV[uVertices] - cV[0]);
+						const float	dx		=	maxDim*(P[uVertices*3+0]	- P[0]);
+						const float	dy		=	maxDim*(P[uVertices*3+1]	- P[1]);
+						const float	dz		=	maxDim*(P[uVertices*3+2]	- P[2]);
+						float		cSr		=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
+						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
+						d		=	cSr*(cV[uVertices] - cV[0]);
 						d		=	max(d,C_EPSILON);
 						d		=	min(d,1);
 						assert(d > 0);
@@ -1008,17 +992,16 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDV[0]	=	d;
 						cDV		+=	uVertices;
 						cV		+=	uVertices;
-						cSr		+=	uVertices;
 						P		+=	uVertices*3;
 					}
 					
 					extrapolateDerivV();
 					
-					cSr[0]		=	cSr[-uVertices];
 					cDV[0]		=	d;
 				}
 			}
-			
+
+			#undef MAX_DIFFERENTIAL_DISCREPANCY
 			#undef extrapolateDerivU
 			#undef extrapolateDerivV
 
