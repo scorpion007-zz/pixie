@@ -46,6 +46,9 @@
 #define	xbucket(__x)	(int) floor((__x - CRenderer::xSampleOffset) * CRenderer::invBucketSampleWidth);
 #define	ybucket(__y)	(int) floor((__y - CRenderer::ySampleOffset) * CRenderer::invBucketSampleHeight);
 
+#define	xbucketNext(__x)	(int) ceil((__x - CRenderer::xSampleOffset) * CRenderer::invBucketSampleWidth);
+#define	ybucketNext(__y)	(int) ceil((__y - CRenderer::ySampleOffset) * CRenderer::invBucketSampleHeight);
+
 
 // Insert an object into a bucket (buckets must be locked)
 #define	objectExplicitInsert(__o,__bx,__by) {			\
@@ -384,7 +387,6 @@ void	CReyes::render() {
 				
 				continue;
 			} else {
-
 				// Dice the object
 				osLock(cObject->mutex);
 
@@ -893,7 +895,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 
 			// Check if we're opaque
 			for (one.real=1,Oi=(T32 *) varying[VARIABLE_OI],i=numPoints;i>0;i--,Oi+=3) {
-				if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
+				//if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
+				if ((Oi[0].real < CRenderer::opacityThreshold[0]) | (Oi[1].real < CRenderer::opacityThreshold[1]) | (Oi[2].real < CRenderer::opacityThreshold[2])) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}
@@ -1031,7 +1034,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			Oi			=	(T32 *) varying[VARIABLE_OI];
 			one.real	=	1;
 			for (k=numVertices;k>0;k--,Oi+=3) {
-				if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
+				//if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
+				if ((Oi[0].real < CRenderer::opacityThreshold[0]) | (Oi[1].real < CRenderer::opacityThreshold[1]) | (Oi[2].real < CRenderer::opacityThreshold[2])) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}
@@ -1666,8 +1670,8 @@ void	CReyes::insertObject(CRasterObject *object) {
 	// For every thread
 	const int	sx = xbucket(object->xbound[0]);
 	const int	sy = ybucket(object->ybound[0]);
-	const int	ex = xbucket(object->xbound[1]);
-	const int	ey = ybucket(object->ybound[1]);
+	const int	ex = xbucketNext(object->xbound[1]);
+	const int	ey = ybucketNext(object->ybound[1]);
 
 	// Trivial reject check
 	if (	(sx >= CRenderer::xBuckets) || 
