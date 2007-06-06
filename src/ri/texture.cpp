@@ -2060,6 +2060,14 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 							cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,smode,tmode,1);
 						}
 					}
+				} else {
+					if (bitspersample == 8) {
+						cTexture	=	readMadeTexture<unsigned char>(name,aname,in,dstart,width,height,RI_BLACK,RI_BLACK,1);
+					} else if (bitspersample == 16) {
+						cTexture	=	readMadeTexture<unsigned short>(name,aname,in,dstart,width,height,RI_BLACK,RI_BLACK,1);
+					} else {
+						cTexture	=	readMadeTexture<float>(name,aname,in,dstart,width,height,RI_BLACK,RI_BLACK,1);
+					}
 				}
 			}
 		}

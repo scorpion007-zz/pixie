@@ -385,7 +385,8 @@ CShader::~CShader() {
 CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 	stats.numShaderInstances++;
 
-	refCount	=	1;
+	attach();
+
 	xform		=	x;
 	xform->attach();
 	

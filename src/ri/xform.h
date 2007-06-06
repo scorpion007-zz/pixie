@@ -33,6 +33,7 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
+#include "refCounter.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
@@ -41,17 +42,13 @@
 //							local system to the global system and "to"
 //							is the transformation from global to local system
 // Comments				:
-class CXform {
+class CXform : public CRefCounter {
 public:
 				CXform();
 				CXform(CXform *);
 	virtual		~CXform();
 
 	CXform		*next;		// points to the next xform in case of motion blur
-	int			refCount;
-
-	void		attach()	{	refCount++;	}
-	void		detach()	{	refCount--; if (refCount == 0) delete this; }
 
 	void		restore(const CXform *xform);
 

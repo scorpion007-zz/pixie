@@ -847,6 +847,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\refCounter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\ri\refCounter.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\resource.cpp"
 				>
 			</File>
@@ -1438,7 +1446,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\src\ri\config.h"
+			RelativePath="..\..\..\..\src\ri\ri_config.h"
 			>
 		</File>
 	</Files>

@@ -265,14 +265,6 @@ private:
 	int							tbucketRight;
 	int							tbucketBottom;
 	
-#ifdef REYES_OBJECT_CACHE_SIZE
-	CRasterObject				*freeRasterObjects;								// List of free objects
-#endif
-
-#ifdef REYES_GRID_CACHE_SIZE
-	CRasterGrid					*freeRasterGrids;								// List of free raster grids
-#endif
-
 
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CReyes

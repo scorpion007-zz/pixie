@@ -43,6 +43,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				quadrics.cpp \
 				random.cpp \
 				raytracer.cpp \
+				refCounter.cpp \
 				remoteChannel.cpp \
 				renderer.cpp \
 				rendererClipping.cpp \

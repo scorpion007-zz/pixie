@@ -39,6 +39,7 @@
 #include "ray.h"
 #include "xform.h"
 #include "map.h"
+#include "refCounter.h"
 
 
 
@@ -85,7 +86,7 @@ public:
 // Class				:	CPhotonMap
 // Description			:	A Photon map
 // Comments				:
-class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView {
+class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView, public CRefCounter {
 	
 	#ifdef PHOTON_LOOKUP_CACHE
 		class	CPhotonSample {
@@ -108,9 +109,6 @@ public:
 				CPhotonMap(const char *,FILE *);
 				~CPhotonMap();
 
-	void		attach()	{	refCount++;	}
-	void		detach()	{	refCount--; if (refCount == 0) delete this; }
-
 	void		reset();
 	void		write(const CXform *);
 
@@ -131,7 +129,6 @@ public:
 		int			maxDepth;			// The maximum depth of the hierarchy
 	#endif
 
-	int			refCount;
 	int			modifying;
 	matrix		from,to;
 	float		maxPower;			// The maximum photon power

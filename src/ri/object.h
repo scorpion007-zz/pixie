@@ -37,6 +37,7 @@
 #include "ray.h"
 #include "rendererc.h"
 #include "renderer.h"
+#include "refCounter.h"
 
 const unsigned int	GEOMETRY_FORCE_VARYING	=	1;	// Force vertex variables to be varying
 const unsigned int	GEOMETRY_FORCE_VERTEX	=	2;	// Force varying variables to be vertex
@@ -59,14 +60,12 @@ const unsigned int	OBJECT_HIERARCHY_READY		=	8;	// Set if the children pointer i
 // Class				:	CObject
 // Description			:	This class encapsulates a general object
 // Comments				:
-class	CObject {
+class	CObject : public CRefCounter {
 public:
 							CObject(CAttributes *,CXform *);
 	virtual					~CObject();
 
 							// Instance management
-	inline	void			attach()	{	refCount++;													}
-	inline	void			detach()	{	refCount--;	if (refCount == 0)	delete this;				}
 	inline	int				raytraced()	{	return (attributes->flags & CRenderer::raytracingFlags);	}
 
 							///////////////////////////////////////////////////////////////

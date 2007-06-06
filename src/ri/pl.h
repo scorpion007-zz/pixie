@@ -36,6 +36,7 @@
 #include "variable.h"
 #include "xform.h"
 #include "attributes.h"
+#include "refCounter.h"
 
 const	unsigned int	PL_VARYING_TO_VERTEX	=	1;	// Force varying variables to be vertex
 const	unsigned int	PL_VERTEX_TO_VARYING	=	2;	// Force vertex variables to be varying
@@ -44,17 +45,13 @@ const	unsigned int	PL_VERTEX_TO_VARYING	=	2;	// Force vertex variables to be var
 // Class				:	CVertexData
 // Description			:	Holds vertex data
 // Comments				:
-class	CVertexData {
+class	CVertexData : public CRefCounter {
 public:
 							CVertexData();
 							~CVertexData();
 
-	void					attach()		{	refCount++;	}
-	void					detach()		{	if (--refCount == 0)	delete this;	}
-
 	void					dispatch(const float *,int,int,float **,float ***);
 
-	int						refCount;				// The reference counter
 	int						parameters;				// The parameters that the user attached (includes varying/uniform/facevarying parameters)
 	char					numVariables;			// The number of vertex variables
 	char					moving;					// TRUE if the vertices are moving

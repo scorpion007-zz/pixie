@@ -76,7 +76,7 @@ CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource
 		root			=	NULL;
 		maxDepth		=	1;
 	#endif
-	refCount		=	1;	// Count the fileResource reference
+	attach();	// Count the fileResource reference
 	modifying		=	FALSE;
 	maxPower		=	0;
 	osCreateMutex(mutex);

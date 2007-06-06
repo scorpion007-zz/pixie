@@ -94,15 +94,11 @@ typedef enum {
 //							attributes share a common clone to avoid unnecessary
 //							memory allocation.
 // Comments				:
-class CAttributes {
+class CAttributes : public CRefCounter {
 public: 
 							CAttributes();
 							CAttributes(const CAttributes *);
 		virtual				~CAttributes();
-
-		void				attach()	{	refCount++;	}
-		void				detach()	{	refCount--; if (refCount == 0) delete this; }
-		void				check()		{	if (refCount == 0)	delete this;			}
 
 		void				addLight(CShaderInstance *);				// Add or remove a lightsource from the environment
 		void				removeLight(CShaderInstance *);
@@ -110,8 +106,6 @@ public:
 		CVariable			*findParameter(const char *);				// Find a shader parameter
 		void				restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding);
 		int					find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const;
-
-		int					refCount;									// Refcount used by the objects and the general graphics state
 		
 		CAttributes			*next;										// points to the next attribute if there's motion blur
 

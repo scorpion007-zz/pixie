@@ -36,6 +36,7 @@
 #include "shading.h"
 #include "surface.h"
 #include "pl.h"
+#include "refCounter.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
@@ -47,19 +48,15 @@ class	CPoints : public CSurface {
 		// Class				:	CPointBase
 		// Description			:	This class holds the memory for the points
 		// Comments				:
-		class CPointBase {
+		class CPointBase : public CRefCounter {
 		public:
-							CPointBase()	{	refCount	=	0;	osCreateMutex(mutex);			}
+							CPointBase()	{	osCreateMutex(mutex);			}
 							~CPointBase()	{	variables->detach();	if (parameters != NULL) delete parameters;	if (vertex != NULL) delete vertex; osDeleteMutex(mutex);	}
-
-			void			attach()		{	refCount++;									}
-			void			detach()		{	if ((--refCount) == 0)	delete this;		}
 
 			float			*vertex;				// The vertex data for the points
 			CParameter		*parameters;			// The parameters for the points
 			CVertexData		*variables;				// The vertex data
 			float			maxSize;				// The maximum size of the point in camera space
-			int				refCount;				// The reference count for the points
 			TMutex			mutex;					// Holds the synchronization object
 		};
 public:

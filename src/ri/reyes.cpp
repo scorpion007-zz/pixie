@@ -157,51 +157,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	numGridsShaded		=	0;
 	numGridsCreated		=	0;
 	numVerticesCreated	=	0;
-
-#ifdef REYES_OBJECT_CACHE_SIZE
-	freeRasterObjects			=	NULL;
-
-	// Pre allocate the objects
-	{
-		CRasterObject	*objects	=	(CRasterObject *) ralloc(REYES_OBJECT_CACHE_SIZE*sizeof(CRasterObject),CRenderer::globalMemory);
-		int				i;
-
-		for (i=0;i<REYES_OBJECT_CACHE_SIZE;i++) {
-			objects[i].next			=	(CRasterObject **) ralloc(CRenderer::numThreads*sizeof(CRasterObject *),CRenderer::globalMemory);
-			objects[i].cached		=	TRUE;
-			osCreateMutex(objects[i].mutex);
-
-			objects[i].next[0]		=	freeRasterObjects;
-			freeRasterObjects		=	objects + i;
-		}
-	}
-#endif
-
-
-#ifdef REYES_GRID_CACHE_SIZE
-	freeRasterGrids				=	NULL;
-
-	// Pre allocate the grids
-	{
-		CRasterGrid		*grids	=	(CRasterGrid *) ralloc(REYES_GRID_CACHE_SIZE*sizeof(CRasterGrid),CRenderer::globalMemory);
-		int				i;
-
-		for (i=0;i<REYES_GRID_CACHE_SIZE;i++) {
-			grids[i].next			=	(CRasterObject **) ralloc(CRenderer::numThreads*sizeof(CRasterObject *),CRenderer::globalMemory);
-			grids[i].cached			=	TRUE;
-			osCreateMutex(grids[i].mutex);
-
-			// Allocate the cache grids with maximum grid size
-			grids[i].vertices		=	(float *)	ralloc(CRenderer::maxGridSize*numVertexSamples*sizeof(float),CRenderer::globalMemory);
-			grids[i].bounds			=	(int *)		ralloc(CRenderer::maxGridSize*4*sizeof(int),CRenderer::globalMemory);
-			grids[i].sizes			=	(float *)	ralloc(CRenderer::maxGridSize*2*sizeof(float),CRenderer::globalMemory);
-
-			grids[i].next[0]		=	freeRasterGrids;
-			freeRasterGrids			=	grids + i;
-		}
-	}
-#endif
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -213,22 +168,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 CReyes::~CReyes() {
 	int		x,y;
 	CBucket	*cBucket;
-
-#ifdef REYES_OBJECT_CACHE_SIZE
-	// Free the raster object cache
-	while(freeRasterObjects) {
-		osDeleteMutex(freeRasterObjects->mutex);
-		freeRasterObjects	=	freeRasterObjects->next[0];
-	}
-#endif
-
-#ifdef REYES_GRID_CACHE_SIZE
-	// Free the raster grid cache
-	while(freeRasterGrids) {
-		osDeleteMutex(freeRasterGrids->mutex);
-		freeRasterGrids	=	(CRasterGrid *) (freeRasterGrids->next[0]);
-	}
-#endif
 
 	osLock(bucketMutex);
 
@@ -271,13 +210,13 @@ CReyes::~CReyes() {
 void		CReyes::renderingLoop() {
 	CRenderer::CJob	job;
 
-#define computeExtends																				\
-	bucketPixelLeft		=	currentXBucket*CRenderer::bucketWidth;									\
-	bucketPixelTop		=	currentYBucket*CRenderer::bucketHeight;									\
-	bucketPixelWidth	=	min(CRenderer::bucketWidth,		CRenderer::xPixels-bucketPixelLeft);	\
-	bucketPixelHeight	=	min(CRenderer::bucketHeight,	CRenderer::yPixels-bucketPixelTop);		\
-	tbucketLeft			=	bucketPixelLeft*CRenderer::pixelXsamples - CRenderer::xSampleOffset;	\
-	tbucketTop			=	bucketPixelTop*CRenderer::pixelYsamples - CRenderer::ySampleOffset;		\
+#define computeExtends																									\
+	bucketPixelLeft		=	currentXBucket*CRenderer::bucketWidth;														\
+	bucketPixelTop		=	currentYBucket*CRenderer::bucketHeight;														\
+	bucketPixelWidth	=	min(CRenderer::bucketWidth,		CRenderer::xPixels-bucketPixelLeft);						\
+	bucketPixelHeight	=	min(CRenderer::bucketHeight,	CRenderer::yPixels-bucketPixelTop);							\
+	tbucketLeft			=	bucketPixelLeft*CRenderer::pixelXsamples - CRenderer::xSampleOffset;						\
+	tbucketTop			=	bucketPixelTop*CRenderer::pixelYsamples - CRenderer::ySampleOffset;							\
 	tbucketRight		=	(bucketPixelLeft + bucketPixelWidth)*CRenderer::pixelXsamples - CRenderer::xSampleOffset;	\
 	tbucketBottom		=	(bucketPixelTop + bucketPixelHeight)*CRenderer::pixelYsamples - CRenderer::ySampleOffset;
 
@@ -414,7 +353,6 @@ void	CReyes::render() {
 			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
 			int				i					=	objectQueue.numItems - 1;
 			CRasterObject	*objectsToDelete	=	NULL;
-
 			
 			osLock(bucketMutex);
 
@@ -1253,25 +1191,6 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	CRasterObject	*nObject;
 
-#ifdef REYES_OBJECT_CACHE_SIZE
-
-	// Do we have a free object ?
-	if (freeRasterObjects == NULL) {
-		nObject			=	new CRasterObject;
-		nObject->next	=	new CRasterObject*[CRenderer::numThreads];
-		osCreateMutex(nObject->mutex);
-		nObject->cached	=	FALSE;
-	} else {
-		nObject					=	freeRasterObjects;
-		freeRasterObjects		=	freeRasterObjects->next[0];
-		assert(nObject->cached == TRUE);
-	}
-
-	nObject->object		=	cObject;
-	nObject->diced		=	FALSE;	// FIXME: Can combine diced and grid into one integer
-	nObject->grid		=	FALSE;
-	nObject->refCount	=	0;
-#else
 	nObject				=	new CRasterObject;
 	nObject->next		=	new CRasterObject*[CRenderer::numThreads];
 	nObject->object		=	cObject;	
@@ -1279,7 +1198,6 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	nObject->grid		=	FALSE;
 	nObject->refCount	=	0;
 	osCreateMutex(nObject->mutex);
-#endif
 
 	osLock(CRenderer::refCountMutex);
 	cObject->attach();
@@ -1300,29 +1218,6 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	CRasterGrid		*grid;
 
-#ifdef REYES_GRID_CACHE_SIZE
-
-	// Do we have a free grid ?
-	if (freeRasterGrids == NULL) {
-		grid				=	new CRasterGrid;
-		grid->next			=	new CRasterObject*[CRenderer::numThreads];
-		osCreateMutex(grid->mutex);
-		grid->vertices		=	new float[numVertices*numVertexSamples];
-		grid->bounds		=	new int[numVertices*4];
-		grid->sizes			=	new float[numVertices*2];
-		grid->cached		=	FALSE;
-	} else {
-		grid				=	freeRasterGrids;
-		freeRasterGrids		=	(CRasterGrid *) freeRasterGrids->next[0];
-		assert(grid->cached == TRUE);
-	}
-
-	grid->numVertices	=	numVertices;
-	grid->object		=	object;
-	grid->diced			=	TRUE;
-	grid->grid			=	TRUE;
-	grid->refCount		=	0;
-#else
 	grid				=	new CRasterGrid;
 	grid->next			=	new CRasterObject*[CRenderer::numThreads];
 	grid->object		=	object;
@@ -1336,7 +1231,6 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	grid->vertices		=	new float[numVertices*numVertexSamples];
 	grid->bounds		=	new int[numVertices*4];
 	grid->sizes			=	new float[numVertices*2];
-#endif
 
 	osLock(CRenderer::refCountMutex);
 	object->attach();
@@ -1371,16 +1265,6 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		// Decrement the active grid counter
 		numGrids--;
 
-#ifdef REYES_GRID_CACHE_SIZE
-
-		// If the grid is cached, put it back into the free list
-		if (grid->cached) {
-			osUnlock(grid->mutex);
-			grid->next[0]		=	freeRasterGrids;
-			freeRasterGrids		=	grid;
-			return;
-		}
-#else
 		// Delete the grid data
 		osUnlock(dObject->mutex);		// Unlock the mutex
 		osDeleteMutex(dObject->mutex);	// Destroy the _unlocked_ mutex
@@ -1389,30 +1273,16 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		delete [] grid->bounds;
 		delete [] grid->sizes;
 		delete grid;
-#endif
-
 	} else {
 
 		// Decrement the active object counter
 		numObjects--;
 
-#ifdef REYES_OBJECT_CACHE_SIZE
-
-		// If the object is cached, put it back into the free list
-		if (dObject->cached) {
-			osUnlock(dObject->mutex);
-			dObject->next[0]	=	freeRasterObjects;
-			freeRasterObjects	=	dObject;
-			return;
-		}
-#else
 		// Delete the object data
 		osUnlock(dObject->mutex);		// Unlock the mutex
 		osDeleteMutex(dObject->mutex);	// Destroy the _unlocked_ mutex
 		delete [] dObject->next;
 		delete dObject;
-#endif
-
 	}
 }
 
@@ -1431,8 +1301,8 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 // Comments				:	Thread safe
 void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	// Compute the grid bound and insert it
-	int					i;
-	const float			*cVertex;
+	int				i;
+	const float		*cVertex;
 
 	// Compute the bound of the grid
 	float xmin	=	C_INFINITY;
@@ -1688,9 +1558,9 @@ void	CReyes::insertObject(CRasterObject *object) {
 	int			refCount	=	0;
 
 	// A fake refcount to prevent other threads from deallocating this object
-	object->refCount	=	CRenderer::numThreads+1;
+	object->refCount	=	CRenderer::numThreads + 1;
 
-
+	// Insert the the object into every thread
 	for (i=0;i<CRenderer::numThreads;i++) {
 		CReyes		*hider	=	(CReyes *) CRenderer::contexts[i];
 		int			bx		=	sx;

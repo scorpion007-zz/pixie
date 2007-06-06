@@ -581,8 +581,17 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 	}
 						
 	// Create an orthanormal coordinate system
-	normalizevf(X,dPdu);
-	crossvv(Y,N,X);
+	if (dotvv(dPdu,dPdu) > 0) {
+		normalizevf(X,dPdu);
+		crossvv(Y,N,X);
+	} else if (dotvv(dPdv,dPdv) > 0) {
+		normalizevf(X,dPdv);
+		crossvv(Y,N,X);
+	} else {
+		// At this point, we're pretty screwed, so why not use the P
+		normalizevf(X,P);
+		crossvv(Y,N,X);
+	}
 
 	// Sample the hemisphere
 	coverage						=	0;

@@ -527,8 +527,6 @@ public:
 CVertexData::CVertexData() {
 	stats.numVertexDatas++;
 	stats.gprimCoreMemory	+=	sizeof(CVertexData);
-
-	refCount	=	0;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -753,7 +751,6 @@ CVertexData	*CPl::vertexData() {
 
 	assert(vertexSize < 65536);
 
-	vd->refCount	=	0;
 	vd->vertexSize	=	(short) vertexSize;
 	vd->parameters	=	param;
 	vd->moving		=	(data1 == NULL ? FALSE : TRUE);

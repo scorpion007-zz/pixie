@@ -46,7 +46,6 @@ CXform::CXform() {
 	stats.xformMemory	+=	sizeof(CXform);
 
 	next				=	NULL;
-	refCount			=	0;
 
 	identitym(from);
 	identitym(to);
@@ -67,8 +66,6 @@ CXform::CXform(CXform *a) {
 		next	=	new CXform(a->next);
 	else
 		next	=	NULL;
-
-	refCount	=	0;
 
 	movmm(from,a->from);
 	movmm(to,a->to);

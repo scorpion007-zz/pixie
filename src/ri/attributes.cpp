@@ -47,7 +47,6 @@
 // Comments				:
 CAttributes::CAttributes() {
 	next					=	NULL;
-	refCount				=	0;
 
 	stats.numAttributes++;
 	stats.attributesMemory	+=	sizeof(CAttributes);

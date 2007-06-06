@@ -971,7 +971,6 @@ void	CCurveMesh::create(CShadingContext *context) {
 				base->maxSize		=	maxSize;
 				base->variables		=	variables;
 				base->sizeEntry		=	sizeVariable->entry;
-				base->refCount		=	0;
 				base->parameters	=	parameters;
 				base->vertex		=	new float[vertexSize*2];
 				memcpy(base->vertex + 0*vertexSize,v0,vertexSize*sizeof(float));

@@ -40,6 +40,7 @@
 #include "fileResource.h"
 #include "ri.h"
 #include "variable.h"
+#include "refCounter.h"
 
 // For forward reference
 class	CShader;
@@ -372,13 +373,10 @@ public:
 // Class				:	CShaderInstance
 // Description			:	This class encapsulates an instance of a shader
 // Comments				:
-class	CShaderInstance {
+class	CShaderInstance : public CRefCounter {
 public:
 								CShaderInstance(CAttributes *,CXform *);
 		virtual					~CShaderInstance();
-
-		void					attach()	{	refCount++;	}
-		void					detach()	{	refCount--; if (refCount == 0) delete this; }
 
 		virtual	void			illuminate(CShadingContext *,float **)					=	0;
 		virtual	void			setParameters(int,char **,void **)						=	0;
@@ -391,7 +389,6 @@ public:
 		void					createCategories();
 
 		CVariable				*parameters;				// The list of parameter (cloned from the parent)
-		int						refCount;					// The refcount to manage the clones
 		CXform					*xform;
 		int						*categories;				// Categories for light shaders
 		unsigned int			flags;

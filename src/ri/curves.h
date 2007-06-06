@@ -48,10 +48,9 @@ public:
 					// Class				:	CBase
 					// Description			:	This class holds the data about a single curve
 					// Comments				:
-					class	CBase {
+					class	CBase : public CRefCounter  {
 					public:
 										CBase() {
-											refCount	=	0;
 										}
 
 										~CBase() {
@@ -60,15 +59,11 @@ public:
 											if (parameters != NULL)	delete parameters;
 										}
 
-						void			attach()	{	refCount++;	}
-						void			detach()	{	if ((--refCount) == 0) delete this;	}
-
 						int				sizeEntry;		// The size variable entry
 						float			maxSize;		// The maximum size of the curve
 						CVertexData		*variables;		// The variables for the curve
 						CParameter		*parameters;	// Da parameters
 						float			*vertex;		// Da vertex data
-						int				refCount;		// Da ref count
 					};
 
 public:
