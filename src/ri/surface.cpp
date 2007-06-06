@@ -363,14 +363,16 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
+		p1->attach();
+		p2->attach();
 		osUnlock(CRenderer::refCountMutex);
 
 		p1->dice(r);
 		p2->dice(r);
 
 		osLock(CRenderer::refCountMutex);
-		p1->check();
-		p2->check();
+		p1->detach();
+		p2->detach();
 		stats.numSplits++;
 		stats.numUsplits++;
 		osUnlock(CRenderer::refCountMutex);
@@ -383,14 +385,16 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);	
 		p2				=	new CPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);	
+		p1->attach();
+		p2->attach();
 		osUnlock(CRenderer::refCountMutex);
 
 		p1->dice(r);
 		p2->dice(r);
 
 		osLock(CRenderer::refCountMutex);
-		p1->check();
-		p2->check();
+		p1->detach();
+		p2->detach();
 		stats.numSplits++;
 		stats.numVsplits++;
 		osUnlock(CRenderer::refCountMutex);
@@ -407,6 +411,10 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);
 		p3				=	new CPatch(attributes,xform,object,umin,umid,vmid,vmax,depth+1,minDepth);
 		p4				=	new CPatch(attributes,xform,object,umid,umax,vmid,vmax,depth+1,minDepth);
+		p1->attach();
+		p2->attach();
+		p3->attach();
+		p4->attach();
 		osUnlock(CRenderer::refCountMutex);
 
 		p1->dice(r);
@@ -415,10 +423,10 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		p4->dice(r);
 
 		osLock(CRenderer::refCountMutex);
-		p1->check();
-		p2->check();
-		p3->check();
-		p4->check();
+		p1->detach();
+		p2->detach();
+		p3->detach();
+		p4->detach();
 		stats.numSplits++;
 		stats.numUVsplits++;
 		osUnlock(CRenderer::refCountMutex);

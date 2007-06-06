@@ -110,7 +110,6 @@ public:
 
 	void		attach()	{	refCount++;	}
 	void		detach()	{	refCount--; if (refCount == 0) delete this; }
-	void		check()		{	if (refCount == 0)	delete this;			}
 
 	void		reset();
 	void		write(const CXform *);

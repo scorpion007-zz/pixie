@@ -1662,15 +1662,31 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 // Return Value			:
 // Comments				:	* Called from parse thread *
 void	CReyes::insertObject(CRasterObject *object) {
+	
+	// For every thread
+	const int	sx = xbucket(object->xbound[0]);
+	const int	sy = ybucket(object->ybound[0]);
+	const int	ex = xbucket(object->xbound[1]);
+	const int	ey = ybucket(object->ybound[1]);
+
+	// Trivial reject check
+	if (	(sx >= CRenderer::xBuckets) || 
+			(sy >= CRenderer::yBuckets) ||
+			(ex < 0) ||
+			(ey < 0)) {
+
+		// Delete and return
+		deleteObject(object);
+		return;
+	}
+
 	int			i;
 	int			refCount	=	0;
 
 	// A fake refcount to prevent other threads from deallocating this object
 	object->refCount	=	CRenderer::numThreads+1;
 
-	// For every thread
-	const int	sx = xbucket(object->xbound[0]);
-	const int	sy = ybucket(object->ybound[0]);
+
 	for (i=0;i<CRenderer::numThreads;i++) {
 		CReyes		*hider	=	(CReyes *) CRenderer::contexts[i];
 		int			bx		=	sx;
@@ -1688,13 +1704,13 @@ void	CReyes::insertObject(CRasterObject *object) {
 			if (bx < 0)	bx	=	0;
 		}
 
-		if ((by >= CRenderer::yBuckets) || (bx >= CRenderer::xBuckets)) {
-			// Out of bounds
-		} else {
-			// Get the bucket
-			cBucket	=	hider->buckets[by][bx];
+		// We must be in bounds
+		if ((bx < CRenderer::xBuckets) && (by < CRenderer::yBuckets)) {
 
-			// Is the bucket dead ?
+			// Normally, this bucket must almost exist
+			// But because there is a mutex release between the time we set the bucket to NULL
+			// and increment the bucket index, buckets[currentYBucket][currentXBucket] may be NULL
+			// ---We can actually eliminate this while loop pretty easily---
 			while((cBucket = hider->buckets[by][bx]) == NULL) {
 				bx++;
 				if (bx == CRenderer::xBuckets) {
@@ -1704,9 +1720,8 @@ void	CReyes::insertObject(CRasterObject *object) {
 						break;
 					}
 				}
-
-				cBucket	=	hider->buckets[by][bx];
 			}
+
 
 			if (cBucket != NULL) {
 				// Insert the object	

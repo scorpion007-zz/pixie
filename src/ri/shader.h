@@ -379,7 +379,6 @@ public:
 
 		void					attach()	{	refCount++;	}
 		void					detach()	{	refCount--; if (refCount == 0) delete this; }
-		void					check()		{	if (refCount == 0)	delete this;			}
 
 		virtual	void			illuminate(CShadingContext *,float **)					=	0;
 		virtual	void			setParameters(int,char **,void **)						=	0;

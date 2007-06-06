@@ -585,12 +585,13 @@ void				CSurface::dice(CShadingContext *rasterizer) {
 
 	osLock(CRenderer::refCountMutex);
 	CPatch	*cSurface	=	new CPatch(attributes,xform,this,0,1,0,1,0,attributes->minSplits);
+	cSurface->attach();
 	osUnlock(CRenderer::refCountMutex);
 
 	cSurface->dice(rasterizer);
 
 	osLock(CRenderer::refCountMutex);
-	cSurface->check();
+	cSurface->detach();
 	osUnlock(CRenderer::refCountMutex);
 	
 	// Note we tesselate for raytracing on demand - so we do not automatically emit a CTesselationPatch here

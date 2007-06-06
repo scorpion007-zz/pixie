@@ -67,7 +67,6 @@ public:
 							// Instance management
 	inline	void			attach()	{	refCount++;													}
 	inline	void			detach()	{	refCount--;	if (refCount == 0)	delete this;				}
-	inline	void			check()		{	if (refCount == 0)	delete this;							}
 	inline	int				raytraced()	{	return (attributes->flags & CRenderer::raytracingFlags);	}
 
 							///////////////////////////////////////////////////////////////
