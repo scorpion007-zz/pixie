@@ -83,8 +83,8 @@ template <class T> static	void	print(FILE *out,T *a,int n,const char *outName,co
 
 	if (strstr(outType,"float") != 0) {
 		for (i=0;i<n;i++) {
-			if (i == 0)	fprintf(out,"%gf",a[i]);
-			else		fprintf(out,",%gf",a[i]);
+			if (i == 0)	fprintf(out,"%gf",(float) a[i]);
+			else		fprintf(out,",%gf",(float) a[i]);
 
 			if (((i+1) % 8) == 0)	fprintf(out,"\n\t");
 		}
