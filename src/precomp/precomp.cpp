@@ -90,8 +90,8 @@ template <class T> static	void	print(FILE *out,T *a,int n,const char *outName,co
 		}
 	} else {
 		for (i=0;i<n;i++) {
-			if (i == 0)	fprintf(out,"%d",a[i]);
-			else		fprintf(out,",%d",a[i]);
+			if (i == 0)	fprintf(out,"%d",(int) a[i]);
+			else		fprintf(out,",%d",(int) a[i]);
 
 			if (((i+1) % 8) == 0)	fprintf(out,"\n\t");
 		}
