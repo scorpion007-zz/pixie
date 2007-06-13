@@ -801,9 +801,23 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 
 
 // Common code for trace transmission and trace reflection
-#define	computeRayDifferentials																	\
-	const float	da	=	((lengthv(rays->dDdu) + lengthv(rays->dDdv))*0.5f) / lengthv(rays->D);	\
+// Note: we are including the cone angle tangent here because
+// there's no point finely tesselating if we have a large coneangle blur
+#define	computeRayDifferentials																		\
+	const float lD	=	lengthv(rays->D);															\
+	const float	da	=	((lengthv(rays->dDdu) + lengthv(rays->dDdv))*0.5f + lD*tanConeAngle) / lD;	\
 	const float	db	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;
+
+// Should we be using only ray-orthogonal components?
+/*
+	vector t1,t2,nD;																				\
+	mulvf(t1,rays->dDdu,dotvv(rays->dDdu,rays->D)/lD);												\
+	subvv(t1,rays->dDdu,t1);																		\
+	mulvf(t2,rays->dDdv,dotvv(rays->dDdv,rays->D)/lD);												\
+	subvv(t2,rays->dDdv,t2);																		\
+	const float	da	=	((lengthv(t1) + lengthv(t2))*0.5f + lD*tanConeAngle) / lD;	\
+	const float	db	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;
+*/
 
 #define	sampleRay(__from,__dir)				\
 	vector	tmp0,tmp1;						\
@@ -833,6 +847,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextur
 	const float			maxDist			=	lookup->maxDist;
 	int					numRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) numSamples;
+	const float			tanConeAngle	=	max(tanf(coneAngle),1.0f);
 	int					currentSample;
 	int					i;
 	CTransmissionBundle	bundle;
@@ -940,6 +955,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 	int					numInteriorRemaining	=	shootStep;
 	int					numExteriorRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) lookup->numSamples;
+	const float			tanConeAngle	=	max(tanf(coneAngle),1.0f);
 	int					currentSample;
 	int					i;
 	CTraceBundle		interiorBundle,exteriorBundle;
