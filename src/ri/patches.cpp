@@ -1156,7 +1156,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			float		*P	=	varying[VARIABLE_P]		+	start*3;
 			const float	*Pw	=	varying[VARIABLE_PW]	+	start*4;
 
-			for (i=numVertices;i>=0;i--,P+=3,Pw+=4)	movvv(P,Pw);
+			for (i=numVertices;i>0;i--,P+=3,Pw+=4)	movvv(P,Pw);
 		}
 
 #undef computeNURBS
