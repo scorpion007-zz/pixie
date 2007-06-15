@@ -1263,15 +1263,15 @@ void			CShadingContext::freeState(CShadingState *cState) {
 				delete [] (char*) cState->varying[j];
 				vertexMemory			-=	var->numFloats*sizeof(char*);
 			} else {
-				delete [] newState->varying[j];
+				delete [] cState->varying[j];
 				vertexMemory			-=	var->numFloats*sizeof(float);
 			}
 		} else {
 			if (var->type == TYPE_STRING) {
-				delete [] (char*) newState->varying[j];
+				delete [] (char*) cState->varying[j];
 				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(char*);
 			} else {
-				delete [] newState->varying[j];
+				delete [] cState->varying[j];
 				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 			}
 		}
