@@ -1259,11 +1259,21 @@ void			CShadingContext::freeState(CShadingState *cState) {
 		const CVariable	*var	=	globalVariables[j];
 
 		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-			delete [] cState->varying[j];
-			vertexMemory		-=	var->numFloats*sizeof(float);
+			if (var->type == TYPE_STRING) {
+				delete [] (char*) cState->varying[j];
+				vertexMemory			-=	var->numFloats*sizeof(char*);
+			} else {
+				delete [] newState->varying[j];
+				vertexMemory			-=	var->numFloats*sizeof(float);
+			}
 		} else {
-			delete [] cState->varying[j];
-			vertexMemory		-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
+			if (var->type == TYPE_STRING) {
+				delete [] (char*) newState->varying[j];
+				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(char*);
+			} else {
+				delete [] newState->varying[j];
+				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
+			}
 		}
 	}
 
