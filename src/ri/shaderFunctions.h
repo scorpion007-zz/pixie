@@ -1446,6 +1446,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								lookup->maxDist			=	C_INFINITY;											\
 								lookup->coneAngle		=	0;													\
 								lookup->label			=	NULL;												\
+								lookup->sampleBase		=	1;													\
 								lookup->texture			=	NULL;												\
 								lookup->environment		=	NULL;												\
 								{																				\
@@ -1483,6 +1484,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 											lookup->maxDist		=	*valf;										\
 										} else if (strcmp(*param,"samplecone") == 0) {							\
 											lookup->coneAngle	=	*valf;										\
+										} else if (strcmp(*param,"samplebase") == 0) {							\
+											lookup->sampleBase	=	*valf;										\
 										} else if (strcmp(*param,"label") == 0) {								\
 											lookup->label		=	*vals;										\
 										}																		\
@@ -1837,7 +1840,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE
 								getUniformParams(lookup);															\
 								CTraceLocation	*rays;																\
 								int				numRays;															\
-								const float		*P,*dPdu,*dPdv,*N;													\
+								const float		*P,*N;																\
+								float			*dPdu,*dPdv;														\
 								if (lookup->environment == NULL) {													\
 									rays	=	(CTraceLocation *) ralloc(currentShadingState->numVertices*sizeof(CTraceLocation),threadMemory);	\
 									P		=	varying[VARIABLE_P];												\
@@ -1933,9 +1937,23 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 #ifndef INIT_SHADING
 
 
+// Note: we are swapping dDdu and dDdv with dPdu and dPdv here, because
+// the ENVIRONMENT_PRE macro always calculates the dD differentials.
+// It is also very impartant that we supply dPdu and dPdv so the ray differentials
+// are correct or otherwise we waste time overtesselating
 
 #define	SHADOWEXPR_PRE			ENVIRONMENTEXPR_PRE("shadow");														\
-								const float	*L	=	varying[VARIABLE_L];
+								const float	*L	=	varying[VARIABLE_L];											\
+								if (lookup->environment == NULL) {													\
+									float *tmp	= 	(float*) ralloc(currentShadingState->numVertices*sizeof(float)*9,threadMemory);	\
+									dPdu		=	tmp		+ currentShadingState->numVertices*3;					\
+									dPdv		=	dPdu	+ currentShadingState->numVertices*3;					\
+									for(int v=0;v<currentShadingState->numVertices*3;v+=3) {						\
+										subvv(tmp+v,D+v,L+v);														\
+									}																				\
+									duVector(dPdu,tmp);																\
+									dvVector(dPdv,tmp);																\
+								}
 
 
 #define	SHADOWEXPR(__float)		if (tex == NULL) {																	\
@@ -1944,8 +1962,8 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 									mulvf(rays->dPdu,dDdu,*du);														\
 									mulvf(rays->dPdv,dDdv,*dv);														\
 									subvv(rays->D,D,L);																\
-									initv(rays->dDdu,0);															\
-									initv(rays->dDdv,0);															\
+									mulvf(rays->dDdu,dPdu,*du);														\
+									mulvf(rays->dDdv,dPdv,*dv);														\
 									rays++;																			\
 									numRays++;																		\
 								} else {																			\
@@ -1973,7 +1991,11 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 								dDdv		+=	3;																	\
 								du++;																				\
 								dv++;																				\
-								L			+=	3;
+								L			+=	3;																	\
+								if (tex == NULL) {																	\
+									dPdu	+=	3;																	\
+									dPdv	+=	3;																	\
+								}
 
 
 #define SHADOWEXPR_POST(__float)																					\

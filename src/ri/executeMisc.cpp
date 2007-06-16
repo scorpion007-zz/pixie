@@ -821,8 +821,8 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 
 #define	sampleRay(__from,__dir)				\
 	vector	tmp0,tmp1;						\
-	mulvf(tmp0,rays->dPdu,urand()-0.5f);	\
-	mulvf(tmp1,rays->dPdv,urand()-0.5f);	\
+	mulvf(tmp0,rays->dPdu,(urand()-0.5f)*sampleBase);	\
+	mulvf(tmp1,rays->dPdv,(urand()-0.5f)*sampleBase);	\
 	addvv(__from,tmp0,tmp1);				\
 	addvv(__from,rays->P);					\
 	mulvf(tmp0,rays->dDdu,urand()-0.5f);	\
@@ -842,12 +842,13 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextur
 	CTransmissionRay	*cRay,**cRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
+	const float			sampleBase		=	lookup->sampleBase;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	const float			maxDist			=	lookup->maxDist;
 	int					numRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) numSamples;
-	const float			tanConeAngle	=	max(tanf(coneAngle),1.0f);
+	const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 	int					currentSample;
 	int					i;
 	CTransmissionBundle	bundle;
@@ -950,12 +951,13 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 	CTraceRay			**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
+	const float			sampleBase		=	lookup->sampleBase;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	int					numInteriorRemaining	=	shootStep;
 	int					numExteriorRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) lookup->numSamples;
-	const float			tanConeAngle	=	max(tanf(coneAngle),1.0f);
+	const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 	int					currentSample;
 	int					i;
 	CTraceBundle		interiorBundle,exteriorBundle;
