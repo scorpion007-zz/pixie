@@ -821,8 +821,8 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 
 #define	sampleRay(__from,__dir)				\
 	vector	tmp0,tmp1;						\
-	mulvf(tmp0,rays->dPdu,urand()-0.5f);	\
-	mulvf(tmp1,rays->dPdv,urand()-0.5f);	\
+	mulvf(tmp0,rays->dPdu,(urand()-0.5f)*sampleBase);	\
+	mulvf(tmp1,rays->dPdv,(urand()-0.5f)*sampleBase);	\
 	addvv(__from,tmp0,tmp1);				\
 	addvv(__from,rays->P);					\
 	mulvf(tmp0,rays->dDdu,urand()-0.5f);	\
