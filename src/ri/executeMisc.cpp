@@ -1075,11 +1075,11 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 	}
 	if (numInteriorRemaining != shootStep) {
 		numReflectionRays			+=	shootStep-numInteriorRemaining;
-		exteriorBundle.numRays		=	shootStep-numInteriorRemaining;
-		exteriorBundle.rays			=	(CRay **) interiorRaysBase;
-		exteriorBundle.depth		=	0;
-		exteriorBundle.last			=	0;
-		exteriorBundle.postShader	=	interiorShader;
+		interiorBundle.numRays		=	shootStep-numInteriorRemaining;
+		interiorBundle.rays			=	(CRay **) interiorRaysBase;
+		interiorBundle.depth		=	0;
+		interiorBundle.last			=	0;
+		interiorBundle.postShader	=	interiorShader;
 		traceEx(&interiorBundle);	
 	}
 }
