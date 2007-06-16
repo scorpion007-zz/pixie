@@ -842,12 +842,13 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextur
 	CTransmissionRay	*cRay,**cRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
+	const float			sampleBase		=	lookup->sampleBase;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	const float			maxDist			=	lookup->maxDist;
 	int					numRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) numSamples;
-	const float			tanConeAngle	=	max(tanf(coneAngle),1.0f);
+	const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 	int					currentSample;
 	int					i;
 	CTransmissionBundle	bundle;
@@ -950,12 +951,13 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 	CTraceRay			**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
 	const int			numSamples		=	lookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
+	const float			sampleBase		=	lookup->sampleBase;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
 	const float			coneAngle		=	lookup->coneAngle;
 	int					numInteriorRemaining	=	shootStep;
 	int					numExteriorRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) lookup->numSamples;
-	const float			tanConeAngle	=	max(tanf(coneAngle),1.0f);
+	const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 	int					currentSample;
 	int					i;
 	CTraceBundle		interiorBundle,exteriorBundle;
@@ -1075,11 +1077,11 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 	}
 	if (numInteriorRemaining != shootStep) {
 		numReflectionRays			+=	shootStep-numInteriorRemaining;
-		exteriorBundle.numRays		=	shootStep-numInteriorRemaining;
-		exteriorBundle.rays			=	(CRay **) interiorRaysBase;
-		exteriorBundle.depth		=	0;
-		exteriorBundle.last			=	0;
-		exteriorBundle.postShader	=	interiorShader;
+		interiorBundle.numRays		=	shootStep-numInteriorRemaining;
+		interiorBundle.rays			=	(CRay **) interiorRaysBase;
+		interiorBundle.depth		=	0;
+		interiorBundle.last			=	0;
+		interiorBundle.postShader	=	interiorShader;
 		traceEx(&interiorBundle);	
 	}
 }
