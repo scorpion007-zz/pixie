@@ -876,7 +876,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				#define extrapolateDerivV()
 			#endif
 
-#define	MAX_DIFFERENTIAL_DISCREPANCY	4
+#define	MAX_DIFFERENTIAL_DISCREPANCY	4*shadingRate
 
 			if (!(currentAttributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)) {
 				// Compute the du
@@ -1259,21 +1259,11 @@ void			CShadingContext::freeState(CShadingState *cState) {
 		const CVariable	*var	=	globalVariables[j];
 
 		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-			if (var->type == TYPE_STRING) {
-				delete [] (char*) cState->varying[j];
-				vertexMemory			-=	var->numFloats*sizeof(char*);
-			} else {
-				delete [] cState->varying[j];
-				vertexMemory			-=	var->numFloats*sizeof(float);
-			}
+			delete [] cState->varying[j];
+			vertexMemory		-=	var->numFloats*sizeof(float);
 		} else {
-			if (var->type == TYPE_STRING) {
-				delete [] (char*) cState->varying[j];
-				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(char*);
-			} else {
-				delete [] cState->varying[j];
-				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
-			}
+			delete [] cState->varying[j];
+			vertexMemory		-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 		}
 	}
 
