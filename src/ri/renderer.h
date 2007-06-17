@@ -260,6 +260,7 @@ public:
 		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
 		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
 		static void				endDisplays();										// Shutdown the displays
+		static	RtFilterFunc	getFilter(const char *);								// Get a filter
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with declerations (implemented in rendererDeclerations.cpp)
@@ -295,7 +296,7 @@ public:
 		static	CTextureInfoBase *getTextureInfo(const char *);							// Load a textureinfo
 		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *,int hierarchy=FALSE);	// Load a point cloud or brickmap
 		static	CShader			*getShader(const char *,TSearchpath *search=NULL);		// Load a shader
-		static	RtFilterFunc	getFilter(const char *);								// Get a filter
+		static	int				getAOVFilter(const char *name);							// Get an AOV filter name
 		static	char			*getFilter(RtFilterFunc);								// The other way around
 		static	CDSO			*getDSO(char *,char *);									// Find a DSO function
 		static	void			shutdownFiles();
@@ -359,6 +360,7 @@ public:
 		static	float					colorQuantizer[5];								// The quantization data
 		static	float					depthQuantizer[5];
 		static	vector					opacityThreshold;								// The opacity threshold
+		static	vector					zvisibilityThreshold;							// The point at which samples are visible in z and noncomp aovs
 		static	COptions::CDisplay		*displays;										// List of displays to send the output
 		static	COptions::CClipPlane	*clipPlanes;									// List of used defined clipping planes
 		static	float					relativeDetail;									// The relative detail multiplier

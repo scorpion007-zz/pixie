@@ -155,6 +155,7 @@ RtFilterFunc					CRenderer::pixelFilter;
 float							CRenderer::colorQuantizer[5];
 float							CRenderer::depthQuantizer[5];
 vector							CRenderer::opacityThreshold;
+vector							CRenderer::zvisibilityThreshold;
 COptions::CDisplay				*CRenderer::displays;
 COptions::CClipPlane			*CRenderer::clipPlanes;
 float							CRenderer::relativeDetail;
@@ -424,6 +425,7 @@ static void	copyOptions(const COptions *o) {
 	memcpy(CRenderer::colorQuantizer,o->colorQuantizer,5*sizeof(float));
 	memcpy(CRenderer::depthQuantizer,o->depthQuantizer,5*sizeof(float));
 	movvv(CRenderer::opacityThreshold,o->opacityThreshold);
+	movvv(CRenderer::zvisibilityThreshold,o->zvisibilityThreshold);
 	CRenderer::displays					=	o->displays;
 	CRenderer::clipPlanes				=	o->clipPlanes;
 	CRenderer::relativeDetail			=	o->relativeDetail;
