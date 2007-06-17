@@ -186,6 +186,12 @@ RtToken		RI_BLACKMANHARRISFILTER		=	"blackman-harris";
 RtToken		RI_MITCHELLFILTER			=	"mitchell";
 RtToken		RI_CUSTOM					=	"custom";
 
+RtToken		RI_MIN						=	"min";
+RtToken		RI_MAX						=	"max";
+RtToken		RI_AVERAGE					=	"average";
+RtToken		RI_ZMIN						=	"zmin";
+RtToken		RI_ZMAX						=	"zmax";
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -289,6 +295,7 @@ RtToken		RI_NUMTHREADS			=	"numthreads";
 RtToken		RI_THREADSTRIDE			=	"threadstride";
 RtToken		RI_GEOCACHEMEMORY		=	"geocachememory";
 RtToken		RI_OTHRESHOLD			=	"othreshold";
+RtToken		RI_ZTHRESHOLD			=	"zthreshold";
 
 // Trace options
 RtToken		RI_MAXDEPTH				=	"maxdepth";
@@ -2196,21 +2203,21 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-	RiMakeTexture3D (char *src, char *dest, ...) {
+	RiMakeBrickMap (int n,char **src, char *dest, ...) {
 	va_list	args;
 
 	va_start(args,dest);
 	getArgs(args);
-	RiMakeTexture3DV(src,dest,nTokens,tokens,values);
+	RiMakeBrickMapV(n,src,dest,nTokens,tokens,values);
 	va_end(args);
 }
 
 EXTERN(RtVoid)
-	RiMakeTexture3DV(char *src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]) {
+	RiMakeBrickMapV(int nb,char **src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]) {
 
 	if (check("RiMakeTexture3D",RENDERMAN_ALL_BLOCKS)) return;	
 
-	renderMan->RiMakeTexture3DV(src,dest,n,tokens,params);
+	renderMan->RiMakeBrickMapV(nb,src,dest,n,tokens,params);
 }
 
 EXTERN(RtVoid)
@@ -2420,7 +2427,7 @@ RiArchiveRecord (RtToken type, char *format, ...) {
 }
 
 EXTERN(RtVoid)
-RiReadArchive (RtString filename, RtFunc callback, ...) {
+RiReadArchive (RtString filename, RtArchiveCallback callback, ...) {
 	va_list	args;
 
 	va_start(args,callback);
@@ -2431,7 +2438,7 @@ RiReadArchive (RtString filename, RtFunc callback, ...) {
 }
 
 EXTERN(RtVoid)
-    RiReadArchiveV (RtString filename, RtFunc callback,
+    RiReadArchiveV (RtString filename, RtArchiveCallback callback,
 	int n, RtToken tokens[], RtPointer params[]) {
 
 	if (check("RiReadArchive",RENDERMAN_ALL_BLOCKS)) return;

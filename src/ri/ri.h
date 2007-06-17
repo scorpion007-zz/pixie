@@ -75,6 +75,7 @@ typedef RtString	RtShaderHandle;
 typedef RtFloat		(*RtFilterFunc)(RtFloat, RtFloat, RtFloat, RtFloat);
 typedef RtVoid		(*RtErrorHandler)(RtInt code, RtInt severity, char *msg);
 typedef RtVoid		(*RtFunc)(const char *);
+typedef RtVoid		(*RtArchiveCallback)(const char *,...);
 
 #define RI_FALSE    0
 #define RI_TRUE     1
@@ -132,6 +133,13 @@ EXTERN(RtToken)	RI_CATMULLROMFILTER;
 EXTERN(RtToken)	RI_BLACKMANHARRISFILTER;
 EXTERN(RtToken)	RI_MITCHELLFILTER;
 EXTERN(RtToken)	RI_CUSTOM;
+
+EXTERN(RtToken)	RI_MIN;
+EXTERN(RtToken)	RI_MAX;
+EXTERN(RtToken)	RI_AVERAGE;
+EXTERN(RtToken)	RI_ZMIN;
+EXTERN(RtToken)	RI_ZMAX;
+
 
 
 
@@ -237,6 +245,7 @@ EXTERN(RtToken)		RI_NUMTHREADS;
 EXTERN(RtToken)		RI_THREADSTRIDE;
 EXTERN(RtToken)		RI_GEOCACHEMEMORY;
 EXTERN(RtToken)		RI_OTHRESHOLD;
+EXTERN(RtToken)		RI_ZTHRESHOLD;
 
 // Trace options
 EXTERN(RtToken)		RI_MAXDEPTH;
@@ -488,8 +497,8 @@ EXTERN(RtVoid)
     RiMakeCubeFaceEnvironmentV (char *px, char *nx, char *py, char *ny, char *pz, char *nz, char *tex, RtFloat fov, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
     RiMakeShadow (char *pic, char *tex, ...),
     RiMakeShadowV (char *pic, char *tex, RtInt n, RtToken tokens[], RtPointer params[]),
-	RiMakeTexture3D (char *src, char *dest, ...),
-	RiMakeTexture3DV(char *src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]);
+	RiMakeBrickMap (int n,char **src, char *dest, ...),
+	RiMakeBrickMapV(int n,char **src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid)
     RiErrorHandler (RtErrorHandler handler),
@@ -520,8 +529,8 @@ EXTERN(RtVoid)
 
 EXTERN(RtVoid)
     RiArchiveRecord (RtToken type, char *format, ...),
-    RiReadArchive (RtString filename, RtFunc callback, ...),
-    RiReadArchiveV (RtString filename, RtFunc callback, int n, RtToken tokens[], RtPointer params[]);
+    RiReadArchive (RtString filename, RtArchiveCallback callback, ...),
+    RiReadArchiveV (RtString filename, RtArchiveCallback callback, int n, RtToken tokens[], RtPointer params[]);
 
 			
 
