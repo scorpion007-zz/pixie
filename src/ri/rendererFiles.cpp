@@ -609,8 +609,6 @@ char					*CRenderer::getFilter(RtFilterFunc func) {
 
 
 
-
-
 ///////////////////////////////////////////////////////////////////////
 // Function				:	dsoLoadCallback
 // Description			:	This function will be called for each module
