@@ -113,6 +113,7 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_THREADSTRIDE,		"int");
 	declareVariable(RI_GEOCACHEMEMORY,		"int");
 	declareVariable(RI_OTHRESHOLD,			"color");
+	declareVariable(RI_ZTHRESHOLD,			"color");
 
 	declareVariable(RI_RADIANCECACHE,		"int");
 	declareVariable(RI_JITTER,				"float");
