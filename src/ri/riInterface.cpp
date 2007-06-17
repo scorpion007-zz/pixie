@@ -354,7 +354,7 @@ void		CRiInterface::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *
 void		CRiInterface::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeBrickMapV(int nb,char **src,char *dest,int n,char *tokens[],void *params[]) {
 }
 
 void		CRiInterface::RiErrorHandler(void (*handler)(int,int,char *)) {
@@ -364,7 +364,7 @@ void		CRiInterface::RiErrorHandler(void (*handler)(int,int,char *)) {
 void		CRiInterface::RiArchiveRecord(char * type,char *format,va_list args) {
 }
 
-void		CRiInterface::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]) {
 }
 
 void		*CRiInterface::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {

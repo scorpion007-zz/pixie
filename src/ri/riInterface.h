@@ -165,12 +165,12 @@ public:
 	virtual	void		RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
 	virtual	void		RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
 	virtual	void		RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeBrickMapV(int n,char **src,char *dest,int n,char *tokens[],void *params[]);
 
 	virtual	void		RiErrorHandler(void (*handler)(int,int,char *));
 
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
-	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]);
+	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]);
 
 	virtual	void		*RiArchiveBeginV(const char *name, int n, char *tokens[], void *parms[]);
 	virtual	void		RiArchiveEnd(void);

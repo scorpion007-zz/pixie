@@ -98,15 +98,15 @@ typedef struct TObject {
 	int				index;			// The index of the object (-1 if named)
 } TObject;
 
-static	int					ribDepth					=	0;		// The rib parsing stack depth
-static	int					numConstant					=	0;		// The number of constant
-static	int					numVertex					=	0;		// The number of vertices
-static	int					numVarying					=	0;		// The number of varyings
-static	int					numFaceVarying				=	0;		// The number of facevaryings
-static	int					numUniform					=	0;		// The number of uniforms
-static	TLight				*lights						=	NULL;	// The linked list of light handles
-static	TObject				*objects					=	NULL;	// The linked list of object handles
-static	void				(*callback)(const char *)	=	NULL;	// The callback function for the parser
+static	int					ribDepth						=	0;		// The rib parsing stack depth
+static	int					numConstant						=	0;		// The number of constant
+static	int					numVertex						=	0;		// The number of vertices
+static	int					numVarying						=	0;		// The number of varyings
+static	int					numFaceVarying					=	0;		// The number of facevaryings
+static	int					numUniform						=	0;		// The number of uniforms
+static	TLight				*lights							=	NULL;	// The linked list of light handles
+static	TObject				*objects						=	NULL;	// The linked list of object handles
+static	void				(*callback)(const char *,...)	=	NULL;	// The callback function for the parser
 
 static	TMemCheckpoint		worldCheckpoint;
 static	TMemCheckpoint		memoryCheckpoint;						// We use this to put a checkpoint to the memory
@@ -587,7 +587,7 @@ static	RtErrorHandler	getErrorHandler(char *n) {
 %token	RIB_MOTION_BEGIN
 %token	RIB_MOTION_END
 %token	RIB_MAKE_TEXTURE
-%token	RIB_MAKE_TEXTURE3D
+%token	RIB_MAKE_BRICKMAP
 %token	RIB_MAKE_BUMP
 %token	RIB_MAKE_LAT_LONG_ENVIRONMENT
 %token	RIB_MAKE_CUBE_FACE_ENVIRONMENT
@@ -2619,12 +2619,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					}
 				}
 				|
-				RIB_MAKE_TEXTURE3D
-				RIB_TEXT
+				RIB_MAKE_BRICKMAP
+				ribTextArray
 				RIB_TEXT
 				ribPL
 				{
-					RiMakeTexture3DV($2,$3,numParameters,tokens,vals);
+					RiMakeBrickMapV($2,getString(0),$3,numParameters,tokens,vals);
 				}
 				|
 				RIB_MAKE_BUMP
@@ -2792,27 +2792,27 @@ void	riberror(char *s,...) {
 // Description			:	Parse a rib file
 // Return Value			:	-
 // Comments				:
-void	ribParse(const char *fileName,void (*c)(const char *)) {
+void	ribParse(const char *fileName,void (*c)(const char *,...)) {
 
 
 	if (fileName != NULL) {
 		
 
 		// Save the environment first
-		TLight				*savedLights					=	lights;
-		TObject				*savedObjects					=	objects;
-		int					savedRibLineno					=	ribLineno;
-		void				(*savedCallback)(const char *)	=	callback;
-		int					savedNumParameters				=	numParameters;
-		int					savedMaxParameter				=	maxParameter;
-		TParameter			*savedParameters				=	parameters;
-		RtToken				*savedTokens					=	tokens;
-		RtPointer			*savedVals						=	vals;
-		int					savedRibDepth					=	ribDepth;
-		YY_BUFFER_STATE		savedLexState					=	YY_CURRENT_BUFFER;
-		TRibFile			*savedRibStack					=	ribStack;
-		const char			*savedRibFile					=	ribFile;
-		FILE				*savedRibIn						=	ribin;
+		TLight				*savedLights						=	lights;
+		TObject				*savedObjects						=	objects;
+		int					savedRibLineno						=	ribLineno;
+		void				(*savedCallback)(const char *,...)	=	callback;
+		int					savedNumParameters					=	numParameters;
+		int					savedMaxParameter					=	maxParameter;
+		TParameter			*savedParameters					=	parameters;
+		RtToken				*savedTokens						=	tokens;
+		RtPointer			*savedVals							=	vals;
+		int					savedRibDepth						=	ribDepth;
+		YY_BUFFER_STATE		savedLexState						=	YY_CURRENT_BUFFER;
+		TRibFile			*savedRibStack						=	ribStack;
+		const char			*savedRibFile						=	ribFile;
+		FILE				*savedRibIn							=	ribin;
 	
 		// Guard against the depreciated fdopen on windoze	
 #ifdef _WINDOWS
