@@ -918,7 +918,6 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("raylabel","s=",0);	
 	addBuiltInFunction("rayinfo","f=s.",0);	
 	addBuiltInFunction("colormap","c=sf!",0);	
-	addBuiltInFunction("volumeillum","c=spv!",0);	
 	addBuiltInFunction("displacement","f=SF",0);
 	addBuiltInFunction("displacement","f=SN",0);
 	addBuiltInFunction("displacement","f=SP",0);
@@ -1007,8 +1006,6 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("photonmap","c=Sp!",0);
 	addBuiltInFunction("indirectdiffuse","c=pnf!",0);
 	addBuiltInFunction("occlusion","f=pnf!",0);
-	addBuiltInFunction("cachesample","f=pnf!",0);
-	addBuiltInFunction("irradiancecache","f=SSSpn!",0);
 	addBuiltInFunction("bump","n=SFnvv!",0);
 	addBuiltInFunction("bump","n=SFnvvff!",0);
 
@@ -1034,7 +1031,6 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("spline","n=SfN",0);
 	addBuiltInFunction("spline","v=SfV",0);
 
-	addBuiltInFunction("blackbody","c=f",0);
 	addBuiltInFunction("bake3d","f=SSpn!",0);
 	addBuiltInFunction("texture3d","f=Spn!",0);
 
