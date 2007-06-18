@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
 			vals[currentParameter++]			= 	(RtPointer) &radiusScale;
 			tokens[currentParameter]			=	"maxdepth";
 			vals[currentParameter++]			= 	(RtPointer) &maxDepth;
-			RiMakeTexture3DV(files[0],files[1],currentParameter,tokens,vals);
+			RiMakeBrickMapV(1,&files[0],files[1],currentParameter,tokens,vals);
 			RiEnd();
 
 			processed	=	TRUE;
