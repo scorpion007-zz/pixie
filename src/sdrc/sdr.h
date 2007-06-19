@@ -417,6 +417,7 @@ TSearchpath				*dsoPath;										// Points to the DSO path
 
 int						passNo;											// 0 - error check, 1 - code generation
 int						lineNo;											// The current line no
+int						statementLineNo;								// The line number we started parsing
 char					*sourceFile;									// The current source file
 
 

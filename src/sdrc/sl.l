@@ -83,7 +83,7 @@ PI												return SL_FCN_PI;
 \[												return SL_OPEN_SQR_PARANTHESIS;
 \]												return SL_CLOSE_SQR_PARANTHESIS;
 
-\#line[ ][0-9]+[ ]\"[\\ a-zA-Z0-9\._-]+\".*		{ char tmp[256]; sscanf(yytext+6,"%d \"%s\"",&sdr->lineNo,tmp); tmp[strlen(tmp)-1] = '\0';  if (sdr->sourceFile != NULL) free(sdr->sourceFile); sdr->sourceFile = strdup(tmp);}
+\#line[ ][0-9]+[ ]\"[^\"]*\"					{ char tmp[256]; sscanf(yytext+6,"%d \"%s\"",&sdr->lineNo,tmp); tmp[strlen(tmp)-1] = '\0';  if (sdr->sourceFile != NULL) free(sdr->sourceFile); sdr->sourceFile = strdup(tmp);}
 \#line[ ][0-9]+.*								{ sscanf(yytext+1,"%d",&sdr->lineNo); }
 \#.*											;
 [ \t]+											;

@@ -690,6 +690,7 @@ CScriptContext::CScriptContext(int s) {
 
 	passNo					=	0;
 	lineNo					=	1;									// The line no in the code
+	statementLineNo			=	1;									// The starting line number for parsing
 	compileError			=	0;									// The number of compiler CScriptContext::errors
 	compileWarning			=	0;									// The number of compiler warnings
 	settings				=	s;									// No settings
@@ -1635,7 +1636,7 @@ void		CScriptContext::error(char *mes,...) {
 
 	if (CScriptContext::settings & COMPILER_SURPRESS_ERRORS) return;
 
-	sprintf(tmp,"%s(%d) : error : %s",sourceFile,lineNo,mes);
+	sprintf(tmp,"%s(%d) : error : %s",sourceFile,statementLineNo,mes);
 
 	va_start(args,mes);
 	vprintf(tmp,args);
@@ -1652,7 +1653,7 @@ void		CScriptContext::warning(char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 
-	sprintf(tmp,"%s(%d) : warning : %s",sourceFile,lineNo,mes);
+	sprintf(tmp,"%s(%d) : warning : %s",sourceFile,statementLineNo,mes);
 
 	if (settings & COMPILER_SURPRESS_WARNINGS) return;
 
@@ -1673,7 +1674,7 @@ void		CScriptContext::fatal(char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 
-	sprintf(tmp,"%s(%d) : fatal : %s",sourceFile,lineNo,mes);
+	sprintf(tmp,"%s(%d) : fatal : %s",sourceFile,statementLineNo,mes);
 
 	va_start(args,mes);
 	vprintf(tmp,args);
