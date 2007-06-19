@@ -1214,9 +1214,9 @@ public:
 								float	C;
 								float	contribution;
 								float	tmp[4],cP[4];
-								float	r[2];
+								float	r[4];
 
-								context->random2d.get(r);
+								context->random4d.get(r);
 
 								x					=	r[0];
 								y					=	r[1];
@@ -1233,9 +1233,8 @@ public:
 								t					=	tmp[1] / tmp[3];
 								
 								if (lookup->blur > 0) {
-									context->random2d.get(r);
-									s				+=	lookup->blur*(r[0] - 0.5f);
-									t				+=	lookup->blur*(r[1] - 0.5f);
+									s				+=	lookup->blur*(r[2] - 0.5f);
+									t				+=	lookup->blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
@@ -1366,9 +1365,9 @@ public:
 								int			bx,by;
 								CDeepTile	*cTile;
 								float		*cPixel;
-								float		r[2];
+								float		r[4];
 
-								context->random2d.get(r);
+								context->random4d.get(r);
 
 								const float x		=	r[0];
 								const float y		=	r[1];
@@ -1385,9 +1384,8 @@ public:
 								t					=	tmp[1] / tmp[3];
 								
 								if (lookup->blur > 0) {
-									context->random2d.get(r);
-									s				+=	lookup->blur*(r[0] - 0.5f);
-									t				+=	lookup->blur*(r[1] - 0.5f);
+									s				+=	lookup->blur*(r[2] - 0.5f);
+									t				+=	lookup->blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
