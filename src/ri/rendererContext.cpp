@@ -1286,7 +1286,8 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 				options->maxBrickSize	*=	1000;								// Convert into bytes
 			optionCheck(RI_NUMTHREADS,			options->numThreads,				1,32,int)
 			optionCheck(RI_THREADSTRIDE,		options->threadStride,				1,32,int)
-			optionCheck(RI_GEOCACHEMEMORY,		options->geoCacheMemory,			0,100000,int)
+			optionCheck(RI_GEOCACHEMEMORY,		options->geoCacheMemory,			0,500000,int)
+				options->geoCacheMemory	*=	1000;								// Convert into bytes
 			optionCheckColor(RI_OTHRESHOLD,		options->opacityThreshold,			0,1)
 			optionCheckColor(RI_ZTHRESHOLD,		options->zvisibilityThreshold,		0,1)
 				options->geoCacheMemory	*=	1000;								// Convert into bytes
