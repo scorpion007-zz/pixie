@@ -372,8 +372,8 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	const float		halfFilterWidth			=	(float) filterWidth*0.5f;
 	const float		halfFilterHeight		=	(float) filterHeight*0.5f;
 	float			*fbs;
-	const int		pixelSize				=	8	+ CRenderer::numExtraSamples;	// alpha + depth + color + opacity + extra samples
-												// FIXME: 6
+	const int		pixelSize				=	6	+ CRenderer::numExtraSamples;	// alpha + depth + color + opacity + extra samples
+
 	float			*tmp;
 	const int		sampleLineDisplacement	=	CRenderer::pixelXsamples*pixelSize;
 
@@ -419,7 +419,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	// 0	=	alpha
 	// 1	=	z;
 	// 2-4	=	color
-	// 5-7	=	opacity
+	// 5	=	z2
 	for (y=0;y<sampleHeight;y++) {
 		CPixel	*cPixel		=	fb[y];
 		float	*cFb		=	&fbs[y*totalWidth*pixelSize];
@@ -433,7 +433,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			//float		*O			=	&cFb[5];
 			vector		O;
 			float		*Z2			=	&cFb[5];
-			float		*ES			=	&cFb[8];	//FIXME: 6
+			float		*ES			=	&cFb[6];
  			
 			assert(cPixel->first.z == -C_INFINITY);
 
@@ -878,7 +878,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					
 					// Filter the extra samples here
 					for (es=0;es<CRenderer::numExtraSamples;es++) {
-						pixelLine[5+es]			+=	filterResponse*sampleLine[8+es];	//FIXME: 6
+						pixelLine[5+es]			+=	filterResponse*sampleLine[6+es];
 					}
 
 					// Advance
