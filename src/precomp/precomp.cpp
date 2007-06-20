@@ -331,6 +331,12 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 	else
 		fprintf(out,"drawQuadGrid");
 	
+	if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
+		fprintf(out,"Zmid");
+	} else {
+		fprintf(out,"Zmin");	
+	}
+	
 	if (i & RASTER_UNSHADED)		fprintf(out,"Unshaded");
 	if (i & RASTER_MOVING)			fprintf(out,"Moving");
 	if (i & RASTER_TRANSPARENT)		fprintf(out,"Transparent");
@@ -363,8 +369,9 @@ int		precomputeStochasticPrimitivesH() {
 	
 	fprintf(out,"#ifdef DEFINE_STOCHASTIC_SWITCH\n");
 	
-	fprintf(out,"switch(grid->flags & RASTER_GLOBAL_MASK) {\n");
-	for (i=0;i<=RASTER_GLOBAL_MASK;i++) {
+	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | ((CRenderer::depthFilter == DEPTH_MID) << RASTER_HIGHBITS_SHIFT)) {\n");
+	const int caseEnumeration = RASTER_GLOBAL_MASK | (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT);
+	for (i=0;i<=caseEnumeration;i++) {
 		fprintf(out,"case %d:\n",i);
 		
 		// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
@@ -409,7 +416,7 @@ int		precomputeStochasticPrimitivesH() {
 		if(j)	fprintf(out,"#ifdef DEFINE_STOCHASTIC_FUNPROTOS\n");
 		else	fprintf(out,"#ifdef DEFINE_STOCHASTIC_FUNCTIONS\n");
 		
-		for (i=0;i<=RASTER_GLOBAL_MASK;i++) {
+		for (i=0;i<=caseEnumeration;i++) {
 			// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
 			// so we don't have to generate functions for those combinations
 			// Unshaded grids are the only ones which can be underculled
@@ -452,7 +459,16 @@ int		precomputeStochasticPrimitivesH() {
 			if (i & RASTER_LOD)				fprintf(out,"\t#define STOCHASTIC_LOD\n");
 			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#define STOCHASTIC_UNDERCULL\n");
 			if (i & RASTER_XTREME)			fprintf(out,"\t#define STOCHASTIC_XTREME\n");
-		
+			
+			// Define the depth filter macros
+			if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
+				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMid()\n");
+				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMid()\n");
+			} else {
+				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMin()\n");
+				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMin()\n");
+			}
+			
 			if (i & RASTER_POINT) {
 				fprintf(out,"\n\n\t\t#include \"stochasticPoint.h\"\n");
 			} else {
