@@ -196,9 +196,10 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
+		depthFilterIf();															\
 		pixel->z						=	z;										\
 		touchNode(pixel->node,z);													\
-	}
+	} depthFilterElse();
 
 
 #else
@@ -210,9 +211,10 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
+		depthFilterIf();															\
 		pixel->z						=	z;										\
 		touchNode(pixel->node,z);													\
-	}
+	} depthFilterElse();
 
 #endif
 
@@ -227,7 +229,7 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
-		updateTransparent();														\
+		updateTransparent(depthFilterIf,depthFilterElse);							\
 	}
 
 
@@ -239,7 +241,7 @@ const	int	yres		=	sampleHeight - 1;
 		nSample->z						=	z;										\
 		colorOpacityUpdate();														\
 		drawExtraSamples();															\
-		updateTransparent();														\
+		updateTransparent(depthFilterIf,depthFilterElse);							\
 	}
 
 #endif
@@ -258,7 +260,7 @@ const	int	yres		=	sampleHeight - 1;
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
 #else
 #define drawPixelCheck()															\
 	CFragment *nSample;																\

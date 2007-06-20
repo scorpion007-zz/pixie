@@ -34,8 +34,6 @@
 #include "memory.h"
 #include "random.h"
 
-// Use the old pixel filtered depths
-//#define PIXELFILTERED_DEPTHS
 
 // This macro is used to allocate fragments
 #define	newFragment(__a)	if (freeFragments == NULL)	{						\
@@ -239,6 +237,12 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 
 
 // The following macros help various fragment operations
+#define depthFilterIfZMin()
+#define depthFilterElseZMin()
+
+#define depthFilterIfZMid()		pixel->zold		=	pixel->z;
+#define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
+
 
 // This macro is used to insert a fragment into the linked list for a pixel
 #define	findSample(__dest,__z) { 																	\
@@ -267,19 +271,19 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 	pixel->update	=	__dest;																		\
 }
 
-
 // This macro is called when an opaque fragment is inserted
+
 #define updateOpaque() {																			\
 	CFragment *cSample=pixel->last.prev;															\
 	while(cSample->z > z) {																			\
-		CFragment *nSample				=	cSample->prev;											\
+		CFragment *nSample	=	cSample->prev;														\
 		nSample->next		=	&pixel->last;														\
 		pixel->last.prev	=	nSample;															\
 		assert(cSample != &pixel->first);															\
 		deleteFragment(cSample);																	\
 		cSample				=	nSample;															\
 	}																								\
-	initv(cSample->accumulatedOpacity,1);																	\
+	initv(cSample->accumulatedOpacity,1);															\
 	pixel->update			=	cSample;															\
 }
 
@@ -288,7 +292,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // beind it.  Otherwise, we need to update accumulated opacity, and cull samples
 // behind the point where we become opaque
 
-#define updateTransparent() {																		\
+#define updateTransparent(dfIf,dfElse) {																\
 	vector O,rO;																					\
 	const float *Oc;																				\
 	CFragment *cSample	=	nSample->prev;															\
@@ -330,9 +334,10 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 			}																						\
 			const float z			=	cSample->z;													\
 			if (z < pixel->z) {																		\
+				dfIf();																				\
 				pixel->z			=	z;															\
 				touchNode(pixel->node,cSample->z);													\
-			}																						\
+			} dfElse();																				\
 			break;																					\
 		}																							\
 		cSample = cSample->next;																	\
@@ -343,6 +348,10 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 #include "stochasticPrimitives.h"
 #undef DEFINE_STOCHASTIC_FUNCTIONS
 
+#undef depthFilterIfZMin
+#undef depthFilterElseZMin
+#undef depthFilterIfZMid
+#undef depthFilterElseZMid
 #undef findSample
 #undef updateOpaque
 
@@ -368,6 +377,10 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	float			*tmp;
 	const int		sampleLineDisplacement	=	CRenderer::pixelXsamples*pixelSize;
 
+	// pull local for speed
+	vector			zvisibilityThreshold;
+	movvv(zvisibilityThreshold,CRenderer::zvisibilityThreshold);
+	
 	// Deep shadow map computation
 	if (CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)	deepShadowCompute();
 	else if (noObjects) {
@@ -432,17 +445,23 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			// Opacity thresholding for non composited aovs
 			//
 			
-			cSample	=	cPixel->first.next;
+			// Q: Why are we recalculating z
+			// A: because maintaining an accurate z for transparent samples
+			//    combined with zthreshold is very awkward.
+			//    We desire z to have the same evaluation properties as a zmin
+			//    aov, which will account for transparent samples.  So we pass
+			//    thru to grab the right value.  In fully opaque scenes this
+			//    should not add significant additional workload
 			
+			cSample	=	cPixel->first.next;
 			if (cPixel->first.opacity[0] >= 0 || cPixel->first.opacity[1] >= 0 || cPixel->first.opacity[2] >= 0) { 		// Pixel has no Matte
 								
 				for (;cSample!=NULL;) {
 					const float *opacity	= cSample->opacity;
-					const float *sampleExtra		= cSample->extraSamples;
 
 					// copy when we see sufficiently opaque sample, check against zthreshold
-					if ((opacity[0] > CRenderer::zvisibilityThreshold[0]) || (opacity[1] > CRenderer::zvisibilityThreshold[1]) || (opacity[2] > CRenderer::zvisibilityThreshold[2])) {
-						const float *sampleExtra = cSample->extraSamples;
+					if ((opacity[0] > zvisibilityThreshold[0]) || (opacity[1] > zvisibilityThreshold[1]) || (opacity[2] > zvisibilityThreshold[2])) {
+						const float *sampleExtra	= cSample->extraSamples;
 						for(int es = 0; es < numExtraNonCompChannels; es++) {
 							const int sampleOffset	= CRenderer::nonCompChannelOrder[es*4];
 							const int numSamples	= CRenderer::nonCompChannelOrder[es*4+1];
@@ -468,7 +487,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					int isMatte = (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0);
 						// Matte
 					
-					if ((1+opacity[0] > CRenderer::zvisibilityThreshold[0]) || (1+opacity[1] > CRenderer::zvisibilityThreshold[1]) || (1+opacity[2] > CRenderer::zvisibilityThreshold[2])) {
+					if ((1+opacity[0] > zvisibilityThreshold[0]) || (1+opacity[1] > zvisibilityThreshold[1]) || (1+opacity[2] > zvisibilityThreshold[2])) {
 
 						// Copy default non-composited AOVs - default values unless ignoring matte
 						const float *sampleExtra = cSample->extraSamples;
@@ -516,6 +535,8 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			} else if (CRenderer::depthFilter == DEPTH_MID) {
 				
 				// Find the second sample for midpoint, if needed
+				// Q: Why not just use zold?
+				// A: It doesn't take account of transparent samples
 				
 				for (;cSample!=NULL;) {
 					const float	*color		= cSample->color;
@@ -524,20 +545,19 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					int isMatte = (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0);
 					// Matte
 					
-					if ((1+opacity[0] > CRenderer::zvisibilityThreshold[0]) || (1+opacity[1] > CRenderer::zvisibilityThreshold[1]) || (1+opacity[2] > CRenderer::zvisibilityThreshold[2])) {
+					if ((1+opacity[0] > zvisibilityThreshold[0]) || (1+opacity[1] > zvisibilityThreshold[1]) || (1+opacity[2] > zvisibilityThreshold[2])) {
 					
-						//if (isMatte && matteMode) {
-						
+						//if (isMatte && matteMode) {						
 						Z2[0]	=	cSample->z;
-						
 						break;
 					}
-					
 				}
 				
 				if (cSample == NULL) {
 					Z2[0]	=	C_INFINITY;
 				}
+				
+				Z2[0] = max(Z2[0],cPixel->zold);
 			}
 			
 			// clip-correct the depth components
@@ -690,12 +710,12 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	// Note: at this point, all the subpixel samples are valid
 	// We could output subpixel samples here if we wish to support a subpixel hider
 	
-#ifndef PIXELFILTERED_DEPTHS
-
 	// Clear the memory first
 	for (tmp=fb2,i=xres*yres*CRenderer::numSamples;i>0;i--)	*tmp++	=	0;
 
 	// Perform non area-filtering for depth
+	// Note: technically, this should filter in the specified width/height
+	// but > 1 pixel doesn't really make sense
 	switch(CRenderer::depthFilter) {
 	case DEPTH_MIN:	
 		
@@ -832,10 +852,9 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		}
 	}
 
-#endif
 
 	// FIXME: Filter non-composited samples
-	{
+	if (numExtraNonCompChannels > 0) {
 	
 	}
 
@@ -857,10 +876,6 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					pixelLine[2]				+=	filterResponse*sampleLine[4];
 					pixelLine[3]				+=	filterResponse*sampleLine[0];
 					
-					#ifdef PIXELFILTERED_DEPTHS
-						pixelLine[4]			+=	filterResponse*sampleLine[1];
-					#endif
-
 					// Filter the extra samples here
 					for (es=0;es<CRenderer::numExtraSamples;es++) {
 						pixelLine[5+es]			+=	filterResponse*sampleLine[8+es];	//FIXME: 6

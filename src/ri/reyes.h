@@ -54,6 +54,7 @@ const	unsigned int	RASTER_XTREME			=	1 << 9;		// The primitive has extreme motio
 const	unsigned int	RASTER_GLOBAL_MASK		=	(1 << 10) - 1;// This mask is used to block the lower fields
 
 const	unsigned int	RASTER_HIGHBITS_SHIFT	=	10;			// The shift needed to put bits in the higher fields
+const	unsigned int	RASTER_DEPTHFILT_MASK	=	1;
 
 const	unsigned int	RASTER_DRAW_FRONT		=	1 << 10;	// Draw the front of the primitive
 const	unsigned int	RASTER_DRAW_BACK		=	1 << 11;	// Draw the back of the primitive

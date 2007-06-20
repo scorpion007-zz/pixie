@@ -172,7 +172,7 @@
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
 		drawExtraSamples();																		\
-		updateTransparent();																	\
+		updateTransparent(depthFilterIf,depthFilterElse);										\
 	}
 
 #else
@@ -211,9 +211,10 @@
 		nSample->z				=	z;															\
 		colorOpacityUpdate();																	\
 		drawExtraSamples();																		\
+		depthFilterIf();																		\
 		pixel->z				=	z;															\
 		touchNode(pixel->node,z);																\
-	}
+	} depthFilterElse();
 
 #endif
 
@@ -258,7 +259,7 @@
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
 		drawExtraSamples();																	\
-		updateTransparent();																\
+		updateTransparent(depthFilterIf,depthFilterElse);									\
 	}
 
 #else
@@ -294,9 +295,10 @@
 		nSample->z				=	z;														\
 		colorOpacityUpdate();																\
 		drawExtraSamples();																	\
+		depthFilterIf();																	\
 		pixel->z				=	z;														\
 		touchNode(pixel->node,z);															\
-	}
+	} depthFilterElse();
 
 #endif
 #endif
@@ -328,14 +330,14 @@
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
 #else
 #define drawPixelCheck()															\
 	if (z < pixel->z) {																\
 		shadeGrid(grid,FALSE);														\
 		rasterDrawPrimitives(grid);													\
 		return;																		\
-	}
+	} depthFilterElse();
 
 
 #endif // undercull
