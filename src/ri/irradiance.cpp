@@ -545,17 +545,18 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Return Value			:
 // Comments				:
 void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const float *dPdv,const float *N,CShadingContext *context,const CTexture3dLookup *lookup) {
-	CCacheSample		*cSample;
-	int					i,j;
-	float				coverage;
-	vector				irradiance;
-	vector				envdir;
-	float				rMean;
-	CRay				ray;
-	vector				X,Y;
-	CCacheNode			*cNode;
-	int					depth;
-	CTextureLookup		*texLookup;
+	CCacheSample			*cSample;
+	int						i,j;
+	float					coverage;
+	vector					irradiance;
+	vector					envdir;
+	float					rMean;
+	CRay					ray;
+	vector					X,Y;
+	CCacheNode				*cNode;
+	int						depth;
+	CTextureLookup			*texLookup;
+	CVaryingTextureLookup	*varyingTexLookup;
 
 	// Allocate memory
 	const int			nt				=	(int) (sqrtf(lookup->numSamples / (float) C_PI) + 0.5);
@@ -563,21 +564,15 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 	const int			numSamples		=	nt*np;
 	CHemisphereSample	*hemisphere		=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
 
-	if(lookup->environment != NULL){
+	if(lookup->environment != NULL) {
 		texLookup				= (CTextureLookup*) alloca(sizeof(CTextureLookup));
-		texLookup->filter		= RiGaussianFilter;
-		texLookup->blur			= 0;
-		texLookup->swidth		= 1;
-		texLookup->twidth		= 1;
-		texLookup->numSamples	= 1;
-		texLookup->channel		= 0;
-		texLookup->fill			= 0;
+		texLookup->init();		
 		texLookup->shadowBias	= lookup->bias;
-		texLookup->maxDist		= C_INFINITY;
-		texLookup->coneAngle	= 0;
-		texLookup->label		= NULL;
-		texLookup->texture		= NULL;
 		texLookup->environment	= lookup->environment;
+		
+		varyingTexLookup		= (CVaryingTextureLookup*) alloca(sizeof(CVaryingTextureLookup));
+		varyingTexLookup->init();
+
 	}
 						
 	// Create an orthanormal coordinate system
@@ -671,7 +666,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup,context);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,varyingTexLookup,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -780,7 +775,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup,context);
+						tex->lookup(color,D0,D1,D2,D3,texLookup,varyingTexLookup,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{

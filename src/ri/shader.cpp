@@ -45,25 +45,28 @@
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShaderLookup
-// Method				:	CShaderLookup
+// Class				:	CDynamicShaderLookup
+// Method				:	CDynamicShaderLookup
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CShaderLookup::CShaderLookup() {
-	numParamBindings	= 0;
-	paramBindings		= NULL;
+CDynamicShaderLookup::CDynamicShaderLookup() {
+	numUniformParamBindings		= 0;
+	uniformParamBindings		= NULL;
+	numVaryingParamBindings		= 0;
+	varyingParamBindings		= NULL;
 }
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CShaderLookup
-// Method				:	~CShaderLookup
+// Class				:	CDynamicShaderLookup
+// Method				:	~CDynamicShaderLookup
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-CShaderLookup::~CShaderLookup() {
-	if (paramBindings != NULL) delete[] paramBindings;
+CDynamicShaderLookup::~CDynamicShaderLookup() {
+	if (uniformParamBindings != NULL) delete[] uniformParamBindings;
+	if (varyingParamBindings != NULL) delete[] varyingParamBindings;
 }
 
 
@@ -272,6 +275,54 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTextureLookup
+// Method				:	CTextureLookup
+// Description			:	Ctor
+// Return Value			:	-
+// Comments				:
+CTextureLookup::CTextureLookup(const CAttributes *attributes) {
+	filter			=	RiGaussianFilter;
+	channel			=	0;
+	fill			=	0;
+	shadowBias		=	attributes->shadowBias;
+	label			=	NULL;
+	sampleBase		=	1;
+	texture			=	NULL;
+	environment		=	NULL;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTextureLookup
+// Method				:	init
+// Description			:	Ctor
+// Return Value			:	-
+// Comments				:
+void CTextureLookup::init() {
+	filter			=	RiGaussianFilter;
+	channel			=	0;
+	fill			=	0;
+	shadowBias		=	0;			// should be filled in later anyway
+	label			=	NULL;
+	sampleBase		=	1;
+	texture			=	NULL;
+	environment		=	NULL;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CVaryingTextureLookup
+// Method				:	CVaryingTextureLookup
+// Description			:	initialize default values
+// Return Value			:	-
+// Comments				:	Can't be a constructor or offsetof() doesn't work
+void CVaryingTextureLookup::init() {
+	blur			=	0;
+	width			=	1;
+	swidth			=	1;
+	twidth			=	1;
+	numSamples		=	1;
+	coneAngle		=	0;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dLookup

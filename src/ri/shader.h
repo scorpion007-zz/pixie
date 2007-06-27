@@ -108,18 +108,32 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 //							relevant to a particular shading language command
 class	CShaderLookup {
 public:
+		virtual			~CShaderLookup() { }
+};
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDynamicShaderLookup
+// Description			:	This class is the base for dynamic lookups
+// Comments				:	dynamic lookups can vary their value each lookup
+//							and must be used with a struct, which they fill in
+class	CDynamicShaderLookup : public CShaderLookup {
+public:
 		struct CParamBinding {
 			int		opIndex;
 			int		type;
-			void	*dest;
+			size_t	dest;
+			float	mult;
 		};
 	
-							CShaderLookup();
-		virtual				~CShaderLookup();
+							CDynamicShaderLookup();
+		virtual				~CDynamicShaderLookup();
 
-		int					numParamBindings;
-		CParamBinding		*paramBindings;
+		int					numUniformParamBindings;
+		CParamBinding		*uniformParamBindings;
+		int					numVaryingParamBindings;
+		CParamBinding		*varyingParamBindings;
 };
 
 
@@ -154,24 +168,38 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
-// Description			:	This class holds information about a particular texture lookup
-// Comments				:
-class	CTextureLookup : public CShaderLookup	{
+// Description			:	This class holds immutable information about a particular texture lookup
+// Comments				:	used with struct CVaryingTextureLookup
+class	CTextureLookup : public CDynamicShaderLookup {
 public:
+		CTextureLookup(const CAttributes *attributes);
+		void				init();
+			
 		RtFilterFunc		filter;					// Lookup filter
-		float				width,swidth,twidth;	// The filter width
-		float				blur;					// Blur amount
-		int					numSamples;				// The number of samples to take in the texture
 		float				shadowBias;				// The shadow bias for the lookup
 		int					channel;				// The start channel for the lookup
 		float				fill;					// The fill in value for the lookup
-		float				maxDist;				// The maximum intersection distance
-		float				coneAngle;				// The coneangle
 		const char			*label;					// The label of the ray
 		float				sampleBase;				// Jitter base samples for raytracing
 		int					lookupFloat;			// TRUE if we're only looking up a float
 		CTexture			*texture;				// Points to the texture being looked up
 		CEnvironment		*environment;			// Points to the environment being looked up
+};
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CVaryingTextureLookup
+// Description			:	This class holds mutable information about a particular texture lookup
+// Comments				:	It's important this is a constructor-less struct of offsetof won't work
+struct CVaryingTextureLookup {
+		// uniform
+		int					numSamples;				// The number of samples to take in the texture
+		float				maxDist;				// The maximum intersection distance
+		// varying
+		float				coneAngle;				// The coneangle
+		float				width,swidth,twidth;	// The filter width
+		float				blur;					// Blur amount
+		
+		void				init();
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -314,9 +342,6 @@ public:
 
 	const char				*category;				// The gather category
 	const char				*label;					// The ray label
-	float					coneAngle;				// The distribution angle
-	float					da;						// The ray differential
-	int						numSamples;				// The number of samples to gather
 	float					bias;					// The shadow bias
 	float					maxDist;				// The maximum intersection distance
 	int						maxRayDepth;			// The maximum ray depth

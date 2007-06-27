@@ -836,19 +836,17 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 // Description			:	Trace transmission rays
 // Return Value			:	-
 // Comments				:
-void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly) {
+void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly) {
 	CTransmissionRay	*rayBase;
 	CTransmissionRay	**raysBase;
 	CTransmissionRay	*cRay,**cRays;
-	const int			numSamples		=	lookup->numSamples;
+	const int			numSamples		=	varyingLookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
 	const float			sampleBase		=	lookup->sampleBase;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
-	const float			coneAngle		=	lookup->coneAngle;
-	const float			maxDist			=	lookup->maxDist;
+	const float			maxDist			=	varyingLookup->maxDist;
 	int					numRemaining	=	shootStep;
 	const float			multiplier		=	1 / (float) numSamples;
-	const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 	int					currentSample;
 	int					i;
 	CTransmissionBundle	bundle;
@@ -869,6 +867,9 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextur
 	// For each ray
 	for (i=numRays;i>0;i--,rays++) {
 		
+		const float			coneAngle		=	rays->coneAngle;
+		const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
+
 		// Compute the ray differentials
 		computeRayDifferentials;
 
@@ -945,19 +946,17 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,CTextur
 // Description			:	Trace reflected rays
 // Return Value			:	-
 // Comments				:
-void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly) {
+void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly) {
 	CTraceRay			*interiorRayBase,*cInteriorRay;
 	CTraceRay			*exteriorRayBase,*cExteriorRay;
 	CTraceRay			**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
-	const int			numSamples		=	lookup->numSamples;
+	const int			numSamples		=	varyingLookup->numSamples;
 	const float			bias			=	lookup->shadowBias;
 	const float			sampleBase		=	lookup->sampleBase;
 	const int			shootStep		=	min(CRenderer::shootStep,numRays*numSamples);
-	const float			coneAngle		=	lookup->coneAngle;
 	int					numInteriorRemaining	=	shootStep;
 	int					numExteriorRemaining	=	shootStep;
-	const float			multiplier		=	1 / (float) lookup->numSamples;
-	const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
+	const float			multiplier		=	1 / (float) numSamples;
 	int					currentSample;
 	int					i;
 	CTraceBundle		interiorBundle,exteriorBundle;
@@ -987,6 +986,9 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,CTextureL
 	
 	// For each ray
 	for (i=numRays;i>0;i--,rays++) {
+		
+		const float			coneAngle		=	rays->coneAngle;
+		const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 		
 		// Compute the ray differentials
 		computeRayDifferentials;

@@ -317,10 +317,11 @@ private:
 			vector				P,dPdu,dPdv;		// The ray origin
 			vector				D,dDdu,dDdv;		// The direction (for reflection), the ray target (for transmission)
 			vector				N;					// Surface normal reference to determine interior or exterior
+			float				coneAngle;			// The angular spread
 		};
 
-		void					traceTransmission(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly);
-		void					traceReflection(int numRays,CTraceLocation *rays,CTextureLookup *lookup,int probeOnly);
+		void					traceTransmission(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly);
+		void					traceReflection(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly);
 
 		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);
