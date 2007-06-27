@@ -176,13 +176,15 @@
 %type<integer>		slInheritanceClass
 %type<integer>		slOutputClass
 %type<integer>		slContainerClass
+%type<integer>		slFloatSpecifier
+%type<integer>		slVectorSpecifier
+%type<integer>		slMatrixSpecifier
+%type<integer>		slStringSpecifier
 %type<integer>		slTypeSpecifier
-%type<code>			slFunctionParameterList
 %type<code>			slFunctionParameters
 %type<code>			slFunctionParameter
 %type<code>			slFunctionParameterIdentifierList
 %type<integer>		slShaderType
-%type<code>			slShaderParameterList
 %type<code>			slShaderParameters
 %type<code>			slShaderParameter
 %type<code>			slShaderParameterInitializer
@@ -290,12 +292,14 @@ slOutputClass:
 			}
 			;
 
-slTypeSpecifier:
+slFloatSpecifier:
 			SL_FLOAT
 			{
 				$$	=	SLC_FLOAT;
 			}
-			|
+			;
+			
+slVectorSpecifier:
 			SL_COLOR
 			{
 				$$	=	SLC_VECTOR | SLC_VCOLOR;
@@ -315,15 +319,43 @@ slTypeSpecifier:
 			{
 				$$	=	SLC_VECTOR | SLC_VPOINT;
 			}
-			|
+			;
+			
+slMatrixSpecifier:
 			SL_MATRIX
 			{
 				$$	=	SLC_MATRIX;
 			}
-			|
+			;
+			
+slStringSpecifier:
 			SL_STRING
 			{
 				$$	=	SLC_STRING | SLC_UNIFORM;
+			}
+			;
+			
+			
+			
+slTypeSpecifier:
+			slFloatSpecifier
+			{
+				$$	=	$1;
+			}
+		|
+			slVectorSpecifier
+			{
+				$$	=	$1;
+			}
+		|
+			slMatrixSpecifier
+			{
+				$$	=	$1;
+			}
+		|
+			slStringSpecifier
+			{
+				$$	=	$1;
 			}
 			;
 
@@ -335,6 +367,7 @@ slTypeDecl:
 			{
 				$$	=	$1 | $2 | $3 | $4;
 				sdr->desire($$);
+				sdr->statementLineNo	=	sdr->lineNo;
 			}
 			;
 
@@ -396,7 +429,7 @@ slFunctionHeader:
 
 slFunction:	
 		slFunctionHeader
-		slFunctionParameterList							// CFunction Parameter list
+		slFunctionParameters							// CFunction Parameter list
 		SL_CLOSE_PARANTHESIS
 		slBlock
 		{
@@ -412,19 +445,6 @@ slFunction:
 		}
 		;
 		
-		////////////////////////////////////////////////
-		// CFunction Parameter list
-		// (Can be empty)
-slFunctionParameterList:
-		slFunctionParameters
-		{
-			$$	=	$1;
-		}
-	|
-		{
-			$$	=	new CNullExpression;
-		}
-		;
 
 		////////////////////////////////////////////////
 		// CFunction Parameters
@@ -435,12 +455,6 @@ slFunctionParameters:
 		slFunctionParameters
 		{
 			$$	=	new CTwoExpressions($1,$3);
-		}
-	|
-		slFunctionParameter
-		SL_SEMI_COLON
-		{
-			$$	=	$1;
 		}
 	|
 		slFunctionParameter
@@ -473,6 +487,10 @@ slFunctionParameter:
 		{
 			$$					=	$3;
 			sdr->undesire();						// We're done with the type
+		}
+		|
+		{
+			$$	=	new CNullExpression;
 		}
 		;
 
@@ -579,7 +597,7 @@ slMain:	slShaderType							// Type of the shader
 			sdr->shaderType					=	$1;
 			sdr->shaderFunction				=	mainFunction;
 		}
-		slShaderParameterList					// Shader Parameter list
+		slShaderParameters						// Shader Parameter list
 		SL_CLOSE_PARANTHESIS
 		{
 			sdr->restoreParameters();
@@ -633,18 +651,6 @@ slShaderType:	SL_SURFACE
 		}
 		;
 
-		////////////////////////////////////////////////
-		// Shader Parameter list
-slShaderParameterList:
-		slShaderParameters
-		{
-			$$	=	$1;
-		}
-	|
-		{
-			$$	=	new CNullExpression;
-		}
-		;
 
 		////////////////////////////////////////////////
 		// Shader Parameters
@@ -654,12 +660,6 @@ slShaderParameters:
 		slShaderParameters
 		{
 			$$	=	new CTwoExpressions($1,$3);
-		}
-	|
-		slShaderParameter
-		SL_SEMI_COLON
-		{
-			$$	=	$1;
 		}
 	|
 		slShaderParameter
@@ -695,6 +695,10 @@ slShaderParameter:
 			}
 
 			sdr->undesire();
+		}
+		|
+		{
+			$$	=	new CNullExpression;
 		}
 		;
 
@@ -974,12 +978,16 @@ slStatement:
 
 slStatements:
 		slStatements
+		{
+			sdr->statementLineNo	=	sdr->lineNo;
+		}
 		slStatement
 		{
-			$$	=	new CTwoExpressions($1,$2);
+			$$	=	new CTwoExpressions($1,$3);
 		}
 	|
 		{
+			sdr->statementLineNo	=	sdr->lineNo;
 			$$	=	new CNullExpression;
 		}
 		;
@@ -2377,6 +2385,7 @@ slAritmeticTerminalValue:
 			$$	=	$2;
 		}
 		;
+	
 
 
 slAritmeticTypeCast:
@@ -2384,7 +2393,7 @@ slAritmeticTypeCast:
 		slAritmeticExpression
 		{
 			$$	=	getConversion($1,$2);
-
+			
 			sdr->undesire();
 		}
 	|
@@ -2397,7 +2406,7 @@ slAritmeticTypeCast:
 			sdr->undesire();
 		}
 		;
-
+		
 slBooleanExpression:
 		SL_OPEN_PARANTHESIS
 		slBooleanExpression
@@ -2494,6 +2503,8 @@ slBooleanExpression:
 		////////////////////////////////////////////////
 		// A CFunction call
 
+
+		
 slFunctionCall:
 		slTextureCall
 		{
