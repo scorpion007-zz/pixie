@@ -365,7 +365,6 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	vector		P,N;
 
 	depth = min(max(depth,0),maxDepth);
-	if (depth < 0)			depth	=	0;
 
 	// First, transform the point to world coordinate system
 	mulmp(P,to,cP);
