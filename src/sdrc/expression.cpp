@@ -1333,6 +1333,7 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 				c[i++]	=	cVar;
 			}
 
+			assert(cVar != NULL);
 			cP->mapping	=	cVar;
 		}
 	} else	{
@@ -1345,7 +1346,6 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 	// Go over the code 
 	if (function->code != NULL) function->code->getCode(out,NULL);
 
-	
 	// Release the locked registers
 	for (j=0;j<i;j++) {
 		if (c[j]->type & SLC_LOCKED) {
@@ -1582,7 +1582,7 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 	usedPrototype[0]	=	fprototype[0];
 	usedPrototype[1]	=	'=';
 
-
+	bool	parameterList	=	false;
 	for (i=0,cParameter = arguments->first();cParameter != NULL;) {
 		if (fprototype[cPrototype]	==	'f')	{
 			expressions[i]	=	getConversion(SLC_FLOAT,cParameter);
@@ -1690,19 +1690,17 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 		} else if (fprototype[cPrototype]	==	'!') {
 			if (plStart == -1)	plStart			=	i;
 
-			expressions[i]	=	getConversion(SLC_STRING,cParameter);
-			usedPrototype[uPrototype++]	=	'S';
-			i++;
-			cParameter = arguments->next();
-			expressions[i]	=	cParameter;
-			usedPrototype[uPrototype++]	=	getExpressionType(cParameter);
-			i++;
-			cParameter = arguments->next();
-
-			if (usedPrototype[uPrototype-1]	==	'o') {
-				assert(FALSE);
+			if (parameterList == false) {
+				parameterList	=	true;
+				expressions[i]	=	getConversion(SLC_STRING,cParameter);
+				usedPrototype[uPrototype++]	=	'S';
+			} else {
+				expressions[i]	=	cParameter;
+				usedPrototype[uPrototype++]	=	getExpressionType(cParameter);
 			}
-			
+
+			i++;
+			cParameter = arguments->next();
 		}
 	}
 
@@ -3133,35 +3131,35 @@ CExpression	*getConversion(int type,CExpression *first) {
 	if (type & SLC_BOOLEAN) {
 		if (first->type & SLC_BOOLEAN)	return	first;
 		else {
-			delete first;
 			sdr->error("Unable to cast a boolean\n");
+			delete first;
 		}
 	} else if (type & SLC_STRING) {
 		if (first->type & SLC_STRING)	return first;
 		else {
-			delete first;
 			sdr->error("Unable to cast a string\n");
+			delete first;
 		}
 	} else if (type & SLC_FLOAT) {
 		if (first->type & SLC_FLOAT)	return first;
 		else {
-			delete first;
 			sdr->error("Unable to cast a float\n");
+			delete first;
 		}
 	} else if (type & SLC_VECTOR) {
 		if (first->type & SLC_VECTOR)		{ first->type |= (type & SLC_SUB_TYPE_MASK);	return first; }
 		else if (first->type & SLC_FLOAT)	return new CUnaryExpression(SLC_VECTOR | (first->type & SLC_UNIFORM) | (type & SLC_SUB_TYPE_MASK), opcodeVectorFromFloat,first);
 		else {
-			delete first;
 			sdr->error("Unable to cast a vector\n");
+			delete first;
 		}
 	} else if (type & SLC_MATRIX) {
 		if (first->type & SLC_MATRIX)		return first;
 		else if (first->type & SLC_FLOAT)	return new CUnaryExpression(SLC_MATRIX | (first->type & SLC_UNIFORM),opcodeMatrixFromFloat,first);
 		else if (first->type & SLC_VECTOR)	return new CUnaryExpression(SLC_MATRIX | (first->type & SLC_UNIFORM),opcodeMatrixFromVector,first);
 		else {
-			delete first;
 			sdr->error("Unable to cast a matrix\n");
+			delete first;
 		}
 	}
 

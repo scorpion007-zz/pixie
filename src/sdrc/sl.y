@@ -85,7 +85,6 @@
 %union {
   char					*string;
   CExpression			*code;
-  CExpression			*expression;
   float					real;
   int					integer;
   CList<CExpression *>	*array;
@@ -202,16 +201,16 @@
 %type<code>			slBreakStatement
 %type<code>			slContinueStatement
 %type<code>			slReturnStatement
-%type<expression>	slWhileStartStatement
+%type<code>			slWhileStartStatement
 %type<code>			slWhileStatement
 %type<code>			slUnmatchedWhileStatement
-%type<expression>	slAssignmentStatement
-%type<expression>	slUpdateStatement
+%type<code>			slAssignmentStatement
+%type<code>			slUpdateStatement
 %type<code>			slForStatement
 %type<code>			slUnmatchedForStatement
 %type<code>			slForInitStatement
 %type<code>			slForInitStatements
-%type<expression>	slForCheckStatement
+%type<code>			slForCheckStatement
 %type<code>			slForIncrementStatement
 %type<code>			slForIncrementStatements
 %type<code>			slMatchedIfStatement
@@ -228,19 +227,20 @@
 %type<code>			slUnmatchedSolarStatement
 %type<array>		slArrayItems
 %type<array>		slArrayList
-%type<expression>	slAritmeticExpression
-%type<expression>	slAritmeticTerminalValue
-%type<expression>	slAritmeticTypeCast
-%type<expression>	slBooleanExpression
-%type<expression>	slFunctionCall
+%type<code>			slAritmeticExpression
+%type<code>			slAritmeticTerminalValue
+%type<code>			slAritmeticTypeCast
+%type<code>			slVectorMatrixExpression
+%type<code>			slVMExpression
+%type<code>			slBooleanExpression
+%type<code>			slFunctionCall
 %type<code>			slFunctionCallParameters
 %type<string>		slFunCallHeader
-%type<expression>	slFunCall
+%type<code>			slFunCall
 %type<string>		slTextureName
 %type<string>		slTextureCall
 %type<code>			slTextureNameSpecifier
 %type<code>			slTextureChannelSpecifier
-%expect				12
 %%
 slStart:		
 		////////////////////////////////////////////////
@@ -1284,7 +1284,7 @@ slReturnStatement:
 			}
 		}
 		;
-
+		
 
 		////////////////////////////////////////////////
 		// While statement
@@ -2163,9 +2163,13 @@ slAritmeticExpression:
 	|
 		slAritmeticExpression
 		SL_CROSS
+		{
+			sdr->desire(SLC_VECTOR | SLC_VVECTOR);
+		}
 		slAritmeticExpression
 		{
-			$$	=	new CBinaryExpression(SLC_VECTOR,opcodeCrossProduct,getConversion(SLC_VECTOR,$1),getConversion(SLC_VECTOR,$3));
+			sdr->undesire();
+			$$	=	new CBinaryExpression(SLC_VECTOR,opcodeCrossProduct,getConversion(SLC_VECTOR,$1),getConversion(SLC_VECTOR,$4));
 		}
 	|
 		SL_PLUS
@@ -2248,6 +2252,21 @@ slAritmeticTerminalValue:
 			$$	=	$1;
 		}
 	|
+		slTypeDecl
+		slFunctionCall
+		{
+			$$	=	getConversion($1,$2);
+			sdr->undesire();
+		}
+	|
+		slTypeDecl
+		SL_TEXT_VALUE
+		slFunctionCall
+		{
+			$$	=	getConversion($1,$2,$3);
+			sdr->undesire();
+		}
+	|
 		SL_IDENTIFIER_VALUE
 		{
 	
@@ -2259,6 +2278,22 @@ slAritmeticTerminalValue:
 			} else { 
 				$$	=	new CTerminalExpression(cVar);
 			}
+		}
+	|
+		slTypeDecl
+		SL_IDENTIFIER_VALUE
+		{
+	
+			CVariable	*cVar	=	sdr->getVariable($2);
+
+			if (cVar == NULL) {
+				sdr->error("Identifier %s not found\n",$2);
+				$$	=	new CNullExpression;
+			} else { 
+				$$	=	getConversion($1,new CTerminalExpression(cVar));
+			}
+			
+			sdr->undesire();
 		}
 	|
 		SL_IDENTIFIER_VALUE
@@ -2313,73 +2348,6 @@ slAritmeticTerminalValue:
 	|
 		SL_OPEN_PARANTHESIS
 		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		{
-			$$	=	new CVectorExpression($2,$4,$6);
-		}
-	|
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		{
-			CExpression	*elements[16];
-
-			elements[0]		=	$2;
-			elements[1]		=	$4;
-			elements[2]		=	$6;
-			elements[3]		=	$8;
-			elements[4]		=	$10;
-			elements[5]		=	$12;
-			elements[6]		=	$14;
-			elements[7]		=	$16;
-			elements[8]		=	$18;
-			elements[9]		=	$20;
-			elements[10]	=	$22;
-			elements[11]	=	$24;
-			elements[12]	=	$26;
-			elements[13]	=	$28;
-			elements[14]	=	$30;
-			elements[15]	=	$32;
-
-			$$				=	new CMatrixExpression(elements);
-		}
-	|
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
 		SL_CLOSE_PARANTHESIS
 		{	
 			$$	=	$2;
@@ -2390,22 +2358,116 @@ slAritmeticTerminalValue:
 
 slAritmeticTypeCast:
 		slTypeDecl
-		slAritmeticExpression
+		SL_TEXT_VALUE
 		{
-			$$	=	getConversion($1,$2);
-			
+			// Change the expected type to float
+			sdr->undesire();
+			sdr->desire(SLC_FLOAT | ($1 & (~(SLC_TYPE_MASK | SLC_SUB_TYPE_MASK))));
+		}
+		slVectorMatrixExpression
+		{
+			$$	=	getConversion($1,$2,$4);
+
 			sdr->undesire();
 		}
 	|
 		slTypeDecl
-		SL_TEXT_VALUE
-		slAritmeticExpression
 		{
-			$$	=	getConversion($1,$2,$3);
+			// Change the expected type to float
+			sdr->undesire();
+			sdr->desire(SLC_FLOAT | ($1 & (~(SLC_TYPE_MASK | SLC_SUB_TYPE_MASK))));
+		}
+		slVectorMatrixExpression
+		{
+			$$	=	getConversion($1,$3);
 
 			sdr->undesire();
 		}
+	|
+		slVectorMatrixExpression
+		{
+			$$	=	$1;
+		}
 		;
+		
+slVectorMatrixExpression:
+		SL_OPEN_PARANTHESIS
+		slVMExpression
+		SL_CLOSE_PARANTHESIS
+		{
+			$$	=	$2;
+		}
+		;
+	
+		
+slVMExpression:
+		slAritmeticExpression
+		{
+			$$	=	$1;
+		}
+	|
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		{
+			$$	=	new CVectorExpression($1,$3,$5);
+		}
+	|
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		SL_COMMA
+		slAritmeticExpression
+		{
+			CExpression	*elements[16];
+
+			elements[0]		=	$1;
+			elements[1]		=	$3;
+			elements[2]		=	$5;
+			elements[3]		=	$7;
+			elements[4]		=	$9;
+			elements[5]		=	$11;
+			elements[6]		=	$13;
+			elements[7]		=	$15;
+			elements[8]		=	$17;
+			elements[9]		=	$19;
+			elements[10]	=	$21;
+			elements[11]	=	$23;
+			elements[12]	=	$25;
+			elements[13]	=	$27;
+			elements[14]	=	$29;
+			elements[15]	=	$31;
+
+			$$				=	new CMatrixExpression(elements);
+		}
 		
 slBooleanExpression:
 		SL_OPEN_PARANTHESIS
@@ -2518,7 +2580,6 @@ slFunctionCall:
 
 			// Restore the old parameters
 			sdr->actualParameters		=	sdr->actualParameterStack->pop();
-
 
 			// Check the builtin functions
 			for (cFun = sdr->builtinFunctions->first(); cFun != NULL; cFun = sdr->builtinFunctions->next()) {

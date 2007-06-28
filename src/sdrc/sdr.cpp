@@ -516,6 +516,10 @@ int			CFunctionPrototype::perfectMatch(char *name,CList<CExpression *> *pl,int d
 	// Names should match exactly
 	if (strcmp(name,symbolName) != 0) return FALSE;
 
+	if (strcmp(name,"shadow") == 0) {
+		int	y	=	1;
+	}
+
 	// Check the return values
 	if (!(dt & SLC_NONE)) {
 		if (prototype[0] == 'o') return FALSE;
@@ -539,6 +543,7 @@ int			CFunctionPrototype::perfectMatch(char *name,CList<CExpression *> *pl,int d
 	// Invalid prototype ?
 	if (prototype[1] != '=') return FALSE;
 
+	bool parameterList	=	false;
 	for (cPrototype = 2,cCode = pl->first(); (cCode != NULL) && (prototype[cPrototype] != '\0'); cCode = pl->next(),cPrototype++) {
 		if (prototype[cPrototype] == '.') {
 				continue;
@@ -558,11 +563,14 @@ int			CFunctionPrototype::perfectMatch(char *name,CList<CExpression *> *pl,int d
 			continue;
 		} else if (prototype[cPrototype] == '!') {
 			// Extract the parameter list
-			if (cCode->type & SLC_STRING) {
-				cCode	=	pl->next();
-				cPrototype--;
-				continue;
-			} else return FALSE;
+			// NOTE: We usually expect string - value pairs, but we will not do a strict check
+			if (parameterList == false) {
+				parameterList	=	true;
+				if ((cCode->type & SLC_STRING)	== 0)	return FALSE;
+			}
+			cCode	=	pl->next();
+			cPrototype--;
+			continue;
 		} else return FALSE;
 
 		return FALSE;
@@ -600,6 +608,7 @@ int			CFunctionPrototype::match(char *name,CList<CExpression *> *pl,int dt) {
 	// Invalid prototype ?
 	if (prototype[1] != '=') return FALSE;
 
+	bool parameterList = false;
 	for (cPrototype = 2,cCode = pl->first(); (cCode != NULL) && (prototype[cPrototype] != '\0'); cCode = pl->next(),cPrototype++) {
 		if (prototype[cPrototype] == '.') {
 			continue;
@@ -629,11 +638,14 @@ int			CFunctionPrototype::match(char *name,CList<CExpression *> *pl,int dt) {
 			continue;
 		} else if (prototype[cPrototype] == '!') {
 			// Extract the parameter list
-			if (cCode->type & SLC_STRING) {
-				cCode	=	pl->next();
-				cPrototype--;
-				continue;
-			} else return FALSE;
+			// NOTE: We usually expect string - value pairs, but we will not do a strict check
+			if (parameterList == false) {
+				parameterList	=	true;
+				if ((cCode->type & SLC_STRING)	== 0)	return FALSE;
+			}
+			cCode	=	pl->next();
+			cPrototype--;
+			continue;
 		} else {
 			return FALSE;
 		}
@@ -1653,11 +1665,11 @@ void		CScriptContext::warning(char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 
-	sprintf(tmp,"%s(%d) : warning : %s",sourceFile,statementLineNo,mes);
+	compileWarning++;
 
 	if (settings & COMPILER_SURPRESS_WARNINGS) return;
 
-	compileWarning++;
+	sprintf(tmp,"%s(%d) : warning : %s",sourceFile,statementLineNo,mes);
 
 	va_start(args,mes);
 	vprintf(tmp,args);
