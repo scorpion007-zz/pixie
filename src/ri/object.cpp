@@ -409,13 +409,25 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	   }
 	} else {	// non raster oriented
 	   vector tmp;
-	   
-	   float maxDim = CRenderer::invImagePlane*max(CRenderer::dPixeldx,CRenderer::dPixeldy);
-	   						
-	   for (j=0;j<(vdiv+1)*(udiv+1);j++) {
-	      mulvf(P+j*3,maxDim);
-	   }
 
+	   float maxDim = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
+	   	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
+			for (j=0;j<(vdiv+1)*(udiv+1);j++) {
+				float x,y;
+				x	=	(CRenderer::imagePlane*P[j*3+COMP_X]/P[j*3+COMP_Z]);
+				y	=	(CRenderer::imagePlane*P[j*3+COMP_Y]/P[j*3+COMP_Z]);
+				initv(tmp,x-P[j*3+COMP_X],y-P[j*3+COMP_Y],P[j*3+COMP_Z]-1);
+				P[j*3+COMP_X]	=	x*maxDim;
+				P[j*3+COMP_Y]	=	y*maxDim;
+				P[j*3+COMP_Z]	=	lengthv(tmp)*maxDim;
+			}
+		} else {
+			for (j=0;j<(vdiv+1)*(udiv+1);j++) {
+				P[j*3+COMP_X]	=	P[j*3+COMP_X]*CRenderer::dPixeldx;
+				P[j*3+COMP_Y]	=	P[j*3+COMP_Y]*CRenderer::dPixeldy;
+				P[j*3+COMP_Z]	*=	maxDim;
+			}
+		}
 
 	   // U stats
 	   cP  =   P;
