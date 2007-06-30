@@ -282,6 +282,7 @@ COptions::COptions() {
 	depthQuantizer[4]		=	0;
 
 	initv(opacityThreshold,0.996f);
+	initv(zvisibilityThreshold,0.996f);
 	
 	// We default to sampling motion, but this can be turned off.
 	// Additionally, if there's no motionblur in the scene, it will be turned off

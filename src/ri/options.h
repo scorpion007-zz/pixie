@@ -192,6 +192,7 @@ public:
 	float						depthQuantizer[5];
 
 	vector						opacityThreshold;								// The opacity threshold
+	vector						zvisibilityThreshold;							// The visibility threshold for z files and noncomp aovs
 	
 	CDisplay					*displays;										// List of displays to send the output
 

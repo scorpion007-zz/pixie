@@ -66,12 +66,17 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 		}
 	}
 // FIXME: lookup the channel's quantizer
+// FIXME: depth quantizer for z
 	// Otherwise, we respect Quantize applied to the current display,
 	// falling back on the default color / depth quantizer
 	if (strcmp(name,"quantize") == 0) {
 		if ((numItems == 4) && (type == FLOAT_PARAMETER))	{
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CRenderer::colorQuantizer;
+				if (!strcmp(currentDisplay->outSamples,"z")) {
+					return	CRenderer::depthQuantizer;
+				} else {
+					return	CRenderer::colorQuantizer;
+				}
 			} else {
 				return	currentDisplay->quantizer;
 			}
@@ -79,7 +84,11 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 	} else if (strcmp(name,"dither") == 0) {
 		if ((numItems == 1) && (type == FLOAT_PARAMETER)) {
 			if (currentDisplay->quantizer[0] == -1) {
-				return	CRenderer::colorQuantizer + 4;
+				if (!strcmp(currentDisplay->outSamples,"z")) {
+					return	CRenderer::depthQuantizer + 4;
+				} else {
+					return	CRenderer::colorQuantizer + 4;
+				}
 			} else {
 				return	currentDisplay->quantizer + 4;
 			}
@@ -102,6 +111,44 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 
 	return	NULL;
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	getAOVFilter
+// Description			:	Return the name matching the filter
+// Return Value			:
+// Comments				:
+int	CRenderer::getAOVFilter(const char *name) {
+	if (strcmp(name,RI_ZMIN) == 0) {
+		return	AOV_FILTER_ZMIN;
+	} else if (strcmp(name,RI_ZMAX) == 0) {
+		return AOV_FILTER_ZMAX;
+	} else if (strcmp(name,RI_MIN) == 0) {
+		return	AOV_FILTER_MIN;
+	} else if (strcmp(name,RI_MAX) == 0) {
+		return AOV_FILTER_MAX;
+	} else if (strcmp(name,RI_AVERAGE) == 0) {
+		return AOV_FILTER_AVERAGE;
+	} else if (strcmp(name,RI_GAUSSIANFILTER) == 0) {
+		return	AOV_FILTER_GAUSSIAN;
+	} else if (strcmp(name,RI_BOXFILTER) == 0) {
+		return	AOV_FILTER_BOX;
+	} else if (strcmp(name,RI_TRIANGLEFILTER) == 0) {
+		return	AOV_FILTER_TRIANGLE;
+	} else if (strcmp(name,RI_SINCFILTER) == 0) {
+		return	AOV_FILTER_SINC;
+	} else if (strcmp(name,RI_CATMULLROMFILTER) == 0) {
+		return	AOV_FILTER_CATMULLROM;
+	} else if (strcmp(name,RI_BLACKMANHARRISFILTER) == 0) {
+		return	AOV_FILTER_BLACKMANHARRIS;
+	} else if (strcmp(name,RI_MITCHELLFILTER) == 0) {
+		return	AOV_FILTER_MITCHELL;
+	}
+
+	error(CODE_BADTOKEN,"Unknown AOV filter type: \"%s\" \n",name);
+	return	AOV_FILTER_DEFAULT;
+}
+
 
 
 
@@ -729,8 +776,8 @@ void	CRenderer::computeDisplayData() {
 	
 	sampleOrder				=	new int[numExtraChannels*2];	// variableEntry,numSamples
 	sampleDefaults			=	new float[numExtraSamples];
-	compChannelOrder		=	new int[numExtraChannels*3];	// offset,numSamples,matteMode
-	nonCompChannelOrder		=	new int[numExtraChannels*3];
+	compChannelOrder		=	new int[numExtraChannels*4];	// offset,numSamples,matteMode,variableEntry
+	nonCompChannelOrder		=	new int[numExtraChannels*4];
 	numExtraCompChannels	=	0;
 	numExtraNonCompChannels	=	0;
 	
@@ -752,23 +799,24 @@ void	CRenderer::computeDisplayData() {
 			sampleOrder[k++] = datas[i].channels[j].outType;
 			sampleOrder[k++] = datas[i].channels[j].numSamples;
 
-			if (datas[i].channels[j].variable != NULL) {
-				if (datas[i].channels[j].variable->type == TYPE_COLOR) {
-// FIXME: this logic should cope with user filter choice
-					compChannelOrder[numExtraCompChannels*3]			= sampleOffset;
-					compChannelOrder[numExtraCompChannels*3+1]			= datas[i].channels[j].numSamples;
-					compChannelOrder[numExtraCompChannels*3+2]			= datas[i].channels[j].matteMode;
-					numExtraCompChannels++;
-				} else {
-					nonCompChannelOrder[numExtraNonCompChannels*3]		= sampleOffset;
-					nonCompChannelOrder[numExtraNonCompChannels*3+1] 	= datas[i].channels[j].numSamples;
-					nonCompChannelOrder[numExtraNonCompChannels*3+2] 	= datas[i].channels[j].matteMode;
-					numExtraNonCompChannels++;
-				}
+			if (datas[i].channels[j].filterType > AOV_FILTER_SPECIALFILTERS) {
+				// verify it matches the main pixel filter
+				
+			}
+			
+			// _only_ color can be composited
+			if ((datas[i].channels[j].variable->type == TYPE_COLOR) && (datas[i].channels[j].filterType == AOV_FILTER_DEFAULT)) {
+// FIXME: this logic should cope with user filter choice					
+				compChannelOrder[numExtraCompChannels*4+0]			= sampleOffset;
+				compChannelOrder[numExtraCompChannels*4+1]			= datas[i].channels[j].numSamples;
+				compChannelOrder[numExtraCompChannels*4+2]			= datas[i].channels[j].matteMode;
+				compChannelOrder[numExtraCompChannels*4+3]			= datas[i].channels[j].outType;
+				numExtraCompChannels++;
 			} else {
-				nonCompChannelOrder[numExtraNonCompChannels*3]			= sampleOffset;
-				nonCompChannelOrder[numExtraNonCompChannels*3+1]		= datas[i].channels[j].numSamples;
-				nonCompChannelOrder[numExtraNonCompChannels*3+2]		= datas[i].channels[j].matteMode;
+				nonCompChannelOrder[numExtraNonCompChannels*4+0]	= sampleOffset;
+				nonCompChannelOrder[numExtraNonCompChannels*4+1] 	= datas[i].channels[j].numSamples;
+				nonCompChannelOrder[numExtraNonCompChannels*4+2] 	= datas[i].channels[j].matteMode;
+				nonCompChannelOrder[numExtraNonCompChannels*4+3]	= datas[i].channels[j].outType;
 				numExtraNonCompChannels++;
 			}
 			

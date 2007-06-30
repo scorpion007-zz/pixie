@@ -103,11 +103,8 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 	const int	*cOrder	=	sampleOrder;
 	vector		t;
 	int			i,j,l,k = 5;
-	T32			one;
-	T32			*opacity;
 
-	one.real	=	(float) 1;
-
+// FIXME: make this deal with comp and non comp channels properly
 	if (depth == 0) {
 		// First hit
 		for (i=0;i<nr;i++,Ci+=3,Oi+=3) {
@@ -128,10 +125,9 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 				cRay->ropacity[2]	=	1-Oi[2];
 			}
 
-			opacity	=	(T32 *) Oi;
-			if (	(opacity[0].integer ^ one.integer) |
-					(opacity[1].integer ^ one.integer) |
-					(opacity[2].integer ^ one.integer)) {
+			 if ((Oi[0] < CRenderer::opacityThreshold[0]) ||
+			 	 (Oi[1] < CRenderer::opacityThreshold[1]) ||
+			 	 (Oi[2] < CRenderer::opacityThreshold[2])) {
 				rays[last++]	=	cRay;
 			} else {
 				movvv(cRay->samples,cRay->color);
@@ -200,9 +196,9 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 		for (i=0;i<nr;i++,Ci+=3,Oi+=3) {
 			CPrimaryRay	*cRay		=	(CPrimaryRay *) r[i];
 
-			opacity	=	(T32 *) Oi;
-
-			const	int	transparent	=	(opacity[0].integer ^ one.integer) | (opacity[1].integer ^ one.integer) | (opacity[2].integer ^ one.integer);
+			const	int	transparent	= ( (Oi[0] < CRenderer::opacityThreshold[0]) ||
+								 		(Oi[1] < CRenderer::opacityThreshold[1]) ||
+								 		(Oi[2] < CRenderer::opacityThreshold[2]));
 
 			if (cRay->object->attributes->flags & ATTRIBUTES_FLAGS_MATTE) {
 				cRay->ropacity[0]	*=	1-Oi[0];

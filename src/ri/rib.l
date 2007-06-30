@@ -132,7 +132,7 @@ MotionBegin											return RIB_MOTION_BEGIN;
 MotionEnd											return RIB_MOTION_END;
 
 MakeTexture											return RIB_MAKE_TEXTURE;
-MakeTexture3D										return RIB_MAKE_TEXTURE3D;
+MakeBrickMap										return RIB_MAKE_BRICKMAP;
 MakeBump											return RIB_MAKE_BUMP;
 MakeLatLongEnvironment								return RIB_MAKE_LAT_LONG_ENVIRONMENT;
 MakeCubeFaceEnvironment								return RIB_MAKE_CUBE_FACE_ENVIRONMENT;

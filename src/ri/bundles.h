@@ -103,9 +103,6 @@ class	CGatherRay : public CRay {
 public:
 	int				*tags;			// The tag
 	int				index;			// The ray index (the ray number)
-
-	vector			gatherDir;		// Gather direction
-	vector			dPdu,dPdv,P;	// The ray origin info
 };
 
 
@@ -132,6 +129,14 @@ public:
 	CGatherLookup	*lookup;				// The parameters for this bundle
 	int				numMisses;				// The number of missed rays
 	int				remainingSamples;		// The number of remaining samples
+	
+	// uniform data
+	int				numSamples;				// The number of samples
+	// varying data
+	const float		*coneAngles;			// The cone angle
+	const float		*gatherDir;				// Gather direction
+	const float		*dPdu,*dPdv,*P;			// The ray origin info
+
 };
 
 

@@ -38,7 +38,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	CTextureLookup	*lookup;										\
+#define	TRANSMISSIONEXPR_PRE	CTextureLookup			*lookup;								\
+								CVaryingTextureLookup	varyingLookup;							\
+								varyingLookup.init();											\
 								osLock(CRenderer::shaderMutex);									\
 								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {		\
 									int			numArguments;									\
@@ -46,6 +48,8 @@
 									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);					\
 								}																\
 								osUnlock(CRenderer::shaderMutex);								\
+								getUniformParams(lookup,varyingLookup);							\
+								initVaryingParams(lookup);										\
 								CTraceLocation	*rays	=	(CTraceLocation *)	ralloc(numVertices*sizeof(CTraceLocation),threadMemory);	\
 								float			*dFdu	=	(float *)			ralloc(numVertices*12*sizeof(float),threadMemory);			\
 								float			*dFdv	=	dFdu + numVertices*3;				\
@@ -66,7 +70,8 @@
 								int				numRays	=	0;
 
 
-#define	TRANSMISSIONEXPR		rays->res	=	res;			\
+#define	TRANSMISSIONEXPR		getVaryingParams(lookup,varyingLookup);		\
+								rays->res	=	res;			\
 								movvv(rays->P,op1);				\
 								mulvf(rays->dPdu,dFdu,*du);		\
 								mulvf(rays->dPdv,dFdv,*dv);		\
@@ -74,6 +79,7 @@
 								mulvf(rays->dDdu,dTdu,*du);		\
 								mulvf(rays->dDdv,dTdv,*dv);		\
 								movvv(rays->N,N);				\
+								rays->coneAngle = varyingLookup.coneAngle;	\
 								rays++;							\
 								numRays++;
 
@@ -86,12 +92,13 @@
 								dTdu	+=	3;					\
 								dTdv	+=	3;					\
 								N		+=	3;					\
-								du++;	dv++;
+								du++;	dv++;					\
+								stepVaryingParams(lookup);
 
 // Actually compule the transmission color
 #define	TRANSMISSIONEXPR_POST	if (numRays > 0) {				\
 									rays	-=	numRays;		\
-									traceTransmission(numRays,rays,lookup,FALSE);						\
+									traceTransmission(numRays,rays,lookup,&varyingLookup,FALSE);		\
 									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
 									expandVector(res);			\
 								}
@@ -100,7 +107,7 @@
 // Just check whether there's smtg between the end points
 #define	VISIBILITYEXPR_POST		if (numRays > 0) {				\
 									rays	-=	numRays;		\
-									traceTransmission(numRays,rays,lookup,TRUE);									\
+									traceTransmission(numRays,rays,lookup,&varyingLookup,TRUE);						\
 									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
 									expandFloat(res);			\
 								}
@@ -135,7 +142,7 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 // Do a full raytrace
 #define	TRACEEXPR_POST			if (numRays > 0) {													\
 									rays	-=	numRays;											\
-									traceReflection(numRays,rays,lookup,FALSE);						\
+									traceReflection(numRays,rays,lookup,&varyingLookup,FALSE);		\
 									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);	\
 									expandVector(res);												\
 								}
@@ -143,7 +150,7 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 // Just compute the nearest intersection
 #define	TRACE2EXPR_POST			if (numRays > 0) {													\
 									rays	-=	numRays;											\
-									traceReflection(numRays,rays,lookup,TRUE);						\
+									traceReflection(numRays,rays,lookup,&varyingLookup,TRUE);		\
 									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;	\
 									expandFloat(res);												\
 								}
@@ -359,10 +366,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lookup->outputs			=	NULL;													\
 								lookup->nonShadeOutputs	=	NULL;													\
 								lookup->category		=	"irradiance";											\
-								lookup->numSamples		=	1;														\
 								lookup->bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
-								lookup->coneAngle		=	(float) (C_PI/2.0);										\
-								lookup->da				=	min(tanf(lookup->coneAngle),DEFAULT_RAY_DA);			\
 								lookup->maxDist			=	C_INFINITY;												\
 								lookup->maxRayDepth		=	CRenderer::maxRayDepth;									\
 								lookup->label			=	rayLabelGather;											\
@@ -382,12 +386,9 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 										if (strcmp(*param,"bias") == 0) {											\
 											lookup->bias		=	valf[0];										\
 										} else if (strcmp(*param,"blur") == 0) {									\
-											lookup->coneAngle	=	(float) (C_PI*valf[0]/2.0);						\
+											/*lookup->coneAngle	=	(float) (C_PI*valf[0]/2.0);*/					\
 										} else if (strcmp(*param,"maxdist") == 0) {									\
 											lookup->maxDist		=	valf[0];										\
-										} else if (strcmp(*param,"samplecone") == 0) {								\
-											lookup->coneAngle	=	valf[0];										\
-											lookup->da			=	min(tanf(lookup->coneAngle),DEFAULT_RAY_DA);	\
 										} else if (strcmp(*param,"label") == 0) {									\
 											lookup->label		=	*vals;											\
 										} else if (strcmp(*param,"distribution") == 0) {							\
@@ -413,27 +414,38 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 #define	GATHERHEADEREXPR_PRE	CGatherLookup	*lookup;															\
 								osLock(CRenderer::shaderMutex);														\
 								if ((lookup = (CGatherLookup *) parameterlist) == NULL) {							\
-									const float		*samples,*sampleCone;											\
 									int				numArguments;													\
 									const char		**category;														\
 									argumentcount(numArguments);													\
 									GATHERPARAMETERS(5,(numArguments-5) >> 1);										\
 									operand(0,category,const char **);												\
-									operand(3,sampleCone,float *);													\
-									operand(4,samples,float *);														\
-									lookup->numSamples				=	(int) *samples;								\
-									lookup->coneAngle				=	min(tanf(*sampleCone),1.0f);				\
 								}																					\
 								osUnlock(CRenderer::shaderMutex);													\
 																													\
+								const float		*samples,*sampleCone;												\
+								const float		*P,*D;																\
+								operand(3,sampleCone,float *);														\
+								operand(4,samples,float *);															\
+								operand(1,P,const float *);															\
+								operand(2,D,const float *);															\
+								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);		\
+								float	*dPdv	=	dPdu + numVertices*3;											\
+								duVector(dPdu,P);																	\
+								dvVector(dPdv,P);																	\
 																													\
 								lastGather							=	new CGatherBundle;							\
 								lastGather->outputs					=	(float **) ralloc((lookup->numOutputs + lookup->numNonShadeOutputs)*sizeof(float *),threadMemory);	\
 								lastGather->nonShadeOutputs			=	lastGather->outputs + lookup->numOutputs;	\
 								lastGather->lookup					=	lookup;										\
-								lastGather->remainingSamples		=	lookup->numSamples;							\
+								lastGather->remainingSamples		=	(int) *samples;								\
 								lastGather->numMisses				=	0;											\
 								lastGather->label					=	lookup->label;								\
+								lastGather->coneAngles				=	sampleCone;									\
+								lastGather->numSamples				=	(int) *samples;								\
+								lastGather->dPdu					=	dPdu;										\
+								lastGather->dPdv					=	dPdv;										\
+								lastGather->P						=	P;											\
+								lastGather->gatherDir				=	D;											\
 																													\
 								CGatherVariable	*var;																\
 								int				cOutput;															\
@@ -446,13 +458,6 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 									operand(var->destIndex,lastGather->nonShadeOutputs[cOutput],float *);			\
 								}																					\
 																													\
-								const float *P,*N;																	\
-								operand(1,P,const float *);															\
-								operand(2,N,const float *);															\
-								float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);		\
-								float	*dPdv	=	dPdu + numVertices*3;											\
-								duVector(dPdu,P);																	\
-								dvVector(dPdv,P);																	\
 								const float	*du	=	varying[VARIABLE_DU];											\
 								const float	*dv	=	varying[VARIABLE_DV];											\
 																													\
@@ -463,18 +468,15 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								
 
 
-#define GATHERHEADEREXPR		movvv(rays->P,P);																	\
-								mulvf(rays->dPdu,dPdu,*du);															\
-								mulvf(rays->dPdv,dPdv,*dv);															\
-								movvv(rays->gatherDir,N);															\
-								rays->da	=	lookup->da;															\
-								rays->db	=	(lengthv(rays->dPdu) + lengthv(rays->dPdv))*0.5f;
+#define GATHERHEADEREXPR		mulvf(dPdu,*du);																	\
+								mulvf(dPdv,*dv);																	\
+								rays->da	=	min(max(tanf(*sampleCone),0.0f),1.0f);								\
+								rays->db	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f;
 
-#define GATHERHEADEREXPR_UPDATE	P		+=	3;																		\
-								N		+=	3;																		\
-								dPdu	+=	3;																		\
+#define GATHERHEADEREXPR_UPDATE	dPdu	+=	3;																		\
 								dPdv	+=	3;																		\
 								du++; dv++;																			\
+								sampleCone++;																		\
 								rays++;
 
 #else

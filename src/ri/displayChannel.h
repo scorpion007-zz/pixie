@@ -34,6 +34,26 @@
 #include "common/os.h"
 #include "variable.h"
 
+// This is the AOV filter type
+typedef enum {
+	AOV_FILTER_DEFAULT,			// Use RiPixelFilter
+	AOV_FILTER_ZMIN,
+	AOV_FILTER_ZMAX,
+	AOV_FILTER_MIN,
+	AOV_FILTER_MAX,
+	AOV_FILTER_AVERAGE,
+	
+	AOV_FILTER_SPECIALFILTERS = AOV_FILTER_AVERAGE,
+	
+	AOV_FILTER_GAUSSIAN,		// standard pixel filter types
+	AOV_FILTER_BOX,
+	AOV_FILTER_TRIANGLE,
+	AOV_FILTER_SINC,
+	AOV_FILTER_CATMULLROM,
+	AOV_FILTER_BLACKMANHARRIS,
+	AOV_FILTER_MITCHELL
+} EAOVFilter;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplayChannel
 // Description			:	Holds information on a display channel

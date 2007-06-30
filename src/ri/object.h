@@ -54,6 +54,7 @@ const unsigned int	OBJECT_DUMMY				=	1;	// Set if the object is a dummy object
 const unsigned int	OBJECT_TESSELATION			=	2;	// Set if the object is an intermediate tesselation
 const unsigned int	OBJECT_MOVING_TESSELATION	=	4;	// Set if the object is an intermediate tesselation which is moving
 const unsigned int	OBJECT_HIERARCHY_READY		=	8;	// Set if the children pointer is processed
+const unsigned int	OBJECT_TERMINAL_TESSELATION	=	16;	// Set if the object should not be further tesselated
 
 
 ///////////////////////////////////////////////////////////////////////

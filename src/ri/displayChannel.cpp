@@ -45,6 +45,7 @@ CDisplayChannel::CDisplayChannel() {
 	outType			=	-1;
 	fill			=	NULL;
 	matteMode		=	1;		// Respect mattes
+	filterType		=	AOV_FILTER_DEFAULT;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -69,5 +70,6 @@ CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int
 	outType		=	entry;
 	fill		=	NULL;
 	matteMode	=	1;		// Respect mattes
+	filterType	=	AOV_FILTER_DEFAULT;
 }
 

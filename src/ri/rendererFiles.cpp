@@ -211,9 +211,9 @@ public:
 						CDummyTexture(const char *name) : CTexture(name) {}
 						~CDummyTexture() {}
 
-	float				lookupz(float u,float v,float z,const CTextureLookup *lookup,CShadingContext *context)						{ return 0;	}
-	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup,CShadingContext *context)					{ initv(dest,lookup->fill);	}
-	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context)	{ initv(dest,lookup->fill);	}
+	float				lookupz(float u,float v,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)						{ return 0;	}
+	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)					{ initv(dest,lookup->fill);	}
+	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)		{ initv(dest,lookup->fill);	}
 	};
 
 
@@ -226,7 +226,7 @@ public:
 						CDummyEnvironment(const char *name) : CEnvironment(name) {}
 						~CDummyEnvironment() {}
 						
-	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) { initv(dest,lookup->fill);	}
+	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) { initv(dest,lookup->fill);	}
 };
 
 
@@ -606,8 +606,6 @@ char					*CRenderer::getFilter(RtFilterFunc func) {
 
 	return	RI_GAUSSIANFILTER;
 }
-
-
 
 
 

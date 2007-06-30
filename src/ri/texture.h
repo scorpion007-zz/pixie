@@ -40,6 +40,7 @@
 
 
 class	CShadingContext;
+class	CVaryingTextureLookup;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureInfoBase
@@ -72,9 +73,9 @@ public:
 							stats.numTextures--;
 						}
 
-	virtual float		lookupz(float u,float v,float z,const CTextureLookup *lookup,CShadingContext *context)						=	0;
-	virtual	void		lookup(float *dest,float u,float v,const CTextureLookup *lookup,CShadingContext *context)					=	0;
-	virtual	void		lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context)	=	0;
+	virtual float		lookupz(float u,float v,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)						=	0;
+	virtual	void		lookup(float *dest,float u,float v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)					=	0;
+	virtual	void		lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)	=	0;
 	
 	// textureinfo support
 	void				getResolution(float *r)		{ r[0] = 0; r[1] = 0; }
@@ -101,7 +102,7 @@ public:
 							stats.numEnvironments--;
 						}
 
-	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context)	=	0;
+	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)	=	0;
 	
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = 0; r[1] = 0; }

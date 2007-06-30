@@ -34,10 +34,16 @@
 //	gather <else>
 #ifndef INIT_SHADING
 #define	GATHEREXPR_PRE		const int	numRealVertices	=	currentShadingState->numRealVertices;	\
-							CGatherRay	*raysBase		=	lastGather->raysBase;					\
-							CGatherRay	**rays			=	(CGatherRay **) lastGather->raysStorage;\
+							CGatherRay		*raysBase	=	lastGather->raysBase;					\
+							CGatherRay		**rays		=	(CGatherRay **) lastGather->raysStorage;\
 							CGatherLookup	*lookup		=	lastGather->lookup;						\
-							float		*N				=	varying[VARIABLE_N];					\
+							const float 	numSamples	=	(float) lastGather->numSamples;			\
+							const float 	*coneAngle	=	lastGather->coneAngles;					\
+							const float		*dPdu		=	lastGather->dPdu;						\
+							const float		*dPdv		=	lastGather->dPdv;						\
+							const float		*P			=	lastGather->P;							\
+							const float		*D			=	lastGather->gatherDir;					\
+							const float		*N				=	varying[VARIABLE_N];				\
 							int			numIntRays		=	0;										\
 							int			numExtRays		=	0;										\
 							int			i;															\
@@ -46,20 +52,20 @@
 									tags[i]++;														\
 								} else {															\
 									vector	tmp0,tmp1;												\
-									mulvf(tmp0,raysBase->dPdu,lookup->sampleBase*(urand() - 0.5f));	\
-									mulvf(tmp1,raysBase->dPdv,lookup->sampleBase*(urand() - 0.5f));	\
+									mulvf(tmp0,dPdu,lookup->sampleBase*(urand() - 0.5f));			\
+									mulvf(tmp1,dPdv,lookup->sampleBase*(urand() - 0.5f));			\
 									addvv(raysBase->from,tmp0,tmp1);								\
-									addvv(raysBase->from,raysBase->P);								\
+									addvv(raysBase->from,P);										\
 																									\
 									if (lookup->uniformDist) {										\
-										sampleHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,random4d);	\
+										sampleHemisphere(raysBase->dir,D,*coneAngle,random4d);		\
 									} else {														\
-										sampleCosineHemisphere(raysBase->dir,raysBase->gatherDir,lookup->coneAngle,random4d);	\
+										sampleCosineHemisphere(raysBase->dir,D,*coneAngle,random4d);\
 									}																\
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	lookup->bias;								\
 									raysBase->t		=	lookup->maxDist;							\
-									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / (float) lookup->numSamples;	\
+									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / numSamples;	\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;				\
 									raysBase->tags	=	&tags[i];									\
 									if (dotvv(raysBase->dir,N) > 0) {								\
@@ -68,7 +74,12 @@
 										rays[numRealVertices-1-numIntRays++] = raysBase++;			\
 									}																\
 								}																	\
-								N	+=	3;															\
+								coneAngle++;														\
+								dPdu	+=	3;														\
+								dPdv	+=	3;														\
+								P		+=	3;														\
+								D		+=	3;														\
+								N		+=	3;														\
 							}																		\
 							if ( (numIntRays+numExtRays) > 0 ) {									\
 								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\

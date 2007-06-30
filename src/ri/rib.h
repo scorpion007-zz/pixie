@@ -31,7 +31,7 @@
 #ifndef RIB_H
 #define RIB_H
 
-void	ribParse(const char *,void (*callback)(const char *));
+void	ribParse(const char *,void (*callback)(const char *,...));
 void	parserCleanup();
 
 #endif

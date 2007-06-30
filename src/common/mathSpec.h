@@ -556,7 +556,28 @@ inline	void	fresnel(const SCALAR_TYPE *I,const SCALAR_TYPE *N,SCALAR_TYPE eta,SC
 	refract(T,I,N,eta);
 }
 
+inline SCALAR_TYPE ptlined(SCALAR_TYPE *A,SCALAR_TYPE *B,SCALAR_TYPE *P) {
+	SCALAR_TYPE vtmp[3],vtmp2[3],vtmp3[3];
+	float l;
 
+	subvv(vtmp,P,B);
+	subvv(vtmp2,A,B);
+	if (dotvv(vtmp,vtmp2) <= 0) {
+		l	=	sqrtf(dotvv(vtmp,vtmp));
+	} else {
+		mulvf(vtmp2,-1);
+		subvv(vtmp,P,A);
+		if (dotvv(vtmp,vtmp2) <= 0) {
+			l = sqrtf(dotvv(vtmp,vtmp));
+		} else {
+			subvv(vtmp,B,A);
+			subvv(vtmp2,B,P);
+			crossvv(vtmp3,vtmp,vtmp2);
+			l = sqrtf(dotvv(vtmp3,vtmp3))/sqrtf(dotvv(vtmp,vtmp));
+		}
+	}
+	return l;
+}
 
 
 

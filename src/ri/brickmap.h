@@ -164,6 +164,44 @@ public:
 										return NULL;
 									}
 								}
+								
+								///////////////////////////////////////////////////////////////////////
+								// Class				:	CBrickMap
+								// Method				:	checkBrick
+								// Description			:	Locate a brick given it's spatial index
+								// Return Value			:	TRUE if found
+								// Comments				:
+			inline	int			checkBrick(int x,int y,int z,int d,CBrickNode **n) {
+									int			key		=	(x + y + z + d) & (BRICK_HASHSIZE-1);	// FIXME: this is a horrible key
+									CBrickNode	*cNode	=	activeBricks[key];
+
+									// Find the brick in the hash if exists
+									for (;cNode!=NULL;cNode=cNode->next) {
+										if (!(	(x ^ cNode->x) |
+												(y ^ cNode->y) |
+												(z ^ cNode->z) |
+												(d ^ cNode->d))) {
+
+											assert(x == cNode->x);
+											assert(y == cNode->y);
+											assert(z == cNode->z);
+											assert(d == cNode->d);
+
+											// We found the node, make sure the brick is in memory
+											if (cNode->brick == NULL) {
+												assert(cNode->fileIndex != -1);
+												cNode->brick = loadBrick(cNode->fileIndex);
+											} else {
+												stats.numBrickmapCacheHits++;
+											}
+
+											if (n != NULL) *n = cNode;
+											
+											return TRUE;
+										}
+									}
+									return FALSE;
+								}
 
 			void				lookup(float *data,const float *P,const float *N,float dP);
 			void				lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *) {	assert(FALSE);	}
@@ -216,7 +254,7 @@ protected:
 
 
 
-void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params);
+void	makeBrickMap(int n,char **src,char *dest,TSearchpath *searchPath,int n,char **tokens,void **params);
 
 
 #endif

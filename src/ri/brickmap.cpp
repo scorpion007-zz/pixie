@@ -364,8 +364,7 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	CBrickNode	*cNode;
 	vector		P,N;
 
-	if (depth > maxDepth)	depth	=	maxDepth;
-	if (depth < 0)			depth	=	0;
+	depth = min(max(depth,0),maxDepth);
 
 	// First, transform the point to world coordinate system
 	mulmp(P,to,cP);
@@ -540,7 +539,7 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 // Method				:	finalize
 // Description			:	Finalize the creation of the brickmap
 // Return Value			:	-
-// Comments				:
+// Comments				:	this relies on all levels lower than a finer one being present
 void				CBrickMap::finalize() {
 	int			*stack		=	(int *) alloca(maxDepth*8*5*sizeof(int));
 	int			*stackBase	=	stack;
@@ -1489,11 +1488,11 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 
 
 ///////////////////////////////////////////////////////////////////////
-// Function				:	makeTexture3D
+// Function				:	makeBrickMap
 // Description			:	This function creates the 3D baed texture from point cloud representation
 // Return Value			:	-
 // Comments				:
-void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
+void	makeBrickMap(int nb,char **src,char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
 	char	tempName[OS_MAX_PATH_LENGTH];
 	char	fileName[OS_MAX_PATH_LENGTH];
 	int		i;
@@ -1517,7 +1516,8 @@ void	makeTexture3D(const char *src,const char *dest,TSearchpath *searchPath,int 
 	// the shading context is gone
 	CBrickMap::initBrickMap(300000000);
 	
-	if (CRenderer::locateFile(fileName,src,searchPath)) {
+	// FIXME: deal with multiple brickmaps
+	if (CRenderer::locateFile(fileName,src[0],searchPath)) {
 		FILE *in;
 		if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
 

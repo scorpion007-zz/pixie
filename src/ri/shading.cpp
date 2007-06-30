@@ -817,12 +817,15 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
+			const float maxdPixeldxy = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
+			const float dPixeldx = (currentAttributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE) ? 1.0f : CRenderer::dPixeldx;
+			const float dPixeldy = (currentAttributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE) ? 1.0f : CRenderer::dPixeldy;
 			if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	(P[COMP_X] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldx;
-					cXy[1]		=	(P[COMP_Y] * CRenderer::imagePlane / P[COMP_Z])*CRenderer::dPixeldy;
+					cXy[0]		=	(P[COMP_X] * CRenderer::imagePlane / P[COMP_Z])*dPixeldx;
+					cXy[1]		=	(P[COMP_Y] * CRenderer::imagePlane / P[COMP_Z])*dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -833,8 +836,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				float	*cXy	=	xy;
 
 				for (i=numVertices;i>0;i--) {
-					cXy[0]		=	P[COMP_X]*CRenderer::dPixeldx;
-					cXy[1]		=	P[COMP_Y]*CRenderer::dPixeldy;
+					cXy[0]		=	P[COMP_X]*dPixeldx;
+					cXy[1]		=	P[COMP_Y]*dPixeldy;
 					cXy			+=	2;
 					P			+=	3;
 				}
@@ -876,7 +879,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				#define extrapolateDerivV()
 			#endif
 
-#define	MAX_DIFFERENTIAL_DISCREPANCY	4
+#define	MAX_DIFFERENTIAL_DISCREPANCY	4*shadingRate
 
 			if (!(currentAttributes->flags & ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)) {
 				// Compute the du
@@ -937,22 +940,25 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				}
 				
 			} else {
-				float maxDim = CRenderer::invImagePlane*max(CRenderer::dPixeldx,CRenderer::dPixeldy);
-
 				// Non raster orient
+				vector tmp1,tmp2;
 			
 				// Compute the du
 				for (i=0;i<vVertices;i++) {
 					const int	tmp		=	i*uVertices;
 					float		*cDU	=	du	+ tmp;
 					const float	*cU		=	u	+ tmp;
+					float		*cXy	=	xy	+ tmp*2;
 					float		d		=	0;
 	
 					P				=	varying[VARIABLE_P]		+	tmp*3;
 					for (j=uVertices-1;j>0;j--) {
-						const float	dx		=	maxDim*(P[3] - P[0]);
-						const float	dy		=	maxDim*(P[4] - P[1]);
-						const float	dz		=	maxDim*(P[5] - P[2]);
+						initv(tmp1,cXy[2]-P[3],cXy[3]-P[4],P[5]-1);
+						initv(tmp2,cXy[0]-P[0],cXy[1]-P[1],P[2]-1);
+						const float	dx		=	maxdPixeldxy*(cXy[2] - cXy[0]);
+						const float	dy		=	maxdPixeldxy*(cXy[3] - cXy[1]);
+						const float	dz		=	maxdPixeldxy*(lengthv(tmp1) - lengthv(tmp2));
+	
 						float		cSr		=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
 						d		=	cSr*(cU[1] - cU[0]);
@@ -964,6 +970,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDU		+=	1;
 						cU		+=	1;
 						P		+=	3;
+						cXy		+=	2;
 					}
 	
 					extrapolateDerivU();
@@ -975,13 +982,18 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				for (i=0;i<uVertices;i++) {
 					float		*cDV	=	dv	+	i;
 					const float	*cV		=	v	+	i;
+					float		*cXy	=	xy	+	i*2;
 					float		d		=	0;
 	
 					P				=	varying[VARIABLE_P]		+	i*3;
 					for (j=0;j<vVertices-1;j++) {
-						const float	dx		=	maxDim*(P[uVertices*3+0]	- P[0]);
-						const float	dy		=	maxDim*(P[uVertices*3+1]	- P[1]);
-						const float	dz		=	maxDim*(P[uVertices*3+2]	- P[2]);
+						initv(tmp1,cXy[uVertices*2]-P[uVertices*3+0],cXy[uVertices*2+1]-P[uVertices*3+1],P[uVertices*3+2]-1);
+						initv(tmp2,cXy[0]-P[0],cXy[1]-P[1],P[2]-1);
+
+						const float	dx		=	maxdPixeldxy*(cXy[uVertices*2]		- cXy[0]);
+						const float	dy		=	maxdPixeldxy*(cXy[uVertices*2+1]	- cXy[1]);
+						const float	dz		=	maxdPixeldxy*(lengthv(tmp1) - lengthv(tmp2));
+
 						float		cSr		=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
 						d		=	cSr*(cV[uVertices] - cV[0]);
@@ -993,6 +1005,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cDV		+=	uVertices;
 						cV		+=	uVertices;
 						P		+=	uVertices*3;
+						cXy		+=	uVertices*2;
 					}
 					
 					extrapolateDerivV();
@@ -1259,21 +1272,11 @@ void			CShadingContext::freeState(CShadingState *cState) {
 		const CVariable	*var	=	globalVariables[j];
 
 		if (	(var->container == CONTAINER_UNIFORM) || (var->container == CONTAINER_CONSTANT)	) {
-			if (var->type == TYPE_STRING) {
-				delete [] (char*) cState->varying[j];
-				vertexMemory			-=	var->numFloats*sizeof(char*);
-			} else {
-				delete [] cState->varying[j];
-				vertexMemory			-=	var->numFloats*sizeof(float);
-			}
+			delete [] cState->varying[j];
+			vertexMemory		-=	var->numFloats*sizeof(float);
 		} else {
-			if (var->type == TYPE_STRING) {
-				delete [] (char*) cState->varying[j];
-				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(char*);
-			} else {
-				delete [] cState->varying[j];
-				vertexMemory			-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
-			}
+			delete [] cState->varying[j];
+			vertexMemory		-=	var->numFloats*CRenderer::maxGridSize*3*sizeof(float);
 		}
 	}
 

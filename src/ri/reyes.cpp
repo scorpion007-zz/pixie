@@ -819,8 +819,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 
 		} else {
-			T32				*Oi;
-			T32				one;
+			float			*Oi;
 
 			// Sanity check
 			numGridsShaded++;
@@ -832,9 +831,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			copySamples(numPoints,varying,grid->vertices,0);
 
 			// Check if we're opaque
-			for (one.real=1,Oi=(T32 *) varying[VARIABLE_OI],i=numPoints;i>0;i--,Oi+=3) {
-				//if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
-				if ((Oi[0].real < CRenderer::opacityThreshold[0]) | (Oi[1].real < CRenderer::opacityThreshold[1]) | (Oi[2].real < CRenderer::opacityThreshold[2])) {
+			for (Oi=varying[VARIABLE_OI],i=numPoints;i>0;i--,Oi+=3) {
+				if ((Oi[0] < CRenderer::opacityThreshold[0]) | (Oi[1] < CRenderer::opacityThreshold[1]) | (Oi[2] < CRenderer::opacityThreshold[2])) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}
@@ -904,7 +902,7 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		float				*v;
 		float				*time;
 		double				cu,cv;
-		T32					*Oi;
+		float				*Oi;
 
 
 		const int			numVertices	=	(udiv+1)*(vdiv+1);			// The number of vertices to shade
@@ -969,11 +967,9 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			copySamples(numVertices,varying,grid->vertices,0);
 
 			// Check the transparency
-			Oi			=	(T32 *) varying[VARIABLE_OI];
-			one.real	=	1;
+			Oi			=	varying[VARIABLE_OI];
 			for (k=numVertices;k>0;k--,Oi+=3) {
-				//if ((Oi[0].integer ^ one.integer) | (Oi[1].integer ^ one.integer) | (Oi[2].integer ^ one.integer)) {
-				if ((Oi[0].real < CRenderer::opacityThreshold[0]) | (Oi[1].real < CRenderer::opacityThreshold[1]) | (Oi[2].real < CRenderer::opacityThreshold[2])) {
+				if ((Oi[0] < CRenderer::opacityThreshold[0]) | (Oi[1] < CRenderer::opacityThreshold[1]) | (Oi[2] < CRenderer::opacityThreshold[2])) {
 					grid->flags	|=	RASTER_TRANSPARENT;
 					break;
 				}

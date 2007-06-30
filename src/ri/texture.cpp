@@ -547,7 +547,7 @@ public:
 							free(name);
 						}
 
-	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,CShadingContext *context) { 
+	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) { 
 							s		*=	width;					// To the pixel space
 							t		*=	height;
 							s		-=	0.5;					// Pixel centers
@@ -586,7 +586,7 @@ public:
 							r[2]	+=	res[11]*tmp;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,CShadingContext *context) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							s		*=	width;						// To the pixel space
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
@@ -851,12 +851,12 @@ public:
 							}
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,CShadingContext *context) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							assert(numLayers > 0);
-							return layers[0]->lookupz(s,t,z,lookup,context);
+							return layers[0]->lookupz(s,t,z,lookup,varyingLookup,context);
 						}
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l,CShadingContext *context) {
+	void				lookup(float *result,float s,float t,const CTextureLookup *l,const CVaryingTextureLookup *vl,CShadingContext *context) {
 
 							// Do the s mode
 							switch(layers[0]->sMode) {
@@ -894,10 +894,10 @@ public:
 								break;
 							}
 
-							layers[0]->lookup(result,s,t,l,context);
+							layers[0]->lookup(result,s,t,l,vl,context);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							int				i;
 							float			totalContribution	=	0;
 							CTextureLayer	*layer0,*layer1;
@@ -932,7 +932,7 @@ public:
 							d			=	ds*ds + dt*dt;
 							diag		=	min(d,diag);
 
-							diag		+=	lookup->blur*lookup->blur*width*height;
+							diag		+=	varyingLookup->blur*varyingLookup->blur*width*height;
 
 																	// Find the layer that we want to probe
 							l			=	(logf(diag)*0.5f*(1/logf(2.0f)));
@@ -947,7 +947,7 @@ public:
 							offset		=	min(offset,1);
 
 							initv(result,0,0,0);					// Result is black
-							for (i=lookup->numSamples;i>0;i--) {
+							for (i=varyingLookup->numSamples;i>0;i--) {
 								float			r[2];
 								float			s,t;
 								vector			C,CC0,CC1;
@@ -998,8 +998,8 @@ public:
 								}
 
 												// lookup (s,t) and add it to the result
-								layer0->lookup(CC0,s,t,lookup,context);
-								layer1->lookup(CC1,s,t,lookup,context);
+								layer0->lookup(CC0,s,t,lookup,varyingLookup,context);
+								layer1->lookup(CC1,s,t,lookup,varyingLookup,context);
 								interpolatev(C,CC0,CC1,offset);
 
 								result[0]		+=	C[0]*contribution;
@@ -1034,13 +1034,13 @@ public:
 							if (layer != NULL) delete  layer;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,CShadingContext *context) {
+	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							assert(layer != NULL);
-							return layer->lookupz(s,t,z,lookup,context);
+							return layer->lookupz(s,t,z,lookup,varyingLookup,context);
 						}
 
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l,CShadingContext *context) {
+	void				lookup(float *result,float s,float t,const CTextureLookup *l,const CVaryingTextureLookup *vl,CShadingContext *context) {
 							// Do the s mode
 							switch(layer->sMode) {
 							case TEXTURE_PERIODIC:
@@ -1077,15 +1077,15 @@ public:
 								break;
 							}
 
-							layer->lookup(result,s,t,l,context);
+							layer->lookup(result,s,t,l,vl,context);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
 
 							initv(result,0,0,0);		// Result is black
-							for (i=lookup->numSamples;i>0;i--) {
+							for (i=varyingLookup->numSamples;i>0;i--) {
 								float			s,t;
 								vector			C;
 								float			contribution;
@@ -1100,11 +1100,11 @@ public:
 								contribution		=	lookup->filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
 								totalContribution	+=	contribution;
 
-								if (lookup->blur > 0) {
+								if (varyingLookup->blur > 0) {
 									context->random2d.get(r);
 
-									s				+=	lookup->blur*(r[0] - 0.5f);
-									t				+=	lookup->blur*(r[1] - 0.5f);
+									s				+=	varyingLookup->blur*(r[0] - 0.5f);
+									t				+=	varyingLookup->blur*(r[1] - 0.5f);
 								}
 
 								// Do the s mode
@@ -1141,7 +1141,7 @@ public:
 									break;
 								}
 												// lookup (s,t) and add it to the result
-								layer->lookup(C,s,t,lookup,context);
+								layer->lookup(C,s,t,lookup,varyingLookup,context);
 
 								result[0]		+=	C[0]*contribution;
 								result[1]		+=	C[1]*contribution;
@@ -1177,7 +1177,7 @@ public:
 							if (side != NULL)	delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
 							vector		center;
@@ -1191,32 +1191,32 @@ public:
 
 							// Apply the filter width
 							subvv(S0,D0,center);
-							mulvf(S0,lookup->width*2);
+							mulvf(S0,varyingLookup->width*2);
 							addvv(S0,center);
 
 							subvv(S1,D1,center);
-							mulvf(S1,lookup->width*2);
+							mulvf(S1,varyingLookup->width*2);
 							addvv(S1,center);
 
 							subvv(S2,D2,center);
-							mulvf(S2,lookup->width*2);
+							mulvf(S2,varyingLookup->width*2);
 							addvv(S2,center);
 
 							subvv(S3,D3,center);
-							mulvf(S3,lookup->width*2);
+							mulvf(S3,varyingLookup->width*2);
 							addvv(S3,center);
 
 
 							result[0]	=	0;
-							for (i=lookup->numSamples;i>0;i--) {
+							for (i=varyingLookup->numSamples;i>0;i--) {
 								float	x,y;
 								float	s,t;
 								float	C;
 								float	contribution;
 								float	tmp[4],cP[4];
-								float	r[2];
+								float	r[4];
 
-								context->random2d.get(r);
+								context->random4d.get(r);
 
 								x					=	r[0];
 								y					=	r[1];
@@ -1232,17 +1232,16 @@ public:
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
 								
-								if (lookup->blur > 0) {
-									context->random2d.get(r);
-									s				+=	lookup->blur*(r[0] - 0.5f);
-									t				+=	lookup->blur*(r[1] - 0.5f);
+								if (varyingLookup->blur > 0) {
+									s				+=	varyingLookup->blur*(r[2] - 0.5f);
+									t				+=	varyingLookup->blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
 									continue;
 								}
 
-								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup,context);
+								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup,varyingLookup,context);
 
 								result[0]			+=	C*contribution;
 							}
@@ -1351,14 +1350,14 @@ public:
 							free(fileName);
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
 
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
-							for (i=lookup->numSamples;i>0;i--) {
+							for (i=varyingLookup->numSamples;i>0;i--) {
 								float		s,t,w;
 								float		contribution;
 								float		tmp[4],cP[4];
@@ -1366,9 +1365,9 @@ public:
 								int			bx,by;
 								CDeepTile	*cTile;
 								float		*cPixel;
-								float		r[2];
+								float		r[4];
 
-								context->random2d.get(r);
+								context->random4d.get(r);
 
 								const float x		=	r[0];
 								const float y		=	r[1];
@@ -1384,10 +1383,9 @@ public:
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
 								
-								if (lookup->blur > 0) {
-									context->random2d.get(r);
-									s				+=	lookup->blur*(r[0] - 0.5f);
-									t				+=	lookup->blur*(r[1] - 0.5f);
+								if (varyingLookup->blur > 0) {
+									s				+=	varyingLookup->blur*(r[2] - 0.5f);
+									t				+=	varyingLookup->blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
@@ -1584,7 +1582,7 @@ public:
 						} EOrder;
 
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							EOrder		order;
 							CTexture	*side;
 							float		u,v;
@@ -1599,7 +1597,7 @@ public:
 
 							if (dotvv(D0,D0) == 0)	return;
 
-							for (i=lookup->numSamples;i>0;i--) {
+							for (i=varyingLookup->numSamples;i>0;i--) {
 								float	t;
 								float	contribution;
 								float	r[2];
@@ -1681,7 +1679,7 @@ public:
 								}
 
 
-								side->lookup(C,u,v,lookup,context);
+								side->lookup(C,u,v,lookup,varyingLookup,context);
 
 								result[0]	+=	C[0]*contribution;
 								result[1]	+=	C[1]*contribution;
@@ -1717,7 +1715,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							float		u[4],v[4];
 							float		m;
 
@@ -1737,7 +1735,7 @@ public:
 							u[3]				=	D3[COMP_X] / m + 0.5f;
 							v[3]				=	D3[COMP_Y] / m + 0.5f;
 
-							side->lookup4(result,u,v,lookup,context);
+							side->lookup4(result,u,v,lookup,varyingLookup,context);
 						}
 
 	// textureinfo support
@@ -1765,7 +1763,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							float		u[4],v[4];
 							double		a,b,c;
 							vector		D,Dsamp;
@@ -1796,7 +1794,7 @@ public:
 								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
 								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
 								
-								side->lookup4(result,u,v,lookup,context);
+								side->lookup4(result,u,v,lookup,varyingLookup,context);
 							} else {
 								initv(result,0,0,0);
 							}

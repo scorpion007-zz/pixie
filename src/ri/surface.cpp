@@ -151,11 +151,16 @@ void	CPatch::dice(CShadingContext *r) {
 	if ((udiv == -1) && (vdiv == -1)) {
 
 		// No, probe the surface and find the bounding box
-		float		*Pmov		=	(float *) alloca(CRenderer::maxGridSize*3*2*sizeof(float));
+		float		*Pmov;
 		float		maxBound;
 		int			up,vp;
 		int			k;
 		int			cullFlags	=	TRUE;
+		int			moving		=	(CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving());
+		
+		if (moving == TRUE) {
+			Pmov	=	(float *) alloca(CRenderer::maxGridSize*3*2*sizeof(float));
+		}
 		
 		// We need to split this patch, so no need to compute udiv / vdiv
 
@@ -191,7 +196,7 @@ void	CPatch::dice(CShadingContext *r) {
 			initv(bmax,-C_INFINITY);
 
 			// Take care of the motion first
-			if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && (object->moving())) {
+			if (moving == TRUE) {
 
 				// Compute the sample positions and corresponding normal vectors
 				for (vp=0,v=vstart,k=0;vp<numVprobes;vp++,v+=vstep) {
@@ -224,6 +229,7 @@ void	CPatch::dice(CShadingContext *r) {
 			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
+//FIXME: implies if either end is culled we cull - wrong
 			// Are we culled ?
 			if (cullFlags)	return;
 
@@ -606,7 +612,15 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		rCur		*=	2.0f;
 		subsample	=	TRUE;
 	}
-		
+
+	if((flags & OBJECT_TERMINAL_TESSELATION) && (level >= TESSELATION_NUM_LEVELS)) {
+		// If this tesselation is marked as final then clamp the level
+		// See below (for non-displaced raytracing)
+		level = TESSELATION_NUM_LEVELS-1;
+		div = 16;
+		rCur = rmax/16;
+	}
+
 	// Did we find a tesselation in this tesselationPatch?
 	if (level < TESSELATION_NUM_LEVELS) {
 		// Yes, our r is sufficient
@@ -725,10 +739,23 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 						}														\
 					}															\
 				}
-	
+
+				/*
+				Note: 
 				
-		#define intersectQuads()												\
-																				\
+				initv(NN,
+					-2.0f*( (P01[COMP_Z] - P10[COMP_Z])*(P00[COMP_Y] - P11[COMP_Y])	
+						   -(P01[COMP_Y] - P10[COMP_Y])*(P00[COMP_Z] - P11[COMP_Z])),
+					-2.0f*(-(P01[COMP_Z] - P10[COMP_Z])*(P00[COMP_X] - P11[COMP_X])
+						   +(P01[COMP_X] - P10[COMP_X])*(P00[COMP_Z] - P11[COMP_Z])),
+					-2.0f*( (P01[COMP_Y] - P10[COMP_Y])*(P00[COMP_X] - P11[COMP_X])
+						   -(P01[COMP_X] - P10[COMP_X])*(P00[COMP_Y] - P11[COMP_Y])));
+				
+				equivalent to individual cross products and sums
+				*/
+
+
+		#define intersectQuadsBilin()											\
 				vector		a,b,c,d;											\
 																				\
 				subvv(a,P11,P10);												\
@@ -763,6 +790,98 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 						solve();												\
 						break;													\
 				}
+								
+			#define intersectQuadsFlat()										\
+				vector NN,tmp1,tmp2;											\
+				subvv(tmp1,P01,P00);											\
+				subvv(tmp2,P10,P00);											\
+				crossvv(NN,tmp2,tmp1);											\
+				float th = dotvv(q,NN);											\
+				if (th != 0) {													\
+					const float d = dotvv(NN,P00);								\
+					const float ha = th = dotvv(q,NN);							\
+					th = (d - dotvv(r,NN)) / th;								\
+					if ((th > cRay->tmin) && (th < cRay->t)) {					\
+						float atop,aright,abottom,aleft;						\
+						int hit = FALSE;										\
+						vector hp;												\
+																				\
+						mulvf(hp,q,th);											\
+						addvv(hp,r);											\
+																				\
+						int majorAxis	=	COMP_X;								\
+						if (fabs(NN[COMP_Y]) > fabs(NN[COMP_X]))	majorAxis	=	COMP_Y;		\
+						if (fabs(NN[COMP_Z]) > fabs(NN[majorAxis]))	majorAxis	=	COMP_Z;		\
+																				\
+						switch(majorAxis) {										\
+							case COMP_X:										\
+								if ((NN[COMP_X]<0.0f))							\
+									hit = 		((atop		= area(hp[COMP_Y],hp[COMP_Z],P00[COMP_Y],P00[COMP_Z],P10[COMP_Y],P10[COMP_Z])) < 0.0f)	\
+											&&	((aright	= area(hp[COMP_Y],hp[COMP_Z],P10[COMP_Y],P10[COMP_Z],P11[COMP_Y],P11[COMP_Z])) < 0.0f)	\
+											&&	((abottom	= area(hp[COMP_Y],hp[COMP_Z],P11[COMP_Y],P11[COMP_Z],P01[COMP_Y],P01[COMP_Z])) < 0.0f)	\
+											&&	((aleft		= area(hp[COMP_Y],hp[COMP_Z],P01[COMP_Y],P01[COMP_Z],P00[COMP_Y],P00[COMP_Z])) < 0.0f);\
+								else											\
+									hit = 		((atop		= area(hp[COMP_Y],hp[COMP_Z],P00[COMP_Y],P00[COMP_Z],P10[COMP_Y],P10[COMP_Z])) > 0.0f)	\
+											&&	((aright	= area(hp[COMP_Y],hp[COMP_Z],P10[COMP_Y],P10[COMP_Z],P11[COMP_Y],P11[COMP_Z])) > 0.0f)	\
+											&&	((abottom	= area(hp[COMP_Y],hp[COMP_Z],P11[COMP_Y],P11[COMP_Z],P01[COMP_Y],P01[COMP_Z])) > 0.0f)	\
+											&&	((aleft		= area(hp[COMP_Y],hp[COMP_Z],P01[COMP_Y],P01[COMP_Z],P00[COMP_Y],P00[COMP_Z])) > 0.0f);\
+								break;											\
+							case COMP_Y:										\
+								if (NN[COMP_Y]<0.0f)							\
+									hit	=		 ((atop		= area(hp[COMP_Z],hp[COMP_X],P00[COMP_Z],P00[COMP_X],P10[COMP_Z],P10[COMP_X])) < 0.0f)	\
+											&&	 ((aright	= area(hp[COMP_Z],hp[COMP_X],P10[COMP_Z],P10[COMP_X],P11[COMP_Z],P11[COMP_X])) < 0.0f)	\
+											&&	 ((abottom	= area(hp[COMP_Z],hp[COMP_X],P11[COMP_Z],P11[COMP_X],P01[COMP_Z],P01[COMP_X])) < 0.0f)	\
+											&&	 ((aleft	= area(hp[COMP_Z],hp[COMP_X],P01[COMP_Z],P01[COMP_X],P00[COMP_Z],P00[COMP_X])) < 0.0f);\
+								else											\
+									hit	=		 ((atop		= area(hp[COMP_Z],hp[COMP_X],P00[COMP_Z],P00[COMP_X],P10[COMP_Z],P10[COMP_X])) > 0.0f)	\
+											&&	 ((aright	= area(hp[COMP_Z],hp[COMP_X],P10[COMP_Z],P10[COMP_X],P11[COMP_Z],P11[COMP_X])) > 0.0f)	\
+											&&	 ((abottom	= area(hp[COMP_Z],hp[COMP_X],P11[COMP_Z],P11[COMP_X],P01[COMP_Z],P01[COMP_X])) > 0.0f)	\
+											&&	 ((aleft	= area(hp[COMP_Z],hp[COMP_X],P01[COMP_Z],P01[COMP_X],P00[COMP_Z],P00[COMP_X])) > 0.0f);\
+								break;											\
+							case COMP_Z:										\
+								if (NN[COMP_Z]<0.0f)							\
+									hit = 		((atop		= area(hp[COMP_X],hp[COMP_Y],P00[COMP_X],P00[COMP_Y],P10[COMP_X],P10[COMP_Y])) < 0.0f)	\
+											&&	((aright	= area(hp[COMP_X],hp[COMP_Y],P10[COMP_X],P10[COMP_Y],P11[COMP_X],P11[COMP_Y])) < 0.0f)	\
+											&&	((abottom	= area(hp[COMP_X],hp[COMP_Y],P11[COMP_X],P11[COMP_Y],P01[COMP_X],P01[COMP_Y])) < 0.0f)	\
+											&&	((aleft		= area(hp[COMP_X],hp[COMP_Y],P01[COMP_X],P01[COMP_Y],P00[COMP_X],P00[COMP_Y])) < 0.0f);\
+								else											\
+									hit = 		((atop		= area(hp[COMP_X],hp[COMP_Y],P00[COMP_X],P00[COMP_Y],P10[COMP_X],P10[COMP_Y])) > 0.0f)	\
+											&&	((aright	= area(hp[COMP_X],hp[COMP_Y],P10[COMP_X],P10[COMP_Y],P11[COMP_X],P11[COMP_Y])) > 0.0f)	\
+											&&	((abottom	= area(hp[COMP_X],hp[COMP_Y],P11[COMP_X],P11[COMP_Y],P01[COMP_X],P01[COMP_Y])) > 0.0f)	\
+											&&	((aleft		= area(hp[COMP_X],hp[COMP_Y],P01[COMP_X],P01[COMP_Y],P00[COMP_X],P00[COMP_Y])) > 0.0f);\
+								break;											\
+						}														\
+						if (hit) {												\
+							const float u	=	aleft / (aleft + aright);		\
+							const float v	=	atop / (atop + abottom);		\
+							if ((u>0.0f) && (u<1.0f) && (v>0.0f) && (v<1.0f)) {	\
+								t = th;											\
+								if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) mulvf(NN,-1); 	\
+								if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {		\
+									cRay->object	=	object;									\
+									cRay->u			=	umin + ((float) u + i)*urg;				\
+									cRay->v			=	vmin + ((float) v + j)*vrg;				\
+									cRay->t			=	(float) t;				\
+									movvv(cRay->N,NN);							\
+								} else {										\
+									if (dotvv(q,NN) < 0.0f) {					\
+										cRay->object	=	object;				\
+										cRay->u			=	umin + ((float) u + i)*urg;			\
+										cRay->v			=	vmin + ((float) v + j)*vrg;			\
+										cRay->t			=	(float) t;							\
+										movvv(cRay->N,NN);						\
+									}											\
+								}												\
+							}													\
+						}														\
+					}															\
+				}
+			
+			#define intersectQuads()	\
+				intersectQuadsBilin()
+				
+				//intersectQuadsFlat()
+				//intersectQuadsBilin()
 		
 		// Common ray properties
 		const float	*r		=	cRay->from;
@@ -1300,7 +1419,7 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	// grid size guess
 	
 	#if DEBUG_TESSELATIONS > 0
-	if (!estimateOnly || DEBUG_TESSELATIONS > 1)
+	if (estimateOnly || DEBUG_TESSELATIONS > 1)
 	{
 		CDebugView	d("/tmp/tesselate.dat",TRUE);
 	
@@ -1586,6 +1705,54 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 	const float vDev = fabs(vMax-vMin)/(float)(div);
 	uAvg += uDev;
 	vAvg += vDev;
+	
+	if (!(attributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)) {
+		// When not tracing displacements, all we desire is a patch
+		// which is flat enough to be a good approximation
+		// if we are tracing displacements, then the quad sizes must
+		// genuinely be smaller than the ray footprint
+		
+		// estimate flatness
+		float	vFlat =	0;
+		for (int i=0;i<=div;i++) {
+			vector D,E,O;
+			movvv(O,Pstorage + i*3);
+			subvv(D,Pstorage + i*3 + (div+1)*div*3,O);
+			const float lD = lengthv(D);
+			if (lengthv(D) > 0) mulvf(D,1.0f/lD);
+			for(int j=1;j<div;j++) {
+				subvv(E,Pstorage + i*3 + (div+1)*j*3,O);
+				mulvf(E,D,dotvv(D,E));
+				addvv(E,O);
+				subvv(E,Pstorage + i*3 + (div+1)*j*3);
+				vFlat += lengthv(E);
+			}
+		}
+	
+		float	uFlat	=	0;
+		for (int i=0;i<=div;i++) {
+			vector D,E,O;
+			movvv(O,Pstorage + (div+1)*i*3);
+			subvv(D,Pstorage + (div+1)*i*3 + div*3,O);
+			const float lD = lengthv(D);
+			if (lengthv(D) > 0) mulvf(D,1.0f/lD);
+			for(int j=1;j<div;j++) {
+				subvv(E,Pstorage + (div+1)*i*3 + j*3,O);
+				mulvf(E,D,dotvv(D,E));
+				addvv(E,O);
+				subvv(E,Pstorage + (div+1)*i*3 + j*3);
+				uFlat += lengthv(E);
+			}
+		}
+	
+		vFlat	/=	(float) div*div;
+		uFlat	/=	(float) div*div;
+
+		//fprintf(stderr,"%d -- %f %f  -- %f %f\n",depth,uAvg,vAvg,uFlat,vFlat);
+		if (uFlat < uAvg && vFlat < vAvg) {
+			flags |= OBJECT_TERMINAL_TESSELATION;
+		}
+	}
 	
 	// Simply save the coarse r estimate
 	if (rdiv == 1) {

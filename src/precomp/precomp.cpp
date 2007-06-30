@@ -331,19 +331,10 @@ void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 	else
 		fprintf(out,"drawQuadGrid");
 	
-	switch(i >> RASTER_HIGHBITS_SHIFT) {
-	case DEPTH_MIN:
-		fprintf(out,"Zmin");
-		break;
-	case DEPTH_MAX:
-		fprintf(out,"Zmax");
-		break;
-	case DEPTH_AVG:
-		fprintf(out,"Zavg");
-		break;
-	case DEPTH_MID:
+	if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
 		fprintf(out,"Zmid");
-		break;
+	} else {
+		fprintf(out,"Zmin");	
 	}
 	
 	if (i & RASTER_UNSHADED)		fprintf(out,"Unshaded");
@@ -378,7 +369,7 @@ int		precomputeStochasticPrimitivesH() {
 	
 	fprintf(out,"#ifdef DEFINE_STOCHASTIC_SWITCH\n");
 	
-	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | (CRenderer::depthFilter << RASTER_HIGHBITS_SHIFT)) {\n");
+	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | ((CRenderer::depthFilter == DEPTH_MID) << RASTER_HIGHBITS_SHIFT)) {\n");
 	const int caseEnumeration = RASTER_GLOBAL_MASK | (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT);
 	for (i=0;i<=caseEnumeration;i++) {
 		fprintf(out,"case %d:\n",i);
@@ -468,27 +459,16 @@ int		precomputeStochasticPrimitivesH() {
 			if (i & RASTER_LOD)				fprintf(out,"\t#define STOCHASTIC_LOD\n");
 			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#define STOCHASTIC_UNDERCULL\n");
 			if (i & RASTER_XTREME)			fprintf(out,"\t#define STOCHASTIC_XTREME\n");
-
+			
 			// Define the depth filter macros
-			switch(i >> RASTER_HIGHBITS_SHIFT) {
-			case DEPTH_MIN:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMin()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMin()\n");
-				break;
-			case DEPTH_MAX:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMax()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMax()\n");
-				break;
-			case DEPTH_AVG:
-				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZAvg()\n");
-				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZAvg()\n");
-				break;
-			case DEPTH_MID:
+			if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
 				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMid()\n");
 				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMid()\n");
-				break;
+			} else {
+				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMin()\n");
+				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMin()\n");
 			}
-		
+			
 			if (i & RASTER_POINT) {
 				fprintf(out,"\n\n\t\t#include \"stochasticPoint.h\"\n");
 			} else {
@@ -528,19 +508,18 @@ int	main(int argc,char *argv[]) {
 
 	
 	// Warning: Re-running this will totally alter the noise values you get
-	if (precomputeNoiseData() == TRUE) {
+	/*if (precomputeNoiseData() == TRUE) {
 		return 1;
-	}
+	}*/
 	
 	/*
 	if (precomputeSubdivisionData() == TRUE) {
 		return 1;
-	}
+	}*/
 
 	if (precomputeStochasticPrimitivesH() == TRUE) {
 		return 1;
 	}
-	*/
 
 	return 0;
 }

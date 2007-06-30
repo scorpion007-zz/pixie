@@ -1110,17 +1110,21 @@ void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void
 					}
 				} else if (strcmp(cVar->name,"matte") == 0) {
 					if (cVar->type == TYPE_INTEGER) {
-						nChannel->matteMode = ((int*)params[i])[0];
+						nChannel->matteMode = (int) ((float*)params[i])[0];
 					} else {
 						error(CODE_BADTOKEN,"Invalid type for AOV matte mode\n");
+					}
+				} else if (strcmp(cVar->name,"filter") == 0) {
+					if (cVar->type == TYPE_STRING) {
+						const char *filt = ((char**)params[i])[0];
+						nChannel->filterType = CRenderer::getAOVFilter(filt);
+					} else {
+						error(CODE_BADTOKEN,"Invalid type for AOV filter mode\n");
 					}
 				} else if (strcmp(cVar->name,"quantize") == 0) {
 					// intentionally empty for compatibility
 					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not implemented (yet)\n",cVar->name);
 				} else if (strcmp(cVar->name,"dither") == 0) {
-					// intentionally empty for compatibility
-					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not implemented (yet)\n",cVar->name);
-				} else if (strcmp(cVar->name,"filter") == 0) {
 					// intentionally empty for compatibility
 					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not implemented (yet)\n",cVar->name);
 				} else {
@@ -1207,6 +1211,15 @@ void	CRendererContext::RiRelativeDetail(float relativedetail) {
 		if (val[0] == '\0') __dest	=	NULL;																\
 		else				__dest	=	strdup(val);
 
+#define	optionCheckColor(__name,__dest,__min,__max)															\
+	} else if (strcmp(tokens[i],__name) == 0) {																\
+		float	*val	=	(float *) params[i];															\
+		if ((val[0] < __min) || (val[1] > __max)  || (val[1] < __min) || (val[1] > __max) || (val[1] < __min) || (val[0] > __max)) { \
+			error(CODE_RANGE,"Invalid value for \"%s\"\n",__name);											\
+		} else {																							\
+			movvv(__dest,val);																				\
+		}
+
 #define	optionEndCheck																						\
 	} else {																								\
 		CVariable	var;																					\
@@ -1273,7 +1286,10 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 				options->maxBrickSize	*=	1000;								// Convert into bytes
 			optionCheck(RI_NUMTHREADS,			options->numThreads,				1,32,int)
 			optionCheck(RI_THREADSTRIDE,		options->threadStride,				1,32,int)
-			optionCheck(RI_GEOCACHEMEMORY,		options->geoCacheMemory,			0,100000,int)
+			optionCheck(RI_GEOCACHEMEMORY,		options->geoCacheMemory,			0,500000,int)
+				options->geoCacheMemory	*=	1000;								// Convert into bytes
+			optionCheckColor(RI_OTHRESHOLD,		options->opacityThreshold,			0,1)
+			optionCheckColor(RI_ZTHRESHOLD,		options->zvisibilityThreshold,		0,1)
 				options->geoCacheMemory	*=	1000;								// Convert into bytes
 			optionEndCheck
 		}
@@ -1616,8 +1632,10 @@ void	CRendererContext::RiShadingRate(float size) {
 		return;
 	}
 
+	// Note: we're converting area to distance here!
+	// _all_ other sr calculations are by edge length
 	attributes				=	getAttributes(TRUE);
-	attributes->shadingRate	=	size;
+	attributes->shadingRate	=	sqrtf(size);
 }
 
 void	CRendererContext::RiShadingInterpolation(char *type) {
@@ -4359,20 +4377,20 @@ void	CRendererContext::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],vo
 	makeSideEnvironment(pic,tex,options->texturePath,RI_CLAMP,RI_CLAMP,RiBoxFilter,1,1,n,tokens,(void **) params,TRUE);
 }
 
-void	CRendererContext::RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeBrickMapV(int nb,char **src,char *dest,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeTexture3D(src,dest,options->texturePath,n,tokens,(void **) params);
+	makeBrickMap(nb,src,dest,options->texturePath,n,tokens,(void **) params);
 }
 
 void	CRendererContext::RiArchiveRecord(char * type,char *format,va_list args) {
 	// We're not archiving
 }
 
-void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char *),int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 
 	if ((filename[0] != '-') && (filename[0] != '|')) {
