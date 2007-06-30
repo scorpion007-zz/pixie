@@ -342,6 +342,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 
 #define		operandBytesPerItem(i)			code->arguments[i].bytesPerItem
 
+#define		operandVaryingStep(i)			code->arguments[i].varyingStep
 
 //	Retrieve an integer operand (label references are integer)
 #define		argument(i)						code->arguments[i].index

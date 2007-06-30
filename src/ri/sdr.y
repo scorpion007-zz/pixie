@@ -370,6 +370,7 @@ static	TSlFunction		functions[]	=	{
 											currentData.currentArgumentPlace->bytesPerItem								=	sizeof(char *);
 											currentData.currentArgumentPlace->index										=	(unsigned short) currentData.currentConstant;
 											currentData.currentArgumentPlace->accessor									=	SL_IMMEDIATE_OPERAND;
+											currentData.currentArgumentPlace->varyingStep								=	0;
 											currentData.constantEntries[currentData.currentConstant]					=	currentData.constants + currentData.currentConstantSize;
 											dest																		=	(char **) currentData.constantEntries[currentData.currentConstant];
 											currentData.currentConstant++;
@@ -410,6 +411,7 @@ static	TSlFunction		functions[]	=	{
 												currentData.currentArgumentPlace->bytesPerItem					=	sizeof(float);
 												currentData.currentArgumentPlace->index							=	(unsigned short) currentData.currentConstant;
 												currentData.currentArgumentPlace->accessor						=	SL_IMMEDIATE_OPERAND;
+												currentData.currentArgumentPlace->varyingStep					=	0;
 												currentData.constantEntries[currentData.currentConstant]		=	currentData.constants + currentData.currentConstantSize;
 												dest															=	(float *) currentData.constantEntries[currentData.currentConstant];
 												currentData.currentConstant++;
@@ -458,6 +460,7 @@ static	TSlFunction		functions[]	=	{
 														currentData.currentArgumentPlace->numItems		=	(char) (cVariable->multiplicity*numComponents(cVariable->type));
 														currentData.currentArgumentPlace->bytesPerItem	=	(cVariable->type == TYPE_STRING ? sizeof(char *) : sizeof(float));
 														currentData.currentArgumentPlace->accessor		=	SL_VARYING_OPERAND;
+														currentData.currentArgumentPlace->varyingStep	=	(cVariable->uniform ? 0 : currentData.currentArgumentPlace->numItems);
 														currentData.currentArgumentPlace++;
 														
 														if (cVariable->uniform == FALSE)
@@ -479,11 +482,15 @@ static	TSlFunction		functions[]	=	{
 													currentData.currentArgumentPlace->numItems		=	(char) var->numFloats;
 													currentData.currentArgumentPlace->bytesPerItem	=	(var->type == TYPE_STRING ? sizeof(char *) : sizeof(float));
 													currentData.currentArgumentPlace->accessor		=	SL_GLOBAL_OPERAND;
-													currentData.currentArgumentPlace++;
 													
-													if ((var->container != CONTAINER_UNIFORM) || (var->container != CONTAINER_CONSTANT))
-															currentData.opcodeUniform								=	FALSE;
+													if ((var->container != CONTAINER_UNIFORM) || (var->container != CONTAINER_CONSTANT)) {
+														currentData.opcodeUniform						=	FALSE;
+														currentData.currentArgumentPlace->varyingStep	=	currentData.currentArgumentPlace->numItems;
+													} else {
+														currentData.currentArgumentPlace->varyingStep	=	0;
+													}
 															
+													currentData.currentArgumentPlace++;
 												} else {
 													slerror("Unknown variable");
 												}

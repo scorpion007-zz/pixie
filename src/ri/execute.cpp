@@ -231,6 +231,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		operandBytesPerItem(i)			code->arguments[i].bytesPerItem
 
+#define		operandVaryingStep(i)			code->arguments[i].varyingStep
+
 // Retrieve the parameterlist
 #define		parameterlist					cInstance->parameterLists[code->plNumber]
 

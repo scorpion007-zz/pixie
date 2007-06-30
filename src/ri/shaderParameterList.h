@@ -42,28 +42,32 @@ struct CTempParamBinding {
 	CTempParamBinding *__varyingParamBindingsEnd	= NULL;
 
 
-#define addUniformParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest)	{			\
-	CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);	\
+#define addUniformParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest)	{				\
+	CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);		\
 	if (__uniformParamBindingsEnd == NULL) __uniformParamBindingsEnd = __uniformParamBindingsStart = __param;	\
-	else { __uniformParamBindingsEnd->next = __param;	__uniformParamBindingsEnd = __param; }			\
-	__param->next = NULL;																				\
-	__param->binding.opIndex	= i*2+__start+1;														\
-	__param->binding.dest		= (size_t) offsetof(__varyingLookupType,__dest);						\
-	__param->binding.type		= __type;																\
-	__param->binding.mult		= __mult;																\
-	__lookup->numUniformParamBindings++;																\
+	else { __uniformParamBindingsEnd->next = __param;	__uniformParamBindingsEnd = __param; }				\
+	__param->next = NULL;																					\
+	__param->binding.opIndex	= i*2+__start+1;															\
+	__param->binding.dest		= (size_t) offsetof(__varyingLookupType,__dest);							\
+	__param->binding.type		= __type;																	\
+	__param->binding.mult		= __mult;																	\
+	__lookup->numUniformParamBindings++;																	\
 }
 
-#define addVaryingParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest)	{			\
-	CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);	\
-	if (__varyingParamBindingsEnd == NULL) __varyingParamBindingsEnd = __varyingParamBindingsStart = __param;	\
-	else { __varyingParamBindingsEnd->next = __param;	__varyingParamBindingsEnd = __param; }			\
-	__param->next = NULL;																				\
-	__param->binding.opIndex	= i*2+__start+1;														\
-	__param->binding.dest		= (size_t) offsetof(__varyingLookupType,__dest);						\
-	__param->binding.type		= __type;																\
-	__param->binding.mult		= __mult;																\
-	__lookup->numVaryingParamBindings++;																\
+#define addVaryingParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest)	{				\
+	if (operandVaryingStep(i*2+__start+1) == 0) {															\
+		addUniformParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest);					\
+	} else {																								\
+		CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);	\
+		if (__varyingParamBindingsEnd == NULL) __varyingParamBindingsEnd = __varyingParamBindingsStart = __param;	\
+		else { __varyingParamBindingsEnd->next = __param;	__varyingParamBindingsEnd = __param; }			\
+		__param->next = NULL;																				\
+		__param->binding.opIndex	= i*2+__start+1;														\
+		__param->binding.dest		= (size_t) offsetof(__varyingLookupType,__dest);						\
+		__param->binding.type		= __type;																\
+		__param->binding.mult		= __mult;																\
+		__lookup->numVaryingParamBindings++;																\
+	}																										\
 }
 
 
@@ -116,7 +120,8 @@ struct CTempParamBinding {
 			__varyingParameterPtrs = (const float**) ralloc(sizeof(const float*)*__lookup->numVaryingParamBindings,threadMemory);	\
 			__varyingParameterSizes = (int*) ralloc(sizeof(int)*__lookup->numVaryingParamBindings,threadMemory);	\
 			for(int o=0;o<__lookup->numVaryingParamBindings;o++,cParamBind++) {			\
-				operandSize(cParamBind->opIndex,__varyingParameterPtrs[o],__varyingParameterSizes[o],const float *);	\
+				operand(cParamBind->opIndex,__varyingParameterPtrs[o],const float *);	\
+				__varyingParameterSizes[o] = operandVaryingStep(cParamBind->opIndex);	\
 			}																			\
 		}																				\
 	}
