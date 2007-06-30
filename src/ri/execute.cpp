@@ -47,6 +47,7 @@
 #include "surface.h"
 #include "texture.h"
 #include "ri_config.h"
+#include "shaderParameterList.h"
 
 // This function is defined in shader.cpp for debugging purposes
 void							debugFunction(float *);
@@ -54,117 +55,6 @@ void							debugFunction(float *);
 // These functions are defined in init.cpp
 void							convertColorFrom(float *,const float *,ECoordinateSystem);
 void							convertColorTo(float *,const float *,ECoordinateSystem);
-
-
-// Parameter list helpers
-struct CTempParamBinding {
-	CDynamicShaderLookup::CParamBinding	binding;
-	CTempParamBinding					*next;
-};
-
-#define initParamBindings(__lookup)												\
-	CTempParamBinding *__uniformParamBindingsStart	= NULL;						\
-	CTempParamBinding *__uniformParamBindingsEnd	= NULL;						\
-	CTempParamBinding *__varyingParamBindingsStart	= NULL;						\
-	CTempParamBinding *__varyingParamBindingsEnd	= NULL;
-
-
-#define addUniformParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest)	{			\
-	CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);	\
-	if (__uniformParamBindingsEnd == NULL) __uniformParamBindingsEnd = __uniformParamBindingsStart = __param;	\
-	else { __uniformParamBindingsEnd->next = __param;	__uniformParamBindingsEnd = __param; }			\
-	__param->next = NULL;																				\
-	__param->binding.opIndex = i*2+__start+1;															\
-	__param->binding.dest = (size_t) offsetof(__varyingLookupType,__dest);								\
-	__param->binding.type = 	__type;																	\
-	__param->binding.mult =		__mult;																	\
-	__lookup->numUniformParamBindings++;																\
-}
-
-#define addVaryingParamBinding(__lookup,__start,__type,__mult,__varyingLookupType,__dest)	{			\
-	CTempParamBinding *__param = (CTempParamBinding *) ralloc(sizeof(CTempParamBinding),threadMemory);	\
-	if (__varyingParamBindingsEnd == NULL) __varyingParamBindingsEnd = __varyingParamBindingsStart = __param;	\
-	else { __varyingParamBindingsEnd->next = __param;	__varyingParamBindingsEnd = __param; }			\
-	__param->next = NULL;																				\
-	__param->binding.opIndex = i*2+__start+1;															\
-	__param->binding.dest = (size_t) offsetof(__varyingLookupType,__dest);								\
-	__param->binding.type = 	__type;																	\
-	__param->binding.mult =		__mult;																	\
-	__lookup->numVaryingParamBindings++;																\
-}
-
-
-#define completeParamBindings(__lookup)	{																				\
-	if (__lookup->numUniformParamBindings > 0) {																		\
-		__lookup->uniformParamBindings = new CDynamicShaderLookup::CParamBinding[__lookup->numUniformParamBindings];	\
-		CDynamicShaderLookup::CParamBinding 	*cBinding		= __lookup->uniformParamBindings;						\
-		CTempParamBinding						*cTempBinding	= __uniformParamBindingsStart;							\
-		while (cTempBinding != NULL) {																					\
-			memcpy(cBinding,cTempBinding,sizeof(CDynamicShaderLookup::CParamBinding));									\
-			cBinding++;																									\
-			cTempBinding = cTempBinding->next;																			\
-		}																												\
-	}																													\
-	if (__lookup->numVaryingParamBindings > 0) {																		\
-		__lookup->varyingParamBindings = new CDynamicShaderLookup::CParamBinding[__lookup->numVaryingParamBindings];	\
-		CDynamicShaderLookup::CParamBinding 	*cBinding		= __lookup->varyingParamBindings;						\
-		CTempParamBinding						*cTempBinding	= __varyingParamBindingsStart;							\
-		while (cTempBinding != NULL) {																					\
-			memcpy(cBinding,cTempBinding,sizeof(CDynamicShaderLookup::CParamBinding));									\
-			cBinding++;																									\
-			cTempBinding = cTempBinding->next;																			\
-		}																												\
-	}																													\
-}
-
-#define getUniformParams(__lookup,__varyingLookup) {									\
-	CDynamicShaderLookup::CParamBinding *cParamBind = __lookup->uniformParamBindings;	\
-	for(int o=0;o<__lookup->numUniformParamBindings;o++,cParamBind++) {					\
-		if (cParamBind->type == TYPE_INTEGER) {											\
-			const float *optmp;															\
-			char *dtmp = (char*)&__varyingLookup;										\
-			operand(cParamBind->opIndex,optmp,const float *);							\
-			*((int*)(dtmp+ cParamBind->dest)) = (int) cParamBind->mult * (int) *optmp;	\
-		} else {																		\
-			const float *optmp;															\
-			char *dtmp = (char*)&__varyingLookup;										\
-			operand(cParamBind->opIndex,optmp,const float *);							\
-			*((float*)(dtmp + cParamBind->dest)) = cParamBind->mult * *optmp;			\
-		}																				\
-	}																					\
-}
-
-#define initVaryingParams(__lookup) 													\
-	const float **__varyingParameterPtrs;												\
-	{																					\
-		CDynamicShaderLookup::CParamBinding *cParamBind = __lookup->varyingParamBindings;	\
-		if (__lookup->numVaryingParamBindings > 0) {									\
-			__varyingParameterPtrs = (const float**) ralloc(sizeof(const float*)*__lookup->numVaryingParamBindings,threadMemory);	\
-			for(int o=0;o<__lookup->numVaryingParamBindings;o++,cParamBind++) {			\
-				operand(cParamBind->opIndex,__varyingParameterPtrs[o],const float *);	\
-			}																			\
-		}																				\
-	}
-
-#define getVaryingParams(__lookup,__varyingLookup) {									\
-	CDynamicShaderLookup::CParamBinding *cParamBind = __lookup->varyingParamBindings;	\
-	for(int o=0;o<__lookup->numVaryingParamBindings;o++,cParamBind++){					\
-		if (cParamBind->type == TYPE_INTEGER) {											\
-			char *dtmp = (char*)&__varyingLookup;										\
-			*((int*)(dtmp+ cParamBind->dest)) = (int) cParamBind->mult * (int) *__varyingParameterPtrs[o];	\
-		} else {																		\
-			char *dtmp = (char*)&__varyingLookup;										\
-			*((float*)(dtmp + cParamBind->dest)) = cParamBind->mult * *__varyingParameterPtrs[o];	\
-		}																				\
-	}																					\
-}
-
-#define stepVaryingParams(__lookup) {													\
-	for(int o=0;o<__lookup->numVaryingParamBindings;o++){								\
-		__varyingParameterPtrs[o]++;													\
-	}																					\
-}																						\
-
 
 
 // Lighting helpers

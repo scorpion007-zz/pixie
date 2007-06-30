@@ -121,10 +121,10 @@ public:
 class	CDynamicShaderLookup : public CShaderLookup {
 public:
 		struct CParamBinding {
-			int		opIndex;
-			int		type;
-			size_t	dest;
-			float	mult;
+			int		opIndex;			// The operand index to copy
+			int		type;				// The type to copy
+			size_t	dest;				// The destination offset
+			float	mult;				// Float multiplier to be applied before storing
 		};
 	
 							CDynamicShaderLookup();
