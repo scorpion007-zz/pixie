@@ -144,6 +144,10 @@
 
 %left 			SL_FLOAT SL_COLOR SL_POINT SL_VECTOR SL_NORMAL SL_MATRIX SL_STRING
 
+// Boolean operators
+%left  			SL_OR
+%left  			SL_AND
+%left 			SL_NOT
 
 // Relation operators
 %left  			SL_COMP_EQUAL SL_COMP_DIFFERENT
@@ -162,11 +166,7 @@
 %left  			SL_DIVIDE SL_MULTIPLY
 %left  			SL_DOT
 
-// Boolean operators
-%left  			SL_OR
-%left  			SL_AND
-%left 			SL_NOT
-
+// Types
 %left			SL_OUTPUT
 %left			SL_EXTERN
 %left			SL_UNIFORM
@@ -2179,6 +2179,7 @@ slAritmeticExpression:
 		slAritmeticExpression
 		{
 			$$			=	getOperation($1,$3,opcodeFloatGreater,opcodeVectorGreater,NULL,NULL);
+			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
 		}
 	|
 		slAritmeticExpression
@@ -2186,6 +2187,7 @@ slAritmeticExpression:
 		slAritmeticExpression
 		{
 			$$			=	getOperation($1,$3,opcodeFloatLess,opcodeVectorLess,NULL,NULL);
+			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
 		}
 	|
 		slAritmeticExpression
@@ -2193,6 +2195,7 @@ slAritmeticExpression:
 		slAritmeticExpression
 		{
 			$$			=	getOperation($1,$3,opcodeFloatEGreater,opcodeVectorEGreater,NULL,NULL);
+			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
 		}
 	|
 		slAritmeticExpression
@@ -2200,6 +2203,7 @@ slAritmeticExpression:
 		slAritmeticExpression
 		{
 			$$			=	getOperation($1,$3,opcodeFloatELess,opcodeVectorELess,NULL,NULL);
+			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
 		}
 	|
 		slAritmeticExpression
@@ -2207,6 +2211,7 @@ slAritmeticExpression:
 		slAritmeticExpression
 		{
 			$$			=	getOperation($1,$3,opcodeFloatEqual,opcodeVectorEqual,NULL,opcodeStringEqual);
+			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
 		}
 	|
 		slAritmeticExpression
@@ -2214,6 +2219,7 @@ slAritmeticExpression:
 		slAritmeticExpression
 		{
 			$$			=	getOperation($1,$3,opcodeFloatNotEqual,opcodeVectorNotEqual,NULL,opcodeStringNotEqual);
+			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
 		}
 	|
 		SL_NOT
