@@ -48,7 +48,7 @@ typedef struct {
 #define IX(i,j,n) ((i)+(n)*(j))
 
 
-#define NOISE_PERM_SIZE 256
+#define NOISE_PERM_SIZE 512
 #define NOISE_PPERM_SIZE 4096
 
 ///////////////////////////////////////////////////////////////////////
@@ -126,11 +126,18 @@ int	precomputeNoiseData() {
 	srand(1);
 
 	// Generate permutation tables
-	permute(px,NOISE_PERM_SIZE);
-	permute(py,NOISE_PERM_SIZE);
-	permute(pz,NOISE_PERM_SIZE);
+	permute(px,NOISE_PERM_SIZE/2);
+	permute(py,NOISE_PERM_SIZE/2);
+	permute(pz,NOISE_PERM_SIZE/2);
 	permute(pN,NOISE_PPERM_SIZE);
 	
+	// Duplicate elements for the second half of the perm tables
+	for(i=0;i<NOISE_PERM_SIZE/2;i++) {
+		px[NOISE_PERM_SIZE/2+i] = px[i];
+		py[NOISE_PERM_SIZE/2+i] = px[i];
+		pz[NOISE_PERM_SIZE/2+i] = px[i];
+	}
+
 	// Generate the random numbers, stratified
 	for (i=0;i<NOISE_PPERM_SIZE;i++)	rN[i] = (i + (float)(rand()/(float)RAND_MAX)) / NOISE_PPERM_SIZE;
 
