@@ -67,6 +67,7 @@ class	CVisorCache;
 class	CPl;
 class	CSphereLight;
 struct	TObjectHash;
+class	CPLLookup;
 
 typedef enum {
 	SHADING_0D,				// Shading points
@@ -107,6 +108,26 @@ public:
 		CShadedLight			*next;								// Points to the next shaded light
 };
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingScratch
+// Description			:	Holds all the scratch variables
+// Comments				:
+class	CShadingScratch {
+public:
+		float					shadowBias;							// The shadow bias for the lookup
+		float					fill;								// The fill in value for the lookup
+		float					label;								// The label of the ray
+		float					sampleBase;							// Jitter base samples for raytracing
+		float					numSamples;							// The number of samples to take in the texture
+		float					maxDist;							// The maximum intersection distance
+		float					coneAngle;							// The coneangle
+		float					width;								// The filter width
+		float					swidth;
+		float					twidth;
+		float					blur;								// Blur amount
+};
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingState
 // Description			:	Holds a shading state at a depth
@@ -141,6 +162,8 @@ public:
 		CShaderInstance			*currentLightInstance;				// The current light instance that's executing
 		
 		float					**locals[NUM_ACCESSORS];			// The local variables for each shader type
+
+		CShadingScratch			scratch;							// The scratch pad that holds PL data
 
 		CShadingState			*next;								// The next in free state list
 };
@@ -362,6 +385,8 @@ private:
 
 		uint32_t				state[624];
 		uint32_t				*next;
+
+		CPLLookup				*plHash[PL_HASH_SIZE];
 
 		void					next_state();
 		void					randomInit(uint32_t u = 5489UL);

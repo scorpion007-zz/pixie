@@ -89,5 +89,7 @@
 // The number of items below which we allocate memory from stack
 #define	ALLOCA_MAX_ITEMS				200
 
+// The hash size for the shader parameter lists
+#define	PL_HASH_SIZE					512
 #endif
 

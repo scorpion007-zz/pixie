@@ -236,6 +236,81 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Retrieve the parameterlist
 #define		parameterlist					cInstance->parameterLists[code->plNumber]
 
+#define		plOffset(__var)					(char *) &(currentShadingState->scratch.__var) - (char *) &(currentShadingState->scratch)
+
+#define		plBegin(__start,__num)			/* Create a hash ID using shader and instruction */						\
+											uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code) & (PL_HASH_SIZE-1);		\
+											CPLLookup	*lookup;													\
+																													\
+											/* Look at the hash to see if we've computed this before	*/			\
+											if ((lookup = plHash[hashKey]) == NULL) {								\
+																													\
+												/* Check for a collision	*/										\
+												if ((lookup->instance != cInstance) || (lookup->code != code)) {	\
+													/* Delete the old lookup */										\
+													delete [] lookup->uniformBindings;								\
+													delete lookup;													\
+												}																	\
+																													\
+												/* Create a new lookup	*/											\
+												lookup					=	new CPLLookup;							\
+												lookup->numUniforms		=	0;										\
+												lookup->uniformBindings	=	new CPLLookup::TParamBinding[(__num)*2];	\
+												lookup->numVaryings		=	0;										\
+												lookup->varyingBindings	=	lookup->uniformBindings + (__num);		\
+												lookup->instance		=	cInstance;								\
+												lookup->code			=	code;									\
+												plHash[hashKey]			=	lookup;									\
+																													\
+												/* Decode the PL */													\
+												for (int i=0;i<__num;i++) {											\
+													const int	opIndex	=	i*2+__start+1;							\
+													CPLLookup::TParamBinding	*cBinding;							\
+													if (operandVaryingStep(opIndex) == 0) {							\
+														cBinding	=	lookup->uniformBindings + lookup->numUniforms++;	\
+													} else {														\
+														cBinding	=	lookup->varyingBindings + lookup->numVaryings++;	\
+													}																\
+																													\
+													cBinding->step		=	operandBytesPerItem(opIndex)*operandNumItems(opIndex);	\
+													cBinding->opIndex	=	opIndex;								\
+																													\
+													const char **param;												\
+													operand(i*2+__start,param,const char **);						\
+																													\
+													if (strcmp(*param,"blur") == 0) {								\
+														cBinding->dest	=	plOffset(blur);							\
+													} else if (strcmp(*param,"width") == 0) {						\
+														cBinding->dest	=	plOffset(width);						\
+													} else if (strcmp(*param,"swidth") == 0) {						\
+														cBinding->dest	=	plOffset(swidth);						\
+													}																\
+													/* FIXME: Add all other possible PL variables */				\
+												}																	\
+											}																		\
+																													\
+											/* Init the varyings	*/												\
+											char	**PL_VARIABLES	=	(char **) ralloc(lookup->numVaryings*sizeof(char *),threadMemory);	\
+											for (int var=0;var<lookup->numVaryings;var++) {							\
+												operand(lookup->varyingBindings[var].opIndex,PL_VARIABLES[var],char *);	\
+											}																		\
+																													\
+											/* Init the uniforms	*/												\
+											for (int var=0;var<lookup->numUniforms;var++) {							\
+												char	*tmp;														\
+												operand(lookup->uniformBindings[var].opIndex,tmp,char *);			\
+												memcpy((char *) &(currentShadingState->scratch) + lookup->uniformBindings[var].dest,tmp,lookup->uniformBindings[var].step);	\
+											}
+
+#define		plReady()						for (int var=0;var<lookup->numVaryings;var++) {							\
+												memcpy((char *) &(currentShadingState->scratch) + lookup->varyingBindings[var].dest,PL_VARIABLES[var],lookup->varyingBindings[var].step);	\
+											}
+
+#define		plStep()						for (int var=0;var<lookup->numVaryings;var++) {							\
+												PL_VARIABLES[var]	+=	lookup->varyingBindings[var].step;			\
+											}
+#define		plEnd()							
+
 #define		dirty()							if (cInstance->dirty == FALSE) {										\
 												osLock(CRenderer::dirtyShaderMutex);								\
 												cInstance->dirty			=	TRUE;								\

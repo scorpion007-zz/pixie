@@ -1484,27 +1484,23 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 #ifndef INIT_SHADING
 #define	TEXTUREFEXPR_PRE		float					*res;													\
 								const float				*s,*t;													\
-								CTextureLookup			*lookup;												\
-								CVaryingTextureLookup	varyingLookup;											\
-								varyingLookup.init();															\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
-									int			numArguments;													\
-									const char	**op1;															\
-									const float	*op2;															\
-									argumentcount(numArguments);												\
-									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
-									operand(1,op1,const char **);												\
-									operand(2,op2,const float *);												\
-									lookup->texture				=	CRenderer::getTexture(*op1);				\
-									lookup->channel				=	(int) *op2;									\
-								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
-								getUniformParams(lookup,varyingLookup);											\
-								initVaryingParams(lookup);														\
+								const char				**op1;													\
+								const float				*op2;													\
+								int						numArguments;											\
+								argumentcount(numArguments);													\
+								/* Begin the parameter list */													\
+								plBegin(5,(numArguments-5) >> 1);												\
+								/* Fetch the parameters as usual */												\
 								operand(0,res,float *);															\
+								operand(1,op1,const char **);													\
+								operand(2,op2,const float *);													\
 								operand(3,s,const float *);														\
 								operand(4,t,const float *);														\
+								/* Get the texture */															\
+								/* Since these functions use a trie, this should be a pretty fast operation */	\
+								osLock(CRenderer::shaderMutex);													\
+								CTexture	*tex			=	CRenderer::getTexture(*op1);					\
+								osUnlock(CRenderer::shaderMutex);												\
 								int				i;																\
 								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
@@ -1512,9 +1508,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								float			*dtdv		=	dtdu + numVertices;								\
 								float			cs[4],ct[4];													\
 								vector			color;															\
-								const	float	swidth		=	varyingLookup.swidth;							\
-								const	float	twidth		=	varyingLookup.twidth;							\
-								CTexture		*tex		=	lookup->texture;								\
+								const	float	swidth		=	currentShadingState->scratch.swidth;			\
+								const	float	twidth		=	currentShadingState->scratch.twidth;			\
 								const float		*du			=	varying[VARIABLE_DU];							\
 								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
@@ -1529,10 +1524,9 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 									dtdu[i]		*=	twidth*du[i];												\
 									dtdv[i]		*=	twidth*dv[i];												\
 								}																				\
-																												\
 								i	=	0;
 
-#define	TEXTUREFEXPR			getVaryingParams(lookup,varyingLookup);											\
+#define	TEXTUREFEXPR			plReady();																		\
 								cs[0]		=	s[i];															\
 								cs[1]		=	s[i] + dsdu[i];													\
 								cs[2]		=	s[i] + dsdv[i];													\
@@ -1541,21 +1535,26 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4(color,cs,ct,lookup,&varyingLookup,this);							\
+								/* These variables would not be needed */										\
+								tex->lookup4(color,cs,ct,NULL,NULL,this);										\
 								res[i]		=	color[0];
 
-#define	TEXTUREFEXPR_UPDATE		i++;	stepVaryingParams(lookup);
+#define	TEXTUREFEXPR_UPDATE		i++;	plStep();
+
+#define	TEXTUREFEXPR_POST		plEnd();
 #else
 #define	TEXTUREFEXPR_PRE
 #define	TEXTUREFEXPR
 #define	TEXTUREFEXPR_UPDATE
+#define	TEXTUREFEXPR_POST
 #endif
 
-DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR,TEXTUREFEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR,TEXTUREFEXPR_UPDATE,TEXTUREFEXPR_POST,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	TEXTUREFEXPR_PRE
 #undef	TEXTUREFEXPR
 #undef	TEXTUREFEXPR_UPDATE
+#undef	TEXTUREFEXPR_POST
 
 
 
