@@ -16,7 +16,7 @@ varying	vector	Nf
 varying	vector	temporary_0
 uniform	vector	temporary_1
 varying	float	temporary_2
-varying	boolean	temporary_3
+varying	float	temporary_3
 varying	float	temporary_4
 varying	float	temporary_5
 uniform	float	temporary_6
@@ -42,30 +42,30 @@ varying	vector	temporary_8
 #!Label10:
 	endif             
 	fresnel	("o=vvfFFVV")  In  Nf  temporary_2  Kr  Kt  R  T 
-	dot               	temporary_2 I N
+	dot               	temporary_3 I N
 	vufloat            temporary_4 0
-	flt               	temporary_3 temporary_2 temporary_4
-	if                	temporary_3 #!Label11
+	flt               	temporary_2 temporary_3 temporary_4
+	if                	temporary_2 #!Label11
 	vfromf            	temporary_1 Ks
 	vuvector           temporary_0 temporary_1
 	negv              	temporary_8 In
-	vufloat            temporary_2 roughness
-	specular	("c=nvf")  temporary_7  Nf  temporary_8  temporary_2 
+	vufloat            temporary_3 roughness
+	specular	("c=nvf")  temporary_7  Nf  temporary_8  temporary_3 
 	mulvv             	Ci temporary_0 temporary_7
 #!Label11:
 	endif             
-	vufloat            temporary_2 0.01
-	fgt               	temporary_3 Kr temporary_2
-	if                	temporary_3 #!Label13
+	vufloat            temporary_3 0.01
+	fgt               	temporary_2 Kr temporary_3
+	if                	temporary_2 #!Label13
 	vfromf            	temporary_7 Kr
 	trace	("c=pv")  temporary_8  P  R 
 	mulvv             	temporary_0 temporary_7 temporary_8
 	addvv             	Ci Ci temporary_0
 #!Label13:
 	endif             
-	vufloat            temporary_2 0.01
-	fgt               	temporary_3 Kt temporary_2
-	if                	temporary_3 #!Label15
+	vufloat            temporary_3 0.01
+	fgt               	temporary_2 Kt temporary_3
+	if                	temporary_2 #!Label15
 	vfromf            	temporary_8 Kt
 	mulvv             	temporary_7 Cs temporary_8
 	trace	("c=pv")  temporary_8  P  T 

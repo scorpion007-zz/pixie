@@ -18,14 +18,14 @@ varying	float	ax
 varying	float	ay
 varying	float	az
 varying	vector	Lworld
-varying	boolean	temporary_1
-uniform	boolean	temporary_2
-uniform	boolean	temporary_3
-uniform	boolean	temporary_4
-uniform	boolean	temporary_5
-uniform	boolean	temporary_6
-uniform	boolean	temporary_7
-uniform	boolean	temporary_8
+varying	float	temporary_1
+uniform	float	temporary_2
+uniform	float	temporary_3
+uniform	float	temporary_4
+uniform	float	temporary_5
+uniform	float	temporary_6
+uniform	float	temporary_7
+uniform	float	temporary_8
 varying	vector	temporary_9
 varying	float	temporary_10
 varying	float	temporary_11
@@ -33,12 +33,10 @@ varying	vector	temporary_12
 varying	vector	temporary_13
 varying	vector	temporary_14
 uniform	vector	temporary_15
-varying	boolean	temporary_16
-varying	boolean	temporary_17
-varying	boolean	temporary_18
-varying	boolean	temporary_19
-varying	boolean	temporary_20
-varying	float	temporary_21
+varying	float	temporary_16
+varying	float	temporary_17
+varying	float	temporary_18
+varying	float	temporary_19
 #!Init:
 	vfromf            	temporary_0 0 0 0
 	pfrom             	from "shader" temporary_0
@@ -55,7 +53,7 @@ varying	float	temporary_21
 	or                	temporary_3 temporary_4 temporary_5
 	seql              	temporary_4 shadowname_nz ""
 	or                	temporary_2 temporary_3 temporary_4
-	vuboolean          temporary_1 temporary_2
+	vufloat            temporary_1 temporary_2
 	if                	temporary_1 #!Label18
 	vuvector           temporary_9 from
 	illuminate        	 temporary_9  #!Label19
@@ -88,14 +86,14 @@ varying	float	temporary_21
 	zcomp	("f=p")  temporary_10  Lworld 
 	abs	("f=f")  az  temporary_10 
 	vufloat            atten 0
-	fgt               	temporary_17 ax ay
-	fgt               	temporary_18 ax az
-	and               	temporary_16 temporary_17 temporary_18
-	if                	temporary_16 #!Label22
-	xcomp	("f=p")  temporary_10  Lworld 
-	vufloat            temporary_11 0.0
-	fgt               	temporary_17 temporary_10 temporary_11
-	if                	temporary_17 #!Label24
+	fgt               	temporary_11 ax ay
+	fgt               	temporary_16 ax az
+	and               	temporary_10 temporary_11 temporary_16
+	if                	temporary_10 #!Label22
+	xcomp	("f=p")  temporary_16  Lworld 
+	vufloat            temporary_17 0.0
+	fgt               	temporary_11 temporary_16 temporary_17
+	if                	temporary_11 #!Label24
 	shadow	("f=SFp")  atten  shadowname_px  0  Ps 
 #!Label24:
 	else              	#!Label23
@@ -104,14 +102,14 @@ varying	float	temporary_21
 	endif             
 #!Label22:
 	else              	#!Label21
-	fgt               	temporary_18 ay ax
-	fgt               	temporary_19 ay az
-	and               	temporary_17 temporary_18 temporary_19
-	if                	temporary_17 #!Label26
-	ycomp	("f=p")  temporary_10  Lworld 
-	vufloat            temporary_11 0.0
-	fgt               	temporary_18 temporary_10 temporary_11
-	if                	temporary_18 #!Label28
+	fgt               	temporary_16 ay ax
+	fgt               	temporary_17 ay az
+	and               	temporary_11 temporary_16 temporary_17
+	if                	temporary_11 #!Label26
+	ycomp	("f=p")  temporary_17  Lworld 
+	vufloat            temporary_18 0.0
+	fgt               	temporary_16 temporary_17 temporary_18
+	if                	temporary_16 #!Label28
 	shadow	("f=SFp")  atten  shadowname_py  0  Ps 
 #!Label28:
 	else              	#!Label27
@@ -120,14 +118,14 @@ varying	float	temporary_21
 	endif             
 #!Label26:
 	else              	#!Label25
-	fgt               	temporary_19 az ay
-	fgt               	temporary_20 az ax
-	and               	temporary_18 temporary_19 temporary_20
-	if                	temporary_18 #!Label29
-	zcomp	("f=p")  temporary_10  Lworld 
-	vufloat            temporary_11 0.0
-	fgt               	temporary_19 temporary_10 temporary_11
-	if                	temporary_19 #!Label32
+	fgt               	temporary_17 az ay
+	fgt               	temporary_18 az ax
+	and               	temporary_16 temporary_17 temporary_18
+	if                	temporary_16 #!Label29
+	zcomp	("f=p")  temporary_18  Lworld 
+	vufloat            temporary_19 0.0
+	fgt               	temporary_17 temporary_18 temporary_19
+	if                	temporary_17 #!Label32
 	shadow	("f=SFp")  atten  shadowname_pz  0  Ps 
 #!Label32:
 	else              	#!Label31
@@ -140,10 +138,10 @@ varying	float	temporary_21
 	endif             
 #!Label21:
 	endif             
-	vufloat            temporary_21 1.0
-	subff             	temporary_11 temporary_21 atten
-	vufloat            temporary_21 intensity
-	mulff             	temporary_10 temporary_11 temporary_21
+	vufloat            temporary_16 1.0
+	subff             	temporary_11 temporary_16 atten
+	vufloat            temporary_16 intensity
+	mulff             	temporary_10 temporary_11 temporary_16
 	vfromf            	temporary_13 temporary_10
 	vuvector           temporary_14 lightcolor
 	mulvv             	temporary_12 temporary_13 temporary_14
