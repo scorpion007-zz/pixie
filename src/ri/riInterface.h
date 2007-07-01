@@ -165,7 +165,7 @@ public:
 	virtual	void		RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
 	virtual	void		RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
 	virtual	void		RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeBrickMapV(int n,char **src,char *dest,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeBrickMapV(int n,char **src,char *dest,int numTokens,char *tokens[],void *params[]);
 
 	virtual	void		RiErrorHandler(void (*handler)(int,int,char *));
 

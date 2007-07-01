@@ -184,19 +184,23 @@ inline float absf(float f) {
 #define SCALAR_TYPE	float
 #define VECTOR_TYPE	vector
 #define MATRIX_TYPE	matrix
+#define	SQRT sqrtf
 #include "mathSpec.h"
 #undef SCALAR_TYPE
 #undef VECTOR_TYPE
 #undef MATRIX_TYPE
+#undef SQRT
 
 
 #define SCALAR_TYPE	double
 #define VECTOR_TYPE	dvector
 #define MATRIX_TYPE	dmatrix
+#define SQRT sqrt
 #include "mathSpec.h"
 #undef SCALAR_TYPE
 #undef VECTOR_TYPE
 #undef MATRIX_TYPE
+#undef SQRT
 
 
 

@@ -7,7 +7,6 @@ output												return SCRL_OUTPUT;
 uniform												return SCRL_UNIFORM;
 varying												return SCRL_VARYING;
 float												return SCRL_FLOAT;
-boolean												return SCRL_BOOLEAN;
 color												return SCRL_COLOR;
 vector												return SCRL_VECTOR;
 normal												return SCRL_NORMAL;

@@ -1071,8 +1071,6 @@ void	CRendererContext::RiDisplayV(char *name,char *type,char *mode,int n,char *t
 						for(k=0;k<cVar->numItems;k++)	*dst++ = (int) *src++;
 					}
 					break;
-				case TYPE_BOOLEAN:
-					break;
 				}
 				j++;
 			} else {

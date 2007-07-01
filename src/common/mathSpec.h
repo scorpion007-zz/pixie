@@ -143,7 +143,7 @@ inline	void	movvv(SCALAR_TYPE *dest,const SCALAR_TYPE *src) {
 }
 
 inline	SCALAR_TYPE	lengthv(const SCALAR_TYPE *v) {
-	return sqrt(dotvv(v,v));
+	return SQRT(dotvv(v,v));
 }
 
 inline	void	normalizev(SCALAR_TYPE *r,const SCALAR_TYPE *v) {
@@ -533,7 +533,7 @@ inline	void	refract(SCALAR_TYPE *r,const SCALAR_TYPE *I,const SCALAR_TYPE *N,SCA
 		//initv(r,0);
 		movvv(r,I);
 	} else	{
-		mulvf(vtmp,N,(eta*IdotN+sqrt(k)));
+		mulvf(vtmp,N,(eta*IdotN+SQRT(k)));
 		mulvf(r,I,eta);
 		subvv(r,vtmp);
 	}
@@ -544,7 +544,7 @@ inline	void	fresnel(const SCALAR_TYPE *I,const SCALAR_TYPE *N,SCALAR_TYPE eta,SC
 	const SCALAR_TYPE	e		=	1 / eta;
 	const SCALAR_TYPE	c		=	-dotvv(I,N);
 	const SCALAR_TYPE	t		=	e*e+c*c-1;
-	const SCALAR_TYPE	g		=	sqrt(max(t,0));
+	const SCALAR_TYPE	g		=	SQRT(max(t,0));
 	const SCALAR_TYPE	a		=	(g - c) / (g + c);
 	const SCALAR_TYPE	b		=	(c*(g+c) - 1) / (c*(g-c) + 1);
 
@@ -558,22 +558,22 @@ inline	void	fresnel(const SCALAR_TYPE *I,const SCALAR_TYPE *N,SCALAR_TYPE eta,SC
 
 inline SCALAR_TYPE ptlined(SCALAR_TYPE *A,SCALAR_TYPE *B,SCALAR_TYPE *P) {
 	SCALAR_TYPE vtmp[3],vtmp2[3],vtmp3[3];
-	float l;
+	SCALAR_TYPE l;
 
 	subvv(vtmp,P,B);
 	subvv(vtmp2,A,B);
 	if (dotvv(vtmp,vtmp2) <= 0) {
-		l	=	sqrtf(dotvv(vtmp,vtmp));
+		l	=	SQRT(dotvv(vtmp,vtmp));
 	} else {
 		mulvf(vtmp2,-1);
 		subvv(vtmp,P,A);
 		if (dotvv(vtmp,vtmp2) <= 0) {
-			l = sqrtf(dotvv(vtmp,vtmp));
+			l = SQRT(dotvv(vtmp,vtmp));
 		} else {
 			subvv(vtmp,B,A);
 			subvv(vtmp2,B,P);
 			crossvv(vtmp3,vtmp,vtmp2);
-			l = sqrtf(dotvv(vtmp3,vtmp3))/sqrtf(dotvv(vtmp,vtmp));
+			l = SQRT(dotvv(vtmp3,vtmp3))/SQRT(dotvv(vtmp,vtmp));
 		}
 	}
 	return l;
@@ -636,7 +636,7 @@ int		invertm(SCALAR_TYPE *,const SCALAR_TYPE *);											// Invert a matrix. R
 ////////////////////////////////////////////////////////////////////////////
 // Initialize a quaternion
 inline	void	normalizeq(SCALAR_TYPE *q) {
-	const double	l	=	1 / sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
+	const double	l	=	1 / SQRT(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
 	q[0]	=	(SCALAR_TYPE) (q[0]*l);
 	q[1]	=	(SCALAR_TYPE) (q[1]*l);
 	q[2]	=	(SCALAR_TYPE) (q[2]*l);

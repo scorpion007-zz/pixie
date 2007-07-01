@@ -498,7 +498,7 @@ EXTERN(RtVoid)
     RiMakeShadow (char *pic, char *tex, ...),
     RiMakeShadowV (char *pic, char *tex, RtInt n, RtToken tokens[], RtPointer params[]),
 	RiMakeBrickMap (int n,char **src, char *dest, ...),
-	RiMakeBrickMapV(int n,char **src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]);
+	RiMakeBrickMapV(int n,char **src, char *dest,RtInt numTokens, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid)
     RiErrorHandler (RtErrorHandler handler),

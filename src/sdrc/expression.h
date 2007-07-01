@@ -477,8 +477,8 @@ public:
 //
 ////////////////////////////////////////////////////////////////////////
 
-CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,char *opcodeBoolean);
-CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,char *opcodeBoolean);
+CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString);
+CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString);
 CExpression	*getConversion(int type,CExpression *first);
 CExpression	*getConversion(int type,char *system,CExpression *first);
 void		getConversion(FILE *,CVariable *,CExpression *);

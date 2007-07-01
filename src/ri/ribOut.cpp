@@ -1416,8 +1416,6 @@ retry:;
 					out("%d ",iv[0]);
 				}
 				break;
-			case TYPE_BOOLEAN:
-				break;
 			default:
 				break;
 			}
@@ -1529,8 +1527,6 @@ retry:;
 				}
 				break;
 			case TYPE_INTEGER:
-				break;
-			case TYPE_BOOLEAN:
 				break;
 			default:
 				break;

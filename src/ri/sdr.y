@@ -230,7 +230,6 @@ static	TSlFunction		functions[]	=	{
 											return	1;
 											break;
 										case TYPE_INTEGER:
-										case TYPE_BOOLEAN:
 											return	1;
 											break;
 										default:
@@ -712,7 +711,6 @@ static	TSlFunction		functions[]	=	{
 %token	 SCRL_OUTPUT
 %token	 SCRL_VARYING
 %token	 SCRL_UNIFORM
-%token	 SCRL_BOOLEAN
 %token	 SCRL_FLOAT
 %token	 SCRL_COLOR
 %token	 SCRL_VECTOR
@@ -1636,9 +1634,6 @@ slVariables:
 
 slVariable:
 				slContainer
-				slBooleanVariable
-				|
-				slContainer
 				slFloatVariable
 				|
 				slContainer
@@ -1658,23 +1653,6 @@ slVariable:
 				|
 				slContainer
 				slMatrixVariable
-				;
-
-slBooleanVariable:
-				SCRL_BOOLEAN
-				SCRL_IDENTIFIER_VALUE
-				{
-					newVariable($2,TYPE_BOOLEAN,1,FALSE);
-				}
-				|
-				SCRL_BOOLEAN
-				SCRL_IDENTIFIER_VALUE
-				SCRL_OPEN_SQR_PARANTHESIS
-				SCRL_FLOAT_VALUE
-				SCRL_CLOSE_SQR_PARANTHESIS
-				{
-					newVariable($2,TYPE_BOOLEAN,(int) $4,FALSE);
-				}
 				;
 
 

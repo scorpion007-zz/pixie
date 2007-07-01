@@ -54,8 +54,7 @@ typedef enum {
 	TYPE_QUAD,							// For "Pw"
 	TYPE_DOUBLE,
 	TYPE_STRING,
-	TYPE_INTEGER,
-	TYPE_BOOLEAN
+	TYPE_INTEGER
 } EVariableType;
 
 // Possible network messages

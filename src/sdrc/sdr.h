@@ -100,7 +100,6 @@ const	int		SLC_VECTOR				=	1 << 1;		// A vector of 3 floats
 const	int		SLC_STRING				=	1 << 2;		// String
 const	int		SLC_MATRIX				=	1 << 3;		// Matrix
 const	int		SLC_NONE				=	1 << 4;		// No type
-const	int		SLC_BOOLEAN				=	1 << 5;		// Boolean (integer)
 
 const	int		SLC_RDONLY				=	1 << 6;		// Read only variable
 
@@ -124,7 +123,7 @@ const	int		SLC_GLOBAL				=	1 << 18;	// Variable is global
 const	int		SLC_PARAMETER			=	1 << 19;	// Variable is parameter
 
 // Some masks that can be used to isolate specific postions of the type integer
-const	int		SLC_TYPE_MASK			=	SLC_FLOAT | SLC_VECTOR | SLC_STRING | SLC_MATRIX | SLC_NONE | SLC_BOOLEAN;
+const	int		SLC_TYPE_MASK			=	SLC_FLOAT | SLC_VECTOR | SLC_STRING | SLC_MATRIX | SLC_NONE;
 const	int		SLC_SUB_TYPE_MASK		=	SLC_VNORMAL | SLC_VVECTOR | SLC_VPOINT | SLC_VCOLOR;
 
 // Script types

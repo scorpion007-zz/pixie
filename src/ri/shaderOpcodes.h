@@ -373,15 +373,13 @@ DEFOPCODE(EndIlluminate	,"endilluminate"	,0, ILLUMINATEEND_PRE, NULL_EXPR, NULL_
 #ifdef INIT_SHADING
 #define SOLAR1EXPR_PRE
 #else
-#define	SOLAR1EXPR_PRE				int		i;													\
-																								\
-									if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {			\
+#define	SOLAR1EXPR_PRE				if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
 										solarBegin(NULL,NULL);									\
 									} else {													\
-										float	*Ps		=	varying[VARIABLE_PS];				\
-										float	*L		=	varying[VARIABLE_L];				\
+										const float	*Ps		=	varying[VARIABLE_PS];			\
+										float		*L		=	varying[VARIABLE_L];			\
 																								\
-										for (i=numVertices;i>0;i--,tags++) {					\
+										for (int i=numVertices;i>0;i--,tags++) {				\
 											if (*tags) {										\
 												(*tags)++;										\
 											} else {											\
@@ -405,7 +403,6 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 #define	SOLAR2EXPR_PRE
 #else
 #define	SOLAR2EXPR_PRE				const float	*Nf,*thetaf;									\
-									int			i;												\
 																								\
 									operand(0,Nf,const float *);								\
 									operand(1,thetaf,const float *);							\
@@ -422,7 +419,7 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 										subvv(R,CRenderer::worldBmax,CRenderer::worldBmin);		\
 										worldRadius				=	dotvv(R,R);					\
 																								\
-										for (i=numVertices;i>0;i--,tags++) {					\
+										for (int i=numVertices;i>0;i--,tags++) {				\
 											if (*tags) {										\
 												(*tags)++;										\
 											} else {											\
@@ -456,16 +453,14 @@ DEFOPCODE(Solar2	,"solar"	,3, SOLAR2EXPR_PRE, NULL_EXPR, NULL_EXPR, SOLAR2EXPR_P
 #ifdef INIT_SHADING
 #define SOLAREND_PRE
 #else
-#define	SOLAREND_PRE				if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {		\
+#define	SOLAREND_PRE				if (CRenderer::hiderFlags & HIDER_ILLUMINATIONHOOK) {	\
 										solarEnd();											\
 									} else {												\
-										const float		*L;									\
+										const float		*L	=	varying[VARIABLE_L];		\
 										float 			*Lsave;								\
-										int				i;									\
-										L	=	varying[VARIABLE_L];						\
 																							\
 										saveLighting(Lsave);								\
-										for (i=0;i<numVertices;i++,tags++) {				\
+										for (int i=0;i<numVertices;i++,tags++) {			\
 											if (*tags) {									\
 												(*tags)--;									\
 												if (*tags == 0) {							\

@@ -196,7 +196,7 @@ static	char			*toLowerCase(char *s) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	parameterListCheck
-// Description			:	Count the number of variables inb the parameter list
+// Description			:	Count the number of variables in the parameter list
 // Return Value			:	TRUE if OK
 // Comments				:	(This version is used by the primitives)
 static	int		parameterListCheck() {

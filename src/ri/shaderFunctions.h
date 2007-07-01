@@ -2206,13 +2206,11 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 									int		i;																	\
 									const char	**param;														\
 									const float	*valf;															\
-									const int	*vali;															\
 									const char	**vals;															\
 																												\
 									for (i=0;i<num;i++) {														\
 										operand(i*2+start,param,const char **);									\
 										operand(i*2+start+1,valf,const float *);								\
-										operand(i*2+start+1,vali,const int *);									\
 										operand(i*2+start+1,vals,const char **);								\
 																												\
 										if (strcmp(*param,"estimator") == 0) {									\
@@ -2257,7 +2255,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 											/* null string counts as default */									\
 											if((*vals)[0] != '\0') lookup->coordsys	=	*vals;					\
 										} else if (strcmp(*param,"interpolate") == 0) {							\
-											lookup->interpolate		=	*vali;									\
+											lookup->interpolate		=	(int) *valf;							\
 										} else if (strcmp(*param,"samplebase") == 0) {							\
 											lookup->sampleBase	=	*valf;										\
 										} else {																\

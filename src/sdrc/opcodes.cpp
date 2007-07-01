@@ -156,7 +156,6 @@ char 	*opcodeVUFloat					=			"\tvufloat           ";
 char 	*opcodeVUVector					=			"\tvuvector          ";
 char 	*opcodeVUMatrix					=			"\tvumatrix          ";
 char 	*opcodeVUString					=			"\tvustring          ";
-char 	*opcodeVUBoolean				=			"\tvuboolean         ";
 
 //	Move
 char	*opcodeMoveFloatFloat			=			"\tmoveff            ";

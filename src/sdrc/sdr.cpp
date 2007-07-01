@@ -82,6 +82,21 @@ CSymbol::~CSymbol() {
 // Comments				:	The first parameter is the name of the variable as referenced in the code and
 //							the second parameter is the function defining this variable
 CVariable::CVariable(char *name,int type,int multiplicity) : CSymbol(name) {
+
+	// Sanity check
+	if (multiplicity > 1) {
+		if (!(type & SLC_ARRAY)) {
+			sdr->error("Variable (%s) has more than one items (%d) but is not an array.\n",name,multiplicity);
+		}
+	}
+
+	// Make sure the array size is reasonable
+	if (multiplicity <= 0) {
+		sdr->error("Array size for %s is invalid (%s)\n",name,multiplicity);
+		multiplicity	=	1;
+	}
+
+	// Record
 	this->type		=	type;
 	this->numItems	=	multiplicity;						// Note that numItems field only makes sense if the ARRAY field
 	cName			=	NULL;								// of the type is set
@@ -1489,8 +1504,6 @@ void			CScriptContext::generateCode(char *o) {
 			// Write the parameter type
 			if (cParameter->type & SLC_FLOAT)
 				fprintf(out,"float\t");
-			else if (cParameter->type & SLC_BOOLEAN)
-				fprintf(out,"boolean\t");
 			else if (cParameter->type & SLC_VECTOR) {
 				if (cParameter->type & SLC_VPOINT)
 					fprintf(out,"point\t");	
@@ -1538,8 +1551,6 @@ void			CScriptContext::generateCode(char *o) {
 			// Write the type
 			if (cVariable->type & SLC_FLOAT)
 				fprintf(out,"float\t");
-			else if (cVariable->type & SLC_BOOLEAN)
-				fprintf(out,"boolean\t");
 			else if (cVariable->type & SLC_VECTOR) {
 				fprintf(out,"vector\t");
 			} else if (cVariable->type & SLC_STRING)

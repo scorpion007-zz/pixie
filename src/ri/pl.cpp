@@ -704,7 +704,6 @@ void		CPl::transform(CXform *x,float *data) {
 			case TYPE_DOUBLE:
 			case TYPE_STRING:
 			case TYPE_INTEGER:
-			case TYPE_BOOLEAN:
 				// No transformation is required
 				break;
 			}

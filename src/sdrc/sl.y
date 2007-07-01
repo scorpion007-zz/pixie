@@ -77,6 +77,9 @@
 // Here's the only global CVariable
 //////////////////////////////////////////////////////////////////////////
 	CScriptContext		*sdr;
+	
+// This macro can be used to record the last parsed line number for accurate error reporting
+#define	checkPoint()	sdr->statementLineNo	=	sdr->lineNo
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -232,7 +235,6 @@
 %type<code>			slAritmeticTypeCast
 %type<code>			slVectorMatrixExpression
 %type<code>			slVMExpression
-%type<code>			slBooleanExpression
 %type<code>			slFunctionCall
 %type<code>			slFunctionCallParameters
 %type<string>		slFunCallHeader
@@ -367,7 +369,7 @@ slTypeDecl:
 			{
 				$$	=	$1 | $2 | $3 | $4;
 				sdr->desire($$);
-				sdr->statementLineNo	=	sdr->lineNo;
+				checkPoint();
 			}
 			;
 
@@ -384,10 +386,12 @@ slShader:
 		slFunction					// Normally slFunction shouldn't have any code associated with it
 		slShader					// Recursion
 		{
+			checkPoint();
 		}
 	|
 		slMain						// The main shader code
 		{
+			checkPoint();
 		}
 		;
 
@@ -415,6 +419,7 @@ slFunctionHeader:
 			thisFunction->returnValue	=	new CParameter($2,$1,1);
 
 			sdr->undesire();
+			checkPoint();
 		}
 		|
 		SL_VOID
@@ -424,6 +429,7 @@ slFunctionHeader:
 			CFunction	*thisFunction	=	sdr->newFunction($2);
 			
 			thisFunction->returnValue	=	NULL;
+			checkPoint();
 		}
 		;
 
@@ -442,6 +448,7 @@ slFunction:
 				if (cFun->returnValueGiven == FALSE) 
 					sdr->error("Return value not given for %s\n",cFun->symbolName);
 
+			checkPoint();
 		}
 		;
 		
@@ -455,11 +462,13 @@ slFunctionParameters:
 		slFunctionParameters
 		{
 			$$	=	new CTwoExpressions($1,$3);
+			checkPoint();
 		}
 	|
 		slFunctionParameter
 		{
 			$$	=	$1;
+			checkPoint();
 		}
 		;
 
@@ -499,9 +508,7 @@ slFunctionParameter:
 slFunctionParameterIdentifierList:
 		SL_IDENTIFIER_VALUE							// Default Parameter values are not supported yet
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired(),1);	// Add the Parameter to the current CFunction
+			sdr->newParameter($1,sdr->desired(),1);	// Add the Parameter to the current CFunction
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList
@@ -511,9 +518,7 @@ slFunctionParameterIdentifierList:
 	|
 		SL_IDENTIFIER_VALUE
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired(),1);
+			sdr->newParameter($1,sdr->desired(),1);
 	
 			$$			=	new CNullExpression;
 		}
@@ -522,9 +527,7 @@ slFunctionParameterIdentifierList:
 		SL_OPEN_SQR_PARANTHESIS
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY,-1);
+			sdr->newParameter($1,sdr->desired() | SLC_ARRAY,-1);
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList
@@ -537,14 +540,7 @@ slFunctionParameterIdentifierList:
 		SL_FLOAT_VALUE
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));
-			
-			if (cParameter->numItems <= 0) {
-				sdr->error("Array size for %s is invalid (%s)\n",$1,$3);
-				cParameter->numItems	=	1;
-			}
+			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));			
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList
@@ -556,9 +552,7 @@ slFunctionParameterIdentifierList:
 		SL_OPEN_SQR_PARANTHESIS
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter;
-			
-			cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, -1);
+			sdr->newParameter($1,sdr->desired() | SLC_ARRAY, -1);
 			
 			$$	=	new CNullExpression;
 		}
@@ -568,15 +562,8 @@ slFunctionParameterIdentifierList:
 		SL_FLOAT_VALUE
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter;
+			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));
 			
-			cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));
-			
-			if (cParameter->numItems <= 0) {
-				sdr->error("Array size for %s is invalid (%s)\n",$1,$3);
-				cParameter->numItems	=	1;
-			}
-
 			$$	=	new CNullExpression;
 		}
 		;
@@ -605,9 +592,8 @@ slMain:	slShaderType							// Type of the shader
 		slBlock
 		{
 			CFunction	*cFun			=	sdr->popFunction();
-			CParameter	*cParameter;
 
-			for (cParameter=cFun->parameters->first();cParameter!=NULL;cParameter=cFun->parameters->next()) {
+			for (CParameter	*cParameter=cFun->parameters->first();cParameter!=NULL;cParameter=cFun->parameters->next()) {
 				sdr->variables->push(cParameter);
 			}
 
@@ -751,11 +737,6 @@ slShaderParameterIdentifierToken:
 		{
 			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,atoi($3));
 
-			if (cParameter->numItems <= 0) {
-				sdr->error("Array size for %s is invalid (%s)\n",$1,$3);
-				cParameter->numItems	=	1;
-			}
-
 			sdr->variableList->push(cParameter);
 		}
 		slShaderParameterIdentifierToken
@@ -769,12 +750,6 @@ slShaderParameterIdentifierToken:
 		SL_CLOSE_SQR_PARANTHESIS
 		{
 			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,atoi($3));
-
-			// Get the parameter
-			if (cParameter->numItems <= 0)	{
-				sdr->error("Array size for %s is invalid (%s)\n",$1,$3);
-				cParameter->numItems	=	1;
-			}
 
 			sdr->variableList->push(cParameter);
 		}
@@ -865,9 +840,7 @@ slVariableInitializer:
 slVariableIdentifierList:
 		SL_IDENTIFIER_VALUE
 		{
-			CVariable	*cVar;
-
-			cVar	=	sdr->newVariable($1,sdr->desired(),1);
+			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired(),1);
 
 			sdr->variableList->push(cVar);
 		}
@@ -878,9 +851,7 @@ slVariableIdentifierList:
 	|
 		SL_IDENTIFIER_VALUE
 		{
-			CVariable	*cVar;
-
-			cVar	=	sdr->newVariable($1,sdr->desired(),1);
+			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired(),1);
 
 			sdr->variableList->push(cVar);
 		}
@@ -896,14 +867,7 @@ slVariableIdentifierList:
 		SL_FLOAT_VALUE
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CVariable	*cVar;
-
-			cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,atoi($3));
-
-			if (cVar->numItems <= 0) {
-				sdr->error("Array size is invalid for %s (%s)\n",$1,$3);
-				cVar->numItems	=	1;
-			}
+			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,atoi($3));
 
 			sdr->variableList->push(cVar);
 		}
@@ -917,15 +881,7 @@ slVariableIdentifierList:
 		SL_FLOAT_VALUE
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CVariable	*cVar;
-
-			cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,atoi($3));
-
-		
-			if (cVar->numItems <= 0) {
-				sdr->error("Array size is invalid for %s (%s)\n",$1,$3);
-				cVar->numItems	=	1;
-			}
+			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,atoi($3));
 
 			sdr->variableList->push(cVar);
 		}
@@ -942,6 +898,7 @@ slVariableIdentifierTail:
 		slVariableIdentifierList
 		{
 			$$	=	$2;
+			checkPoint();
 		}
 	|
 		SL_SEMI_COLON
@@ -959,12 +916,14 @@ slStatement:
 
 			$$	=	$1;
 			assert(sdr->desired() & SLC_NONE);
+			checkPoint();
 		}
 	|
 		slMatchedStatement
 		{
 			$$	=	$1;
 			assert(sdr->desired() & SLC_NONE);
+			checkPoint();
 		}
 	|
 		error
@@ -972,6 +931,7 @@ slStatement:
 			// Recoverable error happened
 			$$	=	new CNullExpression;
 			assert(sdr->desired() & SLC_NONE);
+			checkPoint();
 		}
 
 		;
@@ -1291,7 +1251,7 @@ slReturnStatement:
 slWhileStartStatement:
 		SL_WHILE
 		SL_OPEN_PARANTHESIS
-		slBooleanExpression
+		slAritmeticExpression
 		SL_CLOSE_PARANTHESIS
 		{
 			CFunction	*cFun	=	sdr->newFunction(constantLoopName);
@@ -1696,13 +1656,13 @@ slForInitStatements:
 		////////////////////////////////////////////////
 		// For check statement
 slForCheckStatement:
-		slBooleanExpression
+		slAritmeticExpression
 		{
-			$$	=	getConversion(SLC_BOOLEAN,$1);
+			$$	=	getConversion(SLC_FLOAT,$1);
 		}
 	|
 		{
-			$$	=	new CConstantTerminalExpression(SLC_BOOLEAN | SLC_UNIFORM,strdup("true"));
+			$$	=	new CConstantTerminalExpression(SLC_FLOAT | SLC_UNIFORM,strdup("1"));
 		}
 		;
 
@@ -1752,7 +1712,7 @@ slForIncrementStatements:
 slMatchedIfStatement:
 		SL_IF
 		SL_OPEN_PARANTHESIS
-		slBooleanExpression
+		slAritmeticExpression
 		SL_CLOSE_PARANTHESIS
 		slMatchedStatement
 		SL_ELSE
@@ -1767,7 +1727,7 @@ slMatchedIfStatement:
 slUnmatchedIfStatement:
 		SL_IF
 		SL_OPEN_PARANTHESIS
-		slBooleanExpression
+		slAritmeticExpression
 		SL_CLOSE_PARANTHESIS
 		slStatement
 		{
@@ -1776,7 +1736,7 @@ slUnmatchedIfStatement:
 	|
 		SL_IF
 		SL_OPEN_PARANTHESIS
-		slBooleanExpression
+		slAritmeticExpression
 		SL_CLOSE_PARANTHESIS
 		slMatchedStatement
 		SL_ELSE
@@ -2100,14 +2060,14 @@ slAritmeticExpression:
 		SL_PLUS
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix,NULL,NULL);
+			$$	=	getOperation($1,$3,opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix,NULL);
 		}
 	|
 		slAritmeticExpression
 		SL_MINUS
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeSubFloatFloat,opcodeSubVectorVector,opcodeSubMatrixMatrix,NULL,NULL);
+			$$	=	getOperation($1,$3,opcodeSubFloatFloat,opcodeSubVectorVector,opcodeSubMatrixMatrix,NULL);
 		}
 	|
 		slAritmeticExpression
@@ -2140,14 +2100,14 @@ slAritmeticExpression:
 
 
 			if ($$ == NULL)
-				$$	=	getOperation($1,$3,opcodeMulFloatFloat,opcodeMulVectorVector,opcodeMulMatrixMatrix,NULL,NULL);
+				$$	=	getOperation($1,$3,opcodeMulFloatFloat,opcodeMulVectorVector,opcodeMulMatrixMatrix,NULL);
 		}
 	|
 		slAritmeticExpression
 		SL_DIVIDE
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeDivFloatFloat,opcodeDivVectorVector,opcodeDivMatrixMatrix,NULL,NULL);
+			$$	=	getOperation($1,$3,opcodeDivFloatFloat,opcodeDivVectorVector,opcodeDivMatrixMatrix,NULL);
 		}
 	|
 		slAritmeticExpression
@@ -2181,10 +2141,10 @@ slAritmeticExpression:
 		SL_MINUS
 		slAritmeticExpression
 		{
-			$$	=	getOperation($2,opcodeNegFloat,opcodeNegVector,opcodeNegMatrix,NULL,NULL);
+			$$	=	getOperation($2,opcodeNegFloat,opcodeNegVector,opcodeNegMatrix,NULL);
 		}
 	|
-		slBooleanExpression
+		slAritmeticExpression
 		SL_QUESTION
 		slAritmeticExpression
 		SL_COLON
@@ -2198,6 +2158,68 @@ slAritmeticExpression:
 			} else {
 				sdr->error("Type mismatch in conditional execution\n");
 			}
+		}
+	|
+		slAritmeticExpression
+		SL_AND
+		slAritmeticExpression
+		{
+			$$	=	getOperation($1,$3,opcodeAnd,NULL,NULL,NULL);
+		}
+	|
+		slAritmeticExpression
+		SL_OR
+		slAritmeticExpression
+		{
+			$$	=	getOperation($1,$3,opcodeOr,NULL,NULL,NULL);
+		}
+	|
+		slAritmeticExpression
+		SL_COMP_GREATER
+		slAritmeticExpression
+		{
+			$$			=	getOperation($1,$3,opcodeFloatGreater,opcodeVectorGreater,NULL,NULL);
+		}
+	|
+		slAritmeticExpression
+		SL_COMP_LESS
+		slAritmeticExpression
+		{
+			$$			=	getOperation($1,$3,opcodeFloatLess,opcodeVectorLess,NULL,NULL);
+		}
+	|
+		slAritmeticExpression
+		SL_COMP_GREATER_EQUAL
+		slAritmeticExpression
+		{
+			$$			=	getOperation($1,$3,opcodeFloatEGreater,opcodeVectorEGreater,NULL,NULL);
+		}
+	|
+		slAritmeticExpression
+		SL_COMP_LESS_EQUAL
+		slAritmeticExpression
+		{
+			$$			=	getOperation($1,$3,opcodeFloatELess,opcodeVectorELess,NULL,NULL);
+		}
+	|
+		slAritmeticExpression
+		SL_COMP_EQUAL
+		slAritmeticExpression
+		{
+			$$			=	getOperation($1,$3,opcodeFloatEqual,opcodeVectorEqual,NULL,opcodeStringEqual);
+		}
+	|
+		slAritmeticExpression
+		SL_COMP_DIFFERENT
+		slAritmeticExpression
+		{
+			$$			=	getOperation($1,$3,opcodeFloatNotEqual,opcodeVectorNotEqual,NULL,opcodeStringNotEqual);
+		}
+	|
+		SL_NOT
+		slAritmeticExpression
+		{
+			$$			=	new CUnaryExpression(SLC_FLOAT,opcodeNot,getConversion(SLC_FLOAT,$2));
 		}
 		;
 
@@ -2469,99 +2491,6 @@ slVMExpression:
 			$$				=	new CMatrixExpression(elements);
 		}
 		
-slBooleanExpression:
-		SL_OPEN_PARANTHESIS
-		slBooleanExpression
-		SL_CLOSE_PARANTHESIS
-		{
-			$$	=	$2;
-		}
-	|
-		slBooleanExpression
-		SL_AND
-		slBooleanExpression
-		{
-			$$	=	getOperation($1,$3,NULL,NULL,NULL,NULL,opcodeAnd);
-		}
-	|
-		slBooleanExpression
-		SL_OR
-		slBooleanExpression
-		{
-			$$	=	getOperation($1,$3,NULL,NULL,NULL,NULL,opcodeOr);
-		}
-	|
-		slAritmeticExpression
-		SL_COMP_GREATER
-		slAritmeticExpression
-		{
-			$$			=	getOperation($1,$3,opcodeFloatGreater,opcodeVectorGreater,NULL,NULL,NULL);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slAritmeticExpression
-		SL_COMP_LESS
-		slAritmeticExpression
-		{
-			$$			=	getOperation($1,$3,opcodeFloatLess,opcodeVectorLess,NULL,NULL,NULL);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slAritmeticExpression
-		SL_COMP_GREATER_EQUAL
-		slAritmeticExpression
-		{
-			$$			=	getOperation($1,$3,opcodeFloatEGreater,opcodeVectorEGreater,NULL,NULL,NULL);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slAritmeticExpression
-		SL_COMP_LESS_EQUAL
-		slAritmeticExpression
-		{
-			$$			=	getOperation($1,$3,opcodeFloatELess,opcodeVectorELess,NULL,NULL,NULL);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slAritmeticExpression
-		SL_COMP_EQUAL
-		slAritmeticExpression
-		{
-			$$			=	getOperation($1,$3,opcodeFloatEqual,opcodeVectorEqual,NULL,opcodeStringEqual,NULL);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slAritmeticExpression
-		SL_COMP_DIFFERENT
-		slAritmeticExpression
-		{
-			$$			=	getOperation($1,$3,opcodeFloatNotEqual,opcodeVectorNotEqual,NULL,opcodeStringNotEqual,NULL);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slBooleanExpression
-		SL_COMP_EQUAL
-		slBooleanExpression
-		{
-			$$			=	getOperation($1,$3,NULL,NULL,NULL,NULL,opcodeAnd);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		slBooleanExpression
-		SL_COMP_DIFFERENT
-		slBooleanExpression
-		{
-			$$			=	getOperation($1,$3,NULL,NULL,NULL,NULL,opcodeXor);
-			$$->type	=	SLC_BOOLEAN | ($1->type & $3->type & SLC_UNIFORM);
-		}
-	|
-		SL_NOT
-		slBooleanExpression
-		{
-			$$			=	new CUnaryExpression(SLC_BOOLEAN,opcodeNot,getConversion(SLC_BOOLEAN,$2));
-		}
-		;
-
 		////////////////////////////////////////////////
 		// A CFunction call
 

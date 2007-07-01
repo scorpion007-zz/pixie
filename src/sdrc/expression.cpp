@@ -76,8 +76,6 @@ inline	void	getContainer(FILE *out,int type,CVariable *&dest,CExpression *src) {
 				opcode	=	opcodeVUMatrix;
 			} else if (src->type & SLC_STRING) {
 				opcode	=	opcodeVUString;
-			} else if (src->type & SLC_BOOLEAN) {
-				opcode	=	opcodeVUBoolean;
 			} else {
 				sdr->fatal(constantBug);
 			}
@@ -127,8 +125,6 @@ inline	void	getContainer(FILE *out,CVariable *dest,CVariable *src) {
 				opcode	=	opcodeVUMatrix;
 			} else if (src->type & SLC_STRING) {
 				opcode	=	opcodeVUString;
-			} else if (src->type & SLC_BOOLEAN) {
-				opcode	=	opcodeVUBoolean;
 			} else {
 			}
 
@@ -177,8 +173,6 @@ inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
 				opcode	=	opcodeVUMatrix;
 			} else if (exp->type & SLC_STRING) {
 				opcode	=	opcodeVUString;
-			} else if (exp->type & SLC_BOOLEAN) {
-				opcode	=	opcodeVUBoolean;
 			} else {
 				assert(FALSE);
 			}
@@ -238,8 +232,6 @@ inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 				opcode	=	opcodeVUMatrix;
 			} else if (src->type & SLC_STRING) {
 				opcode	=	opcodeVUString;
-			} else if (src->type & SLC_BOOLEAN) {
-				opcode	=	opcodeVUBoolean;
 			} else {
 				assert(FALSE);
 			}
@@ -1818,7 +1810,7 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 // Return Value			:	-
 // Comments				:
 CConditionalExpression::CConditionalExpression(int type,CExpression *condition,CExpression *first,CExpression *second) : CExpression(type) {
-	this->condition			=	getConversion(SLC_BOOLEAN,condition);
+	this->condition			=	getConversion(SLC_FLOAT,condition);
 	this->trueExpression	=	getConversion(type,first);
 	this->falseExpression	=	getConversion(type,second);
 
@@ -2077,7 +2069,7 @@ CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpr
 	// Create Accessor
 	if(CExpression *arrayAccessor = new CArrayExpression(first,new CTerminalExpression(indexVar))){
 		// Create update expression
-		if(CExpression	*second = getOperation(arrayAccessor,s,opcodeFloat,opcodeVector,opcodeMatrix,NULL,NULL)){
+		if(CExpression	*second = getOperation(arrayAccessor,s,opcodeFloat,opcodeVector,opcodeMatrix,NULL)){
 			// Create expression to store it again
 			arrayAssigner = new CArrayAssignmentExpression(first,new CTerminalExpression(indexVar),second);
 		}
@@ -2380,7 +2372,7 @@ void		CUpdateExpression::getCode(FILE *out,CVariable *dest) {
 // Return Value			:	-
 // Comments				:
 CIfThenElse::CIfThenElse(CExpression *c,CExpression *f,CExpression *s) : CExpression(SLC_NONE) {
-	cond	=	getConversion(SLC_BOOLEAN,c);
+	cond	=	getConversion(SLC_FLOAT,c);
 	first	=	f;
 	second	=	s;
 }
@@ -2669,7 +2661,7 @@ void		CGatherThenElse::getCode(FILE *out,CVariable *dest) {
 // Comments				:
 CForLoop::CForLoop(CExpression *s,CExpression *c,CExpression *u,CExpression *b) : CExpression(0) {
 	start	=	s;
-	cond	=	getConversion(SLC_BOOLEAN,c);
+	cond	=	getConversion(SLC_FLOAT,c);
 	update	=	u;
 	body	=	b;
 }
@@ -3008,7 +3000,7 @@ void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Generate code for a binary operation
 // Return Value			:	The generated expression
 // Comments				:
-CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,char *opcodeBoolean) {
+CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString) {
 	if ((first->type | second->type) & SLC_ARRAY) {
 		delete first;
 		delete second;
@@ -3045,12 +3037,6 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 			} else {
 				return	new CBinaryExpression(SLC_STRING,opcodeString,first,second);
 			}
-		} else if (first->type & SLC_BOOLEAN) {	
-			if (opcodeBoolean == NULL) {
-				sdr->error("This operation is not defined on booleans\n");
-			} else {
-				return	new CBinaryExpression(SLC_BOOLEAN,opcodeBoolean,first,second);
-			}
 		} else {
 			assert(FALSE);
 		}
@@ -3081,12 +3067,6 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 			} else {
 				return	new CBinaryExpression(SLC_FLOAT,opcodeFloat,getConversion(SLC_FLOAT,first),getConversion(SLC_FLOAT,second));
 			}
-		} else if ((first->type | second->type) & SLC_BOOLEAN) {	
-			if (opcodeBoolean == NULL) {
-				sdr->error("This operation is not defined on booleans\n");
-			} else {
-				return	new CBinaryExpression(SLC_BOOLEAN,opcodeBoolean,getConversion(SLC_BOOLEAN,first),getConversion(SLC_BOOLEAN,second));
-			}
 		} else {
 			assert(FALSE);
 		}
@@ -3103,7 +3083,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 // Description			:	Generate a unary operation
 // Return Value			:	The generated expression
 // Comments				:
-CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,char *opcodeBoolean) {
+CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString) {
 	if (first->type & SLC_ARRAY) {
 		delete first;
 		sdr->error("You can not operate on arrays directly\n");
@@ -3114,7 +3094,6 @@ CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVecto
 	else if (first->type & SLC_VECTOR)	return	new CUnaryExpression(SLC_VECTOR | (first->type & SLC_SUB_TYPE_MASK),opcodeVector,first);
 	else if (first->type & SLC_MATRIX)	return	new CUnaryExpression(SLC_MATRIX,opcodeMatrix,first);
 	else if (first->type & SLC_STRING)	return	new CUnaryExpression(SLC_STRING,opcodeString,first);
-	else if (first->type & SLC_BOOLEAN)	return	new CUnaryExpression(SLC_BOOLEAN,opcodeBoolean,first);
 	else {
 		assert(FALSE);
 	}
@@ -3128,13 +3107,7 @@ CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVecto
 // Return Value			:	The converted expression
 // Comments				:
 CExpression	*getConversion(int type,CExpression *first) {
-	if (type & SLC_BOOLEAN) {
-		if (first->type & SLC_BOOLEAN)	return	first;
-		else {
-			sdr->error("Unable to cast a boolean\n");
-			delete first;
-		}
-	} else if (type & SLC_STRING) {
+	if (type & SLC_STRING) {
 		if (first->type & SLC_STRING)	return first;
 		else {
 			sdr->error("Unable to cast a string\n");
@@ -3189,9 +3162,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 
 			first->getCode(out,tVar);
 
-			if (dest->type & SLC_BOOLEAN) {
-				sdr->error("Unable to cast boolean\n");
-			} else if (dest->type & SLC_STRING) {
+			if (dest->type & SLC_STRING) {
 				sdr->error("Unable to cast string\n");
 			} else if (dest->type & SLC_FLOAT) {
 				sdr->error("Unable to cast float\n");
@@ -3218,13 +3189,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 			first->getCode(out,dest);
 		}
 	} else {
-		if (dest->type & SLC_BOOLEAN) {
-			if (first->type & SLC_BOOLEAN)	{
-				assert(FALSE);
-			} else {
-				sdr->error("Unable to cast boolean\n");
-			}
-		} else if (dest->type & SLC_STRING) {
+		if (dest->type & SLC_STRING) {
 			if (first->type & SLC_STRING)	{
 				fprintf(out,"%s\t%s %s\n",opcodeMoveStringString,dest->codeName(),cVar->codeName());
 			} else {

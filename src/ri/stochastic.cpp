@@ -292,7 +292,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // beind it.  Otherwise, we need to update accumulated opacity, and cull samples
 // behind the point where we become opaque
 
-#define updateTransparent(dfIf,dfElse) {																\
+#define updateTransparent(dfIf,dfElse) {															\
 	vector O,rO;																					\
 	const float *Oc;																				\
 	CFragment *cSample	=	nSample->prev;															\
@@ -363,23 +363,11 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // Return Value			:	-
 // Comments				:
 void		CStochastic::rasterEnd(float *fb2,int noObjects) {
-	int				i,y;
-	int				sx,sy;
+	int				i;
 	const int		xres					=	width;
 	const int		yres					=	height;
-	const int		filterWidth				=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
-	const int		filterHeight			=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
-	const float		halfFilterWidth			=	(float) filterWidth*0.5f;
-	const float		halfFilterHeight		=	(float) filterHeight*0.5f;
-	float			*fbs;
-	const int		pixelSize				=	6	+ CRenderer::numExtraSamples;	// alpha + depth + color + opacity + extra samples
-
 	float			*tmp;
-	const int		sampleLineDisplacement	=	CRenderer::pixelXsamples*pixelSize;
-
-	// pull local for speed
-	vector			zvisibilityThreshold;
-	movvv(zvisibilityThreshold,CRenderer::zvisibilityThreshold);
+	
 	
 	// Deep shadow map computation
 	if (CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)	deepShadowCompute();
@@ -408,19 +396,29 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 	memBegin(threadMemory);
 
-	// Allocate the framebuffer
-	fbs				=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
 
 	// Collapse the samples (transparency composite)
-	
-	const int numExtraNonCompChannels	=	CRenderer::numExtraNonCompChannels;
-	const int numExtraCompChannels		=	CRenderer::numExtraCompChannels;
+	const int		numExtraNonCompChannels		=	CRenderer::numExtraNonCompChannels;
+	const int		numExtraCompChannels		=	CRenderer::numExtraCompChannels;
+
+	// pull local for speed
+	vector			zvisibilityThreshold;
+	movvv(zvisibilityThreshold,CRenderer::zvisibilityThreshold);
+
+	const int		filterWidth				=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int		filterHeight			=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
+	const float		halfFilterWidth			=	filterWidth*0.5f;
+	const float		halfFilterHeight		=	filterHeight*0.5f;
+	const int		pixelSize				=	6	+ CRenderer::numExtraSamples;	// alpha + depth + color + opacity + extra samples
+	float			*fbs					=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
+	const int		sampleLineDisplacement	=	CRenderer::pixelXsamples*pixelSize;
+	int				sx,sy;
 	
 	// 0	=	alpha
 	// 1	=	z;
 	// 2-4	=	color
 	// 5	=	z2
-	for (y=0;y<sampleHeight;y++) {
+	for (int y=0;y<sampleHeight;y++) {
 		CPixel	*cPixel		=	fb[y];
 		float	*cFb		=	&fbs[y*totalWidth*pixelSize];
 		vector	ropacity;
@@ -724,7 +722,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	switch(CRenderer::depthFilter) {
 	case DEPTH_MIN:	
 		
-		for (y=0;y<yres;y++) {
+		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
 			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
@@ -752,7 +750,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		break;
 	case DEPTH_MAX:
 		
-		for (y=0;y<yres;y++) {
+		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
 			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
@@ -780,7 +778,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		break;
 	case DEPTH_AVG:
 		
-		for (y=0;y<yres;y++) {
+		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
 			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
@@ -807,7 +805,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		
 		{
 			const float normalizer = 1.0f/((float)CRenderer::pixelXsamples*(float)CRenderer::pixelYsamples);
-			for (y=0;y<yres;y++) {
+			for (int y=0;y<yres;y++) {
 				float			*cPixel		=	&fb2[y*xres*CRenderer::numSamples];
 				for (i=0;i<xres;i++,cPixel+=CRenderer::numSamples) {
 					cPixel[4] 	*= normalizer;
@@ -821,7 +819,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		/// FIXME: for midpoint should be working out front most 2 planes (min of front, min of 2nd)
 		// and do midpoint on the - need extra working space to do this.
 
-		for (y=0;y<yres;y++) {
+		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
 			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
@@ -848,7 +846,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		
 		{
 			const float normalizer = 1.0f/((float)CRenderer::pixelXsamples*(float)CRenderer::pixelYsamples);
-			for (y=0;y<yres;y++) {
+			for (int y=0;y<yres;y++) {
 				float			*cPixel		=	&fb2[y*xres*CRenderer::numSamples];
 				for (i=0;i<xres;i++,cPixel+=CRenderer::numSamples) {
 					cPixel[4] 	*= normalizer;
@@ -864,7 +862,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	}
 
 	// Filter the samples
-	for (y=0;y<yres;y++) {
+	for (int y=0;y<yres;y++) {
 		for (sy=0;sy<filterHeight;sy++) {
 			for (sx=0;sx<filterWidth;sx++) {
 				float			*pixelLine		=	&fb2[y*xres*CRenderer::numSamples];

@@ -31,7 +31,7 @@
 
 // Parameter list helpers
 struct CTempParamBinding {
-	CDynamicShaderLookup::CParamBinding	binding;
+	CDynamicShaderLookup::TParamBinding	binding;
 	CTempParamBinding					*next;
 };
 
@@ -73,21 +73,21 @@ struct CTempParamBinding {
 
 #define completeParamBindings(__lookup)	{																				\
 	if (__lookup->numUniformParamBindings > 0) {																		\
-		__lookup->uniformParamBindings = new CDynamicShaderLookup::CParamBinding[__lookup->numUniformParamBindings];	\
-		CDynamicShaderLookup::CParamBinding 	*cBinding		= __lookup->uniformParamBindings;						\
+		__lookup->uniformParamBindings = new CDynamicShaderLookup::TParamBinding[__lookup->numUniformParamBindings];	\
+		CDynamicShaderLookup::TParamBinding 	*cBinding		= __lookup->uniformParamBindings;						\
 		CTempParamBinding						*cTempBinding	= __uniformParamBindingsStart;							\
 		while (cTempBinding != NULL) {																					\
-			memcpy(cBinding,cTempBinding,sizeof(CDynamicShaderLookup::CParamBinding));									\
+			memcpy(cBinding,cTempBinding,sizeof(CDynamicShaderLookup::TParamBinding));									\
 			cBinding++;																									\
 			cTempBinding = cTempBinding->next;																			\
 		}																												\
 	}																													\
 	if (__lookup->numVaryingParamBindings > 0) {																		\
-		__lookup->varyingParamBindings = new CDynamicShaderLookup::CParamBinding[__lookup->numVaryingParamBindings];	\
-		CDynamicShaderLookup::CParamBinding 	*cBinding		= __lookup->varyingParamBindings;						\
+		__lookup->varyingParamBindings = new CDynamicShaderLookup::TParamBinding[__lookup->numVaryingParamBindings];	\
+		CDynamicShaderLookup::TParamBinding 	*cBinding		= __lookup->varyingParamBindings;						\
 		CTempParamBinding						*cTempBinding	= __varyingParamBindingsStart;							\
 		while (cTempBinding != NULL) {																					\
-			memcpy(cBinding,cTempBinding,sizeof(CDynamicShaderLookup::CParamBinding));									\
+			memcpy(cBinding,cTempBinding,sizeof(CDynamicShaderLookup::TParamBinding));									\
 			cBinding++;																									\
 			cTempBinding = cTempBinding->next;																			\
 		}																												\
@@ -95,7 +95,7 @@ struct CTempParamBinding {
 }
 
 #define getUniformParams(__lookup,__varyingLookup) {									\
-	CDynamicShaderLookup::CParamBinding *cParamBind = __lookup->uniformParamBindings;	\
+	CDynamicShaderLookup::TParamBinding *cParamBind = __lookup->uniformParamBindings;	\
 	for(int o=0;o<__lookup->numUniformParamBindings;o++,cParamBind++) {					\
 		if (cParamBind->type == TYPE_INTEGER) {											\
 			const float *optmp;															\
@@ -115,7 +115,7 @@ struct CTempParamBinding {
 	const float	**__varyingParameterPtrs;												\
 	 int		*__varyingParameterSizes;												\
 	{																					\
-		CDynamicShaderLookup::CParamBinding *cParamBind = __lookup->varyingParamBindings;	\
+		CDynamicShaderLookup::TParamBinding *cParamBind = __lookup->varyingParamBindings;	\
 		if (__lookup->numVaryingParamBindings > 0) {									\
 			__varyingParameterPtrs = (const float**) ralloc(sizeof(const float*)*__lookup->numVaryingParamBindings,threadMemory);	\
 			__varyingParameterSizes = (int*) ralloc(sizeof(int)*__lookup->numVaryingParamBindings,threadMemory);	\
@@ -127,7 +127,7 @@ struct CTempParamBinding {
 	}
 
 #define getVaryingParams(__lookup,__varyingLookup) {									\
-	CDynamicShaderLookup::CParamBinding *cParamBind = __lookup->varyingParamBindings;	\
+	CDynamicShaderLookup::TParamBinding *cParamBind = __lookup->varyingParamBindings;	\
 	for(int o=0;o<__lookup->numVaryingParamBindings;o++,cParamBind++){					\
 		if (cParamBind->type == TYPE_INTEGER) {											\
 			char *dtmp = (char*)&__varyingLookup;										\

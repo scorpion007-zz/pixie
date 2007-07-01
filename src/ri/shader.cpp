@@ -761,8 +761,9 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 				}
 				break;
 			case TYPE_INTEGER:
-			case TYPE_BOOLEAN:
 				{
+					// This should not be possible
+					error(CODE_BUG,"Integer shader variable in shader \"%s\"\n",parent->name);
 					const int	*src	=	(const int *)	val;
 					int			*dest	=	(int *)			cParameter->defaultValue;
 					memcpy(dest,src,cParameter->numItems*sizeof(int));
@@ -890,7 +891,8 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 					*destString++	=	*srcString++;
 				break;
 			case TYPE_INTEGER:
-			case TYPE_BOOLEAN:
+				// This should not be possible
+				error(CODE_BUG,"Integer shader variable in shader \"%s\"\n",name);
 				destInt		=	(int *)			dest;
 				srcInt		=	(const int *)	cParameter->defaultValue;
 				for (j=cParameter->numItems;j>0;j--)

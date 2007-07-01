@@ -85,7 +85,6 @@ static	int					result		=	0;	// 0 - FALSE
 				if (value == NULL)	return expr.stringValue;
 				else				return *((const char **) value);
 			case TYPE_INTEGER:
-			case TYPE_BOOLEAN:
 			default:
 				break;
 		};
@@ -118,7 +117,6 @@ static	int					result		=	0;	// 0 - FALSE
 			case TYPE_STRING:
 				break;
 			case TYPE_INTEGER:
-			case TYPE_BOOLEAN:
 				if (value == NULL)	return (float) expr.intValue;
 				else				return (float) *((int *) value);
 			default:
@@ -152,7 +150,6 @@ static	int					result		=	0;	// 0 - FALSE
 			case TYPE_STRING:
 				break;
 			case TYPE_INTEGER:
-			case TYPE_BOOLEAN:
 				if (value == NULL)	return expr.intValue;
 				else				return *((int *) value);
 			default:

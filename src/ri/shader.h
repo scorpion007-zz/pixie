@@ -120,20 +120,20 @@ public:
 //							and must be used with a struct, which they fill in
 class	CDynamicShaderLookup : public CShaderLookup {
 public:
-		struct CParamBinding {
+		typedef struct {
 			int		opIndex;			// The operand index to copy
 			int		type;				// The type to copy
 			size_t	dest;				// The destination offset
 			float	mult;				// Float multiplier to be applied before storing
-		};
+		} TParamBinding;
 	
 							CDynamicShaderLookup();
 		virtual				~CDynamicShaderLookup();
 
 		int					numUniformParamBindings;
-		CParamBinding		*uniformParamBindings;
+		TParamBinding		*uniformParamBindings;
 		int					numVaryingParamBindings;
-		CParamBinding		*varyingParamBindings;
+		TParamBinding		*varyingParamBindings;
 };
 
 
@@ -172,7 +172,7 @@ public:
 // Comments				:	used with struct CVaryingTextureLookup
 class	CTextureLookup : public CDynamicShaderLookup {
 public:
-		CTextureLookup(const CAttributes *attributes);
+							CTextureLookup(const CAttributes *attributes);
 		void				init();
 			
 		RtFilterFunc		filter;					// Lookup filter
@@ -190,7 +190,8 @@ public:
 // Class				:	CVaryingTextureLookup
 // Description			:	This class holds mutable information about a particular texture lookup
 // Comments				:	It's important this is a constructor-less struct of offsetof won't work
-struct CVaryingTextureLookup {
+class CVaryingTextureLookup {
+public:
 		// uniform
 		int					numSamples;				// The number of samples to take in the texture
 		float				maxDist;				// The maximum intersection distance

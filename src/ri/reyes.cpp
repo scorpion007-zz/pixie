@@ -893,7 +893,6 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		int					i,j;
 		int					k;
 		float				**varying	=	currentShadingState->varying;
-		T32					one;
 		CSurface			*object		=	(CSurface *) (grid->object);
 		const CAttributes	*attributes	=	object->attributes;
 		const int			udiv		=	grid->udiv;

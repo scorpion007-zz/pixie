@@ -56,14 +56,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	if <boolean> <endIf>
-#define	IF2EXPR_PRE			int		*op;														\
-							int		i;															\
-							operand(0,op,int *);												\
-							for (i=0;i<numVertices;i++,op++,tags++)	{							\
+#define	IF2EXPR_PRE			float	*op;														\
+							operand(0,op,float *);												\
+							for (int i=0;i<numVertices;i++,op++,tags++)	{						\
 								if (*tags) {													\
 									(*tags)++;													\
 								} else {														\
-									if (*op) {													\
+									if ((int) (*op)) {											\
 										*tags	=	0;											\
 									} else	{													\
 										*tags	=	1;											\
@@ -113,8 +112,7 @@ DEFOPCODE(Else	,"else"	,1,	ELSEIFEXPR_PRE,NULL_EXPR,NULL_EXPR,ELSEIFEXPR_POST,0)
 //	endif
 
 ///////////////	Single
-#define	ENDIFEXPR_PRE		int	i;																\
-							for (i=0;i<numVertices;i++,tags++)	{								\
+#define	ENDIFEXPR_PRE		for (int i=0;i<numVertices;i++,tags++)	{							\
 								if (*tags) {													\
 									(*tags)--;													\
 																								\
@@ -170,14 +168,14 @@ DEFOPCODE(Forbegin3	,"forbegin"	,3,	FORBEGIN3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_E
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	for <cond>
-#define	FOR3EXPR_PRE		int	*op;															\
-							operand(0,op,int *);												\
+#define	FOR3EXPR_PRE		float	*op;														\
+							operand(0,op,float *);												\
 							lastConditional->forExecCount++;									\
 							for (int i=numVertices;i>0;i--,op++,tags++)	{						\
 								if (*tags) {													\
 									(*tags)++;													\
 								} else {														\
-									if (*op) {													\
+									if ((int) (*op)) {											\
 									} else	{													\
 										*tags	=	lastConditional->forExecCount;				\
 										numActive--;											\
@@ -299,8 +297,8 @@ DEFOPCODE(Continue1	,"continue"	,1,	NULL_EXPR,NULL_EXPR,NULL_EXPR,CONTINUE1EXPR_
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // fcmp
 
-#define	FCMPEXPR			if (op1[0] OPERATION op2[0])	res[0]	=	TRUE;					\
-							else							res[0]	=	FALSE;
+#define	FCMPEXPR			if (op1[0] OPERATION op2[0])	res[0]	=	1.0f;					\
+							else							res[0]	=	0;
 
 
 
@@ -308,73 +306,69 @@ DEFOPCODE(Continue1	,"continue"	,1,	NULL_EXPR,NULL_EXPR,NULL_EXPR,CONTINUE1EXPR_
 // vcmp
 #define	VCMPEXPR			if (	(op1[0] OPERATION op2[0]) &&								\
 									(op1[1] OPERATION op2[1]) &&								\
-									(op1[2] OPERATION op2[2])	)	res[0]	=	TRUE;			\
-							else	res[0]	=	FALSE;
+									(op1[2] OPERATION op2[2])	)	res[0]	=	1.0f;			\
+							else	res[0]	=	0;
 
 
 #define	VNCMPEXPR			if (	(op1[0] OPERATION op2[0]) ||								\
 									(op1[1] OPERATION op2[1]) ||								\
-									(op1[2] OPERATION op2[2])	)	res[0]	=	TRUE;			\
-							else	res[0]	=	FALSE;
+									(op1[2] OPERATION op2[2])	)	res[0]	=	1.0f;			\
+							else	res[0]	=	0;
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // mcmp
-#define	MCMPEXPR			int	index;															\
-							int	result	=	TRUE;												\
-							for (index=0;index<16;index++)										\
-								if (!(op1[index] OPERATION op2[index]))	result	&=	FALSE;		\
-							res[0]	=	result;
+#define	MCMPEXPR			*res	=	1.0f;													\
+							for (int index=0;index<16;index++)									\
+								if (!(op1[index] OPERATION op2[index]))	*res	=	0;
 
-#define	MNCMPEXPR			int	index;															\
-							int	result	=	TRUE;												\
-							for (index=0;index<16;index++)										\
-								if (!(op1[index] OPERATION op2[index]))	result	|=	FALSE;		\
-							res[0]	=	result;
+#define	MNCMPEXPR			*res	=	0;														\
+							for (int index=0;index<16;index++)									\
+								if (!(op1[index] OPERATION op2[index]))	*res	=	1.0f;
 
 
-#define	SEQLEXPR			if (strcmp(op1[0],op2[0]) == 0)	res[0]	=	TRUE;					\
-							else							res[0]	=	FALSE;
+#define	SEQLEXPR			if (strcmp(op1[0],op2[0]) == 0)	res[0]	=	1.0f;					\
+							else							res[0]	=	0;
 
-#define	SNEQLEXPR			if (strcmp(op1[0],op2[0]) != 0)	res[0]	=	TRUE;					\
-							else							res[0]	=	FALSE;
+#define	SNEQLEXPR			if (strcmp(op1[0],op2[0]) != 0)	res[0]	=	1.0f;					\
+							else							res[0]	=	0;
 
 
 
 
 #define	OPERATION			==
-DEFOPCODE(Feql2		,"feql"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Veql2		,"veql"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
-DEFOPCODE(Meql2		,"meql"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),MCMPEXPR,OPERANDS3EXPR_UPDATE(1,16,16),	NULL_EXPR,0)
-DEFOPCODE(Seql2		,"seql"		,3,	OPERANDS3EXPR_PRE(int *,const char **,const char **),SEQLEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Feql2		,"feql"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Veql2		,"veql"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
+DEFOPCODE(Meql2		,"meql"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),MCMPEXPR,OPERANDS3EXPR_UPDATE(1,16,16),		NULL_EXPR,0)
+DEFOPCODE(Seql2		,"seql"		,3,	OPERANDS3EXPR_PRE(float *,const char **,const char **),SEQLEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
 #undef	OPERATION
 
 #define	OPERATION			!=
-DEFOPCODE(Fneql2	,"fneql"	,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Vneql2	,"vneql"	,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),VNCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),	NULL_EXPR,0)
-DEFOPCODE(Mneql2	,"mneql"	,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),MNCMPEXPR,OPERANDS3EXPR_UPDATE(1,16,16),	NULL_EXPR,0)
-DEFOPCODE(Sneql2	,"sneql"	,3,	OPERANDS3EXPR_PRE(int *,const char **,const char **),SNEQLEXPR,OPERANDS3EXPR_UPDATE(1,1,1),	NULL_EXPR,0)
+DEFOPCODE(Fneql2	,"fneql"	,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Vneql2	,"vneql"	,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),VNCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
+DEFOPCODE(Mneql2	,"mneql"	,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),MNCMPEXPR,OPERANDS3EXPR_UPDATE(1,16,16),		NULL_EXPR,0)
+DEFOPCODE(Sneql2	,"sneql"	,3,	OPERANDS3EXPR_PRE(float *,const char **,const char **),SNEQLEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
 #undef OPERATION
 
 #define	OPERATION			>
-DEFOPCODE(Fgt2		,"fgt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Vgt2		,"vgt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
+DEFOPCODE(Fgt2		,"fgt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Vgt2		,"vgt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
 #undef OPERATION
 
 #define	OPERATION			<
-DEFOPCODE(Flt2		,"flt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Vlt2		,"vlt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
+DEFOPCODE(Flt2		,"flt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Vlt2		,"vlt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
 #undef OPERATION
 
 #define	OPERATION			>=
-DEFOPCODE(Fgte2		,"fegt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Vgte2		,"vegt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
+DEFOPCODE(Fgte2		,"fegt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Vgte2		,"vegt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
 #undef OPERATION
 
 #define	OPERATION			<=
-DEFOPCODE(Flte2		,"felt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
-DEFOPCODE(Vlte2		,"velt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
+DEFOPCODE(Flte2		,"felt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),FCMPEXPR,OPERANDS3EXPR_UPDATE(1,1,1),		NULL_EXPR,0)
+DEFOPCODE(Vlte2		,"velt"		,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),VCMPEXPR,OPERANDS3EXPR_UPDATE(1,3,3),		NULL_EXPR,0)
 #undef OPERATION
 
 
@@ -397,34 +391,34 @@ DEFOPCODE(Vlte2		,"velt"		,3,	OPERANDS3EXPR_PRE(int *,const float *,const float 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // logic
-#define	LOGICEXPR			*res	=	*op1 OPERATION *op2;
+#define	LOGICEXPR			*res	=	(float) ((int) (*op1) OPERATION (int) (*op2));
 
 
 #define	OPERATION			&
-DEFOPCODE(And0	,"and"	,3,	OPERANDS3EXPR_PRE(int *,const int *,const int *),LOGICEXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
+DEFOPCODE(And0	,"and"	,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),LOGICEXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 #undef	OPERATION
 
 #define	OPERATION			|
-DEFOPCODE(Or0	,"or"	,3,	OPERANDS3EXPR_PRE(int *,const int *,const int *),LOGICEXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
+DEFOPCODE(Or0	,"or"	,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),LOGICEXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 #undef	OPERATION
 
 #define	OPERATION			^
-DEFOPCODE(Xor0	,"xor"	,3,	OPERANDS3EXPR_PRE(int *,const int *,const int *),LOGICEXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
+DEFOPCODE(Xor0	,"xor"	,3,	OPERANDS3EXPR_PRE(float *,const float *,const float *),LOGICEXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 #undef	OPERATION
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // nxor
-#define	NXOREXPR			*res	=	~(*op1 ^ *op2);
+#define	NXOREXPR			*res	=	(float) ~((int) (*op1) ^ (int) (*op2));
 
-DEFOPCODE(Nxor	,"nxor"	,3, OPERANDS3EXPR_PRE(int *,const int *,const int *),NXOREXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
+DEFOPCODE(Nxor	,"nxor"	,3, OPERANDS3EXPR_PRE(float *,const float *,const float *),NXOREXPR,OPERANDS3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // not
-#define	NOTEXPR			*res	=	~(*op);
+#define	NOTEXPR			*res	=	(float) ~((int) (*op));
 
 
-DEFOPCODE(Not	,"not"	,2, OPERANDS2EXPR_PRE(int *,const int *),NOTEXPR,OPERANDS2EXPR_UPDATE(1,1),NULL_EXPR,0)
+DEFOPCODE(Not	,"not"	,2, OPERANDS2EXPR_PRE(float *,const float *),NOTEXPR,OPERANDS2EXPR_UPDATE(1,1),NULL_EXPR,0)
 
 
 
@@ -750,9 +744,8 @@ DEFOPCODE(Movemm	,"movemm"	,2,	OPERANDS2EXPR_PRE(float *,const float *),MUNARYEX
 DEFOPCODE(Movess	,"movess"	,2,	OPERANDS2EXPR_PRE(float *,const float *),SUNARYEXPR,OPERANDS2EXPR_UPDATE(1,1),		NULL_EXPR,0)
 DEFOPCODE(VUFloat	,"vufloat"	,2,	OPERANDS2EXPR_PRE(float *,const float *),FUNARYEXPR,OPERANDS2EXPR_UPDATE(1,0),		NULL_EXPR,0)
 DEFOPCODE(VUVector	,"vuvector"	,2,	OPERANDS2EXPR_PRE(float *,const float *),VUNARYEXPR,OPERANDS2EXPR_UPDATE(3,0),		NULL_EXPR,0)
-DEFOPCODE(VUMatrix	,"vumatrix"	,2,	OPERANDS2EXPR_PRE(float *,const float *),MUNARYEXPR,OPERANDS2EXPR_UPDATE(16,0),	NULL_EXPR,0)
+DEFOPCODE(VUMatrix	,"vumatrix"	,2,	OPERANDS2EXPR_PRE(float *,const float *),MUNARYEXPR,OPERANDS2EXPR_UPDATE(16,0),		NULL_EXPR,0)
 DEFOPCODE(VUString	,"vustring"	,2,	OPERANDS2EXPR_PRE(float *,const float *),SUNARYEXPR,OPERANDS2EXPR_UPDATE(1,0),		NULL_EXPR,0)
-DEFOPCODE(VUBoolean	,"vuboolean",2,	OPERANDS2EXPR_PRE(float *,const float *),FUNARYEXPR,OPERANDS2EXPR_UPDATE(1,0),		NULL_EXPR,0)
 #undef OPERATION
 
 
