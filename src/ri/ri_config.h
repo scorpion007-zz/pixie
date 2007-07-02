@@ -91,5 +91,8 @@
 
 // The hash size for the shader parameter lists
 #define	PL_HASH_SIZE					512
+
+// The stack size for the point hierarchy lookup
+#define	POINTHIERARCHY_STACK_SIZE		256
 #endif
 

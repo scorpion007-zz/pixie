@@ -199,7 +199,6 @@ public:
 		float				fill;					// The fill in value for the lookup
 		const char			*label;					// The label of the ray
 		float				sampleBase;				// Jitter base samples for raytracing
-		int					lookupFloat;			// TRUE if we're only looking up a float
 		CTexture			*texture;				// Points to the texture being looked up
 		CEnvironment		*environment;			// Points to the environment being looked up
 };
