@@ -1063,7 +1063,8 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 								int			globalIndex = -1;												\
 								operand(0,res,float *);														\
 								operand(1,op1,const char **);												\
-								operandSize(2,op2,op2Step,float *);											\
+								operand(2,op2,float *);														\
+								op2Step = operandVaryingStep(2);											\
 								src		= op2;																\
 								srcStep = op2Step;															\
 																											\
@@ -1099,7 +1100,8 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 								int			globalIndex = -1;												\
 								operand(0,res,float *);														\
 								operand(1,op1,const char **);												\
-								operandSize(2,op2,op2Step,float *);											\
+								operand(2,op2,float *);														\
+								op2Step = operandVaryingStep(2);											\
 								src		= op2;																\
 								srcStep = op2Step;															\
 																											\
