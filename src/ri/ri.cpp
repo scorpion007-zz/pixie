@@ -244,6 +244,8 @@ RtToken		RI_COORDINATESYSYTEM	=	"coordinatesystem";
 RtToken		RI_PHOTON				=	"photon";
 RtToken		RI_ENVIRONMENT			=	"environment";
 RtToken		RI_TRACE				=	"trace";
+RtToken		RI_DIFFUSE				=	"diffuse";
+RtToken		RI_SPECULAR				=	"specular";
 RtToken		RI_TRANSMISSION			=	"transmission";
 RtToken		RI_CAUSTICS				=	"caustics";
 

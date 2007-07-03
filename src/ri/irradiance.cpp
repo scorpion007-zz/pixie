@@ -624,7 +624,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
 				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*dPdu[2] + originJitterY*dPdv[2];
 
-				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
+				ray.flags				=	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE;
 				ray.tmin				=	lookup->bias;
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;
@@ -710,7 +710,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
 				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*dPdu[2] + originJitterY*dPdv[2];
 
-				ray.flags				=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
+				ray.flags				=	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE;
 				ray.tmin				=	lookup->bias;
 				ray.t					=	lookup->maxDistance;
 				ray.time				=	0;

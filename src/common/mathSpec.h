@@ -618,6 +618,73 @@ int		invertm(SCALAR_TYPE *,const SCALAR_TYPE *);											// Invert a matrix. R
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Invert a rigid body transformation
+inline	void	invertRigid(SCALAR_TYPE *dest,const SCALAR_TYPE *src) {
+	MATRIX_TYPE	R,Rt,T;
+
+	movmm(Rt,src);
+	Rt[element(0,3)]	=	0;
+	Rt[element(1,3)]	=	0;
+	Rt[element(2,3)]	=	0;
+	transposem(R,Rt);
+
+	identitym(T);
+	T[element(0,3)]		=	-src[element(0,3)];
+	T[element(1,3)]		=	-src[element(1,3)];
+	T[element(2,3)]		=	-src[element(2,3)];
+
+	mulmm(dest,R,T);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Make a matrix a rotation
+inline	void	makeRotation(SCALAR_TYPE *M) {
+	VECTOR_TYPE	vx,vy,vz;
+	VECTOR_TYPE	ux,uy,uz;
+
+	initv(vx,M[element(0,0)],M[element(1,0)],M[element(2,0)]);
+	initv(vy,M[element(0,1)],M[element(1,1)],M[element(2,1)]);
+	initv(vz,M[element(0,2)],M[element(1,2)],M[element(2,2)]);
+
+	while(TRUE) {
+		SCALAR_TYPE	x,y,z;
+
+		crossvv(ux,vy,vz);
+		crossvv(uy,vz,vx);
+		crossvv(uz,vx,vy);
+
+		normalizev(ux);
+		normalizev(uy);
+		normalizev(uz);
+
+		addvv(vx,ux);
+		addvv(vy,uy);
+		addvv(vz,uz);
+
+		mulvf(vx,0.5f);
+		mulvf(vy,0.5f);
+		mulvf(vz,0.5f);
+
+		x	=	dotvv(vx,vy);
+		y	=	dotvv(vy,vz);
+		z	=	dotvv(vz,vx);
+
+		if ((x*x + y*y + z*z) < (SCALAR_TYPE) 0.000001)	break;
+	}
+
+	M[element(0,0)]	=	vx[0];
+	M[element(1,0)]	=	vx[1];
+	M[element(2,0)]	=	vx[2];
+
+	M[element(0,1)]	=	vy[0];
+	M[element(1,1)]	=	vy[1];
+	M[element(2,1)]	=	vy[2];
+
+	M[element(0,2)]	=	vz[0];
+	M[element(1,2)]	=	vz[1];
+	M[element(2,2)]	=	vz[2];
+}
 
 
 

@@ -2638,20 +2638,15 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 				if (FALSE) {
 				attributeCheckFlag(RI_TRANSMISSION,		attributes->flags,	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE)
 				attributeCheckFlag(RI_CAMERA,			attributes->flags,	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE)
-				attributeCheckFlag(RI_TRACE,			attributes->flags,	ATTRIBUTES_FLAGS_TRACE_VISIBLE)
+				attributeCheckFlag(RI_DIFFUSE,			attributes->flags,	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE)
+				attributeCheckFlag(RI_SPECULAR,			attributes->flags,	ATTRIBUTES_FLAGS_SPECULAR_VISIBLE)
 				attributeCheckFlag(RI_PHOTON,			attributes->flags,	ATTRIBUTES_FLAGS_PHOTON_VISIBLE)
 				attributeEndCheck
 			}
 		} else if (strcmp(name,RI_SHADE) == 0) {
 			for (i=0;i<n;i++) {
-				if (strcmp(tokens[i],RI_TRANSMISSIONHITMODE) == 0) {
-					const char	*val	=	((char **) params[i])[0];
-
-					if (strcmp(val,"opaque") == 0)				attributes->transmissionHitMode	=	'o';
-					else if (strcmp(val,"Os") == 0)				attributes->transmissionHitMode	=	'i';
-					else if (strcmp(val,"shader") == 0)			attributes->transmissionHitMode	=	's';
-					else if (strcmp(val,"transparent") == 0)	attributes->flags	&=	~ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
-					else										error(CODE_BADTOKEN,"Unknown transmission value: %s\n",val);
+				if (strcmp(tokens[i],RI_TRANSMISSIONHITMODE) == 0)	{
+					attributes->transmissionHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
 				attributeEndCheck
 			}
 		} else if (strcmp(name,RI_IDENTIFIER) == 0) {

@@ -838,8 +838,9 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	dirtyInstances			=	NULL;
 	
 	// These are the flags that objects need to have to be visible to raytracer
-	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE			|
-								ATTRIBUTES_FLAGS_TRACE_VISIBLE			|
+	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE				|
+								ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE			|
+								ATTRIBUTES_FLAGS_SPECULAR_VISIBLE			|
 								ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 
 	// Set the root object

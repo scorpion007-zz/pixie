@@ -1634,7 +1634,8 @@ void		CRibOut::declareDefaultVariables() {
 
 	declareVariable(RI_TRANSMISSION,		"int");
 	declareVariable(RI_CAMERA,				"int");
-	declareVariable(RI_TRACE,				"int");
+	declareVariable(RI_SPECULAR,			"int");
+	declareVariable(RI_DIFFUSE,				"int");
 	declareVariable(RI_PHOTON,				"int");
 
 	declareVariable(RI_DIFFUSEHITMODE,		"string");
