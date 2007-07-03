@@ -1178,9 +1178,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	if ((dim == SHADING_2D_GRID) && (currentAttributes->cameraHitMode == 'p')) {
 		// Yes, force opacity 1
 		float			*opacity	=	varying[VARIABLE_OI];
+		const	float	*so			=	currentAttributes->surfaceOpacity;
 		int				i;
 
-		for (i=numVertices;i>0;i--,opacity+=3) initv(opacity,1);
+		for (i=numVertices;i>0;i--,opacity+=3) movvv(opacity,so);
 	}
 
 	// Restore the thread memory
