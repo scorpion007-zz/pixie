@@ -106,6 +106,8 @@ public:
 		CVariable			*findParameter(const char *);				// Find a shader parameter
 		void				restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding);
 		int					find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const;
+		void				setHitmode(char *dest,const char *mode);
+		const char			*getHitmode(char mode);
 		
 		CAttributes			*next;										// points to the next attribute if there's motion blur
 
@@ -144,7 +146,7 @@ public:
 		float				rasterExpand;								// The expansion coefficient during the sampling
 		float				shadowBias;									// The bias amount expressed in the camera coordinates
 
-		char				transmission;								// Either:
+		char				transmissionHitMode;						// Either:
 																		// 'o'	=	opaque
 																		// 'i'	=	Os
 																		// 's'	=	execute

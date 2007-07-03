@@ -208,6 +208,7 @@ RtToken		RI_TEXTURE				=	"texture";
 RtToken		RI_HIDER				=	"hider";
 RtToken		RI_STATISTICS			=	"statistics";
 RtToken		RI_VISIBILITY			=	"visibility";
+RtToken		RI_SHADE				=	"shade";
 RtToken		RI_DISPLACEMENTBOUND	=	"displacementbound";
 RtToken		RI_IRRADIANCE			=	"irradiance";
 RtToken		RI_CULL					=	"cull";
@@ -245,6 +246,11 @@ RtToken		RI_ENVIRONMENT			=	"environment";
 RtToken		RI_TRACE				=	"trace";
 RtToken		RI_TRANSMISSION			=	"transmission";
 RtToken		RI_CAUSTICS				=	"caustics";
+
+RtToken		RI_DIFFUSEHITMODE		=	"diffusehitmode";
+RtToken		RI_SPECULARHITMODE		=	"specularhitmode";
+RtToken		RI_TRANSMISSIONHITMODE	=	"transmissionhitmode";
+RtToken		RI_CAMERAHITMODE		=	"camerahitmode";
 
 // Trace attributes
 RtToken		RI_BIAS					=	"bias";

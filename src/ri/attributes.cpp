@@ -108,7 +108,7 @@ CAttributes::CAttributes() {
 	rasterExpand				=	0.5f;
 	shadowBias					=	0.01f;
 
-	transmission				=	'o';
+	transmissionHitMode			=	'p';
 
 	emit						=	-1;
 	relativeEmit				=	1;
@@ -551,3 +551,34 @@ const char			*CAttributes::findShadingModel(EShadingModel model) {
 	return "matte";
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	setHitmode
+// Description			:	Translate hitmode from string
+// Return Value			:	-
+// Comments				:
+void			CAttributes::setHitmode(char *dest,const char *mode) {
+
+	// Figure out the hit mode
+	if (strcmp(mode,"primitive") == 0) {
+		*dest	=	'p';
+	} else if (strcmp(mode,"shade") == 0) {
+		*dest	=	's';
+	} else {
+		error(CODE_BADTOKEN,"Unrecognized hit mode \"%s\"\n",mode);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	getHitmode
+// Description			:	The other way around
+// Return Value			:	-
+// Comments				:
+const char		*CAttributes::getHitmode(char mode) {
+	if (mode == 'p')		return "primitive";
+	else if (mode == 's')	return "shade";
+	else error(CODE_BUG,"Invalid hit mode encountered: \'%c\'\n",mode);
+
+	return "primitive";
+}

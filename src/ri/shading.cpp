@@ -543,17 +543,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		if (inShadow == TRUE) {
 
 			// Yes, are we supposed to shade the objects in the shadow ?
-			if (currentAttributes->transmission == 'o') {
-
-				// No, just copy the color/opacity from the attributes field
-				float	*opacity	=	varying[VARIABLE_OI];
-				int		i;
-
-				for (i=numVertices;i>0;i--,opacity+=3)	initv(opacity,1,1,1);
-
-				// Nothing more to do here, just return
-				return;
-			} else if (currentAttributes->transmission == 'i') {
+			if (currentAttributes->transmissionHitMode == 'p') {
 
 				// No, just copy the color/opacity from the attributes field
 				float			*opacity	=	varying[VARIABLE_OI];
@@ -565,6 +555,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				// Nothing more to do here, just return
 				return;
 			}
+
+			// The transmission must be shade at this point
+			assert(currentAttributes->transmissionHitMode == 's');
 			
 			// We need to execute the shaders
 			displacement	=	NULL;	//currentAttributes->displacement;	// We probably don't need to execute the displacement shader

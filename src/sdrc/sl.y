@@ -554,7 +554,7 @@ slFunctionParameterIdentifierList:
 		SL_OPEN_SQR_PARANTHESIS
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			sdr->newParameter($1,sdr->desired() | SLC_ARRAY, -1);
+			sdr->newParameter($1,sdr->desired() | SLC_ARRAY, 1);
 			
 			$$	=	new CNullExpression;
 		}
