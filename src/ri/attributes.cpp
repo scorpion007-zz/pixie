@@ -109,6 +109,10 @@ CAttributes::CAttributes() {
 	shadowBias					=	0.01f;
 
 	transmissionHitMode			=	'p';
+	diffuseHitMode				=	'p';
+	cameraHitMode				=	's';
+	specularHitMode				=	's';
+
 
 	emit						=	-1;
 	relativeEmit				=	1;

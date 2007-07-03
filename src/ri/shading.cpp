@@ -565,7 +565,26 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			atmosphere		=	NULL;
 
 		} else {
-		
+			// check the hit mode
+
+			// If we're raytracing, are we supposed to shade hit rays?
+			if ((dim == SHADING_2D) && (currentAttributes->specularHitMode == 'p')) {
+				// No, just copy the color/opacity from the attributes field
+				float			*opacity	=	varying[VARIABLE_OI];
+				float			*color		=	varying[VARIABLE_CI];
+				int				i;
+				const	float	*so			=	currentAttributes->surfaceOpacity;
+				const	float	*sc			=	currentAttributes->surfaceColor;
+
+				for (i=numVertices;i>0;i--,opacity+=3,color+=3) {
+					movvv(opacity,so);
+					movvv(color,sc);
+				}
+
+				// Nothing more to do here, just return
+				return;
+			}
+
 			// We need to execute the shaders
 			if (currentAttributes->flags & ATTRIBUTES_FLAGS_MATTE) {
 				displacement	=	currentAttributes->displacement;
@@ -1152,6 +1171,16 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			locals[ACCESSOR_POSTSHADER]		=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
 			currentShadingState->postShader->execute(this,locals[ACCESSOR_POSTSHADER]);
 		}
+	}
+
+
+	// Check if we should are a camera ray, and have primitive hit mode
+	if ((dim == SHADING_2D_GRID) && (currentAttributes->cameraHitMode == 'p')) {
+		// Yes, force opacity 1
+		float			*opacity	=	varying[VARIABLE_OI];
+		int				i;
+
+		for (i=numVertices;i>0;i--,opacity+=3) initv(opacity,1);
 	}
 
 	// Restore the thread memory

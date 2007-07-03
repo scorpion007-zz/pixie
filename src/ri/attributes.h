@@ -145,9 +145,10 @@ public:
 		float				rasterExpand;								// The expansion coefficient during the sampling
 		float				shadowBias;									// The bias amount expressed in the camera coordinates
 
-		char				transmissionHitMode;						// Either:
-																		// 'p'	=	Look at the primitive
-																		// 's'	=	Execute the shader
+		char				transmissionHitMode;						// Either: 'p' = Look at the primitive   or   's' = Execute the shader
+		char				specularHitMode;							// Either: 'p' = Look at the primitive   or   's' = Execute the shader
+		char				diffuseHitMode;								// Either: 'p' = Look at the primitive   or   's' = Execute the shader
+		char				cameraHitMode;								// Either: 'p' = Look at the primitive   or   's' = Execute the shader
 
 		int					emit;										// The number of photons to emit from this light source
 		float				relativeEmit;								// The relative emittance

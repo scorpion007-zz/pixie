@@ -2647,6 +2647,13 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 			for (i=0;i<n;i++) {
 				if (strcmp(tokens[i],RI_TRANSMISSIONHITMODE) == 0)	{
 					attributes->transmissionHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
+				} else if (strcmp(tokens[i],RI_DIFFUSEHITMODE) == 0) {
+					attributes->diffuseHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
+					if (attributes->diffuseHitMode != 'p') warning(CODE_UNIMPLEMENT,"shading of diffuse rays unsupported\n");
+				} else if (strcmp(tokens[i],RI_SPECULARHITMODE) == 0) {
+					attributes->specularHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
+				} else if (strcmp(tokens[i],RI_CAMERAHITMODE) == 0) {
+					attributes->cameraHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
 				attributeEndCheck
 			}
 		} else if (strcmp(name,RI_IDENTIFIER) == 0) {
