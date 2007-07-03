@@ -2635,8 +2635,28 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 			}
 		} else if (strcmp(name,RI_VISIBILITY) == 0) {
 			for (i=0;i<n;i++) {
-				if (FALSE) {
-				attributeCheckFlag(RI_TRANSMISSION,		attributes->flags,	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE)
+				// DEPRECATED: begin
+				if (strcmp(tokens[i],RI_TRANSMISSION) == 0) {			// DEPRECATED: old attribute style
+					char	*val	=	((char **) params[i])[0];
+
+					attributes->flags	|=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
+					if (strcmp(val,"opaque") == 0) {
+						warning(CODE_BADTOKEN,"deprecated old-style transmission mode \"opaque\" no longer supported\n");
+						attributes->transmissionHitMode	=	'p';
+					}
+					else if (strcmp(val,"Os") == 0)		attributes->transmissionHitMode	=	'p';
+					else if (strcmp(val,"shader") == 0)	attributes->transmissionHitMode	=	's';
+					else if (strcmp(val,"transparent") == 0)	{
+						attributes->flags	&=	~ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
+					} else {
+						error(CODE_BADTOKEN,"Unknown transmission value: %s\n",val);
+					}
+					warning(CODE_BADTOKEN,"deprecated old-style visibility attribute\n");
+				attributeCheckFlag(RI_TRACE,			attributes->flags,	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE|ATTRIBUTES_FLAGS_SPECULAR_VISIBLE)	// DEPRECATED: old attribute
+				attributeCheckFlag("int transmission",	attributes->flags,	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE)
+				// DEPRECATED: end
+
+				//attributeCheckFlag(RI_TRANSMISSION,		attributes->flags,	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE)	// to be replaced with
 				attributeCheckFlag(RI_CAMERA,			attributes->flags,	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE)
 				attributeCheckFlag(RI_DIFFUSE,			attributes->flags,	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE)
 				attributeCheckFlag(RI_SPECULAR,			attributes->flags,	ATTRIBUTES_FLAGS_SPECULAR_VISIBLE)
