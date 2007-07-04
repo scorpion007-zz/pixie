@@ -33,7 +33,7 @@
 
 #include "common/global.h"
 
-void	linSolve(float *A,float *b,int n,int nrhs);
+int		linSolve(float *A,float *b,int n,int nrhs);
 
 #endif
 

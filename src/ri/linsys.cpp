@@ -40,7 +40,7 @@
 // Description			:	LU Decomposition routine
 // Return Value			:	-
 // Comments				:
-template <class T> void ludcmp(T **a, int n, int *indx, T *d) {
+template <class T> int ludcmp(T **a, int n, int *indx, T *d) {
 	int i,imax,j,k;
 	T	 big,dum,sum,temp;
 	T	 *vv;
@@ -52,7 +52,7 @@ template <class T> void ludcmp(T **a, int n, int *indx, T *d) {
 		big=0.0;
 		for (j=1;j<=n;j++)
 			if ((temp=(T) fabs(a[i][j])) > big) big=(T) temp;
-		if (big == 0.0) return;
+		if (big == 0.0) return FALSE;
 		vv[i]=(T) (1.0/big);
 	}
 	for (j=1;j<=n;j++) {
@@ -88,6 +88,8 @@ template <class T> void ludcmp(T **a, int n, int *indx, T *d) {
 			for (i=j+1;i<=n;i++) a[i][j] *= dum;
 		}
 	}
+
+	return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -118,9 +120,9 @@ template <class T> void lubksb(T **a, int n, int *indx, T b[]) {
 ///////////////////////////////////////////////////////////////////////
 // Function				:	linSolve
 // Description			:	Solve Ax = b
-// Return Value			:	x , in b
+// Return Value			:	x , in b false if it can't be soved
 // Comments				:
-void	linSolve(float *A,float *b,int n,int nrhs) {
+int		linSolve(float *A,float *b,int n,int nrhs) {
 	float	**cA;
 	int		i;
 	int		*index	=	(int *) alloca((n+1)*sizeof(int));
@@ -131,10 +133,14 @@ void	linSolve(float *A,float *b,int n,int nrhs) {
 		cA[i+1]	=	A-1;	A	+=	n;
 	}
 
-	ludcmp<float>(cA,n,index,&d);
+	if(!ludcmp<float>(cA,n,index,&d)) {
+		return FALSE;
+	}
 
 	for (i=0;i<nrhs;i++) {
 		lubksb<float>(cA,n,index,b - 1);	b	+=	9;
 	}
+
+	return TRUE;
 }
 
