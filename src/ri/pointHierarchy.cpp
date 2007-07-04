@@ -69,9 +69,10 @@ static	inline	float	ff(const float *rP,const float *rN,const float *oP,const flo
 			if (dotvv(D,oN) >= 0)	return 0;
 
 			normalizevf(nD,D);
+			assert(dotvv(nD,rN) >= 0);
 
 			// Notice that we're computing the disk area without PI because it cancels the one in the denominator
-			return	absf(-dotvv(nD,oN)*dotvv(nD,rN)*dP*dP / (dotvv(D,D) + C_EPSILON));
+			return	-dotvv(nD,oN)*dotvv(nD,rN)*dP*dP / (dotvv(D,D) + C_EPSILON);
 
 		} else {
 			// Full occlusion
@@ -83,9 +84,10 @@ static	inline	float	ff(const float *rP,const float *rN,const float *oP,const flo
 			if (dotvv(D,oN) >= 0)	return 0;
 
 			normalizevf(nD,D);
+			assert(dotvv(nD,rN) >= 0);
 
 			// Notice that we're computing the disk area without PI because it cancels the one in the denominator
-			return	absf(-dotvv(nD,oN)*dotvv(nD,rN)*dP*dP / (dotvv(D,D) + C_EPSILON));
+			return	-dotvv(nD,oN)*dotvv(nD,rN)*dP*dP / (dotvv(D,D) + C_EPSILON);
 		}
 	}
 }
@@ -131,10 +133,6 @@ CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to
 		else if ((strcmp(channels[i].name,radiosityName) == 0)	&& (channels[i].numSamples == 3))	radiosityIndex	=	channels[i].sampleStart;
 	}
 
-	// FIXME: Use the implicit area in the point rather than the stored value
-	// We're doing this because our area function doesn't compute the micropolygon area yet
-	//areaIndex		=	-1;
-
 	// Compute the point hierarchy so that we can perform lookups
 	computeHierarchy();
 }
@@ -163,7 +161,7 @@ void		CPointHierarchy::computeHierarchy() {
 	for (i=1;i<=CMap<CPointCloudPoint>::numItems;i++)	tmp[i-1]	=	i;
 
 	// Compute the map hierarchy
-	int	root	=	cluster(CMap<CPointCloudPoint>::numItems,tmp);
+	const int	root	=	cluster(CMap<CPointCloudPoint>::numItems,tmp);
 
 	// Root is always the first item in the array
 	assert(root == 0);
@@ -179,17 +177,17 @@ void		CPointHierarchy::computeHierarchy() {
 // Return Value			:	-
 // Comments				:
 int			CPointHierarchy::average(int numItems,int *indices) {
-	int			i;
 	CMapNode	node;
 
 	// PASS 1:	Average the position/normal
 	initv(node.P,0);
 	initv(node.N,0);
-	for (i=0;i<numItems;i++) {
-		const CPointCloudPoint	*item	=	CMap<CPointCloudPoint>::items + indices[i];
+	for (int i=numItems;i>0;i--) {
+		const CPointCloudPoint	*item	=	CMap<CPointCloudPoint>::items + (*indices++);
 		addvv(node.P,item->P);
 		addvv(node.N,item->N);
 	}
+	indices	-=	numItems;
 
 	// Normalize the thing
 	assert(numItems > 0);
@@ -200,9 +198,9 @@ int			CPointHierarchy::average(int numItems,int *indices) {
 	initv(node.radiosity,0);
 	node.dP		=	0;
 	node.dN		=	1;
-	for (i=0;i<numItems;i++) {
+	for (int i=numItems;i>0;i--) {
 		vector					D;
-		const CPointCloudPoint	*item	=	CMap<CPointCloudPoint>::items + indices[i];
+		const CPointCloudPoint	*item	=	CMap<CPointCloudPoint>::items + (*indices++);
 		const float				*src	=	data.array + item->entryNumber;
 		float					area;
 
@@ -220,6 +218,9 @@ int			CPointHierarchy::average(int numItems,int *indices) {
 
 		node.dN		=	min(node.dN,dotvv(node.N,item->N));
 	}
+	indices		-=	numItems;
+
+	// Normalize the radiosity and the area
 	mulvf(node.radiosity,1 / node.dP);				// Normalize the radiosity
 	node.dP		=	sqrtf(node.dP / (float) C_PI);	// Convert to effective radius
 
@@ -261,21 +262,20 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 
 		subItems	=	membership	+	numItems;
 
-		int		i;
 		vector	bmin,bmax;
 
 		initv(bmin,C_INFINITY);
 		initv(bmax,-C_INFINITY);
 		
-		// The membership is dummy
-		for (i=0;i<numItems;i++) {
+		// The membership is dummy ... Also compute the bounding box of the point set
+		for (int i=0;i<numItems;i++) {
 			membership[i]	=	-1;
 			addBox(bmin,bmax,CMap<CPointCloudPoint>::items[indices[i]].P);
 		}
 		
 		vector	C0,C1;		// The cluster centers
 		vector	N0,N1;		// The cluster normals
-		
+
 		// Create random cluster centers
 		initv(C0,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
 					_urand()*(bmax[1]-bmin[1]) + bmin[1],
@@ -289,12 +289,10 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 		initv(N1,	_urand()*2-1,	_urand()*2-1,	_urand()*2-1);
 		normalizevf(N0);
 		normalizevf(N1);
-		
+
 		// Perform the clustering iterations
 		int		num0,num1;
-		int		iterations;
-		for (iterations=0;iterations<5;iterations++) {	// Try 5 times
-
+		for (int iterations=0;iterations<5;iterations++) {	// Try 5 times ... Not until convergence
 			int		changed	=	FALSE;
 			vector	nC0,nC1;
 			vector	nN0,nN1;
@@ -302,10 +300,13 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 			// Clear the data
 			initv(nC0,0);
 			initv(nC1,0);
+			initv(nN0,0);
+			initv(nN1,0);
 			num0	=	0;
 			num1	=	0;
 			
-			for (i=0;i<numItems;i++) {
+			// iterate over items
+			for (int i=0;i<numItems;i++) {
 				vector						D;
 				const	CPointCloudPoint	*cItem	=	CMap<CPointCloudPoint>::items + indices[i];
 				
@@ -315,9 +316,9 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 				
 				// Compute the distance to the second cluster
 				subvv(D,cItem->P,C1);
-				const float d1	=	dotvv(D,D) / max(dotvv(N1,cItem->N),C_EPSILON);;
+				const float d1	=	dotvv(D,D) / max(dotvv(N1,cItem->N),C_EPSILON);
 				
-				// Change the membership
+				// Change the membership if necessary
 				if (d0 < d1) {
 					if (membership[i] != 0) {
 						changed			=	TRUE;
@@ -339,6 +340,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 				}
 			}
 			
+			// Check for degenerate cases
 			if ((num0 == 0) || (num1 == 0)) {
 				initv(C0,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
 							_urand()*(bmax[1]-bmin[1]) + bmin[1],
@@ -352,7 +354,6 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 				normalizevf(N0);
 				normalizevf(N1);
 			} else {
-
 				if (changed == FALSE)	break;
 
 				mulvf(C0,nC0,1 / (float) num0);
@@ -369,29 +370,37 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 
 			// Clustering failed - probably coincident points, make an arbitrary split
 			num0 = num1 = 0;
-			for (i=0;i<numItems;i++) {
+			for (int i=0;i<numItems;i++) {
 				const int which = i & 1;
 				if (which)	num1++;
 				else		num0++;
 				membership[i] = which;
 			}
+
+			// FIXME: A smarter thing to do would be to sort the items in one dimension and split it in half
 		}
 		
 		assert((num0 + num1) == numItems);
 
-		int			nodeIndex	=	average(numItems,indices);
+		// Average the items and create an internal node
+		const int	nodeIndex	=	average(numItems,indices);
 		
 		// OK, split the items into two
-		int	j;
+		int	i,j;
 		
+		// Collect the items in the first child
 		for (i=0,j=0;i<numItems;i++)	if (membership[i] == 0)	subItems[j++]	=	indices[i];
 		assert(j == num0);
-		int	child0	=	cluster(num0,subItems);
+		const int	child0	=	cluster(num0,subItems);
 		
+		// Collect the items in the second child
 		for (i=0,j=0;i<numItems;i++)	if (membership[i] == 1)	subItems[j++]	=	indices[i];
 		assert(j == num1);
-		int	child1	=	cluster(num1,subItems);
+		const int	child1	=	cluster(num1,subItems);
 		
+		// NOTE: There's an important subtlety here...
+		// We can not access cNode before the child nodes are created because the creation of children
+		// may change the nodes.array field
 		CMapNode *cNode	=	nodes.array + nodeIndex;
 		cNode->child0	=	child0;
 		cNode->child1	=	child1;
@@ -412,7 +421,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 // Comments				:
 void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const float *dPdvl,const float *Nl,CShadingContext *context,const CTexture3dLookup *l) {
 	const float maxsolidangle	=	l->maxsolidangle;
-	int			*stack			=	(int *) alloca(100*sizeof(int));
+	int			*stack			=	(int *) alloca(POINTHIERARCHY_STACK_SIZE*sizeof(int));
 	int			*stackBase		=	stack;
 	int			i;
 	vector		P,N;
@@ -432,30 +441,31 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 		// Is this a leaf ?
 		if (currentNode < 0) {
 			const CPointCloudPoint	*item	=	CMap<CPointCloudPoint>::items - currentNode;
+
+			// Are we behind the item?
+			if (dotvv(P,item->N) <= dotvv(item->P,item->N))	continue;
 			
-			// Sum this item
-			if (areaIndex == -1)	Cl[0]	+=	ff(P,N,item->P,item->N,item->dP);
-			else	{
-				const float	*src	=	data.array + item->entryNumber;
-				const float form	=	ff(P,N,item->P,item->N,sqrtf(src[areaIndex] / (float) C_PI));
-				if (radiosityIndex > 0) {
-					Cl[0] += form*src[radiosityIndex+0];
-					Cl[1] += form*src[radiosityIndex+1];
-					Cl[2] += form*src[radiosityIndex+2];
-				}
-				Cl[3]	+=	form;
+			// Compute the form factor
+			float		form;
+			const float	*src	=	data.array + item->entryNumber;
+			if (areaIndex == -1)	form	=	ff(P,N,item->P,item->N,item->dP);
+			else					form	=	ff(P,N,item->P,item->N,sqrtf(src[areaIndex] / (float) C_PI));
+			//assert(form >= 0);
+
+			// Sum the data
+			if (radiosityIndex > 0) {
+				Cl[0] += form*src[radiosityIndex+0];
+				Cl[1] += form*src[radiosityIndex+1];
+				Cl[2] += form*src[radiosityIndex+2];
 			}
+			Cl[3]	+=	form;
 
 		} else {
-			const CMapNode			*node	=	nodes.array + currentNode;
+			const CMapNode	*node	=	nodes.array + currentNode;
 			
-			// Do we have any normal variation?
-			if (node->dN > 0.9) {
-			
-				// Are we behind the node?
-				if (dotvv(P,node->N) <= dotvv(node->P,node->N)) {
-					continue;
-				}
+			// Are we behind the node?
+			if ((node->dN > 0.999f) && (dotvv(P,node->N) <= dotvv(node->P,node->N))) {
+				continue;
 			}
 			
 			// FIXME: A more general behind test would be nice
@@ -469,8 +479,11 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			const float dParea	= (float) C_PI*node->dP*node->dP;
 
 			// The split decision
+			//if (FALSE) {
 			if (	(lengthv(D) > node->dP) && ((dParea / distSq) < maxsolidangle)	) {
 				const float form = ff(P,N,node->P,node->N,node->dP);
+				//assert(form >= 0);
+
 				if (radiosityIndex > 0) {
 					Cl[0] += form*node->radiosity[0];
 					Cl[1] += form*node->radiosity[1];
@@ -479,7 +492,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 				Cl[3]	+=	form;
 			} else {
 				// Sanity check
-				assert((stack-stackBase) < 98);
+				assert((stack-stackBase) < (POINTHIERARCHY_STACK_SIZE-2));
 		
 				// Split
 				*stack++	=	node->child0;

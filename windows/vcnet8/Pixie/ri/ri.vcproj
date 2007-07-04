@@ -1353,6 +1353,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\ri\shaderParameterList.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\ri\shading.cpp"
 				>
 			</File>
