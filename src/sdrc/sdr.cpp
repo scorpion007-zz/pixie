@@ -92,7 +92,7 @@ CVariable::CVariable(char *name,int type,int multiplicity) : CSymbol(name) {
 
 	// Make sure the array size is reasonable
 	if (multiplicity <= 0) {
-		sdr->error("Array size for %s is invalid (%s)\n",name,multiplicity);
+		sdr->error("Array size for %s is invalid (%d)\n",name,multiplicity);
 		multiplicity	=	1;
 	}
 
