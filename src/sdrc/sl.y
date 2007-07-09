@@ -165,7 +165,7 @@
 // Binary operators
 %left  			SL_PLUS SL_MINUS 
 %left  			SL_CROSS
-%left  			SL_DIVIDE SL_MULTIPLY
+%left  			SL_MULTIPLY SL_DIVIDE
 %left  			SL_DOT
 
 // Types
@@ -2062,14 +2062,14 @@ slAritmeticExpression:
 		SL_PLUS
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix,NULL);
+			$$	=	getOperation($1,$3,opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix,NULL,0);
 		}
 	|
 		slAritmeticExpression
 		SL_MINUS
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeSubFloatFloat,opcodeSubVectorVector,opcodeSubMatrixMatrix,NULL);
+			$$	=	getOperation($1,$3,opcodeSubFloatFloat,opcodeSubVectorVector,opcodeSubMatrixMatrix,NULL,0);
 		}
 	|
 		slAritmeticExpression
@@ -2102,14 +2102,14 @@ slAritmeticExpression:
 
 
 			if ($$ == NULL)
-				$$	=	getOperation($1,$3,opcodeMulFloatFloat,opcodeMulVectorVector,opcodeMulMatrixMatrix,NULL);
+				$$	=	getOperation($1,$3,opcodeMulFloatFloat,opcodeMulVectorVector,opcodeMulMatrixMatrix,NULL,0);
 		}
 	|
 		slAritmeticExpression
 		SL_DIVIDE
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeDivFloatFloat,opcodeDivVectorVector,opcodeDivMatrixMatrix,NULL);
+			$$	=	getOperation($1,$3,opcodeDivFloatFloat,opcodeDivVectorVector,opcodeDivMatrixMatrix,NULL,0);
 		}
 	|
 		slAritmeticExpression
@@ -2143,7 +2143,7 @@ slAritmeticExpression:
 		SL_MINUS
 		slAritmeticExpression
 		{
-			$$	=	getOperation($2,opcodeNegFloat,opcodeNegVector,opcodeNegMatrix,NULL);
+			$$	=	getOperation($2,opcodeNegFloat,opcodeNegVector,opcodeNegMatrix,NULL,0);
 		}
 	|
 		slAritmeticExpression
@@ -2166,62 +2166,56 @@ slAritmeticExpression:
 		SL_AND
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeAnd,NULL,NULL,NULL);
+			$$	=	getOperation($1,$3,opcodeAnd,NULL,NULL,NULL,0);
 		}
 	|
 		slAritmeticExpression
 		SL_OR
 		slAritmeticExpression
 		{
-			$$	=	getOperation($1,$3,opcodeOr,NULL,NULL,NULL);
+			$$	=	getOperation($1,$3,opcodeOr,NULL,NULL,NULL,0);
 		}
 	|
 		slAritmeticExpression
 		SL_COMP_GREATER
 		slAritmeticExpression
 		{
-			$$			=	getOperation($1,$3,opcodeFloatGreater,opcodeVectorGreater,NULL,NULL);
-			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
+			$$			=	getOperation($1,$3,opcodeFloatGreater,opcodeVectorGreater,NULL,NULL,SLC_FLOAT);
 		}
 	|
 		slAritmeticExpression
 		SL_COMP_LESS
 		slAritmeticExpression
 		{
-			$$			=	getOperation($1,$3,opcodeFloatLess,opcodeVectorLess,NULL,NULL);
-			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
+			$$			=	getOperation($1,$3,opcodeFloatLess,opcodeVectorLess,NULL,NULL,SLC_FLOAT);
 		}
 	|
 		slAritmeticExpression
 		SL_COMP_GREATER_EQUAL
 		slAritmeticExpression
 		{
-			$$			=	getOperation($1,$3,opcodeFloatEGreater,opcodeVectorEGreater,NULL,NULL);
-			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
+			$$			=	getOperation($1,$3,opcodeFloatEGreater,opcodeVectorEGreater,NULL,NULL,SLC_FLOAT);
 		}
 	|
 		slAritmeticExpression
 		SL_COMP_LESS_EQUAL
 		slAritmeticExpression
 		{
-			$$			=	getOperation($1,$3,opcodeFloatELess,opcodeVectorELess,NULL,NULL);
-			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
+			$$			=	getOperation($1,$3,opcodeFloatELess,opcodeVectorELess,NULL,NULL,SLC_FLOAT);
 		}
 	|
 		slAritmeticExpression
 		SL_COMP_EQUAL
 		slAritmeticExpression
 		{
-			$$			=	getOperation($1,$3,opcodeFloatEqual,opcodeVectorEqual,NULL,opcodeStringEqual);
-			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
+			$$			=	getOperation($1,$3,opcodeFloatEqual,opcodeVectorEqual,NULL,opcodeStringEqual,SLC_FLOAT);
 		}
 	|
 		slAritmeticExpression
 		SL_COMP_DIFFERENT
 		slAritmeticExpression
 		{
-			$$			=	getOperation($1,$3,opcodeFloatNotEqual,opcodeVectorNotEqual,NULL,opcodeStringNotEqual);
-			$$->type	=	SLC_FLOAT | ($1->type & $3->type & SLC_UNIFORM);
+			$$			=	getOperation($1,$3,opcodeFloatNotEqual,opcodeVectorNotEqual,NULL,opcodeStringNotEqual,SLC_FLOAT);
 		}
 	|
 		SL_NOT

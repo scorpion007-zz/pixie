@@ -2069,7 +2069,7 @@ CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpr
 	// Create Accessor
 	if(CExpression *arrayAccessor = new CArrayExpression(first,new CTerminalExpression(indexVar))){
 		// Create update expression
-		if(CExpression	*second = getOperation(arrayAccessor,s,opcodeFloat,opcodeVector,opcodeMatrix,NULL)){
+		if(CExpression	*second = getOperation(arrayAccessor,s,opcodeFloat,opcodeVector,opcodeMatrix,NULL,0)){
 			// Create expression to store it again
 			arrayAssigner = new CArrayAssignmentExpression(first,new CTerminalExpression(indexVar),second);
 		}
@@ -3000,7 +3000,7 @@ void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Generate code for a binary operation
 // Return Value			:	The generated expression
 // Comments				:
-CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString) {
+CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite) {
 	if ((first->type | second->type) & SLC_ARRAY) {
 		delete first;
 		delete second;
@@ -3016,26 +3016,26 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 			if (opcodeFloat == NULL) {
 				sdr->error("This operation is not defined on floats\n");
 			} else {
-				return	new CBinaryExpression(SLC_FLOAT,opcodeFloat,first,second);
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_FLOAT),opcodeFloat,first,second);
 			}
 		} else if (first->type & SLC_VECTOR) {	
 			if (opcodeVector == NULL) {
 				sdr->error("This operation is not defined on vectors\n");
 			} else {
 				int subtype = (first->type | second->type) & SLC_SUB_TYPE_MASK;
-				return	new CBinaryExpression(SLC_VECTOR|subtype,opcodeVector,first,second);
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : (SLC_VECTOR|subtype)),opcodeVector,first,second);
 			}
 		} else if (first->type & SLC_MATRIX) {	
 			if (opcodeMatrix == NULL) {
 				sdr->error("This operation is not defined on matrices\n");
 			} else {
-				return	new CBinaryExpression(SLC_MATRIX,opcodeMatrix,first,second);
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_MATRIX),opcodeMatrix,first,second);
 			}
 		} else if (first->type & SLC_STRING) {	
 			if (opcodeString == NULL) {
 				sdr->error("This operation is not defined on strings\n");
 			} else {
-				return	new CBinaryExpression(SLC_STRING,opcodeString,first,second);
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_STRING),opcodeString,first,second);
 			}
 		} else {
 			assert(FALSE);
@@ -3046,26 +3046,26 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 			if (opcodeString == NULL) {
 				sdr->error("This operation is not defined on strings\n");
 			} else {
-				return	new CBinaryExpression(SLC_STRING,opcodeString,getConversion(SLC_STRING,first),getConversion(SLC_STRING,second));
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_STRING),opcodeString,getConversion(SLC_STRING,first),getConversion(SLC_STRING,second));
 			}
 		} else if ((first->type | second->type) & SLC_MATRIX) {		
 			if (opcodeMatrix == NULL) {
 				sdr->error("This operation is not defined on matrices\n");
 			} else {
-				return	new CBinaryExpression(SLC_MATRIX,opcodeMatrix,getConversion(SLC_MATRIX,first),getConversion(SLC_MATRIX,second));
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_MATRIX),opcodeMatrix,getConversion(SLC_MATRIX,first),getConversion(SLC_MATRIX,second));
 			}
 		} else if ((first->type | second->type) & SLC_VECTOR)	{	
 			if (opcodeVector == NULL) {
 				sdr->error("This operation is not defined on vectors\n");
 			} else {
 				int subtype = (first->type | second->type) & SLC_SUB_TYPE_MASK;
-				return	new CBinaryExpression(SLC_VECTOR|subtype,opcodeVector,getConversion(SLC_VECTOR,first),getConversion(SLC_VECTOR,second));
+				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : (SLC_VECTOR|subtype)),opcodeVector,getConversion(SLC_VECTOR,first),getConversion(SLC_VECTOR,second));
 			}
 		} else if ((first->type | second->type) & SLC_FLOAT) {		
 			if (opcodeFloat == NULL) {
 				sdr->error("This operation is not defined on floats\n");
 			} else {
-				return	new CBinaryExpression(SLC_FLOAT,opcodeFloat,getConversion(SLC_FLOAT,first),getConversion(SLC_FLOAT,second));
+				return	new CBinaryExpression(SLC_FLOAT,opcodeFloat,getConversion((typeOverwrite ? typeOverwrite : SLC_FLOAT),first),getConversion(SLC_FLOAT,second));
 			}
 		} else {
 			assert(FALSE);
@@ -3083,17 +3083,17 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 // Description			:	Generate a unary operation
 // Return Value			:	The generated expression
 // Comments				:
-CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString) {
+CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite) {
 	if (first->type & SLC_ARRAY) {
 		delete first;
 		sdr->error("You can not operate on arrays directly\n");
 		return	new CNullExpression();
 	}
 		
-	if (first->type & SLC_FLOAT)		return	new CUnaryExpression(SLC_FLOAT,opcodeFloat,first);
-	else if (first->type & SLC_VECTOR)	return	new CUnaryExpression(SLC_VECTOR | (first->type & SLC_SUB_TYPE_MASK),opcodeVector,first);
-	else if (first->type & SLC_MATRIX)	return	new CUnaryExpression(SLC_MATRIX,opcodeMatrix,first);
-	else if (first->type & SLC_STRING)	return	new CUnaryExpression(SLC_STRING,opcodeString,first);
+	if (first->type & SLC_FLOAT)		return	new CUnaryExpression((typeOverwrite ? typeOverwrite : SLC_FLOAT),opcodeFloat,first);
+	else if (first->type & SLC_VECTOR)	return	new CUnaryExpression((typeOverwrite ? typeOverwrite : (SLC_VECTOR | (first->type & SLC_SUB_TYPE_MASK))),opcodeVector,first);
+	else if (first->type & SLC_MATRIX)	return	new CUnaryExpression((typeOverwrite ? typeOverwrite : SLC_MATRIX),opcodeMatrix,first);
+	else if (first->type & SLC_STRING)	return	new CUnaryExpression((typeOverwrite ? typeOverwrite : SLC_STRING),opcodeString,first);
 	else {
 		assert(FALSE);
 	}
