@@ -567,7 +567,7 @@ char		CAttributes::findHitMode(const char *mode) {
 	// Figure out the hit mode
 	if (strcmp(mode,"primitive") == 0) {
 		return 'p';
-	} else if (strcmp(mode,"shade") == 0) {
+	} else if (strcmp(mode,"shader") == 0) {
 		return 's';
 	} else {
 		error(CODE_BADTOKEN,"Unrecognized hit mode \"%s\"\n",mode);
@@ -583,7 +583,7 @@ char		CAttributes::findHitMode(const char *mode) {
 // Comments				:
 const char		*CAttributes::findHitMode(char mode) {
 	if (mode == 'p')		return "primitive";
-	else if (mode == 's')	return "shade";
+	else if (mode == 's')	return "shader";
 	else error(CODE_BUG,"Invalid hit mode encountered: \'%c\'\n",mode);
 
 	return "primitive";
