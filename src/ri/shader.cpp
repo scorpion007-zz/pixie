@@ -322,6 +322,7 @@ void CVaryingTextureLookup::init() {
 	twidth			=	1;
 	numSamples		=	1;
 	coneAngle		=	0;
+	maxDist			=	C_INFINITY;
 }
 
 ///////////////////////////////////////////////////////////////////////
