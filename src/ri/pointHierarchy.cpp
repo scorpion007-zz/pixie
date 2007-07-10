@@ -450,7 +450,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			const float	*src	=	data.array + item->entryNumber;
 			if (areaIndex == -1)	form	=	ff(P,N,item->P,item->N,item->dP);
 			else					form	=	ff(P,N,item->P,item->N,sqrtf(src[areaIndex] / (float) C_PI));
-			//assert(form >= 0);
+			assert(form >= 0);
 
 			// Sum the data
 			if (radiosityIndex > 0) {
@@ -461,12 +461,10 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			Cl[3]	+=	form;
 
 		} else {
-			const CMapNode	*node	=	nodes.array + currentNode;
+			const CMapNode			*node	=	nodes.array + currentNode;
 			
 			// Are we behind the node?
-			if ((node->dN > 0.999f) && (dotvv(P,node->N) <= dotvv(node->P,node->N))) {
-				continue;
-			}
+			//if ((node->dN > 0.999999) && (dotvv(P,node->N) <= dotvv(node->P,node->N))) {
 			
 			// FIXME: A more general behind test would be nice
 
@@ -479,10 +477,8 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			const float dParea	= (float) C_PI*node->dP*node->dP;
 
 			// The split decision
-			//if (FALSE) {
 			if (	(lengthv(D) > node->dP) && ((dParea / distSq) < maxsolidangle)	) {
 				const float form = ff(P,N,node->P,node->N,node->dP);
-				//assert(form >= 0);
 
 				if (radiosityIndex > 0) {
 					Cl[0] += form*node->radiosity[0];
