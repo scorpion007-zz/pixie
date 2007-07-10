@@ -1279,7 +1279,7 @@ void		CRibOut::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *para
 void		CRibOut::RiMakeBrickMapV(int n,char **src,char *dest,int numTokens,char *tokens[],void *params[]) {
 	out("MakeBrickMap [");
 	for(int i=0;i<n;i++) out("\"%s\" ",src[i]);
-	out(" \"%s\" ",dest);
+	out("] \"%s\" ",dest);
 	writePL(numTokens,tokens,params);
 }
 
