@@ -140,33 +140,35 @@
 //////////////////////////////////////////////////////////////////////////
 %left<string> 	SL_TEXT_VALUE
 
+// Assignment (lowest)
+%right 			SL_EQUAL
+%right			SL_INCREMENT SL_DECREMENT SL_INCREMENT_BY SL_DECREMENT_BY 
+
+// Conditional execution
 %left			SL_QUESTION SL_COLON
 
+// Type decls
 %left 			SL_FLOAT SL_COLOR SL_POINT SL_VECTOR SL_NORMAL SL_MATRIX SL_STRING
-
-
-// Relation operators
-%left  			SL_COMP_EQUAL SL_COMP_DIFFERENT
-%left  			SL_COMP_GREATER SL_COMP_GREATER_EQUAL SL_COMP_LESS SL_COMP_LESS_EQUAL
-
-
-%right 			SL_EQUAL
-
-// Unary oprators
-%right			SL_INCREMENT SL_DECREMENT SL_INCREMENT_BY SL_DECREMENT_BY 
-%right			SL_MULTIPLY_BY SL_DIVIDE_BY
-
-// Binary operators
-%left  			SL_PLUS SL_MINUS 
-%left  			SL_CROSS
-%left  			SL_DIVIDE SL_MULTIPLY
-%left  			SL_DOT
 
 // Boolean operators
 %left  			SL_OR
 %left  			SL_AND
 %left 			SL_NOT
 
+// Relation operators
+%left  			SL_COMP_EQUAL SL_COMP_DIFFERENT
+%left  			SL_COMP_GREATER SL_COMP_GREATER_EQUAL SL_COMP_LESS SL_COMP_LESS_EQUAL
+
+// Unary oprators
+%right			SL_MULTIPLY_BY SL_DIVIDE_BY
+
+// Binary operators
+%left  			SL_PLUS SL_MINUS 
+%left  			SL_CROSS
+%left  			SL_MULTIPLY SL_DIVIDE
+%left  			SL_DOT
+
+// Types
 %left			SL_OUTPUT
 %left			SL_EXTERN
 %left			SL_UNIFORM
@@ -2402,6 +2404,19 @@ slAritmeticTypeCast:
 		slVectorMatrixExpression
 		{
 			$$	=	getConversion($1,$3);
+
+			sdr->undesire();
+		}
+	|
+		slTypeDecl
+		{
+			// Change the expected type to float
+			sdr->undesire();
+			sdr->desire(SLC_FLOAT | ($1 & (~(SLC_TYPE_MASK | SLC_SUB_TYPE_MASK))));
+		}
+		SL_FLOAT_VALUE
+		{
+			$$	=	getConversion($1,new CConstantTerminalExpression(SLC_FLOAT,strdup($3)));
 
 			sdr->undesire();
 		}

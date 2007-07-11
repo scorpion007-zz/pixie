@@ -69,7 +69,6 @@ static	inline	float	ff(const float *rP,const float *rN,const float *oP,const flo
 			if (dotvv(D,oN) >= 0)	return 0;
 
 			normalizevf(nD,D);
-			assert(dotvv(nD,rN) >= 0);
 
 			// Notice that we're computing the disk area without PI because it cancels the one in the denominator
 			return	-dotvv(nD,oN)*dotvv(nD,rN)*dP*dP / (dotvv(D,D) + C_EPSILON);

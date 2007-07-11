@@ -9,8 +9,8 @@ uniform	color	specularcolor	=	1
 uniform	string	texturename	=	""
 #!variables:
 varying	vector	Nf
-varying	boolean	temporary_0
-uniform	boolean	temporary_1
+varying	float	temporary_0
+uniform	float	temporary_1
 varying	vector	temporary_2
 varying	vector	temporary_3
 varying	vector	temporary_4
@@ -19,13 +19,12 @@ uniform	vector	temporary_6
 varying	vector	temporary_7
 varying	vector	temporary_8
 uniform	vector	temporary_9
-varying	float	temporary_10
 #!Init:
 	return            
 #!Code:
 	movevv            	Ci Cs
 	sneql             	temporary_1 texturename ""
-	vuboolean          temporary_0 temporary_1
+	vufloat            temporary_0 temporary_1
 	if                	temporary_0 #!Label3
 	texture	("c=SFff")  temporary_2  texturename  0  s  t 
 	mulvv             	Ci Ci temporary_2
@@ -48,8 +47,8 @@ varying	float	temporary_10
 	vuvector           temporary_4 temporary_6
 	normalize	("v=v")  temporary_8  I 
 	negv              	temporary_7 temporary_8
-	vufloat            temporary_10 roughness
-	specular	("c=nvf")  temporary_5  Nf  temporary_7  temporary_10 
+	vufloat            temporary_0 roughness
+	specular	("c=nvf")  temporary_5  Nf  temporary_7  temporary_0 
 	mulvv             	temporary_3 temporary_4 temporary_5
 	addvv             	Ci temporary_2 temporary_3
 	movevv            	Oi Os

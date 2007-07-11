@@ -11,8 +11,8 @@ uniform	vector	temporary_0
 varying	vector	dir
 varying	vector	temporary_1
 varying	vector	vis
-varying	boolean	temporary_2
-uniform	boolean	temporary_3
+varying	float	temporary_2
+uniform	float	temporary_3
 uniform	vector	temporary_4
 varying	vector	temporary_5
 varying	vector	temporary_6
@@ -29,7 +29,7 @@ varying	vector	temporary_6
 	vuvector           temporary_1 temporary_0
 	solar             	 dir  temporary_1  #!Label4
 	seql              	temporary_3 shadowname ""
-	vuboolean          temporary_2 temporary_3
+	vufloat            temporary_2 temporary_3
 	if                	temporary_2 #!Label6
 	vfromf            	temporary_4 1 1 1
 	cfrom             	temporary_0 "rgb" temporary_4

@@ -7,8 +7,8 @@ uniform	string	texname	=	""
 #!variables:
 varying	vector	Nf
 varying	vector	temporary_0
-varying	boolean	temporary_1
-uniform	boolean	temporary_2
+varying	float	temporary_1
+uniform	float	temporary_2
 varying	vector	temporary_3
 varying	vector	temporary_4
 uniform	vector	temporary_5
@@ -21,7 +21,7 @@ varying	vector	temporary_7
 	faceforward	("v=vv")  Nf  temporary_0  I 
 	movevv            	Ci Cs
 	sneql             	temporary_2 texname ""
-	vuboolean          temporary_1 temporary_2
+	vufloat            temporary_1 temporary_2
 	if                	temporary_1 #!Label3
 	texture	("c=SFff")  temporary_0  texname  0  s  t 
 	mulvv             	Ci Ci temporary_0

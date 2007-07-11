@@ -711,7 +711,7 @@ void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
 	} else if (strcmp(name,RI_VISIBILITY) == 0) {
 		for (i=0;i<n;i++) {
 			if (FALSE) {
-			attributeCheckString(RI_TRANSMISSION)
+			attributeCheckInt(RI_TRANSMISSION,1)
 			attributeCheckInt(RI_CAMERA,1)
 			attributeCheckInt(RI_TRACE,1)
 			attributeCheckInt(RI_PHOTON,1)
@@ -1276,9 +1276,11 @@ void		CRibOut::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *para
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeTexture3DV(char *src,char *dest,int n,char *tokens[],void *params[]) {
-	out("MakeTexture3D \"%s\" \"%s\" ",src,dest);
-	writePL(n,tokens,params);
+void		CRibOut::RiMakeBrickMapV(int n,char **src,char *dest,int numTokens,char *tokens[],void *params[]) {
+	out("MakeBrickMap [");
+	for(int i=0;i<n;i++) out("\"%s\" ",src[i]);
+	out("] \"%s\" ",dest);
+	writePL(numTokens,tokens,params);
 }
 
 void		CRibOut::RiErrorHandler(void (*handler)(int,int,char *)) {
@@ -1632,10 +1634,16 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable(RI_ESTIMATOR,			"int");
 	declareVariable(RI_ILLUMINATEFRONT,		"int");
 
-	declareVariable(RI_TRANSMISSION,		"string");
+	declareVariable(RI_TRANSMISSION,		"int");
 	declareVariable(RI_CAMERA,				"int");
-	declareVariable(RI_TRACE,				"int");
+	declareVariable(RI_SPECULAR,			"int");
+	declareVariable(RI_DIFFUSE,				"int");
 	declareVariable(RI_PHOTON,				"int");
+
+	declareVariable(RI_DIFFUSEHITMODE,		"string");
+	declareVariable(RI_SPECULARHITMODE,		"string");
+	declareVariable(RI_TRANSMISSIONHITMODE,	"string");
+	declareVariable(RI_CAMERAHITMODE,		"string");
 
 	declareVariable(RI_NAME,				"string");
 	

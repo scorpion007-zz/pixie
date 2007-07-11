@@ -463,7 +463,7 @@ static	TSlFunction		functions[]	=	{
 														currentData.currentArgumentPlace++;
 														
 														if (cVariable->uniform == FALSE)
-															currentData.opcodeUniform					=	FALSE;
+															currentData.opcodeUniform									=	FALSE;
 														
 														return;
 													}

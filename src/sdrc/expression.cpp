@@ -1620,49 +1620,49 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'F')	{
 			expressions[i]	=	getConversion(SLC_FLOAT,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'F';
 			cPrototype++;
 			i++;
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'V')	{
 			expressions[i]	=	getConversion(SLC_VECTOR | SLC_VVECTOR,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'V';
 			cPrototype++;
 			i++;
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'N')	{
 			expressions[i]	=	getConversion(SLC_VECTOR | SLC_VNORMAL,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'N';
 			cPrototype++;
 			i++;
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'P')	{
 			expressions[i]	=	getConversion(SLC_VECTOR | SLC_VPOINT,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'P';
 			cPrototype++;
 			i++;
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'C')	{
 			expressions[i]	=	getConversion(SLC_VECTOR | SLC_VCOLOR,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'C';
 			cPrototype++;
 			i++;
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'M')	{
 			expressions[i]	=	getConversion(SLC_MATRIX,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'M';
 			cPrototype++;
 			i++;
 			cParameter = arguments->next();
 		} else if (fprototype[cPrototype]	==	'S')	{
 			expressions[i]	=	getConversion(SLC_STRING,cParameter);
-			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value");
+			if (expressions[i]->getVariable() == NULL)	sdr->warning("Identifier expected as return value\n");
 			usedPrototype[uPrototype++]	=	'S';
 			cPrototype++;
 			i++;

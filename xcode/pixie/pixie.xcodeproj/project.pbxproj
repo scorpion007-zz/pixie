@@ -79,7 +79,9 @@
 		18A299010B44F020006B9ABE /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
 		18A299020B44F02F006B9ABE /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
 		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
-		18AC98FF0BC340D6003682A7 /* mapHierarchy.h in Headers */ = {isa = PBXBuildFile; fileRef = 18AC98FE0BC340D6003682A7 /* mapHierarchy.h */; };
+		18CAFBA50C39FA3600614F8C /* refCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18CAFBA10C39FA3600614F8C /* refCounter.cpp */; };
+		18CAFBA60C39FA3600614F8C /* refCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = 18CAFBA20C39FA3600614F8C /* refCounter.h */; };
+		18CAFBA80C39FA3600614F8C /* shaderParameterList.h in Headers */ = {isa = PBXBuildFile; fileRef = 18CAFBA40C39FA3600614F8C /* shaderParameterList.h */; };
 		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
 		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
 		18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D3515A0B7AD20E009F0DAE /* netFileMapping.h */; };
@@ -953,7 +955,9 @@
 		189830A00BAF85F9004D6C61 /* ifexpr.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = ifexpr.l; path = ../../src/ri/ifexpr.l; sourceTree = SOURCE_ROOT; };
 		189830A10BAF85F9004D6C61 /* ifexpr.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = ifexpr.y; path = ../../src/ri/ifexpr.y; sourceTree = SOURCE_ROOT; };
 		189830A20BAF8618004D6C61 /* ifexpr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ifexpr.cpp; path = ../../src/ri/ifexpr.cpp; sourceTree = SOURCE_ROOT; };
-		18AC98FE0BC340D6003682A7 /* mapHierarchy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mapHierarchy.h; path = ../../src/ri/mapHierarchy.h; sourceTree = SOURCE_ROOT; };
+		18CAFBA10C39FA3600614F8C /* refCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = refCounter.cpp; path = ../../src/ri/refCounter.cpp; sourceTree = SOURCE_ROOT; };
+		18CAFBA20C39FA3600614F8C /* refCounter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = refCounter.h; path = ../../src/ri/refCounter.h; sourceTree = SOURCE_ROOT; };
+		18CAFBA40C39FA3600614F8C /* shaderParameterList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shaderParameterList.h; path = ../../src/ri/shaderParameterList.h; sourceTree = SOURCE_ROOT; };
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
 		18D3515A0B7AD20E009F0DAE /* netFileMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = netFileMapping.h; path = ../../src/ri/netFileMapping.h; sourceTree = SOURCE_ROOT; };
@@ -1779,15 +1783,6 @@
 		C96A6EE30AD6E103003C2D7B /* ri */ = {
 			isa = PBXGroup;
 			children = (
-				18F4D1F50BC80F5800EEB5B3 /* ri_config.h */,
-				18AC98FE0BC340D6003682A7 /* mapHierarchy.h */,
-				18E14A5E0BC216490061F88C /* ptcapi.cpp */,
-				18E14A5A0BC2161E0061F88C /* pointHierarchy.cpp */,
-				18E14A5B0BC2161E0061F88C /* pointHierarchy.h */,
-				182651CA0BBA0B52007B2C37 /* ptcapi.h */,
-				182D83370BB70AE300B0689A /* map.h */,
-				189830A20BAF8618004D6C61 /* ifexpr.cpp */,
-				18EFE5080BACBBA400CC743A /* userAttributes.h */,
 				C96A6EF00AD6E143003C2D7B /* attributes.cpp */,
 				C96A6EF10AD6E143003C2D7B /* attributes.h */,
 				C96A6EF20AD6E143003C2D7B /* brickmap.cpp */,
@@ -1821,6 +1816,7 @@
 				C96A6F120AD6E143003C2D7B /* harmonics.h */,
 				C96A6F130AD6E143003C2D7B /* hcshader.cpp */,
 				C96A6F140AD6E143003C2D7B /* hcshader.h */,
+				189830A20BAF8618004D6C61 /* ifexpr.cpp */,
 				C96A6F170AD6E143003C2D7B /* implicit.h */,
 				C96A6F180AD6E143003C2D7B /* implicitSurface.cpp */,
 				C96A6F190AD6E143003C2D7B /* implicitSurface.h */,
@@ -1829,6 +1825,7 @@
 				C96A6F1E0AD6E143003C2D7B /* irradiance.h */,
 				C96A6F4E0AD6E174003C2D7B /* linsys.cpp */,
 				C96A6F4F0AD6E174003C2D7B /* linsys.h */,
+				182D83370BB70AE300B0689A /* map.h */,
 				C96A6F520AD6E196003C2D7B /* memory.cpp */,
 				C96A6F530AD6E196003C2D7B /* memory.h */,
 				18D3515A0B7AD20E009F0DAE /* netFileMapping.h */,
@@ -1855,10 +1852,14 @@
 				C96A6F690AD6E196003C2D7B /* pl.h */,
 				C96A6F6A0AD6E196003C2D7B /* pointCloud.cpp */,
 				C96A6F6B0AD6E196003C2D7B /* pointCloud.h */,
+				18E14A5A0BC2161E0061F88C /* pointHierarchy.cpp */,
+				18E14A5B0BC2161E0061F88C /* pointHierarchy.h */,
 				C96A6F6C0AD6E196003C2D7B /* points.cpp */,
 				C96A6F6D0AD6E196003C2D7B /* points.h */,
 				C96A6F6E0AD6E196003C2D7B /* polygons.cpp */,
 				C96A6F6F0AD6E196003C2D7B /* polygons.h */,
+				18E14A5E0BC216490061F88C /* ptcapi.cpp */,
+				182651CA0BBA0B52007B2C37 /* ptcapi.h */,
 				C96A6F710AD6E196003C2D7B /* quadrics.cpp */,
 				C96A6F720AD6E196003C2D7B /* quadrics.h */,
 				C96A6F750AD6E196003C2D7B /* random.cpp */,
@@ -1866,6 +1867,8 @@
 				C96A6F770AD6E196003C2D7B /* ray.h */,
 				C96A6F780AD6E196003C2D7B /* raytracer.cpp */,
 				C96A6F790AD6E196003C2D7B /* raytracer.h */,
+				18CAFBA10C39FA3600614F8C /* refCounter.cpp */,
+				18CAFBA20C39FA3600614F8C /* refCounter.h */,
 				C96A6F7A0AD6E196003C2D7B /* remoteChannel.cpp */,
 				C96A6F7B0AD6E196003C2D7B /* remoteChannel.h */,
 				C96A6F7C0AD6E196003C2D7B /* renderer.cpp */,
@@ -1886,6 +1889,7 @@
 				C96A6F800AD6E196003C2D7B /* reyes.h */,
 				C96A6F810AD6E196003C2D7B /* ri.cpp */,
 				C96A6F820AD6E196003C2D7B /* ri.h */,
+				18F4D1F50BC80F5800EEB5B3 /* ri_config.h */,
 				C96A6F830AD6E196003C2D7B /* rib.cpp */,
 				C96A6F840AD6E196003C2D7B /* rib.h */,
 				C96A6F870AD6E196003C2D7B /* ribOut.cpp */,
@@ -1899,6 +1903,7 @@
 				C96A6F910AD6E196003C2D7B /* shader.h */,
 				C96A6F920AD6E196003C2D7B /* shaderFunctions.h */,
 				C96A6F930AD6E196003C2D7B /* shaderOpcodes.h */,
+				18CAFBA40C39FA3600614F8C /* shaderParameterList.h */,
 				C96A6F940AD6E196003C2D7B /* shading.cpp */,
 				C96A6F950AD6E196003C2D7B /* shading.h */,
 				C96A6F960AD6E196003C2D7B /* show.cpp */,
@@ -1927,6 +1932,7 @@
 				C96A6FAE0AD6E196003C2D7B /* texture3d.h */,
 				1862D7630B2A8FB100111435 /* tiff.h */,
 				C96A6FAF0AD6E196003C2D7B /* trace.cpp */,
+				18EFE5080BACBBA400CC743A /* userAttributes.h */,
 				C96A6FB10AD6E196003C2D7B /* variable.cpp */,
 				C96A6FB20AD6E196003C2D7B /* variable.h */,
 				C96A6FB50AD6E196003C2D7B /* xform.cpp */,
@@ -2145,8 +2151,9 @@
 				182D83380BB70AE300B0689A /* map.h in Headers */,
 				182651CB0BBA0B52007B2C37 /* ptcapi.h in Headers */,
 				18E14A5D0BC2161E0061F88C /* pointHierarchy.h in Headers */,
-				18AC98FF0BC340D6003682A7 /* mapHierarchy.h in Headers */,
 				18F4D1F60BC80F5800EEB5B3 /* ri_config.h in Headers */,
+				18CAFBA60C39FA3600614F8C /* refCounter.h in Headers */,
+				18CAFBA80C39FA3600614F8C /* shaderParameterList.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2655,6 +2662,7 @@
 				189830A30BAF8618004D6C61 /* ifexpr.cpp in Sources */,
 				18E14A5C0BC2161E0061F88C /* pointHierarchy.cpp in Sources */,
 				18E14A5F0BC216490061F88C /* ptcapi.cpp in Sources */,
+				18CAFBA50C39FA3600614F8C /* refCounter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

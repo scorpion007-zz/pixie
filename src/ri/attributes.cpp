@@ -108,7 +108,11 @@ CAttributes::CAttributes() {
 	rasterExpand				=	0.5f;
 	shadowBias					=	0.01f;
 
-	transmission				=	'o';
+	transmissionHitMode			=	'p';
+	diffuseHitMode				=	'p';
+	cameraHitMode				=	's';
+	specularHitMode				=	's';
+
 
 	emit						=	-1;
 	relativeEmit				=	1;
@@ -472,7 +476,8 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 
 	if ((category == NULL) || (strcmp(category,RI_VISIBILITY) == 0)) {
 		if (strcmp(name,RI_CAMERA) == 0)				{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_PRIMARY_VISIBLE) != 0;			return TRUE;}
-		else if (strcmp(name,RI_TRACE) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_TRACE_VISIBLE) != 0;			return TRUE;}
+		else if (strcmp(name,RI_DIFFUSE) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE) != 0;			return TRUE;}
+		else if (strcmp(name,RI_SPECULAR) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_SPECULAR_VISIBLE) != 0;		return TRUE;}
 		else if (strcmp(name,RI_PHOTON) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_PHOTON_VISIBLE) != 0;			return TRUE;}
 		else if (strcmp(name,RI_TRANSMISSION) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE) != 0;	return TRUE;}
 	}
@@ -551,3 +556,35 @@ const char			*CAttributes::findShadingModel(EShadingModel model) {
 	return "matte";
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	findHitMode
+// Method				:	setHitmode
+// Description			:	Translate hitmode from string
+// Return Value			:	-
+// Comments				:
+char		CAttributes::findHitMode(const char *mode) {
+
+	// Figure out the hit mode
+	if (strcmp(mode,"primitive") == 0) {
+		return 'p';
+	} else if (strcmp(mode,"shader") == 0) {
+		return 's';
+	} else {
+		error(CODE_BADTOKEN,"Unrecognized hit mode \"%s\"\n",mode);
+		return 'p';
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CAttributes
+// Method				:	findHitMode
+// Description			:	The other way around
+// Return Value			:	-
+// Comments				:
+const char		*CAttributes::findHitMode(char mode) {
+	if (mode == 'p')		return "primitive";
+	else if (mode == 's')	return "shader";
+	else error(CODE_BUG,"Invalid hit mode encountered: \'%c\'\n",mode);
+
+	return "primitive";
+}

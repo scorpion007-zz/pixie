@@ -1,7 +1,7 @@
 [Setup]
 AppName=Pixie
-AppVersion=2.2.1
-AppVerName=Pixie 2.2.1
+AppVersion=2.2.2
+AppVerName=Pixie 2.2.2
 AppPublisher=Pixie Developers
 AppPublisherURL=http://pixie.sourceforge.net
 AppSupportURL=https://sourceforge.net/projects/pixie/
@@ -10,7 +10,7 @@ DefaultDirName={pf}\Pixie
 DefaultGroupName=Pixie
 AllowNoIcons=true
 LicenseFile=..\COPYING
-OutputBaseFilename=Pixie-2.2.1-Setup
+OutputBaseFilename=Pixie-2.2.2-Setup
 WizardImageFile=.\logo.bmp
 WizardSmallImageFile=.\logoSmall.bmp
 WizardImageBackColor=$000000

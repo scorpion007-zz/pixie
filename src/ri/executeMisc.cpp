@@ -1018,7 +1018,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,const CTe
 				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->t				=	C_INFINITY;
 				cRay->tmin			=	bias;
-				cRay->flags			=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;
+				cRay->flags			=	ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;
 				cRay->dest			=	rays->C;
 				cRay->multiplier	=	multiplier;
 				cRay->da			=	da;

@@ -65,8 +65,8 @@
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	lookup->bias;								\
 									raysBase->t		=	lookup->maxDist;							\
-									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / numSamples;	\
-									raysBase->flags	=	ATTRIBUTES_FLAGS_TRACE_VISIBLE;				\
+									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / numSamples;				\
+									raysBase->flags	=	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE | ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;	\
 									raysBase->tags	=	&tags[i];									\
 									if (dotvv(raysBase->dir,N) > 0) {								\
 										rays[numExtRays++] = raysBase++;							\

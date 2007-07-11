@@ -2,7 +2,7 @@
 surface
 #!parameters:
 #!variables:
-varying	boolean	temporary_0
+varying	float	temporary_0
 varying	float	temporary_1
 varying	float	temporary_2
 uniform	vector	temporary_3

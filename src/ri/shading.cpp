@@ -543,17 +543,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		if (inShadow == TRUE) {
 
 			// Yes, are we supposed to shade the objects in the shadow ?
-			if (currentAttributes->transmission == 'o') {
-
-				// No, just copy the color/opacity from the attributes field
-				float	*opacity	=	varying[VARIABLE_OI];
-				int		i;
-
-				for (i=numVertices;i>0;i--,opacity+=3)	initv(opacity,1,1,1);
-
-				// Nothing more to do here, just return
-				return;
-			} else if (currentAttributes->transmission == 'i') {
+			if (currentAttributes->transmissionHitMode == 'p') {
 
 				// No, just copy the color/opacity from the attributes field
 				float			*opacity	=	varying[VARIABLE_OI];
@@ -565,6 +555,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				// Nothing more to do here, just return
 				return;
 			}
+
+			// The transmission must be shade at this point
+			assert(currentAttributes->transmissionHitMode == 's');
 			
 			// We need to execute the shaders
 			displacement	=	NULL;	//currentAttributes->displacement;	// We probably don't need to execute the displacement shader
@@ -572,7 +565,26 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			atmosphere		=	NULL;
 
 		} else {
-		
+			// check the hit mode
+
+			// If we're raytracing, are we supposed to shade hit rays?
+			if ((dim == SHADING_2D) && (currentAttributes->specularHitMode == 'p')) {
+				// No, just copy the color/opacity from the attributes field
+				float			*opacity	=	varying[VARIABLE_OI];
+				float			*color		=	varying[VARIABLE_CI];
+				int				i;
+				const	float	*so			=	currentAttributes->surfaceOpacity;
+				const	float	*sc			=	currentAttributes->surfaceColor;
+
+				for (i=numVertices;i>0;i--,opacity+=3,color+=3) {
+					movvv(opacity,so);
+					movvv(color,sc);
+				}
+
+				// Nothing more to do here, just return
+				return;
+			}
+
 			// We need to execute the shaders
 			if (currentAttributes->flags & ATTRIBUTES_FLAGS_MATTE) {
 				displacement	=	currentAttributes->displacement;
@@ -1159,6 +1171,17 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			locals[ACCESSOR_POSTSHADER]		=	currentShadingState->postShader->prepare(shaderStateMemory,varying,numVertices);
 			currentShadingState->postShader->execute(this,locals[ACCESSOR_POSTSHADER]);
 		}
+	}
+
+
+	// Check if we should are a camera ray, and have primitive hit mode
+	if ((dim == SHADING_2D_GRID) && (currentAttributes->cameraHitMode == 'p')) {
+		// Yes, force opacity 1
+		float			*opacity	=	varying[VARIABLE_OI];
+		const	float	*so			=	currentAttributes->surfaceOpacity;
+		int				i;
+
+		for (i=numVertices;i>0;i--,opacity+=3) movvv(opacity,so);
 	}
 
 	// Restore the thread memory

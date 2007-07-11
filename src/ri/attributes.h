@@ -49,8 +49,9 @@ const	unsigned int		ATTRIBUTES_FLAGS_BINARY_DICE				=	1 << 4;		// Use binary dic
 const	unsigned int		ATTRIBUTES_FLAGS_SINGULARITYFIX				=	1 << 5;		// Fix the possible surface singularities
 const	unsigned int		ATTRIBUTES_FLAGS_PRIMARY_VISIBLE			=	1 << 6;		// The primitive is visible to the primary rays
 const	unsigned int		ATTRIBUTES_FLAGS_PHOTON_VISIBLE				=	1 << 7;		// The primitive is visible to the photon rays
-const	unsigned int		ATTRIBUTES_FLAGS_TRACE_VISIBLE				=	1 << 8;		// The primitive is visible to the trace rays
-const	unsigned int		ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE		=	1 << 9;		// The primitive is visible to the primary rays
+const	unsigned int		ATTRIBUTES_FLAGS_SPECULAR_VISIBLE			=	1 << 9;		// The primitive is visible to the gather/trace/environment rays
+const	unsigned int		ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE			=	1 << 10;	// The primitive is visible to the gather/occlusion/diffuse rays
+const	unsigned int		ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE		=	1 << 11;	// The primitive is visible to the transmission/shadow rays
 const	unsigned int		ATTRIBUTES_FLAGS_DISPLACEMENTS				=	1 << 14;	// The primitive is visible to the photon rays
 const	unsigned int		ATTRIBUTES_FLAGS_IMMEDIATE_RENDERING		=	1 << 16;	// We do immediate rendering
 const	unsigned int		ATTRIBUTES_FLAGS_ILLUMINATE_FRONT_ONLY		=	1 << 17;	// During the photon tracing, only photons that hit the front will be traced
@@ -144,10 +145,10 @@ public:
 		float				rasterExpand;								// The expansion coefficient during the sampling
 		float				shadowBias;									// The bias amount expressed in the camera coordinates
 
-		char				transmission;								// Either:
-																		// 'o'	=	opaque
-																		// 'i'	=	Os
-																		// 's'	=	execute
+		char				transmissionHitMode;						// Either: 'p' = Look at the primitive   or   's' = Execute the shader
+		char				specularHitMode;							// Either: 'p' = Look at the primitive   or   's' = Execute the shader
+		char				diffuseHitMode;								// Either: 'p' = Look at the primitive   or   's' = Execute the shader
+		char				cameraHitMode;								// Either: 'p' = Look at the primitive   or   's' = Execute the shader
 
 		int					emit;										// The number of photons to emit from this light source
 		float				relativeEmit;								// The relative emittance
@@ -174,8 +175,11 @@ public:
 		
 		CUserAttributeDictionary		userAttributes;					// Duh.
 
+static	char				findHitMode(const char *mode);
+static	const char			*findHitMode(char mode);
 static	EShadingModel		findShadingModel(const char *name);
 static	const char			*findShadingModel(EShadingModel model);
+
 };
 
 #endif
