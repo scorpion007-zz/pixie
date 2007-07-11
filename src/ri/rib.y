@@ -2585,7 +2585,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					if (cObject != NULL) {
 						RiObjectInstance(cObject->handle);
 					} else {
-						error(CODE_MISSINGDATA,"Object %d is not found\n",(int) $2);
+						error(CODE_MISSINGDATA,"Object \"%s\" is not found\n",$2);
 					}
 				}
 				|
