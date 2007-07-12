@@ -137,6 +137,36 @@ public:
 };
 
 
+class	CPLLookup {
+public:
+								CPLLookup(int numVariables) {
+									numUniforms		=	0;
+									numVaryings		=	0;
+									uniformBindings	=	new CPLLookup::TParamBinding[numVariables*2];
+									varyingBindings	=	uniformBindings + numVariables;
+								}
+
+								~CPLLookup() {
+									delete [] uniformBindings;
+								}
+
+		typedef struct TParamBinding {
+			int				opIndex;			// The operand index to copy
+			int				step;				// The step size
+			size_t			dest;				// The destination offset
+		} TParamBinding;
+
+		int						numUniforms;		// The number of bindings we have
+		TParamBinding			*uniformBindings;	// The linked list of PL variables
+		int						numVaryings;
+		TParamBinding			*varyingBindings;
+		const CShaderInstance	*instance;			// The instance that has the PL
+		const TCode				*code;				// The code that has the PL
+		int						size;				// The size of the memory that needs to be allocated to save old variables
+};
+
+
+
 #define	NUMFILTERSTEPS	10
 
 
@@ -181,7 +211,6 @@ public:
 		float				fill;					// The fill in value for the lookup
 		const char			*label;					// The label of the ray
 		float				sampleBase;				// Jitter base samples for raytracing
-		int					lookupFloat;			// TRUE if we're only looking up a float
 		CTexture			*texture;				// Points to the texture being looked up
 		CEnvironment		*environment;			// Points to the environment being looked up
 };

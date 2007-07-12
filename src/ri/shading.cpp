@@ -409,8 +409,10 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 	traceObjectHash			=	(TObjectHash *) ralloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE,CRenderer::globalMemory);
 
 	// Fill the object pointers with impossible data
-	int	i;
-	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
+	for (int i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
+
+	// Init the PL hash
+	for (int i=0;i<PL_HASH_SIZE;i++) plHash[i]	=	NULL;
 
 	// Init the random number generator
 	randomInit(5489*(thread+1));
@@ -449,6 +451,11 @@ CShadingContext::~CShadingContext() {
 	
 	// Shutdown the random number generator
 	randomShutdown();
+
+	// Ditch the PL hash
+	for (int i=0;i<PL_HASH_SIZE;i++) {
+		if (plHash[i] != NULL)	delete plHash[i];
+	}
 
 	// Ditch the shading states that have been allocated
 	assert(currentShadingState != NULL);

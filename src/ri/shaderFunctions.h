@@ -1484,39 +1484,33 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"f=SFff"
 #ifndef INIT_SHADING
-#define	TEXTUREFEXPR_PRE		float					*res;													\
-								const float				*s,*t;													\
-								CTextureLookup			*lookup;												\
-								CVaryingTextureLookup	varyingLookup;											\
-								varyingLookup.init();															\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
-									int			numArguments;													\
-									const char	**op1;															\
-									const float	*op2;															\
-									argumentcount(numArguments);												\
-									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
-									operand(1,op1,const char **);												\
-									operand(2,op2,const float *);												\
-									lookup->texture				=	CRenderer::getTexture(*op1);				\
-									lookup->channel				=	(int) *op2;									\
-								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
-								getUniformParams(lookup,varyingLookup);											\
-								initVaryingParams(lookup);														\
+#define	TEXTUREFEXPR_PRE		float			*res;															\
+								const float		*s,*t;															\
+								const char		**op1;															\
+								const float		*op2;															\
+								int				numArguments;													\
+								argumentcount(numArguments);													\
+								/* Begin the parameter list */													\
+								plBegin(5,numArguments-5,plDefault);											\
+								/* Fetch the parameters as usual */												\
 								operand(0,res,float *);															\
+								operand(1,op1,const char **);													\
+								operand(2,op2,const float *);													\
 								operand(3,s,const float *);														\
 								operand(4,t,const float *);														\
+								/* Get the texture */															\
+								/* Since these functions use a trie, this should be a pretty fast operation */	\
+								osLock(CRenderer::shaderMutex);													\
+								CTexture	*tex			=	CRenderer::getTexture(*op1);					\
+								osUnlock(CRenderer::shaderMutex);												\
 								int				i;																\
 								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\
 								float			*dtdu		=	dsdv + numVertices;								\
 								float			*dtdv		=	dtdu + numVertices;								\
 								float			cs[4],ct[4];													\
-								vector			color;															\
-								const	float	swidth		=	varyingLookup.swidth;							\
-								const	float	twidth		=	varyingLookup.twidth;							\
-								CTexture		*tex		=	lookup->texture;								\
+								const float		swidth		=	currentShadingState->scratch.swidth;			\
+								const float		twidth		=	currentShadingState->scratch.twidth;			\
 								const float		*du			=	varying[VARIABLE_DU];							\
 								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
@@ -1531,10 +1525,9 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 									dtdu[i]		*=	twidth*du[i];												\
 									dtdv[i]		*=	twidth*dv[i];												\
 								}																				\
-																												\
 								i	=	0;
 
-#define	TEXTUREFEXPR			getVaryingParams(lookup,varyingLookup);											\
+#define	TEXTUREFEXPR			plReady();																		\
 								cs[0]		=	s[i];															\
 								cs[1]		=	s[i] + dsdu[i];													\
 								cs[2]		=	s[i] + dsdv[i];													\
@@ -1543,21 +1536,21 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4(color,cs,ct,lookup,&varyingLookup,this);							\
-								res[i]		=	color[0];
+								vector	tmp;																	\
+								tex->lookup4(tmp,cs,ct,NULL,NULL,this);											\
+								res[i]		=	tmp[0];
 
-#define	TEXTUREFEXPR_UPDATE		i++;	stepVaryingParams(lookup);
+#define	TEXTUREFEXPR_UPDATE		i++;	plStep();
+
+#define	TEXTUREFEXPR_POST		plEnd();
 #else
 #define	TEXTUREFEXPR_PRE
 #define	TEXTUREFEXPR
 #define	TEXTUREFEXPR_UPDATE
+#define	TEXTUREFEXPR_POST
 #endif
 
-DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR,TEXTUREFEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-
-#undef	TEXTUREFEXPR_PRE
-#undef	TEXTUREFEXPR
-#undef	TEXTUREFEXPR_UPDATE
+DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR,TEXTUREFEXPR_UPDATE,TEXTUREFEXPR_POST,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 
 
@@ -1566,56 +1559,8 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"c=SFff"
 #ifndef INIT_SHADING
-#define	TEXTURECEXPR_PRE		float					*res;													\
-								const float				*s,*t;													\
-								CTextureLookup			*lookup;												\
-								CVaryingTextureLookup	varyingLookup;											\
-								varyingLookup.init();															\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
-									int			numArguments;													\
-									const char	**op1;															\
-									const float	*op2;															\
-									argumentcount(numArguments);												\
-									TEXTUREPARAMETERS(5,(numArguments-5) >> 1);									\
-									operand(1,op1,const char **);												\
-									operand(2,op2,const float *);												\
-									lookup->texture				=	CRenderer::getTexture(*op1);				\
-									lookup->channel				=	(int) *op2;									\
-								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
-								getUniformParams(lookup,varyingLookup);											\
-								initVaryingParams(lookup);														\
-								operand(0,res,float *);															\
-								operand(3,s,const float *);														\
-								operand(4,t,const float *);														\
-								int				i;																\
-								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
-								float			*dsdv		=	dsdu + numVertices;								\
-								float			*dtdu		=	dsdv + numVertices;								\
-								float			*dtdv		=	dtdu + numVertices;								\
-								float			cs[4],ct[4];													\
-								const	float	swidth		=	varyingLookup.swidth;							\
-								const	float	twidth		=	varyingLookup.twidth;							\
-								CTexture		*tex		=	lookup->texture;								\
-								const float		*du			=	varying[VARIABLE_DU];							\
-								const float		*dv			=	varying[VARIABLE_DV];							\
-																												\
-								duFloat(dsdu,s);																\
-								duFloat(dtdu,t);																\
-								dvFloat(dsdv,s);																\
-								dvFloat(dtdv,t);																\
-																												\
-								for (i=0;i<numVertices;i++) {													\
-									dsdu[i]		*=	swidth*du[i];												\
-									dsdv[i]		*=	swidth*dv[i];												\
-									dtdu[i]		*=	twidth*du[i];												\
-									dtdv[i]		*=	twidth*dv[i];												\
-								}																				\
-																												\
-								i	=	0;
 
-#define	TEXTURECEXPR			getVaryingParams(lookup,varyingLookup);											\
+#define	TEXTURECEXPR			plReady();																		\
 								cs[0]		=	s[i];															\
 								cs[1]		=	s[i] + dsdu[i];													\
 								cs[2]		=	s[i] + dsdv[i];													\
@@ -1624,20 +1569,29 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 								ct[1]		=	t[i] + dtdu[i];													\
 								ct[2]		=	t[i] + dtdv[i];													\
 								ct[3]		=	t[i] + dtdu[i] + dtdv[i];										\
-								tex->lookup4(res,cs,ct,lookup,&varyingLookup,this);
+								tex->lookup4(res,cs,ct,NULL,NULL,this);
 
-#define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;	stepVaryingParams(lookup);
+#define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;	plStep();
+
+#define	TEXTURECEXPR_POST		plEnd();
+
 #else
 #define	TEXTURECEXPR_PRE
 #define	TEXTURECEXPR
 #define	TEXTURECEXPR_UPDATE
+#define	TEXTURECEXPR_POST
 #endif
 
-DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR,TEXTURECEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTUREFEXPR_PRE,TEXTURECEXPR,TEXTURECEXPR_UPDATE,TEXTURECEXPR_POST,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	TEXTURECEXPR_PRE
 #undef	TEXTURECEXPR
 #undef	TEXTURECEXPR_UPDATE
+#undef	TEXTURECEXPR_POST
+#undef	TEXTUREFEXPR_PRE
+#undef	TEXTUREFEXPR
+#undef	TEXTUREFEXPR_UPDATE
+#undef	TEXTUREFEXPR_POST
 
 
 
@@ -1659,30 +1613,18 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"f=SFffffffff"
 #ifndef INIT_SHADING
-#define	TEXTUREFFULLEXPR_PRE	float					*res;													\
-								const float				*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;				\
-								CTextureLookup			*lookup;												\
-								CVaryingTextureLookup	varyingLookup;											\
-								float					cs[4],ct[4];											\
-								vector					tmp;													\
-								varyingLookup.init();															\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
-									int			numArguments;													\
-									const char	**op1;															\
-									const float	*op2;															\
-									argumentcount(numArguments);												\
-									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
-									operand(1,op1,const char **);												\
-									operand(2,op2,const float *);												\
-									lookup->texture				=	CRenderer::getTexture(*op1);				\
-									lookup->channel				=	(int) *op2;									\
-								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
-								getUniformParams(lookup,varyingLookup);											\
-								initVaryingParams(lookup);														\
-								CTexture		*tex		=	lookup->texture;								\
+#define	TEXTUREFFULLEXPR_PRE	float			*res;															\
+								const char		**op1;															\
+								const float		*op2,*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;					\
+								float			cs[4],ct[4];													\
+								int				numArguments;													\
+								argumentcount(numArguments);													\
+								/* Begin the parameter list */													\
+								plBegin(11,numArguments-11,plDefault);											\
+								/* Fetch the parameters as usual */												\
 								operand(0,res,float *);															\
+								operand(1,op1,const char **);													\
+								operand(2,op2,const float *);													\
 								operand(3,op3,const float *);													\
 								operand(4,op4,const float *);													\
 								operand(5,op5,const float *);													\
@@ -1690,9 +1632,15 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 								operand(7,op7,const float *);													\
 								operand(8,op8,const float *);													\
 								operand(9,op9,const float *);													\
-								operand(10,op10,const float *);
+								operand(10,op10,const float *);													\
+								/* Get the texture */															\
+								/* Since these functions use a trie, this should be a pretty fast operation */	\
+								osLock(CRenderer::shaderMutex);													\
+								CTexture	*tex			=	CRenderer::getTexture(*op1);					\
+								osUnlock(CRenderer::shaderMutex);
+								
 
-#define	TEXTUREFFULLEXPR		getVaryingParams(lookup,varyingLookup);											\
+#define	TEXTUREFFULLEXPR		plReady();																		\
 								cs[0]		=	*op3;															\
 								cs[1]		=	*op5;															\
 								cs[2]		=	*op7;															\
@@ -1701,7 +1649,8 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 								ct[1]		=	*op6;															\
 								ct[2]		=	*op8;															\
 								ct[3]		=	*op10;															\
-								tex->lookup4(tmp,cs,ct,lookup,&varyingLookup,this);								\
+								vector	tmp;																	\
+								tex->lookup4(tmp,cs,ct,NULL,NULL,this);											\
 								*res		=	tmp[0];
 
 #define	TEXTUREFFULLEXPR_UPDATE	res++;																			\
@@ -1713,20 +1662,20 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTURECEXPR_PRE,TEXTURECEXPR
 								op8++;																			\
 								op9++;																			\
 								op10++;																			\
-								stepVaryingParams(lookup);
+								plStep();
 
+
+#define	TEXTUREFFULLEXPR_POST	plEnd();
 
 #else
 #define	TEXTUREFFULLEXPR_PRE
 #define	TEXTUREFFULLEXPR
 #define	TEXTUREFFULLEXPR_UPDATE
+#define	TEXTUREFFULLEXPR_POST
 #endif
 
-DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE,TEXTUREFFULLEXPR,TEXTUREFFULLEXPR_UPDATE,NULL_EXPR,0)
+DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE,TEXTUREFFULLEXPR,TEXTUREFFULLEXPR_UPDATE,TEXTUREFFULLEXPR_POST,0)
 
-#undef	TEXTUREFFULLEXPR_PRE
-#undef	TEXTUREFFULLEXPR
-#undef	TEXTUREFFULLEXPR_UPDATE
 
 
 
@@ -1736,39 +1685,7 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"c=SFffffffff"
 #ifndef INIT_SHADING
-#define	TEXTURECFULLEXPR_PRE	float					*res;													\
-								const float				*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;				\
-								CTextureLookup			*lookup;												\
-								CVaryingTextureLookup	varyingLookup;											\
-								float					cs[4],ct[4];											\
-								varyingLookup.init();															\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {						\
-									int			numArguments;													\
-									const char	**op1;															\
-									const float	*op2;															\
-									argumentcount(numArguments);												\
-									TEXTUREPARAMETERS(11,(numArguments-11) >> 1);								\
-									operand(1,op1,const char **);												\
-									operand(2,op2,const float *);												\
-									lookup->texture				=	CRenderer::getTexture(*op1);				\
-									lookup->channel				=	(int) *op2;									\
-								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
-								getUniformParams(lookup,varyingLookup);											\
-								initVaryingParams(lookup);														\
-								CTexture		*tex		=	lookup->texture;								\
-								operand(0,res,float *);															\
-								operand(3,op3,const float *);													\
-								operand(4,op4,const float *);													\
-								operand(5,op5,const float *);													\
-								operand(6,op6,const float *);													\
-								operand(7,op7,const float *);													\
-								operand(8,op8,const float *);													\
-								operand(9,op9,const float *);													\
-								operand(10,op10,const float *);
-
-#define	TEXTURECFULLEXPR		getVaryingParams(lookup,varyingLookup);											\
+#define	TEXTURECFULLEXPR		plReady();																		\
 								cs[0]		=	*op3;															\
 								cs[1]		=	*op5;															\
 								cs[2]		=	*op7;															\
@@ -1777,7 +1694,7 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								ct[1]		=	*op6;															\
 								ct[2]		=	*op8;															\
 								ct[3]		=	*op10;															\
-								tex->lookup4(res,cs,ct,lookup,&varyingLookup,this);
+								tex->lookup4(res,cs,ct,NULL,NULL,this);
 
 #define	TEXTURECFULLEXPR_UPDATE	res	+=	3;																		\
 								op3++;																			\
@@ -1788,20 +1705,28 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								op8++;																			\
 								op9++;																			\
 								op10++;																			\
-								stepVaryingParams(lookup);
+								plStep();
 
+
+#define	TEXTURECFULLEXPR_POST	plEnd();
 
 #else
 #define	TEXTURECFULLEXPR_PRE
 #define	TEXTURECFULLEXPR
 #define	TEXTURECFULLEXPR_UPDATE
+#define	TEXTURECFULLEXPR_POST
 #endif
 
-DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTURECFULLEXPR_PRE,TEXTURECFULLEXPR,TEXTURECFULLEXPR_UPDATE,NULL_EXPR,0)
+DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE,TEXTURECFULLEXPR,TEXTURECFULLEXPR_UPDATE,TEXTURECFULLEXPR_POST,0)
 
 #undef	TEXTURECFULLEXPR_PRE
 #undef	TEXTURECFULLEXPR
 #undef	TEXTURECFULLEXPR_UPDATE
+#undef	TEXTURECFULLEXPR_POST
+#undef	TEXTUREFFULLEXPR_PRE
+#undef	TEXTUREFFULLEXPR
+#undef	TEXTUREFFULLEXPR_UPDATE
+#undef	TEXTUREFFULLEXPR_POST
 
 
 
