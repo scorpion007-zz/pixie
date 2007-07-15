@@ -236,6 +236,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Retrieve the parameterlist
 #define		parameterlist					cInstance->parameterLists[code->plNumber]
 
+// This is the default action to be performed for unrecognised parameters
 #define		plDefault						error(CODE_BADTOKEN,"Unknown parameter: \"%s\"\n",*param);
 
 // This macro can be used to bind a particular variable in scratch
@@ -254,10 +255,11 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												lookup->size		+=	cBinding->step;											\
 											}
 
-
-#define		plBegin(__start,__num,__default)	/* Create a hash ID using shader and instruction */						\
+// Use this macro to start processing a parameter list
+#define		plBegin(__class,__start,__num,__default)																\
+											/* Create a hash ID using shader and instruction */						\
 											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code) & (PL_HASH_SIZE-1);		\
-											CPLLookup		*lookup;												\
+											__class		*lookup;													\
 																													\
 											/* Look at the hash to see if we've computed this before	*/			\
 											if ((lookup = plHash[hashKey]) == NULL) {								\
@@ -269,7 +271,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												}																	\
 																													\
 												/* Create a new lookup	*/											\
-												lookup					=	new CPLLookup((__num)/2);				\
+												lookup					=	new __class((__num)/2);					\
 												lookup->instance		=	cInstance;								\
 												lookup->code			=	code;									\
 												lookup->size			=	0;										\
@@ -342,17 +344,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												memcpy(space,scratch + cBinding->dest,cBinding->step);				\
 												space	+=	cBinding->step;											\
 												align64(space);														\
-											}
-
-#define		dirty()							if (cInstance->dirty == FALSE) {										\
-												osLock(CRenderer::dirtyShaderMutex);								\
-												cInstance->dirty			=	TRUE;								\
-												cInstance->nextDirty		=	CRenderer::dirtyInstances;			\
-												cInstance->prevDirty		=	NULL;								\
-												if (CRenderer::dirtyInstances != NULL)								\
-													CRenderer::dirtyInstances->prevDirty	=	cInstance;			\
-												CRenderer::dirtyInstances	=	cInstance;							\
-												osUnlock(CRenderer::dirtyShaderMutex);								\
 											}
 
 //	Retrieve an integer operand (label references are integer)
@@ -883,7 +874,6 @@ execEnd:
 #undef		beginConditional
 #undef		endConditional
 #undef		operand
-#undef		dirty
 #undef		parameterlist
 #undef		argument
 #undef		argumentcount

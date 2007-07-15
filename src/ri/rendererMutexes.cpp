@@ -137,21 +137,6 @@ TMutex							CRenderer::shaderMutex;
 
 
 /////////////////////////////////////////////////////////////
-//	Used to ensure that we manage the list of dirty shaders
-//	in a thread safe manner.  We cannot simply use the
-//	shaderMutex because we also manage the dirty shader list
-//	when a shader gets deleted because the attribute block
-//	is no longer referenced.
-//	- all modifications of the dirty shader array must be
-//	  mutexed
-//
-//	VERIFIED
-/////////////////////////////////////////////////////////////
-TMutex							CRenderer::dirtyShaderMutex;
-
-
-
-/////////////////////////////////////////////////////////////
 //	Used to ensure that only one thread at a time is expanding
 //	delayed objects - so we have only one thread in rib parse
 //	and only one thread executing a DynamicLoad Procedural

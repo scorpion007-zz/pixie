@@ -33,20 +33,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	gather <else>
 #ifndef INIT_SHADING
-#define	GATHEREXPR_PRE		const int	numRealVertices	=	currentShadingState->numRealVertices;	\
-							CGatherRay		*raysBase	=	lastGather->raysBase;					\
-							CGatherRay		**rays		=	(CGatherRay **) lastGather->raysStorage;\
-							CGatherLookup	*lookup		=	lastGather->lookup;						\
-							const float 	numSamples	=	(float) lastGather->numSamples;			\
-							const float 	*coneAngle	=	lastGather->coneAngles;					\
-							const float		*dPdu		=	lastGather->dPdu;						\
-							const float		*dPdv		=	lastGather->dPdv;						\
-							const float		*P			=	lastGather->P;							\
-							const float		*D			=	lastGather->gatherDir;					\
-							const float		*N				=	varying[VARIABLE_N];				\
-							int			numIntRays		=	0;										\
-							int			numExtRays		=	0;										\
-							int			i;															\
+#define	GATHEREXPR_PRE		const int		numRealVertices	=	currentShadingState->numRealVertices;	\
+							CGatherRay		*raysBase		=	lastGather->raysBase;					\
+							CGatherRay		**rays			=	(CGatherRay **) lastGather->raysStorage;\
+							CGatherLookup	*lookup			=	lastGather->lookup;						\
+							const CShadingScratch	*scratch	=	&(currentShadingState->scratch);	\
+							const float 	numSamples		=	(float) scratch->numSamples;			\
+							const float 	*coneAngle		=	scratch->coneAngles;					\
+							const float		*dPdu			=	lastGather->dPdu;						\
+							const float		*dPdv			=	lastGather->dPdv;						\
+							const float		*P				=	lastGather->P;							\
+							const float		*D				=	lastGather->gatherDir;					\
+							const float		*N				=	varying[VARIABLE_N];					\
+							int				numIntRays		=	0;										\
+							int				numExtRays		=	0;										\
+							int				i;															\
 							for (i=0;i<numRealVertices;i++) {										\
 								if (tags[i]) {														\
 									tags[i]++;														\
@@ -63,8 +64,8 @@
 										sampleCosineHemisphere(raysBase->dir,D,*coneAngle,random4d);\
 									}																\
 									raysBase->index	=	i;											\
-									raysBase->tmin	=	lookup->bias;								\
-									raysBase->t		=	lookup->maxDist;							\
+									raysBase->tmin	=	scratch->bias;								\
+									raysBase->t		=	scratch->maxDist;							\
 									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / numSamples;				\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE | ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;	\
 									raysBase->tags	=	&tags[i];									\

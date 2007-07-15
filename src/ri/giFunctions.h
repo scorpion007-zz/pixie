@@ -38,18 +38,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	CTextureLookup			*lookup;								\
-								CVaryingTextureLookup	varyingLookup;							\
-								varyingLookup.init();											\
-								osLock(CRenderer::shaderMutex);									\
-								if ((lookup = (CTextureLookup *) parameterlist) == NULL) {		\
-									int			numArguments;									\
-									argumentcount(numArguments);								\
-									TEXTUREPARAMETERS(3,(numArguments-3) >> 1);					\
-								}																\
-								osUnlock(CRenderer::shaderMutex);								\
-								getUniformParams(lookup,varyingLookup);							\
-								initVaryingParams(lookup);										\
+#define	TRANSMISSIONEXPR_PRE	int	numArguments;												\
+								argumentcount(numArguments);									\
+								plBegin(CPLLookup,3,numArguments-3,plDefault);					\
 								CTraceLocation	*rays	=	(CTraceLocation *)	ralloc(numVertices*sizeof(CTraceLocation),threadMemory);	\
 								float			*dFdu	=	(float *)			ralloc(numVertices*12*sizeof(float),threadMemory);			\
 								float			*dFdv	=	dFdu + numVertices*3;				\
@@ -70,7 +61,7 @@
 								int				numRays	=	0;
 
 
-#define	TRANSMISSIONEXPR		getVaryingParams(lookup,varyingLookup);		\
+#define	TRANSMISSIONEXPR		plReady();						\
 								rays->res	=	res;			\
 								movvv(rays->P,op1);				\
 								mulvf(rays->dPdu,dFdu,*du);		\
@@ -79,7 +70,7 @@
 								mulvf(rays->dDdu,dTdu,*du);		\
 								mulvf(rays->dDdv,dTdv,*dv);		\
 								movvv(rays->N,N);				\
-								rays->coneAngle = varyingLookup.coneAngle;	\
+								rays->coneAngle = currentShadingState->scratch.coneAngle;		\
 								rays++;							\
 								numRays++;
 
@@ -93,24 +84,26 @@
 								dTdv	+=	3;					\
 								N		+=	3;					\
 								du++;	dv++;					\
-								stepVaryingParams(lookup);
+								plStep();
 
 // Actually compule the transmission color
 #define	TRANSMISSIONEXPR_POST	if (numRays > 0) {				\
 									rays	-=	numRays;		\
-									traceTransmission(numRays,rays,lookup,&varyingLookup,FALSE);		\
+									traceTransmission(numRays,rays,FALSE);								\
 									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);		\
 									expandVector(res);			\
-								}
+								}								\
+								plEnd();
 
 
 // Just check whether there's smtg between the end points
 #define	VISIBILITYEXPR_POST		if (numRays > 0) {				\
 									rays	-=	numRays;		\
-									traceTransmission(numRays,rays,lookup,&varyingLookup,TRUE);						\
+									traceTransmission(numRays,rays,TRUE);								\
 									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t < C_INFINITY;		\
 									expandFloat(res);			\
-								}
+								}								\
+								plEnd();
 
 #else
 
@@ -142,7 +135,7 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 // Do a full raytrace
 #define	TRACEEXPR_POST			if (numRays > 0) {													\
 									rays	-=	numRays;											\
-									traceReflection(numRays,rays,lookup,&varyingLookup,FALSE);		\
+									traceReflection(numRays,rays,FALSE);							\
 									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);	\
 									expandVector(res);												\
 								}
@@ -150,7 +143,7 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 // Just compute the nearest intersection
 #define	TRACE2EXPR_POST			if (numRays > 0) {													\
 									rays	-=	numRays;											\
-									traceReflection(numRays,rays,lookup,&varyingLookup,TRUE);		\
+									traceReflection(numRays,rays,TRUE);								\
 									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;	\
 									expandFloat(res);												\
 								}
@@ -186,32 +179,30 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // indirectdiffuse	"c=pnf!"
 #ifndef INIT_SHADING
-#define	IDEXPR_PRE(__occlusion)	CTexture3dLookup	*lookup;																		\
-								FUN4EXPR_PRE;																						\
-								osLock(CRenderer::shaderMutex);																		\
-								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {										\
-									int			numArguments;																		\
-									argumentcount(numArguments);																	\
-									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);													\
-									const float			*from,*to;																	\
-									findCoordinateSystem(lookup->coordsys,from,to);													\
-									lookup->numSamples	=	(int) *op3;																\
-									lookup->occlusion	=	__occlusion;															\
-									lookup->texture		=	CRenderer::getCache(lookup->handle,lookup->filemode,from,to);			\
-									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);			\
+#define	IDEXPR_PRE(__occlusion)	FUN4EXPR_PRE;																						\
+								int	numArguments;																					\
+								argumentcount(numArguments);																		\
+								plBegin(CMapLookup<CTexture3d>,4,numArguments-4,plDefault);											\
+								CTexture3d	*cache;																					\
+								if ((cache = lookup->map) == NULL) {																\
+									const float		*from,*to;																		\
+									findCoordinateSystem(currentShadingState->scratch.coordsys,from,to);							\
+									const CAttributes		*currentAttributes	=	currentShadingState->currentObject->attributes;	\
+									osLock(CRenderer::shaderMutex);																	\
+									lookup->map	=	cache		=	CRenderer::getCache(currentAttributes->irradianceHandle,currentAttributes->irradianceHandleMode,from,to);			\
+									cache->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);					\
+									osUnlock(CRenderer::shaderMutex);																\
 								}																									\
-								osUnlock(CRenderer::shaderMutex);																	\
 								float		*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);					\
 								float		*dPdv	=	dPdu + numVertices*3;														\
 								duVector(dPdu,op1);																					\
 								dvVector(dPdv,op1);																					\
 								const float	*du		=	varying[VARIABLE_DU];														\
 								const float	*dv		=	varying[VARIABLE_DV];														\
-								CTexture3d	*cache	=	lookup->texture;															\
 								assert(cache->dataSize == 7);																		\
 																																	\
 								float	C[7];																						\
-								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);	\
+								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);\
 																																	\
 								int channel;																						\
 								for (channel=0;channel<lookup->numChannels;channel++) {												\
@@ -261,32 +252,33 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // photonmap	"c=spn!"
 #ifndef INIT_SHADING
-#define	PHOTONMAPEXPR_PRE		CTexture3dLookup	*lookup;													\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									int			numArguments;													\
+#define	PHOTONMAPEXPR_PRE		int	numArguments;																\
+								argumentcount(numArguments);													\
+								plBegin(CMapLookup<CPhotonMap>,4,numArguments-4,plDefault);						\
+								CPhotonMap	*map;																\
+								if ((map = lookup->map) == NULL) {												\
 									const char	**op1;															\
-									argumentcount(numArguments);												\
-									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
 									operand(1,op1,const char **);												\
-									lookup->map			=	CRenderer::getPhotonMap(*op1);						\
+									osLock(CRenderer::shaderMutex);												\
+									lookup->map = map	=	CRenderer::getPhotonMap(*op1);						\
+									osUnlock(CRenderer::shaderMutex);											\
 								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
 								float				*res;														\
 								const float			*op2,*op3;													\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
-								operand(3,op3,const float *);													\
-								CPhotonMap	*map	=	lookup->map;
+								operand(3,op3,const float *);
 
 
-#define	PHOTONMAPEXPR			map->lookup(res,op2,op3,lookup->numLookupSamples);
+#define	PHOTONMAPEXPR			plReady();																		\
+								map->lookup(res,op2,op3,currentShadingState->scratch.numLookupSamples);
 
 #define	PHOTONMAPEXPR_UPDATE	res	+=	3;																		\
 								op2	+=	3;																		\
-								op3	+=	3;
+								op3	+=	3;																		\
+								plStep();
 
-#define	PHOTONMAPEXPR_POST		expandVector(res);
+#define	PHOTONMAPEXPR_POST		expandVector(res);	plEnd();
 
 #else
 #define	PHOTONMAPEXPR_PRE
@@ -362,7 +354,6 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 #define	GATHERPARAMETERS(start,num)																					\
 								lookup					=	new CGatherLookup;										\
 								parameterlist			=	(CShaderLookup *) lookup;								\
-								dirty();																			\
 								lookup->outputs			=	NULL;													\
 								lookup->nonShadeOutputs	=	NULL;													\
 								lookup->category		=	"irradiance";											\

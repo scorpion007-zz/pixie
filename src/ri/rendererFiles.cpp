@@ -201,36 +201,6 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 }
 
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDummyTexture
-// Description			:	Encapsulates a texture we use if we could not load it
-// Comments				:
-class	CDummyTexture : public CTexture {
-public:
-						CDummyTexture(const char *name) : CTexture(name) {}
-						~CDummyTexture() {}
-
-	float				lookupz(float u,float v,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)						{ return 0;	}
-	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)					{ initv(dest,lookup->fill);	}
-	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)		{ initv(dest,lookup->fill);	}
-	};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDummyEnvironment
-// Description			:	A dummy environment map we create if we can not instantiate
-// Comments				:
-class	CDummyEnvironment : public CEnvironment {
-public:
-						CDummyEnvironment(const char *name) : CEnvironment(name) {}
-						~CDummyEnvironment() {}
-						
-	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) { initv(dest,lookup->fill);	}
-};
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getTexture

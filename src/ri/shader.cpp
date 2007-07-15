@@ -276,56 +276,6 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLookup
-// Method				:	CTextureLookup
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-CTextureLookup::CTextureLookup(const CAttributes *attributes) {
-	filter			=	RiGaussianFilter;
-	channel			=	0;
-	fill			=	0;
-	shadowBias		=	attributes->shadowBias;
-	label			=	NULL;
-	sampleBase		=	1;
-	texture			=	NULL;
-	environment		=	NULL;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLookup
-// Method				:	init
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-void CTextureLookup::init() {
-	filter			=	RiGaussianFilter;
-	channel			=	0;
-	fill			=	0;
-	shadowBias		=	0;			// should be filled in later anyway
-	label			=	NULL;
-	sampleBase		=	1;
-	texture			=	NULL;
-	environment		=	NULL;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CVaryingTextureLookup
-// Method				:	CVaryingTextureLookup
-// Description			:	initialize default values
-// Return Value			:	-
-// Comments				:	Can't be a constructor or offsetof() doesn't work
-void CVaryingTextureLookup::init() {
-	blur			=	0;
-	width			=	1;
-	swidth			=	1;
-	twidth			=	1;
-	numSamples		=	1;
-	coneAngle		=	0;
-	maxDist			=	C_INFINITY;
-}
-
-///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dLookup
 // Method				:	CTexture3dLookup
 // Description			:	Ctor
@@ -557,8 +507,6 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 
 	strings				=	NULL;
 	parent				=	p;
-	nextDirty			=	NULL;
-	prevDirty			=	NULL;
 	
 	if (parent->numPLs > 0) {
 		parameterLists	=	new CShaderLookup*[parent->numPLs];
@@ -589,7 +537,6 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 	}
 
 	flags				=	(parent->usedParameters & PARAMETER_NONAMBIENT) ? SHADERFLAGS_NONAMBIENT : 0;
-	dirty				=	FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////

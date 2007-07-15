@@ -207,7 +207,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 // Description			:	Lookup da cache
 // Return Value			:
 // Comments				:
-void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const float *cdPdv,const float *cN,CShadingContext *context,const CTexture3dLookup *lookup) {
+void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const float *cdPdv,const float *cN,CShadingContext *context) {
 
 	// Is this a point based lookup?
 	if ((lookup->pointbased) && (lookup->pointHierarchy != NULL)) {
@@ -544,7 +544,7 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 // Description			:	Sample the occlusion
 // Return Value			:
 // Comments				:
-void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const float *dPdv,const float *N,CShadingContext *context,const CTexture3dLookup *lookup) {
+void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const float *dPdv,const float *N,CShadingContext *context) {
 	CCacheSample			*cSample;
 	int						i,j;
 	float					coverage;
@@ -555,25 +555,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 	vector					X,Y;
 	CCacheNode				*cNode;
 	int						depth;
-	CTextureLookup			*texLookup;
-	CVaryingTextureLookup	*varyingTexLookup;
 
 	// Allocate memory
 	const int			nt				=	(int) (sqrtf(lookup->numSamples / (float) C_PI) + 0.5);
 	const int			np				=	(int) (C_PI*nt + 0.5);
 	const int			numSamples		=	nt*np;
 	CHemisphereSample	*hemisphere		=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
-
-	if(lookup->environment != NULL) {
-		texLookup				= (CTextureLookup*) alloca(sizeof(CTextureLookup));
-		texLookup->init();		
-		texLookup->shadowBias	= lookup->bias;
-		texLookup->environment	= lookup->environment;
-		
-		varyingTexLookup		= (CVaryingTextureLookup*) alloca(sizeof(CVaryingTextureLookup));
-		varyingTexLookup->init();
-
-	}
 						
 	// Create an orthanormal coordinate system
 	if (dotvv(dPdu,dPdu) > 0) {
@@ -666,7 +653,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup,varyingTexLookup,context);
+						tex->lookup(color,D0,D1,D2,D3,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -775,7 +762,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
-						tex->lookup(color,D0,D1,D2,D3,texLookup,varyingTexLookup,context);
+						tex->lookup(color,D0,D1,D2,D3,context);
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{

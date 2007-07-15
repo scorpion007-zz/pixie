@@ -61,7 +61,7 @@ public:
 							CPointHierarchy(const char *,const float *from,const float *to,FILE *);
 							~CPointHierarchy();
 
-	void					lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *);
+	void					lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *);
 	void					store(const float *,const float *,const float *,float)	{	assert(FALSE);	}
 	void					lookup(float *,const float *,const float *,float)		{	assert(FALSE);	}
 

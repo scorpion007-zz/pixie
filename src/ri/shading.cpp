@@ -377,6 +377,27 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingScratch
+// Method				:	CShadingScratch
+// Description			:	Ctor
+// Return Value			:	-
+// Comments				:	Initializes the default values for shader functions
+CShadingScratch::CShadingScratch() {
+	filter			=	RiGaussianFilter;
+	fill			=	0;
+	shadowBias		=	0.01f;
+	label			=	NULL;
+	sampleBase		=	1;
+	blur			=	0;
+	width			=	1;
+	swidth			=	1;
+	twidth			=	1;
+	numSamples		=	1;
+	coneAngle		=	0;
+	maxDist			=	C_INFINITY;
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext

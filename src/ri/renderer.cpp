@@ -197,7 +197,6 @@ CShadingContext					**CRenderer::contexts				=	NULL;						// initialized in begi
 int								CRenderer::numActiveThreads			=	0;							// initialized in beginFrame
 CTrie<CRemoteChannel *>			*CRenderer::declaredRemoteChannels	=	NULL;						// initialized in beginFrame, destroyed in endFrame
 CArray<CRemoteChannel *>		*CRenderer::remoteChannels			=	NULL;						// initialized in beginFrame, destroyed in endFrame
-CProgrammableShaderInstance		*CRenderer::dirtyInstances			=	NULL;						// initialized in beginFrame, destroyed in endFrame
 unsigned int					CRenderer::raytracingFlags			=	0;							// initialized in beginFrame
 CObject							*CRenderer::root					=	NULL;						// initialized in beginFrame, destroyed in endFrame
 CObject							*CRenderer::offendingObject			=	NULL;						// initialized in beginFrame
@@ -834,9 +833,6 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 
-	// No dirty shader instances yet
-	dirtyInstances			=	NULL;
-	
 	// These are the flags that objects need to have to be visible to raytracer
 	raytracingFlags			=	ATTRIBUTES_FLAGS_PHOTON_VISIBLE				|
 								ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE			|
@@ -955,23 +951,6 @@ void		CRenderer::endFrame() {
 
 	// Terminate the displays
 	endDisplays();
-
-	// Reset the dirty shader instances
-	while(dirtyInstances != NULL) {
-		int	i;
-
-		// Delete the used parameter lists
-		for (i=0;i<dirtyInstances->parent->numPLs;i++) {
-			if (dirtyInstances->parameterLists[i] != NULL)	{
-				delete dirtyInstances->parameterLists[i];
-				dirtyInstances->parameterLists[i]	=	NULL;
-			}
-		}
-
-		// The shader is no longer dirty
-		dirtyInstances->dirty	=	FALSE;
-		dirtyInstances			=	dirtyInstances->nextDirty;
-	}
 
 	// Ditch the remote channels
 	for (int i=0;i<remoteChannels->numItems;i++) {

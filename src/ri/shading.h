@@ -51,7 +51,6 @@ class	CTracable;
 class	CQuadVertex;
 class	CQuadTriangle;
 class	CQuad;
-class	CTextureLookup;
 class	CTexture3d;
 class	CVertex;
 class	CMovingVertex;
@@ -115,17 +114,39 @@ public:
 // Comments				:
 class	CShadingScratch {
 public:
-		float					shadowBias;							// The shadow bias for the lookup
-		float					fill;								// The fill in value for the lookup
-		float					label;								// The label of the ray
-		float					sampleBase;							// Jitter base samples for raytracing
-		float					numSamples;							// The number of samples to take in the texture
-		float					maxDist;							// The maximum intersection distance
-		float					coneAngle;							// The coneangle
-		float					width;								// The filter width
+								CShadingScratch();		// The constructor only init the default values
+
+		RtFilterFunc			filter;	
+		float					shadowBias;				// The shadow bias for the lookup
+		float					fill;					// The fill in value for the lookup
+		char					*label;					// The label of the ray
+		float					sampleBase;				// Jitter base samples for raytracing
+		float					numSamples;				// The number of samples to take in the texture
+		float					maxDist;				// The maximum intersection distance
+		float					coneAngle;				// The coneangle
+		float					width;					// The filter width
 		float					swidth;
 		float					twidth;
-		float					blur;								// Blur amount
+		float					blur;					// Blur amount
+		char					*coordsys;
+		float					numLookupSamples;		// The number of nearest samples to use during the map access
+		float					maxDistance;			// The maximum ray intersection distance
+		float					maxError;				// The error knob for the sampling
+		float					maxBrightness;			// The maximum brightness amount
+		float					minFGRadius;			// The minimum final gather spacing
+		float					maxFGRadius;			// The maximum final gather spacing
+		float					bias;					// The shadow bias
+		int						occlusion;				// TRUE if this is an occlusion lookup
+		int						pointbased;				// TRUE if we are using point based irradiance
+		float					localThreshold;			// The local threshold for the radiance cache
+		float					lengthA,lengthB;		// The depth to length conversion
+		vector					backgroundColor;		// The color of the background for rays that don't hit anything
+		const char				*handle;				// The irradiance handle
+		const char				*filemode;				// The irradiance filemode
+		float					radius;					// The sample radius
+		float					radiusScale;			// Blur amount
+		int						interpolate;			// Bake polygon centres
+		float					maxsolidangle;			// Maximum solid angle for point based occlusion
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -341,10 +362,14 @@ private:
 			vector				D,dDdu,dDdv;		// The direction (for reflection), the ray target (for transmission)
 			vector				N;					// Surface normal reference to determine interior or exterior
 			float				coneAngle;			// The angular spread
+			int					numSamples;			// The number of samples to shoot from this location
+			float				shadowBias;			// The shadow bias
+			float				sampleBase;			// The sample base
+			float				maxDist;			// The maximum intersection distance
 		};
 
-		void					traceTransmission(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly);
-		void					traceReflection(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly);
+		void					traceTransmission(int numRays,CTraceLocation *rays,int probeOnly);
+		void					traceReflection(int numRays,CTraceLocation *rays,int probeOnly);
 
 		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);

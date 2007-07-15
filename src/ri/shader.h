@@ -100,43 +100,11 @@ const	unsigned int		SL_IMAGER						=	4;
 // Shader flags
 const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShaderLookup
-// Description			:	This class encapsulates a shader lookup
-// Comments				:	Shader lookups are cached in the lifetime of a frame
-//							so they're only allocated once and can store information
-//							relevant to a particular shading language command
-class	CShaderLookup {
-public:
-		virtual			~CShaderLookup() { }
-};
-
-
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CDynamicShaderLookup
-// Description			:	This class is the base for dynamic lookups
-// Comments				:	dynamic lookups can vary their value each lookup
-//							and must be used with a struct, which they fill in
-class	CDynamicShaderLookup : public CShaderLookup {
-public:
-		typedef struct {
-			int		opIndex;			// The operand index to copy
-			int		type;				// The type to copy
-			size_t	dest;				// The destination offset
-			float	mult;				// Float multiplier to be applied before storing
-		} TParamBinding;
-	
-							CDynamicShaderLookup();
-		virtual				~CDynamicShaderLookup();
-
-		int					numUniformParamBindings;
-		TParamBinding		*uniformParamBindings;
-		int					numVaryingParamBindings;
-		TParamBinding		*varyingParamBindings;
-};
-
-
+// Class				:	CPLLookup
+// Description			:	This class encapsulates a parameter list
+// Comments				:	The shader commands that have a parameter list must derive from this class
 class	CPLLookup {
 public:
 								CPLLookup(int numVariables) {
@@ -144,9 +112,13 @@ public:
 									numVaryings		=	0;
 									uniformBindings	=	new CPLLookup::TParamBinding[numVariables*2];
 									varyingBindings	=	uniformBindings + numVariables;
+									instance		=	0;
+									code			=	0;
+									size			=	0;
+									data			=	NULL;
 								}
 
-								~CPLLookup() {
+		virtual					~CPLLookup() {
 									delete [] uniformBindings;
 								}
 
@@ -163,6 +135,7 @@ public:
 		const CShaderInstance	*instance;			// The instance that has the PL
 		const TCode				*code;				// The code that has the PL
 		int						size;				// The size of the memory that needs to be allocated to save old variables
+		void					*data;				// User specific data
 };
 
 
@@ -172,10 +145,10 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLookup
+// Class				:	CFilterLookup
 // Description			:	This class holds information about a particular texture lookup
 // Comments				:
-class	CFilterLookup : public CShaderLookup	{
+class	CFilterLookup : public CPLLookup	{
 public:
 		float				width;					// The width parameter
 		RtFilterFunc		filter;					// The filter function
@@ -187,85 +160,25 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureInfoLookup
+// Class				:	CMapLookup
 // Description			:	This class holds the base of a textureinfo lookup
 // Comments				:
-class	CTextureInfoLookup : public CShaderLookup	{
+template <class T> class	CMapLookup : public CPLLookup	{
 public:
-		CTextureInfoBase	*textureInfo;
+		T					*map;
 };
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CTextureLookup
-// Description			:	This class holds immutable information about a particular texture lookup
-// Comments				:	used with struct CVaryingTextureLookup
-class	CTextureLookup : public CDynamicShaderLookup {
-public:
-							CTextureLookup(const CAttributes *attributes);
-		void				init();
-			
-		RtFilterFunc		filter;					// Lookup filter
-		float				shadowBias;				// The shadow bias for the lookup
-		int					channel;				// The start channel for the lookup
-		float				fill;					// The fill in value for the lookup
-		const char			*label;					// The label of the ray
-		float				sampleBase;				// Jitter base samples for raytracing
-		CTexture			*texture;				// Points to the texture being looked up
-		CEnvironment		*environment;			// Points to the environment being looked up
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CVaryingTextureLookup
-// Description			:	This class holds mutable information about a particular texture lookup
-// Comments				:	It's important this is a constructor-less struct of offsetof won't work
-class CVaryingTextureLookup {
-public:
-		// uniform
-		int					numSamples;				// The number of samples to take in the texture
-		float				maxDist;				// The maximum intersection distance
-		// varying
-		float				coneAngle;				// The coneangle
-		float				width,swidth,twidth;	// The filter width
-		float				blur;					// Blur amount
-		
-		void				init();
-};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGlobalIllumLookup
 // Description			:	This class encapsulates a global illumination lookup
 // Comments				:
-class	CTexture3dLookup : public CShaderLookup {
+class	CTexture3dLookup : public CPLLookup {
 public:
 							CTexture3dLookup(const CAttributes *);
 							~CTexture3dLookup();
 
-		int					numLookupSamples;		// The number of nearest samples to use during the map access
-		float				maxDistance;			// The maximum ray intersection distance
-		int					numSamples;				// The number of samples to gather for each sample
-		float				maxError;				// The error knob for the sampling
-		float				maxBrightness;			// The maximum brightness amount
-		float				minFGRadius;			// The minimum final gather spacing
-		float				maxFGRadius;			// The maximum final gather spacing
-		float				sampleBase;				// The relative ammount to jitter ray origins
-		float				bias;					// The shadow bias
-		int					occlusion;				// TRUE if this is an occlusion lookup
-		int					pointbased;				// TRUE if we are using point based irradiance
-		float				localThreshold;			// The local threshold for the radiance cache
-		float				lengthA,lengthB;		// The depth to length conversion
-		vector				backgroundColor;		// The color of the background for rays that don't hit anything
-		const char			*handle;				// The irradiance handle
-		const char			*filemode;				// The irradiance filemode
-		const char			*coordsys;				// The coordinate system to store
-		CPhotonMap			*map;					// The photon map to lookup
-		CEnvironment		*environment;			// The environment map to use if no intersection
-		CTexture3d			*pointHierarchy;		// The point hierarchy file to lookup
-		CTexture3d			*texture;				// The texture to lookup
-		float				radius;					// The sample radius
-		float				radiusScale;			// Blur amount
-		int					interpolate;			// Bake polygon centres
-		float				maxsolidangle;			// Maximum solid angle for point based occlusion
 		int					numChannels;			// The number of channels bake3d provides
 		int					*index,*entry,*size;	// Entry points for every channel
 };
@@ -357,7 +270,7 @@ public:
 // Class				:	CGatherLookup
 // Description			:	Lookup parameters for the gather
 // Comments				:
-class	CGatherLookup : public CShaderLookup {
+class	CGatherLookup : public CPLLookup {
 public:
 
 							CGatherLookup();
@@ -369,14 +282,6 @@ public:
 	int						numOutputs;				// The number of outputs
 	CGatherVariable			*nonShadeOutputs;		// These are the outputs that do not require shading
 	int						numNonShadeOutputs;		// The number of outputs that don't need shading
-
-	const char				*category;				// The gather category
-	const char				*label;					// The ray label
-	float					bias;					// The shadow bias
-	float					maxDist;				// The maximum intersection distance
-	int						maxRayDepth;			// The maximum ray depth
-	int						uniformDist;			// TRUE if we should sample uniformly
-	float					sampleBase;				// Whether to jutter the origin
 };
 
 
@@ -480,12 +385,8 @@ public:
 
 		CAllocatedString			*strings;					// The strings we allocated for parameters
 		CShader						*parent;					// The parent shader
-		CProgrammableShaderInstance	*nextDirty;					// The next dirty shader instance
-		CProgrammableShaderInstance	*prevDirty;					// The previous dirty shader instance
-		CShaderLookup				**parameterLists;			// The parameter lists
-		int							dirty;						// TRUE if the shader is dirty
 private:
-		int						setParameter(char *,void *);
+		int							setParameter(char *,void *);
 };
 
 #endif

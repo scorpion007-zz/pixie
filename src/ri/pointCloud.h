@@ -67,7 +67,7 @@ public:
 							// Store/Lookup interface
 	void					store(const float *,const float *,const float *,float);
 	void					lookup(float *,const float *,const float *,float);
-	void					lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *) {	assert(FALSE);	}
+	void					lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *) {	assert(FALSE);	}
 
 							// CView interface for drawing
 	void					draw();
