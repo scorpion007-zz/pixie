@@ -103,6 +103,7 @@ class	CGatherRay : public CRay {
 public:
 	int				*tags;			// The tag
 	int				index;			// The ray index (the ray number)
+	float			sampleCone;		// The samplecone for the ray
 };
 
 
@@ -124,12 +125,22 @@ public:
 
 	CGatherRay		*raysBase;
 	CRay			**raysStorage;
-	float			**outputs;				// The array of outputs
-	float			**nonShadeOutputs;		// The array of non-shade outputs
-	CGatherLookup	*lookup;				// The parameters for this bundle
+
+	int				numOutputs;				// List of outputs that would require shading
+	float			**outputs;
+	CGatherVariable	*outputVars;	
+
+	int				numNonShadeOutputs;		// List of outputs that do not require shading
+	float			**nonShadeOutputs;
+	CGatherVariable	*nonShadeOutputVars;
+
 	int				numMisses;				// The number of missed rays
 	int				remainingSamples;		// The number of remaining samples
 	
+
+
+
+
 	// uniform data
 	int				numSamples;				// The number of samples
 	// varying data

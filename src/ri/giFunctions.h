@@ -180,9 +180,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 // indirectdiffuse	"c=pnf!"
 #ifndef INIT_SHADING
 #define	IDEXPR_PRE(__occlusion)	FUN4EXPR_PRE;																						\
-								int	numArguments;																					\
-								argumentcount(numArguments);																		\
-								plBegin(CMapLookup<CTexture3d>,4,numArguments-4,plDefault);											\
+								plBegin(CMapLookup<CTexture3d>,4,plDefault);														\
 								CTexture3d	*cache;																					\
 								if ((cache = lookup->map) == NULL) {																\
 									const float		*from,*to;																		\
@@ -252,9 +250,7 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // photonmap	"c=spn!"
 #ifndef INIT_SHADING
-#define	PHOTONMAPEXPR_PRE		int	numArguments;																\
-								argumentcount(numArguments);													\
-								plBegin(CMapLookup<CPhotonMap>,4,numArguments-4,plDefault);						\
+#define	PHOTONMAPEXPR_PRE		plBegin(CMapLookup<CPhotonMap>,4,plDefault);									\
 								CPhotonMap	*map;																\
 								if ((map = lookup->map) == NULL) {												\
 									const char	**op1;															\
@@ -399,20 +395,13 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								}
 
 
+// This is the default action for the gather
+#define	plGatherAddOutput()	lookup->addOutput(*param,i+1);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // gather	"o=spnff!"
 #ifndef INIT_SHADING
-#define	GATHERHEADEREXPR_PRE	CGatherLookup	*lookup;															\
-								osLock(CRenderer::shaderMutex);														\
-								if ((lookup = (CGatherLookup *) parameterlist) == NULL) {							\
-									int				numArguments;													\
-									const char		**category;														\
-									argumentcount(numArguments);													\
-									GATHERPARAMETERS(5,(numArguments-5) >> 1);										\
-									operand(0,category,const char **);												\
-								}																					\
-								osUnlock(CRenderer::shaderMutex);													\
-																													\
+#define	GATHERHEADEREXPR_PRE	plBegin(CGatherLookup,5,plGatherAddOutput);											\
 								const float		*samples,*sampleCone;												\
 								const float		*P,*D;																\
 								operand(3,sampleCone,float *);														\
@@ -425,9 +414,12 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								dvVector(dPdv,P);																	\
 																													\
 								lastGather							=	new CGatherBundle;							\
+								lastGather->numOutputs				=	lookup->numOutputs;							\
+								lastGather->numNonShadeOutputs		=	lookup->numNonShadeOutputs;					\
 								lastGather->outputs					=	(float **) ralloc((lookup->numOutputs + lookup->numNonShadeOutputs)*sizeof(float *),threadMemory);	\
 								lastGather->nonShadeOutputs			=	lastGather->outputs + lookup->numOutputs;	\
-								lastGather->lookup					=	lookup;										\
+								lastGather->outputVars				=	lookup->outputs;							\
+								lastGather->nonShadeOutputVars		=	lookup->nonShadeOutputVars;					\
 								lastGather->remainingSamples		=	(int) *samples;								\
 								lastGather->numMisses				=	0;											\
 								lastGather->label					=	lookup->label;								\
@@ -459,28 +451,35 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								
 
 
-#define GATHERHEADEREXPR		mulvf(dPdu,*du);																	\
+#define GATHERHEADEREXPR		plReady();																			\
+								mulvf(dPdu,*du);																	\
 								mulvf(dPdv,*dv);																	\
-								rays->da	=	min(max(tanf(*sampleCone),0.0f),1.0f);								\
-								rays->db	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f;
+								rays->da			=	min(max(tanf(*sampleCone),0.0f),1.0f);						\
+								rays->db			=	(lengthv(dPdu) + lengthv(dPdv))*0.5f;						\
+								rays->sampleCone	=	*sampleCone;
 
 #define GATHERHEADEREXPR_UPDATE	dPdu	+=	3;																		\
 								dPdv	+=	3;																		\
 								du++; dv++;																			\
 								sampleCone++;																		\
-								rays++;
+								rays++;																				\
+								plStep();
+
+#define GATHERHEADEREXPR_POST	plEnd();
 
 #else
 #define	GATHERHEADEREXPR_PRE
 #define	GATHERHEADEREXPR
 #define GATHERHEADEREXPR_UPDATE
+#define GATHERHEADEREXPR_POST
 #endif
 
-DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GATHERHEADEREXPR,GATHERHEADEREXPR_UPDATE,NULL_EXPR,PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GATHERHEADEREXPR,GATHERHEADEREXPR_UPDATE,GATHERHEADEREXPR_POST,PARAMETER_DERIVATIVE)
 
 #undef	GATHERHEADEREXPR_PRE
 #undef	GATHERHEADEREXPR
 #undef  GATHERHEADEREXPR_UPDATE
+#undef	GATHERHEADEREXPR_POST
 
 
 

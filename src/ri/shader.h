@@ -273,7 +273,7 @@ public:
 class	CGatherLookup : public CPLLookup {
 public:
 
-							CGatherLookup();
+							CGatherLookup(int numVariables);
 							~CGatherLookup();
 
 	void					addOutput(const char *,int);

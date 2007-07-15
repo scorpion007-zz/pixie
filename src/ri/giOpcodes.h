@@ -36,9 +36,8 @@
 #define	GATHEREXPR_PRE		const int		numRealVertices	=	currentShadingState->numRealVertices;	\
 							CGatherRay		*raysBase		=	lastGather->raysBase;					\
 							CGatherRay		**rays			=	(CGatherRay **) lastGather->raysStorage;\
-							CGatherLookup	*lookup			=	lastGather->lookup;						\
-							const CShadingScratch	*scratch	=	&(currentShadingState->scratch);	\
-							const float 	numSamples		=	(float) scratch->numSamples;			\
+							const CShadingScratch *scratch	=	&(currentShadingState->scratch);		\
+							const float 	temp			=	1 / (float) (lastGather->numSamples);	\
 							const float 	*coneAngle		=	scratch->coneAngles;					\
 							const float		*dPdu			=	lastGather->dPdu;						\
 							const float		*dPdv			=	lastGather->dPdv;						\
@@ -66,7 +65,7 @@
 									raysBase->index	=	i;											\
 									raysBase->tmin	=	scratch->bias;								\
 									raysBase->t		=	scratch->maxDist;							\
-									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) / numSamples;				\
+									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) * temp;				\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE | ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;	\
 									raysBase->tags	=	&tags[i];									\
 									if (dotvv(raysBase->dir,N) > 0) {								\

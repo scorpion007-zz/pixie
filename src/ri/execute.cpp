@@ -256,7 +256,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											}
 
 // Use this macro to start processing a parameter list
-#define		plBegin(__class,__start,__num,__default)																\
+#define		plBegin(__class,__start,__default)																		\
 											/* Create a hash ID using shader and instruction */						\
 											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code) & (PL_HASH_SIZE-1);		\
 											__class		*lookup;													\
@@ -278,7 +278,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												plHash[hashKey]			=	lookup;									\
 																													\
 												/* Decode the PL */													\
-												for (int i=0;i<__num;i++) {											\
+												const int	num	=	code->numArguments - __start;					\
+												for (int i=0;i<num;i++) {											\
 																													\
 													const char **param;												\
 													operand(i+__start,param,const char **);							\

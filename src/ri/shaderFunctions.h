@@ -1488,10 +1488,8 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								const float		*s,*t;															\
 								const char		**op1;															\
 								const float		*op2;															\
-								int				numArguments;													\
-								argumentcount(numArguments);													\
 								/* Begin the parameter list */													\
-								plBegin(CMapLookup<CTexture *>,5,numArguments-5,plDefault);						\
+								plBegin(CMapLookup<CTexture *>,5,plDefault);									\
 								/* Fetch the parameters as usual */												\
 								operand(0,res,float *);															\
 								operand(1,op1,const char **);													\
@@ -1619,10 +1617,8 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTUREFEXPR_PRE,TEXTURECEXPR
 								const char		**op1;															\
 								const float		*op2,*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;					\
 								float			cs[4],ct[4];													\
-								int				numArguments;													\
-								argumentcount(numArguments);													\
 								/* Begin the parameter list */													\
-								plBegin(CMapLookup<CTexture *>,11,numArguments-11,plDefault);					\
+								plBegin(CMapLookup<CTexture *>,11,plDefault);									\
 								/* Fetch the parameters as usual */												\
 								operand(0,res,float *);															\
 								operand(1,op1,const char **);													\
@@ -1759,10 +1755,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								float			*res;																\
 								const char		**op1;																\
 								const float		*op2;																\
-								int				numArguments;														\
-								argumentcount(numArguments);														\
 								/* Begin the parameter list */														\
-								plBegin(CMapLookup<CEnvironment *>,4,numArguments-4,plDefault);						\
+								plBegin(CMapLookup<CEnvironment *>,4,plDefault);									\
 								/* Fetch the parameters as usual */													\
 								operand(0,res,float *);																\
 								operand(1,op1,const char **);														\
