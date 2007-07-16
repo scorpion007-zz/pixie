@@ -711,10 +711,40 @@ void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
 	} else if (strcmp(name,RI_VISIBILITY) == 0) {
 		for (i=0;i<n;i++) {
 			if (FALSE) {
-			attributeCheckInt(RI_TRANSMISSION,1)
+			//attributeCheckInt(RI_TRANSMISSION,1)
+			attributeCheckInt(RI_DIFFUSE,1)
+			attributeCheckInt(RI_SPECULAR,1)
 			attributeCheckInt(RI_CAMERA,1)
 			attributeCheckInt(RI_TRACE,1)
 			attributeCheckInt(RI_PHOTON,1)
+			} else {
+				CVariable	var;
+				if (parseVariable(&var,NULL,tokens[i]) == TRUE) {
+					if (strcmp(var.name,RI_TRANSMISSION) == 0) {
+
+						if (var.type == TYPE_STRING) {
+							char	*val	=	((char **) params[i])[0];
+							out("Attribute \"%s\" \"string transmission\" \"%s\"\n",name,val);
+						} else if (var.type == TYPE_INTEGER) {
+							int		*val	=	((int*) params[i]);
+							out("Attribute \"%s\" \"int transmission\" [%d]\n",name,val[0]);
+						} else {
+							error(CODE_BADTOKEN,"Bad type for transmission attribute\n");
+						}
+					} else {
+						RiAttribute(name,var.name,params[i],RI_NULL);
+					}
+				} else {
+					error(CODE_BADTOKEN,"Unknown %s option: \"%s\"\n",name,tokens[i]);
+				}
+			}
+		}
+	} else if (strcmp(name,RI_SHADE) == 0) {
+		for (i=0;i<n;i++) {
+			if (FALSE) {
+			attributeCheckString(RI_TRANSMISSIONHITMODE)
+			attributeCheckString(RI_DIFFUSEHITMODE)
+			attributeCheckString(RI_SPECULARHITMODE)
 			attributeEndCheck
 		}
 	} else if (strcmp(name,RI_IDENTIFIER) == 0) {
