@@ -128,7 +128,7 @@ public:
 		float					swidth;
 		float					twidth;
 		float					blur;					// Blur amount
-		char					*coordsys;
+		const char				*coordsys;
 		float					numLookupSamples;		// The number of nearest samples to use during the map access
 		float					maxDistance;			// The maximum ray intersection distance
 		float					maxError;				// The error knob for the sampling
@@ -136,6 +136,7 @@ public:
 		float					minFGRadius;			// The minimum final gather spacing
 		float					maxFGRadius;			// The maximum final gather spacing
 		float					bias;					// The shadow bias
+		float					uniformDist;
 		int						occlusion;				// TRUE if this is an occlusion lookup
 		int						pointbased;				// TRUE if we are using point based irradiance
 		float					localThreshold;			// The local threshold for the radiance cache

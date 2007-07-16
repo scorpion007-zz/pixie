@@ -107,11 +107,11 @@ const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
 // Comments				:	The shader commands that have a parameter list must derive from this class
 class	CPLLookup {
 public:
-								CPLLookup(int numVariables) {
+								CPLLookup() {
 									numUniforms		=	0;
 									numVaryings		=	0;
-									uniformBindings	=	new CPLLookup::TParamBinding[numVariables*2];
-									varyingBindings	=	uniformBindings + numVariables;
+									uniforms		=	NULL;
+									varyings		=	NULL;
 									instance		=	0;
 									code			=	0;
 									size			=	0;
@@ -119,9 +119,10 @@ public:
 								}
 
 		virtual					~CPLLookup() {
-									delete [] uniformBindings;
+									if (uniforms != NULL)	delete [] uniforms;
 								}
 
+		
 		typedef struct TParamBinding {
 			int				opIndex;			// The operand index to copy
 			int				step;				// The step size
@@ -129,9 +130,11 @@ public:
 		} TParamBinding;
 
 		int						numUniforms;		// The number of bindings we have
-		TParamBinding			*uniformBindings;	// The linked list of PL variables
+		TParamBinding			*uniforms;			// The array of bindings
+
 		int						numVaryings;
-		TParamBinding			*varyingBindings;
+		TParamBinding			*varyings;
+
 		const CShaderInstance	*instance;			// The instance that has the PL
 		const TCode				*code;				// The code that has the PL
 		int						size;				// The size of the memory that needs to be allocated to save old variables
@@ -161,11 +164,12 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapLookup
-// Description			:	This class holds the base of a textureinfo lookup
+// Description			:	This class holds the base map
 // Comments				:
 template <class T> class	CMapLookup : public CPLLookup	{
 public:
-		T					*map;
+							CMapLookup()	{	map	=	NULL;	}
+		T					map;
 };
 
 
@@ -176,11 +180,15 @@ public:
 // Comments				:
 class	CTexture3dLookup : public CPLLookup {
 public:
-							CTexture3dLookup(const CAttributes *);
+							CTexture3dLookup();
 							~CTexture3dLookup();
 
-		int					numChannels;			// The number of channels bake3d provides
-		int					*index,*entry,*size;	// Entry points for every channel
+		CTexture3d			*map;									// The texture we're lookup up
+		int					numChannels;							// The number of channels bake3d provides
+		const char			*channelName[TEXTURE3D_MAX_CHANNELS];
+		int					channelIndex[TEXTURE3D_MAX_CHANNELS];
+		int					channelEntry[TEXTURE3D_MAX_CHANNELS];
+		int					channelSize[TEXTURE3D_MAX_CHANNELS];	// Entry points for every channel
 };
 
 
@@ -272,8 +280,7 @@ public:
 // Comments				:
 class	CGatherLookup : public CPLLookup {
 public:
-
-							CGatherLookup(int numVariables);
+							CGatherLookup();
 							~CGatherLookup();
 
 	void					addOutput(const char *,int);

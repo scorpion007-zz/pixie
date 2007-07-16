@@ -94,5 +94,9 @@
 
 // The stack size for the point hierarchy lookup
 #define	POINTHIERARCHY_STACK_SIZE		256
+
+// The maximum number of channels in a 3d texture
+#define	TEXTURE3D_MAX_CHANNELS			32
+
 #endif
 

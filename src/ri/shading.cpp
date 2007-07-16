@@ -384,18 +384,39 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Return Value			:	-
 // Comments				:	Initializes the default values for shader functions
 CShadingScratch::CShadingScratch() {
-	filter			=	RiGaussianFilter;
-	fill			=	0;
-	shadowBias		=	0.01f;
-	label			=	NULL;
-	sampleBase		=	1;
-	blur			=	0;
-	width			=	1;
-	swidth			=	1;
-	twidth			=	1;
-	numSamples		=	1;
-	coneAngle		=	0;
-	maxDist			=	C_INFINITY;
+	filter				=	RiGaussianFilter;
+	fill				=	0;
+	shadowBias			=	0.01f;
+	label				=	NULL;
+	sampleBase			=	1;
+	blur				=	0;
+	width				=	1;
+	swidth				=	1;
+	twidth				=	1;
+	numSamples			=	1;
+	coneAngle			=	0;
+	maxDist				=	C_INFINITY;
+
+	numLookupSamples	=	0;
+	maxDistance			=	C_INFINITY;
+	numSamples			=	200;
+	maxError			=	0;
+	maxBrightness		=	1;
+	maxFGRadius			=	C_INFINITY;
+	minFGRadius			=	C_EPSILON;
+	sampleBase			=	0;
+	bias				=	0;
+	occlusion			=	FALSE;
+	pointbased			=	FALSE;
+	localThreshold		=	1;
+	initv(backgroundColor,0);
+	handle				=	NULL;
+	filemode			=	NULL;
+	coordsys			=	coordinateWorldSystem;
+	radius				=	-1.0f;
+	radiusScale			=	1.0f;
+	interpolate			=	FALSE;
+	maxsolidangle		=	0.05f;
 }
 
 

@@ -186,7 +186,6 @@ void							CRenderer::initMutexes() {
 	osCreateMutex(textureMutex);
 	osCreateMutex(refCountMutex);
 	osCreateMutex(shaderMutex);
-	osCreateMutex(dirtyShaderMutex);
 	osCreateMutex(delayedMutex);
 	osCreateMutex(deepShadowMutex);
 	osCreateMutex(hierarchyMutex);
@@ -207,7 +206,6 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(textureMutex);
 	osDeleteMutex(refCountMutex);
 	osDeleteMutex(shaderMutex);
-	osDeleteMutex(dirtyShaderMutex);
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);
 	osDeleteMutex(hierarchyMutex);

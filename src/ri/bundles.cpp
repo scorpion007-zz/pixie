@@ -337,7 +337,7 @@ int		CGatherBundle::postTraceAction() {
 		}
 	}
 
-	return lookup->outputs != NULL;
+	return outputVars != NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////

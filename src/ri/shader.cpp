@@ -44,30 +44,6 @@
 #include	"common/align.h"
 
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDynamicShaderLookup
-// Method				:	CDynamicShaderLookup
-// Description			:	Ctor
-// Return Value			:	-
-// Comments				:
-CDynamicShaderLookup::CDynamicShaderLookup() {
-	numUniformParamBindings		= 0;
-	uniformParamBindings		= NULL;
-	numVaryingParamBindings		= 0;
-	varyingParamBindings		= NULL;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDynamicShaderLookup
-// Method				:	~CDynamicShaderLookup
-// Description			:	Dtor
-// Return Value			:	-
-// Comments				:
-CDynamicShaderLookup::~CDynamicShaderLookup() {
-	if (uniformParamBindings != NULL) delete[] uniformParamBindings;
-	if (varyingParamBindings != NULL) delete[] varyingParamBindings;
-}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -281,37 +257,8 @@ void	CGatherLookup::addOutput(const char *output,int destIndex) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CTexture3dLookup::CTexture3dLookup(const CAttributes *attributes) {
-	numLookupSamples	=	attributes->photonEstimator;
-	maxDistance			=	C_INFINITY;
-	numSamples			=	200;
-	maxError			=	attributes->irradianceMaxError;
-	maxBrightness		=	1;
-	maxFGRadius			=	C_INFINITY;
-	minFGRadius			=	C_EPSILON;
-	sampleBase			=	0;
-	bias				=	attributes->shadowBias;
-	occlusion			=	FALSE;
-	pointbased			=	FALSE;
-	localThreshold		=	1;
-	lengthA				=	CRenderer::lengthA;
-	lengthB				=	CRenderer::lengthB;
-	initv(backgroundColor,0);
-	handle				=	(attributes->irradianceHandle		== NULL ? "temp.irr"	: attributes->irradianceHandle);
-	filemode			=	(attributes->irradianceHandleMode	== NULL ? ""			: attributes->irradianceHandleMode);
-	coordsys			=	coordinateWorldSystem;
-	map					=	NULL;
-	environment			=	NULL;
-	pointHierarchy		=	NULL;
-	texture				=	NULL;
-	radius				=	-1.0f;
-	radiusScale			=	1.0f;
-	interpolate			=	FALSE;
-	maxsolidangle		=	0.05f;
+CTexture3dLookup::CTexture3dLookup() {
 	numChannels			=	0;
-	index				=	NULL;
-	entry				=	NULL;
-	size				=	NULL;	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -321,9 +268,6 @@ CTexture3dLookup::CTexture3dLookup(const CAttributes *attributes) {
 // Return Value			:	-
 // Comments				:
 CTexture3dLookup::~CTexture3dLookup() {
-	if (index != NULL)	delete [] index;
-	if (entry != NULL)	delete [] entry;
-	if (size != NULL)	delete [] size;
 }
 
 ///////////////////////////////////////////////////////////////////////	
@@ -502,21 +446,11 @@ void CShaderInstance::createCategories() {
 // Return Value			:	-
 // Comments				:
 CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes *a,CXform *x) : CShaderInstance(a,x) {
-	int			i;
 	CVariable	*cVariable;
 
 	strings				=	NULL;
 	parent				=	p;
 	
-	if (parent->numPLs > 0) {
-		parameterLists	=	new CShaderLookup*[parent->numPLs];
-
-		for (i=0;i<parent->numPLs;i++)
-			parameterLists[i]	=	NULL;
-	} else {
-		parameterLists	=	NULL;
-	}
-
 	// Clone the parent's parameter list
 	// BEWARE that this reverses the order (which matters when counting the globalIndex)
 	for (cVariable=parent->parameters;cVariable!=NULL;cVariable=cVariable->next) {
@@ -571,37 +505,6 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 		delete cString;
 	}
 
-	// Remove this shader from the list
-	if (dirty == TRUE) {
-
-		// Remove the shader from the list of dirty shaders
-		osLock(CRenderer::dirtyShaderMutex);
-
-		if (prevDirty == NULL) {
-			CRenderer::dirtyInstances	=	nextDirty;
-		} else {
-			assert(prevDirty->nextDirty == this);
-			prevDirty->nextDirty		=	nextDirty;
-		}
-
-		if (nextDirty != NULL)	{
-			assert(nextDirty->prevDirty == this);
-			nextDirty->prevDirty		=	prevDirty;
-		}
-
-		osUnlock(CRenderer::dirtyShaderMutex);
-	}
-
-	// Clear the parameter lists
-	if (parameterLists != NULL) {
-		int	i;
-
-		for (i=0;i<parent->numPLs;i++) {
-			if (parameterLists[i] != NULL)	delete parameterLists[i];
-		}
-
-		delete [] parameterLists;
-	}
 }
 
 

@@ -104,6 +104,11 @@ public:
 	int				*tags;			// The tag
 	int				index;			// The ray index (the ray number)
 	float			sampleCone;		// The samplecone for the ray
+	float			sampleBase;		// The sample base for the ray
+	float			bias,maxDist;	// Ray attributes
+	vector			gatherDir;		// The direction of the gather
+	vector			gatherP;		// The gather position
+	vector			dPdu,dPdv;		// At the ray origin
 };
 
 
@@ -136,18 +141,9 @@ public:
 
 	int				numMisses;				// The number of missed rays
 	int				remainingSamples;		// The number of remaining samples
-	
 
-
-
-
-	// uniform data
 	int				numSamples;				// The number of samples
-	// varying data
-	const float		*coneAngles;			// The cone angle
-	const float		*gatherDir;				// Gather direction
-	const float		*dPdu,*dPdv,*P;			// The ray origin info
-
+	int				uniformDist;				
 };
 
 

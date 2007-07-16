@@ -1272,33 +1272,29 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 
 #ifndef INIT_SHADING
 
-#define	TEXTUREINFO_PRE(_t)		float				*res;											\
+#define	TEXTUREINFO_PRE(_t)		plBegin(CMapLookup<CTextureInfoBase *>,4,plDefault);				\
+								float				*res;											\
 								const char			**op1;											\
 								const char			**op2;											\
 								_t					op3;											\
 								float				found;											\
-								CTextureInfoBase	*textureInfo;									\
 								float				out[16*2];										\
 								char				*outS;											\
 								_t					src = (_t) out;									\
 								int					op3sz;											\
 																									\
-								CTextureInfoLookup	*lookup;										\
 								operand(0,res,float *);												\
+								operand(1,op1,const char **);										\
 								operand(2,op2,const char **);										\
 								operandSize(3,op3,op3sz,_t);										\
-								osLock(CRenderer::shaderMutex);										\
-								if ((lookup = (CTextureInfoLookup *) parameterlist) == NULL) {		\
-									/* cache the texture lookup */									\
-									lookup					=	new CTextureInfoLookup;				\
-									parameterlist			=	lookup;								\
-									dirty();														\
-									operand(1,op1,const char **);									\
-									lookup->textureInfo		=	CRenderer::getTextureInfo(*op1);	\
-								}																	\
-								osUnlock(CRenderer::shaderMutex);									\
 																									\
-								textureInfo = lookup->textureInfo;									\
+								CTextureInfoBase	*textureInfo;									\
+								if ((textureInfo = lookup->map) == NULL) {							\
+									osLock(CRenderer::shaderMutex);									\
+									lookup->map = textureInfo	=	CRenderer::getTextureInfo(*op1);\
+									osUnlock(CRenderer::shaderMutex);								\
+								}																	\
+																									\
 								if (textureInfo == NULL) {											\
 									found		=	0;												\
 									src			=	op3;	/* prevent writing result */			\
@@ -1361,6 +1357,8 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 
 #define	TEXTUREINFO_UPDATE(__r,__o2)	FUN4EXPR_UPDATE(__r,0,0,__o2)
 
+#define	TEXTUREINFO_POST		plEnd();
+
 
 #else
 
@@ -1370,6 +1368,7 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 #undef	TEXTUREINFOV
 #undef	TEXTUREINFOM
 #undef	TEXTUREINFO_UPDATE
+#undef	TEXTUREINFO_POST
 
 #define	TEXTUREINFO_PRE(__t)
 #define	TEXTUREINFOF
@@ -1377,15 +1376,16 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 #define	TEXTUREINFOV
 #define	TEXTUREINFOM
 #define	TEXTUREINFO_UPDATE
+#define	TEXTUREINFO_POST
 #endif
 
 DEFLINKFUNC(Textureinfo2			,"textureinfo"				,"f=SSC!",	0)
 DEFLINKFUNC(Textureinfo3			,"textureinfo"				,"f=SSN!",	0)
 DEFLINKFUNC(Textureinfo4			,"textureinfo"				,"f=SSP!",	0)
-DEFFUNC(TextureinfoV				,"textureinfo"				,"f=SSV!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOV,TEXTUREINFO_UPDATE(1,3),NULL_EXPR,0)
-DEFFUNC(Textureinfo					,"textureinfo"				,"f=SSF!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOF,TEXTUREINFO_UPDATE(1,op3sz),NULL_EXPR,0)
-DEFFUNC(TextureinfoS				,"textureinfo"				,"f=SSS!"	,TEXTUREINFO_PRE(char **),TEXTUREINFOS,TEXTUREINFO_UPDATE(1,1),NULL_EXPR,0)
-DEFFUNC(TextureinfoM				,"textureinfo"				,"f=SSM!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOM,TEXTUREINFO_UPDATE(1,16),NULL_EXPR,0)
+DEFFUNC(TextureinfoV				,"textureinfo"				,"f=SSV!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOV,TEXTUREINFO_UPDATE(1,3),TEXTUREINFO_POST,0)
+DEFFUNC(Textureinfo					,"textureinfo"				,"f=SSF!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOF,TEXTUREINFO_UPDATE(1,op3sz),TEXTUREINFO_POST,0)
+DEFFUNC(TextureinfoS				,"textureinfo"				,"f=SSS!"	,TEXTUREINFO_PRE(char **),TEXTUREINFOS,TEXTUREINFO_UPDATE(1,1),TEXTUREINFO_POST,0)
+DEFFUNC(TextureinfoM				,"textureinfo"				,"f=SSM!"	,TEXTUREINFO_PRE(float *),TEXTUREINFOM,TEXTUREINFO_UPDATE(1,16),TEXTUREINFO_POST,0)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2006,51 +2006,25 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef INIT_SHADING
 #define	FILTERSTEP2EXPR_PRE	FUN3EXPR_PRE																		\
-							CFilterLookup	*lookup;															\
-							float			tmp;																\
-							float			val;																\
-							int				i;																	\
-							float			step,vstep;															\
-							osLock(CRenderer::shaderMutex);														\
-							if ((lookup = (CFilterLookup *) parameterlist) == NULL) {							\
-								int				numArguments;													\
-								argumentcount(numArguments);													\
-								FILTERPARAMETERS(3,(numArguments-3) >> 1);										\
-								lookup->compute();																\
-							}																					\
-							osUnlock(CRenderer::shaderMutex);													\
-							const	float			width	=	lookup->width;									\
 							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
 							float	*dsdv					=	dsdu + numVertices;								\
 							float	*fwidth					=	dsdu;											\
 							const float		*du				=	varying[VARIABLE_DU];							\
 							const float		*dv				=	varying[VARIABLE_DV];							\
-							const float		*s				=	op2;											\
 																												\
-							duFloat(dsdu,s);																	\
-							dvFloat(dsdv,s);																	\
-							for (i=0;i<numVertices;i++) {														\
-								dsdu[i]		=	fabs(dsdu[i]*du[i]);											\
-								dsdv[i]		=	fabs(dsdv[i]*dv[i]);											\
-								fwidth[i]	=	max(dsdv[i] + dsdv[i],C_EPSILON);								\
-							}
+							duFloat(dsdu,op2);																	\
+							dvFloat(dsdv,op2);
 
-#define	FILTERSTEP2EXPR		tmp		=	0;																		\
-							val		=	*op2+width*fwidth[0];													\
-							vstep	=	lookup->valStep*fwidth[0];												\
-							i		=	NUMFILTERSTEPS-1;														\
-							while(i>=0) {																		\
-								if (*op1 > val)	break;															\
-								step	=	min(vstep,val-(*op1));												\
-								tmp		+=	lookup->vals[i]*step;												\
-								val		-=	vstep;																\
-								i--;																			\
+#define	FILTERSTEP2EXPR		*res	=	0;																		\
+							for (int j=0;j<10;++j) {															\
+								const float	s	=	(*dsdu)*(*du)*(urand() - 0.5f)	+							\
+													(*dsdv)*(*dv)*(urand() - 0.5f)	+ (*op2);					\
+								if (s > *op1)	*res	+=	1.0f;												\
 							}																					\
-							*res	=	tmp / (lookup->normalizer * fwidth[0]);
+							*res	/=	10.0f;
 
 
 #define	FILTERSTEP2EXPR_UPDATE	FUN3EXPR_UPDATE(1,1,1)															\
-								fwidth++;
 
 #else
 #define	FILTERSTEP2EXPR_PRE
@@ -2069,35 +2043,14 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 // filterstep "f=fff!"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef INIT_SHADING
-#define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE																		\
-							CFilterLookup	*lookup;															\
-							float			tmp;																\
-							float			val;																\
-							int				i;																	\
-							float			step,vstep,fwidth;													\
-							osLock(CRenderer::shaderMutex);														\
-							if ((lookup = (CFilterLookup *) parameterlist) == NULL) {							\
-								int				numArguments;													\
-								argumentcount(numArguments);													\
-								FILTERPARAMETERS(4,(numArguments-4) >> 1);										\
-								lookup->compute();																\
-							}																					\
-							osUnlock(CRenderer::shaderMutex);													\
-							const	float			width	=	lookup->width;
+#define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE
 
-#define	FILTERSTEP3EXPR		tmp		=	0;																		\
-							fwidth	=	max(fabs(op2[0]-op3[0]),C_EPSILON);										\
-							val		=	*op2+width*fwidth;														\
-							vstep	=	lookup->valStep*fwidth;													\
-							i		=	NUMFILTERSTEPS-1;														\
-							while(i>=0) {																		\
-								if (op1[0] > val)	break;														\
-								step	=	min(vstep,val-op1[0]);												\
-								tmp		+=	lookup->vals[i]*step;												\
-								val		-=	vstep;																\
-								i--;																			\
+#define	FILTERSTEP3EXPR		*res	=	0;																		\
+							for (int j=0;j<10;++j) {															\
+								const float	s	=	((*op3) - (*op2))*urand() + (*op2);							\
+								if (s > *op1)	*res	+=	1.0f;												\
 							}																					\
-							*res	=	tmp / (lookup->normalizer * fwidth);
+							*res	/=	10.0f;
 
 
 #define	FILTERSTEP3EXPR_UPDATE	FUN4EXPR_UPDATE(1,1,1,1)
@@ -2190,24 +2143,29 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								}
 
 
+#define	plTexture3dDefault		i++;																			\
+								if (lookup->numChannels < TEXTURE3D_MAX_CHANNELS) {								\
+									lookup->channelIndex[lookup->numChannels]	= i;									\
+									lookup->channelSize[lookup->numChannels]	= 0;									\
+									lookup->channelName[lookup->numChannels++]	= *param;								\
+								} else error(CODE_LIMIT,"The maximum number of channels in a 3D texture reached (%d)\n",TEXTURE3D_MAX_CHANNELS);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // bake3d	"f=SSpn!"
 #ifndef INIT_SHADING
-#define	BAKE3DEXPR_PRE			CTexture3dLookup*lookup;														\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									int				numArguments;												\
-									argumentcount(numArguments);												\
-									TEXTURE3DPARAMETERS(5,(numArguments-5) >> 1);								\
+#define	BAKE3DEXPR_PRE			plBegin(CTexture3dLookup,5,plTexture3dDefault);									\
+								CTexture3d	*tex;																\
+								if ((tex = lookup->map) == NULL) {												\
+									osLock(CRenderer::shaderMutex);												\
 									const float		*from,*to;													\
-									findCoordinateSystem(lookup->coordsys,from,to);								\
+									findCoordinateSystem(scratch->coordsys,from,to);							\
 									const char		**op1,**op2;												\
 									operand(1,op1,const char **);												\
 									operand(2,op2,const char **);												\
-									lookup->texture		=	CRenderer::getTexture3d(*op1,TRUE,*op2,from,to);	\
-									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);	\
+									lookup->map = tex	=	CRenderer::getTexture3d(*op1,TRUE,*op2,from,to);	\
+									tex->resolve(lookup->numChannels,lookup->channelName,lookup->channelEntry,lookup->channelSize);	\
+									osUnlock(CRenderer::shaderMutex);											\
 								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
 								float			*res;															\
 								const float		*op3,*op4;														\
 								operand(0,res,float *);															\
@@ -2216,8 +2174,7 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								int				curU=0,curV=0;													\
 								const int		uVerts		=	currentShadingState->numUvertices;				\
 								const int		vVerts		=	currentShadingState->numVvertices;				\
-								const int		doInterp	=	(lookup->interpolate && currentShadingState->numVertices == currentShadingState->numRealVertices);	\
-								CTexture3d		*tex		=	lookup->texture;								\
+								const int		doInterp	=	((scratch->interpolate == 1.0f) && currentShadingState->numVertices == currentShadingState->numRealVertices);	\
 								float			*dest		=	(float *) ralloc(tex->dataSize*sizeof(float),threadMemory);	\
 								const float		**channelValues = (const float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);	\
 								float			*dPdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
@@ -2227,23 +2184,23 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								const float		*du			=	varying[VARIABLE_DU];							\
 								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								int	channel;																	\
-								for (channel=0;channel<lookup->numChannels;channel++) {							\
-									operand(lookup->index[channel],channelValues[channel],const float *);		\
+								for (int channel=0;channel<lookup->numChannels;++channel) {						\
+									operand(lookup->channelIndex[channel],channelValues[channel],const float *);\
 								}																				\
 																												\
 								vector	P;																		\
 								float	radius;
 
-#define	BAKE3DEXPR				mulvf(dPdu,*du);																\
+#define	BAKE3DEXPR				plReady();																		\
+								mulvf(dPdu,*du);																\
 								mulvf(dPdv,*dv);																\
-								if (lookup->radius > 0) {														\
-									radius	=	lookup->radius*lookup->radiusScale;								\
+								if (scratch->radius > 0) {														\
+									radius	=	scratch->radius*scratch->radiusScale;							\
 								} else {																		\
-									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*lookup->radiusScale;		\
+									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*scratch->radiusScale;		\
 								}																				\
 																												\
-								texture3Dflatten(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
+								texture3Dflatten(dest,lookup->numChannels,channelValues,lookup->channelEntry,lookup->channelSize);	\
 								if (doInterp == FALSE) {														\
 									movvv(P,op3);																\
 									tex->store(dest,P,op4,radius);												\
@@ -2263,47 +2220,50 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								dPdv	+=	3;																	\
 								du++;	dv++;																	\
 								curU++;																			\
+								plStep();																		\
 								if (curU == uVerts) { curV++; curU = 0; }										\
-								for (channel=0;channel<lookup->numChannels;channel++) {							\
-									channelValues[channel]	+=	lookup->size[channel];							\
+								for (int channel=0;channel<lookup->numChannels;++channel) {						\
+									channelValues[channel]	+=	lookup->channelSize[channel];					\
 								}
+
+#define	BAKE3DEXPR_POST			plEnd();
+
 #else
 #define	BAKE3DEXPR_PRE
 #define	BAKE3DEXPR
 #define	BAKE3DEXPR_UPDATE
+#define	BAKE3DEXPR_POST
 #endif
 
-DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3DEXPR_UPDATE,BAKE3DEXPR_POST,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	BAKE3DEXPR_PRE
 #undef	BAKE3DEXPR
 #undef	BAKE3DEXPR_UPDATE
+#undef	BAKE3DEXPR_POST
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture3d	"f=Spn!"
 #ifndef INIT_SHADING
-#define	TEXTURE3DEXPR_PRE		CTexture3dLookup	*lookup;													\
-								osLock(CRenderer::shaderMutex);													\
-								if ((lookup = (CTexture3dLookup *) parameterlist) == NULL) {					\
-									int					numArguments;											\
-									argumentcount(numArguments);												\
-									TEXTURE3DPARAMETERS(4,(numArguments-4) >> 1);								\
+#define	TEXTURE3DEXPR_PRE		plBegin(CTexture3dLookup,5,plTexture3dDefault);									\
+								CTexture3d	*tex;																\
+								if ((tex = lookup->map) == NULL) {												\
+									osLock(CRenderer::shaderMutex);												\
 									const float			*from,*to;												\
-									findCoordinateSystem(lookup->coordsys,from,to);								\
+									findCoordinateSystem(scratch->coordsys,from,to);							\
 									const char			**op1;													\
 									operand(1,op1,const char **);												\
-									lookup->texture		=	CRenderer::getTexture3d(*op1,FALSE,NULL,from,to);	\
-									lookup->texture->resolve(lookup->numChannels,channelNames,lookup->entry,lookup->size);	\
+									lookup->map	=	tex	=	CRenderer::getTexture3d(*op1,FALSE,NULL,from,to);	\
+									tex->resolve(lookup->numChannels,lookup->channelName,lookup->channelEntry,lookup->channelSize);	\
+									osUnlock(CRenderer::shaderMutex);											\
 								}																				\
-								osUnlock(CRenderer::shaderMutex);												\
 								float				*res;														\
 								const float			*op2,*op3;													\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
 								operand(3,op3,const float *);													\
-								CTexture3d		*tex		=	lookup->texture;								\
 								float			*dest		=	(float *) ralloc(tex->dataSize*sizeof(float),threadMemory);	\
 								float			**channelValues = (float **) ralloc(lookup->numChannels*sizeof(float*),threadMemory);	\
 								float			*dPdu		=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
@@ -2313,21 +2273,21 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 								const float		*du			=	varying[VARIABLE_DU];							\
 								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								int	channel;																	\
-								for (channel=0;channel<lookup->numChannels;channel++) {							\
-									operand(lookup->index[channel],channelValues[channel],float *);				\
+								for (int channel=0;channel<lookup->numChannels;++channel) {						\
+									operand(lookup->channelIndex[channel],channelValues[channel],float *);		\
 								} 
 
-#define	TEXTURE3DEXPR			float radius;																	\
+#define	TEXTURE3DEXPR			plReady();																		\
+								float radius;																	\
 								mulvf(dPdu,*du);																\
 								mulvf(dPdv,*dv);																\
-								if (lookup->radius > 0) {														\
-									radius	=	lookup->radius*lookup->radiusScale;								\
+								if (scratch->radius > 0) {														\
+									radius	=	scratch->radius*scratch->radiusScale;							\
 								} else {																		\
-									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*lookup->radiusScale;		\
+									radius	=	(lengthv(dPdu) + lengthv(dPdv))*0.5f*scratch->radiusScale;		\
 								}																				\
-								tex->lookup(dest,op2,op3,radius);													\
-								texture3Dunpack(dest,lookup->numChannels,channelValues,lookup->entry,lookup->size);	\
+								tex->lookup(dest,op2,op3,radius);												\
+								texture3Dunpack(dest,lookup->numChannels,channelValues,lookup->channelEntry,lookup->channelSize);	\
 								*res		=	1;
 
 #define	TEXTURE3DEXPR_UPDATE	res++;																			\
@@ -2336,20 +2296,25 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 								dPdu	+=	3;																	\
 								dPdv	+=	3;																	\
 								du++;	dv++;																	\
-								for (channel=0;channel<lookup->numChannels;channel++) {							\
-									channelValues[channel]	+=	lookup->size[channel];							\
+								plStep();																		\
+								for (int channel=0;channel<lookup->numChannels;++channel) {						\
+									channelValues[channel]	+=	lookup->channelSize[channel];					\
 								}
+
+#define	TEXTURE3DEXPR_POST
 #else
 #define	TEXTURE3DEXPR_PRE
 #define	TEXTURE3DEXPR
 #define	TEXTURE3DEXPR_UPDATE
+#define	TEXTURE3DEXPR_POST
 #endif
 
-DEFFUNC(Texture3d			,"texture3d"					,"f=Spn!"		,TEXTURE3DEXPR_PRE,TEXTURE3DEXPR,TEXTURE3DEXPR_UPDATE,NULL_EXPR,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFFUNC(Texture3d			,"texture3d"					,"f=Spn!"		,TEXTURE3DEXPR_PRE,TEXTURE3DEXPR,TEXTURE3DEXPR_UPDATE,TEXTURE3DEXPR_POST,PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
 
 #undef	TEXTURE3DEXPR_PRE
 #undef	TEXTURE3DEXPR
 #undef	TEXTURE3DEXPR_UPDATE
+#undef	TEXTURE3DEXPR_POST
 
 
 ///////////////////////////////////////////////////
