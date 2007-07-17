@@ -35,6 +35,8 @@
 #include "ray.h"
 #include "shading.h"
 
+class	CGatherVariable;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "trace" shading language command

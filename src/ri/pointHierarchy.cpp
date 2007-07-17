@@ -31,6 +31,7 @@
 #include "pointHierarchy.h"
 #include "error.h"
 #include "random.h"
+#include "shading.h"
 
 // The predefined names for the area and the radiosity channels
 const	char	*areaName		=	"_area";

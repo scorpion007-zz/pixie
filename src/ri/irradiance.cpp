@@ -42,6 +42,7 @@
 #include "renderer.h"
 #include "ri_config.h"
 #include "debug.h"
+#include "pointHierarchy.h"
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 const	float	horizonCutoff			=	(float) cosf((float) radians(80));
@@ -332,7 +333,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const 
 				mulmv(dPdv,to,cdPdv);
 
 				// Create a new sample
-				sample(C,P,dPdu,dPdv,N,context,lookup);
+				sample(C,P,dPdu,dPdv,N,context);
 				mulmv(C+4,from,C+4);	// envdir is stored in the target coordinate system
 			} else {
 

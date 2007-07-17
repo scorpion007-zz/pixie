@@ -67,6 +67,9 @@ class	CPl;
 class	CSphereLight;
 struct	TObjectHash;
 class	CPLLookup;
+class	CPointHierarchy;
+class	CEnvironment;
+
 
 typedef enum {
 	SHADING_0D,				// Shading points
@@ -148,6 +151,9 @@ public:
 		float					radiusScale;			// Blur amount
 		int						interpolate;			// Bake polygon centres
 		float					maxsolidangle;			// Maximum solid angle for point based occlusion
+
+		CPointHierarchy			*pointHierarchy;		// The point hierarchy for point based lookups
+		CEnvironment			*environment;			// The environment for indirect illumination
 };
 
 ///////////////////////////////////////////////////////////////////////

@@ -42,26 +42,13 @@
 #include "variable.h"
 #include "refCounter.h"
 
-// For forward reference
+// Forward references
 class	CShader;
 class	CShaderInstance;
-class	CObject;
-class	CPhotonMap;
-class	CAttributes;
-class	CActiveLight;
-class	CTexture;
-class	CTexture3d;
-class	CTextureInfoBase;
-class	CEnvironment;
-class	CVolume;
-class	CColorMap;
-class	CVisorCache;
-class	CShadingContext;
-class	CPhotonHider;
-class	CGatherRay;
 class	CMemPage;
+class	CShadingContext;
+class	CAttributes;
 class	CDSO;
-class	CPointHierarchy;
 
 // Meanings of the accessor field of TArgument
 const	unsigned int	SL_IMMEDIATE_OPERAND	=	0;	// Constants
@@ -83,9 +70,9 @@ typedef struct {
 typedef struct {
 	int					opcode;					// The opcode
 	unsigned	char	uniform;				// TRUE if all the arguments are uniform
-	unsigned	char	plNumber;				// The parameter list number of the function
 	unsigned	char	numArguments;			// The number of stack arguments
-	unsigned	char	padding;				// PADDING ... Not used ... PADDING
+	unsigned	char	padding0;				// PADDING ... Not used ... PADDING
+	unsigned	char	padding1;				// PADDING ... Not used ... PADDING
 	TArgument			*arguments;				// The array of arguments
 	CDSO				*dso;					// If this is a DSO, points to the DSO function
 } TCode;
@@ -99,205 +86,6 @@ const	unsigned int		SL_IMAGER						=	4;
 
 // Shader flags
 const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CPLLookup
-// Description			:	This class encapsulates a parameter list
-// Comments				:	The shader commands that have a parameter list must derive from this class
-class	CPLLookup {
-public:
-								CPLLookup() {
-									numUniforms		=	0;
-									numVaryings		=	0;
-									uniforms		=	NULL;
-									varyings		=	NULL;
-									instance		=	0;
-									code			=	0;
-									size			=	0;
-									data			=	NULL;
-								}
-
-		virtual					~CPLLookup() {
-									if (uniforms != NULL)	delete [] uniforms;
-								}
-
-		
-		typedef struct TParamBinding {
-			int				opIndex;			// The operand index to copy
-			int				step;				// The step size
-			size_t			dest;				// The destination offset
-		} TParamBinding;
-
-		int						numUniforms;		// The number of bindings we have
-		TParamBinding			*uniforms;			// The array of bindings
-
-		int						numVaryings;
-		TParamBinding			*varyings;
-
-		const CShaderInstance	*instance;			// The instance that has the PL
-		const TCode				*code;				// The code that has the PL
-		int						size;				// The size of the memory that needs to be allocated to save old variables
-		void					*data;				// User specific data
-};
-
-
-
-#define	NUMFILTERSTEPS	10
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CFilterLookup
-// Description			:	This class holds information about a particular texture lookup
-// Comments				:
-class	CFilterLookup : public CPLLookup	{
-public:
-		float				width;					// The width parameter
-		RtFilterFunc		filter;					// The filter function
-		float				vals[NUMFILTERSTEPS];	// The partial integrals
-		float				valStep;				// The step value for the value
-		float				normalizer;				// The normalizer value
-
-		void				compute();
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CMapLookup
-// Description			:	This class holds the base map
-// Comments				:
-template <class T> class	CMapLookup : public CPLLookup	{
-public:
-							CMapLookup()	{	map	=	NULL;	}
-		T					map;
-};
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CGlobalIllumLookup
-// Description			:	This class encapsulates a global illumination lookup
-// Comments				:
-class	CTexture3dLookup : public CPLLookup {
-public:
-							CTexture3dLookup();
-							~CTexture3dLookup();
-
-		CTexture3d			*map;									// The texture we're lookup up
-		int					numChannels;							// The number of channels bake3d provides
-		const char			*channelName[TEXTURE3D_MAX_CHANNELS];
-		int					channelIndex[TEXTURE3D_MAX_CHANNELS];
-		int					channelEntry[TEXTURE3D_MAX_CHANNELS];
-		int					channelSize[TEXTURE3D_MAX_CHANNELS];	// Entry points for every channel
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CGatherVariable
-// Description			:	Encapsulates a variable to be saved
-// Comments				:
-class	CGatherVariable {
-public:
-	virtual			~CGatherVariable() { }
-	virtual	void	record(float *,int,CGatherRay **,float **varying)	=	0;
-
-	CGatherVariable	*next;		// The next item in the linked list
-	int				shade;		// TRUE if this variable requires shading
-	int				destIndex;	// The destination index
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShaderVectorVariable
-// Description			:	Encapsulates a shader variable
-// Comments				:
-class	CShaderVectorVariable : public CGatherVariable {
-public:
-
-			void	record(float *,int nr,CGatherRay **r,float **varying);
-
-			int		entry;		// Variable index
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShaderFloatVariable
-// Description			:	Encapsulates a shader variable
-// Comments				:
-class	CShaderFloatVariable : public CGatherVariable {
-public:
-
-			void	record(float *,int nr,CGatherRay **r,float **varying);
-
-			int		entry;		// Variable index
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRayOriginVariable
-// Description			:	Ray origin variable
-// Comments				:
-class	CRayOriginVariable : public CGatherVariable {
-public:
-
-			void	record(float *,int nr,CGatherRay **r,float **varying);
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRayDirVariable
-// Description			:	Ray direction variable
-// Comments				:
-class	CRayDirVariable : public CGatherVariable {
-public:
-
-			void	record(float *,int nr,CGatherRay **r,float **varying);
-};
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRayLengthVariable
-// Description			:	Ray direction variable
-// Comments				:
-class	CRayLengthVariable : public CGatherVariable {
-public:
-
-			void	record(float *,int nr,CGatherRay **r,float **varying);
-};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CGatherLookup
-// Description			:	Lookup parameters for the gather
-// Comments				:
-class	CGatherLookup : public CPLLookup {
-public:
-							CGatherLookup();
-							~CGatherLookup();
-
-	void					addOutput(const char *,int);
-
-	CGatherVariable			*outputs;				// These are the outputs that require shading
-	int						numOutputs;				// The number of outputs
-	CGatherVariable			*nonShadeOutputs;		// These are the outputs that do not require shading
-	int						numNonShadeOutputs;		// The number of outputs that don't need shading
-};
-
-
-
-
-
-
-
-
 
 
 
@@ -326,7 +114,6 @@ public:
 		int						numGlobals;						// Number of global parameters
 		int						numStrings;						// Number of strings
 		int						numVariables;					// Number of variables
-		int						numPLs;							// Number of parameter lists
 
 		int						codeEntryPoint;					// Index into code array where the actual code starts
 		int						initEntryPoint;					// Index into code array where the init code starts

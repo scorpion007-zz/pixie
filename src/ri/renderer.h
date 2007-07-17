@@ -100,6 +100,8 @@ class	CRendererContext;
 class	CNetFileMapping;
 class	CRay;
 class	CTextureBlock;
+class	CTextureInfoBase;
+class	CTexture3d;
 
 
 ///////////////////////////////////////////////////////////////////////

@@ -47,6 +47,7 @@
 #include	"error.h"
 #include	"remoteChannel.h"
 #include	"renderer.h"
+#include	"shaderPl.h"
 
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
