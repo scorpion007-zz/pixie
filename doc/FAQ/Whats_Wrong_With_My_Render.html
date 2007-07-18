@@ -2,18 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="robots" content="noindex,follow" />
 		<meta name="keywords" content="FAQ/Whats Wrong With My Render" />
-<link rel="shortcut icon" href="../favicon.ico" />
-<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
+		<link rel="shortcut icon" href="../favicon.ico" />
+		<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>FAQ/Whats Wrong With My Render - PixieWiki</title>
-		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42b"; /*]]>*/</style>
-		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42b" />
-		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42b" />
-		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42b";</style><![endif]-->
-		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42b";</style><![endif]-->
-		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42b";</style><![endif]-->
-		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42b";</style><![endif]-->
-		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42b"></script>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?63"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?63" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?63" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?63";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?63";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?63";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?63";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?63"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
 		
 		<script type= "text/javascript">/*<![CDATA[*/
@@ -27,16 +28,18 @@ var wgCanonicalSpecialPageName = false;
 var wgNamespaceNumber = 0;
 var wgPageName = "FAQ/Whats_Wrong_With_My_Render";
 var wgTitle = "FAQ/Whats Wrong With My Render";
+var wgAction = "view";
 var wgArticleId = "1311";
 var wgIsArticle = true;
 var wgUserName = null;
+var wgUserGroups = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
 var wgCurRevisionId = "1368";
 /*]]>*/</script>
                 
-		<script type="text/javascript" src="../css/wikibits.js?42b"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
 		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
 		<style type="text/css">/*<![CDATA[*/
 @import "../css/MediaWiki_Common.css";
@@ -44,7 +47,7 @@ var wgCurRevisionId = "1368";
 @import "../css/WikiExtraCss.css";
 /*]]>*/</style>
 		<!-- Head Scripts -->
-			</head>
+	</head>
 <body  class="mediawiki ns-0 ltr page-FAQ_Whats_Wrong_With_My_Render">
  <div id="titleBar"></div>
 	<div id="globalWrapper">
@@ -59,7 +62,7 @@ var wgCurRevisionId = "1368";
 			<a name="Displacements_from_textures"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;action=edit&amp;section=1" title="Edit section: Displacements from textures">edit</a>]</span> <span class="mw-headline"> Displacements from textures </span></h1>
 <p>If you use a texture-map to displace the surface, you may find that grid cracks appear - small pinholes in the surface.  This happens because the filter size chosen for adjacent grids may differ slightly, resulting in slightly different displacements which pull the surface edges apart.
 </p><p>Eg.
-</p><p><a href="images/TexDisplacePatchCrack.jpg" class="image" title="Image:TexDisplacePatchCrack.jpg"><img src="../images/TexDisplacePatchCrack.jpg" alt="Image:TexDisplacePatchCrack.jpg" width="518" height="200" longdesc="images/TexDisplacePatchCrack.jpg" /></a>
+</p><p><a href="images/TexDisplacePatchCrack.jpg" class="image" title="Image:TexDisplacePatchCrack.jpg"><img alt="Image:TexDisplacePatchCrack.jpg" longdesc="images/TexDisplacePatchCrack.jpg" src="../images/TexDisplacePatchCrack.jpg" width="518" height="200" /></a>
 </p><p><b>What can you do?</b>
 </p><p>Turn on binary dicing, using
 </p><p><code>Attribute "dice" "binary" 1</code>
@@ -75,7 +78,7 @@ var wgCurRevisionId = "1368";
    #define SINGLEPIX (1/NUMPIXELS)
    P += amt*texture(texname,s,t, s+ SINGLEPIX,t, s,t+ SINGLEPIX, s+ SINGLEPIX,t+ SINGLEPIX,"samples",16)*normalize(N);
 </pre>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1311-0!1!0!!en!2 and timestamp 20070406153749 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1311-0!1!0!!en!2 and timestamp 20070718063636 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wrong_With_My_Render">http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wrong_With_My_Render</a>"</div>
 						<!-- end content -->
@@ -88,10 +91,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wr
 		<h5>Views</h5>
 		<div class="pBody">
 			<ul>
-						 <li id="ca-nstab-main" class="selected"><a href="../FAQ/Whats_Wrong_With_My_Render.html">Article</a></li>
-						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:FAQ/Whats_Wrong_With_My_Render&amp;action=edit">Discussion</a></li>
-						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;action=edit">Edit</a></li>
-						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;action=history">History</a></li>
+					 <li id="ca-nstab-main" class="selected"><a href="../FAQ/Whats_Wrong_With_My_Render.html" title="View the content page [c]" accesskey="c">Article</a></li>
+					 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:FAQ/Whats_Wrong_With_My_Render&amp;action=edit" title="Discussion about the content page [t]" accesskey="t">Discussion</a></li>
+					 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;action=edit" title="You can edit this page. Please use the preview button before saving. [e]" accesskey="e">Edit</a></li>
+					 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;action=history" title="Past versions of this page. [h]" accesskey="h">History</a></li>
 				</ul>
 		</div>
 	</div>
@@ -99,25 +102,25 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wr
 		<h5>Personal tools</h5>
 		<div class="pBody">
 			<ul>
-				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=FAQ/Whats_Wrong_With_My_Render">Log in / create account</a></li>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=FAQ/Whats_Wrong_With_My_Render" title="You are encouraged to log in, it is not mandatory however. [o]" accesskey="o">Log in / create account</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
 		<div class='portlet' id='p-navigation'>
 		<h5>Navigation</h5>
 		<div class='pBody'>
 			<ul>
-				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z">Main Page</a></li>
 				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
 				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
 				<li id="n-Tutorials"><a href="../Tutorials.html">Tutorials</a></li>
 				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
-				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
-				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html" title="The list of recent changes in the wiki. [r]" accesskey="r">Recent changes</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html" title="The place to find out.">Help</a></li>
 			</ul>
 		</div>
 	</div>
@@ -125,7 +128,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wr
 		<h5><label for="searchInput">Search</label></h5>
 		<div id="searchBody" class="pBody">
 			<form action="../NotSupportedStatic.html" id="searchform"><div>
-				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input id="searchInput" name="search" type="text" title="Search PixieWiki [f]" accesskey="f" value="" />
 				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
 				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
 			</div></form>
@@ -135,10 +138,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wr
 		<h5>Toolbox</h5>
 		<div class="pBody">
 			<ul>
-				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
-				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
-<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
-<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html" title="List of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
 				<li id="t-print"><a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=FAQ/Whats_Wrong_With_My_Render&amp;oldid=1368">Permanent link</a></li>			</ul>
 		</div>
 	</div>
@@ -148,7 +151,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wr
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
 				<li id="f-lastmod"> This page was last modified 09:01, 25 March 2006.</li>
-				<li id="f-viewcount">This page has been accessed 481 times.</li>
+				<li id="f-viewcount">This page has been accessed 555 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -158,4 +161,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/FAQ/Whats_Wr
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.223 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.246 secs. --></body></html>

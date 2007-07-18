@@ -2,18 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="robots" content="noindex,follow" />
 		<meta name="keywords" content="Documentation/Baking 3D Textures" />
-<link rel="shortcut icon" href="../favicon.ico" />
-<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
+		<link rel="shortcut icon" href="../favicon.ico" />
+		<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
 		<title>Documentation/Baking 3D Textures - PixieWiki</title>
-		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?42b"; /*]]>*/</style>
-		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?42b" />
-		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?42b" />
-		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?42b";</style><![endif]-->
-		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?42b";</style><![endif]-->
-		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?42b";</style><![endif]-->
-		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?42b";</style><![endif]-->
-		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?42b"></script>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?63"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?63" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?63" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?63";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?63";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?63";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?63";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?63"></script>
 		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
 		
 		<script type= "text/javascript">/*<![CDATA[*/
@@ -27,16 +28,18 @@ var wgCanonicalSpecialPageName = false;
 var wgNamespaceNumber = 0;
 var wgPageName = "Documentation/Baking_3D_Textures";
 var wgTitle = "Documentation/Baking 3D Textures";
+var wgAction = "view";
 var wgArticleId = "1643";
 var wgIsArticle = true;
 var wgUserName = null;
+var wgUserGroups = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2806";
+var wgCurRevisionId = "3006";
 /*]]>*/</script>
                 
-		<script type="text/javascript" src="../css/wikibits.js?42b"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
 		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
 		<style type="text/css">/*<![CDATA[*/
 @import "../css/MediaWiki_Common.css";
@@ -44,7 +47,7 @@ var wgCurRevisionId = "2806";
 @import "../css/WikiExtraCss.css";
 /*]]>*/</style>
 		<!-- Head Scripts -->
-			</head>
+	</head>
 <body  class="mediawiki ns-0 ltr page-Documentation_Baking_3D_Textures">
  <div id="titleBar"></div>
 	<div id="globalWrapper">
@@ -66,7 +69,7 @@ var wgCurRevisionId = "2806";
 <li class="toclevel-2"><a href="#3d_Textures"><span class="tocnumber">1.2</span> <span class="toctext">3d Textures</span></a></li>
 </ul>
 </li>
-<li class="toclevel-1"><a href="#3d_Texture_shadops"><span class="tocnumber">2</span> <span class="toctext">3d Texture shadops</span></a>
+<li class="toclevel-1"><a href="#Bake3d"><span class="tocnumber">2</span> <span class="toctext">Bake3d</span></a>
 <ul>
 <li class="toclevel-2"><a href="#channels"><span class="tocnumber">2.1</span> <span class="toctext">channels</span></a></li>
 <li class="toclevel-2"><a href="#P.2CN"><span class="tocnumber">2.2</span> <span class="toctext">P,N</span></a></li>
@@ -75,13 +78,13 @@ var wgCurRevisionId = "2806";
 </li>
 <li class="toclevel-1"><a href="#Using_texmake_to_prepare_textures"><span class="tocnumber">3</span> <span class="toctext">Using texmake to prepare textures</span></a></li>
 <li class="toclevel-1"><a href="#Alternative_for_preparing_a_texture"><span class="tocnumber">4</span> <span class="toctext">Alternative for preparing a texture</span></a></li>
-<li class="toclevel-1"><a href="#Reading_the_3d_texture_back_in"><span class="tocnumber">5</span> <span class="toctext">Reading the 3d texture back in</span></a>
+<li class="toclevel-1"><a href="#texture3d"><span class="tocnumber">5</span> <span class="toctext">texture3d</span></a>
 <ul>
 <li class="toclevel-2"><a href="#P.2CN_2"><span class="tocnumber">5.1</span> <span class="toctext">P,N</span></a></li>
 <li class="toclevel-2"><a href="#optional_parameters_2"><span class="tocnumber">5.2</span> <span class="toctext">optional parameters</span></a></li>
 </ul>
 </li>
-<li class="toclevel-1"><a href="#Reference_Poses"><span class="tocnumber">6</span> <span class="toctext">Reference Poses</span></a></li>
+<li class="toclevel-1"><a href="#Reference_Positions"><span class="tocnumber">6</span> <span class="toctext">Reference Positions</span></a></li>
 </ul>
 </td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
 <a name="Introduction"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=1" title="Edit section: Introduction">edit</a>]</span> <span class="mw-headline"> Introduction </span></h1>
@@ -100,7 +103,7 @@ var wgCurRevisionId = "2806";
 <p>Pixie supports a 3d Texture format which can be prepared from a point cloud.  Once prepared, the 3d texture supports efficient lookups, which support level-of-detail.  The entire texture does not have to be held in memory, but instead is paged in as needed.  Whilst the preparation of the texture can be a little time consuming, it is usually done offline, and reused for multiple frames.  If the data baked into the texture is expensive to compute, this can represent quite a saving.
 </p><p>Both point clouds and 3d textures can be read by the <tt>texture3d</tt> shadeop.
 </p>
-<a name="3d_Texture_shadops"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=4" title="Edit section: 3d Texture shadops">edit</a>]</span> <span class="mw-headline"> 3d Texture shadops </span></h1>
+<a name="Bake3d"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=4" title="Edit section: Bake3d">edit</a>]</span> <span class="mw-headline"> Bake3d </span></h1>
 <p>Baking 3d data to a 'point cloud' is done via the following shadeop
 </p>
 <pre>bake3d(string filename,string channels,point P,normal N,...,&lt;data&gt;);
@@ -167,7 +170,7 @@ bake3d("cloud.ptc","CoutDiff",P,N,"CoutDiff",Cd);
 </p>
 <pre>MakeTexture3D &lt;inputfile&gt; &lt;outputfile&gt; "maxerror" [float]
 </pre>
-<a name="Reading_the_3d_texture_back_in"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=10" title="Edit section: Reading the 3d texture back in">edit</a>]</span> <span class="mw-headline"> Reading the 3d texture back in </span></h1>
+<a name="texture3d"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=10" title="Edit section: texture3d">edit</a>]</span> <span class="mw-headline"> texture3d </span></h1>
 <p>Reading back a 3d texture or point cloud is done via the following shadeop:
 </p>
 <pre>texture3d(string filename,point P,normal N,...,&lt;data&gt;);
@@ -192,10 +195,10 @@ bake3d("cloud.ptc","CoutDiff",P,N,"CoutDiff",Cd);
 texture3d("cloud.ptc",P,N,"CoutDiff",Cd);
 &lt;use Cd&gt;
 </pre>
-<a name="Reference_Poses"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=13" title="Edit section: Reference Poses">edit</a>]</span> <span class="mw-headline"> Reference Poses </span></h1>
+<a name="Reference_Positions"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit&amp;section=13" title="Edit section: Reference Positions">edit</a>]</span> <span class="mw-headline"> Reference Positions </span></h1>
 <p>If the object you're baking is moving or deforming, you might wish to bake the data onto a reference pose, and look it up using that pose (using a vertex point __Pref to specify the vertices in reference pose).  Future releases may support baking to an arbitrary coordinate system other than 'world'.
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1643-0!1!0!!en!2 and timestamp 20070406135931 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1643-0!1!0!!en!2 and timestamp 20070718113221 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Baking_3D_Textures">http://www.george-graphics.co.uk/pixiewiki/Documentation/Baking_3D_Textures</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -208,10 +211,10 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 		<h5>Views</h5>
 		<div class="pBody">
 			<ul>
-						 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Baking_3D_Textures.html">Article</a></li>
-						 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Baking_3D_Textures&amp;action=edit">Discussion</a></li>
-						 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit">Edit</a></li>
-						 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=history">History</a></li>
+					 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Baking_3D_Textures.html" title="View the content page [c]" accesskey="c">Article</a></li>
+					 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Baking_3D_Textures&amp;action=edit" title="Discussion about the content page [t]" accesskey="t">Discussion</a></li>
+					 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=edit" title="You can edit this page. Please use the preview button before saving. [e]" accesskey="e">Edit</a></li>
+					 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;action=history" title="Past versions of this page. [h]" accesskey="h">History</a></li>
 				</ul>
 		</div>
 	</div>
@@ -219,25 +222,25 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 		<h5>Personal tools</h5>
 		<div class="pBody">
 			<ul>
-				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Baking_3D_Textures">Log in / create account</a></li>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Baking_3D_Textures" title="You are encouraged to log in, it is not mandatory however. [o]" accesskey="o">Log in / create account</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Main Page"></a>
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z"></a>
 	</div>
 	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
 		<div class='portlet' id='p-navigation'>
 		<h5>Navigation</h5>
 		<div class='pBody'>
 			<ul>
-				<li id="n-mainpage"><a href="../NotIncludedStatic.html">Main Page</a></li>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z">Main Page</a></li>
 				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
 				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
 				<li id="n-Tutorials"><a href="../Tutorials.html">Tutorials</a></li>
 				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
-				<li id="n-recentchanges"><a href="../NotSupportedStatic.html">Recent changes</a></li>
-				<li id="n-help"><a href="../NotSupportedStatic.html">Help</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html" title="The list of recent changes in the wiki. [r]" accesskey="r">Recent changes</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html" title="The place to find out.">Help</a></li>
 			</ul>
 		</div>
 	</div>
@@ -245,7 +248,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 		<h5><label for="searchInput">Search</label></h5>
 		<div id="searchBody" class="pBody">
 			<form action="../NotSupportedStatic.html" id="searchform"><div>
-				<input id="searchInput" name="search" type="text" accesskey="f" value="" />
+				<input id="searchInput" name="search" type="text" title="Search PixieWiki [f]" accesskey="f" value="" />
 				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
 				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
 			</div></form>
@@ -255,11 +258,11 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 		<h5>Toolbox</h5>
 		<div class="pBody">
 			<ul>
-				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html">What links here</a></li>
-				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html">Related changes</a></li>
-<li id="t-upload"><a href="../NotSupportedStatic.html">Upload file</a></li>
-<li id="t-specialpages"><a href="../NotSupportedStatic.html">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;oldid=2806">Permanent link</a></li>			</ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html" title="List of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Baking_3D_Textures&amp;oldid=3006">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -267,8 +270,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 10:50, 6 April 2007.</li>
-				<li id="f-viewcount">This page has been accessed 1,017 times.</li>
+				<li id="f-lastmod"> This page was last modified 19:13, 27 May 2007.</li>
+				<li id="f-viewcount">This page has been accessed 1,454 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -278,4 +281,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.339 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.239 secs. --></body></html>

@@ -2,7 +2,8 @@
 
 /* wikitable/prettytable class for skinning normal tables */
 table.wikitable, table.prettytable {
- margin: 1em 1em 1em 0;
+ padding: 3px;
+ margin: 0.8em;
  background: #f9f9f9;
  border: 1px #aaaaaa solid;
  border-collapse: collapse;
@@ -93,3 +94,5 @@ div.insetbox {
         font-size: 1.0em;
 	word-wrap: break-word;
 }
+
+/* </pre></nowiki> */

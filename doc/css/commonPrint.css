@@ -287,5 +287,8 @@ td.diff-context {
     background:#eeeeee;
     font-size: smaller;
 }
-span.diffchange { color: silver; font-weight: bold; text-decoration: underline; }
-
+.diffchange {
+    color: silver;
+    font-weight: bold;
+    text-decoration: underline;
+}

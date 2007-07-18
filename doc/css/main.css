@@ -183,6 +183,7 @@ h1, h2 {border-bottom: 1px dotted #333333;  line-height: 1.1em; padding-bottom: 
 #titleBar {
 	background: #FFF url("pixie-docs.png") repeat-x; /* blue and white background */
 	/* background: #FFF url(pixie-docs.png) repeat-x; retain as comment for static wiki */
+	/* background: #FFF url(geo-wiki.png) repeat-x; retain as comment for static wiki */
 	}
 	
 #titleBar img {
