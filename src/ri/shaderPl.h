@@ -33,6 +33,7 @@
 
 #include "common/global.h"
 #include "ri_config.h"
+#include "ri.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -45,8 +46,8 @@ public:
 		virtual					~CPLLookup();
 
 								// This function must be overwritten to bind a particular variable
-		virtual		void		bind(const char *name,int &opIndex,int step);
-					void		add(const char *name,int &opIndex,int step,size_t dest);
+		virtual		void		bind(const char *name,int &opIndex,int step,void *data);
+					void		add(const char *name,int &opIndex,int step,void *data,size_t dest);
 
 		const void				*instance;			// The instance that has the PL
 		const void				*code;				// The code that has the PL
@@ -72,25 +73,86 @@ public:
 
 
 
-#define	NUMFILTERSTEPS	10
 
+
+class	CTexture;
+class	CEnvironment;
+class	CPhotonMap;
+class	CTextureInfoBase;
+class	CTexture3d;
+class	CPointHierarchy;
 
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CMapLookup
-// Description			:	This class holds the base map
+// Class				:	CTextureLookup
+// Description			:	This class encapsulates a texture lookup
 // Comments				:
-template <class T> class	CMapLookup : public CPLLookup	{
+class	CTextureLookup : public CPLLookup	{
 public:
-							CMapLookup()	{	map	=	NULL;	}
+							CTextureLookup();
+							~CTextureLookup();
 
-		void				bind(const char *name,int &opIndex,int step);
+		void				bind(const char *name,int &opIndex,int step,void *data);
 
-		T					map;
+		CTexture			*map;
+		RtFilterFunc		filter;	
 };
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTraceLookup
+// Description			:	For trace/transmission
+// Comments				:
+class	CTraceLookup : public CPLLookup	{
+public:
+							CTraceLookup();
+							~CTraceLookup();
 
-class	CTexture3d;
+		void				bind(const char *name,int &opIndex,int step,void *data);
+};
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CEnvironmentLookup
+// Description			:	This class encapsulates an environment lookup
+// Comments				:	We are derived from trace lookup since we can spawn rays
+class	CEnvironmentLookup : public CTraceLookup	{
+public:
+							CEnvironmentLookup();
+							~CEnvironmentLookup();
+
+		void				bind(const char *name,int &opIndex,int step,void *data);
+
+		CEnvironment		*map;
+		RtFilterFunc		filter;	
+};
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CPhotonMapLookup
+// Description			:	This class encapsulates an environment lookup
+// Comments				:
+class	CPhotonMapLookup : public CPLLookup	{
+public:
+							CPhotonMapLookup();
+							~CPhotonMapLookup();
+
+		void				bind(const char *name,int &opIndex,int step,void *data);
+
+		CPhotonMap			*map;
+};
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CMapInfoLookup
+// Description			:	This class encapsulates an environment lookup
+// Comments				:
+class	CMapInfoLookup : public CPLLookup	{
+public:
+							CMapInfoLookup();
+							~CMapInfoLookup();
+
+		CTextureInfoBase	*map;
+};
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGlobalIllumLookup
@@ -101,7 +163,7 @@ public:
 							CTexture3dLookup();
 							~CTexture3dLookup();
 
-		void				bind(const char *name,int &opIndex,int step);
+		void				bind(const char *name,int &opIndex,int step,void *data);
 
 		CTexture3d			*map;									// The texture we're lookup up
 		int					numChannels;							// The number of channels bake3d provides
@@ -109,6 +171,22 @@ public:
 		int					channelIndex[TEXTURE3D_MAX_CHANNELS];
 		int					channelEntry[TEXTURE3D_MAX_CHANNELS];
 		int					channelSize[TEXTURE3D_MAX_CHANNELS];	// Entry points for every channel
+};
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CGlobalIllumLookup
+// Description			:	This class encapsulates a global illumination lookup
+// Comments				:	We are derived from texture3D since we're a 3D texture
+class	COcclusionLookup : public CTexture3dLookup {
+public:
+							COcclusionLookup();
+							~COcclusionLookup();
+
+		void				bind(const char *name,int &opIndex,int step,void *data);
+
+		CEnvironment		*environment;							// The environment map to use
+		CTexture3d			*pointHierarchy;						// The point hierarchy to use
 };
 
 
@@ -151,8 +229,7 @@ public:
 							~CGatherLookup();
 
 	void					addOutput(const char *,int);
-
-	void					bind(const char *name,int &opIndex,int step);
+	void					bind(const char *name,int &opIndex,int step,void *data);
 
 	CGatherVariable			*outputs;				// These are the outputs that require shading
 	int						numOutputs;				// The number of outputs

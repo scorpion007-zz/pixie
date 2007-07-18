@@ -38,7 +38,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	plBegin(CPLLookup,3,plDefault);									\
+#define	TRANSMISSIONEXPR_PRE	plBegin(CPLLookup,3);											\
 								CTraceLocation	*rays	=	(CTraceLocation *)	ralloc(numVertices*sizeof(CTraceLocation),threadMemory);	\
 								float			*dFdu	=	(float *)			ralloc(numVertices*12*sizeof(float),threadMemory);			\
 								float			*dFdv	=	dFdu + numVertices*3;				\
@@ -68,7 +68,10 @@
 								mulvf(rays->dDdu,dTdu,*du);		\
 								mulvf(rays->dDdv,dTdv,*dv);		\
 								movvv(rays->N,N);				\
-								rays->coneAngle = scratch->coneAngle;		\
+								rays->coneAngle		=	scratch->traceParams.coneAngle;		\
+								rays->bias			=	scratch->traceParams.bias;			\
+								rays->numSamples	=	(int) scratch->traceParams.samples;	\
+								rays->maxDist		=	scratch->traceParams.maxDist;		\
 								rays++;							\
 								numRays++;
 
@@ -178,15 +181,17 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 // indirectdiffuse	"c=pnf!"
 #ifndef INIT_SHADING
 #define	IDEXPR_PRE(__occlusion)	FUN4EXPR_PRE;																						\
-								plBegin(CTexture3dLookup,4,plDefault);																\
+								plBegin(COcclusionLookup,4);																		\
 								CTexture3d	*cache;																					\
 								if ((cache = lookup->map) == NULL) {																\
 									const float		*from,*to;																		\
-									findCoordinateSystem(currentShadingState->scratch.coordsys,from,to);							\
+									findCoordinateSystem(scratch->texture3dParams.coordsys,from,to);								\
 									const CAttributes		*currentAttributes	=	currentShadingState->currentObject->attributes;	\
 									osLock(CRenderer::shaderMutex);																	\
-									lookup->map	=	cache		=	CRenderer::getCache(currentAttributes->irradianceHandle,currentAttributes->irradianceHandleMode,from,to);			\
-									cache->resolve(lookup->numChannels,lookup->channelName,lookup->channelEntry,lookup->channelSize);					\
+									lookup->map	=	cache		=	CRenderer::getCache(currentAttributes->irradianceHandle,currentAttributes->irradianceHandleMode,from,to);					\
+									if (scratch->occlusionParams.environmentMapName != NULL)	lookup->environment		=	CRenderer::getEnvironment(scratch->occlusionParams.environmentMapName);								\
+									if (scratch->occlusionParams.pointHierarchyName != NULL)	lookup->pointHierarchy	=	CRenderer::getTexture3d(scratch->occlusionParams.pointHierarchyName,FALSE,"_area",from,to,TRUE);	\
+									cache->resolve(lookup->numChannels,lookup->channelName,lookup->channelEntry,lookup->channelSize);															\
 									osUnlock(CRenderer::shaderMutex);																\
 								}																									\
 								float		*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);					\
@@ -197,23 +202,30 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								const float	*dv		=	varying[VARIABLE_DV];														\
 								assert(cache->dataSize == 7);																		\
 																																	\
+								scratch->occlusionParams.environment	=	lookup->environment;													\
+								scratch->occlusionParams.pointHierarchy	=	lookup->pointHierarchy;													\
+																																	\
 								float	C[7];																						\
 								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);\
 																																	\
 								for (int channel=0;channel<lookup->numChannels;++channel) {											\
 									operand(lookup->channelIndex[channel],channelValues[channel],float *);							\
-								} 
+								}																									\
+								const float	savedSamples	=	scratch->traceParams.samples;
 
 
-#define	IDEXPR(__occlusion)		mulvf(dPdu,*du);																					\
+#define	IDEXPR(__occlusion)		plReady();																							\
+								mulvf(dPdu,*du);																					\
 								mulvf(dPdv,*dv);																					\
+								scratch->traceParams.samples	=	*op3;															\
 								cache->lookup(C,op1,dPdu,dPdv,op2,this);															\
 								texture3Dunpack(C,lookup->numChannels,channelValues,lookup->channelEntry,lookup->channelSize);		\
 								if (__occlusion)	*res	=	C[3];																\
 								else				movvv(res,C);
 
 
-#define	IDEXPR_UPDATE(__n)		FUN4EXPR_UPDATE(__n,3,3,0)																			\
+#define	IDEXPR_UPDATE(__n)		FUN4EXPR_UPDATE(__n,3,3,1)																			\
+								plStep();																							\
 								dPdu	+=	3;																						\
 								dPdv	+=	3;																						\
 								du++;	dv++;																						\
@@ -226,7 +238,9 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 									expandFloat(res);			\
 								} else {						\
 									expandVector(res);			\
-								}
+								}								\
+								plEnd();						\
+								scratch->traceParams.samples	=	savedSamples;
 #else
 #define	IDEXPR_PRE
 #define	IDEXPR
@@ -247,7 +261,7 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // photonmap	"c=spn!"
 #ifndef INIT_SHADING
-#define	PHOTONMAPEXPR_PRE		plBegin(CMapLookup<CPhotonMap *>,4,plDefault);									\
+#define	PHOTONMAPEXPR_PRE		plBegin(CPhotonMapLookup,4);													\
 								CPhotonMap	*map;																\
 								if ((map = lookup->map) == NULL) {												\
 									const char	**op1;															\
@@ -256,15 +270,16 @@ DEFSHORTFUNC(Indirectdiffuse	,"indirectdiffuse"	,"c=pnf!"	,IDEXPR_PRE(FALSE),IDE
 									lookup->map = map	=	CRenderer::getPhotonMap(*op1);						\
 									osUnlock(CRenderer::shaderMutex);											\
 								}																				\
-								float				*res;														\
-								const float			*op2,*op3;													\
+								float		*res;																\
+								const float	*op2,*op3;															\
+								const int	estimator	=	(scratch->photonmapParams.estimator == 0 ? currentShadingState->currentObject->attributes->photonEstimator : (int) scratch->photonmapParams.estimator);	\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
 								operand(3,op3,const float *);
 
 
 #define	PHOTONMAPEXPR			plReady();																		\
-								map->lookup(res,op2,op3,(int) (scratch->numLookupSamples));
+								map->lookup(res,op2,estimator);
 
 #define	PHOTONMAPEXPR_UPDATE	res	+=	3;																		\
 								op2	+=	3;																		\
@@ -292,7 +307,7 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // photonmap	"c=sp!"
 #ifndef INIT_SHADING
-#define	PHOTONMAP2EXPR_PRE		plBegin(CMapLookup<CPhotonMap *>,4,plDefault);									\
+#define	PHOTONMAP2EXPR_PRE		plBegin(CPhotonMapLookup,3);													\
 								CPhotonMap	*map;																\
 								if ((map = lookup->map) == NULL) {												\
 									const char	**op1;															\
@@ -301,13 +316,14 @@ DEFSHORTFUNC(Photonmap			,"photonmap"	,"c=Spn!"	,PHOTONMAPEXPR_PRE,PHOTONMAPEXPR
 									lookup->map = map	=	CRenderer::getPhotonMap(*op1);						\
 									osUnlock(CRenderer::shaderMutex);											\
 								}																				\
-								float				*res;														\
-								const float			*op2;														\
+								float		*res;																\
+								const float	*op2;																\
+								const int	estimator	=	(scratch->photonmapParams.estimator == 0 ? currentShadingState->currentObject->attributes->photonEstimator : (int) scratch->photonmapParams.estimator);	\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);
 
 #define	PHOTONMAP2EXPR			plReady();																		\
-								map->lookup(res,op2,(int) (scratch->numLookupSamples));
+								map->lookup(res,op2,estimator);
 
 #define	PHOTONMAP2EXPR_UPDATE	res	+=	3;																		\
 								op2	+=	3;																		\
@@ -337,67 +353,10 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 
 
 
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This macro is used to decode the gather parameter list
-#define	GATHERPARAMETERS(start,num)																					\
-								lookup					=	new CGatherLookup;										\
-								parameterlist			=	(CShaderLookup *) lookup;								\
-								lookup->outputs			=	NULL;													\
-								lookup->nonShadeOutputs	=	NULL;													\
-								lookup->category		=	"irradiance";											\
-								lookup->bias			=	currentShadingState->currentObject->attributes->shadowBias;	\
-								lookup->maxDist			=	C_INFINITY;												\
-								lookup->maxRayDepth		=	CRenderer::maxRayDepth;									\
-								lookup->label			=	rayLabelGather;											\
-								lookup->uniformDist		=	FALSE;													\
-								lookup->sampleBase		=	1.0f;													\
-								{																					\
-									int		i;																		\
-									const char	**param;															\
-									const float	*valf;																\
-									const char	**vals;																\
-																													\
-									for (i=0;i<num;i++) {															\
-										operand(i*2+start,param,const char **);										\
-										operand(i*2+start+1,valf,const float *);									\
-										operand(i*2+start+1,vals,const char **);									\
-																													\
-										if (strcmp(*param,"bias") == 0) {											\
-											lookup->bias		=	valf[0];										\
-										} else if (strcmp(*param,"blur") == 0) {									\
-											/*lookup->coneAngle	=	(float) (C_PI*valf[0]/2.0);*/					\
-										} else if (strcmp(*param,"maxdist") == 0) {									\
-											lookup->maxDist		=	valf[0];										\
-										} else if (strcmp(*param,"label") == 0) {									\
-											lookup->label		=	*vals;											\
-										} else if (strcmp(*param,"distribution") == 0) {							\
-											if (strcmp(*vals,"uniform") == 0) {										\
-												lookup->uniformDist	=	TRUE;										\
-											} else if (strcmp(*vals,"cosine") == 0) {								\
-												lookup->uniformDist	=	FALSE;										\
-											} else {																\
-												error(CODE_BADTOKEN,"Unknown gather distribution: \"%s\"\n",vals[0]);	\
-											}																		\
-										} else if (strcmp(*param,"samplebase")  == 0) {								\
-											lookup->sampleBase	=	valf[0];										\
-										} else { 																	\
-											lookup->addOutput(*param,i*2+start+1);									\
-										}																			\
-									}																				\
-								}
-
-
-// This is the default action for the gather
-#define	plGatherAddOutput	lookup->addOutput(*param,i+1);	i++;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // gather	"o=spnff!"
 #ifndef INIT_SHADING
-#define	GATHERHEADEREXPR_PRE	plBegin(CGatherLookup,5,plGatherAddOutput);											\
+#define	GATHERHEADEREXPR_PRE	plBegin(CGatherLookup,5);															\
 								const float		*samples,*sampleCone;												\
 								const float		*P,*D;																\
 								operand(1,P,const float *);															\
@@ -414,7 +373,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lastGather->nonShadeOutputVars		=	lookup->nonShadeOutputs;					\
 								lastGather->remainingSamples		=	(int) *samples;								\
 								lastGather->numMisses				=	0;											\
-								lastGather->label					=	scratch->label;								\
+								lastGather->label					=	(scratch->traceParams.label == NULL ? rayLabelGather : scratch->traceParams.label);					\
 								lastGather->numSamples				=	(int) *samples;								\
 																													\
 								CGatherVariable	*var;																\
@@ -435,7 +394,12 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								duVector(dPdu,P);																	\
 								dvVector(dPdv,P);																	\
 																													\
-								lastGather->uniformDist				=	(int) (scratch->uniformDist);				\
+								/* Figure out the ray distribution */												\
+								lastGather->uniformDist				=	FALSE;										\
+								if (scratch->gatherParams.distribution != NULL) {									\
+									if (strcmp(scratch->gatherParams.distribution,"uniform") == 0)		lastGather->uniformDist	=	TRUE;	\
+									else if (strcmp(scratch->gatherParams.distribution,"cosine") == 0)	lastGather->uniformDist	=	FALSE;	\
+								}																					\
 																													\
 								CGatherRay		*rays;																\
 								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
@@ -450,9 +414,9 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								rays->da			=	min(max(tanf(*sampleCone),0.0f),1.0f);						\
 								rays->db			=	(lengthv(dPdu) + lengthv(dPdv))*0.5f;						\
 								rays->sampleCone	=	*sampleCone;												\
-								rays->sampleBase	=	scratch->sampleBase;										\
-								rays->bias			=	scratch->bias;												\
-								rays->maxDist		=	scratch->maxDist;											\
+								rays->sampleBase	=	scratch->traceParams.sampleBase;							\
+								rays->bias			=	scratch->traceParams.bias;									\
+								rays->maxDist		=	scratch->traceParams.maxDist;								\
 								movvv(rays->gatherDir,D);															\
 								movvv(rays->gatherP,P);																\
 								movvv(rays->dPdu,dPdu);																\

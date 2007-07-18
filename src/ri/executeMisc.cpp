@@ -821,8 +821,8 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 
 #define	sampleRay(__from,__dir)				\
 	vector	tmp0,tmp1;						\
-	mulvf(tmp0,rays->dPdu,(urand()-0.5f)*sampleBase);	\
-	mulvf(tmp1,rays->dPdv,(urand()-0.5f)*sampleBase);	\
+	mulvf(tmp0,rays->dPdu,(urand()-0.5f)*rays->sampleBase);	\
+	mulvf(tmp1,rays->dPdv,(urand()-0.5f)*rays->sampleBase);	\
 	addvv(__from,tmp0,tmp1);				\
 	addvv(__from,rays->P);					\
 	mulvf(tmp0,rays->dDdu,urand()-0.5f);	\
@@ -841,10 +841,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	CTransmissionRay	**raysBase;
 	CTransmissionRay	*cRay,**cRays;
 	const CShadingScratch	*scratch	=	&(currentShadingState->scratch);
-	const float			bias			=	scratch->shadowBias;
-	const float			sampleBase		=	scratch->sampleBase;
 	const int			shootStep		=	CRenderer::shootStep;
-	const float			maxDist			=	scratch->maxDist;
 	int					numRemaining	=	shootStep;
 	int					currentSample;
 	int					i;
@@ -852,7 +849,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	vector				dir;
 
 	// Set the ray label we're tracing
-	if ((bundle.label = scratch->label) == NULL)	bundle.label	=	rayLabelTransmission;
+	if ((bundle.label = scratch->traceParams.label) == NULL)	bundle.label	=	rayLabelTransmission;
 
 	// Allocate temp memory
 	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
@@ -891,8 +888,8 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 			if (dotvv(cRay->dir,cRay->dir) > C_EPSILON) {
 
 				movvv(cRay->from,from);
-				cRay->t				=	min(maxDist,d) - bias;
-				cRay->tmin			=	bias;
+				cRay->t				=	min(rays->maxDist,d) - rays->bias;
+				cRay->tmin			=	rays->bias;
 				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 				cRay->dest			=	rays->C;
@@ -950,8 +947,6 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 	CTraceRay			*exteriorRayBase,*cExteriorRay;
 	CTraceRay			**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
 	const CShadingScratch	*scratch	=	&(currentShadingState->scratch);
-	const float			bias			=	scratch->shadowBias;
-	const float			sampleBase		=	scratch->sampleBase;
 	const int			shootStep		=	CRenderer::shootStep;
 	int					numInteriorRemaining	=	shootStep;
 	int					numExteriorRemaining	=	shootStep;
@@ -965,12 +960,12 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 	CShaderInstance *exteriorShader	=	cAttr->exterior;
 	
 	// Set the ray label
-	if (scratch->label == NULL)	{
+	if (scratch->traceParams.label == NULL)	{
 		exteriorBundle.label	=	rayLabelTransmission;
 		interiorBundle.label	=	rayLabelTransmission;
 	} else {
-		exteriorBundle.label	=	scratch->label;
-		interiorBundle.label	=	scratch->label;
+		exteriorBundle.label	=	scratch->traceParams.label;
+		interiorBundle.label	=	scratch->traceParams.label;
 	}
 	
 	// Allocate temp memory
@@ -1016,7 +1011,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 				movvv(cRay->from,from);
 				cRay->time			=	(urand() + currentSample - 1) * multiplier;
 				cRay->t				=	C_INFINITY;
-				cRay->tmin			=	bias;
+				cRay->tmin			=	rays->bias;
 				cRay->flags			=	ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;
 				cRay->dest			=	rays->C;
 				cRay->multiplier	=	multiplier;

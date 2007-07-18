@@ -857,7 +857,7 @@ public:
 						}
 
 	void				lookup(float *result,float s,float t,CShadingContext *context) {
-							const float	fill	=	context->currentShadingState->scratch.fill;
+							const float	fill	=	context->currentShadingState->scratch.textureParams.fill;
 
 							// Do the s mode
 							switch(layers[0]->sMode) {
@@ -934,7 +934,7 @@ public:
 							d			=	ds*ds + dt*dt;
 							diag		=	min(d,diag);
 
-							diag		+=	scratch->blur*scratch->blur*width*height;
+							diag		+=	scratch->textureParams.blur*scratch->textureParams.blur*width*height;
 
 																	// Find the layer that we want to probe
 							l			=	(logf(diag)*0.5f*(1/logf(2.0f)));
@@ -949,7 +949,8 @@ public:
 							offset		=	min(offset,1);
 
 							initv(result,0,0,0);					// Result is black
-							for (i=(int) scratch->numSamples;i>0;i--) {
+							//for (i=(int) scratch->samples;i>0;i--) {
+							for (i=1;i>0;i--) {
 								float			r[2];
 								float			s,t;
 								vector			C,CC0,CC1;
@@ -962,7 +963,7 @@ public:
 								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
 														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
 
-								contribution		=	scratch->filter(r[0]-0.5f,r[1]-0.5f,1,1);
+								contribution		=	scratch->textureParams.filter(r[0]-0.5f,r[1]-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								// Do the s mode
@@ -1043,7 +1044,7 @@ public:
 
 
 	void				lookup(float *result,float s,float t,CShadingContext *context) {
-							const float	fill	=	context->currentShadingState->scratch.fill;
+							const float	fill	=	context->currentShadingState->scratch.textureParams.fill;
 
 							// Do the s mode
 							switch(layer->sMode) {
@@ -1090,7 +1091,8 @@ public:
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
 
 							initv(result,0,0,0);		// Result is black
-							for (i=(int) scratch->numSamples;i>0;i--) {
+							//for (i=(int) scratch->samples;i>0;i--) {
+							for (i=1;i>0;i--) {
 								float			s,t;
 								vector			C;
 								float			contribution;
@@ -1102,14 +1104,14 @@ public:
 														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
 								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
 														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
-								contribution		=	scratch->filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
+								contribution		=	scratch->textureParams.filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
 								totalContribution	+=	contribution;
 
-								if (scratch->blur > 0) {
+								if (scratch->textureParams.blur > 0) {
 									context->random2d.get(r);
 
-									s				+=	scratch->blur*(r[0] - 0.5f);
-									t				+=	scratch->blur*(r[1] - 0.5f);
+									s				+=	scratch->textureParams.blur*(r[0] - 0.5f);
+									t				+=	scratch->textureParams.blur*(r[1] - 0.5f);
 								}
 
 								// Do the s mode
@@ -1195,26 +1197,22 @@ public:
 							addvv(center,D3);
 							mulvf(center,0.25f);
 
-							// Apply the filter width
+							// FIXME: Apply the blur
 							subvv(S0,D0,center);
-							mulvf(S0,scratch->width*2);
 							addvv(S0,center);
 
 							subvv(S1,D1,center);
-							mulvf(S1,scratch->width*2);
 							addvv(S1,center);
 
 							subvv(S2,D2,center);
-							mulvf(S2,scratch->width*2);
 							addvv(S2,center);
 
 							subvv(S3,D3,center);
-							mulvf(S3,scratch->width*2);
 							addvv(S3,center);
 
 
 							result[0]	=	0;
-							for (i=(int) scratch->numSamples;i>0;i--) {
+							for (i=(int) scratch->traceParams.samples;i>0;i--) {
 								float	x,y;
 								float	s,t;
 								float	C;
@@ -1226,7 +1224,7 @@ public:
 
 								x					=	r[0];
 								y					=	r[1];
-								contribution		=	scratch->filter(x - 0.5f,y - 0.5f,1,1);
+								contribution		=	scratch->textureParams.filter(x - 0.5f,y - 0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(S0[COMP_X]*(1-x) + S1[COMP_X]*x)*(1-y) + (S2[COMP_X]*(1-x) + S3[COMP_X]*x)*y;
@@ -1238,16 +1236,16 @@ public:
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
 								
-								if (scratch->blur > 0) {
-									s				+=	scratch->blur*(r[2] - 0.5f);
-									t				+=	scratch->blur*(r[3] - 0.5f);
+								if (scratch->textureParams.blur > 0) {
+									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
+									t				+=	scratch->textureParams.blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
 									continue;
 								}
 
-								C	=	side->lookupz(s,t,tmp[2]-scratch->shadowBias,context);
+								C	=	side->lookupz(s,t,tmp[2]-scratch->traceParams.bias,context);
 
 								result[0]			+=	C*contribution;
 							}
@@ -1365,7 +1363,7 @@ public:
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
-							for (i=(int) scratch->numSamples;i>0;i--) {
+							for (i=(int) scratch->traceParams.samples;i>0;i--) {
 								float		s,t,w;
 								float		contribution;
 								float		tmp[4],cP[4];
@@ -1379,7 +1377,7 @@ public:
 
 								const float x		=	r[0];
 								const float y		=	r[1];
-								contribution		=	scratch->filter(x - 0.5f,y - 0.5f,1,1);
+								contribution		=	scratch->textureParams.filter(x - 0.5f,y - 0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
@@ -1391,9 +1389,9 @@ public:
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
 								
-								if (scratch->blur > 0) {
-									s				+=	scratch->blur*(r[2] - 0.5f);
-									t				+=	scratch->blur*(r[3] - 0.5f);
+								if (scratch->textureParams.blur > 0) {
+									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
+									t				+=	scratch->textureParams.blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
@@ -1402,7 +1400,7 @@ public:
 
 								s					*=	header.xres;
 								t					*=	header.yres;
-								w					=	tmp[2] - scratch->shadowBias;
+								w					=	tmp[2] - scratch->traceParams.bias;
 
 								px					=	(int) floor(s);
 								py					=	(int) floor(t);
@@ -1606,7 +1604,7 @@ public:
 
 							if (dotvv(D0,D0) == 0)	return;
 
-							for (i=(int) scratch->numSamples;i>0;i--) {
+							for (i=(int) scratch->traceParams.samples;i>0;i--) {
 								float	t;
 								float	contribution;
 								float	r[2];
@@ -1615,7 +1613,7 @@ public:
 
 								const float x		=	r[0];
 								const float y		=	r[1];
-								contribution		=	scratch->filter(x - (float) 0.5,y - (float) 0.5,1,1);
+								contribution		=	scratch->textureParams.filter(x - (float) 0.5,y - (float) 0.5,1,1);
 								totalContribution	+=	contribution;
 
 								D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
@@ -1853,7 +1851,7 @@ float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) 
 // Return Value			:
 // Comments				:
 void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context) { 
-	initv(dest,context->currentShadingState->scratch.fill);
+	initv(dest,context->currentShadingState->scratch.textureParams.fill);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1863,7 +1861,7 @@ void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context
 // Return Value			:
 // Comments				:
 void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingContext *context) { 
-	initv(dest,context->currentShadingState->scratch.fill);
+	initv(dest,context->currentShadingState->scratch.textureParams.fill);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1873,7 +1871,7 @@ void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingC
 // Return Value			:
 // Comments				:
 void		CDummyEnvironment::lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
-	initv(dest,context->currentShadingState->scratch.fill);
+	initv(dest,context->currentShadingState->scratch.textureParams.fill);
 }
 
 

@@ -421,7 +421,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 // Comments				:
 void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const float *dPdvl,const float *Nl,CShadingContext *context) {
 	const CShadingScratch	*scratch		=	&(context->currentShadingState->scratch);
-	const float				maxsolidangle	=	scratch->maxsolidangle;
+	const float				maxsolidangle	=	scratch->occlusionParams.maxSolidAngle;
 	int						*stack			=	(int *) alloca(POINTHIERARCHY_STACK_SIZE*sizeof(int));
 	int						*stackBase		=	stack;
 	int						i;

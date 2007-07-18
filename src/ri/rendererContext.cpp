@@ -2590,7 +2590,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 			for (i=0;i<n;i++) {
 				if (FALSE) {
 				attributeCheckFlag(RI_DISPLACEMENTS,	attributes->flags,									ATTRIBUTES_FLAGS_DISPLACEMENTS)
-				attributeCheck(RI_BIAS,					attributes->shadowBias,								-C_INFINITY,C_INFINITY,float)
+				attributeCheck(RI_BIAS,					attributes->bias,									-C_INFINITY,C_INFINITY,float)
 				attributeCheck(RI_MAXDIFFUSEDEPTH,		attributes->maxDiffuseDepth,						0,C_INFINITY,int)
 				attributeCheck(RI_MAXSPECULARDEPTH,		attributes->maxSpecularDepth,						0,C_INFINITY,int)
 				attributeEndCheck

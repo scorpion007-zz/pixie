@@ -46,14 +46,12 @@ const	unsigned int		ATTRIBUTES_FLAGS_CUSTOM_ST					=	1 << 1;		// Explicit surfac
 const	unsigned int		ATTRIBUTES_FLAGS_MATTE						=	1 << 2;		// The object is matte
 const	unsigned int		ATTRIBUTES_FLAGS_CUSTOM_BOUND				=	1 << 3;		// The bound of the object is explicitly set
 const	unsigned int		ATTRIBUTES_FLAGS_BINARY_DICE				=	1 << 4;		// Use binary dicing on the surface
-const	unsigned int		ATTRIBUTES_FLAGS_SINGULARITYFIX				=	1 << 5;		// Fix the possible surface singularities
 const	unsigned int		ATTRIBUTES_FLAGS_PRIMARY_VISIBLE			=	1 << 6;		// The primitive is visible to the primary rays
 const	unsigned int		ATTRIBUTES_FLAGS_PHOTON_VISIBLE				=	1 << 7;		// The primitive is visible to the photon rays
 const	unsigned int		ATTRIBUTES_FLAGS_SPECULAR_VISIBLE			=	1 << 9;		// The primitive is visible to the gather/trace/environment rays
 const	unsigned int		ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE			=	1 << 10;	// The primitive is visible to the gather/occlusion/diffuse rays
 const	unsigned int		ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE		=	1 << 11;	// The primitive is visible to the transmission/shadow rays
 const	unsigned int		ATTRIBUTES_FLAGS_DISPLACEMENTS				=	1 << 14;	// The primitive is visible to the photon rays
-const	unsigned int		ATTRIBUTES_FLAGS_IMMEDIATE_RENDERING		=	1 << 16;	// We do immediate rendering
 const	unsigned int		ATTRIBUTES_FLAGS_ILLUMINATE_FRONT_ONLY		=	1 << 17;	// During the photon tracing, only photons that hit the front will be traced
 const	unsigned int		ATTRIBUTES_FLAGS_LOD						=	1 << 18;	// A detail range has been specified
 const	unsigned int		ATTRIBUTES_FLAGS_DISCARD_GEOMETRY			=	1 << 19;	// Discard geometry calls
@@ -143,7 +141,7 @@ public:
 		int					numUProbes,numVProbes;						// The samples to gather when estimating the extend of a patch
 		int					minSplits;									// The minimum number of splits
 		float				rasterExpand;								// The expansion coefficient during the sampling
-		float				shadowBias;									// The bias amount expressed in the camera coordinates
+		float				bias;										// The bias amount expressed in the camera coordinates
 
 		char				transmissionHitMode;						// Either: 'p' = Look at the primitive   or   's' = Execute the shader
 		char				specularHitMode;							// Either: 'p' = Look at the primitive   or   's' = Execute the shader

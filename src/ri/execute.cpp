@@ -233,29 +233,10 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		operandVaryingStep(i)			code->arguments[i].varyingStep
 
-// This is the default action to be performed for unrecognised parameters
-#define		plDefault						error(CODE_BADTOKEN,"Unknown parameter: \"%s\"\n",*param);
-
-// This macro can be used to bind a particular variable in scratch
-#define		plBind(__start,__var)			{																					\
-												const int	opIndex	=	i+__start;												\
-												CPLLookup::TParamBinding	*cBinding;											\
-												if (operandVaryingStep(opIndex) == 0) {											\
-													cBinding	=	uniforms + numUniforms++;									\
-												} else {																		\
-													cBinding	=	varyings + numVaryings++;									\
-												}																				\
-																																\
-												cBinding->step		=	operandBytesPerItem(opIndex)*operandNumItems(opIndex);	\
-												cBinding->opIndex	=	opIndex;												\
-												cBinding->dest		=	(char *) &(currentShadingState->scratch.__var) - (char *) &(currentShadingState->scratch);	\
-												lookup->size		+=	cBinding->step;											\
-											}
 
 // Use this macro to start processing a parameter list
-#define		plBegin(__class,__start,__default)																		\
-											/* Create a hash ID using shader and instruction */						\
-											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code) & (PL_HASH_SIZE-1);		\
+#define		plBegin(__class,__start)		/* Create a hash key using shader and instruction */						\
+											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code / sizeof(TCode)) & (PL_HASH_SIZE-1);		\
 											__class		*lookup;													\
 																													\
 											/* Look at the hash to see if we've computed this before	*/			\
@@ -265,10 +246,15 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												if ((lookup->instance != cInstance) || (lookup->code != code)) {	\
 													/* Delete the old lookup */										\
 													delete lookup;													\
+													/* FIXME: We don't have to delete on collision */				\
 												}																	\
 																													\
 												/* Get the number of arguments we have */							\
-												const int	num	=	code->numArguments - __start;					\
+												const int	num			=	code->numArguments;						\
+																													\
+												/* Allocate temporary memory */										\
+												CPLLookup::TParamBinding	*uniforms	=	(CPLLookup::TParamBinding *) ralloc(num*2*sizeof(CPLLookup::TParamBinding),threadMemory);	\
+												CPLLookup::TParamBinding	*varyings	=	uniforms + num;			\
 																													\
 												/* Create a new lookup	*/											\
 												lookup					=	new __class;							\
@@ -276,46 +262,41 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												lookup->code			=	code;									\
 												lookup->size			=	0;										\
 												plHash[hashKey]			=	lookup;									\
-												int							numUniforms	=	0;						\
-												int							numVaryings	=	0;						\
-												CPLLookup::TParamBinding	*uniforms	=	(CPLLookup::TParamBinding *) ralloc(num*2*sizeof(CPLLookup::TParamBinding),threadMemory);	\
-												CPLLookup::TParamBinding	*varyings	=	uniforms + num;			\
+												lookup->uniforms		=	uniforms;								\
+												lookup->varyings		=	varyings;								\
 																													\
 												/* Decode the PL */													\
-												for (int i=0;i<num;i++) {											\
-																													\
+												for (int i=__start;i<num;++i) {										\
+													/* Get the parameter name */									\
 													const char **param;												\
-													operand(i+__start,param,const char **);							\
+													operand(i,param,const char **);									\
+													/* Get the parameter info */									\
+													i++;															\
+													const int	uniform	=	operandVaryingStep(i) == 0;				\
+													const int	step	=	operandBytesPerItem(i)*operandNumItems(i);	\
+													/* Decode the data only for uniform parameters */				\
+													void		*data	=	NULL;									\
+													if (uniform) {	operand(i,data,void *);	}						\
 																													\
-													if (strcmp(*param,"blur") == 0) {								\
-														i++;														\
-														plBind(__start,blur);										\
-													} else if (strcmp(*param,"width") == 0) {						\
-														i++;														\
-														plBind(__start,width);										\
-													} else if (strcmp(*param,"swidth") == 0) {						\
-														i++;														\
-														plBind(__start,swidth);										\
-														/* FIXME: Add all other possible PL variables */			\
-													} else {														\
-														__default;													\
-													}																\
+													/* Ask the lookup to find the variable */						\
+													lookup->bind(*param,i,step,data);								\
 												}																	\
-												lookup->numUniforms		=	numUniforms;							\
-												lookup->numVaryings		=	numVaryings;							\
-												lookup->uniforms		=	new CPLLookup::TParamBinding[numUniforms+numVaryings];		\
-												lookup->varyings		=	lookup->uniforms + numUniforms;								\
-												memcpy(lookup->uniforms,uniforms,numUniforms*sizeof(CPLLookup::TParamBinding));			\
-												memcpy(lookup->varyings,varyings,numVaryings*sizeof(CPLLookup::TParamBinding));			\
+																													\
+												/* Allocate the final memory for the bound variables */				\
+												lookup->uniforms	=	new CPLLookup::TParamBinding[lookup->numUniforms+lookup->numVaryings];		\
+												lookup->varyings	=	lookup->uniforms + lookup->numUniforms;		\
+												/* Copy the saved data over to the final resting place */			\
+												memcpy(lookup->uniforms,uniforms,lookup->numUniforms*sizeof(CPLLookup::TParamBinding));	\
+												memcpy(lookup->varyings,varyings,lookup->numVaryings*sizeof(CPLLookup::TParamBinding));	\
 											}																		\
 																													\
 											/* Init the varyings	*/												\
-											char	*savedVariables	=	(char *) ralloc(lookup->size,threadMemory);	\
+											char	*savedVariables	=	(char *) ralloc(lookup->size + lookup->numVaryings*sizeof(char *),threadMemory);	\
 											char	*space			=	savedVariables;								\
-											char	**PL_VARIABLES	=	(char **) ralloc(lookup->numVaryings*sizeof(char *),threadMemory);	\
-											const CPLLookup::TParamBinding	*cBinding	=	lookup->varyings;								\
+											char	**PL_VARIABLES	=	(char **) (space + lookup->size);			\
+											const CPLLookup::TParamBinding	*cBinding	=	lookup->varyings;		\
 											CShadingScratch					*scratch	=	&(currentShadingState->scratch);	\
-											for (int var=0;var<lookup->numVaryings;var++,cBinding++) {				\
+											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
 												operand(cBinding->opIndex,PL_VARIABLES[var],char *);				\
 												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
 												space	+=	cBinding->step;											\
@@ -324,7 +305,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 																													\
 											/* Init the uniforms	*/												\
 											cBinding	=	lookup->uniforms;										\
-											for (int var=0;var<lookup->numUniforms;var++,cBinding++) {				\
+											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
 												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
 												space	+=	cBinding->step;											\
 												align64(space);														\
@@ -335,36 +316,28 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 // Use this macro to get the scratch variables updated
 #define		plReady()						cBinding	=	lookup->varyings;										\
-											for (int var=0;var<lookup->numVaryings;var++,cBinding++) {				\
+											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
 												memcpy((char *) scratch + cBinding->dest,PL_VARIABLES[var],cBinding->step);	\
 											}
 
 // Use this variable to step over the variables defined in the parameter list
-#define		plStep()						for (int var=0;var<lookup->numVaryings;var++) {							\
+#define		plStep()						for (int var=0;var<lookup->numVaryings;++var) {							\
 												PL_VARIABLES[var]	+=	lookup->varyings[var].step;					\
 											}
 // Use this macro to restore the scratch variables that have been overwritten
 #define		plEnd()							space		=	savedVariables;											\
 											cBinding	=	lookup->varyings;										\
-											for (int var=0;var<lookup->numUniforms;var++,cBinding++) {				\
+											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
 												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
 												space	+=	cBinding->step;											\
 												align64(space);														\
 											}																		\
 											cBinding	=	lookup->uniforms;										\
-											for (int var=0;var<lookup->numUniforms;var++,cBinding++) {				\
+											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
 												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
 												space	+=	cBinding->step;											\
 												align64(space);														\
 											}
-
-// Use this macro to overwrite a scratch variable from attributes
-#define		plSave(__type,__var)			__type	saved__var	=	scratch->__var;									\
-											if (scratch__var == 0)	saved__var	=	currentAttributes->__var;
-
-
-// Use this macro in the post to restore the value of that variable
-#define		plRestore(__var)				scratch->__var		=	saved__var;
 
 //	Retrieve an integer operand (label references are integer)
 #define		argument(i)						code->arguments[i].index
