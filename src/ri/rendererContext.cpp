@@ -4435,7 +4435,7 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 	}
 }
 
-void	*CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+void	CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
 
 	// Make sure we have the temporary directory created
 	if (!osFileExists(CRenderer::temporaryPath))	osCreateDir(CRenderer::temporaryPath);
@@ -4447,8 +4447,6 @@ void	*CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],vo
 	// Save the interface
 	savedRenderMan	=	renderMan;
 	renderMan		=	new CRibOut(fileName);
-
-	return NULL;
 }
 
 void	CRendererContext::RiArchiveEnd(void) {
