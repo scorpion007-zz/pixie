@@ -556,7 +556,7 @@ ifExpr:			//////////////////////////////////////////////////////////////////////
 				{
 					$$.type			=	TYPE_STRING;
 					$$.value		=	NULL;
-					$$.stringValue	=	(char *) ralloc(strlen(getString($3)) + strlen(getString($5)) + 2,CRenderer::globalMemory);
+					$$.stringValue	=	(char *) ralloc((int) strlen(getString($3)) + (int) strlen(getString($5)) + 2,CRenderer::globalMemory);
 					strcpy($$.stringValue,getString($3));
 					strcat($$.stringValue,getString($5));
 				}
