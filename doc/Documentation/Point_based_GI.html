@@ -1,0 +1,508 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="robots" content="noindex,follow" />
+		<meta name="keywords" content="Documentation/Point based GI" />
+		<link rel="shortcut icon" href="../favicon.ico" />
+		<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
+		<title>Documentation/Point based GI - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?63"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?63" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?63" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?63";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?63";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?63";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?63";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?63"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "../css/";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/Point_based_GI";
+var wgTitle = "Documentation/Point based GI";
+var wgAction = "view";
+var wgArticleId = "1708";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserGroups = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "3196";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+	</head>
+<body  class="mediawiki ns-0 ltr page-Documentation_Point_based_GI">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="contentTop" id="top"></a>
+				<h1 class="firstHeading">Documentation/Point based GI</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Documentation.html" title="Documentation">Documentation</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+</p>
+<table id="toc" class="toc" summary="Contents"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1"><a href="#Point_Based_Occlusion"><span class="tocnumber">1</span> <span class="toctext">Point Based Occlusion</span></a>
+<ul>
+<li class="toclevel-2"><a href="#baking_out_area"><span class="tocnumber">1.1</span> <span class="toctext">baking out area</span></a></li>
+<li class="toclevel-2"><a href="#point_based_occlusion"><span class="tocnumber">1.2</span> <span class="toctext">point based occlusion</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1"><a href="#Point_Based_color_Bleeding"><span class="tocnumber">2</span> <span class="toctext">Point Based color Bleeding</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Pass_1.2C_the_bake"><span class="tocnumber">2.1</span> <span class="toctext">Pass 1, the bake</span></a></li>
+<li class="toclevel-2"><a href="#rendering_point_based_color_bleeding"><span class="tocnumber">2.2</span> <span class="toctext">rendering point based color bleeding</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1"><a href="#Overview"><span class="tocnumber">3</span> <span class="toctext">Overview</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Baking_out"><span class="tocnumber">3.1</span> <span class="toctext">Baking out</span></a></li>
+<li class="toclevel-2"><a href="#Rendering"><span class="tocnumber">3.2</span> <span class="toctext">Rendering</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<a name="Point_Based_Occlusion"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=1" title="Edit section: Point Based Occlusion">edit</a>]</span> <span class="mw-headline"> Point Based Occlusion </span></h1>
+<p>Point based occlusion works by first baking out the micropolygon areas of your scene.  This is done with the <tt>bake3d()</tt> shadeop.  This results in a point cloud with the areas in it.  It is important to bake out the area in a channel called <tt>_area</tt>.
+</p><p>This point cloud is read in a second pass using the <tt>occlusion()</tt> shadop, and specifying to use point based occlusion by passing <tt>"pointbased",1</tt> in the argument list to <tt>occlusion()</tt>.  The filename of the point cloud is specified by passing <tt>"filename","path/to/area.ptc"</tt> in the argument list to <tt>occlusion()</tt>.  The first time that Pixie sees this the occlusion shadeop in point based mode, it will process the point cloud to allow for fast point based occlusion to be computed.  Quality is controlled with the <tt>"maxsolidangle"</tt> parameter which is the maximum solid anbgle in steradians that is permitted for computation of the occlusion.  Smaller numbers are more accurate but slower.
+</p>
+<a name="baking_out_area"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=2" title="Edit section: baking out area">edit</a>]</span> <span class="mw-headline"> baking out area </span></h2>
+<p>This rib
+</p>
+<pre>DisplayChannel "float _area"
+
+FrameBegin 1
+       Format 400 300 1
+       PixelSamples 4 4	
+       ShadingInterpolation "smooth"
+       Display "ambient occlusion.tiff" "framebuffer" "rgba"  # render image to buffer
+       Projection "perspective" "fov" 22
+       Translate 0 -0.5 8
+       Rotate -40 1 0 0
+       Rotate -20 0 1 0 
+       
+       WorldBegin
+               # these attributes are important for point based occlusion to work
+               Attribute "cull" "backfacing" 0
+               Attribute "cull" "hidden" 0
+               Attribute "dice" "rasterorient" 0
+               
+               ShadingRate 5   # You can afford to bake out a higher shading rate
+               Surface "bake_areas" "filename" "areacloud.ptc"
+               
+               # White ground plane
+               AttributeBegin	
+               	  Color [1 1 1]
+                 Polygon "P" [ -5 0 5  5 0 5  5 0 -5  -5 0 -5 ] "uniform normal N" [0 1 0]
+               AttributeEnd
+               
+               # sphere
+               AttributeBegin
+                 Color 1 1 1
+                 Translate -0.7 0.5 0
+                 Sphere 0.5 -0.5 0.5 360
+               AttributeEnd
+              
+               # box
+               AttributeBegin
+                 Translate 0.3 0.01 0
+                 Rotate -30 0 1 0
+                 Color [1 1 1]
+                 Polygon "P" [ 0 0 0  0 0 1  0 1 1  0 1 0 ] "uniform normal N" [-1 0 0]	# left side
+                 Polygon "P" [ 1 1 0  1 1 1  1 0 1  1 0 0 ] "uniform normal N" [1 0 0]	# right side
+                 Color [1 1 1]
+                 Polygon "P" [ 0 1 0  1 1 0  1 0 0  0 0 0 ] "uniform normal N" [0 0 -1]	# front side
+                 Polygon "P" [ 0 0 1  1 0 1  1 1 1  0 1 1 ] "uniform normal N" [0 0 1]	# back side
+                 Color [ 1 1 1]
+                 Polygon "P" [ 0 1 1  1 1 1  1 1 0  0 1 0 ] "uniform normal N" [0 1 0]	# top
+               AttributeEnd
+	WorldEnd
+FrameEnd
+</pre>
+<p>With this surface shader:
+</p>
+<pre>surface bake_areas(string filename="")
+{
+	normal 	Nn = normalize(N);
+
+	float a = area(P,"dicing");
+	bake3d(filename,"_area",P,Nn,"interpolate",1,"_area",a);
+
+	// Set Ci and Oi
+	Ci = Cs * Os * (-normalize(I).Nn);
+	Oi=Os;
+} 
+</pre>
+<p>Will bake out the areas.
+</p>
+<a name="point_based_occlusion"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=3" title="Edit section: point based occlusion">edit</a>]</span> <span class="mw-headline"> point based occlusion </span></h2>
+<p>This rib
+</p>
+<pre>DisplayChannel "float _area"
+
+FrameBegin 1
+	Format 400 300 1
+	PixelSamples 4 4	
+	ShadingInterpolation "smooth"
+	Display "ambient occlusion.tiff" "framebuffer" "rgba"  # render image to buffer
+ 	Projection "perspective" "fov" 22
+	Translate 0 -0.5 8
+	Rotate -40 1 0 0
+	Rotate -20 0 1 0 
+
+WorldBegin
+            Surface "ptocclude" "filename" "areacloud.ptc" "maxsolidangle" 0.1 #0.05  #0.05
+            
+            # White ground plane
+            AttributeBegin
+                         Color [1 1 1]
+                         Polygon "P" [ -5 0 5  5 0 5  5 0 -5  -5 0 -5 ] "uniform normal N" [0 1 0]
+            AttributeEnd
+            
+            # sphere
+            AttributeBegin
+                         Color 1 1 1
+                         Translate -0.7 0.5 0
+                         Attribute "dice" "binary" 1
+                         Sphere 0.5 -0.5 0.5 360
+            AttributeEnd
+
+            # box
+            AttributeBegin
+                         Translate 0.3 0.01 0
+                         Rotate -30 0 1 0
+                         Color [1 1 1] 
+                         Polygon "P" [ 0 0 0  0 0 1  0 1 1  0 1 0 ] "uniform normal N" [-1 0 0]  # left side
+                         Polygon "P" [ 1 1 0  1 1 1  1 0 1  1 0 0 ] "uniform normal N" [1 0 0]   # right side
+                         Color [1 1 1]
+                         Polygon "P" [ 0 1 0  1 1 0  1 0 0  0 0 0 ] "uniform normal N" [0 0 -1]  # front side
+                         Polygon "P" [ 0 0 1  1 0 1  1 1 1  0 1 1 ] "uniform normal N" [0 0 1]   # back side
+                         Color [ 1 1 1]
+                         Polygon "P" [ 0 1 1  1 1 1  1 1 0  0 1 0 ] "uniform normal N" [0 1 0]   # top
+            AttributeEnd
+	WorldEnd
+FrameEnd
+</pre>
+<p>Combined with this shader:
+</p>
+<pre>surface ptocclude(string filename="";float maxsolidangle=0.05)
+{
+	normal 	Ns = faceforward (normalize(N), I);
+	float		occ = 0;
+
+	// Compute occlusion
+	occ = occlusion(P, Ns, 0, "pointbased",1,"filename",filename,"maxsolidangle",maxsolidangle);
+</pre>
+<pre>	// Set Ci and Oi
+	Ci = (1 - occ) * Cs * Os;
+	Oi=Os;
+}
+</pre>
+<p>Will result in this image:
+</p><p><a href="images/Pointbased_occlude.png" class="image" title="Image:Pointbased occlude.png"><img alt="Image:Pointbased occlude.png" longdesc="images/Pointbased_occlude.png" src="../images/Pointbased_occlude.png" width="400" height="300" /></a>
+</p>
+<a name="Point_Based_color_Bleeding"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=4" title="Edit section: Point Based color Bleeding">edit</a>]</span> <span class="mw-headline"> Point Based color Bleeding </span></h1>
+<p>Much like point based occlusion, point based color bleeding is a two-pass technique.  A point cloud is baked out using <tt>bake3d()</tt>, however, this time you must bake both <tt>_area</tt> and <tt>_radiance</tt>.  The radiance value should be baked out to include the direct lighting contribution.
+</p><p>In a second pass, <tt>indirectdiffuse()</tt> take <tt>"pointbased",1</tt> to enable point based color bleeding.  The point cloud is specified using <tt>"filename","path/to/radiance.ptc"</tt> in the arguments to <tt>indirectdiffuse()</tt>.  Again, the <tt>"maxsolidangle"</tt> parameter controls quality vs speed.
+</p>
+<a name="Pass_1.2C_the_bake"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=5" title="Edit section: Pass 1, the bake">edit</a>]</span> <span class="mw-headline"> Pass 1, the bake </span></h2>
+<p>This rib is used to generate the point cloud
+</p>
+<pre>FrameBegin 1
+     Format 400 400 1
+     ShadingInterpolation "smooth"
+     PixelSamples 4 4
+     Display "cornell_a.tif" "framebuffer" "rgba"
+     Display "+cornell_bake.tif" "file" "rgba"
+     Projection "perspective" "fov" 30
+     Translate 0 0 5
+     
+     ShadingRate 16			# No need to use low shading rate
+     
+     DisplayChannel "float _area"
+     DisplayChannel "color _radiosity"
+     DisplayChannel "color Cs"
+     
+     WorldBegin
+     
+       Attribute "cull" "hidden" 0   # Bake out hidden faces
+       Attribute "cull" "backfacing" 0 # Bake out back faces
+       Attribute "dice" "rasterorient" 0   # view-independent dicing
+       
+       LightSource "cosinelight_rts" 1 "from" [0 1.0001 0] "intensity" 4
+       
+       Surface "bake_radiosity" "displaychannels" "_area,_radiosity"
+       	"bakefile" "cornell_radio.ptc" "Kd" 0.8
+       
+       # Matte box
+       AttributeBegin
+         Color [1 0 0]
+         Polygon "P" [ -1 1 -1  -1 1 1  -1 -1 1  -1 -1 -1 ]	"uniform normal N" [1 0 0]	# left wall
+         Color [0 0 1]
+         Polygon "P" [ 1 -1 -1  1 -1 1  1 1 1  1 1 -1 ]		"uniform normal N" [-1 0 0] # right wall
+         Color [1 1 1]
+         Polygon "P" [ -1 1 1  1 1 1  1 -1 1  -1 -1 1 ]		"uniform normal N" [0 0 -1] # back wall
+         Polygon "P" [ -1 1 -1  1 1 -1  1 1 1  -1 1 1 ]		"uniform normal N" [0 -1 0]	# ceiling
+         Polygon "P" [ -1 -1 1  1 -1 1  1 -1 -1  -1 -1 -1 ]	"uniform normal N" [0 1 0]	# floor
+       AttributeEnd
+       
+       Attribute "visibility" "int transmission" 1
+       Attribute "shade" "transmissionhitmode" "primitive" # the spheres cast shadows
+       
+       # Left sphere (mirror set to black in this pass)
+       AttributeBegin
+         color [0 0 0]
+         Translate -0.3 -0.69 0.3
+         Sphere 0.3  -0.3 0.3  360
+       AttributeEnd
+       
+       # Right sphere (matte)
+       AttributeBegin
+         Translate 0.3 -0.69 -0.3
+         Sphere 0.3  -0.3 0.3  360
+       AttributeEnd
+     WorldEnd
+   FrameEnd
+</pre>
+<p>This is the light shader
+</p>
+<pre> light
+cosinelight_rts(
+	float intensity = 1;
+	color lightcolor = 1;
+	float falloff = 2; // default: inverse square fall-off
+	point from = point "shader" (0,0,0); // light position
+	vector dir = (0, -1, 0);
+)
+{
+	illuminate(from, dir, PI/2) {
+		float dist = length(L);
+		Cl = intensity * lightcolor * pow (dist, -falloff); // fall-off
+		Cl *= (L.dir) / (length(L) * length(dir)); // cosine term
+		Cl *= transmission(Ps, from); // ray traced shadow
+	}
+}
+</pre>
+<p>Here is the baking shader.  Note the use of <tt>area(P,"dicing")</tt> to save out the micropolygon areas, rather than the snooth shading areas.
+</p>
+<pre>surface
+   bake_radiosity(string bakefile = "", displaychannels = "";
+                   float Ka = 1, Kd = 1)
+   {
+     color irrad;
+     normal Nn = normalize(N);
+     float a = area(P, "dicing"); // micropolygon area
+     
+     // Compute direct illumination (ambient and diffuse)
+     irrad = Ka*ambient() + Kd*diffuse(Nn);
+     
+     // Compute Ci and Oi
+     Ci = irrad * Cs * Os;
+     Oi = Os;
+     
+     // Store area and Ci in point cloud file
+     bake3d(bakefile, displaychannels, P, Nn, "interpolate", 1,
+            "_area", a, "_radiosity", Ci);
+   }
+</pre>
+<p>The resultant image looks like:
+</p><p><a href="images/Cornell_bake.png" class="image" title="Image:Cornell bake.png"><img alt="Image:Cornell bake.png" longdesc="images/Cornell_bake.png" src="../images/Cornell_bake.png" width="400" height="400" /></a>
+</p><p>You can see the point cloud channels using <tt>show</tt> (use q and w to switch channels):
+</p><p><a href="images/Cornell_ptc.png" class="image" title="Image:Cornell ptc.png"><img alt="Image:Cornell ptc.png" longdesc="images/Cornell_ptc.png" src="../images/Cornell_ptc.png" width="555" height="460" /></a>
+</p>
+<a name="rendering_point_based_color_bleeding"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=6" title="Edit section: rendering point based color bleeding">edit</a>]</span> <span class="mw-headline"> rendering point based color bleeding </span></h2>
+<p>This rib
+</p>
+<pre>  FrameBegin 1
+     Format 400 400 1
+     ShadingInterpolation "smooth"
+     PixelSamples 4 4
+     Display "cornell_pointbased.tif" "framebuffer" "rgba"
+     Display "+cornell_pointbased.tif" "file" "rgba"
+     Projection "perspective" "fov" 30
+     Translate 0 0 5
+     
+     WorldBegin
+     
+       Attribute "visibility" "trace" 1   # make objects visible to refl. rays
+       Attribute "trace" "bias" 0.0001
+       
+       		Surface "pointbasedcolorbleeding" "filename" "cornell_radio.ptc"
+         "maxsolidangle" 0.05
+       
+       # Matte box
+       AttributeBegin
+         Color [1 0 0]
+         Polygon "P" [ -1 1 -1  -1 1 1  -1 -1 1  -1 -1 -1 ]	"uniform normal N" [1 0 0]	# left wall
+         Color [0 0 1]
+         Polygon "P" [ 1 -1 -1  1 -1 1  1 1 1  1 1 -1 ]		"uniform normal N" [-1 0 0] # right wall
+         Color [1 1 1]
+         Polygon "P" [ -1 1 1  1 1 1  1 -1 1  -1 -1 1 ]		"uniform normal N" [0 0 -1] # back wall
+         Polygon "P" [ -1 1 -1  1 1 -1  1 1 1  -1 1 1 ]		"uniform normal N" [0 -1 0]	# ceiling
+         Polygon "P" [ -1 -1 1  1 -1 1  1 -1 -1  -1 -1 -1 ]	"uniform normal N" [0 1 0]	# floor
+       AttributeEnd
+       
+       # Left sphere (chrome)
+       AttributeBegin
+         Surface "mirror"
+         Translate -0.3 -0.69 0.3
+         Sphere 0.3  -0.3 0.3  360
+       AttributeEnd
+       
+       # Right sphere (matte)
+       AttributeBegin
+         Translate 0.3 -0.69 -0.3
+         Sphere 0.3  -0.3 0.3  360
+       AttributeEnd
+     WorldEnd
+   FrameEnd
+</pre>
+<p>With this surface shader
+</p><p><br /> 
+</p>
+<pre>normal shadingnormal(normal Ni) {
+	return faceforward(normalize(Ni),I);
+}
+
+surface 
+	pointbasedcolorbleeding (string filename = "";
+				float maxdist = 1e15,
+				samplebase = 0,
+				maxsolidangle = 0.05;)
+{
+	normal Ns = shadingnormal(N);
+		color irr = indirectdiffuse(P, Ns, 0, "pointbased", 1, "filename", filename,
+					"maxdist", maxdist,
+					"maxsolidangle", maxsolidangle);
+	Ci = Cs*irr*Os;	
+	Oi = Os;
+}
+</pre>
+<p>And results in this image:
+</p><p><a href="images/Cornell_pointbased.png" class="image" title="Image:Cornell pointbased.png"><img alt="Image:Cornell pointbased.png" longdesc="images/Cornell_pointbased.png" src="../images/Cornell_pointbased.png" width="400" height="400" /></a>
+</p>
+<a name="Overview"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=7" title="Edit section: Overview">edit</a>]</span> <span class="mw-headline"> Overview </span></h1>
+<p>Here's a quick summary of how to use point based occlusion / color bleeding in Pixie.
+</p>
+<a name="Baking_out"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=8" title="Edit section: Baking out">edit</a>]</span> <span class="mw-headline"> Baking out </span></h2>
+<ul><li> Use <tt>bake3d()</tt>
+</li><li> Bake out at least <tt>float _area</tt> which should be the result ot <tt>area(P,"dicing")</tt>
+</li><li> Optionally bake out <tt>color _radiance</tt> which is the incoming light for use in color bleeding
+</li><li> When baking out for point based GI, it's particularly important to use the 'bake attributes'
+</li></ul>
+<pre>       Attribute "cull" "hidden" 0   # Bake out hidden surfaces
+       Attribute "cull" "backfacing" 0 # Bake out back faces
+       Attribute "dice" "rasterorient" 0   # view-independent dicing
+</pre>
+<a name="Rendering"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit&amp;section=9" title="Edit section: Rendering">edit</a>]</span> <span class="mw-headline"> Rendering </span></h2>
+<ul><li> use <tt>occlusion(..."pointbased",1,"filename","thepointcloud.ptc")</tt>to get point based occlusion
+</li><li> the <tt>"maxsolidangle"</tt> parameter control quality vs. speed and is the maximum solid angle of an approximate disc that is allowed to be used for approximating occlusion / color bleeding
+</li><li> use <tt>indirectdiffuse(..."pointbased",1,"filename","thepointcloud.ptc")</tt> to get color bleeding  - though you have to have saved <tt>_radiance</tt> in your point cloud.
+</li></ul>
+<p><b>EXAMPLES TO FOLLOW</b>
+</p>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1708-0!1!0!!en!2 and timestamp 20070718092633 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Point_based_GI">http://www.george-graphics.co.uk/pixiewiki/Documentation/Point_based_GI</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+					 <li id="ca-nstab-main" class="selected"><a href="../Documentation/Point_based_GI.html" title="View the content page [c]" accesskey="c">Article</a></li>
+					 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/Point_based_GI&amp;action=edit" title="Discussion about the content page [t]" accesskey="t">Discussion</a></li>
+					 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=edit" title="You can edit this page. Please use the preview button before saving. [e]" accesskey="e">Edit</a></li>
+					 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;action=history" title="Past versions of this page. [h]" accesskey="h">History</a></li>
+				</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/Point_based_GI" title="You are encouraged to log in, it is not mandatory however. [o]" accesskey="o">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z">Main Page</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Tutorials"><a href="../Tutorials.html">Tutorials</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html" title="The list of recent changes in the wiki. [r]" accesskey="r">Recent changes</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html" title="The place to find out.">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" title="Search PixieWiki [f]" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html" title="List of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Point_based_GI&amp;oldid=3196">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 14:40, 12 July 2007.</li>
+				<li id="f-viewcount">This page has been accessed 119 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.242 secs. --></body></html>

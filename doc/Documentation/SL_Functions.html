@@ -1,0 +1,1088 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="robots" content="noindex,follow" />
+		<meta name="keywords" content="Documentation/SL Functions,Documentation/Baking 3D Textures,Documentation/Global illumination,Documentation/Raytracing in SL,Documentation/Global Illumination" />
+		<link rel="shortcut icon" href="../favicon.ico" />
+		<link rel="search" type="application/opensearchdescription+xml" href="/pixiewiki_install/opensearch_desc.php" title="PixieWiki (English)" />
+		<title>Documentation/SL Functions - PixieWiki</title>
+		<style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "../css/main.css?63"; /*]]>*/</style>
+		<link rel="stylesheet" type="text/css"  href="../css/commonPrint.css?63" />
+		<link rel="stylesheet" type="text/css" media="handheld" href="../css/handheld.css?63" />
+		<!--[if lt IE 5.5000]><style type="text/css">@import "../css/IE50Fixes.css?63";</style><![endif]-->
+		<!--[if IE 5.5000]><style type="text/css">@import "../css/IE55Fixes.css?63";</style><![endif]-->
+		<!--[if IE 6]><style type="text/css">@import "../css/IE60Fixes.css?63";</style><![endif]-->
+		<!--[if IE 7]><style type="text/css">@import "../css/IE70Fixes.css?63";</style><![endif]-->
+		<!--[if lt IE 7]><script type="text/javascript" src="../css/IEFixes.js?63"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+		
+		<script type= "text/javascript">/*<![CDATA[*/
+var skin = "monobook";
+var stylepath = "../css/";
+var wgArticlePath = "/pixiewiki/$1";
+var wgScriptPath = "/pixiewiki_install";
+var wgServer = "http://www.george-graphics.co.uk";
+var wgCanonicalNamespace = "";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 0;
+var wgPageName = "Documentation/SL_Functions";
+var wgTitle = "Documentation/SL Functions";
+var wgAction = "view";
+var wgArticleId = "1700";
+var wgIsArticle = true;
+var wgUserName = null;
+var wgUserGroups = null;
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "3105";
+/*]]>*/</script>
+                
+		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
+		<script type="text/javascript" src="../css/WikiExtraJs.js"><!-- site js --></script>
+		<style type="text/css">/*<![CDATA[*/
+@import "../css/MediaWiki_Common.css";
+@import "../css/MediaWiki_Monobook.css";
+@import "../css/WikiExtraCss.css";
+/*]]>*/</style>
+		<!-- Head Scripts -->
+	</head>
+<body  class="mediawiki ns-0 ltr page-Documentation_SL_Functions">
+ <div id="titleBar"></div>
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="contentTop" id="top"></a>
+				<h1 class="firstHeading">Documentation/SL Functions</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From PixieWiki</h3>
+			<div id="contentSub"><span class="subpages">&lt; <a href="../Documentation.html" title="Documentation">Documentation</a></span></div>
+									<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>			<!-- start content -->
+			<p><br />
+</p>
+<a name="Sl_function_Index"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=1" title="Edit section: Sl function Index">edit</a>]</span> <span class="mw-headline"> Sl function Index </span></h1>
+<div class="index">
+<table>
+<tr>
+<td>
+<ul><li><a href="#Deriv" title="">Deriv</a>
+</li><li><a href="#Du" title="">Du</a>
+</li><li><a href="#Dv" title="">Dv</a>
+</li><li><a href="#abs" title="">abs</a>
+</li><li><a href="#acos" title="">acos</a>
+</li><li><a href="#ambient" title="">ambient</a>
+</li><li><a href="#area" title="">area</a>
+</li><li><a href="#asin" title="">asin</a>
+</li><li><a href="#atan" title="">atan</a>
+</li><li><a href="#attribute" title="">attribute</a>
+</li><li><a href="#bake3d" title="">bake3d</a>
+</li><li><a href="#calculatenormal" title="">calculatenormal</a>
+</li><li><a href="#ceil" title="">ceil</a>
+</li><li><a href="#cellnoise" title="">cellnoise</a>
+</li><li><a href="#checkers" title="">checkers</a>
+</li><li><a href="#clamp" title="">clamp</a>
+</li><li><a href="#clearlighting" title="">clearlighting</a>
+</li><li><a href="#colormap" title="">colormap</a>
+</li><li><a href="#comp" title="">comp</a>
+</li><li><a href="#concat" title="">concat</a>
+</li><li><a href="#cos" title="">cos</a>
+</li><li><a href="#ctransform" title="">ctransform</a>
+</li><li><a href="#degrees" title="">degrees</a>
+</li><li><a href="#depth" title="">depth</a>
+</li><li><a href="#determinant" title="">determinant</a>
+</li><li><a href="#diffuse" title="">diffuse</a>
+</li></ul>
+</td><td>
+<ul><li><a href="#displacement" title="">displacement</a>
+</li><li><a href="#distance" title="">distance</a>
+</li><li><a href="#environment" title="">environment</a>
+</li><li><a href="#exp" title="">exp</a>
+</li><li><a href="#faceforward" title="">faceforward</a>
+</li><li><a href="#filterstep" title="">filterstep</a>
+</li><li><a href="#floor" title="">floor</a>
+</li><li><a href="#format" title="">format</a>
+</li><li><a href="#fresnel" title="">fresnel</a>
+</li><li><a href="#gather" title="">gather</a>
+</li><li><a href="#illuminate" title="">illuminate</a>
+</li><li><a href="#illuminance" title="">illuminance</a>
+</li><li><a href="#incident" title="">incident</a>
+</li><li><a href="#indirectdiffuse" title="">indirectdiffuse</a>
+</li><li><a href="#inversqrt" title="">inversqrt</a>
+</li><li><a href="#length" title="">length</a>
+</li><li><a href="#lightsource" title="">lightsource</a>
+</li><li><a href="#log" title="">log</a>
+</li><li><a href="#match" title="">match</a>
+</li><li><a href="#max" title="">max</a>
+</li><li><a href="#min" title="">min</a>
+</li><li><a href="#mix" title="">mix</a>
+</li><li><a href="#mod" title="">mod</a>
+</li><li><a href="#noise" title="">noise</a>
+</li><li><a href="#normalize" title="">normalize</a>
+</li></ul>
+</td><td>
+<ul><li><a href="#ntransform" title="">ntransform</a>
+</li><li><a href="#occlusion" title="">occlusion</a>
+</li><li><a href="#opposite" title="">opposite</a>
+</li><li><a href="#option" title="">option</a>
+</li><li><a href="#phong" title="">phong</a>
+</li><li><a href="#photonmap" title="">photonmap</a>
+</li><li><a href="#pnoise" title="">pnoise</a>
+</li><li><a href="#pow" title="">pow</a>
+</li><li><a href="#printf" title="">printf</a>
+</li><li><a href="#ptlined" title="">ptlined</a>
+</li><li><a href="#radians" title="">radians</a>
+</li><li><a href="#random" title="">random</a>
+</li><li><a href="#raydepth" title="">raydepth</a>
+</li><li><a href="#rayinfo" title="">rayinfo</a>
+</li><li><a href="#raylabel" title="">raylabel</a>
+</li><li><a href="#reflect" title="">reflect</a>
+</li><li><a href="#refract" title="">refract</a>
+</li><li><a href="#rendererinfo" title="">rendererinfo</a>
+</li><li><a href="#rotate" title="">rotate</a>
+</li><li><a href="#round" title="">round</a>
+</li><li><a href="#scale" title="">scale</a>
+</li><li><a href="#setcomp" title="">setcomp</a>
+</li><li><a href="#setxcomp" title="">setxcomp</a>
+</li><li><a href="#setycomp" title="">setycomp</a>
+</li><li><a href="#setzcomp" title="">setzcomp</a>
+</li></ul>
+</td><td>
+<ul><li><a href="#shadername" title="">shadername</a>
+</li><li><a href="#shadow" title="">shadow</a>
+</li><li><a href="#sign" title="">sign</a>
+</li><li><a href="#sin" title="">sin</a>
+</li><li><a href="#smoothstep" title="">smoothstep</a>
+</li><li><a href="#solar" title="">solar</a>
+</li><li><a href="#specular" title="">specular</a>
+</li><li><a href="#specularbrdf" title="">specularbrdf</a>
+</li><li><a href="#spline" title="">spline</a>
+</li><li><a href="#sqrt" title="">sqrt</a>
+</li><li><a href="#step" title="">step</a>
+</li><li><a href="#surface" title="">surface</a>
+</li><li><a href="#tan" title="">tan</a>
+</li><li><a href="#texture" title="">texture</a>
+</li><li><a href="#texture3D" title="">texture3d</a>
+</li><li><a href="#textureinfo" title="">textureinfo</a>
+</li><li><a href="#trace" title="">trace</a>
+</li><li><a href="#transform" title="">transform</a>
+</li><li><a href="#translate" title="">translate</a>
+</li><li><a href="#transmission" title="">transmission</a>
+</li><li><a href="#urandom" title="">urandom</a>
+</li><li><a href="#visibility" title="">visibility</a>
+</li><li><a href="#vtransform" title="">vtransform</a>
+</li><li><a href="#xcomp" title="">xcomp</a>
+</li><li><a href="#ycomp" title="">ycomp</a>
+</li><li><a href="#zcomp" title="">zcomp</a>
+</li></ul>
+</td></tr></table>
+<p><b>NB: UNDER CONSTRUCTION, expect to see more detailed documentation here over time</b>
+</p>
+<a name="SL_Function_Reference"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=2" title="Edit section: SL Function Reference">edit</a>]</span> <span class="mw-headline"> SL Function Reference </span></h1>
+<a name="Math_Functions"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=3" title="Edit section: Math Functions">edit</a>]</span> <span class="mw-headline"> Math Functions </span></h2>
+<a name="abs"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=4" title="Edit section: abs">edit</a>]</span> <span class="mw-headline"> abs </span></h3>
+<pre>float abs(float f)
+</pre>
+<p>return the absolute value of the argument (negative numbers become positive)
+</p>
+<a name="acos"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=5" title="Edit section: acos">edit</a>]</span> <span class="mw-headline"> acos </span></h3>
+<pre>float acos(float f)
+</pre>
+<p>Returns the arc cosine of the argument (in radians)
+</p>
+<a name="asin"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=6" title="Edit section: asin">edit</a>]</span> <span class="mw-headline"> asin </span></h3>
+<pre>float asin(float)
+</pre>
+<p>Returns the arc sine of the argument (in radians)
+</p>
+<a name="atan"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=7" title="Edit section: atan">edit</a>]</span> <span class="mw-headline"> atan </span></h3>
+<pre>float atan(float f)
+float atan(float y,float x)
+</pre>
+<p>Returns the arc tangent of the argument (in radians).  The second form of the function returns an answer covering -180 to 180 degrees using the signs of <tt>y</tt> and <tt>x</tt> to cover the full range.
+</p>
+<a name="ceil"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=8" title="Edit section: ceil">edit</a>]</span> <span class="mw-headline"> ceil </span></h3>
+<pre>float ceil(float f)
+</pre>
+<p>Returns the next highest integer for a float f.
+</p>
+<a name="clamp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=9" title="Edit section: clamp">edit</a>]</span> <span class="mw-headline"> clamp </span></h3>
+<pre>color clamp(color c, float cmin, float cmax)
+float clamp(float f, float fmin, float fmax)
+normal clamp(normal n, normal nmin, normal nmax)
+point clamp(point p, normal pmin, normal pmax)
+vector clamp(vecotr v, vector vmin, vector vmax)
+</pre>
+<p>Clamps the first argument to the second two (inclusive)
+</p>
+<a name="comp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=10" title="Edit section: comp">edit</a>]</span> <span class="mw-headline"> comp </span></h3>
+<pre>float comp(color c, float comp)
+float comp(matrix m, float row, float column)
+float comp(normal n, float c)
+float comp(point p, float c)
+float comp(vector v, float c)
+</pre>
+<p>Returns the numbered component from a color, point, normal or vector.  The components are numbered x:0, y:1, z:2.  The matrix form of the shadeop takes two arguments for the row and column, also numbered from 0.
+</p>
+<a name="cos"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=11" title="Edit section: cos">edit</a>]</span> <span class="mw-headline"> cos </span></h3>
+<pre>float cos(float f)
+</pre>
+<p>Returns the cosine of the argument (in radians)
+</p>
+<a name="degrees"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=12" title="Edit section: degrees">edit</a>]</span> <span class="mw-headline"> degrees </span></h3>
+<pre>float degrees(float f)
+</pre>
+<p>Converts the argument (in degrees) into radians
+</p>
+<a name="Deriv"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=13" title="Edit section: Deriv">edit</a>]</span> <span class="mw-headline"> Deriv </span></h3>
+<pre>float Deriv(float n,float den)
+color Deriv(color c,float den)
+normal Deriv(normal n,float den)
+vector Deriv(point p,float den)
+vector Deriv(vector v,float den)
+</pre>
+<p>Returns the derivative of the first argument with respect to the second.  This is done using the chain rule, such that 
+</p>
+<pre>Deriv(n,den) = Du(n)/Du(den) + Dv(n)/Dv(den);
+</pre>
+<a name="determinant"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=14" title="Edit section: determinant">edit</a>]</span> <span class="mw-headline"> determinant </span></h3>
+<pre>float determinant(matrix m)
+</pre>
+<p>Returns the determinant of the matrix m.  This is zero if the matrix is singular.
+</p>
+<a name="Du"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=15" title="Edit section: Du">edit</a>]</span> <span class="mw-headline"> Du </span></h3>
+<pre>float Du(float f)
+color Du(color c)
+normal Du(normal n)
+point Du(point p)
+vector Du(vector v)
+</pre>
+<p>Compute the derivative of the argument with respect to <tt>u</tt>
+</p>
+<a name="Dv"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=16" title="Edit section: Dv">edit</a>]</span> <span class="mw-headline"> Dv </span></h3>
+<pre>float Dv(float f)
+color Dv(color c)
+normal Dv(normal n)
+point Dv(point p)
+vector Dv(vector v)
+</pre>
+<p>Compute the derivative of the argument with respect to <tt>v</tt>
+</p>
+<a name="distance"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=17" title="Edit section: distance">edit</a>]</span> <span class="mw-headline"> distance </span></h3>
+<pre>float distance(point p1, float p2)
+</pre>
+<p>Returns the distance between the points <tt>p1</tt> and <tt>p2</tt>
+</p>
+<a name="exp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=18" title="Edit section: exp">edit</a>]</span> <span class="mw-headline"> exp </span></h3>
+<pre>float exp(float f)
+</pre>
+<p>Returns <i>e</i> to the power of <tt>x</tt>
+</p>
+<a name="floor"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=19" title="Edit section: floor">edit</a>]</span> <span class="mw-headline"> floor </span></h3>
+<pre>float floor(float f)
+</pre>
+<p>Returns the next lowest integer for the float f
+</p>
+<a name="inversqrt"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=20" title="Edit section: inversqrt">edit</a>]</span> <span class="mw-headline"> inversqrt </span></h3>
+<pre>float inversesqrt(float f)
+</pre>
+<p>Returns 1/sqrt(f)
+</p>
+<a name="length"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=21" title="Edit section: length">edit</a>]</span> <span class="mw-headline"> length </span></h3>
+<pre>float length(vector v)
+</pre>
+<p>Returns the length of the vector v
+</p>
+<a name="log"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=22" title="Edit section: log">edit</a>]</span> <span class="mw-headline"> log </span></h3>
+<pre>float log(float f)
+float log(float f,float b)
+</pre>
+<p>Returns log(f), the second form returns log base b of f.
+</p>
+<a name="max"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=23" title="Edit section: max">edit</a>]</span> <span class="mw-headline"> max </span></h3>
+<pre>float max(float f1,....)
+float max(vector v1,...)
+</pre>
+<p>Returns the maximum of the arguments given.  The second form returns the maximum (component wise) of each component of the arguments, which can be a color, point, normal or vector.
+</p>
+<a name="min"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=24" title="Edit section: min">edit</a>]</span> <span class="mw-headline"> min </span></h3>
+<pre>float min(float f1,....)
+float min(vector v1,...)
+</pre>
+<p>Returns the minimum of the arguments given. The second form returns the minimum (component wise) of each component of the arguments, which can be a color, point, normal or vector.
+</p>
+<a name="mix"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=25" title="Edit section: mix">edit</a>]</span> <span class="mw-headline"> mix </span></h3>
+<pre>color mix(color a, color b, color alpha)
+color mix(color a, color b, float alpha)
+float mix(float a, float b, float alpha)
+normal mix(normal a, normal b, float alpha)
+normal mix(normal a, normal b, normal alpha)
+point mix(point a, point b, float f)
+point mix(point a, point b, point alpha)
+vector mix(vector a, vector b, float alpha)
+vector mix(vector a, vector b, vector alpha)
+</pre>
+<p>Mixes the first two arguments in the form:
+</p>
+<pre>(1-alpha)(a) + (alpha)(b)
+</pre>
+<p>This is done per component in the non-float versions of the function.
+</p>
+<a name="mod"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=26" title="Edit section: mod">edit</a>]</span> <span class="mw-headline"> mod </span></h3>
+<pre>mod(float a, float b)
+</pre>
+<p>Returns the remainder of a divided by b
+</p>
+<a name="normalize"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=27" title="Edit section: normalize">edit</a>]</span> <span class="mw-headline"> normalize </span></h3>
+<pre>color normalize(color c)
+normal normalize(normal n)
+point normalize(point p)
+vector normalize(vector v)
+</pre>
+<p>Returns the the normalized version argument.  If the argument has zero length, a zero-length result will occur, otherwise the result is unit length.
+</p>
+<a name="pow"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=28" title="Edit section: pow">edit</a>]</span> <span class="mw-headline"> pow </span></h3>
+<pre>pow(float a, float b)
+</pre>
+<p>Returns a raised to the power b
+</p>
+<a name="ptlined"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=29" title="Edit section: ptlined">edit</a>]</span> <span class="mw-headline"> ptlined </span></h3>
+<pre>float ptlined(point p1, point p2, point q)
+</pre>
+<p>Returns the minimum perpendicular distance between the <i>finite</i> line passing through p1,p2 and the point q.  If the shortest perpendicular distance between the point q and the infinite line between p1 and p2 is past the end of the finite line, then the distance between the nearest end of the line is returned.
+</p>
+<a name="radians"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=30" title="Edit section: radians">edit</a>]</span> <span class="mw-headline"> radians </span></h3>
+<pre>float radians(float f)
+</pre>
+<p>Returns the argument (in degrees) converted into radians
+</p>
+<a name="sign"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=31" title="Edit section: sign">edit</a>]</span> <span class="mw-headline"> sign </span></h3>
+<pre>sign(float f)
+</pre>
+<p>Returns 1 if the number is positive or zero, or -1 otherwise
+</p>
+<a name="sin"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=32" title="Edit section: sin">edit</a>]</span> <span class="mw-headline"> sin </span></h3>
+<pre>float sin(float f)
+</pre>
+<p>Returns the sine of the argument in radians
+</p>
+<a name="sqrt"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=33" title="Edit section: sqrt">edit</a>]</span> <span class="mw-headline"> sqrt </span></h3>
+<pre>float sqrt(float f)
+</pre>
+<p>Returns the square root of the argument
+</p>
+<a name="spline"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=34" title="Edit section: spline">edit</a>]</span> <span class="mw-headline"> spline </span></h3>
+<pre>float spline([string basis],float value,float f1,float f2,float f3,float f4....)
+float spline([string basis],float value,float fvals[])
+color spline([string basis],float value,color c1,color c2,color c3,color c4....)
+color spline([string basis],float value,color fvals[])
+point spline([string basis],float value,point p1,point p2,point p3,point p4....)
+point spline([string basis],float value,point pvals[])
+normal spline([string basis],float value,normal n1,normal n2,normal n3,normal n4....)
+normal spline([string basis],float value,normal nvals[])
+vector spline([string basis],float value,vector v1,vector v2,vector v3,vector v4....)
+vector spline([string basis],float value,vector vvals[])
+</pre>
+<p>Produces a spline interpolation of the provided values (either as an array or as inline arguments), based on the value <tt>value</tt>.  The interpolation basis can be optionally specified, and defaults to <tt>catmull-rom</tt>.  It can be one of "catmull-rom", "bezier", "bspline", "hermite".  The number of required data points is
+</p>
+<table class="wikitable">
+<tr>
+<td> <tt>catmull-rom</tt> </td><td> any &gt;= 4
+</td></tr>
+<tr>
+<td> <tt>bezier</tt> </td><td> 4n+3
+</td></tr>
+<tr>
+<td> <tt>hermite</tt> </td><td> 4n+2
+</td></tr>
+<tr>
+<td> <tt>bspline</tt> </td><td> any &gt;= 4
+</td></tr></table>
+<a name="round"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=35" title="Edit section: round">edit</a>]</span> <span class="mw-headline"> round </span></h3>
+<pre>float round(float f)
+</pre>
+<p>Rounds the argument to the nearest integer.
+</p>
+<a name="setcomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=36" title="Edit section: setcomp">edit</a>]</span> <span class="mw-headline"> setcomp </span></h3>
+<pre>setcomp(color c,float comp,float v)
+setcomp(matrix m,float row,float column,float v)
+setcomp(normal n,float comp,float v)
+setcomp(point p,float comp,float v)
+setcomp(vector v,float comp,float v)
+</pre>
+<p>Sets the specified component of the first argument to the value v.  The matrix form takes two arguments, specifying row and column.  Components are indexed from 0.
+</p>
+<a name="setxcomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=37" title="Edit section: setxcomp">edit</a>]</span> <span class="mw-headline"> setxcomp </span></h3>
+<pre>setxcomp(normal n, float v)
+setxcomp(point p,float v)
+setxcomp(vector v,float v)
+</pre>
+<p>Sets the x component of the first argument to the specified value.
+</p>
+<a name="setycomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=38" title="Edit section: setycomp">edit</a>]</span> <span class="mw-headline"> setycomp </span></h3>
+<pre>setycomp(normal n,float v)
+setycomp(point p,float v)
+setycomp(vector v,float v)
+</pre>
+<p>Sets the y component of the first argument to the specified value.
+</p>
+<a name="setzcomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=39" title="Edit section: setzcomp">edit</a>]</span> <span class="mw-headline"> setzcomp </span></h3>
+<pre>setzcomp(normal n, float v)
+setzcomp(point p, float v)
+setzcomp(vector v, float f)
+</pre>
+<p>Sets the z component of the first argument to the specified value.
+</p>
+<a name="tan"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=40" title="Edit section: tan">edit</a>]</span> <span class="mw-headline"> tan </span></h3>
+<pre>tan(float f)
+</pre>
+<p>Returns the tangent of the argument in radians.
+</p>
+<a name="xcomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=41" title="Edit section: xcomp">edit</a>]</span> <span class="mw-headline"> xcomp </span></h3>
+<pre>float xcomp(normal n)
+float xcomp(point p)
+float xcomp(vector v)
+</pre>
+<p>Returns the x component of the argument.
+</p>
+<a name="ycomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=42" title="Edit section: ycomp">edit</a>]</span> <span class="mw-headline"> ycomp </span></h3>
+<pre>float ycomp(normal n)
+float ycomp(point p)
+float ycomp(vector v)
+</pre>
+<p>Returns the y component of the argument.
+</p>
+<a name="zcomp"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=43" title="Edit section: zcomp">edit</a>]</span> <span class="mw-headline"> zcomp </span></h3>
+<pre>float zcomp(normal n)
+float zcomp(point p)
+float zcomp(vector v)
+</pre>
+<p>Returns the z component of the argument.
+</p>
+<a name="Lighting"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=44" title="Edit section: Lighting">edit</a>]</span> <span class="mw-headline"> Lighting </span></h2>
+<a name="ambient"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=45" title="Edit section: ambient">edit</a>]</span> <span class="mw-headline"> ambient </span></h3>
+<pre>color ambient()
+</pre>
+<p>Returns the ambient lighting contribution.  Ambient lights are those which do not include a <tt>solar</tt> or <tt>illuminate</tt> shadeop.
+</p>
+<a name="diffuse"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=46" title="Edit section: diffuse">edit</a>]</span> <span class="mw-headline"> diffuse </span></h3>
+<pre>color diffuse(normal n)
+color diffuse(point p,normal n,float angle)
+</pre>
+<p>The first form returns the diffuse contribution given the surface normal <tt>n</tt>.  It is equivalent to:
+</p>
+<pre>color diffuse(normal n) {
+	extern point P;
+	color C = 0;
+	illuminance( P, n, PI/2 )
+	    C += Cl * normalize(L).n;
+	return C;
+}
+</pre>
+<p>The second form allows the position, and angle to be specified.  It is equivalent to:
+</p>
+<pre>color diffuse( normal N, normal p, float angle ) {
+	color C = 0;
+	illuminance(p,n,angle)
+	    C += Cl * normalize(L).n;
+	return C;
+}
+</pre>
+<a name="phong"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=47" title="Edit section: phong">edit</a>]</span> <span class="mw-headline"> phong </span></h3>
+<pre>color phong(normal n,vector I,float size)
+</pre>
+<a name="specular"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=48" title="Edit section: specular">edit</a>]</span> <span class="mw-headline"> specular </span></h3>
+<pre>color specular(normal n,vector I,float roughnes)
+</pre>
+<a name="specularbrdf"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=49" title="Edit section: specularbrdf">edit</a>]</span> <span class="mw-headline"> specularbrdf </span></h3>
+<pre>color specularbrdf(vector L,normal n,vector I,float roughnes)
+</pre>
+<a name="illuminate"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=50" title="Edit section: illuminate">edit</a>]</span> <span class="mw-headline"> illuminate </span></h3>
+<pre>illuminate(point position) {
+	// statements
+}
+illuminate(point position,vector axis,float angle) {
+	// statements
+}
+</pre>
+<p>The first form casts light from the specified <tt>position</tt> in all directions.  The second form casts directional light from the specified position, along the specified <tt>axis</tt> with angular spread <tt>angle</tt> in radians.
+</p><p>Inside the loop <tt>L</tt> is the distance from <tt>Ps</tt> to the specified point <tt>position</tt>.  Statements inside the loop set the lightingt contribution by setting <tt>Cl</tt>.
+</p>
+<a name="illuminance"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=51" title="Edit section: illuminance">edit</a>]</span> <span class="mw-headline"> illuminance </span></h3>
+<pre>illuminance([string category], point position ){
+	// statement
+}
+illuminance([string category], point position, vector axis, float angle ) {
+	// statement
+}
+</pre>
+<p>Illuminance loops over lights (optionally specifying a lighting category to control which lights to include).  The first form includes lights contributions from the entire sphere.  The second form gathers lighting at the specified <tt>position</tt> in the cone specified by <tt>axis</tt> and <tt>angle</tt>.  Inside the loop, statements have access to <tt>L</tt> - the  light direction, and <tt>Cl</tt> the light color at the current shading point.
+</p><p>The optional <tt>category</tt>, if specified can include lights using <tt>"name"</tt> or exclude lights using <tt>"-name"</tt>, where <tt>name</tt> is one of the named categories in a light's <tt>__category</tt> parameter.  If <tt>category</tt> is not specified or is <tt>""</tt> then all lights are considered.
+</p>
+<a name="solar"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=52" title="Edit section: solar">edit</a>]</span> <span class="mw-headline"> solar </span></h3>
+<pre>solar() {
+	// statements
+}
+solar(vector axis,float angle) {
+	// statements
+}
+</pre>
+<p>The solar loop emits light from a distant / infinite point.  The first form emits light in all directions.  The second form restricts light to a cone specified by <tt>axis</tt> and <tt>angle</tt>.  Distant directional lightsources are typically specified with <tt>solar(dir,0)</tt>.  Inside the loop (as for illuminate), <tt>L</tt> is the direction of the surface element currently being shaded, and <tt>Cl</tt> is set to be the emitted light amount.
+</p>
+<a name="clearlighting"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=53" title="Edit section: clearlighting">edit</a>]</span> <span class="mw-headline"> clearlighting </span></h3>
+<pre>clearlighting()
+</pre>
+<p>Internally, Pixie caches lighting, so subsequent calls to diffuse() illuminance() and so on do not need to re-execute the lights.  The positions,normals,distribution angles are used to determine when the saved lighting can be reused.  The <tt>clearlighting()</tt> shadeop forces Pixie to recalculate lights.  You should not need to call this.
+</p>
+<a name="photonmap"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=54" title="Edit section: photonmap">edit</a>]</span> <span class="mw-headline"> photonmap </span></h3>
+<pre>color photonmap(string mapname,point p,...)
+color photonmap(string mapname,point p,normal n,...)
+</pre>
+<p>where <tt>mapname</tt> is the name of the photon map (e.g. <tt>global.gpm</tt>),<tt>P</tt> is the lookup point and <tt>N</tt> is the lookup normal.  The first form does not discriminate based on the normal - meaning it finds photons with all directions.  The second form discriminates based on lookup normal, such that only photons travelling in the opposite direction to <tt>n</tt> will be found (those falling on the front side of the surface.  The following optional parameters can also be passed:
+</p>
+<table class="wikitable">
+<tr>
+<td> <tt>uniform float estimator</tt></td><td>	 The number of photons to use for lookup
+</td></tr>
+<tr>
+<td> <tt>niform float maxRadius</tt></td><td>		 The maximum lookup radius
+</td></tr></table>
+<p>See <a href="../Documentation/Global_illumination.html" title="Documentation/Global illumination">Documentation/Global illumination</a>
+</p>
+<a name="indirectdiffuse"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=55" title="Edit section: indirectdiffuse">edit</a>]</span> <span class="mw-headline"> indirectdiffuse </span></h3>
+<pre>color indirectdiffuse(point p,normal n,float samples,...)
+</pre>
+<p>See <a href="/pixiewiki_install/index.php?title=Documentation/Global_Illumination&amp;action=edit" class="new" title="Documentation/Global Illumination">Documentation/Global Illumination</a>
+</p>
+<a name="occlusion"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=56" title="Edit section: occlusion">edit</a>]</span> <span class="mw-headline"> occlusion </span></h3>
+<pre>float occlusion(point p,normal n,float samples,...)
+</pre>
+<p>Documentation/Global_illumination
+</p>
+<a name="Message_Passing_.2F_Attributes_.26_Options"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=57" title="Edit section: Message Passing / Attributes &amp; Options">edit</a>]</span> <span class="mw-headline"> Message Passing / Attributes &amp; Options </span></h2>
+<a name="attribute"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=58" title="Edit section: attribute">edit</a>]</span> <span class="mw-headline"> attribute </span></h3>
+<pre>float attribute(string attr,color res)
+float attribute(string attr,float res)
+float attribute(string attr,matrix res)
+float atrribute(string attr,normal res)
+float attribute(string attr,point res)
+float attribute(string attr,string res)
+float attribute(string attr,vector res)
+</pre>
+<a name="displacement"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=59" title="Edit section: displacement">edit</a>]</span> <span class="mw-headline"> displacement </span></h3>
+<pre>float displacement(string attr,color res)
+float displacement(string attr,float res)
+float displacement(string attr,matrix res)
+float displacement(string attr,normal res)
+float displacement(string attr,point res)
+float displacement(string attr,string res)
+float displacement(string attr,vector res)
+</pre>
+<a name="lightsource"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=60" title="Edit section: lightsource">edit</a>]</span> <span class="mw-headline"> lightsource </span></h3>
+<pre>float lightsource(string attr,color res)
+float lightsource(string attr,float res)
+float lightsource(string attr,matrix res)
+float lightsource(string attr,normal res)
+float lightsource(string attr,point res)
+float lightsource(string attr,string res)
+float lightsource(string attr,vector res)
+</pre>
+<a name="incident"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=61" title="Edit section: incident">edit</a>]</span> <span class="mw-headline"> incident </span></h3>
+<pre>float incident(string attr,color res)
+float incident(string attr,float res)
+float incident(string attr,matrix res)
+float incident(string attr,normal res)
+float incident(string attr,point res)
+float incident(string attr,string res)
+float incident(string attr,vector res)
+</pre>
+<a name="option"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=62" title="Edit section: option">edit</a>]</span> <span class="mw-headline"> option </span></h3>
+<pre>float option(string attr,color res)
+float option(string attr,float res)
+float option(string attr,matrix res)
+float option(string attr,normal res)
+float option(string attr,point res)
+float option(string attr,string res)
+float option(string attr,vector res)
+</pre>
+<a name="opposite"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=63" title="Edit section: opposite">edit</a>]</span> <span class="mw-headline"> opposite </span></h3>
+<pre>float opposite(string attr,color res)
+float opposite(string attr,float res)
+float opposite(string attr,matrix res)
+float opposite(string attr,normal res)
+float opposite(string attr,point res)
+float opposite(string attr,string res)
+float opposite(string attr,vector res)
+</pre>
+<a name="rendererinfo"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=64" title="Edit section: rendererinfo">edit</a>]</span> <span class="mw-headline"> rendererinfo </span></h3>
+<pre>float rendererinfo(string attr,color res)
+float rendererinfo(string attr,float res)
+float rendererinfo(string attr,matrix res)
+float rendererinfo(string attr,normal res)
+float rendererinfo(string attr,point res)
+float rendererinfo(string attr,string res)
+float rendererinfo(string attr,vector res)
+</pre>
+<a name="surface"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=65" title="Edit section: surface">edit</a>]</span> <span class="mw-headline"> surface </span></h3>
+<pre>float surface(string attr,color res)
+float surface(string attr,float res)
+float surface(string attr,matrix res)
+float surface(string attr,normal res)
+float surface(string attr,point res)
+float surface(string attr,string res)
+float surface(string attr,vector res)
+</pre>
+<a name="shadername"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=66" title="Edit section: shadername">edit</a>]</span> <span class="mw-headline"> shadername </span></h3>
+<pre>string shadername()
+string shadername(string shaderType)
+</pre>
+<a name="Baking_.26_3D_Textures"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=67" title="Edit section: Baking &amp; 3D Textures">edit</a>]</span> <span class="mw-headline"> Baking &amp; 3D Textures </span></h2>
+<a name="bake3d"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=68" title="Edit section: bake3d">edit</a>]</span> <span class="mw-headline"> bake3d </span></h3>
+<pre>bake3d(string filename,string channels,point P,normal N,...,&lt;data&gt;)
+</pre>
+<p>Bakes the specified data, which exists at point positions specified by <tt>P</tt> and normal <tt>N</tt> to the named pointcloud file.  One channel should be given for each channel specified in the channel specifier string <tt>channels</tt> in the form <tt>"channelname",variable</tt>.
+</p><p>See <a href="../Documentation/Baking_3D_Textures.html" title="Documentation/Baking 3D Textures">Documentation/Baking 3D Textures</a>.
+</p>
+<a name="texture3d"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=69" title="Edit section: texture3d">edit</a>]</span> <span class="mw-headline"> texture3d </span></h3>
+<pre>float texture3d(string filename, point p, normal n,...,&lt;data&gt;)
+</pre>
+<p>Reads the specified point cloud or brickmap, and returns the data associated with point <tt>P</tt> and normal <tt>N</tt>.
+</p><p>See <a href="../Documentation/Baking_3D_Textures.html" title="Documentation/Baking 3D Textures">Documentation/Baking 3D Textures</a>.
+</p>
+<a name="Shading"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=70" title="Edit section: Shading">edit</a>]</span> <span class="mw-headline"> Shading </span></h2>
+<a name="area"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=71" title="Edit section: area">edit</a>]</span> <span class="mw-headline"> area </span></h3>
+<pre>float area(point P)
+float area(point P,string measure)
+</pre>
+<p>Returns the area of each micropolygon, using the point P as the point whose areas to measure.  The second form of the <tt>area</tt> function takes an additional <tt>measure</tt> argument which can be one of <tt>"shading"</tt> or <tt>"dicing"</tt>.  If the measure is <tt>"shading"</tt> then the area shadeop works the same as the first version of the function.  That is, the smooth derivatives version of the area is returned.  If the measure is <tt>"dicing"</tt> then the non-smooth area is returned, which is exactly the area formed by the edge lengths of the grid for the point P.
+</p>
+<a name="checkers"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=72" title="Edit section: checkers">edit</a>]</span> <span class="mw-headline"> checkers </span></h3>
+<pre>float checkers()
+</pre>
+<p>Produces a checkerboard pattern in the shading grid, alternate vertices recieve 1 or 0.  Used for debugging.
+</p>
+<a name="calculatenormal"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=73" title="Edit section: calculatenormal">edit</a>]</span> <span class="mw-headline"> calculatenormal </span></h3>
+<pre>point calculatenormal(point)
+</pre>
+<a name="depth"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=74" title="Edit section: depth">edit</a>]</span> <span class="mw-headline"> depth </span></h3>
+<pre>float depth(point p)
+</pre>
+<p>Returns the depth of the point p - this matches the depth that would appear in a shadow map for the point p.
+</p><p><b>FIXME: we should convert to world space</b>
+</p>
+<a name="faceforward"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=75" title="Edit section: faceforward">edit</a>]</span> <span class="mw-headline"> faceforward </span></h3>
+<pre>vector faceforward(vector N,vector I)
+vector faceforward(vector N,vector I,vector NRef)
+</pre>
+<p>Returns a vector such that I points the 'same' way as the normal N.  The first form is equivalent to:
+</p>
+<pre>vector faceforward( vector N, vector I) {
+	vector Nres;
+	if (N.Ng &gt; 0) {
+		if (I.Ng &gt; 0) 	Nres = -N;
+		else  		Nres = N;
+	} else {
+		if (I.Ng &gt; 0) 	Nres = N;
+		else  		Nres = -N;
+	}
+	return Nres;
+}
+</pre>
+<p>And the second
+</p>
+<pre>vector faceforward( vector N, vector I, vector Nref) {
+	vector Nres;
+	if (N.Nref &gt; 0) {
+		if (I.Nref &gt; 0)	Nres = -N;
+		else  		Nres = N;
+	} else {
+		if (I.Nref &gt; 0)	Nres = N;
+		else  		Nres = -N;
+	}
+	return Nres;
+}
+</pre>
+<a name="filterstep"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=76" title="Edit section: filterstep">edit</a>]</span> <span class="mw-headline"> filterstep </span></h3>
+<pre>float filterstep(float s,float....)
+float filterstep(float s1,float s2,float....)
+</pre>
+<p>Produces an antialiased step function.  In the first form, the step function is filtered over the area of the current shading element.  The second form is filtered inbetween <tt>s1</tt> and <tt>s2</tt>.  The optional arguments may also include
+</p>
+<table class="wikitable">
+<tr>
+<td> <tt>"width"</tt> </td><td> a filter area multiplier to allow over or under filtering
+</td></tr>
+<tr>
+<td> <tt>"filter"</tt> </td><td> the filter type to use, which may be one of <tt>"gaussian","box","triangle","sinc","catmull-rom","blackman-harris","mitchell"</tt>
+</td></tr></table>
+<a name="smoothstep"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=77" title="Edit section: smoothstep">edit</a>]</span> <span class="mw-headline"> smoothstep </span></h3>
+<pre>float smoothstep(float min, float max, float value)
+</pre>
+<p>Produces a smooth s-curve when <tt>value</tt> is between <tt>min</tt> and <tt>max</tt>.  If <tt>value</tt> is below <tt>min</tt> 0 is returned, and 1 is returned if <tt>value</tt> is above <tt>max</tt>.
+</p>
+<a name="step"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=78" title="Edit section: step">edit</a>]</span> <span class="mw-headline"> step </span></h3>
+<pre>float step(float min, float value)
+</pre>
+<p>Produces a sharp step at <tt>value=min</tt>.  If <tt>value</tt> is below <tt>min</tt> 0 is returned, 1 is returned otherwise.
+</p>
+<a name="fresnel"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=79" title="Edit section: fresnel">edit</a>]</span> <span class="mw-headline"> fresnel </span></h3>
+<pre>fresnel(vector I,vector n,float eta,output float Kr,output float Kt)
+fresnel(vector I,vector n,float eta,output float Kr,output float Kt,vector R,vector T)
+</pre>
+<a name="reflect"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=80" title="Edit section: reflect">edit</a>]</span> <span class="mw-headline"> reflect </span></h3>
+<pre>vector reflect(vector I,vector N)
+</pre>
+<p>Returns <tt>I</tt> reflected about the normal <tt>N</tt>.  Equivalent to:
+</p>
+<pre>reflect(vector I,vector N) {
+	return I-2*(N.I)*N;
+}
+</pre>
+<a name="refract"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=81" title="Edit section: refract">edit</a>]</span> <span class="mw-headline"> refract </span></h3>
+<pre>vector refract(vector I,vector N,float eta)
+</pre>
+<p>Returns the refracted vector given the incident vector <tt>I</tt>, the normal <tt>N</tt> and the index of refraction <tt>eta</tt>.  The value eta should be index of refraction (of the surface to be entered) in the volume containing the ray <tt>I</tt>.
+</p>
+<pre>vector refract( vector I, vector N; float eta ) {
+	float IdotN = I.N;
+	float k = 1 - eta*eta*(1 - IdotN*IdotN);
+
+	return k &lt; 0&nbsp;? 0&nbsp;: eta*I - (eta*IdotN + sqrt(k))*N;
+}
+</pre>
+<a name="Noise_.26_Random"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=82" title="Edit section: Noise &amp; Random">edit</a>]</span> <span class="mw-headline"> Noise &amp; Random </span></h2>
+<a name="cellnoise"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=83" title="Edit section: cellnoise">edit</a>]</span> <span class="mw-headline"> cellnoise </span></h3>
+<pre>float|color|point|normal|vector cellnoise(float x)
+float|color|point|normal|vector cellnoise(float x, float y)
+float|color|point|normal|vector cellnoise(point p)
+float|color|point|normal|vector cellnoise(point p, float t)
+</pre>
+<p>Returns a pseudorandom result, which depends on the arguments - which can be 1,2,3 or 4 dimentional.  The result is constant inbetween integer boundaries of each argument dimention.  The result is uniformly distributed between 0 and 1, and can be used to construct vornoi noise or cell structure.
+</p>
+<a name="urandom"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=84" title="Edit section: urandom">edit</a>]</span> <span class="mw-headline"> urandom </span></h3>
+<pre>color|float|normal|point|vector urandom()
+color|float|normal|point|vector random()
+</pre>
+<p>Returns a uniformly distributed random number between 0 and 1.
+</p>
+<a name="noise"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=85" title="Edit section: noise">edit</a>]</span> <span class="mw-headline"> noise </span></h3>
+<pre>float|color|point|normal|vector noise(float x)
+float|color|point|normal|vector noise(float x, float y)
+float|color|point|normal|vector noise(point p)
+float|color|point|normal|vector noise(point p, float t)
+</pre>
+<p>Returns a pseudorandom function of it's arguments which can be 1,2,3 or 4 dimentional.  The result is distributed between 0 and 1.
+</p>
+<a name="pnoise"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=86" title="Edit section: pnoise">edit</a>]</span> <span class="mw-headline"> pnoise </span></h3>
+<pre>float|color|point|normal|vector pnoise(float x,float period)
+float|color|point|normal|vector pnoise(float x, float y, float xperiod, float yperiod)
+float|color|point|normal|vector pnoise(point p, point period)
+float|color|point|normal|vector pnoise(point p, float t, point period, float tperiod)
+</pre>
+<p>Produces periodic pseudorandom noise in 1,2,3 or 4 dimentions, with the specified periods.  The period must have integer values.
+</p><p><br />
+</p>
+<a name="String_functions"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=87" title="Edit section: String functions">edit</a>]</span> <span class="mw-headline"> String functions </span></h2>
+<a name="concat"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=88" title="Edit section: concat">edit</a>]</span> <span class="mw-headline"> concat </span></h3>
+<pre>string concat(string s1, string s2...)
+</pre>
+<p>Concatenates all the string arguments and returns them.
+</p>
+<a name="match"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=89" title="Edit section: match">edit</a>]</span> <span class="mw-headline"> match </span></h3>
+<pre>float match(string pat, string val)
+</pre>
+<a name="format"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=90" title="Edit section: format">edit</a>]</span> <span class="mw-headline"> format </span></h3>
+<pre>string format(string format,....)
+</pre>
+<p>Much like printf, <tt>format</tt> returns a string which is the result of applying format to the arguments. See <a href="#printf" title="">printf</a>.
+</p>
+<a name="printf"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=91" title="Edit section: printf">edit</a>]</span> <span class="mw-headline"> printf </span></h3>
+<pre>printf(string format,...)
+</pre>
+<p>Printf prints the string, plus format specified by <tt>format</tt> to the console.  Certain strings in <tt>format</tt> are treated specially, and may require additional arguments to passed to <tt>printf</tt>
+</p>
+<dl><dt><tt>%f</tt></dt><dd>prints a float value, which must be specified
+</dd><dt><tt>%d</tt></dt><dd>prints an integer value, which must be specified
+</dd><dt><tt>%c</tt></dt><dd>prints a color value, which must be specified
+</dd><dt><tt>%n</tt></dt><dd>prints a normal value, which must be specified
+</dd><dt><tt>%v</tt></dt><dd>prints a vector value, which must be specified
+</dd><dt><tt>%s</tt></dt><dd>prints a string value, which must be specified
+</dd><dt><tt>%m</tt></dt><dd>prints a matrix value, which must be specified
+</dd><dt><tt>%%</tt></dt><dd>prints %
+</dd><dt><tt>\n</tt></dt><dd>prints a newline
+</dd><dt><tt>\t</tt></dt><dd>prints a tab character
+</dd></dl>
+<p><br />
+</p>
+<a name="Texturing"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=92" title="Edit section: Texturing">edit</a>]</span> <span class="mw-headline"> Texturing </span></h2>
+<p>The texturing functions (<tt>texture</tt>, <tt>environment</tt> and <tt>shadow</tt> all take optional arguments, which are described below:
+</p>
+<table class="wikitable">
+
+<tr>
+<td> <tt>"filter"</tt> </td><td> Specifies the filter type to be used.  Can be one of <b>FIXME</b>
+</td></tr>
+<tr>
+<td> <tt>"blur"</tt> </td><td> Specifies the blurring of the texture call.  Blurring of 1 means samples can cover the whole texture, 0 is perfectly sharp.
+</td></tr>
+<tr>
+<td> <tt>"width"</tt> </td><td> specifies the filterwidth multiplier for s and t
+</td></tr>
+<tr>
+<td> <tt>"swidth"</tt> </td><td> specifies the filterwidth multiplier in s
+</td></tr>
+<tr>
+<td> <tt>"twidth"</tt> </td><td> specifies the filterwidth multiplier in t
+</td></tr>
+<tr>
+<td> <tt>"fill"</tt> </td><td> the value to use for channels not present in the texture
+</td></tr>
+<tr>
+<td> <tt>"samples"</tt> </td><td> how many samples to take for antialisaing and smooth blur purposes
+</td></tr>
+<tr>
+<td> <tt>"bias"</tt> </td><td> the sample bias for shadows
+</td></tr>
+<tr>
+<td> <tt>"maxdist"</tt> </td><td> the maximum distance to shoot rays if the texurename is <tt>"raytrace"</tt>
+</td></tr>
+<tr>
+<td> <tt>"samplecone"</tt> </td><td> the angle in radians to shoot rays if the texturename is <tt>"raytrace"</tt>
+</td></tr>
+<tr>
+<td> <tt>"label"</tt> </td><td> the ray label if the texturename is <tt>"raytrace"</tt>
+</td></tr></table>
+<a name="environment"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=93" title="Edit section: environment">edit</a>]</span> <span class="mw-headline"> environment </span></h3>
+<pre>color environment(string environmentname,vector R,...)
+float environment(string environmentname,vector R,...)
+</pre>
+<a name="texture"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=94" title="Edit section: texture">edit</a>]</span> <span class="mw-headline"> texture </span></h3>
+<pre>color texture(string tex....)
+color texture(string tex,float s,float t,...)
+color texture(string tex,float s1,float t1,float s2,float t2,float s3,float t3,float s4,float t4,...)
+</pre>
+<pre>float texture(string tex....)
+float texture(string tex,float s,float t,...)
+float texture(string tex,float s1,float t1,float s2,float t2,float s3,float t3,float s4,float t4,...)
+</pre>
+<a name="textureinfo"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=95" title="Edit section: textureinfo">edit</a>]</span> <span class="mw-headline"> textureinfo </span></h3>
+<pre>float textureinfo(string texname,string property,color res)
+float textureinfo(string texname,string property,float res)
+float textureinfo(string texname,string property,matrix res)
+float textureinfo(string texname,string property,normal res)
+float textureinfo(string texname,string property,point res)
+float textureinfo(string texname,string property,string res)
+float textureinfo(string texname,string property,vector res)
+</pre>
+<a name="shadow"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=96" title="Edit section: shadow">edit</a>]</span> <span class="mw-headline"> shadow </span></h3>
+<pre>color shadow(string shdname,point pos,...)
+float shadow(string shdname,point pos,...)
+</pre>
+<a name="transformations"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=97" title="Edit section: transformations">edit</a>]</span> <span class="mw-headline"> transformations </span></h2>
+<a name="rotate"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=98" title="Edit section: rotate">edit</a>]</span> <span class="mw-headline"> rotate </span></h3>
+<pre>matrix rotate(matrix m,float angle,vector axis)
+point rotate(point p,float angle,point p1,point p2)
+</pre>
+<p>The second form rotates point <tt>p</tt> by <tt>angle</tt> in radians, about the axis that runs through points <tt>p1</tt> and <tt>p2</tt>.  The first form returns a matrix which results from concatenating the rotation specified by <tt>angle</tt> and <tt>axis</tt> onto the first matrix argument.
+</p>
+<a name="transform"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=99" title="Edit section: transform">edit</a>]</span> <span class="mw-headline"> transform </span></h3>
+<pre>point transform(string fromspace,string tospace,point p)
+point transform(string fromspace,matrix m,point p)
+point transform(string tospace,point p)
+point transform(matrix m,point p)
+</pre>
+<p>Transforms the point <tt>p</tt> to another named coordinate space.  If <tt>fromspace</tt> is not specified, it is assumed to be <tt>"current"</tt>.
+</p>
+<a name="translate"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=100" title="Edit section: translate">edit</a>]</span> <span class="mw-headline"> translate </span></h3>
+<pre>matrix translate(matrix m,point p)
+</pre>
+<p>Returns a matrix which results from concatenating the translation specified by <tt>p</tt> onto the first matrix argument.
+</p>
+<a name="vtransform"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=101" title="Edit section: vtransform">edit</a>]</span> <span class="mw-headline"> vtransform </span></h3>
+<pre>point vtransform(string fromspace,string tospace,point p)
+point vtransform(string fromspace,matrix m,point p)
+point vtransform(string tospace,point p)
+point vtransform(matrix m,point p)
+</pre>
+<p>Transforms the vector <tt>v</tt> to another named coordinate space.  If <tt>fromspace</tt> is not specified, it is assumed to be <tt>"current"</tt>.
+</p>
+<a name="scale"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=102" title="Edit section: scale">edit</a>]</span> <span class="mw-headline"> scale </span></h3>
+<pre>matrix scale(matrix m,point p)
+</pre>
+<p>Returns a matrix which results from concatenating the scaling specified by <tt>p</tt> onto the first matrix argument.
+</p>
+<a name="ntransform"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=103" title="Edit section: ntransform">edit</a>]</span> <span class="mw-headline"> ntransform </span></h3>
+<pre>point ntransform(string fromspace,string tospace,point p)
+point ntransform(string fromspace,matrix m,point p)
+point ntransform(string tospace,point p)
+point ntransform(matrix m,point p)
+</pre>
+<p>Transforms the normal <tt>v</tt> to another named coordinate space.  If <tt>fromspace</tt> is not specified, it is assumed to be <tt>"current"</tt>.
+</p>
+<a name="ctransform"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=104" title="Edit section: ctransform">edit</a>]</span> <span class="mw-headline"> ctransform </span></h3>
+<pre>color ctransform(string fromspace,string tospace,color c)
+color ctransform(string tospace,color c)
+</pre>
+<p>Transforms a color from one colorspace to another.  If <tt>fromspace</tt> is not given, it is assumed to be <tt>"rgb"</tt>.  The space may be one of <tt>"rgb","hsl","hsv","xyz","yiq","xyy","cie"</tt>.
+</p>
+<a name="raytracing"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=105" title="Edit section: raytracing">edit</a>]</span> <span class="mw-headline"> raytracing </span></h2>
+<a name="gather"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=106" title="Edit section: gather">edit</a>]</span> <span class="mw-headline"> gather </span></h3>
+<pre>gather([string category],point p,vector dir,float angle,float samples,...) {
+	// statements
+}
+[ else {
+	// statements
+} ]
+</pre>
+<p>Fires rays in a cone with apex at point <tt>p</tt> defined by the direction <tt>dir</tt> and the angular spread <tt>angle</tt>.  The number of rays per shading point is controlled by <tt>samples</tt>.
+</p><p><br />
+</p>
+<table class="wikitable">
+<tr>
+<td> <tt>uniform float bias</tt> </td><td>		The self intersection bias.
+</td></tr>
+<tr>
+<td> <tt>uniform float samplecone</tt> </td><td>	Specifies the directional coherence of the rays (in radians)
+</td></tr>
+<tr>
+<td> <tt>uniform float blur</tt> </td><td>		Alternate way to specify the sample cone (1 is full hemisphere blur)
+</td></tr>
+<tr>
+<td> <tt>uniform float maxdist</tt></td><td>		The maximum intersection distance
+</td></tr>
+<tr>
+<td> <tt>uniform string distribution</tt> </td><td>		The sample distribution (<tt>"cosine"</tt> or <tt>"uniform"</tt>)
+</td></tr>
+<tr>
+<td> <tt>uniform string label</tt></td><td>		The ray label
+</td></tr>
+<tr>
+<td> <tt>float samplebase</tt></td><td>	Jitter the ray origin (1 by default)
+</td></tr>
+<tr>
+<td> <tt>varying type shadertype:variablename</tt></td><td>	The query value (output)
+</td></tr>
+<tr>
+<td> <tt>varying float ray:length</tt></td><td>	Length of the ray (output)
+</td></tr>
+<tr>
+<td> <tt>varying vector ray:direction</tt></td><td>	The ray direction (output)
+</td></tr></table>
+<p>See <a href="../Documentation/Raytracing_in_SL.html#gather" title="Documentation/Raytracing in SL">Documentation/Raytracing in SL#gather</a>
+</p>
+<a name="trace"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=107" title="Edit section: trace">edit</a>]</span> <span class="mw-headline"> trace </span></h3>
+<pre>color trace(point p, vector dir,...)
+float trace(point p, vector dir,...)
+</pre>
+<p>See <a href="../Documentation/Raytracing_in_SL.html#trace" title="Documentation/Raytracing in SL">Documentation/Raytracing_in_SL#trace</a>
+</p>
+<a name="transmission"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=108" title="Edit section: transmission">edit</a>]</span> <span class="mw-headline"> transmission </span></h3>
+<pre>color transmission(point p1,point p2,...)
+</pre>
+<p><a href="../Documentation/Raytracing_in_SL.html#transmission" title="Documentation/Raytracing in SL">Documentation/Raytracing_in_SL#transmission</a>
+</p>
+<a name="visibility"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=109" title="Edit section: visibility">edit</a>]</span> <span class="mw-headline"> visibility </span></h3>
+<pre>float visibility(point p1,point p2)
+</pre>
+<p><a href="../Documentation/Raytracing_in_SL.html#visibility" title="Documentation/Raytracing in SL">Documentation/Raytracing_in_SL#visibility</a>
+</p>
+<a name="raydepth"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=110" title="Edit section: raydepth">edit</a>]</span> <span class="mw-headline"> raydepth </span></h3>
+<pre>float raydepth()
+</pre>
+<p>Returns the depth of the current ray, which is 0 for camera rays, and increases by one at each level of shading when a ray is fired.
+</p>
+<a name="rayinfo"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=111" title="Edit section: rayinfo">edit</a>]</span> <span class="mw-headline"> rayinfo </span></h3>
+<pre>float rayinfo(string infotype, output float res)
+float rayinfo(string infotype, output string res)
+</pre>
+<p>See <a href="../Documentation/Raytracing_in_SL.html#rayinfo" title="Documentation/Raytracing in SL">Documentation/Raytracing in SL#rayinfo</a>
+</p>
+<a name="raylabel"></a><h3><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit&amp;section=112" title="Edit section: raylabel">edit</a>]</span> <span class="mw-headline"> raylabel </span></h3>
+<pre>string raylabel()
+</pre>
+Returns the current ray label, which may be none (<tt>""</tt>)</div>
+
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1700-0!1!0!!en!2 and timestamp 20070718223248 -->
+<div class="printfooter">
+Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/SL_Functions">http://www.george-graphics.co.uk/pixiewiki/Documentation/SL_Functions</a>"</div>
+			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
+			<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+					 <li id="ca-nstab-main" class="selected"><a href="../Documentation/SL_Functions.html" title="View the content page [c]" accesskey="c">Article</a></li>
+					 <li id="ca-talk" class="new"><a href="/pixiewiki_install/index.php?title=Talk:Documentation/SL_Functions&amp;action=edit" title="Discussion about the content page [t]" accesskey="t">Discussion</a></li>
+					 <li id="ca-edit"><a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=edit" title="You can edit this page. Please use the preview button before saving. [e]" accesskey="e">Edit</a></li>
+					 <li id="ca-history"><a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;action=history" title="Past versions of this page. [h]" accesskey="h">History</a></li>
+				</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="/pixiewiki_install/index.php?title=Special:Userlogin&amp;returnto=Documentation/SL_Functions" title="You are encouraged to log in, it is not mandatory however. [o]" accesskey="o">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/pixiewiki_install/skins/common/images/wiki.png);" href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class='portlet' id='p-navigation'>
+		<h5>Navigation</h5>
+		<div class='pBody'>
+			<ul>
+				<li id="n-mainpage"><a href="../NotIncludedStatic.html" title="Visit the Main Page [z]" accesskey="z">Main Page</a></li>
+				<li id="n-Documentation"><a href="../Documentation.html">Documentation</a></li>
+				<li id="n-Examples"><a href="../NotIncludedStatic.html">Examples</a></li>
+				<li id="n-Tutorials"><a href="../Tutorials.html">Tutorials</a></li>
+				<li id="n-Sourceforge"><a href="http://pixie.sourceforge.net">Sourceforge</a></li>
+				<li id="n-recentchanges"><a href="../NotSupportedStatic.html" title="The list of recent changes in the wiki. [r]" accesskey="r">Recent changes</a></li>
+				<li id="n-help"><a href="../NotSupportedStatic.html" title="The place to find out.">Help</a></li>
+			</ul>
+		</div>
+	</div>
+		<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="../NotSupportedStatic.html" id="searchform"><div>
+				<input id="searchInput" name="search" type="text" title="Search PixieWiki [f]" accesskey="f" value="" />
+				<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="Go" />&nbsp;
+				<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="Search" />
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="../NotSupportedStatic.html" title="List of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+<li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
+<li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/SL_Functions&amp;oldid=3105">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
+			<ul id="f-list">
+				<li id="f-lastmod"> This page was last modified 13:09, 28 May 2007.</li>
+				<li id="f-viewcount">This page has been accessed 417 times.</li>
+				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
+				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
+				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+		
+	
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
+</div>
+<!-- Served by mercury.svr9-speedyservers.com in 0.569 secs. --></body></html>
