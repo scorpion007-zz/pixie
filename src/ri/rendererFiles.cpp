@@ -240,8 +240,6 @@ public:
 CTexture	*CRenderer::getTexture(const char *name) {
 	CFileResource	*tex;
 
-	if (*name == '\0')	return NULL;
-
 	assert(frameFiles != NULL);
 	
 	if (frameFiles->find(name,tex) == FALSE) {
@@ -251,7 +249,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
-			error(CODE_NOFILE,"Unable open texture \"%s\"\n",name);
+			if (*name != 0) error(CODE_NOFILE,"Unable open texture \"%s\"\n",name);
 			tex					=	new CDummyTexture(name);
 		}
 
