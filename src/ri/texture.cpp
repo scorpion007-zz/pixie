@@ -945,6 +945,8 @@ public:
 							layer1		=	layers[i+1];	
 							offset		=	l - i;
 							offset		=	min(offset,1);
+							
+							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
 
 							initv(result,0,0,0);					// Result is black
 							for (i=varyingLookup->numSamples;i>0;i--) {
@@ -955,12 +957,16 @@ public:
 
 								context->random2d.get(r);
 
-								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
-														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
-								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
-														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float 	x	=	(r[0]-0.5f)*jitter+0.5f;
+								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
 
-								contribution		=	lookup->filter(r[0]-0.5f,r[1]-0.5f,1,1);
+								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
+														(u[2]*(1-x) + u[3]*x)*y;
+								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
+														(v[2]*(1-x) + v[3]*x)*y;
+
+								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								// Do the s mode
@@ -1083,7 +1089,9 @@ public:
 	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
-
+							
+							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
+							
 							initv(result,0,0,0);		// Result is black
 							for (i=varyingLookup->numSamples;i>0;i--) {
 								float			s,t;
@@ -1092,19 +1100,23 @@ public:
 								float			r[2];
 
 								context->random2d.get(r);
-
-								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
-														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
-								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
-														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
-								contribution		=	lookup->filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
+								
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float		x	=	(r[0]-0.5f)*jitter+0.5f;
+								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
+								
+								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
+														(u[2]*(1-x) + u[3]*x)*y;
+								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
+														(v[2]*(1-x) + v[3]*x)*y;
+								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								if (varyingLookup->blur > 0) {
 									context->random2d.get(r);
 
-									s				+=	varyingLookup->blur*(r[0] - 0.5f);
-									t				+=	varyingLookup->blur*(r[1] - 0.5f);
+									s				+=	varyingLookup->blur*(x - 0.5f);
+									t				+=	varyingLookup->blur*(y - 0.5f);
 								}
 
 								// Do the s mode
@@ -1206,10 +1218,10 @@ public:
 							mulvf(S3,varyingLookup->width*2);
 							addvv(S3,center);
 
-
+							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
+							
 							result[0]	=	0;
 							for (i=varyingLookup->numSamples;i>0;i--) {
-								float	x,y;
 								float	s,t;
 								float	C;
 								float	contribution;
@@ -1218,9 +1230,11 @@ public:
 
 								context->random4d.get(r);
 
-								x					=	r[0];
-								y					=	r[1];
-								contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float x		=	(r[0]-0.5f)*jitter+0.5f;
+								const float y		=	(r[1]-0.5f)*jitter+0.5f;
+								
+								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(S0[COMP_X]*(1-x) + S1[COMP_X]*x)*(1-y) + (S2[COMP_X]*(1-x) + S3[COMP_X]*x)*y;
@@ -1353,7 +1367,9 @@ public:
 	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
 							int			i;
 							float		totalContribution	=	0;
-
+							
+							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
+							
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
@@ -1368,10 +1384,12 @@ public:
 								float		r[4];
 
 								context->random4d.get(r);
-
-								const float x		=	r[0];
-								const float y		=	r[1];
-								contribution		=	lookup->filter(x - 0.5f,y - 0.5f,1,1);
+								
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float x		=	(r[0]-0.5f)*jitter+0.5f;
+								const float y		=	(r[1]-0.5f)*jitter+0.5f;
+								
+								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
@@ -1597,16 +1615,20 @@ public:
 
 							if (dotvv(D0,D0) == 0)	return;
 
+							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
+							
 							for (i=varyingLookup->numSamples;i>0;i--) {
 								float	t;
 								float	contribution;
 								float	r[2];
 
 								context->random2d.get(r);
-
-								const float x		=	r[0];
-								const float y		=	r[1];
-								contribution		=	lookup->filter(x - (float) 0.5,y - (float) 0.5,1,1);
+	
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float x		=	(r[0]-0.5f)*jitter+0.5f;
+								const float y		=	(r[1]-0.5f)*jitter+0.5f;
+								
+								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
