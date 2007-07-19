@@ -2401,6 +2401,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						}
 					}
 				}
+				/* REMOVED for non-standard
 				|
 				RIB_SUBDIVISION_MESH
 				RIB_TEXT
@@ -2429,6 +2430,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						}
 					}
 				}
+				*/
 				|
 				RIB_BLOBBY
 				RIB_FLOAT

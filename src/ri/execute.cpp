@@ -237,17 +237,20 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Use this macro to start processing a parameter list
 #define		plBegin(__class,__start)		/* Create a hash key using shader and instruction */						\
 											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code / sizeof(TCode)) & (PL_HASH_SIZE-1);		\
-											__class		*lookup;													\
+											__class			*lookup	=	(__class *) plHash[hashKey];				\
 																													\
-											/* Look at the hash to see if we've computed this before	*/			\
-											if ((lookup = (__class *) plHash[hashKey]) == NULL) {					\
-																													\
-												/* Check for a collision	*/										\
+											/* Check for a collision	*/											\
+											if (lookup != NULL) {													\
 												if ((lookup->instance != cInstance) || (lookup->code != code)) {	\
 													/* Delete the old lookup */										\
 													delete lookup;													\
+													lookup	=	NULL;												\
 													/* FIXME: We don't have to delete on collision */				\
 												}																	\
+											}																		\
+																													\
+											/* Look at the hash to see if we've computed this before	*/			\
+											if (lookup == NULL) {													\
 																													\
 												/* Get the number of arguments we have */							\
 												const int	num			=	code->numArguments;						\
@@ -271,7 +274,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													const char **param;												\
 													operand(i,param,const char **);									\
 													/* Get the parameter info */									\
-													i++;															\
+													++i;															\
 													const int	uniform	=	operandVaryingStep(i) == 0;				\
 													const int	step	=	operandBytesPerItem(i)*operandNumItems(i);	\
 													/* Decode the data only for uniform parameters */				\
