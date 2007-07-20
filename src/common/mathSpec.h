@@ -512,6 +512,10 @@ inline	SCALAR_TYPE		nearestBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,c
 		if (tnear > tfar) return C_INFINITY;
 	}
 
+	// if we're inside, and edge is within ray range, return nearest side
+	if (tnear == tmin && tfar < tmax && tfar > tmin) return tfar;
+	
+	// return nearest t if we're external
 	return (SCALAR_TYPE) tnear;
 }
 
