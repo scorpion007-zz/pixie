@@ -1951,10 +1951,11 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 #ifndef INIT_SHADING
 
 
-// Note: we are swapping dDdu and dDdv with dPdu and dPdv here, because
+// Note: we are swapping D dDdu and dDdv with P dPdu and dPdv here, because
 // the ENVIRONMENT_PRE macro always calculates the dD differentials.
 // It is also very impartant that we supply dPdu and dPdv so the ray differentials
 // are correct or otherwise we waste time overtesselating
+// We also need to ensure that the ray direction is right (light to surface)
 
 #define	SHADOWEXPR_PRE			ENVIRONMENTEXPR_PRE("shadow");														\
 								const float	*L	=	varying[VARIABLE_L];											\
@@ -1972,12 +1973,12 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 
 #define	SHADOWEXPR(__float)		if (tex == NULL) {																	\
 									rays->res	=	res;															\
-									movvv(rays->P,D);																\
-									mulvf(rays->dPdu,dDdu,*du);														\
-									mulvf(rays->dPdv,dDdv,*dv);														\
-									subvv(rays->D,D,L);																\
-									mulvf(rays->dDdu,dPdu,*du);														\
-									mulvf(rays->dDdv,dPdv,*dv);														\
+									subvv(rays->P,D,L);																\
+									mulvf(rays->dPdu,dPdu,*du);														\
+									mulvf(rays->dPdv,dPdv,*dv);														\
+									movvv(rays->D,D);																\
+									mulvf(rays->dDdu,dDdu,*du);														\
+									mulvf(rays->dDdv,dDdv,*dv);														\
 									rays->coneAngle = varyingLookup.coneAngle;										\
 									rays++;																			\
 									numRays++;																		\
