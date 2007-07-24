@@ -65,6 +65,9 @@ class CRWLock {
 #define TRWLock         CRWLock
 typedef void			*(*TFun)(void *);
 
+#define	OS_DIR_SEPERATOR					'\\'
+#define OS_DIR_SEPERATOR_STRING				"\\"
+
 #else				// >>>>>>>>>>>>>>>>>>>   Unix
 #include <unistd.h>
 #include <pthread.h>
@@ -92,6 +95,10 @@ typedef void			*(*TFun)(void *);
 #define TSemaphore		sem_t
 #define TRWLock			pthread_rwlock_t
 typedef void			*(*TFun)(void *);
+
+
+#define OS_DIR_SEPERATOR					'/'
+#define OS_DIR_SEPERATOR_STRING				"/"
 
 #endif
 

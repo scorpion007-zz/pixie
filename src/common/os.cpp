@@ -49,10 +49,6 @@
 #include <direct.h>
 #include <errno.h>
 
-
-#define	OS_DIR_SEPERATOR					'\\'
-#define OS_DIR_SEPERATOR_STRING				"\\"
-
 ///////////////////////////////////////////////////
 // For Windoze we create encapsulate the thread in the following structure
 typedef struct {
@@ -80,8 +76,6 @@ static	DWORD WINAPI  dispatcherThread(void *w) {
 #include <dlfcn.h>
 #include <glob.h>
 
-#define OS_DIR_SEPERATOR					'/'
-#define OS_DIR_SEPERATOR_STRING				"/"
 // << Unix
 #endif
 
