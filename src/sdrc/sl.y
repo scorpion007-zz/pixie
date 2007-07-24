@@ -662,7 +662,9 @@ slShaderParameter:
 		slTypeDecl
 		{
 			int	type	=	$1;
-			
+
+			// Inside the shader param declarations, params
+			// are uniform by default
 			if (type & SLC_VARYING) {
 				// clear this marker, only used to invert the
 				// default from varying to uniform
@@ -670,7 +672,7 @@ slShaderParameter:
 			} else {	 
 				type |= SLC_UNIFORM;	 
 			}
-
+			
 			sdr->undesire();
 			sdr->desire(type);
 		}
