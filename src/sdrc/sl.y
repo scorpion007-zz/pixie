@@ -1198,11 +1198,29 @@ slContinueStatement:
 		////////////////////////////////////////////////
 		// Return statement
 slReturnStatement:
-		SL_RETURN slAritmeticExpression SL_SEMI_COLON
+		SL_RETURN 
+		{
+			CFunction	*cFun = sdr->lastFunction;
+			
+			// Work out what we're returning from
+			for (cFun = sdr->functionStack->last(); cFun != NULL; cFun = sdr->functionStack->prev()) {
+				if (strcmp(cFun->symbolName,constantBlockName) == 0) continue;
+				if (strcmp(cFun->symbolName,constantLoopName) == 0) continue;
+				break;
+			}
+
+			// Figure out what the return type is and desire it
+			CParameter	*retParam = cFun->returnValue;
+			int returnType = retParam->type;
+			sdr->desire(returnType);
+		}
+		slAritmeticExpression SL_SEMI_COLON
 		{
 			CFunction	*cFun	=	sdr->lastFunction;
 			CExpression	*c;
 
+			sdr->undesire();
+			
 			// Skip over loops
 			for (cFun = sdr->functionStack->last(); cFun != NULL; cFun = sdr->functionStack->prev()) {
 				if (strcmp(cFun->symbolName,constantBlockName) == 0) continue;
@@ -1219,8 +1237,8 @@ slReturnStatement:
 					c	=	new CNullExpression;
 				} else {
 					// if the return type is uniform, set the return value to uniform
-					if ($2->type & SLC_UNIFORM) cFun->returnValue->type |= SLC_UNIFORM;
-					c	=	new CAssignmentExpression(cFun->returnValue,$2);				
+					if ($3->type & SLC_UNIFORM) cFun->returnValue->type |= SLC_UNIFORM;
+					c	=	new CAssignmentExpression(cFun->returnValue,$3);
 				}
 
 				$$	=	c;
