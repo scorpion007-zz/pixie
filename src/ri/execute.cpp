@@ -235,7 +235,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 
 // Use this macro to start processing a parameter list
-#define		plBegin(__class,__start)		/* Create a hash key using shader and instruction */						\
+#define		plBegin(__class,__start)		/* Create a hash key using shader and instruction */					\
 											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code / sizeof(TCode)) & (PL_HASH_SIZE-1);		\
 											__class			*lookup	=	(__class *) plHash[hashKey];				\
 																													\
@@ -260,13 +260,12 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												CPLLookup::TParamBinding	*varyings	=	uniforms + num;			\
 																													\
 												/* Create a new lookup	*/											\
-												lookup					=	new __class;							\
-												lookup->instance		=	cInstance;								\
-												lookup->code			=	code;									\
-												lookup->size			=	0;										\
-												plHash[hashKey]			=	lookup;									\
-												lookup->uniforms		=	uniforms;								\
-												lookup->varyings		=	varyings;								\
+												plHash[hashKey] = lookup	=	new __class;						\
+												lookup->instance			=	cInstance;							\
+												lookup->code				=	code;								\
+												lookup->size				=	0;									\
+												lookup->uniforms			=	uniforms;							\
+												lookup->varyings			=	varyings;							\
 																													\
 												/* Decode the PL */													\
 												for (int i=__start;i<num;++i) {										\
@@ -330,7 +329,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Use this macro to restore the scratch variables that have been overwritten
 #define		plEnd()							space		=	savedVariables;											\
 											cBinding	=	lookup->varyings;										\
-											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
+											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
 												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
 												space	+=	cBinding->step;											\
 												align64(space);														\

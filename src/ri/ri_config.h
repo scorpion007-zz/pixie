@@ -98,5 +98,8 @@
 // The maximum number of channels in a 3d texture
 #define	TEXTURE3D_MAX_CHANNELS			32
 
+// The number of samples to take for filtered step
+#define	FILTERSTEP_SAMPLES				100
+
 #endif
 

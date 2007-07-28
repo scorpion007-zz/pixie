@@ -47,7 +47,7 @@ public:
 
 								// This function must be overwritten to bind a particular variable
 		virtual		void		bind(const char *name,int &opIndex,int step,void *data);
-					void		add(const char *name,int &opIndex,int step,void *data,size_t dest);
+					void		add(const char *name,int opIndex,int step,void *data,size_t dest);
 
 		const void				*instance;			// The instance that has the PL
 		const void				*code;				// The code that has the PL

@@ -72,7 +72,7 @@ CPLLookup::~CPLLookup() {
 // Return Value			:	-
 // Comments				:
 void	CPLLookup::bind(const char *name,int &opIndex,int step,void *data) {
-	error(CODE_BADTOKEN,"Unknown parameter: \"%s\"n",name);
+	error(CODE_BADTOKEN,"Unknown parameter: \"%s\"\n",name);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -81,14 +81,14 @@ void	CPLLookup::bind(const char *name,int &opIndex,int step,void *data) {
 // Description			:	Add a parameter
 // Return Value			:	-
 // Comments				:
-void	CPLLookup::add(const char *name,int &opIndex,int step,void *data,size_t dest) {
+void	CPLLookup::add(const char *name,int opIndex,int step,void *data,size_t dest) {
 	TParamBinding	*cBinding;
-
+	
 	if (data != NULL)	cBinding	=	uniforms + numUniforms++;
 	else				cBinding	=	varyings + numVaryings++;
 
 	cBinding->name		=	name;
-	cBinding->opIndex	=	opIndex++;
+	cBinding->opIndex	=	opIndex;
 	cBinding->step		=	step;
 	cBinding->dest		=	dest;
 	size				+=	step;
@@ -98,7 +98,7 @@ void	CPLLookup::add(const char *name,int &opIndex,int step,void *data,size_t des
 
 
 
-#define	expectUniform(__name)	if (data == NULL)	warning(CODE_CONSISTENCY,"\"%s\" parameter was expected to be uniformn",__name)
+#define	expectUniform(__name)	if (data == NULL)	warning(CODE_CONSISTENCY,"\"%s\" parameter was expected to be uniform\n",__name)
 
 
 

@@ -1391,13 +1391,8 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 // Return Value			:	-
 // Comments				:
 CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CList<CExpression *> *p) : CExpression(f->functionType) {
-	int	fa	=	SLC_UNIFORM;
-	int	i;
-
-	if (strcmp(f->symbolName,"lightsource") == 0) {
-		i	=	0;
-	}
-
+	int			fa	=	SLC_UNIFORM;
+	int			i;
 	CExpression	*cEx;
 
 	replacementPrototype	=	NULL;
@@ -1707,6 +1702,7 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 		op[i]	=	NULL;
 
 		if ((i >= plStart) || ((usedPrototype[i+2] >= 'A') && (usedPrototype[i+2] <= 'Z'))) {
+			dt	&=	~SLC_VARYING;
 			dt	|=	SLC_UNIFORM;
 		}
 

@@ -1934,7 +1934,6 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 #define	FILTERSTEP2EXPR_PRE	FUN3EXPR_PRE																		\
 							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
 							float	*dsdv					=	dsdu + numVertices;								\
-							float	*fwidth					=	dsdu;											\
 							const float		*du				=	varying[VARIABLE_DU];							\
 							const float		*dv				=	varying[VARIABLE_DV];							\
 																												\
@@ -1942,15 +1941,15 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 							dvFloat(dsdv,op2);
 
 #define	FILTERSTEP2EXPR		*res	=	0;																		\
-							for (int j=0;j<10;++j) {															\
+							for (int j=FILTERSTEP_SAMPLES;j>0;--j) {											\
 								const float	s	=	(*dsdu)*(*du)*(urand() - 0.5f)	+							\
 													(*dsdv)*(*dv)*(urand() - 0.5f)	+ (*op2);					\
 								if (s > *op1)	*res	+=	1.0f;												\
 							}																					\
-							*res	/=	10.0f;
+							*res	/=	(float) FILTERSTEP_SAMPLES;
 
 
-#define	FILTERSTEP2EXPR_UPDATE	FUN3EXPR_UPDATE(1,1,1)															\
+#define	FILTERSTEP2EXPR_UPDATE	du++; dv++; dsdu++; dsdv++; FUN3EXPR_UPDATE(1,1,1)
 
 #else
 #define	FILTERSTEP2EXPR_PRE
@@ -1972,11 +1971,11 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 #define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE
 
 #define	FILTERSTEP3EXPR		*res	=	0;																		\
-							for (int j=0;j<10;++j) {															\
+							for (int j=FILTERSTEP_SAMPLES;j>0;--j) {											\
 								const float	s	=	((*op3) - (*op2))*urand() + (*op2);							\
 								if (s > *op1)	*res	+=	1.0f;												\
 							}																					\
-							*res	/=	10.0f;
+							*res	/=	(float) FILTERSTEP_SAMPLES;
 
 
 #define	FILTERSTEP3EXPR_UPDATE	FUN4EXPR_UPDATE(1,1,1,1)
