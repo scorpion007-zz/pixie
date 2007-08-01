@@ -126,11 +126,11 @@ public:
 		float			width;
 		float			swidth;
 		float			twidth;
-		float			fill;		}				textureParams;
+		float			fill;			}			textureParams;
 
 	// Photonmap parameters
 	struct {
-		float			estimator;	}				photonmapParams;
+		float			estimator;		}			photonmapParams;
 
 	// texture3d/bake3d parameters
 	struct {
@@ -142,7 +142,7 @@ public:
 	// Trace/Transmission parameters
 	struct {
 		float			samples;
-		float			bias;
+		float			bias;			// This parameter is copied from object attributes by default (unnecessary redundancy in RenderMan)
 		float			coneAngle;
 		float			sampleBase;
 		float			maxDist;
@@ -150,7 +150,7 @@ public:
 
 	// Indirectdiffuse/occlusion parameters
 	struct {
-		float			maxError;
+		float			maxError;		// This parameter is copied from object attributes by default (unnecessary redundancy in RenderMan)
 		float			pointbased;
 		float			maxBrightness;
 		const char		*environmentMapName;

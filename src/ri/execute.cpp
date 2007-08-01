@@ -292,12 +292,19 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												memcpy(lookup->varyings,varyings,lookup->numVaryings*sizeof(CPLLookup::TParamBinding));	\
 											}																		\
 																													\
+											/* Get a local copy of the scratch */									\
+											CShadingScratch		*scratch		=	&(currentShadingState->scratch);	\
+																														\
+											/* Overwrite some of the initial values from the attributes */				\
+											const CAttributes *cAttributes		=	currentShadingState->currentObject->attributes;	\
+											scratch->traceParams.bias			=	cAttributes->bias;					\
+											scratch->occlusionParams.maxError	=	cAttributes->irradianceMaxError;	\
+																													\
 											/* Init the varyings	*/												\
 											char	*savedVariables	=	(char *) ralloc(lookup->size + lookup->numVaryings*sizeof(char *),threadMemory);	\
 											char	*space			=	savedVariables;								\
 											char	**PL_VARIABLES	=	(char **) (space + lookup->size);			\
 											const CPLLookup::TParamBinding	*cBinding	=	lookup->varyings;		\
-											CShadingScratch					*scratch	=	&(currentShadingState->scratch);	\
 											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
 												operand(cBinding->opIndex,PL_VARIABLES[var],char *);				\
 												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
@@ -524,55 +531,40 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Break the shader execution
 #define		BREAK							goto execEnd;
 
+	// Uninitialized local variables
+	CGatherBundle		*lastGather;
 
-
-	//	The	shading variables and junk
-	void						**stuff[3];			// Where we keep pointers to the variables
-	CConditional				*lastConditional;	// The last conditional
-	int							numActive;			// The number of active points being shaded
-	int							numPassive;			// The number of passive points being not shaded (numPassive+numActive = numVertices)
-	int							*tags;				// Execution tags
-	int							*tagStart;
-	int							currentVertex;		// The current vertex being executed
-	CShader						*currentShader			=	cInstance->parent;
-	const TCode					*code;
-	int							numVertices;
-	float						**varying;
-	CShadedLight				**lights;
-	CShadedLight				**alights;
-	CShadedLight				**currentLight;
-	CShadedLight				**freeLights;
-	CGatherBundle				*lastGather;		// Pointer to the last gather bundle
+	// This is the current shader we're executing
+	CShader		*currentShader			=	cInstance->parent;
 	
-
 	assert((currentShadingState->numActive+currentShadingState->numPassive) == currentShadingState->numVertices);
 
 	currentShadingState->currentShaderInstance	=	cInstance;
-	code										=	currentShader->codeArea + currentShader->codeEntryPoint;
-	tagStart									=	currentShadingState->tags;
+	const TCode	*code					=	currentShader->codeArea + currentShader->codeEntryPoint;
+	int			*tagStart				=	currentShadingState->tags;
 
 	// Save this stuff for fast access
-	numVertices							=	currentShadingState->numVertices;
-	varying								=	currentShadingState->varying;
-	lights								=	&currentShadingState->lights;
-	alights								=	&currentShadingState->alights;
-	currentLight						=	&currentShadingState->currentLight;
-	freeLights							=	&currentShadingState->freeLights;
+	int				numVertices			=	currentShadingState->numVertices;
+	float			**varying			=	currentShadingState->varying;
+	CShadedLight	**lights			=	&currentShadingState->lights;
+	CShadedLight	**alights			=	&currentShadingState->alights;
+	CShadedLight	**currentLight		=	&currentShadingState->currentLight;
+	CShadedLight	**freeLights		=	&currentShadingState->freeLights;
 
 	// Set the access arrays
+	void	**stuff[3];
 	stuff[SL_IMMEDIATE_OPERAND]			=	currentShader->constantEntries;				// Immediate operands
 	stuff[SL_GLOBAL_OPERAND]			=	(void **) varying;							// Global variables
 	stuff[SL_VARYING_OPERAND]			=	(void **) locals;							// Local variables
 
-	numActive							=	currentShadingState->numActive;
-	numPassive							=	currentShadingState->numPassive;
-	lastConditional						=	NULL;										// The last conditional block
+	int				numActive			=	currentShadingState->numActive;
+	int				numPassive			=	currentShadingState->numPassive;
+	CConditional	*lastConditional	=	NULL;										// The last conditional block
 
 	// Execute
 execStart:
 	const ESlCode	opcode	=	(ESlCode)	code->opcode;	// Get the opcode
-
-	tags	=	tagStart;						// Set the tags to the start
+	int				*tags	=	tagStart;					// Set the tags to the start
 
 	if (code->uniform) {			// If the opcode is uniform , execute once
 #define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
@@ -652,7 +644,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -668,7 +660,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {			\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -684,7 +676,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -699,7 +691,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -714,7 +706,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {			\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -751,7 +743,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {				\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -764,7 +756,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {					\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -778,7 +770,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {				\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -791,7 +783,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -807,7 +799,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {					\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -846,18 +838,16 @@ execEnd:
 	// Make sure we save the ambient contribution if there has been no illuminate/solar executed
 	if (currentShader->type == SL_LIGHTSOURCE) {
 		if (!(currentShader->usedParameters & PARAMETER_NONAMBIENT)) {
-			float	*Cl		=	varying[VARIABLE_CL];
-			float	*Ol		=	varying[VARIABLE_OL];
-			float	*Clsave;
+			const float	*Cl		=	varying[VARIABLE_CL];
+			float		*Clsave;
 			
 			// Save the ambient junk
 			Clsave	= (*alights)->savedState[1];
 			tags	= tagStart;
-			for (int i=numVertices;i>0;i--,Cl+=3,Ol+=3,Clsave+=3) {
+			for (int i=numVertices;i>0;--i,Cl+=3,Clsave+=3,++tags) {
 				if (*tags==0) {
 					addvv(Clsave,Cl);
 				}
-				tags++;
 			}
 		}
 	}

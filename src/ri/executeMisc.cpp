@@ -837,16 +837,13 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int probeOnly) {
-	CTransmissionRay	*rayBase;
-	CTransmissionRay	**raysBase;
-	CTransmissionRay	*cRay,**cRays;
+	CTransmissionRay		*rayBase;
+	CTransmissionRay		**raysBase;
+	CTransmissionRay		*cRay,**cRays;
 	const CShadingScratch	*scratch	=	&(currentShadingState->scratch);
-	const int			shootStep		=	CRenderer::shootStep;
-	int					numRemaining	=	shootStep;
-	int					currentSample;
-	int					i;
-	CTransmissionBundle	bundle;
-	vector				dir;
+	const int				shootStep		=	CRenderer::shootStep;
+	int						numRemaining	=	shootStep;
+	CTransmissionBundle		bundle;
 
 	// Set the ray label we're tracing
 	if ((bundle.label = scratch->traceParams.label) == NULL)	bundle.label	=	rayLabelTransmission;
@@ -860,7 +857,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	inShadow		=	TRUE;					// We're in shadow
 
 	// For each ray
-	for (i=numRays;i>0;i--,rays++) {
+	for (int i=numRays;i>0;--i,++rays) {
 		const int			numSamples		=	rays->numSamples;
 		const float			coneAngle		=	rays->coneAngle;
 		const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
@@ -874,8 +871,8 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 		rays->t	=	0;
 
 		// Sample
-		for (currentSample=numSamples;currentSample>0;currentSample--) {
-			vector	from,L;
+		for (int currentSample=numSamples;currentSample>0;--currentSample) {
+			vector	from,L,dir;
 
 			// Sample the ray
 			sampleRay(from,L);
@@ -932,8 +929,8 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 		bundle.postShader	=	NULL;
 		traceEx(&bundle);
 	}
-
-	inShadow		=	FALSE;
+	
+	inShadow		=	FALSE;			// We're no longer in shadow
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -943,16 +940,14 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probeOnly) {
-	CTraceRay			*interiorRayBase,*cInteriorRay;
-	CTraceRay			*exteriorRayBase,*cExteriorRay;
-	CTraceRay			**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
-	const CShadingScratch	*scratch	=	&(currentShadingState->scratch);
-	const int			shootStep		=	CRenderer::shootStep;
-	int					numInteriorRemaining	=	shootStep;
-	int					numExteriorRemaining	=	shootStep;
-	int					currentSample;
-	int					i;
-	CTraceBundle		interiorBundle,exteriorBundle;
+	CTraceRay				*interiorRayBase,*cInteriorRay;
+	CTraceRay				*exteriorRayBase,*cExteriorRay;
+	CTraceRay				**interiorRaysBase,**exteriorRaysBase,**cInteriorRays,**cExteriorRays;
+	const CShadingScratch	*scratch				=	&(currentShadingState->scratch);
+	const int				shootStep				=	CRenderer::shootStep;
+	int						numInteriorRemaining	=	shootStep;
+	int						numExteriorRemaining	=	shootStep;
+	CTraceBundle			interiorBundle,exteriorBundle;
 
 	// Verify atmosphere shaders
 	CAttributes *cAttr				=	currentShadingState->currentObject->attributes;
@@ -978,7 +973,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 	}
 	
 	// For each ray
-	for (i=numRays;i>0;i--,rays++) {
+	for (int i=numRays;i>0;--i,++rays) {
 		const int			numSamples		=	rays->numSamples;
 		const float			coneAngle		=	rays->coneAngle;
 		const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
@@ -992,7 +987,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 		rays->t	=	0;
 
 		// Sample
-		for (currentSample=numSamples;currentSample>0;currentSample--) {
+		for (int currentSample=numSamples;currentSample>0;--currentSample) {
 			vector	from,D,dir;
 			
 			sampleRay(from,D);

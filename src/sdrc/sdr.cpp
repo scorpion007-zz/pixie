@@ -806,7 +806,6 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("urandom","n=",0);
 	addBuiltInFunction("urandom","p=",0);
 	addBuiltInFunction("urandom","c=",0);
-	addBuiltInFunction("checkers","f=",0,TRUE);
 	addBuiltInFunction("noise","f=f",0);
 	addBuiltInFunction("noise","f=ff",0);
 	addBuiltInFunction("noise","f=p",0);

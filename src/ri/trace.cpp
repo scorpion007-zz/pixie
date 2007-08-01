@@ -327,10 +327,10 @@ public:
 void	CShadingContext::trace(CRay *ray) {
 
 	
-	CTraceObject		heapBase[101];
+	CTraceObject		heapBase[TRACE_HEAP_SIZE + 1];
 	CTraceObject		*heap		=	heapBase;
 	int					numObjects	=	1;
-	int					maxObjects	=	100;
+	int					maxObjects	=	TRACE_HEAP_SIZE;
 	
 	// Compute the inverse of the ray direction first
 	ray->invDir[0]	= 1.0 / (double) ray->dir[0];

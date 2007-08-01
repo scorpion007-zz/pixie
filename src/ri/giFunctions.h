@@ -68,10 +68,11 @@
 								mulvf(rays->dDdu,dTdu,*du);		\
 								mulvf(rays->dDdv,dTdv,*dv);		\
 								movvv(rays->N,N);				\
-								rays->coneAngle		=	scratch->traceParams.coneAngle;		\
-								rays->bias			=	scratch->traceParams.bias;			\
-								rays->numSamples	=	(int) scratch->traceParams.samples;	\
-								rays->maxDist		=	scratch->traceParams.maxDist;		\
+								rays->coneAngle		=	scratch->traceParams.coneAngle;							\
+								rays->numSamples	=	(int) scratch->traceParams.samples;						\
+								rays->bias			=	scratch->traceParams.bias;								\
+								rays->sampleBase	=	scratch->traceParams.sampleBase;						\
+								rays->maxDist		=	scratch->traceParams.maxDist;							\
 								rays++;							\
 								numRays++;
 
@@ -202,8 +203,8 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								const float	*dv		=	varying[VARIABLE_DV];														\
 								assert(cache->dataSize == 7);																		\
 																																	\
-								scratch->occlusionParams.environment	=	lookup->environment;													\
-								scratch->occlusionParams.pointHierarchy	=	lookup->pointHierarchy;													\
+								scratch->occlusionParams.environment	=	lookup->environment;									\
+								scratch->occlusionParams.pointHierarchy	=	lookup->pointHierarchy;									\
 																																	\
 								float	C[7];																						\
 								float	**channelValues = (float **) ralloc(lookup->numChannels*sizeof(const float *),threadMemory);\
@@ -211,7 +212,8 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								for (int channel=0;channel<lookup->numChannels;++channel) {											\
 									operand(lookup->channelIndex[channel],channelValues[channel],float *);							\
 								}																									\
-								const float	savedSamples	=	scratch->traceParams.samples;
+								const float	savedSamples	=	scratch->traceParams.samples;										\
+								scratch->occlusionParams.occlusion	=	__occlusion;
 
 
 #define	IDEXPR(__occlusion)		plReady();																							\
@@ -233,14 +235,14 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 									channelValues[channel]	+=	lookup->channelSize[channel];										\
 								}
 
-#define	IDEXPR_POST(__occlusion)								\
-								if (__occlusion)	{			\
-									expandFloat(res);			\
-								} else {						\
-									expandVector(res);			\
-								}								\
-								plEnd();						\
-								scratch->traceParams.samples	=	savedSamples;
+#define	IDEXPR_POST(__occlusion)													\
+								if (__occlusion)	{								\
+									expandFloat(res);								\
+								} else {											\
+									expandVector(res);								\
+								}													\
+								scratch->traceParams.samples	=	savedSamples;	\
+								plEnd();
 #else
 #define	IDEXPR_PRE
 #define	IDEXPR

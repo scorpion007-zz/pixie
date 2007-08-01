@@ -1754,8 +1754,9 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									mulvf(rays->dPdu,dPdu,(*du)*swidth);											\
 									mulvf(rays->dPdv,dPdv,(*dv)*twidth);											\
 									rays->coneAngle		=	scratch->traceParams.coneAngle;							\
-									rays->bias			=	scratch->traceParams.bias;								\
 									rays->numSamples	=	(int) scratch->traceParams.samples;						\
+									rays->bias			=	scratch->traceParams.bias;								\
+									rays->sampleBase	=	scratch->traceParams.sampleBase;						\
 									rays->maxDist		=	scratch->traceParams.maxDist;							\
 									rays++;																			\
 									numRays++;																		\
@@ -1851,7 +1852,11 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 									subvv(rays->D,D,L);																\
 									mulvf(rays->dDdu,dPdu,(*du)*swidth);											\
 									mulvf(rays->dDdv,dPdv,(*dv)*twidth);											\
-									rays->coneAngle = scratch->traceParams.coneAngle;								\
+									rays->coneAngle		=	scratch->traceParams.coneAngle;							\
+									rays->sampleBase	=	scratch->traceParams.sampleBase;						\
+									rays->numSamples	=	(int) scratch->traceParams.samples;						\
+									rays->bias			=	scratch->traceParams.bias;								\
+									rays->maxDist		=	scratch->traceParams.maxDist;							\
 									rays++;																			\
 									numRays++;																		\
 								} else {																			\

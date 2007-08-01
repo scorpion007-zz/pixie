@@ -212,7 +212,8 @@ void		CTraceLookup::bind(const char *name,int &opIndex,int step,void *data) {
 // Return Value			:	-
 // Comments				:
 CEnvironmentLookup::CEnvironmentLookup() {
-	map	=	NULL;
+	filter	=	RiBoxFilter;
+	map		=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
