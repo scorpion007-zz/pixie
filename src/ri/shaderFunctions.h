@@ -1464,12 +1464,6 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								dvFloat(dsdv,s);																\
 								dvFloat(dtdv,t);																\
 																												\
-								for (i=0;i<numVertices;i++) {													\
-									dsdu[i]		*=	swidth*du[i];												\
-									dsdv[i]		*=	swidth*dv[i];												\
-									dtdu[i]		*=	twidth*du[i];												\
-									dtdv[i]		*=	twidth*dv[i];												\
-								}																				\
 								i	=	0;
 
 #define	TEXTUREFEXPR			plReady();																		\
