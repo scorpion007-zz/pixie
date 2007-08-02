@@ -122,8 +122,8 @@ CAttributes::CAttributes() {
 	causticMapName				=	NULL;
 	globalMap					=	NULL;
 	causticMap					=	NULL;
-	irradianceHandle			=	NULL;
-	irradianceHandleMode		=	NULL;
+	irradianceHandle			=	strdup("");
+	irradianceHandleMode		=	strdup("w");
 	irradianceMaxError			=	0.6f;
 	irradianceMaxPixelDistance	=	20.0f;
 	photonEstimator				=	100;

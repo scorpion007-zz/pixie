@@ -1457,7 +1457,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								const float		*du			=	varying[VARIABLE_DU];							\
 								const float		*dv			=	varying[VARIABLE_DV];							\
 																												\
-								scratch->textureParams.filter				=	lookup->filter;					\
+								scratch->textureParams.filter	=	lookup->filter;								\
 																												\
 								duFloat(dsdu,s);																\
 								duFloat(dtdu,t);																\
