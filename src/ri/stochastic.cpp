@@ -272,6 +272,10 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 }
 
 // This macro is called when an opaque fragment is inserted
+// Note: On the assumption that the opacity really is nearly opaque, we don't really need
+// to bother messing with pixel->last though it might technicaly be more correct to do so
+// so these sections are commented out in updateOpaque and updateTransparent
+
 
 #define updateOpaque() {																			\
 	CFragment *cSample=pixel->last.prev;															\
@@ -283,7 +287,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 		deleteFragment(cSample);																	\
 		cSample				=	nSample;															\
 	}																								\
-	initv(cSample->accumulatedOpacity,1);															\
+	/*initv(pixel->last.accumulatedOpacity,1);*/													\
 	pixel->update			=	cSample;															\
 }
 
@@ -291,6 +295,23 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // maximum opaque depth - in which case we must flush the new sample and everything
 // beind it.  Otherwise, we need to update accumulated opacity, and cull samples
 // behind the point where we become opaque
+
+#define debugTransparencyStack(cSample) {						\
+	printf(">> cull opac %.6f %.6f %.6f\n",O[0],O[1],O[2]);		\
+	CFragment *ds=cSample;										\
+	while(ds) {													\
+		printf("opac %.6f %.6f %.6f\tropac %.6f %.6f %.6f",ds->opacity[0],ds->opacity[1],ds->opacity[2],	\
+			ds->accumulatedOpacity[0],ds->accumulatedOpacity[1],ds->accumulatedOpacity[2]);					\
+		if(ds==nSample) {										\
+			if(ds==&pixel->last) printf("*");					\
+			printf("*\n");										\
+		} else {												\
+			printf("\n");										\
+		}														\
+		ds = ds->prev;											\
+	}															\
+	printf("\n");												\
+}
 
 #define updateTransparent(dfIf,dfElse) {															\
 	vector O,rO;																					\
@@ -313,16 +334,16 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 			O[0] += Oc[0]*rO[0];																	\
 			O[1] += Oc[1]*rO[1];																	\
 			O[2] += Oc[2]*rO[2];																	\
-			rO[0] += 1-O[0];																		\
-			rO[1] += 1-O[1];																		\
-			rO[2] += 1-O[2];																		\
+			rO[0] *= 1-Oc[0];																		\
+			rO[1] *= 1-Oc[1];																		\
+			rO[2] *= 1-Oc[2];																		\
 		}																							\
 		movvv(cSample->accumulatedOpacity,O);														\
 																									\
 		if (O[0] > CRenderer::opacityThreshold[0] && O[1] > CRenderer::opacityThreshold[1] && O[2] > CRenderer::opacityThreshold[2]) {	\
 			/* opaque after this point */															\
 			CFragment *dSample	=	cSample->next;													\
-			if (dSample != &pixel->last) {															\
+			if (dSample && dSample != &pixel->last) {												\
 				while(dSample && dSample != &pixel->last) {											\
 					CFragment *tSample	=	dSample->next;											\
 					deleteFragment(dSample);														\
@@ -331,12 +352,17 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 				cSample->next		=	&pixel->last;												\
 				pixel->last.prev	=	cSample;													\
 				pixel->update		=	cSample;													\
+				/*initv(pixel->last.color,0);				*/	\
+				/*initv(pixel->last.opacity,0);				*/	\
+				/*initv(pixel->last.accumulatedOpacity,1);	*/	\
+				/*pixel->last.z = CRenderer::clipMax;		*/	\
+				/*initv(cSample->accumulatedOpacity,1);		*/	\
 			}																						\
 			const float z			=	cSample->z;													\
 			if (z < pixel->z) {																		\
 				dfIf();																				\
 				pixel->z			=	z;															\
-				touchNode(pixel->node,cSample->z);													\
+				touchNode(pixel->node,z);															\
 			} dfElse();																				\
 			break;																					\
 		}																							\
