@@ -126,7 +126,7 @@ void		CRenderer::shutdownFiles() {
 int			CRenderer::locateFileEx(char *result,const char *name,const char *extension,TSearchpath *searchpath) {
 	const char *dotpos	=	strchr(name,'.');
 	const char *seppos	=	strchr(name,OS_DIR_SEPERATOR);
-	if (dotpos > seppos || dotpos == NULL) {
+	if (dotpos < seppos || dotpos == NULL) {
 		char	tmp[OS_MAX_PATH_LENGTH];
 
 		sprintf(tmp,"%s.%s",name,extension);
