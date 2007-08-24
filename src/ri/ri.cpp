@@ -426,6 +426,7 @@ const	unsigned int		VALID_XFORM_BLOCKS					=	RENDERMAN_BLOCK | RENDERMAN_FRAME_B
 const	unsigned int		VALID_PRIMITIVE_BLOCKS				=	RENDERMAN_WORLD_BLOCK | RENDERMAN_ARCHIVE_BLOCK | RENDERMAN_ATTRIBUTE_BLOCK | RENDERMAN_XFORM_BLOCK | RENDERMAN_SOLID_PRIMITIVE_BLOCK | RENDERMAN_OBJECT_BLOCK | RENDERMAN_MOTION_BLOCK | RENDERMAN_RESOURCE_BLOCK;
 
 // Global variables to convert calls to the vector form
+static	int					initialized			=	FALSE;
 static	int					nTokens,mTokens;							// Parameter list info
 static	RtToken				*tokens				=	NULL;
 static	RtPointer			*values				=	NULL;
@@ -529,6 +530,8 @@ static	inline	void	getArgs(va_list args) {
 // Return Value			:
 // Comments				:
 static	void RiInit() {
+	if (initialized)	return;
+	
 	nTokens				=	0;
 	mTokens				=	0;
 	tokens				=	NULL;
@@ -540,6 +543,7 @@ static	void RiInit() {
 	tokens				=	new RtToken[mTokens];
 	values				=	new RtPointer[mTokens];
 	currentBlock		=	RENDERMAN_BLOCK;
+	initialized			=	TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1046,6 +1050,9 @@ EXTERN(RtVoid)
 RiOption (char *name, ...) {
 	va_list	args;
 
+	// init if necessary (for gz options)
+	if (!initialized) RiInit();
+	
 	va_start(args,name);
 	getArgs(args);
 	RiOptionV(name,nTokens,tokens,values);
@@ -1075,6 +1082,7 @@ RiOptionV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 				}
 			}
 		}
+		return;
 	}
 	
 	if (check("RiOption",VALID_OPTION_BLOCKS)) return;
@@ -2223,7 +2231,7 @@ EXTERN(RtVoid)
 EXTERN(RtVoid)
 	RiMakeBrickMapV(int nb,char **src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]) {
 
-	if (check("RiMakeTexture3D",RENDERMAN_ALL_BLOCKS)) return;	
+	if (check("RiMakeBrickMap",RENDERMAN_ALL_BLOCKS)) return;	
 
 	renderMan->RiMakeBrickMapV(nb,src,dest,n,tokens,params);
 }
