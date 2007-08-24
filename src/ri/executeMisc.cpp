@@ -59,6 +59,11 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
+		{
+			for (int j=currentShadingState->numVertices;j>0;j--) {
+				*dest++ = 0;
+			}
+		}
 		break;
 
 
@@ -418,6 +423,12 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
+		{
+			for (int j=currentShadingState->numVertices;j>0;j--) {
+				initv(dest,0);
+				dest+=3;
+			}
+		}
 		break;
 
 
@@ -515,6 +526,12 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
+		{
+			for (int j=currentShadingState->numVertices;j>0;j--) {
+				initv(dest,0);
+				dest+=3;
+			}
+		}
 		break;
 
 
@@ -711,7 +728,8 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 		case SHADING_0D:
 		{
 			for (int i=currentShadingState->numVertices;i>0;i--) {
-				*dest++	=	0;
+				initv(dest,0);
+				dest+=3;
 			}
 		}
 		break;
