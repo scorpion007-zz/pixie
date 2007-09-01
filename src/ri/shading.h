@@ -51,7 +51,6 @@ class	CTracable;
 class	CQuadVertex;
 class	CQuadTriangle;
 class	CQuad;
-class	CTextureLookup;
 class	CTexture3d;
 class	CVertex;
 class	CMovingVertex;
@@ -67,6 +66,10 @@ class	CVisorCache;
 class	CPl;
 class	CSphereLight;
 struct	TObjectHash;
+class	CPLLookup;
+class	CPointHierarchy;
+class	CEnvironment;
+
 
 typedef enum {
 	SHADING_0D,				// Shading points
@@ -107,6 +110,63 @@ public:
 		CShadedLight			*next;								// Points to the next shaded light
 };
 
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingScratch
+// Description			:	Holds all the scratch variables
+// Comments				:
+class	CShadingScratch {
+public:
+					CShadingScratch();		// The constructor only init the default values
+
+	// Texture/Environment parameters
+	struct {
+		RtFilterFunc	filter;
+		float			blur;
+		float			width;
+		float			swidth;
+		float			twidth;
+		float			fill;			}			textureParams;
+
+	// Photonmap parameters
+	struct {
+		float			estimator;		}			photonmapParams;
+
+	// texture3d/bake3d parameters
+	struct {
+		const char		*coordsys;
+		float			interpolate;
+		float			radius;
+		float			radiusScale;	}			texture3dParams;
+
+	// Trace/Transmission parameters
+	struct {
+		float			samples;
+		float			bias;			// This parameter is copied from object attributes by default (unnecessary redundancy in RenderMan)
+		float			coneAngle;
+		float			sampleBase;
+		float			maxDist;
+		const char		*label;			}			traceParams;
+
+	// Indirectdiffuse/occlusion parameters
+	struct {
+		float			maxError;		// This parameter is copied from object attributes by default (unnecessary redundancy in RenderMan)
+		float			pointbased;
+		float			maxBrightness;
+		const char		*environmentMapName;
+		const char		*pointHierarchyName;
+		float			maxPixelDist;
+		float			maxSolidAngle;
+		int				occlusion;
+		vector			environmentColor;
+		CTexture3d		*pointHierarchy;
+		CEnvironment	*environment;	}			occlusionParams;
+
+	// Gather parameters
+	struct {
+		const char		*distribution;	}			gatherParams;
+};
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingState
 // Description			:	Holds a shading state at a depth
@@ -141,6 +201,8 @@ public:
 		CShaderInstance			*currentLightInstance;				// The current light instance that's executing
 		
 		float					**locals[NUM_ACCESSORS];			// The local variables for each shader type
+
+		CShadingScratch			scratch;							// The scratch pad that holds PL data
 
 		CShadingState			*next;								// The next in free state list
 };
@@ -318,10 +380,14 @@ private:
 			vector				D,dDdu,dDdv;		// The direction (for reflection), the ray target (for transmission)
 			vector				N;					// Surface normal reference to determine interior or exterior
 			float				coneAngle;			// The angular spread
+			int					numSamples;			// The number of samples to shoot from this location
+			float				bias;				// The shadow bias
+			float				sampleBase;			// The sample base
+			float				maxDist;			// The maximum intersection distance
 		};
 
-		void					traceTransmission(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly);
-		void					traceReflection(int numRays,CTraceLocation *rays,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,int probeOnly);
+		void					traceTransmission(int numRays,CTraceLocation *rays,int probeOnly);
+		void					traceReflection(int numRays,CTraceLocation *rays,int probeOnly);
 
 		// The following functions are used in the shaders
 		int						surfaceParameter(void *dest,const char *name,CVariable**,int*);
@@ -362,6 +428,8 @@ private:
 
 		uint32_t				state[624];
 		uint32_t				*next;
+
+		CPLLookup				*plHash[PL_HASH_SIZE];
 
 		void					next_state();
 		void					randomInit(uint32_t u = 5489UL);

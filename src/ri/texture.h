@@ -73,9 +73,9 @@ public:
 							stats.numTextures--;
 						}
 
-	virtual float		lookupz(float u,float v,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)						=	0;
-	virtual	void		lookup(float *dest,float u,float v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)					=	0;
-	virtual	void		lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)	=	0;
+	virtual float		lookupz(float u,float v,float z,CShadingContext *context)						=	0;
+	virtual	void		lookup(float *dest,float u,float v,CShadingContext *context)					=	0;
+	virtual	void		lookup4(float *dest,const float *u,const float *v,CShadingContext *context)		=	0;
 	
 	// textureinfo support
 	void				getResolution(float *r)		{ r[0] = 0; r[1] = 0; }
@@ -102,7 +102,7 @@ public:
 							stats.numEnvironments--;
 						}
 
-	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)	=	0;
+	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context)	=	0;
 	
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = 0; r[1] = 0; }
@@ -111,6 +111,35 @@ public:
 	int 				getViewMatrix(float*)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
 };
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyTexture
+// Description			:	Encapsulates a texture we use if we could not load it
+// Comments				:
+class	CDummyTexture : public CTexture {
+public:
+						CDummyTexture(const char *name) : CTexture(name) {}
+						~CDummyTexture() {}
+
+	float				lookupz(float u,float v,float z,CShadingContext *context);
+	void				lookup(float *dest,float u,float v,CShadingContext *context);
+	void				lookup4(float *dest,const float *u,const float *v,CShadingContext *context);
+};
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyEnvironment
+// Description			:	A dummy environment map we create if we can not instantiate
+// Comments				:
+class	CDummyEnvironment : public CEnvironment {
+public:
+						CDummyEnvironment(const char *name) : CEnvironment(name) {}
+						~CDummyEnvironment() {}
+						
+	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context);
+};
+
 
 
 ///////////////////////////////////////////////////////////////////////

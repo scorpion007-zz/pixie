@@ -203,36 +203,6 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 }
 
 
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDummyTexture
-// Description			:	Encapsulates a texture we use if we could not load it
-// Comments				:
-class	CDummyTexture : public CTexture {
-public:
-						CDummyTexture(const char *name) : CTexture(name) {}
-						~CDummyTexture() {}
-
-	float				lookupz(float u,float v,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)						{ return 0;	}
-	void				lookup(float *dest,float u,float v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)					{ initv(dest,lookup->fill);	}
-	void				lookup4(float *dest,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context)		{ initv(dest,lookup->fill);	}
-	};
-
-
-///////////////////////////////////////////////////////////////////////
-// Class				:	CDummyEnvironment
-// Description			:	A dummy environment map we create if we can not instantiate
-// Comments				:
-class	CDummyEnvironment : public CEnvironment {
-public:
-						CDummyEnvironment(const char *name) : CEnvironment(name) {}
-						~CDummyEnvironment() {}
-						
-	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) { initv(dest,lookup->fill);	}
-};
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getTexture
@@ -242,6 +212,7 @@ public:
 CTexture	*CRenderer::getTexture(const char *name) {
 	CFileResource	*tex;
 
+	assert(name != NULL);
 	assert(frameFiles != NULL);
 	
 	if (frameFiles->find(name,tex) == FALSE) {
@@ -271,8 +242,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 CEnvironment	*CRenderer::getEnvironment(const char *name) {
 	CFileResource	*tex;
 
-	if (*name == '\0')	return NULL;
-
+	assert(name != NULL);
 	assert(frameFiles != NULL);
 	
 	if (frameFiles->find(name,tex) == FALSE) {
@@ -302,8 +272,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
 
-	if (*name == '\0')	return NULL;
-	
+	assert(name != NULL);
 	assert(frameFiles != NULL);
 
 	// Check the cache to see if the file is in the memory
@@ -334,8 +303,7 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *from,const float *to) {
 	CFileResource	*cache;
 
-	if (*name == '\0')	return NULL;
-
+	assert(name != NULL);
 	assert(frameFiles != NULL);
 	
 	// Check the memory first
@@ -426,8 +394,7 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 	CFileResource	*tex;
 
-	if (*name == '\0')	return NULL;
-
+	assert(name != NULL);
 	assert(frameFiles != NULL);
 	
 	if (frameFiles->find(name,tex) == FALSE){
@@ -460,8 +427,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 	char			fileName[OS_MAX_PATH_LENGTH];
 	FILE			*in;
 
-	if (*name == '\0')	return NULL;
-
+	assert(name != NULL);
 	assert(frameFiles != NULL);
 	
 	if (frameFiles->find(name,texture3d) == FALSE){
@@ -531,6 +497,7 @@ CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 	CShader			*cShader;
 	CFileResource	*file;
 
+	assert(name != NULL);
 	if (strcmp(name,RI_DEFAULTSURFACE) == 0)	name	=	RI_MATTE;
 
 	assert(globalFiles != NULL);
@@ -685,6 +652,8 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 CDSO				*CRenderer::getDSO(char *name,char *prototype) {
 	CDSO				*cDso;
 
+	assert(name != NULL);
+	
 	// Check if the DSO had been loaded before
 	for (cDso=dsos;cDso!=NULL;cDso=cDso->next) {
 		if (strcmp(cDso->name,name) == 0) {

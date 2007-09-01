@@ -72,7 +72,7 @@ public:
 // Comments				:
 CPhotonHider::CPhotonHider(int thread,CAttributes *a) : CShadingContext(thread) {
 	CRenderer::raytracingFlags		|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-	bias							=	a->shadowBias;
+	bias							=	a->bias;
 	phony							=	new CPhonySurface(a,CRenderer::world);
 	phony->attach();
 
@@ -567,7 +567,7 @@ processBounce:;
 
 				// Process the current hit
 				movvv(ray.from,Pl);
-				ray.tmin				=	attributes->shadowBias;
+				ray.tmin				=	attributes->bias;
 				lastBounceSpecular		=	FALSE;
 
 				// We just hit a diffuse surface, so set the ray differential to something big
@@ -602,7 +602,7 @@ processBounce:;
 				
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				ray.tmin				=	attributes->shadowBias;
+				ray.tmin				=	attributes->bias;
 				lastBounceSpecular		=	TRUE;
 
 				// No change in the ray differentials
@@ -646,7 +646,7 @@ processBounce:;
 
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				ray.tmin				=	attributes->shadowBias;
+				ray.tmin				=	attributes->bias;
 				lastBounceSpecular		=	TRUE;
 
 				// No change in the ray differential
@@ -692,7 +692,7 @@ processBounce:;
 
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				ray.tmin				=	attributes->shadowBias;
+				ray.tmin				=	attributes->bias;
 				lastBounceSpecular		=	TRUE;
 
 				goto processBounce;
@@ -742,7 +742,7 @@ processBounce:;
 
 				// Bounce the photon
 				movvv(ray.from,Pl);
-				ray.tmin				=	attributes->shadowBias;
+				ray.tmin				=	attributes->bias;
 				lastBounceSpecular		=	TRUE;
 
 				// No change in the ray differential

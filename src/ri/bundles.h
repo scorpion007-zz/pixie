@@ -35,6 +35,8 @@
 #include "ray.h"
 #include "shading.h"
 
+class	CGatherVariable;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "trace" shading language command
@@ -103,6 +105,12 @@ class	CGatherRay : public CRay {
 public:
 	int				*tags;			// The tag
 	int				index;			// The ray index (the ray number)
+	float			sampleCone;		// The samplecone for the ray
+	float			sampleBase;		// The sample base for the ray
+	float			bias,maxDist;	// Ray attributes
+	vector			gatherDir;		// The direction of the gather
+	vector			gatherP;		// The gather position
+	vector			dPdu,dPdv;		// At the ray origin
 };
 
 
@@ -124,19 +132,20 @@ public:
 
 	CGatherRay		*raysBase;
 	CRay			**raysStorage;
-	float			**outputs;				// The array of outputs
-	float			**nonShadeOutputs;		// The array of non-shade outputs
-	CGatherLookup	*lookup;				// The parameters for this bundle
+
+	int				numOutputs;				// List of outputs that would require shading
+	float			**outputs;
+	CGatherVariable	*outputVars;	
+
+	int				numNonShadeOutputs;		// List of outputs that do not require shading
+	float			**nonShadeOutputs;
+	CGatherVariable	*nonShadeOutputVars;
+
 	int				numMisses;				// The number of missed rays
 	int				remainingSamples;		// The number of remaining samples
-	
-	// uniform data
-	int				numSamples;				// The number of samples
-	// varying data
-	const float		*coneAngles;			// The cone angle
-	const float		*gatherDir;				// Gather direction
-	const float		*dPdu,*dPdv,*P;			// The ray origin info
 
+	int				numSamples;				// The number of samples
+	int				uniformDist;				
 };
 
 

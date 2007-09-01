@@ -547,7 +547,7 @@ public:
 							free(name);
 						}
 
-	void				lookup(float *r,float s,float t,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) { 
+	void				lookup(float *r,float s,float t,CShadingContext *context) { 
 							s		*=	width;					// To the pixel space
 							t		*=	height;
 							s		-=	0.5;					// Pixel centers
@@ -561,7 +561,7 @@ public:
 							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
 
 							float	res[4*3];
-							lookupPixel(res,si,ti,lookup,context);
+							lookupPixel(res,si,ti,context);
 
 							float	tmp;
 
@@ -586,7 +586,7 @@ public:
 							r[2]	+=	res[11]*tmp;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
+	float				lookupz(float s,float t,float z,CShadingContext *context) {
 							s		*=	width;						// To the pixel space
 							t		*=	height;
 							s		-=	0.5;						// Pixel centers
@@ -600,7 +600,7 @@ public:
 							if (ti >= height)	ti	=  (tMode == TEXTURE_PERIODIC) ? (ti - height) : (height-1);
 
 							float	res[4*3];
-							lookupPixel(res,si,ti,lookup,context);
+							lookupPixel(res,si,ti,context);
 
 							float	r		=	0;
 
@@ -631,7 +631,7 @@ public:
 	TTextureMode		sMode,tMode;													// The wrap modes
 protected:
 	// This function must be overriden by the child class
-	virtual	void		lookupPixel(float *,int,int,const CTextureLookup *,CShadingContext *context)		=	0;		// Lookup 4 pixel values
+	virtual	void		lookupPixel(float *,int,int,CShadingContext *context)		=	0;		// Lookup 4 pixel values
 };
 
 
@@ -664,7 +664,7 @@ public:
 
 protected:
 					// The pixel lookup
-			void	lookupPixel(float *res,int x,int y,const CTextureLookup *l,CShadingContext *context) {
+			void	lookupPixel(float *res,int x,int y,CShadingContext *context) {
 						
 						const int	thread	=	context->thread;
 
@@ -690,7 +690,7 @@ protected:
 						const T		*data;
 
 #define access(__x,__y)										\
-						data	=	&((T *) dataBlock.data)[(__y*fileWidth+__x)*numSamples+l->channel];	\
+						data	=	(T *) dataBlock.data + (__y*fileWidth+__x)*numSamples;	\
 						res[0]	=	(float) (data[0]*M);	\
 						res[1]	=	(float) (data[1]*M);	\
 						res[2]	=	(float) (data[2]*M);	\
@@ -767,7 +767,7 @@ public:
 protected:
 
 					// Pixel lookup
-	void			lookupPixel(float *res,int x,int y,const CTextureLookup *l,CShadingContext *context) {
+	void			lookupPixel(float *res,int x,int y,CShadingContext *context) {
 						int					xTile;
 						int					yTile;
 						CTextureBlock		*block;
@@ -787,18 +787,18 @@ protected:
 
 						const int	thread	=	context->thread;
 
-#define	access(__x,__y)																\
+#define	access(__x,__y)															\
 						xTile	=	__x >> tileWidthShift;						\
 						yTile	=	__y >> tileHeightShift;						\
 						block	=	dataBlocks[yTile] + xTile;					\
 																				\
 						if (block->threadData[thread].data == NULL) {			\
 							textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
-						}																										\
-						CRenderer::textureRefNumber[thread]++;																	\
-						block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];						\
-																																\
-						data	=	&((T *) block->data)[(((__y & yt))*tileWidth+(__x&xt))*numSamples+l->channel];				\
+						}																					\
+						CRenderer::textureRefNumber[thread]++;												\
+						block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];	\
+																											\
+						data	=	(T *) block->data + (((__y & yt))*tileWidth+(__x&xt))*numSamples;		\
 						res[0]	=	(float) (data[0]*M);						\
 						res[1]	=	(float) (data[1]*M);						\
 						res[2]	=	(float) (data[2]*M);						\
@@ -851,12 +851,13 @@ public:
 							}
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
+	float				lookupz(float s,float t,float z,CShadingContext *context) {
 							assert(numLayers > 0);
-							return layers[0]->lookupz(s,t,z,lookup,varyingLookup,context);
+							return layers[0]->lookupz(s,t,z,context);
 						}
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l,const CVaryingTextureLookup *vl,CShadingContext *context) {
+	void				lookup(float *result,float s,float t,CShadingContext *context) {
+							const float	fill	=	context->currentShadingState->scratch.textureParams.fill;
 
 							// Do the s mode
 							switch(layers[0]->sMode) {
@@ -866,7 +867,7 @@ public:
 								break;
 							case TEXTURE_BLACK:
 								if ((s < 0) || (s > 1)) {
-									initv(result,l->fill,l->fill,l->fill);
+									initv(result,fill);
 									return;
 								}
 								break;
@@ -884,7 +885,7 @@ public:
 								break;
 							case TEXTURE_BLACK:
 								if ((t < 0) || (t > 1)) {
-									initv(result,l->fill,l->fill,l->fill);
+									initv(result,fill);
 									return;
 								}
 								break;
@@ -894,19 +895,20 @@ public:
 								break;
 							}
 
-							layers[0]->lookup(result,s,t,l,vl,context);
+							layers[0]->lookup(result,s,t,context);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
-							int				i;
-							float			totalContribution	=	0;
-							CTextureLayer	*layer0,*layer1;
-							float			offset;
-							float			l;
-							float			diag;
-							const float		cs	=	((u[0] + u[1] + u[2] + u[3]) * 0.25f);
-							const float		ct	=	((v[0] + v[1] + v[2] + v[3]) * 0.25f);
-							float			ds,dt,d;
+	void				lookup4(float *result,const float *u,const float *v,CShadingContext *context) {
+							int						i;
+							float					totalContribution	=	0;
+							CTextureLayer			*layer0,*layer1;
+							float					offset;
+							float					l;
+							float					diag;
+							const float				cs			=	((u[0] + u[1] + u[2] + u[3]) * 0.25f);
+							const float				ct			=	((v[0] + v[1] + v[2] + v[3]) * 0.25f);
+							float					ds,dt,d;
+							const CShadingScratch	*scratch	=	&(context->currentShadingState->scratch);
 
 
 							const int		width	=	layers[0]->width;
@@ -932,7 +934,7 @@ public:
 							d			=	ds*ds + dt*dt;
 							diag		=	min(d,diag);
 
-							diag		+=	varyingLookup->blur*varyingLookup->blur*width*height;
+							diag		+=	scratch->textureParams.blur*scratch->textureParams.blur*width*height;
 
 																	// Find the layer that we want to probe
 							l			=	(logf(diag)*0.5f*(1/logf(2.0f)));
@@ -945,11 +947,10 @@ public:
 							layer1		=	layers[i+1];	
 							offset		=	l - i;
 							offset		=	min(offset,1);
-							
-							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
 
 							initv(result,0,0,0);					// Result is black
-							for (i=varyingLookup->numSamples;i>0;i--) {
+							//for (i=(int) scratch->samples;i>0;i--) {
+							for (i=1;i>0;i--) {
 								float			r[2];
 								float			s,t;
 								vector			C,CC0,CC1;
@@ -957,16 +958,12 @@ public:
 
 								context->random2d.get(r);
 
-								// stratify the sample so that with low sample counts we don't jitter too much
-								const float 	x	=	(r[0]-0.5f)*jitter+0.5f;
-								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
+								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
+														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
+								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
+														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
 
-								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
-														(u[2]*(1-x) + u[3]*x)*y;
-								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
-														(v[2]*(1-x) + v[3]*x)*y;
-
-								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
+								contribution		=	scratch->textureParams.filter(r[0]-0.5f,r[1]-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								// Do the s mode
@@ -1004,8 +1001,8 @@ public:
 								}
 
 												// lookup (s,t) and add it to the result
-								layer0->lookup(CC0,s,t,lookup,varyingLookup,context);
-								layer1->lookup(CC1,s,t,lookup,varyingLookup,context);
+								layer0->lookup(CC0,s,t,context);
+								layer1->lookup(CC1,s,t,context);
 								interpolatev(C,CC0,CC1,offset);
 
 								result[0]		+=	C[0]*contribution;
@@ -1040,13 +1037,15 @@ public:
 							if (layer != NULL) delete  layer;
 						}
 
-	float				lookupz(float s,float t,float z,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
+	float				lookupz(float s,float t,float z,CShadingContext *context) {
 							assert(layer != NULL);
-							return layer->lookupz(s,t,z,lookup,varyingLookup,context);
+							return layer->lookupz(s,t,z,context);
 						}
 
 
-	void				lookup(float *result,float s,float t,const CTextureLookup *l,const CVaryingTextureLookup *vl,CShadingContext *context) {
+	void				lookup(float *result,float s,float t,CShadingContext *context) {
+							const float	fill	=	context->currentShadingState->scratch.textureParams.fill;
+
 							// Do the s mode
 							switch(layer->sMode) {
 							case TEXTURE_PERIODIC:
@@ -1055,7 +1054,7 @@ public:
 								break;
 							case TEXTURE_BLACK:
 								if ((s < 0) || (s > 1)) {
-									initv(result,l->fill,l->fill,l->fill);
+									initv(result,fill);
 									return;
 								}
 								break;
@@ -1073,7 +1072,7 @@ public:
 								break;
 							case TEXTURE_BLACK:
 								if ((t < 0) || (t > 1)) {
-									initv(result,l->fill,l->fill,l->fill);
+									initv(result,fill);
 									return;
 								}
 								break;
@@ -1083,40 +1082,36 @@ public:
 								break;
 							}
 
-							layer->lookup(result,s,t,l,vl,context);
+							layer->lookup(result,s,t,context);
 						}
 
-	void				lookup4(float *result,const float *u,const float *v,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
-							int			i;
-							float		totalContribution	=	0;
-							
-							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
-							
+	void				lookup4(float *result,const float *u,const float *v,CShadingContext *context) {
+							int						i;
+							float					totalContribution	=	0;
+							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
+
 							initv(result,0,0,0);		// Result is black
-							for (i=varyingLookup->numSamples;i>0;i--) {
+							//for (i=(int) scratch->samples;i>0;i--) {
+							for (i=1;i>0;i--) {
 								float			s,t;
 								vector			C;
 								float			contribution;
 								float			r[2];
 
 								context->random2d.get(r);
-								
-								// stratify the sample so that with low sample counts we don't jitter too much
-								const float		x	=	(r[0]-0.5f)*jitter+0.5f;
-								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
-								
-								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
-														(u[2]*(1-x) + u[3]*x)*y;
-								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
-														(v[2]*(1-x) + v[3]*x)*y;
-								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
+
+								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
+														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
+								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
+														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
+								contribution		=	scratch->textureParams.filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
 								totalContribution	+=	contribution;
 
-								if (varyingLookup->blur > 0) {
+								if (scratch->textureParams.blur > 0) {
 									context->random2d.get(r);
 
-									s				+=	varyingLookup->blur*(x - 0.5f);
-									t				+=	varyingLookup->blur*(y - 0.5f);
+									s				+=	scratch->textureParams.blur*(r[0] - 0.5f);
+									t				+=	scratch->textureParams.blur*(r[1] - 0.5f);
 								}
 
 								// Do the s mode
@@ -1153,7 +1148,7 @@ public:
 									break;
 								}
 												// lookup (s,t) and add it to the result
-								layer->lookup(C,s,t,lookup,varyingLookup,context);
+								layer->lookup(C,s,t,context);
 
 								result[0]		+=	C[0]*contribution;
 								result[1]		+=	C[1]*contribution;
@@ -1189,11 +1184,12 @@ public:
 							if (side != NULL)	delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
-							int			i;
-							float		totalContribution	=	0;
-							vector		center;
-							vector		S0,S1,S2,S3;
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
+							int						i;
+							float					totalContribution	=	0;
+							vector					center;
+							vector					S0,S1,S2,S3;
+							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
 
 							// Compute the center of the lookup
 							addvv(center,D0,D1);
@@ -1201,27 +1197,23 @@ public:
 							addvv(center,D3);
 							mulvf(center,0.25f);
 
-							// Apply the filter width
+							// FIXME: Apply the blur
 							subvv(S0,D0,center);
-							mulvf(S0,varyingLookup->width*2);
 							addvv(S0,center);
 
 							subvv(S1,D1,center);
-							mulvf(S1,varyingLookup->width*2);
 							addvv(S1,center);
 
 							subvv(S2,D2,center);
-							mulvf(S2,varyingLookup->width*2);
 							addvv(S2,center);
 
 							subvv(S3,D3,center);
-							mulvf(S3,varyingLookup->width*2);
 							addvv(S3,center);
 
-							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
-							
+
 							result[0]	=	0;
-							for (i=varyingLookup->numSamples;i>0;i--) {
+							for (i=(int) scratch->traceParams.samples;i>0;i--) {
+								float	x,y;
 								float	s,t;
 								float	C;
 								float	contribution;
@@ -1230,11 +1222,9 @@ public:
 
 								context->random4d.get(r);
 
-								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x		=	(r[0]-0.5f)*jitter+0.5f;
-								const float y		=	(r[1]-0.5f)*jitter+0.5f;
-								
-								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
+								x					=	r[0];
+								y					=	r[1];
+								contribution		=	scratch->textureParams.filter(x - 0.5f,y - 0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(S0[COMP_X]*(1-x) + S1[COMP_X]*x)*(1-y) + (S2[COMP_X]*(1-x) + S3[COMP_X]*x)*y;
@@ -1246,16 +1236,16 @@ public:
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
 								
-								if (varyingLookup->blur > 0) {
-									s				+=	varyingLookup->blur*(r[2] - 0.5f);
-									t				+=	varyingLookup->blur*(r[3] - 0.5f);
+								if (scratch->textureParams.blur > 0) {
+									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
+									t				+=	scratch->textureParams.blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
 									continue;
 								}
 
-								C	=	side->lookupz(s,t,tmp[2]-lookup->shadowBias,lookup,varyingLookup,context);
+								C	=	side->lookupz(s,t,tmp[2]-scratch->traceParams.bias,context);
 
 								result[0]			+=	C*contribution;
 							}
@@ -1364,16 +1354,16 @@ public:
 							free(fileName);
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
-							int			i;
-							float		totalContribution	=	0;
-							
-							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
-							
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
+							int						i;
+							float					totalContribution	=	0;
+							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
+
+
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
-							for (i=varyingLookup->numSamples;i>0;i--) {
+							for (i=(int) scratch->traceParams.samples;i>0;i--) {
 								float		s,t,w;
 								float		contribution;
 								float		tmp[4],cP[4];
@@ -1384,12 +1374,10 @@ public:
 								float		r[4];
 
 								context->random4d.get(r);
-								
-								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x		=	(r[0]-0.5f)*jitter+0.5f;
-								const float y		=	(r[1]-0.5f)*jitter+0.5f;
-								
-								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
+
+								const float x		=	r[0];
+								const float y		=	r[1];
+								contribution		=	scratch->textureParams.filter(x - 0.5f,y - 0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
@@ -1401,9 +1389,9 @@ public:
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
 								
-								if (varyingLookup->blur > 0) {
-									s				+=	varyingLookup->blur*(r[2] - 0.5f);
-									t				+=	varyingLookup->blur*(r[3] - 0.5f);
+								if (scratch->textureParams.blur > 0) {
+									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
+									t				+=	scratch->textureParams.blur*(r[3] - 0.5f);
 								}
 								
 								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
@@ -1412,7 +1400,7 @@ public:
 
 								s					*=	header.xres;
 								t					*=	header.yres;
-								w					=	tmp[2] - lookup->shadowBias;
+								w					=	tmp[2] - scratch->traceParams.bias;
 
 								px					=	(int) floor(s);
 								py					=	(int) floor(t);
@@ -1600,14 +1588,15 @@ public:
 						} EOrder;
 
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
-							EOrder		order;
-							CTexture	*side;
-							float		u,v;
-							vector		D;
-							int			i;
-							float		totalContribution	=	0;
-							vector		C;
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
+							EOrder					order;
+							CTexture				*side;
+							float					u,v;
+							vector					D;
+							int						i;
+							float					totalContribution	=	0;
+							vector					C;
+							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
 
 							result[0]	=	0;
 							result[1]	=	0;
@@ -1615,20 +1604,16 @@ public:
 
 							if (dotvv(D0,D0) == 0)	return;
 
-							const float jitter = 1.0f-1.0f/(float)varyingLookup->numSamples;
-							
-							for (i=varyingLookup->numSamples;i>0;i--) {
+							for (i=(int) scratch->traceParams.samples;i>0;i--) {
 								float	t;
 								float	contribution;
 								float	r[2];
 
 								context->random2d.get(r);
-	
-								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x		=	(r[0]-0.5f)*jitter+0.5f;
-								const float y		=	(r[1]-0.5f)*jitter+0.5f;
-								
-								contribution		=	lookup->filter(x-0.5f,y-0.5f,1,1);
+
+								const float x		=	r[0];
+								const float y		=	r[1];
+								contribution		=	scratch->textureParams.filter(x - (float) 0.5,y - (float) 0.5,1,1);
 								totalContribution	+=	contribution;
 
 								D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
@@ -1701,7 +1686,7 @@ public:
 								}
 
 
-								side->lookup(C,u,v,lookup,varyingLookup,context);
+								side->lookup(C,u,v,context);
 
 								result[0]	+=	C[0]*contribution;
 								result[1]	+=	C[1]*contribution;
@@ -1737,7 +1722,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
 							float		u[4],v[4];
 							float		m;
 
@@ -1757,7 +1742,7 @@ public:
 							u[3]				=	D3[COMP_X] / m + 0.5f;
 							v[3]				=	D3[COMP_Y] / m + 0.5f;
 
-							side->lookup4(result,u,v,lookup,varyingLookup,context);
+							side->lookup4(result,u,v,context);
 						}
 
 	// textureinfo support
@@ -1785,7 +1770,7 @@ public:
 							delete side;
 						}
 
-	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,const CTextureLookup *lookup,const CVaryingTextureLookup *varyingLookup,CShadingContext *context) {
+	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
 							float		u[4],v[4];
 							double		a,b,c;
 							vector		D,Dsamp;
@@ -1816,7 +1801,7 @@ public:
 								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
 								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
 								
-								side->lookup4(result,u,v,lookup,varyingLookup,context);
+								side->lookup4(result,u,v,context);
 							} else {
 								initv(result,0,0,0);
 							}
@@ -1849,10 +1834,45 @@ public:
 
 
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyTexture
+// Method				:	lookupz
+// Description			:	Dummy
+// Return Value			:
+// Comments				:
+float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) { 
+	return 0;
+}
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyTexture
+// Method				:	lookup
+// Description			:	Dummy
+// Return Value			:
+// Comments				:
+void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context) { 
+	initv(dest,context->currentShadingState->scratch.textureParams.fill);
+}
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyTexture
+// Method				:	lookup4
+// Description			:	Dummy
+// Return Value			:
+// Comments				:
+void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingContext *context) { 
+	initv(dest,context->currentShadingState->scratch.textureParams.fill);
+}
 
-
+///////////////////////////////////////////////////////////////////////
+// Class				:	CDummyEnvironment
+// Method				:	lookup
+// Description			:	Dummy
+// Return Value			:
+// Comments				:
+void		CDummyEnvironment::lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
+	initv(dest,context->currentShadingState->scratch.textureParams.fill);
+}
 
 
 

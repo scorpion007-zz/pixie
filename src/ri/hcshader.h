@@ -34,6 +34,8 @@
 #include "common/global.h"
 #include "shader.h"
 
+class	CActiveLight;
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Description			:	This is a quadratic area light source

@@ -89,7 +89,6 @@ CAttributes::CAttributes() {
 
 	flags						=	0;
 	flags						|=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
-	flags						|=	ATTRIBUTES_FLAGS_SINGULARITYFIX;
 	flags						|=	ATTRIBUTES_FLAGS_DOUBLE_SIDED;
 
 	maxDisplacement				=	0;
@@ -106,7 +105,7 @@ CAttributes::CAttributes() {
 	numVProbes					=	4;
 	minSplits					=	2;
 	rasterExpand				=	0.5f;
-	shadowBias					=	0.01f;
+	bias						=	0.01f;
 
 	transmissionHitMode			=	'p';
 	diffuseHitMode				=	'p';
@@ -123,8 +122,8 @@ CAttributes::CAttributes() {
 	causticMapName				=	NULL;
 	globalMap					=	NULL;
 	causticMap					=	NULL;
-	irradianceHandle			=	NULL;
-	irradianceHandleMode		=	NULL;
+	irradianceHandle			=	strdup("");
+	irradianceHandleMode		=	strdup("w");
 	irradianceMaxError			=	0.6f;
 	irradianceMaxPixelDistance	=	20.0f;
 	photonEstimator				=	100;
@@ -453,7 +452,7 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 	}
 
 	if ((category == NULL) || (strcmp(category,RI_TRACE) == 0)) {
-		if (strcmp(name,RI_BIAS) == 0)					{	type	=	TYPE_FLOAT;		value	=	&shadowBias;			return TRUE;}
+		if (strcmp(name,RI_BIAS) == 0)					{	type	=	TYPE_FLOAT;		value	=	&bias;					return TRUE;}
 		else if (strcmp(name,RI_MAXDIFFUSEDEPTH) == 0)	{	type	=	TYPE_STRING;	value	=	maxDisplacementSpace;	return TRUE;}
 		else if (strcmp(name,RI_MAXSPECULARDEPTH) == 0)	{	type	=	TYPE_STRING;	value	=	&maxSpecularDepth;		return TRUE;}
 		else if (strcmp(name,RI_DISPLACEMENTS) == 0)	{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_DISPLACEMENTS) != 0;			return TRUE;}

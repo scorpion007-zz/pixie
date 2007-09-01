@@ -66,7 +66,7 @@
 #define TESSELATION_NUM_LEVELS			3
 
 // The size of the buffer to be used during the network file transfers
-#define	NETWORK_BUFFER_LENGTH			1 << 12
+#define	NETWORK_BUFFER_LENGTH			(1 << 12)
 
 //	The maximum allowed string size that can be handled
 #define	MAX_SCRIPT_STRING_SIZE			256
@@ -94,5 +94,15 @@
 
 // The stack size for the point hierarchy lookup
 #define	POINTHIERARCHY_STACK_SIZE		256
+
+// The maximum number of channels in a 3d texture
+#define	TEXTURE3D_MAX_CHANNELS			32
+
+// The number of samples to take for filtered step
+#define	FILTERSTEP_SAMPLES				100
+
+// The initial size of the raytracing heap
+#define TRACE_HEAP_SIZE					100
+
 #endif
 

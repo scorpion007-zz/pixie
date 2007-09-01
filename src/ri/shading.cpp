@@ -47,6 +47,7 @@
 #include	"error.h"
 #include	"remoteChannel.h"
 #include	"renderer.h"
+#include	"shaderPl.h"
 
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
@@ -377,6 +378,56 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShadingScratch
+// Method				:	CShadingScratch
+// Description			:	Ctor
+// Return Value			:	-
+// Comments				:	Initializes the default values for shader functions
+CShadingScratch::CShadingScratch() {
+
+	// Texture parameters
+	textureParams.filter				=	NULL;					// Filter will always be overwritten by the caller
+	textureParams.blur					=	0;						// No blur
+	textureParams.width					=	0;						// If 0, use swidth/twidth
+	textureParams.swidth				=	1.0f;					// No area scale
+	textureParams.twidth				=	1.0f;					// No area scale
+	textureParams.fill					=	0.0f;					// Fill will zero color
+
+	// Photonmap parameters
+	photonmapParams.estimator			=	0;						// If 0, use the attributes
+
+	// texture3d/occlusion parameters
+	texture3dParams.coordsys			=	coordinateWorldSystem;	// Store everything in the world coordinate system
+	texture3dParams.interpolate			=	0;						// Do not interpolate the samples
+	texture3dParams.radius				=	0;						// Compute radius automatically
+	texture3dParams.radiusScale			=	1.0f;					// No scale
+
+	// Transmission/trace parameters
+	traceParams.samples					=	1.0f;					// The number of samples to collect
+	traceParams.bias					=	0;						// The raytracing bias
+	traceParams.coneAngle				=	0;						// The cone angle
+	traceParams.sampleBase				=	1.0f;					// The sample base
+	traceParams.maxDist					=	C_INFINITY;				// The maximum intersection
+	traceParams.label					=	NULL;					// The label
+
+	// Indirectdiffuse/occlusion parameters
+	occlusionParams.maxError			=	-1;						// If -1, use attribute defaults
+	occlusionParams.pointbased			=	0;						// This is not a point based lookup
+	occlusionParams.maxBrightness		=	1.0f;					// Upper limit on the maximum brightness
+	occlusionParams.environmentMapName	=	NULL;					// No environment map by default
+	occlusionParams.pointHierarchyName	=	NULL;					// No point hierarchy
+	occlusionParams.maxPixelDist		=	50.0f;					// The maximum distance between samples
+	occlusionParams.maxSolidAngle		=	0.05f;					// The maximum solid angle
+	occlusionParams.occlusion			=	FALSE;					// Overwritten on the fly
+	initv(occlusionParams.environmentColor,0);						// The background color for irradiance
+	occlusionParams.pointHierarchy		=	NULL;					// Overwritten on the fly
+	occlusionParams.environment			=	NULL;					// Overwritten on the fly
+
+	// Gather parameters
+	gatherParams.distribution			=	NULL;					// if NULL, it is cosine
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
@@ -409,8 +460,10 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 	traceObjectHash			=	(TObjectHash *) ralloc(sizeof(TObjectHash)*SHADING_OBJECT_CACHE_SIZE,CRenderer::globalMemory);
 
 	// Fill the object pointers with impossible data
-	int	i;
-	for (i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
+	for (int i=0;i<SHADING_OBJECT_CACHE_SIZE;i++)	traceObjectHash[i].object	=	(CSurface *) this;
+
+	// Init the PL hash
+	for (int i=0;i<PL_HASH_SIZE;i++) plHash[i]	=	NULL;
 
 	// Init the random number generator
 	randomInit(5489*(thread+1));
@@ -449,6 +502,11 @@ CShadingContext::~CShadingContext() {
 	
 	// Shutdown the random number generator
 	randomShutdown();
+
+	// Ditch the PL hash
+	for (int i=0;i<PL_HASH_SIZE;i++) {
+		if (plHash[i] != NULL)	delete plHash[i];
+	}
 
 	// Ditch the shading states that have been allocated
 	assert(currentShadingState != NULL);
@@ -1600,7 +1658,7 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 	// Additional attributes
 	else if (strcmp(name,attributesTraceBias) == 0) {
 		float	*d	=	(float *) dest;
-		d[0]		=	(float) currentAttributes->shadowBias;
+		d[0]		=	(float) currentAttributes->bias;
 		return TRUE;
 	} else if (strcmp(name,attributesTraceMaxDiffuse) == 0) {
 		float	*d	=	(float *) dest;

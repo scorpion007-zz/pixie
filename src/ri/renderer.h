@@ -100,6 +100,8 @@ class	CRendererContext;
 class	CNetFileMapping;
 class	CRay;
 class	CTextureBlock;
+class	CTextureInfoBase;
+class	CTexture3d;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -182,7 +184,6 @@ public:
 		static	TMutex							textureMutex;				// To serialize texture fetches
 		static	TMutex							refCountMutex;				// To serialize the object attach()/detach()
 		static	TMutex							shaderMutex;				// To serialize shader parameter list access
-		static	TMutex							dirtyShaderMutex;			// To serialize the dirty shader list
 		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
 		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_
 		static	TMutex							hierarchyMutex;				// To serialize lazy construction of bounding volume hierarchy
@@ -402,7 +403,6 @@ public:
 		static	int						numActiveThreads;			// The number of threads currently active
 		static	CTrie<CRemoteChannel *>	*declaredRemoteChannels;	// Known remote channel lookup
 		static	CArray<CRemoteChannel *>	*remoteChannels;		// all known channels
-		static	CProgrammableShaderInstance *dirtyInstances;
 		static	unsigned int			raytracingFlags;			// The raytracing flags that hold the combination that needs to be raytraced
 		static	CObject					*root;						// The root bounding volume object
 		static	CObject					*offendingObject;			// This points to the object creating an error

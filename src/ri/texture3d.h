@@ -40,7 +40,6 @@
 
 
 class	CShadingContext;
-class	CTexture3dLookup;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
@@ -71,7 +70,7 @@ public:
 	virtual	void			store(const float *,const float *,const float *,float)	= 0;
 
 							// For irradiance cache type of queries
-	virtual	void			lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *)		= 0;
+	virtual	void			lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *)		= 0;
 
 							// Resolve the names to channels
 	void					resolve(int n,const char **names,int *entry,int *size);

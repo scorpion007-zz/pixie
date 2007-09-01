@@ -161,7 +161,6 @@ static	TSlFunction		functions[]	=	{
 				int						currentConstant;
 				int						currentVariable;
 				int						currentString;
-				int						currentPL;				// The current parameter list
 
 				int						currentConstantSize;
 				int						currentVaryingSize;
@@ -532,7 +531,6 @@ static	TSlFunction		functions[]	=	{
 														// Save the opcode
 														currentData.usedParameters						|=	opcodes[i].usedParameters;
 														currentData.currentOpcodePlace->opcode			=	(int) opcode;
-														currentData.currentOpcodePlace->plNumber		=	0;
 														currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
 														currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);
 														currentData.currentOpcodePlace++;
@@ -607,14 +605,11 @@ static	TSlFunction		functions[]	=	{
 													// Save the opcode
 													if (functions[i].name != NULL) {
 														assert((currentData.currentArgument+2) < 256);
-														assert(currentData.currentPL < 256);
 														assert(currentData.opcodeUniform < 256);
 														
 														currentData.currentOpcodePlace->opcode				=	(int) opcode;
-														currentData.currentOpcodePlace->plNumber			=	(unsigned char) (currentData.currentPL);
 														currentData.currentOpcodePlace->numArguments		=	(unsigned char) (currentData.currentArgument);
 														currentData.currentOpcodePlace->uniform				=	(unsigned char) (currentData.opcodeUniform);
-														if (strchr(functions[i].prototype,'!') != NULL)	currentData.currentPL++;
 														currentData.currentOpcodePlace++;
 													} else {
 														// Allright, we could not find the function, check the DSO shaders
@@ -627,7 +622,6 @@ static	TSlFunction		functions[]	=	{
 															if (currentData.currentPrototype[0] == 'o')		currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO_VOID;
 															else											currentData.currentOpcodePlace->opcode	=	FUNCTION_DSO;
 								
-															currentData.currentOpcodePlace->plNumber		=	(unsigned char) (currentData.currentPL);
 															currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
 															currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);
 															currentData.currentOpcodePlace->dso				=	dso;
@@ -1848,7 +1842,6 @@ slDSO:			SCRL_DSO
 
 							assert(currentData.opcodeUniform < 256);
 							
-							currentData.currentOpcodePlace->plNumber		=	(unsigned char) (currentData.currentPL);
 							currentData.currentOpcodePlace->numArguments	=	(unsigned char) (currentData.currentArgument);
 							currentData.currentOpcodePlace->uniform			=	(unsigned char) (currentData.opcodeUniform);															
 							currentData.currentOpcodePlace->dso				=	dso;
@@ -2298,7 +2291,6 @@ CShader	*shaderCreate(const char *shaderName) {
 
 	cShader->numStrings					=	currentData.numStrings;
 	cShader->numVariables				=	currentData.numVariables;
-	cShader->numPLs						=	currentData.currentPL;
 
 	cShader->codeEntryPoint				=	currentData.codeEntryPoint;
 	cShader->initEntryPoint				=	currentData.initEntryPoint;

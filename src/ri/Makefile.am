@@ -61,6 +61,7 @@ libri_la_SOURCES = 		attributes.cpp \
 				riInterface.cpp \
 				ribOut.cpp \
 				shader.cpp \
+				shaderPl.cpp \
 				shading.cpp \
 				show.cpp \
 				sl.cpp \

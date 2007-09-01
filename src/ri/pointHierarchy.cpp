@@ -31,6 +31,7 @@
 #include "pointHierarchy.h"
 #include "error.h"
 #include "random.h"
+#include "shading.h"
 
 // The predefined names for the area and the radiosity channels
 const	char	*areaName		=	"_area";
@@ -418,12 +419,13 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 // Description			:	Lookup smtg
 // Return Value			:
 // Comments				:
-void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const float *dPdvl,const float *Nl,CShadingContext *context,const CTexture3dLookup *l) {
-	const float maxsolidangle	=	l->maxsolidangle;
-	int			*stack			=	(int *) alloca(POINTHIERARCHY_STACK_SIZE*sizeof(int));
-	int			*stackBase		=	stack;
-	int			i;
-	vector		P,N;
+void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const float *dPdvl,const float *Nl,CShadingContext *context) {
+	const CShadingScratch	*scratch		=	&(context->currentShadingState->scratch);
+	const float				maxsolidangle	=	scratch->occlusionParams.maxSolidAngle;
+	int						*stack			=	(int *) alloca(POINTHIERARCHY_STACK_SIZE*sizeof(int));
+	int						*stackBase		=	stack;
+	int						i;
+	vector					P,N;
 
 	// Transform the lookup point to the correct coordinate system
 	mulmp(P,to,Pl);

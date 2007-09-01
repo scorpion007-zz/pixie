@@ -102,7 +102,7 @@ public:
 		void					lookup(float *,const float *,const float *,float)		{	assert(FALSE);	}
 		void					store(const float *,const float *,const float *,float)	{	assert(FALSE);	}
 
-		void					lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *);
+		void					lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *);
 
 		void					draw();
 		int						keyDown(int key);
@@ -112,7 +112,7 @@ private:
 		void					writeNode(FILE *,CCacheNode *);
 		CCacheNode				*readNode(FILE *);
 
-		void					sample(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *);
+		void					sample(float *,const float *,const float *,const float *,const float *,CShadingContext *);
 		void					clamp(CCacheSample *);
 
 		CMemStack				*memory;

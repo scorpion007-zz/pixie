@@ -54,6 +54,8 @@
 
 /* Begin PBXBuildFile section */
 		182651CB0BBA0B52007B2C37 /* ptcapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 182651CA0BBA0B52007B2C37 /* ptcapi.h */; };
+		182C1BB50C55CD34000B070D /* shaderPl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 182C1BB30C55CD34000B070D /* shaderPl.cpp */; };
+		182C1BB60C55CD34000B070D /* shaderPl.h in Headers */ = {isa = PBXBuildFile; fileRef = 182C1BB40C55CD34000B070D /* shaderPl.h */; };
 		182C87BE0BD4579900FDF04D /* dso.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C983E7910AF300EE00648461 /* dso.cpp */; };
 		182D83380BB70AE300B0689A /* map.h in Headers */ = {isa = PBXBuildFile; fileRef = 182D83370BB70AE300B0689A /* map.h */; };
 		183D2A6C0B2BC732001BB8F4 /* ri.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F820AD6E196003C2D7B /* ri.h */; };
@@ -81,7 +83,6 @@
 		18A299030B44F040006B9ABE /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
 		18CAFBA50C39FA3600614F8C /* refCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18CAFBA10C39FA3600614F8C /* refCounter.cpp */; };
 		18CAFBA60C39FA3600614F8C /* refCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = 18CAFBA20C39FA3600614F8C /* refCounter.h */; };
-		18CAFBA80C39FA3600614F8C /* shaderParameterList.h in Headers */ = {isa = PBXBuildFile; fileRef = 18CAFBA40C39FA3600614F8C /* shaderParameterList.h */; };
 		18D351580B7AD1F5009F0DAE /* displayChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18D351560B7AD1F5009F0DAE /* displayChannel.cpp */; };
 		18D351590B7AD1F5009F0DAE /* displayChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D351570B7AD1F5009F0DAE /* displayChannel.h */; };
 		18D3515B0B7AD20E009F0DAE /* netFileMapping.h in Headers */ = {isa = PBXBuildFile; fileRef = 18D3515A0B7AD20E009F0DAE /* netFileMapping.h */; };
@@ -770,6 +771,9 @@
 
 /* Begin PBXFileReference section */
 		182651CA0BBA0B52007B2C37 /* ptcapi.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptcapi.h; path = ../../src/ri/ptcapi.h; sourceTree = SOURCE_ROOT; };
+		182C1BB30C55CD34000B070D /* shaderPl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = shaderPl.cpp; path = ../../src/ri/shaderPl.cpp; sourceTree = SOURCE_ROOT; };
+		182C1BB40C55CD34000B070D /* shaderPl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shaderPl.h; path = ../../src/ri/shaderPl.h; sourceTree = SOURCE_ROOT; };
+		182C1BB70C55CD6A000B070D /* rib.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = rib.y; path = ../../src/ri/rib.y; sourceTree = SOURCE_ROOT; };
 		182C87C20BD4581600FDF04D /* config.xcode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = config.xcode.h; path = ../../config.xcode.h; sourceTree = SOURCE_ROOT; };
 		182D83370BB70AE300B0689A /* map.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = map.h; path = ../../src/ri/map.h; sourceTree = SOURCE_ROOT; };
 		183398370B2D2CA60055E484 /* ambientindirect.sdr */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ambientindirect.sdr; sourceTree = "<group>"; };
@@ -957,7 +961,6 @@
 		189830A20BAF8618004D6C61 /* ifexpr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ifexpr.cpp; path = ../../src/ri/ifexpr.cpp; sourceTree = SOURCE_ROOT; };
 		18CAFBA10C39FA3600614F8C /* refCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = refCounter.cpp; path = ../../src/ri/refCounter.cpp; sourceTree = SOURCE_ROOT; };
 		18CAFBA20C39FA3600614F8C /* refCounter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = refCounter.h; path = ../../src/ri/refCounter.h; sourceTree = SOURCE_ROOT; };
-		18CAFBA40C39FA3600614F8C /* shaderParameterList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shaderParameterList.h; path = ../../src/ri/shaderParameterList.h; sourceTree = SOURCE_ROOT; };
 		18D351560B7AD1F5009F0DAE /* displayChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = displayChannel.cpp; path = ../../src/ri/displayChannel.cpp; sourceTree = SOURCE_ROOT; };
 		18D351570B7AD1F5009F0DAE /* displayChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = displayChannel.h; path = ../../src/ri/displayChannel.h; sourceTree = SOURCE_ROOT; };
 		18D3515A0B7AD20E009F0DAE /* netFileMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = netFileMapping.h; path = ../../src/ri/netFileMapping.h; sourceTree = SOURCE_ROOT; };
@@ -1326,17 +1329,18 @@
 		186156030B97EED2007BE5EA /* parsers */ = {
 			isa = PBXGroup;
 			children = (
+				186156060B97EF3D007BE5EA /* dso.l */,
+				186156070B97EF3D007BE5EA /* dso.y */,
 				189830A00BAF85F9004D6C61 /* ifexpr.l */,
 				189830A10BAF85F9004D6C61 /* ifexpr.y */,
 				186156080B97EF6A007BE5EA /* rib.l */,
+				182C1BB70C55CD6A000B070D /* rib.y */,
 				186156090B97EF6A007BE5EA /* sdr.l */,
 				1861560A0B97EF6A007BE5EA /* sdr.y */,
-				1861560B0B97EF6A007BE5EA /* variable.l */,
-				1861560C0B97EF6A007BE5EA /* variable.y */,
-				186156060B97EF3D007BE5EA /* dso.l */,
-				186156070B97EF3D007BE5EA /* dso.y */,
 				186156040B97EEFC007BE5EA /* sl.l */,
 				186156050B97EEFC007BE5EA /* sl.y */,
+				1861560B0B97EF6A007BE5EA /* variable.l */,
+				1861560C0B97EF6A007BE5EA /* variable.y */,
 			);
 			name = parsers;
 			sourceTree = "<group>";
@@ -1704,24 +1708,24 @@
 		C96A6E180AD6D5C5003C2D7B = {
 			isa = PBXGroup;
 			children = (
-				186156030B97EED2007BE5EA /* parsers */,
-				188383DB0B2FB33F00166E3E /* toplevel */,
+				C96A6E2E0AD6D602003C2D7B /* common */,
 				188383580B2FB2F700166E3E /* doc */,
-				1883834B0B2FB29C00166E3E /* man */,
-				183398360B2D2CA60055E484 /* shaders */,
-				C9E09BAE0AD9C2CD00A33716 /* texmake */,
-				C9E09B5A0AD9BF2700A33716 /* sdrinfo */,
-				C9E09B570AD9BF1500A33716 /* rgbe */,
-				C9E09B070AD9B81100A33716 /* rndr */,
 				C9E09A7E0AD9AF2100A33716 /* dsotest */,
+				C96A6E5E0AD6D74C003C2D7B /* file */,
+				C96A6E650AD6D75A003C2D7B /* framebuffer */,
+				1883834B0B2FB29C00166E3E /* man */,
+				186156030B97EED2007BE5EA /* parsers */,
 				C96A6EEF0AD6E112003C2D7B /* precomp */,
+				C96A6E2A0AD6D5E5003C2D7B /* Products */,
+				C9E09B570AD9BF1500A33716 /* rgbe */,
+				C96A6EE30AD6E103003C2D7B /* ri */,
+				C9E09B070AD9B81100A33716 /* rndr */,
 				C96A6EEE0AD6E10E003C2D7B /* sdr */,
 				C96A6EED0AD6E108003C2D7B /* sdrc */,
-				C96A6EE30AD6E103003C2D7B /* ri */,
-				C96A6E650AD6D75A003C2D7B /* framebuffer */,
-				C96A6E5E0AD6D74C003C2D7B /* file */,
-				C96A6E2E0AD6D602003C2D7B /* common */,
-				C96A6E2A0AD6D5E5003C2D7B /* Products */,
+				C9E09B5A0AD9BF2700A33716 /* sdrinfo */,
+				183398360B2D2CA60055E484 /* shaders */,
+				C9E09BAE0AD9C2CD00A33716 /* texmake */,
+				188383DB0B2FB33F00166E3E /* toplevel */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1903,7 +1907,8 @@
 				C96A6F910AD6E196003C2D7B /* shader.h */,
 				C96A6F920AD6E196003C2D7B /* shaderFunctions.h */,
 				C96A6F930AD6E196003C2D7B /* shaderOpcodes.h */,
-				18CAFBA40C39FA3600614F8C /* shaderParameterList.h */,
+				182C1BB30C55CD34000B070D /* shaderPl.cpp */,
+				182C1BB40C55CD34000B070D /* shaderPl.h */,
 				C96A6F940AD6E196003C2D7B /* shading.cpp */,
 				C96A6F950AD6E196003C2D7B /* shading.h */,
 				C96A6F960AD6E196003C2D7B /* show.cpp */,
@@ -2153,7 +2158,7 @@
 				18E14A5D0BC2161E0061F88C /* pointHierarchy.h in Headers */,
 				18F4D1F60BC80F5800EEB5B3 /* ri_config.h in Headers */,
 				18CAFBA60C39FA3600614F8C /* refCounter.h in Headers */,
-				18CAFBA80C39FA3600614F8C /* shaderParameterList.h in Headers */,
+				182C1BB60C55CD34000B070D /* shaderPl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2663,6 +2668,7 @@
 				18E14A5C0BC2161E0061F88C /* pointHierarchy.cpp in Sources */,
 				18E14A5F0BC216490061F88C /* ptcapi.cpp in Sources */,
 				18CAFBA50C39FA3600614F8C /* refCounter.cpp in Sources */,
+				182C1BB50C55CD34000B070D /* shaderPl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -204,7 +204,7 @@ public:
 								}
 
 			void				lookup(float *data,const float *P,const float *N,float dP);
-			void				lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *,const CTexture3dLookup *) {	assert(FALSE);	}
+			void				lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *) {	assert(FALSE);	}
 			void				store(const float *data,const float *P,const float *N,float dP);
 				
 			void				finalize();

@@ -86,7 +86,7 @@ inline void *ralloc(int size,CMemPage *&stack) {
 
 // This macro duplicates a string in the stack
 inline char *rstrdup(const char *string,CMemPage *&stack) {
-	char	*dest	=	(char *) ralloc(strlen(string)+1,stack);
+	char	*dest	=	(char *) ralloc((int) strlen(string)+1,stack);
 
 	strcpy(dest,string);
 

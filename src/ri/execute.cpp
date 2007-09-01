@@ -46,8 +46,8 @@
 #include "renderer.h"
 #include "surface.h"
 #include "texture.h"
+#include "shaderPl.h"
 #include "ri_config.h"
-#include "shaderParameterList.h"
 
 // This function is defined in shader.cpp for debugging purposes
 void							debugFunction(float *);
@@ -233,18 +233,119 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		operandVaryingStep(i)			code->arguments[i].varyingStep
 
-// Retrieve the parameterlist
-#define		parameterlist					cInstance->parameterLists[code->plNumber]
 
-#define		dirty()							if (cInstance->dirty == FALSE) {										\
-												osLock(CRenderer::dirtyShaderMutex);								\
-												cInstance->dirty			=	TRUE;								\
-												cInstance->nextDirty		=	CRenderer::dirtyInstances;			\
-												cInstance->prevDirty		=	NULL;								\
-												if (CRenderer::dirtyInstances != NULL)								\
-													CRenderer::dirtyInstances->prevDirty	=	cInstance;			\
-												CRenderer::dirtyInstances	=	cInstance;							\
-												osUnlock(CRenderer::dirtyShaderMutex);								\
+// Use this macro to start processing a parameter list
+#define		plBegin(__class,__start)		/* Create a hash key using shader and instruction */					\
+											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code / sizeof(TCode)) & (PL_HASH_SIZE-1);		\
+											__class			*lookup	=	(__class *) plHash[hashKey];				\
+																													\
+											/* Check for a collision	*/											\
+											if (lookup != NULL) {													\
+												if ((lookup->instance != cInstance) || (lookup->code != code)) {	\
+													/* Delete the old lookup */										\
+													delete lookup;													\
+													lookup	=	NULL;												\
+													/* FIXME: We don't have to delete on collision */				\
+												}																	\
+											}																		\
+																													\
+											/* Look at the hash to see if we've computed this before	*/			\
+											if (lookup == NULL) {													\
+																													\
+												/* Get the number of arguments we have */							\
+												const int	num			=	code->numArguments;						\
+																													\
+												/* Allocate temporary memory */										\
+												CPLLookup::TParamBinding	*uniforms	=	(CPLLookup::TParamBinding *) ralloc(num*2*sizeof(CPLLookup::TParamBinding),threadMemory);	\
+												CPLLookup::TParamBinding	*varyings	=	uniforms + num;			\
+																													\
+												/* Create a new lookup	*/											\
+												plHash[hashKey] = lookup	=	new __class;						\
+												lookup->instance			=	cInstance;							\
+												lookup->code				=	code;								\
+												lookup->size				=	0;									\
+												lookup->uniforms			=	uniforms;							\
+												lookup->varyings			=	varyings;							\
+																													\
+												/* Decode the PL */													\
+												for (int i=__start;i<num;++i) {										\
+													/* Get the parameter name */									\
+													const char **param;												\
+													operand(i,param,const char **);									\
+													/* Get the parameter info */									\
+													++i;															\
+													const int	uniform	=	operandVaryingStep(i) == 0;				\
+													const int	step	=	operandBytesPerItem(i)*operandNumItems(i);	\
+													/* Decode the data only for uniform parameters */				\
+													void		*data	=	NULL;									\
+													if (uniform) {	operand(i,data,void *);	}						\
+																													\
+													/* Ask the lookup to find the variable */						\
+													lookup->bind(*param,i,step,data);								\
+												}																	\
+																													\
+												/* Allocate the final memory for the bound variables */				\
+												lookup->uniforms	=	new CPLLookup::TParamBinding[lookup->numUniforms+lookup->numVaryings];		\
+												lookup->varyings	=	lookup->uniforms + lookup->numUniforms;		\
+												/* Copy the saved data over to the final resting place */			\
+												memcpy(lookup->uniforms,uniforms,lookup->numUniforms*sizeof(CPLLookup::TParamBinding));	\
+												memcpy(lookup->varyings,varyings,lookup->numVaryings*sizeof(CPLLookup::TParamBinding));	\
+											}																		\
+																													\
+											/* Get a local copy of the scratch */									\
+											CShadingScratch		*scratch		=	&(currentShadingState->scratch);	\
+																														\
+											/* Overwrite some of the initial values from the attributes */				\
+											const CAttributes *cAttributes		=	currentShadingState->currentObject->attributes;	\
+											scratch->traceParams.bias			=	cAttributes->bias;					\
+											scratch->occlusionParams.maxError	=	cAttributes->irradianceMaxError;	\
+																													\
+											/* Init the varyings	*/												\
+											char	*savedVariables	=	(char *) ralloc(lookup->size + lookup->numVaryings*sizeof(char *),threadMemory);	\
+											char	*space			=	savedVariables;								\
+											char	**PL_VARIABLES	=	(char **) (space + lookup->size);			\
+											const CPLLookup::TParamBinding	*cBinding	=	lookup->varyings;		\
+											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
+												operand(cBinding->opIndex,PL_VARIABLES[var],char *);				\
+												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
+												space	+=	cBinding->step;											\
+												align64(space);														\
+											}																		\
+																													\
+											/* Init the uniforms	*/												\
+											cBinding	=	lookup->uniforms;										\
+											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
+												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
+												space	+=	cBinding->step;											\
+												align64(space);														\
+												char	*tmp;														\
+												operand(cBinding->opIndex,tmp,char *);								\
+												memcpy((char *) scratch + cBinding->dest,tmp,cBinding->step);		\
+											}
+
+// Use this macro to get the scratch variables updated
+#define		plReady()						cBinding	=	lookup->varyings;										\
+											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
+												memcpy((char *) scratch + cBinding->dest,PL_VARIABLES[var],cBinding->step);	\
+											}
+
+// Use this variable to step over the variables defined in the parameter list
+#define		plStep()						for (int var=0;var<lookup->numVaryings;++var) {							\
+												PL_VARIABLES[var]	+=	lookup->varyings[var].step;					\
+											}
+// Use this macro to restore the scratch variables that have been overwritten
+#define		plEnd()							space		=	savedVariables;											\
+											cBinding	=	lookup->varyings;										\
+											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
+												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
+												space	+=	cBinding->step;											\
+												align64(space);														\
+											}																		\
+											cBinding	=	lookup->uniforms;										\
+											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
+												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
+												space	+=	cBinding->step;											\
+												align64(space);														\
 											}
 
 //	Retrieve an integer operand (label references are integer)
@@ -430,55 +531,40 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Break the shader execution
 #define		BREAK							goto execEnd;
 
+	// Uninitialized local variables
+	CGatherBundle		*lastGather;
 
-
-	//	The	shading variables and junk
-	void						**stuff[3];			// Where we keep pointers to the variables
-	CConditional				*lastConditional;	// The last conditional
-	int							numActive;			// The number of active points being shaded
-	int							numPassive;			// The number of passive points being not shaded (numPassive+numActive = numVertices)
-	int							*tags;				// Execution tags
-	int							*tagStart;
-	int							currentVertex;		// The current vertex being executed
-	CShader						*currentShader			=	cInstance->parent;
-	const TCode					*code;
-	int							numVertices;
-	float						**varying;
-	CShadedLight				**lights;
-	CShadedLight				**alights;
-	CShadedLight				**currentLight;
-	CShadedLight				**freeLights;
-	CGatherBundle				*lastGather;		// Pointer to the last gather bundle
+	// This is the current shader we're executing
+	CShader		*currentShader			=	cInstance->parent;
 	
-
 	assert((currentShadingState->numActive+currentShadingState->numPassive) == currentShadingState->numVertices);
 
 	currentShadingState->currentShaderInstance	=	cInstance;
-	code										=	currentShader->codeArea + currentShader->codeEntryPoint;
-	tagStart									=	currentShadingState->tags;
+	const TCode	*code					=	currentShader->codeArea + currentShader->codeEntryPoint;
+	int			*tagStart				=	currentShadingState->tags;
 
 	// Save this stuff for fast access
-	numVertices							=	currentShadingState->numVertices;
-	varying								=	currentShadingState->varying;
-	lights								=	&currentShadingState->lights;
-	alights								=	&currentShadingState->alights;
-	currentLight						=	&currentShadingState->currentLight;
-	freeLights							=	&currentShadingState->freeLights;
+	int				numVertices			=	currentShadingState->numVertices;
+	float			**varying			=	currentShadingState->varying;
+	CShadedLight	**lights			=	&currentShadingState->lights;
+	CShadedLight	**alights			=	&currentShadingState->alights;
+	CShadedLight	**currentLight		=	&currentShadingState->currentLight;
+	CShadedLight	**freeLights		=	&currentShadingState->freeLights;
 
 	// Set the access arrays
+	void	**stuff[3];
 	stuff[SL_IMMEDIATE_OPERAND]			=	currentShader->constantEntries;				// Immediate operands
 	stuff[SL_GLOBAL_OPERAND]			=	(void **) varying;							// Global variables
 	stuff[SL_VARYING_OPERAND]			=	(void **) locals;							// Local variables
 
-	numActive							=	currentShadingState->numActive;
-	numPassive							=	currentShadingState->numPassive;
-	lastConditional						=	NULL;										// The last conditional block
+	int				numActive			=	currentShadingState->numActive;
+	int				numPassive			=	currentShadingState->numPassive;
+	CConditional	*lastConditional	=	NULL;										// The last conditional block
 
 	// Execute
 execStart:
 	const ESlCode	opcode	=	(ESlCode)	code->opcode;	// Get the opcode
-
-	tags	=	tagStart;						// Set the tags to the start
+	int				*tags	=	tagStart;					// Set the tags to the start
 
 	if (code->uniform) {			// If the opcode is uniform , execute once
 #define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
@@ -558,7 +644,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -574,7 +660,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {			\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -590,7 +676,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -605,7 +691,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -620,7 +706,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {			\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -657,7 +743,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {				\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -670,7 +756,7 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {					\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -684,7 +770,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {				\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -697,7 +783,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=numVertices;currentVertex>0;currentVertex--,tags++) {			\
+				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
 					if (*tags == 0) {																\
 						expr;																		\
 					}																				\
@@ -713,7 +799,7 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				for (currentVertex=currentShadingState->numRealVertices;currentVertex>0;currentVertex--) {					\
+				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {					\
 					expr;																			\
 					expr_update;																	\
 				}																					\
@@ -752,18 +838,16 @@ execEnd:
 	// Make sure we save the ambient contribution if there has been no illuminate/solar executed
 	if (currentShader->type == SL_LIGHTSOURCE) {
 		if (!(currentShader->usedParameters & PARAMETER_NONAMBIENT)) {
-			float	*Cl		=	varying[VARIABLE_CL];
-			float	*Ol		=	varying[VARIABLE_OL];
-			float	*Clsave;
+			const float	*Cl		=	varying[VARIABLE_CL];
+			float		*Clsave;
 			
 			// Save the ambient junk
 			Clsave	= (*alights)->savedState[1];
 			tags	= tagStart;
-			for (int i=numVertices;i>0;i--,Cl+=3,Ol+=3,Clsave+=3) {
+			for (int i=numVertices;i>0;--i,Cl+=3,Clsave+=3,++tags) {
 				if (*tags==0) {
 					addvv(Clsave,Cl);
 				}
-				tags++;
 			}
 		}
 	}
@@ -775,7 +859,6 @@ execEnd:
 #undef		beginConditional
 #undef		endConditional
 #undef		operand
-#undef		dirty
 #undef		parameterlist
 #undef		argument
 #undef		argumentcount

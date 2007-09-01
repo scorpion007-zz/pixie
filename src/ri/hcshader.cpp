@@ -130,7 +130,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
 		int				j;
 		CRay			ray;
-		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
+		const float		bias					=	currentShadingState->currentObject->attributes->bias;
 		int				numVertices				=	currentShadingState->numRealVertices;
 		CShadedLight	*cLight;
 		
@@ -445,7 +445,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		const int		*tags					=	currentShadingState->tags;
 		float			*Ps						=	currentShadingState->varying[VARIABLE_PS];
 		CRay			ray;
-		const float		bias					=	currentShadingState->currentObject->attributes->shadowBias;
+		const float		bias					=	currentShadingState->currentObject->attributes->bias;
 		vector			D;
 		int				j;
 		int				numVertices				=	currentShadingState->numRealVertices;

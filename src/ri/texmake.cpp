@@ -525,7 +525,7 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 	for (newHeight=1;newHeight < height[0];newHeight = newHeight << 1);
 	
 	// check if we're supposed to preserve ratios
-	int resizeModeLen = strlen(resizemode);
+	int resizeModeLen = (int) strlen(resizemode);
 	if (resizeModeLen > 2) {
 		if (resizemode[resizeModeLen-1] == '-') {
 			preserveRatio = FALSE;
