@@ -2474,11 +2474,12 @@ ribComm:		RIB_STRUCTURE_COMMENT
 					bound[5]	=	$10;
 
 					cData->bmin[COMP_X]	=	$5;
-					cData->bmin[COMP_Y]	=	$6;
-					cData->bmin[COMP_Z]	=	$7;
-
-					cData->bmax[COMP_X]	=	$8;
-					cData->bmax[COMP_Y]	=	$9;
+					cData->bmax[COMP_X]	=	$6;
+					
+					cData->bmin[COMP_Y]	=	$7;
+					cData->bmax[COMP_Y]	=	$8;
+					
+					cData->bmin[COMP_Z]	=	$9;
 					cData->bmax[COMP_Z]	=	$10;
 
 					if (strcmp($2,RI_PROCDELAYEDREADARCHIVE) == 0) {
