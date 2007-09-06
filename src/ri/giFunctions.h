@@ -38,7 +38,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // transmission	"c=pp!"
 #ifndef INIT_SHADING
-#define	TRANSMISSIONEXPR_PRE	plBegin(CPLLookup,3);											\
+#define	TRANSMISSIONEXPR_PRE	plBegin(CTraceLookup,3);										\
 								CTraceLocation	*rays	=	(CTraceLocation *)	ralloc(numVertices*sizeof(CTraceLocation),threadMemory);	\
 								float			*dFdu	=	(float *)			ralloc(numVertices*12*sizeof(float),threadMemory);			\
 								float			*dFdv	=	dFdu + numVertices*3;				\
@@ -140,7 +140,8 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 									traceReflection(numRays,rays,FALSE);							\
 									for (int i=numRays;i>0;i--,rays++)	movvv(rays->res,rays->C);	\
 									expandVector(res);												\
-								}
+								}																	\
+								plEnd();
 
 // Just compute the nearest intersection
 #define	TRACE2EXPR_POST			if (numRays > 0) {													\
@@ -148,7 +149,8 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 									traceReflection(numRays,rays,TRUE);								\
 									for (int i=numRays;i>0;i--,rays++)	*rays->res	=	rays->t;	\
 									expandFloat(res);												\
-								}
+								}																	\
+								plEnd();
 
 #else
 
@@ -230,6 +232,7 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								plStep();																							\
 								dPdu	+=	3;																						\
 								dPdv	+=	3;																						\
+								op3++;																								\
 								du++;	dv++;																						\
 								for (int channel=0;channel<lookup->numChannels;++channel) {											\
 									channelValues[channel]	+=	lookup->channelSize[channel];										\
