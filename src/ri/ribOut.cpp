@@ -1338,9 +1338,10 @@ void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *,...),
 	out("ReadArchive \"%s\"\n",filename);
 }
 
-void		CRibOut::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+void		*CRibOut::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
 	out("ArchiveBegin \"%s\" ",name);
 	writePL(n,tokens,parms);
+	return NULL;
 }
 
 void		CRibOut::RiArchiveEnd(void) {

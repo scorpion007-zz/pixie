@@ -2352,8 +2352,7 @@ EXTERN(RtArchiveHandle)	RiArchiveBeginV(RtToken name, RtInt n, RtToken tokens[],
 	archiveNesting++;
 
 	// Always call the current renderMan
-	renderMan->RiArchiveBeginV(name,n,tokens,parms);
-	return (RtArchiveHandle) RI_NULL;	// This is not currently implemented
+	return (RtArchiveHandle) renderMan->RiArchiveBeginV(name,n,tokens,parms);
 }
 
 EXTERN(RtVoid)			RiArchiveEnd(void) {

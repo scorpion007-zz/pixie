@@ -367,7 +367,8 @@ void		CRiInterface::RiArchiveRecord(char * type,char *format,va_list args) {
 void		CRiInterface::RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+void		*CRiInterface::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+	return NULL;
 }
 
 void		CRiInterface::RiArchiveEnd(void) {

@@ -172,7 +172,7 @@ public:
 	virtual	void		RiArchiveRecord(char * type,char *format,va_list args);
 	virtual	void		RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]);
 
-	virtual	void		RiArchiveBeginV(const char *name, int n, char *tokens[], void *parms[]);
+	virtual	void		*RiArchiveBeginV(const char *name, int n, char *tokens[], void *parms[]);
 	virtual	void		RiArchiveEnd(void);
 	
 	virtual	void		RiResourceV(const char *handle,const char *type,int n, char *tokens[],void *parms[]);
