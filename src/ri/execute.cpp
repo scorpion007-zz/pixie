@@ -183,7 +183,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		scripterror(mes)				{																	\
 												CRenderer::offendingObject	=	currentShadingState->currentObject;	\
-												error(CODE_SCRIPT,"\"%s\", (nullified)\n",mes);					\
+												error(CODE_SCRIPT,"\"%s\", in shader \"%s\" (nullified)\n",mes,cInstance->getName()); \
 												cInstance->parent->codeEntryPoint	=	-1;						\
 												cInstance->parent->initEntryPoint	=	-1;						\
 												goto	execEnd;												\
@@ -281,7 +281,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													if (uniform) {	operand(i,data,void *);	}						\
 																													\
 													/* Ask the lookup to find the variable */						\
-													lookup->bind(*param,i,step,data);								\
+													lookup->bind(*param,i,step,data,cInstance);						\
 												}																	\
 																													\
 												/* Allocate the final memory for the bound variables */				\
@@ -297,9 +297,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 																														\
 											/* Overwrite some of the initial values from the attributes */				\
 											const CAttributes *cAttributes		=	currentShadingState->currentObject->attributes;	\
-											scratch->traceParams.bias			=	cAttributes->bias;					\
-											scratch->occlusionParams.maxError	=	cAttributes->irradianceMaxError;	\
-																													\
+											lookup->init(scratch,cAttributes);														\
+																																	\
 											/* Init the varyings	*/												\
 											char	*savedVariables	=	(char *) ralloc(lookup->size + lookup->numVaryings*sizeof(char *),threadMemory);	\
 											char	*space			=	savedVariables;								\
@@ -623,7 +622,7 @@ execStart:
 #include "scriptFunctions.h"
 
 		default:
-			error(CODE_BUG,"Opcode conflict");
+			error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
 			goto execEnd;
 		}
 
@@ -725,7 +724,7 @@ execStart:
 #include "scriptFunctions.h"
 
 			default:
-				error(CODE_BUG,"Opcode conflict");
+				error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
 				goto execEnd;
 			}
 
@@ -815,7 +814,7 @@ execStart:
 #include "scriptFunctions.h"
 
 			default:
-				error(CODE_BUG,"Opcode conflict");
+				error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
 				goto execEnd;
 			}
 
