@@ -910,7 +910,6 @@ public:
 							float					ds,dt,d;
 							const CShadingScratch	*scratch	=	&(context->currentShadingState->scratch);
 
-
 							const int		width	=	layers[0]->width;
 							const int		height	=	layers[0]->height;
 
@@ -948,9 +947,10 @@ public:
 							offset		=	l - i;
 							offset		=	min(offset,1);
 
+							const float jitter = 1.0f-1.0f/(float)scratch->textureParams.samples;
+
 							initv(result,0,0,0);					// Result is black
-							//for (i=(int) scratch->samples;i>0;i--) {
-							for (i=1;i>0;i--) {
+							for (i=(int) scratch->textureParams.samples;i>0;i--) {
 								float			r[2];
 								float			s,t;
 								vector			C,CC0,CC1;
@@ -958,12 +958,16 @@ public:
 
 								context->random2d.get(r);
 
-								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
-														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
-								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
-														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float 	x	=	(r[0]-0.5f)*jitter+0.5f;
+								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
 
-								contribution		=	scratch->textureParams.filter(r[0]-0.5f,r[1]-0.5f,1,1);
+								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
+														(u[2]*(1-x) + u[3]*x)*y;
+								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
+														(v[2]*(1-x) + v[3]*x)*y;
+
+								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								// Do the s mode
@@ -1089,10 +1093,11 @@ public:
 							int						i;
 							float					totalContribution	=	0;
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
-
+							
+							const float jitter = 1.0f-1.0f/(float)scratch->textureParams.samples;
+							
 							initv(result,0,0,0);		// Result is black
-							//for (i=(int) scratch->samples;i>0;i--) {
-							for (i=1;i>0;i--) {
+							for (i=(int) scratch->textureParams.samples;i>0;i--) {
 								float			s,t;
 								vector			C;
 								float			contribution;
@@ -1100,18 +1105,23 @@ public:
 
 								context->random2d.get(r);
 
-								s					=	(u[0]*(1-r[0]) + u[1]*r[0])*(1-r[1])	+
-														(u[2]*(1-r[0]) + u[3]*r[0])*r[1];
-								t					=	(v[0]*(1-r[0]) + v[1]*r[0])*(1-r[1])	+
-														(v[2]*(1-r[0]) + v[3]*r[0])*r[1];
-								contribution		=	scratch->textureParams.filter(r[0]-(float) 0.5,r[1]-(float) 0.5,1,1);
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float		x	=	(r[0]-0.5f)*jitter+0.5f;
+								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
+								
+								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
+														(u[2]*(1-x) + u[3]*x)*y;
+								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
+														(v[2]*(1-x) + v[3]*x)*y;
+
+								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								if (scratch->textureParams.blur > 0) {
 									context->random2d.get(r);
 
-									s				+=	scratch->textureParams.blur*(r[0] - 0.5f);
-									t				+=	scratch->textureParams.blur*(r[1] - 0.5f);
+									s				+=	scratch->textureParams.blur*(x - 0.5f);
+									t				+=	scratch->textureParams.blur*(y - 0.5f);
 								}
 
 								// Do the s mode
@@ -1197,23 +1207,27 @@ public:
 							addvv(center,D3);
 							mulvf(center,0.25f);
 
-							// FIXME: Apply the blur
+							// Apply the filter width
 							subvv(S0,D0,center);
+							mulvf(S0,scratch->textureParams.width*2);
 							addvv(S0,center);
 
 							subvv(S1,D1,center);
+							mulvf(S1,scratch->textureParams.width*2);
 							addvv(S1,center);
 
 							subvv(S2,D2,center);
+							mulvf(S2,scratch->textureParams.width*2);
 							addvv(S2,center);
 
 							subvv(S3,D3,center);
+							mulvf(S3,scratch->textureParams.width*2);
 							addvv(S3,center);
-
+							
+							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
 
 							result[0]	=	0;
 							for (i=(int) scratch->traceParams.samples;i>0;i--) {
-								float	x,y;
 								float	s,t;
 								float	C;
 								float	contribution;
@@ -1222,9 +1236,11 @@ public:
 
 								context->random4d.get(r);
 
-								x					=	r[0];
-								y					=	r[1];
-								contribution		=	scratch->textureParams.filter(x - 0.5f,y - 0.5f,1,1);
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float x		=	(r[0]-0.5f)*jitter+0.5f;
+								const float y		=	(r[1]-0.5f)*jitter+0.5f;
+																
+								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(S0[COMP_X]*(1-x) + S1[COMP_X]*x)*(1-y) + (S2[COMP_X]*(1-x) + S3[COMP_X]*x)*y;
@@ -1359,7 +1375,8 @@ public:
 							float					totalContribution	=	0;
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
 
-
+							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
+							
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
@@ -1375,9 +1392,11 @@ public:
 
 								context->random4d.get(r);
 
-								const float x		=	r[0];
-								const float y		=	r[1];
-								contribution		=	scratch->textureParams.filter(x - 0.5f,y - 0.5f,1,1);
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float x		=	(r[0]-0.5f)*jitter+0.5f;
+								const float y		=	(r[1]-0.5f)*jitter+0.5f;
+								
+								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
@@ -1603,7 +1622,9 @@ public:
 							result[2]	=	0;
 
 							if (dotvv(D0,D0) == 0)	return;
-
+							
+							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
+							
 							for (i=(int) scratch->traceParams.samples;i>0;i--) {
 								float	t;
 								float	contribution;
@@ -1611,9 +1632,11 @@ public:
 
 								context->random2d.get(r);
 
-								const float x		=	r[0];
-								const float y		=	r[1];
-								contribution		=	scratch->textureParams.filter(x - (float) 0.5,y - (float) 0.5,1,1);
+								// stratify the sample so that with low sample counts we don't jitter too much
+								const float x		=	(r[0]-0.5f)*jitter+0.5f;
+								const float y		=	(r[1]-0.5f)*jitter+0.5f;
+								
+								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 								totalContribution	+=	contribution;
 
 								D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
