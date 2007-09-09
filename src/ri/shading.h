@@ -115,9 +115,9 @@ public:
 // Class				:	CShadingScratch
 // Description			:	Holds all the scratch variables
 // Comments				:
-class	CShadingScratch {
+struct	CShadingScratch {
 public:
-					CShadingScratch();		// The constructor only init the default values
+					init();
 
 	// Texture/Environment parameters
 	struct {
@@ -126,7 +126,8 @@ public:
 		float			width;
 		float			swidth;
 		float			twidth;
-		float			fill;			}			textureParams;
+		float			fill;
+		float			samples;		}			textureParams;
 
 	// Photonmap parameters
 	struct {

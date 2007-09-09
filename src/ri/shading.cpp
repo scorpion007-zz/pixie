@@ -380,11 +380,13 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingScratch
-// Method				:	CShadingScratch
-// Description			:	Ctor
+// Method				:	init
+// Description			:	Ctor-like function
 // Return Value			:	-
 // Comments				:	Initializes the default values for shader functions
-CShadingScratch::CShadingScratch() {
+
+//FIXME: revise these
+CShadingScratch::init() {
 
 	// Texture parameters
 	textureParams.filter				=	NULL;					// Filter will always be overwritten by the caller
@@ -393,6 +395,7 @@ CShadingScratch::CShadingScratch() {
 	textureParams.swidth				=	1.0f;					// No area scale
 	textureParams.twidth				=	1.0f;					// No area scale
 	textureParams.fill					=	0.0f;					// Fill will zero color
+	textureParams.samples				=	1;						// One sample only
 
 	// Photonmap parameters
 	photonmapParams.estimator			=	0;						// If 0, use the attributes

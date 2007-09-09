@@ -35,6 +35,9 @@
 #include "ri_config.h"
 #include "ri.h"
 
+// Forward declarations
+class CShadingScratch;
+class CAttributes;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPLLookup
@@ -46,7 +49,11 @@ public:
 		virtual					~CPLLookup();
 
 								// This function must be overwritten to bind a particular variable
-		virtual		void		bind(const char *name,int &opIndex,int step,void *data);
+		virtual		void		bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+								// This function can be overridden to perform initialization not dependant on values
+		virtual		void		init(CShadingScratch *scratch,const CAttributes *attributes) { }
+								// This function can be overridden to perform initialization dependant on values
+		virtual		void		postBind() { }
 					void		add(const char *name,int opIndex,int step,void *data,size_t dest);
 
 		const void				*instance;			// The instance that has the PL
@@ -91,7 +98,8 @@ public:
 							CTextureLookup();
 							~CTextureLookup();
 
-		void				bind(const char *name,int &opIndex,int step,void *data);
+		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
 		CTexture			*map;
 		RtFilterFunc		filter;	
@@ -107,7 +115,8 @@ public:
 							CTraceLookup();
 							~CTraceLookup();
 
-		void				bind(const char *name,int &opIndex,int step,void *data);
+		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -119,7 +128,8 @@ public:
 							CEnvironmentLookup();
 							~CEnvironmentLookup();
 
-		void				bind(const char *name,int &opIndex,int step,void *data);
+		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
 		CEnvironment		*map;
 		RtFilterFunc		filter;	
@@ -135,7 +145,8 @@ public:
 							CPhotonMapLookup();
 							~CPhotonMapLookup();
 
-		void				bind(const char *name,int &opIndex,int step,void *data);
+		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
 		CPhotonMap			*map;
 };
@@ -163,8 +174,9 @@ public:
 							CTexture3dLookup();
 							~CTexture3dLookup();
 
-		void				bind(const char *name,int &opIndex,int step,void *data);
-
+		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+		void				init(CShadingScratch *scratch,const CAttributes *attributes);
+		
 		CTexture3d			*map;									// The texture we're lookup up
 		int					numChannels;							// The number of channels bake3d provides
 		const char			*channelName[TEXTURE3D_MAX_CHANNELS];
@@ -183,7 +195,8 @@ public:
 							COcclusionLookup();
 							~COcclusionLookup();
 
-		void				bind(const char *name,int &opIndex,int step,void *data);
+		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
 		CEnvironment		*environment;							// The environment map to use
 		CTexture3d			*pointHierarchy;						// The point hierarchy to use
@@ -228,8 +241,8 @@ public:
 							CGatherLookup();
 							~CGatherLookup();
 
-	void					addOutput(const char *,int);
-	void					bind(const char *name,int &opIndex,int step,void *data);
+	void					addOutput(const char *,int,CShaderInstance *shader);
+	void					bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
 
 	CGatherVariable			*outputs;				// These are the outputs that require shading
 	int						numOutputs;				// The number of outputs
