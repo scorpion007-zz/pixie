@@ -1468,13 +1468,13 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 
 #define	TEXTUREFEXPR			plReady();																		\
 								cs[0]		=	s[i];															\
-								cs[1]		=	s[i] + dsdu[i]*swidth;											\
-								cs[2]		=	s[i] + dsdv[i]*swidth;											\
-								cs[3]		=	s[i] + (dsdu[i] + dsdv[i])*swidth;								\
+								cs[1]		=	s[i] + dsdu[i]*du[i]*swidth;											\
+								cs[2]		=	s[i] + dsdv[i]*dv[i]*swidth;											\
+								cs[3]		=	s[i] + (dsdu[i]*du[i] + dsdv[i]*dv[i])*swidth;								\
 								ct[0]		=	t[i];															\
-								ct[1]		=	t[i] + dtdu[i]*twidth;											\
-								ct[2]		=	t[i] + dtdv[i]*twidth;											\
-								ct[3]		=	t[i] + (dtdu[i] + dtdv[i])*twidth;								\
+								ct[1]		=	t[i] + dtdu[i]*du[i]*twidth;											\
+								ct[2]		=	t[i] + dtdv[i]*dv[i]*twidth;											\
+								ct[3]		=	t[i] + (dtdu[i]*du[i] + dtdv[i]*dv[i])*twidth;								\
 								vector	tmp;																	\
 								tex->lookup4(tmp,cs,ct,this);													\
 								res[i]		=	tmp[0];
@@ -1501,13 +1501,13 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 
 #define	TEXTURECEXPR			plReady();																		\
 								cs[0]		=	s[i];															\
-								cs[1]		=	s[i] + dsdu[i]*swidth;											\
-								cs[2]		=	s[i] + dsdv[i]*swidth;											\
-								cs[3]		=	s[i] + (dsdu[i] + dsdv[i])*swidth;								\
+								cs[1]		=	s[i] + dsdu[i]*du[i]*swidth;											\
+								cs[2]		=	s[i] + dsdv[i]*dv[i]*swidth;											\
+								cs[3]		=	s[i] + (dsdu[i]*du[i] + dsdv[i]*dv[i])*swidth;								\
 								ct[0]		=	t[i];															\
-								ct[1]		=	t[i] + dtdu[i]*twidth;											\
-								ct[2]		=	t[i] + dtdv[i]*twidth;											\
-								ct[3]		=	t[i] + (dtdu[i] + dtdv[i])*twidth;								\
+								ct[1]		=	t[i] + dtdu[i]*du[i]*twidth;											\
+								ct[2]		=	t[i] + dtdv[i]*dv[i]*twidth;											\
+								ct[3]		=	t[i] + (dtdu[i]*du[i] + dtdv[i]*dv[i])*twidth;								\
 								tex->lookup4(res,cs,ct,this);
 
 #define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;	plStep();
@@ -1818,11 +1818,10 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 #ifndef INIT_SHADING
 
 
-// Note: we are swapping D dDdu and dDdv with P dPdu and dPdv here, because
+// Note: we are swapping dDdu and dDdv with dPdu and dPdv here, because
 // the ENVIRONMENT_PRE macro always calculates the dD differentials.
 // It is also very impartant that we supply dPdu and dPdv so the ray differentials
 // are correct or otherwise we waste time overtesselating
-// We also need to ensure that the ray direction is right (light to surface)
 
 #define	SHADOWEXPR_PRE			ENVIRONMENTEXPR_PRE("shadow");														\
 								const float	*L	=	varying[VARIABLE_L];											\
