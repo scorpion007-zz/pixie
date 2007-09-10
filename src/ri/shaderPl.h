@@ -58,7 +58,6 @@ public:
 
 		const void				*instance;			// The instance that has the PL
 		const void				*code;				// The code that has the PL
-		int						size;				// The size of the memory that needs to be allocated to save old variables
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	TParamBinding

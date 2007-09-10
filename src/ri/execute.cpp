@@ -269,7 +269,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												lookup						=	new __class;						\
 												lookup->instance			=	cInstance;							\
 												lookup->code				=	code;								\
-												lookup->size				=	0;									\
 												lookup->uniforms			=	uniforms;							\
 												lookup->varyings			=	varyings;							\
 												lookup->next				=	plHash[hashKey];					\
@@ -308,23 +307,15 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											lookup->init(scratch,cAttributes);														\
 																																	\
 											/* Init the varyings	*/												\
-											char	*savedVariables	=	(char *) ralloc(lookup->size + lookup->numVaryings*sizeof(char *),threadMemory);	\
-											char	*space			=	savedVariables;								\
-											char	**PL_VARIABLES	=	(char **) (space + lookup->size);			\
+											char	**PL_VARIABLES	=	(char **) ralloc(lookup->numVaryings*sizeof(char *),threadMemory);	\
 											const CPLLookup::TParamBinding	*cBinding	=	lookup->varyings;		\
 											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
 												operand(cBinding->opIndex,PL_VARIABLES[var],char *);				\
-												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
-												space	+=	cBinding->step;											\
-												align64(space);														\
 											}																		\
 																													\
 											/* Init the uniforms	*/												\
 											cBinding	=	lookup->uniforms;										\
 											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
-												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
-												space	+=	cBinding->step;											\
-												align64(space);														\
 												char	*tmp;														\
 												operand(cBinding->opIndex,tmp,char *);								\
 												memcpy((char *) scratch + cBinding->dest,tmp,cBinding->step);		\
@@ -340,20 +331,9 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 #define		plStep()						for (int var=0;var<lookup->numVaryings;++var) {							\
 												PL_VARIABLES[var]	+=	lookup->varyings[var].step;					\
 											}
+
 // Use this macro to restore the scratch variables that have been overwritten
-#define		plEnd()							space		=	savedVariables;											\
-											cBinding	=	lookup->varyings;										\
-											for (int var=0;var<lookup->numVaryings;++var,++cBinding) {				\
-												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
-												space	+=	cBinding->step;											\
-												align64(space);														\
-											}																		\
-											cBinding	=	lookup->uniforms;										\
-											for (int var=0;var<lookup->numUniforms;++var,++cBinding) {				\
-												memcpy(space,(char *) scratch + cBinding->dest,cBinding->step);		\
-												space	+=	cBinding->step;											\
-												align64(space);														\
-											}
+#define		plEnd()
 
 //	Retrieve an integer operand (label references are integer)
 #define		argument(i)						code->arguments[i].index

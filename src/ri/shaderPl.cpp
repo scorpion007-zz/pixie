@@ -54,7 +54,6 @@ CPLLookup::CPLLookup() {
 	varyings		=	NULL;
 	instance		=	0;
 	code			=	0;
-	size			=	0;
 	next			=	NULL;
 }
 
@@ -94,8 +93,6 @@ void	CPLLookup::add(const char *name,int opIndex,int step,void *data,size_t dest
 	cBinding->opIndex	=	opIndex;
 	cBinding->step		=	step;
 	cBinding->dest		=	dest;
-	size				+=	step;
-	align64(size);
 }
 
 
