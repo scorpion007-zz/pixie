@@ -237,17 +237,23 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 // Use this macro to start processing a parameter list
 #define		plBegin(__class,__start)		/* Create a hash key using shader and instruction */					\
 											const uintptr_t	hashKey	=	((uintptr_t) cInstance + (uintptr_t) code / sizeof(TCode)) & (PL_HASH_SIZE-1);		\
-											__class			*lookup	=	(__class *) plHash[hashKey];				\
-																													\
-											/* Check for a collision	*/											\
-											if (lookup != NULL) {													\
-												if ((lookup->instance != cInstance) || (lookup->code != code)) {	\
-													/* Delete the old lookup */										\
-													delete lookup;													\
-													lookup	=	NULL;												\
-													/* FIXME: We don't have to delete on collision */				\
+											__class			*lookup	=	NULL;										\
+											CPLLookup		*prev	=	NULL;										\
+											CPLLookup		*current;												\
+											for (current=plHash[hashKey];current!=NULL;prev=current,current=current->next) {	\
+												/* Is this a hit ?*/												\
+												if ((current->instance != cInstance) || (current->code != code)) {	\
+													lookup	=	(__class *) current;								\
+													/* Move the hit to the beginning of the list */					\
+													if (prev != NULL) {												\
+														prev->next		=	current->next;							\
+														current->next	=	plHash[hashKey];						\
+														plHash[hashKey]	=	current;								\
+													}																\
+													break;															\
 												}																	\
 											}																		\
+																													\
 																													\
 											/* Look at the hash to see if we've computed this before	*/			\
 											if (lookup == NULL) {													\
@@ -260,12 +266,14 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												CPLLookup::TParamBinding	*varyings	=	uniforms + num;			\
 																													\
 												/* Create a new lookup	*/											\
-												plHash[hashKey] = lookup	=	new __class;						\
+												lookup						=	new __class;						\
 												lookup->instance			=	cInstance;							\
 												lookup->code				=	code;								\
 												lookup->size				=	0;									\
 												lookup->uniforms			=	uniforms;							\
 												lookup->varyings			=	varyings;							\
+												lookup->next				=	plHash[hashKey];					\
+												plHash[hashKey]				=	lookup;								\
 																													\
 												/* Decode the PL */													\
 												for (int i=__start;i<num;++i) {										\

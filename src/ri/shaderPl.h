@@ -36,7 +36,7 @@
 #include "ri.h"
 
 // Forward declarations
-class CShadingScratch;
+struct CShadingScratch;
 class CAttributes;
 
 ///////////////////////////////////////////////////////////////////////
@@ -76,6 +76,8 @@ public:
 
 		int						numVaryings;
 		TParamBinding			*varyings;
+
+		CPLLookup				*next;				// To maintain a linked list
 };
 
 

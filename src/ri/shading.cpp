@@ -386,7 +386,7 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Comments				:	Initializes the default values for shader functions
 
 //FIXME: revise these
-CShadingScratch::init() {
+void	CShadingScratch::init() {
 
 	// Texture parameters
 	textureParams.filter				=	NULL;					// Filter will always be overwritten by the caller
@@ -508,7 +508,11 @@ CShadingContext::~CShadingContext() {
 
 	// Ditch the PL hash
 	for (int i=0;i<PL_HASH_SIZE;i++) {
-		if (plHash[i] != NULL)	delete plHash[i];
+		CPLLookup	*cLookup;
+		while((cLookup=plHash[i]) != NULL) {
+			plHash[i]	=	cLookup->next;
+			delete cLookup;
+		}
 	}
 
 	// Ditch the shading states that have been allocated

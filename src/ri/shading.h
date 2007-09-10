@@ -117,7 +117,7 @@ public:
 // Comments				:
 struct	CShadingScratch {
 public:
-					init();
+		void			init();
 
 	// Texture/Environment parameters
 	struct {
