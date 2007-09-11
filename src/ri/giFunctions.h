@@ -232,7 +232,6 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 								plStep();																							\
 								dPdu	+=	3;																						\
 								dPdv	+=	3;																						\
-								op3++;																								\
 								du++;	dv++;																						\
 								for (int channel=0;channel<lookup->numChannels;++channel) {											\
 									channelValues[channel]	+=	lookup->channelSize[channel];										\
