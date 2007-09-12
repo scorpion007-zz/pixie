@@ -469,6 +469,17 @@ void		CTexture3dLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 	scratch->texture3dParams.radiusScale		= 1;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	COcclusionLookup
+// Method				:	init
+// Description			:	Initialize the scratch for this lookup
+// Return Value			:	-
+// Comments				:
+void		CTexture3dLookup::postBind(CShadingScratch *scratch) {
+	if (scratch->texture3dParams.coordsys[0] == '\0') {
+		scratch->texture3dParams.coordsys = "world";
+	}
+}
 
 
 
@@ -541,7 +552,7 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 	} else if (strcmp(name,"filemode") == 0) {
 		expectUniform(name);
 		// This is a uniform parameter
-		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.cacheHandle));
+		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.cacheMode));
 	} else {
 		assert(data == NULL);	// The data has to be varying
 
@@ -560,7 +571,7 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 // Comments				:
 void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
 	scratch->occlusionParams.environmentMapName	=	NULL;					// None by default
-	scratch->texture3dParams.coordsys			=	"world";
+	scratch->texture3dParams.coordsys			=	"";
 	scratch->occlusionParams.maxError			=	attributes->irradianceMaxError;
 	scratch->occlusionParams.pointbased			=	0;						// This is not a point based lookup
 	scratch->occlusionParams.maxBrightness		=	1.0f;					// Upper limit on the maximum brightness
@@ -572,8 +583,8 @@ void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 	initv(scratch->occlusionParams.environmentColor,0);						// The background color for irradiance
 	scratch->occlusionParams.pointHierarchy		=	NULL;					// Overwritten on the fly
 	scratch->occlusionParams.environment		=	NULL;					// Overwritten on the fly
-	scratch->occlusionParams.cacheHandle		=	NULL;					// Use the attribute
-	scratch->occlusionParams.cacheMode			=	NULL;					// Use the attribute
+	scratch->occlusionParams.cacheHandle		=	attributes->irradianceHandle;				// Use the attribute by default
+	scratch->occlusionParams.cacheMode			=	attributes->irradianceHandleMode;			// Use the attribute by default
 	
 	scratch->traceParams.samples				=	1;
 	scratch->traceParams.maxDist				=	C_INFINITY;
@@ -584,6 +595,17 @@ void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	COcclusionLookup
+// Method				:	init
+// Description			:	Initialize the scratch for this lookup
+// Return Value			:	-
+// Comments				:
+void		COcclusionLookup::postBind(CShadingScratch *scratch) {
+	if (scratch->texture3dParams.coordsys[0] == '\0') {
+		scratch->texture3dParams.coordsys = "world";
+	}
+}
 
 
 

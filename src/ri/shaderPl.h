@@ -53,7 +53,7 @@ public:
 								// This function can be overridden to perform initialization not dependant on values
 		virtual		void		init(CShadingScratch *scratch,const CAttributes *attributes) { }
 								// This function can be overridden to perform initialization dependant on values
-		virtual		void		postBind() { }
+		virtual		void		postBind(CShadingScratch *scratch) { }
 					void		add(const char *name,int opIndex,int step,void *data,size_t dest);
 
 		const void				*instance;			// The instance that has the PL
@@ -180,6 +180,7 @@ public:
 
 		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
 		void				init(CShadingScratch *scratch,const CAttributes *attributes);
+		void				postBind(CShadingScratch *scratch);
 		
 		CTexture3d			*map;									// The texture we're lookup up
 		int					numChannels;							// The number of channels bake3d provides
@@ -201,6 +202,7 @@ public:
 
 		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
 		void				init(CShadingScratch *scratch,const CAttributes *attributes);
+		void				postBind(CShadingScratch *scratch);
 
 		CEnvironment		*environment;							// The environment map to use
 		CTexture3d			*pointHierarchy;						// The point hierarchy to use
