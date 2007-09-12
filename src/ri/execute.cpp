@@ -319,7 +319,10 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												char	*tmp;														\
 												operand(cBinding->opIndex,tmp,char *);								\
 												memcpy((char *) scratch + cBinding->dest,tmp,cBinding->step);		\
-											}
+											}																		\
+																													\
+											/* let the lookup do any massaging needed */							\
+											lookup->postBind(scratch);
 
 // Use this macro to get the scratch variables updated
 #define		plReady()						cBinding	=	lookup->varyings;										\
