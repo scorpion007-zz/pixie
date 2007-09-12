@@ -102,6 +102,9 @@ public:
 		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
 		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
+		// static helper for irradiance cache lookups
+		static void			staticInit(CShadingScratch *scratch);
+
 		CTexture			*map;
 		RtFilterFunc		filter;	
 };

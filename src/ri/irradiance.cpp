@@ -43,6 +43,7 @@
 #include "ri_config.h"
 #include "debug.h"
 #include "pointHierarchy.h"
+#include "shaderPl.h"
 
 const	float	weightNormalDenominator	=	(float) (1 / (1 - cos(radians(10))));
 const	float	horizonCutoff			=	(float) cosf((float) radians(80));
@@ -564,7 +565,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 	const int				np				=	(int) (C_PI*nt + 0.5);
 	const int				numSamples		=	nt*np;
 	CHemisphereSample		*hemisphere		=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
-						
+	
+	// initialize texture lookups if needed
+	if (scratch->occlusionParams.environment) {
+		CTextureLookup::staticInit(&(context->currentShadingState->scratch));
+	}
+	
 	// Create an orthanormal coordinate system
 	if (dotvv(dPdu,dPdu) > 0) {
 		normalizevf(X,dPdu);
@@ -656,7 +662,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
+						float savedSamples = scratch->traceParams.samples;
+						context->currentShadingState->scratch.traceParams.samples = 1;
 						tex->lookup(color,D0,D1,D2,D3,context);
+						context->currentShadingState->scratch.traceParams.samples = savedSamples;
+						
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -765,7 +775,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
 						
+						float savedSamples = scratch->traceParams.samples;
+						context->currentShadingState->scratch.traceParams.samples = 1;
 						tex->lookup(color,D0,D1,D2,D3,context);
+						context->currentShadingState->scratch.traceParams.samples = savedSamples;
+						
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{

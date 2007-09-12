@@ -165,6 +165,7 @@ void		CTextureLookup::bind(const char *name,int &opIndex,int step,void *data,CSh
 // Return Value			:	-
 // Comments				:
 void		CTextureLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
+	scratch->textureParams.filter	=	RiBoxFilter;
 	scratch->textureParams.blur = 0;
 	scratch->textureParams.width = 1;
 	scratch->textureParams.swidth = 1;
@@ -173,6 +174,21 @@ void		CTextureLookup::init(CShadingScratch *scratch,const CAttributes *attribute
 	scratch->textureParams.samples = 1;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CTextureLookup
+// Method				:	init
+// Description			:	Initialize texture lookup scratch for null lookup
+// Return Value			:	-
+// Comments				:	used by irradiance cache
+void CTextureLookup::staticInit(CShadingScratch *scratch) {
+	scratch->textureParams.filter	=	RiBoxFilter;
+	scratch->textureParams.blur = 0;
+	scratch->textureParams.width = 1;
+	scratch->textureParams.swidth = 1;
+	scratch->textureParams.twidth = 1;
+	scratch->textureParams.fill = 0;
+	scratch->textureParams.samples = 1;
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceLookup
@@ -294,6 +310,8 @@ void		CEnvironmentLookup::bind(const char *name,int &opIndex,int step,void *data
 // Return Value			:	-
 // Comments				:
 void		CEnvironmentLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
+	scratch->textureParams.filter	= RiBoxFilter;
+	scratch->textureParams.samples	= 1;	// also filled in where it's used
 	scratch->textureParams.blur		= 0;
 	scratch->textureParams.width	= 1;
 	scratch->textureParams.swidth	= 1;
@@ -412,7 +430,7 @@ CTexture3dLookup::~CTexture3dLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dLookup
 // Method				:	bind
-// Description			:	Bind the indirectdiffuse/occlusion parameters
+// Description			:	Bind the texture3d/bake3d parameters
 // Return Value			:	-
 // Comments				:
 void		CTexture3dLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -516,6 +534,14 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.environmentColor));
 	} else if (strcmp(name,"maxBrightness") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.maxBrightness));
+	} else if (strcmp(name,"handle") == 0) {
+		expectUniform(name);
+		// This is a uniform parameter
+		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.cacheHandle));
+	} else if (strcmp(name,"filemode") == 0) {
+		expectUniform(name);
+		// This is a uniform parameter
+		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.cacheHandle));
 	} else {
 		assert(data == NULL);	// The data has to be varying
 
@@ -533,6 +559,8 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 // Return Value			:	-
 // Comments				:
 void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
+	scratch->occlusionParams.environmentMapName	=	NULL;					// None by default
+	scratch->texture3dParams.coordsys			=	"world";
 	scratch->occlusionParams.maxError			=	attributes->irradianceMaxError;
 	scratch->occlusionParams.pointbased			=	0;						// This is not a point based lookup
 	scratch->occlusionParams.maxBrightness		=	1.0f;					// Upper limit on the maximum brightness
@@ -544,7 +572,10 @@ void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 	initv(scratch->occlusionParams.environmentColor,0);						// The background color for irradiance
 	scratch->occlusionParams.pointHierarchy		=	NULL;					// Overwritten on the fly
 	scratch->occlusionParams.environment		=	NULL;					// Overwritten on the fly
+	scratch->occlusionParams.cacheHandle		=	NULL;					// Use the attribute
+	scratch->occlusionParams.cacheMode			=	NULL;					// Use the attribute
 	
+	scratch->traceParams.samples				=	1;
 	scratch->traceParams.maxDist				=	C_INFINITY;
 	scratch->traceParams.coneAngle				=	0;
 	scratch->traceParams.sampleBase				=	1;

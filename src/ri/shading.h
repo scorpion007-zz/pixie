@@ -159,6 +159,8 @@ public:
 		float			maxPixelDist;
 		float			maxSolidAngle;
 		int				occlusion;
+		const char		*cacheHandle;
+		const char		*cacheMode;
 		vector			environmentColor;
 		CTexture3d		*pointHierarchy;
 		CEnvironment	*environment;	}			occlusionParams;
