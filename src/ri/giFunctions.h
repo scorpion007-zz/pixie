@@ -191,7 +191,10 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 									findCoordinateSystem(scratch->texture3dParams.coordsys,from,to);								\
 									const CAttributes		*currentAttributes	=	currentShadingState->currentObject->attributes;	\
 									osLock(CRenderer::shaderMutex);																	\
-									lookup->map	=	cache		=	CRenderer::getCache(currentAttributes->irradianceHandle,currentAttributes->irradianceHandleMode,from,to);					\
+									const char *handle,*filemode;																	\
+									handle = (scratch->occlusionParams.cacheHandle != NULL) ? scratch->occlusionParams.cacheHandle : currentAttributes->irradianceHandle; \
+									filemode = (scratch->occlusionParams.cacheMode != NULL) ? scratch->occlusionParams.cacheMode : currentAttributes->irradianceHandleMode; \
+									lookup->map	=	cache		=	CRenderer::getCache(handle,filemode,from,to);					\
 									if (scratch->occlusionParams.environmentMapName != NULL)	lookup->environment		=	CRenderer::getEnvironment(scratch->occlusionParams.environmentMapName);								\
 									if (scratch->occlusionParams.pointHierarchyName != NULL)	lookup->pointHierarchy	=	CRenderer::getTexture3d(scratch->occlusionParams.pointHierarchyName,FALSE,"_area",from,to,TRUE);	\
 									cache->resolve(lookup->numChannels,lookup->channelName,lookup->channelEntry,lookup->channelSize);															\
