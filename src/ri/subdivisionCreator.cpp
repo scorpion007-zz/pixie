@@ -1844,8 +1844,9 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	// Process the tags
 	for (i=0,cnargs=nargs,cintargs=intargs,cfloatargs=floatargs;i<ntags;i++) {
 		if (strcmp(tags[i],RI_HOLE) == 0) {
+			if (cnargs[1] != 0)	error(CODE_RANGE,"hole takes no floating point arguments\n");
 			for (j=0;j<cnargs[0];j++) {
-				faces[intargs[j]]->hole	=	TRUE;
+				faces[cintargs[j]]->hole	=	TRUE;
 			}
 		} else if (strcmp(tags[i],RI_CREASE) == 0) {
 			for (j=0;j<cnargs[0]-1;j++) {
@@ -1861,11 +1862,22 @@ void		CSubdivMesh::create(CShadingContext *context) {
 					error(CODE_RANGE,"The edge between vertices %d-%d not found\n",cintargs[j],cintargs[j+1]);
 				}
 			}
+			if (cnargs[1] != 1) {
+				error(CODE_RANGE,"creases expect exactly 1 float argument\n");
+			}
 		} else if (strcmp(tags[i],RI_INTERPOLATEBOUNDARY) == 0) {
 			data.currentFlags	|=	FACE_INTEPOLATEBOUNDARY;
 		} else if (strcmp(tags[i],RI_CORNER) == 0) {
-			for (j=0;j<cnargs[0];j++) {
-				vertices[cintargs[j]]->sharpness = cfloatargs[j];
+			if (cnargs[1] == cnargs[0]) {
+				for (j=0;j<cnargs[0];j++) {
+					vertices[cintargs[j]]->sharpness = cfloatargs[j];
+				}
+			} else if (cnargs[1] == 1) {
+				for (j=0;j<cnargs[0];j++) {
+					vertices[cintargs[j]]->sharpness = cfloatargs[0];
+				}
+			} else {
+				error(CODE_RANGE,"Corner has 1 or n float arguments\n");
 			}
 		} else {
 			error(CODE_BADTOKEN,"Unknown subdivision tag: \"%s\"\n",tags[i]);
