@@ -28,8 +28,9 @@
 //  Description			:
 //
 ////////////////////////////////////////////////////////////////////////
-
 #include "renderer.h"
+#include "error.h"
+#include "atomic.h"
 
 
 /////////////////////////////////////////////////////////////
@@ -166,6 +167,13 @@ TMutex							CRenderer::deepShadowMutex;
 TMutex							CRenderer::hierarchyMutex;
 
 
+/////////////////////////////////////////////////////////////
+//	Used to serialize the atomic operations on unsupported platforms
+//
+//	VERIFIED
+/////////////////////////////////////////////////////////////
+TMutex							CRenderer::atomicMutex;
+
 // TODO: Comment on
 // Per block mutexes for textures, tesselations, grid objects
 
@@ -189,6 +197,11 @@ void							CRenderer::initMutexes() {
 	osCreateMutex(delayedMutex);
 	osCreateMutex(deepShadowMutex);
 	osCreateMutex(hierarchyMutex);
+
+#ifdef ATOMIC_UNSUPPORTED
+	warning(CODE_SYSTEM,"Atomic operations are not supported on this system, consider leaving a note in Sourceforge about your platform");
+	osCreateMutex(atomicMutex);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -209,5 +222,9 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);
 	osDeleteMutex(hierarchyMutex);
+
+#ifdef ATOMIC_UNSUPPORTED
+	osDeleteMutex(atomicMutex);
+#endif
 }
 

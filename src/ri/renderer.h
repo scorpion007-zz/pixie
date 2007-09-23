@@ -187,6 +187,7 @@ public:
 		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
 		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_
 		static	TMutex							hierarchyMutex;				// To serialize lazy construction of bounding volume hierarchy
+		static	TMutex							atomicMutex;				// To serialize atomic operations on unsupported platforms
 		
 		////////////////////////////////////////////////////////////////////
 		//

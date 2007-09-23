@@ -88,7 +88,7 @@ inline int atomicDecrement(volatile int *ptr)
 
 
 
-// GCC (32 bit)
+// GCC (i386)
 #elif defined(__i386__) && defined(__GNUC__)
 
 inline int atomicIncrement(volatile int *ptr) {
@@ -113,8 +113,58 @@ inline int atomicDecrement(volatile int *ptr) {
     return ret;
 }
 
+// GCC (MIPS)
+#elif defined(__GNUC__)
+
+inline int atomicIncrement(volatile int *ptr) {
+    register int ret;
+    register int one = 1;
+    asm volatile("lwarx  %0, 0, %2\n"
+                 "add    %0, %3, %0\n"
+                 "stwcx. %0, 0, %2\n"
+                 "bne-   $-12\n"
+                 : "=&r" (ret), "=m" (*ptr)
+                 : "r" (ptr), "r" (one)
+                 : "cc", "memory");
+    return ret;
+}
+
+inline int atomicDecrement(volatile int *ptr) {
+    register int ret;
+    register int one = -1;
+    asm volatile("lwarx  %0, 0, %2\n"
+                 "add    %0, %3, %0\n"
+                 "stwcx. %0, 0, %2\n"
+                 "bne-   $-12\n"
+                 : "=&r" (ret), "=m" (*ptr)
+                 : "r" (ptr), "r" (one)
+                 : "cc", "memory");
+    return ret;
+}
+
+
 #else
-#error Unsupported platform
+
+
+#define	ATOMIC_UNSUPPORTED
+
+// Have a cross platform solution here
+inline int atomicIncrement(volatile int *ptr) {
+	int	value;
+	osLock(CRenderer::atomicMutex);
+	value	=	++(*ptr);
+	osUnlock(CRenderer::atomicMutex);
+	return value;
+}
+
+inline int atomicDecrement(volatile int *ptr) {
+	int	value;
+	osLock(CRenderer::atomicMutex);
+	value	=	--(*ptr);
+	osUnlock(CRenderer::atomicMutex);
+	return value;
+}
+
 #endif
 
 #endif

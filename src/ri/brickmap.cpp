@@ -705,7 +705,7 @@ CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {
 	CVoxel	*cVoxel,*tVoxel;
 	int		i,j;
 
-	stats.numBrickmapCachePageins++;
+	atomicIncrement(&stats.numBrickmapCachePageins);
 	
 	// Seek to the right position in file
 	if (file == NULL)	file	=	ropen(name,"w+",fileBrickMap);
