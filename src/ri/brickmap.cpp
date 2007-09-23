@@ -36,6 +36,7 @@
 #include "pointCloud.h"
 #include "memory.h"
 #include "renderer.h"
+#include "atomic.h"
 
 
 
@@ -472,7 +473,8 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 
 	// Perform the lookup
 	osLock(mutex);
-	stats.numBrickmapLookups	+=	2;
+	atomicIncrement(&stats.numBrickmapLookups);
+	atomicIncrement(&stats.numBrickmapLookups);
 	lookup(P,N,dP,data0,depth,normalFactor);
 	lookup(P,N,dP,data1,depth+1,normalFactor);
 	osUnlock(mutex);

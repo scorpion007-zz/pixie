@@ -378,59 +378,6 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	}
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CShadingScratch
-// Method				:	init
-// Description			:	Ctor-like function
-// Return Value			:	-
-// Comments				:	Initializes the default values for shader functions
-
-//FIXME: revise these
-void	CShadingScratch::init() {
-
-	// Texture parameters
-	textureParams.filter				=	NULL;					// Filter will always be overwritten by the caller
-	textureParams.blur					=	0;						// No blur
-	textureParams.width					=	0;						// If 0, use swidth/twidth
-	textureParams.swidth				=	1.0f;					// No area scale
-	textureParams.twidth				=	1.0f;					// No area scale
-	textureParams.fill					=	0.0f;					// Fill will zero color
-	textureParams.samples				=	1;						// One sample only
-
-	// Photonmap parameters
-	photonmapParams.estimator			=	0;						// If 0, use the attributes
-
-	// texture3d/occlusion parameters
-	texture3dParams.coordsys			=	coordinateWorldSystem;	// Store everything in the world coordinate system
-	texture3dParams.interpolate			=	0;						// Do not interpolate the samples
-	texture3dParams.radius				=	0;						// Compute radius automatically
-	texture3dParams.radiusScale			=	1.0f;					// No scale
-
-	// Transmission/trace parameters
-	traceParams.samples					=	1.0f;					// The number of samples to collect
-	traceParams.bias					=	0;						// The raytracing bias
-	traceParams.coneAngle				=	0;						// The cone angle
-	traceParams.sampleBase				=	1.0f;					// The sample base
-	traceParams.maxDist					=	C_INFINITY;				// The maximum intersection
-	traceParams.label					=	NULL;					// The label
-
-	// Indirectdiffuse/occlusion parameters
-	occlusionParams.maxError			=	-1;						// If -1, use attribute defaults
-	occlusionParams.pointbased			=	0;						// This is not a point based lookup
-	occlusionParams.maxBrightness		=	1.0f;					// Upper limit on the maximum brightness
-	occlusionParams.environmentMapName	=	NULL;					// No environment map by default
-	occlusionParams.pointHierarchyName	=	NULL;					// No point hierarchy
-	occlusionParams.maxPixelDist		=	50.0f;					// The maximum distance between samples
-	occlusionParams.maxSolidAngle		=	0.05f;					// The maximum solid angle
-	occlusionParams.occlusion			=	FALSE;					// Overwritten on the fly
-	initv(occlusionParams.environmentColor,0);						// The background color for irradiance
-	occlusionParams.pointHierarchy		=	NULL;					// Overwritten on the fly
-	occlusionParams.environment			=	NULL;					// Overwritten on the fly
-
-	// Gather parameters
-	gatherParams.distribution			=	NULL;					// if NULL, it is cosine
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext

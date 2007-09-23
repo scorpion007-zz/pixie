@@ -117,7 +117,6 @@ public:
 // Comments				:
 struct	CShadingScratch {
 public:
-		void			init();
 
 	// Texture/Environment parameters
 	struct {
@@ -131,7 +130,7 @@ public:
 
 	// Photonmap parameters
 	struct {
-		float			estimator;		}			photonmapParams;
+		int				estimator;		}			photonmapParams;
 
 	// texture3d/bake3d parameters
 	struct {

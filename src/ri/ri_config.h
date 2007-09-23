@@ -104,5 +104,8 @@
 // The initial size of the raytracing heap
 #define TRACE_HEAP_SIZE					100
 
+// The number of bins to use for filterstep function
+#define	FILTERSTEP_NUMSTEPS				10
+
 #endif
 

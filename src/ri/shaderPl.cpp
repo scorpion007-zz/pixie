@@ -165,13 +165,13 @@ void		CTextureLookup::bind(const char *name,int &opIndex,int step,void *data,CSh
 // Return Value			:	-
 // Comments				:
 void		CTextureLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
-	scratch->textureParams.filter	=	RiBoxFilter;
-	scratch->textureParams.blur = 0;
-	scratch->textureParams.width = 1;
-	scratch->textureParams.swidth = 1;
-	scratch->textureParams.twidth = 1;
-	scratch->textureParams.fill = 0;
-	scratch->textureParams.samples = 1;
+	scratch->textureParams.filter	=	filter;
+	scratch->textureParams.blur		=	0;
+	scratch->textureParams.width	=	1;
+	scratch->textureParams.swidth	=	1;
+	scratch->textureParams.twidth	=	1;
+	scratch->textureParams.fill		=	0;
+	scratch->textureParams.samples	=	1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -182,12 +182,12 @@ void		CTextureLookup::init(CShadingScratch *scratch,const CAttributes *attribute
 // Comments				:	used by irradiance cache
 void CTextureLookup::staticInit(CShadingScratch *scratch) {
 	scratch->textureParams.filter	=	RiBoxFilter;
-	scratch->textureParams.blur = 0;
-	scratch->textureParams.width = 1;
-	scratch->textureParams.swidth = 1;
-	scratch->textureParams.twidth = 1;
-	scratch->textureParams.fill = 0;
-	scratch->textureParams.samples = 1;
+	scratch->textureParams.blur		=	0;
+	scratch->textureParams.width	=	1;
+	scratch->textureParams.swidth	=	1;
+	scratch->textureParams.twidth	=	1;
+	scratch->textureParams.fill		=	0;
+	scratch->textureParams.samples	=	1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -241,12 +241,12 @@ void		CTraceLookup::bind(const char *name,int &opIndex,int step,void *data,CShad
 // Comments				:
 void		CTraceLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
 
-	scratch->traceParams.samples = 1;
-	scratch->traceParams.bias = attributes->bias;
-	scratch->traceParams.coneAngle = 0;
-	scratch->traceParams.sampleBase = 1;
-	scratch->traceParams.maxDist = C_INFINITY;
-	scratch->traceParams.label = "";
+	scratch->traceParams.samples	=	1;
+	scratch->traceParams.bias		=	attributes->bias;
+	scratch->traceParams.coneAngle	=	0;
+	scratch->traceParams.sampleBase =	1;
+	scratch->traceParams.maxDist	=	C_INFINITY;
+	scratch->traceParams.label		=	"";
 }
 
 
@@ -310,13 +310,13 @@ void		CEnvironmentLookup::bind(const char *name,int &opIndex,int step,void *data
 // Return Value			:	-
 // Comments				:
 void		CEnvironmentLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
-	scratch->textureParams.filter	= RiBoxFilter;
-	scratch->textureParams.samples	= 1;	// also filled in where it's used
-	scratch->textureParams.blur		= 0;
-	scratch->textureParams.width	= 1;
-	scratch->textureParams.swidth	= 1;
-	scratch->textureParams.twidth	= 1;
-	scratch->textureParams.fill		= 0;
+	scratch->textureParams.filter	=	filter;
+	scratch->textureParams.samples	=	1;	// also filled in where it's used
+	scratch->textureParams.blur		=	0;
+	scratch->textureParams.width	=	1;
+	scratch->textureParams.swidth	=	1;
+	scratch->textureParams.twidth	=	1;
+	scratch->textureParams.fill		=	0;
 	CTraceLookup::init(scratch,attributes);
 }
 
@@ -463,10 +463,10 @@ void		CTexture3dLookup::bind(const char *name,int &opIndex,int step,void *data,C
 // Return Value			:	-
 // Comments				:
 void		CTexture3dLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
-	scratch->texture3dParams.coordsys			= "";
-	scratch->texture3dParams.interpolate		= 0;
-	scratch->texture3dParams.radius				= 0;
-	scratch->texture3dParams.radiusScale		= 1;
+	scratch->texture3dParams.coordsys		=	"";
+	scratch->texture3dParams.interpolate	=	0;
+	scratch->texture3dParams.radius			=	0;
+	scratch->texture3dParams.radiusScale	=	1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -606,6 +606,76 @@ void		COcclusionLookup::postBind(CShadingScratch *scratch) {
 		scratch->texture3dParams.coordsys = "world";
 	}
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFilterLookup
+// Method				:	CFilterLookup
+// Description			:	Ctor
+// Return Value			:	-
+// Comments				:
+CFilterLookup::CFilterLookup() {
+	computed	=	false;
+	filter		=	RiCatmullRomFilter;
+	width		=	1;
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFilterLookup
+// Method				:	~CFilterLookup
+// Description			:	Dtor
+// Return Value			:	-
+// Comments				:
+CFilterLookup::~CFilterLookup() {
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFilterLookup
+// Method				:	bind
+// Description			:	Bind the filterstep parameters
+// Return Value			:	-
+// Comments				:
+void		CFilterLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
+
+	// Find the parameter and bind it
+	if (strcmp(name,"filter") == 0) {
+		expectUniform(name);
+		else				filter		=	CRenderer::getFilter(((const char **) data)[0]);
+	} else if (strcmp(name,"width") == 0) {
+		expectUniform(name);
+		add(name,opIndex,step,data,offsetof(CShadingScratch,textureParams.width));
+	} else	CPLLookup::bind(name,opIndex,step,data,shader);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CFilterLookup
+// Method				:	init
+// Description			:	Initialize the scratch for this lookup
+// Return Value			:	-
+// Comments				:
+void		CFilterLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
+	if (computed == false) {
+		int		i;
+		float	val;
+
+		valStep		=	2*width / (FILTERSTEP_NUMSTEPS-1);
+		val			=	width;
+		normalizer	=	0;
+
+		for (i=0;i<FILTERSTEP_NUMSTEPS;i++,val-=valStep) {
+			vals[i]		=	filter(val,0,width,1);
+			normalizer	+=	vals[i]*valStep;
+		}
+		computed	=	true;
+	}
+}
+
+
+
+
+
+
+
 
 
 

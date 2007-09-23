@@ -1925,30 +1925,50 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 #undef	SHADOWEXPR_POST
 
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // filterstep "f=ff!"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef INIT_SHADING
-#define	FILTERSTEP2EXPR_PRE	FUN3EXPR_PRE																		\
-							float	*dsdu					=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
-							float	*dsdv					=	dsdu + numVertices;								\
-							const float		*du				=	varying[VARIABLE_DU];							\
-							const float		*dv				=	varying[VARIABLE_DV];							\
-																												\
-							duFloat(dsdu,op2);																	\
-							dvFloat(dsdv,op2);
+#define	FILTERSTEP2EXPR_PRE		FUN3EXPR_PRE																		\
+								plBegin(CFilterLookup,3);															\
+								float			tmp;																\
+								float			val;																\
+								int				i;																	\
+								float			step,vstep;															\
+								const	float	width	=	lookup->width;											\
+								float			*dsdu	=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
+								float			*dsdv	=	dsdu + numVertices;										\
+								float			*fwidth	=	dsdu;													\
+								const float		*du		=	varying[VARIABLE_DU];									\
+								const float		*dv		=	varying[VARIABLE_DV];									\
+								const float		*s		=	op2;													\
+																													\
+								duFloat(dsdu,s);																	\
+								dvFloat(dsdv,s);																	\
+								for (i=0;i<numVertices;i++) {														\
+									dsdu[i]		=	fabs(dsdu[i]*du[i]);											\
+									dsdv[i]		=	fabs(dsdv[i]*dv[i]);											\
+									fwidth[i]	=	max(dsdv[i] + dsdv[i],C_EPSILON);								\
+								}
 
-#define	FILTERSTEP2EXPR		*res	=	0;																		\
-							for (int j=FILTERSTEP_SAMPLES;j>0;--j) {											\
-								const float	s	=	(*dsdu)*(*du)*(urand() - 0.5f)	+							\
-													(*dsdv)*(*dv)*(urand() - 0.5f)	+ (*op2);					\
-								if (s > *op1)	*res	+=	1.0f;												\
-							}																					\
-							*res	/=	(float) FILTERSTEP_SAMPLES;
+#define	FILTERSTEP2EXPR			plReady();																			\
+								tmp		=	0;																		\
+								val		=	*op2+width*fwidth[0];													\
+								vstep	=	lookup->valStep*fwidth[0];												\
+								i		=	FILTERSTEP_NUMSTEPS-1;													\
+								while(i>=0) {																		\
+									if (*op1 > val)	break;															\
+									step	=	min(vstep,val-(*op1));												\
+									tmp		+=	lookup->vals[i]*step;												\
+									val		-=	vstep;																\
+									i--;																			\
+								}																					\
+								*res	=	tmp / (lookup->normalizer * fwidth[0]);
 
 
-#define	FILTERSTEP2EXPR_UPDATE	du++; dv++; dsdu++; dsdv++; FUN3EXPR_UPDATE(1,1,1)
+#define	FILTERSTEP2EXPR_UPDATE	plStep();																			\
+								FUN3EXPR_UPDATE(1,1,1)																\
+								fwidth++;
 
 #else
 #define	FILTERSTEP2EXPR_PRE
@@ -1967,17 +1987,31 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 // filterstep "f=fff!"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef INIT_SHADING
-#define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE
+#define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE																		\
+							plBegin(CFilterLookup,4);															\
+							float			tmp;																\
+							float			val;																\
+							int				i;																	\
+							float			step,vstep,fwidth;													\
+							const	float	width	=	lookup->width;
 
-#define	FILTERSTEP3EXPR		*res	=	0;																		\
-							for (int j=FILTERSTEP_SAMPLES;j>0;--j) {											\
-								const float	s	=	((*op3) - (*op2))*urand() + (*op2);							\
-								if (s > *op1)	*res	+=	1.0f;												\
+#define	FILTERSTEP3EXPR		plReady();																			\
+							tmp		=	0;																		\
+							fwidth	=	max(fabs(op2[0]-op3[0]),C_EPSILON);										\
+							val		=	*op2+width*fwidth;														\
+							vstep	=	lookup->valStep*fwidth;													\
+							i		=	FILTERSTEP_NUMSTEPS-1;													\
+							while(i>=0) {																		\
+								if (op1[0] > val)	break;														\
+								step	=	min(vstep,val-op1[0]);												\
+								tmp		+=	lookup->vals[i]*step;												\
+								val		-=	vstep;																\
+								i--;																			\
 							}																					\
-							*res	/=	(float) FILTERSTEP_SAMPLES;
+							*res	=	tmp / (lookup->normalizer * fwidth);
 
 
-#define	FILTERSTEP3EXPR_UPDATE	FUN4EXPR_UPDATE(1,1,1,1)
+#define	FILTERSTEP3EXPR_UPDATE	plStep();	FUN4EXPR_UPDATE(1,1,1,1)
 #else
 #define	FILTERSTEP3EXPR_PRE
 #define	FILTERSTEP3EXPR
