@@ -37,8 +37,36 @@
 
 
 
+
+///////////////////////////////////////////////////////////////
+// Intel compiler
+#if defined(INTEL_COMPILER)
+
+inline int atomicIncrement(volatile int *pointer) {
+	return InterlochedIncrement(pointer);
+}
+
+inline int	atomicDecrement(volatile int *pointer) {
+	return InterlockedDecremenet(pointer);
+}
+
+///////////////////////////////////////////////////////////////
+// Apple
+#elif defined(__APPLE__)
+
+#include <libkern/OSAtomic.h>
+
+inline int atomicIncrement(int *ptr) {
+	return OSAtomicIncrement32(ptr);
+}
+
+inline int atomicDecrement(int *ptr) {
+	return OSAtomicDecrement32(ptr);
+}
+
+///////////////////////////////////////////////////////////////
 // Windows (32 bit)
-#if defined(_WIN32)
+#elif defined(_WIN32)
 
 inline int atomicIncrement(volatile int *pointer) {
     unsigned char retVal;
@@ -60,6 +88,7 @@ inline int atomicDecrement(volatile int *pointer) {
     return retVal;
 }
 
+///////////////////////////////////////////////////////////////
 // Windows 64 bits
 #elif defined(__WIN64)
 
@@ -87,7 +116,7 @@ inline int atomicDecrement(volatile int *ptr)
 }
 
 
-
+///////////////////////////////////////////////////////////////
 // GCC (i386)
 #elif defined(__i386__) && defined(__GNUC__)
 
@@ -113,6 +142,7 @@ inline int atomicDecrement(volatile int *ptr) {
     return ret;
 }
 
+///////////////////////////////////////////////////////////////
 // GCC (MIPS)
 #elif defined(__GNUC__)
 
@@ -142,7 +172,8 @@ inline int atomicDecrement(volatile int *ptr) {
     return ret;
 }
 
-
+///////////////////////////////////////////////////////////////
+// Generic
 #else
 
 
