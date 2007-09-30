@@ -65,7 +65,7 @@ inline int	atomicDecrement(volatile int *pointer) {
 
 ///////////////////////////////////////////////////////////////
 // Apple
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__APPLE_CC__)
 
 // Include the OSX header
 #include <libkern/OSAtomic.h>
