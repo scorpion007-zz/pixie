@@ -136,6 +136,10 @@ typedef union {
 	#endif
 #endif
 
+#ifdef __APPLE__
+#include <assert.h>
+#endif
+
 // Useful macros for allocating/deallocating untyped memory (aligned to 8 bytes)
 #define	allocate_untyped(__size)	(void*) new long long[(__size + sizeof(long long) - 1) / sizeof(long long)]
 #define	free_untyped(__ptr)			delete[] ((long long *) __ptr)

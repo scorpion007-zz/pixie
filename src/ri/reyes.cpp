@@ -150,8 +150,6 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 	if (CRenderer::aperture != 0)		extraPrimitiveFlags	|=	RASTER_FOCALBLUR;
 
 	// Init the stats
-	numGrids			=	0;
-	numObjects			=	0;
 	numGridsRendered	=	0;
 	numQuadsRendered	=	0;
 	numGridsShaded		=	0;
@@ -191,8 +189,6 @@ CReyes::~CReyes() {
 	osDeleteMutex(bucketMutex);	// Destroy the _unlocked_ mutex
 
 	// Update the global stats
-	stats.numRasterObjects			+=	numObjects;
-	stats.numRasterGrids			+=	numGrids;
 	stats.numRasterGridsCreated		+=	numGridsCreated;
 	stats.numRasterVerticesCreated	+=	numVerticesCreated;
 	stats.numRasterGridsShaded		+=	numGridsShaded;
@@ -1194,11 +1190,9 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	nObject->refCount	=	0;
 	osCreateMutex(nObject->mutex);
 
-	osLock(CRenderer::refCountMutex);
 	cObject->attach();
-	osUnlock(CRenderer::refCountMutex);
 
-	numObjects++;
+	atomicIncrement(&stats.numRasterObjects);
 
 	return nObject;
 }
@@ -1227,11 +1221,9 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	grid->bounds		=	new int[numVertices*4];
 	grid->sizes			=	new float[numVertices*2];
 
-	osLock(CRenderer::refCountMutex);
 	object->attach();
-	osUnlock(CRenderer::refCountMutex);
 
-	numGrids++;
+	atomicIncrement(&stats.numRasterGrids);
 	numGridsCreated++;
 	numVerticesCreated	+=	numVertices;
 
@@ -1250,15 +1242,13 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 	assert(dObject->refCount == 0);
 
 	// Detach from the object
-	osLock(CRenderer::refCountMutex);
 	dObject->object->detach();
-	osUnlock(CRenderer::refCountMutex);
 
 	if (dObject->grid)	{
 		CRasterGrid *grid	=	(CRasterGrid *) dObject;
 
 		// Decrement the active grid counter
-		numGrids--;
+		atomicDecrement(&stats.numRasterGrids);
 
 		// Delete the grid data
 		osUnlock(dObject->mutex);		// Unlock the mutex
@@ -1271,7 +1261,7 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 	} else {
 
 		// Decrement the active object counter
-		numObjects--;
+		atomicDecrement(&stats.numRasterObjects);
 
 		// Delete the object data
 		osUnlock(dObject->mutex);		// Unlock the mutex

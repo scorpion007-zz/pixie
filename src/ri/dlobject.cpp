@@ -45,8 +45,7 @@
 // Return Value			:	-
 // Comments				:
 CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const float *bmi,const float *bma,dloInitFunction initFunction,dloIntersectFunction intersectFunction,dloTiniFunction tiniFunction) : CSurface(a,x) {
-	stats.numGprims++;
-	stats.gprimMemory		+=	sizeof(CDLObject);
+	atomicIncrement(&stats.numGprims);
 
 	this->handle			=	handle;
 	this->initFunction		=	initFunction;
@@ -68,8 +67,7 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 // Return Value			:	-
 // Comments				:
 CDLObject::~CDLObject() {
-	stats.numGprims--;
-	stats.gprimMemory		-=	sizeof(CDLObject);
+	atomicDecrement(&stats.numGprims);
 
 	tiniFunction(data);
 	osUnloadModule(handle);

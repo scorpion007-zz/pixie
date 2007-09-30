@@ -46,8 +46,7 @@
 CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	int				i;
 
-	stats.numGprims++;
-	stats.gprimMemory			+=	sizeof(CPoints);
+	atomicIncrement(&stats.numGprims);
 
 	this->numPoints				=	np;
 	this->pl					=	pl;
@@ -142,8 +141,7 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi) : CSurface(a,x) {
 	int		i;
 
-	stats.numGprims++;
-	stats.gprimMemory		+=	sizeof(CPoints) + np*sizeof(float *);
+	atomicIncrement(&stats.numGprims);
 
 	pl						=	NULL;
 	base					=	b;
@@ -172,15 +170,13 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi)
 // Return Value			:	-
 // Comments				:
 CPoints::~CPoints() {
-	stats.numGprims--;
-	stats.gprimMemory		-=	sizeof(CPoints);
+	atomicDecrement(&stats.numGprims);
 
 	if (base != NULL)		base->detach();
 	if (pl != NULL)			delete pl;
 
 	if (points != NULL) {
 		delete [] points;
-		stats.gprimMemory	-=	numPoints*sizeof(float *);
 	}
 }
 
@@ -284,26 +280,20 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 
 		// Create the children primitives
 
-		osLock(CRenderer::refCountMutex);
 		child	=	new CPoints(attributes,xform,base,numFront,front);
 		child->attach();
-		osUnlock(CRenderer::refCountMutex);
 		
 		rasterizer->drawObject(child);
 		
-		osLock(CRenderer::refCountMutex);
 		child->detach();
 		
 		child	=	new CPoints(attributes,xform,base,numBack,back);
 		
 		child->attach();
-		osUnlock(CRenderer::refCountMutex);
 		
 		rasterizer->drawObject(child);
 		
-		osLock(CRenderer::refCountMutex);
 		child->detach();
-		osUnlock(CRenderer::refCountMutex);
 
 		memEnd(rasterizer->threadMemory);
 	}
@@ -454,8 +444,6 @@ void	CPoints::prep() {
 
 	points						=	new const float*[numPoints];
 	const float *vertex			=	base->vertex;
-
-	stats.gprimMemory			+=	numPoints*sizeof(float *);
 
 	for (i=0;i<numPoints;i++) {
 		points[i]				=	vertex;

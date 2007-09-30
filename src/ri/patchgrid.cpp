@@ -57,8 +57,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 	float			*dest;
 	const int		vertexSize	=	var->vertexSize;
 
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CPatchGrid);
+	atomicIncrement(&stats.numGprims);
 
 	variables			=	var;
 	variables->attach();
@@ -75,7 +74,6 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 		const float	*src;
 
 		dest		=	vertex		=	new float[numVertices*vertexSize*2];
-		stats.gprimMemory			+=	sizeof(float)*numVertices*vertexSize*2;
 
 		for (src=ve				,i=numVertices;i>0;i--) {
 			int	j;
@@ -98,7 +96,6 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 		}
 	} else {
 		dest		=	vertex		=	new float[numVertices*vertexSize];
-		stats.gprimMemory			+=	sizeof(float)*numVertices*vertexSize;
 
 		for (i=numVertices*vertexSize;i>0;i--) *dest++ = *ve++;
 	}
@@ -125,8 +122,8 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 		makeBound(bmin,bmax);
 	}
 
-	Pu	=	new float[realNumVertices*3];	stats.gprimMemory	+=	sizeof(float)*realNumVertices;
-	Pv	=	new float[realNumVertices*3];	stats.gprimMemory	+=	sizeof(float)*realNumVertices;
+	Pu	=	new float[realNumVertices*3];
+	Pv	=	new float[realNumVertices*3];
 
 	// Compute dPdu
 	{
@@ -197,16 +194,15 @@ CPatchGrid::~CPatchGrid() {
 	int	numVertices		=	(nu+2)*(nv+2);
 	int realNumVertices	=	(nu*nv);
 
-	delete [] Pu;		stats.gprimMemory	-=	sizeof(float)*realNumVertices;
-	delete [] Pv;		stats.gprimMemory	-=	sizeof(float)*realNumVertices;
-	delete [] vertex;	stats.gprimMemory	-=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize)*numVertices*sizeof(float);
+	delete [] Pu;
+	delete [] Pv;
+	delete [] vertex;
 
 	variables->detach();
 
 	if (parameters != NULL)	delete parameters;
 
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CPatchGrid);
+	atomicDecrement(&stats.numGprims);
 }
 
 ///////////////////////////////////////////////////////////////////////

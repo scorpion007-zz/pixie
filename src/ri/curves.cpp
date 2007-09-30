@@ -103,8 +103,7 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 // Return Value			:	-
 // Comments				:	
 CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CSurface(a,x) {
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CCurve);
+	atomicIncrement(&stats.numGprims);
 
 	vmin				=	vmi;
 	vmax				=	vma;
@@ -121,8 +120,7 @@ CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,
 // Return Value			:	-
 // Comments				:
 CCurve::~CCurve() {
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CCurve);
+	atomicDecrement(&stats.numGprims);
 
 	base->detach();
 }
@@ -510,10 +508,8 @@ void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 	const float vmid = (vmin + vmax) * 0.5f;
 
 	// Create the children
-	osLock(CRenderer::refCountMutex);
 	CCubicCurve	*c0	=	new CCubicCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
 	CCubicCurve	*c1	=	new CCubicCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
-	osUnlock(CRenderer::refCountMutex);
 
 	// Insert the children
 	rasterizer->drawObject(c0);
@@ -641,10 +637,8 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 	const float		vmid = (vmin + vmax) * 0.5f;
 
 	// Create the children
-	osLock(CRenderer::refCountMutex);
 	CLinearCurve	*c0	=	new CLinearCurve(attributes,xform,base,vmin,vmid,gvmin,gvmax);
 	CLinearCurve	*c1	=	new CLinearCurve(attributes,xform,base,vmid,vmax,gvmin,gvmax);
-	osUnlock(CRenderer::refCountMutex);
 
 	// Insert the children
 	rasterizer->drawObject(c0);
@@ -673,8 +667,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
     int			i, j;
 	const float	*P;
 
-	stats.numGprims++;
-	stats.gprimMemory		+=	sizeof(CCurveMesh) + sizeof(int)*nc;
+	atomicIncrement(&stats.numGprims);
 
 	// Attach to the PL
 	pl				=	c;
@@ -803,8 +796,7 @@ CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *
 // Return Value			:	Dtor
 // Comments				:	-
 CCurveMesh::~CCurveMesh() {
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CCurveMesh) + sizeof(int)*numCurves;
+	atomicDecrement(&stats.numGprims);
 
 	delete pl;
 	delete [] nverts;
@@ -934,9 +926,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 				memcpy(base->vertex + 2*vertexSize,v2,vertexSize*sizeof(float));
 				memcpy(base->vertex + 3*vertexSize,v3,vertexSize*sizeof(float));
 
-				osLock(CRenderer::refCountMutex);
 				cCurve				=	new CCubicCurve(attributes,xform,base,0,1,vmin,vmax);
-				osUnlock(CRenderer::refCountMutex);
 				cCurve->sibling		=	allChildren;
 				allChildren			=	cCurve;	
 			}
@@ -976,9 +966,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 				memcpy(base->vertex + 0*vertexSize,v0,vertexSize*sizeof(float));
 				memcpy(base->vertex + 1*vertexSize,v1,vertexSize*sizeof(float));
 
-				osLock(CRenderer::refCountMutex);
 				cCurve				=	new CLinearCurve(attributes,xform,base,0,1,vmin,vmax);
-				osUnlock(CRenderer::refCountMutex);
 				cCurve->sibling		=	allChildren;
 				allChildren			=	cCurve;
 			}

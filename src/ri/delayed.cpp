@@ -43,7 +43,7 @@
 // Return Value			:	-
 // Comments				:
 CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *data,int *drc) : CObject(a,x) {
-	stats.numDelayeds++;
+	atomicIncrement(&stats.numDelayeds);
 
 	movvv(this->bmin,bmin);
 	movvv(this->bmax,bmax);
@@ -77,7 +77,7 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 // Return Value			:	-
 // Comments				:
 CDelayedObject::~CDelayedObject() {
-	stats.numDelayeds--;
+	atomicDecrement(&stats.numDelayeds);
 
 	dataRefCount[0]--;
 
@@ -164,7 +164,7 @@ void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) c
 // Return Value			:	-
 // Comments				:
 CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObject(a,x) {
-	stats.numDelayeds++;
+	atomicIncrement(&stats.numDelayeds);
 
 	instance		=	in;
 	processed		=	FALSE;
@@ -189,7 +189,7 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObje
 // Return Value			:	-
 // Comments				:
 CDelayedInstance::~CDelayedInstance() {
-	stats.numDelayeds--;
+	atomicDecrement(&stats.numDelayeds);
 }
 
 

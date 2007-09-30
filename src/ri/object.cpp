@@ -57,7 +57,7 @@
 // Return Value			:	-
 // Comments				:	
 CObject::CObject(CAttributes *a,CXform *x) {
-	stats.numObjects++;
+	atomicIncrement(&stats.numObjects);
 
 	flags		=	0;
 	attributes	=	a;
@@ -80,7 +80,7 @@ CObject::CObject(CAttributes *a,CXform *x) {
 // Return Value			:	-
 // Comments				:	
 CObject::~CObject() {
-	stats.numObjects--;
+	atomicDecrement(&stats.numObjects);
 
 	attributes->detach();
 	xform->detach();
@@ -98,15 +98,11 @@ void			CObject::dice(CShadingContext *rasterizer) {
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
 		nObject	=	cObject->sibling;
 
-		osLock(CRenderer::refCountMutex);
 		cObject->attach();
-		osUnlock(CRenderer::refCountMutex);
 		
 		rasterizer->drawObject(cObject);
 		
-		osLock(CRenderer::refCountMutex);
 		cObject->detach();
-		osUnlock(CRenderer::refCountMutex);
 	}
 }
 
@@ -574,9 +570,7 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 
 		if (children == NULL) {
 
-			osLock(CRenderer::refCountMutex);
 			CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
-			osUnlock(CRenderer::refCountMutex);
 
 			tesselation->initTesselation(context);
 			tesselation->attach();
@@ -595,16 +589,10 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 // Comments				:
 void				CSurface::dice(CShadingContext *rasterizer) {
 
-	osLock(CRenderer::refCountMutex);
 	CPatch	*cSurface	=	new CPatch(attributes,xform,this,0,1,0,1,0,attributes->minSplits);
 	cSurface->attach();
-	osUnlock(CRenderer::refCountMutex);
-
 	cSurface->dice(rasterizer);
-
-	osLock(CRenderer::refCountMutex);
 	cSurface->detach();
-	osUnlock(CRenderer::refCountMutex);
 	
 	// Note we tesselate for raytracing on demand - so we do not automatically emit a CTesselationPatch here
 }

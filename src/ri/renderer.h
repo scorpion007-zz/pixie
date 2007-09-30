@@ -182,7 +182,6 @@ public:
 		static	TMutex							networkMutex;				// To serialize the network communication
 		static	TMutex							tesselateMutex;				// To serialize the tesselation
 		static	TMutex							textureMutex;				// To serialize texture fetches
-		static	TMutex							refCountMutex;				// To serialize the object attach()/detach()
 		static	TMutex							shaderMutex;				// To serialize shader parameter list access
 		static	TMutex							delayedMutex;				// To serialize rib parsing/delayed objects
 		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_

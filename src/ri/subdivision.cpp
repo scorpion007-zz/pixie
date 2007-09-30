@@ -49,8 +49,7 @@
 CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int N,float uOrg,float vOrg,float uMult,float vMult,float *vertex) : CSurface(a,x) {
 	const int	K		=	2*N+8;
 
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CSubdivision);
+	atomicIncrement(&stats.numGprims);
 
 	vertexData			=	var;
 	vertexData->attach();
@@ -69,12 +68,10 @@ CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter 
 
 	if (vertexData->moving == FALSE) {
 		this->vertex		=	new float[K*vertexData->vertexSize];
-		stats.gprimMemory	+=	K*vertexData->vertexSize*sizeof(float);
 
 		projectVertices(this->vertex							,vertex,	0);
 	} else {
 		this->vertex		=	new float[K*vertexData->vertexSize*2];
-		stats.gprimMemory	+=	K*vertexData->vertexSize*2*sizeof(float);
 
 		projectVertices(this->vertex							,vertex,	0);
 		projectVertices(this->vertex+K*vertexData->vertexSize	,vertex,	vertexData->vertexSize);
@@ -94,15 +91,11 @@ CSubdivision::~CSubdivision() {
 
 	delete [] vertex;	
 
-	if (vertexData->moving)	stats.gprimMemory	-=	K*vertexData->vertexSize*2*sizeof(float);
-	else					stats.gprimMemory	-=	K*vertexData->vertexSize*sizeof(float);
-
 	if (parameters != NULL)	delete parameters;
 
 	vertexData->detach();
 
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CSubdivision);
+	atomicDecrement(&stats.numGprims);
 }
 
 

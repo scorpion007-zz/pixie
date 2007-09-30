@@ -52,7 +52,7 @@
 // Return Value			:
 // Comments				:
 CParameter::CParameter(CVariable *v) {
-	stats.numParameters++;
+	atomicIncrement(&stats.numParameters);
 
 	assert(v != NULL);
 
@@ -67,7 +67,7 @@ CParameter::CParameter(CVariable *v) {
 // Return Value			:
 // Comments				:
 CParameter::~CParameter() {
-	stats.numParameters--;
+	atomicDecrement(&stats.numParameters);
 
 	if (next != NULL)	delete next;
 }
@@ -525,8 +525,7 @@ public:
 // Return Value			:
 // Comments				:
 CVertexData::CVertexData() {
-	stats.numVertexDatas++;
-	stats.gprimCoreMemory	+=	sizeof(CVertexData);
+	atomicIncrement(&stats.numVertexDatas);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -536,8 +535,7 @@ CVertexData::CVertexData() {
 // Return Value			:
 // Comments				:
 CVertexData::~CVertexData() {
-	stats.numVertexDatas--;
-	stats.gprimCoreMemory	-=	(sizeof(CVertexData) + numVariables*sizeof(CVariable *));
+	atomicDecrement(&stats.numVertexDatas);
 
 	delete [] variables;
 }
@@ -578,8 +576,7 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 // Return Value			:
 // Comments				:
 CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
-	stats.numPls++;
-	stats.gprimCoreMemory	+=	sizeof(CPl);
+	atomicIncrement(&stats.numPls);
 
 	this->dataSize			=	dataSize;
 	this->numParameters		=	numParameters;
@@ -596,22 +593,18 @@ CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
 // Return Value			:
 // Comments				:
 CPl::~CPl() {
-	stats.numPls--;
-	stats.gprimCoreMemory	-=	sizeof(CPl);
+	atomicDecrement(&stats.numPls);
 
 	if (parameters != NULL)	{
 		delete [] parameters;
-		stats.gprimCoreMemory	-=	numParameters*sizeof(CPlParameter);
 	}
 
 	if (data0 != NULL) {
 		delete [] data0;
-		stats.gprimCoreMemory	-=	dataSize*sizeof(float);
 	}
 
 	if (data1 != NULL) {
 		delete [] data1;
-		stats.gprimCoreMemory	-=	dataSize*sizeof(float);
 	}
 }
 
@@ -626,7 +619,6 @@ CPl::~CPl() {
 void		CPl::append(float *d) {
 	if (data1 == NULL) {
 		data1					=	new float[dataSize];
-		stats.gprimCoreMemory	+=	dataSize*sizeof(float);
 	}
 
 	memcpy(data1,d,sizeof(float)*dataSize);
@@ -643,7 +635,6 @@ void		CPl::transform(CXform *x,float *data) {
 		if ((x->next != NULL) && (data1 == NULL)) {
 			data1	=	new float[dataSize];
 			memcpy(data1,data0,dataSize*sizeof(float));
-			stats.gprimCoreMemory	+=	dataSize*sizeof(float);
 		}
 
 		if (data0 != NULL)	transform(x,data0);
@@ -734,7 +725,6 @@ CVertexData	*CPl::vertexData() {
 	assert(j < 256);
 	vd->numVariables		=	(char) j;
 	vd->variables			=	new CVariable*[j];
-	stats.gprimCoreMemory	+=	j*sizeof(CVariable *);
 
 	// Set the parameters
 	vertexSize				=	0;
@@ -771,8 +761,6 @@ CPl				*CPl::clone(CAttributes *a) {
 
 	// Copy the data
 	if (data0 != NULL) {
-		stats.gprimCoreMemory	+=	dataSize*sizeof(float);
-
 		ndata0	=	new float[dataSize];
 		memcpy(ndata0,data0,dataSize*sizeof(float));
 	} else {
@@ -780,8 +768,6 @@ CPl				*CPl::clone(CAttributes *a) {
 	}
 
 	if (data1 != NULL) {
-		stats.gprimCoreMemory	+=	dataSize*sizeof(float);
-
 		ndata1	=	new float[dataSize];
 		memcpy(ndata1,data1,dataSize*sizeof(float));
 	} else {
@@ -791,7 +777,6 @@ CPl				*CPl::clone(CAttributes *a) {
 	// Allocate a fresh copy of the parameters
 	nParameters				=	new CPlParameter[numParameters];	
 	memcpy(nParameters,parameters,numParameters*sizeof(CPlParameter));
-	stats.gprimCoreMemory	+=	numParameters*sizeof(CPlParameter);
 
 	// Re-link the variables to the latest attributes
 	for (i=0;i<numParameters;i++) {
@@ -1457,7 +1442,6 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 	// Allocate the data field
 	cData	=	data	=	new float[dataSize];
 	assert(isAligned64(data));
-	stats.gprimCoreMemory	+=	dataSize*sizeof(float);
 
 	// Save the data
 	for (i=0;i<numDefinedParams;i++) {
@@ -1488,7 +1472,6 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 	// Create the memory for the final pl
 	finalParameters			=	new CPlParameter[numDefinedParams];	
 	memcpy(finalParameters,parameters,numDefinedParams*sizeof(CPlParameter));
-	stats.gprimCoreMemory	+=	numDefinedParams*sizeof(CPlParameter);
 	
 	// Return the parameter list
 	return	new CPl(dataSize,numDefinedParams,finalParameters,data);

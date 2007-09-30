@@ -111,16 +111,6 @@ TMutex							CRenderer::tesselateMutex;
 TMutex							CRenderer::textureMutex;
 
 
-
-/////////////////////////////////////////////////////////////
-//	Used to ensure that  each CObject's refCount is only altered
-//	by one thread at a time.
-//	- every attach() and detach() of a CObject must be mutexed
-/////////////////////////////////////////////////////////////
-TMutex							CRenderer::refCountMutex;
-
-
-
 /////////////////////////////////////////////////////////////
 //	Used to ensure that each shader PL gets unpacked by one
 //	thread only
@@ -192,7 +182,6 @@ void							CRenderer::initMutexes() {
 	osCreateMutex(networkMutex);
 	osCreateMutex(tesselateMutex);
 	osCreateMutex(textureMutex);
-	osCreateMutex(refCountMutex);
 	osCreateMutex(shaderMutex);
 	osCreateMutex(delayedMutex);
 	osCreateMutex(deepShadowMutex);
@@ -217,7 +206,6 @@ void							CRenderer::shutdownMutexes() {
 	osDeleteMutex(networkMutex);
 	osDeleteMutex(tesselateMutex);
 	osDeleteMutex(textureMutex);
-	osDeleteMutex(refCountMutex);
 	osDeleteMutex(shaderMutex);
 	osDeleteMutex(delayedMutex);
 	osDeleteMutex(deepShadowMutex);

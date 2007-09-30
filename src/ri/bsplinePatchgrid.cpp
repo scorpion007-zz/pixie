@@ -44,8 +44,7 @@
 // Return Value			:	-
 // Comments				:
 CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,float uOrg,float vOrg,float uMult,float vMult,float *ve) : CSurface(a,x) {
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CBSplinePatchGrid);
+	atomicIncrement(&stats.numGprims);
 
 	variables			=	var;
 	variables->attach();
@@ -84,7 +83,6 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 	const int	vertexSize	=	var->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
 	vertex					=	new float[vs*16*upatches*vpatches];
-	stats.gprimMemory		+=	vs*16*upatches*vpatches*sizeof(float);
 	
 	for (i=0;i<vpatches;i++) {
 		for (j=0;j<upatches;j++) {
@@ -153,14 +151,13 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 // Return Value			:	-
 // Comments				:
 CBSplinePatchGrid::~CBSplinePatchGrid() {
-	delete [] vertex;	stats.gprimMemory	-=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize)*(uVertices-3)*(vVertices-3)*sizeof(float)*16;
+	delete [] vertex;
 
 	variables->detach();
 
 	if (parameters != NULL)	delete parameters;
 
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CBSplinePatchGrid);
+	atomicDecrement(&stats.numGprims);
 }
 
 

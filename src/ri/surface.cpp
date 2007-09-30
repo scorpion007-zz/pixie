@@ -68,9 +68,8 @@ static inline float	minCocPixels(float z1, float z2) {
 // Return Value			:	-
 // Comments				:
 CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth) : CObject(a,x) {
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CPatch);
-	stats.numSurfaces++;
+	atomicIncrement(&stats.numGprims);
+	atomicIncrement(&stats.numSurfaces);
 	if (stats.numSurfaces > stats.numPeakSurfaces)	stats.numPeakSurfaces	=	stats.numSurfaces;
 
 	// Record the stuff
@@ -95,9 +94,8 @@ CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float 
 // Return Value			:	-
 // Comments				:
 CPatch::~CPatch() {
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CPatch);
-	stats.numSurfaces--;
+	atomicDecrement(&stats.numGprims);
+	atomicDecrement(&stats.numSurfaces);
 
 	object->detach();
 }
@@ -366,44 +364,36 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 
 		// Split along one direction
 		umid			=	(umin + umax)*0.5f;
-		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
 		p1->attach();
 		p2->attach();
-		osUnlock(CRenderer::refCountMutex);
 
 		p1->dice(r);
 		p2->dice(r);
 
-		osLock(CRenderer::refCountMutex);
 		p1->detach();
 		p2->detach();
 		stats.numSplits++;
 		stats.numUsplits++;
-		osUnlock(CRenderer::refCountMutex);
 		break;
 	case 1:
 		if (vmax <= vmin)	break;
 
 		// Split along one direction
 		vmid			=	(vmin + vmax)*0.5f;
-		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);	
 		p2				=	new CPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);	
 		p1->attach();
 		p2->attach();
-		osUnlock(CRenderer::refCountMutex);
 
 		p1->dice(r);
 		p2->dice(r);
 
-		osLock(CRenderer::refCountMutex);
 		p1->detach();
 		p2->detach();
 		stats.numSplits++;
 		stats.numVsplits++;
-		osUnlock(CRenderer::refCountMutex);
 		break;
 	case 2:
 		if (vmax <= vmin)	break;
@@ -412,7 +402,6 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		// Split along one direction
 		vmid			=	(vmin + vmax)*0.5f;
 		umid			=	(umin + umax)*0.5f;
-		osLock(CRenderer::refCountMutex);
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmid,depth+1,minDepth);
 		p3				=	new CPatch(attributes,xform,object,umin,umid,vmid,vmax,depth+1,minDepth);
@@ -421,21 +410,18 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		p2->attach();
 		p3->attach();
 		p4->attach();
-		osUnlock(CRenderer::refCountMutex);
 
 		p1->dice(r);
 		p2->dice(r);
 		p3->dice(r);
 		p4->dice(r);
 
-		osLock(CRenderer::refCountMutex);
 		p1->detach();
 		p2->detach();
 		p3->detach();
 		p4->detach();
 		stats.numSplits++;
 		stats.numUVsplits++;
-		osUnlock(CRenderer::refCountMutex);
 
 		break;
 	}
@@ -649,7 +635,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 				stats.tesselationPeakMemory = stats.tesselationMemory;
 			}
 			// Update stats
-			stats.tesselationCacheMisses++;
+			atomicIncrement(&stats.tesselationCacheMisses);
 						
 			tesselationUsedMemory[level][thread] 				+=	levels[level].threadTesselation[thread]->size;
 			
@@ -660,7 +646,7 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 		} else {
 			/// FIXME make these context stats
 			// Update stats
-			stats.tesselationCacheHits++;
+			atomicIncrement(&stats.tesselationCacheHits);
 		}
 		
 		// Bump the tesselation refCount
@@ -1861,9 +1847,7 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 			}
 			
 			// emit the new subpatch			
-			osLock(CRenderer::refCountMutex);
 			CTesselationPatch *cPatch = new CTesselationPatch(attributes,xform,object,uv[0],uv[1],vv[0],vv[1],depth+1,minDepth,-1);
-			osUnlock(CRenderer::refCountMutex);
 			
 			cPatch->initTesselation(context);
 			cPatch->sibling = subPatches;

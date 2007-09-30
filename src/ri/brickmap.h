@@ -132,7 +132,7 @@ public:
 												assert(cNode->fileIndex != -1);
 												cNode->brick = loadBrick(cNode->fileIndex);
 											} else {
-												stats.numBrickmapCacheHits++;
+												atomicIncrement(&stats.numBrickmapCacheHits);
 											}
 
 											if (n != NULL) *n = cNode;
@@ -192,7 +192,7 @@ public:
 												assert(cNode->fileIndex != -1);
 												cNode->brick = loadBrick(cNode->fileIndex);
 											} else {
-												stats.numBrickmapCacheHits++;
+												atomicIncrement(&stats.numBrickmapCacheHits);
 											}
 
 											if (n != NULL) *n = cNode;

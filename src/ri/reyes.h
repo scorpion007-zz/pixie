@@ -224,8 +224,6 @@ public:
 	void						drawPoints(CSurface *,int);								// Draw points (RiPoints)
 
 								// Some stats
-	int							numGrids;										// The number of grids allocated (for housekeeping)
-	int							numObjects;										// The number of objects allocated (for housekeeping)
 	int							numGridsRendered;
 	int							numQuadsRendered;
 	int							numGridsShaded;

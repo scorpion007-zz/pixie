@@ -42,8 +42,7 @@
 // Return Value			:	-
 // Comments				:	Identity at the beginning
 CXform::CXform() {
-	stats.numXforms++;
-	stats.xformMemory	+=	sizeof(CXform);
+	atomicIncrement(&stats.numXforms);
 
 	next				=	NULL;
 
@@ -59,8 +58,7 @@ CXform::CXform() {
 // Return Value			:	-
 // Comments				:	
 CXform::CXform(CXform *a) {
-	stats.numXforms++;
-	stats.xformMemory	+=	sizeof(CXform);
+	atomicIncrement(&stats.numXforms);
 
 	if (a->next != NULL)
 		next	=	new CXform(a->next);
@@ -79,8 +77,7 @@ CXform::CXform(CXform *a) {
 // Return Value			:	-
 // Comments				:	
 CXform::~CXform() {
-	stats.numXforms--;
-	stats.xformMemory	-=	sizeof(CXform);
+	atomicDecrement(&stats.numXforms);
 
 	if (next != NULL)	delete next;
 }

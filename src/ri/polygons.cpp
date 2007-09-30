@@ -187,9 +187,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 			osLock(CRenderer::tesselateMutex);
 	
 			if (children == NULL) {
-				osLock(CRenderer::refCountMutex);
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
-				osUnlock(CRenderer::refCountMutex);
 
 				tesselation->initTesselation(context);
 				tesselation->attach();
@@ -748,9 +746,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 			osLock(CRenderer::tesselateMutex);
 	
 			if (children == NULL) {
-				osLock(CRenderer::refCountMutex);
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
-				osUnlock(CRenderer::refCountMutex);
 
 				tesselation->initTesselation(context);
 				tesselation->attach();
@@ -1265,8 +1261,7 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 	int		i,mVertex;
 	float	*P;
 
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CPolygonMesh);
+	atomicIncrement(&stats.numGprims);
 
 	this->pl			=	pl;
 	this->npoly			=	npoly;
@@ -1282,8 +1277,6 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 	this->nholes		=	new int[npoly];		memcpy(this->nholes,nholes,npoly*sizeof(int));
 	this->nvertices		=	new int[nloops];	memcpy(this->nvertices,nvertices,nloops*sizeof(int));
 	this->vertices		=	new int[nverts];	memcpy(this->vertices,vertices,nverts*sizeof(int));	
-
-	stats.gprimMemory	+=	(npoly + nloops + nverts)*sizeof(int);
 
 	for (i=0,mVertex=-1;i<nverts;i++) {
 		mVertex	=	max(mVertex,vertices[i]);
@@ -1321,9 +1314,7 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 // Return Value			:	-
 // Comments				:
 CPolygonMesh::~CPolygonMesh() {
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CPolygonMesh);
-	stats.gprimMemory	-=	(npoly + nloops + nverts)*sizeof(int);
+	atomicDecrement(&stats.numGprims);
 
 	delete pl;
 	delete [] nholes;
@@ -1419,7 +1410,6 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 	const float			*vs3			=	P+vindices[vi3]*3;
 
 	// Create the triangle
-	osLock(CRenderer::refCountMutex);
 	cQuad				=	new CPolygonQuad(data.meshAttributes,data.meshXform,data.mesh
 		,vindices[vi0]
 		,vindices[vi1]
@@ -1430,7 +1420,6 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 		,data.meshFacevaryingNumber+vi3
 		,data.meshFacevaryingNumber+vi2
 		,data.meshUniformNumber);
-	osUnlock(CRenderer::refCountMutex);
 
 
 	// Add the children into the pool
@@ -1460,7 +1449,6 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 	}
 
 	// Create the triangle
-	osLock(CRenderer::refCountMutex);
 	cTriangle				=	new CPolygonTriangle(data.meshAttributes,data.meshXform,data.mesh
 		,vindices[vi0]
 		,vindices[vi1]
@@ -1469,7 +1457,6 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 		,data.meshFacevaryingNumber+vi1
 		,data.meshFacevaryingNumber+vi2
 		,data.meshUniformNumber);
-	osUnlock(CRenderer::refCountMutex);
 
 
 	// Add the children into the pool

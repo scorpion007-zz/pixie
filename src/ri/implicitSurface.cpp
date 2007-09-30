@@ -76,8 +76,7 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 
 	scaleFactor				=	(float) pow((double) fabs(determinantm(xform->from)),1 / 3.0)*sf*(float) 0.5;
 
-	stats.numGprims++;
-	stats.gprimMemory		+=	sizeof(CImplicit);
+	atomicIncrement(&stats.numGprims);
 }
 
 
@@ -88,8 +87,7 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 // Return Value			:	-
 // Comments				:
 CImplicit::~CImplicit() {
-	stats.numGprims--;
-	stats.gprimMemory		-=	sizeof(CImplicit);
+	atomicDecrement(&stats.numGprims);
 
 	if (handle != NULL) {
 		tiniFunction(data);

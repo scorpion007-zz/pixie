@@ -61,9 +61,7 @@
 			osLock(CRenderer::tesselateMutex);					\
 																\
 			if (children == NULL) {								\
-				osLock(CRenderer::refCountMutex);				\
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);	\
-				osUnlock(CRenderer::refCountMutex);				\
 				tesselation->initTesselation(context);			\
 				tesselation->attach();							\
 				children				=	tesselation;		\
@@ -118,8 +116,7 @@
 // Comments				:	-
 CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertex0) : CSurface(a,x) {
 
-	stats.gprimMemory	+=	sizeof(CBilinearPatch);
-	stats.numGprims++;
+	atomicIncrement(&stats.numGprims);
 
 	this->variables		=	v;
 	this->variables->attach();
@@ -148,7 +145,6 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 			for (j=vertexSize;j>0;j--)	*dest++ = (float) *src++;
 		}
 
-		stats.gprimMemory	+=	vertexSize*8*sizeof(float);
 	} else {
 		int			i;
 		float		*dest;
@@ -156,8 +152,6 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 		dest	=	vertex	=	new float[vertexSize*4];
 
 		for (i=vertexSize*4;i>0;i--) *dest++ = (float) *vertex0++;
-
-		stats.gprimMemory	+=	vertexSize*4*sizeof(float);
 	}
 
 	// Compute the bounding box of the patch
@@ -202,8 +196,7 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 CBilinearPatch::~CBilinearPatch() {
 	const	int	vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
-	stats.gprimMemory	-=	sizeof(CBilinearPatch) + 4*vertexSize*sizeof(float);
-	stats.numGprims--;
+	atomicDecrement(&stats.numGprims);
 
 	if (parameters	!= NULL)	delete parameters;
 	delete [] vertex;
@@ -513,8 +506,7 @@ void	CBilinearPatch::interpolate(int numVertices,float **varying,float ***locals
 CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertexData,const float *uBasis,const float *vBasis) : CSurface(a,x) {
 	const unsigned int vertexSize	=	v->vertexSize;
 
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CBicubicPatch);
+	atomicIncrement(&stats.numGprims);
 
 	variables	=	v;
 	variables->attach();
@@ -536,14 +528,10 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 
 		computeVertexData(vertex					,vertexData,0,uBasis,vBasis);
 		computeVertexData(vertex + vertexSize*16	,vertexData,vertexSize,uBasis,vBasis);
-
-		stats.gprimMemory	+=	vertexSize*32*sizeof(float);
 	} else {
 		vertex	=	new float[vertexSize*16];
 
 		computeVertexData(vertex,vertexData,0,uBasis,vBasis);
-
-		stats.gprimMemory	+=	vertexSize*16*sizeof(float);
 	}
 
 	makeBound(bmin,bmax);
@@ -558,8 +546,7 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 CBicubicPatch::~CBicubicPatch() {
 	const int	vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
-	stats.gprimMemory	-=	sizeof(CBicubicPatch) + sizeof(float)*vertexSize*16;
-	stats.numGprims--;
+	atomicDecrement(&stats.numGprims);
 
 	if (parameters	!= NULL)	delete parameters;
 
@@ -778,8 +765,7 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 	int			j;
 	const int	vertexSize	=	v->vertexSize;
 
-	stats.gprimMemory	+=	sizeof(CNURBSPatch);
-	stats.numGprims++;
+	atomicIncrement(&stats.numGprims);
 
 	this->variables		=	v;
 	this->variables->attach();
@@ -815,14 +801,10 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 
 		precomputeVertexData(vertex								,uCoefficients,vCoefficients,vertex0,0);
 		precomputeVertexData(vertex + uOrder*vOrder*vertexSize	,uCoefficients,vCoefficients,vertex0,vertexSize);
-
-		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*2*sizeof(double);
 	} else {
 		vertex	=	new double[uOrder*vOrder*vertexSize];
 
 		precomputeVertexData(vertex								,uCoefficients,vCoefficients,vertex0,0);
-
-		stats.gprimMemory	+=	vertexSize*uOrder*vOrder*sizeof(double);
 	}
 
 	makeBound(bmin,bmax);
@@ -837,8 +819,7 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 CNURBSPatch::~CNURBSPatch() {
 	const int vertexSize	=	(variables->moving ? variables->vertexSize*2 : variables->vertexSize);
 
-	stats.gprimMemory	-=	sizeof(CNURBSPatch) + sizeof(double)*vertexSize*uOrder*vOrder;
-	stats.numGprims--;
+	atomicDecrement(&stats.numGprims);
 
 	if (parameters	!= NULL) delete parameters;
 	delete [] vertex;
@@ -1273,8 +1254,7 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 	int			i;
 	const float	*P;
 
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CPatchMesh);
+	atomicIncrement(&stats.numGprims);
 
 	pl			=	c;
 	degree		=	d;
@@ -1401,8 +1381,7 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 // Return Value			:	Dtor
 // Comments				:	-
 CPatchMesh::~CPatchMesh() {
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CPatchMesh);
+	atomicDecrement(&stats.numGprims);
 
 	if (pl != NULL)	delete pl;
 
@@ -1514,9 +1493,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 				
 				gatherData(context,j,i,2,2,j,i,k,vertex,parameters);
 
-				osLock(CRenderer::refCountMutex);
 				nObject				=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
-				osUnlock(CRenderer::refCountMutex);
 
 				nObject->sibling	=	allChildren;
 				allChildren			=	nObject;
@@ -1554,9 +1531,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 				gatherData(context,j*us,i*vs,4,4,j,i,k,vertex,parameters);
 
-				osLock(CRenderer::refCountMutex);
 				nObject				=	new CBicubicPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
-				osUnlock(CRenderer::refCountMutex);
 
 				nObject->sibling	=	allChildren;
 				allChildren			=	nObject;
@@ -1607,8 +1582,7 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 	int			i;
 	const float	*P;
 
-	stats.numGprims++;
-	stats.gprimMemory	+=	sizeof(CNURBSPatchMesh) + (nu+uo)*sizeof(float) + (nv+vo)*sizeof(float);
+	atomicIncrement(&stats.numGprims);
 
 	pl			=	c;
 
@@ -1662,8 +1636,7 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 // Return Value			:	Dtor
 // Comments				:	-
 CNURBSPatchMesh::~CNURBSPatchMesh() {
-	stats.numGprims--;
-	stats.gprimMemory	-=	sizeof(CNURBSPatchMesh) + (uVertices+uOrder)*sizeof(float) + (vVertices+vOrder)*sizeof(float);
+	atomicDecrement(&stats.numGprims);
 
 	delete [] uKnots;
 	delete [] vKnots;
@@ -1772,9 +1745,7 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 
 				gatherData(context,i,j,uOrder,vOrder,i,j,k,vertex,parameters);
 
-				osLock(CRenderer::refCountMutex);
 				nObject				=	new CNURBSPatch(attributes,xform,vertexData,parameters,uOrder,vOrder,uKnots+i,vKnots+j,vertex);
-				osUnlock(CRenderer::refCountMutex);
 
 				nObject->sibling	=	allChildren;
 				allChildren			=	nObject;

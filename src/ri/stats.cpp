@@ -69,11 +69,6 @@ void	CStats::reset() {
 	numDelayeds							=	0;
 	numTextures							=	0;
 	numEnvironments						=	0;
-	optionsMemory						=	0;
-	attributesMemory					=	0;
-	xformMemory							=	0;
-	gprimCoreMemory						=	0;
-	gprimMemory							=	0;
 	textureMemory						=	0;
 	sequenceNumber						=	0;
 	runningSequenceNumber				=	0;
@@ -141,10 +136,10 @@ void	CStats::printStats(int level) {
 	info(CODE_STATS,"              Time:  %.2f seconds\n",frameTime);
 
 	info(CODE_STATS,"->Memory\n");
-	info(CODE_STATS,"             Xform: %d(%d) (bytes(instances))\n",xformMemory,numXforms);
-	info(CODE_STATS,"        Attributes: %d(%d) (bytes(instances))\n",attributesMemory,numAttributes);
-	info(CODE_STATS,"             Gprim: %d(%d) (bytes(instances))\n",gprimCoreMemory+gprimMemory,numGprims);
-	info(CODE_STATS,"           Options: %d(%d) (bytes(instances))\n",optionsMemory,numOptions);
+	info(CODE_STATS,"             Xform: %d (instances)\n",numXforms);
+	info(CODE_STATS,"        Attributes: %d (instances)\n",numAttributes);
+	info(CODE_STATS,"             Gprim: %d (instances)\n",numGprims);
+	info(CODE_STATS,"           Options: %d (instances)\n",numOptions);
 	info(CODE_STATS,"          Textures: %d(%d) (bytes(instances))\n",textureMemory,numTextures);
 	info(CODE_STATS,"         Zone Peak: %d (bytes)\n",peakZoneMemory);
 
@@ -237,11 +232,6 @@ void	CStats::check() {
 	assert(numTextures				==	0);
 	assert(numEnvironments			==	0);
 
-	assert(attributesMemory			==	0);
-	assert(xformMemory				==	0);
-	assert(attributesMemory			==	0);
-	assert(gprimCoreMemory			==	0);
-	assert(gprimMemory				==	0);
 	assert(textureMemory			==	0);
 	assert(zoneMemory				==	0);
 }

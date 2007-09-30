@@ -37,6 +37,7 @@
 #include "photonMap.h"
 #include "irradiance.h"
 #include "error.h"
+#include "atomic.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
@@ -48,8 +49,7 @@
 CAttributes::CAttributes() {
 	next					=	NULL;
 
-	stats.numAttributes++;
-	stats.attributesMemory	+=	sizeof(CAttributes);
+	atomicIncrement(&stats.numAttributes);
 
 	surface					=	NULL;
 	displacement			=	NULL;
@@ -154,8 +154,7 @@ CAttributes::CAttributes() {
 CAttributes::CAttributes(const CAttributes *a) {
 	CActiveLight	*cLight,*nLight;
 
-	stats.numAttributes++;
-	stats.attributesMemory	+=	sizeof(CAttributes);
+	atomicIncrement(&stats.numAttributes);
 
 	this[0]						=	a[0];
 	
@@ -202,8 +201,7 @@ CAttributes::CAttributes(const CAttributes *a) {
 CAttributes::~CAttributes(){
 	CActiveLight	*cLight;
 
-	stats.numAttributes--;
-	stats.attributesMemory	-=	sizeof(CAttributes);
+	atomicDecrement(&stats.numAttributes);
 
 	if (surface != NULL)				surface->detach();
 	if (displacement != NULL)			displacement->detach();

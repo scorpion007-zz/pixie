@@ -31,9 +31,8 @@
 #ifndef REFCOUNTER_H
 #define REFCOUNTER_H
 
-
 #include "common/global.h"
-
+#include "atomic.h"
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRefCounter
@@ -44,8 +43,8 @@ public:
 						CRefCounter();
 			virtual		~CRefCounter();
 
-			void		attach()	{	refCount++;	}
-			void		detach()	{	refCount--; if (refCount == 0) delete this; }
+			void		attach()	{	atomicIncrement(&refCount);	}
+			void		detach()	{	if (atomicDecrement(&refCount) == 0) delete this; }
 
 			int			refCount;
 };

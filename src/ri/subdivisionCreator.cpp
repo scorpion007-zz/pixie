@@ -1579,8 +1579,7 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 	int			i,j,ias,fas;
 	const float	*P;
 
-	stats.numGprims++;
-	stats.gprimMemory			+=	sizeof(CSubdivMesh);
+	atomicIncrement(&stats.numGprims);
 
 	this->pl					=	c;
 	this->numFaces				=	numFaces;
@@ -1646,8 +1645,7 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 CSubdivMesh::~CSubdivMesh() {
 	int	i;
 
-	stats.numGprims--;
-	stats.gprimMemory			-=	sizeof(CSubdivMesh);
+	atomicDecrement(&stats.numGprims);
 
 	delete pl;
 	delete [] numVerticesPerFace;
@@ -1694,15 +1692,11 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
 		nObject	=	cObject->sibling;
 		
-		osLock(CRenderer::refCountMutex);
 		cObject->attach();
-		osUnlock(CRenderer::refCountMutex);
 		
 		rasterizer->drawObject(cObject);
 		
-		osLock(CRenderer::refCountMutex);
 		cObject->detach();
-		osUnlock(CRenderer::refCountMutex);
 	}
 }
 							

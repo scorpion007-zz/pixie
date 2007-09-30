@@ -65,12 +65,12 @@ public:
 class	CTexture : public CTextureInfoBase {
 public:
 						CTexture(const char *name) : CTextureInfoBase(name) {
-							stats.numTextures++;
+							atomicIncrement(&stats.numTextures);
 							if (stats.numTextures > stats.numPeakTextures)	stats.numPeakTextures	=	stats.numTextures;
 						}
 
 	virtual				~CTexture() {
-							stats.numTextures--;
+							atomicDecrement(&stats.numTextures);
 						}
 
 	virtual float		lookupz(float u,float v,float z,CShadingContext *context)						=	0;
@@ -94,12 +94,12 @@ public:
 class	CEnvironment : public CTextureInfoBase {
 public:
 						CEnvironment(const char *name) : CTextureInfoBase(name) {
-							stats.numEnvironments++;
+							atomicIncrement(&stats.numEnvironments);
 							if (stats.numEnvironments > stats.numPeakEnvironments)	stats.numPeakEnvironments	=	stats.numEnvironments;
 						}
 
 	virtual				~CEnvironment() {
-							stats.numEnvironments--;
+							atomicDecrement(&stats.numEnvironments);
 						}
 
 	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context)	=	0;

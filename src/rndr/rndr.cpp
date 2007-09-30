@@ -553,7 +553,7 @@ int main(int argc, char* argv[]) {
 	int				displayProgress	=	FALSE;
 	int				numThreads		=	-1;
 	int				localChildren	=	0;
-
+	
 	// Enable memory leak detection/report
 #ifdef _WINDOWS
 #ifdef _DEBUG

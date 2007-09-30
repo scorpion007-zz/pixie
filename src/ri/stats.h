@@ -70,11 +70,6 @@ public:
 	int				numDelayeds;
 	int				numTextures;
 	int				numEnvironments;
-	int				optionsMemory;					// The amount of memory allocated for each of the following
-	int				attributesMemory;
-	int				xformMemory;
-	int				gprimCoreMemory;
-	int				gprimMemory;
 	int				textureMemory;
 	int				sequenceNumber;					// The sequence number
 	int				runningSequenceNumber;			// The running sequence number
