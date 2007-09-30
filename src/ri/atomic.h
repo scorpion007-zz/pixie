@@ -25,7 +25,12 @@
 //
 //  File				:	atomic.h
 //  Classes				:	-
-//  Description			:
+//  Description			:	This file contains the atomic increment and decrement
+//							to ensure consistency in multi-threaded environments
+//							without kernel synchronization.
+//
+//							The Windoze and Apple implementations are pretty standard
+//							but this file gets pretty messy for other platforms.
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef ATOMIC_H
@@ -39,21 +44,30 @@
 
 
 ///////////////////////////////////////////////////////////////
-// Intel compiler
-#if defined(INTEL_COMPILER)
+// Windoze
+#if defined(_WINDOWS)
 
+// Include the mighty (crappy) windoze header
+#ifndef WIN32_LEAN_AND_MEAN
+#define	WIN32_LEAN_AND_MEAN 
+#endif
+#include <windows.h>
+
+// Ugly workaround the stuping LONG definition
+// This is one of the reasons why Windoze is written by monkeys
 inline int atomicIncrement(volatile int *pointer) {
-	return InterlochedIncrement(pointer);
+	return InterlockedIncrement((volatile LONG *) pointer);
 }
 
 inline int	atomicDecrement(volatile int *pointer) {
-	return InterlockedDecremenet(pointer);
+	return InterlockedDecrement((volatile LONG *) pointer);
 }
 
 ///////////////////////////////////////////////////////////////
 // Apple
 #elif defined(__APPLE__)
 
+// Include the OSX header
 #include <libkern/OSAtomic.h>
 
 inline int atomicIncrement(int *ptr) {
@@ -64,6 +78,7 @@ inline int atomicDecrement(int *ptr) {
 	return OSAtomicDecrement32(ptr);
 }
 
+/*
 ///////////////////////////////////////////////////////////////
 // Windows (32 bit)
 #elif defined(_WIN32)
@@ -114,7 +129,7 @@ inline int atomicDecrement(volatile int *ptr)
                  : "memory");
     return static_cast<int>(ret);
 }
-
+*/
 
 ///////////////////////////////////////////////////////////////
 // GCC (i386)
