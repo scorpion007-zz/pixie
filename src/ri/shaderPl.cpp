@@ -226,6 +226,8 @@ void		CTraceLookup::bind(const char *name,int &opIndex,int step,void *data,CShad
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.coneAngle));
 	} else if (strcmp(name,"sampleBase") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.sampleBase));
+	} else if (strcmp(name,"maxdist") == 0) {
+		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.maxDist));
 	} else if (strcmp(name,"label") == 0) {
 		expectUniform(name);
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.label));
