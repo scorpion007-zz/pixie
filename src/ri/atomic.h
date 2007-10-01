@@ -71,11 +71,11 @@ inline int	atomicDecrement(volatile int *pointer) {
 #include <libkern/OSAtomic.h>
 
 inline int atomicIncrement(int *ptr) {
-	return OSAtomicIncrement32(ptr);
+	return OSAtomicIncrement32Barrier(ptr);
 }
 
 inline int atomicDecrement(int *ptr) {
-	return OSAtomicDecrement32(ptr);
+	return OSAtomicDecrement32Barrier(ptr);
 }
 
 /*
