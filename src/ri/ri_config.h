@@ -107,5 +107,8 @@
 // The number of bins to use for filterstep function
 #define	FILTERSTEP_NUMSTEPS				10
 
+// If this flag is set, we ignore the displacement shaders for dicing
+#define	IGNORE_DISPLACEMENTS_FOR_DICING
+
 #endif
 

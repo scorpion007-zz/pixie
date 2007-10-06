@@ -28,8 +28,8 @@
 //  Description			:	RenderMan Header
 //
 ////////////////////////////////////////////////////////////////////////
-#ifndef RI_H
-#define RI_H 1
+#ifndef PIXIE
+#define PIXIE
 
 #ifdef __cplusplus
 extern "C" {

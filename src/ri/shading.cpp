@@ -48,6 +48,7 @@
 #include	"remoteChannel.h"
 #include	"renderer.h"
 #include	"shaderPl.h"
+#include	"ri_config.h"
 
 // George's extrapolated derivative extensions
 #define		USE_EXTRAPOLATED_DERIV
@@ -668,8 +669,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	} else {
 
 		// We are only interested in the surface position, not the color
+#ifdef IGNORE_DISPLACEMENTS_FOR_DICING
+		if (TRUE) {
+#else
 		if (	(currentAttributes->displacement == NULL) || 
 			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)))) {
+#endif
 			const int	savedParameters	=	usedParameters;
 
 			// No, just sample the geometry
