@@ -670,7 +670,10 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 		// We are only interested in the surface position, not the color
 #ifdef IGNORE_DISPLACEMENTS_FOR_DICING
-		if (TRUE) {
+		if (	(currentAttributes->displacement == NULL) || 
+			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS))) ||
+				(displaceOnly & 2)
+			) {
 #else
 		if (	(currentAttributes->displacement == NULL) || 
 			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)))) {

@@ -265,6 +265,7 @@ public:
 		// Shade points on a surface
 		void					shade(CSurface *,int,int,EShadingDim,unsigned int,int displaceOnly=FALSE);
 		inline	void			displace(CSurface *surface,int u,int v,EShadingDim dim,unsigned int up)	{	shade(surface,u,v,dim,up,TRUE);	}
+		inline	void			displaceEstimate(CSurface *surface,int u,int v,EShadingDim dim,unsigned int up)	{	shade(surface,u,v,dim,up,3);	}
 
 		// Raytracing functions
 		void					trace(CRayBundle *);									// Trace and maybe shade bunch of rays

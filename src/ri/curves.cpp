@@ -213,7 +213,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		// Compute the sample positions and corresponding normal vectors
 		for (i=0;i<6;i++) 	timev[i]    =   1;
 
-		rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
+		rasterizer->displaceEstimate(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
 		
 		for (i=0;i<6;i++) 	addBox(bmin,bmax,P + i*3);
 		
@@ -249,7 +249,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	for (i=0;i<6;i++)		timev[i]	=	0;
 	
 	// Sample the curves
-	rasterizer->displace(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
+	rasterizer->displaceEstimate(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
 
 	// Add start sample bounds
 	for (i=0;i<6;i++)	addBox(bmin,bmax,P + i*3);

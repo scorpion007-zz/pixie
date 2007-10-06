@@ -181,8 +181,8 @@ void	CPatch::dice(CShadingContext *r) {
 			double			u,v;
 
 			// If the parametric range is too small, we have to abort
-			if (((float) (ustart + ustep)) == ((float) ustart))	return;
-			if (((float) (vstart + vstep)) == ((float) vstart))	return;
+			if (((float) (ustart + ustep)) <= ((float) ustart))	return;
+			if (((float) (vstart + vstep)) <= ((float) vstart))	return;
 
 			// The current u/v/time vectors
 			float			*uv				=	varying[VARIABLE_U];
@@ -206,7 +206,7 @@ void	CPatch::dice(CShadingContext *r) {
 				}
 				
 				assert(k <= (int) CRenderer::maxGridSize);
-				r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
+				r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_END_SAMPLE);
 				cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
 				// Save the end positions
@@ -224,7 +224,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displace(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE | PARAMETER_RAYTRACE);			// PARAMETER_RAYTRACE IS A HACK to test dice-before-displace
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
 //FIXME: implies if either end is culled we cull - wrong
