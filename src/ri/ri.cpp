@@ -1890,6 +1890,74 @@ RiProcDelayedReadArchive (RtPointer data, RtFloat detail) {
 	CDelayedData	*delayed	=	(CDelayedData *) data;
 
 	renderMan->RiReadArchiveV(delayed->generator,NULL,0,NULL,NULL);
+	
+#if 0
+	int			cubePoints[]	=	{	0, 0, 0,
+										1, 0, 0,
+										1, 0, 1,
+										0, 0, 1,
+										
+										0, 1, 0,
+										1, 1, 0,
+										1, 1, 1,
+										0, 1, 1,
+										
+										0, 0, 0,
+										1, 0, 0,
+										1, 1, 0,
+										0, 1, 0,
+										
+										0, 0, 1,
+										1, 0, 1,
+										1, 1, 1,
+										0, 1, 1,
+										
+										0, 0, 0,
+										0, 1, 0,
+										0, 1, 1,
+										0, 0, 1,
+										
+										1, 0, 0,
+										1, 1, 0,
+										1, 1, 1,
+										1, 0, 1
+										};
+	
+	vector bmin,bmax;
+	interpolatev(bmin,delayed->bmin,delayed->bmax,0.05);
+	interpolatev(bmax,delayed->bmin,delayed->bmax,0.95);
+	
+	float	*P = (float*) alloca(6*4*3*sizeof(float));
+	int 	*Ind = (int*) alloca(6*4*sizeof(int));
+	int 	*NV = (int*) alloca(6*sizeof(int));
+	
+	int		*cInd = Ind;
+	float	*cP = P;
+	
+	#define pt() 							\
+		*cP++ = cp[0] ? bmin[0] : bmax[0];	\
+		*cP++ = cp[1] ? bmin[1] : bmax[1];	\
+		*cP++ = cp[2] ? bmin[2] : bmax[2];	\
+		*cInd++ = i;						\
+		cp += 3;
+	
+	int *cp = cubePoints;
+	for(int i=0;i<6*4;i++) {
+		pt();
+	}
+	for(int i=0;i<6;i++)
+		NV[i] = 4;
+	
+	RiAttributeBegin();
+	vector Cs,Os;
+	initv(Cs,rand()/((float)RAND_MAX),rand()/((float)RAND_MAX),rand()/((float)RAND_MAX));
+	initv(Os,0.2);
+	RiOpacity(Os);
+	RiColor(Cs);
+	RiSides(2);
+	RiPointsPolygons( 6, NV, Ind, "P", P, NULL);
+	RiAttributeEnd();
+#endif
 }
 
 
