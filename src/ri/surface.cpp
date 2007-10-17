@@ -224,7 +224,7 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE | PARAMETER_RAYTRACE);			// PARAMETER_RAYTRACE IS A HACK to test dice-before-displace
+			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
 //FIXME: implies if either end is culled we cull - wrong
