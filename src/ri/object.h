@@ -91,7 +91,6 @@ public:
 	int						flags;						// Holds object flags
 	CAttributes				*attributes;				// Holds the object attributes
 	CXform					*xform;						// Holds the object xform to the object space
-	int						refCount;					// The reference counter
 	CObject					*children,*sibling;			// The hierarchy
 	vector					bmin,bmax;					// The bounding box
 protected:

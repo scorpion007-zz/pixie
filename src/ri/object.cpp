@@ -63,8 +63,6 @@ CObject::CObject(CAttributes *a,CXform *x) {
 	attributes	=	a;
 	xform		=	x;
 
-	refCount	=	0;
-
 	attributes->attach();
 	xform->attach();
 	
