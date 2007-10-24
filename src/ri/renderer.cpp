@@ -1101,10 +1101,10 @@ void			CRenderer::render(CObject *cObject) {
 //							the servers
 // Return Value			:
 // Comments				:
-static	void		*serverDispatchThread(void *w) {
+static	TFunPrefix		serverDispatchThread(void *w) {
 	CRenderer::serverThread(w);
 
-	return NULL;
+	TFunReturn;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1112,10 +1112,10 @@ static	void		*serverDispatchThread(void *w) {
 // Description			:	This thread is responsible for rendering
 // Return Value			:
 // Comments				:
-static	void		*rendererDispatchThread(void *w) {
+static	TFunPrefix		rendererDispatchThread(void *w) {
 	CRenderer::contexts[(uintptr_t) w]->renderingLoop();
 
-	return NULL;
+	TFunReturn;
 }
 
 

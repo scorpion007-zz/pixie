@@ -63,7 +63,9 @@ class CRWLock {
 #define	TMutex			CRITICAL_SECTION 
 #define	TSemaphore		HANDLE
 #define TRWLock         CRWLock
-typedef void			*(*TFun)(void *);
+#define	TFunPrefix		DWORD WINAPI
+#define	TFunReturn		return 0
+typedef LPTHREAD_START_ROUTINE	TFun;
 
 #define	OS_DIR_SEPERATOR					'\\'
 #define OS_DIR_SEPERATOR_STRING				"\\"
@@ -94,6 +96,8 @@ typedef void			*(*TFun)(void *);
 #define	TMutex			pthread_mutex_t
 #define TSemaphore		sem_t
 #define TRWLock			pthread_rwlock_t
+#define	TFunPrefix		void *
+#define	TFunReturn		return NULL
 typedef void			*(*TFun)(void *);
 
 

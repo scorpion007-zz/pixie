@@ -49,25 +49,6 @@
 #include <direct.h>
 #include <errno.h>
 
-///////////////////////////////////////////////////
-// For Windoze we create encapsulate the thread in the following structure
-typedef struct {
-	void	*userData;
-	TFun	thread;
-} TThreadData;
-
-// This is the entry point for Windows threads
-static	DWORD WINAPI  dispatcherThread(void *w) {
-	TThreadData	*data		=	(TThreadData *) w;
-	TFun		thread		=	data->thread;
-	void		*userData	=	data->userData;
-
-	delete data;
-
-	thread(userData);
-
-	return 0;
-}
 
 // << Windows
 #else
@@ -402,12 +383,8 @@ TThread	osCreateThread(TFun entry,void *d) {
 
 #ifdef _WINDOWS
 	DWORD		id;
-	TThreadData	*data	=	new TThreadData;
 
-	data->thread		=	entry;
-	data->userData		=	d;
-
-	cThread				=	CreateThread(NULL,80000000,dispatcherThread,data,0,&id);
+	cThread				=	CreateThread(NULL,80000000,entry,d,0,&id);
 #else
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
