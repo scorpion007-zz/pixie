@@ -108,7 +108,7 @@ public:
 // Return Value			:	-
 // Comments				:
 CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int ifv0,int ifv1,int ifv2,int iuniform) : CSurface(a,x) {
-	stats.numGprims++;
+	atomicIncrement(&stats.numGprims);
 
 	// Save the parameters
 	this->mesh				=	mesh;
@@ -156,7 +156,7 @@ CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,i
 // Return Value			:	-
 // Comments				:
 CPolygonTriangle::~CPolygonTriangle() {
-	stats.numGprims--;
+	atomicDecrement(&stats.numGprims);
 	mesh->detach();
 }
 
@@ -667,7 +667,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 // Return Value			:	-
 // Comments				:
 CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int iv3,int ifv0,int ifv1,int ifv2,int ifv3,int iuniform) : CSurface(a,x) {
-	stats.numGprims++;
+	atomicIncrement(&stats.numGprims);
 
 	// Save the parameters
 	this->mesh				=	mesh;
@@ -714,7 +714,7 @@ CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,i
 // Return Value			:	-
 // Comments				:
 CPolygonQuad::~CPolygonQuad() {
-	stats.numGprims--;
+	atomicDecrement(&stats.numGprims);
 	mesh->detach();
 }
 
