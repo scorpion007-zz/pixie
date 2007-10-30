@@ -42,6 +42,64 @@
 // Some misc macros
 /////////////////////////////////////////////////////////////////////////////////////////
 
+#if 0
+	#define __logPushRight(__object,__x,__y)				fprintf(stderr,"\t->object %x pushed right to %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define __logPushDown(__object,__x,__y)					fprintf(stderr,"\t->object %x pushed down to %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define __logPushDiscard(__object,__x,__y)				fprintf(stderr,"\t->object %x discarded on push at %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define	__logObjectDequeue(__object,__x,__y)			fprintf(stderr,"\t->object %x dequeued at %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define __logObjectRasterizeDice(_object,__x,__y)		fprintf(stderr,"->object %x rasterized / diced at %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define __logObjectOpacityCull(__object,__x,__y)		fprintf(stderr,"\t->object %x gross opacity culled at %d %d in thread %d\n",cObject,currentXBucket,currentYBucket,thread);
+	#define __logBucketStart(__x,__Y)						fprintf(stderr,"START bucket %d,%d in thread %d\n",__x,_y,thread);
+	#define __logBucketTerminate(__x,__y)					fprintf(stderr,"DONE bucket %d,%d in thread %d\n",__x,_y,thread);
+	#define __logBucketSkip(__x,__y)						fprintf(stderr,"SKIP bucket %d,%d in thread %d\n",__x,_y,thread);
+	#define __logObjectSkip(__object,__x,__y)				fprintf(stderr,"->object %x skipped at %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define __logObjectDelete(__object,__x,__y)				fprintf(stderr,"->object %x deleted at %d,%d in thread %d\n",__object,__x,__y,thread);
+	#define __logObjectInsert(__object,__x,__y,__thread,__queue)
+		fprintf(stderr,"->object %x inserted at %d,%d in thread %d (queue was %d)\n",__object,__x,__y,__thread,__queue);
+#else
+	#define __logPushRight(__object,__x,__y)
+	#define __logPushDown(__object,__x,__y)
+	#define __logPushDiscard(__object,__x,__y)
+	#define	__logObjectDequeue(__object,__x,__y)
+	#define __logObjectRasterizeDice(_object,__x,__y)
+	#define __logObjectOpacityCull(__object,__x,__y)
+	#define __logBucketStart(__x,__Y)
+	#define __logBucketTerminate(__x,__y)
+	#define __logBucketSkip(__x,__y)
+	#define __logObjectSkip(__object,__x,__y)
+	#define __logObjectDelete(__object,__x,__y)
+	#define __logObjectInsert(__object,__x,__y,__thread,__queue)
+#endif
+
+#if 0
+	TMutex debugMutex = PTHREAD_MUTEX_INITIALIZER;
+	#include <map>
+	using namespace std;
+	map<void*,int> allocMap;
+
+	void allocateMapCheck() {
+		printf("%d undisposed objects\n",allocMap.size());
+		for(map<void*,int>::iterator it = allocMap.begin(); it != allocMap.end(); it++) {
+			printf("\t%x inserted to %d buckets\n",it->first,it->second);
+		}
+	}
+
+	#define __recordObjectInsert(__object,__ref)	\
+		osLock(debugMutex);							\
+		allocMap[object] = refCount;				\
+		osUnlock(debugMutex);						\
+
+	#define __recordObjectDelete(__object)			\
+		osLock(debugMutex);							\
+		map<void*,int>::iterator it = allocMap.find(grid);	\
+		if(it == allocMap.end())	printf("ERROR deleting nonexistant raster object\n");	\
+		else						allocMap.erase(it);		\
+		osUnlock(debugMutex);
+#else
+	#define __recordObjectInsert(__object,__ref)
+	#define __recordObjectDelete(__object)
+#endif
+
 // Returns the bucket numbers
 #define	xbucket(__x)	(int) floor((__x - CRenderer::xSampleOffset) * CRenderer::invBucketSampleWidth);
 #define	ybucket(__y)	(int) floor((__y - CRenderer::ySampleOffset) * CRenderer::invBucketSampleHeight);
@@ -66,6 +124,7 @@
 		assert(buckets[currentYBucket][currentXBucket+1] != NULL);												\
 																												\
 		objectExplicitInsert(__cObject,currentXBucket+1,currentYBucket);										\
+		__logPushRight(__cObject,currentXBucket+1,currentYBucket);												\
 	} else if (	(__cObject->ybound[1] >= tbucketBottom)	&&	(currentYBucket < CRenderer::yBucketsMinusOne)) {	\
 		int	xb	=	xbucket(__cObject->xbound[0]);																\
 		if (xb < 0)	xb = 0;																						\
@@ -73,7 +132,9 @@
 		assert(buckets[currentYBucket+1][xb] != NULL);															\
 																												\
 		objectExplicitInsert(__cObject,xb,currentYBucket+1);													\
+		__logPushDown(__cObject,xb,currentYBucket+1);															\
 	} else {																									\
+		__logPushDiscard(__cObject,currentXBucket,currentYBucket);												\
 		__cObject->next[thread]	=	objectsToDelete;															\
 		objectsToDelete			=	__cObject;																	\
 	}
@@ -224,8 +285,9 @@ void		CReyes::renderingLoop() {
 
 		// Process the job
 		if (job.type == CRenderer::CJob::TERMINATE) {
-
-			// End the context
+			
+			// End the context, cleanup of incomplete buckets
+			// is in the destructor
 			break;
 		} else if (job.type == CRenderer::CJob::BUCKET) {
 			const int	x	=	job.xBucket;
@@ -266,6 +328,8 @@ void	CReyes::render() {
 	CRasterObject	*cObject;
 	CPqueue			objectQueue;
 
+	__logBucketStart(currentXBucket,currentYBucket);
+
 	// Initialize the opaque depths
 	maxDepth					=	C_INFINITY;
 	culledDepth					=	C_INFINITY;
@@ -277,6 +341,7 @@ void	CReyes::render() {
 	int				noObjects	=	TRUE;
 	cBucket->queue				=	&objectQueue;
 	while((cObject=cBucket->objects) != NULL)	{
+		__logObjectDequeue(cObject,currentXBucket,currentYBucket);
 		cBucket->objects		=	cObject->next[thread];
 		objectQueue.insert(cObject);
 	}
@@ -297,6 +362,8 @@ void	CReyes::render() {
 		// Is the object behind the maximum opaque depth ?
 		if (cObject->zmin < culledDepth) {
 			
+			__logObjectRasterizeDice(cObject,currentXBucket,currentYBucket);
+
 			// Is this a grid ?
 			if (cObject->grid) {
 				CRasterGrid	*grid	=	(CRasterGrid *) cObject;
@@ -356,12 +423,14 @@ void	CReyes::render() {
 			buckets[currentYBucket][currentXBucket]	=	NULL;
 
 			// Defer the current object
+			__logObjectOpacityCull(cObject,currentXBucket,currentYBucket);
 			objectDefer(cObject);
 
 			// Defer the rest of the objects
 			for (;i>0;i--) {
 				cObject			=	*allObjects++;
 				culledDepth		=	min(culledDepth,cObject->zmin);
+				__logObjectOpacityCull(cObject,currentXBucket,currentYBucket);
 				objectDefer(cObject);
 			}
 
@@ -378,6 +447,8 @@ void	CReyes::render() {
 			break;
 		}
 	}
+
+	__logBucketTerminate(currentXBucket,currentYBucket);
 
 	// All objects must be processed
 	buckets[currentYBucket][currentXBucket]	=	NULL;
@@ -447,8 +518,12 @@ void	CReyes::skip() {
 	// Defer the objects
 	osLock(bucketMutex);
 	cBucket	= buckets[currentYBucket][currentXBucket];
+
+	__logBucketSkip(currentXBucket,currentBucket);
+
 	while((cObject = cBucket->objects) != NULL) {
 		cBucket->objects	=	cObject->next[thread];
+		__logObjectSkip(cObject,currentXBucket,currentBucket);
 		objectDefer(cObject);
 	}
 
@@ -1243,6 +1318,9 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 
 	// Detach from the object
 	dObject->object->detach();
+	
+	__logObjectDelete(dObject,currentXBucket,currentYBucket);
+	__recordObjectDelete(dObject);
 
 	if (dObject->grid)	{
 		CRasterGrid *grid	=	(CRasterGrid *) dObject;
@@ -1550,6 +1628,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 		CReyes		*hider	=	(CReyes *) CRenderer::contexts[i];
 		int			bx		=	sx;
 		int			by		=	sy;
+		int			killObj	=	FALSE;
 		CBucket		*cBucket;
 
 		// Secure the area
@@ -1558,24 +1637,42 @@ void	CReyes::insertObject(CRasterObject *object) {
 		// Determine the bucket
 		if (by <= hider->currentYBucket) {
 			by	=	hider->currentYBucket;
-			if (bx < hider->currentXBucket)	bx	=	hider->currentXBucket;
+			if (ey < hider->currentYBucket) {
+				// This must have been caused by dicing an
+				// object which was previously occluded, resulting
+				// in objects in previous buckets, so we will
+				// cause a deletion
+				killObj = TRUE;
+			}
+			if (bx < hider->currentXBucket)	{
+				bx	=	hider->currentXBucket;
+				if (ey == hider->currentYBucket && ex < hider->currentXBucket) {
+					// This must have been caused by dicing an
+					// object which was previously occluded, resulting
+					// in objects in previous buckets, so we will
+					// cause a deletion
+					killObj = TRUE;
+				}
+			}
 		} else {
 			if (bx < 0)	bx	=	0;
 		}
 
 		// We must be in bounds
-		if ((bx < CRenderer::xBuckets) && (by < CRenderer::yBuckets)) {
+		if (!killObj && (bx < CRenderer::xBuckets) && (by < CRenderer::yBuckets)) {
 
 			// Normally, this bucket must almost exist
 			// But because there is a mutex release between the time we set the bucket to NULL
 			// and increment the bucket index, buckets[currentYBucket][currentXBucket] may be NULL
 			// ---We can actually eliminate this while loop pretty easily---
-			while((cBucket = hider->buckets[by][bx]) == NULL) {
-				bx++;
-				if (bx == CRenderer::xBuckets) {
-					bx	=	0;
-					by++;
-					if (by == CRenderer::yBuckets) {
+			int cx = bx,cy = by;
+			while((cBucket = hider->buckets[cy][cx]) == NULL) {
+				cx++;
+				if (cx == CRenderer::xBuckets || cx > ex) {
+					// push down _only_
+					cx	=	sx;
+					cy++;
+					if (cy == CRenderer::yBuckets || cy > ey) {
 						break;
 					}
 				}
@@ -1585,6 +1682,8 @@ void	CReyes::insertObject(CRasterObject *object) {
 			if (cBucket != NULL) {
 				// Insert the object	
 				refCount++;
+				
+				__logObjectInsert(cObject,cx,cy,i,cBucket->queue != NULL);
 				
 				if (cBucket->queue == NULL) {
 					// The thread has not processed this bucket yet
@@ -1604,6 +1703,8 @@ void	CReyes::insertObject(CRasterObject *object) {
 	// Check if we need to delete this object
 	osLock(object->mutex);
 
+	__recordObjectInsert(object,refCount);
+	
 	// Compute the reference count
 	refCount	=	refCount + object->refCount - (CRenderer::numThreads + 1);
 	assert(refCount >= 0);
@@ -1611,6 +1712,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 
 	// Did we kill the object ?
 	if (refCount == 0) {
+		object->refCount	=	0;	// restore a null reference count before deletion
 		deleteObject(object);
 	} else {
 		object->refCount	=	refCount;
