@@ -346,12 +346,12 @@ void	CReyes::render() {
 
 			
 		} else {
+			osLock(bucketMutex);
+
 			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
 			int				i					=	objectQueue.numItems - 1;
 			CRasterObject	*objectsToDelete	=	NULL;
 			
-			osLock(bucketMutex);
-
 			// We killed this bucket
 			buckets[currentYBucket][currentXBucket]	=	NULL;
 
