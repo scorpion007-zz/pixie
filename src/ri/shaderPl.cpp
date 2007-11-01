@@ -895,3 +895,18 @@ void	CGatherLookup::bind(const char *name,int &opIndex,int step,void *data,CShad
 		addOutput(name,opIndex,shader);
 	}
 }
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CGatherLookup
+// Method				:	init
+// Description			:	Init the gather parameters
+// Return Value			:	-
+// Comments				:
+void	CGatherLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
+	scratch->traceParams.samples		=	1;
+	scratch->traceParams.bias			=	attributes->bias;
+	scratch->gatherParams.distribution	=	NULL;
+	scratch->traceParams.sampleBase		=	1;
+	scratch->traceParams.maxDist		=	C_INFINITY;
+	scratch->traceParams.label			=	rayLabelGather;
+}

@@ -168,10 +168,9 @@ void	CPatch::dice(CShadingContext *r) {
 		int				numUprobes		=	attributes->numUProbes;
 		int				numVprobes		=	attributes->numVProbes;
 		float			**varying		=	r->currentShadingState->varying;
-		int				numTries;
 
 		// Estimate the grid size until convergence
-		for(numTries=0;numTries<5;numTries++) {
+		for(int numTries=0;numTries<5;++numTries) {
 
 			// Sample points on the patch
 			const double	ustart			=	umin;
@@ -224,7 +223,79 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+
+
+
+
+
+// FIXME: correct this
+#if 0
+
+
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// OK, we sampled the surface but is it accurate enough?
+			// To verify it compare the numerical derivative against the analytical one
+			// FIXME: We may want to do the centered derivative estimate here
+
+
+			// Compare the derivatives
+			bool		inconsistent	=	false;
+			const float	*P				=	varying[VARIABLE_P];
+			const float	*dPdu			=	varying[VARIABLE_DPDU];
+			for (int i=0;i<numVprobes;++i) {
+				const float	*cP			=	P + i*numUprobes*3;
+				const float	*cdPdu		=	dPdu + i*numUprobes*3;
+				for (int j=numUprobes-1;j>0;--j,cP+=3,cdPdu+=3) {
+					vector	D1,D2;
+					subvv(D1,cP + 3,cP);
+					mulvf(D2,cdPdu,(float) ustep);
+					subvv(D2,D1);
+					if (dotvv(D2,D2) > 0.25f*dotvv(D1,D1)) {		// More than %50 relative error?
+						inconsistent	=	true;
+						break;
+					}
+				}
+
+				if (inconsistent) break;
+			}
+
+			// Are we still going?
+			if (inconsistent == false) {
+				const float	*dPdv			=	varying[VARIABLE_DPDV];
+				for (int i=0;i<numUprobes;++i) {
+					const float	*cP			=	P + i*3;
+					const float	*cdPdv		=	dPdv + i*3;
+					const int	step		=	numUprobes*3;
+					for (int j=numVprobes-1;j>0;--j,cP+=step,cdPdv+=step) {
+						vector	D1,D2;
+						subvv(D1,cP + step,cP);
+						mulvf(D2,cdPdv,(float) vstep);
+						subvv(D2,D1);
+						if (dotvv(D2,D2) > 0.25f*dotvv(D1,D1)) {	// More than %50 relative error?
+							inconsistent	=	true;
+							break;
+						}
+					}
+
+					if (inconsistent) break;
+				}
+			}
+
+			// OK, if we're inconsistent, this probe was not accurate enough
+			if (inconsistent) {
+				// Let's double the probes and re-estimate
+				numUprobes	*=	2;
+				numVprobes	*=	2;
+				continue;
+			}
+
+#endif
+
+
+
+
+
 			cullFlags			&=	cull(bmin,bmax,varying[VARIABLE_P],varying[VARIABLE_N],k,attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED,disableCull);
 
 //FIXME: implies if either end is culled we cull - wrong

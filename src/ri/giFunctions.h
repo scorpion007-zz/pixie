@@ -377,8 +377,9 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lastGather->nonShadeOutputVars		=	lookup->nonShadeOutputs;					\
 								lastGather->remainingSamples		=	(int) *samples;								\
 								lastGather->numMisses				=	0;											\
-								lastGather->label					=	(scratch->traceParams.label == NULL ? rayLabelGather : scratch->traceParams.label);					\
+								lastGather->label					=	scratch->traceParams.label;					\
 								lastGather->numSamples				=	(int) *samples;								\
+								assert(lastGather->label != NULL);													\
 																													\
 								CGatherVariable	*var;																\
 								int				cOutput;															\

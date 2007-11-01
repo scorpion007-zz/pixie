@@ -268,6 +268,7 @@ public:
 
 	void					addOutput(const char *,int,CShaderInstance *shader);
 	void					bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
+	void					init(CShadingScratch *scratch,const CAttributes *attributes);
 
 	CGatherVariable			*outputs;				// These are the outputs that require shading
 	int						numOutputs;				// The number of outputs
