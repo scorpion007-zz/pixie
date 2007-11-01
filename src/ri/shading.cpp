@@ -719,14 +719,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		displacement	=	currentAttributes->displacement;
 		surface			=	NULL;
 		atmosphere		=	NULL;
-		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
-		
-		if (usedParameters & PARAMETER_MESSAGEPASSING) {
-			// displacement shader uses messsage passing, must prepare but not execute
-			// the surface and atmosphere shaders
-			if (currentAttributes->surface != NULL)			locals[ACCESSOR_SURFACE]		=	currentAttributes->surface->prepare(shaderStateMemory,varying,numVertices);
-			if (currentAttributes->atmosphere != NULL)		locals[ACCESSOR_ATMOSPHERE]		=	currentAttributes->atmosphere->prepare(shaderStateMemory,varying,numVertices);
-		}
+
+		// Note: we check for message passing with displacement and prepare appopriately below
 	}
 
 	
@@ -744,6 +738,20 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
 	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
 	if (atmosphere != NULL)							locals[ACCESSOR_ATMOSPHERE]		=	atmosphere->prepare(shaderStateMemory,varying,numVertices);
+
+	if (displaceOnly == TRUE) {
+		// Verify if we have to prepare other shaders, even though displacing
+		// due to message passing this _has_ to be after the shaderStateMemory checkPoint
+		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
+		
+		if (usedParameters & PARAMETER_MESSAGEPASSING) {
+			// displacement shader uses messsage passing, must prepare but not execute
+			// the surface and atmosphere shaders
+			if (currentAttributes->surface != NULL)			locals[ACCESSOR_SURFACE]		=	currentAttributes->surface->prepare(shaderStateMemory,varying,numVertices);
+			if (currentAttributes->atmosphere != NULL)		locals[ACCESSOR_ATMOSPHERE]		=	currentAttributes->atmosphere->prepare(shaderStateMemory,varying,numVertices);
+		}
+	}
+
 	
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 
