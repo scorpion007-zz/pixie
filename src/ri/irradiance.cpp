@@ -833,7 +833,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 		rMean					*=	0.5f;
 
 		// Clamp the radius of validity
-		rMean					=	min(rMean,(CRenderer::lengthA*scratch->occlusionParams.maxPixelDist + CRenderer::lengthB));
+		rMean					=	min(rMean,(CRenderer::lengthA*scratch->occlusionParams.maxPixelDist*dPscale + CRenderer::lengthB));
 		rMean					=	min(rMean,db*dPscale*5.0f);
 				
 		// Record the data (in the target coordinate system)
@@ -986,7 +986,7 @@ void		CIrradianceCache::draw() {
 
 			movvv(cP,cSample->P);
 			movvv(cN,cSample->N);
-			*cdP		=	cSample->dP*0.5f;
+			*cdP		=	cSample->dP;
 			movvv(cC,cSample->irradiance);
 		}
 
