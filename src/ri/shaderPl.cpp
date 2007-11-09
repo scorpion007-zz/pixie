@@ -543,6 +543,8 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.pointHierarchyName));
 	} else if (strcmp(name,"maxpixeldist") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.maxPixelDist));
+	} else if (strcmp(name,"maxsolidangle") == 0) {
+		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.maxSolidAngle));
 	} else if (strcmp(name,"environmentcolor") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.environmentColor));
 	} else if (strcmp(name,"maxBrightness") == 0) {
