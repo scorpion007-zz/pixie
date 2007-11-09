@@ -2565,7 +2565,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 					warning(CODE_BADTOKEN,"Deprecated attribute \"%s\" will be ignored\n",tokens[i]);
 				attributeCheck(RI_MAXSUBDIVISION,			dummy,				1, 100000,int)
 					warning(CODE_BADTOKEN,"Deprecated attribute \"%s\" will be ignored\n",tokens[i]);
-				attributeCheck(RI_MINSPLITS,				attributes->minSplits,					1, 100000,int)
+				attributeCheck(RI_MINSPLITS,				attributes->minSplits,					0, 100000,int)
 				attributeCheck(RI_BOUNDEXPAND,				attributes->rasterExpand,				-C_INFINITY, C_INFINITY,float)				
 				attributeCheckFlag(RI_BINARY,				attributes->flags,						ATTRIBUTES_FLAGS_BINARY_DICE)
 				attributeCheckInvertFlag(RI_RASTERORIENT,	attributes->flags,						ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)
