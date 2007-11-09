@@ -51,6 +51,12 @@ public:
 	void		rasterBegin(int,int,int,int,int);
 	void		rasterDrawPrimitives(CRasterGrid *);
 	void		rasterEnd(float *,int);
+
+protected:
+	int			probeArea(int *xbound,int *ybound, int bw, int bh, int bl, int bt, float zmin) {
+					return probeRect(xbound,ybound,bw,bh,bl,bt,zmin);
+				}
+	
 private:
 
 	///////////////////////////////////////////////////////////////////////

@@ -394,8 +394,26 @@ void	CReyes::render() {
 
 				// Did we dice this object before ?
 				if (cObject->diced == FALSE) {
-					cObject->object->dice(this);
-					cObject->diced	=	TRUE;
+					if(probeArea(cObject->xbound,cObject->ybound,
+						tbucketRight-tbucketLeft,
+						tbucketBottom-tbucketTop,
+						tbucketLeft,
+						tbucketTop,
+						cObject->zmin)) {
+
+						cObject->object->dice(this);
+						cObject->diced	=	TRUE;
+					} else {
+						// We have discovered that the object is occluded
+						// defer it
+						CRasterObject		*objectsToDelete	=	NULL;
+						osUnlock(cObject->mutex);
+						osLock(bucketMutex);				
+						objectDefer(cObject);
+						osUnlock(bucketMutex);
+						flushObjects(objectsToDelete);
+						continue;
+					}
 				}
 
 				cObject->refCount--;
@@ -725,7 +743,7 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 	CRasterGrid			*nGrid;
 
 	// Initialize the grid
-	nGrid			=	newGrid(object,(udiv+1)*(vdiv+1));	
+	nGrid			=	newGrid(object,FALSE,(udiv+1),(vdiv+1));	
 	nGrid->dim		=	SHADING_2D_GRID;
 	nGrid->umin		=	umin;
 	nGrid->umax		=	umax;
@@ -752,7 +770,7 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
 															// Create the grid
-	nGrid			=	newGrid(object,numPoints);
+	nGrid			=	newGrid(object,TRUE,numPoints,1);
 	nGrid->dim		=	SHADING_0D;
 	nGrid->umin		=	0;
 	nGrid->umax		=	0;
@@ -1279,8 +1297,10 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 // Description			:	Initialize a grid by copying the points
 // Return Value			:	-
 // Comments				:	Thread safe
-CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
+CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int points,int numVerticesU,int numVerticesV) {
 	CRasterGrid		*grid;
+
+	int numVertices = numVerticesU*numVerticesV;
 
 	grid				=	new CRasterGrid;
 	grid->next			=	new CRasterObject*[CRenderer::numThreads];
@@ -1293,8 +1313,13 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int numVertices) {
 	// Allocate grid specific fields
 	grid->numVertices	=	numVertices;
 	grid->vertices		=	new float[numVertices*numVertexSamples];
-	grid->bounds		=	new int[numVertices*4];
-	grid->sizes			=	new float[numVertices*2];
+	if (points) {
+		grid->bounds	=	new int[numVertices*4];
+		grid->sizes		=	new float[numVertices*2];
+	} else {
+		grid->bounds	=	new int[(numVerticesU-1)*(numVerticesV-1)*4];
+		grid->sizes		=	NULL;
+	}
 
 	object->attach();
 
@@ -1334,7 +1359,7 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		delete [] dObject->next;
 		delete [] grid->vertices;
 		delete [] grid->bounds;
-		delete [] grid->sizes;
+		if (grid->sizes != NULL) delete [] grid->sizes;
 		delete grid;
 	} else {
 
@@ -1559,8 +1584,6 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 				bounds[2]	=	(int) floor(ybound[0]);		// ymin
 				bounds[3]	=	(int) floor(ybound[1]);		// ymax
 			}
-
-			bounds+=4;
 		}
 
 		// Check if we have xtreme mb/dof

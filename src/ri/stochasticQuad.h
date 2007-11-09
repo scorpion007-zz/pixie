@@ -506,7 +506,6 @@ for (y=ymin;y<=ymax;y++) for (x=xmin;x<=xmax;x++) {
 				drawPixelCheck();
 			}
 		}
-		bounds		+=	4;
 		vertices	+=	numVertexSamples;
 	}
 }
@@ -727,7 +726,6 @@ for (j=0;j<vdiv;j++) {
 #endif
 	}
 
-	bounds		+=	4;
 	vertices	+=	numVertexSamples;
 }
 

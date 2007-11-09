@@ -237,6 +237,11 @@ protected:
 	static	int					numVertexSamples;								// The number of samples per pixel	
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
+
+	virtual int					probeArea(int *xbound,int *ybound, int bw, int bh, int bl, int bt, float zmin) {
+									return TRUE;
+								}
+
 private:
 	void						copyPoints(int,float **,float *,int);			// Data movement (copy P only)
 	void						copySamples(int,float **,float *,int);			// Data movement (copy the color + opacity + extra samples)
@@ -245,7 +250,7 @@ private:
 	void						insertGrid(CRasterGrid *,int);					// Insert a grid into the correct bucket
 
 	CRasterObject				*newObject(CObject *);							// Create a new object
-	CRasterGrid					*newGrid(CSurface *,int);						// Create a new grid
+	CRasterGrid					*newGrid(CSurface *,int,int,int);				// Create a new grid
 	void						deleteObject(CRasterObject *);					// Delete an object (the object can also be a grid)
 	
 	void						render();										// Render the current bucket
