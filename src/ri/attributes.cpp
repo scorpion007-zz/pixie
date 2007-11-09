@@ -103,8 +103,8 @@ CAttributes::CAttributes() {
 
 	numUProbes					=	4;
 	numVProbes					=	4;
-	minSplits					=	2;
-	rasterExpand				=	0.5f;
+	minSplits					=	0;		// This should no longer be needed with convergent dicing
+	rasterExpand				=	0.5f;	// This could be significantly lowered for many primitives
 	bias						=	0.01f;
 
 	transmissionHitMode			=	'p';
