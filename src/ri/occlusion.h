@@ -59,8 +59,7 @@ public:
 	virtual			~COcclusionCuller();
 protected:
 	void			initCuller(int,float *);
-	int				probeTri(const float *,const float *,const float *);
-	int				probeQuad(const float *,const float *,const float *);
+	int				probeRect(int *xbound,int *ybound, int bl, int bt, int br, int bb, float zmin);	
 
 	void			resetHierarchy(COcclusionNode *cNode=NULL);
 	void			initToZero();
@@ -108,7 +107,7 @@ private:
 	float			*maxOpaqueDepth;
 
 
-	COcclusionNode	*newNode(COcclusionNode *,int,int,int);
+	COcclusionNode	*newNode(COcclusionNode *,int w,int d,int nodeOffset,int x,int y);
 };
 
 

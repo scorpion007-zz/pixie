@@ -57,11 +57,13 @@ COcclusionCuller::~COcclusionCuller() {
 // Return Value			:	-
 // Comments				:
 void	COcclusionCuller::initCuller(int w,float *ma) {
-	for (depth=0,width=1;width < w;depth++,width=width<<1);
+	int sizeRequirements = 0;
+	for (depth=0,width=1;width < w;depth++,width=width<<1) sizeRequirements+=width*width;
+	sizeRequirements += width*width;
 
 	// (globalMemory is checkpointed)
-	nodes			=	(COcclusionNode **) ralloc(width*width*sizeof(COcclusionNode *),CRenderer::globalMemory);
-	root			=	newNode(NULL,width,0,0);
+	nodes			=	(COcclusionNode **) ralloc(sizeRequirements*sizeof(COcclusionNode *),CRenderer::globalMemory);
+	root			=	newNode(NULL,width,0,sizeRequirements,0,0);
 	maxOpaqueDepth	=	ma;
 }
 
@@ -118,18 +120,23 @@ void	COcclusionCuller::initToZero() {
 // Description			:	Allocate a new occlusion node
 // Return Value			:	-
 // Comments				:
-COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int x,int y) {
+COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int d,int nodeOffset,int x,int y) {
 	// (globalMemory is checkpointed)
 	COcclusionNode	*cNode	=	(COcclusionNode *) ralloc(sizeof(COcclusionNode),CRenderer::globalMemory);
 
 	cNode->parent		=	p;
 	cNode->width		=	w;
 
+	nodeOffset -= (1<<d)*(1<<d);
+
 	if (w > 1) {
-		cNode->children[0]	=	newNode(cNode,w >> 1,(x << 1)		, (y << 1));
-		cNode->children[1]	=	newNode(cNode,w >> 1,(x << 1) + 1	, (y << 1));
-		cNode->children[2]	=	newNode(cNode,w >> 1,(x << 1) + 1	, (y << 1) + 1);
-		cNode->children[3]	=	newNode(cNode,w >> 1,(x << 1)		, (y << 1) + 1);
+		nodes[nodeOffset + (y<<d) + x] = cNode;
+
+		cNode->children[0]	=	newNode(cNode,w >> 1,d+1,nodeOffset,(x << 1)		, (y << 1));
+		cNode->children[1]	=	newNode(cNode,w >> 1,d+1,nodeOffset,(x << 1) + 1	, (y << 1));
+		cNode->children[2]	=	newNode(cNode,w >> 1,d+1,nodeOffset,(x << 1) + 1	, (y << 1) + 1);
+		cNode->children[3]	=	newNode(cNode,w >> 1,d+1,nodeOffset,(x << 1)		, (y << 1) + 1);
+
 	} else {
 		nodes[(y << depth) + x]	=	cNode;
 
@@ -142,3 +149,69 @@ COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,in
 	return cNode;
 }
 
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	COcclusionCuller
+// Method				:	probeRect
+// Description			:	descover whether a region would be culled
+// Return Value			:	-
+// Comments				:
+int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl, int bt, float zmin) {
+
+	int nodeOffset=0;
+	int queryDepth = depth;
+
+	int xmin;
+	int xmax;
+	int ymin;
+	int ymax;
+	
+	// search for a small enough query area, to keep query cost down
+	// this has the nice property that large objects are less accurately
+	// queried than small ones (where there are chance to be many)
+	for(;queryDepth>0;queryDepth--) {
+
+		xmin				=	xbound[0] - bl;
+		xmax				=	xbound[1] - bl;
+		ymin				=	ybound[0] - bt;
+		ymax				=	ybound[1] - bt;
+
+		xmin = xmin>>(depth-queryDepth);
+		xmax = xmax>>(depth-queryDepth);
+		ymin = ymin>>(depth-queryDepth);
+		ymax = ymax>>(depth-queryDepth);
+
+		// Clamp the bound in the current bucket
+		xmin					=	max(xmin,0);
+		ymin					=	max(ymin,0);
+//		xmax					=	min(xmax,(1<<queryDepth)-1);
+//		ymax					=	min(ymax,(1<<queryDepth)-1);
+		xmax					=	min(xmax,(bw>>(depth-queryDepth))-1);
+		ymax					=	min(ymax,(bh>>(depth-queryDepth))-1);
+
+		// Something odd occurred, abort
+		if (xmin > xmax) return FALSE;
+		if (ymin > ymax) return FALSE;
+
+		// terminate search if we find a sufficiently small area
+		if ((xmax-xmin) <= 4) break;
+		if ((ymax-ymin) <= 4) break;
+	
+		nodeOffset+=(1<<queryDepth)*(1<<queryDepth);
+	}
+
+	// now that we worked out the depth, do the query
+	COcclusionNode **n = nodes + nodeOffset + (ymin<<queryDepth) + xmin;
+	for(int y=ymin;y<=ymax;y++) {
+		COcclusionNode **ne = n;
+		for(int x=xmin;x<=xmax;x++) {
+			
+			if (zmin <= (*ne)->zmax) return TRUE;
+			
+			ne++;
+		}
+		n += 1<<queryDepth;
+	}
+	return FALSE;
+}
