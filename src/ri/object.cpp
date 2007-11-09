@@ -587,7 +587,9 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 // Comments				:
 void				CSurface::dice(CShadingContext *rasterizer) {
 
-	CPatch	*cSurface	=	new CPatch(attributes,xform,this,0,1,0,1,0,attributes->minSplits);
+	int minSplits = max(attributes->minSplits,getMinSplits());
+
+	CPatch	*cSurface	=	new CPatch(attributes,xform,this,0,1,0,1,0,minSplits);
 	cSurface->attach();
 	cSurface->dice(rasterizer);
 	cSurface->detach();

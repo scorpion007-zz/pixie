@@ -54,6 +54,8 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
+		int				getMinSplits() { return 2; }
+
 private:
 		CParameter		*parameters;
 		unsigned int	parametersF;
@@ -79,6 +81,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
+		int				getMinSplits() { return 2; }
 
 private:
 		CParameter		*parameters;
@@ -105,6 +109,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
+		int				getMinSplits() { return 2; }
 
 private:
 		CParameter		*parameters;
@@ -131,6 +137,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
+		int				getMinSplits() { return 2; }
 
 private:
 		CParameter		*parameters;
@@ -157,6 +165,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
+		int				getMinSplits() { return 2; }
 
 private:
 		CParameter		*parameters;
@@ -182,6 +192,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
+		int				getMinSplits() { return 2; }
 
 private:
 		CParameter		*parameters;
@@ -209,6 +221,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
+		
+		int				getMinSplits() { return 2; }
 
 private:
 		CParameter		*parameters;
