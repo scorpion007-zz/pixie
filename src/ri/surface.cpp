@@ -223,14 +223,12 @@ void	CPatch::dice(CShadingContext *r) {
 			}
 			
 			assert(k <= (int) CRenderer::maxGridSize);
-			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
-
-
-
-
 
 // FIXME: correct this
-#if 0
+#if 1
+			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
+#else
+			r->displaceEstimate(object,numUprobes,numVprobes,SHADING_2D_GRID,PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_N | PARAMETER_BEGIN_SAMPLE);
 
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,11 +371,6 @@ void	CPatch::dice(CShadingContext *r) {
 
 			// Check the size ... If we're too big, we should be split
 			if ((udiv+1)*(vdiv+1) > CRenderer::maxGridSize)	{
-
-				if (depth > 10) {
-					float	ar	=	vdiv / (float) udiv;
-				}
-
 				break;
 			}
 
