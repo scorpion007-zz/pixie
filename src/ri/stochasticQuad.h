@@ -213,7 +213,7 @@
 		drawExtraSamples();																		\
 		depthFilterIf();																		\
 		pixel->z				=	z;															\
-		touchNode(pixel->node,z);																\
+		depthFilterTouchNode();																	\
 	} depthFilterElse();
 
 #endif
@@ -297,7 +297,7 @@
 		drawExtraSamples();																	\
 		depthFilterIf();																	\
 		pixel->z				=	z;														\
-		touchNode(pixel->node,z);															\
+		depthFilterTouchNode();																\
 	} depthFilterElse();
 
 #endif

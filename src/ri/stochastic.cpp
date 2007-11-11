@@ -239,9 +239,11 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 // The following macros help various fragment operations
 #define depthFilterIfZMin()
 #define depthFilterElseZMin()
+#define depthFilterTouchNodeZMin()	touchNode(pixel->node,z);
 
-#define depthFilterIfZMid()		pixel->zold		=	pixel->z;
-#define depthFilterElseZMid()	else {	pixel->zold	=	min(pixel->zold,z);	}
+#define depthFilterIfZMid()			pixel->zold		=	pixel->z;
+#define depthFilterElseZMid()		else {	pixel->zold	=	min(pixel->zold,z);	}
+#define depthFilterTouchNodeZMid()	touchNode(pixel->node,pixel->zold);
 
 
 // This macro is used to insert a fragment into the linked list for a pixel
@@ -362,7 +364,7 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 			if (z < pixel->z) {																		\
 				dfIf();																				\
 				pixel->z			=	z;															\
-				touchNode(pixel->node,z);															\
+				depthFilterTouchNode();																\
 			} dfElse();																				\
 			break;																					\
 		}																							\
@@ -558,7 +560,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				// Q: Why not just use zold?
 				// A: It doesn't take account of transparent samples
 				
-				for (;cSample!=NULL;) {
+				for (cSample=cSample->next;cSample!=NULL;) {
 					const float *opacity	= cSample->opacity;
 	
 					if (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0) {
@@ -576,10 +578,12 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					}
 				}
 				if (cSample == NULL) {
-					Z2[0]	=	C_INFINITY;
+					// no second sample, use the first (we have one, 
+					// otherwise we'd be in the first case)
+					Z2[0]	=	Z[0];
 				}
 				Z2[0] = max(Z2[0],cPixel->zold);
-			}
+ 			}
 			
 			#undef NonCompositeSampleLoop
 			#undef copyNonCompSamples

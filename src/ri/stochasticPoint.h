@@ -198,7 +198,7 @@ const	int	yres		=	sampleHeight - 1;
 		drawExtraSamples();															\
 		depthFilterIf();															\
 		pixel->z						=	z;										\
-		touchNode(pixel->node,z);													\
+		depthFilterTouchNode();														\
 	} depthFilterElse();
 
 
@@ -213,7 +213,7 @@ const	int	yres		=	sampleHeight - 1;
 		drawExtraSamples();															\
 		depthFilterIf();															\
 		pixel->z						=	z;										\
-		touchNode(pixel->node,z);													\
+		depthFilterTouchNode();														\
 	} depthFilterElse();
 
 #endif
