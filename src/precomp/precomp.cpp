@@ -471,9 +471,11 @@ int		precomputeStochasticPrimitivesH() {
 			if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
 				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMid()\n");
 				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMid()\n");
+				fprintf(out,"\t#define depthFilterTouchNode()\tdepthFilterTouchNodeZMid()\n");
 			} else {
 				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMin()\n");
 				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMin()\n");
+				fprintf(out,"\t#define depthFilterTouchNode()\tdepthFilterTouchNodeZMin()\n");
 			}
 			
 			if (i & RASTER_POINT) {
@@ -484,6 +486,7 @@ int		precomputeStochasticPrimitivesH() {
 			
 			fprintf(out,"\t#undef depthFilterIf\n");
 			fprintf(out,"\t#undef depthFilterElse\n");
+			fprintf(out,"\t#undef depthFilterTouchNode\n");
 			
 		
 			if (i & RASTER_MOVING)			fprintf(out,"\t#undef STOCHASTIC_MOVING\n");
