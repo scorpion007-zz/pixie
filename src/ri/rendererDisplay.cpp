@@ -101,6 +101,8 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::fromWorld;
 	} else if (strcmp(name,"NP") == 0) {
 		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::worldToNDC;
+	} else if (strcmp(name,"screen") == 0) {
+		if ((numItems == 16) && (type == FLOAT_PARAMETER))		return	&CRenderer::toScreen;
 	} else if (strcmp(name,"gamma") == 0) {
 		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::gamma;
 	} else if (strcmp(name,"gain") == 0) {
@@ -482,6 +484,7 @@ void	CRenderer::computeDisplayData() {
 	char				deviceFile[OS_MAX_PATH_LENGTH];
 	char				*sampleDefinition,*sampleName,*nextComma,*tmp;
 	int					i,j,k,s,isNewChannel;
+	int					hasZOutput = FALSE;
 
 	// mark all channels as unallocated
 	resetDisplayChannelUsage();
@@ -620,6 +623,12 @@ void	CRenderer::computeDisplayData() {
 			datas[numDisplays].numSamples		+= oChannel->numSamples;
 			dspNumChannels++;
 			
+			// do we cover z?
+			if (oChannel->sampleStart < 5 && (oChannel->sampleStart + oChannel->numSamples >= 5)) {
+				hasZOutput = TRUE;
+			}
+
+			// advance the channel definition
 			sampleName = nextComma;
 		} while((sampleName != NULL) && (*sampleName != '\0'));
 		
@@ -826,6 +835,13 @@ void	CRenderer::computeDisplayData() {
 	assert(numExtraCompChannels + numExtraNonCompChannels == numExtraChannels);
 	assert(k == 2*numExtraChannels);
 
+	// If we are not outputting Z, do not perform midpoint calculations
+	// it is slower and we're not outputting the data
+	if (!hasZOutput && (depthFilter == DEPTH_MID)) {
+		depthFilter = DEPTH_MIN;
+	}
+
+	// No active displays? Abort rendering
 	if (numActiveDisplays == 0) hiderFlags	|=	HIDER_BREAK;
 }
 
