@@ -231,7 +231,6 @@ public:
 	int							numVerticesCreated;
 protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
-	float						culledDepth;									// The depth of the closest culled object
 
 	static	int					extraPrimitiveFlags;							// These are the extra primitive flags
 	static	int					numVertexSamples;								// The number of samples per pixel	

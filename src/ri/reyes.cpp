@@ -332,7 +332,6 @@ void	CReyes::render() {
 
 	// Initialize the opaque depths
 	maxDepth					=	C_INFINITY;
-	culledDepth					=	C_INFINITY;
 
 	// Insert the objects into the queue
 	osLock(bucketMutex);
@@ -357,10 +356,8 @@ void	CReyes::render() {
 	// Process the objects and patches
 	while((cObject = objectQueue.get(bucketMutex)) != NULL) {
 
-		if(CRenderer::depthFilter != DEPTH_MID) culledDepth = maxDepth;
-
 		// Is the object behind the maximum opaque depth ?
-		if (cObject->zmin < culledDepth) {
+		if (cObject->zmin < maxDepth) {
 			
 			__logObjectRasterizeDice(cObject,currentXBucket,currentYBucket);
 
@@ -395,8 +392,8 @@ void	CReyes::render() {
 				// Did we dice this object before ?
 				if (cObject->diced == FALSE) {
 					if(probeArea(cObject->xbound,cObject->ybound,
-						tbucketRight-tbucketLeft,
-						tbucketBottom-tbucketTop,
+						tbucketRight - tbucketLeft + 2*CRenderer::xSampleOffset,
+						tbucketBottom - tbucketTop + 2*CRenderer::ySampleOffset,
 						tbucketLeft,
 						tbucketTop,
 						cObject->zmin)) {
@@ -447,7 +444,6 @@ void	CReyes::render() {
 			// Defer the rest of the objects
 			for (;i>0;i--) {
 				cObject			=	*allObjects++;
-				culledDepth		=	min(culledDepth,cObject->zmin);
 				__logObjectOpacityCull(cObject,currentXBucket,currentYBucket);
 				objectDefer(cObject);
 			}
@@ -1694,6 +1690,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 				if (cx == CRenderer::xBuckets || cx > ex) {
 					// push down _only_
 					cx	=	sx;
+					if (cx < 0) cx = 0;
 					cy++;
 					if (cy == CRenderer::yBuckets || cy > ey) {
 						break;
