@@ -449,12 +449,16 @@ void		CTexture3dLookup::bind(const char *name,int &opIndex,int step,void *data,C
 	} else if (strcmp(name,"radiusscale") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,texture3dParams.radiusScale));
 	} else {
-		assert(data == NULL);	// The data has to be varying
+		if (data == NULL) {
+			// The data has to be varying
 
-		channelIndex[numChannels]	= opIndex;
-		channelSize[numChannels]	= step;
-		channelName[numChannels]	= name;
-		numChannels++;
+			channelIndex[numChannels]	= opIndex;
+			channelSize[numChannels]	= step;
+			channelName[numChannels]	= name;
+			numChannels++;
+		} else {
+			warning(CODE_BADTOKEN,"warning, uniform texture3d parameter ignored\n");
+		}
 	}
 }
 
@@ -558,12 +562,16 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 		// This is a uniform parameter
 		add(name,opIndex,step,data,offsetof(CShadingScratch,occlusionParams.cacheMode));
 	} else {
-		assert(data == NULL);	// The data has to be varying
+		if (data == NULL) {
+			// The data has to be varying
 
-		channelIndex[numChannels]	= opIndex;
-		channelSize[numChannels]	= step;
-		channelName[numChannels]	= name;
-		numChannels++;
+			channelIndex[numChannels]	= opIndex;
+			channelSize[numChannels]	= step;
+			channelName[numChannels]	= name;
+			numChannels++;
+		} else {
+			warning(CODE_BADTOKEN,"Warning, uniform occlusion / indirectdiffuse parameter ignored\n");
+		}
 	}
 }
 
