@@ -457,7 +457,7 @@ void		CTexture3dLookup::bind(const char *name,int &opIndex,int step,void *data,C
 			channelName[numChannels]	= name;
 			numChannels++;
 		} else {
-			warning(CODE_BADTOKEN,"warning, uniform texture3d parameter ignored\n");
+			warning(CODE_BADTOKEN,"warning, uniform texture3d parameter \"%s\" ignored\n",name);
 		}
 	}
 }
@@ -570,7 +570,7 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 			channelName[numChannels]	= name;
 			numChannels++;
 		} else {
-			warning(CODE_BADTOKEN,"Warning, uniform occlusion / indirectdiffuse parameter ignored\n");
+			warning(CODE_BADTOKEN,"Warning, uniform occlusion / indirectdiffuse parameter \"%s\" ignored\n",name);
 		}
 	}
 }
