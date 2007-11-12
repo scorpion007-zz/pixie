@@ -242,7 +242,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											CPLLookup		*current;												\
 											for (current=plHash[hashKey];current!=NULL;prev=current,current=current->next) {	\
 												/* Is this a hit ?*/												\
-												if ((current->instance != cInstance) || (current->code != code)) {	\
+												if ((current->instance == cInstance) && (current->code == code)) {	\
 													lookup	=	(__class *) current;								\
 													/* Move the hit to the beginning of the list */					\
 													if (prev != NULL) {												\
