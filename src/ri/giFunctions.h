@@ -194,8 +194,10 @@ DEFSHORTFUNC(TraceV				,"trace"				,"c=pv!"		,TRACEEXPR_PRE,TRACEEXPR,TRACEEXPR_
 									const char *mode = scratch->occlusionParams.cacheMode;											\
 									if (scratch->occlusionParams.pointHierarchyName != NULL)	mode = ""; /* prevent writes */		\
 									lookup->map	=	cache		=	CRenderer::getCache(scratch->occlusionParams.cacheHandle,mode,from,to);	\
-									if (scratch->occlusionParams.environmentMapName != NULL)	lookup->environment		=	CRenderer::getEnvironment(scratch->occlusionParams.environmentMapName);								\
-									if (scratch->occlusionParams.pointHierarchyName != NULL)	lookup->pointHierarchy	=	CRenderer::getTexture3d(scratch->occlusionParams.pointHierarchyName,FALSE,"_area",from,to,TRUE);	\
+									if (scratch->occlusionParams.environmentMapName != NULL && 										\
+										scratch->occlusionParams.environmentMapName[0] != 0)	lookup->environment		=	CRenderer::getEnvironment(scratch->occlusionParams.environmentMapName);								\
+									if (scratch->occlusionParams.pointHierarchyName != NULL &&										\
+										scratch->occlusionParams.pointHierarchyName[0] != 0)	lookup->pointHierarchy	=	CRenderer::getTexture3d(scratch->occlusionParams.pointHierarchyName,FALSE,"_area",from,to,TRUE);	\
 									cache->resolve(lookup->numChannels,lookup->channelName,lookup->channelEntry,lookup->channelSize);															\
 									osUnlock(CRenderer::shaderMutex);																\
 								}																									\
