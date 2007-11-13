@@ -589,7 +589,7 @@ void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 	scratch->occlusionParams.maxBrightness		=	1.0f;					// Upper limit on the maximum brightness
 	scratch->occlusionParams.environmentMapName	=	NULL;					// No environment map by default
 	scratch->occlusionParams.pointHierarchyName	=	NULL;					// No point hierarchy
-	scratch->occlusionParams.maxPixelDist		=	50.0f;					// The maximum distance between samples
+	scratch->occlusionParams.maxPixelDist		=	attributes->irradianceMaxPixelDistance;		// The maximum distance between samples
 	scratch->occlusionParams.maxSolidAngle		=	0.05f;					// The maximum solid angle
 	scratch->occlusionParams.occlusion			=	FALSE;					// Overwritten on the fly
 	initv(scratch->occlusionParams.environmentColor,0);						// The background color for irradiance
