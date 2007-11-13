@@ -161,6 +161,7 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 
 	int nodeOffset=0;
 	int queryDepth = depth;
+	int w=bw,h=bh;
 
 	int xmin;
 	int xmax;
@@ -183,12 +184,19 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		ymax	=	ymax>>(depth-queryDepth);
 
 		// Clamp the bound in the current bucket
-		xmin	=	max(xmin,0);
-		ymin	=	max(ymin,0);
-//		xmax	=	min(xmax,(1<<queryDepth)-1);
-//		ymax	=	min(ymax,(1<<queryDepth)-1);
-		xmax	=	min(xmax,(bw>>(depth-queryDepth))-1);
-		ymax	=	min(ymax,(bh>>(depth-queryDepth))-1);
+		xmin					=	max(xmin,0);
+		ymin					=	max(ymin,0);
+			// This is correct but inefficient due to querying
+//		xmax					=	min(xmax,(1<<queryDepth)-1);
+//		ymax					=	min(ymax,(1<<queryDepth)-1);
+//			// This is incorrect because it doesn't account for buckets straddling bucket edge
+//		xmax					=	min(xmax,(bw>>(depth-queryDepth))-1);
+//		ymax					=	min(ymax,(bh>>(depth-queryDepth))-1);
+	
+			// This is correct, but uses reccurance
+		xmax					=	min(xmax,w-1);
+		ymax					=	min(ymax,h-1);
+// (bw*2+(1<<d))>>d is equivalent but probably slower
 
 		// Something odd occurred, abort
 		if (xmin > xmax) return FALSE;
@@ -198,7 +206,12 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		if ((xmax-xmin) <= 4) break;
 		if ((ymax-ymin) <= 4) break;
 	
+		// update offset
 		nodeOffset				+=	(1<<queryDepth)*(1<<queryDepth);
+		
+		// Deal with odd sized buckets at this depth
+		h = (h+(h&1))>>1;
+		w = (w+(w&1))>>1;
 	}
 
 	// now that we worked out the depth, do the query
