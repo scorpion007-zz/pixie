@@ -317,6 +317,7 @@ RtToken		RI_PROGRESS				=	"progress";
 RtToken		RI_HANDLE				=	"handle";
 RtToken		RI_FILEMODE				=	"filemode";
 RtToken		RI_MAXERROR				=	"maxerror";
+RtToken		RI_MAXPIXELDIST			=	"maxpixeldist";
 RtToken		RI_MINSAMPLEDISTANCE	=	"minsampledistance";
 RtToken		RI_MAXSAMPLEDISTANCE	=	"maxsampledistance";
 
