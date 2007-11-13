@@ -186,17 +186,20 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		// Clamp the bound in the current bucket
 		xmin					=	max(xmin,0);
 		ymin					=	max(ymin,0);
-			// This is correct but inefficient due to querying
-//		xmax					=	min(xmax,(1<<queryDepth)-1);
-//		ymax					=	min(ymax,(1<<queryDepth)-1);
-//			// This is incorrect because it doesn't account for buckets straddling bucket edge
-//		xmax					=	min(xmax,(bw>>(depth-queryDepth))-1);
-//		ymax					=	min(ymax,(bh>>(depth-queryDepth))-1);
-	
-			// This is correct, but uses reccurance
+		
+		// Notes:
+		//		This is correct but inefficient due to querying
+		//			xmax		=	min(xmax,(1<<queryDepth)-1);
+		//			ymax		=	min(ymax,(1<<queryDepth)-1);
+		// 		This is incorrect because it doesn't account for buckets straddling bucket edge
+		//			xmax		=	min(xmax,(bw>>(depth-queryDepth))-1);
+		//			ymax		=	min(ymax,(bh>>(depth-queryDepth))-1);
+		//		We're using a recurrance, this
+		// 			(bw*2+(1<<d))>>d , d = (depth-queryDepth)
+		// 		is equivalent but probably slower
+		
 		xmax					=	min(xmax,w-1);
 		ymax					=	min(ymax,h-1);
-// (bw*2+(1<<d))>>d is equivalent but probably slower
 
 		// Something odd occurred, abort
 		if (xmin > xmax) return FALSE;
