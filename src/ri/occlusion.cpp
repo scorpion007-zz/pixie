@@ -172,23 +172,23 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 	// queried than small ones (where there are chance to be many)
 	for(;queryDepth>0;queryDepth--) {
 
-		xmin				=	xbound[0] - bl;
-		xmax				=	xbound[1] - bl;
-		ymin				=	ybound[0] - bt;
-		ymax				=	ybound[1] - bt;
+		xmin	=	xbound[0] - bl;
+		xmax	=	xbound[1] - bl;
+		ymin	=	ybound[0] - bt;
+		ymax	=	ybound[1] - bt;
 
-		xmin = xmin>>(depth-queryDepth);
-		xmax = xmax>>(depth-queryDepth);
-		ymin = ymin>>(depth-queryDepth);
-		ymax = ymax>>(depth-queryDepth);
+		xmin	=	xmin>>(depth-queryDepth);
+		xmax	=	xmax>>(depth-queryDepth);
+		ymin	=	ymin>>(depth-queryDepth);
+		ymax	=	ymax>>(depth-queryDepth);
 
 		// Clamp the bound in the current bucket
-		xmin					=	max(xmin,0);
-		ymin					=	max(ymin,0);
-//		xmax					=	min(xmax,(1<<queryDepth)-1);
-//		ymax					=	min(ymax,(1<<queryDepth)-1);
-		xmax					=	min(xmax,(bw>>(depth-queryDepth))-1);
-		ymax					=	min(ymax,(bh>>(depth-queryDepth))-1);
+		xmin	=	max(xmin,0);
+		ymin	=	max(ymin,0);
+//		xmax	=	min(xmax,(1<<queryDepth)-1);
+//		ymax	=	min(ymax,(1<<queryDepth)-1);
+		xmax	=	min(xmax,(bw>>(depth-queryDepth))-1);
+		ymax	=	min(ymax,(bh>>(depth-queryDepth))-1);
 
 		// Something odd occurred, abort
 		if (xmin > xmax) return FALSE;
@@ -198,7 +198,7 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		if ((xmax-xmin) <= 4) break;
 		if ((ymax-ymin) <= 4) break;
 	
-		nodeOffset+=(1<<queryDepth)*(1<<queryDepth);
+		nodeOffset				+=	(1<<queryDepth)*(1<<queryDepth);
 	}
 
 	// now that we worked out the depth, do the query

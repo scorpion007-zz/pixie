@@ -1296,7 +1296,7 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int points,int numVerticesU,int numVerticesV) {
 	CRasterGrid		*grid;
 
-	int numVertices = numVerticesU*numVerticesV;
+	const int numVertices = numVerticesU*numVerticesV;
 
 	grid				=	new CRasterGrid;
 	grid->next			=	new CRasterObject*[CRenderer::numThreads];
@@ -1620,8 +1620,8 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 void	CReyes::insertObject(CRasterObject *object) {
 	
 	// For every thread
-	const int	sx = xbucket(object->xbound[0]);
-	const int	sy = ybucket(object->ybound[0]);
+	int			sx = xbucket(object->xbound[0]);
+	int			sy = ybucket(object->ybound[0]);
 	const int	ex = xbucketNext(object->xbound[1]);
 	const int	ey = ybucketNext(object->ybound[1]);
 
@@ -1635,6 +1635,10 @@ void	CReyes::insertObject(CRasterObject *object) {
 		deleteObject(object);
 		return;
 	}
+
+	// Guard
+	sx			=	max(0,sx);
+	sy			=	max(0,sy);
 
 	int			i;
 	int			refCount	=	0;

@@ -78,59 +78,6 @@ inline int atomicDecrement(volatile int *ptr) {
 	return OSAtomicDecrement32Barrier(ptr);
 }
 
-/*
-///////////////////////////////////////////////////////////////
-// Windows (32 bit)
-#elif defined(_WIN32)
-
-inline int atomicIncrement(volatile int *pointer) {
-    unsigned char retVal;
-    __asm {
-        mov ECX,pointer
-        lock inc DWORD ptr[ECX]
-        setne retVal
-    }
-    return retVal;
-}
-
-inline int atomicDecrement(volatile int *pointer) {
-    unsigned char retVal;
-    __asm {
-        mov ECX,pointer
-        lock dec DWORD ptr[ECX]
-        setne retVal
-    }
-    return retVal;
-}
-
-///////////////////////////////////////////////////////////////
-// Windows 64 bits
-#elif defined(__WIN64)
-
-inline int atomicIncrement(volatile int *ptr) {
-    unsigned char ret;
-    asm volatile("lock\n"
-                 "incl %0\n"
-                 "setne %1"
-                 : "=m" (*ptr), "=qm" (ret)
-                 : "m" (*ptr)
-                 : "memory");
-    return static_cast<int>(ret);
-}
-
-inline int atomicDecrement(volatile int *ptr)
-{
-    unsigned char ret;
-    asm volatile("lock\n"
-                 "decl %0\n"
-                 "setne %1"
-                 : "=m" (*ptr), "=qm" (ret)
-                 : "m" (*ptr)
-                 : "memory");
-    return static_cast<int>(ret);
-}
-*/
-
 ///////////////////////////////////////////////////////////////
 // GCC (i386)
 #elif defined(__i386__) && defined(__GNUC__)

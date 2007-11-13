@@ -35,7 +35,6 @@
 // Include the pointer types if necessary
 #ifdef __APPLE_CC__	// >>OSX
 #include "inttypes.h"
-
 #else				// <<OSX
 
 #ifndef _WINDOWS	// >>Not Windoze
