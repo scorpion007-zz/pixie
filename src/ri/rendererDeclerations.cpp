@@ -162,6 +162,7 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_HANDLE,				"string");
 	declareVariable(RI_FILEMODE,			"string");
 	declareVariable(RI_MAXERROR,			"float");
+	declareVariable(RI_MAXPIXELDIST,		"float");
 
 	declareVariable(RI_GLOBALMAP,			"string");
 	declareVariable(RI_CAUSTICMAP,			"string");
