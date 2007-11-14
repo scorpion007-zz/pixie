@@ -128,15 +128,17 @@ CIrradianceCache::~CIrradianceCache() {
 
 	// Are we writing the file out ?
 	if (flags & CACHE_WRITE) {
-		FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
+		if (name[0] != 0) {
+			FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
 
-		if (out != NULL) {
-		
-			// Write the samples
-			fwrite(&maxDepth,	sizeof(int),1,out);
-			writeNode(out,root);
+			if (out != NULL) {
+			
+				// Write the samples
+				fwrite(&maxDepth,	sizeof(int),1,out);
+				writeNode(out,root);
 
-			fclose(out);
+				fclose(out);
+			}
 		}
 	}
 
@@ -833,9 +835,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 		rMean					*=	0.5f;
 
 		// Clamp the radius of validity
-		rMean					=	min(rMean,(CRenderer::lengthA*scratch->occlusionParams.maxPixelDist*dPscale + CRenderer::lengthB));
-		rMean					=	min(rMean,db*dPscale*5.0f);
-				
+		rMean					=	min(rMean,db*scratch->occlusionParams.maxPixelDist);
+		
 		// Record the data (in the target coordinate system)
 		movvv(cSample->P,P);
 		movvv(cSample->N,N);
