@@ -148,6 +148,9 @@ void	CPatch::dice(CShadingContext *r) {
 	// Have we checked size of this piece before ?
 	if ((udiv == -1) && (vdiv == -1)) {
 
+		int			minDivU,minDivV;
+		object->getDicingStats(depth,minDivU,minDivV);
+
 		// No, probe the surface and find the bounding box
 		float		*Pmov;
 		float		maxBound;
@@ -368,6 +371,10 @@ void	CPatch::dice(CShadingContext *r) {
 				udiv	=	0;
 				break;
 			}
+
+			// clamp to the surface dice stats
+			udiv = max(minDivU,udiv);
+			vdiv = max(minDivV,vdiv);
 
 			// Check the size ... If we're too big, we should be split
 			if ((udiv+1)*(vdiv+1) > CRenderer::maxGridSize)	{
