@@ -107,6 +107,8 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = max(uOrder-1-depth,1); minDivV = max(vOrder-1-depth,1); return 0; }
+
 private:
 		void			precompBasisCoefficients(double *,unsigned int,unsigned int,unsigned int,const float *);
 		void			precomputeVertexData(double *,const double *,const double *,float *,int);

@@ -135,7 +135,7 @@ public:
 	virtual	void			interpolate(int,float **,float ***)	const;					// Interpolate the variables
 	virtual	void			shade(CShadingContext *,int,CRay **);						// Shade the object
 
-	virtual int				getMinSplits() { return 0; }
+	virtual int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = 1; return 0; }
 
 protected:
 };

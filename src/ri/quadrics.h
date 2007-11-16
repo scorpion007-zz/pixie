@@ -54,7 +54,7 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
-		int				getMinSplits() { return 2; }
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }				
 
 private:
 		CParameter		*parameters;
@@ -82,8 +82,6 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		
-		int				getMinSplits() { return 2; }
-
 private:
 		CParameter		*parameters;
 		unsigned int	parametersF;
@@ -110,7 +108,7 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		
-		int				getMinSplits() { return 2; }
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = max(3-depth,1); minDivV = 1; return 0; }
 
 private:
 		CParameter		*parameters;
@@ -138,7 +136,7 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		
-		int				getMinSplits() { return 2; }
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }
 
 private:
 		CParameter		*parameters;
@@ -166,7 +164,7 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		
-		int				getMinSplits() { return 2; }
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = max(3-depth,1); minDivV = 1; return 0; }
 
 private:
 		CParameter		*parameters;
@@ -193,7 +191,7 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		
-		int				getMinSplits() { return 2; }
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }
 
 private:
 		CParameter		*parameters;
@@ -222,7 +220,7 @@ public:
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 		
-		int				getMinSplits() { return 2; }
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 2; }
 
 private:
 		CParameter		*parameters;
