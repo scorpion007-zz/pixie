@@ -604,6 +604,9 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
+				float rv[2];
+				context->random2d.get(rv);
+
 				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
 				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
@@ -615,8 +618,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				const float originJitterX = (context->urand() - 0.5f)*scratch->traceParams.sampleBase;
-				const float originJitterY = (context->urand() - 0.5f)*scratch->traceParams.sampleBase;
+				const float originJitterX = (rv[0] - 0.5f)*scratch->traceParams.sampleBase;
+				const float originJitterY = (rv[1] - 0.5f)*scratch->traceParams.sampleBase;
 				
 				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
@@ -694,6 +697,9 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 
 		for (i=0;i<nt;i++) {
 			for (j=0;j<np;j++,hemisphere++) {
+				float rv[2];
+				context->random2d.get(rv);
+				
 				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
 				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
@@ -705,8 +711,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				ray.dir[1]				=	X[1]*cosPhi + Y[1]*sinPhi + N[1]*tmp;
 				ray.dir[2]				=	X[2]*cosPhi + Y[2]*sinPhi + N[2]*tmp;
 
-				const float originJitterX = (context->urand() - 0.5f)*scratch->traceParams.sampleBase;
-				const float originJitterY = (context->urand() - 0.5f)*scratch->traceParams.sampleBase;
+				const float originJitterX = (rv[0] - 0.5f)*scratch->traceParams.sampleBase;
+				const float originJitterY = (rv[1] - 0.5f)*scratch->traceParams.sampleBase;
 				
 				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
