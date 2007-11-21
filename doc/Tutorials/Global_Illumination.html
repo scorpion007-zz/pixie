@@ -36,7 +36,7 @@ var wgUserGroups = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2797";
+var wgCurRevisionId = "3206";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
@@ -69,10 +69,9 @@ var wgCurRevisionId = "2797";
 <li class="toclevel-1"><a href="#Irradiance_Caches_.28SL.29"><span class="tocnumber">4</span> <span class="toctext">Irradiance Caches (SL)</span></a></li>
 <li class="toclevel-1"><a href="#Multi-Pass_approaches"><span class="tocnumber">5</span> <span class="toctext">Multi-Pass approaches</span></a></li>
 <li class="toclevel-1"><a href="#Controlling_the_cache_Density"><span class="tocnumber">6</span> <span class="toctext">Controlling the cache Density</span></a></li>
-<li class="toclevel-1"><a href="#Global_Illumination_parameters"><span class="tocnumber">7</span> <span class="toctext">Global Illumination parameters</span></a>
+<li class="toclevel-1"><a href="#Global_Illumination_.26_Occlusion_parameters"><span class="tocnumber">7</span> <span class="toctext">Global Illumination &amp; Occlusion parameters</span></a>
 <ul>
-<li class="toclevel-2"><a href="#Radiance_Caches"><span class="tocnumber">7.1</span> <span class="toctext">Radiance Caches</span></a></li>
-<li class="toclevel-2"><a href="#Occlusion"><span class="tocnumber">7.2</span> <span class="toctext">Occlusion</span></a></li>
+<li class="toclevel-2"><a href="#Occlusion"><span class="tocnumber">7.1</span> <span class="toctext">Occlusion</span></a></li>
 </ul>
 </li>
 </ul>
@@ -193,31 +192,33 @@ Attribute "cull" "hidden" 0         # shade hidden faces too
 </p><p>The <tt>show</tt> program can be used to view a cache and to see it's sample density.
 </p>
 <div class="thumb tright"><div class="thumbinner" style="width:182px;"><a href="images/GSHICacheVis.png" class="internal" title="cache density as visualized with show"><img alt="cache density as visualized with show" longdesc="images/GSHICacheVis.png" class="thumbimage" src="../thumbs/8/8c/GSHICacheVis.png/180px-GSHICacheVis.png" width="180" height="131" /></a>  <div class="thumbcaption"><div class="magnify" style="float:right"><a href="images/GSHICacheVis.png" class="internal" title="Enlarge"><img src="../css/images/magnify-clip.png" width="15" height="11" alt="" /></a></div>cache density as visualized with <tt>show</tt></div></div></div>
-<a name="Global_Illumination_parameters"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=7" title="Edit section: Global Illumination parameters">edit</a>]</span> <span class="mw-headline"> Global Illumination parameters </span></h1>
-<p><b>maxError</b>
+<a name="Global_Illumination_.26_Occlusion_parameters"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=7" title="Edit section: Global Illumination &amp; Occlusion parameters">edit</a>]</span> <span class="mw-headline"> Global Illumination &amp; Occlusion parameters </span></h1>
+<p><b>maxerror</b>
 </p><p>As discussed, maxError controls two things.  Firstly when it's OK to use samples already in the cache (and hence the blurriness of using such samples.  Secondly it controls when to add samples to the cache (because none are available in the cache).  It's an attribute set in the RIB.
 </p><p><b>minR and maxR</b>
-</p><p>The parameters "<tt>minR</tt>" and "<tt>maxR</tt>" are optional parameters passed to the indirectdiffuse shadeop. 
-They control only newly added samples and therefore are useful for baking.
-They represent the minimum and maximum radius that a sample can occupy.
-</p><p>Normally you would not alter these parameters, but doing so may helpprevent interpolation artifacts or otherwise help control the number of samples.
-</p><p>The <tt>maxR</tt> parameter puts an upper limit on the radius of validity for a sample.
-The <tt>minR</tt> parameter on the other hand can prevent the radius of validity becoming too small.
-</p><p>Setting a small <tt>maxR</tt> paramter will probably increase your cache size (but will make it contain more accurate data).  Increasing <tt>minR</tt> sets an upper bound on the size the cache can grow to.  Note you must set <tt>minR</tt> and <tt>maxR</tt> such that <tt>minR &lt; maxR</tt>.
+</p>
+<table width="100%">
+<tr>
+<td>
+<div class="pre"><tt><tt>minR, maxR</tt></tt></div>
+</td><td width="200px">
+<div class="notebox" style="color: #ff0000">Deprecated in 2.2.3 </div>
+</td></tr></table>
+<p>These have been removed from Pixie, use <tt>maxpixeldist</tt> instead.
+</p><p><b>maxpixeldist</b>
+</p><p>The parameter "<tt>maxpixeldist</tt>" is an optional parameter passed to the indirectdiffuse / occlusion shadeop. 
+It controls (as a measure approximately in screen pixels) the maximum distance over which interpolation can occur.  Setting it lower will uniformly force more samples into the cache where previously interpolation would have occurred from nearby samples.
 </p><p><b>maxdist</b>
 </p><p>The "<tt>maxdist</tt>" parameter to indirectdiffuse controls the maximum intersection distance for rays when sampling the irradiance hemisphere.  You may wish to limit the influence of far off objects by setting this.  By default it's infinity.
 </p><p><b>trace bias</b>
 </p><p>Trace Bias ( <tt>Attribute "trace" "float bias" [0.01]</tt> ) isn't a GI attribute per-se but because irradiancecaches use raytracing to sample the irradiance hemisphere, you need to make sure the bias is appropriate for your scene.
 </p>
-<a name="Radiance_Caches"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=8" title="Edit section: Radiance Caches">edit</a>]</span> <span class="mw-headline"> Radiance Caches </span></h2>
-<p><i>TODO</i>
-</p>
-<a name="Occlusion"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=9" title="Edit section: Occlusion">edit</a>]</span> <span class="mw-headline"> Occlusion </span></h2>
-<p><i>TODO</i>
+<a name="Occlusion"></a><h2><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;action=edit&amp;section=8" title="Edit section: Occlusion">edit</a>]</span> <span class="mw-headline"> Occlusion </span></h2>
+<p>Parameters are similar to <tt>indirectdiffuse()</tt>.  Use instead <tt>occlusion()</tt>.
 </p><p><b>See also</b>
 </p><p><a href="../NotIncludedStatic.html" title="EfficientlyCachingIrradiance">EfficientlyCachingIrradiance</a>
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!!en!2 and timestamp 20070718223243 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1284-0!1!0!!en!2 and timestamp 20071121220543 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Global_Illumination">http://www.george-graphics.co.uk/pixiewiki/Tutorials/Global_Illumination</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Tutorials.html" title="Category:Tutorials">Tutorials</a></span></p></div>			<!-- end content -->
@@ -281,7 +282,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;oldid=2797">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Tutorials/Global_Illumination&amp;oldid=3206">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -289,8 +290,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 15:17, 5 April 2007.</li>
-				<li id="f-viewcount">This page has been accessed 3,483 times.</li>
+				<li id="f-lastmod"> This page was last modified 22:03, 21 November 2007.</li>
+				<li id="f-viewcount">This page has been accessed 4,740 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -300,4 +301,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Tutorials/Gl
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 1.541 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.254 secs. --></body></html>

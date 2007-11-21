@@ -7,7 +7,11 @@ var stylepath = '/pixiewiki_install/skins';
 
  var isViewingMainPage = (/^Main Page(\/..)? - PixieWiki$/.test(document.title));
  if (isViewingMainPage) {
+  if (wgUserName != "Geohar") {
  	document.write('<style type="text/css">/*<![CDATA[*/ #lastmod, #siteSub, h1.firstHeading { display: none !important; }  #content { padding-top: 1em; } #jump-to-nav { display: none !important; }  #p-cactions, #p-tb { display:none; } /*]]>*/</style>');
+  } else {
+ 	document.write('<style type="text/css">/*<![CDATA[*/ #lastmod, #siteSub, h1.firstHeading { display: none !important; }  #content { padding-top: 1em; } /*]]>*/</style>');
+  }
  }
  
  if (mwCustomEditButtons) {

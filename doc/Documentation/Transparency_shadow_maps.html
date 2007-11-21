@@ -36,7 +36,7 @@ var wgUserGroups = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "2060";
+var wgCurRevisionId = "3199";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
@@ -70,8 +70,13 @@ Regular shadow maps compute a depth map from the point of light. The shadow shad
 <pre>Display "test.tif" "file" "z"    -    Compute regular shadow map
 </pre>
 <p>The usage of the transparency shadow maps is the same as regular shadow maps: thru the shadow shading language call. In the case of a regular shadow map, Pixie will lookup binary in/out of shadow values. In the case of the transparency shadow map, the actual opacity amount at the query value will be returned.
+</p><p>When looking up the shadow map remember to use the following syntax
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1308-0!1!0!!en!2 and timestamp 20070718070400 -->
+<pre>color shd = color shadow(...)
+</pre>
+<p>to ensure a full color transparency lookup.
+</p>
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1308-0!1!0!!en!2 and timestamp 20071121223120 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Transparency_shadow_maps">http://www.george-graphics.co.uk/pixiewiki/Documentation/Transparency_shadow_maps</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -135,7 +140,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Transparency_shadow_maps&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Transparency_shadow_maps&amp;oldid=2060">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Transparency_shadow_maps&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Transparency_shadow_maps&amp;oldid=3199">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -143,8 +148,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 16:12, 3 June 2006.</li>
-				<li id="f-viewcount">This page has been accessed 883 times.</li>
+				<li id="f-lastmod"> This page was last modified 08:21, 27 August 2007.</li>
+				<li id="f-viewcount">This page has been accessed 1,239 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -154,4 +159,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.278 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.368 secs. --></body></html>

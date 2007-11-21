@@ -36,7 +36,7 @@ var wgUserGroups = null;
 var wgUserLanguage = "en";
 var wgContentLanguage = "en";
 var wgBreakFrames = false;
-var wgCurRevisionId = "3147";
+var wgCurRevisionId = "3202";
 /*]]>*/</script>
                 
 		<script type="text/javascript" src="../css/wikibits.js?63"><!-- wikibits js --></script>
@@ -110,11 +110,11 @@ var wgCurRevisionId = "3147";
 </p>
 <pre>Attribute "visibility" "int specular" [0]
 </pre>
-<p>If 1, the object is visible to rays created by the <tt>trace()/&lt;tt&gt; shading language command.
+<p>If 1, the object is visible to rays created by the <tt>trace()</tt> shading language command.
 </p>
 <pre>Attribute "visibility" "int diffuse" [0]
 </pre>
-<p>If 1, the object is visible to rays created by the &lt;tt&gt;indirectdiffuse()</tt> and <tt>occlusion()</tt> shading language commands.
+<p>If 1, the object is visible to rays created by the <tt>indirectdiffuse()</tt> and <tt>occlusion()</tt> shading language commands.
 </p>
 <pre>Attribute "visibility" "int photon" [0]
 </pre>
@@ -196,7 +196,11 @@ var wgCurRevisionId = "3147";
 </p>
 <pre>Attribute "irradiance" "float maxerror" [0.5]
 </pre>
-<p>This is a quality knob for the irradiance cache. 0 means a new sample is computer for each shading point without caching (very bad idea).
+<p>This is a quality knob for the irradiance cache. 0 means a new sample is computer for each shading point without caching (high quality, much slower).
+</p>
+<pre>Attribute "irradiance" "float maxpixeldist" [20]
+</pre>
+<p>This is a second quality knob for the irradiance cache. It specifies the maximum radius of validity for a cache sample - meaning interpolation cannot occur over a larger distance.  This forces more samples into the cache (in a uniform manner, whereas maxerror is adaptive wrt. the change of irradiance / occlusion).  The value is approximately in screen pixels.
 </p>
 <a name="Photon_attributes"></a><h1><span class="editsection">[<a href="/pixiewiki_install/index.php?title=Documentation/Attributes&amp;action=edit&amp;section=7" title="Edit section: Photon attributes">edit</a>]</span> <span class="mw-headline"> Photon attributes </span></h1>
 <p>These attributes control the photon mapping.
@@ -229,7 +233,7 @@ Attribute "photon" "iorrange" [1.5 1.4]
 </pre>
 <p>This is the number of photons to use when estimating the irradiance. Bigger numbers will cause smoother but blurrier estimates. The smaller numbers will create sharper but noisier image.
 </p>
-<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1302-0!1!0!!en!2 and timestamp 20070717225144 -->
+<!-- Saved in parser cache with key georgeg_pixiewikidb:pcache:idhash:1302-0!1!0!!en!2 and timestamp 20071121215919 -->
 <div class="printfooter">
 Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentation/Attributes">http://www.george-graphics.co.uk/pixiewiki/Documentation/Attributes</a>"</div>
 			<div id="catlinks"><p class='catlinks'><a href="../NotSupportedStatic.html" title="Special:Categories">Category</a>: <span dir='ltr'><a href="../Category_Documentation.html" title="Category:Documentation">Documentation</a></span></p></div>			<!-- end content -->
@@ -293,7 +297,7 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 				<li id="t-recentchangeslinked"><a href="../NotSupportedStatic.html" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
 <li id="t-upload"><a href="../NotSupportedStatic.html" title="Upload images or media files [u]" accesskey="u">Upload file</a></li>
 <li id="t-specialpages"><a href="../NotSupportedStatic.html" title="List of all special pages [q]" accesskey="q">Special pages</a></li>
-				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Attributes&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Attributes&amp;oldid=3147">Permanent link</a></li>			</ul>
+				<li id="t-print"><a href="/pixiewiki_install/index.php?title=Documentation/Attributes&amp;printable=yes&amp;printable=yes">Printable version</a></li>				<li id="t-permalink"><a href="/pixiewiki_install/index.php?title=Documentation/Attributes&amp;oldid=3202">Permanent link</a></li>			</ul>
 		</div>
 	</div>
 		</div><!-- end of the left (by default at least) column -->
@@ -301,8 +305,8 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 			<div id="footer">
 				<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="../css/images/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" /></a></div>
 			<ul id="f-list">
-				<li id="f-lastmod"> This page was last modified 21:39, 3 July 2007.</li>
-				<li id="f-viewcount">This page has been accessed 1,195 times.</li>
+				<li id="f-lastmod"> This page was last modified 21:06, 10 October 2007.</li>
+				<li id="f-viewcount">This page has been accessed 1,720 times.</li>
 				<li id="f-privacy"><a href="../NotSupportedStatic.html" title="PixieWiki:Privacy policy">Privacy policy</a></li>
 				<li id="f-about"><a href="../NotSupportedStatic.html" title="PixieWiki:About">About PixieWiki</a></li>
 				<li id="f-disclaimer"><a href="../NotSupportedStatic.html" title="PixieWiki:General disclaimer">Disclaimers</a></li>
@@ -312,4 +316,4 @@ Retrieved from "<a href="http://www.george-graphics.co.uk/pixiewiki/Documentatio
 	
 		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
 </div>
-<!-- Served by mercury.svr9-speedyservers.com in 0.253 secs. --></body></html>
+<!-- Served by mercury.svr9-speedyservers.com in 0.272 secs. --></body></html>
