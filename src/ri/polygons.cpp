@@ -1486,13 +1486,32 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 		if(sVertex == from) { sVertex = sVertex->next; continue; }
 
 		const float	*s1	=	sVertex->xy;
-				
-		if(	(area(c[0],c[1],s1[0],s1[1],b[0],b[1])*area(c[0],c[1],a[0],a[1],b[0],b[1]) > 0) &&
-			(area(c[0],c[1],s1[0],s1[1],a[0],a[1])*area(c[0],c[1],b[0],b[1],a[0],a[1]) > 0) &&
-			(area(b[0],b[1],s1[0],s1[1],a[0],a[1])*area(b[0],b[1],c[0],c[1],a[0],a[1]) > 0)) return FALSE;
 		
+		double a1 = area(c[0],c[1],s1[0],s1[1],b[0],b[1]);
+		double a2 = area(c[0],c[1],s1[0],s1[1],a[0],a[1]);
+		double a3 = area(b[0],b[1],s1[0],s1[1],a[0],a[1]);
+
+		// is a point colinear with the suggested cut edge
+		if (fabsf(a1) < C_EPSILON_TINY) {
+			// area is zero, verify if we're within the endpoints of the line
+			const float dp = (b[0] -c[0])*(s1[0]-c[0]) + (b[1] -c[1])*(s1[1]-c[1]);
+			const float l1 = (b[0] -c[0])*(b[0] -c[0]) + (b[1] -c[1])*(b[1] -c[1]);
+			const float l2 = (s1[0]-c[0])*(s1[0]-c[0]) + (s1[1]-c[1])*(s1[1]-c[1]);
+			const float l = l1*l2 + C_EPSILON_TINY;
+
+			if (dp > -C_EPSILON_TINY && dp < l) {
+				// within the endpoints is invalid
+				return FALSE;
+			}
+		}
+
+		if(	(a1*area(c[0],c[1],a[0],a[1],b[0],b[1]) > 0) &&
+			(a2*area(c[0],c[1],b[0],b[1],a[0],a[1]) > 0) &&
+			(a3*area(b[0],b[1],c[0],c[1],a[0],a[1]) > 0)) return FALSE;	
+
+
 		sVertex = sVertex->next;
-	}while(sVertex != loop);
+	} while(sVertex != loop);
 	return TRUE;
 }
 
@@ -1812,7 +1831,7 @@ nextLoop:;
 				const float	a	=	area(pVertex->xy[0],pVertex->xy[1],cVertex->xy[0],cVertex->xy[1],nVertex->xy[0],nVertex->xy[1]);
 
 				if (a >= 0) {
-					if (valid(sVertex,nVertex,pVertex)) {
+					if (valid(cVertex,nVertex,pVertex)) {
 						const int	vi0	=	(int) (nVertex->xy - xy) >> 1;
 						const int	vi1	=	(int) (cVertex->xy - xy) >> 1;
 						const int	vi2	=	(int) (pVertex->xy - xy) >> 1;
