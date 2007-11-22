@@ -2434,6 +2434,16 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				|
 				RIB_BLOBBY
 				RIB_FLOAT
+				ribIntArray
+				ribFloatArray
+				ribPL
+				{
+					// FIXME: Not implemented
+				}
+				|
+				RIB_BLOBBY
+				RIB_FLOAT
+				ribIntArray
 				ribFloatArray
 				ribTextArray
 				ribPL

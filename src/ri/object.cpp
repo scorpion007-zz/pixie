@@ -346,15 +346,12 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 // Return Value		   :
 // Comments			   :   P must be in pixels
 void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient) {
-   float	   uAvg,vAvg;  // The average edge length
    float	   uMin,vMin;  // The minimum edge length
    float	   uMax,vMax;  // The maximum edge length
    int		   i,j;
    const float *cP,*nP,*tP;
-   float	   l;
    float	   dx,dy;
 
-   uAvg	   =   vAvg	   =   0;
    uMax	   =   vMax	   =   0;
    uMin	   =   vMin	   =   C_INFINITY;
 
@@ -365,17 +362,13 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 
 	   // U stats
 	   cP  =   P;
-	   for (j=(vdiv+1);j>0;j--) {
+	   for (j=(vdiv+1);j>0;--j) {
 	
 		   float	total	=	0;
-		   for (i=udiv;i>0;i--,cP+=3) {
+		   for (i=udiv;i>0;--i,cP+=3) {
 			   dx		=   cP[3 + COMP_X] - cP[COMP_X];
 			   dy		=   cP[3 + COMP_Y] - cP[COMP_Y];
-			   l		=   sqrtf(dx*dx + dy*dy);
-			   uAvg		+=	l;
-			   total	+=	l;
-			   if (l < uMin)   uMin	   =   l;
-			   if (l > uMax)   uMax	   =   l;
+			   total	+=	sqrtf(dx*dx + dy*dy);
 		   }
 		   cP  +=  3;
 		   uMax	=	max(uMax,total);
@@ -384,18 +377,14 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	
 	   // V stats
 	   cP  =   P;
-	   for (i=(udiv+1);i>0;i--,cP+=3) {
+	   for (i=(udiv+1);i>0;--i,cP+=3) {
 		   nP  =   cP;
 		   tP  =   nP  +   (udiv+1)*3;
 		   float	total	=	0;
-		   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+		   for (j=vdiv;j>0;--j,nP=tP,tP+=(udiv+1)*3) {
 			   dx		=   tP[COMP_X] - nP[COMP_X];
 			   dy		=   tP[COMP_Y] - nP[COMP_Y];
-			   l		=   sqrtf(dx*dx + dy*dy);
-			   vAvg		+=  l; 
-			   total	+=	l;
-			   if (l < vMin)   vMin	   =   l;
-			   if (l > vMax)   vMax	   =   l;
+			   total	+=	sqrtf(dx*dx + dy*dy);
 		   }
 	
 		   vMax	=	max(vMax,total);
@@ -406,7 +395,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 
 	   float maxDim = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
 	   	if(CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
-			for (j=0;j<(vdiv+1)*(udiv+1);j++) {
+			for (j=0;j<(vdiv+1)*(udiv+1);++j) {
 				float x,y;
 				x	=	(CRenderer::imagePlane*P[j*3+COMP_X]/P[j*3+COMP_Z]);
 				y	=	(CRenderer::imagePlane*P[j*3+COMP_Y]/P[j*3+COMP_Z]);
@@ -416,7 +405,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 				P[j*3+COMP_Z]	=	lengthv(tmp)*maxDim;
 			}
 		} else {
-			for (j=0;j<(vdiv+1)*(udiv+1);j++) {
+			for (j=0;j<(vdiv+1)*(udiv+1);++j) {
 				P[j*3+COMP_X]	=	P[j*3+COMP_X]*CRenderer::dPixeldx;
 				P[j*3+COMP_Y]	=	P[j*3+COMP_Y]*CRenderer::dPixeldy;
 				P[j*3+COMP_Z]	*=	maxDim;
@@ -425,16 +414,12 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 
 	   // U stats
 	   cP  =   P;
-	   for (j=(vdiv+1);j>0;j--) {
+	   for (j=(vdiv+1);j>0;--j) {
 	
 		   float	total	=	0;
-		   for (i=udiv;i>0;i--,cP+=3) {
+		   for (i=udiv;i>0;--i,cP+=3) {
 			   subvv(tmp,cP+3,cP);
-			   l		=   lengthv(tmp);
-			   uAvg		+=	l;
-			   total	+=	l;
-			   if (l < uMin)   uMin	   =   l;
-			   if (l > uMax)   uMax	   =   l;
+			   total	+=	lengthv(tmp);
 		   }
 		   cP  +=  3;
 		   uMax	=	max(uMax,total);
@@ -443,17 +428,13 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	
 	   // V stats
 	   cP  =   P;
-	   for (i=(udiv+1);i>0;i--,cP+=3) {
+	   for (i=(udiv+1);i>0;--i,cP+=3) {
 		   nP  =   cP;
 		   tP  =   nP  +   (udiv+1)*3;
 		   float	total	=	0;
-		   for (j=vdiv;j>0;j--,nP=tP,tP+=(udiv+1)*3) {
+		   for (j=vdiv;j>0;--j,nP=tP,tP+=(udiv+1)*3) {
 			   subvv(tmp,tP,nP);
-			   l		=   lengthv(tmp);
-			   vAvg		+=  l; 
-			   total	+=	l;
-			   if (l < vMin)   vMin	   =   l;
-			   if (l > vMax)   vMax	   =   l;
+			   total	+=	lengthv(tmp);
 		   }
 	
 		   vMax	=	max(vMax,total);
@@ -462,15 +443,9 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	}
    float	udivf,vdivf;
 
-   if (FALSE) {
-	   // Compute the new grid size based on the average size
-	   udivf   =  (uAvg / (shadingRate*(vdiv+1)));
-	   vdivf   =  (vAvg / (shadingRate*(udiv+1)));
-   } else {
-	   // Compute the new grid size based on the maximum size
-	   udivf   =  uMax / shadingRate;
-	   vdivf   =  vMax / shadingRate;
-   }
+   // Compute the new grid size based on the maximum size
+   udivf   =	uMax / shadingRate;
+   vdivf   =	vMax / shadingRate;
    
    // Clamp the division amount
    udivf	=   max(1,udivf);

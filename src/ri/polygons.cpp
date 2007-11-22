@@ -1487,12 +1487,12 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 
 		const float	*s1	=	sVertex->xy;
 		
-		double a1 = area(c[0],c[1],s1[0],s1[1],b[0],b[1]);
-		double a2 = area(c[0],c[1],s1[0],s1[1],a[0],a[1]);
-		double a3 = area(b[0],b[1],s1[0],s1[1],a[0],a[1]);
+		const double a1 = area(c[0],c[1],s1[0],s1[1],b[0],b[1]);
+		const double a2 = area(c[0],c[1],s1[0],s1[1],a[0],a[1]);
+		const double a3 = area(b[0],b[1],s1[0],s1[1],a[0],a[1]);
 
 		// is a point colinear with the suggested cut edge
-		if (fabsf(a1) < C_EPSILON_TINY) {
+		if (fabs(a1) < C_EPSILON_TINY) {
 			// area is zero, verify if we're within the endpoints of the line
 			const float dp = (b[0] -c[0])*(s1[0]-c[0]) + (b[1] -c[1])*(s1[1]-c[1]);
 			const float l1 = (b[0] -c[0])*(b[0] -c[0]) + (b[1] -c[1])*(b[1] -c[1]);

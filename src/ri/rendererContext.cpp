@@ -2589,10 +2589,10 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 		} else if (strcmp(name,RI_TRACE) == 0) {
 			for (i=0;i<n;i++) {
 				if (FALSE) {
-				attributeCheckFlag(RI_DISPLACEMENTS,	attributes->flags,									ATTRIBUTES_FLAGS_DISPLACEMENTS)
-				attributeCheck(RI_BIAS,					attributes->bias,									-C_INFINITY,C_INFINITY,float)
-				attributeCheck(RI_MAXDIFFUSEDEPTH,		attributes->maxDiffuseDepth,						0,C_INFINITY,int)
-				attributeCheck(RI_MAXSPECULARDEPTH,		attributes->maxSpecularDepth,						0,C_INFINITY,int)
+				attributeCheckFlag(RI_DISPLACEMENTS,	attributes->flags,							ATTRIBUTES_FLAGS_DISPLACEMENTS)
+				attributeCheck(RI_BIAS,					attributes->bias,							-C_INFINITY,C_INFINITY,float)
+				attributeCheck(RI_MAXDIFFUSEDEPTH,		attributes->maxDiffuseDepth,				0,C_INFINITY,int)
+				attributeCheck(RI_MAXSPECULARDEPTH,		attributes->maxSpecularDepth,				0,C_INFINITY,int)
 				attributeEndCheck
 			}
 		// Check the irradiance cache options
@@ -2601,7 +2601,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 				if (FALSE) {
 				attributeCheckString(RI_HANDLE,			attributes->irradianceHandle)
 				attributeCheckString(RI_FILEMODE,		attributes->irradianceHandleMode)
-				attributeCheck(RI_MAXERROR,				attributes->irradianceMaxError,		0,C_INFINITY,float)
+				attributeCheck(RI_MAXERROR,				attributes->irradianceMaxError,				0,C_INFINITY,float)
 				attributeCheck(RI_MAXPIXELDIST,			attributes->irradianceMaxPixelDistance,		0,C_INFINITY,float)
 				attributeEndCheck
 			}
@@ -2630,8 +2630,8 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 						attributes->photonIor[0] 	=	val[0];
 						attributes->photonIor[1]	=	val[1];
 					}
-				attributeCheck(RI_ESTIMATOR,			attributes->photonEstimator,						1,C_INFINITY,int)
-				attributeCheckFlag(RI_ILLUMINATEFRONT,	attributes->flags,									ATTRIBUTES_FLAGS_ILLUMINATE_FRONT_ONLY)
+				attributeCheck(RI_ESTIMATOR,			attributes->photonEstimator,					1,C_INFINITY,int)
+				attributeCheckFlag(RI_ILLUMINATEFRONT,	attributes->flags,								ATTRIBUTES_FLAGS_ILLUMINATE_FRONT_ONLY)
 				attributeEndCheck
 			}
 		} else if (strcmp(name,RI_VISIBILITY) == 0) {
