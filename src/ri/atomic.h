@@ -70,11 +70,11 @@ inline int	atomicDecrement(volatile int *pointer) {
 // Include the OSX header
 #include <libkern/OSAtomic.h>
 
-inline int atomicIncrement(volatile int *ptr) {
+inline int atomicIncrement(int32_t *ptr) {
 	return OSAtomicIncrement32Barrier(ptr);
 }
 
-inline int atomicDecrement(volatile int *ptr) {
+inline int atomicDecrement(int32_t *ptr) {
 	return OSAtomicDecrement32Barrier(ptr);
 }
 

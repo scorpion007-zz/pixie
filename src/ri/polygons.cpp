@@ -1494,10 +1494,10 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 		// is a point colinear with the suggested cut edge
 		if (fabs(a1) < C_EPSILON_TINY) {
 			// area is zero, verify if we're within the endpoints of the line
-			const float dp = (b[0] -c[0])*(s1[0]-c[0]) + (b[1] -c[1])*(s1[1]-c[1]);
-			const float l1 = (b[0] -c[0])*(b[0] -c[0]) + (b[1] -c[1])*(b[1] -c[1]);
-			const float l2 = (s1[0]-c[0])*(s1[0]-c[0]) + (s1[1]-c[1])*(s1[1]-c[1]);
-			const float l = l1*l2 + C_EPSILON_TINY;
+			const double dp = (b[0] -c[0])*(s1[0]-c[0]) + (b[1] -c[1])*(s1[1]-c[1]);
+			const double l1 = (b[0] -c[0])*(b[0] -c[0]) + (b[1] -c[1])*(b[1] -c[1]);
+			const double l2 = (s1[0]-c[0])*(s1[0]-c[0]) + (s1[1]-c[1])*(s1[1]-c[1]);
+			const double l = l1*l2 + C_EPSILON_TINY;
 
 			if (dp > -C_EPSILON_TINY && dp < l) {
 				// within the endpoints is invalid
