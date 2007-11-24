@@ -762,11 +762,12 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // diffuse	"c=n"
-#define	DIFFUSEEXPR_PRE		const float		*P,*N,*Cl,*L;										\
+#define	DIFFUSEEXPR_PRE		const float		*P,*N,*Cl,*L,*nd;									\
 							float			*R;													\
 							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
-							int				i;													\
+							int				i,ndStep;											\
 							float			coefficient;										\
+							float			_nd = 0;											\
 							float			*res;												\
 							const float		*op;												\
 							vector			Ltmp;												\
@@ -789,6 +790,15 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 							*currentLight	=	*lights;										\
 							while (*currentLight) {												\
 								enterFastLightingConditional();									\
+								CShaderInstance *_inst = (*currentLight)->instance;				\
+								if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
+									CLightShaderData *lightData = (CLightShaderData*) _inst->data;			\
+									nd		=	(*currentLight)->savedState[2+lightData->nonDiffuseIndex];	\
+									ndStep 	=	lightData->nonDiffuseStep;						\
+								} else {														\
+									nd		=	&_nd;											\
+									ndStep	=	0;												\
+								}																\
 								L		=	(*currentLight)->savedState[0];						\
 								Cl		=	(*currentLight)->savedState[1];						\
 								R		=	res;												\
@@ -797,7 +807,7 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 
 
 #define DIFFUSEEXPR			normalizev(Ltmp,L);													\
-							coefficient = dotvv(N,Ltmp);										\
+							coefficient = (1.0f-nd[0])*dotvv(N,Ltmp);							\
 							if (coefficient > 0) {												\
 								R[COMP_R] += coefficient * Cl[COMP_R];							\
 								R[COMP_G] += coefficient * Cl[COMP_G];							\
@@ -807,7 +817,8 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 #define	DIFFUSEEXPR_UPDATE	R		+=	3;														\
 							N		+=	3;														\
 							Cl		+=	3;														\
-							L		+=	3;
+							L		+=	3;														\
+							nd		+=	ndStep;
 
 #define DIFFUSEEXPR_POST		exitFastLightingConditional();									\
 								*currentLight=(*currentLight)->next;							\
@@ -817,14 +828,15 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // diffuse	"c=pnf"
-#define	DIFFUSE2EXPR_PRE	const float		*P,*N,*Cl,*L;										\
+#define	DIFFUSE2EXPR_PRE	const float		*P,*N,*Cl,*L,*nd;									\
 							float			*R;													\
 							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory); \
 							const float		*cosangle;											\
 							const float		*op3;												\
+							float			_nd = 0;											\
 							float			coefficient;										\
 							vector			Ltmp;												\
-							int				i;													\
+							int				i,ndStep;											\
 							float			*res;												\
 							const float		*op2;												\
 							operand(0,res,float *);												\
@@ -846,6 +858,15 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 							*currentLight = *lights;											\
 							while (*currentLight) {												\
 								enterFastLightingConditional();									\
+								CShaderInstance *_inst = (*currentLight)->instance;				\
+								if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
+									CLightShaderData *lightData = (CLightShaderData*) _inst->data;			\
+									nd		=	(*currentLight)->savedState[2+lightData->nonDiffuseIndex];	\
+									ndStep 	=	lightData->nonDiffuseStep;						\
+								} else {														\
+									nd		=	&_nd;											\
+									ndStep	=	0;												\
+								}																\
 								L			=	(*currentLight)->savedState[0];					\
 								Cl			=	(*currentLight)->savedState[1];					\
 								R			=	res;											\
@@ -854,7 +875,7 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 								tags		=	tagStart;
 
 #define DIFFUSE2EXPR		normalizev(Ltmp,L);													\
-							coefficient = dotvv(N,Ltmp);										\
+							coefficient = (1.0f-nd[0])*dotvv(N,Ltmp);							\
 							if (coefficient > *cosangle) {										\
 								R[COMP_R] += coefficient * Cl[COMP_R];							\
 								R[COMP_G] += coefficient * Cl[COMP_G];							\
@@ -865,7 +886,8 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 							N			+=	3;													\
 							cosangle	+=	1;													\
 							Cl			+=	3;													\
-							L			+=	3;
+							L			+=	3;													\
+							nd			+=	ndStep;
 							
 
 #define DIFFUSE2EXPR_POST		exitFastLightingConditional();									\
@@ -880,13 +902,14 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // specular	"c=nvf"
-#define	SPECULAREXPR_PRE		const float		*P,*N,*Cl,*L,*V;									\
+#define	SPECULAREXPR_PRE		const float		*P,*N,*Cl,*L,*V,*ns;								\
 								float			*R,*power;											\
 								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								float			*powers		=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								const float		*op1,*op2,*op3;										\
 								float			*res;												\
-								int				i;													\
+								int				i,nsStep;											\
+								float			_ns = 0;											\
 								float			coefficient;										\
 								vector			Ltmp,halfway;										\
 								operand(0,res,float *);												\
@@ -915,6 +938,15 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 								*currentLight = *lights;											\
 								while (*currentLight) {												\
 									enterFastLightingConditional();									\
+									CShaderInstance *_inst = (*currentLight)->instance;				\
+									if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
+										CLightShaderData *lightData = (CLightShaderData*) _inst->data;			\
+										ns		=	(*currentLight)->savedState[2+lightData->nonSpecularIndex];	\
+										nsStep 	=	lightData->nonSpecularStep;						\
+									} else {														\
+										ns		=	&_ns;											\
+										nsStep	=	0;												\
+									}																\
 									L			=	(*currentLight)->savedState[0];					\
 									Cl			=	(*currentLight)->savedState[1];					\
 									R			=	res;											\
@@ -926,7 +958,7 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 #define SPECULAREXPR			normalizev(Ltmp,L);													\
 								addvv(halfway,V,Ltmp);												\
 								normalizev(halfway);												\
-								coefficient = dotvv(N,halfway);										\
+								coefficient = (1.0f-ns[0])*dotvv(N,halfway);						\
 								if (coefficient > 0) {												\
 									coefficient = (float) pow(coefficient,*power);					\
 									R[COMP_R] += coefficient * Cl[COMP_R];							\
@@ -939,7 +971,8 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 								V			+=	3;													\
 								power		+=	1;													\
 								Cl			+=	3;													\
-								L			+=	3;
+								L			+=	3;													\
+								ns			+=	nsStep;
 
 #define SPECULAREXPR_POST			exitFastLightingConditional();									\
 									*currentLight=(*currentLight)->next;							\
@@ -950,15 +983,16 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // phong	"c=nvf"
-#define	PHONGEXPR_PRE			const float		*P,*N,*Cl,*L,*V,*size;								\
+#define	PHONGEXPR_PRE			const float		*P,*N,*Cl,*L,*V,*size,*ns;							\
 								float			*refDir,*R;											\
 								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float),threadMemory);	\
 								const float		*op1,*op2,*op3;										\
 								float			*res;												\
+								float			_ns = 0;											\
 								float			coefficient;										\
 								vector			Ltmp;												\
-								int				i;													\
+								int				i,nsStep;											\
 								operand(0,res,float *);												\
 								operand(1,op1,const float *);										\
 								operand(2,op2,const float *);										\
@@ -989,6 +1023,15 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 								*currentLight = *lights;											\
 								while (*currentLight) {												\
 									enterFastLightingConditional();									\
+									CShaderInstance *_inst = (*currentLight)->instance;				\
+									if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
+										CLightShaderData *lightData = (CLightShaderData*) _inst->data;			\
+										ns		=	(*currentLight)->savedState[2+lightData->nonSpecularIndex];	\
+										nsStep 	=	lightData->nonSpecularStep;						\
+									} else {														\
+										ns		=	&_ns;											\
+										nsStep	=	0;												\
+									}																\
 									L			=	(*currentLight)->savedState[0];					\
 									Cl			=	(*currentLight)->savedState[1];					\
 									R			=	res;											\
@@ -997,7 +1040,7 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 									tags		=	tagStart;
 
 #define PHONGEXPR				normalizev(Ltmp,L);													\
-								coefficient = (float) pow(max(0,dotvv(refDir,Ltmp)),*size);			\
+								coefficient = (1.0f-ns[0]) * (float) pow(max(0,dotvv(refDir,Ltmp)),*size);			\
 								if (coefficient > 0) {												\
 									R[COMP_R] += coefficient * Cl[COMP_R];							\
 									R[COMP_G] += coefficient * Cl[COMP_G];							\
@@ -1008,7 +1051,8 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 								size	+=	1;														\
 								refDir	+=	3;														\
 								Cl		+=	3;														\
-								L		+=	3;
+								L		+=	3;														\
+								ns		+=	nsStep;
 
 #define PHONGEXPR_POST			exitFastLightingConditional();										\
 								*currentLight=(*currentLight)->next;								\

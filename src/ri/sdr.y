@@ -2326,6 +2326,7 @@ CShader	*shaderCreate(const char *shaderName) {
 		cShader->numGlobals	=	numGlobals;
 	}
 	
+	cShader->analyse();
 	
 
 	currentData.memory					=	NULL;
@@ -2334,7 +2335,7 @@ CShader	*shaderCreate(const char *shaderName) {
 	currentData.varyingSizes			=	NULL;
 	currentData.strings					=	NULL;
 	currentData.constantEntries			=	NULL;
-
+	
 
 	return cShader;
 }

@@ -105,6 +105,8 @@ public:
 class	CShadedLight {
 public:
 		float					**savedState;						// the saved variables for this light
+																	// savedState[0] -> L
+																	// savedState[1] -> Cl
 		int						*lightTags;							// the runtags indicating which points this light ran on
 		CShaderInstance			*instance;							// points to the instance of light
 		CShadedLight			*next;								// Points to the next shaded light

@@ -86,6 +86,39 @@ const	unsigned int		SL_IMAGER						=	4;
 
 // Shader flags
 const	unsigned int		SHADERFLAGS_NONAMBIENT			=	1;
+const	unsigned int		SHADERFLAGS_NONDIFFUSE			=	2;
+const	unsigned int		SHADERFLAGS_NONSPECULAR			=	4;
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShaderData
+// Description			:	This class records extra data for a shader instance
+// Comments				:
+class CShaderData {
+public:
+			CShaderData()  { }
+	virtual ~CShaderData() { }
+};
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CLightShaderData
+// Description			:	This class records data for a light
+// Comments				:
+class CLightShaderData : public CShaderData {
+public:
+	int		nonDiffuseIndex;
+	int		nonDiffuseStep;
+	int		nonSpecularIndex;
+	int		nonSpecularStep;
+
+	CLightShaderData() {
+		nonDiffuseIndex		= -1;
+		nonSpecularIndex	= -1;
+		nonDiffuseStep		= 0;
+		nonSpecularStep		= 0;
+	}
+};
 
 
 
@@ -119,9 +152,14 @@ public:
 		int						initEntryPoint;					// Index into code array where the init code starts
 
 		int						usedParameters;
+		
+		unsigned int			flags;							// shadows of parent data (to support hcShaders)
+		CShaderData				*data;							// Additional data (owned by CShader)
 
 		friend	CShader			*parseShader(const char *,const char *);
+		void					analyse();
 };
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -147,6 +185,8 @@ public:
 		CXform					*xform;
 		int						*categories;				// Categories for light shaders
 		unsigned int			flags;
+		CShaderData				*data;						// Extra non-instance data
+															// simply referenced here (not owned)
 };
 
 ///////////////////////////////////////////////////////////////////////

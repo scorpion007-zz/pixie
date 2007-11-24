@@ -60,6 +60,8 @@ CShader::CShader(const char *name) : CFileResource(name) {
 	varyingSizes			=	NULL;
 	strings					=	NULL;
 	parameters				=	NULL;
+	flags					=	0;
+	data					=	NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -90,8 +92,63 @@ CShader::~CShader() {
 		free(strings[i]);
 	}
 
+	// Delete additional data
+	if (data != NULL)		delete data;
+
 	// Ditch the memory baby
 	if (memory != NULL)					free_untyped(memory);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CShader
+// Method				:	analyse
+// Description			:	work out if there are special parameters
+// Return Value			:	-
+// Comments				:
+void CShader::analyse() {
+	CVariable	*cVariable;
+	int			varIndex	=	numGlobals-1;
+
+	// BEWARE that this is reversed compareed to the instance order 
+	// hence the reversed counting of globalIndex
+	for (cVariable=parameters;cVariable!=NULL;cVariable=cVariable->next) {
+		// Check for special parameters
+		if (cVariable->storage == STORAGE_MUTABLEPARAMETER || cVariable->storage == STORAGE_GLOBAL) {
+			if (type == SL_LIGHTSOURCE) {
+				if (!strcmp(cVariable->name,"__nondiffuse")) {
+					if ((cVariable->numItems == 1) && cVariable->type == TYPE_FLOAT) {
+						flags				|=	 SHADERFLAGS_NONDIFFUSE;
+						
+						if (data == NULL)	data = new CLightShaderData;
+						CLightShaderData *lightData = (CLightShaderData*) data;
+						
+						lightData->nonDiffuseIndex	=	varIndex;
+						lightData->nonDiffuseStep	=	((cVariable->container == CONTAINER_CONSTANT) || (cVariable->container == CONTAINER_UNIFORM)) ? 0 : 1;
+					} else {
+						warning(CODE_BADTOKEN,"warning type mismatch for expected definition of __nondiffuse in shader \"%s\"",name);
+					}
+				} else if (!strcmp(cVariable->name,"__nonspecular")) {
+					if ((cVariable->numItems == 1) && cVariable->type == TYPE_FLOAT) {
+						flags				|=	 SHADERFLAGS_NONSPECULAR;
+						
+						if (data == NULL)	data = new CLightShaderData;
+						CLightShaderData *lightData = (CLightShaderData*) data;
+						
+						lightData->nonSpecularIndex	=	varIndex;
+						lightData->nonSpecularStep	=	((cVariable->container == CONTAINER_CONSTANT) || (cVariable->container == CONTAINER_UNIFORM)) ? 0 : 1;
+					} else {
+						warning(CODE_BADTOKEN,"warning type mismatch for expected definition of __nonspecular in shader \"%s\"",name);
+					}
+				}
+			}
+			varIndex--;
+		}
+	}
+
+	if (usedParameters & PARAMETER_NONAMBIENT)
+		flags				|=	 SHADERFLAGS_NONAMBIENT;
 }
 
 
@@ -127,6 +184,8 @@ CShaderInstance::~CShaderInstance() {
 	
 	if (categories != NULL)	delete[] categories;
 
+	// Note: data is not owned by the instance
+	
 	// The children class must clear the parameter list here
 }
 
@@ -224,7 +283,9 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 
 	strings				=	NULL;
 	parent				=	p;
-	
+	flags				=	parent->flags;
+	data				=	parent->data;
+
 	// Clone the parent's parameter list
 	// BEWARE that this reverses the order (which matters when counting the globalIndex)
 	for (cVariable=parent->parameters;cVariable!=NULL;cVariable=cVariable->next) {
@@ -243,8 +304,6 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 			memcpy(nVariable->defaultValue,cVariable->defaultValue,nVariable->numFloats*sizeof(float));
 		}
 	}
-
-	flags				=	(parent->usedParameters & PARAMETER_NONAMBIENT) ? SHADERFLAGS_NONAMBIENT : 0;
 }
 
 ///////////////////////////////////////////////////////////////////////
