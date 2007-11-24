@@ -939,7 +939,7 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 								while (*currentLight) {												\
 									enterFastLightingConditional();									\
 									CShaderInstance *_inst = (*currentLight)->instance;				\
-									if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
+									if (_inst ->flags & SHADERFLAGS_NONSPECULAR) {					\
 										CLightShaderData *lightData = (CLightShaderData*) _inst->data;			\
 										ns		=	(*currentLight)->savedState[2+lightData->nonSpecularIndex];	\
 										nsStep 	=	lightData->nonSpecularStep;						\
@@ -1024,7 +1024,7 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 								while (*currentLight) {												\
 									enterFastLightingConditional();									\
 									CShaderInstance *_inst = (*currentLight)->instance;				\
-									if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
+									if (_inst ->flags & SHADERFLAGS_NONSPECULAR) {					\
 										CLightShaderData *lightData = (CLightShaderData*) _inst->data;			\
 										ns		=	(*currentLight)->savedState[2+lightData->nonSpecularIndex];	\
 										nsStep 	=	lightData->nonSpecularStep;						\
