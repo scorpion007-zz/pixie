@@ -1992,7 +1992,7 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 								for (i=0;i<numVertices;i++) {														\
 									dsdu[i]		=	fabs(dsdu[i]*du[i]);											\
 									dsdv[i]		=	fabs(dsdv[i]*dv[i]);											\
-									fwidth[i]	=	max(dsdv[i] + dsdv[i],C_EPSILON);								\
+									fwidth[i]	=	scratch->textureParams.width*max(dsdv[i] + dsdv[i],C_EPSILON);	\
 								}
 
 #define	FILTERSTEP2EXPR			plReady();																			\
