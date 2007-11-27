@@ -218,9 +218,9 @@ DEFFUNC(Derivf		,"Deriv"			,"f=ff"	,DERIVFEXPR_PRE,DERIVFEXPR,DERIVFEXPR_UPDATE,
 								dvFloat(dvBottom,	op2);
 
 #define	DERIVVEXPR				if (duBottom[0] != 0) {														\
-									res[0]	=	duTop[0] / duBottom[0];										\
-									res[1]	=	duTop[1] / duBottom[0];										\
-									res[2]	=	duTop[2] / duBottom[0];										\
+									res[0]	=	(float) ((double)duTop[0] / (double)duBottom[0]);			\
+									res[1]	=	(float) ((double)duTop[1] / (double)duBottom[0]);			\
+									res[2]	=	(float) ((double)duTop[2] / (double)duBottom[0]);			\
 								} else {																	\
 									res[0]	=	0;															\
 									res[1]	=	0;															\
@@ -228,9 +228,9 @@ DEFFUNC(Derivf		,"Deriv"			,"f=ff"	,DERIVFEXPR_PRE,DERIVFEXPR,DERIVFEXPR_UPDATE,
 								}																			\
 																											\
 								if (dvBottom[0] != 0) {														\
-									res[0]	+=	dvTop[0] / dvBottom[0];										\
-									res[1]	+=	dvTop[1] / dvBottom[0];										\
-									res[2]	+=	dvTop[2] / dvBottom[0];										\
+									res[0]	+=	(float) ((double)dvTop[0] / (double)dvBottom[0]);			\
+									res[1]	+=	(float) ((double)dvTop[1] / (double)dvBottom[0]);			\
+									res[2]	+=	(float) ((double)dvTop[2] / (double)dvBottom[0]);			\
 								}
 
 
