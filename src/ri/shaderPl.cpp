@@ -666,6 +666,7 @@ void		CFilterLookup::bind(const char *name,int &opIndex,int step,void *data,CSha
 // Return Value			:	-
 // Comments				:
 void		CFilterLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
+	scratch->textureParams.width		=	1.0f;
 	if (computed == false) {
 		int		i;
 		float	val;
