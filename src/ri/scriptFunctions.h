@@ -224,21 +224,21 @@ DEFFUNC(Clampv			,"clamp"		,	"v=vvv"	,FUN4EXPR_PRE,CLAMPVEXP,FUN4EXPR_UPDATE(3,3
 
 
 
-#define	MIXFEXP		res[0]	=	op1[0]*(1-op3[0]) + op2[0]*op3[0];
+#define	MIXFEXP		res[0]	=	(float) (op1[0]*(1.0-(double)op3[0]) + op2[0]*(double)op3[0]);
 DEFFUNC(Mixf		,"mix"		,"f=fff",FUN4EXPR_PRE,MIXFEXP,FUN4EXPR_UPDATE(1,1,1,1),NULL_EXPR,0)
 
-#define	MIXVEXP		res[0]	=	op1[0]*(1-op3[0]) + op2[0]*op3[0];	\
-					res[1]	=	op1[1]*(1-op3[0]) + op2[1]*op3[0];	\
-					res[2]	=	op1[2]*(1-op3[0]) + op2[2]*op3[0];
+#define	MIXVEXP		res[0]	=	(float) (op1[0]*(1.0-(double)op3[0]) + op2[0]*(double)op3[0]);	\
+					res[1]	=	(float) (op1[1]*(1.0-(double)op3[0]) + op2[1]*(double)op3[0]);	\
+					res[2]	=	(float) (op1[2]*(1.0-(double)op3[0]) + op2[2]*(double)op3[0]);
 
 DEFLINKFUNC(Mixc		,"mix"			,	"c=ccf", 0)
 DEFLINKFUNC(Mixp		,"mix"			,	"p=ppf", 0)
 DEFLINKFUNC(Mixn		,"mix"			,	"n=nnf", 0)
 DEFFUNC(Mixv			,"mix"			,	"v=vvf",FUN4EXPR_PRE,MIXVEXP,FUN4EXPR_UPDATE(3,3,3,1),NULL_EXPR,0)
 
-#define	MIXVVEXP	res[0]	=	op1[0]*(1-op3[0]) + op2[0]*op3[0];	\
-					res[1]	=	op1[1]*(1-op3[1]) + op2[1]*op3[1];	\
-					res[2]	=	op1[2]*(1-op3[2]) + op2[2]*op3[2];
+#define	MIXVVEXP	res[0]	=	(float) (op1[0]*(1.0-(double)op3[0]) + op2[0]*(double)op3[0]);	\
+					res[1]	=	(float) (op1[1]*(1.0-(double)op3[1]) + op2[1]*(double)op3[1]);	\
+					res[2]	=	(float) (op1[2]*(1.0-(double)op3[2]) + op2[2]*(double)op3[2]);
 
 DEFLINKFUNC(Mixcc		,"mix"			,	"c=ccc", 0)
 DEFLINKFUNC(Mixpp		,"mix"			,	"p=ppp", 0)
