@@ -115,9 +115,9 @@ inline	SCALAR_TYPE	dotvv(const SCALAR_TYPE *s1,const SCALAR_TYPE *s2) {
 }
 
 inline	void	interpolatev(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *s2,const SCALAR_TYPE alpha) {
-	result[0]	=	s1[0]*(1-alpha) + s2[0]*alpha;
-	result[1]	=	s1[1]*(1-alpha) + s2[1]*alpha;
-	result[2]	=	s1[2]*(1-alpha) + s2[2]*alpha;
+	result[0]	=	(float) (s1[0]*(1.0-(double)alpha) + s2[0]*(double)alpha);
+	result[1]	=	(float) (s1[1]*(1.0-(double)alpha) + s2[1]*(double)alpha);
+	result[2]	=	(float) (s1[2]*(1.0-(double)alpha) + s2[2]*(double)alpha);
 }
 
 inline	SCALAR_TYPE	interpolatea(const SCALAR_TYPE s1,const SCALAR_TYPE s2,const SCALAR_TYPE alpha) {
