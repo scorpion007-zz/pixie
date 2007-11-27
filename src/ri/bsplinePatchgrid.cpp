@@ -214,7 +214,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 				const	float	ctime		=	*time++;
 
 				for (j=0;j<vertexDataStep;j++) {
-					*interpolate++	=	vertex0[j]*(1-ctime) + vertex1[j]*ctime;
+					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
 		}
@@ -234,8 +234,8 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 			double			tmp1[4],tmp2[4];
 			const	int		x			=	(int) floor(min(u[i]*upatches,(uVertices-4)));
 			const	int		y			=	(int) floor(min(v[i]*vpatches,(vVertices-4)));
-			const	float	cu			=	(u[i]*upatches - x);
-			const	float	cv			=	(v[i]*vpatches - y);
+			const	double	cu			=	(u[i]*upatches - x);
+			const	double	cv			=	(v[i]*vpatches - y);
 
 			const	float	*data		=	vertexData + (y*upatches + x)*vertexSampleStride;
 			const	double	usquared	=	cu*cu;
