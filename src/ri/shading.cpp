@@ -124,14 +124,14 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 			const	float	*s2		=	attributes2->s;
 
 			for (i=num;i>0;i--) {
-				const	float	ctime	=	*time++;
-				const	float	cu		=	*u++;
-				const	float	cv		=	*v++;
+				const	double	ctime	=	*time++;
+				const	double	cu		=	*u++;
+				const	double	cv		=	*v++;
 
-				*s++			=	((s1[0]*(1-ctime) + s2[0]*ctime)*(1-cu) + 
-									 (s1[1]*(1-ctime) + s2[1]*ctime)*cu)*(1-cv) + 
-									((s1[2]*(1-ctime) + s2[2]*ctime)*(1-cu) + 
-									 (s1[3]*(1-ctime) + s2[3]*ctime)*cu)*cv;
+				*s++			=	(float) (((s1[0]*(1.0-ctime) + s2[0]*ctime)*(1.0-cu) + 
+											 (s1[1]*(1.0-ctime) + s2[1]*ctime)*cu)*(1.0-cv) + 
+											((s1[2]*(1.0-ctime) + s2[2]*ctime)*(1.0-cu) + 
+											 (s1[3]*(1.0-ctime) + s2[3]*ctime)*cu)*cv);
 			}
 		} else {
 			memcpy(s,u,num*sizeof(float));
@@ -149,14 +149,14 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 			const	float	*t2		=	attributes2->t;
 
 			for (i=num;i>0;i--) {
-				const	float	ctime	=	*time++;
-				const	float	cu		=	*u++;
-				const	float	cv		=	*v++;
+				const	double	ctime	=	*time++;
+				const	double	cu		=	*u++;
+				const	double	cv		=	*v++;
 
-				*t++			=	((t1[0]*(1-ctime) + t2[0]*ctime)*(1-cu) + 
-								     (t1[1]*(1-ctime) + t2[1]*ctime)*cu)*(1-cv) + 
-									((t1[2]*(1-ctime) + t2[2]*ctime)*(1-cu) + 
-									 (t1[3]*(1-ctime) + t2[3]*ctime)*cu)*cv;
+				*t++			=	(float) (((t1[0]*(1.0-ctime) + t2[0]*ctime)*(1.0-cu) + 
+										     (t1[1]*(1.0-ctime) + t2[1]*ctime)*cu)*(1.0-cv) + 
+											((t1[2]*(1.0-ctime) + t2[2]*ctime)*(1.0-cu) + 
+											 (t1[3]*(1.0-ctime) + t2[3]*ctime)*cu)*cv);
 				u++;
 				v++;
 				time++;
@@ -280,7 +280,9 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 			const	float	*sCoord	=	attributes->s;
 
 			for (i=num;i>0;i--) {
-				*s++		=	(sCoord[0]*(1-(*u)) + sCoord[1]*(*u))*(1-(*v)) + (sCoord[2]*(1-(*u)) + sCoord[3]*(*u))*(*v);
+				const double uu = *u;
+				const double vv = *v;
+				*s++		=	(float) ((sCoord[0]*(1.0-uu) + sCoord[1]*uu)*(1.0-vv) + (sCoord[2]*(1.0-uu) + sCoord[3]*uu)*vv);
 				u++;
 				v++;
 			}
@@ -298,7 +300,9 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 			const	float	*tCoord	=	attributes->t;
 
 			for (i=num;i>0;i--) {
-				*t++		=	(tCoord[0]*(1-(*u)) + tCoord[1]*(*u))*(1-(*v)) + (tCoord[2]*(1-(*u)) + tCoord[3]*(*u))*(*v);
+				const double uu = *u;
+				const double vv = *v;
+				*t++		=	(float) ((tCoord[0]*(1.0-uu) + tCoord[1]*uu)*(1.0-vv) + (tCoord[2]*(1.0-uu) + tCoord[3]*uu)*vv);
 				u++;
 				v++;
 			}
