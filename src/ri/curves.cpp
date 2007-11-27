@@ -596,14 +596,14 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 
 	const	float	*v = varying[VARIABLE_V];
 	for (j=numVertices;j>0;j--) {
-		const	float	cv	=	*v++;
+		const	double	cv	=	*v++;
 
-		*intr++	=	v0[0]*(1-cv) + v1[0]*cv;
-		*intr++	=	v0[1]*(1-cv) + v1[1]*cv;
-		*intr++	=	v0[2]*(1-cv) + v1[2]*cv;
+		*intr++	=	(float) (v0[0]*(1.0-cv) + v1[0]*cv);
+		*intr++	=	(float) (v0[1]*(1.0-cv) + v1[1]*cv);
+		*intr++	=	(float) (v0[2]*(1.0-cv) + v1[2]*cv);
 
 		for (k=3;k<vertexSize;k++) {
-			*intr++			=	v0[k]*(1-cv) + v1[k]*cv;
+			*intr++			=	(float) (v0[k]*(1.0-cv) + v1[k]*cv);
 		}
 	}
 
