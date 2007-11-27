@@ -238,11 +238,11 @@ public:
 							const float	*v			=	varying[VARIABLE_V];
 
 							for (i=numVertices;i>0;i--) {
-								const float	cu	=	*u++;
-								const float	cv	=	*v++;
+								const double	cu	=	*u++;
+								const double	cv	=	*v++;
 
 								for (j=0;j<numFloats;j++) {
-									*dest++	=	(v0[j]*(1-cu) + v1[j]*cu)*(1-cv) + (v2[j]*(1-cu) + v3[j]*cu)*cv;
+									*dest++	=	(float) ((v0[j]*(1.0-cu) + v1[j]*cu)*(1.0-cv) + (v2[j]*(1.0-cu) + v3[j]*cu)*cv);
 								}
 							}
 						}
@@ -269,11 +269,11 @@ public:
 
 							dest					+=	start*numFloats;
 							for (i=numVertices;i>0;i--) {
-								const float	cu	=	*u++;
-								const float	cv	=	*v++;
+								const double	cu	=	*u++;
+								const double	cv	=	*v++;
 
 								for (j=0;j<numFloats;j++) {
-									*dest++	=	(v0[j]*(1-cu) + v1[j]*cu)*(1-cv) + (v2[j]*(1-cu) + v3[j]*cu)*cv;
+									*dest++	=	(float) ((v0[j]*(1.0-cu) + v1[j]*cu)*(1.0-cv) + (v2[j]*(1.0-cu) + v3[j]*cu)*cv);
 								}
 							}
 						}
@@ -329,11 +329,11 @@ public:
 							const float	*v			=	varying[VARIABLE_V];
 
 							for (i=numVertices;i>0;i--) {
-								const float	cu	=	*u++;
-								const float	cv	=	*v++;
+								const double	cu	=	*u++;
+								const double	cv	=	*v++;
 
 								for (j=0;j<numFloats;j++) {
-									*dest++	=	v0[j]*(1-cu) + v1[j]*cu*cv + v2[j]*cu*(1-cv);
+									*dest++	=	(float) (v0[j]*(1.0-cu) + v1[j]*cu*cv + v2[j]*cu*(1.0-cv));
 								}
 							}	
 						}
@@ -360,11 +360,11 @@ public:
 							dest					+=	start*numFloats;
 
 							for (i=numVertices;i>0;i--) {
-								const float	cu	=	*u++;
-								const float	cv	=	*v++;
+								const double	cu	=	*u++;
+								const double	cv	=	*v++;
 
 								for (j=0;j<numFloats;j++) {
-									*dest++	=	v0[j]*(1-cu) + v1[j]*cu*cv + v2[j]*cu*(1-cv);
+									*dest++	=	(float) (v0[j]*(1.0-cu) + v1[j]*cu*cv + v2[j]*cu*(1.0-cv));
 								}
 							}
 						}
@@ -420,10 +420,10 @@ public:
 							const float	*v			=	varying[VARIABLE_V];
 
 							for (i=numVertices;i>0;i--) {
-								const float	cv	=	*v++;
+								const double	cv	=	*v++;
 
 								for (j=0;j<numFloats;j++) {
-									*dest++	=	v0[j]*(1-cv) + v1[j]*cv;
+									*dest++	=	(float) (v0[j]*(1.0-cv) + v1[j]*cv);
 								}
 							}
 						}
@@ -448,10 +448,10 @@ public:
 							dest					+=	start*numFloats;
 
 							for (i=numVertices;i>0;i--) {
-								const float	cv	=	*v++;
+								const double	cv	=	*v++;
 
 								for (j=0;j<numFloats;j++) {
-									*dest++	=	v0[j]*(1-cv) + v1[j]*cv;
+									*dest++	=	(float) (v0[j]*(1.0-cv) + v1[j]*cv);
 								}
 							}
 						}
