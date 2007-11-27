@@ -243,10 +243,10 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			interpolate				=	vertexData;
 
 			for (i=numVertices;i>0;i--) {
-				const float ctime	=	*time++;
+				const double ctime	=	*time++;
 
 				for (j=0;j<vertexDataStep;j++) {
-					*interpolate++	=	vertex0[j]*(1-ctime) + vertex1[j]*ctime;
+					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
 		}
@@ -262,16 +262,16 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 
 		// Interpolate the vertices
 		for (i=0;i<numVertices;i++) {
-			const	float	cu		=	u[i] * (nu - 1);
-			const	float	cv		=	v[i] * (nv - 1);
+			const	double	cu		=	u[i] * (nu - 1.0);
+			const	double	cv		=	v[i] * (nv - 1.0);
 			const	int		x		=	(int) floor(min(cu,(nu-2)));
 			const	int		y		=	(int) floor(min(cv,(nv-2)));
 			const	float	*d0		=	vertexData + ((y+1)*(nu+2) + x+1)*vertexSize;
 			const	float	*d1		=	vertexData + ((y+1)*(nu+2) + x+2)*vertexSize;
 			const	float	*d2		=	vertexData + ((y+2)*(nu+2) + x+1)*vertexSize;
 			const	float	*d3		=	vertexData + ((y+2)*(nu+2) + x+2)*vertexSize;
-			const	float	xoff	=	cu - x;
-			const	float	yoff	=	cv - y;
+			const	double	xoff	=	cu - x;
+			const	double	yoff	=	cv - y;
 			int		j;
 
 			//assert((xoff >= 0) && (xoff <= 1.001));
@@ -280,7 +280,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			//assert((y >= 0) && (y < (nv-1)));
 
 			for (j=vertexSize;j>0;j--) {
-				*intr++	=	((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff;
+				*intr++	=	(float) (((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff);
 			}
 
 			vertexData				+=	vertexDataStep;
@@ -289,17 +289,17 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			d1		=	Pu + (y*nu + x+1)*3;
 			d2		=	Pu + ((y+1)*nu + x)*3;
 			d3		=	Pu + ((y+1)*nu + x+1)*3;
-			*dPdu++	=	(((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff)*um;
-			*dPdu++	=	(((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff)*um;
-			*dPdu++	=	(((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff)*um;
+			*dPdu++	=	(float) ((((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff)*um);
+			*dPdu++	=	(float) ((((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff)*um);
+			*dPdu++	=	(float) ((((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff)*um);
 
 			d0		=	Pv + (y*nu + x)*3;
 			d1		=	Pv + (y*nu + x+1)*3;
 			d2		=	Pv + ((y+1)*nu + x)*3;
 			d3		=	Pv + ((y+1)*nu + x+1)*3;
-			*dPdv++	=	(((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff)*vm;
-			*dPdv++	=	(((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff)*vm;
-			*dPdv++	=	(((*d0++)*(1-xoff) + (*d1++)*xoff)*(1-yoff)  + ((*d2++)*(1-xoff) + (*d3++)*xoff)*yoff)*vm;
+			*dPdv++	=	(float) ((((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff)*vm);
+			*dPdv++	=	(float) ((((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff)*vm);
+			*dPdv++	=	(float) ((((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff)*vm);
 		}
 
 		if (up & PARAMETER_NG) {
