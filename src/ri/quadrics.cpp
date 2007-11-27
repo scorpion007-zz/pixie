@@ -248,10 +248,10 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 	checkRay(rv);
 
 	if (nextData != NULL) {
-		r		=	this->r		* (1-rv->time) + nextData[0] * rv->time;
-		vmin	=	this->vmin	* (1-rv->time) + nextData[1] * rv->time;
-		vmax	=	this->vmax	* (1-rv->time) + nextData[2] * rv->time;
-		umax	=	this->umax	* (1-rv->time) + nextData[3] * rv->time;
+		r		=	(float) (this->r	* (1.0-rv->time) + nextData[0] * (double)rv->time);
+		vmin	=	(float) (this->vmin	* (1.0-rv->time) + nextData[1] * (double)rv->time);
+		vmax	=	(float) (this->vmax	* (1.0-rv->time) + nextData[2] * (double)rv->time);
+		umax	=	(float) (this->umax	* (1.0-rv->time) + nextData[3] * (double)rv->time);
 	} else {
 		r		=	this->r;
 		vmin	=	this->vmin;
@@ -370,17 +370,17 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 
 		// Precompute sinu cosu sinv and cosv
 		for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
-			const float ctime		=	*time++;
-			const float	cumax		=	umax[currentVertex]		=	this->umax * (1 - ctime)	+ nextData[3] * ctime;
-			const float	cvmax		=	vmax[currentVertex]		=	this->vmax * (1 - ctime)	+ nextData[2] * ctime;
-			const float	cvmin		=	vmin[currentVertex]		=	this->vmin * (1 - ctime)	+ nextData[1] * ctime;
-			r[currentVertex]		=	this->r * (1 - ctime)		+ nextData[0] * ctime;
+			const double	ctime	=	*time++;
+			const float		cumax	=	(float) (umax[currentVertex]		=	this->umax * (1.0 - ctime)	+ nextData[3] * ctime);
+			const float		cvmax	=	(float) (vmax[currentVertex]		=	this->vmax * (1.0 - ctime)	+ nextData[2] * ctime);
+			const float		cvmin	=	(float) (vmin[currentVertex]		=	this->vmin * (1.0 - ctime)	+ nextData[1] * ctime);
+			r[currentVertex]		=	(float) (this->r * (1.0 - ctime)		+ nextData[0] * (double)ctime);
 
 			// Precompute sinu cosu sinv and cosv
-			const float	cu			=	*u++;
-			const float	cv			=	*v++;
-			const float	uAngle		=	cumax*cu;
-			const float	vAngle		=	cvmax*cv + cvmin*(1-cv);
+			const double	cu		=	*u++;
+			const double	cv		=	*v++;
+			const float	uAngle		=	(float) (cumax*cu);
+			const float	vAngle		=	(float) (cvmax*cv + cvmin*(1.0-cv));
 			sinu[currentVertex]		=	sinf(uAngle);
 			cosu[currentVertex]		=	cosf(uAngle);
 			sinv[currentVertex]		=	sinf(vAngle);
@@ -434,8 +434,8 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 		// Precompute sinu cosu sinv and cosv
 		dest	=	&varying[VARIABLE_P][start*3];
 		for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
-			const float	uAngle	=	umax*u[currentVertex];
-			const float	vAngle	=	vmax*v[currentVertex] + vmin*(1-v[currentVertex]);
+			const float	uAngle	=	(float) (umax*(double)u[currentVertex]);
+			const float	vAngle	=	(float) (vmax*(double)v[currentVertex] + vmin*(1.0-v[currentVertex]));
 			sinu[currentVertex]	=	sinf(uAngle);
 			cosu[currentVertex]	=	cosf(uAngle);
 			sinv[currentVertex]	=	sinf(vAngle);
@@ -666,9 +666,9 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 
 	// Convert to the object coordinate system
 	if (nextData != NULL) {
-		r		=	this->r		* (1-rv->time) + nextData[0] * rv->time;
-		z		=	this->z		* (1-rv->time) + nextData[1] * rv->time;
-		umax	=	this->umax	* (1-rv->time) + nextData[2] * rv->time;
+		r		=	(float) (this->r	* (1.0-(double)rv->time) + nextData[0] * (double)rv->time);
+		z		=	(float) (this->z	* (1.0-(double)rv->time) + nextData[1] * (double)rv->time);
+		umax	=	(float) (this->umax	* (1.0-(double)rv->time) + nextData[2] * (double)rv->time);
 	} else {
 		r		=	this->r;
 		z		=	this->z;
@@ -752,16 +752,16 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		// Precompute sinu cosu sinv and cosv
 		for (i=0;i<numVertices;i++,dest+=3) {
-			const float ctime	=	*time++;
+			const double ctime	=	*time++;
 
-			r[i]			=	this->r * (1 - ctime)		+ nextData[0] * ctime;
-			z[i]			=	this->z * (1 - ctime)		+ nextData[1] * ctime;
-			umax[i]			=	this->umax * (1 - ctime)	+ nextData[2] * ctime;
+			r[i]			=	(float) (this->r 	* (1.0 - ctime)	+ nextData[0] * ctime);
+			z[i]			=	(float) (this->z 	* (1.0 - ctime)	+ nextData[1] * ctime);
+			umax[i]			=	(float) (this->umax * (1.0 - ctime)	+ nextData[2] * ctime);
 			cosu[i]			=	cosf(u[i]*umax[i]);
 			sinu[i]			=	sinf(u[i]*umax[i]);
 
-			dest[COMP_X]	=	r[i]*(1-v[i])*cosu[i];
-			dest[COMP_Y]	=	r[i]*(1-v[i])*sinu[i];
+			dest[COMP_X]	=	(float) (r[i]*(1.0-(double)v[i])*cosu[i]);
+			dest[COMP_Y]	=	(float) (r[i]*(1.0-(double)v[i])*sinu[i]);
 			dest[COMP_Z]	=	z[i];
 		}
 
@@ -771,8 +771,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				dPdu[COMP_X]	=	-umax[i]*r[i]*(1-v[i])*sinu[i];
-				dPdu[COMP_Y]	=	umax[i]*r[i]*(1-v[i])*cosu[i];
+				dPdu[COMP_X]	=	(float) (-umax[i]*r[i]*(1.0-(double)v[i])*sinu[i]);
+				dPdu[COMP_Y]	=	(float) ( umax[i]*r[i]*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
 				dPdv[COMP_X]	=	-r[i]*cosu[i];
 				dPdv[COMP_Y]	=	-r[i]*sinu[i];
@@ -797,8 +797,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 		for (i=0;i<numVertices;i++,dest+=3) {
 			cosu[i]			=	cosf(u[i]*umax);
 			sinu[i]			=	sinf(u[i]*umax);
-			dest[COMP_X]	=	r*(1-v[i])*cosu[i];
-			dest[COMP_Y]	=	r*(1-v[i])*sinu[i];
+			dest[COMP_X]	=	(float) (r*(1.0-(double)v[i])*cosu[i]);
+			dest[COMP_Y]	=	(float) (r*(1.0-(double)v[i])*sinu[i]);
 			dest[COMP_Z]	=	z;
 		}
 
@@ -808,8 +808,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				dPdu[COMP_X]	=	-umax*r*(1-v[i])*sinu[i];
-				dPdu[COMP_Y]	=	umax*r*(1-v[i])*cosu[i];
+				dPdu[COMP_X]	=	(float) (-umax*r*(1.0-(double)v[i])*sinu[i]);
+				dPdu[COMP_Y]	=	(float) ( umax*r*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
 				dPdv[COMP_X]	=	-r*cosu[i];
 				dPdv[COMP_Y]	=	-r*sinu[i];
@@ -994,9 +994,9 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 	dir		=	oDir;
 
 	if (nextData != NULL) {
-		r		=	this->r *		(1-rv->time) + nextData[0] * rv->time;
-		height	=	this->height *	(1-rv->time) + nextData[1] * rv->time;
-		umax	=	this->umax *	(1-rv->time) + nextData[2] * rv->time;
+		r		=	(float) (this->r *		(1.0-(double)rv->time) + nextData[0] * (double)rv->time);
+		height	=	(float) (this->height *	(1.0-(double)rv->time) + nextData[1] * (double)rv->time);
+		umax	=	(float) (this->umax *	(1.0-(double)rv->time) + nextData[2] * (double)rv->time);
 	} else {
 		r		=	this->r;
 		height	=	this->height;
@@ -1053,7 +1053,7 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 			}
 		}
 
-		if (r*r > height*height)	v			=	1 - sqrt((P[COMP_X]*P[COMP_X] + P[COMP_Y]*P[COMP_Y]) / (r*r));
+		if (r*r > height*height)	v			=	1.0 - sqrt((P[COMP_X]*P[COMP_X] + P[COMP_Y]*P[COMP_Y]) / (r*r));
 		else						v			=	P[COMP_Z] / height;
 
 		if (v < 0)	{
@@ -1062,7 +1062,7 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 
 		Nt[COMP_X]					=	(float) (P[COMP_X]*height*umax);
 		Nt[COMP_Y]					=	(float) (P[COMP_Y]*height*umax);
-		Nt[COMP_Z]					=	(float) (r*r*umax*(1 - v));
+		Nt[COMP_Z]					=	(float) (r*r*umax*(1.0 - v));
 		if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) {
 			mulvf(Nt,-1);
 		}
@@ -1124,11 +1124,11 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 		// Precompute sinu cosu sinv and cosv
 		dest			=	varying[VARIABLE_P] + start*3;
 		for (i=0;i<numVertices;i++,dest+=3) {
-			r[i]			=	this->r * (1 - time[i])			+ nextData[0] * time[i];
-			height[i]		=	this->height * (1 - time[i])	+ nextData[1] * time[i];
-			umax[i]			=	this->umax * (1 - time[i])		+ nextData[2] * time[i];
-			dest[COMP_X]	=	r[i]*(1-v[i])*cosu[i];
-			dest[COMP_Y]	=	r[i]*(1-v[i])*sinu[i];
+			r[i]			=	(float) (this->r		* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
+			height[i]		=	(float) (this->height	* (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
+			umax[i]			=	(float) (this->umax 	* (1.0 - (double)time[i])	+ nextData[2] * (double)time[i]);
+			dest[COMP_X]	=	(float) (r[i]*(1.0-(double)v[i])*cosu[i]);
+			dest[COMP_Y]	=	(float) (r[i]*(1.0-(double)v[i])*sinu[i]);
 			dest[COMP_Z]	=	v[i]*height[i];
 		}
 
@@ -1140,7 +1140,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			for (i=0;i<numVertices;i++) {
 				Ng[COMP_X]	=	P[COMP_X]*umax[i]*height[i];
 				Ng[COMP_Y]	=	P[COMP_Y]*umax[i]*height[i];
-				Ng[COMP_Z]	=	r[i]*r[i]*umax[i]*(1-v[i]);
+				Ng[COMP_Z]	=	(float) (r[i]*r[i]*umax[i]*(1.0-(double)v[i]));
 				Ng			+=	3;
 				P			+=	3;
 			}
@@ -1152,8 +1152,8 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				dPdu[COMP_X]	=	-umax[i]*r[i]*(1-v[i])*sinu[i];
-				dPdu[COMP_Y]	=	umax[i]*r[i]*(1-v[i])*cosu[i];
+				dPdu[COMP_X]	=	(float) (-umax[i]*r[i]*(1.0-(double)v[i])*sinu[i]);
+				dPdu[COMP_Y]	=	(float) ( umax[i]*r[i]*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
 				dPdv[COMP_X]	=	-r[i]*cosu[i];
 				dPdv[COMP_Y]	=	-r[i]*sinu[i];
@@ -1175,8 +1175,8 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		// Set u/v/P
 		for (i=0,dest=&varying[VARIABLE_P][start*3];i<numVertices;i++) {
-			dest[COMP_X]	=	r*(1-v[i])*cosu[i];
-			dest[COMP_Y]	=	r*(1-v[i])*sinu[i];
+			dest[COMP_X]	=	(float) (r*(1.0-(double)v[i])*cosu[i]);
+			dest[COMP_Y]	=	(float) (r*(1.0-(double)v[i])*sinu[i]);
 			dest[COMP_Z]	=	v[i]*height;
 			dest			+=	3;
 		}
@@ -1189,7 +1189,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			for (i=0;i<numVertices;i++) {
 				Ng[COMP_X]	=	P[COMP_X]*height*umax;
 				Ng[COMP_Y]	=	P[COMP_Y]*height*umax;
-				Ng[COMP_Z]	=	r*r*umax*(1-v[i]);
+				Ng[COMP_Z]	=	(float) (r*r*umax*(1.0-(double)v[i]));
 				Ng			+=	3;
 				P			+=	3;
 			}
@@ -1201,8 +1201,8 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				dPdu[COMP_X]	=	-umax*r*(1-v[i])*sinu[i];
-				dPdu[COMP_Y]	=	umax*r*(1-v[i])*cosu[i];
+				dPdu[COMP_X]	=	(float) (-umax*r*(1.0-(double)v[i])*sinu[i]);
+				dPdu[COMP_Y]	=	(float) ( umax*r*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
 				dPdv[COMP_X]	=	-r*cosu[i];
 				dPdv[COMP_Y]	=	-r*sinu[i];
@@ -1395,10 +1395,10 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 	float	r,umax;
 
 	if (nextData != NULL) {
-		zmin	=	this->zmin * (1 - rv->time) + nextData[1] * rv->time;
-		zmax	=	this->zmax * (1 - rv->time) + nextData[2] * rv->time;
-		r		=	this->r * (1 - rv->time)	+ nextData[0] * rv->time;
-		umax	=	this->umax * (1 - rv->time) + nextData[3] * rv->time;
+		zmin	=	(float) (this->zmin * (1.0 - (double)rv->time) + nextData[1] * (double)rv->time);
+		zmax	=	(float) (this->zmax * (1.0 - (double)rv->time) + nextData[2] * (double)rv->time);
+		r		=	(float) (this->r	* (1.0 - (double)rv->time) + nextData[0] * (double)rv->time);
+		umax	=	(float) (this->umax * (1.0 - (double)rv->time) + nextData[3] * (double)rv->time);
 	} else {
 		zmin	=	this->zmin;
 		zmax	=	this->zmax;
@@ -1506,10 +1506,10 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 		// Precompute the sin/cos for u points
 		dest			=				varying[VARIABLE_P] + start*3;
 		for (i=0;i<numVertices;i++) {
-			r[i]			=	this->r * (1 - time[i])	   + nextData[0] * time[i];
-			zmin[i]			=	this->zmin * (1 - time[i]) + nextData[1] * time[i];
-			zmax[i]			=	this->zmax * (1 - time[i]) + nextData[2] * time[i];
-			umax[i]			=	this->umax * (1 - time[i]) + nextData[3] * time[i];
+			r[i]			=	(float) (this->r	* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
+			zmin[i]			=	(float) (this->zmin * (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
+			zmax[i]			=	(float) (this->zmax * (1.0 - (double)time[i])	+ nextData[2] * (double)time[i]);
+			umax[i]			=	(float) (this->umax * (1.0 - (double)time[i])	+ nextData[3] * (double)time[i]);
 			cosu[i]			=	cosf(u[i]*umax[i]);
 			sinu[i]			=	sinf(u[i]*umax[i]);
 			sqrtz[i]		=	sqrtf(((zmax[i]-zmin[i])*v[i]+zmin[i])/zmax[i]);
@@ -1778,10 +1778,10 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 	float	r,zmin,zmax,umax;
 
 	if (nextData != NULL) {
-		zmin	=	this->zmin * (1 - rv->time) + nextData[1] * rv->time;
-		zmax	=	this->zmax * (1 - rv->time) + nextData[2] * rv->time;
-		r		=	this->r * (1 - rv->time) + nextData[0] * rv->time;
-		umax	=	this->umax * (1 - rv->time) + nextData[3] * rv->time;
+		zmin	=	(float) (this->zmin * (1.0 - (double)rv->time) + nextData[1] * (double)rv->time);
+		zmax	=	(float) (this->zmax * (1.0 - (double)rv->time) + nextData[2] * (double)rv->time);
+		r		=	(float) (this->r	* (1.0 - (double)rv->time) + nextData[0] * (double)rv->time);
+		umax	=	(float) (this->umax * (1.0 - (double)rv->time) + nextData[3] * (double)rv->time);
 	} else {
 		zmin	=	this->zmin;
 		zmax	=	this->zmax;
@@ -1884,10 +1884,10 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 		// Precompute the sin/cos for u points
 		dest			=	varying[VARIABLE_P] + start*3;
 		for (i=0;i<numVertices;i++) {
-			r[i]		=	this->r * (1 - time[i])		+ nextData[0] * time[i];
-			zmin[i]		=	this->zmin * (1 - time[i])  + nextData[1] * time[i];
-			zmax[i]		=	this->zmax * (1 - time[i])  + nextData[2] * time[i];
-			umax[i]		=	this->umax * (1 - time[i])  + nextData[3] * time[i];
+			r[i]		=	(float) (this->r 	* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
+			zmin[i]		=	(float) (this->zmin * (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
+			zmax[i]		=	(float) (this->zmax * (1.0 - (double)time[i])	+ nextData[2] * (double)time[i]);
+			umax[i]		=	(float) (this->umax * (1.0 - (double)time[i])	+ nextData[3] * (double)time[i]);
 			cosu[i]		=	(cosf(u[i]*umax[i]))*r[i];
 			sinu[i]		=	(sinf(u[i]*umax[i]))*r[i];
 
@@ -2160,7 +2160,7 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 	if (nextData != NULL) {
 		interpolatev(p1,this->p1,&nextData[0],rv->time);
 		interpolatev(p2,this->p2,&nextData[3],rv->time);
-		umax	=	this->umax * (1 - rv->time) + nextData[6] * rv->time;
+		umax	=	(float) (this->umax * (1.0 - (double)rv->time) + nextData[6] * (double)rv->time);
 	} else {
 		movvv(p1,this->p1);
 		movvv(p2,this->p2);
@@ -2246,8 +2246,8 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 			if (v > 1)	continue;
 		}
 		
-		x			=	p1[COMP_X]*(1-v) + p2[COMP_X]*v;
-		y			=	p1[COMP_Y]*(1-v) + p2[COMP_Y]*v;
+		x			=	(float) (p1[COMP_X]*(1.0-v) + p2[COMP_X]*(double)v);
+		y			=	(float) (p1[COMP_Y]*(1.0-v) + p2[COMP_Y]*(double)v);
 
 		u			=	atan2(P[COMP_Y],P[COMP_X]);
 		ustart		=	atan2(y,x);
@@ -2325,13 +2325,13 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 
 		// Precompute the sin/cos for u points
 		for (i=0;i<numVertices;i++) {
-			umax[i]		=	this->umax * (1 - time[i]) + nextData[6] * time[i];
-			cp1[COMP_X]	=	tp1[COMP_X] * (1 - time[i]) + np1[COMP_X] * time[i];
-			cp1[COMP_Y]	=	tp1[COMP_Y] * (1 - time[i]) + np1[COMP_Y] * time[i];
-			cp1[COMP_Z]	=	tp1[COMP_Z] * (1 - time[i]) + np1[COMP_Z] * time[i];
-			cp2[COMP_X]	=	tp2[COMP_X] * (1 - time[i]) + np2[COMP_X] * time[i];
-			cp2[COMP_Y]	=	tp2[COMP_Y] * (1 - time[i]) + np2[COMP_Y] * time[i];
-			cp2[COMP_Z]	=	tp2[COMP_Z] * (1 - time[i]) + np2[COMP_Z] * time[i];
+			umax[i]		=	(float) (this->umax  * (1.0 - (double)time[i]) + nextData[6] * (double)time[i]);
+			cp1[COMP_X]	=	(float) (tp1[COMP_X] * (1.0 - (double)time[i]) + np1[COMP_X] * (double)time[i]);
+			cp1[COMP_Y]	=	(float) (tp1[COMP_Y] * (1.0 - (double)time[i]) + np1[COMP_Y] * (double)time[i]);
+			cp1[COMP_Z]	=	(float) (tp1[COMP_Z] * (1.0 - (double)time[i]) + np1[COMP_Z] * (double)time[i]);
+			cp2[COMP_X]	=	(float) (tp2[COMP_X] * (1.0 - (double)time[i]) + np2[COMP_X] * (double)time[i]);
+			cp2[COMP_Y]	=	(float) (tp2[COMP_Y] * (1.0 - (double)time[i]) + np2[COMP_Y] * (double)time[i]);
+			cp2[COMP_Z]	=	(float) (tp2[COMP_Z] * (1.0 - (double)time[i]) + np2[COMP_Z] * (double)time[i]);
 			dx[i]		=	cp2[COMP_X]	-	cp1[COMP_X];
 			dy[i]		=	cp2[COMP_Y]	-	cp1[COMP_Y];
 			dz[i]		=	cp2[COMP_Z]	-	cp1[COMP_Z];
@@ -2625,11 +2625,11 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 
 
 	if (nextData != NULL) {
-		rmin	=	this->rmin * (1 - rv->time) + nextData[0] * rv->time;
-		rmax	=	this->rmax * (1 - rv->time) + nextData[1] * rv->time;
-		umax	=	this->umax * (1 - rv->time) + nextData[2] * rv->time;
-		vmax	=	this->vmax * (1 - rv->time) + nextData[3] * rv->time;
-		vmin	=	this->vmin * (1 - rv->time) + nextData[4] * rv->time;
+		rmin	=	(float) (this->rmin * (1.0 - (double)rv->time) + nextData[0] * (double)rv->time);
+		rmax	=	(float) (this->rmax * (1.0 - (double)rv->time) + nextData[1] * (double)rv->time);
+		umax	=	(float) (this->umax * (1.0 - (double)rv->time) + nextData[2] * (double)rv->time);
+		vmax	=	(float) (this->vmax * (1.0 - (double)rv->time) + nextData[3] * (double)rv->time);
+		vmin	=	(float) (this->vmin * (1.0 - (double)rv->time) + nextData[4] * (double)rv->time);
 	} else {
 		rmin	=	this->rmin;
 		rmax	=	this->rmax;
@@ -2790,11 +2790,11 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 
 		// Precompute the sin/cos for u points
 		for (i=0;i<numVertices;i++) {
-			rmin[i]	=	this->rmin * (1 - time[i]) + nextData[0] * time[i];
-			rmax[i]	=	this->rmax * (1 - time[i]) + nextData[1] * time[i];
-			vmin[i]	=	this->vmin * (1 - time[i]) + nextData[2] * time[i];
-			vmax[i]	=	this->vmax * (1 - time[i]) + nextData[3] * time[i];
-			umax[i]	=	this->umax * (1 - time[i]) + nextData[4] * time[i];
+			rmin[i]	=	(float) (this->rmin * (1.0 - (double)time[i]) + nextData[0] * (double)time[i]);
+			rmax[i]	=	(float) (this->rmax * (1.0 - (double)time[i]) + nextData[1] * (double)time[i]);
+			vmin[i]	=	(float) (this->vmin * (1.0 - (double)time[i]) + nextData[2] * (double)time[i]);
+			vmax[i]	=	(float) (this->vmax * (1.0 - (double)time[i]) + nextData[3] * (double)time[i]);
+			umax[i]	=	(float) (this->umax * (1.0 - (double)time[i]) + nextData[4] * (double)time[i]);
 
 			cosu[i]	=	cosf(u[i]*umax[i]);
 			sinu[i]	=	sinf(u[i]*umax[i]);
