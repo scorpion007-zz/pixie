@@ -327,13 +327,13 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 					const float	*sv12	=	data1 + this->v2*variable->numFloats;
 
 					for (i=0;i<numVertices;i++) {
-						const	float	cu		=	u[i];
-						const	float	cv		=	v[i];
-						const	float	ctime	=	time[i];
+						const	double	cu		=	u[i];
+						const	double	cv		=	v[i];
+						const	double	ctime	=	time[i];
 
 						for (k=0;k<numFloats;k++) {
-							*dest++	=	(sv00[k]*(1-cu) + sv01[k]*cu*cv + sv02[k]*cu*(1-cv))*(1-ctime) + 
-										(sv10[k]*(1-cu) + sv11[k]*cu*cv + sv12[k]*cu*(1-cv))*ctime;
+							*dest++	=	(float) ((sv00[k]*(1.0-cu) + sv01[k]*cu*cv + sv02[k]*cu*(1.0-cv))*(1.0-ctime) + 
+												 (sv10[k]*(1.0-cu) + sv11[k]*cu*cv + sv12[k]*cu*(1.0-cv))*ctime);
 						}
 					}
 				}
@@ -352,12 +352,12 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cv		=	v[i];
-				const float	ctime	=	time[i];
+				const double cv		=	v[i];
+				const double ctime	=	time[i];
 
-				dest[0]			=	(v01[0]*cv + v02[0]*(1-cv) - v00[0])*(1-ctime) + (v11[0]*cv + v12[0]*(1-cv) - v10[0])*ctime;
-				dest[1]			=	(v01[1]*cv + v02[1]*(1-cv) - v00[1])*(1-ctime) + (v11[1]*cv + v12[1]*(1-cv) - v10[1])*ctime;
-				dest[2]			=	(v01[2]*cv + v02[2]*(1-cv) - v00[2])*(1-ctime) + (v11[2]*cv + v12[2]*(1-cv) - v10[2])*ctime;
+				dest[0]			=	(float) ((v01[0]*cv + v02[0]*(1.0-cv) - v00[0])*(1.0-ctime) + (v11[0]*cv + v12[0]*(1-cv) - v10[0])*ctime);
+				dest[1]			=	(float) ((v01[1]*cv + v02[1]*(1.0-cv) - v00[1])*(1.0-ctime) + (v11[1]*cv + v12[1]*(1-cv) - v10[1])*ctime);
+				dest[2]			=	(float) ((v01[2]*cv + v02[2]*(1.0-cv) - v00[2])*(1.0-ctime) + (v11[2]*cv + v12[2]*(1-cv) - v10[2])*ctime);
 				dest			+=	3;
 			}
 		}
@@ -366,12 +366,12 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cu		=	u[i];
-				const float	ctime	=	time[i];
+				const double cu		=	u[i];
+				const double ctime	=	time[i];
 
-				dest[0]			=	(v01[0] - v02[0])*cu*(1-ctime) + (v11[0] - v12[0])*cu*ctime;
-				dest[1]			=	(v01[1] - v02[1])*cu*(1-ctime) + (v11[1] - v12[1])*cu*ctime;
-				dest[2]			=	(v01[2] - v02[2])*cu*(1-ctime) + (v11[2] - v12[2])*cu*ctime;
+				dest[0]			=	(float) ((v01[0] - v02[0])*cu*(1.0-ctime) + (v11[0] - v12[0])*cu*ctime);
+				dest[1]			=	(float) ((v01[1] - v02[1])*cu*(1.0-ctime) + (v11[1] - v12[1])*cu*ctime);
+				dest[2]			=	(float) ((v01[2] - v02[2])*cu*(1.0-ctime) + (v11[2] - v12[2])*cu*ctime);
 				dest			+=	3;
 			}
 		}
@@ -428,11 +428,11 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 					const float	*sv2	=	data + pl->parameters[j].index + this->v2*variable->numFloats;
 
 					for (i=0;i<numVertices;i++) {
-						const	float	cu	=	u[i];
-						const	float	cv	=	v[i];
+						const	double	cu	=	u[i];
+						const	double	cv	=	v[i];
 
 						for (k=0;k<numFloats;k++) {
-							*dest++	=	sv0[k]*(1-cu) + sv1[k]*cu*cv + sv2[k]*cu*(1-cv);
+							*dest++	=	(float) (sv0[k]*(1.0-cu) + sv1[k]*cu*cv + sv2[k]*cu*(1.0-cv));
 						}
 					}
 				}
@@ -444,11 +444,11 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cv	=	v[i];
+				const double cv	=	v[i];
 
-				dest[0]			=	v1[0]*cv + v2[0]*(1-cv) - v0[0];
-				dest[1]			=	v1[1]*cv + v2[1]*(1-cv) - v0[1];
-				dest[2]			=	v1[2]*cv + v2[2]*(1-cv) - v0[2];
+				dest[0]			=	(float) (v1[0]*cv + v2[0]*(1.0-cv) - v0[0]);
+				dest[1]			=	(float) (v1[1]*cv + v2[1]*(1.0-cv) - v0[1]);
+				dest[2]			=	(float) (v1[2]*cv + v2[2]*(1.0-cv) - v0[2]);
 				dest			+=	3;
 			}
 		}
@@ -457,11 +457,11 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cu	=	u[i];
+				const double cu	=	u[i];
 
-				dest[0]			=	(v1[0] - v2[0])*cu;
-				dest[1]			=	(v1[1] - v2[1])*cu;
-				dest[2]			=	(v1[2] - v2[2])*cu;
+				dest[0]			=	(float) ((v1[0] - v2[0])*cu);
+				dest[1]			=	(float) ((v1[1] - v2[1])*cu);
+				dest[2]			=	(float) ((v1[2] - v2[2])*cu);
 				dest			+=	3;
 			}
 		}
@@ -565,11 +565,11 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 				v1	=	data + this->v1*numFloats;
 				v2	=	data + this->v2*numFloats;
 				for (j=0;j<numVertices;j++) {
-					const	float	cu	=	u[j];
-					const	float	cv	=	v[j];
+					const	double	cu	=	u[j];
+					const	double	cv	=	v[j];
 
 					for (k=0;k<numFloats;k++) {
-						*dest++	=	v0[k]*(1-cu) + v1[k]*cu*cv + v2[k]*cu*(1-cv);
+						*dest++	=	(float) (v0[k]*(1-cu) + v1[k]*cu*cv + v2[k]*cu*(1-cv));
 					}
 				}
 
@@ -579,11 +579,11 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 				v1	=	data + this->fv1*numFloats;
 				v2	=	data + this->fv2*numFloats;
 				for (j=0;j<numVertices;j++) {
-					const	float	cu	=	u[j];
-					const	float	cv	=	v[j];
+					const	double	cu	=	u[j];
+					const	double	cv	=	v[j];
 
 					for (k=0;k<numFloats;k++) {
-						*dest++	=	v0[k]*(1-cu) + v1[k]*cu*cv + v2[k]*cu*(1-cv);
+						*dest++	=	(float) (v0[k]*(1-cu) + v1[k]*cu*cv + v2[k]*cu*(1-cv));
 					}
 				}
 				break;
@@ -919,13 +919,13 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 					const float	*sv13	=	data1 + this->v3*variable->numFloats;
 
 					for (i=0;i<numVertices;i++) {
-						const	float	cu		=	u[i];
-						const	float	cv		=	v[i];
-						const	float	ctime	=	time[i];
+						const	double	cu		=	u[i];
+						const	double	cv		=	v[i];
+						const	double	ctime	=	time[i];
 
 						for (k=0;k<numFloats;k++) {
-							*dest++	=	((sv00[k]*(1-cu) + sv01[k]*cu)*(1-cv) + (sv02[k]*(1-cu) + sv03[k]*cu)*cv)*(1-ctime) + 
-										((sv10[k]*(1-cu) + sv11[k]*cu)*(1-cv) + (sv12[k]*(1-cu) + sv13[k]*cu)*cv)*ctime;
+							*dest++	=	(float) (((sv00[k]*(1.0-cu) + sv01[k]*cu)*(1.0-cv) + (sv02[k]*(1.0-cu) + sv03[k]*cu)*cv)*(1.0-ctime) + 
+												 ((sv10[k]*(1.0-cu) + sv11[k]*cu)*(1.0-cv) + (sv12[k]*(1.0-cu) + sv13[k]*cu)*cv)*ctime);
 						}
 					}
 				}
@@ -946,12 +946,12 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cv		=	v[i];
-				const float	ctime	=	time[i];
+				const double cv		=	v[i];
+				const double ctime	=	time[i];
 
-				dest[0]			=	((-v00[0] + v01[0])*(1-cv) + (-v02[0] + v03[0])*cv)*(1-ctime) + ((-v10[0] + v11[0])*(1-cv) + (-v12[0] + v13[0])*cv)*ctime;
-				dest[1]			=	((-v00[1] + v01[1])*(1-cv) + (-v02[1] + v03[1])*cv)*(1-ctime) + ((-v10[1] + v11[1])*(1-cv) + (-v12[1] + v13[1])*cv)*ctime;
-				dest[2]			=	((-v00[2] + v01[2])*(1-cv) + (-v02[2] + v03[2])*cv)*(1-ctime) + ((-v10[2] + v11[2])*(1-cv) + (-v12[2] + v13[2])*cv)*ctime;
+				dest[0]			=	(float) (((-v00[0] + v01[0])*(1.0-cv) + (-v02[0] + v03[0])*cv)*(1.0-ctime) + ((-v10[0] + v11[0])*(1.0-cv) + (-v12[0] + v13[0])*cv)*ctime);
+				dest[1]			=	(float) (((-v00[1] + v01[1])*(1.0-cv) + (-v02[1] + v03[1])*cv)*(1.0-ctime) + ((-v10[1] + v11[1])*(1.0-cv) + (-v12[1] + v13[1])*cv)*ctime);
+				dest[2]			=	(float) (((-v00[2] + v01[2])*(1.0-cv) + (-v02[2] + v03[2])*cv)*(1.0-ctime) + ((-v10[2] + v11[2])*(1.0-cv) + (-v12[2] + v13[2])*cv)*ctime);
 				dest			+=	3;
 			}
 		}
@@ -960,12 +960,12 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cu		=	u[i];
-				const float	ctime	=	time[i];
+				const double cu		=	u[i];
+				const double ctime	=	time[i];
 
-				dest[0]			=	(-(v00[0]*(1-cu) + (v01[0]*cu)) + (v02[0]*(1-cu) + (v03[0]*cu)))*(1-ctime) + (-(v10[0]*(1-cu) + (v11[0]*cu)) + (v12[0]*(1-cu) + (v13[0]*cu)))*ctime;
-				dest[1]			=	(-(v00[1]*(1-cu) + (v01[1]*cu)) + (v02[1]*(1-cu) + (v03[1]*cu)))*(1-ctime) + (-(v10[1]*(1-cu) + (v11[1]*cu)) + (v12[1]*(1-cu) + (v13[1]*cu)))*ctime;
-				dest[2]			=	(-(v00[2]*(1-cu) + (v01[2]*cu)) + (v02[2]*(1-cu) + (v03[2]*cu)))*(1-ctime) + (-(v10[2]*(1-cu) + (v11[2]*cu)) + (v12[2]*(1-cu) + (v13[2]*cu)))*ctime;
+				dest[0]			=	(float) ((-(v00[0]*(1.0-cu) + (v01[0]*cu)) + (v02[0]*(1.0-cu) + (v03[0]*cu)))*(1.0-ctime) + (-(v10[0]*(1.0-cu) + (v11[0]*cu)) + (v12[0]*(1.0-cu) + (v13[0]*cu)))*ctime);
+				dest[1]			=	(float) ((-(v00[1]*(1.0-cu) + (v01[1]*cu)) + (v02[1]*(1.0-cu) + (v03[1]*cu)))*(1.0-ctime) + (-(v10[1]*(1.0-cu) + (v11[1]*cu)) + (v12[1]*(1.0-cu) + (v13[1]*cu)))*ctime);
+				dest[2]			=	(float) ((-(v00[2]*(1.0-cu) + (v01[2]*cu)) + (v02[2]*(1.0-cu) + (v03[2]*cu)))*(1.0-ctime) + (-(v10[2]*(1.0-cu) + (v11[2]*cu)) + (v12[2]*(1.0-cu) + (v13[2]*cu)))*ctime);
 				dest			+=	3;
 			}
 		}
@@ -1016,27 +1016,27 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 					const float	*sv3	=	data + pl->parameters[j].index + this->v3*variable->numFloats;
 
 					for (i=0;i<numVertices;i++) {
-						const	float	cu	=	u[i];
-						const	float	cv	=	v[i];
+						const	double cu	=	u[i];
+						const	double cv	=	v[i];
 
 						for (k=0;k<numFloats;k++) {
-							*dest++	=	(sv0[k]*(1-cu) + sv1[k]*cu)*(1-cv) + (sv2[k]*(1-cu) + sv3[k]*cu)*cv;
+							*dest++	=	(float) ((sv0[k]*(1.0-cu) + sv1[k]*cu)*(1.0-cv) + (sv2[k]*(1.0-cu) + sv3[k]*cu)*cv);
 						}
 					}
 				}
 			}
 		}
-
+		
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
 			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cv	=	v[i];
+				const double cv	=	v[i];
 
-				dest[0]			=	(v1[0] - v0[0])*(1-cv) + (v3[0] - v2[0])*cv;
-				dest[1]			=	(v1[1] - v0[1])*(1-cv) + (v3[1] - v2[1])*cv;
-				dest[2]			=	(v1[2] - v0[2])*(1-cv) + (v3[2] - v2[2])*cv;
+				dest[0]			=	(float) ((v1[0] - v0[0])*(1.0-cv) + (v3[0] - v2[0])*cv);
+				dest[1]			=	(float) ((v1[1] - v0[1])*(1.0-cv) + (v3[1] - v2[1])*cv);
+				dest[2]			=	(float) ((v1[2] - v0[2])*(1.0-cv) + (v3[2] - v2[2])*cv);
 				dest			+=	3;
 			}
 		}
@@ -1045,11 +1045,11 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
 
 			for (i=0;i<numVertices;i++) {
-				const float	cu	=	u[i];
+				const double cu	=	u[i];
 
-				dest[0]			=	(v2[0]*(1-cu) + v3[0]*cu) - (v0[0]*(1-cu) + v1[0]*cu);
-				dest[1]			=	(v2[1]*(1-cu) + v3[1]*cu) - (v0[1]*(1-cu) + v1[1]*cu);
-				dest[2]			=	(v2[2]*(1-cu) + v3[2]*cu) - (v0[2]*(1-cu) + v1[2]*cu);
+				dest[0]			=	(float) ((v2[0]*(1.0-cu) + v3[0]*cu) - (v0[0]*(1.0-cu) + v1[0]*cu));
+				dest[1]			=	(float) ((v2[1]*(1.0-cu) + v3[1]*cu) - (v0[1]*(1.0-cu) + v1[1]*cu));
+				dest[2]			=	(float) ((v2[2]*(1.0-cu) + v3[2]*cu) - (v0[2]*(1.0-cu) + v1[2]*cu));
 				dest			+=	3;
 			}
 		}
@@ -1149,11 +1149,11 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 				v2	=	data + this->v2*numFloats;
 				v3	=	data + this->v3*numFloats;
 				for (j=0;j<numVertices;j++) {
-					const	float	cu	=	u[j];
-					const	float	cv	=	v[j];
+					const	double	cu	=	u[j];
+					const	double	cv	=	v[j];
 
 					for (k=0;k<numFloats;k++) {
-						*dest++	=	(v0[k]*(1-cu) + v1[k]*cu)*(1-cv) + (v2[k]*(1-cu) + v3[k]*cu)*cv;
+						*dest++	=	(float) (v0[k]*(1.0-cu) + v1[k]*cu)*(1.0-cv) + (v2[k]*(1.0-cu) + v3[k]*cu)*cv;
 					}
 				}
 
@@ -1164,11 +1164,11 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 				v2	=	data + this->fv2*numFloats;
 				v3	=	data + this->fv3*numFloats;
 				for (j=0;j<numVertices;j++) {
-					const	float	cu	=	u[j];
-					const	float	cv	=	v[j];
+					const	double	cu	=	u[j];
+					const	double	cv	=	v[j];
 
 					for (k=0;k<numFloats;k++) {
-						*dest++	=	(v0[k]*(1-cu) + v1[k]*cu)*(1-cv) + (v2[k]*(1-cu) + v3[k]*cu)*cv;
+						*dest++	=	(float) (v0[k]*(1.0-cu) + v1[k]*cu)*(1.0-cv) + (v2[k]*(1.0-cu) + v3[k]*cu)*cv;
 					}
 				}
 				break;
