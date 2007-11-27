@@ -1975,7 +1975,7 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 #ifndef INIT_SHADING
 #define	FILTERSTEP2EXPR_PRE		FUN3EXPR_PRE																		\
 								plBegin(CFilterLookup,3);															\
-								float			tmp;																\
+								double			tmp;																\
 								float			val;																\
 								int				i;																	\
 								float			step,vstep;															\
@@ -1992,7 +1992,7 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 								for (i=0;i<numVertices;i++) {														\
 									dsdu[i]		=	fabs(dsdu[i]*du[i]);											\
 									dsdv[i]		=	fabs(dsdv[i]*dv[i]);											\
-									fwidth[i]	=	scratch->textureParams.width*max(dsdv[i] + dsdv[i],C_EPSILON);	\
+									fwidth[i]	=	scratch->textureParams.width*max(dsdu[i] + dsdv[i],C_EPSILON);	\
 								}
 
 #define	FILTERSTEP2EXPR			plReady();																			\
@@ -2007,7 +2007,7 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 									val		-=	vstep;																\
 									i--;																			\
 								}																					\
-								*res	=	tmp / (lookup->normalizer * fwidth[0]);
+								*res	=	(float) (tmp / ((double) lookup->normalizer * fwidth[0]));
 
 
 #define	FILTERSTEP2EXPR_UPDATE	plStep();																			\
