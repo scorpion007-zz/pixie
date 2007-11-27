@@ -366,9 +366,9 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 			k				=	vertexSize*4;
 
 			for (i=numVertices;i>0;i--) {
-				const float	ctime	=	*time++;
+				const double ctime	=	*time++;
 				for (j=0;j<k;j++) {
-					*interpolate++	=	vertex0[j]*(1-ctime) + vertex1[j]*ctime;
+					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
 		}
@@ -384,12 +384,12 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 		float		*tmp	=	intr;
 
 		for (i=0;i<numVertices;i++) {
-			const float cu	=	*u++;
-			const float cv	=	*v++;
+			const double cu	=	*u++;
+			const double cv	=	*v++;
 
 			for (j=0;j<vertexSize;j++) {
-				*tmp++	=	(v0[j]*(1 - cu) + v1[j]*cu)*(1-cv)	+
-							(v2[j]*(1 - cu) + v3[j]*cu)*cv;
+				*tmp++	=	(float) ((v0[j]*(1.0 - cu) + v1[j]*cu)*(1.0 - cv)	+
+									 (v2[j]*(1.0 - cu) + v3[j]*cu)*cv);
 			}
 
 			v0			+=	vertexDataStep;
@@ -650,10 +650,10 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 			interpolate		=	vertexData;
 
 			for (i=numVertices;i>0;i--) {
-				const float	ctime	=	*time++;
+				const double	ctime	=	*time++;
 
 				for (j=0;j<vertexDataStep;j++) {
-					*interpolate++	=	vertex0[j]*(1-ctime) + vertex1[j]*ctime;
+					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
 		}
@@ -909,9 +909,9 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			interpolate		=	vertexData;
 
 			for (i=numVertices;i>0;i--) {
-				const float ctime	=	*time++;
+				const double ctime	=	*time++;
 				for (j=0;j<vertexDataStep;j++) {
-					*interpolate++	=	vertex0[j]*(1-ctime) + vertex1[j]*ctime;
+					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
 		}
