@@ -1153,7 +1153,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 					const	double	cv	=	v[j];
 
 					for (k=0;k<numFloats;k++) {
-						*dest++	=	(float) (v0[k]*(1.0-cu) + v1[k]*cu)*(1.0-cv) + (v2[k]*(1.0-cu) + v3[k]*cu)*cv;
+						*dest++	=	(float) ((v0[k]*(1.0-cu) + v1[k]*cu)*(1.0-cv) + (v2[k]*(1.0-cu) + v3[k]*cu)*cv);
 					}
 				}
 
@@ -1168,7 +1168,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 					const	double	cv	=	v[j];
 
 					for (k=0;k<numFloats;k++) {
-						*dest++	=	(float) (v0[k]*(1.0-cu) + v1[k]*cu)*(1.0-cv) + (v2[k]*(1.0-cu) + v3[k]*cu)*cv;
+						*dest++	=	(float) ((v0[k]*(1.0-cu) + v1[k]*cu)*(1.0-cv) + (v2[k]*(1.0-cu) + v3[k]*cu)*cv);
 					}
 				}
 				break;

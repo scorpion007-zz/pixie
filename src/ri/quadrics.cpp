@@ -371,9 +371,9 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 		// Precompute sinu cosu sinv and cosv
 		for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
 			const double	ctime	=	*time++;
-			const float		cumax	=	(float) (umax[currentVertex]		=	this->umax * (1.0 - ctime)	+ nextData[3] * ctime);
-			const float		cvmax	=	(float) (vmax[currentVertex]		=	this->vmax * (1.0 - ctime)	+ nextData[2] * ctime);
-			const float		cvmin	=	(float) (vmin[currentVertex]		=	this->vmin * (1.0 - ctime)	+ nextData[1] * ctime);
+			const float		cumax	=	umax[currentVertex]		=	(float) (this->umax * (1.0 - ctime)	+ nextData[3] * ctime);
+			const float		cvmax	=	vmax[currentVertex]		=	(float) (this->vmax * (1.0 - ctime)	+ nextData[2] * ctime);
+			const float		cvmin	=	vmin[currentVertex]		=	(float) (this->vmin * (1.0 - ctime)	+ nextData[1] * ctime);
 			r[currentVertex]		=	(float) (this->r * (1.0 - ctime)		+ nextData[0] * (double)ctime);
 
 			// Precompute sinu cosu sinv and cosv
