@@ -1800,13 +1800,12 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									numRays++;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
-									movvv(D0,D);																	\
-									mulvf(D1,dDdu,(*du)*swidth);													\
-									mulvf(D2,dDdv,(*dv)*twidth);													\
-									addvv(D3,D1,D2);																\
-									addvv(D1,D);																	\
-									addvv(D2,D);																	\
-									addvv(D3,D);																	\
+									mulvf(dDdu,(*du)*swidth*0.5f);													\
+									mulvf(dDdv,(*dv)*twidth*0.5f);													\
+									subvv(D0,D,dDdu); subvv(D0,dDdv);												\
+									addvv(D1,D,dDdu); subvv(D1,dDdv);												\
+									subvv(D2,D,dDdu); addvv(D2,dDdv);												\
+									addvv(D3,D,dDdu); addvv(D3,dDdv);												\
 									if (__float) {																	\
 										vector	color;																\
 										tex->lookup(color,D0,D1,D2,D3,this);										\
@@ -1899,13 +1898,12 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 									numRays++;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
-									movvv(D0,D);																	\
-									mulvf(D1,dDdu,(*du)*swidth);													\
-									mulvf(D2,dDdv,(*dv)*twidth);													\
-									addvv(D3,D1,D2);																\
-									addvv(D1,D);																	\
-									addvv(D2,D);																	\
-									addvv(D3,D);																	\
+									mulvf(dDdu,(*du)*swidth*0.5f);													\
+									mulvf(dDdv,(*dv)*twidth*0.5f);													\
+									subvv(D0,D,dDdu); subvv(D0,dDdv);												\
+									addvv(D1,D,dDdu); subvv(D1,dDdv);												\
+									subvv(D2,D,dDdu); addvv(D2,dDdv);												\
+									addvv(D3,D,dDdu); addvv(D3,dDdv);												\
 									if (__float) {																	\
 										vector	color;																\
 										tex->lookup(color,D0,D1,D2,D3,this);										\

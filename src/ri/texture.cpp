@@ -1209,19 +1209,19 @@ public:
 
 							// Apply the filter width
 							subvv(S0,D0,center);
-							mulvf(S0,scratch->textureParams.width*2);
+							//mulvf(S0,scratch->textureParams.width*2);
 							addvv(S0,center);
 
 							subvv(S1,D1,center);
-							mulvf(S1,scratch->textureParams.width*2);
+							//mulvf(S1,scratch->textureParams.width*2);
 							addvv(S1,center);
 
 							subvv(S2,D2,center);
-							mulvf(S2,scratch->textureParams.width*2);
+							//mulvf(S2,scratch->textureParams.width*2);
 							addvv(S2,center);
 
 							subvv(S3,D3,center);
-							mulvf(S3,scratch->textureParams.width*2);
+							//mulvf(S3,scratch->textureParams.width*2);
 							addvv(S3,center);
 							
 							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
