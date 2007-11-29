@@ -358,13 +358,12 @@ DEFFUNC(Distance		,"distance"			,"f=pp"	,DISTANCEEXP_PRE,DISTANCEEXP,FUN3EXPR_UP
 
 // Point to line distance
 #define	PTLINEDEXP_PRE		FUN4EXPR_PRE											\
-							const float	*ftmp,*ftmp2,*ftmp3;						\
 							vector		vtmp,vtmp2,vtmp3;							\
 							float		l;
 
-#define	PTLINEDEXP			ftmp	=	op1;										\
-							ftmp2	=	op2;										\
-							ftmp3	=	op3;										\
+#define	PTLINEDEXP			const float *ftmp	=	op1;							\
+							const float *ftmp2	=	op2;							\
+							const float *ftmp3	=	op3;							\
 																					\
 							subvv(vtmp,ftmp3,ftmp2);								\
 							subvv(vtmp2,ftmp,ftmp2);								\
@@ -422,9 +421,8 @@ DEFFUNC(Fresnel			,"fresnel"		,"o=vvfFF",FUN5OUTEXPR_PRE,FRESNELEXP,FUN5EXPR_UPD
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // fresnel "o=vvfFFVV"
 #define	FRESNEL7EXPR_PRE	float	*op[7];																\
-							int		i;																	\
 																										\
-							for (i=0;i<7;i++) {															\
+							for (int i=0;i<7;++i) {														\
 								operand(i,op[i],float *);												\
 							}
 
@@ -474,27 +472,26 @@ DEFFUNC(Scalem			,"scale"				,"m=mp"		,SCALEEXPR_PRE,SCALEEXPR,FUN3EXPR_UPDATE(1
 #define	MINFEXPR_PRE		float		*res;												\
 							const float	**op;												\
 							int			numArguments;										\
-							int			i;													\
 							float		min;												\
 																							\
 							operand(0,res,float *);											\
 							argumentcount(numArguments);									\
-							numArguments--;													\
+							--numArguments;													\
 							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								operand(i+1,op[i],const float *);							\
 							}
 
 #define	MINFEXPR			min	=	*op[0];													\
-							for (i=1;i<numArguments;i++) {									\
+							for (int i=1;i<numArguments;++i) {								\
 								if (*op[i] < min)	min = *op[i];							\
 							}																\
 							*res	=	min;
 
-#define	MINFEXPR_UPDATE		res	++;															\
-							for (i=0;i<numArguments;i++)									\
-								op[i]++;
+#define	MINFEXPR_UPDATE		++res;															\
+							for (int i=0;i<numArguments;++i)								\
+								++op[i];
 
 #define	MINFEXPR_POST
 
@@ -503,7 +500,6 @@ DEFFUNC(Minf				,"min"						,"f=f+"		,MINFEXPR_PRE,MINFEXPR,MINFEXPR_UPDATE,MINF
 #define	MINVEXPR_PRE		float		*res;												\
 							const float	**op;												\
 							int			numArguments;										\
-							int			i;													\
 							float		minx,miny,minz;										\
 																							\
 							operand(0,res,float *);											\
@@ -511,14 +507,14 @@ DEFFUNC(Minf				,"min"						,"f=f+"		,MINFEXPR_PRE,MINFEXPR,MINFEXPR_UPDATE,MINF
 							numArguments--;													\
 							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								operand(i+1,op[i],const float *);							\
 							}
 
 #define	MINVEXPR			minx	=	op[0][0];											\
 							miny	=	op[0][1];											\
 							minz	=	op[0][2];											\
-							for (i=1;i<numArguments;i++) {									\
+							for (int i=1;i<numArguments;++i) {								\
 								if (op[i][0] < minx)	minx = op[i][0];					\
 								if (op[i][1] < miny)	miny = op[i][1];					\
 								if (op[i][2] < minz)	minz = op[i][2];					\
@@ -528,7 +524,7 @@ DEFFUNC(Minf				,"min"						,"f=f+"		,MINFEXPR_PRE,MINFEXPR,MINFEXPR_UPDATE,MINF
 							res[2]	=	minz;
 
 #define	MINVEXPR_UPDATE		res	+=	3;														\
-							for (i=0;i<numArguments;i++)									\
+							for (int i=0;i<numArguments;++i)								\
 								op[i]	+=	3;
 
 #define	MINVEXPR_POST
@@ -538,7 +534,6 @@ DEFFUNC(Minv				,"min"						,"v=v+"		,MINVEXPR_PRE,MINVEXPR,MINVEXPR_UPDATE,MINV
 #define	MAXFEXPR_PRE		float		*res;												\
 							const float	**op;												\
 							int			numArguments;										\
-							int			i;													\
 							float		max;												\
 																							\
 							operand(0,res,float *);											\
@@ -546,19 +541,19 @@ DEFFUNC(Minv				,"min"						,"v=v+"		,MINVEXPR_PRE,MINVEXPR,MINVEXPR_UPDATE,MINV
 							numArguments--;													\
 							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								operand(i+1,op[i],const float *);							\
 							}
 
 #define	MAXFEXPR			max	=	*op[0];													\
-							for (i=1;i<numArguments;i++) {									\
+							for (int i=1;i<numArguments;++i) {								\
 								if (*op[i] > max)	max = *op[i];							\
 							}																\
 							*res	=	max;
 
-#define	MAXFEXPR_UPDATE		res++;															\
-							for (i=0;i<numArguments;i++)									\
-								op[i]++;
+#define	MAXFEXPR_UPDATE		++res;															\
+							for (int i=0;i<numArguments;++i)								\
+								++op[i];
 
 #define	MAXFEXPR_POST
 
@@ -568,7 +563,6 @@ DEFFUNC(Maxf				,"max"						,"f=f+"		,MAXFEXPR_PRE,MAXFEXPR,MAXFEXPR_UPDATE,MAXF
 #define	MAXVEXPR_PRE		float		*res;												\
 							const float	**op;												\
 							int			numArguments;										\
-							int			i;													\
 							float		maxx,maxy,maxz;										\
 																							\
 							operand(0,res,float *);											\
@@ -576,14 +570,14 @@ DEFFUNC(Maxf				,"max"						,"f=f+"		,MAXFEXPR_PRE,MAXFEXPR,MAXFEXPR_UPDATE,MAXF
 							numArguments--;													\
 							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 																							\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								operand(i+1,op[i],const float *);							\
 							}
 
 #define	MAXVEXPR			maxx	=	op[0][0];											\
 							maxy	=	op[0][1];											\
 							maxz	=	op[0][2];											\
-							for (i=1;i<numArguments;i++) {									\
+							for (int i=1;i<numArguments;++i) {								\
 								if (op[i][0] > maxx)	maxx = op[i][0];					\
 								if (op[i][1] > maxy)	maxy = op[i][1];					\
 								if (op[i][2] > maxz)	maxz = op[i][2];					\
@@ -593,7 +587,7 @@ DEFFUNC(Maxf				,"max"						,"f=f+"		,MAXFEXPR_PRE,MAXFEXPR,MAXFEXPR_UPDATE,MAXF
 							res[2]	=	maxz;
 
 #define	MAXVEXPR_UPDATE		res	+=	3;														\
-							for (i=0;i<numArguments;i++)									\
+							for (int i=0;i<numArguments;++i)								\
 								op[i]	+=	3;
 
 #define	MAXVEXPR_POST
@@ -605,21 +599,21 @@ DEFFUNC(Maxv				,"max"						,"v=v+"		,MAXVEXPR_PRE,MAXVEXPR,MAXVEXPR_UPDATE,MAXV
 #define	CONCATEXPR_PRE		char		tmp[MAX_SCRIPT_STRING_SIZE];									\
 							char		**res;															\
 							const char	***op;															\
-							int			i,numArguments;													\
+							int			numArguments;													\
 							argumentcount(numArguments);												\
 							numArguments--;																\
 							operand(0,res,char **);														\
 							op	=	(const char ***) ralloc(numArguments*sizeof(char **),threadMemory);	\
-							for (i=0;i<numArguments;i++) {												\
+							for (int i=0;i<numArguments;++i) {												\
 								operand(i+1,op[i],const char **);										\
 							}
 
 #define CONCATEXPR			strcpy(tmp,*op[0]);															\
-							for (i=1;i<numArguments;i++)	strcat(tmp,*op[i]);							\
+							for (int i=1;i<numArguments;++i)	strcat(tmp,*op[i]);							\
 							savestring(*res,tmp);
 
 #define	CONCATEXPR_UPDATE	res++;																		\
-							for (i=0;i<numArguments;i++)	op[i]++;
+							for (int i=0;i<numArguments;++i)	op[i]++;
 
 
 DEFFUNC(Concat				,"concat"						,"s=ss*"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR_UPDATE,NULL_EXPR,0)
@@ -633,10 +627,10 @@ DEFFUNC(Concat				,"concat"						,"s=ss*"		,CONCATEXPR_PRE,CONCATEXPR,CONCATEXPR
 							operand(1,op1,const char **);							\
 							operand(2,op2,const char **);
 
-#define MATCHEXPR		if (strcmp(*op1,*op2) == 0)									\
-							*res	=	1;											\
-						else														\
-							*res	=	0;
+#define MATCHEXPR			if (strcmp(*op1,*op2) == 0)								\
+								*res	=	1;										\
+							else													\
+								*res	=	0;
 
 DEFFUNC(Match				,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
@@ -696,7 +690,6 @@ DEFFUNC(Match				,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE
 							int			*opSteps;												\
 							int			resStep;												\
 							int			numArguments;											\
-							int			i;														\
 							int			numRealVertices = currentShadingState->numRealVertices;	\
 							int			vertexN	=	0;											\
 																								\
@@ -707,7 +700,7 @@ DEFFUNC(Match				,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE
 							ops		=	(const char ***)	ralloc(numArguments*sizeof(char **),threadMemory);	\
 							opSteps	=	(int *)				ralloc(numArguments*sizeof(int),threadMemory);		\
 																								\
-							for (i=0;i<numArguments;i++) {										\
+							for (int i=0;i<numArguments;++i) {									\
 								operandSize(i+1,ops[i],opSteps[i],const char **);				\
 								operandSize(i+1,opf[i],opSteps[i],const float *);				\
 							}
@@ -718,7 +711,7 @@ DEFFUNC(Match				,"match"						,"f=ss"		,FUN3SEXPR_PRE,MATCHEXPR,FUN3EXPR_UPDATE
 							}
 
 #define	PRINTF_UPDATE		res	+=	resStep;													\
-							for (i=0;i<numArguments;i++) {										\
+							for (int i=0;i<numArguments;++i) {									\
 								opf[i]	+=	opSteps[i];											\
 								ops[i]	+=	opSteps[i];											\
 							}																	\
@@ -755,7 +748,6 @@ DEFFUNC(Printf				,"printf"						,"o=s.*"		,PRINTFEXPR_PRE,PRINTFEXPR,PRINTF_UPD
 							int			*opSteps;												\
 							int			resStep,strStep;										\
 							int			numArguments;											\
-							int			i;														\
 																								\
 							operandSize(0,res,resStep,char **);									\
 							operandSize(1,strArg,strStep,char **);								\
@@ -766,7 +758,7 @@ DEFFUNC(Printf				,"printf"						,"o=s.*"		,PRINTFEXPR_PRE,PRINTFEXPR,PRINTF_UPD
 							ops		=	(const char ***)	ralloc(numArguments*sizeof(char **),threadMemory);	\
 							opSteps	=	(int *)				ralloc(numArguments*sizeof(int),threadMemory);		\
 																								\
-							for (i=0;i<numArguments;i++) {										\
+							for (int i=0;i<numArguments;++i) {									\
 								operandSize(i+2,opf[i],opSteps[i],const float *);				\
 								operandSize(i+2,ops[i],opSteps[i],const char **);				\
 							}
@@ -777,7 +769,7 @@ DEFFUNC(Printf				,"printf"						,"o=s.*"		,PRINTFEXPR_PRE,PRINTFEXPR,PRINTF_UPD
 
 #define	FORMAT_UPDATE		res	+=	resStep;												\
 							strArg +=	strStep;											\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								opf[i]	+=	opSteps[i];										\
 								ops[i]	+=	opSteps[i];										\
 							}
@@ -797,7 +789,6 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 #define	SPLINEVEXPR_PRE		float		*res;													\
 							const float	**op;													\
 							int			numArguments;											\
-							int			i;														\
 							const float *val;													\
 							const char	**splineType;											\
 							float		ub[4],tmp[4];											\
@@ -830,7 +821,7 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 							numPieces = (numArguments-4)/ustep+1;								\
 																								\
-							for (i=0;i<numArguments;i++) {										\
+							for (int i=0;i<numArguments;++i) {									\
 								operand(i+3,op[i],float *);										\
 							}
 
@@ -838,7 +829,6 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 #define	SPLINEEXPR_PRE		float		*res;													\
 							const float	**op;													\
 							int			numArguments;											\
-							int			i;														\
 							const float	*val;													\
 							float		ub[4],tmp[4];											\
 							const float	*ubasis = (float*) RiCatmullRomBasis;					\
@@ -853,7 +843,7 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 							op		=	(const float **) ralloc(numArguments*sizeof(float *),threadMemory);	\
 							numPieces = (numArguments-3);										\
 																								\
-							for (i=0;i<numArguments;i++) {										\
+							for (int i=0;i<numArguments;++i) {									\
 								operand(i+2,op[i],const float *);								\
 							}
 
@@ -880,10 +870,10 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 							}																			\
 
 
-#define	SPLINEFEXPR_UPDATE	res++;																		\
-							val++;																		\
-							for (i=0;i<numArguments;i++)												\
-								op[i]++;
+#define	SPLINEFEXPR_UPDATE	++res;																		\
+							++val;																		\
+							for (int i=0;i<numArguments;++i)											\
+								++op[i];
 
 #define	SPLINEFEXPR_POST
 
@@ -916,9 +906,9 @@ DEFFUNC(Splinesf				,"spline"						,"f=Sfffff*"	,SPLINEVEXPR_PRE,SPLINEFEXPR,SPL
 #define	SPLINEPEXPR			if (*val <= 0)			movvv(res,op[1]);									\
 							else if (*val >= 1)		movvv(res,op[numArguments-2]);						\
 							else {																		\
-								int		piece	=	(int) floor((*val) * (float) numPieces);			\
-								int		pieceid	=	piece*ustep;										\
-								float	u		=	(*val)*((float) numPieces) - (float) piece;			\
+								const int	piece	=	(int) floor((*val) * (float) numPieces);		\
+								const int	pieceid	=	piece*ustep;									\
+								const float	u		=	(*val)*((float) numPieces) - (float) piece;		\
 								ub[3] = 1;																\
 								ub[2] =	u;																\
 								ub[1] =	u*u;															\
@@ -948,7 +938,7 @@ DEFFUNC(Splinesf				,"spline"						,"f=Sfffff*"	,SPLINEVEXPR_PRE,SPLINEFEXPR,SPL
 
 #define	SPLINEPEXPR_UPDATE	res	+=	3;																	\
 							val +=	1;																	\
-							for (i=0;i<numArguments;i++)												\
+							for (int i=0;i<numArguments;++i)											\
 								op[i]	+=	3;
 
 #define	SPLINEPEXPR_POST
@@ -1002,9 +992,9 @@ DEFFUNC(VSplinep		,"spline"		,"p=Sfpppp*"	,SPLINEVEXPR_PRE,SPLINEPEXPR,SPLINEPEX
 #define	SPLINEAPEXPR		if (*val <= 0)				movvv(res,&op[3]);						\
 							else if (*val >= 1)			movvv(res,&op[(numArguments-2)*3]);		\
 							else {																		\
-								int		piece	=	(int) floor((*val) * (float) numPieces);			\
-								int		pieceid	=	piece*ustep;										\
-								float	u		=	(*val)*((float) numPieces) - (float) piece;		\
+								const int	piece	=	(int) floor((*val) * (float) numPieces);		\
+								const int	pieceid	=	piece*ustep;									\
+								const float	u		=	(*val)*((float) numPieces) - (float) piece;		\
 								ub[3] = 1;																\
 								ub[2] =	u;																\
 								ub[1] =	u*u;															\
@@ -1049,14 +1039,13 @@ DEFFUNC(Splineap			,"spline"		,"p=fP"		,SPLINEAPEXPR_PRE,SPLINEAPEXPR,SPLINEAPEX
 #define	DSOEXEC_PRE			int					numArguments;								\
 							char				**op;										\
 							int					*opSteps;									\
-							int					i;											\
 																							\
 							argumentcount(numArguments);									\
 																							\
 							op		=	(char **)	ralloc(numArguments*sizeof(char *),threadMemory);	\
 							opSteps	=	(int *)		ralloc(numArguments*sizeof(int),threadMemory);		\
 																							\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								operandSize(i,op[i],opSteps[i],char *);						\
 								opSteps[i]	*=	operandBytesPerItem(i);						\
 							}																\
@@ -1067,7 +1056,7 @@ DEFFUNC(Splineap			,"spline"		,"p=fP"		,SPLINEAPEXPR_PRE,SPLINEAPEXPR,SPLINEAPEX
 
 #define	DSOEXEC				exec(handle,numArguments-1,(void **) op);
 
-#define	DSOEXEC_UPDATE		for (i=0;i<numArguments;i++) {									\
+#define	DSOEXEC_UPDATE		for (int i=0;i<numArguments;++i) {								\
 								op[i]	+=	opSteps[i];										\
 							}
 
@@ -1080,14 +1069,13 @@ DEFFUNC(DSO				,"XXX",			"XXX",	DSOEXEC_PRE,DSOEXEC,DSOEXEC_UPDATE,DSOEXEC_POST,
 #define	DSOVOIDEXEC_PRE		int					numArguments;								\
 							float				**op;										\
 							int					*opSteps;									\
-							int					i;											\
 																							\
 							argumentcount(numArguments);									\
 																							\
 							op		=	(float **) ralloc((numArguments+1)*sizeof(float *),threadMemory);	\
 							opSteps	=	(int *)	   ralloc((numArguments+1)*sizeof(int),threadMemory);		\
 																							\
-							for (i=0;i<numArguments;i++) {									\
+							for (int i=0;i<numArguments;++i) {								\
 								operandSize(i,op[i+1],opSteps[i+1],float *);				\
 								opSteps[i+1]	*=	operandBytesPerItem(i);					\
 							}																\
@@ -1097,7 +1085,7 @@ DEFFUNC(DSO				,"XXX",			"XXX",	DSOEXEC_PRE,DSOEXEC,DSOEXEC_UPDATE,DSOEXEC_POST,
 
 #define	DSOVOIDEXEC			exec(handle,numArguments,(void **) op);
 
-#define	DSOVOIDEXEC_UPDATE	for (i=0;i<numArguments;i++) {									\
+#define	DSOVOIDEXEC_UPDATE	for (int i=0;i<numArguments;++i) {								\
 								op[i+1]	+=	opSteps[i+1];									\
 							}
 

@@ -58,7 +58,7 @@
 //	if <boolean> <endIf>
 #define	IF2EXPR_PRE			float	*op;														\
 							operand(0,op,float *);												\
-							for (int i=0;i<numVertices;i++,op++,tags++)	{						\
+							for (int i=0;i<numVertices;++i,++op,++tags)	{						\
 								if (*tags) {													\
 									(*tags)++;													\
 								} else {														\
@@ -66,8 +66,8 @@
 										*tags	=	0;											\
 									} else	{													\
 										*tags	=	1;											\
-										numActive--;											\
-										numPassive++;											\
+										--numActive;											\
+										++numPassive;											\
 									}															\
 								}																\
 							}
@@ -84,16 +84,16 @@ DEFOPCODE(If2	,"if"	,2,	IF2EXPR_PRE,NULL_EXPR,NULL_EXPR,IF2EXPR_POST,0)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	elseif
 
-#define	ELSEIFEXPR_PRE		for (int i=0;i<numVertices;i++,tags++)	{							\
+#define	ELSEIFEXPR_PRE		for (int i=0;i<numVertices;++i,++tags)	{							\
 								if (*tags <= 1) {												\
 									if (*tags == 1) {											\
 										*tags	=	0;											\
-										numActive++;											\
-										numPassive--;											\
+										++numActive;											\
+										--numPassive;											\
 									} else {													\
 										*tags	=	1;											\
-										numActive--;											\
-										numPassive++;											\
+										--numActive;											\
+										++numPassive;											\
 									}															\
 								}																\
 							}
@@ -112,13 +112,13 @@ DEFOPCODE(Else	,"else"	,1,	ELSEIFEXPR_PRE,NULL_EXPR,NULL_EXPR,ELSEIFEXPR_POST,0)
 //	endif
 
 ///////////////	Single
-#define	ENDIFEXPR_PRE		for (int i=0;i<numVertices;i++,tags++)	{							\
+#define	ENDIFEXPR_PRE		for (int i=0;i<numVertices;++i,++tags)	{							\
 								if (*tags) {													\
 									(*tags)--;													\
 																								\
 									if (*tags == 0) {											\
-										numActive++;											\
-										numPassive--;											\
+										++numActive;											\
+										--numPassive;											\
 									}															\
 								}																\
 							}
@@ -152,12 +152,9 @@ DEFOPCODE(Endif	,"endif"	,0,	ENDIFEXPR_PRE,NULL_EXPR,NULL_EXPR,ENDIFEXPR_POST,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	forbegin <body> <continue> <end>
-#define	FORBEGIN3EXPR_PRE	int		bodyIndex;													\
-							int		continueIndex;												\
-							int		endIndex;													\
-							bodyIndex		=	argument(0);									\
-							continueIndex	=	argument(1);									\
-							endIndex		=	argument(2);									\
+#define	FORBEGIN3EXPR_PRE	const int bodyIndex		=	argument(0);							\
+							const int continueIndex	=	argument(1);							\
+							const int endIndex		=	argument(2);							\
 							beginConditional();													\
 							lastConditional->forStart		=	bodyIndex;						\
 							lastConditional->forContinue	=	continueIndex;					\
@@ -171,15 +168,15 @@ DEFOPCODE(Forbegin3	,"forbegin"	,3,	FORBEGIN3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_E
 #define	FOR3EXPR_PRE		float	*op;														\
 							operand(0,op,float *);												\
 							lastConditional->forExecCount++;									\
-							for (int i=numVertices;i>0;i--,op++,tags++)	{						\
+							for (int i=numVertices;i>0;--i,++op,++tags)	{						\
 								if (*tags) {													\
 									(*tags)++;													\
 								} else {														\
 									if ((int) (*op)) {											\
 									} else	{													\
 										*tags	=	lastConditional->forExecCount;				\
-										numActive--;											\
-										numPassive++;											\
+										--numActive;											\
+										++numPassive;											\
 									}															\
 								}																\
 							}
@@ -201,13 +198,13 @@ DEFOPCODE(For3	,"for"	,1,	FOR3EXPR_PRE,NULL_EXPR,NULL_EXPR,FOR3EXPR_POST,0)
 #define	FOREND3EXPR_PRE		if (numActive > 0)	jmp(lastConditional->forStart);					\
 							numActive	=	0;													\
 							numPassive	=	numVertices;										\
-							for (int i=numVertices;i>0;i--,tags++)	{							\
+							for (int i=numVertices;i>0;--i,++tags)	{							\
 								if (*tags) {													\
 									*tags	-=	lastConditional->forExecCount;					\
 									if (*tags	<= 0)	{										\
 										*tags	=	0;											\
-										numActive++;											\
-										numPassive--;											\
+										++numActive;											\
+										--numPassive;											\
 									}															\
 								}																\
 							}																	\
@@ -219,11 +216,11 @@ DEFOPCODE(Forend3	,"forend"	,0,	FOREND3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	break
-#define	BREAK1EXPR_PRE		for (int i=0;i<numVertices;i++,tags++)	{							\
+#define	BREAK1EXPR_PRE		for (int i=0;i<numVertices;++i,++tags)	{							\
 								if (*tags	== 0)	{											\
 									*tags	=	lastConditional->forExecCount;					\
-									numPassive++;												\
-									numActive--;												\
+									++numPassive;												\
+									--numActive;												\
 								}																\
 							}
 
@@ -320,11 +317,11 @@ DEFOPCODE(Continue1	,"continue"	,1,	NULL_EXPR,NULL_EXPR,NULL_EXPR,CONTINUE1EXPR_
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // mcmp
 #define	MCMPEXPR			*res	=	1.0f;													\
-							for (int index=0;index<16;index++)									\
+							for (int index=0;index<16;++index)									\
 								if (!(op1[index] OPERATION op2[index]))	*res	=	0;
 
 #define	MNCMPEXPR			*res	=	0;														\
-							for (int index=0;index<16;index++)									\
+							for (int index=0;index<16;++index)									\
 								if (!(op1[index] OPERATION op2[index]))	*res	=	1.0f;
 
 
@@ -635,9 +632,9 @@ DEFOPCODE(Mfromf	,"mfromf"	,2,	OPERANDS2EXPR_PRE(float *,const float *),MFROMFEX
 							res[2]	=	*z;
 
 #define	VFROMF3EXPR_UPDATE	res	+=	3;										\
-							x	++;											\
-							y	++;											\
-							z	++;
+							++x;											\
+							++y;											\
+							++z;
 
 #define	VFROMF3EXPR_POST
 
@@ -645,16 +642,15 @@ DEFOPCODE(Vfromf3	,"vfromf"	,4,	VFROMF3EXPR_PRE,VFROMF3EXPR,VFROMF3EXPR_UPDATE,V
 
 #define	MFROMF17EXPR_PRE	float		*res;								\
 							const float	*e[16];								\
-							int			i;									\
 							operand(0,res,float *);							\
-							for (i=0;i<16;i++) {							\
+							for (int i=0;i<16;++i) {						\
 								operand(i+1,e[i],const float *);			\
 							}
 
-#define	MFROMF17EXPR		for (i=0;i<16;i++)								\
+#define	MFROMF17EXPR		for (int i=0;i<16;++i)							\
 								res[i]	=	*e[i];
 
-#define	MFROMF17EXPR_UPDATE	for (i=0;i<16;i++)	e[i]++;						\
+#define	MFROMF17EXPR_UPDATE	for (int i=0;i<16;++i)	e[i]++;					\
 							res	+=	16;
 
 #define	MFROMF17EXPR_POST
@@ -805,7 +801,7 @@ DEFOPCODE(USFromA	,"usfroma"	,3,	ARRAY_PRE(char **),SFROMAEXPR,UARRAY_UPDATE(1),
 
 #define	ARRAY_UPDATE(__os)											\
 						res		+=	resStep;						\
-						op1++;										\
+						++op1;										\
 						op2		+=	__os;
 
 

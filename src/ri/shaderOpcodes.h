@@ -39,16 +39,13 @@
 #define ILLUMINATION_RUNCATLIGHTS	runCategoryLights(P,N,costheta,lightCat);
 
 #define	ILLUMINATION1EXPR_PRE(lightCatPreExpr,runlightsExpr)												\
-									int				endIndex;												\
-									int				beginIndex;												\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
 									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float)*4,threadMemory);	\
 									float			*Ntmp		=	costheta + numVertices;					\
-									int				i;														\
 									lightCatPreExpr;														\
-									beginIndex		=	argument(1);										\
-									endIndex		=	argument(2);										\
+									const int beginIndex		=	argument(1);							\
+									const int endIndex			=	argument(2);							\
 									beginConditional();														\
 									lastConditional->forStart		=	beginIndex;							\
 									lastConditional->forContinue	=	endIndex;							\
@@ -56,7 +53,7 @@
 									lastConditional->forExecCount	=	1;									\
 									operand(0,P,const float *);												\
 									N	=	Ntmp;															\
-									for (i=0;i<numVertices;i++) {											\
+									for (int i=0;i<numVertices;++i) {										\
 										initv(Ntmp+i*3,0,0,1);												\
 										costheta[i]	=	-1;													\
 									}																		\
@@ -68,7 +65,7 @@
 										Cl		=	varying[VARIABLE_CL];									\
 										Lsave	= 	(*currentLight)->savedState[0];							\
 										Clsave	= 	(*currentLight)->savedState[1];							\
-										for (i=0;i<numVertices;i++,tags++) {								\
+										for (int i=0;i<numVertices;++i,++tags) {							\
 											if (*tags == 0) {												\
 												movvv(L,Lsave);												\
 												movvv(Cl,Clsave);											\
@@ -97,16 +94,13 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 									operand(5,lightCat,char **);
 
 #define	ILLUMINATION2EXPR_PRE(lightCatPreExpr,runlightsExpr)												\
-									int				endIndex;												\
-									int				beginIndex;												\
 									const float		*angle;													\
-									int				i;														\
 									const float		*P,*N,*Lsave,*Clsave;									\
 									float			*L,*Cl;													\
 									float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 									lightCatPreExpr;														\
-									beginIndex		=	argument(3);										\
-									endIndex		=	argument(4);										\
+									const int beginIndex		=	argument(3);							\
+									const int endIndex			=	argument(4);							\
 									beginConditional();														\
 									lastConditional->forStart		=	beginIndex;							\
 									lastConditional->forContinue	=	endIndex;							\
@@ -115,7 +109,7 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 									operand(0,P,const float *);												\
 									operand(1,N,const float *);												\
 									operand(2,angle,const float *);											\
-									for (i=0;i<numVertices;i++) costheta[i]	=	(float) cos(angle[i]);		\
+									for (int i=0;i<numVertices;++i) costheta[i]	=	(float) cos(angle[i]);	\
 									runlightsExpr;															\
 									if ((*currentLight=*lights) != NULL) {									\
 										enterLightingConditional();											\
@@ -124,7 +118,7 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 										Cl		=	varying[VARIABLE_CL];									\
 										Lsave	= 	(*currentLight)->savedState[0];							\
 										Clsave	= 	(*currentLight)->savedState[1];							\
-										for (i=0;i<numVertices;i++,tags++) {								\
+										for (int i=0;i<numVertices;++i,++tags) {							\
 											if (*tags == 0) {												\
 												movvv(L,Lsave);												\
 												movvv(Cl,Clsave);											\
@@ -151,7 +145,6 @@ DEFOPCODE(IlluminationCat2	,"illuminance"	,6, ILLUMINATION2EXPR_PRE(ILLUMINATION
 // endillumination
 #define	ENDILLUMINATIONEXPR_PRE		const float		*Lsave,*Clsave;											\
 									float			*L,*Cl;													\
-									int				i;														\
 									lastConditional->forExecCount++;										\
 									if (*currentLight != NULL) {											\
 										exitLightingConditional();											\
@@ -163,7 +156,7 @@ DEFOPCODE(IlluminationCat2	,"illuminance"	,6, ILLUMINATION2EXPR_PRE(ILLUMINATION
 											Cl		=	varying[VARIABLE_CL];								\
 											Lsave	= 	(*currentLight)->savedState[0];						\
 											Clsave	= 	(*currentLight)->savedState[1];						\
-											for (i=0;i<numVertices;i++,tags++) {							\
+											for (int i=0;i<numVertices;++i,++tags) {						\
 												if (*tags == 0) {											\
 													movvv(L,Lsave);											\
 													movvv(Cl,Clsave);										\
@@ -209,7 +202,6 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 // illuminate <P> <end>
 // always execute (no shadow checking)
 #define	ILLUMINATE1EXPR_PRE			const float	*Pl;													\
-									int			i;														\
 																										\
 									operand(0,Pl,const float *);										\
 																										\
@@ -221,7 +213,7 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 										const float	*Ns			=	currentShadingState->Ns;			\
 										const float	*costheta	=	currentShadingState->costheta;		\
 																										\
-										for (i=numVertices;i>0;i--,tags++) {							\
+										for (int i=numVertices;i>0;--i,++tags) {						\
 											if (*tags) {												\
 												(*tags)++;												\
 											} else {													\
@@ -229,8 +221,8 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 																										\
 												if (dotvv(Ns,L) > -(*costheta)*lengthv(L)) {			\
 													(*tags)++;											\
-													numActive--;										\
-													numPassive++;										\
+													--numActive;										\
+													++numPassive;										\
 												}														\
 											}															\
 																										\
@@ -238,7 +230,7 @@ DEFOPCODE(EndIlluminationExpr	,"endilluminance"	,0, ENDILLUMINATIONEXPR_PRE, NUL
 											L			+=	3;											\
 											Ps			+=	3;											\
 											Ns			+=	3;											\
-											costheta++;													\
+											++costheta;													\
 										}																\
 																										\
 										if (numActive == 0) {											\
@@ -259,7 +251,6 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 #define	ILLUMINATE3EXPR_PRE
 #else
 #define	ILLUMINATE3EXPR_PRE			const float	*Pf,*Nf,*thetaf;										\
-									int			i;														\
 																										\
 									operand(0,Pf,const float *);										\
 									operand(1,Nf,const float *);										\
@@ -273,7 +264,7 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 										const float	*Ns			=	currentShadingState->Ns;			\
 										const float	*costheta	=	currentShadingState->costheta;		\
 																										\
-										for (i=numVertices;i>0;i--,tags++) {							\
+										for (int i=numVertices;i>0;--i,++tags) {						\
 											if (*tags) {												\
 												(*tags)++;												\
 											} else {													\
@@ -281,18 +272,18 @@ DEFOPCODE(Illuminate1	,"illuminate"	,2, ILLUMINATE1EXPR_PRE, NULL_EXPR, NULL_EXP
 												const float	Lm		=	lengthv(L);						\
 												if ((dotvv(Nf,L) < cos(*thetaf)*Lm) || (dotvv(Ns,L) > -(*costheta)*Lm)) {	\
 													(*tags)++;											\
-													numActive--;										\
-													numPassive++;										\
+													--numActive;										\
+													++numPassive;										\
 												}														\
 											}															\
 																										\
 											Pf			+=	3;											\
 											Nf			+=	3;											\
-											thetaf		++;												\
+											++thetaf;													\
 											L			+=	3;											\
 											Ps			+=	3;											\
 											Ns			+=	3;											\
-											costheta++;													\
+											++costheta;													\
 										}																\
 																										\
 																										\
@@ -319,15 +310,14 @@ DEFOPCODE(Illuminate3	,"illuminate"	,4, ILLUMINATE3EXPR_PRE, NULL_EXPR, NULL_EXP
 									} else {													\
 										const float		*L =	varying[VARIABLE_L];			\
 										float 			*Lsave;									\
-										int				i;										\
 																								\
 										saveLighting(Lsave);									\
-										for (i=0;i<numVertices;i++,tags++) {					\
+										for (int i=0;i<numVertices;++i,++tags) {				\
 											if (*tags) {										\
 												(*tags)--;										\
 												if (*tags == 0) {								\
-													numActive++;								\
-													numPassive--;								\
+													++numActive;								\
+													--numPassive;								\
 												}												\
 											} else {											\
 												mulvf(Lsave,L,-1);								\
@@ -379,7 +369,7 @@ DEFOPCODE(EndIlluminate	,"endilluminate"	,0, ILLUMINATEEND_PRE, NULL_EXPR, NULL_
 										const float	*Ps		=	varying[VARIABLE_PS];			\
 										float		*L		=	varying[VARIABLE_L];			\
 																								\
-										for (int i=numVertices;i>0;i--,tags++) {				\
+										for (int i=numVertices;i>0;--i,++tags) {				\
 											if (*tags) {										\
 												(*tags)++;										\
 											} else {											\
@@ -419,7 +409,7 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 										subvv(R,CRenderer::worldBmax,CRenderer::worldBmin);		\
 										worldRadius				=	dotvv(R,R);					\
 																								\
-										for (int i=numVertices;i>0;i--,tags++) {				\
+										for (int i=numVertices;i>0;--i,++tags) {				\
 											if (*tags) {										\
 												(*tags)++;										\
 											} else {											\
@@ -427,14 +417,14 @@ DEFOPCODE(Solar1	,"solar"	,1, SOLAR1EXPR_PRE, NULL_EXPR, NULL_EXPR, NULL_EXPR,PA
 												mulvf(L,worldRadius);							\
 												if (dotvv(Ns,L) > -(*costheta)*lengthv(L)) {	\
 													(*tags)++;									\
-													numActive--;								\
-													numPassive++;								\
+													--numActive;								\
+													++numPassive;								\
 												}												\
 											}													\
 											Nf			+=	3;									\
 											L			+=	3;									\
 											Ns			+=	3;									\
-											costheta++;											\
+											++costheta;											\
 										}														\
 									}
 
@@ -460,12 +450,12 @@ DEFOPCODE(Solar2	,"solar"	,3, SOLAR2EXPR_PRE, NULL_EXPR, NULL_EXPR, SOLAR2EXPR_P
 										float 			*Lsave;								\
 																							\
 										saveLighting(Lsave);								\
-										for (int i=0;i<numVertices;i++,tags++) {			\
+										for (int i=0;i<numVertices;++i,++tags) {			\
 											if (*tags) {									\
 												(*tags)--;									\
 												if (*tags == 0) {							\
-													numActive++;							\
-													numPassive--;							\
+													++numActive;							\
+													--numPassive;							\
 												}											\
 											} else {										\
 												mulvf(Lsave,L,-1);							\

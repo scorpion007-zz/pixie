@@ -119,30 +119,28 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 }
 
 #define enterLightingConditional() {									\
-	int			tmpTag;													\
 	const int	*lightTags	=	(*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
-	for (i=numVertices;i>0;i--,tags++,lightTags++) {					\
-		tmpTag = (*tags == 0);											\
+	for (int i=numVertices;i>0;--i,++tags,++lightTags) {				\
+		const int tmpTag = (*tags == 0);								\
 		*tags += *lightTags;											\
 		if (tmpTag && *tags) {											\
-			numActive--;												\
-			numPassive++;												\
+			--numActive;												\
+			++numPassive;												\
 		}																\
 	}																	\
 	tags = tagStart;													\
 }
 
 #define exitLightingConditional() {										\
-	int			tmpTag;													\
 	const int	*lightTags	= (*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
-	for (i=numVertices;i>0;i--,tags++,lightTags++) {					\
-		tmpTag = *tags;													\
+	for (int i=numVertices;i>0;--i,++tags,++lightTags) {				\
+		const int tmpTag = *tags;										\
 		*tags -= *lightTags;											\
 		if (tmpTag && (*tags == 0)) {									\
-			numActive++;												\
-			numPassive--;												\
+			++numActive;												\
+			--numPassive;												\
 		}																\
 	}																	\
 	tags = tagStart;													\
@@ -151,7 +149,7 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 #define enterFastLightingConditional() {								\
 	const int *lightTags	=	(*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
-	for (i=numVertices;i>0;i--) {										\
+	for (int i=numVertices;i>0;--i) {									\
 		(*tags++) += (*lightTags++);									\
 	}																	\
 	tags = tagStart;													\
@@ -160,7 +158,7 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 #define exitFastLightingConditional() {									\
 	const int *lightTags	= (*currentLight)->lightTags;				\
 	tags			=	tagStart;										\
-	for (i=numVertices;i>0;i--) {										\
+	for (int i=numVertices;i>0;--i) {									\
 		(*tags++) -= (*lightTags++);									\
 	}																	\
 	tags = tagStart;													\
@@ -353,7 +351,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 //	Expand the results from primary shading points to all
 #define		expandVector(__res)				if (numVertices != currentShadingState->numRealVertices) {		\
 												const float	*src	=	__res - currentShadingState->numRealVertices*3;			\
-												for (int i=currentShadingState->numRealVertices;i>0;i--) {						\
+												for (int i=currentShadingState->numRealVertices;i>0;--i) {						\
 													movvv(__res,src);	__res	+=	3;	src	+=	3;			\
 													movvv(__res,src);	__res	+=	3;	src	+=	3;			\
 												}															\
@@ -362,7 +360,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 //	Expand the results from primary shading points to all
 #define		expandFloat(__res)				if (numVertices != currentShadingState->numRealVertices) {		\
 												const float	*src	=	__res - currentShadingState->numRealVertices;			\
-												for (int i=currentShadingState->numRealVertices;i>0;i--) {						\
+												for (int i=currentShadingState->numRealVertices;i>0;--i) {						\
 													*__res++	=	*src++;									\
 													*__res++	=	*src++;									\
 												}															\
@@ -373,7 +371,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 #define		runAmbientLights()				if (!currentShadingState->ambientLightsExecuted) {				\
 												const CAttributes		*currentAttributes	=	currentShadingState->currentObject->attributes;	\
 												float					*Clsave;							\
-												int						i;									\
 																											\
 												assert((numActive+numPassive) == numVertices);				\
 												assert(numVertices == currentShadingState->numVertices);	\
@@ -391,15 +388,14 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													(*alights)->next			=		NULL;				\
 																											\
 													Clsave	= (*alights)->savedState[1];					\
-													for (i=numVertices;i>0;i--,Clsave+=3) {					\
+													for (int i=numVertices;i>0;--i,Clsave+=3) {				\
 														initv(Clsave,0);									\
 													}														\
 												}															\
 																											\
 												if (inShadow == FALSE) {									\
-													CActiveLight			*cLight;						\
 																											\
-													for (cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {	\
+													for (CActiveLight	*cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {	\
 														CProgrammableShaderInstance	*light	=	cLight->light;						\
 														if (!(light->flags & SHADERFLAGS_NONAMBIENT)) {								\
 															memBegin(shaderStateMemory);											\
@@ -424,7 +420,6 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											if (curLightingValid) {											\
 												const int	*aTag	=	tagStart;							\
 												const int	*lTag	=	currentShadingState->lightingTags;	\
-												int			i;												\
 												curLightingValid = curLightingValid && 						\
 													(currentShadingState->lightCategory == saveCat);		\
 												/* memcmp is faster than a T32/xor/compare loop here */		\
@@ -436,7 +431,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 													!memcmp(lT,currentShadingState->costheta,sizeof(float)*numVertices);	\
 												/* we must still compare active tags, note this isn't */					\
 												/* the same as tags being numerically equal */								\
-												for (i=numVertices; curLightingValid && (i>0); i--) {						\
+												for (int i=numVertices; curLightingValid && (i>0); --i) {					\
 													curLightingValid = curLightingValid && (!*aTag++ & !*lTag++);			\
 												}																			\
 											}																\
@@ -459,9 +454,8 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 												*lights			=	NULL;									\
 																											\
 												if (inShadow == FALSE) {									\
-													CActiveLight			*cLight;						\
 																											\
-													for (cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {		\
+													for (CActiveLight *cLight=currentAttributes->lightSources;cLight!=NULL;cLight=cLight->next) {		\
 														CProgrammableShaderInstance	*light	=	cLight->light;							\
 														lightCategoryCheck;																\
 														if (light->flags & SHADERFLAGS_NONAMBIENT) {									\
@@ -492,8 +486,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 #define		CATEGORYLIGHT_CHECK				if (light->categories != NULL) {								\
 												int			validLight = FALSE;								\
-												const int	*cCat;											\
-												for (cCat=light->categories;(*cCat!=0);cCat++) {			\
+												for (const int *cCat=light->categories;(*cCat!=0);cCat++) {	\
 													if (*cCat == runCat) {									\
 														validLight = TRUE;									\
 														break;												\

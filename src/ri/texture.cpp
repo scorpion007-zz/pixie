@@ -242,8 +242,6 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,CShadingC
 // Return Value			:	Pointer to the new texture
 // Comments				:
 static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir,CShadingContext *context) {
-	void			*data	=	NULL;
-	TIFF			*in;
 	
 	#ifndef TEXTURE_PERBLOCK_LOCK
 		osLock(CRenderer::textureMutex);
@@ -253,7 +251,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	
 	// if we already have the data, use that and increment the reference count
 	if (entry->data != NULL) {
-		entry->threadData[context->thread].data	=	data;
+		entry->threadData[context->thread].data	=	entry->data;
 		entry->refCount++;
 		
 		#ifndef TEXTURE_PERBLOCK_LOCK 
@@ -280,30 +278,27 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	//TIFFSetWarningHandler(tiffErrorHandler);
 
 	// Open the file
-	in		=	TIFFOpen(name,"r");
-
+	TIFF	*in		=	TIFFOpen(name,"r");
+	void	*data	=	NULL;
 	if (in != NULL) {		// Error, we opened this file before
 							// The stupid user must have deleted the 
 							// file or unmounted the drive while in progress
-		uint32	width,height;
-		uint16	numSamples;
-		int		pixelSize;
-		int		i;
-		uint16	bitspersample;
-		int		tiled;
-
 		TIFFSetDirectory(in,dir);
 
 		// Get the texture properties
 		// Note: using fileWidth, rather than the pixar full width is fine,
 		// we only use this to work out whether we're tiled or not
+		uint32	width,height;
+		uint16	numSamples;
+		uint16	bitspersample;
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&width);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&height);
 		TIFFGetFieldDefaulted(in,TIFFTAG_SAMPLESPERPIXEL         ,&numSamples);
 		TIFFGetFieldDefaulted(in,TIFFTAG_BITSPERSAMPLE           ,&bitspersample);
-		tiled	=	TIFFIsTiled(in);
+		int		tiled		=	TIFFIsTiled(in);
 
 		int bytesPerSample;
+		int	pixelSize;
 		if (bitspersample == 8) {
 			bytesPerSample	=	sizeof(unsigned char);
 			pixelSize		=	numSamples*sizeof(unsigned char);
@@ -333,12 +328,12 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 
 				// Read the entire image
 				assert((int) (pixelSize*width) == TIFFScanlineSize(in));
-				for (i=0;i<(int) height;i++) {
+				for (int i=0;i<(int) height;++i) {
 					TIFFReadScanline(in,&tdata[pixelSize*i*width],i,0);
 					if (i >= (y+h))	break;	// If we read the last required scanline, break
 				}
 
-				for (i=0;i<h;i++) {
+				for (int i=0;i<h;++i) {
 					memcpy(&((unsigned char *) data)[i*pixelSize*w],&tdata[((y+i)*width + x)*pixelSize],w*pixelSize);
 				}
 
@@ -398,11 +393,9 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 					}
 				}
 			} else {
-				int	i;
-
 				// Read the entire image
 				assert((int) (pixelSize*width) == TIFFScanlineSize(in));
-				for (i=0;i<(int) height;i++) {
+				for (int i=0;i<(int) height;i) {
 					TIFFReadScanline(in,&((unsigned char *) data)[pixelSize*i*width],i,0);
 				}
 			}
@@ -450,7 +443,7 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 	#ifdef TEXTURE_PERBLOCK_LOCK
 		osCreateMutex(cEntry->mutex);
 	#endif
-	for (int i=0;i<CRenderer::numThreads;i++) {
+	for (int i=0;i<CRenderer::numThreads;++i) {
 		cEntry->threadData[i].data				=	NULL;
 		cEntry->threadData[i].lastRefNumber		=	0; // FIXME: is this right?
 							// should be CRenderer::textureRefNumber ???
@@ -474,7 +467,7 @@ static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
 		stats.textureSize	-=	cEntry->size;
 		stats.textureMemory	-=	cEntry->size;
 		// how to deal with this??
-		for (int i=0;i<CRenderer::numThreads;i++) {
+		for (int i=0;i<CRenderer::numThreads;++i) {
 			if (cEntry->threadData[i].data != NULL) {
 				CRenderer::textureUsedMemory[i]	-=	cEntry->size;
 			}
@@ -730,13 +723,12 @@ public:
 					yTiles					=	(int) ceil((float) height / (float) tileHeight);
 
 					const int	tileLength	=	tileWidth*tileHeight*numSamples*sizeof(T);
-					int			i,j;
 
-					dataBlocks			=	new CTextureBlock*[yTiles];
-					for (i=0;i<yTiles;i++) {
-						dataBlocks[i]	=	new CTextureBlock[xTiles];
+					dataBlocks				=	new CTextureBlock*[yTiles];
+					for (int i=0;i<yTiles;++i) {
+						dataBlocks[i]		=	new CTextureBlock[xTiles];
 
-						for (j=0;j<xTiles;j++) {
+						for (int j=0;j<xTiles;++j) {
 							textureRegisterBlock(dataBlocks[i] + j,tileLength);
 						}
 					}
@@ -751,10 +743,8 @@ public:
 				// Return Value			:	-
 				// Comments				:
 				~CTiledTexture() {
-					int i,j;
-
-					for (i=0;i<yTiles;i++) {
-						for (j=0;j<xTiles;j++) {
+					for (int i=0;i<yTiles;++i) {
+						for (int j=0;j<xTiles;++j) {
 							textureUnregisterBlock(&dataBlocks[i][j]);
 						}
 
@@ -843,10 +833,7 @@ public:
 
 	virtual				~CMadeTexture() {
 							if (layers != NULL) {
-								int	i;
-
-								for (i=0;i<numLayers;i++)
-									delete layers[i];
+								for (int i=0;i<numLayers;++i) delete layers[i];
 								delete [] layers;
 							}
 						}
@@ -953,8 +940,6 @@ public:
 							for (i=(int) scratch->textureParams.samples;i>0;i--) {
 								float			r[2];
 								float			s,t;
-								vector			C,CC0,CC1;
-								float			contribution;
 
 								context->random2d.get(r);
 
@@ -967,8 +952,8 @@ public:
 								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
 														(v[2]*(1-x) + v[3]*x)*y;
 
-								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
-								totalContribution	+=	contribution;
+								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+								totalContribution			+=	contribution;
 
 								// Do the s mode
 								switch(layers[0]->sMode) {
@@ -1005,6 +990,7 @@ public:
 								}
 
 												// lookup (s,t) and add it to the result
+								vector			C,CC0,CC1;
 								layer0->lookup(CC0,s,t,context);
 								layer1->lookup(CC1,s,t,context);
 								interpolatev(C,CC0,CC1,offset);
@@ -1099,8 +1085,6 @@ public:
 							initv(result,0,0,0);		// Result is black
 							for (i=(int) scratch->textureParams.samples;i>0;i--) {
 								float			s,t;
-								vector			C;
-								float			contribution;
 								float			r[2];
 
 								context->random2d.get(r);
@@ -1114,8 +1098,8 @@ public:
 								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
 														(v[2]*(1-x) + v[3]*x)*y;
 
-								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
-								totalContribution	+=	contribution;
+								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+								totalContribution			+=	contribution;
 
 								if (scratch->textureParams.blur > 0) {
 									context->random2d.get(r);
@@ -1158,6 +1142,7 @@ public:
 									break;
 								}
 												// lookup (s,t) and add it to the result
+								vector			C;
 								layer->lookup(C,s,t,context);
 
 								result[0]		+=	C[0]*contribution;
@@ -1195,62 +1180,32 @@ public:
 						}
 
 	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
-							int						i;
 							float					totalContribution	=	0;
-							vector					center;
-							vector					S0,S1,S2,S3;
-							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
-
-							// Compute the center of the lookup
-							addvv(center,D0,D1);
-							addvv(center,D2);
-							addvv(center,D3);
-							mulvf(center,0.25f);
-
-							// Apply the filter width
-							subvv(S0,D0,center);
-							//mulvf(S0,scratch->textureParams.width*2);
-							addvv(S0,center);
-
-							subvv(S1,D1,center);
-							//mulvf(S1,scratch->textureParams.width*2);
-							addvv(S1,center);
-
-							subvv(S2,D2,center);
-							//mulvf(S2,scratch->textureParams.width*2);
-							addvv(S2,center);
-
-							subvv(S3,D3,center);
-							//mulvf(S3,scratch->textureParams.width*2);
-							addvv(S3,center);
-							
-							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
+							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);			
+							const float				jitter				=	1.0f-1.0f/(float)scratch->traceParams.samples;
 
 							result[0]	=	0;
-							for (i=(int) scratch->traceParams.samples;i>0;i--) {
-								float	s,t;
-								float	C;
-								float	contribution;
+							for (int i=(int) scratch->traceParams.samples;i>0;--i) {
 								float	tmp[4],cP[4];
 								float	r[4];
 
 								context->random4d.get(r);
 
 								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x		=	(r[0]-0.5f)*jitter+0.5f;
-								const float y		=	(r[1]-0.5f)*jitter+0.5f;
-																
-								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+								const float x				=	(r[0]-0.5f)*jitter+0.5f;
+								const float y				=	(r[1]-0.5f)*jitter+0.5f;					
+								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+
 								totalContribution	+=	contribution;
 
-								cP[COMP_X]			=	(S0[COMP_X]*(1-x) + S1[COMP_X]*x)*(1-y) + (S2[COMP_X]*(1-x) + S3[COMP_X]*x)*y;
-								cP[COMP_Y]			=	(S0[COMP_Y]*(1-x) + S1[COMP_Y]*x)*(1-y) + (S2[COMP_Y]*(1-x) + S3[COMP_Y]*x)*y;
-								cP[COMP_Z]			=	(S0[COMP_Z]*(1-x) + S1[COMP_Z]*x)*(1-y) + (S2[COMP_Z]*(1-x) + S3[COMP_Z]*x)*y;
+								cP[COMP_X]			=	(D0[COMP_X]*(1-x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1-x) + D3[COMP_X]*x)*y;
+								cP[COMP_Y]			=	(D0[COMP_Y]*(1-x) + D1[COMP_Y]*x)*(1-y) + (D2[COMP_Y]*(1-x) + D3[COMP_Y]*x)*y;
+								cP[COMP_Z]			=	(D0[COMP_Z]*(1-x) + D1[COMP_Z]*x)*(1-y) + (D2[COMP_Z]*(1-x) + D3[COMP_Z]*x)*y;
 								cP[3]				=	1;
 
 								mulmp4(tmp,toNDC,cP);
-								s					=	tmp[0] / tmp[3];
-								t					=	tmp[1] / tmp[3];
+								float	s			=	tmp[0] / tmp[3];
+								float	t			=	tmp[1] / tmp[3];
 								
 								if (scratch->textureParams.blur > 0) {
 									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
@@ -1261,9 +1216,7 @@ public:
 									continue;
 								}
 
-								C	=	side->lookupz(s,t,tmp[2]-scratch->traceParams.bias,context);
-
-								result[0]			+=	C*contribution;
+								result[0]			+=	contribution*side->lookupz(s,t,tmp[2]-scratch->traceParams.bias,context);
 							}
 
 							result[0]	/=	totalContribution;
@@ -1303,7 +1256,6 @@ class	CDeepShadow : public CEnvironment{
 public:
 
 						CDeepShadow(const char *name,const char *fn,const float *toWorld,FILE *in) : CEnvironment(name) {
-							int		i,k;
 							matrix	mtmp;
 							int		*tileSizes;
 
@@ -1330,12 +1282,11 @@ public:
 							
 							// Init the tiles
 							tiles	=	new CDeepTile*[header.yTiles];
-							for (k=0,i=0;i<header.yTiles;i++) {
-								int	j;
+							for (int k=0,i=0;i<header.yTiles;++i) {
 
 								tiles[i]	=	new CDeepTile[header.xTiles];
 
-								for (j=0;j<header.xTiles;j++,k++) {
+								for (int j=0;j<header.xTiles;++j,++k) {
 									CDeepTile	*cTile	=	tiles[i]+j;
 									int			size;
 
@@ -1353,10 +1304,8 @@ public:
 						}
 
 	virtual				~CDeepShadow() {
-							int	i,j;
-
-							for (j=0;j<header.yTiles;j++) {
-								for (i=0;i<header.xTiles;i++) {
+							for (int j=0;j<header.yTiles;++j) {
+								for (int i=0;i<header.xTiles;++i) {
 									textureUnregisterBlock(&(tiles[j][i].block));
 									delete [] tiles[j][i].lastData;
 									delete [] tiles[j][i].data;
@@ -1371,18 +1320,15 @@ public:
 						}
 
 	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
-							int						i;
 							float					totalContribution	=	0;
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
-
-							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
+							const float				jitter				=	1.0f-1.0f/(float)scratch->traceParams.samples;
 							
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
-							for (i=(int) scratch->traceParams.samples;i>0;i--) {
+							for (int i=(int) scratch->traceParams.samples;i>0;--i) {
 								float		s,t,w;
-								float		contribution;
 								float		tmp[4],cP[4];
 								int			px,py;
 								int			bx,by;
@@ -1393,10 +1339,10 @@ public:
 								context->random4d.get(r);
 
 								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x		=	(r[0]-0.5f)*jitter+0.5f;
-								const float y		=	(r[1]-0.5f)*jitter+0.5f;
-								
-								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+								const float x				=	(r[0]-0.5f)*jitter+0.5f;
+								const float y				=	(r[1]-0.5f)*jitter+0.5f;
+								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+
 								totalContribution	+=	contribution;
 
 								cP[COMP_X]			=	(D0[COMP_X]*(1 - x) + D1[COMP_X]*x)*(1-y) + (D2[COMP_X]*(1 - x) + D3[COMP_X]*x)*y;
@@ -1506,7 +1452,6 @@ private:
 							float		**cData;
 							float		**cLastData;
 							float		*data,*dataStart;
-							int			i;
 							int			startIndex;
 
 							assert(in != NULL);
@@ -1520,7 +1465,7 @@ private:
 
 							cLastData		=	cTile->lastData;
 							cData			=	cTile->data;
-							for (i=header.tileSize*header.tileSize;i>0;i--) {
+							for (int i=header.tileSize*header.tileSize;i>0;--i) {
 								cData[0]		=	data;
 								cLastData[0]	=	data;
 								cData++;
@@ -1612,7 +1557,6 @@ public:
 							CTexture				*side;
 							float					u,v;
 							vector					D;
-							int						i;
 							float					totalContribution	=	0;
 							vector					C;
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
@@ -1625,18 +1569,17 @@ public:
 							
 							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
 							
-							for (i=(int) scratch->traceParams.samples;i>0;i--) {
+							for (int i=(int) scratch->traceParams.samples;i>0;--i) {
 								float	t;
-								float	contribution;
 								float	r[2];
 
 								context->random2d.get(r);
 
 								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x		=	(r[0]-0.5f)*jitter+0.5f;
-								const float y		=	(r[1]-0.5f)*jitter+0.5f;
-								
-								contribution		=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+								const float x				=	(r[0]-0.5f)*jitter+0.5f;
+								const float y				=	(r[1]-0.5f)*jitter+0.5f;
+								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
+
 								totalContribution	+=	contribution;
 
 								D[0]				=	(D0[0]*(1-x) + D1[0]*x)*(1-y) + (D2[0]*(1-x) + D3[0]*x)*y;
@@ -1944,12 +1887,9 @@ void		CDummyEnvironment::lookup(float *dest,const float *D0,const float *D1,cons
 // Return Value			:	TRUE on success
 // Comments				:
 template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int &dstart,int width,int height,char *smode,char *tmode,T enforcer) {
-	CMadeTexture			*cTexture;
-	int						i;
 	uint32					fileWidth,fileHeight;
 	uint32					tileWidth,tileHeight;
 	uint16					numSamples;
-	int						cwidth,cheight;
 	TTextureMode			sMode,tMode;
 	int						tileWidthShift, tileHeightShift;
 	double					M;
@@ -1988,8 +1928,7 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 		tMode	=	TEXTURE_BLACK;
 	}
 
-	cTexture	=	new CMadeTexture(aname);
-
+	CMadeTexture	*cTexture	=	new CMadeTexture(aname);
 
 	if (sizeof(T) == sizeof(float)) {
 		M		=	1;
@@ -2007,14 +1946,14 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 	}
 
 	// This is the number of levels we have for the texture
-	int	pyramidSize		=	tiffNumLevels(fileWidth,fileHeight);
+	const int	pyramidSize		=	tiffNumLevels(fileWidth,fileHeight);
 
 	cTexture->numLayers	=	pyramidSize;
 	cTexture->layers	=	new CTextureLayer*[pyramidSize];
 
-	cwidth				=	width;
-	cheight				=	height;
-	for (i=0;i<pyramidSize;i++) {
+	int cwidth			=	width;
+	int cheight			=	height;
+	for (int i=0;i<pyramidSize;++i) {
 		TIFFSetDirectory(in,dstart);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH             ,&fileWidth);
 		TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH            ,&fileHeight);
@@ -2043,19 +1982,16 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 // Return Value			:	The texture
 // Comments				:
 template <class T> static CTexture	*readTexture(const char *name,const char *aname,TIFF *in,int &dstart,T enforcer) {
-	uint32				width,height;
-	uint16				numSamples;
-	CRegularTexture		*cTexture;
-	double				M;
-
 	TIFFSetDirectory(in,dstart);
-	width				=	0;
-	height				=	0;
+	uint32	width		=	0;
+	uint32	height		=	0;
+	uint16	numSamples	=	0;
 	// Note: regular textures don't have pixar full image tag
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGEWIDTH              ,&width);
 	TIFFGetFieldDefaulted(in,TIFFTAG_IMAGELENGTH             ,&height);
 	TIFFGetFieldDefaulted(in,TIFFTAG_SAMPLESPERPIXEL         ,&numSamples);
 
+	double		M;
 	if (sizeof(T) == sizeof(float)) {
 		M		=	1;
 	} else if(sizeof(T) == sizeof(unsigned short)) {
@@ -2064,8 +2000,8 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 		M		=	1.0/255.0;
 	}
 
-	cTexture			=	new CRegularTexture(aname);
-	cTexture->layer		=	new CBasicTexture<T>(name,dstart,width,height,numSamples,width,height,TEXTURE_BLACK,TEXTURE_BLACK,M);
+	CRegularTexture	*cTexture	=	new CRegularTexture(aname);
+	cTexture->layer				=	new CBasicTexture<T>(name,dstart,width,height,numSamples,width,height,TEXTURE_BLACK,TEXTURE_BLACK,M);
 	dstart++;
 
 	return cTexture;
@@ -2086,10 +2022,8 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 
 	// Is this a made texture file ?
 	if (unMade == FALSE) {
-		uint32			width,height;
-
-		width	=	0;
-		height	=	0;
+		uint32	width	=	0;
+		uint32	height	=	0;
 
 		// Use full image tags in preference to image size tags
 		// Allows us to rescale when texmake makes a texture power of 2
@@ -2164,10 +2098,7 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 // Return Value			:	Pointer to the new texture
 // Comments				:
 CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
-	TIFF			*in;
-	CTexture		*cTexture	=	NULL;
 	char			fn[OS_MAX_PATH_LENGTH];
-	int				directory	=	0;
 
 	if (CRenderer::locateFile(fn,name,path) == FALSE) {
 		return NULL;
@@ -2178,10 +2109,11 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 	TIFFSetWarningHandler(tiffErrorHandler);
 
 	// Open the texture
-	in			=	TIFFOpen(fn,"r");
-
+	TIFF		*in			=	TIFFOpen(fn,"r");
+	CTexture	*cTexture	=	NULL;
 	if (in != NULL) {
-		char	*textureFormat = NULL;
+		char	*textureFormat	= NULL;
+		int		directory		=	0;
 
 		if (TIFFGetField(in,TIFFTAG_PIXAR_TEXTUREFORMAT,&textureFormat) == 1) {
 			if (strcmp(textureFormat,TIFF_TEXTURE) == 0)
@@ -2208,17 +2140,14 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 // Return Value			:	Pointer to the new environment
 // Comments				:
 CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
-	TIFF			*in;
 	char			fileName[OS_MAX_PATH_LENGTH];
-	CEnvironment	*cTexture	=	NULL;
-	FILE			*tmpin;
 
 	if (CRenderer::locateFile(fileName,name,path) == FALSE) {
 		return NULL;
 	}
 
 	// Check if the file is a transparency shadow map
-	tmpin		=	ropen(fileName,"rb",fileTransparencyShadow,TRUE);
+	FILE	*tmpin		=	ropen(fileName,"rb",fileTransparencyShadow,TRUE);
 	if (tmpin != NULL) {
 		return	new CDeepShadow(name,fileName,toWorld,tmpin);
 	}
@@ -2228,8 +2157,8 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 	TIFFSetWarningHandler(tiffErrorHandler);
 
 	// Open the texture
-	in			=	TIFFOpen(fileName,"r");
-
+	TIFF			*in			=	TIFFOpen(fileName,"r");
+	CEnvironment	*cTexture	=	NULL;
 	if (in != NULL) {
 		char				*textureFormat = NULL;
 
@@ -2238,10 +2167,9 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 			if (strcmp(textureFormat,TIFF_CUBIC_ENVIRONMENT) == 0) {
 				// We're loading a cubic environment 
 				int			directory	=	0;
-				int			i;
 				CTexture	*sides[6];
 
-				for (i=0;i<6;i++) {
+				for (int i=0;i<6;++i) {
 					sides[i]	=	texLoad(fileName,name,in,directory);
 				}
 
@@ -2290,7 +2218,7 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 // Comments				:
 void			CRenderer::initTextures(int mm) {
 	// Set up our texturing
-	int maxPerThread = (int) ceil((float)mm/CRenderer::numThreads);
+	const int maxPerThread			=	(int) ceil((float)mm/CRenderer::numThreads);
 	
 	CRenderer::textureUsedBlocks	=	NULL;
 	
@@ -2299,7 +2227,7 @@ void			CRenderer::initTextures(int mm) {
 	
 	CRenderer::textureRefNumber		=	new	int[CRenderer::numThreads];
 	
-	for (int i=0;i<CRenderer::numThreads;i++) {
+	for (int i=0;i<CRenderer::numThreads;++i) {
 		CRenderer::textureMaxMemory[i]		=	maxPerThread;
 		CRenderer::textureUsedMemory[i]		=	0;
 		

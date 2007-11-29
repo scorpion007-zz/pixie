@@ -184,11 +184,11 @@ DEFFUNC(Dvv			,"Dv"		,"v=v"	,DVVEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 
 
 
-#define	DERIVFEXPR_UPDATE		res++;																		\
-								duTop++;																	\
-								duBottom++;																	\
-								dvTop++;																	\
-								dvBottom++;
+#define	DERIVFEXPR_UPDATE		++res;																		\
+								++duTop;																	\
+								++duBottom;																	\
+								++dvTop;																	\
+								++dvBottom;
 
 #else
 
@@ -237,8 +237,8 @@ DEFFUNC(Derivf		,"Deriv"			,"f=ff"	,DERIVFEXPR_PRE,DERIVFEXPR,DERIVFEXPR_UPDATE,
 #define	DERIVVEXPR_UPDATE		res			+=	3;															\
 								duTop		+=	3;															\
 								dvTop		+=	3;															\
-								duBottom++;																	\
-								dvBottom++;
+								++duBottom;																	\
+								++dvBottom;
 
 #else
 #define	DERIVVEXPR_PRE
@@ -274,11 +274,11 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 								*res	=	lengthv(tmp);													\
 								assert(*res >= 0);
 
-#define	AREAEXPR_UPDATE			res++;																		\
+#define	AREAEXPR_UPDATE			++res;																		\
 								dPdu	+=	3;																\
 								dPdv	+=	3;																\
-								du++;																		\
-								dv++;
+								++du;																		\
+								++dv;
 #else
 #define	AREAEXPR_PRE
 #define	AREAEXPR
@@ -335,12 +335,12 @@ DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 									*res	=	lengthv(tmp);												\
 								}
 
-#define	AREAEXPR_UPDATE			res++;																		\
-								du++;																		\
+#define	AREAEXPR_UPDATE			++res;																		\
+								++du;																		\
 								if (dicingMeasure == FALSE) {												\
 									dPdu	+=	3;															\
 									dPdv	+=	3;															\
-									dv++;																	\
+									++dv;																	\
 								}
 #else
 #define	AREAEXPR_PRE
@@ -361,11 +361,11 @@ DEFFUNC(AreaS	,"area"		,"f=pS",	AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 // calculatenormal "p=p"
 #ifndef INIT_SHADING
 
-#define	CALCULATENORMALEXPR_PRE		FUN2EXPR_PRE																\
-									float	*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);			\
-									float	*dPdv	=	dPdu + numVertices*3;									\
-									float	mult	=	((currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ? (float) -1 : (float) 1);	\
-									duVector(dPdu,op);															\
+#define	CALCULATENORMALEXPR_PRE		FUN2EXPR_PRE																		\
+									float		*dPdu	=	(float *) ralloc(numVertices*6*sizeof(float),threadMemory);	\
+									float		*dPdv	=	dPdu + numVertices*3;										\
+									const float	mult	=	((currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ? (float) -1 : (float) 1);	\
+									duVector(dPdu,op);																	\
 									dvVector(dPdv,op);
 
 #define	CALCULATENORMALEXPR			crossvv(res,dPdu,dPdv);														\
@@ -762,33 +762,31 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // diffuse	"c=n"
-#define	DIFFUSEEXPR_PRE		const float		*P,*N,*Cl,*L,*nd;									\
-							float			*R;													\
-							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
-							int				i,ndStep;											\
-							float			coefficient;										\
-							float			_nd = 0;											\
+#define	DIFFUSEEXPR_PRE		float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 							float			*res;												\
 							const float		*op;												\
 							vector			Ltmp;												\
-							for (i=0;i<numVertices;i++) costheta[i]	=	0;						\
+							for (int i=0;i<numVertices;++i) costheta[i]	=	0;					\
 							operand(0,res,float *);												\
 							operand(1,op,const float *);										\
-							P		=	varying[VARIABLE_P];									\
-							N		=	op;														\
+							const float	*P		=	varying[VARIABLE_P];						\
+							const float	*N		=	op;											\
 																								\
 							runLights(P,N,costheta);											\
 							/* initialize output appropriately */								\
-							R		=	res;													\
-							tags	=	tagStart;												\
-							for (i=0;i<numVertices;i++) {										\
+							float *R			=	res;										\
+							tags				=	tagStart;									\
+							for (int i=0;i<numVertices;++i) {									\
 								if (*tags == 0) initv(R,0,0,0);									\
 								R += 3;															\
-								tags++;															\
+								++tags;															\
 							}																	\
 							/* loop the lighting contributions */								\
 							*currentLight	=	*lights;										\
 							while (*currentLight) {												\
+								int				ndStep;											\
+								float			_nd = 0;										\
+								const float		*nd;											\
 								enterFastLightingConditional();									\
 								CShaderInstance *_inst = (*currentLight)->instance;				\
 								if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
@@ -799,15 +797,15 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 									nd		=	&_nd;											\
 									ndStep	=	0;												\
 								}																\
-								L		=	(*currentLight)->savedState[0];						\
-								Cl		=	(*currentLight)->savedState[1];						\
+								const float	*L		=	(*currentLight)->savedState[0];			\
+								const float	*Cl		=	(*currentLight)->savedState[1];			\
 								R		=	res;												\
 								N		=	op;													\
 								tags	=	tagStart;
 
 
 #define DIFFUSEEXPR			normalizev(Ltmp,L);													\
-							coefficient = (1.0f-nd[0])*dotvv(N,Ltmp);							\
+							const float coefficient = (1.0f-nd[0])*dotvv(N,Ltmp);				\
 							if (coefficient > 0) {												\
 								R[COMP_R] += coefficient * Cl[COMP_R];							\
 								R[COMP_G] += coefficient * Cl[COMP_G];							\
@@ -828,35 +826,34 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // diffuse	"c=pnf"
-#define	DIFFUSE2EXPR_PRE	const float		*P,*N,*Cl,*L,*nd;									\
-							float			*R;													\
+#define	DIFFUSE2EXPR_PRE	const float		*P,*N;												\
 							float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory); \
 							const float		*cosangle;											\
 							const float		*op3;												\
-							float			_nd = 0;											\
-							float			coefficient;										\
 							vector			Ltmp;												\
-							int				i,ndStep;											\
 							float			*res;												\
 							const float		*op2;												\
 							operand(0,res,float *);												\
 							operand(1,P,const float *);											\
 							operand(2,op2,const float *);										\
 							operand(3,op3,const float *);										\
-							for (i=0;i<numVertices;i++) costheta[i] = (float) cos(op3[i]);		\
-							R		=	res;													\
+							for (int i=0;i<numVertices;++i) costheta[i] = (float) cos(op3[i]);	\
 							N		=	op2;													\
 							runLights(P,N,costheta);											\
 							/* initialize output appropriately */								\
-							tags 	=	tagStart;												\
-							for (i=0;i<numVertices;i++) {										\
+							float *R		=	res;											\
+							tags			=	tagStart;										\
+							for (int i=0;i<numVertices;++i) {									\
 								if (*tags==0) initv(R,0,0,0);									\
 								R += 3;															\
-								tags++;															\
+								++tags;															\
 							}																	\
 							/* loop the lighting contributions */								\
 							*currentLight = *lights;											\
 							while (*currentLight) {												\
+								int				ndStep;											\
+								float			_nd = 0;										\
+								const float		*nd;											\
 								enterFastLightingConditional();									\
 								CShaderInstance *_inst = (*currentLight)->instance;				\
 								if (_inst ->flags & SHADERFLAGS_NONDIFFUSE) {					\
@@ -867,15 +864,15 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 									nd		=	&_nd;											\
 									ndStep	=	0;												\
 								}																\
-								L			=	(*currentLight)->savedState[0];					\
-								Cl			=	(*currentLight)->savedState[1];					\
+								const float *L	=	(*currentLight)->savedState[0];				\
+								const float *Cl	=	(*currentLight)->savedState[1];				\
 								R			=	res;											\
 								N			=	op2;											\
 								cosangle	=	costheta;										\
 								tags		=	tagStart;
 
 #define DIFFUSE2EXPR		normalizev(Ltmp,L);													\
-							coefficient = (1.0f-nd[0])*dotvv(N,Ltmp);							\
+							const float coefficient = (1.0f-nd[0])*dotvv(N,Ltmp);				\
 							if (coefficient > *cosangle) {										\
 								R[COMP_R] += coefficient * Cl[COMP_R];							\
 								R[COMP_G] += coefficient * Cl[COMP_G];							\
@@ -902,29 +899,24 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // specular	"c=nvf"
-#define	SPECULAREXPR_PRE		const float		*P,*N,*Cl,*L,*V,*ns;								\
-								float			*R,*power;											\
-								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
+#define	SPECULAREXPR_PRE		float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								float			*powers		=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								const float		*op1,*op2,*op3;										\
 								float			*res;												\
-								int				i,nsStep;											\
-								float			_ns = 0;											\
-								float			coefficient;										\
 								vector			Ltmp,halfway;										\
 								operand(0,res,float *);												\
 								operand(1,op1,const float *);										\
 								operand(2,op2,const float *);										\
 								operand(3,op3,const float *);										\
-								for (i=0;i<numVertices;i++)	costheta[i]	=	0;						\
-								P		=	varying[VARIABLE_P];									\
-								N		=	op1;													\
+								for (int i=0;i<numVertices;++i)	costheta[i]	=	0;					\
+								const float *P		=	varying[VARIABLE_P];						\
+								const float *N		=	op1;										\
 								runLights(P,N,costheta);											\
 								/* initialize output appropriately */								\
-								R			=	res;												\
-								power		=	powers;												\
-								tags		=	tagStart;											\
-								for (i=0;i<numVertices;i++) {										\
+								float *R			=	res;										\
+								float *power		=	powers;										\
+								tags				=	tagStart;									\
+								for (int i=0;i<numVertices;++i) {									\
 									if (*tags==0) {													\
 										initv(R,0,0,0);												\
 										*power = 10.0f / *op3;										\
@@ -932,11 +924,14 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 									R			+=	3;												\
 									op3			+=	1;												\
 									power		+=	1;												\
-									tags++;															\
+									++tags;															\
 								}																	\
 								/* loop the lighting contributions */								\
 								*currentLight = *lights;											\
 								while (*currentLight) {												\
+									float	_ns = 0;												\
+									int		nsStep;													\
+									const float	*ns;												\
 									enterFastLightingConditional();									\
 									CShaderInstance *_inst = (*currentLight)->instance;				\
 									if (_inst ->flags & SHADERFLAGS_NONSPECULAR) {					\
@@ -947,20 +942,20 @@ DEFLIGHTFUNC(Diffuse2			,"diffuse"				,"c=pnf"	,DIFFUSE2EXPR_PRE, DIFFUSE2EXPR, 
 										ns		=	&_ns;											\
 										nsStep	=	0;												\
 									}																\
-									L			=	(*currentLight)->savedState[0];					\
-									Cl			=	(*currentLight)->savedState[1];					\
+									const float *L			=	(*currentLight)->savedState[0];		\
+									const float *Cl			=	(*currentLight)->savedState[1];		\
+									const float *V			=	op2;								\
 									R			=	res;											\
 									N			=	op1;											\
-									V			=	op2;											\
 									power		=	powers;											\
 									tags		=	tagStart;
 
 #define SPECULAREXPR			normalizev(Ltmp,L);													\
 								addvv(halfway,V,Ltmp);												\
 								normalizev(halfway);												\
-								coefficient = (1.0f-ns[0])*dotvv(N,halfway);						\
-								if (coefficient > 0) {												\
-									coefficient = (float) pow(coefficient,*power);					\
+								const float	tmp	=	((1.0f-ns[0])*dotvv(N,halfway));				\
+								if (tmp > 0) {														\
+									const float coefficient = (float) pow(tmp,*power);				\
 									R[COMP_R] += coefficient * Cl[COMP_R];							\
 									R[COMP_G] += coefficient * Cl[COMP_G];							\
 									R[COMP_B] += coefficient * Cl[COMP_B];							\
@@ -983,31 +978,26 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // phong	"c=nvf"
-#define	PHONGEXPR_PRE			const float		*P,*N,*Cl,*L,*V,*size,*ns;							\
-								float			*refDir,*R;											\
-								float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
+#define	PHONGEXPR_PRE			float			*costheta	=	(float *) ralloc(numVertices*sizeof(float),threadMemory);	\
 								float			*refDirs	=	(float *) ralloc(3*numVertices*sizeof(float),threadMemory);	\
 								const float		*op1,*op2,*op3;										\
 								float			*res;												\
-								float			_ns = 0;											\
-								float			coefficient;										\
 								vector			Ltmp;												\
-								int				i,nsStep;											\
 								operand(0,res,float *);												\
 								operand(1,op1,const float *);										\
 								operand(2,op2,const float *);										\
 								operand(3,op3,const float *);										\
-								for (i=0;i<numVertices;i++)	costheta[i]	=	0;						\
-								P		=	varying[VARIABLE_P];									\
-								N		=	op1;													\
+								for (int i=0;i<numVertices;++i)	costheta[i]	=	0;					\
+								const float	*P		=	varying[VARIABLE_P];						\
+								const float	*N		=	op1;										\
 								runLights(P,N,costheta);											\
 								/* initialize output appropriately */								\
-								R			=	res;												\
-								N			=	op1;												\
-								V			=	op2;												\
-								refDir		=	refDirs;											\
-								tags		=	tagStart;											\
-								for (i=0;i<numVertices;i++) {										\
+								float		*R		=	res;										\
+								const float	*V		=	op2;										\
+								float *refDir		=	refDirs;									\
+								N					=	op1;										\
+								tags				=	tagStart;									\
+								for (int i=0;i<numVertices;++i) {									\
 									if (*tags==0) {													\
 										initv(R,0,0,0);												\
 										mulvf(refDir,N,2*dotvv(N,V));								\
@@ -1017,11 +1007,14 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 									N			+=	3;												\
 									V			+=	3;												\
 									refDir		+=	3;												\
-									tags++;															\
+									++tags;															\
 								}																	\
 								/* loop the lighting contributions */								\
 								*currentLight = *lights;											\
 								while (*currentLight) {												\
+									int				nsStep;											\
+									const float		*ns;											\
+									float			_ns = 0;										\
 									enterFastLightingConditional();									\
 									CShaderInstance *_inst = (*currentLight)->instance;				\
 									if (_inst ->flags & SHADERFLAGS_NONSPECULAR) {					\
@@ -1032,15 +1025,15 @@ DEFLIGHTFUNC(Specular				,"specular"				,"c=nvf"		,SPECULAREXPR_PRE, SPECULAREXP
 										ns		=	&_ns;											\
 										nsStep	=	0;												\
 									}																\
-									L			=	(*currentLight)->savedState[0];					\
-									Cl			=	(*currentLight)->savedState[1];					\
+									const float *L			=	(*currentLight)->savedState[0];		\
+									const float *Cl			=	(*currentLight)->savedState[1];		\
+									const float *size		=	op3;								\
 									R			=	res;											\
-									size		=	op3;											\
 									refDir		=	refDirs;										\
 									tags		=	tagStart;
 
 #define PHONGEXPR				normalizev(Ltmp,L);													\
-								coefficient = (1.0f-ns[0]) * (float) pow(max(0,dotvv(refDir,Ltmp)),*size);			\
+								const float coefficient = (1.0f-ns[0]) * (float) pow(max(0,dotvv(refDir,Ltmp)),*size);			\
 								if (coefficient > 0) {												\
 									R[COMP_R] += coefficient * Cl[COMP_R];							\
 									R[COMP_G] += coefficient * Cl[COMP_G];							\
@@ -1099,20 +1092,18 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 #define	PARAMETEREXPR_PRE(accessor)																			\
 								float		*res;															\
 								const char	**op1;															\
-								float	*op2;																\
-								const float	*src;															\
-								int			srcStep,op2Step;												\
-								float		found;															\
-								CVariable	*cVar = NULL;													\
-								int			globalIndex = -1;												\
+								float		*op2;															\
+								int			op2Step;														\
 								operand(0,res,float *);														\
 								operand(1,op1,const char **);												\
 								operand(2,op2,float *);														\
 								op2Step = operandVaryingStep(2);											\
-								src		= op2;																\
-								srcStep = op2Step;															\
 																											\
-								found		=	(float) FUNCTION(op2,*op1,&cVar,&globalIndex);				\
+								int			globalIndex =	-1;												\
+								CVariable	*cVar		=	NULL;											\
+								float		found		=	(float) FUNCTION(op2,*op1,&cVar,&globalIndex);	\
+								const float	*src		=	op2;											\
+								int			srcStep		=	op2Step;										\
 																											\
 								if (found != 0) {															\
 									srcStep					=	0;											\
@@ -1137,19 +1128,17 @@ DEFFUNC(SpecularBRDF			,"specularbrdf"				,"c=vnvf"		,SPECULARBRDFEXPR_PRE,SPECU
 #define LIGHTPARAMETEREXPR_PRE	float		*res;															\
 								const char	**op1;															\
 								float		*op2;															\
-								const float	*src;															\
-								int			srcStep,op2Step;												\
-								float		found;															\
-								CVariable	*cVar = NULL;													\
-								int			globalIndex = -1;												\
+								int			op2Step;														\
 								operand(0,res,float *);														\
 								operand(1,op1,const char **);												\
 								operand(2,op2,float *);														\
 								op2Step = operandVaryingStep(2);											\
-								src		= op2;																\
-								srcStep = op2Step;															\
 																											\
-								found		=	(float) (*currentLight)->instance->getParameter(*op1,op2,&cVar,&globalIndex);\
+								int			globalIndex =	-1;												\
+								CVariable	*cVar		=	NULL;											\
+								float		found		=	(float) (*currentLight)->instance->getParameter(*op1,op2,&cVar,&globalIndex);\
+								const float	*src		=	op2;											\
+								int			srcStep		=	op2Step;										\
 																											\
 								if (found != 0) {															\
 									srcStep				=	0;												\
@@ -1343,9 +1332,8 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 									found		=	0;												\
 									src			=	op3;	/* prevent writing result */			\
 								} else {															\
-									int	i;															\
 																									\
-									for (i=0;i<16*2;i++) out[i] = 0;								\
+									for (int i=0;i<16*2;++i) out[i] = 0;							\
 																									\
 									found				=	1;										\
 																									\
@@ -1523,7 +1511,7 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								tex->lookup4(tmp,cs,ct,this);													\
 								res[i]		=	tmp[0];
 
-#define	TEXTUREFEXPR_UPDATE		i++;	plStep();
+#define	TEXTUREFEXPR_UPDATE		++i;	plStep();
 
 #define	TEXTUREFEXPR_POST		plEnd();
 #else
@@ -1554,7 +1542,7 @@ DEFFUNC(TextureFloat			,"texture"					,"f=SFff!"		,TEXTUREFEXPR_PRE,TEXTUREFEXPR
 								ct[3]		=	t[i] + (dtdu[i]*du[i] + dtdv[i]*dv[i])*twidth;								\
 								tex->lookup4(res,cs,ct,this);
 
-#define	TEXTURECEXPR_UPDATE		i++;	res	+=	3;	plStep();
+#define	TEXTURECEXPR_UPDATE		++i;	res	+=	3;	plStep();
 
 #define	TEXTURECEXPR_POST		plEnd();
 
@@ -1596,12 +1584,12 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTUREFEXPR_PRE,TEXTURECEXPR
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture	"f=SFffffffff"
 #ifndef INIT_SHADING
-#define	TEXTUREFFULLEXPR_PRE	float			*res;															\
-								const float		*op2,*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;					\
-								float			cs[4],ct[4];													\
-								/* Begin the parameter list */													\
+#define	TEXTUREFFULLEXPR_PRE	/* Begin the parameter list */													\
 								plBegin(CTextureLookup,11);														\
 								/* Fetch the parameters as usual */												\
+								float			*res;															\
+								const float		*op2,*op3,*op4,*op5,*op6,*op7,*op8,*op9,*op10;					\
+								float			cs[4],ct[4];													\
 								operand(0,res,float *);															\
 								operand(2,op2,const float *);													\
 								operand(3,op3,const float *);													\
@@ -1637,15 +1625,15 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTUREFEXPR_PRE,TEXTURECEXPR
 								tex->lookup4(tmp,cs,ct,this);													\
 								*res		=	tmp[0];
 
-#define	TEXTUREFFULLEXPR_UPDATE	res++;																			\
-								op3++;																			\
-								op4++;																			\
-								op5++;																			\
-								op6++;																			\
-								op7++;																			\
-								op8++;																			\
-								op9++;																			\
-								op10++;																			\
+#define	TEXTUREFFULLEXPR_UPDATE	++res;																			\
+								++op3;																			\
+								++op4;																			\
+								++op5;																			\
+								++op6;																			\
+								++op7;																			\
+								++op8;																			\
+								++op9;																			\
+								++op10;																			\
 								plStep();
 
 
@@ -1681,14 +1669,14 @@ DEFFUNC(TextureFloatFull			,"texture"				,"f=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								tex->lookup4(res,cs,ct,this);
 
 #define	TEXTURECFULLEXPR_UPDATE	res	+=	3;																		\
-								op3++;																			\
-								op4++;																			\
-								op5++;																			\
-								op6++;																			\
-								op7++;																			\
-								op8++;																			\
-								op9++;																			\
-								op10++;																			\
+								++op3;																			\
+								++op4;																			\
+								++op5;																			\
+								++op6;																			\
+								++op7;																			\
+								++op8;																			\
+								++op9;																			\
+								++op10;																			\
 								plStep();
 
 
@@ -1736,11 +1724,11 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 // environment	"f=SFv"
 #ifndef INIT_SHADING
 #define	ENVIRONMENTEXPR_PRE(__name)																					\
+								/* Begin the parameter list */														\
+								plBegin(CEnvironmentLookup,4);														\
 								float			*res;																\
 								const char		**op1;																\
 								const float		*op2;																\
-								/* Begin the parameter list */														\
-								plBegin(CEnvironmentLookup,4);														\
 								/* Fetch the parameters as usual */													\
 								operand(0,res,float *);																\
 								operand(1,op1,const char **);														\
@@ -1796,8 +1784,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									rays->bias			=	scratch->traceParams.bias;								\
 									rays->sampleBase	=	scratch->traceParams.sampleBase;						\
 									rays->maxDist		=	scratch->traceParams.maxDist;							\
-									rays++;																			\
-									numRays++;																		\
+									++rays;																			\
+									++numRays;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
 									mulvf(dDdu,(*du)*swidth*0.5f);													\
@@ -1820,8 +1808,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								D			+=	3;																	\
 								dDdu		+=	3;																	\
 								dDdv		+=	3;																	\
-								du++;																				\
-								dv++;																				\
+								++du;																				\
+								++dv;																				\
 								if (tex == NULL) {																	\
 									P		+=	3;																	\
 									N		+=	3;																	\
@@ -1837,11 +1825,11 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									rays	-=	numRays;															\
 									traceReflection(numRays,rays,FALSE);											\
 									if (__float) {																	\
-										for (int i=numRays;i>0;i--,rays++) {										\
+										for (int i=numRays;i>0;--i,++rays) {										\
 											*(rays->res)	=	(rays->C[0] + rays->C[1] + rays->C[2]) / 3.0f;		\
 										}																			\
 									} else {																		\
-										for (int i=numRays;i>0;i--,rays++) movvv(rays->res,rays->C);				\
+										for (int i=numRays;i>0;--i,++rays) movvv(rays->res,rays->C);				\
 									}																				\
 								}																					\
 								plEnd();
@@ -1894,8 +1882,8 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 									rays->numSamples	=	(int) scratch->traceParams.samples;						\
 									rays->bias			=	scratch->traceParams.bias;								\
 									rays->maxDist		=	scratch->traceParams.maxDist;							\
-									rays++;																			\
-									numRays++;																		\
+									++rays;																			\
+									++numRays;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
 									mulvf(dDdu,(*du)*swidth*0.5f);													\
@@ -1917,8 +1905,8 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 								D			+=	3;																	\
 								dDdu		+=	3;																	\
 								dDdv		+=	3;																	\
-								du++;																				\
-								dv++;																				\
+								++du;																				\
+								++dv;																				\
 								L			+=	3;																	\
 								if (tex == NULL) {																	\
 									dPdu	+=	3;																	\
@@ -1932,11 +1920,11 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 								rays	-=	numRays;																\
 								traceTransmission(numRays,rays,FALSE);												\
 								if (__float) {																		\
-									for (int i=numRays;i>0;i--,rays++) {											\
+									for (int i=numRays;i>0;--i,++rays) {											\
 										*(rays->res)	=	1 - (rays->C[0] + rays->C[1] + rays->C[2]) / 3.0f;		\
 									}																				\
 								} else {																			\
-									for (int i=numRays;i>0;i--,rays++) {											\
+									for (int i=numRays;i>0;--i,++rays) {											\
 										res		=	rays->res;														\
 										res[0]	=	1 - rays->C[0];													\
 										res[1]	=	1 - rays->C[1];													\
@@ -1973,10 +1961,6 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 #ifndef INIT_SHADING
 #define	FILTERSTEP2EXPR_PRE		FUN3EXPR_PRE																		\
 								plBegin(CFilterLookup,3);															\
-								double			tmp;																\
-								float			val;																\
-								int				i;																	\
-								float			step,vstep;															\
 								const	float	width	=	lookup->width;											\
 								float			*dsdu	=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
 								float			*dsdv	=	dsdu + numVertices;										\
@@ -1987,30 +1971,28 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 																													\
 								duFloat(dsdu,s);																	\
 								dvFloat(dsdv,s);																	\
-								for (i=0;i<numVertices;i++) {														\
+								for (int i=0;i<numVertices;++i) {													\
 									dsdu[i]		=	fabs(dsdu[i]*du[i]);											\
 									dsdv[i]		=	fabs(dsdv[i]*dv[i]);											\
 									fwidth[i]	=	scratch->textureParams.width*max(dsdu[i] + dsdv[i],C_EPSILON);	\
 								}
 
 #define	FILTERSTEP2EXPR			plReady();																			\
-								tmp		=	0;																		\
-								val		=	*op2+width*fwidth[0];													\
-								vstep	=	lookup->valStep*fwidth[0];												\
-								i		=	FILTERSTEP_NUMSTEPS-1;													\
-								while(i>=0) {																		\
+								double		tmp		=	0;															\
+								float		val		=	*op2+width*fwidth[0];										\
+								const float	vstep	=	lookup->valStep*fwidth[0];									\
+								for (int i = FILTERSTEP_NUMSTEPS-1;i>=0;--i) {										\
 									if (*op1 > val)	break;															\
-									step	=	min(vstep,val-(*op1));												\
+									const float	step	=	min(vstep,val-(*op1));									\
 									tmp		+=	lookup->vals[i]*step;												\
 									val		-=	vstep;																\
-									i--;																			\
 								}																					\
 								*res	=	(float) (tmp / ((double) lookup->normalizer * fwidth[0]));
 
 
 #define	FILTERSTEP2EXPR_UPDATE	plStep();																			\
 								FUN3EXPR_UPDATE(1,1,1)																\
-								fwidth++;
+								++fwidth;
 
 #else
 #define	FILTERSTEP2EXPR_PRE
@@ -2031,24 +2013,18 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 #ifndef INIT_SHADING
 #define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE																		\
 							plBegin(CFilterLookup,4);															\
-							float			tmp;																\
-							float			val;																\
-							int				i;																	\
-							float			step,vstep,fwidth;													\
 							const	float	width	=	lookup->width;
 
 #define	FILTERSTEP3EXPR		plReady();																			\
-							tmp		=	0;																		\
-							fwidth	=	max(fabs(op2[0]-op3[0]),C_EPSILON);										\
-							val		=	*op2+width*fwidth;														\
-							vstep	=	lookup->valStep*fwidth;													\
-							i		=	FILTERSTEP_NUMSTEPS-1;													\
-							while(i>=0) {																		\
+							float		tmp		=	0;															\
+							const float fwidth	=	max(fabs(op2[0]-op3[0]),C_EPSILON);							\
+							float		val		=	*op2+width*fwidth;											\
+							const float vstep	=	lookup->valStep*fwidth;										\
+							for (int i = FILTERSTEP_NUMSTEPS-1;i>=0;--i) {										\
 								if (op1[0] > val)	break;														\
-								step	=	min(vstep,val-op1[0]);												\
+								const float step	=	min(vstep,val-op1[0]);									\
 								tmp		+=	lookup->vals[i]*step;												\
 								val		-=	vstep;																\
-								i--;																			\
 							}																					\
 							*res	=	tmp / (lookup->normalizer * fwidth);
 
@@ -2131,13 +2107,13 @@ DEFFUNC(FilterStep3			,"filterstep"				,"f=fff!"		,FILTERSTEP3EXPR_PRE,FILTERSTE
 								}																				\
 								*res		=	1;
 
-#define	BAKE3DEXPR_UPDATE		res++;																			\
+#define	BAKE3DEXPR_UPDATE		++res;																			\
 								op3		+=	3;																	\
 								op4		+=	3;																	\
 								dPdu	+=	3;																	\
 								dPdv	+=	3;																	\
-								du++;	dv++;																	\
-								curU++;																			\
+								++du;	++dv;																	\
+								++curU;																			\
 								plStep();																		\
 								if (curU == uVerts) { curV++; curU = 0; }										\
 								for (int channel=0;channel<lookup->numChannels;++channel) {						\
@@ -2208,12 +2184,12 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 								texture3Dunpack(dest,lookup->numChannels,channelValues,lookup->channelEntry,lookup->channelSize);	\
 								*res		=	1;
 
-#define	TEXTURE3DEXPR_UPDATE	res++;																			\
+#define	TEXTURE3DEXPR_UPDATE	++res;																			\
 								op2		+=	3;																	\
 								op3		+=	3;																	\
 								dPdu	+=	3;																	\
 								dPdv	+=	3;																	\
-								du++;	dv++;																	\
+								++du;	++dv;																	\
 								plStep();																		\
 								for (int channel=0;channel<lookup->numChannels;++channel) {						\
 									channelValues[channel]	+=	lookup->channelSize[channel];					\
