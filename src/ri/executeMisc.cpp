@@ -80,8 +80,8 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 			assert(u[1] > u[0]);
 
 			// These values are constant accross a grid
-			double		invDu1		=	(double)uVertices / (double) (u[uVertices-1] - u[0]);
-			double		invDu2		=	(double)uVertices / (double) (2*(u[uVertices-1] - u[0]));			
+			double		invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
+			double		invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));
 
 			// Compute the Du
 			for (j=vVertices;j>0;j--) {
@@ -246,8 +246,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 			assert(vVertices >= 2);
 			assert(v[uVertices] > v[0]);
 
-			const double	invDv1		=	(double)vVertices / (double) (v[uVertices*(vVertices-1)] - v[0]);
-			const double	invDv2		=	(double)vVertices / (double) (2*(v[uVertices*(vVertices-1)] - v[0]));
+			const double	invDv1		=	1.0 / ((double)v[uVertices] - (double)v[0]);
+			const double	invDv2		=	1.0 / (2.0*((double)v[uVertices] - (double)v[0]));
 
 			// Compute the DV
 			for (j=0;j<uVertices;j++) {
@@ -348,13 +348,13 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 
 				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]			=	(float) (((double)cOp[uVertices] - (double)cOp[-uVertices]) * 0.5f);
+					cRes[0]			=	(float) (((double)cOp[uVertices] - (double)cOp[-uVertices]) * 0.5);
 					cRes			+=	uVertices;
 					cOp				+=	uVertices;
 				}
 
 				// Backward differencing
-				cRes[0]				=	(float) (cOp[0] - cOp[-uVertices]);
+				cRes[0]				=	(float) ((double)cOp[0] - (double)cOp[-uVertices]);
 			}
 		}
 		break;
@@ -449,8 +449,8 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 			assert(vVertices >= 2);
 			assert(u[1] > u[0]);
 
-			double		invDu1		=	(double)uVertices / (double) (u[uVertices-1] - u[0]);
-			double		invDu2		=	(double)uVertices / (double) (2*(u[uVertices-1] - u[0]));			
+			double		invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
+			double		invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));			
 
 			for (j=vVertices;j>0;j--) {
 
@@ -647,8 +647,8 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			assert(vVertices >= 2);
 			assert(v[uVertices] > v[0]);
 
-			const double	invDv1		=	(double)vVertices / (double) (v[uVertices*(vVertices-1)] - v[0]);
-			const double	invDv2		=	(double)vVertices / (double) (2*(v[uVertices*(vVertices-1)] - v[0]));
+			const double	invDv1		=	1.0 / ((double)v[uVertices] - (double)v[0]);
+			const double	invDv2		=	1.0 / (2.0*((double)v[uVertices] - (double)v[0]));
 			
 			for (j=0;j<uVertices;j++) {
 				float		*cRes	=	dest + j*3;
