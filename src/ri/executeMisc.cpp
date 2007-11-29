@@ -60,7 +60,7 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
 		{
-			for (int j=currentShadingState->numVertices;j>0;j--) {
+			for (int j=currentShadingState->numVertices;j>0;--j) {
 				*dest++ = 0;
 			}
 		}
@@ -72,7 +72,6 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 		{
 			const int	uVertices	=	currentShadingState->numUvertices;
 			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i,j;
 			const float	*u			=	currentShadingState->varying[VARIABLE_U];
 
 			assert(uVertices >= 2);
@@ -80,25 +79,25 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 			assert(u[1] > u[0]);
 
 			// These values are constant accross a grid
-			double		invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
-			double		invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));
+			const double	invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
+			const double	invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));
 
 			// Compute the Du
-			for (j=vVertices;j>0;j--) {
+			for (int j=vVertices;j>0;--j) {
 
 				// Forward differencing
 				*dest++	=	(float) (((double)src[1] - (double)src[0]) * invDu1);
-				src++;
+				++src;
 
 				// Central differencing
-				for (i=uVertices-2;i>0;i--) {
+				for (int i=uVertices-2;i>0;--i) {
 					*dest++	=	(float) (((double)src[1] - (double)src[-1]) * invDu2);
-					src++;
+					++src;
 				}
 
 				// Backward differencing
 				*dest++	=	(float) (((double)src[0] - (double)src[-1]) * invDu1);
-				src++;
+				++src;
 			}
 		}
 		break;
@@ -111,9 +110,8 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 			const float	*dsrc			=	src + numRealVertices;
 			float		*ddest			=	dest + numRealVertices;
 			const float	*du				=	currentShadingState->varying[VARIABLE_DU];
-			int			i;
 
-			for (i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				assert(*du != 0);
 
@@ -147,7 +145,7 @@ void	CShadingContext::DuFloat(float *dest,const float *src) {
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
 		{
-			for (int j=currentShadingState->numVertices;j>0;j--) {
+			for (int j=currentShadingState->numVertices;j>0;--j) {
 				*dest++ = 0;
 			}
 		}
@@ -159,20 +157,19 @@ void	CShadingContext::DuFloat(float *dest,const float *src) {
 		{
 			const int	uVertices	=	currentShadingState->numUvertices;
 			const int	vVertices	=	currentShadingState->numVvertices;
-			int			i,j;
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
 
 			// Compute the Du
-			for (j=vVertices;j>0;j--) {
+			for (int j=vVertices;j>0;--j) {
 
 				// Forward differencing
 				*dest++	=	(float) ((double)src[1] - (double)src[0]);
 				src++;
 
 				// Central differencing
-				for (i=uVertices-2;i>0;i--) {
+				for (int i=uVertices-2;i>0;--i) {
 					*dest++	=	(float) (((double)src[1] - (double)src[-1]) * 0.5);
 					src++;
 				}
@@ -191,9 +188,8 @@ void	CShadingContext::DuFloat(float *dest,const float *src) {
 			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices;
 			float		*ddest			=	dest + numRealVertices;
-			int			i;
 
-			for (i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				const float	val	=	(float) ((double)dsrc[0] - (double)src[0]);
 
@@ -227,7 +223,7 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		// Dv executing on Points
 		case SHADING_0D:
 		{
-			for (int i=currentShadingState->numVertices;i>0;i--) {
+			for (int i=currentShadingState->numVertices;i>0;--i) {
 				*dest++	=	0;
 			}
 		}
@@ -239,7 +235,6 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 		{
 			const int		uVertices	=	currentShadingState->numUvertices;
 			const int		vVertices	=	currentShadingState->numVvertices;
-			int				i,j;
 			const float		*v			=	currentShadingState->varying[VARIABLE_V];
 
 			assert(uVertices >= 2);
@@ -250,7 +245,7 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 			const double	invDv2		=	1.0 / (2.0*((double)v[uVertices] - (double)v[0]));
 
 			// Compute the DV
-			for (j=0;j<uVertices;j++) {
+			for (int j=0;j<uVertices;++j) {
 				float		*cRes	=	dest + j;
 				const float	*cOp	=	src + j;
 
@@ -260,7 +255,7 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 				cOp					+=	uVertices;
 
 				// Central differencing
-				for (i=vVertices-2;i>0;i--) {
+				for (int i=vVertices-2;i>0;--i) {
 					cRes[0]			=	(float) (((double)cOp[uVertices] - (double)cOp[-uVertices]) * invDv2);
 					cRes			+=	uVertices;
 					cOp				+=	uVertices;
@@ -283,7 +278,7 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 
 			assert(numVertices == numRealVertices*3);
 
-			for (int i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				assert(*dv != 0);
 
@@ -293,8 +288,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 				ddest[1]		=	val;
 				dest[0]			=	val;
 
-				dest++;
-				src++;
+				++dest;
+				++src;
 				ddest			+=	2;
 				dsrc			+=	2;
 			}
@@ -319,7 +314,7 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 		// Dv executing on Points
 		case SHADING_0D:
 		{
-			for (int i=currentShadingState->numVertices;i>0;i--) {
+			for (int i=currentShadingState->numVertices;i>0;--i) {
 				*dest++	=	0;
 			}
 		}
@@ -331,13 +326,12 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 		{
 			const int		uVertices	=	currentShadingState->numUvertices;
 			const int		vVertices	=	currentShadingState->numVvertices;
-			int				i,j;
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
 
 			// Compute the DV
-			for (j=0;j<uVertices;j++) {
+			for (int j=0;j<uVertices;++j) {
 				float		*cRes	=	dest + j;
 				const float	*cOp	=	src + j;
 
@@ -347,7 +341,7 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 				cOp					+=	uVertices;
 
 				// Central differencing
-				for (i=vVertices-2;i>0;i--) {
+				for (int i=vVertices-2;i>0;--i) {
 					cRes[0]			=	(float) (((double)cOp[uVertices] - (double)cOp[-uVertices]) * 0.5);
 					cRes			+=	uVertices;
 					cOp				+=	uVertices;
@@ -369,7 +363,7 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 
 			assert(numVertices == numRealVertices*3);
 
-			for (int i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				const float	val	=	(float) ((double)dsrc[1] - (double)src[0]);
 
@@ -377,8 +371,8 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 				ddest[1]		=	val;
 				dest[0]			=	val;
 
-				dest++;
-				src++;
+				++dest;
+				++src;
 				ddest			+=	2;
 				dsrc			+=	2;
 			}
@@ -429,7 +423,7 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
 		{
-			for (int j=currentShadingState->numVertices;j>0;j--) {
+			for (int j=currentShadingState->numVertices;j>0;--j) {
 				initv(dest,0);
 				dest+=3;
 			}
@@ -442,17 +436,16 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 		{
 			const int		uVertices	=	currentShadingState->numUvertices;
 			const int		vVertices	=	currentShadingState->numVvertices;
-			int				i,j;
 			const float		*u			=	currentShadingState->varying[VARIABLE_U];
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
 			assert(u[1] > u[0]);
 
-			double		invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
-			double		invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));			
+			const double	invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
+			const double	invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));			
 
-			for (j=vVertices;j>0;j--) {
+			for (int j=vVertices;j>0;--j) {
 
 				// Use forward difference
 				*dest++	=	(float) (((double)src[3] - (double)src[0]) * invDu1);
@@ -461,7 +454,7 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 				src		+=	3;
 
 				// Use central difference
-				for (i=uVertices-2;i>0;i--) {
+				for (int i=uVertices-2;i>0;--i) {
 					*dest++	=	(float) (((double)src[3] - (double)src[-3]) * invDu2);
 					*dest++	=	(float) (((double)src[4] - (double)src[-2]) * invDu2);
 					*dest++	=	(float) (((double)src[5] - (double)src[-1]) * invDu2);
@@ -485,9 +478,8 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
 			const float	*du				=	currentShadingState->varying[VARIABLE_DU];
-			int			i;
 
-			for (i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				assert(*du != 0);
 
@@ -532,7 +524,7 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 		// Du executing on Points or Curves (note that curves are defined along v)
 		case SHADING_0D:
 		{
-			for (int j=currentShadingState->numVertices;j>0;j--) {
+			for (int j=currentShadingState->numVertices;j>0;--j) {
 				initv(dest,0);
 				dest+=3;
 			}
@@ -545,12 +537,11 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 		{
 			const int		uVertices	=	currentShadingState->numUvertices;
 			const int		vVertices	=	currentShadingState->numVvertices;
-			int				i,j;
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
 
-			for (j=vVertices;j>0;j--) {
+			for (int j=vVertices;j>0;--j) {
 
 				// Use forward difference
 				*dest++	=	(float) ((double)src[3] - (double)src[0]);
@@ -559,7 +550,7 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 				src		+=	3;
 
 				// Use central difference
-				for (i=uVertices-2;i>0;i--) {
+				for (int i=uVertices-2;i>0;--i) {
 					*dest++	=	(float) (((double)src[3] - (double)src[-3]) * 0.5);
 					*dest++	=	(float) (((double)src[4] - (double)src[-2]) * 0.5);
 					*dest++	=	(float) (((double)src[5] - (double)src[-1]) * 0.5);
@@ -582,9 +573,8 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
-			int			i;
 
-			for (i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				const float	val0	=	(float) ((double)dsrc[0] - (double)src[0]);
 				const float	val1	=	(float) ((double)dsrc[1] - (double)src[1]);
@@ -628,7 +618,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		// Dv executing on Points
 		case SHADING_0D:
 		{
-			for (int i=currentShadingState->numVertices;i>0;i--) {
+			for (int i=currentShadingState->numVertices;i>0;--i) {
 				initv(dest,0);
 				dest+=3;
 			}
@@ -640,7 +630,6 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 		{
 			const int		uVertices	=	currentShadingState->numUvertices;
 			const int		vVertices	=	currentShadingState->numVvertices;
-			int				i,j;
 			const float		*v			=	currentShadingState->varying[VARIABLE_V];
 
 			assert(uVertices >= 2);
@@ -650,7 +639,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			const double	invDv1		=	1.0 / ((double)v[uVertices] - (double)v[0]);
 			const double	invDv2		=	1.0 / (2.0*((double)v[uVertices] - (double)v[0]));
 			
-			for (j=0;j<uVertices;j++) {
+			for (int j=0;j<uVertices;++j) {
 				float		*cRes	=	dest + j*3;
 				const float	*cOp	=	src + j*3;
 
@@ -662,7 +651,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 				cOp					+=	uVertices*3;
 
 				// Central differencing
-				for (i=vVertices-2;i>0;i--) {
+				for (int i=vVertices-2;i>0;--i) {
 					cRes[0]			=	(float) (((double)cOp[uVertices*3+0] - (double)cOp[-uVertices*3+0]) * invDv2);
 					cRes[1]			=	(float) (((double)cOp[uVertices*3+1] - (double)cOp[-uVertices*3+1]) * invDv2);
 					cRes[2]			=	(float) (((double)cOp[uVertices*3+2] - (double)cOp[-uVertices*3+2]) * invDv2);
@@ -686,11 +675,10 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
 			const float	*dv				=	currentShadingState->varying[VARIABLE_DV];
-			int			i;
 
 			assert(numVertices == numRealVertices*3);
 
-			for (i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				assert(*dv > 0);
 
@@ -732,7 +720,7 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 		// Dv executing on Points
 		case SHADING_0D:
 		{
-			for (int i=currentShadingState->numVertices;i>0;i--) {
+			for (int i=currentShadingState->numVertices;i>0;--i) {
 				initv(dest,0);
 				dest+=3;
 			}
@@ -744,13 +732,11 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 		{
 			const int		uVertices	=	currentShadingState->numUvertices;
 			const int		vVertices	=	currentShadingState->numVvertices;
-			int				i,j;
 
 			assert(uVertices >= 2);
 			assert(vVertices >= 2);
 
-			
-			for (j=0;j<uVertices;j++) {
+			for (int j=0;j<uVertices;++j) {
 				float		*cRes	=	dest + j*3;
 				const float	*cOp	=	src + j*3;
 
@@ -762,7 +748,7 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 				cOp					+=	uVertices*3;
 
 				// Central differencing
-				for (i=vVertices-2;i>0;i--) {
+				for (int i=vVertices-2;i>0;--i) {
 					cRes[0]			=	(float) (((double)cOp[uVertices*3+0] - (double)cOp[-uVertices*3+0]) * 0.5);
 					cRes[1]			=	(float) (((double)cOp[uVertices*3+1] - (double)cOp[-uVertices*3+1]) * 0.5);
 					cRes[2]			=	(float) (((double)cOp[uVertices*3+2] - (double)cOp[-uVertices*3+2]) * 0.5);
@@ -785,11 +771,10 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 			const int	numRealVertices	=	currentShadingState->numRealVertices;
 			const float	*dsrc			=	src + numRealVertices*3;
 			float		*ddest			=	dest + numRealVertices*3;
-			int			i;
 
 			assert(numVertices == numRealVertices*3);
 
-			for (i=numRealVertices;i>0;i--) {
+			for (int i=numRealVertices;i>0;--i) {
 
 				const float	val0	=	(float) ((double)dsrc[3] - (double)src[0]);
 				const float	val1	=	(float) ((double)dsrc[4] - (double)src[1]);
