@@ -395,7 +395,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 			} else {
 				// Read the entire image
 				assert((int) (pixelSize*width) == TIFFScanlineSize(in));
-				for (int i=0;i<(int) height;i) {
+				for (int i=0;i<(int) height;++i) {
 					TIFFReadScanline(in,&((unsigned char *) data)[pixelSize*i*width],i,0);
 				}
 			}
