@@ -80,24 +80,24 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 			assert(u[1] > u[0]);
 
 			// These values are constant accross a grid
-			double		invDu1		=	1 / (double) (u[1] - u[0]);
-			double		invDu2		=	1 / (double) (2*(u[1] - u[0]));			
+			double		invDu1		=	(double)uVertices / (double) (u[uVertices-1] - u[0]);
+			double		invDu2		=	(double)uVertices / (double) (2*(u[uVertices-1] - u[0]));			
 
 			// Compute the Du
 			for (j=vVertices;j>0;j--) {
 
 				// Forward differencing
-				*dest++	=	(float) ((src[1] - src[0]) * invDu1);
+				*dest++	=	(float) (((double)src[1] - (double)src[0]) * invDu1);
 				src++;
 
 				// Central differencing
 				for (i=uVertices-2;i>0;i--) {
-					*dest++	=	(float) ((src[1] - src[-1]) * invDu2);
+					*dest++	=	(float) (((double)src[1] - (double)src[-1]) * invDu2);
 					src++;
 				}
 
 				// Backward differencing
-				*dest++	=	(float) ((src[0] - src[-1]) * invDu1);
+				*dest++	=	(float) (((double)src[0] - (double)src[-1]) * invDu1);
 				src++;
 			}
 		}
@@ -117,7 +117,7 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 
 				assert(*du != 0);
 
-				const float	val	=	(dsrc[0] - src[0]) / (*du++);
+				const float	val	=	(float) (((double)dsrc[0] - (double)src[0]) / ((double)*du++));
 
 				ddest[0]		=	val;
 				ddest[1]		=	val;
@@ -168,17 +168,17 @@ void	CShadingContext::DuFloat(float *dest,const float *src) {
 			for (j=vVertices;j>0;j--) {
 
 				// Forward differencing
-				*dest++	=	(float) (src[1] - src[0]);
+				*dest++	=	(float) ((double)src[1] - (double)src[0]);
 				src++;
 
 				// Central differencing
 				for (i=uVertices-2;i>0;i--) {
-					*dest++	=	(float) ((src[1] - src[-1]) * 0.5f);
+					*dest++	=	(float) (((double)src[1] - (double)src[-1]) * 0.5);
 					src++;
 				}
 
 				// Backward differencing
-				*dest++	=	(float) (src[0] - src[-1]);
+				*dest++	=	(float) ((double)src[0] - (double)src[-1]);
 				src++;
 			}
 		}
@@ -195,7 +195,7 @@ void	CShadingContext::DuFloat(float *dest,const float *src) {
 
 			for (i=numRealVertices;i>0;i--) {
 
-				const float	val	=	(dsrc[0] - src[0]);
+				const float	val	=	(float) ((double)dsrc[0] - (double)src[0]);
 
 				ddest[0]		=	val;
 				ddest[1]		=	val;
@@ -246,8 +246,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 			assert(vVertices >= 2);
 			assert(v[uVertices] > v[0]);
 
-			const double	invDv1		=	1 / (double) (v[uVertices] - v[0]);
-			const double	invDv2		=	1 / (double) (2*(v[uVertices] - v[0]));
+			const double	invDv1		=	(double)vVertices / (double) (v[uVertices*(vVertices-1)] - v[0]);
+			const double	invDv2		=	(double)vVertices / (double) (2*(v[uVertices*(vVertices-1)] - v[0]));
 
 			// Compute the DV
 			for (j=0;j<uVertices;j++) {
@@ -255,19 +255,19 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 				const float	*cOp	=	src + j;
 
 				// Forward differencing
-				cRes[0]				=	(float) ((cOp[uVertices] - cOp[0]) * invDv1);
+				cRes[0]				=	(float) ((double)(cOp[uVertices] - (double)cOp[0]) * invDv1);
 				cRes				+=	uVertices;
 				cOp					+=	uVertices;
 
 				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]			=	(float) ((cOp[uVertices] - cOp[-uVertices]) * invDv2);
+					cRes[0]			=	(float) (((double)cOp[uVertices] - (double)cOp[-uVertices]) * invDv2);
 					cRes			+=	uVertices;
 					cOp				+=	uVertices;
 				}
 
 				// Backward differencing
-				cRes[0]				=	(float) ((cOp[0] - cOp[-uVertices]) * invDv1);
+				cRes[0]				=	(float) (((double)cOp[0] - (double)cOp[-uVertices]) * invDv1);
 			}
 		}
 		break;
@@ -287,7 +287,7 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 
 				assert(*dv != 0);
 
-				const float	val	=	(dsrc[1] - src[0]) / (*dv++);
+				const float	val	=	(float) (((double)dsrc[1] - (double)src[0]) / ((double)*dv++));
 
 				ddest[0]		=	val;
 				ddest[1]		=	val;
@@ -342,13 +342,13 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 				const float	*cOp	=	src + j;
 
 				// Forward differencing
-				cRes[0]				=	(float) (cOp[uVertices] - cOp[0]);
+				cRes[0]				=	(float) ((double)cOp[uVertices] - (double)cOp[0]);
 				cRes				+=	uVertices;
 				cOp					+=	uVertices;
 
 				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]			=	(float) ((cOp[uVertices] - cOp[-uVertices]) * 0.5f);
+					cRes[0]			=	(float) (((double)cOp[uVertices] - (double)cOp[-uVertices]) * 0.5f);
 					cRes			+=	uVertices;
 					cOp				+=	uVertices;
 				}
@@ -371,7 +371,7 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 
 			for (int i=numRealVertices;i>0;i--) {
 
-				const float	val	=	(dsrc[1] - src[0]);
+				const float	val	=	(float) ((double)dsrc[1] - (double)src[0]);
 
 				ddest[0]		=	val;
 				ddest[1]		=	val;
@@ -449,29 +449,29 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 			assert(vVertices >= 2);
 			assert(u[1] > u[0]);
 
-			const double	invDu1		=	1 / (double) (u[1] - u[0]);		
-			const double	invDu2		=	1 / (double) (2*(u[1] - u[0]));
+			double		invDu1		=	(double)uVertices / (double) (u[uVertices-1] - u[0]);
+			double		invDu2		=	(double)uVertices / (double) (2*(u[uVertices-1] - u[0]));			
 
 			for (j=vVertices;j>0;j--) {
 
 				// Use forward difference
-				*dest++	=	(float) ((src[3] - src[0]) * invDu1);
-				*dest++	=	(float) ((src[4] - src[1]) * invDu1);
-				*dest++	=	(float) ((src[5] - src[2]) * invDu1);
+				*dest++	=	(float) (((double)src[3] - (double)src[0]) * invDu1);
+				*dest++	=	(float) (((double)src[4] - (double)src[1]) * invDu1);
+				*dest++	=	(float) (((double)src[5] - (double)src[2]) * invDu1);
 				src		+=	3;
 
 				// Use central difference
 				for (i=uVertices-2;i>0;i--) {
-					*dest++	=	(float) ((src[3] - src[-3]) * invDu2);
-					*dest++	=	(float) ((src[4] - src[-2]) * invDu2);
-					*dest++	=	(float) ((src[5] - src[-1]) * invDu2);
+					*dest++	=	(float) (((double)src[3] - (double)src[-3]) * invDu2);
+					*dest++	=	(float) (((double)src[4] - (double)src[-2]) * invDu2);
+					*dest++	=	(float) (((double)src[5] - (double)src[-1]) * invDu2);
 					src		+=	3;
 				}
 
 				// Use backward difference
-				*dest++	=	(float) ((src[0] - src[-3]) * invDu1);
-				*dest++	=	(float) ((src[1] - src[-2]) * invDu1);
-				*dest++	=	(float) ((src[2] - src[-1]) * invDu1);
+				*dest++	=	(float) (((double)src[0] - (double)src[-3]) * invDu1);
+				*dest++	=	(float) (((double)src[1] - (double)src[-2]) * invDu1);
+				*dest++	=	(float) (((double)src[2] - (double)src[-1]) * invDu1);
 				src		+=	3;
 			}
 		}
@@ -491,10 +491,10 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 
 				assert(*du != 0);
 
-				const float	invDu	=	1 / (*du++);
-				const float	val0	=	(dsrc[0] - src[0]) * invDu;
-				const float	val1	=	(dsrc[1] - src[1]) * invDu;
-				const float	val2	=	(dsrc[2] - src[2]) * invDu;
+				const double invDu	=	1 / ((double)*du++);
+				const float	val0	=	(float) (((double)dsrc[0] - (double)src[0]) * invDu);
+				const float	val1	=	(float) (((double)dsrc[1] - (double)src[1]) * invDu);
+				const float	val2	=	(float) (((double)dsrc[2] - (double)src[2]) * invDu);
 
 				ddest[0]		=	val0;
 				ddest[1]		=	val1;
@@ -553,23 +553,23 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 			for (j=vVertices;j>0;j--) {
 
 				// Use forward difference
-				*dest++	=	(float) (src[3] - src[0]);
-				*dest++	=	(float) (src[4] - src[1]);
-				*dest++	=	(float) (src[5] - src[2]);
+				*dest++	=	(float) ((double)src[3] - (double)src[0]);
+				*dest++	=	(float) ((double)src[4] - (double)src[1]);
+				*dest++	=	(float) ((double)src[5] - (double)src[2]);
 				src		+=	3;
 
 				// Use central difference
 				for (i=uVertices-2;i>0;i--) {
-					*dest++	=	(float) ((src[3] - src[-3]) * 0.5f);
-					*dest++	=	(float) ((src[4] - src[-2]) * 0.5f);
-					*dest++	=	(float) ((src[5] - src[-1]) * 0.5f);
+					*dest++	=	(float) (((double)src[3] - (double)src[-3]) * 0.5);
+					*dest++	=	(float) (((double)src[4] - (double)src[-2]) * 0.5);
+					*dest++	=	(float) (((double)src[5] - (double)src[-1]) * 0.5);
 					src		+=	3;
 				}
 
 				// Use backward difference
-				*dest++	=	(float) (src[0] - src[-3]);
-				*dest++	=	(float) (src[1] - src[-2]);
-				*dest++	=	(float) (src[2] - src[-1]);
+				*dest++	=	(float) ((double)src[0] - (double)src[-3]);
+				*dest++	=	(float) ((double)src[1] - (double)src[-2]);
+				*dest++	=	(float) ((double)src[2] - (double)src[-1]);
 				src		+=	3;
 			}
 		}
@@ -586,9 +586,9 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 
 			for (i=numRealVertices;i>0;i--) {
 
-				const float	val0	=	(dsrc[0] - src[0]);
-				const float	val1	=	(dsrc[1] - src[1]);
-				const float	val2	=	(dsrc[2] - src[2]);
+				const float	val0	=	(float) ((double)dsrc[0] - (double)src[0]);
+				const float	val1	=	(float) ((double)dsrc[1] - (double)src[1]);
+				const float	val2	=	(float) ((double)dsrc[2] - (double)src[2]);
 
 				ddest[0]		=	val0;
 				ddest[1]		=	val1;
@@ -647,34 +647,33 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			assert(vVertices >= 2);
 			assert(v[uVertices] > v[0]);
 
-			const double	invDv1		=	1 / (double) (v[uVertices] - v[0]);
-			const double	invDv2		=	1 / (double) (2*(v[uVertices] - v[0]));
-
+			const double	invDv1		=	(double)vVertices / (double) (v[uVertices*(vVertices-1)] - v[0]);
+			const double	invDv2		=	(double)vVertices / (double) (2*(v[uVertices*(vVertices-1)] - v[0]));
 			
 			for (j=0;j<uVertices;j++) {
 				float		*cRes	=	dest + j*3;
 				const float	*cOp	=	src + j*3;
 
 				// Forward differencing
-				cRes[0]				=	(float) ((cOp[uVertices*3+0] - cOp[0]) * invDv1);
-				cRes[1]				=	(float) ((cOp[uVertices*3+1] - cOp[1]) * invDv1);
-				cRes[2]				=	(float) ((cOp[uVertices*3+2] - cOp[2]) * invDv1);
+				cRes[0]				=	(float) (((double)cOp[uVertices*3+0] - (double)cOp[0]) * invDv1);
+				cRes[1]				=	(float) (((double)cOp[uVertices*3+1] - (double)cOp[1]) * invDv1);
+				cRes[2]				=	(float) (((double)cOp[uVertices*3+2] - (double)cOp[2]) * invDv1);
 				cRes				+=	uVertices*3;
 				cOp					+=	uVertices*3;
 
 				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]			=	(float) ((cOp[uVertices*3+0] - cOp[-uVertices*3+0]) * invDv2);
-					cRes[1]			=	(float) ((cOp[uVertices*3+1] - cOp[-uVertices*3+1]) * invDv2);
-					cRes[2]			=	(float) ((cOp[uVertices*3+2] - cOp[-uVertices*3+2]) * invDv2);
+					cRes[0]			=	(float) (((double)cOp[uVertices*3+0] - (double)cOp[-uVertices*3+0]) * invDv2);
+					cRes[1]			=	(float) (((double)cOp[uVertices*3+1] - (double)cOp[-uVertices*3+1]) * invDv2);
+					cRes[2]			=	(float) (((double)cOp[uVertices*3+2] - (double)cOp[-uVertices*3+2]) * invDv2);
 					cRes			+=	uVertices*3;
 					cOp				+=	uVertices*3;
 				}
 
 				// Backward differencing
-				cRes[0]				=	(float) ((cOp[0] - cOp[-uVertices*3+0]) * invDv1);
-				cRes[1]				=	(float) ((cOp[1] - cOp[-uVertices*3+1]) * invDv1);
-				cRes[2]				=	(float) ((cOp[2] - cOp[-uVertices*3+2]) * invDv1);
+				cRes[0]				=	(float) (((double)cOp[0] - (double)cOp[-uVertices*3+0]) * invDv1);
+				cRes[1]				=	(float) (((double)cOp[1] - (double)cOp[-uVertices*3+1]) * invDv1);
+				cRes[2]				=	(float) (((double)cOp[2] - (double)cOp[-uVertices*3+2]) * invDv1);
 			}
 		}
 		break;
@@ -695,10 +694,10 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 
 				assert(*dv > 0);
 
-				const float	invDv	=	1 / (*dv++);
-				const float	val0	=	(dsrc[3] - src[0]) * invDv;
-				const float	val1	=	(dsrc[4] - src[1]) * invDv;
-				const float	val2	=	(dsrc[5] - src[2]) * invDv;
+				const double invDv	=	1 / ((double)*dv++);
+				const float	val0	=	(float) (((double)dsrc[3] - (double)src[0]) * invDv);
+				const float	val1	=	(float) (((double)dsrc[4] - (double)src[1]) * invDv);
+				const float	val2	=	(float) (((double)dsrc[5] - (double)src[2]) * invDv);
 
 				ddest[0]		=	val0;
 				ddest[1]		=	val1;
@@ -756,25 +755,25 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 				const float	*cOp	=	src + j*3;
 
 				// Forward differencing
-				cRes[0]				=	(float) (cOp[uVertices*3+0] - cOp[0]);
-				cRes[1]				=	(float) (cOp[uVertices*3+1] - cOp[1]);
-				cRes[2]				=	(float) (cOp[uVertices*3+2] - cOp[2]);
+				cRes[0]				=	(float) ((double)cOp[uVertices*3+0] - (double)cOp[0]);
+				cRes[1]				=	(float) ((double)cOp[uVertices*3+1] - (double)cOp[1]);
+				cRes[2]				=	(float) ((double)cOp[uVertices*3+2] - (double)cOp[2]);
 				cRes				+=	uVertices*3;
 				cOp					+=	uVertices*3;
 
 				// Central differencing
 				for (i=vVertices-2;i>0;i--) {
-					cRes[0]			=	(float) ((cOp[uVertices*3+0] - cOp[-uVertices*3+0]) * 0.5f);
-					cRes[1]			=	(float) ((cOp[uVertices*3+1] - cOp[-uVertices*3+1]) * 0.5f);
-					cRes[2]			=	(float) ((cOp[uVertices*3+2] - cOp[-uVertices*3+2]) * 0.5f);
+					cRes[0]			=	(float) (((double)cOp[uVertices*3+0] - (double)cOp[-uVertices*3+0]) * 0.5);
+					cRes[1]			=	(float) (((double)cOp[uVertices*3+1] - (double)cOp[-uVertices*3+1]) * 0.5);
+					cRes[2]			=	(float) (((double)cOp[uVertices*3+2] - (double)cOp[-uVertices*3+2]) * 0.5);
 					cRes			+=	uVertices*3;
 					cOp				+=	uVertices*3;
 				}
 
 				// Backward differencing
-				cRes[0]				=	(float) (cOp[0] - cOp[-uVertices*3+0]);
-				cRes[1]				=	(float) (cOp[1] - cOp[-uVertices*3+1]);
-				cRes[2]				=	(float) (cOp[2] - cOp[-uVertices*3+2]);
+				cRes[0]				=	(float) ((double)cOp[0] - (double)cOp[-uVertices*3+0]);
+				cRes[1]				=	(float) ((double)cOp[1] - (double)cOp[-uVertices*3+1]);
+				cRes[2]				=	(float) ((double)cOp[2] - (double)cOp[-uVertices*3+2]);
 			}
 		}
 		break;
@@ -792,9 +791,9 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 
 			for (i=numRealVertices;i>0;i--) {
 
-				const float	val0	=	(dsrc[3] - src[0]);
-				const float	val1	=	(dsrc[4] - src[1]);
-				const float	val2	=	(dsrc[5] - src[2]);
+				const float	val0	=	(float) ((double)dsrc[3] - (double)src[0]);
+				const float	val1	=	(float) ((double)dsrc[4] - (double)src[1]);
+				const float	val2	=	(float) ((double)dsrc[5] - (double)src[2]);
 
 				ddest[0]		=	val0;
 				ddest[1]		=	val1;
