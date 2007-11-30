@@ -1788,8 +1788,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									++numRays;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
-									mulvf(dDdu,(*du)*swidth);														\
-									mulvf(dDdv,(*dv)*twidth);														\
+									mulvf(dDdu,(*du)*swidth*0.5f);													\
+									mulvf(dDdv,(*dv)*twidth*0.5f);													\
 									subvv(D0,D,dDdu); subvv(D0,dDdv);												\
 									addvv(D1,D,dDdu); subvv(D1,dDdv);												\
 									subvv(D2,D,dDdu); addvv(D2,dDdv);												\
@@ -1886,8 +1886,8 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 									++numRays;																		\
 								} else {																			\
 									vector	D0,D1,D2,D3;															\
-									mulvf(dDdu,(*du)*swidth);														\
-									mulvf(dDdv,(*dv)*twidth);														\
+									mulvf(dDdu,(*du)*swidth*0.5f);													\
+									mulvf(dDdv,(*dv)*twidth*0.5f);													\
 									subvv(D0,D,dDdu); subvv(D0,dDdv);												\
 									addvv(D1,D,dDdu); subvv(D1,dDdv);												\
 									subvv(D2,D,dDdu); addvv(D2,dDdv);												\
