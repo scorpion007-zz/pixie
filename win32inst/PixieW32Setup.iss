@@ -43,12 +43,12 @@ Source: ..\bin\sdr.dll; DestDir: {app}\bin; Components: main
 ; Distribute the modules
 Source: ..\modules\gui.dll; DestDir: {app}\modules; Components: main
 ; Distribute the dependant DLLs
-Source: C:\okan\software\GnuWin32\bin\jpeg62.dll; DestDir: {app}\bin; Components: main
-Source: C:\okan\software\GnuWin32\bin\libpng13.dll; DestDir: {app}\bin; Components: main
-Source: C:\okan\software\GnuWin32\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
-Source: C:\okan\software\GnuWin32\bin\zlib1.dll; DestDir: {app}\bin; Components: main
-Source: C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin\libmmd.dll; DestDir: {app}\bin; Components: main
-Source: C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\jpeg62.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\libpng13.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\zlib1.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\libmmd.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\msvcr80.dll; DestDir: {app}\bin; Components: main
 ; Distribute the executables
 Source: ..\bin\*.exe; DestDir: {app}\bin; Components: main
 ; Distribute the display drivers

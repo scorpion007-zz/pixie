@@ -18,12 +18,12 @@ copy bin\sdr.dll Pixie\bin
 copy bin\ri.lib Pixie\lib
 copy bin\sdr.lib Pixie\lib
 copy modules\gui.dll Pixie\modules
-copy C:\okan\software\GnuWin32\bin\jpeg62.dll Pixie\bin
-copy C:\okan\software\GnuWin32\bin\libpng13.dll Pixie\bin
-copy C:\okan\software\GnuWin32\bin\libtiff3.dll Pixie\bin
-copy C:\okan\software\GnuWin32\bin\zlib1.dll Pixie\bin
-copy "C:\Program Files\Intel\Compiler\C++\9.1\IA32\Bin\libmmd.dll" Pixie\bin
-copy "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll" Pixie\bin
+copy bin\jpeg62.dll Pixie\bin
+copy bin\libpng13.dll Pixie\bin
+copy bin\libtiff3.dll Pixie\bin
+copy bin\zlib1.dll Pixie\bin
+copy bin\libmmd.dll Pixie\bin
+copy bin\msvcr80.dll Pixie\bin
 copy displays\file.dll Pixie\displays
 copy displays\framebuffer.dll Pixie\displays
 copy displays\rgbe.dll Pixie\displays
