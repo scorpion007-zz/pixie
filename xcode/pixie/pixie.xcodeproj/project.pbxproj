@@ -15,9 +15,6 @@
 				188383560B2FB2ED00166E3E /* CopyFiles */,
 				18FD22750B856BAD00681F0C /* CopyFiles */,
 			);
-			buildSettings = {
-				PRODUCT_NAME = all;
-			};
 			dependencies = (
 				C98988FB0AF1B95A003DB17A /* PBXTargetDependency */,
 				C98988FF0AF1B962003DB17A /* PBXTargetDependency */,
@@ -42,9 +39,6 @@
 			buildPhases = (
 				C9E09ACF0AD9B42300A33716 /* ShellScript */,
 			);
-			buildSettings = {
-				PRODUCT_NAME = parsers;
-			};
 			dependencies = (
 			);
 			name = parsers;
@@ -435,23 +429,6 @@
 		};
 /* End PBXBuildRule section */
 
-/* Begin PBXBuildStyle section */
-		C97A3D0D0AD6E3B200889CEB /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-			};
-			name = Development;
-		};
-		C97A3D0E0AD6E3B200889CEB /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
-
 /* Begin PBXContainerItemProxy section */
 		C983E7120AF2EB6000648461 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -678,7 +655,7 @@
 		};
 		188383500B2FB2D100166E3E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = /Applications/Graphics/Pixie/man;
 			dstSubfolderSpec = 0;
 			files = (
@@ -2202,14 +2179,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = common;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 			);
 			name = common;
@@ -2227,15 +2196,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = file;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C9CDEAB00AD9C92F00E1AA3B /* PBXTargetDependency */,
 			);
@@ -2254,15 +2214,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = framebuffer;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C9CDEAB20AD9C93600E1AA3B /* PBXTargetDependency */,
 			);
@@ -2291,15 +2242,6 @@
 				C96A70320AD6E2C6003C2D7B /* PBXBuildRule */,
 				C96A70350AD6E321003C2D7B /* PBXBuildRule */,
 			);
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = ri;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C9CDEAA60AD9C90A00E1AA3B /* PBXTargetDependency */,
 				C9CDEAA80AD9C91300E1AA3B /* PBXTargetDependency */,
@@ -2322,15 +2264,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = dsotest;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 			);
 			name = dsotest;
@@ -2349,15 +2282,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = sdr;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 			);
 			name = sdr;
@@ -2374,14 +2298,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = rndr;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C983E7300AF2EEB400648461 /* PBXTargetDependency */,
 				C983E72E0AF2EEB000648461 /* PBXTargetDependency */,
@@ -2400,14 +2316,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = sdrc;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C983E7320AF2EEBF00648461 /* PBXTargetDependency */,
 			);
@@ -2425,14 +2333,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = precomp;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 			);
 			name = precomp;
@@ -2449,14 +2349,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = sdrinfo;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C983E7340AF2EEC600648461 /* PBXTargetDependency */,
 				C983E7360AF2EEC900648461 /* PBXTargetDependency */,
@@ -2475,14 +2367,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = texmake;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C983E7380AF2EECF00648461 /* PBXTargetDependency */,
 				C983E73A0AF2EED100648461 /* PBXTargetDependency */,
@@ -2502,15 +2386,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = rgbe;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				C9CDEAB60AD9C96400E1AA3B /* PBXTargetDependency */,
 			);
@@ -2525,12 +2400,6 @@
 		C96A6E1A0AD6D5C5003C2D7B /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C96A6E1B0AD6D5C5003C2D7B /* Build configuration list for PBXProject "pixie" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				C97A3D0D0AD6E3B200889CEB /* Development */,
-				C97A3D0E0AD6E3B200889CEB /* Deployment */,
-			);
 			hasScannedForEncodings = 0;
 			mainGroup = C96A6E180AD6D5C5003C2D7B;
 			productRefGroup = C96A6E2A0AD6D5E5003C2D7B /* Products */;
@@ -2904,6 +2773,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = i386;
+				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = /;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -2922,6 +2792,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = i386;
+				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = /;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
