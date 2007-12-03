@@ -15,6 +15,7 @@
 				188383560B2FB2ED00166E3E /* Install Docs */,
 				18FD22750B856BAD00681F0C /* Install Shaders */,
 				1F1DEC060D0440DD00338FF9 /* Install Headers */,
+				1F1DEC500D044C3200338FF9 /* ShellScript */,
 			);
 			dependencies = (
 				C98988FB0AF1B95A003DB17A /* PBXTargetDependency */,
@@ -2657,6 +2658,19 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1F1DEC500D044C3200338FF9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rsync -ra --exclude .svn ../../doc/ /Applications/Graphics/Pixie/doc/";
+		};
 		C9E09ACF0AD9B42300A33716 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
