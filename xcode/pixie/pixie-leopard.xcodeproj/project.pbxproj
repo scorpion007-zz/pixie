@@ -14,6 +14,7 @@
 				188383500B2FB2D100166E3E /* CopyFiles */,
 				188383560B2FB2ED00166E3E /* CopyFiles */,
 				18FD22750B856BAD00681F0C /* CopyFiles */,
+				1F1DEC060D0440DD00338FF9 /* CopyFiles */,
 			);
 			dependencies = (
 				1F134E390D0429B000A46197 /* PBXTargetDependency */,
@@ -154,6 +155,13 @@
 		1F134DDF0D04204800A46197 /* opengl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F134DD90D04204800A46197 /* opengl.h */; };
 		1F134E230D0426FD00A46197 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		1F134E2A0D04279F00A46197 /* openexr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F134E290D04279F00A46197 /* openexr.cpp */; };
+		1F1DEC070D04415000338FF9 /* ri.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F820AD6E196003C2D7B /* ri.h */; };
+		1F1DEC080D04416E00338FF9 /* dlo.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F000AD6E143003C2D7B /* dlo.h */; };
+		1F1DEC090D04417800338FF9 /* implicit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F170AD6E143003C2D7B /* implicit.h */; };
+		1F1DEC0A0D04418000338FF9 /* shadeop.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F8F0AD6E196003C2D7B /* shadeop.h */; };
+		1F1DEC0B0D04418900338FF9 /* dsply.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F080AD6E143003C2D7B /* dsply.h */; };
+		1F1DEC0C0D04419000338FF9 /* ptcapi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 182651CA0BBA0B52007B2C37 /* ptcapi.h */; };
+		1F1DEC0D0D04419A00338FF9 /* sdr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9E09B300AD9BCF300A33716 /* sdr.h */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -464,7 +472,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = C96A6E1A0AD6D5C5003C2D7B /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1F134E190D0426FD00A46197 /* openexr */;
+			remoteGlobalIDString = 1F134E190D0426FD00A46197;
 			remoteInfo = openexr;
 		};
 		C983E7120AF2EB6000648461 /* PBXContainerItemProxy */ = {
@@ -782,6 +790,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1F1DEC060D0440DD00338FF9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /Applications/Graphics/Pixie/include;
+			dstSubfolderSpec = 0;
+			files = (
+				1F1DEC080D04416E00338FF9 /* dlo.h in CopyFiles */,
+				1F1DEC090D04417800338FF9 /* implicit.h in CopyFiles */,
+				1F1DEC0A0D04418000338FF9 /* shadeop.h in CopyFiles */,
+				1F1DEC0C0D04419000338FF9 /* ptcapi.h in CopyFiles */,
+				1F1DEC0B0D04418900338FF9 /* dsply.h in CopyFiles */,
+				1F1DEC0D0D04419A00338FF9 /* sdr.h in CopyFiles */,
+				1F1DEC070D04415000338FF9 /* ri.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -995,8 +1019,6 @@
 		1F134DD70D04204800A46197 /* opengl-fltk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "opengl-fltk.h"; path = "../../src/gui/opengl-fltk.h"; sourceTree = SOURCE_ROOT; };
 		1F134DD80D04204800A46197 /* opengl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = opengl.cpp; path = ../../src/gui/opengl.cpp; sourceTree = SOURCE_ROOT; };
 		1F134DD90D04204800A46197 /* opengl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../src/gui/opengl.h; sourceTree = SOURCE_ROOT; };
-		1F134DDA0D04204800A46197 /* statView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = statView.cpp; path = ../../src/gui/statView.cpp; sourceTree = SOURCE_ROOT; };
-		1F134DDB0D04204800A46197 /* statView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = statView.h; path = ../../src/gui/statView.h; sourceTree = SOURCE_ROOT; };
 		1F134E270D0426FD00A46197 /* openexr.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = openexr.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F134E290D04279F00A46197 /* openexr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = openexr.cpp; path = ../../src/openexr/openexr.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1753,8 +1775,6 @@
 				1F134DD70D04204800A46197 /* opengl-fltk.h */,
 				1F134DD80D04204800A46197 /* opengl.cpp */,
 				1F134DD90D04204800A46197 /* opengl.h */,
-				1F134DDA0D04204800A46197 /* statView.cpp */,
-				1F134DDB0D04204800A46197 /* statView.h */,
 			);
 			name = gui;
 			sourceTree = "<group>";
@@ -2539,7 +2559,7 @@
 /* Begin PBXProject section */
 		C96A6E1A0AD6D5C5003C2D7B /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C96A6E1B0AD6D5C5003C2D7B /* Build configuration list for PBXProject "pixie" */;
+			buildConfigurationList = C96A6E1B0AD6D5C5003C2D7B /* Build configuration list for PBXProject "pixie-leopard" */;
 			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = C96A6E180AD6D5C5003C2D7B;
@@ -2579,7 +2599,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\ncd ../../src/ri\nflex -i -Pdso -olex.dso.cpp dso.l\nbison -p dso -o dso.cpp dso.y\nflex -i -Prib -olex.rib.cpp rib.l\nbison -p rib -o rib.cpp rib.y\nflex -Psl -olex.sl.cpp sdr.l\nbison -p sl -o sl.cpp sdr.y\nflex -Pvar -olex.var.cpp variable.l\nbison -p var -o variable.cpp variable.y\nflex -Pif -olex.if.cpp ifexpr.l\nbison -p if -o ifexpr.cpp ifexpr.y\ncd ../sdr\nflex -Psdr -olex.sdr.cpp sdr.l\nbison -p sdr -o sdr.cpp sdr.y\ncd ../sdrc\nflex -Psl -olex.sl.cpp sl.l\nbison -p sl -o sl.cpp sl.y\nexit 0";
+			shellScript = "# shell script goes here\ncat |make -f - <<EOF\n\n\n\nall: ../../src/ri/lex.dso.cpp ../../src/ri/dso.cpp ../../src/ri/lex.rib.cpp \\\n\t../../src/ri/rib.cpp ../../src/ri/lex.sl.cpp ../../src/ri/sl.cpp \\\n\t../../src/ri/lex.var.cpp ../../src/ri/variable.cpp ../../src/ri/lex.if.cpp \\\n\t../../src/ri/ifexpr.cpp ../../src/sdr/lex.sdr.cpp ../../src/sdr/sdr.cpp \\\n\t../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.cpp\n\n\n\n\n../../src/ri/lex.dso.cpp: ../../src/ri/dso.l\n\tflex -i -Pdso -o../../src/ri/lex.dso.cpp ../../src/ri/dso.l\n\n../../src/ri/dso.cpp: ../../src/ri/dso.y\n\tbison -p dso -o ../../src/ri/dso.cpp ../../src/ri/dso.y\n\n../../src/ri/lex.rib.cpp: ../../src/ri/rib.l\n\tflex -i -Prib -o../../src/ri/lex.rib.cpp ../../src/ri/rib.l\n\n../../src/ri/rib.cpp: ../../src/ri/rib.y\n\tbison -p rib -o ../../src/ri/rib.cpp ../../src/ri/rib.y\n\n../../src/ri/lex.sl.cpp: ../../src/ri/sdr.l\n\tflex -Psl -o../../src/ri/lex.sl.cpp ../../src/ri/sdr.l\n\n../../src/ri/sl.cpp: ../../src/ri/sdr.y\n\tbison -p sl -o ../../src/ri/sl.cpp ../../src/ri/sdr.y\n\n../../src/ri/lex.var.cpp: ../../src/ri/variable.l\n\tflex -Pvar -o../../src/ri/lex.var.cpp ../../src/ri/variable.l\n\n../../src/ri/variable.cpp: ../../src/ri/variable.y\n\tbison -p var -o ../../src/ri/variable.cpp ../../src/ri/variable.y\n\n\n../../src/ri/lex.if.cpp: ../../src/ri/ifexpr.l\n\tflex -Pif -o../../src/ri/lex.if.cpp ../../src/ri/ifexpr.l\n\n../../src/ri/ifexpr.cpp: ../../src/ri/ifexpr.y\n\tbison -p if -o ../../src/ri/ifexpr.cpp ../../src/ri/ifexpr.y\n\n../../src/sdr/lex.sdr.cpp: ../../src/sdr/sdr.l\n\tflex -Psdr -o../../sdr/lex.sdr.cpp ..../src/sdr/sdr.l\n\n../../src/sdr/sdr.cpp: ../../src/sdr/sdr.y\n\tbison -p sdr -o ../../src/sdr/sdr.cpp ../../src/sdr/sdr.y\n\n../../src/sdrc/lex.sl.cpp: ../../src/sdrc/sl.l\n\tflex -Psl -o../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.l\n\n../../src/sdrc/sl.cpp: ../../src/sdrc/sl.y\n\tbison -p sl -o ../../src/sdrc/sl.cpp ../../src/sdrc/sl.y\n\nEOF\n\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2954,20 +2974,28 @@
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					"~/Pixie/trunk/src",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/include/",
+					"$(SRCROOT)/../../src",
+					/usr/X11/include,
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/X11R6/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/libfltk_gl.a",
+					"-lGLU",
+					"-lGL",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/libfltk.a",
+					"-framework",
+					OpenGL,
+					"-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib",
+					"-lfltk",
+					"-lXft",
+					"-lpthread",
 					"-lX11",
 					"-lXext",
 				);
-				PRODUCT_NAME = framebuffer;
+				PRODUCT_NAME = gui;
 			};
 			name = Debug;
 		};
@@ -2976,20 +3004,18 @@
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
 				HEADER_SEARCH_PATHS = (
-					/usr/X11/include,
+					"$(PIXIELIBS)/fltk/STAGING/fltk/include/",
 					"$(SRCROOT)/../../src",
+					/usr/X11/include,
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
 				INSTALL_PATH = /Applications/Graphics/Pixie/modules;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/X11R6/lib,
-					/Users/geohar/Development/PixieLibs/fltk/STAGING/fltk/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
-					/Users/geohar/Development/PixieLibs/fltk/STAGING/fltk/lib/libfltk_gl.a,
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/libfltk_gl.a",
 					"-lGLU",
 					"-lGL",
-					/Users/geohar/Development/PixieLibs/fltk/STAGING/fltk/lib/libfltk.a,
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/libfltk.a",
 					"-framework",
 					OpenGL,
 					"-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib",
@@ -3007,21 +3033,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					"~/Pixie/trunk/src",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR",
+					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/X11R6/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmImf.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libImath.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIex.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libHalf.a",
+					"-lz",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmThread.a",
 					"-lX11",
 					"-lXext",
 				);
-				PRODUCT_NAME = framebuffer;
+				PRODUCT_NAME = openexr;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 			};
 			name = Debug;
 		};
@@ -3031,26 +3062,24 @@
 				EXECUTABLE_EXTENSION = so;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				HEADER_SEARCH_PATHS = (
-					/Users/geohar/Development/PixieLibs/OpenEXR/STAGING/OpenEXR/include/OpenEXR,
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR",
 					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/X11R6/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
-					"/Users/geohar/Development/PixieLibs//OpenEXR/STAGING/OpenEXR/lib/libIlmImf.a",
-					"/Users/geohar/Development/PixieLibs//OpenEXR/STAGING/OpenEXR/lib/libImath.a",
-					"/Users/geohar/Development/PixieLibs//OpenEXR/STAGING/OpenEXR/lib/libIex.a",
-					"/Users/geohar/Development/PixieLibs//OpenEXR/STAGING/OpenEXR/lib/libHalf.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmImf.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libImath.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIex.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libHalf.a",
 					"-lz",
-					"/Users/geohar/Development/PixieLibs//OpenEXR/STAGING/OpenEXR/lib/libIlmThread.a",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmThread.a",
 					"-lX11",
 					"-lXext",
 				);
 				PRODUCT_NAME = openexr;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 			};
 			name = Release;
 		};
@@ -3063,10 +3092,19 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/include/",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/include/",
 					../../src,
 				);
-				LIBRARY_SEARCH_PATHS = /sw/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/Applications/Graphics/Pixie/lib,
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/lib/",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				PIXIELIBS = /Users/geohar/Development/PixieLibs;
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 			};
@@ -3081,18 +3119,19 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				HEADER_SEARCH_PATHS = (
-					/Users/geohar/Development/PixieLibs/OpenEXR/STAGING/OpenEXR/include,
-					/Users/geohar/Development/PixieLibs/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/include/,
-					/Users/geohar/Development/PixieLibs/fltk/STAGING/fltk/include,
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/include/",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/include/",
 					../../src,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/Applications/Graphics/Pixie/lib,
-					/Users/geohar/Development/PixieLibs/OpenEXR/STAGING/OpenEXR/lib/,
-					/Users/geohar/Development/PixieLibs/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/lib/,
-					/Users/geohar/Development/PixieLibs/fltk/STAGING/fltk/lib/,
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/lib/",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				PIXIELIBS = /Users/geohar/Development/PixieLibs;
 				PREBINDING = NO;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 			};
@@ -3139,15 +3178,11 @@
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
-					"~/Pixie/trunk/src",
+					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/X11R6/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"-lX11",
 					"-lXext",
@@ -3161,15 +3196,11 @@
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
 				HEADER_SEARCH_PATHS = (
-					/sw/include,
 					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
 				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				LIBRARY_SEARCH_PATHS = (
-					/sw/lib,
-					/usr/X11R6/lib,
-				);
+				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"-lX11",
 					"-lXext",
@@ -3405,7 +3436,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C96A6E1B0AD6D5C5003C2D7B /* Build configuration list for PBXProject "pixie" */ = {
+		C96A6E1B0AD6D5C5003C2D7B /* Build configuration list for PBXProject "pixie-leopard" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C96A6E1C0AD6D5C5003C2D7B /* Debug */,
