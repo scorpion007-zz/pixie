@@ -1,0 +1,5 @@
+These scripts (run in the order specified) will make the necessary
+libs for pixie
+
+./get-source.sh
+./install-libs
