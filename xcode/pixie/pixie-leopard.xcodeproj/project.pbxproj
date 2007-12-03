@@ -167,6 +167,8 @@
 		1F1DEC3A0D0448C200338FF9 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		1F1DEC3B0D0448C200338FF9 /* libri.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
 		1F1DEC430D04491700338FF9 /* show.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F1DEC420D04491700338FF9 /* show.cpp */; };
+		1FDB50FD0D0458E200B5FEC8 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
+		1FDB510A0D0459B600B5FEC8 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -322,7 +324,6 @@
 		C983E6EF0AF2EA1200648461 /* precomp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9E09B170AD9B8E600A33716 /* precomp.cpp */; };
 		C983E6F80AF2EA4000648461 /* sdrinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9E09B610AD9BF7200A33716 /* sdrinfo.cpp */; };
 		C983E7010AF2EA9300648461 /* texmake.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9E09BB20AD9C2E900A33716 /* texmake.cpp */; };
-		C983E7480AF2F2B900648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		C983E7490AF2F2C100648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
 		C983E74B0AF2F2D000648461 /* libsdr.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EE20AD6E0F6003C2D7B /* libsdr.dylib */; };
 		C983E74C0AF2F2D800648461 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
@@ -498,7 +499,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = C96A6E1A0AD6D5C5003C2D7B /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1F1DEC320D0448C200338FF9 /* show */;
+			remoteGlobalIDString = 1F1DEC320D0448C200338FF9;
 			remoteInfo = show;
 		};
 		C983E7120AF2EB6000648461 /* PBXContainerItemProxy */ = {
@@ -1328,7 +1329,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C983E7480AF2F2B900648461 /* libcommon.a in Frameworks */,
+				1FDB510A0D0459B600B5FEC8 /* libcommon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1344,6 +1345,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FDB50FD0D0458E200B5FEC8 /* libcommon.a in Frameworks */,
 				C983E74B0AF2F2D000648461 /* libsdr.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2579,8 +2581,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				C983E7340AF2EEC600648461 /* PBXTargetDependency */,
 				C983E7360AF2EEC900648461 /* PBXTargetDependency */,
+				C983E7340AF2EEC600648461 /* PBXTargetDependency */,
 			);
 			name = sdrinfo;
 			productName = sdrinfo;
@@ -3095,7 +3097,6 @@
 					"-framework",
 					OpenGL,
 					"-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib",
-					"-lfltk",
 					"-lXft",
 					"-lpthread",
 					"-lX11",
@@ -3125,7 +3126,6 @@
 					"-framework",
 					OpenGL,
 					"-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib",
-					"-lfltk",
 					"-lXft",
 					"-lpthread",
 					"-lX11",
