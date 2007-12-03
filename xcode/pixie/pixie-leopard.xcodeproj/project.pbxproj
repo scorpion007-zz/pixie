@@ -17,6 +17,7 @@
 				1F1DEC060D0440DD00338FF9 /* CopyFiles */,
 			);
 			dependencies = (
+				1F1DEC450D04491D00338FF9 /* PBXTargetDependency */,
 				1F134E390D0429B000A46197 /* PBXTargetDependency */,
 				C98988FB0AF1B95A003DB17A /* PBXTargetDependency */,
 				C98988FF0AF1B962003DB17A /* PBXTargetDependency */,
@@ -162,6 +163,9 @@
 		1F1DEC0B0D04418900338FF9 /* dsply.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C96A6F080AD6E143003C2D7B /* dsply.h */; };
 		1F1DEC0C0D04419000338FF9 /* ptcapi.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 182651CA0BBA0B52007B2C37 /* ptcapi.h */; };
 		1F1DEC0D0D04419A00338FF9 /* sdr.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C9E09B300AD9BCF300A33716 /* sdr.h */; };
+		1F1DEC3A0D0448C200338FF9 /* libcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libcommon.a */; };
+		1F1DEC3B0D0448C200338FF9 /* libri.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6EC20AD6E08A003C2D7B /* libri.dylib */; };
+		1F1DEC430D04491700338FF9 /* show.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F1DEC420D04491700338FF9 /* show.cpp */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -475,6 +479,27 @@
 			remoteGlobalIDString = 1F134E190D0426FD00A46197;
 			remoteInfo = openexr;
 		};
+		1F1DEC340D0448C200338FF9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C96A6E1A0AD6D5C5003C2D7B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C96A6E280AD6D5E5003C2D7B;
+			remoteInfo = common;
+		};
+		1F1DEC360D0448C200338FF9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C96A6E1A0AD6D5C5003C2D7B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C96A6EC10AD6E08A003C2D7B;
+			remoteInfo = ri;
+		};
+		1F1DEC440D04491D00338FF9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C96A6E1A0AD6D5C5003C2D7B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F1DEC320D0448C200338FF9 /* show */;
+			remoteInfo = show;
+		};
 		C983E7120AF2EB6000648461 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C96A6E1A0AD6D5C5003C2D7B /* Project object */;
@@ -701,7 +726,7 @@
 		188383500B2FB2D100166E3E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie/man;
+			dstPath = /Applications/Graphics/Pixie/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 				188383520B2FB2E300166E3E /* rndr.1 in CopyFiles */,
@@ -1021,6 +1046,8 @@
 		1F134DD90D04204800A46197 /* opengl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../src/gui/opengl.h; sourceTree = SOURCE_ROOT; };
 		1F134E270D0426FD00A46197 /* openexr.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = openexr.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F134E290D04279F00A46197 /* openexr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = openexr.cpp; path = ../../src/openexr/openexr.cpp; sourceTree = SOURCE_ROOT; };
+		1F1DEC3F0D0448C200338FF9 /* show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = show; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F1DEC420D04491700338FF9 /* show.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = show.cpp; path = ../../src/show/show.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libcommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E2F0AD6D651003C2D7B /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = algebra.cpp; path = ../../src/common/algebra.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E300AD6D651003C2D7B /* algebra.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = algebra.h; path = ../../src/common/algebra.h; sourceTree = SOURCE_ROOT; };
@@ -1227,6 +1254,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F134E230D0426FD00A46197 /* libcommon.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F1DEC390D0448C200338FF9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F1DEC3A0D0448C200338FF9 /* libcommon.a in Frameworks */,
+				1F1DEC3B0D0448C200338FF9 /* libri.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1787,9 +1823,18 @@
 			name = openexr;
 			sourceTree = "<group>";
 		};
+		1F1DEC410D04490500338FF9 /* show */ = {
+			isa = PBXGroup;
+			children = (
+				1F1DEC420D04491700338FF9 /* show.cpp */,
+			);
+			name = show;
+			sourceTree = "<group>";
+		};
 		C96A6E180AD6D5C5003C2D7B = {
 			isa = PBXGroup;
 			children = (
+				1F1DEC410D04490500338FF9 /* show */,
 				1F134E280D04277F00A46197 /* openexr */,
 				1F134DC50D041F1D00A46197 /* gui */,
 				C96A6E2E0AD6D602003C2D7B /* common */,
@@ -1830,6 +1875,7 @@
 				C983E6FF0AF2EA8400648461 /* texmake */,
 				1F134DD40D041F6300A46197 /* gui.so */,
 				1F134E270D0426FD00A46197 /* openexr.so */,
+				1F1DEC3F0D0448C200338FF9 /* show */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2329,6 +2375,24 @@
 			productReference = 1F134E270D0426FD00A46197 /* openexr.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		1F1DEC320D0448C200338FF9 /* show */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F1DEC3C0D0448C200338FF9 /* Build configuration list for PBXNativeTarget "show" */;
+			buildPhases = (
+				1F1DEC370D0448C200338FF9 /* Sources */,
+				1F1DEC390D0448C200338FF9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F1DEC330D0448C200338FF9 /* PBXTargetDependency */,
+				1F1DEC350D0448C200338FF9 /* PBXTargetDependency */,
+			);
+			name = show;
+			productName = texmake;
+			productReference = 1F1DEC3F0D0448C200338FF9 /* show */;
+			productType = "com.apple.product-type.tool";
+		};
 		C96A6E280AD6D5E5003C2D7B /* common */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C96A6E2B0AD6D5E6003C2D7B /* Build configuration list for PBXNativeTarget "common" */;
@@ -2579,6 +2643,7 @@
 				C983E6D10AF2E9C900648461 /* sdrc */,
 				C983E6EC0AF2E9FE00648461 /* precomp */,
 				C983E6F50AF2EA3400648461 /* sdrinfo */,
+				1F1DEC320D0448C200338FF9 /* show */,
 				C983E6FE0AF2EA8400648461 /* texmake */,
 				C98988F90AF1B953003DB17A /* all */,
 				1F134DC60D041F6300A46197 /* gui */,
@@ -2617,6 +2682,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F134E2A0D04279F00A46197 /* openexr.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F1DEC370D0448C200338FF9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F1DEC430D04491700338FF9 /* show.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2825,6 +2898,21 @@
 			isa = PBXTargetDependency;
 			target = 1F134E190D0426FD00A46197 /* openexr */;
 			targetProxy = 1F134E380D0429B000A46197 /* PBXContainerItemProxy */;
+		};
+		1F1DEC330D0448C200338FF9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C96A6E280AD6D5E5003C2D7B /* common */;
+			targetProxy = 1F1DEC340D0448C200338FF9 /* PBXContainerItemProxy */;
+		};
+		1F1DEC350D0448C200338FF9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C96A6EC10AD6E08A003C2D7B /* ri */;
+			targetProxy = 1F1DEC360D0448C200338FF9 /* PBXContainerItemProxy */;
+		};
+		1F1DEC450D04491D00338FF9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F1DEC320D0448C200338FF9 /* show */;
+			targetProxy = 1F1DEC440D04491D00338FF9 /* PBXContainerItemProxy */;
 		};
 		C983E7130AF2EB6000648461 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3080,6 +3168,22 @@
 				);
 				PRODUCT_NAME = openexr;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+			};
+			name = Release;
+		};
+		1F1DEC3D0D0448C200338FF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				PRODUCT_NAME = show;
+			};
+			name = Debug;
+		};
+		1F1DEC3E0D0448C200338FF9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				PRODUCT_NAME = show;
 			};
 			name = Release;
 		};
@@ -3432,6 +3536,15 @@
 			buildConfigurations = (
 				1F134E250D0426FD00A46197 /* Debug */,
 				1F134E260D0426FD00A46197 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F1DEC3C0D0448C200338FF9 /* Build configuration list for PBXNativeTarget "show" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F1DEC3D0D0448C200338FF9 /* Debug */,
+				1F1DEC3E0D0448C200338FF9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
