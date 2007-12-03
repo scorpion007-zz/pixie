@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright ï¿½ 1999 - 2003, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -46,6 +46,7 @@
 
 #include "common/global.h"
 #include "common/algebra.h"
+#include "common/os.h"
 #include "ri/dsply.h"							// The display driver interface
 
 using namespace Imf;
@@ -146,6 +147,8 @@ public:
 					this->width			=	width;
 					this->height		=	height;
 					this->numSamples	=	numSamples;
+
+					osCreateMutex(fileMutex);
 				}
 
 				///////////////////////////////////////////////////////////////////////
@@ -172,6 +175,8 @@ public:
 
 					delete [] scanlines;
 					delete [] scanlineUsage;
+
+					osDeleteMutex(fileMutex);					
 				}
 
 				///////////////////////////////////////////////////////////////////////
@@ -208,6 +213,8 @@ public:
 						}
 					}
 
+					osLock(fileMutex);
+					
 					for (i=0;i<h;i++) {
 						half	*scan;
 						
@@ -252,6 +259,8 @@ public:
 							}
 						}
 					}
+
+					osUnlock(fileMutex);					
 				}
 
 	half			**scanlines;
@@ -263,6 +272,7 @@ public:
 	int				pixelSize;
 	int				numSamples;
 	int				lastSavedLine;
+	TMutex			fileMutex;	
 	
 	float			gamma,gain;
 	float			qmin,qmax,qone,qzero,qamp;
