@@ -741,7 +741,7 @@
 		188383560B2FB2ED00166E3E /* Install Docs */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie;
+			dstPath = /Applications/Graphics/Pixie/doc;
 			dstSubfolderSpec = 0;
 			files = (
 				188383E30B2FB39D00166E3E /* AUTHORS in Install Docs */,
@@ -2637,6 +2637,7 @@
 			projectRoot = ../..;
 			targets = (
 				C9E09AD00AD9B42300A33716 /* parsers */,
+				C98988F90AF1B953003DB17A /* all */,
 				C96A6E280AD6D5E5003C2D7B /* common */,
 				C96A6E570AD6D73A003C2D7B /* file */,
 				C9E09B410AD9BEBE00A33716 /* rgbe */,
@@ -2650,7 +2651,6 @@
 				C983E6F50AF2EA3400648461 /* sdrinfo */,
 				1F1DEC320D0448C200338FF9 /* show */,
 				C983E6FE0AF2EA8400648461 /* texmake */,
-				C98988F90AF1B953003DB17A /* all */,
 				1F134DC60D041F6300A46197 /* gui */,
 				1F134E190D0426FD00A46197 /* openexr */,
 			);
