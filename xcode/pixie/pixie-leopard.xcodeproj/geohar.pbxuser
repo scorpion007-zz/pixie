@@ -1,0 +1,295 @@
+// !$*UTF8*$!
+{
+	1F134DC60D041F6300A46197 /* gui */ = {
+		activeExec = 0;
+	};
+	1F134DD60D04204800A46197 /* interface.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {500, 3612}}";
+			sepNavSelRange = "{1310, 27}";
+			sepNavVisRange = "{1136, 364}";
+		};
+	};
+	1F134DD70D04204800A46197 /* opengl-fltk.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {566, 2828}}";
+			sepNavSelRange = "{1368, 20}";
+			sepNavVisRange = "{1170, 422}";
+		};
+	};
+	1F134DDA0D04204800A46197 /* statView.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {500, 1288}}";
+			sepNavSelRange = "{1285, 17}";
+			sepNavVisRange = "{1007, 464}";
+		};
+	};
+	1F134E190D0426FD00A46197 /* openexr */ = {
+		activeExec = 0;
+	};
+	1F134E290D04279F00A46197 /* openexr.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {721, 4340}}";
+			sepNavSelRange = "{1410, 18}";
+			sepNavVisRange = "{1184, 443}";
+		};
+	};
+	1F6953E70D03375600E5645D /* rndr */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = rndr;
+		sourceDirectories = (
+		);
+	};
+	1F6953E80D03375600E5645D /* sdrc */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = sdrc;
+		sourceDirectories = (
+		);
+	};
+	1F6953E90D03375600E5645D /* precomp */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = precomp;
+		sourceDirectories = (
+		);
+	};
+	1F6953EA0D03375600E5645D /* sdrinfo */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = sdrinfo;
+		sourceDirectories = (
+		);
+	};
+	1F6953EB0D03375600E5645D /* texmake */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = texmake;
+		sourceDirectories = (
+		);
+	};
+	1F6953F30D03377D00E5645D /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	1F6953F40D03377D00E5645D /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	C96A6E1A0AD6D5C5003C2D7B /* Project object */ = {
+		activeArchitecture = i386;
+		activeBuildConfigurationName = Release;
+		activeExecutable = 1F6953E70D03375600E5645D /* rndr */;
+		activeTarget = C98988F90AF1B953003DB17A /* all */;
+		addToTargets = (
+			1F134E190D0426FD00A46197 /* openexr */,
+		);
+		codeSenseManager = 1F6953F40D03377D00E5645D /* Code sense */;
+		executables = (
+			1F6953E70D03375600E5645D /* rndr */,
+			1F6953E80D03375600E5645D /* sdrc */,
+			1F6953E90D03375600E5645D /* precomp */,
+			1F6953EA0D03375600E5645D /* sdrinfo */,
+			1F6953EB0D03375600E5645D /* texmake */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					243,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					203,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 218375578;
+			PBXWorkspaceStateSaveDate = 218375578;
+		};
+		sourceControlManager = 1F6953F30D03377D00E5645D /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	C96A6E280AD6D5E5003C2D7B /* common */ = {
+		activeExec = 0;
+	};
+	C96A6E570AD6D73A003C2D7B /* file */ = {
+		activeExec = 0;
+	};
+	C96A6E5C0AD6D746003C2D7B /* framebuffer */ = {
+		activeExec = 0;
+	};
+	C96A6E680AD6D791003C2D7B /* fbx.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {721, 7476}}";
+			sepNavSelRange = "{1590, 0}";
+			sepNavVisRange = "{935, 746}";
+		};
+	};
+	C96A6EC10AD6E08A003C2D7B /* ri */ = {
+		activeExec = 0;
+	};
+	C96A6EC60AD6E096003C2D7B /* dsotest */ = {
+		activeExec = 0;
+	};
+	C96A6EE10AD6E0F6003C2D7B /* sdr */ = {
+		activeExec = 0;
+	};
+	C983E6C10AF2E8FB00648461 /* rndr */ = {
+		activeExec = 0;
+		executables = (
+			1F6953E70D03375600E5645D /* rndr */,
+		);
+	};
+	C983E6D10AF2E9C900648461 /* sdrc */ = {
+		activeExec = 0;
+		executables = (
+			1F6953E80D03375600E5645D /* sdrc */,
+		);
+	};
+	C983E6EC0AF2E9FE00648461 /* precomp */ = {
+		activeExec = 0;
+		executables = (
+			1F6953E90D03375600E5645D /* precomp */,
+		);
+	};
+	C983E6F50AF2EA3400648461 /* sdrinfo */ = {
+		activeExec = 0;
+		executables = (
+			1F6953EA0D03375600E5645D /* sdrinfo */,
+		);
+	};
+	C983E6FE0AF2EA8400648461 /* texmake */ = {
+		activeExec = 0;
+		executables = (
+			1F6953EB0D03375600E5645D /* texmake */,
+		);
+	};
+	C98988F90AF1B953003DB17A /* all */ = {
+		activeExec = 0;
+	};
+	C9E09AD00AD9B42300A33716 /* parsers */ = {
+		activeExec = 0;
+	};
+	C9E09B410AD9BEBE00A33716 /* rgbe */ = {
+		activeExec = 0;
+	};
+}
