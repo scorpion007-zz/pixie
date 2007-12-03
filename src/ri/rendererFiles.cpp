@@ -574,6 +574,31 @@ char					*CRenderer::getFilter(RtFilterFunc func) {
 	return	RI_GAUSSIANFILTER;
 }
 
+///////////////////////////////////////////////////////////////////////
+// Class				:	CRenderer
+// Method				:	getStepFilter
+// Description			:	Return the filter matching the name
+// Return Value			:
+// Comments				:
+RtStepFilterFunc		CRenderer::getStepFilter(const char *name) {
+	if (strcmp(name,RI_GAUSSIANFILTER) == 0) {
+		return	RiGaussianStepFilter;
+	} else if (strcmp(name,RI_BOXFILTER) == 0) {
+		return	RiBoxStepFilter;
+	} else if (strcmp(name,RI_TRIANGLEFILTER) == 0) {
+		return	RiTriangleStepFilter;
+/*	} else if (strcmp(name,RI_SINCFILTER) == 0) {
+		return	RiSincFilter;*/
+	} else if (strcmp(name,RI_CATMULLROMFILTER) == 0) {
+		return	RiCatmullRomStepFilter;
+/*	} else if (strcmp(name,RI_BLACKMANHARRISFILTER) == 0) {
+		return	RiBlackmanHarrisFilter;*/
+	} else if (strcmp(name,RI_MITCHELLFILTER) == 0) {
+		return	RiMitchellStepFilter;
+	}
+
+	return	RiGaussianStepFilter;
+}
 
 
 ///////////////////////////////////////////////////////////////////////
