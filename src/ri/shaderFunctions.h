@@ -1961,7 +1961,6 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 #ifndef INIT_SHADING
 #define	FILTERSTEP2EXPR_PRE		FUN3EXPR_PRE																		\
 								plBegin(CFilterLookup,3);															\
-								const	float	width	=	lookup->width;											\
 								float			*dsdu	=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);	\
 								float			*dsdv	=	dsdu + numVertices;										\
 								float			*fwidth	=	dsdu;													\
@@ -1978,16 +1977,7 @@ DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FA
 								}
 
 #define	FILTERSTEP2EXPR			plReady();																			\
-								double		tmp		=	0;															\
-								float		val		=	*op2+width*fwidth[0];										\
-								const float	vstep	=	lookup->valStep*fwidth[0];									\
-								for (int i = FILTERSTEP_NUMSTEPS-1;i>=0;--i) {										\
-									if (*op1 > val)	break;															\
-									const float	step	=	min(vstep,val-(*op1));									\
-									tmp		+=	lookup->vals[i]*step;												\
-									val		-=	vstep;																\
-								}																					\
-								*res	=	(float) (tmp / ((double) lookup->normalizer * fwidth[0]));
+								*res	=	lookup->filter(*op2,*op1,fwidth[0]);
 
 
 #define	FILTERSTEP2EXPR_UPDATE	plStep();																			\
@@ -2012,21 +2002,10 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef INIT_SHADING
 #define	FILTERSTEP3EXPR_PRE	FUN4EXPR_PRE																		\
-							plBegin(CFilterLookup,4);															\
-							const	float	width	=	lookup->width;
+							plBegin(CFilterLookup,4);
 
 #define	FILTERSTEP3EXPR		plReady();																			\
-							float		tmp		=	0;															\
-							const float fwidth	=	max(fabs(op2[0]-op3[0]),C_EPSILON);							\
-							float		val		=	*op2+width*fwidth;											\
-							const float vstep	=	lookup->valStep*fwidth;										\
-							for (int i = FILTERSTEP_NUMSTEPS-1;i>=0;--i) {										\
-								if (op1[0] > val)	break;														\
-								const float step	=	min(vstep,val-op1[0]);									\
-								tmp		+=	lookup->vals[i]*step;												\
-								val		-=	vstep;																\
-							}																					\
-							*res	=	tmp / (lookup->normalizer * fwidth);
+							*res	=	lookup->filter(0.5*(*op2+*op3),*op1,*op3-*op2);
 
 
 #define	FILTERSTEP3EXPR_UPDATE	plStep();	FUN4EXPR_UPDATE(1,1,1,1)
