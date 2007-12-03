@@ -195,13 +195,13 @@ DEFFUNC(Round		,"round"		,"f=f",FUN2EXPR_PRE,SIMPLEFUNCTION,FUN2EXPR_UPDATE(1,1)
 #define	ATAN2EXP	*res		=	atan2f(*op1,*op2);
 DEFFUNC(Atan2		,"atan"			,"f=ff",FUN3EXPR_PRE,ATAN2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	POW2EXP		*res		=	powf(*op1,*op2); if ((*res)*(*res) < 0) *res = 0;
+#define	POW2EXP		*res		=	(float) pow(*op1,*op2); if ((*res)*(*res) < 0) *res = 0;
 DEFFUNC(Pow2		,"pow"			,"f=ff",FUN3EXPR_PRE,POW2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	LOG2EXP		*res		=	logf(*op1) / logf(*op2);
+#define	LOG2EXP		*res		=	(float) (log((double)*op1) / log((double)*op2));
 DEFFUNC(Log2		,"log"			,"f=ff",FUN3EXPR_PRE,LOG2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
-#define	MOD2EXP		*res		=	fmodf(*op1,*op2); if (*res < 0) *res += *op2; assert(*res >= 0);
+#define	MOD2EXP		*res		=	(float) fmod((double)*op1,(double)*op2); if (*res < 0) *res += *op2; assert(*res >= 0);
 DEFFUNC(Mod2		,"mod"			,"f=ff",FUN3EXPR_PRE,MOD2EXP,FUN3EXPR_UPDATE(1,1,1),NULL_EXPR,0)
 
 #define	CLAMPFEXP	*res		=	(*op1 < *op2 ? *op2: *op1 > *op3 ? *op3 : *op1);
