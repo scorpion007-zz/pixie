@@ -555,6 +555,7 @@ static	void RiInit() {
 static	void RiTini() {
 	if (tokens != NULL)				delete [] tokens;
 	if (values != NULL)				delete [] values;
+	initialized	= FALSE;
 }
 
 
