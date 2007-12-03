@@ -73,6 +73,7 @@ typedef RtPointer	RtContextHandle;
 typedef RtString	RtArchiveHandle;
 typedef RtString	RtShaderHandle;
 typedef RtFloat		(*RtFilterFunc)(RtFloat, RtFloat, RtFloat, RtFloat);
+typedef RtFloat		(*RtStepFilterFunc)(RtFloat, RtFloat, RtFloat);
 typedef RtVoid		(*RtErrorHandler)(RtInt code, RtInt severity, char *msg);
 typedef RtVoid		(*RtFunc)(const char *);
 typedef RtVoid		(*RtArchiveCallback)(const char *,...);
@@ -359,6 +360,13 @@ EXTERN(RtFloat)
     RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth);
+
+EXTERN(RtFloat)
+    RiGaussianStepFilter (RtFloat t, RtFloat edge, RtFloat width),
+    RiBoxStepFilter (RtFloat t, RtFloat edge, RtFloat width),
+    RiTriangleStepFilter (RtFloat t, RtFloat edge, RtFloat width),
+	RiMitchellStepFilter (RtFloat t, RtFloat edge, RtFloat width),
+    RiCatmullRomStepFilter (RtFloat t, RtFloat edge, RtFloat width);
 
 EXTERN(RtVoid)
     RiHider (RtToken type, ...),

@@ -1016,6 +1016,121 @@ RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 }
 
 
+
+
+EXTERN(RtFloat)
+RiGaussianStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
+	const double t = _t,edge = _edge,w = _w;
+	double res = 0.0;
+	
+	res = (1.0/2.0)*erfc( (2.0*sqrt(2)*(edge-t))/w );
+
+	return (RtFloat) res;
+}
+
+EXTERN(RtFloat)
+RiCatmullRomStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
+	const double t = _t,edge = _edge,w = _w;
+	double res = 0.0;
+
+	if (edge==t && edge>=(t+w) && edge<(t+2.0*w)) {
+		res = -1.0/24.0;
+	} else if (edge<t && (edge+w)<=t && (edge+2.0*w)<=t) {
+		res = 1.0;	
+	} else if ((edge+w)==t && (edge+2.0*w)>t && edge<t) {
+		res = 25.0/24.0;
+	} else if (edge>t && edge>(t+w) && edge<(t+2.0*w)) {
+		res = ((3.0*edge-3.0*t-2.0*w) * pow(edge-t-2.0*w,3.0)) / (24.0*pow(w,4.0));
+	} else if ((edge+2.0*w)>t && edge<t && (edge+w)<t) {
+		res = (-3.0*pow(edge-t,4.0) - 20.0*pow(edge-t,3.0)*w - 48.0*pow(edge-t,2.0)*w*w + 
+				 48.0*(-edge+t)*pow(w,3.0) + 8.0*pow(w,4.0))/(24.0*pow(w,4.0));
+	} else if ((edge+w)>t && edge<t && (edge+2.0*w)<=t) {
+		res	= (-edge+t)/w		+ (3.0*pow(edge-t,4))/(8.0*pow(w,4.0))
+								+ (5.0*pow(edge-t,3))/(6.0*pow(w,3.0))
+								+ (11.0)/24.0;
+	} else if (edge<(t+w) && (edge>t || (edge>=t && edge<(t+2.0*w)))) {
+		res = (-edge+t)/w		- (3.0*pow(edge-t,4))/(8.0*pow(w,4.0))
+								+ (5.0*pow(edge-t,3))/(6.0*pow(w,3.0))
+								+ 1.0/2.0;
+	} else if ((edge+w)>t && (edge+2.0*w)>t && edge<t) {
+		res = (-edge+t)/w		+ (3.0*pow(edge-t,4))/(8.0*pow(w,4.0))
+								+ (5.0*pow(edge-t,3))/(6.0*pow(w,3.0))
+								+ 1.0/2.0;
+	} else if (edge==t && edge>=(t+2.0*w) && edge<(t+w)) {
+		res = 13.0/24.0;
+	}
+	
+	return (RtFloat) res;
+}
+
+EXTERN(RtFloat)
+RiMitchellStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
+	const double t = _t,edge = _edge,w = _w;
+	double res = 0.0;
+
+	if (edge==t && edge>=(t+w) && edge<(t+2.0*w)) {
+		res = -1.0/72.0;
+	} else if (edge<t && (edge+w)<=t && (edge+2.0*w)<=t) {
+		res = 1.0;	
+	} else if ((edge+w)==t && (edge+2.0*w)>t && edge<t) {
+		res = 73.0/72.0;
+	} else if (edge>t && edge>(t+w) && edge<(t+2.0*w)) {
+		res = ((7.0*edge-7.0*t-6.0*w) * pow(edge-t-2.0*w,3.0)) / (72.0*pow(w,4.0));
+	} else if ((edge+2.0*w)>t && edge<t && (edge+w)<t) {
+		res = (-7.0*pow(edge-t,4.0) - 48.0*pow(edge-t,3.0)*w - 120.0*pow(edge-t,2.0)*w*w + 
+				 128.0*(-edge+t)*pow(w,3.0) + 24.0*pow(w,4.0))/(72.0*pow(w,4.0));
+	} else if ((edge+w)>t && edge<t && (edge+2.0*w)<=t) {
+		res	= (64.0*(-edge+t)/(w*72.0)) + (35.0/72.0)
+								+ ( (21.0*pow(edge-t,4))
+								+   (48.0*w*pow(edge-t,3)) ) /(72.0*pow(w,4.0));
+	} else if (edge<(t+w) && (edge>t || (edge>=t && edge<(t+2.0*w)))) {
+		res	= (64.0*(-edge+t)/(w*72.0)) + (36.0/72.0)
+								+ ( (-21.0*pow(edge-t,4))
+								+   (48.0*w*pow(edge-t,3)) ) /(72.0*pow(w,4.0));
+	} else if ((edge+w)>t && (edge+2.0*w)>t && edge<t) {
+		res	= (64.0*(-edge+t)/(w*72.0)) + (36.0/72.0)
+								+ ( (21.0*pow(edge-t,4))
+								+   (48.0*w*pow(edge-t,3)) ) /(72.0*pow(w,4.0));
+	} else if (edge==t && edge>=(t+2.0*w) && edge<(t+w)) {
+		res = 37.0/72.0;
+	}
+	
+	return (RtFloat) res;
+}
+
+
+EXTERN(RtFloat)
+RiTriangleStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
+	const double t = _t,edge = _edge,w = _w;
+	double res = 0.0;
+	
+	if ((edge-t+w)<= 0 && (edge-t) < 0) {
+		res = 1.0;
+	} else if ((edge-t)<0 && (edge-t+w) > 0) {
+		res = (-edge*edge + 2.0*edge*t - t*t - 2.0*edge*w + 2.0*t*w + w*w)/(2.0*w*w);
+	} else if ((edge-t)>=0 && (edge-t-w) < 0) {
+		res = ( edge*edge - 2.0*edge*t + t*t - 2.0*edge*w + 2.0*t*w + w*w)/(2.0*w*w);
+	}
+
+	return (RtFloat) res;
+}
+
+EXTERN(RtFloat)
+RiBoxStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
+	const double t = _t,edge = _edge,w = _w;
+	double res = 0.0;
+	
+	if ((edge-t)<0 && (2.0*edge-2*t+w) <= 0) {
+		res = 1.0;
+	} else if (((2.0*edge-2.0*t+w)>0 && (edge-t)<0) || ((edge-t)>=0 && (2.0*edge-2.0*t-w)<0)) {
+		res = (-2.0*edge + 2.0*t + w)/(2.0*w);
+	}
+
+	return (RtFloat) res;
+}
+
+
+
 EXTERN(RtVoid)
 RiHider (RtToken type, ...) {
 	va_list	args;
