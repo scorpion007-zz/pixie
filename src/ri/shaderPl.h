@@ -222,12 +222,7 @@ public:
 		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
 		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
-		bool				computed;					// set to true if the filter has been computed
-		float				width;						// The width parameter
-		RtFilterFunc		filter;						// The filter function
-		float				vals[FILTERSTEP_NUMSTEPS];	// The partial integrals
-		float				valStep;					// The step value for the value
-		float				normalizer;					// The normalizer value
+		RtStepFilterFunc	filter;						// The filter function
 };
 
 

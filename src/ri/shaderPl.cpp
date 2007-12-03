@@ -627,9 +627,7 @@ void		COcclusionLookup::postBind(CShadingScratch *scratch) {
 // Return Value			:	-
 // Comments				:
 CFilterLookup::CFilterLookup() {
-	computed	=	false;
-	filter		=	RiCatmullRomFilter;
-	width		=	1;
+	filter		=	RiCatmullRomStepFilter;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -652,7 +650,7 @@ void		CFilterLookup::bind(const char *name,int &opIndex,int step,void *data,CSha
 	// Find the parameter and bind it
 	if (strcmp(name,"filter") == 0) {
 		expectUniform(name);
-		else				filter		=	CRenderer::getFilter(((const char **) data)[0]);
+		else				filter		=	CRenderer::getStepFilter(((const char **) data)[0]);
 	} else if (strcmp(name,"width") == 0) {
 		expectUniform(name);
 		add(name,opIndex,step,data,offsetof(CShadingScratch,textureParams.width));
@@ -667,20 +665,6 @@ void		CFilterLookup::bind(const char *name,int &opIndex,int step,void *data,CSha
 // Comments				:
 void		CFilterLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
 	scratch->textureParams.width		=	1.0f;
-	if (computed == false) {
-		int		i;
-		float	val;
-
-		valStep		=	2*width / (FILTERSTEP_NUMSTEPS-1);
-		val			=	width;
-		normalizer	=	0;
-
-		for (i=0;i<FILTERSTEP_NUMSTEPS;i++,val-=valStep) {
-			vals[i]		=	filter(val,0,width,1);
-			normalizer	+=	vals[i]*valStep;
-		}
-		computed	=	true;
-	}
 }
 
 
