@@ -4382,7 +4382,7 @@ void	CRendererContext::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*fil
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeSphericalEnvironment(pic,tex,options->texturePath,RI_PERIODIC,RI_CLAMP,filterfunc,swidth,twidth,n,tokens,(void **) params);
+	makeCylindericalEnvironment(pic,tex,options->texturePath,RI_PERIODIC,RI_CLAMP,filterfunc,swidth,twidth,n,tokens,(void **) params);
 }
 
 void	CRendererContext::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny, char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
