@@ -1842,7 +1842,11 @@ void		CConditionalExpression::getCode(FILE *out,CVariable *dest) {
 	sdr->newLabel(elseLabel);
 	sdr->newLabel(endLabel);
 
+	// Note condition variables must always be varying
+	// so we use a HACK to force varying conditions (or else behaves badly, acting as ifever)
+	int typeSave = type;	type &= ~SLC_UNIFORM;
 	lock(cond,condition);
+	type = typeSave;
 
 	fprintf(out,"%s\t%s %s\n",opcodeIf,cond,elseLabel);
 
