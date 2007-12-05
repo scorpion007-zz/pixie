@@ -1738,39 +1738,26 @@ public:
 
 	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
 							float		u[4],v[4];
-							double		a,b,c;
-							vector		D,Dsamp;
+							vector		D;
 
-							if (dotvv(D0,D0) > 0) {
-								normalizev(D,D0);
-								movvv(Dsamp,D);
-								u[0]				=	(atan2f(D[COMP_Z],D[COMP_X]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
-								v[0]				=	acosf(D[COMP_Y]) * (1.0f / (float) C_PI);
-								
-								c = (D[COMP_X]*D[COMP_X]+D[COMP_Z]*D[COMP_Z])*2.0*C_PI;
-								a = -D[COMP_Z]/c;
-								b = D[COMP_X]/c;
-								c = -1.0f/(C_PI*sqrt(1.0f-D[COMP_Y]*D[COMP_Y] + C_EPSILON));
-										
-								normalizev(D,D1);
-								subvv(D,Dsamp);
-								u[1]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-								v[1]				=	v[0] + (float) (c*D[COMP_Y]);
+							// Map to the texture space
+							normalizev(D,D0);
+							u[0]				=	(atan2f(D[COMP_X],D[COMP_Y]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
+							v[0]				=	asinf(-D[COMP_Z]) * (1.0f / (float) C_PI);
+									
+							normalizev(D,D1);
+							u[1]				=	(atan2f(D[COMP_X],D[COMP_Y]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
+							v[1]				=	asinf(-D[COMP_Z]) * (1.0f / (float) C_PI);
 
-								normalizev(D,D2);
-								subvv(D,Dsamp);
-								u[2]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-								v[2]				=	v[0] + (float) (c*D[COMP_Y]);
-								
-								normalizev(D,D3);
-								subvv(D,Dsamp);
-								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
-								
-								side->lookup4(result,u,v,context);
-							} else {
-								initv(result,0,0,0);
-							}
+							normalizev(D,D2);
+							u[2]				=	(atan2f(D[COMP_X],D[COMP_Y]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
+							v[2]				=	asinf(-D[COMP_Z]) * (1.0f / (float) C_PI);
+
+							normalizev(D,D3);
+							u[3]				=	(atan2f(D[COMP_X],D[COMP_Y]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
+							v[3]				=	asinf(-D[COMP_Z]) * (1.0f / (float) C_PI);
+							
+							side->lookup4(result,u,v,context);
 						}
 
 	// textureinfo support
