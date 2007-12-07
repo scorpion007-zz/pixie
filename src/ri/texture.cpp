@@ -1742,34 +1742,33 @@ public:
 							vector		D,Dsamp;
 							
 							// Note Cylinderical maps (EnvLatL maps) are Z is north
-							// -pi is top +pi is bottom, but for pixie 0 is bottom and 1 is top
-							// so hence the sign flip
+							// -pi is top +pi is bottom, hence sign flip in z
 
 							if (dotvv(D0,D0) > 0) {
 								normalizev(D,D0);
 								movvv(Dsamp,D);
-								u[0]				=	(atan2f(D[COMP_Z],D[COMP_X]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
-								v[0]				=	asin(-D[COMP_Y]) * (1.0f / (float) C_PI) + 0.5f;
+								u[0]				=	(atan2f(D[COMP_Y],D[COMP_X]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
+								v[0]				=	asin(-D[COMP_Z]) * (1.0f / (float) C_PI) + 0.5f;
 								
-								c = (D[COMP_X]*D[COMP_X]+D[COMP_Z]*D[COMP_Z])*2.0*C_PI;
-								a = -D[COMP_Z]/c;
+								c = (D[COMP_X]*D[COMP_X]+D[COMP_Y]*D[COMP_Y])*2.0*C_PI;
+								a = -D[COMP_Y]/c;
 								b = D[COMP_X]/c;
-								c = 1.0f/(C_PI*sqrt(1.0f-D[COMP_Y]*D[COMP_Y] + C_EPSILON));	// would be -ve but cancels with -y
+								c = 1.0f/(C_PI*sqrt(1.0f-D[COMP_Z]*D[COMP_Z] + C_EPSILON));	// would be -ve but cancels with -y
 										
 								normalizev(D,D1);
 								subvv(D,Dsamp);
-								u[1]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-								v[1]				=	v[0] + (float) (c*D[COMP_Y]);
+								u[1]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Y]);
+								v[1]				=	v[0] + (float) (c*D[COMP_Z]);
 
 								normalizev(D,D2);
 								subvv(D,Dsamp);
-								u[2]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-								v[2]				=	v[0] + (float) (c*D[COMP_Y]);
+								u[2]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Y]);
+								v[2]				=	v[0] + (float) (c*D[COMP_Z]);
 								
 								normalizev(D,D3);
 								subvv(D,Dsamp);
-								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Z]);
-								v[3]				=	v[0] + (float) (c*D[COMP_Y]);
+								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Y]);
+								v[3]				=	v[0] + (float) (c*D[COMP_Z]);
 								
 								side->lookup4(result,u,v,context);
 							} else {
