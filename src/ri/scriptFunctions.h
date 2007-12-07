@@ -390,11 +390,11 @@ DEFFUNC(Ptlined		,"ptlined"			,"f=ppp"	,PTLINEDEXP_PRE,PTLINEDEXP,FUN4EXPR_UPDAT
 						vector	vtmp,vtmp2;											\
 						matrix	mtmp;
 
-#define	ROTATEEXP		subvv(vtmp,op3,op4);										\
+#define	ROTATEEXP		subvv(vtmp,op4,op3);										\
 						rotatem(mtmp,vtmp,*op2);									\
-						subvv(vtmp2,op1,op4);										\
+						subvv(vtmp2,op1,op3);										\
 						mulmp(vtmp,mtmp,vtmp2);										\
-						addvv(res,vtmp,op4);
+						addvv(res,vtmp,op3);
 
 DEFFUNC(Rotatep		,"rotate"			,"p=pfpp"	,ROTATEEXP_PRE,ROTATEEXP,FUN5EXPR_UPDATE(3,3,1,3,3),NULL_EXPR,0)
 
