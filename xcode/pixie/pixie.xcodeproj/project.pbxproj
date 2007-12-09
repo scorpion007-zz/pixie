@@ -3195,6 +3195,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = show;
 			};
 			name = Debug;
@@ -3203,6 +3204,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = show;
 			};
 			name = Release;
@@ -3403,6 +3405,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = rndr;
 			};
 			name = Debug;
@@ -3411,6 +3414,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = rndr;
 			};
 			name = Release;
@@ -3467,6 +3471,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = texmake;
 			};
 			name = Debug;
@@ -3475,6 +3480,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				OTHER_LDFLAGS = "-ltiff";
 				PRODUCT_NAME = texmake;
 			};
 			name = Release;

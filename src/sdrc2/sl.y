@@ -163,9 +163,9 @@
 // Rule types
 %%
 slStart:		
-		////////////////////////////////////////////////
-		// Initilization stuff
-		////////////////////////////////////////////////
+			////////////////////////////////////////////////
+			// Initilization stuff
+			////////////////////////////////////////////////
 			{
 			}
 			slShader 
@@ -177,11 +177,11 @@ slContainerClass:
 			SL_UNIFORM
 			{
 			}
-			|
+		|
 			SL_VARIABLE
 			{
 			}
-			|
+		|
 			{
 			}
 			;
@@ -191,7 +191,7 @@ slInheritanceClass:
 			SL_EXTERN
 			{
 			}
-			|
+		|
 			{
 			}
 			;
@@ -200,7 +200,7 @@ slOutputClass:
 			SL_OUTPUT
 			{
 			}
-			|
+		|
 			{
 			}
 			;
@@ -215,15 +215,15 @@ slVectorSpecifier:
 			SL_COLOR
 			{
 			}
-			|
+		|
 			SL_VECTOR
 			{
 			}
-			|
+		|
 			SL_NORMAL
 			{
 			}
-			|
+		|
 			SL_POINT
 			{
 			}
