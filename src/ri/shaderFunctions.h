@@ -2005,7 +2005,7 @@ DEFFUNC(FilterStep2			,"filterstep"				,"f=ff!"		,FILTERSTEP2EXPR_PRE,FILTERSTEP
 							plBegin(CFilterLookup,4);
 
 #define	FILTERSTEP3EXPR		plReady();																			\
-							*res	=	lookup->filter(0.5*(*op2+*op3),*op1,*op3-*op2);
+							*res	=	lookup->filter(0.5f*(*op2+*op3),*op1,*op3-*op2);
 
 
 #define	FILTERSTEP3EXPR_UPDATE	plStep();	FUN4EXPR_UPDATE(1,1,1,1)

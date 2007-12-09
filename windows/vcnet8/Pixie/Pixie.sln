@@ -92,6 +92,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gui", "gui\gui.vcproj", "{C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsotest", "dsotest\dsotest.vcproj", "{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdrc2", "sdrc2\sdrc2.vcproj", "{96EF9056-2A50-47FC-A588-877A834AA0D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -220,6 +222,12 @@ Global
 		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Release|Win32.Build.0 = Release|Win32
 		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Release|x64.ActiveCfg = Release|x64
 		{609D799E-F3B1-4C4F-8CDF-4A818E7E21DD}.Release|x64.Build.0 = Release|x64
+		{96EF9056-2A50-47FC-A588-877A834AA0D8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{96EF9056-2A50-47FC-A588-877A834AA0D8}.Debug|Win32.Build.0 = Debug|Win32
+		{96EF9056-2A50-47FC-A588-877A834AA0D8}.Debug|x64.ActiveCfg = Debug|Win32
+		{96EF9056-2A50-47FC-A588-877A834AA0D8}.Release|Win32.ActiveCfg = Release|Win32
+		{96EF9056-2A50-47FC-A588-877A834AA0D8}.Release|Win32.Build.0 = Release|Win32
+		{96EF9056-2A50-47FC-A588-877A834AA0D8}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1024,7 +1024,7 @@ RiGaussianStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
 	const double t = _t,edge = _edge,w = _w;
 	double res = 0.0;
 	
-	res = (1.0/2.0)*erfc( (2.0*sqrt(2)*(edge-t))/w );
+	res = (1.0/2.0)*erfc( (2.0*sqrt(2.0)*(edge-t))/w );
 
 	return (RtFloat) res;
 }
