@@ -52,6 +52,16 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		181574F90D0CC3250000B665 /* pp1.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574EF0D0CC3250000B665 /* pp1.c */; };
+		181574FA0D0CC3250000B665 /* pp2.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F00D0CC3250000B665 /* pp2.c */; };
+		181574FB0D0CC3250000B665 /* pp3.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F10D0CC3250000B665 /* pp3.c */; };
+		181574FC0D0CC3250000B665 /* pp4.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F20D0CC3250000B665 /* pp4.c */; };
+		181574FD0D0CC3250000B665 /* pp5.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F30D0CC3250000B665 /* pp5.c */; };
+		181574FE0D0CC3250000B665 /* pp6.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F40D0CC3250000B665 /* pp6.c */; };
+		181574FF0D0CC3250000B665 /* pp7.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F50D0CC3250000B665 /* pp7.c */; };
+		181575000D0CC3250000B665 /* pp8.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F60D0CC3250000B665 /* pp8.c */; };
+		181575010D0CC3250000B665 /* sdrc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 181574F80D0CC3250000B665 /* sdrc.cpp */; };
+		181575120D0CCAD70000B665 /* opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 181575100D0CCAD70000B665 /* opcode.cpp */; };
 		182651CB0BBA0B52007B2C37 /* ptcapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 182651CA0BBA0B52007B2C37 /* ptcapi.h */; };
 		182C1BB50C55CD34000B070D /* shaderPl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 182C1BB30C55CD34000B070D /* shaderPl.cpp */; };
 		182C1BB60C55CD34000B070D /* shaderPl.h in Headers */ = {isa = PBXBuildFile; fileRef = 182C1BB40C55CD34000B070D /* shaderPl.h */; };
@@ -840,6 +850,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		181574DF0D0CC24E0000B665 /* sdrc2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = sdrc2; path = build/Debug/sdrc2; sourceTree = "<group>"; };
+		181574EE0D0CC3250000B665 /* pp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = pp.h; path = ../../src/sdrc2/pp.h; sourceTree = SOURCE_ROOT; };
+		181574EF0D0CC3250000B665 /* pp1.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp1.c; path = ../../src/sdrc2/pp1.c; sourceTree = SOURCE_ROOT; };
+		181574F00D0CC3250000B665 /* pp2.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp2.c; path = ../../src/sdrc2/pp2.c; sourceTree = SOURCE_ROOT; };
+		181574F10D0CC3250000B665 /* pp3.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp3.c; path = ../../src/sdrc2/pp3.c; sourceTree = SOURCE_ROOT; };
+		181574F20D0CC3250000B665 /* pp4.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp4.c; path = ../../src/sdrc2/pp4.c; sourceTree = SOURCE_ROOT; };
+		181574F30D0CC3250000B665 /* pp5.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp5.c; path = ../../src/sdrc2/pp5.c; sourceTree = SOURCE_ROOT; };
+		181574F40D0CC3250000B665 /* pp6.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp6.c; path = ../../src/sdrc2/pp6.c; sourceTree = SOURCE_ROOT; };
+		181574F50D0CC3250000B665 /* pp7.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp7.c; path = ../../src/sdrc2/pp7.c; sourceTree = SOURCE_ROOT; };
+		181574F60D0CC3250000B665 /* pp8.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp8.c; path = ../../src/sdrc2/pp8.c; sourceTree = SOURCE_ROOT; };
+		181574F70D0CC3250000B665 /* ppext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ppext.h; path = ../../src/sdrc2/ppext.h; sourceTree = SOURCE_ROOT; };
+		181574F80D0CC3250000B665 /* sdrc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = sdrc.cpp; path = ../../src/sdrc2/sdrc.cpp; sourceTree = SOURCE_ROOT; };
+		181575100D0CCAD70000B665 /* opcode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = opcode.cpp; path = ../../src/sdrc2/opcode.cpp; sourceTree = SOURCE_ROOT; };
+		181575110D0CCAD70000B665 /* opcode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = opcode.h; path = ../../src/sdrc2/opcode.h; sourceTree = SOURCE_ROOT; };
 		182651CA0BBA0B52007B2C37 /* ptcapi.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptcapi.h; path = ../../src/ri/ptcapi.h; sourceTree = SOURCE_ROOT; };
 		182C1BB30C55CD34000B070D /* shaderPl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = shaderPl.cpp; path = ../../src/ri/shaderPl.cpp; sourceTree = SOURCE_ROOT; };
 		182C1BB40C55CD34000B070D /* shaderPl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shaderPl.h; path = ../../src/ri/shaderPl.h; sourceTree = SOURCE_ROOT; };
@@ -1248,6 +1272,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		181574DD0D0CC24E0000B665 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1F134DCF0D041F6300A46197 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1371,6 +1402,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		181574ED0D0CC3000000B665 /* sdrc2 */ = {
+			isa = PBXGroup;
+			children = (
+				181575100D0CCAD70000B665 /* opcode.cpp */,
+				181575110D0CCAD70000B665 /* opcode.h */,
+				181574EE0D0CC3250000B665 /* pp.h */,
+				181574EF0D0CC3250000B665 /* pp1.c */,
+				181574F00D0CC3250000B665 /* pp2.c */,
+				181574F10D0CC3250000B665 /* pp3.c */,
+				181574F20D0CC3250000B665 /* pp4.c */,
+				181574F30D0CC3250000B665 /* pp5.c */,
+				181574F40D0CC3250000B665 /* pp6.c */,
+				181574F50D0CC3250000B665 /* pp7.c */,
+				181574F60D0CC3250000B665 /* pp8.c */,
+				181574F70D0CC3250000B665 /* ppext.h */,
+				181574F80D0CC3250000B665 /* sdrc.cpp */,
+			);
+			name = sdrc2;
+			sourceTree = "<group>";
+		};
 		183398360B2D2CA60055E484 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -1858,6 +1909,7 @@
 				C9E09B070AD9B81100A33716 /* rndr */,
 				C96A6EEE0AD6E10E003C2D7B /* sdr */,
 				C96A6EED0AD6E108003C2D7B /* sdrc */,
+				181574ED0D0CC3000000B665 /* sdrc2 */,
 				C9E09B5A0AD9BF2700A33716 /* sdrinfo */,
 				183398360B2D2CA60055E484 /* shaders */,
 				1F1DEC410D04490500338FF9 /* show */,
@@ -1885,6 +1937,7 @@
 				1F134E270D0426FD00A46197 /* openexr.so */,
 				1F1DEC3F0D0448C200338FF9 /* show */,
 				1F2BF74F0D04743000CF2E91 /* framebuffer.so */,
+				181574DF0D0CC24E0000B665 /* sdrc2 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2348,6 +2401,22 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		181574DE0D0CC24E0000B665 /* sdrc2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 181574E70D0CC27A0000B665 /* Build configuration list for PBXNativeTarget "sdrc2" */;
+			buildPhases = (
+				181574DC0D0CC24E0000B665 /* Sources */,
+				181574DD0D0CC24E0000B665 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sdrc2;
+			productName = sdrc2;
+			productReference = 181574DF0D0CC24E0000B665 /* sdrc2 */;
+			productType = "com.apple.product-type.tool";
+		};
 		1F134DC60D041F6300A46197 /* gui */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1F134DD10D041F6300A46197 /* Build configuration list for PBXNativeTarget "gui" */;
@@ -2651,6 +2720,7 @@
 				C96A6EE10AD6E0F6003C2D7B /* sdr */,
 				C983E6C10AF2E8FB00648461 /* rndr */,
 				C983E6D10AF2E9C900648461 /* sdrc */,
+				181574DE0D0CC24E0000B665 /* sdrc2 */,
 				C983E6EC0AF2E9FE00648461 /* precomp */,
 				C983E6F50AF2EA3400648461 /* sdrinfo */,
 				1F1DEC320D0448C200338FF9 /* show */,
@@ -2686,11 +2756,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\ncat |make -f - <<EOF\n\n\n\nall: ../../src/ri/lex.dso.cpp ../../src/ri/dso.cpp ../../src/ri/lex.rib.cpp \\\n\t../../src/ri/rib.cpp ../../src/ri/lex.sl.cpp ../../src/ri/sl.cpp \\\n\t../../src/ri/lex.var.cpp ../../src/ri/variable.cpp ../../src/ri/lex.if.cpp \\\n\t../../src/ri/ifexpr.cpp ../../src/sdr/lex.sdr.cpp ../../src/sdr/sdr.cpp \\\n\t../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.cpp\n\n\n\n\n../../src/ri/lex.dso.cpp: ../../src/ri/dso.l\n\tflex -i -Pdso -o../../src/ri/lex.dso.cpp ../../src/ri/dso.l\n\n../../src/ri/dso.cpp: ../../src/ri/dso.y\n\tbison -p dso -o ../../src/ri/dso.cpp ../../src/ri/dso.y\n\n../../src/ri/lex.rib.cpp: ../../src/ri/rib.l\n\tflex -i -Prib -o../../src/ri/lex.rib.cpp ../../src/ri/rib.l\n\n../../src/ri/rib.cpp: ../../src/ri/rib.y\n\tbison -p rib -o ../../src/ri/rib.cpp ../../src/ri/rib.y\n\n../../src/ri/lex.sl.cpp: ../../src/ri/sdr.l\n\tflex -Psl -o../../src/ri/lex.sl.cpp ../../src/ri/sdr.l\n\n../../src/ri/sl.cpp: ../../src/ri/sdr.y\n\tbison -p sl -o ../../src/ri/sl.cpp ../../src/ri/sdr.y\n\n../../src/ri/lex.var.cpp: ../../src/ri/variable.l\n\tflex -Pvar -o../../src/ri/lex.var.cpp ../../src/ri/variable.l\n\n../../src/ri/variable.cpp: ../../src/ri/variable.y\n\tbison -p var -o ../../src/ri/variable.cpp ../../src/ri/variable.y\n\n\n../../src/ri/lex.if.cpp: ../../src/ri/ifexpr.l\n\tflex -Pif -o../../src/ri/lex.if.cpp ../../src/ri/ifexpr.l\n\n../../src/ri/ifexpr.cpp: ../../src/ri/ifexpr.y\n\tbison -p if -o ../../src/ri/ifexpr.cpp ../../src/ri/ifexpr.y\n\n../../src/sdr/lex.sdr.cpp: ../../src/sdr/sdr.l\n\tflex -Psdr -o../../sdr/lex.sdr.cpp ..../src/sdr/sdr.l\n\n../../src/sdr/sdr.cpp: ../../src/sdr/sdr.y\n\tbison -p sdr -o ../../src/sdr/sdr.cpp ../../src/sdr/sdr.y\n\n../../src/sdrc/lex.sl.cpp: ../../src/sdrc/sl.l\n\tflex -Psl -o../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.l\n\n../../src/sdrc/sl.cpp: ../../src/sdrc/sl.y\n\tbison -p sl -o ../../src/sdrc/sl.cpp ../../src/sdrc/sl.y\n\nEOF\n\nexit 0";
+			shellScript = "# shell script goes here\ncat |make -f - <<EOF\n\n\n\nall: ../../src/ri/lex.dso.cpp ../../src/ri/dso.cpp ../../src/ri/lex.rib.cpp \\\n\t../../src/ri/rib.cpp ../../src/ri/lex.sl.cpp ../../src/ri/sl.cpp \\\n\t../../src/ri/lex.var.cpp ../../src/ri/variable.cpp ../../src/ri/lex.if.cpp \\\n\t../../src/ri/ifexpr.cpp ../../src/sdr/lex.sdr.cpp ../../src/sdr/sdr.cpp \\\n\t../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.cpp\n\n\n\n\n../../src/ri/lex.dso.cpp: ../../src/ri/dso.l\n\tflex -i -Pdso -o../../src/ri/lex.dso.cpp ../../src/ri/dso.l\n\n../../src/ri/dso.cpp: ../../src/ri/dso.y\n\tbison -p dso -o ../../src/ri/dso.cpp ../../src/ri/dso.y\n\n../../src/ri/lex.rib.cpp: ../../src/ri/rib.l\n\tflex -i -Prib -o../../src/ri/lex.rib.cpp ../../src/ri/rib.l\n\n../../src/ri/rib.cpp: ../../src/ri/rib.y\n\tbison -p rib -o ../../src/ri/rib.cpp ../../src/ri/rib.y\n\n../../src/ri/lex.sl.cpp: ../../src/ri/sdr.l\n\tflex -Psl -o../../src/ri/lex.sl.cpp ../../src/ri/sdr.l\n\n../../src/ri/sl.cpp: ../../src/ri/sdr.y\n\tbison -p sl -o ../../src/ri/sl.cpp ../../src/ri/sdr.y\n\n../../src/ri/lex.var.cpp: ../../src/ri/variable.l\n\tflex -Pvar -o../../src/ri/lex.var.cpp ../../src/ri/variable.l\n\n../../src/ri/variable.cpp: ../../src/ri/variable.y\n\tbison -p var -o ../../src/ri/variable.cpp ../../src/ri/variable.y\n\n\n../../src/ri/lex.if.cpp: ../../src/ri/ifexpr.l\n\tflex -Pif -o../../src/ri/lex.if.cpp ../../src/ri/ifexpr.l\n\n../../src/ri/ifexpr.cpp: ../../src/ri/ifexpr.y\n\tbison -p if -o ../../src/ri/ifexpr.cpp ../../src/ri/ifexpr.y\n\n../../src/sdr/lex.sdr.cpp: ../../src/sdr/sdr.l\n\tflex -Psdr -o../../sdr/lex.sdr.cpp ..../src/sdr/sdr.l\n\n../../src/sdr/sdr.cpp: ../../src/sdr/sdr.y\n\tbison -p sdr -o ../../src/sdr/sdr.cpp ../../src/sdr/sdr.y\n\n../../src/sdrc/lex.sl.cpp: ../../src/sdrc/sl.l\n\tflex -Psl -o../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.l\n\n../../src/sdrc/sl.cpp: ../../src/sdrc/sl.y\n\tbison -p sl -o ../../src/sdrc/sl.cpp ../../src/sdrc/sl.y\n\n../../src/sdrc2/lex.sl.cpp: ../../src/sdrc2/sl.l\n\tflex -Psl -o../../src/sdrc2/lex.sl.cpp ../../src/sdrc2/sl.l\n\n../../src/sdrc2/sl.cpp: ../../src/sdrc2/sl.y\n\tbison -p sl -o ../../src/sdrc2/sl.cpp ../../src/sdrc2/sl.y\n\nEOF\n\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		181574DC0D0CC24E0000B665 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				181574F90D0CC3250000B665 /* pp1.c in Sources */,
+				181574FA0D0CC3250000B665 /* pp2.c in Sources */,
+				181574FB0D0CC3250000B665 /* pp3.c in Sources */,
+				181574FC0D0CC3250000B665 /* pp4.c in Sources */,
+				181574FD0D0CC3250000B665 /* pp5.c in Sources */,
+				181574FE0D0CC3250000B665 /* pp6.c in Sources */,
+				181574FF0D0CC3250000B665 /* pp7.c in Sources */,
+				181575000D0CC3250000B665 /* pp8.c in Sources */,
+				181575010D0CC3250000B665 /* sdrc.cpp in Sources */,
+				181575120D0CCAD70000B665 /* opcode.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1F134DCC0D041F6300A46197 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3079,6 +3166,36 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		181574E80D0CC27A0000B665 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = sdrc2;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		181574E90D0CC27A0000B665 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = sdrc2;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		1F134DD20D041F6300A46197 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3550,6 +3667,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		181574E70D0CC27A0000B665 /* Build configuration list for PBXNativeTarget "sdrc2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				181574E80D0CC27A0000B665 /* Debug */,
+				181574E90D0CC27A0000B665 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1F134DD10D041F6300A46197 /* Build configuration list for PBXNativeTarget "gui" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

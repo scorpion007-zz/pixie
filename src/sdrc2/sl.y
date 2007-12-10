@@ -80,6 +80,7 @@
 //////////////////////////////////////////////////////////////////////////
 // Token definitions
 //////////////////////////////////////////////////////////////////////////
+%token			SL_CLASS
 %token			SL_SURFACE										// Shader types
 %token			SL_DISPLACEMENT
 %token			SL_LIGHT
@@ -158,6 +159,8 @@
 %left			SL_EXTERN
 %left			SL_UNIFORM
 %left			SL_VARIABLE
+%left			SL_PUBLIC
+%left			SL_PRIVATE
 %start	slStart
 
 // Rule types
@@ -172,7 +175,22 @@ slStart:
 			{
 			}
 			;
+			
+			// Class access
+slAccessClass:
+			SL_PUBLIC
+			{
+			}
+		|
+			SL_PRIVATE
+			{
+			}
+		|
+			{
+			}
+			;
 
+			// The container class
 slContainerClass:
 			SL_UNIFORM
 			{
@@ -186,7 +204,7 @@ slContainerClass:
 			}
 			;
 
-
+			// The inheritance class
 slInheritanceClass:
 			SL_EXTERN
 			{
@@ -196,6 +214,7 @@ slInheritanceClass:
 			}
 			;
 
+			// The output class
 slOutputClass:
 			SL_OUTPUT
 			{
@@ -205,13 +224,16 @@ slOutputClass:
 			}
 			;
 
-slFloatSpecifier:
+			// The type class
+slTypeClass:
+			SL_VOID
+			{
+			}
+		|
 			SL_FLOAT
 			{
 			}
-			;
-			
-slVectorSpecifier:
+		|
 			SL_COLOR
 			{
 			}
@@ -227,49 +249,82 @@ slVectorSpecifier:
 			SL_POINT
 			{
 			}
-			;
-			
-slMatrixSpecifier:
+		|
 			SL_MATRIX
 			{
 			}
-			;
-			
-slStringSpecifier:
+		|
 			SL_STRING
 			{
 			}
 			;
 			
-			
-			
-slTypeSpecifier:
-			slFloatSpecifier
-			{
-			}
-		|
-			slVectorSpecifier
-			{
-			}
-		|
-			slMatrixSpecifier
-			{
-			}
-		|
-			slStringSpecifier
-			{
-			}
-			;
-
+			// A type decleration
 slTypeDecl:
+			slAccessClass
 			slInheritanceClass
 			slOutputClass
 			slContainerClass
-			slTypeSpecifier
+			slTypeClass
 			{
 			}
 			;
 
+			// An array declaration
+slArrayDecl:
+			SL_OPEN_SQR_PARANTHESIS
+			slAritmeticExpression
+			SL_CLOSE_SQR_PARANTHESIS
+			{
+			}
+		|
+			SL_OPEN_SQR_PARANTHESIS
+			slAritmeticExpression
+			SL_CLOSE_SQR_PARANTHESIS
+			{
+			}
+		|
+			{
+			}
+			;
+
+			// The list of identifiers
+slIdentifiers:
+			SL_IDENTIFIER_VALUE
+			slIdentifiers
+			{
+			}
+		|
+			SL_IDENTIFIER_VALUE
+			{
+			}
+			;
+
+			// Variable init expression
+slVariableInit:
+			SL_EQUAL
+			slAritmeticExpression
+			{
+			}
+		|
+			{
+			}
+			;
+			
+			// Variable declaration
+slVariableDecl:
+			slTypeDecl
+			slIdentifiers
+			slArrayDecl
+			slVariableInit
+			{
+			}
+		
+		
+		
+		
+		
+			
 		////////////////////////////////////////////////
 		//
 		// Shader file description:
@@ -293,111 +348,30 @@ slShader:
 
 		////////////////////////////////////////////////
 		//
-		// A function decleration:
-		// slFunctionReturnType <CFunction_name> (
-		// slFunctionParameterList ) slBlock 
-		// 
+		// A function decleration
 		//
 		////////////////////////////////////////////////
-slFunctionHeader:
-		slTypeDecl
-		SL_IDENTIFIER_VALUE									// Name of the Function
-		SL_OPEN_PARANTHESIS
-		{
-		}
-		|
-		SL_VOID
-		SL_IDENTIFIER_VALUE									// Name of the CFunction
-		SL_OPEN_PARANTHESIS
-		{
-		}
-		;
-
-slFunction:	
-		slFunctionHeader
-		slFunctionParameters							// CFunction Parameter list
+slFunction:
+		slTypeDecl											// The return type
+		SL_IDENTIFIER_VALUE									// The function name
+		SL_OPEN_PARANTHESIS	
+		slFunctionParameters								// List of function parameters
 		SL_CLOSE_PARANTHESIS
-		slBlock
+		slBlock												// The function body
 		{
 		}
 		;
 		
 
 		////////////////////////////////////////////////
-		// CFunction Parameters
-		// No default Parameters
+		// Function parameters
 slFunctionParameters:
-		slFunctionParameter								// Semi colon seperated
+		slVariableDecl
 		SL_SEMI_COLON 
 		slFunctionParameters
 		{
 		}
 	|
-		slFunctionParameter
-		{
-		}
-		;
-
-		////////////////////////////////////////////////
-		// A single parameter definition
-slFunctionParameter:
-		slTypeDecl
-		{
-		} 
-		slFunctionParameterIdentifierList
-		{
-		}
-		|
-		{
-		}
-		;
-
-		////////////////////////////////////////////////
-		// An identifier list for CFunction Parameters
-slFunctionParameterIdentifierList:
-		SL_IDENTIFIER_VALUE							// Default Parameter values are not supported yet
-		{
-		}
-		SL_COMMA
-		slFunctionParameterIdentifierList
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_CLOSE_SQR_PARANTHESIS
-		{
-		}
-		SL_COMMA
-		slFunctionParameterIdentifierList
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
-		SL_CLOSE_SQR_PARANTHESIS
-		{
-		}
-		SL_COMMA
-		slFunctionParameterIdentifierList
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_CLOSE_SQR_PARANTHESIS
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
-		SL_CLOSE_SQR_PARANTHESIS
 		{
 		}
 		;
@@ -409,12 +383,8 @@ slFunctionParameterIdentifierList:
 slMain:	slShaderType							// Type of the shader
 		SL_IDENTIFIER_VALUE						// Name of the shader
 		SL_OPEN_PARANTHESIS
-		{
-		}
 		slShaderParameters						// Shader Parameter list
 		SL_CLOSE_PARANTHESIS
-		{
-		}
 		slBlock
 		{
 		}
@@ -422,7 +392,8 @@ slMain:	slShaderType							// Type of the shader
 
 		////////////////////////////////////////////////
 		// Shader type
-slShaderType:	SL_SURFACE
+slShaderType:	
+		SL_SURFACE
 		{
 		}
 	|
@@ -451,190 +422,26 @@ slShaderType:	SL_SURFACE
 		////////////////////////////////////////////////
 		// Shader Parameters
 slShaderParameters:
-		slShaderParameter 
+		slVariableDecl 
 		SL_SEMI_COLON
 		slShaderParameters
 		{
 		}
 	|
-		slShaderParameter
 		{
 		}
 		;
-
-		/////////////////////////////////////////////////
-		// A single shader Parameter
-slShaderParameter:
-		slTypeDecl
-		{
-		}
-		slShaderParameterIdentifierList
-		{
-		}
-		|
-		{
-		}
-		;
-
-		////////////////////////////////////////////////
-		// Shader Parameter initializer
-slShaderParameterInitializer:
-		SL_EQUAL
-		slAritmeticExpression
-		{
-		}
-		|
-		SL_EQUAL
-		slArrayList
-		{
-		}
-		;
-
-
-slShaderParameterIdentifierToken:
-		SL_IDENTIFIER_VALUE
-		SL_COMMA
-		{
-		}
-		slShaderParameterIdentifierToken
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		{
-		}
-		slShaderParameterInitializer
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
-		SL_CLOSE_SQR_PARANTHESIS
-		SL_COMMA
-		{
-		}
-		slShaderParameterIdentifierToken
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
-		SL_CLOSE_SQR_PARANTHESIS
-		{
-		}
-		slShaderParameterInitializer
-		{
-		}
-
-	|
-		{
-		}
-
-		;
-
-slShaderParameterIdentifierList:
-		slShaderParameterIdentifierToken
-		{
-		}
-	|
-		slShaderParameterIdentifierToken
-		SL_COMMA
-		slShaderParameterIdentifierList
-		{
-		}
-	;
 
 		
 		////////////////////////////////////////////////
 		// A block
 slBlock:
 		SL_OPEN_CRL_PARANTHESIS
-		{
-		}
 		slStatements
 		SL_CLOSE_CRL_PARANTHESIS
 		{
 		}
 		;
-
-		////////////////////////////////////////////////
-		// A statement
-		////////////////////////////////////////////////
-		// Variable declerations in a block
-slVariableDeclerations:
-		slTypeDecl
-		slVariableIdentifierList
-		{
-		}
-		;
-
-		////////////////////////////////////////////////
-		// Variable identifier list
-slVariableInitializer:
-		SL_EQUAL
-		slAritmeticExpression
-		{
-		}
-		|
-		SL_EQUAL
-		slArrayList
-		{
-		}
-		;
-
-slVariableIdentifierList:
-		SL_IDENTIFIER_VALUE
-		{
-		}
-		slVariableIdentifierTail
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		{
-		}
-		slVariableInitializer
-		slVariableIdentifierTail
-		{
-		}
-	|
-		
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
-		SL_CLOSE_SQR_PARANTHESIS
-		{
-		}
-		slVariableIdentifierTail
-		{
-		}
-	|
-		SL_IDENTIFIER_VALUE
-		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
-		SL_CLOSE_SQR_PARANTHESIS
-		{
-		}
-
-		slVariableInitializer
-		slVariableIdentifierTail
-		{
-		}
-		;
-
-slVariableIdentifierTail:
-		SL_COMMA
-		slVariableIdentifierList
-		{
-		}
-	|
-		SL_SEMI_COLON
-		{
-		}
-		;
-
 
 		////////////////////////////////////////////////
 		// A general statement
@@ -796,10 +603,7 @@ slContinueStatement:
 		////////////////////////////////////////////////
 		// Return statement
 slReturnStatement:
-		SL_RETURN 
-		{
-		}
-		slAritmeticExpression SL_SEMI_COLON
+		SL_RETURN slAritmeticExpression SL_SEMI_COLON
 		{
 		}
 	|
@@ -840,8 +644,6 @@ slUnmatchedWhileStatement:
 slAssignmentStatement:
 		SL_IDENTIFIER_VALUE
 		SL_EQUAL
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -851,8 +653,6 @@ slAssignmentStatement:
 		slAritmeticExpression
 		SL_CLOSE_SQR_PARANTHESIS
 		SL_EQUAL
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -863,16 +663,12 @@ slAssignmentStatement:
 slUpdateStatement:
 		SL_IDENTIFIER_VALUE
 		SL_INCREMENT_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
 		|
 		SL_IDENTIFIER_VALUE
 		SL_DECREMENT_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -889,16 +685,12 @@ slUpdateStatement:
 		|
 		SL_IDENTIFIER_VALUE
 		SL_MULTIPLY_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
 		|
 		SL_IDENTIFIER_VALUE
 		SL_DIVIDE_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -908,8 +700,6 @@ slUpdateStatement:
 		slAritmeticExpression
 		SL_CLOSE_SQR_PARANTHESIS
 		SL_INCREMENT_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -919,8 +709,6 @@ slUpdateStatement:
 		slAritmeticExpression
 		SL_CLOSE_SQR_PARANTHESIS
 		SL_DECREMENT_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -946,8 +734,6 @@ slUpdateStatement:
 		slAritmeticExpression
 		SL_CLOSE_SQR_PARANTHESIS
 		SL_MULTIPLY_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -957,8 +743,6 @@ slUpdateStatement:
 		slAritmeticExpression
 		SL_CLOSE_SQR_PARANTHESIS
 		SL_DIVIDE_BY
-		{
-		}
 		slAritmeticExpression
 		{
 		}
@@ -970,6 +754,7 @@ slForStartStatement:
 		SL_FOR
 		{
 		}
+		;
 
 slForStatement:
 		slForStartStatement

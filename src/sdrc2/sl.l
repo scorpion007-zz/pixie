@@ -1,6 +1,7 @@
 %option never-interactive
 %option noyywrap
 %%
+class											return SL_CLASS;
 surface											return SL_SURFACE;
 displacement									return SL_DISPLACEMENT;
 light											return SL_LIGHT;
@@ -26,6 +27,8 @@ else											return SL_ELSE;
 break											return SL_BREAK;
 uniform											return SL_UNIFORM;
 varying											return SL_VARIABLE;
+private											return SL_PRIVATE;
+public											return SL_PUBLIC;
 continue										return SL_CONTINUE;
 illuminance										return SL_ILLUMINANCE;
 illuminate										return SL_ILLUMINATE;
