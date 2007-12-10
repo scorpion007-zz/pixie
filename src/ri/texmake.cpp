@@ -932,6 +932,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
+			char			modes[128];
 
 			memBegin(CRenderer::globalMemory);
 
@@ -942,9 +943,12 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 			TIFF	*outHandle	=	TIFFOpen(output,"w");
 			if (output != NULL) {
 				int	dstart	=	0;
+
+				sprintf(modes,"%s,%s",smode,tmode);	
 				
 				// Write out the data
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_SPHERICAL_ENVIRONMENT);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_WRAPMODES,		modes);
 
 				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode,resizeMode);
 				TIFFClose(outHandle);
@@ -987,6 +991,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			RtFilterFunc	filter			=	filt;
 			float			filterWidth		=	fwidth;
 			float			filterHeight	=	fheight;
+			char			modes[128];
 
 			memBegin(CRenderer::globalMemory);
 
@@ -997,8 +1002,12 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 			TIFF	*outHandle	=	TIFFOpen(output,"w");
 			if (output != NULL) {
 				int	dstart	=	0;
-				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_CYLINDER_ENVIRONMENT);
 
+				sprintf(modes,"%s,%s",smode,tmode);
+				
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_CYLINDER_ENVIRONMENT);
+				TIFFSetField(outHandle, TIFFTAG_PIXAR_WRAPMODES,		modes);
+				
 				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode,resizeMode);
 				TIFFClose(outHandle);
 			}
