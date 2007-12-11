@@ -1016,14 +1016,46 @@ RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 	return x*y;
 }
 
-
+#ifdef _WINDOWS
+//
+// Computation of the complementary error function erfc(x).
+//
+// The algorithm is based on a Chebyshev fit as denoted in
+// Numerical Recipes 2nd ed. on p. 214 (W.H.Press et al.).
+//
+// The fractional error is always less than 1.2e-7.
+//
+//
+// The parameters of the Chebyshev fit
+//
+inline double erfc(double x) {
+	const double a1 = -1.26551223, a2 = 1.00002368,
+	a3 = 0.37409196, a4 = 0.09678418,
+	a5 = -0.18628806, a6 = 0.27886807,
+	a7 = -1.13520398, a8 = 1.48851587,
+	a9 = -0.82215223, a10 = 0.17087277;
+	//
+	double v = 1; // The return value
+	double z = fabs(x);
+	//
+	if (z <= 0) return v; // erfc(0)=1
+	//
+	double t = 1/(1+0.5*z);
+	//
+	v = t*exp((-z*z) +a1+t*(a2+t*(a3+t*(a4+t*(a5+t*(a6+t*(a7+t*(a8+t*(a9+t*a10)))))))));
+	//
+	if (x < 0) v = 2-v; // erfc(-x)=2-erfc(x)
+	//
+	return v;
+}
+#endif
 
 
 EXTERN(RtFloat)
 RiGaussianStepFilter(RtFloat _t,RtFloat _edge,RtFloat _w) {
 	const double t = _t,edge = _edge,w = _w;
 	double res = 0.0;
-	
+
 	res = (1.0/2.0)*erfc( (2.0*sqrt(2.0)*(edge-t))/w );
 
 	return (RtFloat) res;
