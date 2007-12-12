@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="IlmImf_d.lib Iex_d.lib Imath_d.lib Half_d.lib IlmThread_d.lib zlibd.lib"
+				AdditionalDependencies="IlmImf_d.lib Iex_d.lib Imath_d.lib Half_d.lib IlmThread_d.lib zlibd.lib common.lib"
 				OutputFile="$(OutDir)/openexr.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"
@@ -156,7 +156,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="IlmImf.lib Iex.lib Imath.lib Half.lib IlmThread.lib zlib.lib"
+				AdditionalDependencies="IlmImf.lib Iex.lib Imath.lib Half.lib IlmThread.lib zlib.lib  common.lib"
 				OutputFile="$(OutDir)/openexr.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"

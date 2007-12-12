@@ -78,7 +78,7 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(), apert
 	for (i=0;i<totalHeight;i++) {
 		cPixel		=	fb[i]		=	 (CPixel *) ralloc(totalWidth*sizeof(CPixel),CRenderer::globalMemory);
 
-		for (j=totalHeight;j>0;j--,cPixel++,cExtraSample+=CRenderer::numExtraSamples) {
+		for (j=totalWidth;j>0;j--,cPixel++,cExtraSample+=CRenderer::numExtraSamples) {
 			cPixel->last.extraSamples	=	cExtraSample;
 			cPixel->first.extraSamples	=	NULL;
 		}
@@ -124,7 +124,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	
 	assert(numFragments == 0);
 
-	zoldStart	=	CRenderer::clipMax;
+	zoldStart			=	CRenderer::clipMax;
 
 	// Set the digits
 	width				=	w;
