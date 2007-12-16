@@ -1480,6 +1480,15 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 				if (sizes[0] > maxmaxSize)	maxmaxSize	=	sizes[0];
 			}
 
+			// Expand the bound by the focal blur amount
+			if (CRenderer::aperture != 0) {
+				const float coc = vertices[9];
+				
+				xbound[0] -= coc;
+				xbound[1] += coc;
+				ybound[0] -= coc;
+				ybound[1] += coc;
+			}
 			
 			bounds[0]	=	(int) floor(xbound[0]);		// xmin
 			bounds[1]	=	(int) floor(xbound[1]);		// xmax
