@@ -146,13 +146,13 @@ protected:
 
 											mulmv(d,cameraToWorld,d);
 											//mulvf(d,0.005f);
-											mulvf(d,0.005f*zoom);
+											mulvf(d,0.005f*zoom*zoom);
 											addvv(position,savedPosition,d);
 										}
 										break;
 									case INTERFACE_MID_BUTTON:
 										{	// Zoom
-											zoom		=	savedZoom - (x-fromZ[0])*0.005f;
+											zoom		=	savedZoom - (x-fromZ[0])*0.005f*savedZoom;
 										}
 										break;
 								}
