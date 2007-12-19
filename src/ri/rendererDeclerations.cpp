@@ -170,9 +170,7 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_ESTIMATOR,			"int");
 	declareVariable(RI_ILLUMINATEFRONT,		"int");
 
-	declareVariable(RI_TRANSMISSION,		"string");		// DEPRECATED: old attribute
-	declareVariable(RI_TRACE		,		"int");			// DEPRECATED: old attribute
-	//declareVariable(RI_TRANSMISSION,		"int");			// to be replaced by this
+	declareVariable(RI_TRANSMISSION,		"int");
 	declareVariable(RI_CAMERA,				"int");
 	declareVariable(RI_SPECULAR,			"int");
 	declareVariable(RI_DIFFUSE,				"int");
