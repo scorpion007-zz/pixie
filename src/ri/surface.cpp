@@ -390,7 +390,7 @@ void	CPatch::dice(CShadingContext *r) {
 				
 				break;
 			}
-
+			
 			// Go again
 			numUprobes	=	udiv+1;
 			numVprobes	=	vdiv+1;
@@ -1809,6 +1809,10 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 		if (uFlat < uAvg && vFlat < vAvg) {
 			flags |= OBJECT_TERMINAL_TESSELATION;
 		}
+	} else {
+		// prevent tesselation beyond a level we could deal with
+		if ((umax-umin)/(4*div) < C_EPSILON) flags |= OBJECT_TERMINAL_TESSELATION;
+		if ((vmax-vmin)/(4*div) < C_EPSILON) flags |= OBJECT_TERMINAL_TESSELATION;
 	}
 	
 	// Simply save the coarse r estimate
