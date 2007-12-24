@@ -224,9 +224,12 @@ DEFOPCODE(Forend3	,"forend"	,0,	FOREND3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 								}																\
 							}
 
-#define	BREAK1EXPR_POST		if (numActive == 0) {												\
-								jmp(lastConditional->forEnd);									\
-							}
+#define	BREAK1EXPR_POST		
+
+// FIXME: this optmization 'breaks' varying breaks!
+//							if (numActive == 0) {												\
+//								jmp(lastConditional->forEnd);									\
+//							}
 
 DEFOPCODE(Break1	,"break"	,1,	BREAK1EXPR_PRE,NULL_EXPR,NULL_EXPR,BREAK1EXPR_POST,0)
 
