@@ -226,7 +226,8 @@ DEFOPCODE(Forend3	,"forend"	,0,	FOREND3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 
 #define	BREAK1EXPR_POST		
 
-// FIXME: this optmization 'breaks' varying breaks!
+// FIXME: this optmization 'breaks' varying breaks! because they need to exit the conditional
+// in which they are defined.  No easy fix
 //							if (numActive == 0) {												\
 //								jmp(lastConditional->forEnd);									\
 //							}
