@@ -127,7 +127,9 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	base->maxSize		=	maxSize;
 	base->variables		=	pl->vertexData();
 	base->variables->attach();
-	base->parameters	=	pl->uniform(0,NULL);
+
+	// defferred to prep()
+	base->parameters	=	NULL;
 	base->vertex		=	NULL;
 }
 
@@ -423,12 +425,12 @@ void	CPoints::prep() {
 			break;
 		} else if (cVar->entry == VARIABLE_CONSTANTWIDTH) {
 			float		*vertex	=	pl->data0 + pl->parameters[i].index;
-
+			
 			vertex[0]			*=	expansion;
 
 			if (pl->data1 != NULL) {
 				vertex	=	pl->data1 + pl->parameters[i].index;
-
+				
 				vertex[0]		*=	expansion;
 			}
 
@@ -450,6 +452,10 @@ void	CPoints::prep() {
 		vertex					+=	vertexSize;
 	}
 
+	// select out the uniforms
+	base->parameters	=	pl->uniform(0,NULL);
+
+	// trash the pl, it's now in the vertex and parameters
 	delete pl;
 	pl							=	NULL;
 
