@@ -227,7 +227,8 @@ void		CRiInterface::RiCoordinateSystem(char * space) {
 void		CRiInterface::RiCoordSysTransform(char * space) {
 }
 
-void		CRiInterface::RiTransformPoints(char * fromspace,char * tospace,int npoints,float points[][3]) {
+RtPoint *		CRiInterface::RiTransformPoints(char * fromspace,char * tospace,int npoints,RtPoint *points) {
+	return NULL;
 }
 
 void		CRiInterface::RiTransformBegin(void) {
