@@ -75,6 +75,10 @@
 #include "displayChannel.h"
 #include "ribOut.h"
 
+// include "isfinite" macro on Windows systems
+#ifdef _WINDOWS && !defined(isfinite)
+#define isfinite(x)	_finite(x)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // The global variables are defined here
@@ -2478,20 +2482,26 @@ void	CRendererContext::RiCoordSysTransform(char *space) {
 	}
 }
 
-void	CRendererContext::RiTransformPoints(char *fromspace,char *tospace,int npoints,float points[][3]) {
+RtPoint *	CRendererContext::RiTransformPoints(char *fromspace,char *tospace,int npoints,RtPoint *points) {
 	const float			*from1,*to1;
 	const float			*from2,*to2;
 	ECoordinateSystem	cSystem1,cSystem2;
-	int					i;
-	vector				tmp;
 
-	CRenderer::findCoordinateSystem(fromspace,from1,to1,cSystem1);
-	CRenderer::findCoordinateSystem(tospace,from2,to2,cSystem2);
+	if (!CRenderer::findCoordinateSystem(fromspace,from1,to1,cSystem1))
+		return NULL;
+	if (!CRenderer::findCoordinateSystem(tospace,from2,to2,cSystem2))
+		return NULL;
 
-	for (i=0;i<npoints;i++) {
-		mulmp(tmp,from1,points[i]);
-		mulmp(points[i],to2,tmp);
-	}
+	matrix tmp;
+	mulmm(tmp, to2, from1);
+	for (int i=0;i<16;i++)
+		if (!isfinite(tmp[i]))
+			return NULL;
+
+	for (int i=0;i<npoints;i++)
+		mulmp(points[i], tmp, points[i]);
+	
+	return points;
 }
 
 void	CRendererContext::RiTransformBegin (void) {

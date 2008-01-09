@@ -424,7 +424,7 @@ EXTERN(RtVoid)
     RiCoordinateSystem (RtToken space),
     RiCoordSysTransform (RtToken space);
 
-EXTERN(void) 
+EXTERN(RtPoint *) 
 	RiTransformPoints (RtToken fromspace, RtToken tospace, RtInt npoints, RtPoint *points);
 
 EXTERN(RtVoid) 

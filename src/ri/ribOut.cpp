@@ -605,8 +605,9 @@ void		CRibOut::RiCoordSysTransform(char * space) {
 	out("CoordSysTransform \"%s\"\n",space);
 }
 
-void		CRibOut::RiTransformPoints(char * fromspace,char * tospace,int npoints,float points[][3]) {
+RtPoint *		CRibOut::RiTransformPoints(char * fromspace,char * tospace,int npoints,RtPoint *points) {
 	errorHandler(RIE_SYSTEM,RIE_ERROR,"Unable to output TransformPoints\n");
+	return NULL;
 }
 
 void		CRibOut::RiTransformBegin(void) {

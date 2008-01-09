@@ -1592,12 +1592,12 @@ RiCoordSysTransform (RtToken space) {
 }
 
 
-EXTERN(void)
+EXTERN(RtPoint *)
 RiTransformPoints (RtToken fromspace, RtToken tospace,
 							RtInt npoints, RtPoint *points) {
-	if (check("RiTransformPoints",RENDERMAN_ALL_BLOCKS)) return;
+	if (check("RiTransformPoints",RENDERMAN_ALL_BLOCKS)) return NULL;
 
-	renderMan->RiTransformPoints(fromspace,tospace,npoints,points);
+	return renderMan->RiTransformPoints(fromspace,tospace,npoints,points);
 }
 
 
