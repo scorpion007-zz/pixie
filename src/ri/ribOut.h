@@ -138,7 +138,7 @@ public:
 	virtual	void		RiCoordinateSystem(char * space);
 	virtual	void		RiCoordSysTransform(char * space);
 
-	virtual	void		RiTransformPoints(char * fromspace,char * tospace,int npoints,float points[][3]);
+	virtual	RtPoint *		RiTransformPoints(char * fromspace,char * tospace,int npoints,RtPoint *points);
 
 	virtual	void		RiTransformBegin(void);
 	virtual	void		RiTransformEnd(void);
