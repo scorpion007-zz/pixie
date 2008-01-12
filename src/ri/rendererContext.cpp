@@ -29,6 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <stdarg.h>
 
@@ -76,7 +77,7 @@
 #include "ribOut.h"
 
 // include "isfinite" macro on Windows systems
-#ifdef _WINDOWS && !defined(isfinite)
+#if defined(_WINDOWS) && (!defined(isfinite))
 #define isfinite(x)	_finite(x)
 #endif
 
