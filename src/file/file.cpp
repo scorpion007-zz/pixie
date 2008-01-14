@@ -69,14 +69,16 @@ public:
 					// If we could not open the file, there's nothing to do
 					if (image == NULL)	return;
 
-					// Get the quantization and gamma correction stuff
+					// Copy the quantization data
+					if ((tmp = (float *) findParameter("quantize",FLOAT_PARAMETER,4))) {
+						qzero			=	tmp[0];
+						qone			=	tmp[1];
+						qmin			=	tmp[2];
+						qmax			=	tmp[3];
+					}
+
+					// Get the gamma correction stuff (only if we're not depth)
 					if (strcmp(samples,"z") != 0) {
-						if ((tmp = (float *) findParameter("quantize",FLOAT_PARAMETER,4))) {
-							qzero			=	tmp[0];
-							qone			=	tmp[1];
-							qmin			=	tmp[2];
-							qmax			=	tmp[3];
-						}
 
 						if ((tmp = (float *) findParameter("dither",FLOAT_PARAMETER,1))) {
 							qamp			=	tmp[0];
