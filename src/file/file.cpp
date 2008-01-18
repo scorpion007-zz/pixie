@@ -93,10 +93,6 @@ public:
 						}
 					} else {
 						// If we're saving the z channel, we must be HDR
-						qmin			=	0;
-						qmax			=	0;
-						qzero			=	0;
-						qone			=	0;
 						qamp			=	0;
 						gamma			=	1;
 						gain			=	1;
