@@ -75,6 +75,11 @@ public:
 						qone			=	tmp[1];
 						qmin			=	tmp[2];
 						qmax			=	tmp[3];
+					} else {
+						qzero			=	0;
+						qone			=	0;
+						qmin			=	0;
+						qmax			=	0;
 					}
 
 					// Get the gamma correction stuff (only if we're not depth)

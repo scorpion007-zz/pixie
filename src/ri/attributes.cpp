@@ -480,7 +480,7 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 	}
 	
 	if ((category == NULL) || (strcmp(category,RI_IDENTIFIER) == 0)) {
-		if (strcmp(name,RI_NAME) == 0)					{	type	=	TYPE_STRING;	value	=	name;	return TRUE;}
+		if (strcmp(name,RI_NAME) == 0)					{	type	=	TYPE_STRING;	value	=	this->name;				return TRUE;}
 	}
 
 	if ((category == NULL) || (strcmp(category,RI_CULL) == 0)) {
