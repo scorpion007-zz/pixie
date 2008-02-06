@@ -79,8 +79,8 @@ inline int atomicDecrement(int32_t *ptr) {
 }
 
 ///////////////////////////////////////////////////////////////
-// GCC (i386)
-#elif defined(__i386__) && defined(__GNUC__)
+// GCC (i386 or x86_64)
+#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 
 inline int atomicIncrement(volatile int *ptr) {
     unsigned char ret;
@@ -106,7 +106,8 @@ inline int atomicDecrement(volatile int *ptr) {
 
 ///////////////////////////////////////////////////////////////
 // GCC (MIPS)
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && defined( __PPC__)
+
 
 inline int atomicIncrement(volatile int *ptr) {
     register int ret;
@@ -140,6 +141,7 @@ inline int atomicDecrement(volatile int *ptr) {
 
 
 #define	ATOMIC_UNSUPPORTED
+#warning Atomic Instructions are not supported on this platform, defaulting to generic implementation
 
 // Have a cross platform solution here
 inline int atomicIncrement(volatile int *ptr) {
