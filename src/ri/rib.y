@@ -2401,6 +2401,49 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						}
 					}
 				}
+				|
+				RIB_SUBDIVISION_MESH
+				RIB_TEXT
+				ribIntArray
+				ribIntArray
+				ribIntArray
+				ribIntArray
+				ribIntArray
+				ribFloatArray
+				ribPL
+				{
+					// Support for no tags (parsed as int array for arg 5)
+					int		*argi1,*argi2,*argi3,*argi4;
+					char	**args1;
+					float	*argf1;
+					int		numVertices,i,j;
+
+					if (parameterListCheck()) {
+						argi1	=	getInt(0);
+						argi2	=	getInt($3);
+						args1	=	getString(0);
+						argi3	=	getInt($3+$4);
+						argi4	=	getInt($3+$4+$6);
+						argf1	=	getFloat(0);
+
+						if ($5 == 0) {
+							// Count the number of faces / vertices
+							for (i=0,j=0;i<$3;j+=argi1[i],i++);
+
+							for (numVertices=-1,i=0;i<j;i++) {
+								if (argi2[i] > numVertices)	numVertices	=	argi2[i];
+							}
+							numVertices++;
+
+
+							if (sizeCheck(numVertices,numVertices,j,$3)) {
+								RiSubdivisionMeshV($2,$3,argi1,argi2,0,args1,argi3,argi4,argf1,numParameters,tokens,vals);
+							}
+						} else {
+							error(CODE_BADTOKEN,"Subdivision surface expected string array (tags) for argument 5\n");
+						}
+					}
+				}
 				/* REMOVED for non-standard
 				|
 				RIB_SUBDIVISION_MESH
