@@ -80,7 +80,7 @@ inline int atomicDecrement(int32_t *ptr) {
 
 ///////////////////////////////////////////////////////////////
 // GCC (i386 or x86_64)
-#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+#elif (defined(__i386__) && defined(__GNUC__) || defined(__x86_64__)  && defined(__GNUC__))
 
 inline int atomicIncrement(volatile int *ptr) {
     unsigned char ret;

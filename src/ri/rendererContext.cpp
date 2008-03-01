@@ -484,11 +484,13 @@ void	CRendererContext::addObject(CObject *o) {
 // Comments				:
 void	CRendererContext::addInstance(void *d) {
 	CInstance		*cInstance		=	(CInstance *) d;
-	CXform			*cXform			=	getXform(FALSE);
-	CAttributes		*cAttributes	=	getAttributes(FALSE);
+	if (cInstance->objects != NULL) {
+		CXform			*cXform			=	getXform(FALSE);
+		CAttributes		*cAttributes	=	getAttributes(FALSE);
 
-	// Instanciate the instance
-	addObject(new CDelayedInstance(cAttributes,cXform,cInstance->objects));
+		// Instanciate the instance
+		addObject(new CDelayedInstance(cAttributes,cXform,cInstance->objects));
+	}
 }
 
 
