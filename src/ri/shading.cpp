@@ -1170,20 +1170,34 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			surface->execute(this,locals[ACCESSOR_SURFACE]);
 		} else {
 			// No surface shader eh, make up a color
+			
+
+			// Overwrite the colors if not specified by the primitives
+			if (usedParameters & PARAMETER_CS)	{
+				const float		*Cs		=	currentAttributes->surfaceColor;
+				float			*C		=	varying[VARIABLE_CI];
+				for (i=numVertices;i>0;i--,C+=3)	movvv(C,Cs);
+			}
+
+			// Overwrite the opacity if not specified by the primitive
+			if (usedParameters & PARAMETER_OS)	{
+				const float		*Os		=	currentAttributes->surfaceOpacity;
+				float			*O		=	varying[VARIABLE_OI];
+				for (i=numVertices;i>0;i--,O+=3)	movvv(O,Os);
+			}
+
+			// Get the variables
 			float			*C		=	varying[VARIABLE_CI];
-			float			*O		=	varying[VARIABLE_OI];
 			float			*N		=	varying[VARIABLE_N];
 			float			*I		=	varying[VARIABLE_I];
-			const float		*Cs		=	currentAttributes->surfaceColor;
-			const float		*Os		=	currentAttributes->surfaceOpacity;
 
+			// Do a simple dot product shading here
 			for (i=numVertices;i>0;i--) {
 				normalizevf(N);
 				normalizevf(I);
-				mulvf(C,Cs,absf(dotvv(I,N)));
-				movvv(O,Os);
+
+				mulvf(C,absf(dotvv(I,N)));
 				C	+=	3;
-				O	+=	3;
 				N	+=	3;
 				I	+=	3;
 			}

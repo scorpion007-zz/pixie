@@ -222,7 +222,7 @@ void		CTraceLookup::bind(const char *name,int &opIndex,int step,void *data,CShad
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.samples));
 	} else if (strcmp(name,"bias") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.bias));
-	} else if (strcmp(name,"sampleCone") == 0) {
+	} else if (strcmp(name,"samplecone") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.coneAngle));
 	} else if (strcmp(name,"sampleBase") == 0) {
 		add(name,opIndex,step,data,offsetof(CShadingScratch,traceParams.sampleBase));
