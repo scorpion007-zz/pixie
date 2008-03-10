@@ -226,8 +226,6 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 	const float det = dotvv(edge1, pvec);
 
 	if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {
-		if ((det > -C_EPSILON) && (det < C_EPSILON))	return;
-
 		const float	inv_det = 1.0f / det;
 
 		subvv(tvec, cRay->from, vert0);
@@ -253,9 +251,9 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 	} else {
 
 		if ((attributes->flags & ATTRIBUTES_FLAGS_INSIDE) ^ xform->flip) {
-			if (det < C_EPSILON)	return;
+			if (det < 0)	return;
 		} else {
-			if (det > -C_EPSILON)	return;
+			if (det > 0)	return;
 		}
 
 		subvv(tvec, cRay->from, vert0);

@@ -261,8 +261,8 @@ public:
 		static void				dispatch(int,int,int,int,float *);					// Dispatch a window to out devices
 		static void				getDisplayName(char *,const char *,const char *);	// Retrieve the display name
 		static void				endDisplays();										// Shutdown the displays
-		static	RtFilterFunc		getFilter(const char *);						// Get a filter
-		static	RtStepFilterFunc	getStepFilter(const char *);					// Get a filter
+		static RtFilterFunc		getFilter(const char *);							// Get a filter
+		static RtStepFilterFunc	getStepFilter(const char *);						// Get a filter
 
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with declerations (implemented in rendererDeclerations.cpp)

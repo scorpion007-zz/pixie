@@ -44,9 +44,6 @@
 // Return Value			:	-
 // Comments				:
 CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOrder,int numExtraSamp,float *sampDefaults) {
-	int		i;
-	float	*src;
-
 	maxPrimaryRays		=	mr;
 	numExtraChannels	=	0;		// These will be filled in after constuction if needed
 	sampleOrder			=	NULL;
@@ -57,8 +54,8 @@ CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOr
 	numRays				=	0;
 	allSamples			=	new float[numSamples*maxPrimaryRays];
 
-	src					=	allSamples;
-	for (i=0;i<maxPrimaryRays;i++,src+=numSamples) {
+	float	*src		=	allSamples;
+	for (int i=0;i<maxPrimaryRays;i++,src+=numSamples) {
 		rayBase[i].samples	=	src;
 	}
 	
@@ -101,23 +98,22 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 	float		*Ci		=	varying[VARIABLE_CI];
 	float		*Oi		=	varying[VARIABLE_OI];
 	const int	*cOrder	=	sampleOrder;
-	vector		t;
-	int			i,j,l,k = 5;
 
-// FIXME: make this deal with comp and non comp channels properly
+	// FIXME: make this deal with comp and non comp channels properly
 	if (depth == 0) {
+
 		// First hit
-		for (i=0;i<nr;i++,Ci+=3,Oi+=3) {
+		for (int i=0;i<nr;i++,Ci+=3,Oi+=3) {
 			CPrimaryRay	*cRay	=	(CPrimaryRay *) r[i];
 
+			// Is this a matte surface
 			if (cRay->object->attributes->flags & ATTRIBUTES_FLAGS_MATTE) {
 				initv(cRay->color,0);
 				initv(cRay->opacity,0);
 				cRay->ropacity[0]	=	1-Oi[0];
 				cRay->ropacity[1]	=	1-Oi[1];
 				cRay->ropacity[2]	=	1-Oi[2];
-			}
-			else {
+			} else {
 				movvv(cRay->color,Ci);
 				movvv(cRay->opacity,Oi);
 				cRay->ropacity[0]	=	1-Oi[0];
@@ -138,7 +134,8 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 		}
 
 		// Copy the extra samples
-		for (i=0;i<numExtraChannels;i++) {
+		int	k = 5;
+		for (int i=0;i<numExtraChannels;i++) {
 			const int 	outType			= *cOrder++;
 			const int 	channelSamples	= *cOrder++;
 			const float	*s				= varying[outType];
@@ -148,14 +145,14 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 			case 0:
 				break;
 			case 1:
-				for (j=0;j<nr;j++) {
+				for (int j=0;j<nr;j++) {
 					d		=	((CPrimaryRay *) r[j])->samples + k;
 					*d++	=	*s++;
 				}
 				k++;
 				break;
 			case 2:
-				for (j=0;j<nr;j++) {
+				for (int j=0;j<nr;j++) {
 					d		=	((CPrimaryRay *) r[j])->samples + k;
 					*d++	=	*s++;
 					*d++	=	*s++;
@@ -163,7 +160,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 				k	+=	2;
 				break;
 			case 3:
-				for (j=0;j<nr;j++) {
+				for (int j=0;j<nr;j++) {
 					d		=	((CPrimaryRay *) r[j])->samples + k;
 					*d++	=	*s++;
 					*d++	=	*s++;
@@ -172,7 +169,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 				k	+=	3;
 				break;
 			case 4:
-				for (j=0;j<nr;j++) {
+				for (int j=0;j<nr;j++) {
 					d		=	((CPrimaryRay *) r[j])->samples + k;
 					*d++	=	*s++;
 					*d++	=	*s++;
@@ -182,9 +179,9 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 				k	+=	4;
 				break;
 			default:
-				for (j=0;j<nr;j++) {
+				for (int j=0;j<nr;j++) {
 					d		=	((CPrimaryRay *) r[j])->samples + k;
-					for (l=channelSamples;l>0;l--) {
+					for (int l=channelSamples;l>0;l--) {
 						*d++	=	*s++;
 					}
 				}
@@ -193,7 +190,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 		}
 	} else {
 		// Transparency hit
-		for (i=0;i<nr;i++,Ci+=3,Oi+=3) {
+		for (int i=0;i<nr;i++,Ci+=3,Oi+=3) {
 			CPrimaryRay	*cRay		=	(CPrimaryRay *) r[i];
 
 			const	int	transparent	= ( (Oi[0] < CRenderer::opacityThreshold[0]) ||
@@ -205,6 +202,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 				cRay->ropacity[1]	*=	1-Oi[1];
 				cRay->ropacity[2]	*=	1-Oi[2];
 			} else {
+				vector	t;
 				movvv(t,Oi);
 				mulvv(Ci,cRay->ropacity);
 				mulvv(Oi,cRay->ropacity);
@@ -237,10 +235,8 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 // Return Value			:	-
 // Comments				:
 void	CPrimaryBundle::postShade(int nr,CRay **r) {
-	int			i,j;
-
 	if (depth == 0) {
-		for (i=0;i<nr;i++) {
+		for (int i=0;i<nr;i++) {
 			CPrimaryRay	*cRay	=	(CPrimaryRay *) r[i];
 
 			cRay->samples[0]	=	0;
@@ -252,15 +248,15 @@ void	CPrimaryBundle::postShade(int nr,CRay **r) {
 		
 		// zero the extra samples
 		if (numExtraSamples > 0) {
-			for (j=0;j<nr;j++) {
+			for (int j=0;j<nr;j++) {
 				float		*d		=	((CPrimaryRay *) r[j])->samples + 5;
 				const float *src	=	sampleDefaults;
-				for (i=0;i<numExtraSamples;i++)
+				for (int i=0;i<numExtraSamples;i++)
 					*d++ = *src++;
 			}
 		}
 	} else {
-		for (i=0;i<nr;i++) {
+		for (int i=0;i<nr;i++) {
 			CPrimaryRay	*cRay	=	(CPrimaryRay *) r[i];
 
 			movvv(cRay->samples,cRay->color);
@@ -389,11 +385,8 @@ void	CRaytracer::renderingLoop() {
 void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	int				maxShading			=	primaryBundle.maxPrimaryRays;
 	int				i,j;
-	int				k;
-	const int		xoffset				=	(int) ceil((CRenderer::pixelFilterWidth	 - 1)*CRenderer::pixelXsamples*0.5f);
-	const int		yoffset				=	(int) ceil((CRenderer::pixelFilterHeight - 1)*CRenderer::pixelYsamples*0.5f);
-	const int		xsamples			=	xpixels*CRenderer::pixelXsamples + 2*xoffset;
-	const int		ysamples			=	ypixels*CRenderer::pixelYsamples + 2*yoffset;
+	const int		xsamples			=	xpixels*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int		ysamples			=	ypixels*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 	CPrimaryRay		*rays				=	primaryBundle.rayBase;
 	CRay			**rayPointers		=	primaryBundle.rays;
 	CPrimaryRay		*cRay;
@@ -422,8 +415,8 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 
 				for (y=0;y<my;y++) {
 					for (x=0;x<mx;x++) {
-						cRay->x						=	(float) left + (float) (i+x-xoffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invXsamples;	// Center the sample location in the pixel
-						cRay->y						=	(float) top  + (float) (j+y-yoffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invYsamples;
+						cRay->x						=	(float) left + (float) (i+x-CRenderer::xSampleOffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invXsamples;	// Center the sample location in the pixel
+						cRay->y						=	(float) top  + (float) (j+y-CRenderer::ySampleOffset+CRenderer::jitter*(urand()-(float) 0.5) + (float) 0.5)*invYsamples;
 
 						rayPointers[numShading++]	=	cRay;
 						cRay++;
@@ -450,7 +443,7 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 	for (i=0;i<xpixels*ypixels;i++) {
 		const float	invContribution	=	1 / fbContribution[i];
 
-		for (k=0;k<CRenderer::numSamples;k++) {
+		for (int k=0;k<CRenderer::numSamples;k++) {
 			fbPixels[i*CRenderer::numSamples+k]	*=	invContribution;
 		}
 	}
@@ -551,11 +544,13 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 // Return Value			:	-
 // Comments				:
 void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int top,int xpixels,int ypixels) {
-	int				i,j;
-	const int		pw			=	(int) ceil((CRenderer::pixelFilterWidth-1)*0.5f);
-	const int		ph			=	(int) ceil((CRenderer::pixelFilterHeight-1)*0.5f);
+	const int		pw				=	(int) ceil((CRenderer::pixelFilterWidth-1)*0.5f);
+	const int		ph				=	(int) ceil((CRenderer::pixelFilterHeight-1)*0.5f);
+	const int		filterWidth		=	CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
+	const int		filterHeight	=	CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
 
-	for (i=0;i<numShading;i++,samples++) {
+	// Process each sample
+	for (int i=0;i<numShading;i++,samples++) {
 		const float	x			=	samples->x;
 		const float	y			=	samples->y;
 		float		*fbs		=	samples->samples;
@@ -566,15 +561,33 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 		int			pr			=	ix + pw;
 		int			pt			=	iy - ph;
 		int			pb			=	iy + ph;
-		float		cx,cy;
 
 		pl				=	max(pl,left);
 		pt				=	max(pt,top);
 		pr				=	min(pr,left + xpixels - 1);
 		pb				=	min(pb,top + ypixels - 1);
 
-		for (cy=pt + (float) 0.5 - y,pixelY=pt;pixelY<=pb;pixelY++,cy++) {
-			for (cx=pl + (float) 0.5 - x,pixelX=pl;pixelX<=pr;pixelX++,cx++) {
+		/*
+		for (pixelY=pt;pixelY<=pb;pixelY++) {
+			for (pixelX=pl;pixelX<=pr;pixelX++) {
+				const int	px				=	(int) floor(pixelX + 0.5f - x + CRenderer::pixelFilterWidth*0.5f)*filterWidth/CRenderer::pixelFilterWidth;
+				const int	py				=	(int) floor(pixelY + 0.5f - y + CRenderer::pixelFilterHeight*0.5f)*filterWidth/CRenderer::pixelFilterHeight;
+				const float	contribution	=	CRenderer::pixelFilterKernel[py*filterWidth+px];
+				float		*dest			=	&fbPixels[((pixelY-top)*xpixels+pixelX-left)*CRenderer::numSamples];
+				const float	*src			=	fbs;
+
+				assert((top+ypixels) > pixelY);
+				assert((left+xpixels) > pixelX);
+
+				for (int j=CRenderer::numSamples;j>0;j--) {
+					*dest++	+=	(*src++)*contribution;
+				}
+			}
+		}
+		*/
+		float	cx,cy;
+		for (cy=pt + 0.5f - y,pixelY=pt;pixelY<=pb;pixelY++,cy++) {
+			for (cx=pl + 0.5f - x,pixelX=pl;pixelX<=pr;pixelX++,cx++) {
 				const float	contribution	=	CRenderer::pixelFilter(cx,cy,CRenderer::pixelFilterWidth,CRenderer::pixelFilterHeight);
 				float		*dest			=	&fbPixels[((pixelY-top)*xpixels+pixelX-left)*CRenderer::numSamples];
 				const float	*src			=	fbs;
@@ -585,7 +598,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 				// Save the contribution for later normalization
 				fbContribution[((pixelY-top)*xpixels+pixelX-left)]	+=	contribution;
 
-				for (j=CRenderer::numSamples;j>0;j--) {
+				for (int j=CRenderer::numSamples;j>0;j--) {
 					*dest++	+=	(*src++)*contribution;
 				}
 			}
