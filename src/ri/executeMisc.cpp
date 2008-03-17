@@ -860,9 +860,11 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	cRay	=	rayBase		=	(CTransmissionRay *) ralloc(shootStep*sizeof(CTransmissionRay),threadMemory);
 	cRays	=	raysBase	=	(CTransmissionRay **) ralloc(shootStep*sizeof(CTransmissionRay*),threadMemory);
 
+	// We can not be in shadow at this stage
 	assert(inShadow == FALSE);
 
-	inShadow		=	TRUE;					// We're in shadow
+	// We're in shadow
+	inShadow		=	TRUE;
 
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {
