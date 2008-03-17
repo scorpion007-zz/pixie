@@ -20,7 +20,7 @@ light shadowspot ( float intensity = 1;
 		atten *= smoothstep (cos(coneangle), cos(coneangle-conedeltaangle),cosangle);
 
 		if (shadowname != "")
-			atten	*=	(1-shadow(shadowname,Ps,"blur",0.1));
+			atten	*=	(1-shadow(shadowname,Ps));
 
 		Cl = atten * intensity * lightcolor;
 	}

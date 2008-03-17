@@ -59,7 +59,7 @@ varying	vector	temporary_11
 	vufloat            temporary_4 temporary_7
 	if                	temporary_4 #!Label5
 	vufloat            temporary_8 1
-	shadow	("f=SFpSf")  temporary_10  shadowname  0  Ps  "blur"  0.1 
+	shadow	("f=SFp")  temporary_10  shadowname  0  Ps 
 	subff             	temporary_6 temporary_8 temporary_10
 	mulff             	atten atten temporary_6
 #!Label5:
