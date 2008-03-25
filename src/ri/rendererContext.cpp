@@ -1285,7 +1285,7 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 			optionCheckFlag(RI_INHERITATTRIBUTES,options->flags,					OPTIONS_FLAGS_INHERIT_ATTRIBUTES)
 			optionCheck(RI_GRIDSIZE,			options->maxGridSize,				128,100000,int)
 			optionCheck(RI_EYESPLITS,			options->maxEyeSplits,				1,100000,int)
-			optionCheck(RI_TEXTUREMEMORY,		options->maxTextureSize,			0,100000,int)
+			optionCheck(RI_TEXTUREMEMORY,		options->maxTextureSize,			0,(2*1024*1024),int)
 				options->maxTextureSize	*=	1000;								// Convert into bytes
 			optionCheck(RI_BRICKMEMORY,			options->maxBrickSize,				0,100000,int)
 				options->maxBrickSize	*=	1000;								// Convert into bytes
@@ -4694,4 +4694,5 @@ void	CRendererContext::RiError(int code,int severity,char *mes) {
 		}
 	}
 }
+
 

@@ -36,7 +36,7 @@
 class	COpcode {
 public:
 						COpcode();
-		virtual			~Copcode();
+		virtual			~COpcode();
 		
 		virtual	void	exec(int num,void **variables)	=	0;
 };
@@ -52,6 +52,7 @@ public:
 
 
 #endif
+
 
 
 

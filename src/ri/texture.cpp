@@ -428,13 +428,8 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 // Return Value			:	Pointer to the new block
 // Comments				:
 static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
-	
-	cEntry->prev						=	NULL;
-	cEntry->next						=	CRenderer::textureUsedBlocks;
-	if (CRenderer::textureUsedBlocks != NULL)
-		CRenderer::textureUsedBlocks->prev	=	cEntry;
-	CRenderer::textureUsedBlocks		=	cEntry;
 
+	// Fully construct the cEntry before placing it on the list
 	cEntry->data						=	NULL;
 	cEntry->refCount					=	0;
 	cEntry->threadData					=	new CTexBlockThreadData[CRenderer::numThreads];
@@ -448,6 +443,13 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 		cEntry->threadData[i].lastRefNumber		=	0; // FIXME: is this right?
 							// should be CRenderer::textureRefNumber ???
 	}
+	
+	// Place cEntry on list
+	cEntry->prev						=	NULL;
+	cEntry->next						=	CRenderer::textureUsedBlocks;
+	if (CRenderer::textureUsedBlocks != NULL)
+		CRenderer::textureUsedBlocks->prev	=	cEntry;
+	CRenderer::textureUsedBlocks		=	cEntry;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2263,4 +2265,5 @@ void			CRenderer::shutdownTextures() {
 	
 	delete[] CRenderer::textureRefNumber;
 }
+
 

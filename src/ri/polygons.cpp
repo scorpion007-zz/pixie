@@ -415,10 +415,10 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			const int		numFloats	=	variable->numFloats;
 
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
-				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
+				float		*dest	=	pl->parameters[j].resolve(varying,locals);
 
 				if (dest != NULL) {
-				
+					dest += start*numFloats;
 					assert(isAligned64(data + pl->parameters[j].index));
 					
 					const float	*sv0	=	data + pl->parameters[j].index + this->v0*variable->numFloats;
@@ -1975,4 +1975,5 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	
 	osUnlock(mutex);
 }
+
 
