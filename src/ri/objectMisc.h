@@ -194,8 +194,8 @@ inline	void	transform(float *oFrom,float *oDir,const CXform *xform,CRay *ray) {
 		mulmp(tmp[3],xform->next->to,to);
 
 		interpolatev(oFrom,tmp[0],tmp[2],ray->time);
-		interpolatev(tmp[5],tmp[1],tmp[3],ray->time);
-		subvv(oDir,tmp[5],oFrom);
+		interpolatev(tmp[4],tmp[1],tmp[3],ray->time);
+		subvv(oDir,tmp[4],oFrom);
 	} else {
 		vector	to,tmp;
 		addvv(to,ray->from,ray->dir);
