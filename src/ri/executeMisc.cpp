@@ -866,6 +866,9 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	// We're in shadow
 	inShadow		=	TRUE;
 
+	// Are we sampling the motion in the reflections?
+	int		sampleMotion	=	currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
+	
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {
 		const int			numSamples		=	rays->numSamples;
@@ -897,7 +900,8 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 				movvv(cRay->from,from);
 				cRay->t				=	min(rays->maxDist,d) - rays->bias;
 				cRay->tmin			=	rays->bias;
-				cRay->time			=	(urand() + currentSample - 1) * multiplier;
+				if (sampleMotion)	cRay->time	=	(urand() + currentSample - 1) * multiplier;
+				else				cRay->time	=	rays->time;
 				cRay->flags			=	ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE;
 				cRay->dest			=	rays->C;
 				cRay->multiplier	=	multiplier;
@@ -982,6 +986,9 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 		cInteriorRays	=	interiorRaysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
 	}
 	
+	// Are we sampling the motion in the reflections?
+	int		sampleMotion	=	cAttr->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
+	
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {
 		const int			numSamples		=	rays->numSamples;
@@ -1014,7 +1021,8 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 				
 				movvv(cRay->dir,dir);
 				movvv(cRay->from,from);
-				cRay->time			=	(urand() + currentSample - 1) * multiplier;
+				if (sampleMotion)	cRay->time		=	(urand() + currentSample - 1) * multiplier;
+				else				cRay->time		=	rays->time;
 				cRay->t				=	C_INFINITY;
 				cRay->tmin			=	rays->bias;
 				cRay->flags			=	ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;

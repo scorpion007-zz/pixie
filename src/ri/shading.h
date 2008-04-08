@@ -384,6 +384,7 @@ private:
 			vector				P,dPdu,dPdv;		// The ray origin
 			vector				D,dDdu,dDdv;		// The direction (for reflection), the ray target (for transmission)
 			vector				N;					// Surface normal reference to determine interior or exterior
+			float				time;				// Of the sample
 			float				coneAngle;			// The angular spread
 			int					numSamples;			// The number of samples to shoot from this location
 			float				bias;				// The shadow bias

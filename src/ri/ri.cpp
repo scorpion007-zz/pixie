@@ -259,6 +259,7 @@ RtToken		RI_BIAS					=	"bias";
 RtToken		RI_DISPLACEMENTS		=	"displacements";
 RtToken		RI_MAXDIFFUSEDEPTH		=	"maxdiffusedepth";
 RtToken		RI_MAXSPECULARDEPTH		=	"maxspeculardepth";
+RtToken		RI_SAMPLEMOTION			=	"samplemotion";
 
 // Photon attributes
 RtToken		RI_GLOBALMAP			=	"globalmap";
@@ -328,7 +329,6 @@ RtToken		RI_EMIT					=	"emit";
 RtToken		RI_SAMPLESPECTRUM		=	"samplespectrum";
 RtToken		RI_DEPTHFILTER			=	"depthfilter";
 RtToken		RI_RADIANCECACHE		=	"radiancecache";
-RtToken		RI_SAMPLEMOTION			=	"samplemotion";
 
 // IO options
 RtToken		RI_MASKRESOLUTION		=	"maskresolution";

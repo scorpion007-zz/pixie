@@ -120,7 +120,6 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_FALSECOLOR,			"int");
 	declareVariable(RI_EMIT,				"int");
 	declareVariable(RI_SAMPLESPECTRUM,		"int");
-	declareVariable(RI_SAMPLEMOTION,		"int");
 	declareVariable(RI_DEPTHFILTER,			"string");
 
 	declareVariable(RI_MAXDEPTH,			"int");
@@ -158,6 +157,7 @@ void			CRenderer::initDeclerations() {
 	declareVariable(RI_BIAS,				"float");
 	declareVariable(RI_MAXDIFFUSEDEPTH,		"int");
 	declareVariable(RI_MAXSPECULARDEPTH,	"int");
+	declareVariable(RI_SAMPLEMOTION,		"int");
 
 	declareVariable(RI_HANDLE,				"string");
 	declareVariable(RI_FILEMODE,			"string");

@@ -2606,6 +2606,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 				attributeCheck(RI_BIAS,					attributes->bias,							-C_INFINITY,C_INFINITY,float)
 				attributeCheck(RI_MAXDIFFUSEDEPTH,		attributes->maxDiffuseDepth,				0,C_INFINITY,int)
 				attributeCheck(RI_MAXSPECULARDEPTH,		attributes->maxSpecularDepth,				0,C_INFINITY,int)
+				attributeCheckFlag(RI_SAMPLEMOTION,		attributes->flags,							ATTRIBUTES_FLAGS_SAMPLEMOTION)
 				attributeEndCheck
 			}
 		// Check the irradiance cache options

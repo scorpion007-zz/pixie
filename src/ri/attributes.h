@@ -60,6 +60,7 @@ const	unsigned int		ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE		=	1 << 21;	// Perform
 const	unsigned int		ATTRIBUTES_FLAGS_SHADE_HIDDEN				=	1 << 22;	// Shade even if occluded
 const	unsigned int		ATTRIBUTES_FLAGS_SHADE_BACKFACE				=	1 << 23;	// Shade even if backfacing
 const	unsigned int		ATTRIBUTES_FLAGS_DOUBLE_SIDED				=	1 << 24;	// The surface is double sided
+const	unsigned int		ATTRIBUTES_FLAGS_SAMPLEMOTION				=	1 << 25;	// Sample the time in tracing rays
 
 
 // The minimum shading rate

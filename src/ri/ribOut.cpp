@@ -1634,6 +1634,7 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable(RI_BIAS,				"float");
 	declareVariable(RI_MAXDIFFUSEDEPTH,		"int");
 	declareVariable(RI_MAXSPECULARDEPTH,	"int");
+	declareVariable(RI_SAMPLEMOTION,		"int");
 
 	declareVariable(RI_HANDLE,				"string");
 	declareVariable(RI_FILEMODE,			"string");

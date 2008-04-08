@@ -56,6 +56,7 @@
 								const float		*du		=	varying[VARIABLE_DU];				\
 								const float		*dv		=	varying[VARIABLE_DV];				\
 								const float		*N		=	varying[VARIABLE_N];				\
+								const float		*time	=	varying[VARIABLE_TIME];				\
 								int				numRays	=	0;
 
 
@@ -73,6 +74,7 @@
 								rays->bias			=	scratch->traceParams.bias;								\
 								rays->sampleBase	=	scratch->traceParams.sampleBase;						\
 								rays->maxDist		=	scratch->traceParams.maxDist;							\
+								rays->time			=	*time;	\
 								rays++;							\
 								numRays++;
 
@@ -85,7 +87,7 @@
 								dTdu	+=	3;					\
 								dTdv	+=	3;					\
 								N		+=	3;					\
-								du++;	dv++;					\
+								du++;	dv++;	++time;			\
 								plStep();
 
 // Actually compule the transmission color
@@ -117,8 +119,8 @@
 
 #endif
 
-DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(1),VISIBILITYEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
-DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(3),TRANSMISSIONEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV)
+DEFSHORTFUNC(Visibility			,"visibility"			,"f=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(1),VISIBILITYEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV | PARAMETER_TIME)
+DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRANSMISSIONEXPR,TRANSMISSIONEXPR_UPDATE(3),TRANSMISSIONEXPR_POST,PARAMETER_RAYTRACE | PARAMETER_DERIVATIVE | PARAMETER_DU | PARAMETER_DV | PARAMETER_TIME)
 
 
 

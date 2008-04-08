@@ -850,7 +850,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		181574DF0D0CC24E0000B665 /* sdrc2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = sdrc2; path = build/Debug/sdrc2; sourceTree = "<group>"; };
+		181574DF0D0CC24E0000B665 /* sdrc2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrc2; sourceTree = BUILT_PRODUCTS_DIR; };
 		181574EE0D0CC3250000B665 /* pp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = pp.h; path = ../../src/sdrc2/pp.h; sourceTree = SOURCE_ROOT; };
 		181574EF0D0CC3250000B665 /* pp1.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp1.c; path = ../../src/sdrc2/pp1.c; sourceTree = SOURCE_ROOT; };
 		181574F00D0CC3250000B665 /* pp2.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp2.c; path = ../../src/sdrc2/pp2.c; sourceTree = SOURCE_ROOT; };

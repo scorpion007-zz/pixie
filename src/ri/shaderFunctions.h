@@ -1760,6 +1760,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								float			*dDdv		=	dDdu + numVertices*3;								\
 								const float		*du			=	varying[VARIABLE_DU];								\
 								const float		*dv			=	varying[VARIABLE_DV];								\
+								const float		*time		=	varying[VARIABLE_TIME];								\
 								const float		swidth		=	(scratch->textureParams.width == 0 ? scratch->textureParams.swidth : scratch->textureParams.width);	\
 								const float		twidth		=	(scratch->textureParams.width == 0 ? scratch->textureParams.twidth : scratch->textureParams.width);	\
 								operand(3,D,const float *);															\
@@ -1784,6 +1785,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									rays->bias			=	scratch->traceParams.bias;								\
 									rays->sampleBase	=	scratch->traceParams.sampleBase;						\
 									rays->maxDist		=	scratch->traceParams.maxDist;							\
+									rays->time			=	*time;													\
 									++rays;																			\
 									++numRays;																		\
 								} else {																			\
@@ -1810,6 +1812,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 								dDdv		+=	3;																	\
 								++du;																				\
 								++dv;																				\
+								++time;																				\
 								if (tex == NULL) {																	\
 									P		+=	3;																	\
 									N		+=	3;																	\
@@ -1841,8 +1844,8 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 #define	ENVIRONMENTEXPR_POST(__float)
 #endif
 
-DEFSHORTFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(TRUE),ENVIRONMENTEXPR_UPDATE(1),ENVIRONMENTEXPR_POST(TRUE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(FALSE),ENVIRONMENTEXPR_UPDATE(3),ENVIRONMENTEXPR_POST(FALSE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(EnvironmentFloat			,"environment"				,"f=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(TRUE),ENVIRONMENTEXPR_UPDATE(1),ENVIRONMENTEXPR_POST(TRUE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_TIME | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PRE("reflection"),ENVIRONMENTEXPR(FALSE),ENVIRONMENTEXPR_UPDATE(3),ENVIRONMENTEXPR_POST(FALSE),PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DU | PARAMETER_DV | PARAMETER_TIME | PARAMETER_DERIVATIVE)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // shadow	"f=Sfv"
@@ -1882,6 +1885,7 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 									rays->numSamples	=	(int) scratch->traceParams.samples;						\
 									rays->bias			=	scratch->traceParams.bias;								\
 									rays->maxDist		=	scratch->traceParams.maxDist;							\
+									rays->time			=	*time;													\
 									++rays;																			\
 									++numRays;																		\
 								} else {																			\
@@ -1907,6 +1911,7 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 								dDdv		+=	3;																	\
 								++du;																				\
 								++dv;																				\
+								++time;																				\
 								L			+=	3;																	\
 								if (tex == NULL) {																	\
 									dPdu	+=	3;																	\
@@ -1941,8 +1946,8 @@ DEFSHORTFUNC(EnvironmentColor			,"environment"				,"c=SFv!"		,ENVIRONMENTEXPR_PR
 #define	SHADOWEXPR_POST(__float)
 #endif
 
-DEFSHORTFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(TRUE),SHADOWEXPR_UPDATE(1),SHADOWEXPR_POST(TRUE),PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
-DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FALSE),SHADOWEXPR_UPDATE(3),SHADOWEXPR_POST(FALSE),PARAMETER_DU | PARAMETER_DV | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(ShadowFloat			,"shadow"				,"f=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(TRUE),SHADOWEXPR_UPDATE(1),SHADOWEXPR_POST(TRUE),PARAMETER_DU | PARAMETER_DV | PARAMETER_TIME | PARAMETER_DERIVATIVE)
+DEFSHORTFUNC(ShadowColor			,"shadow"				,"c=SFp!"		,SHADOWEXPR_PRE,SHADOWEXPR(FALSE),SHADOWEXPR_UPDATE(3),SHADOWEXPR_POST(FALSE),PARAMETER_DU | PARAMETER_DV | PARAMETER_TIME | PARAMETER_DERIVATIVE)
 
 #undef	ENVIRONMENTEXPR_PRE
 #undef	ENVIRONMENTEXPR
