@@ -867,7 +867,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	inShadow		=	TRUE;
 
 	// Are we sampling the motion in the reflections?
-	int		sampleMotion	=	currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
+	const int	sampleMotion	=	currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
 	
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {
@@ -987,7 +987,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 	}
 	
 	// Are we sampling the motion in the reflections?
-	int		sampleMotion	=	cAttr->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
+	const int	sampleMotion	=	cAttr->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
 	
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {

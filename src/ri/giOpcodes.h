@@ -38,8 +38,11 @@
 							CGatherRay		**rays			=	(CGatherRay **) lastGather->raysStorage;\
 							const float 	temp			=	1 / (float) (lastGather->numSamples);	\
 							const float		*N				=	varying[VARIABLE_N];					\
+							const float		*time			=	varying[VARIABLE_TIME];					\
 							int				numIntRays		=	0;										\
 							int				numExtRays		=	0;										\
+							const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\
+							const int			sampleMotion	=	cAttributes->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;	\
 							for (int i=0;i<numRealVertices;++i) {										\
 								if (tags[i]) {															\
 									++tags[i];															\
@@ -58,7 +61,8 @@
 									raysBase->index	=	i;												\
 									raysBase->tmin	=	raysBase->bias;									\
 									raysBase->t		=	raysBase->maxDist;								\
-									raysBase->time	=	(urand() + lastGather->remainingSamples - 1) * temp;						\
+									if (sampleMotion)	raysBase->time	=	(urand() + lastGather->remainingSamples - 1) * temp;	\
+									else				raysBase->time	=	time[0];					\
 									raysBase->flags	=	ATTRIBUTES_FLAGS_DIFFUSE_VISIBLE | ATTRIBUTES_FLAGS_SPECULAR_VISIBLE;		\
 									raysBase->tags	=	&tags[i];										\
 									if (dotvv(raysBase->dir,N) > 0) {									\
@@ -69,9 +73,9 @@
 								}																		\
 								raysBase++;																\
 								N		+=	3;															\
+								++time;																	\
 							}																			\
 							if ( (numIntRays+numExtRays) > 0 ) {										\
-								const CAttributes	*cAttributes	=	currentShadingState->currentObject->attributes;		\
 								if (numIntRays > 0) {													\
 									lastGather->numRays		=	numIntRays;								\
 									lastGather->rays		=	(CRay **) rays+numRealVertices-numIntRays;	\

@@ -478,7 +478,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			subvv(cRay->dir,to,from);
 			normalizev(cRay->dir);
 
-			cRay->time			=	urand();
+			cRay->time			=	((CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION) ? urand() : 0);
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;
@@ -502,7 +502,7 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 			subvv(cRay->dir,to,from);
 			normalizev(cRay->dir);
 
-			cRay->time			=	urand();
+			cRay->time			=	((CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION) ? urand() : 0);
 			cRay->t				=	C_INFINITY;
 			cRay->flags			=	ATTRIBUTES_FLAGS_PRIMARY_VISIBLE;
 			cRay->tmin			=	0;
@@ -570,8 +570,8 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 		/*
 		for (pixelY=pt;pixelY<=pb;pixelY++) {
 			for (pixelX=pl;pixelX<=pr;pixelX++) {
-				const int	px				=	(int) floor(pixelX + 0.5f - x + CRenderer::pixelFilterWidth*0.5f)*filterWidth/CRenderer::pixelFilterWidth;
-				const int	py				=	(int) floor(pixelY + 0.5f - y + CRenderer::pixelFilterHeight*0.5f)*filterWidth/CRenderer::pixelFilterHeight;
+				const int	px				=	(int) floor((x - (pixelX + 0.5f))*filterWidth) + filterWidth>>1;
+				const int	py				=	(int) floor((y - (pixelY + 0.5f))*filterWidth) + filterHeight>>1;
 				const float	contribution	=	CRenderer::pixelFilterKernel[py*filterWidth+px];
 				float		*dest			=	&fbPixels[((pixelY-top)*xpixels+pixelX-left)*CRenderer::numSamples];
 				const float	*src			=	fbs;
@@ -585,6 +585,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 			}
 		}
 		*/
+
 		float	cx,cy;
 		for (cy=pt + 0.5f - y,pixelY=pt;pixelY<=pb;pixelY++,cy++) {
 			for (cx=pl + 0.5f - x,pixelX=pl;pixelX<=pr;pixelX++,cx++) {
@@ -598,6 +599,7 @@ void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int t
 				// Save the contribution for later normalization
 				fbContribution[((pixelY-top)*xpixels+pixelX-left)]	+=	contribution;
 
+				// Accumulate the pixel filter results
 				for (int j=CRenderer::numSamples;j>0;j--) {
 					*dest++	+=	(*src++)*contribution;
 				}

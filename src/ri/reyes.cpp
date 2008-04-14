@@ -1168,7 +1168,6 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 		movvv(d+6,O);
 	}
 
-
 	// Do the extra samples
 	k	=	disp + 10;
 	for (i=0;i<CRenderer::numExtraChannels;i++) {
