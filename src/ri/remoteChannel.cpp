@@ -445,6 +445,9 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	uint64_t sz = curPos - lastPosition;
 	rcSend(s,&sz,sizeof(uint64_t));
 	
+	// Reset the sz because we may have overwritten it
+	sz = curPos - lastPosition;
+	
 	// send the tile data
 	char buf[NETWORK_BUFFER_LENGTH];
 	while(sz > 0){

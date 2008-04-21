@@ -317,7 +317,7 @@ void		CRenderer::serverThread(void *w) {
 
 			// Receive the result
 			rcRecv(netServers[index],&header,5*sizeof(T32));		// Receive the response header
-			rcSend(netServers[index],&netBuffer,1*sizeof(T32));	// Echo the message back
+			rcSend(netServers[index],&netBuffer,1*sizeof(T32));		// Echo the message back
 
 			buffer					=	new float[header[4].integer];
 																			// Receive the framebuffer
