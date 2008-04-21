@@ -439,7 +439,7 @@ CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,in
 // Return Value			:	success or failure
 // Comments				:	
 int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
-	// record current position, seek back to tile start
+	// Record current position, seek back to tile start
 	uint64_t curPos = ftell(tsmFile);
 	fseek(tsmFile,lastPosition,SEEK_SET);
 	uint64_t sz = curPos - lastPosition;
@@ -448,7 +448,7 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	// Reset the sz because we may have overwritten it
 	sz = curPos - lastPosition;
 	
-	// send the tile data
+	// Send the tile data
 	char buf[NETWORK_BUFFER_LENGTH];
 	while(sz > 0){
 		int nn = (int) ((sz>(NETWORK_BUFFER_LENGTH)) ? (NETWORK_BUFFER_LENGTH) : sz);
@@ -456,13 +456,23 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 		rcSend(s,buf,nn,FALSE);
 		sz -= nn;
 	}
+	
+	/* FIXME: Old code, remove after verification
 	uint64_t newPos = ftell(tsmFile);
 	if(newPos != curPos) {
 		fseek(tsmFile,(long) curPos,SEEK_SET);
 		error(CODE_BUG,"Error reading tsm file.\n");
 	}
+	*/
+	
+	// Overwrite the last position
 	lastPosition = (long) curPos;
 	
+	// Seek back to the saved position (why is this necessary?)
+	assert(ftell(tsmFile) == curPos);
+	fseek(tsmFile,curPos,SEEK_SET);
+	
+	// Good to go
 	return TRUE;
 }
 
