@@ -140,7 +140,7 @@ AC_ARG_WITH(fltk-config,[  --with-fltk-config=PATH Specify which fltk-config to 
 AC_ARG_ENABLE(static-fltk,[  --enable-static-fltk Specify whether to link fltk statically (optional)], STATIC_FLTK=true,STATIC_FLTK=false)
 
   if test x$FLTK_CONFIG != xno ; then
-  	if test x$STATIC_FLTK != xno ; then
+  	if test x$STATIC_FLTK != xtrue ; then
   	    FLTK_CXXFLAGS="`$FLTK_CONFIG --use-gl --cxxflags`"
     	FLTK_LDFLAGS="`$FLTK_CONFIG --use-gl --ldstaticflags`"
   	else
