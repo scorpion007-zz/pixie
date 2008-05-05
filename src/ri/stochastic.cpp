@@ -560,7 +560,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				// Q: Why not just use zold?
 				// A: It doesn't take account of transparent samples
 				
-				for (cSample=cSample->next;cSample!=NULL;) {
+				for (;cSample!=NULL;cSample=cSample->next) {
 					const float *opacity	= cSample->opacity;
 	
 					if (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0) {
