@@ -155,7 +155,6 @@ void	CSubdivision::projectVertices(float *fvertex,float *vertexData,int disp) {
 // Return Value			:	-
 // Comments				:
 void		CSubdivision::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int					i,j,k,t;
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
 	const int			vertexSize				=	this->vertexData->vertexSize;
@@ -186,10 +185,10 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 
 			interpolate				=	vertexData;
 
-			for (i=numVertices;i>0;i--) {
+			for (int i=numVertices;i>0;--i) {
 				const float ctime		=	*time++;
 
-				for (j=0;j<vertexDataStep;j++) {
+				for (int j=0;j<vertexDataStep;++j) {
 					*interpolate++	=	vertex0[j]*(1-ctime) + vertex1[j]*ctime;
 				}
 			}
@@ -203,41 +202,38 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 
 
 	{	// Do the vertices
-		float	*intr	=	(float *) alloca(numVertices*vertexSize*sizeof(float));
-		float	*tmp	=	intr;
-		//float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
-		//float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-		float	*dPdu	=	varying[VARIABLE_DPDV] + start*3;
-		float	*dPdv	=	varying[VARIABLE_DPDU] + start*3;
-		float	*N		=	varying[VARIABLE_NG] + start*3;
+		float	*intr		=	(float *) alloca(numVertices*vertexSize*sizeof(float));
+		float	*tmp		=	intr;
+		//float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
+		//float	*dPdv		=	varying[VARIABLE_DPDV] + start*3;
+		float	*dPdu		=	varying[VARIABLE_DPDV] + start*3;
+		float	*dPdv		=	varying[VARIABLE_DPDU] + start*3;
+		float	*dPdtime	=	varying[VARIABLE_DPDTIME] + start*3;
+		float	*N			=	varying[VARIABLE_NG] + start*3;
 
 		// Init the interpolate
-		for (i=0;i<numVertices*vertexSize;i++) {
+		for (int i=0;i<numVertices*vertexSize;++i) {
 			intr[i]	=	0;
 		}
 
-		// FIXME: This definition of real is temporary. After profiling, remove it
-#define	real	double
-
-		for (i=0;i<numVertices;i++) {
-			real	cu	=	v[i];
-			real	cv	=	u[i];
-			real	pow2;
-			int		n;
-			real	u2;
-			real	u3;
-			real	v2;
-			real	v3;
-			real	normalScale;
+		for (int i=0;i<numVertices;++i) {
+			double	cu	=	v[i];
+			double	cv	=	u[i];
+			int		k,n;
+			double	u2;
+			double	u3;
+			double	v2;
+			double	v3;
+			double	normalScale;
 
 			if ((cu == 0) && (cv == 0)) {
 				n		=	/*10*/24;
 			} else {
-				n		=		(int)  floor(min(-log(cu),-log(cv))/log(2.0))+1;
+				n		=	(int)  floor(min(-log(cu),-log(cv))/log(2.0))+1;
 				if (n <= 0)	n	=	1;	// Need at least one subdivision
 			}
 
-			pow2	=		(real) (1 << (n-1));
+			const double pow2	=		(1 << (n-1));
 			cu		*=		pow2;
 			cv		*=		pow2;
 			if (cv < 0.5) {
@@ -255,6 +251,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 			}
 			initv(dPdu,0,0,0);
 			initv(dPdv,0,0,0);
+			initv(dPdtime,0,0,0);
 			initv(N,0,0,0);
 
 			u2			=	cu*cu;
@@ -263,12 +260,11 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 			v3			=	v2*cv;
 			normalScale	=	pow2*2;
 
-			for (j=0;j<K;j++) {
-				float	*Psrc;
-				real	coef,ducoef,dvcoef;
-				real	p;
-				real	t0,t1,t2,t3;
-				float	*coefs	=	cBasis->basis[k]+j*16;
+			for (int j=0;j<K;++j) {
+				double		coef,ducoef,dvcoef;
+				double		p;
+				double		t0,t1,t2,t3;
+				const float	*coefs	=	cBasis->basis[k]+j*16;
 
 				t0				=	coefs[0]*v3		+ coefs[1]*v2	+ coefs[2]*cv		+ coefs[3];
 				t1				=	coefs[4]*v3		+ coefs[5]*v2	+ coefs[6]*cv		+ coefs[7];
@@ -285,25 +281,38 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 
 				dvcoef			=	u3*t0 + u2*t1 + cu*t2 + t3;
 
-				p				=	(real) pow(cBasis->evals[j],n-1);
+				p				=	pow(cBasis->evals[j],n-1);
 
 				coef			*=	p;
 				ducoef			*=	p*normalScale;
 				dvcoef			*=	p*normalScale;
 			
 
-				Psrc			=	vertexData + j*vertexSize;
+				// This is where we're getting our data
+				const float *Psrc	=	vertexData + j*vertexSize;
 
-				for (t=0;t<vertexSize;t++) {
+				// Compute the vertex data
+				for (int t=0;t<vertexSize;++t) {
 					tmp[t]		+=	(float) (Psrc[t]*coef);
 				}
 
+				// Compute the surface derivatives
 				dPdv[0]			+=	(float) (Psrc[0]*dvcoef);
 				dPdv[1]			+=	(float) (Psrc[1]*dvcoef);
 				dPdv[2]			+=	(float) (Psrc[2]*dvcoef);
 				dPdu[0]			+=	(float) (Psrc[0]*ducoef);
 				dPdu[1]			+=	(float) (Psrc[1]*ducoef);
 				dPdu[2]			+=	(float) (Psrc[2]*ducoef);
+				
+				// Are we moving?
+				if (this->vertexData->moving) {
+					const float	*Psrc0	=	vertex + j*vertexSize;
+					const float	*Psrc1	=	Psrc0 +	K*vertexSize;
+					
+					dPdtime[0]	+=	(float) ((Psrc1[0] - Psrc0[0])*coef);
+					dPdtime[1]	+=	(float) ((Psrc1[1] - Psrc0[1])*coef);
+					dPdtime[2]	+=	(float) ((Psrc1[2] - Psrc0[2])*coef);
+				}
 			}
 
 			//crossvv(N,dPdu,dPdv);
@@ -312,19 +321,19 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 			tmp			+=	vertexSize;
 			dPdu		+=	3;
 			dPdv		+=	3;
+			dPdtime		+=	3;
 			N			+=	3;
 			vertexData	+=	vertexDataStep;
 		}
-
-#undef real
 
 		this->vertexData->dispatch(intr,start,numVertices,varying,locals);
 	}
 
 	// Fix the degenerate normals
-	//normalFix();
-
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | this->vertexData->parameters);
+	normalFix();
+	
+	// Turn off the parameters we computed
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | this->vertexData->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////

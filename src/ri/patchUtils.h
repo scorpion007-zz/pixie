@@ -43,9 +43,8 @@ static	dmatrix	dinvBezier		=	{	0,		0,			0,			1.0,
 // This macro is used to fix the degenerate normal vectors
 #define	normalFix()	{																				\
 	float		*Ng	=	varying[VARIABLE_NG];														\
-	int			i;																					\
 																									\
-	for (i=numVertices;i>0;i--,Ng+=3) {																\
+	for (int i=numVertices;i>0;i--,Ng+=3) {															\
 		if (dotvv(Ng,Ng) == 0) {																	\
 			const float	*u		=	varying[VARIABLE_U];											\
 			const float	*v		=	varying[VARIABLE_V];											\

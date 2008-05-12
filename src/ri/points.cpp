@@ -312,37 +312,48 @@ void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,u
 	CVertexData		*variables	=	base->variables;
 	const int		vertexSize	=	variables->vertexSize;
 	float			*vertexData	=	(float *) alloca(numPoints*vertexSize*sizeof(float));
-	int				i;
 	float			*vertexBase	=	vertexData;
 
 	assert(numVertices == numPoints);
 	assert(start == 0);
 
 	if ((variables->moving) && (usedParameters & PARAMETER_END_SAMPLE)) {
-		for (i=0;i<numPoints;i++) {
-			const float	*cP			=	points[i] + vertexSize;
+		for (int i=0;i<numPoints;++i) {
+			const float	*cP		=	points[i] + vertexSize;
 			memcpy(vertexData,cP,vertexSize*sizeof(float));
 			vertexData			+=	vertexSize;
 		}
 	} else {
-		for (i=0;i<numPoints;i++) {
-			const float	*cP			=	points[i];
+		for (int i=0;i<numPoints;++i) {
+			const float	*cP		=	points[i];
 			memcpy(vertexData,cP,vertexSize*sizeof(float));
 			vertexData			+=	vertexSize;
 		}
 	}
 
+	// Compute the normal vector
 	if (usedParameters & PARAMETER_NG) {
 		float	*N	=	varying[VARIABLE_NG];
 
-		for (i=numPoints;i>0;i--,N+=3) {
-			initv(N,0,0,-1);
+		for (int i=numPoints;i>0;--i,N+=3)	initv(N,0,0,-1);
+	}
+	
+	// Compute dPdtime
+	if (usedParameters & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME];
+		
+		// Do we have motion?
+		if (variables->moving) {
+			for (int i=0;i<numPoints;++i)	subvv(dest,points[i]+vertexSize,points[i]);
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numPoints;++i)	initv(dest,0,0,0);
 		}
 	}
 
 	variables->dispatch(vertexBase,0,numPoints,varying,locals);
 
-	usedParameters	&=	~(PARAMETER_NG | variables->parameters);
+	usedParameters	&=	~(PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
 
 

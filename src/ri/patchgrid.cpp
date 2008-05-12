@@ -212,7 +212,6 @@ CPatchGrid::~CPatchGrid() {
 // Return Value			:	-
 // Comments				:
 void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int					i,j;
 	const float			*u						=	varying[VARIABLE_U]+start;
 	const float			*v						=	varying[VARIABLE_V]+start;
 	const int			vertexSize				=	variables->vertexSize;
@@ -242,10 +241,10 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 
 			interpolate				=	vertexData;
 
-			for (i=numVertices;i>0;i--) {
+			for (int i=numVertices;i>0;--i) {
 				const double ctime	=	*time++;
 
-				for (j=0;j<vertexDataStep;j++) {
+				for (int j=0;j<vertexDataStep;++j) {
 					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
@@ -261,7 +260,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 		const float	vm		=	(float) (nv - 1);
 
 		// Interpolate the vertices
-		for (i=0;i<numVertices;i++) {
+		for (int i=0;i<numVertices;--i) {
 			const	double	cu		=	u[i] * (nu - 1.0);
 			const	double	cv		=	v[i] * (nv - 1.0);
 			const	int		x		=	(int) floor(min(cu,(nu-2)));
@@ -272,14 +271,13 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			const	float	*d3		=	vertexData + ((y+2)*(nu+2) + x+2)*vertexSize;
 			const	double	xoff	=	cu - x;
 			const	double	yoff	=	cv - y;
-			int		j;
 
 			//assert((xoff >= 0) && (xoff <= 1.001));
 			//assert((yoff >= 0) && (yoff <= 1.001));
 			//assert((x >= 0) && (x < (nu-1)));
 			//assert((y >= 0) && (y < (nv-1)));
 
-			for (j=vertexSize;j>0;j--) {
+			for (int j=vertexSize;j>0;--j) {
 				*intr++	=	(float) (((*d0++)*(1.0-xoff) + (*d1++)*xoff)*(1.0-yoff)  + ((*d2++)*(1.0-xoff) + (*d3++)*xoff)*yoff);
 			}
 
@@ -307,7 +305,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			const	float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
 			const	float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=numVertices;i>0;i--) {
+			for (int i=numVertices;i>0;--i) {
 				crossvv(N,dPdu,dPdv);
 				N		+=	3;
 				dPdu	+=	3;
@@ -315,10 +313,47 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			}
 		}
 
+		// Commit these variables
 		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (variables->moving) {
+			assert(u == varying[VARIABLE_U] + start);
+			assert(v == varying[VARIABLE_V] + start);
+			const int disp	=	vertexSize*(nu+2)*(nv+2);
+			
+			// Interpolate the thing
+			for (int i=0;i<numVertices;++i,dest+=3) {
+				const	float	cu		=	u[i] * (nu - 1.0f);
+				const	float	cv		=	v[i] * (nv - 1.0f);
+				const	int		x		=	(int) floor(min(cu,(nu-2)));
+				const	int		y		=	(int) floor(min(cv,(nv-2)));
+				const	float	*d0		=	vertexData + ((y+1)*(nu+2) + x+1)*vertexSize;
+				const	float	*d1		=	vertexData + ((y+1)*(nu+2) + x+2)*vertexSize;
+				const	float	*d2		=	vertexData + ((y+2)*(nu+2) + x+1)*vertexSize;
+				const	float	*d3		=	vertexData + ((y+2)*(nu+2) + x+2)*vertexSize;
+				const	float	xoff	=	cu - x;
+				const	float	yoff	=	cv - y;
+
+				// Interpolate the thing
+				for (int j=0;j<3;++j) {
+					dest[j]	=	(((d0[disp+j])*(1.0f-xoff) + (d1[disp+j])*xoff)*(1.0f-yoff)  + ((d2[disp+j])*(1.0f-xoff) + (d3[disp+j])*xoff)*yoff) -
+								(((d0[j])*(1.0f-xoff) + (d1[j])*xoff)*(1.0f-yoff)  + ((d2[j])*(1.0f-xoff) + (d3[j])*xoff)*yoff);
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+	
+	// Turn off the parameters we've fixed
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////

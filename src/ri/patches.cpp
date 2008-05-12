@@ -336,7 +336,6 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 // Return Value			:	-
 // Comments				:	-
 void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int				i,j;
 	const float		*u				=	varying[VARIABLE_U]+start;
 	const float		*v				=	varying[VARIABLE_V]+start;
 	const int		vertexSize		=	variables->vertexSize;
@@ -356,18 +355,16 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 		} else {
 			float		*interpolate;
 			const float	*time		=	varying[VARIABLE_TIME] + start;
-			int			j,k;
 			const float	*vertex0	=	vertex;
 			const float	*vertex1	=	vertex + vertexSize*4;
 
 			vertexData		=	(float *) alloca(numVertices*vertexSize*4*sizeof(float));
 			vertexDataStep	=	vertexSize*4;
 			interpolate		=	vertexData;
-			k				=	vertexSize*4;
 
-			for (i=numVertices;i>0;i--) {
+			for (int i=numVertices;i>0;--i) {
 				const double ctime	=	*time++;
-				for (j=0;j<k;j++) {
+				for (int j=0;j<vertexSize*4;++j) {
 					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
@@ -383,11 +380,11 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 		const float	*v3		=	v2 + vertexSize;
 		float		*tmp	=	intr;
 
-		for (i=0;i<numVertices;i++) {
+		for (int i=0;i<numVertices;++i) {
 			const double cu	=	*u++;
 			const double cv	=	*v++;
 
-			for (j=0;j<vertexSize;j++) {
+			for (int j=0;j<vertexSize;++j) {
 				*tmp++	=	(float) ((v0[j]*(1.0 - cu) + v1[j]*cu)*(1.0 - cv)	+
 									 (v2[j]*(1.0 - cu) + v3[j]*cu)*cv);
 			}
@@ -417,7 +414,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 				subvv(dv1,v2,v0);
 				subvv(dv2,v3,v1);
 
-				for (i=0;i<numVertices;i++) {
+				for (int i=0;i<numVertices;++i) {
 					interpolatev(destdu,du1,du2,v[i]);
 					interpolatev(destdv,dv1,dv2,u[i]);
 					crossvv(destn,destdu,destdv);
@@ -431,7 +428,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 				v2		=	v1 + vertexSize;
 				v3		=	v2 + vertexSize;
 
-				for (i=0;i<numVertices;i++) {
+				for (int i=0;i<numVertices;++i) {
 					subvv(du1,v1,v0);
 					subvv(du2,v3,v2);
 					subvv(dv1,v2,v0);
@@ -451,11 +448,40 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 			}
 		}
 	}
+	
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (variables->moving) {
+			const float	*u		=	varying[VARIABLE_U] + start;
+			const float	*v		=	varying[VARIABLE_V] + start;
+			const float	*v0		=	vertex;
+			const float	*v1		=	v0 + vertexSize;
+			const float	*v2		=	v1 + vertexSize;
+			const float	*v3		=	v2 + vertexSize;
+			for (int i=0;i<numVertices;++i,dest+=3) {
+				const double cu	=	*u++;
+				const double cv	=	*v++;
+
+				// Sum over the components
+				for (int j=0;j<3;++j) {
+					const int	k	=	4*vertexSize + j;
+					dest[j]	=	(((v0[k]*(1.0f - cu) + v1[k]*cu)*(1.0 - cv)	+ (v2[k]*(1.0f - cu) + v3[k]*cu)*cv - (v0[j]*(1.0f - cu) + v1[j]*cu)*(1.0 - cv)	+ (v2[j]*(1.0f - cu) + v3[j]*cu)*cv));
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
 
 	// Fix the degenerate normals
 	normalFix();
 
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
+	// Turn off the parameters we computed
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -619,7 +645,6 @@ void	CBicubicPatch::computeVertexData(float *vertex,const float *vertexData,int 
 // Return Value			:	-
 // Comments				:	-
 void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int					i,k;
 	const float			*u					=	varying[VARIABLE_U]+start;
 	const float			*v					=	varying[VARIABLE_V]+start;
 	const int			vertexSize			=	variables->vertexSize;
@@ -641,7 +666,6 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 		} else {
 			float			*interpolate;
 			const float		*time		=	varying[VARIABLE_TIME] + start;
-			int				j;
 			const float		*vertex0	=	vertex;
 			const float		*vertex1	=	vertex + vertexSize*16;
 
@@ -649,10 +673,10 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 			vertexDataStep	=	vertexSize*16;
 			interpolate		=	vertexData;
 
-			for (i=numVertices;i>0;i--) {
+			for (int i=numVertices;i>0;--i) {
 				const double	ctime	=	*time++;
 
-				for (j=0;j<vertexDataStep;j++) {
+				for (int j=0;j<vertexDataStep;++j) {
 					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
@@ -668,8 +692,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 		float	*N			=	varying[VARIABLE_NG] + start*3;
 
 		// Interpolate the vertices
-		for (i=0,k=0;i<numVertices;i++) {
-			int				j;
+		for (int i=0;i<numVertices;++i) {
 			double			tmp1[4],tmp2[4];
 			const double	cu			=	u[i];
 			const double 	cv			=	v[i];
@@ -677,25 +700,26 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 			const double	ucubed		=	cu*usquared;
 			const double	vsquared	=	cv*cv;
 			const double	vcubed		=	cv*vsquared;
+			int				j;
 
-			for (data=vertexData,j=0;j<3;j++) {
-				for (int t=0;t<4;t++) {
+			for (data=vertexData,j=0;j<3;++j) {
+				for (int t=0;t<4;++t) {
 					tmp2[t]	=	3*vsquared*data[element(0,t)] + 2*cv*data[element(1,t)]     + data[element(2,t)];
 					tmp1[t]	=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
 				}
 
 				dPdv[j]			=	(float) (tmp2[0]*ucubed + tmp2[1]*usquared + tmp2[2]*cu + tmp2[3]);
 				dPdu[j]			=	(float) (tmp1[0]*3*usquared + tmp1[1]*2*cu + tmp1[2]);
-				intr[k++]		=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
+				*intr++			=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
 				data			+=	16;
 			}
 
-			for (;j<vertexSize;j++) {
+			for (;j<vertexSize;++j) {
 				for (int t=0;t<4;t++) {
 					tmp1[t]		=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
 				}
 
-				intr[k++]		=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
+				*intr++			=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
 				data			+=	16;
 			}
 
@@ -706,6 +730,9 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 			dPdv			+=	3;
 			N				+=	3;
 		}
+		
+		// Sanity check
+		assert(intr == intrStart + numVertices*vertexSize);
 
 		// Note: make the common case fast: We're computing NG,DPDU and DPDV even if it's not required.
 		// Most of the time though, surface normal is required
@@ -714,10 +741,49 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (variables->moving) {
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			const int	disp	=	vertexSize*16;
+			for (int i=0;i<numVertices;++i,dest+=3) {
+				int				j;
+				double			tmpStart[4],tmpEnd[4];
+				const double	cu			=	u[i];
+				const double 	cv			=	v[i];
+				const double	usquared	=	cu*cu;
+				const double	ucubed		=	cu*usquared;
+				const double	vsquared	=	cv*cv;
+				const double	vcubed		=	cv*vsquared;
+				float			*data;
+
+				// For each component
+				for (data=vertex,j=0;j<3;j++,data+=16) {
+				
+					// Do the partial computation
+					for (int t=0;t<4;t++) {
+						tmpStart[t]	=	  vcubed*  data[element(0,t)]			+ vsquared*data[element(1,t)]			+ cv*data[element(2,t)]			+ data[element(3,t)];
+						tmpEnd[t]	=	  vcubed*  data[disp + element(0,t)]	+ vsquared*data[disp + element(1,t)]	+ cv*data[disp + element(2,t)]	+ data[disp + element(3,t)];
+					}
+
+					// Compute the result
+					dest[j]			=	(float) ((tmpEnd[0]*ucubed + tmpEnd[1]*usquared + tmpEnd[2]*cu + tmpEnd[3]) - (tmpStart[0]*ucubed + tmpStart[1]*usquared + tmpStart[2]*cu + tmpStart[3]));
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+	
 	// Fix the degenerate normals
 	normalFix();
 
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -880,7 +946,6 @@ void	CNURBSPatch::precomputeVertexData(double *vertex,const double *uCoefficient
 // Return Value			:	-
 // Comments				:	-
 void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int					i;
 	const float			*u			=	varying[VARIABLE_U]+start;
 	const float			*v			=	varying[VARIABLE_V]+start;
 	int					vertexSize	=	variables->vertexSize;
@@ -900,7 +965,6 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		} else {
 			double			*interpolate;
 			const float		*time		=	varying[VARIABLE_TIME] + start;
-			int				j;
 			const double	*vertex0	=	vertex;
 			const double	*vertex1	=	vertex + vertexSize*uOrder*vOrder;
 
@@ -908,9 +972,9 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			vertexDataStep	=	vertexSize*uOrder*vOrder;
 			interpolate		=	vertexData;
 
-			for (i=numVertices;i>0;i--) {
+			for (int i=numVertices;i>0;--i) {
 				const double ctime	=	*time++;
-				for (j=0;j<vertexDataStep;j++) {
+				for (int j=0;j<vertexDataStep;++j) {
 					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
@@ -926,7 +990,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		float	*vertexStart;
 		double	pdu[4];
 		double	pdv[4];
-
+		
 #define computeNURBS(UORDER,VORDER) {																\
 		double	*memBase		=	(double *) alloca((UORDER*3 + VORDER*3)*sizeof(double));		\
 		double	*uPowers		=	memBase;														\
@@ -934,37 +998,37 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		double	*duPowers		=	vPowers + VORDER;												\
 		double	*dvPowers		=	duPowers + UORDER;												\
 																									\
-		for (i=0;i<numVertices;i++) {																\
-			int				j,t,var;																\
+		for (int i=0;i<numVertices;++i) {															\
 			double			denominator;															\
 			const double	cu	=	u[i]*uMult + uOrg;												\
 			const double	cv	=	v[i]*vMult + vOrg;												\
 																									\
 			uPowers[0]		=	1;																	\
 			duPowers[0]		=	0;																	\
-			for (j=1;j<UORDER;j++) {																\
+			for (int j=1;j<UORDER;++j) {															\
 				uPowers[j]	=	cu*uPowers[j-1];													\
 				duPowers[j]	=	j*uPowers[j-1];														\
 			}																						\
 																									\
 			vPowers[0]		=	1;																	\
 			dvPowers[0]		=	0;																	\
-			for (j=1;j<VORDER;j++) {																\
+			for (int j=1;j<VORDER;++j) {															\
 				vPowers[j]	=	cv*vPowers[j-1];													\
 				dvPowers[j]	=	j*vPowers[j-1];														\
 			}																						\
 																									\
 			const double *cVertex	=	vertexData;													\
 			vertexStart		=	intr;																\
-			for (var=0;var<4;var++) {																\
+			int	var;																				\
+			for (var=0;var<4;++var) {																\
 				denominator		=	0;																\
 				pdu[var]		=	0;																\
 				pdv[var]		=	0;																\
-				for (j=0;j<UORDER;j++) {															\
+				for (int j=0;j<UORDER;++j) {														\
 					double	tmp		=	0;															\
 					double	tmpdv	=	0;															\
 																									\
-					for (t=0;t<VORDER;t++,cVertex++) {												\
+					for (int t=0;t<VORDER;++t,++cVertex) {											\
 						tmp		+=	(*cVertex)*vPowers[t];											\
 						tmpdv	+=	(*cVertex)*dvPowers[t];											\
 					}																				\
@@ -976,12 +1040,12 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 				*intr++	=	(float) denominator;													\
 			}																						\
 																									\
-			for (;var<vertexSize;var++) {															\
+			for (;var<vertexSize;++var) {															\
 				double	res	=	0;																	\
-				for (j=0;j<UORDER;j++) {															\
+				for (int j=0;j<UORDER;++j) {														\
 					double	tmp	=	0;																\
 																									\
-					for (t=0;t<VORDER;t++) {														\
+					for (int t=0;t<VORDER;++t) {													\
 						tmp		+=	(*cVertex++)*vPowers[t];										\
 					}																				\
 																									\
@@ -1003,7 +1067,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			crossvv(N,dPdu,dPdv);																	\
 																									\
 			const double	invD	=	1 / (denominator);											\
-			for (var=0;var<vertexSize;var++) {														\
+			for (var=0;var<vertexSize;++var) {														\
 				vertexStart[var]	=	(float) (vertexStart[var]*invD);							\
 			}																						\
 																									\
@@ -1014,121 +1078,63 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		}																							\
 		}
 
-		switch(uOrder) {
-		case 0:
-			assert(FALSE);
-			break;
-		case 1:
-			assert(FALSE);
-			break;
-		case 2:
-			switch(vOrder) {
-			case 0:
-				assert(FALSE);
-				break;
-			case 1:
-				assert(FALSE);
-				break;
-			case 2:
-				computeNURBS(2,2);
-				break;
-			case 3:
-				computeNURBS(2,3);
-				break;
-			case 4:
-				computeNURBS(2,4);
-				break;
-			case 5:
-				computeNURBS(2,5);
-				break;
-			default:
-				computeNURBS(uOrder,vOrder);
-				break;
-			}
-			break;
-		case 3:
-			switch(vOrder) {
-			case 0:
-				assert(FALSE);
-				break;
-			case 1:
-				assert(FALSE);
-				break;
-			case 2:
-				computeNURBS(3,2);
-				break;
-			case 3:
-				computeNURBS(3,3);
-				break;
-			case 4:
-				computeNURBS(3,4);
-				break;
-			case 5:
-				computeNURBS(3,5);
-				break;
-			default:
-				computeNURBS(uOrder,vOrder);
-				break;
-			}
-			break;
-		case 4:
-			switch(vOrder) {
-			case 0:
-				assert(FALSE);
-				break;
-			case 1:
-				assert(FALSE);
-				break;
-			case 2:
-				computeNURBS(4,2);
-				break;
-			case 3:
-				computeNURBS(4,3);
-				break;
-			case 4:
-				computeNURBS(4,4);
-				break;
-			case 5:
-				computeNURBS(4,5);
-				break;
-			default:
-				computeNURBS(uOrder,vOrder);
-				break;
-			}
-			break;
-		case 5:
-			switch(vOrder) {
-			case 0:
-				assert(FALSE);
-				break;
-			case 1:
-				assert(FALSE);
-				break;
-			case 2:
-				computeNURBS(5,2);
-				break;
-			case 3:
-				computeNURBS(5,3);
-				break;
-			case 4:
-				computeNURBS(5,4);
-				break;
-			case 5:
-				computeNURBS(5,5);
-				break;
-			default:
-				computeNURBS(uOrder,vOrder);
-				break;
-			}
-			break;
-		default:
-			computeNURBS(uOrder,vOrder);
-			break;
+#define compute()																					\
+		switch(uOrder) {																			\
+		case 0:	assert(FALSE);	break;																\
+		case 1:	assert(FALSE);	break;																\
+		case 2:																						\
+			switch(vOrder) {																		\
+			case 0:		assert(FALSE);					break;										\
+			case 1:		assert(FALSE);					break;										\
+			case 2:		computeNURBS(2,2);				break;										\
+			case 3:		computeNURBS(2,3);				break;										\
+			case 4:		computeNURBS(2,4);				break;										\
+			case 5:		computeNURBS(2,5);				break;										\
+			default:	computeNURBS(uOrder,vOrder);	break;										\
+			}																						\
+			break;																					\
+		case 3:																						\
+			switch(vOrder) {																		\
+			case 0:		assert(FALSE);					break;										\
+			case 1:		assert(FALSE);					break;										\
+			case 2:		computeNURBS(3,2);				break;										\
+			case 3:		computeNURBS(3,3);				break;										\
+			case 4:		computeNURBS(3,4);				break;										\
+			case 5:		computeNURBS(3,5);				break;										\
+			default:	computeNURBS(uOrder,vOrder);	break;										\
+			}																						\
+			break;																					\
+		case 4:																						\
+			switch(vOrder) {																		\
+			case 0:		assert(FALSE);					break;										\
+			case 1:		assert(FALSE);					break;										\
+			case 2:		computeNURBS(4,2);				break;										\
+			case 3:		computeNURBS(4,3);				break;										\
+			case 4:		computeNURBS(4,4);				break;										\
+			case 5:		computeNURBS(4,5);				break;										\
+			default:	computeNURBS(uOrder,vOrder);	break;										\
+			}																						\
+			break;																					\
+		case 5:																						\
+			switch(vOrder) {																		\
+			case 0:		assert(FALSE);					break;										\
+			case 1:		assert(FALSE);					break;										\
+			case 2:		computeNURBS(5,2);				break;										\
+			case 3:		computeNURBS(5,3);				break;										\
+			case 4:		computeNURBS(5,4);				break;										\
+			case 5:		computeNURBS(5,5);				break;										\
+			default:	computeNURBS(uOrder,vOrder);	break;										\
+			}																						\
+			break;																					\
+		default:	computeNURBS(uOrder,vOrder);	break;											\
 		}
+		
+		// Do the computation
+		compute();
 
 		// Note: make the common case fast: We're computing NG,DPDU and DPDV even if it's not required.
 		// Most of the time though, surface normal is required
-
+		
 		// Dispatch the vertex data
 		variables->dispatch(intrStart,start,numVertices,varying,locals);
 
@@ -1137,17 +1143,83 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			float		*P	=	varying[VARIABLE_P]		+	start*3;
 			const float	*Pw	=	varying[VARIABLE_PW]	+	start*4;
 
-			for (i=numVertices;i>0;i--,P+=3,Pw+=4)	movvv(P,Pw);
+			for (int i=numVertices;i>0;i--,P+=3,Pw+=4)	movvv(P,Pw);
 		}
-
-#undef computeNURBS
 	}
+
+		
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (variables->moving) {
+			// OK, here's the tricky point, 
+			const int	disp	=	vertexSize*uOrder*vOrder;
+#undef computeNURBS
+#define computeNURBS(UORDER,VORDER) {															\
+	double	*memBase		=	(double *) alloca((UORDER*3 + VORDER*3)*sizeof(double));		\
+	double	*uPowers		=	memBase;														\
+	double	*vPowers		=	uPowers + UORDER;												\
+																								\
+	for (int i=0;i<numVertices;++i,dest+=3) {													\
+		double			Pstart[4],Pend[4];														\
+		const double	cu	=	u[i]*uMult + uOrg;												\
+		const double	cv	=	v[i]*vMult + vOrg;												\
+																								\
+		uPowers[0]		=	1;																	\
+		for (int j=1;j<UORDER;++j) {															\
+			uPowers[j]	=	cu*uPowers[j-1];													\
+		}																						\
+																								\
+		vPowers[0]		=	1;																	\
+		for (int j=1;j<VORDER;++j) {															\
+			vPowers[j]	=	cv*vPowers[j-1];													\
+		}																						\
+																								\
+		const double *cVertex	=	vertex;														\
+		for (int var=0;var<4;++var) {															\
+			Pstart[var]	=	Pend[var]	=	0;													\
+			for (int j=0;j<UORDER;++j) {														\
+				double	tmpStart	=	0;														\
+				double	tmpEnd		=	0;														\
+																								\
+				for (int t=0;t<VORDER;++t,++cVertex) {											\
+					tmpStart	+=	cVertex[0]*vPowers[t];										\
+					tmpEnd		+=	cVertex[disp]*vPowers[t];									\
+				}																				\
+																								\
+				Pstart[var]	+=	tmpStart*uPowers[j];											\
+				Pend[var]	+=	tmpEnd*uPowers[j];												\
+			}																					\
+		}																						\
+																								\
+																								\
+		mulvf(Pstart,1/Pstart[3]);																\
+		mulvf(Pend,1/Pend[3]);																	\
+		dest[0]		=	(float) (Pend[0] - Pstart[0]);											\
+		dest[1]		=	(float) (Pend[1] - Pstart[1]);											\
+		dest[2]		=	(float) (Pend[2] - Pstart[2]);											\
+	}																							\
+	}
+	
+		compute();
+
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+	
+#undef computeNURBS
+#undef compute
 
 
 	// Fix the degenerate normals
 	normalFix();
 
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
+	// Turn off the computed parameters
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////

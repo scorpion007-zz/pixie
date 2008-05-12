@@ -287,26 +287,20 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 // Return Value			:	-
 // Comments				:
 void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U] + start;
 	const float	*v				=	varying[VARIABLE_V] + start;
 	const CPl	*pl				=	mesh->pl;
 
 
 	if ((pl->data1 != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		const float		*v00;
-		const float		*v01;
-		const float		*v02;
-		const float		*v10;
-		const float		*v11;
-		const float		*v12;
-		const float		*time	=	varying[VARIABLE_TIME] + start*3;
+		const float		*time	=	varying[VARIABLE_TIME] + start;
 
 		// Interpolate the vertex variables accross the triangle
-		for (j=0;j<pl->numParameters;j++) {
+		for (int j=0;j<pl->numParameters;++j) {
 			const CVariable	*variable	=	pl->parameters[j].variable;
 			const int		numFloats	=	variable->numFloats;
 
+			// Is this a vertex parameter?
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
 				float		*dest	=	pl->parameters[j].resolve(varying,locals) + start*numFloats;
 
@@ -324,12 +318,12 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 					const float	*sv11	=	data1 + this->v1*variable->numFloats;
 					const float	*sv12	=	data1 + this->v2*variable->numFloats;
 
-					for (i=0;i<numVertices;i++) {
+					for (int i=0;i<numVertices;++i) {
 						const	double	cu		=	u[i];
 						const	double	cv		=	v[i];
 						const	double	ctime	=	time[i];
 
-						for (k=0;k<numFloats;k++) {
+						for (int k=0;k<numFloats;++k) {
 							*dest++	=	(float) ((sv00[k]*(1.0-cu) + sv01[k]*cu*cv + sv02[k]*cu*(1.0-cv))*(1.0-ctime) + 
 												 (sv10[k]*(1.0-cu) + sv11[k]*cu*cv + sv12[k]*cu*(1.0-cv))*ctime);
 						}
@@ -338,82 +332,71 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			}
 		}
 
-		v00	=	pl->data0 + this->v0*3;
-		v01	=	pl->data0 + this->v1*3;
-		v02	=	pl->data0 + this->v2*3;
-		v10	=	pl->data1 + this->v0*3;
-		v11	=	pl->data1 + this->v1*3;
-		v12	=	pl->data1 + this->v2*3;
+		// Get the corners
+		const float *v00	=	pl->data0 + this->v0*3;
+		const float *v01	=	pl->data0 + this->v1*3;
+		const float *v02	=	pl->data0 + this->v2*3;
+		const float *v10	=	pl->data1 + this->v0*3;
+		const float *v11	=	pl->data1 + this->v1*3;
+		const float *v12	=	pl->data1 + this->v2*3;
 
 		// Compute surface derivatives and normal if required
 		if (up & PARAMETER_DPDU) {
-			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
+			float	*dest	=	varying[VARIABLE_DPDU] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cv		=	v[i];
 				const double ctime	=	time[i];
 
 				dest[0]			=	(float) ((v01[0]*cv + v02[0]*(1.0-cv) - v00[0])*(1.0-ctime) + (v11[0]*cv + v12[0]*(1-cv) - v10[0])*ctime);
 				dest[1]			=	(float) ((v01[1]*cv + v02[1]*(1.0-cv) - v00[1])*(1.0-ctime) + (v11[1]*cv + v12[1]*(1-cv) - v10[1])*ctime);
 				dest[2]			=	(float) ((v01[2]*cv + v02[2]*(1.0-cv) - v00[2])*(1.0-ctime) + (v11[2]*cv + v12[2]*(1-cv) - v10[2])*ctime);
-				dest			+=	3;
 			}
 		}
 
 		if (up & PARAMETER_DPDV) {
-			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dest	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cu		=	u[i];
 				const double ctime	=	time[i];
 
 				dest[0]			=	(float) ((v01[0] - v02[0])*cu*(1.0-ctime) + (v11[0] - v12[0])*cu*ctime);
 				dest[1]			=	(float) ((v01[1] - v02[1])*cu*(1.0-ctime) + (v11[1] - v12[1])*cu*ctime);
 				dest[2]			=	(float) ((v01[2] - v02[2])*cu*(1.0-ctime) + (v11[2] - v12[2])*cu*ctime);
-				dest			+=	3;
 			}
 		}
 
 		if (up & PARAMETER_NG) {
-			float	*dest	=	&varying[VARIABLE_NG][start*3];
+			float	*dest	=	varying[VARIABLE_NG] + start*3;
 			vector	normal0,normal1;
 			vector	D0,D1;
 
+			// Compute the normal at the beginning
 			subvv(D0,v01,v00);
 			subvv(D1,v02,v00);
 			crossvv(normal0,D1,D0);
 
+			// And at the end
 			subvv(D0,v11,v10);
 			subvv(D1,v12,v10);
 			crossvv(normal1,D1,D0);
 
-			for (i=0;i<numVertices;i++) {
-				interpolatev(dest,normal0,normal1,time[i]);
-
-				dest			+=	3;
-			}
+			// Interpolate the normal vector
+			for (int i=0;i<numVertices;i++,dest+=3)	interpolatev(dest,normal0,normal1,time[i]);
 		}
 	} else {
-		const float		*v0;
-		const float		*v1;
-		const float		*v2;
 		const float		*data;
 
-		if (up & PARAMETER_END_SAMPLE) {
-			data		=	pl->data1;
-		} else {
-			data		=	pl->data0;
-		}
-
-		v0	=	data + this->v0*3;
-		v1	=	data + this->v1*3;
-		v2	=	data + this->v2*3;
+		if (up & PARAMETER_END_SAMPLE)	data		=	pl->data1;
+		else							data		=	pl->data0;
 
 		// Interpolate the vertex variables accross the triangle
-		for (j=0;j<pl->numParameters;j++) {
+		for (int j=0;j<pl->numParameters;++j) {
 			const CVariable	*variable	=	pl->parameters[j].variable;
 			const int		numFloats	=	variable->numFloats;
 
+			// Should we interpolate this parameter?
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
 				float		*dest	=	pl->parameters[j].resolve(varying,locals);
 
@@ -425,63 +408,94 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 					const float	*sv1	=	data + pl->parameters[j].index + this->v1*variable->numFloats;
 					const float	*sv2	=	data + pl->parameters[j].index + this->v2*variable->numFloats;
 
-					for (i=0;i<numVertices;i++) {
+					for (int i=0;i<numVertices;++i) {
 						const	double	cu	=	u[i];
 						const	double	cv	=	v[i];
 
-						for (k=0;k<numFloats;k++) {
+						for (int k=0;k<numFloats;++k) {
 							*dest++	=	(float) (sv0[k]*(1.0-cu) + sv1[k]*cu*cv + sv2[k]*cu*(1.0-cv));
 						}
 					}
 				}
 			}
 		}
+		
+		// Get the vertex corners
+		const float	*v0	=	data + this->v0*3;
+		const float	*v1	=	data + this->v1*3;
+		const float	*v2	=	data + this->v2*3;
 
 		// Compute surface derivatives and normal if required
 		if (up & PARAMETER_DPDU) {
-			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
+			float	*dest	=	varying[VARIABLE_DPDU] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cv	=	v[i];
 
 				dest[0]			=	(float) (v1[0]*cv + v2[0]*(1.0-cv) - v0[0]);
 				dest[1]			=	(float) (v1[1]*cv + v2[1]*(1.0-cv) - v0[1]);
 				dest[2]			=	(float) (v1[2]*cv + v2[2]*(1.0-cv) - v0[2]);
-				dest			+=	3;
 			}
 		}
 
 		if (up & PARAMETER_DPDV) {
-			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dest	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cu	=	u[i];
 
 				dest[0]			=	(float) ((v1[0] - v2[0])*cu);
 				dest[1]			=	(float) ((v1[1] - v2[1])*cu);
 				dest[2]			=	(float) ((v1[2] - v2[2])*cu);
-				dest			+=	3;
 			}
 		}
 
 		if (up & PARAMETER_NG) {
-			float	*dest	=	&varying[VARIABLE_NG][start*3];
+			float	*dest	=	varying[VARIABLE_NG] + start*3;
 			vector	normal;
 			vector	D0,D1;
 
+			// Compute the normal vector
 			subvv(D0,v1,v0);
 			subvv(D1,v2,v0);
 			crossvv(normal,D1,D0);
 
-			for (i=0;i<numVertices;i++) {
-				movvv(dest,normal);
+			// Just duplicate the normal vector
+			for (int i=0;i<numVertices;++i,dest+=3)		movvv(dest,normal);
+		}
+	}
+	
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (pl->data1 != NULL) {
+			const float *v00	=	pl->data0 + this->v0*3;
+			const float *v01	=	pl->data0 + this->v1*3;
+			const float *v02	=	pl->data0 + this->v2*3;
+			const float *v10	=	pl->data1 + this->v0*3;
+			const float *v11	=	pl->data1 + this->v1*3;
+			const float *v12	=	pl->data1 + this->v2*3;
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			for (int i=0;i<numVertices;++i) {
+				const	double	cu	=	u[i];
+				const	double	cv	=	v[i];
 
-				dest			+=	3;
+				// Do the interpolation
+				for (int k=0;k<3;k++) {
+					*dest++	=	(float) ((v10[k]*(1.0-cu) + v11[k]*cu*cv + v12[k]*cu*(1.0-cv)) - (v00[k]*(1.0-cu) + v01[k]*cu*cv + v02[k]*cu*(1.0-cv)));					
+				}
 			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
 		}
 	}
 
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | mesh->parameters);
+	// Turn off the interpolated variables
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | mesh->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -875,26 +889,18 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 // Return Value			:	-
 // Comments				:
 void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int			i,j,k;
 	const float	*u				=	varying[VARIABLE_U] + start;
 	const float	*v				=	varying[VARIABLE_V] + start;
 	const CPl	*pl				=	mesh->pl;
 
 
 	if ((pl->data1 != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		const float		*v00;
-		const float		*v01;
-		const float		*v02;
-		const float		*v03;
-		const float		*v10;
-		const float		*v11;
-		const float		*v12;
-		const float		*v13;
-		const float		*time	=	varying[VARIABLE_TIME] + start*3;
+		const float		*time	=	varying[VARIABLE_TIME] + start;
 
 		// Interpolate the vertex variables accross the triangle
-		for (j=0;j<pl->numParameters;j++) {
+		for (int j=0;j<pl->numParameters;j++) {
 			
+			// Is this a vertex variable that needs to be interpolated?
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
 				const CVariable	*variable	=	pl->parameters[j].variable;
 				const int		numFloats	=	variable->numFloats;
@@ -916,12 +922,12 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 					const float	*sv12	=	data1 + this->v2*variable->numFloats;
 					const float	*sv13	=	data1 + this->v3*variable->numFloats;
 
-					for (i=0;i<numVertices;i++) {
+					for (int i=0;i<numVertices;i++) {
 						const	double	cu		=	u[i];
 						const	double	cv		=	v[i];
 						const	double	ctime	=	time[i];
 
-						for (k=0;k<numFloats;k++) {
+						for (int k=0;k<numFloats;k++) {
 							*dest++	=	(float) (((sv00[k]*(1.0-cu) + sv01[k]*cu)*(1.0-cv) + (sv02[k]*(1.0-cu) + sv03[k]*cu)*cv)*(1.0-ctime) + 
 												 ((sv10[k]*(1.0-cu) + sv11[k]*cu)*(1.0-cv) + (sv12[k]*(1.0-cu) + sv13[k]*cu)*cv)*ctime);
 						}
@@ -930,50 +936,48 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			}
 		}
 
-		v00	=	pl->data0 + this->v0*3;
-		v01	=	pl->data0 + this->v1*3;
-		v02	=	pl->data0 + this->v2*3;
-		v03	=	pl->data0 + this->v3*3;
-		v10	=	pl->data1 + this->v0*3;
-		v11	=	pl->data1 + this->v1*3;
-		v12	=	pl->data1 + this->v2*3;
-		v13	=	pl->data1 + this->v3*3;
+		const float	*v00	=	pl->data0 + this->v0*3;
+		const float	*v01	=	pl->data0 + this->v1*3;
+		const float	*v02	=	pl->data0 + this->v2*3;
+		const float	*v03	=	pl->data0 + this->v3*3;
+		const float	*v10	=	pl->data1 + this->v0*3;
+		const float	*v11	=	pl->data1 + this->v1*3;
+		const float	*v12	=	pl->data1 + this->v2*3;
+		const float	*v13	=	pl->data1 + this->v3*3;
 
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
-			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
+			float	*dest	=	varying[VARIABLE_DPDU]+start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cv		=	v[i];
 				const double ctime	=	time[i];
 
 				dest[0]			=	(float) (((-v00[0] + v01[0])*(1.0-cv) + (-v02[0] + v03[0])*cv)*(1.0-ctime) + ((-v10[0] + v11[0])*(1.0-cv) + (-v12[0] + v13[0])*cv)*ctime);
 				dest[1]			=	(float) (((-v00[1] + v01[1])*(1.0-cv) + (-v02[1] + v03[1])*cv)*(1.0-ctime) + ((-v10[1] + v11[1])*(1.0-cv) + (-v12[1] + v13[1])*cv)*ctime);
 				dest[2]			=	(float) (((-v00[2] + v01[2])*(1.0-cv) + (-v02[2] + v03[2])*cv)*(1.0-ctime) + ((-v10[2] + v11[2])*(1.0-cv) + (-v12[2] + v13[2])*cv)*ctime);
-				dest			+=	3;
 			}
 		}
 
 		if (up & (PARAMETER_DPDV | PARAMETER_NG)) {
-			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dest	=	varying[VARIABLE_DPDV]+start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cu		=	u[i];
 				const double ctime	=	time[i];
 
 				dest[0]			=	(float) ((-(v00[0]*(1.0-cu) + (v01[0]*cu)) + (v02[0]*(1.0-cu) + (v03[0]*cu)))*(1.0-ctime) + (-(v10[0]*(1.0-cu) + (v11[0]*cu)) + (v12[0]*(1.0-cu) + (v13[0]*cu)))*ctime);
 				dest[1]			=	(float) ((-(v00[1]*(1.0-cu) + (v01[1]*cu)) + (v02[1]*(1.0-cu) + (v03[1]*cu)))*(1.0-ctime) + (-(v10[1]*(1.0-cu) + (v11[1]*cu)) + (v12[1]*(1.0-cu) + (v13[1]*cu)))*ctime);
 				dest[2]			=	(float) ((-(v00[2]*(1.0-cu) + (v01[2]*cu)) + (v02[2]*(1.0-cu) + (v03[2]*cu)))*(1.0-ctime) + (-(v10[2]*(1.0-cu) + (v11[2]*cu)) + (v12[2]*(1.0-cu) + (v13[2]*cu)))*ctime);
-				dest			+=	3;
 			}
 		}
 
 		if (up & PARAMETER_NG) {
-			float	*dest	=	&varying[VARIABLE_NG][start*3];
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dest	=	varying[VARIABLE_NG] + start*3;
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				crossvv(dest,dPdu,dPdv);
 
 				dest			+=	3;
@@ -982,25 +986,13 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			}
 		}
 	} else {
-		const float		*v0;
-		const float		*v1;
-		const float		*v2;
-		const float		*v3;
 		const float		*data;
 
-		if (up & PARAMETER_END_SAMPLE) {
-			data		=	pl->data1;
-		} else {
-			data		=	pl->data0;
-		}
-
-		v0	=	data + this->v0*3;
-		v1	=	data + this->v1*3;
-		v2	=	data + this->v2*3;
-		v3	=	data + this->v3*3;
+		if (up & PARAMETER_END_SAMPLE)	data		=	pl->data1;
+		else							data		=	pl->data0;
 
 		// Interpolate the vertex variables accross the triangle
-		for (j=0;j<pl->numParameters;j++) {
+		for (int j=0;j<pl->numParameters;j++) {
 			const CVariable	*variable	=	pl->parameters[j].variable;
 			const int		numFloats	=	variable->numFloats;
 
@@ -1013,11 +1005,11 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 					const float	*sv2	=	data + pl->parameters[j].index + this->v2*variable->numFloats;
 					const float	*sv3	=	data + pl->parameters[j].index + this->v3*variable->numFloats;
 
-					for (i=0;i<numVertices;i++) {
+					for (int i=0;i<numVertices;++i) {
 						const	double cu	=	u[i];
 						const	double cv	=	v[i];
 
-						for (k=0;k<numFloats;k++) {
+						for (int k=0;k<numFloats;k++) {
 							*dest++	=	(float) ((sv0[k]*(1.0-cu) + sv1[k]*cu)*(1.0-cv) + (sv2[k]*(1.0-cu) + sv3[k]*cu)*cv);
 						}
 					}
@@ -1025,39 +1017,43 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			}
 		}
 		
+		// Get the quad corners
+		const float *v0	=	data + this->v0*3;
+		const float *v1	=	data + this->v1*3;
+		const float *v2	=	data + this->v2*3;
+		const float *v3	=	data + this->v3*3;
+		
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
-			float	*dest	=	&varying[VARIABLE_DPDU][start*3];
+			float	*dest	=	varying[VARIABLE_DPDU]+start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i,dest+=3) {
 				const double cv	=	v[i];
 
 				dest[0]			=	(float) ((v1[0] - v0[0])*(1.0-cv) + (v3[0] - v2[0])*cv);
 				dest[1]			=	(float) ((v1[1] - v0[1])*(1.0-cv) + (v3[1] - v2[1])*cv);
 				dest[2]			=	(float) ((v1[2] - v0[2])*(1.0-cv) + (v3[2] - v2[2])*cv);
-				dest			+=	3;
 			}
 		}
 
 		if (up & (PARAMETER_DPDV | PARAMETER_NG)) {
-			float	*dest	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dest	=	varying[VARIABLE_DPDV]+start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;i++,dest+=3) {
 				const double cu	=	u[i];
 
 				dest[0]			=	(float) ((v2[0]*(1.0-cu) + v3[0]*cu) - (v0[0]*(1.0-cu) + v1[0]*cu));
 				dest[1]			=	(float) ((v2[1]*(1.0-cu) + v3[1]*cu) - (v0[1]*(1.0-cu) + v1[1]*cu));
 				dest[2]			=	(float) ((v2[2]*(1.0-cu) + v3[2]*cu) - (v0[2]*(1.0-cu) + v1[2]*cu));
-				dest			+=	3;
 			}
 		}
 
 		if (up & PARAMETER_NG) {
-			float	*dest	=	&varying[VARIABLE_NG][start*3];
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dest	=	varying[VARIABLE_NG]+start*3;
+			float	*dPdu	=	varying[VARIABLE_DPDU]+start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV]+start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				crossvv(dest,dPdu,dPdv);
 
 				dest			+=	3;
@@ -1066,8 +1062,40 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			}
 		}
 	}
+	
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (pl->data1 != NULL) {
+			const float *v00	=	pl->data0 + this->v0*3;
+			const float *v01	=	pl->data0 + this->v1*3;
+			const float *v02	=	pl->data0 + this->v2*3;
+			const float *v03	=	pl->data0 + this->v3*3;
+			const float *v10	=	pl->data1 + this->v0*3;
+			const float *v11	=	pl->data1 + this->v1*3;
+			const float *v12	=	pl->data1 + this->v2*3;
+			const float *v13	=	pl->data1 + this->v3*3;
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			for (int i=0;i<numVertices;++i,dest+=3) {
+				const	double	cu	=	u[i];
+				const	double	cv	=	v[i];
 
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | mesh->parameters);
+				// Do the interpolation
+				for (int k=0;k<3;k++) {
+					dest[k]	=	(float) (((v10[k]*(1.0-cu) + v11[k]*cu)*(1.0-cv) + (v12[k]*(1.0-cu) + v13[k]*cu)*cv) - ((v00[k]*(1.0-cu) + v01[k]*cu)*(1.0-cv) + (v02[k]*(1.0-cu) + v03[k]*cu)*cv));
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+
+	// Turn off the interpolated variables
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | mesh->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////

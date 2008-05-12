@@ -169,16 +169,14 @@ CBSplinePatchGrid::~CBSplinePatchGrid() {
 // Return Value			:	-
 // Comments				:
 void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int					i,j,k;
-	const float			*u						=	varying[VARIABLE_U]+start;
-	const float			*v						=	varying[VARIABLE_V]+start;
-	const int			vertexSize				=	variables->vertexSize;
-	float				*vertexData;
-	int					vertexDataStep;
-	int					vertexSampleStride;
-	
-	const int 	upatches	=	uVertices - 3;
-	const int 	vpatches	=	vVertices - 3;
+	const float		*u				=	varying[VARIABLE_U]+start;
+	const float		*v				=	varying[VARIABLE_V]+start;
+	const int		vertexSize		=	variables->vertexSize;
+	float			*vertexData;
+	int				vertexDataStep;
+	int				vertexSampleStride;
+	const int		upatches		=	uVertices - 3;
+	const int		vpatches		=	vVertices - 3;
 	
 
 	if (variables->moving == FALSE) {
@@ -206,14 +204,14 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 
 			interpolate				=	vertexData;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				const	int		x			=	(int) floor(min(u[i]*upatches,(uVertices-4)));
 				const	int		y			=	(int) floor(min(v[i]*vpatches,(vVertices-4)));
 				const 	float	*vertex0	=	vertex + (y*upatches + x)*vertexSize*16;
 				const 	float	*vertex1	=	vertex0 + vertexSize*16*upatches*vpatches;
 				const	float	ctime		=	*time++;
 
-				for (j=0;j<vertexDataStep;j++) {
+				for (int j=0;j<vertexDataStep;j) {
 					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}
@@ -230,13 +228,12 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 		const float vm		=	(float) vpatches;
 				
 		// Interpolate the vertices
-		for (i=0,k=0;i<numVertices;i++) {
+		for (int i=0;i<numVertices;++i) {
 			double			tmp1[4],tmp2[4];
 			const	int		x			=	(int) floor(min(u[i]*upatches,(uVertices-4)));
 			const	int		y			=	(int) floor(min(v[i]*vpatches,(vVertices-4)));
 			const	double	cu			=	(u[i]*upatches - x);
 			const	double	cv			=	(v[i]*vpatches - y);
-
 			const	float	*data		=	vertexData + (y*upatches + x)*vertexSampleStride;
 			const	double	usquared	=	cu*cu;
 			const	double	ucubed		=	cu*usquared;
@@ -244,24 +241,23 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 			const	double	vcubed		=	cv*vsquared;
 			int				j;
 
-			for (j=0;j<3;j++) {
-				for (int t=0;t<4;t++) {
+			for (j=0;j<3;++j,data+=16) {
+				for (int t=0;t<4;++t) {
 					tmp2[t]	=	3*vsquared*data[element(0,t)] + 2*cv*data[element(1,t)]     + data[element(2,t)];
 					tmp1[t]	=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
 				}
 
 				dPdv[j]			=	(float) (tmp2[0]*ucubed + tmp2[1]*usquared + tmp2[2]*cu + tmp2[3])*vm;
 				dPdu[j]			=	(float) (tmp1[0]*3*usquared + tmp1[1]*2*cu + tmp1[2])*um;
-				intr[k++]		=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
-				data			+=	16;
+				*intr++			=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
 			}
 
-			for (;j<vertexSize;j++) {
-				for (int t=0;t<4;t++) {
+			for (;j<vertexSize;++j) {
+				for (int t=0;t<4;++t) {
 					tmp1[t]	=	  vcubed*  data[element(0,t)] + vsquared*data[element(1,t)] + cv*data[element(2,t)] + data[element(3,t)];
 				}
 
-				intr[k++]		=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
+				*intr++			=	(float) (tmp1[0]*ucubed + tmp1[1]*usquared + tmp1[2]*cu + tmp1[3]);
 				data			+=	16;
 			}
 
@@ -280,9 +276,53 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
 	
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Do we have motion?
+		if (variables->moving) {
+			assert(u == varying[VARIABLE_U] + start);
+			assert(v == varying[VARIABLE_V] + start);
+			const int disp	=	vertexSize*16*upatches*vpatches;
+			
+			// Interpolate the thing
+			for (int i=0;i<numVertices;++i) {
+				double			tmpStart[4],tmpEnd[4];
+				const	int		x			=	(int) floor(min(u[i]*upatches,(uVertices-4)));
+				const	int		y			=	(int) floor(min(v[i]*vpatches,(vVertices-4)));
+				const	double	cu			=	(u[i]*upatches - x);
+				const	double	cv			=	(v[i]*vpatches - y);
+				const	float	*data		=	vertex + (y*upatches + x)*vertexSize*16;
+				const	double	usquared	=	cu*cu;
+				const	double	ucubed		=	cu*usquared;
+				const	double	vsquared	=	cv*cv;
+				const	double	vcubed		=	cv*vsquared;
+
+				// For x,y,z
+				for (int j=0;j<3;++j,data+=16) {
+				
+					// The inner product
+					for (int t=0;t<4;++t) {
+						tmpStart[t]	=	  vcubed*  data[element(0,t)]			+ vsquared*data[element(1,t)]			+ cv*data[element(2,t)]				+ data[element(3,t)];
+						tmpEnd[t]	=	  vcubed*  data[disp + element(0,t)]	+ vsquared*data[disp + element(1,t)]	+ cv*data[disp + element(2,t)]		+ data[disp + element(3,t)];
+					}
+
+					// Update the data
+					*dest++			=	(float) ((tmpEnd[0]*ucubed + tmpEnd[1]*usquared + tmpEnd[2]*cu + tmpEnd[3]) - (tmpStart[0]*ucubed + tmpStart[1]*usquared + tmpStart[2]*cu + tmpStart[3]));
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+	
+	// Make sure we don't have any zero normals
 	normalFix();
 	
-	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | variables->parameters);
+	// Turn off the processed parameters
+	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
 
 ///////////////////////////////////////////////////////////////////////

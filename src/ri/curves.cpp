@@ -365,7 +365,6 @@ CCubicCurve::~CCubicCurve() {
 // Return Value			:	-
 // Comments				:
 void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int				i,k;
 	float			*intr,*intrStart;
 	const	float	*vBasis				=	attributes->vBasis;
 	CVertexData		*variables			=	base->variables;
@@ -384,14 +383,19 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		v2		=	v1 + vs;
 		v3		=	v2 + vs;
 	} else {
+		// Curves can not be raytraced, so we must be sampling at the beginning or the end
+		assert(up & PARAMETER_END_SAMPLE);
 		v0		=	base->vertex + vertexSize;
 		v1		=	v0 + vs;
 		v2		=	v1 + vs;
 		v3		=	v2 + vs;
 	}
+	
+	// We should start from beginning
+	assert(start == 0);
 
-	const	float	*v					=	varying[VARIABLE_V] + start;
-	for (i=numVertices;i>0;i--) {
+	const	float	*v					=	varying[VARIABLE_V];
+	for (int i=numVertices;i>0;i--) {
 		const	float	cv				=	*v++;
 		float			vb[4];
 		float			tmp[4];
@@ -410,17 +414,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		*intr++	=	tmp[0]*v0[1] + tmp[1]*v1[1] + tmp[2]*v2[1] + tmp[3]*v3[1];
 		*intr++	=	tmp[0]*v0[2] + tmp[1]*v1[2] + tmp[2]*v2[2] + tmp[3]*v3[2];
 
-		if (intr[-3] > 5) {
-			int	y	=	1;
-		}
-
-		/*
-		FILE	*out	=	fopen("c:\\temp\\o.txt","a");
-		fprintf(out,"%g %g %g \n",intr[-3],intr[-2],intr[-1]);
-		fclose(out);
-		*/
-
-		for (k=3;k<vertexSize;k++) {
+		for (int k=3;k<vertexSize;k++) {
 			*intr++	=	tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k];
 		}
 	}
@@ -428,14 +422,14 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 	// Dispatch the variables
 	variables->dispatch(intrStart,start,numVertices,varying,locals);
 
-	float		*dPdv	=	varying[VARIABLE_DPDV]	+ start*3;
-	float		*dPdu	=	varying[VARIABLE_DPDU]	+ start*3;
-	const float	*P		=	varying[VARIABLE_P]		+ start*3;
-	float		*N		=	varying[VARIABLE_NG]	+ start*3;
+	float		*dPdv	=	varying[VARIABLE_DPDV];
+	float		*dPdu	=	varying[VARIABLE_DPDU];
+	const float	*P		=	varying[VARIABLE_P];
+	float		*N		=	varying[VARIABLE_NG];
 
-	v	=	varying[VARIABLE_V] + start;
+	v	=	varying[VARIABLE_V];
 
-	for (i=numVertices;i>0;i--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
+	for (int i=numVertices;i>0;i--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
 		const	float	cv	= *v++;
 		float			vb[4];
 		float			tmp[4];
@@ -456,14 +450,13 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 
 		// Do we have a numerical problem?
 		if (dotvv(dPdv,dPdv) < C_EPSILON) {
-			float	step;
 
 			// Perform a parametric search
-			for (step=1e-5f;step<0.1f;step*=2) {
+			for (float step=1e-5f;step<0.1f;step*=2) {
 				int	k;
 
 				// On either side
-				for (k=0;k<2;k++) {
+				for (int k=0;k<2;k++) {
 					const float	tv	=	cv + (k == 0 ? step : -step);
 
 					if ((tv >= 0) && (tv <= 1)) {
@@ -493,8 +486,46 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
+	
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME];
+		
+		// Do we have motion?
+		if (variables->moving) {
+			const float	*v	=	varying[VARIABLE_V];
+			v0		=	base->vertex;
+			v1		=	v0 + vs;
+			v2		=	v1 + vs;
+			v3		=	v2 + vs;
+		
+			for (int i=0;i<numVertices;++i,dest+=3) {
+				const	float	cv				=	*v++;
+				float			vb[4];
+				float			tmp[4];
 
-	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
+				vb[3]	=	1;
+				vb[2]	=	cv;
+				vb[1]	=	cv*cv;
+				vb[0]	=	cv*vb[1];
+
+				tmp[0]	=	vb[0]*vBasis[element(0,0)] + vb[1]*vBasis[element(0,1)] + vb[2]*vBasis[element(0,2)] + vb[3]*vBasis[element(0,3)];
+				tmp[1]	=	vb[0]*vBasis[element(1,0)] + vb[1]*vBasis[element(1,1)] + vb[2]*vBasis[element(1,2)] + vb[3]*vBasis[element(1,3)];
+				tmp[2]	=	vb[0]*vBasis[element(2,0)] + vb[1]*vBasis[element(2,1)] + vb[2]*vBasis[element(2,2)] + vb[3]*vBasis[element(2,3)];
+				tmp[3]	=	vb[0]*vBasis[element(3,0)] + vb[1]*vBasis[element(3,1)] + vb[2]*vBasis[element(3,2)] + vb[3]*vBasis[element(3,3)];
+
+				// For each component
+				for (int k=0;k<3;++k) {
+					dest[k]	=	(tmp[0]*v0[vertexSize+k] + tmp[1]*v1[vertexSize+k] + tmp[2]*v2[vertexSize+k] + tmp[3]*v3[vertexSize+k]) - (tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k]);
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+
+	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | variables->parameters);
 }
 
 
@@ -593,17 +624,19 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 		v0					=	base->vertex + vertexSize;
 		v1					=	v0 + vs;
 	}
+	
+	assert(start == 0);
 
 	const	float	*v = varying[VARIABLE_V];
 	for (j=numVertices;j>0;j--) {
-		const	double	cv	=	*v++;
+		const	float	cv	=	*v++;
 
-		*intr++	=	(float) (v0[0]*(1.0-cv) + v1[0]*cv);
-		*intr++	=	(float) (v0[1]*(1.0-cv) + v1[1]*cv);
-		*intr++	=	(float) (v0[2]*(1.0-cv) + v1[2]*cv);
+		*intr++	=	(v0[0]*(1.0f-cv) + v1[0]*cv);
+		*intr++	=	(v0[1]*(1.0f-cv) + v1[1]*cv);
+		*intr++	=	(v0[2]*(1.0f-cv) + v1[2]*cv);
 
 		for (k=3;k<vertexSize;k++) {
-			*intr++			=	(float) (v0[k]*(1.0-cv) + v1[k]*cv);
+			*intr++			=	(v0[k]*(1.0f-cv) + v1[k]*cv);
 		}
 	}
 
@@ -611,10 +644,10 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 	variables->dispatch(intrStart,0,numSavedVertices,varying,locals);
 
 	// Compute the normal and derivatives
-	float		*dPdv	=	varying[VARIABLE_DPDV] + start*3;
-	float		*dPdu	=	varying[VARIABLE_DPDU] + start*3;
-	const float	*P		=	varying[VARIABLE_P] + start*3;
-	float		*N		=	varying[VARIABLE_NG] + start*3;
+	float		*dPdv	=	varying[VARIABLE_DPDV];
+	float		*dPdu	=	varying[VARIABLE_DPDU];
+	const float	*P		=	varying[VARIABLE_P];
+	float		*N		=	varying[VARIABLE_NG];
 
 	for (j=numVertices;j>0;j--,P+=3,dPdu+=3,dPdv+=3,N+=3) {
 		subvv(dPdv,v1,v0);
@@ -622,8 +655,33 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
+	
+	// Compute dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		float	*dest	=	varying[VARIABLE_DPDTIME];
+		
+		// Do we have motion?
+		if (variables->moving) {
+			const float	*v	=	varying[VARIABLE_V];
+			v0		=	base->vertex;
+			v1		=	v0 + vs;
+		
+			// Compute the dPdtime
+			for (int i=0;i<numVertices;++i,dest+=3) {
+				const	double	cv	=	*v++;
 
-	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | variables->parameters);
+				// For each component
+				for (int k=0;k<3;++k) {
+					dest[k]	= (v0[vertexSize+k]*(1.0f-cv) + v1[vertexSize+k]*cv) - (v0[k]*(1.0f-cv) + v1[k]*cv);
+				}
+			}
+		} else {
+			// We have no motion, so dPdtime is {0,0,0}
+			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
+		}
+	}
+
+	up	&=	~(PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | variables->parameters);
 }
 
 

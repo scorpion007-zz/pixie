@@ -44,6 +44,7 @@
 #include "renderer.h"
 #include "rendererContext.h"
 #include "objectMisc.h"
+#include "patchUtils.h"
 #include "common/polynomial.h"
 
 
@@ -105,7 +106,6 @@
 			to		=	xform->next->to;															\
 		}																							\
 																									\
-																									\
 		transform(&varying[VARIABLE_P][start*3],numVertices,from);									\
 																									\
 		if (up & PARAMETER_DPDU) {																	\
@@ -123,42 +123,6 @@
 
 
 
-
-#define	normalFix()	{																				\
-	float		*Ng	=	varying[VARIABLE_NG];														\
-	int			i;																					\
-																									\
-	for (i=numVertices;i>0;i--,Ng+=3) {																\
-		if (dotvv(Ng,Ng) == 0) {																	\
-			const float	*u		=	varying[VARIABLE_U];											\
-			const float	*v		=	varying[VARIABLE_V];											\
-			const float	*cNg	=	varying[VARIABLE_NG];											\
-			const float	cu		=	u[numVertices-i];												\
-			const float	cv		=	v[numVertices-i];												\
-			float		cd		=	C_INFINITY;														\
-			const float	*closest=	NULL;															\
-			int			j;																			\
-																									\
-			for (j=numVertices;j>0;j--,cNg+=3,u++,v++) {											\
-				if (dotvv(cNg,cNg) > 0) {															\
-					const float	du	=	cu - u[0];													\
-					const float	dv	=	cv - v[0];													\
-					float		d;																	\
-																									\
-					d	=	du*du + dv*dv;															\
-					if (d < cd) {																	\
-						cd		=	d;																\
-						closest	=	cNg;															\
-					}																				\
-				}																					\
-			}																						\
-																									\
-			assert(cd < C_INFINITY);																\
-			assert(closest != NULL);																\
-			movvv(Ng,closest);																		\
-		}																							\
-	}																								\
-}
 
 //////////////////////////////////////////// S P H E R E ///////////////////////////////////////////////////////
 
@@ -178,7 +142,7 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra
 	umax		=	anglea;
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	NULL;
 
@@ -204,7 +168,7 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0
 	umax		=	angle0;
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	new float[4];
 	nextData[0]	=	r1;
@@ -341,35 +305,23 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CSphere::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	int				currentVertex;
-	float			*dest;
 	const float		*u		=	varying[VARIABLE_U] + start;
 	const float		*v		=	varying[VARIABLE_V] + start;
-	float			*sinu;
-	float			*cosu;
-	float			*sinv;
-	float			*cosv;
-	float			*memBase;
-
-	memBase			=	(float *)	alloca(numVertices*4*sizeof(float));
-	sinu			=	memBase;
-	cosu			=	sinu + numVertices;
-	sinv			=	cosu + numVertices;
-	cosv			=	sinv + numVertices;
+	float			*sinu	=	(float *)	alloca(numVertices*4*sizeof(float));
+	float			*cosu	=	sinu + numVertices;
+	float			*sinv	=	cosu + numVertices;
+	float			*cosv	=	sinv + numVertices;
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		const float	*time	=	&varying[VARIABLE_TIME][start];
-		float		*r,*umax,*vmax,*vmin;
-
-		memBase			=	(float *)	alloca(numVertices*4*sizeof(float));
-		r				=	memBase;
-		umax			=	r + numVertices;
-		vmax			=	umax + numVertices;
-		vmin			=	vmax + numVertices;
-		dest			=	varying[VARIABLE_P] + start;
+		float		*r		=	(float *)	alloca(numVertices*4*sizeof(float));
+		float		*umax	=	r + numVertices;
+		float		*vmax	=	umax + numVertices;
+		float		*vmin	=	vmax + numVertices;
+		const float	*time	=	varying[VARIABLE_TIME] + start;
+		float		*dest	=	varying[VARIABLE_P] + start*3;
 
 		// Precompute sinu cosu sinv and cosv
-		for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
+		for (int currentVertex = 0; currentVertex < numVertices; ++currentVertex) {
 			const double	ctime	=	*time++;
 			const float		cumax	=	umax[currentVertex]		=	(float) (this->umax * (1.0 - ctime)	+ nextData[3] * ctime);
 			const float		cvmax	=	vmax[currentVertex]		=	(float) (this->vmax * (1.0 - ctime)	+ nextData[2] * ctime);
@@ -377,8 +329,8 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 			r[currentVertex]		=	(float) (this->r * (1.0 - ctime)		+ nextData[0] * (double)ctime);
 
 			// Precompute sinu cosu sinv and cosv
-			const double	cu		=	*u++;
-			const double	cv		=	*v++;
+			const double	cu		=	u[currentVertex];
+			const double	cv		=	v[currentVertex];
 			const float	uAngle		=	(float) (cumax*cu);
 			const float	vAngle		=	(float) (cvmax*cv + cvmin*(1.0-cv));
 			sinu[currentVertex]		=	sinf(uAngle);
@@ -392,13 +344,13 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 			dest[COMP_Y]			=	tmp*sinu[currentVertex];
 			dest					+=	3;
 		}
-
-			// Set dPdu
+		
+		// Set dPdu
 		if (up & PARAMETER_DPDU) {
-			float	*src	=	&varying[VARIABLE_P][start*3];
-					dest	=	&varying[VARIABLE_DPDU][start*3];
+			const float	*src	=	varying[VARIABLE_P] + start*3;
+						dest	=	varying[VARIABLE_DPDU] + start*3;
 
-			for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
+			for (int currentVertex = 0; currentVertex < numVertices; ++currentVertex) {
 				dest[COMP_X]	=	-umax[currentVertex]*src[COMP_Y];
 				dest[COMP_Y]	=	umax[currentVertex]*src[COMP_X];
 				dest[COMP_Z]	=	0;
@@ -409,9 +361,9 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 
 		// Set dPdv
 		if (up & PARAMETER_DPDV) {
-			dest	=	&varying[VARIABLE_DPDV][start*3];
+			dest	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
+			for (int currentVertex = 0; currentVertex < numVertices; ++currentVertex) {
 				dest[COMP_X]	=	-r[currentVertex]*cosu[currentVertex]*sinv[currentVertex]*(vmax[currentVertex]-vmin[currentVertex]);
 				dest[COMP_Y]	=	-r[currentVertex]*sinu[currentVertex]*sinv[currentVertex]*(vmax[currentVertex]-vmin[currentVertex]);
 				dest[COMP_Z]	=	r[currentVertex]*cosv[currentVertex]*(vmax[currentVertex]-vmin[currentVertex]);
@@ -432,8 +384,8 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 		}
 
 		// Precompute sinu cosu sinv and cosv
-		dest	=	&varying[VARIABLE_P][start*3];
-		for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
+		float	*dest	=	varying[VARIABLE_P] + start*3;
+		for (int currentVertex = 0; currentVertex < numVertices; ++currentVertex) {
 			const float	uAngle	=	(float) (umax*(double)u[currentVertex]);
 			const float	vAngle	=	(float) (vmax*(double)v[currentVertex] + vmin*(1.0-v[currentVertex]));
 			sinu[currentVertex]	=	sinf(uAngle);
@@ -450,11 +402,11 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 
 			// Set dPdu
 		if (up & PARAMETER_DPDU) {
-			const float	*src	=	&varying[VARIABLE_P][start*3];
-						dest	=	&varying[VARIABLE_DPDU][start*3];
+			const float	*src	=	varying[VARIABLE_P] + start*3;
+						dest	=	varying[VARIABLE_DPDU] + start*3;
 
 
-			for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
+			for (int currentVertex = 0; currentVertex < numVertices; ++currentVertex) {
 				dest[COMP_X]	=	-umax*src[COMP_Y];
 				dest[COMP_Y]	=	umax*src[COMP_X];
 				dest[COMP_Z]	=	0;
@@ -465,9 +417,9 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 
 		// Set dPdv
 		if (up & PARAMETER_DPDV) {
-			dest	=	&varying[VARIABLE_DPDV][start*3];
+			dest	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (currentVertex = 0; currentVertex < numVertices; currentVertex++) {
+			for (int currentVertex = 0; currentVertex < numVertices; ++currentVertex) {
 				dest[COMP_X]	=	-r*cosu[currentVertex]*sinv[currentVertex]*(vmax-vmin);
 				dest[COMP_Y]	=	-r*sinu[currentVertex]*sinv[currentVertex]*(vmax-vmin);
 				dest[COMP_Z]	=	r*cosv[currentVertex]*(vmax-vmin);
@@ -489,10 +441,63 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 			mulvf(N,P,f);
 		}
 	}
+	
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			// Get the u and v
+			assert(u ==	(varying[VARIABLE_U] + start));
+			assert(v ==	(varying[VARIABLE_V] + start));
+			
+			// Compute the xforms
+			for (int currentVertex=0;currentVertex<numVertices;++currentVertex,dest+=3)	{
+				const float	uAngleStart	=	(float) (umax*(double)u[currentVertex]);
+				const float	vAngleStart	=	(float) (vmax*(double)v[currentVertex] + vmin*(1.0-v[currentVertex]));
+				const float	rStart		=	r;
+				const float	uAngleEnd	=	(float) (nextData[3]*(double)u[currentVertex]);
+				const float	vAngleEnd	=	(float) (nextData[2]*(double)v[currentVertex] + nextData[1]*(1.0-v[currentVertex]));
+				const float	rEnd		=	nextData[0];
+				vector		Pstart,Pend;
+
+				// Compute the position at the beginning
+				Pstart[COMP_Z]			=	rStart*sinf(vAngleStart);
+				Pstart[COMP_X]			=	rStart*cosf(vAngleStart)*cosf(uAngleStart);
+				Pstart[COMP_Y]			=	rStart*cosf(vAngleStart)*sinf(uAngleStart);
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				Pend[COMP_Z]			=	rEnd*sinf(vAngleEnd);
+				Pend[COMP_X]			=	rEnd*cosf(vAngleEnd)*cosf(uAngleEnd);
+				Pend[COMP_Y]			=	rEnd*cosf(vAngleEnd)*sinf(uAngleEnd);
+				mulmp(Pend,fromEnd,Pend);
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
+		}
+	}
 
 	// Transform the points
 	transformPoints();
 
+	// Turn off the parameters we computed
 	up	&=	~parametersF;
 }
 
@@ -595,7 +600,7 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 	umax			=	anglea;
 
 	parameters		=	c;
-	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData		=	NULL;
 
@@ -620,7 +625,7 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 	umax		=	angle0;
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	new float[3];
 	nextData[0]	=	r1;
@@ -725,33 +730,22 @@ void	CDisk::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	float			*sinu;
-	float			*cosu;
-	int				i;
-	const float		*u		=	&varying[VARIABLE_U][start];
-	const float		*v		=	&varying[VARIABLE_V][start];
-	float			*dest;
-	float			*memBase;
+	const float		*u		=	varying[VARIABLE_U] + start;
+	const float		*v		=	varying[VARIABLE_V] + start;
 
 	// Allocate memory for precomputing sin(u) , cos(u)
-	memBase	=	(float *)	alloca(numVertices*2*sizeof(float));
-	sinu	=	memBase;
-	cosu	=	sinu + numVertices;
+	float			*sinu	=	(float *)	alloca(numVertices*2*sizeof(float));
+	float			*cosu	=	sinu + numVertices;
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		const float	*time	=	&varying[VARIABLE_TIME][start];
-		float		*r;
-		float		*z;
-		float		*umax;
-
-		memBase				=	(float *)	alloca(numVertices*3*sizeof(float));
-		r					=	memBase;
-		z					=	r + numVertices;
-		umax				=	z + numVertices;
-		dest				=	varying[VARIABLE_P] + start*3;
+		float		*r			=	(float *)	alloca(numVertices*3*sizeof(float));
+		float		*z			=	r + numVertices;
+		float		*umax		=	z + numVertices;
+		const float	*time		=	varying[VARIABLE_TIME] + start;
+		float		*dest		=	varying[VARIABLE_P] + start*3;
 
 		// Precompute sinu cosu sinv and cosv
-		for (i=0;i<numVertices;i++,dest+=3) {
+		for (int i=0;i<numVertices;++i,dest+=3) {
 			const double ctime	=	*time++;
 
 			r[i]			=	(float) (this->r 	* (1.0 - ctime)	+ nextData[0] * ctime);
@@ -767,10 +761,10 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		// Set dPdu/dPdv if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	(float) (-umax[i]*r[i]*(1.0-(double)v[i])*sinu[i]);
 				dPdu[COMP_Y]	=	(float) ( umax[i]*r[i]*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
@@ -793,8 +787,8 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 		}
 
 		// Precompute the sin/cos for u points
-		dest			=	varying[VARIABLE_P] + start*3;
-		for (i=0;i<numVertices;i++,dest+=3) {
+		float	*dest		=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i,dest+=3) {
 			cosu[i]			=	cosf(u[i]*umax);
 			sinu[i]			=	sinf(u[i]*umax);
 			dest[COMP_X]	=	(float) (r*(1.0-(double)v[i])*cosu[i]);
@@ -804,10 +798,10 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		// Set dPdu/dPdv if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	(float) (-umax*r*(1.0-(double)v[i])*sinu[i]);
 				dPdu[COMP_Y]	=	(float) ( umax*r*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
@@ -822,19 +816,72 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 
 	// Set Ng if needed
 	if (up & PARAMETER_NG) {
-		float	*Ng		=	&varying[VARIABLE_NG][start*3];
+		float	*Ng		=	varying[VARIABLE_NG] + start*3;
 		float	f		=	umax;
 
 		if (xform->flip)	f	=	-umax;
 
-		for (i=numVertices;i>0;i--,Ng+=3) {
+		for (int i=numVertices;i>0;i--,Ng+=3) {
 			initv(Ng,0,0,f);
+		}
+	}
+	
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			// Obtain the u/v
+			assert(u ==	(varying[VARIABLE_U] + start));
+			assert(v ==	(varying[VARIABLE_V] + start));
+			
+			// Compute the xforms
+			for (int i=0;i<numVertices;++i,dest+=3)	{
+				const float	uAngleStart	=	umax;
+				const float	zStart		=	z;
+				const float	rStart		=	r;
+				const float	uAngleEnd	=	nextData[2];
+				const float	zEnd		=	nextData[1];
+				const float	rEnd		=	nextData[0];
+				vector		Pstart,Pend;
+			
+				// Compute the position at the beginning
+				Pstart[COMP_X]			=	(float) (rStart*(1.0-(double)v[i])*cosf(u[i]*uAngleStart));
+				Pstart[COMP_Y]			=	(float) (rStart*(1.0-(double)v[i])*sinf(u[i]*uAngleStart));
+				Pstart[COMP_Z]			=	zStart;
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				Pend[COMP_X]			=	(float) (rEnd*(1.0-(double)v[i])*cosf(u[i]*uAngleEnd));
+				Pend[COMP_Y]			=	(float) (rEnd*(1.0-(double)v[i])*sinf(u[i]*uAngleEnd));
+				Pend[COMP_Z]			=	zEnd;
+				mulmp(Pend,fromEnd,Pend);
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
 	}
 	
 	// Transform the points
 	transformPoints();
 
+	// Turn off the parameters we computed
 	up	&=	~parametersF;
 }
 
@@ -920,7 +967,7 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 	umax			=	anglea;
 
 	parameters		=	c;
-	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData		=	NULL;
 
@@ -945,7 +992,7 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 	umax			=	angle0;
 
 	parameters		=	c;
-	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData		=	new float[3];
 	nextData[0]		=	r1;
@@ -1090,43 +1137,28 @@ void	CCone::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CCone::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	float		*cosu;
-	float		*sinu;
-	int			i;
 	const float	*u		=	varying[VARIABLE_U] + start;
 	const float	*v		=	varying[VARIABLE_V] + start;
-	float		*dest;
-	float		*memBase;
 
 	// Allocate memory for precomputing sin(u) , cos(u)
-	memBase	=	(float *)	alloca(numVertices*2*sizeof(float));
-	sinu	=	memBase;
-	cosu	=	sinu + numVertices;
+	float		*sinu	=	(float *)	alloca(numVertices*2*sizeof(float));
+	float		*cosu	=	sinu + numVertices;
 
-
-	// Precompute the sin/cos for u points
-	for (i=0;i<numVertices;i++) {
-		cosu[i]	=	cosf(u[i]*umax);
-		sinu[i]	=	sinf(u[i]*umax);
-	}
-
+	// Are we raytracing this primitive?
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		const float	*time		=	varying[VARIABLE_TIME] + start;
-		float		*r;
-		float		*height;
-		float		*umax;
-
-		memBase			=	(float *)	alloca(numVertices*sizeof(float));
-		r				=	memBase;
-		height			=	r + numVertices;
-		umax			=	height + numVertices;
-
-		// Precompute sinu cosu sinv and cosv
-		dest			=	varying[VARIABLE_P] + start*3;
-		for (i=0;i<numVertices;i++,dest+=3) {
+		float		*r		=	(float *)	alloca(numVertices*3*sizeof(float));
+		float		*height	=	r + numVertices;
+		float		*umax	=	height + numVertices;
+		const float	*time	=	varying[VARIABLE_TIME] + start;
+		float		*dest	=	varying[VARIABLE_P] + start*3;
+		
+		// Compute the position
+		for (int i=0;i<numVertices;++i,dest+=3) {
 			r[i]			=	(float) (this->r		* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
 			height[i]		=	(float) (this->height	* (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
 			umax[i]			=	(float) (this->umax 	* (1.0 - (double)time[i])	+ nextData[2] * (double)time[i]);
+			cosu[i]			=	cosf(u[i]*umax[i]);
+			sinu[i]			=	sinf(u[i]*umax[i]);
 			dest[COMP_X]	=	(float) (r[i]*(1.0-(double)v[i])*cosu[i]);
 			dest[COMP_Y]	=	(float) (r[i]*(1.0-(double)v[i])*sinu[i]);
 			dest[COMP_Z]	=	v[i]*height[i];
@@ -1137,7 +1169,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			float		*Ng		=	varying[VARIABLE_NG] + start*3;
 			const float	*P		=	varying[VARIABLE_P] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				Ng[COMP_X]	=	P[COMP_X]*umax[i]*height[i];
 				Ng[COMP_Y]	=	P[COMP_Y]*umax[i]*height[i];
 				Ng[COMP_Z]	=	(float) (r[i]*r[i]*umax[i]*(1.0-(double)v[i]));
@@ -1148,10 +1180,10 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		// Set dPdu/dPdv if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	(float) (-umax[i]*r[i]*(1.0-(double)v[i])*sinu[i]);
 				dPdu[COMP_Y]	=	(float) ( umax[i]*r[i]*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
@@ -1174,7 +1206,10 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 		}
 
 		// Set u/v/P
-		for (i=0,dest=&varying[VARIABLE_P][start*3];i<numVertices;i++) {
+		float	*dest	=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
+			cosu[i]			=	cosf(u[i]*umax);
+			sinu[i]			=	sinf(u[i]*umax);
 			dest[COMP_X]	=	(float) (r*(1.0-(double)v[i])*cosu[i]);
 			dest[COMP_Y]	=	(float) (r*(1.0-(double)v[i])*sinu[i]);
 			dest[COMP_Z]	=	v[i]*height;
@@ -1186,7 +1221,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			float		*Ng		=	varying[VARIABLE_NG] + start*3;
 			const float	*P		=	varying[VARIABLE_P] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				Ng[COMP_X]	=	P[COMP_X]*height*umax;
 				Ng[COMP_Y]	=	P[COMP_Y]*height*umax;
 				Ng[COMP_Z]	=	(float) (r*r*umax*(1.0-(double)v[i]));
@@ -1197,10 +1232,10 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		// Set dPdu/dPdv if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	(float) (-umax*r*(1.0-(double)v[i])*sinu[i]);
 				dPdu[COMP_Y]	=	(float) ( umax*r*(1.0-(double)v[i])*cosu[i]);
 				dPdu[COMP_Z]	=	0;
@@ -1216,14 +1251,64 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 	if (xform->flip == 1) {
 		float	*N	=	varying[VARIABLE_NG] + start*3;
 
-		for (int i=numVertices;i>0;i--,N+=3) {
+		for (int i=numVertices;i>0;--i,N+=3) {
 			mulvf(N,-1);
 		}
 	}
+	
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			// Compute the xforms
+			for (int i=0;i<numVertices;++i,dest+=3)	{
+				const float rStart			=	r;
+				const float heightStart		=	height;
+				const float umaxStart		=	umax;
+				const float rEnd			=	nextData[0];
+				const float heightEnd		=	nextData[1];
+				const float umaxEnd			=	nextData[2];
+				vector		Pstart,Pend;
+				
+				// Compute the position at the start
+				Pstart[COMP_X]	=	(rStart*(1.0f-v[i])*cosf(u[i]*umaxStart));
+				Pstart[COMP_Y]	=	(rStart*(1.0f-v[i])*sinf(u[i]*umaxStart));
+				Pstart[COMP_Z]	=	v[i]*heightStart;
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				Pend[COMP_X]	=	(rEnd*(1.0f-v[i])*cosf(u[i]*umaxEnd));
+				Pend[COMP_Y]	=	(rEnd*(1.0f-v[i])*sinf(u[i]*umaxEnd));
+				Pend[COMP_Z]	=	v[i]*heightEnd;
+				mulmp(Pend,fromEnd,Pend);
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
+		}
+	}
+
 
 	// Transform the points
 	transformPoints();
 
+	// Turn off the parameters we computed
 	up	&=	~parametersF;
 }
 
@@ -1318,7 +1403,7 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 	umax			=	anglea;
 
 	parameters		=	c;
-	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF		=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData		=	NULL;
 
@@ -1345,7 +1430,7 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	new float[4];
 	nextData[0]	=	r1;
@@ -1482,30 +1567,24 @@ void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CParaboloid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	float	*cosu;
-	float	*sinu;
-	float	*sqrtz;
-	int		i;
-	float	*u		=	&varying[VARIABLE_U][start];
-	float	*v		=	&varying[VARIABLE_V][start];
-	float	*dest;
+	const float	*u		=	varying[VARIABLE_U] + start;
+	const float	*v		=	varying[VARIABLE_V] + start;
 
 	// Allocate memory for precomputing sin(u) , cos(u)
-	sinu	=	(float *)	alloca(numVertices*sizeof(float));
-	cosu	=	(float *)	alloca(numVertices*sizeof(float));
-	sqrtz	=	(float *)	alloca(numVertices*sizeof(float));
-
+	float		*sinu	=	(float *)	alloca(numVertices*3*sizeof(float));
+	float		*cosu	=	sinu + numVertices;
+	float		*sqrtz	=	cosu + numVertices;
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*r		=	(float *)	alloca(numVertices*sizeof(float));
-		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*zmax	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*zmin	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*time	=	&varying[VARIABLE_TIME][start];
-
-		// Precompute the sin/cos for u points
-		dest			=				varying[VARIABLE_P] + start*3;
-		for (i=0;i<numVertices;i++) {
+		float		*r		=	(float *)	alloca(numVertices*4*sizeof(float));
+		float		*umax	=	r + numVertices;
+		float		*zmax	=	umax + numVertices;
+		float		*zmin	=	zmax + numVertices;
+		const float	*time	=	varying[VARIABLE_TIME] + start;
+		float		*dest	=	varying[VARIABLE_P] + start*3;
+		
+		// For each point to compute
+		for (int i=0;i<numVertices;++i) {
 			r[i]			=	(float) (this->r	* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
 			zmin[i]			=	(float) (this->zmin * (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
 			zmax[i]			=	(float) (this->zmax * (1.0 - (double)time[i])	+ nextData[2] * (double)time[i]);
@@ -1522,25 +1601,25 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 
 		// Set Ng if needed
 		if (up & PARAMETER_NG) {
-			float	*Ng		=	&varying[VARIABLE_NG][start*3];
-			float	*P		=	&varying[VARIABLE_P][start*3];
+			float		*Ng		=	varying[VARIABLE_NG] + start*3;
+			const float	*P		=	varying[VARIABLE_P] + start*3;
 
-			for (i=0;i<numVertices;i++) {
-				float	tmp2	=	umax[i]*(zmax[i]-zmin[i]);
-				Ng[COMP_X]		=	P[COMP_X]*tmp2;
-				Ng[COMP_Y]		=	P[COMP_Y]*tmp2;
-				Ng[COMP_Z]		=	-r[i]*r[i]*tmp2 / (2*zmax[i]);
-				Ng				+=	3;
-				P				+=	3;
+			for (int i=0;i<numVertices;++i) {
+				const float	tmp2	=	umax[i]*(zmax[i]-zmin[i]);
+				Ng[COMP_X]			=	P[COMP_X]*tmp2;
+				Ng[COMP_Y]			=	P[COMP_Y]*tmp2;
+				Ng[COMP_Z]			=	-r[i]*r[i]*tmp2 / (2*zmax[i]);
+				Ng					+=	3;
+				P					+=	3;
 			}
 		}
 
 		// Set dPdu/dPdv if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	-umax[i]*sqrtz[i]*sinu[i];
 				dPdu[COMP_Y]	=	umax[i]*sqrtz[i]*cosu[i];
 				dPdu[COMP_Z]	=	0;
@@ -1565,8 +1644,8 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 		}
 
 		// Precompute the sin/cos for u points
-		dest			=	varying[VARIABLE_P] + start*3;
-		for (i=0;i<numVertices;i++) {
+		float *dest			=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
 			cosu[i]			=	cosf(u[i]*umax);
 			sinu[i]			=	sinf(u[i]*umax);
 			sqrtz[i]		=	sqrtf(((zmax-zmin)*v[i]+zmin)/zmax);
@@ -1579,11 +1658,11 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 
 		// Set Ng if needed
 		if (up & PARAMETER_NG) {
-			float	*Ng		=	&varying[VARIABLE_NG][start*3];
-			float	*P		=	&varying[VARIABLE_P][start*3];
-			float	tmp2	=	umax*(zmax-zmin);
+			float		*Ng		=	varying[VARIABLE_NG] + start*3;
+			const float	*P		=	varying[VARIABLE_P] + start*3;
+			float		tmp2	=	umax*(zmax-zmin);
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				Ng[COMP_X]	=	P[COMP_X]*tmp2;
 				Ng[COMP_Y]	=	P[COMP_Y]*tmp2;
 				Ng[COMP_Z]	=	-r*r*tmp2 / (2*zmax);
@@ -1594,10 +1673,10 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 
 		// Set dPdu/dPdv if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	-umax*sqrtz[i]*sinu[i];
 				dPdu[COMP_Y]	=	umax*sqrtz[i]*cosu[i];
 				dPdu[COMP_Z]	=	0;
@@ -1613,8 +1692,61 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 	if (xform->flip == 1) {
 		float	*N	=	varying[VARIABLE_NG] + start*3;
 
-		for (int i=numVertices;i>0;i--,N+=3) {
+		for (int i=numVertices;i>0;--i,N+=3) {
 			mulvf(N,-1);
+		}
+	}
+	
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			
+			// Compute the xforms
+			for (int i=0;i<numVertices;++i,dest+=3)	{
+				const float rStart		=	r;
+				const float zminStart	=	zmin;
+				const float zmaxStart	=	zmax;
+				const float umaxStart	=	umax;
+				const float rEnd		=	nextData[0];
+				const float zminEnd		=	nextData[1];
+				const float zmaxEnd		=	nextData[2];
+				const float umaxEnd		=	nextData[3];			
+				vector		Pstart,Pend;
+
+				// Compute the position at the start
+				Pstart[COMP_Z]	=	(zmaxStart - zminStart)*v[i] + zminStart;
+				Pstart[COMP_X]	=	rStart*sqrtf(((zmaxStart-zminStart)*v[i]+zminStart)/zmaxStart)*cosf(u[i]*umaxStart);
+				Pstart[COMP_Y]	=	rStart*sqrtf(((zmaxStart-zminStart)*v[i]+zminStart)/zmaxStart)*sinf(u[i]*umaxStart);
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				Pend[COMP_Z]	=	(zmaxEnd - zminEnd)*v[i] + zminEnd;
+				Pend[COMP_X]	=	rEnd*sqrtf(((zmaxEnd-zminEnd)*v[i]+zminEnd)/zmaxEnd)*cosf(u[i]*umaxEnd);
+				Pend[COMP_Y]	=	rEnd*sqrtf(((zmaxEnd-zminEnd)*v[i]+zminEnd)/zmaxEnd)*sinf(u[i]*umaxEnd);
+				mulmp(Pend,fromEnd,Pend);
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
 	}
 
@@ -1704,7 +1836,7 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	NULL;
 
@@ -1730,7 +1862,7 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 	umax		=	angle0;
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	new float[4];
 	nextData[0]	=	r1;
@@ -1863,27 +1995,23 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CCylinder::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	float	*cosu;
-	float	*sinu;
-	int		i;
-	float	*u		=	varying[VARIABLE_U];
-	float	*v		=	varying[VARIABLE_V];
-	float	*dest;
+	float	*u		=	varying[VARIABLE_U] + start;
+	float	*v		=	varying[VARIABLE_V] + start;
 
 	// Allocate memory for precomputing sin(u) , cos(u)
-	sinu	=	(float *)	alloca(numVertices*sizeof(float));
-	cosu	=	(float *)	alloca(numVertices*sizeof(float));
+	float	*sinu	=	(float *)	alloca(numVertices*2*sizeof(float));
+	float	*cosu	=	sinu + numVertices;
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
-		float	*r		=	(float *)	alloca(numVertices*sizeof(float));
-		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*zmax	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*zmin	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*time	=	&varying[VARIABLE_TIME][start];
-
-		// Precompute the sin/cos for u points
-		dest			=	varying[VARIABLE_P] + start*3;
-		for (i=0;i<numVertices;i++) {
+		float		*r		=	(float *)	alloca(numVertices*4*sizeof(float));
+		float		*umax	=	r + numVertices;
+		float		*zmax	=	umax + numVertices;
+		float		*zmin	=	zmax + numVertices;
+		const float	*time	=	varying[VARIABLE_TIME] + start;
+		float		*dest	=	varying[VARIABLE_P] + start*3;
+		
+		// For every vertex to compute 
+		for (int i=0;i<numVertices;++i) {
 			r[i]		=	(float) (this->r 	* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
 			zmin[i]		=	(float) (this->zmin * (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
 			zmax[i]		=	(float) (this->zmax * (1.0 - (double)time[i])	+ nextData[2] * (double)time[i]);
@@ -1902,7 +2030,7 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			float	*Ng		=	varying[VARIABLE_NG] + start*3;
 			float	*P		=	varying[VARIABLE_P] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				const float	tmp2	=	umax[i]*(zmax[i]-zmin[i]);
 				Ng[COMP_X]	=	P[COMP_X]*tmp2;
 				Ng[COMP_Y]	=	P[COMP_Y]*tmp2;
@@ -1917,7 +2045,7 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
 			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	-umax[i]*sinu[i];
 				dPdu[COMP_Y]	=	umax[i]*cosu[i];
 				dPdu[COMP_Z]	=	0;
@@ -1941,14 +2069,11 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			umax		=	nextData[3];
 		}
 
-		// Precompute the sin/cos for u points
-		for (i=0;i<numVertices;i++) {
-			cosu[i]		=	(cosf(u[i]*umax))*r;
-			sinu[i]		=	(sinf(u[i]*umax))*r;
-		}
-
 		// Set u/v/P
-		for (i=0,dest=varying[VARIABLE_P] + start*3;i<numVertices;i++) {
+		float *dest		=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
+			cosu[i]			=	(cosf(u[i]*umax))*r;
+			sinu[i]			=	(sinf(u[i]*umax))*r;
 			dest[COMP_X]	=	cosu[i];
 			dest[COMP_Y]	=	sinu[i];
 			dest[COMP_Z]	=	(zmax - zmin)*v[i] + zmin;
@@ -1961,7 +2086,7 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			float		*P		=	varying[VARIABLE_P] + start*3;
 			const float	tmp2	=	umax*(zmax-zmin);
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				Ng[COMP_X]	=	P[COMP_X]*tmp2;
 				Ng[COMP_Y]	=	P[COMP_Y]*tmp2;
 				Ng[COMP_Z]	=	0;
@@ -1975,7 +2100,7 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
 			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				dPdu[COMP_X]	=	-umax*sinu[i];
 				dPdu[COMP_Y]	=	umax*cosu[i];
 				dPdu[COMP_Z]	=	0;
@@ -1991,14 +2116,69 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 	if (xform->flip) {
 		float	*N	=	varying[VARIABLE_NG] + start*3;
 
-		for (int i=numVertices;i>0;i--,N+=3) {
+		for (int i=numVertices;i>0;--i,N+=3) {
 			mulvf(N,-1);
 		}
 	}
 
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			// Basic sanity check
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			
+			// Compute the xforms
+			for (int i=0;i<numVertices;++i,dest+=3)	{
+				const float rStart		=	r;
+				const float zminStart	=	zmin;
+				const float zmaxStart	=	zmax;
+				const float umaxStart	=	umax;
+				const float rEnd		=	nextData[0];
+				const float zminEnd		=	nextData[1];
+				const float zmaxEnd		=	nextData[2];
+				const float umaxEnd		=	nextData[3];
+				vector		Pstart,Pend;
+
+				// Compute the position at the start
+				Pstart[COMP_X]	=	(cosf(u[i]*umaxStart))*rStart;
+				Pstart[COMP_Y]	=	(sinf(u[i]*umaxStart))*rStart;
+				Pstart[COMP_Z]	=	(zmaxStart - zminStart)*v[i] + zminStart;
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				Pend[COMP_X]	=	(cosf(u[i]*umaxEnd))*rEnd;
+				Pend[COMP_Y]	=	(sinf(u[i]*umaxEnd))*rEnd;
+				Pend[COMP_Z]	=	(zmaxEnd - zminEnd)*v[i] + zminEnd;
+				mulmp(Pend,fromEnd,Pend);
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
+		}
+	}
+	
 	// Transform the points
 	transformPoints();
 
+	// Turn off the parameters we computed
 	up	&=	~parametersF;
 }
 
@@ -2082,7 +2262,7 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	NULL;
 
@@ -2108,7 +2288,7 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	new float[7];
 	movvv(&nextData[0],p11);
@@ -2298,15 +2478,10 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	float	*cosu;
-	float	*sinu;
-	int		i;
-	float	*u		=	&varying[VARIABLE_U][start];
-	float	*v		=	&varying[VARIABLE_V][start];
-	float	*dest;
-
-	sinu	=	(float *)	alloca(numVertices*sizeof(float));
-	cosu	=	(float *)	alloca(numVertices*sizeof(float));
+	float	*u		=	varying[VARIABLE_U] + start;
+	float	*v		=	varying[VARIABLE_V] + start;
+	float	*sinu	=	(float *)	alloca(numVertices*2*sizeof(float));
+	float	*cosu	=	sinu + numVertices;
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
 		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
@@ -2321,10 +2496,10 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 		float	*np2	=	&nextData[3];
 		float	*cp1	=	p1;
 		float	*cp2	=	p2;
-		float	*time	=	&varying[VARIABLE_TIME][start];
+		const float	*time	=	varying[VARIABLE_TIME] + start;
 
 		// Precompute the sin/cos for u points
-		for (i=0;i<numVertices;i++) {
+		for (int i=0;i<numVertices;++i) {
 			umax[i]		=	(float) (this->umax  * (1.0 - (double)time[i]) + nextData[6] * (double)time[i]);
 			cp1[COMP_X]	=	(float) (tp1[COMP_X] * (1.0 - (double)time[i]) + np1[COMP_X] * (double)time[i]);
 			cp1[COMP_Y]	=	(float) (tp1[COMP_Y] * (1.0 - (double)time[i]) + np1[COMP_Y] * (double)time[i]);
@@ -2344,7 +2519,8 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 		// Set u/v/P
 		cp1	=	p1;
 		cp2	=	p2;
-		for (i=0,dest=&varying[VARIABLE_P][start*3];i<numVertices;i++) {
+		float	*dest	=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
 			const float x	=	cp1[COMP_X] + dx[i]*v[i];
 			const float y	=	cp1[COMP_Y] + dy[i]*v[i];
 			const float z	=	cp1[COMP_Z] + dz[i]*v[i];
@@ -2359,14 +2535,13 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 
 		// Set dPdu/dPdv/Ng if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU | PARAMETER_NG)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
-			float	*Ng		=	&varying[VARIABLE_NG][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
+			float	*Ng		=	varying[VARIABLE_NG] + start*3;
 
 			cp1	=	p1;
 			cp2	=	p2;
-			for (i=0;i<numVertices;i++) {
-
+			for (int i=0;i<numVertices;++i) {
 				const float x	=	cp1[COMP_X] + dx[i]*v[i];
 				const float y	=	cp1[COMP_Y] + dy[i]*v[i];
 				const float z	=	cp1[COMP_Z] + dz[i]*v[i];
@@ -2389,7 +2564,7 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 	} else {
 		const	float	*p1		=	this->p1;
 		const	float	*p2		=	this->p2;
-		float	umax	=	this->umax;
+		float			umax	=	this->umax;
 
 		if ((up & PARAMETER_END_SAMPLE) && (nextData != NULL)) {
 			p1			=	&nextData[0];
@@ -2401,18 +2576,14 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 		const float	dy		=	p2[COMP_Y] - p1[COMP_Y];
 		const float	dz		=	p2[COMP_Z] - p1[COMP_Z];
 
-		// Precompute the sin/cos for u points
-		for (i=0;i<numVertices;i++) {
-			cosu[i]	=	cosf(u[i]*umax);
-			sinu[i]	=	sinf(u[i]*umax);
-		}
-
 		// Set u/v/P
-		for (i=0,dest=&varying[VARIABLE_P][start*3];i<numVertices;i++) {
+		float		*dest	=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
 			const float x	=	p1[COMP_X] + dx*v[i];
 			const float y	=	p1[COMP_Y] + dy*v[i];
 			const float z	=	p1[COMP_Z] + dz*v[i];
-
+			cosu[i]			=	cosf(u[i]*umax);
+			sinu[i]			=	sinf(u[i]*umax);
 			dest[COMP_X]	=	(x*cosu[i] - y*sinu[i]);
 			dest[COMP_Y]	=	(x*sinu[i] + y*cosu[i]);
 			dest[COMP_Z]	=	z;
@@ -2421,11 +2592,11 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 
 		// Set dPdu/dPdv/Ng if needed
 		if (up & (PARAMETER_DPDU | PARAMETER_DPDU | PARAMETER_NG)) {
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
-			float	*Ng		=	&varying[VARIABLE_NG][start*3];
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
+			float	*Ng		=	varying[VARIABLE_NG] + start*3;
 
-			for (i=0;i<numVertices;i++) {
+			for (int i=0;i<numVertices;++i) {
 				const float x	=	p1[COMP_X] + dx*v[i];
 				const float y	=	p1[COMP_Y] + dy*v[i];
 				const float z	=	p1[COMP_Z] + dz*v[i];
@@ -2447,17 +2618,84 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 		}
 	}
 
+	// Do we need to flip orientation?
 	if (xform->flip == 1) {
 		float	*N	=	varying[VARIABLE_NG] + start*3;
 
-		for (int i = numVertices;i>0;i--,N+=3) {
+		for (int i = numVertices;i>0;--i,N+=3) {
 			mulvf(N,-1);
 		}
 	}
+	
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			
+			// Compute the xforms
+			for (int i=0;i<numVertices;++i,dest+=3)	{
+				const float	*p1End	=	nextData;
+				const float	*p2End	=	nextData + 3;
+				const float	umaxEnd	=	nextData[6];
+				const float	dx		=	p2[COMP_X] - p1[COMP_X];
+				const float	dy		=	p2[COMP_Y] - p1[COMP_Y];
+				const float	dz		=	p2[COMP_Z] - p1[COMP_Z];
+				const float	dxEnd	=	p2End[COMP_X] - p1End[COMP_X];
+				const float	dyEnd	=	p2End[COMP_Y] - p1End[COMP_Y];
+				const float	dzEnd	=	p2End[COMP_Z] - p1End[COMP_Z];
+				vector		Pstart,Pend;
+
+				// Compute the position at the start
+				{
+					const float x	=	p1[COMP_X] + dx*v[i];
+					const float y	=	p1[COMP_Y] + dy*v[i];
+					const float z	=	p1[COMP_Z] + dz*v[i];
+					Pstart[COMP_X]	=	(x*cosf(u[i]*umax) - y*sinf(u[i]*umax));
+					Pstart[COMP_Y]	=	(x*sinf(u[i]*umax) + y*cosf(u[i]*umax));
+					Pstart[COMP_Z]	=	z;
+				}
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				{
+					const float x	=	p1End[COMP_X] + dxEnd*v[i];
+					const float y	=	p1End[COMP_Y] + dyEnd*v[i];
+					const float z	=	p1End[COMP_Z] + dzEnd*v[i];
+					Pend[COMP_X]	=	(x*cosf(u[i]*umaxEnd) - y*sinf(u[i]*umaxEnd));
+					Pend[COMP_Y]	=	(x*sinf(u[i]*umaxEnd) + y*cosf(u[i]*umaxEnd));
+					Pend[COMP_Z]	=	z;
+				}
+				mulmp(Pend,fromEnd,Pend);
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
+		}
+	}
+
 
 	// Transform the points
 	transformPoints();
 
+	// Turn off the parameters we computed
 	up	&=	~parametersF;
 }
 
@@ -2552,7 +2790,7 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 	umax		=	umaxa;
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	NULL;
 
@@ -2580,7 +2818,7 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 
 
 	parameters	=	c;
-	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | pf;
+	parametersF	=	PARAMETER_P | PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_DPDTIME | pf;
 
 	nextData	=	new float[5];
 	nextData[0]	=	rmin1;
@@ -2765,20 +3003,12 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 // Return Value			:	-
 // Comments				:
 void			CToroid::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
-	float	*cosu;
-	float	*sinu;
-	float	*sinv;
-	float	*cosv;
-	int		i;
-	float	*u		=	&varying[VARIABLE_U][start];
-	float	*v		=	&varying[VARIABLE_V][start];
-	float	*dest;
-
-	sinu	=	(float *)	alloca(numVertices*sizeof(float));
-	cosu	=	(float *)	alloca(numVertices*sizeof(float));
-	sinv	=	(float *)	alloca(numVertices*sizeof(float));
-	cosv	=	(float *)	alloca(numVertices*sizeof(float));
-
+	float	*u		=	varying[VARIABLE_U] + start;
+	float	*v		=	varying[VARIABLE_V] + start;
+	float	*sinu	=	(float *)	alloca(numVertices*4*sizeof(float));
+	float	*cosu	=	sinu + numVertices;
+	float	*sinv	=	cosu + numVertices;
+	float	*cosv	=	sinv + numVertices;
 
 	if ((nextData != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {
 		float	*rmin	=	(float *)	alloca(numVertices*sizeof(float));
@@ -2786,10 +3016,10 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 		float	*vmin	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*vmax	=	(float *)	alloca(numVertices*sizeof(float));
 		float	*umax	=	(float *)	alloca(numVertices*sizeof(float));
-		float	*time	=	&varying[VARIABLE_TIME][start];
+		float	*time	=	varying[VARIABLE_TIME] + start;
 
 		// Precompute the sin/cos for u points
-		for (i=0;i<numVertices;i++) {
+		for (int i=0;i<numVertices;++i) {
 			rmin[i]	=	(float) (this->rmin * (1.0 - (double)time[i]) + nextData[0] * (double)time[i]);
 			rmax[i]	=	(float) (this->rmax * (1.0 - (double)time[i]) + nextData[1] * (double)time[i]);
 			vmin[i]	=	(float) (this->vmin * (1.0 - (double)time[i]) + nextData[2] * (double)time[i]);
@@ -2803,8 +3033,9 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 		}
 
 		// Set u/v/P
-		for (i=0,dest=&varying[VARIABLE_P][start*3];i<numVertices;i++) {
-			float	r		=	rmin[i]*cosv[i];
+		float *dest	=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
+			const float	r	=	rmin[i]*cosv[i];
 			dest[COMP_Z]	=	rmin[i]*sinv[i];
 			dest[COMP_X]	=	(rmax[i]+r)*cosu[i];
 			dest[COMP_Y]	=	(rmax[i]+r)*sinu[i];
@@ -2814,12 +3045,12 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 
 		// Set Ng if needed
 		if (up & (PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV)) {
-			float	*Ng		=	&varying[VARIABLE_NG][start*3];
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*Ng		=	varying[VARIABLE_NG] + start*3;
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
-				float		r	=	rmin[i]*cosv[i];
+			for (int i=0;i<numVertices;++i) {
+				const float	r	=	rmin[i]*cosv[i];
 				dPdu[COMP_Z]	=	0;
 				dPdu[COMP_X]	=	-(rmax[i]+r)*sinu[i]*umax[i];
 				dPdu[COMP_Y]	=	(rmax[i]+r)*cosu[i]*umax[i];
@@ -2847,17 +3078,14 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 			umax		=	nextData[4];
 		}
 
-		// Precompute the sin/cos for u points
-		for (i=0;i<numVertices;i++) {
-			cosu[i]	=	cosf(u[i]*umax);
-			sinu[i]	=	sinf(u[i]*umax);
-			cosv[i]	=	cosf(v[i]*(vmax-vmin) + vmin);
-			sinv[i]	=	sinf(v[i]*(vmax-vmin) + vmin);
-		}
-
 		// Set u/v/P
-		for (i=0,dest=&varying[VARIABLE_P][start*3];i<numVertices;i++) {
-			float	r		=	rmin*cosv[i];
+		float *dest	=	varying[VARIABLE_P] + start*3;
+		for (int i=0;i<numVertices;++i) {
+			cosu[i]			=	cosf(u[i]*umax);
+			sinu[i]			=	sinf(u[i]*umax);
+			cosv[i]			=	cosf(v[i]*(vmax-vmin) + vmin);
+			sinv[i]			=	sinf(v[i]*(vmax-vmin) + vmin);
+			const float	r	=	rmin*cosv[i];
 			dest[COMP_Z]	=	rmin*sinv[i];
 			dest[COMP_X]	=	(rmax+r)*cosu[i];
 			dest[COMP_Y]	=	(rmax+r)*sinu[i];
@@ -2867,12 +3095,12 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 
 		// Set Ng if needed
 		if (up & (PARAMETER_NG | PARAMETER_DPDU | PARAMETER_DPDV)) {
-			float	*Ng		=	&varying[VARIABLE_NG][start*3];
-			float	*dPdu	=	&varying[VARIABLE_DPDU][start*3];
-			float	*dPdv	=	&varying[VARIABLE_DPDV][start*3];
+			float	*Ng		=	varying[VARIABLE_NG] + start*3;
+			float	*dPdu	=	varying[VARIABLE_DPDU] + start*3;
+			float	*dPdv	=	varying[VARIABLE_DPDV] + start*3;
 
-			for (i=0;i<numVertices;i++) {
-				float		r	=	rmin*cosv[i];
+			for (int i=0;i<numVertices;++i) {
+				const float	r	=	rmin*cosv[i];
 				dPdu[COMP_Z]	=	0;
 				dPdu[COMP_X]	=	-(rmax+r)*sinu[i]*umax;
 				dPdu[COMP_Y]	=	(rmax+r)*cosu[i]*umax;
@@ -2891,10 +3119,75 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 	if (xform->flip == 1) {
 		float	*N	=	varying[VARIABLE_NG] + start*3;
 
-		for (int i=numVertices;i>0;i--,N+=3) {
+		for (int i=numVertices;i>0;--i,N+=3) {
 			mulvf(N,-1);
 		}
 	}
+
+
+	// Set dPdtime
+	if (up & PARAMETER_DPDTIME) {
+		// This is where we'll store the result
+		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
+		
+		// Are we moving?
+		if (nextData != NULL) {
+			// Get the xform matrices to move to the camera system
+			const float	*fromStart	=	xform->from;
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
+			
+			// Sanity check
+			assert(u == (varying[VARIABLE_U] + start));
+			assert(v == (varying[VARIABLE_V] + start));
+			
+			// Compute the xforms
+			for (int i=0;i<numVertices;++i,dest+=3)	{
+				vector		Pstart,Pend;
+
+				// Compute the position at the start
+				const float cosu	=	cosf(u[i]*umax);
+				const float sinu	=	sinf(u[i]*umax);
+				const float cosv	=	cosf(v[i]*(vmax-vmin) + vmin);
+				const float sinv	=	sinf(v[i]*(vmax-vmin) + vmin);
+				const float	r		=	rmin*cosv;
+				Pstart[COMP_Z]	=	rmin*sinv;
+				Pstart[COMP_X]	=	(rmax+r)*cosu;
+				Pstart[COMP_Y]	=	(rmax+r)*sinu;
+				mulmp(Pstart,fromStart,Pstart);
+				
+				// Compute the position at the end
+				{
+					const float rminEnd		=	nextData[0];
+					const float rmaxEnd		=	nextData[1];
+					const float vminEnd		=	nextData[2];
+					const float vmaxEnd		=	nextData[3];
+					const float umaxEnd		=	nextData[4];
+					const float cosu		=	cosf(u[i]*umaxEnd);
+					const float sinu		=	sinf(u[i]*umaxEnd);
+					const float cosv		=	cosf(v[i]*(vmaxEnd-vminEnd) + vminEnd);
+					const float sinv		=	sinf(v[i]*(vmaxEnd-vminEnd) + vminEnd);
+					const float	r			=	rminEnd*cosv;
+					Pstart[COMP_Z]	=	rminEnd*sinv;
+					Pstart[COMP_X]	=	(rmaxEnd+r)*cosu;
+					Pstart[COMP_Y]	=	(rmaxEnd+r)*sinu;
+					mulmp(Pend,fromEnd,Pend);
+				}
+				
+				// Compute the dPdtime
+				subvv(dest,Pend,Pstart);
+			}
+		} else {
+			// Get the xform matrices
+			const float	*fromStart	=	xform->from + element(0,3);
+			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
+			vector		D;
+			subvv(D,fromEnd,fromStart);
+			
+			// dPdtime is zero
+			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
+		}
+	}
+
 
 	// Transform the points
 	transformPoints();
