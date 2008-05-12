@@ -344,7 +344,10 @@ void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,u
 		
 		// Do we have motion?
 		if (variables->moving) {
-			for (int i=0;i<numPoints;++i)	subvv(dest,points[i]+vertexSize,points[i]);
+			for (int i=0;i<numPoints;++i) {
+				subvv(dest,points[i]+vertexSize,points[i]);
+				mulvf(dest,CRenderer::invShutterTime);
+			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}
 			for (int i=0;i<numPoints;++i)	initv(dest,0,0,0);

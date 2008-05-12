@@ -470,6 +470,9 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 					const int	k	=	4*vertexSize + j;
 					dest[j]	=	(((v0[k]*(1.0f - cu) + v1[k]*cu)*(1.0 - cv)	+ (v2[k]*(1.0f - cu) + v3[k]*cu)*cv - (v0[j]*(1.0f - cu) + v1[j]*cu)*(1.0 - cv)	+ (v2[j]*(1.0f - cu) + v3[j]*cu)*cv));
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}
@@ -773,6 +776,9 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 					// Compute the result
 					dest[j]			=	(float) ((tmpEnd[0]*ucubed + tmpEnd[1]*usquared + tmpEnd[2]*cu + tmpEnd[3]) - (tmpStart[0]*ucubed + tmpStart[1]*usquared + tmpStart[2]*cu + tmpStart[3]));
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}
@@ -1200,6 +1206,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		dest[0]		=	(float) (Pend[0] - Pstart[0]);											\
 		dest[1]		=	(float) (Pend[1] - Pstart[1]);											\
 		dest[2]		=	(float) (Pend[2] - Pstart[2]);											\
+		mulvf(dest,CRenderer::invShutterTime);													\
 	}																							\
 	}
 	

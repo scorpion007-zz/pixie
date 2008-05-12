@@ -487,6 +487,9 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 				for (int k=0;k<3;k++) {
 					*dest++	=	(float) ((v10[k]*(1.0-cu) + v11[k]*cu*cv + v12[k]*cu*(1.0-cv)) - (v00[k]*(1.0-cu) + v01[k]*cu*cv + v02[k]*cu*(1.0-cv)));					
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest-3,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}
@@ -1087,6 +1090,9 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 				for (int k=0;k<3;k++) {
 					dest[k]	=	(float) (((v10[k]*(1.0-cu) + v11[k]*cu)*(1.0-cv) + (v12[k]*(1.0-cu) + v13[k]*cu)*cv) - ((v00[k]*(1.0-cu) + v01[k]*cu)*(1.0-cv) + (v02[k]*(1.0-cu) + v03[k]*cu)*cv));
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}

@@ -311,6 +311,9 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 					// Update the data
 					*dest++			=	(float) ((tmpEnd[0]*ucubed + tmpEnd[1]*usquared + tmpEnd[2]*cu + tmpEnd[3]) - (tmpStart[0]*ucubed + tmpStart[1]*usquared + tmpStart[2]*cu + tmpStart[3]));
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest-3,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}

@@ -518,6 +518,9 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 				for (int k=0;k<3;++k) {
 					dest[k]	=	(tmp[0]*v0[vertexSize+k] + tmp[1]*v1[vertexSize+k] + tmp[2]*v2[vertexSize+k] + tmp[3]*v3[vertexSize+k]) - (tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k]);
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}
@@ -674,6 +677,9 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 				for (int k=0;k<3;++k) {
 					dest[k]	= (v0[vertexSize+k]*(1.0f-cv) + v1[vertexSize+k]*cv) - (v0[k]*(1.0f-cv) + v1[k]*cv);
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}

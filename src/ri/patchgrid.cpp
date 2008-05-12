@@ -345,6 +345,9 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 					dest[j]	=	(((d0[disp+j])*(1.0f-xoff) + (d1[disp+j])*xoff)*(1.0f-yoff)  + ((d2[disp+j])*(1.0f-xoff) + (d3[disp+j])*xoff)*yoff) -
 								(((d0[j])*(1.0f-xoff) + (d1[j])*xoff)*(1.0f-yoff)  + ((d2[j])*(1.0f-xoff) + (d3[j])*xoff)*yoff);
 				}
+				
+				// Scale the dPdtime
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// We have no motion, so dPdtime is {0,0,0}

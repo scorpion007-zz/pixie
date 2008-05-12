@@ -481,6 +481,7 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -488,6 +489,7 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
@@ -865,6 +867,7 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -872,6 +875,7 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
@@ -1291,6 +1295,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -1298,6 +1303,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
@@ -1737,6 +1743,7 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -1744,6 +1751,7 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
@@ -2162,6 +2170,7 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -2169,6 +2178,7 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
@@ -2678,6 +2688,7 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -2685,6 +2696,7 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
@@ -3175,6 +3187,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 				
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
+				mulvf(dest,CRenderer::invShutterTime);
 			}
 		} else {
 			// Get the xform matrices
@@ -3182,6 +3195,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
 			vector		D;
 			subvv(D,fromEnd,fromStart);
+			mulvf(D,CRenderer::invShutterTime);
 			
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
