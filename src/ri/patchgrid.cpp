@@ -260,7 +260,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 		const float	vm		=	(float) (nv - 1);
 
 		// Interpolate the vertices
-		for (int i=0;i<numVertices;--i) {
+		for (int i=0;i<numVertices;++i) {
 			const	double	cu		=	u[i] * (nu - 1.0);
 			const	double	cv		=	v[i] * (nv - 1.0);
 			const	int		x		=	(int) floor(min(cu,(nu-2)));
