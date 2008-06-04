@@ -1500,16 +1500,16 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 
 #define	TEXTUREFEXPR			plReady();																		\
 								cs[0]		=	s[i];															\
-								cs[1]		=	s[i] + dsdu[i]*du[i]*swidth;											\
-								cs[2]		=	s[i] + dsdv[i]*dv[i]*swidth;											\
-								cs[3]		=	s[i] + (dsdu[i]*du[i] + dsdv[i]*dv[i])*swidth;								\
+								cs[1]		=	s[i] + dsdu[i]*du[i]*swidth;									\
+								cs[2]		=	s[i] + dsdv[i]*dv[i]*swidth;									\
+								cs[3]		=	s[i] + (dsdu[i]*du[i] + dsdv[i]*dv[i])*swidth;					\
 								ct[0]		=	t[i];															\
-								ct[1]		=	t[i] + dtdu[i]*du[i]*twidth;											\
-								ct[2]		=	t[i] + dtdv[i]*dv[i]*twidth;											\
-								ct[3]		=	t[i] + (dtdu[i]*du[i] + dtdv[i]*dv[i])*twidth;								\
+								ct[1]		=	t[i] + dtdu[i]*du[i]*twidth;									\
+								ct[2]		=	t[i] + dtdv[i]*dv[i]*twidth;									\
+								ct[3]		=	t[i] + (dtdu[i]*du[i] + dtdv[i]*dv[i])*twidth;					\
 								vector	tmp;																	\
 								tex->lookup4(tmp,cs,ct,this);													\
-								res[i]		=	tmp[0];
+								res[i]		=	tmp[int(*op2)&3];
 
 #define	TEXTUREFEXPR_UPDATE		++i;	plStep();
 

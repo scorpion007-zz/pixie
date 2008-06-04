@@ -742,7 +742,6 @@ CPolygonQuad::~CPolygonQuad() {
 // Return Value			:	-
 // Comments				:
 void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
-
 	if (! (cRay->flags & attributes->flags) )	return;
 
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
@@ -787,7 +786,6 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 		interpolatev(t2,P01,vertices + this->v2*3,cRay->time);	P01	=	t2;
 		interpolatev(t3,P11,vertices + this->v3*3,cRay->time);	P11	=	t3;
 	} 
-
 
 	const float	*r			=	cRay->from;
 	const float	*q			=	cRay->dir;
@@ -1630,19 +1628,19 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 	if ((nloops == 1) && (nverts[0] == 3)) {
 
 		// Create the triangle
-		createTriangle(vindices,0,1,2);
+		createTriangle(vindices,0,1,2,data);
 
-		meshUniformNumber++;
-		meshFacevaryingNumber	+=	3;
+		data.meshUniformNumber++;
+		data.meshFacevaryingNumber	+=	3;
 
 		return;
 	} else if ((nloops == 1) && (nverts[0] == 4)) {
 
 		// Create the quad
-		createQuad(vindices,0,1,2,3);
+		createQuad(vindices,0,1,2,3,data);
 
-		meshUniformNumber++;
-		meshFacevaryingNumber	+=	4;
+		data.meshUniformNumber++;
+		data.meshFacevaryingNumber	+=	4;
 
 		return;
 	}
@@ -1683,8 +1681,6 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 				majorAxis	=	COMP_X;
 				minorAxis	=	COMP_Y;
 			}
-
-		
 
 			break;
 		}
@@ -1771,9 +1767,8 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		data.meshUniformNumber++;
 		data.meshFacevaryingNumber	+=	4;
 
-		return;
+		return; 
 	}
-
 #endif
 
 	// Eliminate holes by connecting them to the outher hull

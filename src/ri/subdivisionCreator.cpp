@@ -1910,11 +1910,11 @@ void		CSubdivMesh::create(CShadingContext *context) {
 			faces[i]->vertices[j]->facevarying	=	data.facevaryingData + (k+j)*data.facevaryingSize;
 			
 			// Check for degenerate faces
-			int val = faces[i]->vertices[j]->valence;
-			int fval = faces[i]->vertices[j]->fvalence;
-			if((val == 1))					{ warning(CODE_CONSISTENCY,"Subdivision mesh has hanging vertex"); goto skipFace; }
-			if((val == 2) && (fval != 1)) 	{ warning(CODE_CONSISTENCY,"Subdivision mesh is degenerate (face %d)\n",i); goto skipFace; }
-			if((val >= 3) && (fval > val)) 	{ warning(CODE_CONSISTENCY,"Subdivision mesh is degenerate (face %d)\n",i); goto skipFace; }
+			const int val	= faces[i]->vertices[j]->valence;
+			const int fval	= faces[i]->vertices[j]->fvalence;
+			if((val == 1))					{ warning(CODE_CONSISTENCY,"Subdivision mesh has hanging vertex");			k    +=    faces[i]->numEdges;	goto skipFace; }
+			if((val == 2) && (fval != 1)) 	{ warning(CODE_CONSISTENCY,"Subdivision mesh is degenerate (face %d)\n",i); k    +=    faces[i]->numEdges;	goto skipFace; }
+			if((val >= 3) && (fval > val)) 	{ warning(CODE_CONSISTENCY,"Subdivision mesh is degenerate (face %d)\n",i); k    +=    faces[i]->numEdges;	goto skipFace; }
 		}
 
 		k	+=	j;
