@@ -440,9 +440,9 @@ CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,in
 // Comments				:	
 int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	// Record current position, seek back to tile start
-	uint64_t curPos = ftell(tsmFile);
+	long curPos = ftell(tsmFile);
 	fseek(tsmFile,lastPosition,SEEK_SET);
-	uint64_t sz = curPos - lastPosition;
+	long sz = curPos - lastPosition;
 	rcSend(s,&sz,sizeof(uint64_t));
 	
 	// Reset the sz because we may have overwritten it

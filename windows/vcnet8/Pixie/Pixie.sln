@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcproj", "{9D01025F-82A2-4E47-9B37-7BDE5430A087}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "file", "file\file.vcproj", "{999FBC26-4F20-4BEF-B7DC-87DB7AA47F72}"
@@ -67,23 +67,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texmake", "texmake\texmake.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openexr", "openexr\openexr.vcproj", "{9A91A7E3-FB05-4E3F-91DE-FA47F5FDC398}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E37B7988-63F4-48D8-A39B-79D705E4D25A}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\AUTHORS = ..\..\..\AUTHORS
-		..\..\..\ChangeLog = ..\..\..\ChangeLog
-		..\..\..\COMPILING.txt = ..\..\..\COMPILING.txt
-		..\..\..\config.windows.h = ..\..\..\config.windows.h
-		..\..\..\configure.in = ..\..\..\configure.in
-		..\..\..\COPYING = ..\..\..\COPYING
-		..\..\..\DEVNOTES = ..\..\..\DEVNOTES
-		..\..\..\INSTALL = ..\..\..\INSTALL
-		..\..\..\LICENSE = ..\..\..\LICENSE
-		..\..\..\NEWS = ..\..\..\NEWS
-		..\..\..\pixie.spec = ..\..\..\pixie.spec
-		..\..\..\win32inst\PixieW32Setup.iss = ..\..\..\win32inst\PixieW32Setup.iss
-		..\..\..\README = ..\..\..\README
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gui", "gui\gui.vcproj", "{CC482007-8EFD-4855-8262-B92C89B328ED}"
 	ProjectSection(ProjectDependencies) = postProject

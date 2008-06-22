@@ -1,6 +1,6 @@
 Name: Pixie
 Summary: 3D renderer Renderman compliant
-Version: 2.2.3
+Version: 2.2.4
 Release: 1
 License: GPL/LGPL
 Group: Applications

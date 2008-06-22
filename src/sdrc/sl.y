@@ -798,7 +798,7 @@ slBlock:
 
 			cFun->code			=	$3;
 
-			$$	=	new	CFuncallExpression(cFun,NULL);
+			$$					=	new	CFuncallExpression(cFun,NULL);
 		}
 		;
 
@@ -1847,117 +1847,29 @@ slIlluminanceStartStatement:
 slIlluminanceStatement:
 		slIlluminanceStartStatement
 		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
+		slArrayItems
 		SL_CLOSE_PARANTHESIS
 		slMatchedStatement
 		{
 			CFunction	*cFun	=	sdr->popFunction();
 
-			$$	=	new CIlluminationLoop(NULL,$3,NULL,NULL,$5);
-		}
-	|
-		slIlluminanceStartStatement
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		slMatchedStatement
-		{
-			CFunction	*cFun	=	sdr->popFunction();
-
-			$$	=	new CIlluminationLoop($3,$5,NULL,NULL,$7);
-		}
-	|
-		slIlluminanceStartStatement
-		SL_OPEN_PARANTHESIS
-   		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		slMatchedStatement
-		{
-			CFunction	*cFun	=	sdr->popFunction();
-
-			$$	=	new CIlluminationLoop(NULL,$3,$5,$7,$9);
-		}
-	|
-		slIlluminanceStartStatement
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
-		SL_COMMA
-   		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		slMatchedStatement
-		{
-			CFunction	*cFun	=	sdr->popFunction();
-
-			$$	=	new CIlluminationLoop($3,$5,$7,$9,$11);
+			$$	=	new CIlluminationLoop($3,$5);
+			
 		}
 		;
 
 slUnmatchedIlluminanceStatement:
 		slIlluminanceStartStatement
 		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
+		slArrayItems
 		SL_CLOSE_PARANTHESIS
 		slUnmatchedStatement
 		{
 			CFunction	*cFun	=	sdr->popFunction();
 
-			$$	=	new CIlluminationLoop(NULL,$3,NULL,NULL,$5);
+			$$	=	new CIlluminationLoop($3,$5);
 		}
-	|
-		slIlluminanceStartStatement
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		slUnmatchedStatement
-		{
-			CFunction	*cFun	=	sdr->popFunction();
 
-			$$	=	new CIlluminationLoop($3,$5,NULL,NULL,$7);
-		}
-	|
-		slIlluminanceStartStatement
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		slUnmatchedStatement
-		{
-			CFunction	*cFun	=	sdr->popFunction();
-
-			$$	=	new CIlluminationLoop(NULL,$3,$5,$7,$9);
-		}
-	|
-		slIlluminanceStartStatement
-		SL_OPEN_PARANTHESIS
-		slAritmeticExpression
-		SL_COMMA
-   		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_COMMA
-		slAritmeticExpression
-		SL_CLOSE_PARANTHESIS
-		slUnmatchedStatement
-		{
-			CFunction	*cFun	=	sdr->popFunction();
-
-			$$	=	new CIlluminationLoop($3,$5,$7,$9,$11);
-		}
 		;
 
 		////////////////////////////////////////////////

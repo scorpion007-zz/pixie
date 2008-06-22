@@ -848,7 +848,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 	CTransmissionRay		*rayBase;
 	CTransmissionRay		**raysBase;
 	CTransmissionRay		*cRay,**cRays;
-	const CShadingScratch	*scratch	=	&(currentShadingState->scratch);
+	const CShadingScratch	*scratch		=	&(currentShadingState->scratch);
 	const int				shootStep		=	CRenderer::shootStep;
 	int						numRemaining	=	shootStep;
 	CTransmissionBundle		bundle;
@@ -915,7 +915,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 					trace(cRay);
 					rays->t					+=	cRay->t*multiplier;
 				} else {
-					*cRays++			=	cRay++;
+					*cRays++				=	cRay++;
 					if (--numRemaining == 0) {
 						numTransmissionRays	+=	shootStep;
 						bundle.numRays		=	shootStep;

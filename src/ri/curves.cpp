@@ -456,7 +456,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 				int	k;
 
 				// On either side
-				for (int k=0;k<2;k++) {
+				for (k=0;k<2;k++) {
 					const float	tv	=	cv + (k == 0 ? step : -step);
 
 					if ((tv >= 0) && (tv <= 1)) {
@@ -675,7 +675,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 
 				// For each component
 				for (int k=0;k<3;++k) {
-					dest[k]	= (v0[vertexSize+k]*(1.0f-cv) + v1[vertexSize+k]*cv) - (v0[k]*(1.0f-cv) + v1[k]*cv);
+					dest[k]	= (float) ((v0[vertexSize+k]*(1.0-cv) + v1[vertexSize+k]*cv) - (v0[k]*(1.0-cv) + v1[k]*cv));
 				}
 				
 				// Scale the dPdtime

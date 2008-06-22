@@ -2759,12 +2759,42 @@ void		CForLoop::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CIlluminationLoop::CIlluminationLoop(CExpression *c,CExpression *p,CExpression *n,CExpression *a,CExpression *b) : CExpression(0) {
-	this->category	=	(c != NULL ? getConversion(SLC_STRING,c) : NULL);
-	this->P			=	(p != NULL ? getConversion(SLC_VECTOR,p) : NULL);
-	this->N			=	(n != NULL ? getConversion(SLC_VECTOR,n) : NULL);
-	this->angle		=	(a != NULL ? getConversion(SLC_FLOAT,a) : NULL);
-	this->body		=	b;
+CIlluminationLoop::CIlluminationLoop(CList<CExpression *> *p,CExpression *b) : CExpression(0), category(NULL), P(NULL), N(NULL), angle(NULL), body(b) {
+	// Note that p is reverse
+
+	// Figure out the number of core items
+	int	numCore;
+	for (numCore=1;numCore<p->numItems;++numCore) {
+		if (p->array[p->numItems-numCore-1]->type & SLC_STRING) break;
+	}
+
+	// Get the parameters
+	switch(numCore) {
+	case 1:		
+		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-0]);
+		break;
+	case 2:		
+		this->category	=	getConversion(SLC_STRING,p->array[p->numItems-1-0]);
+		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-1]);
+		break;
+	case 3:		
+		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-0]);
+		this->N			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-1]);
+		this->angle		=	getConversion(SLC_FLOAT,p->array[p->numItems-1-2]);
+		break;
+	case 4:		
+		this->category	=	getConversion(SLC_STRING,p->array[p->numItems-1-0]);
+		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-1]);
+		this->N			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-2]);
+		this->angle		=	getConversion(SLC_FLOAT,p->array[p->numItems-1-3]);
+		break;
+	default:
+		sdr->error("Invalid number of parameters to the illumination loop");
+		break;
+	}
+
+	// We're done with the list
+	delete p;
 }
 
 

@@ -422,7 +422,7 @@ public:
 // Comments				:
 class	CIlluminationLoop : public CExpression {
 public:
-						CIlluminationLoop(CExpression *,CExpression *,CExpression *,CExpression *,CExpression *);
+						CIlluminationLoop(CList<CExpression *> *,CExpression *);
 						~CIlluminationLoop();
 
 			void		getCode(FILE *,CVariable *);

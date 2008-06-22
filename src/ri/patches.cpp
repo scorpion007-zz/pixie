@@ -468,7 +468,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 				// Sum over the components
 				for (int j=0;j<3;++j) {
 					const int	k	=	4*vertexSize + j;
-					dest[j]	=	(((v0[k]*(1.0f - cu) + v1[k]*cu)*(1.0 - cv)	+ (v2[k]*(1.0f - cu) + v3[k]*cu)*cv - (v0[j]*(1.0f - cu) + v1[j]*cu)*(1.0 - cv)	+ (v2[j]*(1.0f - cu) + v3[j]*cu)*cv));
+					dest[j]			=	(float) ((((v0[k]*(1.0 - cu) + v1[k]*cu)*(1.0 - cv)	+ (v2[k]*(1.0 - cu) + v3[k]*cu)*cv - (v0[j]*(1.0 - cu) + v1[j]*cu)*(1.0 - cv)	+ (v2[j]*(1.0 - cu) + v3[j]*cu)*cv)));
 				}
 				
 				// Scale the dPdtime
