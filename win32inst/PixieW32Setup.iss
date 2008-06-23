@@ -48,7 +48,7 @@ Source: ..\bin\libpng13.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\zlib1.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\libmmd.dll; DestDir: {app}\bin; Components: main
-Source: ..\bin\msvcr80.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\msvcr90.dll; DestDir: {app}\bin; Components: main
 ; Distribute the executables
 Source: ..\bin\*.exe; DestDir: {app}\bin; Components: main
 ; Distribute the display drivers

@@ -123,6 +123,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
+				Optimization="3"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\..\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GUI_EXPORTS"

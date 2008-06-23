@@ -23,7 +23,7 @@ copy bin\libpng13.dll Pixie\bin
 copy bin\libtiff3.dll Pixie\bin
 copy bin\zlib1.dll Pixie\bin
 copy bin\libmmd.dll Pixie\bin
-copy bin\msvcr80.dll Pixie\bin
+copy bin\msvcr90.dll Pixie\bin
 copy displays\file.dll Pixie\displays
 copy displays\framebuffer.dll Pixie\displays
 copy displays\rgbe.dll Pixie\displays
