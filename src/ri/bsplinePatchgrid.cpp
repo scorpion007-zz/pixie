@@ -211,7 +211,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 				const 	float	*vertex1	=	vertex0 + vertexSize*16*upatches*vpatches;
 				const	float	ctime		=	*time++;
 
-				for (int j=0;j<vertexDataStep;j) {
+				for (int j=0;j<vertexDataStep;++j) {
 					*interpolate++	=	(float) (vertex0[j]*(1.0-ctime) + vertex1[j]*ctime);
 				}
 			}

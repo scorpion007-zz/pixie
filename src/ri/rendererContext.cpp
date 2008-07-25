@@ -152,11 +152,17 @@ CRendererContext::~CRendererContext() {
 	for (cInstance=allocatedInstances->pop();cInstance!=NULL;cInstance=allocatedInstances->pop()) {
 		CObject	*cObject;
 
+		// Detach from the objects
 		while((cObject = cInstance->objects) != NULL) {
 			cInstance->objects	=	cObject->sibling;
 			cObject->detach();
 		}
+
+		// Get rid of the instance
+		delete cInstance;
 	}
+
+	// Ditch the allocated instances array
 	delete allocatedInstances;
 
 	// Delete the object stack

@@ -1201,7 +1201,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				if (cVar == NULL) {
 					// No match, query the shaders
 					sVar		=	&tmp;
-					
+					 
 					cVar		=	attributes->findParameter(tmp.name);
 					
 					if (cVar != NULL) {
