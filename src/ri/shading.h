@@ -132,7 +132,7 @@ public:
 
 	// Photonmap parameters
 	struct {
-		int				estimator;		}			photonmapParams;
+		float			estimator;		}			photonmapParams;
 
 	// texture3d/bake3d parameters
 	struct {
