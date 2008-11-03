@@ -59,6 +59,7 @@ class CRWLock {
 #define LIB_IMPORT		__declspec(dllimport)
 #define	popen			_popen
 #define	pclose			_pclose
+#define	j1				_j1
 #define	TThread			HANDLE
 #define	TMutex			CRITICAL_SECTION 
 #define	TSemaphore		HANDLE

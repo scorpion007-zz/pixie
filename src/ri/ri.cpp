@@ -1031,7 +1031,7 @@ RiBesselFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 		return 0.0f;
 
 	const float d = sqrtf( x2 + y2 );
-	return j1( d*2 )/d;
+	return (float) (j1( d*2 )/d);
 }
 
 
@@ -1041,7 +1041,7 @@ RiDiskFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 	const float yc = y / ywidth;
 	const float d = xc * xc + yc * yc;
 
-	return ( d <= 0.25 )? 1.0 : 0.0;
+	return ( d <= 0.25f )? 1.0f : 0.0f;
 }
 
 #ifdef _WINDOWS

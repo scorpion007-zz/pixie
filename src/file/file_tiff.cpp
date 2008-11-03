@@ -144,11 +144,11 @@ CFileFramebuffer()
 	pixelSize	=	numSamples*bitspersample / 8;
 	
 	// The default compression is LZW
-	if (compression == NULL || strcasecmp(compression,"LZW") == 0) {
+	if (compression == NULL || strcmp(compression,"LZW") == 0) {
 			TIFFSetField(image, TIFFTAG_COMPRESSION,	COMPRESSION_LZW);
-	} else if (strcasecmp(compression,"JPEG") == 0) {
+	} else if (strcmp(compression,"JPEG") == 0) {
 		TIFFSetField(image, TIFFTAG_COMPRESSION,	COMPRESSION_JPEG);
-	} else if (strcasecmp(compression,"Deflate") == 0) {
+	} else if (strcmp(compression,"Deflate") == 0) {
 		TIFFSetField(image, TIFFTAG_COMPRESSION,	COMPRESSION_DEFLATE);
 	}
 	
