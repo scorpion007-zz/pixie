@@ -28,6 +28,12 @@
 //  Description			:	OS dependent functions
 //
 ////////////////////////////////////////////////////////////////////////
+
+// Needs to be first, or clashes with other definitions
+#if defined(__APPLE__) || defined(__APPLE_CC__)    	// guard against __APPLE__ being undef from ftlk
+#include <CoreServices/CoreServices.h>         		// For FSRef, FSRefMakePath, FSFindFolder
+#endif
+
 #include "os.h"
 
 #include <stdio.h>
@@ -54,6 +60,7 @@
 #else
 // >> Unix
 #include <sys/param.h>
+#include <sys/sysctl.h>
 #include <dlfcn.h>
 #include <glob.h>
 
@@ -235,6 +242,44 @@ void	osFixSlashes(char *st) {
 	for (;*st!='\0';st++) {
 		if ((*st == '\\') || (*st == '/')) *st	=	OS_DIR_SEPERATOR;
 	}
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Function            :   osTempdir
+// Description         :   Create a path to a directory suitable
+//                     :   for storing temporary files.
+// Return Value        :   -
+// Comments            :   The directory will end with / or \
+//                     :   Does not create the directory.
+//                     :   Path is only unique within this process.
+void   osTempdir(char *result, size_t resultsize) {    
+   
+#ifdef _WINDOWS
+	sprintf(result,"PixieTemp_%d\\",GetCurrentProcessId());
+#elif defined(__APPLE__) || defined(__APPLE_CC__)  // guard against __APPLE__ being undef from ftlk
+	FSRef tempRef;
+	char tempDirPath[OS_MAX_PATH_LENGTH];
+	OSErr err = FSFindFolder(kLocalDomain,kTemporaryFolderType,true,&tempRef);
+	if (!err)
+		err = FSRefMakePath(&tempRef,(UInt8*)tempDirPath,sizeof(tempDirPath));
+	if (!err)
+		snprintf(result,resultsize,"%s/PixieTemp_%d/",tempDirPath,getpid());
+	else
+		snprintf(result,resultsize,"/tmp/PixieTemp_%d/",getpid());
+	
+#else
+	// Unix-y
+	const char *tempDirEnv = osEnvironment("TMPDIR");
+	if (!tempDirEnv)
+		tempDirEnv = osEnvironment("TMP");
+	if (!tempDirEnv)
+		snprintf(result,resultsize,"%s/PixieTemp_%d/",tempDirEnv,getpid());
+	else
+		snprintf(result,resultsize,"PixieTemp_%d/",getpid());
+#endif
+	
+	osFixSlashes(result);   
 }
 
 
@@ -503,4 +548,46 @@ void	osProcessEscapes(char *str) {
 		}
 	}
 	str[i]	=	'\0';
+}
+
+///////////////////////////////////////////////////////////////////////
+// Function            :   osAvailableCPUs
+// Description         :   Get number of CPUs available
+// Return Value        :   Number of available CPUs or -1 if unknown
+// Comments            :   See <http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine>
+int    osAvailableCPUs() {
+
+#if defined(WIN32)
+	SYSTEM_INFO sys_info;
+    GetSystemInfo(&sys_info);
+    return sys_info.dwNumberOfProcessors;
+	
+#elif defined(CTL_HW)
+	// BSD, Mac OS X
+	int ncpu = 0;
+	int mib[2];
+	size_t sz = sizeof(ncpu);
+	mib[0] = CTL_HW;
+#ifdef HW_AVAILCPU
+	mib[1] = HW_AVAILCPU;
+#else
+	mib[1] = HW_NCPU;
+#endif
+	if(sysctl(mib, 2, &ncpu, &sz, NULL, 0) == -1)
+		return ncpu;
+	   
+#elif defined(_SC_NPROCESSORS_ONLN)
+	// Linux, AIX, Solaris
+	return sysconf( _SC_NPROCESSORS_ONLN );
+	
+#elif defined(MPC_GETNUMSPUS)
+	// HP-UX
+	return mpctl(MPC_GETNUMSPUS, NULL, NULL);
+   
+#elif defined(_SC_NPROC_ONLN)
+	// IRIX
+	return sysconf( _SC_NPROC_ONLN );
+#endif 
+	
+	return -1;
 }

@@ -5,7 +5,7 @@
 set dest=`pwd`
 set jpeg=`dirname ${dest}`/STAGING/libjpeg
 set dest=`dirname ${dest}`/STAGING/libtiff
-mkdir -p ${dest}
+mkdir -p ${dest} ${dest}-i386 ${dest}-ppc
 
 unsetenv CXXFLAGS
 unsetenv CPPFLAGS
@@ -20,28 +20,45 @@ if (1) then
 	set DEPLOYMENT_TARGET='MACOSX_DEPLOYMENT_TARGET=10.4'
 	set CXXEXTRA="-isysroot ${SDK}"
 	set LDEXTRA="${CXXEXTRA} -Wl,-syslibroot,${SDK}"
-	set CXXFLAGS="-g -O3 ${CXXEXTRA}"
-	set CFLAGS="-g -O3 ${CXXEXTRA}"
+	set CXXFLAGS="-g -Os ${CXXEXTRA}"
+	set CFLAGS="-g -Os ${CXXEXTRA}"
 	set LDFLAGS="-g ${LDEXTRA}"
 else
-	set CXXFLAGS='-g -O3'
-	set CFLAGS='-g -O3'
+	set CXXFLAGS='-g -Os'
+	set CFLAGS='-g -Os'
 	set LDFLAGS='-g'
 	set DEPLOYMENT_TARGET=''
 endif
 
-
-#setenv LIBRARY_PATH /Users/geohar/Development/libtiff/STAGING/libjpeg/lib/
-
+# Arch i386
 ./configure  \
 	CPPFLAGS=-I${jpeg}/include \
 	CXXFLAGS="-L${jpeg}/lib ${CXXFLAGS}" \
-	CFLAGS="-L${jpeg}/lib ${CXXFLAGS}" \
+	CFLAGS="-arch i386 -L${jpeg}/lib ${CXXFLAGS}" \
 	LDFLAGS="-L${jpeg}/lib ${LDFLAGS}" \
 	CXX="env ${DEPLOYMENT_TARGET} g++" \
 	CC="env ${DEPLOYMENT_TARGET} gcc" \
-	--prefix=/Applications/Graphics/Pixie
+	--prefix=/ \
+    --disable-cxx --disable-shared
 
 make clean
-make install DESTDIR=${dest}
+make install DESTDIR=${dest}-i386
 
+# Arch ppc
+./configure  \
+	CPPFLAGS=-I${jpeg}/include \
+	CXXFLAGS="-L${jpeg}/lib ${CXXFLAGS}" \
+	CFLAGS="-arch ppc -L${jpeg}/lib ${CXXFLAGS}" \
+	LDFLAGS="-L${jpeg}/lib ${LDFLAGS}" \
+	CXX="env ${DEPLOYMENT_TARGET} g++" \
+	CC="env ${DEPLOYMENT_TARGET} gcc" \
+	--prefix=/ \
+    --disable-cxx --disable-shared
+
+make clean
+make install DESTDIR=${dest}-ppc
+
+
+lipo ${dest}-i386/lib/libtiff.a \
+    ${dest}-ppc/lib/libtiff.a \
+    -create -output {$dest}/libpixietiff.a

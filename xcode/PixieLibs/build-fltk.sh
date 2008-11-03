@@ -17,14 +17,14 @@ if (1) then
 	set SDK=/Developer/SDKs/MacOSX10.4u.sdk
 	#this must be present during all gcc invocations
 	set DEPLOYMENT_TARGET='MACOSX_DEPLOYMENT_TARGET=10.4'
-	set CXXEXTRA="-isysroot ${SDK}"
+	set CXXEXTRA="-arch i386 -arch ppc -isysroot ${SDK}"
 	set LDEXTRA="${CXXEXTRA} -Wl,-syslibroot,${SDK}"
-	set CXXFLAGS="-g -O3 ${CXXEXTRA}"
-	set CFLAGS="-g -O3 ${CXXEXTRA}"
+	set CXXFLAGS="-g -Os ${CXXEXTRA}"
+	set CFLAGS="-g -Os ${CXXEXTRA}"
 	set LDFLAGS="-g ${LDEXTRA}"
 else
-	set CXXFLAGS='-g -O3'
-	set CFLAGS='-g -O3'
+	set CXXFLAGS='-g -Os'
+	set CFLAGS='-g -Os'
 	set LDFLAGS='-g'
 	set DEPLOYMENT_TARGET=''
 endif
@@ -36,7 +36,7 @@ endif
 #X11 libGL and OSX libGL conflict
 
 ./configure --enable-shared --with-x  --enable-xft \
-	--mandir=/Users/geohar/Development/fltk/fltk-1.1.7/STAGING/fltk/share/man --without-links --enable-threads \
+	--mandir=${dest}/share/man --without-links --enable-threads \
 	CPPFLAGS="-U__APPLE__ -I/usr/X11R6/include" \
 	CXXFLAGS="${CXXFLAGS}" \
 	CFLAGS="${CXXFLAGS}" \

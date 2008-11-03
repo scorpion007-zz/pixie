@@ -184,6 +184,8 @@ RtToken		RI_SINCFILTER				=	"sinc";
 RtToken		RI_CATMULLROMFILTER			=	"catmull-rom";
 RtToken		RI_BLACKMANHARRISFILTER		=	"blackman-harris";
 RtToken		RI_MITCHELLFILTER			=	"mitchell";
+RtToken		RI_BESSELFILTER				=   "bessel";
+RtToken		RI_DISKFILTER				=   "disk";
 RtToken		RI_CUSTOM					=	"custom";
 
 RtToken		RI_MIN						=	"min";
@@ -1014,6 +1016,32 @@ RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 	}
 
 	return x*y;
+}
+
+EXTERN(RtFloat)
+RiBesselFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
+	const float x2 = x * x;
+	const float y2 = y * y;
+	
+	if ( x2+y2 < 0.0001f )
+		return 1.0f;
+
+	const float w = x2 / ( xwidth * xwidth ) + y2 / ( ywidth * ywidth );
+	if ( w >= 0.25f )
+		return 0.0f;
+
+	const float d = sqrtf( x2 + y2 );
+	return j1( d*2 )/d;
+}
+
+
+EXTERN(RtFloat)
+RiDiskFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
+	const float xc = x / xwidth;
+	const float yc = y / ywidth;
+	const float d = xc * xc + yc * yc;
+
+	return ( d <= 0.25 )? 1.0 : 0.0;
 }
 
 #ifdef _WINDOWS

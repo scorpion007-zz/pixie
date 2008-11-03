@@ -158,14 +158,15 @@ static	int	translate(EErrorCode c) {
 // Return Value			:
 // Comments				:
 void	error(EErrorCode code,char *mes,...) {
-	char	tmp[OS_MAX_PATH_LENGTH];
+	char	*tmp;
 	va_list	args;
 
 	va_start(args,mes);
-	vsprintf(tmp,mes,args);
+	vasprintf(&tmp,mes,args);
 
 	renderMan->RiError(translate(code),RIE_ERROR,tmp);
 	va_end(args);
+	free(tmp);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -174,14 +175,15 @@ void	error(EErrorCode code,char *mes,...) {
 // Return Value			:
 // Comments				:
 void	warning(EErrorCode code,char *mes,...) {
-	char	tmp[OS_MAX_PATH_LENGTH];
+	char	*tmp;
 	va_list	args;
 
 	va_start(args,mes);
-	vsprintf(tmp,mes,args);
+	vasprintf(&tmp,mes,args);
 
 	renderMan->RiError(translate(code),RIE_WARNING,tmp);
 	va_end(args);
+	free(tmp);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -190,14 +192,15 @@ void	warning(EErrorCode code,char *mes,...) {
 // Return Value			:
 // Comments				:
 void	fatal(EErrorCode code,char *mes,...) {
-	char	tmp[OS_MAX_PATH_LENGTH];
+	char	*tmp;
 	va_list	args;
 
 	va_start(args,mes);
-	vsprintf(tmp,mes,args);
+	vasprintf(&tmp,mes,args);
 
 	renderMan->RiError(translate(code),RIE_SEVERE,tmp);
 	va_end(args);
+	free(tmp);
 }
 
 
@@ -207,13 +210,14 @@ void	fatal(EErrorCode code,char *mes,...) {
 // Return Value			:
 // Comments				:
 void	info(EErrorCode code,char *mes,...) {
-	char	tmp[OS_MAX_PATH_LENGTH];
+	char	*tmp;
 	va_list	args;
 
 	va_start(args,mes);
-	vsprintf(tmp,mes,args);
+	vasprintf(&tmp,mes,args);
 
 	renderMan->RiError(translate(code),RIE_INFO,tmp);
 	va_end(args);
+	free(tmp);
 }
 

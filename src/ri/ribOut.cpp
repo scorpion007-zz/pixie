@@ -60,6 +60,10 @@ static	char	*getFilter(float (*function)(float,float,float,float)) {
 		return	RI_MITCHELLFILTER;
 	} else if (function == RiSincFilter) {
 		return	RI_SINCFILTER;
+	} else if (function == RiBesselFilter) {
+		return  RI_BESSELFILTER;
+	} else if (function == RiDiskFilter) {
+		return  RI_DISKFILTER;
 	} else {
 		return	RI_GAUSSIANFILTER;
 	}
@@ -259,6 +263,10 @@ void		CRibOut::RiPixelFilter(float (*function)(float,float,float,float),float xw
 		out("PixelFilter \"%s\" %g %g\n",RI_MITCHELLFILTER,xwidth,ywidth);
 	} else if (function == RiSincFilter) {
 		out("PixelFilter \"%s\" %g %g\n",RI_SINCFILTER,xwidth,ywidth);
+	} else if (function == RiBesselFilter) {
+		out("PixelFilter \"%s\" %g %g\n",RI_BESSELFILTER,xwidth,ywidth);
+	} else if (function == RiDiskFilter) {
+		out("PixelFilter \"%s\" %g %g\n",RI_DISKFILTER,xwidth,ywidth);
 	} else {
 		errorHandler(RIE_BADHANDLE,RIE_ERROR,"Unable to write custom filter function\n");
 	}

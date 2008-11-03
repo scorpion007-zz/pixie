@@ -4655,7 +4655,7 @@ void	CRendererContext::RiIfEnd(void) {
 }
 
 void	CRendererContext::RiError(int code,int severity,char *mes) {
-	char		tmp[OS_MAX_PATH_LENGTH];
+	char		*tmp		=	NULL;
 	CAttributes	*attributes	=	NULL;
 
 	if (CRenderer::offendingObject != NULL) {
@@ -4664,22 +4664,21 @@ void	CRendererContext::RiError(int code,int severity,char *mes) {
 
 	if (attributes == NULL)	attributes	=	currentAttributes;
 
-	if (severity != RIE_INFO) {
-		if (ribFile != NULL) {
-			sprintf(tmp,"%s (%d): ",ribFile,ribCommandLineno);
-		} else {
-			sprintf(tmp,"");
-		}
-	} else {
-		sprintf(tmp,"");
-	}
+	int len = strlen(mes)+1;                // '\0'
+	if (severity != RIE_INFO && ribFile)
+		len += strlen(ribFile)+11;          // ' (999999): '
+	if (attributes && attributes->name)
+		len += strlen(attributes->name)+3;  // '() '
+	tmp = (char*)malloc(len);
+	tmp[0] = '\0';
 
-	if (attributes != NULL)	{
-		if (attributes->name != NULL) {
-			strcat(tmp,"(");
-			strcat(tmp,attributes->name);
-			strcat(tmp,") ");
-		}
+	if (severity != RIE_INFO && ribFile)    
+		sprintf(tmp,"%s (%d): ",ribFile,ribCommandLineno);
+
+	if (attributes && attributes->name) {
+		strcat(tmp,"(");
+		strcat(tmp,attributes->name);
+		strcat(tmp,") ");
 	}
 
 	strcat(tmp,mes);
@@ -4700,6 +4699,7 @@ void	CRendererContext::RiError(int code,int severity,char *mes) {
 			errorHandler(code,severity,tmp);
 		}
 	}
+	free(tmp);
 }
 
 

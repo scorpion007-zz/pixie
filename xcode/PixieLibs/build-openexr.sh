@@ -24,12 +24,12 @@ if (1) then
 	set DEPLOYMENT_TARGET='MACOSX_DEPLOYMENT_TARGET=10.4'
 	set CXXEXTRA="-isysroot ${SDK}"
 	set LDEXTRA="${CXXEXTRA} -Wl,-syslibroot,${SDK}"
-	set CXXFLAGS="-g -O3 ${CXXEXTRA}"
-	set CFLAGS="-g -O3 ${CXXEXTRA}"
+	set CXXFLAGS="-g -Os ${CXXEXTRA}"
+	set CFLAGS="-g -Os ${CXXEXTRA}"
 	set LDFLAGS="-g ${LDEXTRA}"
 else
-	set CXXFLAGS='-g -O3'
-	set CFLAGS='-g -O3'
+	set CXXFLAGS='-g -Os'
+	set CFLAGS='-g -Os'
 	set LDFLAGS='-g'
 	set DEPLOYMENT_TARGET=''
 endif
@@ -42,7 +42,10 @@ endif
 	LDFLAGS="${LDFLAGS}" \
 	CXX="env ${DEPLOYMENT_TARGET} g++" \
 	CC="env ${DEPLOYMENT_TARGET} gcc" \
-	--prefix=${dest}
+	--prefix=${dest} --disable-dependency-tracking \
+    --enable-osx-universal-binaries \
+    --with-fltk-config=`pwd`/../../fltk/STAGING/fltk/bin/fltk-config
 
+make clean
 make install
 

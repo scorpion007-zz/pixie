@@ -87,7 +87,9 @@ typedef LPTHREAD_START_ROUTINE	TFun;
 //#endif
 
 
+#ifndef LIB_EXPORT
 #define	LIB_EXPORT		extern
+#endif
 #define LIB_IMPORT		extern
 #define SOCKET			int
 #define	closesocket		close
@@ -146,6 +148,7 @@ char			*osEnvironment(const char *);
 // File io
 int				osFileExists(const char *);
 void			osFixSlashes(char *);
+void			osTempdir(char *result, size_t resultsize);
 void			osTempname(const char *,const char *,char*);
 
 // Directory IO
@@ -170,6 +173,7 @@ void			osDeleteSemaphore(TMutex &);
 
 // Misc functions
 void			osProcessEscapes(char *str);
+int             osAvailableCPUs();
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osLock

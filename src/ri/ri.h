@@ -133,6 +133,8 @@ EXTERN(RtToken)	RI_SINCFILTER;
 EXTERN(RtToken)	RI_CATMULLROMFILTER;
 EXTERN(RtToken)	RI_BLACKMANHARRISFILTER;
 EXTERN(RtToken)	RI_MITCHELLFILTER;
+EXTERN(RtToken)	RI_BESSELFILTER;
+EXTERN(RtToken)	RI_DISKFILTER;
 EXTERN(RtToken)	RI_CUSTOM;
 
 EXTERN(RtToken)	RI_MIN;
@@ -358,7 +360,9 @@ EXTERN(RtFloat)
 	RiMitchellFilter( RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiCatmullRomFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
     RiBlackmanHarrisFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
-    RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth);
+    RiSincFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
+    RiBesselFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth),
+    RiDiskFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth);
 
 EXTERN(RtFloat)
     RiGaussianStepFilter (RtFloat t, RtFloat edge, RtFloat width),

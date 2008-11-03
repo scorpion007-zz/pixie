@@ -153,13 +153,16 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 		}
 	}
 	
+	if (strchr(name,OS_DIR_SEPERATOR)) {
+		// Supplied path
 	// Check if the file exists
 	if (osFileExists(name)) {
 		strcpy(result,name);
 		info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",name,name);
 		return TRUE;
 	}
-
+	} else {
+		// Only filename
 	// Look at the search path
 	for (;searchpath!=NULL;searchpath=searchpath->next) {
 		sprintf(result,"%s%s",searchpath->directory,name);
@@ -176,6 +179,7 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 	if (osFileExists(result)) {
 		info(CODE_RESOLUTION,"\"%s\" -> \"%s\"\n",name,result);
 		return TRUE;
+	}
 	}
 
 	// Unable to find the file, check the network
@@ -543,6 +547,10 @@ RtFilterFunc			CRenderer::getFilter(const char *name) {
 		return	RiBlackmanHarrisFilter;
 	} else if (strcmp(name,RI_MITCHELLFILTER) == 0) {
 		return	RiMitchellFilter;
+	} else if (strcmp(name,RI_BESSELFILTER) == 0) {
+		return  RiBesselFilter;
+	} else if (strcmp(name,RI_DISKFILTER) == 0) {
+		return  RiDiskFilter;
 	}
 
 	return	RiGaussianFilter;
@@ -569,6 +577,10 @@ char					*CRenderer::getFilter(RtFilterFunc func) {
 		return	RI_BLACKMANHARRISFILTER;
 	} else if (func == RiMitchellFilter) {
 		return	RI_MITCHELLFILTER;
+	} else if (func == RiBesselFilter) {
+		return  RI_BESSELFILTER;
+	} else if (func == RiDiskFilter) {
+		return  RI_DISKFILTER;
 	}
 
 	return	RI_GAUSSIANFILTER;

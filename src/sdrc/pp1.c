@@ -519,6 +519,19 @@ main(argc,argv)
 		}
 #endif	/* DEBUG */
 
+    /* Cleanup symbol table */
+    for(i=0;i<NUMBUCKETS;i++) {
+		if (Macros[i]) {
+			p=Macros[i];
+			while(p) {
+				if (p->s_body) free(p->s_body);
+				if (p->s_params) free(p->s_params);
+				p = p->s_link;
+			}
+			Macros[i]=0;
+		}
+	}
+
 	return TRUE;
 
 	if((Output != stdout) && (fclose(Output) == EOF))
@@ -631,6 +644,9 @@ init()
 	Ipcnt		=		/* Number of -i paths		*/
 	Unique		= 0;		/* Zero unique # counter	*/
 
+	for(i=0;i<NUMBUCKETS;i++)
+		Macros[i]=0;
+	
 	Ifstack[0].i_state = Ifstate =
 		IFTRUE;			/* Currently TRUE #ifxxx assumed */
 

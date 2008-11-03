@@ -76,7 +76,11 @@ extern	"C" int	preprocess(char *,FILE *,int,char **);
 #define			PATH				"PATH"			// The environment variable to search for the preprocessor
 #define			INCLUDE				"INCLUDE"		// The default include path for the preprocessor
 
-
+// Return codes
+#define ERR_NONE 0			// No error
+#define ERR_FILE 1			// Cannot load file, cannot create tempfile
+#define ERR_PREPROCESS 2	// Error in preprocessing
+#define ERR_COMPILE 3		// Error in compilation
 
 // If the preprocessing is not turned off, then the preprocessor will be invoked to generate
 // preprocessed stuff into the argumentTemporaryFileName and then the compiler will be run on
@@ -93,11 +97,12 @@ static	char	*compilerName					=			"sdrc";
 static	char	*argumentIncludeDirectory		=			"-I";
 static	char	*argumentDefine					=			"-D";
 static	char	*argumentOutput					=			"-o";
-static	char	*argumentSurpressWarnings		=			"-nw";
-static	char	*argumentSurpressErrors			=			"-ne";
+static	char	*argumentSuppressWarnings		=			"-nw";
+static	char	*argumentSuppressErrors			=			"-ne";
 static	char	*argumentResolutionInfo			=			"-ri";
 static	char	*argumentHelp					=			"--help";
 static	char	*argumentPrintVersionInfo		=			"-v";
+static	char	*argumentSilentInfo				=			"-s";
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printVersion
@@ -105,7 +110,7 @@ static	char	*argumentPrintVersionInfo		=			"-v";
 // Return Value			:	-
 // Comments				:
 void	printVersion() {
-	printf("RenderMan Shading Language Compiler (%s) v%d.%d.%d\n",compilerName,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
+	printf("Pixie Shading Language Compiler (%s) v%d.%d.%d\n",compilerName,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -116,7 +121,7 @@ void	printVersion() {
 void	printUsage() {
 	printVersion();
 	printf("Usage:\n");
-	printf("%s [options] [<in_file>]\n",compilerName);
+	printf("%s [options] <in_file> [<in_file> ...]\n",compilerName);
 	printf("options:\n");
 
 	printf("%s<path>\t: Specify additional include path for the preprocessor\n",argumentIncludeDirectory);
@@ -125,9 +130,11 @@ void	printUsage() {
 
 	printf("%s <outname>\t: Output to \"outname\" \n",argumentOutput);
 
-	printf("%s\t\t: Surpress warnings\n",argumentSurpressWarnings);
+	printf("%s\t\t: Suppress warnings\n",argumentSuppressWarnings);
 
-	printf("%s\t\t: Surpress errors\n",argumentSurpressErrors);
+	printf("%s\t\t: Suppress errors\n",argumentSuppressErrors);
+
+	printf("%s\t\t: Suppress progress\n",argumentSilentInfo);
 
 	printf("%s\t\t: Display resolution info\n",argumentResolutionInfo);
 
@@ -178,14 +185,16 @@ int		append(const char *file,void *ud) {
 int main(int argc, char* argv[]) {
 	CScriptContext	*currentCompiler;
 	int				i;
-	int				settings	=	COMPILER_SURPRESS_DEFINITIONS;
+	int				settings	=	COMPILER_SUPPRESS_DEFINITIONS;
 	TSearchpath		*dsoPath;
 	CList<char *>	*sourceFiles;
 	char			*sourceFile;
 	char			*ppargv[100];
 	int				ppargc;
 	char			*outName	=	NULL;
-	char 			*includeEnv = getenv(INCLUDE);
+	char 			*includeEnv = osEnvironment(INCLUDE);
+	int				error = ERR_NONE;
+	int				silent = FALSE;
 	
 	sourceFiles					=	new CList<char *>;
 
@@ -204,14 +213,22 @@ int main(int argc, char* argv[]) {
 		ppargv[ppargc++]		=	includeEnv;
 	}
 
+	// Require some parameters, or else print help and exit
+	if (argc<2) {
+		printUsage();
+		exit(1);
+	}
+	
 	// Process the arguments
 	for (i=1;i<argc;i++) {
-		if (strcmp(argv[i],argumentSurpressWarnings) == 0) {
-			settings	|=	COMPILER_SURPRESS_WARNINGS;
-		} else if (strcmp(argv[i],argumentSurpressErrors) == 0) {
-			settings	|=	COMPILER_SURPRESS_ERRORS;
+		if (strcmp(argv[i],argumentSuppressWarnings) == 0) {
+			settings	|=	COMPILER_SUPPRESS_WARNINGS;
+		} else if (strcmp(argv[i],argumentSuppressErrors) == 0) {
+			settings	|=	COMPILER_SUPPRESS_ERRORS;
 		} else if (strcmp(argv[i],argumentResolutionInfo) == 0) {
-			settings	&=	~COMPILER_SURPRESS_DEFINITIONS;
+			settings	&=	~COMPILER_SUPPRESS_DEFINITIONS;
+		} else if (strcmp(argv[i],argumentSilentInfo) == 0) {
+			silent = TRUE;
 		} else if (strcmp(argv[i],argumentPrintVersionInfo) == 0) {
 			printVersion();
 			exit(1);
@@ -263,18 +280,31 @@ int main(int argc, char* argv[]) {
 		sourceFiles	=	newSources;
 	}
 
-	if (sourceFiles->numItems == 1) {
 		// Get a temp file
-		FILE	*in	=	fopen("sdrc.temp","w+");
+	char tempfile[OS_MAX_PATH_LENGTH];
+	char tempdir[OS_MAX_PATH_LENGTH];
+	osTempdir(tempdir,sizeof(tempdir));
+	osCreateDir(tempdir);
+	osTempname(tempdir,"sdrc",tempfile);
+	
+	for (sourceFile=sourceFiles->first();error==ERR_NONE,sourceFile!=NULL;sourceFile=sourceFiles->next()) {
 
-		// Do we have a go ?
-		if (in != NULL) {
+		if (!silent)
+			fprintf(stderr,"Processing %s\n",sourceFile);
 
-			// Get the source file
-			sourceFile	=	sourceFiles->pop();
+		FILE	*in	=	fopen(tempfile,"w+");		
+		if (in == NULL) {
+			fprintf(stderr,"Unable to create temporary file\n");
+			error = ERR_FILE;
+			break;
+		}
 
 			// Preprocess the file
-			if (preprocess(sourceFile,in,ppargc,ppargv) == TRUE) {
+		if (!preprocess(sourceFile,in,ppargc,ppargv)) {
+			error = ERR_PREPROCESS;
+			fclose(in);
+			break;
+		}
 
 				// Rewind in the file
 				fseek(in,0,SEEK_SET);
@@ -283,55 +313,24 @@ int main(int argc, char* argv[]) {
 				currentCompiler				=	new CScriptContext(settings);
 				currentCompiler->dsoPath	=	dsoPath;
 
-				// Set the file name
-				if (currentCompiler->sourceFile != NULL)	free(currentCompiler->sourceFile);
-
 				// Compile the file
 				currentCompiler->sourceFile	=	strdup(sourceFile);
 				currentCompiler->compile(in,outName);
 
 				// Ditch the compiler
-				delete currentCompiler;
-			}
+		if (currentCompiler->compileError)
+			error = ERR_COMPILE;
 
-			// Ditch the temp file
+		delete currentCompiler;
 			fclose(in);
-			osDeleteFile("sdrc.temp");
-		} else {
-			fprintf(stderr,"Unable to create temporary file\n");
-		}
-
-		// Ditch the filename
-		free(sourceFile);
-	} else {
-		char	tmp[OS_MAX_PATH_LENGTH];
-		char	*fp;
-
-		// Recreate the argument list
-		strcpy(tmp,"");
-		for (i=0;i<argc;i++) {
-			if (argv[i] != NULL) {
-				strcat(tmp,argv[i]);
-				strcat(tmp," ");
 			}
-		}
 
-		fp	=	tmp	+ strlen(tmp);
-
-		for (sourceFile=sourceFiles->first();sourceFile!=NULL;sourceFile=sourceFiles->next()) {
-			sprintf(fp,sourceFile);
-
-			fprintf(stdout,"Compiling %s\n",sourceFile);
-
-			system(tmp);
-
+	// Ditch the temp file
+	osDeleteFile(tempfile);
+	osDeleteDir(tempdir);
 			free(sourceFile);
-		}
-	}
-
-
 	delete sourceFiles;
 
-	return 0;
+	return error;
 }
 

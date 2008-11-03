@@ -109,6 +109,8 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 		if ((numItems == 1) && (type == FLOAT_PARAMETER))		return	&CRenderer::gain;
 	} else if (strcmp(name,"Software") == 0) {
 		if ((numItems == 1) && (type == STRING_PARAMETER))		return	(void *) "Pixie";
+	} else if (strcmp(name,"type") == 0 && currentDisplay) {
+		if ((numItems == 1) && (type == STRING_PARAMETER))		return	(void *) currentDisplay->outDevice;
 	}
 
 	return	NULL;
@@ -653,9 +655,11 @@ void	CRenderer::computeDisplayData() {
 		datas[numDisplays].displayName = strdup(displayName);
 		
 		char * outDevice = cDisplay->outDevice;
-		if (strcmp(outDevice,"shadow") == 0)	outDevice	= 	RI_FILE;
-		if (strcmp(outDevice,"zfile") == 0)		outDevice	=	RI_FILE;
-		if (strcmp(outDevice,"tiff") == 0)		outDevice	=	RI_FILE;
+		if (strcmp(outDevice,"shadow") == 0
+			|| strcmp(outDevice,"zfile") == 0
+			|| strcmp(outDevice,"tiff") == 0
+			|| strcmp(outDevice,"png") == 0)
+			outDevice	=	RI_FILE;
 			
 		if (strcmp(outDevice,"tsm") == 0) {
 			int					j;

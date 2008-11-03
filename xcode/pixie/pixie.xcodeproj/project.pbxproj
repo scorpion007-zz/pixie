@@ -15,7 +15,8 @@
 				188383560B2FB2ED00166E3E /* Install Docs */,
 				18FD22750B856BAD00681F0C /* Install Shaders */,
 				1F1DEC060D0440DD00338FF9 /* Install Headers */,
-				1F1DEC500D044C3200338FF9 /* ShellScript */,
+				1F1DEC500D044C3200338FF9 /* Install Docs */,
+				36E0193C0EBA036E00C2288E /* Update Shaders */,
 			);
 			dependencies = (
 				C98988FB0AF1B95A003DB17A /* PBXTargetDependency */,
@@ -52,16 +53,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		181574F90D0CC3250000B665 /* pp1.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574EF0D0CC3250000B665 /* pp1.c */; };
-		181574FA0D0CC3250000B665 /* pp2.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F00D0CC3250000B665 /* pp2.c */; };
-		181574FB0D0CC3250000B665 /* pp3.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F10D0CC3250000B665 /* pp3.c */; };
-		181574FC0D0CC3250000B665 /* pp4.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F20D0CC3250000B665 /* pp4.c */; };
-		181574FD0D0CC3250000B665 /* pp5.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F30D0CC3250000B665 /* pp5.c */; };
-		181574FE0D0CC3250000B665 /* pp6.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F40D0CC3250000B665 /* pp6.c */; };
-		181574FF0D0CC3250000B665 /* pp7.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F50D0CC3250000B665 /* pp7.c */; };
-		181575000D0CC3250000B665 /* pp8.c in Sources */ = {isa = PBXBuildFile; fileRef = 181574F60D0CC3250000B665 /* pp8.c */; };
-		181575010D0CC3250000B665 /* sdrc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 181574F80D0CC3250000B665 /* sdrc.cpp */; };
-		181575120D0CCAD70000B665 /* opcode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 181575100D0CCAD70000B665 /* opcode.cpp */; };
 		182651CB0BBA0B52007B2C37 /* ptcapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 182651CA0BBA0B52007B2C37 /* ptcapi.h */; };
 		182C1BB50C55CD34000B070D /* shaderPl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 182C1BB30C55CD34000B070D /* shaderPl.cpp */; };
 		182C1BB60C55CD34000B070D /* shaderPl.h in Headers */ = {isa = PBXBuildFile; fileRef = 182C1BB40C55CD34000B070D /* shaderPl.h */; };
@@ -179,6 +170,12 @@
 		1F1DEC430D04491700338FF9 /* show.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F1DEC420D04491700338FF9 /* show.cpp */; };
 		1FDB50FD0D0458E200B5FEC8 /* libpixiecommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libpixiecommon.a */; };
 		1FDB510A0D0459B600B5FEC8 /* libpixiecommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libpixiecommon.a */; };
+		36E018E50EB9FD3300C2288E /* libpixiecommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C96A6E290AD6D5E5003C2D7B /* libpixiecommon.a */; };
+		36E01B250EBA48AC00C2288E /* file_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E01B200EBA48AC00C2288E /* file_png.cpp */; };
+		36E01B260EBA48AC00C2288E /* file_png.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E01B210EBA48AC00C2288E /* file_png.h */; };
+		36E01B270EBA48AC00C2288E /* file_tiff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E01B220EBA48AC00C2288E /* file_tiff.cpp */; };
+		36E01B280EBA48AC00C2288E /* file_tiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E01B230EBA48AC00C2288E /* file_tiff.h */; };
+		36E01B290EBA48AC00C2288E /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = 36E01B240EBA48AC00C2288E /* file.h */; };
 		C96A6E340AD6D651003C2D7B /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C96A6E2F0AD6D651003C2D7B /* algebra.cpp */; };
 		C96A6E350AD6D651003C2D7B /* algebra.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E300AD6D651003C2D7B /* algebra.h */; };
 		C96A6E360AD6D651003C2D7B /* comments.h in Headers */ = {isa = PBXBuildFile; fileRef = C96A6E310AD6D651003C2D7B /* comments.h */; };
@@ -713,8 +710,8 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		183D2A6A0B2BC718001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = /Applications/Graphics/Pixie/include;
+			buildActionMask = 8;
+			dstPath = /Library/Pixie/include;
 			dstSubfolderSpec = 0;
 			files = (
 				18A299030B44F040006B9ABE /* dlo.h in CopyFiles */,
@@ -723,22 +720,22 @@
 				183D2A6D0B2BC741001BB8F4 /* dsply.h in CopyFiles */,
 				183D2A6C0B2BC732001BB8F4 /* ri.h in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 		183D2A700B2BC76A001BB8F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie/include;
+			buildActionMask = 8;
+			dstPath = /Library/Pixie/include;
 			dstSubfolderSpec = 0;
 			files = (
 				183D2A720B2BC77E001BB8F4 /* sdr.h in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 		188383500B2FB2D100166E3E /* Install Manpages */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie/man/man1;
+			buildActionMask = 12;
+			dstPath = /Library/Pixie/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 				188383520B2FB2E300166E3E /* rndr.1 in Install Manpages */,
@@ -751,8 +748,8 @@
 		};
 		188383560B2FB2ED00166E3E /* Install Docs */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie/doc;
+			buildActionMask = 12;
+			dstPath = /Library/Pixie/doc;
 			dstSubfolderSpec = 0;
 			files = (
 				188383E30B2FB39D00166E3E /* AUTHORS in Install Docs */,
@@ -768,8 +765,8 @@
 		};
 		18FD22750B856BAD00681F0C /* Install Shaders */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie/shaders;
+			buildActionMask = 12;
+			dstPath = /Library/Pixie/shaders;
 			dstSubfolderSpec = 0;
 			files = (
 				18FD22770B856BE600681F0C /* ambientindirect.sdr in Install Shaders */,
@@ -832,8 +829,8 @@
 		};
 		1F1DEC060D0440DD00338FF9 /* Install Headers */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /Applications/Graphics/Pixie/include;
+			buildActionMask = 12;
+			dstPath = /Library/Pixie/include;
 			dstSubfolderSpec = 0;
 			files = (
 				1F1DEC080D04416E00338FF9 /* dlo.h in Install Headers */,
@@ -850,20 +847,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		181574DF0D0CC24E0000B665 /* sdrc2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sdrc2; sourceTree = BUILT_PRODUCTS_DIR; };
-		181574EE0D0CC3250000B665 /* pp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = pp.h; path = ../../src/sdrc2/pp.h; sourceTree = SOURCE_ROOT; };
-		181574EF0D0CC3250000B665 /* pp1.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp1.c; path = ../../src/sdrc2/pp1.c; sourceTree = SOURCE_ROOT; };
-		181574F00D0CC3250000B665 /* pp2.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp2.c; path = ../../src/sdrc2/pp2.c; sourceTree = SOURCE_ROOT; };
-		181574F10D0CC3250000B665 /* pp3.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp3.c; path = ../../src/sdrc2/pp3.c; sourceTree = SOURCE_ROOT; };
-		181574F20D0CC3250000B665 /* pp4.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp4.c; path = ../../src/sdrc2/pp4.c; sourceTree = SOURCE_ROOT; };
-		181574F30D0CC3250000B665 /* pp5.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp5.c; path = ../../src/sdrc2/pp5.c; sourceTree = SOURCE_ROOT; };
-		181574F40D0CC3250000B665 /* pp6.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp6.c; path = ../../src/sdrc2/pp6.c; sourceTree = SOURCE_ROOT; };
-		181574F50D0CC3250000B665 /* pp7.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp7.c; path = ../../src/sdrc2/pp7.c; sourceTree = SOURCE_ROOT; };
-		181574F60D0CC3250000B665 /* pp8.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = pp8.c; path = ../../src/sdrc2/pp8.c; sourceTree = SOURCE_ROOT; };
-		181574F70D0CC3250000B665 /* ppext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ppext.h; path = ../../src/sdrc2/ppext.h; sourceTree = SOURCE_ROOT; };
-		181574F80D0CC3250000B665 /* sdrc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = sdrc.cpp; path = ../../src/sdrc2/sdrc.cpp; sourceTree = SOURCE_ROOT; };
-		181575100D0CCAD70000B665 /* opcode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = opcode.cpp; path = ../../src/sdrc2/opcode.cpp; sourceTree = SOURCE_ROOT; };
-		181575110D0CCAD70000B665 /* opcode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = opcode.h; path = ../../src/sdrc2/opcode.h; sourceTree = SOURCE_ROOT; };
 		182651CA0BBA0B52007B2C37 /* ptcapi.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptcapi.h; path = ../../src/ri/ptcapi.h; sourceTree = SOURCE_ROOT; };
 		182C1BB30C55CD34000B070D /* shaderPl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = shaderPl.cpp; path = ../../src/ri/shaderPl.cpp; sourceTree = SOURCE_ROOT; };
 		182C1BB40C55CD34000B070D /* shaderPl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shaderPl.h; path = ../../src/ri/shaderPl.h; sourceTree = SOURCE_ROOT; };
@@ -1018,9 +1001,7 @@
 		188383A90B2FB31600166E3E /* Shadow4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Shadow4.jpg; sourceTree = "<group>"; };
 		188383AA0B2FB31600166E3E /* TexDisplacePatchCrack.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = TexDisplacePatchCrack.jpg; sourceTree = "<group>"; };
 		188383AB0B2FB31600166E3E /* index.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
-		188383AC0B2FB31600166E3E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		188383AD0B2FB31600166E3E /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
-		188383AE0B2FB31600166E3E /* Makefile.in */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
 		188383AF0B2FB31600166E3E /* NotIncludedStatic.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = NotIncludedStatic.html; sourceTree = "<group>"; };
 		188383B00B2FB31600166E3E /* NotSupportedStatic.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = NotSupportedStatic.html; sourceTree = "<group>"; };
 		188383B40B2FB31600166E3E /* DispersionPhotons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DispersionPhotons.png; sourceTree = "<group>"; };
@@ -1035,7 +1016,6 @@
 		188383CB0B2FB31600166E3E /* GSHPhotonMapVis.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GSHPhotonMapVis.png; sourceTree = "<group>"; };
 		188383CE0B2FB31600166E3E /* GSHGIReusedError.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GSHGIReusedError.png; sourceTree = "<group>"; };
 		188383D10B2FB31600166E3E /* Docs_ex1_precompute.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Docs_ex1_precompute.jpg; sourceTree = "<group>"; };
-		188383D20B2FB31600166E3E /* Thumbs.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = Thumbs.db; sourceTree = "<group>"; };
 		188383D40B2FB31600166E3E /* BakeToTexture.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = BakeToTexture.html; sourceTree = "<group>"; };
 		188383D50B2FB31600166E3E /* Basics_Running_Pixie.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = Basics_Running_Pixie.html; sourceTree = "<group>"; };
 		188383D60B2FB31600166E3E /* Dispersion.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = Dispersion.html; sourceTree = "<group>"; };
@@ -1079,7 +1059,19 @@
 		1F1DEC3F0D0448C200338FF9 /* show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = show; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F1DEC420D04491700338FF9 /* show.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = show.cpp; path = ../../src/show/show.cpp; sourceTree = SOURCE_ROOT; };
 		1F2BF74F0D04743000CF2E91 /* framebuffer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = framebuffer.so; sourceTree = BUILT_PRODUCTS_DIR; };
-		1FDB51170D04676D00B5FEC8 /* framebuffer.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = framebuffer.so; path = /Applications/Graphics/Pixie/displays/framebuffer.so; sourceTree = "<absolute>"; };
+		36E018920EB9F88D00C2288E /* display.exp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.exports; path = display.exp; sourceTree = "<group>"; };
+		36E018930EB9F88D00C2288E /* libri.exp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.exports; path = libri.exp; sourceTree = "<group>"; };
+		36E018940EB9F88D00C2288E /* libsdr.exp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.exports; path = libsdr.exp; sourceTree = "<group>"; };
+		36E01A5C0EBA35F600C2288E /* lex.sl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = lex.sl.cpp; path = ../../src/sdrc/lex.sl.cpp; sourceTree = SOURCE_ROOT; };
+		36E01A5D0EBA35F600C2288E /* sl.tab.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = sl.tab.c; path = ../../src/sdrc/sl.tab.c; sourceTree = SOURCE_ROOT; };
+		36E01A6C0EBA366800C2288E /* lex.sdr.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = lex.sdr.cpp; path = ../../src/sdr/lex.sdr.cpp; sourceTree = SOURCE_ROOT; };
+		36E01A6D0EBA366800C2288E /* sdr.l */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = sdr.l; path = ../../src/sdr/sdr.l; sourceTree = SOURCE_ROOT; };
+		36E01A6E0EBA366800C2288E /* sdr.y */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = sdr.y; path = ../../src/sdr/sdr.y; sourceTree = SOURCE_ROOT; };
+		36E01B200EBA48AC00C2288E /* file_png.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file_png.cpp; path = ../../src/file/file_png.cpp; sourceTree = SOURCE_ROOT; };
+		36E01B210EBA48AC00C2288E /* file_png.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = file_png.h; path = ../../src/file/file_png.h; sourceTree = SOURCE_ROOT; };
+		36E01B220EBA48AC00C2288E /* file_tiff.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file_tiff.cpp; path = ../../src/file/file_tiff.cpp; sourceTree = SOURCE_ROOT; };
+		36E01B230EBA48AC00C2288E /* file_tiff.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = file_tiff.h; path = ../../src/file/file_tiff.h; sourceTree = SOURCE_ROOT; };
+		36E01B240EBA48AC00C2288E /* file.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = file.h; path = ../../src/file/file.h; sourceTree = SOURCE_ROOT; };
 		C96A6E290AD6D5E5003C2D7B /* libpixiecommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpixiecommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A6E2F0AD6D651003C2D7B /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = algebra.cpp; path = ../../src/common/algebra.cpp; sourceTree = SOURCE_ROOT; };
 		C96A6E300AD6D651003C2D7B /* algebra.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = algebra.h; path = ../../src/common/algebra.h; sourceTree = SOURCE_ROOT; };
@@ -1272,13 +1264,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		181574DD0D0CC24E0000B665 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1F134DCF0D041F6300A46197 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1354,6 +1339,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18A298DB0B44E80E006B9ABE /* libri.dylib in Frameworks */,
+				36E018E50EB9FD3300C2288E /* libpixiecommon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1402,26 +1388,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		181574ED0D0CC3000000B665 /* sdrc2 */ = {
-			isa = PBXGroup;
-			children = (
-				181575100D0CCAD70000B665 /* opcode.cpp */,
-				181575110D0CCAD70000B665 /* opcode.h */,
-				181574EE0D0CC3250000B665 /* pp.h */,
-				181574EF0D0CC3250000B665 /* pp1.c */,
-				181574F00D0CC3250000B665 /* pp2.c */,
-				181574F10D0CC3250000B665 /* pp3.c */,
-				181574F20D0CC3250000B665 /* pp4.c */,
-				181574F30D0CC3250000B665 /* pp5.c */,
-				181574F40D0CC3250000B665 /* pp6.c */,
-				181574F50D0CC3250000B665 /* pp7.c */,
-				181574F60D0CC3250000B665 /* pp8.c */,
-				181574F70D0CC3250000B665 /* ppext.h */,
-				181574F80D0CC3250000B665 /* sdrc.cpp */,
-			);
-			name = sdrc2;
-			sourceTree = "<group>";
-		};
 		183398360B2D2CA60055E484 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -1514,14 +1480,6 @@
 			name = man;
 			sourceTree = "<group>";
 		};
-		188383580B2FB2F700166E3E /* doc */ = {
-			isa = PBXGroup;
-			children = (
-				188383590B2FB31600166E3E /* doc */,
-			);
-			name = doc;
-			sourceTree = "<group>";
-		};
 		188383590B2FB31600166E3E /* doc */ = {
 			isa = PBXGroup;
 			children = (
@@ -1535,13 +1493,10 @@
 				188383900B2FB31600166E3E /* favicon.ico */,
 				188383910B2FB31600166E3E /* images */,
 				188383AB0B2FB31600166E3E /* index.html */,
-				188383AC0B2FB31600166E3E /* Makefile */,
 				188383AD0B2FB31600166E3E /* Makefile.am */,
-				188383AE0B2FB31600166E3E /* Makefile.in */,
 				188383AF0B2FB31600166E3E /* NotIncludedStatic.html */,
 				188383B00B2FB31600166E3E /* NotSupportedStatic.html */,
 				188383B10B2FB31600166E3E /* thumbs */,
-				188383D20B2FB31600166E3E /* Thumbs.db */,
 				188383D30B2FB31600166E3E /* Tutorials */,
 				188383DA0B2FB31600166E3E /* Tutorials.html */,
 			);
@@ -1896,25 +1851,27 @@
 				1F134E280D04277F00A46197 /* openexr */,
 				1F134DC50D041F1D00A46197 /* gui */,
 				C96A6E2E0AD6D602003C2D7B /* common */,
-				188383580B2FB2F700166E3E /* doc */,
 				C9E09A7E0AD9AF2100A33716 /* dsotest */,
 				C96A6E5E0AD6D74C003C2D7B /* file */,
 				C96A6E650AD6D75A003C2D7B /* framebuffer */,
-				1883834B0B2FB29C00166E3E /* man */,
 				186156030B97EED2007BE5EA /* parsers */,
 				C96A6EEF0AD6E112003C2D7B /* precomp */,
-				C96A6E2A0AD6D5E5003C2D7B /* Products */,
 				C9E09B570AD9BF1500A33716 /* rgbe */,
 				C96A6EE30AD6E103003C2D7B /* ri */,
 				C9E09B070AD9B81100A33716 /* rndr */,
 				C96A6EEE0AD6E10E003C2D7B /* sdr */,
 				C96A6EED0AD6E108003C2D7B /* sdrc */,
-				181574ED0D0CC3000000B665 /* sdrc2 */,
 				C9E09B5A0AD9BF2700A33716 /* sdrinfo */,
 				183398360B2D2CA60055E484 /* shaders */,
 				1F1DEC410D04490500338FF9 /* show */,
 				C9E09BAE0AD9C2CD00A33716 /* texmake */,
 				188383DB0B2FB33F00166E3E /* toplevel */,
+				188383590B2FB31600166E3E /* doc */,
+				1883834B0B2FB29C00166E3E /* man */,
+				C96A6E2A0AD6D5E5003C2D7B /* Products */,
+				36E018920EB9F88D00C2288E /* display.exp */,
+				36E018930EB9F88D00C2288E /* libri.exp */,
+				36E018940EB9F88D00C2288E /* libsdr.exp */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1924,20 +1881,19 @@
 				C96A6E290AD6D5E5003C2D7B /* libpixiecommon.a */,
 				C96A6E580AD6D73A003C2D7B /* file.so */,
 				C96A6EC20AD6E08A003C2D7B /* libri.dylib */,
-				1FDB51170D04676D00B5FEC8 /* framebuffer.so */,
 				C96A6EC70AD6E096003C2D7B /* libdsotest.dylib */,
 				C96A6EE20AD6E0F6003C2D7B /* libsdr.dylib */,
 				C9E09B420AD9BEBE00A33716 /* rgbe.so */,
+				1F134DD40D041F6300A46197 /* gui.so */,
+				1F134E270D0426FD00A46197 /* openexr.so */,
+				1F2BF74F0D04743000CF2E91 /* framebuffer.so */,
 				C983E6C20AF2E8FB00648461 /* rndr */,
 				C983E6D20AF2E9C900648461 /* sdrc */,
 				C983E6ED0AF2E9FE00648461 /* precomp */,
 				C983E6F60AF2EA3400648461 /* sdrinfo */,
 				C983E6FF0AF2EA8400648461 /* texmake */,
-				1F134DD40D041F6300A46197 /* gui.so */,
-				1F134E270D0426FD00A46197 /* openexr.so */,
 				1F1DEC3F0D0448C200338FF9 /* show */,
 				1F2BF74F0D04743000CF2E91 /* framebuffer.so */,
-				181574DF0D0CC24E0000B665 /* sdrc2 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1963,6 +1919,11 @@
 			isa = PBXGroup;
 			children = (
 				C96A6E660AD6D778003C2D7B /* file.cpp */,
+				36E01B200EBA48AC00C2288E /* file_png.cpp */,
+				36E01B210EBA48AC00C2288E /* file_png.h */,
+				36E01B220EBA48AC00C2288E /* file_tiff.cpp */,
+				36E01B230EBA48AC00C2288E /* file_tiff.h */,
+				36E01B240EBA48AC00C2288E /* file.h */,
 			);
 			name = file;
 			sourceTree = "<group>";
@@ -2166,6 +2127,8 @@
 				C9E09AA60AD9B03900A33716 /* sl.cpp */,
 				C9E09A920AD9B01700A33716 /* expression.cpp */,
 				C9E09A930AD9B01700A33716 /* expression.h */,
+				36E01A5C0EBA35F600C2288E /* lex.sl.cpp */,
+				36E01A5D0EBA35F600C2288E /* sl.tab.c */,
 			);
 			name = sdrc;
 			sourceTree = "<group>";
@@ -2175,6 +2138,9 @@
 			children = (
 				C9E09B2F0AD9BCF300A33716 /* sdr.cpp */,
 				C9E09B300AD9BCF300A33716 /* sdr.h */,
+				36E01A6C0EBA366800C2288E /* lex.sdr.cpp */,
+				36E01A6D0EBA366800C2288E /* sdr.l */,
+				36E01A6E0EBA366800C2288E /* sdr.y */,
 			);
 			name = sdr;
 			sourceTree = "<group>";
@@ -2268,6 +2234,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36E01B260EBA48AC00C2288E /* file_png.h in Headers */,
+				36E01B280EBA48AC00C2288E /* file_tiff.h in Headers */,
+				36E01B290EBA48AC00C2288E /* file.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2401,22 +2370,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		181574DE0D0CC24E0000B665 /* sdrc2 */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 181574E70D0CC27A0000B665 /* Build configuration list for PBXNativeTarget "sdrc2" */;
-			buildPhases = (
-				181574DC0D0CC24E0000B665 /* Sources */,
-				181574DD0D0CC24E0000B665 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = sdrc2;
-			productName = sdrc2;
-			productReference = 181574DF0D0CC24E0000B665 /* sdrc2 */;
-			productType = "com.apple.product-type.tool";
-		};
 		1F134DC60D041F6300A46197 /* gui */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1F134DD10D041F6300A46197 /* Build configuration list for PBXNativeTarget "gui" */;
@@ -2702,48 +2655,61 @@
 		C96A6E1A0AD6D5C5003C2D7B /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C96A6E1B0AD6D5C5003C2D7B /* Build configuration list for PBXProject "pixie" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = C96A6E180AD6D5C5003C2D7B;
 			productRefGroup = C96A6E2A0AD6D5E5003C2D7B /* Products */;
 			projectDirPath = "";
 			projectRoot = ../..;
 			targets = (
-				C9E09AD00AD9B42300A33716 /* parsers */,
 				C98988F90AF1B953003DB17A /* all */,
 				C96A6E280AD6D5E5003C2D7B /* pixiecommon */,
+				C96A6EC10AD6E08A003C2D7B /* ri */,
+				C96A6EE10AD6E0F6003C2D7B /* sdr */,
 				C96A6E570AD6D73A003C2D7B /* file */,
 				C9E09B410AD9BEBE00A33716 /* rgbe */,
 				C96A6E5C0AD6D746003C2D7B /* framebuffer */,
-				C96A6EC10AD6E08A003C2D7B /* ri */,
+				1F134E190D0426FD00A46197 /* openexr */,
 				C96A6EC60AD6E096003C2D7B /* dsotest */,
-				C96A6EE10AD6E0F6003C2D7B /* sdr */,
+				1F134DC60D041F6300A46197 /* gui */,
 				C983E6C10AF2E8FB00648461 /* rndr */,
 				C983E6D10AF2E9C900648461 /* sdrc */,
-				181574DE0D0CC24E0000B665 /* sdrc2 */,
 				C983E6EC0AF2E9FE00648461 /* precomp */,
 				C983E6F50AF2EA3400648461 /* sdrinfo */,
 				1F1DEC320D0448C200338FF9 /* show */,
 				C983E6FE0AF2EA8400648461 /* texmake */,
-				1F134DC60D041F6300A46197 /* gui */,
-				1F134E190D0426FD00A46197 /* openexr */,
+				C9E09AD00AD9B42300A33716 /* parsers */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1F1DEC500D044C3200338FF9 /* ShellScript */ = {
+		1F1DEC500D044C3200338FF9 /* Install Docs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Install Docs";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "rsync -ra --exclude .svn ../../doc/ /Library/Pixie/doc/";
+		};
+		36E0193C0EBA036E00C2288E /* Update Shaders */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Update Shaders";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rsync -ra --exclude .svn ../../doc/ /Applications/Graphics/Pixie/doc/";
+			shellScript = "SDRC=/Library/Pixie/bin/sdrc\n\ncd /Library/Pixie/shaders\nfor shader in *.sl; do\n\t$SDRC $shader\ndone";
 		};
 		C9E09ACF0AD9B42300A33716 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2756,28 +2722,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\ncat |make -f - <<EOF\n\n\n\nall: ../../src/ri/lex.dso.cpp ../../src/ri/dso.cpp ../../src/ri/lex.rib.cpp \\\n\t../../src/ri/rib.cpp ../../src/ri/lex.sl.cpp ../../src/ri/sl.cpp \\\n\t../../src/ri/lex.var.cpp ../../src/ri/variable.cpp ../../src/ri/lex.if.cpp \\\n\t../../src/ri/ifexpr.cpp ../../src/sdr/lex.sdr.cpp ../../src/sdr/sdr.cpp \\\n\t../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.cpp\n\n\n\n\n../../src/ri/lex.dso.cpp: ../../src/ri/dso.l\n\tflex -i -Pdso -o../../src/ri/lex.dso.cpp ../../src/ri/dso.l\n\n../../src/ri/dso.cpp: ../../src/ri/dso.y\n\tbison -p dso -o ../../src/ri/dso.cpp ../../src/ri/dso.y\n\n../../src/ri/lex.rib.cpp: ../../src/ri/rib.l\n\tflex -i -Prib -o../../src/ri/lex.rib.cpp ../../src/ri/rib.l\n\n../../src/ri/rib.cpp: ../../src/ri/rib.y\n\tbison -p rib -o ../../src/ri/rib.cpp ../../src/ri/rib.y\n\n../../src/ri/lex.sl.cpp: ../../src/ri/sdr.l\n\tflex -Psl -o../../src/ri/lex.sl.cpp ../../src/ri/sdr.l\n\n../../src/ri/sl.cpp: ../../src/ri/sdr.y\n\tbison -p sl -o ../../src/ri/sl.cpp ../../src/ri/sdr.y\n\n../../src/ri/lex.var.cpp: ../../src/ri/variable.l\n\tflex -Pvar -o../../src/ri/lex.var.cpp ../../src/ri/variable.l\n\n../../src/ri/variable.cpp: ../../src/ri/variable.y\n\tbison -p var -o ../../src/ri/variable.cpp ../../src/ri/variable.y\n\n\n../../src/ri/lex.if.cpp: ../../src/ri/ifexpr.l\n\tflex -Pif -o../../src/ri/lex.if.cpp ../../src/ri/ifexpr.l\n\n../../src/ri/ifexpr.cpp: ../../src/ri/ifexpr.y\n\tbison -p if -o ../../src/ri/ifexpr.cpp ../../src/ri/ifexpr.y\n\n../../src/sdr/lex.sdr.cpp: ../../src/sdr/sdr.l\n\tflex -Psdr -o../../sdr/lex.sdr.cpp ..../src/sdr/sdr.l\n\n../../src/sdr/sdr.cpp: ../../src/sdr/sdr.y\n\tbison -p sdr -o ../../src/sdr/sdr.cpp ../../src/sdr/sdr.y\n\n../../src/sdrc/lex.sl.cpp: ../../src/sdrc/sl.l\n\tflex -Psl -o../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.l\n\n../../src/sdrc/sl.cpp: ../../src/sdrc/sl.y\n\tbison -p sl -o ../../src/sdrc/sl.cpp ../../src/sdrc/sl.y\n\n../../src/sdrc2/lex.sl.cpp: ../../src/sdrc2/sl.l\n\tflex -Psl -o../../src/sdrc2/lex.sl.cpp ../../src/sdrc2/sl.l\n\n../../src/sdrc2/sl.cpp: ../../src/sdrc2/sl.y\n\tbison -p sl -o ../../src/sdrc2/sl.cpp ../../src/sdrc2/sl.y\n\nEOF\n\nexit 0";
+			shellScript = "# shell script goes here\nmake -f - <<EOF\n\n\n\nall: ../../src/ri/lex.dso.cpp ../../src/ri/dso.cpp ../../src/ri/lex.rib.cpp \\\n\t../../src/ri/rib.cpp ../../src/ri/lex.sl.cpp ../../src/ri/sl.cpp \\\n\t../../src/ri/lex.var.cpp ../../src/ri/variable.cpp ../../src/ri/lex.if.cpp \\\n\t../../src/ri/ifexpr.cpp ../../src/sdr/lex.sdr.cpp ../../src/sdr/sdr.cpp \\\n\t../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.cpp\n\n\n\n\n../../src/ri/lex.dso.cpp: ../../src/ri/dso.l\n\tflex -i -Pdso -o../../src/ri/lex.dso.cpp ../../src/ri/dso.l\n\n../../src/ri/dso.cpp: ../../src/ri/dso.y\n\tbison -p dso -o ../../src/ri/dso.cpp ../../src/ri/dso.y\n\n../../src/ri/lex.rib.cpp: ../../src/ri/rib.l\n\tflex -i -Prib -o../../src/ri/lex.rib.cpp ../../src/ri/rib.l\n\n../../src/ri/rib.cpp: ../../src/ri/rib.y\n\tbison -p rib -o ../../src/ri/rib.cpp ../../src/ri/rib.y\n\n../../src/ri/lex.sl.cpp: ../../src/ri/sdr.l\n\tflex -Psl -o../../src/ri/lex.sl.cpp ../../src/ri/sdr.l\n\n../../src/ri/sl.cpp: ../../src/ri/sdr.y\n\tbison -p sl -o ../../src/ri/sl.cpp ../../src/ri/sdr.y\n\n../../src/ri/lex.var.cpp: ../../src/ri/variable.l\n\tflex -Pvar -o../../src/ri/lex.var.cpp ../../src/ri/variable.l\n\n../../src/ri/variable.cpp: ../../src/ri/variable.y\n\tbison -p var -o ../../src/ri/variable.cpp ../../src/ri/variable.y\n\n\n../../src/ri/lex.if.cpp: ../../src/ri/ifexpr.l\n\tflex -Pif -o../../src/ri/lex.if.cpp ../../src/ri/ifexpr.l\n\n../../src/ri/ifexpr.cpp: ../../src/ri/ifexpr.y\n\tbison -p if -o ../../src/ri/ifexpr.cpp ../../src/ri/ifexpr.y\n\n../../src/sdr/lex.sdr.cpp: ../../src/sdr/sdr.l\n\tflex -Psdr -o../../src/sdr/lex.sdr.cpp ../../src/sdr/sdr.l\n\n../../src/sdr/sdr.cpp: ../../src/sdr/sdr.y\n\tbison -p sdr -o ../../src/sdr/sdr.cpp ../../src/sdr/sdr.y\n\n../../src/sdrc/lex.sl.cpp: ../../src/sdrc/sl.l\n\tflex -Psl -o../../src/sdrc/lex.sl.cpp ../../src/sdrc/sl.l\n\n../../src/sdrc/sl.cpp: ../../src/sdrc/sl.y\n\tbison -p sl -o ../../src/sdrc/sl.cpp ../../src/sdrc/sl.y\n\n../../src/sdrc2/lex.sl.cpp: ../../src/sdrc2/sl.l\n\tflex -Psl -o../../src/sdrc2/lex.sl.cpp ../../src/sdrc2/sl.l\n\n../../src/sdrc2/sl.cpp: ../../src/sdrc2/sl.y\n\tbison -p sl -o ../../src/sdrc2/sl.cpp ../../src/sdrc2/sl.y\n\nEOF\n\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		181574DC0D0CC24E0000B665 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				181574F90D0CC3250000B665 /* pp1.c in Sources */,
-				181574FA0D0CC3250000B665 /* pp2.c in Sources */,
-				181574FB0D0CC3250000B665 /* pp3.c in Sources */,
-				181574FC0D0CC3250000B665 /* pp4.c in Sources */,
-				181574FD0D0CC3250000B665 /* pp5.c in Sources */,
-				181574FE0D0CC3250000B665 /* pp6.c in Sources */,
-				181574FF0D0CC3250000B665 /* pp7.c in Sources */,
-				181575000D0CC3250000B665 /* pp8.c in Sources */,
-				181575010D0CC3250000B665 /* sdrc.cpp in Sources */,
-				181575120D0CCAD70000B665 /* opcode.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1F134DCC0D041F6300A46197 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2816,6 +2765,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C96A6E670AD6D778003C2D7B /* file.cpp in Sources */,
+				36E01B250EBA48AC00C2288E /* file_png.cpp in Sources */,
+				36E01B270EBA48AC00C2288E /* file_tiff.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3166,36 +3117,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		181574E80D0CC27A0000B665 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = sdrc2;
-				ZERO_LINK = YES;
-			};
-			name = Debug;
-		};
-		181574E90D0CC27A0000B665 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = sdrc2;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		1F134DD20D041F6300A46197 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3206,7 +3127,7 @@
 					/usr/X11/include,
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				INSTALL_PATH = /Library/Pixie/modules;
 				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/libfltk_gl.a",
@@ -3235,7 +3156,7 @@
 					/usr/X11/include,
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /Applications/Graphics/Pixie/modules;
+				INSTALL_PATH = /Library/Pixie/modules;
 				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/libfltk_gl.a",
@@ -3264,7 +3185,7 @@
 					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				INSTALL_PATH = /Library/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmImf.a",
@@ -3275,6 +3196,8 @@
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmThread.a",
 					"-lX11",
 					"-lXext",
+					"-framework",
+					Carbon,
 				);
 				PRODUCT_NAME = openexr;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
@@ -3284,14 +3207,16 @@
 		1F134E260D0426FD00A46197 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_EXTENSION = so;
+				EXPORTED_SYMBOLS_FILE = display.exp;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR",
 					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				INSTALL_PATH = /Library/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmImf.a",
@@ -3302,17 +3227,25 @@
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/libIlmThread.a",
 					"-lX11",
 					"-lXext",
+					"-framework",
+					Carbon,
 				);
 				PRODUCT_NAME = openexr;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
 		1F1DEC3D0D0448C200338FF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "-ltiff";
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-lz",
+					"-ljpeg",
+				);
 				PRODUCT_NAME = show;
 			};
 			name = Debug;
@@ -3320,9 +3253,15 @@
 		1F1DEC3E0D0448C200338FF9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "-ltiff";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-lz",
+					"-ljpeg",
+				);
 				PRODUCT_NAME = show;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -3336,14 +3275,16 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR/",
-					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/include/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff-$(arch)/include/",
 					"$(PIXIELIBS)/fltk/STAGING/fltk/include/",
+					"$(PIXIELIBS)/libpng/STAGING/libpng-$(arch)/include",
 					../../src,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/Applications/Graphics/Pixie/lib,
+					"$(BUILT_PRODUCTS_DIR)",
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/",
-					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/lib/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/",
+					"$(PIXIELIBS)/libtiff/STAGING/libjpeg/lib/",
 					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -3357,21 +3298,26 @@
 		C96A6E1D0AD6D5C5003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = i386;
+				ARCHS = (
+					i386,
+					ppc,
+				);
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = /;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/include/OpenEXR/",
-					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/include/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff-$(arch)/include/",
 					"$(PIXIELIBS)/fltk/STAGING/fltk/include/",
+					"$(PIXIELIBS)/libpng/STAGING/libpng-$(arch)/include",
 					../../src,
 				);
 				LIBRARY_SEARCH_PATHS = (
-					/Applications/Graphics/Pixie/lib,
+					"$(BUILT_PRODUCTS_DIR)",
 					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/",
-					"$(PIXIELIBS)/libtiff/STAGING/libtiff/Applications/Graphics/Pixie/lib/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/",
+					"$(PIXIELIBS)/libtiff/STAGING/libjpeg/lib/",
 					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -3385,7 +3331,8 @@
 		C96A6E2C0AD6D5E6003C2D7B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
+				INSTALL_PATH = /Library/Pixie/lib;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = pixiecommon;
 			};
 			name = Debug;
@@ -3393,7 +3340,9 @@
 		C96A6E2D0AD6D5E6003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
+				DEPLOYMENT_LOCATION = NO;
+				INSTALL_PATH = /Library/Pixie/lib;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = pixiecommon;
 			};
 			name = Release;
@@ -3402,8 +3351,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				OTHER_LDFLAGS = "-ltiff";
+				GCC_PREPROCESSOR_DEFINITIONS = "HAVE_LIBPNG=1";
+				INSTALL_PATH = /Library/Pixie/displays;
+				LIBRARY_SEARCH_PATHS = (
+					"$(BUILT_PRODUCTS_DIR)",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/",
+					"$(PIXIELIBS)/libtiff/STAGING/libjpeg/lib/",
+					"$(PIXIELIBS)/libpng/STAGING/libpng/",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/",
+				);
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-ljpeg",
+					"-lpixiepng",
+					"-lz",
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = file;
 			};
 			name = Debug;
@@ -3411,10 +3376,30 @@
 		C96A6E610AD6D74C003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_EXTENSION = so;
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
-				OTHER_LDFLAGS = "-ltiff";
+				EXPORTED_SYMBOLS_FILE = display.exp;
+				GCC_PREPROCESSOR_DEFINITIONS = "HAVE_LIBPNG=1";
+				INSTALL_PATH = /Library/Pixie/displays;
+				LIBRARY_SEARCH_PATHS = (
+					"$(BUILT_PRODUCTS_DIR)",
+					"$(PIXIELIBS)/OpenEXR/STAGING/OpenEXR/lib/",
+					"$(PIXIELIBS)/libtiff/STAGING/libtiff/",
+					"$(PIXIELIBS)/libtiff/STAGING/libjpeg/lib/",
+					"$(PIXIELIBS)/libpng/STAGING/libpng/",
+					"$(PIXIELIBS)/fltk/STAGING/fltk/lib/",
+				);
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-ljpeg",
+					"-lpixiepng",
+					"-lz",
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = file;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
@@ -3426,7 +3411,7 @@
 					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				INSTALL_PATH = /Library/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"-lX11",
@@ -3439,18 +3424,22 @@
 		C96A6E640AD6D74C003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_EXTENSION = so;
+				EXPORTED_SYMBOLS_FILE = display.exp;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../src",
 					/Developer/SDKs/MacOSX10.4u.sdk/usr/include,
 				);
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				INSTALL_PATH = /Library/Pixie/displays;
 				LIBRARY_SEARCH_PATHS = /usr/X11R6/lib;
 				OTHER_LDFLAGS = (
 					"-lX11",
 					"-lXext",
 				);
 				PRODUCT_NAME = framebuffer;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
@@ -3458,10 +3447,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
-				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
+				INSTALL_PATH = /Library/Pixie/lib;
 				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-ljpeg",
 					"-lz",
-					"-ltiff",
+					"-framework",
+					Carbon,
 				);
 				PRODUCT_NAME = ri;
 			};
@@ -3470,13 +3462,20 @@
 		C96A6ECA0AD6E0B5003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_PREFIX = lib;
-				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
+				EXPORTED_SYMBOLS_FILE = libri.exp;
+				INSTALL_PATH = /Library/Pixie/lib;
 				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-ljpeg",
 					"-lz",
-					"-ltiff",
+					"-framework",
+					Carbon,
 				);
 				PRODUCT_NAME = ri;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
@@ -3484,7 +3483,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				INSTALL_PATH = /Library/Pixie/bin;
 				PRODUCT_NAME = dsotest;
 			};
 			name = Debug;
@@ -3492,9 +3491,12 @@
 		C96A6ECD0AD6E0B5003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_PREFIX = lib;
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				INSTALL_PATH = /Library/Pixie/bin;
 				PRODUCT_NAME = dsotest;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
 			};
 			name = Release;
 		};
@@ -3502,8 +3504,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
-				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
-				OTHER_LDFLAGS = "-lcommon";
+				INSTALL_PATH = /Library/Pixie/lib;
+				OTHER_LDFLAGS = (
+					"-lpixiecommon",
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = sdr;
 			};
 			name = Debug;
@@ -3511,18 +3517,32 @@
 		C96A6EEC0AD6E103003C2D7B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_PREFIX = lib;
-				INSTALL_PATH = /Applications/Graphics/Pixie/lib;
-				OTHER_LDFLAGS = "-lcommon";
+				EXPORTED_SYMBOLS_FILE = libsdr.exp;
+				INSTALL_PATH = /Library/Pixie/lib;
+				OTHER_LDFLAGS = (
+					"-lpixiecommon",
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = sdr;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
 		C983E6C60AF2E93400648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "-ltiff";
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-lz",
+					"-ljpeg",
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = rndr;
 			};
 			name = Debug;
@@ -3530,16 +3550,28 @@
 		C983E6C70AF2E93400648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "-ltiff";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-lz",
+					"-ljpeg",
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = rndr;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
 		C983E6D50AF2E9E700648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = sdrc;
 			};
 			name = Debug;
@@ -3547,15 +3579,21 @@
 		C983E6D60AF2E9E700648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = sdrc;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
 		C983E6F10AF2EA3000648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				INSTALL_PATH = /Library/Pixie/bin;
 				PRODUCT_NAME = precomp;
 			};
 			name = Debug;
@@ -3563,15 +3601,21 @@
 		C983E6F20AF2EA3000648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				INSTALL_PATH = /Library/Pixie/bin;
 				PRODUCT_NAME = precomp;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
 		C983E6FA0AF2EA5E00648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = sdrinfo;
 			};
 			name = Debug;
@@ -3579,16 +3623,26 @@
 		C983E6FB0AF2EA5E00648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
 				PRODUCT_NAME = sdrinfo;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
 		C983E7050AF2EAD200648461 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "-ltiff";
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-lz",
+					"-ljpeg",
+				);
 				PRODUCT_NAME = texmake;
 			};
 			name = Debug;
@@ -3596,9 +3650,15 @@
 		C983E7060AF2EAD200648461 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INSTALL_PATH = /Applications/Graphics/Pixie/bin;
-				OTHER_LDFLAGS = "-ltiff";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				INSTALL_PATH = /Library/Pixie/bin;
+				OTHER_LDFLAGS = (
+					"-lpixietiff",
+					"-lz",
+					"-ljpeg",
+				);
 				PRODUCT_NAME = texmake;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -3650,7 +3710,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_EXTENSION = so;
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				INSTALL_PATH = /Library/Pixie/displays;
 				PRODUCT_NAME = rgbe;
 			};
 			name = Debug;
@@ -3658,24 +3718,19 @@
 		C9E09B470AD9BEC200A33716 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEPLOYMENT_POSTPROCESSING = YES;
 				EXECUTABLE_EXTENSION = so;
-				INSTALL_PATH = /Applications/Graphics/Pixie/displays;
+				EXPORTED_SYMBOLS_FILE = display.exp;
+				INSTALL_PATH = /Library/Pixie/displays;
 				PRODUCT_NAME = rgbe;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		181574E70D0CC27A0000B665 /* Build configuration list for PBXNativeTarget "sdrc2" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				181574E80D0CC27A0000B665 /* Debug */,
-				181574E90D0CC27A0000B665 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		1F134DD10D041F6300A46197 /* Build configuration list for PBXNativeTarget "gui" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

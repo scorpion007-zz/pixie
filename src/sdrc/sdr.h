@@ -87,9 +87,9 @@ class	CScriptContext;						// The main shader context. Holds everything
 
 
 // Bit position definitions for the settings field of the CScriptContext
-const	int		COMPILER_SURPRESS_WARNINGS		=	1;
-const	int		COMPILER_SURPRESS_ERRORS		=	2;
-const	int		COMPILER_SURPRESS_DEFINITIONS	=	4;
+const	int		COMPILER_SUPPRESS_WARNINGS		=	1;
+const	int		COMPILER_SUPPRESS_ERRORS		=	2;
+const	int		COMPILER_SUPPRESS_DEFINITIONS	=	4;
 
 
 ////////////////////////////////////////////////////////////////

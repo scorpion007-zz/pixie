@@ -32,6 +32,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __APPLE__
+#include <sys/stat.h>
+#include <CoreServices/CoreServices.h>
+#ifdef check   // Apple's library defines "check"
+#undef check
+#endif
+#endif
+
 #include "options.h"
 #include "texture.h"
 #include "stats.h"
@@ -252,12 +260,68 @@ COptions::COptions() {
 
 	hider					=	strdup("stochastic");
 	
+#ifdef __APPLE__
+	// Support for finding resources in Mac OS X bundles and standard Mac OS X file system locations
+	
+	// Find the application bundle's plug-in and Resources directory
+	char path[OS_MAX_PATH_LENGTH];
+	char pathtmp[OS_MAX_PATH_LENGTH];
+	CFBundleRef bundle = CFBundleGetMainBundle();
+	if (bundle) {
+		CFURLRef url = CFBundleCopyBuiltInPlugInsURL(bundle);
+		if (url) {
+			Boolean validpath = CFURLGetFileSystemRepresentation(url,true,(UInt8*)path,OS_MAX_PATH_LENGTH);
+			if (validpath)
+				setenv("PIXIEAPPPLUGINS", (const char*)path, 1);
+			CFRelease(url);
+		}
+		url = CFBundleCopyResourcesDirectoryURL(bundle);
+		if (url) {
+			Boolean validpath = CFURLGetFileSystemRepresentation(url,true,(UInt8*)path,OS_MAX_PATH_LENGTH);
+			if (validpath)
+				setenv("PIXIEAPPRESOURCES", (const char*)path, 1);
+			CFRelease(url);
+		}
+		CFRelease(bundle);
+	}
+	
+	// Find the application support directory (~/Library/Application Support/Pixie/PlugIns), and set the
+	// PIXIEUSERDIR environment variable to that directory
+	FSRef appsupport;
+    if (FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &appsupport) == noErr) {
+		FSRefMakePath(&appsupport, (UInt8*)path, OS_MAX_PATH_LENGTH);
+		sprintf(pathtmp, "%s/" PACKAGE, path);
+		mkdir(pathtmp, 0755);
+		setenv("PIXIEUSERDIR", (const char*)pathtmp, 1);
+	}
+	
+	// Find the application support directory (/Library/Application Support/Pixie/PlugIns), and set the
+	// PIXIELOCALDIR environment variable to that directory
+    if (FSFindFolder(kLocalDomain, kApplicationSupportFolderType, kCreateFolder, &appsupport) == noErr) {
+		FSRefMakePath(&appsupport, (UInt8*)path, OS_MAX_PATH_LENGTH);
+		snprintf(pathtmp, OS_MAX_PATH_LENGTH, "%s/" PACKAGE, path);
+		mkdir(pathtmp, 0755);
+		setenv("PIXIELOCALDIR", (const char*)pathtmp, 1);
+	}
+	
+	// Default home, unless overridden with environment
+	setenv("PIXIEHOME","/Library/Pixie",0);
+	
+	archivePath             =   optionsGetSearchPath(".:%RIBS%:%PIXIEHOME%/ribs" ,NULL);
+	proceduralPath          =   optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEUSERDIR%/procedurals:%PIXIELOCALDIR%/procedurals:%PIXIEAPPPLUGINS%:%PIXIEHOME%/procedurals",NULL);
+	texturePath             =   optionsGetSearchPath(".:%TEXTURES%:%PIXIEUSERDIR%/textures:%PIXIELOCALDIR%/textures:%PIXIEAPPRESOURCES%/textures:%PIXIEHOME%/textures",NULL);
+	shaderPath              =   optionsGetSearchPath(".:%SHADERS%:%PIXIEUSERDIR%/shaders:%PIXIELOCALDIR%/shaders:%PIXIEAPPRESOURCES%/shaders:%PIXIEHOME%/shaders",NULL);
+	displayPath             =   optionsGetSearchPath("%DISPLAYS%:%PIXIEUSERDIR%/displays:%PIXIELOCALDIR%/displays:%PIXIEAPPPLUGINS%:%PIXIEHOME%/displays",NULL);
+	modulePath              =   optionsGetSearchPath("%MODULES%:%PIXIEUSERDIR%/modules:%PIXIELOCALDIR%/modules:%PIXIEAPPPLUGINS%:%PIXIEHOME%/modules",NULL);
+
+#else
 	archivePath				=	optionsGetSearchPath(".:%RIBS%:" PIXIE_RIBS,NULL);
 	proceduralPath			=	optionsGetSearchPath(".:%PROCEDURALS%:" PIXIE_PROCEDURALS,NULL);
 	texturePath				=	optionsGetSearchPath(".:%TEXTURES%:" PIXIE_TEXTURES,NULL);
 	shaderPath				=	optionsGetSearchPath(".:%SHADERS%:" PIXIE_SHADERS,NULL);
 	displayPath				=	optionsGetSearchPath(".:%DISPLAYS%:" PIXIE_DISPLAYS,NULL);
 	modulePath				=	optionsGetSearchPath(".:%MODULES%:" PIXIE_MODULES,NULL);
+#endif
 
 	pixelXsamples			=	2;
 	pixelYsamples			=	2;
@@ -311,7 +375,9 @@ COptions::COptions() {
 	endofframe				=	0;
 	filelog					=	NULL;
 
-	numThreads				=	DEFAULT_NUM_THREADS;
+	numThreads              =   osAvailableCPUs();
+	if (numThreads < 1)
+		numThreads          =   DEFAULT_NUM_THREADS;
 
 	maxTextureSize			=	DEFAULT_MAX_TEXTURESIZE;
 	maxBrickSize			=	DEFAULT_MAX_BRICKSIZE;
@@ -615,9 +681,17 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 				if (value != NULL) {
 					strcpy(dest,value);
 					dest	+=	strlen(value);
+					currentPath =   endOfCurrentPath+1;
+				} else {
+					// If this environment variable was not defined, scrap the entire
+					// path in progress b/c it will not be correct without this env variable
+					dest = tmp;
+					*dest = '\0';   // Truncate dest path
+					currentPath = strchr(endOfCurrentPath,':');         // Skip to next path
+					if (!currentPath)
+						currentPath = strchr(endOfCurrentPath,'\0');    // ...or end if last path
 				}
 
-				currentPath	=	endOfCurrentPath+1;
 			} else {
 				currentPath++;
 			}

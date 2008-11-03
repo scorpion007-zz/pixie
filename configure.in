@@ -110,6 +110,26 @@ TIFF_LIBS="$LIBS"
 LIBS="$saved_LIBS"
 
 dnl ---------------------------------------------------
+dnl Find libpng
+dnl
+
+saved_LIBS="$LIBS"
+
+have_libpng=true
+AC_CHECK_HEADER(png.h,,AC_MSG_WARN([png.h not found]))
+AC_CHECK_LIB(png,png_create_write_struct,,[AC_MSG_WARN([libpng not found]);have_libpng=false],)
+
+if test "x$have_libpng" = "xtrue"; then
+    AC_DEFINE_UNQUOTED(HAVE_LIBPNG,1, [Is libpng avaiable?])
+    PNG_LIBS="$LIBS"
+else
+    AC_DEFINE_UNQUOTED(HAVE_LIBPNG,0, [Is libpng avaiable?])
+    PNG_LIBS=""
+fi
+
+LIBS="$saved_LIBS"
+
+dnl ---------------------------------------------------
 dnl Find OpenEXR
 dnl
 
@@ -175,12 +195,28 @@ if test "x$BISON" == xfalse; then
 fi
 
 dnl ---------------------------------------------------
+dnl Check for Mac OS X
+dnl
+have_carbon=no
+AC_MSG_CHECKING([for Mac OS X Carbon support])
+AC_TRY_CPP([
+#include <Carbon/Carbon.h>
+#include <CoreServices/CoreServices.h>
+], have_carbon=yes)
+AC_MSG_RESULT([$have_carbon])
+
+if test "x$have_carbon" = "xyes"; then
+  LIBS="$LIBS -Wl,-framework,Carbon"
+fi
+
+dnl ---------------------------------------------------
 dnl Do variable substitution
 dnl
 AC_SUBST(X_LIBS)
 AC_SUBST(X_CFLAGS)
 AC_SUBST(X_LDFLAGS)
 AC_SUBST(TIFF_LIBS)
+AC_SUBST(PNG_LIBS)
 AC_SUBST(BUILD_SHOW)
 AC_SUBST(ZLIB_LIBS)
 AC_SUBST(FLTK_CXXFLAGS)
@@ -322,6 +358,13 @@ echo "------------------------------------------------"
 echo "--->            ZLib not found."
 echo "---> You can download it from www.zlib.net"
 echo "---> compressed rib support will not be built."
+fi
+
+if test "x$have_libpng" != "xtrue"; then
+echo "------------------------------------------------"
+echo "--->            libpng not found."
+echo "---> You can download it from www.libpng.org"
+echo "---> Writing PNG files will not be supported."
 fi
 
 echo "------------------------------------------------"

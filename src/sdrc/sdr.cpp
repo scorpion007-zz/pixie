@@ -1241,7 +1241,7 @@ void		CScriptContext::define(CSymbol *s) {
 // Return Value			:
 // Comments				:
 void		CScriptContext::printDefine(CSymbol *s) {
-	if (settings & COMPILER_SURPRESS_DEFINITIONS) return ;
+	if (settings & COMPILER_SUPPRESS_DEFINITIONS) return ;
 
 	if (s->defFileName != NULL)
 		printf("%s \t(%s(%d)) \t-> %d in %s\n",s->symbolName,sourceFile,lineNo-1,s->defLineNo,s->defFileName);
@@ -1657,7 +1657,7 @@ void		CScriptContext::error(char *mes,...) {
 
 	compileError++;
 
-	if (CScriptContext::settings & COMPILER_SURPRESS_ERRORS) return;
+	if (CScriptContext::settings & COMPILER_SUPPRESS_ERRORS) return;
 
 	sprintf(tmp,"%s(%d) : error : %s",sourceFile,statementLineNo,mes);
 
@@ -1678,7 +1678,7 @@ void		CScriptContext::warning(char *mes,...) {
 
 	compileWarning++;
 
-	if (settings & COMPILER_SURPRESS_WARNINGS) return;
+	if (settings & COMPILER_SUPPRESS_WARNINGS) return;
 
 	sprintf(tmp,"%s(%d) : warning : %s",sourceFile,statementLineNo,mes);
 

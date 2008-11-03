@@ -130,7 +130,7 @@ void	printUsage() {
 	fprintf(stdout,"  -d           : Ignore the display drivers and use framebuffer\n");
 	fprintf(stdout,"  -t           : Print renderer statistics after every frame\n");
 	fprintf(stdout,"  -p           : Display the progress\n");
-	fprintf(stdout,"  -P:n         : Use n processoes\n");
+	fprintf(stdout,"  -P:n         : Use n processors\n");
 	fprintf(stdout,"  -t:n         : Use n threads (more efficient than -P:n)\n");
 	fprintf(stdout,"  -r <port>    : Start a server\n");
 	fprintf(stdout,"  -k <port>    : Kill the server\n");
@@ -166,8 +166,17 @@ void	riThread(void *w) {
 #endif
 #endif
 
-	
-	RiReadArchive((char *) &buffer[1].character,NULL,NULL);
+	char *source	= strdup((char *) &buffer[1].character);
+	char *pstart 	= source;
+	char *pend 		= strchr(pstart,':');
+	while(pend) {
+		*pend 	= '\0';
+		RiReadArchive(pstart,NULL,NULL);
+		pstart 	= pend+1;
+		pend 	= strchr(pstart,':');
+	}
+	RiReadArchive(pstart,NULL,NULL);
+	free(source);
 	RiEnd();
 }
 
@@ -247,7 +256,17 @@ retryBind:
 #endif
 #endif
 
-	RiReadArchive(ribFile,NULL,NULL);
+	char *source	= strdup(ribFile);
+	char *pstart 	= source;
+	char *pend 		= strchr(pstart,':');
+	while(pend) {
+		*pend 	= '\0';
+		RiReadArchive(pstart,NULL,NULL);
+		pstart 	= pend+1;
+		pend 	= strchr(pstart,':');
+	}
+	RiReadArchive(pstart,NULL,NULL);
+	free(source);
 	RiEnd();
 }
 
@@ -530,7 +549,6 @@ void	rndrd(int port) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
 // Description			:	The god
@@ -654,7 +672,17 @@ int main(int argc, char* argv[]) {
 		} else if (strcmp(argv[i],"-p") == 0) {
 			displayProgress	=	TRUE;
 		} else {
-			source	=	argv[i];
+			// Create colon-separated list of source RIBs
+			if (!source) {
+				source = strdup(argv[i]);
+			} else {
+				char* tmp = (char*)malloc(strlen(source)+1+strlen(argv[i])+1);
+				strcpy(tmp,source);
+				strcat(tmp,":");
+				strcat(tmp,argv[i]);
+				free(source);
+				source = tmp;
+			}
 		}
 	}
 	
@@ -662,6 +690,7 @@ int main(int argc, char* argv[]) {
 	if (client | server | localserver) {
 		if ((client ^ server ^ localserver) == 0) {
 			fprintf(stderr,"Invalid combination of client and server options\n");
+			if (source) free(source);
 			exit(0);
 		}
 	}
@@ -669,6 +698,7 @@ int main(int argc, char* argv[]) {
 	// FIXME: remove once multithreaded netrenders are working
 	if ((client | server | localserver) && numThreads > 0) {
 		fprintf(stderr,"You cannot specify multithreaded for network / multiprocessor renders\n");
+		if (source) free(source);
 		exit(0);
 	}
 
@@ -676,22 +706,25 @@ int main(int argc, char* argv[]) {
 	if (port != 0) {
 		if ((localChildren != 0) | server) {
 			fprintf(stderr,"You cannot launch a deamon with multiprocessor options\n");
+			if (source) free(source);
 			exit(0);
 		}
 		
 		noRestart	=	FALSE;
 		rndrd(port);
+		if (source) free(source);
 		exit(0);
 
 	}
 	
 	// If no source, get the input from stdin
-	if (source == NULL)	source	=	"-";
+	if (source == NULL)	source	=	strdup("-");
 
 	// Deal with stdin renders
 	if (strcmp(source,"-") == 0) {
 		if ((client | server | localserver)  && (silent == FALSE) && (killservers != TRUE)) {
 			fprintf(stderr,"You cannot use stdin for network / multiprocessor renders\n");
+			free(source);
 			exit(0);
 		}
 	}
@@ -703,12 +736,14 @@ int main(int argc, char* argv[]) {
 		// verify rib exists
 		if (osFileExists(source) == FALSE) {
 			if (silent == FALSE)	fprintf(stderr,"Cannot find rib file for subprocesses\n");
+			free(source);
 			exit(0);
 		}
 		
 		// run teh servers
 		if (runLocalServers(localChildren,source,managerString) == FALSE) {
 			if (silent == FALSE)	fprintf(stderr,"Cannot launch multiprocessor subprocesses\n");
+			free(source);
 			exit(0);
 		}
 	}
@@ -716,6 +751,7 @@ int main(int argc, char* argv[]) {
 	// Launch as spawned local server if needed
 	if (clientport != 0) {
 		rndrc(source,clientport);
+		free(source);
 		exit(0);
 	}
 	
@@ -759,9 +795,21 @@ int main(int argc, char* argv[]) {
 		RiOption(RI_LIMITS,RI_NUMTHREADS,&numThreads,RI_NULL);
 	}
 	
-	if (!killservers) RiReadArchive(source,NULL,NULL);
+	if (!killservers) {
+		char *pstart 	= source;
+		char *pend 		= strchr(pstart,':');
+		while(pend) {
+			*pend 	= '\0';
+			RiReadArchive(pstart,NULL,NULL);
+			*pend 	= ':';
+			pstart 	= pend+1;
+			pend 	= strchr(pstart,':');
+		}
+		RiReadArchive(pstart,NULL,NULL);
+	}
 
 	RiEnd();
+	free(source);
 
 	return (RiLastError != RIE_NOERROR) ? -1 : 0;
 }

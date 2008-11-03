@@ -44,7 +44,7 @@
 // Return Value			:	-
 // Comments				:
 CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
-	int				i;
+	int				i,j;
 
 	atomicIncrement(&stats.numGprims);
 
@@ -63,15 +63,15 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 		if (cVar->entry == VARIABLE_WIDTH) {
 			const float		*vertex	=	pl->data0 + pl->parameters[i].index;
 
-			for (i=0;i<np;i++) {
-				maxSize			=	max(maxSize,vertex[i]);
+			for (j=0;j<np;j++) {
+				maxSize			=	max(maxSize,vertex[j]);
 			}
 
 			if (pl->data1 != NULL) {
 				vertex	=	pl->data1 + pl->parameters[i].index;
 
-				for (i=0;i<np;i++) {
-					maxSize			=	max(maxSize,vertex[i]);
+				for (j=0;j<np;j++) {
+					maxSize			=	max(maxSize,vertex[j]);
 				}
 			}
 

@@ -461,6 +461,10 @@ static	RtFilterFunc	getFilter(char *n) {
 		f = RiMitchellFilter;
 	} else if (strcmp(name,RI_SINCFILTER) == 0) {
 		f = RiSincFilter;
+	} else if (strcmp(name,RI_BESSELFILTER) == 0) {
+		f = RiBesselFilter;
+	} else if (strcmp(name,RI_DISKFILTER) == 0) {
+		f = RiDiskFilter;
 	} else {
 		error(CODE_BADTOKEN,"Filter \"%s\" not recognised\n",name);
 	}
