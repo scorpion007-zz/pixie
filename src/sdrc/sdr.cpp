@@ -86,13 +86,13 @@ CVariable::CVariable(char *name,int type,int multiplicity) : CSymbol(name) {
 	// Sanity check
 	if (multiplicity > 1) {
 		if (!(type & SLC_ARRAY)) {
-			sdr->error("Variable (%s) has more than one items (%d) but is not an array.\n",name,multiplicity);
+			sdr->error("Variable \"%s\" has more than one items (%d) but is not an array\n",name,multiplicity);
 		}
 	}
 
 	// Make sure the array size is reasonable
 	if (multiplicity <= 0) {
-		sdr->error("Array size for %s is invalid (%d)\n",name,multiplicity);
+		sdr->error("Array size for \"%s\" is invalid (%d)\n",name,multiplicity);
 		multiplicity	=	1;
 	}
 
@@ -231,7 +231,7 @@ CParameter	*CFunction::addParameter(char *name,int type,int multiplicity) {
 	for (cParameter=parameters->first();cParameter != NULL;cParameter=parameters->next()) {
 		// We already have a parameter with the same name
 		if (strcmp(cParameter->symbolName,name) == 0) {
-			sdr->error("Parameter %s is already defined\n",name);
+			sdr->error("Parameter \"%s\" is already defined\n",name);
 			return	cParameter;
 		}
 	}
@@ -265,7 +265,7 @@ CVariable	*CFunction::addVariable(char *name,int type,int multiplicity) {
 	// Check the function variables
 	for (cVariable=variables->first();cVariable != NULL;cVariable=variables->next()) {
 		if (strcmp(cVariable->symbolName,name) == 0) {
-			sdr->error("Variable %s is already defined\n",name);
+			sdr->error("Variable \"%s\" is already defined\n",name);
 			return	cVariable;
 		}
 	}
@@ -326,7 +326,7 @@ CVariable	*CFunction::getVariable(char *name,int probe) {
 	}
 
 	//if (probe == FALSE)
-	//	sdr->error("Variable %s not found\n",name);
+	//	sdr->error("Variable \"%s\" is not found\n",name);
 
 	return NULL;
 }
@@ -1432,7 +1432,7 @@ void			CScriptContext::generateCode(char *o) {
 	FILE				*out	=	NULL;
 
 	if (!(requiredShaderContext & shaderType)) {
-		CScriptContext::error("The shader uses some functions/constructs that are not defined for its type.\n");
+		CScriptContext::error("The shader uses some functions or constructs that are not defined for its type\n");
 	}
 
 	if (compileError != 0) {
@@ -1454,7 +1454,7 @@ void			CScriptContext::generateCode(char *o) {
 	out		=	fopen(o,"w");
 
 	if (out == NULL) {
-		sdr->error("Unable to open %s\n",o);
+		sdr->error("Failed to open \"%s\"\n",o);
 		return;
 	}
 

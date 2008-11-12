@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 //
-//  File				:	rendererDeclerations.cpp
+//  File				:	rendererDeclarations.cpp
 //  Classes				:	CRenderer
 //  Description			:
 //
@@ -53,11 +53,11 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
-// Method				:	initDeclerations
-// Description			:	Init the declerations
+// Method				:	initDeclarations
+// Description			:	Init the declarations
 // Return Value			:
 // Comments				:
-void			CRenderer::initDeclerations() {
+void			CRenderer::initDeclarations() {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,11 +290,11 @@ void			CRenderer::initDeclerations() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
-// Method				:	shutdownDeclerations
-// Description			:	Clear the declerations
+// Method				:	shutdownDeclarations
+// Description			:	Clear the declarations
 // Return Value			:
 // Comments				:
-void			CRenderer::shutdownDeclerations() {
+void			CRenderer::shutdownDeclarations() {
 	// Ditch the global IDs
 	assert(globalIdHash != NULL);
 	globalIdHash->destroy();

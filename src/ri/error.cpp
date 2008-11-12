@@ -144,7 +144,7 @@ static	int	translate(EErrorCode c) {
 		code	=	RIE_PROGRESS;
 		break;
 	default:
-		error(CODE_BUG,"Unknown error code used.\n");
+		error(CODE_BUG,"Unknown error code used\n");
 		code	=	RIE_NOERROR;
 		break;
 	}

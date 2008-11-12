@@ -89,7 +89,7 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 		};
 		
-		error(CODE_SYNTAX,"Unable to cast a string in the epxression");
+		error(CODE_SYNTAX,"Unable to cast a string in the expression\n");
 		
 		return "__nonsense__";
 	}
@@ -123,7 +123,7 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 		};
 		
-		error(CODE_SYNTAX,"Unable to cast a float in the epxression");
+		error(CODE_SYNTAX,"Unable to cast a float in the expression\n");
 		
 		return 0;
 	}
@@ -156,7 +156,7 @@ static	int					result		=	0;	// 0 - FALSE
 				break;
 		};
 		
-		error(CODE_SYNTAX,"Unable to cast a integer in the epxression");
+		error(CODE_SYNTAX,"Unable to cast an integer in the expression\n");
 		
 		return 0;
 	}
@@ -217,11 +217,11 @@ static	int					result		=	0;	// 0 - FALSE
 					if (typeSet == FALSE) {
 						COptions	*cOptions		=	context->getOptions();
 						if (cOptions->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
-							if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+							if (!silent) error(CODE_BADTOKEN,"Failed to find variable \"%s\"\n",name);
 							result	=	FALSE;
 						}
 					} else {
-						if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+						if (!silent) error(CODE_BADTOKEN,"Failed to find variable \"%s\"\n",name);
 						result	=	FALSE;
 					}
 				}
@@ -233,11 +233,11 @@ static	int					result		=	0;	// 0 - FALSE
 					if (typeSet == FALSE) {
 						CAttributes	*cAttributes	=	context->getAttributes(TRUE);
 						if (cAttributes->find(name,decl,expr.type,expr.value,expr.intValue,expr.floatValue) == FALSE) {
-							if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+							if (!silent) error(CODE_BADTOKEN,"Failed to find variable \"%s\"\n",name);
 							result	=	FALSE;
 						}
 					} else {
-						if (!silent) error(CODE_BADTOKEN,"Unable to find variable \"%s\"\n",name);
+						if (!silent) error(CODE_BADTOKEN,"Failed to find variable \"%s\"\n",name);
 						result	=	FALSE;
 					}
 				}

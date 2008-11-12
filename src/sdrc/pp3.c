@@ -312,7 +312,7 @@ doinclude()
 #endif	/* HOST == H_CPM */
 
 	if(! ok)
-		non_fatal("Unable to open include file: ",incfile);
+		non_fatal("Failed to open include file: ",incfile);
 	pushback('\n');
 
 	/* Let token scanner see first things on line */
@@ -726,7 +726,7 @@ init_path()
 
 		if(fclose(pf) == EOF)
 			{
-			non_fatal("Unable to close include path file: ",
+			non_fatal("Failed to close include path file: ",
 				PATHFILE);
 			}
 		}
@@ -792,7 +792,7 @@ popfile()
 #else	/* !PP_SYSIO */
 	if(fclose((f = Filestack[Filelevel])->f_file) == EOF)
 #endif	/* PP_SYSIO */
-		non_fatal("Unable to close input/include file: ",f->f_name);
+		non_fatal("Failed to close input/include file: ",f->f_name);
 
 	free((char *)f);		/* Free the entry */
 

@@ -361,7 +361,7 @@ int RGBE_ReadPixels_RLE(FILE *fp, float *data, int scanline_width,
       scanline_buffer = (unsigned char *)
 	malloc(sizeof(unsigned char)*4*scanline_width);
     if (scanline_buffer == NULL) 
-      return rgbe_error(rgbe_memory_error,"unable to allocate buffer space");
+      return rgbe_error(rgbe_memory_error,"failed to allocate buffer space");
     
     ptr = &scanline_buffer[0];
     /* read each of the four channels for the scanline into the buffer */

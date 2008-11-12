@@ -152,9 +152,9 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) 
 		// Don't use warning or error as Ri may not be initialized
 		fprintf(stderr,"format request is not supported\n");
 	} else {
-		//error(CODE_BADTOKEN,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
+		//error(CODE_BADTOKEN,"Unknown PtcGetPointCloudInfo request \"%s\"\n",request);
 		// Don't use warning or error as Ri may not be initialized
-		fprintf(stderr,"unknown PtcGetPointCloudInfo request \"%s\"\n",request);
+		fprintf(stderr,"Unknown PtcGetPointCloudInfo request \"%s\"\n",request);
 	}
 
 	return TRUE;

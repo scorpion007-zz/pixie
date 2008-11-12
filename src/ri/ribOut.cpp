@@ -124,7 +124,7 @@ CRibOut::CRibOut(const char *n) : CRiInterface() {
 
 	// Write a header
 	out("## Pixie %d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
-	out("## Generated %s \n",asctime(newtime));
+	out("## Generated %s\n",asctime(newtime));
 
 	declareDefaultVariables();
 }
@@ -148,7 +148,7 @@ CRibOut::CRibOut(FILE *o) : CRiInterface() {
 
 	// Write a header
 	out("## Pixie %d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
-	out("## Generated %s \n",asctime(newtime));
+	out("## Generated %s\n",asctime(newtime));
 
 	declareDefaultVariables();
 }
@@ -268,7 +268,7 @@ void		CRibOut::RiPixelFilter(float (*function)(float,float,float,float),float xw
 	} else if (function == RiDiskFilter) {
 		out("PixelFilter \"%s\" %g %g\n",RI_DISKFILTER,xwidth,ywidth);
 	} else {
-		errorHandler(RIE_BADHANDLE,RIE_ERROR,"Unable to write custom filter function\n");
+		errorHandler(RIE_BADHANDLE,RIE_ERROR,"Failed to write custom filter function\n");
 	}
 }
 
@@ -614,7 +614,7 @@ void		CRibOut::RiCoordSysTransform(char * space) {
 }
 
 RtPoint *		CRibOut::RiTransformPoints(char * fromspace,char * tospace,int npoints,RtPoint *points) {
-	errorHandler(RIE_SYSTEM,RIE_ERROR,"Unable to output TransformPoints\n");
+	errorHandler(RIE_SYSTEM,RIE_ERROR,"Failed to output TransformPoints\n");
 	return NULL;
 }
 
@@ -912,7 +912,7 @@ void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,i
 	} else if ((strcmp(uwrap,RI_NONPERIODIC) == 0) || (strcmp(uwrap,RI_NOWRAP) == 0)) {
 		uw	=	FALSE;
 	} else {
-		errorHandler(RIE_BADTOKEN,RIE_ERROR,"Wrapping mode unrecognised \n");
+		errorHandler(RIE_BADTOKEN,RIE_ERROR,"Wrapping mode unrecognized\n");
 		return;
 	}
 
@@ -921,7 +921,7 @@ void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,i
 	} else if ((strcmp(vwrap,RI_NONPERIODIC) == 0) || (strcmp(vwrap,RI_NOWRAP) == 0)) {
 		vw	=	FALSE;
 	} else {
-		errorHandler(RIE_BADTOKEN,RIE_ERROR,"Wrapping mode unrecognised \n");
+		errorHandler(RIE_BADTOKEN,RIE_ERROR,"Wrapping mode unrecognized\n");
 		return;
 	}
 
@@ -931,14 +931,14 @@ void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,i
 	if (strcmp(type,RI_BICUBIC) == 0) {
 		if (uw)		{
 			if ((uver % attributes->uStep) != 0) {
-				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of u vertices \n");
+				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of u vertices\n");
 				return;
 			}
 
 			upatches	=	(uver ) / attributes->uStep;
 		} else {
 			if (((uver - 4) % attributes->uStep) != 0) {
-				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of u vertices \n");
+				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of u vertices\n");
 				return;
 			}
 
@@ -947,14 +947,14 @@ void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,i
 
 		if (vw)		{
 			if ((vver % attributes->vStep) != 0) {
-				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of v vertices \n");
+				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of v vertices\n");
 				return;
 			}
 
 			vpatches	=	(vver) / attributes->vStep;
 		} else {
 			if (((vver - 4) % attributes->vStep) != 0) {
-				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of v vertices \n");
+				errorHandler(RIE_CONSISTENCY,RIE_ERROR,"Unexpected number of v vertices\n");
 				return;
 			}
 
@@ -1118,11 +1118,11 @@ void		CRibOut::RiTorusV(float majorrad,float minorrad,float phimin,float phimax,
 }
 
 void		CRibOut::RiProcedural(void * data,float *bound,void (*subdivfunc)(void *,float),void (*freefunc)(void *)) {
-	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Unable to output procedural geometry\n");
+	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Failed to output procedural geometry\n");
 }
 
 void		CRibOut::RiGeometryV(char * type,int n,char *tokens[],void *params[]) {
-	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Unable to output optional geometry\n");
+	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Failed to output optional geometry\n");
 }
 
 void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int n,char *tokens[],void *params[]) {
@@ -1482,7 +1482,7 @@ void		CRibOut::writePL(int numVertex,int numVarying,int numFaceVarying,int numUn
 		__dest	=	__var->numItems;				\
 		break;										\
 	default:										\
-		error(CODE_BUG,"Unknown container in writePL.\n");	\
+		error(CODE_BUG,"Unknown container in writePL\n");	\
 		__dest	=	1;								\
 	}
 

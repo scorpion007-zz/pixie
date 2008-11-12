@@ -812,8 +812,8 @@ void	CGatherLookup::addOutput(const char *output,int destIndex,CShaderInstance *
 
 	if (strncmp(output,"surface:",8) == 0) {
 		CVariable				*var	=	CRenderer::retrieveVariable(output+8);
-		if (var == NULL)							error(CODE_BADTOKEN,"Variable %s not found in shader %s\n",output,shader->getName());
-		else if (var->storage != STORAGE_GLOBAL)	error(CODE_BADTOKEN,"Variable %s not found in shader %s\n",output,shader->getName());
+		if (var == NULL)							error(CODE_BADTOKEN,"Variable \"%s\" is not found in shader %s\n",output,shader->getName());
+		else if (var->storage != STORAGE_GLOBAL)	error(CODE_BADTOKEN,"Variable \"%s\" is not found in shader %s\n",output,shader->getName());
 		else {
 			if (	(var->type == TYPE_VECTOR)	||
 					(var->type == TYPE_POINT)	||

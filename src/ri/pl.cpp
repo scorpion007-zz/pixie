@@ -1307,7 +1307,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				numItems	=	1;
 				break;
 			default:
-				error(CODE_BUG,"Unknown container class in parameter list.\n");
+				error(CODE_BUG,"Unknown container class in parameter list\n");
 				numItems	=	1;
 				break;
 		}
@@ -1363,7 +1363,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 						decl	=	"constant float";
 						break;
 					default:
-						error(CODE_BUG,"Unknown container class in parameter list.\n");
+						error(CODE_BUG,"Unknown container class in parameter list\n");
 						decl	=	"uniform float";
 						break;
 				}

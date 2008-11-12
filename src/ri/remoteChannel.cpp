@@ -80,7 +80,7 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 				buffer[0].integer	=	NET_NACK;
 				rcSend(netClient,buffer,sizeof(T32));
 				
-				error(CODE_BUG,"Remote channel initialization failed.\n");
+				error(CODE_BUG,"Remote channel initialization failed\n");
 				delete serverChannel;
 				return FALSE;
 			}
@@ -97,7 +97,7 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 			clientInitialized = TRUE;
 		}
 	} else {
-		error(CODE_BUG,"Client refused remote channel request.\n");
+		error(CODE_BUG,"Client refused remote channel request\n");
 		delete serverChannel;
 		return FALSE;
 	}
@@ -107,7 +107,7 @@ int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 		remoteChannels->push(serverChannel);
 		declaredRemoteChannels->insert(serverChannel->name,serverChannel);
 	} else {
-		error(CODE_BUG,"Remote channel initialization failed.\n");
+		error(CODE_BUG,"Remote channel initialization failed\n");
 		delete serverChannel;
 		return FALSE;
 	}
@@ -146,7 +146,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 		buffer[0].integer	=	-1;
 		buffer[1].integer	=	NET_NACK;
 		rcSend(s,buffer,2*sizeof(T32));
-		error(CODE_BUG,"Remote channels may not communicate over different byte orders.\n");
+		error(CODE_BUG,"Remote channels may not communicate over different byte orders\n");
 		return FALSE;
 	}
 	
@@ -196,7 +196,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 			buffer[0].integer	=	-1;
 			buffer[1].integer	=	NET_NACK;
 			rcSend(s,buffer,2*sizeof(T32));
-			error(CODE_BUG,"Invalid remote channel type requested.\n");
+			error(CODE_BUG,"Invalid remote channel type requested\n");
 			return FALSE;
 		}
 		
@@ -211,7 +211,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 			
 			// Ignore the server response
 			rcRecv(s,buffer,sizeof(T32));
-			error(CODE_BUG,"Remote channel initialization failed.\n");
+			error(CODE_BUG,"Remote channel initialization failed\n");
 			return FALSE;
 		}
 		
@@ -225,7 +225,7 @@ int		CRenderer::processChannelRequest(int index,SOCKET s){
 			remoteChannels->push(rChannel);
 			declaredRemoteChannels->insert(rChannel->name,rChannel);
 		} else {
-			error(CODE_BUG,"Remote channel initialization failed.\n");
+			error(CODE_BUG,"Remote channel initialization failed\n");
 			delete rChannel;
 			return FALSE;
 		}
@@ -259,7 +259,7 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 			
 			if (buffer[0].integer == NET_ACK) {
 				if (channels[i]->sendRemoteBucket(netClient,x,y) == FALSE){
-					error(CODE_BUG,"Remote channel communication error.\n");
+					error(CODE_BUG,"Remote channel communication error\n");
 					
 					CRemoteChannel *val;
 					declaredRemoteChannels->erase(channels[i]->name,val);
@@ -267,7 +267,7 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 					channels[i] = NULL;
 				}
 			} else {
-				error(CODE_BUG,"Client refused update for remote channel.\n");
+				error(CODE_BUG,"Client refused update for remote channel\n");
 
 				CRemoteChannel *val;
 				declaredRemoteChannels->erase(channels[i]->name,val);
@@ -310,10 +310,10 @@ void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 				rcSend(s,buffer,1*sizeof(T32));
 				// Perform it
 				if (channels[remoteId]->recvRemoteBucket(s,x,y) == FALSE) {
-					error(CODE_BUG,"Remote channel communication error.\n");
+					error(CODE_BUG,"Remote channel communication error\n");
 				}
 			} else {
-				error(CODE_BUG,"Update received for unkown remote channel.\n");
+				error(CODE_BUG,"Update received for unknown remote channel\n");
 				buffer[0].integer = NET_NACK;
 				rcSend(s,buffer,1*sizeof(T32));
 			}
@@ -350,7 +350,7 @@ void CRenderer::sendFrameDataChannels() {
 			
 			if (buffer[0].integer == NET_ACK) {
 				if (channels[i]->sendRemoteFrame(netClient) == FALSE){
-					error(CODE_BUG,"Remote channel communication error.\n");
+					error(CODE_BUG,"Remote channel communication error\n");
 					
 					CRemoteChannel *val;
 					declaredRemoteChannels->erase(channels[i]->name,val);
@@ -358,7 +358,7 @@ void CRenderer::sendFrameDataChannels() {
 					channels[i] = NULL;
 				}
 			} else {
-				error(CODE_BUG,"Client refused update for remote channel.\n");
+				error(CODE_BUG,"Client refused update for remote channel\n");
 				
 				CRemoteChannel *val;
 				declaredRemoteChannels->erase(channels[i]->name,val);
@@ -400,10 +400,10 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 				rcSend(s,buffer,1*sizeof(T32));
 				// Perform it
 				if (channels[remoteId]->recvRemoteFrame(s) == FALSE) {
-					error(CODE_BUG,"Remote channel communication error.\n");
+					error(CODE_BUG,"Remote channel communication error\n");
 				}
 			} else {
-				error(CODE_BUG,"Update received for unkown remote channel.\n");
+				error(CODE_BUG,"Update received for unknown remote channel\n");
 				buffer[0].integer = NET_NACK;
 				rcSend(s,buffer,1*sizeof(T32));
 			}
@@ -461,7 +461,7 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 	uint64_t newPos = ftell(tsmFile);
 	if(newPos != curPos) {
 		fseek(tsmFile,(long) curPos,SEEK_SET);
-		error(CODE_BUG,"Error reading tsm file.\n");
+		error(CODE_BUG,"Error reading TSM file\n");
 	}
 	*/
 	

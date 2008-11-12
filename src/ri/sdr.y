@@ -1524,7 +1524,7 @@ slMatrixArrayInitializer:
 				SCRL_CLOSE_SQR_PARANTHESIS
 				{
 					if(currentData.numArrayItemsRemaining){
-						slerror("wrong number of items in array initializer\n");
+						slerror("Wrong number of items in array initializer\n");
 					}
 				}
 				;
@@ -1574,7 +1574,7 @@ slMatrixArrayInitializerItems:
 						currentData.numArrayItemsRemaining--;
 					}
 					else{
-						slerror("wrong number of items in array initializer\n");
+						slerror("Wrong number of items in array initializer\n");
 					}
 				}	
 				|
@@ -1605,7 +1605,7 @@ slMatrixArrayInitializerItems:
 						currentData.numArrayItemsRemaining--;
 					}
 					else{
-						slerror("wrong number of items in array initializer\n");
+						slerror("Wrong number of items in array initializer\n");
 					}
 				}
 				|
@@ -1847,7 +1847,7 @@ slDSO:			SCRL_DSO
 							currentData.currentOpcodePlace->dso				=	dso;
 							currentData.currentOpcodePlace++;
 						} else {
-							slerror("Unable to locate DSO function\n");
+							slerror("Failed to locate DSO function\n");
 						}
 						break;
 					default:

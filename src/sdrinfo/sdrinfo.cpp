@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 		cShader	=	sdrGet(argv[1],tmp);
 
 		if (cShader == NULL) {
-			fprintf(stderr,"Unable to find shader \"%s\"\n",argv[1]);
+			fprintf(stderr,"Failed to find shader \"%s\"\n",argv[1]);
 			exit(1);
 		}
 

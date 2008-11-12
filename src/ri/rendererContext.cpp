@@ -309,7 +309,7 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 
 	// If not found, error out
 	if (cInstance == NULL) {
-		error(CODE_NOSHADER,"Unable to find shader \"%s\"\n",name);
+		error(CODE_NOSHADER,"Failed to find shader \"%s\"\n",name);
 		return NULL;
 	}
 
@@ -552,12 +552,12 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,char *name,
 		lastCommand			=	name;
 	} else {
 		if (numMotions >= numExpectedMotions) {
-			error(CODE_NESTING,"%s: Too many motions in motion block.\n",name);
+			error(CODE_NESTING,"%s: Too many motions in motion block\n",name);
 			return 0;
 		}
 
 		if (lastCommand != name) {
-			error(CODE_NESTING,"%s: Different commands in motion block.\n",name);
+			error(CODE_NESTING,"%s: Different commands in motion block\n",name);
 			return 0;
 		}
 	}
@@ -724,7 +724,7 @@ void	CRendererContext::RiFormat(int xres,int yres,float aspect) {
 	COptions	*options;
 
 	if ((xres <= 0) || (yres <= 0)) {
-		error(CODE_RANGE,"Resolution too small (%dx%d).\n",xres,yres);
+		error(CODE_RANGE,"Resolution too small (%dx%d)\n",xres,yres);
 		return;
 	}
 
@@ -741,7 +741,7 @@ void	CRendererContext::RiFrameAspectRatio(float aspect) {
 	COptions	*options;
 
 	if (aspect == 0) {
-		error(CODE_RANGE,"Invalid frame aspectratio (%f).\n",aspect);
+		error(CODE_RANGE,"Invalid frame aspect ratio: %f\n",aspect);
 		return;
 	}
 
@@ -765,7 +765,7 @@ void	CRendererContext::RiCropWindow(float xmin,float xmax,float ymin,float ymax)
 	COptions	*options;
 
 	if ((xmin < 0) || (xmin > 1) || (ymin < 0) || (ymax > 1) || (xmax <= xmin) || (ymax <= ymin)) {
-		error(CODE_RANGE,"Invalid crop window boundaries (%.3f,%.3f,%.3f,%.3f).\n",xmin,xmax,ymin,ymax);
+		error(CODE_RANGE,"Invalid crop window boundary: (%.3f,%.3f,%.3f,%.3f)\n",xmin,xmax,ymin,ymax);
 		return;
 	}
 
@@ -788,16 +788,16 @@ void	CRendererContext::RiProjectionV(char *name,int n,char *tokens[],void *param
 			if (strcmp(tokens[i],RI_FOV) == 0) 
 				options->fov	=	((float **) params)[i][0];
 			else 
-				error(CODE_BADTOKEN,"Invalid perspective projection parameter (%s).\n",tokens[i]);
+				error(CODE_BADTOKEN,"Invalid perspective projection parameter: %s\n",tokens[i]);
 		}
 	} else if (strcmp(name,RI_ORTHOGRAPHIC) == 0) {
 		int	i;
 		options->projection = OPTIONS_PROJECTION_ORTHOGRAPHIC;
 		for (i=0;i<n;i++) {
-			error(CODE_BADTOKEN,"Invalid orthographic projection parameter (%s).\n",tokens[i]);
+			error(CODE_BADTOKEN,"Invalid orthographic projection parameter: %s\n",tokens[i]);
 		}
 	} else {
-		error(CODE_BADTOKEN,"Invalid projection type (%s).\n",name);
+		error(CODE_BADTOKEN,"Invalid projection type: %s\n",name);
 	}
 }
 
@@ -805,7 +805,7 @@ void	CRendererContext::RiClipping(float hither,float yon) {
 	COptions	*options;
 
 	if ((yon < hither)  || (hither < 0) || (yon < 0)) {
-		error(CODE_RANGE,"Invalid clipping boundaries (%f,%f).\n",hither,yon);
+		error(CODE_RANGE,"Invalid clipping boundary: (%.3f,%.3f)\n",hither,yon);
 		return;
 	}
 
@@ -847,12 +847,12 @@ void	CRendererContext::RiDepthOfField(float fstop,float focallength,float focald
 	}
 
 	if (focallength < 0) {
-		error(CODE_RANGE,"Invalid focallength: %f\n",focallength);
+		error(CODE_RANGE,"Invalid focal length: %f\n",focallength);
 		return;
 	}
 
 	if (focaldistance < 0) {
-		error(CODE_RANGE,"Invalid focaldistance: %f\n",focaldistance);
+		error(CODE_RANGE,"Invalid focal distance: %f\n",focaldistance);
 		return;
 	}
 
@@ -866,7 +866,7 @@ void	CRendererContext::RiShutter(float smin,float smax) {
 	COptions	*options;
 
 	if (smax < smin) {
-		error(CODE_RANGE,"Invalid shutter interval [%f %f]\n",smin,smax);
+		error(CODE_RANGE,"Invalid shutter interval: [%f %f]\n",smin,smax);
 		return;
 	}
 
@@ -887,7 +887,7 @@ void	CRendererContext::RiPixelSamples(float xsamples,float ysamples) {
 	COptions	*options;
 
 	if ((xsamples < 1) || (ysamples < 1)) {
-		error(CODE_RANGE,"Invalid pixel samples (%f,%f).\n",xsamples,ysamples);
+		error(CODE_RANGE,"Invalid pixel samples: (%f,%f)\n",xsamples,ysamples);
 		return;
 	}
 
@@ -900,12 +900,12 @@ void	CRendererContext::RiPixelFilter(float (*function)(float,float,float,float),
 	COptions	*options;
 
 	if ((xwidth < 0) || (ywidth < 0)) {
-		warning(CODE_RANGE,"Invalid filter dimentions (%f,%f).\n",xwidth,ywidth);
+		warning(CODE_RANGE,"Invalid filter dimensions: (%f,%f)\n",xwidth,ywidth);
 		return;
 	}
 
 	if ((xwidth < 1) || (ywidth < 1)) {
-		warning(CODE_RANGE,"Filter support is less than a pixel (%f,%f).\n",xwidth,ywidth);
+		warning(CODE_RANGE,"Filter width less than a pixel: (%f,%f)\n",xwidth,ywidth);
 	}
 
 	options							=	getOptions(TRUE);
@@ -918,12 +918,12 @@ void	CRendererContext::RiExposure(float gain,float gamma) {
 	COptions	*options;
 
 	if (gamma <= C_EPSILON) {
-		error(CODE_RANGE,"Invalid gamma (%f).\n",gamma);
+		error(CODE_RANGE,"Invalid gamma: %f\n",gamma);
 		return;
 	}
 
 	if (gain <= C_EPSILON) {
-		error(CODE_RANGE,"Invalid gain (%f).\n",gain);
+		error(CODE_RANGE,"Invalid gain: %f\n",gain);
 		return;
 	}
 
@@ -933,7 +933,7 @@ void	CRendererContext::RiExposure(float gain,float gamma) {
 }
 
 void	CRendererContext::RiImagerV (char *name,int n,char *tokens[],void *params[]) {
-	error(CODE_INCAPABLE,"Imager shaders are not supported (yet).\n");
+	error(CODE_INCAPABLE,"Imager shaders are not currently supported\n");
 }
 
 void	CRendererContext::RiQuantize(char *type,int one,int qmin,int qmax,float ampl) {
@@ -963,7 +963,7 @@ void	CRendererContext::RiQuantize(char *type,int one,int qmin,int qmax,float amp
 			cDisplay->quantizer[4]	=	(float) ampl;
 		}
 	} else {
-		error(CODE_BADTOKEN,"Unknown quantizer type (%s).\n",type);
+		error(CODE_BADTOKEN,"Unknown quantizer type: %s\n",type);
 	}
 }
 
@@ -1087,7 +1087,7 @@ void	CRendererContext::RiDisplayV(char *name,char *type,char *mode,int n,char *t
 				}
 				j++;
 			} else {
-				error(CODE_BADTOKEN,"Display parameter %s not defined\n",tokens[i]);
+				error(CODE_BADTOKEN,"Display parameter \"%s\" not defined\n",tokens[i]);
 			}
 		}
 		cDisplay->numParameters	=	j;
@@ -1134,16 +1134,16 @@ void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void
 					}
 				} else if (strcmp(cVar->name,"quantize") == 0) {
 					// intentionally empty for compatibility
-					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not implemented (yet)\n",cVar->name);
+					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not currently supported\n",cVar->name);
 				} else if (strcmp(cVar->name,"dither") == 0) {
 					// intentionally empty for compatibility
-					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not implemented (yet)\n",cVar->name);
+					warning(CODE_UNIMPLEMENT,"Display channel parameter \"%s\" is not currently supported\n",cVar->name);
 				} else {
-					error(CODE_BADTOKEN,"Invalid display channel parameter %s\n",tokens[i]);
+					error(CODE_BADTOKEN,"Invalid display channel parameter: %s\n",tokens[i]);
 				}
 				j++;
 			} else {
-				error(CODE_BADTOKEN,"Display channel parameter %s not defined\n",tokens[i]);
+				error(CODE_BADTOKEN,"Display channel parameter \"%s\" not defined\n",tokens[i]);
 			}
 		}
 	}
@@ -1168,7 +1168,7 @@ void	CRendererContext::RiColorSamples(int N,float *nRGB,float *RGBn) {
 	COptions	*options;
 
 	if (N < 1) {
-		error(CODE_RANGE,"Invalid number of color samples (%d).\n",N);
+		error(CODE_RANGE,"Invalid number of color samples: %d\n",N);
 		return;
 	}
 
@@ -1191,7 +1191,7 @@ void	CRendererContext::RiRelativeDetail(float relativedetail) {
 	COptions	*options;
 
 	if (relativedetail < 0) {
-		error(CODE_RANGE,"Invalid relative detail (%4.2).\n",relativedetail);
+		error(CODE_RANGE,"Invalid relative detail: %4.2f\n",relativedetail);
 		return;
 	}
 
@@ -1275,7 +1275,7 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 			if (strcmp(tokens[i],RI_BUCKETSIZE) == 0) {
 				int	*val	=	(int *) params[i];
 				if ((val[0] < 0) || (val[1] < 0)) {
-					error(CODE_RANGE,"Invalid bucket size (%dx%d)\n",val[0],val[1]);
+					error(CODE_RANGE,"Invalid bucket size: %dx%d\n",val[0],val[1]);
 				} else {
 					options->bucketWidth	=	val[0];
 					options->bucketHeight	=	val[1];
@@ -1283,7 +1283,7 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 			} else if (strcmp(tokens[i],RI_METABUCKETS) == 0) {
 				int	*val	=	(int *) params[i];
 				if ((val[0] < 0) || (val[1] < 0)) {
-					error(CODE_RANGE,"Invalid meta bucket size (%dx%d)\n",val[0],val[1]);
+					error(CODE_RANGE,"Invalid meta bucket size: %dx%d\n",val[0],val[1]);
 				} else {
 					options->netXBuckets	=	val[0];
 					options->netYBuckets	=	val[1];
@@ -1321,7 +1321,7 @@ void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[])
 				else if (strcmp(val,"max") == 0)		options->depthFilter	=	DEPTH_MAX;
 				else if (strcmp(val,"average") == 0)	options->depthFilter	=	DEPTH_AVG;
 				else if (strcmp(val,"midpoint") == 0)	options->depthFilter	=	DEPTH_MID;
-				else error(CODE_BADTOKEN,"Unknown depth filter: \"%s\" \n",val);
+				else error(CODE_BADTOKEN,"Unknown depth filter: \"%s\"\n",val);
 			optionEndCheck
 		}
 
@@ -1639,7 +1639,7 @@ void	CRendererContext::RiShadingRate(float size) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	if (size < C_EPSILON) {
-		error(CODE_RANGE,"Invalid shading rate (%f)\n",size);
+		error(CODE_RANGE,"Invalid shading rate: %f\n",size);
 		return;
 	}
 
@@ -1764,7 +1764,7 @@ void	CRendererContext::RiGeometricApproximation(char *type,float value) {
 void	CRendererContext::RiGeometricRepresentation(char *type) {
 	if (CRenderer::netNumServers > 0)	return;
 
-	error(CODE_INCAPABLE,"Arbitrary geometric representation is not implemented (yet).\n");
+	error(CODE_INCAPABLE,"Arbitrary geometric representation is not currently supported\n");
 
 	return;
 }
@@ -1781,7 +1781,7 @@ void	CRendererContext::RiOrientation(char *orientation) {
 	} else if ((strcmp(orientation,RI_INSIDE) == 0) || (strcmp(orientation,RI_RH) == 0)) {
 		attributes->flags	|=	ATTRIBUTES_FLAGS_INSIDE;
 	} else
-		error(CODE_BADTOKEN,"Invalid orientation (%s).\n",orientation);
+		error(CODE_BADTOKEN,"Invalid orientation: %s\n",orientation);
 }
 
 void	CRendererContext::RiReverseOrientation(void) {
@@ -1799,7 +1799,7 @@ void	CRendererContext::RiSides(int nsides) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	if (!((nsides == 1) || (nsides == 2)))
-		error(CODE_RANGE,"Invalid number of sides (%d).\n",nsides);
+		error(CODE_RANGE,"Invalid number of sides: %d\n",nsides);
 	else {
 
 		attributes			=	getAttributes(TRUE);
@@ -1936,7 +1936,7 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 		break;
 	case 1:
 		if (invertm(to0,p0) == TRUE) {
-			error(CODE_MATH,"Singular transformation matrix detected.\n");
+			error(CODE_MATH,"Singular transformation matrix detected\n");
 		} else {
 			xform			=	getXform(TRUE);
 
@@ -1984,7 +1984,7 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 		break;
 	case 2:
 		if ((invertm(to0,p0) == TRUE) || (invertm(to1,p1) == TRUE)) {
-			error(CODE_MATH,"Singular transformation matrix detected.\n");
+			error(CODE_MATH,"Singular transformation matrix detected\n");
 		} else {
 			xform			=	getXform(TRUE);
 
@@ -2062,7 +2062,7 @@ void	CRendererContext::RiConcatTransform(float transform[][4]) {
 		break;
 	case 1:
 		if (invertm(to0,p0) == TRUE) {
-			error(CODE_MATH,"Singular transformation matrix detected.\n");
+			error(CODE_MATH,"Singular transformation matrix detected\n");
 		} else {
 			xform	=	getXform(TRUE);
 			mulmm(tmp,xform->from,p0);
@@ -2094,7 +2094,7 @@ void	CRendererContext::RiConcatTransform(float transform[][4]) {
 		break;
 	case 2:
 		if ((invertm(to0,p0) == TRUE) || (invertm(to1,p1) == TRUE)) {
-			error(CODE_MATH,"Singular transformation matrix detected.\n");
+			error(CODE_MATH,"Singular transformation matrix detected\n");
 		} else {
 			xform	=	getXform(TRUE);
 
@@ -2319,7 +2319,7 @@ void	CRendererContext::RiScale(float dx,float dy,float dz) {
 	int			nflip;
 
 	if ((dx == 0) || (dy == 0) || (dz == 0)) {
-		error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f)).\n",dx,dy,dz);
+		error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f))\n",dx,dy,dz);
 		return;
 	}
 
@@ -2332,7 +2332,7 @@ void	CRendererContext::RiScale(float dx,float dy,float dz) {
 		break;
 	case 1:
 		if ((p0[0] == 0) || (p0[1] == 0) || (p0[2] == 0)) {
-			error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f)).\n",p0[0],p0[1],p0[2]);
+			error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f))\n",p0[0],p0[1],p0[2]);
 			return;
 		}
 
@@ -2354,12 +2354,12 @@ void	CRendererContext::RiScale(float dx,float dy,float dz) {
 		break;
 	case 2:
 		if ((p0[0] == 0) || (p0[1] == 0) || (p0[2] == 0)) {
-			error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f)).\n",p0[0],p0[1],p0[2]);
+			error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f))\n",p0[0],p0[1],p0[2]);
 			return;
 		}
 
 		if ((p0[0] == 0) || (p0[1] == 0) || (p0[2] == 0)) {
-			error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f)).\n",p1[0],p1[1],p1[2]);
+			error(CODE_MATH,"The matrix is uninvertible (scale(%f,%f,%f))\n",p1[0],p1[1],p1[2]);
 			return;
 		}
 
@@ -2446,7 +2446,7 @@ void	CRendererContext::RiSkew(float angle,float dx1,float dy1,float dz1,float dx
 void	CRendererContext::RiDeformationV(char *name,int n,char *tokens[],void *params[]) {
 	if (CRenderer::netNumServers > 0)	return;
 
-	error(CODE_INCAPABLE,"Atbitrary deformations are not implemented (yet).\n");
+	error(CODE_INCAPABLE,"Arbitrary deformations are not currently supported\n");
 
 	return;
 }
@@ -2575,7 +2575,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 				if (strcmp(tokens[i],RI_NUMPROBES) == 0) {
 					int		*val	=	(int *) params[i];
 
-					if ((val[0] < 0) || (val[1] < 0)) error(CODE_RANGE,"Invalid number of probes (%dx%d)\n",val[0],val[1]);
+					if ((val[0] < 0) || (val[1] < 0)) error(CODE_RANGE,"Invalid number of probes: %dx%d\n",val[0],val[1]);
 					else {
 						attributes->numUProbes	=	val[0];
 						attributes->numVProbes	=	val[1];
@@ -2670,7 +2670,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 					attributes->transmissionHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
 				} else if (strcmp(tokens[i],RI_DIFFUSEHITMODE) == 0) {
 					attributes->diffuseHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
-					if (attributes->diffuseHitMode != 'p') warning(CODE_UNIMPLEMENT,"shading of diffuse rays unsupported\n");
+					if (attributes->diffuseHitMode != 'p') warning(CODE_UNIMPLEMENT,"shading of diffuse rays not currently supported\n");
 				} else if (strcmp(tokens[i],RI_SPECULARHITMODE) == 0) {
 					attributes->specularHitMode = CAttributes::findHitMode(((const char **) params[i])[0]);
 				} else if (strcmp(tokens[i],RI_CAMERAHITMODE) == 0) {
@@ -3159,7 +3159,7 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 	} else if ((strcmp(uwrap,RI_NONPERIODIC) == 0) || (strcmp(uwrap,RI_NOWRAP) == 0)) {
 		uw	=	FALSE;
 	} else {
-		error(CODE_BADTOKEN,"Wrapping mode unrecognised: \"%s\"\n",uwrap);
+		error(CODE_BADTOKEN,"Wrapping mode unrecognized: \"%s\"\n",uwrap);
 		return;
 	}
 
@@ -3168,7 +3168,7 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 	} else if ((strcmp(vwrap,RI_NONPERIODIC) == 0) || (strcmp(vwrap,RI_NOWRAP) == 0)) {
 		vw	=	FALSE;
 	} else {
-		error(CODE_BADTOKEN,"Wrapping mode unrecognised: \"%s\"\n",vwrap);
+		error(CODE_BADTOKEN,"Wrapping mode unrecognized: \"%s\"\n",vwrap);
 		return;
 	}
 
@@ -3177,14 +3177,14 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 
 		if (uw)		{
 			if ((nu % attributes->uStep) != 0) {
-				error(CODE_MISSINGDATA,"Unexpected number of u vertices \n");
+				error(CODE_MISSINGDATA,"Unexpected number of u vertices\n");
 				return;
 			}
 
 			upatches	=	(nu) / attributes->uStep;
 		} else {
 			if (((nu - 4) % attributes->uStep) != 0) {
-				error(CODE_MISSINGDATA,"Unexpected number of u vertices \n");
+				error(CODE_MISSINGDATA,"Unexpected number of u vertices\n");
 				return;
 			}
 
@@ -3193,14 +3193,14 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 
 		if (vw)		{
 			if ((nv % attributes->vStep) != 0) {
-				error(CODE_MISSINGDATA,"Unexpected number of v vertices \n");
+				error(CODE_MISSINGDATA,"Unexpected number of v vertices\n");
 				return;
 			}
 
 			vpatches	=	(nv) / attributes->vStep;
 		} else {
 			if (((nv - 4) % attributes->vStep) != 0) {
-				error(CODE_MISSINGDATA,"Unexpected number of v vertices \n");
+				error(CODE_MISSINGDATA,"Unexpected number of v vertices\n");
 				return;
 			}
 
@@ -3319,7 +3319,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 void	CRendererContext::RiTrimCurve (int nloops,int *ncurves,int *order,float *knot,float *amin,float *amax,int *n,float *u,float *v,float *w) {
 	if (CRenderer::netNumServers > 0)	return;
 
-	error(CODE_INCAPABLE,"Trim curves are not implemented yet (yet).\n");
+	error(CODE_INCAPABLE,"Trim curves are not currently supported\n");
 }
 
 void	CRendererContext::RiCurvesV(char *d,int ncurves,int nverts[], char *w,int n,char *tokens[],void *params[]) {
@@ -4088,13 +4088,13 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 					tokens[i]	=	var.name;
 					i--;
 				} else {
-					error(CODE_BADTOKEN,"Unrecognised implicit parameter: %s\n",tokens[i]);
+					error(CODE_BADTOKEN,"Unrecognized implicit parameter: %s\n",tokens[i]);
 				}
 			}
 		}
 
 		if (name == NULL)	{
-			error(CODE_BADTOKEN,"Implicit geometry requires a dso name\n");
+			error(CODE_BADTOKEN,"Implicit geometry requires a DSO name\n");
 		} else {
 			char	location[OS_MAX_PATH_LENGTH];
 
@@ -4103,7 +4103,7 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 
 				addObject(cObject);
 			} else {
-				error(CODE_NOFILE,"Unable to find %s. Make sure it's in your procedural path\n",name);
+				error(CODE_NOFILE,"Failed to find \"%s\" in the procedural path\n",name);
 			}
 		}
 	} else if (strcmp(type,"dlo") == 0) {
@@ -4124,13 +4124,13 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 					tokens[i]	=	var.name;
 					i--;
 				} else {
-					error(CODE_BADTOKEN,"Unrecognised implicit parameter: %s\n",tokens[i]);
+					error(CODE_BADTOKEN,"Unrecognized implicit parameter: %s\n",tokens[i]);
 				}
 			}
 		}
 
 		if (name == NULL)	{
-			error(CODE_BADTOKEN,"Dynamic object requires a dso name\n");
+			error(CODE_BADTOKEN,"Dynamic object requires a DSO name\n");
 		} else {
 			char	location[OS_MAX_PATH_LENGTH];
 
@@ -4153,22 +4153,22 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 								if (data != NULL) {
 									addObject(new CDLObject(getAttributes(FALSE),getXform(FALSE),handle,data,bmin,bmax,initFunction,intersectFunction,tiniFunction));
 								} else {
-									error(CODE_BADFILE,"dlo %s failed to initialize\n",name);
+									error(CODE_BADFILE,"DLO \"%s\" failed to initialize\n",name);
 								}
 							} else {
-								error(CODE_BADFILE,"Missing \"dloTini\" in dlo %s\n",name);
+								error(CODE_BADFILE,"Missing \"dloTini\" in DLO \"%s\"\n",name);
 							}
 						} else {
-							error(CODE_BADFILE,"Missing \"dloIntersect\" in dlo %s\n",name);
+							error(CODE_BADFILE,"Missing \"dloIntersect\" in DLO \"%s\"\n",name);
 						}
 					} else {
-						error(CODE_BADFILE,"Missing \"dloInit\" in dlo %s\n",name);
+						error(CODE_BADFILE,"Missing \"dloInit\" in DLO \"%s\"\n",name);
 					}
 				} else {
-					error(CODE_BADFILE,"Unable to load dlo %s\n",name);
+					error(CODE_BADFILE,"Failed to load DLO \"%s\"\n",name);
 				}
 			} else {
-				error(CODE_NOFILE,"Unable to load %s (error %s)\n",name,osModuleError());
+				error(CODE_NOFILE,"Failed to load \"%s\": %s\n",name,osModuleError());
 			}
 		}
 	} else {
@@ -4237,7 +4237,7 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 
 	// Only catmull clark is supported for the time being
 	if (strcmp(scheme,RI_CATMULLCLARK) != 0) {
-		error(CODE_INCAPABLE,"Unknown subdivision scheme (%s).\n",scheme);
+		error(CODE_INCAPABLE,"Unknown subdivision scheme: %s\n",scheme);
 		return;
 	}
 			
@@ -4281,14 +4281,14 @@ void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float f
 
 	if (CRenderer::netNumServers > 0)	return;
 
-	error(CODE_INCAPABLE,"Blobby primitive is not implemented yet (yet).\n");
+	error(CODE_INCAPABLE,"Blobby primitives are not currently supported\n");
 }
 
 
 void	CRendererContext::RiSolidBegin(char *type) {
 	if (CRenderer::netNumServers > 0)	return;
 
-	error(CODE_OPTIONAL,"CSG is not implemented.\n");
+	error(CODE_OPTIONAL,"CSG is not currently supported\n");
 }
 
 void	CRendererContext::RiSolidEnd(void) {
@@ -4425,7 +4425,7 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 			// Success, parse the file
 			ribParse(tmp,callback);
 		} else {
-			error(CODE_BADFILE,"Unable to find %s\n",filename);
+			error(CODE_BADFILE,"Failed to find \"%s\"\n",filename);
 		}
 	} else {
 		ribParse(filename,callback);
@@ -4525,11 +4525,11 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,cha
 					return;
 				}
 			} else {
-				error(CODE_BADTOKEN,"Unrecognised parameter in resource: %s\n",(const char *) tokens[i]);
+				error(CODE_BADTOKEN,"Unrecognized parameter in resource: %s\n",(const char *) tokens[i]);
 				return;
 			}
 		} else {
-			error(CODE_BADTOKEN,"Unrecognised parameter in resource: %s\n",(const char *) tokens[i]);
+			error(CODE_BADTOKEN,"Unrecognized parameter in resource: %s\n",(const char *) tokens[i]);
 			return;
 		}
 	}

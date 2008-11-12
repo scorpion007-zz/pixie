@@ -196,7 +196,7 @@
 %type<code>			slShaderParameterIdentifierList
 %type<code>			slBlock
 %type<code>			slVariableInitializer
-%type<code>			slVariableDeclerations
+%type<code>			slVariableDeclarations
 %type<code>			slVariableIdentifierList
 %type<code>			slVariableIdentifierTail
 %type<code>			slStatement
@@ -400,7 +400,7 @@ slShader:
 
 		////////////////////////////////////////////////
 		//
-		// A function decleration:
+		// A function declaration:
 		// slFunctionReturnType <CFunction_name> (
 		// slFunctionParameterList ) slBlock 
 		// 
@@ -805,8 +805,8 @@ slBlock:
 		////////////////////////////////////////////////
 		// A statement
 		////////////////////////////////////////////////
-		// Variable declerations in a block
-slVariableDeclerations:
+		// Variable declarations in a block
+slVariableDeclarations:
 		slTypeDecl
 		slVariableIdentifierList
 		{
@@ -1025,7 +1025,7 @@ slMatchedStatement:
 			$$	=	$1;
 		}
 	|
-		slVariableDeclerations
+		slVariableDeclarations
 		{
 			$$	=	$1;
 		}
@@ -1233,7 +1233,7 @@ slReturnStatement:
 				$$	=	new CNullExpression;
 			} else {
 				if (cFun->returnValue == NULL) {
-					sdr->error("Function %s was not expecting a return value\n",cFun->symbolName);
+					sdr->error("Function \"%s\" was not expecting a return value\n",cFun->symbolName);
 					c	=	new CNullExpression;
 				} else {
 					// if the return type is uniform, set the return value to uniform
@@ -1261,7 +1261,7 @@ slReturnStatement:
 			if (cFun ==	NULL)	sdr->error("Return target not found\n");
 			else {
 				if (cFun->returnValue != NULL) {
-					sdr->error("Function %s was expecting a return value\n",cFun->symbolName);
+					sdr->error("Function \"%s\" was expecting a return value\n",cFun->symbolName);
 				}
 			}
 		}
@@ -1312,7 +1312,7 @@ slAssignmentStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1335,7 +1335,7 @@ slAssignmentStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1386,7 +1386,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1406,7 +1406,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1426,7 +1426,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else {
 				$$	=	new CUpdateExpression(cVar,opcodeAddFloatFloat,opcodeAddVectorVector,FALSE,new CConstantTerminalExpression(SLC_FLOAT,strdup("1")));
 			}
@@ -1437,7 +1437,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else {
 				$$	=	new CUpdateExpression(cVar,opcodeAddFloatFloat,opcodeAddVectorVector,FALSE,new CConstantTerminalExpression(SLC_FLOAT,strdup("-1")));
 			}
@@ -1448,7 +1448,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1468,7 +1468,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1491,7 +1491,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1514,7 +1514,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1537,7 +1537,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else {
 				$$	=	new CArrayUpdateExpression(cVar,$3,new CConstantTerminalExpression(SLC_FLOAT,strdup("1")),opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix);
 			}
@@ -1551,7 +1551,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else {
 				$$	=	new CArrayUpdateExpression(cVar,$3,new CConstantTerminalExpression(SLC_FLOAT,strdup("-1")),opcodeAddFloatFloat,opcodeAddVectorVector,opcodeAddMatrixMatrix);
 			}
@@ -1565,7 +1565,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -1588,7 +1588,7 @@ slUpdateStatement:
 		{
 			CVariable	*cVar				=	sdr->getVariable($1);
 
-			if (cVar == NULL)	sdr->error("Identifier %s not found\n",$1);
+			if (cVar == NULL)	sdr->error("Identifier \"%s\" is not found\n",$1);
 			else				sdr->desire(cVar->type);
 		}
 		slAritmeticExpression
@@ -2229,7 +2229,7 @@ slAritmeticTerminalValue:
 			CVariable	*cVar	=	sdr->getVariable($1);
 
 			if (cVar == NULL) {
-				sdr->error("Identifier %s not found\n",$1);
+				sdr->error("Identifier \"%s\" is not found\n",$1);
 				$$	=	new CNullExpression;
 			} else { 
 				$$	=	new CTerminalExpression(cVar);
@@ -2243,7 +2243,7 @@ slAritmeticTerminalValue:
 			CVariable	*cVar	=	sdr->getVariable($2);
 
 			if (cVar == NULL) {
-				sdr->error("Identifier %s not found\n",$2);
+				sdr->error("Identifier \"%s\" is not found\n",$2);
 				$$	=	new CNullExpression;
 			} else { 
 				$$	=	getConversion($1,new CTerminalExpression(cVar));
@@ -2260,7 +2260,7 @@ slAritmeticTerminalValue:
 			CVariable *cVar	=	sdr->getVariable($1);
 
 			if (cVar == NULL) {
-				sdr->error("Identifier %s not found\n",$1);
+				sdr->error("Identifier \"%s\" is not found\n",$1);
 				$$	=	new CNullExpression;
 			} else if (cVar->type & SLC_ARRAY) { 
 				$$	=	new CArrayExpression(cVar,$3);
@@ -2471,7 +2471,7 @@ slFunctionCall:
 			if (cFun != NULL) {
 				$$	=	new CBuiltinExpression(cFun,parameters);
 			} else {
-				sdr->error("Function %s not found\n",$1);
+				sdr->error("Function \"%s\" is not found\n",$1);
 				if (parameters->numItems != 0) {
 					CExpression	*cCode;
 					while((cCode = parameters->pop()) != NULL) {
@@ -2600,7 +2600,7 @@ slFunCall:
 				if (cFun != NULL) {
 					$$	=	new CBuiltinExpression(cFun,parameters);
 				} else {
-					sdr->error("Function %s not found\n",$1);
+					sdr->error("Function \"%s\" is not found\n",$1);
 					if (parameters->numItems != 0) {
 						CExpression	*cCode;
 						while((cCode = parameters->pop()) != NULL) {

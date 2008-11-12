@@ -36,7 +36,7 @@
 #include "patches.h"
 #include "pl.h"
 
-// Some forward declerations
+// Some forward declarations
 class	CPolygonTriangle;
 
 ///////////////////////////////////////////////////////////////////////

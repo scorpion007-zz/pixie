@@ -363,7 +363,7 @@ main(argc,argv)
 			if(! inc_open(s))	/* Open input file */
 #endif	/* HOST == H_CPM */
 				{
-				fatal("Unable to open input file: ",s);
+				fatal("Failed to open input file: ",s);
 				}
 			ifile = TRUE;	/* Got an input file */
 			}
@@ -384,7 +384,7 @@ main(argc,argv)
 	if(! inc_open(inFile))		/* Open input file */
 #endif	/* HOST == H_CPM */
 	{
-		fatal("Unable to open input file: ",inFile);
+		fatal("Failed to open input file: ",inFile);
 		return FALSE;
 	}
 
@@ -535,7 +535,7 @@ main(argc,argv)
 	return TRUE;
 
 	if((Output != stdout) && (fclose(Output) == EOF))
-		fatal("Unable to close output file: ",Outfile);
+		fatal("Failed to close output file: ",Outfile);
 	exit(Eflag ? 0 : Errors);
 	}
 

@@ -129,8 +129,8 @@ void	CStats::printStats(int level) {
 	info(CODE_STATS,"---> Renderer current:\n");
 
 	info(CODE_STATS,"       Zone memory: %d/%d (Current/Peak bytes)\n",zoneMemory,peakZoneMemory);
-	info(CODE_STATS,"              Time: %.2f seconds \n",osTime() - rendererStartTime);
-	info(CODE_STATS,"           Network: %d KB received, %d KB sent \n",totalNetRecv >> 10,totalNetSend >> 10);
+	info(CODE_STATS,"              Time: %.2f seconds\n",osTime() - rendererStartTime);
+	info(CODE_STATS,"           Network: %d KB received, %d KB sent\n",totalNetRecv >> 10,totalNetSend >> 10);
 
 	info(CODE_STATS,"---> End of frame stats:\n");
 	info(CODE_STATS,"              Time:  %.2f seconds\n",frameTime);
@@ -147,7 +147,7 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"->Rasterizer\n");
 
 		if (numRasterGridsCreated > 0) {
-			info(CODE_STATS,"      Grid Culling: %.2f (percent) \n",100*(numRasterGridsCreated-numRasterGridsShaded) / (float) numRasterGridsCreated);
+			info(CODE_STATS,"      Grid Culling: %.2f (percent)\n",100*(numRasterGridsCreated-numRasterGridsShaded) / (float) numRasterGridsCreated);
 			info(CODE_STATS,"       Vertex/Grid: %.2f (%d/%d)\n",numRasterVerticesCreated / (float) numRasterGridsCreated,numRasterVerticesCreated,numRasterGridsCreated);
 			info(CODE_STATS,"          Overdraw: %.2f (times)\n",numRasterGridsRendered / (float) numRasterGridsCreated);
 		}
@@ -198,7 +198,7 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"   Bricks paged in: %d (bricks)\n",numBrickmapCachePageins);
 		info(CODE_STATS,"  Bricks paged out: %d (bricks)\n",numBrickmapCachePageouts);
 		
-		info(CODE_STATS,"->Tesselation Cache\n");
+		info(CODE_STATS,"->Tessellation Cache\n");
 		info(CODE_STATS,"       Peak memory: %d (bytes)\n",tesselationPeakMemory);
 		info(CODE_STATS,"            memory: %d (bytes)\n",tesselationMemory);
 		info(CODE_STATS,"        Cache hits: %d (times)\n",tesselationCacheHits);

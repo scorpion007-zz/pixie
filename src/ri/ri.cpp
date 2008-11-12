@@ -595,7 +595,7 @@ RiContext(RtContextHandle handle) {
 EXTERN(RtVoid)
 RiBegin (RtToken name) {
 	if (renderMan != NULL) {
-		error(CODE_NESTING,"Already started.\n");
+		error(CODE_NESTING,"Already started\n");
 		return;
 	}
 
@@ -672,7 +672,7 @@ RiEnd (void) {
 	if (check("RiEnd",RENDERMAN_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_BLOCK) {
-		error(CODE_NESTING,"Matching RiBegin not found.\n");
+		error(CODE_NESTING,"Matching RiBegin not found\n");
 	}
 
 	currentBlock	=	blocks.pop();
@@ -710,7 +710,7 @@ RiFrameEnd (void) {
 	if (check("RiFrameEnd",RENDERMAN_FRAME_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_FRAME_BLOCK) {
-		error(CODE_NESTING,"Matching RiFrameBegin not found.\n");
+		error(CODE_NESTING,"Matching RiFrameBegin not found\n");
 		return;
 	}
 
@@ -738,7 +738,7 @@ RiWorldEnd (void) {
 	if (check("RiWorldEnd",RENDERMAN_WORLD_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_WORLD_BLOCK) {
-		error(CODE_NESTING,"Matching RiWorldBegin not found.\n");
+		error(CODE_NESTING,"Matching RiWorldBegin not found\n");
 		return;
 	}
 
@@ -1280,7 +1280,7 @@ RiAttributeEnd (void) {
 	if (check("RiAttributeEnd",RENDERMAN_ATTRIBUTE_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_ATTRIBUTE_BLOCK) {
-		error(CODE_NESTING,"Matching RiAttributeBegin not found.\n");
+		error(CODE_NESTING,"Matching RiAttributeBegin not found\n");
 		return;
 	}
 
@@ -1641,7 +1641,7 @@ RiTransformEnd (void) {
 	if (check("RiTransformEnd",RENDERMAN_XFORM_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_XFORM_BLOCK) {
-		error(CODE_NESTING,"Matching RiTransformBegin not found.\n");
+		error(CODE_NESTING,"Matching RiTransformBegin not found\n");
 		return;
 	}
 
@@ -2256,7 +2256,7 @@ RiProcDynamicLoad (RtPointer data, RtFloat detail) {
 
 		//osUnloadModule(module);
 	} else {
-		error(CODE_NOFILE,"The delayed module %s not found (error %s)\n",delayed->generator,osModuleError());
+		error(CODE_NOFILE,"The delayed module \"%s\" is not found: %s\n",delayed->generator,osModuleError());
 	}
 }
 
@@ -2296,7 +2296,7 @@ RiObjectEnd (void) {
 	if (check("RiObjectBegin",RENDERMAN_OBJECT_BLOCK)) return;	
 
 	if (currentBlock != RENDERMAN_OBJECT_BLOCK) {
-		error(CODE_NESTING,"Matching RiObjectBegin not found.\n");
+		error(CODE_NESTING,"Matching RiObjectBegin not found\n");
 		return;
 	}
 
@@ -2555,7 +2555,7 @@ EXTERN(RtVoid)	RiResourceEnd(void) {
 	if (check("RiResourceEnd",RENDERMAN_RESOURCE_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_RESOURCE_BLOCK) {
-		error(CODE_NESTING,"Matching RiResourceBegin not found.\n");
+		error(CODE_NESTING,"Matching RiResourceBegin not found\n");
 		return;
 	}
 
@@ -2602,7 +2602,7 @@ EXTERN(RtVoid)			RiArchiveEnd(void) {
 	if (check("RiArchiveEnd",RENDERMAN_ARCHIVE_BLOCK)) return;
 
 	if (currentBlock != RENDERMAN_ARCHIVE_BLOCK) {
-		error(CODE_NESTING,"Matching RiResourceBegin not found.\n");
+		error(CODE_NESTING,"Matching RiResourceBegin not found\n");
 		return;
 	}
 

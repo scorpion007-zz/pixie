@@ -52,7 +52,7 @@
 #define	DEFAULT_GEO_CACHE_SIZE	30720*1024
 
 // The default network port
-#define	DEFAULT_PORT					24914
+#define	DEFAULT_SERVER_PORT		24914
 
 // Per block or global locking for textures
 // Per block is faster, but requires (fractionally) more memory

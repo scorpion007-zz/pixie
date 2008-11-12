@@ -45,7 +45,7 @@
 #endif
 
 #define	BUFFERSIZE			1024
-#define DEFAULT_PORT		24666
+#define DEFAULT_DAEMON_PORT	24666
 #define	MAX_LOCALSERVERS	8
 
 // Whether non Windows implementations should exec after fork
@@ -57,7 +57,7 @@
 		int		main(int argc, char* argv[]);
 static	int		gargc;
 static	char	**gargv;
-static	int		deamon;
+static	int		isDaemon;
 static	int		silent;
 static	int		noRestart;
 static	SOCKET	listenSock;
@@ -78,7 +78,7 @@ extern "C" {
 // Return Value			:	-
 // Comments				:
 void	exitFunction() {
-	if (deamon == TRUE) {
+	if (isDaemon == TRUE) {
 		// Close socket before respawning
 		closesocket(listenSock);
 
@@ -90,7 +90,7 @@ void	exitFunction() {
 			for (i=0;i<gargc;i++) {
 				argv[i]	=	gargv[i];
 			}
-			argv[i++]	=	"-silent";
+			argv[i++]	=	"-q";
 			argv[i]		=	NULL;
 			
 			// use execvp to search PATH, incase pixie
@@ -113,31 +113,46 @@ void	exitFunction() {
 }
 
 ///////////////////////////////////////////////////////////////////////
+// Function				:	printVersion
+// Description			:	Print the version
+// Return Value			:	-
+// Comments				:
+void	printVersion() {
+	printf("Pixie RenderMan Renderer (rndr) v%d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
+	printf("\nCopyright 1999-2008 Okan Arikan. http://renderpixie.com/\n");
+	printf("Pixie is free software. There is NO warranty; not even for\n");
+	printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+}
+
+///////////////////////////////////////////////////////////////////////
 // Function				:	printUsage
 // Description			:	Print the stinking usage
 // Return Value			:	-
 // Comments				:
 void	printUsage() {
-	fprintf(stdout,"PIXIE v%d.%d.%d\n",VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
-
-	fprintf(stdout,"\nrndr rib_file <options>\n\n");
-	fprintf(stdout,"Comman line options:\n");
-	fprintf(stdout,"  -f <range>   : Render only a subsequence of frames\n");
-	fprintf(stdout,"                  -f 43     = Render only 43'rd frame\n");
-	fprintf(stdout,"                  -f 5:15   = Render frames 5 thru 15\n");
-	fprintf(stdout,"                  -f 5:2:15 = Render frames 5 thru 15 skipping every other one\n");
-	fprintf(stdout,"  -q           : Quiet mode (errors/warning ignored)\n");
-	fprintf(stdout,"  -d           : Ignore the display drivers and use framebuffer\n");
-	fprintf(stdout,"  -t           : Print renderer statistics after every frame\n");
-	fprintf(stdout,"  -p           : Display the progress\n");
-	fprintf(stdout,"  -P:n         : Use n processors\n");
-	fprintf(stdout,"  -t:n         : Use n threads (more efficient than -P:n)\n");
-	fprintf(stdout,"  -r <port>    : Start a server\n");
-	fprintf(stdout,"  -k <port>    : Kill the server\n");
-	fprintf(stdout,"  -s <servers> : Network render\n");
-	fprintf(stdout,"                   where servers is the list of <servers> specified\n");
-	fprintf(stdout,"                   as <IP:port,IP:port,IP:port,...> \n");
-
+	printf("Usage: rndr <options> file.rib [file.rib ...]\n");	
+	printf("To read from STDIN specify \"-\" as the filename.\n");
+	printf("Listing several RIB files concatenates them before rendering.\n");	
+	printf("\nOptions:\n");
+	printf("  -f <range>      Render only a subsequence of frames\n");
+	printf("                    -f 43     = Render only the 43rd frame\n");
+	printf("                    -f 5:15   = Render frames 5 thru 15\n");
+	printf("                    -f 5:2:15 = Render every second frame from 5 thru 15\n");
+	printf("  -q              Quiet mode; errors and warnings are ignored\n");
+	printf("  -d              Ignore the display drivers and use framebuffer\n");
+	printf("  -t              Print renderer statistics after every frame\n");
+	printf("  -p              Display rendering progress\n");
+	printf("  -P:<n>          Render using <n> processes; default is using one process\n");
+	printf("  -t:<n>          Render using <n> threads; default is one thread per CPU core\n");
+	printf("  -r [port]       Start a network server. If given, use port <port>\n");
+	printf("  -k <serverlist> Stop network servers in <serverlist>\n");
+	printf("  -s <serverlist> Render on network servers in <serverlist>\n");
+	printf("                  <serverlist> specified as <IP[:port],IP[:port],...>\n");
+	printf("  -v              Display version information\n");
+	printf("  -h              Display this help\n");
+	printf("\nEnvironment variables:\n");
+	printf("  PIXIEHOME       Pixie installation path\n");
+	printf("  SHADERS         Shader search path\n");
 }
 
 
@@ -168,14 +183,13 @@ void	riThread(void *w) {
 
 	char *source	= strdup((char *) &buffer[1].character);
 	char *pstart 	= source;
-	char *pend 		= strchr(pstart,':');
-	while(pend) {
-		*pend 	= '\0';
+	char *pend;
+	do {
+		pend = strchr(pstart,':');
+		if (pend)	*pend = '\0';
 		RiReadArchive(pstart,NULL,NULL);
-		pstart 	= pend+1;
-		pend 	= strchr(pstart,':');
-	}
-	RiReadArchive(pstart,NULL,NULL);
+		pstart = pend + 1;
+	} while(pend);
 	free(source);
 	RiEnd();
 }
@@ -258,14 +272,13 @@ retryBind:
 
 	char *source	= strdup(ribFile);
 	char *pstart 	= source;
-	char *pend 		= strchr(pstart,':');
-	while(pend) {
-		*pend 	= '\0';
+	char *pend;
+	do {
+		pend = strchr(pstart,':');
+		if (pend)	*pend = '\0';
 		RiReadArchive(pstart,NULL,NULL);
-		pstart 	= pend+1;
-		pend 	= strchr(pstart,':');
-	}
-	RiReadArchive(pstart,NULL,NULL);
+		pstart = pend + 1;
+	} while(pend);
 	free(source);
 	RiEnd();
 }
@@ -350,7 +363,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 		sprintf(portbuf,"%d",listenPort);
 
 		argv[0]	=	gargv[0];
-		argv[1]	=	"-silent";
+		argv[1]	=	"-q";
 		argv[2]	=	"-c";
 		argv[3]	=	portbuf;
 		argv[4]	=	ribFile;
@@ -362,14 +375,14 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 				// isn't on the default search path
 				intptr_t pid = _spawnvp(_P_NOWAIT,argv[0],argv);
 				if (pid <= 0) {
-					if (silent == FALSE)	fprintf(stderr,"Subprocess launch failed\n");
+					if (silent == FALSE)	fprintf(stderr,"Failed to launch subprocess\n");
 					return FALSE;
 				}
 			#else
 				long pid = fork();
 				if (pid < 0) {
 					// We failed to fork
-					if (silent == FALSE)	fprintf(stderr,"Subprocess launch failed\n");
+					if (silent == FALSE)	fprintf(stderr,"Failed to launch subprocess\n");
 					return FALSE;
 				} else if (pid == 0) {
 					// We are now the child server
@@ -443,7 +456,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rndrd
-// Description			:	Run the network deamon
+// Description			:	Run the network daemon
 // Return Value			:	-
 // Comments				:
 void	rndrd(int port) {
@@ -496,13 +509,13 @@ void	rndrd(int port) {
 
 		if(gethostname(hostName,sizeof(hostName)) == 0) {
 			if((hostinfo = gethostbyname(hostName)) != NULL) {
-				if (silent == FALSE) {	fprintf(stdout,"Active at %s:%d\n",inet_ntoa (*(struct in_addr *)*hostinfo->h_addr_list),ntohs(me.sin_port)); fflush(stdout); }
+				if (silent == FALSE) {	printf("Active at %s:%d\n",inet_ntoa (*(struct in_addr *)*hostinfo->h_addr_list),ntohs(me.sin_port)); fflush(stdout); }
 			}
 		}
 	}
 
-	// We're running a deamon
-	deamon	=	TRUE;
+	// We're running a daemon
+	isDaemon	=	TRUE;
 
 	// Save socket so we can close it on fatal errors
 	listenSock = sock;
@@ -583,21 +596,30 @@ int main(int argc, char* argv[]) {
 	sprintf(managerString,"");
 	gargc				=	argc;
 	gargv				=	argv;
-	deamon				=	FALSE;
+	isDaemon			=	FALSE;
 	silent				=	FALSE;
 	numLocalServers		=	0;
 	atexit(exitFunction);
 
 	for (i=1;i<argc;i++) {
-		if ((strcmp(argv[i],"-h") == 0) || (strcmp(argv[i],"--help") == 0) || (strcmp(argv[i],"-v") == 0)) {
+		if (strcmp(argv[i],"-h") == 0
+			|| strcmp(argv[i],"-help") == 0
+			|| strcmp(argv[i],"--help") == 0) {
 			printUsage();
+			if (source) free(source);
+			exit(0);
+		} else if (strcmp(argv[i],"-v") == 0
+				   || strcmp(argv[i],"-version") == 0
+				   || strcmp(argv[i],"--version") == 0) {
+			printVersion();
+			if (source) free(source);
 			exit(0);
 		} else if (strcmp(argv[i],"-r") == 0) {
 			i++;
 
 			if ((i < argc) && (sscanf(argv[i],"%d",&port) == 1)) {
 			} else {
-				port	=	DEFAULT_PORT;
+				port	=	DEFAULT_DAEMON_PORT;
 				i--;
 			}
 		} else if (strcmp(argv[i],"-q") == 0) {
@@ -608,12 +630,12 @@ int main(int argc, char* argv[]) {
 			i++;
 			if (i >= argc) {
 				if (silent == FALSE)	fprintf(stderr,"Was expecting client port\n");
-				exit(0);
+				exit(1);
 			}
 			
 			if(sscanf(argv[i],"%d",&clientport) != 1) {
 				if (silent == FALSE)	fprintf(stderr,"Unrecognized client port\n");
-				exit(0);
+				exit(1);
 			}
 		} else if (strcmp(argv[i],"-sizereport") == 0) {
 			printf("Size Report:\n");
@@ -633,7 +655,7 @@ int main(int argc, char* argv[]) {
 			i++;
 			if (i >= argc) {
 				if (silent == FALSE)	fprintf(stderr,"Was expecting list of servers\n");
-				exit(0);
+				exit(1);
 			}
 			sprintf(managerString,"servers=%s",argv[i]);
 		} else if (strcmp(argv[i],"-k") == 0) {
@@ -643,14 +665,14 @@ int main(int argc, char* argv[]) {
 			i++;
 			if (i >= argc) {
 				if (silent == FALSE)	fprintf(stderr,"Was expecting list of servers\n");
-				exit(0);
+				exit(1);
 			}
 			sprintf(managerString,"killservers=%s",argv[i]);
 		} else if (strcmp(argv[i],"-f") == 0) {
 			i++;
 			if (i >= argc) {
 				if (silent == FALSE)	fprintf(stderr,"Was expecting the frame range\n");
-				exit(0);
+				exit(1);
 			}
 
 			frameRange	=	argv[i];
@@ -671,6 +693,10 @@ int main(int argc, char* argv[]) {
 			displayStats	=	TRUE;
 		} else if (strcmp(argv[i],"-p") == 0) {
 			displayProgress	=	TRUE;
+		} else if (argv[i][0] == '-' && argv[i][1] != 0) {
+			// Starts with '-' but not matched any option
+			if (silent == FALSE)
+				fprintf(stderr,"Unknown option '%s'\n", argv[i]);
 		} else {
 			// Create colon-separated list of source RIBs
 			if (!source) {
@@ -686,46 +712,46 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
+	// Require input RIB
+	if (source == NULL)	{
+		fprintf(stderr,"no input files\n");
+		exit(0);		
+	};
+	
 	// Validate option combinations
-	if (client | server | localserver) {
-		if ((client ^ server ^ localserver) == 0) {
-			fprintf(stderr,"Invalid combination of client and server options\n");
-			if (source) free(source);
-			exit(0);
-		}
+	if ((client | server | localserver) && (client ^ server ^ localserver) == 0) {
+		fprintf(stderr,"Invalid combination of client and server options\n");
+		free(source);
+		exit(1);
 	}
 	
 	// FIXME: remove once multithreaded netrenders are working
 	if ((client | server | localserver) && numThreads > 0) {
-		fprintf(stderr,"You cannot specify multithreaded for network / multiprocessor renders\n");
-		if (source) free(source);
-		exit(0);
+		fprintf(stderr,"Using threads is currently not possible for network or multiprocess renders; turning off threads.\n");
+		numThreads = 0;
 	}
 
 	// Launch into daemon mode if appropriate
 	if (port != 0) {
 		if ((localChildren != 0) | server) {
-			fprintf(stderr,"You cannot launch a deamon with multiprocessor options\n");
-			if (source) free(source);
-			exit(0);
+			fprintf(stderr,"Using multiple processes is not possible for network renders\n");
+			free(source);
+			exit(1);
 		}
 		
 		noRestart	=	FALSE;
 		rndrd(port);
-		if (source) free(source);
+		free(source);
 		exit(0);
 
 	}
 	
-	// If no source, get the input from stdin
-	if (source == NULL)	source	=	strdup("-");
-
 	// Deal with stdin renders
 	if (strcmp(source,"-") == 0) {
 		if ((client | server | localserver)  && (silent == FALSE) && (killservers != TRUE)) {
-			fprintf(stderr,"You cannot use stdin for network / multiprocessor renders\n");
+			fprintf(stderr,"Using STDIN pipe is not possible for network or multiprocess renders\n");
 			free(source);
-			exit(0);
+			exit(1);
 		}
 	}
 	
@@ -733,18 +759,26 @@ int main(int argc, char* argv[]) {
 	if (localChildren != 0) {
 		noRestart	=	TRUE;
 		
-		// verify rib exists
-		if (osFileExists(source) == FALSE) {
-			if (silent == FALSE)	fprintf(stderr,"Cannot find rib file for subprocesses\n");
-			free(source);
-			exit(0);
-		}
+		// verify RIBs exists
+		char *pstart = source;
+		char *pend;
+		do {
+			pend = strchr(pstart,':');
+			if (pend)	*pend = '\0';
+			if (osFileExists(pstart) == FALSE) {
+				if (silent == FALSE)	fprintf(stderr,"Cannot find RIB file '%s'\n",pstart);
+				free(source);
+				exit(1);
+			}
+			if (pend)	*pend = ':';
+			pstart = pend + 1;
+		} while(pend);
 		
 		// run teh servers
 		if (runLocalServers(localChildren,source,managerString) == FALSE) {
-			if (silent == FALSE)	fprintf(stderr,"Cannot launch multiprocessor subprocesses\n");
+			if (silent == FALSE)	fprintf(stderr,"Failed to launch subprocesses\n");
 			free(source);
-			exit(0);
+			exit(1);
 		}
 	}
 	
@@ -796,16 +830,15 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (!killservers) {
-		char *pstart 	= source;
-		char *pend 		= strchr(pstart,':');
-		while(pend) {
-			*pend 	= '\0';
+		char *pstart = source;
+		char *pend;
+		do {
+			pend = strchr(pstart,':');
+			if (pend)	*pend = '\0';
 			RiReadArchive(pstart,NULL,NULL);
-			*pend 	= ':';
-			pstart 	= pend+1;
-			pend 	= strchr(pstart,':');
-		}
-		RiReadArchive(pstart,NULL,NULL);
+			if (pend)	*pend = ':';
+			pstart = pend + 1;
+		} while(pend);
 	}
 
 	RiEnd();

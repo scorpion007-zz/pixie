@@ -206,7 +206,7 @@ void		CPhotonHider::renderingLoop(){
 				}
 			}
 		} else {
-			error(CODE_BUG,"Unexpected job type in photon hider.\n");
+			error(CODE_BUG,"Unexpected job type in photon hider\n");
 		}
 	}
 }

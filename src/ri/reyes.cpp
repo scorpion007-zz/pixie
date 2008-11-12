@@ -92,7 +92,7 @@
 	#define __recordObjectDelete(__object)			\
 		osLock(debugMutex);							\
 		map<void*,int>::iterator it = allocMap.find(grid);	\
-		if(it == allocMap.end())	printf("ERROR deleting nonexistant raster object\n");	\
+		if(it == allocMap.end())	printf("ERROR deleting nonexistent raster object\n");	\
 		else						allocMap.erase(it);		\
 		osUnlock(debugMutex);
 #else
@@ -307,7 +307,7 @@ void		CReyes::renderingLoop() {
 			computeExtends;
 			render();
 		} else {
-			error(CODE_BUG,"Invalid job for the hider.\n");
+			error(CODE_BUG,"Invalid job for the hider\n");
 			break;
 		}
 	}

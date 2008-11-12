@@ -226,7 +226,7 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
-			if (*name != 0) error(CODE_NOFILE,"Unable open texture \"%s\"\n",name);
+			if (*name != 0) error(CODE_NOFILE,"Failed open texture \"%s\"\n",name);
 			tex					=	new CDummyTexture(name);
 		}
 
@@ -255,7 +255,7 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 
 		if (tex == NULL)	{
 			// Not found, substitude with a dummy one
-			error(CODE_NOFILE,"Unable open environment \"%s\"\n",name);
+			error(CODE_NOFILE,"Failed open environment \"%s\"\n",name);
 			tex					=	new CDummyEnvironment(name);
 		}
 
@@ -355,7 +355,7 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 					if (strcmp(type,fileIrradianceCache) == 0) {
 						cache	=	new CIrradianceCache(name,flags,in,from,to,NULL);
 					} else {
-						error(CODE_BUG,"This seems to be a Pixie file of unrecognised type (%s)\n",name);
+						error(CODE_BUG,"Unable to recognize the file format of \"%s\"\n",name);
 						fclose(in);
 					}
 				}
@@ -478,7 +478,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			
 			if (in == NULL) {
 				// allocate a dummy blank-channel point cloud
-				error(CODE_BADTOKEN,"Cannot find or open Texture3d file \"%s\"\n",name);
+				error(CODE_BADTOKEN,"Cannot find or open Texture3D file \"%s\"\n",name);
 				texture3d	=	new CPointCloud(name,world->from,world->to,NULL,NULL,FALSE);
 				// remove the dummy mapping once the frame ends
 				registerFrameTemporary(name,FALSE);
@@ -670,7 +670,7 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 
 		osUnloadModule(module);
 	} else {
-		error(CODE_SYSTEM,"Unable to load dso %s (error %s)\n",file,osModuleError());
+		error(CODE_SYSTEM,"Failed to load DSO \"%s\": %s\n",file,osModuleError());
 	}
 
 	// Continue iterating

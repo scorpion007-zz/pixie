@@ -1948,7 +1948,7 @@ void				CPolygonMesh::create(CShadingContext *context) {
 			triangleType	=	0;
 			break;
 		default:
-			error(CODE_BUG,"Unknown container type in polygon mesh.\n");
+			error(CODE_BUG,"Unknown container type in polygon mesh\n");
 			triangleType	=	0;
 			break;
 		}

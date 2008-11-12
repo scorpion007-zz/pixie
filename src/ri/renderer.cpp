@@ -111,16 +111,16 @@ const char	*colorCieSystem				=	"cie";
 CMemPage						*CRenderer::globalMemory				=	NULL;					// initialized in beginRenderer, destroyed in endRenderer
 CRendererContext				*CRenderer::context						=	NULL;					// initialzied in beginRenderer
 CArray<CShaderInstance *>		*CRenderer::allLights					=	NULL;					// initialized in beginRenderer, destroyed in endRenderer
-CTrie<CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
-CTrie<CVariable *>				*CRenderer::declaredVariables			=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CTrie<CNamedCoordinateSystem *>	*CRenderer::definedCoordinateSystems	=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
+CTrie<CVariable *>				*CRenderer::declaredVariables			=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
 CTrie<CFileResource  *>			*CRenderer::globalFiles					=	NULL;					// initialized in initFiles, destroyed in shutdownFiles
-CTrie<CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+CTrie<CGlobalIdentifier *>		*CRenderer::globalIdHash				=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
 CTrie<CNetFileMapping *>		*CRenderer::netFileMappings				=	NULL;					// initialized in initNetwork, destroyed in shutdownNetwork
-int								CRenderer::numKnownGlobalIds			=	0;						// initialized in initDeclerations
-CVariable						*CRenderer::variables					=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
-CArray<CVariable *>				*CRenderer::globalVariables				=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
-CTrie<CDisplayChannel *>		*CRenderer::declaredChannels			=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
-CArray<CDisplayChannel*>		*CRenderer::displayChannels				=	NULL;					// initialized in initDeclerations, destroyed in shutdownDeclerations
+int								CRenderer::numKnownGlobalIds			=	0;						// initialized in initDeclarations
+CVariable						*CRenderer::variables					=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
+CArray<CVariable *>				*CRenderer::globalVariables				=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
+CTrie<CDisplayChannel *>		*CRenderer::declaredChannels			=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
+CArray<CDisplayChannel*>		*CRenderer::displayChannels				=	NULL;					// initialized in initDeclarations, destroyed in shutdownDeclarations
 CDSO							*CRenderer::dsos						=	NULL;					// initialized in initFiles, destroyed in shutdownFiles
 SOCKET							CRenderer::netClient					=	INVALID_SOCKET;			// initialized in initNetwork
 int								CRenderer::netNumServers				=	0;						// initialized in initNetwork
@@ -304,8 +304,8 @@ void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetStri
 	// Init the files
 	initFiles();
 
-	// Init the declerations
-	initDeclerations();
+	// Init the declarations
+	initDeclarations();
 
 	// Init the network (if applicable)
 	initNetwork(ribFile,riNetString);
@@ -342,8 +342,8 @@ void		CRenderer::endRenderer() {
 	// Init the network
 	shutdownNetwork();
 
-	// Init the declerations
-	shutdownDeclerations();
+	// Init the declarations
+	shutdownDeclarations();
 
 	// Init the files
 	shutdownFiles();

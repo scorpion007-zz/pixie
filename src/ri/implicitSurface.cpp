@@ -55,7 +55,7 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 		if (	(initFunction	==	NULL)	||
 				(evalFunction	==	NULL)	||
 				(tiniFunction	==	NULL)	) {
-			error(CODE_BADFILE,"Implicit file %s is missing some functions\n",name);
+			error(CODE_BADFILE,"Implicit file \"%s\" is missing some functions\n",name);
 			osUnloadModule(handle);
 			handle			=	NULL;
 		} else {
@@ -65,13 +65,13 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 				xform->transformBound(bmin,bmax);
 				stepSize			=	ss;
 			} else {
-				error(CODE_BADFILE,"Implicit %s failed to initialise\n",name);
+				error(CODE_BADFILE,"Implicit \"%s\" failed to initialize\n",name);
 				osUnloadModule(handle);
 				handle			=	NULL;
 			}
 		}
 	} else {
-		error(CODE_BADFILE,"Unable to load implicit %s (%s)\n",name,osModuleError());
+		error(CODE_BADFILE,"Failed to load implicit \"%s\": %s\n",name,osModuleError());
 	}
 
 	scaleFactor				=	(float) pow((double) fabs(determinantm(xform->from)),1 / 3.0)*sf*(float) 0.5;

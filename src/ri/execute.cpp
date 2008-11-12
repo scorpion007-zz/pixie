@@ -584,7 +584,7 @@ execStart:
 #define		DEFLIGHTFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)				\
 			case FUNCTION_##name:																	\
 			{																						\
-				scripterror("invalid uniform lighting call");										\
+				scripterror("Invalid uniform lighting call");										\
 				code++;																				\
 				goto execStart;																		\
 			}

@@ -319,7 +319,7 @@ DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 									du				=	rayDiff(op);										\
 									dicingMeasure	=	TRUE;												\
 								} else {																	\
-									error(CODE_BADTOKEN,"Unrecognised area measure: \"%s\". Assuming \"dicing\"\n",*measure);					\
+									error(CODE_BADTOKEN,"Unrecognized area measure: \"%s\". Assuming \"dicing\"\n",*measure);					\
 									du				=	rayDiff(op);										\
 									dicingMeasure	=	TRUE;												\
 								}

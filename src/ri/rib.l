@@ -193,10 +193,10 @@ ReadArchive[ \t]*\"[^\"]*\"							{
 																rib_switch_to_buffer(rib_create_buffer( ribin, YY_BUF_SIZE ) );
 																BEGIN(INITIAL);
 															} else {
-																error(CODE_NOFILE,"Unable to open \"%s\" \n",location);
+																error(CODE_NOFILE,"Failed to open \"%s\"\n",location);
 															}
 														} else {
-															error(CODE_NOFILE,"Unable to find \"%s(.rib)\" \n",fileName);
+															error(CODE_NOFILE,"Failed to find \"%s(.rib)\"\n",fileName);
 														}
 													}
 

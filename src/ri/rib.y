@@ -233,13 +233,13 @@ static	int		parameterListCheck() {
 					} else {
 						// This isn't a globally declared variable
 						// Neither is it an inline delcaration
-						error(CODE_BADTOKEN,"Parameter \"%s\" is not declared.\n",par->name);
+						error(CODE_BADTOKEN,"Parameter \"%s\" is not declared\n",par->name);
 						return FALSE;
 					}
 				} else {
 					// This isn't a globally declared variable
 					// Neither is it an inline delcaration
-					error(CODE_BADTOKEN,"Parameter \"%s\" is not declared.\n",par->name);
+					error(CODE_BADTOKEN,"Parameter \"%s\" is not declared\n",par->name);
 					return FALSE;
 				}
 			}
@@ -352,7 +352,7 @@ static	int		parameterListCheck() {
 			SIZECHECK(numConstant);
 			break;
 		default:
-			error(CODE_BUG,"Unknown container class in parameter list.\n");
+			error(CODE_BUG,"Unknown container class in parameter list\n");
 			return FALSE;
 			break;
 		}
@@ -466,7 +466,7 @@ static	RtFilterFunc	getFilter(char *n) {
 	} else if (strcmp(name,RI_DISKFILTER) == 0) {
 		f = RiDiskFilter;
 	} else {
-		error(CODE_BADTOKEN,"Filter \"%s\" not recognised\n",name);
+		error(CODE_BADTOKEN,"Filter \"%s\" is not recognized\n",name);
 	}
 
 	return f;
@@ -488,7 +488,7 @@ static	RtErrorHandler	getErrorHandler(char *n) {
 	} else if (strcmp(name,RI_ERRORABORT) == 0) {
 		f = RiErrorAbort;
 	} else {
-		error(CODE_BADTOKEN,"Error handler \"%s\" not recognised\n",name);
+		error(CODE_BADTOKEN,"Error handler \"%s\" is not recognized\n",name);
 	}
 
 	return f;
@@ -1026,7 +1026,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribFloats
 				{
 					if ((floatArgs.numItems & 1) || ((floatArgs.numItems % 6) != 0)) {
-						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs.numItems);
+						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\")\n",floatArgs.numItems);
 					} else {
 						int		n		=	floatArgs.numItems/6;
 						float	*argf1	=	getFloat(0);
@@ -1041,7 +1041,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribFloatArray
 				{
 					if (($2 != $3) || ((floatArgs.numItems % 6) != 0)) {
-						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\") \n",floatArgs.numItems);
+						error(CODE_MISSINGDATA,"ColorSamples: Invalid number of arguments (\"%d\")\n",floatArgs.numItems);
 					} else {
 						int		n		=	floatArgs.numItems/6;
 						float	*argf1	=	getFloat(0);
@@ -2541,7 +2541,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 					if (strcmp($2,RI_PROCDELAYEDREADARCHIVE) == 0) {
 						if ($3 != 1) {
-							error(CODE_MISSINGDATA,"Proc delayed archive expects one argument (given %d)\n",$3);
+							error(CODE_MISSINGDATA,"Procedure delayed archive expects one argument (given %d)\n",$3);
 						} else {
 							arg		=	getString(0);
 
@@ -2551,7 +2551,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						}
 					} else if (strcmp($2,RI_PROCRUNPROGRAM) == 0) {
 						if ($3 != 2) {
-							error(CODE_MISSINGDATA,"Proc delayed archive expects two arguments (given %d)\n",$3);
+							error(CODE_MISSINGDATA,"Procedure run program expects two arguments (given %d)\n",$3);
 						} else {
 							arg		=	getString(0);
 
@@ -2562,7 +2562,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 						}
 					} else if (strcmp($2,RI_PROCDYNAMICLOAD) == 0) {
 						if ($3 != 2) {
-							error(CODE_MISSINGDATA,"Proc delayed archive expects two arguments (given %d)\n",$3);
+							error(CODE_MISSINGDATA,"Procedure dynamic load expects two arguments (given %d)\n",$3);
 						} else {
 							arg		=	getString(0);
 
@@ -2825,7 +2825,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				error
 				{
 					if (YYRECOVERING() == 0) {
-						error(CODE_BADFILE,"Syntax error.\n");
+						error(CODE_BADFILE,"Syntax error\n");
 					}
 				}
 				;

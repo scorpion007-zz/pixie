@@ -73,7 +73,6 @@
 extern	"C" int	preprocess(char *,FILE *,int,char **);
 
 // The environment variables to be searched for the preprocessor and include files
-#define			PATH				"PATH"			// The environment variable to search for the preprocessor
 #define			INCLUDE				"INCLUDE"		// The default include path for the preprocessor
 
 // Return codes
@@ -100,9 +99,9 @@ static	char	*argumentOutput					=			"-o";
 static	char	*argumentSuppressWarnings		=			"-nw";
 static	char	*argumentSuppressErrors			=			"-ne";
 static	char	*argumentResolutionInfo			=			"-ri";
-static	char	*argumentHelp					=			"--help";
+static	char	*argumentHelp					=			"-h";
 static	char	*argumentPrintVersionInfo		=			"-v";
-static	char	*argumentSilentInfo				=			"-s";
+static	char	*argumentQuietInfo				=			"-q";
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printVersion
@@ -110,7 +109,10 @@ static	char	*argumentSilentInfo				=			"-s";
 // Return Value			:	-
 // Comments				:
 void	printVersion() {
-	printf("Pixie Shading Language Compiler (%s) v%d.%d.%d\n",compilerName,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
+	printf("Pixie RenderMan Shader Language Compiler (%s) v%d.%d.%d\n",compilerName,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
+	printf("\nCopyright 1999-2008 Okan Arikan. http://renderpixie.com/\n");
+	printf("Pixie is free software. There is NO warranty; not even for\n");
+	printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -119,34 +121,21 @@ void	printVersion() {
 // Return Value			:	-
 // Comments				:
 void	printUsage() {
-	printVersion();
-	printf("Usage:\n");
-	printf("%s [options] <in_file> [<in_file> ...]\n",compilerName);
-	printf("options:\n");
-
-	printf("%s<path>\t: Specify additional include path for the preprocessor\n",argumentIncludeDirectory);
-
-	printf("%s<symbol>\t: Define \"symbol\" for the preprocessor\n",argumentDefine);
-
-	printf("%s <outname>\t: Output to \"outname\" \n",argumentOutput);
-
-	printf("%s\t\t: Suppress warnings\n",argumentSuppressWarnings);
-
-	printf("%s\t\t: Suppress errors\n",argumentSuppressErrors);
-
-	printf("%s\t\t: Suppress progress\n",argumentSilentInfo);
-
-	printf("%s\t\t: Display resolution info\n",argumentResolutionInfo);
-
-	printf("%s\t\t: Display version info\n",argumentPrintVersionInfo);
-
-	printf("%s\t\t: Display this message\n",argumentHelp);
-
-	printf("The environment variable PATH will be searched for the preprocessor by default\n");
-
-	printf("The environment variable INCLUDE will be passed to the preprocessor by default\n");
-
-	printf("***<in_file> can have wildcards\n");
+	printf("Usage: %s <options> filename.sl [filename.sl ...]\n",compilerName);
+	printf("The filenames are wildcard-expanded\n\n");
+	printf("Options:\n");
+	printf("  %s<path>           Additional include path for the preprocessor\n",argumentIncludeDirectory);
+	printf("  %s<symbol>         Define <symbol> for the preprocessor\n",argumentDefine);
+	printf("  %s<symbol>=<value> Define <symbol> to be <value>\n",argumentDefine);
+	printf("  %s <filename>      Output to <filename> \n",argumentOutput);
+	printf("  %s                Suppress warnings\n",argumentSuppressWarnings);
+	printf("  %s                Suppress errors\n",argumentSuppressErrors);
+	printf("  %s                 Quiet, suppress progress display\n",argumentQuietInfo);
+	printf("  %s                Display resolution information\n",argumentResolutionInfo);
+	printf("  %s                 Display version information\n",argumentPrintVersionInfo);
+	printf("  %s                 Display this help\n",argumentHelp);
+	printf("\nEnvironment variables:\n");
+	printf("  INCLUDE            Additional include paths for the preprocessor\n");
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -194,7 +183,7 @@ int main(int argc, char* argv[]) {
 	char			*outName	=	NULL;
 	char 			*includeEnv = osEnvironment(INCLUDE);
 	int				error = ERR_NONE;
-	int				silent = FALSE;
+	int				quiet = FALSE;
 	
 	sourceFiles					=	new CList<char *>;
 
@@ -227,20 +216,24 @@ int main(int argc, char* argv[]) {
 			settings	|=	COMPILER_SUPPRESS_ERRORS;
 		} else if (strcmp(argv[i],argumentResolutionInfo) == 0) {
 			settings	&=	~COMPILER_SUPPRESS_DEFINITIONS;
-		} else if (strcmp(argv[i],argumentSilentInfo) == 0) {
-			silent = TRUE;
-		} else if (strcmp(argv[i],argumentPrintVersionInfo) == 0) {
+		} else if (strcmp(argv[i],argumentQuietInfo) == 0) {
+			quiet = TRUE;
+		} else if (strcmp(argv[i],argumentPrintVersionInfo) == 0
+				   ||strcmp(argv[i],"-version") == 0
+				   ||strcmp(argv[i],"--version") == 0) {
 			printVersion();
-			exit(1);
-		} else if (strcmp(argv[i],argumentHelp) == 0) {
+			exit(0);
+		} else if (strcmp(argv[i],argumentHelp) == 0
+				   || strcmp(argv[i],"-help")==0
+				   || strcmp(argv[i],"--help")==0) {
 			printUsage();
-			exit(1);
+			exit(0);
 		} else if (strcmp(argv[i],argumentOutput) == 0) {
 			if (i < (argc-1)) {
 				outName				=	argv[i+1];
 				i++;
 			} else
-				fprintf(stderr,"Output name expected\n");
+				fprintf(stderr,"Output filename expected\n");
 		} else if (strncmp(argv[i],argumentDefine,strlen(argumentDefine)) == 0) {
 			ppargv[ppargc++]	=	"-d";
 			ppargv[ppargc++]	=	&argv[i][2];
@@ -253,13 +246,17 @@ int main(int argc, char* argv[]) {
 			nPath->directory	=	strdup(&argv[i][2]);
 			nPath->next			=	dsoPath;
 			dsoPath				=	nPath;
+		} else if (argv[i][0] == '-' && argv[i][1] != 0) {
+			// Starts with '-' but not matched any option
+			if (!(settings & (COMPILER_SUPPRESS_WARNINGS|COMPILER_SUPPRESS_ERRORS)))
+				fprintf(stderr,"Unknown option '%s'\n", argv[i]);			
 		} else {
 			// Save the files
 			sourceFiles->push(strdup(argv[i]));
 			argv[i]	=	NULL;
 		}
 	}
-
+	
 	ppargv[ppargc++]	=	"-v";
 
 	// Go over the arguments and replace the wildcards
@@ -280,6 +277,18 @@ int main(int argc, char* argv[]) {
 		sourceFiles	=	newSources;
 	}
 
+	// Require input file
+	if (sourceFiles->numItems == 0)	{
+		fprintf(stderr,"no input files\n");
+		exit(0);
+	};
+	
+	// If using -o only one file can be processed
+	if (outName != NULL && sourceFiles->numItems > 1) {
+		fprintf(stderr,"Named output file requires single input file\n");
+		exit(1);
+	};
+		
 		// Get a temp file
 	char tempfile[OS_MAX_PATH_LENGTH];
 	char tempdir[OS_MAX_PATH_LENGTH];
@@ -289,12 +298,11 @@ int main(int argc, char* argv[]) {
 	
 	for (sourceFile=sourceFiles->first();error==ERR_NONE,sourceFile!=NULL;sourceFile=sourceFiles->next()) {
 
-		if (!silent)
-			fprintf(stderr,"Processing %s\n",sourceFile);
+		if (!quiet)	fprintf(stderr,"Compiling %s\n",sourceFile);
 
 		FILE	*in	=	fopen(tempfile,"w+");		
 		if (in == NULL) {
-			fprintf(stderr,"Unable to create temporary file\n");
+			fprintf(stderr,"Failed to create a temporary file\n");
 			error = ERR_FILE;
 			break;
 		}

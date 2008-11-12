@@ -180,13 +180,13 @@ int	precomputeSubdivisionData() {
 
 #ifdef _WINDOWS
 	if (!(f=fopen("ccdata50NT.dat","rb"))) {
-		fprintf(stderr,"Unable to open ccdata50NT.dat\n");
+		fprintf(stderr,"Failed to open ccdata50NT.dat\n");
 		return TRUE;
 	}
 	out				=	fopen("..\\src\\ri\\subdivisionData.h","w");
 #else
 	if (!(f=fopen("ccdata50.dat","r"))) {
-		fprintf(stderr,"Unable to open ccdata50.dat\n");
+		fprintf(stderr,"Failed to open ccdata50.dat\n");
 		return TRUE;
 	}
 	out				=	fopen("../ri/subdivisionData.h","w");

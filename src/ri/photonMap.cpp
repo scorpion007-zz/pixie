@@ -193,7 +193,7 @@ void	CPhotonMap::write(const CXform *world) {
 	
 			fclose(out);
 		} else {
-			error(CODE_BADFILE,"Unable to open %s for writing\n",name);
+			error(CODE_BADFILE,"Failed to open \"%s\" for writing\n",name);
 		}
 		
 		// We are no longer modifying this map

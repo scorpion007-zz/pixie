@@ -1299,7 +1299,7 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 			}
 
 			if (lFunction == NULL) {
-				sdr->error("Extern variable %s not found\n",cVariable->symbolName);
+				sdr->error("Extern variable \"%s\" is not found\n",cVariable->symbolName);
 			}
 		} else {
 			sdr->addVariable(cVariable);
@@ -2992,7 +2992,7 @@ CFixedExpression::~CFixedExpression() {
 // Comments				:
 void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 	if (dest != NULL) {
-		sdr->error("Destination variable %s was not expected\n",dest->symbolName);
+		sdr->error("Destination variable \"%s\" was not expected\n",dest->symbolName);
 		return;
 	}
 
@@ -3034,7 +3034,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 	if ((first->type | second->type) & SLC_ARRAY) {
 		delete first;
 		delete second;
-		sdr->error("You can not operate on arrays directly\n");
+		sdr->error("Direct operations on arrays is not possible\n");
 		return	new CNullExpression;
 	}
 	
@@ -3116,7 +3116,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite) {
 	if (first->type & SLC_ARRAY) {
 		delete first;
-		sdr->error("You can not operate on arrays directly\n");
+		sdr->error("Direct operations on arrays is not possible\n");
 		return	new CNullExpression();
 	}
 		

@@ -703,7 +703,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 	getResizeMode(numParams,params,vals);
 
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
-		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
+		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
 		// Set the error handler so we don't crash
 		TIFFSetErrorHandler(tiffErrorHandler);
@@ -711,7 +711,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 
 		TIFF	*inHandle = TIFFOpen(inputFileName,"r");
 		if (inHandle == NULL) {
-			error(CODE_NOFILE,"Unable to open \"%s\" \n",inputFileName);
+			error(CODE_NOFILE,"Failed to open \"%s\"\n",inputFileName);
 		} else {
 			void			*data;
 			int				numSamples;
@@ -761,7 +761,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 	getResizeMode(numParams,params,vals);
 	
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
-		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
+		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
 		// Set the error handler so we don't crash
 		TIFFSetErrorHandler(tiffErrorHandler);
@@ -769,7 +769,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 
 		TIFF	*inHandle = TIFFOpen(inputFileName,"r");
 		if (inHandle == NULL) {
-			error(CODE_NOFILE,"Unable to open \"%s\" \n",inputFileName);
+			error(CODE_NOFILE,"Failed to open \"%s\"\n",inputFileName);
 		} else {
 			void			*data;
 			int				numSamples;
@@ -786,14 +786,14 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 
 			// Read off the from world transformation from the image if possible
 			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	&tmp) == FALSE) {
-				error(CODE_BUG,"Unable to read the world to camera matrix.\n");
+				error(CODE_BUG,"Failed to read the world to camera matrix\n");
 				identitym(worldToCamera);
 			} else {
 				movmm(worldToCamera,tmp);
 			}
 
 			if (TIFFGetField(inHandle,TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	&tmp) == FALSE) {
-				error(CODE_BUG,"Unable to read the world to screen matrix.\n");
+				error(CODE_BUG,"Failed to read the world to screen matrix\n");
 				identitym(worldToScreen);
 			} else {
 				movmm(worldToScreen,tmp);
@@ -819,7 +819,7 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 
 				TIFFClose(outHandle);
 			} else {
-				error(CODE_SYSTEM,"Unable to create %s for writing\n",output);
+				error(CODE_SYSTEM,"Failed to create \"%s\" for writing\n",output);
 			}
 
 			memEnd(CRenderer::globalMemory);
@@ -846,7 +846,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 	names[5]	=	nz;
 
 	if (CRenderer::locateFile(inputFileName,names[0],path) == FALSE) {
-		error(CODE_NOFILE,"Unable to find \"%s\"\n",names[0]);
+		error(CODE_NOFILE,"Failed to find \"%s\"\n",names[0]);
 	} else {
 
 		// Set the error handler so we don't crash
@@ -875,7 +875,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 
 					// Open the file
 					if (CRenderer::locateFile(inputFileName,names[i],path) == FALSE) {
-						error(CODE_NOFILE,"Unable to find \"%s\"\n",names[i]);
+						error(CODE_NOFILE,"Failed to find \"%s\"\n",names[i]);
 						break;
 					} else {
 						inHandle	=	TIFFOpen(inputFileName,"r");
@@ -897,7 +897,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 				TIFFClose(outHandle);
 			}
 		} else {
-			error(CODE_SYSTEM,"Unable to create %s for writing\n",output);
+			error(CODE_SYSTEM,"Failed to create \"%s\" for writing\n",output);
 		}
 	}
 }
@@ -913,7 +913,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 	getResizeMode(numParams,params,vals);
 	
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
-		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
+		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
 		// Set the error handler so we don't crash
 		TIFFSetErrorHandler(tiffErrorHandler);
@@ -922,7 +922,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 		TIFF	*inHandle	=	TIFFOpen(inputFileName,"r");
 
 		if (inHandle == NULL) {
-			error(CODE_NOFILE,"Unable to open \"%s\" \n",inputFileName);
+			error(CODE_NOFILE,"Failed to open \"%s\"\n",inputFileName);
 		} else {
 			void			*data;
 			int				numSamples;
@@ -972,7 +972,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 	getResizeMode(numParams,params,vals);
 	
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
-		error(CODE_NOFILE,"Unable to find \"%s\"\n",input);
+		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
 		// Set the error handler so we don't crash
 		TIFFSetErrorHandler(tiffErrorHandler);
@@ -981,7 +981,7 @@ void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char
 		TIFF	*inHandle		=	TIFFOpen(inputFileName,"r");
 
 		if (inHandle == NULL) {
-			error(CODE_NOFILE,"Unable to open \"%s\" \n",inputFileName);
+			error(CODE_NOFILE,"Failed to open \"%s\"\n",inputFileName);
 		} else {
 			void			*data;
 			int				numSamples;

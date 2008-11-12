@@ -26,7 +26,7 @@
 //
 //  File				:	variable.y
 //  Classes				:	-
-//  Description			:	Parse a variable decleration
+//  Description			:	Parse a variable declaration
 //
 ////////////////////////////////////////////////////////////////////////
 #undef alloca
@@ -212,7 +212,7 @@ varItems:	VAR_OPEN
 static	int	numErrors	=	0;
 
 void	varerror(char *str) {
-	//error(CODE_BADTOKEN,"Variable decleration error \"%s\" \"%s\"\n",(currentName == NULL ? "NULL" : currentName),currentDecl);
+	//error(CODE_BADTOKEN,"Variable declaration error \"%s\" \"%s\"\n",(currentName == NULL ? "NULL" : currentName),currentDecl);
 	numErrors++;
 }
 

@@ -1838,7 +1838,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	// Process the tags
 	for (i=0,cnargs=nargs,cintargs=intargs,cfloatargs=floatargs;i<ntags;i++) {
 		if (strcmp(tags[i],RI_HOLE) == 0) {
-			if (cnargs[1] != 0)	error(CODE_RANGE,"hole takes no floating point arguments\n");
+			if (cnargs[1] != 0)	error(CODE_RANGE,"Hole takes no floating point arguments\n");
 			for (j=0;j<cnargs[0];j++) {
 				faces[cintargs[j]]->hole	=	TRUE;
 			}
@@ -1857,7 +1857,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 				}
 			}
 			if (cnargs[1] != 1) {
-				error(CODE_RANGE,"creases expect exactly 1 float argument\n");
+				error(CODE_RANGE,"Creases expect exactly 1 float argument\n");
 			}
 		} else if (strcmp(tags[i],RI_INTERPOLATEBOUNDARY) == 0) {
 			data.currentFlags	|=	FACE_INTEPOLATEBOUNDARY;

@@ -95,10 +95,10 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 						fread(version,sizeof(int),4,in);
 
 						if (!((version[0] == VERSION_RELEASE) || (version[1] == VERSION_BETA))) {
-							error(CODE_VERSION,"File %s is from an incompatible version\n",fileName);
+							error(CODE_VERSION,"File \"%s\" is from an incompatible version\n",fileName);
 						} else {
 							if (version[3] != sizeof(int*) ) {
-								error(CODE_VERSION,"File %s is binary an incompatible (generated on a machine with different word size)\n",fileName);
+								error(CODE_VERSION,"File \"%s\" is binary an incompatible (generated on a machine with different word size)\n",fileName);
 							} else {
 								
 								fread(&i,sizeof(int),1,in);

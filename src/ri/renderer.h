@@ -110,7 +110,7 @@ class	CTexture3d;
 //
 //		renderer.cpp			- Init / shutdown code
 //		rendererMutexes.cpp		- The portion that holds the synchronization objects
-//		rendererDeclerations	- The portion that deals with declerations such as variables/coordinate systems etc.
+//		rendererDeclarations	- The portion that deals with declarations such as variables/coordinate systems etc.
 //		rendererDisplay			- The portion that handles the output
 //		rendererFiles			- The portion that manages files and loads stuff
 //		rendererNetwork			- The portion that manages the network
@@ -265,9 +265,9 @@ public:
 		static RtStepFilterFunc	getStepFilter(const char *);						// Get a filter
 
 		////////////////////////////////////////////////////////////////////
-		// Functions that deal with declerations (implemented in rendererDeclerations.cpp)
+		// Functions that deal with declarations (implemented in rendererDeclarations.cpp)
 		////////////////////////////////////////////////////////////////////
-		static	void			initDeclerations();
+		static	void			initDeclarations();
 		static	void			defineCoordinateSystem(const char *,const float *,const float *,ECoordinateSystem type = COORDINATE_CUSTOM);
 		static	int				findCoordinateSystem(const char *,const float *&,const float *&,ECoordinateSystem &);
 		static	CVariable		*declareVariable(const char *,const char *,int um = 0);
@@ -279,7 +279,7 @@ public:
 		static	void			resetDisplayChannelUsage();
 		static	void			registerFrameTemporary(const char *,int);			// Register file for end-of-frame deletion
 		static	int				getGlobalID(const char *);							// Global ID management
-		static	void			shutdownDeclerations();
+		static	void			shutdownDeclarations();
 								
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with files (implemented in rendererFiles.cpp)

@@ -71,7 +71,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			
 			job.type				=	CJob::TERMINATE;
 		} else {
-			error(CODE_BUG,"Unrecognised network request\n");
+			error(CODE_BUG,"Unrecognized network request\n");
 			job.type				=	CJob::TERMINATE;
 		}
 

@@ -170,7 +170,7 @@ void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 			dataSize								+= var.numFloats;
 			numChannels++;	
 		} else  {
-			error(CODE_BADTOKEN,"Unable to interpret display channel name \"%s\"\n",channelNames[i]);
+			error(CODE_BADTOKEN,"Failed to interpret display channel name \"%s\"\n",channelNames[i]);
 		}		
 	}
 }

@@ -366,7 +366,7 @@ void	CRaytracer::renderingLoop() {
 			}
 
 		} else {
-			error(CODE_BUG,"Invalid job for the hider.\n");
+			error(CODE_BUG,"Invalid job for the hider\n");
 		}
 	}
 

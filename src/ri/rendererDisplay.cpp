@@ -149,7 +149,7 @@ int	CRenderer::getAOVFilter(const char *name) {
 		return	AOV_FILTER_MITCHELL;
 	}
 
-	error(CODE_BADTOKEN,"Unknown AOV filter type: \"%s\" \n",name);
+	error(CODE_BADTOKEN,"Unknown AOV filter type: \"%s\"\n",name);
 	return	AOV_FILTER_DEFAULT;
 }
 
@@ -547,7 +547,7 @@ void	CRenderer::computeDisplayData() {
 				if (oChannel->variable != NULL) {
 					// variable is NULL only for RGBAZ channels
 					if (hiderFlags & HIDER_RGBAZ_ONLY) {
-						error(CODE_BADTOKEN,"Hider %s can not handle display channels\n",hider);
+						error(CODE_BADTOKEN,"Hider \"%s\" cannot handle display channels\n",hider);
 						dspError = TRUE;
 						break;
 					}	
@@ -562,7 +562,7 @@ void	CRenderer::computeDisplayData() {
 				// it's an old-style AOV
 				
 				if (hiderFlags & HIDER_RGBAZ_ONLY) {
-					error(CODE_BADTOKEN,"Hider %s can not handle arbitrary output variables\n",hider);
+					error(CODE_BADTOKEN,"Hider \"%s\" cannot handle arbitrary output variables\n",hider);
 					dspError = TRUE;
 					break;
 				} else {				
@@ -578,12 +578,12 @@ void	CRenderer::computeDisplayData() {
 						if (cVar->storage != STORAGE_GLOBAL) {
 							makeGlobalVariable(cVar);
 						} else if (cVar->storage == STORAGE_PARAMETER || cVar->storage == STORAGE_MUTABLEPARAMETER) {
-							error(CODE_BADTOKEN,"Unable to find output variable or display channel \"%s\" (seems to be a parameter?)\n",sampleName);
+							error(CODE_BADTOKEN,"Failed to find output variable or display channel \"%s\"\n",sampleName);
 							dspError = TRUE;
 							break;
 						}
 					} else {
-						error(CODE_BADTOKEN,"Unable to find output variable or display channel \"%s\"\n",sampleName);
+						error(CODE_BADTOKEN,"Failed to find output variable or display channel \"%s\"\n",sampleName);
 						dspError = TRUE;
 						break;
 					}
@@ -592,7 +592,7 @@ void	CRenderer::computeDisplayData() {
 					oChannel = declareDisplayChannel(cVar);
 					
 					if (oChannel == NULL) {
-						error(CODE_BADTOKEN,"variable \"%s\" clashes with a display channel\n",cVar->name);
+						error(CODE_BADTOKEN,"Variable \"%s\" clashes with a display channel\n",cVar->name);
 						dspError = TRUE;
 						break;
 					}
@@ -637,7 +637,7 @@ void	CRenderer::computeDisplayData() {
 		free(sampleDefinition);
 		
 		if (dspError) {
-			error(CODE_BADTOKEN,"display \"%s\" disabled\n",cDisplay->outName);
+			error(CODE_BADTOKEN,"Display \"%s\" disabled\n",cDisplay->outName);
 			delete [] datas[numDisplays].channels;
 			continue;
 		}
@@ -681,16 +681,16 @@ void	CRenderer::computeDisplayData() {
 
 			// The sanity check
 			if ((1 << header.tileShift) != bucketWidth) {
-				error(CODE_LIMIT,"Bucket width must be a power of 2 for tsm (%d).\n",bucketWidth);
+				error(CODE_LIMIT,"Bucket width must be a power of 2 for TSM: %d\n",bucketWidth);
 			} else {
 				if (bucketWidth != bucketHeight) {
-					error(CODE_LIMIT,"Bucket width and height must be same for tsm (%d,%d).\n",bucketWidth,bucketHeight);
+					error(CODE_LIMIT,"Bucket width and height must be same for TSM: (%d,%d)\n",bucketWidth,bucketHeight);
 				} else {
 					if (strcmp(hider,"stochastic") != 0) {
-						error(CODE_LIMIT,"Hider must be stochastic / hidden for tsm.\n");
+						error(CODE_LIMIT,"Hider must be stochastic or hidden for TSM\n");
 					} else {
 						if (deepShadowFile != NULL) {
-							error(CODE_LIMIT,"There can only be one tsm output.\n");
+							error(CODE_LIMIT,"There can only be one TSM output\n");
 						} else {
 							if (netClient != INVALID_SOCKET) {
 								char tempTsmName[OS_MAX_PATH_LENGTH];
@@ -749,7 +749,7 @@ void	CRenderer::computeDisplayData() {
 					datas[numDisplays].finish		=	(TDisplayFinishFunction)	osResolve(datas[numDisplays].module,"displayFinish");
 
 					if ((datas[numDisplays].start == NULL) || (datas[numDisplays].data == NULL) || (datas[numDisplays].finish == NULL)) {
-						error(CODE_SYSTEM,"The module %s has missing implementation\n",deviceFile);
+						error(CODE_SYSTEM,"The module \"%s\" has missing implementation\n",deviceFile);
 						osUnloadModule(datas[numDisplays].module);
 						datas[numDisplays].module	=	NULL;
 					} else {
@@ -765,11 +765,11 @@ void	CRenderer::computeDisplayData() {
 					}
 				} else {
 					datas[numDisplays].module		=	NULL;
-					error(CODE_SYSTEM,"Unable to open out device \"%s\" (error: %s)\n",cDisplay->outDevice,osModuleError());
+					error(CODE_SYSTEM,"Failed to open out device \"%s\" (error: %s)\n",cDisplay->outDevice,osModuleError());
 				}
 			} else {
 				datas[numDisplays].module		=	NULL;
-				error(CODE_SYSTEM,"Unable to find out device \"%s\"\n",cDisplay->outDevice);
+				error(CODE_SYSTEM,"Failed to find out device \"%s\"\n",cDisplay->outDevice);
 			}
 		} else {
 			datas[numDisplays].module	=	NULL;

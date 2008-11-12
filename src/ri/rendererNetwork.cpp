@@ -196,10 +196,10 @@ static	int		netName(sockaddr_in *address,char *name) {
 	portMarker						=	strchr(name,':');
 
 	// Try to read off the port
-	if (portMarker == NULL)	port	=	DEFAULT_PORT;
+	if (portMarker == NULL)	port	=	DEFAULT_SERVER_PORT;
 	else {
 		if (sscanf(portMarker,":%d",&port) != 1) {
-			port	=	DEFAULT_PORT;
+			port	=	DEFAULT_SERVER_PORT;
 		}
 
 		*portMarker	=	'\0';
@@ -314,7 +314,7 @@ static	int		netName(sockaddr_in *address,char *name) {
 		error(CODE_SYSTEM,"NET ERROR: %s\n",lastError);	\
 }
 #else
-#define	netError() error(CODE_SYSTEM,"NET ERROR : %s\n",strerror(errno));
+#define	netError() error(CODE_SYSTEM,"NET ERROR: %s\n",strerror(errno));
 #endif
 
 ///////////////////////////////////////////////////////////////////////
@@ -441,12 +441,12 @@ int			CRenderer::getFile(char *outName,const char *inName) {
 		if (getFile(out,inName) > 0) {
 			result	=	TRUE;
 		} else {
-			error(CODE_SYSTEM,"Unable to download file %s\n",inName);
+			error(CODE_SYSTEM,"Failed to download file %s\n",inName);
 		}
 
 		fclose(out);
 	} else {
-		error(CODE_SYSTEM,"Unable to create file %s\n",outName);
+		error(CODE_SYSTEM,"Failed to create file %s\n",outName);
 	}
 
 	return result;
@@ -494,7 +494,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 
 		// Check the message
 		if (netBuffer[0].integer != NET_CONNECT) {
-			fatal(CODE_SYSTEM,"Unrecognised startup sequence from the client\n");
+			fatal(CODE_SYSTEM,"Unrecognized startup sequence from the client\n");
 		}
 
 		// Check the version
@@ -630,11 +630,11 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 					}
 				} else {
 					netError();
-					error(CODE_SYSTEM,"Unable to connect to %s\n",tmp);
+					error(CODE_SYSTEM,"Failed to connect to %s\n",tmp);
 				}
 			} else {
 				netError();
-				error(CODE_SYSTEM,"Unable to resolve %s\n",tmp);
+				error(CODE_SYSTEM,"Failed to resolve %s\n",tmp);
 			}
 
 			tmp	=	marker;
@@ -680,11 +680,11 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 				control	=	INVALID_SOCKET;
 			} else {
 				netError();
-				error(CODE_SYSTEM,"Unable to connect to %s\n",tmp);
+				error(CODE_SYSTEM,"Failed to connect to %s\n",tmp);
 			}
 		} else {
 			netError();
-			error(CODE_SYSTEM,"Unable to resolve %s\n",tmp);
+			error(CODE_SYSTEM,"Failed to resolve %s\n",tmp);
 		}
 	} else if (strncmp(tmp,"locclient=",10) == 0) {
 		tmp += 10;

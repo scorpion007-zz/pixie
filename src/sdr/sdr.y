@@ -389,7 +389,7 @@ slFloatArrayInitializer:
 		SCRL_CLOSE_SQR_PARANTHESIS
 		{
 			if(numArrayItemsRemaining){
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}
 		;
@@ -404,7 +404,7 @@ slFloatArrayInitializerItems:
 				numArrayItemsRemaining--;
 			}
 			else{
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}	
 	|
@@ -471,7 +471,7 @@ slStringArrayInitializer:
 		SCRL_CLOSE_SQR_PARANTHESIS
 		{
 			if(numArrayItemsRemaining){
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}
 		;
@@ -486,7 +486,7 @@ slStringArrayInitializerItems:
 				numArrayItemsRemaining--;
 			}
 			else{
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}	
 	|
@@ -602,7 +602,7 @@ slVectorArrayInitializer:
 		SCRL_CLOSE_SQR_PARANTHESIS
 		{
 			if(numArrayItemsRemaining){
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 		}
 		}
 		;
@@ -614,7 +614,7 @@ slVectorArrayInitializerItems:
 				currentDefaultItem->vector = new float[3];
 			}
 			else{
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}
 		slVector
@@ -888,7 +888,7 @@ slMatrixArrayInitializer:
 		SCRL_CLOSE_SQR_PARANTHESIS
 		{
 			if(numArrayItemsRemaining){
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}
 		;
@@ -937,7 +937,7 @@ slMatrixArrayInitializerItems:
 				numArrayItemsRemaining--;
 			}
 			else{
-				sdrerror("wrong number of items in array initializer\n");
+				sdrerror("Wrong number of items in array initializer\n");
 			}
 		}	
 	|
