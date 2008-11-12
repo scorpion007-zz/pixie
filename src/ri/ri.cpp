@@ -1027,9 +1027,6 @@ RiBesselFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 		return 1.0f;
 
 	const float w = x2 / ( xwidth * xwidth ) + y2 / ( ywidth * ywidth );
-	if ( w >= 0.25f )
-		return 0.0f;
-
 	const float d = sqrtf( x2 + y2 );
 	return (float) (j1( d*2 )/d);
 }
