@@ -273,7 +273,7 @@ void   osTempdir(char *result, size_t resultsize) {
 	const char *tempDirEnv = osEnvironment("TMPDIR");
 	if (!tempDirEnv)
 		tempDirEnv = osEnvironment("TMP");
-	if (!tempDirEnv)
+	if (tempDirEnv != NULL)
 		snprintf(result,resultsize,"%s/PixieTemp_%d/",tempDirEnv,getpid());
 	else
 		snprintf(result,resultsize,"PixieTemp_%d/",getpid());

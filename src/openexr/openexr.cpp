@@ -35,8 +35,6 @@
 #include <string.h>
 #include <math.h>
 
-
-//#include <half.h>
 #include <ImfOutputFile.h>
 #include <ImfChannelList.h>
 #include <ImfStringAttribute.h>
