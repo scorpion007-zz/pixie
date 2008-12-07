@@ -143,6 +143,7 @@
 // Assignment (lowest)
 %right 			SL_EQUAL
 %right			SL_INCREMENT SL_DECREMENT SL_INCREMENT_BY SL_DECREMENT_BY 
+%right			SL_MULTIPLY_BY SL_DIVIDE_BY
 
 // Conditional execution
 %left			SL_QUESTION SL_COLON
@@ -158,9 +159,6 @@
 // Relation operators
 %left  			SL_COMP_EQUAL SL_COMP_DIFFERENT
 %left  			SL_COMP_GREATER SL_COMP_GREATER_EQUAL SL_COMP_LESS SL_COMP_LESS_EQUAL
-
-// Unary oprators
-%right			SL_MULTIPLY_BY SL_DIVIDE_BY
 
 // Binary operators
 %left  			SL_PLUS SL_MINUS 
@@ -385,18 +383,13 @@ slTypeDecl:
 		//
 		////////////////////////////////////////////////
 slShader:		
-		slFunction					// Normally slFunction shouldn't have any code associated with it
-		slShader					// Recursion
-		{
-			checkPoint();
-		}
-	|
-		slMain						// The main shader code
-		{
-			checkPoint();
-		}
+		slMainOrFunction
+		| 
+		slShader slMainOrFunction
 		;
 
+slMainOrFunction:
+		slMain | slFunction	;
 
 		////////////////////////////////////////////////
 		//
@@ -435,7 +428,7 @@ slFunctionHeader:
 		}
 		;
 
-slFunction:	
+slFunction:
 		slFunctionHeader
 		slFunctionParameters							// CFunction Parameter list
 		SL_CLOSE_PARANTHESIS
@@ -578,13 +571,19 @@ slMain:	slShaderType							// Type of the shader
 		SL_IDENTIFIER_VALUE						// Name of the shader
 		SL_OPEN_PARANTHESIS
 		{
-			CFunction		*mainFunction	=	sdr->newFunction(constantShaderMain);
+			if (sdr->shaderType) {
+				sdr->error("Shader file contains multiple shaders\n");
+				sdr->lastFunction			=	sdr->shaderFunction;
+			} else {
+				CFunction		*mainFunction	=	sdr->newFunction(constantShaderMain);
 
-			mainFunction->returnValue		=	NULL;
+				mainFunction->returnValue		=	NULL;
 
-			sdr->shaderName					=	strdup($2);
-			sdr->shaderType					=	$1;
-			sdr->shaderFunction				=	mainFunction;
+				sdr->shaderName				=	strdup($2);
+				sdr->shaderType				=	$1;
+				sdr->shaderFunction			=	mainFunction;
+				sdr->lastFunction			=	mainFunction;
+			}
 		}
 		slShaderParameters						// Shader Parameter list
 		SL_CLOSE_PARANTHESIS
@@ -598,8 +597,6 @@ slMain:	slShaderType							// Type of the shader
 			for (CParameter	*cParameter=cFun->parameters->first();cParameter!=NULL;cParameter=cFun->parameters->next()) {
 				sdr->variables->push(cParameter);
 			}
-
-			assert(cFun == sdr->shaderFunction);
 
 			cFun->initExpression	=	$5;
 			cFun->code				=	$8;
@@ -919,14 +916,16 @@ slStatement:
 		{
 
 			$$	=	$1;
-			assert(sdr->desired() & SLC_NONE);
+			if (!(sdr->desired() & SLC_NONE))
+				sdr->fatalbailout();
 			checkPoint();
 		}
 	|
 		slMatchedStatement
 		{
 			$$	=	$1;
-			assert(sdr->desired() & SLC_NONE);
+			if (!(sdr->desired() & SLC_NONE))
+				sdr->fatalbailout();
 			checkPoint();
 		}
 	|
@@ -934,7 +933,8 @@ slStatement:
 		{
 			// Recoverable error happened
 			$$	=	new CNullExpression;
-			assert(sdr->desired() & SLC_NONE);
+			if (!(sdr->desired() & SLC_NONE))
+				sdr->fatalbailout();
 			checkPoint();
 		}
 
@@ -1211,8 +1211,12 @@ slReturnStatement:
 
 			// Figure out what the return type is and desire it
 			CParameter	*retParam = cFun->returnValue;
-			int returnType = retParam->type;
-			sdr->desire(returnType);
+			if (retParam) {
+				int returnType = retParam->type;
+				sdr->desire(returnType);
+			} else {
+				sdr->desire(SLC_NONE);
+			}
 		}
 		slAritmeticExpression SL_SEMI_COLON
 		{
@@ -1233,9 +1237,18 @@ slReturnStatement:
 				$$	=	new CNullExpression;
 			} else {
 				if (cFun->returnValue == NULL) {
-					sdr->error("Function \"%s\" was not expecting a return value\n",cFun->symbolName);
+					if (cFun == sdr->shaderFunction)
+						sdr->warning("Shader was not expecting a return statement\n");
+					else
+						sdr->error("Function \"%s\" was not expecting a return value\n",cFun->symbolName);
 					c	=	new CNullExpression;
 				} else {
+					// Warn if the actual return type is different from the declared return type. Some type conversions
+					// (like upconvert float to vector) can be done, but may not be intended.
+					if (($3->type & (SLC_FLOAT|SLC_VECTOR|SLC_STRING|SLC_MATRIX)) 
+						!= (cFun->returnValue->type & (SLC_FLOAT|SLC_VECTOR|SLC_STRING|SLC_MATRIX)))
+						sdr->warning("Return value of function \"%s\" does not match function declaration\n",cFun->symbolName);
+						
 					// if the return type is uniform, set the return value to uniform
 					if ($3->type & SLC_UNIFORM) cFun->returnValue->type |= SLC_UNIFORM;
 					c	=	new CAssignmentExpression(cFun->returnValue,$3);
@@ -2795,6 +2808,10 @@ int	CScriptContext::compile(FILE *in,char *outName) {
 
 	slparse();
 
+	// Must have exactly one main shader function
+	if (!sdr->shaderType)
+		sdr->error("Shader file missing main shader body\n");
+
 	if (compileError == 0) {
 		char		*tmp;
 
@@ -2819,6 +2836,9 @@ int	CScriptContext::compile(FILE *in,char *outName) {
 
 
 void	yyerror(char *mes) {
-	sdr->error("Parse error\n");
+	if (yytext && yytext[0])
+		sdr->error("Parse error before '%s'\n",yytext);
+	else
+		sdr->error("Parse error\n");
 }
 

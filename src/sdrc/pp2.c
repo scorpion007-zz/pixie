@@ -182,7 +182,7 @@ docall(p,internal,internal_limit)
 							(cp != t_token)) &&
 								(! printed))
 							{
-					warning("Too many arguments for: ",
+					warning("Too many arguments for",
 								p->s_name);
 							printed = TRUE;
 							}
@@ -195,7 +195,7 @@ docall(p,internal,internal_limit)
 						if((cp == t_token) &&
 							(! printed))
 							{
-					warning("Missing argument for: ",
+					warning("Missing argument for",
 								p->s_name);
 							printed = TRUE;
 							}
@@ -204,7 +204,7 @@ docall(p,internal,internal_limit)
 						if((! done) && (pp == NULL) &&
 							(! printed))
 							{
-					warning("Too many arguments for: ",
+					warning("Too many arguments for",
 								p->s_name);
 							printed = TRUE;
 							}
@@ -231,7 +231,7 @@ docall(p,internal,internal_limit)
  */
 			if(pp != NULL)
 				{
-				warning("Too few arguments for: ",
+				warning("Too few arguments for",
 					p->s_name);
 				for(/* Empty */; pp != NULL; pp = pp->p_link)
 					fbind(&formals,pp->p_name,"");
@@ -1002,14 +1002,14 @@ dodefine(mactype)
 				{
 				if(strcmp(sy->s_body,body) != EQUAL)
 					{
-			non_fatal("Illegal redefinition of symbol: ",name);
+			non_fatal("Invalid redefinition of symbol",name);
 					}
 				unparam(pp);
 				}
 			else
 				{
 				if(strcmp(sy->s_body,body) != EQUAL)
-					warning("Redefining symbol: ",name);
+					warning("Redefining symbol",name);
 				sbind(name,body,pp);
 				}
 			}
@@ -1035,7 +1035,7 @@ doerror()
 	char			*cptr2;
 	char			msgbuf[MESSAGEBUFSIZE];
 
-	cptr1 = readline(msgbuf,MESSAGEBUFSIZE,GT_STR);
+	cptr1 = readline(msgbuf,MESSAGEBUFSIZE,GT_STR,FALSE);
 
 	if((*cptr1 == '"') && ((cptr2 = strrchr(++cptr1,'"')) != NULL))
 		{
@@ -1043,7 +1043,7 @@ doerror()
 		non_fatal(cptr1,"");
 		}
 	else
-		non_fatal("Bad parameter to \"#error\"","");
+		non_fatal(cptr1,"");
 	}
 
 /************************************************************************/
@@ -1161,7 +1161,7 @@ flookup(formals,name)
 struct	param	*
 getparams()
 	{
-	static	char		*iffmsg = "Invalid formal parameter flag: ";
+	static	char		*iffmsg = "Invalid macro parameter flag";
 
 	register int		flags;
 	register struct	param	*lh;
@@ -1180,7 +1180,7 @@ getparams()
 			if(getnstoken(GT_STR) != LETTER)
 				{
 				p = NULL;	/* For lint */
-				non_fatal("Invalid formal parameter","");
+				non_fatal("Invalid macro parameter","");
 				}
 			else
 				{
@@ -1240,7 +1240,7 @@ getparams()
 		}
 
 	if(t != ')')
-		non_fatal("Illegal or out of place token: ",Token);
+		non_fatal("Invalid or out of place token",Token);
 
 	if(lh == NULL)
 		lh = makeparam("",0);	/* Make a null parameter */
@@ -1575,7 +1575,7 @@ unsbind(sym)
 #endif	/* DEBUG */
 
 	if((s = lookup(sym,&p)) == NULL)
-		non_fatal("Symbol not defined: ",sym);
+		non_fatal("Symbol not defined",sym);
 	else
 		{
 		if(s->s_body != NULL)

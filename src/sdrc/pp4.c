@@ -386,7 +386,7 @@ gettoken(f)
 							}
 						if(t == EOF)
 							{
-						non_fatal("EOF in comment","");
+						non_fatal("Comment extends to end of file","");
 							return (EOF);
 							}
 						nt = nextch();
@@ -420,7 +420,7 @@ gettoken(f)
 						t = nextch();
 					if(t == EOF)
 						{
-						non_fatal("EOF in comment","");
+						non_fatal("Comment extends to end of file","");
 
 						return (EOF);
 						}

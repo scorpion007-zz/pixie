@@ -1344,7 +1344,7 @@ int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **v
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	displacementParameter
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
@@ -1359,7 +1359,7 @@ int		CShadingContext::displacementParameter(void *dest,const char *name,CVariabl
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	atmosphereParameter
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
@@ -1373,7 +1373,7 @@ int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	incidentParameter
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
@@ -1387,7 +1387,7 @@ int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	oppositeParameter
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
@@ -1401,7 +1401,7 @@ int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	options
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
@@ -1516,7 +1516,7 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	attributes
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:
@@ -1591,7 +1591,7 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Method				:	surfaceParameter
+// Method				:	rendererInfo
 // Description			:	Execute light sources
 // Return Value			:	-
 // Comments				:

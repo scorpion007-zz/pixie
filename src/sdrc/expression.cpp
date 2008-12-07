@@ -174,7 +174,7 @@ inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
 			} else if (exp->type & SLC_STRING) {
 				opcode	=	opcodeVUString;
 			} else {
-				assert(FALSE);
+				sdr->fatalbailout();
 			}
 
 			fprintf(out,"%s %s %s\n",opcode,dest->codeName(),cVar->codeName());
@@ -1198,7 +1198,8 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : C
 	error		=	FALSE;
 	
 	// take the container from subexpressions
-	type		|=	function->code->type & SLC_UNIFORM;
+	if (function->code)
+		type		|=	function->code->type & SLC_UNIFORM;
 	
 	// handle the parameters
 	if (p == NULL) {
@@ -3068,7 +3069,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_STRING),opcodeString,first,second);
 			}
 		} else {
-			assert(FALSE);
+			sdr->fatalbailout();
 		}
 	} else {
 		// Nop, try converting to the most general type
@@ -3098,7 +3099,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 				return	new CBinaryExpression(SLC_FLOAT,opcodeFloat,getConversion((typeOverwrite ? typeOverwrite : SLC_FLOAT),first),getConversion(SLC_FLOAT,second));
 			}
 		} else {
-			assert(FALSE);
+			sdr->fatalbailout();
 		}
 	}
 
@@ -3137,23 +3138,45 @@ CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVecto
 // Return Value			:	The converted expression
 // Comments				:
 CExpression	*getConversion(int type,CExpression *first) {
+	
+	char* firsttype = "none";
+	if (first->type & SLC_STRING)
+		firsttype = "string";
+	else if (first->type & SLC_FLOAT)
+		firsttype = "float";
+	else if (first->type & SLC_VECTOR)
+		firsttype = "vector";
+	else if (first->type & SLC_MATRIX)
+		firsttype = "matrix";
+
+	char* desttype = "none";
+	if (type & SLC_STRING)
+		desttype = "string";
+	else if (type & SLC_FLOAT)
+		desttype = "float";
+	else if (type & SLC_VECTOR)
+		desttype = "vector";
+	else if (type & SLC_MATRIX)
+		desttype = "matrix";
+	
+	char* unabletocast = "Unable to cast %s to %s\n";
 	if (type & SLC_STRING) {
 		if (first->type & SLC_STRING)	return first;
 		else {
-			sdr->error("Unable to cast a string\n");
+			sdr->error(unabletocast, firsttype, desttype);
 			delete first;
 		}
 	} else if (type & SLC_FLOAT) {
 		if (first->type & SLC_FLOAT)	return first;
 		else {
-			sdr->error("Unable to cast a float\n");
+			sdr->error(unabletocast, firsttype, desttype);
 			delete first;
 		}
 	} else if (type & SLC_VECTOR) {
 		if (first->type & SLC_VECTOR)		{ first->type |= (type & SLC_SUB_TYPE_MASK);	return first; }
 		else if (first->type & SLC_FLOAT)	return new CUnaryExpression(SLC_VECTOR | (first->type & SLC_UNIFORM) | (type & SLC_SUB_TYPE_MASK), opcodeVectorFromFloat,first);
 		else {
-			sdr->error("Unable to cast a vector\n");
+			sdr->error(unabletocast, firsttype, desttype);
 			delete first;
 		}
 	} else if (type & SLC_MATRIX) {
@@ -3161,7 +3184,7 @@ CExpression	*getConversion(int type,CExpression *first) {
 		else if (first->type & SLC_FLOAT)	return new CUnaryExpression(SLC_MATRIX | (first->type & SLC_UNIFORM),opcodeMatrixFromFloat,first);
 		else if (first->type & SLC_VECTOR)	return new CUnaryExpression(SLC_MATRIX | (first->type & SLC_UNIFORM),opcodeMatrixFromVector,first);
 		else {
-			sdr->error("Unable to cast a matrix\n");
+			sdr->error(unabletocast, firsttype, desttype);
 			delete first;
 		}
 	}
@@ -3183,6 +3206,28 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 		return;
 	}
 
+	char* firsttype = "none";
+	if (first->type & SLC_STRING)
+		firsttype = "string";
+	else if (first->type & SLC_FLOAT)
+		firsttype = "float";
+	else if (first->type & SLC_VECTOR)
+		firsttype = "vector";
+	else if (first->type & SLC_MATRIX)
+		firsttype = "matrix";
+
+	char* desttype = "none";
+	if (dest->type & SLC_STRING)
+		desttype = "string";
+	else if (dest->type & SLC_FLOAT)
+		desttype = "float";
+	else if (dest->type & SLC_VECTOR)
+		desttype = "vector";
+	else if (dest->type & SLC_MATRIX)
+		desttype = "matrix";
+	
+	char* unabletocast = "Unable to cast %s to %s\n";
+	
 	cVar	=	first->getVariable();
 
 	if (cVar == NULL) {
@@ -3193,14 +3238,14 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 			first->getCode(out,tVar);
 
 			if (dest->type & SLC_STRING) {
-				sdr->error("Unable to cast string\n");
+				sdr->error(unabletocast, firsttype, desttype);
 			} else if (dest->type & SLC_FLOAT) {
-				sdr->error("Unable to cast float\n");
+				sdr->error(unabletocast, firsttype, desttype);
 			} else if (dest->type & SLC_VECTOR) {
 				if (first->type & SLC_FLOAT)	{
 					fprintf(out,"%s\t%s %s\n",opcodeVectorFromFloat,dest->codeName(),tVar->codeName());
 				} else {
-					sdr->error("Unable to cast vector\n");
+					sdr->error(unabletocast, firsttype, desttype);
 				}
 			} else if (dest->type & SLC_MATRIX) {
 				if (first->type & SLC_FLOAT) {
@@ -3208,7 +3253,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 				} else if (first->type & SLC_VECTOR) {
 					fprintf(out,"%s\t%s %s\n",opcodeMatrixFromVector,dest->codeName(),tVar->codeName());
 				} else {
-					sdr->error("Unable to cast matrix\n");
+					sdr->error(unabletocast, firsttype, desttype);
 				}
 			}
 
@@ -3223,13 +3268,13 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 			if (first->type & SLC_STRING)	{
 				fprintf(out,"%s\t%s %s\n",opcodeMoveStringString,dest->codeName(),cVar->codeName());
 			} else {
-				sdr->error("Unable to cast string\n");
+				sdr->error(unabletocast, firsttype, desttype);
 			}
 		} else if (dest->type & SLC_FLOAT)	{
 			if (first->type & SLC_FLOAT)	{
 				fprintf(out,"%s\t%s %s\n",opcodeMoveFloatFloat,dest->codeName(),cVar->codeName());
 			} else {
-				sdr->error("Unable to cast float\n");
+				sdr->error(unabletocast, firsttype, desttype);
 			}
 		} else if (dest->type & SLC_VECTOR) {
 			if (first->type & SLC_VECTOR)	{
@@ -3237,7 +3282,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 			} else if (first->type & SLC_FLOAT)	{
 				fprintf(out,"%s\t%s %s\n",opcodeVectorFromFloat,dest->codeName(),cVar->codeName());
 			} else {
-				sdr->error("Unable to cast vector\n");
+				sdr->error(unabletocast, firsttype, desttype);
 			}
 		} else if (dest->type & SLC_MATRIX) {
 			if (first->type & SLC_MATRIX)	{
@@ -3247,7 +3292,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 			} else if (first->type & SLC_VECTOR) {
 				fprintf(out,"%s\t%s %s\n",opcodeMatrixFromVector,dest->codeName(),cVar->codeName());
 			} else {
-				sdr->error("Unable to cast matrix\n");
+				sdr->error(unabletocast, firsttype, desttype);
 			}
 		}
 	}

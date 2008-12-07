@@ -1435,10 +1435,8 @@ void			CScriptContext::generateCode(char *o) {
 		CScriptContext::error("The shader uses some functions or constructs that are not defined for its type\n");
 	}
 
-	if (compileError != 0) {
-		sdr->error("No code generated\n");
+	if (compileError != 0)
 		return;
-	}
 
 	passNo	=	0;
 	// Code generation
@@ -1446,10 +1444,8 @@ void			CScriptContext::generateCode(char *o) {
 	if (shaderFunction->initExpression != NULL)	shaderFunction->initExpression->getCode(out,NULL);
 	if (shaderFunction->code != NULL)			shaderFunction->code->getCode(out,NULL);
 
-	if (compileError != 0) {
-		sdr->error("No code generated\n");
+	if (compileError != 0)
 		return;
-	}
 
 	out		=	fopen(o,"w");
 
@@ -1659,7 +1655,7 @@ void		CScriptContext::error(char *mes,...) {
 
 	if (CScriptContext::settings & COMPILER_SUPPRESS_ERRORS) return;
 
-	sprintf(tmp,"%s(%d) : error : %s",sourceFile,statementLineNo,mes);
+	sprintf(tmp,"%s(%d) Error: %s",sourceFile,lineNo,mes);
 
 	va_start(args,mes);
 	vprintf(tmp,args);
@@ -1680,7 +1676,7 @@ void		CScriptContext::warning(char *mes,...) {
 
 	if (settings & COMPILER_SUPPRESS_WARNINGS) return;
 
-	sprintf(tmp,"%s(%d) : warning : %s",sourceFile,statementLineNo,mes);
+	sprintf(tmp,"%s(%d) Warning: %s",sourceFile,lineNo,mes);
 
 	va_start(args,mes);
 	vprintf(tmp,args);
@@ -1697,13 +1693,23 @@ void		CScriptContext::fatal(char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 
-	sprintf(tmp,"%s(%d) : fatal : %s",sourceFile,statementLineNo,mes);
+	sprintf(tmp,"%s(%d) Error: %s",sourceFile,lineNo,mes);
 
 	va_start(args,mes);
 	vprintf(tmp,args);
 	va_end(args);
 
 	exit(-1);
+}
+
+///////////////////////////////////////////////////////////////////////
+// Class				:	CScriptContext
+// Method				:	fatalbailout()
+// Description			:	Unrecoverable error
+// Return Value			:	
+// Comments				:
+void		CScriptContext::fatalbailout() {
+	fatal("Confused by earlier errors, bailing out\n");
 }
 
 ///////////////////////////////////////////////////////////////////////

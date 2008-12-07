@@ -223,7 +223,7 @@ main(argc,argv)
 					s2 = one_string;	/* Default */
 				
 				if(lookup(s,NULL) != NULL)
-					warning("Symbol already defined: ",s);
+					warning("Symbol already defined",s);
 				else
 					sbind(s,s2,NO_PARAMS);
 
@@ -325,7 +325,7 @@ main(argc,argv)
 				s = getnext(s,&argc,&argv,NO);
 
 				if(lookup(s,NULL) == NULL)
-					warning("Symbol not defined: ",s);
+					warning("Symbol not defined",s);
 				else
 					unsbind(s);
 				skip = TRUE;	/* Skip to next param */
@@ -363,7 +363,7 @@ main(argc,argv)
 			if(! inc_open(s))	/* Open input file */
 #endif	/* HOST == H_CPM */
 				{
-				fatal("Failed to open input file: ",s);
+				fatal("Failed to open input file",s);
 				}
 			ifile = TRUE;	/* Got an input file */
 			}
@@ -384,7 +384,7 @@ main(argc,argv)
 	if(! inc_open(inFile))		/* Open input file */
 #endif	/* HOST == H_CPM */
 	{
-		fatal("Failed to open input file: ",inFile);
+		fatal("Failed to open input file",inFile);
 		return FALSE;
 	}
 
@@ -418,6 +418,11 @@ main(argc,argv)
 			}
 		else if(Lastnl && (t == DIRECTIVE_CHAR))
 			{
+			// Store line in temp buffer for error messages
+			char buf[TOKENSIZE+1];
+			buf[0]=DIRECTIVE_CHAR;
+			pbcstr(readline(&buf[1],TOKENSIZE,GT_STR,FALSE));
+
 			t = getnstoken(GT_STR);
 			if(t == LETTER)
 				{
@@ -433,13 +438,13 @@ main(argc,argv)
 						}
 					}
 				else if(Ifstate == IFTRUE)
-					non_fatal("Illegal directive","");
+					non_fatal("Invalid directive",buf);
 
 				scaneol();	/* Suck till EOL ('\n' next) */
 				}
 			else if(t != '\n')
 				{
-				non_fatal("Bad directive","");
+				non_fatal("Invalid directive",buf);
 				scaneol();
 				}
 			else
@@ -483,7 +488,7 @@ main(argc,argv)
 	if(Iflevel != 0)
 		{
 		/* Unterminated #if */
-		non_fatal("Unterminated conditional","");
+		non_fatal("Unterminated #if","");
 		}
 
 	if(Verbose)
@@ -495,6 +500,7 @@ main(argc,argv)
 #endif	/* HOST == H_CPM */
 		}
 
+#if DEBUG
 	if(Verbose || Errors)
 		{
 		if(Errors)
@@ -502,6 +508,7 @@ main(argc,argv)
 		else
 			printf("\nNo errors detected\n");
 		}
+#endif
 
 #if	DEBUG
 	if(Stats)
@@ -535,7 +542,7 @@ main(argc,argv)
 	return TRUE;
 
 	if((Output != stdout) && (fclose(Output) == EOF))
-		fatal("Failed to close output file: ",Outfile);
+		fatal("Failed to close output file",Outfile);
 	exit(Eflag ? 0 : Errors);
 	}
 

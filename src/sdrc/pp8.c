@@ -83,7 +83,7 @@ eval()
 			{
 			if(Token[0] != '\n')
 				{
-				non_fatal("Expression: Invalid operator: ",
+				non_fatal("Invalid operator",
 					Token);
 				}
 			else
@@ -116,7 +116,7 @@ evaltern()
 	val_t = eval();			/* Get true-side expression */
 	if(! test(":"))
 		{
-		non_fatal("Expression: ':' expected","");
+		non_fatal("':' expected","");
 		return ((EVALINT) 0);
 		}
 	val_f = eval();			/* Get false-side expression */
@@ -332,7 +332,7 @@ evalmdr()
 			temp = evalfuns();
 			if(temp == 0)
 				{
-				non_fatal("Expression: Division by zero","");
+				non_fatal("Division by zero","");
 				val = 0;
 				}
 			else
@@ -343,7 +343,7 @@ evalmdr()
 			temp = evalfuns();
 			if(temp == 0)
 				{
-				non_fatal("Expression: Division by zero","");
+				non_fatal("Division by zero","");
 				val = 0;
 				}
 			else
@@ -387,7 +387,7 @@ evalfuns()
 
 	if(test("sizeof"))
 		{
-		non_fatal("Expression: sizeof() not allowed","");
+		non_fatal("sizeof() not allowed","");
 
 		while(((t = getnstoken(GT_STR)) != ')') &&
 			(t != '\n') && (t != EOF))
@@ -405,7 +405,7 @@ evalfuns()
 
 			if(pflag && (getnstoken(GT_STR) != ')'))
 				{
-				non_fatal("Expression: Missing ')'","");
+				non_fatal("Missing ')'","");
 				pbstr(Token);
 				}
 
@@ -416,14 +416,14 @@ evalfuns()
 		else if(t == EOF)
 			end_of_file();
 
-		non_fatal("Expression: Not an identifier: ",Token);
+		non_fatal("Not an identifier",Token);
 		return ((EVALINT) FALSE);
 		}
 	else if(test("_isstring"))
 		{
 		rv = FALSE;
 		if(! test("("))
-			non_fatal("Expression: Missing '('","");
+			non_fatal("Missing '('","");
 		else
 			{
 			if(item(getnstoken,GT_STR) && (Token[0] == '"'))
@@ -441,7 +441,7 @@ evalfuns()
 				}
 			if(t != ')')
 				{
-				non_fatal("Expression: Missing ')'","");
+				non_fatal("Missing ')'","");
 				if(t == EOF)
 					end_of_file();
 				pbstr(Token);
@@ -453,7 +453,7 @@ evalfuns()
 		{
 		rv = 1;
 		if(! test("("))
-			non_fatal("Expression: Missing '('","");
+			non_fatal("Missing '('","");
 		else
 			{
 			if(item(getnstoken,GT_STR) && (Token[0] != '"'))
@@ -472,7 +472,7 @@ evalfuns()
 					}
 				if(t != ')')
 					{
-					non_fatal("Expression: Missing ')'",
+					non_fatal("Missing ')'",
 						"");
 					if(t == EOF)
 						end_of_file();
@@ -530,7 +530,7 @@ evalfuns()
 						}
 					if(t != ')')
 						{
-				non_fatal("Expression: Missing ')'","");
+				non_fatal("Missing ')'","");
 						if(t == '\n')
 							pushback('\n');
 						else if(t == EOF)
@@ -612,7 +612,7 @@ evalval()
 		{
 		val = evaltern();	/* Get deeper expression */
 		if(! test(")"))
-			non_fatal("Expression: Mismatched \"()\"","");
+			non_fatal("Mismatched \"()\"","");
 		}
 	else if(test("'"))		/* Quoted character constant ? */
 		{
@@ -642,7 +642,7 @@ evalval()
 				{
 				if(c == '\n')
 					{
-				non_fatal("Expression: EOL in '' constant","");
+				non_fatal("EOL in '' constant","");
 					break;
 					}
 				else if(c == EOF)
@@ -651,7 +651,7 @@ evalval()
 					val = val * 8 + c - '0';  /* Add in */
 				else
 					{
-			non_fatal("Expression: Illegal octal digit","");
+			non_fatal("Invalid octal digit","");
 					break;
 					}
 				}
@@ -666,7 +666,7 @@ evalval()
 				{
 				if(c == '\n')
 					{
-				non_fatal("Expression: EOL in '' constant","");
+				non_fatal("EOL in '' constant","");
 					break;
 					}
 				else if(c == EOF)
@@ -675,19 +675,19 @@ evalval()
 					val = val * 16 + hexbin(c);
 				else
 					{
-			non_fatal("Expression: Illegal hex digit","");
+			non_fatal("Invalid hex digit","");
 					break;
 					}
 				}
 			pushback(c);
 			break;
 		default:
-			non_fatal("Expression: Illegal character escape","");
+			non_fatal("Invalid character escape","");
 			break;
 				}
 			}
 		if(! test("'"))
-			non_fatal("Expression: Mismatched apostrophes","");
+			non_fatal("Mismatched apostrophes","");
 		}
 	else
 		{
@@ -728,7 +728,7 @@ evalval()
 					}
 				if(*p != '\0')
 					{
-					non_fatal("Expression: Bad operand: ",
+					non_fatal("Bad operand",
 						Token);
 					}
 				}
@@ -737,14 +737,14 @@ evalval()
 				/* #if of undef'd id OK */
 				if(! istype(Token[0] & 0xFF,C_L))
 					{
-			non_fatal("Expression: Expected operand: ",Token);
+			non_fatal("Expected operand",Token);
 					}
 				return ((EVALINT) 0);
 				}
 			}
 		else
 			{
-			non_fatal("Expression: Expected operand: ",Token);
+			non_fatal("Expected operand",Token);
 			return ((EVALINT) 0);
 			}
 		}
@@ -880,7 +880,7 @@ match(tbuf,str)
 			{
 			/* Build token */
 			t = addstr(t,&tbuf[TOKENSIZE],
-				"Expression: Token too long",Token);
+				"Token too long",Token);
 
 			s += strlen(Token);	/* Move past matched part */
 			if(*s == '\0')

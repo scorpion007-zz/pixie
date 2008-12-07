@@ -111,7 +111,7 @@ dopragma()
 /*
  *	Expand macros...
  */
-		puttoken(readline(pragbuf,PRAGBUFSIZE,GT_STR));
+		puttoken(readline(pragbuf,PRAGBUFSIZE,GT_STR,TRUE));
 		}
 	}
 
@@ -157,7 +157,7 @@ pragasm(asmtype)
 void
 pragendm()
 	{
-	non_fatal("\"#pragma endmacro\" illegal outside macro","");
+	non_fatal("\"#pragma endmacro\" not allowed outside macro","");
 	}
 
 /************************************************************************/
@@ -173,7 +173,7 @@ pragerror()
 	{
 	char			msgbuf[MESSAGEBUFSIZE];
 
-	non_fatal(readline(msgbuf,MESSAGEBUFSIZE,GT_STR),"");
+	non_fatal(readline(msgbuf,MESSAGEBUFSIZE,GT_STR,FALSE),"");
 	}
 
 /************************************************************************/
@@ -192,9 +192,9 @@ pragmsg()
 	{
 	char			msgbuf[MESSAGEBUFSIZE];
 
-	printf("<%s> @ %u: MESSAGE: %s\n",
+	printf("%s(%u): MESSAGE: %s\n",
 		Filestack[Filelevel >= 0 ? Filelevel : 0]->f_name,LLine,
-			readline(msgbuf,MESSAGEBUFSIZE,GT_STR));
+			readline(msgbuf,MESSAGEBUFSIZE,GT_STR,FALSE));
 	}
 
 /************************************************************************/

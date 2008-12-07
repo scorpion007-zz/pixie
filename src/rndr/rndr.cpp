@@ -131,7 +131,6 @@ void	printVersion() {
 // Comments				:
 void	printUsage() {
 	printf("Usage: rndr <options> file.rib [file.rib ...]\n");	
-	printf("To read from STDIN specify \"-\" as the filename.\n");
 	printf("Listing several RIB files concatenates them before rendering.\n");	
 	printf("\nOptions:\n");
 	printf("  -f <range>      Render only a subsequence of frames\n");
@@ -712,11 +711,9 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
-	// Require input RIB
-	if (source == NULL)	{
-		fprintf(stderr,"no input files\n");
-		exit(0);		
-	};
+	// Read from STDIN if no source given
+	if (source == NULL)
+		source = strdup("-");
 	
 	// Validate option combinations
 	if ((client | server | localserver) && (client ^ server ^ localserver) == 0) {

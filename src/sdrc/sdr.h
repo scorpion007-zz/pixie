@@ -381,6 +381,7 @@ public:
 	void				error(char *,...);								// Compiler error
 	void				warning(char *,...);							// Compiler warning
 	void				fatal(char *,...);								// Fatal compiler error
+	void				fatalbailout();									// Fatal compiler error, standard error message
 
 	void				desire(int);									// Desire a particular type
 	int					undesire();										// Return back to the previous desired type

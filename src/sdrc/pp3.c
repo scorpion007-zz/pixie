@@ -169,13 +169,13 @@ doinclude()
 #endif	/* DEBUG */
 	if(Filelevel >= FILESTACKSIZE)
 		{
-		non_fatal("Include file stack overflow","");
+		non_fatal("Too many include files","");
 		return;
 		}
 /*
  *	Read line and process any macros encountered.
  */
-	pbcstr(readline(buf,TOKENSIZE,GT_ANGLE));
+	pbcstr(readline(buf,TOKENSIZE,GT_ANGLE,TRUE));
 
 	while(istype((c = getchn()),C_W))
 		;
@@ -201,7 +201,7 @@ doinclude()
 
 		if(incf >= &incfile[FILENAMESIZE])
 			{
-			non_fatal("Include file name too long","");
+			non_fatal("Include filename too long","");
 			return;
 			}
 		else
@@ -215,7 +215,7 @@ doinclude()
 		*incf = '\0';
 	else
 		{
-		non_fatal("Illegal file name","");
+		non_fatal("Invalid filename","");
 		return;
 		}
 
@@ -267,14 +267,14 @@ doinclude()
 				user = atoi(p);
 				if((user < 0) || (user > 31))
 					{
-					non_fatal("Illegal user number","");
+					non_fatal("Invalid user number","");
 					return;
 					}
 				}
 			}
 		else
 			{
-			non_fatal("Illegal disk drive specifier","");
+			non_fatal("Invalid disk drive specifier","");
 			return;
 			}
 
@@ -312,7 +312,7 @@ doinclude()
 #endif	/* HOST == H_CPM */
 
 	if(! ok)
-		non_fatal("Failed to open include file: ",incfile);
+		non_fatal("Failed to open include file",incfile);
 	pushback('\n');
 
 	/* Let token scanner see first things on line */
@@ -337,7 +337,7 @@ doline()
 /*
  *	Read line and process any macros encountered.
  */
-	pbcstr(readline(buf,TOKENSIZE,GT_STR));
+	pbcstr(readline(buf,TOKENSIZE,GT_STR,TRUE));
 
 	while(istype((c = getchn()),C_W))
 		;
@@ -714,7 +714,7 @@ init_path()
 				if(inum == Ipcnt)
 					{
 					/* Didn't find any -- give error msg */
-				warning("Bad format on include path file: ",
+				warning("Bad format on include path file",
 						PATHFILE);
 /* Use default path */			Ipath[inum++] = DFLT_PATH;
 					}
@@ -726,7 +726,7 @@ init_path()
 
 		if(fclose(pf) == EOF)
 			{
-			non_fatal("Failed to close include path file: ",
+			non_fatal("Failed to close include path file",
 				PATHFILE);
 			}
 		}
@@ -792,7 +792,7 @@ popfile()
 #else	/* !PP_SYSIO */
 	if(fclose((f = Filestack[Filelevel])->f_file) == EOF)
 #endif	/* PP_SYSIO */
-		non_fatal("Failed to close input/include file: ",f->f_name);
+		non_fatal("Failed to close file",f->f_name);
 
 	free((char *)f);		/* Free the entry */
 
@@ -827,15 +827,16 @@ popfile()
 /*									*/
 /*	readline							*/
 /*									*/
-/*	Read and edit a line into buffer with macro expansion.		*/
+/*	Read and edit a line into buffer with optional macro expansion.		*/
 /*									*/
 /************************************************************************/
 
 char	*
-readline(buf,bufsize,flags)
+readline(buf,bufsize,flags,doexpand)
 	register char		*buf;
 	register int		bufsize;
 	register int		flags;
+	int					doexpand;
 	{
 	static	char		rbo[] = "Read buffer overflow";
 
@@ -848,7 +849,7 @@ readline(buf,bufsize,flags)
 		if(t == EOF)
 			end_of_file();
 		if((t == LETTER) && ((sy = lookup(Token,NULL)) != NULL) &&
-			(sy->disable != TRUE))
+			(sy->disable != TRUE) && (doexpand == TRUE))
 			{
 			bufp = docall(sy,bufp,&buf[bufsize - 1]);
 			}

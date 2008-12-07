@@ -90,7 +90,7 @@ CFileFramebuffer()
 		gain			=	1;
 	}
 	
-	// Camera to world matrix
+	// World to screen matrix
 	if ((tmp = (float *) findParameter("NP",FLOAT_PARAMETER,16))) {
 		int	i;
 		
@@ -99,7 +99,7 @@ CFileFramebuffer()
 		}
 	}
 	
-	// Camera to world matrix
+	// World to Camera matrix
 	if ((tmp = (float *) findParameter("Nl",FLOAT_PARAMETER,16))) {
 		int	i;
 		
@@ -144,13 +144,34 @@ CFileFramebuffer()
 	pixelSize	=	numSamples*bitspersample / 8;
 	
 	// The default compression is LZW
-	if (compression == NULL || strcmp(compression,"LZW") == 0) {
-			TIFFSetField(image, TIFFTAG_COMPRESSION,	COMPRESSION_LZW);
-	} else if (strcmp(compression,"JPEG") == 0) {
-		TIFFSetField(image, TIFFTAG_COMPRESSION,	COMPRESSION_JPEG);
-	} else if (strcmp(compression,"Deflate") == 0) {
-		TIFFSetField(image, TIFFTAG_COMPRESSION,	COMPRESSION_DEFLATE);
+	ttag_t tiffcompression = COMPRESSION_LZW;
+	if (compression == NULL)
+		tiffcompression = COMPRESSION_LZW;
+	else if (strcmp(compression,"LZW") == 0 || strcmp(compression,"lzw") == 0)
+		tiffcompression = COMPRESSION_LZW;
+	else if (strcmp(compression,"JPEG") == 0 || strcmp(compression,"jpeg") == 0 || strcmp(compression,"jpg") == 0)
+		tiffcompression = COMPRESSION_JPEG;
+	else if (strcmp(compression,"Deflate") == 0 || strcmp(compression,"deflate") == 0 || strcmp(compression,"zip") == 0)
+		tiffcompression = COMPRESSION_ADOBE_DEFLATE;
+	else if (strcmp(compression,"none") == 0)
+		tiffcompression = COMPRESSION_NONE;
+	
+	// Check codec availability in libtiff
+	if (tiffcompression != COMPRESSION_NONE && !TIFFIsCODECConfigured(tiffcompression)) {
+		if (TIFFIsCODECConfigured(COMPRESSION_LZW))
+			tiffcompression = COMPRESSION_LZW;
+		else
+			tiffcompression = COMPRESSION_NONE;
 	}
+	TIFFSetField(image, TIFFTAG_COMPRESSION, tiffcompression);
+	
+	if (tiffcompression == COMPRESSION_LZW || tiffcompression == COMPRESSION_DEFLATE 
+		|| tiffcompression == COMPRESSION_ADOBE_DEFLATE || tiffcompression == COMPRESSION_PIXARLOG ) {
+		ttag_t predictor = PREDICTOR_HORIZONTAL;
+		if (sampleformat == SAMPLEFORMAT_IEEEFP)
+			predictor = PREDICTOR_FLOATINGPOINT;
+		TIFFSetField(image, TIFFTAG_PREDICTOR, predictor);
+	}		
 	
 	if (numSamples == 1)
 		TIFFSetField(image, TIFFTAG_PHOTOMETRIC,	PHOTOMETRIC_MINISBLACK);

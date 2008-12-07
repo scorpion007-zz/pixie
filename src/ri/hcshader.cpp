@@ -71,7 +71,7 @@ CSphereLight::~CSphereLight() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	illuminate
-// Description			:	Called chen we need to illuminate a point
+// Description			:	Called when we need to illuminate a point
 // Return Value			:	-
 // Comments				:
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {

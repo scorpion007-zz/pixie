@@ -48,7 +48,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// Shading language functions ... (implemented in interpreter.cpp)
+// Shading language functions ... (implemented in execute.cpp)
 #define	saveLighting(a)						scripterror("Invalid environment function call during init\n")
 #define clearLighting()						scripterror("Invalid environment function call during init\n")
 #define enterLightingConditional()			scripterror("Invalid environment function call during init\n")
