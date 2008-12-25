@@ -1099,7 +1099,6 @@ CScriptContext::CScriptContext(int s) {
 // Comments				:		
 CScriptContext::~CScriptContext() {
 	char		*str;
-	TSearchpath	*cPath,*nPath;
 
 	delete		rootFunction;
 
@@ -1108,15 +1107,6 @@ CScriptContext::~CScriptContext() {
 
 	delete functionStack;							// Delete the function stack
 	delete runtimeFunctionStack;					// Delete the function stack
-
-	if (sourceFile != NULL) free(sourceFile);
-
-	for (cPath=dsoPath;cPath!=NULL;) {
-		nPath	=	cPath->next;
-		free(cPath->directory);
-		delete cPath;
-		cPath	=	nPath;
-	}
 
 	while((str = allocatedStrings->pop()) != NULL)	// Delete the allocated stings
 		free(str);

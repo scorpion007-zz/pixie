@@ -183,6 +183,7 @@
 %type<integer>		slMatrixSpecifier
 %type<integer>		slStringSpecifier
 %type<integer>		slTypeSpecifier
+%type<real>			slFloatValue
 %type<code>			slFunctionParameters
 %type<code>			slFunctionParameter
 %type<code>			slFunctionParameterIdentifierList
@@ -360,6 +361,26 @@ slTypeSpecifier:
 				$$	=	$1;
 			}
 			;
+			
+slFloatValue:	slAritmeticExpression
+			{
+				$$	=	0;
+				
+				// Is this a float type?
+				if ($1->type & SLC_FLOAT) {
+					char	tmp[256];
+					
+					// Is this a simple expression?
+					if ($1->value(tmp)) {
+					
+						// Yes, convert it to float
+						$$	=	atof(tmp);
+					} else
+						sdr->error("Expecting a simple float argument\n");
+				} else
+					sdr->error("Expecting a float argument\n");
+			}
+			;
 
 slTypeDecl:
 			slInheritanceClass
@@ -532,10 +553,10 @@ slFunctionParameterIdentifierList:
 	|
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
+		slFloatValue
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));			
+			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, (int) $3);			
 		}
 		SL_COMMA
 		slFunctionParameterIdentifierList
@@ -554,10 +575,10 @@ slFunctionParameterIdentifierList:
 	|
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
+		slFloatValue
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, atoi($3));
+			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_ARRAY, (int) $3);
 			
 			$$	=	new CNullExpression;
 		}
@@ -732,11 +753,11 @@ slShaderParameterIdentifierToken:
 	|
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
+		slFloatValue
 		SL_CLOSE_SQR_PARANTHESIS
 		SL_COMMA
 		{
-			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,atoi($3));
+			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,(int) $3);
 
 			sdr->variableList->push(cParameter);
 		}
@@ -747,10 +768,10 @@ slShaderParameterIdentifierToken:
 	|
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
+		slFloatValue
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,atoi($3));
+			CParameter	*cParameter	=	sdr->newParameter($1,sdr->desired() | SLC_PARAMETER | SLC_ARRAY,(int) $3);
 
 			sdr->variableList->push(cParameter);
 		}
@@ -865,10 +886,10 @@ slVariableIdentifierList:
 		
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
+		slFloatValue
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,atoi($3));
+			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,(int) $3);
 
 			sdr->variableList->push(cVar);
 		}
@@ -879,10 +900,10 @@ slVariableIdentifierList:
 	|
 		SL_IDENTIFIER_VALUE
 		SL_OPEN_SQR_PARANTHESIS
-		SL_FLOAT_VALUE
+		slFloatValue
 		SL_CLOSE_SQR_PARANTHESIS
 		{
-			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,atoi($3));
+			CVariable	*cVar	=	sdr->newVariable($1,sdr->desired() | SLC_ARRAY,(int) $3);
 
 			sdr->variableList->push(cVar);
 		}

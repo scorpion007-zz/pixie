@@ -322,7 +322,7 @@ int main(int argc, char* argv[]) {
 				currentCompiler->dsoPath	=	dsoPath;
 
 				// Compile the file
-				currentCompiler->sourceFile	=	strdup(sourceFile);
+				currentCompiler->sourceFile	=	sourceFile;
 				currentCompiler->compile(in,outName);
 
 				// Ditch the compiler
@@ -338,6 +338,14 @@ int main(int argc, char* argv[]) {
 	osDeleteDir(tempdir);
 			free(sourceFile);
 	delete sourceFiles;
+	
+	TSearchpath	*cPath,*nPath;
+	for (cPath=dsoPath;cPath!=NULL;) {
+		nPath	=	cPath->next;
+		free(cPath->directory);
+		delete cPath;
+		cPath	=	nPath;
+	}
 
 	return error;
 }
