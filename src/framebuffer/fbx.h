@@ -83,7 +83,6 @@ private:
 	Window					xcanvas;
 	Display					*display;
 	int						screen;
-	pthread_mutex_t			mutex;
 	GC						image_gc;
 	XImage					*xim;
 	Atom					WM_DELETE_WINDOW;
