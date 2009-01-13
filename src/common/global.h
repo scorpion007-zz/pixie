@@ -47,7 +47,7 @@
 #ifndef GLOBAL_H
 #define	GLOBAL_H
 
-// The Pixie version
+// The Pixie version 
 #define	VERSION_RELEASE	2
 #define	VERSION_BETA	2
 #define	VERSION_ALPHA	5

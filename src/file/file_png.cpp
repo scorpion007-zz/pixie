@@ -30,6 +30,7 @@
 //							Gamma is stored in the metadata and does not change pixel values
 //
 ////////////////////////////////////////////////////////////////////////
+#include "common/global.h"
 
 #ifdef HAVE_LIBPNG
 
