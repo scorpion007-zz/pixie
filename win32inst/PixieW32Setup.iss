@@ -48,7 +48,8 @@ Source: ..\bin\libpng13.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\zlib1.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\libmmd.dll; DestDir: {app}\bin; Components: main
-Source: ..\bin\msvcr90.dll; DestDir: {app}\bin; Components: main
+; Distribute the shared assemblies
+Source: ..\bin\vcredist_x86.exe; DestDir: {app}; Flags: deleteafterinstall;
 ; Distribute the executables
 Source: ..\bin\*.exe; DestDir: {app}\bin; Components: main
 ; Distribute the display drivers
@@ -72,6 +73,9 @@ Source: ..\doc\*.*; DestDir: {app}\html; Components: documentation; Flags: recur
 ; Distribute the shaders
 Source: ..\shaders\*.sdr; DestDir: {app}\shaders; Components: content
 Source: ..\shaders\*.sl; DestDir: {app}\shaders; Components: content
+
+[Run]
+Filename: "{app}\vcredist_x86.exe"; Parameters: "/q:a"; StatusMsg: "Installing shared assemblies..."
 
 [Components]
 Name: main; Description: Pixie Renderer; Types: Custom Compact Full FullU
