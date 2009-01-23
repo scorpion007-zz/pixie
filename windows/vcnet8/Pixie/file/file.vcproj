@@ -46,7 +46,7 @@
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
+				PreprocessorDefinitions="HAVE_LIBPNG;WIN32;_DEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libtiff.lib libjpeg.lib zlib.lib"
+				AdditionalDependencies="libpngd.lib libtiff.lib libjpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"
@@ -222,7 +222,7 @@
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\..\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
+				PreprocessorDefinitions="HAVE_LIBPNG;WIN32;NDEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -242,7 +242,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libtiff.lib libjpeg.lib zlib.lib"
+				AdditionalDependencies="libpng.lib libtiff.lib libjpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"

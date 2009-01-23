@@ -59,7 +59,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 	int len = strlen(name);
 	if ( 
 		 // Name contains "png" and type is not specifically "tiff"
-		 ( (len > 4 && strcasecmp(&name[len-4],".png")==0) && ( type && strcmp(type, "tiff") != 0 ) )
+		 ( (len > 4 && strcmp(&name[len-4],".png")==0) && ( type && strcmp(type, "tiff") != 0 ) )
 		 // or type is specifically "png"
 		 || (type && strcmp(type, "png") == 0 ) ) {
 		fb = new CFileFramebufferPNG(name,width,height,numSamples,samples,findParameter);

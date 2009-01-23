@@ -166,7 +166,7 @@ CFileFramebuffer()
 	scanlineUsage	=	new int[height];
 	
 	for (i=0;i<height;i++) {
-		scanlines[i]		=	NULL;
+		scanlines[i]		=	NULL; 
 		scanlineUsage[i]	=	width;
 	}
 	
@@ -186,7 +186,7 @@ CFileFramebuffer()
 // Description			:	Dtor
 // Return Value			:	-
 // Comments				:
-CFileFramebufferPNG::~CFileFramebuffer() {
+CFileFramebufferPNG::~CFileFramebufferPNG() {
 	int	i;
 	
 	if (fhandle == NULL)
