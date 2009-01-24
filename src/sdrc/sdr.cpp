@@ -1637,7 +1637,7 @@ void		CScriptContext::enumerateDso(char *name) {
 // Description			:	Print an CScriptContext::error message and terminate
 // Return Value			:
 // Comments				:
-void		CScriptContext::error(char *mes,...) {
+void		CScriptContext::error(const char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 
@@ -1658,7 +1658,7 @@ void		CScriptContext::error(char *mes,...) {
 // Description			:	Print a warning message
 // Return Value			:	
 // Comments				:
-void		CScriptContext::warning(char *mes,...) {
+void		CScriptContext::warning(const char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 
@@ -1679,7 +1679,7 @@ void		CScriptContext::warning(char *mes,...) {
 // Description			:	Unrecoverable error
 // Return Value			:	
 // Comments				:
-void		CScriptContext::fatal(char *mes,...) {
+void		CScriptContext::fatal(const char *mes,...) {
 	char	tmp[1024];
 	va_list	args;
 

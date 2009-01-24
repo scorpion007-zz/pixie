@@ -40,7 +40,7 @@
 #include "rendererContext.h"
 
 int							iflex(void );		// Forward definition for stupid yacc
-void						iferror(char *,...);
+void						iferror(const char *,...);
 
 static	CRendererContext	*context	=	NULL;
 static	int					silent		=	FALSE;
@@ -602,7 +602,7 @@ int		CRendererContext::ifParse(const char *expr) {
 // Description			:	Count the parse errors
 // Return Value			:
 // Comments				:
-void	iferror(char *,...) {
+void	iferror(const char *,...) {
 	// What do we do in the case of an error ?
 	warning(CODE_BADTOKEN,"Condition parse error\n");
 }

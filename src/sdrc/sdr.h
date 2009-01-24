@@ -378,9 +378,9 @@ public:
 
 	void				enumerateDso(char *);							// Find a DSO and add it into the library
 
-	void				error(char *,...);								// Compiler error
-	void				warning(char *,...);							// Compiler warning
-	void				fatal(char *,...);								// Fatal compiler error
+	void				error(const char *,...);						// Compiler error
+	void				warning(const char *,...);						// Compiler warning
+	void				fatal(const char *,...);						// Fatal compiler error
 	void				fatalbailout();									// Fatal compiler error, standard error message
 
 	void				desire(int);									// Desire a particular type

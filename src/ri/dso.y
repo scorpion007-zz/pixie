@@ -36,7 +36,7 @@
 #include "ri_config.h"
 
 int								dsolex(void );				// Forward definition for stupid yacc
-void							dsoerror(char *,...);
+void							dsoerror(const char *,...);
 
 static	char					nameBuffer[256];
 static	char					prototypeBuffer[256];
@@ -173,7 +173,7 @@ int		dsoParse(const char *decl,char *&name,char *&prototype) {
 // Description			:	Count the parse errors
 // Return Value			:
 // Comments				:
-void	dsoerror(char *,...) {
+void	dsoerror(const char *,...) {
 	numErrors++;
 }
 

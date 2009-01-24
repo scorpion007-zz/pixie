@@ -52,7 +52,7 @@ public:
 	virtual				~CTextureInfoBase() { }
 	
 	virtual void		getResolution(float *dest)			= 0;
-	virtual char* 		getTextureType()					= 0;
+	virtual const char	*getTextureType()					= 0;
 	virtual int 		getNumChannels()					= 0;
 	virtual int 		getViewMatrix(float *dest)			= 0;
 	virtual int 		getProjectionMatrix(float *dest)	= 0;
@@ -79,7 +79,7 @@ public:
 	
 	// textureinfo support
 	void				getResolution(float *r)		{ r[0] = 0; r[1] = 0; }
-	char* 				getTextureType()			{ return "texture"; }
+	const char			*getTextureType()			{ return "texture"; }
 	int 				getNumChannels()			{ return 0; }
 	int 				getViewMatrix(float*)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
@@ -106,7 +106,7 @@ public:
 	
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = 0; r[1] = 0; }
-	char* 				getTextureType()			{ return "environment"; }
+	const char			*getTextureType()			{ return "environment"; }
 	int 				getNumChannels()			{ return 0; }
 	int 				getViewMatrix(float*)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }

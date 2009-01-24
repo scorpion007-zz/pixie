@@ -64,7 +64,7 @@
 %{
 // Some forward definitions
 		int						riblex(ribval*);				// Forward definition for stupid yacc
-		void					riberror(char *,...);
+		void					riberror(const char *,...);
 
 // Types for the data encountered in the rib file
 // Note that there's no type for integer as they are recovered from floats
@@ -2843,7 +2843,7 @@ static	int		ribStep		=	5*(1<<10);	// Parse 5 KB at a time
 // Description			:	Parser error file
 // Return Value			:	-
 // Comments				:
-void	riberror(char *s,...) {
+void	riberror(const char *s,...) {
 	warning(CODE_BADFILE,"RIB Parse error\n");
 }
 

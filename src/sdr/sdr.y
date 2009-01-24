@@ -42,7 +42,7 @@
 
 
 // Some forward definitions
-		void							sdrerror(char *);			// Forward definition for stupid yacc
+		void							sdrerror(const char *);		// Forward definition for stupid yacc
 		int								sdrlex(void );				// Forward definition for stupid yacc
 
 
@@ -1284,7 +1284,7 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-void			sdrerror(char *s) {
+void			sdrerror(const char *s) {
 	fprintf(stdout,"%s\n",s);
 }
 

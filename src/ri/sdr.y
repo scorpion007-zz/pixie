@@ -47,7 +47,7 @@
 
 
 // Some forward definitions
-		void							slerror(char *);			// Forward definition for stupid yacc
+		void							slerror(const char *);		// Forward definition for stupid yacc
 		int								sllex(void );				// Forward definition for stupid yacc
 
 		const	char					*initLabel	=	"#!Init";	// The label for the init
@@ -2052,7 +2052,7 @@ int	slLineno	=	0;
 // Description			:	Parser error function
 // Return Value			:
 // Comments				:
-void	slerror(char *s) {
+void	slerror(const char *s) {
 	warning(CODE_BADFILE,"Error in shader \"%s\" (%d) (\"%s\") (v%d.%d.%d)\n",currentData.name,slLineno,s,VERSION_RELEASE,VERSION_BETA,VERSION_ALPHA);
 	currentData.numErrors++;
 }

@@ -39,7 +39,7 @@
 #include	"ri_config.h"
 
 // Some forward definitions
-		void							varerror(char *);			// Forward definition for stupid yacc
+		void							varerror(const char *);		// Forward definition for stupid yacc
 		int								varlex(void );				// Forward definition for stupid yacc
 
 		static							CVariable		*currentVariable;
@@ -211,7 +211,7 @@ varItems:	VAR_OPEN
 
 static	int	numErrors	=	0;
 
-void	varerror(char *str) {
+void	varerror(const char *str) {
 	//error(CODE_BADTOKEN,"Variable declaration error \"%s\" \"%s\"\n",(currentName == NULL ? "NULL" : currentName),currentDecl);
 	numErrors++;
 }

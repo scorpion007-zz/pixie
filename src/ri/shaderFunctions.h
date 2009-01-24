@@ -1312,7 +1312,7 @@ DEFFUNC(RendererinfoM				,"rendererinfo"				,"f=SM"		,PARAMETEREXPR_PRE(0),PARAM
 								_t					op3;											\
 								float				found;											\
 								float				out[16*2];										\
-								char				*outS;											\
+								const char			*outS;											\
 								_t					src = (_t) out;									\
 								int					op3sz;											\
 																									\

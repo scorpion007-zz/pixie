@@ -71,10 +71,10 @@ typedef enum {
 } EErrorCode;
 
 
-void	error(EErrorCode,char *,...);
-void	warning(EErrorCode,char *,...);
-void	fatal(EErrorCode,char *,...);
-void	info(EErrorCode,char *,...);
+void	error(EErrorCode,const char *,...);
+void	warning(EErrorCode,const char *,...);
+void	fatal(EErrorCode,const char *,...);
+void	info(EErrorCode,const char *,...);
 
 #endif
 

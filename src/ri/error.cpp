@@ -157,7 +157,7 @@ static	int	translate(EErrorCode c) {
 // Description			:	Generate an error message
 // Return Value			:
 // Comments				:
-void	error(EErrorCode code,char *mes,...) {
+void	error(EErrorCode code,const char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
 
@@ -173,7 +173,7 @@ void	error(EErrorCode code,char *mes,...) {
 // Description			:	Generate a warning message
 // Return Value			:
 // Comments				:
-void	warning(EErrorCode code,char *mes,...) {
+void	warning(EErrorCode code,const char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
 
@@ -189,7 +189,7 @@ void	warning(EErrorCode code,char *mes,...) {
 // Description			:	Generate a fatal message
 // Return Value			:
 // Comments				:
-void	fatal(EErrorCode code,char *mes,...) {
+void	fatal(EErrorCode code,const char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
 
@@ -206,7 +206,7 @@ void	fatal(EErrorCode code,char *mes,...) {
 // Description			:	Generate an info message
 // Return Value			:
 // Comments				:
-void	info(EErrorCode code,char *mes,...) {
+void	info(EErrorCode code,const char *mes,...) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 	va_list	args;
 
