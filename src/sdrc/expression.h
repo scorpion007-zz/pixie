@@ -190,13 +190,13 @@ public:
 // Comments				:
 class	CBinaryExpression : public CExpression {
 public:
-						CBinaryExpression(int,char *,CExpression *,CExpression *);
+						CBinaryExpression(int,const char *,CExpression *,CExpression *);
 						~CBinaryExpression();
 
 			void		getCode(FILE *,CVariable *);
 
 			CExpression	*first,*second;
-			char		*opcode;
+			const char	*opcode;
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -205,13 +205,13 @@ public:
 // Comments				:
 class	CUnaryExpression : public CExpression {
 public:
-						CUnaryExpression(int,char *,CExpression *);
+						CUnaryExpression(int,const char *,CExpression *);
 						~CUnaryExpression();
 
 			void		getCode(FILE *,CVariable *);
 
 			CExpression	*first;
-			char		*opcode;
+			const char	*opcode;
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -220,14 +220,14 @@ public:
 // Comments				:
 class	CSysConversionExpression : public CExpression {
 public:
-						CSysConversionExpression(int,char *,char *,CExpression *);
+						CSysConversionExpression(int,const char *,const char *,CExpression *);
 						~CSysConversionExpression();
 
 			void		getCode(FILE *,CVariable *);
 			int			value(char *);
 
 			CExpression	*first;
-			char		*opcode;
+			const char	*opcode;
 			char		*system;
 };
 
@@ -353,14 +353,14 @@ public:
 // Comments				:
 class	CUpdateExpression : public CExpression {
 public:
-						CUpdateExpression(CVariable *,char *,char *,int,CExpression *);
+						CUpdateExpression(CVariable *,const char *,const char *,int,CExpression *);
 						~CUpdateExpression();
 
 			void		getCode(FILE *,CVariable *);
 
 			CVariable	*first;
 			CExpression	*second;
-			char		*opcodeFloat,*opcodeVector;
+			const char	*opcodeFloat,*opcodeVector;
 			int			pre;
 };
 
@@ -438,14 +438,14 @@ public:
 // Comments				:
 class	CIlluminateSolar : public CExpression {
 public:
-						CIlluminateSolar(char *,char *,CExpression *,CExpression *,CExpression *,CExpression *);
+						CIlluminateSolar(const char *,const char *,CExpression *,CExpression *,CExpression *,CExpression *);
 						~CIlluminateSolar();
 
 			void		getCode(FILE *,CVariable *);
 
 			CExpression	*P,*N,*angle;
 			CExpression	*body;
-			char		*beginOpcode,*endOpcode;
+			const char	*beginOpcode,*endOpcode;
 };
 
 
@@ -456,7 +456,7 @@ public:
 // Comments				:
 class	CFixedExpression : public CExpression {
 public:
-						CFixedExpression(char *);
+						CFixedExpression(const char *);
 						~CFixedExpression();
 
 			void		getCode(FILE *,CVariable *);
@@ -477,10 +477,10 @@ public:
 //
 ////////////////////////////////////////////////////////////////////////
 
-CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite);
-CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite);
+CExpression	*getOperation(CExpression *first,CExpression *second,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix,const char *opcodeString,int typeOverwrite);
+CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix,const char *opcodeString,int typeOverwrite);
 CExpression	*getConversion(int type,CExpression *first);
-CExpression	*getConversion(int type,char *system,CExpression *first);
+CExpression	*getConversion(int type,const char *system,CExpression *first);
 void		getConversion(FILE *,CVariable *,CExpression *);
 CExpression	*getAssignment(CList<CVariable *> *,CExpression *);
 CExpression	*getAssignment(CList<CVariable *> *,CList<CExpression *> *);

@@ -953,7 +953,7 @@ int			CConstantTerminalExpression::value(char *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CBinaryExpression::CBinaryExpression(int t,char *o,CExpression *f,CExpression *s) : CExpression(t | (f->type & s->type & SLC_UNIFORM))	{ 
+CBinaryExpression::CBinaryExpression(int t,const char *o,CExpression *f,CExpression *s) : CExpression(t | (f->type & s->type & SLC_UNIFORM))	{ 
 	first	=	f;
 	second	=	s;
 	opcode	=	o;
@@ -1028,7 +1028,7 @@ void	CBinaryExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CUnaryExpression::CUnaryExpression(int t,char *o,CExpression *f) : CExpression(t | (f->type & SLC_UNIFORM) ) { 
+CUnaryExpression::CUnaryExpression(int t,const char *o,CExpression *f) : CExpression(t | (f->type & SLC_UNIFORM) ) { 
 	first	= f; 
 	opcode	= o; 
 }
@@ -1101,7 +1101,7 @@ void	CUnaryExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CSysConversionExpression::CSysConversionExpression(int t,char *opcode,char *system,CExpression *ft) : CExpression(t | (ft->type & SLC_UNIFORM) ) {
+CSysConversionExpression::CSysConversionExpression(int t,const char *opcode,const char *system,CExpression *ft) : CExpression(t | (ft->type & SLC_UNIFORM) ) {
 	this->opcode	=	opcode;
 	this->system	=	strdup(system);
 	this->first		=	ft;
@@ -2262,7 +2262,7 @@ void		CArrayMove::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CUpdateExpression::CUpdateExpression(CVariable *f,char *opcodeFloat,char *opcodeVector,int pre,CExpression *s) : CExpression(f->type) {
+CUpdateExpression::CUpdateExpression(CVariable *f,const char *opcodeFloat,const char *opcodeVector,int pre,CExpression *s) : CExpression(f->type) {
 	first	=	f;
 	second	=	getConversion(f->type & SLC_TYPE_MASK,s);
 
@@ -2299,7 +2299,7 @@ CUpdateExpression::~CUpdateExpression() {
 // Return Value			:	-
 // Comments				:
 void		CUpdateExpression::getCode(FILE *out,CVariable *dest) {
-	char	*opcode,*opcodeM;
+	const char	*opcode,*opcodeM;
 
 	lock(op,second);
 
@@ -2885,7 +2885,7 @@ void		CIlluminationLoop::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CIlluminateSolar::CIlluminateSolar(char *op1,char *op2,CExpression *p,CExpression *n,CExpression *a,CExpression *b) : CExpression(0) {
+CIlluminateSolar::CIlluminateSolar(const char *op1,const char *op2,CExpression *p,CExpression *n,CExpression *a,CExpression *b) : CExpression(0) {
 	beginOpcode	=	strdup(op1);
 	endOpcode	=	strdup(op2);
 	this->P		=	(p != NULL ? getConversion(SLC_VECTOR,p) : NULL);
@@ -2970,7 +2970,7 @@ void		CIlluminateSolar::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CFixedExpression::CFixedExpression(char *f) : CExpression(SLC_NONE)  {
+CFixedExpression::CFixedExpression(const char *f) : CExpression(SLC_NONE)  {
 	fixed	=	strdup(f);
 }
 
@@ -3031,7 +3031,7 @@ void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Generate code for a binary operation
 // Return Value			:	The generated expression
 // Comments				:
-CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite) {
+CExpression	*getOperation(CExpression *first,CExpression *second,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix,const char *opcodeString,int typeOverwrite) {
 	if ((first->type | second->type) & SLC_ARRAY) {
 		delete first;
 		delete second;
@@ -3114,7 +3114,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,char *opcodeFlo
 // Description			:	Generate a unary operation
 // Return Value			:	The generated expression
 // Comments				:
-CExpression *getOperation(CExpression *first,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix,char *opcodeString,int typeOverwrite) {
+CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix,const char *opcodeString,int typeOverwrite) {
 	if (first->type & SLC_ARRAY) {
 		delete first;
 		sdr->error("Direct operations on arrays is not possible\n");
@@ -3303,7 +3303,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 // Description			:	Generates a coordinate system conversion code
 // Return Value			:	The generated expression
 // Comments				:
-CExpression	*getConversion(int type,char *system,CExpression *first) {
+CExpression	*getConversion(int type,const char *system,CExpression *first) {
 	if (type & SLC_VECTOR) {
 		if (type & (SLC_VVECTOR | SLC_VNORMAL))
 			return new CSysConversionExpression(type,opcodeVectorFrom,system,getConversion(SLC_VECTOR | (type & SLC_SUB_TYPE_MASK) | (first->type & SLC_UNIFORM) ,first));

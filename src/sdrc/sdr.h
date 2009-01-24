@@ -355,8 +355,8 @@ public:
 																		// The following two functions are
 																		// used to search the context for a function
 																		// or a variable
-	CFunction			*getFunction(char *,CList<CExpression *> *);
-	CVariable			*getVariable(char *);
+	CFunction			*getFunction(const char *,CList<CExpression *> *);
+	CVariable			*getVariable(const char *);
 
 	void				define(CSymbol *);								// Define a symbol here
 	void				printDefine(CSymbol *);							// Print the definition of a symbol
@@ -364,9 +364,9 @@ public:
 	CVariable			*lockRegister(int,int numItems=1);				// Allocate a temporary register
 	void				releaseRegister(CVariable *);					// Deallocate a temporary register
 
-	CParameter			*newParameter(char *,int,int);					// Create a new parameter to the topmost function
-	CVariable			*newVariable(char *,int,int);					// Create a new variable to the topmost function
-	CFunction			*newFunction(char *);							// Create a function to the topmost function																		
+	CParameter			*newParameter(const char *,int,int);			// Create a new parameter to the topmost function
+	CVariable			*newVariable(const char *,int,int);				// Create a new variable to the topmost function
+	CFunction			*newFunction(const char *);						// Create a function to the topmost function																		
 	void				newLabel(char *);								// Create a unique label
 	void				addVariable(CVariable *);						// Create a unique name for the variable
 
@@ -374,9 +374,9 @@ public:
 
 	void				uniformParameters();							// Make all the parameters uniform
 	void				restoreParameters();							// Restore all the parameters to their original types
-	void				generateCode(char *);							// Prints the generated code into a stream
+	void				generateCode(const char *);						// Prints the generated code into a stream
 
-	void				enumerateDso(char *);							// Find a DSO and add it into the library
+	void				enumerateDso(const char *);						// Find a DSO and add it into the library
 
 	void				error(const char *,...);						// Compiler error
 	void				warning(const char *,...);						// Compiler warning

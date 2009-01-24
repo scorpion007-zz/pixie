@@ -533,7 +533,7 @@ void	CRendererContext::addInstance(void *d) {
 //	0	-	skip
 //	1	-	process single
 //	2	-	process double
-int		CRendererContext::addMotion(float *parameters,int parameterSize,char *name,float *&p0,float *&p1) {
+int		CRendererContext::addMotion(float *parameters,int parameterSize,const char *name,float *&p0,float *&p1) {
 	if (numExpectedMotions == 1)	{
 		p0	=	parameters;
 		return	1;

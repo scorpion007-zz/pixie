@@ -1165,7 +1165,7 @@ void	CScriptContext::addGlobalVariable(const char *name,int type,int scope) {
 // Description			:	Search for a function in the current context
 // Return Value			:	NULL if the function is not found, pointer to the function otherwise
 // Comments				:
-CFunction	*CScriptContext::getFunction(char *fn,CList<CExpression *> *params) {
+CFunction	*CScriptContext::getFunction(const char *fn,CList<CExpression *> *params) {
 	CFunction	*f	=	lastFunction->getFunction(fn,params,desiredType);
 
 	if (f != NULL) printDefine(f);
@@ -1179,7 +1179,7 @@ CFunction	*CScriptContext::getFunction(char *fn,CList<CExpression *> *params) {
 // Description			:	Search for a variable in the current context
 // Return Value			:	NULL if the variable is not found, pointer to the variable otherwise
 // Comments				:
-CVariable	*CScriptContext::getVariable(char *vn) {
+CVariable	*CScriptContext::getVariable(const char *vn) {
 	CVariable	*v	=	lastFunction->getVariable(vn);
 
 	if (v == NULL) {
@@ -1246,7 +1246,7 @@ void		CScriptContext::printDefine(CSymbol *s) {
 // Description			:	This function creates a new parameter
 // Return Value			:	NULL if the parameter already defined
 // Comments				:
-CParameter		*CScriptContext::newParameter(char *name,int type,int multiplicity) {
+CParameter		*CScriptContext::newParameter(const char *name,int type,int multiplicity) {
 	CParameter	*cParameter	=	lastFunction->addParameter(name,type,multiplicity);
 
 	if (type & SLC_PARAMETER) {
@@ -1264,7 +1264,7 @@ CParameter		*CScriptContext::newParameter(char *name,int type,int multiplicity) 
 // Description			:	This function creates a new variable
 // Return Value			:	NULL if the variable already exists
 // Comments				:
-CVariable		*CScriptContext::newVariable(char *name,int type,int multiplicity) {
+CVariable		*CScriptContext::newVariable(const char *name,int type,int multiplicity) {
 	CVariable	*cVariable	=	lastFunction->addVariable(name,type,multiplicity);
 
 	return cVariable;
@@ -1276,7 +1276,7 @@ CVariable		*CScriptContext::newVariable(char *name,int type,int multiplicity) {
 // Description			:	This function creates a new function :)
 // Return Value			:	pointer to the new function (this method never fails)
 // Comments				:
-CFunction		*CScriptContext::newFunction(char *name) {
+CFunction		*CScriptContext::newFunction(const char *name) {
 	CFunction	*cFunction	=	new CFunction(name,lastFunction);
 
 	if ( (strcmp(name,constantBlockName) != 0) && (strcmp(name,constantLoopName) != 0)) {
@@ -1416,7 +1416,7 @@ void			CScriptContext::restoreParameters() {
 // Description			:	This method prints the code into a file
 // Return Value			:
 // Comments				:
-void			CScriptContext::generateCode(char *o) {
+void			CScriptContext::generateCode(const char *o) {
 	CParameter			*cParameter;
 	CVariable			*cVariable;
 	FILE				*out	=	NULL;
@@ -1620,14 +1620,14 @@ static	int	dsoEnumerateCallback(const char *file,void *ud) {
 // Description			:	Enumerate a particular DSO
 // Return Value			:
 // Comments				:
-void		CScriptContext::enumerateDso(char *name) {
+void		CScriptContext::enumerateDso(const char *name) {
 	char		searchPath[OS_MAX_PATH_LENGTH];
 	TSearchpath	*inPath;
 
 	// Go over the directories
 	for (inPath=dsoPath;inPath!=NULL;inPath=inPath->next) {
 		sprintf(searchPath,"%s/*.%s",inPath->directory,osModuleExtension);
-		osEnumerate(searchPath,dsoEnumerateCallback,name);
+		osEnumerate(searchPath,dsoEnumerateCallback,(void *) name);
 	}
 }
 
