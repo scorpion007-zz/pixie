@@ -355,8 +355,8 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	
 	// fork or launch the children
 	{
-		char	*argv[6];
-		char	portbuf[20];
+		const char	*argv[6];
+		char		portbuf[20];
 		
 		// prepare the args for child process
 		sprintf(portbuf,"%d",listenPort);

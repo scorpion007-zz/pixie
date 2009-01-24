@@ -47,7 +47,7 @@ extern "C" {
 #endif
 
 	// Create a blank point cloud with nvars channels
-	LIB_EXPORT	PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,
+	LIB_EXPORT	PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, const char **vartypes, const char **varnames,
 			   	float *world2eye, float *world2ndc, float *format);
 
 	// Write a point to the file
@@ -60,7 +60,7 @@ extern "C" {
 	LIB_EXPORT	PtcPointCloud PtcOpenPointCloudFile(char *filename, int *nvars, char **vartypes, char **varnames);
 
 	// Get info on the point cloud
-	LIB_EXPORT	int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result);
+	LIB_EXPORT	int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *result);
 
 	// Read a single point
 	LIB_EXPORT	int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data);

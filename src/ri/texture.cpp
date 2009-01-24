@@ -1228,7 +1228,7 @@ public:
 	
 	// textureinfo support
 	void				getResolution(float *r) 		{ side->getResolution(r); }
-	char* 				getTextureType()				{ return "shadow"; }
+	const char			*getTextureType()				{ return "shadow"; }
 	int 				getNumChannels()				{ return side->getNumChannels(); }
 	int 				getViewMatrix(float *m)			{ movmm(m,toCamera); return TRUE; }
 	int 				getProjectionMatrix(float *m)	{ movmm(m,toNDC); return TRUE; }
@@ -1423,7 +1423,7 @@ public:
 	
 	// textureinfo support
 	void				getResolution(float *r) 		{ r[0] = (float) header.xres; r[1] = (float) header.yres; }
-	char* 				getTextureType()				{ return "shadow"; }
+	const char			*getTextureType()				{ return "shadow"; }
 	int 				getNumChannels()				{ return 4; }
 	int 				getViewMatrix(float *m)			{ movmm(m,header.toCamera); return TRUE; }
 	int 				getProjectionMatrix(float *m)	{ movmm(m,header.toNDC); return TRUE; }
@@ -1666,7 +1666,7 @@ public:
 
 	// textureinfo support
 	void				getResolution(float *r) 	{ sides[0]->getResolution(r); }
-	char* 				getTextureType()			{ return "environment"; }
+	const char			*getTextureType()			{ return "environment"; }
 	int 				getNumChannels()			{ return sides[0]->getNumChannels(); }
 	int 				getViewMatrix(float *m)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
@@ -1715,7 +1715,7 @@ public:
 
 	// textureinfo support
 	void				getResolution(float *r) 	{ side->getResolution(r); }
-	char* 				getTextureType()			{ return "environment"; }
+	const char			*getTextureType()			{ return "environment"; }
 	int 				getNumChannels()			{ return side->getNumChannels(); }
 	int 				getViewMatrix(float *m)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
@@ -1780,7 +1780,7 @@ public:
 
 	// textureinfo support
 	void				getResolution(float *r) 	{ side->getResolution(r); }
-	char* 				getTextureType()			{ return "environment"; }
+	const char			*getTextureType()			{ return "environment"; }
 	int 				getNumChannels()			{ return side->getNumChannels(); }
 	int 				getViewMatrix(float *m)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }

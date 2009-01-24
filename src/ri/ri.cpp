@@ -456,7 +456,7 @@ static	int					archiveNesting		=	0;
 // Description			:	Make sure the command is good for a given nesting
 // Return Value			:	TRUE if the command should be ignored
 // Comments				:
-static	inline int		check(char *fun,int scope) {
+static	inline int		check(const char *fun,int scope) {
 	if (ignoreFrame | ignoreCommand)	return TRUE;
 
 	if (scope & currentBlock & allowedCommands)	return FALSE;

@@ -260,7 +260,7 @@ public:
 
 			CList<CExpression *>	*arguments;
 			CFunctionPrototype		*function;
-			char					*replacementPrototype;
+			const char				*replacementPrototype;
 };
 
 ///////////////////////////////////////////////////////////////////////

@@ -76,7 +76,7 @@ public:
 	void					resolve(int n,const char **names,int *entry,int *size);
 	
 							// ptcAPI interface
-	void					queryChannels(int *,char **,char **);
+	void					queryChannels(int *,const char **,const char **);
 	int						getDataSize()			{ return dataSize; }
 	void					getFromMatrix(float *m) { movmm(m,from); }
 	void					getToMatrix(float *m)	{ movmm(m,to); }

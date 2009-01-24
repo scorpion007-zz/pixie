@@ -98,7 +98,7 @@ void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
 // Description			:	Open an existing point cloud file
 // Return Value			:
 // Comments				:	Handle
-PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes, char **varnames) {
+PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, const char **vartypes, const char **varnames) {
 	PtcPointCloudInternal	*ptcInternal = new PtcPointCloudInternal;
 	FILE					*in;
 	
@@ -126,7 +126,7 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, char **vartypes,
 // Description			:	Query the point cloud
 // Return Value			:
 // Comments				:	Handle
-int PtcGetPointCloudInfo(PtcPointCloud pointcloud, char *request, void *result) {
+int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *result) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
 	if (strcmp(request,"npoints") == 0) {

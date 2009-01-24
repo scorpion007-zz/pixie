@@ -1532,7 +1532,7 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 	int			uPrototype;
 	CVariable	*d;
 	CVariable	*temp	=	NULL;
-	char		*fprototype;
+	const char	*fprototype;
 	int			plStart	=	-1;
 
 	if (replacementPrototype == NULL) {
@@ -3139,7 +3139,7 @@ CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char 
 // Comments				:
 CExpression	*getConversion(int type,CExpression *first) {
 	
-	char* firsttype = "none";
+	const char* firsttype = "none";
 	if (first->type & SLC_STRING)
 		firsttype = "string";
 	else if (first->type & SLC_FLOAT)
@@ -3206,7 +3206,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 		return;
 	}
 
-	char* firsttype = "none";
+	const char* firsttype = "none";
 	if (first->type & SLC_STRING)
 		firsttype = "string";
 	else if (first->type & SLC_FLOAT)

@@ -252,7 +252,7 @@ void	CTexture3d::resolve(int n,const char **names,int *entry,int *size) {
 // Description			:	queryChannels
 // Return Value			:	-
 // Comments				:	FIXME and return enums, do the ptcapi conversion there
-void CTexture3d::queryChannels(int *num,char **vartypes,char **varnames) {
+void CTexture3d::queryChannels(int *num,const char **vartypes,const char **varnames) {
 	num[0] = numChannels;
 	for (int i=0;i<numChannels;i++)	{
 		varnames[i] = channels[i].name;
