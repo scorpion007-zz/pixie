@@ -161,7 +161,7 @@ typedef struct TSearchpath {
 //							of this symbol. They can be NULL.
 class	CSymbol {
 public:
-						CSymbol(char *);								// The parameter is the name of the symbol
+						CSymbol(const char *);							// The parameter is the name of the symbol
 	virtual				~CSymbol();
 	
 	char				*symbolName;									// This is the name a variable refered in the original code
@@ -193,7 +193,7 @@ public:
 																		// The function owning this variable
 																		// The type of the variable
 																		// The multiplicity of the variable
-						CVariable(char *,int,int multiplicity=1);
+						CVariable(const char *,int,int multiplicity=1);
 						~CVariable();
 
 	virtual	char		*codeName();
@@ -219,7 +219,7 @@ public:
 																		// The type of the parameter
 																		// The multiplicity of the parameter
 																		// The order of the parameter from left
-						CParameter(char *,int,int);
+						CParameter(const char *,int,int);
 						~CParameter();
 
 	virtual	char		*codeName();
@@ -252,16 +252,16 @@ public:
 																		// The parameters to the constructor are:
 																		// The name of the function as it appears in the source code
 																		// The function owning this function
-							CFunction(char *,CFunction *);
+							CFunction(const char *,CFunction *);
 							~CFunction();
 
-	CParameter				*addParameter(char *,int,int);				// Adds a parameter into the papameter list. Retuns NULL if a parameter with the same name exists
-	CVariable				*addVariable(char *,int,int);				// Adds a variable into the variable list. Returns NULL if a variable with the same name exists
-	CFunction				*addFunction(char *);						// Adds a function into the function list.
+	CParameter				*addParameter(const char *,int,int);		// Adds a parameter into the papameter list. Retuns NULL if a parameter with the same name exists
+	CVariable				*addVariable(const char *,int,int);			// Adds a variable into the variable list. Returns NULL if a variable with the same name exists
+	CFunction				*addFunction(const char *);					// Adds a function into the function list.
 
-	CVariable				*getVariable(char *,int probe=FALSE);		// Gets the variable record associated with the name. Returns null if the variable doesn't exist
+	CVariable				*getVariable(const char *,int probe=FALSE);		// Gets the variable record associated with the name. Returns null if the variable doesn't exist
 																		// Gets the function associated with the name and the parameter list. Retuns NULL if not found
-	CFunction				*getFunction(char *,CList<CExpression *> *,int returnType = SLC_NONE);	
+	CFunction				*getFunction(const char *,CList<CExpression *> *,int returnType = SLC_NONE);	
 
 	CExpression				*initExpression;
 	CExpression				*code;

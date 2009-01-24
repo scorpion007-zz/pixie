@@ -68,7 +68,7 @@
 #include "common/os.h"								// OS dependent stuff)
 #include "common/containers.h"
 
-extern	"C" int	preprocess(char *,FILE *,int,char **);
+extern	"C" int	preprocess(char *,FILE *,int,const char **);
 void	compile(FILE *in,char *outName);
 
 // The environment variables to be searched for the preprocessor and include files

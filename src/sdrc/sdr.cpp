@@ -44,7 +44,7 @@
 // Method				:	CSymbol(char *)
 // Description			:	Allocate memory ...
 // Comments				:	The first parameter is the name of the variable as referenced in the code
-CSymbol::CSymbol(char *name) {
+CSymbol::CSymbol(const char *name) {
 	assert(name != NULL);
 
 	symbolName	=	strdup(name);
@@ -81,7 +81,7 @@ CSymbol::~CSymbol() {
 // Description			:	Init the structure
 // Comments				:	The first parameter is the name of the variable as referenced in the code and
 //							the second parameter is the function defining this variable
-CVariable::CVariable(char *name,int type,int multiplicity) : CSymbol(name) {
+CVariable::CVariable(const char *name,int type,int multiplicity) : CSymbol(name) {
 
 	// Sanity check
 	if (multiplicity > 1) {
@@ -143,7 +143,7 @@ char	*CVariable::codeName() {
 //							from 0. Thus this function replaces the actual parameter name with "$0", "$1" ...
 //							so that later on, the occurance of these parameters in the code can be translated
 //							to the actual parameter names in the caller's context
-CParameter::CParameter(char *name,int type,int multiplicity) : CVariable(name,type,multiplicity) {
+CParameter::CParameter(const char *name,int type,int multiplicity) : CVariable(name,type,multiplicity) {
 	defaultValue	=	NULL;
 	mapping			=	NULL;
 }
@@ -187,7 +187,7 @@ char	*CParameter::codeName() {
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-CFunction::CFunction(char *name,CFunction *p) : CSymbol(name) {
+CFunction::CFunction(const char *name,CFunction *p) : CSymbol(name) {
 	this->returnValue		=	NULL;
 	this->returnValueGiven	=	FALSE;
 	this->initExpression	=	NULL;
@@ -224,7 +224,7 @@ CFunction::~CFunction() {
 // Description			:	This method creates a new parameter and adds it into the the function.
 // Return Value			:	The newly added parameter
 // Comments				:
-CParameter	*CFunction::addParameter(char *name,int type,int multiplicity) {
+CParameter	*CFunction::addParameter(const char *name,int type,int multiplicity) {
 	CParameter	*cParameter;
 
 	// Check the function parameters
@@ -250,7 +250,7 @@ CParameter	*CFunction::addParameter(char *name,int type,int multiplicity) {
 // Return Value			:	The newly create variable (NULL if the variable (or parameter) already exists)
 // Comments				:	This method adds a copy of the variable into the parent's list as well
 //							This is done so that variables declared in the scope are propegated to the parent function
-CVariable	*CFunction::addVariable(char *name,int type,int multiplicity) {
+CVariable	*CFunction::addVariable(const char *name,int type,int multiplicity) {
 	CVariable	*cVariable;
 
 	// Check the function parameters
@@ -285,7 +285,7 @@ CVariable	*CFunction::addVariable(char *name,int type,int multiplicity) {
 // Return Value			:	The newly added function
 // Comments				:	This function does not check the existance of another function
 //							with the exact same signature.
-CFunction	*CFunction::addFunction(char *name) {
+CFunction	*CFunction::addFunction(const char *name) {
 	// FIXME: should I check if a function having exactly the same signature defined ?
 	CFunction	*cFun	=	new CFunction(name,this);
 
@@ -300,7 +300,7 @@ CFunction	*CFunction::addFunction(char *name) {
 // Comments				:	If the variable is not found in this function, method searches the parents as well.
 //							The second parameter is used to controll the number functions above the current function.
 //							e.g.: depth=0 means only this function is searched for the variable
-CVariable	*CFunction::getVariable(char *name,int probe) {
+CVariable	*CFunction::getVariable(const char *name,int probe) {
 	CVariable	*cVariable;
 
 	// Check the function parameters
@@ -337,7 +337,7 @@ CVariable	*CFunction::getVariable(char *name,int probe) {
 // Description			:	This method searches all the defined functions for a match
 // Return Value			:	NULL if no compatible function exists, a pointer to the function othervise
 // Comments				:
-CFunction	*CFunction::getFunction(char *name,CList<CExpression *> *args,int returnType) {
+CFunction	*CFunction::getFunction(const char *name,CList<CExpression *> *args,int returnType) {
 	CFunction	*cFun;
 
 	// Look for an exact match first
@@ -1150,7 +1150,7 @@ CFunctionPrototype	*CScriptContext::addBuiltInFunction(char *name,char *prototyp
 // Description			:	Add a built in function
 // Return Value			:
 // Comments				:		
-void	CScriptContext::addGlobalVariable(char *name,int type,int scope) {
+void	CScriptContext::addGlobalVariable(const char *name,int type,int scope) {
 	CVariable			*cVar	=	lastFunction->addVariable(name,type | SLC_GLOBAL,1);
 
 	cVar->cName					=	strdup(name);

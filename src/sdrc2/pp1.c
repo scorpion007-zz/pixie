@@ -133,7 +133,7 @@ extern	unsigned	_stklen = 32767;
 #pragma	optimize("l",off)		/* Disable loop optimizations */
 #endif	/* MSC_OPT */
 
-int	preprocess(char *inFile,FILE *outFile,int argc,char **argv) {
+int	preprocess(char *inFile,FILE *outFile,int argc,const char **argv) {
 /*
 void
 main(argc,argv)

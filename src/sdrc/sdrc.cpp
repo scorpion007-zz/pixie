@@ -70,7 +70,7 @@
 #endif
 
 
-extern	"C" int	preprocess(char *,FILE *,int,char **);
+extern	"C" int	preprocess(char *,FILE *,int,const char **);
 
 // The environment variables to be searched for the preprocessor and include files
 #define			INCLUDE				"INCLUDE"		// The default include path for the preprocessor
@@ -86,22 +86,22 @@ extern	"C" int	preprocess(char *,FILE *,int,char **);
 // this file
 
 // The symbol to be defined by the preprocessor
-static	char	*defineProgramName				=			"PIXIE";
+static	const char	*defineProgramName				=			"PIXIE";
 // The name of the executable
-static	char	*compilerName					=			"sdrc";
+static	const char	*compilerName					=			"sdrc";
 
 
 /////////////////////////////////////////////////////////////////////
 // Program command line switches
-static	char	*argumentIncludeDirectory		=			"-I";
-static	char	*argumentDefine					=			"-D";
-static	char	*argumentOutput					=			"-o";
-static	char	*argumentSuppressWarnings		=			"-nw";
-static	char	*argumentSuppressErrors			=			"-ne";
-static	char	*argumentResolutionInfo			=			"-ri";
-static	char	*argumentHelp					=			"-h";
-static	char	*argumentPrintVersionInfo		=			"-v";
-static	char	*argumentQuietInfo				=			"-q";
+static	const char	*argumentIncludeDirectory		=			"-I";
+static	const char	*argumentDefine					=			"-D";
+static	const char	*argumentOutput					=			"-o";
+static	const char	*argumentSuppressWarnings		=			"-nw";
+static	const char	*argumentSuppressErrors			=			"-ne";
+static	const char	*argumentResolutionInfo			=			"-ri";
+static	const char	*argumentHelp					=			"-h";
+static	const char	*argumentPrintVersionInfo		=			"-v";
+static	const char	*argumentQuietInfo				=			"-q";
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printVersion
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
 	TSearchpath		*dsoPath;
 	CList<char *>	*sourceFiles;
 	char			*sourceFile;
-	char			*ppargv[100];
+	const char		*ppargv[100];
 	int				ppargc;
 	char			*outName	=	NULL;
 	char 			*includeEnv = osEnvironment(INCLUDE);
