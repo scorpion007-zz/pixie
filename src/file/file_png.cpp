@@ -303,3 +303,5 @@ void CFileFramebufferPNG::write(int x,int y,int w,int h,float *data)
 }	
 
 #endif // HAVE_LIBPNG
+
+

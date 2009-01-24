@@ -83,7 +83,7 @@ void	exitFunction() {
 		closesocket(listenSock);
 
 		if (noRestart == FALSE) {
-			const char	**argv	=	new const char*[gargc+2];
+			char		**const argv	=	new char*[gargc+2];
 			int			i;
 
 			for (i=0;i<gargc;++i)	argv[i]	=	gargv[i];
@@ -352,18 +352,13 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	
 	// fork or launch the children
 	{
-		const char	*argv[6];
 		char		portbuf[20];
-		
+
 		// prepare the args for child process
 		sprintf(portbuf,"%d",listenPort);
 
-		argv[0]	=	gargv[0];
-		argv[1]	=	"-q";
-		argv[2]	=	"-c";
-		argv[3]	=	portbuf;
-		argv[4]	=	ribFile;
-		argv[5]	=	NULL;
+		// The command line arguments
+		char 		* const argv[]	=	{gargv[0],"-q","-c",portbuf,ribFile,NULL};
 		
 		for(int k=0;k<numChildren;k++){
 			#ifdef _WINDOWS
