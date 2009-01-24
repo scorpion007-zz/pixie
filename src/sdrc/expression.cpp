@@ -3149,7 +3149,7 @@ CExpression	*getConversion(int type,CExpression *first) {
 	else if (first->type & SLC_MATRIX)
 		firsttype = "matrix";
 
-	char* desttype = "none";
+	const char* desttype = "none";
 	if (type & SLC_STRING)
 		desttype = "string";
 	else if (type & SLC_FLOAT)
@@ -3159,7 +3159,7 @@ CExpression	*getConversion(int type,CExpression *first) {
 	else if (type & SLC_MATRIX)
 		desttype = "matrix";
 	
-	char* unabletocast = "Unable to cast %s to %s\n";
+	const char* unabletocast = "Unable to cast %s to %s\n";
 	if (type & SLC_STRING) {
 		if (first->type & SLC_STRING)	return first;
 		else {
@@ -3216,7 +3216,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 	else if (first->type & SLC_MATRIX)
 		firsttype = "matrix";
 
-	char* desttype = "none";
+	const char* desttype = "none";
 	if (dest->type & SLC_STRING)
 		desttype = "string";
 	else if (dest->type & SLC_FLOAT)
@@ -3226,7 +3226,7 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 	else if (dest->type & SLC_MATRIX)
 		desttype = "matrix";
 	
-	char* unabletocast = "Unable to cast %s to %s\n";
+	const char* unabletocast = "Unable to cast %s to %s\n";
 	
 	cVar	=	first->getVariable();
 
