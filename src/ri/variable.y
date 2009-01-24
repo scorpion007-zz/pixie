@@ -55,7 +55,6 @@
 %token	VAR_VARYING
 %token	VAR_FACEVARYING
 %token	VAR_VERTEX
-%token	VAR_FLOAT
 %token	VAR_INTEGER
 %token	VAR_VECTOR
 %token	VAR_COLOR

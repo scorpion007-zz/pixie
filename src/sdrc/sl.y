@@ -70,7 +70,7 @@
 #include	"opcodes.h"
 #include	"sdr.h"
 
-	void				yyerror(char *);				// Forward definition for stupid yacc
+	void				yyerror(const char *);			// Forward definition for stupid yacc
 	int					yylex(void );					// Forward definition for stupid yacc
 														
 //////////////////////////////////////////////////////////////////////////
@@ -2856,7 +2856,7 @@ int	CScriptContext::compile(FILE *in,char *outName) {
 }
 
 
-void	yyerror(char *mes) {
+void	yyerror(const char *mes) {
 	if (yytext && yytext[0])
 		sdr->error("Parse error before '%s'\n",yytext);
 	else

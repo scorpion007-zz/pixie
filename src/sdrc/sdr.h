@@ -348,7 +348,7 @@ public:
 
 																		// Add global junk
 	CFunctionPrototype	*addBuiltInFunction(char *,char *,int,int nonuniform=FALSE);
-	void				addGlobalVariable(char *,int,int);
+	void				addGlobalVariable(const char *,int,int);
 	int					compile(FILE *,char *outName = NULL);			// All mighty compile function
 
 
