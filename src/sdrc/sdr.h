@@ -307,13 +307,13 @@ public:
 																		// The name of the function as it appears in the source code
 																		// The prototype string
 																		// The script that this function can be called from
-						CFunctionPrototype(char *,char *,int = SLC_GENERIC | SLC_SURFACE | SLC_LIGHT | SLC_DISPLACEMENT | SLC_TRANSFORMATION | SLC_IMAGER | SLC_VOLUME,int nonuniform=FALSE);
+						CFunctionPrototype(const char *,const char *,int = SLC_GENERIC | SLC_SURFACE | SLC_LIGHT | SLC_DISPLACEMENT | SLC_TRANSFORMATION | SLC_IMAGER | SLC_VOLUME,int nonuniform=FALSE);
 						~CFunctionPrototype();
 
 																		// Returns TRUE if the given function matches perfectly to this
-	int					perfectMatch(char *,CList<CExpression *> *,int dt = SLC_NONE);	
+	int					perfectMatch(const char *,CList<CExpression *> *,int dt = SLC_NONE);	
 																		// Returns TRUE if these two functions are compatible
-	int					match(char *,CList<CExpression *> *,int dt = SLC_NONE);	
+	int					match(const char *,CList<CExpression *> *,int dt = SLC_NONE);	
 																		// Returns the function call code
 	
 	char				*prototype;										// The prototype of the function (e.g.: "f=f" for sin)
@@ -347,7 +347,7 @@ public:
 
 
 																		// Add global junk
-	CFunctionPrototype	*addBuiltInFunction(char *,char *,int,int nonuniform=FALSE);
+	CFunctionPrototype	*addBuiltInFunction(const char *,const char *,int,int nonuniform=FALSE);
 	void				addGlobalVariable(const char *,int,int);
 	int					compile(FILE *,char *outName = NULL);			// All mighty compile function
 

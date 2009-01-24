@@ -449,7 +449,7 @@ CFunction	*CFunction::getFunction(const char *name,CList<CExpression *> *args,in
 // Description			:	Init the data structures
 // Return Value			:	
 // Comments				:
-CFunctionPrototype::CFunctionPrototype(char *name,char *p,int compatible,int nonuniform)  : CSymbol(name) {
+CFunctionPrototype::CFunctionPrototype(const char *name,const char *p,int compatible,int nonuniform)  : CSymbol(name) {
 	prototype			=	strdup(p);
 	compatibleShaders	=	compatible;
 	this->nonuniform	=	nonuniform;
@@ -522,7 +522,7 @@ CFunctionPrototype::~CFunctionPrototype() {
 //
 // General prototype format:
 // <return_type>=<parameterType>*
-int			CFunctionPrototype::perfectMatch(char *name,CList<CExpression *> *pl,int dt) {
+int			CFunctionPrototype::perfectMatch(const char *name,CList<CExpression *> *pl,int dt) {
 	CExpression	*cCode;
 	int			cPrototype;
 
@@ -610,7 +610,7 @@ int			CFunctionPrototype::perfectMatch(char *name,CList<CExpression *> *pl,int d
 // Description			:	This function checks if the prototype is compatible to the given signature
 // Return Value			:	TRUE if compatible, FALSE othervise
 // Comments				:
-int			CFunctionPrototype::match(char *name,CList<CExpression *> *pl,int dt) {
+int			CFunctionPrototype::match(const char *name,CList<CExpression *> *pl,int dt) {
 	CExpression	*cCode;
 	int			cPrototype;
 
@@ -1134,7 +1134,7 @@ CScriptContext::~CScriptContext() {
 // Description			:	Add a built in function
 // Return Value			:
 // Comments				:		
-CFunctionPrototype	*CScriptContext::addBuiltInFunction(char *name,char *prototype,int scope,int nonuniform) {
+CFunctionPrototype	*CScriptContext::addBuiltInFunction(const char *name,const char *prototype,int scope,int nonuniform) {
 	CFunctionPrototype	*cFun	=	new CFunctionPrototype(name,prototype,scope,nonuniform);
 
 	builtinFunctions->push(cFun);
