@@ -340,22 +340,22 @@ void		CRiInterface::RiMotionBeginV(int N,float times[]) {
 void		CRiInterface::RiMotionEnd(void) {
 }
 
-void		CRiInterface::RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeTextureV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeBumpV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny,const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]) {
 }
 
-void		CRiInterface::RiMakeBrickMapV(int nb,char **src,char *dest,int n,char *tokens[],void *params[]) {
+void		CRiInterface::RiMakeBrickMapV(int nb,const char **src,const char *dest,int n,char *tokens[],void *params[]) {
 }
 
 void		CRiInterface::RiErrorHandler(void (*handler)(int,int,char *)) {

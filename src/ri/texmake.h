@@ -35,11 +35,11 @@
 #include "ri.h"
 #include "options.h"
 
-void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
-void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int);
-void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,char *output,char *smode,char *tmode,TSearchpath *path,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int);
-void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
-void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
+void	makeTexture(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
+void	makeSideEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int);
+void	makeCubicEnvironment(const char *px,const char *py,const char *pz,const char *nx,const char *ny,const char *nz,const char *output,const char *smode,const char *tmode,TSearchpath *path,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int);
+void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
+void	makeCylindericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals);
 
 
 #endif

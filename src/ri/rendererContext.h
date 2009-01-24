@@ -177,12 +177,12 @@ public:
 	void				RiMotionBeginV(int N,float times[]);
 	void				RiMotionEnd(void);
 
-	void				RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	void				RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]);
-	void				RiMakeBrickMapV(int nb,char **src,char *dest,int n,char *tokens[],void *params[]);
+	void				RiMakeTextureV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	void				RiMakeBumpV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	void				RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	void				RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny,const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	void				RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]);
+	void				RiMakeBrickMapV(int nb,const char **src,const char *dest,int n,char *tokens[],void *params[]);
 
 	void				RiArchiveRecord(char * type,char *format,va_list args);
 	void				RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]);

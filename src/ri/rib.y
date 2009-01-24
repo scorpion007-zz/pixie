@@ -112,7 +112,7 @@ static	TMemCheckpoint		worldCheckpoint;
 static	TMemCheckpoint		memoryCheckpoint;						// We use this to put a checkpoint to the memory
 static	CArray<float>		floatArgs;								// The array of float arguments
 static	CArray<int>			intArgs;								// The array of integer arguments
-static	CArray<char *>		stringArgs;								// The array of string arguments
+static	CArray<const char*>	stringArgs;								// The array of string arguments
 
 static	int					numParameters				=	0;
 static	int					maxParameter				=	0;
@@ -2378,10 +2378,10 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribFloatArray
 				ribPL
 				{
-					int		*argi1,*argi2,*argi3,*argi4;
-					char	**args1;
-					float	*argf1;
-					int		numVertices,i,j;
+					int			*argi1,*argi2,*argi3,*argi4;
+					const char	**args1;
+					float		*argf1;
+					int			numVertices,i,j;
 
 					if (parameterListCheck()) {
 						argi1	=	getInt(0);
@@ -2401,7 +2401,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 
 						if (sizeCheck(numVertices,numVertices,j,$3)) {
-							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,args1,argi3,argi4,argf1,numParameters,tokens,vals);
+							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,(char **) args1,argi3,argi4,argf1,numParameters,tokens,vals);
 						}
 					}
 				}
@@ -2417,10 +2417,10 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				ribPL
 				{
 					// Support for no tags (parsed as int array for arg 5)
-					int		*argi1,*argi2,*argi3,*argi4;
-					char	**args1;
-					float	*argf1;
-					int		numVertices,i,j;
+					int			*argi1,*argi2,*argi3,*argi4;
+					const char	**args1;
+					float		*argf1;
+					int			numVertices,i,j;
 
 					if (parameterListCheck()) {
 						argi1	=	getInt(0);
@@ -2441,7 +2441,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 
 							if (sizeCheck(numVertices,numVertices,j,$3)) {
-								RiSubdivisionMeshV($2,$3,argi1,argi2,0,args1,argi3,argi4,argf1,numParameters,tokens,vals);
+								RiSubdivisionMeshV($2,$3,argi1,argi2,0,(char **) args1,argi3,argi4,argf1,numParameters,tokens,vals);
 							}
 						} else {
 							error(CODE_BADTOKEN,"Subdivision surface expected string array (tags) for argument 5\n");
@@ -2521,7 +2521,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 				{
 					RtBound			bound;
 					CDelayedData	*cData	=	new CDelayedData;
-					char			**arg;
+					const char		**arg;
 
 					bound[0]	=	$5;
 					bound[1]	=	$6;

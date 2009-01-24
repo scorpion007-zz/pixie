@@ -508,18 +508,18 @@ EXTERN(RtVoid)
     RiMotionEnd (void);
 
 EXTERN(RtVoid)
-    RiMakeTexture (char *pic, char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
-    RiMakeTextureV (char *pic, char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiMakeBump (char *pic, char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
-    RiMakeBumpV (char *pic, char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiMakeLatLongEnvironment (char *pic, char *tex, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
-    RiMakeLatLongEnvironmentV (char *pic, char *tex, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiMakeCubeFaceEnvironment (char *px, char *nx, char *py, char *ny, char *pz, char *nz, char *tex, RtFloat fov, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
-    RiMakeCubeFaceEnvironmentV (char *px, char *nx, char *py, char *ny, char *pz, char *nz, char *tex, RtFloat fov, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiMakeShadow (char *pic, char *tex, ...),
-    RiMakeShadowV (char *pic, char *tex, RtInt n, RtToken tokens[], RtPointer params[]),
-	RiMakeBrickMap (int n,char **src, char *dest, ...),
-	RiMakeBrickMapV(int n,char **src, char *dest,RtInt numTokens, RtToken tokens[], RtPointer params[]);
+    RiMakeTexture (const char *pic, const char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
+    RiMakeTextureV (const char *pic, const char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiMakeBump (const char *pic, const char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
+    RiMakeBumpV (const char *pic, const char *tex, RtToken swrap, RtToken twrap, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiMakeLatLongEnvironment (const char *pic, const char *tex, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
+    RiMakeLatLongEnvironmentV (const char *pic, const char *tex, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiMakeCubeFaceEnvironment (const char *px, const char *nx, const char *py, const char *ny, const char *pz, const char *nz, const char *tex, RtFloat fov, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...),
+    RiMakeCubeFaceEnvironmentV (const char *px, const char *nx, const char *py, const char *ny, const char *pz, const char *nz, const char *tex, RtFloat fov, RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiMakeShadow (const char *pic, const char *tex, ...),
+    RiMakeShadowV (const char *pic, const char *tex, RtInt n, RtToken tokens[], RtPointer params[]),
+	RiMakeBrickMap (int n,const char **src, const char *dest, ...),
+	RiMakeBrickMapV(int n,const char **src, const char *dest,RtInt numTokens, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid)
     RiErrorHandler (RtErrorHandler handler),

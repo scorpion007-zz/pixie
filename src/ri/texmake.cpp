@@ -697,7 +697,7 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 // Description			:	Create an image pyramid from input
 // Return Value			:
 // Comments				:
-void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
+void	makeTexture(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 	
 	getResizeMode(numParams,params,vals);
@@ -755,7 +755,7 @@ void	makeTexture(char *input,char *output,TSearchpath *path,char *smode,char *tm
 // Description			:	Create a single sided environment map
 // Return Value			:
 // Comments				:
-void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
+void	makeSideEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
 	getResizeMode(numParams,params,vals);
@@ -832,9 +832,9 @@ void	makeSideEnvironment(char *input,char *output,TSearchpath *path,char *smode,
 // Description			:	Create an environment map where each side is a pyramid
 // Return Value			:
 // Comments				:
-void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,char *output,char *smode,char *tmode,TSearchpath *path,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
-	char	inputFileName[OS_MAX_PATH_LENGTH];
-	char	*names[6];
+void	makeCubicEnvironment(const char *px,const char *py,const char *pz,const char *nx,const char *ny,const char *nz,const char *output,const char *smode,const char *tmode,TSearchpath *path,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals,int shadow) {
+	char		inputFileName[OS_MAX_PATH_LENGTH];
+	const char	*names[6];
 
 	getResizeMode(numParams,params,vals);
 	
@@ -907,7 +907,7 @@ void	makeCubicEnvironment(char *px,char *py,char *pz,char *nx,char *ny,char *nz,
 // Description			:	Create an image pyramid from input
 // Return Value			:
 // Comments				:
-void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
+void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
 	getResizeMode(numParams,params,vals);
@@ -966,7 +966,7 @@ void	makeSphericalEnvironment(char *input,char *output,TSearchpath *path,char *s
 // Description			:	Create an image pyramid from input
 // Return Value			:
 // Comments				:
-void	makeCylindericalEnvironment(char *input,char *output,TSearchpath *path,char *smode,char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
+void	makeCylindericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,char **params,void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 	
 	getResizeMode(numParams,params,vals);

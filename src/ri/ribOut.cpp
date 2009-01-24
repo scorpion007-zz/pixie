@@ -1270,32 +1270,32 @@ void		CRibOut::RiMotionEnd(void) {
 	out("MotionEnd\n");
 }
 
-void		CRibOut::RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeTextureV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeTexture \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g %g ",pic,tex,swrap,twrap,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeBumpV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeBump \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g %g ",pic,tex,swrap,twrap,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeBump \"%s\" \"%s\" \"%s\" %g %g",pic,tex,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny,const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	out("MakeCubeFaceEnvironment \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g \"%s\" %g %g ",px,nx,py,ny,pz,nz,tex,fov,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]) {
 	out("MakeShadow \"%s\" \"%s\" ",pic,tex);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeBrickMapV(int n,char **src,char *dest,int numTokens,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeBrickMapV(int n,const char **src,const char *dest,int numTokens,char *tokens[],void *params[]) {
 	out("MakeBrickMap [");
 	for(int i=0;i<n;i++) out("\"%s\" ",src[i]);
 	out("] \"%s\" ",dest);

@@ -2356,7 +2356,7 @@ RiMotionEnd (void) {
 }
 
 EXTERN(RtVoid)
-    RiMakeTexture (char *pic, char *tex, RtToken swrap, RtToken twrap,
+    RiMakeTexture (const char *pic, const char *tex, RtToken swrap, RtToken twrap,
 	RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...) {
 
 	va_list	args;
@@ -2368,7 +2368,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeTextureV (char *pic, char *tex, RtToken swrap, RtToken twrap,
+    RiMakeTextureV (const char *pic, const char *tex, RtToken swrap, RtToken twrap,
 		    RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth,
 			RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiMakeTexture",RENDERMAN_ALL_BLOCKS)) return;	
@@ -2377,7 +2377,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeBump (char *pic, char *tex, RtToken swrap, RtToken twrap,
+    RiMakeBump (const char *pic, const char *tex, RtToken swrap, RtToken twrap,
 	RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth, ...) {
 	va_list	args;
 
@@ -2388,7 +2388,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeBumpV (char *pic, char *tex, RtToken swrap, RtToken twrap,
+    RiMakeBumpV (const char *pic, const char *tex, RtToken swrap, RtToken twrap,
 		 RtFilterFunc filterfunc, RtFloat swidth, RtFloat twidth,
 		 RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiMakeBump",RENDERMAN_ALL_BLOCKS)) return;	
@@ -2397,7 +2397,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeLatLongEnvironment (char *pic, char *tex, RtFilterFunc filterfunc,
+    RiMakeLatLongEnvironment (const char *pic, const char *tex, RtFilterFunc filterfunc,
 	RtFloat swidth, RtFloat twidth, ...) {
 	va_list	args;
 
@@ -2408,7 +2408,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeLatLongEnvironmentV (char *pic, char *tex, RtFilterFunc filterfunc,
+    RiMakeLatLongEnvironmentV (const char *pic, const char *tex, RtFilterFunc filterfunc,
 			      RtFloat swidth, RtFloat twidth,
 				  RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiMakeLatLongEnvironment",RENDERMAN_ALL_BLOCKS)) return;	
@@ -2417,9 +2417,9 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeCubeFaceEnvironment (char *px, char *nx, char *py,
-			       char *ny, char *pz, char *nz,
-			       char *tex, RtFloat fov, RtFilterFunc filterfunc,
+    RiMakeCubeFaceEnvironment (const char *px, const char *nx, const char *py,
+			       const char *ny, const char *pz, const char *nz,
+			       const char *tex, RtFloat fov, RtFilterFunc filterfunc,
 				   RtFloat swidth, RtFloat twidth, ...) {
 	va_list	args;
 
@@ -2430,9 +2430,9 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-    RiMakeCubeFaceEnvironmentV (char *px, char *nx, char *py,
-				char *ny, char *pz, char *nz,
-				char *tex, RtFloat fov, RtFilterFunc filterfunc,
+    RiMakeCubeFaceEnvironmentV (const char *px, const char *nx, const char *py,
+				const char *ny, const char *pz, const char *nz,
+				const char *tex, RtFloat fov, RtFilterFunc filterfunc,
 				RtFloat swidth, RtFloat twidth,
 				RtInt n, RtToken tokens[], RtPointer params[]) {
 
@@ -2442,7 +2442,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-RiMakeShadow (char *pic, char *tex, ...) {
+RiMakeShadow (const char *pic, const char *tex, ...) {
 	va_list	args;
 
 	va_start(args,tex);
@@ -2452,7 +2452,7 @@ RiMakeShadow (char *pic, char *tex, ...) {
 }
 
 EXTERN(RtVoid)
-    RiMakeShadowV (char *pic, char *tex,
+    RiMakeShadowV (const char *pic, const char *tex,
 	RtInt n, RtToken tokens[], RtPointer params[]) {
 
 	if (check("RiMakeShadow",RENDERMAN_ALL_BLOCKS)) return;	
@@ -2461,7 +2461,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-	RiMakeBrickMap (int n,char **src, char *dest, ...) {
+	RiMakeBrickMap (int n,const char **src, const char *dest, ...) {
 	va_list	args;
 
 	va_start(args,dest);
@@ -2471,7 +2471,7 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-	RiMakeBrickMapV(int nb,char **src, char *dest,RtInt n, RtToken tokens[], RtPointer params[]) {
+	RiMakeBrickMapV(int nb,const char **src, const char *dest,RtInt n, RtToken tokens[], RtPointer params[]) {
 
 	if (check("RiMakeBrickMap",RENDERMAN_ALL_BLOCKS)) return;	
 

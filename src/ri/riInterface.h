@@ -162,12 +162,12 @@ public:
 	virtual	void		RiMotionBeginV(int N,float times[]);
 	virtual	void		RiMotionEnd(void);
 
-	virtual	void		RiMakeTextureV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeBumpV(char *pic,char *tex,char * swrap,char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny,char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]);
-	virtual	void		RiMakeBrickMapV(int n,char **src,char *dest,int numTokens,char *tokens[],void *params[]);
+	virtual	void		RiMakeTextureV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeBumpV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny,const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]);
+	virtual	void		RiMakeBrickMapV(int n,const char **src,const char *dest,int numTokens,char *tokens[],void *params[]);
 
 	virtual	void		RiErrorHandler(void (*handler)(int,int,char *));
 

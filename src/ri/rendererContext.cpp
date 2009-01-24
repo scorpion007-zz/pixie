@@ -4354,7 +4354,7 @@ void	CRendererContext::RiMotionEnd(void) {
 	keyTimes			=	NULL;
 }
 
-void	CRendererContext::RiMakeTextureV(char *pic,char *tex,char *swrap,char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeTextureV(const char *pic,const char *tex,const char *swrap,const char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
@@ -4363,7 +4363,7 @@ void	CRendererContext::RiMakeTextureV(char *pic,char *tex,char *swrap,char *twra
 	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,(void **) params);
 }
 
-void	CRendererContext::RiMakeBumpV(char *pic,char *tex,char *swrap,char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeBumpV(const char *pic,const char *tex,const char *swrap,const char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
@@ -4372,7 +4372,7 @@ void	CRendererContext::RiMakeBumpV(char *pic,char *tex,char *swrap,char *twrap,f
 	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,(void **) params);
 }
 
-void	CRendererContext::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
@@ -4381,7 +4381,7 @@ void	CRendererContext::RiMakeLatLongEnvironmentV(char *pic,char *tex,float (*fil
 	makeCylindericalEnvironment(pic,tex,options->texturePath,RI_PERIODIC,RI_CLAMP,filterfunc,swidth,twidth,n,tokens,(void **) params);
 }
 
-void	CRendererContext::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,char *ny, char *pz,char *nz,char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny, const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
@@ -4391,7 +4391,7 @@ void	CRendererContext::RiMakeCubeFaceEnvironmentV(char *px,char *nx,char *py,cha
 }
 
 
-void	CRendererContext::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
@@ -4400,7 +4400,7 @@ void	CRendererContext::RiMakeShadowV(char *pic,char *tex,int n,char *tokens[],vo
 	makeSideEnvironment(pic,tex,options->texturePath,RI_CLAMP,RI_CLAMP,RiBoxFilter,1,1,n,tokens,(void **) params,TRUE);
 }
 
-void	CRendererContext::RiMakeBrickMapV(int nb,char **src,char *dest,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeBrickMapV(int nb,const char **src,const char *dest,int n,char *tokens[],void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;

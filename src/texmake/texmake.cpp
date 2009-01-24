@@ -62,20 +62,20 @@ void	printUsage() {
 
 int main(int argc, char* argv[]) {
 	int				tileSize		=	32;
-	char			*resizeMode		=	"up";
-	char			*smode			=	"periodic";
-	char			*tmode			=	"periodic";
+	const char		*resizeMode		=	"up";
+	const char		*smode			=	"periodic";
+	const char		*tmode			=	"periodic";
 	float			filterWidth		=	3;
 	float			filterHeight	=	3;
-	char			*inPath			=	".";
-	char			*outPath		=	".";
+	const char		*inPath			=	".";
+	const char		*outPath		=	".";
 	float			fov				=	90;
 	RtFilterFunc	filter			=	RiCatmullRomFilter;
 	float			maxerror		=	0.002f;
 	float			radiusScale		=	1.0f;
 	int				maxDepth		=	10;
 	int				i;
-	char			*textureMode	=	"texture";
+	const char		*textureMode	=	"texture";
 	int				processed;
 
 	RtToken			tokens[50];
