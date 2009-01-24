@@ -86,7 +86,7 @@
 
 %}
 %union {
-  char					*string;
+  const char			*string;
   CExpression			*code;
   float					real;
   int					integer;
@@ -374,7 +374,7 @@ slFloatValue:	slAritmeticExpression
 					if ($1->value(tmp)) {
 					
 						// Yes, convert it to float
-						$$	=	atof(tmp);
+						$$	=	(float) atof(tmp);
 					} else
 						sdr->error("Expecting a simple float argument\n");
 				} else
@@ -2482,8 +2482,7 @@ slFunctionCall:
 		{
 			CFunctionPrototype		*cFun;
 			CList<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
-
-			char					*funName	=	$1;
+			const char				*funName	=	$1;
 
 			// Clear the desired type flags
 			sdr->undesire();
@@ -2579,8 +2578,7 @@ slFunCall:
 		{
 			CFunction				*cFun;
 			CList<CExpression *>	*parameters	=	sdr->actualParameters;	// This is the list of parameters to the function
-
-			char					*funName	=	$1;
+			const char				*funName	=	$1;
 
 			// Clear the desired type flags
 			sdr->undesire();
@@ -2603,7 +2601,7 @@ slFunCall:
 			// If not found, check the predefined CFunctions
 			if (cFun == NULL) {
 				CFunctionPrototype	*cFun;
-				char				*fName	=	$1;
+				const char			*fName	=	$1;
 				// Check the builtin CFunctions
 
 				for (cFun = sdr->builtinFunctions->first(); cFun != NULL; cFun = sdr->builtinFunctions->next()) {

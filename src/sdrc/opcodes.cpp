@@ -33,160 +33,160 @@
 
 ////////////////////////////////////////////////////////////////////////
 //	Conditionals
-char	*opcodeIf						=			"\tif                ";
-char	*opcodeElse						=			"\telse              ";
-char	*opcodeEndif					=			"\tendif             ";
-char	*opcodeGatherHeader				=			"\tgatherHeader      ";
-char	*opcodeGather					=			"\tgather            ";
-char	*opcodeGatherElse				=			"\tgatherElse        ";
-char	*opcodeGatherEnd				=			"\tgatherEnd         ";
-char	*opcodeFor						=			"\tfor               ";
-char	*opcodeBeginfor					=			"\tforbegin          ";
-char	*opcodeEndfor					=			"\tforend            ";
-char	*opcodeIlluminance				=			"\tilluminance       ";
-char	*opcodeBeginIlluminance			=			"\tbeginilluminance  ";
-char	*opcodeEndIlluminance			=			"\tendilluminance    ";
-char	*opcodeSolar					=			"\tsolar             ";
-char	*opcodeEndSolar					=			"\tendsolar          ";
-char	*opcodeIlluminate				=			"\tilluminate        ";
-char	*opcodeEndIlluminate			=			"\tendilluminate     ";
-char	*opcodeBreak					=			"\tbreak             ";
-char	*opcodeContinue					=			"\tcontinue          ";
-char	*opcodeReturn					=			"\treturn            ";
+const char	*opcodeIf						=			"\tif                ";
+const char	*opcodeElse						=			"\telse              ";
+const char	*opcodeEndif					=			"\tendif             ";
+const char	*opcodeGatherHeader				=			"\tgatherHeader      ";
+const char	*opcodeGather					=			"\tgather            ";
+const char	*opcodeGatherElse				=			"\tgatherElse        ";
+const char	*opcodeGatherEnd				=			"\tgatherEnd         ";
+const char	*opcodeFor						=			"\tfor               ";
+const char	*opcodeBeginfor					=			"\tforbegin          ";
+const char	*opcodeEndfor					=			"\tforend            ";
+const char	*opcodeIlluminance				=			"\tilluminance       ";
+const char	*opcodeBeginIlluminance			=			"\tbeginilluminance  ";
+const char	*opcodeEndIlluminance			=			"\tendilluminance    ";
+const char	*opcodeSolar					=			"\tsolar             ";
+const char	*opcodeEndSolar					=			"\tendsolar          ";
+const char	*opcodeIlluminate				=			"\tilluminate        ";
+const char	*opcodeEndIlluminate			=			"\tendilluminate     ";
+const char	*opcodeBreak					=			"\tbreak             ";
+const char	*opcodeContinue					=			"\tcontinue          ";
+const char	*opcodeReturn					=			"\treturn            ";
 
 
 ////////////////////////////////////////////////////////////////////////
 //	Relations
 
 // Equal
-char	*opcodeFloatEqual				=			"\tfeql              ";
-char	*opcodeVectorEqual				=			"\tveql              ";
-char	*opcodeStringEqual				=			"\tseql              ";
-char	*opcodeMatrixEqual				=			"\tmeql              ";
+const char	*opcodeFloatEqual				=			"\tfeql              ";
+const char	*opcodeVectorEqual				=			"\tveql              ";
+const char	*opcodeStringEqual				=			"\tseql              ";
+const char	*opcodeMatrixEqual				=			"\tmeql              ";
 
 // Not Equal
-char	*opcodeFloatNotEqual			=			"\tfneql             ";
-char	*opcodeVectorNotEqual			=			"\tvneql             ";
-char	*opcodeStringNotEqual			=			"\tsneql             ";
-char	*opcodeMatrixNotEqual			=			"\tmneql             ";
+const char	*opcodeFloatNotEqual			=			"\tfneql             ";
+const char	*opcodeVectorNotEqual			=			"\tvneql             ";
+const char	*opcodeStringNotEqual			=			"\tsneql             ";
+const char	*opcodeMatrixNotEqual			=			"\tmneql             ";
 
 // Less than or equal
-char	*opcodeFloatELess				=			"\tfelt              ";
-char	*opcodeVectorELess				=			"\tvelt              ";
+const char	*opcodeFloatELess				=			"\tfelt              ";
+const char	*opcodeVectorELess				=			"\tvelt              ";
 
 // Less than
-char	*opcodeFloatLess				=			"\tflt               ";
-char	*opcodeVectorLess				=			"\tvlt               ";
+const char	*opcodeFloatLess				=			"\tflt               ";
+const char	*opcodeVectorLess				=			"\tvlt               ";
 
 // Greater than or equal
-char	*opcodeFloatEGreater			=			"\tfegt              ";
-char	*opcodeVectorEGreater			=			"\tvegt              ";
+const char	*opcodeFloatEGreater			=			"\tfegt              ";
+const char	*opcodeVectorEGreater			=			"\tvegt              ";
 
 // Greater than
-char	*opcodeFloatGreater				=			"\tfgt               ";
-char	*opcodeVectorGreater			=			"\tvgt               ";
+const char	*opcodeFloatGreater				=			"\tfgt               ";
+const char	*opcodeVectorGreater			=			"\tvgt               ";
 
 ////////////////////////////////////////////////////////////////////////
 //	Conversions
-char	*opcodeMatrixFromFloat			=			"\tmfromf            ";
-char	*opcodeVectorFromFloat			=			"\tvfromf            ";
-char	*opcodeMatrixFromVector			=			"\tmfromv            ";
+const char	*opcodeMatrixFromFloat			=			"\tmfromf            ";
+const char	*opcodeVectorFromFloat			=			"\tvfromf            ";
+const char	*opcodeMatrixFromVector			=			"\tmfromv            ";
 
 // System conversion
-char	*opcodeVectorFrom				=			"\tvfrom             ";
-char	*opcodeColorFrom				=			"\tcfrom             ";
-char	*opcodePointFrom				=			"\tpfrom             ";
-char	*opcodeMatrixFrom				=			"\tmfrom             ";
+const char	*opcodeVectorFrom				=			"\tvfrom             ";
+const char	*opcodeColorFrom				=			"\tcfrom             ";
+const char	*opcodePointFrom				=			"\tpfrom             ";
+const char	*opcodeMatrixFrom				=			"\tmfrom             ";
 
 ////////////////////////////////////////////////////////////////////////
 //	Boolean operations
-char	*opcodeAnd						=			"\tand               ";
-char	*opcodeOr						=			"\tor                ";
-char	*opcodeXor						=			"\txor               ";
-char	*opcodeNXor						=			"\tnxor              ";
-char	*opcodeNot						=			"\tnot               ";
+const char	*opcodeAnd						=			"\tand               ";
+const char	*opcodeOr						=			"\tor                ";
+const char	*opcodeXor						=			"\txor               ";
+const char	*opcodeNXor						=			"\tnxor              ";
+const char	*opcodeNot						=			"\tnot               ";
 
 
 ////////////////////////////////////////////////////////////////////////
 //	Unary operations
 
 //	Negetion
-char	*opcodeNegFloat					=			"\tnegf              ";
-char	*opcodeNegVector				=			"\tnegv              ";
-char	*opcodeNegMatrix				=			"\tnegm              ";
+const char	*opcodeNegFloat					=			"\tnegf              ";
+const char	*opcodeNegVector				=			"\tnegv              ";
+const char	*opcodeNegMatrix				=			"\tnegm              ";
 
 ////////////////////////////////////////////////////////////////////////
 //	Binary operations
 
 // Dot and cross products
-char	*opcodeDotProduct				=			"\tdot               ";
-char	*opcodeCrossProduct				=			"\tcross             ";
+const char	*opcodeDotProduct				=			"\tdot               ";
+const char	*opcodeCrossProduct				=			"\tcross             ";
 
 // Division
-char	*opcodeDivFloatFloat			=			"\tdivff             ";
-char	*opcodeDivVectorVector			=			"\tdivvv             ";
-char	*opcodeDivMatrixMatrix			=			"\tdivmm             ";
+const char	*opcodeDivFloatFloat			=			"\tdivff             ";
+const char	*opcodeDivVectorVector			=			"\tdivvv             ";
+const char	*opcodeDivMatrixMatrix			=			"\tdivmm             ";
 
 // Multipication
-char	*opcodeMulFloatFloat			=			"\tmulff             ";
-char	*opcodeMulVectorVector			=			"\tmulvv             ";
-char	*opcodeMulMatrixMatrix			=			"\tmulmm             ";
-char	*opcodeMulMatrixPoint			=			"\tmulmp             ";
-char	*opcodeMulMatrixNormal			=			"\tmulmn             ";
-char	*opcodeMulMatrixVector			=			"\tmulmv             ";
-char	*opcodeMulPointMatrix			=			"\tmulpm             ";
-char	*opcodeMulNormalMatrix			=			"\tmulnm             ";
-char	*opcodeMulVectorMatrix			=			"\tmulvm             ";
+const char	*opcodeMulFloatFloat			=			"\tmulff             ";
+const char	*opcodeMulVectorVector			=			"\tmulvv             ";
+const char	*opcodeMulMatrixMatrix			=			"\tmulmm             ";
+const char	*opcodeMulMatrixPoint			=			"\tmulmp             ";
+const char	*opcodeMulMatrixNormal			=			"\tmulmn             ";
+const char	*opcodeMulMatrixVector			=			"\tmulmv             ";
+const char	*opcodeMulPointMatrix			=			"\tmulpm             ";
+const char	*opcodeMulNormalMatrix			=			"\tmulnm             ";
+const char	*opcodeMulVectorMatrix			=			"\tmulvm             ";
 
 // Addition
-char	*opcodeAddFloatFloat			=			"\taddff             ";
-char	*opcodeAddVectorVector			=			"\taddvv             ";
-char	*opcodeAddMatrixMatrix			=			"\taddmm             ";
+const char	*opcodeAddFloatFloat			=			"\taddff             ";
+const char	*opcodeAddVectorVector			=			"\taddvv             ";
+const char	*opcodeAddMatrixMatrix			=			"\taddmm             ";
 
 // Subtraction
-char	*opcodeSubFloatFloat			=			"\tsubff             ";
-char	*opcodeSubVectorVector			=			"\tsubvv             ";
-char	*opcodeSubMatrixMatrix			=			"\tsubmm             ";
+const char	*opcodeSubFloatFloat			=			"\tsubff             ";
+const char	*opcodeSubVectorVector			=			"\tsubvv             ";
+const char	*opcodeSubMatrixMatrix			=			"\tsubmm             ";
 
 ////////////////////////////////////////////////////////////////////////
 //	Data movement operations
 
 // Uniform to varying assignment
-char 	*opcodeVUFloat					=			"\tvufloat           ";
-char 	*opcodeVUVector					=			"\tvuvector          ";
-char 	*opcodeVUMatrix					=			"\tvumatrix          ";
-char 	*opcodeVUString					=			"\tvustring          ";
+const char 	*opcodeVUFloat					=			"\tvufloat           ";
+const char 	*opcodeVUVector					=			"\tvuvector          ";
+const char 	*opcodeVUMatrix					=			"\tvumatrix          ";
+const char 	*opcodeVUString					=			"\tvustring          ";
 
 //	Move
-char	*opcodeMoveFloatFloat			=			"\tmoveff            ";
-char	*opcodeMoveVectorVector			=			"\tmovevv            ";
-char	*opcodeMoveStringString			=			"\tmovess            ";
-char	*opcodeMoveMatrixMatrix			=			"\tmovemm            ";
-char	*opcodeMoveAFloatFloat			=			"\tmoveaff           ";
-char	*opcodeMoveAVectorVector		=			"\tmoveavv           ";
-char	*opcodeMoveAStringString		=			"\tmoveass           ";
-char	*opcodeMoveAMatrixMatrix		=			"\tmoveamm           ";
-char	*opcodeFFromArray				=			"\tffroma            ";
-char	*opcodeFToArray					=			"\tftoa              ";
-char	*opcodeVFromArray				=			"\tvfroma            ";
-char	*opcodeVToArray					=			"\tvtoa              ";
-char	*opcodeMFromArray				=			"\tmfroma            ";
-char	*opcodeMToArray					=			"\tmtoa              ";
-char	*opcodeSFromArray				=			"\tsfroma            ";
-char	*opcodeSToArray					=			"\tstoa              ";
-char	*opcodeUFFromArray				=			"\tuffroma           ";
-char	*opcodeUVFromArray				=			"\tuvfroma           ";
-char	*opcodeUMFromArray				=			"\tumfroma           ";
-char	*opcodeUSFromArray				=			"\tusfroma           ";
+const char	*opcodeMoveFloatFloat			=			"\tmoveff            ";
+const char	*opcodeMoveVectorVector			=			"\tmovevv            ";
+const char	*opcodeMoveStringString			=			"\tmovess            ";
+const char	*opcodeMoveMatrixMatrix			=			"\tmovemm            ";
+const char	*opcodeMoveAFloatFloat			=			"\tmoveaff           ";
+const char	*opcodeMoveAVectorVector		=			"\tmoveavv           ";
+const char	*opcodeMoveAStringString		=			"\tmoveass           ";
+const char	*opcodeMoveAMatrixMatrix		=			"\tmoveamm           ";
+const char	*opcodeFFromArray				=			"\tffroma            ";
+const char	*opcodeFToArray					=			"\tftoa              ";
+const char	*opcodeVFromArray				=			"\tvfroma            ";
+const char	*opcodeVToArray					=			"\tvtoa              ";
+const char	*opcodeMFromArray				=			"\tmfroma            ";
+const char	*opcodeMToArray					=			"\tmtoa              ";
+const char	*opcodeSFromArray				=			"\tsfroma            ";
+const char	*opcodeSToArray					=			"\tstoa              ";
+const char	*opcodeUFFromArray				=			"\tuffroma           ";
+const char	*opcodeUVFromArray				=			"\tuvfroma           ";
+const char	*opcodeUMFromArray				=			"\tumfroma           ";
+const char	*opcodeUSFromArray				=			"\tusfroma           ";
 
 
 
 ////////////////////////////////////////////////////////////////////////
 //	Constants
 
-char	*constantLoopName				=			"1__$$__$$__$$__loop";
-char	*constantBlockName				=			"1__$$__$$__$$__block";
-char	*constantShaderMain				=			"1__$$__$$__$$__main";
-char	*constantReturnValue			=			"__ReturnValue__";
-char	*constantBug					=			"Compiler bug, please report";
+const char	*constantLoopName				=			"1__$$__$$__$$__loop";
+const char	*constantBlockName				=			"1__$$__$$__$$__block";
+const char	*constantShaderMain				=			"1__$$__$$__$$__main";
+const char	*constantReturnValue			=			"__ReturnValue__";
+const char	*constantBug					=			"Compiler bug, please report";
 

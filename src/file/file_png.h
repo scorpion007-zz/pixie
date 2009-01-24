@@ -64,3 +64,4 @@ public:
 	png_infop		info_ptr;
 	FILE			*fhandle;
 };
+

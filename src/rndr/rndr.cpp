@@ -83,13 +83,10 @@ void	exitFunction() {
 		closesocket(listenSock);
 
 		if (noRestart == FALSE) {
-			char	**argv	=	new char*[gargc+2];
-			int		i;
+			const char	**argv	=	new const char*[gargc+2];
+			int			i;
 
-
-			for (i=0;i<gargc;i++) {
-				argv[i]	=	gargv[i];
-			}
+			for (i=0;i<gargc;++i)	argv[i]	=	gargv[i];
 			argv[i++]	=	"-q";
 			argv[i]		=	NULL;
 			

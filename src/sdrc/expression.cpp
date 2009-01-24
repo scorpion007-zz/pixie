@@ -60,7 +60,7 @@ inline	void	getContainer(FILE *out,int type,CVariable *&dest,CExpression *src) {
 		if (src->type & SLC_UNIFORM) {
 			// Uniform to varying assignment
 			CVariable	*nDest	=	sdr->lockRegister(src->type ^ SLC_UNIFORM);
-			char		*opcode;
+			const char	*opcode;
 
 			if (dest == NULL) {
 				dest	=	sdr->lockRegister(src->type);
@@ -114,7 +114,7 @@ inline	void	getContainer(FILE *out,CVariable *dest,CVariable *src) {
 	} else {
 		if (src->type & SLC_UNIFORM) {
 			// Uniform to varying assignment
-			char		*opcode;
+			const char		*opcode;
 
 			// Uniform to varying assignment
 			if (src->type & SLC_FLOAT) {
@@ -152,7 +152,7 @@ inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
 	} else {
 		if (src->type & SLC_UNIFORM) {
 			// Uniform to varying assignment
-			char		*opcode;
+			const char	*opcode;
 			CVariable	*cVar;
 			CExpression	*exp		=	getConversion(dest->type,src);
 			int			allocated	=	FALSE;
@@ -211,7 +211,7 @@ inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 	} else {
 		if (src->type & SLC_UNIFORM) {
 			// Uniform to varying assignment
-			char		*opcode;
+			const char	*opcode;
 			CVariable	*cVar;
 			int			allocated	=	FALSE;
 
@@ -735,7 +735,7 @@ CArrayExpression::~CArrayExpression() {
 // Return Value			:	-
 // Comments				:
 void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
-	char	*opcode;
+	const char	*opcode;
 
 	if (dest == NULL) {
 		// We have to be assigned to something
@@ -818,7 +818,7 @@ CTerminalExpression::~CTerminalExpression()	{
 // Return Value			:	-
 // Comments				:
 void		CTerminalExpression::getCode(FILE *out,CVariable *dest) {
-	char	*opcode;
+	const char	*opcode;
 
 	if (dest == NULL) {
 		sdr->warning("Useless assignment\n");
@@ -886,7 +886,7 @@ CConstantTerminalExpression::~CConstantTerminalExpression()	{
 // Return Value			:	-
 // Comments				:
 void		CConstantTerminalExpression::getCode(FILE *out,CVariable *dest) {
-	char	*opcode;
+	const char	*opcode;
 
 	if (dest == NULL) {
 		sdr->warning("Useless constant expression\n");
@@ -1994,8 +1994,8 @@ CArrayAssignmentExpression::~CArrayAssignmentExpression() {
 // Return Value			:	-
 // Comments				:
 void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
-	char	*opcode;
-	char	*opcodeN;
+	const char	*opcode;
+	const char	*opcodeN;
 
 	lock(opi,index);	// Get float index
 	lock(op,second);	// Get the second code
@@ -2057,7 +2057,7 @@ void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpression *s,char *opcodeFloat,char *opcodeVector,char *opcodeMatrix) : CExpression(f->type) {
+CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpression *s,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix) : CExpression(f->type) {
 	first = f;
 	arrayAssigner = NULL;
 	

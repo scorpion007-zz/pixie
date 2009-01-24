@@ -318,7 +318,7 @@ public:
 // Comments				:
 class	CArrayUpdateExpression : public CExpression {
 public:
-						CArrayUpdateExpression(CVariable *,CExpression *,CExpression *,char *,char *,char *);
+						CArrayUpdateExpression(CVariable *,CExpression *,CExpression *,const char *,const char *,const char *);
 						~CArrayUpdateExpression();
 
 			void		getCode(FILE *,CVariable *);

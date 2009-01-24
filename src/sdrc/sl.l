@@ -40,11 +40,11 @@ bump											return SL_BUMP;
 
 PI												return SL_FCN_PI;
 
-\"[^\"]*\"										{	yylval.string = strdup(yytext);	    sdr->allocatedStrings->push(yylval.string); return SL_TEXT_VALUE;	}
-[a-zA-Z\_][a-zA-Z0-9\_]*						{	yylval.string = strdup(yytext);		sdr->allocatedStrings->push(yylval.string); return SL_IDENTIFIER_VALUE;			}
-(([0-9]*\.[0-9]+)([eE][+-]?[0-9]+)?)f?			{	yylval.string = strdup(yytext);		sdr->allocatedStrings->push(yylval.string); return SL_FLOAT_VALUE;				}
-(([0-9]+\.[0-9]*)([eE][+-]?[0-9]+)?)f?			{	yylval.string = strdup(yytext);		sdr->allocatedStrings->push(yylval.string); return SL_FLOAT_VALUE;				}
-(([0-9]+)([eE][+-]?[0-9]+)?)f?					{	yylval.string = strdup(yytext);		sdr->allocatedStrings->push(yylval.string); return SL_FLOAT_VALUE;				}
+\"[^\"]*\"										{	char	*token	=	strdup(yytext);	yylval.string = token;	    sdr->allocatedStrings->push(token); return SL_TEXT_VALUE;	}
+[a-zA-Z\_][a-zA-Z0-9\_]*						{	char	*token	=	strdup(yytext);	yylval.string = token;	    sdr->allocatedStrings->push(token); return SL_IDENTIFIER_VALUE;			}
+(([0-9]*\.[0-9]+)([eE][+-]?[0-9]+)?)f?			{	char	*token	=	strdup(yytext);	yylval.string = token;	    sdr->allocatedStrings->push(token); return SL_FLOAT_VALUE;				}
+(([0-9]+\.[0-9]*)([eE][+-]?[0-9]+)?)f?			{	char	*token	=	strdup(yytext);	yylval.string = token;	    sdr->allocatedStrings->push(token); return SL_FLOAT_VALUE;				}
+(([0-9]+)([eE][+-]?[0-9]+)?)f?					{	char	*token	=	strdup(yytext);	yylval.string = token;	    sdr->allocatedStrings->push(token); return SL_FLOAT_VALUE;				}
 
 
 \,												return SL_COMMA;

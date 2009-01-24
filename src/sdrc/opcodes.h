@@ -40,155 +40,155 @@
 
 /////////////////////////////////////////////////
 // Conditional execution
-extern	char	*opcodeIf						;
-extern	char	*opcodeElse						;
-extern	char	*opcodeEndif					;
-extern	char	*opcodeGatherHeader				;
-extern	char	*opcodeGather					;
-extern	char	*opcodeGatherElse				;
-extern	char	*opcodeGatherEnd				;
-extern	char	*opcodeFor						;
-extern	char	*opcodeBeginfor					;
-extern	char	*opcodeEndfor					;
-extern	char	*opcodeIlluminance				;
-extern	char	*opcodeEndIlluminance			;
-extern	char	*opcodeSolar					;
-extern	char	*opcodeEndSolar					;
-extern	char	*opcodeIlluminate				;
-extern	char	*opcodeEndIlluminate			;
-extern	char	*opcodeBreak					;
-extern	char	*opcodeContinue					;
-extern	char	*opcodeReturn					;
+extern	const char	*opcodeIf						;
+extern	const char	*opcodeElse						;
+extern	const char	*opcodeEndif					;
+extern	const char	*opcodeGatherHeader				;
+extern	const char	*opcodeGather					;
+extern	const char	*opcodeGatherElse				;
+extern	const char	*opcodeGatherEnd				;
+extern	const char	*opcodeFor						;
+extern	const char	*opcodeBeginfor					;
+extern	const char	*opcodeEndfor					;
+extern	const char	*opcodeIlluminance				;
+extern	const char	*opcodeEndIlluminance			;
+extern	const char	*opcodeSolar					;
+extern	const char	*opcodeEndSolar					;
+extern	const char	*opcodeIlluminate				;
+extern	const char	*opcodeEndIlluminate			;
+extern	const char	*opcodeBreak					;
+extern	const char	*opcodeContinue					;
+extern	const char	*opcodeReturn					;
 
 
 /////////////////////////////////////////////////
 // Relations
 
 // Equal
-extern char 	*opcodeFloatEqual				;
-extern char 	*opcodeVectorEqual				;
-extern char 	*opcodeStringEqual				;
-extern char 	*opcodeMatrixEqual				;
+extern const char 	*opcodeFloatEqual				;
+extern const char 	*opcodeVectorEqual				;
+extern const char 	*opcodeStringEqual				;
+extern const char 	*opcodeMatrixEqual				;
 
 // Not Equal
-extern char 	*opcodeFloatNotEqual			;
-extern char 	*opcodeVectorNotEqual			;
-extern char 	*opcodeStringNotEqual			;
-extern char 	*opcodeMatrixNotEqual			;
+extern const char 	*opcodeFloatNotEqual			;
+extern const char 	*opcodeVectorNotEqual			;
+extern const char 	*opcodeStringNotEqual			;
+extern const char 	*opcodeMatrixNotEqual			;
 
 // Less than or equal
-extern char 	*opcodeFloatELess				;
-extern char 	*opcodeVectorELess				;
+extern const char 	*opcodeFloatELess				;
+extern const char 	*opcodeVectorELess				;
 
 // Less than
-extern char 	*opcodeFloatLess				;
-extern char 	*opcodeVectorLess				;
+extern const char 	*opcodeFloatLess				;
+extern const char 	*opcodeVectorLess				;
 
 // Greater than or equal
-extern char 	*opcodeFloatEGreater			;
-extern char 	*opcodeVectorEGreater			;
+extern const char 	*opcodeFloatEGreater			;
+extern const char 	*opcodeVectorEGreater			;
 
 // Greater than
-extern char 	*opcodeFloatGreater				;
-extern char 	*opcodeVectorGreater			;
+extern const char 	*opcodeFloatGreater				;
+extern const char 	*opcodeVectorGreater			;
 
 /////////////////////////////////////////////////
 // Conversions
-extern char 	*opcodeMatrixFromFloat			;
-extern char 	*opcodeVectorFromFloat			;
-extern char 	*opcodeMatrixFromVector			;
+extern const char 	*opcodeMatrixFromFloat			;
+extern const char 	*opcodeVectorFromFloat			;
+extern const char 	*opcodeMatrixFromVector			;
 
 // System conversion
-extern	char	*opcodeVectorFrom				;
-extern	char	*opcodeColorFrom				;
-extern	char	*opcodePointFrom				;
-extern	char	*opcodeMatrixFrom				;
+extern const char	*opcodeVectorFrom				;
+extern const char	*opcodeColorFrom				;
+extern const char	*opcodePointFrom				;
+extern const char	*opcodeMatrixFrom				;
 
 
 /////////////////////////////////////////////////
 // Boolean operations
-extern char 	*opcodeAnd						;
-extern char 	*opcodeOr						;
-extern char 	*opcodeXor						;
-extern char 	*opcodeNXor						;
-extern char 	*opcodeNot						;
+extern const char 	*opcodeAnd						;
+extern const char 	*opcodeOr						;
+extern const char 	*opcodeXor						;
+extern const char 	*opcodeNXor						;
+extern const char 	*opcodeNot						;
 
 /////////////////////////////////////////////////
 // Unary operations
-extern char 	*opcodeNegFloat					;
-extern char 	*opcodeNegVector				;
-extern char 	*opcodeNegMatrix				;
+extern const char 	*opcodeNegFloat					;
+extern const char 	*opcodeNegVector				;
+extern const char 	*opcodeNegMatrix				;
 
 /////////////////////////////////////////////////
 // Binary operations
 
 // Dot and cross products
-extern char 	*opcodeDotProduct				;
-extern char 	*opcodeCrossProduct				;
+extern const char 	*opcodeDotProduct				;
+extern const char 	*opcodeCrossProduct				;
 
 // Division
-extern char 	*opcodeDivFloatFloat			;
-extern char 	*opcodeDivVectorVector			;
-extern char 	*opcodeDivMatrixMatrix			;
+extern const char 	*opcodeDivFloatFloat			;
+extern const char 	*opcodeDivVectorVector			;
+extern const char 	*opcodeDivMatrixMatrix			;
 
 // Multipication
-extern char 	*opcodeMulFloatFloat			;
-extern char 	*opcodeMulVectorVector			;
-extern char 	*opcodeMulMatrixMatrix			;
-extern char 	*opcodeMulMatrixPoint			;
-extern char 	*opcodeMulMatrixNormal			;
-extern char 	*opcodeMulMatrixVector			;
-extern char 	*opcodeMulPointMatrix			;
-extern char 	*opcodeMulNormalMatrix			;
-extern char 	*opcodeMulVectorMatrix			;
+extern const char 	*opcodeMulFloatFloat			;
+extern const char 	*opcodeMulVectorVector			;
+extern const char 	*opcodeMulMatrixMatrix			;
+extern const char 	*opcodeMulMatrixPoint			;
+extern const char 	*opcodeMulMatrixNormal			;
+extern const char 	*opcodeMulMatrixVector			;
+extern const char 	*opcodeMulPointMatrix			;
+extern const char 	*opcodeMulNormalMatrix			;
+extern const char 	*opcodeMulVectorMatrix			;
 
 // Addition
-extern char 	*opcodeAddFloatFloat			;
-extern char 	*opcodeAddVectorVector			;
-extern char 	*opcodeAddMatrixMatrix			;
+extern const char 	*opcodeAddFloatFloat			;
+extern const char 	*opcodeAddVectorVector			;
+extern const char 	*opcodeAddMatrixMatrix			;
 
 // Subtraction
-extern char 	*opcodeSubFloatFloat			;
-extern char 	*opcodeSubVectorVector			;
-extern char 	*opcodeSubMatrixMatrix			;
+extern const char 	*opcodeSubFloatFloat			;
+extern const char 	*opcodeSubVectorVector			;
+extern const char 	*opcodeSubMatrixMatrix			;
 
 
 /////////////////////////////////////////////////
 // Data movement operations
-extern char 	*opcodeVUFloat					;
-extern char 	*opcodeVUVector					;
-extern char 	*opcodeVUMatrix					;
-extern char 	*opcodeVUString					;
-extern char 	*opcodeVUBoolean				;
+extern const char 	*opcodeVUFloat					;
+extern const char 	*opcodeVUVector					;
+extern const char 	*opcodeVUMatrix					;
+extern const char 	*opcodeVUString					;
+extern const char 	*opcodeVUBoolean				;
 
-extern char 	*opcodeMoveFloatFloat			;
-extern char 	*opcodeMoveVectorVector			;
-extern char 	*opcodeMoveStringString			;
-extern char 	*opcodeMoveMatrixMatrix			;
-extern char 	*opcodeMoveAFloatFloat			;
-extern char 	*opcodeMoveAVectorVector		;
-extern char 	*opcodeMoveAStringString		;
-extern char 	*opcodeMoveAMatrixMatrix		;
-extern char		*opcodeFFromArray				;
-extern char		*opcodeFToArray					;
-extern char		*opcodeVFromArray				;
-extern char		*opcodeVToArray					;
-extern char		*opcodeMFromArray				;
-extern char		*opcodeMToArray					;
-extern char		*opcodeSFromArray				;
-extern char		*opcodeSToArray					;
-extern char		*opcodeUFFromArray				;
-extern char		*opcodeUVFromArray				;
-extern char		*opcodeUMFromArray				;
-extern char		*opcodeUSFromArray				;
+extern const char 	*opcodeMoveFloatFloat			;
+extern const char 	*opcodeMoveVectorVector			;
+extern const char 	*opcodeMoveStringString			;
+extern const char 	*opcodeMoveMatrixMatrix			;
+extern const char 	*opcodeMoveAFloatFloat			;
+extern const char 	*opcodeMoveAVectorVector		;
+extern const char 	*opcodeMoveAStringString		;
+extern const char 	*opcodeMoveAMatrixMatrix		;
+extern const char	*opcodeFFromArray				;
+extern const char	*opcodeFToArray					;
+extern const char	*opcodeVFromArray				;
+extern const char	*opcodeVToArray					;
+extern const char	*opcodeMFromArray				;
+extern const char	*opcodeMToArray					;
+extern const char	*opcodeSFromArray				;
+extern const char	*opcodeSToArray					;
+extern const char	*opcodeUFFromArray				;
+extern const char	*opcodeUVFromArray				;
+extern const char	*opcodeUMFromArray				;
+extern const char	*opcodeUSFromArray				;
 
 /////////////////////////////////////////////////
 // Misc constants
-extern char		*constantLoopName				;
-extern char		*constantBlockName				;
-extern char		*constantShaderMain				;
-extern char		*constantReturnValue			;
-extern char		*constantBug					;
+extern const char		*constantLoopName				;
+extern const char		*constantBlockName				;
+extern const char		*constantShaderMain				;
+extern const char		*constantReturnValue			;
+extern const char		*constantBug					;
 
 #endif
 
