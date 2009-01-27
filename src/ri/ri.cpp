@@ -2200,7 +2200,7 @@ RiProcRunProgram (void *data, RtFloat detail) {
 				dup2(fdout[0],STDIN_FILENO);	close(fdout[0]);// remap stdin and stdout
 				dup2(fdin[1],STDOUT_FILENO);	close(fdin[1]);
 				
-				putenv("PIXIE_RUNPROGRAM=1");
+				putenv((char *) "PIXIE_RUNPROGRAM=1");
 				
 				// launch the program (via shell to do cmdline parsing / breaking up!)
 				if (system(delayed->generator) != 0) {
