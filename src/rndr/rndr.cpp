@@ -83,11 +83,11 @@ void	exitFunction() {
 		closesocket(listenSock);
 
 		if (noRestart == FALSE) {
-			char		**const argv	=	new char*[gargc+2];
+			char		**argv	=	new char*[gargc+2];
 			int			i;
 
 			for (i=0;i<gargc;++i)	argv[i]	=	gargv[i];
-			argv[i++]	=	"-q";
+			argv[i++]	=	(char *) "-q";
 			argv[i]		=	NULL;
 			
 			// use execvp to search PATH, incase pixie
@@ -358,7 +358,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 		sprintf(portbuf,"%d",listenPort);
 
 		// The command line arguments
-		char 		* const argv[]	=	{gargv[0],"-q","-c",portbuf,ribFile,NULL};
+		char 		* const argv[]	=	{gargv[0],(char *) "-q",(char *) "-c",portbuf,ribFile,NULL};
 		
 		for(int k=0;k<numChildren;k++){
 			#ifdef _WINDOWS

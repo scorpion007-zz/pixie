@@ -85,7 +85,7 @@ CFileFramebuffer()
 	if (software) {
 		png_text comment;
 		comment.compression = -1;
-		comment.key = "Software";
+		comment.key = (png_charp) "Software";
 		comment.text = software;
 		comment.text_length = strlen(software);
 		png_set_text(png_ptr, info_ptr, &comment, 1);

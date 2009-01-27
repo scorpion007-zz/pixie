@@ -73,15 +73,15 @@ typedef struct TSlLabel {
 
 typedef struct {
 	ESlCode			entryPoint;
-	char			*name;
+	const char		*name;
 	int				nargs;
 	unsigned int	usedParameters;
 } TSlOpcode;
 
 typedef struct {
 	ESlCode			entryPoint;
-	char			*name;
-	char			*prototype;
+	const char		*name;
+	const char		*prototype;
 	unsigned int	usedParameters;
 } TSlFunction;
 
