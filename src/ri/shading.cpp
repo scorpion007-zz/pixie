@@ -54,48 +54,48 @@
 #define		USE_EXTRAPOLATED_DERIV
 
 // Options that are defined and responded
-static	char	*optionsFormat				=	"Format";
-static	char	*optionsDeviceFrame			=	"Frame";
-static	char	*optionsDeviceResolution	=	"DeviceResolution";
-static	char	*optionsFrameAspectRatio	=	"FrameAspectRatio";
-static	char	*optionsCropWindow			=	"CropWindow";
-static	char	*optionsDepthOfField		=	"DepthOfField";
-static	char	*optionsShutter				=	"Shutter";
-static	char	*optionsClipping			=	"Clipping";
-static	char	*optionsBucketSize			=	"BucketSize";
-static	char	*optionsColorQuantizer		=	"ColorQuantizer";
-static	char	*optionsDepthQuantizer		=	"DepthQuantizer";
-static	char	*optionsPixelFilter			=	"PixelFilter";
-static	char	*optionsGamma				=	"Gamma";
-static	char	*optionsMaxRayDepth			=	"MaxRayDepth";
-static	char	*optionsRelativeDetail		=	"RelativeDetail";
-static	char	*optionsPixelSamples		=	"PixelSamples";
+const	char	*optionsFormat				=	"Format";
+const	char	*optionsDeviceFrame			=	"Frame";
+const	char	*optionsDeviceResolution	=	"DeviceResolution";
+const	char	*optionsFrameAspectRatio	=	"FrameAspectRatio";
+const	char	*optionsCropWindow			=	"CropWindow";
+const	char	*optionsDepthOfField		=	"DepthOfField";
+const	char	*optionsShutter				=	"Shutter";
+const	char	*optionsClipping			=	"Clipping";
+const	char	*optionsBucketSize			=	"BucketSize";
+const	char	*optionsColorQuantizer		=	"ColorQuantizer";
+const	char	*optionsDepthQuantizer		=	"DepthQuantizer";
+const	char	*optionsPixelFilter			=	"PixelFilter";
+const	char	*optionsGamma				=	"Gamma";
+const	char	*optionsMaxRayDepth			=	"MaxRayDepth";
+const	char	*optionsRelativeDetail		=	"RelativeDetail";
+const	char	*optionsPixelSamples		=	"PixelSamples";
 
 // Attributes that are defined and responded
-static	char	*attributesShadingRate		=	"ShadingRate";
-static	char	*attributesSides			=	"Sides";
-static	char	*attributesMatte			=	"matte";
-static	char	*attributesMotionfactor		=	"GeometricApproximation:motionfactor";
-static	char	*attributesDisplacementBnd	=	"displacementbound:sphere";
-static	char	*attributesDisplacementSys	=	"displacementbound:coordinatesystem";
-static	char	*attributesName				=	"identifier:name";
+const	char	*attributesShadingRate		=	"ShadingRate";
+const	char	*attributesSides			=	"Sides";
+const	char	*attributesMatte			=	"matte";
+const	char	*attributesMotionfactor		=	"GeometricApproximation:motionfactor";
+const	char	*attributesDisplacementBnd	=	"displacementbound:sphere";
+const	char	*attributesDisplacementSys	=	"displacementbound:coordinatesystem";
+const	char	*attributesName				=	"identifier:name";
 
-static	char	*attributesTraceBias		=	"trace:bias";
-static	char	*attributesTraceMaxDiffuse	=	"trace:maxdiffusedepth";
-static	char	*attributesTraceMaxSpecular	=	"trace:maxspeculardepth";
+const	char	*attributesTraceBias		=	"trace:bias";
+const	char	*attributesTraceMaxDiffuse	=	"trace:maxdiffusedepth";
+const	char	*attributesTraceMaxSpecular	=	"trace:maxspeculardepth";
 
-static	char	*attributesUser				=	"user:";
+const	char	*attributesUser				=	"user:";
 
 // Rendererinfo requests
-static	char	*rendererinfoRenderer		=	"renderer";
-static	char	*rendererinfoVersion		=	"version";
-static	char	*rendererinfoVersionStr		=	"versionstring";
+const	char	*rendererinfoRenderer		=	"renderer";
+const	char	*rendererinfoVersion		=	"version";
+const	char	*rendererinfoVersionStr		=	"versionstring";
 
 // Predefined ray labels used during raytracing
-		char	*rayLabelPrimary			=	"camera";
-		char	*rayLabelTrace				=	"trace";
-		char	*rayLabelTransmission		=	"transmission";
-		char	*rayLabelGather				=	"gather";
+const	char	*rayLabelPrimary			=	"camera";
+const	char	*rayLabelTrace				=	"trace";
+const	char	*rayLabelTransmission		=	"transmission";
+const	char	*rayLabelGather				=	"gather";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -1599,7 +1599,7 @@ int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int 
 	
 	if (strcmp(name,rendererinfoRenderer) == 0) {
 		char	**d	=	(char **) dest;
-		d[0]		=	"Pixie";
+		d[0]		=	(char *) "Pixie";
 		return TRUE;
 	} else if (strcmp(name,rendererinfoVersion) == 0) {
 		float	*d	=	(float *) dest;

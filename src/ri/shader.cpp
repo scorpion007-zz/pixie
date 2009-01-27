@@ -196,7 +196,7 @@ CShaderInstance::~CShaderInstance() {
 // Description			:	This function implements "strsep" which is non portable
 // Return Value			:
 // Comments				:
-static char	*token(char **str,char *tok) {
+static char	*token(char **str,const char *tok) {
 	char	*cStr	=	*str;
 	char	*oStr	=	cStr;
 	int		n		=	(int) strlen(tok);

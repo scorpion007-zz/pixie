@@ -78,10 +78,10 @@ typedef enum {
 } EShadingDim;
 
 // Predefined ray labels used during raytracing
-extern	char	*rayLabelPrimary;
-extern	char	*rayLabelTrace;
-extern	char	*rayLabelTransmission;
-extern	char	*rayLabelGather;
+extern	const char	*rayLabelPrimary;
+extern	const char	*rayLabelTrace;
+extern	const char	*rayLabelTransmission;
+extern	const char	*rayLabelGather;
 
 
 ///////////////////////////////////////////////////////////////////////
