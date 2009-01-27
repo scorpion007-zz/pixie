@@ -206,7 +206,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 // Description			:	Set shader parameters
 // Return Value			:	-
 // Comments				:
-void					CSphereLight::setParameters(int n,char **params,void **vals) {
+void					CSphereLight::setParameters(int n,const char **params,const void **vals) {
 	int	i;
 
 	for (i=0;i<n;i++) {
@@ -546,7 +546,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 // Description			:	Set shader parameters
 // Return Value			:	-
 // Comments				:
-void					CQuadLight::setParameters(int n,char **params,void **vals) {
+void					CQuadLight::setParameters(int n,const char **params,const void **vals) {
 	int	i;
 
 	for (i=0;i<n;i++) {

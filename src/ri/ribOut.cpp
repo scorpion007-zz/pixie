@@ -45,7 +45,7 @@ const	int	ribOutScratchSize	=	1000;
 int	preferCompressedRibOut		=	FALSE;
 
 
-static	char	*getFilter(float (*function)(float,float,float,float)) {
+static	const char	*getFilter(float (*function)(float,float,float,float)) {
 	if (function == RiGaussianFilter) {
 		return	RI_GAUSSIANFILTER;
 	} else if (function == RiBoxFilter) {
@@ -219,7 +219,7 @@ void		CRibOut::RiCropWindow(float xmin,float xmax,float ymin,float ymax) {
 	out("CropWindow %g %g %g %g\n",xmin,xmax,ymin,ymax);
 }
 
-void		CRibOut::RiProjectionV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiProjectionV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Projection \"%s\" ",name);
 	writePL(n,tokens,params);
 }
@@ -276,26 +276,26 @@ void		CRibOut::RiExposure(float gain,float gamma) {
 	out("Exposure %g %g\n",gain,gamma);
 }
 
-void		CRibOut::RiImagerV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiImagerV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Imager \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiQuantize(char * type,int one,int qmin,int qmax,float ampl) {
+void		CRibOut::RiQuantize(const char * type,int one,int qmin,int qmax,float ampl) {
 	out("Quantize \"%s\" %d %d %d %g\n",type,one,qmin,qmax,ampl);
 }
 
-void		CRibOut::RiDisplayV(char *name,char * type,char * mode,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiDisplayV(const char *name,const char * type,const char * mode,int n,const char *tokens[],const void *params[]) {
 	out("Display \"%s\" \"%s\" \"%s\" ",name,type,mode);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiDisplayChannelV(char *channel,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiDisplayChannelV(const char *channel,int n,const char *tokens[],const void *params[]) {
 	out("Display \"%s\" ",channel);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiHiderV(char * type,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiHiderV(const char * type,int n,const char *tokens[],const void *params[]) {
 	out("Hider \"%s\" ",type);
 	writePL(n,tokens,params);
 }
@@ -326,7 +326,7 @@ void		CRibOut::RiRelativeDetail(float relativedetail) {
 
 #define	optionCheckInt(__name,__num)																		\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		int		*val	=	(int *) params[i];																\
+		const int		*val	=	(const int *) params[i];																\
 		int		k;																							\
 		out("Option \"%s\" \"%s\" [%i",name,tokens[i],val[0]);									\
 		for (k=1;k<__num;k++) {																				\
@@ -337,7 +337,7 @@ void		CRibOut::RiRelativeDetail(float relativedetail) {
 
 #define	optionCheckFloat(__name,__num)																		\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		float	*val	=	(float *) params[i];															\
+		const float	*val	=	(const float *) params[i];															\
 		int		k;																							\
 		out("Option \"%s\" \"%s\" [%g",name,tokens[i],val[0]);									\
 		for (k=1;k<__num;k++) {																				\
@@ -348,7 +348,7 @@ void		CRibOut::RiRelativeDetail(float relativedetail) {
 
 #define	optionCheckString(__name)																			\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		char	*val	=	((char **) params[i])[0];														\
+		const char	*val	=	((const char **) params[i])[0];														\
 		out("Option \"%s\" \"%s\" \"%s\"\n",name,tokens[i],val);
 
 #define	optionEndCheck																						\
@@ -365,7 +365,7 @@ void		CRibOut::RiRelativeDetail(float relativedetail) {
 
 
 
-void		CRibOut::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiOptionV(const char *name,int n,const char *tokens[],const void *params[]) {
 	int	i;
 
 	// Check the searchpath options
@@ -427,7 +427,7 @@ void		CRibOut::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
 		for (i=0;i<n;i++) {
 			if (FALSE) {
 			} else if (strcmp(tokens[i],RI_COMPRESSION) == 0) {
-				char	*val	=	((char **) params[i])[0];
+				const char	*val	=	((const char **) params[i])[0];
 				if (strcmp(val,"gzip") == 0) {
 					preferCompressedRibOut	=	TRUE;
 				} else if (strcmp(val,"none") == 0) {
@@ -475,40 +475,40 @@ void		CRibOut::RiTextureCoordinates(float s1,float t1,float s2,float t2,float s3
 	out("TextureCoordinates [%g %g %g %g %g %g %g %g]\n",s1,t1,s2,t2,s3,t3,s4,t4);
 }
 
-void		*CRibOut::RiLightSourceV(char *name,int n,char *tokens[],void *params[]) {
+void		*CRibOut::RiLightSourceV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("LightSource \"%s\" %d ",name,numLightSources);
 	writePL(n,tokens,params);
 
 	return (void *) (uintptr_t) numLightSources++;
 }
 
-void		*CRibOut::RiAreaLightSourceV(char *name,int n,char *tokens[],void *params[]) {
+void		*CRibOut::RiAreaLightSourceV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("AreaLightSource \"%s\" %d ",name,numLightSources);
 	writePL(n,tokens,params);
 
 	return (void *) (uintptr_t) numLightSources++;
 }
 
-void		CRibOut::RiIlluminate(void *light,int onoff) {
+void		CRibOut::RiIlluminate(const void *light,int onoff) {
 	out("Illuminate %d %d\n",light,onoff);
 }
 
-void		CRibOut::RiSurfaceV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiSurfaceV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Surface \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiAtmosphereV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiAtmosphereV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Atmosphere \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiInteriorV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiInteriorV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Interior \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiExteriorV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiExteriorV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Exterior \"%s\" ",name);
 	writePL(n,tokens,params);
 }
@@ -517,7 +517,7 @@ void		CRibOut::RiShadingRate(float size) {
 	out("ShadingRate %g\n",size);
 }
 
-void		CRibOut::RiShadingInterpolation(char * type) {
+void		CRibOut::RiShadingInterpolation(const char * type) {
 	out("ShadingInterpolation \"%s\"\n",type);
 }
 
@@ -537,15 +537,15 @@ void		CRibOut::RiDetailRange(float minvis,float lowtran,float uptran,float maxvi
 	out("DetailRange %g %g %g %g\n",minvis,lowtran,uptran,maxvis);
 }
 
-void		CRibOut::RiGeometricApproximation(char * type,float value) {
+void		CRibOut::RiGeometricApproximation(const char * type,float value) {
 	out("GeometricApproximation \"%s\" %g\n",type,value);
 }
 
-void		CRibOut::RiGeometricRepresentation(char * type) {
+void		CRibOut::RiGeometricRepresentation(const char * type) {
 	out("GeometricRepresentation \"%s\"\n",type);
 }
 
-void		CRibOut::RiOrientation(char * orientation) {
+void		CRibOut::RiOrientation(const char * orientation) {
 	out("Orientation \"%s\"\n",orientation);
 }
 
@@ -595,25 +595,25 @@ void		CRibOut::RiSkew(float angle,float dx1,float dy1,float dz1,float dx2,float 
 	out("Skew %g %g %g %g %g %g %g\n",angle,dx1,dy1,dz1,dx2,dy2,dz2);
 }
 
-void		CRibOut::RiDeformationV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiDeformationV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Deformation \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiDisplacementV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiDisplacementV(const char *name,int n,const char *tokens[],const void *params[]) {
 	out("Displacement \"%s\" ",name);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiCoordinateSystem(char * space) {
+void		CRibOut::RiCoordinateSystem(const char * space) {
 	out("CoordinateSystem \"%s\"\n",space);
 }
 
-void		CRibOut::RiCoordSysTransform(char * space) {
+void		CRibOut::RiCoordSysTransform(const char * space) {
 	out("CoordSysTransform \"%s\"\n",space);
 }
 
-RtPoint *		CRibOut::RiTransformPoints(char * fromspace,char * tospace,int npoints,RtPoint *points) {
+RtPoint *		CRibOut::RiTransformPoints(const char * fromspace,const char * tospace,int npoints,RtPoint *points) {
 	errorHandler(RIE_SYSTEM,RIE_ERROR,"Failed to output TransformPoints\n");
 	return NULL;
 }
@@ -629,8 +629,8 @@ void		CRibOut::RiTransformEnd(void) {
 
 #define	attributeCheckInt(__name,__num)																		\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		int		*val	=	(int *) params[i];																\
-		int		k;																							\
+		const int	*val	=	(const int *) params[i];																\
+		int			k;																							\
 		out("Attribute \"%s\" \"%s\" [%i",name,tokens[i],val[0]);								\
 		for (k=1;k<__num;k++) {																				\
 			out(" %i",val[k]);																	\
@@ -640,8 +640,8 @@ void		CRibOut::RiTransformEnd(void) {
 
 #define	attributeCheckFloat(__name,__num)																	\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		float	*val	=	(float *) params[i];															\
-		int		k;																							\
+		const float	*val	=	(const float *) params[i];															\
+		int			k;																							\
 		out("Attribute \"%s\" \"%s\" [%g",name,tokens[i],val[0]);								\
 		for (k=1;k<__num;k++) {																				\
 			out(" %g",val[k]);																	\
@@ -651,7 +651,7 @@ void		CRibOut::RiTransformEnd(void) {
 
 #define	attributeCheckString(__name)																		\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		char	*val	=	((char **) params[i])[0];														\
+		const char	*val	=	((const char **) params[i])[0];														\
 		out("Attribute \"%s\" \"%s\" \"%s\"\n",name,tokens[i],val);
 
 #define	attributeEndCheck																					\
@@ -666,7 +666,7 @@ void		CRibOut::RiTransformEnd(void) {
 
 
 
-void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiAttributeV(const char *name,int n,const char *tokens[],const void *params[]) {
 	int	i;
 
 	if (strcmp(name,RI_DICE) == 0) {
@@ -759,12 +759,12 @@ void		CRibOut::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
 #undef	attributeEndCheck
 
 
-void		CRibOut::RiPolygonV(int nvertices,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiPolygonV(int nvertices,int n,const char *tokens[],const void *params[]) {
 	out("Polygon ");
 	writePL(nvertices,nvertices,nvertices,1,n,tokens,params);
 }
 
-void		CRibOut::RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiGeneralPolygonV(int nloops,int *nverts,int n,const char *tokens[],const void *params[]) {
 	int	i;
 	int	nvertices=0;
 
@@ -778,7 +778,7 @@ void		CRibOut::RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],voi
 	writePL(nvertices,nvertices,nvertices,1,n,tokens,params);
 }
 
-void		CRibOut::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,const char *tokens[],const void *params[]) {
 	int	i;
 	int	nvertices		=	0;
 	int	mvertex			=	0;
@@ -802,7 +802,7 @@ void		CRibOut::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *t
 	writePL(mvertex,mvertex,nvertices,npolys,n,tokens,params);
 }
 
-void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,const char *tokens[],const void *params[]) {
 	int	i,j;
 	int	snverts		=	0;
 	int	sverts		=	0;
@@ -885,7 +885,7 @@ void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) 
 	attributes->vStep	=	vstep;
 }
 
-void		CRibOut::RiPatchV(char * type,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiPatchV(const char * type,int n,const char *tokens[],const void *params[]) {
 	int	uver,vver;
 
 	if (strcmp(type,RI_BILINEAR) == 0)		{	uver	=	2;	vver	=	2;	}
@@ -902,7 +902,7 @@ void		CRibOut::RiPatchV(char * type,int n,char *tokens[],void *params[]) {
 	writePL(uver*vver,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiPatchMeshV(const char *type,int nu,const char * uwrap,int nv,const char * vwrap,int n,const char *tokens[],const void *params[]) {
 	int	uw,vw;
 	int	uver,vver;
 	int	upatches,vpatches;
@@ -976,7 +976,7 @@ void		CRibOut::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char * vwrap,i
 	writePL(uver*vver,uver*vver,uver*vver,upatches*vpatches,n,tokens,params);
 }
 
-void		CRibOut::RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,const char *tokens[],const void *params[]) {
 	int	upatches		=	nu - uorder + 1;
 	int	vpatches		=	nv - vorder + 1;
 	int	i,uk,vk;
@@ -1082,37 +1082,37 @@ void		CRibOut::RiTrimCurve(int nloops,int *ncurves,int *order,float *knot,float 
 	out("]\n");
 }
 
-void		CRibOut::RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Sphere %g %g %g %g ",radius,zmin,zmax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiConeV(float height,float radius,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiConeV(float height,float radius,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Cone %g %g %g ",height,radius,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiCylinderV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiCylinderV(float radius,float zmin,float zmax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Cylinder %g %g %g %g ",radius,zmin,zmax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiHyperboloidV(float *point1,float *point2,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiHyperboloidV(float *point1,float *point2,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Hyperboloid %g %g %g %g %g %g %g ",point1[0],point1[1],point1[2],point2[0],point2[1],point2[2],thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiParaboloidV(float rmax,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiParaboloidV(float rmax,float zmin,float zmax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Paraboloid %g %g %g %g ",rmax,zmin,zmax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiDiskV(float height,float radius,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiDiskV(float height,float radius,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Disk %g %g %g ",height,radius,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
 
-void		CRibOut::RiTorusV(float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiTorusV(float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	out("Torus %g %g %g %g %g",majorrad,minorrad,phimin,phimax,thetamax);
 	writePL(4,4,4,1,n,tokens,params);
 }
@@ -1121,11 +1121,11 @@ void		CRibOut::RiProcedural(void * data,float *bound,void (*subdivfunc)(void *,f
 	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Failed to output procedural geometry\n");
 }
 
-void		CRibOut::RiGeometryV(char * type,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiGeometryV(const char * type,int n,const char *tokens[],const void *params[]) {
 	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Failed to output optional geometry\n");
 }
 
-void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiCurvesV(const char * degree,int ncurves,int nverts[],const char * wrap,int n,const char *tokens[],const void *params[]) {
 	int	i;
 	int	nvertices	=	0;
 	int	nvaryings	=	0;
@@ -1160,12 +1160,12 @@ void		CRibOut::RiCurvesV(char * degree,int ncurves,int nverts[],char * wrap,int 
 	writePL(nvertices,nvaryings,nvaryings,ncurves,n,tokens,params);
 }
 
-void		CRibOut::RiPointsV(int npts,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiPointsV(int npts,int n,const char *tokens[],const void *params[]) {
 	out("Points ");
 	writePL(npts,npts,npts,1,n,tokens,params);
 }
 
-void		CRibOut::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int vertices[],int ntags,char * tags[],int nargs[],int intargs[],float floatargs[],int n,char *tokens[],void *params[]) {
+void		CRibOut::RiSubdivisionMeshV(const char * scheme,int nfaces,int nvertices[],int vertices[],int ntags,const char * tags[],int nargs[],int intargs[],float floatargs[],int n,const char *tokens[],const void *params[]) {
 	int	numVertices;
 	int	i,j;
 	int	numInt,numFloat;
@@ -1218,23 +1218,23 @@ void		CRibOut::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int v
 	writePL(numVertices,numVertices,numFacevaryings,nfaces,n,tokens,params);
 }
 
-void		CRibOut::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]) {
+void		CRibOut::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,const char *str[],int n,const char *tokens[],const void *params[]) {
 	errorHandler(RIE_UNIMPLEMENT,RIE_ERROR,"Blobby primitive is not implemented\n");
 }
 
-void		CRibOut::RiProcDelayedReadArchive(char * data,float detail) {
+void		CRibOut::RiProcDelayedReadArchive(const char * data,float detail) {
 }
 
-void		CRibOut::RiProcRunProgram(char * data,float detail) {
+void		CRibOut::RiProcRunProgram(const char * data,float detail) {
 }
 
-void		CRibOut::RiProcDynamicLoad(char * data,float detail) {
+void		CRibOut::RiProcDynamicLoad(const char * data,float detail) {
 }
 
-void		CRibOut::RiProcFree(char *) {
+void		CRibOut::RiProcFree(const char *) {
 }
 
-void		CRibOut::RiSolidBegin(char * type) {
+void		CRibOut::RiSolidBegin(const char * type) {
 	out("SolidBegin \"%s\"\n",type);
 }
 
@@ -1252,7 +1252,7 @@ void		CRibOut::RiObjectEnd(void) {
 	out("ObjectEnd\n");
 }
 
-void		CRibOut::RiObjectInstance(void *handle) {
+void		CRibOut::RiObjectInstance(const void *handle) {
 	out("ObjectInstance %d\n",handle);
 }
 
@@ -1270,43 +1270,43 @@ void		CRibOut::RiMotionEnd(void) {
 	out("MotionEnd\n");
 }
 
-void		CRibOut::RiMakeTextureV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeTextureV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	out("MakeTexture \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g %g ",pic,tex,swrap,twrap,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeBumpV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeBumpV(const char *pic,const char *tex,const char * swrap,const char * twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	out("MakeBump \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g %g ",pic,tex,swrap,twrap,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	out("MakeBump \"%s\" \"%s\" \"%s\" %g %g",pic,tex,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny,const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny,const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	out("MakeCubeFaceEnvironment \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" %g \"%s\" %g %g ",px,nx,py,ny,pz,nz,tex,fov,getFilter(filterfunc),swidth,twidth);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeShadowV(const char *pic,const char *tex,int n,const char *tokens[],const void *params[]) {
 	out("MakeShadow \"%s\" \"%s\" ",pic,tex);
 	writePL(n,tokens,params);
 }
 
-void		CRibOut::RiMakeBrickMapV(int n,const char **src,const char *dest,int numTokens,char *tokens[],void *params[]) {
+void		CRibOut::RiMakeBrickMapV(int n,const char **src,const char *dest,int numTokens,const char *tokens[],const void *params[]) {
 	out("MakeBrickMap [");
 	for(int i=0;i<n;i++) out("\"%s\" ",src[i]);
 	out("] \"%s\" ",dest);
 	writePL(numTokens,tokens,params);
 }
 
-void		CRibOut::RiErrorHandler(void (*handler)(int,int,char *)) {
+void		CRibOut::RiErrorHandler(void (*handler)(int,int,const char *)) {
 	errorHandler	=	handler;
 }
 
-void		CRibOut::RiArchiveRecord(char * type,char *format,va_list args) {
+void		CRibOut::RiArchiveRecord(const char * type,const char *format,va_list args) {
 	if (strcmp(type,RI_COMMENT) == 0) {
 		out("#");
 		vout(format,args);
@@ -1323,11 +1323,11 @@ void		CRibOut::RiArchiveRecord(char * type,char *format,va_list args) {
 	}
 }
 
-void		CRibOut::RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]) {
+void		CRibOut::RiReadArchiveV(const char *filename,void (*callback)(const char *,...),int n,const char *tokens[],const void *params[]) {
 	out("ReadArchive \"%s\"\n",filename);
 }
 
-void		*CRibOut::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+void		*CRibOut::RiArchiveBeginV(const char *name,int n,const char *tokens[],const void *parms[]) {
 	out("ArchiveBegin \"%s\" ",name);
 	writePL(n,tokens,parms);
 	return NULL;
@@ -1337,7 +1337,7 @@ void		CRibOut::RiArchiveEnd(void) {
 	out("ArchiveEnd\n");
 }
 	
-void		CRibOut::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
+void		CRibOut::RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]) {
 	out("Resource \"%s\" \"%s\" ",handle,type);
 	writePL(n,tokens,parms);
 }
@@ -1350,12 +1350,12 @@ void		CRibOut::RiResourceEnd(void) {
 	out("ResourceEnd\n");
 }
 
-void		CRibOut::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {
+void		CRibOut::RiIfBeginV(const char *expr,int n,const char *tokens[],const void *parms[]) {
 	out("IfBegin \"%s\" ",expr);
 	writePL(n,tokens,parms);
 }
 
-void		CRibOut::RiElseIfV(const char *expr,int n,char *tokens[],void *parms[]) {
+void		CRibOut::RiElseIfV(const char *expr,int n,const char *tokens[],const void *parms[]) {
 	out("ElseIf \"%s\" ",expr);
 	writePL(n,tokens,parms);
 }
@@ -1369,11 +1369,11 @@ void		CRibOut::RiIfEnd(void) {
 }
 
 
-void		CRibOut::writePL(int numParameters,char *tokens[],void *vals[]) {
-	int		i,j;
-	float	*f;
-	int		*iv;
-	char	**s;
+void		CRibOut::writePL(int numParameters,const char *tokens[],const void *vals[]) {
+	int			i,j;
+	const float	*f;
+	const int	*iv;
+	const char	**s;
 
 	for (i=0;i<numParameters;i++) {
 		CVariable	tmpVar;
@@ -1425,7 +1425,7 @@ retry:;
 				break;
 			case TYPE_STRING:
 
-				s	=	(char **) vals[i];
+				s	=	(const char **) vals[i];
 				for (j=variable->numItems;j>0;j--,s++) {
 					out("\"%s\" ",s[0]);
 				}
@@ -1459,10 +1459,10 @@ retry:;
 	out("\n");
 }
 
-void		CRibOut::writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int numParameters,char *tokens[],void *vals[]) {
-	int		i,j;
-	float	*f;
-	char	**s;
+void		CRibOut::writePL(int numVertex,int numVarying,int numFaceVarying,int numUniform,int numParameters,const char *tokens[],const void *vals[]) {
+	int			i,j;
+	const float	*f;
+	const char	**s;
 
 #define	numItems(__dest,__var)						\
 	switch(variable->container) {					\
@@ -1542,7 +1542,7 @@ retry:;
 				break;
 			case TYPE_STRING:
 
-				s	=	(char **) vals[i];
+				s	=	(const char **) vals[i];
 				for (j=variable->numItems;j>0;j--,s++) {
 					out("\"%s\" ",s[0]);
 				}

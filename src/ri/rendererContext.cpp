@@ -95,7 +95,7 @@ extern	CRiInterface	*renderMan;							// Defined in ri.cpp
 // Description			:	Ctor
 // Return Value			:
 // Comments				:
-CRendererContext::CRendererContext(char *ribFile,char *riNetString) {
+CRendererContext::CRendererContext(const char *ribFile,const char *riNetString) {
 
 	// Initiate the renderer
 	CRenderer::beginRenderer(this,ribFile,riNetString);
@@ -257,7 +257,7 @@ COptions	*CRendererContext::getOptions() {
 // Description			:	Create an instance of a shader
 // Return Value			:
 // Comments				:
-CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,char **params,void **vals) {
+CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,const char **params,const void **vals) {
 	CShaderInstance	*cInstance	=	NULL;
 
 	if (strcmp(name,"null") == 0)	return	NULL;
@@ -488,8 +488,8 @@ void	CRendererContext::addObject(CObject *o) {
 // Description			:	Add an instance of a compound object
 // Return Value			:
 // Comments				:
-void	CRendererContext::addInstance(void *d) {
-	CInstance		*cInstance		=	(CInstance *) d;
+void	CRendererContext::addInstance(const void *d) {
+	const CInstance		*cInstance		=	(const CInstance *) d;
 	if (cInstance->objects != NULL) {
 		CXform			*cXform			=	getXform(FALSE);
 		CAttributes		*cAttributes	=	getAttributes(FALSE);
@@ -776,7 +776,7 @@ void	CRendererContext::RiCropWindow(float xmin,float xmax,float ymin,float ymax)
 	options->cropBottom			=	ymax;
 }
 
-void	CRendererContext::RiProjectionV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiProjectionV(const char *name,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	options	=	getOptions(TRUE);
@@ -932,11 +932,11 @@ void	CRendererContext::RiExposure(float gain,float gamma) {
 	options->gain	=	gain; 
 }
 
-void	CRendererContext::RiImagerV (char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiImagerV (const char *name,int n,const char *tokens[],const void *params[]) {
 	error(CODE_INCAPABLE,"Imager shaders are not currently supported\n");
 }
 
-void	CRendererContext::RiQuantize(char *type,int one,int qmin,int qmax,float ampl) {
+void	CRendererContext::RiQuantize(const char *type,int one,int qmin,int qmax,float ampl) {
 	COptions	*options;
 
 	options	=	getOptions(TRUE);
@@ -968,7 +968,7 @@ void	CRendererContext::RiQuantize(char *type,int one,int qmin,int qmax,float amp
 }
 
 
-void	CRendererContext::RiDisplayV(char *name,char *type,char *mode,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiDisplayV(const char *name,const char *type,const char *mode,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (strcmp(mode,RI_RGBZ) == 0) {
@@ -1094,7 +1094,7 @@ void	CRendererContext::RiDisplayV(char *name,char *type,char *mode,int n,char *t
 	}
 }
 
-void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiDisplayChannelV(const char *channel,int n,const char *tokens[],const void *params[]) {
 	int i,j;
 	
 	CDisplayChannel *nChannel = CRenderer::declareDisplayChannel(channel);
@@ -1149,7 +1149,7 @@ void	CRendererContext::RiDisplayChannelV(char *channel,int n,char *tokens[],void
 	}
 }
 
-void	CRendererContext::RiHiderV(char *type,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiHiderV(const char *type,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	options	=	getOptions(TRUE);
@@ -1242,7 +1242,7 @@ void	CRendererContext::RiRelativeDetail(float relativedetail) {
 	}
 
 
-void	CRendererContext::RiOptionV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiOptionV(const char *name,int n,const char *tokens[],const void *params[]) {
 	int			i;
 	COptions	*options;
 
@@ -1518,44 +1518,44 @@ void	CRendererContext::RiTextureCoordinates(float s1,float t1,float s2,float t2,
 
 
 
-void	*CRendererContext::RiLightSourceV(char *name,int n,char *tokens[],void *params[]) {
+void	*CRendererContext::RiLightSourceV(const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes			*attributes;
 	CShaderInstance		*cShader;
 
 	if (CRenderer::netNumServers > 0)	return NULL;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_LIGHTSOURCE,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_LIGHTSOURCE,n,tokens,params);
 
 	if (cShader != NULL) {
 		attributes->addLight(cShader);
 
-		return (RtLightHandle) cShader;
+		return cShader;
 	}
 
 	return NULL;
 }
 
-void	*CRendererContext::RiAreaLightSourceV(char *name,int n,char *tokens[],void *params[]) {
+void	*CRendererContext::RiAreaLightSourceV(const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes			*attributes;
 	CShaderInstance		*cShader;
 
 	if (CRenderer::netNumServers > 0)	return NULL;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_LIGHTSOURCE,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_LIGHTSOURCE,n,tokens,params);
 
 	if (cShader != NULL) {
 		attributes->addLight(cShader);
 
-		return (RtLightHandle) cShader;
+		return cShader;
 	}
 
 	return NULL;
 }
 
 
-void	CRendererContext::RiIlluminate (void *light,int onoff) {
+void	CRendererContext::RiIlluminate (const void *light,int onoff) {
 	CShaderInstance	*cInstance	=	(CShaderInstance *) light;
 	CAttributes		*attributes;
 
@@ -1569,14 +1569,14 @@ void	CRendererContext::RiIlluminate (void *light,int onoff) {
 		attributes->removeLight(cInstance);
 }
 
-void	CRendererContext::RiSurfaceV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiSurfaceV(const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_SURFACE,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_SURFACE,n,tokens,params);
 
 	if (attributes->surface != NULL)
 		attributes->surface->detach();
@@ -1585,14 +1585,14 @@ void	CRendererContext::RiSurfaceV(char *name,int n,char *tokens[],void *params[]
 	attributes->checkParameters();
 }
 
-void	CRendererContext::RiAtmosphereV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiAtmosphereV(const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,params);
 
 	if (attributes->atmosphere != NULL)
 		attributes->atmosphere->detach();
@@ -1601,14 +1601,14 @@ void	CRendererContext::RiAtmosphereV(char *name,int n,char *tokens[],void *param
 	attributes->checkParameters();
 }
 
-void	CRendererContext::RiInteriorV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiInteriorV(const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,params);
 
 	if (attributes->interior != NULL)
 		attributes->interior->detach();
@@ -1617,14 +1617,14 @@ void	CRendererContext::RiInteriorV(char *name,int n,char *tokens[],void *params[
 	attributes->checkParameters();
 }
 
-void	CRendererContext::RiExteriorV (char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiExteriorV (const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_ATMOSPHERE,n,tokens,params);
 
 	if (attributes->exterior != NULL)
 		attributes->exterior->detach();
@@ -1649,7 +1649,7 @@ void	CRendererContext::RiShadingRate(float size) {
 	attributes->shadingRate	=	sqrtf(size);
 }
 
-void	CRendererContext::RiShadingInterpolation(char *type) {
+void	CRendererContext::RiShadingInterpolation(const char *type) {
 }
 
 void	CRendererContext::RiMatte(int onoff) {
@@ -1741,7 +1741,7 @@ void	CRendererContext::RiDetailRange(float minvis,float lowtran,float uptran,flo
 	}
 }
 
-void	CRendererContext::RiGeometricApproximation(char *type,float value) {
+void	CRendererContext::RiGeometricApproximation(const char *type,float value) {
 	CAttributes	*attributes;
 
 	if (CRenderer::netNumServers > 0)	return;
@@ -1761,7 +1761,7 @@ void	CRendererContext::RiGeometricApproximation(char *type,float value) {
 	}
 }
 
-void	CRendererContext::RiGeometricRepresentation(char *type) {
+void	CRendererContext::RiGeometricRepresentation(const char *type) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_INCAPABLE,"Arbitrary geometric representation is not currently supported\n");
@@ -1769,7 +1769,7 @@ void	CRendererContext::RiGeometricRepresentation(char *type) {
 	return;
 }
 
-void	CRendererContext::RiOrientation(char *orientation) {
+void	CRendererContext::RiOrientation(const char *orientation) {
 	CAttributes	*attributes;
 
 	if (CRenderer::netNumServers > 0)	return;
@@ -2443,7 +2443,7 @@ void	CRendererContext::RiSkew(float angle,float dx1,float dy1,float dz1,float dx
 	}
 }
 
-void	CRendererContext::RiDeformationV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiDeformationV(const char *name,int n,const char *tokens[],const void *params[]) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_INCAPABLE,"Arbitrary deformations are not currently supported\n");
@@ -2452,14 +2452,14 @@ void	CRendererContext::RiDeformationV(char *name,int n,char *tokens[],void *para
 }
 
 
-void	CRendererContext::RiDisplacementV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiDisplacementV(const char *name,int n,const char *tokens[],const void *params[]) {
 	CAttributes		*attributes;
 	CShaderInstance	*cShader;
 
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
-	cShader		=	getShader(name,SL_DISPLACEMENT,n,tokens,(void **) params);
+	cShader		=	getShader(name,SL_DISPLACEMENT,n,tokens,params);
 
 	if (attributes->displacement != NULL)
 		attributes->displacement->detach();
@@ -2468,7 +2468,7 @@ void	CRendererContext::RiDisplacementV(char *name,int n,char *tokens[],void *par
 	attributes->checkParameters();
 }
 
-void	CRendererContext::RiCoordinateSystem(char *space) {
+void	CRendererContext::RiCoordinateSystem(const char *space) {
 	CXform	*xform;
 
 	xform	=	getXform(FALSE);
@@ -2476,7 +2476,7 @@ void	CRendererContext::RiCoordinateSystem(char *space) {
 	CRenderer::defineCoordinateSystem(space,xform->from,xform->to);
 }
 
-void	CRendererContext::RiCoordSysTransform(char *space) {
+void	CRendererContext::RiCoordSysTransform(const char *space) {
 	const float			*from,*to;
 	ECoordinateSystem	cSystem;
 	CXform				*xform;
@@ -2491,7 +2491,7 @@ void	CRendererContext::RiCoordSysTransform(char *space) {
 	}
 }
 
-RtPoint *	CRendererContext::RiTransformPoints(char *fromspace,char *tospace,int npoints,RtPoint *points) {
+RtPoint *	CRendererContext::RiTransformPoints(const char *fromspace,const char *tospace,int npoints,RtPoint *points) {
 	const float			*from1,*to1;
 	const float			*from2,*to2;
 	ECoordinateSystem	cSystem1,cSystem2;
@@ -2523,7 +2523,7 @@ void	CRendererContext::RiTransformEnd (void) {
 
 #define	attributeCheck(__name,__dest,__min,__max,__type)													\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		__type	*val	=	(__type *) params[i];															\
+		const __type	*val	=	(const __type *) params[i];															\
 		if ((val[0] < __min) || (val[0] > __max)) {															\
 			error(CODE_RANGE,"Invalid value for \"%s\"\n",__name);											\
 		} else {																							\
@@ -2532,19 +2532,19 @@ void	CRendererContext::RiTransformEnd (void) {
 
 #define	attributeCheckFlag(__name,__dest,__flag)															\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		int	*val	=	(int *) params[i];																	\
+		const int	*val	=	(const int *) params[i];																	\
 		if (val[0] != 0)	__dest	|=	__flag;																\
 		else				__dest	&=	~(__flag);															\
 
 #define	attributeCheckInvertFlag(__name,__dest,__flag)														\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		int	*val	=	(int *) params[i];																	\
+		const int	*val	=	(const int *) params[i];																	\
 		if (val[0] != 0)	__dest	&=	~(__flag);															\
 		else				__dest	|=	__flag;																\
 
 #define	attributeCheckString(__name,__dest)																	\
 	} else if (strcmp(tokens[i],__name) == 0) {																\
-		char	*val	=	((char **) params[i])[0];														\
+		const char	*val	=	((const char **) params[i])[0];														\
 		if (__dest != NULL) free(__dest);																	\
 		if (val[0] == '\0') __dest	=	NULL;																\
 		else				__dest	=	strdup(val);
@@ -2561,7 +2561,7 @@ void	CRendererContext::RiTransformEnd (void) {
 
 
 
-void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiAttributeV(const char *name,int n,const char *tokens[],const void *params[]) {
 	int			i,dummy;
 	CAttributes	*attributes;
 
@@ -2718,7 +2718,7 @@ void	CRendererContext::RiAttributeV(char *name,int n,char *tokens[],void *params
 #undef	attributeCheckString
 #undef	attributeEndCheck
 
-void	CRendererContext::RiPolygonV(int nvertices,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiPolygonV(int nvertices,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -2731,7 +2731,7 @@ void	CRendererContext::RiPolygonV(int nvertices,int n,char *tokens[],void *param
 	
 	checkGeometryOrDiscard();
 	
-	pl				=	parseParameterList(1,nvertices,0,nvertices,n,tokens,(void **) params,RI_P,PL_VARYING_TO_VERTEX,attributes);
+	pl				=	parseParameterList(1,nvertices,0,nvertices,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
 	// We have the core
@@ -2765,7 +2765,7 @@ void	CRendererContext::RiPolygonV(int nvertices,int n,char *tokens[],void *param
 }
 
 
-void	CRendererContext::RiGeneralPolygonV(int nloops,int *nverts,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiGeneralPolygonV(int nloops,int *nverts,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -2784,7 +2784,7 @@ void	CRendererContext::RiGeneralPolygonV(int nloops,int *nverts,int n,char *toke
 		nvertices	+=	nverts[i];
 	}
 	
-	pl				=	parseParameterList(1,nvertices,0,nvertices,n,tokens,(void **) params,RI_P,PL_VARYING_TO_VERTEX,attributes);
+	pl				=	parseParameterList(1,nvertices,0,nvertices,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
 	// We have the core
@@ -2814,7 +2814,7 @@ void	CRendererContext::RiGeneralPolygonV(int nloops,int *nverts,int n,char *toke
 	addObject(new CPolygonMesh(attributes,xform,pl,1,&nloops,nverts,vertices));
 }
 
-void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -2839,7 +2839,7 @@ void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n
 		mvertex		=	max(mvertex,verts[i]);
 	}
 
-	pl				=	parseParameterList(npolys,mvertex+1,0,nvertices,n,tokens,(void **) params,RI_P,PL_VARYING_TO_VERTEX,attributes);
+	pl				=	parseParameterList(npolys,mvertex+1,0,nvertices,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
 	// We have the core
@@ -2879,7 +2879,7 @@ void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *verts,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -2915,7 +2915,7 @@ void	CRendererContext::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nver
 		numVertices	=	max(numVertices,verts[i]);
 	}
 	
-	pl				=	parseParameterList(npolys,numVertices+1,0,sverts,n,tokens,(void **) params,RI_P,PL_VARYING_TO_VERTEX,attributes);
+	pl				=	parseParameterList(npolys,numVertices+1,0,sverts,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
 	// We have the core
@@ -2969,8 +2969,8 @@ void	CRendererContext::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int
 
 #define	correct3begin(xv,yv)													\
 {																				\
-	int		i;																	\
-	char	**newTokens	=	(char **) ralloc(n*sizeof(char *),CRenderer::globalMemory);					\
+	int			i;																\
+	const char	**newTokens	=	(const char **) ralloc(n*sizeof(char *),CRenderer::globalMemory);					\
 	memcpy(newTokens,tokens,n*sizeof(char *));									\
 	tokens				=	newTokens;											\
 	for (i=0;i<n;i++) {															\
@@ -3009,8 +3009,8 @@ void	CRendererContext::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int
 
 #define correct3cbegin(xv)														\
 {																				\
-	int		i;																	\
-	char	**newTokens	=	(char **) ralloc(n*sizeof(char *),CRenderer::globalMemory);					\
+	int			i;																\
+	const char	**newTokens	=	(const char **) ralloc(n*sizeof(char *),CRenderer::globalMemory);					\
 	memcpy(newTokens,tokens,n*sizeof(char *));									\
 	tokens				=	newTokens;											\
 	for (i=0;i<n;i++) {															\
@@ -3033,8 +3033,8 @@ void	CRendererContext::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int
 
 #define	correct4begin(xv,yv)													\
 {																				\
-	int		i;																	\
-	char	**newTokens	=	(char **) ralloc(n*sizeof(char *),CRenderer::globalMemory);					\
+	int			i;																\
+	const char	**newTokens	=	(const char **) ralloc(n*sizeof(char *),CRenderer::globalMemory);					\
 	memcpy(newTokens,tokens,n*sizeof(char *));									\
 	tokens				=	newTokens;											\
 	for (i=0;i<n;i++) {															\
@@ -3074,7 +3074,7 @@ void	CRendererContext::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int
 }
 
 
-void	CRendererContext::RiPatchV (char * type,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiPatchV(const char * type,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3106,7 +3106,7 @@ void	CRendererContext::RiPatchV (char * type,int n,char *tokens[],void *params[]
 
 	correct3begin(uver,vver);
 	
-	pl				=	parseParameterList(1,uver*vver,4,0,n,tokens,(void **) params,RI_P,0,attributes);
+	pl				=	parseParameterList(1,uver*vver,4,0,n,tokens,params,RI_P,0,attributes);
 
 	if (pl != NULL) {
 		// We have the core
@@ -3138,7 +3138,7 @@ void	CRendererContext::RiPatchV (char * type,int n,char *tokens[],void *params[]
 }
 
 
-void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *vwrap,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiPatchMeshV(const char *type,int nu,const char * uwrap,int nv,const char *vwrap,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3235,7 +3235,7 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 	correct3begin(nu,nv);
 
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(numUniform,numVertex,numVarying,0,n,tokens,(void **) params,RI_P,0,attributes);
+	pl				=	parseParameterList(numUniform,numVertex,numVarying,0,n,tokens,params,RI_P,0,attributes);
 
 	if (pl != NULL) {
 		// We have the core
@@ -3264,7 +3264,7 @@ void	CRendererContext::RiPatchMeshV(char *type,int nu,char * uwrap,int nv,char *
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,float umax,int nv,int vorder,float *vknot,float vmin,float vmax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3285,7 +3285,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 	upatches		=	nu - uorder + 1;
 	vpatches		=	nv - vorder + 1;
 	
-	pl				=	parseParameterList(upatches*vpatches,nu*nv,(upatches+1)*(vpatches+1),0,n,tokens,(void **) params,RI_PW,0,attributes);
+	pl				=	parseParameterList(upatches*vpatches,nu*nv,(upatches+1)*(vpatches+1),0,n,tokens,params,RI_PW,0,attributes);
 
 	if (pl != NULL) {
 		// We have the core
@@ -3322,7 +3322,7 @@ void	CRendererContext::RiTrimCurve (int nloops,int *ncurves,int *order,float *kn
 	error(CODE_INCAPABLE,"Trim curves are not currently supported\n");
 }
 
-void	CRendererContext::RiCurvesV(char *d,int ncurves,int nverts[], char *w,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiCurvesV(const char *d,int ncurves,int nverts[],const char *w,int n,const char *tokens[],const void *params[]) {
 	CAttributes	*attributes;
 	CXform		*xform;
 	float		*p0,*p1;
@@ -3388,7 +3388,7 @@ void	CRendererContext::RiCurvesV(char *d,int ncurves,int nverts[], char *w,int n
 	
 	correct3cbegin(numVertices);
 	
-	pl				=	parseParameterList(ncurves,numVertices,numVaryings,0,n,tokens,(void **) params,RI_P,0,attributes);
+	pl				=	parseParameterList(ncurves,numVertices,numVaryings,0,n,tokens,params,RI_P,0,attributes);
 	if (pl == NULL)	return;
 	
 
@@ -3424,7 +3424,7 @@ void	CRendererContext::RiCurvesV(char *d,int ncurves,int nverts[], char *w,int n
 #undef correct4begin
 #undef correct3cbegin
 
-void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3442,7 +3442,7 @@ void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetam
 	
 	checkGeometryOrDiscard();
 	
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -3527,7 +3527,7 @@ void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetam
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3544,7 +3544,7 @@ void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,c
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -3606,7 +3606,7 @@ void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,c
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3623,7 +3623,7 @@ void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float the
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -3690,7 +3690,7 @@ void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float the
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3708,7 +3708,7 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -3779,7 +3779,7 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3796,7 +3796,7 @@ void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float th
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -3865,7 +3865,7 @@ void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float th
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3882,7 +3882,7 @@ void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,c
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -3947,7 +3947,7 @@ void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,c
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,float phimax,float thetamax,int n,const char *tokens[],const void *params[]) {
 	CXform			*xform;
 	CAttributes		*attributes;
 	float			*p0,*p1;
@@ -3964,7 +3964,7 @@ void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,floa
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,0,4,0,n,tokens,(void **) params,NULL,PL_VERTEX_TO_VARYING,attributes);
+	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
 
@@ -4059,7 +4059,7 @@ void	CRendererContext::RiProcedural(void *data,float *bound,void (*subdivfunc) (
 }
 
 
-void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiGeometryV(const char *type,int n,const char *tokens[],const void *params[]) {
 	if (CRenderer::netNumServers > 0)	return;
 		
 	if (strcmp(type,"implicit") == 0) {
@@ -4177,7 +4177,7 @@ void	CRendererContext::RiGeometryV(char *type,int n,char *tokens[],void *params[
 }
 
 
-void	CRendererContext::RiPointsV(int npts,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiPointsV(int npts,int n,const char *tokens[],const void *params[]) {
 	CAttributes	*attributes;
 	CXform		*xform;
 	float		*p0,*p1;
@@ -4190,7 +4190,7 @@ void	CRendererContext::RiPointsV(int npts,int n,char *tokens[],void *params[]) {
 	checkGeometryOrDiscard();
 	
 	xform			=	getXform(FALSE);
-	pl				=	parseParameterList(1,npts,0,0,n,tokens,(void **) params,RI_P,PL_VARYING_TO_VERTEX,attributes);
+	pl				=	parseParameterList(1,npts,0,0,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
 	memBegin(CRenderer::globalMemory);
@@ -4220,7 +4220,7 @@ void	CRendererContext::RiPointsV(int npts,int n,char *tokens[],void *params[]) {
 	memEnd(CRenderer::globalMemory);
 }
 
-void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices[],int vertices[],int ntags, char * tags[],int nargs[],int intargs[],float floatargs[],int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiSubdivisionMeshV(const char * scheme,int nfaces,int nvertices[],int vertices[],int ntags,const char * tags[],int nargs[],int intargs[],float floatargs[],int n,const char *tokens[],const void *params[]) {
 	int			i,j;
 	int			numVertices;
 	CPl			*pl;
@@ -4250,7 +4250,7 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 	numVertices++;
 
 	// Create the core
-	pl		=	parseParameterList(nfaces,numVertices,numVertices,j,n,tokens,(void **) params,RI_P,PL_VARYING_TO_VERTEX,attributes);
+	pl		=	parseParameterList(nfaces,numVertices,numVertices,j,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
 	switch(addMotion(pl->data0,pl->dataSize,"RiSubdivisionMesh",p0,p1)) {
@@ -4277,7 +4277,7 @@ void	CRendererContext::RiSubdivisionMeshV(char * scheme,int nfaces,int nvertices
 	addObject(new CSubdivMesh(attributes,xform,pl,nfaces,nvertices,vertices,ntags,tags,nargs,intargs,floatargs));
 }
 
-void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,char *str[],int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float flt[],int nstr,const char *str[],int n,const char *tokens[],const void *params[]) {
 
 	if (CRenderer::netNumServers > 0)	return;
 
@@ -4285,7 +4285,7 @@ void	CRendererContext::RiBlobbyV(int nleaf,int ncode,int code[],int nflt,float f
 }
 
 
-void	CRendererContext::RiSolidBegin(char *type) {
+void	CRendererContext::RiSolidBegin(const char *type) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	error(CODE_OPTIONAL,"CSG is not currently supported\n");
@@ -4329,7 +4329,7 @@ void	CRendererContext::RiObjectEnd(void) {
 }
 
 
-void	CRendererContext::RiObjectInstance(void *handle) {
+void	CRendererContext::RiObjectInstance(const void *handle) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	addInstance(handle);
@@ -4354,66 +4354,66 @@ void	CRendererContext::RiMotionEnd(void) {
 	keyTimes			=	NULL;
 }
 
-void	CRendererContext::RiMakeTextureV(const char *pic,const char *tex,const char *swrap,const char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeTextureV(const char *pic,const char *tex,const char *swrap,const char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,(void **) params);
+	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,params);
 }
 
-void	CRendererContext::RiMakeBumpV(const char *pic,const char *tex,const char *swrap,const char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeBumpV(const char *pic,const char *tex,const char *swrap,const char *twrap,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,(void **) params);
+	makeTexture(pic,tex,options->texturePath,swrap,twrap,filterfunc,swidth,twidth,n,tokens,params);
 }
 
-void	CRendererContext::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeLatLongEnvironmentV(const char *pic,const char *tex,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeCylindericalEnvironment(pic,tex,options->texturePath,RI_PERIODIC,RI_CLAMP,filterfunc,swidth,twidth,n,tokens,(void **) params);
+	makeCylindericalEnvironment(pic,tex,options->texturePath,RI_PERIODIC,RI_CLAMP,filterfunc,swidth,twidth,n,tokens,params);
 }
 
-void	CRendererContext::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny, const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeCubeFaceEnvironmentV(const char *px,const char *nx,const char *py,const char *ny, const char *pz,const char *nz,const char *tex,float fov,float (*filterfunc)(float,float,float,float),float swidth,float twidth,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeCubicEnvironment(px,py,pz,nx,ny,nz,tex,RI_CLAMP,RI_CLAMP,options->texturePath,filterfunc,swidth,twidth,n,tokens,(void **) params,FALSE);
+	makeCubicEnvironment(px,py,pz,nx,ny,nz,tex,RI_CLAMP,RI_CLAMP,options->texturePath,filterfunc,swidth,twidth,n,tokens,params,FALSE);
 }
 
 
-void	CRendererContext::RiMakeShadowV(const char *pic,const char *tex,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeShadowV(const char *pic,const char *tex,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeSideEnvironment(pic,tex,options->texturePath,RI_CLAMP,RI_CLAMP,RiBoxFilter,1,1,n,tokens,(void **) params,TRUE);
+	makeSideEnvironment(pic,tex,options->texturePath,RI_CLAMP,RI_CLAMP,RiBoxFilter,1,1,n,tokens,params,TRUE);
 }
 
-void	CRendererContext::RiMakeBrickMapV(int nb,const char **src,const char *dest,int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiMakeBrickMapV(int nb,const char **src,const char *dest,int n,const char *tokens[],const void *params[]) {
 	COptions	*options;
 
 	if (CRenderer::netClient != INVALID_SOCKET)	return;
 
 	options	=	getOptions(FALSE);
-	makeBrickMap(nb,src,dest,options->texturePath,n,tokens,(void **) params);
+	makeBrickMap(nb,src,dest,options->texturePath,n,tokens,params);
 }
 
-void	CRendererContext::RiArchiveRecord(char * type,char *format,va_list args) {
+void	CRendererContext::RiArchiveRecord(const char * type,const char *format,va_list args) {
 	// We're not archiving
 }
 
-void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char *,...),int n,char *tokens[],void *params[]) {
+void	CRendererContext::RiReadArchiveV(const char *filename,void (*callback)(const char *,...),int n,const char *tokens[],const void *params[]) {
 	char	tmp[OS_MAX_PATH_LENGTH];
 
 	if ((filename[0] != '-') && (filename[0] != '|')) {
@@ -4432,7 +4432,7 @@ void	CRendererContext::RiReadArchiveV(char *filename,void (*callback)(const char
 	}
 }
 
-void	*CRendererContext::RiArchiveBeginV(const char *name,int n,char *tokens[],void *parms[]) {
+void	*CRendererContext::RiArchiveBeginV(const char *name,int n,const char *tokens[],const void *parms[]) {
 
 	// Make sure we have the temporary directory created
 	if (!osFileExists(CRenderer::temporaryPath))	osCreateDir(CRenderer::temporaryPath);
@@ -4452,7 +4452,7 @@ void	CRendererContext::RiArchiveEnd(void) {
 	savedRenderMan	=	NULL;
 }
 	
-void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,char *tokens[],void *parms[]) {
+void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]) {
 	
 	// Check the parameters
 	if (n == 0) {
@@ -4598,7 +4598,7 @@ void	CRendererContext::RiResourceEnd(void) {
 	currentResource	=	savedResources->pop();
 }
 
-void	CRendererContext::RiIfBeginV(const char *expr,int n,char *tokens[],void *parms[]) {
+void	CRendererContext::RiIfBeginV(const char *expr,int n,const char *tokens[],const void *parms[]) {
 
 	if (riExecTag == 0) {
 		if (ifParse(expr)) {
@@ -4613,7 +4613,7 @@ void	CRendererContext::RiIfBeginV(const char *expr,int n,char *tokens[],void *pa
 	}
 }
 
-void	CRendererContext::RiElseIfV(const char *expr,int n,char *tokens[],void *parms[]) {
+void	CRendererContext::RiElseIfV(const char *expr,int n,const char *tokens[],const void *parms[]) {
 	
 	if (riExecTag == 0) {
 		ignoreCommand	=	TRUE;
@@ -4654,7 +4654,7 @@ void	CRendererContext::RiIfEnd(void) {
 	}
 }
 
-void	CRendererContext::RiError(int code,int severity,char *mes) {
+void	CRendererContext::RiError(int code,int severity,const char *mes) {
 	char		*tmp		=	NULL;
 	CAttributes	*attributes	=	NULL;
 

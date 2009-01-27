@@ -286,7 +286,7 @@ CUserAttributeDictionary		*CRenderer::userOptions					=	NULL;					// initialized
 // Description			:	Begin the renderer
 // Return Value			:	-
 // Comments				:
-void		CRenderer::beginRenderer(CRendererContext *c,char *ribFile,char *riNetString) {
+void		CRenderer::beginRenderer(CRendererContext *c,const char *ribFile,const char *riNetString) {
 	const float		startTime	=	osCPUTime();
 
 	// Save the context
@@ -766,9 +766,9 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		// (globalMemory is checkpointed)
 		displays				=	(COptions::CDisplay *) ralloc(sizeof(COptions::CDisplay),CRenderer::globalMemory);
 		displays->next			=	NULL;
-		displays->outDevice		=	RI_FILE;
-		displays->outName		=	"ri.tif";
-		displays->outSamples	=	RI_RGBA;
+		displays->outDevice		=	(char *) RI_FILE;
+		displays->outName		=	(char *) "ri.tif";
+		displays->outSamples	=	(char *) RI_RGBA;
 	}
 
 	// The sample offsets

@@ -134,7 +134,7 @@ public:
 		//  They pretty much do what you would expect
 		// 
 		////////////////////////////////////////////////////////////////////
-		static void								beginRenderer(CRendererContext *context,char *ribFile,char *riNetString);
+		static void								beginRenderer(CRendererContext *context,const char *ribFile,const char *riNetString);
 		static void								endRenderer();
 
 								
@@ -299,8 +299,8 @@ public:
 		static	CTexture3d		*getTexture3d(const char*,int,const char*,const float*,const float *,int hierarchy=FALSE);	// Load a point cloud or brickmap
 		static	CShader			*getShader(const char *,TSearchpath *search=NULL);		// Load a shader
 		static	int				getAOVFilter(const char *name);							// Get an AOV filter name
-		static	char			*getFilter(RtFilterFunc);								// The other way around
-		static	CDSO			*getDSO(char *,char *);									// Find a DSO function
+		static	const char		*getFilter(RtFilterFunc);								// The other way around
+		static	CDSO			*getDSO(const char *,const char *);						// Find a DSO function
 		static	void			shutdownFiles();
 		static	void			shutdownTextures();										// clean up texturing
 
@@ -308,8 +308,8 @@ public:
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with network (implemented in rendererNetwork.cpp)
 		////////////////////////////////////////////////////////////////////
-		static	void			initNetwork(char *ribFile,char *riNetString);			// Initiate misc network functionality
-		static	void			netSetup(char *,char *);								// Setup the network for rendering
+		static	void			initNetwork(const char *ribFile,const char *riNetString);// Initiate misc network functionality
+		static	void			netSetup(const char *,const char *);					// Setup the network for rendering
 		static	void			sendFile(int,char *,int,int);							// Send a particular file
 		static	int				getFile(char *,const char *);							// Get a particular file from network
 		static	int				getFile(FILE *,const char *,int start=0,int size=0);	// Get a particular file from network

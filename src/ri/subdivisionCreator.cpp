@@ -1575,7 +1575,7 @@ static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVer
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,char **tags,int *nargs,int *intargs,float *floatargs) : CObject(a,x) {
+CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,const char **tags,int *nargs,int *intargs,float *floatargs) : CObject(a,x) {
 	int			i,j,ias,fas;
 	const float	*P;
 
@@ -1613,7 +1613,6 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 
 		if (ias > 0)	this->intargs			=	new int[ias];			memcpy(this->intargs,intargs,ias*sizeof(int));
 		if (fas > 0)	this->floatargs			=	new float[fas];			memcpy(this->floatargs,floatargs,fas*sizeof(float));
-
 	}
 
 	// Compute the bounding box
@@ -1713,7 +1712,7 @@ void		CSubdivMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) con
 
 	if (a == NULL)	a	=	attributes;
 
-	c->addObject(new CSubdivMesh(a,nx,pl->clone(a),numFaces,numVerticesPerFace,vertexIndices,ntags,tags,nargs,intargs,floatargs));
+	c->addObject(new CSubdivMesh(a,nx,pl->clone(a),numFaces,numVerticesPerFace,vertexIndices,ntags,(const char **) tags,nargs,intargs,floatargs));
 }
 
 

@@ -347,7 +347,7 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 // Description			:	Set the values of the parameters
 // Return Value			:	-
 // Comments				:
-int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
+int	CProgrammableShaderInstance::setParameter(const char *param,const void *val) {
 	CVariable	*cParameter;
 
 	for (cParameter=parameters;cParameter!=NULL;cParameter=cParameter->next) {
@@ -470,7 +470,7 @@ int	CProgrammableShaderInstance::setParameter(char *param,void *val) {
 // Description			:	Set the values of the parameters
 // Return Value			:	-
 // Comments				:
-void	CProgrammableShaderInstance::setParameters(int np,char **params,void **vals) {
+void	CProgrammableShaderInstance::setParameters(int np,const char **params,const void **vals) {
 	int	i;
 
 

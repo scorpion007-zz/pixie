@@ -124,7 +124,7 @@ public:
 	// Description			:	Insert a variable
 	// Return Value			:
 	// Comments				:
-	void insert(CVariable *var,void *value) {
+	void insert(CVariable *var,const void *value) {
 		CVariable *cAttr	=	attribs;
 		CVariable *pAttr	=	NULL;
 		
@@ -173,7 +173,7 @@ public:
 		// store the value
 		if (var->type == TYPE_STRING) {
 			nAttr->defaultValue	= (float*) new char *[var->numFloats];
-			char **src						= (char**) value;
+			const char **src						= (const char**) value;
 			for (int i = 0; i < var->numFloats;	i++) {
 				((char**) nAttr->defaultValue)[i] = strdup(src[i]);
 			}

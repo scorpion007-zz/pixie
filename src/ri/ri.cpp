@@ -776,7 +776,7 @@ RiCropWindow (RtFloat xmin, RtFloat xmax, RtFloat ymin, RtFloat ymax) {
 }
 
 EXTERN(RtVoid)
-RiProjection (char *name, ...) {
+RiProjection (const char *name, ...) {
 	va_list	args;
 	va_start(args,name);
 	getArgs(args);
@@ -786,7 +786,7 @@ RiProjection (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiProjectionV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiProjectionV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiProjection",VALID_OPTION_BLOCKS)) return;
 
 	renderMan->RiProjectionV(name,n,tokens,params);
@@ -849,7 +849,7 @@ RiExposure (RtFloat gain, RtFloat gamma) {
 }
 
 EXTERN(RtVoid)
-RiImager (char *name, ...) {
+RiImager (const char *name, ...) {
 	va_list	args;
 
 	va_start(args,name);
@@ -859,7 +859,7 @@ RiImager (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiImagerV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiImagerV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiImager",VALID_OPTION_BLOCKS)) return;
 
 	renderMan->RiImagerV(name,n,tokens,params);
@@ -873,7 +873,7 @@ RiQuantize (RtToken type, RtInt one, RtInt qmin, RtInt qmax, RtFloat ampl) {
 }
 
 EXTERN(RtVoid)
-RiDisplay (char *name, RtToken type, RtToken mode, ...) {
+RiDisplay (const char *name, RtToken type, RtToken mode, ...) {
 	va_list	args;
 
 	va_start(args,mode);
@@ -883,7 +883,7 @@ RiDisplay (char *name, RtToken type, RtToken mode, ...) {
 }
 
 EXTERN(RtVoid)
-RiDisplayV (char *name, RtToken type, RtToken mode,
+RiDisplayV (const char *name, RtToken type, RtToken mode,
 			RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiDisplayChannel",VALID_OPTION_BLOCKS)) return;
 
@@ -1221,7 +1221,7 @@ RiRelativeDetail (RtFloat relativedetail) {
 }
 
 EXTERN(RtVoid)
-RiOption (char *name, ...) {
+RiOption (const char *name, ...) {
 	va_list	args;
 
 	// init if necessary (for gz options)
@@ -1235,7 +1235,7 @@ RiOption (char *name, ...) {
 
 
 EXTERN(RtVoid)
-RiOptionV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiOptionV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 
 	// This section allows us to parse RibOut options before RiBegin, to match the standard
 	if (renderMan == NULL) {
@@ -1313,7 +1313,7 @@ RiTextureCoordinates (RtFloat s1, RtFloat t1, RtFloat s2, RtFloat t2,
 
 
 EXTERN(RtLightHandle)
-RiLightSource (char *name, ...) {
+RiLightSource (const char *name, ...) {
 	RtLightHandle	handle;
 	va_list			args;
 
@@ -1326,14 +1326,14 @@ RiLightSource (char *name, ...) {
 }
 
 EXTERN(RtLightHandle)
-RiLightSourceV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiLightSourceV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiLightSource",VALID_ATTRIBUTE_BLOCKS)) return NULL;
 
 	return (RtLightHandle) renderMan->RiLightSourceV(name,n,tokens,params);
 }
 
 EXTERN(RtLightHandle)
-RiAreaLightSource (char *name, ...) {
+RiAreaLightSource (const char *name, ...) {
 	RtLightHandle	handle;
 	va_list			args;
 
@@ -1346,7 +1346,7 @@ RiAreaLightSource (char *name, ...) {
 }
 
 EXTERN(RtLightHandle)
-RiAreaLightSourceV (char *name, RtInt n,
+RiAreaLightSourceV (const char *name, RtInt n,
 					RtToken tokens[], RtPointer params[]) {
 	if (check("RiAreaLightSource",VALID_ATTRIBUTE_BLOCKS)) return NULL;
 
@@ -1362,7 +1362,7 @@ RiIlluminate (RtLightHandle light, RtBoolean onoff) {
 }
 
 EXTERN(RtVoid)
-RiSurface (char *name, ...) {
+RiSurface (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1372,14 +1372,14 @@ RiSurface (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiSurfaceV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiSurfaceV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiSurface",VALID_ATTRIBUTE_BLOCKS)) return;
 
 	renderMan->RiSurfaceV(name,n,tokens,params);
 }
 
 EXTERN(RtVoid)
-RiAtmosphere (char *name, ...) {
+RiAtmosphere (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1389,14 +1389,14 @@ RiAtmosphere (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiAtmosphereV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiAtmosphereV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiAtmosphere",VALID_ATTRIBUTE_BLOCKS)) return;
 
 	renderMan->RiAtmosphereV(name,n,tokens,params);
 }
 
 EXTERN(RtVoid)
-RiInterior (char *name, ...) {
+RiInterior (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1406,14 +1406,14 @@ RiInterior (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiInteriorV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiInteriorV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiInterior",VALID_ATTRIBUTE_BLOCKS)) return;
 
 	renderMan->RiInteriorV(name,n,tokens,params);
 }
 
 EXTERN(RtVoid)
-RiExterior (char *name, ...) {
+RiExterior (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1423,7 +1423,7 @@ RiExterior (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiExteriorV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiExteriorV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiExterior",VALID_ATTRIBUTE_BLOCKS)) return;
 
 	renderMan->RiExteriorV(name,n,tokens,params);
@@ -1567,7 +1567,7 @@ RiSkew (RtFloat angle, RtFloat dx1, RtFloat dy1, RtFloat dz1,
 }
 
 EXTERN(RtVoid)
-RiDeformation (char *name, ...) {
+RiDeformation (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1577,14 +1577,14 @@ RiDeformation (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiDeformationV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiDeformationV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiDeformation",VALID_XFORM_BLOCKS)) return;
 
 	renderMan->RiDeformationV(name,n,tokens,params);
 }
 
 EXTERN(RtVoid)
-RiDisplacement (char *name, ...) {
+RiDisplacement (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1594,7 +1594,7 @@ RiDisplacement (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiDisplacementV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiDisplacementV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 
 	// We treat displacement as an attribute, not an xform
 	if (check("RiDisplacement",VALID_ATTRIBUTE_BLOCKS)) return;
@@ -1652,7 +1652,7 @@ RiTransformEnd (void) {
 
 
 EXTERN(RtVoid)
-RiAttribute (char *name, ...) {
+RiAttribute (const char *name, ...) {
 	va_list			args;
 
 	va_start(args,name);
@@ -1662,7 +1662,7 @@ RiAttribute (char *name, ...) {
 }
 
 EXTERN(RtVoid)
-RiAttributeV (char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
+RiAttributeV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]) {
 	if (check("RiAttribute",VALID_ATTRIBUTE_BLOCKS)) return;
 
 	renderMan->RiAttributeV(name,n,tokens,params);
@@ -1971,8 +1971,8 @@ RiCurvesV (RtToken degree, RtInt ncurves, RtInt nverts[], RtToken wrap,
 }
 
 EXTERN(RtVoid)
-    RiProcedural (RtPointer data, RtBound bound,
-		  RtVoid (*subdivfunc) (RtPointer, RtFloat),RtVoid (*freefunc) (RtPointer)) {
+    RiProcedural (void *data, RtBound bound,
+		  RtVoid (*subdivfunc) (void *, RtFloat),RtVoid (*freefunc) (void *)) {
 	if (check("RiProcedural",VALID_PRIMITIVE_BLOCKS)) return;
 
 	renderMan->RiProcedural(data,bound,subdivfunc,freefunc);
@@ -2060,7 +2060,7 @@ EXTERN(RtVoid)
 
 
 EXTERN(RtVoid)
-RiProcDelayedReadArchive (RtPointer data, RtFloat detail) {
+RiProcDelayedReadArchive (void *data, RtFloat detail) {
 	CDelayedData	*delayed	=	(CDelayedData *) data;
 
 	renderMan->RiReadArchiveV(delayed->generator,NULL,0,NULL,NULL);
@@ -2136,7 +2136,7 @@ RiProcDelayedReadArchive (RtPointer data, RtFloat detail) {
 
 
 EXTERN(RtVoid)
-RiProcRunProgram (RtPointer data, RtFloat detail) {
+RiProcRunProgram (void *data, RtFloat detail) {
 	CDelayedData	*delayed	=	(CDelayedData *) data;
 	
 	// GSHTODO: cache the open pipes and close on last RunProgram
@@ -2227,7 +2227,7 @@ RiProcRunProgram (RtPointer data, RtFloat detail) {
 }
 
 EXTERN(RtVoid)
-RiProcDynamicLoad (RtPointer data, RtFloat detail) {
+RiProcDynamicLoad (void *data, RtFloat detail) {
 	CDelayedData	*delayed	=	(CDelayedData *) data;
 	void			*module;
 
@@ -2260,7 +2260,7 @@ RiProcDynamicLoad (RtPointer data, RtFloat detail) {
 	}
 }
 
-EXTERN(RtVoid)	RiProcFree(RtPointer data) {
+EXTERN(RtVoid)	RiProcFree(void *data) {
 	CDelayedData	*delayed	=	(CDelayedData *) data;
 
 	delete delayed;
@@ -2479,19 +2479,19 @@ EXTERN(RtVoid)
 }
 
 EXTERN(RtVoid)
-RiErrorHandler (RtErrorHandler handler) {
+RiErrorHandler (const RtErrorHandler handler) {
 	renderMan->RiErrorHandler(handler);
 }
 
 EXTERN(RtVoid)
-RiErrorIgnore (RtInt code, RtInt severity, char *message) {
+RiErrorIgnore (RtInt code, RtInt severity, const char *message) {
 	if ((severity == RIE_ERROR) || (severity == RIE_SEVERE)) {
 		RiLastError = code;
 	}
 }
 
 EXTERN(RtVoid)
-RiErrorPrint (RtInt code, RtInt severity, char *message) {
+RiErrorPrint (RtInt code, RtInt severity, const char *message) {
 	if (severity == RIE_SEVERE) {
 		// Severe errors must still abort
 
@@ -2513,7 +2513,7 @@ RiErrorPrint (RtInt code, RtInt severity, char *message) {
 }
 
 EXTERN(RtVoid)
-RiErrorAbort (RtInt code, RtInt severity, char *message) {
+RiErrorAbort (RtInt code, RtInt severity, const char *message) {
 	if ((severity == RIE_ERROR) || (severity == RIE_SEVERE)) {
 		RiLastError = code;
 		
@@ -2624,7 +2624,7 @@ EXTERN(RtVoid)			RiArchiveEnd(void) {
 //
 //  Conditional evaluation functions
 //
-EXTERN(RtVoid)			RiIfBegin(char *expr, ...) {
+EXTERN(RtVoid)			RiIfBegin(const char *expr, ...) {
 	va_list	args;
 
 	va_start(args,expr);
@@ -2633,13 +2633,13 @@ EXTERN(RtVoid)			RiIfBegin(char *expr, ...) {
 	va_end(args);
 }
 
-EXTERN(RtVoid)			RiIfBeginV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
+EXTERN(RtVoid)			RiIfBeginV(const char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
 	
 	// Do not check for scope
 	renderMan->RiIfBeginV(expr,n,tokens,parms);
 }
 
-EXTERN(RtVoid)			RiElseIf(char *expr, ...) {
+EXTERN(RtVoid)			RiElseIf(const char *expr, ...) {
 	va_list	args;
 
 	va_start(args,expr);
@@ -2648,7 +2648,7 @@ EXTERN(RtVoid)			RiElseIf(char *expr, ...) {
 	va_end(args);
 }
 
-EXTERN(RtVoid)			RiElseIfV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
+EXTERN(RtVoid)			RiElseIfV(const char *expr, RtInt n, RtToken tokens[], RtPointer parms[]) {
 	
 	// Do not check for scope
 	renderMan->RiElseIfV(expr,n,tokens,parms);}
@@ -2674,7 +2674,7 @@ EXTERN(RtVoid)			RiIfEnd(void) {
 //  Archieve reading functions
 //
 EXTERN(RtVoid)
-RiArchiveRecord (RtToken type, char *format, ...) {
+RiArchiveRecord (RtToken type, const char *format, ...) {
 	va_list	args;
 
 	va_start(args,format);

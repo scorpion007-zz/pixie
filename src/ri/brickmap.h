@@ -254,7 +254,7 @@ protected:
 
 
 
-void	makeBrickMap(int n,const char **src,const char *dest,TSearchpath *searchPath,int numTokens,char **tokens,void **params);
+void	makeBrickMap(int n,const char **src,const char *dest,TSearchpath *searchPath,int numTokens,const char **tokens,const void **params);
 
 
 #endif

@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 
 	RtToken			tokens[50];
 	RtPointer		vals[50];
-	char			*files[50];
+	const char		*files[50];
 	int				currentFile			=	0;
 	int				currentParameter	=	0;
 

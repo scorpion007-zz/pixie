@@ -43,7 +43,7 @@
 // Description			:	Receive data from network
 // Return Value			:
 // Comments				:
-void			CRenderer::initNetwork(char *ribFile,char *riNetString) {
+void			CRenderer::initNetwork(const char *ribFile,const char *riNetString) {
 
 	// Clear some data
 	netClient						=	INVALID_SOCKET;
@@ -178,20 +178,15 @@ void		rcRecv(SOCKET s,void *dataToReceive,int n,int toNetwork) {
 // Description			:	Lookup the name of a socket and return it's address
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
-static	int		netName(sockaddr_in *address,char *name) {
+static	int		netName(sockaddr_in *address,const char *orgName) {
 	int					port;
 	struct	hostent		*hp			=	NULL;
 	char				*portMarker;
-	char				tmp[256];
+	char				name[256];
 
-	if (name == NULL) {
-		gethostname(tmp,256);
-		name	=	tmp;
-	} else {
-		// Make a local copy of the address
-		strcpy(tmp,name);
-		name	=	tmp;
-	}
+	// Make a local copy of the name
+	if (orgName == NULL)	gethostname(name,256);
+	else					strcpy(name,orgName);
 
 	portMarker						=	strchr(name,':');
 
@@ -458,8 +453,7 @@ int			CRenderer::getFile(char *outName,const char *inName) {
 // Description			:	Setup the network connections
 // Return Value			:
 // Comments				:
-void		CRenderer::netSetup(char *ribFile,char *riNetString) {
-	char		*tmp		=	riNetString;
+void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 	sockaddr_in	me;
 	SOCKET		control;
 
@@ -467,7 +461,10 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 	netNumServers		=	0;
 	netServers			=	NULL;
 
-	if (tmp == NULL)	return;
+	if (riNetString == NULL)	return;
+
+	char	*tmp		=	(char *) alloca(strlen(riNetString)+1);
+	strcpy(tmp,riNetString);
 
 #ifdef _WINDOWS
 	WSADATA wsaData;
@@ -520,6 +517,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 		int			port;
 		T32			netBuffer[4];
 		int			killservers = FALSE,tmpOffset;
+		char		*tmpStart	=	tmp;
 
 		if (*tmp == 'k') {
 			tmp			+=	(tmpOffset=12);
@@ -563,7 +561,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 			netNumServers++;
 			tmp	=	marker+1;
 		}
-		tmp					=	riNetString+tmpOffset;
+		tmp					=	tmpStart+tmpOffset;
 		netNumServers++;
 
 		netServers			=	new SOCKET[netNumServers];
@@ -695,6 +693,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 		sscanf(tmp,"%d",&netClient);
 	} else if (strncmp(tmp,"locservers=",11) == 0) {
 		char		*marker;
+		char		*tmpStarts	=	tmp;
 		
 		tmp += 11;
 		
@@ -706,7 +705,7 @@ void		CRenderer::netSetup(char *ribFile,char *riNetString) {
 			tmp	=	marker+1;
 		}
 		netNumServers++;
-		tmp		=	riNetString+11;
+		tmp		=	tmpStarts+11;
 		
 		// Allocate our arrays
 		netServers			=	new SOCKET[netNumServers];

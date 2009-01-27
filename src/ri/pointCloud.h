@@ -149,7 +149,7 @@ private:
 	static	int				drawDiscs;			// Which type to draw
 	static	int				drawChannel;		// Which channel to draw
 	
-	friend			void	makeBrickMap(int n,const char **,const char *,TSearchpath *,int,char **,void **);
+	friend			void	makeBrickMap(int n,const char **,const char *,TSearchpath *,int,const char **,const void **);
 	
 	friend class CRemotePtCloudChannel;
 };

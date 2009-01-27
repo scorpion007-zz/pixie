@@ -2401,7 +2401,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 
 						if (sizeCheck(numVertices,numVertices,j,$3)) {
-							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,(char **) args1,argi3,argi4,argf1,numParameters,tokens,vals);
+							RiSubdivisionMeshV($2,$3,argi1,argi2,$5,args1,argi3,argi4,argf1,numParameters,tokens,vals);
 						}
 					}
 				}
@@ -2441,7 +2441,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 
 							if (sizeCheck(numVertices,numVertices,j,$3)) {
-								RiSubdivisionMeshV($2,$3,argi1,argi2,0,(char **) args1,argi3,argi4,argf1,numParameters,tokens,vals);
+								RiSubdivisionMeshV($2,$3,argi1,argi2,0,args1,argi3,argi4,argf1,numParameters,tokens,vals);
 							}
 						} else {
 							error(CODE_BADTOKEN,"Subdivision surface expected string array (tags) for argument 5\n");
@@ -2547,7 +2547,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 
 							cData->generator	=	strdup(arg[0]);
 
-							RiProcedural((RtPointer) cData,bound,RiProcDelayedReadArchive,RiProcFree);
+							RiProcedural(cData,bound,RiProcDelayedReadArchive,RiProcFree);
 						}
 					} else if (strcmp($2,RI_PROCRUNPROGRAM) == 0) {
 						if ($3 != 2) {
@@ -2558,7 +2558,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 							cData->generator	=	strdup(arg[0]);
 							cData->helper		=	strdup(arg[1]);
 
-							RiProcedural((RtPointer) cData,bound,RiProcRunProgram,RiProcFree);
+							RiProcedural(cData,bound,RiProcRunProgram,RiProcFree);
 						}
 					} else if (strcmp($2,RI_PROCDYNAMICLOAD) == 0) {
 						if ($3 != 2) {
@@ -2569,7 +2569,7 @@ ribComm:		RIB_STRUCTURE_COMMENT
 							cData->generator	=	strdup(arg[0]);
 							cData->helper		=	strdup(arg[1]);
 
-							RiProcedural((RtPointer) cData,bound,RiProcDynamicLoad,RiProcFree);
+							RiProcedural(cData,bound,RiProcDynamicLoad,RiProcFree);
 						}
 					} else {
 						error(CODE_BADTOKEN,"Unknown procedural: %s\n",$2);

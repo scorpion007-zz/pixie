@@ -46,7 +46,7 @@ public:
 		virtual					~CQuadLight();
 
 		void					illuminate(CShadingContext *,float **);
-		void					setParameters(int,char **,void **);
+		void					setParameters(int,const char **,const void **);
 		int						getParameter(const char *,void *,CVariable**,int*);
 		void					execute(CShadingContext *,float **);
 		unsigned int			requiredParameters();
@@ -74,7 +74,7 @@ public:
 		virtual					~CSphereLight();
 
 		void					illuminate(CShadingContext *,float **);
-		void					setParameters(int,char **,void **);
+		void					setParameters(int,const char **,const void **);
 		int						getParameter(const char *,void *,CVariable**,int*);
 		void					execute(CShadingContext *,float **);
 		unsigned int			requiredParameters();

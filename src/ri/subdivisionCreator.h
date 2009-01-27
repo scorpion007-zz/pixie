@@ -41,7 +41,7 @@
 // Comments				:
 class	CSubdivMesh : public CObject {
 public:
-							CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,char **tags,int *nargs,int *intargs,float *floatargs);
+							CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,const char **tags,int *nargs,int *intargs,float *floatargs);
 							~CSubdivMesh();
 
 	void					intersect(CShadingContext *,CRay *);

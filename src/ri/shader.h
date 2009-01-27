@@ -172,7 +172,7 @@ public:
 		virtual					~CShaderInstance();
 
 		virtual	void			illuminate(CShadingContext *,float **)					=	0;
-		virtual	void			setParameters(int,char **,void **)						=	0;
+		virtual	void			setParameters(int,const char **,const void **)			=	0;
 		virtual int				getParameter(const char *,void *,CVariable**,int*)		=	0;
 		virtual	void			execute(CShadingContext *,float **)						=	0;
 		virtual	unsigned int	requiredParameters()									=	0;
@@ -209,7 +209,7 @@ public:
 		virtual						~CProgrammableShaderInstance();
 
 		void						illuminate(CShadingContext *,float **);
-		void						setParameters(int,char **,void **);
+		void						setParameters(int,const char **,const void **);
 		int							getParameter(const char *,void *,CVariable**,int*);	// Get the value of a parameter
 		void						execute(CShadingContext *,float **);				// Execute the shader
 		unsigned int				requiredParameters();
@@ -220,7 +220,7 @@ public:
 		CAllocatedString			*strings;					// The strings we allocated for parameters
 		CShader						*parent;					// The parent shader
 private:
-		int							setParameter(char *,void *);
+		int							setParameter(const char *,const void *);
 };
 
 #endif

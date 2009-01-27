@@ -654,7 +654,7 @@ void	CRenderer::computeDisplayData() {
 		// save the computed display name
 		datas[numDisplays].displayName = strdup(displayName);
 		
-		char * outDevice = cDisplay->outDevice;
+		const char * outDevice = cDisplay->outDevice;
 		if (strcmp(outDevice,"shadow") == 0
 			|| strcmp(outDevice,"zfile") == 0
 			|| strcmp(outDevice,"tiff") == 0

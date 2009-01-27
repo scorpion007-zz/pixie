@@ -58,10 +58,10 @@ extern "C" {
 typedef short		RtBoolean;
 typedef int			RtInt;
 typedef float		RtFloat;
-typedef char		*RtToken;
+typedef const char	*RtToken;
 typedef	void		RtVoid;
-typedef char		*RtString;
-typedef void		*RtPointer;
+typedef const char	*RtString;
+typedef const void	*RtPointer;
 typedef RtFloat		RtColor[3];
 typedef RtFloat		RtPoint[3];
 typedef RtFloat		RtMatrix[4][4];
@@ -74,7 +74,7 @@ typedef RtString	RtArchiveHandle;
 typedef RtString	RtShaderHandle;
 typedef RtFloat		(*RtFilterFunc)(RtFloat, RtFloat, RtFloat, RtFloat);
 typedef RtFloat		(*RtStepFilterFunc)(RtFloat, RtFloat, RtFloat);
-typedef RtVoid		(*RtErrorHandler)(RtInt code, RtInt severity, char *msg);
+typedef RtVoid		(*RtErrorHandler)(RtInt code, RtInt severity,const char *msg);
 typedef RtVoid		(*RtFunc)(const char *);
 typedef RtVoid		(*RtArchiveCallback)(const char *,...);
 
@@ -333,8 +333,8 @@ EXTERN(RtVoid)
     RiFrameAspectRatio (RtFloat aspect),
     RiScreenWindow (RtFloat left, RtFloat right, RtFloat bot, RtFloat top),
     RiCropWindow (RtFloat xmin, RtFloat xmax, RtFloat ymin, RtFloat ymax),
-    RiProjection (char *name, ...),
-    RiProjectionV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiProjection (const char *name, ...),
+    RiProjectionV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
     RiClipping (RtFloat hither, RtFloat yon),
 	RiClippingPlane(RtFloat x,RtFloat y,RtFloat z,RtFloat nx,RtFloat ny,RtFloat nz),
     RiDepthOfField (RtFloat fstop, RtFloat focallength, RtFloat focaldistance),
@@ -345,11 +345,11 @@ EXTERN(RtVoid)
     RiPixelSamples (RtFloat xsamples, RtFloat ysamples),
     RiPixelFilter (RtFilterFunc function, RtFloat xwidth, RtFloat ywidth),
     RiExposure (RtFloat gain, RtFloat gamma),
-    RiImager (char *name, ...),
-    RiImagerV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiImager (const char *name, ...),
+    RiImagerV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
     RiQuantize (RtToken type, RtInt one, RtInt qmin, RtInt qmax, RtFloat ampl),
-    RiDisplay (char *name, RtToken type, RtToken mode, ...),
-    RiDisplayV (char *name, RtToken type, RtToken mode, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiDisplay (const char *name, RtToken type, RtToken mode, ...),
+    RiDisplayV (const char *name, RtToken type, RtToken mode, RtInt n, RtToken tokens[], RtPointer params[]),
 	RiDisplayChannel (RtToken channel, ...),
     RiDisplayChannelV (RtToken channel,RtInt n, RtToken tokens[], RtPointer params[]);
 
@@ -376,8 +376,8 @@ EXTERN(RtVoid)
     RiHiderV (RtToken type, RtInt n, RtToken tokens[], RtPointer params[]),
     RiColorSamples (RtInt N, RtFloat *nRGB, RtFloat *RGBn),
     RiRelativeDetail (RtFloat relativedetail),
-    RiOption (char *name, ...),
-    RiOptionV (char *name, RtInt n, RtToken tokens[], RtPointer params[]);
+    RiOption (const char *name, ...),
+    RiOptionV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid)
     RiAttributeBegin (void), RiAttributeEnd (void),
@@ -385,21 +385,21 @@ EXTERN(RtVoid)
     RiTextureCoordinates (RtFloat s1, RtFloat t1, RtFloat s2, RtFloat t2, RtFloat s3, RtFloat t3, RtFloat s4, RtFloat t4);
 
 EXTERN(RtLightHandle)
-    RiLightSource (char *name, ...),
-    RiLightSourceV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiAreaLightSource (char *name, ...),
-    RiAreaLightSourceV (char *name, RtInt n, RtToken tokens[], RtPointer params[]);
+    RiLightSource (const char *name, ...),
+    RiLightSourceV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiAreaLightSource (const char *name, ...),
+    RiAreaLightSourceV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid)
     RiIlluminate (RtLightHandle light, RtBoolean onoff),
-    RiSurface (char *name, ...),
-    RiSurfaceV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiAtmosphere (char *name, ...),
-    RiAtmosphereV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiInterior (char *name, ...),
-    RiInteriorV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiExterior (char *name, ...),
-    RiExteriorV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiSurface (const char *name, ...),
+    RiSurfaceV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiAtmosphere (const char *name, ...),
+    RiAtmosphereV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiInterior (const char *name, ...),
+    RiInteriorV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiExterior (const char *name, ...),
+    RiExteriorV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
     RiShadingRate (RtFloat size),
     RiShadingInterpolation (RtToken type),
     RiMatte (RtBoolean onoff);
@@ -420,10 +420,10 @@ EXTERN(RtVoid)
     RiRotate (RtFloat angle, RtFloat dx, RtFloat dy, RtFloat dz),
     RiScale (RtFloat dx, RtFloat dy, RtFloat dz),
     RiSkew (RtFloat angle, RtFloat dx1, RtFloat dy1, RtFloat dz1, RtFloat dx2, RtFloat dy2, RtFloat dz2),
-    RiDeformation (char *name, ...),
-    RiDeformationV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiDisplacement (char *name, ...),
-    RiDisplacementV (char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiDeformation (const char *name, ...),
+    RiDeformationV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
+    RiDisplacement (const char *name, ...),
+    RiDisplacementV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]),
     RiCoordinateSystem (RtToken space),
     RiCoordSysTransform (RtToken space);
 
@@ -435,8 +435,8 @@ EXTERN(RtVoid)
 	RiTransformEnd (void);
 
 EXTERN(RtVoid)
-    RiAttribute (char *name, ...),
-    RiAttributeV (char *name, RtInt n, RtToken tokens[], RtPointer params[]);
+    RiAttribute (const char *name, ...),
+    RiAttributeV (const char *name, RtInt n, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid)
     RiPolygon (RtInt nvertices, ...),
@@ -473,7 +473,7 @@ EXTERN(RtVoid)
     RiTorusV (RtFloat majorrad, RtFloat minorrad, RtFloat phimin, RtFloat phimax, RtFloat thetamax, RtInt n, RtToken tokens[], RtPointer params[]),
     RiCurves (RtToken degree, RtInt ncurves, RtInt nverts[], RtToken wrap, ...),
     RiCurvesV (RtToken degree, RtInt ncurves, RtInt nverts[], RtToken wrap, RtInt n, RtToken tokens[], RtPointer params[]),
-    RiProcedural (RtPointer data, RtBound bound, RtVoid (*subdivfunc) (RtPointer, RtFloat), RtVoid (*freefunc) (RtPointer)),
+    RiProcedural (void *data, RtBound bound, RtVoid (*subdivfunc) (void *, RtFloat), RtVoid (*freefunc) (void *)),
     RiGeometry (RtToken type, ...),
     RiGeometryV (RtToken type, RtInt n, RtToken tokens[], RtPointer params[]);
 
@@ -488,10 +488,10 @@ EXTERN(RtVoid)
     RiBlobbyV (RtInt nleaf, RtInt ncode, RtInt code[], RtInt nflt, RtFloat flt[], RtInt nstr, RtString str[], RtInt n, RtToken tokens[], RtPointer params[]);
 
 EXTERN(RtVoid) 
-	RiProcDelayedReadArchive (RtPointer data, RtFloat detail),
-    RiProcRunProgram (RtPointer data, RtFloat detail),
-    RiProcDynamicLoad (RtPointer data, RtFloat detail),
-	RiProcFree(RtPointer);
+	RiProcDelayedReadArchive (void *data, RtFloat detail),
+    RiProcRunProgram (void *data, RtFloat detail),
+    RiProcDynamicLoad (void *data, RtFloat detail),
+	RiProcFree(void *);
 
 EXTERN(RtVoid)
 	RiSolidBegin(RtToken type), 
@@ -523,9 +523,9 @@ EXTERN(RtVoid)
 
 EXTERN(RtVoid)
     RiErrorHandler (RtErrorHandler handler),
-    RiErrorIgnore (RtInt code, RtInt severity, char *message),
-    RiErrorPrint (RtInt code, RtInt severity, char *message),
-    RiErrorAbort (RtInt code, RtInt severity, char *message);
+    RiErrorIgnore (RtInt code, RtInt severity, const char *message),
+    RiErrorPrint (RtInt code, RtInt severity, const char *message),
+    RiErrorAbort (RtInt code, RtInt severity, const char *message);
 
 EXTERN(RtVoid)
 	RiResource(RtToken handle, RtToken type, ...),
@@ -541,15 +541,15 @@ EXTERN(RtVoid)
 	RiArchiveEnd(void);
 
 EXTERN(RtVoid)
-	RiIfBegin(char *expr, ...),
-	RiIfBeginV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
-	RiElseIf(char *expr, ...),
-	RiElseIfV(char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
+	RiIfBegin(const char *expr, ...),
+	RiIfBeginV(const char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
+	RiElseIf(const char *expr, ...),
+	RiElseIfV(const char *expr, RtInt n, RtToken tokens[], RtPointer parms[]),
 	RiElse(void),
 	RiIfEnd(void);
 
 EXTERN(RtVoid)
-    RiArchiveRecord (RtToken type, char *format, ...),
+    RiArchiveRecord (RtToken type, const char *format, ...),
     RiReadArchive (RtString filename, RtArchiveCallback callback, ...),
     RiReadArchiveV (RtString filename, RtArchiveCallback callback, int n, RtToken tokens[], RtPointer params[]);
 

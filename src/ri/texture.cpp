@@ -1891,7 +1891,7 @@ void		CDummyEnvironment::lookup(float *dest,const float *D0,const float *D1,cons
 // Description			:	Read the pyramid layers
 // Return Value			:	TRUE on success
 // Comments				:
-template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int &dstart,int width,int height,char *smode,char *tmode,T enforcer) {
+template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int &dstart,int width,int height,const char *smode,const char *tmode,T enforcer) {
 	uint32					fileWidth,fileHeight;
 	uint32					tileWidth,tileHeight;
 	uint16					numSamples;

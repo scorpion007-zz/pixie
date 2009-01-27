@@ -1494,7 +1494,7 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 // Description			:	This function creates the 3D baed texture from point cloud representation
 // Return Value			:	-
 // Comments				:
-void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPath,int n,char **tokens,void **params) {
+void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPath,int n,const char **tokens,const void **params) {
 	char	tempName[OS_MAX_PATH_LENGTH];
 	char	fileName[OS_MAX_PATH_LENGTH];
 	int		i;

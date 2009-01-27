@@ -134,7 +134,7 @@ public:
 	CPlParameter			*parameters;			// Parameters
 };
 
-CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,char **params,void **vals,char *required,int flags,CAttributes *attributes);
+CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,const char **params,const void **vals,const char *required,int flags,CAttributes *attributes);
 
 #endif
 

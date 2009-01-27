@@ -562,7 +562,7 @@ RtFilterFunc			CRenderer::getFilter(const char *name) {
 // Description			:	Return the name matching the filter
 // Return Value			:
 // Comments				:
-char					*CRenderer::getFilter(RtFilterFunc func) {
+const char					*CRenderer::getFilter(RtFilterFunc func) {
 	if (func == RiGaussianFilter) {
 		return	RI_GAUSSIANFILTER;
 	} else if (func == RiBoxFilter) {
@@ -686,7 +686,7 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 // Description			:	Load a DSO matching the prototyoe
 // Return Value			:
 // Comments				:	This function does not need to be thread safe
-CDSO				*CRenderer::getDSO(char *name,char *prototype) {
+CDSO				*CRenderer::getDSO(const char *name,const char *prototype) {
 	CDSO				*cDso;
 
 	assert(name != NULL);
@@ -709,8 +709,8 @@ CDSO				*CRenderer::getDSO(char *name,char *prototype) {
 	cleanup		=	NULL;
 
 	void	*userData[5];
-	userData[0]	=	name;
-	userData[1]	=	prototype;
+	userData[0]	=	(void *) name;
+	userData[1]	=	(void *) prototype;
 	userData[2]	=	&init;
 	userData[3]	=	&exec;
 	userData[4]	=	&cleanup;

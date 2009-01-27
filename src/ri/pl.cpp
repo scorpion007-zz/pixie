@@ -1169,17 +1169,17 @@ unsigned int CPl::parameterUsage() {
 // Description			:	Parse a parameter list
 // Return Value			:	The parsed parameter list
 // Comments				:
-CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,char **params,void **vals,char *required,int flags,CAttributes *attributes) {
+CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,const char **params,const void **vals,const char *required,int flags,CAttributes *attributes) {
 	int					i,numDefinedParams = 0;
 	CPlParameter		*parameters,*finalParameters;
 	int					dataSize;
 	float				*data;
 	float				*cData;
-	void				**paramvals;
+	const void			**paramvals;
 
 	// Resolve the variables
 	parameters		=	(CPlParameter *)	alloca(numParams*sizeof(CPlParameter));
-	paramvals		=	(void**)			alloca(numParams*sizeof(void*));
+	paramvals		=	(const void **)		alloca(numParams*sizeof(void*));
 	for (dataSize=0,i=0;i<numParams;i++) {
 		CVariable		*cVar,*sVar = NULL,tmp;
 		int				numItems;
@@ -1318,8 +1318,8 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 			memBegin(CRenderer::globalMemory);
 
-			char	**ntokens	=	(char **) ralloc((numParams+1)*sizeof(char *),CRenderer::globalMemory);
-			void	**nvals		=	(void **) ralloc((numParams+1)*sizeof(void *),CRenderer::globalMemory);
+			const char	**ntokens 	=	(const char **) ralloc((numParams+1)*sizeof(char *),CRenderer::globalMemory);
+			const void	**nvals		=	(const void **) ralloc((numParams+1)*sizeof(void *),CRenderer::globalMemory);
 			int		j;
 			float	*sval,*tval,*src;
 
@@ -1340,11 +1340,11 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				nvals[j]	=	vals[j];
 			}
 
-			char	*sDecl = RI_S;
-			char	*tDecl = RI_T;
+			const char	*sDecl = RI_S;
+			const char	*tDecl = RI_T;
 			
 			if( declaredParam ) { 
-				char	*decl;
+				const char	*decl;
 				
 				switch(container) {
 					case CONTAINER_UNIFORM:
@@ -1367,10 +1367,13 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 						decl	=	"uniform float";
 						break;
 				}
-				sDecl = (char*) ralloc((int) strlen(decl) + (int) strlen(RI_S) + 2,CRenderer::globalMemory);
-				tDecl = (char*) ralloc((int) strlen(decl) + (int) strlen(RI_T) + 2,CRenderer::globalMemory);
-				sprintf(sDecl,"%s %s",decl,RI_S);
-				sprintf(tDecl,"%s %s",decl,RI_T);
+				char *sDeclTemp = (char*) ralloc((int) strlen(decl) + (int) strlen(RI_S) + 2,CRenderer::globalMemory);
+				char *tDeclTemp = (char*) ralloc((int) strlen(decl) + (int) strlen(RI_T) + 2,CRenderer::globalMemory);
+				sprintf(sDeclTemp,"%s %s",decl,RI_S);
+				sprintf(tDeclTemp,"%s %s",decl,RI_T);
+
+				sDecl	=	sDeclTemp;
+				tDecl	=	tDeclTemp;
 			}
 			
 			ntokens[j]		=	sDecl;
@@ -1421,7 +1424,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				// Make sure that the first parameter is always the required one
 				if (i != 0) {
 					CPlParameter	tmp		=	parameters[0];
-					void			*vtmp	=	paramvals[0];
+					const void		*vtmp	=	paramvals[0];
 					parameters[0]			=	parameters[i];
 					paramvals[0]			=	paramvals[i];
 					parameters[i]			=	tmp;
