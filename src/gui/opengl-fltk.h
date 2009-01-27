@@ -207,9 +207,6 @@ protected:
 // Return Value			:	-
 // Comments				:
 void		pglVisualize(CView *view) {
-	int		argc	=	1;
-	char	*argv[]	=	{	"View"	};
-
 	CMainWindow		mainWindow(view);
 
 	Fl::run();

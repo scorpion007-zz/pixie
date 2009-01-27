@@ -83,10 +83,7 @@ typedef RtVoid		(*RtArchiveCallback)(const char *,...);
 #define RI_INFINITY (RtFloat)1.0e38
 #define RI_EPSILON  (RtFloat)1.0e-10
 
-#ifndef NULL
-#define NULL 0
-#endif
-#define RI_NULL NULL
+#define RI_NULL		((RtToken)0)
 
 
 ////////////////////////////////////////////////////////////////////////

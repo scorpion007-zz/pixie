@@ -119,7 +119,7 @@ Name: {app}; Type: filesandordirs; Components: main content
 Type: files; Name: {app}\Pixie.url
 
 [INI]
-Filename: {app}\Pixie.url; Section: InternetShortcut; Key: URL; String: http://pixie.sourcefornet.net
+Filename: {app}\Pixie.url; Section: InternetShortcut; Key: URL; String: http://renderpixie.com
 
 [LangOptions]
 WelcomeFontName=Tahoma
