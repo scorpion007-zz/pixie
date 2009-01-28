@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpngd.lib libtiff.lib libjpeg.lib zlib.lib"
+				AdditionalDependencies="libpng.lib libtiff.lib libjpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin"

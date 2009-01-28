@@ -426,6 +426,9 @@ COptions::COptions(const COptions *o) {
 
 	this[0]					=	o[0];
 
+	// Note: The assignment here also invokes the assignment operator of userOptions
+	//      so there's no need for a separate copy for that
+
 	hider					=	strdup(o->hider);
 
 	archivePath				=	optionsCloneSearchPath(o->archivePath);
@@ -483,8 +486,6 @@ COptions::COptions(const COptions *o) {
 	globalIn				=	(o->globalIn != NULL ? strdup(o->globalIn) : NULL);
 	globalOut				=	(o->globalOut != NULL ? strdup(o->globalOut) : NULL);
 	filelog					=	(o->filelog != NULL ? strdup(o->filelog) : NULL);
-	
-	userOptions				=	o->userOptions;
 }
 
 

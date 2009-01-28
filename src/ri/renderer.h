@@ -456,7 +456,7 @@ public:
 		static	int						deepShadowIndexStart;		// The offset in the file for the indices
 		static	char					*deepShadowFileName;
 		
-		static CUserAttributeDictionary	*userOptions;
+		static	const CUserAttributeDictionary	*userOptions;
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CDisplayData

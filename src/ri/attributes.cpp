@@ -157,6 +157,9 @@ CAttributes::CAttributes(const CAttributes *a) {
 	atomicIncrement(&stats.numAttributes);
 
 	this[0]						=	a[0];
+
+	// Note: The assignment here also invokes the assignment operator of userAttributes
+	//      so there's no need for a separate copy for that
 	
 	refCount					=	0;
 
@@ -186,8 +189,6 @@ CAttributes::CAttributes(const CAttributes *a) {
 	}
 
 	name					=	(a->name != NULL ? strdup(a->name) : NULL);
-
-	userAttributes			=	a->userAttributes;
 
 	if (a->next != NULL) next	=	new CAttributes(a->next);
 }
