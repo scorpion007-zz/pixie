@@ -380,7 +380,7 @@ echo "       Modules: " $modulesdir
 echo "------------------------------------------------"
 echo "To build Pixie:"
 echo ">make"
-echo ">make -install"
+echo ">make install"
 echo "              Terminus Est"
 echo
 
