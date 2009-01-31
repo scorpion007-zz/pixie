@@ -44,7 +44,7 @@ Source: ..\bin\sdr.dll; DestDir: {app}\bin; Components: main
 Source: ..\modules\gui.dll; DestDir: {app}\modules; Components: main
 ; Distribute the dependant DLLs
 Source: ..\bin\jpeg62.dll; DestDir: {app}\bin; Components: main
-Source: ..\bin\libpng13.dll; DestDir: {app}\bin; Components: main
+Source: ..\bin\libpng12.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\libtiff3.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\zlib1.dll; DestDir: {app}\bin; Components: main
 Source: ..\bin\libmmd.dll; DestDir: {app}\bin; Components: main

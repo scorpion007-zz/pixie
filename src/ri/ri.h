@@ -296,7 +296,7 @@ EXTERN(RtToken)		RI_DEFAULTSURFACE;
 
 EXTERN(RtInt)		RiLastError;
 
-EXTERN(RtBasis)		RiBezierBasis, RiBSplineBasis, RiCatmullRomBasis, RiHermiteBasis, RiPowerBasis;
+EXTERN(RtBasis)		RiBezierBasis, RiBSplineBasis, RiCatmullRomBasis, RiHermiteBasis, RiPowerBasis, RiLinearBasis;
 
 #define RI_BEZIERSTEP       ((RtInt)3)
 #define RI_BSPLINESTEP      ((RtInt)1)

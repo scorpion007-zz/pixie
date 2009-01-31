@@ -810,6 +810,9 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 							} else if (!strcmp(*splineType,"hermite")) {						\
 								ubasis 	=	(float*) RiHermiteBasis;							\
 								ustep	=	2;													\
+							} else if (!strcmp(*splineType,"linear")) {							\
+								ubasis 	=	(float*) RiLinearBasis;								\
+								ustep	=	2;													\
 							} else {															\
 								error(CODE_BADTOKEN,"Unknown spline basis \"%s\"\n",*splineType);	\
 							}																	\

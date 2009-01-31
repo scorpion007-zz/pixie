@@ -169,8 +169,8 @@ static	TSlFunction		functions[]	=	{
 				char					**currentStringArray;	// If the array is string, we this pointer instead
 				int						numArrayItemsRemaining;	// Number of array items we're still expecting to read
 				
-				char					currentOpcode[32];		// Holds the opcode being parsed
-				char					currentPrototype[32];	// Holds the prototype being parsed
+				char					currentOpcode[64];		// Holds the opcode being parsed
+				char					currentPrototype[64];	// Holds the prototype being parsed
 				int						currentArgument;		// The current argument number
 				unsigned int			usedParameters;			// Used parameters by this shader
 				TCode					*currentOpcodePlace;	// Points to the code that should holds the opcode

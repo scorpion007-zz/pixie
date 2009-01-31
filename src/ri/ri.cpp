@@ -382,6 +382,13 @@ RtBasis		RiPowerBasis		= {
 	{(float)  0,	(float)	0,		(float)	1,		(float)	0},
 	{(float)  0,	(float)	0,		(float)	0,		(float)	1 }};
 
+RtBasis		RiLinearBasis		= {
+	{(float)  0,	(float)	0,		(float)	0,		(float)	0},
+	{(float)  0,	(float)	0,		(float)	0,		(float)	0},
+	{(float)  0,	(float)	0,		(float)	1,		(float)	0},
+	{(float)  0,	(float)	0,		(float)	0,		(float)	1 }};
+
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Action begins here

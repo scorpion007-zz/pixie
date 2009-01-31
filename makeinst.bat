@@ -19,7 +19,7 @@ copy bin\ri.lib Pixie\lib
 copy bin\sdr.lib Pixie\lib
 copy modules\gui.dll Pixie\modules
 copy bin\jpeg62.dll Pixie\bin
-copy bin\libpng13.dll Pixie\bin
+copy bin\libpng12.dll Pixie\bin
 copy bin\libtiff3.dll Pixie\bin
 copy bin\zlib1.dll Pixie\bin
 copy bin\libmmd.dll Pixie\bin
