@@ -90,6 +90,7 @@ public:
 	void				RiImagerV(const char *name,int n,const char *tokens[],const void *params[]);
 	void				RiQuantize(const char * type,int one,int qmin,int qmax,float ampl);
 	void				RiDisplayV(const char *name,const char * type,const char * mode,int n,const char *tokens[],const void *params[]);
+	void				RiCustomDisplayV(const char *name, RtToken mode, RtDisplayStartFunction, RtDisplayDataFunction, RtDisplayFinishFunction, RtInt n, RtToken tokens[], RtPointer params[]);
 	void				RiDisplayChannelV(const char * channel,int n,const char *tokens[],const void *params[]);
 
 	void				RiHiderV(const char * type,int n,const char *tokens[],const void *params[]);

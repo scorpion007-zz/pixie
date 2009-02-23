@@ -200,31 +200,36 @@ void	rotatem(SCALAR_TYPE *r,SCALAR_TYPE x,SCALAR_TYPE y,SCALAR_TYPE z,const SCAL
 	double	s	=	cos(angle/2);
 	double	sp	=	sin(angle/2);
 	double	l	=	sqrt(x*x + y*y + z*z);
-	double	a	=	x*sp/l;
-	double	b	=	y*sp/l;
-	double	c	=	z*sp/l;
-	l			=	sqrt(a*a + b*b + c*c + s*s);
-	a			/=	l;
-	b			/=	l;
-	c			/=	l;
-	s			/=	l;
 
-	r[element(0,0)] = (SCALAR_TYPE) (1-2*b*b-2*c*c);
-	r[element(0,1)] = (SCALAR_TYPE) (2*a*b-2*s*c);
-	r[element(0,2)] = (SCALAR_TYPE) (2*a*c+2*s*b);
-	r[element(0,3)] = 0;
-	r[element(1,0)] = (SCALAR_TYPE) (2*a*b+2*s*c);
-	r[element(1,1)] = (SCALAR_TYPE) (1-2*a*a-2*c*c);
-	r[element(1,2)] = (SCALAR_TYPE) (2*b*c-2*s*a);
-	r[element(1,3)] = 0;
-	r[element(2,0)] = (SCALAR_TYPE) (2*a*c-2*s*b);
-	r[element(2,1)] = (SCALAR_TYPE) (2*b*c+2*s*a);
-	r[element(2,2)] = (SCALAR_TYPE) (1-2*a*a-2*b*b);
-	r[element(2,3)] = 0;
-	r[element(3,0)] = 0;
-	r[element(3,1)] = 0;
-	r[element(3,2)] = 0;
-	r[element(3,3)] = 1;
+	// If this is a zero rotation, set the identity matrix
+	if ((l == 0) || (angle==0)) identitym(r);
+	else {
+		double	a	=	x*sp/l;
+		double	b	=	y*sp/l;
+		double	c	=	z*sp/l;
+		l			=	sqrt(a*a + b*b + c*c + s*s);
+		a			/=	l;
+		b			/=	l;
+		c			/=	l;
+		s			/=	l;
+
+		r[element(0,0)] = (SCALAR_TYPE) (1-2*b*b-2*c*c);
+		r[element(0,1)] = (SCALAR_TYPE) (2*a*b-2*s*c);
+		r[element(0,2)] = (SCALAR_TYPE) (2*a*c+2*s*b);
+		r[element(0,3)] = 0;
+		r[element(1,0)] = (SCALAR_TYPE) (2*a*b+2*s*c);
+		r[element(1,1)] = (SCALAR_TYPE) (1-2*a*a-2*c*c);
+		r[element(1,2)] = (SCALAR_TYPE) (2*b*c-2*s*a);
+		r[element(1,3)] = 0;
+		r[element(2,0)] = (SCALAR_TYPE) (2*a*c-2*s*b);
+		r[element(2,1)] = (SCALAR_TYPE) (2*b*c+2*s*a);
+		r[element(2,2)] = (SCALAR_TYPE) (1-2*a*a-2*b*b);
+		r[element(2,3)] = 0;
+		r[element(3,0)] = 0;
+		r[element(3,1)] = 0;
+		r[element(3,2)] = 0;
+		r[element(3,3)] = 1;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////

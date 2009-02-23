@@ -103,6 +103,10 @@ COptions::CDisplay::CDisplay() {
 	outSamples		=	NULL;
 	next			=	NULL;
 
+	startFunction	=	NULL;
+	dataFunction	=	NULL;
+	finishFunction	=	NULL;
+
 	quantizer[0]	=	-1;	// Copy from the default
 
 	numParameters	=	0;
@@ -125,6 +129,10 @@ COptions::CDisplay::CDisplay(const CDisplay *other) {
 	quantizer[2]	=	other->quantizer[2];
 	quantizer[3]	=	other->quantizer[3];
 	quantizer[4]	=	other->quantizer[4];
+
+	startFunction	=	other->startFunction;
+	dataFunction	=	other->dataFunction;
+	finishFunction	=	other->finishFunction;
 
 	if (other->numParameters > 0) {
 		int	i;

@@ -420,7 +420,8 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 	// Set the delayed object
 	delayed	=	cDelayed;
 	
-	CAttributes		*cAttributes	=	cDelayed->attributes;
+	//CAttributes		*cAttributes	=	cDelayed->attributes;
+	CAttributes		*cAttributes	=	NULL;
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
 		cAttributes		=	getAttributes(FALSE);
 	}
@@ -1092,6 +1093,19 @@ void	CRendererContext::RiDisplayV(const char *name,const char *type,const char *
 		}
 		cDisplay->numParameters	=	j;
 	}
+}
+
+void	CRendererContext::RiCustomDisplayV(const char *name, RtToken mode, RtDisplayStartFunction startFunction, RtDisplayDataFunction dataFunction, RtDisplayFinishFunction finishFunction, RtInt n, RtToken tokens[], RtPointer params[]) {
+	COptions	*options			=	getOptions(TRUE);
+	COptions::CDisplay	*cDisplay	=	new COptions::CDisplay;
+	cDisplay->outDevice				=	strdup("custom");
+	cDisplay->outName				=	strdup(name);
+	cDisplay->outSamples			=	strdup(mode);
+	cDisplay->next					=	options->displays;
+	cDisplay->startFunction			=	startFunction;
+	cDisplay->dataFunction			=	dataFunction;
+	cDisplay->finishFunction		=	finishFunction;
+	options->displays				=	cDisplay;
 }
 
 void	CRendererContext::RiDisplayChannelV(const char *channel,int n,const char *tokens[],const void *params[]) {

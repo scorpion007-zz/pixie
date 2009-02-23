@@ -105,6 +105,9 @@ void		CRiInterface::RiQuantize(const char * type,int one,int qmin,int qmax,float
 void		CRiInterface::RiDisplayV(const char *name,const char * type,const char * mode,int n,const char *tokens[],const void *params[]) {
 }
 
+void		CRiInterface::RiCustomDisplayV(const char *name, RtToken mode, RtDisplayStartFunction, RtDisplayDataFunction, RtDisplayFinishFunction, RtInt n, RtToken tokens[], RtPointer params[]) {
+}
+
 void		CRiInterface::RiDisplayChannelV(const char * channel,int n,const char *tokens[],const void *params[]) {
 }
 

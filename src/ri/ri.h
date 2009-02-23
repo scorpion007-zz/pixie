@@ -78,6 +78,13 @@ typedef RtVoid		(*RtErrorHandler)(RtInt code, RtInt severity,const char *msg);
 typedef RtVoid		(*RtFunc)(const char *);
 typedef RtVoid		(*RtArchiveCallback)(const char *,...);
 
+typedef void		*(*RtDisplayParameterFunction)(const char *,int,int);
+typedef	void		*(*RtDisplayStartFunction)(const char *,int,int,int,const char *,RtDisplayParameterFunction);
+typedef int			(*RtDisplayDataFunction)(void *,int,int,int,int,float *);
+typedef int			(*RtDisplayRawDataFunction)(void *,int,int,int,int,void *);
+typedef void		(*RtDisplayFinishFunction)(void *);
+
+
 #define RI_FALSE    0
 #define RI_TRUE     1
 #define RI_INFINITY (RtFloat)1.0e38
@@ -347,6 +354,8 @@ EXTERN(RtVoid)
     RiQuantize (RtToken type, RtInt one, RtInt qmin, RtInt qmax, RtFloat ampl),
     RiDisplay (const char *name, RtToken type, RtToken mode, ...),
     RiDisplayV (const char *name, RtToken type, RtToken mode, RtInt n, RtToken tokens[], RtPointer params[]),
+	RiCustomDisplay (const char *name, RtToken mode, RtDisplayStartFunction, RtDisplayDataFunction, RtDisplayFinishFunction, ...),
+    RiCustomDisplayV (const char *name, RtToken mode, RtDisplayStartFunction, RtDisplayDataFunction, RtDisplayFinishFunction, RtInt n, RtToken tokens[], RtPointer params[]),
 	RiDisplayChannel (RtToken channel, ...),
     RiDisplayChannelV (RtToken channel,RtInt n, RtToken tokens[], RtPointer params[]);
 

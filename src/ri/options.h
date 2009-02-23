@@ -113,6 +113,10 @@ public:
 		CDisplay					*next;
 		float						quantizer[5];	// The quantization data
 
+		RtDisplayStartFunction		startFunction;	// For custom displays
+		RtDisplayDataFunction		dataFunction;
+		RtDisplayFinishFunction		finishFunction;
+
 		int							numParameters;
 		TDisplayParameter			*parameters;
 	};

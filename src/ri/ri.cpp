@@ -892,11 +892,30 @@ RiDisplay (const char *name, RtToken type, RtToken mode, ...) {
 EXTERN(RtVoid)
 RiDisplayV (const char *name, RtToken type, RtToken mode,
 			RtInt n, RtToken tokens[], RtPointer params[]) {
-	if (check("RiDisplayChannel",VALID_OPTION_BLOCKS)) return;
+	if (check("RiDisplay",VALID_OPTION_BLOCKS)) return;
 
 	if (framebufferOnly) return;
 
 	renderMan->RiDisplayV(name,type,mode,n,tokens,params);
+}
+
+EXTERN(RtVoid)
+RiCustomDisplay (const char *name, RtToken mode, RtDisplayStartFunction startFunc, RtDisplayDataFunction dataFunc, RtDisplayFinishFunction endFunc, ...) {
+	va_list	args;
+
+	va_start(args,mode);
+	getArgs(args);
+	RiCustomDisplayV(name,mode,startFunc,dataFunc,endFunc,nTokens,tokens,values);
+	va_end(args);
+}
+
+EXTERN(RtVoid)
+RiCustomDisplayV (const char *name, RtToken mode, RtDisplayStartFunction startFunc, RtDisplayDataFunction dataFunc, RtDisplayFinishFunction endFunc, RtInt n, RtToken tokens[], RtPointer params[]) {
+	if (check("RiCustomDisplay",VALID_OPTION_BLOCKS)) return;
+
+	if (framebufferOnly) return;
+
+	renderMan->RiCustomDisplayV(name,mode,startFunc,dataFunc,endFunc,n,tokens,params);
 }
 
 EXTERN(RtVoid)

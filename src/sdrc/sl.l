@@ -87,7 +87,7 @@ PI												return SL_FCN_PI;
 ^\#line[ ][0-9]+[^\n]*							{ sscanf(yytext+6,"%d",&sdr->lineNo); sdr->lineNo--; }
 ^\#pragma[ ]nolint[^\n]*						;
 ^\#[^\n]*										{ sdr->warning("Skipping unknown preprocessor directive \"%s\"\n",yytext); }
-[ \t]+											;
+[ \r\t]+										;
 
 \n												{ sdr->lineNo++; }
 .												{ sdr->error("Stray '%c' in shader\n",yytext[0]); }

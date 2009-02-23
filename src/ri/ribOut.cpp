@@ -290,6 +290,10 @@ void		CRibOut::RiDisplayV(const char *name,const char * type,const char * mode,i
 	writePL(n,tokens,params);
 }
 
+void		CRibOut::RiCustomDisplayV(const char *name, RtToken mode, RtDisplayStartFunction, RtDisplayDataFunction, RtDisplayFinishFunction, RtInt n, RtToken tokens[], RtPointer params[]) {
+	error(CODE_INCAPABLE,"Can not serialize custom displays.\n");
+}
+
 void		CRibOut::RiDisplayChannelV(const char *channel,int n,const char *tokens[],const void *params[]) {
 	out("Display \"%s\" ",channel);
 	writePL(n,tokens,params);

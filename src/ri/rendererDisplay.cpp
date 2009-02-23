@@ -740,36 +740,45 @@ void	CRenderer::computeDisplayData() {
 			}
 		} else if (netClient == INVALID_SOCKET) {
 			
-			if (locateFileEx(deviceFile,outDevice,osModuleExtension,displayPath)) {
-				datas[numDisplays].module		=	osLoadModule(deviceFile);
-				if (datas[numDisplays].module != NULL) {
+			// Is this a custom display driver?
+			if (strcmp(outDevice,"custom") == 0) {
+				datas[numDisplays].module		=	(void *) outDevice;
+				datas[numDisplays].start		=	(TDisplayStartFunction) cDisplay->startFunction;
+				datas[numDisplays].data			=	(TDisplayDataFunction) cDisplay->dataFunction;
+				datas[numDisplays].rawData		=	NULL;
+				datas[numDisplays].finish		=	(TDisplayFinishFunction) cDisplay->finishFunction;
+			} else {
+
+				// Load the display driver
+				if (locateFileEx(deviceFile,outDevice,osModuleExtension,displayPath)) {
+					datas[numDisplays].module		=	osLoadModule(deviceFile);
 					datas[numDisplays].start		=	(TDisplayStartFunction)		osResolve(datas[numDisplays].module,"displayStart");
 					datas[numDisplays].data			=	(TDisplayDataFunction)		osResolve(datas[numDisplays].module,"displayData");
 					datas[numDisplays].rawData		=	(TDisplayRawDataFunction)	osResolve(datas[numDisplays].module,"displayRawData");
 					datas[numDisplays].finish		=	(TDisplayFinishFunction)	osResolve(datas[numDisplays].module,"displayFinish");
-
-					if ((datas[numDisplays].start == NULL) || (datas[numDisplays].data == NULL) || (datas[numDisplays].finish == NULL)) {
-						error(CODE_SYSTEM,"The module \"%s\" has missing implementation\n",deviceFile);
-						osUnloadModule(datas[numDisplays].module);
-						datas[numDisplays].module	=	NULL;
-					} else {
-						currentDisplay				=	cDisplay;
-						datas[numDisplays].handle	=	datas[numDisplays].start(displayName,xres,yres,datas[numDisplays].numSamples,cDisplay->outSamples,findParameter);
-							//GSHTODO: above sample names are now quite incorrect
-						if (datas[numDisplays].handle != NULL) {
-							numActiveDisplays++;
-						} else {
-							osUnloadModule(datas[numDisplays].module);
-							datas[numDisplays].module	=	NULL;
-						}
-					}
 				} else {
 					datas[numDisplays].module		=	NULL;
 					error(CODE_SYSTEM,"Failed to open out device \"%s\" (error: %s)\n",cDisplay->outDevice,osModuleError());
 				}
+			}
+
+			// Check the stuff
+			if ((datas[numDisplays].start == NULL) || (datas[numDisplays].data == NULL) || (datas[numDisplays].finish == NULL)) {
+				error(CODE_SYSTEM,"The module \"%s\" has missing implementation\n",deviceFile);
+				if (datas[numDisplays].module != outDevice)
+					osUnloadModule(datas[numDisplays].module);
+				datas[numDisplays].module	=	NULL;
 			} else {
-				datas[numDisplays].module		=	NULL;
-				error(CODE_SYSTEM,"Failed to find out device \"%s\"\n",cDisplay->outDevice);
+				currentDisplay				=	cDisplay;
+				datas[numDisplays].handle	=	datas[numDisplays].start(displayName,xres,yres,datas[numDisplays].numSamples,cDisplay->outSamples,findParameter);
+					//GSHTODO: above sample names are now quite incorrect
+				if (datas[numDisplays].handle != NULL) {
+					numActiveDisplays++;
+				} else {
+					if (datas[numDisplays].module != outDevice)
+						osUnloadModule(datas[numDisplays].module);
+					datas[numDisplays].module	=	NULL;
+				}
 			}
 		} else {
 			datas[numDisplays].module	=	NULL;
