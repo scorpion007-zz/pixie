@@ -80,9 +80,11 @@ CMemPage		*memoryNewPage(int size) {
 	float		time		=	osCPUTime();
 
 	// Are we allocating/deallocating too often ?
+	/*
 	if ((time - lastPagingTime) < 1) {
 		memoryPageSize		+=	ZONE_INCREMENT_SIZE;	// Increase the page size
 	}
+	*/
 	lastPagingTime			=	time;
 
 	size					=	max(size,memoryPageSize);

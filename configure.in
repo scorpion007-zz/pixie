@@ -123,7 +123,6 @@ if test "x$have_libpng" = "xtrue"; then
     AC_DEFINE_UNQUOTED(HAVE_LIBPNG,1, [Is libpng avaiable?])
     PNG_LIBS="$LIBS"
 else
-    AC_DEFINE_UNQUOTED(HAVE_LIBPNG,0, [Is libpng avaiable?])
     PNG_LIBS=""
 fi
 
