@@ -29,7 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef ALIGN_H
-#define ALIGN_N
+#define ALIGN_H
 #include "global.h"
 
 // Include the pointer types if necessary

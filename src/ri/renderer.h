@@ -162,7 +162,7 @@ public:
 		static	SOCKET							*netServers;				// The array of servers that are serving us		
 		static	int								numRenderedBuckets;			// The number of rendered buckets
 		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
-		static	int								*textureRefNumber;			// The last reference number for each thread's textures
+		static	int								**textureRefNumber;			// The last reference number for each thread's textures
 		static	CTextureBlock					*textureUsedBlocks;			// All texture blocks currently in use
 		static	int								*textureUsedMemory;			// The amount of texture memory in use for each thread
 		static	int								*textureMaxMemory;			// The maximum texture memory for each thread

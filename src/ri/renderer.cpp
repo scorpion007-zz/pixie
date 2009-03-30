@@ -261,7 +261,7 @@ int								*CRenderer::nonCompChannelOrder;									// initialized in beginDispl
 int								CRenderer::numExtraNonCompChannels;									// initialized in beginDisplays / computeDisplayData
 int								CRenderer::numExtraChannels;										// initialized in beginDisplays / computeDisplayData
 int								CRenderer::numRenderedBuckets			=	0;						// initialized in beginFrame
-int								*CRenderer::textureRefNumber			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
+int								**CRenderer::textureRefNumber			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
 CTextureBlock					*CRenderer::textureUsedBlocks			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
 int								*CRenderer::textureUsedMemory			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures
 int								*CRenderer::textureMaxMemory			=	NULL;					// initialized in initTextures, destroyed in shutdownTextures

@@ -670,8 +670,8 @@ protected:
 						
 
 						// Texture cache management
-						CRenderer::textureRefNumber[thread]++;
-						dataBlock.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
+						(*CRenderer::textureRefNumber[thread])++;
+						dataBlock.threadData[thread].lastRefNumber	=	*CRenderer::textureRefNumber[thread];
 
 						int	xi		=	x+1;
 						int	yi		=	y+1;
@@ -787,8 +787,8 @@ protected:
 						if (block->threadData[thread].data == NULL) {			\
 							textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
 						}																					\
-						CRenderer::textureRefNumber[thread]++;												\
-						block->threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];	\
+						(*CRenderer::textureRefNumber[thread])++;											\
+						block->threadData[thread].lastRefNumber	=	*CRenderer::textureRefNumber[thread];	\
 																											\
 						data	=	(T *) block->data + (((__y & yt))*tileWidth+(__x&xt))*numSamples;		\
 						res[0]	=	(float) (data[0]*M);						\
@@ -1380,8 +1380,8 @@ public:
 
 								const int thread	=	context->thread;
 
-								CRenderer::textureRefNumber[thread]++;
-								cTile->block.threadData[thread].lastRefNumber	=	CRenderer::textureRefNumber[thread];
+								(*CRenderer::textureRefNumber[thread])++;
+								cTile->block.threadData[thread].lastRefNumber	=	*CRenderer::textureRefNumber[thread];
 								
 								if (cTile->block.threadData[thread].data == NULL) {
 									loadTile(bx,by,context);
@@ -2230,13 +2230,14 @@ void			CRenderer::initTextures(int mm) {
 	CRenderer::textureUsedMemory	=	new int[CRenderer::numThreads];
 	CRenderer::textureMaxMemory		=	new int[CRenderer::numThreads];
 	
-	CRenderer::textureRefNumber		=	new	int[CRenderer::numThreads];
+	CRenderer::textureRefNumber		=	new	int*[CRenderer::numThreads];
 	
 	for (int i=0;i<CRenderer::numThreads;++i) {
 		CRenderer::textureMaxMemory[i]		=	maxPerThread;
 		CRenderer::textureUsedMemory[i]		=	0;
 		
-		CRenderer::textureRefNumber[i]		=	0;
+		CRenderer::textureRefNumber[i]		=	new int;
+		*CRenderer::textureRefNumber[i]		=	0;
 	}
 	
 	// Note: all memory should have been cleared by previous shutdown
@@ -2259,10 +2260,11 @@ void			CRenderer::shutdownTextures() {
 	assert(CRenderer::textureUsedBlocks == NULL);
 	
 	// free up our texturing counters
-	
 	delete[] CRenderer::textureUsedMemory;
 	delete[] CRenderer::textureMaxMemory;
 	
+	// Get rid of the reference counter
+	for (int i=0;i<CRenderer::numThreads;++i) delete CRenderer::textureRefNumber[i];
 	delete[] CRenderer::textureRefNumber;
 }
 
