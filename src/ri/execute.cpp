@@ -549,12 +549,26 @@ execStart:
 	const ESlCode	opcode	=	(ESlCode)	code->opcode;	// Get the opcode
 	int				*tags	=	tagStart;					// Set the tags to the start
 
-	if (code->uniform) {			// If the opcode is uniform , execute once
+	
 #define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				expr;																				\
+                if (code->uniform) {																\
+					expr;																			\
+                } else if (numPassive != 0) {                                 						\
+					for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {	\
+						if (*tags == 0) {															\
+							expr;																	\
+						}																			\
+						expr_update;																\
+					}																				\
+				} else {							                                                \
+					for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {			\
+						expr;																		\
+						expr_update;																\
+					}																				\
+				}																					\
 				expr_post;																			\
 				code++;																				\
 				goto execStart;																		\
@@ -564,7 +578,21 @@ execStart:
 			case OPCODE_##name:																		\
 			{																						\
 				expr_pre;																			\
-				expr;																				\
+                if (code->uniform) {																\
+					expr;																			\
+                } else if (numPassive != 0) {                                 						\
+					for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {	\
+						if (*tags == 0) {															\
+							expr;																	\
+						}																			\
+						expr_update;																\
+					}																				\
+				} else {							                                                \
+					for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {			\
+						expr;																		\
+						expr_update;																\
+					}																				\
+				}																					\
 				expr_post;																			\
 				code++;																				\
 				goto execStart;																		\
@@ -575,7 +603,21 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				expr;																				\
+                if (code->uniform) {																\
+					expr;																			\
+                } else if (numPassive != 0) {                                 						\
+					for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {	\
+						if (*tags == 0) {															\
+							expr;																	\
+						}																			\
+						expr_update;																\
+					}																				\
+				} else {							                                                \
+					for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {			\
+						expr;																		\
+						expr_update;																\
+					}																				\
+				}																					\
 				expr_post;																			\
 				code++;																				\
 				goto execStart;																		\
@@ -584,7 +626,18 @@ execStart:
 #define		DEFLIGHTFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)				\
 			case FUNCTION_##name:																	\
 			{																						\
-				scripterror("Invalid uniform lighting call");										\
+                if (code->uniform) {																\
+					scripterror("Invalid uniform lighting call");									\
+                } else {                                 											\
+					expr_pre;																		\
+					for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {	\
+						if (*tags == 0) {															\
+							expr;																	\
+						}																			\
+						expr_update;																\
+					}																				\
+					expr_post;																		\
+				}																					\
 				code++;																				\
 				goto execStart;																		\
 			}
@@ -593,26 +646,40 @@ execStart:
 			case FUNCTION_##name:																	\
 			{																						\
 				expr_pre;																			\
-				expr;																				\
+                if (code->uniform) {																\
+					expr;																			\
+                } else if (numPassive != 0) {                                 						\
+					for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {	\
+						if (*tags == 0) {															\
+							expr;																	\
+						}																			\
+						expr_update;																\
+					}																				\
+				} else {							                                                \
+					for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {			\
+						expr;																		\
+						expr_update;																\
+					}																				\
+				}																					\
 				expr_post;																			\
 				code++;																				\
 				goto execStart;																		\
 			}
 
-		switch(opcode) {
+    switch(opcode) {
 
 #include "scriptOpcodes.h"
 
 #include "scriptFunctions.h"
 
-		default:
-			error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
-			goto execEnd;
-		}
+    default:
+        error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
+        goto execEnd;
+    }
 
-		// Resume executing instructions
-		code++;
-		goto execStart;
+    // Resume executing instructions
+    code++;
+    goto execStart;
 
 #undef DEFOPCODE
 #undef DEFSHORTOPCODE
@@ -620,202 +687,6 @@ execStart:
 #undef DEFLIGHTFUNC
 #undef DEFSHORTFUNC
 
-
-	} else {
-		if (numPassive != 0) {					// If we have some vertices that are passive, be more careful
-#define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
-			case OPCODE_##name:																		\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
-					if (*tags == 0) {																\
-						expr;																		\
-					}																				\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-
-#define		DEFSHORTOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)				\
-			case OPCODE_##name:																		\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {			\
-					if (*tags == 0) {																\
-						expr;																		\
-					}																				\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-
-#define		DEFFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)					\
-			case FUNCTION_##name:																	\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
-					if (*tags == 0) {																\
-						expr;																		\
-					}																				\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-#define		DEFLIGHTFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)				\
-			case FUNCTION_##name:																	\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
-					if (*tags == 0) {																\
-						expr;																		\
-					}																				\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-			
-#define		DEFSHORTFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)				\
-			case FUNCTION_##name:																	\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex,++tags) {			\
-					if (*tags == 0) {																\
-						expr;																		\
-					}																				\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-
-			switch(opcode) {
-
-#include "scriptOpcodes.h"
-
-#include "scriptFunctions.h"
-
-			default:
-				error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
-				goto execEnd;
-			}
-
-			code++;
-			goto execStart;
-		} else {
-
-#undef DEFOPCODE
-#undef DEFSHORTOPCODE
-#undef DEFFUNC
-#undef DEFLIGHTFUNC
-#undef DEFSHORTFUNC
-
-#define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
-			case OPCODE_##name:																		\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {				\
-					expr;																			\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-#define		DEFSHORTOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)				\
-			case OPCODE_##name:																		\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {					\
-					expr;																			\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-
-#define		DEFFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)					\
-			case FUNCTION_##name:																	\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=numVertices;currentVertex>0;--currentVertex) {				\
-					expr;																			\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-#define		DEFLIGHTFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)				\
-			case FUNCTION_##name:																	\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=numVertices;currentVertex>0;--currentVertex,++tags) {		\
-					if (*tags == 0) {																\
-						expr;																		\
-					}																				\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-
-#define		DEFSHORTFUNC(name,text,prototype,expr_pre,expr,expr_update,expr_post,par)				\
-			case FUNCTION_##name:																	\
-			{																						\
-				expr_pre;																			\
-				for (int currentVertex=currentShadingState->numRealVertices;currentVertex>0;--currentVertex) {					\
-					expr;																			\
-					expr_update;																	\
-				}																					\
-				expr_post																			\
-				code++;																				\
-				goto execStart;																		\
-			}
-
-			switch(opcode) {
-
-#include "scriptOpcodes.h"
-
-#include "scriptFunctions.h"
-
-			default:
-				error(CODE_BUG,"Opcode conflict in shader \"%s\"",cInstance->getName());
-				goto execEnd;
-			}
-
-			code++;
-			goto execStart;
-		}
-
-#undef DEFOPCODE
-#undef DEFSHORTOPCODE
-#undef DEFFUNC
-#undef DEFLIGHTFUNC
-#undef DEFSHORTFUNC
-
-	}
-
-
-	goto execStart;
 execEnd:
 
 	// Make sure we save the ambient contribution if there has been no illuminate/solar executed
