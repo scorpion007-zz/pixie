@@ -903,7 +903,7 @@ EXTERN(RtVoid)
 RiCustomDisplay (const char *name, RtToken mode, RtDisplayStartFunction startFunc, RtDisplayDataFunction dataFunc, RtDisplayFinishFunction endFunc, ...) {
 	va_list	args;
 
-	va_start(args,mode);
+	va_start(args,endFunc);
 	getArgs(args);
 	RiCustomDisplayV(name,mode,startFunc,dataFunc,endFunc,nTokens,tokens,values);
 	va_end(args);
