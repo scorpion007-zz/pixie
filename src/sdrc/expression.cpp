@@ -3387,7 +3387,7 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 	CVariable	*cVar;
 	CExpression	*pExpression	=	NULL;
 	int i,hasNamedSpace,hasComplexRef;
-	char tmp[256],tmp2[256];
+	char tmp[128],*tmp2;
 
 #define NEWARRAYPARSE
 #ifdef NEWARRAYPARSE
@@ -3413,6 +3413,7 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 					}
 				}
 				
+				tmp2 = (char*)malloc(expressions->numItems * 128);
 				sprintf(tmp2,"[ ");
 				for(i=expressions->numItems-1;i>=0;i--){
 					if((*expressions)[i]->value(tmp)){
@@ -3433,6 +3434,7 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 				if(!hasNamedSpace && !hasComplexRef){
 					cPar->defaultValue	=	strdup(tmp2);
 				}
+				free(tmp2);
 			}
 			else{	// item count mismatch
 				sdr->error("Parameter initializer for \"%s\" has wrong number of items\n",cVar->symbolName);
