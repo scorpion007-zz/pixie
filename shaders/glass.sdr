@@ -1,4 +1,4 @@
-#!version 2.2.5
+#!version 2.2.6
 surface
 #!parameters:
 uniform	float	eta	=	1.5

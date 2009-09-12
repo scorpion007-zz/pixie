@@ -1568,9 +1568,44 @@ public:
 							result[2]	=	0;
 
 							if (dotvv(D0,D0) == 0)	return;
-							
-							const float jitter = 1.0f-1.0f/(float)scratch->traceParams.samples;
-							
+
+							// Blur the directions if needed
+							vector	tmp[4];
+							if (scratch->textureParams.blur > 0) {
+								vector	middle;
+
+								// First, compute the mid point
+								addvv(middle,D0,D1);
+								addvv(middle,D2);
+								addvv(middle,D3);
+								mulvf(middle,1.0f/4.0f);
+								
+								// Scale the directions along the mid point with the blur
+								subvv(tmp[0],D0,middle);
+								normalizevf(tmp[0]);
+								mulvf(tmp[0],scratch->textureParams.blur*lengthv(D0)*2);
+								addvv(tmp[0],D0);
+								D0	=	tmp[0];
+
+								subvv(tmp[1],D1,middle);
+								normalizevf(tmp[1]);
+								mulvf(tmp[1],scratch->textureParams.blur*lengthv(D1)*2);
+								addvv(tmp[1],D1);
+								D1	=	tmp[1];
+
+								subvv(tmp[2],D2,middle);
+								normalizevf(tmp[2]);
+								mulvf(tmp[2],scratch->textureParams.blur*lengthv(D2)*2);
+								addvv(tmp[2],D2);
+								D2	=	tmp[2];
+
+								subvv(tmp[3],D3,middle);
+								normalizevf(tmp[3]);
+								mulvf(tmp[3],scratch->textureParams.blur*lengthv(D3)*2);
+								addvv(tmp[3],D3);
+								D3	=	tmp[3];
+							}
+						
 							for (int i=(int) scratch->traceParams.samples;i>0;--i) {
 								float	t;
 								float	r[2];
@@ -1578,8 +1613,8 @@ public:
 								context->random2d.get(r);
 
 								// stratify the sample so that with low sample counts we don't jitter too much
-								const float x				=	(r[0]-0.5f)*jitter+0.5f;
-								const float y				=	(r[1]-0.5f)*jitter+0.5f;
+								const float x				=	(r[0]-0.5f)+0.5f;
+								const float y				=	(r[1]-0.5f)+0.5f;
 								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 
 								totalContribution	+=	contribution;
