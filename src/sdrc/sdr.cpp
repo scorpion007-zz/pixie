@@ -1300,7 +1300,7 @@ CFunction		*CScriptContext::newFunction(const char *name) {
 // Comments				:
 void	CScriptContext::addVariable(CVariable *cVariable) {
 	CVariable	*tVar;
-	char		tmp[32];
+	char		tmp[512];
 	int			count		=	0;
 	int			collusion	=	TRUE;
 

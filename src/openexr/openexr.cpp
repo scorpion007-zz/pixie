@@ -35,7 +35,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <ImfOutputFile.h>
+#include <ImfOutputFile.h> 
 #include <ImfChannelList.h>
 #include <ImfStringAttribute.h>
 #include <ImfChromaticitiesAttribute.h>

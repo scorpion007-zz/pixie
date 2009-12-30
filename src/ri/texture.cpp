@@ -787,6 +787,7 @@ protected:
 						if (block->threadData[thread].data == NULL) {			\
 							textureLoadBlock(block,name,xTile << tileWidthShift,yTile << tileHeightShift,tileWidth,tileHeight,directory,context); \
 						}																					\
+						assert(block->data != NULL);							\
 						(*CRenderer::textureRefNumber[thread])++;											\
 						block->threadData[thread].lastRefNumber	=	*CRenderer::textureRefNumber[thread];	\
 																											\

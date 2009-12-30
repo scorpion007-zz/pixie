@@ -1496,6 +1496,37 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 
 
 
+#define CLOCKWISE -1
+#define COUNTER_CLOCKWISE 1
+#define LINE 0
+
+
+int check_tri_clock_dir(const float *pt1, const float *pt2, const float *pt3) {
+  const double test = (((pt2[0] - pt1[0])*(pt3[1] - pt1[1])) - ((pt3[0] - pt1[0])*(pt2[1] - pt1[1]))); 
+  if (test > 0) return COUNTER_CLOCKWISE;
+  else if(test < 0) return CLOCKWISE;
+  else return LINE;
+}
+
+bool check_intersect(const float *l1p1, const float *l1p2, const float *l2p1, const float *l2p2) {
+   int test1_a, test1_b, test2_a, test2_b;
+
+   test1_a = check_tri_clock_dir(l1p1, l1p2, l2p1);
+   test1_b = check_tri_clock_dir(l1p1, l1p2, l2p2);
+   if (test1_a != test1_b)
+   {
+      test2_a = check_tri_clock_dir(l2p1, l2p2, l1p1);
+      test2_b = check_tri_clock_dir(l2p1, l2p2, l1p2);
+      if (test2_a != test2_b)
+      {
+         return true;
+      }
+   }
+   return false;
+}
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -1508,28 +1539,58 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 	const float			*a			=	loop->xy;
 	const float			*b			=	from->xy;
 	const float			*c			=	to->xy;
-
-	sVertex = sVertex->next;
+	assert((b[0] != c[0]) || (b[1] != c[1]));
 
 	do{
-		if(sVertex == to) 	{ sVertex = sVertex->next; continue; }
-		if(sVertex == from) { sVertex = sVertex->next; continue; }
 
-		const float	*s1	=	sVertex->xy;
+		// If we are sharing a vertex, keep going
+		if (	(sVertex->xy != to->xy) && 
+				(sVertex->xy != from->xy) && 
+				(sVertex->next->xy != to->xy) && 
+				(sVertex->next->xy != from->xy)) {
+
+			const float	*s1	=	sVertex->xy;
+			const float	*s2	=	sVertex->next->xy;
+
+			assert((s1[0] != s2[0]) || (s1[1] != s2[1]));
+			assert((s1[0] != b[0]) || (s1[1] != b[1]));
+			assert((s1[0] != c[0]) || (s1[1] != c[1]));
+			assert((s2[0] != b[0]) || (s2[1] != b[1]));
+			assert((s2[0] != c[0]) || (s2[1] != c[1]));
+
+			if (	area(b[0],b[1],c[0],c[1],s1[0],s1[1]) *
+					area(b[0],b[1],c[0],c[1],s2[0],s2[1]) <= 0) {
+
+				if (	area(s1[0],s1[1],s2[0],s2[1],b[0],b[1]) *
+						area(s1[0],s1[1],s2[0],s2[1],c[0],c[1]) <= 0) {
+
+					return FALSE;
+				}
+			}
+
+			if(	(area(a[0],a[1],s1[0],s1[1],b[0],b[1]) > 0) &&
+				(area(b[0],b[1],s1[0],s1[1],c[0],c[1]) > 0) &&
+				(area(c[0],c[1],s1[0],s1[1],a[0],a[1]) > 0)	)	return FALSE;
+
+			if(	(area(a[0],a[1],s2[0],s2[1],b[0],b[1]) > 0) &&
+				(area(b[0],b[1],s2[0],s2[1],c[0],c[1]) > 0) &&
+				(area(c[0],c[1],s2[0],s2[1],a[0],a[1]) > 0)	)	return FALSE;
+		}
 		
+		/*
 		const double a1 = area(c[0],c[1],s1[0],s1[1],b[0],b[1]);
 		const double a2 = area(c[0],c[1],s1[0],s1[1],a[0],a[1]);
 		const double a3 = area(b[0],b[1],s1[0],s1[1],a[0],a[1]);
 
 		// is a point colinear with the suggested cut edge
-		if (fabs(a1) < C_EPSILON_TINY) {
+		if (fabs(a1) < 0) {
 			// area is zero, verify if we're within the endpoints of the line
 			const double dp = (b[0] -c[0])*(s1[0]-c[0]) + (b[1] -c[1])*(s1[1]-c[1]);
 			const double l1 = (b[0] -c[0])*(b[0] -c[0]) + (b[1] -c[1])*(b[1] -c[1]);
 			const double l2 = (s1[0]-c[0])*(s1[0]-c[0]) + (s1[1]-c[1])*(s1[1]-c[1]);
 			const double l = l1*l2 + C_EPSILON_TINY;
 
-			if (dp > -C_EPSILON_TINY && dp < l) {
+			if (dp > -0 && dp < l) {
 				// within the endpoints is invalid
 				return FALSE;
 			}
@@ -1539,7 +1600,7 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 			(a2*area(c[0],c[1],b[0],b[1],a[0],a[1]) > 0) &&
 			(a3*area(b[0],b[1],c[0],c[1],a[0],a[1]) > 0)) return FALSE;	
 
-
+			*/
 		sVertex = sVertex->next;
 	} while(sVertex != loop);
 	return TRUE;
@@ -1826,9 +1887,6 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		} while(sVertex != loops[i]);
 
 		// We have an error: could not connect the hole to the outher hull, ignore the hole
-		int	temp;
-
-		temp	=	1;
 
 nextLoop:;
 
@@ -1855,9 +1913,11 @@ nextLoop:;
 			do {
 				pVertex			=	cVertex->prev;
 				nVertex			=	cVertex->next;
-				const float	a	=	area(pVertex->xy[0],pVertex->xy[1],cVertex->xy[0],cVertex->xy[1],nVertex->xy[0],nVertex->xy[1]);
 
-				if (a >= 0) {
+				// Is the polygon orientation correct?
+				if (area(pVertex->xy[0],pVertex->xy[1],cVertex->xy[0],cVertex->xy[1],nVertex->xy[0],nVertex->xy[1]) >= 0) {
+
+					// If we clip this edge, do we intersect another?
 					if (valid(cVertex,nVertex,pVertex)) {
 						const int	vi0	=	(int) (nVertex->xy - xy) >> 1;
 						const int	vi1	=	(int) (cVertex->xy - xy) >> 1;

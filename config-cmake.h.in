@@ -1,0 +1,31 @@
+
+#cmakedefine HAVE_DL
+#cmakedefine HAVE_M
+#cmakedefine HAVE_PTHREAD
+
+#cmakedefine HAVE_MALLOC_H 1
+#cmakedefine HAVE_STDINT_H
+#cmakedefine HAVE_SYS_MOUNT_H
+#cmakedefine HAVE_SYS_TIME_H
+#define TIME_WITH_SYS_TIME
+
+#cmakedefine HAVE_RANDOM
+#cmakedefine HAVE_GETTIMEOFDAY
+#cmakedefine HAVE_SQRTF
+#cmakedefine HAVE_COSF
+#cmakedefine HAVE_SINF
+#cmakedefine HAVE_TANF
+#cmakedefine HAVE_ATAN2F
+#cmakedefine HAVE_POWF
+#cmakedefine HAVE_LOGF
+#cmakedefine HAVE_FMODF
+
+
+#define PIXIE_DOCS 			"@PIXIE_INSTALL_PREFIX@/doc"
+#define PIXIE_SHADERS 		"@PIXIE_INSTALL_PREFIX@/shaders"
+#define PIXIE_RIBS 			"@PIXIE_INSTALL_PREFIX@/ribs"
+#define PIXIE_TEXTURES 		"@PIXIE_INSTALL_PREFIX@/textures"
+#define PIXIE_DISPLAYS 		"@PIXIE_INSTALL_PREFIX@/displays"
+#define PIXIE_PROCEDURALS 	"@PIXIE_INSTALL_PREFIX@/procedurals"
+#define PIXIE_MODULES 		"@PIXIE_INSTALL_PREFIX@/modules"
+
