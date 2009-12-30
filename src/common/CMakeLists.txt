@@ -1,8 +1,14 @@
 file(GLOB pixiecommon_headers *.h)
 
-add_library(pixiecommon SHARED os.cpp algebra.cpp ${pixiecommon_headers})
-target_link_libraries(pixiecommon pthread dl)
-install(TARGETS pixiecommon LIBRARY DESTINATION "${libdir}")
+add_library(pixiecommon STATIC os.cpp algebra.cpp ${pixiecommon_headers})
+target_link_libraries(pixiecommon)
+install(TARGETS pixiecommon LIBRARY DESTINATION "${libdir}"
+				ARCHIVE DESTINATION "{$libdir}"
+				RUNTIME DESTINATION "{$bindir}")
+
+if(UNIX)
+	target_link_libraries(pixiecommon pthread dl)
+endif(UNIX)
 
 if(APPLE)
 	# some Apple specific dependencies

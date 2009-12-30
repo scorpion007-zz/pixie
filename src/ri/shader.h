@@ -38,6 +38,7 @@
 #include "xform.h"
 #include "rendererc.h"
 #include "fileResource.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "variable.h"
 #include "refCounter.h"

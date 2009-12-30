@@ -43,6 +43,7 @@
 #include "rendererContext.h"
 #include "pl.h"
 #include "renderer.h"
+#include "ri_config.h"
 #include "ri.h"
 
 #undef new

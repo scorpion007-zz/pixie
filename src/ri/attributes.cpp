@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "attributes.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "stats.h"
 #include "photonMap.h"

@@ -36,6 +36,7 @@
 #include "common/algebra.h"
 #include "rendererc.h"
 #include "xform.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "shader.h"
 #include "dsply.h"

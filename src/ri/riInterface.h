@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "ri_config.h"
 #include "ri.h"
 
 ///////////////////////////////////////////////////////////////////////

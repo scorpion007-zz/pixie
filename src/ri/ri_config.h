@@ -110,5 +110,8 @@
 // If this flag is set, we ignore the displacement shaders for dicing
 #define	IGNORE_DISPLACEMENTS_FOR_DICING
 
+// We are compiling the renderer. This define switches the dllimport/dllexport settings on Windoze
+#define RENDERER
+
 #endif
 

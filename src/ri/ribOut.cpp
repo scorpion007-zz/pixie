@@ -34,6 +34,7 @@
 
 #include "ribOut.h"
 #include "common/os.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "error.h"
 #include "variable.h"

@@ -105,9 +105,19 @@ endif(USE_FLEX_BISON)
 
 
 add_library(ri SHARED ${ri_sources} ${ri_headers})
-target_link_libraries(ri ${pixietiff_libs} z pixiecommon)
-install(TARGETS ri LIBRARY DESTINATION "${libdir}")
+target_link_libraries(ri ${pixietiff_libs} pixiecommon)
+install(TARGETS ri LIBRARY DESTINATION "${libdir}"
+			ARCHIVE DESTINATION "{$libdir}"
+			RUNTIME DESTINATION "{$bindir}")
 install(FILES dlo.h dsply.h implicit.h ptcapi.h ri.h shadeop.h DESTINATION "${includedir}")
+
+if(WIN32)
+	target_link_libraries(ri zlib ws2_32)
+endif(WIN32)
+
+if(UNIX)
+	target_link_libraries(ri z)
+endif(UNIX)
 
 if(APPLE)
 	set_target_properties(ri PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")

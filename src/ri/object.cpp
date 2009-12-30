@@ -32,6 +32,7 @@
 
 #include "object.h"
 #include "error.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "shading.h"
 #include "stats.h"

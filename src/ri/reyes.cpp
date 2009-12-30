@@ -32,6 +32,7 @@
 
 #include "rendererc.h"
 #include "error.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "stats.h"
 #include "memory.h"

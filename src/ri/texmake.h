@@ -32,6 +32,7 @@
 #define TEXMAKE_H
 
 #include "common/global.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "options.h"
 

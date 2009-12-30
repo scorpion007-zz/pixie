@@ -29,12 +29,12 @@
 //
 ////////////////////////////////////////////////////////////////////////
 #include "texmake.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "memory.h"
 #include "error.h"
 #include "renderer.h"
 #include "tiff.h"
-#include "ri_config.h"
 
 #include <stddef.h>		// ensure we have NULL defined before libtiff
 #include <tiffio.h>

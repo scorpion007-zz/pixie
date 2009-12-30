@@ -32,6 +32,7 @@
 
 #include "riInterface.h"
 #include "common/os.h"
+#include "ri_config.h"
 #include "ri.h"
 
 CRiInterface::CRiInterface() {

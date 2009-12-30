@@ -46,6 +46,7 @@
 #include "zbuffer.h"
 #include "rendererContext.h"
 #include "patches.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "rib.h"
 #include "shadeop.h"

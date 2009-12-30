@@ -39,6 +39,7 @@
 #include "common/global.h"
 #include "common/os.h"
 #include "error.h"
+#include "ri_config.h"
 #include "ri.h"
 #include "riInterface.h"
 #include "ribOut.h"
