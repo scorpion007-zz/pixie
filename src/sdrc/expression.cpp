@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -41,7 +41,8 @@ extern	CScriptContext	*sdr;
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getContainer
-// Description			:	Generate uniform 2 varying conversion
+// Description			:
+/// \brief					Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
 inline	void	getContainer(FILE *out,int type,CVariable *&dest,CExpression *src) {
@@ -100,7 +101,8 @@ inline	void	getContainer(FILE *out,int type,CVariable *&dest,CExpression *src) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getContainer
-// Description			:	Generate uniform 2 varying conversion
+// Description			:
+/// \brief					Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
 inline	void	getContainer(FILE *out,CVariable *dest,CVariable *src) {
@@ -138,7 +140,8 @@ inline	void	getContainer(FILE *out,CVariable *dest,CVariable *src) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getContainer
-// Description			:	Generate uniform 2 varying conversion
+// Description			:
+/// \brief					Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
 inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
@@ -191,7 +194,8 @@ inline	void	getContainer(FILE *out,CVariable *dest,CExpression *src) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getContainer
-// Description			:	Generate uniform 2 varying conversion
+// Description			:
+/// \brief					Generate uniform 2 varying conversion
 // Return Value			:	-
 // Comments				:
 inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
@@ -285,7 +289,8 @@ inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CExpression
 // Method				:	CExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CExpression::CExpression(int t)	{	
@@ -296,7 +301,8 @@ CExpression::CExpression(int t)	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CExpression
 // Method				:	~CExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CExpression::~CExpression()	{	
@@ -326,7 +332,8 @@ CVariable	*CExpression::getVariable()	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CExpression
 // Method				:	value
-// Description			:	This is another form of the get variable
+// Description			:
+/// \brief					This is another form of the get variable
 // Return Value			:	-
 // Comments				:
 int			CExpression::value(char *) {
@@ -337,7 +344,8 @@ int			CExpression::value(char *) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNullExpression
 // Method				:	CNullExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CNullExpression::CNullExpression() : CExpression(SLC_NONE) {
@@ -399,7 +407,8 @@ CNullExpression::CNullExpression() : CExpression(SLC_NONE) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTwoExpressions
 // Method				:	CTwoExpressions
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTwoExpressions::CTwoExpressions(CExpression *f,CExpression *s) : CExpression(SLC_NONE) {
@@ -417,7 +426,8 @@ CTwoExpressions::CTwoExpressions(CExpression *f,CExpression *s) : CExpression(SL
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTwoExpressions
 // Method				:	~CTwoExpressions
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTwoExpressions::~CTwoExpressions() {
@@ -470,7 +480,8 @@ void		CTwoExpressions::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVectorExpression
 // Method				:	CVectorExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CVectorExpression::CVectorExpression(CExpression *x,CExpression *y,CExpression *z) : CExpression(SLC_VECTOR | (x->type & y->type & z->type & SLC_UNIFORM)) {
@@ -484,7 +495,8 @@ CVectorExpression::CVectorExpression(CExpression *x,CExpression *y,CExpression *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVectorExpression
 // Method				:	~CVextorExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CVectorExpression::~CVectorExpression() {
@@ -566,7 +578,8 @@ int			CVectorExpression::value(char *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMatrixExpression
 // Method				:	CMatrixExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CMatrixExpression::CMatrixExpression(CExpression **e) : CExpression(SLC_MATRIX) {
@@ -584,7 +597,8 @@ CMatrixExpression::CMatrixExpression(CExpression **e) : CExpression(SLC_MATRIX) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMatrixExpression
 // Method				:	~CMatrixExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CMatrixExpression::~CMatrixExpression() {
@@ -704,7 +718,8 @@ int			CMatrixExpression::value(char *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayExpression
 // Method				:	CArrayExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CArrayExpression::CArrayExpression(CVariable *v,CExpression *i) : CExpression((v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK)) | (v->type & i->type & SLC_UNIFORM)) {
@@ -720,7 +735,8 @@ CArrayExpression::CArrayExpression(CVariable *v,CExpression *i) : CExpression((v
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayExpression
 // Method				:	~CArrayExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CArrayExpression::~CArrayExpression() {
@@ -731,7 +747,8 @@ CArrayExpression::~CArrayExpression() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayExpression
 // Method				:	getCode
-// Description			:	Code generation
+// Description			:
+/// \brief					Code generation
 // Return Value			:	-
 // Comments				:
 void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
@@ -793,7 +810,8 @@ void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTerminalExpression
 // Method				:	CTerminalExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK | SLC_UNIFORM))	{	
@@ -805,7 +823,8 @@ CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTerminalExpression
 // Method				:	~CTerminalExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTerminalExpression::~CTerminalExpression()	{	
@@ -859,7 +878,8 @@ void		CTerminalExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CConstantTerminalExpression
 // Method				:	CConstantTerminalExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpression(t | SLC_UNIFORM) {	
@@ -871,7 +891,8 @@ CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpre
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CConstantTerminalExpression
 // Method				:	~CConstantTerminalExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CConstantTerminalExpression::~CConstantTerminalExpression()	{	
@@ -950,7 +971,8 @@ int			CConstantTerminalExpression::value(char *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBinaryExpression
 // Method				:	CBinaryExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CBinaryExpression::CBinaryExpression(int t,const char *o,CExpression *f,CExpression *s) : CExpression(t | (f->type & s->type & SLC_UNIFORM))	{ 
@@ -963,7 +985,8 @@ CBinaryExpression::CBinaryExpression(int t,const char *o,CExpression *f,CExpress
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBinaryExpression
 // Method				:	~CBinaryExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CBinaryExpression::~CBinaryExpression() {
@@ -1025,7 +1048,8 @@ void	CBinaryExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUnaryExpression
 // Method				:	CUnaryExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CUnaryExpression::CUnaryExpression(int t,const char *o,CExpression *f) : CExpression(t | (f->type & SLC_UNIFORM) ) { 
@@ -1037,7 +1061,8 @@ CUnaryExpression::CUnaryExpression(int t,const char *o,CExpression *f) : CExpres
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUnaryExpression
 // Method				:	~CUnaryExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CUnaryExpression::~CUnaryExpression() {
@@ -1098,7 +1123,8 @@ void	CUnaryExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSysConversionExpression
 // Method				:	CSysConversionExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CSysConversionExpression::CSysConversionExpression(int t,const char *opcode,const char *system,CExpression *ft) : CExpression(t | (ft->type & SLC_UNIFORM) ) {
@@ -1110,7 +1136,8 @@ CSysConversionExpression::CSysConversionExpression(int t,const char *opcode,cons
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSysConversionExpression
 // Method				:	~CSysConversionExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CSysConversionExpression::~CSysConversionExpression() {
@@ -1189,7 +1216,8 @@ int			CSysConversionExpression::value(char *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFuncallExpression
 // Method				:	CFuncallExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : CExpression(SLC_NONE) {
@@ -1236,7 +1264,8 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFuncallExpression
 // Method				:	~CFuncallExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CFuncallExpression::~CFuncallExpression() {
@@ -1388,7 +1417,8 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBuiltinExpression
 // Method				:	CBuiltinExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CList<CExpression *> *p) : CExpression(f->functionType) {
@@ -1488,7 +1518,8 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CList<CExpression *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBuiltinExpression
 // Method				:	~CBuiltinExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CBuiltinExpression::~CBuiltinExpression() {
@@ -1803,7 +1834,8 @@ void		CBuiltinExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CConditionalExpression
 // Method				:	CConditionalExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CConditionalExpression::CConditionalExpression(int type,CExpression *condition,CExpression *first,CExpression *second) : CExpression(type) {
@@ -1821,7 +1853,8 @@ CConditionalExpression::CConditionalExpression(int type,CExpression *condition,C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CConditionalExpression
 // Method				:	~CConditionalExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CConditionalExpression::~CConditionalExpression() {
@@ -1886,7 +1919,8 @@ void		CConditionalExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAssignmentExpression
 // Method				:	CAssignmentExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CAssignmentExpression::CAssignmentExpression(CVariable *f,CExpression *s) : CExpression(f->type) {
@@ -1908,7 +1942,8 @@ CAssignmentExpression::CAssignmentExpression(CVariable *f,CExpression *s) : CExp
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAssignmentExpression
 // Method				:	~CAssignmentExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CAssignmentExpression::~CAssignmentExpression() {
@@ -1956,7 +1991,8 @@ void		CAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayAssignmentExpression
 // Method				:	CArrayAssignmentExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CArrayAssignmentExpression::CArrayAssignmentExpression(CVariable *f,CExpression *i,CExpression *s) : CExpression(f->type) {
@@ -1979,7 +2015,8 @@ CArrayAssignmentExpression::CArrayAssignmentExpression(CVariable *f,CExpression 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAssignmentExpression
 // Method				:	~CAssignmentExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CArrayAssignmentExpression::~CArrayAssignmentExpression() {
@@ -2054,7 +2091,8 @@ void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayUpdateExpression
 // Method				:	CArrayUpdateExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpression *s,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix) : CExpression(f->type) {
@@ -2081,7 +2119,8 @@ CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpr
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAssignmentExpression
 // Method				:	~CAssignmentExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CArrayUpdateExpression::~CArrayUpdateExpression() {
@@ -2141,9 +2180,11 @@ void		CArrayUpdateExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayMove
 // Method				:	CArrayMove
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
-// Comments				:	Note that e array holds the last item first
+// Comments				:
+/// \note					Note that e array holds the last item first
 CArrayMove::CArrayMove(CVariable *f,CList<CExpression *> *e) : CExpression(f->type & (~SLC_ARRAY)) {
 	CExpression	*cExpression;
 	int			numItems	=	0;
@@ -2171,7 +2212,8 @@ CArrayMove::CArrayMove(CVariable *f,CList<CExpression *> *e) : CExpression(f->ty
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayMove
 // Method				:	~CArrayMove
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CArrayMove::~CArrayMove() {
@@ -2185,7 +2227,8 @@ CArrayMove::~CArrayMove() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayMove
 // Method				:	CArrayMove
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 void		CArrayMove::getCode(FILE *out,CVariable *dest) {
@@ -2259,7 +2302,8 @@ void		CArrayMove::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUpdateExpression
 // Method				:	CUpdateExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CUpdateExpression::CUpdateExpression(CVariable *f,const char *opcodeFloat,const char *opcodeVector,int pre,CExpression *s) : CExpression(f->type) {
@@ -2285,7 +2329,8 @@ CUpdateExpression::CUpdateExpression(CVariable *f,const char *opcodeFloat,const 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUpdateExpression
 // Method				:	~CUpdateExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CUpdateExpression::~CUpdateExpression() {
@@ -2369,7 +2414,8 @@ void		CUpdateExpression::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIfThenElse
 // Method				:	CIfThenElse
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CIfThenElse::CIfThenElse(CExpression *c,CExpression *f,CExpression *s) : CExpression(SLC_NONE) {
@@ -2382,7 +2428,8 @@ CIfThenElse::CIfThenElse(CExpression *c,CExpression *f,CExpression *s) : CExpres
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIfThenElse
 // Method				:	~CIfThenElse
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CIfThenElse::~CIfThenElse() {
@@ -2466,7 +2513,8 @@ void		CIfThenElse::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherThenElse
 // Method				:	CGatherThenElse
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CGatherThenElse::CGatherThenElse(CList<CExpression *> *pl,CExpression *f,CExpression *s) : CExpression(0) {
@@ -2479,7 +2527,8 @@ CGatherThenElse::CGatherThenElse(CList<CExpression *> *pl,CExpression *f,CExpres
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherThenElse
 // Method				:	~CGatherThenElse
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CGatherThenElse::~CGatherThenElse() {
@@ -2657,7 +2706,8 @@ void		CGatherThenElse::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CForLoop
 // Method				:	CForLoop
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CForLoop::CForLoop(CExpression *s,CExpression *c,CExpression *u,CExpression *b) : CExpression(0) {
@@ -2671,7 +2721,8 @@ CForLoop::CForLoop(CExpression *s,CExpression *c,CExpression *u,CExpression *b) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CForLoop
 // Method				:	~CForLoop
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CForLoop::~CForLoop() {
@@ -2757,7 +2808,8 @@ void		CForLoop::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIlluminationLoop
 // Method				:	CIlluminationLoop
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CIlluminationLoop::CIlluminationLoop(CList<CExpression *> *p,CExpression *b) : CExpression(0), category(NULL), P(NULL), N(NULL), angle(NULL), body(b) {
@@ -2802,7 +2854,8 @@ CIlluminationLoop::CIlluminationLoop(CList<CExpression *> *p,CExpression *b) : C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIlluminationLoop
 // Method				:	~CIlluminationLoop
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CIlluminationLoop::~CIlluminationLoop() {
@@ -2882,7 +2935,8 @@ void		CIlluminationLoop::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIlluminateSolar
 // Method				:	CIlluminateSolar
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CIlluminateSolar::CIlluminateSolar(const char *op1,const char *op2,CExpression *p,CExpression *n,CExpression *a,CExpression *b) : CExpression(0) {
@@ -2898,7 +2952,8 @@ CIlluminateSolar::CIlluminateSolar(const char *op1,const char *op2,CExpression *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIlluminateSolar
 // Method				:	~CIlluminateSolar
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CIlluminateSolar::~CIlluminateSolar() {
@@ -2967,7 +3022,8 @@ void		CIlluminateSolar::getCode(FILE *out,CVariable *dest) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFixedExpression
 // Method				:	CFixedExpression
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CFixedExpression::CFixedExpression(const char *f) : CExpression(SLC_NONE)  {
@@ -2977,7 +3033,8 @@ CFixedExpression::CFixedExpression(const char *f) : CExpression(SLC_NONE)  {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFixedExpression
 // Method				:	~CFixedExpression
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CFixedExpression::~CFixedExpression() {
@@ -3028,7 +3085,8 @@ void			CFixedExpression::getCode(FILE *out,CVariable *dest) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getOperation
-// Description			:	Generate code for a binary operation
+// Description			:
+/// \brief					Generate code for a binary operation
 // Return Value			:	The generated expression
 // Comments				:
 CExpression	*getOperation(CExpression *first,CExpression *second,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix,const char *opcodeString,int typeOverwrite) {
@@ -3111,7 +3169,8 @@ CExpression	*getOperation(CExpression *first,CExpression *second,const char *opc
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getOperation
-// Description			:	Generate a unary operation
+// Description			:
+/// \brief					Generate a unary operation
 // Return Value			:	The generated expression
 // Comments				:
 CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix,const char *opcodeString,int typeOverwrite) {
@@ -3134,7 +3193,8 @@ CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char 
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getConversion
-// Description			:	Convert an expression to a desired type
+// Description			:
+/// \brief					Convert an expression to a desired type
 // Return Value			:	The converted expression
 // Comments				:
 CExpression	*getConversion(int type,CExpression *first) {
@@ -3195,7 +3255,8 @@ CExpression	*getConversion(int type,CExpression *first) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getConversion
-// Description			:	Convert an expression to a desired type
+// Description			:
+/// \brief					Convert an expression to a desired type
 // Return Value			:	The converted expression
 // Comments				:
 void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
@@ -3300,7 +3361,8 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getConversion
-// Description			:	Generates a coordinate system conversion code
+// Description			:
+/// \brief					Generates a coordinate system conversion code
 // Return Value			:	The generated expression
 // Comments				:
 CExpression	*getConversion(int type,const char *system,CExpression *first) {
@@ -3327,7 +3389,8 @@ CExpression	*getConversion(int type,const char *system,CExpression *first) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getAssignment
-// Description			:	Generates an assignment code
+// Description			:
+/// \brief					Generates an assignment code
 // Return Value			:	The generated expression
 // Comments				:
 CExpression		*getAssignment(CList<CVariable *> *variables,CExpression *expression) {
@@ -3380,7 +3443,8 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CExpression *expressio
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	getAssignment
-// Description			:	Generates an assignment code
+// Description			:
+/// \brief					Generates an assignment code
 // Return Value			:	The generated expression
 // Comments				:
 CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *expressions) {

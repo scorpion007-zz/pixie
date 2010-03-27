@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,9 +40,7 @@
 // Class				:
 // Description			:
 // Comments				:
-
-
-
+/// \note					
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:
@@ -50,8 +48,7 @@
 // Description			:
 // Return Value			:
 // Comments				:
-
-
+/// \note					
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:

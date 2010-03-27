@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	bundles.h
 //  Classes				:	
-//  Description			:	Special ray bundle classes
+//  Description			:
+/// \brief					Special ray bundle classes
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef BUNDLES_H
@@ -51,7 +52,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceBundle
-// Description			:	Encapsulates a bundle of rays
+// Description			:
+/// \brief					Encapsulates a bundle of rays
 // Comments				:
 class	CTraceBundle : public CRayBundle {
 public:
@@ -72,7 +74,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceRay
 // Description			:	Expands the ray for "transmission" shading language command
-// Comments				:	Note that we do not have color
+// Comments				:
+/// \note					Note that we do not have color
 class	CTransmissionRay : public CRay {
 public:
 		vector					opacity;
@@ -82,7 +85,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceBundle
-// Description			:	Encapsulates a bundle of rays
+// Description			:
+/// \brief					Encapsulates a bundle of rays
 // Comments				:
 class	CTransmissionBundle : public CRayBundle {
 public:
@@ -99,7 +103,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherRay
-// Description			:	The ray used for gathering
+// Description			:
+/// \brief					The ray used for gathering
 // Comments				:
 class	CGatherRay : public CRay {
 public:
@@ -117,7 +122,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherBundle
-// Description			:	Bundle of gather rays
+// Description			:
+/// \brief					Bundle of gather rays
 // Comments				:
 class	CGatherBundle : public CRayBundle {
 public:

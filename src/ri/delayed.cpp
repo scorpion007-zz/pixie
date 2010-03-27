@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -39,7 +39,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedObject
 // Method				:	CDelayedObject
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const float *bmax,void	(*subdivisionFunction)(void *,float),void	(*freeFunction)(void *),void *data,int *drc) : CObject(a,x) {
@@ -73,7 +74,8 @@ CDelayedObject::CDelayedObject(CAttributes *a,CXform *x,const float *bmin,const 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedObject
 // Method				:	~CDelayedObject
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDelayedObject::~CDelayedObject() {
@@ -160,7 +162,8 @@ void	CDelayedObject::instantiate(CAttributes *a,CXform *x,CRendererContext *c) c
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedInstance
 // Method				:	CDelayedInstance
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObject(a,x) {
@@ -185,7 +188,8 @@ CDelayedInstance::CDelayedInstance(CAttributes *a,CXform *x,CObject *in) : CObje
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedInstance
 // Method				:	~CDelayedInstance
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDelayedInstance::~CDelayedInstance() {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	pl.h
 //  Classes				:	
-//  Description			:	Parameter list class
+//  Description			:
+/// \brief					Parameter list class
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef PL_H
@@ -43,7 +44,8 @@ const	unsigned int	PL_VERTEX_TO_VARYING	=	2;	// Force vertex variables to be var
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVertexData
-// Description			:	Holds vertex data
+// Description			:
+/// \brief					Holds vertex data
 // Comments				:
 class	CVertexData : public CRefCounter {
 public:
@@ -62,7 +64,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParameter
-// Description			:	Encapsulates a parameter
+// Description			:
+/// \brief					Encapsulates a parameter
 // Comments				:
 class	CParameter {
 public:
@@ -80,7 +83,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPlParameter
-// Description			:	Encapsulates a parameter
+// Description			:
+/// \brief					Encapsulates a parameter
 // Comments				:
 class CPlParameter {
 public:
@@ -93,7 +97,8 @@ public:
 
 							///////////////////////////////////////////////////////////////////////
 							// Class				:	CPlParameter
-							// Description			:	This function is used to obtain the variable to write to
+							// Description			:
+/// \brief					This function is used to obtain the variable to write to
 							// Comments				:
 	float					*resolve(float **varying,float ***locals) const {
 								if (variable->storage == STORAGE_GLOBAL)		return varying[variable->entry];
@@ -104,7 +109,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
-// Description			:	Holds a parameter list
+// Description			:
+/// \brief					Holds a parameter list
 // Comments				:
 class	CPl {
 public:

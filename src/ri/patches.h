@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -27,7 +27,8 @@
 //  Classes				:	CPointDB
 //							CBilinearPatchMesh
 //							CBicubicPatchMesh
-//  Description			:	Some geometry classes
+//  Description			:
+/// \brief					Some geometry classes
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef PATCHES_H
@@ -40,7 +41,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBilinearPatch
-// Description			:	Encapsulates a bilinear patch
+// Description			:
+/// \brief					Encapsulates a bilinear patch
 // Comments				:
 class	CBilinearPatch : public CSurface {
 public:
@@ -66,7 +68,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
-// Description			:	Encapsulates a bicubic patch
+// Description			:
+/// \brief					Encapsulates a bicubic patch
 // Comments				:
 class	CBicubicPatch : public CSurface {
 public:
@@ -92,7 +95,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatch
-// Description			:	Encapsulates a NURBS patch
+// Description			:
+/// \brief					Encapsulates a NURBS patch
 // Comments				:
 class	CNURBSPatch : public CSurface {
 public:
@@ -135,7 +139,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
-// Description			:	Encapsulates a patch mesh
+// Description			:
+/// \brief					Encapsulates a patch mesh
 // Comments				:
 class	CPatchMesh : public CObject {
 public:
@@ -160,7 +165,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatchMesh
-// Description			:	Encapsulates a NURBS patch mesh
+// Description			:
+/// \brief					Encapsulates a NURBS patch mesh
 // Comments				:
 class	CNURBSPatchMesh : public CObject {
 public:

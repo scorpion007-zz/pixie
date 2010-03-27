@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -38,7 +38,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
-// Description			:	Encapsulates a piece of 2D surface
+// Description			:
+/// \brief					Encapsulates a piece of 2D surface
 // Comments				:
 class	CPatch : public CObject {
 public:
@@ -65,7 +66,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
-// Description			:	Encapsulates a piece of 2D surface
+// Description			:
+/// \brief					Encapsulates a piece of 2D surface
 // Comments				:
 class	CTesselationPatch : public CObject {
 

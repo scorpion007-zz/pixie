@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	bundles.cpp
 //  Classes				:	CRayBundle
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -42,7 +43,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceBundle
 // Method				:	postTraceAction
-// Description			:	Make sure we trace the rays
+// Description			:
+/// \brief					Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
 int		CTraceBundle::postTraceAction() {
@@ -52,7 +54,8 @@ int		CTraceBundle::postTraceAction() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceBundle
 // Method				:	postShade
-// Description			:	Make sure we trace the rays
+// Description			:
+/// \brief					Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
 void	CTraceBundle::postShade(int nr,CRay **r,float **varying) {
@@ -143,7 +146,8 @@ void	CTraceBundle::postShade(int nr,CRay **r) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceBundle
 // Method				:	post
-// Description			:	Called after the first pass
+// Description			:
+/// \brief					Called after the first pass
 // Return Value			:	-
 // Comments				:
 void	CTraceBundle::post() {
@@ -188,7 +192,8 @@ void	CTraceBundle::post() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTransmissionBundle
 // Method				:	postTraceAction
-// Description			:	Make sure we trace the rays
+// Description			:
+/// \brief					Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
 int		CTransmissionBundle::postTraceAction() {
@@ -198,7 +203,8 @@ int		CTransmissionBundle::postTraceAction() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTransmissionBundle
 // Method				:	postShade
-// Description			:	Make sure we trace the rays
+// Description			:
+/// \brief					Make sure we trace the rays
 // Return Value			:	-
 // Comments				:
 void	CTransmissionBundle::postShade(int nr,CRay **r,float **varying) {
@@ -280,7 +286,8 @@ void	CTransmissionBundle::postShade(int nr,CRay **r) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceBundle
 // Method				:	post
-// Description			:	Called after the first pass
+// Description			:
+/// \brief					Called after the first pass
 // Return Value			:	-
 // Comments				:
 void	CTransmissionBundle::post() {
@@ -298,7 +305,8 @@ void	CTransmissionBundle::post() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherBundle
 // Method				:	CGatherBundle
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CGatherBundle::CGatherBundle() {
@@ -307,7 +315,8 @@ CGatherBundle::CGatherBundle() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherBundle
 // Method				:	~CGatherBundle
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CGatherBundle::~CGatherBundle() {

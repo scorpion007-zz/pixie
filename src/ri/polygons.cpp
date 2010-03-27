@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -65,7 +65,8 @@ void	*operator new(size_t size,CMovingTriangle *buf) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTriVertex
-// Description			:	This is a temporary vertex used during the triangulation
+// Description			:
+/// \brief					This is a temporary vertex used during the triangulation
 // Comments				:
 class	CTriVertex {
 public:
@@ -77,7 +78,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMeshData
-// Description			:	This class holds transient data about the polygon mesh used during triangulation
+// Description			:
+/// \brief					This class holds transient data about the polygon mesh used during triangulation
 // Comments				:
 class	CMeshData {
 public:
@@ -104,7 +106,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
 // Method				:	CPolygonTriangle
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int ifv0,int ifv1,int ifv2,int iuniform) : CSurface(a,x) {
@@ -152,7 +155,8 @@ CPolygonTriangle::CPolygonTriangle(CAttributes *a,CXform *x,CPolygonMesh *mesh,i
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
 // Method				:	~CPolygonTriangle
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPolygonTriangle::~CPolygonTriangle() {
@@ -165,7 +169,8 @@ CPolygonTriangle::~CPolygonTriangle() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
 // Method				:	intersect
-// Description			:	Intersect the polygon with the ray
+// Description			:
+/// \brief					Intersect the polygon with the ray
 // Return Value			:	-
 // Comments				:
 void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
@@ -283,7 +288,8 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
 // Method				:	sample
-// Description			:	Sample bunch of points on the triangle
+// Description			:
+/// \brief					Sample bunch of points on the triangle
 // Return Value			:	-
 // Comments				:
 void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
@@ -504,7 +510,8 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
 // Method				:	interpolate
-// Description			:	Core interpolation
+// Description			:
+/// \brief					Core interpolation
 // Return Value			:	-
 // Comments				:
 void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***locals) const {
@@ -678,7 +685,8 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
 // Method				:	CPolygonQuad
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,int iv1,int iv2,int iv3,int ifv0,int ifv1,int ifv2,int ifv3,int iuniform) : CSurface(a,x) {
@@ -725,7 +733,8 @@ CPolygonQuad::CPolygonQuad(CAttributes *a,CXform *x,CPolygonMesh *mesh,int iv0,i
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
 // Method				:	~CPolygonQuad
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPolygonQuad::~CPolygonQuad() {
@@ -738,7 +747,8 @@ CPolygonQuad::~CPolygonQuad() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
 // Method				:	intersect
-// Description			:	Intersect the quad with a ray
+// Description			:
+/// \brief					Intersect the quad with a ray
 // Return Value			:	-
 // Comments				:
 void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
@@ -886,7 +896,8 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
 // Method				:	sample
-// Description			:	Sample bunch of points on the quad
+// Description			:
+/// \brief					Sample bunch of points on the quad
 // Return Value			:	-
 // Comments				:
 void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
@@ -1105,7 +1116,8 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
 // Method				:	interpolate
-// Description			:	Core interpolation
+// Description			:
+/// \brief					Core interpolation
 // Return Value			:	-
 // Comments				:
 void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals) const {
@@ -1284,7 +1296,8 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
 // Method				:	CPolygonMesh
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nholes,int *nvertices,int *vertices) : CObject(a,x) {
@@ -1340,7 +1353,8 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
 // Method				:	~CPolygonMesh
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPolygonMesh::~CPolygonMesh() {
@@ -1359,7 +1373,8 @@ CPolygonMesh::~CPolygonMesh() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
 // Method				:	intersect
-// Description			:	Intersect with a ray
+// Description			:
+/// \brief					Intersect with a ray
 // Return Value			:	-
 // Comments				:
 void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
@@ -1371,7 +1386,8 @@ void		CPolygonMesh::intersect(CShadingContext *r,CRay *ray) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
 // Method				:	dice
-// Description			:	Split the mesh
+// Description			:
+/// \brief					Split the mesh
 // Return Value			:	-
 // Comments				:
 void		CPolygonMesh::dice(CShadingContext *r) {
@@ -1385,7 +1401,8 @@ void		CPolygonMesh::dice(CShadingContext *r) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
 // Method				:	instantiate
-// Description			:	Instanciate the mesh
+// Description			:
+/// \brief					Instanciate the mesh
 // Return Value			:	-
 // Comments				:
 void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
@@ -1428,7 +1445,8 @@ void		CPolygonMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) co
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	createTriangle
-// Description			:	Actually create the triangle
+// Description			:
+/// \brief					Actually create the triangle
 // Return Value			:	-
 // Comments				:
 inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int vi2,const int vi3,CMeshData &data) {
@@ -1459,7 +1477,8 @@ inline	void	createQuad(const int *vindices,const int vi0,const int vi1,const int
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	createTriangle
-// Description			:	Actually create the triangle
+// Description			:
+/// \brief					Actually create the triangle
 // Return Value			:	-
 // Comments				:
 inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const int vi2,CMeshData &data) {
@@ -1531,7 +1550,8 @@ bool check_intersect(const float *l1p1, const float *l1p2, const float *l2p1, co
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	valid
-// Description			:	Check if the edge between from and to is inside the polygon
+// Description			:
+/// \brief					Check if the edge between from and to is inside the polygon
 // Return Value			:	TRUE if this is a valid edge
 // Comments				:
 static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTriVertex *to) {
@@ -1608,7 +1628,8 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	orientationCheck
-// Description			:	Check the orientation of a loop to make sure it is CW or CCW
+// Description			:
+/// \brief					Check the orientation of a loop to make sure it is CW or CCW
 // Return Value			:	-
 // Comments				:
 static	inline	int			orientationCheck(CTriVertex *loop,int cw,CMeshData &data) {
@@ -1668,7 +1689,8 @@ static	inline	int			orientationCheck(CTriVertex *loop,int cw,CMeshData &data) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	triangulate
-// Description			:	Triangulate a general polygon
+// Description			:
+/// \brief					Triangulate a general polygon
 // Return Value			:	-
 // Comments				:
 inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &data) {
@@ -1960,7 +1982,8 @@ nextLoop:;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
 // Method				:	triangulate
-// Description			:	Triangulate the mesh
+// Description			:
+/// \brief					Triangulate the mesh
 // Return Value			:	-
 // Comments				:
 void				CPolygonMesh::create(CShadingContext *context) {

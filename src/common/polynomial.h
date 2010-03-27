@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -24,7 +24,8 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	polynomial.h
-//  Description			:	Various polynimial related functions
+//  Description			:
+/// \brief					Various polynimial related functions
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef POLYNOMIAL_H

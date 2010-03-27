@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	brickmap.cpp
 //  Classes				:	CBrickMap
-//  Description			:	Da implementation
+//  Description			:
+/// \brief					Da implementation
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -119,7 +120,8 @@ static	inline	float	intersect(const float *P,float dP,float x,float y,float z,fl
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	CBrickMap
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to) : CTexture3d(name,from,to) {
@@ -179,9 +181,11 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	CBrickMap
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
-// Comments				:	Use this contructor to compute from sctratch
+// Comments				:
+/// \note					Use this contructor to compute from sctratch
 CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CChannel *ch,int nc,int md = 10) : CTexture3d(name,from,to,toNDC,nc,ch) {
 	int	i;
 	
@@ -216,7 +220,8 @@ CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const fl
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	~CBrickMap
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CBrickMap::~CBrickMap() {
@@ -354,7 +359,8 @@ CBrickMap::~CBrickMap() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	store
-// Description			:	Add a point into the structure
+// Description			:
+/// \brief					Add a point into the structure
 // Return Value			:	-
 // Comments				:
 void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP) {
@@ -442,7 +448,8 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	lookup
-// Description			:	Lookup data
+// Description			:
+/// \brief					Lookup data
 // Return Value			:	-
 // Comments				:
 void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
@@ -487,7 +494,8 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	lookup
-// Description			:	Lookup a particular depth
+// Description			:
+/// \brief					Lookup a particular depth
 // Return Value			:	-
 // Comments				:
 void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int depth,float normalFactor) {
@@ -539,9 +547,11 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	finalize
-// Description			:	Finalize the creation of the brickmap
+// Description			:
+/// \brief					Finalize the creation of the brickmap
 // Return Value			:	-
-// Comments				:	this relies on all levels lower than a finer one being present
+// Comments				:
+/// \note					this relies on all levels lower than a finer one being present
 void				CBrickMap::finalize() {
 	int			*stack		=	(int *) alloca(maxDepth*8*5*sizeof(int));
 	int			*stackBase	=	stack;
@@ -659,7 +669,8 @@ void				CBrickMap::finalize() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	newBrick
-// Description			:	Create a new brick
+// Description			:
+/// \brief					Create a new brick
 // Return Value			:	-
 // Comments				:
 CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
@@ -697,7 +708,8 @@ CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	loadBrick
-// Description			:	Load a brick
+// Description			:
+/// \brief					Load a brick
 // Return Value			:	-
 // Comments				:
 CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {	
@@ -1018,7 +1030,8 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	draw
-// Description			:	Draw the brickmap
+// Description			:
+/// \brief					Draw the brickmap
 // Return Value			:	-
 // Comments				:
 void				CBrickMap::draw() {
@@ -1231,7 +1244,8 @@ void				CBrickMap::draw() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	keyDown
-// Description			:	handle interface keys
+// Description			:
+/// \brief					handle interface keys
 // Return Value			:	-
 // Comments				:
 int			CBrickMap::keyDown(int key) {
@@ -1272,7 +1286,8 @@ int			CBrickMap::keyDown(int key) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	bound
-// Description			:	Bound the brickmap
+// Description			:
+/// \brief					Bound the brickmap
 // Return Value			:	-
 // Comments				:
 void				CBrickMap::bound(float *bmin,float *bmax) {
@@ -1284,7 +1299,8 @@ void				CBrickMap::bound(float *bmin,float *bmax) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	initBrickMap
-// Description			:	Initialize the brickmaps at the beginning of a frame
+// Description			:
+/// \brief					Initialize the brickmaps at the beginning of a frame
 // Return Value			:	-
 // Comments				:
 void				CBrickMap::initBrickMap(int m) {
@@ -1427,7 +1443,8 @@ void				CBrickMap::flushBrickMap(int allBricks) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
 // Method				:	shutdownBrickMap
-// Description			:	Clear the memory used by the brickmaps
+// Description			:
+/// \brief					Clear the memory used by the brickmaps
 // Return Value			:	-
 // Comments				:
 void				CBrickMap::shutdownBrickMap() {
@@ -1491,7 +1508,8 @@ void			CBrickMap::brickQuickSort(CBrickNode **nodes,int start,int end) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeBrickMap
-// Description			:	This function creates the 3D baed texture from point cloud representation
+// Description			:
+/// \brief					This function creates the 3D baed texture from point cloud representation
 // Return Value			:	-
 // Comments				:
 void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPath,int n,const char **tokens,const void **params) {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	object.cpp
 //  Classes				:	CGeometry
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -54,7 +55,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	CObject
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	
 CObject::CObject(CAttributes *a,CXform *x) {
@@ -75,7 +77,8 @@ CObject::CObject(CAttributes *a,CXform *x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	~CObject
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:	
 CObject::~CObject() {
@@ -89,7 +92,8 @@ CObject::~CObject() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	dice
-// Description			:	Dice the children objects
+// Description			:
+/// \brief					Dice the children objects
 // Return Value			:	-
 // Comments				:	
 void			CObject::dice(CShadingContext *rasterizer) {
@@ -138,7 +142,8 @@ static	float	getDisp(const float *mat,float disp) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	cluster
-// Description			:	Cluster the objects
+// Description			:
+/// \brief					Cluster the objects
 // Return Value			:
 // Comments				:
 void		CObject::cluster(CShadingContext *context) {
@@ -277,7 +282,8 @@ void		CObject::cluster(CShadingContext *context) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	setChildren
-// Description			:	Set the children objects
+// Description			:
+/// \brief					Set the children objects
 // Return Value			:
 // Comments				:
 void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
@@ -293,7 +299,8 @@ void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	destroy
-// Description			:	Destroy the entire tree
+// Description			:
+/// \brief					Destroy the entire tree
 // Return Value			:
 // Comments				:
 void		CObject::destroy() {
@@ -306,7 +313,8 @@ void		CObject::destroy() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
 // Method				:	makeBound
-// Description			:	Make sure we do not have empty bounding box
+// Description			:
+/// \brief					Make sure we do not have empty bounding box
 // Return Value			:
 // Comments				:
 void		CObject::makeBound(float *bmin,float *bmax) const {
@@ -343,9 +351,11 @@ void		CObject::makeBound(float *bmin,float *bmax) const {
 ///////////////////////////////////////////////////////////////////////
 // Class			   :   CObject
 // Method			   :   estimateDicing
-// Description		   :   Estimate the dicing size on the screen
+// Description		   :
+/// \brief					Estimate the dicing size on the screen
 // Return Value		   :
-// Comments			   :   P must be in pixels
+// Comments			   :
+/// \note					P must be in pixels
 void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvdiv,float shadingRate,int nonrasterorient) {
    float	   uMin,vMin;  // The minimum edge length
    float	   uMax,vMax;  // The maximum edge length
@@ -475,7 +485,8 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyObject
 // Method				:	CDummyObject
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
@@ -485,7 +496,8 @@ CDummyObject::CDummyObject(CAttributes *a,CXform *x) : CObject(a,x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyObject
 // Method				:	~CDummyObject
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CDummyObject::~CDummyObject() {
@@ -494,7 +506,8 @@ CDummyObject::~CDummyObject() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyObject
 // Method				:	intersect
-// Description			:	Intersect a ray
+// Description			:
+/// \brief					Intersect a ray
 // Return Value			:
 // Comments				:
 void			CDummyObject::intersect(CShadingContext *,CRay *) {
@@ -513,7 +526,8 @@ void			CDummyObject::intersect(CShadingContext *,CRay *) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	intersect
-// Description			:	Intersect the surface
+// Description			:
+/// \brief					Intersect the surface
 // Return Value			:
 // Comments				:
 void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
@@ -558,7 +572,8 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	dice
-// Description			:	Dice the object into smaller ones
+// Description			:
+/// \brief					Dice the object into smaller ones
 // Return Value			:
 // Comments				:
 void				CSurface::dice(CShadingContext *rasterizer) {
@@ -577,7 +592,8 @@ void				CSurface::dice(CShadingContext *rasterizer) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	moving
-// Description			:	TRUE if the object is moving
+// Description			:
+/// \brief					TRUE if the object is moving
 // Return Value			:
 // Comments				:
 int					CSurface::moving() const {
@@ -587,7 +603,8 @@ int					CSurface::moving() const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	sample
-// Description			:	Sample a bunch of points on the surface
+// Description			:
+/// \brief					Sample a bunch of points on the surface
 // Return Value			:	TRUE if the sampling was done and shaders need to be executed
 // Comments				:
 void				CSurface::sample(int,int,float **,float ***,unsigned int &) const {
@@ -598,7 +615,8 @@ void				CSurface::sample(int,int,float **,float ***,unsigned int &) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	interpolate
-// Description			:	Interpolate the varying data and set the uniform data
+// Description			:
+/// \brief					Interpolate the varying data and set the uniform data
 // Return Value			:
 // Comments				:
 void				CSurface::interpolate(int,float **,float ***)	const {
@@ -610,7 +628,8 @@ void				CSurface::interpolate(int,float **,float ***)	const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	split
-// Description			:	Split an object
+// Description			:
+/// \brief					Split an object
 // Return Value			:
 // Comments				:
 void				CSurface::shade(CShadingContext *context,int numRays,CRay **rays) {

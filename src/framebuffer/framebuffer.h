@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	framebuffer.h
 //  Classes				:	CDisplay
-//  Description			:	Defines a generic display class that holds
+//  Description			:
+/// \brief					Defines a generic display class that holds
 //							the display data to be passed to the display thread
 //
 ////////////////////////////////////////////////////////////////////////
@@ -37,7 +38,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplay
-// Description			:	Holds image data to be passed to the window thread
+// Description			:
+/// \brief					Holds image data to be passed to the window thread
 // Comments				:
 class	CDisplay {
 public:

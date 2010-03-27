@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	file_tiff.cpp
 //  Classes				:
-//  Description			:	This file implements the TIFF writer output device
+//  Description			:
+/// \brief					This file implements the TIFF writer output device
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferTIFF
-// Description			:	Holds the framebuffer
+// Description			:
+/// \brief					Holds the framebuffer
 // Comments				:
 CFileFramebufferTIFF::CFileFramebufferTIFF(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter): 
 CFileFramebuffer() 
@@ -204,7 +206,8 @@ CFileFramebuffer()
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferTIFF
 // Method				:	~CFileFramebufferTIFF
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CFileFramebufferTIFF::~CFileFramebufferTIFF() 
@@ -229,7 +232,8 @@ CFileFramebufferTIFF::~CFileFramebufferTIFF()
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferTIFF
 // Method				:	write
-// Description			:	Write image data to the file
+// Description			:
+/// \brief					Write image data to the file
 // Return Value			:	-
 // Comments				:
 void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data) 

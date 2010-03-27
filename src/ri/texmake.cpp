@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	texmake.cpp
 //  Classes				:	-
-//  Description			:	This file comtains texture file making routines
+//  Description			:
+/// \brief					This file comtains texture file making routines
 //
 ////////////////////////////////////////////////////////////////////////
 #include "texmake.h"
@@ -54,7 +55,8 @@ const char	*resizeNoneMode					=	"none";
 
 ///////////////////////////////////////////////////////////////////////
 // function				:	tiffErrorHandler
-// Description			:	Handle errors coming from the libtiff
+// Description			:
+/// \brief					Handle errors coming from the libtiff
 // Return Value			:	-
 // Comments				:
 static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
@@ -68,7 +70,8 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	appendLayer
-// Description			:	Append a layer of image into an image file
+// Description			:
+/// \brief					Append a layer of image into an image file
 // Return Value			:	-
 // Comments				:
 static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int tileSize,int width,int height,void *data) {
@@ -137,7 +140,8 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	appendPyramid
-// Description			:	Append an image pyramid into an image file
+// Description			:
+/// \brief					Append an image pyramid into an image file
 //							the reduction gives the amount of reduction in the image size at each step
 // Return Value			:
 // Comments				:
@@ -212,7 +216,8 @@ template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSample
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	readLayer
-// Description			:	Read a layer of the image into memory
+// Description			:
+/// \brief					Read a layer of the image into memory
 // Return Value			:
 // Comments				:
 void	*readLayer(TIFF *in,int *width,int *height,int *bitsperpixel,int *numSamples) {
@@ -254,7 +259,8 @@ void	*readLayer(TIFF *in,int *width,int *height,int *bitsperpixel,int *numSample
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	copyData
-// Description			:	Copy a rectangular portion between images
+// Description			:
+/// \brief					Copy a rectangular portion between images
 // Return Value			:
 // Comments				:
 template <class T> void copyData(T *from,int fw,int fh,int x,int y,int w,int h,
@@ -274,7 +280,8 @@ template <class T> void copyData(T *from,int fw,int fh,int x,int y,int w,int h,
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	initData
-// Description			:	Paint
+// Description			:
+/// \brief					Paint
 // Return Value			:
 // Comments				:
 template <class T> void	initData(T *to,int width,int height,int x,int y,int w,int h,int numSamples,T n) {
@@ -288,7 +295,8 @@ template <class T> void	initData(T *to,int width,int height,int x,int y,int w,in
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	initDataValues
-// Description			:	Paint
+// Description			:
+/// \brief					Paint
 // Return Value			:
 // Comments				:
 template <class T> void	initDataValues(T *to,int width,int height,int x,int y,int w,int h,int numSamples,T* v) {
@@ -302,7 +310,8 @@ template <class T> void	initDataValues(T *to,int width,int height,int x,int y,in
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	filterImage
-// Description			:	Apply a filter to the image
+// Description			:
+/// \brief					Apply a filter to the image
 // Return Value			:
 // Comments				:
 template <class T> void	filterImage(int width,int height,int numSamples,int bitspersample,float filterWidth,float filterHeight,RtFilterFunc filter,T *data) {
@@ -398,7 +407,8 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	filterScaleImage
-// Description			:	Apply a filter to the image and scale it
+// Description			:
+/// \brief					Apply a filter to the image and scale it
 // Return Value			:
 // Comments				:
 template <class T> void	filterScaleImage(int width,int height,int targetWidth,int targetHeight,int newWidth,int newHeight,
@@ -515,7 +525,8 @@ template <class T> void	filterScaleImage(int width,int height,int targetWidth,in
 // Function				:	adjustSize
 // Description			:	Adjust the size of an image so that it's size is a power of two
 // Return Value			:
-// Comments				:	resize modes to match prman
+// Comments				:
+/// \note					resize modes to match prman
 template <class T> void	adjustSize(T **data,int *width,int *height,int *validWidth,int *validHeight,int numSamples,int bitspersample,float filterWidth,float filterHeight,RtFilterFunc filter,const char *smode,const char *tmode,const char *resizemode) {
 	int	newWidth,newHeight,targetWidth,targetHeight;
 	int preserveRatio = TRUE;
@@ -649,7 +660,8 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	appendTexture
-// Description			:	Make and append a texture to the end of the TIFF file
+// Description			:
+/// \brief					Make and append a texture to the end of the TIFF file
 // Return Value			:
 // Comments				:	FIXME: filter only when adjusting size
 void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int bitspersample,RtFilterFunc filter,float filterWidth,float filterHeight,int tileSize,void *data,const char *smode,const char *tmode,const char *resizemode) {
@@ -694,7 +706,8 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeTexture
-// Description			:	Create an image pyramid from input
+// Description			:
+/// \brief					Create an image pyramid from input
 // Return Value			:
 // Comments				:
 void	makeTexture(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals) {
@@ -752,7 +765,8 @@ void	makeTexture(const char *input,const char *output,TSearchpath *path,const ch
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeSideEnvironment
-// Description			:	Create a single sided environment map
+// Description			:
+/// \brief					Create a single sided environment map
 // Return Value			:
 // Comments				:
 void	makeSideEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals,int shadow) {
@@ -829,7 +843,8 @@ void	makeSideEnvironment(const char *input,const char *output,TSearchpath *path,
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeCubicEnvironment
-// Description			:	Create an environment map where each side is a pyramid
+// Description			:
+/// \brief					Create an environment map where each side is a pyramid
 // Return Value			:
 // Comments				:
 void	makeCubicEnvironment(const char *px,const char *py,const char *pz,const char *nx,const char *ny,const char *nz,const char *output,const char *smode,const char *tmode,TSearchpath *path,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals,int shadow) {
@@ -904,7 +919,8 @@ void	makeCubicEnvironment(const char *px,const char *py,const char *pz,const cha
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeSphericalEnvironment
-// Description			:	Create an image pyramid from input
+// Description			:
+/// \brief					Create an image pyramid from input
 // Return Value			:
 // Comments				:
 void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals) {
@@ -963,7 +979,8 @@ void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeSphericalEnvironment
-// Description			:	Create an image pyramid from input
+// Description			:
+/// \brief					Create an image pyramid from input
 // Return Value			:
 // Comments				:
 void	makeCylindericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals) {

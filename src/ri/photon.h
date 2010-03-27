@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonHider
-// Description			:	This class implements the photon hider
+// Description			:
+/// \brief					This class implements the photon hider
 // Comments				:
 class	CPhotonHider : public CShadingContext {
 public:

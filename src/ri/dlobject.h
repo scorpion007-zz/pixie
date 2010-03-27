@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	dlobject.h
 //  Classes				:	CDLObject
-//  Description			:	Defines a dynamically loaded object
+//  Description			:
+/// \brief					Defines a dynamically loaded object
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef DLOBJECT_H
@@ -38,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
-// Description			:	This class defines an object that is dynamically loaded
+// Description			:
+/// \brief					This class defines an object that is dynamically loaded
 // Comments				:
 class	CDLObject : public CSurface {
 public:

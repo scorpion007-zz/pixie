@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGlobalIdentifier
-// Description			:	Holds a global identifier
+// Description			:
+/// \brief					Holds a global identifier
 // Comments				:
 class  CGlobalIdentifier {
 public:
@@ -54,7 +55,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	initDeclarations
-// Description			:	Init the declarations
+// Description			:
+/// \brief					Init the declarations
 // Return Value			:
 // Comments				:
 void			CRenderer::initDeclarations() {
@@ -291,7 +293,8 @@ void			CRenderer::initDeclarations() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	shutdownDeclarations
-// Description			:	Clear the declarations
+// Description			:
+/// \brief					Clear the declarations
 // Return Value			:
 // Comments				:
 void			CRenderer::shutdownDeclarations() {
@@ -320,7 +323,8 @@ void			CRenderer::shutdownDeclarations() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	defineCoordinateSystem
-// Description			:	Define a coordinate system
+// Description			:
+/// \brief					Define a coordinate system
 // Return Value			:
 // Comments				:
 void			CRenderer::defineCoordinateSystem(const char *name,const float *from,const float *to,ECoordinateSystem type) {
@@ -348,7 +352,8 @@ void			CRenderer::defineCoordinateSystem(const char *name,const float *from,cons
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	findCoordinateSystem
-// Description			:	Find a coordinate system
+// Description			:
+/// \brief					Find a coordinate system
 // Return Value			:	TRUE on success
 // Comments				:
 int			CRenderer::findCoordinateSystem(const char *name,const float *&from,const float *&to,ECoordinateSystem &cSystem) {
@@ -404,7 +409,8 @@ int			CRenderer::findCoordinateSystem(const char *name,const float *&from,const 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	declareVariable
-// Description			:	Define a new variable
+// Description			:
+/// \brief					Define a new variable
 // Return Value			:	The new variable if successful, NULL otherwise
 // Comments				:
 CVariable		*CRenderer::declareVariable(const char *name,const char *type,int marker) {
@@ -471,7 +477,8 @@ CVariable		*CRenderer::declareVariable(const char *name,const char *type,int mar
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	makeGlobalVariable
-// Description			:	Forcefully make a variable global
+// Description			:
+/// \brief					Forcefully make a variable global
 // Return Value			:
 // Comments				:
 void	CRenderer::makeGlobalVariable(CVariable *var) {
@@ -494,7 +501,8 @@ void	CRenderer::makeGlobalVariable(CVariable *var) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	retrieveVariable
-// Description			:	Lookup a variable
+// Description			:
+/// \brief					Lookup a variable
 // Return Value			:	The variable if found, NULL otherwise
 // Comments				:
 CVariable		*CRenderer::retrieveVariable(const char *name) {
@@ -512,7 +520,8 @@ CVariable		*CRenderer::retrieveVariable(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getGlobalID
-// Description			:	Map a string to a number globally
+// Description			:
+/// \brief					Map a string to a number globally
 // Return Value			:	The ID
 // Comments				:
 int		CRenderer::getGlobalID(const char *name) {
@@ -533,7 +542,8 @@ int		CRenderer::getGlobalID(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	declareDisplayChannel
-// Description			:	Define a new displayChannel
+// Description			:
+/// \brief					Define a new displayChannel
 // Return Value			:	The new display channel, NULL otherwise
 // Comments				:
 CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
@@ -575,7 +585,8 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	declareDisplayChannel
-// Description			:	Define a new displayChannel
+// Description			:
+/// \brief					Define a new displayChannel
 // Return Value			:	The new display channel, NULL otherwise
 // Comments				:
 CDisplayChannel		*CRenderer::declareDisplayChannel(CVariable *var) {
@@ -603,7 +614,8 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(CVariable *var) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	retrieveDisplayChannel
-// Description			:	Define a new displayChannel
+// Description			:
+/// \brief					Define a new displayChannel
 // Return Value			:	The found display channel, NULL otherwise
 // Comments				:
 CDisplayChannel		*CRenderer::retrieveDisplayChannel(const char *name) {
@@ -618,7 +630,8 @@ CDisplayChannel		*CRenderer::retrieveDisplayChannel(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	resetDisplayChannelUsage
-// Description			:	Mark all AOV channels as unused
+// Description			:
+/// \brief					Mark all AOV channels as unused
 // Return Value			:	
 // Comments				:
 void CRenderer::resetDisplayChannelUsage() {
@@ -635,13 +648,15 @@ void CRenderer::resetDisplayChannelUsage() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	registerFrameTemporary
-// Description			:	Register a file as a temporary
+// Description			:
+/// \brief					Register a file as a temporary
 //						:	 Optionally register for deletion at frame-end
 //						:	 certain files (namely those which are netrender temporaries)
 //						:	 would otherwise be found in preference to the merged 
 //						:	 client-side file, and must be removed before next frame.
 // Return Value			:	
-// Comments				:	Also removes any netFileMappings for the file
+// Comments				:
+/// \note					Also removes any netFileMappings for the file
 void CRenderer::registerFrameTemporary(const char *name, int deleteFile) {
 	char *tmp = new char[strlen(name)+2];
 	tmp[0] = (deleteFile == TRUE) ? 1 : 0;

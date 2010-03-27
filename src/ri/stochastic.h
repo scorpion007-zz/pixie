@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -61,7 +61,8 @@ private:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFragment
-	// Description			:	This class holds a sample
+	// Description			:
+/// \brief					This class holds a sample
 	// Comments				:
 	class	CFragment {
 	public:
@@ -76,7 +77,8 @@ private:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPixel
-	// Description			:	This class holds a pixel
+	// Description			:
+/// \brief					This class holds a pixel
 	// Comments				:
 	class	CPixel {
 	public:

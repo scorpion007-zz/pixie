@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -39,7 +39,8 @@ const	char	*radiosityName	=	"_radiosity";
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ff
-// Description			:	Compute the form factor from an occluding disk
+// Description			:
+/// \brief					Compute the form factor from an occluding disk
 // Return Value			:	The form factor
 // Comments				:
 static	inline	float	ff(const float *rP,const float *rN,const float *oP,const float *oN,float dP) {
@@ -101,7 +102,8 @@ static	inline	float	ff(const float *rP,const float *rN,const float *oP,const flo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Method				:	CPointHierarchy
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
@@ -140,7 +142,8 @@ CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Method				:	~CPointHierarchy
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CPointHierarchy::~CPointHierarchy() {
@@ -149,7 +152,8 @@ CPointHierarchy::~CPointHierarchy() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Method				:	computeHierarchy
-// Description			:	Constructs a hierarchy of the stored items
+// Description			:
+/// \brief					Constructs a hierarchy of the stored items
 // Return Value			:	-
 // Comments				:
 void		CPointHierarchy::computeHierarchy() {
@@ -173,7 +177,8 @@ void		CPointHierarchy::computeHierarchy() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Method				:	average
-// Description			:	Create an internal node by averaging the point data
+// Description			:
+/// \brief					Create an internal node by averaging the point data
 // Return Value			:	-
 // Comments				:
 int			CPointHierarchy::average(int numItems,int *indices) {
@@ -232,7 +237,8 @@ int			CPointHierarchy::average(int numItems,int *indices) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Method				:	cluster
-// Description			:	Cluster the items
+// Description			:
+/// \brief					Cluster the items
 // Return Value			:	-
 // Comments				:
 int			CPointHierarchy::cluster(int numItems,int *indices) {
@@ -416,7 +422,8 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
 // Method				:	lookup
-// Description			:	Lookup smtg
+// Description			:
+/// \brief					Lookup smtg
 // Return Value			:
 // Comments				:
 void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const float *dPdvl,const float *Nl,CShadingContext *context) {

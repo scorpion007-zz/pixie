@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	userAttributes.h
 //  Classes				:	CUserAttribute
-//  Description			:	Holds user attributes dictionary
+//  Description			:
+/// \brief					Holds user attributes dictionary
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef USER_ATTRIBUTES_H
@@ -36,7 +37,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUserAttributeDictionary
 // Description			:	The user options/attributes
-// Comments				:	We may want to call this class CUserVariables
+// Comments				:
+/// \note					We may want to call this class CUserVariables
 class CUserAttributeDictionary {	
 	CVariable *attribs;
 
@@ -45,7 +47,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	CUserAttributeDictionary
-	// Description			:	Ctor
+	// Description			:
+/// \brief					Ctor
 	// Return Value			:
 	// Comments				:
 	CUserAttributeDictionary() : attribs(NULL) { }
@@ -53,7 +56,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	~CUserAttributeDictionary
-	// Description			:	Dtor
+	// Description			:
+/// \brief					Dtor
 	// Return Value			:
 	// Comments				:
 	~CUserAttributeDictionary() {
@@ -80,7 +84,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	=
-	// Description			:	Assignment operator
+	// Description			:
+/// \brief					Assignment operator
 	// Return Value			:
 	// Comments				:
 	CUserAttributeDictionary &operator=(const CUserAttributeDictionary &rhs) {
@@ -121,7 +126,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	insert
-	// Description			:	Insert a variable
+	// Description			:
+/// \brief					Insert a variable
 	// Return Value			:
 	// Comments				:
 	void insert(CVariable *var,const void *value) {
@@ -186,7 +192,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	lookup
-	// Description			:	Lookup a variable
+	// Description			:
+/// \brief					Lookup a variable
 	// Return Value			:
 	// Comments				:
 	int lookup(const char *name, CVariable *&var) const {

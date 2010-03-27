@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	renderer.h
 //  Classes				:	CRenderer
-//  Description			:	This class holds global info about the renderer
+//  Description			:
+/// \brief					This class holds global info about the renderer
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef FRAME_H
@@ -121,7 +122,8 @@ class	CTexture3d;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
-// Description			:	This class holds data about the current frame being rendered
+// Description			:
+/// \brief					This class holds data about the current frame being rendered
 // Comments				:	This class is invalid outside beginFrame / endFrame
 class CRenderer {
 public:
@@ -221,7 +223,8 @@ public:
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CJob
-		// Description			:	This class keeps track of a job to perform
+		// Description			:
+/// \brief					This class keeps track of a job to perform
 		// Comments				:
 		class	CJob {
 		public:
@@ -460,7 +463,8 @@ public:
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CDisplayData
-		// Description			:	This class holds data about a display driver
+		// Description			:
+/// \brief					This class holds data about a display driver
 		// Comments				:
 		class CDisplayData {
 		public:
@@ -507,7 +511,8 @@ void			rcRecv(SOCKET,void *,int,int net = TRUE);			// Recv data
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	camera2pixels
-// Description			:	Project from camera space into the pixel space
+// Description			:
+/// \brief					Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 inline void		camera2pixels(float *P) {
@@ -522,7 +527,8 @@ inline void		camera2pixels(float *P) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	camera2pixels
-// Description			:	Project from camera space into the pixel space
+// Description			:
+/// \brief					Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 inline void		camera2pixels(float *x,float *y,const float *P) {
@@ -540,7 +546,8 @@ inline void		camera2pixels(float *x,float *y,const float *P) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	camera2pixels
-// Description			:	Project from camera space into the pixel space
+// Description			:
+/// \brief					Project from camera space into the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 inline void		camera2pixels(int n,float *P) {
@@ -559,7 +566,8 @@ inline void		camera2pixels(int n,float *P) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	camera2screen
-// Description			:	Project from camera space into the screen space
+// Description			:
+/// \brief					Project from camera space into the screen space
 // Return Value			:
 // Comments				:	(inline for speed)
 inline void		camera2screen(int n,float *P) {
@@ -578,7 +586,8 @@ inline void		camera2screen(int n,float *P) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	distance2pixels
-// Description			:	Project a distance in camera space into a distance in the pixel space
+// Description			:
+/// \brief					Project a distance in camera space into a distance in the pixel space
 // Return Value			:
 // Comments				:	(inline for speed)
 inline void		distance2pixels(int n,float *dist,float *P) {
@@ -595,7 +604,8 @@ inline void		distance2pixels(int n,float *dist,float *P) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pixels2distance
-// Description			:	Convert from pixel distance to camera space distance
+// Description			:
+/// \brief					Convert from pixel distance to camera space distance
 // Return Value			:	-
 // Comments				:
 inline void			pixels2distance(float &a,float &b,float d) {
@@ -605,7 +615,8 @@ inline void			pixels2distance(float &a,float &b,float d) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	samples2camera
-// Description			:	Back project from sample space into the camera space
+// Description			:
+/// \brief					Back project from sample space into the camera space
 // Return Value			:
 // Comments				:	(inline for speed)
 inline void		pixels2camera(float *P,float x,float y,float z) {
@@ -634,7 +645,8 @@ inline void		pixels2camera(float *P,float x,float y,float z) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNamedCoordinateSystem
-// Description			:	Holds a coordinate system
+// Description			:
+/// \brief					Holds a coordinate system
 // Comments				:
 class  CNamedCoordinateSystem {
 public:
@@ -647,7 +659,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDSO
-// Description			:	Holds a DSO shader info
+// Description			:
+/// \brief					Holds a DSO shader info
 // Comments				:
 class	CDSO {
 public:

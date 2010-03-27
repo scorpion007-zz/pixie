@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -33,7 +33,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDebugView
 // Method				:	CDebugView
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDebugView::CDebugView(const char *fileName,int append) {
@@ -64,7 +65,8 @@ CDebugView::CDebugView(const char *fileName,int append) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDebugView
 // Method				:	CDebugView
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDebugView::CDebugView(FILE *in,const char *fn) {
@@ -80,7 +82,8 @@ CDebugView::CDebugView(FILE *in,const char *fn) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDebugView
 // Method				:	~CDebugView
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDebugView::~CDebugView() {
@@ -97,7 +100,8 @@ CDebugView::~CDebugView() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDebugView
 // Method				:	draw
-// Description			:	Draw the stuff in the file
+// Description			:
+/// \brief					Draw the stuff in the file
 // Return Value			:	-
 // Comments				:
 void		CDebugView::draw() {
@@ -108,7 +112,8 @@ void		CDebugView::draw() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDebugView
 // Method				:	bound
-// Description			:	Bound the stuff in the file
+// Description			:
+/// \brief					Bound the stuff in the file
 // Return Value			:	-
 // Comments				:
 void		CDebugView::bound(float *bmin,float *bmax) {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -71,7 +71,8 @@ extern	const float				sinphi[];
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapItem
-// Description			:	Holds a generic point
+// Description			:
+/// \brief					Holds a generic point
 // Comments				:
 class	CMapItem {
 public:
@@ -81,15 +82,18 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMap
-// Description			:	Holds a generic map
-// Comments				:	A map stores spatial data
+// Description			:
+/// \brief					Holds a generic map
+// Comments				:
+/// \note					A map stores spatial data
 template <class T> class	CMap {
 public:
 
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	CMap
-				// Description			:	Ctor
+				// Description			:
+/// \brief					Ctor
 				// Return Value			:
 				// Comments				:
 				CMap() {
@@ -104,7 +108,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	~CMap
-				// Description			:	Dtor
+				// Description			:
+/// \brief					Dtor
 				// Return Value			:
 				// Comments				:
 		virtual	~CMap() {
@@ -114,7 +119,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	read
-				// Description			:	Read the photonmap from a file
+				// Description			:
+/// \brief					Read the photonmap from a file
 				// Return Value			:
 				// Comments				:
 		void	read(FILE *in) {
@@ -131,7 +137,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	write
-				// Description			:	Append the photon map into a file
+				// Description			:
+/// \brief					Append the photon map into a file
 				// Return Value			:
 				// Comments				:
 		void	write(FILE *out) {
@@ -145,7 +152,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	reset
-				// Description			:	Reset the photonmap
+				// Description			:
+/// \brief					Reset the photonmap
 				// Return Value			:
 				// Comments				:
 		void	reset() {
@@ -161,7 +169,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	store
-				// Description			:	Store a photon
+				// Description			:
+/// \brief					Store a photon
 				// Return Value			:
 				// Comments				:
 		T		*store(const float *P,const float *N) {
@@ -201,7 +210,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	store
-				// Description			:	Store a photon
+				// Description			:
+/// \brief					Store a photon
 				// Return Value			:
 				// Comments				:
 		T		*store(const T *item) {
@@ -236,9 +246,11 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CMap
 				// Method				:	balance
-				// Description			:	Balance the map
+				// Description			:
+/// \brief					Balance the map
 				// Return Value			:	-
-				// Comments				:	Must be called before the map is used
+				// Comments				:
+/// \note					Must be called before the map is used
 virtual	void	balance() {
 					if (numItems == 0)	return;
 
@@ -284,7 +296,8 @@ protected:
 			///////////////////////////////////////////////////////////////////////
 			// Class				:	CMap
 			// Method				:	balance
-			// Description			:	Balance a particular subset
+			// Description			:
+/// \brief					Balance a particular subset
 			// Return Value			:	Internally used by balance
 			// Comments				:
 	void	balance(T **ar1,T **ar2,int index,int start,int end) {
@@ -383,7 +396,8 @@ public:
 						///////////////////////////////////////////////////////////////////////
 						// Class				:	CMap
 						// Method				:	lookup
-						// Description			:	Locate the nearest maxFoundPhoton items
+						// Description			:
+/// \brief					Locate the nearest maxFoundPhoton items
 						// Return Value			:	Internally used
 						// Comments				:
 				void	lookupWithN(CLookup *l,int index) {
@@ -424,7 +438,8 @@ public:
 						///////////////////////////////////////////////////////////////////////
 						// Class				:	CMap
 						// Method				:	lookup
-						// Description			:	Locate the nearest maxFoundPhoton items
+						// Description			:
+/// \brief					Locate the nearest maxFoundPhoton items
 						// Return Value			:	Internally used
 						// Comments				:
 				void	lookup(CLookup *l,int index) {
@@ -463,7 +478,8 @@ public:
 						///////////////////////////////////////////////////////////////////////
 						// Class				:	CMap
 						// Method				:	insert
-						// Description			:	Insert an item into the list of founf items
+						// Description			:
+/// \brief					Insert an item into the list of founf items
 						// Return Value			:	Internally used
 						// Comments				:
 		void			insert(CLookup *l,const float d,const T *photon) {

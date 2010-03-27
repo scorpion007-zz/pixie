@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright � 1999 - 2003, Okan Arikan
+// Copyright � 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	opengl-fltk.h
 //  Classes				:
-//  Description			:	Hardware resterizer
+//  Description			:
+/// \brief					Hardware resterizer
 //
 // !!! Work under progress !!!
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMainWindow
-// Description			:	This class is responsible for drawing a view
+// Description			:
+/// \brief					This class is responsible for drawing a view
 // Comments				:
 class	CMainWindow : public Fl_Gl_Window, public CInterface {
 public:
@@ -203,7 +205,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglVisualize
-// Description			:	Visualize some data
+// Description			:
+/// \brief					Visualize some data
 // Return Value			:	-
 // Comments				:
 void		pglVisualize(CView *view) {

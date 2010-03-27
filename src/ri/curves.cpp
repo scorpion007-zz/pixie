@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	curves.cpp
 //  Classes				:	CCurve
-//  Description			:	Curve primitive
+//  Description			:
+/// \brief					Curve primitive
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -45,7 +46,8 @@ static	matrix	invBezier	=	{	0,	0,				0,				1,
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeCubicBound
-// Description			:	Converts the control vertices to Bezier control vertices
+// Description			:
+/// \brief					Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
 static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const float *v1,const float *v2,const float *v3,const float *geometryMatrix,const CXform *xform) {
@@ -99,7 +101,8 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurve
 // Method				:	CCurve
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	
 CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CSurface(a,x) {
@@ -116,7 +119,8 @@ CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurve
 // Method				:	~CCurve
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CCurve::~CCurve() {
@@ -129,7 +133,8 @@ CCurve::~CCurve() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	interpolate
-// Description			:	Interpolate the junk
+// Description			:
+/// \brief					Interpolate the junk
 // Return Value			:	-
 // Comments				:
 void			CCurve::interpolate(int numVertices,float **varying,float ***locals) const {
@@ -170,7 +175,8 @@ void			CCurve::interpolate(int numVertices,float **varying,float ***locals) cons
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	CCurve
-// Description			:	Dice the curve group into smaller ones
+// Description			:
+/// \brief					Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
 void			CCurve::dice(CShadingContext *rasterizer) {
@@ -313,7 +319,8 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	CCubicCurve
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	
 CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
@@ -352,7 +359,8 @@ CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,f
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	~CCubicCurve
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CCubicCurve::~CCubicCurve() {
@@ -361,7 +369,8 @@ CCubicCurve::~CCubicCurve() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	sample
-// Description			:	Sample the curves
+// Description			:
+/// \brief					Sample the curves
 // Return Value			:	-
 // Comments				:
 void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
@@ -535,7 +544,8 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurve
 // Method				:	dice
-// Description			:	Dice the curve group into smaller ones
+// Description			:
+/// \brief					Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
 void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
@@ -570,7 +580,8 @@ void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurve
 // Method				:	CLinearCurve
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	
 CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
@@ -596,7 +607,8 @@ CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurve
 // Method				:	~CLinearCurve
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CLinearCurve::~CLinearCurve() {
@@ -605,7 +617,8 @@ CLinearCurve::~CLinearCurve() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurve
 // Method				:	sample
-// Description			:	Sample the curves
+// Description			:
+/// \brief					Sample the curves
 // Return Value			:	-
 // Comments				:
 void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
@@ -694,7 +707,8 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurve
 // Method				:	split
-// Description			:	Dice the curve group into smaller ones
+// Description			:
+/// \brief					Dice the curve group into smaller ones
 // Return Value			:	-
 // Comments				:
 void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
@@ -724,7 +738,8 @@ void			CLinearCurve::splitToChildren(CShadingContext *rasterizer) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CCurveMesh
-// Description			:	CCurveMesh
+// Description			:
+/// \brief					CCurveMesh
 // Return Value			:	Ctor
 // Comments				:	-
 CCurveMesh::CCurveMesh(CAttributes *a,CXform *x,CPl *c,int d,int nv,int nc,int *nve,int w) : CObject(a,x) {
@@ -871,7 +886,8 @@ CCurveMesh::~CCurveMesh() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CCurveMesh
-// Description			:	instantiate
+// Description			:
+/// \brief					instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
 void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
@@ -887,7 +903,8 @@ void	CCurveMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurveMesh
 // Method				:	dice
-// Description			:	Dice the primitive
+// Description			:
+/// \brief					Dice the primitive
 // Return Value			:	-
 // Comments				:
 void	CCurveMesh::dice(CShadingContext *rasterizer) {
@@ -901,7 +918,8 @@ void	CCurveMesh::dice(CShadingContext *rasterizer) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurveMesh
 // Method				:	dice
-// Description			:	Dice the primitive
+// Description			:
+/// \brief					Dice the primitive
 // Return Value			:	-
 // Comments				:
 void	CCurveMesh::create(CShadingContext *context) {

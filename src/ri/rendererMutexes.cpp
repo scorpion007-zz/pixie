@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -172,7 +172,8 @@ TMutex							CRenderer::atomicMutex;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	beginMutexes
-// Description			:	Create the synchronization mutexes
+// Description			:
+/// \brief					Create the synchronization mutexes
 // Return Value			:	-
 // Comments				:
 void							CRenderer::initMutexes() {
@@ -196,7 +197,8 @@ void							CRenderer::initMutexes() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	endMutexes
-// Description			:	Delete the synchronization mutexes
+// Description			:
+/// \brief					Delete the synchronization mutexes
 // Return Value			:	-
 // Comments				:
 void							CRenderer::shutdownMutexes() {

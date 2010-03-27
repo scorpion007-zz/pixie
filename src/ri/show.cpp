@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	show.cpp
 //  Classes				:	-
-//  Description			:	The hardware visualizer
+//  Description			:
+/// \brief					The hardware visualizer
 //
 ////////////////////////////////////////////////////////////////////////
 #include "show.h"
@@ -49,7 +50,8 @@ TGlFileFunction			CView::drawFile			=	NULL;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
 // Method				:	CShow
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CShow::CShow(int thread) : CShadingContext(thread) {
@@ -151,7 +153,8 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
 // Method				:	~CShow
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CShow::~CShow() {
@@ -160,7 +163,8 @@ CShow::~CShow() {
 ///////////////////////////////////////////////////////////////////////
 // Class                :   CShow
 // Method               :   preDisplaySetup
-// Description          :   allow the hider to affect display setup
+// Description          :
+/// \brief					allow the hider to affect display setup
 // Return Value         :   -
 // Comments             :
 void CShow::preDisplaySetup() {

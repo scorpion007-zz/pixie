@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	hcshader.cpp
 //  Classes				:	-
-//  Description			:	This file holds the hardcoded shaders
+//  Description			:
+/// \brief					This file holds the hardcoded shaders
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -43,7 +44,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	CSphereLight
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CSphereLight::CSphereLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
@@ -61,7 +63,8 @@ CSphereLight::CSphereLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	~CSphereLight
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CSphereLight::~CSphereLight() {
@@ -71,7 +74,8 @@ CSphereLight::~CSphereLight() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	illuminate
-// Description			:	Called when we need to illuminate a point
+// Description			:
+/// \brief					Called when we need to illuminate a point
 // Return Value			:	-
 // Comments				:
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
@@ -203,7 +207,8 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	setParameters
-// Description			:	Set shader parameters
+// Description			:
+/// \brief					Set shader parameters
 // Return Value			:	-
 // Comments				:
 void					CSphereLight::setParameters(int n,const char **params,const void **vals) {
@@ -237,7 +242,8 @@ void					CSphereLight::setParameters(int n,const char **params,const void **vals
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	getParameter
-// Description			:	Query a shader parameter
+// Description			:
+/// \brief					Query a shader parameter
 // Return Value			:	-
 // Comments				:
 int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*) {
@@ -274,9 +280,11 @@ int						CSphereLight::getParameter(const char *param,void *val,CVariable**,int*
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	execute
-// Description			:	Execute the shader
+// Description			:
+/// \brief					Execute the shader
 // Return Value			:	-
-// Comments				:	Should never be called
+// Comments				:
+/// \note					Should never be called
 void					CSphereLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
@@ -285,7 +293,8 @@ void					CSphereLight::execute(CShadingContext *context,float **locals) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	requiredParameters
-// Description			:	Get the required parameters
+// Description			:
+/// \brief					Get the required parameters
 // Return Value			:	-
 // Comments				:
 unsigned int			CSphereLight::requiredParameters() {
@@ -295,7 +304,8 @@ unsigned int			CSphereLight::requiredParameters() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
 // Method				:	getName
-// Description			:	Get the name of the shader
+// Description			:
+/// \brief					Get the name of the shader
 // Return Value			:	-
 // Comments				:
 const char				*CSphereLight::getName() {
@@ -328,7 +338,8 @@ const char				*CSphereLight::getName() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	CQuadLight
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
@@ -379,7 +390,8 @@ CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	~CQuadLight
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CQuadLight::~CQuadLight() {
@@ -389,7 +401,8 @@ CQuadLight::~CQuadLight() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	illuminate
-// Description			:	Called chen we need to illuminate a point
+// Description			:
+/// \brief					Called chen we need to illuminate a point
 // Return Value			:	-
 // Comments				:
 void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
@@ -543,7 +556,8 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	setParameters
-// Description			:	Set shader parameters
+// Description			:
+/// \brief					Set shader parameters
 // Return Value			:	-
 // Comments				:
 void					CQuadLight::setParameters(int n,const char **params,const void **vals) {
@@ -589,7 +603,8 @@ void					CQuadLight::setParameters(int n,const char **params,const void **vals) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	getParameter
-// Description			:	Query a shader parameter
+// Description			:
+/// \brief					Query a shader parameter
 // Return Value			:	-
 // Comments				:
 int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) {
@@ -641,9 +656,11 @@ int						CQuadLight::getParameter(const char *param,void *val,CVariable**,int*) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	execute
-// Description			:	Execute the shader
+// Description			:
+/// \brief					Execute the shader
 // Return Value			:	-
-// Comments				:	Should never be called
+// Comments				:
+/// \note					Should never be called
 void					CQuadLight::execute(CShadingContext *context,float **locals) {
 	// Should never be called
 	assert(FALSE);
@@ -652,7 +669,8 @@ void					CQuadLight::execute(CShadingContext *context,float **locals) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	requiredParameters
-// Description			:	Get the required parameters
+// Description			:
+/// \brief					Get the required parameters
 // Return Value			:	-
 // Comments				:
 unsigned int			CQuadLight::requiredParameters() {
@@ -662,7 +680,8 @@ unsigned int			CQuadLight::requiredParameters() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
 // Method				:	getName
-// Description			:	Get the name of the shader
+// Description			:
+/// \brief					Get the name of the shader
 // Return Value			:	-
 // Comments				:
 const char				*CQuadLight::getName() {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	objectMisc.h
 //  Classes				:	-
-//  Description			:	Some misc inline functions
+//  Description			:
+/// \brief					Some misc inline functions
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef OBJECTMISC_H
@@ -33,7 +34,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	transform
-// Description			:	Transform bunch of points from one space to another
+// Description			:
+/// \brief					Transform bunch of points from one space to another
 // Return Value			:
 // Comments				:
 inline	void	transform(float *dest,const float *src,int num,const float *from) {
@@ -48,9 +50,11 @@ inline	void	transform(float *dest,const float *src,int num,const float *from) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	transform
-// Description			:	Transform bunch of points from one space to another
+// Description			:
+/// \brief					Transform bunch of points from one space to another
 // Return Value			:
-// Comments				:	In place version of the one above
+// Comments				:
+/// \note					In place version of the one above
 inline	void	transform(float *src,int num,const float *from) {
 	int		i;
 
@@ -62,9 +66,11 @@ inline	void	transform(float *src,int num,const float *from) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	transform
-// Description			:	Transform bunch of points from one space to another
+// Description			:
+/// \brief					Transform bunch of points from one space to another
 // Return Value			:
-// Comments				:	This one also interpolates with a time constant
+// Comments				:
+/// \note					This one also interpolates with a time constant
 inline	void	transform(float *src,int num,const float *from0,const float *from1,const float *time) {
 	int		i;
 	vector	tmp0,tmp1;
@@ -81,7 +87,8 @@ inline	void	transform(float *src,int num,const float *from0,const float *from1,c
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	vtransform
-// Description			:	Transform bunch of vectors from one space to another
+// Description			:
+/// \brief					Transform bunch of vectors from one space to another
 // Return Value			:
 // Comments				:
 inline	void	vtransform(float *src,int num,const float *from) {
@@ -95,9 +102,11 @@ inline	void	vtransform(float *src,int num,const float *from) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	vtransform
-// Description			:	Transform bunch of vectors from one space to another
+// Description			:
+/// \brief					Transform bunch of vectors from one space to another
 // Return Value			:
-// Comments				:	This one also interpolates with a time constant
+// Comments				:
+/// \note					This one also interpolates with a time constant
 inline	void	vtransform(float *src,int num,const float *from0,const float *from1,const float *time) {
 	vector	tmp0,tmp1;
 	int		i;
@@ -112,7 +121,8 @@ inline	void	vtransform(float *src,int num,const float *from0,const float *from1,
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ntransform
-// Description			:	Transform bunch of normals from one space to another
+// Description			:
+/// \brief					Transform bunch of normals from one space to another
 // Return Value			:
 // Comments				:
 inline	void	ntransform(float *src,int num,const float *to) {
@@ -126,9 +136,11 @@ inline	void	ntransform(float *src,int num,const float *to) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ntransform
-// Description			:	Transform bunch of normals from one space to another
+// Description			:
+/// \brief					Transform bunch of normals from one space to another
 // Return Value			:
-// Comments				:	This one also interpolates with a time constant
+// Comments				:
+/// \note					This one also interpolates with a time constant
 inline	void	ntransform(float *src,int num,const float *to0,const float *to1,const float *time) {
 	vector	tmp0,tmp1;
 	int		i;
@@ -143,7 +155,8 @@ inline	void	ntransform(float *src,int num,const float *to0,const float *to1,cons
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	interpolate
-// Description			:	Interpolate bunch of floats
+// Description			:
+/// \brief					Interpolate bunch of floats
 // Return Value			:
 // Comments				:
 inline	void	interpolate(int num,float *src0,const float *src1,const float *time) {
@@ -159,7 +172,8 @@ inline	void	interpolate(int num,float *src0,const float *src1,const float *time)
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	interpolate
-// Description			:	Interpolate bunch of points
+// Description			:
+/// \brief					Interpolate bunch of points
 // Return Value			:
 // Comments				:
 inline	void	interpolate3(int num,float *src0,const float *src1,const float *time) {
@@ -177,7 +191,8 @@ inline	void	interpolate3(int num,float *src0,const float *src1,const float *time
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	transform
-// Description			:	Transform a ray
+// Description			:
+/// \brief					Transform a ray
 // Return Value			:
 // Comments				:
 inline	void	transform(float *oFrom,float *oDir,const CXform *xform,CRay *ray) {

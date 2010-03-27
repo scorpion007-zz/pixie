@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	simd.h
 //  Classes				:	-
-//  Description			:	The simd operations
+//  Description			:
+/// \brief					The simd operations
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef SIMD_H

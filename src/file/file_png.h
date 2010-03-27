@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	file_png.h
 //  Classes				:
-//  Description			:	This file implements the PNG writer output device
+//  Description			:
+/// \brief					This file implements the PNG writer output device
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferPNG
-// Description			:	Holds the framebuffer
+// Description			:
+/// \brief					Holds the framebuffer
 // Comments				:
 class	CFileFramebufferPNG: public CFileFramebuffer {
 public:

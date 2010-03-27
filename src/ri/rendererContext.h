@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	renderer.h
 //  Classes				:	CRendererContext
-//  Description			:	This file defines the main renderer interface
+//  Description			:
+/// \brief					This file defines the main renderer interface
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef RENDERER_H
@@ -55,7 +56,8 @@ class	CNetFileMapping;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
-// Description			:	Holds the global rendering context
+// Description			:
+/// \brief					Holds the global rendering context
 // Comments				:
 class	CRendererContext : public CRiInterface {
 public:
@@ -221,7 +223,8 @@ private:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CInstance
-	// Description			:	This class is allocated at objectBegin only to hold
+	// Description			:
+/// \brief					This class is allocated at objectBegin only to hold
 	//							a list of objects
 	// Comments				:
 	class	CInstance {

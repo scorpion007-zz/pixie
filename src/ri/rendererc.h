@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	rendererc,h
 //  Classes				:	-
-//  Description			:	This file holds some global types used by the renderer
+//  Description			:
+/// \brief					This file holds some global types used by the renderer
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef RENDERER_CONSTANTS

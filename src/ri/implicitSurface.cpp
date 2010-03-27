@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	CImplicit
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float ss,float sf) : CSurface(a,x) {
@@ -83,7 +84,8 @@ CImplicit::CImplicit(CAttributes *a,CXform *x,int frame,const char *name,float s
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	~CImplicit
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CImplicit::~CImplicit() {
@@ -100,7 +102,8 @@ CImplicit::~CImplicit() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	intersect
-// Description			:	Intersect the surface with the ray
+// Description			:
+/// \brief					Intersect the surface with the ray
 // Return Value			:	-
 // Comments				:
 void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
@@ -178,7 +181,8 @@ martchLoop:;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	sample
-// Description			:	Sample the surface
+// Description			:
+/// \brief					Sample the surface
 // Return Value			:	-
 // Comments				:
 void					CImplicit::sample(int,int,float **,float ***,unsigned int &up) const {
@@ -188,7 +192,8 @@ void					CImplicit::sample(int,int,float **,float ***,unsigned int &up) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	interpolate
-// Description			:	Interpolate the surface
+// Description			:
+/// \brief					Interpolate the surface
 // Return Value			:	-
 // Comments				:
 void					CImplicit::interpolate(int,float **,float ***)	const {
@@ -206,7 +211,8 @@ void					CImplicit::dice(CShadingContext *) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	instantiate
-// Description			:	Create a copy
+// Description			:
+/// \brief					Create a copy
 // Return Value			:	-
 // Comments				:
 void					CImplicit::instantiate(CAttributes *a,CXform *x,CRendererContext *context) const {
@@ -216,7 +222,8 @@ void					CImplicit::instantiate(CAttributes *a,CXform *x,CRendererContext *conte
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
 // Method				:	shade
-// Description			:	Shade the surface
+// Description			:
+/// \brief					Shade the surface
 // Return Value			:	-
 // Comments				:
 void					CImplicit::shade(CShadingContext *context,int numRays,CRay **rays) {

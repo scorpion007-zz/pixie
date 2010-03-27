@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -35,7 +35,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	~COcclusionCuller
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 COcclusionCuller::COcclusionCuller() {
@@ -44,7 +45,8 @@ COcclusionCuller::COcclusionCuller() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	~COcclusionCuller
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 COcclusionCuller::~COcclusionCuller() {
@@ -53,7 +55,8 @@ COcclusionCuller::~COcclusionCuller() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	COcclusionCuller
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 void	COcclusionCuller::initCuller(int w,float *ma) {
@@ -71,7 +74,8 @@ void	COcclusionCuller::initCuller(int w,float *ma) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	reset
-// Description			:	Reset the occlusion hierarchy
+// Description			:
+/// \brief					Reset the occlusion hierarchy
 // Return Value			:	-
 // Comments				:
 void	COcclusionCuller::resetHierarchy(COcclusionNode *cNode) {
@@ -91,7 +95,8 @@ void	COcclusionCuller::resetHierarchy(COcclusionNode *cNode) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	reset
-// Description			:	Reset the occlusion hierarchy
+// Description			:
+/// \brief					Reset the occlusion hierarchy
 // Return Value			:	-
 // Comments				:
 void	COcclusionCuller::initToZero() {
@@ -117,7 +122,8 @@ void	COcclusionCuller::initToZero() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	newNode
-// Description			:	Allocate a new occlusion node
+// Description			:
+/// \brief					Allocate a new occlusion node
 // Return Value			:	-
 // Comments				:
 COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,int w,int d,int nodeOffset,int x,int y) {
@@ -154,7 +160,8 @@ COcclusionCuller::COcclusionNode	*COcclusionCuller::newNode(COcclusionNode *p,in
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
 // Method				:	probeRect
-// Description			:	descover whether a region would be culled
+// Description			:
+/// \brief					descover whether a region would be culled
 // Return Value			:	-
 // Comments				:
 int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl, int bt, float zmin) {

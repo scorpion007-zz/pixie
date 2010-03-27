@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	file_tiff.h
 //  Classes				:
-//  Description			:	This file implements the TIFF writer output device
+//  Description			:
+/// \brief					This file implements the TIFF writer output device
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferTIFF
-// Description			:	Holds the framebuffer
+// Description			:
+/// \brief					Holds the framebuffer
 // Comments				:
 class	CFileFramebufferTIFF: public CFileFramebuffer {
 public:

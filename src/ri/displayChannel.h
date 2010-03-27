@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -56,7 +56,8 @@ typedef enum {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplayChannel
-// Description			:	Holds information on a display channel
+// Description			:
+/// \brief					Holds information on a display channel
 // Comments				:	if variable is NULL and entry is -1 this is
 //						:	one of the standard rgbaz channels
 //						:	sampleStart is filled at render time

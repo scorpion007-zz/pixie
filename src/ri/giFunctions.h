@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	giFunctions.h
 //  Classes				:	-
-//  Description			:	Shading language Global Illumination functions
+//  Description			:
+/// \brief					Shading language Global Illumination functions
 //
 ////////////////////////////////////////////////////////////////////////
 

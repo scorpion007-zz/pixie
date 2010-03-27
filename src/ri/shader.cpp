@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -26,7 +26,8 @@
 //  File				:	shader.cpp
 //  Classes				:	CShader
 //							CShaderInstance
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include	<math.h>
@@ -47,7 +48,8 @@
 ///////////////////////////////////////////////////////////////////////	
 // Class				:	CShader
 // Method				:	CShader
-// Description			:	Constructor
+// Description			:
+/// \brief					Constructor
 // Return Value			:	-
 // Comments				:
 CShader::CShader(const char *name) : CFileResource(name) {
@@ -67,7 +69,8 @@ CShader::CShader(const char *name) : CFileResource(name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShader
 // Method				:	~CShader
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CShader::~CShader() {
@@ -104,7 +107,8 @@ CShader::~CShader() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShader
 // Method				:	analyse
-// Description			:	work out if there are special parameters
+// Description			:
+/// \brief					work out if there are special parameters
 // Return Value			:	-
 // Comments				:
 void CShader::analyse() {
@@ -156,7 +160,8 @@ void CShader::analyse() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderInstance
 // Method				:	CShaderInstance
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
@@ -174,7 +179,8 @@ CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderInstance
 // Method				:	CShaderInstance
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CShaderInstance::~CShaderInstance() {
@@ -233,7 +239,8 @@ static char	*token(char **str,const char *tok) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderInstance
 // Method				:	CShaderInstance
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 void CShaderInstance::createCategories() {
@@ -275,7 +282,8 @@ void CShaderInstance::createCategories() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	CProgrammableShaderInstance
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes *a,CXform *x) : CShaderInstance(a,x) {
@@ -309,7 +317,8 @@ CProgrammableShaderInstance::CProgrammableShaderInstance(CShader *p,CAttributes 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	~CProgrammableShaderInstance
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CProgrammableShaderInstance::~CProgrammableShaderInstance() {
@@ -344,7 +353,8 @@ CProgrammableShaderInstance::~CProgrammableShaderInstance() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	setParameters
-// Description			:	Set the values of the parameters
+// Description			:
+/// \brief					Set the values of the parameters
 // Return Value			:	-
 // Comments				:
 int	CProgrammableShaderInstance::setParameter(const char *param,const void *val) {
@@ -467,7 +477,8 @@ int	CProgrammableShaderInstance::setParameter(const char *param,const void *val)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	setParameters
-// Description			:	Set the values of the parameters
+// Description			:
+/// \brief					Set the values of the parameters
 // Return Value			:	-
 // Comments				:
 void	CProgrammableShaderInstance::setParameters(int np,const char **params,const void **vals) {
@@ -493,7 +504,8 @@ void	CProgrammableShaderInstance::setParameters(int np,const char **params,const
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	getParameter
-// Description			:	Get the current value of a parameter
+// Description			:
+/// \brief					Get the current value of a parameter
 // Return Value			:	TRUE if successful, FALSE othervise
 // Comments				:	The second void * must be float *
 //							if the type of the parameter is float/vector/matrix
@@ -599,7 +611,8 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	execute
-// Description			:	Actually execute the shader
+// Description			:
+/// \brief					Actually execute the shader
 // Return Value			:	-
 // Comments				:
 void			CProgrammableShaderInstance::execute(CShadingContext *context,float **locals) {
@@ -609,7 +622,8 @@ void			CProgrammableShaderInstance::execute(CShadingContext *context,float **loc
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	requiredParameters
-// Description			:	Return the required parameters
+// Description			:
+/// \brief					Return the required parameters
 // Return Value			:	-
 // Comments				:
 unsigned int	CProgrammableShaderInstance::requiredParameters() {
@@ -621,7 +635,8 @@ unsigned int	CProgrammableShaderInstance::requiredParameters() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	getName
-// Description			:	Get the name of the shader
+// Description			:
+/// \brief					Get the name of the shader
 // Return Value			:	-
 // Comments				:
 const char		*CProgrammableShaderInstance::getName() {
@@ -631,7 +646,8 @@ const char		*CProgrammableShaderInstance::getName() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	illuminate
-// Description			:	Illuminate the shading state is a lightsource shader
+// Description			:
+/// \brief					Illuminate the shading state is a lightsource shader
 // Return Value			:	-
 // Comments				:
 void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **locals) {
@@ -646,7 +662,8 @@ void			CProgrammableShaderInstance::illuminate(CShadingContext *context,float **
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
 // Method				:	prepare
-// Description			:	Allocate the cache and set the parameter defaults
+// Description			:
+/// \brief					Allocate the cache and set the parameter defaults
 // Return Value			:	-
 // Comments				:
 float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **varying,int numVertices) {
@@ -754,9 +771,11 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	debugFunction
-// Description			:	This function is used to debugging purposes
+// Description			:
+/// \brief					This function is used to debugging purposes
 // Return Value			:	-
-// Comments				:	You can trigger this function from the compiled shader
+// Comments				:
+/// \note					You can trigger this function from the compiled shader
 //							code by debug ("f=o")
 void	debugFunction(float *op) {
 	fprintf(stderr,"Debug\n");

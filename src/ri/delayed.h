@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -36,7 +36,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedData
-// Description			:	This is a simple container used by the rib interface for procedural dynamic objects
+// Description			:
+/// \brief					This is a simple container used by the rib interface for procedural dynamic objects
 // Comments				:
 class	CDelayedData {
 public:
@@ -57,7 +58,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedObject
-// Description			:	Contains a delayed object
+// Description			:
+/// \brief					Contains a delayed object
 // Comments				:
 class	CDelayedObject : public CObject {
 public:
@@ -82,7 +84,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDelayedInstance
-// Description			:	Contains an instance object
+// Description			:
+/// \brief					Contains an instance object
 // Comments				:
 class	CDelayedInstance : public CObject {
 public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	ri_config.h
 //  Classes				:
-//  Description			:	This file contains the libri config settings
+//  Description			:
+/// \brief					This file contains the libri config settings
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef CONFIG_H

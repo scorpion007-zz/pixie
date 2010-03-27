@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	options.cpp
 //  Classes				:	COptions
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -48,7 +49,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	optionsDeleteSearchPath
-// Description			:	Delete the searchpath
+// Description			:
+/// \brief					Delete the searchpath
 // Return Value			:	-
 // Comments				:
 static	void		optionsDeleteSearchPath(TSearchpath *cPath) {
@@ -65,7 +67,8 @@ static	void		optionsDeleteSearchPath(TSearchpath *cPath) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	optionsCloneSearchPath
-// Description			:	Clone a search path
+// Description			:
+/// \brief					Clone a search path
 // Return Value			:	-
 // Comments				:
 static	TSearchpath	*optionsCloneSearchPath(TSearchpath *cPath) {
@@ -94,7 +97,8 @@ static	TSearchpath	*optionsCloneSearchPath(TSearchpath *cPath) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions::CDisplay
 // Method				:	CDisplay
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 COptions::CDisplay::CDisplay() {
@@ -116,7 +120,8 @@ COptions::CDisplay::CDisplay() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions::CDisplay
 // Method				:	CDisplay
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 COptions::CDisplay::CDisplay(const CDisplay *other) {
@@ -180,7 +185,8 @@ COptions::CDisplay::CDisplay(const CDisplay *other) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions::CDisplay
 // Method				:	~CDisplay
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 COptions::CDisplay::~CDisplay() {
@@ -213,7 +219,8 @@ COptions::CDisplay::~CDisplay() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions::CClipPlane
 // Method				:	CCplitPlane
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 COptions::CClipPlane::CClipPlane() {
@@ -223,7 +230,8 @@ COptions::CClipPlane::CClipPlane() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions::CClipPlane
 // Method				:	CCplitPlane
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
@@ -235,7 +243,8 @@ COptions::CClipPlane::CClipPlane(const CClipPlane *other) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	COptions
-// Description			:	All the default frame specific settings are defined here
+// Description			:
+/// \brief					All the default frame specific settings are defined here
 // Return Value			:	-
 // Comments				:
 COptions::COptions() {
@@ -426,7 +435,8 @@ COptions::COptions() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	COptions
-// Description			:	Create an exact copy of another options block
+// Description			:
+/// \brief					Create an exact copy of another options block
 // Return Value			:	-
 // Comments				:
 COptions::COptions(const COptions *o) {
@@ -500,7 +510,8 @@ COptions::COptions(const COptions *o) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	~COptions
-// Description			:	Destructor
+// Description			:
+/// \brief					Destructor
 // Return Value			:	-
 // Comments				:
 COptions::~COptions(){
@@ -553,7 +564,8 @@ COptions::~COptions(){
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	convertColor
-// Description			:	Convert color to RGB space from whatever space entered
+// Description			:
+/// \brief					Convert color to RGB space from whatever space entered
 // Return Value			:	-
 // Comments				:
 void	COptions::convertColor(vector &c,const float *f)	const	{
@@ -575,7 +587,8 @@ void	COptions::convertColor(vector &c,const float *f)	const	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	pickSearchpath
-// Description			:	Pick a searchpath from name
+// Description			:
+/// \brief					Pick a searchpath from name
 // Return Value			:	-
 // Comments				:
 TSearchpath		*COptions::pickSearchpath(const char *name) {
@@ -614,7 +627,8 @@ TSearchpath		*COptions::pickSearchpath(const char *name) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	optionsGetSearchPath
-// Description			:	Get the searchpath
+// Description			:
+/// \brief					Get the searchpath
 // Return Value			:	-
 // Comments				:
 TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
@@ -733,7 +747,8 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
 // Method				:	find
-// Description			:	Find the value of a particular option
+// Description			:
+/// \brief					Find the value of a particular option
 // Return Value			:	-
 // Comments				:
 int			COptions::find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const {

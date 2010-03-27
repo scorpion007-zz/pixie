@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	xform.cpp
 //  Classes				:	CXform
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
@@ -38,9 +39,11 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	CXform
-// Description			:	Constructor
+// Description			:
+/// \brief					Constructor
 // Return Value			:	-
-// Comments				:	Identity at the beginning
+// Comments				:
+/// \note					Identity at the beginning
 CXform::CXform() {
 	atomicIncrement(&stats.numXforms);
 
@@ -54,7 +57,8 @@ CXform::CXform() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	CXform
-// Description			:	Create an exact copy of another xform
+// Description			:
+/// \brief					Create an exact copy of another xform
 // Return Value			:	-
 // Comments				:	
 CXform::CXform(CXform *a) {
@@ -73,7 +77,8 @@ CXform::CXform(CXform *a) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	~CXform
-// Description			:	Destructor
+// Description			:
+/// \brief					Destructor
 // Return Value			:	-
 // Comments				:	
 CXform::~CXform() {
@@ -86,7 +91,8 @@ CXform::~CXform() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	restore
-// Description			:	Restore from a saved Xform
+// Description			:
+/// \brief					Restore from a saved Xform
 // Return Value			:	-
 // Comments				:
 void	CXform::restore(const CXform *xform) {
@@ -111,7 +117,8 @@ void	CXform::restore(const CXform *xform) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	identity
-// Description			:	Initialize the transformation to identity
+// Description			:
+/// \brief					Initialize the transformation to identity
 // Return Value			:	-
 // Comments				:
 void	CXform::identity() {
@@ -141,7 +148,8 @@ void	CXform::translate(float dx,float dy,float dz) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	rotate
-// Description			:	Append a rotation
+// Description			:
+/// \brief					Append a rotation
 // Return Value			:	-
 // Comments				:
 void	CXform::rotate(float angle,float x,float y,float z) {
@@ -160,7 +168,8 @@ void	CXform::rotate(float angle,float x,float y,float z) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	scale
-// Description			:	Append a scale
+// Description			:
+/// \brief					Append a scale
 // Return Value			:	-
 // Comments				:
 void	CXform::scale(float sx,float sy,float sz) {
@@ -181,7 +190,8 @@ void	CXform::scale(float sx,float sy,float sz) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	skew
-// Description			:	Append a skew
+// Description			:
+/// \brief					Append a skew
 // Return Value			:	-
 // Comments				:
 void	CXform::skew(float angle,float dx1,float dy1,float dz1,float dx2,float dy2,float dz2) {
@@ -224,7 +234,8 @@ void	CXform::concat(CXform *x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	invert
-// Description			:	Invert the transformation
+// Description			:
+/// \brief					Invert the transformation
 // Return Value			:	-
 // Comments				:
 void	CXform::invert() {
@@ -239,7 +250,8 @@ void	CXform::invert() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	transformBound
-// Description			:	Transfer the bounding box from one system to another
+// Description			:
+/// \brief					Transfer the bounding box from one system to another
 // Return Value			:	-
 // Comments				:
 void	CXform::transformBound(float *bmin,float *bmax) const {
@@ -324,7 +336,8 @@ void	CXform::transformBound(float *bmin,float *bmax) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	invTransformBound
-// Description			:	Transfer the bounding box from one system to another
+// Description			:
+/// \brief					Transfer the bounding box from one system to another
 // Return Value			:	-
 // Comments				:
 void	CXform::invTransformBound(float *bmin,float *bmax) const {
@@ -409,7 +422,8 @@ void	CXform::invTransformBound(float *bmin,float *bmax) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	transformBound
-// Description			:	This function is used to transform a bounding box
+// Description			:
+/// \brief					This function is used to transform a bounding box
 // Return Value			:	-
 // Comments				:
 void	transformBound(float *lbmin,float *lbmax,const float *to,const float *bmin,const float *bmax) {
@@ -453,7 +467,8 @@ void	transformBound(float *lbmin,float *lbmax,const float *to,const float *bmin,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXform
 // Method				:	updateBound
-// Description			:	Update the bounding box
+// Description			:
+/// \brief					Update the bounding box
 // Return Value			:	-
 // Comments				:
 void		CXform::updateBound(float *bmin,float *bmax,int numPoints,const float *P) {

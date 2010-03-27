@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloudPoint
-// Description			:	A point cloud point
+// Description			:
+/// \brief					A point cloud point
 // Comments				:
 class	CPointCloudPoint : public CMapItem {
 public:
@@ -50,7 +51,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
-// Description			:	A collection of points
+// Description			:
+/// \brief					A collection of points
 // Comments				:
 class	CPointCloud : public CTexture3d, public CMap<CPointCloudPoint> {
 public:
@@ -83,7 +85,8 @@ private:
 
 							///////////////////////////////////////////////////////////////////////
 							// Class				:	CPointLookup
-							// Description			:	Extend the CLookup to include extra info
+							// Description			:
+/// \brief					Extend the CLookup to include extra info
 							// Comments				:
 							class	CPointLookup : public CLookup {
 							public:
@@ -93,7 +96,8 @@ private:
 							///////////////////////////////////////////////////////////////////////
 							// Class				:	CMap
 							// Method				:	lookup
-							// Description			:	Locate the nearest valid points
+							// Description			:
+/// \brief					Locate the nearest valid points
 							// Return Value			:	Internally used
 							// Comments				:
 					void	lookup(CPointLookup *l,int index,const float scale) {

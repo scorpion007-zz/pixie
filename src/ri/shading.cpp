@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -102,7 +102,8 @@ const	char	*rayLabelGather				=	"gather";
 // Function				:	complete
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 inline void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes1,const CAttributes *attributes2) {
 	int		i;
 
@@ -260,7 +261,8 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 // Function				:	complete
 // Description			:	This function fills in the missing data (not filled by the object) from attributes
 // Return Value			:
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 inline	void	complete(int num,float **varying,unsigned int usedParameters,const CAttributes *attributes) {
 	int		i;
 
@@ -387,7 +389,8 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	CShadingContext
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CShadingContext::CShadingContext(int t) : thread(t) {
@@ -443,7 +446,8 @@ CShadingContext::CShadingContext(int t) : thread(t) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	~CShadingContext
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CShadingContext::~CShadingContext() {
@@ -508,7 +512,8 @@ CShadingContext::~CShadingContext() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	renderPrimitive
-// Description			:	Add an object into the scene
+// Description			:
+/// \brief					Add an object into the scene
 // Return Value			:
 // Comments				:
 void	CShadingContext::drawObject(CObject *cObject) {
@@ -525,7 +530,8 @@ void	CShadingContext::drawObject(CObject *cObject) {
 // Method				:	shade2D
 // Description			:	Sample/Shade bunch of points
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 //
 //
 //
@@ -1162,7 +1168,8 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	newState
-// Description			:	Allocate a new shading state
+// Description			:
+/// \brief					Allocate a new shading state
 // Return Value			:	-
 // Comments				:
 CShadingState	*CShadingContext::newState() {
@@ -1226,7 +1233,8 @@ CShadingState	*CShadingContext::newState() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	newState
-// Description			:	Allocate a new shading state
+// Description			:
+/// \brief					Allocate a new shading state
 // Return Value			:	-
 // Comments				:
 void				CShadingContext::deleteState(CShadingState *cState) {
@@ -1238,7 +1246,8 @@ void				CShadingContext::deleteState(CShadingState *cState) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	freeState
-// Description			:	Ditch a shading state
+// Description			:
+/// \brief					Ditch a shading state
 // Return Value			:	-
 // Comments				:
 void			CShadingContext::freeState(CShadingState *cState) {
@@ -1275,7 +1284,8 @@ void			CShadingContext::freeState(CShadingState *cState) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	variableUpdate
-// Description			:	This function is called to signal that there has been
+// Description			:
+/// \brief					This function is called to signal that there has been
 //							a modification on the set of active variables
 // Return Value			:	-
 // Comments				:
@@ -1298,7 +1308,8 @@ void		CShadingContext::updateState() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	saveState
-// Description			:	Save the shading state so a nested tesselation
+// Description			:
+/// \brief					Save the shading state so a nested tesselation
 //							doesn't trash our variables
 // Return Value			:	an opaque shading state reference
 // Comments				:
@@ -1315,7 +1326,8 @@ void	*CShadingContext::saveState() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	restoreState
-// Description			:	Restore the shading state from a previous save
+// Description			:
+/// \brief					Restore the shading state from a previous save
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::restoreState(void *state) {
@@ -1331,7 +1343,8 @@ void	CShadingContext::restoreState(void *state) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	surfaceParameter
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
@@ -1345,7 +1358,8 @@ int		CShadingContext::surfaceParameter(void *dest,const char *name,CVariable **v
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	displacementParameter
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::displacementParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
@@ -1360,7 +1374,8 @@ int		CShadingContext::displacementParameter(void *dest,const char *name,CVariabl
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	atmosphereParameter
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
@@ -1374,7 +1389,8 @@ int		CShadingContext::atmosphereParameter(void *dest,const char *name,CVariable 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	incidentParameter
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
@@ -1388,7 +1404,8 @@ int		CShadingContext::incidentParameter(void *dest,const char *name,CVariable **
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	oppositeParameter
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **var,int *globalIndex) {
@@ -1402,7 +1419,8 @@ int		CShadingContext::oppositeParameter(void *dest,const char *name,CVariable **
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	options
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
@@ -1517,7 +1535,8 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	attributes
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *) {
@@ -1592,7 +1611,8 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	rendererInfo
-// Description			:	Execute light sources
+// Description			:
+/// \brief					Execute light sources
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int *) {
@@ -1616,7 +1636,8 @@ int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	shaderName
-// Description			:	Get the name of the shader
+// Description			:
+/// \brief					Get the name of the shader
 // Return Value			:	-
 // Comments				:
 const char	*CShadingContext::shaderName() {
@@ -1628,7 +1649,8 @@ const char	*CShadingContext::shaderName() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	shaderName
-// Description			:	Get the name of a particular shader
+// Description			:
+/// \brief					Get the name of a particular shader
 // Return Value			:	-
 // Comments				:
 const char	*CShadingContext::shaderName(const char *type) {
@@ -1660,7 +1682,8 @@ const char	*CShadingContext::shaderName(const char *type) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	findCoordinateSystem
-// Description			:	Locate a coordinate system
+// Description			:
+/// \brief					Locate a coordinate system
 // Return Value			:	-
 // Comments				:	Sometimes we just don't care about what system it is
 void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to) {
@@ -1672,7 +1695,8 @@ void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	findCoordinateSystem
-// Description			:	Locate a coordinate system
+// Description			:
+/// \brief					Locate a coordinate system
 // Return Value			:	-
 // Comments				:
 void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to,ECoordinateSystem &cSystem) {
@@ -1779,7 +1803,8 @@ void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	randomInit
-// Description			:	Init the random number generator
+// Description			:
+/// \brief					Init the random number generator
 // Return Value			:	-
 // Comments				:
 void			CShadingContext::randomInit(uint32_t s) {
@@ -1796,7 +1821,8 @@ void			CShadingContext::randomInit(uint32_t s) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	randomShutdown
-// Description			:	Shutdown the random number generator
+// Description			:
+/// \brief					Shutdown the random number generator
 // Return Value			:	-
 // Comments				:
 void			CShadingContext::randomShutdown() {
@@ -1805,7 +1831,8 @@ void			CShadingContext::randomShutdown() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	next_state
-// Description			:	Get the next stage for the random number generator
+// Description			:
+/// \brief					Get the next stage for the random number generator
 // Return Value			:	-
 // Comments				:
 void			CShadingContext::next_state() {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -38,7 +38,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	CTexture3d
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *tndc,int nc,CChannel *ch) : CFileResource(n) { 
@@ -67,7 +68,8 @@ CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	~CTexture3d
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTexture3d::~CTexture3d() { 
@@ -77,7 +79,8 @@ CTexture3d::~CTexture3d() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	defineChannels
-// Description			:	Define the channels
+// Description			:
+/// \brief					Define the channels
 // Return Value			:	-
 // Comments				:
 void CTexture3d::defineChannels(const char *channelDefinitions) {
@@ -143,7 +146,8 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	defineChannels
-// Description			:	Define the channels
+// Description			:
+/// \brief					Define the channels
 // Return Value			:	-
 // Comments				:	used by ptcapi, does not require RiBegin()
 void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
@@ -179,7 +183,8 @@ void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	writeChannels
-// Description			:	Write the channels to file
+// Description			:
+/// \brief					Write the channels to file
 // Return Value			:	-
 // Comments				:
 void CTexture3d::writeChannels(FILE *out) {
@@ -195,7 +200,8 @@ void CTexture3d::writeChannels(FILE *out) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	readChannels
-// Description			:	Read the channels from file
+// Description			:
+/// \brief					Read the channels from file
 // Return Value			:	-
 // Comments				:
 void CTexture3d::readChannels(FILE *in) {
@@ -216,7 +222,8 @@ void CTexture3d::readChannels(FILE *in) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	resolve
-// Description			:	Resolve the names of channels
+// Description			:
+/// \brief					Resolve the names of channels
 // Return Value			:	-
 // Comments				:
 void	CTexture3d::resolve(int n,const char **names,int *entry,int *size) {
@@ -249,7 +256,8 @@ void	CTexture3d::resolve(int n,const char **names,int *entry,int *size) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	queryChannels
-// Description			:	queryChannels
+// Description			:
+/// \brief					queryChannels
 // Return Value			:	-
 // Comments				:	FIXME and return enums, do the ptcapi conversion there
 void CTexture3d::queryChannels(int *num,const char **vartypes,const char **varnames) {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -86,7 +86,8 @@ extern	const char	*rayLabelGather;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CConditional
-// Description			:	This class is used to hold info about a conditional
+// Description			:
+/// \brief					This class is used to hold info about a conditional
 // Comments				:
 class	CConditional {
 public:
@@ -100,7 +101,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadedLight
-// Description			:	Hold a shaded light
+// Description			:
+/// \brief					Hold a shaded light
 // Comments				:	An instance of this class will be created for each execution of "solar" or "illuminate"
 class	CShadedLight {
 public:
@@ -115,7 +117,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingScratch
-// Description			:	Holds all the scratch variables
+// Description			:
+/// \brief					Holds all the scratch variables
 // Comments				:
 struct	CShadingScratch {
 public:
@@ -173,7 +176,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingState
-// Description			:	Holds a shading state at a depth
+// Description			:
+/// \brief					Holds a shading state at a depth
 // Comments				:
 class	CShadingState {
 public:
@@ -213,7 +217,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRayBundle
-// Description			:	Encapsulates a bundle of rays
+// Description			:
+/// \brief					Encapsulates a bundle of rays
 // Comments				:
 class	CRayBundle {
 public:
@@ -232,7 +237,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	TObjectHash
-// Description			:	Holds an object hash root
+// Description			:
+/// \brief					Holds an object hash root
 // Comments				:
 typedef struct TObjectHash {
 		CSurface				*object;
@@ -244,7 +250,8 @@ typedef struct TObjectHash {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
-// Description			:	Holds thread specific stuff
+// Description			:
+/// \brief					Holds thread specific stuff
 // Comments				:
 class	CShadingContext {
 public:

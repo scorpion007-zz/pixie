@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	init.cpp
 //  Classes				:	-
-//  Description			:	This file implements the shading language interpreter that runs the init code
+//  Description			:
+/// \brief					This file implements the shading language interpreter that runs the init code
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -66,7 +67,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	convertColorFrom
-// Description			:	Do color conversion
+// Description			:
+/// \brief					Do color conversion
 // Return Value			:	-
 // Comments				:
 void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
@@ -182,7 +184,8 @@ void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	convertColorTo
-// Description			:	Do color conversion
+// Description			:
+/// \brief					Do color conversion
 // Return Value			:	-
 // Comments				:
 void		convertColorTo(float *out,const float *in,ECoordinateSystem s) {

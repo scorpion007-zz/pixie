@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	random.h
 //  Classes				:	CSobol, CSphereSampler, CCosineSampler
-//  Description			:	Several random generators
+//  Description			:
+/// \brief					Several random generators
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef RANDOM_H
@@ -65,7 +66,8 @@ extern const int v_init[8][SOBOL_MAX_DIMENSION];
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSobol
-// Description			:	Sobol quasi random generator
+// Description			:
+/// \brief					Sobol quasi random generator
 // Comments				:
 template <int dimension> class CSobol {
 public:

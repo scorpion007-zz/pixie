@@ -19,7 +19,7 @@
       bind               - Debug mode binaries (only after compilation)
       tmpd               - Debug mode object files (only after compilation)
 
-      For compilation instructions, see doc/Pixie.pdf
+      For compilation instructions, see COMPILING.txt
 
 
 	Okan Arikan

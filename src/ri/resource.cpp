@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -34,7 +34,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CResource
 // Method				:	CResource
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CResource::CResource(const char *name,CAttributes *attributes,CXform *xform) {
@@ -47,7 +48,8 @@ CResource::CResource(const char *name,CAttributes *attributes,CXform *xform) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CResource
 // Method				:	CResource
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CResource::~CResource() {
@@ -59,7 +61,8 @@ CResource::~CResource() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CResource
 // Method				:	restore
-// Description			:	Restore whatever that was saved in this resource
+// Description			:
+/// \brief					Restore whatever that was saved in this resource
 // Return Value			:	-
 // Comments				:
 void	CResource::restore(CAttributes *attributes,CXform *xform) {

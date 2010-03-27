@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	brickmap.h
 //  Classes				:	CBrickMap
-//  Description			:	The implementation of a 3D texture
+//  Description			:
+/// \brief					The implementation of a 3D texture
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef BRICKMAP_H
@@ -55,15 +56,18 @@ class CBrickMapGeometry;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBrickMap
-// Description			:	Implements a 3D texture
+// Description			:
+/// \brief					Implements a 3D texture
 // Comments				:
 class	CBrickMap : public CTexture3d {
 
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CVoxel
-	// Description			:	Holds a voxel data
-	// Comments				:	The data is implicitly stored after the voxel in memory
+	// Description			:
+/// \brief					Holds a voxel data
+	// Comments				:
+/// \note					The data is implicitly stored after the voxel in memory
 	class CVoxel {
 	public:
 		CVoxel			*next;				// The next voxel in the list if incoherent
@@ -74,7 +78,8 @@ class	CBrickMap : public CTexture3d {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CBrick
-	// Description			:	Holds a brick
+	// Description			:
+/// \brief					Holds a brick
 	// Comments				:
 	class CBrick {
 	public:
@@ -86,7 +91,8 @@ class	CBrickMap : public CTexture3d {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CBrickNode
-	// Description			:	Holds a hash bucket entry for a bucket
+	// Description			:
+/// \brief					Holds a hash bucket entry for a bucket
 	// Comments				:	FIXME: We should make this structure 16 bytes (it is currently 20 bytes)
 	class CBrickNode {
 	public:

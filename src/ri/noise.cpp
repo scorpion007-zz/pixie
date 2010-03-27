@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	noise.cpp
 //  Classes				:	-
-//  Description			:	The misc noise functions
+//  Description			:
+/// \brief					The misc noise functions
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -638,7 +639,8 @@ void	pnoiseVector(float *r,const float *arg,float w,const float *periods,float w
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	cellNoiseFloat1D
-// Description			:	Fast cell noise implementation
+// Description			:
+/// \brief					Fast cell noise implementation
 // Return Value			:
 // Comments				:
 float	cellNoiseFloat(float arg) {

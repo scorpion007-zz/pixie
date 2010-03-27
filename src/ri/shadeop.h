@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	shadeop.h
 //  Classes				:
-//  Description			:	Defines misc macros for the DSO shadeops
+//  Description			:
+/// \brief					Defines misc macros for the DSO shadeops
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef SHADEOP_H

@@ -2,7 +2,8 @@
 //
 //  File				:	mathSpec.cpp
 //  Classes				:	-
-//  Description			:	This file implements some basic algebra operations
+//  Description			:
+/// \brief					This file implements some basic algebra operations
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -11,7 +12,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	det4x4
-// Description			:	4 by 4 determinant computation
+// Description			:
+/// \brief					4 by 4 determinant computation
 // Return Value			:	Determinant
 // Comments				:
 // Matrix:
@@ -42,7 +44,8 @@ static	inline double det4x4( const SCALAR_TYPE *m ) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	adjoint
-// Description			:	Compute the adjoint of a 4 by 4 matrix
+// Description			:
+/// \brief					Compute the adjoint of a 4 by 4 matrix
 // Return Value			:	-
 // Comments				:
 // Construct the adjoint matrix
@@ -90,7 +93,8 @@ static	inline void adjoint( SCALAR_TYPE *out,const SCALAR_TYPE *in) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	invert
-// Description			:	invert a 4 by 4 matrix
+// Description			:
+/// \brief					invert a 4 by 4 matrix
 // Return Value			:	Determinant
 // Comments				:
 int			invertm(SCALAR_TYPE *d,const SCALAR_TYPE *s)	{
@@ -114,7 +118,8 @@ int			invertm(SCALAR_TYPE *d,const SCALAR_TYPE *s)	{
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	skewsymm
-// Description			:	compute the skewed symmetic matrix
+// Description			:
+/// \brief					compute the skewed symmetic matrix
 // Return Value			:	-
 // Comments				:
 void	skewsymm(SCALAR_TYPE *dest,const SCALAR_TYPE *src) {
@@ -133,7 +138,8 @@ void	skewsymm(SCALAR_TYPE *dest,const SCALAR_TYPE *src) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	determinantm
-// Description			:	4 by 4 determinant computation
+// Description			:
+/// \brief					4 by 4 determinant computation
 // Return Value			:	Determinant
 // Comments				:
 SCALAR_TYPE	determinantm(const SCALAR_TYPE *r) {
@@ -142,7 +148,8 @@ SCALAR_TYPE	determinantm(const SCALAR_TYPE *r) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	identitym
-// Description			:	create identity matrix
+// Description			:
+/// \brief					create identity matrix
 // Return Value			:	-
 // Comments				:
 void	identitym(SCALAR_TYPE *r) {
@@ -158,7 +165,8 @@ void	identitym(SCALAR_TYPE *r) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	translatem
-// Description			:	create translation matrix
+// Description			:
+/// \brief					create translation matrix
 // Return Value			:	-
 // Comments				:
 void	translatem(SCALAR_TYPE *r,const SCALAR_TYPE tx,const SCALAR_TYPE ty,const SCALAR_TYPE tz) {
@@ -171,7 +179,8 @@ void	translatem(SCALAR_TYPE *r,const SCALAR_TYPE tx,const SCALAR_TYPE ty,const S
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	scalem
-// Description			:	create scale matrix
+// Description			:
+/// \brief					create scale matrix
 // Return Value			:	Determinant
 // Comments				:
 void	scalem(SCALAR_TYPE *r,const SCALAR_TYPE sx,const SCALAR_TYPE sy,const SCALAR_TYPE sz) {
@@ -184,18 +193,22 @@ void	scalem(SCALAR_TYPE *r,const SCALAR_TYPE sx,const SCALAR_TYPE sy,const SCALA
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rotatem
-// Description			:	create a rotation matrix
+// Description			:
+/// \brief					create a rotation matrix
 // Return Value			:	-
-// Comments				:	the angle is in degrees
+// Comments				:
+/// \note					the angle is in degrees
 void	rotatem(SCALAR_TYPE *r,const SCALAR_TYPE *v,const SCALAR_TYPE angle) {
 	rotatem(r,v[0],v[1],v[2],angle);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rotatem
-// Description			:	create a rotation matrix
+// Description			:
+/// \brief					create a rotation matrix
 // Return Value			:	-
-// Comments				:	the angle is in degrees
+// Comments				:
+/// \note					the angle is in degrees
 void	rotatem(SCALAR_TYPE *r,SCALAR_TYPE x,SCALAR_TYPE y,SCALAR_TYPE z,const SCALAR_TYPE angle) {
 	double	s	=	cos(angle/2);
 	double	sp	=	sin(angle/2);
@@ -234,9 +247,11 @@ void	rotatem(SCALAR_TYPE *r,SCALAR_TYPE x,SCALAR_TYPE y,SCALAR_TYPE z,const SCAL
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	skewm
-// Description			:	create a skew matrix
+// Description			:
+/// \brief					create a skew matrix
 // Return Value			:	-
-// Comments				:	the angle is in degrees
+// Comments				:
+/// \note					the angle is in degrees
 void	skewm(SCALAR_TYPE *r,const SCALAR_TYPE angle,const SCALAR_TYPE dx1,const SCALAR_TYPE dy1,const SCALAR_TYPE dz1,const SCALAR_TYPE dx2,const SCALAR_TYPE dy2,const SCALAR_TYPE dz2) {
 	VECTOR_TYPE	v1,v2,d;
 	MATRIX_TYPE	R,S,tmp,tmp2;
@@ -295,7 +310,8 @@ void	skewm(SCALAR_TYPE *r,const SCALAR_TYPE angle,const SCALAR_TYPE dx1,const SC
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rotatem
-// Description			:	create a rotation matrix
+// Description			:
+/// \brief					create a rotation matrix
 // Return Value			:	-
 // Comments				:
 void	rotatem(SCALAR_TYPE *to,const SCALAR_TYPE *from) {

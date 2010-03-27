@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcRecv
-// Description			:	Receive data from network
+// Description			:
+/// \brief					Receive data from network
 // Return Value			:
 // Comments				:
 void			CRenderer::initNetwork(const char *ribFile,const char *riNetString) {
@@ -61,7 +62,8 @@ void			CRenderer::initNetwork(const char *ribFile,const char *riNetString) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcRecv
-// Description			:	Receive data from network
+// Description			:
+/// \brief					Receive data from network
 // Return Value			:
 // Comments				:
 void			CRenderer::shutdownNetwork() {
@@ -87,7 +89,8 @@ void			CRenderer::shutdownNetwork() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcSend
-// Description			:	Send data on the network
+// Description			:
+/// \brief					Send data on the network
 // Return Value			:
 // Comments				:
 void		rcSend(SOCKET s,const void *dataToSend,int n,int toNetwork) {
@@ -131,7 +134,8 @@ void		rcSend(SOCKET s,const void *dataToSend,int n,int toNetwork) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rcRecv
-// Description			:	Receive data from network
+// Description			:
+/// \brief					Receive data from network
 // Return Value			:
 // Comments				:
 void		rcRecv(SOCKET s,void *dataToReceive,int n,int toNetwork) {
@@ -315,7 +319,8 @@ static	int		netName(sockaddr_in *address,const char *orgName) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	sendFile
-// Description			:	Send a file over the network to the server
+// Description			:
+/// \brief					Send a file over the network to the server
 // Return Value			:
 // Comments				:
 void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
@@ -363,7 +368,8 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	sfGetFile
-// Description			:	Get a portion of a file
+// Description			:
+/// \brief					Get a portion of a file
 // Return Value			:	The size received
 // Comments				:
 int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
@@ -415,7 +421,8 @@ int			CRenderer::getFile(FILE *file,const char *inName,int start,int size) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getFile
-// Description			:	Receive a file over the network from the client
+// Description			:
+/// \brief					Receive a file over the network from the client
 // Return Value			:
 // Comments				:
 int			CRenderer::getFile(char *outName,const char *inName) {
@@ -450,7 +457,8 @@ int			CRenderer::getFile(char *outName,const char *inName) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	netSetup
-// Description			:	Setup the network connections
+// Description			:
+/// \brief					Setup the network connections
 // Return Value			:
 // Comments				:
 void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {

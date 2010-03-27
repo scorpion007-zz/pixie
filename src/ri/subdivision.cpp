@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	subdivision.cpp
 //  Classes				:	CSubdivision
-//  Description			:	Implements a subdivision surface
+//  Description			:
+/// \brief					Implements a subdivision surface
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -43,7 +44,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivision
 // Method				:	CSubdivision
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int N,float uOrg,float vOrg,float uMult,float vMult,float *vertex) : CSurface(a,x) {
@@ -83,7 +85,8 @@ CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivision
 // Method				:	~CSubdivision
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CSubdivision::~CSubdivision() {
@@ -102,7 +105,8 @@ CSubdivision::~CSubdivision() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivision
 // Method				:	projectVertices
-// Description			:	Project a set of vertices into the eigen space of the patch
+// Description			:
+/// \brief					Project a set of vertices into the eigen space of the patch
 // Return Value			:	The projected points
 // Comments				:
 void	CSubdivision::projectVertices(float *fvertex,float *vertexData,int disp) {

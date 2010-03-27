@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	ri.cpp
 //  Classes				:	-
-//  Description			:	RenderMan Interface Implementation
+//  Description			:
+/// \brief					RenderMan Interface Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -461,7 +462,8 @@ static	int					archiveNesting		=	0;
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	check
-// Description			:	Make sure the command is good for a given nesting
+// Description			:
+/// \brief					Make sure the command is good for a given nesting
 // Return Value			:	TRUE if the command should be ignored
 // Comments				:
 static	inline int		check(const char *fun,int scope) {
@@ -480,7 +482,8 @@ static	inline int		check(const char *fun,int scope) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	extract
-// Description			:	Extract a parameter from the command string
+// Description			:
+/// \brief					Extract a parameter from the command string
 // Return Value			:
 // Comments				:
 static	inline int		extract(char *dest,const char *tag,const char *src) {
@@ -537,7 +540,8 @@ static	inline	void	getArgs(va_list args) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	RiInit
-// Description			:	Init the static variables
+// Description			:
+/// \brief					Init the static variables
 // Return Value			:
 // Comments				:
 static	void RiInit() {
@@ -559,7 +563,8 @@ static	void RiInit() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	RiTini
-// Description			:	Ditch the allocated static variables
+// Description			:
+/// \brief					Ditch the allocated static variables
 // Return Value			:
 // Comments				:
 static	void RiTini() {

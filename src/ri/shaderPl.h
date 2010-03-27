@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -41,8 +41,10 @@ class CAttributes;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPLLookup
-// Description			:	This class encapsulates a parameter list
-// Comments				:	The shader commands that have a parameter list must derive from this class
+// Description			:
+/// \brief					This class encapsulates a parameter list
+// Comments				:
+/// \note					The shader commands that have a parameter list must derive from this class
 class	CPLLookup {
 public:
 								CPLLookup();
@@ -61,7 +63,8 @@ public:
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	TParamBinding
-		// Description			:	This struct holds a parameter binding
+		// Description			:
+/// \brief					This struct holds a parameter binding
 		// Comments				:
 		typedef struct TParamBinding {
 			const char		*name;					// The name of the variable (used only for debugging)
@@ -92,7 +95,8 @@ class	CPointHierarchy;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
-// Description			:	This class encapsulates a texture lookup
+// Description			:
+/// \brief					This class encapsulates a texture lookup
 // Comments				:
 class	CTextureLookup : public CPLLookup	{
 public:
@@ -125,8 +129,10 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CEnvironmentLookup
-// Description			:	This class encapsulates an environment lookup
-// Comments				:	We are derived from trace lookup since we can spawn rays
+// Description			:
+/// \brief					This class encapsulates an environment lookup
+// Comments				:
+/// \note					We are derived from trace lookup since we can spawn rays
 class	CEnvironmentLookup : public CTraceLookup	{
 public:
 							CEnvironmentLookup();
@@ -142,7 +148,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMapLookup
-// Description			:	This class encapsulates an environment lookup
+// Description			:
+/// \brief					This class encapsulates an environment lookup
 // Comments				:
 class	CPhotonMapLookup : public CPLLookup	{
 public:
@@ -158,7 +165,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapInfoLookup
-// Description			:	This class encapsulates an environment lookup
+// Description			:
+/// \brief					This class encapsulates an environment lookup
 // Comments				:
 class	CMapInfoLookup : public CPLLookup	{
 public:
@@ -171,7 +179,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGlobalIllumLookup
-// Description			:	This class encapsulates a global illumination lookup
+// Description			:
+/// \brief					This class encapsulates a global illumination lookup
 // Comments				:
 class	CTexture3dLookup : public CPLLookup {
 public:
@@ -193,7 +202,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGlobalIllumLookup
-// Description			:	This class encapsulates a global illumination lookup
+// Description			:
+/// \brief					This class encapsulates a global illumination lookup
 // Comments				:	We are derived from texture3D since we're a 3D texture
 class	COcclusionLookup : public CTexture3dLookup {
 public:
@@ -212,7 +222,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
-// Description			:	This class holds information about a particular texture lookup
+// Description			:
+/// \brief					This class holds information about a particular texture lookup
 // Comments				:
 class	CFilterLookup : public CPLLookup	{
 public:
@@ -238,7 +249,8 @@ class	CGatherRay;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherVariable
-// Description			:	Encapsulates a variable to be saved
+// Description			:
+/// \brief					Encapsulates a variable to be saved
 // Comments				:
 class	CGatherVariable {
 public:
@@ -254,7 +266,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherLookup
-// Description			:	Lookup parameters for the gather
+// Description			:
+/// \brief					Lookup parameters for the gather
 // Comments				:
 class	CGatherLookup : public CPLLookup {
 public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -49,7 +49,8 @@ int			CPointCloud::drawChannel	=	0;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	CPointCloud
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,const char *channelDefs,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
@@ -70,7 +71,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	CPointCloud
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:	for a write-mode map via ptcapi, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const float *toNDC,int numChannels,char **channelNames,char **channelTypes,int write) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to,toNDC) {
@@ -92,7 +94,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,const f
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	CPointCloud
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:	for a write-mode map, ch and nc must be provided
 CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
@@ -129,7 +132,8 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	~CPointCloud
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CPointCloud::~CPointCloud() {
@@ -142,7 +146,8 @@ CPointCloud::~CPointCloud() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	reset
-// Description			:	Reset the photonmap
+// Description			:
+/// \brief					Reset the photonmap
 // Return Value			:
 // Comments				:
 void	CPointCloud::reset() {
@@ -154,7 +159,8 @@ void	CPointCloud::reset() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	write
-// Description			:	Write the photon map into a file
+// Description			:
+/// \brief					Write the photon map into a file
 // Return Value			:
 // Comments				:
 void	CPointCloud::write() {
@@ -190,9 +196,11 @@ void	CPointCloud::write() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	lookup
-// Description			:	Locate the nearest points
+// Description			:
+/// \brief					Locate the nearest points
 // Return Value			:
-// Comments				:	Nl	must be normalized
+// Comments				:
+/// \note					Nl	must be normalized
 //							Il	must be normalized
 void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
 	const int 				maxFound	=	16;
@@ -254,7 +262,8 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	balance
-// Description			:	Balance the map
+// Description			:
+/// \brief					Balance the map
 // Return Value			:
 // Comments				:
 void	CPointCloud::balance() {
@@ -279,7 +288,8 @@ void	CPointCloud::balance() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	store
-// Description			:	Store a photon
+// Description			:
+/// \brief					Store a photon
 // Return Value			:
 // Comments				:
 void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP) {
@@ -306,7 +316,8 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	getPoint
-// Description			:	Retrieve an indexed point
+// Description			:
+/// \brief					Retrieve an indexed point
 // Return Value			:
 // Comments				:
 void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
@@ -327,7 +338,8 @@ void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	draw
-// Description			:	Gui interface
+// Description			:
+/// \brief					Gui interface
 // Return Value			:
 // Comments				:
 void	CPointCloud::draw() {
@@ -379,7 +391,8 @@ void	CPointCloud::draw() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	keyDown
-// Description			:	handle keypresses
+// Description			:
+/// \brief					handle keypresses
 // Return Value			:	-
 // Comments				:
 int			CPointCloud::keyDown(int key) {
@@ -407,7 +420,8 @@ int			CPointCloud::keyDown(int key) {
 //////////////////////////////////////////////////////////////////////
 // Class				:	CPointCloud
 // Method				:	draw
-// Description			:	Gui interface
+// Description			:
+/// \brief					Gui interface
 // Return Value			:
 // Comments				:
 void	CPointCloud::bound(float *bmin,float *bmax) {

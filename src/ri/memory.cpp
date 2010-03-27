@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -45,7 +45,8 @@ static	float				lastPagingTime			=	0;
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	memoryInit
-// Description			:	Initialize a named memory manager
+// Description			:
+/// \brief					Initialize a named memory manager
 // Return Value			:
 // Comments				:
 void			memoryInit(CMemPage *&stack) {
@@ -54,9 +55,11 @@ void			memoryInit(CMemPage *&stack) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	memoryTini
-// Description			:	Destroy a named memory manager
+// Description			:
+/// \brief					Destroy a named memory manager
 // Return Value			:
-// Comments				:	Should be called before memTini so counts are correct
+// Comments				:
+/// \note					Should be called before memTini so counts are correct
 void			memoryTini(CMemPage *&stack) {
 	CMemPage	*cPage;
 
@@ -115,7 +118,8 @@ CMemPage		*memoryNewPage(int size) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	memoryDeletePage
-// Description			:	Dealoocate memory page
+// Description			:
+/// \brief					Dealoocate memory page
 // Return Value			:
 // Comments				:
 void		memoryDeletePage(CMemPage *cPage) {

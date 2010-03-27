@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -36,14 +36,16 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionCuller
-// Description			:	The occlusion culler class
+// Description			:
+/// \brief					The occlusion culler class
 // Comments				:
 class	COcclusionCuller {
 public:
 
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	COcclusionCuller
-					// Description			:	The occlusion culler class
+					// Description			:
+/// \brief					The occlusion culler class
 					// Comments				:
 					class COcclusionNode {
 					public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -55,7 +55,8 @@ CShader			*parseShader(const char *,const char *);
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	initFiles
-// Description			:	Init the files
+// Description			:
+/// \brief					Init the files
 // Return Value			:
 // Comments				:
 void		CRenderer::initFiles() {
@@ -72,7 +73,8 @@ void		CRenderer::initFiles() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	sfClearTemp
-// Description			:	This callback function is used to remove the temporary files
+// Description			:
+/// \brief					This callback function is used to remove the temporary files
 // Return Value			:
 // Comments				:
 static int	rcClearTemp(const char *fileName,void *userData) {
@@ -84,7 +86,8 @@ static int	rcClearTemp(const char *fileName,void *userData) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	shutdownFiles
-// Description			:	Shutdown the files
+// Description			:
+/// \brief					Shutdown the files
 // Return Value			:
 // Comments				:
 void		CRenderer::shutdownFiles() {
@@ -120,7 +123,8 @@ void		CRenderer::shutdownFiles() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	locateFileEx
-// Description			:	Locate a file on disk
+// Description			:
+/// \brief					Locate a file on disk
 // Return Value			:	TRUE if found
 // Comments				:
 int			CRenderer::locateFileEx(char *result,const char *name,const char *extension,TSearchpath *searchpath) {
@@ -140,7 +144,8 @@ int			CRenderer::locateFileEx(char *result,const char *name,const char *extensio
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	locateFile
-// Description			:	Locate a file on disk
+// Description			:
+/// \brief					Locate a file on disk
 // Return Value			:	TRUE if found
 // Comments				:
 int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath) {
@@ -210,7 +215,8 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getTexture
-// Description			:	Load a texture from file
+// Description			:
+/// \brief					Load a texture from file
 // Return Value			:
 // Comments				:
 CTexture	*CRenderer::getTexture(const char *name) {
@@ -268,7 +274,8 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getPhotonMap
-// Description			:	Load a photon map
+// Description			:
+/// \brief					Load a photon map
 // Return Value			:
 // Comments				:
 CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
@@ -301,7 +308,8 @@ CPhotonMap		*CRenderer::getPhotonMap(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getCache
-// Description			:	Load a cache
+// Description			:
+/// \brief					Load a cache
 // Return Value			:
 // Comments				:
 CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *from,const float *to) {
@@ -392,7 +400,8 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getTextureInfo
-// Description			:	Load a texture from file
+// Description			:
+/// \brief					Load a texture from file
 // Return Value			:
 // Comments				:
 CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
@@ -423,7 +432,8 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getTexture3d
-// Description			:	Get a point cloud or brickmap
+// Description			:
+/// \brief					Get a point cloud or brickmap
 // Return Value			:
 // Comments				:
 CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* channels,const float *from,const float *to,int hierarchy) {
@@ -494,7 +504,8 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	getShader
-// Description			:	Create an instance of a shader
+// Description			:
+/// \brief					Create an instance of a shader
 // Return Value			:
 // Comments				:
 CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
@@ -529,7 +540,8 @@ CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getFilter
-// Description			:	Return the filter matching the name
+// Description			:
+/// \brief					Return the filter matching the name
 // Return Value			:
 // Comments				:
 RtFilterFunc			CRenderer::getFilter(const char *name) {
@@ -559,7 +571,8 @@ RtFilterFunc			CRenderer::getFilter(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getFilter
-// Description			:	Return the name matching the filter
+// Description			:
+/// \brief					Return the name matching the filter
 // Return Value			:
 // Comments				:
 const char					*CRenderer::getFilter(RtFilterFunc func) {
@@ -589,7 +602,8 @@ const char					*CRenderer::getFilter(RtFilterFunc func) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getStepFilter
-// Description			:	Return the filter matching the name
+// Description			:
+/// \brief					Return the filter matching the name
 // Return Value			:
 // Comments				:
 RtStepFilterFunc		CRenderer::getStepFilter(const char *name) {
@@ -615,7 +629,8 @@ RtStepFilterFunc		CRenderer::getStepFilter(const char *name) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	dsoLoadCallback
-// Description			:	This function will be called for each module
+// Description			:
+/// \brief					This function will be called for each module
 // Return Value			:
 // Comments				:
 static	int	dsoLoadCallback(const char *file,void *ud) {
@@ -683,9 +698,11 @@ static	int	dsoLoadCallback(const char *file,void *ud) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getDSO
-// Description			:	Load a DSO matching the prototyoe
+// Description			:
+/// \brief					Load a DSO matching the prototyoe
 // Return Value			:
-// Comments				:	This function does not need to be thread safe
+// Comments				:
+/// \note					This function does not need to be thread safe
 CDSO				*CRenderer::getDSO(const char *name,const char *prototype) {
 	CDSO				*cDso;
 

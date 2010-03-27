@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	fileResource.cpp
 //  Classes				:	CFileResource
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
@@ -47,7 +48,8 @@ const	char	*fileBrickMap			=	"BrickMap";
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileResource
 // Method				:	CFileResource
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CFileResource::CFileResource(const char *n) {
@@ -57,7 +59,8 @@ CFileResource::CFileResource(const char *n) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileResource
 // Method				:	~CFileResource
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CFileResource::~CFileResource() {
@@ -67,7 +70,8 @@ CFileResource::~CFileResource() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ropen
-// Description			:	Open a binary file
+// Description			:
+/// \brief					Open a binary file
 // Return Value			:	File handle is successful
 // Comments				:	-
 FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
@@ -150,7 +154,8 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ropen
-// Description			:	Open a binary file
+// Description			:
+/// \brief					Open a binary file
 // Return Value			:	File handle is successful
 // Comments				:	-
 FILE	*ropen(const char *name,char *type) {

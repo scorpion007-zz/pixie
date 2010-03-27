@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	ptcapi.h
 //  Classes				:
-//  Description			:	Point Cloud API
+//  Description			:
+/// \brief					Point Cloud API
 //
 ////////////////////////////////////////////////////////////////////////
 #include "fileResource.h"
@@ -45,9 +46,11 @@ struct PtcPointCloudInternal {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcCreatePointCloudFile
-// Description			:	Create a point cloud file
+// Description			:
+/// \brief					Create a point cloud file
 // Return Value			:
-// Comments				:	Handle
+// Comments				:
+/// \note					Handle
 PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,float *world2eye, float *world2ndc, float *format) {		
 	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
 	
@@ -63,7 +66,8 @@ PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcWriteDataPoint
-// Description			:	Write into a point cloud file
+// Description			:
+/// \brief					Write into a point cloud file
 // Return Value			:
 // Comments				:
 void PtcWriteDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float radius, float *data) {
@@ -77,7 +81,8 @@ void PtcWriteDataPoint(PtcPointCloud pointcloud, float *point, float *normal, fl
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcFinishPointCloudFile
-// Description			:	Close the handle
+// Description			:
+/// \brief					Close the handle
 // Return Value			:
 // Comments				:
 void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
@@ -95,9 +100,11 @@ void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcOpenPointCloudFile
-// Description			:	Open an existing point cloud file
+// Description			:
+/// \brief					Open an existing point cloud file
 // Return Value			:
-// Comments				:	Handle
+// Comments				:
+/// \note					Handle
 PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, const char **vartypes, const char **varnames) {
 	PtcPointCloudInternal	*ptcInternal = new PtcPointCloudInternal;
 	FILE					*in;
@@ -123,9 +130,11 @@ PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, const char **var
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcGetPointCloudInfo
-// Description			:	Query the point cloud
+// Description			:
+/// \brief					Query the point cloud
 // Return Value			:
-// Comments				:	Handle
+// Comments				:
+/// \note					Handle
 int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *result) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
 
@@ -162,7 +171,8 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *re
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcReadDataPoint
-// Description			:	Read data from the point cloud
+// Description			:
+/// \brief					Read data from the point cloud
 // Return Value			:
 // Comments				:
 int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data) {
@@ -176,7 +186,8 @@ int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, floa
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	PtcClosePointCloudFile
-// Description			:	Close the handle
+// Description			:
+/// \brief					Close the handle
 // Return Value			:
 // Comments				:
 void PtcClosePointCloudFile(PtcPointCloud pointcloud) {

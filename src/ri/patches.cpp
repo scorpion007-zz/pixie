@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -27,7 +27,8 @@
 //  Classes				:	CBilinearPatchMesh
 //							CBicubicPatchMesh
 //							CNURBSPatch
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -73,7 +74,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Macro				:	gatherData
-// Description			:	Get the data to create the primitive
+// Description			:
+/// \brief					Get the data to create the primitive
 // Return Value			:	-
 // Comments				:	-
 #define	gatherData(__context,__u,__v,__nu,__nv,__uv,__vv,__un,__vertex,__parameters) {	\
@@ -111,7 +113,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBilinearPatch
 // Method				:	CBilinearPatch
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	-
 CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertex0) : CSurface(a,x) {
@@ -190,7 +193,8 @@ CBilinearPatch::CBilinearPatch(CAttributes *a,CXform *x,CVertexData *v,CParamete
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBilinearPatch
 // Method				:	~CBilinearPatch
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:	-
 CBilinearPatch::~CBilinearPatch() {
@@ -529,7 +533,8 @@ void	CBilinearPatch::interpolate(int numVertices,float **varying,float ***locals
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
 // Method				:	CBicubicPatch
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	-
 CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,float uOrg,float vOrg,float uMult,float vMult,float *vertexData,const float *uBasis,const float *vBasis) : CSurface(a,x) {
@@ -569,7 +574,8 @@ CBicubicPatch::CBicubicPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBicubicPatch
 // Method				:	~CBicubicPatch
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:	-
 CBicubicPatch::~CBicubicPatch() {
@@ -830,7 +836,8 @@ void	CBicubicPatch::interpolate(int numVertices,float **varying,float ***locals)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatch
 // Method				:	CNURBSPatch
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:	-
 CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,int uOrder,int vOrder,float *uKnots,float *vKnots,float *vertex0) : CSurface(a,x) {
@@ -885,7 +892,8 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatch
 // Method				:	~CNURBSPatch
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:	-
 CNURBSPatch::~CNURBSPatch() {
@@ -1264,7 +1272,8 @@ void			CNURBSPatch::interpolate(int numVertices,float **varying,float ***locals)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSMesh
 // Method				:	precompBasisCoefficients
-// Description			:	Compute the coefficients of a basis
+// Description			:
+/// \brief					Compute the coefficients of a basis
 // Return Value			:	-
 // Comments				:
 void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int order,unsigned int start,unsigned int interval,const float *knots) {
@@ -1326,7 +1335,8 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CPatchMesh
-// Description			:	CPatchMesh
+// Description			:
+/// \brief					CPatchMesh
 // Return Value			:	Ctor
 // Comments				:	-
 CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int uw,int vw) : CObject(a,x) {
@@ -1471,7 +1481,8 @@ CPatchMesh::~CPatchMesh() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CPatchMesh
-// Description			:	instantiate
+// Description			:
+/// \brief					instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
 void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
@@ -1489,7 +1500,8 @@ void	CPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
 // Method				:	intersect
-// Description			:	Intersect a ray with this pritimive
+// Description			:
+/// \brief					Intersect a ray with this pritimive
 // Return Value			:	-
 // Comments				:
 void	CPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
@@ -1500,7 +1512,8 @@ void	CPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
 // Method				:	dice
-// Description			:	Dice the primitive
+// Description			:
+/// \brief					Dice the primitive
 // Return Value			:	-
 // Comments				:
 void	CPatchMesh::dice(CShadingContext *rasterizer) {
@@ -1513,7 +1526,8 @@ void	CPatchMesh::dice(CShadingContext *rasterizer) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchMesh
 // Method				:	split
-// Description			:	Create the children
+// Description			:
+/// \brief					Create the children
 // Return Value			:	-
 // Comments				:
 void	CPatchMesh::create(CShadingContext *context) {
@@ -1654,7 +1668,8 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CNURBSPatchMesh
-// Description			:	CNURBSPatchMesh
+// Description			:
+/// \brief					CNURBSPatchMesh
 // Return Value			:	Ctor
 // Comments				:	-
 CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,int uo,int vo,float *uk,float *vk) : CObject(a,x) {
@@ -1728,7 +1743,8 @@ CNURBSPatchMesh::~CNURBSPatchMesh() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CNURBSPatchMesh
-// Description			:	instantiate
+// Description			:
+/// \brief					instantiate
 // Return Value			:	Clone the object
 // Comments				:	-
 void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
@@ -1744,7 +1760,8 @@ void	CNURBSPatchMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatchMesh
 // Method				:	dice
-// Description			:	Dice the primitive
+// Description			:
+/// \brief					Dice the primitive
 // Return Value			:	-
 // Comments				:
 void	CNURBSPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
@@ -1755,7 +1772,8 @@ void	CNURBSPatchMesh::intersect(CShadingContext *rasterizer,CRay *ray) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNURBSPatchMesh
 // Method				:	dice
-// Description			:	Dice the primitive
+// Description			:
+/// \brief					Dice the primitive
 // Return Value			:	-
 // Comments				:
 void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
@@ -1767,7 +1785,8 @@ void	CNURBSPatchMesh::dice(CShadingContext *rasterizer) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	CNURBSPatchMesh
-// Description			:	split
+// Description			:
+/// \brief					split
 // Return Value			:	Split the mesh
 // Comments				:	-
 void	CNURBSPatchMesh::create(CShadingContext *context) {

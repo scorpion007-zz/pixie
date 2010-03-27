@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	points.h
 //  Classes				:	CPoints
-//  Description			:	Points primitive
+//  Description			:
+/// \brief					Points primitive
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef POINTS_H
@@ -40,13 +41,15 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
-// Description			:	Implements a points primitive
+// Description			:
+/// \brief					Implements a points primitive
 // Comments				:
 class	CPoints : public CSurface {
 
 		///////////////////////////////////////////////////////////////////////
 		// Class				:	CPointBase
-		// Description			:	This class holds the memory for the points
+		// Description			:
+/// \brief					This class holds the memory for the points
 		// Comments				:
 		class CPointBase : public CRefCounter {
 		public:

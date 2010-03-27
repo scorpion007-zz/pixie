@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	framebuffer.cpp
 //  Classes				:	CDisplay
-//  Description			:	Implementation of the framebuffer display driver
+//  Description			:
+/// \brief					Implementation of the framebuffer display driver
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
@@ -48,7 +49,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplay
 // Method				:	CDisplay
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDisplay::CDisplay(const char *name,const char *samples,int width,int height,int numSamples) {
@@ -63,7 +65,8 @@ CDisplay::CDisplay(const char *name,const char *samples,int width,int height,int
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplay
 // Method				:	~CDisplay
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDisplay::~CDisplay() {
@@ -75,7 +78,8 @@ CDisplay::~CDisplay() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplay
 // Method				:	clampData
-// Description			:	The main display loop
+// Description			:
+/// \brief					The main display loop
 // Return Value			:	-
 // Comments				:
 void	CDisplay::clampData(int w,int h,float *d) {
@@ -91,7 +95,8 @@ void	CDisplay::clampData(int w,int h,float *d) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayStart
-// Description			:	Begin receiving an image
+// Description			:
+/// \brief					Begin receiving an image
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
@@ -112,7 +117,8 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayData
-// Description			:	Receive image data
+// Description			:
+/// \brief					Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
@@ -130,7 +136,8 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayFinish
-// Description			:	Finish receiving an image
+// Description			:
+/// \brief					Finish receiving an image
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
 void	displayFinish(void *im) {

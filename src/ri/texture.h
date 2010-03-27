@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -44,7 +44,8 @@ class	CVaryingTextureLookup;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureInfoBase
-// Description			:	This class allows textureinfo to get data
+// Description			:
+/// \brief					This class allows textureinfo to get data
 // Comments				:
 class	CTextureInfoBase : public CFileResource {
 public:
@@ -60,7 +61,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture
-// Description			:	This class the the base of all texture types
+// Description			:
+/// \brief					This class the the base of all texture types
 // Comments				:
 class	CTexture : public CTextureInfoBase {
 public:
@@ -115,7 +117,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyTexture
-// Description			:	Encapsulates a texture we use if we could not load it
+// Description			:
+/// \brief					Encapsulates a texture we use if we could not load it
 // Comments				:
 class	CDummyTexture : public CTexture {
 public:
@@ -130,7 +133,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyEnvironment
-// Description			:	A dummy environment map we create if we can not instantiate
+// Description			:
+/// \brief					A dummy environment map we create if we can not instantiate
 // Comments				:
 class	CDummyEnvironment : public CEnvironment {
 public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	atomic.h
 //  Classes				:	-
-//  Description			:	This file contains the atomic increment and decrement
+//  Description			:
+/// \brief					This file contains the atomic increment and decrement
 //							to ensure consistency in multi-threaded environments
 //							without kernel synchronization.
 //

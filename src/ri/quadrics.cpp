@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -27,7 +27,8 @@
 //  Classes				:	CSphere
 //							CDisk
 //							CCone ...
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 //	FIXME: The quadrics implementation has not been heavily optimized
 //	FIXME: Re-optimize
@@ -130,7 +131,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
 // Method				:	CSphere
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float vmina,float vmaxa,float anglea) : CSurface(a,x)  {
@@ -154,7 +156,8 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
 // Method				:	CSphere
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float vmin0,float vmax0,float angle0,float r1,float vmin1,float vmax1,float angle1) : CSurface(a,x) {
@@ -187,7 +190,8 @@ CSphere::CSphere(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
 // Method				:	~CSphere
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CSphere::~CSphere() {
@@ -201,7 +205,8 @@ CSphere::~CSphere() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CSphere::intersect(CShadingContext *context,CRay *rv) {
@@ -535,7 +540,8 @@ void	CSphere::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CSphere::computeObjectBound(float *bmin,float *bmax,float r,float vmin,float vmax,float umax) {
@@ -591,7 +597,8 @@ void			CSphere::computeObjectBound(float *bmin,float *bmax,float r,float vmin,fl
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
 // Method				:	CDisk
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float za,float anglea) : CSurface(a,x)  {
@@ -614,7 +621,8 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
 // Method				:	CDisk
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float z0,float angle0,float r1,float z1,float angle1) : CSurface(a,x) {
@@ -645,7 +653,8 @@ CDisk::CDisk(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
 // Method				:	~CDisk
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDisk::~CDisk() {
@@ -659,7 +668,8 @@ CDisk::~CDisk() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CDisk::intersect(CShadingContext *context,CRay *rv) {
@@ -921,7 +931,8 @@ void			CDisk::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CDisk::computeObjectBound(float *bmin,float *bmax,float r,float z,float umax) {
@@ -960,7 +971,8 @@ void			CDisk::computeObjectBound(float *bmin,float *bmax,float r,float z,float u
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
 // Method				:	CCone
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float heighta,float anglea) : CSurface(a,x)  {
@@ -983,7 +995,8 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,flo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
 // Method				:	CCone
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float height0,float angle0,float r1,float height1,float angle1) : CSurface(a,x) {
@@ -1014,7 +1027,8 @@ CCone::CCone(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,flo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
 // Method				:	~CCone
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CCone::~CCone() {
@@ -1028,7 +1042,8 @@ CCone::~CCone() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CCone::intersect(CShadingContext *context,CRay *rv) {
@@ -1351,7 +1366,8 @@ void			CCone::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CCone::computeObjectBound(float *bmin,float *bmax,float r,float height,float umax) {
@@ -1397,7 +1413,8 @@ void			CCone::computeObjectBound(float *bmin,float *bmax,float r,float height,fl
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
 // Method				:	CParaboloid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float zmina,float zmaxa,float anglea) : CSurface(a,x)  {
@@ -1421,7 +1438,8 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
 // Method				:	CParaboloid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float zmin0,float zmax0,float angle0,float r1,float zmin1,float zmax1,float angle1) : CSurface(a,x) {
@@ -1455,7 +1473,8 @@ CParaboloid::CParaboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
 // Method				:	~CParaboloid
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CParaboloid::~CParaboloid() {
@@ -1469,7 +1488,8 @@ CParaboloid::~CParaboloid() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CParaboloid::intersect(CShadingContext *context,CRay *rv) {
@@ -1796,7 +1816,8 @@ void		CParaboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) co
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CParaboloid::computeObjectBound(float *bmin,float *bmax,float r,float zmin,float zmax,float umax) {
@@ -1831,7 +1852,8 @@ void			CParaboloid::computeObjectBound(float *bmin,float *bmax,float r,float zmi
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
 // Method				:	CCylinder
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float ra,float zmina,float zmaxa,float anglea) : CSurface(a,x)  {
@@ -1856,7 +1878,8 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
 // Method				:	CCylinder
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float r0,float zmin0,float zmax0,float angle0,float r1,float zmin1,float zmax1,float angle1) : CSurface(a,x) {
@@ -1889,7 +1912,8 @@ CCylinder::CCylinder(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,floa
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
 // Method				:	~CCylinder
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CCylinder::~CCylinder() {
@@ -1903,7 +1927,8 @@ CCylinder::~CCylinder() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
@@ -2224,7 +2249,8 @@ void	CCylinder::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CCylinder::computeObjectBound(float *bmin,float *bmax,float r,float zmin,float zmax,float umax) {
@@ -2260,7 +2286,8 @@ void			CCylinder::computeObjectBound(float *bmin,float *bmax,float r,float zmin,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
 // Method				:	CHyperboloid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,const float *p1a,const float *p2a,float anglea) : CSurface(a,x)  {
@@ -2284,7 +2311,8 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
 // Method				:	CHyperboloid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,const float *p10,const float *p20,float angle0,const float *p11,const float *p21,float angle1) : CSurface(a,x) {
@@ -2316,7 +2344,8 @@ CHyperboloid::CHyperboloid(CAttributes *a,CXform *x,CParameter *c,unsigned int p
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
 // Method				:	~CHyperboloid
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CHyperboloid::~CHyperboloid() {
@@ -2330,7 +2359,8 @@ CHyperboloid::~CHyperboloid() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
@@ -2743,7 +2773,8 @@ void			CHyperboloid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CHyperboloid::computeObjectBound(float *bmin,float *bmax,float *p1,float *p2,float umax) {
@@ -2789,7 +2820,8 @@ void			CHyperboloid::computeObjectBound(float *bmin,float *bmax,float *p1,float 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
 // Method				:	CToroid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rmina,float rmaxa,float vmina,float vmaxa,float umaxa) : CSurface(a,x)  {
@@ -2814,7 +2846,8 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
 // Method				:	CToroid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rmin0,float rmax0,float vmin0,float vmax0,float umax0,float rmin1,float rmax1,float vmin1,float vmax1,float umax1) : CSurface(a,x) {
@@ -2850,7 +2883,8 @@ CToroid::CToroid(CAttributes *a,CXform *x,CParameter *c,unsigned int pf,float rm
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
 // Method				:	~CToroid
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CToroid::~CToroid() {
@@ -2864,7 +2898,8 @@ CToroid::~CToroid() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
 // Method				:	intersect
-// Description			:	Compute the intersection with a ray
+// Description			:
+/// \brief					Compute the intersection with a ray
 // Return Value			:	TRUE if intersects
 // Comments				:
 void	CToroid::intersect(CShadingContext *context,CRay *rv) {
@@ -3244,7 +3279,8 @@ void	CToroid::instantiate(CAttributes *a,CXform *x,CRendererContext *cx) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
 // Method				:	computeObjectBound
-// Description			:	Compute the bounding box in the object space
+// Description			:
+/// \brief					Compute the bounding box in the object space
 // Return Value			:	-
 // Comments				:
 void			CToroid::computeObjectBound(float *bmin,float *bmax,float rmin,float rmax,float vmin,float vmax,float umax) {

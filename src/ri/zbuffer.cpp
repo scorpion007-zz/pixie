@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	zbuffer.cpp
 //  Classes				:	CZbuffer
-//  Description			:	The cheap simple rasterizer
+//  Description			:
+/// \brief					The cheap simple rasterizer
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -45,7 +46,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
 // Method				:	CZbuffer
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
@@ -69,7 +71,8 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
 // Method				:	~CZbuffer
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CZbuffer::~CZbuffer() {
@@ -80,7 +83,8 @@ CZbuffer::~CZbuffer() {
 ///////////////////////////////////////////////////////////////////////
 // Class                :   CZBuffer
 // Method               :   preDisplaySetup
-// Description          :   allow the hider to affect display setup
+// Description          :
+/// \brief					allow the hider to affect display setup
 // Return Value         :   -
 // Comments             :
 void CZbuffer::preDisplaySetup() {
@@ -90,9 +94,11 @@ void CZbuffer::preDisplaySetup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
 // Method				:	rasterBegin
-// Description			:	Init the framebuffer
+// Description			:
+/// \brief					Init the framebuffer
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 	int	i,j;
 
@@ -139,9 +145,11 @@ void	CZbuffer::rasterBegin(int w,int h,int l,int t,int /*nullBucket*/) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
 // Method				:	rasterDrawTriangles
-// Description			:	Draw rectangles
+// Description			:
+/// \brief					Draw rectangles
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 
 	// Draw the suckers one by one
@@ -156,9 +164,11 @@ void	CZbuffer::rasterDrawPrimitives(CRasterGrid *grid) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CZbuffer
 // Method				:	rasterEnd
-// Description			:	Retrieve the image
+// Description			:
+/// \brief					Retrieve the image
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void	CZbuffer::rasterEnd(float *fb2,int /*noObjects*/) {
 	int			sx,sy;
 	int			i,y;

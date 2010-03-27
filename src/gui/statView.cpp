@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	statView.cpp
 //  Classes				:	CStatView
-//  Description			:	This class visualizes the statistics during the view
+//  Description			:
+/// \brief					This class visualizes the statistics during the view
 //
 ////////////////////////////////////////////////////////////////////////
 #include <QtGui>
@@ -35,7 +36,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStatView
 // Method				:	CStatView
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CStatView::CStatView(CStatistics *s,QWidget *parent) : QDialog(parent) {
@@ -71,7 +73,8 @@ CStatView::CStatView(CStatistics *s,QWidget *parent) : QDialog(parent) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTimeMemory
 // Method				:	update
-// Description			:	Update the tabs
+// Description			:
+/// \brief					Update the tabs
 // Return Value			:	-
 // Comments				:
 void		CTimeMemory::update(CStatistics *stats) {
@@ -81,7 +84,8 @@ void		CTimeMemory::update(CStatistics *stats) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNumbers
 // Method				:	update
-// Description			:	Update the tabs
+// Description			:
+/// \brief					Update the tabs
 // Return Value			:	-
 // Comments				:
 void		CNumbers::update(CStatistics *stats) {

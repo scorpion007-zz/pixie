@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -52,7 +52,8 @@ const	int		SPLIT_UV	=	3;
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	minCocPixels
-// Description			:	return the minimum circle of confusion
+// Description			:
+/// \brief					return the minimum circle of confusion
 // Return Value			:
 // Comments				:	(inline for speed, needed for CSurface::dice() )
 static inline float	minCocPixels(float z1, float z2) {
@@ -64,7 +65,8 @@ static inline float	minCocPixels(float z1, float z2) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
 // Method				:	CPatch
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,int depth,int minDepth) : CObject(a,x) {
@@ -90,7 +92,8 @@ CPatch::CPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
 // Method				:	~CPatch
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPatch::~CPatch() {
@@ -140,7 +143,8 @@ static	inline int	cull(float *bmin,float *bmax,const float *P,const float *N,int
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
 // Method				:	dice
-// Description			:	Dice the surface into smaller primitives
+// Description			:
+/// \brief					Dice the surface into smaller primitives
 // Return Value			:	-
 // Comments				:
 void	CPatch::dice(CShadingContext *r) {
@@ -422,7 +426,8 @@ void	CPatch::dice(CShadingContext *r) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatch
 // Method				:	split
-// Description			:	Split the surface into smaller ones
+// Description			:
+/// \brief					Split the surface into smaller ones
 // Return Value			:	-
 // Comments				:
 void	CPatch::splitToChildren(CShadingContext *r,int dir) {
@@ -537,7 +542,8 @@ static int tessPerDepth[DEBUG_STATS];
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	CTesselationPatch
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float umin,float umax,float vmin,float vmax,char depth,char minDepth,float r) : CObject(a,x) {
@@ -589,7 +595,8 @@ CTesselationPatch::CTesselationPatch(CAttributes *a,CXform *x,CSurface *o,float 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	~CTesselationPatch
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTesselationPatch::~CTesselationPatch() {
@@ -618,7 +625,8 @@ CTesselationPatch::~CTesselationPatch() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	intersect
-// Description			:	intersect a ray with a tesselation patch
+// Description			:
+/// \brief					intersect a ray with a tesselation patch
 // Return Value			:	-
 // Comments				:
 void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
@@ -1284,7 +1292,8 @@ void	CTesselationPatch::intersect(CShadingContext *context,CRay *cRay) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	measureLength
-// Description			:	This function takes P and returns the sum of edge lengths
+// Description			:
+/// \brief					This function takes P and returns the sum of edge lengths
 // Return Value			:
 // Comments				:
 static	inline	float	measureLength(const float *P,int step,int num) {
@@ -1307,7 +1316,8 @@ static	inline	float	measureLength(const float *P,int step,int num) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	initTesselation
-// Description			:	Make an estimate about required tesselation sizes
+// Description			:
+/// \brief					Make an estimate about required tesselation sizes
 // Return Value			:
 // Comments				:
 void CTesselationPatch::initTesselation(CShadingContext *context) {
@@ -1323,7 +1333,8 @@ void CTesselationPatch::initTesselation(CShadingContext *context) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	sampleTesselation
-// Description			:	Perform displacement and sample begin or end sample
+// Description			:
+/// \brief					Perform displacement and sample begin or end sample
 // Return Value			:
 // Comments				:
 void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsigned int sample,float *&P) {
@@ -1451,7 +1462,8 @@ void CTesselationPatch::sampleTesselation(CShadingContext *context,int div,unsig
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	tesselate
-// Description			:	Find the best tesselation for this object
+// Description			:
+/// \brief					Find the best tesselation for this object
 // Return Value			:
 // Comments				:
 CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingContext *context,char rdiv,int estimateOnly) {
@@ -1871,7 +1883,8 @@ CTesselationPatch::CPurgableTesselation*		CTesselationPatch::tesselate(CShadingC
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
 // Method				:	splitToChildren
-// Description			:	generate subpatches when current tesselations are insufficient
+// Description			:
+/// \brief					generate subpatches when current tesselations are insufficient
 // Return Value			:
 // Comments				:
 void		CTesselationPatch::splitToChildren(CShadingContext *context) {	
@@ -1938,7 +1951,8 @@ void		CTesselationPatch::splitToChildren(CShadingContext *context) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	initTesselations
-// Description			:	initialize the thread data for tesselations
+// Description			:
+/// \brief					initialize the thread data for tesselations
 // Return Value			:
 // Comments				:
 void		CTesselationPatch::initTesselations(int geoCacheMemory) {
@@ -1966,7 +1980,8 @@ void		CTesselationPatch::initTesselations(int geoCacheMemory) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	shutdownTesselations
-// Description			:	shutdown tesselations
+// Description			:
+/// \brief					shutdown tesselations
 // Return Value			:
 // Comments				:
 void		CTesselationPatch::shutdownTesselations() {
@@ -1990,7 +2005,8 @@ void		CTesselationPatch::shutdownTesselations() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	tesselationQuickSort
-// Description			:	Sort the tesselations in the order of increasing last ref number
+// Description			:
+/// \brief					Sort the tesselations in the order of increasing last ref number
 // Return Value			:
 // Comments				:
 void	CTesselationPatch::tesselationQuickSort(CTesselationEntry **activeTesselations,int start,int end,int thread) {
@@ -2022,7 +2038,8 @@ void	CTesselationPatch::tesselationQuickSort(CTesselationEntry **activeTesselati
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTesselationPatch
 // Method				:	purgeTesselations
-// Description			:	purge tesselations of level from thread
+// Description			:
+/// \brief					purge tesselations of level from thread
 // Return Value			:
 // Comments				:
 void		CTesselationPatch::purgeTesselations(CShadingContext *context,CTesselationPatch *entry,int thread,int level,int all) {

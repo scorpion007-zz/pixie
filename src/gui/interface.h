@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	interface.h
 //  Classes				:	CInterface
-//  Description			:	This class handles the user interface
+//  Description			:
+/// \brief					This class handles the user interface
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef INTERFACE_H
@@ -45,7 +46,8 @@ const int	INTERFACE_CTRL_KEY		=	65507;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CInterface
-// Description			:	Deals with the trackball interface
+// Description			:
+/// \brief					Deals with the trackball interface
 // Comments				:	-
 class	CInterface {
 public:

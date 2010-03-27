@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -34,9 +34,11 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplayChannel
-// Description			:	display channel info ctor
+// Description			:
+/// \brief					display channel info ctor
 // Return Value			:
-// Comments				:	var can be NULL
+// Comments				:
+/// \note					var can be NULL
 CDisplayChannel::CDisplayChannel() {
 	strcpy(this->name,"*INVALID*");
 	variable		=	NULL;
@@ -50,18 +52,22 @@ CDisplayChannel::CDisplayChannel() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplayChannel
-// Description			:	display channel info dtor
+// Description			:
+/// \brief					display channel info dtor
 // Return Value			:
-// Comments				:	var can be NULL
+// Comments				:
+/// \note					var can be NULL
 CDisplayChannel::~CDisplayChannel() {
 	if (fill) delete [] fill;
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisplayChannel
-// Description			:	display channel info ctor
+// Description			:
+/// \brief					display channel info ctor
 // Return Value			:
-// Comments				:	var can be NULL
+// Comments				:
+/// \note					var can be NULL
 CDisplayChannel::CDisplayChannel(const char *name,CVariable *var,int samples,int start,int entry) {
 	strcpy(this->name,name);
 	variable	=	var;

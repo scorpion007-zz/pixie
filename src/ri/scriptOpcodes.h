@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	scriptOpcodes.h
 //  Classes				:	-
-//  Description			:	Script opcodes
+//  Description			:
+/// \brief					Script opcodes
 //
 //
 //

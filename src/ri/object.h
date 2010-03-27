@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -59,7 +59,8 @@ const unsigned int	OBJECT_TERMINAL_TESSELATION	=	16;	// Set if the object should
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CObject
-// Description			:	This class encapsulates a general object
+// Description			:
+/// \brief					This class encapsulates a general object
 // Comments				:
 class	CObject : public CRefCounter {
 public:
@@ -104,7 +105,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyObject
-// Description			:	A dummy object
+// Description			:
+/// \brief					A dummy object
 // Comments				:
 class	CDummyObject : public CObject {
 public:
@@ -118,7 +120,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSurface
-// Description			:	This class encapsulates a 2D surface
+// Description			:
+/// \brief					This class encapsulates a 2D surface
 // Comments				:
 class	CSurface : public CObject {
 public:

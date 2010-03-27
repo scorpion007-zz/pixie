@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	implicitSurface.h
 //  Classes				:	CImplicit
-//  Description			:	Defines an implicit surface
+//  Description			:
+/// \brief					Defines an implicit surface
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef IMPLICITSURFACE_H
@@ -38,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CImplicit
-// Description			:	This class encapsulates an implicit surface defined by a signed distance function
+// Description			:
+/// \brief					This class encapsulates an implicit surface defined by a signed distance function
 // Comments				:
 class	CImplicit : public CSurface {
 public:

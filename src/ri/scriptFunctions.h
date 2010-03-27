@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	scriptFunctions.h
 //  Classes				:	-
-//  Description			:	This file defines the built in functions that
+//  Description			:
+/// \brief					This file defines the built in functions that
 //							can be used from the script. Note that the
 //							functions defined here are totally generic and
 //							don't need the presence of any external library.

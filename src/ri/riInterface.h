@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -39,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRiInterface
-// Description			:	This is the virtual class that implements the RenderMan interface
+// Description			:
+/// \brief					This is the virtual class that implements the RenderMan interface
 // Comments				:
 class	CRiInterface {
 public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	harmonics.h
 //  Classes				:	-
-//  Description			:	Some misc spherical harmonic manipulation functions
+//  Description			:
+/// \brief					Some misc spherical harmonic manipulation functions
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef HARMONICS_H
@@ -35,7 +36,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	harmonicAccumulate
-// Description			:	Accumulate a sample into the matrices
+// Description			:
+/// \brief					Accumulate a sample into the matrices
 // Return Value			:	-
 // Comments				:
 inline	void	harmonicAccumulate(float *X,float *Y,const float *D,const float *C) {
@@ -68,7 +70,8 @@ inline	void	harmonicAccumulate(float *X,float *Y,const float *D,const float *C) 
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	harmonicEvaluate
-// Description			:	Evaluate spherical harmonics at a particular point
+// Description			:
+/// \brief					Evaluate spherical harmonics at a particular point
 // Return Value			:	-
 // Comments				:
 inline	void	harmonicEvaluate(float *C,const float *Y,const float *D) {
@@ -117,7 +120,8 @@ inline	void	harmonicEvaluate(float *C,const float *Y,const float *D) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	harmonicDiffuse
-// Description			:	Evaluate the diffuse illumination at a point
+// Description			:
+/// \brief					Evaluate the diffuse illumination at a point
 // Return Value			:	-
 // Comments				:
 inline	void	harmonicDiffuse(float *C,const float *Y,const float *D) {
@@ -159,7 +163,8 @@ inline	void	harmonicDiffuse(float *C,const float *Y,const float *D) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	harmonicMultiply
-// Description			:	Multiply the harmonics with a normal vector
+// Description			:
+/// \brief					Multiply the harmonics with a normal vector
 // Return Value			:	-
 // Comments				:
 inline	void	harmonicTransform(float *y,const float *D) {
@@ -191,7 +196,8 @@ inline	void	harmonicTransform(float *y,const float *D) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	harmonicDot
-// Description			:	Multiply the harmonics with a normal vector
+// Description			:
+/// \brief					Multiply the harmonics with a normal vector
 // Return Value			:	-
 // Comments				:
 inline	void	harmonicDot(float *C,const float *Y,const float *y) {

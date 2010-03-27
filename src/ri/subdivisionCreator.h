@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	subdivisionCreator.h
 //  Classes				:	
-//  Description			:	The code that does the subdivision and generates the bicubic patches
+//  Description			:
+/// \brief					The code that does the subdivision and generates the bicubic patches
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef SUBDIVCREATOR_H
@@ -37,7 +38,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
-// Description			:	Holds a subdivision surface mesh
+// Description			:
+/// \brief					Holds a subdivision surface mesh
 // Comments				:
 class	CSubdivMesh : public CObject {
 public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -63,7 +63,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhoton
-// Description			:	A Photon
+// Description			:
+/// \brief					A Photon
 // Comments				:
 class	CPhoton : public CMapItem {
 public:
@@ -74,7 +75,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonRay
-// Description			:	A Photon
+// Description			:
+/// \brief					A Photon
 // Comments				:
 class	CPhotonRay : public CRay {
 public:
@@ -84,7 +86,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
-// Description			:	A Photon map
+// Description			:
+/// \brief					A Photon map
 // Comments				:
 class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView, public CRefCounter {
 	
