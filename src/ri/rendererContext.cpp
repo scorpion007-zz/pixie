@@ -431,8 +431,8 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 	// Set the delayed object
 	delayed	=	cDelayed;
 	
-	//CAttributes		*cAttributes	=	cDelayed->attributes;
-	CAttributes		*cAttributes	=	NULL;
+	CAttributes		*cAttributes	=	cDelayed->attributes;
+	//CAttributes		*cAttributes	=	NULL;
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
 		cAttributes		=	getAttributes(FALSE);
 	}
