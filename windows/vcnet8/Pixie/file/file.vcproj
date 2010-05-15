@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="file"
 	ProjectGUID="{999FBC26-4F20-4BEF-B7DC-87DB7AA47F72}"
+	RootNamespace="file"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -45,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
 				PreprocessorDefinitions="HAVE_LIBPNG;WIN32;_DEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -69,10 +70,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib libtiff.lib libjpeg.lib zlib.lib"
+				AdditionalDependencies="libpng.lib libtiff.lib jpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames="libcd, libc"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/file.pdb"
@@ -221,7 +222,7 @@
 				EnableIntrinsicFunctions="true"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
 				PreprocessorDefinitions="HAVE_LIBPNG;WIN32;NDEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -242,10 +243,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib libtiff.lib libjpeg.lib zlib.lib"
+				AdditionalDependencies="libpng.lib libtiff.lib jpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames="libc"
 				GenerateDebugInformation="false"
 				SubSystem="2"

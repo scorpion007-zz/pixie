@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;RI_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -70,10 +70,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="common.lib libtiff.lib libjpeg.lib zlib.lib ws2_32.lib"
+				AdditionalDependencies="common.lib libtiff.lib jpeg.lib zlib.lib ws2_32.lib"
 				OutputFile="$(OutDir)/ri.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames="LIBCMTD"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ri.pdb"
@@ -222,7 +222,7 @@
 				EnableIntrinsicFunctions="true"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;RI_EXPORTS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -244,10 +244,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="common.lib libtiff.lib libjpeg.lib zlib.lib ws2_32.lib"
+				AdditionalDependencies="common.lib libtiff.lib jpeg.lib zlib.lib ws2_32.lib"
 				OutputFile="$(OutDir)/ri.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				SubSystem="2"
