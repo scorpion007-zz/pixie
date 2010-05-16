@@ -1,0 +1,7 @@
+*.sln
+*.ncb
+*.suo
+tmp/
+bin/
+*.vcproj.*
+*.swp
