@@ -136,12 +136,15 @@ void	CWinDisplay::main() {
 	RegisterClassEx(&wcex);
 
 	// Create the window
-	hWnd							= CreateWindow("WinDisplay", name, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, width, height, NULL, NULL, hInst, NULL);
+  hWnd = CreateWindow("WinDisplay", name, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+    0, width, height, NULL, NULL, hInst, NULL);
 
 	if (!hWnd)	{
 		active	=	FALSE;
 		return;	// Nothing to do
 	}
+
+  SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
 
 	// Show the window
 	ShowWindow(hWnd,SW_SHOW);
@@ -174,10 +177,6 @@ void	CWinDisplay::main() {
 
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0,0)) {
-		if (msg.message == WM_PAINT) {
-			redraw();
-		}
-
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -192,25 +191,36 @@ void	CWinDisplay::main() {
 // Description			:	Redraw the image
 // Return Value			:	-
 // Comments				:
-void	CWinDisplay::redraw() {
-	RECT	windowRect;
-	RECT	imageRect;
-	HDC		cDc;
+void	CWinDisplay::redraw(HDC hdc, RECT *rcUpdate) {
+  int x, y, w, h;
 
-	cDc				=	GetDC(hWnd);
+  if (rcUpdate) {
+    // Repaint just the dirty rect.
+    x = rcUpdate->left;
+    y = rcUpdate->top;
+    w = min(rcUpdate->right - rcUpdate->left, width);
+    h = min(rcUpdate->bottom - rcUpdate->top, height);
+  } else {
+    // Repaint the whole thing.
+    x = 0;
+    y = 0;
+    w = width;
+    h = height;
+  }
 
-	imageRect.left	=	0;
-	imageRect.top	=	0;
-	imageRect.right	=	width;
-	imageRect.bottom=	height;
-	
-	GetClientRect(hWnd,&windowRect);
+  // NOTE: Refer to Petzold's "Programming Windows" for an explanation of
+  // the strange coordinate system bitmaps and the following function use.
+  SetDIBitsToDevice(hdc, x, y, w, h, x, height - y - h, 0, height,
+    imageData, &info, DIB_RGB_COLORS);
 
-	SetStretchBltMode(cDc, COLORONCOLOR);
-	StretchDIBits(cDc,	0,0,width,height,
-						0,0,width,height,
-						imageData,&info,DIB_RGB_COLORS,SRCCOPY);
-	willRedraw		=	FALSE;
+  willRedraw = FALSE;
+}
+
+// Helper function to repaint the whole window, out of the WM_PAINT message.
+void CWinDisplay::redraw() {
+  HDC hdc = GetDC(hWnd);
+  redraw(hdc, NULL);  // Repaint the whole window.
+  ReleaseDC(hWnd, hdc);
 }
 
 
@@ -329,7 +339,16 @@ void	CWinDisplay::finish() {
 // Return Value			:	-
 // Comments				:
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+  CWinDisplay *dpy = (CWinDisplay *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
 	switch (message) {
+    case WM_PAINT: {
+      PAINTSTRUCT ps;
+      BeginPaint(hWnd, &ps);
+      dpy->redraw(ps.hdc, &ps.rcPaint);
+      EndPaint(hWnd, &ps);
+      break;
+    }
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;

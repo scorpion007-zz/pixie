@@ -48,6 +48,7 @@ public:
 	int				ready();
 	void			main();
 	void			redraw();
+  void      redraw(HDC hdc, RECT *rcUpdate);
 	int				data(int,int,int,int,float *);
 	void			finish();
 
