@@ -128,15 +128,16 @@ void	CWinDisplay::main() {
 	wcex.hInstance					= hInst;
 	wcex.hIcon						= LoadIcon(NULL,IDI_APPLICATION);
 	wcex.hCursor					= LoadCursor(NULL,IDC_ARROW);
-	wcex.hbrBackground				= (HBRUSH)(COLOR_WINDOW+1);
+	wcex.hbrBackground				= NULL;
 	wcex.lpszMenuName				= NULL;
 	wcex.lpszClassName				= "WinDisplay";
 	wcex.hIconSm					= LoadIcon(NULL,IDI_APPLICATION);
 
 	RegisterClassEx(&wcex);
 
-	// Create the window
-  hWnd = CreateWindow("WinDisplay", name, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+  // Create the window (non-resizable).
+  hWnd = CreateWindow("WinDisplay", name,
+    WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX), CW_USEDEFAULT,
     0, width, height, NULL, NULL, hInst, NULL);
 
 	if (!hWnd)	{
