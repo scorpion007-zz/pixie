@@ -36,13 +36,13 @@
 #include "common/global.h"
 #include "common/containers.h"
 #include "common/os.h"
+#include "ri_config.h"   // Must define RENDERER before including <ri.h>
 #include "ri.h"
 #include "delayed.h"
 #include "rib.h"
 #include "rendererContext.h"
 #include "renderer.h"
 #include "error.h"
-#include "ri_config.h"
 
 #include <math.h>
 #include <string.h>
