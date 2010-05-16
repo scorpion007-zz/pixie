@@ -113,9 +113,8 @@ CWinDisplay::~CWinDisplay() {
 // Comments				:
 void	CWinDisplay::main() {
 	WNDCLASSEX	wcex;
-	RECT		clientRect,windowRect;
-	int			nw,nh;
 	MSG			msg;
+  const char *szPixieWndClass = "PixieWinDisplay";
 
 	hInst							= (HINSTANCE) GetModuleHandle(NULL);
 
@@ -130,35 +129,36 @@ void	CWinDisplay::main() {
 	wcex.hCursor					= LoadCursor(NULL,IDC_ARROW);
 	wcex.hbrBackground				= NULL;
 	wcex.lpszMenuName				= NULL;
-	wcex.lpszClassName				= "WinDisplay";
+	wcex.lpszClassName				= szPixieWndClass;
 	wcex.hIconSm					= LoadIcon(NULL,IDI_APPLICATION);
 
 	RegisterClassEx(&wcex);
 
+  // Make a non-resizable window style.
+  DWORD dwStyle = WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+
+  // Size of our desired client area.
+  RECT rc = { 0, 0, width, height };
+
+  // Compute the correct window size given our style.
+  AdjustWindowRect(&rc, dwStyle, FALSE);
+
   // Create the window (non-resizable).
-  hWnd = CreateWindow("WinDisplay", name,
-    WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX), CW_USEDEFAULT,
-    0, width, height, NULL, NULL, hInst, NULL);
+  hWnd = CreateWindow(szPixieWndClass, name,
+    dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
+    rc.bottom - rc.top, NULL, NULL, hInst, NULL);
 
 	if (!hWnd)	{
 		active	=	FALSE;
 		return;	// Nothing to do
 	}
 
+  // Associate a pointer to our instance with this window.
   SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
 
 	// Show the window
 	ShowWindow(hWnd,SW_SHOW);
 	UpdateWindow(hWnd);
-
-	// Adjust the size of the window so that we display the entire picture
-	GetWindowRect(hWnd,&windowRect);
-	GetClientRect(hWnd,&clientRect);
-
-	nw	=	width	+	(windowRect.right - windowRect.left) - (clientRect.right - clientRect.left);
-	nh	=	height	+	(windowRect.bottom - windowRect.top) - (clientRect.bottom - clientRect.top);
-
-	SetWindowPos(hWnd,NULL,0,0,nw,nh,SWP_SHOWWINDOW);
 
 	// Set up the bitmap
 	info.bmiHeader.biSize			= sizeof(BITMAPINFOHEADER);
