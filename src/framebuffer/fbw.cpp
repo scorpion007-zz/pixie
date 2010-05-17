@@ -31,6 +31,12 @@
 #include "framebuffer.h"
 #include "fbw.h"
 
+#include <windowsx.h>
+#include <math.h>
+#include <tchar.h>
+
+using namespace Gdiplus;
+
 // Foward declarations of functions included in this code module:
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -40,7 +46,15 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 #define	get_g(col)		(((col) >> 8) & 255)
 #define	get_b(col)		((col) & 255)
 
+#define ARRAY_COUNT(x) sizeof(x)/sizeof((x)[0])
 
+// Amount we zoom by each increment.
+static const float ZOOM_INCREMENT = .1f;
+
+// Valid for positive numbers.
+inline double round(double x) {
+  return (int)(x + .5);
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayThread
@@ -56,20 +70,30 @@ DWORD WINAPI  displayThread(void *w) {
 	return 0;
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	CWinDisplay
 // Description			:	Ctor
 // Return Value			:	-
 // Comments				:
-CWinDisplay::CWinDisplay(const char *name,const char *samples,int width,int height,int numSamples)
-: CDisplay(name,samples,width,height,numSamples) {
+CWinDisplay::CWinDisplay(const char *name,
+                         const char *samples,
+                         int width,
+                         int height,
+                         int numSamples):
+CDisplay(name, samples, width, height, numSamples),
+mouseDown(false), mag_fac(1), hInst(NULL), hWnd(NULL) {
 	int	i,j;
 	DWORD	threadID;
 
-	hInst		=	NULL;
-	hWnd		=	NULL;
+  // Initialize GDI+.
+  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+  zoomOrigin.x = 0;
+  zoomOrigin.y = 0;
+  lastPos.x = 0;
+  lastPos.y = 0;
+
 	imageData	=	new unsigned int[width*height];
 
 	// Create a checkerboard pattern
@@ -102,8 +126,43 @@ CWinDisplay::CWinDisplay(const char *name,const char *samples,int width,int heig
 // Comments				:
 CWinDisplay::~CWinDisplay() {
 	delete [] imageData;
+  GdiplusShutdown(gdiplusToken);
 }
 
+// Helper to get the base name from a path.
+TCHAR *basename(TCHAR *path) {
+  int len = _tcslen(path);
+  int i;
+  for (i = len-1; i >= 0; --i) {
+    if (path[i] == _T('\\') || path[i] == _T('/')) {
+      break;
+    }
+  }
+  if (i >= 0) {
+    return path+i+1;
+  } else {
+    return path;
+  }
+}
+
+// Makes a title for the framebuffer window, containing various pieces of
+// information.
+// Parameters:
+//  buf - buffer to write string to.
+//  cch - count of characters available in buf.
+//  file_name - Name of image we're displaying.
+//  mag_fac - magnification factor.
+void MakeWindowTitle(TCHAR *buf, size_t cch, TCHAR *file_name, float mag_fac) {
+  TCHAR *szBasename = basename(file_name);
+  _sntprintf(buf, cch-1, "%s [%d%%] - Pixie", szBasename,
+    (int)(round(mag_fac * 100)));
+  buf[cch-1] = 0;  // Null-terminate it.
+}
+
+void CWinDisplay::UpdateWinTitle() {
+  MakeWindowTitle(wndTitle, ARRAY_COUNT(wndTitle), name, mag_fac);
+  SetWindowText(hWnd, wndTitle);
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
@@ -118,7 +177,7 @@ void	CWinDisplay::main() {
 
 	hInst							= (HINSTANCE) GetModuleHandle(NULL);
 
-	wcex.cbSize						= sizeof(WNDCLASSEX); 
+	wcex.cbSize						= sizeof(WNDCLASSEX);
 
 	wcex.style						= CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc				= (WNDPROC)	WndProc;
@@ -135,7 +194,7 @@ void	CWinDisplay::main() {
 	RegisterClassEx(&wcex);
 
   // Make a non-resizable window style.
-  DWORD dwStyle = WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+  DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 
   // Size of our desired client area.
   RECT rc = { 0, 0, width, height };
@@ -143,8 +202,11 @@ void	CWinDisplay::main() {
   // Compute the correct window size given our style.
   AdjustWindowRect(&rc, dwStyle, FALSE);
 
+  // Create the initial title for the window.
+  MakeWindowTitle(wndTitle, ARRAY_COUNT(wndTitle), name, mag_fac);
+
   // Create the window (non-resizable).
-  hWnd = CreateWindow(szPixieWndClass, name,
+  hWnd = CreateWindow(szPixieWndClass, wndTitle,
     dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
     rc.bottom - rc.top, NULL, NULL, hInst, NULL);
 
@@ -155,6 +217,8 @@ void	CWinDisplay::main() {
 
   // Associate a pointer to our instance with this window.
   SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
+
+  ActualPixels();
 
 	// Show the window
 	ShowWindow(hWnd,SW_SHOW);
@@ -185,6 +249,106 @@ void	CWinDisplay::main() {
 	active	=	FALSE;
 }
 
+void CWinDisplay::OnMouseDown(int x, int y) {
+  mouseDown = true;
+  lastPos.x = (float)x;
+  lastPos.y = (float)y;
+
+  InvalidateRect(hWnd, NULL, TRUE);
+  SetCapture(hWnd);
+}
+
+void CWinDisplay::OnSize(int cx, int cy) {
+  UNREFERENCED_PARAMETER(cx);
+  UNREFERENCED_PARAMETER(cy);
+  CenterImage();
+}
+
+void CWinDisplay::OnGetMinMaxInfo(MINMAXINFO *mmi) {
+  // Restrict the minimum size of the window.
+  mmi->ptMinTrackSize.x = 250;
+  mmi->ptMinTrackSize.y = 150;
+}
+
+void CWinDisplay::OnMouseUp(int x, int y) {
+  mouseDown = false;
+  lastPos.x = (float)x;
+  lastPos.y = (float)y;
+  ReleaseCapture();
+}
+
+void CWinDisplay::OnMouseMove(int x, int y) {
+  if (mouseDown) {
+    float dx = (x - lastPos.x);
+    float dy = (y - lastPos.y);
+
+    zoomOrigin.x += dx;
+    zoomOrigin.y += dy;
+    InvalidateRect(hWnd, NULL, TRUE);
+
+    lastPos.x = (float)x;
+    lastPos.y = (float)y;
+  }
+}
+
+template<class T>
+inline T clamp(T x, T low, T high) {
+  if (x < low) {
+    x = low;
+  } else if (x > high) {
+    x = high;
+  }
+  return x;
+}
+
+void CWinDisplay::OnMouseWheel(int x, int y, int zDelta) {
+  UNREFERENCED_PARAMETER(x);
+  UNREFERENCED_PARAMETER(y);
+  if (zDelta > 0) {
+    ZoomIn();
+  } else {
+    ZoomOut();
+  }
+}
+
+void CWinDisplay::ZoomDelta(float dmag) {
+  ZoomImage(mag_fac + dmag);
+}
+
+void CWinDisplay::ZoomIn() {
+  ZoomDelta(ZOOM_INCREMENT);
+}
+
+void CWinDisplay::ZoomOut() {
+  ZoomDelta(-ZOOM_INCREMENT);
+}
+
+void CWinDisplay::CenterImage() {
+  RECT rc;
+  GetClientRect(hWnd, &rc);
+
+  zoomOrigin.x = ((rc.right - rc.left) - width*mag_fac)/2;
+  zoomOrigin.y = ((rc.bottom - rc.top) - height*mag_fac)/2;
+}
+
+void CWinDisplay::ActualPixels() {
+  ZoomImage(1);
+  CenterImage();
+}
+
+void CWinDisplay::ZoomImage(float mag) {
+  const float MINZOOM = .2f;
+  const float MAXZOOM = 10.f;
+
+  mag_fac = mag;
+
+  // Clamp zoom.
+  mag_fac = clamp(mag_fac, MINZOOM, MAXZOOM);
+
+  UpdateWinTitle();
+
+  InvalidateRect(hWnd, NULL, TRUE);
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
@@ -193,27 +357,27 @@ void	CWinDisplay::main() {
 // Return Value			:	-
 // Comments				:
 void	CWinDisplay::redraw(HDC hdc, RECT *rcUpdate) {
-  int x, y, w, h;
+  Graphics graphics(hdc);
+  graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
+  Bitmap bm(&info, imageData);
 
-  if (rcUpdate) {
-    // Repaint just the dirty rect.
-    x = rcUpdate->left;
-    y = rcUpdate->top;
-    w = min(rcUpdate->right - rcUpdate->left, width);
-    h = min(rcUpdate->bottom - rcUpdate->top, height);
-  } else {
-    // Repaint the whole thing.
-    x = 0;
-    y = 0;
-    w = width;
-    h = height;
-  }
+  float dstx = zoomOrigin.x;
+  float dsty = zoomOrigin.y;
 
-  // NOTE: Refer to Petzold's "Programming Windows" for an explanation of
-  // the strange coordinate system bitmaps and the following function use.
-  SetDIBitsToDevice(hdc, x, y, w, h, x, height - y - h, 0, height,
-    imageData, &info, DIB_RGB_COLORS);
+  float dstw = width*mag_fac;
+  float dsth = height*mag_fac;
 
+  // Entire surface.
+  RECT rc = { 0, 0, width, height };
+
+  ExcludeClipRect(hdc, (int)dstx, (int)dsty,
+    (int)(dstx+dstw), (int)(dsty+dsth));
+
+  FillRect(hdc, rcUpdate ? rcUpdate : &rc, GetStockBrush(GRAY_BRUSH));
+  SelectClipRgn(hdc, NULL);
+
+  RectF dest(dstx, dsty, dstw, dsth);
+  graphics.DrawImage(&bm, dest);
   willRedraw = FALSE;
 }
 
@@ -224,6 +388,13 @@ void CWinDisplay::redraw() {
   ReleaseDC(hWnd, hdc);
 }
 
+void CWinDisplay::OnKeyDown(int vk) {
+  switch(vk) {
+    case VK_NUMPAD0:
+      ActualPixels();  // Zoom to 100%.
+      break;
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
@@ -350,6 +521,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
       EndPaint(hWnd, &ps);
       break;
     }
+    case WM_LBUTTONDOWN:
+      dpy->OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      break;
+    case WM_LBUTTONUP:
+      dpy->OnMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      break;
+    case WM_MOUSEMOVE:
+      dpy->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      break;
+    case WM_MOUSEWHEEL:
+      dpy->OnMouseWheel(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam),
+        GET_WHEEL_DELTA_WPARAM(wParam));
+      break;
+    case WM_KEYDOWN:
+      dpy->OnKeyDown(wParam);
+      break;
+    case WM_SIZE:
+      dpy->OnSize(LOWORD(lParam), HIWORD(lParam));
+      break;
+    case WM_GETMINMAXINFO:
+      dpy->OnGetMinMaxInfo((MINMAXINFO*)lParam);
+      break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;

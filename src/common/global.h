@@ -120,7 +120,6 @@ typedef union {
 	double			real;
 } T64;
 
-
 // Some useful machinery for memory management
 #ifdef		_WINDOWS
 	#ifdef		_DEBUG
@@ -130,9 +129,6 @@ typedef union {
 		#define		_CRTDBG_MAP_ALLOC
 		#include	<stdlib.h>
 		#include	<crtdbg.h>
-
-		#define		MYDEBUG_NEW		new( _NORMAL_BLOCK, __FILE__, __LINE__)
-		#define		new				MYDEBUG_NEW
 	#endif
 #endif
 

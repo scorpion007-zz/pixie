@@ -32,6 +32,7 @@
 #define FBW_H
 
 #include <windows.h>
+#include <gdiplus.h>
 
 #include "framebuffer.h"
 
@@ -47,13 +48,19 @@ public:
 
 	int				ready();
 	void			main();
-	void			redraw();
-  void      redraw(HDC hdc, RECT *rcUpdate);
 	int				data(int,int,int,int,float *);
 	void			finish();
-
 	HANDLE			thread;
 
+  void      redraw();
+  void      redraw(HDC hdc, RECT *rcUpdate);
+  void      OnMouseDown(int x, int y);
+  void      OnMouseUp(int x, int y);
+  void      OnMouseMove(int x, int y);
+  void      OnMouseWheel(int x, int y, int zDelta);
+  void      OnKeyDown(int vk);
+  void      OnSize(int cx, int cy);
+  void      OnGetMinMaxInfo(MINMAXINFO *mmi);
 private:
 	HINSTANCE		hInst;								// current instance
 	HWND			hWnd;								// current window
@@ -62,6 +69,27 @@ private:
 	unsigned int	*imageData;
 	int				active;
 	int				willRedraw;
+
+  void UpdateWinTitle();
+  void ZoomImage(float mag);   // Zoom to a fixed factor.
+  void ZoomDelta(float dmag);  // Zoom by some offset
+
+  // Helper functions for common cases.
+  void ZoomIn();
+  void ZoomOut();
+  void ActualPixels();  // Zoom to 100%.
+  void CenterImage();
+
+  ULONG_PTR gdiplusToken;
+  Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+  TCHAR wndTitle[200];
+
+  // Zoom origin
+  POINTFLOAT zoomOrigin;
+  POINTFLOAT lastPos;
+  float mag_fac;
+  POINT vpOrigin;  // viewport origin.
+  bool mouseDown;
 };
 
 
