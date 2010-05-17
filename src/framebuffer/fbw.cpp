@@ -193,7 +193,7 @@ void	CWinDisplay::main() {
 
 	RegisterClassEx(&wcex);
 
-  // Make a non-resizable window style.
+  // Define our window style.
   DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 
   // Size of our desired client area.
