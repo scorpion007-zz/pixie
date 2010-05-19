@@ -465,10 +465,12 @@ public:
 		class CDisplayData {
 		public:
       CDisplayData(): module(NULL), handle(NULL), start(NULL), data(NULL),
-                      rawData(NULL), finish(NULL), display(NULL) {}
+                      rawData(NULL), finish(NULL), display(NULL), abort(false)
+      {}
 
 				void						*module;				// The module handle for the out device
 				void						*handle;				// The handle for the out device
+        bool            abort;     // Is an abort in progress?
 				int							numSamples;				// The number of samples
 				CDisplayChannel				*channels;
 				int							numChannels;

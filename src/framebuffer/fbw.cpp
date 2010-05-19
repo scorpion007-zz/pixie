@@ -31,14 +31,19 @@
 #include "framebuffer.h"
 #include "fbw.h"
 
+#include "resource.h"
+
 #include <windowsx.h>
 #include <math.h>
 #include <tchar.h>
 
 using namespace Gdiplus;
 
+static HINSTANCE hInst;  // Our DLL's instance.
+
 // Foward declarations of functions included in this code module:
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+void GenCheckerboard(unsigned int *buf, int w, int h);
 
 #define	color(r,g,b,a)	((a << 24) | (r << 16) | (g << 8) | b)
 #define	get_a(col)		((col) >> 24)
@@ -46,7 +51,14 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 #define	get_g(col)		(((col) >> 8) & 255)
 #define	get_b(col)		((col) & 255)
 
-#define ARRAY_COUNT(x) sizeof(x)/sizeof((x)[0])
+#define ARRAY_COUNT(x) (sizeof(x)/sizeof((x)[0]))
+
+// Channel manipulation macros.
+#define TEST_CHANNEL(x, channel) ((x) & (1 << (channel)))
+#define SET_CHANNEL(x, channel) ((x) |= (1 << (channel)))
+#define UNSET_CHANNEL(x, channel) ((x) &= ~(1 << (channel)))
+#define TOGGLE_CHANNEL(x, channel) ((x) ^= (1 << (channel)))
+#define EXTRACT_CHANNEL(x, channel) (((x) >> (16 - 8 * (channel))) & 0xFF)
 
 // Amount we zoom by each increment.
 static const float ZOOM_INCREMENT = .1f;
@@ -82,9 +94,11 @@ CWinDisplay::CWinDisplay(const char *name,
                          int height,
                          int numSamples):
 CDisplay(name, samples, width, height, numSamples),
-mouseDown(false), mag_fac(1), hInst(NULL), hWnd(NULL) {
-	int	i,j;
+mouseDown(false), mag_fac(1), hWnd(NULL), m_channels(0),
+m_alpha(false) {
 	DWORD	threadID;
+
+  memset(m_channelsPresent, 0, sizeof(m_channelsPresent));
 
   // Initialize GDI+.
   GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
@@ -94,22 +108,27 @@ mouseDown(false), mag_fac(1), hInst(NULL), hWnd(NULL) {
   lastPos.x = 0;
   lastPos.y = 0;
 
-	imageData	=	new unsigned int[width*height];
+  // Default to RGB
+  SetRGBA();
 
-	// Create a checkerboard pattern
-	for (i=0;i<height;i++) {
-		for (j=0;j<width;j++) {
-			unsigned char	d	=	255;
-			int				t	=	0;
+  imageData	=	new unsigned int[width*height];
 
-			if ((i & 63) < 32)	t ^=	1;
-			if ((j & 63) < 32)	t ^=	1;
+  int nchannels = min(numSamples, MAX_CHANNELS);
 
-			if (t)			d	=	128;
+  // Allocate storage for channel data.
+  for (int i = 0; i < nchannels; ++i) {
+    m_channelData[i] = new float[width*height];
+    memset(m_channelData[i], 0, width*height*sizeof(float));
+    m_channelsPresent[i] = true;
+  }
 
-			imageData[i*width+j]	=	color(d,d,d,d);
-		}
-	}
+  if (m_channelsPresent[CHAN_ALPHA]) {
+    // Create a checkerboard pattern
+    GenCheckerboard(imageData, width, height);
+  } else {
+    // Fill with black.
+    memset(imageData, 0, width*height * sizeof(*imageData));
+  }
 
 	active		=	TRUE;
 	willRedraw	=	FALSE;
@@ -126,6 +145,11 @@ mouseDown(false), mag_fac(1), hInst(NULL), hWnd(NULL) {
 // Comments				:
 CWinDisplay::~CWinDisplay() {
 	delete [] imageData;
+  for (int i = 0; i < MAX_CHANNELS; ++i) {
+    if (m_channelsPresent[i]) {
+      delete [] m_channelData[i];
+    }
+  }
   GdiplusShutdown(gdiplusToken);
 }
 
@@ -152,16 +176,107 @@ TCHAR *basename(TCHAR *path) {
 //  cch - count of characters available in buf.
 //  file_name - Name of image we're displaying.
 //  mag_fac - magnification factor.
-void MakeWindowTitle(TCHAR *buf, size_t cch, TCHAR *file_name, float mag_fac) {
+void MakeWindowTitle(TCHAR *buf, size_t cch, TCHAR *file_name, float mag_fac,
+                     DWORD channels, bool alphaOnly) {
   TCHAR *szBasename = basename(file_name);
-  _sntprintf(buf, cch-1, "%s [%d%%] - Pixie", szBasename,
-    (int)(round(mag_fac * 100)));
+  _sntprintf(buf, cch-1, "%s [%d%%] [%c%c%c%c] - Pixie", szBasename,
+    (int)(round(mag_fac * 100)),
+    TEST_CHANNEL(channels, CHAN_RED) && !alphaOnly ? 'R' : '-',
+    TEST_CHANNEL(channels, CHAN_GREEN) && !alphaOnly ? 'G' : '-',
+    TEST_CHANNEL(channels, CHAN_BLUE) && !alphaOnly ? 'B' : '-',
+    TEST_CHANNEL(channels, CHAN_ALPHA) || alphaOnly ? 'A' : '-'
+    );
   buf[cch-1] = 0;  // Null-terminate it.
 }
 
 void CWinDisplay::UpdateWinTitle() {
-  MakeWindowTitle(wndTitle, ARRAY_COUNT(wndTitle), name, mag_fac);
+  DWORD channels = m_channels;
+  if (m_channelsPresent[CHAN_ALPHA]) {
+    SET_CHANNEL(channels, CHAN_ALPHA);
+  }
+  MakeWindowTitle(wndTitle, ARRAY_COUNT(wndTitle), name, mag_fac, channels,
+    m_alpha);
   SetWindowText(hWnd, wndTitle);
+}
+
+// Generates a checkerboard pattern.
+void GenCheckerboard(unsigned int *buf, int w, int h) {
+  for (int i=0; i<h; i++) {
+    for (int j=0; j<w; j++) {
+      unsigned char d = 255;
+      int t = 0;
+
+      if ((i & 63) < 32) t ^= 1;
+      if ((j & 63) < 32) t ^= 1;
+
+      if (t)   d = 128;
+
+      buf[i*w+j] = color(d,d,d,d);
+    }
+  }
+}
+
+// The alpha channel is special and requires different processing.
+void CWinDisplay::QuantizeAlpha() {
+  assert(m_alpha);
+  if (!m_channelsPresent[CHAN_ALPHA]) {
+    // Fill with black
+    memset(imageData, 0, width*height*sizeof(*imageData));
+  } else {
+    for (int i = 0; i < height; ++i) {
+      for (int j = 0; j < width; ++j) {
+        int idx = j + i*width;
+        imageData[idx] = ComputeDisplayPixel(0, j, i);
+      }
+    }
+  }
+}
+
+void CWinDisplay::ShowAlpha() {
+  m_alpha = true;
+  QuantizeAlpha();
+  UpdateWinTitle();
+  InvalidateRect(hWnd, NULL, FALSE);
+}
+
+DWORD CWinDisplay::ComputeDisplayPixel(DWORD channels, int x, int y) {
+  int idx = x + y*width;
+
+  if (m_alpha || (!channels && m_channelsPresent[CHAN_ALPHA])) {
+    BYTE alpha = m_channelsPresent[CHAN_ALPHA] ?
+      m_channelData[CHAN_ALPHA][idx] * 255 : 0;
+    return color(alpha, alpha, alpha, 0);
+  } else {
+    float alpha = m_channelsPresent[CHAN_ALPHA] ?
+      m_channelData[CHAN_ALPHA][idx] : 1;
+
+    BYTE rgb[3] = {0};
+
+    // Blend the sample with the background to achieve transparency
+    // (for display).
+    for (int ch = 0; ch < 3; ++ch) {
+      if (TEST_CHANNEL(channels, ch) && m_channelsPresent[ch]) {
+        rgb[ch] = alpha * m_channelData[ch][idx] * 255 + (1-alpha) *
+          EXTRACT_CHANNEL(imageData[idx], ch);
+      }
+    }
+
+    return color(rgb[0], rgb[1], rgb[2], 0);
+  }
+}
+
+// Quantize several color channels for display and cache the results.
+// channels - bitfield of channels to display
+void CWinDisplay::QuantizeChannels(DWORD channels) {
+  // Make the background (in case it's transparent).
+  GenCheckerboard(imageData, width, height);
+
+  for (int i = 0; i < height; ++i) {
+    for (int j = 0; j < width; ++j) {
+      int idx = j + i*width;
+      imageData[idx] = ComputeDisplayPixel(channels, j, i);
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -175,7 +290,7 @@ void	CWinDisplay::main() {
 	MSG			msg;
   const char *szPixieWndClass = "PixieWinDisplay";
 
-	hInst							= (HINSTANCE) GetModuleHandle(NULL);
+  curPan = LoadCursor(hInst, MAKEINTRESOURCE(IDC_PAN));
 
 	wcex.cbSize						= sizeof(WNDCLASSEX);
 
@@ -185,7 +300,7 @@ void	CWinDisplay::main() {
 	wcex.cbWndExtra					= 0;
 	wcex.hInstance					= hInst;
 	wcex.hIcon						= LoadIcon(NULL,IDI_APPLICATION);
-	wcex.hCursor					= LoadCursor(NULL,IDC_ARROW);
+	wcex.hCursor					= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground				= NULL;
 	wcex.lpszMenuName				= NULL;
 	wcex.lpszClassName				= szPixieWndClass;
@@ -203,7 +318,8 @@ void	CWinDisplay::main() {
   AdjustWindowRect(&rc, dwStyle, FALSE);
 
   // Create the initial title for the window.
-  MakeWindowTitle(wndTitle, ARRAY_COUNT(wndTitle), name, mag_fac);
+  MakeWindowTitle(wndTitle, ARRAY_COUNT(wndTitle), name, mag_fac, m_channels,
+    m_alpha);
 
   // Create the window (non-resizable).
   hWnd = CreateWindow(szPixieWndClass, wndTitle,
@@ -222,7 +338,7 @@ void	CWinDisplay::main() {
 
 	// Show the window
 	ShowWindow(hWnd,SW_SHOW);
-	UpdateWindow(hWnd);
+  InvalidateRect(hWnd, NULL, FALSE);
 
 	// Set up the bitmap
 	info.bmiHeader.biSize			= sizeof(BITMAPINFOHEADER);
@@ -236,9 +352,6 @@ void	CWinDisplay::main() {
 	info.bmiHeader.biYPelsPerMeter	= 2834;
 	info.bmiHeader.biClrUsed		= 0;
 	info.bmiHeader.biClrImportant	= 0;
-
-	// Display the checkerboard
-	redraw();
 
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0,0)) {
@@ -256,6 +369,7 @@ void CWinDisplay::OnMouseDown(int x, int y) {
 
   InvalidateRect(hWnd, NULL, TRUE);
   SetCapture(hWnd);
+  SetCursor(curPan);
 }
 
 void CWinDisplay::OnSize(int cx, int cy) {
@@ -329,6 +443,8 @@ void CWinDisplay::CenterImage() {
 
   zoomOrigin.x = ((rc.right - rc.left) - width*mag_fac)/2;
   zoomOrigin.y = ((rc.bottom - rc.top) - height*mag_fac)/2;
+
+  InvalidateRect(hWnd, NULL, FALSE);
 }
 
 void CWinDisplay::ActualPixels() {
@@ -356,11 +472,7 @@ void CWinDisplay::ZoomImage(float mag) {
 // Description			:	Redraw the image
 // Return Value			:	-
 // Comments				:
-void	CWinDisplay::redraw(HDC hdc, RECT *rcUpdate) {
-  Graphics graphics(hdc);
-  graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
-  Bitmap bm(&info, imageData);
-
+void	CWinDisplay::redraw() {
   float dstx = zoomOrigin.x;
   float dsty = zoomOrigin.y;
 
@@ -368,24 +480,62 @@ void	CWinDisplay::redraw(HDC hdc, RECT *rcUpdate) {
   float dsth = height*mag_fac;
 
   // Entire surface.
-  RECT rc = { 0, 0, width, height };
+  RECT rcEntire;
+  GetClientRect(hWnd, &rcEntire);
 
-  ExcludeClipRect(hdc, (int)dstx, (int)dsty,
-    (int)(dstx+dstw), (int)(dsty+dsth));
-
-  FillRect(hdc, rcUpdate ? rcUpdate : &rc, GetStockBrush(GRAY_BRUSH));
-  SelectClipRgn(hdc, NULL);
+  Graphics graphics(hWnd);
+  graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
+  graphics.SetPixelOffsetMode(PixelOffsetModeHalf);
+  Bitmap bm(&info, imageData);
 
   RectF dest(dstx, dsty, dstw, dsth);
+  graphics.ExcludeClip(dest);
+  SolidBrush bgBrush(Color(127, 127, 127));
+  graphics.FillRectangle(&bgBrush,
+    rcEntire.left, rcEntire.top,
+    rcEntire.right-rcEntire.left,
+    rcEntire.bottom-rcEntire.top);
+  graphics.ResetClip();
+
   graphics.DrawImage(&bm, dest);
   willRedraw = FALSE;
 }
 
-// Helper function to repaint the whole window, out of the WM_PAINT message.
-void CWinDisplay::redraw() {
-  HDC hdc = GetDC(hWnd);
-  redraw(hdc, NULL);  // Repaint the whole window.
-  ReleaseDC(hWnd, hdc);
+void CWinDisplay::ToggleChannel(int channel) {
+  TOGGLE_CHANNEL(m_channels, channel);
+  QuantizeChannels(m_channels);
+  UpdateWinTitle();
+  InvalidateRect(hWnd, NULL, FALSE);
+}
+
+void CWinDisplay::ShowChannel(int channel) {
+  m_alpha = false;
+  m_channels = 0;
+  SET_CHANNEL(m_channels, channel);
+  UpdateWinTitle();
+  QuantizeChannels(m_channels);
+  InvalidateRect(hWnd, NULL, FALSE);
+}
+
+void CWinDisplay::SetRGBA() {
+  m_channels = 0;
+  SET_CHANNEL(m_channels, CHAN_RED);
+  SET_CHANNEL(m_channels, CHAN_GREEN);
+  SET_CHANNEL(m_channels, CHAN_BLUE);
+}
+
+void CWinDisplay::ShowRGBA() {
+  m_alpha = false;
+  SetRGBA();
+  UpdateWinTitle();
+  QuantizeChannels(m_channels);
+  InvalidateRect(hWnd, NULL, FALSE);
+}
+
+// Use during keyboard message only!
+BOOL IsKeyDown(int nVirtKey) {
+  // Return the high bit.
+  return GetKeyState(nVirtKey) & 0x8000;
 }
 
 void CWinDisplay::OnKeyDown(int vk) {
@@ -393,15 +543,56 @@ void CWinDisplay::OnKeyDown(int vk) {
     case VK_NUMPAD0:
       ActualPixels();  // Zoom to 100%.
       break;
+    case 'C':  // Show RGBA color
+      ShowRGBA();
+      break;
+    case 'R':
+      if (IsKeyDown(VK_CONTROL)) {
+        ToggleChannel(CHAN_RED);
+      } else {
+        ShowChannel(CHAN_RED);
+      }
+      break;
+    case 'G':
+      if (IsKeyDown(VK_CONTROL)) {
+        ToggleChannel(CHAN_GREEN);
+      } else {
+        ShowChannel(CHAN_GREEN);
+      }
+      break;
+    case 'B':
+      if (IsKeyDown(VK_CONTROL)) {
+        ToggleChannel(CHAN_BLUE);
+      } else {
+        ShowChannel(CHAN_BLUE);
+      }
+      break;
+    case 'A':
+      ShowAlpha();
+      break;
+    case VK_HOME:
+      CenterImage();
+      break;
   }
 }
 
+BOOL CWinDisplay::OnSetCursor() {
+  if (mouseDown) {
+    SetCursor(curPan);
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+
 ///////////////////////////////////////////////////////////////////////
-// Class				:	CWinDisplay
-// Method				:	data
-// Description			:	Draw the data onto the screen
-// Return Value			:	-
-// Comments				:
+// Class        : CWinDisplay
+// Method				: data
+// Description  : Draw the data onto the screen
+// Return Value :
+// Comments     : Must be thread safe! Called from multiple threads
+// concurrently.
 int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 	int	i,j;
 
@@ -410,70 +601,55 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 	for (i=0;i<h;i++) {
 		const float		*src	=	&d[i*w*numSamples];
 		unsigned int	*dest	=	&imageData[((height-(i+y)-1)*width+x)];
+    int offset = (height-1-(i+y))*width + x;
 
 		switch(numSamples) {
 		case 0:
 			break;
 		case 1:
 			for (j=0;j<w;j++) {
-				unsigned char	d	=	(unsigned char) (src[0]*255);
+        for (int c = 0; c < numSamples; ++c) {
+          m_channelData[c][offset + j] = src[c];
+        }
 
-				*dest++				=	color(d,d,d,d);
+				*dest++				=	ComputeDisplayPixel(m_channels, x+j, height-1-(y+i));
 				src++;
 			}
 			break;
 		case 2:
 			for (j=0;j<w;j++) {
-				const float		r	=	src[0]*src[1]*255	+ (1-src[1])*get_r(dest[0]);
-				const float		a	=	src[1]*255			+ (1-src[1])*get_a(dest[0]);
-				unsigned char	dr	=	(unsigned char) r;
-				unsigned char	da	=	(unsigned char) a;
-
-				*dest++				=	color(dr,dr,dr,da);
-
+        for (int c = 0; c < numSamples; ++c) {
+          m_channelData[c][offset + j] = src[c];
+        }
+				*dest++				=	ComputeDisplayPixel(m_channels, x+j, height-1-(y+i));
 				src					+=	2;
 			}
 			break;
 		case 3:
 			for (j=0;j<w;j++) {
-				unsigned char	dr	=	(unsigned char) (src[0]*255);
-				unsigned char	dg	=	(unsigned char) (src[1]*255);
-				unsigned char	db	=	(unsigned char) (src[2]*255);
-
-				*dest++				=	color(dr,dg,db,(unsigned char) 255);
-
+        for (int c = 0; c < numSamples; ++c) {
+          m_channelData[c][offset + j] = src[c];
+        }
+				*dest++				=	ComputeDisplayPixel(m_channels, x+j, height-1-(y+i));
 				src					+=	3;
 			}
 			break;
 		case 4:
 			for (j=0;j<w;j++) {
-				const float		r	=	src[0]*src[3]*255	+ (1-src[3])*get_r(dest[0]);
-				const float		g	=	src[1]*src[3]*255	+ (1-src[3])*get_g(dest[0]);
-				const float		b	=	src[2]*src[3]*255	+ (1-src[3])*get_b(dest[0]);
-				const float		a	=	src[3]*255			+ (1-src[3])*get_a(dest[0]);
-				unsigned char	dr	=	(unsigned char) r;
-				unsigned char	dg	=	(unsigned char) g;
-				unsigned char	db	=	(unsigned char) b;
-				unsigned char	da	=	(unsigned char) a;
-
-				*dest++				=	color(dr,dg,db,da);
-
+        for (int c = 0; c < numSamples; ++c) {
+          m_channelData[c][offset + j] = src[c];
+        }
+				*dest++				=	ComputeDisplayPixel(m_channels, x+j, height-1-(y+i));
 				src					+=	4;
 			}
 			break;
 		default:
 			for (j=0;j<w;j++) {
-				float			r	=	src[0]*src[3]*255	+ (1-src[3])*get_r(*dest);
-				float			g	=	src[1]*src[3]*255	+ (1-src[3])*get_g(*dest);
-				float			b	=	src[2]*src[3]*255	+ (1-src[3])*get_b(*dest);
-				float			a	=	src[3]*255			+ (1-src[3])*get_a(*dest);
-				unsigned char	dr	=	(unsigned char) r;
-				unsigned char	dg	=	(unsigned char) g;
-				unsigned char	db	=	(unsigned char) b;
-				unsigned char	da	=	(unsigned char) a;
-
-				*dest++				=	color(dr,dg,db,da);
-
+        // We only support storing up to 4 channels for now (RGBA)
+        for (int c = 0; c < 4; ++c) {
+          m_channelData[c][offset + j] = src[c];
+        }
+				*dest++				=	ComputeDisplayPixel(m_channels, x+j, height-1-(y+i));
 				src					+=	numSamples;
 			}
 			break;
@@ -481,11 +657,10 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 	}
 
 	if (active) {
-		if (willRedraw == FALSE) {
-			// Pump messages
-			willRedraw	=	TRUE;
-			PostMessage(hWnd,WM_PAINT,(WPARAM) this,0);
-		}
+    float dstx = zoomOrigin.x + x;
+    float dsty = zoomOrigin.y + y;
+    RECT rc = { dstx, dsty, dstx + w*mag_fac , dsty + h*mag_fac };
+    InvalidateRect(hWnd, &rc, FALSE);
 	}
 
 	return active;
@@ -498,9 +673,6 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 // Return Value			:	-
 // Comments				:
 void	CWinDisplay::finish() {
-	// Pump the redraw message
-	redraw();
-
 	// Wait for the user to close the window
 	WaitForSingleObject(thread,INFINITE);
 }
@@ -513,12 +685,9 @@ void	CWinDisplay::finish() {
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   CWinDisplay *dpy = (CWinDisplay *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-	switch (message) {
+  switch (message) {
     case WM_PAINT: {
-      PAINTSTRUCT ps;
-      BeginPaint(hWnd, &ps);
-      dpy->redraw(ps.hdc, &ps.rcPaint);
-      EndPaint(hWnd, &ps);
+      dpy->redraw();
       break;
     }
     case WM_LBUTTONDOWN:
@@ -543,13 +712,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_GETMINMAXINFO:
       dpy->OnGetMinMaxInfo((MINMAXINFO*)lParam);
       break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-   }
+    case WM_DESTROY:
+      PostQuitMessage(0);
+      break;
+    case WM_SETCURSOR:
+      if (dpy->OnSetCursor()) {
+        break;
+      }
+  }
 
-   return 0;
+  return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+  switch (fdwReason) {
+    case DLL_PROCESS_ATTACH:
+      hInst = hinstDLL;  // Save our module handle.
+      break;
+  }
+  return TRUE;
+}

@@ -36,6 +36,13 @@
 
 #include "framebuffer.h"
 
+enum CHANNEL {
+  CHAN_RED,
+  CHAN_GREEN,
+  CHAN_BLUE,
+  CHAN_ALPHA,
+  MAX_CHANNELS
+};
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
@@ -53,26 +60,41 @@ public:
 	HANDLE			thread;
 
   void      redraw();
-  void      redraw(HDC hdc, RECT *rcUpdate);
   void      OnMouseDown(int x, int y);
   void      OnMouseUp(int x, int y);
   void      OnMouseMove(int x, int y);
   void      OnMouseWheel(int x, int y, int zDelta);
   void      OnKeyDown(int vk);
   void      OnSize(int cx, int cy);
+  BOOL      OnSetCursor();
   void      OnGetMinMaxInfo(MINMAXINFO *mmi);
 private:
-	HINSTANCE		hInst;								// current instance
 	HWND			hWnd;								// current window
 	BITMAPINFO		info;								// bitmap info
-	RGBQUAD			*bmiColors;							// the colors
-	unsigned int	*imageData;
+
+	unsigned int	*imageData;  // Cached, quantized color channel for display.
+
+  float *m_channelData[MAX_CHANNELS];  // Original float channel data
+
+  // Tells us whether a channel is present.
+  bool m_channelsPresent[MAX_CHANNELS];
+
 	int				active;
 	int				willRedraw;
+
+  void QuantizeChannels(DWORD channels);
+  void QuantizeAlpha();
+  DWORD ComputeDisplayPixel(DWORD channels, int x, int y);
 
   void UpdateWinTitle();
   void ZoomImage(float mag);   // Zoom to a fixed factor.
   void ZoomDelta(float dmag);  // Zoom by some offset
+
+  void ToggleChannel(int channel);
+  void ShowAlpha();
+  void ShowChannel(int channel);
+  void ShowRGBA();
+  void SetRGBA();
 
   // Helper functions for common cases.
   void ZoomIn();
@@ -84,12 +106,16 @@ private:
   Gdiplus::GdiplusStartupInput gdiplusStartupInput;
   TCHAR wndTitle[200];
 
+  DWORD m_channels;
+  bool m_alpha;   // Show alpha only (takes precedence over color).
+
   // Zoom origin
   POINTFLOAT zoomOrigin;
   POINTFLOAT lastPos;
   float mag_fac;
-  POINT vpOrigin;  // viewport origin.
   bool mouseDown;
+
+  HCURSOR curPan;  // Pan cursor.
 };
 
 

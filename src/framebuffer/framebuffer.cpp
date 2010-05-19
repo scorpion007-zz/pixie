@@ -95,7 +95,6 @@ void	CDisplay::clampData(int w,int h,float *d) {
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
-
 #ifdef _WINDOWS
 	CWinDisplay		*cWindow	=	new CWinDisplay(name,samples,width,height,numSamples);
 #else
@@ -115,17 +114,13 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Description			:	Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
+// NOTE: This code needs to be re-entrant, as it will be called from multiple
+// threads at the same time!
+
+
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
-	CDisplay	*cWindow	=	(CDisplay *) im;
-
-	assert(cWindow != NULL);
-
-	if (cWindow->data(x,y,w,h,data) == FALSE) {
-		delete cWindow;
-		return FALSE;
-	}
-
-	return TRUE;
+  CDisplay	*cWindow	=	(CDisplay *) im;
+  return cWindow->data(x,y,w,h,data);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -134,13 +129,8 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 // Return Value			:	TRUE on success, FALSE othervise
 // Comments				:
 void	displayFinish(void *im) {
-	CDisplay	*cWindow		=	(CDisplay *) im;
-
-	assert(cWindow != NULL);
-
-	cWindow->finish();
-
-	delete cWindow;
-
+  CDisplay	*cWindow		=	(CDisplay *) im;
+  cWindow->finish();
+  delete cWindow;
 }
 

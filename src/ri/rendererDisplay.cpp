@@ -212,13 +212,15 @@ void	CRenderer::endDisplays() {
 	// Finish the out images
 	for (i=0;i<numDisplays;i++) {
 	
-		// Is the module up ?
-		if (datas[i].module != NULL) {
-			datas[i].finish(datas[i].handle);
-			if (strcmp(datas[i].display->outDevice,RI_SHADOW) == 0) {
-				CRenderer::context->RiMakeShadowV(datas[i].displayName,datas[i].displayName,0,NULL,NULL);
-			}
-		}
+    // Call its cleanup function.
+    datas[i].finish(datas[i].handle);
+
+    // Unload it from memory.
+    osUnloadModule(datas[i].module);
+
+    if (strcmp(datas[i].display->outDevice,RI_SHADOW) == 0) {
+      CRenderer::context->RiMakeShadowV(datas[i].displayName,datas[i].displayName,0,NULL,NULL);
+    }
 		if (datas[i].displayName != NULL) free(datas[i].displayName);
 		
 		// Delete the fill array if set
@@ -265,7 +267,7 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 
 	// Send the pixels to the output servers
 	for (i=0;i<numDisplays;i++) {
-		if (datas[i].module != NULL) {
+		if (!datas[i].abort) {  // Check for abort requested.
 			float	*dispatchData;
 			int		imageSamples							=	datas[i].numSamples;
 			int		size									=	width*height*imageSamples*sizeof(float);
@@ -291,16 +293,19 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 				}
 			}
 
-			if (datas[i].data(datas[i].handle,left,top,width,height,dispatchData) == FALSE) {
-				// Lock this piece of code
-				osLock(displayKillMutex);
-				datas[i].handle	=	NULL;
-				numActiveDisplays--;
-				if (numActiveDisplays == 0)	hiderFlags	|=	HIDER_BREAK;
-				osUnloadModule(datas[i].module);
-				datas[i].module	=	NULL;
-				osUnlock(displayKillMutex);
-			}
+      if (datas[i].data(datas[i].handle, left,
+        top, width, height, dispatchData) == FALSE) {
+          // Lock this piece of code
+          osLock(displayKillMutex);
+          datas[i].abort = true;  // Abort was requested.
+          numActiveDisplays--;
+          if (numActiveDisplays == 0)	hiderFlags	|=	HIDER_BREAK;
+          // NOTE: It's not safe to unload the module here, since
+          // another thread may be about to enter its data() function above!
+          // We just mark this display as having an abort request and clean it
+          // up at the end, skipping the rest of the buckets.
+          osUnlock(displayKillMutex);
+      }
 
 			if (size >= MAX_DISPATCH_SIZE)	delete [] dispatchData;
 		}
