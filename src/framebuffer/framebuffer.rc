@@ -64,7 +64,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 // Cursor
 //
 
-IDC_PAN                 CURSOR                  "D:\\dev\\pixie\\src\\framebuffer\\panCursor.cur"
+IDC_PAN                 CURSOR                  "panCursor.cur"
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
