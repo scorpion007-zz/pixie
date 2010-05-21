@@ -373,10 +373,6 @@
 			>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\..\src\sdr\sdr.l"
 			>
 			<FileConfiguration
