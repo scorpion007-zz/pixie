@@ -1,4 +1,4 @@
-echo off
+@echo off
 rmdir /Q /S Pixie
 mkdir Pixie
 mkdir Pixie\bin
@@ -23,7 +23,6 @@ copy bin\libpng12.dll Pixie\bin
 copy bin\libtiff3.dll Pixie\bin
 copy bin\zlib1.dll Pixie\bin
 copy bin\libmmd.dll Pixie\bin
-copy bin\msvcr90.dll Pixie\bin
 copy displays\file.dll Pixie\displays
 copy displays\framebuffer.dll Pixie\displays
 copy displays\rgbe.dll Pixie\displays
@@ -45,3 +44,16 @@ echo *********************************************
 echo At this point, the directory "Pixie" contains
 echo the Pixie distribution for the host computer
 echo *********************************************
+
+REM The following requires 7zip to be installed and in your PATH.
+
+REM Build a date string. (YYYY-MM-DD)
+REM NOTE: It depends on user's locale, so MM and DD may be reversed!
+for /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set date=%%c-%%b-%%a)
+
+REM Name our snapshot file.
+SET snap_file=Pixie_%date%.zip
+del %snap_file%
+7z a -tzip %snap_file% Pixie
+
+echo Snapshot file: %snap_file%
