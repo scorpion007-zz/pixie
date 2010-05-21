@@ -592,4 +592,7 @@ int    osAvailableCPUs() {
 	return -1;
 }
 
-
+void safe_strcpy(char *dst, const char *src, int cb) {
+  strncpy(dst, src, cb-1);
+  dst[cb-1] = 0;
+}

@@ -57,7 +57,7 @@
 %}
 %union slval {
 	float			real;
-	char			string[64];
+	char			string[512];
 	matrix			m;
 	vector			v;
 	TSdrParameter *parameter;

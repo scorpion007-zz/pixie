@@ -175,6 +175,13 @@ void			osDeleteSemaphore(TMutex &);
 void			osProcessEscapes(char *str);
 int             osAvailableCPUs();
 
+// String functions
+
+// Copies at most (cb-1) bytes from 'src' into 'dst', truncating 'src' to fit
+// 'dst' if necessary and guarantees NULL termination of 'dst'.
+// Use this instead of 'strcpy' to ensure no buffer-overruns occur.
+void safe_strcpy(char *dst, const char *src, int cb);
+
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osLock
 // Description			:	Lock a mutex
