@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\sdr"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -100,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\sdr"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -126,7 +126,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -137,7 +137,6 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -152,8 +151,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="true"
+				LargeAddressAware="2"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -180,8 +180,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\sdr"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -231,7 +231,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="false"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
@@ -262,8 +262,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\sdr"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -291,7 +291,7 @@
 				EnableIntrinsicFunctions="true"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -299,7 +299,6 @@
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -314,8 +313,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="false"
+				LargeAddressAware="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
 				TargetMachine="17"

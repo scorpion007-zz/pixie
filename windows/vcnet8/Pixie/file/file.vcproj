@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\displays"
-			IntermediateDirectory="..\..\..\..\tmp\file"
+			OutputDirectory="..\..\..\..\displays\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -73,7 +73,7 @@
 				AdditionalDependencies="libpng.lib libtiff.lib jpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames="libcd, libc"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/file.pdb"
@@ -107,8 +107,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="..\..\..\..\displays"
-			IntermediateDirectory="..\..\..\..\tmp\file"
+			OutputDirectory="..\..\..\..\displays\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -133,7 +133,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(tiff)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -144,7 +144,6 @@
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -161,11 +160,12 @@
 				AdditionalDependencies="libtiff.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(tiff)"
 				IgnoreDefaultLibraryNames="libcd, libc"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/file.pdb"
 				SubSystem="2"
+				LargeAddressAware="2"
 				ImportLibrary="$(OutDir)/file.lib"
 				TargetMachine="17"
 			/>
@@ -193,8 +193,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\displays"
-			IntermediateDirectory="..\..\..\..\tmp\file"
+			OutputDirectory="..\..\..\..\displays\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -246,7 +246,7 @@
 				AdditionalDependencies="libpng.lib libtiff.lib jpeg.lib zlib.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames="libc"
 				GenerateDebugInformation="false"
 				SubSystem="2"
@@ -282,8 +282,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="..\..\..\..\displays"
-			IntermediateDirectory="..\..\..\..\tmp\file"
+			OutputDirectory="..\..\..\..\displays\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -311,7 +311,7 @@
 				EnableIntrinsicFunctions="true"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\..\src"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(tiff)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FILE_EXPORTS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -319,7 +319,6 @@
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -336,10 +335,11 @@
 				AdditionalDependencies="libtiff.lib"
 				OutputFile="$(OutDir)/file.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(tiff)"
 				IgnoreDefaultLibraryNames="libc"
 				GenerateDebugInformation="false"
 				SubSystem="2"
+				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"

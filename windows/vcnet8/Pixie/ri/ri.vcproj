@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\ri\Debug"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -56,7 +56,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -74,7 +74,7 @@
 				ShowProgress="0"
 				OutputFile="$(OutDir)/ri.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames="LIBCMTD"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ri.pdb"
@@ -108,8 +108,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\ri"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -134,8 +134,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\src"
-				PreprocessorDefinitions="RENDERER;WIN32;_DEBUG;_WINDOWS;_USRDLL;RI_EXPORTS"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;RI_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -144,8 +144,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -159,14 +158,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="common.lib libtiff.lib zlib.lib ws2_32.lib"
+				AdditionalDependencies="common.lib libtiff_i.lib zlib.lib ws2_32.lib"
 				OutputFile="$(OutDir)/ri.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(zlib);$(tiff)"
 				IgnoreDefaultLibraryNames="libcd, libc"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ri.pdb"
 				SubSystem="2"
+				LargeAddressAware="2"
 				ImportLibrary="$(OutDir)/ri.lib"
 				TargetMachine="17"
 			/>
@@ -194,8 +194,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\ri\Release"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -227,7 +227,7 @@
 				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -244,7 +244,7 @@
 				AdditionalDependencies="common.lib libtiff.lib jpeg.lib zlib.lib ws2_32.lib"
 				OutputFile="$(OutDir)/ri.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin;$(gnuwin32)\lib"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(gnuwin32)\lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				SubSystem="2"
@@ -279,8 +279,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="..\..\..\..\bin"
-			IntermediateDirectory="..\..\..\..\tmp\ri"
+			OutputDirectory="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\tmp\$(ProjectName)\$(ConfigurationName)\$(PlatformName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
@@ -304,21 +304,16 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="true"
-				OmitFramePointers="true"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\..\..\src"
-				PreprocessorDefinitions="RENDERER;WIN32;NDEBUG;_WINDOWS;_USRDLL;RI_EXPORTS"
+				Optimization="2"
+				AdditionalIncludeDirectories="..\..\..\..\src;$(gnuwin32)\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;RI_EXPORTS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="0"
+				WarningLevel="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -331,13 +326,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="common.lib libtiff.lib zlib.lib ws2_32.lib"
+				AdditionalDependencies="common.lib libtiff_i.lib zlib.lib ws2_32.lib"
 				OutputFile="$(OutDir)/ri.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\bin"
+				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName);$(zlib);$(tiff)"
 				IgnoreDefaultLibraryNames="libc"
 				GenerateDebugInformation="false"
 				SubSystem="2"
+				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="0"
@@ -1302,6 +1298,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+						Optimization="0"
 						OmitFramePointers="false"
 					/>
 				</FileConfiguration>
