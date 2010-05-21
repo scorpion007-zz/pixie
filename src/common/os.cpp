@@ -49,7 +49,7 @@
 #endif
 
 // Environment seperators
-#ifdef _WINDOWS
+#ifdef _WIN32
 // >> Windoze
 #include <io.h>
 #include <direct.h>
@@ -130,7 +130,7 @@ void	osShutdown() {
 void	*osLoadModule(const char *name) {
 	void	*cModule	=	NULL;
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 	// Windows stuff here
 	cModule	=	LoadLibrary(name);
 #else
@@ -158,7 +158,7 @@ void	*osLoadModule(const char *name) {
 // Return Value			:	The error string
 // Comments				:
 const char *osModuleError() {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	return NULL;
 #else
 	return dlerror();
@@ -171,7 +171,7 @@ const char *osModuleError() {
 // Return Value			:	The module handle
 // Comments				:
 void	osUnloadModule(void *cModule) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	if (cModule != NULL) FreeLibrary((HMODULE) cModule);
 #else
 	if (cModule != NULL) dlclose((void *) cModule);
@@ -188,7 +188,7 @@ void	*osResolve(void *cModule,const char *name) {
 	void	*result	=	NULL;
 
 	if (cModule != NULL) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 		result	=	GetProcAddress((HMODULE) cModule,name);
 #else
 		result	=	dlsym((void *) cModule,name);
@@ -223,7 +223,7 @@ char			*osEnvironment(const char *name) {
 // Return Value			:	TRUE if it does
 // Comments				:
 int		osFileExists(const char *name) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	if (_access(name,0) == 0) return TRUE;
 #else
 	if (access(name,0) == 0) return TRUE;
@@ -255,7 +255,7 @@ void	osFixSlashes(char *st) {
 //                     :   Path is only unique within this process.
 void   osTempdir(char *result, size_t resultsize) {    
    
-#ifdef _WINDOWS
+#ifdef _WIN32
 	sprintf(result,"PixieTemp_%d\\",GetCurrentProcessId());
 #elif defined(__APPLE__) || defined(__APPLE_CC__)  // guard against __APPLE__ being undef from ftlk
 	FSRef tempRef;
@@ -289,7 +289,7 @@ void   osTempdir(char *result, size_t resultsize) {
 // Return Value			:	-
 // Comments				:	The directory must end with / (or \)
 void	osTempname(const char *directory,const char *prefix,char *result) {
-	#ifdef _WINDOWS
+	#ifdef _WIN32
 		// avoid some windows shortcomings by extending count when we
 		// start to get clashes
 		static int i = 0;
@@ -312,7 +312,7 @@ void	osTempname(const char *directory,const char *prefix,char *result) {
 // Return Value			:	-
 // Comments				:
 void	osCreateDir(const char *n) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 		_mkdir(n);
 #else
 		mkdir(n,S_IRWXU);
@@ -325,7 +325,7 @@ void	osCreateDir(const char *n) {
 // Return Value			:	-
 // Comments				:
 void	osDeleteDir(const char *n)	{
-#ifdef _WINDOWS
+#ifdef _WIN32
 	_rmdir(n);	
 #else
 	rmdir(n);
@@ -338,7 +338,7 @@ void	osDeleteDir(const char *n)	{
 // Return Value			:	-
 // Comments				:
 void	osDeleteFile(const char *n)	{
-#ifdef _WINDOWS
+#ifdef _WIN32
 	_unlink(n);	
 #else
 	unlink(n);	
@@ -352,7 +352,7 @@ void	osDeleteFile(const char *n)	{
 // Return Value			:
 // Comments				:
 void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *userData) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	_finddata_t	c_file;
 	intptr_t	hFile;
 	char		tmp[OS_MAX_PATH_LENGTH];
@@ -426,7 +426,7 @@ float	osCPUTime() {
 TThread	osCreateThread(TFun entry,void *d) {
 	TThread	cThread;
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 	DWORD		id;
 
 	cThread				=	CreateThread(NULL,80000000,entry,d,0,&id);
@@ -448,7 +448,7 @@ TThread	osCreateThread(TFun entry,void *d) {
 // Return Value			:
 // Comments				:
 int		osWaitThread(TThread	thread) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	WaitForSingleObject(thread,INFINITE);
 #else
 	return pthread_join(thread,NULL);
@@ -463,7 +463,7 @@ int		osWaitThread(TThread	thread) {
 // Return Value			:
 // Comments				:
 void	osCreateMutex(TMutex &mutex) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	InitializeCriticalSection(&mutex);
 #else
 	pthread_mutex_init(&mutex,NULL);
@@ -476,7 +476,7 @@ void	osCreateMutex(TMutex &mutex) {
 // Return Value			:
 // Comments				:
 void	osDeleteMutex(TMutex &mutex) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	DeleteCriticalSection(&mutex);
 #else
 	pthread_mutex_destroy(&mutex);
@@ -489,7 +489,7 @@ void	osDeleteMutex(TMutex &mutex) {
 // Return Value			:
 // Comments				:
 void	osCreateSemaphore(TSemaphore &sem,int count) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	sem	=	CreateSemaphore(NULL,0,count,NULL);
 #else
 	sem_init(&sem,PTHREAD_PROCESS_PRIVATE,count);
@@ -502,7 +502,7 @@ void	osCreateSemaphore(TSemaphore &sem,int count) {
 // Return Value			:
 // Comments				:
 void	osDeleteSemaphore(TSemaphore &sem) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	CloseHandle(sem);
 #else
 	sem_destroy(&sem);

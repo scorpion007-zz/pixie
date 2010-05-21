@@ -1068,7 +1068,7 @@ RiDiskFilter (RtFloat x, RtFloat y, RtFloat xwidth, RtFloat ywidth) {
 	return ( d <= 0.25f )? 1.0f : 0.0f;
 }
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 //
 // Computation of the complementary error function erfc(x).
 //
@@ -2168,7 +2168,7 @@ RiProcRunProgram (void *data, RtFloat detail) {
 	
 	// GSHTODO: cache the open pipes and close on last RunProgram
 	
-#ifdef _WINDOWS
+#ifdef _WIN32
 	char			progString[256];
 	char			tmpFile[512];
 

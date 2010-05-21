@@ -37,7 +37,7 @@
 #include "inttypes.h"
 #else				// <<OSX
 
-#ifndef _WINDOWS	// >>Not Windoze
+#ifndef _WIN32	// >>Not Windoze
 
 #ifdef HAVE_STDINT_H
 	#include <stdint.h>

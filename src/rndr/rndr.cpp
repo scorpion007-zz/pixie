@@ -36,7 +36,7 @@
 #include "ri/ri.h"
 
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 #include <process.h>
 #else
 #include <sys/select.h>
@@ -92,7 +92,7 @@ void	exitFunction() {
 			
 			// use execvp to search PATH, incase pixie
 			// isn't on the default search path
-#ifdef _WINDOWS
+#ifdef _WIN32
 			_execvp(argv[0],argv);
 #else
 			execvp(argv[0],argv);
@@ -170,7 +170,7 @@ void	riThread(void *w) {
 	// I may want to do this in a seperate process
 	RiBegin(managerString);
 	
-#ifndef _WINDOWS
+#ifndef _WIN32
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);
@@ -202,7 +202,7 @@ void	rndrc(char *ribFile,int port) {
 	SOCKET		sock;
 	struct		sockaddr_in	client;
 	
-#ifdef _WINDOWS
+#ifdef _WIN32
 	WSADATA wsaData;
 
 	// Init the winsock
@@ -259,7 +259,7 @@ retryBind:
 	
 	RiBegin(managerString);
 	
-#ifndef _WINDOWS
+#ifndef _WIN32
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);
@@ -291,7 +291,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	char		*tmp = managerString + strlen(managerString);
 	int			i,j;
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 	WSADATA wsaData;
 
 	// Init the winsock
@@ -361,7 +361,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 		char 		* const argv[]	=	{gargv[0],(char *) "-q",(char *) "-c",portbuf,ribFile,NULL};
 		
 		for(int k=0;k<numChildren;k++){
-			#ifdef _WINDOWS
+			#ifdef _WIN32
 				// use _spawnvp to search PATH, incase pixie
 				// isn't on the default search path
 				intptr_t pid = _spawnvp(_P_NOWAIT,argv[0],argv);
@@ -456,7 +456,7 @@ void	rndrd(int port) {
 	T32			buffer[BUFFERSIZE];
 	int			running	=	TRUE;
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 	WSADATA wsaData;
 
 	// Init the winsock
@@ -577,7 +577,7 @@ int main(int argc, char* argv[]) {
 	int				localChildren	=	0;
 	
 	// Enable memory leak detection/report
-#ifdef _WINDOWS
+#ifdef _WIN32
 #ifdef _DEBUG
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
@@ -796,7 +796,7 @@ int main(int argc, char* argv[]) {
 
 	RiBegin(managerString2);
 	
-#ifndef _WINDOWS
+#ifndef _WIN32
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);

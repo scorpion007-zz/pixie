@@ -33,7 +33,7 @@
 
 #include "global.h"
 
-#ifdef _WINDOWS		// >>>>>>>>>>>>>>>>>>>   Windoze
+#ifdef _WIN32		// >>>>>>>>>>>>>>>>>>>   Windoze
 #include <windows.h>
 #include <winsock.h>
 #include <malloc.h>
@@ -115,7 +115,7 @@ typedef void			*(*TFun)(void *);
 
 // Because Microzort developers are monkeys, we need these
 // for compatibility with the .NET 2005
-#ifdef _WINDOWS			// >>>>>>>>>>>>>>>>>>>   Windoze
+#ifdef _WIN32			// >>>>>>>>>>>>>>>>>>>   Windoze
 
 #ifndef strdup
 #define		strdup	_strdup
@@ -188,7 +188,7 @@ void safe_strcpy(char *dst, const char *src, int cb);
 // Return Value			:
 // Comments				:
 inline	void	osLock(TMutex &mutex) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	EnterCriticalSection(&mutex);
 #else
 	pthread_mutex_lock(&mutex);
@@ -201,7 +201,7 @@ inline	void	osLock(TMutex &mutex) {
 // Return Value			:
 // Comments				:
 inline	void	osUnlock(TMutex &mutex) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	LeaveCriticalSection(&mutex);
 #else
 	pthread_mutex_unlock(&mutex);
@@ -215,7 +215,7 @@ inline	void	osUnlock(TMutex &mutex) {
 // Return Value			:
 // Comments				:
 inline	void	osUp(TSemaphore &sem) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	ReleaseSemaphore(sem,1,NULL);
 #else
 	sem_post(&sem);
@@ -228,7 +228,7 @@ inline	void	osUp(TSemaphore &sem) {
 // Return Value			:
 // Comments				:
 inline	void	osDown(TSemaphore &sem) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	WaitForSingleObject(sem,INFINITE);
 #else
 	sem_wait(&sem);
@@ -241,7 +241,7 @@ inline	void	osDown(TSemaphore &sem) {
 // Return Value			:
 // Comments				:
 inline	void osCreateRWLock(TRWLock &l) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	l.readerEvent	=	CreateEvent(NULL,TRUE,FALSE,NULL);
 	l.mutex			=	CreateEvent(NULL,FALSE,TRUE,NULL);
 	l.writerMutex	=	CreateMutex(NULL,FALSE,NULL);
@@ -257,7 +257,7 @@ inline	void osCreateRWLock(TRWLock &l) {
 // Return Value			:
 // Comments				:
 inline	void osDeleteRWLock(TRWLock &l) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	CloseHandle(l.readerEvent);
 	CloseHandle(l.mutex);
 	CloseHandle(l.writerMutex);
@@ -272,7 +272,7 @@ inline	void osDeleteRWLock(TRWLock &l) {
 // Return Value			:
 // Comments				:
 inline	void osReadLock(TRWLock &l) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	// If we're first reader, claim mutex for all readers
 	if (InterlockedIncrement(&l.readCount) == 0) {
 		WaitForSingleObject(l.mutex, INFINITE);
@@ -290,7 +290,7 @@ inline	void osReadLock(TRWLock &l) {
 // Return Value			:
 // Comments				:
 inline	void osReadUnlock(TRWLock &l) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	// If we're last reader, signal that there are no more
 	if (InterlockedDecrement(&l.readCount) < 0) {
 		ResetEvent(l.readerEvent);
@@ -308,7 +308,7 @@ inline	void osReadUnlock(TRWLock &l) {
 // Return Value			:
 // Comments				:
 inline	void osWriteLock(TRWLock &l) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	// Ensure we are the only writr
 	WaitForSingleObject(l.writerMutex, INFINITE);
 	// Claim the global mutex
@@ -324,7 +324,7 @@ inline	void osWriteLock(TRWLock &l) {
 // Return Value			:
 // Comments				:
 inline	void osWriteUnlock(TRWLock &l) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	// Signal that that there are no more writers
 	SetEvent(l.mutex);
 	// And release writer mutex for a reader
@@ -336,7 +336,7 @@ inline	void osWriteUnlock(TRWLock &l) {
 
 
 // Misc. file extensions
-#ifdef _WINDOWS
+#ifdef _WIN32
 const	char	osModuleExtension[]		=	"dll";
 #else		// Windoze
 #ifdef __APPLE_CC__

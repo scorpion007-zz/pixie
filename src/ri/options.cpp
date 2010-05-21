@@ -628,7 +628,7 @@ TSearchpath					*optionsGetSearchPath(const char *path,TSearchpath *oldPath) {
 	for (dest=tmp,currentPath=path;;) {
 		if ((*currentPath == '\0') || (*currentPath == ':')) {		// End of the current path
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 			if ((dest - tmp) == 1) {
 				if ((currentPath[1] == '\\') || (currentPath[1] == '/')) {
 					*dest++	=	*currentPath++;

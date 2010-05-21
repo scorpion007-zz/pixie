@@ -39,7 +39,7 @@
 #define TRUE	1
 #define	FALSE	0
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 #include "fbw.h"	// Windoze framebuffer
 #else
 #include "fbx.h"	// X-Windoze framebuffer
@@ -95,7 +95,7 @@ void	CDisplay::clampData(int w,int h,float *d) {
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
-#ifdef _WINDOWS
+#ifdef _WIN32
 	CWinDisplay		*cWindow	=	new CWinDisplay(name,samples,width,height,numSamples);
 #else
 	CXDisplay		*cWindow	=	new CXDisplay(name,samples,width,height,numSamples);

@@ -121,7 +121,7 @@ typedef union {
 } T64;
 
 // Some useful machinery for memory management
-#ifdef		_WINDOWS
+#ifdef		_WIN32
 	#ifdef		_DEBUG
 		#include	<assert.h>
 
@@ -151,7 +151,7 @@ typedef union {
 #else
 
 	// Are we running under Visual Studio?
-	#ifdef _WINDOWS
+	#ifdef _WIN32
 		#include "../../config.windows.h"
 	#endif
 	

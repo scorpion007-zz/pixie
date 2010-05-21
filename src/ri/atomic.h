@@ -45,7 +45,7 @@
 
 ///////////////////////////////////////////////////////////////
 // Windoze
-#if defined(_WINDOWS)
+#if defined(_WIN32)
 
 // Include the mighty (crappy) windoze header
 #ifndef WIN32_LEAN_AND_MEAN

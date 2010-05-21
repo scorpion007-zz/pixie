@@ -187,7 +187,7 @@ void	sampleSphere(float *P,CSobol<3> &generator);
 // rand() does not return random lower-order bits, so fix it up since this
 // platform doesn't have random().
 
-	#ifdef _WINDOWS
+	#ifdef _WIN32
 	static inline long int random() {
 		// On Windows RAND_MAX is less than 0x7fffffff
 		return rand();

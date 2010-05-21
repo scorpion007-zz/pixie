@@ -78,7 +78,7 @@
 #include "ribOut.h"
 
 // include "isfinite" macro on Windows systems
-#if defined(_WINDOWS) && (!defined(isfinite))
+#if defined(_WIN32) && (!defined(isfinite))
 #define isfinite(x)	_finite(x)
 #endif
 
