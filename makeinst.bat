@@ -7,6 +7,9 @@ if "%1" == "x64" (
 )
 
 SET ConfigType=Release
+if "%2" == "Debug" (
+  SET ConfigType=%2
+)
 
 rmdir /Q /S Pixie\%platform%\
 mkdir Pixie\%platform%\
@@ -20,15 +23,15 @@ mkdir Pixie\%platform%\doc
 
 REM Copy third party dependencies.
 if "%platform%" == "Win32" (
-  copy bin\%platform%\libtiff3.dll Pixie\%platform%\bin
+  copy thirdparty\%platform%\libtiff3.dll Pixie\%platform%\bin
 ) else (
-  copy bin\%platform%\libtiff.dll Pixie\%platform%\bin
+  copy thirdparty\%platform%\libtiff.dll Pixie\%platform%\bin
 )
 
-copy bin\%platform%\jpeg62.dll Pixie\%platform%\bin
-copy bin\%platform%\libpng12.dll Pixie\%platform%\bin
-copy bin\%platform%\zlib1.dll Pixie\%platform%\bin
-copy bin\%platform%\libmmd.dll Pixie\%platform%\bin
+copy thirdparty\%platform%\jpeg62.dll Pixie\%platform%\bin
+copy thirdparty\%platform%\libpng12.dll Pixie\%platform%\bin
+copy thirdparty\%platform%\zlib1.dll Pixie\%platform%\bin
+copy thirdparty\%platform%\libmmd.dll Pixie\%platform%\bin
 
 REM Copy our binaries.
 copy bin\%platform%\%ConfigType%\rndr.exe Pixie\%platform%\bin
@@ -77,4 +80,8 @@ pushd Pixie\%platform%
 7z a -tzip ..\..\%snap_file% .
 popd
 
+echo.
+if "%ConfigType%" == "Debug" (
+  echo WARNING: Debug version deployed!
+)
 echo Snapshot file: %snap_file%
