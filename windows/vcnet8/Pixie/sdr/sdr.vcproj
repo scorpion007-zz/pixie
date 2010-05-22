@@ -73,6 +73,7 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="true"
+				SetChecksum="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 			/>
@@ -154,6 +155,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				LargeAddressAware="2"
+				SetChecksum="true"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -232,9 +234,10 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
+				SetChecksum="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 			/>
@@ -314,10 +317,11 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				LargeAddressAware="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="1"
+				SetChecksum="true"
 				TargetMachine="17"
 			/>
 			<Tool

@@ -69,6 +69,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\bin\$(PlatformName)\$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				SetChecksum="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -146,6 +147,7 @@
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				LargeAddressAware="2"
+				SetChecksum="true"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -220,6 +222,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				SetChecksum="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -297,6 +300,7 @@
 				LargeAddressAware="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				SetChecksum="true"
 				TargetMachine="17"
 			/>
 			<Tool
